@@ -1,46 +1,42 @@
 import { parseNeed } from "./parse-need.js";
 import Immutable from "immutable";
 import won from "../../won-es6.js";
+import { get } from "../../utils.js";
 
-export function addNeed(needs, jsonldNeed, isOwned) {
+export function addNeed(needs, jsonldNeed) {
   let newState;
   let parsedNeed = parseNeed(jsonldNeed);
+  const parsedNeedUri = get(parsedNeed, "uri");
 
-  if (parsedNeed && parsedNeed.get("uri")) {
-    let existingNeed = needs.get(parsedNeed.get("uri"));
-    const isExistingOwnedNeed = existingNeed && existingNeed.get("isOwned");
+  if (parsedNeedUri) {
+    let existingNeed = get(needs, parsedNeedUri);
 
     if (existingNeed) {
-      if (isOwned || isExistingOwnedNeed) {
-        parsedNeed = parsedNeed
-          .set("connections", existingNeed.get("connections"))
-          .set("isOwned", true);
-      } else if (!isOwned) {
-        parsedNeed = parsedNeed
-          .set("connections", existingNeed.get("connections"))
-          .set("isOwned", false);
-      }
+      parsedNeed = parsedNeed.set(
+        "connections",
+        get(existingNeed, "connections")
+      );
 
-      const heldNeedUris = parsedNeed.get("holds");
+      const heldNeedUris = get(parsedNeed, "holds");
       if (heldNeedUris.size > 0) {
         heldNeedUris.map(needUri => {
-          if (!needs.get(needUri) || !needs.getIn([needUri, "isOwned"])) {
+          if (!get(needs, needUri)) {
             needs = addTheirNeedToLoad(needs, needUri);
           }
         });
       }
 
-      const groupMemberUris = parsedNeed.get("groupMembers");
+      const groupMemberUris = get(parsedNeed, "groupMembers");
       if (groupMemberUris.size > 0) {
         groupMemberUris.map(needUri => {
-          if (!needs.get(needUri) || !needs.getIn([needUri, "isOwned"])) {
+          if (!get(needs, needUri)) {
             needs = addTheirNeedToLoad(needs, needUri);
           }
         });
       }
     }
 
-    return needs.set(parsedNeed.get("uri"), parsedNeed);
+    return needs.set(parsedNeedUri, parsedNeed);
   } else {
     console.error("Tried to add invalid need-object: ", jsonldNeed);
     newState = needs;
@@ -159,7 +155,6 @@ export function addNeedInCreation(needs, needInCreation, needUri) {
 
   if (need) {
     need = need.set("uri", needUri);
-    need = need.set("isOwned", true);
     need = need.set("isBeingCreated", true);
     need = need.set("connections", Immutable.Map());
 

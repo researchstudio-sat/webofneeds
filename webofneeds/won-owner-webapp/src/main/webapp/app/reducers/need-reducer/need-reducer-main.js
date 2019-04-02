@@ -56,10 +56,10 @@ export default function(allNeedsInState = initialState, action = {}) {
 
     case actionTypes.account.loginStarted:
       // starting a new login process. this could mean switching
-      // to a different session. we need to mark any needs
-      // that are already loaded as non-owned.
+      // to a different session. we need to remove all connections
+      // that are already of loaded needs loaded.
       return allNeedsInState.map(need =>
-        need.set("isOwned", false).set("connections", Immutable.Map())
+        need.set("connections", Immutable.Map())
       );
 
     case actionTypes.needs.storeOwnedActiveUris: {
@@ -96,7 +96,7 @@ export default function(allNeedsInState = initialState, action = {}) {
       needs = needs ? needs : Immutable.Set();
 
       return needs.reduce(
-        (updatedState, need) => addNeed(updatedState, need, true),
+        (updatedState, need) => addNeed(updatedState, need),
         allNeedsInState
       );
     }
@@ -122,7 +122,7 @@ export default function(allNeedsInState = initialState, action = {}) {
       needs = needs ? needs : Immutable.Set();
 
       return needs.reduce(
-        (updatedState, need) => addNeed(updatedState, need, false),
+        (updatedState, need) => addNeed(updatedState, need),
         allNeedsInState
       );
     }
@@ -229,7 +229,7 @@ export default function(allNeedsInState = initialState, action = {}) {
     }
 
     case actionTypes.needs.createSuccessful:
-      return addNeed(allNeedsInState, action.payload.need, true);
+      return addNeed(allNeedsInState, action.payload.need);
 
     case actionTypes.messages.openMessageReceived:
     case actionTypes.messages.connectMessageReceived: {
@@ -481,9 +481,6 @@ export default function(allNeedsInState = initialState, action = {}) {
         // connection uri. now that we have the uri, we can store it
         // (see connectAdHoc)
         const needUri = tmpNeed.get("uri");
-        if (!tmpNeed.get("isOwned")) {
-          throw new Error("Need not owned, can't alter connection.");
-        }
 
         const properConnection = tmpConnection
           .delete("usingTemporaryUri")
