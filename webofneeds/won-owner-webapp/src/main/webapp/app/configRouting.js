@@ -164,6 +164,13 @@ export function accessControl({
       return;
     }
 
+    case "settings":
+      if (!accountUtils.isLoggedIn(get(state, "account"))) {
+        event.preventDefault();
+        dispatch(actionCreators.router__stateGoResetParams(defaultRoute));
+      }
+      return;
+
     case "signup":
     case "about":
       return; // can always access these pages.
