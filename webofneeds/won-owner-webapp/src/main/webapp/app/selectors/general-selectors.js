@@ -5,7 +5,7 @@
 import { createSelector } from "reselect";
 
 import { decodeUriComponentProperly, getIn, get } from "../utils.js";
-import { isPersona, isNeed, isActive, isInactive } from "../need-utils.js";
+import * as needUtils from "../need-utils.js";
 import * as accountUtils from "../account-utils.js";
 import Color from "color";
 
@@ -32,7 +32,7 @@ export function getPosts(state) {
   return needs.filter(need => {
     if (!need.getIn(["content", "type"])) return true;
 
-    return isNeed(need) && !isPersona(need);
+    return needUtils.isNeed(need) && !needUtils.isPersona(need);
   });
 }
 
@@ -45,23 +45,27 @@ export const getOwnedPosts = state => {
 
 export function getOwnedOpenPosts(state) {
   const allOwnedNeeds = getOwnedPosts(state);
-  return allOwnedNeeds && allOwnedNeeds.filter(post => isActive(post));
+  return (
+    allOwnedNeeds && allOwnedNeeds.filter(post => needUtils.isActive(post))
+  );
 }
 
 export function getOpenPosts(state) {
   const allPosts = getPosts(state);
-  return allPosts && allPosts.filter(post => isActive(post));
+  return allPosts && allPosts.filter(post => needUtils.isActive(post));
 }
 
 export function getActiveNeeds(state) {
   const allNeeds = getNeeds(state);
-  return allNeeds && allNeeds.filter(need => isActive(need));
+  return allNeeds && allNeeds.filter(need => needUtils.isActive(need));
 }
 
 //TODO: METHOD NAME TO ACTUALLY REPRESENT WHAT THE SELECTOR DOES
 export function getOwnedClosedPosts(state) {
   const allOwnedNeeds = getOwnedPosts(state);
-  return allOwnedNeeds && allOwnedNeeds.filter(post => isInactive(post));
+  return (
+    allOwnedNeeds && allOwnedNeeds.filter(post => needUtils.isInactive(post))
+  );
 }
 
 export function getOwnedNeedsInCreation(state) {
@@ -207,7 +211,7 @@ export const getAboutSectionFromRoute = createSelector(
 
 export function getOwnedPersonas(state) {
   const needs = getOwnedNeeds(state);
-  const personas = needs.toList().filter(need => isPersona(need));
+  const personas = needs.toList().filter(need => needUtils.isPersona(need));
   return personas.map(persona => {
     return {
       displayName: getIn(persona, ["content", "personaName"]),
@@ -245,4 +249,32 @@ export function isNeedOwned(state, needUri) {
     return accountUtils.isNeedOwned(accountState, needUri);
   }
   return false;
+}
+
+/**
+ * This checks if the given needUri is allowed to be used as a template,
+ * it is only allowed if the need exists is NOT owned, and if it has a matchedUseCase
+ * @param needUri
+ * @returns {*|boolean}
+ */
+export function isNeedUsableAsTemplate(state, needUri) {
+  const need = getIn(state, ["needs", needUri]);
+
+  return (
+    !!need && !isNeedOwned(state, needUri) && needUtils.hasMatchedUseCase(need)
+  );
+}
+
+/**
+ * This checks if the given needUri is allowed to be edited,
+ * it is only allowed if the need exists, and if it IS owned and has a matchedUseCase
+ * @param need
+ * @returns {*|boolean}
+ */
+export function isNeedEditable(state, needUri) {
+  const need = getIn(state, ["needs", needUri]);
+
+  return (
+    !!need && isNeedOwned(state, needUri) && needUtils.hasMatchedUseCase(need)
+  );
 }

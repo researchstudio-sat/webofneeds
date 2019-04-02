@@ -104,8 +104,11 @@ function genComponentConf() {
           isOwnPost: generalSelectors.isNeedOwned(state, this.needUri),
           isActive: needUtils.isActive(post),
           isInactive: needUtils.isInactive(post),
-          isUsableAsTemplate: needUtils.isUsableAsTemplate(post),
-          isEditable: needUtils.isEditable(post),
+          isUsableAsTemplate: generalSelectors.isNeedUsableAsTemplate(
+            state,
+            this.needUri
+          ),
+          isEditable: generalSelectors.isNeedEditable(state, this.needUri),
           post,
           postLoading:
             !post || processUtils.isNeedLoading(process, post.get("uri")),

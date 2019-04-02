@@ -6,14 +6,10 @@ import angular from "angular";
 import ngAnimate from "angular-animate";
 import { actionCreators } from "../actions/actions.js";
 import { attach, get, getIn, toAbsoluteURL } from "../utils.js";
-import {
-  getConnectionUriFromRoute,
-  getOwnedNeedByConnectionUri,
-} from "../selectors/general-selectors.js";
+import * as generalSelectors from "../selectors/general-selectors.js";
 import { connect2Redux } from "../won-utils.js";
 import { ownerBaseUrl } from "config";
 import * as connectionUtils from "../connection-utils.js";
-import * as needUtils from "../need-utils.js";
 import * as processUtils from "../process-utils.js";
 
 import "style/_context-dropdown.scss";
@@ -65,6 +61,12 @@ function genComponentConf() {
                         ng-click="self.router__stateGoAbs('connections', {fromNeedUri: self.remoteNeedUri, mode: 'DUPLICATE'})">
                         Post this too!
                     </button>
+                    <button
+                        class="won-button--outlined thin red"
+                        ng-if="self.isRemoteNeedEditable"
+                        ng-click="self.router__stateGoAbs('connections', {fromNeedUri: self.needUri, mode: 'EDIT'})">
+                        Edit
+                    </button>
                     <a class="won-button--outlined thin red"
                         ng-if="self.adminEmail"
                         href="mailto:{{ self.adminEmail }}?{{ self.generateReportPostMailParams()}}">
@@ -84,14 +86,14 @@ function genComponentConf() {
       attach(this, serviceDependencies, arguments);
 
       const selectFromState = state => {
-        const connectionUri = getConnectionUriFromRoute(state);
+        const connectionUri = generalSelectors.getConnectionUriFromRoute(state);
 
         const post =
-          connectionUri && getOwnedNeedByConnectionUri(state, connectionUri);
+          connectionUri &&
+          generalSelectors.getOwnedNeedByConnectionUri(state, connectionUri);
         const connection = post && post.getIn(["connections", connectionUri]);
 
         const remoteNeedUri = getIn(connection, ["remoteNeedUri"]);
-        const remoteNeed = getIn(state, ["needs", remoteNeedUri]);
 
         let linkToPost;
         if (ownerBaseUrl && remoteNeedUri) {
@@ -117,8 +119,13 @@ function genComponentConf() {
           isSentRequest: connectionUtils.isRequestSent(connection),
           isReceivedRequest: connectionUtils.isRequestReceived(connection),
           isSuggested: connectionUtils.isSuggested(connection),
-          isRemoteNeedUsableAsTemplate: needUtils.isUsableAsTemplate(
-            remoteNeed
+          isRemoteNeedUsableAsTemplate: generalSelectors.isNeedUsableAsTemplate(
+            state,
+            remoteNeedUri
+          ),
+          isRemoteNeedEditable: generalSelectors.isNeedEditable(
+            state,
+            remoteNeedUri
           ),
           connectionLoading:
             !connection ||

@@ -228,8 +228,14 @@ function genComponentConf() {
           isEditFromNeed,
           isFromNeedLoading,
           isFromNeedToLoad,
-          isFromNeedEditable: needUtils.isEditable(fromNeed),
-          isFromNeedUsableAsTemplate: needUtils.isUsableAsTemplate(fromNeed),
+          isFromNeedEditable: generalSelectors.isNeedEditable(
+            state,
+            fromNeedUri
+          ),
+          isFromNeedUsableAsTemplate: generalSelectors.isNeedUsableAsTemplate(
+            state,
+            fromNeedUri
+          ),
           isHoldable: useCaseUtils.isHoldable(useCase),
           hasFromNeedFailedToLoad,
           showCreateInput:
