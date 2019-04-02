@@ -241,7 +241,7 @@ export function currentSkin() {
 /**
  * Returns true if the need is owned by the user who is currently logged in
  * @param state FULL redux state, no substates allowed
- * @param needUri needUri to check isOwned state
+ * @param needUri
  */
 export function isNeedOwned(state, needUri) {
   if (needUri) {
