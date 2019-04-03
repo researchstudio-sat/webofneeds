@@ -5,8 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import won.node.camel.processor.AbstractFromOwnerCamelProcessor;
+import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.camel.processor.annotation.FixedMessageProcessor;
 import won.protocol.message.WonMessage;
 import won.protocol.message.processor.camel.WonCamelConstants;
@@ -18,7 +17,7 @@ import won.protocol.vocabulary.WONMSG;
  */
 @Component
 @FixedMessageProcessor(direction = WONMSG.TYPE_FROM_SYSTEM_STRING, messageType = WONMSG.TYPE_OPEN_STRING)
-public class OpenMessageFromSystemProcessor extends AbstractFromOwnerCamelProcessor {
+public class OpenMessageFromSystemProcessor extends AbstractCamelProcessor {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     @Autowired
     private OpenMessageFromOwnerProcessor openFromOwnerProcessor;

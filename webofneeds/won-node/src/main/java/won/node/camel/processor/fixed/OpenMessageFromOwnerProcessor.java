@@ -7,8 +7,7 @@ import java.util.Optional;
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.springframework.stereotype.Component;
-
-import won.node.camel.processor.AbstractFromOwnerCamelProcessor;
+import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.camel.processor.annotation.FixedMessageProcessor;
 import won.node.camel.processor.general.OutboundMessageFactoryProcessor;
 import won.protocol.message.WonMessage;
@@ -26,7 +25,7 @@ import won.protocol.vocabulary.WONMSG;
  */
 @Component
 @FixedMessageProcessor(direction = WONMSG.TYPE_FROM_OWNER_STRING, messageType = WONMSG.TYPE_OPEN_STRING)
-public class OpenMessageFromOwnerProcessor extends AbstractFromOwnerCamelProcessor {
+public class OpenMessageFromOwnerProcessor extends AbstractCamelProcessor {
     public void process(final Exchange exchange) throws Exception {
         Message message = exchange.getIn();
         WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.MESSAGE_HEADER);
@@ -43,15 +42,9 @@ public class OpenMessageFromOwnerProcessor extends AbstractFromOwnerCamelProcess
         if (!con.getConnectionURI().equals(wonMessage.getSenderURI()))
             throw new IllegalStateException("connection uri must be equal to sender uri");
         if (wonMessage.getReceiverURI() != null) {
-            if (!wonMessage.getReceiverURI().equals(con.getRemoteConnectionURI()))
+            if (!wonMessage.getReceiverURI().equals(con.getRemoteConnectionURI())) {
                 throw new IllegalStateException("remote connection uri must be equal to receiver uri");
-            if (con.getRemoteConnectionURI() == null) {
-                // we didn't have it before, now we do:
-                con.setRemoteConnectionURI(wonMessage.getReceiverURI());
             }
-        } else {
-            // do nothing. it's not clean, but easier to implement on the client side
-            // TODO: refactor connection state and open/connect
         }
         // facets: the remote facet in the connection may be null before the open.
         // check if the owner sent a remote facet. there must not be a clash
@@ -111,7 +104,7 @@ public class OpenMessageFromOwnerProcessor extends AbstractFromOwnerCamelProcess
     }
 
     private class OutboundMessageFactory extends OutboundMessageFactoryProcessor {
-        private Connection connection;
+        private final Connection connection;
 
         public OutboundMessageFactory(URI messageURI, Connection connection) {
             super(messageURI);

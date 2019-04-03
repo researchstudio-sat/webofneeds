@@ -6,8 +6,7 @@ import java.util.Optional;
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.springframework.stereotype.Component;
-
-import won.node.camel.processor.AbstractFromOwnerCamelProcessor;
+import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.camel.processor.annotation.FixedMessageProcessor;
 import won.node.camel.processor.general.OutboundMessageFactoryProcessor;
 import won.protocol.exception.NoSuchConnectionException;
@@ -19,7 +18,6 @@ import won.protocol.model.Connection;
 import won.protocol.model.ConnectionEventType;
 import won.protocol.model.ConnectionState;
 import won.protocol.model.Facet;
-import won.protocol.model.MessageEventPlaceholder;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
 import won.protocol.vocabulary.WONMSG;
@@ -29,7 +27,7 @@ import won.protocol.vocabulary.WONMSG;
  */
 @Component
 @FixedMessageProcessor(direction = WONMSG.TYPE_FROM_OWNER_STRING, messageType = WONMSG.TYPE_CONNECT_STRING)
-public class ConnectMessageFromOwnerProcessor extends AbstractFromOwnerCamelProcessor {
+public class ConnectMessageFromOwnerProcessor extends AbstractCamelProcessor {
     public void process(final Exchange exchange) throws Exception {
         Message message = exchange.getIn();
         WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.MESSAGE_HEADER);
@@ -46,7 +44,7 @@ public class ConnectMessageFromOwnerProcessor extends AbstractFromOwnerCamelProc
         Optional<URI> connectionURI = Optional.ofNullable(wonMessage.getSenderURI()); // if the uri is known already, we
                                                                                       // can
                                                                                       // load the connection!
-        Optional<Connection> con = Optional.empty();
+        Optional<Connection> con;
         if (connectionURI.isPresent()) {
             // we know the connection: load it
             con = connectionRepository.findOneByConnectionURIForUpdate(connectionURI.get());
@@ -86,9 +84,7 @@ public class ConnectMessageFromOwnerProcessor extends AbstractFromOwnerCamelProc
                             .of(userDefinedRemoteFacetURI.orElse(lookupDefaultFacet(receiverNeedURI)));
             con = connectionRepository.findOneByNeedURIAndRemoteNeedURIAndFacetURIAndRemoteFacetURIForUpdate(
                             senderNeedURI, receiverNeedURI, actualFacetURI.get(), actualRemoteFacetURI.get());
-            if (con.isPresent()) {
-                // found a connection. use it.
-            } else {
+            if (!con.isPresent()) {
                 // did not find such a connection. It could be the connection exists, but
                 // without a remote facet
                 con = connectionRepository.findOneByNeedURIAndRemoteNeedURIAndFacetURIAndNullRemoteFacetForUpdate(
@@ -136,36 +132,6 @@ public class ConnectMessageFromOwnerProcessor extends AbstractFromOwnerCamelProc
         message.setHeader(WonCamelConstants.OUTBOUND_MESSAGE_FACTORY_HEADER, outboundMessageFactory);
     }
 
-    private WonMessage createMessageToSendToRemoteNode(WonMessage wonMessage, Connection con) {
-        // create the message to send to the remote node
-        return WonMessageBuilder
-                        .setPropertiesForPassingMessageToRemoteNode(wonMessage,
-                                        wonNodeInformationService.generateEventURI(wonMessage.getReceiverNodeURI()))
-                        .setSenderURI(con.getConnectionURI()).build();
-    }
-
-    @Override
-    public void onSuccessResponse(final Exchange exchange) throws Exception {
-        WonMessage responseMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
-        MessageEventPlaceholder mep = this.messageEventRepository
-                        .findOneByCorrespondingRemoteMessageURI(responseMessage.getIsResponseToMessageURI());
-        // update the connection database: set the remote connection URI just obtained
-        // from the response
-        Optional<Connection> con = this.connectionRepository.findOneByConnectionURIForUpdate(mep.getSenderURI());
-        con.get().setRemoteConnectionURI(responseMessage.getSenderURI());
-        this.connectionRepository.save(con.get());
-    }
-
-    @Override
-    public void onFailureResponse(final Exchange exchange) throws Exception {
-        // TODO: define what to do if the connect fails remotely option: create a system
-        // message of type CLOSE,
-        // and forward it only to the owner. Add an explanation (a reference to the
-        // failure response and some
-        // expplanation text.
-        logger.warn("The remote end responded with a failure message. Our behaviour is now undefined.");
-    }
-
     private URI lookupDefaultFacet(URI needURI) {
         // look up the default facet and use that one
         return WonLinkedDataUtils.getDefaultFacet(needURI, true, linkedDataSource)
@@ -173,7 +139,7 @@ public class ConnectMessageFromOwnerProcessor extends AbstractFromOwnerCamelProc
     }
 
     private class OutboundMessageFactory extends OutboundMessageFactoryProcessor {
-        private Connection connection;
+        private final Connection connection;
 
         public OutboundMessageFactory(URI messageURI, Connection connection) {
             super(messageURI);

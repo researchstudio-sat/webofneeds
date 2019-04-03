@@ -13,7 +13,7 @@ package won.node.camel.processor.fixed;
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.springframework.stereotype.Component;
-import won.node.camel.processor.AbstractFromOwnerCamelProcessor;
+import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.camel.processor.annotation.FixedMessageProcessor;
 import won.node.camel.processor.general.OutboundMessageFactoryProcessor;
 import won.protocol.exception.IllegalMessageForConnectionStateException;
@@ -30,7 +30,7 @@ import java.net.URI;
 
 @Component
 @FixedMessageProcessor(direction = WONMSG.TYPE_FROM_SYSTEM_STRING, messageType = WONMSG.TYPE_CHANGE_NOTIFICATION_STRING)
-public class SendChangeNotificationMessageFromSystemProcessor extends AbstractFromOwnerCamelProcessor {
+public class SendChangeNotificationMessageFromSystemProcessor extends AbstractCamelProcessor {
     public void process(final Exchange exchange) throws Exception {
         Message message = exchange.getIn();
         WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.MESSAGE_HEADER);
@@ -61,7 +61,7 @@ public class SendChangeNotificationMessageFromSystemProcessor extends AbstractFr
     }
 
     private class OutboundMessageFactory extends OutboundMessageFactoryProcessor {
-        private Connection connection;
+        private final Connection connection;
 
         public OutboundMessageFactory(URI messageURI, Connection connection) {
             super(messageURI);
