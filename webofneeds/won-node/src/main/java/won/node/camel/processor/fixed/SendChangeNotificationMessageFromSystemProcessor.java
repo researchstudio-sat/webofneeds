@@ -40,7 +40,8 @@ public class SendChangeNotificationMessageFromSystemProcessor extends AbstractFr
         }
         Connection con = connectionRepository.findOneByConnectionURIForUpdate(connectionUri).get();
         if (con.getState() != ConnectionState.CONNECTED) {
-            throw new IllegalMessageForConnectionStateException(connectionUri, "CHANGE_NOTIFICATION_MESSAGE", con.getState());
+            throw new IllegalMessageForConnectionStateException(connectionUri, "CHANGE_NOTIFICATION_MESSAGE",
+                            con.getState());
         }
         URI remoteMessageUri = wonNodeInformationService.generateEventURI(wonMessage.getReceiverNodeURI());
         if (wonMessage.getReceiverURI() == null) {
