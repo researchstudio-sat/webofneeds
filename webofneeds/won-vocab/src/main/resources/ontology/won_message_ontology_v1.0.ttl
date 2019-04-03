@@ -249,6 +249,17 @@
                rdfs:isDefinedBy <http://purl.org/webofneeds/message> .
 			   
 
+###  http://purl.org/webofneeds/message#ChangeNotificationMessage
+
+:ChangeNotificationMessage rdf:type owl:Class ;
+
+               rdfs:subClassOf :MessageType ;
+
+               rdfs:comment "Type of message sent from a WoN Node to indicate that the remote Need has changed."@en ;
+
+               rdfs:isDefinedBy <http://purl.org/webofneeds/message> .
+
+
 ###  http://purl.org/webofneeds/message#DeactivateMessage
 
 :DeactivateMessage rdf:type owl:Class ;
