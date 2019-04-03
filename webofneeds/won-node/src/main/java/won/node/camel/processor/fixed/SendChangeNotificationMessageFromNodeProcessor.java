@@ -31,7 +31,8 @@ public class SendChangeNotificationMessageFromNodeProcessor extends AbstractCame
         }
         Connection con = connectionRepository.findOneByConnectionURIForUpdate(connectionUri).get();
         if (con.getState() != ConnectionState.CONNECTED) {
-            throw new IllegalMessageForConnectionStateException(connectionUri, "CHANGE_NOTIFICATION_MESSAGE", con.getState());
+            throw new IllegalMessageForConnectionStateException(connectionUri, "CHANGE_NOTIFICATION_MESSAGE",
+                            con.getState());
         }
         if (logger.isDebugEnabled()) {
             logger.debug("received this ChangeNotificationMessage FromExternal:\n{}",
