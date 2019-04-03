@@ -1,11 +1,8 @@
 package won.node.camel.processor.fixed;
 
-import java.net.URI;
-
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.springframework.stereotype.Component;
-
 import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.camel.processor.annotation.FixedMessageProcessor;
 import won.protocol.exception.IllegalMessageForConnectionStateException;
@@ -17,12 +14,14 @@ import won.protocol.model.ConnectionState;
 import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.WONMSG;
 
+import java.net.URI;
+
 /**
  * User: syim Date: 02.03.2015
  */
 @Component
-@FixedMessageProcessor(direction = WONMSG.TYPE_FROM_EXTERNAL_STRING, messageType = WONMSG.TYPE_CONNECTION_MESSAGE_STRING)
-public class SendMessageFromNodeProcessor extends AbstractCamelProcessor {
+@FixedMessageProcessor(direction = WONMSG.TYPE_FROM_EXTERNAL_STRING, messageType = WONMSG.TYPE_CHANGE_NOTIFICATION_STRING)
+public class SendChangeNotificationMessageFromNodeProcessor extends AbstractCamelProcessor {
     public void process(final Exchange exchange) throws Exception {
         Message message = exchange.getIn();
         WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.MESSAGE_HEADER);
@@ -32,10 +31,10 @@ public class SendMessageFromNodeProcessor extends AbstractCamelProcessor {
         }
         Connection con = connectionRepository.findOneByConnectionURIForUpdate(connectionUri).get();
         if (con.getState() != ConnectionState.CONNECTED) {
-            throw new IllegalMessageForConnectionStateException(connectionUri, "CONNECTION_MESSAGE", con.getState());
+            throw new IllegalMessageForConnectionStateException(connectionUri, "CHANGE_NOTIFICATION_MESSAGE", con.getState());
         }
         if (logger.isDebugEnabled()) {
-            logger.debug("received this ConnectionMessage FromExternal:\n{}",
+            logger.debug("received this ChangeNotificationMessage FromExternal:\n{}",
                             RdfUtils.toString(wonMessage.getCompleteDataset()));
             if (wonMessage.getForwardedMessageURI() != null) {
                 logger.debug("This message contains the forwarded message {}", wonMessage.getForwardedMessageURI());
