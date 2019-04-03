@@ -66,53 +66,18 @@ public class MessageTypeSlipComputer implements InitializingBean, ApplicationCon
         assert messageType != null : "messageType header must not be null";
         URI direction = (URI) exchange.getIn().getHeader(WonCamelConstants.DIRECTION_HEADER);
         assert direction != null : "direction header must not be null";
-        String method = "process";
-        if (WonMessageDirection.FROM_EXTERNAL.isIdentifiedBy(direction)) {
-            // check if we're handling a response. If so, do special routing
-            // the response comes from the remote node, but the handler we need is the
-            // one that sent the original message, so we have to switch direction
-            // and we have to set the type to the type of the original message that
-            // we are now handling the response to
-            if (WonMessageType.SUCCESS_RESPONSE.isIdentifiedBy(messageType)) {
-                method = "onSuccessResponse";
-                direction = URI.create(WonMessageDirection.FROM_OWNER.getResource().toString());
-                WonMessageType origType = message.getIsResponseToMessageType();
-                if (origType == null) {
-                    throw new MissingMessagePropertyException(
-                                    URI.create(WONMSG.IS_RESPONSE_TO_MESSAGE_TYPE.getURI().toString()));
-                }
-                messageType = origType.getURI();
-            } else if (WonMessageType.FAILURE_RESPONSE.isIdentifiedBy(messageType)) {
-                WonMessageType isResponseToType = message.getIsResponseToMessageType();
-                if (WonMessageType.FAILURE_RESPONSE == isResponseToType
-                                || WonMessageType.SUCCESS_RESPONSE == isResponseToType) {
-                    // exception from the exception: if we're handling a FailureResponse
-                    // to a response - in that case, don't compute a slip value - no bean
-                    // will specially process this.
-                    return null;
-                }
-                method = "onFailureResponse";
-                direction = URI.create(WonMessageDirection.FROM_OWNER.getResource().toString());
-                WonMessageType origType = message.getIsResponseToMessageType();
-                if (origType == null) {
-                    throw new MissingMessagePropertyException(
-                                    URI.create(WONMSG.IS_RESPONSE_TO_MESSAGE_TYPE.getURI().toString()));
-                }
-                messageType = origType.getURI();
-            }
-        }
         try {
             String bean = computeMessageTypeSlip(messageType, direction);
             if (bean == null) {
                 return null;
             }
-            slip = "bean:" + bean + "?method=" + method;
+            slip = "bean:" + bean + "?method=process";
         } catch (NoSuchMethodException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         } catch (InvocationTargetException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         } catch (IllegalAccessException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         }
         return type.cast(slip);
     }
@@ -143,24 +108,24 @@ public class MessageTypeSlipComputer implements InitializingBean, ApplicationCon
         if (annotation == null || messageType == null || direction == null)
             return false;
         if (messageType != null) {
-            if (!annotationFeatureMatches(annotation, messageType.toString(), "messageType")) {
+            if (annotationFeatureMismatch(annotation, messageType.toString(), "messageType")) {
                 return false;
             }
         }
         if (direction != null) {
-            if (!annotationFeatureMatches(annotation, direction.toString(), "direction")) {
+            if (annotationFeatureMismatch(annotation, direction.toString(), "direction")) {
                 return false;
             }
         }
         if (facetType != null) {
-            if (!annotationFeatureMatches(annotation, facetType.toString(), "facetType")) {
+            if (annotationFeatureMismatch(annotation, facetType.toString(), "facetType")) {
                 return false;
             }
         }
         return true;
     }
 
-    private boolean annotationFeatureMatches(Annotation annotation, String expected, String featureName)
+    private boolean annotationFeatureMismatch(Annotation annotation, String expected, String featureName)
                     throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         return expected.equals(annotation.annotationType().getDeclaredMethod(featureName).invoke(annotation));
     }
