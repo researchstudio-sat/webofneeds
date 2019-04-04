@@ -43,11 +43,11 @@ public class ReplaceNeedMessageFromOwnerReactionProcessor extends AbstractCamelP
 
     public void process(final Exchange exchange) throws Exception {
         WonMessage wonMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
-        URI receiverNeedURI = wonMessage.getReceiverNeedURI();
-        logger.debug("Replaced need. needURI:{}", receiverNeedURI);
-        if (receiverNeedURI == null)
-            throw new WonMessageProcessingException("receiverNeedURI is not set");
-        Need need = DataAccessUtils.loadNeed(needRepository, receiverNeedURI);
+        URI needURI = wonMessage.getSenderNeedURI();
+        if (needURI == null)
+            throw new IllegalArgumentException("senderNeedURI not found!");
+        logger.debug("Reacting to need replacement. NeedURI:{}", needURI);
+        Need need = DataAccessUtils.loadNeed(needRepository, needURI);
         matcherProtocolMatcherClient.needModified(need.getNeedURI(), wonMessage);
         // notify all connections
         Collection<Connection> conns = connectionRepository.findByNeedURIAndState(need.getNeedURI(),
