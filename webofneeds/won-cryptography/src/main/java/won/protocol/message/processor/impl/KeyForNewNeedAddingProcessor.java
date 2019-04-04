@@ -56,6 +56,20 @@ public class KeyForNewNeedAddingProcessor implements WonMessageProcessor {
                 Model contentModel = msgDataset.getNamedModel(contentName);
                 keyWriter.writeToModel(contentModel, contentModel.createResource(needUri), pubKey);
                 return new WonMessage(msgDataset);
+            } else if (message.getMessageType() == WonMessageType.REPLACE) {
+                String needUri = message.getSenderNeedURI().toString();
+                Dataset msgDataset = WonMessageEncoder.encodeAsDataset(message);
+                // we should already have the key. If not, that's a problem!
+                String alias = keyPairAliasDerivationStrategy.getAliasForNeedUri(needUri);
+                if (cryptographyService.getPrivateKey(alias) == null) {
+                    throw new IllegalStateException("Cannot replace need " + needUri + ": no key pair found");
+                }
+                PublicKey pubKey = cryptographyService.getPublicKey(alias);
+                WonKeysReaderWriter keyWriter = new WonKeysReaderWriter();
+                String contentName = message.getContentGraphURIs().get(0);
+                Model contentModel = msgDataset.getNamedModel(contentName);
+                keyWriter.writeToModel(contentModel, contentModel.createResource(needUri), pubKey);
+                return new WonMessage(msgDataset);
             }
         } catch (Exception e) {
             logger.error("Failed to add key", e);
