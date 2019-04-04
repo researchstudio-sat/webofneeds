@@ -110,6 +110,6 @@ public class FacetTypeSlipComputer implements InitializingBean, ApplicationConte
 
     private boolean annotationFeatureMismatch(Annotation annotation, String expected, String featureName)
                     throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        return expected.equals(annotation.annotationType().getDeclaredMethod(featureName).invoke(annotation));
+        return !expected.equals(annotation.annotationType().getDeclaredMethod(featureName).invoke(annotation));
     }
 }
