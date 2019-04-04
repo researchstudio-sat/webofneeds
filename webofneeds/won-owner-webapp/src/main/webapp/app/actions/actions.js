@@ -86,7 +86,10 @@ import * as cnct from "./connections-actions.js";
 import * as messages from "./messages-actions.js";
 import * as configActions from "./config-actions.js";
 
-import { pageLoadAction } from "./load-action.js";
+import {
+  pageLoadAction,
+  fetchAllActiveNeedUrisFromOwner,
+} from "./load-action.js";
 import { stateGo, stateReload } from "redux-ui-router";
 import {
   createPersona,
@@ -157,6 +160,8 @@ const actionHierarchy = {
     connect: needsConnect,
     fetchUnloadedNeeds: fetchUnloadedNeeds,
     fetchUnloadedNeed: fetchUnloadedNeed,
+
+    fetchAllActiveNeedUrisFromOwner: fetchAllActiveNeedUrisFromOwner,
 
     storeOwnedInactiveUris: INJ_DEFAULT,
     storeOwnedInactiveUrisInLoading: INJ_DEFAULT,
