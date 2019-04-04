@@ -107,20 +107,12 @@ public class MessageTypeSlipComputer implements InitializingBean, ApplicationCon
                     throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         if (annotation == null || messageType == null || direction == null)
             return false;
-        if (messageType != null) {
-            if (annotationFeatureMismatch(annotation, messageType.toString(), "messageType")) {
-                return false;
-            }
+        if (annotationFeatureMismatch(annotation, messageType.toString(), "messageType")
+                        || annotationFeatureMismatch(annotation, direction.toString(), "direction")) {
+            return false;
         }
-        if (direction != null) {
-            if (annotationFeatureMismatch(annotation, direction.toString(), "direction")) {
-                return false;
-            }
-        }
-        if (facetType != null) {
-            if (annotationFeatureMismatch(annotation, facetType.toString(), "facetType")) {
-                return false;
-            }
+        if (facetType != null && annotationFeatureMismatch(annotation, facetType.toString(), "facetType")) {
+            return false;
         }
         return true;
     }
