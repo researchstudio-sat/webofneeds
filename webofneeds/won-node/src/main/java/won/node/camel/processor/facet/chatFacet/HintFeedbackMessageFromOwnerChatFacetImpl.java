@@ -12,8 +12,7 @@ package won.node.camel.processor.facet.chatFacet;
 
 import org.apache.camel.Exchange;
 import org.springframework.stereotype.Component;
-
-import won.node.camel.processor.AbstractFromOwnerCamelProcessor;
+import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.camel.processor.annotation.DefaultFacetMessageProcessor;
 import won.node.camel.processor.annotation.FacetMessageProcessor;
 import won.protocol.vocabulary.WON;
@@ -25,7 +24,7 @@ import won.protocol.vocabulary.WONMSG;
 @Component
 @DefaultFacetMessageProcessor(direction = WONMSG.TYPE_FROM_OWNER_STRING, messageType = WONMSG.TYPE_HINT_FEEDBACK_STRING)
 @FacetMessageProcessor(facetType = WON.CHAT_FACET_STRING, direction = WONMSG.TYPE_FROM_OWNER_STRING, messageType = WONMSG.TYPE_HINT_FEEDBACK_STRING)
-public class HintFeedbackMessageFromOwnerChatFacetImpl extends AbstractFromOwnerCamelProcessor {
+public class HintFeedbackMessageFromOwnerChatFacetImpl extends AbstractCamelProcessor {
     @Override
     public void process(final Exchange exchange) {
         logger.debug("default facet implementation, not doing anything");

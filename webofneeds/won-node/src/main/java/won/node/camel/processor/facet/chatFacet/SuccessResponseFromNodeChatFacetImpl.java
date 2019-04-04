@@ -9,12 +9,12 @@ import won.protocol.vocabulary.WON;
 import won.protocol.vocabulary.WONMSG;
 
 /**
- * User: syim Date: 05.03.2015
+ * User: quasarchimaere Date: 04.04.2019
  */
 @Component
-@DefaultFacetMessageProcessor(direction = WONMSG.TYPE_FROM_OWNER_STRING, messageType = WONMSG.TYPE_OPEN_STRING)
-@FacetMessageProcessor(facetType = WON.CHAT_FACET_STRING, direction = WONMSG.TYPE_FROM_OWNER_STRING, messageType = WONMSG.TYPE_OPEN_STRING)
-public class OpenFromOwnerChatFacetImpl extends AbstractCamelProcessor {
+@DefaultFacetMessageProcessor(direction = WONMSG.TYPE_FROM_EXTERNAL_STRING, messageType = WONMSG.TYPE_SUCCESS_RESPONSE_STRING)
+@FacetMessageProcessor(facetType = WON.CHAT_FACET_STRING, direction = WONMSG.TYPE_FROM_EXTERNAL_STRING, messageType = WONMSG.TYPE_SUCCESS_RESPONSE_STRING)
+public class SuccessResponseFromNodeChatFacetImpl extends AbstractCamelProcessor {
     @Override
     public void process(final Exchange exchange) {
         logger.debug("default facet implementation, not doing anything");

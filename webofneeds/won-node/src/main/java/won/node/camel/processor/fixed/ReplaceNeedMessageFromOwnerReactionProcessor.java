@@ -23,6 +23,7 @@ import won.node.camel.processor.annotation.FixedMessageReactionProcessor;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
 import won.protocol.message.WonMessageDirection;
+import won.protocol.message.WonMessageType;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.message.processor.exception.WonMessageProcessingException;
 import won.protocol.model.Connection;
@@ -52,17 +53,17 @@ public class ReplaceNeedMessageFromOwnerReactionProcessor extends AbstractCamelP
         Collection<Connection> conns = connectionRepository.findByNeedURIAndState(need.getNeedURI(),
                         ConnectionState.CONNECTED);
         for (Connection con : conns) {
-            sendMessage(need, con, "Note: need content was changed.");
+            sendChangeNotificationMessage(need, con);
         }
     }
 
-    public void sendMessage(final Need need, final Connection con, String textMessage) {
+    private void sendChangeNotificationMessage(final Need need, final Connection con) {
         // send message from system via connection
         URI messageURI = wonNodeInformationService.generateEventURI();
         URI remoteWonNodeURI = wonNodeInformationService.getWonNodeUri(con.getRemoteNeedURI());
-        WonMessage message = WonMessageBuilder.setMessagePropertiesForSystemMessageToRemoteNeed(messageURI,
-                        con.getConnectionURI(), con.getNeedURI(), need.getWonNodeURI(), con.getRemoteConnectionURI(),
-                        con.getRemoteNeedURI(), remoteWonNodeURI, textMessage).build();
+        WonMessage message = WonMessageBuilder.setMessagePropertiesForSystemChangeNotificationMessageToRemoteNeed(
+                        messageURI, con.getConnectionURI(), con.getNeedURI(), need.getWonNodeURI(),
+                        con.getRemoteConnectionURI(), con.getRemoteNeedURI(), remoteWonNodeURI).build();
         sendSystemMessage(message);
     }
 }

@@ -380,6 +380,23 @@ public class WonMessageBuilder {
                         .setSentTimestampToNow();
     }
 
+    public static WonMessageBuilder setMessagePropertiesForSystemChangeNotificationMessageToRemoteNeed(URI messageURI,
+                    URI localConnection, URI localNeed, URI localWonNode, URI remoteConnection, URI remoteNeed,
+                    URI remoteNode, String textMessage) {
+        return new WonMessageBuilder(messageURI).setWonMessageDirection(WonMessageDirection.FROM_SYSTEM)
+                        .setWonMessageType(WonMessageType.CHANGE_NOTIFICATION).setSenderURI(localConnection)
+                        .setSenderNeedURI(localNeed).setSenderNodeURI(localWonNode).setReceiverURI(remoteConnection)
+                        .setReceiverNeedURI(remoteNeed).setReceiverNodeURI(remoteNode).setTextMessage(textMessage)
+                        .setSentTimestampToNow();
+    }
+
+    public static WonMessageBuilder setMessagePropertiesForSystemChangeNotificationMessageToRemoteNeed(URI messageURI,
+                    URI localConnection, URI localNeed, URI localWonNode, URI remoteConnection, URI remoteNeed,
+                    URI remoteNode) {
+        return setMessagePropertiesForSystemChangeNotificationMessageToRemoteNeed(messageURI, localConnection,
+                        localNeed, localWonNode, remoteConnection, remoteNeed, remoteNode, null);
+    }
+
     public static WonMessageBuilder setMessagePropertiesForDeactivateFromOwner(URI messageURI, URI localNeed,
                     URI localWonNode) {
         return new WonMessageBuilder(messageURI).setWonMessageDirection(WonMessageDirection.FROM_OWNER)

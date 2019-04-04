@@ -43,6 +43,8 @@ public class ShouldCallFacetImplForMessagePredicate implements Predicate {
                 return false;
             case REPLACE:
                 return false;
+            case CHANGE_NOTIFICATION:
+                return false;
             default:
                 break;
         }

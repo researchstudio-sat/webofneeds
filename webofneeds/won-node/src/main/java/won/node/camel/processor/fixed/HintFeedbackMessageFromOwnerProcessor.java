@@ -18,8 +18,7 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.springframework.stereotype.Component;
-
-import won.node.camel.processor.AbstractFromOwnerCamelProcessor;
+import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.camel.processor.annotation.FixedMessageProcessor;
 import won.protocol.message.WonMessage;
 import won.protocol.message.processor.camel.WonCamelConstants;
@@ -33,7 +32,7 @@ import won.protocol.vocabulary.WONMSG;
  */
 @Component
 @FixedMessageProcessor(direction = WONMSG.TYPE_FROM_OWNER_STRING, messageType = WONMSG.TYPE_HINT_FEEDBACK_STRING)
-public class HintFeedbackMessageFromOwnerProcessor extends AbstractFromOwnerCamelProcessor {
+public class HintFeedbackMessageFromOwnerProcessor extends AbstractCamelProcessor {
     public void process(final Exchange exchange) throws Exception {
         Message message = exchange.getIn();
         WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.MESSAGE_HEADER);
@@ -46,24 +45,20 @@ public class HintFeedbackMessageFromOwnerProcessor extends AbstractFromOwnerCame
     /**
      * Finds feedback in the message, processes it and removes it from the message.
      *
-     * @param con
-     * @param message
-     * @return true if feedback was present, false otherwise
+     * @param con the feedback should be processed in
+     * @param message contains the feedback
      */
     private void processFeedbackMessage(final Connection con, final WonMessage message) {
         assert con != null : "connection must not be null";
         assert message != null : "message must not be null";
         final URI messageURI = message.getMessageURI();
-        RdfUtils.visit(message.getMessageContent(), new RdfUtils.ModelVisitor<Object>() {
-            @Override
-            public Model visit(final Model model) {
-                Resource baseResource = model.getResource(messageURI.toString());
-                if (baseResource.hasProperty(WON.HAS_FEEDBACK)) {
-                    // add the base resource as a feedback event to the connection
-                    processFeedback(con, baseResource);
-                }
-                return null;
+        RdfUtils.visit(message.getMessageContent(), model -> {
+            Resource baseResource = model.getResource(messageURI.toString());
+            if (baseResource.hasProperty(WON.HAS_FEEDBACK)) {
+                // add the base resource as a feedback event to the connection
+                processFeedback(con, baseResource);
             }
+            return null;
         });
     }
 

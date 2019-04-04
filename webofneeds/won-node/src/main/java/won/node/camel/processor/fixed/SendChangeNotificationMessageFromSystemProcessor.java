@@ -10,8 +10,6 @@
  */
 package won.node.camel.processor.fixed;
 
-import java.net.URI;
-
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.springframework.stereotype.Component;
@@ -28,9 +26,11 @@ import won.protocol.model.Connection;
 import won.protocol.model.ConnectionState;
 import won.protocol.vocabulary.WONMSG;
 
+import java.net.URI;
+
 @Component
-@FixedMessageProcessor(direction = WONMSG.TYPE_FROM_SYSTEM_STRING, messageType = WONMSG.TYPE_CONNECTION_MESSAGE_STRING)
-public class SendMessageFromSystemProcessor extends AbstractCamelProcessor {
+@FixedMessageProcessor(direction = WONMSG.TYPE_FROM_SYSTEM_STRING, messageType = WONMSG.TYPE_CHANGE_NOTIFICATION_STRING)
+public class SendChangeNotificationMessageFromSystemProcessor extends AbstractCamelProcessor {
     public void process(final Exchange exchange) throws Exception {
         Message message = exchange.getIn();
         WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.MESSAGE_HEADER);
@@ -40,7 +40,8 @@ public class SendMessageFromSystemProcessor extends AbstractCamelProcessor {
         }
         Connection con = connectionRepository.findOneByConnectionURIForUpdate(connectionUri).get();
         if (con.getState() != ConnectionState.CONNECTED) {
-            throw new IllegalMessageForConnectionStateException(connectionUri, "CONNECTION_MESSAGE", con.getState());
+            throw new IllegalMessageForConnectionStateException(connectionUri, "CHANGE_NOTIFICATION_MESSAGE",
+                            con.getState());
         }
         URI remoteMessageUri = wonNodeInformationService.generateEventURI(wonMessage.getReceiverNodeURI());
         if (wonMessage.getReceiverURI() == null) {
