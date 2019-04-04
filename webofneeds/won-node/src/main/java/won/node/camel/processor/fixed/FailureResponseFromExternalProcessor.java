@@ -13,7 +13,7 @@ import won.protocol.vocabulary.WONMSG;
  * User: quasarchimaere Date: 03.04.2019
  */
 @Component
-@FixedMessageProcessor(direction = WONMSG.TYPE_FROM_OWNER_STRING, messageType = WONMSG.TYPE_CONNECT_STRING)
+@FixedMessageProcessor(direction = WONMSG.TYPE_FROM_OWNER_STRING, messageType = WONMSG.TYPE_FAILURE_RESPONSE_STRING)
 public class FailureResponseFromExternalProcessor extends AbstractCamelProcessor {
     public void process(final Exchange exchange) throws Exception {
         WonMessage responseMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
