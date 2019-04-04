@@ -40,6 +40,7 @@ import won.owner.model.User;
 import won.owner.model.UserNeed;
 import won.owner.pojo.CreateDraftPojo;
 import won.owner.repository.DraftRepository;
+import won.owner.repository.UserNeedRepository;
 import won.owner.repository.UserRepository;
 import won.owner.service.impl.URIService;
 import won.owner.service.impl.WONUserDetailService;
@@ -57,6 +58,8 @@ public class RestNeedController {
     private WONUserDetailService wonUserDetailService;
     @Autowired
     UserRepository userRepository;
+    @Autowired
+    UserNeedRepository userNeedRepository;
 
     /**
      * returns a List containing needs belonging to the user
@@ -112,6 +115,32 @@ public class RestNeedController {
             createDraftPojos.add(createDraftPojo);
         }
         return createDraftPojos;
+    }
+
+    /**
+     * returns a List containing needs belonging to the user
+     *
+     * @return JSON List of need objects
+     */
+    @ResponseBody
+    @RequestMapping(value = "/all", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
+    public List<URI> getAllNeeds(@RequestParam(value = "state", required = false) NeedState state) {
+        List<UserNeed> allNeeds = userNeedRepository.findAllNeeds();
+        List<URI> needUris = new ArrayList(allNeeds.size());
+        if (state == null) {
+            logger.debug("Getting all needuris");
+            for (UserNeed userNeed : allNeeds) {
+                needUris.add(userNeed.getUri());
+            }
+        } else {
+            logger.debug("Getting all needuris filtered by state: " + state);
+            for (UserNeed userNeed : allNeeds) {
+                if (state.equals(userNeed.getState())) {
+                    needUris.add(userNeed.getUri());
+                }
+            }
+        }
+        return needUris;
     }
 
     /**
