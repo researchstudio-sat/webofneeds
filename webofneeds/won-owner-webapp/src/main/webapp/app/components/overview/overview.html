@@ -1,0 +1,18 @@
+<won-modal-dialog ng-if="self.showModalDialog"></won-modal-dialog>
+<div class="won-modal-needview" ng-if="self.showNeedOverlay">
+    <won-post-info include-header="true" need-uri="self.viewNeedUri"></won-post-info>
+</div>
+<div class="won-modal-connectionview" ng-if="self.showConnectionOverlay">
+    <won-post-messages connection-uri="self.viewConnUri"></won-post-messages>
+</div>
+<header>
+    <won-topnav></won-topnav>
+</header>
+<won-toasts></won-toasts>
+<won-slide-in ng-if="self.showSlideIns"></won-slide-in>
+<main class="owneroverview" ng-class="{'owneroverview--won-loading': self.needLoading, 'owneroverview--won-failed': self.needFailedToLoad}">
+    <div class="owneroverview__need" ng-repeat="needUri in self.allActiveNeedUrisArray track by needUri" ng-click="self.router__stateGoCurrent({viewNeedUri: needUri})">
+        <won-post-info include-header="true" need-uri="needUri"></won-post-info>
+    </div>
+</main>
+<won-footer></won-footer>
