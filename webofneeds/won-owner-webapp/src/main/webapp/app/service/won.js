@@ -1344,18 +1344,9 @@ WonMessage.prototype = {
     return this.compactRawMessage;
   },
   getMessageType: function() {
-    if (
-      this.getProperty("http://purl.org/webofneeds/message#hasMessageType") ===
-        "http://purl.org/webofneeds/message#ConnectionMessage" &&
-      this.getTextMessage() === "Note: need content was changed."
-    ) {
-      //TODO: REMOVE THIS HANDLER ONCE THE CHANGENOTIFICATIONMESSAGE TYPE HAS BEEN IMPLEMENTED IN THE BACKEND
-      return "http://purl.org/webofneeds/message#ChangeNotificationMessage";
-    } else {
-      return this.getProperty(
-        "http://purl.org/webofneeds/message#hasMessageType"
-      );
-    }
+    return this.getProperty(
+      "http://purl.org/webofneeds/message#hasMessageType"
+    );
   },
   getInjectIntoConnectionUris: function() {
     return createArray(
