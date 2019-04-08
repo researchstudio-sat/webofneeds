@@ -11,15 +11,14 @@ won-need-card {
   padding: 0.5rem;
   color: black;
 
+  &.won-is-invisible {
+    display: none;
+  }
+
   &.won-is-toload,
   &.won-is-loading {
     @include animateOpacityHeartBeat();
     pointer-events: none;
-
-    .ph__icon__skeleton {
-      @include fixed-square(15rem);
-      background-color: $won-skeleton-color;
-    }
 
     .ph__right__subtitle__type {
       height: $smallFontSize;
@@ -35,7 +34,11 @@ won-need-card {
   }
   @include square-image(15rem);
 
-  .ph__icon__skeleton,
+  .ph__icon__skeleton {
+    @include fixed-square(15rem);
+    background-color: $won-skeleton-color;
+  }
+
   won-square-image {
     grid-area: icon;
   }

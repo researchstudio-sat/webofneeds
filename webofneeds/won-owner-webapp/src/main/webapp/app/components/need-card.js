@@ -22,69 +22,71 @@ const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
   let template = `
     <won-square-image
-        ng-if="!self.needLoading && !self.needToLoad"
+        ng-if="self.needLoaded"
         uri="::self.needUri">
     </won-square-image>
     <div class="ph__icon__skeleton"
       ng-if="self.needToLoad"
       in-view="$inview && self.ensureNeedIsLoaded()">
     </div>
-    <div class="ph__icon__skeleton" ng-if="self.needLoading"></div>
-    <div class="ph__right" ng-if="!self.needLoading && !self.needToLoad">
-      <div class="ph__right__topline" ng-if="!self.needFailedToLoad">
-        <div class="ph__right__topline__title" ng-if="self.hasTitle()">
-          {{ self.generateTitle() }}
+    <div class="ph__icon__skeleton" ng-if="self.needLoading || self.needFailedToLoad"></div>
+    <div class="ph__right" ng-if="self.needLoaded">
+        <div class="ph__right__topline">
+            <div class="ph__right__topline__title" ng-if="self.hasTitle()">
+                {{ self.generateTitle() }}
+            </div>
+            <div class="ph__right__topline__notitle" ng-if="!self.hasTitle() && self.isDirectResponse">
+                RE: no title
+            </div>
+            <div class="ph__right__topline__notitle" ng-if="!self.hasTitle() && !self.isDirectResponse">
+                no title
+            </div>
         </div>
-        <div class="ph__right__topline__notitle" ng-if="!self.hasTitle() && self.isDirectResponse">
-          RE: no title
+        <div class="ph__right__subtitle">
+            <span class="ph__right__subtitle__type">
+                <span class="ph__right__subtitle__type__persona"
+                    ng-if="self.personaName">
+                    {{self.personaName}}
+                </span>
+                <span class="ph__right__subtitle__type__groupchat"
+                    ng-if="self.isGroupChatEnabled && !self.isChatEnabled">
+                    Group Chat
+                </span>
+                <span class="ph__right__subtitle__type__groupchat"
+                    ng-if="self.isGroupChatEnabled && self.isChatEnabled">
+                    Group Chat enabled
+                </span>
+                <span ng-if="!self.shouldShowRdf">
+                    {{ self.shortTypesLabel }}{{ self.matchingContext }}
+                </span>
+                <span ng-if="self.shouldShowRdf">
+                    {{ self.fullTypesLabel }}
+                </span>
+            </span>
+            <div class="ph__right__subtitle__date">
+                {{ self.friendlyTimestamp }}
+            </div>
         </div>
-        <div class="ph__right__topline__notitle" ng-if="!self.hasTitle() && !self.isDirectResponse">
-          no title
+    </div>
+    <div class="ph__right" ng-if="self.needFailedToLoad">
+        <div class="ph__right__topline">
+            <div class="ph__right__topline__notitle">
+                Need Loading failed
+            </div>
         </div>
-      </div>
-      <div class="ph__right__subtitle" ng-if="!self.needFailedToLoad">
-        <span class="ph__right__subtitle__type">
-          <span class="ph__right__subtitle__type__persona"
-            ng-if="self.personaName">
-            {{self.personaName}}
-          </span>
-          <span class="ph__right__subtitle__type__groupchat"
-            ng-if="self.isGroupChatEnabled && !self.isChatEnabled">
-            Group Chat
-          </span>
-          <span class="ph__right__subtitle__type__groupchat"
-            ng-if="self.isGroupChatEnabled && self.isChatEnabled">
-            Group Chat enabled
-          </span>
-          <span ng-if="!self.shouldShowRdf">
-            {{ self.shortTypesLabel }}{{ self.matchingContext }}
-          </span>
-          <span ng-if="self.shouldShowRdf">
-            {{ self.fullTypesLabel }}
-          </span>
-        </span>
-        <div class="ph__right__subtitle__date">
-          {{ self.friendlyTimestamp }}
+        <div class="ph__right__subtitle">
+            <span class="ph__right__subtitle__type">
+                Need might have been deleted.
+            </span>
         </div>
-      </div>
-      <div class="ph__right__topline" ng-if="self.needFailedToLoad">
-        <div class="ph__right__topline__notitle">
-          Need Loading failed
-        </div>
-      </div>
-      <div class="ph__right__subtitle" ng-if="self.needFailedToLoad">
-        <span class="ph__right__subtitle__type">
-          Need might have been deleted.
-        </span>
-      </div>
     </div>
     <div class="ph__right" ng-if="self.needLoading || self.needToLoad">
-      <div class="ph__right__topline">
-        <div class="ph__right__topline__title"></div>
-      </div>
-      <div class="ph__right__subtitle">
-        <span class="ph__right__subtitle__type"></span>
-      </div>
+        <div class="ph__right__topline">
+            <div class="ph__right__topline__title"></div>
+        </div>
+        <div class="ph__right__subtitle">
+            <span class="ph__right__subtitle__type"></span>
+        </div>
     </div>
     `;
 
@@ -138,6 +140,7 @@ function genComponentConf() {
 
       classOnComponentRoot("won-is-loading", () => this.needLoading, this);
       classOnComponentRoot("won-is-toload", () => this.needToLoad, this);
+      classOnComponentRoot("won-is-invisible", () => this.hideNeed(), this);
     }
 
     ensureNeedIsLoaded() {
@@ -149,6 +152,13 @@ function genComponentConf() {
       ) {
         this.needs__fetchUnloadedNeed(this.needUri);
       }
+    }
+
+    hideNeed() {
+      return (
+        this.needFailedToLoad ||
+        (this.needLoaded && needUtils.isInactive(this.need))
+      );
     }
 
     hasTitle() {
