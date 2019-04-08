@@ -55,6 +55,7 @@ class Controller {
             lastNeedUrisUpdateDate
           ),
         needUrisArray: needUris && needUris.toArray(),
+        needUrisSize: needUris ? needUris.size : 0,
         isOwnerNeedUrisLoading,
         isOwnerNeedUrisToLoad,
         showSlideIns:

@@ -3,11 +3,12 @@
  * Created by ksinger on 10.04.2017.
  */
 import angular from "angular";
+import inviewModule from "angular-inview";
 import "ng-redux";
 import squareImageModule from "./square-image.js";
 import { actionCreators } from "../actions/actions.js";
 import { relativeTime } from "../won-label-utils.js";
-import { attach, getIn, get, delay } from "../utils.js";
+import { attach, getIn, get } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
 import { selectLastUpdateTime } from "../selectors/general-selectors.js";
 import * as viewSelectors from "../selectors/view-selectors.js";
@@ -22,10 +23,15 @@ const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
   let template = `
     <won-square-image
-        ng-if="!self.needLoading"
+        ng-if="!self.needLoading && !self.needToLoad"
         uri="::self.needUri">
     </won-square-image>
-    <div class="ph__right" ng-if="!self.needLoading">
+    <div class="ph__icon__skeleton"
+      ng-if="self.needToLoad"
+      in-view="$inview && self.ensureNeedIsLoaded()">
+    </div>
+    <div class="ph__icon__skeleton" ng-if="self.needLoading"></div>
+    <div class="ph__right" ng-if="!self.needLoading && !self.needToLoad">
       <div class="ph__right__topline" ng-if="!self.needFailedToLoad">
         <div class="ph__right__topline__title" ng-if="self.hasTitle()">
           {{ self.generateTitle() }}
@@ -73,9 +79,7 @@ function genComponentConf() {
         </span>
       </div>
     </div>
-    
-    <div class="ph__icon__skeleton" ng-if="self.needLoading"></div>
-    <div class="ph__right" ng-if="self.needLoading">
+    <div class="ph__right" ng-if="self.needLoading || self.needToLoad">
       <div class="ph__right__topline">
         <div class="ph__right__topline__title"></div>
       </div>
@@ -134,13 +138,6 @@ function genComponentConf() {
 
       classOnComponentRoot("won-is-loading", () => this.needLoading, this);
       classOnComponentRoot("won-is-toload", () => this.needToLoad, this);
-
-      this.$scope.$watch(
-        () =>
-          this.needUri &&
-          (!this.need || (this.needToLoad && !this.needLoading)),
-        () => delay(0).then(() => this.ensureNeedIsLoaded())
-      );
     }
 
     ensureNeedIsLoaded() {
@@ -182,5 +179,8 @@ function genComponentConf() {
 }
 
 export default angular
-  .module("won.owner.components.needCard", [squareImageModule])
+  .module("won.owner.components.needCard", [
+    squareImageModule,
+    inviewModule.name,
+  ])
   .directive("wonNeedCard", genComponentConf).name;

@@ -50,25 +50,6 @@ main.owneroverview {
   }
 
   .owneroverview__content {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    grid-gap: 0.5rem;
-    padding: 0.5rem;
-
-    @media (max-width: $responsivenessBreakPoint) {
-      grid-template-columns: 1fr;
-    }
-
-    won-post-header.owneroverview__content__need {
-      cursor: pointer;
-      border: $thinGrayBorder;
-      background: $won-light-gray;
-      padding: 0.5rem;
-    }
-  }
-  /*
-  //TODO: Once we figured out how we want to display need-cards we can use this instead
-  & .owneroverview__content {
     display: flex;
     flex-wrap: wrap;
     padding: 0.5rem;
@@ -89,5 +70,5 @@ main.owneroverview {
         margin-right: 0;
       }
     }
-  }*/
+  }
 }
