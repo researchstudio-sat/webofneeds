@@ -73,6 +73,7 @@ export default function(allNeedsInState = initialState, action = {}) {
     }
 
     case actionTypes.personas.storeTheirUrisInLoading:
+    case actionTypes.needs.storeNeedUrisFromOwner:
     case actionTypes.needs.storeTheirUrisInLoading: {
       return addNeedStubs(allNeedsInState, action.payload.get("uris"));
     }

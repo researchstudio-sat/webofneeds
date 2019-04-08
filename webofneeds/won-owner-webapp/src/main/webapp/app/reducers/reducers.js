@@ -57,6 +57,31 @@ const reducers = {
         return config;
     }
   },
+  owner: (
+    owner = Immutable.fromJS({
+      needUris: Immutable.Set(),
+      lastNeedUrisUpdateTime: undefined,
+    }),
+    action = {}
+  ) => {
+    switch (action.type) {
+      case actionTypes.needs.storeNeedUrisFromOwner: {
+        const fetchedNeedUris = action.payload.get("uris");
+        let ownerNeedUris = owner.get("needUris");
+
+        fetchedNeedUris &&
+          fetchedNeedUris.forEach(
+            needUri => (ownerNeedUris = ownerNeedUris.add(needUri))
+          );
+
+        return owner
+          .set("needUris", ownerNeedUris)
+          .set("lastNeedUrisUpdateTime", Date.now());
+      }
+      default:
+        return owner;
+    }
+  },
 };
 
 export default reduceReducers(

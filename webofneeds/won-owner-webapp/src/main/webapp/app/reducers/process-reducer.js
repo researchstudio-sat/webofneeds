@@ -17,6 +17,7 @@ const initialState = Immutable.fromJS({
   processingVerifyEmailAddress: false,
   processingResendVerificationEmail: false,
   processingSendAnonymousLinkEmail: false,
+  processingNeedUrisFromOwnerLoad: false,
   needs: Immutable.Map(),
   connections: Immutable.Map(),
 });
@@ -117,6 +118,20 @@ export default function(processState = initialState, action = {}) {
       }
 
       return processState;
+    }
+
+    case actionTypes.needs.loadAllActiveNeedUrisFromOwner:
+      return processState.set("processingNeedUrisFromOwnerLoad", true);
+
+    case actionTypes.needs.storeNeedUrisFromOwner: {
+      const needUris = action.payload.get("uris");
+      needUris &&
+        needUris.forEach(needUri => {
+          processState = updateNeedProcess(processState, needUri, {
+            toLoad: true,
+          });
+        });
+      return processState.set("processingNeedUrisFromOwnerLoad", false);
     }
 
     case actionTypes.personas.create:
