@@ -18,6 +18,7 @@ main.owneroverview {
     grid-gap: 0.5rem;
     border-bottom: $thinGrayBorder;
     padding: 0.5rem;
+    align-items: center;
 
     &__title {
       font-size: $mediumFontSize;
@@ -42,6 +43,7 @@ main.owneroverview {
       }
 
       &__reload.won-button--filled.red {
+        font-size: 0.75rem;
         padding: 0.25rem;
       }
     }
