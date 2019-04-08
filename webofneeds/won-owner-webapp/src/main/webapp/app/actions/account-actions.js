@@ -8,6 +8,7 @@ import { actionTypes, actionCreators } from "./actions.js";
 import { fetchOwnedData } from "../won-message-utils.js";
 import {
   registerAccount,
+  changePassword,
   transferPrivateAccount,
   acceptTermsOfService,
   confirmRegistration,
@@ -239,6 +240,21 @@ export function accountTransfer(credentials) {
         dispatch(
           actionCreators.account__registerFailed({ registerError, error })
         );
+      });
+}
+
+/**
+ * @param credentials {email, oldPassword, newPassword}
+ * @returns {Function}
+ */
+export function accountChangePassword(credentials) {
+  return dispatch =>
+    changePassword(credentials)
+      .then(() => {
+        dispatch({ type: actionTypes.account.changePasswordSuccess });
+      })
+      .catch(() => {
+        dispatch({ type: actionTypes.account.changePasswordFailed });
       });
 }
 
