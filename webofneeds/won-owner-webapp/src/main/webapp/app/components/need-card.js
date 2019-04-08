@@ -12,7 +12,6 @@ import { attach, getIn, get } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
 import { selectLastUpdateTime } from "../selectors/general-selectors.js";
 import * as viewSelectors from "../selectors/view-selectors.js";
-import won from "../won-es6.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
 import * as needUtils from "../need-utils.js";
 import * as processUtils from "../process-utils.js";
@@ -94,7 +93,6 @@ function genComponentConf() {
       attach(this, serviceDependencies, arguments);
       window.ph4dbg = this;
 
-      this.WON = won.WON;
       const selectFromState = state => {
         const need = getIn(state, ["needs", this.needUri]);
         const isDirectResponse = needUtils.isDirectResponseNeed(need);
