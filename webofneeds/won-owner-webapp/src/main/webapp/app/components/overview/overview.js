@@ -8,6 +8,8 @@ import { connect2Redux } from "../../won-utils.js";
 import won from "../../won-es6.js";
 import { actionCreators } from "../../actions/actions.js";
 import postMessagesModule from "../post-messages.js";
+import needCardModule from "../need-card.js";
+import postHeaderModule from "../post-header.js";
 import * as generalSelectors from "../../selectors/general-selectors.js";
 import * as viewSelectors from "../../selectors/view-selectors.js";
 import * as processUtils from "../../process-utils.js";
@@ -89,5 +91,10 @@ class Controller {
 Controller.$inject = serviceDependencies;
 
 export default angular
-  .module("won.owner.components.overview", [ngAnimate, postMessagesModule])
+  .module("won.owner.components.overview", [
+    ngAnimate,
+    postMessagesModule,
+    needCardModule,
+    postHeaderModule,
+  ])
   .controller("OverviewController", Controller).name;

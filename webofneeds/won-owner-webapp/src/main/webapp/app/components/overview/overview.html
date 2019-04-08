@@ -28,9 +28,8 @@
         </div>
     </div>
     <div class="owneroverview__content">
-        <div class="owneroverview__content__need" ng-repeat="needUri in self.needUrisArray track by needUri" ng-click="self.router__stateGoCurrent({viewNeedUri: needUri})">
-            <won-post-info include-header="true" need-uri="needUri"></won-post-info>
-        </div>
+        <!--won-need-card class="owneroverview__content__need" need-uri="needUri" ng-repeat="needUri in self.needUrisArray track by needUri" ng-click="self.router__stateGo('post', {postUri: needUri})"></won-need-card-->
+        <won-post-header class="owneroverview__content__need" need-uri="needUri" ng-repeat="needUri in self.needUrisArray track by needUri" ng-click="self.router__stateGo('post', {postUri: needUri})"></won-post-header>
     </div>
 </main>
 <won-footer></won-footer>

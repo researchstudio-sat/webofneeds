@@ -16,7 +16,6 @@ main.owneroverview {
     display: grid;
     grid-template-columns: 1fr min-content;
     grid-gap: 0.5rem;
-    margin-bottom: 0.5rem;
     border-bottom: $thinGrayBorder;
     padding: 0.5rem;
 
@@ -48,7 +47,7 @@ main.owneroverview {
     }
   }
 
-  & .owneroverview__content {
+  .owneroverview__content {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     grid-gap: 0.5rem;
@@ -58,9 +57,35 @@ main.owneroverview {
       grid-template-columns: 1fr;
     }
 
-    &__need {
+    won-post-header.owneroverview__content__need {
+      cursor: pointer;
       border: $thinGrayBorder;
-      background: white;
+      background: $won-light-gray;
+      padding: 0.5rem;
     }
   }
+  /*
+  //TODO: Once we figured out how we want to display need-cards we can use this instead
+  & .owneroverview__content {
+    display: flex;
+    flex-wrap: wrap;
+    padding: 0.5rem;
+
+    won-need-card.owneroverview__content__need {
+      cursor: pointer;
+      border: $thinGrayBorder;
+      background: $won-light-gray;
+
+      margin-right: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    @media (max-width: $responsivenessBreakPoint) {
+      display: block;
+
+      won-need-card.owneroverview__content__need {
+        margin-right: 0;
+      }
+    }
+  }*/
 }
