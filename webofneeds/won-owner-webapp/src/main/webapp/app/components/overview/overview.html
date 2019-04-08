@@ -10,9 +10,27 @@
 </header>
 <won-toasts></won-toasts>
 <won-slide-in ng-if="self.showSlideIns"></won-slide-in>
-<main class="owneroverview" ng-class="{'owneroverview--won-loading': self.needLoading, 'owneroverview--won-failed': self.needFailedToLoad}">
-    <div class="owneroverview__need" ng-repeat="needUri in self.allActiveNeedUrisArray track by needUri" ng-click="self.router__stateGoCurrent({viewNeedUri: needUri})">
-        <won-post-info include-header="true" need-uri="needUri"></won-post-info>
+<main class="owneroverview">
+    <div class="owneroverview__header">
+        <div class="owneroverview__header__title">
+            Overview
+        </div>
+        <div class="owneroverview__header__loading" ng-if="self.isOwnerNeedUrisLoading">
+            Loading...
+        </div>
+        <div class="owneroverview__header__updated" ng-if="!self.isOwnerNeedUrisLoading">
+            <div class="owneroverview__header__updated__time">
+                Updated: {{ self.friendlyLastNeedUrisUpdateTimestamp }}
+            </div>
+            <div class="owneroverview__header__updated__reload won-button--filled red" ng-click="self.reload()">
+                Reload
+            </div>
+        </div>
+    </div>
+    <div class="owneroverview__content">
+        <div class="owneroverview__content__need" ng-repeat="needUri in self.needUrisArray track by needUri" ng-click="self.router__stateGoCurrent({viewNeedUri: needUri})">
+            <won-post-info include-header="true" need-uri="needUri"></won-post-info>
+        </div>
     </div>
 </main>
 <won-footer></won-footer>
