@@ -88,7 +88,7 @@ import * as configActions from "./config-actions.js";
 
 import {
   pageLoadAction,
-  fetchAllActiveNeedUrisFromOwner,
+  loadAllActiveNeedUrisFromOwner,
 } from "./load-action.js";
 import { stateGo, stateReload } from "redux-ui-router";
 import {
@@ -161,7 +161,8 @@ const actionHierarchy = {
     fetchUnloadedNeeds: fetchUnloadedNeeds,
     fetchUnloadedNeed: fetchUnloadedNeed,
 
-    fetchAllActiveNeedUrisFromOwner: fetchAllActiveNeedUrisFromOwner,
+    loadAllActiveNeedUrisFromOwner: loadAllActiveNeedUrisFromOwner,
+    storeNeedUrisFromOwner: INJ_DEFAULT,
 
     storeOwnedInactiveUris: INJ_DEFAULT,
     storeOwnedInactiveUrisInLoading: INJ_DEFAULT,
