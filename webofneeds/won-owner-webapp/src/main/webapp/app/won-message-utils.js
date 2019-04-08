@@ -594,6 +594,35 @@ export function fetchOwnedData(dispatch) {
     .then(needUris => fetchDataForOwnedNeeds(needUris, dispatch));
 }
 
+export function fetchAllActiveNeedUrisFromOwner(dispatch) {
+  return fetchAllNeedUrisFromOwner().then(needUris => {
+    dispatch({
+      type: actionTypes.needs.storeNeedUrisFromOwner,
+      payload: Immutable.fromJS({ uris: needUris }),
+    });
+    return needUris;
+  });
+}
+
+/**
+ * Calls the restendpoint of the owner webapp, to retrieve all needUris stored
+ * on this instance
+ * @param state ACTIVE or INACTIVE, default is ACTIVE
+ * @returns {*}
+ */
+function fetchAllNeedUrisFromOwner(state = "ACTIVE") {
+  return fetch(urljoin(ownerBaseUrl, "/rest/needs/all?state=" + state), {
+    method: "get",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+  })
+    .then(checkHttpStatus)
+    .then(response => response.json());
+}
+
 function fetchOwnedInactiveNeedUris() {
   return fetch(urljoin(ownerBaseUrl, "/rest/needs?state=INACTIVE"), {
     method: "get",
