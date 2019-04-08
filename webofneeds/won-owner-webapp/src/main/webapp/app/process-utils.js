@@ -18,6 +18,15 @@ export function isProcessingInitialLoad(process) {
 }
 
 /**
+ * Return true if processingNeedUrisFromOwnerLoad is currently active
+ * @param process (full process from state)
+ * @returns {*}
+ */
+export function isProcessingNeedUrisFromOwnerLoad(process) {
+  return get(process, "processingNeedUrisFromOwnerLoad");
+}
+
+/**
  * Return true if processingLogin is currently active
  * @param process (full process from state)
  * @returns {*}
