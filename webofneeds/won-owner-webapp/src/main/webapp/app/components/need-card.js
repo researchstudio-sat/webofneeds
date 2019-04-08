@@ -114,11 +114,13 @@ function genComponentConf() {
           shortTypesLabel: need && needUtils.generateShortNeedTypesLabel(need),
           matchingContext: need && needUtils.generateNeedMatchingContext(need),
           personaName,
-          needLoading:
-            !need || processUtils.isNeedLoading(process, this.needUri),
-          needToLoad: !need || processUtils.isNeedToLoad(process, this.needUri),
-          needFailedToLoad:
-            need && processUtils.hasNeedFailedToLoad(process, this.needUri),
+          needLoaded: processUtils.isNeedLoaded(process, this.needUri),
+          needLoading: processUtils.isNeedLoading(process, this.needUri),
+          needToLoad: processUtils.isNeedToLoad(process, this.needUri),
+          needFailedToLoad: processUtils.hasNeedFailedToLoad(
+            process,
+            this.needUri
+          ),
           isDirectResponse: isDirectResponse,
           isGroupChatEnabled: needUtils.hasGroupFacet(need),
           isChatEnabled: needUtils.hasChatFacet(need),
@@ -141,7 +143,9 @@ function genComponentConf() {
     ensureNeedIsLoaded() {
       if (
         this.needUri &&
-        (!this.need || (this.needToLoad && !this.needLoading))
+        !this.needLoaded &&
+        !this.needLoading &&
+        this.needToLoad
       ) {
         this.needs__fetchUnloadedNeed(this.needUri);
       }

@@ -6,6 +6,7 @@ import Immutable from "immutable";
 import { getIn } from "../utils.js";
 import { parseNeed } from "./need-reducer/parse-need.js";
 import { parseMessage } from "./need-reducer/parse-message.js";
+import * as processUtils from "../process-utils.js";
 
 const initialState = Immutable.fromJS({
   processingInitialLoad: true,
@@ -25,6 +26,7 @@ const initialState = Immutable.fromJS({
 export const emptyNeedProcess = Immutable.fromJS({
   loading: false,
   toLoad: false,
+  loaded: false,
   failedToLoad: false,
   processUpdate: false,
 });
@@ -127,9 +129,11 @@ export default function(processState = initialState, action = {}) {
       const needUris = action.payload.get("uris");
       needUris &&
         needUris.forEach(needUri => {
-          processState = updateNeedProcess(processState, needUri, {
-            toLoad: true,
-          });
+          if (!processUtils.isNeedLoaded(processState, needUri)) {
+            processState = updateNeedProcess(processState, needUri, {
+              toLoad: true,
+            });
+          }
         });
       return processState.set("processingNeedUrisFromOwnerLoad", false);
     }
@@ -456,13 +460,14 @@ export default function(processState = initialState, action = {}) {
               toLoad: false,
               failedToLoad: false,
               loading: false,
+              loaded: true,
             }
           );
 
           const heldNeedUris = parsedNeed.get("holds");
           if (heldNeedUris.size > 0) {
             heldNeedUris.map(heldNeedUri => {
-              if (!processState.getIn(["needs", heldNeedUri])) {
+              if (!processUtils.isNeedLoaded(processState, heldNeedUri)) {
                 processState = updateNeedProcess(processState, heldNeedUri, {
                   toLoad: true,
                 });
@@ -473,7 +478,7 @@ export default function(processState = initialState, action = {}) {
           const groupMemberUris = parsedNeed.get("groupMembers");
           if (groupMemberUris.size > 0) {
             groupMemberUris.map(groupMemberUri => {
-              if (!processState.getIn(["needs", groupMemberUri])) {
+              if (!processUtils.isNeedLoaded(processState, groupMemberUri)) {
                 processState = updateNeedProcess(processState, groupMemberUri, {
                   toLoad: true,
                 });
@@ -580,7 +585,7 @@ export function addOriginatorNeedToLoad(
 
       if (originatorUri) {
         //Message is originally from another need, we might need to add the need as well
-        if (!processState.getIn(["needs", originatorUri])) {
+        if (!processUtils.isNeedLoaded(processState, originatorUri)) {
           console.debug(
             "Originator Need is not in the state yet, we need to add it"
           );

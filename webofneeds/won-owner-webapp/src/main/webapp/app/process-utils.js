@@ -119,6 +119,10 @@ export function isNeedLoading(process, needUri) {
   return needUri && getIn(process, ["needs", needUri, "loading"]);
 }
 
+export function isNeedLoaded(process, needUri) {
+  return needUri && getIn(process, ["needs", needUri, "loaded"]);
+}
+
 /**
  * Return true if given needUri is set toLoad
  * @param process (full process from state)
