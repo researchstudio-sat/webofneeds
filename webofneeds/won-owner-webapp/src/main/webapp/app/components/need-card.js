@@ -19,11 +19,12 @@ import "style/_need-card.scss";
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
   let template = `
-    <div class="card__icon" ng-if="self.needLoaded"
+    <div class="card__icon clickable" ng-if="self.needLoaded"
         ng-class="{
           'won-is-persona': self.isPersona,
           'inactive': self.isInactive,
-        }">
+        }"
+        ng-click="self.router__stateGo('post', {postUri: self.need.get('uri')})">
         <div class="image usecaseimage" style="background-color: {{::self.useCaseIconBackground}}"
             ng-if="::self.useCaseIcon">
             <svg class="si__usecaseicon">
@@ -38,7 +39,7 @@ function genComponentConf() {
     <div class="card__icon__skeleton" ng-if="!self.needLoaded"
       in-view="$inview && self.needToLoad && self.ensureNeedIsLoaded()">
     </div>
-    <div class="card__main" ng-if="self.needLoaded">
+    <div class="card__main clickable" ng-if="self.needLoaded" ng-click="self.router__stateGo('post', {postUri: self.need.get('uri')})">
         <div class="card__main__topline">
             <div class="card__main__topline__title" ng-if="self.hasTitle()">
                 {{ self.generateTitle() }}
@@ -69,7 +70,7 @@ function genComponentConf() {
             </div>
         </div>
     </div>
-    <div class="card__persona" ng-if="self.needLoaded && self.persona">
+    <div class="card__persona clickable" ng-if="self.needLoaded && self.persona" ng-click="self.router__stateGoCurrent({viewNeedUri: self.personaUri})">
           <img class="card__persona__icon"
               ng-if="::self.personaIdenticonSvg"
               alt="Auto-generated title image for persona that holds the need"
@@ -144,6 +145,7 @@ function genComponentConf() {
           responseToNeed,
           need,
           needTypeLabel: need && needUtils.generateNeedTypeLabel(need),
+          personaUri,
           persona,
           personaName,
           personaVerified,
