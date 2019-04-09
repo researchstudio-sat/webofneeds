@@ -337,7 +337,6 @@ changeView skin model =
                     [ Elements.mainButton
                         skin
                         [ width <| maximum 320 fill
-                        , Background.color skin.primaryColor
                         , padding 5
                         ]
                         { onPress =
@@ -357,14 +356,11 @@ changeView skin model =
                                 Just ChangeButtonPressed
                         , label =
                             el
-                                [ Font.color Skin.white
-                                , centerX
-
-                                --, Font.size 32
+                                [ centerX
                                 ]
                             <|
                                 if newPassword /= newPasswordRepeat then
-                                    text "Not Equal"
+                                    text "Do not match"
 
                                 else
                                     text "Save Changes"
@@ -375,7 +371,7 @@ changeView skin model =
         ChangeInProgress ->
             el
                 [ width fill
-                , Background.color skin.lightGray
+                , Background.color skin.lineGray
                 , Font.color Skin.white
                 , padding 20
                 ]
@@ -385,12 +381,12 @@ changeView skin model =
         ChangeCompleted ->
             el
                 [ width fill
-                , Background.color skin.lightGray
+                , Background.color skin.lineGray
                 , Font.color Skin.white
                 , padding 20
                 ]
             <|
-                text "Change completed"
+                text "Password changed"
 
         ChangeFailed ->
             el
