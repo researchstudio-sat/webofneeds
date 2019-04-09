@@ -4,7 +4,7 @@
 
 import won from "./won-es6.js";
 import Immutable from "immutable";
-import { checkHttpStatus, urisToLookupMap, is } from "./utils.js";
+import { checkHttpStatus, urisToLookupMap, is, getIn } from "./utils.js";
 
 import { ownerBaseUrl } from "config";
 import urljoin from "url-join";
@@ -446,7 +446,7 @@ export async function buildEditMessage(editedNeedData, oldNeed, wonNodeUri) {
   //if type  create -> use needBuilder as well
   const prepareContentNodeData = async editedNeedData => ({
     // Adds all fields from needDataIsOrSeeks:
-    // title, description, tags, matchingContext, location,...
+    // title, description, tags, location,...
     ...editedNeedData,
 
     publishedContentUri: needUriToEdit, //mandatory
@@ -464,9 +464,6 @@ export async function buildEditMessage(editedNeedData, oldNeed, wonNodeUri) {
       : undefined,
     useCase: editedNeedData.useCase ? editedNeedData.useCase : undefined, //only needed for need building
     // FIXME: find a better way to include need details that are not part of is or seeks
-    matchingContext: editedNeedData.matchingContext
-      ? editedNeedData.matchingContext
-      : undefined,
     facet: editedNeedData.facet,
   });
 
@@ -518,7 +515,7 @@ export async function buildCreateMessage(needData, wonNodeUri) {
   //if type  create -> use needBuilder as well
   const prepareContentNodeData = async needData => ({
     // Adds all fields from needDataIsOrSeeks:
-    // title, description, tags, matchingContext, location,...
+    // title, description, tags, location,...
     ...needData,
 
     publishedContentUri: publishedContentUri, //mandatory
@@ -534,9 +531,6 @@ export async function buildCreateMessage(needData, wonNodeUri) {
       : undefined,
     useCase: needData.useCase ? needData.useCase : undefined, //only needed for need building
     // FIXME: find a better way to include need details that are not part of is or seeks
-    matchingContext: needData.matchingContext
-      ? needData.matchingContext
-      : undefined,
     facet: needData.facet,
   });
 
@@ -594,23 +588,16 @@ export function fetchOwnedData(dispatch) {
     .then(needUris => fetchDataForOwnedNeeds(needUris, dispatch));
 }
 
-export function fetchAllActiveNeedUrisFromOwner(dispatch) {
-  return fetchAllNeedUrisFromOwner().then(needUris => {
+export function fetchAllActiveNeedUrisFromOwner(dispatch, getState) {
+  return fetchAllNeedUrisFromNode(getState).then(needUris => {
+    //return fetchAllNeedUrisFromOwner().then(needUris => { //FIXME: use this instead once we store more uris on the owner itself
     dispatch({
       type: actionTypes.needs.storeNeedUrisFromOwner,
       payload: Immutable.fromJS({ uris: needUris }),
     });
     return needUris;
   });
-}
-
-/**
- * Calls the restendpoint of the owner webapp, to retrieve all needUris stored
- * on this instance
- * @param state ACTIVE or INACTIVE, default is ACTIVE
- * @returns {*}
- */
-function fetchAllNeedUrisFromOwner(state = "ACTIVE") {
+} /*function fetchAllNeedUrisFromOwner(state = "ACTIVE") {
   return fetch(urljoin(ownerBaseUrl, "/rest/needs/all?state=" + state), {
     method: "get",
     headers: {
@@ -621,7 +608,58 @@ function fetchAllNeedUrisFromOwner(state = "ACTIVE") {
   })
     .then(checkHttpStatus)
     .then(response => response.json());
+}*/ //FIXME: use this once we store more uris on the owner itself
+
+/**
+ * Calls the restendpoint of the owner webapp, to retrieve all needUris stored
+ * on this instance
+ * @param state ACTIVE or INACTIVE, default is ACTIVE
+ * @returns {*}
+ */ function fetchAllNeedUrisFromNode(getState) {
+  const nodeUri = getIn(getState(), ["config", "defaultNodeUri"]);
+  //const nodeUri = "https://node.matchat.org/won/resource/need"; //for testing purposes
+
+  return fetch("/owner/rest/linked-data/?uri=" + encodeURIComponent(nodeUri), {
+    method: "get",
+    //credentials: "same-origin",
+    headers: {
+      Accept: "application/ld+json",
+      "Content-Type": "application/ld+json",
+      //Prefer: `return=representation; max-member-count="2000"`,
+      Prefer: undefined,
+    },
+  })
+    .then(response => {
+      if (response.status === 200) return response;
+      else
+        throw new Error(
+          `${response.status} - ${
+            response.statusText
+          } for fetchAllNeedUrisFromNode-request`
+        );
+    })
+    .then(dataset => dataset.json())
+    .then(dataset => {
+      const datasetImm = Immutable.fromJS(dataset);
+      const datasetGraph = datasetImm && datasetImm.get("@graph");
+      const firstDatasetGraph = datasetGraph && datasetGraph.first();
+      const rdfsMembers =
+        firstDatasetGraph && firstDatasetGraph.get("rdfs:member");
+
+      if (rdfsMembers && rdfsMembers.size > 0) {
+        return datasetImm
+          .get("@graph")
+          .first()
+          .get("rdfs:member")
+          .map(member => nodeUri + "/" + member.get("@id").split(":")[1])
+          .toJS();
+      } else {
+        return [];
+      }
+    });
 }
+
+window.fetchAllNeedUrisFromNode4dbg = fetchAllNeedUrisFromNode;
 
 function fetchOwnedInactiveNeedUris() {
   return fetch(urljoin(ownerBaseUrl, "/rest/needs?state=INACTIVE"), {
@@ -812,9 +850,14 @@ function fetchOwnedNeedAndDispatch(needUri, dispatch) {
       });
       return need;
     })
-    .catch(() => {
+    .catch(err => {
+      const errResponse = err && err.response;
+      const isDeleted = !!(errResponse && errResponse.status == 410);
+
       dispatch({
-        type: actionTypes.needs.storeUriFailed,
+        type: isDeleted
+          ? actionTypes.needs.removeDeleted
+          : actionTypes.needs.storeUriFailed,
         payload: Immutable.fromJS({ uri: needUri }),
       });
       return;
@@ -861,9 +904,14 @@ export function fetchTheirNeedAndDispatch(needUri, dispatch) {
             });
             return need;
           })
-          .catch(() => {
+          .catch(err => {
+            const errResponse = err && err.response;
+            const isDeleted = !!(errResponse && errResponse.status == 410);
+
             dispatch({
-              type: actionTypes.personas.storeUriFailed,
+              type: isDeleted
+                ? actionTypes.personas.removeDeleted
+                : actionTypes.personas.storeUriFailed,
               payload: Immutable.fromJS({ uri: personaUri }),
             });
             return need;
@@ -879,9 +927,14 @@ export function fetchTheirNeedAndDispatch(needUri, dispatch) {
       });
       return need;
     })
-    .catch(() => {
+    .catch(err => {
+      const errResponse = err && err.response;
+      const isDeleted = !!(errResponse && errResponse.status == 410);
+
       dispatch({
-        type: actionTypes.needs.storeUriFailed,
+        type: isDeleted
+          ? actionTypes.needs.removeDeleted
+          : actionTypes.needs.storeUriFailed,
         payload: Immutable.fromJS({ uri: needUri }),
       });
       return;
