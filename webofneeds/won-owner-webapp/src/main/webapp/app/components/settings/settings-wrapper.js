@@ -1,18 +1,12 @@
 import angular from "angular";
-import {
-  Elm
-} from "../../../elm/Settings.elm";
-import {
-  actionCreators
-} from "../../actions/actions";
+import { Elm } from "../../../elm/Settings.elm";
+import { actionCreators } from "../../actions/actions";
 import "../identicon.js";
 import {
   getOwnedPersonas,
   currentSkin,
 } from "../../selectors/general-selectors.js";
-import {
-  get
-} from "../../utils";
+import { get } from "../../utils";
 import * as accountUtils from "../../account-utils.js";
 
 function genComponentConf($ngRedux) {
@@ -49,9 +43,13 @@ function genComponentConf($ngRedux) {
       });
 
       elmApp.ports.getAccountInfo.subscribe(() => {
-        const accountInfo = accountUtils.getEmail(
-          get($ngRedux.getState(), "account")
-        );
+        const accountInfo = {
+          email: accountUtils.getEmail(get($ngRedux.getState(), "account")),
+          isVerified: accountUtils.isEmailVerified(
+            get($ngRedux.getState(), "account")
+          ),
+        };
+
         elmApp.ports.accountInfoIn.send(accountInfo);
       });
 
@@ -64,7 +62,10 @@ function genComponentConf($ngRedux) {
         return {
           personas: getOwnedPersonas(state),
           isVerified: accountUtils.isEmailVerified(get(state, "account")),
-          accountInfo: accountUtils.getEmail(get(state, "account")),
+          accountInfo: {
+            email: accountUtils.getEmail(get(state, "account")),
+            isVerified: accountUtils.isEmailVerified(get(state, "account")),
+          },
         };
       })(state => {
         if (state.personas) {

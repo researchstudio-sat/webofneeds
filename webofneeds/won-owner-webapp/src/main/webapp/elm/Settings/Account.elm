@@ -19,15 +19,21 @@ import Old.Skin as Skin exposing (Skin)
 
 type alias Model =
     { accountState : AccountState
-    , isVerifiedAccount : Bool
-    , username : String
+    , accountInfo : AccountInfo
     , passwordList : PasswordList
     }
 
 
 type alias PasswordList =
     { newPassword : String
+    , newPasswordRepeat : String
     , oldPassword : String
+    }
+
+
+type alias AccountInfo =
+    { email : String
+    , isVerified : Bool
     }
 
 
@@ -48,15 +54,11 @@ type AccountState
 
 init : () -> ( Model, Cmd Msg )
 init () =
-    ( { isVerifiedAccount = False
-      , username = ""
-      , accountState = EnteringPassword { newPassword = "", oldPassword = "" }
-      , passwordList = { newPassword = "", oldPassword = "" }
+    ( { accountInfo = { email = "", isVerified = False }
+      , accountState = EnteringPassword { newPassword = "", newPasswordRepeat = "", oldPassword = "" }
+      , passwordList = { newPassword = "", newPasswordRepeat = "", oldPassword = "" }
       }
-    , Cmd.batch
-        [ getVerifiedAccount ()
-        , getAccountInfo ()
-        ]
+    , getAccountInfo ()
     )
 
 
@@ -68,8 +70,8 @@ type Msg
     = PasswordChanged PasswordList
     | OldPasswordChanged String
     | NewPasswordChanged String
-    | VerificationStatusChanged Bool
-    | AccountInfoChanged String
+    | NewPasswordRepeatChanged String
+    | AccountInfoChanged AccountInfo
     | ChangeButtonPressed
     | ChangeRequestReturned (Result Http.Error ())
 
@@ -82,6 +84,9 @@ update msg model =
 
         NewPasswordChanged newPwd ->
             updateNewPassword newPwd model
+
+        NewPasswordRepeatChanged newPwdR ->
+            updateNewPasswordRepeat newPwdR model
 
         OldPasswordChanged oldPwd ->
             updateOldPassword oldPwd model
@@ -105,16 +110,9 @@ update msg model =
                     , Cmd.none
                     )
 
-        VerificationStatusChanged newStatus ->
+        AccountInfoChanged newAccountInfo ->
             ( { model
-                | isVerifiedAccount = newStatus
-              }
-            , Cmd.none
-            )
-
-        AccountInfoChanged newUsername ->
-            ( { model
-                | username = newUsername
+                | accountInfo = newAccountInfo
               }
             , Cmd.none
             )
@@ -123,22 +121,15 @@ update msg model =
 changePassword : Model -> ( Model, Cmd Msg )
 changePassword model =
     case model.accountState of
-        EnteringPassword { newPassword, oldPassword } ->
+        EnteringPassword { newPassword, newPasswordRepeat, oldPassword } ->
             ( { model
                 | accountState = ChangeInProgress
               }
-            , changeRequest ( { newPassword = newPassword, oldPassword = oldPassword }, model )
+            , changeRequest ( { newPassword = newPassword, newPasswordRepeat = newPasswordRepeat, oldPassword = oldPassword }, model )
             )
 
         _ ->
             ( model, Cmd.none )
-
-
-
-{- username: email,
-   oldPassword: oldPassword,
-   newPassword: newPassword,
--}
 
 
 changeRequest : ( PasswordList, Model ) -> Cmd Msg
@@ -148,7 +139,7 @@ changeRequest ( { newPassword, oldPassword }, model ) =
         , body =
             Http.jsonBody <|
                 Encode.object
-                    [ ( "username", Encode.string model.username )
+                    [ ( "username", Encode.string model.accountInfo.email )
                     , ( "oldPassword", Encode.string oldPassword )
                     , ( "newPassword", Encode.string newPassword )
                     ]
@@ -177,6 +168,29 @@ updateNewPassword newEnteredPassword model =
             let
                 newPasswordList =
                     { newPassword = newEnteredPassword
+                    , newPasswordRepeat = model.passwordList.newPasswordRepeat
+                    , oldPassword = model.passwordList.oldPassword
+                    }
+            in
+            { model
+                | accountState = EnteringPassword newPasswordList
+                , passwordList = newPasswordList
+            }
+
+        _ ->
+            model
+    , Cmd.none
+    )
+
+
+updateNewPasswordRepeat : String -> Model -> ( Model, Cmd Msg )
+updateNewPasswordRepeat newEnteredrepeatPassword model =
+    ( case model.accountState of
+        EnteringPassword _ ->
+            let
+                newPasswordList =
+                    { newPassword = model.passwordList.newPassword
+                    , newPasswordRepeat = newEnteredrepeatPassword
                     , oldPassword = model.passwordList.oldPassword
                     }
             in
@@ -198,6 +212,7 @@ updateOldPassword oldEnteredPassword model =
             let
                 newPasswordList =
                     { newPassword = model.passwordList.newPassword
+                    , newPasswordRepeat = model.passwordList.newPasswordRepeat
                     , oldPassword = oldEnteredPassword
                     }
             in
@@ -219,7 +234,7 @@ updateOldPassword oldEnteredPassword model =
 changeView : Skin -> Model -> Element Msg
 changeView skin model =
     case model.accountState of
-        EnteringPassword { oldPassword, newPassword } ->
+        EnteringPassword { oldPassword, newPassword, newPasswordRepeat } ->
             column
                 [ width fill
                 , spacing 20
@@ -236,21 +251,60 @@ changeView skin model =
                 , row
                     [ spacing 10
                     ]
-                    [ Input.newPassword [ width fill ]
+                    [ Input.newPassword
+                        [ width fill
+                        , paddingEach
+                            { left = 0
+                            , top = 0
+                            , bottom = 0
+                            , right = 0
+                            }
+                        ]
                         { onChange = OldPasswordChanged
                         , text = oldPassword
                         , placeholder = Nothing
                         , label =
                             Input.labelLeft
                                 [ centerY
+                                , Font.size 14
                                 , paddingEach
-                                    { left = 9
+                                    { left = 0
                                     , top = 0
                                     , bottom = 0
-                                    , right = 10
+                                    , right = 39
                                     }
                                 ]
-                                (text "Old:")
+                                (text "Current:")
+                        , show = False
+                        }
+                    ]
+                , row
+                    [ spacing 10
+                    ]
+                    [ Input.newPassword
+                        [ width fill
+                        , paddingEach
+                            { left = 0
+                            , top = 0
+                            , bottom = 0
+                            , right = 0
+                            }
+                        ]
+                        { onChange = NewPasswordChanged
+                        , text = newPassword
+                        , placeholder = Nothing
+                        , label =
+                            Input.labelLeft
+                                [ centerY
+                                , Font.size 14
+                                , paddingEach
+                                    { left = 0
+                                    , top = 0
+                                    , bottom = 0
+                                    , right = 60
+                                    }
+                                ]
+                                (text "New:")
                         , show = False
                         }
                     ]
@@ -258,24 +312,34 @@ changeView skin model =
                     [ spacing 10
                     ]
                     [ Input.newPassword [ width fill ]
-                        { onChange = NewPasswordChanged
-                        , text = newPassword
+                        { onChange = NewPasswordRepeatChanged
+                        , text = newPasswordRepeat
                         , placeholder = Nothing
                         , label =
                             Input.labelLeft
                                 [ centerY
+                                , Font.size 14
                                 , paddingEach
                                     { left = 0
                                     , top = 0
                                     , bottom = 0
-                                    , right = 10
+                                    , right = 9
                                     }
                                 ]
-                                (text "New:")
+                                (text "Re-type new:")
                         , show = False
                         }
-                    , Elements.mainButton skin
-                        [ height fill ]
+                    ]
+                , row
+                    [ width fill
+                    , spacing 20
+                    ]
+                    [ Elements.mainButton
+                        skin
+                        [ width <| maximum 320 fill
+                        , Background.color skin.primaryColor
+                        , padding 5
+                        ]
                         { onPress =
                             if String.isEmpty oldPassword then
                                 Nothing
@@ -283,9 +347,27 @@ changeView skin model =
                             else if String.isEmpty newPassword then
                                 Nothing
 
+                            else if String.isEmpty newPasswordRepeat then
+                                Nothing
+
+                            else if newPassword /= newPasswordRepeat then
+                                Nothing
+
                             else
                                 Just ChangeButtonPressed
-                        , label = text "Change"
+                        , label =
+                            el
+                                [ Font.color Skin.white
+                                , centerX
+
+                                --, Font.size 32
+                                ]
+                            <|
+                                if newPassword /= newPasswordRepeat then
+                                    text "Not Equal"
+
+                                else
+                                    text "Save Changes"
                         }
                     ]
                 ]
@@ -332,40 +414,32 @@ view skin model =
         , paragraph [ width fill ]
             [ text "Here you can change your account data."
             ]
-        , if model.isVerifiedAccount then
+        , if model.accountInfo.isVerified then
             changeView skin model
 
           else
             changeView skin model
+
+        {- DEBUG
+           paragraph [ width fill ]
+               [ text "You need an account with a verified email address to export your data" ]
+        -}
         ]
 
 
 
-{- DEBUG
-   paragraph [ width fill ]
-       [ text "You need an account with a verified email address to export your data" ]
--}
 ---- SUBSCRIPTIONS ----
-
-
-port isVerifiedAccount : (Bool -> msg) -> Sub msg
-
-
-port getVerifiedAccount : () -> Cmd msg
 
 
 port getAccountInfo : () -> Cmd msg
 
 
-port accountInfoIn : (String -> msg) -> Sub msg
+port accountInfoIn : (AccountInfo -> msg) -> Sub msg
 
 
 subscriptions : Sub Msg
 subscriptions =
-    Sub.batch
-        [ isVerifiedAccount VerificationStatusChanged
-        , accountInfoIn AccountInfoChanged
-        ]
+    accountInfoIn AccountInfoChanged
 
 
 
