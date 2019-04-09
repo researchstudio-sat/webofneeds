@@ -41,29 +41,17 @@ function genComponentConf() {
               {{ self.friendlyModifiedDate }}
             </div>
           </div>
-          <!-- TYPES - IF SHOW RDF IS TRUE -->
-          <div class="pcg__columns__left__item" ng-if="self.shouldShowRdf">
+          <div class="pcg__columns__left__item">
             <div class="pcg__columns__left__item__label">
               Types
             </div>
             <div class="pcg__columns__left__item__value">
-              {{ self.fullTypesLabel }}
+              {{ self.needTypeLabel }}
             </div>
           </div>
         </div>
 
       <!-- RIGHT COLUMN -->
-        <!-- TYPES - IF SHOW RDF IS FALSE -->
-        <div class="pcg__columns__right" ng-if="!self.shouldShowRdf && self.shortTypesLabel.length > 0">
-          <div class="pcg__columns__left__item">
-            <div class="pcg__columns__left__item__label">
-              Type
-            </div>
-            <div class="pcg__columns__left__item__value">
-              {{ self.shortTypesLabel }}
-            </div>
-          </div>
-        </div>
         <!-- FLAGS -->
         <div class="pcg__columns__right" ng-if="self.shouldShowRdf || (self.shortFlags && self.shortFlags.length > 0)">
           <div class="pcg__columns__right__item">
@@ -120,8 +108,7 @@ function genComponentConf() {
 
         return {
           WON: won.WON,
-          fullTypesLabel: post && needUtils.generateNeedTypeLabel(post),
-          shortTypesLabel: post && needUtils.generateNeedTypeLabel(post),
+          needTypeLabel: post && needUtils.generateNeedTypeLabel(post),
           fullFlags: post && needUtils.generateFullNeedFlags(post),
           shortFlags: post && needUtils.generateShortNeedFlags(post),
           fullFacets: post && needUtils.generateFullNeedFacets(post),

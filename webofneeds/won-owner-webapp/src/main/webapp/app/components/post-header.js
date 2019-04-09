@@ -10,7 +10,6 @@ import { relativeTime } from "../won-label-utils.js";
 import { attach, getIn, get, delay } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
 import { selectLastUpdateTime } from "../selectors/general-selectors.js";
-import * as viewSelectors from "../selectors/view-selectors.js";
 import won from "../won-es6.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
 import * as needUtils from "../need-utils.js";
@@ -52,11 +51,8 @@ function genComponentConf() {
             ng-if="self.isGroupChatEnabled && self.isChatEnabled">
             Group Chat enabled
           </span>
-          <span ng-if="!self.shouldShowRdf">
-            {{ self.shortTypesLabel }}
-          </span>
-          <span ng-if="self.shouldShowRdf">
-            {{ self.fullTypesLabel }}
+          <span>
+            {{ self.needTypeLabel }}
           </span>
         </span>
         <div class="ph__right__subtitle__date">
@@ -95,11 +91,8 @@ function genComponentConf() {
             ng-if="self.isGroupChatEnabled && self.isChatEnabled">
             Group Chat enabled
           </span>
-          <span class="ph__right__subtitle__type" ng-if="!self.shouldShowRdf">
-            {{ self.shortTypesLabel }}
-          </span>
-          <span class="ph__right__subtitle__type" ng-if="self.shouldShowRdf">
-            {{ self.fullTypesLabel }}
+          <span class="ph__right__subtitle__type"
+            {{ self.needTypeLabel }}
           </span>
       </div>
     </div>
@@ -137,8 +130,7 @@ function genComponentConf() {
         return {
           responseToNeed,
           need,
-          fullTypesLabel: need && needUtils.generateNeedTypeLabel(need),
-          shortTypesLabel: need && needUtils.generateNeedTypeLabel(need),
+          needTypeLabel: need && needUtils.generateNeedTypeLabel(need),
           personaName,
           needLoading:
             !need || processUtils.isNeedLoading(process, this.needUri),
@@ -154,7 +146,6 @@ function genComponentConf() {
               selectLastUpdateTime(state),
               get(need, "lastUpdateDate")
             ),
-          shouldShowRdf: viewSelectors.showRdf(state),
         };
       };
 

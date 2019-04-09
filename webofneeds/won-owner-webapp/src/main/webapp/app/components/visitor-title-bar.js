@@ -34,8 +34,7 @@ function genComponentConf() {
                           ng-if="self.isGroupChatEnabled && self.isChatEnabled">
                           Group Chat enabled
                         </span>
-                        <div class="vtb__titles__type" ng-if="!self.shouldShowRdf">{{ self.shortTypesLabel }}</div>
-                        <div class="vtb__titles__type" ng-if="self.shouldShowRdf">{{ self.fullTypesLabel }}</div>
+                        <div class="vtb__titles__type">{{ self.needTypeLabel }}</div>
                     </hgroup>
                 </div>
             </div>
@@ -70,9 +69,7 @@ function genComponentConf() {
           responseToNeed,
           isGroupChatEnabled: needUtils.hasGroupFacet(post),
           isChatEnabled: needUtils.hasChatFacet(post),
-          fullTypesLabel: post && needUtils.generateNeedTypeLabel(post),
-          shortTypesLabel: post && needUtils.generateNeedTypeLabel(post),
-          shouldShowRdf: state.getIn(["view", "showRdf"]),
+          needTypeLabel: post && needUtils.generateNeedTypeLabel(post),
         };
       };
       connect2Redux(selectFromState, actionCreators, [], this);
