@@ -147,6 +147,7 @@ function genComponentConf() {
       }
     }
 
+    //FIXME: THIS and the corresponding css-class need to be removed, this is solely to prevent loaded/but inactive need to show up for now
     hideNeed() {
       return this.needLoaded && needUtils.isInactive(this.need);
     }
