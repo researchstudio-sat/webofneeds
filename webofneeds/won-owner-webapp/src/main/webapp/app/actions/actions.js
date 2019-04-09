@@ -80,6 +80,7 @@ import {
   accountResendVerificationEmail,
   accountSendAnonymousLinkEmail,
   reconnect,
+  accountChangePassword,
 } from "./account-actions.js";
 
 import * as cnct from "./connections-actions.js";
@@ -313,6 +314,10 @@ const actionHierarchy = {
 
     acceptDisclaimer: accountAcceptDisclaimer,
     acceptDisclaimerSuccess: INJ_DEFAULT,
+
+    changePassword: accountChangePassword,
+    changePasswordSuccess: INJ_DEFAULT,
+    changePasswordFailed: INJ_DEFAULT,
 
     acceptTermsOfService: accountAcceptTermsOfService,
     acceptTermsOfServiceStarted: INJ_DEFAULT,
