@@ -616,19 +616,32 @@ export function fetchAllActiveNeedUrisFromOwner(dispatch, getState) {
  * @param state ACTIVE or INACTIVE, default is ACTIVE
  * @returns {*}
  */ function fetchAllNeedUrisFromNode(getState) {
-  const nodeUri = getIn(getState(), ["config", "defaultNodeUri"]) + "/need/";
+  const nodeUri = getIn(getState(), ["config", "defaultNodeUri"]) + "/need";
   //const nodeUri = "https://node.matchat.org/won/resource/need"; //for testing purposes
 
-  return fetch("/owner/rest/linked-data/?uri=" + encodeURIComponent(nodeUri), {
-    method: "get",
-    //credentials: "same-origin",
-    headers: {
-      Accept: "application/ld+json",
-      "Content-Type": "application/ld+json",
-      //Prefer: `return=representation; max-member-count="2000"`,
-      Prefer: undefined,
-    },
-  })
+  const DAYS_BEFORE = 30;
+  const modifiedAfterDate = new Date(
+    Date.now() - DAYS_BEFORE * 24 * 60 * 60 * 1000
+  );
+
+  return fetch(
+    "/owner/rest/linked-data/?uri=" +
+      encodeURIComponent(
+        nodeUri +
+          "?state=Active&modifiedafter=" +
+          modifiedAfterDate.toISOString()
+      ),
+    {
+      method: "get",
+      //credentials: "same-origin",
+      headers: {
+        Accept: "application/ld+json",
+        "Content-Type": "application/ld+json",
+        //Prefer: `return=representation; max-member-count="2000"`,
+        Prefer: undefined,
+      },
+    }
+  )
     .then(response => {
       if (response.status === 200) return response;
       else
@@ -651,7 +664,7 @@ export function fetchAllActiveNeedUrisFromOwner(dispatch, getState) {
           .get("@graph")
           .first()
           .get("rdfs:member")
-          .map(member => nodeUri + member.get("@id").split(":")[1])
+          .map(member => nodeUri + "/" + member.get("@id").split(":")[1])
           .toJS();
       } else {
         return [];
