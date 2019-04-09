@@ -432,7 +432,3 @@ port accountInfoIn : (AccountInfo -> msg) -> Sub msg
 subscriptions : Sub Msg
 subscriptions =
     accountInfoIn AccountInfoChanged
-
-
-
--- subscriptions =
