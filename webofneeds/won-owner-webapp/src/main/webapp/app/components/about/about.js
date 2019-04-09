@@ -269,29 +269,6 @@ class AboutController {
     }
   }
 
-  createWhatsNew() {
-    if (this.processingPublish) {
-      console.debug("publish in process, do not take any action");
-      return;
-    }
-
-    if (this.loggedIn) {
-      this.needs__whatsNew();
-    } else {
-      this.view__showTermsDialog(
-        Immutable.fromJS({
-          acceptCallback: () => {
-            this.view__hideModalDialog();
-            this.needs__whatsNew();
-          },
-          cancelCallback: () => {
-            this.view__hideModalDialog();
-          },
-        })
-      );
-    }
-  }
-
   toggleMoreInfo() {
     this.moreInfo = !this.moreInfo;
   }

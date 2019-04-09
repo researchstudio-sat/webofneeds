@@ -140,7 +140,6 @@ export default function(processState = initialState, action = {}) {
 
     case actionTypes.personas.create:
     case actionTypes.needs.create:
-    case actionTypes.needs.whatsNew:
     case actionTypes.needs.whatsAround:
       return processState.set("processingPublish", true);
 

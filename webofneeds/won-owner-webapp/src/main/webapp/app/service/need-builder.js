@@ -8,10 +8,7 @@
 import won from "./won.js";
 import * as useCaseUtils from "../usecase-utils";
 import { is } from "../utils";
-import {
-  generateWhatsAroundQuery,
-  generateWhatsNewQuery,
-} from "../sparql-builder-utils.js";
+import { generateWhatsAroundQuery } from "../sparql-builder-utils.js";
 
 import { Generator } from "sparqljs";
 
@@ -134,10 +131,6 @@ import { Generator } from "sparqljs";
       flags &&
       ((is("Array", flags) && flags.indexOf("won:WhatsAround") != -1) ||
         flags === "won:WhatsAround");
-    const isWhatsNewDraft =
-      flags &&
-      ((is("Array", flags) && flags.indexOf("won:WhatsNew") != -1) ||
-        flags === "won:WhatsNew");
 
     let queryString = undefined;
     if (isWhatsAroundDraft) {
@@ -146,8 +139,6 @@ import { Generator } from "sparqljs";
       if (location && location.lat && location.lng) {
         queryString = generateWhatsAroundQuery(location.lat, location.lng);
       }
-    } else if (isWhatsNewDraft) {
-      queryString = generateWhatsNewQuery();
     } else if (useCase && useCase.generateQuery) {
       const queryMask = {
         type: "query",

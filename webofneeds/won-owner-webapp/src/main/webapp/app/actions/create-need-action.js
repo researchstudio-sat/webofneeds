@@ -15,7 +15,7 @@ import {
   nominatim2draftLocation,
 } from "../utils.js";
 
-import { isWhatsAroundNeed, isWhatsNewNeed } from "../need-utils.js";
+import { isWhatsAroundNeed } from "../need-utils.js";
 import * as accountUtils from "../account-utils.js";
 
 export function needEdit(draft, oldNeed, nodeUri) {
@@ -128,30 +128,6 @@ export function needCreate(draft, persona, nodeUri) {
   };
 }
 
-export function createWhatsNew() {
-  return (dispatch, getState) => {
-    const state = getState();
-    const nodeUri = getIn(state, ["config", "defaultNodeUri"]);
-
-    dispatch({ type: actionTypes.needs.whatsNew });
-
-    const whatsNewObject = {
-      content: {
-        flags: ["won:WhatsNew", "won:NoHintForCounterpart"],
-      },
-      seeks: {},
-    };
-
-    getIn(state, ["needs"])
-      .filter(need => isWhatsAroundNeed(need) || isWhatsNewNeed(need))
-      .map(need => {
-        dispatch(actionCreators.needs__delete(need.get("uri")));
-      });
-
-    dispatch(actionCreators.needs__create(whatsNewObject, null, nodeUri));
-  };
-}
-
 export function createWhatsAround() {
   return (dispatch, getState) => {
     const state = getState();
@@ -170,7 +146,7 @@ export function createWhatsAround() {
             const location = nominatim2draftLocation(searchResult);
 
             getIn(state, ["needs"])
-              .filter(need => isWhatsAroundNeed(need) || isWhatsNewNeed(need))
+              .filter(need => isWhatsAroundNeed(need))
               .map(need => {
                 dispatch(actionCreators.needs__delete(need.get("uri"))); //TODO action creators should not call other action creators, according to Moru
               });

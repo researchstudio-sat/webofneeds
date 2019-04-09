@@ -148,18 +148,6 @@ export function isSearchNeed(need) {
 }
 
 /**
- * Determines if a given need is a WhatsNew-Need
- * @param need
- * @returns {*|boolean}
- */
-export function isWhatsNewNeed(need) {
-  return (
-    getIn(need, ["content", "flags"]) &&
-    getIn(need, ["content", "flags"]).contains("won:WhatsNew")
-  );
-}
-
-/**
  * Generates an array that contains all need flags, using a human readable label if available.
  */
 export function generateFullNeedFlags(needImm) {

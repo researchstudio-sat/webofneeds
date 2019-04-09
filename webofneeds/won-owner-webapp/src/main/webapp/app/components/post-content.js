@@ -196,9 +196,7 @@ function genComponentConf() {
           this.postUri
         );
 
-        const isOwnedNeedWhatsX =
-          isOwned &&
-          (needUtils.isWhatsAroundNeed(post) || needUtils.isWhatsNewNeed(post));
+        const isOwnedNeedWhatsX = isOwned && needUtils.isWhatsAroundNeed(post);
 
         const viewState = get(state, "view");
         const process = get(state, "process");

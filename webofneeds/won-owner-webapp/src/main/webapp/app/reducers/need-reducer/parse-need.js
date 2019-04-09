@@ -2,7 +2,6 @@ import Immutable from "immutable";
 import won from "../../won-es6.js";
 import * as useCaseUtils from "../../usecase-utils.js";
 import {
-  isWhatsNewNeed,
   isWhatsAroundNeed,
   isSearchNeed,
   isPersona,
@@ -228,8 +227,6 @@ function getHumanReadableStringFromNeed(need, detailsToParse) {
 
     if (isPersona(need)) {
       return getIn(need, ["content", "personaName"]);
-    } else if (isWhatsNewNeed(immNeed)) {
-      return "What's New";
     } else if (isWhatsAroundNeed(immNeed)) {
       let location =
         (needContent && needContent["location"]) ||

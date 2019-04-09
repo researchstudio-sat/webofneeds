@@ -56,9 +56,6 @@ function genComponentConf() {
       <div class="suggestpostp__error" ng-if="self.uriToFetchFailedToLoad && self.fetchNeedUriFieldHasText()">
           Failed to Load Suggestion, might not be a valid uri.
       </div>
-      <div class="suggestpostp__error" ng-if="self.uriToFetchIsWhatsNew && self.fetchNeedUriFieldHasText()">
-          Suggestion invalid, you are trying to share a What's New Need.
-      </div>
       <div class="suggestpostp__error" ng-if="self.uriToFetchIsWhatsAround && self.fetchNeedUriFieldHasText()">
           Suggestion invalid, you are trying to share a What's Around Need.
       </div>
@@ -108,9 +105,6 @@ function genComponentConf() {
         ]);
         const uriToFetchLoading = !!get(uriToFetchProcess, "loading");
         const uriToFetchFailedToLoad = !!get(uriToFetchProcess, "failedToLoad");
-        const uriToFetchIsWhatsNew = needUtils.isWhatsNewNeed(
-          get(allForbiddenNeeds, this.uriToFetch)
-        );
         const uriToFetchIsWhatsAround = needUtils.isWhatsAroundNeed(
           get(allForbiddenNeeds, this.uriToFetch)
         );
@@ -127,7 +121,6 @@ function genComponentConf() {
           suggestedNeedUri,
           uriToFetchLoading,
           uriToFetchFailedToLoad,
-          uriToFetchIsWhatsNew,
           uriToFetchIsWhatsAround,
           uriToFetchIsExcluded,
           uriToFetchIsNotAllowed,
@@ -149,7 +142,6 @@ function genComponentConf() {
             !uriToFetchLoading &&
             (uriToFetchFailedToLoad ||
               uriToFetchIsWhatsAround ||
-              uriToFetchIsWhatsNew ||
               uriToFetchIsExcluded ||
               uriToFetchIsNotAllowed),
         };
@@ -208,7 +200,6 @@ function genComponentConf() {
     isSuggestable(need) {
       return (
         !needUtils.isWhatsAroundNeed(need) &&
-        !needUtils.isWhatsNewNeed(need) &&
         !this.isExcludedNeed(need) &&
         this.hasAtLeastOneAllowedFacet(need)
       );
