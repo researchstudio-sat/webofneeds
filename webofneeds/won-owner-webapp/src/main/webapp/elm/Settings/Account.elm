@@ -414,12 +414,8 @@ view skin model =
             changeView skin model
 
           else
-            changeView skin model
-
-        {- DEBUG
-           paragraph [ width fill ]
-               [ text "You need an account with a verified email address to export your data" ]
-        -}
+            paragraph [ width fill ]
+                [ text "You need an account with a verified email address to export your data" ]
         ]
 
 
