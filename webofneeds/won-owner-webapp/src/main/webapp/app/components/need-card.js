@@ -148,10 +148,7 @@ function genComponentConf() {
     }
 
     hideNeed() {
-      return (
-        this.needFailedToLoad ||
-        (this.needLoaded && needUtils.isInactive(this.need))
-      );
+      return this.needLoaded && needUtils.isInactive(this.need);
     }
 
     hasTitle() {
