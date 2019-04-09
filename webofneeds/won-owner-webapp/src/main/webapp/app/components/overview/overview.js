@@ -54,7 +54,7 @@ class Controller {
             generalSelectors.selectLastUpdateTime(state),
             lastNeedUrisUpdateDate
           ),
-        needUrisArray: needUris && needUris.toArray().splice(0, 1000), //FIXME: CURRENTLY LIMIT TO 1000 entries
+        needUrisArray: needUris && needUris.toArray().splice(0, 200), //FIXME: CURRENTLY LIMIT TO 200 entries
         needUrisSize: needUris ? needUris.size : 0,
         isOwnerNeedUrisLoading,
         isOwnerNeedUrisToLoad,
