@@ -5,7 +5,6 @@
 import angular from "angular";
 import inviewModule from "angular-inview";
 import "ng-redux";
-import squareImageModule from "./square-image.js";
 import { actionCreators } from "../actions/actions.js";
 import { relativeTime } from "../won-label-utils.js";
 import { attach, getIn, get } from "../utils.js";
@@ -20,38 +19,44 @@ import "style/_need-card.scss";
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
   let template = `
-    <won-square-image
-        ng-if="self.needLoaded"
-        uri="::self.needUri">
-    </won-square-image>
-    <div class="ph__icon__skeleton"
-      ng-if="self.needToLoad"
-      in-view="$inview && self.ensureNeedIsLoaded()">
+    <div class="card__icon" ng-if="self.needLoaded"
+        ng-class="{
+          'won-is-persona': self.isPersona,
+          'inactive': self.isInactive,
+        }">
+        <div class="image usecaseimage" style="background-color: {{::self.useCaseIconBackground}}"
+            ng-if="::self.useCaseIcon">
+            <svg class="si__usecaseicon">
+                <use xlink:href="{{ ::self.useCaseIcon }}" href="{{ ::self.useCaseIcon }}"></use>
+            </svg>
+        </div>
+        <img class="image"
+            ng-if="::self.identiconSvg"
+            alt="Auto-generated title image"
+            ng-src="data:image/svg+xml;base64,{{::self.identiconSvg}}">
     </div>
-    <div class="ph__icon__skeleton" ng-if="self.needLoading || self.needFailedToLoad"></div>
-    <div class="ph__right" ng-if="self.needLoaded">
-        <div class="ph__right__topline">
-            <div class="ph__right__topline__title" ng-if="self.hasTitle()">
+    <div class="card__icon__skeleton" ng-if="!self.needLoaded"
+      in-view="$inview && self.needToLoad && self.ensureNeedIsLoaded()">
+    </div>
+    <div class="card__main" ng-if="self.needLoaded">
+        <div class="card__main__topline">
+            <div class="card__main__topline__title" ng-if="self.hasTitle()">
                 {{ self.generateTitle() }}
             </div>
-            <div class="ph__right__topline__notitle" ng-if="!self.hasTitle() && self.isDirectResponse">
+            <div class="card__main__topline__notitle" ng-if="!self.hasTitle() && self.isDirectResponse">
                 RE: no title
             </div>
-            <div class="ph__right__topline__notitle" ng-if="!self.hasTitle() && !self.isDirectResponse">
+            <div class="card__main__topline__notitle" ng-if="!self.hasTitle() && !self.isDirectResponse">
                 no title
             </div>
         </div>
-        <div class="ph__right__subtitle">
-            <span class="ph__right__subtitle__type">
-                <span class="ph__right__subtitle__type__persona"
-                    ng-if="self.personaName">
-                    {{self.personaName}}
-                </span>
-                <span class="ph__right__subtitle__type__groupchat"
+        <div class="card__main__subtitle">
+            <span class="card__main__subtitle__type">
+                <span class="card__main__subtitle__type__groupchat"
                     ng-if="self.isGroupChatEnabled && !self.isChatEnabled">
                     Group Chat
                 </span>
-                <span class="ph__right__subtitle__type__groupchat"
+                <span class="card__main__subtitle__type__groupchat"
                     ng-if="self.isGroupChatEnabled && self.isChatEnabled">
                     Group Chat enabled
                 </span>
@@ -59,29 +64,43 @@ function genComponentConf() {
                     {{ self.needTypeLabel }}
                 </span>
             </span>
-            <div class="ph__right__subtitle__date">
+            <div class="card__main__subtitle__date">
                 {{ self.friendlyTimestamp }}
             </div>
         </div>
     </div>
-    <div class="ph__right" ng-if="self.needFailedToLoad">
-        <div class="ph__right__topline">
-            <div class="ph__right__topline__notitle">
+    <div class="card__persona" ng-if="self.needLoaded && self.persona">
+          <img class="card__persona__icon"
+              ng-if="::self.personaIdenticonSvg"
+              alt="Auto-generated title image for persona that holds the need"
+              ng-src="data:image/svg+xml;base64,{{::self.personaIdenticonSvg}}">
+          <div class="card__persona__name"
+              ng-if="self.personaName">
+              <span class="card__persona__name__label">{{ self.personaName }}</span>
+              <span class="card__persona__name__verification card__persona__name__verification--verified" ng-if="self.personaVerified" title="The Persona-Relation of this Post is verified by the Persona">Verified</span>
+              <span class="card__persona__name__verification card__persona__name__verification--unverified" ng-if="!self.personaVerified" title="The Persona-Relation of this Post is NOT verified by the Persona">Unverified!</span>
+          </div>
+          <div class="card__persona__websitelabel" ng-if="self.personaWebsite">Website:</div>
+          <a class="card__persona__websitelink" target="_blank" href="{{self.personaWebsite}}" ng-if="self.personaWebsite">{{ self.personaWebsite }}</a>
+    </div>
+    <div class="card__main" ng-if="self.needFailedToLoad">
+        <div class="card__main__topline">
+            <div class="card__main__topline__notitle">
                 Need Loading failed
             </div>
         </div>
-        <div class="ph__right__subtitle">
-            <span class="ph__right__subtitle__type">
+        <div class="card__main__subtitle">
+            <span class="card__main__subtitle__type">
                 Need might have been deleted.
             </span>
         </div>
     </div>
-    <div class="ph__right" ng-if="self.needLoading || self.needToLoad">
-        <div class="ph__right__topline">
-            <div class="ph__right__topline__title"></div>
+    <div class="card__main" ng-if="self.needLoading || self.needToLoad">
+        <div class="card__main__topline">
+            <div class="card__main__topline__title"></div>
         </div>
-        <div class="ph__right__subtitle">
-            <span class="ph__right__subtitle__type"></span>
+        <div class="card__main__subtitle">
+            <span class="card__main__subtitle__type"></span>
         </div>
     </div>
     `;
@@ -89,7 +108,7 @@ function genComponentConf() {
   class Controller {
     constructor() {
       attach(this, serviceDependencies, arguments);
-      window.ph4dbg = this;
+      window.nc4dbg = this;
 
       const selectFromState = state => {
         const need = getIn(state, ["needs", this.needUri]);
@@ -99,17 +118,35 @@ function genComponentConf() {
         const responseToNeed =
           responseToUri && getIn(state, ["needs", responseToUri]);
 
+        const isPersona = needUtils.isPersona(need);
+
         const personaUri = get(need, "heldBy");
         const persona = personaUri && getIn(state, ["needs", personaUri]);
         const personaName = get(persona, "humanReadable");
-
+        const personaHolds = persona && get(persona, "holds");
+        const personaVerified =
+          personaHolds && personaHolds.includes(this.needUri);
         const process = get(state, "process");
 
+        const personaIdenticonSvg = needUtils.getIdenticonSvg(persona);
+        const useCaseIcon = !isPersona
+          ? needUtils.getMatchedUseCaseIcon(need)
+          : undefined;
+        const useCaseIconBackground = !isPersona
+          ? needUtils.getMatchedUseCaseIconBackground(need)
+          : undefined;
+        const identiconSvg = !useCaseIcon
+          ? needUtils.getIdenticonSvg(need)
+          : undefined;
+
         return {
+          //General
           responseToNeed,
           need,
           needTypeLabel: need && needUtils.generateNeedTypeLabel(need),
+          persona,
           personaName,
+          personaVerified,
           needLoaded: processUtils.isNeedLoaded(process, this.needUri),
           needLoading: processUtils.isNeedLoading(process, this.needUri),
           needToLoad: processUtils.isNeedToLoad(process, this.needUri),
@@ -117,6 +154,8 @@ function genComponentConf() {
             process,
             this.needUri
           ),
+          isPersona,
+          isInactive: needUtils.isInactive(need),
           isDirectResponse: isDirectResponse,
           isGroupChatEnabled: needUtils.hasGroupFacet(need),
           isChatEnabled: needUtils.hasChatFacet(need),
@@ -126,6 +165,11 @@ function genComponentConf() {
               selectLastUpdateTime(state),
               get(need, "lastUpdateDate")
             ),
+          //image specific
+          useCaseIconBackground,
+          useCaseIcon,
+          identiconSvg,
+          personaIdenticonSvg,
         };
       };
 
@@ -182,8 +226,5 @@ function genComponentConf() {
 }
 
 export default angular
-  .module("won.owner.components.needCard", [
-    squareImageModule,
-    inviewModule.name,
-  ])
+  .module("won.owner.components.needCard", [inviewModule.name])
   .directive("wonNeedCard", genComponentConf).name;

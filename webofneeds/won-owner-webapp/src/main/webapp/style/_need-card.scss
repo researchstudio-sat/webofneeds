@@ -1,13 +1,11 @@
 @import "won-config";
 @import "sizing-utils";
-@import "square-image";
 @import "animate";
 
 won-need-card {
   display: grid;
-  grid-gap: 0.5rem;
-  grid-template-areas: "icon" "main";
-  grid-template-rows: max-content min-content;
+  grid-template-areas: "card__icon" "card__main" "card__persona";
+  grid-template-rows: max-content min-content min-content;
   padding: 0.5rem;
   color: black;
 
@@ -20,31 +18,117 @@ won-need-card {
     @include animateOpacityHeartBeat();
     pointer-events: none;
 
-    .ph__right__subtitle__type {
+    .card__main__subtitle__type {
       height: $smallFontSize;
       width: 5rem;
       background-color: $won-skeleton-color;
     }
 
-    .ph__right__topline__title {
+    .card__main__topline__title {
       height: $normalFontSize;
       width: 7rem;
       background-color: $won-skeleton-color;
     }
   }
-  @include square-image(15rem);
-
-  .ph__icon__skeleton {
+  .card__icon__skeleton {
     @include fixed-square(15rem);
     background-color: $won-skeleton-color;
+    margin-bottom: 0.5rem;
   }
 
-  won-square-image {
-    grid-area: icon;
+  .card__icon {
+    grid-area: card__icon;
+    margin-bottom: 0.5rem;
+
+    display: block;
+    user-select: none;
+    position: relative;
+    height: 15rem;
+
+    &.won-is-persona .image {
+      border-radius: 100%;
+    }
+
+    &.inactive {
+      -webkit-filter: grayscale(100%);
+      filter: grayscale(100%);
+    }
+
+    & .image {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      @include fixed-square(15rem);
+
+      &.usecaseimage {
+        box-sizing: border-box;
+        padding: 0.25rem;
+
+        > svg {
+          @include fixed-square(calc(#{15rem}-0.5rem));
+        }
+
+        & .si__usecaseicon {
+          --local-primary: #{$won-secondary-text-color};
+        }
+      }
+    }
   }
 
-  .ph__right {
-    grid-area: main;
+  .card__persona {
+    grid-area: card__persona;
+    margin-top: 0.5rem;
+
+    display: grid;
+    grid-template-areas:
+      "card__persona__icon card__persona__name card__persona__name"
+      "card__persona__icon card__persona__websitelabel card__persona__websitelink";
+    grid-template-columns: $postIconSize max-content 1fr;
+    grid-column-gap: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: $thinGrayBorder;
+
+    &__icon {
+      grid-area: card__persona__icon;
+
+      border-radius: 100%;
+      @include fixed-square($postIconSize);
+    }
+
+    &__name {
+      grid-area: card__persona__name;
+      display: flex;
+      align-items: center;
+
+      &__label {
+        font-size: $normalFontSize;
+      }
+
+      &__verification {
+        font-size: $smallFontSize;
+        margin-left: 0.25rem;
+
+        &--verified {
+          color: $won-line-gray;
+        }
+        &--unverified {
+          color: $won-unread-attention;
+        }
+      }
+    }
+
+    .card__persona__websitelabel {
+      font-size: $smallFontSize;
+      grid-area: card__persona__websitelabel;
+    }
+    .card__persona__websitelink {
+      font-size: $smallFontSize;
+      grid-area: card__persona__websitelink;
+    }
+  }
+
+  .card__main {
+    grid-area: card__main;
     display: grid;
     grid-template-areas: "topline" "subtitle";
     width: 15rem;
@@ -79,15 +163,6 @@ won-need-card {
         text-overflow: ellipsis;
         overflow: hidden;
         white-space: nowrap;
-
-        &__persona {
-          border-radius: 0.19rem;
-          background: $won-secondary-color-lighter;
-          color: $won-secondary-text-color;
-          margin: 0.1rem;
-          padding: 0 0.25rem;
-          display: inline-block;
-        }
 
         &__groupchat {
           border-radius: 0.19rem;
