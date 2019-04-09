@@ -122,8 +122,6 @@ import { Generator } from "sparqljs";
       return addContent(contentNode, seeksData);
     };
 
-    const matchingContext = args.matchingContext;
-
     let seeksContentUri = args.seeks && won.WON.contentNodeBlankUri.seeks;
 
     const useCase = useCaseUtils.getUseCase(args.useCase);
@@ -211,7 +209,6 @@ import { Generator } from "sparqljs";
       "won:doNotMatchAfter": doNotMatchAfter
         ? { "@value": doNotMatchAfter, "@type": "xsd:dateTime" }
         : undefined,
-      "won:hasMatchingContext": matchingContext ? matchingContext : undefined,
       "won:hasQuery": queryString,
     };
 

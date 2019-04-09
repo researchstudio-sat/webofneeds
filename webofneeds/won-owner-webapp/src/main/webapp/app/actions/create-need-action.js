@@ -132,7 +132,6 @@ export function createWhatsNew() {
   return (dispatch, getState) => {
     const state = getState();
     const nodeUri = getIn(state, ["config", "defaultNodeUri"]);
-    const defaultContext = getIn(state, ["config", "theme", "defaultContext"]);
 
     dispatch({ type: actionTypes.needs.whatsNew });
 
@@ -141,7 +140,6 @@ export function createWhatsNew() {
         flags: ["won:WhatsNew", "won:NoHintForCounterpart"],
       },
       seeks: {},
-      matchingContext: defaultContext,
     };
 
     getIn(state, ["needs"])
@@ -158,7 +156,6 @@ export function createWhatsAround() {
   return (dispatch, getState) => {
     const state = getState();
     const nodeUri = getIn(state, ["config", "defaultNodeUri"]);
-    const defaultContext = getIn(state, ["config", "theme", "defaultContext"]);
 
     dispatch({ type: actionTypes.needs.whatsAround });
 
@@ -182,7 +179,6 @@ export function createWhatsAround() {
                 flags: ["won:WhatsAround", "won:NoHintForCounterpart"],
               },
               seeks: { location: location },
-              matchingContext: defaultContext,
             };
 
             dispatch(

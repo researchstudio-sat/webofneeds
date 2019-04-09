@@ -159,19 +159,7 @@ export function isWhatsNewNeed(need) {
 }
 
 /**
- * Generates a string that can be used to add matching contexts to a label.
- */
-export function generateNeedMatchingContext(needImm) {
-  const matchingContexts = needImm && needImm.get("matchingContexts");
-  if (matchingContexts && matchingContexts.size > 0) {
-    return " posted in " + matchingContexts.join(", ");
-  } else {
-    return "";
-  }
-}
-
-/**
- * Generates a string that can be used as a Types Label for any given need, includes the matchingContexts
+ * Generates a string that can be used as a Types Label for any given need
  * TODO: We Do not store a single type anymore but a list of types... adapt accordingly
  */
 export function generateFullNeedTypesLabel(needImm) {
@@ -185,7 +173,7 @@ export function generateFullNeedTypesLabel(needImm) {
     label = types.join(", ");
   }
 
-  return label + generateNeedMatchingContext(needImm);
+  return label;
 }
 
 /**

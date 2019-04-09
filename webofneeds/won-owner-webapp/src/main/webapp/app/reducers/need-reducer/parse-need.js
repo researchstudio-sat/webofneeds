@@ -22,7 +22,6 @@ export function parseNeed(jsonldNeed) {
       identiconSvg: generateIdenticon(jsonldNeedImm),
       nodeUri: jsonldNeedImm.getIn(["won:hasWonNode", "@id"]),
       state: extractState(jsonldNeedImm),
-      matchingContexts: extractMatchingContext(jsonldNeedImm),
       heldBy: won.parseFrom(jsonldNeedImm, ["won:heldBy"], "xsd:ID"),
       holds:
         won.parseListFrom(jsonldNeedImm, ["won:holds"], "xsd:ID") ||
@@ -135,15 +134,6 @@ function extractState(needJsonLd) {
     won.WON.ActiveCompacted
     ? won.WON.ActiveCompacted
     : won.WON.InactiveCompacted;
-}
-
-function extractMatchingContext(needJsonLd) {
-  const wonHasMatchingContexts = needJsonLd.get("won:hasMatchingContext");
-  return wonHasMatchingContexts
-    ? Immutable.List.isList(wonHasMatchingContexts)
-      ? wonHasMatchingContexts
-      : Immutable.List.of(wonHasMatchingContexts)
-    : undefined;
 }
 
 function generateIdenticon(needJsonLd) {

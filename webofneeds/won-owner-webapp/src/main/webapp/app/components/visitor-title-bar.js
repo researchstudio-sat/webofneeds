@@ -8,7 +8,6 @@ import { getPostUriFromRoute } from "../selectors/general-selectors.js";
 import {
   generateFullNeedTypesLabel,
   generateShortNeedTypesLabel,
-  generateNeedMatchingContext,
 } from "../need-utils.js";
 import { actionCreators } from "../actions/actions.js";
 import postContextDropDownModule from "../components/post-context-dropdown.js";
@@ -39,7 +38,7 @@ function genComponentConf() {
                           ng-if="self.isGroupChatEnabled && self.isChatEnabled">
                           Group Chat enabled
                         </span>
-                        <div class="vtb__titles__type" ng-if="!self.shouldShowRdf">{{ self.shortTypesLabel }}{{ self.matchingContext }}</div>
+                        <div class="vtb__titles__type" ng-if="!self.shouldShowRdf">{{ self.shortTypesLabel }}</div>
                         <div class="vtb__titles__type" ng-if="self.shouldShowRdf">{{ self.fullTypesLabel }}</div>
                     </hgroup>
                 </div>
@@ -77,7 +76,6 @@ function genComponentConf() {
           isChatEnabled: needUtils.hasChatFacet(post),
           fullTypesLabel: post && generateFullNeedTypesLabel(post),
           shortTypesLabel: post && generateShortNeedTypesLabel(post),
-          matchingContext: post && generateNeedMatchingContext(post),
           shouldShowRdf: state.getIn(["view", "showRdf"]),
         };
       };

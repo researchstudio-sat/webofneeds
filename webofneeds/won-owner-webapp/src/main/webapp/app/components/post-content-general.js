@@ -14,7 +14,6 @@ import {
   generateFullNeedFacets,
   generateShortNeedFlags,
   generateShortNeedFacets,
-  generateNeedMatchingContext,
 } from "../need-utils.js";
 import * as viewUtils from "../view-utils.js";
 import {
@@ -68,17 +67,7 @@ function genComponentConf() {
               Type
             </div>
             <div class="pcg__columns__left__item__value">
-              {{ self.shortTypesLabel }} {{self.matchingContext}}
-            </div>
-          </div>
-        </div>
-        <div class="pcg__columns__right" ng-if="!self.shouldShowRdf && self.shortTypesLabel.length === 0 && self.matchingContext.length > 0">
-          <div class="pcg__columns__left__item">
-            <div class="pcg__columns__left__item__label">
-              Context
-            </div>
-            <div class="pcg__columns__left__item__value">
-              {{self.matchingContext}}
+              {{ self.shortTypesLabel }}
             </div>
           </div>
         </div>
@@ -140,7 +129,6 @@ function genComponentConf() {
           WON: won.WON,
           fullTypesLabel: post && generateFullNeedTypesLabel(post),
           shortTypesLabel: post && generateShortNeedTypesLabel(post),
-          matchingContext: post && generateNeedMatchingContext(post),
           fullFlags: post && generateFullNeedFlags(post),
           shortFlags: post && generateShortNeedFlags(post),
           fullFacets: post && generateFullNeedFacets(post),

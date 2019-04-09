@@ -53,7 +53,7 @@ function genComponentConf() {
             Group Chat enabled
           </span>
           <span ng-if="!self.shouldShowRdf">
-            {{ self.shortTypesLabel }}{{ self.matchingContext }}
+            {{ self.shortTypesLabel }}
           </span>
           <span ng-if="self.shouldShowRdf">
             {{ self.fullTypesLabel }}
@@ -96,7 +96,7 @@ function genComponentConf() {
             Group Chat enabled
           </span>
           <span class="ph__right__subtitle__type" ng-if="!self.shouldShowRdf">
-            {{ self.shortTypesLabel }}{{ self.matchingContext }}
+            {{ self.shortTypesLabel }}
           </span>
           <span class="ph__right__subtitle__type" ng-if="self.shouldShowRdf">
             {{ self.fullTypesLabel }}
@@ -139,7 +139,6 @@ function genComponentConf() {
           need,
           fullTypesLabel: need && needUtils.generateFullNeedTypesLabel(need),
           shortTypesLabel: need && needUtils.generateShortNeedTypesLabel(need),
-          matchingContext: need && needUtils.generateNeedMatchingContext(need),
           personaName,
           needLoading:
             !need || processUtils.isNeedLoading(process, this.needUri),
