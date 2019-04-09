@@ -3,8 +3,11 @@ port module Actions exposing
     , disconnectPersona
     )
 
-import Application exposing (Id)
 import Json.Encode as Encode exposing (Value)
+
+
+type alias Id =
+    String
 
 
 port outPort : { action : String, payload : Value } -> Cmd msg

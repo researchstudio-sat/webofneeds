@@ -1,0 +1,289 @@
+module AddPersona exposing (main)
+
+import Actions
+import Application exposing (Style, logError)
+import Browser
+import Color
+import Dict exposing (Dict)
+import Dict.Extra as Dict
+import Html exposing (..)
+import Html.Attributes as Attributes
+import Html.Events as Events
+import Icons
+import Json.Decode as Decode exposing (Decoder, Value)
+import Json.Decode.Extra as Decode
+import Json.Decode.Pipeline as DP
+import Maybe.Extra as Maybe
+import Time exposing (Posix)
+import Url exposing (Url)
+
+
+
+---- MODEL ----
+
+
+type alias Id =
+    String
+
+
+type Model
+    = Selecting (Maybe Id)
+    | AddingPersona Id
+
+
+type alias Persona =
+    { uri : String
+    , name : String
+    , created : Posix
+    }
+
+
+
+---- PROPS ----
+
+
+type alias Props =
+    { postUri : Id
+    , personas : List Persona
+    }
+
+
+compareCheck : a -> Decoder a -> Decoder ()
+compareCheck value decoder =
+    decoder
+        |> Decode.andThen
+            (\decoded ->
+                if decoded == value then
+                    Decode.succeed ()
+
+                else
+                    Decode.fail "Unexpected value"
+            )
+
+
+checkDecoder : Decoder () -> Decoder a -> Decoder a
+checkDecoder guard decoder =
+    guard
+        |> Decode.andThen (\() -> decoder)
+
+
+personaDecoder : Decoder Persona
+personaDecoder =
+    Decode.succeed Persona
+        |> DP.required "url" Decode.string
+        |> DP.required "displayName" Decode.string
+        |> DP.required "timestamp" Decode.datetime
+        |> checkDecoder (Decode.field "saved" <| compareCheck True Decode.bool)
+
+
+propDecoder : Decoder Props
+propDecoder =
+    Decode.map2 Props
+        (Decode.at [ "post", "uri" ] Decode.string)
+        (Decode.field "personas" <| Decode.list personaDecoder)
+
+
+
+---- INIT ----
+
+
+init : Props -> ( Model, Cmd Msg )
+init { postUri, personas } =
+    ( Selecting Nothing
+    , Cmd.none
+    )
+
+
+
+---- UPDATE ----
+
+
+type Msg
+    = SelectPersona Id
+    | AddPersona
+
+
+selectedPersona : List Persona -> Model -> Maybe Persona
+selectedPersona personas model =
+    let
+        getPersona id =
+            personas
+                |> List.filter (\persona -> persona.uri == id)
+                |> List.head
+    in
+    case model of
+        Selecting id ->
+            id |> Maybe.andThen getPersona
+
+        AddingPersona id ->
+            getPersona id
+
+
+update :
+    Msg
+    ->
+        { model : Model
+        , props : Props
+        }
+    -> ( Model, Cmd Msg )
+update msg { model, props } =
+    case msg of
+        AddPersona ->
+            case model of
+                AddingPersona _ ->
+                    ( model, Cmd.none )
+
+                Selecting Nothing ->
+                    ( model, Cmd.none )
+
+                Selecting (Just id) ->
+                    case selectedPersona props.personas model of
+                        Just persona ->
+                            ( AddingPersona id
+                            , Actions.connectPersona
+                                { personaUrl = id
+                                , needUrl = props.postUri
+                                }
+                            )
+
+                        Nothing ->
+                            ( model, Cmd.none )
+
+        SelectPersona id ->
+            case model of
+                AddingPersona _ ->
+                    ( model, Cmd.none )
+
+                Selecting _ ->
+                    ( Selecting (Just id), Cmd.none )
+
+
+
+---- VIEW ----
+
+
+view :
+    { style : Style
+    , model : Model
+    , props : Props
+    }
+    -> Html Msg
+view { style, model, props } =
+    let
+        saving =
+            case model of
+                AddingPersona _ ->
+                    True
+
+                _ ->
+                    False
+
+        selected =
+            selectedPersona props.personas model
+                |> Maybe.isJust
+    in
+    div
+        [ Attributes.classList
+            [ ( "won-add-persona", True )
+            , ( "saving", saving )
+            ]
+        ]
+        ([ h1 [] [ text "Add a persona to your post" ]
+         ]
+            ++ (if List.isEmpty props.personas then
+                    [ div [] [ text "You have no personas yet" ]
+                    , a
+                        [ Attributes.href "#!/settings"
+                        , Attributes.class "won-button--filled"
+                        , Attributes.class "red"
+                        ]
+                        [ text "Create a Persona" ]
+                    ]
+
+                else
+                    [ personaList props.personas model
+                    , wonButton
+                        [ Attributes.disabled (not selected)
+                        , Events.onClick AddPersona
+                        , Attributes.class "add-persona-button"
+                        ]
+                        [ if saving then
+                            text "Saving..."
+
+                          else
+                            text "Add"
+                        ]
+                    ]
+               )
+        )
+
+
+wonButton : List (Attribute msg) -> List (Html msg) -> Html msg
+wonButton attrs children =
+    button
+        (attrs
+            ++ [ Attributes.class "red"
+               , Attributes.class "won-button--filled"
+               ]
+        )
+        children
+
+
+personaSelected : Model -> Persona -> Bool
+personaSelected model persona =
+    case model of
+        Selecting (Just id) ->
+            id == persona.uri
+
+        AddingPersona id ->
+            id == persona.uri
+
+        Selecting Nothing ->
+            False
+
+
+personaList : List Persona -> Model -> Html Msg
+personaList personas model =
+    ul [ Attributes.class "won-persona-list" ]
+        (personas
+            |> List.sortBy (.created >> Time.posixToMillis)
+            |> List.reverse
+            |> List.map
+                (\persona ->
+                    personaEntry (personaSelected model persona) persona
+                )
+        )
+
+
+personaEntry : Bool -> Persona -> Html Msg
+personaEntry selected persona =
+    div
+        [ Attributes.classList
+            [ ( "won-persona-list-entry", True )
+            , ( "selected", selected )
+            ]
+        , Events.onClick (SelectPersona persona.uri)
+        ]
+        [ personaIcon persona
+        , span [ Attributes.class "won-persona-name" ]
+            [ text persona.name ]
+        ]
+
+
+personaIcon : Persona -> Html msg
+personaIcon persona =
+    Icons.identicon [ Attributes.class "won-persona-icon" ] persona.uri
+
+
+
+---- MAIN ----
+
+
+main =
+    Application.element
+        { init = init
+        , update = update
+        , view = view
+        , subscriptions = \_ -> Sub.none
+        , propDecoder = propDecoder
+        }
