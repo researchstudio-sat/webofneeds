@@ -112,8 +112,8 @@ function genComponentConf() {
         return {
           responseToNeed,
           need,
-          fullTypesLabel: need && needUtils.generateFullNeedTypesLabel(need),
-          shortTypesLabel: need && needUtils.generateShortNeedTypesLabel(need),
+          fullTypesLabel: need && needUtils.generateNeedTypeLabel(need),
+          shortTypesLabel: need && needUtils.generateNeedTypeLabel(need),
           personaName,
           needLoaded: processUtils.isNeedLoaded(process, this.needUri),
           needLoading: processUtils.isNeedLoading(process, this.needUri),

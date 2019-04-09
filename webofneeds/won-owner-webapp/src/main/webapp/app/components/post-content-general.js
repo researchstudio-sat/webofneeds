@@ -7,14 +7,7 @@ import { attach, get, getIn } from "../utils.js";
 import won from "../won-es6.js";
 import { relativeTime } from "../won-label-utils.js";
 import { connect2Redux } from "../won-utils.js";
-import {
-  generateFullNeedTypesLabel,
-  generateShortNeedTypesLabel,
-  generateFullNeedFlags,
-  generateFullNeedFacets,
-  generateShortNeedFlags,
-  generateShortNeedFacets,
-} from "../need-utils.js";
+import * as needUtils from "../need-utils.js";
 import * as viewUtils from "../view-utils.js";
 import {
   selectLastUpdateTime,
@@ -127,12 +120,12 @@ function genComponentConf() {
 
         return {
           WON: won.WON,
-          fullTypesLabel: post && generateFullNeedTypesLabel(post),
-          shortTypesLabel: post && generateShortNeedTypesLabel(post),
-          fullFlags: post && generateFullNeedFlags(post),
-          shortFlags: post && generateShortNeedFlags(post),
-          fullFacets: post && generateFullNeedFacets(post),
-          shortFacets: post && generateShortNeedFacets(post),
+          fullTypesLabel: post && needUtils.generateNeedTypeLabel(post),
+          shortTypesLabel: post && needUtils.generateNeedTypeLabel(post),
+          fullFlags: post && needUtils.generateFullNeedFlags(post),
+          shortFlags: post && needUtils.generateShortNeedFlags(post),
+          fullFacets: post && needUtils.generateFullNeedFacets(post),
+          shortFacets: post && needUtils.generateShortNeedFacets(post),
           friendlyCreationDate:
             creationDate &&
             relativeTime(selectLastUpdateTime(state), creationDate),

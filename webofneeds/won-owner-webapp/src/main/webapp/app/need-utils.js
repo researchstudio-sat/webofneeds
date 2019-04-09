@@ -6,6 +6,7 @@ import won from "./won-es6.js";
 import { get, getIn } from "./utils.js";
 import { labels } from "./won-label-utils.js";
 import * as connectionUtils from "./connection-utils.js";
+import * as useCaseUtils from "./usecase-utils.js";
 
 /**
  * Determines if a given need is a Active
@@ -159,24 +160,6 @@ export function isWhatsNewNeed(need) {
 }
 
 /**
- * Generates a string that can be used as a Types Label for any given need
- * TODO: We Do not store a single type anymore but a list of types... adapt accordingly
- */
-export function generateFullNeedTypesLabel(needImm) {
-  const types = getIn(needImm, ["content", "type"]);
-
-  //TODO: GENERATE CORRECT LABEL
-  //self.labels.type[self.need.getIn(['content','type'])]
-  let label = "";
-
-  if (types && types.size > 0) {
-    label = types.join(", ");
-  }
-
-  return label;
-}
-
-/**
  * Generates an array that contains all need flags, using a human readable label if available.
  */
 export function generateFullNeedFlags(needImm) {
@@ -207,49 +190,23 @@ export function generateFullNeedFacets(needImm) {
 }
 
 /**
- * Generates a string that can be used as a simplified Types Label for non-debug views. Hides information.
+ * Retrieves the Label of the used useCase as a needType, if no usecase is specified we check if need is a searchNeed or DirectResponseNeed
  * @param {*} needImm the need as saved in the state
  */
-export function generateShortNeedTypesLabel(needImm) {
-  const needTypes = needImm && needImm.getIn(["content", "type"]);
+export function generateNeedTypeLabel(needImm) {
+  const useCase = useCaseUtils.getUseCase(getMatchedUseCaseIdentifier(needImm));
 
-  const getNeedLabel = type => {
-    switch (type) {
-      //Insert specific overrides here
-      default: {
-        const match = /[^:/]+$/.exec(type);
-        if (match) {
-          return match[0];
-        } else {
-          return "Unknown";
-        }
-      }
+  if (useCase) {
+    return useCase.label;
+  } else {
+    if (isSearchNeed(needImm)) {
+      return "Search";
+    } else if (isDirectResponseNeed(needImm)) {
+      return "Direct Response";
     }
-  };
 
-  let label = "";
-
-  if (isWhatsAroundNeed(needImm) || isWhatsNewNeed(needImm)) {
-    label = "";
-  } else if (isSearchNeed(needImm)) {
-    label = "Search";
-  } else if (isDirectResponseNeed(needImm)) {
-    label = "Direct Response";
-    // TODO: groupchat label
-  } else if (needTypes && needTypes.size > 0) {
-    let types = new Array();
-    for (let type of Array.from(needTypes)) {
-      // hide won:Need
-      if (type === "won:Need") {
-        continue;
-        // cut off everything before the first :
-      } else {
-        types.push(getNeedLabel(type));
-      }
-    }
-    label += types.join(", ");
+    return "";
   }
-  return label;
 }
 
 /**

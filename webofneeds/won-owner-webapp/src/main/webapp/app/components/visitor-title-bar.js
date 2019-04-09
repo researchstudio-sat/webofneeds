@@ -5,10 +5,6 @@ import angular from "angular";
 import { attach, get, getIn } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
 import { getPostUriFromRoute } from "../selectors/general-selectors.js";
-import {
-  generateFullNeedTypesLabel,
-  generateShortNeedTypesLabel,
-} from "../need-utils.js";
 import { actionCreators } from "../actions/actions.js";
 import postContextDropDownModule from "../components/post-context-dropdown.js";
 import shareDropdownModule from "../components/share-dropdown.js";
@@ -74,8 +70,8 @@ function genComponentConf() {
           responseToNeed,
           isGroupChatEnabled: needUtils.hasGroupFacet(post),
           isChatEnabled: needUtils.hasChatFacet(post),
-          fullTypesLabel: post && generateFullNeedTypesLabel(post),
-          shortTypesLabel: post && generateShortNeedTypesLabel(post),
+          fullTypesLabel: post && needUtils.generateNeedTypeLabel(post),
+          shortTypesLabel: post && needUtils.generateNeedTypeLabel(post),
           shouldShowRdf: state.getIn(["view", "showRdf"]),
         };
       };
