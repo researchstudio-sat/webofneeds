@@ -173,6 +173,7 @@ export default function(processState = initialState, action = {}) {
         toLoad: false,
         failedToLoad: false,
         loading: false,
+        loaded: true,
       });
       return processState.set("processingPublish", false);
     }
