@@ -616,7 +616,7 @@ export function fetchAllActiveNeedUrisFromOwner(dispatch, getState) {
  * @param state ACTIVE or INACTIVE, default is ACTIVE
  * @returns {*}
  */ function fetchAllNeedUrisFromNode(getState) {
-  const nodeUri = getIn(getState(), ["config", "defaultNodeUri"]);
+  const nodeUri = getIn(getState(), ["config", "defaultNodeUri"]) + "/need/";
   //const nodeUri = "https://node.matchat.org/won/resource/need"; //for testing purposes
 
   return fetch("/owner/rest/linked-data/?uri=" + encodeURIComponent(nodeUri), {
@@ -651,7 +651,7 @@ export function fetchAllActiveNeedUrisFromOwner(dispatch, getState) {
           .get("@graph")
           .first()
           .get("rdfs:member")
-          .map(member => nodeUri + "/" + member.get("@id").split(":")[1])
+          .map(member => nodeUri + member.get("@id").split(":")[1])
           .toJS();
       } else {
         return [];
