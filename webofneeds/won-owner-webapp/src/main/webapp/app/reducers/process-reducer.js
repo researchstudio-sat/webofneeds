@@ -231,6 +231,7 @@ export default function(processState = initialState, action = {}) {
     case actionTypes.personas.storeUriFailed: {
       return updateNeedProcess(processState, action.payload.get("uri"), {
         toLoad: false,
+        loaded: false,
         failedToLoad: true,
         loading: false,
       });
@@ -530,7 +531,11 @@ export default function(processState = initialState, action = {}) {
       return addOriginatorNeedToLoad(processState, action.payload);
 
     case actionTypes.needs.delete:
-      return processState.deleteIn(["needs", action.payload.ownNeedUri]);
+    case actionTypes.needs.removeDeleted:
+    case actionTypes.personas.removeDeleted: {
+      const needUri = action.payload.get("uri");
+      return processState.deleteIn(["needs", needUri]);
+    }
 
     default:
       return processState;

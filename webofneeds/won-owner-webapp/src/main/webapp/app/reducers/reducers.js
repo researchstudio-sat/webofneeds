@@ -78,6 +78,16 @@ const reducers = {
           .set("needUris", ownerNeedUris)
           .set("lastNeedUrisUpdateTime", Date.now());
       }
+
+      case actionTypes.needs.removeDeleted:
+      case actionTypes.personas.removeDeleted:
+      case actionTypes.needs.delete: {
+        const needUri = action.payload.get("uri");
+        const needUris = owner.get("needUris");
+
+        return owner.set("needUris", needUris.remove(needUri));
+      }
+
       default:
         return owner;
     }

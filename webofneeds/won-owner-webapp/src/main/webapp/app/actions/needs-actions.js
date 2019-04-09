@@ -5,6 +5,7 @@
 import won from "../won-es6.js";
 
 import { actionTypes, actionCreators } from "./actions.js";
+import Immutable from "immutable";
 
 import {
   buildConnectMessage,
@@ -167,9 +168,9 @@ export function needsDelete(needUri) {
         // assume close went through successfully, update GUI
         dispatch({
           type: actionTypes.needs.delete,
-          payload: {
-            ownNeedUri: needUri,
-          },
+          payload: Immutable.fromJS({
+            uri: needUri,
+          }),
         })
       );
   };

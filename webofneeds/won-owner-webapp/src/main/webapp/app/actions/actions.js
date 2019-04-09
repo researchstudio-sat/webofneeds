@@ -173,7 +173,7 @@ const actionHierarchy = {
     storeTheirs: INJ_DEFAULT,
 
     storeUriFailed: INJ_DEFAULT,
-    storeUriDeleted: INJ_DEFAULT,
+    removeDeleted: INJ_DEFAULT,
     selectTab: INJ_DEFAULT,
   },
   personas: {
@@ -186,7 +186,7 @@ const actionHierarchy = {
     storeTheirUrisInLoading: INJ_DEFAULT,
 
     storeUriFailed: INJ_DEFAULT,
-    storeUriDeleted: INJ_DEFAULT,
+    removeDeleted: INJ_DEFAULT,
   },
   router: {
     stateGo, // only overwrites parameters that are explicitly mentioned, unless called without queryParams object (which also resets "pervasive" parameters, that shouldn't be removed
