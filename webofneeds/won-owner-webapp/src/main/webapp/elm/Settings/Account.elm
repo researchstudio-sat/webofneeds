@@ -9,6 +9,7 @@ port module Settings.Account exposing
 
 import Element exposing (..)
 import Element.Background as Background
+import Element.Border as Border
 import Element.Font as Font
 import Element.Input as Input
 import Elements
@@ -308,6 +309,19 @@ changeView skin model =
                         , show = False
                         }
                     ]
+                , if String.length newPassword > 0 && String.length newPassword < 6 then
+                    row [ spacing 10 ]
+                        [ el
+                            [ width fill
+                            , Font.color skin.primaryColor
+                            , Font.size 10
+                            ]
+                          <|
+                            text "Password too short, must be at least 6 Characters"
+                        ]
+
+                  else
+                    none
                 , row
                     [ spacing 10
                     ]
@@ -330,6 +344,19 @@ changeView skin model =
                         , show = False
                         }
                     ]
+                , if String.length newPasswordRepeat > 0 && newPassword /= newPasswordRepeat then
+                    row [ spacing 10 ]
+                        [ el
+                            [ width fill
+                            , Font.color skin.primaryColor
+                            , Font.size 10
+                            ]
+                          <|
+                            text "Password is not equal"
+                        ]
+
+                  else
+                    none
                 , row
                     [ width fill
                     , spacing 20
@@ -346,6 +373,9 @@ changeView skin model =
                             else if String.isEmpty newPassword then
                                 Nothing
 
+                            else if String.length newPassword < 6 then
+                                Nothing
+
                             else if String.isEmpty newPasswordRepeat then
                                 Nothing
 
@@ -359,7 +389,13 @@ changeView skin model =
                                 [ centerX
                                 ]
                             <|
-                                if newPassword /= newPasswordRepeat then
+                                if String.length newPassword < 1 then
+                                    text "Save Changes"
+
+                                else if String.length newPassword < 6 then
+                                    text "New password to short"
+
+                                else if newPassword /= newPasswordRepeat then
                                     text "Do not match"
 
                                 else
