@@ -1,0 +1,96 @@
+# This file contains one expression per line that is replaced by the 
+# corresponding line in newforms.txt.
+# Before processing, all lines starting with '#' are stripped.
+http://purl.org/webofneeds
+hasAdditionalData
+hasWonNode
+hasBrokerUri
+hasConnectionState
+hasConnections
+hasEventContainer
+hasFacet
+hasRemoteFacet
+hasDefaultFacet
+hasFlag
+hasMatchingContext
+hasLocation
+hasMatcherProtocolEndpoint
+hasNeedProtocolEndpoint
+hasOriginator
+hasOwner
+hasOwnerProtocolEndpoint
+hasRemoteConnection
+hasRemoteFacet
+hasRemoteNeed
+hasTag
+hasTimeSpecification
+hasActiveMQNeedProtocolQueueName
+hasActiveMQOwnerProtocolQueueName
+hasEndTime
+hasRecursIn
+hasRecursInfiniteTimes
+hasRecursTimes
+hasStartTime
+hasTag
+hasTimeStamp
+isInState
+hasContent
+hasMessageType
+hasTextMessage
+hasReceiver
+hasReceiverNeed
+hasReceiverNode
+hasResponseStateProperty
+hasSender
+hasSenderNeed
+hasSenderNode
+hasSenderFacet
+hasReceiverFacet
+hasCorrespondingRemoteMessage
+hasTimestamp
+hasReceivedTimestamp
+hasSentTimestamp
+hasPreviousMessage
+hasSignatureValue
+hasVerificationCertificate
+hasHash
+hasPublicKeyFingerprint
+hasSignedGraph
+hasFeedbackEvent
+# changing a few property names we are not happy with
+remoteNeed
+remoteneed
+remote_need
+REMOTE_NEED
+remoteConnection
+remoteconnection
+remote_connection
+REMOTE_CONNECTION
+remoteFacet
+remotefacet
+remote_facet
+REMOTE_FACET
+belongsToNeed
+# here we start replacing 'need' in a number of forms
+Needs
+Need
+eventContainer
+EventContainer
+EVENT_CONTAINER
+event_container
+needs
+need
+NEED
+# here we fix a few mistakes we are making
+Web of Atoms
+web of atoms
+webofatoms
+a atom
+A atom
+A Atom
+atomed
+Atomed
+atoming
+Atoming
+You atom
+you atom

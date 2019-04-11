@@ -1,0 +1,96 @@
+# This file contains one expression per line that replaces the 
+# corresponding line in oldforms.txt. 
+# Before processing, all lines starting with '#' are stripped.
+https://w3id.org/won
+additionalData
+wonNode
+brokerUri
+connectionState
+connections
+eventContainer
+facet
+remoteFacet
+defaultFacet
+flag
+matchingContext
+location
+matcherProtocolEndpoint
+needProtocolEndpoint
+originator
+owner
+ownerProtocolEndpoint
+remoteConnection
+remoteFacet
+remoteNeed
+tag
+timeSpecification
+activeMQNeedProtocolQueueName
+activeMQOwnerProtocolQueueName
+endTime
+recursIn
+recursInfiniteTimes
+recursTimes
+startTime
+tag
+timeStamp
+needState
+content
+messageType
+textMessage
+recipient
+recipientNeed
+recipientNode
+responseStateProperty
+sender
+senderNeed
+senderNode
+senderFacet
+recipientFacet
+correspondingRemoteMessage
+timestamp
+receivedTimestamp
+sentTimestamp
+previousMessage
+signatureValue
+verificationCertificate
+hash
+publicKeyFingerprint
+signedGraph
+feedbackEvent
+# changing a few property names we are not happy with
+linkedNeed
+linkedneed
+linked_need
+LINKED_NEED
+linkedConnection
+linkedconnection
+linked_connection
+LINKED_CONNECTION
+linkedFacet
+linkedfacet
+linked_facet
+LINKED_FACET
+need
+# here we start replacing 'need' in a number of forms
+Atoms
+Atom
+messageContainer
+MessageContainer
+MESSAGE_CONTAINER
+message_container
+atoms
+atom
+ATOM
+# here we fix a few mistakes we are making
+Web of Needs
+web of needs
+webofneeds
+an atom
+An atom
+An Atom
+needed
+Needed
+needing
+Needing
+You need
+you need
