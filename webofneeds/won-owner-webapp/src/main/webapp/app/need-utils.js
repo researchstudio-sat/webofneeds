@@ -25,8 +25,8 @@ export function getMatchedUseCaseIcon(need) {
   return getIn(need, ["matchedUseCase", "icon"]);
 }
 
-export function getMatchedUseCaseIconBackground(need) {
-  return getIn(need, ["matchedUseCase", "iconBackground"]);
+export function getBackground(need) {
+  return get(need, "background");
 }
 
 export function getMatchedUseCaseIdentifier(need) {

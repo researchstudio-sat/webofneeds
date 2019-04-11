@@ -21,7 +21,7 @@ function genComponentConf() {
   let template = `
     <div class="card__icon clickable"
         ng-if="self.needLoaded"
-        style="background-color: {{::self.useCaseIconBackground}}"
+        style="background-color: {{::self.iconBackground}}"
         ng-class="{
           'won-is-persona': self.isPersona,
           'inactive': self.isInactive,
@@ -135,8 +135,8 @@ function genComponentConf() {
         const useCaseIcon = !isPersona
           ? needUtils.getMatchedUseCaseIcon(need)
           : undefined;
-        const useCaseIconBackground = !isPersona
-          ? needUtils.getMatchedUseCaseIconBackground(need)
+        const iconBackground = !isPersona
+          ? needUtils.getBackground(need)
           : undefined;
         const identiconSvg = !useCaseIcon
           ? needUtils.getIdenticonSvg(need)
@@ -170,7 +170,7 @@ function genComponentConf() {
               get(need, "lastUpdateDate")
             ),
           //image specific
-          useCaseIconBackground,
+          iconBackground,
           useCaseIcon,
           identiconSvg,
           personaIdenticonSvg,

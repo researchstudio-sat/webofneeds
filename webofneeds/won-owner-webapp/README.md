@@ -202,8 +202,8 @@ $ngRedux.getState();
        matchedUseCase: { //saves a matchedUseCase within the need so we dont have to parse it multiple times
            identifier: undefined, //matched identifier that is set within the matched usecase
            icon: undefined, //matched icon that is set within the matched usecase
-           iconBackground: //generated background color based on a hash of the need-uri, (similar to identiconSvg),
        },
+       background: //generated background color based on a hash of the need-uri, (similar to identiconSvg),
        content : {...},
        seeks: {...}
    },

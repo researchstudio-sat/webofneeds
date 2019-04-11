@@ -38,10 +38,10 @@ export function parseNeed(jsonldNeed) {
       matchedUseCase: {
         identifier: undefined,
         icon: undefined,
-        iconBackground: undefined,
         enabledUseCases: undefined,
         reactionUseCases: undefined,
       },
+      background: generateBackground(jsonldNeedImm),
       unread: false,
       isBeingCreated: false,
       jsonld: jsonldNeed,
@@ -70,10 +70,6 @@ export function parseNeed(jsonldNeed) {
         parsedNeedImm = parsedNeedImm
           .setIn(["matchedUseCase", "identifier"], matchingUseCase.identifier)
           .setIn(["matchedUseCase", "icon"], matchingUseCase.icon)
-          .setIn(
-            ["matchedUseCase", "iconBackground"],
-            generateUseCaseIconBackground(jsonldNeedImm)
-          )
           .setIn(
             ["matchedUseCase", "enabledUseCases"],
             matchingUseCase.enabledUseCases
@@ -155,7 +151,7 @@ function generateIdenticon(needJsonLd) {
   return idc.toString();
 }
 
-function generateUseCaseIconBackground(needJsonLd) {
+function generateBackground(needJsonLd) {
   const needUri = needJsonLd.get("@id");
 
   if (!needUri) {
