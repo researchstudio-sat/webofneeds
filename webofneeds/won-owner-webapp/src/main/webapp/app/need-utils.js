@@ -51,6 +51,22 @@ export function hasImages(need) {
   );
 }
 
+export function hasLocation(need) {
+  return (
+    !!getIn(need, ["content", "location"]) ||
+    !!getIn(need, ["seeks", "location"])
+  );
+}
+
+export function getLocation(need) {
+  if (hasLocation(need)) {
+    return (
+      getIn(need, ["content", "location"]) || getIn(need, ["seeks", "location"])
+    );
+  }
+  return undefined;
+}
+
 /**
  * Returns the "Default" Image (currently the first one, branch content is checked before seeks) of a need
  * if the need does not have any images we return undefined

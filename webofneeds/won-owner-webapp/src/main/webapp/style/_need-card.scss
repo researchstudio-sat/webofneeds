@@ -163,6 +163,9 @@ won-need-card {
         @include fixed-square(calc(#{$postIconSize}-0.5rem));
         --local-primary: #{$won-secondary-text-color};
       }
+      &__identicon {
+        @include fixed-square($postIconSize);
+      }
     }
 
     &__topline {

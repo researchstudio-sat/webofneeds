@@ -21,26 +21,30 @@ function genComponentConf() {
   let template = `
     <div class="card__icon clickable"
         ng-if="self.needLoaded"
-        style="background-color: {{!self.hasImage && self.iconBackground}}"
+        style="background-color: {{self.showDefaultIcon && self.iconBackground}}"
         ng-class="{
           'won-is-persona': self.isPersona,
           'inactive': self.isInactive,
         }"
         ng-click="self.router__stateGo('post', {postUri: self.need.get('uri')})">
         <div class="identicon usecaseimage"
-            ng-if="!self.needImage && self.useCaseIcon">
+            ng-if="self.showDefaultIcon && self.useCaseIcon">
             <svg>
                 <use xlink:href="{{ ::self.useCaseIcon }}" href="{{ ::self.useCaseIcon }}"></use>
             </svg>
         </div>
         <img class="identicon"
-            ng-if="!self.needImage && self.identiconSvg"
+            ng-if="self.showDefaultIcon && self.identiconSvg"
             alt="Auto-generated title image"
             ng-src="data:image/svg+xml;base64,{{::self.identiconSvg}}"/>
         <img class="image"
             ng-if="self.needImage"
             alt="{{self.needImage.get('name')}}"
             ng-src="data:{{self.needImage.get('type')}};base64,{{self.needImage.get('data')}}"/>
+        <div class="location"
+            ng-if="self.needImage && self.needLocation">
+            LOCATION
+        </div>
     </div>
     <div class="card__icon__skeleton" ng-if="!self.needLoaded"
       in-view="$inview && self.needToLoad && self.ensureNeedIsLoaded()">
@@ -48,9 +52,9 @@ function genComponentConf() {
     <div class="card__main clickable"
         ng-if="self.needLoaded" ng-click="self.router__stateGo('post', {postUri: self.need.get('uri')})"
         ng-class="{
-          'card__main--showIcon': self.needImage,
+          'card__main--showIcon': !self.showDefaultIcon,
         }">
-        <div class="card__main__icon" ng-if="self.needImage"style=" background-color: {{!self.hasImage && self.iconBackground}}">
+        <div class="card__main__icon" ng-if="!self.showDefaultIcon" style=" background-color: {{!self.hasImage && self.iconBackground}}">
             <div class="card__main__icon__usecaseimage"
                 ng-if="self.useCaseIcon">
                 <svg>
@@ -163,6 +167,7 @@ function genComponentConf() {
           : undefined;
 
         const needImage = needUtils.getDefaultImage(need);
+        const needLocation = false; //needUtils.getLocation(need); //TODO: Location implementation pending
 
         return {
           //General
@@ -197,6 +202,8 @@ function genComponentConf() {
           identiconSvg,
           personaIdenticonSvg,
           needImage,
+          needLocation,
+          showDefaultIcon: !needImage && !needLocation, //if no image and no locaiton are present we display the defaultIcon in the card__icon area, instead of next to the title
         };
       };
 
