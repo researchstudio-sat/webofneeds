@@ -74,7 +74,6 @@ export function getLocation(need) {
  */
 export function getDefaultImage(need) {
   if (hasImages(need)) {
-    console.debug("NEED HAS IMAGES");
     const contentImages = getIn(need, ["content", "images"]);
 
     if (contentImages) {
