@@ -1,5 +1,7 @@
 port module PublishButton exposing (main)
 
+import Actions
+import Application
 import Browser
 import Browser.Events
 import Dict exposing (Dict)
@@ -11,21 +13,50 @@ import Element.Input as Input
 import Elements
 import Html exposing (Html)
 import Html.Attributes as HA
-import Json.Decode as Decode exposing (Value)
+import Json.Decode as Decode exposing (Decoder, Value)
+import Json.Encode as Encode
 import NonEmpty
-import Old.Persona as Persona exposing (Persona, PersonaData, SaveState(..))
 import Old.Skin as Skin exposing (Skin)
+import Persona exposing (Persona)
 import Time exposing (Posix)
 import Url exposing (Url)
 
 
 main =
-    Skin.skinnedElement
+    Application.element
         { init = init
         , subscriptions = subscriptions
         , update = update
         , view = view
+        , propDecoder = propDecoder
         }
+
+
+
+---- PROPS ----
+
+
+type alias Props =
+    { draftValid : Bool
+    , showPersonas : Bool
+    , personas : Dict String Persona
+    }
+
+
+propDecoder : Decoder Props
+propDecoder =
+    let
+        dictDecoder =
+            Decode.list Persona.decoder
+                |> Decode.map
+                    (List.map (\persona -> ( persona.uri, persona ))
+                        >> Dict.fromList
+                    )
+    in
+    Decode.map3 Props
+        (Decode.field "draftValid" Decode.bool)
+        (Decode.field "showPersonas" Decode.bool)
+        (Decode.field "personas" <| dictDecoder)
 
 
 
@@ -33,10 +64,8 @@ main =
 
 
 type alias Model =
-    { personas : Dict String Persona
-    , state : State
+    { state : State
     , selectedPersona : SelectedPersona
-    , options : Options
     , size : Size
     }
 
@@ -44,13 +73,6 @@ type alias Model =
 type alias Size =
     { width : Int
     , height : Int
-    }
-
-
-type alias Options =
-    { draftValid : Bool
-    , loggedIn : Bool
-    , showPersonas : Bool
     }
 
 
@@ -64,19 +86,13 @@ type SelectedPersona
     | Persona String
 
 
-init : { width : Int, height : Int } -> ( Model, Cmd Msg )
-init { width, height } =
-    ( { personas = Dict.empty
-      , state = Closed
+init : Props -> ( Model, Cmd Msg )
+init props =
+    ( { state = Closed
       , selectedPersona = Anonymous
-      , options =
-            { draftValid = False
-            , loggedIn = False
-            , showPersonas = False
-            }
       , size =
-            { width = width
-            , height = height
+            { width = 0
+            , height = 0
             }
       }
     , Cmd.none
@@ -87,11 +103,19 @@ init { width, height } =
 ---- VIEW ----
 
 
-view : Skin -> Model -> Html Msg
-view skin model =
+view :
+    { model : Model
+    , props : Props
+    , style : Application.Style
+    }
+    -> Html Msg
+view { model, props } =
     let
+        skin =
+            Skin.default
+
         buttonColor =
-            if model.options.draftValid then
+            if props.draftValid then
                 skin.primaryColor
 
             else
@@ -113,7 +137,7 @@ view skin model =
         , Font.size 16
         ]
     <|
-        if not model.options.loggedIn || not model.options.showPersonas then
+        if not props.showPersonas then
             Input.button
                 [ width fill
                 , height (px 43)
@@ -142,21 +166,8 @@ view skin model =
                         Open ->
                             personaList skin
                                 model.size
-                                (model.personas
+                                (props.personas
                                     |> Dict.values
-                                    |> List.filterMap
-                                        (\persona ->
-                                            case Persona.saved persona of
-                                                Saved timestamp ->
-                                                    Just
-                                                        { timestamp = timestamp
-                                                        , data = Persona.data persona
-                                                        , url = Persona.url persona
-                                                        }
-
-                                                Unsaved ->
-                                                    Nothing
-                                        )
                                 )
 
                         Closed ->
@@ -186,7 +197,7 @@ view skin model =
                             }
                         ]
                         { onPress =
-                            if model.options.draftValid then
+                            if props.draftValid then
                                 Just Publish
 
                             else
@@ -201,13 +212,10 @@ view skin model =
                                 text
                                     (case model.selectedPersona of
                                         Persona url ->
-                                            case Dict.get url model.personas of
+                                            case Dict.get url props.personas of
                                                 Just persona ->
                                                     "Publish as "
-                                                        ++ (Persona.data persona
-                                                                |> .displayName
-                                                                |> NonEmpty.get
-                                                           )
+                                                        ++ persona.name
 
                                                 Nothing ->
                                                     ""
@@ -252,12 +260,7 @@ view skin model =
 personaList :
     Skin
     -> Size
-    ->
-        List
-            { url : Url
-            , timestamp : Posix
-            , data : PersonaData
-            }
+    -> List Persona
     -> Element Msg
 personaList skin screenSize personas =
     let
@@ -276,7 +279,7 @@ personaList skin screenSize personas =
 
         personaEntries =
             personas
-                |> List.sortBy (.timestamp >> Time.posixToMillis)
+                |> List.sortBy (.created >> Time.posixToMillis)
                 |> List.map (personaEntry skin)
 
         anonymousEntry =
@@ -326,15 +329,11 @@ personaList skin screenSize personas =
 
 personaEntry :
     Skin
-    ->
-        { url : Url
-        , timestamp : Posix
-        , data : PersonaData
-        }
+    -> Persona
     -> Element Msg
 personaEntry skin persona =
     Input.button [ width fill ]
-        { onPress = Just <| SelectPersona <| Persona <| Url.toString persona.url
+        { onPress = Just <| SelectPersona <| Persona <| persona.uri
         , label =
             row
                 [ width fill
@@ -344,8 +343,8 @@ personaEntry skin persona =
                     [ width (px 45)
                     , height (px 45)
                     ]
-                    (Url.toString persona.url)
-                , text <| NonEmpty.get persona.data.displayName
+                    persona.uri
+                , text persona.name
                 ]
         }
 
@@ -357,15 +356,19 @@ personaEntry skin persona =
 type Msg
     = SelectPersona SelectedPersona
     | ToggleDropdown
-    | ReceivedPersonas (Dict String Persona)
-    | OptionsUpdated Options
     | Publish
     | SizeChanged Size
     | NoOp
 
 
-update : Msg -> Model -> ( Model, Cmd Msg )
-update msg model =
+update :
+    Msg
+    ->
+        { model : Model
+        , props : Props
+        }
+    -> ( Model, Cmd Msg )
+update msg { model, props } =
     case msg of
         ToggleDropdown ->
             ( { model
@@ -380,30 +383,12 @@ update msg model =
             , Cmd.none
             )
 
-        ReceivedPersonas personas ->
-            ( { model
-                | personas = personas
-                , selectedPersona =
-                    case model.selectedPersona of
-                        Persona url ->
-                            if Dict.member url model.personas then
-                                model.selectedPersona
-
-                            else
-                                Anonymous
-
-                        Anonymous ->
-                            model.selectedPersona
-              }
-            , Cmd.none
-            )
-
         SelectPersona newSelection ->
             ( { model
                 | selectedPersona =
                     case newSelection of
                         Persona url ->
-                            if Dict.member url model.personas then
+                            if Dict.member url props.personas then
                                 newSelection
 
                             else
@@ -420,21 +405,7 @@ update msg model =
             ( { model
                 | state = Closed
               }
-            , publishOut
-                (case model.selectedPersona of
-                    Persona url ->
-                        Just url
-
-                    Anonymous ->
-                        Nothing
-                )
-            )
-
-        OptionsUpdated options ->
-            ( { model
-                | options = options
-              }
-            , Cmd.none
+            , publish model.selectedPersona
             )
 
         SizeChanged size ->
@@ -448,27 +419,29 @@ update msg model =
             ( model, Cmd.none )
 
 
+publish : SelectedPersona -> Cmd msg
+publish personaChoice =
+    Actions.emitEvent
+        { eventName = "publish"
+        , payload =
+            case personaChoice of
+                Persona personaId ->
+                    Encode.string personaId
+
+                Anonymous ->
+                    Encode.null
+        }
+
+
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
-        [ Persona.subscription ReceivedPersonas (always NoOp)
-        , publishIn OptionsUpdated
-        , Browser.Events.onResize
+        [ Browser.Events.onResize
             (\width height ->
                 SizeChanged <|
                     Size width height
             )
         ]
-
-
-
----- PORTS ----
-
-
-port publishIn : (Options -> msg) -> Sub msg
-
-
-port publishOut : Maybe String -> Cmd msg
 
 
 

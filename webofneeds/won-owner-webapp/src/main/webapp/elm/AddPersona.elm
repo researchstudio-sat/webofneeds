@@ -14,6 +14,7 @@ import Json.Decode as Decode exposing (Decoder, Value)
 import Json.Decode.Extra as Decode
 import Json.Decode.Pipeline as DP
 import Maybe.Extra as Maybe
+import Persona exposing (Persona)
 import Time exposing (Posix)
 import Url exposing (Url)
 
@@ -31,13 +32,6 @@ type Model
     | AddingPersona Id
 
 
-type alias Persona =
-    { uri : String
-    , name : String
-    , created : Posix
-    }
-
-
 
 ---- PROPS ----
 
@@ -48,39 +42,11 @@ type alias Props =
     }
 
 
-compareCheck : a -> Decoder a -> Decoder ()
-compareCheck value decoder =
-    decoder
-        |> Decode.andThen
-            (\decoded ->
-                if decoded == value then
-                    Decode.succeed ()
-
-                else
-                    Decode.fail "Unexpected value"
-            )
-
-
-checkDecoder : Decoder () -> Decoder a -> Decoder a
-checkDecoder guard decoder =
-    guard
-        |> Decode.andThen (\() -> decoder)
-
-
-personaDecoder : Decoder Persona
-personaDecoder =
-    Decode.succeed Persona
-        |> DP.required "url" Decode.string
-        |> DP.required "displayName" Decode.string
-        |> DP.required "timestamp" Decode.datetime
-        |> checkDecoder (Decode.field "saved" <| compareCheck True Decode.bool)
-
-
 propDecoder : Decoder Props
 propDecoder =
     Decode.map2 Props
         (Decode.at [ "post", "uri" ] Decode.string)
-        (Decode.field "personas" <| Decode.list personaDecoder)
+        (Decode.field "personas" <| Decode.list Persona.decoder)
 
 
 
@@ -141,7 +107,7 @@ update msg { model, props } =
                         Just persona ->
                             ( AddingPersona id
                             , Actions.connectPersona
-                                { personaUrl = id
+                                { persona = persona
                                 , needUrl = props.postUri
                                 }
                             )
@@ -264,15 +230,10 @@ personaEntry selected persona =
             ]
         , Events.onClick (SelectPersona persona.uri)
         ]
-        [ personaIcon persona
+        [ Persona.icon persona
         , span [ Attributes.class "won-persona-name" ]
             [ text persona.name ]
         ]
-
-
-personaIcon : Persona -> Html msg
-personaIcon persona =
-    Icons.identicon [ Attributes.class "won-persona-icon" ] persona.uri
 
 
 

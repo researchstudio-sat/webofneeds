@@ -109,8 +109,7 @@ view skin model =
                     }
                 ]
     in
-    layoutWith
-        { options = [ noStaticStyleSheet ] }
+    layout
         [ Font.size 16
         , width shrink
         ]

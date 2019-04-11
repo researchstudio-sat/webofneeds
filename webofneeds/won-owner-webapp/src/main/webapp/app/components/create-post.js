@@ -8,7 +8,6 @@ import ngAnimate from "angular-animate";
 import "ng-redux";
 import labelledHrModule from "./labelled-hr.js";
 import createIsseeksModule from "./create-isseeks.js";
-import publishButtonModule from "./publish-button.js";
 import { get, attach, delay, getIn } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { connect2Redux } from "../won-utils.js";
@@ -17,6 +16,8 @@ import * as needUtils from "../need-utils.js";
 import * as processSelectors from "../selectors/process-selectors.js";
 import * as useCaseUtils from "../usecase-utils.js";
 import * as accountUtils from "../account-utils.js";
+import { Elm } from "../../elm/PublishButton.elm";
+import elmModule from "./elm.js";
 
 import "style/_create-post.scss";
 import "style/_responsiveness-utils.scss";
@@ -102,7 +103,7 @@ function genComponentConf() {
         </div>
         <div class="cp__footer" >
             <won-labelled-hr label="::'done?'" class="cp__footer__labelledhr"></won-labelled-hr>
-            <won-publish-button on-publish="self.publish(persona)" is-valid="self.isValid()" show-personas="self.isHoldable" ng-if="self.showCreateInput && !self.isEditFromNeed"></won-publish-button>
+            <won-elm module="self.publishButton" props="{draftValid: self.isValid(), showPersonas: self.isHoldable && self.loggedIn, personas: self.personas}" on-action="self.publish(payload)" ></won-elm>
             <div class="cp__footer__edit" ng-if="self.loggedIn && self.showCreateInput && self.isEditFromNeed && self.isFromNeedEditable">
               <button class="cp__footer__edit__save won-button--filled red" ng-click="self.save()" ng-disabled="!self.isValid()">
                   Save
@@ -134,6 +135,7 @@ function genComponentConf() {
       this.details = { is: [], seeks: [] };
       this.isNew = true;
 
+      this.publishButton = Elm.PublishButton;
       const selectFromState = state => {
         const fromNeedUri = generalSelectors.getFromNeedUriFromRoute(state);
         const mode = generalSelectors.getModeFromRoute(state);
@@ -231,6 +233,7 @@ function genComponentConf() {
           isFromNeedUsableAsTemplate: needUtils.isUsableAsTemplate(fromNeed),
           isHoldable: useCaseUtils.isHoldable(useCase),
           hasFromNeedFailedToLoad,
+          personas: generalSelectors.getOwnedPersonas(state).toJS(),
           showCreateInput:
             useCase &&
             !(
@@ -467,6 +470,6 @@ angular
     labelledHrModule,
     createIsseeksModule,
     ngAnimate,
-    publishButtonModule,
+    elmModule,
   ])
   .directive("wonCreatePost", genComponentConf).name;
