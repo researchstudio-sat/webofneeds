@@ -2,10 +2,43 @@
 @import "sizing-utils";
 
 .won-publish-button {
-  .won-persona-list {
+  > button {
+    width: 100%;
+  }
+
+  .won-button-row {
+    display: grid;
+    grid-template-columns: 1fr min-content;
+
+    grid-column-gap: 0.1em;
     position: relative;
-    bottom: 0.25em;
+
+    button.left {
+      border-bottom-right-radius: 0;
+      border-top-right-radius: 0;
+    }
+
+    button.right {
+      border-bottom-left-radius: 0;
+      border-top-left-radius: 0;
+    }
+
+    .won-dropdown-button {
+      padding-left: 1ch;
+      padding-right: 1ch;
+      won-svg-icon {
+        @include fixed-square($iconSize * 0.8);
+      }
+    }
+  }
+
+  .won-persona-list {
     $line-size: $postIconSize * 0.7;
+
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: calc(100% + 0.25em);
     display: grid;
     background: white;
     border: $won-line-gray 1px solid;
@@ -37,7 +70,7 @@
       }
 
       &.empty {
-        grid-template-columns: 1fr min-content 1fr;
+        grid-template-columns: 1fr max-content 1fr;
         .won-persona-name {
           grid-column: 2;
           font-style: italic;

@@ -2,31 +2,23 @@ port module PublishButton exposing (main)
 
 import Actions
 import Application
-import Browser
-import Browser.Events
+import Color
 import Dict exposing (Dict)
-import Element exposing (..)
-import Element.Background as Background
-import Element.Border as Border
-import Element.Font as Font
-import Element.Input as Input
-import Elements
 import Html exposing (Html)
 import Html.Attributes as HA
 import Html.Events as Events
+import Icons
 import Json.Decode as Decode exposing (Decoder, Value)
 import Json.Encode as Encode
-import NonEmpty
-import Old.Skin as Skin exposing (Skin)
+import Palette
 import Persona exposing (Persona)
 import Time exposing (Posix)
-import Url exposing (Url)
 
 
 main =
     Application.element
         { init = init
-        , subscriptions = subscriptions
+        , subscriptions = always Sub.none
         , update = update
         , view = view
         , propDecoder = propDecoder
@@ -67,13 +59,6 @@ propDecoder =
 type alias Model =
     { state : State
     , selectedPersona : SelectedPersona
-    , size : Size
-    }
-
-
-type alias Size =
-    { width : Int
-    , height : Int
     }
 
 
@@ -91,10 +76,6 @@ init : Props -> ( Model, Cmd Msg )
 init props =
     ( { state = Closed
       , selectedPersona = Anonymous
-      , size =
-            { width = 0
-            , height = 0
-            }
       }
     , Cmd.none
     )
@@ -111,152 +92,66 @@ view :
     }
     -> Html Msg
 view { model, props } =
-    let
-        skin =
-            Skin.default
-
-        buttonColor =
-            if props.draftValid then
-                skin.primaryColor
-
-            else
-                skin.lineGray
-
-        focusStyle =
-            focused
-                [ Border.shadow
-                    { offset = ( 0, 0 )
-                    , size = 2
-                    , blur = 0
-                    , color = Skin.setAlpha 0.4 buttonColor
-                    }
+    Html.div [ HA.class "won-publish-button" ]
+        [ if not props.showPersonas then
+            Palette.wonButton
+                [ HA.disabled <| not props.draftValid
+                , Events.onClick Publish
                 ]
-    in
-    layout
-        [ -- This is needed so .ui doesn't set the min-height to 100%
-          height (minimum 0 shrink)
-        , Font.size 16
-        , htmlAttribute (HA.class "won-publish-button")
-        ]
-    <|
-        if not props.showPersonas then
-            Input.button
-                [ width fill
-                , height (px 43)
-                , focusStyle
-                , Background.color buttonColor
-                , Border.rounded 3
+                [ Html.text "Publish Anonymously"
                 ]
-                { onPress = Just Publish
-                , label =
-                    el
-                        [ centerY
-                        , centerX
-                        , Font.color Skin.white
-                        ]
-                    <|
-                        text "Publish Anonymously"
-                }
 
-        else
-            row
-                [ width fill
-                , spacing 2
-                , height (px 43)
-                , above <|
-                    case model.state of
-                        Open ->
-                            personaList
-                                (props.personas
-                                    |> Dict.values
-                                )
-                                |> html
-
-                        Closed ->
-                            none
-                ]
-                [ el
-                    [ width fill
-                    , height fill
+          else
+            Html.div [ HA.class "won-button-row" ]
+                ([ Palette.wonButton
+                    [ HA.class "left"
+                    , HA.disabled <| not props.draftValid
+                    , Events.onClick Publish
                     ]
-                  <|
-                    Input.button
-                        [ Background.color buttonColor
-                        , width fill
-                        , height fill
-                        , Border.roundEach
-                            { topLeft = 3
-                            , bottomLeft = 3
-                            , topRight = 0
-                            , bottomRight = 0
-                            }
-                        , focusStyle
-                        , paddingEach
-                            { left = 42
-                            , right = 0
-                            , top = 0
-                            , bottom = 0
-                            }
-                        ]
-                        { onPress =
-                            if props.draftValid then
-                                Just Publish
+                    [ Html.text
+                        ((case model.selectedPersona of
+                            Persona url ->
+                                Just url
 
-                            else
+                            Anonymous ->
                                 Nothing
-                        , label =
-                            el
-                                [ centerY
-                                , centerX
-                                , Font.color Skin.white
-                                ]
-                            <|
-                                text
-                                    (case model.selectedPersona of
-                                        Persona url ->
-                                            case Dict.get url props.personas of
-                                                Just persona ->
-                                                    "Publish as "
-                                                        ++ persona.name
-
-                                                Nothing ->
-                                                    ""
-
-                                        Anonymous ->
-                                            "Publish Anonymously"
-                                    )
-                        }
-                , Input.button
-                    [ Background.color skin.primaryColor
-                    , Border.roundEach
-                        { topLeft = 0
-                        , bottomLeft = 0
-                        , topRight = 3
-                        , bottomRight = 3
-                        }
-                    , width (px 40)
-                    , height fill
-                    , focusStyle
+                         )
+                            |> Maybe.andThen
+                                (\url ->
+                                    Dict.get url props.personas
+                                )
+                            |> Maybe.map
+                                (\persona ->
+                                    "Publish as " ++ persona.name
+                                )
+                            |> Maybe.withDefault "Publish Anonymously"
+                        )
                     ]
-                    { onPress = Just ToggleDropdown
-                    , label =
-                        svgIcon
-                            [ width (px 20)
-                            , height (px 20)
-                            , centerX
-                            , centerY
-                            ]
-                            { color = Skin.white
-                            , name =
-                                case model.state of
-                                    Open ->
-                                        "ico16_arrow_down"
+                 , Palette.wonButton
+                    [ HA.class "right"
+                    , HA.class "won-dropdown-button"
+                    , Events.onClick ToggleDropdown
+                    ]
+                    [ Icons.icon
+                        (case model.state of
+                            Open ->
+                                Icons.arrowDown
 
-                                    Closed ->
-                                        "ico16_arrow_up"
-                            }
-                    }
-                ]
+                            Closed ->
+                                Icons.arrowUp
+                        )
+                        Color.white
+                    ]
+                 ]
+                    ++ (case model.state of
+                            Open ->
+                                [ personaList (Dict.values props.personas) ]
+
+                            Closed ->
+                                []
+                       )
+                )
+        ]
 
 
 personaList : List Persona -> Html Msg
@@ -315,8 +210,6 @@ type Msg
     = SelectPersona SelectedPersona
     | ToggleDropdown
     | Publish
-    | SizeChanged Size
-    | NoOp
 
 
 update :
@@ -366,16 +259,6 @@ update msg { model, props } =
             , publish model.selectedPersona
             )
 
-        SizeChanged size ->
-            ( { model
-                | size = size
-              }
-            , Cmd.none
-            )
-
-        NoOp ->
-            ( model, Cmd.none )
-
 
 publish : SelectedPersona -> Cmd msg
 publish personaChoice =
@@ -389,37 +272,3 @@ publish personaChoice =
                 Anonymous ->
                     Encode.null
         }
-
-
-subscriptions : Model -> Sub Msg
-subscriptions model =
-    Sub.batch
-        [ Browser.Events.onResize
-            (\width height ->
-                SizeChanged <|
-                    Size width height
-            )
-        ]
-
-
-
----- ELEMENTS ----
-
-
-svgIcon :
-    List (Attribute msg)
-    ->
-        { color : Color
-        , name : String
-        }
-    -> Element msg
-svgIcon attributes { color, name } =
-    el attributes <|
-        html <|
-            Html.node "won-svg-icon"
-                [ HA.attribute "icon" name
-                , HA.attribute "color" (Skin.cssColor color)
-                , HA.style "width" "100%"
-                , HA.style "height" "100%"
-                ]
-                []

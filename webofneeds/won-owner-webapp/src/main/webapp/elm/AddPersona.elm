@@ -14,6 +14,7 @@ import Json.Decode as Decode exposing (Decoder, Value)
 import Json.Decode.Extra as Decode
 import Json.Decode.Pipeline as DP
 import Maybe.Extra as Maybe
+import Palette
 import Persona exposing (Persona)
 import Time exposing (Posix)
 import Url exposing (Url)
@@ -168,7 +169,7 @@ view { style, model, props } =
 
                 else
                     [ personaList props.personas model
-                    , wonButton
+                    , Palette.wonButton
                         [ Attributes.disabled (not selected)
                         , Events.onClick AddPersona
                         , Attributes.class "add-persona-button"
@@ -182,17 +183,6 @@ view { style, model, props } =
                     ]
                )
         )
-
-
-wonButton : List (Attribute msg) -> List (Html msg) -> Html msg
-wonButton attrs children =
-    button
-        (attrs
-            ++ [ Attributes.class "red"
-               , Attributes.class "won-button--filled"
-               ]
-        )
-        children
 
 
 personaSelected : Model -> Persona -> Bool
