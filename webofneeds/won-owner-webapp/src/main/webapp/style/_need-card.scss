@@ -84,6 +84,17 @@ won-need-card {
         height: 10rem;
       }
     }
+
+    & won-need-map.location {
+      display: block;
+      width: 15rem;
+      height: 10rem;
+
+      .need-map__mapmount {
+        width: 100%;
+        height: 10rem;
+      }
+    }
   }
 
   .card__persona {

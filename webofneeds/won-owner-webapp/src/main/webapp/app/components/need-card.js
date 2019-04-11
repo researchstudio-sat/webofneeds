@@ -5,6 +5,7 @@
 import angular from "angular";
 import inviewModule from "angular-inview";
 import "ng-redux";
+import needMapModule from "./need-map.js";
 import { actionCreators } from "../actions/actions.js";
 import { relativeTime } from "../won-label-utils.js";
 import { attach, getIn, get } from "../utils.js";
@@ -41,10 +42,8 @@ function genComponentConf() {
             ng-if="self.needImage"
             alt="{{self.needImage.get('name')}}"
             ng-src="data:{{self.needImage.get('type')}};base64,{{self.needImage.get('data')}}"/>
-        <div class="location"
-            ng-if="self.needImage && self.needLocation">
-            LOCATION
-        </div>
+        <won-need-map class="location" locations="[self.needLocation]" ng-if="!self.needImage && self.needLocation">
+        </won-need-map>
     </div>
     <div class="card__icon__skeleton" ng-if="!self.needLoaded"
       in-view="$inview && self.needToLoad && self.ensureNeedIsLoaded()">
@@ -167,7 +166,7 @@ function genComponentConf() {
           : undefined;
 
         const needImage = needUtils.getDefaultImage(need);
-        const needLocation = false; //needUtils.getLocation(need); //TODO: Location implementation pending
+        const needLocation = false; //needUtils.getLocation(need); //include the comment instead of the false, to display location in the need-card
 
         return {
           //General
@@ -260,5 +259,5 @@ function genComponentConf() {
 }
 
 export default angular
-  .module("won.owner.components.needCard", [inviewModule.name])
+  .module("won.owner.components.needCard", [inviewModule.name, needMapModule])
   .directive("wonNeedCard", genComponentConf).name;
