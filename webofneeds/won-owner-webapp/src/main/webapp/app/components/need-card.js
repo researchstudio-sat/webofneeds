@@ -19,13 +19,15 @@ import "style/_need-card.scss";
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
   let template = `
-    <div class="card__icon clickable" ng-if="self.needLoaded"
+    <div class="card__icon clickable"
+        ng-if="self.needLoaded"
+        style="background-color: {{::self.useCaseIconBackground}}"
         ng-class="{
           'won-is-persona': self.isPersona,
           'inactive': self.isInactive,
         }"
         ng-click="self.router__stateGo('post', {postUri: self.need.get('uri')})">
-        <div class="image usecaseimage" style="background-color: {{::self.useCaseIconBackground}}"
+        <div class="image usecaseimage"
             ng-if="::self.useCaseIcon">
             <svg class="si__usecaseicon">
                 <use xlink:href="{{ ::self.useCaseIcon }}" href="{{ ::self.useCaseIcon }}"></use>

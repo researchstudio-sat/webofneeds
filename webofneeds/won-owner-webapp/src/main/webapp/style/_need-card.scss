@@ -31,19 +31,19 @@ won-need-card {
     }
   }
   .card__icon__skeleton {
-    @include fixed-square(15rem);
+    height: 10rem;
     background-color: $won-skeleton-color;
     margin-bottom: 0.5rem;
   }
 
   .card__icon {
     grid-area: card__icon;
+    display: grid;
+    justify-content: center;
+    align-items: center;
     margin-bottom: 0.5rem;
-
-    display: block;
     user-select: none;
-    position: relative;
-    height: 15rem;
+    height: 10rem;
 
     &.won-is-persona .image {
       border-radius: 100%;
@@ -58,14 +58,14 @@ won-need-card {
       display: flex;
       align-items: center;
       justify-content: center;
-      @include fixed-square(15rem);
+      @include fixed-square(5rem);
 
       &.usecaseimage {
         box-sizing: border-box;
         padding: 0.25rem;
 
         > svg {
-          @include fixed-square(calc(#{15rem}-0.5rem));
+          @include fixed-square(calc(#{5rem}-0.5rem));
         }
 
         & .si__usecaseicon {
