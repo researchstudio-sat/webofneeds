@@ -42,8 +42,8 @@ function genComponentConf() {
             ng-if="self.needImage"
             alt="{{self.needImage.get('name')}}"
             ng-src="data:{{self.needImage.get('type')}};base64,{{self.needImage.get('data')}}"/>
-        <won-need-map class="location" locations="[self.needLocation]" ng-if="!self.needImage && self.needLocation">
-        </won-need-map>
+        <!--won-need-map class="location" locations="[self.needLocation]" ng-if="!self.needImage && self.needLocation">
+        </won-need-map-->
     </div>
     <div class="card__icon__skeleton" ng-if="!self.needLoaded"
       in-view="$inview && self.needToLoad && self.ensureNeedIsLoaded()">
