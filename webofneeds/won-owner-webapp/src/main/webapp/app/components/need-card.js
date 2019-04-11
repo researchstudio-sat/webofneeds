@@ -29,7 +29,7 @@ function genComponentConf() {
         ng-click="self.router__stateGo('post', {postUri: self.need.get('uri')})">
         <div class="identicon usecaseimage"
             ng-if="!self.needImage && self.useCaseIcon">
-            <svg class="si__usecaseicon">
+            <svg>
                 <use xlink:href="{{ ::self.useCaseIcon }}" href="{{ ::self.useCaseIcon }}"></use>
             </svg>
         </div>
@@ -45,7 +45,23 @@ function genComponentConf() {
     <div class="card__icon__skeleton" ng-if="!self.needLoaded"
       in-view="$inview && self.needToLoad && self.ensureNeedIsLoaded()">
     </div>
-    <div class="card__main clickable" ng-if="self.needLoaded" ng-click="self.router__stateGo('post', {postUri: self.need.get('uri')})">
+    <div class="card__main clickable"
+        ng-if="self.needLoaded" ng-click="self.router__stateGo('post', {postUri: self.need.get('uri')})"
+        ng-class="{
+          'card__main--showIcon': self.needImage,
+        }">
+        <div class="card__main__icon" ng-if="self.needImage"style=" background-color: {{!self.hasImage && self.iconBackground}}">
+            <div class="card__main__icon__usecaseimage"
+                ng-if="self.useCaseIcon">
+                <svg>
+                    <use xlink:href="{{ ::self.useCaseIcon }}" href="{{ ::self.useCaseIcon }}"></use>
+                </svg>
+            </div>
+            <img class="card__main__icon__identicon"
+                ng-if="self.identiconSvg"
+                alt="Auto-generated title image"
+                ng-src="data:image/svg+xml;base64,{{::self.identiconSvg}}"/>
+        </div>
         <div class="card__main__topline">
             <div class="card__main__topline__title" ng-if="self.hasTitle()">
                 {{ self.generateTitle() }}

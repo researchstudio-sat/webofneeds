@@ -66,9 +66,6 @@ won-need-card {
 
         > svg {
           @include fixed-square(calc(#{5rem}-0.5rem));
-        }
-
-        & .si__usecaseicon {
           --local-primary: #{$won-secondary-text-color};
         }
       }
@@ -136,12 +133,32 @@ won-need-card {
   .card__main {
     grid-area: card__main;
     display: grid;
-    grid-template-areas: "topline" "subtitle";
+    grid-template-areas: "card__main__topline" "card__main__subtitle";
+    grid-template-columns: 1fr;
     width: 15rem;
     max-width: 15rem;
 
+    &--showIcon {
+      grid-template-areas: "card__main__icon card__main__topline" "card__main__icon card__main__subtitle";
+      grid-template-columns: min-content 1fr;
+      grid-column-gap: 0.5rem;
+    }
+
+    &__icon {
+      grid-area: card__main__icon;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      @include fixed-square($postIconSize);
+
+      &__usecaseimage > svg {
+        @include fixed-square(calc(#{$postIconSize}-0.5rem));
+        --local-primary: #{$won-secondary-text-color};
+      }
+    }
+
     &__topline {
-      grid-area: topline;
+      grid-area: card__main__topline;
       min-width: 0;
 
       &__notitle,
@@ -158,7 +175,7 @@ won-need-card {
     }
 
     &__subtitle {
-      grid-area: subtitle;
+      grid-area: card__main__subtitle;
       display: grid;
       grid-template-columns: 1fr min-content;
       color: $won-subtitle-gray;
