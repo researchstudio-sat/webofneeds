@@ -45,7 +45,7 @@ won-need-card {
     user-select: none;
     height: 10rem;
 
-    &.won-is-persona .image {
+    &.won-is-persona .identicon {
       border-radius: 100%;
     }
 
@@ -54,7 +54,7 @@ won-need-card {
       filter: grayscale(100%);
     }
 
-    & .image {
+    & .identicon {
       display: flex;
       align-items: center;
       justify-content: center;
@@ -72,6 +72,12 @@ won-need-card {
           --local-primary: #{$won-secondary-text-color};
         }
       }
+    }
+
+    & .image {
+      object-fit: cover;
+      width: 15rem;
+      height: 10rem;
     }
   }
 

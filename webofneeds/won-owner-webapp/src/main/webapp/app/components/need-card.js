@@ -21,22 +21,26 @@ function genComponentConf() {
   let template = `
     <div class="card__icon clickable"
         ng-if="self.needLoaded"
-        style="background-color: {{::self.iconBackground}}"
+        style="background-color: {{!self.hasImage && self.iconBackground}}"
         ng-class="{
           'won-is-persona': self.isPersona,
           'inactive': self.isInactive,
         }"
         ng-click="self.router__stateGo('post', {postUri: self.need.get('uri')})">
-        <div class="image usecaseimage"
-            ng-if="::self.useCaseIcon">
+        <div class="identicon usecaseimage"
+            ng-if="!self.needImage && self.useCaseIcon">
             <svg class="si__usecaseicon">
                 <use xlink:href="{{ ::self.useCaseIcon }}" href="{{ ::self.useCaseIcon }}"></use>
             </svg>
         </div>
-        <img class="image"
-            ng-if="::self.identiconSvg"
+        <img class="identicon"
+            ng-if="!self.needImage && self.identiconSvg"
             alt="Auto-generated title image"
-            ng-src="data:image/svg+xml;base64,{{::self.identiconSvg}}">
+            ng-src="data:image/svg+xml;base64,{{::self.identiconSvg}}"/>
+        <img class="image"
+            ng-if="self.needImage"
+            alt="{{self.needImage.get('name')}}"
+            ng-src="data:{{self.needImage.get('type')}};base64,{{self.needImage.get('data')}}"/>
     </div>
     <div class="card__icon__skeleton" ng-if="!self.needLoaded"
       in-view="$inview && self.needToLoad && self.ensureNeedIsLoaded()">
@@ -76,7 +80,7 @@ function genComponentConf() {
           <img class="card__persona__icon"
               ng-if="::self.personaIdenticonSvg"
               alt="Auto-generated title image for persona that holds the need"
-              ng-src="data:image/svg+xml;base64,{{::self.personaIdenticonSvg}}">
+              ng-src="data:image/svg+xml;base64,{{::self.personaIdenticonSvg}}"/>
           <div class="card__persona__name"
               ng-if="self.personaName">
               <span class="card__persona__name__label">{{ self.personaName }}</span>
@@ -142,6 +146,8 @@ function genComponentConf() {
           ? needUtils.getIdenticonSvg(need)
           : undefined;
 
+        const needImage = needUtils.getDefaultImage(need);
+
         return {
           //General
           responseToNeed,
@@ -174,6 +180,7 @@ function genComponentConf() {
           useCaseIcon,
           identiconSvg,
           personaIdenticonSvg,
+          needImage,
         };
       };
 

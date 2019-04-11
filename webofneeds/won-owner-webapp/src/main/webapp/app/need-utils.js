@@ -45,6 +45,35 @@ export function hasMatchedUseCase(need) {
   return !!getIn(need, ["matchedUseCase", "identifier"]);
 }
 
+export function hasImages(need) {
+  return (
+    !!getIn(need, ["content", "images"]) || !!getIn(need, ["seeks", "images"])
+  );
+}
+
+/**
+ * Returns the "Default" Image (currently the first one, branch content is checked before seeks) of a need
+ * if the need does not have any images we return undefined
+ * @param need
+ */
+export function getDefaultImage(need) {
+  if (hasImages(need)) {
+    console.debug("NEED HAS IMAGES");
+    const contentImages = getIn(need, ["content", "images"]);
+
+    if (contentImages) {
+      return contentImages.first();
+    }
+
+    const seeksImages = getIn(need, ["content", "images"]);
+
+    if (seeksImages) {
+      return seeksImages.first();
+    }
+  }
+  return undefined;
+}
+
 /**
  * Determines if a given need is a Inactive
  * @param need
