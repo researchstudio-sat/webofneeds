@@ -177,7 +177,7 @@ personaList personas =
 
         personaEntries =
             personas
-                |> List.sortBy (.created >> Time.posixToMillis)
+                |> List.sortBy .name
                 |> List.map personaEntry
 
         anonymousEntry =
