@@ -1,6 +1,11 @@
-module Persona exposing (Persona, decoder, icon)
+module Persona exposing
+    ( Persona
+    , decoder
+    , icon
+    , inlineView
+    )
 
-import Html exposing (Html)
+import Html exposing (Attribute, Html)
 import Html.Attributes as Attributes
 import Icons
 import Json.Decode as Decode exposing (Decoder)
@@ -23,6 +28,21 @@ type alias Persona =
 icon : Persona -> Html msg
 icon persona =
     Icons.identicon [ Attributes.class "won-persona-icon" ] persona.uri
+
+
+inlineView : List (Attribute msg) -> Persona -> Html msg
+inlineView attrs persona =
+    Html.div
+        ([ Attributes.classList
+            [ ( "won-persona-list-entry", True )
+            ]
+         ]
+            ++ attrs
+        )
+        [ icon persona
+        , Html.span [ Attributes.class "won-persona-name" ]
+            [ Html.text persona.name ]
+        ]
 
 
 

@@ -1,0 +1,49 @@
+@import "won-config";
+@import "sizing-utils";
+
+.won-publish-button {
+  .won-persona-list {
+    position: relative;
+    bottom: 0.25em;
+    $line-size: $postIconSize * 0.7;
+    display: grid;
+    background: white;
+    border: $won-line-gray 1px solid;
+    border-radius: 0.19rem;
+
+    .won-persona-list-entry {
+      display: grid;
+      height: $line-size;
+      padding: 0.5rem;
+      grid-template-columns: min-content 1fr;
+      grid-column-gap: 1ch;
+      user-select: none;
+      cursor: pointer;
+
+      .won-persona-name {
+        align-self: center;
+        font-size: 1.2em;
+      }
+
+      &:hover {
+        background-color: $won-light-gray;
+      }
+
+      .won-persona-icon {
+        border-radius: 100%;
+        overflow: hidden;
+        @include fixed-square($line-size);
+        display: block;
+      }
+
+      &.empty {
+        grid-template-columns: 1fr min-content 1fr;
+        .won-persona-name {
+          grid-column: 2;
+          font-style: italic;
+          color: $won-line-gray;
+        }
+      }
+    }
+  }
+}

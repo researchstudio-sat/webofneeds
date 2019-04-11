@@ -17,7 +17,7 @@ $item-indicator-width: 0.25rem;
 
     .won-persona-list-entry {
       display: grid;
-      grid-template-columns: min-content 1fr min-content;
+      grid-template-columns: min-content 1fr;
       grid-column-gap: 2ch;
       padding: 0.5rem;
       user-select: none;
@@ -30,15 +30,6 @@ $item-indicator-width: 0.25rem;
       .won-persona-name {
         align-self: center;
         font-size: 1.2em;
-      }
-
-      button {
-        height: $postIconSize;
-        font-size: 0.75rem;
-      }
-
-      &:not(:hover) button:not(.adding) {
-        display: none;
       }
 
       .won-persona-icon {

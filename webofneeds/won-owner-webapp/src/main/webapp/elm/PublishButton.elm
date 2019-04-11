@@ -13,6 +13,7 @@ import Element.Input as Input
 import Elements
 import Html exposing (Html)
 import Html.Attributes as HA
+import Html.Events as Events
 import Json.Decode as Decode exposing (Decoder, Value)
 import Json.Encode as Encode
 import NonEmpty
@@ -135,6 +136,7 @@ view { model, props } =
         [ -- This is needed so .ui doesn't set the min-height to 100%
           height (minimum 0 shrink)
         , Font.size 16
+        , htmlAttribute (HA.class "won-publish-button")
         ]
     <|
         if not props.showPersonas then
@@ -164,11 +166,11 @@ view { model, props } =
                 , above <|
                     case model.state of
                         Open ->
-                            personaList skin
-                                model.size
+                            personaList
                                 (props.personas
                                     |> Dict.values
                                 )
+                                |> html
 
                         Closed ->
                             none
@@ -257,21 +259,22 @@ view { model, props } =
                 ]
 
 
-personaList :
-    Skin
-    -> Size
-    -> List Persona
-    -> Element Msg
-personaList skin screenSize personas =
+personaList : List Persona -> Html Msg
+personaList personas =
     let
         listElements =
             if List.isEmpty personas then
-                [ newTabLink [ width fill, height (px 45) ]
-                    { url = "#!/settings"
-                    , label =
-                        el [ centerX ] <|
-                            text "Create Personas"
-                    }
+                [ Html.div
+                    [ HA.class "won-persona-list-entry"
+                    , HA.class "empty"
+                    ]
+                    [ Html.a
+                        [ HA.href "#!/settings"
+                        , HA.target "_blank"
+                        , HA.class "won-persona-name"
+                        ]
+                        [ Html.text "Create Personas" ]
+                    ]
                 ]
 
             else
@@ -280,73 +283,28 @@ personaList skin screenSize personas =
         personaEntries =
             personas
                 |> List.sortBy (.created >> Time.posixToMillis)
-                |> List.map (personaEntry skin)
+                |> List.map personaEntry
 
         anonymousEntry =
-            Input.button [ width fill ]
-                { onPress = Just <| SelectPersona Anonymous
-                , label =
-                    row
-                        [ width fill
-                        , spacing 5
-                        ]
-                        [ el
-                            [ width (px 45)
-                            , height (px 45)
-                            ]
-                            none
-                        , text "Anonymous"
-                        ]
-                }
-
-        line =
-            el
-                [ width fill
-                , Border.widthEach
-                    { bottom = 1
-                    , left = 0
-                    , right = 0
-                    , top = 0
-                    }
-                , Border.color skin.lightGray
+            Html.div
+                [ HA.class "anonymous"
+                , HA.class "won-persona-list-entry"
+                , Events.onClick <| SelectPersona Anonymous
                 ]
-                none
-
-        maxHeight =
-            screenSize.height - 70
+                [ Html.div [ HA.class "won-persona-name" ]
+                    [ Html.text "Anonymous" ]
+                ]
     in
-    column
-        [ width fill
-        , Border.color skin.lineGray
-        , Border.width 1
-        , moveUp 5
-        , Background.color Skin.white
-        , scrollbarY
-        , height (maximum maxHeight shrink)
+    Html.div [ HA.class "won-persona-list" ]
+        listElements
+
+
+personaEntry : Persona -> Html Msg
+personaEntry persona =
+    Persona.inlineView
+        [ Events.onClick (SelectPersona <| Persona persona.uri)
         ]
-        (List.intersperse line listElements)
-
-
-personaEntry :
-    Skin
-    -> Persona
-    -> Element Msg
-personaEntry skin persona =
-    Input.button [ width fill ]
-        { onPress = Just <| SelectPersona <| Persona <| persona.uri
-        , label =
-            row
-                [ width fill
-                , spacing 5
-                ]
-                [ Elements.identicon
-                    [ width (px 45)
-                    , height (px 45)
-                    ]
-                    persona.uri
-                , text persona.name
-                ]
-        }
+        persona
 
 
 

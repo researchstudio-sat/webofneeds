@@ -214,26 +214,23 @@ personaList personas model =
         (personas
             |> List.sortBy (.created >> Time.posixToMillis)
             |> List.reverse
-            |> List.map
-                (\persona ->
-                    personaEntry (personaSelected model persona) persona
-                )
+            |> List.map (personaView model)
         )
 
 
-personaEntry : Bool -> Persona -> Html Msg
-personaEntry selected persona =
-    div
-        [ Attributes.classList
-            [ ( "won-persona-list-entry", True )
-            , ( "selected", selected )
+personaView : Model -> Persona -> Html Msg
+personaView model persona =
+    let
+        isSelected =
+            personaSelected model persona
+    in
+    Persona.inlineView
+        [ Events.onClick (SelectPersona persona.uri)
+        , Attributes.classList
+            [ ( "selected", isSelected )
             ]
-        , Events.onClick (SelectPersona persona.uri)
         ]
-        [ Persona.icon persona
-        , span [ Attributes.class "won-persona-name" ]
-            [ text persona.name ]
-        ]
+        persona
 
 
 
