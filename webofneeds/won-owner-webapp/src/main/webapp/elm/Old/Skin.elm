@@ -14,7 +14,7 @@ port module Old.Skin exposing
 import Browser
 import Element exposing (..)
 import Html exposing (Html)
-import Json.Decode as Decode exposing (Decoder, Error, Value)
+import Json.Decode as Decode exposing (Decoder)
 
 
 type alias Skin =
@@ -100,7 +100,10 @@ port skin : (SkinFlags -> msg) -> Sub msg
 
 
 type alias Rgb =
-    { r : Int, g : Int, b : Int }
+    { r : Int
+    , g : Int
+    , b : Int
+    }
 
 
 type alias Model model =

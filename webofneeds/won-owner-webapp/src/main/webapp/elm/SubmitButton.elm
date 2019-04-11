@@ -1,6 +1,5 @@
 port module SubmitButton exposing (main)
 
-import Browser
 import Browser.Events
 import Dict exposing (Dict)
 import Element exposing (..)
@@ -10,8 +9,6 @@ import Element.Font as Font
 import Element.Input as Input
 import Elements exposing (svgIcon)
 import Html exposing (Html)
-import Html.Attributes as HA
-import Json.Decode as Decode exposing (Value)
 import NonEmpty
 import Old.Persona as Persona exposing (Persona, PersonaData, SaveState(..))
 import Old.Skin as Skin exposing (Skin)

@@ -1,4 +1,4 @@
-port module PublishButton exposing (main)
+module PublishButton exposing (main)
 
 import Actions
 import Application
@@ -8,11 +8,10 @@ import Html exposing (Html)
 import Html.Attributes as HA
 import Html.Events as Events
 import Icons
-import Json.Decode as Decode exposing (Decoder, Value)
+import Json.Decode as Decode exposing (Decoder)
 import Json.Encode as Encode
 import Palette
 import Persona exposing (Persona)
-import Time exposing (Posix)
 
 
 main =
@@ -73,7 +72,7 @@ type SelectedPersona
 
 
 init : Props -> ( Model, Cmd Msg )
-init props =
+init _ =
     ( { state = Closed
       , selectedPersona = Anonymous
       }

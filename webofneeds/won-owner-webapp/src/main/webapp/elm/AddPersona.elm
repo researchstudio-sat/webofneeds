@@ -1,23 +1,16 @@
 module AddPersona exposing (main)
 
 import Actions
-import Application exposing (Style, logError)
-import Browser
-import Color
-import Dict exposing (Dict)
-import Dict.Extra as Dict
+import Application exposing (Style)
 import Html exposing (..)
 import Html.Attributes as Attributes
 import Html.Events as Events
-import Icons
-import Json.Decode as Decode exposing (Decoder, Value)
+import Json.Decode as Decode exposing (Decoder)
 import Json.Decode.Extra as Decode
-import Json.Decode.Pipeline as DP
 import Maybe.Extra as Maybe
 import Palette
 import Persona exposing (Persona)
-import Time exposing (Posix)
-import Url exposing (Url)
+import Time
 
 
 
@@ -55,7 +48,7 @@ propDecoder =
 
 
 init : Props -> ( Model, Cmd Msg )
-init { postUri, personas } =
+init _ =
     ( Selecting Nothing
     , Cmd.none
     )
@@ -135,7 +128,7 @@ view :
     , props : Props
     }
     -> Html Msg
-view { style, model, props } =
+view { model, props } =
     let
         saving =
             case model of
