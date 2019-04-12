@@ -1,5 +1,6 @@
-port module RatingView exposing (main)
+module RatingView exposing (main)
 
+import Application exposing (Style)
 import Element exposing (..)
 import Element.Background as Background
 import Element.Border as Border
@@ -8,16 +9,50 @@ import Element.Font as Font
 import Element.Input as Input
 import Html exposing (Html)
 import Html.Attributes as HA
+import Json.Decode as Decode exposing (Decoder)
 import Old.Skin as Skin exposing (Skin)
+import Persona
 
 
 main =
-    Skin.skinnedElement
+    Application.element
         { init = init
         , update = update
         , subscriptions = subscriptions
         , view = view
+        , propDecoder = propDecoder
         }
+
+
+
+---- PROPS ----
+
+
+type alias Props =
+    { rating : Maybe Rating
+    , connectionUri : Maybe String
+    }
+
+
+ratingDecoder : Decoder Rating
+ratingDecoder =
+    Decode.int
+        |> Decode.andThen
+            (fromInt
+                >> Maybe.map Decode.succeed
+                >> Maybe.withDefault (Decode.fail "Not a valid rating")
+            )
+
+
+propDecoder : Decoder Props
+propDecoder =
+    Decode.map2 Props
+        (Decode.field "rating" ratingDecoder
+            |> Decode.maybe
+        )
+        (Decode.field "connectionUri" Decode.string
+            |> Decode.maybe
+        )
 
 
 
@@ -73,12 +108,6 @@ toInt rating =
             5
 
 
-type alias Model =
-    { rating : Maybe Rating
-    , popupState : PopupState
-    }
-
-
 type alias Popup =
     { reviewText : String
     , selectedValue : Maybe Rating
@@ -86,32 +115,23 @@ type alias Popup =
     }
 
 
-type PopupState
+type Model
     = CannotRate
     | Closed
     | Hovered
     | Open Popup
 
 
-init : { rating : Int, canRate : Bool } -> ( Model, Cmd Msg )
-init { rating, canRate } =
-    ( { rating = fromInt rating
-      , popupState =
-            if canRate then
-                Closed
+init : Props -> ( Model, Cmd Msg )
+init { rating, connectionUri } =
+    ( case connectionUri of
+        Just _ ->
+            Closed
 
-            else
-                CannotRate
-      }
+        Nothing ->
+            CannotRate
     , Cmd.none
     )
-
-
-
----- PORT ----
-
-
-port reviewSubmitted : { value : Int, message : String } -> Cmd msg
 
 
 
@@ -131,45 +151,49 @@ type Msg
     | PopupMsg PopupMsg
 
 
-update : Msg -> Model -> ( Model, Cmd Msg )
-update msg model =
+update :
+    Msg
+    ->
+        { model : Model
+        , props : Props
+        }
+    -> ( Model, Cmd Msg )
+update msg { model, props } =
     case msg of
         Hover hovered ->
-            ( { model
-                | popupState = updateHover hovered model.popupState
-              }
+            ( updateHover hovered model
             , Cmd.none
             )
 
         TogglePopup ->
-            ( { model
-                | popupState =
-                    case model.popupState of
-                        CannotRate ->
-                            CannotRate
+            ( case model of
+                CannotRate ->
+                    CannotRate
 
-                        Closed ->
-                            Open initialPopup
+                Closed ->
+                    Open initialPopup
 
-                        Hovered ->
-                            Open initialPopup
+                Hovered ->
+                    Open initialPopup
 
-                        Open _ ->
-                            Closed
-              }
+                Open _ ->
+                    Closed
             , Cmd.none
             )
 
         PopupMsg popupMsg ->
-            let
-                ( newPopupState, popupCmd ) =
-                    updatePopup popupMsg model.popupState
-            in
-            ( { model
-                | popupState = newPopupState
-              }
-            , Cmd.map PopupMsg popupCmd
-            )
+            case props.connectionUri of
+                Just connectionUri ->
+                    let
+                        ( newPopupState, popupCmd ) =
+                            updatePopup connectionUri popupMsg model
+                    in
+                    ( newPopupState
+                    , Cmd.map PopupMsg popupCmd
+                    )
+
+                Nothing ->
+                    ( CannotRate, Cmd.none )
 
 
 initialPopup : Popup
@@ -180,7 +204,7 @@ initialPopup =
     }
 
 
-updateHover : Bool -> PopupState -> PopupState
+updateHover : Bool -> Model -> Model
 updateHover hovered state =
     case ( hovered, state ) of
         ( _, CannotRate ) ->
@@ -196,8 +220,8 @@ updateHover hovered state =
             Closed
 
 
-updatePopup : PopupMsg -> PopupState -> ( PopupState, Cmd PopupMsg )
-updatePopup msg popupState =
+updatePopup : String -> PopupMsg -> Model -> ( Model, Cmd PopupMsg )
+updatePopup connectionUri msg popupState =
     case popupState of
         CannotRate ->
             ( CannotRate, Cmd.none )
@@ -239,9 +263,12 @@ updatePopup msg popupState =
                         Just value ->
                             -- TODO: actually do something
                             ( Closed
-                            , reviewSubmitted
-                                { value = toInt value
-                                , message = state.reviewText
+                            , Persona.review
+                                { connection = connectionUri
+                                , review =
+                                    { value = toInt value
+                                    , message = state.reviewText
+                                    }
                                 }
                             )
 
@@ -289,8 +316,17 @@ viewMaybeRating skin maybeRating =
                 text "☆☆☆☆☆"
 
 
-view : Skin -> Model -> Html Msg
-view skin model =
+view :
+    { props : Props
+    , model : Model
+    , style : Style
+    }
+    -> Html Msg
+view { model, props } =
+    let
+        skin =
+            Skin.default
+    in
     layout
         [ htmlAttribute <| HA.style "display" "inline-block"
         , paddingEach
@@ -310,7 +346,7 @@ view skin model =
             ]
             [ el
                 [ below <|
-                    case model.popupState of
+                    case model of
                         CannotRate ->
                             none
 
@@ -324,8 +360,8 @@ view skin model =
                             popup skin popupState
                 ]
               <|
-                viewMaybeRating skin model.rating
-            , if model.popupState == Hovered then
+                viewMaybeRating skin props.rating
+            , if model == Hovered then
                 el
                     [ Font.size 14
                     , Font.color skin.primaryColor

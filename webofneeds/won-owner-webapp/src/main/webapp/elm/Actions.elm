@@ -1,17 +1,36 @@
-port module Actions exposing (connectPersona, emitEvent)
+port module Actions exposing (Action, Event, emitEvent, startAction)
 
 import Json.Encode as Encode exposing (Value)
-import Persona exposing (Persona)
 
 
-port outPort : { action : String, payload : Value } -> Cmd msg
+
+---- PORT ----
 
 
-emitEvent :
+port outPort : Action -> Cmd msg
+
+
+
+---- DATA ----
+
+
+type alias Action =
+    { action : String
+    , payload : Value
+    }
+
+
+type alias Event =
     { eventName : String
     , payload : Value
     }
-    -> Cmd msg
+
+
+
+---- ACTIONS ----
+
+
+emitEvent : Event -> Cmd msg
 emitEvent { eventName, payload } =
     outPort
         { action = eventName
@@ -19,17 +38,6 @@ emitEvent { eventName, payload } =
         }
 
 
-connectPersona :
-    { persona : Persona
-    , needUrl : String
-    }
-    -> Cmd msg
-connectPersona { persona, needUrl } =
-    outPort
-        { action = "personas__connect"
-        , payload =
-            Encode.list Encode.string
-                [ needUrl
-                , persona.uri
-                ]
-        }
+startAction : Action -> Cmd msg
+startAction action =
+    outPort action

@@ -13,10 +13,12 @@ import {
 import * as needUtils from "../need-utils.js";
 import * as processUtils from "../process-utils.js";
 import { actionCreators } from "../actions/actions.js";
-import ratingView from "./rating-view.js";
 import squareImageModule from "./square-image.js";
 import descriptionDetailViewerModule from "./details/viewer/description-viewer.js";
 import { details } from "../../config/detail-definitions.js";
+
+import { Elm } from "../../elm/RatingView.elm";
+import elmModule from "./elm.js";
 
 import "style/_post-content-persona.scss";
 import { getOwnedConnectionByUri } from "../selectors/connection-selectors.js";
@@ -42,7 +44,13 @@ function genComponentConf() {
           <span class="pcp__rating__label__title">Rating</span>
           <span class="pcp__rating__label__aggregate" ng-if="self.aggregateRatingString">(★ {{self.aggregateRatingString}})</span>
         </div>
-        <won-rating-view rating="self.aggregateRatingRounded" rating-connection-uri="self.ratingConnectionUri"></won-rating-view>
+        <won-elm
+          module="self.ratingView"
+          props="{
+            rating: self.aggregateRatingRounded,
+            connectionUri: self.ratingConnectionUri
+          }"
+        ></won-elm>
         <div class="pcp__rating__reviewcount" ng-if="self.reviewCount">{{ self.reviewCount }} Reviews</div>
         <button class="pcp__rating__view won-button--filled red" ng-if="self.reviewCount" ng-click="self.viewPersonaReviews()">View</button>
       </div>
@@ -58,6 +66,8 @@ function genComponentConf() {
     constructor() {
       attach(this, serviceDependencies, arguments);
       window.pcp4dbg = this;
+
+      this.ratingView = Elm.RatingView;
 
       const selectFromState = state => {
         const connectionUri = getConnectionUriFromRoute(state);
@@ -155,7 +165,7 @@ function genComponentConf() {
 
 export default angular
   .module("won.owner.components.postContentPersona", [
-    ratingView,
+    elmModule,
     squareImageModule,
     descriptionDetailViewerModule,
   ])

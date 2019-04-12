@@ -100,7 +100,7 @@ update msg { model, props } =
                     case selectedPersona props.personas model of
                         Just persona ->
                             ( AddingPersona id
-                            , Actions.connectPersona
+                            , Persona.connect
                                 { persona = persona
                                 , needUrl = props.postUri
                                 }
