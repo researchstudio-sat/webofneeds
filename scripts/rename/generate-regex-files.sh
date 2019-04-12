@@ -4,12 +4,29 @@ script_path="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 oldforms_file=${script_path}/oldforms.txt
 newforms_file=${script_path}/newforms.txt
+oldforms_file_expanded=${script_path}/generated/oldforms-expanded.txt
+newforms_file_expanded=${script_path}/generated/newforms-expanded.txt
 sed_script_file=${script_path}/generated/sed-changefile-regexes.txt
 sed_script_file_db_migration=${script_path}/generated/sed-db-migration-regexes.txt
 grep_script_file=${script_path}/generated/grep-checkfile-regex.txt
 
 
-if [[ $(cat ${oldforms_file} | grep -v '^#' | wc -l ) != $(cat ${oldforms_file} | grep -v '^#' | wc -l) ]]
+
+
+function join_by { local IFS="$1"; shift; echo "$*"; }
+
+cat ${oldforms_file} | ${script_path}/expand.pl > ${oldforms_file_expanded}
+cat ${newforms_file} | ${script_path}/expand.pl > ${newforms_file_expanded}
+
+# read files into arrays 'oldforms' and 'newforms' (don't try to make this a function, they can't return arrays in bash)
+# see https://stackoverflow.com/questions/10582763/how-to-return-an-array-in-bash-without-using-globals
+myifs=$IFS
+IFS=$'\r\n'; 
+read -d '' -r -a oldforms < <(cat ${oldforms_file_expanded} | grep -v '^#')
+read -d '' -r -a newforms < <(cat ${newforms_file_expanded} | grep -v '^#')
+IFS=${myifs}
+
+if [[ ${#oldforms[@]} != ${#newforms[@]} ]]
 then
 	echo "ERROR: ${oldforms_file} and ${newforms_file} must have the same number of lines!" >&2
 	echo "${oldforms_file}: " $(wc -l ${oldforms_file} | awk '{print $1;}') " lines" >&2
@@ -17,18 +34,9 @@ then
 	exit 1
 fi
 
-function join_by { local IFS="$1"; shift; echo "$*"; }
-
-# read files into arrays 'oldforms' and 'newforms' (don't try to make this a function, they can't return arrays in bash)
-# see https://stackoverflow.com/questions/10582763/how-to-return-an-array-in-bash-without-using-globals
-myifs=$IFS
-IFS=$'\r\n'; 
-read -d '' -r -a oldforms < <(cat ${oldforms_file} | grep -v '^#')
-read -d '' -r -a newforms < <(cat ${newforms_file} | grep -v '^#')
-IFS=${myifs}
-
 echo "found ${#oldforms[@]} expressions to replace" >&2
 echo "found ${#newforms[@]} replacement expressions" >&2
+
 
 write_sed_file() {
 	echo "# sed script for renaming" > ${sed_script_file} 

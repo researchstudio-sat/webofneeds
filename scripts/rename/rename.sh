@@ -14,13 +14,15 @@ rm -f ${changedFilesList}
 touch ${changedFilesList}
 echo "writing changed files to ${changedFilesList}" >&2
 
-
+# Parameters: 
+# $1: the file to process
+# Performs the replacements within the file if it is a file and renames it if it is a file or directory
 process_replace (){
-	while read replaceInFile
+	while read currentFile
 	do
-		echo -en "processing ${replaceInFile}... " >&2
+		echo -en "processing ${currentFile}... " >&2
 		# fast basename: http://www.skybert.net/bash/making-your-bash-programs-run-faster/
-		baseName=${replaceInFile##*/}
+		baseName=${currentFile##*/}
 		newBaseName=$(echo "${baseName}" | sed --file="${sed_script_file}")
 		if (! ${FORCE})
 		then
@@ -30,27 +32,30 @@ process_replace (){
 			fi	
 		fi
 		# fast dirname
-		newFileName="${replaceInFile%/*}/${newBaseName}"
+		newFileName="${currentFile%/*}/${newBaseName}"
 		if (${FORCE})
 		then
+			if [[ -f ${currentFile} ]]
+			then
+				echo -en "\e[33mmodifying\e[0m file ... " >&2	
+				sed --file="${sed_script_file}" --follow-symlinks -i ${currentFile}
+			fi
 			if [[ ${baseName} != ${newBaseName} ]]
 			then
 
-				git ls-files --error-unmatch ${replaceInFile} > /dev/null 2>&1
+				git ls-files --error-unmatch ${currentFile} > /dev/null 2>&1
 				managedByGit=$?
 				if [[ ${managedByGit} -eq 0 ]]
 				then 
-					echo -en "\e[33mgit-renaming\e[0m to ${newBaseName} ... " >&2	
-					git mv ${replaceInFile} ${newFileName} 			
+					echo -en "\e[96mgit-mv\e[0m to ${newBaseName} ... " >&2	
+					git mv ${currentFile} ${newFileName} 			
 				else
-					echo -en "\e[33mrenaming\e[0m to ${newBaseName} ... " >&2	
-					mv ${replaceInFile} ${newFileName} 			
+					echo -en "\e[96mmv\e[0m to ${newBaseName} ... " >&2	
+					mv ${currentFile} ${newFileName} 			
 				fi
 			fi
-			echo -en "\e[33mmodifying\e[0m file ... " >&2	
-			sed --file="${sed_script_file}" --follow-symlinks -i ${newFileName}
 		fi
-		echo "${replaceInFile} -> ${newFileName}" >> ${changedFilesList}
+		echo "${currentFile} -> ${newFileName}" >> ${changedFilesList}
 		echo -e "\e[32mdone\e[0m" >&2
 	done
 }
@@ -64,7 +69,12 @@ else
 	echo "You said 'FORCE'. Starting the replacement process" >&2
 fi 
 
-write_sed_file
-
+# list all files, filter using our file filter, and pass to replace
 find . -type f | grep -v -E -f "${script_path}/rename-file-filter.txt" | process_replace
+
+# list all directories, filter by our file filter, compute length of string with awk and add as first attribute,
+# sort whole output longest first, remove length attribute, and pass to replace
+# have to do it this way so that nested folders get renamed first
+find . -type d | grep -v -E -f "${script_path}/rename-file-filter.txt" | awk '{ print length($0) " " $0; }' | sort -r -n | cut -d ' ' -f 2- | process_replace
+
 
