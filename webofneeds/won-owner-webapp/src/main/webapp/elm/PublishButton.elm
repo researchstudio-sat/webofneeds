@@ -29,10 +29,15 @@ main =
 
 
 type alias Props =
-    { draftValid : Bool
+    { buttonEnabled : Bool
     , showPersonas : Bool
     , personas : Dict String Persona
+    , label : String
     }
+
+
+defaultLabel =
+    "Publish"
 
 
 propDecoder : Decoder Props
@@ -45,10 +50,14 @@ propDecoder =
                         >> Dict.fromList
                     )
     in
-    Decode.map3 Props
-        (Decode.field "draftValid" Decode.bool)
+    Decode.map4 Props
+        (Decode.field "buttonEnabled" Decode.bool)
         (Decode.field "showPersonas" Decode.bool)
-        (Decode.field "personas" <| dictDecoder)
+        (Decode.field "personas" dictDecoder)
+        (Decode.field "label" Decode.string
+            |> Decode.maybe
+            |> Decode.map (Maybe.withDefault defaultLabel)
+        )
 
 
 
@@ -84,6 +93,21 @@ init _ =
 ---- VIEW ----
 
 
+selectedPersona : Model -> Props -> Maybe Persona
+selectedPersona model props =
+    (case model.selectedPersona of
+        Persona url ->
+            Just url
+
+        Anonymous ->
+            Nothing
+    )
+        |> Maybe.andThen
+            (\url ->
+                Dict.get url props.personas
+            )
+
+
 view :
     { model : Model
     , props : Props
@@ -91,66 +115,58 @@ view :
     }
     -> Html Msg
 view { model, props } =
-    Html.div [ HA.class "won-publish-button" ]
-        [ if not props.showPersonas then
-            Palette.wonButton
-                [ HA.disabled <| not props.draftValid
+    let
+        fullLabel =
+            selectedPersona model props
+                |> Maybe.map (\persona -> props.label ++ " as " ++ persona.name)
+                |> Maybe.withDefault (props.label ++ " Anonymously")
+    in
+    if not props.showPersonas then
+        Palette.wonButton
+            [ HA.disabled <| not props.buttonEnabled
+            , HA.class "won-publish-button"
+            , Events.onClick Publish
+            ]
+            [ Html.text props.label
+            ]
+
+    else
+        Html.div
+            [ HA.class "won-button-row"
+            , HA.class "won-publish-button"
+            ]
+            ([ Palette.wonButton
+                [ HA.class "left"
+                , HA.class "submit-button"
+                , HA.disabled <| not props.buttonEnabled
                 , Events.onClick Publish
                 ]
-                [ Html.text "Publish Anonymously"
+                [ Html.text fullLabel
                 ]
+             , Palette.wonButton
+                [ HA.class "right"
+                , HA.class "won-dropdown-button"
+                , Events.onClick ToggleDropdown
+                ]
+                [ Icons.icon
+                    (case model.state of
+                        Open ->
+                            Icons.arrowDown
 
-          else
-            Html.div [ HA.class "won-button-row" ]
-                ([ Palette.wonButton
-                    [ HA.class "left"
-                    , HA.disabled <| not props.draftValid
-                    , Events.onClick Publish
-                    ]
-                    [ Html.text
-                        ((case model.selectedPersona of
-                            Persona url ->
-                                Just url
+                        Closed ->
+                            Icons.arrowUp
+                    )
+                    Color.white
+                ]
+             ]
+                ++ (case model.state of
+                        Open ->
+                            [ personaList (Dict.values props.personas) ]
 
-                            Anonymous ->
-                                Nothing
-                         )
-                            |> Maybe.andThen
-                                (\url ->
-                                    Dict.get url props.personas
-                                )
-                            |> Maybe.map
-                                (\persona ->
-                                    "Publish as " ++ persona.name
-                                )
-                            |> Maybe.withDefault "Publish Anonymously"
-                        )
-                    ]
-                 , Palette.wonButton
-                    [ HA.class "right"
-                    , HA.class "won-dropdown-button"
-                    , Events.onClick ToggleDropdown
-                    ]
-                    [ Icons.icon
-                        (case model.state of
-                            Open ->
-                                Icons.arrowDown
-
-                            Closed ->
-                                Icons.arrowUp
-                        )
-                        Color.white
-                    ]
-                 ]
-                    ++ (case model.state of
-                            Open ->
-                                [ personaList (Dict.values props.personas) ]
-
-                            Closed ->
-                                []
-                       )
-                )
-        ]
+                        Closed ->
+                            []
+                   )
+            )
 
 
 personaList : List Persona -> Html Msg

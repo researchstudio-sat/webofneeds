@@ -103,7 +103,15 @@ function genComponentConf() {
         </div>
         <div class="cp__footer" >
             <won-labelled-hr label="::'done?'" class="cp__footer__labelledhr"></won-labelled-hr>
-            <won-elm module="self.publishButton" props="{draftValid: self.isValid(), showPersonas: self.isHoldable && self.loggedIn, personas: self.personas}" on-action="self.publish(payload)" ></won-elm>
+            <won-elm
+              module="self.publishButton"
+              props="{
+                buttonEnabled: self.isValid(),
+                showPersonas: self.isHoldable && self.loggedIn,
+                personas: self.personas
+              }"
+              on-action="self.publish(payload)" >
+            </won-elm>
             <div class="cp__footer__edit" ng-if="self.loggedIn && self.showCreateInput && self.isEditFromNeed && self.isFromNeedEditable">
               <button class="cp__footer__edit__save won-button--filled red" ng-click="self.save()" ng-disabled="!self.isValid()">
                   Save

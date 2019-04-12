@@ -2,6 +2,8 @@ import angular from "angular";
 import { currentSkin } from "../selectors/general-selectors";
 import { actionCreators } from "../actions/actions";
 
+import "./svg-icon.js";
+
 import "../../style/_elm.scss";
 import { getIn } from "../utils";
 

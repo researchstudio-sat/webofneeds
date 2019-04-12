@@ -12,7 +12,10 @@ import "ng-redux";
 import ngAnimate from "angular-animate";
 import { dispatchEvent, attach, delay, get } from "../utils.js";
 import won from "../won-es6.js";
-import { getOwnedNeedByConnectionUri } from "../selectors/general-selectors.js";
+import {
+  getOwnedNeedByConnectionUri,
+  getOwnedPersonas,
+} from "../selectors/general-selectors.js";
 import { getMessagesByConnectionUri } from "../selectors/message-selectors.js";
 import {
   isMessageProposable,
@@ -30,8 +33,10 @@ import { actionCreators } from "../actions/actions.js";
 import labelledHrModule from "./labelled-hr.js";
 import { getHumanReadableStringFromMessage } from "../reducers/need-reducer/parse-message.js";
 import { isChatToGroup } from "../connection-utils.js";
-import submitButtonModule from "./submit-button.js";
 import * as accountUtils from "../account-utils.js";
+
+import { Elm } from "../../elm/PublishButton.elm";
+import elmModule from "./elm.js";
 
 import "style/_chattextfield.scss";
 import "style/_textfield.scss";
@@ -214,14 +219,17 @@ function genComponentConf() {
             placeholder="{{self.placeholder}}"></textarea>
 
       <!-- PERSONA SELECTION START -->
-        <div class="cts__submitbutton">
-            <won-submit-button
-                is-valid="self.valid()"
-                on-submit="self.submit(persona)" 
-                show-personas="self.showPersonasSelection"
-                label="self.submitButtonLabel">
-            </won-submit-button>
-        </div>
+          <won-elm
+            class="cts__submitbutton"
+            module="self.publishButton"
+            props="{
+              buttonEnabled: self.valid(),
+              showPersonas: self.showPersonasSelection,
+              personas: self.personas,
+              label: self.submitButtonLabel
+            }"
+            on-action="self.submit(payload)" >
+          </won-elm>
       <!-- PERSONA SELECTION END -->
 
       <!-- ADDED DETAILS START -->  
@@ -281,13 +289,14 @@ function genComponentConf() {
       this.allMessageDetails = useCaseUtils.getAllMessageDetails();
 
       this.draftObject = {};
+      this.publishButton = Elm.PublishButton;
       this.additionalContent = new Map(); //Stores the additional Detail content of a message
       this.referencedContent = new Map(); //Stores the reference Content of a message (e.g. proposes, retracts...)
 
       // keep up-to-date on whether we need to show personas or not
-      this.showPersonasSelection = this.showPersonas || undefined;
+      this.showPersonasSelection = this.showPersonas || false;
       this.$scope.$watch("self.showPersonas", newValue => {
-        this.showPersonasSelection = newValue;
+        this.showPersonasSelection = newValue || false;
       });
 
       const selectFromState = state => {
@@ -363,6 +372,7 @@ function genComponentConf() {
           selectedDetail,
           selectedDetailComponent: selectedDetail && selectedDetail.component,
           isLoggedIn: accountUtils.isLoggedIn(get(state, "account")),
+          personas: getOwnedPersonas(state).toJS(),
         };
       };
 
@@ -697,7 +707,7 @@ export default angular
   .module("won.owner.components.chatTextfield", [
     labelledHrModule,
     autoresizingTextareaModule,
-    submitButtonModule,
+    elmModule,
     ngAnimate,
   ])
   .directive("messageDetailElement", [
