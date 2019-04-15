@@ -61,9 +61,7 @@ function genComponentConf() {
                 <span>What's in your Area?</span>
             </button>
             <button class="won-button--filled red ucp__createx__button"
-                    ng-if="!self.processingPublish"
-                    ng-click="self.createWhatsNew()"
-                    ng-disabled="self.processingPublish">
+                    ng-click="self.router__stateGo('overview')">
                 <span>What's new?</span>
             </button>
 
@@ -195,29 +193,6 @@ function genComponentConf() {
             acceptCallback: () => {
               this.view__hideModalDialog();
               this.needs__whatsAround();
-            },
-            cancelCallback: () => {
-              this.view__hideModalDialog();
-            },
-          })
-        );
-      }
-    }
-
-    createWhatsNew() {
-      if (this.processingPublish) {
-        console.debug("publish in process, do not take any action");
-        return;
-      }
-
-      if (this.loggedIn) {
-        this.needs__whatsNew();
-      } else {
-        this.view__showTermsDialog(
-          Immutable.fromJS({
-            acceptCallback: () => {
-              this.view__hideModalDialog();
-              this.needs__whatsNew();
             },
             cancelCallback: () => {
               this.view__hideModalDialog();

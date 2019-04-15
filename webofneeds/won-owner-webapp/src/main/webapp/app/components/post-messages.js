@@ -313,9 +313,7 @@ function genComponentConf() {
         const connection =
           ownedNeed && ownedNeed.getIn(["connections", selectedConnectionUri]);
         const isOwnedNeedWhatsX =
-          ownedNeed &&
-          (needUtils.isWhatsAroundNeed(ownedNeed) ||
-            needUtils.isWhatsNewNeed(ownedNeed));
+          ownedNeed && needUtils.isWhatsAroundNeed(ownedNeed);
         const remoteNeedUri = connection && connection.get("remoteNeedUri");
         const remoteNeed =
           remoteNeedUri && state.getIn(["needs", remoteNeedUri]);

@@ -11,6 +11,7 @@
 package won.owner.repository;
 
 import java.net.URI;
+import java.util.List;
 
 import org.springframework.data.jpa.repository.Query;
 
@@ -23,4 +24,7 @@ import won.protocol.repository.WonRepository;
 public interface UserNeedRepository extends WonRepository<UserNeed> {
     @Query(value = "SELECT n from UserNeed n where n.uri = ?1")
     public UserNeed findByNeedUri(URI needUri);
+
+    @Query(value = "SELECT n from UserNeed n order by n.creationDate DESC")
+    public List<UserNeed> findAllNeeds();
 }

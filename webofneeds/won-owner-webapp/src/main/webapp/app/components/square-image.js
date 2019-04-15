@@ -42,7 +42,7 @@ function genComponentConf() {
           ? needUtils.getMatchedUseCaseIcon(need)
           : undefined;
         const useCaseIconBackground = !isPersona
-          ? needUtils.getMatchedUseCaseIconBackground(need)
+          ? needUtils.getBackground(need)
           : undefined;
 
         const identiconSvg = !useCaseIcon

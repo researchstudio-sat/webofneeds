@@ -21,7 +21,6 @@ const emptyDraftImm = Immutable.fromJS({
     defaultFacet: { "#chatFacet": "won:ChatFacet" },
   },
   seeks: {},
-  matchingContext: undefined,
 });
 
 /**

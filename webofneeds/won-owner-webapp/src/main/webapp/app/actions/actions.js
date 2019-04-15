@@ -42,7 +42,6 @@ import { hierarchy2Creators } from "./action-utils.js";
 import {
   needCreate,
   needEdit,
-  createWhatsNew,
   createWhatsAround,
 } from "./create-need-action.js";
 
@@ -86,7 +85,10 @@ import * as cnct from "./connections-actions.js";
 import * as messages from "./messages-actions.js";
 import * as configActions from "./config-actions.js";
 
-import { pageLoadAction } from "./load-action.js";
+import {
+  pageLoadAction,
+  loadAllActiveNeedUrisFromOwner,
+} from "./load-action.js";
 import { stateGo, stateReload } from "redux-ui-router";
 import {
   createPersona,
@@ -146,7 +148,6 @@ const actionHierarchy = {
     edit: needEdit,
     editSuccessful: INJ_DEFAULT,
     editFailure: INJ_DEFAULT,
-    whatsNew: createWhatsNew,
     whatsAround: createWhatsAround,
     createSuccessful: INJ_DEFAULT,
     reopen: needsOpen,
@@ -158,6 +159,9 @@ const actionHierarchy = {
     fetchUnloadedNeeds: fetchUnloadedNeeds,
     fetchUnloadedNeed: fetchUnloadedNeed,
 
+    loadAllActiveNeedUrisFromOwner: loadAllActiveNeedUrisFromOwner,
+    storeNeedUrisFromOwner: INJ_DEFAULT,
+
     storeOwnedInactiveUris: INJ_DEFAULT,
     storeOwnedInactiveUrisInLoading: INJ_DEFAULT,
     storeOwnedActiveUris: INJ_DEFAULT,
@@ -167,6 +171,7 @@ const actionHierarchy = {
     storeTheirs: INJ_DEFAULT,
 
     storeUriFailed: INJ_DEFAULT,
+    removeDeleted: INJ_DEFAULT,
     selectTab: INJ_DEFAULT,
   },
   personas: {
@@ -179,6 +184,7 @@ const actionHierarchy = {
     storeTheirUrisInLoading: INJ_DEFAULT,
 
     storeUriFailed: INJ_DEFAULT,
+    removeDeleted: INJ_DEFAULT,
   },
   router: {
     stateGo, // only overwrites parameters that are explicitly mentioned, unless called without queryParams object (which also resets "pervasive" parameters, that shouldn't be removed

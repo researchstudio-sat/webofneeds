@@ -1,0 +1,73 @@
+@import "won-config";
+@import "sizing-utils";
+@import "fonts";
+@import "flex-layout";
+
+main.owneroverview {
+  grid-column: 1 / -1;
+  padding: 0;
+  box-sizing: border-box;
+  align-items: stretch;
+  max-width: $maxContentWidth;
+  width: 100%;
+  margin: 0 auto;
+
+  & .owneroverview__header {
+    display: grid;
+    grid-template-columns: 1fr min-content;
+    grid-gap: 0.5rem;
+    border-bottom: $thinGrayBorder;
+    padding: 0.5rem;
+    align-items: center;
+
+    &__title {
+      font-size: $mediumFontSize;
+    }
+
+    &__loading {
+      font-size: $smallFontSize;
+      color: $won-line-gray;
+    }
+
+    &__updated {
+      display: grid;
+      grid-template-columns: min-content min-content;
+      grid-gap: 0.5rem;
+      align-items: center;
+
+      font-size: $smallFontSize;
+
+      &__time {
+        white-space: nowrap;
+        color: $won-line-gray;
+      }
+
+      &__reload.won-button--filled.red {
+        font-size: 0.75rem;
+        padding: 0.25rem;
+      }
+    }
+  }
+
+  .owneroverview__content {
+    display: flex;
+    flex-wrap: wrap;
+    padding: 0.5rem;
+
+    won-need-card.owneroverview__content__need {
+      border: $thinGrayBorder;
+      background: $won-light-gray;
+
+      margin-right: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    @media (max-width: $responsivenessBreakPoint) {
+      display: block;
+
+      won-need-card.owneroverview__content__need {
+        margin-right: 0;
+      }
+    }
+  }
+}

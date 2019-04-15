@@ -5,11 +5,6 @@ import angular from "angular";
 import { attach, get, getIn } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
 import { getPostUriFromRoute } from "../selectors/general-selectors.js";
-import {
-  generateFullNeedTypesLabel,
-  generateShortNeedTypesLabel,
-  generateNeedMatchingContext,
-} from "../need-utils.js";
 import { actionCreators } from "../actions/actions.js";
 import postContextDropDownModule from "../components/post-context-dropdown.js";
 import shareDropdownModule from "../components/share-dropdown.js";
@@ -39,8 +34,7 @@ function genComponentConf() {
                           ng-if="self.isGroupChatEnabled && self.isChatEnabled">
                           Group Chat enabled
                         </span>
-                        <div class="vtb__titles__type" ng-if="!self.shouldShowRdf">{{ self.shortTypesLabel }}{{ self.matchingContext }}</div>
-                        <div class="vtb__titles__type" ng-if="self.shouldShowRdf">{{ self.fullTypesLabel }}</div>
+                        <div class="vtb__titles__type">{{ self.needTypeLabel }}</div>
                     </hgroup>
                 </div>
             </div>
@@ -75,10 +69,7 @@ function genComponentConf() {
           responseToNeed,
           isGroupChatEnabled: needUtils.hasGroupFacet(post),
           isChatEnabled: needUtils.hasChatFacet(post),
-          fullTypesLabel: post && generateFullNeedTypesLabel(post),
-          shortTypesLabel: post && generateShortNeedTypesLabel(post),
-          matchingContext: post && generateNeedMatchingContext(post),
-          shouldShowRdf: state.getIn(["view", "showRdf"]),
+          needTypeLabel: post && needUtils.generateNeedTypeLabel(post),
         };
       };
       connect2Redux(selectFromState, actionCreators, [], this);

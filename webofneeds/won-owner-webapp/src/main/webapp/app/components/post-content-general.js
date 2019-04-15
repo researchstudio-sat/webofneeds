@@ -7,15 +7,7 @@ import { attach, get, getIn } from "../utils.js";
 import won from "../won-es6.js";
 import { relativeTime } from "../won-label-utils.js";
 import { connect2Redux } from "../won-utils.js";
-import {
-  generateFullNeedTypesLabel,
-  generateShortNeedTypesLabel,
-  generateFullNeedFlags,
-  generateFullNeedFacets,
-  generateShortNeedFlags,
-  generateShortNeedFacets,
-  generateNeedMatchingContext,
-} from "../need-utils.js";
+import * as needUtils from "../need-utils.js";
 import * as viewUtils from "../view-utils.js";
 import {
   selectLastUpdateTime,
@@ -49,39 +41,17 @@ function genComponentConf() {
               {{ self.friendlyModifiedDate }}
             </div>
           </div>
-          <!-- TYPES - IF SHOW RDF IS TRUE -->
-          <div class="pcg__columns__left__item" ng-if="self.shouldShowRdf">
+          <div class="pcg__columns__left__item">
             <div class="pcg__columns__left__item__label">
               Types
             </div>
             <div class="pcg__columns__left__item__value">
-              {{ self.fullTypesLabel }}
+              {{ self.needTypeLabel }}
             </div>
           </div>
         </div>
 
       <!-- RIGHT COLUMN -->
-        <!-- TYPES - IF SHOW RDF IS FALSE -->
-        <div class="pcg__columns__right" ng-if="!self.shouldShowRdf && self.shortTypesLabel.length > 0">
-          <div class="pcg__columns__left__item">
-            <div class="pcg__columns__left__item__label">
-              Type
-            </div>
-            <div class="pcg__columns__left__item__value">
-              {{ self.shortTypesLabel }} {{self.matchingContext}}
-            </div>
-          </div>
-        </div>
-        <div class="pcg__columns__right" ng-if="!self.shouldShowRdf && self.shortTypesLabel.length === 0 && self.matchingContext.length > 0">
-          <div class="pcg__columns__left__item">
-            <div class="pcg__columns__left__item__label">
-              Context
-            </div>
-            <div class="pcg__columns__left__item__value">
-              {{self.matchingContext}}
-            </div>
-          </div>
-        </div>
         <!-- FLAGS -->
         <div class="pcg__columns__right" ng-if="self.shouldShowRdf || (self.shortFlags && self.shortFlags.length > 0)">
           <div class="pcg__columns__right__item">
@@ -138,13 +108,11 @@ function genComponentConf() {
 
         return {
           WON: won.WON,
-          fullTypesLabel: post && generateFullNeedTypesLabel(post),
-          shortTypesLabel: post && generateShortNeedTypesLabel(post),
-          matchingContext: post && generateNeedMatchingContext(post),
-          fullFlags: post && generateFullNeedFlags(post),
-          shortFlags: post && generateShortNeedFlags(post),
-          fullFacets: post && generateFullNeedFacets(post),
-          shortFacets: post && generateShortNeedFacets(post),
+          needTypeLabel: post && needUtils.generateNeedTypeLabel(post),
+          fullFlags: post && needUtils.generateFullNeedFlags(post),
+          shortFlags: post && needUtils.generateShortNeedFlags(post),
+          fullFacets: post && needUtils.generateFullNeedFacets(post),
+          shortFacets: post && needUtils.generateShortNeedFacets(post),
           friendlyCreationDate:
             creationDate &&
             relativeTime(selectLastUpdateTime(state), creationDate),

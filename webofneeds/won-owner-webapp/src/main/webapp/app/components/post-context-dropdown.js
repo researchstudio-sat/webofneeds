@@ -187,7 +187,7 @@ function genComponentConf() {
           text: "Deleting the Post is irreversible, do you want to proceed?",
           buttons: [
             {
-              caption: "YES",
+              caption: "Yes",
               callback: () => {
                 this.needs__delete(this.post.get("uri"));
                 this.router__stateGoCurrent({
@@ -198,7 +198,7 @@ function genComponentConf() {
               },
             },
             {
-              caption: "NO",
+              caption: "No",
               callback: () => {
                 this.view__hideModalDialog();
               },

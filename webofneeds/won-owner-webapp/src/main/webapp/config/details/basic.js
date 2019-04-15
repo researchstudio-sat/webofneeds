@@ -229,7 +229,6 @@ export const flags = {
   component: undefined, //this is so we do not display the component as a detail-picker, but are still able to use the parseToRDF, parseFromRDF functions
   multiSelect: true,
   options: [
-    { value: "won:WhatsNew", label: "WhatsNew" },
     { value: "won:WhatsAround", label: "WhatsAround" },
     { value: "won:NoHintForMe", label: "NoHintForMe" },
     { value: "won:NoHintForCounterpart", label: "NoHintForCounterpart" },
