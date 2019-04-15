@@ -18,14 +18,18 @@ won-need-card {
     @include animateOpacityHeartBeat();
     pointer-events: none;
 
+    .card__main {
+      grid-row-gap: 0.15rem;
+    }
+
     .card__main__subtitle__type {
-      height: $smallFontSize;
+      height: calc(#{$smallFontSize} - 0.1rem);
       width: 5rem;
       background-color: $won-skeleton-color;
     }
 
     .card__main__topline__title {
-      height: $normalFontSize;
+      height: calc(#{$smallFontSize} - 0.05rem);
       width: 7rem;
       background-color: $won-skeleton-color;
     }
