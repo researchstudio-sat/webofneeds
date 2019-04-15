@@ -68,7 +68,7 @@ export function getLocation(need) {
 }
 
 /**
- * Returns the "Default" Image (currently the first one, branch content is checked before seeks) of a need
+ * Returns the "Default" Image (currently the content branch is checked before seeks) of a need
  * if the need does not have any images we return undefined
  * @param need
  */
@@ -77,13 +77,25 @@ export function getDefaultImage(need) {
     const contentImages = getIn(need, ["content", "images"]);
 
     if (contentImages) {
-      return contentImages.first();
+      const defaultImage = contentImages.find(image => get(image, "default"));
+
+      if (defaultImage) {
+        return defaultImage;
+      }
     }
 
     const seeksImages = getIn(need, ["content", "images"]);
 
     if (seeksImages) {
-      return seeksImages.first();
+      const defaultImage = seeksImages.find(image => get(image, "default"));
+
+      if (defaultImage) {
+        return defaultImage;
+      } else {
+        return seeksImages.first();
+      }
+    } else {
+      return contentImages.first();
     }
   }
   return undefined;
