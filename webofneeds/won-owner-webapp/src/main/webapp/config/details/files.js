@@ -92,7 +92,7 @@ export const images = {
   accepts: "image/*",
   multiSelect: true,
   component: "won-file-picker",
-  viewerComponent: "won-file-viewer",
+  viewerComponent: "won-image-viewer",
   messageEnabled: true,
   parseToRDF: function({ value, identifier, contentUri }) {
     if (!value) {
@@ -100,8 +100,12 @@ export const images = {
     }
     let payload = [];
     value.forEach(image => {
-      //TODO: SAVE CORRECT RDF THIS METHOD
-      if (image.name && image.type && image.data) {
+      if (
+        image.name &&
+        image.type &&
+        image.data &&
+        /^image\//.test(image.type)
+      ) {
         let img = {
           "@id":
             contentUri && identifier
@@ -128,13 +132,12 @@ export const images = {
     if (Immutable.List.isList(images)) {
       images &&
         images.forEach(image => {
-          //TODO: RETRIEVE FROM CORRECT RDF THIS METHOD
           let img = {
             name: get(image, "s:name"),
             type: get(image, "s:type"),
             data: get(image, "s:data"),
           };
-          if (img.name && img.type && img.data) {
+          if (img.name && img.type && img.data && /^image\//.test(img.type)) {
             imgs.push(img);
           }
         });
@@ -144,7 +147,7 @@ export const images = {
         type: get(images, "s:type"),
         data: get(images, "s:data"),
       };
-      if (img.name && img.type && img.data) {
+      if (img.name && img.type && img.data && /^image\//.test(img.type)) {
         return Immutable.fromJS([img]);
       }
     }
