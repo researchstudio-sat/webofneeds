@@ -4,58 +4,66 @@
 won-image-viewer {
   @include won-detail-viewer("imagev");
 
+  .imagev__content {
+    .imagev__content__selected {
+      background: white;
+      border: $thinGrayBorder;
+
+      .imagev__content__selected__image {
+        &:hover {
+          cursor: pointer;
+        }
+        height: 100%;
+        width: 100%;
+        object-fit: scale-down;
+      }
+    }
+
+    .imagev__content__thumbnails {
+      display: grid;
+      background: $won-lighter-gray;
+      border: $thinGrayBorder;
+      border-top: 0;
+      padding: 0.5rem;
+      grid-gap: 0.5rem;
+
+      .imagev__content__thumbnails__thumbnail {
+        background: white;
+        height: $postIconSize;
+        border: $thinGrayBorder;
+        opacity: 0.5;
+        &--selected {
+          border-color: $won-primary-color;
+          opacity: 1;
+
+          &:hover {
+            cursor: default;
+            opacity: 1;
+          }
+        }
+
+        &:hover {
+          cursor: pointer;
+          opacity: 0.75;
+        }
+
+        .imagev__content__thumbnails__thumbnail__image {
+          height: 100%;
+          width: 100%;
+          object-fit: cover;
+        }
+      }
+    }
+  }
+
   &.won-in-message {
     .imagev__content {
       .imagev__content__selected {
         height: 15rem;
-        background: white;
-        border: $thinGrayBorder;
-
-        .imagev__content__selected__image {
-          &:hover {
-            cursor: pointer;
-          }
-          height: 100%;
-          width: 100%;
-          object-fit: scale-down;
-        }
       }
 
       .imagev__content__thumbnails {
-        display: grid;
         grid-template-columns: 1fr 1fr 1fr 1fr;
-        background: $won-lighter-gray;
-        border: $thinGrayBorder;
-        border-top: 0;
-        padding: 0.5rem;
-        grid-gap: 0.5rem;
-
-        .imagev__content__thumbnails__thumbnail {
-          background: white;
-          height: $postIconSize;
-          border: $thinGrayBorder;
-          opacity: 0.5;
-          &--selected {
-            border-color: $won-primary-color;
-            opacity: 1;
-
-            &:hover {
-              cursor: default;
-              opacity: 1;
-            }
-          }
-
-          &:hover {
-            cursor: pointer;
-            opacity: 0.75;
-          }
-
-          .imagev__content__thumbnails__thumbnail__image {
-            height: 100%;
-            width: 100%;
-            object-fit: cover;
-          }
-        }
       }
     }
   }
@@ -69,59 +77,14 @@ won-image-viewer {
         @media (min-width: $responsivenessBreakPoint) {
           height: 25rem;
         }
-        background: white;
-        border: $thinGrayBorder;
-
-        .imagev__content__selected__image {
-          &:hover {
-            cursor: pointer;
-          }
-          height: 100%;
-          width: 100%;
-          object-fit: scale-down;
-        }
       }
 
       .imagev__content__thumbnails {
-        display: grid;
         @media (max-width: $responsivenessBreakPoint) {
           grid-template-columns: 1fr 1fr 1fr 1fr;
         }
         @media (min-width: $responsivenessBreakPoint) {
           grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
-        }
-
-        background: $won-lighter-gray;
-        border: $thinGrayBorder;
-        border-top: 0;
-        padding: 0.5rem;
-        grid-gap: 0.5rem;
-
-        .imagev__content__thumbnails__thumbnail {
-          background: white;
-          height: $postIconSize;
-          border: $thinGrayBorder;
-          opacity: 0.5;
-          &--selected {
-            border-color: $won-primary-color;
-            opacity: 1;
-
-            &:hover {
-              cursor: default;
-              opacity: 1;
-            }
-          }
-
-          &:hover {
-            cursor: pointer;
-            opacity: 0.75;
-          }
-
-          .imagev__content__thumbnails__thumbnail__image {
-            height: 100%;
-            width: 100%;
-            object-fit: cover;
-          }
         }
       }
     }
