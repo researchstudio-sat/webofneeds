@@ -42,14 +42,4 @@ foreach my $line ( <STDIN> ) {
 	$out =~ s/(\p{IsLower})(\p{IsUpper})/$1-$2/g;
 	$out =~ s/(\p{IsUpper})/lc($1)/ge;
 	print $out . "\n";
-	## camel case to lowercase space-separated
-	$out = $line;
-	$out =~ s/(\p{IsLower})(\p{IsUpper})/$1 $2/g;
-	$out =~ s/(\p{IsUpper})/lc($1)/ge;
-	print $out . "\n";
-	## camel case to uppercase space-separated
-	$out = $line;
-	$out =~ s/(\p{IsLower})(\p{IsUpper})/$1 $2/g;
-	$out =~ s/(\p{IsUpper})/uc($1)/ge;
-	print $out . "\n";
 }
