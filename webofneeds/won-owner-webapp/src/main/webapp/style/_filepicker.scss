@@ -28,12 +28,13 @@ won-file-picker {
 
       .filep__preview__item__image,
       .filep__preview__item__typeicon {
-        @include fixed-square($postIconSize);
-        object-fit: contain;
+        @include fixed-square($postIconSizeMobile);
+        object-fit: cover;
         --local-primary: #{$won-line-gray};
       }
 
       .filep__preview__item__label {
+        font-size: $smallFontSize;
         text-overflow: ellipsis;
         overflow: hidden;
         max-width: 100%;
@@ -42,7 +43,7 @@ won-file-picker {
 
       .filep__preview__item__remove {
         --local-primary: #{$won-primary-text-color};
-        @include fixed-square($postIconSize);
+        @include fixed-square($postIconSizeMobile);
 
         &:hover {
           cursor: pointer;
