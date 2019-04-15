@@ -1,0 +1,117 @@
+@import "won-config";
+@import "sizing-utils";
+
+won-image-viewer {
+  @include won-detail-viewer("imagev");
+
+  &.won-in-message {
+    .imagev__content {
+      .imagev__content__selected {
+        padding: 0.5rem;
+        height: 15rem;
+        background: $won-light-gray;
+        border: $thinGrayBorder;
+
+        .imagev__content__selected__image {
+          &:hover {
+            cursor: pointer;
+          }
+          height: 100%;
+          width: 100%;
+          object-fit: scale-down;
+        }
+      }
+
+      .imagev__content__thumbnails {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr 1fr;
+        background: $won-lighter-gray;
+        border: $thinGrayBorder;
+        border-top: 0;
+        padding: 0.5rem;
+        grid-gap: 0.5rem;
+
+        .imagev__content__thumbnails__thumbnail {
+          height: $postIconSize;
+          border: $thinGrayBorder;
+
+          &:hover {
+            cursor: pointer;
+          }
+
+          .imagev__content__thumbnails__thumbnail__image {
+            height: 100%;
+            width: 100%;
+            object-fit: cover;
+          }
+        }
+      }
+    }
+  }
+
+  &:not(.won-in-message) {
+    .imagev__content {
+      .imagev__content__selected {
+        padding: 0.5rem;
+        @media (max-width: $responsivenessBreakPoint) {
+          height: 15rem;
+        }
+        @media (min-width: $responsivenessBreakPoint) {
+          height: 25rem;
+        }
+        background: $won-light-gray;
+        border: $thinGrayBorder;
+
+        .imagev__content__selected__image {
+          &:hover {
+            cursor: pointer;
+          }
+          height: 100%;
+          width: 100%;
+          object-fit: scale-down;
+        }
+      }
+
+      .imagev__content__thumbnails {
+        display: grid;
+        @media (max-width: $responsivenessBreakPoint) {
+          grid-template-columns: 1fr 1fr 1fr 1fr;
+        }
+        @media (min-width: $responsivenessBreakPoint) {
+          grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+        }
+
+        background: $won-lighter-gray;
+        border: $thinGrayBorder;
+        border-top: 0;
+        padding: 0.5rem;
+        grid-gap: 0.5rem;
+
+        .imagev__content__thumbnails__thumbnail {
+          height: $postIconSize;
+          border: $thinGrayBorder;
+
+          &:hover {
+            cursor: pointer;
+          }
+
+          .imagev__content__thumbnails__thumbnail__image {
+            height: 100%;
+            width: 100%;
+            object-fit: cover;
+          }
+        }
+      }
+    }
+  }
+}
+
+won-send-request won-image-viewer:not(.won-in-message) .imagev__content > {
+  //Send Request view should have a different thumbnail height if not mobile
+
+  @media (min-width: $responsivenessBreakPoint) {
+    .imagev__content__thumbnails > .imagev__content__thumbnails__thumbnail {
+      height: $hugeiconSize;
+    }
+  }
+}
