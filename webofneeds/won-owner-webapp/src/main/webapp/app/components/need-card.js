@@ -94,6 +94,14 @@ function genComponentConf() {
                 {{ self.friendlyTimestamp }}
             </div>
         </div>
+        <div class="card__main__location" ng-if="self.needLocation">
+          <svg class="card__main__location__icon">
+              <use xlink:href="#ico36_detail_location" href="#ico36_detail_location"></use>
+          </svg>
+          <span class="card__main__location__address">
+              {{ self.needLocation.get('address') }}
+          </span>
+        </div>
     </div>
     <div class="card__persona clickable" ng-if="self.needLoaded && self.persona" ng-click="self.router__stateGoCurrent({viewNeedUri: self.personaUri})">
           <img class="card__persona__icon"
@@ -166,7 +174,7 @@ function genComponentConf() {
           : undefined;
 
         const needImage = needUtils.getDefaultImage(need);
-        const needLocation = false; //needUtils.getLocation(need); //include the comment instead of the false, to display location in the need-card
+        const needLocation = needUtils.getLocation(need); //include the comment instead of the false, to display location in the need-card
 
         return {
           //General
@@ -202,7 +210,7 @@ function genComponentConf() {
           personaIdenticonSvg,
           needImage,
           needLocation,
-          showDefaultIcon: !needImage && !needLocation, //if no image and no locaiton are present we display the defaultIcon in the card__icon area, instead of next to the title
+          showDefaultIcon: !needImage /*&& !needLocation*/, //if no image and no location are present we display the defaultIcon in the card__icon area, instead of next to the title
         };
       };
 
