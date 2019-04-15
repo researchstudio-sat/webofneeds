@@ -13,34 +13,27 @@ won-file-picker {
   .filep__preview {
     width: 100%;
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-template-columns: 1fr;
     grid-gap: 0.5rem;
 
     .filep__preview__item {
       display: grid;
-      grid-template-columns: 1fr min-content;
-      grid-template-rows: min-content 1fr;
+      grid-template-columns: min-content 1fr min-content;
       border: $thinGrayBorder;
-      border-radius: 0.19rem;
-      height: 5rem;
       background: $won-lighter-gray;
       grid-gap: 0.25rem;
       padding: 0.25rem;
-      justify-items: center;
+      justify-items: left;
+      align-items: center;
 
       .filep__preview__item__image,
       .filep__preview__item__typeicon {
-        grid-row: 2 / span 1;
-        grid-column: 1 / span 2;
-        max-width: 100%;
-        max-height: 100%;
+        @include fixed-square($postIconSize);
+        object-fit: contain;
         --local-primary: #{$won-line-gray};
       }
 
       .filep__preview__item__label {
-        grid-row: 1 / span 1;
-        grid-column: 1 / span 1;
-        font-size: $smallFontSize;
         text-overflow: ellipsis;
         overflow: hidden;
         max-width: 100%;
@@ -48,11 +41,8 @@ won-file-picker {
       }
 
       .filep__preview__item__remove {
-        grid-row: 1 / span 1;
-        grid-column: 2 / span 1;
-
         --local-primary: #{$won-primary-text-color};
-        @include fixed-square(1rem);
+        @include fixed-square($postIconSize);
 
         &:hover {
           cursor: pointer;
