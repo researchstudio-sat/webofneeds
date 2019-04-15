@@ -22,7 +22,10 @@ function genComponentConf() {
           <div class="imagev__content__thumbnails" ng-if="self.content.size > 1">
             <div class="imagev__content__thumbnails__thumbnail"
               ng-repeat="file in self.content.toArray()"
-              ng-if="self.isImage(file)">
+              ng-if="self.isImage(file)"
+              ng-class="{
+                'imagev__content__thumbnails__thumbnail--selected': self.selectedIndex == $index,
+              }">
               <img class="imagev__content__thumbnails__thumbnail__image" ng-click="self.changeSelectedIndex($index)"
                 alt="{{file.get('name')}}"
                 ng-src="data:{{file.get('type')}};base64,{{file.get('data')}}"/>

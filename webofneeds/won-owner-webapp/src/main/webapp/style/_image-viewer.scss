@@ -31,11 +31,23 @@ won-image-viewer {
         grid-gap: 0.5rem;
 
         .imagev__content__thumbnails__thumbnail {
+          background: white;
           height: $postIconSize;
           border: $thinGrayBorder;
+          opacity: 0.5;
+          &--selected {
+            border-color: $won-primary-color;
+            opacity: 1;
+
+            &:hover {
+              cursor: default;
+              opacity: 1;
+            }
+          }
 
           &:hover {
             cursor: pointer;
+            opacity: 0.75;
           }
 
           .imagev__content__thumbnails__thumbnail__image {
@@ -86,11 +98,23 @@ won-image-viewer {
         grid-gap: 0.5rem;
 
         .imagev__content__thumbnails__thumbnail {
+          background: white;
           height: $postIconSize;
           border: $thinGrayBorder;
+          opacity: 0.5;
+          &--selected {
+            border-color: $won-primary-color;
+            opacity: 1;
+
+            &:hover {
+              cursor: default;
+              opacity: 1;
+            }
+          }
 
           &:hover {
             cursor: pointer;
+            opacity: 0.75;
           }
 
           .imagev__content__thumbnails__thumbnail__image {
