@@ -72,7 +72,7 @@ function genComponentConf($ngRedux) {
           elmApp.ports.personaIn.send(state.personas.toJS());
         }
         elmApp.ports.isVerified.send(state.isVerified);
-        if (state.accountInfo) {
+        if (state.accountInfo.isVerified && state.accountInfo.email) {
           elmApp.ports.accountInfoIn.send(state.accountInfo);
         }
       });
