@@ -41,4 +41,5 @@ A Atom
 atomed
 atoming
 you atom
-we atom to
+we atom
+they atom
