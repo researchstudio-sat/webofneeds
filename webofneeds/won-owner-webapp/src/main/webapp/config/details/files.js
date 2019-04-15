@@ -17,7 +17,6 @@ export const files = {
     }
     let payload = [];
     value.forEach(file => {
-      //TODO: SAVE CORRECT RDF THIS METHOD
       if (file.name && file.type && file.data) {
         let f = {
           "@id":
@@ -45,7 +44,6 @@ export const files = {
     if (Immutable.List.isList(files)) {
       files &&
         files.forEach(file => {
-          //TODO: RETRIEVE FROM CORRECT RDF THIS METHOD
           let f = {
             name: get(file, "s:name"),
             type: get(file, "s:type"),
@@ -91,7 +89,7 @@ export const images = {
   placeholder: "",
   accepts: "image/*",
   multiSelect: true,
-  component: "won-file-picker",
+  component: "won-image-picker",
   viewerComponent: "won-image-viewer",
   messageEnabled: true,
   parseToRDF: function({ value, identifier, contentUri }) {
@@ -115,6 +113,7 @@ export const images = {
           "s:name": image.name,
           "s:type": image.type,
           "s:data": image.data,
+          "s:representativeOfPage": image.default,
         };
 
         payload.push(img);
@@ -136,6 +135,7 @@ export const images = {
             name: get(image, "s:name"),
             type: get(image, "s:type"),
             data: get(image, "s:data"),
+            default: get(image, "s:representativeOfPage"),
           };
           if (img.name && img.type && img.data && /^image\//.test(img.type)) {
             imgs.push(img);
@@ -146,6 +146,7 @@ export const images = {
         name: get(images, "s:name"),
         type: get(images, "s:type"),
         data: get(images, "s:data"),
+        default: get(images, "s:representativeOfPage"),
       };
       if (img.name && img.type && img.data && /^image\//.test(img.type)) {
         return Immutable.fromJS([img]);
