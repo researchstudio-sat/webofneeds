@@ -13,6 +13,7 @@ import selectPickerModule from "./select-picker.js";
 import rangePickerModule from "./range-picker.js";
 import priceRangePickerModule from "./price-range-picker.js";
 import filePickerModule from "./file-picker.js";
+import imagePickerModule from "./image-picker.js";
 import workflowPickerModule from "./workflow-picker.js";
 import petrinetPickerModule from "./petrinet-picker.js";
 import petrinettransitionPickerModule from "./petrinettransition-picker.js";
@@ -39,6 +40,7 @@ export default [
   rangePickerModule,
   priceRangePickerModule,
   filePickerModule,
+  imagePickerModule,
   workflowPickerModule,
   petrinetPickerModule,
   petrinettransitionPickerModule,
