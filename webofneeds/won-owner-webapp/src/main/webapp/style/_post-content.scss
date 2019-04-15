@@ -81,6 +81,7 @@ won-post-content {
       }
     }
 
+    .post-content__members,
     .post-content__suggestions {
       &__empty {
         color: $won-line-gray;
@@ -88,6 +89,7 @@ won-post-content {
         text-align: center;
       }
 
+      & .post-content__members__member,
       & .post-content__suggestions__suggestion {
         border: $thinGrayBorder;
         border-left: 0;
@@ -102,6 +104,7 @@ won-post-content {
           margin-top: 0;
         }
 
+        & > .post-content__members__member__indicator,
         & > .post-content__suggestions__suggestion__indicator {
           grid-area: member_indicator;
           box-sizing: border-box;
@@ -109,10 +112,12 @@ won-post-content {
           height: 100%;
         }
 
+        &.won-unread > .post-content__members__member__indicator,
         &.won-unread > .post-content__suggestions__suggestion__indicator {
           border-left: 0.25rem solid $won-unread-attention;
         }
 
+        &:not(.won-unread) > .post-content__members__member__indicator,
         &:not(.won-unread) > .post-content__suggestions__suggestion__indicator {
           border-left: $thinGrayBorder;
         }

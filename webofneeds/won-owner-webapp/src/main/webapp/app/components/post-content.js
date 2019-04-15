@@ -128,6 +128,7 @@ function genComponentConf() {
               class="post-content__members__member"
               ng-if="self.hasHeldPosts"
               ng-repeat="heldPostUri in self.heldPostsArray track by heldPostUri">
+              <div class="post-content__members__member__indicator"></div>
               <won-post-header
                 class="clickable"
                 ng-click="self.router__stateGoCurrent({viewNeedUri: heldPostUri, viewConnUri: undefined})"
