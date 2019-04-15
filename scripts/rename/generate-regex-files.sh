@@ -10,8 +10,7 @@ sed_script_file=${script_path}/generated/sed-changefile-regexes.txt
 sed_script_file_db_migration=${script_path}/generated/sed-db-migration-regexes.txt
 grep_script_file=${script_path}/generated/grep-checkfile-regex.txt
 
-
-
+mkdir ${script_path}/generated
 
 function join_by { local IFS="$1"; shift; echo "$*"; }
 
