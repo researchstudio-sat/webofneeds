@@ -117,8 +117,8 @@ function genComponentConf() {
           <div class="card__persona__websitelabel" ng-if="self.personaWebsite">Website:</div>
           <a class="card__persona__websitelink" target="_blank" href="{{self.personaWebsite}}" ng-if="self.personaWebsite">{{ self.personaWebsite }}</a>
     </div>
-    <div class="card__nopersona" ng-if="self.needLoaded && !self.persona">
-        <span class="card__nopersona__label">No Persona attached</span>
+    <div class="card__nopersona" ng-if="(self.needLoaded && !self.persona) || !self.needLoaded">
+        <span class="card__nopersona__label" ng-if="self.needLoaded">No Persona attached</span>
     </div>
     <div class="card__main" ng-if="self.needFailedToLoad">
         <div class="card__main__topline">

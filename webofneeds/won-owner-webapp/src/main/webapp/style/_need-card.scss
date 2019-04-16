@@ -259,9 +259,11 @@ won-need-card {
       grid-column-gap: 0.25rem;
 
       &__address {
+        white-space: nowrap;
         font-size: $smallFontSize;
         text-overflow: ellipsis;
         color: $won-subtitle-gray;
+        overflow: hidden;
       }
 
       &__icon {
