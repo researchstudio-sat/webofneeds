@@ -5,7 +5,7 @@
 won-need-card {
   display: grid;
   grid-template-areas: "card__icon" "card__main" "card__persona";
-  grid-template-rows: max-content min-content min-content;
+  grid-template-rows: max-content 1fr min-content;
   padding: 0.5rem;
   color: black;
 
@@ -101,6 +101,26 @@ won-need-card {
     }
   }
 
+  // Defines the height of the (no)persona-div, so that they no-persona is the same height as attached personas
+  --persona-height: 2.5rem;
+
+  .card__nopersona {
+    grid-area: card__persona;
+    margin-top: 0.5rem;
+    display: grid;
+    grid-column-gap: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: $thinGrayBorder;
+    justify-items: center;
+    align-items: center;
+    height: var(--persona-height);
+
+    &__label {
+      font-size: $smallFontSize;
+      color: $won-line-gray;
+    }
+  }
+
   .card__persona {
     grid-area: card__persona;
     margin-top: 0.5rem;
@@ -109,7 +129,7 @@ won-need-card {
     grid-template-areas:
       "card__persona__icon card__persona__name card__persona__name"
       "card__persona__icon card__persona__websitelabel card__persona__websitelink";
-    grid-template-columns: $postIconSize max-content 1fr;
+    grid-template-columns: var(--persona-height) max-content 1fr;
     grid-column-gap: 0.5rem;
     padding-top: 0.5rem;
     border-top: $thinGrayBorder;
@@ -118,7 +138,7 @@ won-need-card {
       grid-area: card__persona__icon;
 
       border-radius: 100%;
-      @include fixed-square($postIconSize);
+      @include fixed-square(var(--persona-height));
     }
 
     &__name {
@@ -158,6 +178,7 @@ won-need-card {
     display: grid;
     grid-template-areas: "card__main__topline" "card__main__subtitle" "card__main__location";
     grid-template-columns: 1fr;
+    grid-template-rows: min-content min-content min-content;
     width: 15rem;
     max-width: 15rem;
 
