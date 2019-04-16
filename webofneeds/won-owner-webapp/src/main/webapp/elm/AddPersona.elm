@@ -1,6 +1,5 @@
 module AddPersona exposing (main)
 
-import Actions
 import Application exposing (Style)
 import Html exposing (..)
 import Html.Attributes as Attributes

@@ -1,6 +1,6 @@
 port module Actions exposing (Action, Event, emitEvent, startAction)
 
-import Json.Encode as Encode exposing (Value)
+import Json.Encode exposing (Value)
 
 
 

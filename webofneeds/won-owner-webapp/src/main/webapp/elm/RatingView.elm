@@ -2,15 +2,11 @@ module RatingView exposing (main)
 
 import Application exposing (Style)
 import Element exposing (..)
-import Element.Background as Background
-import Element.Border as Border
-import Element.Events as Events
-import Element.Font as Font
-import Element.Input as Input
 import Html exposing (Html)
 import Html.Attributes as HA
+import Html.Events as HE
 import Json.Decode as Decode exposing (Decoder)
-import Old.Skin as Skin exposing (Skin)
+import Palette
 import Persona
 
 
@@ -18,7 +14,7 @@ main =
     Application.element
         { init = init
         , update = update
-        , subscriptions = subscriptions
+        , subscriptions = always Sub.none
         , view = view
         , propDecoder = propDecoder
         }
@@ -123,7 +119,7 @@ type Model
 
 
 init : Props -> ( Model, Cmd Msg )
-init { rating, connectionUri } =
+init { connectionUri } =
     ( case connectionUri of
         Just _ ->
             Closed
@@ -261,7 +257,6 @@ updatePopup connectionUri msg popupState =
                 SubmitReview ->
                     case state.selectedValue of
                         Just value ->
-                            -- TODO: actually do something
                             ( Closed
                             , Persona.review
                                 { connection = connectionUri
@@ -276,44 +271,35 @@ updatePopup connectionUri msg popupState =
                             ( popupState, Cmd.none )
 
 
-subscriptions : Model -> Sub Msg
-subscriptions model =
-    Sub.none
-
-
 
 ---- VIEW ----
 
 
-viewRating : Skin -> Rating -> Element msg
-viewRating skin rating =
+viewRating : Rating -> String
+viewRating rating =
     let
         numberOfFilled =
             toInt rating
     in
-    row
-        [ spacing 2
+    List.repeat numberOfFilled "★"
+        ++ List.repeat (5 - numberOfFilled) "☆"
+        |> String.concat
+
+
+viewMaybeRating : Maybe Rating -> Html Msg
+viewMaybeRating maybeRating =
+    Html.span
+        [ HA.class "rating-display"
+        , HE.onClick TogglePopup
         ]
-    <|
-        List.repeat numberOfFilled (text "★")
-            ++ List.repeat (5 - numberOfFilled) (text "☆")
+        [ Html.text <|
+            case maybeRating of
+                Just rating ->
+                    viewRating rating
 
-
-viewMaybeRating : Skin -> Maybe Rating -> Element Msg
-viewMaybeRating skin maybeRating =
-    el
-        [ Font.color skin.primaryColor
-        , Font.size 12
-        , Font.bold
-        , Events.onClick <| TogglePopup
+                Nothing ->
+                    "☆☆☆☆☆"
         ]
-    <|
-        case maybeRating of
-            Just rating ->
-                viewRating skin rating
-
-            Nothing ->
-                text "☆☆☆☆☆"
 
 
 view :
@@ -323,60 +309,39 @@ view :
     }
     -> Html Msg
 view { model, props } =
-    let
-        skin =
-            Skin.default
-    in
-    layout
-        [ htmlAttribute <| HA.style "display" "inline-block"
-        , paddingEach
-            { left = 5
-            , right = 0
-            , top = 0
-            , bottom = 0
-            }
-        , width shrink
+    Html.span
+        [ HE.onMouseEnter <| Hover True
+        , HE.onMouseLeave <| Hover False
+        , HA.class "won-rating-view"
         ]
     <|
-        row
-            [ spacing 5
-            , Events.onMouseEnter <| Hover True
-            , Events.onMouseLeave <| Hover False
-            , htmlAttribute <| HA.style "user-select" "none"
-            ]
-            [ el
-                [ below <|
-                    case model of
-                        CannotRate ->
-                            none
-
-                        Closed ->
-                            none
-
-                        Hovered ->
-                            none
-
-                        Open popupState ->
-                            popup skin popupState
-                ]
-              <|
-                viewMaybeRating skin props.rating
+        List.filterMap identity
+            [ Just <| viewMaybeRating props.rating
             , if model == Hovered then
-                el
-                    [ Font.size 14
-                    , Font.color skin.primaryColor
-                    , Events.onClick <| TogglePopup
-                    ]
-                <|
-                    text "+"
+                Just <|
+                    Html.span
+                        [ HA.class "rating-display" ]
+                        [ Html.text "+" ]
 
               else
-                none
+                Nothing
+            , case model of
+                CannotRate ->
+                    Nothing
+
+                Closed ->
+                    Nothing
+
+                Hovered ->
+                    Nothing
+
+                Open popupState ->
+                    Just <| popup popupState
             ]
 
 
-popup : Skin -> Popup -> Element Msg
-popup skin state =
+popup : Popup -> Html Msg
+popup state =
     let
         canSubmit =
             case state.selectedValue of
@@ -386,68 +351,35 @@ popup skin state =
                 Nothing ->
                     False
     in
-    column
-        [ Background.color Skin.white
-        , moveDown 3
-        , padding 5
-        , Border.color skin.lineGray
-        , Border.width 1
-        , Font.size 14
-        , spacing 5
-        , width <| minimum 200 shrink
-        ]
-        [ text "Set a rating:"
-        , starSelector skin state
-        , Input.multiline []
-            { onChange = ReviewChanged >> PopupMsg
-            , text = state.reviewText
-            , label = Input.labelAbove [] <| text "Write a review:"
-            , placeholder = Just <| Input.placeholder [] <| text "..."
-            , spellcheck = False
-            }
-        , Input.button
-            ((if canSubmit then
-                [ Background.color skin.primaryColor
+    Html.div [ HA.class "rating-popup" ]
+        [ Html.label []
+            [ Html.text "Set a rating:"
+            , starSelector state
+            ]
+        , Html.label [ HA.class "review-text" ]
+            [ Html.text "Write a review:"
+            , Html.textarea
+                [ HA.placeholder "..."
+                , HE.onInput (ReviewChanged >> PopupMsg)
                 ]
-
-              else
-                [ Background.color skin.lightGray
-                , htmlAttribute <| HA.style "cursor" "auto"
-                , focused []
-                ]
-             )
-                ++ [ padding 14
-                   , width fill
-                   , Border.rounded 3
-                   ]
-            )
-            { label =
-                el
-                    [ centerX
-                    , Font.color Skin.white
-                    , Font.size 16
-                    ]
-                <|
-                    text "Submit"
-            , onPress =
-                if canSubmit then
-                    Just (PopupMsg SubmitReview)
-
-                else
-                    Nothing
-            }
+                [ Html.text state.reviewText ]
+            ]
+        , Palette.wonButton
+            [ HE.onClick <| PopupMsg SubmitReview
+            , HA.disabled <| not canSubmit
+            , HA.class "submit-button"
+            ]
+            [ Html.text "Submit" ]
         ]
 
 
 starSelector :
-    Skin
-    ->
-        { a
-            | selectedValue : Maybe Rating
-            , hoveredValue : Maybe Rating
-        }
-    -> Element Msg
-starSelector skin { selectedValue, hoveredValue } =
+    { a
+        | selectedValue : Maybe Rating
+        , hoveredValue : Maybe Rating
+    }
+    -> Html Msg
+starSelector { selectedValue, hoveredValue } =
     let
         orElse left right =
             Maybe.map Just left
@@ -460,10 +392,9 @@ starSelector skin { selectedValue, hoveredValue } =
             Maybe.map toInt displayedValue
                 |> Maybe.withDefault 0
     in
-    row
-        [ Font.size 18
-        , Font.color skin.primaryColor
-        , Events.onMouseLeave (PopupMsg <| HoveredValue Nothing)
+    Html.div
+        [ HE.onMouseLeave (PopupMsg <| HoveredValue Nothing)
+        , HA.class "star-selector"
         ]
         (List.range 1 5
             |> List.map
@@ -472,17 +403,18 @@ starSelector skin { selectedValue, hoveredValue } =
                         currentRating =
                             fromInt id
                     in
-                    el
-                        [ Events.onMouseEnter
+                    Html.span
+                        [ HE.onMouseEnter
                             (PopupMsg <| HoveredValue currentRating)
-                        , Events.onClick
+                        , HE.onClick
                             (PopupMsg <| SelectedValue currentRating)
+                        , HA.class "star"
                         ]
-                    <|
-                        if id <= numberOfFilled then
-                            text "★"
+                        [ if id <= numberOfFilled then
+                            Html.text "★"
 
-                        else
-                            text "☆"
+                          else
+                            Html.text "☆"
+                        ]
                 )
         )
