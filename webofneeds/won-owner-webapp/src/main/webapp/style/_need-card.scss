@@ -176,14 +176,14 @@ won-need-card {
   .card__main {
     grid-area: card__main;
     display: grid;
-    grid-template-areas: "card__main__topline" "card__main__subtitle" "card__main__location";
+    grid-template-areas: "card__main__topline" "card__main__subtitle";
     grid-template-columns: 1fr;
     grid-template-rows: min-content min-content min-content;
     width: 15rem;
     max-width: 15rem;
 
     &--showIcon {
-      grid-template-areas: "card__main__icon card__main__topline" "card__main__icon card__main__subtitle" "card__main__location card__main__location";
+      grid-template-areas: "card__main__icon card__main__topline" "card__main__icon card__main__subtitle";
       grid-template-columns: min-content 1fr;
       grid-column-gap: 0.5rem;
     }
@@ -248,27 +248,6 @@ won-need-card {
         white-space: nowrap;
         padding-left: 0.5rem;
         min-width: 0;
-      }
-    }
-
-    &__location {
-      grid-area: card__main__location;
-      display: grid;
-      grid-template-columns: min-content 1fr;
-      margin-top: 0.5rem;
-      grid-column-gap: 0.25rem;
-
-      &__address {
-        white-space: nowrap;
-        font-size: $smallFontSize;
-        text-overflow: ellipsis;
-        color: $won-subtitle-gray;
-        overflow: hidden;
-      }
-
-      &__icon {
-        @include fixed-square($normalFontSize);
-        --local-primary: #{$won-subtitle-gray};
       }
     }
   }
