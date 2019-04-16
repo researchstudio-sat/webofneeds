@@ -52,11 +52,18 @@ function genLoginConf() {
                 type="checkbox"/> Remember me
         </form>
         <div class="wl__register">
-            No account yet?
-            <a href="{{ self.absHRef(self.$state, 'signup') }}" ng-click="self.view__hideMainMenu()">
-                Sign up
-            </a>
-        </div>`;
+          Forgot Password?
+          <a href="{{ self.absHRef(self.$state, 'forgotPassword') }}" ng-click="self.view__hideMainMenu()">
+              RESET
+          </a>
+        </div> 
+        <div class = "wl__register" >
+          No account yet ?
+            <a href = "{{ self.absHRef(self.$state, 'signup') }}"
+              ng - click = "self.view__hideMainMenu()" >
+                Sign up 
+            </a> 
+          </div>`;
 
   const serviceDependencies = [
     "$ngRedux",

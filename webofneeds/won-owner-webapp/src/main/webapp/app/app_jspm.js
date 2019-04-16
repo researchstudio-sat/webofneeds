@@ -44,6 +44,7 @@ import postComponent from "./components/post/post.js";
 import aboutComponent from "./components/about/about.js";
 import signupComponent from "./components/signup/signup.js";
 import settingsComponent from "./components/settings/settings.js";
+import forgotPasswordComponent from "./components/forgotPassword/forgotPassword.js";
 
 //won import (used so you can access the debugmode variable without reloading the page)
 import won from "./service/won.js";
@@ -59,8 +60,8 @@ import detailModules from "./components/details/details.js";
 
 let app = angular.module("won.owner", [
   /* to enable legacy $stateChange* events in ui-router (see
-     * here for details: https://ui-router.github.io/guide/ng1/migrate-to-1_0#state-change-events)
-     */
+   * here for details: https://ui-router.github.io/guide/ng1/migrate-to-1_0#state-change-events)
+   */
   "ui.router.state.events",
 
   ngReduxModule,
@@ -84,6 +85,7 @@ let app = angular.module("won.owner", [
   aboutComponent,
   signupComponent,
   settingsComponent,
+  forgotPasswordComponent,
 ]);
 
 /* create store, register middlewares, set up redux-devtool-support, etc */
@@ -96,7 +98,9 @@ app.config(configRouting).config([
     const urlSanitizationRegex = /^\s*(https?|ftp|mailto|tel|file|blob|data):/;
 
     $compileProvider.aHrefSanitizationWhitelist(urlSanitizationRegex);
-    markedProvider.setOptions({ sanitize: true });
+    markedProvider.setOptions({
+      sanitize: true,
+    });
     //removed this codesnippet due to problems with link rendering -> xss vulnerability
     markedProvider.setRenderer({
       link: function(href, title, text) {

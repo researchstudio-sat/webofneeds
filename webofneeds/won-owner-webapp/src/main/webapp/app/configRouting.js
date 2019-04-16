@@ -65,10 +65,22 @@ export const configRouting = [
     });
 
     [
-      { path: "/about?aboutSection", component: "about" },
-      { path: "/overview?viewAtomUri?viewConnUri", component: "overview" },
-      { path: "/signup", component: "signup" },
-      { path: "/settings", component: "settings" },
+      {
+        path: "/about?aboutSection",
+        component: "about",
+      },
+      {
+        path: "/signup",
+        component: "signup",
+      },
+      {
+        path: "/settings",
+        component: "settings",
+      },
+      {
+        path: "/forgotPassword",
+        component: "forgotPassword",
+      },
       {
         path:
           "/connections?privateId?postUri?connectionUri?useCase?useCaseGroup?token?viewAtomUri?viewConnUri?fromAtomUri?mode",
@@ -177,6 +189,7 @@ export function accessControl({
     case "overview":
     case "signup":
     case "about":
+    case "forgotPassword":
       return; // can always access these pages.
 
     default:
