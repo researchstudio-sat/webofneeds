@@ -45,16 +45,24 @@ See the files for a given extension (optionally, print affected lines: -p option
 
 ### Required manual post-processing
 
+#### Fix broken test
+
+First, `fix the won-utils-conversation` unit test that has a `taxi-no-show.trig` file containing base64-encoded xml. 
+1. use e.g. Notepad++ to convert the xml content in `petrinet-taxi.xml` to base64
+2. replace the content of the `https://w3id.org/won/workflow#hasInlinePetriNetDefinition` property with the base64 string you created.
+
 #### Reformat java and javascript files
 
 ```
 
 cd webofneeds
 mvn formatter:format
-cd won-owner-webapp/src/main/webapp
+# Note: if you haven't built the project at all, you have to 
+# do `mvn install` to download nodejs now or the next step will fail
+pushd won-owner-webapp/src/main/webapp
 shopt -s globstar
 node_modules/prettier/bin-prettier.js --write app/**/*.js config/**/*.js *.js 
-cd ../../../../
+popd
 
 ```
 
@@ -68,12 +76,6 @@ cp ./scripts/rename/generated/rename-migration-node.sql webofneeds/won-node/src/
 cp ./scripts/rename/generated/rename-migration-owner.sql webofneeds/won-owner/src/main/resources/db/migration/V #[complete with approproate file name]
 ```
 
-
-#### Build and test
-
-First, `fix the won-utils-conversation` unit test that has a `taxi-no-show.trig` file containing base64-encoded xml. 
-1. use e.g. Notepad++ to convert the xml content in `petrinet-taxi.xml` to base64
-2. replace the content of the `https://w3id.org/won/workflow#hasInlinePetriNetDefinition` property with the base64 string you created.
 
 #### Build the whole project
 
