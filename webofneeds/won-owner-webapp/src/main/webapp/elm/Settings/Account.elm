@@ -34,7 +34,6 @@ type alias PasswordList =
 
 type alias AccountInfo =
     { email : String
-    , isVerified : Bool
     }
 
 
@@ -55,7 +54,7 @@ type AccountState
 
 init : () -> ( Model, Cmd Msg )
 init () =
-    ( { accountInfo = { email = "", isVerified = False }
+    ( { accountInfo = { email = "" }
       , accountState = EnteringPassword { newPassword = "", newPasswordRepeat = "", oldPassword = "" }
       , passwordList = { newPassword = "", newPasswordRepeat = "", oldPassword = "" }
       }
@@ -389,17 +388,7 @@ changeView skin model =
                                 [ centerX
                                 ]
                             <|
-                                if String.length newPassword < 1 then
-                                    text "Save Changes"
-
-                                else if String.length newPassword < 6 then
-                                    text "New password to short"
-
-                                else if newPassword /= newPasswordRepeat then
-                                    text "Do not match"
-
-                                else
-                                    text "Save Changes"
+                                text "Save Changes"
                         }
                     ]
                 ]
@@ -446,12 +435,7 @@ view skin model =
         , paragraph [ width fill ]
             [ text "Here you can change your account data."
             ]
-        , if model.accountInfo.isVerified then
-            changeView skin model
-
-          else
-            paragraph [ width fill ]
-                [ text "You need an account with a verified email address to export your data" ]
+        , changeView skin model
         ]
 
 
