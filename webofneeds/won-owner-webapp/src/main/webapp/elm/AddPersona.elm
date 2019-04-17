@@ -195,7 +195,6 @@ personaList personas model =
     ul [ Attributes.class "won-persona-list" ]
         (personas
             |> List.sortBy (.name >> String.toLower)
-            |> List.reverse
             |> List.map (personaView model)
         )
 
