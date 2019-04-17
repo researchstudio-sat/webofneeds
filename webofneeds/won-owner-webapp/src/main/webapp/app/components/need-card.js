@@ -20,12 +20,14 @@ import "style/_need-card.scss";
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
   let template = `
+    <!-- Icon Information -->
     <div class="card__icon clickable"
         ng-if="self.needLoaded"
         style="background-color: {{self.showDefaultIcon && self.iconBackground}}"
         ng-class="{
           'won-is-persona': self.isPersona,
           'inactive': self.isInactive,
+          'card__icon--map': self.showMap,
         }"
         ng-click="self.router__stateGo('post', {postUri: self.need.get('uri')})">
         <div class="identicon usecaseimage"
@@ -42,12 +44,13 @@ function genComponentConf() {
             ng-if="self.needImage"
             alt="{{self.needImage.get('name')}}"
             ng-src="data:{{self.needImage.get('type')}};base64,{{self.needImage.get('data')}}"/>
-        <!--won-need-map class="location" locations="[self.needLocation]" ng-if="!self.needImage && self.needLocation">
-        </won-need-map-->
+        <won-need-map class="location" locations="[self.needLocation]" ng-if="self.showMap" disable-controls default-layer-only add-current-location>
+        </won-need-map>
     </div>
     <div class="card__icon__skeleton" ng-if="!self.needLoaded"
       in-view="$inview && self.needToLoad && self.ensureNeedIsLoaded()">
     </div>
+    <!-- Main Information -->
     <div class="card__main clickable"
         ng-if="self.needLoaded" ng-click="self.router__stateGo('post', {postUri: self.need.get('uri')})"
         ng-class="{
@@ -94,28 +97,6 @@ function genComponentConf() {
                 {{ self.friendlyTimestamp }}
             </div>
         </div>
-        <div class="card__main__location" ng-if="self.needLocation">
-          <svg class="card__main__location__icon">
-              <use xlink:href="#ico36_detail_location" href="#ico36_detail_location"></use>
-          </svg>
-          <span class="card__main__location__address">
-              {{ self.needLocation.get('address') }}
-          </span>
-        </div>
-    </div>
-    <div class="card__persona clickable" ng-if="self.needLoaded && self.persona" ng-click="self.router__stateGoCurrent({viewNeedUri: self.personaUri})">
-          <img class="card__persona__icon"
-              ng-if="::self.personaIdenticonSvg"
-              alt="Auto-generated title image for persona that holds the need"
-              ng-src="data:image/svg+xml;base64,{{::self.personaIdenticonSvg}}"/>
-          <div class="card__persona__name"
-              ng-if="self.personaName">
-              <span class="card__persona__name__label">{{ self.personaName }}</span>
-              <span class="card__persona__name__verification card__persona__name__verification--verified" ng-if="self.personaVerified" title="The Persona-Relation of this Post is verified by the Persona">Verified</span>
-              <span class="card__persona__name__verification card__persona__name__verification--unverified" ng-if="!self.personaVerified" title="The Persona-Relation of this Post is NOT verified by the Persona">Unverified!</span>
-          </div>
-          <div class="card__persona__websitelabel" ng-if="self.personaWebsite">Website:</div>
-          <a class="card__persona__websitelink" target="_blank" href="{{self.personaWebsite}}" ng-if="self.personaWebsite">{{ self.personaWebsite }}</a>
     </div>
     <div class="card__main" ng-if="self.needFailedToLoad">
         <div class="card__main__topline">
@@ -136,6 +117,24 @@ function genComponentConf() {
         <div class="card__main__subtitle">
             <span class="card__main__subtitle__type"></span>
         </div>
+    </div>
+    <!-- Attached Persona Info -->
+    <div class="card__persona clickable" ng-if="self.needLoaded && self.persona && self.needHasHoldableFacet" ng-click="self.router__stateGoCurrent({viewNeedUri: self.personaUri})">
+          <img class="card__persona__icon"
+              ng-if="::self.personaIdenticonSvg"
+              alt="Auto-generated title image for persona that holds the need"
+              ng-src="data:image/svg+xml;base64,{{::self.personaIdenticonSvg}}"/>
+          <div class="card__persona__name"
+              ng-if="self.personaName">
+              <span class="card__persona__name__label">{{ self.personaName }}</span>
+              <span class="card__persona__name__verification card__persona__name__verification--verified" ng-if="self.personaVerified" title="The Persona-Relation of this Post is verified by the Persona">Verified</span>
+              <span class="card__persona__name__verification card__persona__name__verification--unverified" ng-if="!self.personaVerified" title="The Persona-Relation of this Post is NOT verified by the Persona">Unverified!</span>
+          </div>
+          <div class="card__persona__websitelabel" ng-if="self.personaWebsite">Website:</div>
+          <a class="card__persona__websitelink" target="_blank" href="{{self.personaWebsite}}" ng-if="self.personaWebsite">{{ self.personaWebsite }}</a>
+    </div>
+    <div class="card__nopersona" ng-if="(self.needLoaded && !self.persona && self.needHasHoldableFacet) || !self.needLoaded">
+        <span class="card__nopersona__label" ng-if="self.needLoaded">No Persona attached</span>
     </div>
     `;
 
@@ -185,6 +184,8 @@ function genComponentConf() {
           persona,
           personaName,
           personaVerified,
+          needHasHolderFacet: needUtils.hasHolderFacet(need),
+          needHasHoldableFacet: needUtils.hasHoldableFacet(need),
           needLoaded: processUtils.isNeedLoaded(process, this.needUri),
           needLoading: processUtils.isNeedLoading(process, this.needUri),
           needToLoad: processUtils.isNeedToLoad(process, this.needUri),
@@ -210,7 +211,8 @@ function genComponentConf() {
           personaIdenticonSvg,
           needImage,
           needLocation,
-          showDefaultIcon: !needImage /*&& !needLocation*/, //if no image and no location are present we display the defaultIcon in the card__icon area, instead of next to the title
+          showDefaultIcon: !needImage && !needLocation, //if no image and no location are present we display the defaultIcon in the card__icon area, instead of next to the title
+          showMap: !needImage && needLocation, //if no image is present but a location is, we display a map instead
         };
       };
 

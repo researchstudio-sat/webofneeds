@@ -110,6 +110,9 @@ function updateMessageProcess(processState, connUri, messageUri, payload) {
 
 export default function(processState = initialState, action = {}) {
   switch (action.type) {
+    case actionTypes.account.reset:
+      return initialState;
+
     case actionTypes.needs.edit: {
       const needUri = action.payload.needUri;
 

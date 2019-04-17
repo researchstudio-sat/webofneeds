@@ -5,7 +5,7 @@
 won-need-card {
   display: grid;
   grid-template-areas: "card__icon" "card__main" "card__persona";
-  grid-template-rows: max-content min-content min-content;
+  grid-template-rows: max-content 1fr min-content;
   padding: 0.5rem;
   color: black;
 
@@ -42,9 +42,18 @@ won-need-card {
 
   .card__icon {
     grid-area: card__icon;
-    display: grid;
-    justify-content: center;
-    align-items: center;
+
+    &:not(.card__icon--map) {
+      display: grid;
+      justify-content: center;
+      align-items: center;
+    }
+
+    &.card__icon--map {
+      display: block;
+      width: 100%;
+    }
+
     margin-bottom: 0.5rem;
     user-select: none;
     height: 10rem;
@@ -75,9 +84,8 @@ won-need-card {
       }
     }
 
-    & .image {
-      object-fit: cover;
-
+    & .image,
+    & won-need-map.location {
       @media (max-width: $responsivenessBreakPoint) {
         width: 100%;
         height: 10rem;
@@ -89,15 +97,37 @@ won-need-card {
       }
     }
 
+    & .image {
+      object-fit: cover;
+    }
+
     & won-need-map.location {
       display: block;
-      width: 15rem;
-      height: 10rem;
 
       .need-map__mapmount {
         width: 100%;
         height: 10rem;
       }
+    }
+  }
+
+  // Defines the height of the (no)persona-div, so that they no-persona is the same height as attached personas
+  --persona-height: 2.5rem;
+
+  .card__nopersona {
+    grid-area: card__persona;
+    margin-top: 0.5rem;
+    display: grid;
+    grid-column-gap: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: $thinGrayBorder;
+    justify-items: center;
+    align-items: center;
+    height: var(--persona-height);
+
+    &__label {
+      font-size: $smallFontSize;
+      color: $won-line-gray;
     }
   }
 
@@ -109,7 +139,7 @@ won-need-card {
     grid-template-areas:
       "card__persona__icon card__persona__name card__persona__name"
       "card__persona__icon card__persona__websitelabel card__persona__websitelink";
-    grid-template-columns: $postIconSize max-content 1fr;
+    grid-template-columns: var(--persona-height) max-content 1fr;
     grid-column-gap: 0.5rem;
     padding-top: 0.5rem;
     border-top: $thinGrayBorder;
@@ -118,7 +148,7 @@ won-need-card {
       grid-area: card__persona__icon;
 
       border-radius: 100%;
-      @include fixed-square($postIconSize);
+      @include fixed-square(var(--persona-height));
     }
 
     &__name {
@@ -156,13 +186,14 @@ won-need-card {
   .card__main {
     grid-area: card__main;
     display: grid;
-    grid-template-areas: "card__main__topline" "card__main__subtitle" "card__main__location";
+    grid-template-areas: "card__main__topline" "card__main__subtitle";
     grid-template-columns: 1fr;
+    grid-template-rows: min-content min-content min-content;
     width: 15rem;
     max-width: 15rem;
 
     &--showIcon {
-      grid-template-areas: "card__main__icon card__main__topline" "card__main__icon card__main__subtitle" "card__main__location card__main__location";
+      grid-template-areas: "card__main__icon card__main__topline" "card__main__icon card__main__subtitle";
       grid-template-columns: min-content 1fr;
       grid-column-gap: 0.5rem;
     }
@@ -227,25 +258,6 @@ won-need-card {
         white-space: nowrap;
         padding-left: 0.5rem;
         min-width: 0;
-      }
-    }
-
-    &__location {
-      grid-area: card__main__location;
-      display: grid;
-      grid-template-columns: min-content 1fr;
-      margin-top: 0.5rem;
-      grid-column-gap: 0.25rem;
-
-      &__address {
-        font-size: $smallFontSize;
-        text-overflow: ellipsis;
-        color: $won-subtitle-gray;
-      }
-
-      &__icon {
-        @include fixed-square($normalFontSize);
-        --local-primary: #{$won-subtitle-gray};
       }
     }
   }

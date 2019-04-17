@@ -15,6 +15,9 @@ const initialState = Immutable.fromJS({
 });
 export function messagesReducer(messages = initialState, action = {}) {
   switch (action.type) {
+    case actionTypes.account.reset:
+      return initialState;
+
     case actionTypes.connections.open:
     case actionTypes.connections.sendChatMessage:
     case actionTypes.connections.rate:

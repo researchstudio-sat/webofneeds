@@ -29,12 +29,59 @@ function genComponentConf() {
       //TODO: debug; deleteme
       window.map4dbg = this;
 
-      this.map = initLeaflet(this.mapMount());
+      const overrideOptions = this.$element[0].hasAttribute("disable-controls")
+        ? {
+            dragging: false,
+            //attributionControl: false,
+            zoomControl: false,
+            doubleClickZoom: false,
+            boxZoom: false,
+            scrollWheelZoom: false,
+            touchZoom: false,
+          }
+        : {};
+
+      this.map = initLeaflet(
+        this.mapMount(),
+        overrideOptions,
+        this.$element[0].hasAttribute("default-layer-only")
+      );
+      this.addCurrentLocation = this.$element[0].hasAttribute(
+        "add-current-location"
+      );
 
       this.$scope.$watch("self.locations", newLocations => {
         if (newLocations) {
-          this.updateMap(newLocations);
-          this._mapHasBeenAutoCentered = true;
+          if (this.addCurrentLocation && "geolocation" in navigator) {
+            navigator.geolocation.getCurrentPosition(
+              currentLocation => {
+                const lat = currentLocation.coords.latitude;
+                const lng = currentLocation.coords.longitude;
+
+                this.updateMap(newLocations, [lat, lng]);
+                this._mapHasBeenAutoCentered = true;
+              },
+              error => {
+                //error handler
+                console.error(
+                  "Could not retrieve geolocation due to error: ",
+                  error.code,
+                  ", continuing map initialization without currentLocation. fullerror:",
+                  error
+                );
+                this.updateMap(newLocations);
+                this._mapHasBeenAutoCentered = true;
+              },
+              {
+                //options
+                enableHighAccuracy: true,
+                maximumAge: 30 * 60 * 1000, //use if cache is not older than 30min
+              }
+            );
+          } else {
+            this.updateMap(newLocations);
+            this._mapHasBeenAutoCentered = true;
+          }
         }
       });
 
@@ -51,9 +98,8 @@ function genComponentConf() {
       }
     }
 
-    updateMap(locations) {
+    updateMap(locations, currentLatLng) {
       let markedLocations = [];
-      let boundCoords = [];
 
       for (let location of locations) {
         if (!location || !location.get("lat") || !location.get("lng")) {
@@ -62,46 +108,33 @@ function genComponentConf() {
         }
 
         markedLocations.push(location);
-        boundCoords.push(
-          new L.LatLng(location.get("lat"), location.get("lng"))
-        );
-
-        if (location.get("nwCorner"))
-          boundCoords.push(
-            new L.latLng(
-              location.getIn(["nwCorner", "lat"]),
-              location.getIn(["nwCorner", "lng"])
-            )
-          );
-
-        if (location.get("seCorner"))
-          boundCoords.push(
-            new L.latLng(
-              location.getIn(["seCorner", "lat"]),
-              location.getIn(["seCorner", "lng"])
-            )
-          );
       }
 
       if (markedLocations.length === 0) {
         console.warn("no markers set for locations: ", locations.toJS());
         return;
       }
-      this.placeMarkers(markedLocations);
+      this.placeMarkers(markedLocations, currentLatLng);
 
-      if (boundCoords.length === 0) {
+      if (this.markers.length === 0) {
         console.warn(
           "no map coordinates found for locations: ",
           locations.toJS()
         );
         return;
       }
-      this.map.fitBounds(boundCoords, { maxZoom: 14 });
+
+      this.map.fitBounds(
+        L.featureGroup(this.markers)
+          .getBounds()
+          .pad(0.5),
+        this.addCurrentLocation ? {} : { maxZoom: 14 }
+      );
 
       this.mapAlreadyInitialized = true;
     }
 
-    placeMarkers(locations) {
+    placeMarkers(locations, currentLatLng) {
       if (this.markers) {
         //remove previously placed markers
         for (let m of this.markers) {
@@ -112,6 +145,16 @@ function genComponentConf() {
       this.markers = locations.map(
         location => L.marker([location.get("lat"), location.get("lng")]) //.bindPopup(location.name)
       );
+
+      if (currentLatLng) {
+        const currentLocationMarkerIcon = L.divIcon({
+          className: "wonCurrentLocationMarkerIcon",
+        });
+
+        this.markers.push(
+          L.marker(currentLatLng, { icon: currentLocationMarkerIcon })
+        );
+      }
 
       for (let m of this.markers) {
         this.map.addLayer(m);

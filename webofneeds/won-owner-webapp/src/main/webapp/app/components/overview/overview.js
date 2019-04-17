@@ -13,7 +13,6 @@ import postHeaderModule from "../post-header.js";
 import * as generalSelectors from "../../selectors/general-selectors.js";
 import * as viewSelectors from "../../selectors/view-selectors.js";
 import * as processUtils from "../../process-utils.js";
-import * as srefUtils from "../../sref-utils.js";
 import * as wonLabelUtils from "../../won-label-utils.js";
 
 import "style/_overview.scss";
@@ -27,7 +26,6 @@ class Controller {
     this.selection = 0;
     window.overview4dbg = this;
     this.WON = won.WON;
-    Object.assign(this, srefUtils); // bind srefUtils to scope
 
     const selectFromState = state => {
       const viewNeedUri = generalSelectors.getViewNeedUriFromRoute(state);

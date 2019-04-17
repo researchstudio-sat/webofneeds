@@ -135,7 +135,7 @@ export const images = {
             name: get(image, "s:name"),
             type: get(image, "s:type"),
             data: get(image, "s:data"),
-            default: get(image, "s:representativeOfPage"),
+            default: JSON.parse(get(image, "s:representativeOfPage")),
           };
           if (img.name && img.type && img.data && /^image\//.test(img.type)) {
             imgs.push(img);
