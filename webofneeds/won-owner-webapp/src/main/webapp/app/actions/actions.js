@@ -143,7 +143,6 @@ const actionHierarchy = {
   needs: {
     received: INJ_DEFAULT,
     connectionsReceived: INJ_DEFAULT,
-    clean: INJ_DEFAULT,
     create: needCreate,
     edit: needEdit,
     editSuccessful: INJ_DEFAULT,
