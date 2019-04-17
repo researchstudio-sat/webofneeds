@@ -135,7 +135,9 @@
     }
 
     .#{$prefix}__content {
-      padding-left: calc(0.25rem + #{$contentInfoHeaderIconSize});
+      @media (min-width: $responsivenessBreakPoint) {
+        padding-left: calc(0.25rem + #{$contentInfoHeaderIconSize});
+      }
       box-sizing: border-box;
     }
   }

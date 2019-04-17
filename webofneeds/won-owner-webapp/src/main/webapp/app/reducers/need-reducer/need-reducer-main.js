@@ -5,7 +5,12 @@ import { actionTypes } from "../../actions/actions.js";
 import Immutable from "immutable";
 import won from "../../won-es6.js";
 import { msStringToDate, get, getIn } from "../../utils.js";
-import { addNeedStubs, addNeed, addNeedInCreation } from "./reduce-needs.js";
+import {
+  addNeedStubs,
+  addNeed,
+  addNeedInCreation,
+  deleteNeed,
+} from "./reduce-needs.js";
 import {
   addMessage,
   addExistingMessages,
@@ -73,6 +78,7 @@ export default function(allNeedsInState = initialState, action = {}) {
     }
 
     case actionTypes.personas.storeTheirUrisInLoading:
+    case actionTypes.needs.storeNeedUrisFromOwner:
     case actionTypes.needs.storeTheirUrisInLoading: {
       return addNeedStubs(allNeedsInState, action.payload.get("uris"));
     }
@@ -128,25 +134,10 @@ export default function(allNeedsInState = initialState, action = {}) {
         won.WON.InactiveCompacted
       );
 
+    case actionTypes.needs.removeDeleted:
+    case actionTypes.personas.removeDeleted:
     case actionTypes.needs.delete:
-      return allNeedsInState.delete(action.payload.ownNeedUri).map(need => {
-        const removeHolder = need => {
-          if (need.get("heldBy") == action.payload.ownNeedUri) {
-            return need.delete("heldBy");
-          } else return need;
-        };
-        const removeHeld = need => {
-          return need.updateIn(
-            ["holds"],
-            heldItems =>
-              heldItems &&
-              heldItems.filter(
-                heldItem => heldItem != action.payload.ownNeedUri
-              )
-          );
-        };
-        return removeHeld(removeHolder(need));
-      });
+      return deleteNeed(allNeedsInState, action.payload.get("uri"));
 
     case actionTypes.personas.create: {
       //FIXME: Please let us use the addNeed method as a single entry point to add Needs(even Personas) to the State

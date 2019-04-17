@@ -44,6 +44,15 @@ export default function(userData = initialState, action = {}) {
       );
     }
 
+    case actionTypes.needs.removeDeleted:
+    case actionTypes.personas.removeDeleted:
+    case actionTypes.needs.delete: {
+      const needUri = action.payload.get("uri");
+
+      const ownedNeedUris = userData.get("ownedNeedUris");
+      return userData.set("ownedNeedUris", ownedNeedUris.remove(needUri));
+    }
+
     case actionTypes.needs.create: //for optimistic additions
     case actionTypes.personas.create: //for optimistic additions
     case actionTypes.needs.createSuccessful: {

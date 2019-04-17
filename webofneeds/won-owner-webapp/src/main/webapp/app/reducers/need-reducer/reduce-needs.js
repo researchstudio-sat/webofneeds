@@ -44,6 +44,46 @@ export function addNeed(needs, jsonldNeed) {
   return newState;
 }
 
+export function deleteNeed(needs, deletedNeedUri) {
+  return needs.delete(deletedNeedUri).map(need => {
+    const removeHolder = need => {
+      if (need.get("heldBy") === deletedNeedUri) {
+        return need.delete("heldBy");
+      } else return need;
+    };
+    const removeHeld = need => {
+      return need.updateIn(
+        ["holds"],
+        heldItems =>
+          heldItems && heldItems.filter(heldItem => heldItem != deletedNeedUri)
+      );
+    };
+
+    const removeGroupMembers = need => {
+      return need.updateIn(
+        ["groupMembers"],
+        heldItems =>
+          heldItems && heldItems.filter(heldItem => heldItem != deletedNeedUri)
+      );
+    };
+
+    const removeConnections = need => {
+      return need.updateIn(
+        ["connections"],
+        connections =>
+          connections &&
+          connections.filter(
+            conn => get(conn, "remoteNeedUri") !== deletedNeedUri
+          )
+      );
+    };
+
+    return removeConnections(
+      removeHeld(removeHolder(removeGroupMembers(need)))
+    );
+  });
+}
+
 /**
  * Adds a need-stub into the need-redux-state, needed to get Posts that are not loaded/loading to show up as skeletons
  * Checks if stub/need already exists, if so do nothing

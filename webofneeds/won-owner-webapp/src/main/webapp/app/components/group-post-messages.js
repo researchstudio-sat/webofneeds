@@ -171,9 +171,7 @@ function genComponentConf() {
         const connectionUri = getConnectionUriFromRoute(state);
         const ownedNeed = getOwnedNeedByConnectionUri(state, connectionUri);
         const connection = getIn(ownedNeed, ["connections", connectionUri]);
-        const isOwnedNeedWhatsX =
-          needUtils.isWhatsAroundNeed(ownedNeed) ||
-          needUtils.isWhatsNewNeed(ownedNeed);
+        const isOwnedNeedWhatsX = needUtils.isWhatsAroundNeed(ownedNeed);
         const remoteNeedUri = get(connection, "remoteNeedUri");
         const remoteNeed = getIn(state, ["needs", remoteNeedUri]);
         const allChatMessages = get(connection, "messages");

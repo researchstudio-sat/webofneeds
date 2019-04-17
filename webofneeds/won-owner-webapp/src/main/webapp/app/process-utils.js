@@ -18,6 +18,15 @@ export function isProcessingInitialLoad(process) {
 }
 
 /**
+ * Return true if processingNeedUrisFromOwnerLoad is currently active
+ * @param process (full process from state)
+ * @returns {*}
+ */
+export function isProcessingNeedUrisFromOwnerLoad(process) {
+  return get(process, "processingNeedUrisFromOwnerLoad");
+}
+
+/**
  * Return true if processingLogin is currently active
  * @param process (full process from state)
  * @returns {*}
@@ -108,6 +117,10 @@ export function isNeedProcessingUpdate(process, needUri) {
  */
 export function isNeedLoading(process, needUri) {
   return needUri && getIn(process, ["needs", needUri, "loading"]);
+}
+
+export function isNeedLoaded(process, needUri) {
+  return needUri && getIn(process, ["needs", needUri, "loaded"]);
 }
 
 /**

@@ -1,41 +1,35 @@
 import angular from "angular";
 import { attach } from "../../../utils.js";
 
-import "style/_file-viewer.scss";
+import "style/_image-viewer.scss";
 
 const serviceDependencies = ["$scope", "$element"];
 function genComponentConf() {
   let template = `
-        <div class="filev__header">
-          <svg class="filev__header__icon" ng-if="self.detail.icon">
+        <div class="imagev__header">
+          <svg class="imagev__header__icon" ng-if="self.detail.icon">
               <use xlink:href={{self.detail.icon}} href={{self.detail.icon}}></use>
           </svg>
-          <span class="filev__header__label" ng-if="self.detail.label">{{self.detail.label}}</span>
+          <span class="imagev__header__label" ng-if="self.detail.label">{{self.detail.label}}</span>
         </div>
-        <div class="filev__content" ng-if="self.content && self.content.size > 0">
-          <div class="filev__content__item"
-            ng-repeat="file in self.content.toArray()">
-            <a class="filev__content__item__inner"
-              ng-href="data:{{file.get('type')}};base64,{{file.get('data')}}"
-              download="{{ file.get('name') }}"
-              ng-if="!self.isImage(file)">
-              <svg class="filev__content__item__inner__typeicon">
-                <use xlink:href="#ico36_uc_transport_demand" href="#ico36_uc_transport_demand"></use>
-              </svg>
-              <div class="filev__content__item__inner__label">
-                {{ file.get('name') }}
-              </div>
-            </a>
-            <a class="filev__content__item__inner"
-              ng-click="self.openImageInNewTab(file)"
-              ng-if="self.isImage(file)">
-              <img class="filev__content__item__inner__image"
+        <div class="imagev__content" ng-if="self.content && self.content.size > 0">
+          <div class="imagev__content__selected">
+            <img class="imagev__content__selected__image"
+              ng-click="self.openImageInNewTab(self.getSelectedImage())"
+              alt="{{self.getSelectedImage().get('name')}}"
+              ng-src="data:{{self.getSelectedImage().get('type')}};base64,{{self.getSelectedImage().get('data')}}"/>
+          </div>
+          <div class="imagev__content__thumbnails" ng-if="self.content.size > 1">
+            <div class="imagev__content__thumbnails__thumbnail"
+              ng-repeat="file in self.content.toArray()"
+              ng-if="self.isImage(file)"
+              ng-class="{
+                'imagev__content__thumbnails__thumbnail--selected': self.selectedIndex == $index,
+              }">
+              <img class="imagev__content__thumbnails__thumbnail__image" ng-click="self.changeSelectedIndex($index)"
                 alt="{{file.get('name')}}"
                 ng-src="data:{{file.get('type')}};base64,{{file.get('data')}}"/>
-              <div class="filev__content__item__inner__label">
-                {{ file.get('name') }}
-              </div>
-            </a>
+            </div>
           </div>
         </div>
       </div>
@@ -44,8 +38,8 @@ function genComponentConf() {
   class Controller {
     constructor() {
       attach(this, serviceDependencies, arguments);
-      window.filev4dbg = this;
-
+      window.imagev4dbg = this;
+      this.selectedIndex = 0;
       this.$scope.$watch("self.content", (newContent, prevContent) =>
         this.updatedContent(newContent, prevContent)
       );
@@ -78,6 +72,14 @@ function genComponentConf() {
         w.document.write(image.outerHTML);
       }
     }
+
+    changeSelectedIndex(index) {
+      this.selectedIndex = index;
+    }
+
+    getSelectedImage() {
+      return this.content && this.content.toArray()[this.selectedIndex];
+    }
   }
   Controller.$inject = serviceDependencies;
 
@@ -95,5 +97,5 @@ function genComponentConf() {
 }
 
 export default angular
-  .module("won.owner.components.fileViewer", [])
-  .directive("wonFileViewer", genComponentConf).name;
+  .module("won.owner.components.imageViewer", [])
+  .directive("wonImageViewer", genComponentConf).name;

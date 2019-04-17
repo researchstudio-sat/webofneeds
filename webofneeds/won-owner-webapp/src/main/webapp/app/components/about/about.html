@@ -83,9 +83,7 @@
                 <span>What's in your Area?</span>
             </button>
             <button class="won-button--filled red about__howto__createx__button"
-                    ng-if="!self.processingPublish"
-                    ng-click="self.createWhatsNew()"
-                    ng-disabled="self.processingPublish">
+                    ng-click="self.router__stateGo('overview')">
                 <span>What's new?</span>
             </button>
             <won-labelled-hr label="::'Or'" class="about__howto__createx__labelledhr"></won-labelled-hr>

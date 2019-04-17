@@ -8,42 +8,37 @@ won-file-viewer {
     .filev__content {
       width: 100%;
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr;
       grid-gap: 0.25rem;
-    }
+      padding-top: 0.25rem;
 
-    .filev__content__item {
-      .filev__content__item__inner {
-        display: grid;
-        grid-template-rows: min-content 1fr;
-        border: $thinGrayBorder;
-        border-radius: 0.19rem;
-        height: 5rem;
-        background: $won-lighter-gray;
-        grid-gap: 0.25rem;
-        padding: 0.25rem;
-        justify-items: center;
+      .filev__content__item {
+        .filev__content__item__inner {
+          display: grid;
+          grid-template-columns: min-content 1fr;
+          grid-gap: 0.25rem;
+          justify-items: left;
+          align-items: center;
 
-        &:hover {
-          cursor: pointer;
-        }
+          &:hover {
+            cursor: pointer;
+          }
 
-        .filev__content__item__inner__image,
-        .filev__content__item__inner__typeicon {
-          grid-row: 2 / span 1;
-          max-width: 100%;
-          max-height: 100%;
-          --local-primary: #{$won-line-gray};
-        }
+          .filev__content__item__inner__image,
+          .filev__content__item__inner__typeicon {
+            @include fixed-square($postIconSizeMobile);
+            object-fit: cover;
+            --local-primary: #{$won-line-gray};
+          }
 
-        .filev__content__item__inner__label {
-          grid-row: 1 / span 1;
-          font-size: $smallFontSize;
-          color: $won-primary-text-color;
-          text-overflow: ellipsis;
-          overflow: hidden;
-          max-width: 100%;
-          white-space: nowrap;
+          .filev__content__item__inner__label {
+            font-size: $smallFontSize;
+            color: $won-primary-text-color;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            max-width: 100%;
+            white-space: nowrap;
+          }
         }
       }
     }
@@ -53,20 +48,17 @@ won-file-viewer {
     .filev__content {
       width: 100%;
       display: grid;
-      grid-template-columns: 1fr 1fr 1fr 1fr;
+      grid-template-columns: 1fr;
       grid-gap: 0.5rem;
+      padding-top: 0.5rem;
 
       .filev__content__item {
         .filev__content__item__inner {
           display: grid;
-          grid-template-rows: min-content 1fr;
-          border: $thinGrayBorder;
-          border-radius: 0.19rem;
-          height: 5rem;
-          background: $won-lighter-gray;
+          grid-template-columns: min-content 1fr;
           grid-gap: 0.25rem;
-          padding: 0.25rem;
-          justify-items: center;
+          justify-items: left;
+          align-items: center;
 
           &:hover {
             cursor: pointer;
@@ -74,14 +66,12 @@ won-file-viewer {
 
           .filev__content__item__inner__image,
           .filev__content__item__inner__typeicon {
-            grid-row: 2 / span 1;
-            max-width: 100%;
-            max-height: 100%;
+            @include fixed-square($postIconSizeMobile);
+            object-fit: cover;
             --local-primary: #{$won-line-gray};
           }
 
           .filev__content__item__inner__label {
-            grid-row: 1 / span 1;
             font-size: $smallFontSize;
             color: $won-primary-text-color;
             text-overflow: ellipsis;

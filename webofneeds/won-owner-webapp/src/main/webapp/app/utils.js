@@ -932,6 +932,8 @@ export function rethrow(e, prependedMsg = "") {
     // a class defined
     const g = new Error(prependedMsg + e.message);
     g.stack = e.stack;
+    g.response = e.response; //we add the response so we can look up why a request threw an error
+
     throw g;
   } else {
     throw new Error(prependedMsg + JSON.stringify(e));

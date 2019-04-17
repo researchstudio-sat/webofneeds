@@ -1,0 +1,83 @@
+@import "won-config";
+@import "sizing-utils";
+@import "positioning-utils";
+
+won-image-picker {
+  display: grid;
+  grid-gap: 0.5rem;
+
+  .imagep__header {
+    font-size: $smallFontSize;
+  }
+
+  .imagep__preview {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-gap: 0.5rem;
+
+    .imagep__preview__item {
+      display: grid;
+      grid-template-columns: 1fr min-content;
+      grid-template-rows: min-content 1fr min-content;
+      border: $thinGrayBorder;
+      border-radius: 0.19rem;
+      height: 7.5rem;
+      background: $won-lighter-gray;
+      grid-gap: 0.25rem;
+      padding: 0.25rem;
+      justify-items: left;
+      align-items: center;
+
+      &--default {
+        border-color: $won-primary-color;
+      }
+
+      &:hover {
+        border-color: $won-primary-color-light;
+      }
+
+      .imagep__preview__item__label {
+        grid-row: 1 / span 1;
+        grid-column: 1 / span 1;
+        font-size: $smallFontSize;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        max-width: 100%;
+        white-space: nowrap;
+        cursor: pointer;
+      }
+
+      .imagep__preview__item__remove {
+        grid-row: 1 / span 1;
+        grid-column: 2 / span 1;
+        cursor: pointer;
+        @include fixed-square(1rem);
+
+        --local-primary: #{$won-primary-text-color};
+
+        &:hover {
+          --local-primary: #{$won-primary-color};
+        }
+      }
+
+      .imagep__preview__item__image {
+        grid-row: 2 / span 1;
+        grid-column: 1 / span 2;
+        object-fit: contain;
+        width: 100%;
+        height: 100%;
+        background: white;
+        border: $thinGrayBorder;
+        cursor: pointer;
+      }
+
+      .imagep__preview__item__default {
+        grid-row: 3 / span 1;
+        grid-column: 1 / span 2;
+        font-size: $smallFontSize;
+        cursor: pointer;
+      }
+    }
+  }
+}
