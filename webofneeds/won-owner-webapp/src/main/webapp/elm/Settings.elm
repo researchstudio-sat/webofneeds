@@ -9,6 +9,7 @@ import Element.Input as Input
 import Elements
 import Html exposing (Html)
 import Old.Skin as Skin exposing (Skin)
+import Settings.Account as Account
 import Settings.Export as Export
 import Settings.Personas as Personas
 
@@ -56,11 +57,13 @@ type alias Model =
 type Page
     = Personas Personas.Model
     | Export Export.Model
+    | Account Account.Model
 
 
 type Route
     = PersonasR
     | ExportR
+    | AccountR
 
 
 toRoute : Page -> Route
@@ -71,6 +74,9 @@ toRoute page =
 
         Export _ ->
             ExportR
+
+        Account _ ->
+            AccountR
 
 
 init : { width : Int, height : Int } -> ( Model, Cmd Msg )
@@ -101,6 +107,7 @@ subInit toPage toMsg ( subModel, cmd ) =
 type Msg
     = PersonasMsg Personas.Msg
     | ExportMsg Export.Msg
+    | AccountMsg Account.Msg
     | ChangeRoute Route
     | Resized Size
     | Back
@@ -116,6 +123,10 @@ update msg model =
         ( ExportMsg subMsg, Export subModel ) ->
             Export.update subMsg subModel
                 |> updateWith Export ExportMsg model
+
+        ( AccountMsg subMsg, Account subModel ) ->
+            Account.update subMsg subModel
+                |> updateWith Account AccountMsg model
 
         ( ChangeRoute newRoute, _ ) ->
             if toRoute model.page == newRoute then
@@ -156,6 +167,9 @@ changeRoute route model =
 
                 PersonasR ->
                     subInit Personas PersonasMsg (Personas.init ())
+
+                AccountR ->
+                    subInit Account AccountMsg (Account.init ())
     in
     ( { model
         | page = newPage
@@ -237,6 +251,9 @@ view skin model =
             Export subModel ->
                 viewPage ExportMsg Export.view subModel
 
+            Account subModel ->
+                viewPage AccountMsg Account.view subModel
+
 
 navigation : DeviceClass -> Skin -> Route -> Element Msg
 navigation deviceClass skin route =
@@ -277,6 +294,7 @@ navigation deviceClass skin route =
         attrs
         [ navItem PersonasR
         , navItem ExportR
+        , navItem AccountR
         ]
 
 
@@ -288,6 +306,9 @@ routeLabel route =
 
         PersonasR ->
             "Personas"
+
+        AccountR ->
+            "Account"
 
 
 
@@ -304,6 +325,10 @@ subSubscriptions page =
         Export _ ->
             Export.subscriptions
                 |> Sub.map ExportMsg
+
+        Account _ ->
+            Account.subscriptions
+                |> Sub.map AccountMsg
 
 
 subscriptions : Model -> Sub Msg
