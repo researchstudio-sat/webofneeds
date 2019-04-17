@@ -167,7 +167,9 @@ export function accessControl({
 
     case "settings":
       if (!accountUtils.isLoggedIn(get(state, "account"))) {
-        event.preventDefault();
+        if (event) {
+          event.preventDefault();
+        }
         dispatch(actionCreators.router__stateGoResetParams(defaultRoute));
       }
       return;
@@ -249,7 +251,9 @@ function reactToPrivateIdChanges(
   //If there is a toPrivateId param and it is different than the old one we process a login for that privateId regardless
   if (toPrivateId && fromPrivateId !== toPrivateId) {
     // privateId has changed or was added
-    const credentials = { privateId: toPrivateId };
+    const credentials = {
+      privateId: toPrivateId,
+    };
     return accountLogin(credentials)(dispatch, getState);
   }
 }
