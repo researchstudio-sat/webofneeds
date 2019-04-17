@@ -60,6 +60,7 @@
         <intercept-url pattern="/rest/users/settings" access="isAuthenticated()"/>
         <intercept-url pattern="/rest/users/acceptTermsOfService" access="isAuthenticated()"/>
         <intercept-url pattern="/rest/needs/drafts/*" access="hasRole('ROLE_ACCOUNT')"/>
+        <intercept-url pattern="/rest/needs/all" access="permitAll()"/>
         <intercept-url pattern="/rest/**" access="isAuthenticated()"/>
         <intercept-url pattern="/**"  requires-channel="https"/>
         <!--intercept-url pattern="/rest/**" access="isAuthenticated()" /-->

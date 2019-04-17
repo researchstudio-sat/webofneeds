@@ -35,7 +35,7 @@ public class SendMessageFromNodeProcessor extends AbstractCamelProcessor {
             throw new IllegalMessageForConnectionStateException(connectionUri, "CONNECTION_MESSAGE", con.getState());
         }
         if (logger.isDebugEnabled()) {
-            logger.debug("received this ConnectioMessage FromExternal:\n{}",
+            logger.debug("received this ConnectionMessage FromExternal:\n{}",
                             RdfUtils.toString(wonMessage.getCompleteDataset()));
             if (wonMessage.getForwardedMessageURI() != null) {
                 logger.debug("This message contains the forwarded message {}", wonMessage.getForwardedMessageURI());

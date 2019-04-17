@@ -11,6 +11,7 @@ import dropdownViewerModule from "./dropdown-viewer.js";
 import selectViewerModule from "./select-viewer.js";
 import rangeViewerModule from "./range-viewer.js";
 import fileViewerModule from "./file-viewer.js";
+import imageViewerModule from "./image-viewer.js";
 import workflowViewerModule from "./workflow-viewer.js";
 import petrinetViewerModule from "./petrinet-viewer.js";
 import petrinettransitionViewerModule from "./petrinettransition-viewer.js";
@@ -35,6 +36,7 @@ export default [
   selectViewerModule,
   rangeViewerModule,
   fileViewerModule,
+  imageViewerModule,
   workflowViewerModule,
   petrinetViewerModule,
   petrinettransitionViewerModule,

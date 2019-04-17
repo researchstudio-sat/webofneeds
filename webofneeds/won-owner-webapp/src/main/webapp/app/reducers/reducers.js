@@ -57,6 +57,41 @@ const reducers = {
         return config;
     }
   },
+  owner: (
+    owner = Immutable.fromJS({
+      needUris: Immutable.Set(),
+      lastNeedUrisUpdateTime: undefined,
+    }),
+    action = {}
+  ) => {
+    switch (action.type) {
+      case actionTypes.needs.storeNeedUrisFromOwner: {
+        const fetchedNeedUris = action.payload.get("uris");
+        let ownerNeedUris = owner.get("needUris");
+
+        fetchedNeedUris &&
+          fetchedNeedUris.forEach(
+            needUri => (ownerNeedUris = ownerNeedUris.add(needUri))
+          );
+
+        return owner
+          .set("needUris", ownerNeedUris)
+          .set("lastNeedUrisUpdateTime", Date.now());
+      }
+
+      case actionTypes.needs.removeDeleted:
+      case actionTypes.personas.removeDeleted:
+      case actionTypes.needs.delete: {
+        const needUri = action.payload.get("uri");
+        const needUris = owner.get("needUris");
+
+        return owner.set("needUris", needUris.remove(needUri));
+      }
+
+      default:
+        return owner;
+    }
+  },
 };
 
 export default reduceReducers(
@@ -130,11 +165,7 @@ function deleteChatConnectionsBetweenOwnedNeeds(state) {
           //Any connection that is not of type chatFacet will be exempt from deletion
           if (isChatConnection(conn)) {
             //Any other connection will be checked if it would be connected to the ownedNeed, if so we remove it.
-            return !state.getIn([
-              "needs",
-              conn.get("remoteNeedUri"),
-              "isOwned",
-            ]);
+            return !generalSelectors.isNeedOwned(state, conn.get("remoteNeedUri"));
           }
           return true;
         });*/

@@ -11,8 +11,7 @@ import shareDropdownModule from "./share-dropdown.js";
 import { attach, get, getIn } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
 import * as processUtils from "../process-utils.js";
-import * as needUtils from "../need-utils.js";
-import { getPostUriFromRoute } from "../selectors/general-selectors.js";
+import * as generalSelectors from "../selectors/general-selectors.js";
 import { actionCreators } from "../actions/actions.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
 
@@ -78,16 +77,6 @@ function genComponentConf() {
                     </svg>
                     <span>{{ self.getUseCaseLabel(ucIdentifier) }}</span>
             </button>
-            <button class="won-button--filled red post-info__footer__button" style="margin: 0rem 0rem .3rem 0rem;"
-                ng-if="self.showCreateWhatsAround"
-                ng-click="self.createWhatsAround()"
-                ng-disabled="self.processingPublish">
-                <svg class="won-button-icon" style="--local-primary:white;">
-                    <use xlink:href="#ico36_location_current" href="#ico36_location_current"></use>
-                </svg>
-                <span ng-if="!self.processingPublish">What's in your Area?</span>
-                <span ng-if="self.processingPublish">Finding out what's going on&hellip;</span>
-            </button>
         </div>
     `;
 
@@ -103,7 +92,7 @@ function genComponentConf() {
         */
         const postUri = this.needUri
           ? this.needUri
-          : getPostUriFromRoute(state);
+          : generalSelectors.getPostUriFromRoute(state);
         const post = state.getIn(["needs", postUri]);
         const process = get(state, "process");
 
@@ -111,23 +100,19 @@ function genComponentConf() {
           !post || processUtils.isNeedLoading(process, postUri);
         const postFailedToLoad =
           post && processUtils.hasNeedFailedToLoad(process, postUri);
-        const showCreateWhatsAround =
-          post && needUtils.isOwned(post) && needUtils.isWhatsNewNeed(post);
+        const isOwned = generalSelectors.isNeedOwned(state, postUri);
 
         const reactionUseCases =
           post &&
-          !needUtils.isOwned(post) &&
+          !isOwned &&
           getIn(post, ["matchedUseCase", "reactionUseCases"]);
         const hasReactionUseCases =
           reactionUseCases && reactionUseCases.size > 0;
 
         const enabledUseCases =
-          post &&
-          needUtils.isOwned(post) &&
-          getIn(post, ["matchedUseCase", "enabledUseCases"]);
+          post && isOwned && getIn(post, ["matchedUseCase", "enabledUseCases"]);
         const hasEnabledUseCases = enabledUseCases && enabledUseCases.size > 0;
         return {
-          processingPublish: state.getIn(["process", "processingPublish"]),
           postUri,
           post,
           postLoading,
@@ -138,13 +123,10 @@ function genComponentConf() {
           enabledUseCasesArray: enabledUseCases && enabledUseCases.toArray(),
           createdTimestamp: post && post.get("creationDate"),
           showOverlayNeed: !!this.needUri,
-          showCreateWhatsAround,
           showFooter:
             !postLoading &&
             !postFailedToLoad &&
-            (showCreateWhatsAround ||
-              hasReactionUseCases ||
-              hasEnabledUseCases),
+            (hasReactionUseCases || hasEnabledUseCases),
         };
       };
       connect2Redux(
@@ -155,12 +137,6 @@ function genComponentConf() {
       );
 
       classOnComponentRoot("won-is-loading", () => this.postLoading, this);
-    }
-
-    createWhatsAround() {
-      if (!this.processingPublish) {
-        this.needs__whatsAround();
-      }
     }
 
     getUseCaseIcon(ucIdentifier) {

@@ -135,7 +135,6 @@ won.WON.BasicNeedTypeCombinedCompacted = won.WON.baseUri + ":Combined";
 won.WON.BasicNeedTypeCritique = won.WON.baseUri + "Critique";
 won.WON.BasicNeedTypeCritiqueCompacted = won.WON.prefix + ":Critique";
 won.WON.BasicNeedTypeWhatsAroundCompacted = won.WON.prefix + ":WhatsAround";
-won.WON.BasicNeedTypeWhatsNewCompacted = won.WON.prefix + ":WhatsNew";
 won.WON.NoHintForCounterpartCompacted =
   won.WON.prefix + ":NoHintForCounterpart";
 won.WON.UsedForTestingCompacted = won.WON.prefix + ":UsedForTesting";
@@ -1344,18 +1343,9 @@ WonMessage.prototype = {
     return this.compactRawMessage;
   },
   getMessageType: function() {
-    if (
-      this.getProperty("http://purl.org/webofneeds/message#hasMessageType") ===
-        "http://purl.org/webofneeds/message#ConnectionMessage" &&
-      this.getTextMessage() === "Note: need content was changed."
-    ) {
-      //TODO: REMOVE THIS HANDLER ONCE THE CHANGENOTIFICATIONMESSAGE TYPE HAS BEEN IMPLEMENTED IN THE BACKEND
-      return "http://purl.org/webofneeds/message#ChangeNotificationMessage";
-    } else {
-      return this.getProperty(
-        "http://purl.org/webofneeds/message#hasMessageType"
-      );
-    }
+    return this.getProperty(
+      "http://purl.org/webofneeds/message#hasMessageType"
+    );
   },
   getInjectIntoConnectionUris: function() {
     return createArray(

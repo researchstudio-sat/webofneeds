@@ -6,6 +6,7 @@ import won from "./won-es6.js";
 import { get, getIn } from "./utils.js";
 import { labels } from "./won-label-utils.js";
 import * as connectionUtils from "./connection-utils.js";
+import * as useCaseUtils from "./usecase-utils.js";
 
 /**
  * Determines if a given need is a Active
@@ -16,10 +17,6 @@ export function isActive(need) {
   return get(need, "state") && get(need, "state") === won.WON.ActiveCompacted;
 }
 
-export function isOwned(need) {
-  return get(need, "isOwned");
-}
-
 export function getIdenticonSvg(need) {
   return get(need, "identiconSvg");
 }
@@ -28,8 +25,8 @@ export function getMatchedUseCaseIcon(need) {
   return getIn(need, ["matchedUseCase", "icon"]);
 }
 
-export function getMatchedUseCaseIconBackground(need) {
-  return getIn(need, ["matchedUseCase", "iconBackground"]);
+export function getBackground(need) {
+  return get(need, "background");
 }
 
 export function getMatchedUseCaseIdentifier(need) {
@@ -46,6 +43,50 @@ export function getEnabledUseCases(need) {
 
 export function hasMatchedUseCase(need) {
   return !!getIn(need, ["matchedUseCase", "identifier"]);
+}
+
+export function hasImages(need) {
+  return (
+    !!getIn(need, ["content", "images"]) || !!getIn(need, ["seeks", "images"])
+  );
+}
+
+export function hasLocation(need) {
+  return (
+    !!getIn(need, ["content", "location"]) ||
+    !!getIn(need, ["seeks", "location"])
+  );
+}
+
+export function getLocation(need) {
+  if (hasLocation(need)) {
+    return (
+      getIn(need, ["content", "location"]) || getIn(need, ["seeks", "location"])
+    );
+  }
+  return undefined;
+}
+
+/**
+ * Returns the "Default" Image (currently the first one, branch content is checked before seeks) of a need
+ * if the need does not have any images we return undefined
+ * @param need
+ */
+export function getDefaultImage(need) {
+  if (hasImages(need)) {
+    const contentImages = getIn(need, ["content", "images"]);
+
+    if (contentImages) {
+      return contentImages.first();
+    }
+
+    const seeksImages = getIn(need, ["content", "images"]);
+
+    if (seeksImages) {
+      return seeksImages.first();
+    }
+  }
+  return undefined;
 }
 
 /**
@@ -67,26 +108,6 @@ export function isWhatsAroundNeed(need) {
     getIn(need, ["content", "flags"]) &&
     getIn(need, ["content", "flags"]).contains("won:WhatsAround")
   );
-}
-
-/**
- * This checks if the need is allowed to be used as a template,
- * it is only allowed if the need exists, and if it has a matchedUseCase
- * @param need
- * @returns {*|boolean}
- */
-export function isUsableAsTemplate(need) {
-  return need && !isOwned(need) && hasMatchedUseCase(need);
-}
-
-/**
- * This checks if the need is allowed to be edited,
- * it is only allowed if the need exists, and if it is OWNED and has a matchedUseCase
- * @param need
- * @returns {*|boolean}
- */
-export function isEditable(need) {
-  return need && isOwned(need) && hasMatchedUseCase(need);
 }
 
 /**
@@ -171,48 +192,6 @@ export function isSearchNeed(need) {
 }
 
 /**
- * Determines if a given need is a WhatsNew-Need
- * @param need
- * @returns {*|boolean}
- */
-export function isWhatsNewNeed(need) {
-  return (
-    getIn(need, ["content", "flags"]) &&
-    getIn(need, ["content", "flags"]).contains("won:WhatsNew")
-  );
-}
-
-/**
- * Generates a string that can be used to add matching contexts to a label.
- */
-export function generateNeedMatchingContext(needImm) {
-  const matchingContexts = needImm && needImm.get("matchingContexts");
-  if (matchingContexts && matchingContexts.size > 0) {
-    return " posted in " + matchingContexts.join(", ");
-  } else {
-    return "";
-  }
-}
-
-/**
- * Generates a string that can be used as a Types Label for any given need, includes the matchingContexts
- * TODO: We Do not store a single type anymore but a list of types... adapt accordingly
- */
-export function generateFullNeedTypesLabel(needImm) {
-  const types = getIn(needImm, ["content", "type"]);
-
-  //TODO: GENERATE CORRECT LABEL
-  //self.labels.type[self.need.getIn(['content','type'])]
-  let label = "";
-
-  if (types && types.size > 0) {
-    label = types.join(", ");
-  }
-
-  return label + generateNeedMatchingContext(needImm);
-}
-
-/**
  * Generates an array that contains all need flags, using a human readable label if available.
  */
 export function generateFullNeedFlags(needImm) {
@@ -243,49 +222,23 @@ export function generateFullNeedFacets(needImm) {
 }
 
 /**
- * Generates a string that can be used as a simplified Types Label for non-debug views. Hides information.
+ * Retrieves the Label of the used useCase as a needType, if no usecase is specified we check if need is a searchNeed or DirectResponseNeed
  * @param {*} needImm the need as saved in the state
  */
-export function generateShortNeedTypesLabel(needImm) {
-  const needTypes = needImm && needImm.getIn(["content", "type"]);
+export function generateNeedTypeLabel(needImm) {
+  const useCase = useCaseUtils.getUseCase(getMatchedUseCaseIdentifier(needImm));
 
-  const getNeedLabel = type => {
-    switch (type) {
-      //Insert specific overrides here
-      default: {
-        const match = /[^:/]+$/.exec(type);
-        if (match) {
-          return match[0];
-        } else {
-          return "Unknown";
-        }
-      }
+  if (useCase) {
+    return useCase.label;
+  } else {
+    if (isSearchNeed(needImm)) {
+      return "Search";
+    } else if (isDirectResponseNeed(needImm)) {
+      return "Direct Response";
     }
-  };
 
-  let label = "";
-
-  if (isWhatsAroundNeed(needImm) || isWhatsNewNeed(needImm)) {
-    label = "";
-  } else if (isSearchNeed(needImm)) {
-    label = "Search";
-  } else if (isDirectResponseNeed(needImm)) {
-    label = "Direct Response";
-    // TODO: groupchat label
-  } else if (needTypes && needTypes.size > 0) {
-    let types = new Array();
-    for (let type of Array.from(needTypes)) {
-      // hide won:Need
-      if (type === "won:Need") {
-        continue;
-        // cut off everything before the first :
-      } else {
-        types.push(getNeedLabel(type));
-      }
-    }
-    label += types.join(", ");
+    return "";
   }
-  return label;
 }
 
 /**

@@ -233,12 +233,19 @@ function genComponentConf() {
           useCase,
           fromNeed,
           fromNeedUri,
+          isFromNeedOwned: generalSelectors.isNeedOwned(state, fromNeedUri),
           isCreateFromNeed,
           isEditFromNeed,
           isFromNeedLoading,
           isFromNeedToLoad,
-          isFromNeedEditable: needUtils.isEditable(fromNeed),
-          isFromNeedUsableAsTemplate: needUtils.isUsableAsTemplate(fromNeed),
+          isFromNeedEditable: generalSelectors.isNeedEditable(
+            state,
+            fromNeedUri
+          ),
+          isFromNeedUsableAsTemplate: generalSelectors.isNeedUsableAsTemplate(
+            state,
+            fromNeedUri
+          ),
           isHoldable: useCaseUtils.isHoldable(useCase),
           hasFromNeedFailedToLoad,
           personas: generalSelectors.getOwnedPersonas(state).toJS(),
@@ -340,7 +347,7 @@ function genComponentConf() {
     }
 
     save() {
-      if (this.loggedIn && needUtils.isOwned(this.fromNeed)) {
+      if (this.loggedIn && this.isFromNeedOwned) {
         this.draftObject.useCase = get(this.useCase, "identifier");
 
         if (!isBranchContentPresent(this.draftObject.content, true)) {

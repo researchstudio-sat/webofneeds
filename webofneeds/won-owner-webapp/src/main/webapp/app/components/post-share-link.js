@@ -6,13 +6,15 @@ import { attach, toAbsoluteURL } from "../utils.js";
 import { connect2Redux, generateSvgQrCode } from "../won-utils.js";
 import { ownerBaseUrl } from "config";
 
+import * as generalSelectors from "../selectors/general-selectors.js";
+
 import "style/_post-share-link.scss";
 
 const serviceDependencies = ["$scope", "$ngRedux", "$element"];
 function genComponentConf() {
   let template = `
         <div class="psl__content">
-            <p class="psl__text" ng-if="(self.post.get('connections').size != 0 && self.post.get('isOwned')) || !self.post.get('isOwned')">
+            <p class="psl__text" ng-if="(self.post.get('connections').size != 0 && self.isOwned) || !self.isOwned">
                 Know someone who might also be interested in this posting? Consider sharing the link below in social media.
             </p>
             <div class="psl__tabs">
@@ -49,7 +51,7 @@ function genComponentConf() {
 
         let linkToPost;
         if (ownerBaseUrl && post) {
-          const path = "#!post/" + `?postUri=${encodeURI(post.get("uri"))}`;
+          const path = "#!post/" + `?postUri=${encodeURI(this.postUri)}`;
 
           linkToPost = toAbsoluteURL(ownerBaseUrl).toString() + path;
         }
@@ -57,6 +59,7 @@ function genComponentConf() {
 
         return {
           post,
+          isOwned: generalSelectors.isNeedOwned(state, this.postUri),
           linkToPost,
           svgQrCodeToPost,
         };

@@ -3,9 +3,10 @@
  */
 import { actionTypes } from "../actions/actions.js";
 import Immutable from "immutable";
-import { getIn, get } from "../utils.js";
+import { getIn } from "../utils.js";
 import { parseNeed } from "./need-reducer/parse-need.js";
 import { parseMessage } from "./need-reducer/parse-message.js";
+import * as processUtils from "../process-utils.js";
 
 const initialState = Immutable.fromJS({
   processingInitialLoad: true,
@@ -17,6 +18,7 @@ const initialState = Immutable.fromJS({
   processingVerifyEmailAddress: false,
   processingResendVerificationEmail: false,
   processingSendAnonymousLinkEmail: false,
+  processingNeedUrisFromOwnerLoad: false,
   needs: Immutable.Map(),
   connections: Immutable.Map(),
 });
@@ -24,6 +26,7 @@ const initialState = Immutable.fromJS({
 export const emptyNeedProcess = Immutable.fromJS({
   loading: false,
   toLoad: false,
+  loaded: false,
   failedToLoad: false,
   processUpdate: false,
 });
@@ -119,9 +122,24 @@ export default function(processState = initialState, action = {}) {
       return processState;
     }
 
+    case actionTypes.needs.loadAllActiveNeedUrisFromOwner:
+      return processState.set("processingNeedUrisFromOwnerLoad", true);
+
+    case actionTypes.needs.storeNeedUrisFromOwner: {
+      const needUris = action.payload.get("uris");
+      needUris &&
+        needUris.forEach(needUri => {
+          if (!processUtils.isNeedLoaded(processState, needUri)) {
+            processState = updateNeedProcess(processState, needUri, {
+              toLoad: true,
+            });
+          }
+        });
+      return processState.set("processingNeedUrisFromOwnerLoad", false);
+    }
+
     case actionTypes.personas.create:
     case actionTypes.needs.create:
-    case actionTypes.needs.whatsNew:
     case actionTypes.needs.whatsAround:
       return processState.set("processingPublish", true);
 
@@ -150,13 +168,11 @@ export default function(processState = initialState, action = {}) {
     }
 
     case actionTypes.needs.createSuccessful: {
-      const needUri =
-        action.payload.need && get(parseNeed(action.payload.need), "uri");
-
-      processState = updateNeedProcess(processState, needUri, {
+      processState = updateNeedProcess(processState, action.payload.needUri, {
         toLoad: false,
         failedToLoad: false,
         loading: false,
+        loaded: true,
       });
       return processState.set("processingPublish", false);
     }
@@ -214,6 +230,7 @@ export default function(processState = initialState, action = {}) {
     case actionTypes.personas.storeUriFailed: {
       return updateNeedProcess(processState, action.payload.get("uri"), {
         toLoad: false,
+        loaded: false,
         failedToLoad: true,
         loading: false,
       });
@@ -444,13 +461,14 @@ export default function(processState = initialState, action = {}) {
               toLoad: false,
               failedToLoad: false,
               loading: false,
+              loaded: true,
             }
           );
 
           const heldNeedUris = parsedNeed.get("holds");
           if (heldNeedUris.size > 0) {
             heldNeedUris.map(heldNeedUri => {
-              if (!processState.getIn(["needs", heldNeedUri])) {
+              if (!processUtils.isNeedLoaded(processState, heldNeedUri)) {
                 processState = updateNeedProcess(processState, heldNeedUri, {
                   toLoad: true,
                 });
@@ -461,7 +479,7 @@ export default function(processState = initialState, action = {}) {
           const groupMemberUris = parsedNeed.get("groupMembers");
           if (groupMemberUris.size > 0) {
             groupMemberUris.map(groupMemberUri => {
-              if (!processState.getIn(["needs", groupMemberUri])) {
+              if (!processUtils.isNeedLoaded(processState, groupMemberUri)) {
                 processState = updateNeedProcess(processState, groupMemberUri, {
                   toLoad: true,
                 });
@@ -512,7 +530,11 @@ export default function(processState = initialState, action = {}) {
       return addOriginatorNeedToLoad(processState, action.payload);
 
     case actionTypes.needs.delete:
-      return processState.deleteIn(["needs", action.payload.ownNeedUri]);
+    case actionTypes.needs.removeDeleted:
+    case actionTypes.personas.removeDeleted: {
+      const needUri = action.payload.get("uri");
+      return processState.deleteIn(["needs", needUri]);
+    }
 
     default:
       return processState;
@@ -568,7 +590,7 @@ export function addOriginatorNeedToLoad(
 
       if (originatorUri) {
         //Message is originally from another need, we might need to add the need as well
-        if (!processState.getIn(["needs", originatorUri])) {
+        if (!processUtils.isNeedLoaded(processState, originatorUri)) {
           console.debug(
             "Originator Need is not in the state yet, we need to add it"
           );

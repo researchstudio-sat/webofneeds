@@ -10,7 +10,6 @@ export const labels = deepFreeze({
     [won.WON.BasicNeedTypeCombinedCompacted]: "Post + Search", //'I want to post and search',
     [won.WON.BasicNeedTypeCritiqueCompacted]: "Post", //'I want to change something',
     [won.WON.BasicNeedTypeWhatsAroundCompacted]: "What's Around",
-    [won.WON.BasicNeedTypeWhatsNewCompacted]: "What's New",
   },
   connectionState: {
     [won.WON.Suggested]: "Conversation suggested.",
@@ -29,7 +28,6 @@ export const labels = deepFreeze({
   },
   flags: {
     [won.WON.BasicNeedTypeWhatsAroundCompacted]: "What's Around",
-    [won.WON.BasicNeedTypeWhatsNewCompacted]: "What's New",
     [won.WON.NoHintForCounterpartCompacted]: "No Hint For Others",
     [won.WON.NoHintForMeCompacted]: "No Hint For Me",
     [won.WON.UsedForTestingCompacted]: "Used For Testing",

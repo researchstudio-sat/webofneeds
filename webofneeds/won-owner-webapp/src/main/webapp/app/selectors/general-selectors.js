@@ -5,7 +5,8 @@
 import { createSelector } from "reselect";
 
 import { decodeUriComponentProperly, getIn, get } from "../utils.js";
-import { isPersona, isNeed, isActive, isInactive } from "../need-utils.js";
+import * as needUtils from "../need-utils.js";
+import * as accountUtils from "../account-utils.js";
 import Color from "color";
 
 export const selectLastUpdateTime = state => state.get("lastUpdateTime");
@@ -13,42 +14,58 @@ export const getRouterParams = state =>
   getIn(state, ["router", "currentParams"]);
 
 export const getNeeds = state => state.get("needs");
-export const getOwnedNeeds = state =>
-  getNeeds(state).filter(need => need.get("isOwned"));
-export const getNonOwnedNeeds = state =>
-  getNeeds(state).filter(need => !need.get("isOwned"));
+export const getOwnedNeeds = state => {
+  const accountState = get(state, "account");
+  return getNeeds(state).filter(need =>
+    accountUtils.isNeedOwned(accountState, get(need, "uri"))
+  );
+};
+export const getNonOwnedNeeds = state => {
+  const accountState = get(state, "account");
+  return getNeeds(state).filter(
+    need => !accountUtils.isNeedOwned(accountState, get(need, "uri"))
+  );
+};
 
 export function getPosts(state) {
   const needs = getNeeds(state);
   return needs.filter(need => {
     if (!need.getIn(["content", "type"])) return true;
 
-    return isNeed(need) && !isPersona(need);
+    return needUtils.isNeed(need) && !needUtils.isPersona(need);
   });
 }
 
-export const getOwnedPosts = state =>
-  getPosts(state).filter(need => need.get("isOwned"));
+export const getOwnedPosts = state => {
+  const accountState = get(state, "account");
+  return getPosts(state).filter(need =>
+    accountUtils.isNeedOwned(accountState, get(need, "uri"))
+  );
+};
 
 export function getOwnedOpenPosts(state) {
   const allOwnedNeeds = getOwnedPosts(state);
-  return allOwnedNeeds && allOwnedNeeds.filter(post => isActive(post));
+  return (
+    allOwnedNeeds && allOwnedNeeds.filter(post => needUtils.isActive(post))
+  );
 }
 
 export function getOpenPosts(state) {
   const allPosts = getPosts(state);
-  return allPosts && allPosts.filter(post => isActive(post));
+  return allPosts && allPosts.filter(post => needUtils.isActive(post));
 }
 
 export function getActiveNeeds(state) {
   const allNeeds = getNeeds(state);
-  return allNeeds && allNeeds.filter(need => isActive(need));
+  return allNeeds && allNeeds.filter(need => needUtils.isActive(need));
 }
 
 //TODO: METHOD NAME TO ACTUALLY REPRESENT WHAT THE SELECTOR DOES
 export function getOwnedClosedPosts(state) {
   const allOwnedNeeds = getOwnedPosts(state);
-  return allOwnedNeeds && allOwnedNeeds.filter(post => isInactive(post));
+  return (
+    allOwnedNeeds && allOwnedNeeds.filter(post => needUtils.isInactive(post))
+  );
 }
 
 export function getOwnedNeedsInCreation(state) {
@@ -194,7 +211,7 @@ export const getAboutSectionFromRoute = createSelector(
 
 export function getOwnedPersonas(state) {
   const needs = getOwnedNeeds(state);
-  const personas = needs.toList().filter(need => isPersona(need));
+  const personas = needs.toList().filter(need => needUtils.isPersona(need));
   return personas.map(persona => {
     return {
       displayName: getIn(persona, ["content", "personaName"]),
@@ -220,4 +237,44 @@ export function currentSkin() {
     lineGray: getColor("--won-line-gray"),
     subtitleGray: getColor("--won-subtitle-gray"),
   };
+}
+/**
+ * Returns true if the need is owned by the user who is currently logged in
+ * @param state FULL redux state, no substates allowed
+ * @param needUri
+ */
+export function isNeedOwned(state, needUri) {
+  if (needUri) {
+    const accountState = get(state, "account");
+    return accountUtils.isNeedOwned(accountState, needUri);
+  }
+  return false;
+}
+
+/**
+ * This checks if the given needUri is allowed to be used as a template,
+ * it is only allowed if the need exists is NOT owned, and if it has a matchedUseCase
+ * @param needUri
+ * @returns {*|boolean}
+ */
+export function isNeedUsableAsTemplate(state, needUri) {
+  const need = getIn(state, ["needs", needUri]);
+
+  return (
+    !!need && !isNeedOwned(state, needUri) && needUtils.hasMatchedUseCase(need)
+  );
+}
+
+/**
+ * This checks if the given needUri is allowed to be edited,
+ * it is only allowed if the need exists, and if it IS owned and has a matchedUseCase
+ * @param need
+ * @returns {*|boolean}
+ */
+export function isNeedEditable(state, needUri) {
+  const need = getIn(state, ["needs", needUri]);
+
+  return (
+    !!need && isNeedOwned(state, needUri) && needUtils.hasMatchedUseCase(need)
+  );
 }

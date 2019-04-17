@@ -2,7 +2,6 @@ import Immutable from "immutable";
 import won from "../../won-es6.js";
 import * as useCaseUtils from "../../usecase-utils.js";
 import {
-  isWhatsNewNeed,
   isWhatsAroundNeed,
   isSearchNeed,
   isPersona,
@@ -11,7 +10,7 @@ import { generateHexColor, generateRgbColorArray, getIn } from "../../utils.js";
 import shajs from "sha.js";
 import Identicon from "identicon.js";
 
-export function parseNeed(jsonldNeed, isOwned) {
+export function parseNeed(jsonldNeed) {
   const jsonldNeedImm = Immutable.fromJS(jsonldNeed);
 
   if (jsonldNeedImm && jsonldNeedImm.get("@id")) {
@@ -22,7 +21,6 @@ export function parseNeed(jsonldNeed, isOwned) {
       identiconSvg: generateIdenticon(jsonldNeedImm),
       nodeUri: jsonldNeedImm.getIn(["won:hasWonNode", "@id"]),
       state: extractState(jsonldNeedImm),
-      matchingContexts: extractMatchingContext(jsonldNeedImm),
       heldBy: won.parseFrom(jsonldNeedImm, ["won:heldBy"], "xsd:ID"),
       holds:
         won.parseListFrom(jsonldNeedImm, ["won:holds"], "xsd:ID") ||
@@ -40,12 +38,11 @@ export function parseNeed(jsonldNeed, isOwned) {
       matchedUseCase: {
         identifier: undefined,
         icon: undefined,
-        iconBackground: undefined,
         enabledUseCases: undefined,
         reactionUseCases: undefined,
       },
+      background: generateBackground(jsonldNeedImm),
       unread: false,
-      isOwned: !!isOwned,
       isBeingCreated: false,
       jsonld: jsonldNeed,
       connections: Immutable.Map(),
@@ -73,10 +70,6 @@ export function parseNeed(jsonldNeed, isOwned) {
         parsedNeedImm = parsedNeedImm
           .setIn(["matchedUseCase", "identifier"], matchingUseCase.identifier)
           .setIn(["matchedUseCase", "icon"], matchingUseCase.icon)
-          .setIn(
-            ["matchedUseCase", "iconBackground"],
-            generateUseCaseIconBackground(jsonldNeedImm)
-          )
           .setIn(
             ["matchedUseCase", "enabledUseCases"],
             matchingUseCase.enabledUseCases
@@ -138,15 +131,6 @@ function extractState(needJsonLd) {
     : won.WON.InactiveCompacted;
 }
 
-function extractMatchingContext(needJsonLd) {
-  const wonHasMatchingContexts = needJsonLd.get("won:hasMatchingContext");
-  return wonHasMatchingContexts
-    ? Immutable.List.isList(wonHasMatchingContexts)
-      ? wonHasMatchingContexts
-      : Immutable.List.of(wonHasMatchingContexts)
-    : undefined;
-}
-
 function generateIdenticon(needJsonLd) {
   const needUri = needJsonLd.get("@id");
 
@@ -167,7 +151,7 @@ function generateIdenticon(needJsonLd) {
   return idc.toString();
 }
 
-function generateUseCaseIconBackground(needJsonLd) {
+function generateBackground(needJsonLd) {
   const needUri = needJsonLd.get("@id");
 
   if (!needUri) {
@@ -239,8 +223,6 @@ function getHumanReadableStringFromNeed(need, detailsToParse) {
 
     if (isPersona(need)) {
       return getIn(need, ["content", "personaName"]);
-    } else if (isWhatsNewNeed(immNeed)) {
-      return "What's New";
     } else if (isWhatsAroundNeed(immNeed)) {
       let location =
         (needContent && needContent["location"]) ||

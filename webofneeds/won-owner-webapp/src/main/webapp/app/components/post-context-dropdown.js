@@ -12,6 +12,7 @@ import {
 } from "../won-utils.js";
 import * as needUtils from "../need-utils.js";
 import * as processUtils from "../process-utils.js";
+import * as generalSelectors from "../selectors/general-selectors.js";
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 
@@ -100,11 +101,14 @@ function genComponentConf() {
 
         return {
           adminEmail: getIn(state, ["config", "theme", "adminEmail"]),
-          isOwnPost: needUtils.isOwned(post),
+          isOwnPost: generalSelectors.isNeedOwned(state, this.needUri),
           isActive: needUtils.isActive(post),
           isInactive: needUtils.isInactive(post),
-          isUsableAsTemplate: needUtils.isUsableAsTemplate(post),
-          isEditable: needUtils.isEditable(post),
+          isUsableAsTemplate: generalSelectors.isNeedUsableAsTemplate(
+            state,
+            this.needUri
+          ),
+          isEditable: generalSelectors.isNeedEditable(state, this.needUri),
           post,
           postLoading:
             !post || processUtils.isNeedLoading(process, post.get("uri")),
@@ -183,7 +187,7 @@ function genComponentConf() {
           text: "Deleting the Post is irreversible, do you want to proceed?",
           buttons: [
             {
-              caption: "YES",
+              caption: "Yes",
               callback: () => {
                 this.needs__delete(this.post.get("uri"));
                 this.router__stateGoCurrent({
@@ -194,7 +198,7 @@ function genComponentConf() {
               },
             },
             {
-              caption: "NO",
+              caption: "No",
               callback: () => {
                 this.view__hideModalDialog();
               },

@@ -5,7 +5,7 @@ import postContentModule from "./post-content.js";
 import postMenuModule from "./post-menu.js";
 import chatTextFieldModule from "./chat-textfield.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
-import { getPostUriFromRoute } from "../selectors/general-selectors.js";
+import * as generalSelectors from "../selectors/general-selectors.js";
 import { connect2Redux } from "../won-utils.js";
 import { attach, get, getIn } from "../utils.js";
 import * as needUtils from "../need-utils.js";
@@ -64,19 +64,19 @@ function genComponentConf() {
       attach(this, serviceDependencies, arguments);
 
       const selectFromState = state => {
-        const postUriToConnectTo = getPostUriFromRoute(state);
+        const postUriToConnectTo = generalSelectors.getPostUriFromRoute(state);
         const displayedPost = state.getIn(["needs", postUriToConnectTo]);
 
         const post = state.getIn(["needs", postUriToConnectTo]);
+        const isOwned = generalSelectors.isNeedOwned(state, postUriToConnectTo);
+
         const reactionUseCases =
-          post &&
-          !needUtils.isOwned(post) &&
-          needUtils.getReactionUseCases(post);
+          post && !isOwned && needUtils.getReactionUseCases(post);
         const hasReactionUseCases =
           reactionUseCases && reactionUseCases.size > 0;
 
         const enabledUseCases =
-          post && needUtils.isOwned(post) && needUtils.getEnabledUseCases(post);
+          post && isOwned && needUtils.getEnabledUseCases(post);
         const hasEnabledUseCases = enabledUseCases && enabledUseCases.size > 0;
 
         return {

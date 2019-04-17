@@ -19,22 +19,22 @@ function genComponentConf() {
               ng-href="data:{{file.get('type')}};base64,{{file.get('data')}}"
               download="{{ file.get('name') }}"
               ng-if="!self.isImage(file)">
-              <div class="filev__content__item__inner__label">
-                {{ file.get('name') }}
-              </div>
               <svg class="filev__content__item__inner__typeicon">
                 <use xlink:href="#ico36_uc_transport_demand" href="#ico36_uc_transport_demand"></use>
               </svg>
+              <div class="filev__content__item__inner__label">
+                {{ file.get('name') }}
+              </div>
             </a>
             <a class="filev__content__item__inner"
               ng-click="self.openImageInNewTab(file)"
               ng-if="self.isImage(file)">
-              <div class="filev__content__item__inner__label">
-                {{ file.get('name') }}
-              </div>
               <img class="filev__content__item__inner__image"
                 alt="{{file.get('name')}}"
                 ng-src="data:{{file.get('type')}};base64,{{file.get('data')}}"/>
+              <div class="filev__content__item__inner__label">
+                {{ file.get('name') }}
+              </div>
             </a>
           </div>
         </div>

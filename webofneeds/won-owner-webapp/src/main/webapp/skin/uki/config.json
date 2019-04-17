@@ -3,7 +3,6 @@
   "adminEmail": "office.sat@researchstudio.at",
   "imprintTemplate": "imprint.html",
   "tosTemplate": "tos.html",
-  "defaultContext": ["cbi"],
   "privacyPolicyTemplate": "privacyPolicy.html",
   "welcomeTemplate": "welcomeTemplate.html"
 }

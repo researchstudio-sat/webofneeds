@@ -11,6 +11,7 @@ import * as needUtils from "../need-utils.js";
 import * as viewUtils from "../view-utils.js";
 import * as processUtils from "../process-utils.js";
 import * as connectionSelectors from "../selectors/connection-selectors.js";
+import * as generalSelectors from "../selectors/general-selectors.js";
 import * as connectionUtils from "../connection-utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
@@ -118,7 +119,7 @@ function genComponentConf() {
       const selectFromState = state => {
         const post = getIn(state, ["needs", this.postUri]);
         const isPersona = needUtils.isPersona(post);
-        const isOwned = needUtils.isOwned(post);
+        const isOwned = generalSelectors.isNeedOwned(state, this.postUri);
 
         const hasHolderFacet = needUtils.hasHolderFacet(post);
         const hasGroupFacet = needUtils.hasGroupFacet(post);

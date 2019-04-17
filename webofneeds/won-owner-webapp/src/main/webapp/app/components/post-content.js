@@ -19,8 +19,9 @@ import * as viewUtils from "../view-utils.js";
 import * as processUtils from "../process-utils.js";
 import * as connectionSelectors from "../selectors/connection-selectors.js";
 import {
-  getConnectionUriFromRoute,
   getOwnedPersonas,
+  getConnectionUriFromRoute,
+  isNeedOwned,
 } from "../selectors/general-selectors.js";
 import { actionCreators } from "../actions/actions.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
@@ -131,6 +132,7 @@ function genComponentConf() {
               class="post-content__members__member"
               ng-if="self.hasHeldPosts"
               ng-repeat="heldPostUri in self.heldPostsArray track by heldPostUri">
+              <div class="post-content__members__member__indicator"></div>
               <won-post-header
                 class="clickable"
                 ng-click="self.router__stateGoCurrent({viewNeedUri: heldPostUri, viewConnUri: undefined})"
@@ -181,7 +183,7 @@ function genComponentConf() {
         const openConnectionUri = getConnectionUriFromRoute(state);
         const post = getIn(state, ["needs", this.postUri]);
         const isPersona = needUtils.isPersona(post);
-        const isOwned = needUtils.isOwned(post);
+        const isOwned = isNeedOwned(state, this.postUri);
         const content = get(post, "content");
 
         //TODO it will be possible to have more than one seeks
@@ -197,9 +199,7 @@ function genComponentConf() {
           this.postUri
         );
 
-        const isOwnedNeedWhatsX =
-          isOwned &&
-          (needUtils.isWhatsAroundNeed(post) || needUtils.isWhatsNewNeed(post));
+        const isOwnedNeedWhatsX = isOwned && needUtils.isWhatsAroundNeed(post);
 
         const viewState = get(state, "view");
         const process = get(state, "process");
@@ -293,10 +293,6 @@ function genComponentConf() {
 
     addPersona(persona) {
       this.personas__connect(this.postUri, persona);
-    }
-
-    canAttachPersona() {
-      return this.post.get("isOwned") && !this.post.get("heldBy");
     }
 
     isSelectedTab(tabName) {

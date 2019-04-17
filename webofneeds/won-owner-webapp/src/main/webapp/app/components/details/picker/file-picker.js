@@ -16,14 +16,6 @@ function genComponentConf() {
       <div class="filep__preview" ng-if="self.addedFiles && self.addedFiles.length > 0">
         <div class="filep__preview__item"
           ng-repeat="file in self.addedFiles">
-          <div class="filep__preview__item__label">
-            {{ file.name }}
-          </div>
-          <svg
-            class="filep__preview__item__remove"
-            ng-click="self.removeFile(file)">
-            <use xlink:href="#ico36_close" href="#ico36_close"></use>
-          </svg>
           <img class="filep__preview__item__image"
             ng-if="self.isImage(file)"
             alt="{{file.name}}"
@@ -31,6 +23,14 @@ function genComponentConf() {
           <svg ng-if="!self.isImage(file)"
             class="filep__preview__item__typeicon">
             <use xlink:href="#ico36_uc_transport_demand" href="#ico36_uc_transport_demand"></use>
+          </svg>
+          <div class="filep__preview__item__label">
+            {{ file.name }}
+          </div>
+          <svg
+            class="filep__preview__item__remove"
+            ng-click="self.removeFile(file)">
+            <use xlink:href="#ico36_close" href="#ico36_close"></use>
           </svg>
         </div>
       </div>

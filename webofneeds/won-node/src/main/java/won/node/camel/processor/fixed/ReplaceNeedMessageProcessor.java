@@ -61,8 +61,10 @@ public class ReplaceNeedMessageProcessor extends AbstractCamelProcessor {
         // remove attachment and its signature from the needContent
         removeAttachmentsFromNeedContent(needContent, attachmentHolders);
         URI needURI = getNeedURIFromWonMessage(needContent);
+        if (needURI == null)
+            throw new IllegalArgumentException("Could not determine need URI within message content");
         if (!needURI.equals(wonMessage.getSenderNeedURI()))
-            throw new IllegalArgumentException("receiverNeedURI and NeedURI of the content are not equal");
+            throw new IllegalArgumentException("senderNeedURI and NeedURI of the content are not equal");
         final Need need = DataAccessUtils.loadNeed(needRepository, needURI);
         NeedEventContainer needEventContainer = need.getEventContainer();
         if (needEventContainer == null) {

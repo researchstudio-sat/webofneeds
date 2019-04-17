@@ -13,7 +13,6 @@ import groupPostMessagesModule from "../group-post-messages.js";
 import visitorTitleBarModule from "../visitor-title-bar.js";
 import * as generalSelectors from "../../selectors/general-selectors.js";
 import * as viewSelectors from "../../selectors/view-selectors.js";
-import * as needUtils from "../../need-utils.js";
 import * as processUtils from "../../process-utils.js";
 import * as srefUtils from "../../sref-utils.js";
 
@@ -40,7 +39,7 @@ class Controller {
 
       return {
         needUri,
-        isOwnedNeed: needUtils.isOwned(need),
+        isOwnedNeed: generalSelectors.isNeedOwned(state, needUri),
         need,
         won: won.WON,
         showSlideIns:

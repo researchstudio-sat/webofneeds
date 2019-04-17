@@ -8,8 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import won.node.camel.processor.AbstractFromOwnerCamelProcessor;
+import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.camel.processor.annotation.FacetMessageProcessor;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
@@ -29,7 +28,7 @@ import won.protocol.vocabulary.WONMSG;
  */
 @Component
 @FacetMessageProcessor(facetType = WON.GROUP_FACET_STRING, direction = WONMSG.TYPE_FROM_EXTERNAL_STRING, messageType = WONMSG.TYPE_CONNECTION_MESSAGE_STRING)
-public class SendMessageFromNodeGroupFacetImpl extends AbstractFromOwnerCamelProcessor {
+public class SendMessageFromNodeGroupFacetImpl extends AbstractCamelProcessor {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     @Autowired
     private ConnectionRepository connectionRepository;
