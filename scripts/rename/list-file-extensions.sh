@@ -22,9 +22,19 @@ then
 	exit 1	
 fi
 
+if [[ ! -e "${confdir}/renameignore" ]]
+then
+	touch "${confdir}/renameignore"
+fi
+
+if [[ ! -e "${confdir}/renameselect" ]]
+then
+	echo '*' > "${confdir}/renameselect"
+fi
+
 #find out which file extensions rename.sh will process
 
 echo -e "These are the file extensions \e[32mrename.sh\e[0m will be processing, starting at the current directory"
 echo "If you don't like that, change the file ${confdir}/renameignore "
-find . -type f | grep -v -E -f "${confdir}/renameignore" | sed -r -e 's/^.+\.([^\.])/\1/g' | sort | uniq >&2
+find . -type f | grep -E -f "${confdir}/renameselect" | grep -v -E -f "${confdir}/renameignore" | sed -r -e 's/^.+\.([^\.])/\1/g' | sort | uniq >&2
 exit 1

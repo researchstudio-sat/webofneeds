@@ -25,6 +25,15 @@ then
 	exit 1	
 fi
 
+if [[ ! -e "${confdir}/renameignore" ]]
+then
+	touch "${confdir}/renameignore"
+fi
+
+if [[ ! -e "${confdir}/renameselect" ]]
+then
+	echo '*' > "${confdir}/renameselect"
+fi
 
 sed_script_file=${confdir}/generated/sed-changefile-regexes.txt
 grep_script_file=${confdir}/generated/grep-checkfile-regex.txt
@@ -82,5 +91,5 @@ ${script_path}/generate-regex-files.sh $confdir || exit 1
 
 echo -e "These are the files with extension .${ext} that \e[32mrename.sh\e[0m will be processing, starting at the current directory" >&2
 echo "If you don't like that, change the file ${confdir}/renameignore " >&2
-find . -type f -name "*.${ext}" | grep -v -E -f "${confdir}/renameignore" | checkfile 
+find . -type f -name "*.${ext}" | grep -E -f "${confdir}/renameselect" | grep -v -E -f "${confdir}/renameignore" | checkfile 
 exit 1

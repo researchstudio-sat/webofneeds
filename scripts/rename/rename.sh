@@ -94,12 +94,22 @@ else
 	echo "You said 'FORCE'. Starting the replacement process" >&2
 fi 
 
+if [[ ! -e "${confdir}/renameignore" ]]
+then
+	touch "${confdir}/renameignore"
+fi
+
+if [[ ! -e "${confdir}/renameselect" ]]
+then
+	echo '*' > "${confdir}/renameselect"
+fi
+
 # list all files, filter using our file filter, and pass to replace
-find . -type f | grep -v -E -f "${confdir}/renameignore" | process_replace
+find . -type f | grep -E -f "${confdir}/renameselect" | grep -v -E -f "${confdir}/renameignore" | process_replace
 
 # list all directories, filter by our file filter, compute length of string with awk and add as first attribute,
 # sort whole output longest first, remove length attribute, and pass to replace
 # have to do it this way so that nested folders get renamed first
-find . -type d | grep -v -E -f "${confdir}/renameignore" | awk '{ print length($0) " " $0; }' | sort -r -n | cut -d ' ' -f 2- | process_replace
+find . -type d | grep -E -f "${confdir}/renameselect" | grep -v -E -f "${confdir}/renameignore" | awk '{ print length($0) " " $0; }' | sort -r -n | cut -d ' ' -f 2- | process_replace
 
 

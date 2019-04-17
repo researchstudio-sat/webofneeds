@@ -12,7 +12,8 @@ The script requires a parameter, the name of the 'configuration directory'
 	- all other lines are expanded. This means that the line is used, and in addition to that, it is converted into several forms (uppercase, lowercase, first letter uppercase, camel case converted to '_' separated, and more). See `expand.pl` for details.
 * `newforms.txt` - containing the replacement terms. 
 The lines of the two files are aligned - each line in `oldforms.txt` has a corresponding line in `newforms.txt`
-* `renameignore` - contains a regular expression matching files or folders to be excluded from processing.
+* `renameselect` - contains regular expressions (for grep -e) matching files or folders to be included in processing. Will be created if not provided, content defaults to '*'.
+* `renameignore` - contains regular expressions (for grep -e) matching files or folders to be excluded from processing. Will be created empty if not provided.
 
 
 # Usage
