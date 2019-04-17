@@ -38,12 +38,14 @@ See the files for a given extension (here, all '.md' files)
 
 ### Reformat java and javascript files
 ```
+
 cd webofneeds
 mvn formatter:format
 cd won-owner-webapp/src/main/webapp
 shopt -s globstar
 node_modules/prettier/bin-prettier.js --write app/**/*.js config/**/*.js *.js 
 cd ../../../../
+
 ```
 
 ### Set up the DB migration
