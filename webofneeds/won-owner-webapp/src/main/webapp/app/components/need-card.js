@@ -27,6 +27,7 @@ function genComponentConf() {
         ng-class="{
           'won-is-persona': self.isPersona,
           'inactive': self.isInactive,
+          'card__icon--map': self.showMap,
         }"
         ng-click="self.router__stateGo('post', {postUri: self.need.get('uri')})">
         <div class="identicon usecaseimage"
@@ -43,7 +44,7 @@ function genComponentConf() {
             ng-if="self.needImage"
             alt="{{self.needImage.get('name')}}"
             ng-src="data:{{self.needImage.get('type')}};base64,{{self.needImage.get('data')}}"/>
-        <won-need-map class="location" locations="[self.needLocation]" ng-if="!self.needImage && self.needLocation" disable-controls default-layer-only add-current-location>
+        <won-need-map class="location" locations="[self.needLocation]" ng-if="self.showMap" disable-controls default-layer-only add-current-location>
         </won-need-map>
     </div>
     <div class="card__icon__skeleton" ng-if="!self.needLoaded"
@@ -211,6 +212,7 @@ function genComponentConf() {
           needImage,
           needLocation,
           showDefaultIcon: !needImage && !needLocation, //if no image and no location are present we display the defaultIcon in the card__icon area, instead of next to the title
+          showMap: !needImage && needLocation, //if no image is present but a location is, we display a map instead
         };
       };
 
