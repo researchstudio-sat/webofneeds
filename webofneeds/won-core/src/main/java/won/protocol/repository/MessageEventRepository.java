@@ -21,37 +21,37 @@ public interface MessageEventRepository extends WonRepository<MessageEventPlaceh
     MessageEventPlaceholder findOneByMessageURI(URI URI);
 
     // read is permitted iff any of these conditions apply:
-    // * the WebId is the sender need
-    // * the WebId is the recipient need
-    // * the WebId is a need that has a connection to the sender need AND the
-    // message is in the need's event container
+    // * the WebId is the sender atom
+    // * the WebId is the recipient atom
+    // * the WebId is an atom that has a connection to the sender atom AND the
+    // message is in the atom's event container
     /*
      * sql: select msg.*, con.* from message_event msg left outer join connection
-     * con on ( msg.parentURI = con.connectionURI -- msg is in connection. need and
-     * remote need have access or msg.parentURI = con.needURI -- msg not in
-     * connection but belongs to need. We allow all remote needs access -- if con is
-     * null, there are no connections for the msg's need, and therefore no remote
-     * needs. only allow the local need access ) where ( msg.messageURI =
+     * con on ( msg.parentURI = con.connectionURI -- msg is in connection. atom and
+     * remote atom have access or msg.parentURI = con.atomURI -- msg not in
+     * connection but belongs to atom. We allow all remote atoms access -- if con is
+     * null, there are no connections for the msg's atom, and therefore no remote
+     * atoms. only allow the local atom access ) where ( msg.messageURI =
      * 'https://satvm05.researchstudio.at/won/resource/event/2x27qe2l4jt6obgxiqij'
      * -- ok now we have the event and maybe a connection and ( (con is null and
      * msg.parentURI =
-     * 'https://satvm05.researchstudio.at/won/resource/need/6825071433651196000') --
-     * the event belongs to the need: fine or con.needURI =
-     * 'https://satvm05.researchstudio.at/won/resource/need/6825071433651196000' --
-     * grant access to the local need or con.remoteNeedURI =
-     * 'https://satvm05.researchstudio.at/won/resource/need/6825071433651196000' --
-     * grant access to the remote need or msg.senderNodeURI =
-     * 'https://satvm05.researchstudio.at/won/resource/need/6825071433651196000' --
-     * grant access to the sender node or msg.receiverNodeURI =
-     * 'https://satvm05.researchstudio.at/won/resource/need/6825071433651196000' --
+     * 'https://satvm05.researchstudio.at/won/resource/atom/6825071433651196000') --
+     * the event belongs to the atom: fine or con.atomURI =
+     * 'https://satvm05.researchstudio.at/won/resource/atom/6825071433651196000' --
+     * grant access to the local atom or con.targetAtomURI =
+     * 'https://satvm05.researchstudio.at/won/resource/atom/6825071433651196000' --
+     * grant access to the remote atom or msg.senderNodeURI =
+     * 'https://satvm05.researchstudio.at/won/resource/atom/6825071433651196000' --
+     * grant access to the sender node or msg.recipientNodeURI =
+     * 'https://satvm05.researchstudio.at/won/resource/atom/6825071433651196000' --
      * grant access to the receiver node ) )
      */
     @Query("select case when (count(msg) > 0) then true else false end "
                     + "from MessageEventPlaceholder msg left outer join Connection con on ("
-                    + " msg.parentURI = con.connectionURI or " + " msg.parentURI = con.needURI " + " ) "
+                    + " msg.parentURI = con.connectionURI or " + " msg.parentURI = con.atomURI " + " ) "
                     + " where msg.messageURI = :messageUri and (" + "   ( con is null and msg.parentURI = :webId )"
-                    + "   or con.needURI = :webId " + "   or con.remoteNeedURI = :webId "
-                    + "   or msg.receiverNodeURI = :webId " + "   or msg.senderNodeURI = :webId " + ")")
+                    + "   or con.atomURI = :webId " + "   or con.targetAtomURI = :webId "
+                    + "   or msg.recipientNodeURI = :webId " + "   or msg.senderNodeURI = :webId " + ")")
     public boolean isReadPermittedForWebID(@Param("messageUri") URI messageUri, @Param("webId") URI webId);
 
     /*
@@ -62,12 +62,12 @@ public interface MessageEventRepository extends WonRepository<MessageEventPlaceh
      * + "        m.parenturi = last.parenturi n" +
      * "    	and m.messagetype not in ('SUCCESS_RESPONSE', 'FAILURE_RESPONSE') "
      * + "    	and m.creationdate > last.creationdate " + "    ) " +
-     * "    join EventContainer e on ( " + "    	last.parenturi = e.parent_uri "
+     * "    join MessageContainer e on ( " + "    	last.parenturi = e.parent_uri "
      * + "    ) " + "    join Connection c on ( " +
      * "    	c.connectionuri = last.parenturi " + "    ) " +
      * "    and e.parent_type = 'Connection' " + "    where  " +
      * "    	last.messageuri in :lastSeenMessageUris " +
-     * "        and c.needuri = :needUri " +
+     * "        and c.atomuri = :atomUri " +
      * "    group by (c.connectionuri, c.state) " )
      */
     @Query("select \n" + "	new won.protocol.model.unread.UnreadMessageInfoForConnection(\n"
@@ -77,20 +77,20 @@ public interface MessageEventRepository extends WonRepository<MessageEventPlaceh
                     + "    	c.connectionURI = m.parentURI\n" + "    left join MessageEventPlaceholder last on \n"
                     + "        m.parentURI = last.parentURI\n"
                     + "        and last.messageURI in :lastSeenMessageUris \n" + "    where \n"
-                    + "        c.needURI = :needUri \n"
+                    + "        c.atomURI = :atomUri \n"
                     + "		and m.messageType not in ('SUCCESS_RESPONSE', 'FAILURE_RESPONSE') \n"
                     + "        and (last is null or m.creationDate > last.creationDate) \n"
                     + "    group by c.connectionURI, c.state \n")
-    public List<UnreadMessageInfoForConnection> getUnreadInfoForNeed(@Param("needUri") URI needURI,
+    public List<UnreadMessageInfoForConnection> getUnreadInfoForAtom(@Param("atomUri") URI atomURI,
                     @Param("lastSeenMessageUris") Collection<URI> lastSeenMessageURIs);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query("select n,c from NeedEventContainer c join MessageEventPlaceholder msg on msg.parentURI = c.parentUri join Need n on c.parentUri = n.needURI where msg.messageURI = :messageUri")
-    public void lockNeedAndEventContainerByContainedMessageForUpdate(@Param("messageUri") URI messageUri);
+    @Query("select n,c from AtomMessageContainer c join MessageEventPlaceholder msg on msg.parentURI = c.parentUri join Atom n on c.parentUri = n.atomURI where msg.messageURI = :messageUri")
+    public void lockAtomAndMessageContainerByContainedMessageForUpdate(@Param("messageUri") URI messageUri);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query("select con,c from NeedEventContainer c join MessageEventPlaceholder msg on msg.parentURI = c.parentUri join Connection con on c.parentUri = con.connectionURI where msg.messageURI = :messageUri")
-    public void lockConnectionAndEventContainerByContainedMessageForUpdate(@Param("messageUri") URI messageUri);
+    @Query("select con,c from AtomMessageContainer c join MessageEventPlaceholder msg on msg.parentURI = c.parentUri join Connection con on c.parentUri = con.connectionURI where msg.messageURI = :messageUri")
+    public void lockConnectionAndMessageContainerByContainedMessageForUpdate(@Param("messageUri") URI messageUri);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select msg from MessageEventPlaceholder msg where msg.messageURI = :uri")
@@ -236,15 +236,15 @@ public interface MessageEventRepository extends WonRepository<MessageEventPlaceh
                     + "from MessageEventPlaceholder msg, MessageEventPlaceholder otherMsg join Connection otherCon "
                     + "on (otherMsg.parentURI = otherCon.connectionURI) " + "where "
                     + "msg.messageURI = :messageUri and " + "otherMsg.messageURI <> msg.messageURI and "
-                    + "otherCon.needURI = msg.receiverNeedURI and "
-                    + "otherMsg.receiverNeedURI = msg.receiverNeedURI and "
+                    + "otherCon.atomURI = msg.recipientAtomURI and "
+                    + "otherMsg.recipientAtomURI = msg.recipientAtomURI and "
                     + "otherMsg.innermostMessageURI = msg.innermostMessageURI and " + "( " +
                     // either the other message is earlier - then we lose
                     "    msg.creationDate > otherMsg.creationDate " + "    or (" +
                     // if both messages happen at the same instant, we need a tie-breaker: db id
                     "        msg.creationDate = otherMsg.creationDate and " + "        msg.id > otherMsg.id " + "    )"
                     + ")")
-    public boolean existEarlierMessageWithSameInnermostMessageURIAndReceiverNeedURI(
+    public boolean existEarlierMessageWithSameInnermostMessageURIAndRecipientAtomURI(
                     @Param("messageUri") URI messageUri);
 
     /**
@@ -258,12 +258,12 @@ public interface MessageEventRepository extends WonRepository<MessageEventPlaceh
     @Query("select case when (count(otherMsg) > 0) then true else false end "
                     + "from MessageEventPlaceholder msg, MessageEventPlaceholder otherMsg join Connection otherCon "
                     + "on (otherMsg.parentURI = otherCon.connectionURI) " + "where "
-                    + "msg.messageURI = :messageUri and " + "otherMsg.senderNeedURI = :senderNeedUri and "
-                    + "otherMsg.messageURI <> msg.messageURI and " + "otherCon.needURI = msg.receiverNeedURI and "
-                    + "otherMsg.receiverNeedURI = msg.receiverNeedURI and "
+                    + "msg.messageURI = :messageUri and " + "otherMsg.senderAtomURI = :senderAtomUri and "
+                    + "otherMsg.messageURI <> msg.messageURI and " + "otherCon.atomURI = msg.recipientAtomURI and "
+                    + "otherMsg.recipientAtomURI = msg.recipientAtomURI and "
                     + "otherMsg.innermostMessageURI = msg.innermostMessageURI")
     public boolean isReceivedSameInnermostMessageFromSender(@Param("messageUri") URI messageUri,
-                    @Param("senderNeedUri") URI senderNeedURI);
+                    @Param("senderAtomUri") URI senderAtomURI);
 
     public void deleteByParentURI(URI parentUri);
 }

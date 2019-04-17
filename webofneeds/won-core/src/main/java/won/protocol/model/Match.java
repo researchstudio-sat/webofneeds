@@ -21,19 +21,19 @@ import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
 @Entity
-@Table(name = "match", uniqueConstraints = @UniqueConstraint(columnNames = { "fromNeed", "toNeed", "originator" }))
+@Table(name = "match", uniqueConstraints = @UniqueConstraint(columnNames = { "fromAtom", "toAtom", "originator" }))
 public class Match {
     /* This is the event ID to the corresponding match */
     @Id
     @GeneratedValue
     @Column(name = "id")
     private long id;
-    @Column(name = "fromNeed")
+    @Column(name = "fromAtom")
     @Convert(converter = URIConverter.class)
-    private URI fromNeed;
-    @Column(name = "toNeed")
+    private URI fromAtom;
+    @Column(name = "toAtom")
     @Convert(converter = URIConverter.class)
-    private URI toNeed;
+    private URI toAtom;
     @Column(name = "score")
     private double score;
     @Column(name = "originator")
@@ -44,7 +44,7 @@ public class Match {
 
     @Override
     public String toString() {
-        return "Match{" + ", id=" + id + ", fromNeed=" + fromNeed + ", toNeed=" + toNeed + ", score=" + score
+        return "Match{" + ", id=" + id + ", fromAtom=" + fromAtom + ", toAtom=" + toAtom + ", score=" + score
                         + ", originator=" + originator + ", eventId=" + eventId + '}';
     }
 
@@ -56,20 +56,20 @@ public class Match {
         this.id = id;
     }
 
-    public URI getFromNeed() {
-        return fromNeed;
+    public URI getFromAtom() {
+        return fromAtom;
     }
 
-    public void setFromNeed(URI fromNeed) {
-        this.fromNeed = fromNeed;
+    public void setFromAtom(URI fromAtom) {
+        this.fromAtom = fromAtom;
     }
 
-    public URI getToNeed() {
-        return toNeed;
+    public URI getToAtom() {
+        return toAtom;
     }
 
-    public void setToNeed(URI toNeed) {
-        this.toNeed = toNeed;
+    public void setToAtom(URI toAtom) {
+        this.toAtom = toAtom;
     }
 
     public double getScore() {

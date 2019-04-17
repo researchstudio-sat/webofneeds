@@ -1,6 +1,6 @@
 #parse('mail-templates/inc/mail-messages.vm')
 
-#parse('mail-templates/inc/remote-need-info.vm')
+#parse('mail-templates/inc/target-atom-info.vm')
 
 #parse('mail-templates/inc/quoted-mail.vm')
 

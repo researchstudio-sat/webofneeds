@@ -48,11 +48,11 @@
 		<constructor-arg name="defaultAlias" value="${uri.prefix.owner}" />
 	</bean>
 	<!-- alias used here, but the owner webapp uses two different beans-->
-	<alias alias="CryptographyServiceOnBehalfOfNeed" name="cryptographyService" />
+	<alias alias="CryptographyServiceOnBehalfOfAtom" name="cryptographyService" />
     
     <!-- if the fixedPrivateKeyAlias is empty or null, the processor generates 
-        a new Keypair for every need, if it is a string, the processor uses the same 
-        key pair for all needs and storese it under the specified alias -->
+        a new Keypair for every atom, if it is a string, the processor uses the same 
+        key pair for all atoms and storese it under the specified alias -->
     <bean id="keyPairAliasDerivationStrategyFactory"
         class="won.cryptography.keymanagement.KeyPairAliasDerivationStrategyFactory">
         <property name="predefinedAlias" value="${owner.fixedPrivateKeyAlias}" />
@@ -70,7 +70,7 @@
 		</constructor-arg>
 	</bean>
 	<!-- alias used here, but the owner webapp uses two different beans-->
-	<alias alias="linkedDataRestClientOnBehalfOfNeed" name="linkedDataRestClient" />
+	<alias alias="linkedDataRestClientOnBehalfOfAtom" name="linkedDataRestClient" />
 	
 	<bean id="messagingContext" class="won.cryptography.ssl.MessagingContext">
 		<constructor-arg ref="keyStoreService" />
@@ -90,6 +90,6 @@
         </constructor-arg>   
 	</bean>
 	<!-- alias used here, but the owner webapp uses two different beans-->
-	<alias name="linkedDataRestBridge" alias="linkedDataRestBridgeOnBehalfOfNeed"/>
+	<alias name="linkedDataRestBridge" alias="linkedDataRestBridgeOnBehalfOfAtom"/>
 
 </beans>

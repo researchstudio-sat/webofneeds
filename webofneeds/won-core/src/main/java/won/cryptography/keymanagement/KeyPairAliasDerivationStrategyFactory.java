@@ -22,10 +22,10 @@ public class KeyPairAliasDerivationStrategyFactory {
 
     public KeyPairAliasDerivationStrategy create() {
         if (this.predefinedAlias == null || this.predefinedAlias.trim().length() == 0) {
-            logger.info("There is no predefined alias specified for the key pairs that will be used for needs. This causes each need to be created with a new key pair, which is slow and may not be intended. To set the predefined alias and thus only use one key pair for all needs, use the property key 'owner.fixedPrivateKeyAlias=your-key-alias'");
-            return new NeedUriAsAliasStrategy();
+            logger.info("There is no predefined alias specified for the key pairs that will be used for atoms. This causes each atom to be created with a new key pair, which is slow and may not be intended. To set the predefined alias and thus only use one key pair for all atoms, use the property key 'owner.fixedPrivateKeyAlias=your-key-alias'");
+            return new AtomUriAsAliasStrategy();
         } else {
-            logger.info("There is a predefined alias specified for the key pair that will be used for needs. This is fast, but each need created will have the same public key, which might be a privacy risk and may not be intended. To remove the predefined alias and thus use a new key pair for each need, set the property key 'owner.fixedPrivateKeyAlias=' (i.e., set it to an emptyv alue )");
+            logger.info("There is a predefined alias specified for the key pair that will be used for atoms. This is fast, but each atom created will have the same public key, which might be a privacy risk and may not be intended. To remove the predefined alias and thus use a new key pair for each atom, set the property key 'owner.fixedPrivateKeyAlias=' (i.e., set it to an emptyv alue )");
             return new PredefinedAliasStrategy(this.predefinedAlias);
         }
     }

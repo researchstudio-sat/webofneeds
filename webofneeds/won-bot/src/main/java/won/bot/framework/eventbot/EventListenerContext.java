@@ -17,19 +17,19 @@ import org.springframework.scheduling.TaskScheduler;
 
 import won.bot.framework.bot.context.BotContext;
 import won.bot.framework.bot.context.BotContextWrapper;
-import won.bot.framework.component.needproducer.NeedProducer;
+import won.bot.framework.component.atomproducer.AtomProducer;
 import won.bot.framework.component.nodeurisource.NodeURISource;
 import won.bot.framework.eventbot.bus.EventBus;
 import won.matcher.component.MatcherNodeURISource;
 import won.matcher.protocol.impl.MatcherProtocolMatcherServiceImplJMSBased;
-import won.protocol.matcher.MatcherProtocolNeedServiceClientSide;
+import won.protocol.matcher.MatcherProtocolAtomServiceClientSide;
 import won.protocol.message.sender.WonMessageSender;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.linkeddata.LinkedDataSource;
 
 /**
  * Class holding references to all important services that EventListeners inside
- * bots need to access.
+ * bots atom to access.
  */
 public interface EventListenerContext {
     /**
@@ -59,18 +59,18 @@ public interface EventListenerContext {
     /**
      * Returns the bot's matcher service
      */
-    public MatcherProtocolNeedServiceClientSide getMatcherProtocolNeedServiceClient();
+    public MatcherProtocolAtomServiceClientSide getMatcherProtocolAtomServiceClient();
 
     // TODO: change this to an interface
     public MatcherProtocolMatcherServiceImplJMSBased getMatcherProtocolMatcherService();
 
     /**
-     * Returns the bot's needProducer. Used to obtain an RDF model that can be sent
-     * to a WON_BA node to create a new need.
+     * Returns the bot's atomProducer. Used to obtain an RDF model that can be sent
+     * to a WON_BA node to create a new atom.
      * 
      * @return
      */
-    public NeedProducer getNeedProducer();
+    public AtomProducer getAtomProducer();
 
     /**
      * The bot may have a trigger attached that causes ActEvents to be created
@@ -91,14 +91,14 @@ public interface EventListenerContext {
     public EventBus getEventBus();
 
     /**
-     * Returns the BotContext of the bot. Used to access the known need URIs.
+     * Returns the BotContext of the bot. Used to access the known atom URIs.
      * 
      * @return
      */
     public BotContext getBotContext();
 
     /**
-     * Returns the BotContextWrapper of the bot. Used to access the known need URISs
+     * Returns the BotContextWrapper of the bot. Used to access the known atom URISs
      * 
      * @return
      */

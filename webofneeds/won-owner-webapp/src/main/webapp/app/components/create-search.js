@@ -170,7 +170,7 @@ function genComponentConf() {
     }
 
     publish() {
-      // Post both needs
+      // Post both atoms
       if (!this.processingPublish) {
         const tempDraft = this.draftObject;
         const tempDefaultNodeUri = this.$ngRedux
@@ -178,13 +178,13 @@ function genComponentConf() {
           .getIn(["config", "defaultNodeUri"]);
 
         if (this.loggedIn) {
-          this.needs__create(tempDraft, undefined, tempDefaultNodeUri);
+          this.atoms__create(tempDraft, undefined, tempDefaultNodeUri);
         } else {
           this.view__showTermsDialog(
             Immutable.fromJS({
               acceptCallback: () => {
                 this.view__hideModalDialog();
-                this.needs__create(tempDraft, undefined, tempDefaultNodeUri);
+                this.atoms__create(tempDraft, undefined, tempDefaultNodeUri);
               },
               cancelCallback: () => {
                 this.view__hideModalDialog();

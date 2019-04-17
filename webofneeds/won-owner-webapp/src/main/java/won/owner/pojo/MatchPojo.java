@@ -16,11 +16,11 @@ package won.owner.pojo;
 public class MatchPojo {
     private double score;
     private String originator;
-    private String needURI;
+    private String atomURI;
     private String connectionURI;
-    private String remoteNeedURI;
-    private String facetURI;
-    private String remoteFacetURI;
+    private String targetAtomURI;
+    private String socketURI;
+    private String targetSocketURI;
     private String title;
     private String description;
     private String imageURI;
@@ -42,12 +42,12 @@ public class MatchPojo {
         this.originator = originator;
     }
 
-    public String getNeedURI() {
-        return needURI;
+    public String getAtomURI() {
+        return atomURI;
     }
 
-    public void setNeedURI(final String needURI) {
-        this.needURI = needURI;
+    public void setAtomURI(final String atomURI) {
+        this.atomURI = atomURI;
     }
 
     public String getConnectionURI() {
@@ -58,28 +58,28 @@ public class MatchPojo {
         this.connectionURI = connectionURI;
     }
 
-    public String getRemoteNeedURI() {
-        return remoteNeedURI;
+    public String getTargetAtomURI() {
+        return targetAtomURI;
     }
 
-    public void setRemoteNeedURI(final String remoteNeedURI) {
-        this.remoteNeedURI = remoteNeedURI;
+    public void setTargetAtomURI(final String targetAtomURI) {
+        this.targetAtomURI = targetAtomURI;
     }
 
-    public String getFacetURI() {
-        return facetURI;
+    public String getSocketURI() {
+        return socketURI;
     }
 
-    public void setFacetURI(final String facetURI) {
-        this.facetURI = facetURI;
+    public void setSocketURI(final String socketURI) {
+        this.socketURI = socketURI;
     }
 
-    public String getRemoteFacetURI() {
-        return remoteFacetURI;
+    public String getTargetSocketURI() {
+        return targetSocketURI;
     }
 
-    public void setRemoteFacetURI(final String remoteFacetURI) {
-        this.remoteFacetURI = remoteFacetURI;
+    public void setTargetSocketURI(final String targetSocketURI) {
+        this.targetSocketURI = targetSocketURI;
     }
 
     public String getTitle() {

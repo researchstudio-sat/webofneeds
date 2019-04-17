@@ -59,7 +59,7 @@ export const paypalPayment = {
         // "s:identifier": value.secret,
         "s:accountId": value.receiver,
         // "s:customer": {
-        //   "@type": "won:Need",
+        //   "@type": "won:Atom",
         //   "@id": value.customerUri,
         // },
         // TODO: handle optional information
@@ -87,7 +87,7 @@ export const paypalPayment = {
 
     // TODO: this should work with personas too?
     // const customer = get(invoice, "s:customer");
-    // if (!customer || customer.get("@type") !== won.WON.NeedCompacted) {
+    // if (!customer || customer.get("@type") !== won.WON.AtomCompacted) {
     //   return undefined;
     // }
 

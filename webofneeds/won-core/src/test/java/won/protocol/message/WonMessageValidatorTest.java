@@ -25,10 +25,10 @@ import won.protocol.vocabulary.WONMSG;
  * User: ypanchenko Date: 28.04.2015
  */
 public class WonMessageValidatorTest {
-    private static final String NEED_LOCAL_URI = "http://localhost:8080/won/resource/need/o1ybhchandwvg6c8pv81";
+    private static final String ATOM_LOCAL_URI = "http://localhost:8080/won/resource/atom/o1ybhchandwvg6c8pv81";
     private static final String NODE_LOCAL_URI = "http://localhost:8080/won/resource";
     private static final String NODE_REMOTE_URI = "http://remotehost:8080/won/resource";
-    // create-need message
+    // create-atom message
     private static final String RESOURCE_FILE_CREATE_MSG_VALID = "/validation/valid/create_msg.trig";
     private static final String CREATE_CONTENT_NAME = "http://localhost:8080/won/resource/event/td3u9uqz1pismn4qtn92#content-9ti7";
     private static final String CREATE_CONTENT_NAME_SIG = "http://localhost:8080/won/resource/event/td3u9uqz1pismn4qtn92#content-9ti7-sig";
@@ -128,7 +128,7 @@ public class WonMessageValidatorTest {
     }
 
     @Test
-    public void testValidForwardToReceiverMessage() throws IOException {
+    public void testValidForwardToRecipientMessage() throws IOException {
         WonMessageValidator validator = new WonMessageValidator();
         StringBuilder message = new StringBuilder();
         boolean valid = validator.validate(
@@ -137,7 +137,7 @@ public class WonMessageValidatorTest {
     }
 
     @Test
-    public void testInvalidForwardToReceiverMessage() throws IOException {
+    public void testInvalidForwardToRecipientMessage() throws IOException {
         WonMessageValidator validator = new WonMessageValidator();
         StringBuilder message = new StringBuilder();
         boolean valid = validator.validate(Utils.createTestDataset("/validation/invalid/create_msg_with_forward.trig"),
@@ -172,7 +172,7 @@ public class WonMessageValidatorTest {
         Model env1Model = invalidDataset.getNamedModel(CREATE_ENV1_NAME);
         Model env2Model = invalidDataset.getNamedModel(CREATE_ENV2_NAME);
         Statement stmtOld = env2Model.createStatement(ResourceFactory.createResource(CREATE_ENV1_ENV2_MSG_URI),
-                        RDF.type, WONMSG.TYPE_FROM_OWNER);
+                        RDF.type, WONMSG.FromOwner);
         env1Model.remove(stmtOld);
         env2Model.remove(stmtOld);
         // validate this invalid dataset
@@ -199,7 +199,7 @@ public class WonMessageValidatorTest {
                         .copyByDatasetSerialization(new WonMessage(createMessageDataset)).getCompleteDataset();
         Model env1Model = invalidDataset.getNamedModel(CREATE_ENV1_NAME);
         Statement stmtOld = env1Model.createStatement(ResourceFactory.createResource(CREATE_ENV1_ENV2_MSG_URI),
-                        WONMSG.HAS_MESSAGE_TYPE_PROPERTY, WONMSG.TYPE_CREATE);
+                        WONMSG.messageType, WONMSG.CreateMessage);
         env1Model.remove(stmtOld);
         // validate this invalid dataset
         WonMessageValidator validator = new WonMessageValidator();
@@ -209,7 +209,7 @@ public class WonMessageValidatorTest {
         Assert.assertTrue(message.toString().contains("missing_type"));
         // create invalid dataset by adding a triple with invalid message type
         Statement stmtNew = env1Model.createStatement(ResourceFactory.createResource(CREATE_ENV1_ENV2_MSG_URI),
-                        WONMSG.HAS_MESSAGE_TYPE_PROPERTY, ResourceFactory.createProperty("test:property:uri"));
+                        WONMSG.messageType, ResourceFactory.createProperty("test:property:uri"));
         env1Model.add(stmtNew);
         // validate this invalid dataset
         valid = validator.validate(invalidDataset, message);
@@ -226,10 +226,9 @@ public class WonMessageValidatorTest {
         Model env1Model = invalidDataset.getNamedModel(CREATE_ENV1_NAME);
         Model env2Model = invalidDataset.getNamedModel(CREATE_ENV2_NAME);
         Statement stmt1Old = env1Model.createStatement(ResourceFactory.createResource(CREATE_ENV1_ENV2_MSG_URI),
-                        WONMSG.HAS_SENT_TIMESTAMP,
-                        ResourceFactory.createTypedLiteral("1433774711093", XSDDatatype.XSDlong));
+                        WONMSG.sentTimestamp, ResourceFactory.createTypedLiteral("1433774711093", XSDDatatype.XSDlong));
         Statement stmt2Old = env2Model.createStatement(ResourceFactory.createResource(CREATE_ENV1_ENV2_MSG_URI),
-                        WONMSG.HAS_RECEIVED_TIMESTAMP,
+                        WONMSG.receivedTimestamp,
                         ResourceFactory.createTypedLiteral("1433774714580", XSDDatatype.XSDlong));
         env1Model.remove(stmt1Old);
         env2Model.remove(stmt2Old);
@@ -252,7 +251,7 @@ public class WonMessageValidatorTest {
         Model env2Model = invalidDataset.getNamedModel(CREATE_ENV2_NAME);
         Model env1Model = invalidDataset.getNamedModel(CREATE_ENV1_NAME);
         Statement stmtOld = env2Model.createStatement(ResourceFactory.createResource(CREATE_ENV2_NAME),
-                        WONMSG.CONTAINS_ENVELOPE, ResourceFactory.createResource(CREATE_ENV1_NAME));
+                        WONMSG.containsEnvelope, ResourceFactory.createResource(CREATE_ENV1_NAME));
         env2Model.remove(stmtOld);
         // validate this invalid dataset
         WonMessageValidator validator = new WonMessageValidator();
@@ -267,7 +266,7 @@ public class WonMessageValidatorTest {
         // envelope 1,
         // thus creating a cycle in the envelope chain
         Statement stmtNew = env1Model.createStatement(ResourceFactory.createResource(CREATE_ENV1_NAME),
-                        WONMSG.CONTAINS_ENVELOPE, ResourceFactory.createResource(CREATE_ENV2_NAME));
+                        WONMSG.containsEnvelope, ResourceFactory.createResource(CREATE_ENV2_NAME));
         env1Model.add(stmtNew);
         // validate this invalid dataset
         valid = validator.validate(invalidDataset, message);
@@ -278,7 +277,7 @@ public class WonMessageValidatorTest {
         // test 3
         // create invalid dataset by adding a triple that references an envelope that is
         // not present in the dataset
-        stmtNew = env1Model.createStatement(ResourceFactory.createResource(CREATE_ENV1_NAME), WONMSG.CONTAINS_ENVELOPE,
+        stmtNew = env1Model.createStatement(ResourceFactory.createResource(CREATE_ENV1_NAME), WONMSG.containsEnvelope,
                         ResourceFactory.createResource("test:resource:uri"));
         env1Model.add(stmtNew);
         // validate this invalid dataset
@@ -301,7 +300,7 @@ public class WonMessageValidatorTest {
         // second envelope (additionally to
         // the first envelope)
         Statement stmtNew = env2Model.createStatement(ResourceFactory.createResource(CREATE_ENV1_ENV2_MSG_URI),
-                        WONMSG.HAS_CONTENT_PROPERTY, ResourceFactory.createResource(CREATE_CONTENT_NAME));
+                        WONMSG.content, ResourceFactory.createResource(CREATE_CONTENT_NAME));
         env2Model.add(stmtNew);
         // validate this invalid dataset
         WonMessageValidator validator = new WonMessageValidator();
@@ -315,7 +314,7 @@ public class WonMessageValidatorTest {
         // create invalid dataset by removing a reference to the content from the
         // envelope
         Statement stmtOld = env1Model.createStatement(ResourceFactory.createResource(CREATE_ENV1_ENV2_MSG_URI),
-                        WONMSG.HAS_CONTENT_PROPERTY, ResourceFactory.createResource(CREATE_CONTENT_NAME));
+                        WONMSG.content, ResourceFactory.createResource(CREATE_CONTENT_NAME));
         env1Model.remove(stmtOld);
         // validate this invalid dataset
         valid = validator.validate(invalidDataset, message);
@@ -338,7 +337,7 @@ public class WonMessageValidatorTest {
                         SFSIG.HAS_VERIFICATION_CERT, ResourceFactory.createResource(NODE_LOCAL_URI));
         env1sigModel.remove(stmtOld);
         Statement stmtNew = env1sigModel.createStatement(ResourceFactory.createResource(RESPONSE_LOCAL_ENV1_SIG_NAME),
-                        SFSIG.HAS_VERIFICATION_CERT, ResourceFactory.createResource(NEED_LOCAL_URI));
+                        SFSIG.HAS_VERIFICATION_CERT, ResourceFactory.createResource(ATOM_LOCAL_URI));
         env1sigModel.add(stmtNew);
         WonMessageValidator validator = new WonMessageValidator();
         StringBuilder message = new StringBuilder();
@@ -359,7 +358,7 @@ public class WonMessageValidatorTest {
         Model env1sigModel = invalidDataset.getNamedModel(CREATE_ENV1_SIG_NAME);
         // create invalid dataset by replacing a signer in leaf envelope
         Statement stmtOld = env1sigModel.createStatement(ResourceFactory.createResource(CREATE_ENV1_SIG_NAME),
-                        SFSIG.HAS_VERIFICATION_CERT, ResourceFactory.createResource(NEED_LOCAL_URI));
+                        SFSIG.HAS_VERIFICATION_CERT, ResourceFactory.createResource(ATOM_LOCAL_URI));
         env1sigModel.remove(stmtOld);
         Statement stmtNew = env1sigModel.createStatement(ResourceFactory.createResource(CREATE_ENV1_SIG_NAME),
                         SFSIG.HAS_VERIFICATION_CERT, ResourceFactory.createResource(NODE_LOCAL_URI));
@@ -382,7 +381,7 @@ public class WonMessageValidatorTest {
                         SFSIG.HAS_VERIFICATION_CERT, ResourceFactory.createResource(NODE_LOCAL_URI));
         env2sigModel.remove(stmtOld);
         stmtNew = env2sigModel.createStatement(ResourceFactory.createResource(TEXT_ENV2_SIG_NAME),
-                        SFSIG.HAS_VERIFICATION_CERT, ResourceFactory.createResource(NEED_LOCAL_URI));
+                        SFSIG.HAS_VERIFICATION_CERT, ResourceFactory.createResource(ATOM_LOCAL_URI));
         env2sigModel.add(stmtNew);
         validator = new WonMessageValidator();
         message = new StringBuilder();
@@ -426,7 +425,7 @@ public class WonMessageValidatorTest {
                         SFSIG.HAS_VERIFICATION_CERT, ResourceFactory.createResource(NODE_LOCAL_URI));
         env4sigModel.remove(stmtOld);
         stmtNew = env4sigModel.createStatement(ResourceFactory.createResource(TEXT_ENV4_SIG_NAME),
-                        SFSIG.HAS_VERIFICATION_CERT, ResourceFactory.createResource(NEED_LOCAL_URI));
+                        SFSIG.HAS_VERIFICATION_CERT, ResourceFactory.createResource(ATOM_LOCAL_URI));
         env4sigModel.add(stmtNew);
         validator = new WonMessageValidator();
         message = new StringBuilder();
@@ -457,8 +456,8 @@ public class WonMessageValidatorTest {
         Assert.assertTrue(message.toString().contains("signature_properties"));
         // reset for further testing:
         env1sigModel.add(stmtOld);
-        iter = env1sigModel.listStatements(ResourceFactory.createResource(CREATE_ENV1_SIG_NAME),
-                        WONMSG.HAS_SIGNED_GRAPH_PROPERTY, RdfUtils.EMPTY_RDF_NODE);
+        iter = env1sigModel.listStatements(ResourceFactory.createResource(CREATE_ENV1_SIG_NAME), WONMSG.signedGraph,
+                        RdfUtils.EMPTY_RDF_NODE);
         Statement stmtModified = iter.nextStatement();
         stmtModified.changeObject(ResourceFactory.createResource("test:object:uri"));
         env1sigModel.add(stmtModified);
@@ -507,10 +506,10 @@ public class WonMessageValidatorTest {
                         .copyByDatasetSerialization(new WonMessage(createMessageDataset)).getCompleteDataset();
         Model env2sigModel = invalidDataset.getNamedModel(CREATE_ENV2_SIG_NAME);
         StmtIterator iter = env2sigModel.listStatements(ResourceFactory.createResource(CREATE_ENV2_SIG_NAME),
-                        WONMSG.HAS_SIGNED_GRAPH_PROPERTY, RdfUtils.EMPTY_RDF_NODE);
+                        WONMSG.signedGraph, RdfUtils.EMPTY_RDF_NODE);
         Statement stmtOld = iter.removeNext();
         Statement stmtNew = env2sigModel.createStatement(ResourceFactory.createResource(CREATE_ENV2_SIG_NAME),
-                        WONMSG.HAS_SIGNED_GRAPH_PROPERTY, ResourceFactory.createResource("test:resource:uri"));
+                        WONMSG.signedGraph, ResourceFactory.createResource("test:resource:uri"));
         env2sigModel.add(stmtNew);
         WonMessageValidator validator = new WonMessageValidator();
         StringBuilder message = new StringBuilder();
@@ -534,19 +533,18 @@ public class WonMessageValidatorTest {
         Dataset invalidDataset = WonRdfUtils.MessageUtils
                         .copyByDatasetSerialization(new WonMessage(createMessageDataset)).getCompleteDataset();
         Model env1Model = invalidDataset.getNamedModel(CREATE_ENV1_NAME);
-        StmtIterator iter = env1Model.listStatements(null, WONMSG.HAS_SIGNATURE_GRAPH_PROPERTY,
-                        RdfUtils.EMPTY_RDF_NODE);
+        StmtIterator iter = env1Model.listStatements(null, WONMSG.signatureGraph, RdfUtils.EMPTY_RDF_NODE);
         Statement stmtOld = iter.removeNext();
-        iter = env1Model.listStatements(null, WONMSG.HAS_SIGNED_GRAPH_PROPERTY, RdfUtils.EMPTY_RDF_NODE);
+        iter = env1Model.listStatements(null, WONMSG.signedGraph, RdfUtils.EMPTY_RDF_NODE);
         Statement stmtOld2 = iter.removeNext();
         Statement stmtNew = stmtOld.changeObject(ResourceFactory.createResource(CREATE_ENV1_SIG_NAME));
         env1Model.add(stmtNew);
         Statement stmtNew2 = stmtOld2.changeObject(ResourceFactory.createResource(CREATE_ENV1_NAME));
         env1Model.add(stmtNew2);
         Model env2Model = invalidDataset.getNamedModel(CREATE_ENV2_NAME);
-        iter = env2Model.listStatements(null, WONMSG.HAS_SIGNATURE_GRAPH_PROPERTY, RdfUtils.EMPTY_RDF_NODE);
+        iter = env2Model.listStatements(null, WONMSG.signatureGraph, RdfUtils.EMPTY_RDF_NODE);
         Statement stmtOld3 = iter.removeNext();
-        iter = env2Model.listStatements(null, WONMSG.HAS_SIGNED_GRAPH_PROPERTY, RdfUtils.EMPTY_RDF_NODE);
+        iter = env2Model.listStatements(null, WONMSG.signedGraph, RdfUtils.EMPTY_RDF_NODE);
         Statement stmtOld4 = iter.removeNext();
         Statement stmtNew3 = stmtOld3.changeObject(ResourceFactory.createResource(CREATE_CONTENT_NAME_SIG));
         env2Model.add(stmtNew3);
@@ -587,20 +585,18 @@ public class WonMessageValidatorTest {
         String dummyName = "test:graph:uri";
         invalidDataset.addNamedModel(dummyName, contModel);
         Model env1Model = invalidDataset.getNamedModel(CREATE_ENV1_NAME);
-        StmtIterator iter = env1Model.listStatements(null, WONMSG.HAS_CONTENT_PROPERTY, RdfUtils.EMPTY_RDF_NODE);
+        StmtIterator iter = env1Model.listStatements(null, WONMSG.content, RdfUtils.EMPTY_RDF_NODE);
         Statement stmtOld = iter.removeNext();
         Statement stmtNew = env1Model.createStatement(stmtOld.getSubject(), stmtOld.getPredicate(),
                         ResourceFactory.createResource(dummyName));
         env1Model.add(stmtNew);
-        iter = env1Model.listStatements(null, WONMSG.HAS_SIGNED_GRAPH_PROPERTY,
-                        ResourceFactory.createResource(CREATE_CONTENT_NAME));
+        iter = env1Model.listStatements(null, WONMSG.signedGraph, ResourceFactory.createResource(CREATE_CONTENT_NAME));
         Statement stmtOld2 = iter.removeNext();
         Statement stmtNew2 = env1Model.createStatement(stmtOld2.getSubject(), stmtOld2.getPredicate(),
                         ResourceFactory.createResource(dummyName));
         env1Model.add(stmtNew2);
         Model sigModel = invalidDataset.getNamedModel(CREATE_CONTENT_NAME_SIG);
-        iter = sigModel.listStatements(null, WONMSG.HAS_SIGNED_GRAPH_PROPERTY,
-                        ResourceFactory.createResource(CREATE_CONTENT_NAME));
+        iter = sigModel.listStatements(null, WONMSG.signedGraph, ResourceFactory.createResource(CREATE_CONTENT_NAME));
         Statement stmtOld3 = iter.removeNext();
         Statement stmtNew3 = sigModel.createStatement(stmtOld3.getSubject(), stmtOld3.getPredicate(),
                         ResourceFactory.createResource(dummyName));
@@ -629,8 +625,7 @@ public class WonMessageValidatorTest {
                         .getCompleteDataset();
         Model envModel = invalidDataset.getNamedModel(TEXT_ENV3_NAME);
         String dummyName = TEXT_ENV3_NAME;
-        StmtIterator iter = envModel.listStatements(null, WONMSG.HAS_CORRESPONDING_REMOTE_MESSAGE,
-                        RdfUtils.EMPTY_RDF_NODE);
+        StmtIterator iter = envModel.listStatements(null, WONMSG.correspondingRemoteMessage, RdfUtils.EMPTY_RDF_NODE);
         Statement stmtOld = iter.removeNext();
         Statement stmtNew = envModel.createStatement(stmtOld.getSubject(), stmtOld.getPredicate(),
                         ResourceFactory.createResource(dummyName));

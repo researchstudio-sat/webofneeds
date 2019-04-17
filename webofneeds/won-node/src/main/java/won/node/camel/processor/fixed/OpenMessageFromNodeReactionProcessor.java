@@ -15,28 +15,28 @@ import won.protocol.message.WonMessageDirection;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionState;
-import won.protocol.model.Facet;
+import won.protocol.model.Socket;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
 import won.protocol.vocabulary.WONMSG;
 
 @Component
-@FixedMessageReactionProcessor(direction = WONMSG.TYPE_FROM_EXTERNAL_STRING, messageType = WONMSG.TYPE_OPEN_STRING)
+@FixedMessageReactionProcessor(direction = WONMSG.FromExternalString, messageType = WONMSG.OpenMessageString)
 public class OpenMessageFromNodeReactionProcessor extends AbstractCamelProcessor {
     @Override
     public void process(Exchange exchange) throws Exception {
-        // if the connection's facet isAutoOpen and the connection state is
+        // if the connection's socket isAutoOpen and the connection state is
         // REQUEST_RECEIVED
         Message message = exchange.getIn();
         WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.MESSAGE_HEADER);
-        Optional<URI> needURI = Optional.of(wonMessage.getReceiverNeedURI());
-        Optional<URI> connectionURI = Optional.of(wonMessage.getReceiverURI());
-        if (connectionURI.isPresent() && needURI.isPresent()) {
+        Optional<URI> atomURI = Optional.of(wonMessage.getRecipientAtomURI());
+        Optional<URI> connectionURI = Optional.of(wonMessage.getRecipientURI());
+        if (connectionURI.isPresent() && atomURI.isPresent()) {
             Optional<Connection> con = connectionRepository.findOneByConnectionURIForUpdate(connectionURI.get());
             if (con.isPresent() && con.get().getState() == ConnectionState.REQUEST_RECEIVED) {
-                Facet facet = facetRepository.findOneByFacetURI(con.get().getFacetURI());
-                Optional<URI> remoteFacet = WonLinkedDataUtils.getTypeOfFacet(con.get().getRemoteFacetURI(),
+                Socket socket = socketRepository.findOneBySocketURI(con.get().getSocketURI());
+                Optional<URI> targetSocket = WonLinkedDataUtils.getTypeOfSocket(con.get().getTargetSocketURI(),
                                 linkedDataSource);
-                if (remoteFacet.isPresent() && facetService.isAutoOpen(facet.getTypeURI(), remoteFacet.get())) {
+                if (targetSocket.isPresent() && socketService.isAutoOpen(socket.getTypeURI(), targetSocket.get())) {
                     sendAutoOpenForOpen(wonMessage);
                 }
             }
@@ -44,7 +44,7 @@ public class OpenMessageFromNodeReactionProcessor extends AbstractCamelProcessor
     }
 
     private void sendAutoOpenForOpen(WonMessage connectMessageToReactTo) {
-        URI fromWonNodeURI = connectMessageToReactTo.getReceiverNodeURI();
+        URI fromWonNodeURI = connectMessageToReactTo.getRecipientNodeURI();
         URI messageURI = wonNodeInformationService.generateEventURI(fromWonNodeURI);
         WonMessage msg = WonMessageBuilder
                         .setMessagePropertiesForOpen(messageURI, connectMessageToReactTo,

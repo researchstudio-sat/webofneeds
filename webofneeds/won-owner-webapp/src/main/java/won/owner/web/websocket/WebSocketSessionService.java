@@ -19,29 +19,29 @@ import won.owner.model.User;
 
 public class WebSocketSessionService {
     private WebSocketSessionMapping<Long> userIdToSession = new WebSocketSessionMapping<Long>();
-    private WebSocketSessionMapping<URI> needUriToSession = new WebSocketSessionMapping<URI>();
+    private WebSocketSessionMapping<URI> atomUriToSession = new WebSocketSessionMapping<URI>();
 
     public void addMapping(User user, WebSocketSession session) {
         this.userIdToSession.addMapping(user.getId(), session);
     }
 
-    public void addMapping(URI needUri, WebSocketSession session) {
-        this.needUriToSession.addMapping(needUri, session);
+    public void addMapping(URI atomUri, WebSocketSession session) {
+        this.atomUriToSession.addMapping(atomUri, session);
     }
 
     public void removeMapping(User user, WebSocketSession session) {
         this.userIdToSession.removeMapping(user.getId(), session);
     }
 
-    public void removeMapping(URI needUri, WebSocketSession session) {
-        this.needUriToSession.removeMapping(needUri, session);
+    public void removeMapping(URI atomUri, WebSocketSession session) {
+        this.atomUriToSession.removeMapping(atomUri, session);
     }
 
     public Set<WebSocketSession> getWebSocketSessions(User user) {
         return this.userIdToSession.getWebSocketSessions(user.getId());
     }
 
-    public Set<WebSocketSession> getWebSocketSessions(URI needUri) {
-        return this.needUriToSession.getWebSocketSessions(needUri);
+    public Set<WebSocketSession> getWebSocketSessions(URI atomUri) {
+        return this.atomUriToSession.getWebSocketSessions(atomUri);
     }
 }

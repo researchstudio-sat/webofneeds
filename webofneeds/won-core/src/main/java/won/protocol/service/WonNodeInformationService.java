@@ -78,43 +78,43 @@ public interface WonNodeInformationService {
     public boolean isValidConnectionURI(URI connectionURI, URI wonNodeURI);
 
     /**
-     * Generates a random need URI according to the URI pattern of the default won
+     * Generates a random atom URI according to the URI pattern of the default won
      * node.
      *
      * @return
      */
-    public URI generateNeedURI();
+    public URI generateAtomURI();
 
     /**
-     * Generates a random need URI according to the URI pattern of the specified won
+     * Generates a random atom URI according to the URI pattern of the specified won
      * node.
      *
      * @param wonNodeURI
      * @return
      */
-    public URI generateNeedURI(URI wonNodeURI);
+    public URI generateAtomURI(URI wonNodeURI);
 
     /**
-     * Checks if the passed need URI is matching the won default node pattern
+     * Checks if the passed atom URI is matching the won default node pattern
      * 
-     * @param needURI
+     * @param atomURI
      * @return
      */
-    public boolean isValidNeedURI(URI needURI);
+    public boolean isValidAtomURI(URI atomURI);
 
     /**
-     * Checks if the passed need URI is matching the won node pattern
+     * Checks if the passed atom URI is matching the won node pattern
      * 
-     * @param needURI
+     * @param atomURI
      * @param wonNodeURI
      * @return
      */
-    public boolean isValidNeedURI(URI needURI, URI wonNodeURI);
+    public boolean isValidAtomURI(URI atomURI, URI wonNodeURI);
 
     public URI getDefaultWonNodeURI();
 
     /**
-     * Obtains the won node uri associated with the specified need or connection
+     * Obtains the won node uri associated with the specified atom or connection
      * resource.
      *
      * @param resourceURI

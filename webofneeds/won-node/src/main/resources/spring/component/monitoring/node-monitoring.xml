@@ -28,16 +28,16 @@
 
     <aop:config proxy-target-class="false">
         <!-- name of the class or interface -->
-        <!--aop:advisor advice-ref="monitoringInterceptor" pointcut="execution(* won.node.facet.impl.Facet.*(..))"/-->
+        <!--aop:advisor advice-ref="monitoringInterceptor" pointcut="execution(* won.node.socket.impl.Socket.*(..))"/-->
         <!-- messaging would be nice to monitor but we'd have to extract interfaces for those beans
         aop:advisor advice-ref="monitoringInterceptor"
-        pointcut="execution(* won.node.messaging.NeedProtocolNeedClientImplJMSBased.*(..))"/>
-        <aop:advisor advice-ref="monitoringInterceptor" pointcut="execution(* won.node.messaging.MatcherProtocolNeedServiceImplJMSBased.*(..))"/>
+        pointcut="execution(* won.node.messaging.AtomProtocolAtomClientImplJMSBased.*(..))"/>
+        <aop:advisor advice-ref="monitoringInterceptor" pointcut="execution(* won.node.messaging.MatcherProtocolAtomServiceImplJMSBased.*(..))"/>
         <aop:advisor advice-ref="monitoringInterceptor" pointcut="execution(* won.node.messaging.OwnerProtocolOwnerClientImplJMSBased.*(..))"/>
         <aop:advisor advice-ref="monitoringInterceptor"
-                     pointcut="execution(* won.node.messaging.OwnerProtocolNeedServiceImplJMSBased.*(..))"/-->
-        <aop:advisor advice-ref="monitoringInterceptor" pointcut="execution(* won.node.protocol.impl.NeedProtocolNeedServiceImpl.*(..))"/>
-        <aop:advisor advice-ref="monitoringInterceptor" pointcut="execution(* won.node.protocol.impl.OwnerProtocolNeedServiceImpl.*(..))"/>
+                     pointcut="execution(* won.node.messaging.OwnerProtocolAtomServiceImplJMSBased.*(..))"/-->
+        <aop:advisor advice-ref="monitoringInterceptor" pointcut="execution(* won.node.protocol.impl.AtomProtocolAtomServiceImpl.*(..))"/>
+        <aop:advisor advice-ref="monitoringInterceptor" pointcut="execution(* won.node.protocol.impl.OwnerProtocolAtomServiceImpl.*(..))"/>
         <aop:advisor advice-ref="monitoringInterceptor" pointcut="execution(* won.node.service.impl.DataAccessServiceImpl.*(..))"/>
         <aop:advisor advice-ref="monitoringInterceptor" pointcut="execution(* won.node.service.impl.LinkedDataServiceImpl.*(..))"/>
         <aop:advisor advice-ref="monitoringInterceptor"

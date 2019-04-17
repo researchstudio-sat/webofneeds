@@ -1,10 +1,10 @@
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-PREFIX msg: <http://purl.org/webofneeds/message#>
-PREFIX won: <http://purl.org/webofneeds/model#>
-PREFIX agr: <http://purl.org/webofneeds/agreement#>
-PREFIX mod: <http://purl.org/webofneeds/modification#> 
+PREFIX msg: <https://w3id.org/won/message#>
+PREFIX won: <https://w3id.org/won/core#>
+PREFIX agr: <https://w3id.org/won/agreement#>
+PREFIX mod: <https://w3id.org/won/modification#> 
 
-SELECT distinct ?msg ?direction ?msgType ?senderNeed ?retracts ?accepts ?proposes ?proposesToCancel ?rejects ?previous ?correspondingRemoteMessage ?isResponseTo ?isRemoteResponseTo ?contentGraph WHERE 
+SELECT distinct ?msg ?direction ?msgType ?senderAtom ?retracts ?accepts ?proposes ?proposesToCancel ?rejects ?previous ?correspondingRemoteMessage ?isResponseTo ?isRemoteResponseTo ?contentGraph WHERE 
 {
     GRAPH <urn:x-arq:UnionGraph> 
     {
@@ -18,13 +18,13 @@ SELECT distinct ?msg ?direction ?msgType ?senderNeed ?retracts ?accepts ?propose
         ?msg a msg:FromSystem.
         bind(msg:FromSystem as ?direction)
        } OPTIONAL {
-        ?msg msg:hasPreviousMessage ?previous.
+        ?msg msg:previousMessage ?previous.
        } OPTIONAL {
         ?msg msg:isResponseTo ?isResponseTo.
        } OPTIONAL {
         ?msg msg:isRemoteResponseTo ?isRemoteResponseTo.
        } OPTIONAL {
-        ?msg msg:hasCorrespondingRemoteMessage ?correspondingRemoteMessage.
+        ?msg msg:correspondingRemoteMessage ?correspondingRemoteMessage.
        } OPTIONAL {
         ?msg agr:proposes ?proposes.
        } OPTIONAL {
@@ -36,11 +36,11 @@ SELECT distinct ?msg ?direction ?msgType ?senderNeed ?retracts ?accepts ?propose
        } OPTIONAL {
         ?msg mod:retracts ?retracts.
        } OPTIONAL {
-        ?msg msg:hasSenderNeed ?senderNeed.
+        ?msg msg:senderAtom ?senderAtom.
        } OPTIONAL {
-        ?msg msg:hasMessageType ?msgType.
+        ?msg msg:messageType ?msgType.
        } OPTIONAL {
-        ?msg msg:hasContent ?contentGraph.
+        ?msg msg:content ?contentGraph.
        }
     }  
 }

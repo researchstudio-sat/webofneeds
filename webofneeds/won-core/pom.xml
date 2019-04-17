@@ -123,13 +123,13 @@
         </dependency>
         <dependency>
             <!-- required for hibernate, which has it in test/provided scopes 
-                but needs it in our application -->
+                but atoms it in our application -->
             <groupId>org.jboss</groupId>
             <artifactId>jandex</artifactId>
         </dependency>
         <dependency>
             <!-- required for hibernate, which has it in test/provided scopes 
-                but needs it in our application -->
+                but atoms it in our application -->
             <groupId>com.fasterxml</groupId>
             <artifactId>classmate</artifactId>
         </dependency>

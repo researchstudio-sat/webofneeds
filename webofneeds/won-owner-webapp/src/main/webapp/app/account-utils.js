@@ -100,14 +100,14 @@ export function isTermsOfServiceAccepted(accountState) {
 }
 
 /**
- * Returns true if the given needUri is owned by the loggedIn account
+ * Returns true if the given atomUri is owned by the loggedIn account
  * @param accountState
- * @param needUri
+ * @param atomUri
  * @returns {*|boolean|boolean}
  */
-export function isNeedOwned(accountState, needUri) {
+export function isAtomOwned(accountState, atomUri) {
   return (
     isLoggedIn(accountState) &&
-    !!getIn(accountState, ["ownedNeedUris", needUri])
+    !!getIn(accountState, ["ownedAtomUris", atomUri])
   );
 }

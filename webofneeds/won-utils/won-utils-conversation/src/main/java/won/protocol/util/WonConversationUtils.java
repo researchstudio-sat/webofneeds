@@ -34,56 +34,56 @@ public class WonConversationUtils {
         return AgreementProtocolState.of(conversationDataset).getNthLatestMessage(predicate, n);
     }
 
-    public static URI getLatestMessageOfNeed(Dataset conversationDataset, URI senderNeed) {
-        return AgreementProtocolState.of(conversationDataset).getLatestMessageSentByNeed(senderNeed);
+    public static URI getLatestMessageOfAtom(Dataset conversationDataset, URI senderAtom) {
+        return AgreementProtocolState.of(conversationDataset).getLatestMessageSentByAtom(senderAtom);
     }
 
-    public static URI getNthLatestMessageOfNeed(Dataset conversationDataset, URI senderNeed, int n) {
-        return AgreementProtocolState.of(conversationDataset).getNthLatestMessageSentByNeed(senderNeed, n);
+    public static URI getNthLatestMessageOfAtom(Dataset conversationDataset, URI senderAtom, int n) {
+        return AgreementProtocolState.of(conversationDataset).getNthLatestMessageSentByAtom(senderAtom, n);
     }
 
-    public static URI getLatestAcceptsMessageOfNeed(Dataset conversationDataset, URI senderNeed) {
-        return AgreementProtocolState.of(conversationDataset).getLatestAcceptsMessageSentByNeed(senderNeed);
+    public static URI getLatestAcceptsMessageOfAtom(Dataset conversationDataset, URI senderAtom) {
+        return AgreementProtocolState.of(conversationDataset).getLatestAcceptsMessageSentByAtom(senderAtom);
     }
 
     public static URI getLatestAcceptsMessage(Dataset conversationDataset) {
         return AgreementProtocolState.of(conversationDataset).getLatestAcceptsMessage();
     }
 
-    public static URI getLatestRetractsMessageOfNeed(Dataset conversationDataset, URI senderNeed) {
-        return AgreementProtocolState.of(conversationDataset).getLatestRetractsMessageSentByNeed(senderNeed);
+    public static URI getLatestRetractsMessageOfAtom(Dataset conversationDataset, URI senderAtom) {
+        return AgreementProtocolState.of(conversationDataset).getLatestRetractsMessageSentByAtom(senderAtom);
     }
 
-    public static URI getLatestProposesMessageOfNeed(Dataset conversationDataset, URI senderNeed) {
-        return AgreementProtocolState.of(conversationDataset).getLatestProposesMessageSentByNeed(senderNeed);
+    public static URI getLatestProposesMessageOfAtom(Dataset conversationDataset, URI senderAtom) {
+        return AgreementProtocolState.of(conversationDataset).getLatestProposesMessageSentByAtom(senderAtom);
     }
 
-    public static URI getLatestProposesToCancelMessageOfNeed(Dataset conversationDataset, URI senderNeed) {
-        return AgreementProtocolState.of(conversationDataset).getLatestProposesToCancelMessageSentByNeed(senderNeed);
+    public static URI getLatestProposesToCancelMessageOfAtom(Dataset conversationDataset, URI senderAtom) {
+        return AgreementProtocolState.of(conversationDataset).getLatestProposesToCancelMessageSentByAtom(senderAtom);
     }
 
-    public static URI getLatestRejectsMessageOfNeed(Dataset conversationDataset, URI senderNeed, int n) {
-        return AgreementProtocolState.of(conversationDataset).getLatestRejectsMessageSentByNeed(senderNeed);
+    public static URI getLatestRejectsMessageOfAtom(Dataset conversationDataset, URI senderAtom, int n) {
+        return AgreementProtocolState.of(conversationDataset).getLatestRejectsMessageSentByAtom(senderAtom);
     }
 
     public static AgreementProtocolState getAgreementProtocolState(URI connectionUri,
                     LinkedDataSource linkedDataSource) {
-        URI needUri = WonLinkedDataUtils.getNeedURIforConnectionURI(connectionUri, linkedDataSource);
+        URI atomUri = WonLinkedDataUtils.getAtomURIforConnectionURI(connectionUri, linkedDataSource);
         // allow each resource to be re-crawled once for each reason
         Set<URI> recrawledForIncompleteness = new HashSet<>();
         Set<URI> recrawledForFailedFetch = new HashSet<>();
         while (true) {
             // we leave the loop either with a runtime exception or with the result
             try {
-                Dataset conversationDataset = WonLinkedDataUtils.getConversationAndNeedsDataset(connectionUri,
+                Dataset conversationDataset = WonLinkedDataUtils.getConversationAndAtomsDataset(connectionUri,
                                 linkedDataSource);
                 return AgreementProtocolState.of(conversationDataset);
             } catch (IncompleteConversationDataException e) {
                 // we may have tried to crawl a conversation dataset of which messages
                 // were still in-flight. we allow one re-crawl attempt per exception before
                 // we throw the exception on:
-                refreshDataForConnection(connectionUri, needUri, linkedDataSource);
-                if (!recrawl(recrawledForIncompleteness, connectionUri, needUri, linkedDataSource,
+                refreshDataForConnection(connectionUri, atomUri, linkedDataSource);
+                if (!recrawl(recrawledForIncompleteness, connectionUri, atomUri, linkedDataSource,
                                 e.getMissingMessageUri(), e.getReferringMessageUri())) {
                     throw e;
                 }
@@ -91,15 +91,15 @@ public class WonConversationUtils {
                 // we may have tried to crawl a conversation dataset of which messages
                 // were still in-flight. we allow one re-crawl attempt per exception before
                 // we throw the exception on:
-                refreshDataForConnection(connectionUri, needUri, linkedDataSource);
-                if (!recrawl(recrawledForFailedFetch, connectionUri, needUri, linkedDataSource, e.getResourceUri())) {
+                refreshDataForConnection(connectionUri, atomUri, linkedDataSource);
+                if (!recrawl(recrawledForFailedFetch, connectionUri, atomUri, linkedDataSource, e.getResourceUri())) {
                     throw e;
                 }
             }
         }
     }
 
-    private static void refreshDataForConnection(URI connectionUri, URI needUri, LinkedDataSource linkedDataSource) {
+    private static void refreshDataForConnection(URI connectionUri, URI atomUri, LinkedDataSource linkedDataSource) {
         // we may have tried to crawl a conversation dataset of which messages
         // were still in-flight. we allow one re-crawl attempt per exception before
         // we throw the exception on:
@@ -109,22 +109,22 @@ public class WonConversationUtils {
         if (connectionUri == null) {
             return;
         }
-        invalidate(connectionUri, needUri, linkedDataSource);
-        URI connectionEventContainerUri = WonLinkedDataUtils.getEventContainerURIforConnectionURI(connectionUri,
+        invalidate(connectionUri, atomUri, linkedDataSource);
+        URI connectionMessageContainerUri = WonLinkedDataUtils.getMessageContainerURIforConnectionURI(connectionUri,
                         linkedDataSource);
-        invalidate(connectionEventContainerUri, needUri, linkedDataSource);
-        URI remoteConnectionUri = WonLinkedDataUtils.getRemoteConnectionURIforConnectionURI(connectionUri,
+        invalidate(connectionMessageContainerUri, atomUri, linkedDataSource);
+        URI targetConnectionUri = WonLinkedDataUtils.getTargetConnectionURIforConnectionURI(connectionUri,
                         linkedDataSource);
-        if (remoteConnectionUri == null) {
+        if (targetConnectionUri == null) {
             return;
         }
-        invalidate(remoteConnectionUri, needUri, linkedDataSource);
-        URI remoteConnectionEventContainerUri = WonLinkedDataUtils
-                        .getEventContainerURIforConnectionURI(remoteConnectionUri, linkedDataSource);
-        invalidate(remoteConnectionEventContainerUri, needUri, linkedDataSource);
+        invalidate(targetConnectionUri, atomUri, linkedDataSource);
+        URI targetConnectionMessageContainerUri = WonLinkedDataUtils
+                        .getMessageContainerURIforConnectionURI(targetConnectionUri, linkedDataSource);
+        invalidate(targetConnectionMessageContainerUri, atomUri, linkedDataSource);
     }
 
-    private static boolean recrawl(Set<URI> recrawled, URI connectionUri, URI needUri,
+    private static boolean recrawl(Set<URI> recrawled, URI connectionUri, URI atomUri,
                     LinkedDataSource linkedDataSource, URI... uris) {
         Set<URI> urisToCrawl = new HashSet<URI>();
         Arrays.stream(uris).filter(x -> !recrawled.contains(x)).forEach(urisToCrawl::add);
@@ -139,7 +139,7 @@ public class WonConversationUtils {
         }
         if (linkedDataSource instanceof CachingLinkedDataSource) {
             urisToCrawl.stream().forEach(uri -> {
-                invalidate(uri, needUri, linkedDataSource);
+                invalidate(uri, atomUri, linkedDataSource);
             });
         }
         recrawled.addAll(urisToCrawl);

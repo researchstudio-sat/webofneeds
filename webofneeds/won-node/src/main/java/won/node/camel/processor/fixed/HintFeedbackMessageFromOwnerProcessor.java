@@ -31,7 +31,7 @@ import won.protocol.vocabulary.WONMSG;
  * User: syim Date: 02.03.2015
  */
 @Component
-@FixedMessageProcessor(direction = WONMSG.TYPE_FROM_OWNER_STRING, messageType = WONMSG.TYPE_HINT_FEEDBACK_STRING)
+@FixedMessageProcessor(direction = WONMSG.FromOwnerString, messageType = WONMSG.HintFeedbackMessageString)
 public class HintFeedbackMessageFromOwnerProcessor extends AbstractCamelProcessor {
     public void process(final Exchange exchange) throws Exception {
         Message message = exchange.getIn();
@@ -54,7 +54,7 @@ public class HintFeedbackMessageFromOwnerProcessor extends AbstractCamelProcesso
         final URI messageURI = message.getMessageURI();
         RdfUtils.visit(message.getMessageContent(), model -> {
             Resource baseResource = model.getResource(messageURI.toString());
-            if (baseResource.hasProperty(WON.HAS_FEEDBACK)) {
+            if (baseResource.hasProperty(WON.feedback)) {
                 // add the base resource as a feedback event to the connection
                 processFeedback(con, baseResource);
             }

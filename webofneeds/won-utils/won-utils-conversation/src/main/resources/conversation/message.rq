@@ -1,23 +1,23 @@
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-PREFIX msg: <http://purl.org/webofneeds/message#>
-PREFIX won: <http://purl.org/webofneeds/model#>
-PREFIX agr: <http://purl.org/webofneeds/agreement#>
-PREFIX mod: <http://purl.org/webofneeds/modification#> 
+PREFIX msg: <https://w3id.org/won/message#>
+PREFIX won: <https://w3id.org/won/core#>
+PREFIX agr: <https://w3id.org/won/agreement#>
+PREFIX mod: <https://w3id.org/won/modification#> 
 
 SELECT distinct 
-?msg ?msgType ?text ?senderNeed ?sender ?inEventContainerOf ?retracts ?accepts ?proposes ?accepts ?proposesToCancel 
+?msg ?msgType ?text ?senderAtom ?sender ?inMessageContainerOf ?retracts ?accepts ?proposes ?accepts ?proposesToCancel 
 WHERE 
 {
    GRAPH <urn:x-arq:UnionGraph> {
-     ?msg msg:hasMessageType ?msgType.
-     ?msg msg:hasSenderNeed ?senderNeed.
-     ?inEventContainerOf won:hasEventContainer/rdfs:member ?msg.
+     ?msg msg:messageType ?msgType.
+     ?msg msg:senderAtom ?senderAtom.
+     ?inMessageContainerOf won:messageContainer/rdfs:member ?msg.
      OPTIONAL {
-      ?msg msg:hasSender ?sender.
+      ?msg msg:sender ?sender.
      }
      filter( (! bound(?senderConnection) )|| ?senderConnection = ?sender)  
      OPTIONAL {
-      ?msg (msg:hasCorrespondingRemoteMessage|msg:hasForwardedMessage)*/won:hasTextMessage ?text.
+      ?msg (msg:correspondingRemoteMessage|msg:forwardedMessage)*/won:textMessage ?text.
      }
      OPTIONAL {
       ?msg agr:proposes ?proposes.

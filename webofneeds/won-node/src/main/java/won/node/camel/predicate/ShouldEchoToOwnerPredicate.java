@@ -21,7 +21,7 @@ import won.protocol.message.processor.camel.WonCamelConstants;
 /**
  * True if the WonMessage in the wonOriginalMessage header meets the criteria
  * for echoing it to the owner: - sent FROM_SYSTEM or FROM_OWNER - if it is a
- * response, it is not directed at the remote need
+ * response, it is not directed at the remote atom
  */
 public class ShouldEchoToOwnerPredicate implements Predicate {
     @Override
@@ -33,9 +33,9 @@ public class ShouldEchoToOwnerPredicate implements Predicate {
             return false;
         if ((message.getMessageType() == WonMessageType.SUCCESS_RESPONSE
                         || message.getMessageType() == WonMessageType.FAILURE_RESPONSE)
-                        && (message.getSenderNeedURI() != null
-                                        && !message.getSenderNeedURI().equals(message.getReceiverNeedURI()))) {
-            // responses directed at remote needs are not to be echoed to the owner
+                        && (message.getSenderAtomURI() != null
+                                        && !message.getSenderAtomURI().equals(message.getRecipientAtomURI()))) {
+            // responses directed at remote atoms are not to be echoed to the owner
             return false;
         }
         return true;

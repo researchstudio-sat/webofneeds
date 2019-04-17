@@ -25,7 +25,7 @@ public class SolrMatcherConfig {
     @Value("${matcher.solr.query.maxHintsForCounterparts}")
     private int maxHintsForCounterparts;
     @Value("${matcher.solr.index.commit}")
-    private boolean commitIndexedNeedImmediately;
+    private boolean commitIndexedAtomImmediately;
     @Value("${matcher.solr.query.score.threshold}")
     private float scoreThreshold;
     @Value("${matcher.solr.query.cutAfterIthElbowInScore}")
@@ -49,8 +49,8 @@ public class SolrMatcherConfig {
         return maxHintsForCounterparts;
     }
 
-    public boolean isCommitIndexedNeedImmediately() {
-        return commitIndexedNeedImmediately;
+    public boolean isCommitIndexedAtomImmediately() {
+        return commitIndexedAtomImmediately;
     }
 
     public String getSolrServerPublicUri() {

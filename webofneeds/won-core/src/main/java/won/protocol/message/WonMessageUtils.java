@@ -31,17 +31,17 @@ public class WonMessageUtils {
     }
 
     /**
-     * Returns the need that this message belongs to.
+     * Returns the atom that this message belongs to.
      * 
      * @param message
      * @return
      */
-    public static URI getParentNeedUri(final WonMessage message) {
+    public static URI getParentAtomUri(final WonMessage message) {
         WonMessageDirection direction = message.getEnvelopeType();
         if (direction == WonMessageDirection.FROM_EXTERNAL) {
-            return message.getReceiverNeedURI();
+            return message.getRecipientAtomURI();
         } else if (direction == WonMessageDirection.FROM_OWNER || direction == WonMessageDirection.FROM_SYSTEM) {
-            return message.getSenderNeedURI();
+            return message.getSenderAtomURI();
         } else {
             throw new IllegalArgumentException("Unexpected message direction: " + direction);
         }
@@ -51,7 +51,7 @@ public class WonMessageUtils {
         URI parentURI;
         parentURI = message.getSenderURI();
         if (parentURI == null) {
-            parentURI = message.getSenderNeedURI();
+            parentURI = message.getSenderAtomURI();
         }
         if (parentURI == null) {
             parentURI = message.getSenderNodeURI();
@@ -61,12 +61,12 @@ public class WonMessageUtils {
 
     private static URI getParentUriFromReceiverProperties(WonMessage message) {
         URI parentURI;
-        parentURI = message.getReceiverURI();
+        parentURI = message.getRecipientURI();
         if (parentURI == null) {
-            parentURI = message.getReceiverNeedURI();
+            parentURI = message.getRecipientAtomURI();
         }
         if (parentURI == null) {
-            parentURI = message.getReceiverNodeURI();
+            parentURI = message.getRecipientNodeURI();
         }
         return parentURI;
     }

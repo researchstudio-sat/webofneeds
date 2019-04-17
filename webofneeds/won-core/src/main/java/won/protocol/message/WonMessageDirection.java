@@ -10,7 +10,7 @@ import won.protocol.vocabulary.WONMSG;
  * User: syim Date: 17.02.2015
  */
 public enum WonMessageDirection {
-    FROM_OWNER(WONMSG.TYPE_FROM_OWNER), FROM_SYSTEM(WONMSG.TYPE_FROM_SYSTEM), FROM_EXTERNAL(WONMSG.TYPE_FROM_EXTERNAL);
+    FROM_OWNER(WONMSG.FromOwner), FROM_SYSTEM(WONMSG.FromSystem), FROM_EXTERNAL(WONMSG.FromExternal);
     private Resource resource;
 
     private WonMessageDirection(Resource resource) {
@@ -32,11 +32,11 @@ public enum WonMessageDirection {
     }
 
     public static WonMessageDirection getWonMessageDirection(Resource resource) {
-        if (WONMSG.TYPE_FROM_OWNER.equals(resource))
+        if (WONMSG.FromOwner.equals(resource))
             return FROM_OWNER;
-        if (WONMSG.TYPE_FROM_SYSTEM.equals(resource))
+        if (WONMSG.FromSystem.equals(resource))
             return FROM_SYSTEM;
-        if (WONMSG.TYPE_FROM_EXTERNAL.equals(resource))
+        if (WONMSG.FromExternal.equals(resource))
             return FROM_EXTERNAL;
         return null;
     }

@@ -47,14 +47,14 @@ public class CrawlAction extends BaseEventBotAction {
         Dataset crawledData = null;
         try {
             crawledData = ctx.getLinkedDataSource().getDataForResourceWithPropertyPath(crawlCommandEvent.getStartURI(),
-                            crawlCommandEvent.getNeedURI(), crawlCommandEvent.getPropertyPaths(),
+                            crawlCommandEvent.getAtomURI(), crawlCommandEvent.getPropertyPaths(),
                             crawlCommandEvent.getGetMaxRequest(), crawlCommandEvent.getMaxDepth());
         } catch (Exception e) {
             logger.debug("caught exeption during crawl for {}", crawlCommandEvent.getStartURI(), e);
             ctx.getEventBus()
                             .publish(new CrawlCommandFailureEvent(crawlCommandEvent,
                                             "Could not crawl " + crawlCommandEvent.getStartURI() + " with WebID "
-                                                            + crawlCommandEvent.getNeedURI() + ": caught " + e));
+                                                            + crawlCommandEvent.getAtomURI() + ": caught " + e));
             return;
         }
         stopWatch.stop();

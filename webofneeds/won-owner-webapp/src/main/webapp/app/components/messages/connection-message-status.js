@@ -5,7 +5,7 @@ import { relativeTime } from "../../won-label-utils.js";
 import { connect2Redux } from "../../won-utils.js";
 import { attach, getIn } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
-import { getOwnedNeedByConnectionUri } from "../../selectors/general-selectors.js";
+import { getOwnedAtomByConnectionUri } from "../../selectors/general-selectors.js";
 
 import "style/_connection-message-status.scss";
 
@@ -42,11 +42,11 @@ function genComponentConf() {
       this.relativeTime = relativeTime;
 
       const selectFromState = state => {
-        const ownedNeed =
+        const ownedAtom =
           this.connectionUri &&
-          getOwnedNeedByConnectionUri(state, this.connectionUri);
+          getOwnedAtomByConnectionUri(state, this.connectionUri);
         const connection =
-          ownedNeed && ownedNeed.getIn(["connections", this.connectionUri]);
+          ownedAtom && ownedAtom.getIn(["connections", this.connectionUri]);
         const message =
           connection && this.messageUri
             ? getIn(connection, ["messages", this.messageUri])

@@ -19,25 +19,25 @@ import won.protocol.util.RdfUtils;
  * Created by ypanchenko on 23.03.2015.
  */
 public class WonAssemblerTest {
-    private static final String RESOURCE_FILE = "/won-signed-messages/create-need-msg.trig";
-    private static final String NEED_CORE_DATA_URI = "http://localhost:8080/won/resource/need/3144709509622353000/core/#data";
-    private static final String NEED_CORE_DATA_SIG_URI = "http://localhost:8080/won/resource/need/3144709509622353000/core/#data-sig";
+    private static final String RESOURCE_FILE = "/won-signed-messages/create-atom-msg.trig";
+    private static final String ATOM_CORE_DATA_URI = "http://localhost:8080/won/resource/atom/3144709509622353000/core/#data";
+    private static final String ATOM_CORE_DATA_SIG_URI = "http://localhost:8080/won/resource/atom/3144709509622353000/core/#data-sig";
 
     @Test
     public void testAssembleOneGraphSignature() throws Exception {
         // The Signingframework reader cannot reproduce the correct graph
         // structure, it has problems with blank nodes [] parts.
         // GraphCollection gc = TriGPlusReader.readFile(inFile);
-        // create dataset that contains need core data graph
+        // create dataset that contains atom core data graph
         Dataset testDataset = TestSigningUtils.prepareTestDatasetFromNamedGraphs(RESOURCE_FILE,
-                        new String[] { NEED_CORE_DATA_URI });
+                        new String[] { ATOM_CORE_DATA_URI });
         // convert to graph collection
-        GraphCollection gc = ModelConverter.modelToGraphCollection(NEED_CORE_DATA_URI, testDataset);
+        GraphCollection gc = ModelConverter.modelToGraphCollection(ATOM_CORE_DATA_URI, testDataset);
         // create mock signature
         SignatureData mockSigData = createMockSignature();
         gc.setSignature(mockSigData);
         // test assemble()
-        WonAssembler.assemble(gc, testDataset, NEED_CORE_DATA_SIG_URI);
+        WonAssembler.assemble(gc, testDataset, ATOM_CORE_DATA_SIG_URI);
         // use for debugging output
         // TestSigningUtils.writeToTempFile(testDataset);
         // extract names of the named graphs
@@ -46,18 +46,18 @@ public class WonAssemblerTest {
         Assert.assertEquals("should be one named graph with data and one named graph with signature", 2,
                         namesList.size());
         Assert.assertTrue("should be some triples in signature graph",
-                        testDataset.getNamedModel(NEED_CORE_DATA_SIG_URI).listStatements().hasNext());
+                        testDataset.getNamedModel(ATOM_CORE_DATA_SIG_URI).listStatements().hasNext());
         Assert.assertTrue("should be no triples in default graph",
                         !testDataset.getDefaultModel().listStatements().hasNext());
         int triplesCounter = TestSigningUtils
-                        .countTriples(testDataset.getNamedModel(NEED_CORE_DATA_SIG_URI).listStatements());
-        Set<String> subjs = TestSigningUtils.getSubjects(testDataset.getNamedModel(NEED_CORE_DATA_SIG_URI));
-        Set<String> objs = TestSigningUtils.getUriResourceObjects(testDataset.getNamedModel(NEED_CORE_DATA_SIG_URI));
+                        .countTriples(testDataset.getNamedModel(ATOM_CORE_DATA_SIG_URI).listStatements());
+        Set<String> subjs = TestSigningUtils.getSubjects(testDataset.getNamedModel(ATOM_CORE_DATA_SIG_URI));
+        Set<String> objs = TestSigningUtils.getUriResourceObjects(testDataset.getNamedModel(ATOM_CORE_DATA_SIG_URI));
         Assert.assertEquals("signature graph should contain 11 triples", 11, triplesCounter);
         Assert.assertTrue("signed graph name should be an object in signature triples",
-                        objs.contains(NEED_CORE_DATA_URI));
+                        objs.contains(ATOM_CORE_DATA_URI));
         Assert.assertTrue("signature graph name should be a subject in signature triples",
-                        subjs.contains(NEED_CORE_DATA_SIG_URI));
+                        subjs.contains(ATOM_CORE_DATA_SIG_URI));
     }
 
     private SignatureData createMockSignature() throws NoSuchAlgorithmException {

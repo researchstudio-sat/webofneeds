@@ -12,17 +12,17 @@ package won.bot.framework.eventbot.event.impl.validate;
 
 import java.net.URI;
 
-import won.bot.framework.eventbot.event.BaseNeedSpecificEvent;
+import won.bot.framework.eventbot.event.BaseAtomSpecificEvent;
 import won.bot.framework.eventbot.event.impl.cmd.CommandEvent;
 
 /**
  * Initiates the validation of the data of a given connection.
  */
-public class ValidateConnectionCommandEvent extends BaseNeedSpecificEvent implements CommandEvent {
+public class ValidateConnectionCommandEvent extends BaseAtomSpecificEvent implements CommandEvent {
     private URI connectionURI;
 
-    public ValidateConnectionCommandEvent(URI needURI, URI connectionURI) {
-        super(needURI);
+    public ValidateConnectionCommandEvent(URI atomURI, URI connectionURI) {
+        super(atomURI);
         this.connectionURI = connectionURI;
     }
 

@@ -101,7 +101,7 @@ update msg { model, props } =
                             ( AddingPersona id
                             , Persona.connect
                                 { persona = persona
-                                , needUrl = props.postUri
+                                , atomUrl = props.postUri
                                 }
                             )
 

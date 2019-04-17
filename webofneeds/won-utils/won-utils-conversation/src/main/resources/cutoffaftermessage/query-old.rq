@@ -1,36 +1,36 @@
-PREFIX mod: <http://purl.org/webofneeds/modification#>
-PREFIX agr: <http://purl.org/webofneeds/agreement#>
+PREFIX mod: <https://w3id.org/won/modification#>
+PREFIX agr: <https://w3id.org/won/agreement#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-PREFIX msg: <http://purl.org/webofneeds/message#>
-PREFIX won: <http://purl.org/webofneeds/model#>
+PREFIX msg: <https://w3id.org/won/message#>
+PREFIX won: <https://w3id.org/won/core#>
 
-### template that needs to be extended from messages to message containing graphs....
-### I need something like this....
+### template that atoms to be extended from messages to message containing graphs....
+### I atom something like this....
 ###  SELECT ?g ?s ?p ?o WHERE {
 SELECT distinct ?first ?msg ?distance ?text ?msgType ?time ?rem WHERE {
  {
    SELECT distinct ?first ?msg (count (?mid) as ?distance) WHERE {
    
-   ## I need to the use this query to construct graph content like the agreement query ...
+   ## I atom to the use this query to construct graph content like the agreement query ...
     GRAPH <urn:x-arq:UnionGraph> {
-       ?terminatinggraph msg:hasPreviousMessage* ?msg .
-       ?msg msg:hasPreviousMessage* ?mid .
-        ?mid msg:hasPreviousMessage+ ?first .
+       ?terminatinggraph msg:previousMessage* ?msg .
+       ?msg msg:previousMessage* ?mid .
+        ?mid msg:previousMessage+ ?first .
     }
      
-     FILTER NOT EXISTS {?first msg:hasPreviousMessage ?none}  
+     FILTER NOT EXISTS {?first msg:previousMessage ?none}  
    }
    GROUP BY ?msg ?first 
  }
  OPTIONAL {
-   ?msg won:hasTextMessage ?text.
-   ?msg msg:hasMessageType ?msgType.
+   ?msg won:textMessage ?text.
+   ?msg msg:messageType ?msgType.
  }
  OPTIONAL {
-    ?msg msg:hasCorrespondingRemoteMessage ?rem . 
-   ?rem won:hasTextMessage ?text.
-   ?rem msg:hasMessageType ?msgType.
+    ?msg msg:correspondingRemoteMessage ?rem . 
+   ?rem won:textMessage ?text.
+   ?rem msg:messageType ?msgType.
  }
- ?msg msg:hasReceivedTimestamp ?time.  
+ ?msg msg:receivedTimestamp ?time.  
 } ORDER BY ?first ?distance ?time
 }

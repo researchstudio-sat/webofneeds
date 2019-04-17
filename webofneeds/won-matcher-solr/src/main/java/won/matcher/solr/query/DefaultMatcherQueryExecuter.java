@@ -37,7 +37,7 @@ public class DefaultMatcherQueryExecuter implements SolrMatcherQueryExecutor {
     }
 
     @Override
-    public SolrDocumentList executeNeedQuery(String queryString, int maxHints, SolrParams params,
+    public SolrDocumentList executeAtomQuery(String queryString, int maxHints, SolrParams params,
                     String... filterQueries) throws IOException, SolrServerException {
         if (queryString == null) {
             log.debug("query string is null, do execute any query!");

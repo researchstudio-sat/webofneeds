@@ -20,7 +20,7 @@ import akka.cluster.pubsub.DistributedPubSub;
 import akka.cluster.pubsub.DistributedPubSubMediator;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
-import won.matcher.service.common.event.NeedEvent;
+import won.matcher.service.common.event.AtomEvent;
 import won.matcher.service.common.service.sparql.SparqlService;
 import won.matcher.service.crawler.config.CrawlConfig;
 import won.matcher.service.crawler.exception.CrawlWrapperException;
@@ -28,9 +28,9 @@ import won.matcher.service.crawler.msg.CrawlUriMessage;
 import won.matcher.service.crawler.msg.ResourceCrawlUriMessage;
 import won.matcher.service.crawler.service.CrawlSparqlService;
 import won.protocol.exception.IncorrectPropertyCountException;
-import won.protocol.model.NeedState;
+import won.protocol.model.AtomState;
 import won.protocol.rest.DatasetResponseWithStatusCodeAndHeaders;
-import won.protocol.util.NeedModelWrapper;
+import won.protocol.util.AtomModelWrapper;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.linkeddata.LinkedDataSourceBase;
 import won.protocol.vocabulary.WON;
@@ -62,7 +62,7 @@ public class WorkerCrawlerActor extends UntypedActor {
 
     @Override
     public void preStart() {
-        // initialize the distributed event bus to send need events to the matchers
+        // initialize the distributed event bus to send atom events to the matchers
         pubSubMediator = DistributedPubSub.get(getContext().system()).mediator();
     }
 
@@ -156,19 +156,20 @@ public class WorkerCrawlerActor extends UntypedActor {
             }
             // signal sender that this URI is processed and save meta data about crawling
             // the URI.
-            // This needs to be done after all extracted URI messages have been sent to
+            // This atoms to be done after all extracted URI messages have been sent to
             // guarantee consistency
             // in case of failure
             sendDoneUriMessage(uriMsg, wonNodeUri, etags);
-            // if this URI/dataset was a need then send an event to the distributed event bu
-            if (NeedModelWrapper.isANeed(ds)) {
-                NeedModelWrapper needModelWrapper = new NeedModelWrapper(ds, false);
-                NeedState state = needModelWrapper.getNeedState();
-                NeedEvent.TYPE type = state.equals(NeedState.ACTIVE) ? NeedEvent.TYPE.ACTIVE : NeedEvent.TYPE.INACTIVE;
-                log.debug("Created need event for need uri {}", uriMsg.getUri());
+            // if this URI/dataset was an atom then send an event to the distributed event
+            // bu
+            if (AtomModelWrapper.isAAtom(ds)) {
+                AtomModelWrapper atomModelWrapper = new AtomModelWrapper(ds, false);
+                AtomState state = atomModelWrapper.getAtomState();
+                AtomEvent.TYPE type = state.equals(AtomState.ACTIVE) ? AtomEvent.TYPE.ACTIVE : AtomEvent.TYPE.INACTIVE;
+                log.debug("Created atom event for atom uri {}", uriMsg.getUri());
                 long crawlDate = System.currentTimeMillis();
-                NeedEvent needEvent = new NeedEvent(uriMsg.getUri(), wonNodeUri, type, crawlDate, ds);
-                pubSubMediator.tell(new DistributedPubSubMediator.Publish(needEvent.getClass().getName(), needEvent),
+                AtomEvent atomEvent = new AtomEvent(uriMsg.getUri(), wonNodeUri, type, crawlDate, ds);
+                pubSubMediator.tell(new DistributedPubSubMediator.Publish(atomEvent.getClass().getName(), atomEvent),
                                 getSelf());
             }
         } catch (RestClientException e1) {
@@ -196,7 +197,7 @@ public class WorkerCrawlerActor extends UntypedActor {
      */
     private String extractWonNodeUri(Dataset ds, String uri) {
         try {
-            return RdfUtils.findOnePropertyFromResource(ds, URI.create(uri), WON.HAS_WON_NODE).asResource().getURI();
+            return RdfUtils.findOnePropertyFromResource(ds, URI.create(uri), WON.wonNode).asResource().getURI();
         } catch (IncorrectPropertyCountException e) {
             return null;
         }

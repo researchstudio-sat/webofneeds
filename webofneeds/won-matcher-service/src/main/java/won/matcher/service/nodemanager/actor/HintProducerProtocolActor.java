@@ -63,8 +63,8 @@ public class HintProducerProtocolActor extends UntypedProducerActor {
     public Object onTransformOutgoingMessage(Object message) {
         HintEvent hint = (HintEvent) message;
         Map<String, Object> headers = new HashMap<>();
-        headers.put("needURI", hint.getFromNeedUri());
-        headers.put("otherNeedURI", hint.getToNeedUri());
+        headers.put("atomURI", hint.getFromAtomUri());
+        headers.put("otherAtomURI", hint.getToAtomUri());
         headers.put("score", String.valueOf(hint.getScore()));
         headers.put("originator", hint.getMatcherUri());
         // headers.put("content",
@@ -75,8 +75,8 @@ public class HintProducerProtocolActor extends UntypedProducerActor {
         Object body = WonMessageEncoder.encode(wonMessage, Lang.TRIG);
         CamelMessage camelMsg = new CamelMessage(body, headers);
         // monitoring code
-        monitoringService.stopClock(MonitoringService.NEED_HINT_STOPWATCH, hint.getFromNeedUri());
-        log.debug("Send hint camel message {}", hint.getFromNeedUri());
+        monitoringService.stopClock(MonitoringService.ATOM_HINT_STOPWATCH, hint.getFromAtomUri());
+        log.debug("Send hint camel message {}", hint.getFromAtomUri());
         return camelMsg;
     }
 
@@ -90,8 +90,8 @@ public class HintProducerProtocolActor extends UntypedProducerActor {
     private WonMessage createHintWonMessage(HintEvent hint) throws WonMessageBuilderException {
         URI wonNode = URI.create(hint.getFromWonNodeUri());
         return WonMessageBuilder
-                        .setMessagePropertiesForHint(hint.getGeneratedEventUri(), URI.create(hint.getFromNeedUri()),
-                                        Optional.empty(), wonNode, URI.create(hint.getToNeedUri()), Optional.empty(),
+                        .setMessagePropertiesForHint(hint.getGeneratedEventUri(), URI.create(hint.getFromAtomUri()),
+                                        Optional.empty(), wonNode, URI.create(hint.getToAtomUri()), Optional.empty(),
                                         URI.create(hint.getMatcherUri()), hint.getScore())
                         .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL).build();
     }

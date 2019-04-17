@@ -3,23 +3,23 @@ prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
 prefix geo:   <http://www.w3.org/2003/01/geo/wgs84_pos#>
 prefix conn:  <http://localhost:8080/won/resource/connection/>
 prefix event: <http://localhost:8080/won/resource/event/>
-prefix woncrypt: <http://purl.org/webofneeds/woncrypt#>
+prefix woncrypt: <https://w3id.org/won/core#>
 prefix xsd:   <http://www.w3.org/2001/XMLSchema#>
 prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 prefix local: <http://localhost:8080/won/resource/>
-prefix won:   <http://purl.org/webofneeds/model#>
-prefix msg:   <http://purl.org/webofneeds/message#>
+prefix won:   <https://w3id.org/won/core#>
+prefix msg:   <https://w3id.org/won/message#>
 prefix signature: <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#>
 prefix ldp:   <http://www.w3.org/ns/ldp#>
 
-# true => there is an object of msg:hasMessageType that has unknown type uri
+# true => there is an object of msg:messageType that has unknown type uri
 ASK
 {
   SELECT (count(?subj) as ?num) WHERE
   {
     GRAPH ?graph
     {
-       ?subj msg:hasMessageType ?type
+       ?subj msg:messageType ?type
        FILTER (?type != msg:CreateMessage  &&  ?type != msg:ConnectMessage
             && ?type != msg:ReplaceMessage 
             && ?type != msg:CloseMessage && ?type != msg:ConnectionMessage && ?type != msg:HintMessage
@@ -27,7 +27,7 @@ ASK
             && ?type != msg:FailureResponse && ?type != msg:SuccessResponse
             && ?type != msg:ActivateMessage && ?type != msg:DeactivateMessage
             && ?type != msg:OpenMessage && ?type != msg:HintFeedbackMessage
-            && ?type != msg:NeedMessage && ?type != msg:ChangeNotificationMessage)
+            && ?type != msg:AtomMessage && ?type != msg:ChangeNotificationMessage)
     } 
   }
   HAVING (?num > 0)

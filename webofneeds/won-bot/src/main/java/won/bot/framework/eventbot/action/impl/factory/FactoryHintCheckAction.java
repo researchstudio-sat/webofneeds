@@ -40,9 +40,9 @@ public class FactoryHintCheckAction extends BaseEventBotAction {
         FactoryBotContextWrapper botContextWrapper = (FactoryBotContextWrapper) getEventListenerContext()
                         .getBotContextWrapper();
         Match match = ((HintFromMatcherEvent) event).getMatch();
-        URI ownUri = match.getFromNeed();
-        URI requesterUri = match.getToNeed();
-        if (botContextWrapper.isFactoryNeed(ownUri)) {
+        URI ownUri = match.getFromAtom();
+        URI requesterUri = match.getToAtom();
+        if (botContextWrapper.isFactoryAtom(ownUri)) {
             logger.debug("FactoryHint for factoryURI: " + ownUri + " from the requesterUri: " + requesterUri);
             EventBus bus = getEventListenerContext().getEventBus();
             bus.publish(new FactoryHintEvent(requesterUri, ownUri));

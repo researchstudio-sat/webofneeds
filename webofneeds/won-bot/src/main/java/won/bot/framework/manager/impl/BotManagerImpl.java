@@ -25,20 +25,20 @@ public class BotManagerImpl implements BotManager {
     private Object monitor = new Object();
 
     @Override
-    public Bot getBotForNeedURI(URI needUri) {
+    public Bot getBotForAtomURI(URI atomUri) {
         // try the botByUri map
         {
-            Bot bot = botByUri.get(needUri);
+            Bot bot = botByUri.get(atomUri);
             if (bot != null)
                 return bot;
         }
-        // check each bot, return first that knows the needUri
+        // check each bot, return first that knows the atomUri
         logger.debug("bots size:{} ", bots.size());
         for (Bot mybot : bots) {
-            // logger.debug("bot knows need: {}", mybot.knowsNeedURI(needUri));
-            if (mybot.knowsNeedURI(needUri)) {
+            // logger.debug("bot knows atom: {}", mybot.knowsAtomURI(atomUri));
+            if (mybot.knowsAtomURI(atomUri)) {
                 synchronized (getMonitor()) {
-                    this.botByUri.put(needUri, mybot);
+                    this.botByUri.put(atomUri, mybot);
                 }
                 return mybot;
             }

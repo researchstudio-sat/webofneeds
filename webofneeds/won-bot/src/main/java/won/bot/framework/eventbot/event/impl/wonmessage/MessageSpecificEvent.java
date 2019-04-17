@@ -29,7 +29,7 @@ public abstract class MessageSpecificEvent extends BaseEvent {
         return message.getMessageURI();
     }
 
-    public URI getNeedURI() {
-        return message.getSenderNeedURI();
+    public URI getAtomURI() {
+        return message.getSenderAtomURI();
     }
 }

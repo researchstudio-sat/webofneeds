@@ -8,8 +8,8 @@ import { connect2Redux } from "../../../won-utils.js";
 import { actionCreators } from "../../../actions/actions.js";
 import postHeaderModule from "../../post-header.js";
 import labelledHrModule from "../../labelled-hr.js";
-import { getActiveNeeds } from "../../../selectors/general-selectors.js";
-import * as needUtils from "../../../need-utils.js";
+import { getActiveAtoms } from "../../../selectors/general-selectors.js";
+import * as atomUtils from "../../../atom-utils.js";
 
 import "style/_suggestpostpicker.scss";
 
@@ -18,29 +18,29 @@ function genComponentConf() {
   let template = `
       <div class="suggestpostp__posts" ng-if="self.suggestionsAvailable">
         <div class="suggestpostp__posts__post clickable"
-          ng-class="{'won--selected': self.isSelected(need)}"
-          ng-repeat="need in self.sortedActiveNeeds"
-          ng-click="self.selectNeed(need)">
+          ng-class="{'won--selected': self.isSelected(atom)}"
+          ng-repeat="atom in self.sortedActiveAtoms"
+          ng-click="self.selectAtom(atom)">
           <won-post-header
-              need-uri="need.get('uri')">
+              atom-uri="atom.get('uri')">
           </won-post-header>
         </div>
       </div>
       <div class="suggestpostp__noposts" ng-if="!self.suggestionsAvailable">
         {{ self.noSuggestionsLabel }}
       </div>
-      <won-labelled-hr label="::'Not happy with the options? Add a Need-URI below'" class="suggestpostp__labelledhr"></won-labelled-hr>
+      <won-labelled-hr label="::'Not happy with the options? Add an Atom-URI below'" class="suggestpostp__labelledhr"></won-labelled-hr>
       <div class="suggestpostp__input">
          <svg class="suggestpostp__input__icon clickable"
             style="--local-primary:var(--won-primary-color);"
-            ng-if="!self.uriToFetchLoading && self.showFetchButton && !self.uriToFetchFailed && self.fetchNeedUriFieldHasText()"
-            ng-click="self.fetchNeed()">
+            ng-if="!self.uriToFetchLoading && self.showFetchButton && !self.uriToFetchFailed && self.fetchAtomUriFieldHasText()"
+            ng-click="self.fetchAtom()">
             <use xlink:href="#ico16_checkmark" href="#ico16_checkmark"></use>
          </svg>
          <svg class="suggestpostp__input__icon clickable"
             style="--local-primary:var(--won-primary-color);"
-            ng-if="!self.uriToFetchLoading && (self.showResetButton || self.uriToFetchFailed) && self.fetchNeedUriFieldHasText()"
-            ng-click="self.resetNeedUriField()">
+            ng-if="!self.uriToFetchLoading && (self.showResetButton || self.uriToFetchFailed) && self.fetchAtomUriFieldHasText()"
+            ng-click="self.resetAtomUriField()">
             <use xlink:href="#ico36_close" href="#ico36_close"></use>
          </svg>
          <svg class="suggestpostp__input__icon hspinner"
@@ -51,19 +51,19 @@ function genComponentConf() {
             type="url"
             placeholder="{{self.detail.placeholder}}"
             class="suggestpostp__input__inner"
-            won-input="::self.updateFetchNeedUriField()"/>
+            won-input="::self.updateFetchAtomUriField()"/>
       </div>
-      <div class="suggestpostp__error" ng-if="self.uriToFetchFailedToLoad && self.fetchNeedUriFieldHasText()">
+      <div class="suggestpostp__error" ng-if="self.uriToFetchFailedToLoad && self.fetchAtomUriFieldHasText()">
           Failed to Load Suggestion, might not be a valid uri.
       </div>
-      <div class="suggestpostp__error" ng-if="self.uriToFetchIsWhatsAround && self.fetchNeedUriFieldHasText()">
-          Suggestion invalid, you are trying to share a What's Around Need.
+      <div class="suggestpostp__error" ng-if="self.uriToFetchIsWhatsAround && self.fetchAtomUriFieldHasText()">
+          Suggestion invalid, you are trying to share a What's Around Atom.
       </div>
-      <div class="suggestpostp__error" ng-if="self.uriToFetchIsExcluded && self.fetchNeedUriFieldHasText()">
+      <div class="suggestpostp__error" ng-if="self.uriToFetchIsExcluded && self.fetchAtomUriFieldHasText()">
           {{ self.excludedText }}
       </div>
-      <div class="suggestpostp__error" ng-if="self.uriToFetchIsNotAllowed && self.fetchNeedUriFieldHasText()">
-          {{ self.notAllowedFacetText }}
+      <div class="suggestpostp__error" ng-if="self.uriToFetchIsNotAllowed && self.fetchAtomUriFieldHasText()">
+          {{ self.notAllowedSocketText }}
       </div>
     `;
 
@@ -80,63 +80,63 @@ function genComponentConf() {
       this.uriToFetch = undefined;
 
       const selectFromState = state => {
-        const suggestedNeedUri = this.initialValue;
-        const allActiveNeeds = getActiveNeeds(state);
+        const suggestedAtomUri = this.initialValue;
+        const allActiveAtoms = getActiveAtoms(state);
 
-        const allSuggestableNeeds =
-          allActiveNeeds &&
-          allActiveNeeds.filter(need => this.isSuggestable(need));
+        const allSuggestableAtoms =
+          allActiveAtoms &&
+          allActiveAtoms.filter(atom => this.isSuggestable(atom));
 
-        const allForbiddenNeeds =
-          allActiveNeeds &&
-          allActiveNeeds.filter(need => !this.isSuggestable(need));
+        const allForbiddenAtoms =
+          allActiveAtoms &&
+          allActiveAtoms.filter(atom => !this.isSuggestable(atom));
 
-        const suggestedNeed = get(allSuggestableNeeds, suggestedNeedUri);
-        const sortedActiveNeeds =
-          allSuggestableNeeds &&
-          sortBy(allSuggestableNeeds, elem =>
+        const suggestedAtom = get(allSuggestableAtoms, suggestedAtomUri);
+        const sortedActiveAtoms =
+          allSuggestableAtoms &&
+          sortBy(allSuggestableAtoms, elem =>
             (elem.get("humanReadable") || "").toLowerCase()
           );
 
         const uriToFetchProcess = getIn(state, [
           "process",
-          "needs",
+          "atoms",
           this.uriToFetch,
         ]);
         const uriToFetchLoading = !!get(uriToFetchProcess, "loading");
         const uriToFetchFailedToLoad = !!get(uriToFetchProcess, "failedToLoad");
-        const uriToFetchIsWhatsAround = needUtils.isWhatsAroundNeed(
-          get(allForbiddenNeeds, this.uriToFetch)
+        const uriToFetchIsWhatsAround = atomUtils.isWhatsAroundAtom(
+          get(allForbiddenAtoms, this.uriToFetch)
         );
         const uriToFetchIsNotAllowed =
-          !!get(allForbiddenNeeds, this.uriToFetch) &&
-          !this.hasAtLeastOneAllowedFacet(
-            get(allForbiddenNeeds, this.uriToFetch)
+          !!get(allForbiddenAtoms, this.uriToFetch) &&
+          !this.hasAtLeastOneAllowedSocket(
+            get(allForbiddenAtoms, this.uriToFetch)
           );
-        const uriToFetchIsExcluded = this.isExcludedNeed(
-          get(allForbiddenNeeds, this.uriToFetch)
+        const uriToFetchIsExcluded = this.isExcludedAtom(
+          get(allForbiddenAtoms, this.uriToFetch)
         );
 
         return {
-          suggestedNeedUri,
+          suggestedAtomUri,
           uriToFetchLoading,
           uriToFetchFailedToLoad,
           uriToFetchIsWhatsAround,
           uriToFetchIsExcluded,
           uriToFetchIsNotAllowed,
-          allSuggestableNeeds,
-          allForbiddenNeeds,
+          allSuggestableAtoms,
+          allForbiddenAtoms,
           suggestionsAvailable:
-            allSuggestableNeeds && allSuggestableNeeds.size > 0,
-          sortedActiveNeeds,
-          suggestedNeed,
+            allSuggestableAtoms && allSuggestableAtoms.size > 0,
+          sortedActiveAtoms,
+          suggestedAtom,
           noSuggestionsLabel:
-            this.noSuggestionsText || "No Needs available to suggest",
+            this.noSuggestionsText || "No Atoms available to suggest",
           uriToFetchSuccess:
             this.uriToFetch &&
             !uriToFetchLoading &&
             !uriToFetchFailedToLoad &&
-            get(allSuggestableNeeds, this.uriToFetch),
+            get(allSuggestableAtoms, this.uriToFetch),
           uriToFetchFailed:
             this.uriToFetch &&
             !uriToFetchLoading &&
@@ -155,8 +155,8 @@ function genComponentConf() {
           "self.detail",
           "self.uriToFetch",
           "self.excludedUris",
-          "self.allowedFacets",
-          "self.notAllowedFacetText",
+          "self.allowedSockets",
+          "self.notAllowedSocketText",
           "self.excludedText",
           "self.noSuggestionsText",
         ],
@@ -169,47 +169,47 @@ function genComponentConf() {
           delay(0).then(() => {
             if (this.uriToFetchSuccess) {
               this.update(this.uriToFetch);
-              this.resetNeedUriField();
+              this.resetAtomUriField();
             }
           })
       );
     }
 
-    hasAtLeastOneAllowedFacet(need) {
-      if (this.allowedFacets) {
-        const allowedFacetsImm = Immutable.fromJS(this.allowedFacets);
-        const needFacetsImm = need && need.getIn(["content", "facets"]);
+    hasAtLeastOneAllowedSocket(atom) {
+      if (this.allowedSockets) {
+        const allowedSocketsImm = Immutable.fromJS(this.allowedSockets);
+        const atomSocketsImm = atom && atom.getIn(["content", "sockets"]);
 
         return (
-          needFacetsImm &&
-          needFacetsImm.find(facet => allowedFacetsImm.contains(facet))
+          atomSocketsImm &&
+          atomSocketsImm.find(socket => allowedSocketsImm.contains(socket))
         );
       }
       return true;
     }
 
-    isExcludedNeed(need) {
+    isExcludedAtom(atom) {
       if (this.excludedUris) {
         const excludedUrisImm = Immutable.fromJS(this.excludedUris);
 
-        return excludedUrisImm.contains(get(need, "uri"));
+        return excludedUrisImm.contains(get(atom, "uri"));
       }
       return false;
     }
 
-    isSuggestable(need) {
+    isSuggestable(atom) {
       return (
-        !needUtils.isWhatsAroundNeed(need) &&
-        !this.isExcludedNeed(need) &&
-        this.hasAtLeastOneAllowedFacet(need)
+        !atomUtils.isWhatsAroundAtom(atom) &&
+        !this.isExcludedAtom(atom) &&
+        this.hasAtLeastOneAllowedSocket(atom)
       );
     }
 
-    isSelected(need) {
+    isSelected(atom) {
       return (
-        need &&
-        this.suggestedNeed &&
-        need.get("uri") === this.suggestedNeed.get("uri")
+        atom &&
+        this.suggestedAtom &&
+        atom.get("uri") === this.suggestedAtom.get("uri")
       );
     }
 
@@ -224,7 +224,7 @@ function genComponentConf() {
       }
     }
 
-    updateFetchNeedUriField() {
+    updateFetchAtomUriField() {
       const text = this.fetchUriField().value;
       this.uriToFetch = undefined;
 
@@ -239,29 +239,29 @@ function genComponentConf() {
       }
     }
 
-    fetchNeedUriFieldHasText() {
+    fetchAtomUriFieldHasText() {
       const text = this.fetchUriField().value;
       return text && text.length > 0;
     }
 
-    resetNeedUriField() {
+    resetAtomUriField() {
       this.fetchUriField().value = "";
       this.showResetButton = false;
       this.showFetchButton = false;
       this.uriToFetch = undefined;
     }
 
-    fetchNeed() {
+    fetchAtom() {
       let uriToFetch = this.fetchUriField().value;
       uriToFetch = uriToFetch.trim();
 
       if (
-        !getIn(this.allSuggestableNeeds, uriToFetch) &&
-        !get(this.allForbiddenNeeds, uriToFetch)
+        !getIn(this.allSuggestableAtoms, uriToFetch) &&
+        !get(this.allForbiddenAtoms, uriToFetch)
       ) {
         this.uriToFetch = uriToFetch;
-        this.needs__fetchUnloadedNeed(uriToFetch);
-      } else if (get(this.allForbiddenNeeds, uriToFetch)) {
+        this.atoms__fetchUnloadedAtom(uriToFetch);
+      } else if (get(this.allForbiddenAtoms, uriToFetch)) {
         this.uriToFetch = uriToFetch;
       } else {
         this.update(uriToFetch);
@@ -277,11 +277,11 @@ function genComponentConf() {
       return this._fetchUriInput;
     }
 
-    selectNeed(need) {
-      const needUri = get(need, "uri");
+    selectAtom(atom) {
+      const atomUri = get(atom, "uri");
 
-      if (needUri) {
-        this.update(needUri);
+      if (atomUri) {
+        this.update(atomUri);
       }
     }
   }
@@ -297,9 +297,9 @@ function genComponentConf() {
       initialValue: "=",
       detail: "=",
       excludedUris: "=", //list of uris that should be excluded from the suggestions
-      allowedFacets: "=", //list of facets where at least one facet needs to be present in the need for it to be allowed as a suggestion
-      notAllowedFacetText: "=", //error message to display if need does not have any allowed facets
-      excludedText: "=", //error message to display when excluded need is added via the fetch input
+      allowedSockets: "=", //list of sockets where at least one socket atoms to be present in the atom for it to be allowed as a suggestion
+      notAllowedSocketText: "=", //error message to display if atom does not have any allowed sockets
+      excludedText: "=", //error message to display when excluded atom is added via the fetch input
       noSuggestionsText: "=", //Text to display when no suggestions are available
     },
     template: template,

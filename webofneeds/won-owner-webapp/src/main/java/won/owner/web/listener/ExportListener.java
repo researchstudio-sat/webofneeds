@@ -40,7 +40,7 @@ import won.protocol.util.linkeddata.WonLinkedDataUtils;
 public class ExportListener implements ApplicationListener<OnExportUserEvent> {
     private static final Logger logger = LoggerFactory.getLogger(ExportListener.class);
     @Autowired
-    private LinkedDataSource linkedDataSourceOnBehalfOfNeed;
+    private LinkedDataSource linkedDataSourceOnBehalfOfAtom;
     @Autowired
     private WonOwnerMailSender emailSender;
     @Autowired
@@ -58,9 +58,9 @@ public class ExportListener implements ApplicationListener<OnExportUserEvent> {
             tmpFile = File.createTempFile("won", null);
             tmpFile.deleteOnExit();
             ZipOutputStream zip = new ZipOutputStream(new FileOutputStream(tmpFile), Charset.forName("UTF-8"));
-            ZipEntry needsEntry = new ZipEntry("export.nq");
-            zip.putNextEntry(needsEntry);
-            user.getUserNeeds().stream().parallel().map(userNeed -> fetchNeedData(authentication, userNeed.getUri()))
+            ZipEntry atomsEntry = new ZipEntry("export.nq");
+            zip.putNextEntry(atomsEntry);
+            user.getUserAtoms().stream().parallel().map(userAtom -> fetchAtomData(authentication, userAtom.getUri()))
                             .forEach(dataset -> {
                                 RDFDataMgr.write(zip, dataset, RDFFormat.NQUADS_UTF8);
                             });
@@ -105,52 +105,52 @@ public class ExportListener implements ApplicationListener<OnExportUserEvent> {
         }
     }
 
-    private static void refreshData(URI needUri, LinkedDataSource linkedDataSource) {
+    private static void refreshData(URI atomUri, LinkedDataSource linkedDataSource) {
         // we may have tried to crawl a conversation dataset of which messages
         // were still in-flight. we allow one re-crawl attempt per exception before
         // we throw the exception on:
         if (!(linkedDataSource instanceof CachingLinkedDataSource)) {
             return;
         }
-        invalidate(needUri, needUri, linkedDataSource);
+        invalidate(atomUri, atomUri, linkedDataSource);
     }
 
-    private static boolean recrawl(Set<URI> recrawled, URI needUri, LinkedDataSource linkedDataSource, URI... uris) {
+    private static boolean recrawl(Set<URI> recrawled, URI atomUri, LinkedDataSource linkedDataSource, URI... uris) {
         Set<URI> urisToCrawl = new HashSet<URI>();
         Arrays.stream(uris).filter(x -> !recrawled.contains(x)).forEach(urisToCrawl::add);
         if (urisToCrawl.isEmpty()) {
             if (logger.isDebugEnabled()) {
-                logger.debug("need {}: not recrawling again: {}", needUri, Arrays.toString(uris));
+                logger.debug("atom {}: not recrawling again: {}", atomUri, Arrays.toString(uris));
             }
             return false;
         }
         if (logger.isDebugEnabled()) {
-            logger.debug("need {}, recrawling: {}", needUri, urisToCrawl);
+            logger.debug("atom {}, recrawling: {}", atomUri, urisToCrawl);
         }
         if (linkedDataSource instanceof CachingLinkedDataSource) {
             urisToCrawl.stream().forEach(uri -> {
-                invalidate(uri, needUri, linkedDataSource);
+                invalidate(uri, atomUri, linkedDataSource);
             });
         }
         recrawled.addAll(urisToCrawl);
         return true;
     }
 
-    public Dataset fetchNeedData(Authentication authentication, URI needUri) {
+    public Dataset fetchAtomData(Authentication authentication, URI atomUri) {
         // allow each resource to be re-crawled once for each reason
         Set<URI> recrawledForFailedFetch = new HashSet<>();
         AuthenticationThreadLocal.setAuthentication(authentication);
         while (true) {
             // we leave the loop either with a runtime exception or with the result
             try {
-                Dataset needDataset = WonLinkedDataUtils.getFullNeedDataset(needUri, linkedDataSourceOnBehalfOfNeed);
-                return needDataset;
+                Dataset atomDataset = WonLinkedDataUtils.getFullAtomDataset(atomUri, linkedDataSourceOnBehalfOfAtom);
+                return atomDataset;
             } catch (LinkedDataFetchingException e) {
                 // we may have tried to crawl a conversation dataset of which messages
                 // were still in-flight. we allow one re-crawl attempt per exception before
                 // we throw the exception on:
-                refreshData(needUri, linkedDataSourceOnBehalfOfNeed);
-                if (!recrawl(recrawledForFailedFetch, needUri, linkedDataSourceOnBehalfOfNeed, e.getResourceUri())) {
+                refreshData(atomUri, linkedDataSourceOnBehalfOfAtom);
+                if (!recrawl(recrawledForFailedFetch, atomUri, linkedDataSourceOnBehalfOfAtom, e.getResourceUri())) {
                     throw e;
                 }
             }

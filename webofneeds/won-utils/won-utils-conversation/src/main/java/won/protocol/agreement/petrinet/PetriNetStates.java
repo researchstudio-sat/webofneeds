@@ -78,7 +78,7 @@ public class PetriNetStates {
     }
 
     private void loadPetrinetsForAgreement(Model agreement, URI agreementUri, boolean isAgreement) {
-        StmtIterator it = agreement.listStatements(null, WONWF.HAS_INLINE_PETRI_NET_DEFINITION, (RDFNode) null);
+        StmtIterator it = agreement.listStatements(null, WONWF.inlinePetriNetDefinition, (RDFNode) null);
         while (it.hasNext()) {
             Statement stmt = it.next();
             if (stmt.getSubject().isURIResource() && stmt.getObject().isLiteral()) {
@@ -99,7 +99,7 @@ public class PetriNetStates {
     }
 
     private void executePetriNetEventsForAgreement(Model agreement, URI agreementUri, boolean isAgreement) {
-        StmtIterator it = agreement.listStatements(null, WONWF.FIRES_TRANSITION, (RDFNode) null);
+        StmtIterator it = agreement.listStatements(null, WONWF.firesTransition, (RDFNode) null);
         while (it.hasNext()) {
             Statement stmt = it.next();
             if (stmt.getSubject().isURIResource() && stmt.getObject().isURIResource()) {

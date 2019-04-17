@@ -15,7 +15,7 @@ public class ReadWriteTest {
     // "/01_OA_to_WN1.trig";
     // "/02_WN1.trig";
     // "/01_WN2_to_WN1.trig";
-    private static final String RESOURCE_FILE = "/need-lifecycle_with_message_02adj/04_deactivate_(by_owner)"
+    private static final String RESOURCE_FILE = "/atom-lifecycle_with_message_02adj/04_deactivate_(by_owner)"
                     + "/02_WN1.trig";
 
     @Test

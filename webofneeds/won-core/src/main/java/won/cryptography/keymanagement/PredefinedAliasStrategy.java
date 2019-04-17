@@ -24,7 +24,7 @@ public class PredefinedAliasStrategy implements KeyPairAliasDerivationStrategy {
     }
 
     @Override
-    public String getAliasForNeedUri(String needURI) {
+    public String getAliasForAtomUri(String atomURI) {
         return predefinedAlias;
     }
 }

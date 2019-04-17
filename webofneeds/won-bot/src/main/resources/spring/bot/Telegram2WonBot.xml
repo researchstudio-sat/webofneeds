@@ -24,7 +24,7 @@
     <import resource="classpath:spring/component/telegram/telegramContentExtractor.xml"/>
 
     <bean id="telegram2wonBot" class="won.bot.impl.Telegram2WonBot">
-        <!-- optional property, by default one echo need per each need will be created -->
+        <!-- optional property, by default one echo atom per each atom will be created -->
 
         <property name="botContextWrapper" ref="botContextWrapper"/>
         <property name="taskScheduler" ref="taskScheduler"/>
@@ -32,13 +32,13 @@
         <property name="botName" value="${telegrambot.botname}"/>
         <property name="telegramContentExtractor" ref="telegramContentExtractor"/>
         <property name="telegramMessageGenerator" ref="telegramGenerator"/>
-        <!--property name="needProducer" ref="needProducerFromMails" /-->
+        <!--property name="atomProducer" ref="atomProducerFromMails" /-->
         <!--property name="nodeURISource" ref="nodeUriSourceRandom" /-->
         <!--<property name="matcherNodeURISource" ref="matcherNodeURISource"/>-->
         <!--<property name="matcherUri" value="${matcher.uri}" />-->
-        <!-- expects a bean named "ownerProtocolNeedServiceClient" in the context -->
-        <!--property name="ownerService" ref="ownerProtocolNeedServiceClient" /-->
-        <!--<property name="matcherProtocolNeedServiceClient" ref="matcherProtocolNeedServiceClient"/>-->
+        <!-- expects a bean named "ownerProtocolAtomServiceClient" in the context -->
+        <!--property name="ownerService" ref="ownerProtocolAtomServiceClient" /-->
+        <!--<property name="matcherProtocolAtomServiceClient" ref="matcherProtocolAtomServiceClient"/>-->
         <!--<property name="matcherProtocolMatcherService" ref="matcherProtocolMatcherServiceJMSBased"/>-->
         <property name="trigger">
             <bean class="org.springframework.scheduling.support.PeriodicTrigger">

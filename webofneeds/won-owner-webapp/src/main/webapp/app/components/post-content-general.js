@@ -7,12 +7,12 @@ import { attach, get, getIn } from "../utils.js";
 import won from "../won-es6.js";
 import { relativeTime } from "../won-label-utils.js";
 import { connect2Redux } from "../won-utils.js";
-import * as needUtils from "../need-utils.js";
+import * as atomUtils from "../atom-utils.js";
 import * as viewUtils from "../view-utils.js";
 import {
   selectLastUpdateTime,
   getConnectionUriFromRoute,
-  getOwnedNeedByConnectionUri,
+  getOwnedAtomByConnectionUri,
 } from "../selectors/general-selectors.js";
 import { actionCreators } from "../actions/actions.js";
 
@@ -46,7 +46,7 @@ function genComponentConf() {
               Types
             </div>
             <div class="pcg__columns__left__item__value">
-              {{ self.needTypeLabel }}
+              {{ self.atomTypeLabel }}
             </div>
           </div>
         </div>
@@ -66,17 +66,17 @@ function genComponentConf() {
             </div>
           </div>
         </div>
-        <!-- FACETS -->
-        <div class="pcg__columns__right" ng-if="self.shouldShowRdf || (self.shortFacets && self.shortFacets.length > 0)">
+        <!-- SOCKETS -->
+        <div class="pcg__columns__right" ng-if="self.shouldShowRdf || (self.shortSockets && self.shortSockets.length > 0)">
           <div class="pcg__columns__right__item">
             <div class="pcg__columns__right__item__label">
-              Facets
+              Sockets
             </div>
             <div class="pcg__columns__right__item__value" ng-if="self.shouldShowRdf">
-              <span class="pcg__columns__right__item__value__facet" ng-repeat="facet in self.fullFacets">{{facet}}</span>
+              <span class="pcg__columns__right__item__value__socket" ng-repeat="socket in self.fullSockets">{{socket}}</span>
             </div>
             <div class="pcg__columns__right__item__value" ng-if="!self.shouldShowRdf">
-              <span class="pcg__columns__right__item__value__facet" ng-repeat="facet in self.shortFacets">{{facet}}</span>
+              <span class="pcg__columns__right__item__value__socket" ng-repeat="socket in self.shortSockets">{{socket}}</span>
             </div>
           </div>
         </div>
@@ -92,15 +92,15 @@ function genComponentConf() {
         const connectionUri = getConnectionUriFromRoute(state);
         const connection = getOwnedConnectionByUri(state, connectionUri);
 
-        const ownNeed = getOwnedNeedByConnectionUri(state, connectionUri);
+        const ownAtom = getOwnedAtomByConnectionUri(state, connectionUri);
 
         const ratingConnectionUri =
-          get(connection, "remoteNeedUri") == this.postUri &&
-          get(ownNeed, "heldBy")
+          get(connection, "targetAtomUri") == this.postUri &&
+          get(ownAtom, "heldBy")
             ? connectionUri
             : null;
 
-        const post = this.postUri && getIn(state, ["needs", this.postUri]);
+        const post = this.postUri && getIn(state, ["atoms", this.postUri]);
         const viewState = get(state, "view");
 
         const creationDate = get(post, "creationDate");
@@ -108,11 +108,11 @@ function genComponentConf() {
 
         return {
           WON: won.WON,
-          needTypeLabel: post && needUtils.generateNeedTypeLabel(post),
-          fullFlags: post && needUtils.generateFullNeedFlags(post),
-          shortFlags: post && needUtils.generateShortNeedFlags(post),
-          fullFacets: post && needUtils.generateFullNeedFacets(post),
-          shortFacets: post && needUtils.generateShortNeedFacets(post),
+          atomTypeLabel: post && atomUtils.generateAtomTypeLabel(post),
+          fullFlags: post && atomUtils.generateFullAtomFlags(post),
+          shortFlags: post && atomUtils.generateShortAtomFlags(post),
+          fullSockets: post && atomUtils.generateFullAtomSockets(post),
+          shortSockets: post && atomUtils.generateShortAtomSockets(post),
           friendlyCreationDate:
             creationDate &&
             relativeTime(selectLastUpdateTime(state), creationDate),

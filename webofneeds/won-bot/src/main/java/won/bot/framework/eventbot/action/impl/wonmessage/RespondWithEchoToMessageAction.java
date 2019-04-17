@@ -91,14 +91,14 @@ public class RespondWithEchoToMessageAction extends BaseEventBotAction {
     private WonMessage createWonMessage(URI connectionURI, String textMessage) throws WonMessageBuilderException {
         WonNodeInformationService wonNodeInformationService = getEventListenerContext().getWonNodeInformationService();
         Dataset connectionRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(connectionURI);
-        URI remoteNeed = WonRdfUtils.ConnectionUtils.getRemoteNeedURIFromConnection(connectionRDF, connectionURI);
-        URI localNeed = WonRdfUtils.ConnectionUtils.getLocalNeedURIFromConnection(connectionRDF, connectionURI);
+        URI targetAtom = WonRdfUtils.ConnectionUtils.getTargetAtomURIFromConnection(connectionRDF, connectionURI);
+        URI localAtom = WonRdfUtils.ConnectionUtils.getLocalAtomURIFromConnection(connectionRDF, connectionURI);
         URI wonNode = WonRdfUtils.ConnectionUtils.getWonNodeURIFromConnection(connectionRDF, connectionURI);
-        Dataset remoteNeedRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(remoteNeed);
+        Dataset targetAtomRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(targetAtom);
         URI messageURI = wonNodeInformationService.generateEventURI(wonNode);
-        return WonMessageBuilder.setMessagePropertiesForConnectionMessage(messageURI, connectionURI, localNeed, wonNode,
-                        WonRdfUtils.ConnectionUtils.getRemoteConnectionURIFromConnection(connectionRDF, connectionURI),
-                        remoteNeed, WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(remoteNeedRDF, remoteNeed), textMessage)
+        return WonMessageBuilder.setMessagePropertiesForConnectionMessage(messageURI, connectionURI, localAtom, wonNode,
+                        WonRdfUtils.ConnectionUtils.getTargetConnectionURIFromConnection(connectionRDF, connectionURI),
+                        targetAtom, WonRdfUtils.AtomUtils.getWonNodeURIFromAtom(targetAtomRDF, targetAtom), textMessage)
                         .build();
     }
 }

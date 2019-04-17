@@ -1,7 +1,7 @@
-@prefix msg:   <http://purl.org/webofneeds/message#> .
+@prefix msg:   <https://w3id.org/won/message#> .
 @prefix conn:  <https://satvm05.researchstudio.at/won/resource/connection/> .
-@prefix need:  <https://satvm05.researchstudio.at/won/resource/need/> .
-@prefix woncrypt: <http://purl.org/webofneeds/woncrypt#> .
+@prefix atom:  <https://satvm05.researchstudio.at/won/resource/atom/> .
+@prefix woncrypt: <https://w3id.org/won/core#> .
 @prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
 @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix cert:  <http://www.w3.org/ns/auth/cert#> .
@@ -11,7 +11,7 @@
 @prefix s:     <http://schema.org/> .
 @prefix sh:    <http://www.w3.org/ns/shacl#> .
 @prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-@prefix won:   <http://purl.org/webofneeds/model#> .
+@prefix won:   <https://w3id.org/won/core#> .
 @prefix ldp:   <http://www.w3.org/ns/ldp#> .
 @prefix event: <https://satvm05.researchstudio.at/won/resource/event/> .
 @prefix dc:    <http://purl.org/dc/elements/1.1/> .
@@ -70,7 +70,7 @@
                             ] ;
             sh:targetClass  s:TravelAction .
     
-    need:o21e3jpf8uqah4sn03k5
+    atom:o21e3jpf8uqah4sn03k5
             cert:key  [ cert:PublicKey  [ a                       woncrypt:ECCPublicKey ;
                                           woncrypt:ecc_algorithm  "EC" ;
                                           woncrypt:ecc_curveId    "secp384r1" ;
@@ -90,40 +90,40 @@
 <https://satvm05.researchstudio.at/won/resource/event/bzzhdyfl5v2r2nloruo7#envelope-97ee-sig> {
     <https://satvm05.researchstudio.at/won/resource/event/bzzhdyfl5v2r2nloruo7#envelope-97ee-sig>
             a                               sig:Signature ;
-            sig:hasSignatureValue           "MGYCMQCHu93eVusjygFwwLfVgb3dmE54MMPeBgV18gTjeUXMfhfEIYPzC9PGRnN1FWvZIVkCMQCkTSTXrRRaVKus4jju8KgLW6qZwY1ykyntmDYdfuti3xUKAE5vP/xJEWEnwu3fjvw=" ;
-            sig:hasVerificationCertificate  need:o21e3jpf8uqah4sn03k5 ;
-            msg:hasHash                     "HiJEA/VICJs459SHIhFeJqG7b3uTAi+kCBU0Q58V1A/kJ9kxB7+8ZrgP3xSb9biGyPHxfuGdiMR28j1BtTsZ9EMGn8NcTKY1z/V48FrWaurEHwPaEZiz+Jcl0o7n0ELuwDbG40EP1KL7IbT58bJkXQm4dP1VGR9qf5dJaaojF0k=" ;
-            msg:hasPublicKeyFingerprint     "JSiFDW790YXrNG0kz72BFCo6YDc5Ba1iWlSN+90wDgk=" ;
-            msg:hasSignedGraph              <https://satvm05.researchstudio.at/won/resource/event/bzzhdyfl5v2r2nloruo7#envelope-97ee> .
+            sig:signatureValue           "MGYCMQCHu93eVusjygFwwLfVgb3dmE54MMPeBgV18gTjeUXMfhfEIYPzC9PGRnN1FWvZIVkCMQCkTSTXrRRaVKus4jju8KgLW6qZwY1ykyntmDYdfuti3xUKAE5vP/xJEWEnwu3fjvw=" ;
+            sig:hasVerificationCertificate  atom:o21e3jpf8uqah4sn03k5 ;
+            msg:hash                     "HiJEA/VICJs459SHIhFeJqG7b3uTAi+kCBU0Q58V1A/kJ9kxB7+8ZrgP3xSb9biGyPHxfuGdiMR28j1BtTsZ9EMGn8NcTKY1z/V48FrWaurEHwPaEZiz+Jcl0o7n0ELuwDbG40EP1KL7IbT58bJkXQm4dP1VGR9qf5dJaaojF0k=" ;
+            msg:publicKeyFingerprint     "JSiFDW790YXrNG0kz72BFCo6YDc5Ba1iWlSN+90wDgk=" ;
+            msg:signedGraph              <https://satvm05.researchstudio.at/won/resource/event/bzzhdyfl5v2r2nloruo7#envelope-97ee> .
 }
 
 <https://satvm05.researchstudio.at/won/resource/event/bzzhdyfl5v2r2nloruo7#content-fyqq> {
-    need:o21e3jpf8uqah4sn03k5
-            a             won:Need ;
-            won:goal      [ won:hasShapesGraph  <https://satvm05.researchstudio.at/won/resource/event/bzzhdyfl5v2r2nloruo7#content-p93v> ] ;
-            won:hasFacet  won:ChatFacet ;
-            won:hasFlag   won:NoHintForCounterpart , won:NoHintForMe ;
+    atom:o21e3jpf8uqah4sn03k5
+            a             won:Atom ;
+            won:goal      [ won:shapesGraph  <https://satvm05.researchstudio.at/won/resource/event/bzzhdyfl5v2r2nloruo7#content-p93v> ] ;
+            won:socket  won:ChatSocket ;
+            won:flag   won:NoHintForCounterpart , won:NoHintForMe ;
             dc:title  "TaxiBot Offer" .
 }
 
-<https://satvm05.researchstudio.at/won/resource/need/o21e3jpf8uqah4sn03k5#sysinfo> {
-    need:o21e3jpf8uqah4sn03k5
-            a                      won:Need ;
+<https://satvm05.researchstudio.at/won/resource/atom/o21e3jpf8uqah4sn03k5#sysinfo> {
+    atom:o21e3jpf8uqah4sn03k5
+            a                      won:Atom ;
             <http://purl.org/dc/terms/created>
                     "2018-08-27T09:37:20.742Z"^^xsd:dateTime ;
             <http://purl.org/dc/terms/modified>
                     "2018-08-27T09:37:20.75Z"^^xsd:dateTime ;
-            won:hasConnections     <https://satvm05.researchstudio.at/won/resource/need/o21e3jpf8uqah4sn03k5/connections> ;
-            won:hasContentGraph    <https://satvm05.researchstudio.at/won/resource/event/bzzhdyfl5v2r2nloruo7#envelope-97ee-sig> , <https://satvm05.researchstudio.at/won/resource/event/bzzhdyfl5v2r2nloruo7#content-fyqq> , <https://satvm05.researchstudio.at/won/resource/event/bzzhdyfl5v2r2nloruo7#content-p93v> ;
-            won:hasEventContainer  <https://satvm05.researchstudio.at/won/resource/need/o21e3jpf8uqah4sn03k5#events> ;
-            won:hasWonNode         <https://satvm05.researchstudio.at/won/resource> ;
-            won:isInState          won:Active .
+            won:connections     <https://satvm05.researchstudio.at/won/resource/atom/o21e3jpf8uqah4sn03k5/connections> ;
+            won:contentGraph    <https://satvm05.researchstudio.at/won/resource/event/bzzhdyfl5v2r2nloruo7#envelope-97ee-sig> , <https://satvm05.researchstudio.at/won/resource/event/bzzhdyfl5v2r2nloruo7#content-fyqq> , <https://satvm05.researchstudio.at/won/resource/event/bzzhdyfl5v2r2nloruo7#content-p93v> ;
+            won:messageContainer  <https://satvm05.researchstudio.at/won/resource/atom/o21e3jpf8uqah4sn03k5#events> ;
+            won:wonNode         <https://satvm05.researchstudio.at/won/resource> ;
+            won:atomState          won:Active .
     
-    <https://satvm05.researchstudio.at/won/resource/need/o21e3jpf8uqah4sn03k5#events>
-            a            won:EventContainer ;
+    <https://satvm05.researchstudio.at/won/resource/atom/o21e3jpf8uqah4sn03k5#events>
+            a            won:MessageContainer ;
             rdfs:member  event:bzzhdyfl5v2r2nloruo7 , event:kh0276gl3xpqf8b7nqid .
     
-    <https://satvm05.researchstudio.at/won/resource/need/o21e3jpf8uqah4sn03k5#sysinfo>
+    <https://satvm05.researchstudio.at/won/resource/atom/o21e3jpf8uqah4sn03k5#sysinfo>
             <http://www.w3.org/2004/03/trix/rdfg-1/subGraphOf>
-                    need:o21e3jpf8uqah4sn03k5 .
+                    atom:o21e3jpf8uqah4sn03k5 .
 }

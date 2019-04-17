@@ -29,34 +29,34 @@ public class MatcherProtocolMatcherServiceImpl implements MatcherProtocolMatcher
     }
 
     @Override
-    public void onNewNeed(final URI wonNodeURI, URI needURI, Dataset content) {
-        logger.debug("matcher from need: need created event for needURI {}", needURI);
-        if (needURI == null)
-            throw new IllegalArgumentException("needURI is not set");
-        matcherServiceCallback.onNewNeed(wonNodeURI, needURI, content);
+    public void onNewAtom(final URI wonNodeURI, URI atomURI, Dataset content) {
+        logger.debug("matcher from atom: atom created event for atomURI {}", atomURI);
+        if (atomURI == null)
+            throw new IllegalArgumentException("atomURI is not set");
+        matcherServiceCallback.onNewAtom(wonNodeURI, atomURI, content);
     }
 
     @Override
-    public void onNeedModified(final URI wonNodeURI, final URI needURI) {
-        logger.debug("matcher from need: need modified event for needURI {}", needURI);
-        if (needURI == null)
-            throw new IllegalArgumentException("needURI is not set");
-        matcherServiceCallback.onNeedModified(wonNodeURI, needURI);
+    public void onAtomModified(final URI wonNodeURI, final URI atomURI) {
+        logger.debug("matcher from atom: atom modified event for atomURI {}", atomURI);
+        if (atomURI == null)
+            throw new IllegalArgumentException("atomURI is not set");
+        matcherServiceCallback.onAtomModified(wonNodeURI, atomURI);
     }
 
     @Override
-    public void onNeedActivated(final URI wonNodeURI, final URI needURI) {
-        logger.debug("matcher from need: need activated event for needURI {}", needURI);
-        if (needURI == null)
-            throw new IllegalArgumentException("needURI is not set");
-        matcherServiceCallback.onNeedActivated(wonNodeURI, needURI);
+    public void onAtomActivated(final URI wonNodeURI, final URI atomURI) {
+        logger.debug("matcher from atom: atom activated event for atomURI {}", atomURI);
+        if (atomURI == null)
+            throw new IllegalArgumentException("atomURI is not set");
+        matcherServiceCallback.onAtomActivated(wonNodeURI, atomURI);
     }
 
     @Override
-    public void onNeedDeactivated(final URI wonNodeURI, final URI needURI) {
-        logger.debug("matcher from need: need deactivated event for needURI {}", needURI);
-        if (needURI == null)
-            throw new IllegalArgumentException("needURI is not set");
-        matcherServiceCallback.onNeedDeactivated(wonNodeURI, needURI);
+    public void onAtomDeactivated(final URI wonNodeURI, final URI atomURI) {
+        logger.debug("matcher from atom: atom deactivated event for atomURI {}", atomURI);
+        if (atomURI == null)
+            throw new IllegalArgumentException("atomURI is not set");
+        matcherServiceCallback.onAtomDeactivated(wonNodeURI, atomURI);
     }
 }

@@ -8,7 +8,7 @@ import { getPostUriFromRoute } from "../selectors/general-selectors.js";
 import { actionCreators } from "../actions/actions.js";
 import postContextDropDownModule from "../components/post-context-dropdown.js";
 import shareDropdownModule from "../components/share-dropdown.js";
-import * as needUtils from "../need-utils.js";
+import * as atomUtils from "../atom-utils.js";
 
 import "style/_visitor-title-bar.scss";
 
@@ -34,12 +34,12 @@ function genComponentConf() {
                           ng-if="self.isGroupChatEnabled && self.isChatEnabled">
                           Group Chat enabled
                         </span>
-                        <div class="vtb__titles__type">{{ self.needTypeLabel }}</div>
+                        <div class="vtb__titles__type">{{ self.atomTypeLabel }}</div>
                     </hgroup>
                 </div>
             </div>
-            <won-share-dropdown need-uri="self.postUri"></won-share-dropdown>
-            <won-post-context-dropdown need-uri="self.postUri"></won-post-context-dropdown>
+            <won-share-dropdown atom-uri="self.postUri"></won-share-dropdown>
+            <won-post-context-dropdown atom-uri="self.postUri"></won-post-context-dropdown>
         </nav>
     `;
 
@@ -50,42 +50,42 @@ function genComponentConf() {
 
       const selectFromState = state => {
         const postUri = getPostUriFromRoute(state);
-        const post = state.getIn(["needs", postUri]);
+        const post = state.getIn(["atoms", postUri]);
 
         const personaUri = get(post, "heldBy");
-        const persona = personaUri && getIn(state, ["needs", personaUri]);
+        const persona = personaUri && getIn(state, ["atoms", personaUri]);
         const personaName = get(persona, "humanReadable");
-        const isDirectResponse = needUtils.isDirectResponseNeed(post);
+        const isDirectResponse = atomUtils.isDirectResponseAtom(post);
         const responseToUri =
           isDirectResponse && getIn(post, ["content", "responseToUri"]);
-        const responseToNeed =
-          responseToUri && getIn(state, ["needs", responseToUri]);
+        const responseToAtom =
+          responseToUri && getIn(state, ["atoms", responseToUri]);
 
         return {
           postUri,
           post,
           personaName,
           isDirectResponse,
-          responseToNeed,
-          isGroupChatEnabled: needUtils.hasGroupFacet(post),
-          isChatEnabled: needUtils.hasChatFacet(post),
-          needTypeLabel: post && needUtils.generateNeedTypeLabel(post),
+          responseToAtom,
+          isGroupChatEnabled: atomUtils.hasGroupSocket(post),
+          isChatEnabled: atomUtils.hasChatSocket(post),
+          atomTypeLabel: post && atomUtils.generateAtomTypeLabel(post),
         };
       };
       connect2Redux(selectFromState, actionCreators, [], this);
     }
 
     hasTitle() {
-      if (this.isDirectResponse && this.responseToNeed) {
-        return !!this.responseToNeed.get("humanReadable");
+      if (this.isDirectResponse && this.responseToAtom) {
+        return !!this.responseToAtom.get("humanReadable");
       } else {
         return !!this.post.get("humanReadable");
       }
     }
 
     generateTitle() {
-      if (this.isDirectResponse && this.responseToNeed) {
-        return "Re: " + this.responseToNeed.get("humanReadable");
+      if (this.isDirectResponse && this.responseToAtom) {
+        return "Re: " + this.responseToAtom.get("humanReadable");
       } else {
         return this.post.get("humanReadable");
       }

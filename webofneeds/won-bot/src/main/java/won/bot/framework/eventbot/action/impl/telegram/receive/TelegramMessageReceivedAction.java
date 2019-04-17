@@ -58,7 +58,7 @@ public class TelegramMessageReceivedAction extends BaseEventBotAction {
                 AnswerCallbackQuery answerCallbackQuery = new AnswerCallbackQuery();
                 answerCallbackQuery.setCallbackQueryId(callbackQuery.getId());
                 switch (correspondingURI.getType()) {
-                    case NEED:
+                    case ATOM:
                         break;
                     case CONNECTION:
                         if ("0".equals(data)) { // CLOSE CONNECTION
@@ -71,11 +71,11 @@ public class TelegramMessageReceivedAction extends BaseEventBotAction {
                         } else if ("1".equals(data)) { // ACCEPT CONNECTION
                             Dataset connectionRDF = getEventListenerContext().getLinkedDataSource()
                                             .getDataForResource(correspondingURI.getUri());
-                            URI remoteNeed = WonRdfUtils.ConnectionUtils.getRemoteNeedURIFromConnection(connectionRDF,
+                            URI targetAtom = WonRdfUtils.ConnectionUtils.getTargetAtomURIFromConnection(connectionRDF,
                                             correspondingURI.getUri());
-                            URI localNeed = WonRdfUtils.ConnectionUtils.getLocalNeedURIFromConnection(connectionRDF,
+                            URI localAtom = WonRdfUtils.ConnectionUtils.getLocalAtomURIFromConnection(connectionRDF,
                                             correspondingURI.getUri());
-                            bus.publish(new ConnectCommandEvent(localNeed, remoteNeed));
+                            bus.publish(new ConnectCommandEvent(localAtom, targetAtom));
                             answerCallbackQuery.setText("Opened Connection");
                         }
                         break;

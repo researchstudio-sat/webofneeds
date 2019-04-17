@@ -83,7 +83,7 @@ public class WonMessageSignerVerifier {
         if (graphIsEnvelope) {
             // only connect envelope to signature. pure signature graphs are not connected
             // this way.
-            envelopeResource.addProperty(WONMSG.CONTAINS_SIGNATURE_PROPERTY, sigNode);
+            envelopeResource.addProperty(WONMSG.containsSignature, sigNode);
         }
         WonRdfUtils.SignatureUtils.addSignature(sigNode, sigData);
     }

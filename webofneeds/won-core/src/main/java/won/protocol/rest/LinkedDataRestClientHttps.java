@@ -23,7 +23,7 @@ import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 
 import won.cryptography.keymanagement.KeyPairAliasDerivationStrategy;
-import won.cryptography.keymanagement.NeedUriAsAliasStrategy;
+import won.cryptography.keymanagement.AtomUriAsAliasStrategy;
 import won.cryptography.service.CryptographyUtils;
 import won.cryptography.service.TrustStoreService;
 import won.cryptography.service.keystore.KeyStoreService;
@@ -41,7 +41,7 @@ public class LinkedDataRestClientHttps extends LinkedDataRestClient {
     private KeyStoreService keyStoreService;
     private TrustStoreService trustStoreService;
     private TrustStrategy trustStrategy;
-    private KeyPairAliasDerivationStrategy keyPairAliasDerivationStrategy = new NeedUriAsAliasStrategy();
+    private KeyPairAliasDerivationStrategy keyPairAliasDerivationStrategy = new AtomUriAsAliasStrategy();
 
     public LinkedDataRestClientHttps(KeyStoreService keyStoreService, TrustStoreService trustStoreService,
                     TrustStrategy trustStrategy, KeyPairAliasDerivationStrategy keyPairAliasDerivationStrategy) {
@@ -66,7 +66,7 @@ public class LinkedDataRestClientHttps extends LinkedDataRestClient {
             template = CryptographyUtils.createSslRestTemplate(this.keyStoreService.getUnderlyingKeyStore(),
                             this.keyStoreService.getPassword(),
                             new PredefinedAliasPrivateKeyStrategy(
-                                            keyPairAliasDerivationStrategy.getAliasForNeedUri(webID)),
+                                            keyPairAliasDerivationStrategy.getAliasForAtomUri(webID)),
                             this.trustStoreService.getUnderlyingKeyStore(), this.trustStrategy, readTimeout,
                             connectionTimeout, true);
         } catch (Exception e) {

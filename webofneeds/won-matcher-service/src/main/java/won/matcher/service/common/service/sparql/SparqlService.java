@@ -123,9 +123,9 @@ public class SparqlService {
         return ds;
     }
 
-    public Dataset retrieveNeedDataset(String uri) {
-        String queryString = "prefix won: <http://purl.org/webofneeds/model#> select distinct ?g where { "
-                        + "GRAPH ?g { ?uri a won:Need. ?a ?b ?c. } }";
+    public Dataset retrieveAtomDataset(String uri) {
+        String queryString = "prefix won: <https://w3id.org/won/core#> select distinct ?g where { "
+                        + "GRAPH ?g { ?uri a won:Atom. ?a ?b ?c. } }";
         ParameterizedSparqlString pps = new ParameterizedSparqlString();
         pps.setCommandText(queryString);
         pps.setIri("uri", uri);

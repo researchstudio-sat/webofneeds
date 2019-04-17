@@ -14,12 +14,12 @@ import java.net.URI;
 
 /**
  * Interface responsible for extracting the ActiveMQ queue name for connecting
- * to a need via ActiveMQ from the linked data description of a need or WON
+ * to an atom via ActiveMQ from the linked data description of an atom or WON
  * node.
  */
 public interface ActiveMQService extends MessageBrokerService {
     /**
-     * Extracts the ActiveMQ queue name for connecting via ActiveMQ to the need or
+     * Extracts the ActiveMQ queue name for connecting via ActiveMQ to the atom or
      * WON node identified by the specified resourceUri.
      * 
      * @param resourceUri

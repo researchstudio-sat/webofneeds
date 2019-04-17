@@ -20,7 +20,7 @@ function genTopnavConf() {
         <div class="footer__appTitle">
             {{ self.appTitle }}
         </div>
-        <div class="footer__tagLine">Web Of Needs</div>-->
+        <div class="footer__tagLine">Web of Needs</div>-->
         <div class="footer__linksdesktop hide-in-responsive">
             <a class="footer__linksdesktop__link" href="{{ self.absHRef(self.$state, 'about', {'aboutSection': undefined}) }}">About</a>
             <span class="footer__linksdesktop__divider">|</span>

@@ -10,7 +10,7 @@ import won.bot.framework.bot.Bot;
  *
  */
 public interface BotManager {
-    public Bot getBotForNeedURI(URI needUri);
+    public Bot getBotForAtomURI(URI atomUri);
 
     public List<Bot> getBotsForNodeURI(URI nodeUri);
 

@@ -1,6 +1,6 @@
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-PREFIX msg: <http://purl.org/webofneeds/message#>
-PREFIX won: <http://purl.org/webofneeds/model#>
+PREFIX msg: <https://w3id.org/won/message#>
+PREFIX won: <https://w3id.org/won/core#>
 SELECT distinct ?g ?s ?p ?o WHERE {
 
      GRAPH ?g {
@@ -10,7 +10,7 @@ SELECT distinct ?g ?s ?p ?o WHERE {
      
      optional {
        GRAPH ?e1 {
-            ?msg msg:hasContent ?g
+            ?msg msg:content ?g
        }
        GRAPH ?g {
             ?s ?p ?o
@@ -28,7 +28,7 @@ SELECT distinct ?g ?s ?p ?o WHERE {
         
         
      GRAPH <urn:x-arq:UnionGraph> { 
-         ?terminatinggraph   msg:hasPreviousMessage*/msg:hasCorrespondingRemoteMessage?/^(msg:isResponseTo|msg:isRemoteResponseTo)? ?msg .    
+         ?terminatinggraph   msg:previousMessage*/msg:correspondingRemoteMessage?/^(msg:isResponseTo|msg:isRemoteResponseTo)? ?msg .    
      }  
 
 } order by ?g

@@ -5,8 +5,8 @@ import { connect2Redux } from "../../won-utils.js";
 import { attach, get, getIn } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
 import {
-  getOwnedNeedByConnectionUri,
-  getNeeds,
+  getOwnedAtomByConnectionUri,
+  getAtoms,
 } from "../../selectors/general-selectors.js";
 import { getOwnedConnections } from "../../selectors/connection-selectors.js";
 import trigModule from "../trig.js";
@@ -42,7 +42,7 @@ function genComponentConf() {
             class="msg__header__inject"
             ng-class="{'clickable': self.isInjectIntoConnectionPresent(connUri)}"
             ng-repeat="connUri in self.injectIntoArray"
-            uri="self.getInjectIntoNeedUri(connUri)"
+            uri="self.getInjectIntoAtomUri(connUri)"
             ng-click="!self.multiSelectType && self.isInjectIntoConnectionPresent(connUri) && self.router__stateGoCurrent({connectionUri: connUri})">
           </won-square-image>
       </div>
@@ -67,11 +67,11 @@ function genComponentConf() {
       attach(this, serviceDependencies, arguments);
 
       const selectFromState = state => {
-        const ownedNeed =
+        const ownedAtom =
           this.connectionUri &&
-          getOwnedNeedByConnectionUri(state, this.connectionUri);
+          getOwnedAtomByConnectionUri(state, this.connectionUri);
         const connection =
-          ownedNeed && ownedNeed.getIn(["connections", this.connectionUri]);
+          ownedAtom && ownedAtom.getIn(["connections", this.connectionUri]);
 
         const message =
           connection &&
@@ -87,27 +87,27 @@ function genComponentConf() {
         const referencesClaims = references && references.get("claims");
 
         const allConnections = getOwnedConnections(state);
-        const allNeeds = getNeeds(state);
+        const allAtoms = getAtoms(state);
 
         /*Extract persona name from message:
 
-         either within the need of the originatorUri-need (in group-chat-messages)
+         either within the atom of the originatorUri-atom (in group-chat-messages)
          or
-         within the remoteNeedUri-need of the connection (for 1:1 chats)
+         within the targetAtomUri-atom of the connection (for 1:1 chats)
          */
-        const relevantNeedUri =
+        const relevantAtomUri =
           !get(message, "outgoingMessage") &&
           (this.groupChatMessage
             ? get(message, "originatorUri")
-            : get(connection, "remoteNeedUri"));
+            : get(connection, "targetAtomUri"));
         const relevantPersonaUri =
-          relevantNeedUri && getIn(allNeeds, [relevantNeedUri, "heldBy"]);
+          relevantAtomUri && getIn(allAtoms, [relevantAtomUri, "heldBy"]);
         const personaName =
           relevantPersonaUri &&
-          getIn(allNeeds, [relevantPersonaUri, "content", "personaName"]);
+          getIn(allAtoms, [relevantPersonaUri, "content", "personaName"]);
 
         return {
-          allNeeds,
+          allAtoms,
           allConnections,
           personaName,
           multiSelectType: connection && connection.get("multiSelectType"),
@@ -120,7 +120,7 @@ function genComponentConf() {
           hasProposes: referencesProposes && referencesProposes.size > 0,
           messageStatus: message && message.get("messageStatus"),
           isGroupChatMessage: this.groupChatMessage,
-          isInjectIntoMessage: injectInto && injectInto.size > 0, //contains the remoteConnectionUris
+          isInjectIntoMessage: injectInto && injectInto.size > 0, //contains the targetConnectionUris
           originatorUri: message && message.get("originatorUri"),
           injectIntoArray: injectInto && Array.from(injectInto.toSet()),
           messageType,
@@ -201,34 +201,34 @@ function genComponentConf() {
       return undefined;
     }
 
-    getInjectIntoNeedUri(connectionUri) {
+    getInjectIntoAtomUri(connectionUri) {
       //TODO: THIS MIGHT BE A CONNECTION THAT WE DONT EVEN OWN, SO WE NEED TO BE MORE SMART ABOUT IT
       let connection =
         this.allConnections && this.allConnections.get(connectionUri);
 
       if (connection) {
-        return connection.get("remoteNeedUri");
+        return connection.get("targetAtomUri");
       } else {
         connection =
           this.allConnections &&
           this.allConnections.find(
-            conn => conn.get("remoteConnectionUri") === connectionUri
+            conn => conn.get("targetConnectionUri") === connectionUri
           );
 
         if (connection) {
-          return connection.get("remoteNeedUri");
+          return connection.get("targetAtomUri");
         }
       }
       return undefined;
     }
 
-    getInjectIntoNeedTitle(connectionUri) {
+    getInjectIntoAtomTitle(connectionUri) {
       //TODO: THIS MIGHT BE A CONNECTION THAT WE DONT EVEN OWN, SO WE NEED TO BE MORE SMART ABOUT IT
-      const injectIntoNeedUri = this.getInjectIntoNeedUri(connectionUri);
-      const injectIntoNeed =
-        injectIntoNeedUri && this.allNeeds.get(injectIntoNeedUri);
+      const injectIntoAtomUri = this.getInjectIntoAtomUri(connectionUri);
+      const injectIntoAtom =
+        injectIntoAtomUri && this.allAtoms.get(injectIntoAtomUri);
 
-      return injectIntoNeed && injectIntoNeed.get("humanReadable");
+      return injectIntoAtom && injectIntoAtom.get("humanReadable");
     }
 
     isInjectIntoConnectionPresent(connectionUri) {
@@ -242,7 +242,7 @@ function genComponentConf() {
         return (
           this.allConnections &&
           !!this.allConnections.find(
-            conn => conn.get("remoteConnectionUri") === connectionUri
+            conn => conn.get("targetConnectionUri") === connectionUri
           )
         );
       }

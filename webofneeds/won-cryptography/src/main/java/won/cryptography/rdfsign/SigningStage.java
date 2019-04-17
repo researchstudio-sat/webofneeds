@@ -107,18 +107,18 @@ public class SigningStage {
         graphUriToItsMessageUri.put(envelopeGraphUri, envMessageUri);
         Resource msgEventResource = envelopeGraph.getResource(envMessageUri);
         Resource msgEnvelopeResource = envelopeGraph.getResource(envelopeGraphUri);
-        StmtIterator it = msgEventResource.listProperties(WONMSG.HAS_CONTENT_PROPERTY);
+        StmtIterator it = msgEventResource.listProperties(WONMSG.content);
         while (it.hasNext()) {
             contentUriToContainingItEnvUri.put(it.nextStatement().getObject().asResource().getURI(), envelopeGraphUri);
         }
         // find if it contains another envelopes
-        it = msgEnvelopeResource.listProperties(WONMSG.CONTAINS_ENVELOPE);
+        it = msgEnvelopeResource.listProperties(WONMSG.containsEnvelope);
         // TODO make sure that > 1 envelope is not possible in the protocol
         if (it.hasNext()) {
             envUriToContainedInItEnvUri.put(envelopeGraphUri, it.nextStatement().getObject().asResource().getURI());
         }
         // find if it contains a signature references
-        it = msgEnvelopeResource.listProperties(WONMSG.CONTAINS_SIGNATURE_PROPERTY);
+        it = msgEnvelopeResource.listProperties(WONMSG.containsSignature);
         while (it.hasNext()) {
             Resource refObj = it.next().getObject().asResource();
             extractSignatureData(refObj.getURI(), refObj.getModel());

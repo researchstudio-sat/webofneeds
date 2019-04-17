@@ -45,7 +45,7 @@ import org.springframework.web.client.ResponseExtractor;
 import org.springframework.web.client.RestTemplate;
 
 import won.owner.model.User;
-import won.owner.model.UserNeed;
+import won.owner.model.UserAtom;
 import won.owner.service.impl.WONUserDetailService;
 import won.protocol.rest.LinkedDataRestBridge;
 import won.protocol.rest.RDFMediaType;
@@ -66,7 +66,7 @@ public class BridgeForLinkedDataController implements InitializingBean {
     @Autowired
     private WONUserDetailService wonUserDetailService;
     @Autowired
-    private LinkedDataRestBridge linkedDataRestBridgeOnBehalfOfNeed;
+    private LinkedDataRestBridge linkedDataRestBridgeOnBehalfOfAtom;
     @Autowired
     private LinkedDataRestBridge linkedDataRestBridge;
 
@@ -111,7 +111,7 @@ public class BridgeForLinkedDataController implements InitializingBean {
             // check if the currently logged in user owns that webid:
             if (currentUserHasIdentity(requesterWebId)) {
                 // yes: let them use it
-                restTemplate = linkedDataRestBridgeOnBehalfOfNeed.getRestTemplate(requesterWebId);
+                restTemplate = linkedDataRestBridgeOnBehalfOfAtom.getRestTemplate(requesterWebId);
             } else {
                 // no: that's fishy, but we let them make the request without the webid
                 restTemplate = linkedDataRestBridge.getRestTemplate();
@@ -128,7 +128,7 @@ public class BridgeForLinkedDataController implements InitializingBean {
             @Override
             public ClientHttpResponse extractData(final ClientHttpResponse originalResponse) throws IOException {
                 prepareBridgeResponseOutputStream(originalResponse, response);
-                // we don't really need to return anything, so we don't
+                // we don't really atom to return anything, so we don't
                 return null;
             }
         });
@@ -261,7 +261,7 @@ public class BridgeForLinkedDataController implements InitializingBean {
 
     /**
      * Check if the current user has the claimed identity represented by web-id of
-     * the need. I.e. if the identity is that of the need that belongs to the user -
+     * the atom. I.e. if the identity is that of the atom that belongs to the user -
      * return true, otherwise - false.
      *
      * @param requesterWebId
@@ -270,18 +270,18 @@ public class BridgeForLinkedDataController implements InitializingBean {
     private boolean currentUserHasIdentity(final String requesterWebId) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = (User) wonUserDetailService.loadUserByUsername(username);
-        Set<URI> needUris = getUserNeedUris(user);
-        if (needUris.contains(URI.create(requesterWebId))) {
+        Set<URI> atomUris = getUserAtomUris(user);
+        if (atomUris.contains(URI.create(requesterWebId))) {
             return true;
         }
         return false;
     }
 
-    private Set<URI> getUserNeedUris(final User user) {
-        Set<URI> needUris = new HashSet<>();
-        for (UserNeed userNeed : user.getUserNeeds()) {
-            needUris.add(userNeed.getUri());
+    private Set<URI> getUserAtomUris(final User user) {
+        Set<URI> atomUris = new HashSet<>();
+        for (UserAtom userAtom : user.getUserAtoms()) {
+            atomUris.add(userAtom.getUri());
         }
-        return needUris;
+        return atomUris;
     }
 }

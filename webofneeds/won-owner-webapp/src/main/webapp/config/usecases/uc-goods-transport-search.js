@@ -278,9 +278,9 @@ export const goodsTransportSearch = {
           xsd: "http://www.w3.org/2001/XMLSchema#",
         },
         operations: [
-          `${resultName} a won:Need.`,
+          `${resultName} a won:Atom.`,
           `${resultName} a <http://dbpedia.org/resource/Transport>. `,
-          `${resultName} (won:hasLocation|s:location) ?location.`,
+          `${resultName} (won:location|s:location) ?location.`,
           "?location s:geo ?location_geo.",
           "?location_geo s:latitude ?location_lat;",
           "s:longitude ?location_lon;",
@@ -312,9 +312,9 @@ export const goodsTransportSearch = {
           xsd: "http://www.w3.org/2001/XMLSchema#",
         },
         operations: [
-          `${resultName} a won:Need.`,
+          `${resultName} a won:Atom.`,
           `${resultName} a <http://dbpedia.org/resource/Transport>.`,
-          `${resultName} (won:hasLocation|s:location) ?location.`,
+          `${resultName} (won:location|s:location) ?location.`,
           "?location s:geo ?location_geo.",
           "?location_geo s:latitude ?location_lat;",
           "s:longitude ?location_lon;",
@@ -338,9 +338,9 @@ export const goodsTransportSearch = {
           xsd: "http://www.w3.org/2001/XMLSchema#",
         },
         operations: [
-          `${resultName} a won:Need.`,
+          `${resultName} a won:Atom.`,
           `${resultName} a <http://dbpedia.org/resource/Transport>.`,
-          `${resultName} (won:hasLocation|s:location) ?location.`,
+          `${resultName} (won:location|s:location) ?location.`,
           "?location s:geo ?location_geo.",
           "?location_geo s:latitude ?location_lat;",
           "s:longitude ?location_lon;",
@@ -361,7 +361,7 @@ export const goodsTransportSearch = {
           won: won.defaultContext["won"],
         },
         operations: [
-          `${resultName} a won:Need.`,
+          `${resultName} a won:Atom.`,
           `${resultName} a <http://dbpedia.org/resource/Transport>. `,
         ],
       };

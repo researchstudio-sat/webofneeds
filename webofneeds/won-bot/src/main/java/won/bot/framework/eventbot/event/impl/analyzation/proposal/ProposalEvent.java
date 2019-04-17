@@ -3,7 +3,7 @@ package won.bot.framework.eventbot.event.impl.analyzation.proposal;
 import java.net.URI;
 import java.util.List;
 
-import won.bot.framework.eventbot.event.BaseNeedAndConnectionSpecificEvent;
+import won.bot.framework.eventbot.event.BaseAtomAndConnectionSpecificEvent;
 import won.bot.framework.eventbot.event.MessageEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.WonMessageReceivedOnConnectionEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.WonMessageSentOnConnectionEvent;
@@ -13,7 +13,7 @@ import won.protocol.util.WonRdfUtils;
 /**
  * Created by fsuda on 08.03.2018.
  */
-public abstract class ProposalEvent extends BaseNeedAndConnectionSpecificEvent {
+public abstract class ProposalEvent extends BaseAtomAndConnectionSpecificEvent {
     private MessageEvent proposalEvent;
     private URI proposalUri;
 

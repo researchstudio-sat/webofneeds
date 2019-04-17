@@ -9,8 +9,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.redfin.sitemapgenerator.WebSitemapGenerator;
 
-import won.owner.model.UserNeed;
-import won.owner.repository.UserNeedRepository;
+import won.owner.model.UserAtom;
+import won.owner.repository.UserAtomRepository;
 import won.owner.service.impl.URIService;
 
 @Service
@@ -18,21 +18,21 @@ public final class SitemapService {
     @Autowired
     private URIService uriService;
     @Autowired
-    private UserNeedRepository userNeedRepository;
+    private UserAtomRepository userAtomRepository;
 
     public void setUriService(URIService uriService) {
         this.uriService = uriService;
     }
 
-    public void setUserNeedRepository(UserNeedRepository userNeedRepository) {
-        this.userNeedRepository = userNeedRepository;
+    public void setUserAtomRepository(UserAtomRepository userAtomRepository) {
+        this.userAtomRepository = userAtomRepository;
     }
 
     @Transactional(propagation = Propagation.SUPPORTS)
     public String createSitemap() throws MalformedURLException {
         WebSitemapGenerator sitemap = new WebSitemapGenerator(uriService.getOwnerProtocolOwnerURI().toString());
-        for (UserNeed need : userNeedRepository.findAll()) {
-            sitemap.addUrl(uriService.getOwnerProtocolOwnerURI() + "/#!post/?postUri=" + need.getUri());
+        for (UserAtom atom : userAtomRepository.findAll()) {
+            sitemap.addUrl(uriService.getOwnerProtocolOwnerURI() + "/#!post/?postUri=" + atom.getUri());
         }
         return String.join("", sitemap.writeAsStrings());
     }

@@ -22,25 +22,25 @@ import org.springframework.stereotype.Component;
 import com.github.jsonldjava.core.JsonLdError;
 
 import won.matcher.solr.hints.HintBuilder;
-import won.matcher.solr.index.NeedIndexer;
+import won.matcher.solr.index.AtomIndexer;
 import won.matcher.solr.query.TestMatcherQueryExecutor;
-import won.matcher.solr.query.factory.BasicNeedQueryFactory;
-import won.matcher.solr.query.factory.TestNeedQueryFactory;
+import won.matcher.solr.query.factory.BasicAtomQueryFactory;
+import won.matcher.solr.query.factory.TestAtomQueryFactory;
 import won.matcher.utils.tensor.TensorMatchingData;
 import won.protocol.exception.IncorrectPropertyCountException;
-import won.protocol.util.DefaultNeedModelWrapper;
+import won.protocol.util.DefaultAtomModelWrapper;
 
 /**
  * Created by hfriedrich on 05.08.2016. This class can be used to do evaluation
- * of the quality of matching of Solr querying. It reads needs mail files from
+ * of the quality of matching of Solr querying. It reads atoms mail files from
  * supply and demand directories on the hard drive. Subject will be mapped to
- * title and content will be mapped to description. These needs can be written
+ * title and content will be mapped to description. These atoms can be written
  * to the Solr index and queried. The class uses a solr query executor that
  * defines the Solr query to test for matching. The class can build to tensors
  * that can be used by the "wonpreprocessing" project to evaluate the quality of
  * the matching. The connection tensor has all ground truth connections between
- * all needs (read from the connections file). The prediction tensor has all
- * computed matches between all needs using the solr querying. These tensor
+ * all atoms (read from the connections file). The prediction tensor has all
+ * computed matches between all atoms using the solr querying. These tensor
  * slices can be compared by the "wonpreprocessing" project to compute
  * statistical evaluation measures like precision, recall, accuracy and f-score.
  */
@@ -49,43 +49,43 @@ public class SolrMatcherEvaluation {
     @Autowired
     TestMatcherQueryExecutor queryExecutor;
     @Autowired
-    NeedIndexer needIndexer;
+    AtomIndexer atomIndexer;
     @Autowired
-    private MailDirNeedProducer seeksNeedProducer;
+    private MailDirAtomProducer seeksAtomProducer;
     @Autowired
-    private MailDirNeedProducer isNeedProducer;
+    private MailDirAtomProducer isAtomProducer;
     @Autowired
     HintBuilder hintBuilder;
     private String outputDir;
     private String connectionsFile;
-    private Map<String, Dataset> needFileDatasetMap;
+    private Map<String, Dataset> atomFileDatasetMap;
     private TensorMatchingData matchingDataConnections;
     private TensorMatchingData matchingDataPredictions;
 
-    public void setSeeksNeedProducer(final MailDirNeedProducer seeksNeedProducer) {
-        this.seeksNeedProducer = seeksNeedProducer;
+    public void setSeeksAtomProducer(final MailDirAtomProducer seeksAtomProducer) {
+        this.seeksAtomProducer = seeksAtomProducer;
     }
 
-    public void setIsNeedProducer(final MailDirNeedProducer isNeedProducer) {
-        this.isNeedProducer = isNeedProducer;
+    public void setIsAtomProducer(final MailDirAtomProducer isAtomProducer) {
+        this.isAtomProducer = isAtomProducer;
     }
 
-    public static String createNeedId(Dataset need) {
+    public static String createAtomId(Dataset atom) {
         String title = "";
         String description = "";
         try {
-            DefaultNeedModelWrapper needModelWrapper = new DefaultNeedModelWrapper(need);
-            title = needModelWrapper.getAllTitles().iterator().next();
+            DefaultAtomModelWrapper atomModelWrapper = new DefaultAtomModelWrapper(atom);
+            title = atomModelWrapper.getAllTitles().iterator().next();
             title = title.replaceAll("[^A-Za-z0-9 ]", "_");
             title = title.replaceAll("NOT", "_");
             title = title.replaceAll("AND", "_");
             title = title.replaceAll("OR", "_");
-            description = needModelWrapper.getSomeDescription();
+            description = atomModelWrapper.getSomeDescription();
         } catch (IncorrectPropertyCountException e) {
             // do nothing
         }
         if (title.isEmpty()) {
-            throw new IllegalArgumentException("need has no title!!");
+            throw new IllegalArgumentException("atom has no title!!");
         }
         return title + "_" + (title + description).hashCode();
     }
@@ -93,39 +93,39 @@ public class SolrMatcherEvaluation {
     public SolrMatcherEvaluation() {
         matchingDataConnections = new TensorMatchingData();
         matchingDataPredictions = new TensorMatchingData();
-        needFileDatasetMap = new HashMap<>();
+        atomFileDatasetMap = new HashMap<>();
     }
 
     @PostConstruct
     public void init() throws IOException {
-        initNeedDir(seeksNeedProducer);
-        initNeedDir(isNeedProducer);
+        initAtomDir(seeksAtomProducer);
+        initAtomDir(isAtomProducer);
     }
 
-    private void initNeedDir(MailDirNeedProducer needProducer) throws IOException {
-        // read the need files and add needs to the tensor
-        if (needProducer.getDirectory() == null || !needProducer.getDirectory().isDirectory()) {
+    private void initAtomDir(MailDirAtomProducer atomProducer) throws IOException {
+        // read the atom files and add atoms to the tensor
+        if (atomProducer.getDirectory() == null || !atomProducer.getDirectory().isDirectory()) {
             throw new IOException("Input folder not a directory: "
-                            + ((needProducer.getDirectory() != null) ? needProducer.getDirectory().toString() : null));
+                            + ((atomProducer.getDirectory() != null) ? atomProducer.getDirectory().toString() : null));
         }
-        while (!needProducer.isExhausted()) {
-            String needFileName = needProducer.getCurrentFileName();
-            Dataset ds = needProducer.create();
-            String needId = createNeedId(ds);
-            if (needProducer == seeksNeedProducer) {
-                matchingDataConnections.addNeedAttribute("needtype", needId, "WANT");
-                matchingDataPredictions.addNeedAttribute("needtype", needId, "WANT");
-            } else if (needProducer == isNeedProducer) {
-                matchingDataConnections.addNeedAttribute("needtype", needId, "OFFER");
-                matchingDataPredictions.addNeedAttribute("needtype", needId, "OFFER");
+        while (!atomProducer.isExhausted()) {
+            String atomFileName = atomProducer.getCurrentFileName();
+            Dataset ds = atomProducer.create();
+            String atomId = createAtomId(ds);
+            if (atomProducer == seeksAtomProducer) {
+                matchingDataConnections.addAtomAttribute("atomtype", atomId, "WANT");
+                matchingDataPredictions.addAtomAttribute("atomtype", atomId, "WANT");
+            } else if (atomProducer == isAtomProducer) {
+                matchingDataConnections.addAtomAttribute("atomtype", atomId, "OFFER");
+                matchingDataPredictions.addAtomAttribute("atomtype", atomId, "OFFER");
             }
-            needFileDatasetMap.put(FilenameUtils.removeExtension(needFileName), ds);
+            atomFileDatasetMap.put(FilenameUtils.removeExtension(atomFileName), ds);
         }
     }
 
-    public void indexNeeds() throws IOException, JsonLdError {
-        for (Dataset need : needFileDatasetMap.values()) {
-            needIndexer.indexNeedModel(need.getDefaultModel(), createNeedId(DatasetFactory.create(need)), true);
+    public void indexAtoms() throws IOException, JsonLdError {
+        for (Dataset atom : atomFileDatasetMap.values()) {
+            atomIndexer.indexAtomModel(atom.getDefaultModel(), createAtomId(DatasetFactory.create(atom)), true);
         }
     }
 
@@ -133,57 +133,57 @@ public class SolrMatcherEvaluation {
         // read the connection file and add connections to the tensor
         BufferedReader reader = new BufferedReader(new FileReader(connectionsFile));
         String line = "";
-        List<String> needs = new LinkedList<String>();
+        List<String> atoms = new LinkedList<String>();
         while ((line = reader.readLine()) != null) {
             if (line.length() == 0) {
-                // add a connection between the first need and all following needs until empty
+                // add a connection between the first atom and all following atoms until empty
                 // line
-                addConnection(needs, false);
-                needs = new LinkedList<String>();
+                addConnection(atoms, false);
+                atoms = new LinkedList<String>();
             } else {
-                Dataset ds = needFileDatasetMap.get(line.trim());
+                Dataset ds = atomFileDatasetMap.get(line.trim());
                 if (ds == null) {
-                    throw new IOException("Dataset is null for need file entry: " + line.trim());
+                    throw new IOException("Dataset is null for atom file entry: " + line.trim());
                 }
-                String needId = createNeedId(ds);
-                if (needId == null) {
-                    throw new IOException("Need from connection file not found in need directory: " + line);
+                String atomId = createAtomId(ds);
+                if (atomId == null) {
+                    throw new IOException("Atom from connection file not found in atom directory: " + line);
                 }
-                needs.add(needId);
+                atoms.add(atomId);
             }
         }
-        addConnection(needs, false);
+        addConnection(atoms, false);
         // output the tensor data
         matchingDataConnections.writeOutputFiles(outputDir + "/connections");
     }
 
     public void buildPredictionTensor() throws IOException, SolrServerException {
-        for (Dataset need : needFileDatasetMap.values()) {
-            for (String match : computeMatchingNeeds(need)) {
-                if (!matchingDataPredictions.getNeeds().contains(createNeedId(need))
-                                || !matchingDataPredictions.getNeeds().contains(match)) {
+        for (Dataset atom : atomFileDatasetMap.values()) {
+            for (String match : computeMatchingAtoms(atom)) {
+                if (!matchingDataPredictions.getAtoms().contains(createAtomId(atom))
+                                || !matchingDataPredictions.getAtoms().contains(match)) {
                     throw new IOException(
-                                    "No need found in input directory for connection specified in connection file:  \n"
-                                                    + createNeedId(need) + "\n" + match);
+                                    "No atom found in input directory for connection specified in connection file:  \n"
+                                                    + createAtomId(atom) + "\n" + match);
                 }
-                matchingDataPredictions.addNeedConnection(createNeedId(need), match, false);
+                matchingDataPredictions.addAtomConnection(createAtomId(atom), match, false);
             }
         }
         // output the tensor data
         matchingDataPredictions.writeOutputFiles(outputDir + "/predictions");
     }
 
-    private List<String> computeMatchingNeeds(Dataset need) throws IOException, SolrServerException {
-        TestNeedQueryFactory needQuery = new TestNeedQueryFactory(need);
-        SolrDocumentList docs = queryExecutor.executeNeedQuery(needQuery.createQuery(), 20, null,
-                        new BasicNeedQueryFactory(need).createQuery());
+    private List<String> computeMatchingAtoms(Dataset atom) throws IOException, SolrServerException {
+        TestAtomQueryFactory atomQuery = new TestAtomQueryFactory(atom);
+        SolrDocumentList docs = queryExecutor.executeAtomQuery(atomQuery.createQuery(), 20, null,
+                        new BasicAtomQueryFactory(atom).createQuery());
         SolrDocumentList matchedDocs = hintBuilder.calculateMatchingResults(docs);
-        List<String> matchedNeeds = new LinkedList<>();
+        List<String> matchedAtoms = new LinkedList<>();
         for (SolrDocument doc : matchedDocs) {
-            String matchedNeedId = doc.getFieldValue("id").toString();
-            matchedNeeds.add(matchedNeedId);
+            String matchedAtomId = doc.getFieldValue("id").toString();
+            matchedAtoms.add(matchedAtomId);
         }
-        return matchedNeeds;
+        return matchedAtoms;
     }
 
     public void setOutputDir(String outputDir) {
@@ -194,19 +194,19 @@ public class SolrMatcherEvaluation {
         this.connectionsFile = connectionsFile;
     }
 
-    private void addConnection(List<String> needs, boolean ignoreNeedsNotFound) throws IOException {
-        for (int i = 1; i < needs.size(); i++) {
-            String need1 = needs.get(0);
-            String need2 = needs.get(i);
-            if (!matchingDataConnections.getNeeds().contains(need1)
-                            || !matchingDataConnections.getNeeds().contains(need2)) {
-                if (!ignoreNeedsNotFound) {
+    private void addConnection(List<String> atoms, boolean ignoreAtomsNotFound) throws IOException {
+        for (int i = 1; i < atoms.size(); i++) {
+            String atom1 = atoms.get(0);
+            String atom2 = atoms.get(i);
+            if (!matchingDataConnections.getAtoms().contains(atom1)
+                            || !matchingDataConnections.getAtoms().contains(atom2)) {
+                if (!ignoreAtomsNotFound) {
                     throw new IOException(
-                                    "No need found in input directory for connection specified in connection file:  \n"
-                                                    + need1 + "\n" + need2);
+                                    "No atom found in input directory for connection specified in connection file:  \n"
+                                                    + atom1 + "\n" + atom2);
                 }
             }
-            matchingDataConnections.addNeedConnection(need1, need2, false);
+            matchingDataConnections.addAtomConnection(atom1, atom2, false);
         }
     }
 }

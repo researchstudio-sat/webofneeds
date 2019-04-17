@@ -48,7 +48,7 @@ public class WonMessageProcessorCamelAdapter implements Processor {
             logger.debug("calling adaptee {} with message {} (type: {}, direction: {}, recipient: {})",
                             new Object[] { adaptee, msg, ((WonMessage) msg).getMessageType(),
                                             ((WonMessage) msg).getEnvelopeType(),
-                                            ((WonMessage) msg).getReceiverURI() });
+                                            ((WonMessage) msg).getRecipientURI() });
         }
         // call the process method
         WonMessage resultMsg = null;
@@ -58,13 +58,13 @@ public class WonMessageProcessorCamelAdapter implements Processor {
                 logger.debug("returning from adaptee {} with message {} (type: {}, direction: {}, recipient: {})",
                                 new Object[] { adaptee, msg, ((WonMessage) msg).getMessageType(),
                                                 ((WonMessage) msg).getEnvelopeType(),
-                                                ((WonMessage) msg).getReceiverURI() });
+                                                ((WonMessage) msg).getRecipientURI() });
             }
         } catch (Exception e) {
             logger.info("re-throwing exception {} caught calling adaptee {} with message {} (type: {}, direction: {}, recipient:{})",
                             new Object[] { e, adaptee, msg, ((WonMessage) msg).getMessageType(),
                                             ((WonMessage) msg).getEnvelopeType(),
-                                            ((WonMessage) msg).getReceiverURI() });
+                                            ((WonMessage) msg).getRecipientURI() });
             throw e;
         }
         // set the result of the call as the new message in the exchange's in

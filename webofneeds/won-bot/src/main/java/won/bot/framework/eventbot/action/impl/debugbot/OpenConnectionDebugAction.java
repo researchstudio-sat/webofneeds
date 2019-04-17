@@ -21,7 +21,7 @@ import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.event.ConnectionSpecificEvent;
 import won.bot.framework.eventbot.event.Event;
-import won.bot.framework.eventbot.event.impl.wonmessage.ConnectFromOtherNeedEvent;
+import won.bot.framework.eventbot.event.impl.wonmessage.ConnectFromOtherAtomEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.WonMessageReceivedOnConnectionEvent;
 import won.bot.framework.eventbot.listener.EventListener;
 import won.protocol.exception.WonMessageBuilderException;
@@ -49,7 +49,7 @@ public class OpenConnectionDebugAction extends BaseEventBotAction {
 
     @Override
     public void doRun(final Event event, EventListener executingListener) throws Exception {
-        if (!(event instanceof ConnectFromOtherNeedEvent)) {
+        if (!(event instanceof ConnectFromOtherAtomEvent)) {
             return;
         }
         if (event instanceof WonMessageReceivedOnConnectionEvent) {
@@ -99,34 +99,34 @@ public class OpenConnectionDebugAction extends BaseEventBotAction {
     private WonMessage createOpenWonMessage(URI connectionURI, String message) throws WonMessageBuilderException {
         WonNodeInformationService wonNodeInformationService = getEventListenerContext().getWonNodeInformationService();
         Dataset connectionRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(connectionURI);
-        URI remoteNeed = WonRdfUtils.ConnectionUtils.getRemoteNeedURIFromConnection(connectionRDF, connectionURI);
-        URI localNeed = WonRdfUtils.ConnectionUtils.getLocalNeedURIFromConnection(connectionRDF, connectionURI);
+        URI targetAtom = WonRdfUtils.ConnectionUtils.getTargetAtomURIFromConnection(connectionRDF, connectionURI);
+        URI localAtom = WonRdfUtils.ConnectionUtils.getLocalAtomURIFromConnection(connectionRDF, connectionURI);
         URI wonNode = WonRdfUtils.ConnectionUtils.getWonNodeURIFromConnection(connectionRDF, connectionURI);
-        Dataset remoteNeedRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(remoteNeed);
+        Dataset targetAtomRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(targetAtom);
         return WonMessageBuilder
                         .setMessagePropertiesForOpen(wonNodeInformationService.generateEventURI(wonNode), connectionURI,
-                                        localNeed, wonNode,
-                                        WonRdfUtils.ConnectionUtils.getRemoteConnectionURIFromConnection(connectionRDF,
+                                        localAtom, wonNode,
+                                        WonRdfUtils.ConnectionUtils.getTargetConnectionURIFromConnection(connectionRDF,
                                                         connectionURI),
-                                        remoteNeed,
-                                        WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(remoteNeedRDF, remoteNeed), message)
+                                        targetAtom,
+                                        WonRdfUtils.AtomUtils.getWonNodeURIFromAtom(targetAtomRDF, targetAtom), message)
                         .build();
     }
 
     private WonMessage createCloseWonMessage(URI connectionURI, String message) throws WonMessageBuilderException {
         WonNodeInformationService wonNodeInformationService = getEventListenerContext().getWonNodeInformationService();
         Dataset connectionRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(connectionURI);
-        URI remoteNeed = WonRdfUtils.ConnectionUtils.getRemoteNeedURIFromConnection(connectionRDF, connectionURI);
-        URI localNeed = WonRdfUtils.ConnectionUtils.getLocalNeedURIFromConnection(connectionRDF, connectionURI);
+        URI targetAtom = WonRdfUtils.ConnectionUtils.getTargetAtomURIFromConnection(connectionRDF, connectionURI);
+        URI localAtom = WonRdfUtils.ConnectionUtils.getLocalAtomURIFromConnection(connectionRDF, connectionURI);
         URI wonNode = WonRdfUtils.ConnectionUtils.getWonNodeURIFromConnection(connectionRDF, connectionURI);
-        Dataset remoteNeedRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(remoteNeed);
+        Dataset targetAtomRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(targetAtom);
         return WonMessageBuilder
                         .setMessagePropertiesForClose(wonNodeInformationService.generateEventURI(wonNode),
-                                        connectionURI, localNeed, wonNode,
-                                        WonRdfUtils.ConnectionUtils.getRemoteConnectionURIFromConnection(connectionRDF,
+                                        connectionURI, localAtom, wonNode,
+                                        WonRdfUtils.ConnectionUtils.getTargetConnectionURIFromConnection(connectionRDF,
                                                         connectionURI),
-                                        remoteNeed,
-                                        WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(remoteNeedRDF, remoteNeed), message)
+                                        targetAtom,
+                                        WonRdfUtils.AtomUtils.getWonNodeURIFromAtom(targetAtomRDF, targetAtom), message)
                         .build();
     }
 }

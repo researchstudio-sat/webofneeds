@@ -24,7 +24,7 @@ import org.springframework.context.ApplicationListener;
 import won.protocol.jms.MessagingService;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageEncoder;
-import won.protocol.message.processor.impl.KeyForNewNeedAddingProcessor;
+import won.protocol.message.processor.impl.KeyForNewAtomAddingProcessor;
 import won.protocol.message.processor.impl.SignatureAddingWonMessageProcessor;
 import won.protocol.message.sender.WonMessageSender;
 import won.protocol.model.WonNode;
@@ -50,7 +50,7 @@ public class OwnerWonMessageSenderJMSBased implements ApplicationListener<WonNod
     @Autowired
     private SignatureAddingWonMessageProcessor signatureAddingProcessor;
     @Autowired
-    private KeyForNewNeedAddingProcessor needKeyGeneratorAndAdder;
+    private KeyForNewAtomAddingProcessor atomKeyGeneratorAndAdder;
 
     public void sendWonMessage(WonMessage wonMessage) {
         try {
@@ -64,9 +64,9 @@ public class OwnerWonMessageSenderJMSBased implements ApplicationListener<WonNod
             // class
             URI wonNodeUri = wonMessage.getSenderNodeURI();
             if (wonNodeUri == null) {
-                // obtain the sender won node from the sender need
+                // obtain the sender won node from the sender atom
                 throw new IllegalStateException(
-                                "a message needs a SenderNodeUri otherwise we can't determine the won node "
+                                "a message atoms a SenderNodeUri otherwise we can't determine the won node "
                                                 + "via which to send it");
             }
             // get the camel endpoint for talking to the WoN node
@@ -103,10 +103,10 @@ public class OwnerWonMessageSenderJMSBased implements ApplicationListener<WonNod
     // information to the message
     // TODO exceptions
     private WonMessage doSigningOnOwner(final WonMessage wonMessage) throws Exception {
-        // add public key of the newly created need
-        WonMessage outMessage = needKeyGeneratorAndAdder.process(wonMessage);
+        // add public key of the newly created atom
+        WonMessage outMessage = atomKeyGeneratorAndAdder.process(wonMessage);
         // add signature:
-        return signatureAddingProcessor.processOnBehalfOfNeed(outMessage);
+        return signatureAddingProcessor.processOnBehalfOfAtom(outMessage);
     }
 
     /**

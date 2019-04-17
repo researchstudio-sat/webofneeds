@@ -1,9 +1,9 @@
 <https://localhost:8443/won/resource/event/1107469913331435500> {
     <https://localhost:8443/won/resource/event/6149800720990867000>
-            <http://purl.org/webofneeds/model#hasFacet>
-                    <http://purl.org/webofneeds/model#ChatFacet> ;
-            <http://purl.org/webofneeds/model#hasRemoteFacet>
-                    <http://purl.org/webofneeds/model#ChatFacet> ;
-            <http://purl.org/webofneeds/model#hasTextMessage>
+            <https://w3id.org/won/core#socket>
+                    <https://w3id.org/won/core#ChatSocket> ;
+            <https://w3id.org/won/core#targetSocket>
+                    <https://w3id.org/won/core#ChatSocket> ;
+            <https://w3id.org/won/core#textMessage>
                     "Hello, debugbot!" .
 }

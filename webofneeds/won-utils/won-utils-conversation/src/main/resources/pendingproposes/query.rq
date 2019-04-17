@@ -1,9 +1,9 @@
 #pendingproposes with 2proposal-noaccepted.trig
-PREFIX mod: <http://purl.org/webofneeds/modification#>
-PREFIX agr: <http://purl.org/webofneeds/agreement#>
+PREFIX mod: <https://w3id.org/won/modification#>
+PREFIX agr: <https://w3id.org/won/agreement#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-PREFIX msg: <http://purl.org/webofneeds/message#>
-PREFIX won: <http://purl.org/webofneeds/model#>
+PREFIX msg: <https://w3id.org/won/message#>
+PREFIX won: <https://w3id.org/won/core#>
 
 CONSTRUCT { ?openprop agr:proposes ?openclause  . }
  WHERE {
@@ -18,7 +18,7 @@ CONSTRUCT { ?openprop agr:proposes ?openclause  . }
     }
           
       GRAPH <urn:x-arq:UnionGraph> { 
-         ?openprop msg:hasPreviousMessage+/msg:hasCorrespondingRemoteMessage? ?openclause .
+         ?openprop msg:previousMessage+/msg:correspondingRemoteMessage? ?openclause .
       }
           
     GRAPH ?openclauseContent {
@@ -26,12 +26,12 @@ CONSTRUCT { ?openprop agr:proposes ?openclause  . }
     }
           
     GRAPH ?openg3 {
-        ?openclause msg:hasContent ?openclauseContent .
+        ?openclause msg:content ?openclauseContent .
     }
           
   ## this query checks to see that the proposal exists in a content graph  
     GRAPH ?openg4 {
-       ?adatagraph msg:hasContent ?openg1 .
+       ?adatagraph msg:content ?openg1 .
     }      
    # end of edit ..
    
@@ -42,17 +42,17 @@ CONSTRUCT { ?openprop agr:proposes ?openclause  . }
     }
 
    GRAPH ?g3 {
-        ?clause msg:hasContent ?clauseContent .
+        ?clause msg:content ?clauseContent .
     }
     
 FILTER NOT EXISTS {
-    # Note: for this pattern, we need the union of all graphs that contain msg:hasPreviousMessage triples,
+    # Note: for this pattern, we need the union of all graphs that contain msg:previousMessage triples,
     # Jena provides the special graph name <urn:x-arq:UnionGraph> for querying the union of all the query's graphs
     # THIS QUERY WILL ONLY WORK WITH JENA
     filter (?prop != ?acc) .
      GRAPH <urn:x-arq:UnionGraph> {
-        ?prop msg:hasPreviousMessage+/msg:hasCorrespondingRemoteMessage? ?clause .
-        ?acc msg:hasPreviousMessage+/msg:hasCorrespondingRemoteMessage ?prop .
+        ?prop msg:previousMessage+/msg:correspondingRemoteMessage? ?clause .
+        ?acc msg:previousMessage+/msg:correspondingRemoteMessage ?prop .
      }
     GRAPH ?g2 {
         ?acc agr:accepts ?prop .
@@ -71,12 +71,12 @@ FILTER NOT EXISTS {
         }   
           GRAPH <urn:x-arq:UnionGraph> { 
             # also after prop
-            ?acc2 msg:hasPreviousMessage+/msg:hasCorrespondingRemoteMessage ?prop .
+            ?acc2 msg:previousMessage+/msg:correspondingRemoteMessage ?prop .
             # acc2 must not be before acc. If it is parallel, use lexicographically first uri
             filter exists {
                 # if there is a path from acc to acc2, acc2 is earlier and we want the
                 # overall solution to be discarded.
-                ?acc msg:hasPreviousMessage+ ?acc2.
+                ?acc msg:previousMessage+ ?acc2.
             }
          
          }
@@ -94,12 +94,12 @@ FILTER NOT EXISTS {
         }   
           GRAPH <urn:x-arq:UnionGraph> {
             # also after prop
-            ?acc2 msg:hasPreviousMessage+/msg:hasCorrespondingRemoteMessage ?prop .
+            ?acc2 msg:previousMessage+/msg:correspondingRemoteMessage ?prop .
             # acc2 must not be before acc. If it is parallel, use lexicographically first uri
             filter not exists {
                 # if there is a path from acc to acc2, acc2 is earlier and we want the
                 # overall solution to be discarded.
-                ?acc msg:hasPreviousMessage+ ?acc2.
+                ?acc msg:previousMessage+ ?acc2.
             }
             filter (STR(?acc2) < STR(?acc)) 
           }
@@ -113,21 +113,21 @@ FILTER NOT EXISTS {
       GRAPH ?gc1 {   
           ?cancelProp agr:proposesToCancel ?acc .
       }
-      # Note: for this pattern, we need the union of all graphs that contain msg:hasPreviousMessage triples,
+      # Note: for this pattern, we need the union of all graphs that contain msg:previousMessage triples,
       # Jena provides the special graph name <urn:x-arq:UnionGraph> for querying the union of all the query's graphs
       # THIS QUERY WILL ONLY WORK WITH JENA
         GRAPH <urn:x-arq:UnionGraph> {   
-          ?cancelProp msg:hasPreviousMessage+/msg:hasCorrespondingRemoteMessage? ?acc .
-          ?cancelAcc msg:hasPreviousMessage+/msg:hasCorrespondingRemoteMessage ?cancelProp .
+          ?cancelProp msg:previousMessage+/msg:correspondingRemoteMessage? ?acc .
+          ?cancelAcc msg:previousMessage+/msg:correspondingRemoteMessage ?cancelProp .
         }
       GRAPH ?gc2 {
           ?cancelAcc agr:accepts ?cancelProp .
       }  
       GRAPH ?gc3 {
-          ?cancelProp msg:hasContent ?gc1.  
+          ?cancelProp msg:content ?gc1.  
       }
       GRAPH ?gc4 {
-          ?cancelAcc msg:hasContent ?gc2.  
+          ?cancelAcc msg:content ?gc2.  
       }
                   
     }

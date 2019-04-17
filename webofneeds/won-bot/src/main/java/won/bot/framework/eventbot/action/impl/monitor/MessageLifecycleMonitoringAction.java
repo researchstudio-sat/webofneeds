@@ -34,7 +34,7 @@ import won.bot.framework.eventbot.event.impl.monitor.MessageDispatchStartedEvent
 import won.bot.framework.eventbot.event.impl.monitor.MessageDispatchedEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.DeliveryResponseEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.FailureResponseEvent;
-import won.bot.framework.eventbot.event.impl.wonmessage.MessageFromOtherNeedEvent;
+import won.bot.framework.eventbot.event.impl.wonmessage.MessageFromOtherAtomEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.MessageSpecificEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.SuccessResponseEvent;
 import won.bot.framework.eventbot.listener.EventListener;
@@ -73,7 +73,7 @@ public class MessageLifecycleMonitoringAction extends BaseEventBotAction {
                 msgSplitsBC.put(msgURI.toString(), splitBC);
                 msgSplitsBCD.put(msgURI.toString(), splitBCD);
                 msgSplitsBCDE.put(msgURI.toString(), splitBCDE);
-                connectionMsgUris.put(msgURI, msgEvent.getNeedURI());
+                connectionMsgUris.put(msgURI, msgEvent.getAtomURI());
             } else if (event instanceof MessageDispatchedEvent) {
                 msgSplitsB.get(msgURI.toString()).stop();
             }
@@ -81,10 +81,10 @@ public class MessageLifecycleMonitoringAction extends BaseEventBotAction {
             DeliveryResponseEvent responseEvent = (DeliveryResponseEvent) event;
             if (connectionMsgUris.keySet().contains(responseEvent.getOriginalMessageURI())
                             || connectionMsgUris.keySet().contains(responseEvent.getRemoteResponseToMessageURI())) {
-                responseMsgUris.put(responseEvent.getMessage().getMessageURI(), responseEvent.getNeedURI());
+                responseMsgUris.put(responseEvent.getMessage().getMessageURI(), responseEvent.getAtomURI());
                 if (responseEvent.isRemoteResponse()) {
                     responseMsgUris.put(responseEvent.getMessage().getCorrespondingRemoteMessageURI(),
-                                    responseEvent.getRemoteNeedURI());
+                                    responseEvent.getTargetAtomURI());
                 }
             }
             if (responseEvent.isRemoteResponse()) {
@@ -97,11 +97,11 @@ public class MessageLifecycleMonitoringAction extends BaseEventBotAction {
                 logger.debug("RECEIVED RESPONSE EVENT {} for uri {}", event, responseEvent.getOriginalMessageURI());
                 msgSplitsBC.get(responseEvent.getOriginalMessageURI().toString()).stop();
             }
-        } else if (event instanceof MessageFromOtherNeedEvent) {
-            WonMessage msg = ((MessageFromOtherNeedEvent) event).getWonMessage();
+        } else if (event instanceof MessageFromOtherAtomEvent) {
+            WonMessage msg = ((MessageFromOtherAtomEvent) event).getWonMessage();
             URI remoteMessageURI = msg.getCorrespondingRemoteMessageURI();
             msgSplitsBCD.get(remoteMessageURI.toString()).stop();
-            connectionMsgUris.put(msg.getMessageURI(), msg.getReceiverNeedURI());
+            connectionMsgUris.put(msg.getMessageURI(), msg.getRecipientAtomURI());
         } else if (event instanceof CrawlReadyEvent) {
             reportMessageSizes(connectionMsgUris, "Connection Messages");
             reportMessageSizes(responseMsgUris, "Delivery Responses");

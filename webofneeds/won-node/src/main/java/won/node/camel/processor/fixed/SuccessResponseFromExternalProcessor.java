@@ -17,7 +17,7 @@ import java.util.Optional;
  * User: quasarchimaere Date: 03.04.2019
  */
 @Component
-@FixedMessageProcessor(direction = WONMSG.TYPE_FROM_EXTERNAL_STRING, messageType = WONMSG.TYPE_SUCCESS_RESPONSE_STRING)
+@FixedMessageProcessor(direction = WONMSG.FromExternalString, messageType = WONMSG.SuccessResponseString)
 public class SuccessResponseFromExternalProcessor extends AbstractCamelProcessor {
     public void process(final Exchange exchange) throws Exception {
         WonMessage responseMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
@@ -30,7 +30,7 @@ public class SuccessResponseFromExternalProcessor extends AbstractCamelProcessor
             // update the connection database: set the remote connection URI just obtained
             // from the response
             Optional<Connection> con = this.connectionRepository.findOneByConnectionURIForUpdate(mep.getSenderURI());
-            con.get().setRemoteConnectionURI(responseMessage.getSenderURI());
+            con.get().setTargetConnectionURI(responseMessage.getSenderURI());
             this.connectionRepository.save(con.get());
         }
     }

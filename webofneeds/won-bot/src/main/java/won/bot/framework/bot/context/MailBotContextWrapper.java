@@ -32,8 +32,8 @@ public class MailBotContextWrapper extends BotContextWrapper {
     }
 
     // Util Methods to Get/Remove/Add Uri -> MimeMessage Relation
-    public void removeUriMimeMessageRelation(URI needURI) {
-        getBotContext().removeFromObjectMap(uriMimeMessageName, needURI.toString());
+    public void removeUriMimeMessageRelation(URI atomURI) {
+        getBotContext().removeFromObjectMap(uriMimeMessageName, atomURI.toString());
     }
 
     public MimeMessage getMimeMessageForURI(URI uri) throws MessagingException {
@@ -43,10 +43,10 @@ public class MailBotContextWrapper extends BotContextWrapper {
         return new MimeMessage(Session.getDefaultInstance(new Properties(), null), is);
     }
 
-    public void addUriMimeMessageRelation(URI needURI, MimeMessage mimeMessage) throws IOException, MessagingException {
+    public void addUriMimeMessageRelation(URI atomURI, MimeMessage mimeMessage) throws IOException, MessagingException {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         mimeMessage.writeTo(os);
-        getBotContext().saveToObjectMap(uriMimeMessageName, needURI.toString(), os.toByteArray());
+        getBotContext().saveToObjectMap(uriMimeMessageName, atomURI.toString(), os.toByteArray());
     }
 
     // Util Methods to Get/Remove/Add MailId -> URI Relation

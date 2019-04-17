@@ -1,7 +1,7 @@
 package won.protocol.message.processor.exception;
 
 /**
- * Indicates that the uri (of event or need) is already in use. User: ypanchenko
+ * Indicates that the uri (of event or atom) is already in use. User: ypanchenko
  * Date: 24.04.2015
  */
 public class UriAlreadyInUseException extends WonMessageProcessingException {

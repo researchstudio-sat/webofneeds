@@ -22,14 +22,14 @@ import won.matcher.camel.routes.Matcher2NodeDynamicRoutes;
 import won.matcher.camel.routes.MatcherApplicationListenerRouteBuilder;
 import won.protocol.exception.CamelConfigurationFailedException;
 import won.protocol.jms.MatcherProtocolCamelConfigurator;
-import won.protocol.jms.NeedBasedCamelConfiguratorImpl;
+import won.protocol.jms.AtomBasedCamelConfiguratorImpl;
 import won.protocol.model.MessagingType;
 
-// import won.node.camel.routes.NeedProtocolDynamicRoutes;
+// import won.node.camel.routes.AtomProtocolDynamicRoutes;
 /**
  * User: LEIH-NB Date: 26.02.14
  */
-public class MatcherProtocolCamelConfiguratorImpl extends NeedBasedCamelConfiguratorImpl
+public class MatcherProtocolCamelConfiguratorImpl extends AtomBasedCamelConfiguratorImpl
                 implements MatcherProtocolCamelConfigurator {
     private Logger logger = LoggerFactory.getLogger(getClass());
 

@@ -7,17 +7,17 @@
 @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
 @prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-@prefix won:   <http://purl.org/webofneeds/model#> .
+@prefix won:   <https://w3id.org/won/core#> .
 @prefix gr:    <http://purl.org/goodrelations/v1#> .
 @prefix signature: <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#> .
 @prefix ldp:   <http://www.w3.org/ns/ldp#> .
 
 
 :OWN1 {
-    _:wonneed a                     won:Need ;
-      won:hasBasicNeedType  won:Supply ;
-      won:hasContent        [ a                          won:NeedContent ;
-                              won:hasContentDescription  [ a               gr:SomeItems , tio:Taxi ;
+    _:wonatom a                     won:Atom ;
+      won:hasBasicAtomType  won:Supply ;
+      won:content        [ a                          won:AtomContent ;
+                              won:contentDescription  [ a               gr:SomeItems , tio:Taxi ;
                                                            gr:description  "Wherever you want to go, we'll take you there"@en ;
                                                            gr:name         "Fastest taxi in town"@en
                                                          ]
@@ -25,9 +25,9 @@
 }
 
 :OWN2 {
-  _:wonneed won:hasNeedModality
-      [ a   won:NeedModality ;
-         won:hasLocationSpecification  [
+  _:wonatom won:atomModality
+      [ a   won:AtomModality ;
+         won:locationSpecification  [
          a geo:Point ;
          geo:latitude   "48.2187304" ;
          geo:longitude  "16.3602146"

@@ -66,7 +66,7 @@ export function initLeaflet(
   // for some reason this doesn't happen by default
   // when the map is within a tag.
   // this.map.invalidateSize();
-  // ^ doesn't work (needs to be done manually atm);
+  // ^ doesn't work (atoms to be done manually atm);
 
   return map;
 }
@@ -114,12 +114,12 @@ export function leafletBounds(location) {
  *
  * example usage:
  * ```
- * reduxSelectDependsOnProperties(['self.needUri', 'self.timestamp'], selectFromState, this)
+ * reduxSelectDependsOnProperties(['self.atomUri', 'self.timestamp'], selectFromState, this)
  * ```
  *
  * @param properties a list of watch expressions
  * @param selectFromState same as $ngRedux.connect
- * @param ctrl the controller to bind the results to. needs to have `$ngRedux` and `$scope` attached.
+ * @param ctrl the controller to bind the results to. atoms to have `$ngRedux` and `$scope` attached.
  * @returns {*}
  * @returns a function to unregister the watch
  */
@@ -479,7 +479,7 @@ export function parseCredentials(credentials) {
 }
 
 export function getRandomWonId() {
-  // needs to start with a letter, so N3 doesn't run into
+  // atoms to start with a letter, so N3 doesn't run into
   // problems when serializing, see
   // https://github.com/RubenVerborgh/N3.js/issues/121
   return (
@@ -685,7 +685,7 @@ export function createDocumentDefinitionFromPost(post) {
  * corresponding javascript-value.
  *
  * Will traverse into `s:value` of `s:PropertyValue` and
- * `s:QuantiativeValue`s. Note that you'll need to pass the
+ * `s:QuantiativeValue`s. Note that you'll atom to pass the
  * inner type in that case though (e.g. `s:Float` or `s:Text`)
  *
  * @param {*} val

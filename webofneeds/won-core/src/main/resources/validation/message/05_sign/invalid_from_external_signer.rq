@@ -3,13 +3,13 @@ prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
 prefix geo:   <http://www.w3.org/2003/01/geo/wgs84_pos#>
 prefix conn:  <http://localhost:8080/won/resource/connection/>
 prefix event: <http://localhost:8080/won/resource/event/>
-prefix woncrypt: <http://purl.org/webofneeds/woncrypt#>
+prefix woncrypt: <https://w3id.org/won/core#>
 prefix xsd:   <http://www.w3.org/2001/XMLSchema#>
 prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 prefix rdfg:   <http://www.w3.org/2004/03/trix/rdfg-1/>
 prefix local: <http://localhost:8080/won/resource/>
-prefix won:   <http://purl.org/webofneeds/model#>
-prefix msg:   <http://purl.org/webofneeds/message#>
+prefix won:   <https://w3id.org/won/core#>
+prefix msg:   <https://w3id.org/won/message#>
 prefix signature: <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#>
 prefix ldp:   <http://www.w3.org/ns/ldp#>
 
@@ -46,7 +46,7 @@ prefix ldp:   <http://www.w3.org/ns/ldp#>
       {
           graph ?g{
               ?g rdfg:subGraphOf ?event.
-                   ?event msg:hasMessageType ?type.
+                   ?event msg:messageType ?type.
            }
         }
     }
@@ -60,8 +60,8 @@ prefix ldp:   <http://www.w3.org/ns/ldp#>
       {
           # delete the line below and uncomment the next line when
           # the matcher can sign its own envelopes!!!!!!!!!!!!!!!!
-          ?event msg:hasReceiverNode    ?envsigner
-          #?event msg:hasSenderNode    ?envsigner
+          ?event msg:recipientNode    ?envsigner
+          #?event msg:senderNode    ?envsigner
       } .
       GRAPH ?env
       {
@@ -74,7 +74,7 @@ prefix ldp:   <http://www.w3.org/ns/ldp#>
       GRAPH ?g2
       {
           ?envsig a signature:Signature .
-          ?envsig msg:hasSignedGraph ?env .
+          ?envsig msg:signedGraph ?env .
           ?envsig signature:hasVerificationCertificate ?envsigner .
       } .
     } ORDER BY ?event
@@ -120,12 +120,12 @@ prefix ldp:   <http://www.w3.org/ns/ldp#>
       } .
       GRAPH ?g1
       {
-          ?otherevent msg:hasSenderNode    ?envsigner
+          ?otherevent msg:senderNode    ?envsigner
       } .
       GRAPH ?g5
       {
           ?envsig a signature:Signature .
-          ?envsig msg:hasSignedGraph ?g .
+          ?envsig msg:signedGraph ?g .
           ?envsig signature:hasVerificationCertificate ?envsigner .
       } .
     } ORDER BY ?event
@@ -173,7 +173,7 @@ prefix ldp:   <http://www.w3.org/ns/ldp#>
       } .
       GRAPH ?g1
       {
-          ?otherevent msg:hasReceiverNode    ?envsigner
+          ?otherevent msg:recipientNode    ?envsigner
       } .
       GRAPH ?g3
       {
@@ -187,7 +187,7 @@ prefix ldp:   <http://www.w3.org/ns/ldp#>
       GRAPH ?g5
       {
           ?envsig a signature:Signature .
-          ?envsig msg:hasSignedGraph ?g .
+          ?envsig msg:signedGraph ?g .
           ?envsig signature:hasVerificationCertificate ?envsigner .
       } .
     } ORDER BY ?event

@@ -27,9 +27,9 @@
     <import resource="classpath:/spring/component/ownerCallback/ownerCallback.xml"/>
     <import resource="classpath:/spring/component/matcherProtocolMatcherServiceHandler/matcherProtocolMatcherServiceHandler.xml"/>
     <import resource="classpath:/spring/component/botManager/botManager.xml"/>
-    <!-- this introduces the email-based subsystem for generating needs to be loaded, which is not desirable for most
+    <!-- this introduces the email-based subsystem for generating atoms to be loaded, which is not desirable for most
      applications. -->
-    <!-- import resource="classpath:/spring/component/needproducer/needproducer-mixed.xml" /-->
+    <!-- import resource="classpath:/spring/component/atomproducer/atomproducer-mixed.xml" /-->
     <import resource="classpath:/spring/component/nodeurisource/nodeurisource-roundrobin.xml"/>
     <import resource="classpath:/spring/owner-jmsonly.xml"/>
     <!-- monitoring -->
@@ -43,7 +43,7 @@
 
     <!--import resource="classpath:/spring/matcher-jmsonly.xml"/-->
 
-    <import resource="classpath:/spring/component/matcherProtocolNeedServiceClient/matcherProtocolNeedServiceClient-jms.xml"/>
+    <import resource="classpath:/spring/component/matcherProtocolAtomServiceClient/matcherProtocolAtomServiceClient-jms.xml"/>
     <import resource="classpath:/spring/component/MatcherProtocolMatcherService/matcherProtocolMatcherService-jms.xml"/>
     <import resource="classpath:/spring/component/camel/matcher-camel.xml"/>
     <import resource="classpath:/spring/core/matcher-core.xml"/>

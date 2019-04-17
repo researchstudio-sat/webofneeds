@@ -19,7 +19,7 @@ logging.basicConfig(level=logging.INFO, stream=sys.stdout,
 _log = logging.getLogger()
 
 # This file contains util functions for the processing of the tensor (including handling
-# of needs, attributes, etc.)
+# of atoms, attributes, etc.)
 
 def startsWithAttr(str):
     return str.startswith('Attr:')
@@ -30,11 +30,11 @@ class SparseTensor:
 
         CONNECTION_SLICE = 0
 
-        def __init__(self, headers, needIndices, attrIndices):
+        def __init__(self, headers, atomIndices, attrIndices):
             self.shape = (len(headers), len(headers))
             self.data = []
             self.headers = list(headers)
-            self.needIndices = needIndices
+            self.atomIndices = atomIndices
             self.attrIndices = attrIndices
 
         def copy(self):
@@ -65,11 +65,11 @@ class SparseTensor:
         def getArrayFromSliceMatrix(self, slice, indices):
             return matrix_to_array(self.data[slice], indices)
 
-        # return a list of indices which refer to rows/columns of needs in the tensor
-        def getNeedIndices(self):
-            return self.needIndices
-            #needs = [i for i in range(0, len(self.getHeaders())) if (self.getHeaders()[i].startswith('Need:'))]
-            #return needs
+        # return a list of indices which refer to rows/columns of atoms in the tensor
+        def getAtomIndices(self):
+            return self.atomIndices
+            #atoms = [i for i in range(0, len(self.getHeaders())) if (self.getHeaders()[i].startswith('Atom:'))]
+            #return atoms
 
         # return a list of indices which refer to rows/columns of attributes in the tensor
         def getAttributeIndices(self):
@@ -77,24 +77,24 @@ class SparseTensor:
             #attrs = [i for i in range(0, len(self.getHeaders())) if (self.getHeaders()[i].startswith('Attr:'))]
             #return attrs
 
-        def getNeedLabel(self, need):
-            return self.getHeaders()[need][6:]
+        def getAtomLabel(self, atom):
+            return self.getHeaders()[atom][6:]
 
-        def getAttributesForNeed(self, need, slice):
-            attr = self.data[slice][need,].nonzero()[1]
+        def getAttributesForAtom(self, atom, slice):
+            attr = self.data[slice][atom,].nonzero()[1]
             attr = [self.getHeaders()[i][6:] for i in attr]
             return attr
 
-        def hasConnection(self, need1, need2):
-            return (self.data[SparseTensor.CONNECTION_SLICE][need1,need2] != 0)
+        def hasConnection(self, atom1, atom2):
+            return (self.data[SparseTensor.CONNECTION_SLICE][atom1,atom2] != 0)
 
-        # return the "need x need" matrix and their connections between them without attributes for the extension of
+        # return the "atom x atom" matrix and their connections between them without attributes for the extension of
         # the rescal algorithm extrescal
-        def getPureNeedConnectionMatrix(self):
+        def getPureAtomConnectionMatrix(self):
             return self.getSliceMatrix(SparseTensor.CONNECTION_SLICE)
 
-        # return the "need x attribute" matrix D for the extension of the rescal algorithm extrescal
-        def getNeedAttributeMatrix(self):
+        # return the "atom x attribute" matrix D for the extension of the rescal algorithm extrescal
+        def getAtomAttributeMatrix(self):
             D = self.getSliceMatrix(1)
             for i in range(2, len(self.data)):
                 D = D + self.getSliceMatrix(i)
@@ -107,7 +107,7 @@ class SparseTensor:
 # read the input tensor data (e.g. data-0.mtx ... ) and the headers file (e.g. headers.txt)
 # if adjustDim is True then the dimensions of the slice matrix
 # files are automatically adjusted to fit to biggest dimensions of all slices
-def read_input_tensor(headers_filename, need_indices_filename, data_file_names, adjustDim=False):
+def read_input_tensor(headers_filename, atom_indices_filename, data_file_names, adjustDim=False):
 
     #load the header file
     _log.info("Read header input file: " + headers_filename)
@@ -115,12 +115,12 @@ def read_input_tensor(headers_filename, need_indices_filename, data_file_names, 
     headers = input.read().splitlines()
     input.close()
 
-    # load the need indices file and calculate the attr indices from that
-    _log.info("Read the need indices file: " + need_indices_filename)
-    indicesFile = codecs.open(need_indices_filename,'r',encoding='utf8')
-    needIndices = map(int, indicesFile.read().splitlines())
+    # load the atom indices file and calculate the attr indices from that
+    _log.info("Read the atom indices file: " + atom_indices_filename)
+    indicesFile = codecs.open(atom_indices_filename,'r',encoding='utf8')
+    atomIndices = map(int, indicesFile.read().splitlines())
     indicesFile.close()
-    attrIndices = list(set(range(len(headers))) - set(needIndices))
+    attrIndices = list(set(range(len(headers))) - set(atomIndices))
 
     # get the largest dimension of all slices
     if adjustDim:
@@ -134,7 +134,7 @@ def read_input_tensor(headers_filename, need_indices_filename, data_file_names, 
 
     # load the data files
     slice = 1
-    tensor = SparseTensor(headers, needIndices, attrIndices)
+    tensor = SparseTensor(headers, atomIndices, attrIndices)
     for data_file in data_file_names:
         if adjustDim:
             adjusted = adjust_mm_dimension(data_file, maxDim)
@@ -178,8 +178,8 @@ def adjust_mm_dimension(data_file, dim):
 
 def execute_extrescal(input_tensor, rank, init='nvecs', conv=1e-4, lmbda=0.0):
 
-    temp_tensor = [input_tensor.getPureNeedConnectionMatrix()]
-    D = input_tensor.getNeedAttributeMatrix()
+    temp_tensor = [input_tensor.getPureAtomConnectionMatrix()]
+    D = input_tensor.getAtomAttributeMatrix()
 
     _log.info('start extrescal processing ...')
     _log.info('config: init=%s, conv=%f, lmbda=%f' % (init, conv, lmbda))
@@ -193,7 +193,7 @@ def execute_extrescal(input_tensor, rank, init='nvecs', conv=1e-4, lmbda=0.0):
     R = result[1]
     return A, R
 
-# create a similarity matrix of needs (and attributes)
+# create a similarity matrix of atoms (and attributes)
 def similarity_ranking(A):
     dist = squareform(pdist(A, metric='cosine'))
     return dist
@@ -209,8 +209,8 @@ def matrix_to_array(m, indices):
 # - A, R: result matrices of rescal algorithm
 # - threshold: write out only those predictions that are above the threshold
 # - input_tensor: tensor for which the predictions are computed
-# - symmetric: are connections between needs symmentric? then only the half of the predictions have to be computed
-# - keepConnections: if true keep the predictions between the needs where a connection existed before
+# - symmetric: are connections between atoms symmentric? then only the half of the predictions have to be computed
+# - keepConnections: if true keep the predictions between the atoms where a connection existed before
 def predict_rescal_hints_by_threshold(A, R, threshold, input_tensor, symmetric=True, keepConnections=False):
 
     rows = []
@@ -219,12 +219,12 @@ def predict_rescal_hints_by_threshold(A, R, threshold, input_tensor, symmetric=T
     A_T = A.T
 
     rounds = 0
-    for j in input_tensor.getNeedIndices():
+    for j in input_tensor.getAtomIndices():
         if (rounds % 1000 == 0):
-            _log.debug("Processing predictions ... number of needs processed: " + str(rounds) + " (out of " + str(len(input_tensor.getNeedIndices())) + ")")
+            _log.debug("Processing predictions ... number of atoms processed: " + str(rounds) + " (out of " + str(len(input_tensor.getAtomIndices())) + ")")
         rounds = rounds + 1
         colPred = np.dot(R[SparseTensor.CONNECTION_SLICE], A_T[:,j])
-        for i in input_tensor.getNeedIndices():
+        for i in input_tensor.getAtomIndices():
             if ((not symmetric) or j < i):
                 x = np.dot(A[i], colPred)
                 if (x > threshold):
@@ -238,7 +238,7 @@ def predict_rescal_hints_by_threshold(A, R, threshold, input_tensor, symmetric=T
 
 
 # TESTING METHOD for rescal algorithm output predict hints
-# PLEASE NOTE: this matrix can only practically be build for small and medium datasets e.g. < 1000 needs
+# PLEASE NOTE: this matrix can only practically be build for small and medium datasets e.g. < 1000 atoms
 # Parameters:
 # - A, R: result matrices of rescal algorithm
 # - threshold: write out only those predictions that are above the threshold
@@ -262,21 +262,21 @@ def test_predict_rescal_hints_by_threshold(A, R, threshold, mask_matrix, keepSco
     return hint_prediction_matrix
 
 # TESTING METHOD create a binary mask matrix for hint prediction, 1 specifies where predictions should be calculated.
-# the mask contains by default entries between needs of need types that match each other and removes
+# the mask contains by default entries between atoms of atom types that match each other and removes
 # entries for connections of the tensor that were already available
-# PLEASE NOTE: this matrix can only practically be build for small and medium datasets e.g. < 1000 needs
+# PLEASE NOTE: this matrix can only practically be build for small and medium datasets e.g. < 1000 atoms
 # Parameters:
 # - tensor: tensor for which the predictions are computed
 # - symmetric: create a symmetric mask
-# - keepConnections: if true keep the predictions between the needs where a connection existed before
+# - keepConnections: if true keep the predictions between the atoms where a connection existed before
 def test_create_hint_mask_matrix(tensor, symmetric=False, keepConnections=False):
 
-    # use only need to need indices for hint connection prediction
-    need_indices = np.zeros(tensor.getMatrixShape()[0])
-    need_indices[tensor.getNeedIndices()] = 1
-    need_vector = need_indices[np.newaxis]
-    need_vector = lil_matrix(need_vector)
-    mask_matrix = need_vector.multiply(need_vector.T).tolil()
+    # use only atom to atom indices for hint connection prediction
+    atom_indices = np.zeros(tensor.getMatrixShape()[0])
+    atom_indices[tensor.getAtomIndices()] = 1
+    atom_vector = atom_indices[np.newaxis]
+    atom_vector = lil_matrix(atom_vector)
+    mask_matrix = atom_vector.multiply(atom_vector.T).tolil()
     mask_matrix.setdiag(0)
 
     # optionally exclude already existing connections from prediction

@@ -30,43 +30,43 @@ import won.protocol.util.WonRdfUtils;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
 
 /**
- * BaseEventBotAction connecting two needs on the specified facets. The need's
+ * BaseEventBotAction connecting two atoms on the specified sockets. The atom's
  * URIs are obtained from the bot context. The first two URIs found there are
  * used.
  */
 public class ConnectFromListToListAction extends BaseEventBotAction {
     private String fromListName;
     private String toListName;
-    private Optional<URI> fromFacetType = Optional.empty();
-    private Optional<URI> toFacetType = Optional.empty();
+    private Optional<URI> fromSocketType = Optional.empty();
+    private Optional<URI> toSocketType = Optional.empty();
     private long millisBetweenCalls;
     private ConnectHook connectHook;
     private String welcomeMessage;
 
     public ConnectFromListToListAction(EventListenerContext eventListenerContext, String fromListName,
-                    String toListName, URI fromFacetType, URI toFacetType, final long millisBetweenCalls,
+                    String toListName, URI fromSocketType, URI toSocketType, final long millisBetweenCalls,
                     String welcomeMessage) {
         super(eventListenerContext);
-        Objects.requireNonNull(fromFacetType);
-        Objects.requireNonNull(toFacetType);
+        Objects.requireNonNull(fromSocketType);
+        Objects.requireNonNull(toSocketType);
         this.fromListName = fromListName;
         this.toListName = toListName;
-        this.fromFacetType = Optional.of(fromFacetType);
-        this.toFacetType = Optional.of(toFacetType);
+        this.fromSocketType = Optional.of(fromSocketType);
+        this.toSocketType = Optional.of(toSocketType);
         this.millisBetweenCalls = millisBetweenCalls;
         this.welcomeMessage = welcomeMessage;
     }
 
     public ConnectFromListToListAction(final EventListenerContext eventListenerContext, final String fromListName,
-                    final String toListName, final URI fromFacetType, final URI toFacetType,
+                    final String toListName, final URI fromSocketType, final URI toSocketType,
                     final long millisBetweenCalls, final ConnectHook connectHook, String welcomeMessage) {
         super(eventListenerContext);
-        Objects.requireNonNull(fromFacetType);
-        Objects.requireNonNull(toFacetType);
+        Objects.requireNonNull(fromSocketType);
+        Objects.requireNonNull(toSocketType);
         this.fromListName = fromListName;
         this.toListName = toListName;
-        this.fromFacetType = Optional.of(fromFacetType);
-        this.toFacetType = Optional.of(toFacetType);
+        this.fromSocketType = Optional.of(fromSocketType);
+        this.toSocketType = Optional.of(toSocketType);
         this.millisBetweenCalls = millisBetweenCalls;
         this.connectHook = connectHook;
         this.welcomeMessage = welcomeMessage;
@@ -94,18 +94,18 @@ public class ConnectFromListToListAction extends BaseEventBotAction {
 
     @Override
     public void doRun(Event event, EventListener executingListener) {
-        List<URI> fromNeeds = getEventListenerContext().getBotContext().getNamedNeedUriList(fromListName);
-        List<URI> toNeeds = getEventListenerContext().getBotContext().getNamedNeedUriList(toListName);
-        logger.debug("connecting needs from list \"{}\" ({}) to needs from list \"{}\" ({})",
-                        new Object[] { fromListName, fromNeeds, toListName, toNeeds });
+        List<URI> fromAtoms = getEventListenerContext().getBotContext().getNamedAtomUriList(fromListName);
+        List<URI> toAtoms = getEventListenerContext().getBotContext().getNamedAtomUriList(toListName);
+        logger.debug("connecting atoms from list \"{}\" ({}) to atoms from list \"{}\" ({})",
+                        new Object[] { fromListName, fromAtoms, toListName, toAtoms });
         long start = System.currentTimeMillis();
         long count = 0;
         if (fromListName.equals(toListName)) {
             // only one connection per pair if from-list is to-list
-            for (int i = 0; i < fromNeeds.size(); i++) {
-                URI fromUri = fromNeeds.get(i);
-                for (int j = i + 1; j < fromNeeds.size(); j++) {
-                    URI toUri = fromNeeds.get(j);
+            for (int i = 0; i < fromAtoms.size(); i++) {
+                URI fromUri = fromAtoms.get(i);
+                for (int j = i + 1; j < fromAtoms.size(); j++) {
+                    URI toUri = fromAtoms.get(j);
                     try {
                         count++;
                         performConnect(fromUri, toUri, new Date(start + count * millisBetweenCalls));
@@ -115,8 +115,8 @@ public class ConnectFromListToListAction extends BaseEventBotAction {
                 }
             }
         } else {
-            for (URI fromUri : fromNeeds) {
-                for (URI toUri : toNeeds) {
+            for (URI fromUri : fromAtoms) {
+                for (URI toUri : toAtoms) {
                     try {
                         count++;
                         logger.debug("tmp: Connect {} with {}", fromUri.toString(), toUri.toString());
@@ -134,7 +134,7 @@ public class ConnectFromListToListAction extends BaseEventBotAction {
         getEventListenerContext().getTaskScheduler().schedule(new Runnable() {
             public void run() {
                 try {
-                    logger.debug("connecting needs {} and {}", fromUri, toUri);
+                    logger.debug("connecting atoms {} and {}", fromUri, toUri);
                     if (connectHook != null) {
                         connectHook.onConnect(fromUri, toUri);
                     }
@@ -150,25 +150,25 @@ public class ConnectFromListToListAction extends BaseEventBotAction {
 
     private WonMessage createWonMessage(URI fromUri, URI toUri) throws WonMessageBuilderException {
         WonNodeInformationService wonNodeInformationService = getEventListenerContext().getWonNodeInformationService();
-        Dataset localNeedRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(fromUri);
-        Dataset remoteNeedRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(toUri);
-        URI localWonNode = WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(localNeedRDF, fromUri);
-        URI remoteWonNode = WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(remoteNeedRDF, toUri);
+        Dataset localAtomRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(fromUri);
+        Dataset targetAtomRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(toUri);
+        URI localWonNode = WonRdfUtils.AtomUtils.getWonNodeURIFromAtom(localAtomRDF, fromUri);
+        URI remoteWonNode = WonRdfUtils.AtomUtils.getWonNodeURIFromAtom(targetAtomRDF, toUri);
         return WonMessageBuilder.setMessagePropertiesForConnect(
                         wonNodeInformationService.generateEventURI(localWonNode),
-                        fromFacetType.map(facetType -> WonLinkedDataUtils
-                                        .getFacetsOfType(fromUri, facetType,
+                        fromSocketType.map(socketType -> WonLinkedDataUtils
+                                        .getSocketsOfType(fromUri, socketType,
                                                         getEventListenerContext().getLinkedDataSource())
                                         .stream().findFirst().orElse(null)),
                         fromUri, localWonNode,
-                        toFacetType.map(facetType -> WonLinkedDataUtils
-                                        .getFacetsOfType(toUri, facetType,
+                        toSocketType.map(socketType -> WonLinkedDataUtils
+                                        .getSocketsOfType(toUri, socketType,
                                                         getEventListenerContext().getLinkedDataSource())
                                         .stream().findFirst().orElse(null)),
                         toUri, remoteWonNode, welcomeMessage).build();
     }
 
     public static abstract class ConnectHook {
-        public abstract void onConnect(URI fromNeedURI, URI toNeedURI);
+        public abstract void onConnect(URI fromAtomURI, URI toAtomURI);
     }
 }

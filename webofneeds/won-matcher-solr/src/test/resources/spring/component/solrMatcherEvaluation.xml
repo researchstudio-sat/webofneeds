@@ -17,34 +17,34 @@
 
 <beans xmlns="http://www.springframework.org/schema/beans"        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"        xmlns:context="http://www.springframework.org/schema/context"        xsi:schemaLocation="http://www.springframework.org/schema/beans         http://www.springframework.org/schema/beans/spring-beans-4.1.xsd         http://www.springframework.org/schema/context         http://www.springframework.org/schema/context/spring-context-4.1.xsd">
 
-    <context:property-placeholder location="file:${WON_CONFIG_DIR}/mail-dir-bot.properties" ignore-unresolvable="true"/> <!-- was in needproducer-mixed.xml -->
-    <context:property-placeholder location="file:${WON_CONFIG_DIR}/need-dir-bot.properties" ignore-unresolvable="true"/> <!-- was in needproducer-mixed.xml -->
+    <context:property-placeholder location="file:${WON_CONFIG_DIR}/mail-dir-bot.properties" ignore-unresolvable="true"/> <!-- was in atomproducer-mixed.xml -->
+    <context:property-placeholder location="file:${WON_CONFIG_DIR}/atom-dir-bot.properties" ignore-unresolvable="true"/> <!-- was in atomproducer-mixed.xml -->
 
-    <import resource="classpath:spring/component/needproducer/needproducer-mixed.xml"/>
+    <import resource="classpath:spring/component/atomproducer/atomproducer-mixed.xml"/>
 
-    <bean id="isNeedProducer" class="won.matcher.solr.evaluation.MailDirNeedProducer">
+    <bean id="isAtomProducer" class="won.matcher.solr.evaluation.MailDirAtomProducer">
         <property name="template" value="classpath:/default-templates/default-template.ttl"/>
         <property name="wrappedProducer">
-            <bean class="won.bot.framework.component.needproducer.impl.DirectoryBasedNeedProducer">
+            <bean class="won.bot.framework.component.atomproducer.impl.DirectoryBasedAtomProducer">
                 <property name="directory" value="${mail.directory.is}"/>
                 <property name="filenameFilterRegex" value=".*eml"/>
                 <property name="repeat" value="false"/>
-                <property name="fileBasedNeedProducer">
-                    <bean class="won.bot.framework.component.needproducer.impl.MailFileNeedProducer"/>
+                <property name="fileBasedAtomProducer">
+                    <bean class="won.bot.framework.component.atomproducer.impl.MailFileAtomProducer"/>
                 </property>
             </bean>
         </property>
     </bean>
 
-    <bean id="seeksNeedProducer" class="won.matcher.solr.evaluation.MailDirNeedProducer">
+    <bean id="seeksAtomProducer" class="won.matcher.solr.evaluation.MailDirAtomProducer">
         <property name="template" value="classpath:/default-templates/default-template.ttl"/>
         <property name="wrappedProducer">
-            <bean class="won.bot.framework.component.needproducer.impl.DirectoryBasedNeedProducer">
+            <bean class="won.bot.framework.component.atomproducer.impl.DirectoryBasedAtomProducer">
                 <property name="directory" value="${mail.directory.seeks}"/>
                 <property name="filenameFilterRegex" value=".*eml"/>
                 <property name="repeat" value="false"/>
-                <property name="fileBasedNeedProducer">
-                    <bean class="won.bot.framework.component.needproducer.impl.MailFileNeedProducer"/>
+                <property name="fileBasedAtomProducer">
+                    <bean class="won.bot.framework.component.atomproducer.impl.MailFileAtomProducer"/>
                 </property>
             </bean>
         </property>
@@ -53,8 +53,8 @@
     <bean id="solrMatcherEvaluation" class="won.matcher.solr.evaluation.SolrMatcherEvaluation" >
         <property name="outputDir" value="C:/dev/projects/matching-evaluation/out"/>
         <property name="connectionsFile" value="C:/dev/projects/matching-evaluation/connections.txt"/>
-        <property name="isNeedProducer" ref="isNeedProducer"/>
-        <property name="seeksNeedProducer" ref="seeksNeedProducer"/>
+        <property name="isAtomProducer" ref="isAtomProducer"/>
+        <property name="seeksAtomProducer" ref="seeksAtomProducer"/>
     </bean>
 
 </beans>

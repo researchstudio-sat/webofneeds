@@ -93,15 +93,15 @@ decoder =
 
 connect :
     { persona : Persona
-    , needUrl : String
+    , atomUrl : String
     }
     -> Cmd msg
-connect { persona, needUrl } =
+connect { persona, atomUrl } =
     Actions.startAction
         { action = "personas__connect"
         , payload =
             Encode.list Encode.string
-                [ needUrl
+                [ atomUrl
                 , persona.uri
                 ]
         }

@@ -1,0 +1,37 @@
+@prefix dc:    <http://purl.org/dc/elements/1.1/> .
+@prefix atom:  <http://localhost:8080/won/resource/atom/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix geo:   <http://www.w3.org/2003/01/geo/wgs84_pos#> .
+@prefix conn:  <http://localhost:8080/won/resource/connection/> .
+@prefix event: <http://localhost:8080/won/resource/event/> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix won:   <https://w3id.org/won/core#> .
+@prefix local: <http://localhost:8080/won/resource/> .
+@prefix msg:   <https://w3id.org/won/message#> .
+@prefix ldp:   <http://www.w3.org/ns/ldp#> .
+@prefix signature: <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#> .
+@prefix cert: <http://www.w3.org/ns/auth/cert#> .
+
+
+
+# ATOM DATA GRAPH
+<http://localhost:8080/won/resource/atom/3144709509622353000/core/#data>
+{
+    atom:3144709509622353000
+            a                     won:Atom ;
+            won:hasBasicAtomType  won:Supply ;
+            won:content        [ a                          won:AtomContent ;
+                                    dc:title                   "salat offer a" ;
+                                    won:contentDescription  [ a                             won:AtomModality ;
+                                                                 won:locationSpecification  [ a               geo:Point ;
+                                                                                                 won:hasAddress  "" ;
+                                                                                                 geo:latitude    "0.000000"^^xsd:float ;
+                                                                                                 geo:longitude   "0.000000"
+                                                                                               ]
+                                                               ] ;
+                                    won:tag                 "aaa" ;
+                                    dc:description     "a"
+                                  ] ;
+            won:socket          won:ChatSocket .
+}

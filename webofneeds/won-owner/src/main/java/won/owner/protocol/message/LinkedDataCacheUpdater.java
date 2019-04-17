@@ -21,21 +21,21 @@ import won.protocol.util.linkeddata.LinkedDataSource;
 public class LinkedDataCacheUpdater implements WonMessageProcessor {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     @Autowired
-    private LinkedDataSource linkedDataSourceOnBehalfOfNeed;
+    private LinkedDataSource linkedDataSourceOnBehalfOfAtom;
 
     @Override
     public WonMessage process(WonMessage message) throws WonMessageProcessingException {
-        if (this.linkedDataSourceOnBehalfOfNeed != null
-                        && this.linkedDataSourceOnBehalfOfNeed instanceof CachingLinkedDataSource) {
+        if (this.linkedDataSourceOnBehalfOfAtom != null
+                        && this.linkedDataSourceOnBehalfOfAtom instanceof CachingLinkedDataSource) {
             logger.debug("putting message {} into cache", message.getMessageURI());
-            URI requester = message.getReceiverNeedURI();
-            ((CachingLinkedDataSource) linkedDataSourceOnBehalfOfNeed).addToCache(message.getCompleteDataset(),
+            URI requester = message.getRecipientAtomURI();
+            ((CachingLinkedDataSource) linkedDataSourceOnBehalfOfAtom).addToCache(message.getCompleteDataset(),
                             message.getMessageURI(), requester);
         }
         return message;
     }
 
-    public void setLinkedDataSourceOnBehalfOfNeed(LinkedDataSource linkedDataSourceOnBehalfOfNeed) {
-        this.linkedDataSourceOnBehalfOfNeed = linkedDataSourceOnBehalfOfNeed;
+    public void setLinkedDataSourceOnBehalfOfAtom(LinkedDataSource linkedDataSourceOnBehalfOfAtom) {
+        this.linkedDataSourceOnBehalfOfAtom = linkedDataSourceOnBehalfOfAtom;
     }
 }

@@ -45,50 +45,50 @@ public class WonLinkedDataUtils {
     public static URI getConnectionStateforConnectionURI(URI connectionURI, LinkedDataSource linkedDataSource) {
         assert linkedDataSource != null : "linkedDataSource must not be null";
         Dataset dataset = getDataForResource(connectionURI, linkedDataSource);
-        Path propertyPath = PathParser.parse("<" + WON.HAS_CONNECTION_STATE + ">", PrefixMapping.Standard);
+        Path propertyPath = PathParser.parse("<" + WON.connectionState + ">", PrefixMapping.Standard);
         return RdfUtils.getURIPropertyForPropertyPath(dataset, connectionURI, propertyPath);
     }
 
-    public static URI getNeedURIforConnectionURI(URI connectionURI, LinkedDataSource linkedDataSource) {
+    public static URI getAtomURIforConnectionURI(URI connectionURI, LinkedDataSource linkedDataSource) {
         assert linkedDataSource != null : "linkedDataSource must not be null";
         Dataset dataset = getDataForResource(connectionURI, linkedDataSource);
-        Path propertyPath = PathParser.parse("<" + WON.BELONGS_TO_NEED + ">", PrefixMapping.Standard);
+        Path propertyPath = PathParser.parse("<" + WON.sourceAtom + ">", PrefixMapping.Standard);
         return RdfUtils.getURIPropertyForPropertyPath(dataset, connectionURI, propertyPath);
     }
 
-    public static URI getRemoteConnectionURIforConnectionURI(URI connectionURI, LinkedDataSource linkedDataSource) {
+    public static URI getTargetConnectionURIforConnectionURI(URI connectionURI, LinkedDataSource linkedDataSource) {
         assert linkedDataSource != null : "linkedDataSource must not be null";
         Dataset dataset = getDataForResource(connectionURI, linkedDataSource);
-        Path propertyPath = PathParser.parse("<" + WON.HAS_REMOTE_CONNECTION + ">", PrefixMapping.Standard);
+        Path propertyPath = PathParser.parse("<" + WON.targetConnection + ">", PrefixMapping.Standard);
         return RdfUtils.getURIPropertyForPropertyPath(dataset, connectionURI, propertyPath);
     }
 
-    public static URI getRemoteNeedURIforConnectionURI(URI connectionURI, LinkedDataSource linkedDataSource) {
+    public static URI getTargetAtomURIforConnectionURI(URI connectionURI, LinkedDataSource linkedDataSource) {
         assert linkedDataSource != null : "linkedDataSource must not be null";
         Dataset dataset = getDataForResource(connectionURI, linkedDataSource);
-        Path propertyPath = PathParser.parse("<" + WON.HAS_REMOTE_NEED + ">", PrefixMapping.Standard);
+        Path propertyPath = PathParser.parse("<" + WON.targetAtom + ">", PrefixMapping.Standard);
         return RdfUtils.getURIPropertyForPropertyPath(dataset, connectionURI, propertyPath);
     }
 
-    public static URI getEventContainerURIforConnectionURI(URI connectionURI, LinkedDataSource linkedDataSource) {
+    public static URI getMessageContainerURIforConnectionURI(URI connectionURI, LinkedDataSource linkedDataSource) {
         assert linkedDataSource != null : "linkedDataSource must not be null";
         Dataset dataset = getDataForResource(connectionURI, linkedDataSource);
-        Path propertyPath = PathParser.parse("<" + WON.HAS_EVENT_CONTAINER + ">", PrefixMapping.Standard);
+        Path propertyPath = PathParser.parse("<" + WON.messageContainer + ">", PrefixMapping.Standard);
         return RdfUtils.getURIPropertyForPropertyPath(dataset, connectionURI, propertyPath);
     }
 
-    public static URI getEventContainerURIforNeedURI(URI needURI, LinkedDataSource linkedDataSource) {
+    public static URI getMessageContainerURIforAtomURI(URI atomURI, LinkedDataSource linkedDataSource) {
         assert linkedDataSource != null : "linkedDataSource must not be null";
-        Dataset dataset = getDataForResource(needURI, linkedDataSource);
-        Path propertyPath = PathParser.parse("<" + WON.HAS_EVENT_CONTAINER + ">", PrefixMapping.Standard);
-        return RdfUtils.getURIPropertyForPropertyPath(dataset, needURI, propertyPath);
+        Dataset dataset = getDataForResource(atomURI, linkedDataSource);
+        Path propertyPath = PathParser.parse("<" + WON.messageContainer + ">", PrefixMapping.Standard);
+        return RdfUtils.getURIPropertyForPropertyPath(dataset, atomURI, propertyPath);
     }
 
-    public static Dataset getConversationAndNeedsDataset(String connectionURI, LinkedDataSource linkedDataSource) {
-        return getConversationAndNeedsDataset(URI.create(connectionURI), linkedDataSource);
+    public static Dataset getConversationAndAtomsDataset(String connectionURI, LinkedDataSource linkedDataSource) {
+        return getConversationAndAtomsDataset(URI.create(connectionURI), linkedDataSource);
     }
 
-    public static Dataset getFullNeedDataset(URI needURI, LinkedDataSource linkedDataSource) {
+    public static Dataset getFullAtomDataset(URI atomURI, LinkedDataSource linkedDataSource) {
         assert linkedDataSource != null : "linkedDataSource must not be null";
         int depth = 7;
         int maxRequests = 1000;
@@ -97,28 +97,26 @@ public class WonLinkedDataUtils {
         pmap.withDefaultMappings(PrefixMapping.Standard);
         pmap.setNsPrefix("won", WON.getURI());
         pmap.setNsPrefix("msg", WONMSG.getURI());
-        propertyPaths.add(PathParser.parse("won:hasConnections", pmap));
-        propertyPaths.add(PathParser.parse("won:hasConnections/rdfs:member", pmap));
-        propertyPaths.add(PathParser.parse("won:hasConnections/rdfs:member/won:hasEventContainer", pmap));
-        propertyPaths.add(PathParser.parse("won:hasConnections/rdfs:member/won:hasEventContainer/rdfs:member", pmap));
+        propertyPaths.add(PathParser.parse("won:connections", pmap));
+        propertyPaths.add(PathParser.parse("won:connections/rdfs:member", pmap));
+        propertyPaths.add(PathParser.parse("won:connections/rdfs:member/won:messageContainer", pmap));
+        propertyPaths.add(PathParser.parse("won:connections/rdfs:member/won:messageContainer/rdfs:member", pmap));
         propertyPaths.add(PathParser.parse(
-                        "won:hasConnections/rdfs:member/won:hasEventContainer/rdfs:member/msg:hasCorrespondingRemoteMessage",
+                        "won:connections/rdfs:member/won:messageContainer/rdfs:member/msg:correspondingRemoteMessage",
                         pmap));
         propertyPaths.add(PathParser.parse(
-                        "won:hasConnections/rdfs:member/won:hasEventContainer/rdfs:member/msg:hasPreviousMessage",
-                        pmap));
-        propertyPaths.add(PathParser.parse("won:hasConnections/rdfs:member/won:belongsToNeed", pmap));
-        propertyPaths.add(PathParser.parse("won:hasConnections/rdfs:member/won:belongsToNeed/won:hasEventContainer",
-                        pmap));
+                        "won:connections/rdfs:member/won:messageContainer/rdfs:member/msg:previousMessage", pmap));
+        propertyPaths.add(PathParser.parse("won:connections/rdfs:member/won:sourceAtom", pmap));
+        propertyPaths.add(PathParser.parse("won:connections/rdfs:member/won:sourceAtom/won:messageContainer", pmap));
+        propertyPaths.add(PathParser
+                        .parse("won:connections/rdfs:member/won:sourceAtom/won:messageContainer/rdfs:member", pmap));
         propertyPaths.add(PathParser.parse(
-                        "won:hasConnections/rdfs:member/won:belongsToNeed/won:hasEventContainer/rdfs:member", pmap));
-        propertyPaths.add(PathParser.parse(
-                        "won:hasConnections/rdfs:member/won:belongsToNeed/won:hasEventContainer/rdfs:member/msg:hasPreviousMessage",
+                        "won:connections/rdfs:member/won:sourceAtom/won:messageContainer/rdfs:member/msg:previousMessage",
                         pmap));
-        return linkedDataSource.getDataForResourceWithPropertyPath(needURI, needURI, propertyPaths, maxRequests, depth);
+        return linkedDataSource.getDataForResourceWithPropertyPath(atomURI, atomURI, propertyPaths, maxRequests, depth);
     }
 
-    public static Dataset getConversationAndNeedsDataset(URI connectionURI, LinkedDataSource linkedDataSource) {
+    public static Dataset getConversationAndAtomsDataset(URI connectionURI, LinkedDataSource linkedDataSource) {
         assert linkedDataSource != null : "linkedDataSource must not be null";
         int depth = 5;
         int maxRequests = 1000;
@@ -127,30 +125,28 @@ public class WonLinkedDataUtils {
         pmap.withDefaultMappings(PrefixMapping.Standard);
         pmap.setNsPrefix("won", WON.getURI());
         pmap.setNsPrefix("msg", WONMSG.getURI());
-        propertyPaths.add(PathParser.parse("won:hasEventContainer", pmap));
-        propertyPaths.add(PathParser.parse("won:hasEventContainer/rdfs:member", pmap));
+        propertyPaths.add(PathParser.parse("won:messageContainer", pmap));
+        propertyPaths.add(PathParser.parse("won:messageContainer/rdfs:member", pmap));
+        propertyPaths.add(PathParser.parse("won:messageContainer/rdfs:member/msg:correspondingRemoteMessage", pmap));
+        propertyPaths.add(PathParser.parse("won:messageContainer/rdfs:member/msg:previousMessage", pmap));
+        propertyPaths.add(PathParser.parse("won:sourceAtom", pmap));
+        propertyPaths.add(PathParser.parse("won:sourceAtom/won:messageContainer", pmap));
+        propertyPaths.add(PathParser.parse("won:sourceAtom/won:messageContainer/rdfs:member", pmap));
         propertyPaths.add(
-                        PathParser.parse("won:hasEventContainer/rdfs:member/msg:hasCorrespondingRemoteMessage", pmap));
-        propertyPaths.add(PathParser.parse("won:hasEventContainer/rdfs:member/msg:hasPreviousMessage", pmap));
-        propertyPaths.add(PathParser.parse("won:belongsToNeed", pmap));
-        propertyPaths.add(PathParser.parse("won:belongsToNeed/won:hasEventContainer", pmap));
-        propertyPaths.add(PathParser.parse("won:belongsToNeed/won:hasEventContainer/rdfs:member", pmap));
-        propertyPaths.add(PathParser.parse("won:belongsToNeed/won:hasEventContainer/rdfs:member/msg:hasPreviousMessage",
-                        pmap));
-        propertyPaths.add(PathParser.parse("won:hasRemoteNeed", pmap));
-        propertyPaths.add(PathParser.parse("won:hasRemoteNeed/won:hasEventContainer", pmap));
-        propertyPaths.add(PathParser.parse("won:hasRemoteNeed/won:hasEventContainer/rdfs:member", pmap));
-        propertyPaths.add(PathParser.parse("won:hasRemoteNeed/won:hasEventContainer/rdfs:member/msg:hasPreviousMessage",
-                        pmap));
-        propertyPaths.add(PathParser.parse("won:hasRemoteConnection", pmap));
-        propertyPaths.add(PathParser.parse("won:hasRemoteConnection/won:hasEventContainer", pmap));
-        propertyPaths.add(PathParser.parse("won:hasRemoteConnection/won:hasEventContainer/rdfs:member", pmap));
+                        PathParser.parse("won:sourceAtom/won:messageContainer/rdfs:member/msg:previousMessage", pmap));
+        propertyPaths.add(PathParser.parse("won:targetAtom", pmap));
+        propertyPaths.add(PathParser.parse("won:targetAtom/won:messageContainer", pmap));
+        propertyPaths.add(PathParser.parse("won:targetAtom/won:messageContainer/rdfs:member", pmap));
+        propertyPaths.add(
+                        PathParser.parse("won:targetAtom/won:messageContainer/rdfs:member/msg:previousMessage", pmap));
+        propertyPaths.add(PathParser.parse("won:targetConnection", pmap));
+        propertyPaths.add(PathParser.parse("won:targetConnection/won:messageContainer", pmap));
+        propertyPaths.add(PathParser.parse("won:targetConnection/won:messageContainer/rdfs:member", pmap));
         propertyPaths.add(PathParser.parse(
-                        "won:hasRemoteConnection/won:hasEventContainer/rdfs:member/msg:hasCorrespondingRemoteMessage",
+                        "won:targetConnection/won:messageContainer/rdfs:member/msg:correspondingRemoteMessage", pmap));
+        propertyPaths.add(PathParser.parse("won:targetConnection/won:messageContainer/rdfs:member/msg:previousMessage",
                         pmap));
-        propertyPaths.add(PathParser.parse(
-                        "won:hasRemoteConnection/won:hasEventContainer/rdfs:member/msg:hasPreviousMessage", pmap));
-        URI requesterWebId = WonLinkedDataUtils.getNeedURIforConnectionURI(connectionURI, linkedDataSource);
+        URI requesterWebId = WonLinkedDataUtils.getAtomURIforConnectionURI(connectionURI, linkedDataSource);
         return linkedDataSource.getDataForResourceWithPropertyPath(connectionURI, requesterWebId, propertyPaths,
                         maxRequests, depth);
     }
@@ -168,12 +164,12 @@ public class WonLinkedDataUtils {
         pmap.withDefaultMappings(PrefixMapping.Standard);
         pmap.setNsPrefix("won", WON.getURI());
         pmap.setNsPrefix("msg", WONMSG.getURI());
-        propertyPaths.add(PathParser.parse("won:hasEventContainer", pmap));
-        propertyPaths.add(PathParser.parse("won:hasEventContainer/rdfs:member", pmap));
-        propertyPaths.add(PathParser.parse("won:hasRemoteConnection", pmap));
-        propertyPaths.add(PathParser.parse("won:hasRemoteConnection/won:hasEventContainer", pmap));
-        propertyPaths.add(PathParser.parse("won:hasRemoteConnection/won:hasEventContainer/rdfs:member", pmap));
-        URI requesterWebId = WonLinkedDataUtils.getNeedURIforConnectionURI(connectionURI, linkedDataSource);
+        propertyPaths.add(PathParser.parse("won:messageContainer", pmap));
+        propertyPaths.add(PathParser.parse("won:messageContainer/rdfs:member", pmap));
+        propertyPaths.add(PathParser.parse("won:targetConnection", pmap));
+        propertyPaths.add(PathParser.parse("won:targetConnection/won:messageContainer", pmap));
+        propertyPaths.add(PathParser.parse("won:targetConnection/won:messageContainer/rdfs:member", pmap));
+        URI requesterWebId = WonLinkedDataUtils.getAtomURIforConnectionURI(connectionURI, linkedDataSource);
         return linkedDataSource.getDataForResourceWithPropertyPath(connectionURI, requesterWebId, propertyPaths,
                         maxRequests, depth);
     }
@@ -196,30 +192,30 @@ public class WonLinkedDataUtils {
         return new ModelFetchingIterator(uriIterator, linkedDataSource);
     }
 
-    public static URI getWonNodeURIForNeedOrConnectionURI(final URI resourceURI, LinkedDataSource linkedDataSource) {
+    public static URI getWonNodeURIForAtomOrConnectionURI(final URI resourceURI, LinkedDataSource linkedDataSource) {
         assert linkedDataSource != null : "linkedDataSource must not be null";
         logger.debug("fetching WON node URI for resource {} with linked data source {}", resourceURI, linkedDataSource);
-        return getWonNodeURIForNeedOrConnection(resourceURI, linkedDataSource.getDataForResource(resourceURI));
+        return getWonNodeURIForAtomOrConnection(resourceURI, linkedDataSource.getDataForResource(resourceURI));
     }
 
-    public static URI getWonNodeURIForNeedOrConnection(final URI resURI, final Model resourceModel) {
+    public static URI getWonNodeURIForAtomOrConnection(final URI resURI, final Model resourceModel) {
         assert resourceModel != null : "model must not be null";
         // we didnt't get the queue name. Check if the model contains a triple <baseuri>
-        // won:hasWonNode
+        // won:wonNode
         // <wonNode> and get the information from there.
         logger.debug("getting WON node URI from model");
         Resource baseResource = resourceModel.getResource(resURI.toString());
         logger.debug("resourceModel: {}", RdfUtils.toString(resourceModel));
-        StmtIterator wonNodeStatementIterator = baseResource.listProperties(WON.HAS_WON_NODE);
+        StmtIterator wonNodeStatementIterator = baseResource.listProperties(WON.wonNode);
         if (!wonNodeStatementIterator.hasNext()) {
-            // no won:hasWonNode triple found. we can't do anything.
-            logger.debug("base resource {} has no won:hasWonNode property", baseResource);
+            // no won:wonNode triple found. we can't do anything.
+            logger.debug("base resource {} has no won:wonNode property", baseResource);
             return null;
         }
         Statement stmt = wonNodeStatementIterator.nextStatement();
         RDFNode wonNodeNode = stmt.getObject();
         if (!wonNodeNode.isResource()) {
-            logger.debug("won:hasWonNode property of base resource {} is not a resource", baseResource);
+            logger.debug("won:wonNode property of base resource {} is not a resource", baseResource);
             return null;
         }
         URI wonNodeUri = URI.create(wonNodeNode.asResource().getURI().toString());
@@ -230,17 +226,17 @@ public class WonLinkedDataUtils {
         return wonNodeUri;
     }
 
-    public static URI getWonNodeURIForNeedOrConnection(final URI resourceURI, final Dataset resourceDataset) {
+    public static URI getWonNodeURIForAtomOrConnection(final URI resourceURI, final Dataset resourceDataset) {
         return RdfUtils.findFirst(resourceDataset, new RdfUtils.ModelVisitor<URI>() {
             @Override
             public URI visit(final Model model) {
-                return getWonNodeURIForNeedOrConnection(resourceURI, model);
+                return getWonNodeURIForAtomOrConnection(resourceURI, model);
             }
         });
     }
 
     /**
-     * For the specified need or connection URI, the model is fetched, the WON node
+     * For the specified atom or connection URI, the model is fetched, the WON node
      * URI found there is also de-referenced, and the specified property path is
      * evaluated in that graph, starting at the WON node URI.
      *
@@ -249,10 +245,10 @@ public class WonLinkedDataUtils {
      * @param linkedDataSource
      * @return
      */
-    public static Node getWonNodePropertyForNeedOrConnectionURI(URI resourceURI, Path propertyPath,
+    public static Node getWonNodePropertyForAtomOrConnectionURI(URI resourceURI, Path propertyPath,
                     LinkedDataSource linkedDataSource) {
         assert linkedDataSource != null : "linkedDataSource must not be null";
-        URI wonNodeUri = WonLinkedDataUtils.getWonNodeURIForNeedOrConnectionURI(resourceURI, linkedDataSource);
+        URI wonNodeUri = WonLinkedDataUtils.getWonNodeURIForAtomOrConnectionURI(resourceURI, linkedDataSource);
         Dataset nodeDataset = linkedDataSource.getDataForResource(wonNodeUri);
         return RdfUtils.getNodeForPropertyPath(nodeDataset, wonNodeUri, propertyPath);
     }
@@ -272,25 +268,25 @@ public class WonLinkedDataUtils {
         return RdfUtils.getNodeForPropertyPath(dataset, resourceURI, propertyPath);
     }
 
-    public static Optional<URI> getDefaultFacet(URI needURI, boolean returnAnyIfNoDefaultFound,
+    public static Optional<URI> getDefaultSocket(URI atomURI, boolean returnAnyIfNoDefaultFound,
                     LinkedDataSource linkedDataSource) {
-        return WonRdfUtils.FacetUtils.getDefaultFacet(getDataForResource(needURI, linkedDataSource), needURI,
+        return WonRdfUtils.SocketUtils.getDefaultSocket(getDataForResource(atomURI, linkedDataSource), atomURI,
                         returnAnyIfNoDefaultFound);
     }
 
-    public static Collection<URI> getFacetsOfType(URI needURI, URI facetTypeURI, LinkedDataSource linkedDataSource) {
-        return WonRdfUtils.FacetUtils.getFacetsOfType(getDataForResource(needURI, linkedDataSource), needURI,
-                        facetTypeURI);
+    public static Collection<URI> getSocketsOfType(URI atomURI, URI socketTypeURI, LinkedDataSource linkedDataSource) {
+        return WonRdfUtils.SocketUtils.getSocketsOfType(getDataForResource(atomURI, linkedDataSource), atomURI,
+                        socketTypeURI);
     }
 
-    public static Optional<URI> getTypeOfFacet(URI facetURI, LinkedDataSource linkedDataSource) {
-        return WonRdfUtils.FacetUtils.getTypeOfFacet(getDataForResource(facetURI, linkedDataSource), facetURI);
+    public static Optional<URI> getTypeOfSocket(URI socketURI, LinkedDataSource linkedDataSource) {
+        return WonRdfUtils.SocketUtils.getTypeOfSocket(getDataForResource(socketURI, linkedDataSource), socketURI);
     }
 
     /**
-     * Crawls all connections of the specified need without messages.
+     * Crawls all connections of the specified atom without messages.
      */
-    public static Dataset getConnectionNetwork(URI needURI, LinkedDataSource linkedDataSource) {
+    public static Dataset getConnectionNetwork(URI atomURI, LinkedDataSource linkedDataSource) {
         assert linkedDataSource != null : "linkedDataSource must not be null";
         int depth = 5;
         int maxRequests = 1000;
@@ -299,9 +295,9 @@ public class WonLinkedDataUtils {
         pmap.withDefaultMappings(PrefixMapping.Standard);
         pmap.setNsPrefix("won", WON.getURI());
         pmap.setNsPrefix("msg", WONMSG.getURI());
-        propertyPaths.add(PathParser.parse("won:hasConnections", pmap));
-        propertyPaths.add(PathParser.parse("won:hasConnections/rdfs:member", pmap));
-        return linkedDataSource.getDataForResourceWithPropertyPath(needURI, needURI, propertyPaths, maxRequests, depth);
+        propertyPaths.add(PathParser.parse("won:connections", pmap));
+        propertyPaths.add(PathParser.parse("won:connections/rdfs:member", pmap));
+        return linkedDataSource.getDataForResourceWithPropertyPath(atomURI, atomURI, propertyPaths, maxRequests, depth);
     }
 
     /**

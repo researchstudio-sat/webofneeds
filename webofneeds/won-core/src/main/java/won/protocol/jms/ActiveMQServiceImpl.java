@@ -37,12 +37,11 @@ import won.protocol.vocabulary.WON;
  */
 public class ActiveMQServiceImpl implements ActiveMQService {
     private final Logger logger = LoggerFactory.getLogger(getClass());
-    private static final String PATH_OWNER_PROTOCOL_QUEUE_NAME = "<" + WON.SUPPORTS_WON_PROTOCOL_IMPL + ">/<"
-                    + WON.HAS_ACTIVEMQ_OWNER_PROTOCOL_QUEUE_NAME + ">";
-    private static final String PATH_NEED_PROTOCOL_QUEUE_NAME = "<" + WON.SUPPORTS_WON_PROTOCOL_IMPL + ">/<"
-                    + WON.HAS_ACTIVEMQ_NEED_PROTOCOL_QUEUE_NAME + ">";
-    private static final String PATH_BROKER_URI = "<" + WON.SUPPORTS_WON_PROTOCOL_IMPL + ">/<" + WON.HAS_BROKER_URI
-                    + ">";
+    private static final String PATH_OWNER_PROTOCOL_QUEUE_NAME = "<" + WON.supportsWonProtocolImpl + ">/<"
+                    + WON.activeMQOwnerProtocolQueueName + ">";
+    private static final String PATH_ATOM_PROTOCOL_QUEUE_NAME = "<" + WON.supportsWonProtocolImpl + ">/<"
+                    + WON.activeMQAtomProtocolQueueName + ">";
+    private static final String PATH_BROKER_URI = "<" + WON.supportsWonProtocolImpl + ">/<" + WON.brokerUri + ">";
     protected String queueNamePath;
     private List<String> matcherProtocolTopicList;
     private ProtocolType protocolType;
@@ -53,8 +52,8 @@ public class ActiveMQServiceImpl implements ActiveMQService {
             case OwnerProtocol:
                 queueNamePath = PATH_OWNER_PROTOCOL_QUEUE_NAME;
                 break;
-            case NeedProtocol:
-                queueNamePath = PATH_NEED_PROTOCOL_QUEUE_NAME;
+            case AtomProtocol:
+                queueNamePath = PATH_ATOM_PROTOCOL_QUEUE_NAME;
                 break;
             case MatcherProtocol:
                 break;
@@ -80,7 +79,7 @@ public class ActiveMQServiceImpl implements ActiveMQService {
                 return activeMQOwnerProtocolQueueName;
             }
             logger.debug("could not to get queue name from resource {}, trying to obtain won node URI", resourceUri);
-            URI wonNodeUri = WonLinkedDataUtils.getWonNodeURIForNeedOrConnection(resourceUri, resourceDataset);
+            URI wonNodeUri = WonLinkedDataUtils.getWonNodeURIForAtomOrConnection(resourceUri, resourceDataset);
             activeMQOwnerProtocolQueueName = RdfUtils.getStringPropertyForPropertyPath(
                             linkedDataSource.getDataForResource(wonNodeUri), wonNodeUri, path);
             // now, even if it's null, we return the result.
@@ -111,9 +110,9 @@ public class ActiveMQServiceImpl implements ActiveMQService {
             }
             logger.debug("could not to get broker URI from resource {}, trying to obtain won node URI", resourceUri);
             // we didnt't get the queue name. Check if the model contains a triple <baseuri>
-            // won:hasWonNode
+            // won:wonNode
             // <wonNode> and get the information from there.
-            URI wonNodeUri = WonLinkedDataUtils.getWonNodeURIForNeedOrConnection(resourceUri, resourceDataset);
+            URI wonNodeUri = WonLinkedDataUtils.getWonNodeURIForAtomOrConnection(resourceUri, resourceDataset);
             logger.debug("wonNodeUri: {}", wonNodeUri);
             resourceDataset = linkedDataSource.getDataForResource(wonNodeUri);
             activeMQEndpoint = RdfUtils.getURIPropertyForPropertyPath(resourceDataset, wonNodeUri, path);

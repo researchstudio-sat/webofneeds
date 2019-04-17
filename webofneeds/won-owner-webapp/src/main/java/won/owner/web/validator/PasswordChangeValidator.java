@@ -38,7 +38,7 @@ public class PasswordChangeValidator implements Validator {
         ChangePasswordPojo changePasswordPojo = (ChangePasswordPojo) target;
         validator.validate(target, errors);
         if (changePasswordPojo.getNewPassword().length() < 6) {
-            errors.rejectValue("newPassword", "passwordTooShort", "Password needs to be at least 6 Characters long");
+            errors.rejectValue("newPassword", "passwordTooShort", "Password atoms to be at least 6 Characters long");
         }
         if (errors.getFieldError("username") != null) {
             User userInDb = (User) wonUserDetailService.loadUserByUsername(changePasswordPojo.getUsername());

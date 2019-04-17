@@ -14,7 +14,7 @@ import won.bot.framework.eventbot.action.impl.mail.model.UriType;
 import won.bot.framework.eventbot.action.impl.mail.model.WonURI;
 import won.bot.framework.eventbot.action.impl.mail.receive.MailContentExtractor;
 import won.bot.framework.eventbot.event.Event;
-import won.bot.framework.eventbot.event.impl.wonmessage.ConnectFromOtherNeedEvent;
+import won.bot.framework.eventbot.event.impl.wonmessage.ConnectFromOtherAtomEvent;
 import won.bot.framework.eventbot.listener.EventListener;
 import won.protocol.model.Connection;
 
@@ -34,15 +34,15 @@ public class Connect2MailParserAction extends BaseEventBotAction {
     @Override
     protected void doRun(Event event, EventListener executingListener) throws Exception {
         EventListenerContext ctx = getEventListenerContext();
-        if (event instanceof ConnectFromOtherNeedEvent && ctx.getBotContextWrapper() instanceof MailBotContextWrapper) {
+        if (event instanceof ConnectFromOtherAtomEvent && ctx.getBotContextWrapper() instanceof MailBotContextWrapper) {
             MailBotContextWrapper botContextWrapper = (MailBotContextWrapper) ctx.getBotContextWrapper();
-            Connection con = ((ConnectFromOtherNeedEvent) event).getCon();
-            URI responseTo = con.getNeedURI();
-            URI remoteNeedUri = con.getRemoteNeedURI();
+            Connection con = ((ConnectFromOtherAtomEvent) event).getCon();
+            URI responseTo = con.getAtomURI();
+            URI targetAtomUri = con.getTargetAtomURI();
             MimeMessage originalMail = botContextWrapper.getMimeMessageForURI(responseTo);
             logger.debug("Someone issued a connect for URI: " + responseTo + " sending a mail to the creator: "
                             + MailContentExtractor.getFromAddressString(originalMail));
-            WonMimeMessage answerMessage = mailGenerator.createConnectMail(originalMail, remoteNeedUri);
+            WonMimeMessage answerMessage = mailGenerator.createConnectMail(originalMail, targetAtomUri);
             botContextWrapper.addMailIdWonURIRelation(answerMessage.getMessageID(),
                             new WonURI(con.getConnectionURI(), UriType.CONNECTION));
             sendChannel.send(new GenericMessage<>(answerMessage));

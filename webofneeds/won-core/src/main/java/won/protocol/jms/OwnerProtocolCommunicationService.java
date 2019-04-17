@@ -22,5 +22,5 @@ public interface OwnerProtocolCommunicationService extends ProtocolCommunication
 
     public URI getWonNodeUriWithConnectionUri(URI connectionUri) throws NoSuchConnectionException;
 
-    public URI getWonNodeUriWithNeedUri(URI needUri) throws NoSuchConnectionException;
+    public URI getWonNodeUriWithAtomUri(URI atomUri) throws NoSuchConnectionException;
 }

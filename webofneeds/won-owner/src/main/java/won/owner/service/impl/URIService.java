@@ -17,7 +17,7 @@ import java.net.URI;
  */
 public class URIService {
     private URI ownerProtocolOwnerServiceEndpointURI;
-    private URI defaultOwnerProtocolNeedServiceEndpointURI;
+    private URI defaultOwnerProtocolAtomServiceEndpointURI;
     private URI ownerProtocolOwnerURI;
 
     public URI getOwnerProtocolOwnerServiceEndpointURI() {
@@ -28,12 +28,12 @@ public class URIService {
         this.ownerProtocolOwnerServiceEndpointURI = ownerProtocolOwnerServiceEndpointURI;
     }
 
-    public URI getDefaultOwnerProtocolNeedServiceEndpointURI() {
-        return defaultOwnerProtocolNeedServiceEndpointURI;
+    public URI getDefaultOwnerProtocolAtomServiceEndpointURI() {
+        return defaultOwnerProtocolAtomServiceEndpointURI;
     }
 
-    public void setDefaultOwnerProtocolNeedServiceEndpointURI(final URI defaultOwnerProtocolNeedServiceEndpointURI) {
-        this.defaultOwnerProtocolNeedServiceEndpointURI = defaultOwnerProtocolNeedServiceEndpointURI;
+    public void setDefaultOwnerProtocolAtomServiceEndpointURI(final URI defaultOwnerProtocolAtomServiceEndpointURI) {
+        this.defaultOwnerProtocolAtomServiceEndpointURI = defaultOwnerProtocolAtomServiceEndpointURI;
     }
 
     public URI getOwnerProtocolOwnerURI() {

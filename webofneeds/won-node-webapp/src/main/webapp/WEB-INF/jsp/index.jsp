@@ -26,7 +26,7 @@ Useful links:
  </p>
 <ul>
   <li><a href="/won/resource/">WoN node descriptor</a></li>
-  <li><a href="/won/resource/need/">needs as linked Data </a></li>
+  <li><a href="/won/resource/atom/">atoms as linked Data </a></li>
   <li><a href="/won/resource/connection/">connections as linked Data</a></li>
 </ul>
 </body>

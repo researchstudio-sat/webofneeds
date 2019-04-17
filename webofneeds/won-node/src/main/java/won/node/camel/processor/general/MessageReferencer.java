@@ -30,12 +30,12 @@ import won.protocol.message.processor.exception.WonMessageProcessingException;
 import won.protocol.message.processor.impl.WonMessageSignerVerifier;
 import won.protocol.model.DatasetHolder;
 import won.protocol.model.MessageEventPlaceholder;
-import won.protocol.repository.ConnectionEventContainerRepository;
+import won.protocol.repository.ConnectionMessageContainerRepository;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.DatasetHolderRepository;
 import won.protocol.repository.MessageEventRepository;
-import won.protocol.repository.NeedEventContainerRepository;
-import won.protocol.repository.NeedRepository;
+import won.protocol.repository.AtomMessageContainerRepository;
+import won.protocol.repository.AtomRepository;
 import won.protocol.vocabulary.WONMSG;
 
 /**
@@ -49,11 +49,11 @@ public class MessageReferencer {
     @Autowired
     private ConnectionRepository connectionRepository;
     @Autowired
-    private ConnectionEventContainerRepository connectionEventContainerRepository;
+    private ConnectionMessageContainerRepository connectionMessageContainerRepository;
     @Autowired
-    private NeedRepository needRepository;
+    private AtomRepository atomRepository;
     @Autowired
-    private NeedEventContainerRepository needEventContainerRepository;
+    private AtomMessageContainerRepository atomMessageContainerRepository;
     @Autowired
     private DatasetHolderRepository datasetHolderRepository;
 
@@ -130,25 +130,25 @@ public class MessageReferencer {
                                     messageEventPlaceholder.getParentURI()));
                 }
                 break;
-            case CREATE_NEED:
+            case CREATE_ATOM:
                 // a create message does not reference any other message. It is the root of the
                 // message structure
                 break;
             default:
                 // any other message: reference the latest message in the parent (i.e. the
                 // container of the message)
-                // if we don't find any: reference the create message of the need.
+                // if we don't find any: reference the create message of the atom.
                 URI parentUri = WonMessageUtils.getParentEntityUri(message);
                 messageEventPlaceholder = messageEventRepository.findNewestByParentURI(parentUri);
                 if (messageEventPlaceholder != null) {
                     selectedUris.add(new MessageUriAndParentUri(messageEventPlaceholder.getMessageURI(),
                                     messageEventPlaceholder.getParentURI()));
                 } else {
-                    // we did not find any message to link to. Choose the create message of the need
-                    // we're starting a conversation, link to the create message of the need.
-                    URI parentNeedUri = WonMessageUtils.getParentNeedUri(message);
+                    // we did not find any message to link to. Choose the create message of the atom
+                    // we're starting a conversation, link to the create message of the atom.
+                    URI parentAtomUri = WonMessageUtils.getParentAtomUri(message);
                     List<MessageEventPlaceholder> eventsToSelect = messageEventRepository
-                                    .findByParentURIAndMessageType(parentNeedUri, WonMessageType.CREATE_NEED);
+                                    .findByParentURIAndMessageType(parentAtomUri, WonMessageType.CREATE_ATOM);
                     selectedUris.addAll(eventsToSelect.stream()
                                     .map(p -> (new MessageUriAndParentUri(p.getMessageURI(), p.getParentURI())))
                                     .collect(Collectors.toList()));
@@ -157,13 +157,13 @@ public class MessageReferencer {
     }
 
     private void lockParentByParentURI(URI parentUri) {
-        needEventContainerRepository.lockParentAndContainerByParentUriForUpdate(parentUri);
-        connectionEventContainerRepository.lockParentAndContainerByParentUriForUpdate(parentUri);
+        atomMessageContainerRepository.lockParentAndContainerByParentUriForUpdate(parentUri);
+        connectionMessageContainerRepository.lockParentAndContainerByParentUriForUpdate(parentUri);
     }
 
     private void lockParentByContainedMessage(URI isResponseToURI) {
-        messageEventRepository.lockNeedAndEventContainerByContainedMessageForUpdate(isResponseToURI);
-        messageEventRepository.lockConnectionAndEventContainerByContainedMessageForUpdate(isResponseToURI);
+        messageEventRepository.lockAtomAndMessageContainerByContainedMessageForUpdate(isResponseToURI);
+        messageEventRepository.lockConnectionAndMessageContainerByContainedMessageForUpdate(isResponseToURI);
     }
 
     /**
@@ -171,7 +171,7 @@ public class MessageReferencer {
      */
     private void selectUnreferenceMessages(Set<MessageUriAndParentUri> selectedUris, final WonMessage message)
                     throws WonMessageProcessingException {
-        if (message.getMessageType() == WonMessageType.CREATE_NEED)
+        if (message.getMessageType() == WonMessageType.CREATE_ATOM)
             return;
         URI parentUri = WonMessageUtils.getParentEntityUri(message);
         // find all unreferenced messages for the current message's parent
@@ -198,8 +198,7 @@ public class MessageReferencer {
         });
         WonMessage newMessage = new WonMessage(messageDataset);
         selected.forEach((MessageAndPlaceholder m) -> {
-            newMessage.addMessageProperty(WONMSG.HAS_PREVIOUS_MESSAGE_PROPERTY,
-                            m.getMessageEventPlaceholder().getMessageURI());
+            newMessage.addMessageProperty(WONMSG.previousMessage, m.getMessageEventPlaceholder().getMessageURI());
         });
         return newMessage;
     }

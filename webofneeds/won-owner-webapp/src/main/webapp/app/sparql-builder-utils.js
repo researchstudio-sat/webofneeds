@@ -180,7 +180,7 @@ export function optionalFilters(filters) {
  * Subquery that generates a score [1,0] (1 for exact location matches, 0 for anything
  * further away than the `radius`, linearly degrading inbetween)
  *
- * @param {String} resultName: a variable name that the score judges, e.g. `?need`
+ * @param {String} resultName: a variable name that the score judges, e.g. `?atom`
  * @param {String} bindScoreAs: the variable name for the score (use the same name for
  *   sorting/aggregating in the parent query)
  * @param {String} pathToGeoCoords: the predicates to be traversed to get to the
@@ -236,7 +236,7 @@ export function vicinityScoreSubQuery({
  * potential match's set of tags. Full overlap means 1, having no shared tags
  * means 0.
  *
- * @param {String} resultName: a variable name that the score judges, e.g. `?need`
+ * @param {String} resultName: a variable name that the score judges, e.g. `?atom`
  * @param {String} bindScoreAs: the variable name for the score (use the same name for
  *   sorting/aggregating in the parent query)
  * @param {String} pathToTags: the predicates to be traversed to get to the tags
@@ -313,7 +313,7 @@ export function tagOverlapScoreSubQuery({
  * Calculates the jaccard-index (i.e. normalized set-overlap) between own keywords
  * and a potential match. Full overlap means 1, having none of the keywords means 0.
  *
- * @param {String} resultName a variable name that the score judges, e.g. `?need`
+ * @param {String} resultName a variable name that the score judges, e.g. `?atom`
  * @param {String} bindScoreAs the variable name for the score (use the same name for
  *   sorting/aggregating in the parent query)
  * @param {String} pathToText the predicates to be traversed to get to the text
@@ -411,7 +411,7 @@ export function filterFloorSizeRange(rootSubject, min, max) {
 }
 
 /**
- * Uses a given numeric property and finds needs that constrain that
+ * Uses a given numeric property and finds atoms that constrain that
  * property using sh:property, sh:path, sh:minInclusive and sh:maxInclusive.
  *
  * @param {string} rootSubject sparql variable name (must start with '?') to attach triples to
@@ -513,7 +513,7 @@ export function filterPriceRange(rootSubject, min, max, currency) {
 }
 
 /**
- * Uses a given rent to find needs that have a matching priceRange. Works like filterNumericProperty (see docs there).
+ * Uses a given rent to find atoms that have a matching priceRange. Works like filterNumericProperty (see docs there).
  */
 export function filterPrice(rootSubject, rent, currency, sparqlVarPrefix) {
   const prefixes = {
@@ -561,7 +561,7 @@ export function filterPrice(rootSubject, rent, currency, sparqlVarPrefix) {
  * @returns {String} in the form of e.g.
  * ```
  * prefix s: <http://schema.org/>
- * prefix won: <http://purl.org/webofneeds/model#>
+ * prefix won: <https://w3id.org/won/core#>
  * ```
  */
 export function prefixesString(prefixes) {
@@ -581,15 +581,15 @@ function isSparqlVariable(str) {
 //TODO should return a context-def as well
 
 export function generateWhatsAroundQuery(latitude, longitude) {
-  return `PREFIX won: <http://purl.org/webofneeds/model#>
+  return `PREFIX won: <https://w3id.org/won/core#>
       PREFIX s: <http://schema.org/>
       PREFIX geo: <http://www.bigdata.com/rdf/geospatial#>
       PREFIX geoliteral: <http://www.bigdata.com/rdf/geospatial/literals/v1#>
       SELECT DISTINCT ?result ((?radius-?location_geoDistance)/?radius as ?score) WHERE {
         VALUES ?radius { 10 }        
-        ?result <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> won:Need.
-        ?result won:isInState  won:Active .
-        ?result won:seeks?/(won:hasLocation|s:jobLocation|s:location|s:fromLocation|s:toLocation) ?location.
+        ?result <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> won:Atom.
+        ?result won:atomState  won:Active .
+        ?result won:seeks?/(won:location|s:jobLocation|s:location|s:fromLocation|s:toLocation) ?location.
         ?location s:geo ?location_geo.
         SERVICE geo:search {
           ?location_geo geo:search "inCircle".
@@ -600,7 +600,7 @@ export function generateWhatsAroundQuery(latitude, longitude) {
           ?location_geo geo:distanceValue ?location_geoDistance.
         }
         FILTER(?location_geoDistance < ?radius)
-        FILTER NOT EXISTS { ?result won:hasFlag won:NoHintForCounterpart }
-        FILTER NOT EXISTS { ?result won:hasFlag won:WhatsAround }
+        FILTER NOT EXISTS { ?result won:flag won:NoHintForCounterpart }
+        FILTER NOT EXISTS { ?result won:flag won:WhatsAround }
       }`;
 }

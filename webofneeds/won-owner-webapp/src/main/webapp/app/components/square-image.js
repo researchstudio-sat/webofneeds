@@ -1,7 +1,7 @@
 import angular from "angular";
 
 import { attach, get, getIn } from "../utils.js";
-import * as needUtils from "../need-utils.js";
+import * as atomUtils from "../atom-utils.js";
 import * as processUtils from "../process-utils.js";
 import { connect2Redux } from "../won-utils.js";
 import { actionCreators } from "../actions/actions.js";
@@ -22,7 +22,7 @@ function genComponentConf() {
       ng-src="data:image/svg+xml;base64,{{::self.identiconSvg}}">
     <img class="personaImage"
       ng-if="::self.personaIdenticonSvg"
-      alt="Auto-generated title image for persona that holds the need"
+      alt="Auto-generated title image for persona that holds the atom"
       ng-src="data:image/svg+xml;base64,{{::self.personaIdenticonSvg}}">
   `;
 
@@ -31,29 +31,29 @@ function genComponentConf() {
       attach(this, serviceDependencies, arguments);
 
       const selectFromState = state => {
-        const need = getIn(state, ["needs", this.uri]);
-        const personaUri = get(need, "heldBy");
-        const persona = getIn(state, ["needs", personaUri]);
-        const personaIdenticonSvg = needUtils.getIdenticonSvg(persona);
+        const atom = getIn(state, ["atoms", this.uri]);
+        const personaUri = get(atom, "heldBy");
+        const persona = getIn(state, ["atoms", personaUri]);
+        const personaIdenticonSvg = atomUtils.getIdenticonSvg(persona);
 
-        const isPersona = needUtils.isPersona(need);
+        const isPersona = atomUtils.isPersona(atom);
 
         const useCaseIcon = !isPersona
-          ? needUtils.getMatchedUseCaseIcon(need)
+          ? atomUtils.getMatchedUseCaseIcon(atom)
           : undefined;
         const useCaseIconBackground = !isPersona
-          ? needUtils.getBackground(need)
+          ? atomUtils.getBackground(atom)
           : undefined;
 
         const identiconSvg = !useCaseIcon
-          ? needUtils.getIdenticonSvg(need)
+          ? atomUtils.getIdenticonSvg(atom)
           : undefined;
         const process = get(state, "process");
         return {
           isPersona,
-          needInactive: needUtils.isInactive(need),
-          needFailedToLoad:
-            need && processUtils.hasNeedFailedToLoad(process, this.uri),
+          atomInactive: atomUtils.isInactive(atom),
+          atomFailedToLoad:
+            atom && processUtils.hasAtomFailedToLoad(process, this.uri),
           useCaseIcon,
           useCaseIconBackground,
           identiconSvg,
@@ -63,11 +63,11 @@ function genComponentConf() {
 
       connect2Redux(selectFromState, actionCreators, ["self.uri"], this);
 
-      classOnComponentRoot("inactive", () => this.needInactive, this);
+      classOnComponentRoot("inactive", () => this.atomInactive, this);
 
       classOnComponentRoot(
         "won-failed-to-load",
-        () => this.needFailedToLoad,
+        () => this.atomFailedToLoad,
         this
       );
 

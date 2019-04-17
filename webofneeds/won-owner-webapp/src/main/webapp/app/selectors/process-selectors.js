@@ -14,7 +14,7 @@ export function isLoading(state) {
 
   return (
     processUtils.isProcessingInitialLoad(process) ||
-    processUtils.isProcessingNeedUrisFromOwnerLoad(process) ||
+    processUtils.isProcessingAtomUrisFromOwnerLoad(process) ||
     processUtils.isProcessingLogin(process) ||
     processUtils.isProcessingLogout(process) ||
     processUtils.isProcessingPublish(process) ||
@@ -22,7 +22,7 @@ export function isLoading(state) {
     processUtils.isProcessingVerifyEmailAddress(process) ||
     processUtils.isProcessingResendVerificationEmail(process) ||
     processUtils.isProcessingSendAnonymousLinkEmail(process) ||
-    processUtils.isAnyNeedLoading(process) ||
+    processUtils.isAnyAtomLoading(process) ||
     processUtils.isAnyConnectionLoading(process, true) ||
     processUtils.isAnyMessageLoading(process)
   );
@@ -46,17 +46,17 @@ export function isProcessingSendAnonymousLinkEmail(state) {
   return processUtils.isProcessingSendAnonymousLinkEmail(get(state, "process"));
 }
 
-export function isNeedLoading(state, needUri) {
-  return processUtils.isNeedLoading(get(state, "process"), needUri);
+export function isAtomLoading(state, atomUri) {
+  return processUtils.isAtomLoading(get(state, "process"), atomUri);
 }
 
-export function isNeedToLoad(state, needUri) {
+export function isAtomToLoad(state, atomUri) {
   return (
-    !getIn(state, ["needs", needUri]) ||
-    processUtils.isNeedToLoad(get(state, "process"), needUri)
+    !getIn(state, ["atoms", atomUri]) ||
+    processUtils.isAtomToLoad(get(state, "process"), atomUri)
   );
 }
 
-export function hasNeedFailedToLoad(state, needUri) {
-  return processUtils.hasNeedFailedToLoad(get(state, "process"), needUri);
+export function hasAtomFailedToLoad(state, atomUri) {
+  return processUtils.hasAtomFailedToLoad(get(state, "process"), atomUri);
 }

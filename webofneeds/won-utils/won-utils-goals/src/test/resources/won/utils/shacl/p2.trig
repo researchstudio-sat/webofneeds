@@ -11,8 +11,8 @@
 
 ex2:p2-data {
     ex2:p2 voc:hasGoal ex2:p2g.
-    ex2:p2g voc:hasDataGraph ex2:p2g-data;
-        voc:hasShapesGraph ex2:p2g-shapes ;
+    ex2:p2g voc:dataGraph ex2:p2g-data;
+        voc:shapesGraph ex2:p2g-shapes ;
 		voc:hasMergeClass taxi:Ride .
 }
 

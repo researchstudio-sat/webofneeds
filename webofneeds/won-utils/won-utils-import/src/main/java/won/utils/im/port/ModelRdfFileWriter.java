@@ -12,7 +12,7 @@ import org.apache.jena.riot.RDFDataMgr;
 /**
  * User: ypanchenko Date: 04.09.2014
  */
-public class ModelRdfFileWriter implements NeedDataWriter<Model> {
+public class ModelRdfFileWriter implements AtomDataWriter<Model> {
     private OutputStream out;
 
     public ModelRdfFileWriter(final File outputFile) throws IOException {

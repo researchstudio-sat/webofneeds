@@ -35,7 +35,7 @@ import won.bot.impl.ConversationBot;
  * Integration test.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "classpath:/spring/app/simple2NeedConversationTest.xml" })
+@ContextConfiguration(locations = { "classpath:/spring/app/simple2AtomConversationTest.xml" })
 public class ConversationBotTest {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private static final int RUN_ONCE = 1;
@@ -57,7 +57,7 @@ public class ConversationBotTest {
         this.bot = (MyBot) beanFactory.autowire(MyBot.class, AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, false);
         Object botBean = beanFactory.initializeBean(this.bot, "mybot");
         this.bot = (MyBot) botBean;
-        // the bot also needs a trigger so its act() method is called regularly.
+        // the bot also atoms a trigger so its act() method is called regularly.
         // (there is no trigger bean in the context)
         PeriodicTrigger trigger = new PeriodicTrigger(ACT_LOOP_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
         trigger.setInitialDelay(ACT_LOOP_INITIAL_DELAY_MILLIS);
@@ -71,7 +71,7 @@ public class ConversationBotTest {
      */
     @Test
     public void testConversationBot() throws Exception {
-        logger.info("starting test case testCreate2NeedsShortConversationBot");
+        logger.info("starting test case testCreate2AtomsShortConversationBot");
         // adding the bot to the bot manager will cause it to be initialized.
         // at that point, the trigger starts.
         botManager.addBot(this.bot);
@@ -83,7 +83,7 @@ public class ConversationBotTest {
         this.bot.getBarrier().await();
         // now check the results!
         this.bot.executeAsserts();
-        logger.info("finishing test case testCreate2NeedsShortConversationBot");
+        logger.info("finishing test case testCreate2AtomsShortConversationBot");
     }
 
     /**
@@ -124,11 +124,11 @@ public class ConversationBotTest {
          */
         public void executeAsserts() {
             // 2 act events
-            Assert.assertEquals(2, this.needCreator.getEventCount());
-            Assert.assertEquals(0, this.needCreator.getExceptionCount());
-            // 2 create need events
-            Assert.assertEquals(2, this.needConnector.getEventCount());
-            Assert.assertEquals(0, this.needConnector.getExceptionCount());
+            Assert.assertEquals(2, this.atomCreator.getEventCount());
+            Assert.assertEquals(0, this.atomCreator.getExceptionCount());
+            // 2 create atom events
+            Assert.assertEquals(2, this.atomConnector.getEventCount());
+            Assert.assertEquals(0, this.atomConnector.getExceptionCount());
             // TODO: should here be 1 or 2? Before was 2: 1 connect, 1 open
             Assert.assertEquals(1, this.autoOpener.getEventCount());
             Assert.assertEquals(0, this.autoOpener.getExceptionCount());
@@ -139,14 +139,14 @@ public class ConversationBotTest {
             Assert.assertEquals(10, this.connectionCloser.getEventCount());
             Assert.assertEquals(0, this.connectionCloser.getExceptionCount());
             // 1 close (one sent, one received - but for sending we create no event)
-            Assert.assertEquals(1, this.needDeactivator.getEventCount());
-            Assert.assertEquals(0, this.needDeactivator.getExceptionCount());
-            // 2 needs deactivated
+            Assert.assertEquals(1, this.atomDeactivator.getEventCount());
+            Assert.assertEquals(0, this.atomDeactivator.getExceptionCount());
+            // 2 atoms deactivated
             Assert.assertEquals(2, this.workDoneSignaller.getEventCount());
             Assert.assertEquals(0, this.workDoneSignaller.getExceptionCount());
             // TODO: there is more to check:
             // * what does the RDF look like?
-            // --> pull it from the needURI/ConnectionURI and check contents
+            // --> pull it from the atomURI/ConnectionURI and check contents
             // * what does the database look like?
         }
     }

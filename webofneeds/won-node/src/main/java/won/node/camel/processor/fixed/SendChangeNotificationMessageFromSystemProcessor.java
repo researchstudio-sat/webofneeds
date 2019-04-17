@@ -29,27 +29,27 @@ import won.protocol.vocabulary.WONMSG;
 import java.net.URI;
 
 @Component
-@FixedMessageProcessor(direction = WONMSG.TYPE_FROM_SYSTEM_STRING, messageType = WONMSG.TYPE_CHANGE_NOTIFICATION_STRING)
+@FixedMessageProcessor(direction = WONMSG.FromSystemString, messageType = WONMSG.ChangeNotificationMessageString)
 public class SendChangeNotificationMessageFromSystemProcessor extends AbstractCamelProcessor {
     public void process(final Exchange exchange) throws Exception {
         Message message = exchange.getIn();
         WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.MESSAGE_HEADER);
         URI connectionUri = wonMessage.getSenderURI();
         if (connectionUri == null) {
-            throw new MissingMessagePropertyException(URI.create(WONMSG.SENDER_PROPERTY.toString()));
+            throw new MissingMessagePropertyException(URI.create(WONMSG.sender.toString()));
         }
         Connection con = connectionRepository.findOneByConnectionURIForUpdate(connectionUri).get();
         if (con.getState() != ConnectionState.CONNECTED) {
             throw new IllegalMessageForConnectionStateException(connectionUri, "CHANGE_NOTIFICATION_MESSAGE",
                             con.getState());
         }
-        URI remoteMessageUri = wonNodeInformationService.generateEventURI(wonMessage.getReceiverNodeURI());
-        if (wonMessage.getReceiverURI() == null) {
+        URI remoteMessageUri = wonNodeInformationService.generateEventURI(wonMessage.getRecipientNodeURI());
+        if (wonMessage.getRecipientURI() == null) {
             // set the sender uri in the envelope TODO: TwoMsgs: do not set sender here
-            wonMessage.addMessageProperty(WONMSG.RECEIVER_PROPERTY, con.getRemoteConnectionURI());
+            wonMessage.addMessageProperty(WONMSG.recipient, con.getTargetConnectionURI());
         }
         // add the information about the remote message to the locally stored one
-        wonMessage.addMessageProperty(WONMSG.HAS_CORRESPONDING_REMOTE_MESSAGE, remoteMessageUri);
+        wonMessage.addMessageProperty(WONMSG.correspondingRemoteMessage, remoteMessageUri);
         // the persister will pick it up later
         // put the factory into the outbound message factory header. It will be used to
         // generate the outbound message

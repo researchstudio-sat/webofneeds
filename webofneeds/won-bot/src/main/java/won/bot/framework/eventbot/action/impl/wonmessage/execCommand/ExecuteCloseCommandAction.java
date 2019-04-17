@@ -30,8 +30,8 @@ import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.WonRdfUtils;
 
 /**
- * Action executing a ConnectCommandEvent, connecting to the remoteNeed on
- * behalf of the need.
+ * Action executing a ConnectCommandEvent, connecting to the targetAtom on
+ * behalf of the atom.
  */
 public class ExecuteCloseCommandAction extends ExecuteSendMessageCommandAction<CloseCommandEvent> {
     public ExecuteCloseCommandAction(final EventListenerContext eventListenerContext) {
@@ -41,22 +41,22 @@ public class ExecuteCloseCommandAction extends ExecuteSendMessageCommandAction<C
     @Override
     protected MessageCommandFailureEvent createRemoteNodeFailureEvent(CloseCommandEvent originalCommand,
                     WonMessage messageSent, FailureResponseEvent failureResponseEvent) {
-        return new CloseCommandFailureEvent(originalCommand, failureResponseEvent.getNeedURI(),
-                        failureResponseEvent.getRemoteNeedURI(), failureResponseEvent.getConnectionURI());
+        return new CloseCommandFailureEvent(originalCommand, failureResponseEvent.getAtomURI(),
+                        failureResponseEvent.getTargetAtomURI(), failureResponseEvent.getConnectionURI());
     }
 
     @Override
     protected MessageCommandSuccessEvent createRemoteNodeSuccessEvent(CloseCommandEvent originalCommand,
                     WonMessage messageSent, SuccessResponseEvent successResponseEvent) {
-        return new CloseCommandSuccessEvent(originalCommand, successResponseEvent.getNeedURI(),
-                        successResponseEvent.getRemoteNeedURI(), successResponseEvent.getConnectionURI());
+        return new CloseCommandSuccessEvent(originalCommand, successResponseEvent.getAtomURI(),
+                        successResponseEvent.getTargetAtomURI(), successResponseEvent.getConnectionURI());
     }
 
     @Override
     protected MessageCommandFailureEvent createLocalNodeFailureEvent(CloseCommandEvent originalCommand,
                     WonMessage messageSent, FailureResponseEvent failureResponseEvent) {
-        return new CloseCommandFailureEvent(originalCommand, failureResponseEvent.getNeedURI(),
-                        failureResponseEvent.getRemoteNeedURI(), failureResponseEvent.getConnectionURI());
+        return new CloseCommandFailureEvent(originalCommand, failureResponseEvent.getAtomURI(),
+                        failureResponseEvent.getTargetAtomURI(), failureResponseEvent.getConnectionURI());
     }
 
     @Override
@@ -74,14 +74,14 @@ public class ExecuteCloseCommandAction extends ExecuteSendMessageCommandAction<C
         URI connectionURI = connectCommandEvent.getConnectionURI();
         WonNodeInformationService wonNodeInformationService = getEventListenerContext().getWonNodeInformationService();
         Dataset connectionRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(connectionURI);
-        URI remoteNeed = WonRdfUtils.ConnectionUtils.getRemoteNeedURIFromConnection(connectionRDF, connectionURI);
-        URI localNeed = WonRdfUtils.ConnectionUtils.getLocalNeedURIFromConnection(connectionRDF, connectionURI);
+        URI targetAtom = WonRdfUtils.ConnectionUtils.getTargetAtomURIFromConnection(connectionRDF, connectionURI);
+        URI localAtom = WonRdfUtils.ConnectionUtils.getLocalAtomURIFromConnection(connectionRDF, connectionURI);
         URI wonNode = WonRdfUtils.ConnectionUtils.getWonNodeURIFromConnection(connectionRDF, connectionURI);
-        Dataset remoteNeedRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(remoteNeed);
+        Dataset targetAtomRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(targetAtom);
         return WonMessageBuilder.setMessagePropertiesForClose(wonNodeInformationService.generateEventURI(wonNode),
-                        connectionURI, localNeed, wonNode,
-                        WonRdfUtils.ConnectionUtils.getRemoteConnectionURIFromConnection(connectionRDF, connectionURI),
-                        remoteNeed, WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(remoteNeedRDF, remoteNeed),
+                        connectionURI, localAtom, wonNode,
+                        WonRdfUtils.ConnectionUtils.getTargetConnectionURIFromConnection(connectionRDF, connectionURI),
+                        targetAtom, WonRdfUtils.AtomUtils.getWonNodeURIFromAtom(targetAtomRDF, targetAtom),
                         connectCommandEvent.getCloseMessage()).build();
     }
 }

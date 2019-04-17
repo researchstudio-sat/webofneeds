@@ -15,11 +15,11 @@ import java.net.URI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
-import won.bot.framework.component.needproducer.NeedProducer;
+import won.bot.framework.component.atomproducer.AtomProducer;
 import won.bot.framework.component.nodeurisource.NodeURISource;
 import won.matcher.component.MatcherNodeURISource;
 import won.matcher.protocol.impl.MatcherProtocolMatcherServiceImplJMSBased;
-import won.protocol.matcher.MatcherProtocolNeedServiceClientSide;
+import won.protocol.matcher.MatcherProtocolAtomServiceClientSide;
 import won.protocol.message.sender.WonMessageSender;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.linkeddata.LinkedDataSource;
@@ -31,9 +31,9 @@ public abstract class BasicServiceBot extends BaseBot {
     private NodeURISource nodeURISource;
     private MatcherNodeURISource matcherNodeURISource;
     private URI solrServerURI;
-    private NeedProducer needProducer;
+    private AtomProducer atomProducer;
     private WonMessageSender wonMessageSender;
-    private MatcherProtocolNeedServiceClientSide matcherProtocolNeedServiceClient;
+    private MatcherProtocolAtomServiceClientSide matcherProtocolAtomServiceClient;
     private MatcherProtocolMatcherServiceImplJMSBased matcherProtocolMatcherService;
     private LinkedDataSource linkedDataSource;
     private WonNodeInformationService wonNodeInformationService;
@@ -62,8 +62,8 @@ public abstract class BasicServiceBot extends BaseBot {
         return wonMessageSender;
     }
 
-    protected MatcherProtocolNeedServiceClientSide getMatcherProtocolNeedServiceClient() {
-        return matcherProtocolNeedServiceClient;
+    protected MatcherProtocolAtomServiceClientSide getMatcherProtocolAtomServiceClient() {
+        return matcherProtocolAtomServiceClient;
     }
 
     protected MatcherProtocolMatcherServiceImplJMSBased getMatcherProtocolMatcherService() {
@@ -86,9 +86,9 @@ public abstract class BasicServiceBot extends BaseBot {
 
     @Qualifier("default")
     @Autowired(required = true)
-    public void setMatcherProtocolNeedServiceClient(
-                    final MatcherProtocolNeedServiceClientSide matcherProtocolNeedServiceClient) {
-        this.matcherProtocolNeedServiceClient = matcherProtocolNeedServiceClient;
+    public void setMatcherProtocolAtomServiceClient(
+                    final MatcherProtocolAtomServiceClientSide matcherProtocolAtomServiceClient) {
+        this.matcherProtocolAtomServiceClient = matcherProtocolAtomServiceClient;
     }
 
     @Qualifier("default")
@@ -98,14 +98,14 @@ public abstract class BasicServiceBot extends BaseBot {
         this.matcherProtocolMatcherService = matcherProtocolMatcherService;
     }
 
-    protected NeedProducer getNeedProducer() {
-        return needProducer;
+    protected AtomProducer getAtomProducer() {
+        return atomProducer;
     }
 
     @Qualifier("default")
     @Autowired(required = true)
-    public void setNeedProducer(final NeedProducer needProducer) {
-        this.needProducer = needProducer;
+    public void setAtomProducer(final AtomProducer atomProducer) {
+        this.atomProducer = atomProducer;
     }
 
     public LinkedDataSource getLinkedDataSource() {

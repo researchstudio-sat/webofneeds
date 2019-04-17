@@ -44,9 +44,9 @@ public class SendFeedbackForHintAction extends BaseEventBotAction {
             // better to
             // use connection object instead
             HintFromMatcherEvent hintEvent = (HintFromMatcherEvent) event;
-            hintEvent.getWonMessage().getReceiverURI();
+            hintEvent.getWonMessage().getRecipientURI();
             boolean feedbackValue = random.nextBoolean();
-            WonMessage message = createFeedbackMessage(hintEvent.getWonMessage().getReceiverURI(), feedbackValue);
+            WonMessage message = createFeedbackMessage(hintEvent.getWonMessage().getRecipientURI(), feedbackValue);
             logger.debug("sending {} feedback for hint {} in message {}",
                             new Object[] { (feedbackValue ? "positive" : "negative"), event, message.getMessageURI() });
             getEventListenerContext().getWonMessageSender().sendWonMessage(message);
@@ -57,11 +57,11 @@ public class SendFeedbackForHintAction extends BaseEventBotAction {
                     throws WonMessageBuilderException {
         WonNodeInformationService wonNodeInformationService = getEventListenerContext().getWonNodeInformationService();
         Dataset connectionRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(connectionURI);
-        URI localNeed = WonRdfUtils.ConnectionUtils.getLocalNeedURIFromConnection(connectionRDF, connectionURI);
+        URI localAtom = WonRdfUtils.ConnectionUtils.getLocalAtomURIFromConnection(connectionRDF, connectionURI);
         URI wonNode = WonRdfUtils.ConnectionUtils.getWonNodeURIFromConnection(connectionRDF, connectionURI);
         return WonMessageBuilder
                         .setMessagePropertiesForHintFeedback(wonNodeInformationService.generateEventURI(wonNode),
-                                        connectionURI, localNeed, wonNode, booleanFeedbackValue)
+                                        connectionURI, localAtom, wonNode, booleanFeedbackValue)
                         .build();
     }
 }

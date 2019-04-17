@@ -33,13 +33,13 @@ public class WonHokifyJobBotHandler implements ICommandRegistry {
         this.hokifyMessageGenerator = hokifyMessageGenerator;
         this.commandRegistry = new CommandRegistry(true, botName);
         // BotCommand offerBotCommand = new OfferBotCommand("offer", "create a offer
-        // need", bus);
+        // atom", bus);
         // BotCommand demandBotCommand = new DemandBotCommand("demand", "create a demand
-        // need", bus);
+        // atom", bus);
         // BotCommand critiqueBotCommand = new CritiqueBotCommand("critique", "create a
-        // critique need", bus);
+        // critique atom", bus);
         // BotCommand togetherBotCommand = new TogetherBotCommand("together", "create a
-        // together need", bus);
+        // together atom", bus);
         BotCommand helpBotCommand = new HelpBotCommand("help", "list help", bus);
         // commandRegistry.registerAll(helpBotCommand, offerBotCommand,
         // demandBotCommand, critiqueBotCommand, togetherBotCommand);

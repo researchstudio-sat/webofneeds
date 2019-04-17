@@ -186,7 +186,7 @@ public class SparqlMatcherUtils {
                                             .orElse(new NodeValueBoolean(true));
                             return OpFilter.filterBy(new ExprList(filterExpression), op);
                         })).reduce((op1, op2) -> new OpUnion(op1, op2));
-        Op maintriple = new OpTriple(new Triple(resultName, RDF.type.asNode(), WON.NEED.asNode()));
+        Op maintriple = new OpTriple(new Triple(resultName, RDF.type.asNode(), WON.Atom.asNode()));
         Op mainOp = union.isPresent() ? OpJoin.create(maintriple, union.get()) : maintriple;
         return mainOp;
     }
@@ -195,8 +195,7 @@ public class SparqlMatcherUtils {
         InsertionTargetFindingVisitor targetFinder = new InsertionTargetFindingVisitor();
         Walker.walk(q, targetFinder);
         OpInserter inserter = targetFinder.getInserter();
-        inserter.setNotExistsTriple(
-                        new Triple(resultName, WON.HAS_FLAG.asNode(), WON.NO_HINT_FOR_COUNTERPART.asNode()));
+        inserter.setNotExistsTriple(new Triple(resultName, WON.flag.asNode(), WON.NoHintForCounterpart.asNode()));
         return Transformer.transform(inserter, q);
     }
 
@@ -204,7 +203,7 @@ public class SparqlMatcherUtils {
         InsertionTargetFindingVisitor targetFinder = new InsertionTargetFindingVisitor();
         Walker.walk(q, targetFinder);
         OpInserter inserter = targetFinder.getInserter();
-        inserter.setJoinWithTriple(new Triple(resultName, WON.HAS_FLAG.asNode(), WON.NO_HINT_FOR_COUNTERPART.asNode()));
+        inserter.setJoinWithTriple(new Triple(resultName, WON.flag.asNode(), WON.NoHintForCounterpart.asNode()));
         return Transformer.transform(inserter, q);
     }
 

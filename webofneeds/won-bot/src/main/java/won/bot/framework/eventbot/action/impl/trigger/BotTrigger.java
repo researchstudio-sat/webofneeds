@@ -67,7 +67,7 @@ public class BotTrigger {
             // nothing to do, the interval is already minimial
             return;
         } else if (factor == 1) {
-            // nothing to do, no need to reschedule
+            // nothing to do, no atom to reschedule
             return;
         }
         if (factor <= 0)

@@ -21,21 +21,21 @@ import won.bot.framework.eventbot.action.impl.counter.CounterImpl;
 import won.bot.framework.eventbot.action.impl.counter.DecrementCounterAction;
 import won.bot.framework.eventbot.action.impl.counter.IncrementCounterAction;
 import won.bot.framework.eventbot.action.impl.lifecycle.SignalWorkDoneAction;
-import won.bot.framework.eventbot.action.impl.needlifecycle.CreateNeedWithFacetsAction;
+import won.bot.framework.eventbot.action.impl.atomlifecycle.CreateAtomWithSocketsAction;
 import won.bot.framework.eventbot.action.impl.wonmessage.CloseConnectionAction;
 import won.bot.framework.eventbot.action.impl.wonmessage.OpenConnectionAction;
 import won.bot.framework.eventbot.action.impl.wonmessage.SendFeedbackForHintAction;
 import won.bot.framework.eventbot.action.impl.wonmessage.SendMessageAction;
 import won.bot.framework.eventbot.bus.EventBus;
 import won.bot.framework.eventbot.event.Event;
-import won.bot.framework.eventbot.event.NeedCreationFailedEvent;
+import won.bot.framework.eventbot.event.AtomCreationFailedEvent;
 import won.bot.framework.eventbot.event.impl.lifecycle.ActEvent;
-import won.bot.framework.eventbot.event.impl.needlifecycle.NeedCreatedEvent;
-import won.bot.framework.eventbot.event.impl.needlifecycle.NeedProducerExhaustedEvent;
-import won.bot.framework.eventbot.event.impl.wonmessage.ConnectFromOtherNeedEvent;
+import won.bot.framework.eventbot.event.impl.atomlifecycle.AtomCreatedEvent;
+import won.bot.framework.eventbot.event.impl.atomlifecycle.AtomProducerExhaustedEvent;
+import won.bot.framework.eventbot.event.impl.wonmessage.ConnectFromOtherAtomEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.HintFromMatcherEvent;
-import won.bot.framework.eventbot.event.impl.wonmessage.MessageFromOtherNeedEvent;
-import won.bot.framework.eventbot.event.impl.wonmessage.OpenFromOtherNeedEvent;
+import won.bot.framework.eventbot.event.impl.wonmessage.MessageFromOtherAtomEvent;
+import won.bot.framework.eventbot.event.impl.wonmessage.OpenFromOtherAtomEvent;
 import won.bot.framework.eventbot.listener.BaseEventListener;
 import won.bot.framework.eventbot.listener.EventListener;
 import won.bot.framework.eventbot.listener.impl.ActionOnEventListener;
@@ -59,55 +59,56 @@ public class RandomSimulatorBot extends EventBot {
     protected void initializeEventListeners() {
         final EventListenerContext ctx = getEventListenerContext();
         EventBus bus = getEventBus();
-        final Counter needCreationSuccessfulCounter = new CounterImpl("needsCreated");
-        final Counter needCreationFailedCounter = new CounterImpl("needCreationFailed");
-        final Counter needCreationStartedCounter = new CounterImpl("creationStarted");
+        final Counter atomCreationSuccessfulCounter = new CounterImpl("atomsCreated");
+        final Counter atomCreationFailedCounter = new CounterImpl("atomCreationFailed");
+        final Counter atomCreationStartedCounter = new CounterImpl("creationStarted");
         final Counter creationUnfinishedCounter = new CounterImpl("creationUnfinished");
-        // create the first need when the first actEvent happens
+        // create the first atom when the first actEvent happens
         this.groupMemberCreator = new ActionOnceAfterNEventsListener(ctx, "groupMemberCreator", 1, new MultipleActions(
-                        ctx, new IncrementCounterAction(ctx, needCreationStartedCounter),
+                        ctx, new IncrementCounterAction(ctx, atomCreationStartedCounter),
                         new IncrementCounterAction(ctx, creationUnfinishedCounter),
-                        new CreateNeedWithFacetsAction(ctx, getBotContextWrapper().getNeedCreateListName())));
+                        new CreateAtomWithSocketsAction(ctx, getBotContextWrapper().getAtomCreateListName())));
         bus.subscribe(ActEvent.class, this.groupMemberCreator);
-        // when a need is created (or it failed), decrement the
+        // when an atom is created (or it failed), decrement the
         // creationUnfinishedCounter
         EventListener downCounter = new ActionOnEventListener(ctx, "downCounter",
                         new DecrementCounterAction(ctx, creationUnfinishedCounter));
-        // count a successful need creation
-        bus.subscribe(NeedCreatedEvent.class, downCounter);
+        // count a successful atom creation
+        bus.subscribe(AtomCreatedEvent.class, downCounter);
         // if a creation failed, we don't want to keep us from keeping the correct count
-        bus.subscribe(NeedCreationFailedEvent.class, downCounter);
+        bus.subscribe(AtomCreationFailedEvent.class, downCounter);
         // we count the one execution when the creator realizes that the producer is
         // exhausted, we have to count down
         // once for that, too.
-        bus.subscribe(NeedProducerExhaustedEvent.class, downCounter);
+        bus.subscribe(AtomProducerExhaustedEvent.class, downCounter);
         // also, keep track of what worked and what didn't
-        bus.subscribe(NeedCreationFailedEvent.class,
-                        new ActionOnEventListener(ctx, new IncrementCounterAction(ctx, needCreationFailedCounter)));
-        bus.subscribe(NeedCreatedEvent.class,
-                        new ActionOnEventListener(ctx, new IncrementCounterAction(ctx, needCreationSuccessfulCounter)));
-        // print a logging message every N needs
-        bus.subscribe(NeedCreatedEvent.class, new ActionOnEventListener(ctx, "logger", new BaseEventBotAction(ctx) {
+        bus.subscribe(AtomCreationFailedEvent.class,
+                        new ActionOnEventListener(ctx, new IncrementCounterAction(ctx, atomCreationFailedCounter)));
+        bus.subscribe(AtomCreatedEvent.class,
+                        new ActionOnEventListener(ctx, new IncrementCounterAction(ctx, atomCreationSuccessfulCounter)));
+        // print a logging message every N atoms
+        bus.subscribe(AtomCreatedEvent.class, new ActionOnEventListener(ctx, "logger", new BaseEventBotAction(ctx) {
             int lastOutput = 0;
 
             @Override
             protected void doRun(final Event event, EventListener executingListener) throws Exception {
-                int cnt = needCreationStartedCounter.getCount();
+                int cnt = atomCreationStartedCounter.getCount();
                 int unfinishedCount = creationUnfinishedCounter.getCount();
-                int successCnt = needCreationSuccessfulCounter.getCount();
-                int failedCnt = needCreationFailedCounter.getCount();
+                int successCnt = atomCreationSuccessfulCounter.getCount();
+                int failedCnt = atomCreationFailedCounter.getCount();
                 if (cnt - lastOutput >= 200) {
-                    logger.info("started creation of {} needs, creation not yet finished for {}. Successful: {}, failed: {}",
+                    logger.info("started creation of {} atoms, creation not yet finished for {}. Successful: {}, failed: {}",
                                     new Object[] { cnt, unfinishedCount, successCnt, failedCnt });
                     lastOutput = cnt;
                 }
             }
         }));
-        // each time a need was created, wait for a random interval, then create another
+        // each time an atom was created, wait for a random interval, then create
+        // another
         // one
-        bus.subscribe(NeedCreatedEvent.class, new ActionOnEventListener(ctx, new RandomDelayedAction(ctx,
+        bus.subscribe(AtomCreatedEvent.class, new ActionOnEventListener(ctx, new RandomDelayedAction(ctx,
                         MIN_NEXT_CREATION_TIMEOUT_MILLIS, MAX_NEXT_CREATION_TIMEOUT_MILLIS, this.hashCode(),
-                        new CreateNeedWithFacetsAction(ctx, getBotContextWrapper().getNeedCreateListName()))));
+                        new CreateAtomWithSocketsAction(ctx, getBotContextWrapper().getAtomCreateListName()))));
         // when a hint is received, connect fraction of the cases after a random timeout
         bus.subscribe(HintFromMatcherEvent.class, new ActionOnEventListener(ctx, "hint-reactor",
                         new RandomDelayedAction(ctx, MIN_RECATION_TIMEOUT_MILLIS, MAX_REACTION_TIMEOUT_MILLIS,
@@ -125,8 +126,8 @@ public class RandomSimulatorBot extends EventBot {
                                         new ProbabilisticSelectionAction(ctx, PROB_MESSAGE_ON_OPEN,
                                                         (long) this.hashCode(), new OpenConnectionAction(ctx, "Hi!"),
                                                         new CloseConnectionAction(ctx, "Bye!"))));
-        bus.subscribe(OpenFromOtherNeedEvent.class, opener);
-        bus.subscribe(ConnectFromOtherNeedEvent.class, opener);
+        bus.subscribe(OpenFromOtherAtomEvent.class, opener);
+        bus.subscribe(ConnectFromOtherAtomEvent.class, opener);
         // when an open is received, send message or close randomly after a random
         // timeout
         EventListener replyer = new ActionOnEventListener(ctx, "message-reactor",
@@ -135,10 +136,10 @@ public class RandomSimulatorBot extends EventBot {
                                         new ProbabilisticSelectionAction(ctx, PROB_MESSAGE_ON_MESSAGE,
                                                         (long) this.hashCode(), new SendMessageAction(ctx),
                                                         new CloseConnectionAction(ctx, "Bye!"))));
-        bus.subscribe(MessageFromOtherNeedEvent.class, replyer);
-        bus.subscribe(OpenFromOtherNeedEvent.class, replyer);
-        // When the needproducer is exhausted, stop.
+        bus.subscribe(MessageFromOtherAtomEvent.class, replyer);
+        bus.subscribe(OpenFromOtherAtomEvent.class, replyer);
+        // When the atomproducer is exhausted, stop.
         this.workDoneSignaller = new ActionOnEventListener(ctx, "workDoneSignaller", new SignalWorkDoneAction(ctx), 1);
-        bus.subscribe(NeedProducerExhaustedEvent.class, this.workDoneSignaller);
+        bus.subscribe(AtomProducerExhaustedEvent.class, this.workDoneSignaller);
     }
 }

@@ -26,7 +26,7 @@ import won.matcher.utils.tensor.TensorEntryTokenizer;
 import won.matcher.utils.tensor.TensorMatchingData;
 
 /**
- * Main actor that controls the rescal matching process. It loads the needs and
+ * Main actor that controls the rescal matching process. It loads the atoms and
  * connection data from the rdf store, preprocess the data and save it to file
  * system for the actual rescal processing in python. After the rescal algorithm
  * finished execution the generated hints are loaded and send back for saving
@@ -49,7 +49,7 @@ public class RescalMatcherActor extends UntypedActor {
 
     @Override
     public void preStart() throws IOException {
-        // subscribe to need events
+        // subscribe to atom events
         pubSubMediator = DistributedPubSub.get(getContext().system()).mediator();
         // Execute the rescal algorithm regularly
         getContext().system().scheduler().schedule(FiniteDuration.Zero(), config.getExecutionDuration(), getSelf(),
@@ -66,7 +66,7 @@ public class RescalMatcherActor extends UntypedActor {
     }
 
     /**
-     * Load the need and connection data from the sparql endpoint, preprocess the
+     * Load the atom and connection data from the sparql endpoint, preprocess the
      * data and write it to some directory to be processed by the rescal python
      * algorithm that produces hints. The hints are then loaded and send to the
      * event bus.
@@ -75,27 +75,27 @@ public class RescalMatcherActor extends UntypedActor {
      * @throws InterruptedException
      */
     private void executeRescalAlgorithm() throws IOException, InterruptedException {
-        // load the needs and connections from the rdf store
+        // load the atoms and connections from the rdf store
         log.info("start processing (every {} minutes) ...", config.getExecutionDuration());
         long queryDate = System.currentTimeMillis();
-        log.info("query needs and connections from rdf store '{}' from date '{}' to date '{}'",
+        log.info("query atoms and connections from rdf store '{}' from date '{}' to date '{}'",
                         config.getSparqlEndpoint(), lastQueryDate, queryDate);
-        // add the attributes of the needs to the rescal tensor
+        // add the attributes of the atoms to the rescal tensor
         TensorEntryAllGenerator tensorEntryAllGenerator = new TensorEntryAllGenerator("queries/attribute",
                         config.getSparqlEndpoint(), lastQueryDate, queryDate);
         TensorEntryTokenizer tokenizer = new TensorEntryTokenizer(tensorEntryAllGenerator.generateTensorEntries());
         Collection<TensorEntry> tensorEntries = tokenizer.generateTensorEntries();
         for (TensorEntry entry : tensorEntries) {
-            rescalInputData.addNeedAttribute(entry);
+            rescalInputData.addAtomAttribute(entry);
         }
-        // add the connections between the needs to the rescal tensor
+        // add the connections between the atoms to the rescal tensor
         tensorEntryAllGenerator = new TensorEntryAllGenerator("queries/connection", config.getSparqlEndpoint(),
                         lastQueryDate, queryDate);
         tensorEntries = tensorEntryAllGenerator.generateTensorEntries();
         for (TensorEntry entry : tensorEntries) {
-            rescalInputData.addNeedConnection(entry.getNeedUri(), entry.getValue(), true);
+            rescalInputData.addAtomConnection(entry.getAtomUri(), entry.getValue(), true);
         }
-        log.info("number of needs in tensor: {}", rescalInputData.getNeeds().size());
+        log.info("number of atoms in tensor: {}", rescalInputData.getAtoms().size());
         log.info("number of attributes in tensor: {}", rescalInputData.getAttributes().size());
         log.info("number of connections in tensor: {}", rescalInputData.getNumberOfConnections());
         log.info("number of slices in tensor: {}", rescalInputData.getSlices().size());
@@ -107,8 +107,8 @@ public class RescalMatcherActor extends UntypedActor {
         log.info("write rescal input data to folder: {}", config.getExecutionDirectory());
         TensorMatchingData cleanedTensorData = rescalInputData.writeCleanedOutputFiles(config.getExecutionDirectory());
         int tensorSize = cleanedTensorData.getTensorDimensions()[0];
-        if (rescalInputData.getNeeds().size() + rescalInputData.getAttributes().size() < config.getRescalRank()) {
-            log.info("Do not start rescal algorithm since tensor size (number of needs + number of attributes) = {} is "
+        if (rescalInputData.getAtoms().size() + rescalInputData.getAttributes().size() < config.getRescalRank()) {
+            log.info("Do not start rescal algorithm since tensor size (number of atoms + number of attributes) = {} is "
                             + "smaller than rank parameter {}.", tensorSize, config.getRescalRank());
             return;
         }

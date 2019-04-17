@@ -59,7 +59,7 @@ export const rideShareOffer = {
           xsd: "http://www.w3.org/2001/XMLSchema#",
         },
         operations: [
-          `${resultName} a won:Need.`,
+          `${resultName} a won:Atom.`,
           `${resultName} won:seeks ?seeks.`,
           isValidDate(fromTime) && `?seeks s:validFrom ?starttime.`,
           `?seeks won:travelAction/s:fromLocation ?fromLocation.`,
@@ -106,7 +106,7 @@ export const rideShareOffer = {
           xsd: "http://www.w3.org/2001/XMLSchema#",
         },
         operations: [
-          `${resultName} a won:Need.`,
+          `${resultName} a won:Atom.`,
           `${resultName} won:seeks ?seeks.`,
           isValidDate(fromTime) && `?seeks s:validFrom ?starttime.`,
           `?seeks won:travelAction/s:fromLocation ?fromLocation.`,
@@ -141,7 +141,7 @@ export const rideShareOffer = {
           xsd: "http://www.w3.org/2001/XMLSchema#",
         },
         operations: [
-          `${resultName} a won:Need.`,
+          `${resultName} a won:Atom.`,
           `${resultName} won:seeks ?seeks.`,
           isValidDate(fromTime) && `?seeks s:validFrom ?starttime.`,
           `?seeks won:travelAction/s:toLocation ?toLocation.`,
@@ -174,7 +174,7 @@ export const rideShareOffer = {
           s: won.defaultContext["s"],
         },
         operations: [
-          `${resultName} a won:Need.`,
+          `${resultName} a won:Atom.`,
           `${resultName} won:seeks ?seeks.`,
           isValidDate(fromTime) && `?seeks s:validFrom ?starttime.`,
         ],

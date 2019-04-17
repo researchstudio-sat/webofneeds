@@ -27,14 +27,14 @@ public class CloseCommandSuccessEvent extends AbstractMessageCommandResultEvent
         super(originalCommandEvent, con);
     }
 
-    public CloseCommandSuccessEvent(MessageCommandEvent originalCommandEvent, URI needURI, URI remoteNeedURI,
+    public CloseCommandSuccessEvent(MessageCommandEvent originalCommandEvent, URI atomURI, URI targetAtomURI,
                     URI connectionURI) {
-        super(originalCommandEvent, needURI, remoteNeedURI, connectionURI);
+        super(originalCommandEvent, atomURI, targetAtomURI, connectionURI);
     }
 
-    public CloseCommandSuccessEvent(MessageCommandEvent originalCommandEvent, URI needURI, URI remoteNeedURI,
+    public CloseCommandSuccessEvent(MessageCommandEvent originalCommandEvent, URI atomURI, URI targetAtomURI,
                     URI connectionURI, String message) {
-        super(originalCommandEvent, needURI, remoteNeedURI, connectionURI, message);
+        super(originalCommandEvent, atomURI, targetAtomURI, connectionURI, message);
     }
 
     public CloseCommandSuccessEvent(MessageCommandEvent originalCommandEvent, Connection con, String message) {

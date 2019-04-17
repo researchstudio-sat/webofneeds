@@ -1,0 +1,98 @@
+@prefix msg:   <https://w3id.org/won/message#> .
+@prefix conn:  <https://satvm05.researchstudio.at/won/resource/connection/> .
+@prefix atom:  <https://satvm05.researchstudio.at/won/resource/atom/> .
+@prefix woncrypt: <https://w3id.org/won/core#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix cert:  <http://www.w3.org/ns/auth/cert#> .
+@prefix local: <https://satvm05.researchstudio.at/won/resource/> .
+@prefix geo:   <http://www.w3.org/2003/01/geo/wgs84_pos#> .
+@prefix sig:   <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#> .
+@prefix s:     <http://schema.org/> .
+@prefix sh:    <http://www.w3.org/ns/shacl#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix won:   <https://w3id.org/won/core#> .
+@prefix ldp:   <http://www.w3.org/ns/ldp#> .
+@prefix event: <https://satvm05.researchstudio.at/won/resource/event/> .
+@prefix dc:    <http://purl.org/dc/elements/1.1/> .
+@prefix sioc:  <http://rdfs.org/sioc/ns#> .
+
+<https://satvm05.researchstudio.at/won/resource/event/uz35pxareinysmin8p1c#content-j7h4> {
+    <http://example.org/2/TaxiRideShape>
+            a                     sh:NodeShape ;
+            sh:closed             true ;
+            sh:ignoredProperties  ( rdf:type ) ;
+            sh:property           [ sh:maxCount  1 ;
+                                    sh:minCount  1 ;
+                                    sh:nodeKind  sh:IRI ;
+                                    sh:path      <http://example.org/taxi/hasDriver>
+                                  ] ;
+            sh:property           [ sh:hasValue  <http://sat.researchstudio.at/oln/test/taxiService1> ;
+                                    sh:maxCount  1 ;
+                                    sh:minCount  1 ;
+                                    sh:path      <http://example.org/taxi/hasClient>
+                                  ] ;
+            sh:property           [ sh:class     s:GeoCoordinates ;
+                                    sh:maxCount  1 ;
+                                    sh:minCount  1 ;
+                                    sh:path      <http://example.org/taxi/hasPickupLocation>
+                                  ] ;
+            sh:property           [ sh:datatype  xsd:dateTime ;
+                                    sh:maxCount  1 ;
+                                    sh:minCount  1 ;
+                                    sh:path      <http://example.org/taxi/hasPickupTime>
+                                  ] ;
+            sh:targetClass        <http://example.org/taxi/Ride> .
+
+    <http://example.org/2/selfShape>
+            a              sh:NodeShape ;
+            sh:property    [ sh:class  <http://example.org/taxi/Ride> ;
+                             sh:path   [ sh:inversePath  <http://example.org/taxi/hasClient> ]
+                           ] ;
+            sh:targetNode  <http://sat.researchstudio.at/oln/test/taxiService1> .
+
+    atom:dy0ki3xnazndkx641lmr
+            cert:key  [ cert:PublicKey  [ a                       woncrypt:ECCPublicKey ;
+                                          woncrypt:ecc_algorithm  "EC" ;
+                                          woncrypt:ecc_curveId    "secp384r1" ;
+                                          woncrypt:ecc_qx         "714b151b554a519188bb879ba11b172936e1f32d2879a2264b99276a529fecfe7a7babd246a3242e29437a7763dc623c" ;
+                                          woncrypt:ecc_qy         "946f0deda18e99b68c62e5e8d83627001f2eccc29a279f6e74d3ed162fa09b19c4de62e32aec7db872230eaf64c94b4c"
+                                        ] ] .
+}
+
+<https://satvm05.researchstudio.at/won/resource/atom/dy0ki3xnazndkx641lmr#sysinfo> {
+    <https://satvm05.researchstudio.at/won/resource/atom/dy0ki3xnazndkx641lmr#events>
+            a            won:MessageContainer ;
+            rdfs:member  event:x1h1a4a0tqzd9nq3pr1e .
+
+    atom:dy0ki3xnazndkx641lmr
+            a                      won:Atom ;
+            <http://purl.org/dc/terms/created>
+                    "2018-01-18T09:42:07.026Z"^^xsd:dateTime ;
+            <http://purl.org/dc/terms/modified>
+                    "2018-01-18T09:42:07.029Z"^^xsd:dateTime ;
+            won:connections     <https://satvm05.researchstudio.at/won/resource/atom/dy0ki3xnazndkx641lmr/connections> ;
+            won:messageContainer  <https://satvm05.researchstudio.at/won/resource/atom/dy0ki3xnazndkx641lmr#events> ;
+            won:wonNode         <https://satvm05.researchstudio.at/won/resource> ;
+            won:atomState          won:Active .
+}
+
+<https://satvm05.researchstudio.at/won/resource/event/uz35pxareinysmin8p1c#content-6el2> {
+    atom:dy0ki3xnazndkx641lmr
+            a             won:Atom ;
+            won:goal      [ won:shapesGraph  <https://satvm05.researchstudio.at/won/resource/event/uz35pxareinysmin8p1c#content-j7h4> ] ;
+            won:socket  won:ChatSocket ;
+            won:flag   won:NoHintForCounterpart , won:NoHintForMe ;
+            dc:description  "This is a automatically created atom by the TaxiBot" ;
+            dc:title        "Taxi in Wien<->Taxi Wien" .
+}
+
+<https://satvm05.researchstudio.at/won/resource/event/uz35pxareinysmin8p1c#envelope-phwh-sig> {
+    <https://satvm05.researchstudio.at/won/resource/event/uz35pxareinysmin8p1c#envelope-phwh-sig>
+            a                               sig:Signature ;
+            sig:signatureValue           "MGUCMQCqYxAxS2ZG+P9hVl4KuX2kZQGZ44zkcTaifguB1R2jGyYsyrkc4XfKCec0ypuC/cgCMA15MAqkPv8dOQ+mxBaY+b025foZD+Z5vsIzUGTH8SgQvMDCHL55EJgjcfiFETl01w==" ;
+            sig:hasVerificationCertificate  atom:dy0ki3xnazndkx641lmr ;
+            msg:hash                     "Z/W7kzU+D0mkaV62I0o6idNkKpuOCRToAs0kyxQZv4WI6g0SwGRu58mGLgExLbvB8Jk2MD95aIgAgx5STultkXqaBlZnM4aQycRuDY4YnUtB3I6KOzS9HH+gy6RXvZlQTVFkn5bLgYwEgsOe7tsk2xqJ2ww6D8C3904sieaHiw4=" ;
+            msg:publicKeyFingerprint     "NiW0szkU7kAEw/EPSGk3hdZCjNGoSd9h6FUYGMyDq9Y=" ;
+            msg:signedGraph              <https://satvm05.researchstudio.at/won/resource/event/uz35pxareinysmin8p1c#envelope-phwh> .
+}

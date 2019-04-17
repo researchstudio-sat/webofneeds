@@ -9,11 +9,11 @@ import {
   isMessageUnread,
   isMessageAgreement,
 } from "../message-utils.js";
-import { getOwnedNeedByConnectionUri } from "./general-selectors.js";
+import { getOwnedAtomByConnectionUri } from "./general-selectors.js";
 
 export function getMessagesByConnectionUri(state, connectionUri) {
-  const need = getOwnedNeedByConnectionUri(state, connectionUri);
-  return need && need.getIn(["connections", connectionUri, "messages"]);
+  const atom = getOwnedAtomByConnectionUri(state, connectionUri);
+  return atom && atom.getIn(["connections", connectionUri, "messages"]);
 }
 
 export function getAgreementMessagesByConnectionUri(state, connectionUri) {

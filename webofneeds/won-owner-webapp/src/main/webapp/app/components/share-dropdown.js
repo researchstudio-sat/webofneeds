@@ -32,7 +32,7 @@ function genComponentConf() {
                             <use xlink:href="#ico16_share" href="#ico16_share"></use>
                         </svg>
                     </div>
-                    <won-post-share-link post-uri="self.needUri"></won-post-share-link>
+                    <won-post-share-link post-uri="self.atomUri"></won-post-share-link>
                 </div>
             </div>
         `;
@@ -68,7 +68,7 @@ function genComponentConf() {
     controllerAs: "self",
     bindToController: true, //scope-bindings -> ctrl
     scope: {
-      needUri: "=",
+      atomUri: "=",
     },
     template: template,
   };

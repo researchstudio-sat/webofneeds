@@ -14,14 +14,14 @@ import trigModule from "./trig.js";
 import { attach, getIn, get } from "../utils.js";
 import won from "../won-es6.js";
 import { connect2Redux } from "../won-utils.js";
-import * as needUtils from "../need-utils.js";
+import * as atomUtils from "../atom-utils.js";
 import * as viewUtils from "../view-utils.js";
 import * as processUtils from "../process-utils.js";
 import * as connectionSelectors from "../selectors/connection-selectors.js";
 import {
   getOwnedPersonas,
   getConnectionUriFromRoute,
-  isNeedOwned,
+  isAtomOwned,
 } from "../selectors/general-selectors.js";
 import { actionCreators } from "../actions/actions.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
@@ -56,7 +56,7 @@ function genComponentConf() {
               <use xlink:href="#ico16_indicator_error" href="#ico16_indicator_error"></use>
           </svg>
           <span class="post-failedtoload__label">
-              Failed To Load - Need might have been deleted
+              Failed To Load - Atom might have been deleted
           </span>
           <div class="post-failedtoload__actions">
             <button class="post-failedtoload__actions__button red won-button--outlined thin"
@@ -81,7 +81,7 @@ function genComponentConf() {
 
           <!-- PERSONA INFORMATION -->
           <won-post-content-persona ng-if="self.isSelectedTab('HELDBY') && self.post.get('heldBy')" holds-uri="self.postUri"></won-post-content-persona>
-          <won-elm module="self.addPersonaModule" ng-if="self.isSelectedTab('HELDBY') && self.isOwned && self.hasHoldableFacet && !self.post.get('heldBy')" props="{post: self.post.toJS(), personas: self.personas.toJS()}"></won-elm>
+          <won-elm module="self.addPersonaModule" ng-if="self.isSelectedTab('HELDBY') && self.isOwned && self.hasHoldableSocket && !self.post.get('heldBy')" props="{post: self.post.toJS(), personas: self.personas.toJS()}"></won-elm>
           
           <!-- PARTICIPANT INFORMATION -->
           <won-post-content-participants ng-if="self.isSelectedTab('PARTICIPANTS')" post-uri="self.postUri"></won-post-content-participants>
@@ -105,7 +105,7 @@ function genComponentConf() {
                 <won-post-header
                   class="clickable"
                   ng-click="self.viewSuggestion(conn)"
-                  need-uri="::conn.get('remoteNeedUri')">
+                  atom-uri="::conn.get('targetAtomUri')">
                 </won-post-header>
                 <div class="post-content__suggestions__suggestion__actions">
                     <div
@@ -122,11 +122,11 @@ function genComponentConf() {
             </div>
             <div class="post-content__suggestions__empty"
                 ng-if="!self.hasSuggestions">
-                No Suggestions for this Need.
+                No Suggestions for this Atom.
             </div>
           </div>
 
-          <!-- OTHER NEEDS -->
+          <!-- OTHER ATOMS -->
           <div class="post-content__members" ng-if="self.isSelectedTab('HOLDS')">
             <div
               class="post-content__members__member"
@@ -135,13 +135,13 @@ function genComponentConf() {
               <div class="post-content__members__member__indicator"></div>
               <won-post-header
                 class="clickable"
-                ng-click="self.router__stateGoCurrent({viewNeedUri: heldPostUri, viewConnUri: undefined})"
-                need-uri="::heldPostUri">
+                ng-click="self.router__stateGoCurrent({viewAtomUri: heldPostUri, viewConnUri: undefined})"
+                atom-uri="::heldPostUri">
               </won-post-header>
             </div>
             <div class="post-content__members__empty"
                 ng-if="!self.hasHeldPosts">
-                This Persona does not have any Needs.
+                This Persona does not have any Atoms.
             </div>
           </div>
           <!-- RDF REPRESENTATION -->
@@ -181,9 +181,9 @@ function genComponentConf() {
 
       const selectFromState = state => {
         const openConnectionUri = getConnectionUriFromRoute(state);
-        const post = getIn(state, ["needs", this.postUri]);
-        const isPersona = needUtils.isPersona(post);
-        const isOwned = isNeedOwned(state, this.postUri);
+        const post = getIn(state, ["atoms", this.postUri]);
+        const isPersona = atomUtils.isPersona(post);
+        const isOwned = isAtomOwned(state, this.postUri);
         const content = get(post, "content");
 
         //TODO it will be possible to have more than one seeks
@@ -194,12 +194,12 @@ function genComponentConf() {
 
         const heldPosts = isPersona && get(post, "holds");
 
-        const suggestions = connectionSelectors.getSuggestedConnectionsByNeedUri(
+        const suggestions = connectionSelectors.getSuggestedConnectionsByAtomUri(
           state,
           this.postUri
         );
 
-        const isOwnedNeedWhatsX = isOwned && needUtils.isWhatsAroundNeed(post);
+        const isOwnedAtomWhatsX = isOwned && atomUtils.isWhatsAroundAtom(post);
 
         const viewState = get(state, "view");
         const process = get(state, "process");
@@ -208,26 +208,26 @@ function genComponentConf() {
           hasContent,
           hasSeeksBranch,
           post,
-          isOwnedNeedWhatsX,
+          isOwnedAtomWhatsX,
           isPersona,
           isOwned,
           hasHeldPosts: isPersona && heldPosts && heldPosts.size > 0,
           heldPostsArray: isPersona && heldPosts && heldPosts.toArray(),
-          hasChatFacet: needUtils.hasChatFacet(post),
-          hasHoldableFacet: needUtils.hasHoldableFacet(post),
+          hasChatSocket: atomUtils.hasChatSocket(post),
+          hasHoldableSocket: atomUtils.hasHoldableSocket(post),
           hasSuggestions: isOwned && suggestions && suggestions.size > 0,
           suggestionsArray: isOwned && suggestions && suggestions.toArray(),
           postLoading:
-            !post || processUtils.isNeedLoading(process, this.postUri),
+            !post || processUtils.isAtomLoading(process, this.postUri),
           postFailedToLoad:
-            post && processUtils.hasNeedFailedToLoad(process, this.postUri),
+            post && processUtils.hasAtomFailedToLoad(process, this.postUri),
           postProcessingUpdate:
-            post && processUtils.isNeedProcessingUpdate(process, this.postUri),
+            post && processUtils.isAtomProcessingUpdate(process, this.postUri),
           createdTimestamp: post && post.get("creationDate"),
           shouldShowRdf: viewUtils.showRdf(viewState),
           fromConnection: !!openConnectionUri,
           openConnectionUri,
-          visibleTab: viewUtils.getVisibleTabByNeedUri(viewState, this.postUri),
+          visibleTab: viewUtils.getVisibleTabByAtomUri(viewState, this.postUri),
           personas: getOwnedPersonas(state),
         };
       };
@@ -238,7 +238,7 @@ function genComponentConf() {
 
     tryReload() {
       if (this.postUri && this.postFailedToLoad) {
-        this.needs__fetchUnloadedNeed(this.postUri);
+        this.atoms__fetchUnloadedAtom(this.postUri);
       }
     }
 
@@ -256,7 +256,7 @@ function genComponentConf() {
       if (conn.get("unread")) {
         this.connections__markAsRead({
           connectionUri: connUri,
-          needUri: this.postUri,
+          atomUri: this.postUri,
         });
       }
 
@@ -269,25 +269,25 @@ function genComponentConf() {
       }
 
       const connUri = get(conn, "uri");
-      const remoteNeedUri = get(conn, "remoteNeedUri");
+      const targetAtomUri = get(conn, "targetAtomUri");
 
       if (conn.get("unread")) {
         this.connections__markAsRead({
           connectionUri: connUri,
-          needUri: this.postUri,
+          atomUri: this.postUri,
         });
       }
 
-      if (this.isOwnedNeedWhatsX) {
+      if (this.isOwnedAtomWhatsX) {
         this.connections__close(connUri);
 
-        if (remoteNeedUri) {
-          this.connections__connectAdHoc(remoteNeedUri, message);
+        if (targetAtomUri) {
+          this.connections__connectAdHoc(targetAtomUri, message);
         }
         //this.router__back();
       } else {
         this.connections__rate(connUri, won.WON.binaryRatingGood);
-        this.needs__connect(this.postUri, connUri, remoteNeedUri, message);
+        this.atoms__connect(this.postUri, connUri, targetAtomUri, message);
       }
     }
 
@@ -303,7 +303,7 @@ function genComponentConf() {
       if (conn && conn.get("unread")) {
         const payload = {
           connectionUri: conn.get("uri"),
-          needUri: this.postUri,
+          atomUri: this.postUri,
         };
 
         const tmp_connections__markAsRead = this.connections__markAsRead;
@@ -324,13 +324,13 @@ function genComponentConf() {
       if (conn.get("unread")) {
         this.connections__markAsRead({
           connectionUri: connUri,
-          needUri: this.postUri,
+          atomUri: this.postUri,
         });
       }
 
       this.router__stateGoCurrent({
         viewConnUri: connUri,
-        viewNeedUri: undefined,
+        viewAtomUri: undefined,
       });
     }
 
@@ -343,8 +343,8 @@ function genComponentConf() {
         contentBranchImm.find(
           (detailValue, detailKey) =>
             detailKey != "type" &&
-            detailKey != "facets" &&
-            detailKey != "defaultFacet"
+            detailKey != "sockets" &&
+            detailKey != "defaultSocket"
         )
       );
     }

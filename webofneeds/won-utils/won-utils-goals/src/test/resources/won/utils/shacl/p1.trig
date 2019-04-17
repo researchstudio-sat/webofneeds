@@ -13,8 +13,8 @@
 
 ex1:p1-data {
 ex1:p1 voc:hasGoal ex1:p1g.
-ex1:p1g voc:hasDataGraph ex1:p1g-data;
-     voc:hasShapesGraph ex1:p1g-shapes.
+ex1:p1g voc:dataGraph ex1:p1g-data;
+     voc:shapesGraph ex1:p1g-shapes.
 }
 
 ex1:p1g-data {

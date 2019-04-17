@@ -10,7 +10,7 @@
  */
 package won.bot.framework.eventbot.event.impl.wonmessage;
 
-import won.bot.framework.eventbot.event.BaseNeedAndConnectionSpecificEvent;
+import won.bot.framework.eventbot.event.BaseAtomAndConnectionSpecificEvent;
 import won.bot.framework.eventbot.event.MessageEvent;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageType;
@@ -20,7 +20,7 @@ import won.protocol.model.Connection;
  * Base class for all events that signal an incoming WonMessage (but not a
  * Success/FailureResponse).
  */
-public class WonMessageReceivedOnConnectionEvent extends BaseNeedAndConnectionSpecificEvent implements MessageEvent {
+public class WonMessageReceivedOnConnectionEvent extends BaseAtomAndConnectionSpecificEvent implements MessageEvent {
     private final WonMessage wonMessage;
 
     public WonMessageReceivedOnConnectionEvent(final Connection con, final WonMessage wonMessage) {

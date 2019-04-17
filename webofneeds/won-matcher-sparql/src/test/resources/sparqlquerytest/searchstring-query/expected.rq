@@ -1,6 +1,6 @@
 SELECT  *
 WHERE
-  { ?result  a                     <http://purl.org/webofneeds/model#Need>
+  { ?result  a                     <https://w3id.org/won/core#Atom>
       {   { ?result  ?tmpProp_0  ?textSearchTarget
             FILTER contains(lcase(?textSearchTarget), "the query string")
           }

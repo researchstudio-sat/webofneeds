@@ -4,7 +4,7 @@
 @prefix geo:     <http://www.w3.org/2003/01/geo/wgs84_pos#> .
 @prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
 @prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-@prefix won:     <http://purl.org/webofneeds/model#> .
+@prefix won:     <https://w3id.org/won/core#> .
 @prefix gr:      <http://purl.org/goodrelations/v1#> .
 @prefix ldp:     <http://www.w3.org/ns/ldp#> .
 @prefix sp:      <http://spinrdf.org/sp#>.
@@ -14,12 +14,12 @@
 # owner-specified content (permanent):
 :OWN1
 {
-  _:wonneed a won:Need ;
-              won:hasBasicNeedType
+  _:wonatom a won:Atom ;
+              won:hasBasicAtomType
                   won:Supply ;
-              won:hasContent
-                  [ a   won:NeedContent ;
-                    won:hasContentDescription
+              won:content
+                  [ a   won:AtomContent ;
+                    won:contentDescription
                     [ a tio:Taxi, gr:SomeItems ;
                           gr:name "Fastest taxi in town"@en ;
                           gr:description "Wherever you want to go, we'll take you there"@en

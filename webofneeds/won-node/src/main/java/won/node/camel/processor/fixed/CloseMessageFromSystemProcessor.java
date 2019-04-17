@@ -39,7 +39,7 @@ import won.protocol.vocabulary.WONMSG;
  * </ul>
  */
 @Component
-@FixedMessageProcessor(direction = WONMSG.TYPE_FROM_SYSTEM_STRING, messageType = WONMSG.TYPE_CLOSE_STRING)
+@FixedMessageProcessor(direction = WONMSG.FromSystemString, messageType = WONMSG.CloseMessageString)
 public class CloseMessageFromSystemProcessor extends AbstractCamelProcessor {
     public void process(final Exchange exchange) throws Exception {
         Message message = exchange.getIn();
@@ -51,8 +51,8 @@ public class CloseMessageFromSystemProcessor extends AbstractCamelProcessor {
         con = dataService.nextConnectionState(con, ConnectionEventType.OWNER_CLOSE);
         // if we know the remote connection, send a close message to the remote
         // connection
-        if (con.getRemoteConnectionURI() != null) {
-            URI remoteNodeURI = wonNodeInformationService.getWonNodeUri(con.getRemoteConnectionURI());
+        if (con.getTargetConnectionURI() != null) {
+            URI remoteNodeURI = wonNodeInformationService.getWonNodeUri(con.getTargetConnectionURI());
             URI remoteMessageUri = wonNodeInformationService.generateEventURI(remoteNodeURI);
             // put the factory into the outbound message factory header. It will be used to
             // generate the outbound message
@@ -62,9 +62,9 @@ public class CloseMessageFromSystemProcessor extends AbstractCamelProcessor {
             OutboundMessageFactory outboundMessageFactory = new OutboundMessageFactory(remoteMessageUri, con);
             message.setHeader(WonCamelConstants.OUTBOUND_MESSAGE_FACTORY_HEADER, outboundMessageFactory);
             // set the sender uri in the envelope TODO: TwoMsgs: do not set sender here
-            wonMessage.addMessageProperty(WONMSG.SENDER_PROPERTY, con.getConnectionURI());
+            wonMessage.addMessageProperty(WONMSG.sender, con.getConnectionURI());
             // add the information about the corresponding message to the local one
-            wonMessage.addMessageProperty(WONMSG.HAS_CORRESPONDING_REMOTE_MESSAGE, remoteMessageUri);
+            wonMessage.addMessageProperty(WONMSG.correspondingRemoteMessage, remoteMessageUri);
             // the persister will pick it up later
         }
         // because the FromSystem message is now in the message header, it will be
@@ -84,18 +84,18 @@ public class CloseMessageFromSystemProcessor extends AbstractCamelProcessor {
 
         @Override
         public WonMessage process(WonMessage message) throws WonMessageProcessingException {
-            // there need not be a remote connection. Don't create a message if this is the
+            // there atom not be a remote connection. Don't create a message if this is the
             // case.
-            if (connection.getRemoteConnectionURI() == null)
+            if (connection.getTargetConnectionURI() == null)
                 return null;
-            URI remoteNodeURI = wonNodeInformationService.getWonNodeUri(connection.getRemoteConnectionURI());
+            URI remoteNodeURI = wonNodeInformationService.getWonNodeUri(connection.getTargetConnectionURI());
             URI localNodeURI = wonNodeInformationService.getWonNodeUri(connection.getConnectionURI());
             // create the message to send to the remote node
             return WonMessageBuilder.setPropertiesForPassingMessageToRemoteNode(message, getMessageURI())
                             .setSenderNodeURI(localNodeURI).setSenderURI(connection.getConnectionURI())
-                            .setSenderNeedURI(connection.getNeedURI()).setReceiverNodeURI(remoteNodeURI)
-                            .setReceiverURI(connection.getRemoteConnectionURI())
-                            .setReceiverNeedURI(connection.getRemoteNeedURI()).build();
+                            .setSenderAtomURI(connection.getAtomURI()).setRecipientNodeURI(remoteNodeURI)
+                            .setRecipientURI(connection.getTargetConnectionURI())
+                            .setRecipientAtomURI(connection.getTargetAtomURI()).build();
         }
     }
 }

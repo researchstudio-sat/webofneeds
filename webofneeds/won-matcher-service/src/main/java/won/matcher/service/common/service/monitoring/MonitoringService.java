@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component;
 @Scope("singleton")
 public class MonitoringService {
     private final Logger log = LoggerFactory.getLogger(getClass());
-    public static final String NEED_HINT_STOPWATCH = "NeedReceivedUntilFirstHintSent";
+    public static final String ATOM_HINT_STOPWATCH = "AtomReceivedUntilFirstHintSent";
     private Map<String, Map<String, Split>> stopWatchSplits = new HashMap<>();
     @Value("${matcher.service.monitoring}")
     private boolean monitoringEnabled;

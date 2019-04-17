@@ -19,13 +19,13 @@ import won.protocol.exception.DataIntegrityException;
 /**
  * Executes a sparql query on a sparql endpoint and returns the data as
  * {@link TensorEntry} objects. Expects that the sparql query returns the
- * variables ?slice, ?need and ?value. Created by hfriedrich on 21.04.2017.
+ * variables ?slice, ?atom and ?value. Created by hfriedrich on 21.04.2017.
  */
 public class TensorEntrySparqlGenerator implements TensorEntryGenerator {
     private String sparqlEndpoint;
     private String query;
     private Map<String, Object> parameterBindings;
-    private static String[] variableNames = { "slice", "need", "value" };
+    private static String[] variableNames = { "slice", "atom", "value" };
 
     public TensorEntrySparqlGenerator(String sparqlEndpoint, String sparqlQuery) {
         this.sparqlEndpoint = sparqlEndpoint;
@@ -65,8 +65,8 @@ public class TensorEntrySparqlGenerator implements TensorEntryGenerator {
                 QuerySolution qs = results.next();
                 RDFNode node = qs.get("slice");
                 entry.setSliceName(node.isResource() ? node.asResource().getURI() : node.asLiteral().getString());
-                node = qs.get("need");
-                entry.setNeedUri(node.isResource() ? node.asResource().getURI() : node.asLiteral().getString());
+                node = qs.get("atom");
+                entry.setAtomUri(node.isResource() ? node.asResource().getURI() : node.asLiteral().getString());
                 node = qs.get("value");
                 entry.setValue(node.isResource() ? node.asResource().getURI() : node.asLiteral().getString());
                 tensorEntries.add(entry);

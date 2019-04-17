@@ -34,11 +34,11 @@ function loadingWhileSignedIn(dispatch) {
   return wonMessageUtils.fetchOwnedData(dispatch);
 }
 
-export const loadAllActiveNeedUrisFromOwner = () => (dispatch, getState) => {
+export const loadAllActiveAtomUrisFromOwner = () => (dispatch, getState) => {
   dispatch({
-    type: actionTypes.needs.loadAllActiveNeedUrisFromOwner,
+    type: actionTypes.atoms.loadAllActiveAtomUrisFromOwner,
   });
-  return wonMessageUtils.fetchAllActiveNeedUrisFromOwner(dispatch, getState);
+  return wonMessageUtils.fetchAllActiveAtomUrisFromOwner(dispatch, getState);
 };
 /*
  Simply prints a logline and resolves the promise so we can go on in the chain

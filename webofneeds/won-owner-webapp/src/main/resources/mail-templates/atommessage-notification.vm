@@ -1,0 +1,13 @@
+Hi there,
+
+We have news regarding your post '$localAtomTitle' on $serviceName:
+
+The server hosting your post '$localAtomTitle' says:
+
+    $textMsg
+
+View your post: $linkLocalAtom
+
+Best wishes, 
+
+The team at $serviceName

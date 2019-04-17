@@ -25,22 +25,22 @@ public class NopMatcherProtocolMatcherServiceCallback implements MatcherProtocol
     }
 
     @Override
-    public void onNewNeed(final URI wonNodeURI, URI needURI, Dataset content) {
+    public void onNewAtom(final URI wonNodeURI, URI atomURI, Dataset content) {
         // empty implementation
     }
 
     @Override
-    public void onNeedActivated(final URI wonNodeURI, final URI needURI) {
+    public void onAtomActivated(final URI wonNodeURI, final URI atomURI) {
         // empty implementation
     }
 
     @Override
-    public void onNeedDeactivated(final URI wonNodeURI, final URI needURI) {
+    public void onAtomDeactivated(final URI wonNodeURI, final URI atomURI) {
         // empty implementation
     }
 
     @Override
-    public void onNeedModified(URI wonNodeURI, URI needURI) {
+    public void onAtomModified(URI wonNodeURI, URI atomURI) {
         // empty implementation
     }
 }

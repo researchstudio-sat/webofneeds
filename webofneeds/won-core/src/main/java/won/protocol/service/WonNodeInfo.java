@@ -21,17 +21,17 @@ public class WonNodeInfo {
     private String wonNodeURI;
     private String eventURIPrefix;
     private String connectionURIPrefix;
-    private String needURIPrefix;
-    private String needListURI;
+    private String atomURIPrefix;
+    private String atomListURI;
     private Map<String, Map<String, String>> supportedProtocolImpl;
 
-    protected WonNodeInfo(String wonNodeURI, String eventURIPrefix, String connectionURIPattern, String needURIPattern,
-                    String needListURI, Map<String, Map<String, String>> supportedProtocolImpl) {
+    protected WonNodeInfo(String wonNodeURI, String eventURIPrefix, String connectionURIPattern, String atomURIPattern,
+                    String atomListURI, Map<String, Map<String, String>> supportedProtocolImpl) {
         this.wonNodeURI = wonNodeURI;
         this.eventURIPrefix = eventURIPrefix;
         this.connectionURIPrefix = connectionURIPattern;
-        this.needURIPrefix = needURIPattern;
-        this.needListURI = needListURI;
+        this.atomURIPrefix = atomURIPattern;
+        this.atomListURI = atomListURI;
         this.supportedProtocolImpl = supportedProtocolImpl;
     }
 
@@ -39,8 +39,8 @@ public class WonNodeInfo {
         return wonNodeURI;
     }
 
-    public String getNeedListURI() {
-        return needListURI;
+    public String getAtomListURI() {
+        return atomListURI;
     }
 
     public String getSupportedProtocolImplParamValue(String protocol, String paramName) {
@@ -74,7 +74,7 @@ public class WonNodeInfo {
         return connectionURIPrefix;
     }
 
-    public String getNeedURIPrefix() {
-        return needURIPrefix;
+    public String getAtomURIPrefix() {
+        return atomURIPrefix;
     }
 }

@@ -1,21 +1,21 @@
-<http://www.example.com/resource/need/12#ALL> {
-	<http://www.example.com/resource/need/12> <http://purl.org/webofneeds/model#isInState> <http://purl.org/webofneeds/model#Active> .
-	<http://www.example.com/resource/need/12> <http://purl.org/webofneeds/model#needCreationDate> "2013-09-252T10:49:54.054+0000" .
-	<http://www.example.com/resource/need/12> <http://purl.org/webofneeds/model#hasContent> _:200cc5ec025be735cd4c3017267d4b4f .
-	<http://www.example.com/resource/need/12> <http://purl.org/webofneeds/model#ownerProtocolEndpoint> <http://www.example.com/won/protocol/owner> .
-	<http://www.example.com/resource/need/12> <http://purl.org/webofneeds/model#needProtocolEndpoint> <http://www.example.com/won/protocol/need> .
-	<http://www.example.com/resource/need/12> <http://purl.org/webofneeds/model#matcherProtocolEndpoint> <http://www.example.com/won/protocol/matcher> .
-	<http://www.example.com/resource/need/12> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://purl.org/webofneeds/model#Need> .
-	<http://www.example.com/resource/need/12> <http://purl.org/webofneeds/model#hasBasicNeedType> <http://purl.org/webofneeds/model#Supply> .
-	<http://www.example.com/resource/need/12> <http://purl.org/webofneeds/model#hasNeedModality> _:1aceff4429f4f73225eb70eca50ce2c8 .
-	<http://www.example.com/resource/need/12> <http://purl.org/webofneeds/model#hasConnections> <http://www.example.com/resource/need/12/connections/> .
+<http://www.example.com/resource/atom/12#ALL> {
+	<http://www.example.com/resource/atom/12> <https://w3id.org/won/core#atomState> <https://w3id.org/won/core#Active> .
+	<http://www.example.com/resource/atom/12> <https://w3id.org/won/core#atomCreationDate> "2013-09-252T10:49:54.054+0000" .
+	<http://www.example.com/resource/atom/12> <https://w3id.org/won/core#content> _:200cc5ec025be735cd4c3017267d4b4f .
+	<http://www.example.com/resource/atom/12> <https://w3id.org/won/core#ownerProtocolEndpoint> <http://www.example.com/won/protocol/owner> .
+	<http://www.example.com/resource/atom/12> <https://w3id.org/won/core#atomProtocolEndpoint> <http://www.example.com/won/protocol/atom> .
+	<http://www.example.com/resource/atom/12> <https://w3id.org/won/core#matcherProtocolEndpoint> <http://www.example.com/won/protocol/matcher> .
+	<http://www.example.com/resource/atom/12> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/core#Atom> .
+	<http://www.example.com/resource/atom/12> <https://w3id.org/won/core#hasBasicAtomType> <https://w3id.org/won/core#Supply> .
+	<http://www.example.com/resource/atom/12> <https://w3id.org/won/core#atomModality> _:1aceff4429f4f73225eb70eca50ce2c8 .
+	<http://www.example.com/resource/atom/12> <https://w3id.org/won/core#connections> <http://www.example.com/resource/atom/12/connections/> .
 	_:88df9b2e2eed547e81e80d935d42fa61 <http://purl.org/goodrelations/v1#hasValue> "45"^^<http://www.w3.org/2001/XMLSchema#float> .
 	_:88df9b2e2eed547e81e80d935d42fa61 <http://purl.org/goodrelations/v1#hasUnitOfMeasurement> "CMT"^^<http://www.w3.org/2001/XMLSchema#string> .
 	_:88df9b2e2eed547e81e80d935d42fa61 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://purl.org/goodrelations/v1#QuantitativeValueFloat> .
 	_:4cec74d8b390bf1493e304551c2eedaa <http://purl.org/goodrelations/v1#hasValue> "15"^^<http://www.w3.org/2001/XMLSchema#float> .
 	_:4cec74d8b390bf1493e304551c2eedaa <http://purl.org/goodrelations/v1#hasUnitOfMeasurement> "CMT"^^<http://www.w3.org/2001/XMLSchema#string> .
 	_:4cec74d8b390bf1493e304551c2eedaa <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://purl.org/goodrelations/v1#QuantitativeValueFloat> .
-	_:1aceff4429f4f73225eb70eca50ce2c8 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://purl.org/webofneeds/model#NeedModality> .
+	_:1aceff4429f4f73225eb70eca50ce2c8 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/core#AtomModality> .
 	_:fa15bb871ebf6a60297b48492b86a5d7 <http://purl.org/goodrelations/v1#hasValue> "45"^^<http://www.w3.org/2001/XMLSchema#float> .
 	_:fa15bb871ebf6a60297b48492b86a5d7 <http://purl.org/goodrelations/v1#hasUnitOfMeasurement> "CMT"^^<http://www.w3.org/2001/XMLSchema#string> .
 	_:fa15bb871ebf6a60297b48492b86a5d7 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://purl.org/goodrelations/v1#QuantitativeValueFloat> .
@@ -25,8 +25,8 @@
 	_:24d9caefb08856690da16884f2b19bec <http://purl.org/goodrelations/v1#color> "natural birch" .
 	_:24d9caefb08856690da16884f2b19bec <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://purl.org/goodrelations/v1#Individual> .
 	_:24d9caefb08856690da16884f2b19bec <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://dbpedia.org/resource/Cupboard> .
-	_:200cc5ec025be735cd4c3017267d4b4f <http://purl.org/webofneeds/model#hasContentDescription> _:24d9caefb08856690da16884f2b19bec .
+	_:200cc5ec025be735cd4c3017267d4b4f <https://w3id.org/won/core#contentDescription> _:24d9caefb08856690da16884f2b19bec .
 	_:200cc5ec025be735cd4c3017267d4b4f <http://purl.org/dc/elements/1.1/title> "small cupboard"^^<http://www.w3.org/2001/XMLSchema#string> .
-	_:200cc5ec025be735cd4c3017267d4b4f <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://purl.org/webofneeds/model#NeedContent> .
-	<http://www.example.com/resource/need/12/connections/> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/ldp#Container> .
+	_:200cc5ec025be735cd4c3017267d4b4f <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/core#AtomContent> .
+	<http://www.example.com/resource/atom/12/connections/> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/ldp#Container> .
 }

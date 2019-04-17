@@ -82,7 +82,7 @@ public class MessageTimingManager {
         Date lastSent = (Date) context.getBotContext().loadFromObjectMap(KEY_LAST_MESSAGE_OUT_TIMESTAMPS,
                         connectionUri.toString());
         if (lastSent == null)
-            return false; // avoid sending messages on every actEvent if too many needs are connected
+            return false; // avoid sending messages on every actEvent if too many atoms are connected
         return getInactivityPeriodOfPartner(connectionUri)
                         .isPauseLongEnough(System.currentTimeMillis() - lastSent.getTime());
     }

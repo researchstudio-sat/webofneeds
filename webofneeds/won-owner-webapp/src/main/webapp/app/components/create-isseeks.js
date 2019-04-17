@@ -155,7 +155,7 @@ function genComponentConf() {
   };
 }
 
-export default //.controller('CreateNeedController', [...serviceDependencies, CreateNeedController])
+export default //.controller('CreateAtomController', [...serviceDependencies, CreateAtomController])
 angular
   .module("won.owner.components.createIsseek", [])
   // this directive creates detail picker components with callbacks

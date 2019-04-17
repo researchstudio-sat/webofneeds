@@ -43,7 +43,7 @@ function genComponentConf() {
           </div>
           <div class="paypalpaymentv__content__customer" ng-if="self.customerPost">
             <won-post-header
-                need-uri="self.customerPost.get('uri')"
+                atom-uri="self.customerPost.get('uri')"
                 timestamp="self.customerPost.get('creationDate')"
                 hide-image="::false">
             </won-post-header>
@@ -65,7 +65,7 @@ function genComponentConf() {
       const selectFromState = state => {
         const customerUri = this.content && this.content.get("customerUri");
 
-        const customerPost = customerUri && state.getIn(["needs", customerUri]);
+        const customerPost = customerUri && state.getIn(["atoms", customerUri]);
 
         return {
           customerUri,
@@ -100,7 +100,7 @@ function genComponentConf() {
 
     // loadPost() {
     //   if (this.customerUri) {
-    //     this.needs__fetchSuggested(this.customerUri);
+    //     this.atoms__fetchSuggested(this.customerUri);
     //   }
     // }
   }

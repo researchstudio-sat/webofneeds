@@ -18,12 +18,12 @@ export function isProcessingInitialLoad(process) {
 }
 
 /**
- * Return true if processingNeedUrisFromOwnerLoad is currently active
+ * Return true if processingAtomUrisFromOwnerLoad is currently active
  * @param process (full process from state)
  * @returns {*}
  */
-export function isProcessingNeedUrisFromOwnerLoad(process) {
-  return get(process, "processingNeedUrisFromOwnerLoad");
+export function isProcessingAtomUrisFromOwnerLoad(process) {
+  return get(process, "processingAtomUrisFromOwnerLoad");
 }
 
 /**
@@ -99,60 +99,60 @@ export function isProcessingSendAnonymousLinkEmail(process) {
 }
 
 /**
- * Return true if given needUri is currently processing an update
+ * Return true if given atomUri is currently processing an update
  * @param process (full process from state)
- * @param needUri
+ * @param atomUri
  * @returns {*}
  */
 
-export function isNeedProcessingUpdate(process, needUri) {
-  return needUri && getIn(process, ["needs", needUri, "processUpdate"]);
+export function isAtomProcessingUpdate(process, atomUri) {
+  return atomUri && getIn(process, ["atoms", atomUri, "processUpdate"]);
 }
 
 /**
- * Return true if given needUri is currently loading
+ * Return true if given atomUri is currently loading
  * @param process (full process from state)
- * @param needUri
+ * @param atomUri
  * @returns {*}
  */
-export function isNeedLoading(process, needUri) {
-  return needUri && getIn(process, ["needs", needUri, "loading"]);
+export function isAtomLoading(process, atomUri) {
+  return atomUri && getIn(process, ["atoms", atomUri, "loading"]);
 }
 
-export function isNeedLoaded(process, needUri) {
-  return needUri && getIn(process, ["needs", needUri, "loaded"]);
+export function isAtomLoaded(process, atomUri) {
+  return atomUri && getIn(process, ["atoms", atomUri, "loaded"]);
 }
 
 /**
- * Return true if given needUri is set toLoad
+ * Return true if given atomUri is set toLoad
  * @param process (full process from state)
- * @param needUri
+ * @param atomUri
  * @returns {*}
  */
-export function isNeedToLoad(process, needUri) {
-  return needUri && getIn(process, ["needs", needUri, "toLoad"]);
+export function isAtomToLoad(process, atomUri) {
+  return atomUri && getIn(process, ["atoms", atomUri, "toLoad"]);
 }
 
 /**
- * Return true if given needUri has failedToLoad
+ * Return true if given atomUri has failedToLoad
  * @param process (full process from state)
- * @param needUri
+ * @param atomUri
  * @returns {*}
  */
-export function hasNeedFailedToLoad(process, needUri) {
-  return needUri && getIn(process, ["needs", needUri, "failedToLoad"]);
+export function hasAtomFailedToLoad(process, atomUri) {
+  return atomUri && getIn(process, ["atoms", atomUri, "failedToLoad"]);
 }
 
 /**
- * Return true if any needUri is currently loading
+ * Return true if any atomUri is currently loading
  * @param process
  * @returns {boolean}
  */
-export function isAnyNeedLoading(process) {
-  const needProcess = get(process, "needs");
+export function isAnyAtomLoading(process) {
+  const atomProcess = get(process, "atoms");
 
-  return !!needProcess.find((needProcess, needUri) =>
-    isNeedLoading(process, needUri)
+  return !!atomProcess.find((atomProcess, atomUri) =>
+    isAtomLoading(process, atomUri)
   );
 }
 
@@ -177,9 +177,9 @@ export function isConnectionLoading(process, connUri, includeSubData = false) {
 }
 
 /**
- * Return true if given needUri has failedToLoad
+ * Return true if given atomUri has failedToLoad
  * @param process (full process from state)
- * @param needUri
+ * @param atomUri
  * @returns {*}
  */
 export function hasConnectionFailedToLoad(process, connUri) {
@@ -195,7 +195,7 @@ export function hasConnectionFailedToLoad(process, connUri) {
 export function isAnyConnectionLoading(process, includeSubData) {
   const connectionProcess = get(process, "connections");
 
-  return !!connectionProcess.find((needProcess, connUri) =>
+  return !!connectionProcess.find((atomProcess, connUri) =>
     isConnectionLoading(process, connUri, includeSubData)
   );
 }

@@ -13,7 +13,7 @@ import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.impl.wonmessage.FailureResponseEvent;
-import won.bot.framework.eventbot.event.impl.wonmessage.MessageFromOtherNeedEvent;
+import won.bot.framework.eventbot.event.impl.wonmessage.MessageFromOtherAtomEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.SuccessResponseEvent;
 import won.bot.framework.eventbot.listener.EventListener;
 import won.bot.framework.eventbot.listener.impl.ActionOnEventListener;
@@ -38,7 +38,7 @@ public class EagerlyPopulateCacheBehaviour extends BotBehaviour {
         logger.debug("activating EagerlyPopulateCacheBehaviour");
         ProcessResponseAction processResponseAction = new ProcessResponseAction(context);
         ProcessIncomingMessageAction processIncomingMessageAction = new ProcessIncomingMessageAction(context);
-        this.subscribeWithAutoCleanup(MessageFromOtherNeedEvent.class,
+        this.subscribeWithAutoCleanup(MessageFromOtherAtomEvent.class,
                         new ActionOnEventListener(context, processIncomingMessageAction));
         this.subscribeWithAutoCleanup(SuccessResponseEvent.class,
                         new ActionOnEventListener(context, processResponseAction));
@@ -71,7 +71,7 @@ public class EagerlyPopulateCacheBehaviour extends BotBehaviour {
             // put received message into cache
             LinkedDataSource linkedDataSource = context.getLinkedDataSource();
             if (linkedDataSource instanceof CachingLinkedDataSource) {
-                URI requester = responseWonMessage.getReceiverNeedURI();
+                URI requester = responseWonMessage.getRecipientAtomURI();
                 ((CachingLinkedDataSource) linkedDataSource).addToCache(responseWonMessage.getCompleteDataset(),
                                 responseWonMessage.getMessageURI(), requester);
                 // load the original message(s) into cache, too
@@ -93,17 +93,17 @@ public class EagerlyPopulateCacheBehaviour extends BotBehaviour {
 
         @Override
         protected void doRun(Event event, EventListener executingListener) throws Exception {
-            if (!(event instanceof MessageFromOtherNeedEvent)) {
+            if (!(event instanceof MessageFromOtherAtomEvent)) {
                 return;
             }
             logger.debug("eagerly caching data in reaction to event {}", event);
-            MessageFromOtherNeedEvent msgEvent = (MessageFromOtherNeedEvent) event;
+            MessageFromOtherAtomEvent msgEvent = (MessageFromOtherAtomEvent) event;
             WonMessage wonMessage = msgEvent.getWonMessage();
             LinkedDataSource linkedDataSource = context.getLinkedDataSource();
             if (linkedDataSource instanceof CachingLinkedDataSource) {
                 ((CachingLinkedDataSource) linkedDataSource).addToCache(wonMessage.getCompleteDataset(),
-                                wonMessage.getMessageURI(), wonMessage.getReceiverNeedURI());
-                URI requester = wonMessage.getReceiverNeedURI();
+                                wonMessage.getMessageURI(), wonMessage.getRecipientAtomURI());
+                URI requester = wonMessage.getRecipientAtomURI();
                 Set<URI> toLoad = new HashSet<URI>();
                 addIfNotNull(toLoad, wonMessage.getCorrespondingRemoteMessageURI());
                 List<URI> previous = WonRdfUtils.MessageUtils.getPreviousMessageUrisIncludingRemote(wonMessage);

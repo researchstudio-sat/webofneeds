@@ -28,9 +28,9 @@ public class ConversationResultMapper implements Function<QuerySolution, Convers
         if (ret == null) {
             ret = new ConversationMessage(messageUri);
         }
-        URI senderNeedUri = getUriVar(solution, "senderNeed");
-        if (senderNeedUri != null) {
-            ret.setSenderNeedURI(senderNeedUri);
+        URI senderAtomUri = getUriVar(solution, "senderAtom");
+        if (senderAtomUri != null) {
+            ret.setSenderAtomURI(senderAtomUri);
         }
         URI previous = getUriVar(solution, "previous");
         if (previous != null) {

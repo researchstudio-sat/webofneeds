@@ -8,7 +8,7 @@ import { connect2Redux } from "../../won-utils.js";
 import won from "../../won-es6.js";
 import { actionCreators } from "../../actions/actions.js";
 import postMessagesModule from "../post-messages.js";
-import needCardModule from "../need-card.js";
+import atomCardModule from "../atom-card.js";
 import postHeaderModule from "../post-header.js";
 import * as generalSelectors from "../../selectors/general-selectors.js";
 import * as viewSelectors from "../../selectors/view-selectors.js";
@@ -16,7 +16,7 @@ import * as processUtils from "../../process-utils.js";
 import * as wonLabelUtils from "../../won-label-utils.js";
 
 import "style/_overview.scss";
-import "style/_need-overlay.scss";
+import "style/_atom-overlay.scss";
 import "style/_connection-overlay.scss";
 
 const serviceDependencies = ["$ngRedux", "$scope"];
@@ -28,40 +28,40 @@ class Controller {
     this.WON = won.WON;
 
     const selectFromState = state => {
-      const viewNeedUri = generalSelectors.getViewNeedUriFromRoute(state);
+      const viewAtomUri = generalSelectors.getViewAtomUriFromRoute(state);
       const viewConnUri = generalSelectors.getViewConnectionUriFromRoute(state);
 
-      const needUris = getIn(state, ["owner", "needUris"]);
-      const lastNeedUrisUpdateDate = getIn(state, [
+      const atomUris = getIn(state, ["owner", "atomUris"]);
+      const lastAtomUrisUpdateDate = getIn(state, [
         "owner",
-        "lastNeedUrisUpdateTime",
+        "lastAtomUrisUpdateTime",
       ]);
 
       const process = get(state, "process");
-      const isOwnerNeedUrisLoading = processUtils.isProcessingNeedUrisFromOwnerLoad(
+      const isOwnerAtomUrisLoading = processUtils.isProcessingAtomUrisFromOwnerLoad(
         process
       );
-      const isOwnerNeedUrisToLoad =
-        !lastNeedUrisUpdateDate && !isOwnerNeedUrisLoading;
+      const isOwnerAtomUrisToLoad =
+        !lastAtomUrisUpdateDate && !isOwnerAtomUrisLoading;
 
       return {
-        lastNeedUrisUpdateDate,
-        friendlyLastNeedUrisUpdateTimestamp:
-          lastNeedUrisUpdateDate &&
+        lastAtomUrisUpdateDate,
+        friendlyLastAtomUrisUpdateTimestamp:
+          lastAtomUrisUpdateDate &&
           wonLabelUtils.relativeTime(
             generalSelectors.selectLastUpdateTime(state),
-            lastNeedUrisUpdateDate
+            lastAtomUrisUpdateDate
           ),
-        needUrisArray: needUris && needUris.toArray().splice(0, 200), //FIXME: CURRENTLY LIMIT TO 200 entries
-        needUrisSize: needUris ? needUris.size : 0,
-        isOwnerNeedUrisLoading,
-        isOwnerNeedUrisToLoad,
+        atomUrisArray: atomUris && atomUris.toArray().splice(0, 200), //FIXME: CURRENTLY LIMIT TO 200 entries
+        atomUrisSize: atomUris ? atomUris.size : 0,
+        isOwnerAtomUrisLoading,
+        isOwnerAtomUrisToLoad,
         showSlideIns:
           viewSelectors.hasSlideIns(state) && viewSelectors.showSlideIns(state),
         showModalDialog: viewSelectors.showModalDialog(state),
-        showNeedOverlay: !!viewNeedUri,
+        showAtomOverlay: !!viewAtomUri,
         showConnectionOverlay: !!viewConnUri,
-        viewNeedUri,
+        viewAtomUri,
         viewConnUri,
       };
     };
@@ -69,20 +69,20 @@ class Controller {
     connect2Redux(selectFromState, actionCreators, [], this);
 
     this.$scope.$watch(
-      () => this.isOwnerNeedUrisToLoad,
-      () => delay(0).then(() => this.ensureNeedUrisLoaded())
+      () => this.isOwnerAtomUrisToLoad,
+      () => delay(0).then(() => this.ensureAtomUrisLoaded())
     );
   }
 
-  ensureNeedUrisLoaded() {
-    if (this.isOwnerNeedUrisToLoad) {
-      this.needs__loadAllActiveNeedUrisFromOwner();
+  ensureAtomUrisLoaded() {
+    if (this.isOwnerAtomUrisToLoad) {
+      this.atoms__loadAllActiveAtomUrisFromOwner();
     }
   }
 
   reload() {
-    if (!this.isOwnerNeedUrisLoading) {
-      this.needs__loadAllActiveNeedUrisFromOwner();
+    if (!this.isOwnerAtomUrisLoading) {
+      this.atoms__loadAllActiveAtomUrisFromOwner();
     }
   }
 }
@@ -93,7 +93,7 @@ export default angular
   .module("won.owner.components.overview", [
     ngAnimate,
     postMessagesModule,
-    needCardModule,
+    atomCardModule,
     postHeaderModule,
   ])
   .controller("OverviewController", Controller).name;

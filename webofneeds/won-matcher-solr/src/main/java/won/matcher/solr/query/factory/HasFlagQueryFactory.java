@@ -29,7 +29,7 @@ public class HasFlagQueryFactory extends SolrQueryFactory {
 
     @Override
     protected String makeQueryString() {
-        return new ExactMatchFieldQueryFactory("_graph.http___purl.org_webofneeds_model_hasFlag._id", flagMap.get(flag))
+        return new ExactMatchFieldQueryFactory("_graph.http___purl.org_webofneeds_model_flag._id", flagMap.get(flag))
                         .createQuery();
     }
 }

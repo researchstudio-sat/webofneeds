@@ -57,7 +57,7 @@ public class GoalUtils {
      * /won/utils/goals/extraction/goal-extraction-only-referenced-properties.rq
      *
      * @param dataModel The data model is expected to contain the rdf data which is
-     * usually the merged data of two needs and their conversation from which the
+     * usually the merged data of two atoms and their conversation from which the
      * goal data is gonna be extracted.
      * @param shaclShapesModel the shapes model specifies shacl constraints for the
      * data that should be extracted from the data model

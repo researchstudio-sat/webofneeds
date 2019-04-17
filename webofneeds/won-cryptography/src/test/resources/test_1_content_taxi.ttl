@@ -1,39 +1,39 @@
-@prefix :    <http://www.example.com/resource/need/100> .
+@prefix :    <http://www.example.com/resource/atom/100> .
 @prefix dc:  <http://purl.org/dc/elements/1.1/> .
 @prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix geo:     <http://www.w3.org/2003/01/geo/wgs84_pos#> .
 @prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
 @prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-@prefix won:     <http://purl.org/webofneeds/model#> .
+@prefix won:     <https://w3id.org/won/core#> .
 @prefix gr:  <http://purl.org/goodrelations/v1#> .
 @prefix ldp:     <http://www.w3.org/ns/ldp#> .
 @prefix sp:  <http://spinrdf.org/sp#>.
 @prefix acco: <http://purl.org/acco/ns#>.
 @prefix tio:        <http://purl.org/tio/ns#> .
 
-<http://www.example.com/resource/need/100>
+<http://www.example.com/resource/atom/100>
 
 # owner-specified content (permanent):
-  a   won:Need ;
-  won:hasBasicNeedType
+  a   won:Atom ;
+  won:hasBasicAtomType
       won:Supply ;
-  won:hasContent
-      [ a   won:NeedContent ;
-        won:hasContentDescription
+  won:content
+      [ a   won:AtomContent ;
+        won:contentDescription
         [ a tio:Taxi, gr:SomeItems ;
               gr:name "Fastest taxi in town"@en ;
               gr:description "Wherever you want to go, we'll take you there"@en ;
               # Link to the hotel and its features
-              # tio:operatedBy foo:myCompany; #TODO: how do we want to link to other entities (maybe shared by a number of needs, like the company here)
+              # tio:operatedBy foo:myCompany; #TODO: how do we want to link to other entities (maybe shared by a number of atoms, like the company here)
               # tio:operatedBy foo:myDriver;
               # Price of taxi is actually not that simple to define..
         ]
       ] ;
 
 # owner-specified content (transient).
-  won:hasNeedModality
-      [ a   won:NeedModality
-         won:hasLocationSpecification  [
+  won:atomModality
+      [ a   won:AtomModality
+         won:locationSpecification  [
          a geo:Point ;
          geo:latitude   "48.2187304" ;
          geo:longitude  "16.3602146"
@@ -41,16 +41,16 @@
       ] ;
 
 #node-defined content
-  won:hasConnections <http://www.example.com/resource/need/100/connections/> ;
-  won:isInState won:Active ;
+  won:connections <http://www.example.com/resource/atom/100/connections/> ;
+  won:atomState won:Active ;
   won:matcherProtocolEndpoint
       <http://www.example.com/won/protocol/matcher> ;
-  won:needCreationDate
+  won:atomCreationDate
       "2013-09-252T10:49:54.054+0000" ;
-  won:needProtocolEndpoint
-      <http://www.example.com/won/protocol/need> ;
+  won:atomProtocolEndpoint
+      <http://www.example.com/won/protocol/atom> ;
   won:ownerProtocolEndpoint
       <http://www.example.com/won/protocol/owner> .
 
-<http://www.example.com/resource/need/24/connections/>
+<http://www.example.com/resource/atom/24/connections/>
   a   ldp:Container .

@@ -22,13 +22,13 @@ import won.protocol.message.WonMessage;
 public interface MatcherProtocolMatcherServiceClientSide {
     public void matcherRegistered(final URI wonNodeURI, final WonMessage wonMessage);
 
-    public void needCreated(final URI needURI, final Model content, final WonMessage wonMessage);
+    public void atomCreated(final URI atomURI, final Model content, final WonMessage wonMessage);
 
-    public void needModified(final URI needURI, final WonMessage wonMessage);
+    public void atomModified(final URI atomURI, final WonMessage wonMessage);
 
-    public void needActivated(final URI needURI, final WonMessage wonMessage);
+    public void atomActivated(final URI atomURI, final WonMessage wonMessage);
 
-    public void needDeactivated(final URI needURI, final WonMessage wonMessage);
+    public void atomDeactivated(final URI atomURI, final WonMessage wonMessage);
 
-    public void needDeleted(final URI needURI, final WonMessage wonMessage);
+    public void atomDeleted(final URI atomURI, final WonMessage wonMessage);
 }

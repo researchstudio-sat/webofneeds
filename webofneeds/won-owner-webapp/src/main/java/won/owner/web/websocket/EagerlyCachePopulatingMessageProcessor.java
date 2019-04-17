@@ -20,17 +20,17 @@ import won.protocol.util.linkeddata.LinkedDataSource;
 public class EagerlyCachePopulatingMessageProcessor implements WonMessageProcessor {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     @Autowired
-    private LinkedDataSource linkedDataSourceOnBehalfOfNeed;
+    private LinkedDataSource linkedDataSourceOnBehalfOfAtom;
     @Autowired
     private ThreadPoolExecutor parallelRequestsThreadpool;
 
     @Override
     public WonMessage process(WonMessage message) throws WonMessageProcessingException {
-        if (this.linkedDataSourceOnBehalfOfNeed != null
-                        && this.linkedDataSourceOnBehalfOfNeed instanceof CachingLinkedDataSource) {
+        if (this.linkedDataSourceOnBehalfOfAtom != null
+                        && this.linkedDataSourceOnBehalfOfAtom instanceof CachingLinkedDataSource) {
             logger.debug("eagerly fetching delivery chain for mesasge {} into cache", message.getMessageURI());
-            URI requester = message.getReceiverNeedURI();
-            ((CachingLinkedDataSource) linkedDataSourceOnBehalfOfNeed).addToCache(message.getCompleteDataset(),
+            URI requester = message.getRecipientAtomURI();
+            ((CachingLinkedDataSource) linkedDataSourceOnBehalfOfAtom).addToCache(message.getCompleteDataset(),
                             message.getMessageURI(), requester);
             // load the original message(s) into cache, too
             Set<URI> toLoad = new HashSet<URI>();
@@ -40,13 +40,13 @@ public class EagerlyCachePopulatingMessageProcessor implements WonMessageProcess
             List<URI> previous = WonRdfUtils.MessageUtils.getPreviousMessageUrisIncludingRemote(message);
             addIfNotNull(toLoad, previous);
             parallelRequestsThreadpool.submit(() -> toLoad.parallelStream()
-                            .forEach(uri -> linkedDataSourceOnBehalfOfNeed.getDataForResource(uri, requester)));
+                            .forEach(uri -> linkedDataSourceOnBehalfOfAtom.getDataForResource(uri, requester)));
         }
         return message;
     }
 
-    public void setLinkedDataSourceOnBehalfOfNeed(LinkedDataSource linkedDataSourceOnBehalfOfNeed) {
-        this.linkedDataSourceOnBehalfOfNeed = linkedDataSourceOnBehalfOfNeed;
+    public void setLinkedDataSourceOnBehalfOfAtom(LinkedDataSource linkedDataSourceOnBehalfOfAtom) {
+        this.linkedDataSourceOnBehalfOfAtom = linkedDataSourceOnBehalfOfAtom;
     }
 
     public void setThreadPoolExecutor(ThreadPoolExecutor threadPoolExecutor) {

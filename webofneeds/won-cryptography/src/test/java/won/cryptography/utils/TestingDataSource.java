@@ -32,8 +32,8 @@ public class TestingDataSource implements LinkedDataSource {
         File keysFile = new File(this.getClass().getResource(TestSigningUtils.KEYS_FILE).getFile());
         FileBasedKeyStoreService storeService = new FileBasedKeyStoreService(keysFile, "temp");
         storeService.init();
-        pubKeysMap.put(TestSigningUtils.needCertUri,
-                        storeService.getCertificate(TestSigningUtils.needCertUri).getPublicKey());
+        pubKeysMap.put(TestSigningUtils.atomCertUri,
+                        storeService.getCertificate(TestSigningUtils.atomCertUri).getPublicKey());
         pubKeysMap.put(TestSigningUtils.ownerCertUri,
                         storeService.getCertificate(TestSigningUtils.ownerCertUri).getPublicKey());
         pubKeysMap.put(TestSigningUtils.nodeCertUri,

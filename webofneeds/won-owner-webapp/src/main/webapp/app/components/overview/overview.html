@@ -1,6 +1,6 @@
 <won-modal-dialog ng-if="self.showModalDialog"></won-modal-dialog>
-<div class="won-modal-needview" ng-if="self.showNeedOverlay">
-    <won-post-info include-header="true" need-uri="self.viewNeedUri"></won-post-info>
+<div class="won-modal-atomview" ng-if="self.showAtomOverlay">
+    <won-post-info include-header="true" atom-uri="self.viewAtomUri"></won-post-info>
 </div>
 <div class="won-modal-connectionview" ng-if="self.showConnectionOverlay">
     <won-post-messages connection-uri="self.viewConnUri"></won-post-messages>
@@ -13,14 +13,14 @@
 <main class="owneroverview">
     <div class="owneroverview__header">
         <div class="owneroverview__header__title">
-            What's new? <span class="owneroverview__header__title__count" ng-if="!self.isOwnerNeedUrisLoading">({{ self.needUrisSize }})</span>
+            What's new? <span class="owneroverview__header__title__count" ng-if="!self.isOwnerAtomUrisLoading">({{ self.atomUrisSize }})</span>
         </div>
-        <div class="owneroverview__header__loading" ng-if="self.isOwnerNeedUrisLoading">
+        <div class="owneroverview__header__loading" ng-if="self.isOwnerAtomUrisLoading">
             Loading...
         </div>
-        <div class="owneroverview__header__updated" ng-if="!self.isOwnerNeedUrisLoading">
+        <div class="owneroverview__header__updated" ng-if="!self.isOwnerAtomUrisLoading">
             <div class="owneroverview__header__updated__time">
-                Updated: {{ self.friendlyLastNeedUrisUpdateTimestamp }}
+                Updated: {{ self.friendlyLastAtomUrisUpdateTimestamp }}
             </div>
             <div class="owneroverview__header__updated__reload won-button--filled red" ng-click="self.reload()">
                 Reload
@@ -28,7 +28,7 @@
         </div>
     </div>
     <div class="owneroverview__content">
-        <won-need-card class="owneroverview__content__need" need-uri="needUri" ng-repeat="needUri in self.needUrisArray track by needUri"></won-need-card>
+        <won-atom-card class="owneroverview__content__atom" atom-uri="atomUri" ng-repeat="atomUri in self.atomUrisArray track by atomUri"></won-atom-card>
     </div>
 </main>
 <won-footer></won-footer>

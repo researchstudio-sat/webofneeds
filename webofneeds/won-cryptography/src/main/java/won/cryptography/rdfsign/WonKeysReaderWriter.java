@@ -110,10 +110,10 @@ public class WonKeysReaderWriter {
                 RDFNode eccKeyObj = ni.next();
                 // ECC pub key statements
                 StmtIterator eccPubKeyStmts = model.listStatements(eccKeyObj.asResource(), RDF.type,
-                                WONCRYPT.ECC_PUBLIC_KEY);
+                                WONCRYPT.ECCPublicKey);
                 if (eccPubKeyStmts.hasNext()) {
                     // extract properties of ECC public key:
-                    ni = model.listObjectsOfProperty(eccKeyObj.asResource(), WONCRYPT.ECC_ALGORITHM);
+                    ni = model.listObjectsOfProperty(eccKeyObj.asResource(), WONCRYPT.ecc_algorithm);
                     String algName = null;
                     String curveId = null;
                     String qx = null;
@@ -123,19 +123,19 @@ public class WonKeysReaderWriter {
                     } else {
                         return;
                     }
-                    ni = model.listObjectsOfProperty(eccKeyObj.asResource(), WONCRYPT.ECC_CURVE_ID);
+                    ni = model.listObjectsOfProperty(eccKeyObj.asResource(), WONCRYPT.ecc_curveId);
                     if (ni.hasNext()) {
                         curveId = ni.next().asLiteral().toString();
                     } else {
                         return;
                     }
-                    ni = model.listObjectsOfProperty(eccKeyObj.asResource(), WONCRYPT.ECC_QX);
+                    ni = model.listObjectsOfProperty(eccKeyObj.asResource(), WONCRYPT.ecc_qx);
                     if (ni.hasNext()) {
                         qx = ni.next().asLiteral().toString();
                     } else {
                         return;
                     }
-                    ni = model.listObjectsOfProperty(eccKeyObj.asResource(), WONCRYPT.ECC_QY);
+                    ni = model.listObjectsOfProperty(eccKeyObj.asResource(), WONCRYPT.ecc_qy);
                     if (ni.hasNext()) {
                         qy = ni.next().asLiteral().toString();
                     } else {
@@ -174,15 +174,15 @@ public class WonKeysReaderWriter {
     public void writeToModel(Model model, Resource keySubject, WonEccPublicKey pubKey) {
         // EC public key triples
         Resource bn = model.createResource();
-        Statement stmt = model.createStatement(bn, RDF.type, WONCRYPT.ECC_PUBLIC_KEY);
+        Statement stmt = model.createStatement(bn, RDF.type, WONCRYPT.ECCPublicKey);
         model.add(stmt);
-        stmt = model.createStatement(bn, WONCRYPT.ECC_ALGORITHM, pubKey.getAlgorithm());
+        stmt = model.createStatement(bn, WONCRYPT.ecc_algorithm, pubKey.getAlgorithm());
         model.add(stmt);
-        stmt = model.createStatement(bn, WONCRYPT.ECC_CURVE_ID, pubKey.getCurveId());
+        stmt = model.createStatement(bn, WONCRYPT.ecc_curveId, pubKey.getCurveId());
         model.add(stmt);
-        stmt = model.createStatement(bn, WONCRYPT.ECC_QX, model.createLiteral(pubKey.getQx()));
+        stmt = model.createStatement(bn, WONCRYPT.ecc_qx, model.createLiteral(pubKey.getQx()));
         model.add(stmt);
-        stmt = model.createStatement(bn, WONCRYPT.ECC_QY, model.createLiteral(pubKey.getQy()));
+        stmt = model.createStatement(bn, WONCRYPT.ecc_qy, model.createLiteral(pubKey.getQy()));
         model.add(stmt);
         // public key triple
         Resource bn2 = model.createResource();

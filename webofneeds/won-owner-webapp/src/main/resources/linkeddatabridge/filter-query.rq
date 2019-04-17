@@ -1,5 +1,5 @@
 PREFIX sig:   <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#>
-PREFIX msg: <http://purl.org/webofneeds/message#>  
+PREFIX msg: <https://w3id.org/won/message#>  
 
 DELETE
  {

@@ -7,21 +7,21 @@ import java.util.Set;
 
 public class ProposalUris {
     private URI uri;
-    private URI proposingNeedUri;
+    private URI proposingAtomUri;
     private Set<URI> proposes = new HashSet<>();
     private Set<URI> proposesToCancel = new HashSet<>();
 
-    public ProposalUris(URI uri, URI needUri) {
+    public ProposalUris(URI uri, URI atomUri) {
         this.uri = uri;
-        this.proposingNeedUri = needUri;
+        this.proposingAtomUri = atomUri;
     }
 
     public URI getUri() {
         return uri;
     }
 
-    public URI getProposingNeedUri() {
-        return proposingNeedUri;
+    public URI getProposingAtomUri() {
+        return proposingAtomUri;
     }
 
     public Set<URI> getProposes() {

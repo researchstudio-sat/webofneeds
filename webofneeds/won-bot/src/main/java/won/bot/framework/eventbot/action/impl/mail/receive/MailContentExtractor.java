@@ -17,7 +17,7 @@ import won.bot.framework.eventbot.action.impl.mail.model.ActionType;
 import won.bot.framework.eventbot.action.impl.mail.model.MailPropertyType;
 
 /**
- * Extracts need properties like title, description, need type, etc from mails.
+ * Extracts atom properties like title, description, atom type, etc from mails.
  * Configurable via regular expression patterns in spring xml
  */
 public class MailContentExtractor {
@@ -35,10 +35,10 @@ public class MailContentExtractor {
     private Pattern titleExtractionPattern;
     // extract description from mail content
     private Pattern descriptionExtractionPattern;
-    // check if the need created from the mail should is used for testing only
+    // check if the atom created from the mail should is used for testing only
     private Pattern usedForTestingPattern;
-    // check if the need created from the mail should be not matched with other
-    // needs
+    // check if the atom created from the mail should be not matched with other
+    // atoms
     private Pattern doNotMatchPattern;
     // check if this is a command mail of different action types
     private Pattern cmdClosePattern;
@@ -57,7 +57,7 @@ public class MailContentExtractor {
         }
         // second search the mail reference in the subject written by predefined mailto
         // links
-        // e.g. in case of close need
+        // e.g. in case of close atom
         Pattern referenceMailPattern = Pattern.compile("Message-Id_(.+)");
         Matcher m = referenceMailPattern.matcher(message.getSubject());
         return m.find() ? m.group(1) : null;
@@ -166,14 +166,14 @@ public class MailContentExtractor {
         this.cmdTakenPattern = cmdTakenPattern;
     }
 
-    public boolean isCreateNeedMail(MimeMessage message) throws MessagingException {
+    public boolean isCreateAtomMail(MimeMessage message) throws MessagingException {
         return getMailType(message) != null;
     }
 
     public boolean isCommandMail(MimeMessage message) throws IOException, MessagingException {
         // command mail is either an answer mail (with reference) to a previous mail
         // (e.g. message, implicit connect) or an
-        // explicitly set action command (e.g. subscribe, unsubscribe, close need)
+        // explicitly set action command (e.g. subscribe, unsubscribe, close atom)
         return getMailReference(message) != null
                         || (getMailAction(message) != null && !ActionType.NO_ACTION.equals(getMailAction(message)));
     }
@@ -188,7 +188,7 @@ public class MailContentExtractor {
         } else if (cmdConnectPattern.matcher(message.getSubject()).matches()) {
             return ActionType.OPEN_CONNECTION;
         } else if (cmdTakenPattern.matcher(message.getSubject()).matches()) {
-            return ActionType.CLOSE_NEED;
+            return ActionType.CLOSE_ATOM;
         } else {
             return ActionType.NO_ACTION;
         }

@@ -7,7 +7,7 @@ the webofneeds applications as docker containers. There are images for the follo
 * owner: the owner application
 * postgres: postgres database for the wonnode and owner
 * matcher_service: a general matcher service
-* matcher_solr: a matcher that uses solr search index to match needs
+* matcher_solr: a matcher that uses solr search index to match atoms
 * bigdata: a RDF store that is used by the matcher-service to store rdf data
 * solr: a solr server with used by the matcher-solr
 * gencert: a tool that can generate certificates for wonnode and owner application
@@ -22,7 +22,7 @@ which can be used to deploy all components on one local server.
 1. Install and configure docker (https://www.docker.com)
 2. Install and configure docker compose (https://docs.docker.com/compose/)
 3. Download the [docker-compose.yml](deploy/local/docker-compose.yml) file  that deploys all components at once
-4. The script needs two environment parameters to be set. Export `deploy_host` to set the host you want to deploy the
+4. The script atoms two environment parameters to be set. Export `deploy_host` to set the host you want to deploy the
  docker containers on. Export `base_folder` to set the folder where data (like certificates) are created and mounted
 5. Make sure no other services on the server are running on the following ports that are used by the different
 containers: 8889, 2561, 2562, 5433, 7071, 8082, 8984, 10000, 61617
@@ -32,10 +32,10 @@ When the script executes it runs all the above listed docker images as container
 webofneeds docker hub repository if not available locally. If the script finishes without error all components
 should be started.
 
-You can access the owner application to log in and create needs using the following link:
+You can access the owner application to log in and create atoms using the following link:
 * **owner:** [https://${deploy_host}:8082/owner](https://${deploy_host}:8082/owner)
 
-You can access the wonnode and check the generated RDF needs using the following link:
+You can access the wonnode and check the generated RDF atoms using the following link:
 * **wonnode:** [https://${deploy_host}:8889/won](https://${deploy_host}:8889/won)
 
 The certificates used by the application are created on the first execution of the script, and reused in later

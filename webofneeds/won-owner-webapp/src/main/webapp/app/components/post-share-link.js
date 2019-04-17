@@ -46,7 +46,7 @@ function genComponentConf() {
       window.postShareLink4dbg = this;
 
       const selectFromState = state => {
-        const post = this.postUri && state.getIn(["needs", this.postUri]);
+        const post = this.postUri && state.getIn(["atoms", this.postUri]);
         this.showLink = true;
 
         let linkToPost;
@@ -59,7 +59,7 @@ function genComponentConf() {
 
         return {
           post,
-          isOwned: generalSelectors.isNeedOwned(state, this.postUri),
+          isOwned: generalSelectors.isAtomOwned(state, this.postUri),
           linkToPost,
           svgQrCodeToPost,
         };

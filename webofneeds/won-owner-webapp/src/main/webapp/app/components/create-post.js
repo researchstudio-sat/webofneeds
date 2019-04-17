@@ -12,7 +12,7 @@ import { get, attach, delay, getIn } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { connect2Redux } from "../won-utils.js";
 import * as generalSelectors from "../selectors/general-selectors.js";
-import * as needUtils from "../need-utils.js";
+import * as atomUtils from "../atom-utils.js";
 import * as processSelectors from "../selectors/process-selectors.js";
 import * as useCaseUtils from "../usecase-utils.js";
 import * as accountUtils from "../account-utils.js";
@@ -48,12 +48,12 @@ function genComponentConf() {
                 style="--local-primary:var(--won-primary-color);">
                     <use xlink:href="{{self.useCase['icon']}}" href="{{self.useCase['icon']}}"></use>
             </svg>
-            <span class="cp__header__title" ng-if="!self.isCreateFromNeed && !self.isEditFromNeed">{{self.useCase.label}}</span>
-            <span class="cp__header__title" ng-if="self.isCreateFromNeed">Duplicate from '{{self.useCase.label}}'</span>
-            <span class="cp__header__title" ng-if="self.isEditFromNeed">Edit Post</span>
+            <span class="cp__header__title" ng-if="!self.isCreateFromAtom && !self.isEditFromAtom">{{self.useCase.label}}</span>
+            <span class="cp__header__title" ng-if="self.isCreateFromAtom">Duplicate from '{{self.useCase.label}}'</span>
+            <span class="cp__header__title" ng-if="self.isEditFromAtom">Edit Post</span>
         </div>
         <div class="cp__content">
-            <div class="cp__content__loading" ng-if="!self.showCreateInput && self.isFromNeedLoading">
+            <div class="cp__content__loading" ng-if="!self.showCreateInput && self.isFromAtomLoading">
                 <svg class="cp__content__loading__spinner hspinner">
                     <use xlink:href="#ico_loading_anim" href="#ico_loading_anim"></use>
                 </svg>
@@ -61,7 +61,7 @@ function genComponentConf() {
                     Loading...
                 </span>
             </div>
-            <div class="cp__content__failed" ng-if="!self.showCreateInput && self.hasFromNeedFailedToLoad">
+            <div class="cp__content__failed" ng-if="!self.showCreateInput && self.hasFromAtomFailedToLoad">
                 <svg class="cp__content__failed__icon">
                     <use xlink:href="#ico16_indicator_error" href="#ico16_indicator_error"></use>
                 </svg>
@@ -70,7 +70,7 @@ function genComponentConf() {
                 </span>
                 <div class="cp__content__failed__actions">
                     <button class="cp__content__failed__actions__button red won-button--outlined thin"
-                        ng-click="self.needs__fetchUnloadedNeed(self.fromNeedUri)()">
+                        ng-click="self.atoms__fetchUnloadedAtom(self.fromAtomUri)()">
                         Try Reload
                     </button>
                 </div>
@@ -111,9 +111,9 @@ function genComponentConf() {
                 personas: self.personas
               }"
               on-action="self.publish(payload)"
-              ng-if="self.showCreateInput && !self.isEditFromNeed">
+              ng-if="self.showCreateInput && !self.isEditFromAtom">
             </won-elm>
-            <div class="cp__footer__edit" ng-if="self.loggedIn && self.showCreateInput && self.isEditFromNeed && self.isFromNeedEditable">
+            <div class="cp__footer__edit" ng-if="self.loggedIn && self.showCreateInput && self.isEditFromAtom && self.isFromAtomEditable">
               <button class="cp__footer__edit__save won-button--filled red" ng-click="self.save()" ng-disabled="!self.isValid()">
                   Save
               </button>
@@ -121,11 +121,11 @@ function genComponentConf() {
                   Cancel
               </button>
             </div>
-            <div class="cp__footer__error" ng-if="self.showCreateInput && self.isEditFromNeed && !self.isFromNeedEditable">
-              Can't edit this need (need not owned or doesn't have a matching usecase)
+            <div class="cp__footer__error" ng-if="self.showCreateInput && self.isEditFromAtom && !self.isFromAtomEditable">
+              Can't edit this atom (atom not owned or doesn't have a matching usecase)
             </div>
-            <div class="cp__footer__error" ng-if="self.showCreateInput && self.isCreateFromNeed && !self.isFromNeedUsableAsTemplate">
-              Can't use this need as a template (need is owned or doesn't have a matching usecase)
+            <div class="cp__footer__error" ng-if="self.showCreateInput && self.isCreateFromAtom && !self.isFromAtomUsableAsTemplate">
+              Can't use this atom as a template (atom is owned or doesn't have a matching usecase)
             </div>
         </div>
     `;
@@ -146,78 +146,78 @@ function genComponentConf() {
 
       this.publishButton = Elm.PublishButton;
       const selectFromState = state => {
-        const fromNeedUri = generalSelectors.getFromNeedUriFromRoute(state);
+        const fromAtomUri = generalSelectors.getFromAtomUriFromRoute(state);
         const mode = generalSelectors.getModeFromRoute(state);
-        let fromNeed;
+        let fromAtom;
 
         let useCaseString;
         let useCase;
 
-        const isCreateFromNeed = !!(fromNeedUri && mode === "DUPLICATE");
-        const isEditFromNeed = !!(fromNeedUri && mode === "EDIT");
+        const isCreateFromAtom = !!(fromAtomUri && mode === "DUPLICATE");
+        const isEditFromAtom = !!(fromAtomUri && mode === "EDIT");
 
-        let isFromNeedLoading = false;
-        let isFromNeedToLoad = false;
-        let hasFromNeedFailedToLoad = false;
+        let isFromAtomLoading = false;
+        let isFromAtomToLoad = false;
+        let hasFromAtomFailedToLoad = false;
 
-        const connectToNeedUri = mode === "CONNECT" && fromNeedUri;
+        const connectToAtomUri = mode === "CONNECT" && fromAtomUri;
 
-        if (isCreateFromNeed || isEditFromNeed) {
-          isFromNeedLoading = processSelectors.isNeedLoading(
+        if (isCreateFromAtom || isEditFromAtom) {
+          isFromAtomLoading = processSelectors.isAtomLoading(
             state,
-            fromNeedUri
+            fromAtomUri
           );
-          isFromNeedToLoad = processSelectors.isNeedToLoad(state, fromNeedUri);
-          hasFromNeedFailedToLoad = processSelectors.hasNeedFailedToLoad(
+          isFromAtomToLoad = processSelectors.isAtomToLoad(state, fromAtomUri);
+          hasFromAtomFailedToLoad = processSelectors.hasAtomFailedToLoad(
             state,
-            fromNeedUri
+            fromAtomUri
           );
-          fromNeed =
-            !isFromNeedLoading &&
-            !isFromNeedToLoad &&
-            !hasFromNeedFailedToLoad &&
-            getIn(state, ["needs", fromNeedUri]);
+          fromAtom =
+            !isFromAtomLoading &&
+            !isFromAtomToLoad &&
+            !hasFromAtomFailedToLoad &&
+            getIn(state, ["atoms", fromAtomUri]);
 
-          if (fromNeed) {
-            const matchedUseCaseIdentifier = needUtils.getMatchedUseCaseIdentifier(
-              fromNeed
+          if (fromAtom) {
+            const matchedUseCaseIdentifier = atomUtils.getMatchedUseCaseIdentifier(
+              fromAtom
             );
 
             useCaseString = matchedUseCaseIdentifier || "customUseCase";
             useCase = useCaseUtils.getUseCase(useCaseString);
 
-            const fromNeedContent = get(fromNeed, "content");
-            const fromNeedSeeks = get(fromNeed, "seeks");
-            const facetsReset = needUtils.getFacetsWithKeysReset(fromNeed);
-            const defaultFacetReset = needUtils.getDefaultFacetWithKeyReset(
-              fromNeed
+            const fromAtomContent = get(fromAtom, "content");
+            const fromAtomSeeks = get(fromAtom, "seeks");
+            const socketsReset = atomUtils.getSocketsWithKeysReset(fromAtom);
+            const defaultSocketReset = atomUtils.getDefaultSocketWithKeyReset(
+              fromAtom
             );
-            const seeksFacetsReset = needUtils.getSeeksFacetsWithKeysReset(
-              fromNeed
+            const seeksSocketsReset = atomUtils.getSeeksSocketsWithKeysReset(
+              fromAtom
             );
-            const seeksDefaultFacetReset = needUtils.getSeeksDefaultFacetWithKeyReset(
-              fromNeed
+            const seeksDefaultSocketReset = atomUtils.getSeeksDefaultSocketWithKeyReset(
+              fromAtom
             );
 
-            if (fromNeedContent) {
-              useCase.draft.content = fromNeedContent.toJS();
+            if (fromAtomContent) {
+              useCase.draft.content = fromAtomContent.toJS();
             }
-            if (fromNeedSeeks) {
-              useCase.draft.seeks = fromNeedSeeks.toJS();
-            }
-
-            if (facetsReset) {
-              useCase.draft.content.facets = facetsReset.toJS();
-            }
-            if (defaultFacetReset) {
-              useCase.draft.content.defaultFacet = defaultFacetReset.toJS();
+            if (fromAtomSeeks) {
+              useCase.draft.seeks = fromAtomSeeks.toJS();
             }
 
-            if (seeksFacetsReset) {
-              useCase.draft.seeks.facets = seeksFacetsReset.toJS();
+            if (socketsReset) {
+              useCase.draft.content.sockets = socketsReset.toJS();
             }
-            if (seeksDefaultFacetReset) {
-              useCase.draft.seeks.defaultFacet = seeksDefaultFacetReset.toJS();
+            if (defaultSocketReset) {
+              useCase.draft.content.defaultSocket = defaultSocketReset.toJS();
+            }
+
+            if (seeksSocketsReset) {
+              useCase.draft.seeks.sockets = seeksSocketsReset.toJS();
+            }
+            if (seeksDefaultSocketReset) {
+              useCase.draft.seeks.defaultSocket = seeksDefaultSocketReset.toJS();
             }
           }
         } else {
@@ -227,35 +227,35 @@ function genComponentConf() {
 
         return {
           loggedIn: accountUtils.isLoggedIn(get(state, "account")),
-          connectToNeedUri,
+          connectToAtomUri,
           processingPublish: state.getIn(["process", "processingPublish"]),
           connectionHasBeenLost: !generalSelectors.selectIsConnected(state),
           useCaseString,
           useCase,
-          fromNeed,
-          fromNeedUri,
-          isFromNeedOwned: generalSelectors.isNeedOwned(state, fromNeedUri),
-          isCreateFromNeed,
-          isEditFromNeed,
-          isFromNeedLoading,
-          isFromNeedToLoad,
-          isFromNeedEditable: generalSelectors.isNeedEditable(
+          fromAtom,
+          fromAtomUri,
+          isFromAtomOwned: generalSelectors.isAtomOwned(state, fromAtomUri),
+          isCreateFromAtom,
+          isEditFromAtom,
+          isFromAtomLoading,
+          isFromAtomToLoad,
+          isFromAtomEditable: generalSelectors.isAtomEditable(
             state,
-            fromNeedUri
+            fromAtomUri
           ),
-          isFromNeedUsableAsTemplate: generalSelectors.isNeedUsableAsTemplate(
+          isFromAtomUsableAsTemplate: generalSelectors.isAtomUsableAsTemplate(
             state,
-            fromNeedUri
+            fromAtomUri
           ),
           isHoldable: useCaseUtils.isHoldable(useCase),
-          hasFromNeedFailedToLoad,
+          hasFromAtomFailedToLoad,
           personas: generalSelectors.getOwnedPersonas(state).toJS(),
           showCreateInput:
             useCase &&
             !(
-              isCreateFromNeed &&
-              isEditFromNeed &&
-              (isFromNeedLoading || hasFromNeedFailedToLoad || isFromNeedToLoad)
+              isCreateFromAtom &&
+              isEditFromAtom &&
+              (isFromAtomLoading || hasFromAtomFailedToLoad || isFromAtomToLoad)
             ),
         };
       };
@@ -263,8 +263,8 @@ function genComponentConf() {
       connect2Redux(selectFromState, actionCreators, [], this);
 
       this.$scope.$watch(
-        () => this.isFromNeedToLoad,
-        () => delay(0).then(() => this.ensureFromNeedIsLoaded())
+        () => this.isFromAtomToLoad,
+        () => delay(0).then(() => this.ensureFromAtomIsLoaded())
       );
 
       this.$scope.$watch(
@@ -273,9 +273,9 @@ function genComponentConf() {
       );
     }
 
-    ensureFromNeedIsLoaded() {
-      if (this.isFromNeedToLoad) {
-        this.needs__fetchUnloadedNeed(this.fromNeedUri);
+    ensureFromAtomIsLoaded() {
+      if (this.isFromAtomToLoad) {
+        this.atoms__fetchUnloadedAtom(this.fromAtomUri);
       }
     }
 
@@ -348,7 +348,7 @@ function genComponentConf() {
     }
 
     save() {
-      if (this.loggedIn && this.isFromNeedOwned) {
+      if (this.loggedIn && this.isFromAtomOwned) {
         this.draftObject.useCase = get(this.useCase, "identifier");
 
         if (!isBranchContentPresent(this.draftObject.content, true)) {
@@ -358,7 +358,7 @@ function genComponentConf() {
           delete this.draftObject.seeks;
         }
 
-        this.needs__edit(this.draftObject, this.fromNeed);
+        this.atoms__edit(this.draftObject, this.fromAtom);
       }
     }
 
@@ -368,13 +368,13 @@ function genComponentConf() {
         return;
       }
 
-      if (this.connectToNeedUri) {
-        const tempConnectToNeedUri = this.connectToNeedUri;
+      if (this.connectToAtomUri) {
+        const tempConnectToAtomUri = this.connectToAtomUri;
         const tempDraft = this.draftObject;
 
         if (this.loggedIn) {
-          this.connections__connectReactionNeed(
-            tempConnectToNeedUri,
+          this.connections__connectReactionAtom(
+            tempConnectToAtomUri,
             tempDraft,
             persona
           );
@@ -387,8 +387,8 @@ function genComponentConf() {
             Immutable.fromJS({
               acceptCallback: () => {
                 this.view__hideModalDialog();
-                this.connections__connectReactionNeed(
-                  tempConnectToNeedUri,
+                this.connections__connectReactionAtom(
+                  tempConnectToAtomUri,
                   tempDraft,
                   persona
                 );
@@ -419,13 +419,13 @@ function genComponentConf() {
           .getIn(["config", "defaultNodeUri"]);
 
         if (this.loggedIn) {
-          this.needs__create(tempDraft, persona, tempDefaultNodeUri);
+          this.atoms__create(tempDraft, persona, tempDefaultNodeUri);
         } else {
           this.view__showTermsDialog(
             Immutable.fromJS({
               acceptCallback: () => {
                 this.view__hideModalDialog();
-                this.needs__create(tempDraft, persona, tempDefaultNodeUri);
+                this.atoms__create(tempDraft, persona, tempDefaultNodeUri);
               },
               cancelCallback: () => {
                 this.view__hideModalDialog();
@@ -480,7 +480,7 @@ function mandatoryDetailsSet(isOrSeeks, useCaseBranchDetails) {
   return true;
 }
 
-export default //.controller('CreateNeedController', [...serviceDependencies, CreateNeedController])
+export default //.controller('CreateAtomController', [...serviceDependencies, CreateAtomController])
 angular
   .module("won.owner.components.createPost", [
     labelledHrModule,

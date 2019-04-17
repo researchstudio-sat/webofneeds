@@ -1,6 +1,6 @@
 import angular from "angular";
 import { attach } from "../../../utils.js";
-import needMapModule from "../../need-map.js";
+import atomMapModule from "../../atom-map.js";
 
 import "style/_travel-action-viewer.scss";
 
@@ -35,10 +35,10 @@ function genComponentConf() {
                    <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
                 </svg>
           </div>
-          <won-need-map
+          <won-atom-map
             locations="[self.content.get('fromLocation'), self.content.get('toLocation')]"
             ng-if="self.showMap && self.content && (self.content.get('fromLocation') || self.content.get('toLocation'))">
-          </won-need-map>
+          </won-atom-map>
         </div>
     `;
 
@@ -86,5 +86,5 @@ function genComponentConf() {
 }
 
 export default angular
-  .module("won.owner.components.travelActionViewer", [needMapModule])
+  .module("won.owner.components.travelActionViewer", [atomMapModule])
   .directive("wonTravelActionViewer", genComponentConf).name;

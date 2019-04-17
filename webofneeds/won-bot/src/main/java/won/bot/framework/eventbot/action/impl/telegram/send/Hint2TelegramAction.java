@@ -35,18 +35,18 @@ public class Hint2TelegramAction extends BaseEventBotAction {
             TelegramBotContextWrapper botContextWrapper = (TelegramBotContextWrapper) ctx.getBotContextWrapper();
             Match match = ((HintFromMatcherEvent) event).getMatch();
             WonMessage wonMessage = ((HintFromMatcherEvent) event).getWonMessage();
-            URI yourNeedUri = match.getFromNeed();
-            URI remoteNeedUri = match.getToNeed();
-            Long chatId = botContextWrapper.getChatIdForURI(yourNeedUri);
+            URI yourAtomUri = match.getFromAtom();
+            URI targetAtomUri = match.getToAtom();
+            Long chatId = botContextWrapper.getChatIdForURI(yourAtomUri);
             if (chatId == null) {
-                logger.error("No chatId found for the specified needUri");
+                logger.error("No chatId found for the specified atomUri");
                 return;
             }
             try {
                 Message message = wonTelegramBotHandler.sendMessage(wonTelegramBotHandler.getTelegramMessageGenerator()
-                                .getHintMessage(chatId, remoteNeedUri, yourNeedUri));
+                                .getHintMessage(chatId, targetAtomUri, yourAtomUri));
                 botContextWrapper.addMessageIdWonURIRelation(message.getMessageId(),
-                                new WonURI(wonMessage.getReceiverURI(), UriType.CONNECTION));
+                                new WonURI(wonMessage.getRecipientURI(), UriType.CONNECTION));
             } catch (TelegramApiException te) {
                 logger.error(te.getMessage());
             }

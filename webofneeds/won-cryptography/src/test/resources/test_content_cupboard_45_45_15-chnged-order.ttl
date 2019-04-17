@@ -1,23 +1,23 @@
-@prefix :    <http://www.example.com/resource/need/12> .
+@prefix :    <http://www.example.com/resource/atom/12> .
 @prefix dc:  <http://purl.org/dc/elements/1.1/> .
 @prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix geo:     <http://www.w3.org/2003/01/geo/wgs84_pos#> .
 @prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
 @prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-@prefix won:     <http://purl.org/webofneeds/model#> .
+@prefix won:     <https://w3id.org/won/core#> .
 @prefix gr:  <http://purl.org/goodrelations/v1#> .
 @prefix ldp:     <http://www.w3.org/ns/ldp#> .
 @prefix sp:  <http://spinrdf.org/sp#>.
 
-<http://www.example.com/resource/need/12>
-  a   won:Need ;
-  won:hasBasicNeedType
+<http://www.example.com/resource/atom/12>
+  a   won:Atom ;
+  won:hasBasicAtomType
       won:Supply ;
-  won:isInState won:Active ;
-  won:hasContent
-      [ a   won:NeedContent ;
+  won:atomState won:Active ;
+  won:content
+      [ a   won:AtomContent ;
         dc:title "small cupboard"^^xsd:string ;
-        won:hasContentDescription
+        won:contentDescription
         [ a   <http://dbpedia.org/resource/Cupboard> , gr:Individual ;
           gr:width
             [ a   gr:QuantitativeValueFloat ;
@@ -40,15 +40,15 @@
                 ]
         ]
       ] ;
-  won:hasNeedModality
-      [ a   won:NeedModality
+  won:atomModality
+      [ a   won:AtomModality
       ] ;
   won:matcherProtocolEndpoint
       <http://www.example.com/won/protocol/matcher> ;
-  won:needCreationDate
+  won:atomCreationDate
       "2013-09-25T10:49:54Z"^^xsd:dateTime ;
-  won:needProtocolEndpoint
-      <http://www.example.com/won/protocol/need> ;
+  won:atomProtocolEndpoint
+      <http://www.example.com/won/protocol/atom> ;
   won:ownerProtocolEndpoint
       <http://www.example.com/won/protocol/owner> .
 

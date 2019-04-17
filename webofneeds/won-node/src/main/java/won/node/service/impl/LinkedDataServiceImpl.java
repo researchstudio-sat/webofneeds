@@ -30,16 +30,16 @@ import org.springframework.transaction.annotation.Transactional;
 import won.cryptography.rdfsign.WonKeysReaderWriter;
 import won.cryptography.service.CryptographyService;
 import won.protocol.exception.NoSuchConnectionException;
-import won.protocol.exception.NoSuchNeedException;
+import won.protocol.exception.NoSuchAtomException;
 import won.protocol.message.WonMessageType;
 import won.protocol.model.*;
 import won.protocol.model.unread.UnreadMessageInfo;
-import won.protocol.model.unread.UnreadMessageInfoForNeed;
+import won.protocol.model.unread.UnreadMessageInfoForAtom;
 import won.protocol.repository.DatasetHolderRepository;
 import won.protocol.repository.MessageEventRepository;
-import won.protocol.repository.NeedRepository;
+import won.protocol.repository.AtomRepository;
 import won.protocol.service.LinkedDataService;
-import won.protocol.service.NeedInformationService;
+import won.protocol.service.AtomInformationService;
 import won.protocol.service.impl.UnreadInformationService;
 import won.protocol.util.DefaultPrefixUtils;
 import won.protocol.util.RdfUtils;
@@ -59,8 +59,8 @@ import java.util.stream.Collectors;
  */
 public class LinkedDataServiceImpl implements LinkedDataService {
     private final Logger logger = LoggerFactory.getLogger(getClass());
-    // prefix of a need resource
-    private String needResourceURIPrefix;
+    // prefix of an atom resource
+    private String atomResourceURIPrefix;
     // prefix of a connection resource
     private String connectionResourceURIPrefix;
     // prefix of a event resource
@@ -74,105 +74,105 @@ public class LinkedDataServiceImpl implements LinkedDataService {
     @Autowired
     private MessageEventRepository messageEventRepository;
     @Autowired
-    private NeedRepository needRepository;
+    private AtomRepository atomRepository;
     @Autowired
     private DatasetHolderRepository datasetHolderRepository;
     // TODO: used to access/create event URIs for connection model rendering. Could
     // be removed if events knew their URIs.
     private URIService uriService;
     @Autowired
-    private NeedModelMapper needModelMapper;
+    private AtomModelMapper atomModelMapper;
     @Autowired
     private ConnectionModelMapper connectionModelMapper;
     @Autowired
     private CryptographyService cryptographyService;
     @Autowired
     private UnreadInformationService unreadInformationService;
-    private String needProtocolEndpoint;
+    private String atomProtocolEndpoint;
     private String matcherProtocolEndpoint;
     private String ownerProtocolEndpoint;
-    private NeedInformationService needInformationService;
+    private AtomInformationService atomInformationService;
     private String activeMqEndpoint;
-    private String activeMqNeedProtcolQueueName;
+    private String activeMqAtomProtcolQueueName;
     private String activeMqOwnerProtcolQueueName;
     private String activeMqMatcherPrtotocolQueueName;
-    private String activeMqMatcherProtocolTopicNameNeedCreated;
-    private String activeMqMatcherProtocolTopicNameNeedActivated;
-    private String activeMqMatcherProtocolTopicNameNeedDeactivated;
-    private String activeMqMatcherProtocolTopicNameNeedDeleted;
+    private String activeMqMatcherProtocolTopicNameAtomCreated;
+    private String activeMqMatcherProtocolTopicNameAtomActivated;
+    private String activeMqMatcherProtocolTopicNameAtomDeactivated;
+    private String activeMqMatcherProtocolTopicNameAtomDeleted;
 
     @Transactional
-    public Dataset listNeedURIs() {
+    public Dataset listAtomURIs() {
         Model model = ModelFactory.createDefaultModel();
         setNsPrefixes(model);
-        Collection<URI> uris = needInformationService.listNeedURIs();
-        Resource needListPageResource = model.createResource(this.needResourceURIPrefix + "/");
-        for (URI needURI : uris) {
-            model.add(model.createStatement(needListPageResource, RDFS.member,
-                            model.createResource(needURI.toString())));
+        Collection<URI> uris = atomInformationService.listAtomURIs();
+        Resource atomListPageResource = model.createResource(this.atomResourceURIPrefix + "/");
+        for (URI atomURI : uris) {
+            model.add(model.createStatement(atomListPageResource, RDFS.member,
+                            model.createResource(atomURI.toString())));
         }
-        Dataset ret = newDatasetWithNamedModel(createDataGraphUriFromResource(needListPageResource), model);
+        Dataset ret = newDatasetWithNamedModel(createDataGraphUriFromResource(atomListPageResource), model);
         addBaseUriAndDefaultPrefixes(ret);
         return ret;
     }
 
     @Transactional
-    public NeedInformationService.PagedResource<Dataset, URI> listNeedURIs(final int pageNum) {
-        return listNeedURIs(pageNum, null, null);
+    public AtomInformationService.PagedResource<Dataset, URI> listAtomURIs(final int pageNum) {
+        return listAtomURIs(pageNum, null, null);
     }
 
     @Transactional
-    public NeedInformationService.PagedResource<Dataset, URI> listNeedURIsBefore(final URI need) {
-        return listNeedURIsBefore(need, null, null);
+    public AtomInformationService.PagedResource<Dataset, URI> listAtomURIsBefore(final URI atom) {
+        return listAtomURIsBefore(atom, null, null);
     }
 
     @Transactional
-    public NeedInformationService.PagedResource<Dataset, URI> listNeedURIsAfter(final URI need) {
-        return listNeedURIsAfter(need, null, null);
+    public AtomInformationService.PagedResource<Dataset, URI> listAtomURIsAfter(final URI atom) {
+        return listAtomURIsAfter(atom, null, null);
     }
 
     @Transactional
-    public NeedInformationService.PagedResource<Dataset, URI> listNeedURIs(final int pageNum,
-                    final Integer preferedSize, NeedState needState) {
-        Slice<URI> slice = needInformationService.listNeedURIs(pageNum, preferedSize, needState);
-        return toContainerPage(this.needResourceURIPrefix + "/", slice);
+    public AtomInformationService.PagedResource<Dataset, URI> listAtomURIs(final int pageNum,
+                    final Integer preferedSize, AtomState atomState) {
+        Slice<URI> slice = atomInformationService.listAtomURIs(pageNum, preferedSize, atomState);
+        return toContainerPage(this.atomResourceURIPrefix + "/", slice);
     }
 
     @Transactional
-    public NeedInformationService.PagedResource<Dataset, URI> listNeedURIsBefore(final URI need,
-                    final Integer preferedSize, NeedState needState) {
-        Slice<URI> slice = needInformationService.listNeedURIsBefore(need, preferedSize, needState);
-        return toContainerPage(this.needResourceURIPrefix + "/", slice);
+    public AtomInformationService.PagedResource<Dataset, URI> listAtomURIsBefore(final URI atom,
+                    final Integer preferedSize, AtomState atomState) {
+        Slice<URI> slice = atomInformationService.listAtomURIsBefore(atom, preferedSize, atomState);
+        return toContainerPage(this.atomResourceURIPrefix + "/", slice);
     }
 
     @Transactional
-    public NeedInformationService.PagedResource<Dataset, URI> listNeedURIsAfter(final URI need,
-                    final Integer preferedSize, NeedState needState) {
-        Slice<URI> slice = needInformationService.listNeedURIsAfter(need, preferedSize, needState);
-        return toContainerPage(this.needResourceURIPrefix + "/", slice);
+    public AtomInformationService.PagedResource<Dataset, URI> listAtomURIsAfter(final URI atom,
+                    final Integer preferedSize, AtomState atomState) {
+        Slice<URI> slice = atomInformationService.listAtomURIsAfter(atom, preferedSize, atomState);
+        return toContainerPage(this.atomResourceURIPrefix + "/", slice);
     }
 
     @Transactional
-    public Dataset listModifiedNeedURIsAfter(Date modifiedDate) {
+    public Dataset listModifiedAtomURIsAfter(Date modifiedDate) {
         Model model = ModelFactory.createDefaultModel();
         setNsPrefixes(model);
-        Collection<URI> uris = needInformationService.listModifiedNeedURIsAfter(modifiedDate);
-        Resource needListPageResource = model.createResource(this.needResourceURIPrefix + "/");
-        for (URI needURI : uris) {
-            model.add(model.createStatement(needListPageResource, RDFS.member,
-                            model.createResource(needURI.toString())));
+        Collection<URI> uris = atomInformationService.listModifiedAtomURIsAfter(modifiedDate);
+        Resource atomListPageResource = model.createResource(this.atomResourceURIPrefix + "/");
+        for (URI atomURI : uris) {
+            model.add(model.createStatement(atomListPageResource, RDFS.member,
+                            model.createResource(atomURI.toString())));
         }
-        Dataset ret = newDatasetWithNamedModel(createDataGraphUriFromResource(needListPageResource), model);
+        Dataset ret = newDatasetWithNamedModel(createDataGraphUriFromResource(atomListPageResource), model);
         addBaseUriAndDefaultPrefixes(ret);
         return ret;
     }
 
     @Transactional
-    public DataWithEtag<Dataset> getNeedDataset(final URI needUri, String etag) {
-        DataWithEtag<Need> data;
+    public DataWithEtag<Dataset> getAtomDataset(final URI atomUri, String etag) {
+        DataWithEtag<Atom> data;
         try {
-            data = needInformationService.readNeed(needUri, etag);
-        } catch (NoSuchNeedException e) {
+            data = atomInformationService.readAtom(atomUri, etag);
+        } catch (NoSuchAtomException e) {
             return DataWithEtag.dataNotFound();
         }
         if (data.isNotFound()) {
@@ -181,61 +181,61 @@ public class LinkedDataServiceImpl implements LinkedDataService {
         if (!data.isChanged()) {
             return DataWithEtag.dataNotChanged(data);
         }
-        Need need = data.getData();
+        Atom atom = data.getData();
         String newEtag = data.getEtag();
         // load the dataset from storage
-        boolean isDeleted = (need.getState() == NeedState.DELETED);
-        Dataset dataset = isDeleted ? DatasetFactory.createGeneral() : need.getDatatsetHolder().getDataset();
-        Model metaModel = needModelMapper.toModel(need);
-        Resource needResource = metaModel.getResource(needUri.toString());
-        String needMetaInformationURI = uriService.createNeedSysInfoGraphURI(needUri).toString();
-        Resource needMetaInformationResource = metaModel.getResource(needMetaInformationURI);
-        // link needMetaInformationURI to need via rdfg:subGraphOf
-        needMetaInformationResource.addProperty(RDFG.SUBGRAPH_OF, needResource);
+        boolean isDeleted = (atom.getState() == AtomState.DELETED);
+        Dataset dataset = isDeleted ? DatasetFactory.createGeneral() : atom.getDatatsetHolder().getDataset();
+        Model metaModel = atomModelMapper.toModel(atom);
+        Resource atomResource = metaModel.getResource(atomUri.toString());
+        String atomMetaInformationURI = uriService.createAtomSysInfoGraphURI(atomUri).toString();
+        Resource atomMetaInformationResource = metaModel.getResource(atomMetaInformationURI);
+        // link atomMetaInformationURI to atom via rdfg:subGraphOf
+        atomMetaInformationResource.addProperty(RDFG.SUBGRAPH_OF, atomResource);
         // add connections
-        Resource connectionsContainer = metaModel.createResource(need.getNeedURI().toString() + "/connections");
-        metaModel.add(metaModel.createStatement(needResource, WON.HAS_CONNECTIONS, connectionsContainer));
-        // add need event container
-        Resource needEventContainer = metaModel.createResource(need.getNeedURI().toString() + "#events",
-                        WON.EVENT_CONTAINER);
-        metaModel.add(metaModel.createStatement(needResource, WON.HAS_EVENT_CONTAINER, needEventContainer));
-        // add need event URIs
-        Collection<MessageEventPlaceholder> messageEvents = need.getEventContainer().getEvents();
+        Resource connectionsContainer = metaModel.createResource(atom.getAtomURI().toString() + "/connections");
+        metaModel.add(metaModel.createStatement(atomResource, WON.connections, connectionsContainer));
+        // add atom event container
+        Resource atomMessageContainer = metaModel.createResource(atom.getAtomURI().toString() + "#events",
+                        WON.MessageContainer);
+        metaModel.add(metaModel.createStatement(atomResource, WON.messageContainer, atomMessageContainer));
+        // add atom event URIs
+        Collection<MessageEventPlaceholder> messageEvents = atom.getMessageContainer().getEvents();
         for (MessageEventPlaceholder messageEvent : messageEvents) {
-            metaModel.add(metaModel.createStatement(needEventContainer, RDFS.member,
+            metaModel.add(metaModel.createStatement(atomMessageContainer, RDFS.member,
                             metaModel.getResource(messageEvent.getMessageURI().toString())));
         }
         // add WON node link
-        needResource.addProperty(WON.HAS_WON_NODE, metaModel.createResource(this.resourceURIPrefix));
-        // link all need graphs taken from the create message to need uri:
+        atomResource.addProperty(WON.wonNode, metaModel.createResource(this.resourceURIPrefix));
+        // link all atom graphs taken from the create message to atom uri:
         Iterator<String> namesIt = dataset.listNames();
         while (namesIt.hasNext()) {
             String name = namesIt.next();
-            Resource needGraphResource = metaModel.getResource(name);
-            needResource.addProperty(WON.HAS_CONTENT_GRAPH, needGraphResource);
+            Resource atomGraphResource = metaModel.getResource(name);
+            atomResource.addProperty(WON.contentGraph, atomGraphResource);
         }
         // add meta model to dataset
-        dataset.addNamedModel(needMetaInformationURI, metaModel);
+        dataset.addNamedModel(atomMetaInformationURI, metaModel);
         addBaseUriAndDefaultPrefixes(dataset);
         return new DataWithEtag<>(dataset, newEtag, etag, isDeleted);
     }
 
     @Override
     @Transactional
-    public Dataset getNeedDataset(final URI needUri, boolean deep, Integer deepLayerSize)
-                    throws NoSuchNeedException, NoSuchConnectionException, NoSuchMessageException {
-        Dataset dataset = getNeedDataset(needUri, null).getData();
+    public Dataset getAtomDataset(final URI atomUri, boolean deep, Integer deepLayerSize)
+                    throws NoSuchAtomException, NoSuchConnectionException, NoSuchMessageException {
+        Dataset dataset = getAtomDataset(atomUri, null).getData();
         if (deep) {
-            Need need = needInformationService.readNeed(needUri);
-            if (need.getState() == NeedState.ACTIVE) {
-                // only add deep data if need is active
-                Slice<URI> slice = needInformationService.listConnectionURIs(needUri, 1, deepLayerSize, null, null);
-                NeedInformationService.PagedResource<Dataset, URI> connectionsResource = toContainerPage(
-                                this.uriService.createConnectionsURIForNeed(needUri).toString(), slice);
+            Atom atom = atomInformationService.readAtom(atomUri);
+            if (atom.getState() == AtomState.ACTIVE) {
+                // only add deep data if atom is active
+                Slice<URI> slice = atomInformationService.listConnectionURIs(atomUri, 1, deepLayerSize, null, null);
+                AtomInformationService.PagedResource<Dataset, URI> connectionsResource = toContainerPage(
+                                this.uriService.createConnectionsURIForAtom(atomUri).toString(), slice);
                 addDeepConnectionData(connectionsResource.getContent(), slice.getContent());
                 RdfUtils.addDatasetToDataset(dataset, connectionsResource.getContent());
                 for (URI connectionUri : slice.getContent()) {
-                    NeedInformationService.PagedResource<Dataset, URI> eventsResource = listConnectionEventURIs(
+                    AtomInformationService.PagedResource<Dataset, URI> eventsResource = listConnectionEventURIs(
                                     connectionUri, 1, deepLayerSize, null, true);
                     RdfUtils.addDatasetToDataset(dataset, eventsResource.getContent());
                 }
@@ -246,20 +246,20 @@ public class LinkedDataServiceImpl implements LinkedDataService {
 
     @Override
     @Transactional
-    public Model getUnreadInformationForNeed(URI needURI, Collection<URI> lastSeenMessageURIs) {
-        UnreadMessageInfoForNeed unreadInfo = this.unreadInformationService.getUnreadInformation(needURI,
+    public Model getUnreadInformationForAtom(URI atomURI, Collection<URI> lastSeenMessageURIs) {
+        UnreadMessageInfoForAtom unreadInfo = this.unreadInformationService.getUnreadInformation(atomURI,
                         lastSeenMessageURIs);
         Model ret = ModelFactory.createDefaultModel();
-        Resource needRes = ret.createResource(needURI.toString());
-        addUnreadInfoWithProperty(ret, needRes, WON.HAS_UNREAD_SUGGESTED,
+        Resource atomRes = ret.createResource(atomURI.toString());
+        addUnreadInfoWithProperty(ret, atomRes, WON.unreadSuggested,
                         unreadInfo.getUnreadInfoByConnectionState().get(ConnectionState.SUGGESTED));
-        addUnreadInfoWithProperty(ret, needRes, WON.HAS_UNREAD_CONNECTED,
+        addUnreadInfoWithProperty(ret, atomRes, WON.unreadConnected,
                         unreadInfo.getUnreadInfoByConnectionState().get(ConnectionState.CONNECTED));
-        addUnreadInfoWithProperty(ret, needRes, WON.HAS_UNREAD_REQUEST_SENT,
+        addUnreadInfoWithProperty(ret, atomRes, WON.unreadRequestSent,
                         unreadInfo.getUnreadInfoByConnectionState().get(ConnectionState.REQUEST_SENT));
-        addUnreadInfoWithProperty(ret, needRes, WON.HAS_UNREAD_REQUEST_RECEIVED,
+        addUnreadInfoWithProperty(ret, atomRes, WON.unreadRequestReceived,
                         unreadInfo.getUnreadInfoByConnectionState().get(ConnectionState.REQUEST_RECEIVED));
-        addUnreadInfoWithProperty(ret, needRes, WON.HAS_UNREAD_CLOSED,
+        addUnreadInfoWithProperty(ret, atomRes, WON.unreadClosed,
                         unreadInfo.getUnreadInfoByConnectionState().get(ConnectionState.CLOSED));
         unreadInfo.getUnreadMessageInfoForConnections().forEach(info -> {
             Resource connRes = ret.createResource(info.getConnectionURI().toString());
@@ -277,9 +277,9 @@ public class LinkedDataServiceImpl implements LinkedDataService {
                 subject.addProperty(property, node);
                 subject = node;
             }
-            subject.addLiteral(WON.HAS_UNREAD_COUNT, info.getCount());
-            subject.addLiteral(WON.HAS_UNREAD_OLDEST_TIMESTAMP, info.getOldestTimestamp().getTime());
-            subject.addLiteral(WON.HAS_UNREAD_NEWEST_TIMESTAMP, info.getNewestTimestamp().getTime());
+            subject.addLiteral(WON.unreadCount, info.getCount());
+            subject.addLiteral(WON.unreadOldestTimestamp, info.getOldestTimestamp().getTime());
+            subject.addLiteral(WON.unreadNewestTimestamp, info.getNewestTimestamp().getTime());
         }
     }
 
@@ -288,7 +288,7 @@ public class LinkedDataServiceImpl implements LinkedDataService {
         Model model = ModelFactory.createDefaultModel();
         setNsPrefixes(model);
         Resource showNodePageResource = model.createResource(this.resourceURIPrefix);
-        addNeedList(model, showNodePageResource);
+        addAtomList(model, showNodePageResource);
         addProtocolEndpoints(model, showNodePageResource);
         Dataset ret = newDatasetWithNamedModel(createDataGraphUriFromResource(showNodePageResource), model);
         addBaseUriAndDefaultPrefixes(ret);
@@ -296,8 +296,8 @@ public class LinkedDataServiceImpl implements LinkedDataService {
         return ret;
     }
 
-    private void addNeedList(Model model, Resource res) {
-        res.addProperty(WON.HAS_NEED_LIST, model.createResource(this.needResourceURIPrefix));
+    private void addAtomList(Model model, Resource res) {
+        res.addProperty(WON.atomList, model.createResource(this.atomResourceURIPrefix));
     }
 
     private void addPublicKey(Model model, Resource res) {
@@ -309,32 +309,31 @@ public class LinkedDataServiceImpl implements LinkedDataService {
         }
     }
 
-    // TODO: protocol endpoint specification in RDF model needs refactoring!
+    // TODO: protocol endpoint specification in RDF model atoms refactoring!
     private void addProtocolEndpoints(Model model, Resource res) {
         Resource blankNodeActiveMq = model.createResource();
-        res.addProperty(WON.SUPPORTS_WON_PROTOCOL_IMPL, blankNodeActiveMq);
-        blankNodeActiveMq.addProperty(RDF.type, WON.WON_OVER_ACTIVE_MQ)
-                        .addProperty(WON.HAS_BROKER_URI, model.createResource(this.activeMqEndpoint))
-                        .addProperty(WON.HAS_ACTIVEMQ_OWNER_PROTOCOL_QUEUE_NAME, this.activeMqOwnerProtcolQueueName,
+        res.addProperty(WON.supportsWonProtocolImpl, blankNodeActiveMq);
+        blankNodeActiveMq.addProperty(RDF.type, WON.WonOverActiveMq)
+                        .addProperty(WON.brokerUri, model.createResource(this.activeMqEndpoint))
+                        .addProperty(WON.activeMQOwnerProtocolQueueName, this.activeMqOwnerProtcolQueueName,
                                         XSDDatatype.XSDstring)
-                        .addProperty(WON.HAS_ACTIVEMQ_NEED_PROTOCOL_QUEUE_NAME, this.activeMqNeedProtcolQueueName,
+                        .addProperty(WON.activeMQAtomProtocolQueueName, this.activeMqAtomProtcolQueueName,
                                         XSDDatatype.XSDstring)
-                        .addProperty(WON.HAS_ACTIVEMQ_MATCHER_PROTOCOL_QUEUE_NAME,
-                                        this.activeMqMatcherPrtotocolQueueName, XSDDatatype.XSDstring)
-                        .addProperty(WON.HAS_ACTIVEMQ_MATCHER_PROTOCOL_OUT_NEED_ACTIVATED_TOPIC_NAME,
-                                        this.activeMqMatcherProtocolTopicNameNeedActivated, XSDDatatype.XSDstring)
-                        .addProperty(WON.HAS_ACTIVEMQ_MATCHER_PROTOCOL_OUT_NEED_DEACTIVATED_TOPIC_NAME,
-                                        this.activeMqMatcherProtocolTopicNameNeedDeactivated, XSDDatatype.XSDstring)
-                        .addProperty(WON.HAS_ACTIVEMQ_MATCHER_PROTOCOL_OUT_NEED_DELETED_TOPIC_NAME,
-                                        this.activeMqMatcherProtocolTopicNameNeedDeleted, XSDDatatype.XSDstring)
-                        .addProperty(WON.HAS_ACTIVEMQ_MATCHER_PROTOCOL_OUT_NEED_CREATED_TOPIC_NAME,
-                                        this.activeMqMatcherProtocolTopicNameNeedCreated, XSDDatatype.XSDstring);
+                        .addProperty(WON.activeMQMatcherProtocolQueueName, this.activeMqMatcherPrtotocolQueueName,
+                                        XSDDatatype.XSDstring)
+                        .addProperty(WON.activeMQMatcherProtocolOutAtomActivatedTopicName,
+                                        this.activeMqMatcherProtocolTopicNameAtomActivated, XSDDatatype.XSDstring)
+                        .addProperty(WON.activeMQMatcherProtocolOutAtomDeactivatedTopicName,
+                                        this.activeMqMatcherProtocolTopicNameAtomDeactivated, XSDDatatype.XSDstring)
+                        .addProperty(WON.activeMQMatcherProtocolOutAtomDeletedTopicName,
+                                        this.activeMqMatcherProtocolTopicNameAtomDeleted, XSDDatatype.XSDstring)
+                        .addProperty(WON.activeMQMatcherProtocolOutAtomCreatedTopicName,
+                                        this.activeMqMatcherProtocolTopicNameAtomCreated, XSDDatatype.XSDstring);
         Resource blankNodeUriSpec = model.createResource();
-        res.addProperty(WON.HAS_URI_PATTERN_SPECIFICATION, blankNodeUriSpec);
-        blankNodeUriSpec.addProperty(WON.HAS_NEED_URI_PREFIX, model.createLiteral(this.needResourceURIPrefix));
-        blankNodeUriSpec.addProperty(WON.HAS_CONNECTION_URI_PREFIX,
-                        model.createLiteral(this.connectionResourceURIPrefix));
-        blankNodeUriSpec.addProperty(WON.HAS_EVENT_URI_PREFIX, model.createLiteral(this.eventResourceURIPrefix));
+        res.addProperty(WON.uriPrefixSpecification, blankNodeUriSpec);
+        blankNodeUriSpec.addProperty(WON.atomUriPrefix, model.createLiteral(this.atomResourceURIPrefix));
+        blankNodeUriSpec.addProperty(WON.connectionUriPrefix, model.createLiteral(this.connectionResourceURIPrefix));
+        blankNodeUriSpec.addProperty(WON.eventUriPrefix, model.createLiteral(this.eventResourceURIPrefix));
     }
 
     /**
@@ -342,16 +341,16 @@ public class LinkedDataServiceImpl implements LinkedDataService {
      * account new events, only changes to the connection itself.
      *
      * @param connectionUri
-     * @param includeEventContainer
-     * @param includeEventContainer
+     * @param includeMessageContainer
+     * @param includeMessageContainer
      * @param etag
      * @return
      */
     @Override
     @Transactional
-    public DataWithEtag<Dataset> getConnectionDataset(final URI connectionUri, final boolean includeEventContainer,
+    public DataWithEtag<Dataset> getConnectionDataset(final URI connectionUri, final boolean includeMessageContainer,
                     final String etag) {
-        DataWithEtag<Connection> data = needInformationService.readConnection(connectionUri, etag);
+        DataWithEtag<Connection> data = atomInformationService.readConnection(connectionUri, etag);
         if (data.isNotFound()) {
             return DataWithEtag.dataNotFound();
         }
@@ -375,12 +374,12 @@ public class LinkedDataServiceImpl implements LinkedDataService {
         // create connection member
         Resource connectionResource = model.getResource(connection.getConnectionURI().toString());
         // add WON node link
-        connectionResource.addProperty(WON.HAS_WON_NODE, model.createResource(this.resourceURIPrefix));
-        if (includeEventContainer) {
+        connectionResource.addProperty(WON.wonNode, model.createResource(this.resourceURIPrefix));
+        if (includeMessageContainer) {
             // create event container and attach it to the member
-            Resource eventContainer = model.createResource(connection.getConnectionURI().toString() + "/events");
-            connectionResource.addProperty(WON.HAS_EVENT_CONTAINER, eventContainer);
-            eventContainer.addProperty(RDF.type, WON.EVENT_CONTAINER);
+            Resource messageContainer = model.createResource(connection.getConnectionURI().toString() + "/events");
+            connectionResource.addProperty(WON.messageContainer, messageContainer);
+            messageContainer.addProperty(RDF.type, WON.MessageContainer);
             DatasetHolder datasetHolder = connection.getDatasetHolder();
             if (datasetHolder != null) {
                 addAdditionalData(model, datasetHolder.getDataset().getDefaultModel(), connectionResource);
@@ -393,10 +392,10 @@ public class LinkedDataServiceImpl implements LinkedDataService {
 
     @Override
     @Transactional
-    public NeedInformationService.PagedResource<Dataset, Connection> listConnections(final boolean deep)
+    public AtomInformationService.PagedResource<Dataset, Connection> listConnections(final boolean deep)
                     throws NoSuchConnectionException {
-        List<Connection> connections = new ArrayList<>(needInformationService.listConnections());
-        NeedInformationService.PagedResource<Dataset, Connection> connectionsContainerPage = toConnectionsContainerPage(
+        List<Connection> connections = new ArrayList<>(atomInformationService.listConnections());
+        AtomInformationService.PagedResource<Dataset, Connection> connectionsContainerPage = toConnectionsContainerPage(
                         this.connectionResourceURIPrefix + "/", new SliceImpl<>(connections));
         if (deep) {
             List<URI> uris = connections.stream().map(Connection::getConnectionURI).collect(Collectors.toList());
@@ -407,11 +406,11 @@ public class LinkedDataServiceImpl implements LinkedDataService {
 
     @Override
     @Transactional
-    public NeedInformationService.PagedResource<Dataset, Connection> listModifiedConnectionsAfter(Date modifiedAfter,
+    public AtomInformationService.PagedResource<Dataset, Connection> listModifiedConnectionsAfter(Date modifiedAfter,
                     boolean deep) throws NoSuchConnectionException {
         List<Connection> connections = new ArrayList<>(
-                        needInformationService.listModifiedConnectionsAfter(modifiedAfter));
-        NeedInformationService.PagedResource<Dataset, Connection> connectionsContainerPage = toConnectionsContainerPage(
+                        atomInformationService.listModifiedConnectionsAfter(modifiedAfter));
+        AtomInformationService.PagedResource<Dataset, Connection> connectionsContainerPage = toConnectionsContainerPage(
                         this.connectionResourceURIPrefix + "/", new SliceImpl<>(connections));
         if (deep) {
             List<URI> uris = connections.stream().map(Connection::getConnectionURI).collect(Collectors.toList());
@@ -422,10 +421,10 @@ public class LinkedDataServiceImpl implements LinkedDataService {
 
     @Override
     @Transactional
-    public NeedInformationService.PagedResource<Dataset, Connection> listConnections(final int page,
+    public AtomInformationService.PagedResource<Dataset, Connection> listConnections(final int page,
                     final Integer preferredSize, Date timeSpot, final boolean deep) throws NoSuchConnectionException {
-        Slice<Connection> slice = needInformationService.listConnections(page, preferredSize, timeSpot);
-        NeedInformationService.PagedResource<Dataset, Connection> connectionsContainerPage = toConnectionsContainerPage(
+        Slice<Connection> slice = atomInformationService.listConnections(page, preferredSize, timeSpot);
+        AtomInformationService.PagedResource<Dataset, Connection> connectionsContainerPage = toConnectionsContainerPage(
                         this.connectionResourceURIPrefix + "/", slice);
         if (deep) {
             List<URI> uris = slice.getContent().stream().map(Connection::getConnectionURI).collect(Collectors.toList());
@@ -436,10 +435,10 @@ public class LinkedDataServiceImpl implements LinkedDataService {
 
     @Override
     @Transactional
-    public NeedInformationService.PagedResource<Dataset, Connection> listConnectionsBefore(URI beforeConnURI,
+    public AtomInformationService.PagedResource<Dataset, Connection> listConnectionsBefore(URI beforeConnURI,
                     final Integer preferredSize, Date timeSpot, boolean deep) throws NoSuchConnectionException {
-        Slice<Connection> slice = needInformationService.listConnectionsBefore(beforeConnURI, preferredSize, timeSpot);
-        NeedInformationService.PagedResource<Dataset, Connection> connectionsContainerPage = toConnectionsContainerPage(
+        Slice<Connection> slice = atomInformationService.listConnectionsBefore(beforeConnURI, preferredSize, timeSpot);
+        AtomInformationService.PagedResource<Dataset, Connection> connectionsContainerPage = toConnectionsContainerPage(
                         this.connectionResourceURIPrefix + "/", slice);
         if (deep) {
             List<URI> uris = slice.getContent().stream().map(Connection::getConnectionURI).collect(Collectors.toList());
@@ -450,10 +449,10 @@ public class LinkedDataServiceImpl implements LinkedDataService {
 
     @Override
     @Transactional
-    public NeedInformationService.PagedResource<Dataset, Connection> listConnectionsAfter(URI afterConnURI,
+    public AtomInformationService.PagedResource<Dataset, Connection> listConnectionsAfter(URI afterConnURI,
                     final Integer preferredSize, Date timeSpot, boolean deep) throws NoSuchConnectionException {
-        Slice<Connection> slice = needInformationService.listConnectionsAfter(afterConnURI, preferredSize, timeSpot);
-        NeedInformationService.PagedResource<Dataset, Connection> connectionsContainerPage = toConnectionsContainerPage(
+        Slice<Connection> slice = atomInformationService.listConnectionsAfter(afterConnURI, preferredSize, timeSpot);
+        AtomInformationService.PagedResource<Dataset, Connection> connectionsContainerPage = toConnectionsContainerPage(
                         this.connectionResourceURIPrefix + "/", slice);
         if (deep) {
             List<URI> uris = slice.getContent().stream().map(Connection::getConnectionURI).collect(Collectors.toList());
@@ -464,87 +463,87 @@ public class LinkedDataServiceImpl implements LinkedDataService {
 
     @Override
     @Transactional
-    public NeedInformationService.PagedResource<Dataset, Connection> listConnections(final URI needURI, boolean deep,
-                    boolean addMetadata) throws NoSuchNeedException, NoSuchConnectionException {
-        List<Connection> connections = new ArrayList<>(needInformationService.listConnections(needURI));
-        URI connectionsUri = this.uriService.createConnectionsURIForNeed(needURI);
-        NeedInformationService.PagedResource<Dataset, Connection> connectionsContainerPage = toConnectionsContainerPage(
+    public AtomInformationService.PagedResource<Dataset, Connection> listConnections(final URI atomURI, boolean deep,
+                    boolean addMetadata) throws NoSuchAtomException, NoSuchConnectionException {
+        List<Connection> connections = new ArrayList<>(atomInformationService.listConnections(atomURI));
+        URI connectionsUri = this.uriService.createConnectionsURIForAtom(atomURI);
+        AtomInformationService.PagedResource<Dataset, Connection> connectionsContainerPage = toConnectionsContainerPage(
                         connectionsUri.toString(), new SliceImpl<>(connections));
         if (deep) {
             List<URI> uris = connections.stream().map(Connection::getConnectionURI).collect(Collectors.toList());
             addDeepConnectionData(connectionsContainerPage.getContent(), uris);
         }
         if (addMetadata) {
-            addConnectionMetadata(connectionsContainerPage.getContent(), needURI, connectionsUri);
+            addConnectionMetadata(connectionsContainerPage.getContent(), atomURI, connectionsUri);
         }
         return connectionsContainerPage;
     }
 
     @Override
     @Transactional
-    public NeedInformationService.PagedResource<Dataset, Connection> listConnections(final int page, final URI needURI,
+    public AtomInformationService.PagedResource<Dataset, Connection> listConnections(final int page, final URI atomURI,
                     final Integer preferredSize, final WonMessageType messageType, final Date timeSpot, boolean deep,
-                    boolean addMetadata) throws NoSuchNeedException, NoSuchConnectionException {
-        Slice<Connection> slice = needInformationService.listConnections(needURI, page, preferredSize, messageType,
+                    boolean addMetadata) throws NoSuchAtomException, NoSuchConnectionException {
+        Slice<Connection> slice = atomInformationService.listConnections(atomURI, page, preferredSize, messageType,
                         timeSpot);
-        URI connectionsUri = this.uriService.createConnectionsURIForNeed(needURI);
-        NeedInformationService.PagedResource<Dataset, Connection> connectionsContainerPage = toConnectionsContainerPage(
+        URI connectionsUri = this.uriService.createConnectionsURIForAtom(atomURI);
+        AtomInformationService.PagedResource<Dataset, Connection> connectionsContainerPage = toConnectionsContainerPage(
                         connectionsUri.toString(), slice);
         if (deep) {
             List<URI> uris = slice.getContent().stream().map(Connection::getConnectionURI).collect(Collectors.toList());
             addDeepConnectionData(connectionsContainerPage.getContent(), uris);
         }
         if (addMetadata) {
-            addConnectionMetadata(connectionsContainerPage.getContent(), needURI, connectionsUri);
+            addConnectionMetadata(connectionsContainerPage.getContent(), atomURI, connectionsUri);
         }
         return connectionsContainerPage;
     }
 
     @Override
     @Transactional
-    public NeedInformationService.PagedResource<Dataset, Connection> listConnectionsBefore(final URI needURI,
+    public AtomInformationService.PagedResource<Dataset, Connection> listConnectionsBefore(final URI atomURI,
                     URI beforeEventURI, final Integer preferredSize, final WonMessageType messageType,
                     final Date timeSpot, boolean deep, boolean addMetadata)
-                    throws NoSuchNeedException, NoSuchConnectionException {
-        Slice<Connection> slice = needInformationService.listConnectionsBefore(needURI, beforeEventURI, preferredSize,
+                    throws NoSuchAtomException, NoSuchConnectionException {
+        Slice<Connection> slice = atomInformationService.listConnectionsBefore(atomURI, beforeEventURI, preferredSize,
                         messageType, timeSpot);
-        URI connectionsUri = this.uriService.createConnectionsURIForNeed(needURI);
-        NeedInformationService.PagedResource<Dataset, Connection> connectionsContainerPage = toConnectionsContainerPage(
+        URI connectionsUri = this.uriService.createConnectionsURIForAtom(atomURI);
+        AtomInformationService.PagedResource<Dataset, Connection> connectionsContainerPage = toConnectionsContainerPage(
                         connectionsUri.toString(), slice);
         if (deep) {
             List<URI> uris = slice.getContent().stream().map(Connection::getConnectionURI).collect(Collectors.toList());
             addDeepConnectionData(connectionsContainerPage.getContent(), uris);
         }
         if (addMetadata) {
-            addConnectionMetadata(connectionsContainerPage.getContent(), needURI, connectionsUri);
+            addConnectionMetadata(connectionsContainerPage.getContent(), atomURI, connectionsUri);
         }
         return connectionsContainerPage;
     }
 
     @Override
     @Transactional
-    public NeedInformationService.PagedResource<Dataset, Connection> listConnectionsAfter(final URI needURI,
+    public AtomInformationService.PagedResource<Dataset, Connection> listConnectionsAfter(final URI atomURI,
                     URI resumeConnURI, final Integer preferredSize, final WonMessageType messageType,
                     final Date timeSpot, boolean deep, boolean addMetadata)
-                    throws NoSuchNeedException, NoSuchConnectionException {
-        Slice<Connection> slice = needInformationService.listConnectionsAfter(needURI, resumeConnURI, preferredSize,
+                    throws NoSuchAtomException, NoSuchConnectionException {
+        Slice<Connection> slice = atomInformationService.listConnectionsAfter(atomURI, resumeConnURI, preferredSize,
                         messageType, timeSpot);
-        URI connectionsUri = this.uriService.createConnectionsURIForNeed(needURI);
-        NeedInformationService.PagedResource<Dataset, Connection> connectionsContainerPage = toConnectionsContainerPage(
+        URI connectionsUri = this.uriService.createConnectionsURIForAtom(atomURI);
+        AtomInformationService.PagedResource<Dataset, Connection> connectionsContainerPage = toConnectionsContainerPage(
                         connectionsUri.toString(), slice);
         if (deep) {
             List<URI> uris = slice.getContent().stream().map(Connection::getConnectionURI).collect(Collectors.toList());
             addDeepConnectionData(connectionsContainerPage.getContent(), uris);
         }
         if (addMetadata) {
-            addConnectionMetadata(connectionsContainerPage.getContent(), needURI, connectionsUri);
+            addConnectionMetadata(connectionsContainerPage.getContent(), atomURI, connectionsUri);
         }
         return connectionsContainerPage;
     }
 
-    private void addConnectionMetadata(final Dataset content, URI needURI, URI containerURI) {
+    private void addConnectionMetadata(final Dataset content, URI atomURI, URI containerURI) {
         Model model = content.getNamedModel(createDataGraphUriFromUri(containerURI));
-        List<Object[]> connectionCountsPerState = needRepository.getCountsPerConnectionState(needURI);
+        List<Object[]> connectionCountsPerState = atomRepository.getCountsPerConnectionState(atomURI);
         Resource containerResource = model.getResource(containerURI.toString());
         for (Object[] countForState : connectionCountsPerState) {
             ConnectionState stateName = (ConnectionState) countForState[0];
@@ -561,17 +560,17 @@ public class LinkedDataServiceImpl implements LinkedDataService {
     private Property getRdfPropertyForState(ConnectionState state) {
         switch (state) {
             case SUGGESTED:
-                return WON.HAS_SUGGESTED_COUNT;
+                return WON.suggestedCount;
             case REQUEST_RECEIVED:
-                return WON.HAS_REQUEST_RECEIVED_COUNT;
+                return WON.requestReceivedCount;
             case REQUEST_SENT:
-                return WON.HAS_REQUEST_SENT_COUNT;
+                return WON.requestSentCount;
             case CONNECTED:
-                return WON.HAS_CONNECTED_COUNT;
+                return WON.connectedCount;
             case CLOSED:
-                return WON.HAS_CLOSED_COUNT;
+                return WON.closedCount;
             case DELETED:
-                return WON.HAS_DELETED_COUNT;
+                return WON.deletedCount;
         }
         return null;
     }
@@ -581,16 +580,16 @@ public class LinkedDataServiceImpl implements LinkedDataService {
     public Dataset listConnectionEventURIs(final URI connectionUri, boolean deep) throws NoSuchConnectionException {
         Model model = ModelFactory.createDefaultModel();
         setNsPrefixes(model);
-        Connection connection = needInformationService.readConnection(connectionUri);
-        Resource eventContainer = model.createResource(connection.getConnectionURI().toString() + "/events",
-                        WON.EVENT_CONTAINER);
+        Connection connection = atomInformationService.readConnection(connectionUri);
+        Resource messageContainer = model.createResource(connection.getConnectionURI().toString() + "/events",
+                        WON.MessageContainer);
         // add the events with the new format (only the URI, no content)
         List<MessageEventPlaceholder> connectionEvents = messageEventRepository.findByParentURI(connectionUri);
-        Dataset eventsContainerDataset = newDatasetWithNamedModel(createDataGraphUriFromResource(eventContainer),
+        Dataset eventsContainerDataset = newDatasetWithNamedModel(createDataGraphUriFromResource(messageContainer),
                         model);
         addBaseUriAndDefaultPrefixes(eventsContainerDataset);
         for (MessageEventPlaceholder event : connectionEvents) {
-            model.add(model.createStatement(eventContainer, RDFS.member,
+            model.add(model.createStatement(messageContainer, RDFS.member,
                             model.getResource(event.getMessageURI().toString())));
             if (deep) {
                 Dataset eventDataset = event.getDatasetHolder().getDataset();
@@ -602,10 +601,10 @@ public class LinkedDataServiceImpl implements LinkedDataService {
 
     @Override
     @Transactional
-    public NeedInformationService.PagedResource<Dataset, URI> listConnectionEventURIs(final URI connectionUri,
+    public AtomInformationService.PagedResource<Dataset, URI> listConnectionEventURIs(final URI connectionUri,
                     final int pageNum, Integer preferedSize, WonMessageType msgType, boolean deep)
                     throws NoSuchConnectionException {
-        Slice<MessageEventPlaceholder> slice = needInformationService.listConnectionEvents(connectionUri, pageNum,
+        Slice<MessageEventPlaceholder> slice = atomInformationService.listConnectionEvents(connectionUri, pageNum,
                         preferedSize, msgType);
         return eventsToContainerPage(this.uriService.createEventsURIForConnection(connectionUri).toString(), slice,
                         deep);
@@ -613,10 +612,10 @@ public class LinkedDataServiceImpl implements LinkedDataService {
 
     @Override
     @Transactional
-    public NeedInformationService.PagedResource<Dataset, URI> listConnectionEventURIsAfter(final URI connectionUri,
+    public AtomInformationService.PagedResource<Dataset, URI> listConnectionEventURIsAfter(final URI connectionUri,
                     final URI msgURI, Integer preferedSize, WonMessageType msgType, boolean deep)
                     throws NoSuchConnectionException {
-        Slice<MessageEventPlaceholder> slice = needInformationService.listConnectionEventsAfter(connectionUri, msgURI,
+        Slice<MessageEventPlaceholder> slice = atomInformationService.listConnectionEventsAfter(connectionUri, msgURI,
                         preferedSize, msgType);
         return eventsToContainerPage(this.uriService.createEventsURIForConnection(connectionUri).toString(), slice,
                         deep);
@@ -624,10 +623,10 @@ public class LinkedDataServiceImpl implements LinkedDataService {
 
     @Override
     @Transactional
-    public NeedInformationService.PagedResource<Dataset, URI> listConnectionEventURIsBefore(final URI connectionUri,
+    public AtomInformationService.PagedResource<Dataset, URI> listConnectionEventURIsBefore(final URI connectionUri,
                     final URI msgURI, Integer preferedSize, WonMessageType msgType, boolean deep)
                     throws NoSuchConnectionException {
-        Slice<MessageEventPlaceholder> slice = needInformationService.listConnectionEventsBefore(connectionUri, msgURI,
+        Slice<MessageEventPlaceholder> slice = atomInformationService.listConnectionEventsBefore(connectionUri, msgURI,
                         preferedSize, msgType);
         return eventsToContainerPage(this.uriService.createEventsURIForConnection(connectionUri).toString(), slice,
                         deep);
@@ -658,8 +657,8 @@ public class LinkedDataServiceImpl implements LinkedDataService {
         return new DataWithEtag<>(dataset, Integer.toString(datasetHolder.getVersion()), etag);
     }
 
-    private String createDataGraphUriFromResource(Resource needListPageResource) {
-        URI uri = URI.create(needListPageResource.getURI());
+    private String createDataGraphUriFromResource(Resource atomListPageResource) {
+        URI uri = URI.create(atomListPageResource.getURI());
         return createDataGraphUriFromUri(uri);
     }
 
@@ -683,7 +682,7 @@ public class LinkedDataServiceImpl implements LinkedDataService {
             Resource additionalData = fromModel.createResource();
             // TODO: check if the statement below is now necessary
             // RdfUtils.replaceBaseResource(additionalDataModel, additionalData);
-            targetModel.add(targetModel.createStatement(targetResource, WON.HAS_ADDITIONAL_DATA, additionalData));
+            targetModel.add(targetModel.createStatement(targetResource, WON.additionalData, additionalData));
             targetModel.add(fromModel);
         }
     }
@@ -708,7 +707,7 @@ public class LinkedDataServiceImpl implements LinkedDataService {
     private Dataset addBaseUriAndDefaultPrefixes(Dataset dataset) {
         setNsPrefixes(dataset.getDefaultModel());
         addPrefixForSpecialResources(dataset, "local", this.resourceURIPrefix);
-        addPrefixForSpecialResources(dataset, "need", this.needResourceURIPrefix);
+        addPrefixForSpecialResources(dataset, "atom", this.atomResourceURIPrefix);
         addPrefixForSpecialResources(dataset, "event", this.eventResourceURIPrefix);
         addPrefixForSpecialResources(dataset, "conn", this.connectionResourceURIPrefix);
         return dataset;
@@ -726,7 +725,7 @@ public class LinkedDataServiceImpl implements LinkedDataService {
         dataset.getDefaultModel().getGraph().getPrefixMapping().setNsPrefix(prefix, uri);
     }
 
-    private NeedInformationService.PagedResource<Dataset, URI> toContainerPage(String containerUri, Slice<URI> slice) {
+    private AtomInformationService.PagedResource<Dataset, URI> toContainerPage(String containerUri, Slice<URI> slice) {
         List<URI> uris = slice.getContent();
         URI resumeBefore = null;
         URI resumeAfter = null;
@@ -745,17 +744,17 @@ public class LinkedDataServiceImpl implements LinkedDataService {
         }
         Model model = ModelFactory.createDefaultModel();
         setNsPrefixes(model);
-        Resource needListPageResource = model.createResource(containerUri);
-        for (URI needURI : uris) {
-            model.add(model.createStatement(needListPageResource, RDFS.member,
-                            model.createResource(needURI.toString())));
+        Resource atomListPageResource = model.createResource(containerUri);
+        for (URI atomURI : uris) {
+            model.add(model.createStatement(atomListPageResource, RDFS.member,
+                            model.createResource(atomURI.toString())));
         }
-        Dataset dataset = newDatasetWithNamedModel(createDataGraphUriFromResource(needListPageResource), model);
+        Dataset dataset = newDatasetWithNamedModel(createDataGraphUriFromResource(atomListPageResource), model);
         addBaseUriAndDefaultPrefixes(dataset);
-        return new NeedInformationService.PagedResource(dataset, resumeBefore, resumeAfter);
+        return new AtomInformationService.PagedResource(dataset, resumeBefore, resumeAfter);
     }
 
-    private NeedInformationService.PagedResource<Dataset, Connection> toConnectionsContainerPage(String containerUri,
+    private AtomInformationService.PagedResource<Dataset, Connection> toConnectionsContainerPage(String containerUri,
                     Slice<Connection> slice) {
         List<Connection> connections = slice.getContent();
         Connection resumeBefore = null;
@@ -775,15 +774,15 @@ public class LinkedDataServiceImpl implements LinkedDataService {
         }
         Model model = ModelFactory.createDefaultModel();
         setNsPrefixes(model);
-        Resource needListPageResource = model.createResource(containerUri);
+        Resource atomListPageResource = model.createResource(containerUri);
         for (Connection conn : connections) {
-            model.add(model.createStatement(needListPageResource, RDFS.member,
+            model.add(model.createStatement(atomListPageResource, RDFS.member,
                             model.createResource(conn.getConnectionURI().toString())));
             model.add(connectionModelMapper.toModel(conn));
         }
-        Dataset dataset = newDatasetWithNamedModel(createDataGraphUriFromResource(needListPageResource), model);
+        Dataset dataset = newDatasetWithNamedModel(createDataGraphUriFromResource(atomListPageResource), model);
         addBaseUriAndDefaultPrefixes(dataset);
-        return new NeedInformationService.PagedResource(dataset, resumeBefore, resumeAfter);
+        return new AtomInformationService.PagedResource(dataset, resumeBefore, resumeAfter);
     }
 
     /**
@@ -796,7 +795,7 @@ public class LinkedDataServiceImpl implements LinkedDataService {
      * @param deep
      * @return
      */
-    private NeedInformationService.PagedResource<Dataset, URI> eventsToContainerPage(String containerUri,
+    private AtomInformationService.PagedResource<Dataset, URI> eventsToContainerPage(String containerUri,
                     Slice<MessageEventPlaceholder> slice, boolean deep) {
         List<MessageEventPlaceholder> events = slice.getContent();
         URI resumeBefore = null;
@@ -816,19 +815,19 @@ public class LinkedDataServiceImpl implements LinkedDataService {
         }
         Model model = ModelFactory.createDefaultModel();
         setNsPrefixes(model);
-        Resource needListPageResource = model.createResource(containerUri);
+        Resource atomListPageResource = model.createResource(containerUri);
         DatasetHolderAggregator aggregator = new DatasetHolderAggregator();
         for (MessageEventPlaceholder event : events) {
-            model.add(model.createStatement(needListPageResource, RDFS.member,
+            model.add(model.createStatement(atomListPageResource, RDFS.member,
                             model.createResource(event.getMessageURI().toString())));
             if (deep) {
                 aggregator.appendDataset(event.getDatasetHolder());
             }
         }
         Dataset dataset = aggregator.aggregate();
-        dataset.addNamedModel(createDataGraphUriFromResource(needListPageResource), model);
+        dataset.addNamedModel(createDataGraphUriFromResource(atomListPageResource), model);
         addBaseUriAndDefaultPrefixes(dataset);
-        return new NeedInformationService.PagedResource(dataset, resumeBefore, resumeAfter);
+        return new AtomInformationService.PagedResource(dataset, resumeBefore, resumeAfter);
     }
 
     private void addDeepConnectionData(Dataset dataset, List<URI> connectionURIs) {
@@ -839,8 +838,8 @@ public class LinkedDataServiceImpl implements LinkedDataService {
         }
     }
 
-    public void setNeedResourceURIPrefix(final String needResourceURIPrefix) {
-        this.needResourceURIPrefix = needResourceURIPrefix;
+    public void setAtomResourceURIPrefix(final String atomResourceURIPrefix) {
+        this.atomResourceURIPrefix = atomResourceURIPrefix;
     }
 
     public void setConnectionResourceURIPrefix(final String connectionResourceURIPrefix) {
@@ -859,12 +858,12 @@ public class LinkedDataServiceImpl implements LinkedDataService {
         this.resourceURIPrefix = resourceURIPrefix;
     }
 
-    public void setNeedInformationService(final NeedInformationService needInformationService) {
-        this.needInformationService = needInformationService;
+    public void setAtomInformationService(final AtomInformationService atomInformationService) {
+        this.atomInformationService = atomInformationService;
     }
 
-    public void setNeedProtocolEndpoint(final String needProtocolEndpoint) {
-        this.needProtocolEndpoint = needProtocolEndpoint;
+    public void setAtomProtocolEndpoint(final String atomProtocolEndpoint) {
+        this.atomProtocolEndpoint = atomProtocolEndpoint;
     }
 
     public void setMatcherProtocolEndpoint(final String matcherProtocolEndpoint) {
@@ -887,8 +886,8 @@ public class LinkedDataServiceImpl implements LinkedDataService {
         this.activeMqOwnerProtcolQueueName = activeMqOwnerProtcolQueueName;
     }
 
-    public void setActiveMqNeedProtcolQueueName(String activeMqNeedProtcolQueueName) {
-        this.activeMqNeedProtcolQueueName = activeMqNeedProtcolQueueName;
+    public void setActiveMqAtomProtcolQueueName(String activeMqAtomProtcolQueueName) {
+        this.activeMqAtomProtcolQueueName = activeMqAtomProtcolQueueName;
     }
 
     public void setActiveMqMatcherPrtotocolQueueName(String activeMqMatcherPrtotocolQueueName) {
@@ -899,23 +898,23 @@ public class LinkedDataServiceImpl implements LinkedDataService {
         this.activeMqEndpoint = activeMqEndpoint;
     }
 
-    public void setActiveMqMatcherProtocolTopicNameNeedCreated(
-                    final String activeMqMatcherProtocolTopicNameNeedCreated) {
-        this.activeMqMatcherProtocolTopicNameNeedCreated = activeMqMatcherProtocolTopicNameNeedCreated;
+    public void setActiveMqMatcherProtocolTopicNameAtomCreated(
+                    final String activeMqMatcherProtocolTopicNameAtomCreated) {
+        this.activeMqMatcherProtocolTopicNameAtomCreated = activeMqMatcherProtocolTopicNameAtomCreated;
     }
 
-    public void setActiveMqMatcherProtocolTopicNameNeedActivated(
-                    final String activeMqMatcherProtocolTopicNameNeedActivated) {
-        this.activeMqMatcherProtocolTopicNameNeedActivated = activeMqMatcherProtocolTopicNameNeedActivated;
+    public void setActiveMqMatcherProtocolTopicNameAtomActivated(
+                    final String activeMqMatcherProtocolTopicNameAtomActivated) {
+        this.activeMqMatcherProtocolTopicNameAtomActivated = activeMqMatcherProtocolTopicNameAtomActivated;
     }
 
-    public void setActiveMqMatcherProtocolTopicNameNeedDeactivated(
-                    final String activeMqMatcherProtocolTopicNameNeedDeactivated) {
-        this.activeMqMatcherProtocolTopicNameNeedDeactivated = activeMqMatcherProtocolTopicNameNeedDeactivated;
+    public void setActiveMqMatcherProtocolTopicNameAtomDeactivated(
+                    final String activeMqMatcherProtocolTopicNameAtomDeactivated) {
+        this.activeMqMatcherProtocolTopicNameAtomDeactivated = activeMqMatcherProtocolTopicNameAtomDeactivated;
     }
 
-    public void setActiveMqMatcherProtocolTopicNameNeedDeleted(
-                    final String activeMqMatcherProtocolTopicNameNeedDeleted) {
-        this.activeMqMatcherProtocolTopicNameNeedDeleted = activeMqMatcherProtocolTopicNameNeedDeleted;
+    public void setActiveMqMatcherProtocolTopicNameAtomDeleted(
+                    final String activeMqMatcherProtocolTopicNameAtomDeleted) {
+        this.activeMqMatcherProtocolTopicNameAtomDeleted = activeMqMatcherProtocolTopicNameAtomDeleted;
     }
 }

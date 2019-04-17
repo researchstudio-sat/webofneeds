@@ -22,7 +22,7 @@
 
     <!-- find all message processors -->
     <context:component-scan base-package="won.node.camel.processor.fixed"/>
-    <context:component-scan base-package="won.node.camel.processor.facet"/>
+    <context:component-scan base-package="won.node.camel.processor.socket"/>
     <!-- find add-ons -->
     <context:component-scan base-package="won.node.contrib"/>
     <context:annotation-config />

@@ -1,5 +1,5 @@
 /**
- * Component for rendering need-title
+ * Component for rendering atom-title
  * Created by ksinger on 10.04.2017.
  */
 import angular from "angular";
@@ -12,7 +12,7 @@ import { connect2Redux } from "../won-utils.js";
 import { selectLastUpdateTime } from "../selectors/general-selectors.js";
 import won from "../won-es6.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
-import * as needUtils from "../need-utils.js";
+import * as atomUtils from "../atom-utils.js";
 import * as processUtils from "../process-utils.js";
 
 import "style/_post-header.scss";
@@ -22,11 +22,11 @@ function genComponentConf() {
   let template = `
 
     <won-square-image
-        ng-if="!self.needLoading"
-        uri="::self.needUri">
+        ng-if="!self.atomLoading"
+        uri="::self.atomUri">
     </won-square-image>
-    <div class="ph__right" ng-if="!self.need.get('isBeingCreated') && !self.needLoading">
-      <div class="ph__right__topline" ng-if="!self.needFailedToLoad">
+    <div class="ph__right" ng-if="!self.atom.get('isBeingCreated') && !self.atomLoading">
+      <div class="ph__right__topline" ng-if="!self.atomFailedToLoad">
         <div class="ph__right__topline__title" ng-if="self.hasTitle()">
           {{ self.generateTitle() }}
         </div>
@@ -37,7 +37,7 @@ function genComponentConf() {
           no title
         </div>
       </div>
-      <div class="ph__right__subtitle" ng-if="!self.needFailedToLoad">
+      <div class="ph__right__subtitle" ng-if="!self.atomFailedToLoad">
         <span class="ph__right__subtitle__type">
           <span class="ph__right__subtitle__type__persona"
             ng-if="self.personaName">
@@ -52,26 +52,26 @@ function genComponentConf() {
             Group Chat enabled
           </span>
           <span>
-            {{ self.needTypeLabel }}
+            {{ self.atomTypeLabel }}
           </span>
         </span>
         <div class="ph__right__subtitle__date">
           {{ self.friendlyTimestamp }}
         </div>
       </div>
-      <div class="ph__right__topline" ng-if="self.needFailedToLoad">
+      <div class="ph__right__topline" ng-if="self.atomFailedToLoad">
         <div class="ph__right__topline__notitle">
-          Need Loading failed
+          Atom Loading failed
         </div>
       </div>
-      <div class="ph__right__subtitle" ng-if="self.needFailedToLoad">
+      <div class="ph__right__subtitle" ng-if="self.atomFailedToLoad">
         <span class="ph__right__subtitle__type">
-          Need might have been deleted.
+          Atom might have been deleted.
         </span>
       </div>
     </div>
     
-    <div class="ph__right" ng-if="self.need.get('isBeingCreated')">
+    <div class="ph__right" ng-if="self.atom.get('isBeingCreated')">
       <div class="ph__right__topline">
         <div class="ph__right__topline__notitle">
           Creating...
@@ -92,12 +92,12 @@ function genComponentConf() {
             Group Chat enabled
           </span>
           <span class="ph__right__subtitle__type"
-            {{ self.needTypeLabel }}
+            {{ self.atomTypeLabel }}
           </span>
       </div>
     </div>
-    <div class="ph__icon__skeleton" ng-if="self.needLoading"></div>
-    <div class="ph__right" ng-if="self.needLoading">
+    <div class="ph__icon__skeleton" ng-if="self.atomLoading"></div>
+    <div class="ph__right" ng-if="self.atomLoading">
       <div class="ph__right__topline">
         <div class="ph__right__topline__title"></div>
       </div>
@@ -114,76 +114,76 @@ function genComponentConf() {
 
       this.WON = won.WON;
       const selectFromState = state => {
-        const need = getIn(state, ["needs", this.needUri]);
-        const isDirectResponse = needUtils.isDirectResponseNeed(need);
+        const atom = getIn(state, ["atoms", this.atomUri]);
+        const isDirectResponse = atomUtils.isDirectResponseAtom(atom);
         const responseToUri =
-          isDirectResponse && getIn(need, ["content", "responseToUri"]);
-        const responseToNeed =
-          responseToUri && getIn(state, ["needs", responseToUri]);
+          isDirectResponse && getIn(atom, ["content", "responseToUri"]);
+        const responseToAtom =
+          responseToUri && getIn(state, ["atoms", responseToUri]);
 
-        const personaUri = get(need, "heldBy");
-        const persona = personaUri && getIn(state, ["needs", personaUri]);
+        const personaUri = get(atom, "heldBy");
+        const persona = personaUri && getIn(state, ["atoms", personaUri]);
         const personaName = get(persona, "humanReadable");
 
         const process = get(state, "process");
 
         return {
-          responseToNeed,
-          need,
-          needTypeLabel: need && needUtils.generateNeedTypeLabel(need),
+          responseToAtom,
+          atom,
+          atomTypeLabel: atom && atomUtils.generateAtomTypeLabel(atom),
           personaName,
-          needLoading:
-            !need || processUtils.isNeedLoading(process, this.needUri),
-          needToLoad: !need || processUtils.isNeedToLoad(process, this.needUri),
-          needFailedToLoad:
-            need && processUtils.hasNeedFailedToLoad(process, this.needUri),
+          atomLoading:
+            !atom || processUtils.isAtomLoading(process, this.atomUri),
+          atomToLoad: !atom || processUtils.isAtomToLoad(process, this.atomUri),
+          atomFailedToLoad:
+            atom && processUtils.hasAtomFailedToLoad(process, this.atomUri),
           isDirectResponse: isDirectResponse,
-          isGroupChatEnabled: needUtils.hasGroupFacet(need),
-          isChatEnabled: needUtils.hasChatFacet(need),
+          isGroupChatEnabled: atomUtils.hasGroupSocket(atom),
+          isChatEnabled: atomUtils.hasChatSocket(atom),
           friendlyTimestamp:
-            need &&
+            atom &&
             relativeTime(
               selectLastUpdateTime(state),
-              get(need, "lastUpdateDate")
+              get(atom, "lastUpdateDate")
             ),
         };
       };
 
-      connect2Redux(selectFromState, actionCreators, ["self.needUri"], this);
+      connect2Redux(selectFromState, actionCreators, ["self.atomUri"], this);
 
-      classOnComponentRoot("won-is-loading", () => this.needLoading, this);
-      classOnComponentRoot("won-is-toload", () => this.needToLoad, this);
+      classOnComponentRoot("won-is-loading", () => this.atomLoading, this);
+      classOnComponentRoot("won-is-toload", () => this.atomToLoad, this);
 
       this.$scope.$watch(
         () =>
-          this.needUri &&
-          (!this.need || (this.needToLoad && !this.needLoading)),
-        () => delay(0).then(() => this.ensureNeedIsLoaded())
+          this.atomUri &&
+          (!this.atom || (this.atomToLoad && !this.atomLoading)),
+        () => delay(0).then(() => this.ensureAtomIsLoaded())
       );
     }
 
-    ensureNeedIsLoaded() {
+    ensureAtomIsLoaded() {
       if (
-        this.needUri &&
-        (!this.need || (this.needToLoad && !this.needLoading))
+        this.atomUri &&
+        (!this.atom || (this.atomToLoad && !this.atomLoading))
       ) {
-        this.needs__fetchUnloadedNeed(this.needUri);
+        this.atoms__fetchUnloadedAtom(this.atomUri);
       }
     }
 
     hasTitle() {
-      if (this.isDirectResponse && this.responseToNeed) {
-        return !!this.responseToNeed.get("humanReadable");
+      if (this.isDirectResponse && this.responseToAtom) {
+        return !!this.responseToAtom.get("humanReadable");
       } else {
-        return !!this.need.get("humanReadable");
+        return !!this.atom.get("humanReadable");
       }
     }
 
     generateTitle() {
-      if (this.isDirectResponse && this.responseToNeed) {
-        return "Re: " + this.responseToNeed.get("humanReadable");
+      if (this.isDirectResponse && this.responseToAtom) {
+        return "Re: " + this.responseToAtom.get("humanReadable");
       } else {
-        return this.need.get("humanReadable");
+        return this.atom.get("humanReadable");
       }
     }
   }
@@ -194,7 +194,7 @@ function genComponentConf() {
     controllerAs: "self",
     bindToController: true, //scope-bindings -> ctrl
     scope: {
-      needUri: "=",
+      atomUri: "=",
     },
     template: template,
   };

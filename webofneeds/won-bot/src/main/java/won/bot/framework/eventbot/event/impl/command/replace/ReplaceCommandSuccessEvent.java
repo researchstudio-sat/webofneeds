@@ -12,27 +12,27 @@ package won.bot.framework.eventbot.event.impl.command.replace;
 
 import java.net.URI;
 
-import won.bot.framework.eventbot.event.BaseNeedSpecificEvent;
+import won.bot.framework.eventbot.event.BaseAtomSpecificEvent;
 import won.bot.framework.eventbot.event.impl.command.MessageCommandEvent;
 import won.bot.framework.eventbot.event.impl.command.MessageCommandSuccessEvent;
 
 /**
- * Indicates that creating a need succeeded.
+ * Indicates that creating an atom succeeded.
  */
-public class ReplaceCommandSuccessEvent extends BaseNeedSpecificEvent
+public class ReplaceCommandSuccessEvent extends BaseAtomSpecificEvent
                 implements MessageCommandSuccessEvent, ReplaceCommandResultEvent {
     private ReplaceCommandEvent replaceCommandEvent;
     private String message;
 
-    public ReplaceCommandSuccessEvent(URI needURI, ReplaceCommandEvent replaceCommandEvent, String message) {
-        super(needURI);
+    public ReplaceCommandSuccessEvent(URI atomURI, ReplaceCommandEvent replaceCommandEvent, String message) {
+        super(atomURI);
         this.replaceCommandEvent = replaceCommandEvent;
         this.message = message;
     }
 
-    public ReplaceCommandSuccessEvent(URI needURI, ReplaceCommandEvent createNeedCommandEvent) {
-        super(needURI);
-        this.replaceCommandEvent = createNeedCommandEvent;
+    public ReplaceCommandSuccessEvent(URI atomURI, ReplaceCommandEvent createAtomCommandEvent) {
+        super(atomURI);
+        this.replaceCommandEvent = createAtomCommandEvent;
     }
 
     @Override

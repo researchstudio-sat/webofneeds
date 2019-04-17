@@ -2,23 +2,23 @@ package won.matcher.utils.tensor;
 
 /**
  * Represents an entry in the tensor structure build by
- * {@link TensorMatchingData} in a specified slice, for a specified need the
+ * {@link TensorMatchingData} in a specified slice, for a specified atom the
  * specified (attribute) value can be set. However instead of an attribute value
- * also a need can be specified e.g. to connect two needs in the connection
+ * also an atom can be specified e.g. to connect two atoms in the connection
  * slice. Created by hfriedrich on 21.04.2017.
  */
 public class TensorEntry {
     private String sliceName;
-    private String needUri;
+    private String atomUri;
     private String value;
 
     public TensorEntry() {
     }
 
-    public TensorEntry(String sliceName, String needUri, String value) {
+    public TensorEntry(String sliceName, String atomUri, String value) {
         setSliceName(sliceName);
         setValue(value);
-        setNeedUri(needUri);
+        setAtomUri(atomUri);
     }
 
     public String getValue() {
@@ -37,11 +37,11 @@ public class TensorEntry {
         this.sliceName = sliceName;
     }
 
-    public String getNeedUri() {
-        return needUri;
+    public String getAtomUri() {
+        return atomUri;
     }
 
-    public void setNeedUri(String needUri) {
-        this.needUri = needUri;
+    public void setAtomUri(String atomUri) {
+        this.atomUri = atomUri;
     }
 }

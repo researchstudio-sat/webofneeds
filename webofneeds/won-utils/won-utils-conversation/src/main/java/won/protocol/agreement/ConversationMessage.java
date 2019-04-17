@@ -18,7 +18,7 @@ import won.protocol.message.WonMessageType;
  */
 public class ConversationMessage implements Comparable<ConversationMessage> {
     URI messageURI;
-    URI senderNeedURI;
+    URI senderAtomURI;
     Set<URI> proposes = new HashSet<>();
     Set<ConversationMessage> proposesRefs = new HashSet<ConversationMessage>();
     Set<ConversationMessage> proposesInverseRefs = new HashSet<ConversationMessage>();
@@ -145,7 +145,7 @@ public class ConversationMessage implements Comparable<ConversationMessage> {
 
     public boolean isForwardedOrRemoteMessageOfForwarded() {
         return isForwardedMessage()
-                        || hasCorrespondingRemoteMessage() && correspondingRemoteMessageRef.isForwardedMessage();
+                        || correspondingRemoteMessage() && correspondingRemoteMessageRef.isForwardedMessage();
     }
 
     public ConversationMessage getRootOfDeliveryChain() {
@@ -155,7 +155,7 @@ public class ConversationMessage implements Comparable<ConversationMessage> {
     public boolean isHeadOfDeliveryChain() {
         return isFromOwner() || // owner initiated message
                         (isFromSystem() && !isResponse()) || // system initiated Message
-                        (!hasCorrespondingRemoteMessage() && !isResponse()) || // message not going to remote need
+                        (!correspondingRemoteMessage() && !isResponse()) || // message not going to remote atom
                         (isFromSystem() && isResponse() && !getIsResponseToOption().isPresent()); // failure without
                                                                                                   // original
     }
@@ -183,7 +183,7 @@ public class ConversationMessage implements Comparable<ConversationMessage> {
                 return deliveryChain;
             }
         }
-        if (hasCorrespondingRemoteMessage()) {
+        if (correspondingRemoteMessage()) {
             this.deliveryChain = getCorrespondingRemoteMessageRef().getDeliveryChain();
             if (this.deliveryChain != null) {
                 this.deliveryChain.addMessage(this);
@@ -228,13 +228,13 @@ public class ConversationMessage implements Comparable<ConversationMessage> {
 
     public boolean isAcknowledgedRemotely() {
         boolean hsr = hasSuccessResponse();
-        boolean hcrm = hasCorrespondingRemoteMessage();
+        boolean hcrm = correspondingRemoteMessage();
         boolean hrsr = hcrm && correspondingRemoteMessageRef.hasSuccessResponse();
-        boolean hrr = hrsr && correspondingRemoteMessageRef.getIsResponseToInverseRef().hasCorrespondingRemoteMessage();
+        boolean hrr = hrsr && correspondingRemoteMessageRef.getIsResponseToInverseRef().correspondingRemoteMessage();
         return hsr && hcrm && hrsr && hrr;
     }
 
-    public boolean hasPreviousMessage() {
+    public boolean previousMessage() {
         return !this.getPreviousRefs().isEmpty();
     }
 
@@ -304,7 +304,7 @@ public class ConversationMessage implements Comparable<ConversationMessage> {
             return this.order.getAsInt();
         }
         OptionalInt mindist = getPreviousRefs().stream().mapToInt(msg -> msg.getOrder() + 1).min();
-        if (this.hasCorrespondingRemoteMessage() && this.isFromExternal()) {
+        if (this.correspondingRemoteMessage() && this.isFromExternal()) {
             this.order = OptionalInt.of(Math.max(mindist.orElse(0), getCorrespondingRemoteMessageRef().getOrder() + 1));
         } else {
             this.order = OptionalInt.of(mindist.orElse(0));
@@ -333,7 +333,7 @@ public class ConversationMessage implements Comparable<ConversationMessage> {
         if (ownRoot.isDefined()) {
             roots.add(ownRoot.get());
         }
-        if (this.hasCorrespondingRemoteMessage()) {
+        if (this.correspondingRemoteMessage()) {
             Option<ConversationMessage> remoteRoot = getCorrespondingRemoteMessageRef().getOwnConversationRoot();
             if (remoteRoot.isDefined()) {
                 roots.add(remoteRoot.get());
@@ -366,7 +366,7 @@ public class ConversationMessage implements Comparable<ConversationMessage> {
             return true;
         }
         visited.add(this);
-        if (!this.hasPreviousMessage()) {
+        if (!this.previousMessage()) {
             return false;
         }
         Boolean foundIt = getPreviousRefs().stream().filter(msg -> !visited.contains(msg))
@@ -375,7 +375,7 @@ public class ConversationMessage implements Comparable<ConversationMessage> {
             this.knownMessagesOnPathToRoot.add(other);
             return true;
         }
-        if (this.hasCorrespondingRemoteMessage() && !visited.contains(this.getCorrespondingRemoteMessageRef())) {
+        if (this.correspondingRemoteMessage() && !visited.contains(this.getCorrespondingRemoteMessageRef())) {
             return this.getCorrespondingRemoteMessageRef().isMessageOnPathToRoot(other, visited);
         }
         return false;
@@ -454,12 +454,12 @@ public class ConversationMessage implements Comparable<ConversationMessage> {
         return messageURI;
     }
 
-    public URI getSenderNeedURI() {
-        return senderNeedURI;
+    public URI getSenderAtomURI() {
+        return senderAtomURI;
     }
 
-    public void setSenderNeedURI(URI senderNeedURI) {
-        this.senderNeedURI = senderNeedURI;
+    public void setSenderAtomURI(URI senderAtomURI) {
+        this.senderAtomURI = senderAtomURI;
     }
 
     public Set<URI> getProposes() {
@@ -598,7 +598,7 @@ public class ConversationMessage implements Comparable<ConversationMessage> {
         return this.correspondingRemoteMessageRef;
     }
 
-    public boolean hasCorrespondingRemoteMessage() {
+    public boolean correspondingRemoteMessage() {
         return this.correspondingRemoteMessageRef != null;
     }
 
@@ -766,7 +766,7 @@ public class ConversationMessage implements Comparable<ConversationMessage> {
                         + ", messageType=" + messageType + ", deliveryChainPosition:"
                         + (this == getDeliveryChain().getHead() ? "head"
                                         : this == getDeliveryChain().getEnd() ? "end" : "middle")
-                        + ", deliveryChainHead:" + getDeliveryChain().getHeadURI() + ", senderNeedURI=" + senderNeedURI
+                        + ", deliveryChainHead:" + getDeliveryChain().getHeadURI() + ", senderAtomURI=" + senderAtomURI
                         + ", proposes=" + proposes + ", proposesRefs:" + proposesRefs.size() + ", claims=" + claims
                         + ", claimsRefs:" + claimsRefs.size() + ", rejects=" + rejects + ", rejectsRefs:"
                         + rejectsRefs.size() + ", previous=" + previous + ", previousRefs:" + previousRefs.size()

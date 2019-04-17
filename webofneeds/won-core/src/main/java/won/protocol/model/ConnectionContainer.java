@@ -30,7 +30,7 @@ import won.protocol.model.parentaware.VersionedEntity;
 
 @Entity
 @Table(name = "connection_container")
-public class ConnectionContainer implements ParentAware<Need>, VersionedEntity {
+public class ConnectionContainer implements ParentAware<Atom>, VersionedEntity {
     @Id
     @Column(name = "id")
     protected Long id;
@@ -40,9 +40,9 @@ public class ConnectionContainer implements ParentAware<Need>, VersionedEntity {
     @Column(name = "last_update", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private Date lastUpdate = new Date();
     @OneToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "need_id")
+    @JoinColumn(name = "atom_id")
     @MapsId
-    private Need need;
+    private Atom atom;
 
     @Override
     @PrePersist
@@ -61,27 +61,27 @@ public class ConnectionContainer implements ParentAware<Need>, VersionedEntity {
         return version;
     }
 
-    public Need getNeed() {
-        return need;
+    public Atom getAtom() {
+        return atom;
     }
 
     @Override
-    public Need getParent() {
-        return getNeed();
+    public Atom getParent() {
+        return getAtom();
     }
 
-    public void setNeed(final Need need) {
-        this.need = need;
+    public void setAtom(final Atom atom) {
+        this.atom = atom;
     }
 
     public Long getId() {
         return this.id;
     }
 
-    public ConnectionContainer(final Need need) {
-        this.need = need;
-        if (need != null) {
-            need.setConnectionContainer(this);
+    public ConnectionContainer(final Atom atom) {
+        this.atom = atom;
+        if (atom != null) {
+            atom.setConnectionContainer(this);
         }
     }
 

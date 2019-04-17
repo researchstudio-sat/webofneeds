@@ -33,7 +33,7 @@ import won.protocol.model.URIConverter;
  * http://www.postgresql.org/message-id/Pine.NEB.4.10.10008291649550.4357-100000@scimitar.caravan.com
  */
 @Entity
-@Table(name = "needDraft", uniqueConstraints = @UniqueConstraint(columnNames = { "id", "draftURI" }))
+@Table(name = "atomDraft", uniqueConstraints = @UniqueConstraint(columnNames = { "id", "draftURI" }))
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Draft {
     @Id

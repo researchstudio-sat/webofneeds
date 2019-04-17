@@ -75,7 +75,7 @@ public class WonMessageBuilderTest {
     @Test
     public void test_wrap_allows_new_envelope_graph_properties() {
         WonMessage msg2 = wrapMessage(createMessageWithContent().build()).build();
-        Assert.assertEquals(CONNECTION_URI_1, msg2.getReceiverURI());
+        Assert.assertEquals(CONNECTION_URI_1, msg2.getRecipientURI());
     }
 
     @Test
@@ -256,7 +256,7 @@ public class WonMessageBuilderTest {
     }
 
     private WonMessageBuilder wrapMessage(final WonMessage msg1) {
-        return wrap(msg1).setReceiverURI(CONNECTION_URI_1).setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL);
+        return wrap(msg1).setRecipientURI(CONNECTION_URI_1).setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL);
     }
 
     private WonMessageBuilder createMessageWithContent() {

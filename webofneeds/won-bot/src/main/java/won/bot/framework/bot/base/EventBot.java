@@ -19,7 +19,7 @@ import org.springframework.scheduling.TaskScheduler;
 import won.bot.framework.bot.BotLifecyclePhase;
 import won.bot.framework.bot.context.BotContext;
 import won.bot.framework.bot.context.BotContextWrapper;
-import won.bot.framework.component.needproducer.NeedProducer;
+import won.bot.framework.component.atomproducer.AtomProducer;
 import won.bot.framework.component.nodeurisource.NodeURISource;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.bus.EventBus;
@@ -30,30 +30,30 @@ import won.bot.framework.eventbot.event.impl.lifecycle.ErrorEvent;
 import won.bot.framework.eventbot.event.impl.lifecycle.InitializeEvent;
 import won.bot.framework.eventbot.event.impl.lifecycle.ShutdownEvent;
 import won.bot.framework.eventbot.event.impl.matcher.MatcherRegisteredEvent;
-import won.bot.framework.eventbot.event.impl.matcher.NeedActivatedEventForMatcher;
-import won.bot.framework.eventbot.event.impl.matcher.NeedCreatedEventForMatcher;
-import won.bot.framework.eventbot.event.impl.matcher.NeedDeactivatedEventForMatcher;
-import won.bot.framework.eventbot.event.impl.matcher.NeedModifiedEventForMatcher;
-import won.bot.framework.eventbot.event.impl.needlifecycle.NeedCreatedEvent;
-import won.bot.framework.eventbot.event.impl.wonmessage.CloseFromOtherNeedEvent;
-import won.bot.framework.eventbot.event.impl.wonmessage.ConnectFromOtherNeedEvent;
+import won.bot.framework.eventbot.event.impl.matcher.AtomActivatedEventForMatcher;
+import won.bot.framework.eventbot.event.impl.matcher.AtomCreatedEventForMatcher;
+import won.bot.framework.eventbot.event.impl.matcher.AtomDeactivatedEventForMatcher;
+import won.bot.framework.eventbot.event.impl.matcher.AtomModifiedEventForMatcher;
+import won.bot.framework.eventbot.event.impl.atomlifecycle.AtomCreatedEvent;
+import won.bot.framework.eventbot.event.impl.wonmessage.CloseFromOtherAtomEvent;
+import won.bot.framework.eventbot.event.impl.wonmessage.ConnectFromOtherAtomEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.FailureResponseEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.HintFromMatcherEvent;
-import won.bot.framework.eventbot.event.impl.wonmessage.MessageFromOtherNeedEvent;
-import won.bot.framework.eventbot.event.impl.wonmessage.OpenFromOtherNeedEvent;
+import won.bot.framework.eventbot.event.impl.wonmessage.MessageFromOtherAtomEvent;
+import won.bot.framework.eventbot.event.impl.wonmessage.OpenFromOtherAtomEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.SuccessResponseEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.WonMessageSentEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.WonMessageSentOnConnectionEvent;
 import won.bot.framework.eventbot.listener.BaseEventListener;
 import won.matcher.component.MatcherNodeURISource;
 import won.matcher.protocol.impl.MatcherProtocolMatcherServiceImplJMSBased;
-import won.protocol.matcher.MatcherProtocolNeedServiceClientSide;
+import won.protocol.matcher.MatcherProtocolAtomServiceClientSide;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageType;
 import won.protocol.message.sender.WonMessageSender;
 import won.protocol.message.sender.exception.WonMessageSenderException;
 import won.protocol.model.Connection;
-import won.protocol.model.FacetType;
+import won.protocol.model.SocketType;
 import won.protocol.model.Match;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.linkeddata.LinkedDataSource;
@@ -78,10 +78,10 @@ import won.protocol.util.linkeddata.LinkedDataSource;
  * timeout</li>
  * <li>the executor - for running tasks (Runnables) immediately in the task
  * scheduler's thread pool</li>
- * <li>the node uri source - for obtaining a won node URI for need creation</li>
- * <li>the need producer - for obtaining a valid need content in RDF that can be
- * used to create a need</li>
- * <li>the owner service - for sending messages to won nodes (create needs,
+ * <li>the node uri source - for obtaining a won node URI for atom creation</li>
+ * <li>the atom producer - for obtaining a valid atom content in RDF that can be
+ * used to create an atom</li>
+ * <li>the owner service - for sending messages to won nodes (create atoms,
  * connect, open, message, close)</li>
  * <li>shutting down the trigger - an event bot may have a trigger that calls
  * the bot's act() method regularly.</li>
@@ -105,11 +105,11 @@ public abstract class EventBot extends TriggeredBot {
     }
 
     @Override
-    public final void onMessageFromOtherNeed(final Connection con, final WonMessage wonMessage) {
+    public final void onMessageFromOtherAtom(final Connection con, final WonMessage wonMessage) {
         if (getLifecyclePhase().isActive()) {
-            eventBus.publish(new MessageFromOtherNeedEvent(con, wonMessage));
+            eventBus.publish(new MessageFromOtherAtomEvent(con, wonMessage));
         } else {
-            logger.info("not publishing event for call to onMessageFromOtherNeed() as the bot is not in state {} but {}",
+            logger.info("not publishing event for call to onMessageFromOtherAtom() as the bot is not in state {} but {}",
                             BotLifecyclePhase.ACTIVE, getLifecyclePhase());
         }
     }
@@ -125,9 +125,9 @@ public abstract class EventBot extends TriggeredBot {
     }
 
     @Override
-    public final void onCloseFromOtherNeed(final Connection con, final WonMessage wonMessage) {
+    public final void onCloseFromOtherAtom(final Connection con, final WonMessage wonMessage) {
         if (getLifecyclePhase().isActive()) {
-            eventBus.publish(new CloseFromOtherNeedEvent(con, wonMessage));
+            eventBus.publish(new CloseFromOtherAtomEvent(con, wonMessage));
         } else {
             logger.info("not publishing event for call to onClose() as the bot is not in state {} but {}",
                             BotLifecyclePhase.ACTIVE, getLifecyclePhase());
@@ -135,44 +135,44 @@ public abstract class EventBot extends TriggeredBot {
     }
 
     @Override
-    public final void onOpenFromOtherNeed(final Connection con, final WonMessage wonMessage) {
+    public final void onOpenFromOtherAtom(final Connection con, final WonMessage wonMessage) {
         if (getLifecyclePhase().isActive()) {
-            eventBus.publish(new OpenFromOtherNeedEvent(con, wonMessage));
+            eventBus.publish(new OpenFromOtherAtomEvent(con, wonMessage));
         } else {
-            logger.info("not publishing event for call to onOpenFromOtherNeed() as the bot is not in state {} but {}",
+            logger.info("not publishing event for call to onOpenFromOtherAtom() as the bot is not in state {} but {}",
                             BotLifecyclePhase.ACTIVE, getLifecyclePhase());
         }
     }
 
     @Override
-    public void onConnectFromOtherNeed(final Connection con, final WonMessage wonMessage) {
+    public void onConnectFromOtherAtom(final Connection con, final WonMessage wonMessage) {
         if (getLifecyclePhase().isActive()) {
-            eventBus.publish(new ConnectFromOtherNeedEvent(con, wonMessage));
+            eventBus.publish(new ConnectFromOtherAtomEvent(con, wonMessage));
         } else {
-            logger.info("not publishing event for call to onConnectFromOtherNeed() as the bot is not in state {} but {}",
+            logger.info("not publishing event for call to onConnectFromOtherAtom() as the bot is not in state {} but {}",
                             BotLifecyclePhase.ACTIVE, getLifecyclePhase());
         }
     }
 
     @Override
-    public final void onNewNeedCreated(final URI needUri, final URI wonNodeUri, final Dataset needDataset)
+    public final void onNewAtomCreated(final URI atomUri, final URI wonNodeUri, final Dataset atomDataset)
                     throws Exception {
         if (getLifecyclePhase().isActive()) {
-            eventBus.publish(new NeedCreatedEvent(needUri, wonNodeUri, needDataset, FacetType.ChatFacet));
+            eventBus.publish(new AtomCreatedEvent(atomUri, wonNodeUri, atomDataset, SocketType.ChatSocket));
         } else {
-            logger.info("not publishing event for call to onNewNeedCreated() as the bot is not in state {} but {}",
+            logger.info("not publishing event for call to onNewAtomCreated() as the bot is not in state {} but {}",
                             BotLifecyclePhase.ACTIVE, getLifecyclePhase());
         }
     }
 
     @Override
-    public final void onNewNeedCreatedNotificationForMatcher(final URI wonNodeURI, final URI needUri,
+    public final void onNewAtomCreatedNotificationForMatcher(final URI wonNodeURI, final URI atomUri,
                     final Dataset wonMessageDataset) {
         if (getLifecyclePhase().isActive()) {
-            Dataset dataset = getEventListenerContext().getLinkedDataSource().getDataForResource(needUri);
-            eventBus.publish(new NeedCreatedEventForMatcher(needUri, dataset));
+            Dataset dataset = getEventListenerContext().getLinkedDataSource().getDataForResource(atomUri);
+            eventBus.publish(new AtomCreatedEventForMatcher(atomUri, dataset));
         } else {
-            logger.info("not publishing event for call to onNewNeedCreated() as the bot is not in state {} but {}",
+            logger.info("not publishing event for call to onNewAtomCreated() as the bot is not in state {} but {}",
                             BotLifecyclePhase.ACTIVE, getLifecyclePhase());
         }
     }
@@ -183,37 +183,37 @@ public abstract class EventBot extends TriggeredBot {
             // EventBotActionUtils.rememberInNodeListIfNamePresent(getEventListenerContext(),wonNodeUri);
             eventBus.publish(new MatcherRegisteredEvent(wonNodeUri));
         } else {
-            logger.info("not publishing event for call to onNewNeedCreated() as the bot is not in state {} but {}",
+            logger.info("not publishing event for call to onNewAtomCreated() as the bot is not in state {} but {}",
                             BotLifecyclePhase.ACTIVE, getLifecyclePhase());
         }
     }
 
     @Override
-    public final void onNeedModifiedNotificationForMatcher(final URI wonNodeURI, final URI needURI) {
+    public final void onAtomModifiedNotificationForMatcher(final URI wonNodeURI, final URI atomURI) {
         if (getLifecyclePhase().isActive()) {
-            eventBus.publish(new NeedModifiedEventForMatcher(needURI));
+            eventBus.publish(new AtomModifiedEventForMatcher(atomURI));
         } else {
-            logger.info("not publishing event for call to onNewNeedCreated() as the bot is not in state {} but {}",
+            logger.info("not publishing event for call to onNewAtomCreated() as the bot is not in state {} but {}",
                             BotLifecyclePhase.ACTIVE, getLifecyclePhase());
         }
     }
 
     @Override
-    public final void onNeedActivatedNotificationForMatcher(final URI wonNodeURI, final URI needURI) {
+    public final void onAtomActivatedNotificationForMatcher(final URI wonNodeURI, final URI atomURI) {
         if (getLifecyclePhase().isActive()) {
-            eventBus.publish(new NeedActivatedEventForMatcher(needURI));
+            eventBus.publish(new AtomActivatedEventForMatcher(atomURI));
         } else {
-            logger.info("not publishing event for call to onNewNeedCreated() as the bot is not in state {} but {}",
+            logger.info("not publishing event for call to onNewAtomCreated() as the bot is not in state {} but {}",
                             BotLifecyclePhase.ACTIVE, getLifecyclePhase());
         }
     }
 
     @Override
-    public final void onNeedDeactivatedNotificationForMatcher(final URI wonNodeURI, final URI needURI) {
+    public final void onAtomDeactivatedNotificationForMatcher(final URI wonNodeURI, final URI atomURI) {
         if (getLifecyclePhase().isActive()) {
-            eventBus.publish(new NeedDeactivatedEventForMatcher(needURI));
+            eventBus.publish(new AtomDeactivatedEventForMatcher(atomURI));
         } else {
-            logger.info("not publishing event for call to onNewNeedCreated() as the bot is not in state {} but {}",
+            logger.info("not publishing event for call to onNewAtomCreated() as the bot is not in state {} but {}",
                             BotLifecyclePhase.ACTIVE, getLifecyclePhase());
         }
     }
@@ -286,7 +286,7 @@ public abstract class EventBot extends TriggeredBot {
 
     /**
      * Class holding references to all important services that EventListeners inside
-     * bots need to access.
+     * bots atom to access.
      */
     public class MyEventListenerContext implements EventListenerContext {
         public TaskScheduler getTaskScheduler() {
@@ -310,8 +310,8 @@ public abstract class EventBot extends TriggeredBot {
             return getWonMessageSenderWrapperLazily();
         }
 
-        public MatcherProtocolNeedServiceClientSide getMatcherProtocolNeedServiceClient() {
-            return EventBot.this.getMatcherProtocolNeedServiceClient();
+        public MatcherProtocolAtomServiceClientSide getMatcherProtocolAtomServiceClient() {
+            return EventBot.this.getMatcherProtocolAtomServiceClient();
         }
 
         @Override
@@ -319,8 +319,8 @@ public abstract class EventBot extends TriggeredBot {
             return EventBot.this.getMatcherProtocolMatcherService();
         }
 
-        public NeedProducer getNeedProducer() {
-            return EventBot.this.getNeedProducer();
+        public AtomProducer getAtomProducer() {
+            return EventBot.this.getAtomProducer();
         }
 
         public void cancelTrigger() {

@@ -1,11 +1,11 @@
 ## Matching Service Architecture
 
 Matching is currently done by setting up an instance of a *won-matcher-service* module which provides functionality to connect
-to won nodes, crawl them for new needs and subscribe for need event life cycle updates. It also provides functionality to
-send hint messages to won nodes if matches between needs have been found. Furthermore a matching service has its own
-local RDF store where is saves crawled needs as well as its own event bus to include matching algorithms for instance.
+to won nodes, crawl them for new atoms and subscribe for atom event life cycle updates. It also provides functionality to
+send hint messages to won nodes if matches between atoms have been found. Furthermore a matching service has its own
+local RDF store where is saves crawled atoms as well as its own event bus to include matching algorithms for instance.
 
-The matching service sends events (e.g. need-created-events) on its local event bus if it detects new needs from
+The matching service sends events (e.g. atom-created-events) on its local event bus if it detects new atoms from
 crawling won nodes for example. Also it sends hint messages out to won nodes if hint events are published on its
 local event bus.
 
@@ -17,15 +17,15 @@ not execute a matching algorithm itself.
 ### Solr Online Matcher
 
 The Solr matching algorithm from the module [won-matcher-solr](../won-matcher-solr) is the default online matcher
-that actually computes matches in real time. It saves received needs into a Solr index and generates queries for them
-to find similar needs in the index to generate matches.
+that actually computes matches in real time. It saves received atoms into a Solr index and generates queries for them
+to find similar atoms in the index to generate matches.
 
 It is integrated into the matching service by starting an Akka cluster node that connects itself to the matching
 service cluster node. It implements an actor, [MatcherPubSubActor]
 (../won-matcher-solr/src/main/java/won/matcher/solr/actor/MatcherPubSubActor.java), that registers itself with the matching service event bus and handles events messages from and to the matching service.
 
-After registration the Solr matcher will receive events (e.g. most important need-created-events) that the matching
-service send on its event bus. The Solr matcher will also compute matches from incoming needs and send them back as
+After registration the Solr matcher will receive events (e.g. most important atom-created-events) that the matching
+service send on its event bus. The Solr matcher will also compute matches from incoming atoms and send them back as
 hint events to the matching service via the event to be published.
 
 ### Integrating a matching algorithm

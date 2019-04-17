@@ -10,7 +10,7 @@ import suggestPostPickerModule from "./details/picker/suggestpost-picker.js";
 import { attach, getIn, get } from "../utils.js";
 import won from "../won-es6.js";
 import { connect2Redux } from "../won-utils.js";
-import * as needUtils from "../need-utils.js";
+import * as atomUtils from "../atom-utils.js";
 import * as connectionSelectors from "../selectors/connection-selectors.js";
 import * as connectionUtils from "../connection-utils.js";
 import * as generalSelectors from "../selectors/general-selectors.js";
@@ -26,13 +26,13 @@ function genComponentConf() {
   let template = `
       <div
           class="pc-participants__participant"
-          ng-if="!self.isOwned && self.hasGroupMembers"
+          ng-if="!self.isOwned && self.groupMembers"
           ng-repeat="memberUri in self.groupMembersArray track by memberUri">
           <div class="pc-participants__participant__indicator"></div>
           <won-post-header
             class="clickable"
-            ng-click="self.router__stateGoCurrent({viewNeedUri: memberUri, viewConnUri: undefined})"
-            need-uri="::memberUri">
+            ng-click="self.router__stateGoCurrent({viewAtomUri: memberUri, viewConnUri: undefined})"
+            atom-uri="::memberUri">
           </won-post-header>
           <div class="pc-participants__participant__actions"></div>
       </div>
@@ -44,8 +44,8 @@ function genComponentConf() {
           <div class="pc-participants__participant__indicator"></div>
           <won-post-header
             class="clickable"
-            ng-click="self.router__stateGoCurrent({viewNeedUri: conn.get('remoteNeedUri'), viewConnUri: undefined})"
-            need-uri="::conn.get('remoteNeedUri')">
+            ng-click="self.router__stateGoCurrent({viewAtomUri: conn.get('targetAtomUri'), viewConnUri: undefined})"
+            atom-uri="::conn.get('targetAtomUri')">
           </won-post-header>
           <div class="pc-participants__participant__actions">
               <div
@@ -81,7 +81,7 @@ function genComponentConf() {
           </div>
       </div>
       <div class="pc-participants__empty"
-          ng-if="(!self.isOwned && !self.hasGroupMembers) || (self.isOwned && !self.hasGroupChatConnections)">
+          ng-if="(!self.isOwned && !self.groupMembers) || (self.isOwned && !self.hasGroupChatConnections)">
           No Groupmembers present.
       </div>
       <won-labelled-hr label="::'Invite'" class="pc-participants__labelledhr" ng-if="self.isOwned"></won-labelled-hr>
@@ -89,11 +89,11 @@ function genComponentConf() {
           ng-if="self.isOwned"
           initial-value="undefined"
           on-update="self.inviteParticipant(value)"
-          detail="::{placeholder: 'Insert NeedUri to invite'}"
+          detail="::{placeholder: 'Insert AtomUri to invite'}"
           excluded-uris="self.excludedFromInviteUris"
-          allowed-facets="::[self.won.WON.ChatFacetCompacted, self.won.WON.GroupFacetCompacted]"
-          excluded-text="::'Invitation does not work for needs that are already part of the Group, or the group itself'"
-          not-allowed-facet-text="::'Invitation does not work on needs without Group or Chat Facet'"
+          allowed-sockets="::[self.won.WON.ChatSocketCompacted, self.won.WON.GroupSocketCompacted]"
+          excluded-text="::'Invitation does not work for atoms that are already part of the Group, or the group itself'"
+          not-allowed-socket-text="::'Invitation does not work on atoms without Group or Chat Socket'"
           no-suggestions-text="::'No Participants available to invite'"
       ></won-suggestpost-picker>
     `;
@@ -105,16 +105,16 @@ function genComponentConf() {
       window.postcontentparticipants4dbg = this;
 
       const selectFromState = state => {
-        const post = getIn(state, ["needs", this.postUri]);
-        const isOwned = generalSelectors.isNeedOwned(state, this.postUri);
+        const post = getIn(state, ["atoms", this.postUri]);
+        const isOwned = generalSelectors.isAtomOwned(state, this.postUri);
 
-        const hasGroupFacet = needUtils.hasGroupFacet(post);
+        const hasGroupSocket = atomUtils.hasGroupSocket(post);
 
-        const groupMembers = hasGroupFacet && get(post, "groupMembers");
+        const groupMembers = hasGroupSocket && get(post, "groupMembers");
         const groupChatConnections =
           isOwned &&
-          hasGroupFacet &&
-          connectionSelectors.getGroupChatConnectionsByNeedUri(
+          hasGroupSocket &&
+          connectionSelectors.getGroupChatConnectionsByAtomUri(
             state,
             this.postUri
           );
@@ -125,15 +125,15 @@ function genComponentConf() {
           groupChatConnections
             .filter(conn => !connectionUtils.isClosed(conn))
             .map(conn =>
-              excludedFromInviteUris.push(get(conn, "remoteNeedUri"))
+              excludedFromInviteUris.push(get(conn, "targetAtomUri"))
             );
         }
 
         return {
           post,
           isOwned,
-          hasGroupFacet,
-          hasGroupMembers: groupMembers && groupMembers.size > 0,
+          hasGroupSocket,
+          groupMembers: groupMembers && groupMembers.size > 0,
           hasGroupChatConnections:
             groupChatConnections && groupChatConnections.size > 0,
           groupChatConnectionsArray:
@@ -159,7 +159,7 @@ function genComponentConf() {
       if (conn.get("unread")) {
         this.connections__markAsRead({
           connectionUri: connUri,
-          needUri: this.postUri,
+          atomUri: this.postUri,
         });
       }
 
@@ -176,7 +176,7 @@ function genComponentConf() {
       if (conn.get("unread")) {
         this.connections__markAsRead({
           connectionUri: connUri,
-          needUri: this.postUri,
+          atomUri: this.postUri,
         });
       }
 
@@ -189,32 +189,32 @@ function genComponentConf() {
       }
 
       const connUri = get(conn, "uri");
-      const remoteNeedUri = get(conn, "remoteNeedUri");
+      const targetAtomUri = get(conn, "targetAtomUri");
 
       if (conn.get("unread")) {
         this.connections__markAsRead({
           connectionUri: connUri,
-          needUri: this.postUri,
+          atomUri: this.postUri,
         });
       }
 
       this.connections__rate(connUri, won.WON.binaryRatingGood);
-      this.needs__connect(this.postUri, connUri, remoteNeedUri, message);
+      this.atoms__connect(this.postUri, connUri, targetAtomUri, message);
     }
 
-    inviteParticipant(needUri, message = "") {
-      if (!this.isOwned || !this.hasGroupFacet) {
-        console.warn("Trying to invite to a non-owned or non groupFacet need");
+    inviteParticipant(atomUri, message = "") {
+      if (!this.isOwned || !this.hasGroupSocket) {
+        console.warn("Trying to invite to a non-owned or non groupSocket atom");
         return;
       }
-      this.needs__connect(this.postUri, undefined, needUri, message);
+      this.atoms__connect(this.postUri, undefined, atomUri, message);
     }
 
     markAsRead(conn) {
       if (conn && conn.get("unread")) {
         const payload = {
           connectionUri: conn.get("uri"),
-          needUri: this.postUri,
+          atomUri: this.postUri,
         };
 
         const tmp_connections__markAsRead = this.connections__markAsRead;

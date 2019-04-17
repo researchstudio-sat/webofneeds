@@ -4,8 +4,8 @@
 import { actionTypes } from "../actions/actions.js";
 import Immutable from "immutable";
 import { getIn } from "../utils.js";
-import { parseNeed } from "./need-reducer/parse-need.js";
-import { parseMessage } from "./need-reducer/parse-message.js";
+import { parseAtom } from "./atom-reducer/parse-atom.js";
+import { parseMessage } from "./atom-reducer/parse-message.js";
 import * as processUtils from "../process-utils.js";
 
 const initialState = Immutable.fromJS({
@@ -18,12 +18,12 @@ const initialState = Immutable.fromJS({
   processingVerifyEmailAddress: false,
   processingResendVerificationEmail: false,
   processingSendAnonymousLinkEmail: false,
-  processingNeedUrisFromOwnerLoad: false,
-  needs: Immutable.Map(),
+  processingAtomUrisFromOwnerLoad: false,
+  atoms: Immutable.Map(),
   connections: Immutable.Map(),
 });
 
-export const emptyNeedProcess = Immutable.fromJS({
+export const emptyAtomProcess = Immutable.fromJS({
   loading: false,
   toLoad: false,
   loaded: false,
@@ -54,19 +54,19 @@ export const emptyMessagesProcess = Immutable.fromJS({
   failedToLoad: false,
 });
 
-function updateNeedProcess(processState, needUri, payload) {
-  if (!needUri) {
+function updateAtomProcess(processState, atomUri, payload) {
+  if (!atomUri) {
     return processState;
   }
 
-  const oldNeedProcess = getIn(processState, ["needs", needUri]);
+  const oldAtomProcess = getIn(processState, ["atoms", atomUri]);
   const payloadImm = Immutable.fromJS(payload);
 
   return processState.setIn(
-    ["needs", needUri],
-    oldNeedProcess
-      ? oldNeedProcess.mergeDeep(payloadImm)
-      : emptyNeedProcess.mergeDeep(payloadImm)
+    ["atoms", atomUri],
+    oldAtomProcess
+      ? oldAtomProcess.mergeDeep(payloadImm)
+      : emptyAtomProcess.mergeDeep(payloadImm)
   );
 }
 
@@ -113,11 +113,11 @@ export default function(processState = initialState, action = {}) {
     case actionTypes.account.reset:
       return initialState;
 
-    case actionTypes.needs.edit: {
-      const needUri = action.payload.needUri;
+    case actionTypes.atoms.edit: {
+      const atomUri = action.payload.atomUri;
 
-      if (needUri) {
-        processState = updateNeedProcess(processState, needUri, {
+      if (atomUri) {
+        processState = updateAtomProcess(processState, atomUri, {
           processUpdate: true,
         });
       }
@@ -125,44 +125,44 @@ export default function(processState = initialState, action = {}) {
       return processState;
     }
 
-    case actionTypes.needs.loadAllActiveNeedUrisFromOwner:
-      return processState.set("processingNeedUrisFromOwnerLoad", true);
+    case actionTypes.atoms.loadAllActiveAtomUrisFromOwner:
+      return processState.set("processingAtomUrisFromOwnerLoad", true);
 
-    case actionTypes.needs.storeNeedUrisFromOwner: {
-      const needUris = action.payload.get("uris");
-      needUris &&
-        needUris.forEach(needUri => {
-          if (!processUtils.isNeedLoaded(processState, needUri)) {
-            processState = updateNeedProcess(processState, needUri, {
+    case actionTypes.atoms.storeAtomUrisFromOwner: {
+      const atomUris = action.payload.get("uris");
+      atomUris &&
+        atomUris.forEach(atomUri => {
+          if (!processUtils.isAtomLoaded(processState, atomUri)) {
+            processState = updateAtomProcess(processState, atomUri, {
               toLoad: true,
             });
           }
         });
-      return processState.set("processingNeedUrisFromOwnerLoad", false);
+      return processState.set("processingAtomUrisFromOwnerLoad", false);
     }
 
     case actionTypes.personas.create:
-    case actionTypes.needs.create:
-    case actionTypes.needs.whatsAround:
+    case actionTypes.atoms.create:
+    case actionTypes.atoms.whatsAround:
       return processState.set("processingPublish", true);
 
     case actionTypes.failedToGetLocation:
       return processState.set("processingPublish", false);
 
-    case actionTypes.needs.editFailure: {
+    case actionTypes.atoms.editFailure: {
       console.debug(
-        "process-reducer actionTypes.needs.editFailure todo: impl / payload-> ",
+        "process-reducer actionTypes.atoms.editFailure todo: impl / payload-> ",
         action.payload
       );
       //TODO: IMPL
       return processState;
     }
 
-    case actionTypes.needs.editSuccessful: {
-      const needUri = action.payload.needUri;
+    case actionTypes.atoms.editSuccessful: {
+      const atomUri = action.payload.atomUri;
 
-      if (needUri) {
-        processState = updateNeedProcess(processState, needUri, {
+      if (atomUri) {
+        processState = updateAtomProcess(processState, atomUri, {
           processUpdate: false,
         });
       }
@@ -170,8 +170,8 @@ export default function(processState = initialState, action = {}) {
       return processState;
     }
 
-    case actionTypes.needs.createSuccessful: {
-      processState = updateNeedProcess(processState, action.payload.needUri, {
+    case actionTypes.atoms.createSuccessful: {
+      processState = updateAtomProcess(processState, action.payload.atomUri, {
         toLoad: false,
         failedToLoad: false,
         loading: false,
@@ -229,9 +229,9 @@ export default function(processState = initialState, action = {}) {
     case actionTypes.account.sendAnonymousLinkEmailSuccess:
       return processState.set("processingSendAnonymousLinkEmail", false);
 
-    case actionTypes.needs.storeUriFailed:
+    case actionTypes.atoms.storeUriFailed:
     case actionTypes.personas.storeUriFailed: {
-      return updateNeedProcess(processState, action.payload.get("uri"), {
+      return updateAtomProcess(processState, action.payload.get("uri"), {
         toLoad: false,
         loaded: false,
         failedToLoad: true,
@@ -411,8 +411,8 @@ export default function(processState = initialState, action = {}) {
       return processState;
     }
 
-    case actionTypes.messages.reopenNeed.failed:
-    case actionTypes.messages.closeNeed.failed: {
+    case actionTypes.messages.reopenAtom.failed:
+    case actionTypes.messages.closeAtom.failed: {
       let connections = action.payload.connections;
 
       connections &&
@@ -449,17 +449,17 @@ export default function(processState = initialState, action = {}) {
       return processState;
     }
 
-    case actionTypes.needs.storeTheirs:
+    case actionTypes.atoms.storeTheirs:
     case actionTypes.personas.storeTheirs:
-    case actionTypes.needs.storeOwned: {
-      let needs = action.payload.get("needs");
+    case actionTypes.atoms.storeOwned: {
+      let atoms = action.payload.get("atoms");
 
-      needs &&
-        needs.map(need => {
-          const parsedNeed = parseNeed(need);
-          processState = updateNeedProcess(
+      atoms &&
+        atoms.map(atom => {
+          const parsedAtom = parseAtom(atom);
+          processState = updateAtomProcess(
             processState,
-            parsedNeed.get("uri"),
+            parsedAtom.get("uri"),
             {
               toLoad: false,
               failedToLoad: false,
@@ -468,22 +468,22 @@ export default function(processState = initialState, action = {}) {
             }
           );
 
-          const heldNeedUris = parsedNeed.get("holds");
-          if (heldNeedUris.size > 0) {
-            heldNeedUris.map(heldNeedUri => {
-              if (!processUtils.isNeedLoaded(processState, heldNeedUri)) {
-                processState = updateNeedProcess(processState, heldNeedUri, {
+          const heldAtomUris = parsedAtom.get("holds");
+          if (heldAtomUris.size > 0) {
+            heldAtomUris.map(heldAtomUri => {
+              if (!processUtils.isAtomLoaded(processState, heldAtomUri)) {
+                processState = updateAtomProcess(processState, heldAtomUri, {
                   toLoad: true,
                 });
               }
             });
           }
 
-          const groupMemberUris = parsedNeed.get("groupMembers");
+          const groupMemberUris = parsedAtom.get("groupMembers");
           if (groupMemberUris.size > 0) {
             groupMemberUris.map(groupMemberUri => {
-              if (!processUtils.isNeedLoaded(processState, groupMemberUri)) {
-                processState = updateNeedProcess(processState, groupMemberUri, {
+              if (!processUtils.isAtomLoaded(processState, groupMemberUri)) {
+                processState = updateAtomProcess(processState, groupMemberUri, {
                   toLoad: true,
                 });
               }
@@ -493,22 +493,22 @@ export default function(processState = initialState, action = {}) {
       return processState;
     }
 
-    case actionTypes.needs.storeOwnedActiveUris: {
-      const needUris = action.payload.get("uris");
-      needUris &&
-        needUris.forEach(needUri => {
-          processState = updateNeedProcess(processState, needUri, {
-            loading: true, //FIXME: once we dont actually retrieve the needs right after this dispatch we need to set "toLoad" instead of loading
+    case actionTypes.atoms.storeOwnedActiveUris: {
+      const atomUris = action.payload.get("uris");
+      atomUris &&
+        atomUris.forEach(atomUri => {
+          processState = updateAtomProcess(processState, atomUri, {
+            loading: true, //FIXME: once we dont actually retrieve the atoms right after this dispatch we need to set "toLoad" instead of loading
           });
         });
       return processState;
     }
 
-    case actionTypes.needs.storeOwnedInactiveUris: {
-      const needUris = action.payload.get("uris");
-      needUris &&
-        needUris.forEach(needUri => {
-          processState = updateNeedProcess(processState, needUri, {
+    case actionTypes.atoms.storeOwnedInactiveUris: {
+      const atomUris = action.payload.get("uris");
+      atomUris &&
+        atomUris.forEach(atomUri => {
+          processState = updateAtomProcess(processState, atomUri, {
             toLoad: true,
           });
         });
@@ -516,11 +516,11 @@ export default function(processState = initialState, action = {}) {
     }
 
     case actionTypes.personas.storeTheirUrisInLoading:
-    case actionTypes.needs.storeTheirUrisInLoading: {
-      const needUris = action.payload.get("uris");
-      needUris &&
-        needUris.forEach(needUri => {
-          processState = updateNeedProcess(processState, needUri, {
+    case actionTypes.atoms.storeTheirUrisInLoading: {
+      const atomUris = action.payload.get("uris");
+      atomUris &&
+        atomUris.forEach(atomUri => {
+          processState = updateAtomProcess(processState, atomUri, {
             toLoad: false,
             loading: true,
           });
@@ -528,15 +528,15 @@ export default function(processState = initialState, action = {}) {
       return processState;
     }
 
-    //Necessary to flag the originatorUri of a message as need toLoad if the need is not currently in the state yet (e.g new groupmember sends message)
+    //Necessary to flag the originatorUri of a message as atom toLoad if the atom is not currently in the state yet (e.g new groupmember sends message)
     case actionTypes.messages.processConnectionMessage:
-      return addOriginatorNeedToLoad(processState, action.payload);
+      return addOriginatorAtomToLoad(processState, action.payload);
 
-    case actionTypes.needs.delete:
-    case actionTypes.needs.removeDeleted:
+    case actionTypes.atoms.delete:
+    case actionTypes.atoms.removeDeleted:
     case actionTypes.personas.removeDeleted: {
-      const needUri = action.payload.get("uri");
-      return processState.deleteIn(["needs", needUri]);
+      const atomUri = action.payload.get("uri");
+      return processState.deleteIn(["atoms", atomUri]);
     }
 
     default:
@@ -547,20 +547,20 @@ export default function(processState = initialState, action = {}) {
 /*
  "alreadyProcessed" flag, which indicates that we do not care about the
  sent status anymore and assume that it has been successfully sent to each server (incl. the remote)
- "insertIntoConnUri" and "insertIntoNeedUri" are used for forwardedMessages so that the message is
- stored within the given connection/need and not in the original need or connection as we might not
+ "insertIntoConnUri" and "insertIntoAtomUri" are used for forwardedMessages so that the message is
+ stored within the given connection/atom and not in the original atom or connection as we might not
  have these stored in the state
  */
-export function addOriginatorNeedToLoad(
+export function addOriginatorAtomToLoad(
   processState,
   wonMessage,
   alreadyProcessed = false,
   insertIntoConnUri = undefined,
-  insertIntoNeedUri = undefined
+  insertIntoAtomUri = undefined
 ) {
   // we used to exclude messages without content here, using
   // if (wonMessage.getContentGraphs().length > 0) as the condition
-  // however, after moving the facet info of connect/open messages from
+  // however, after moving the socket info of connect/open messages from
   // content to envelope and making them optional, connect messages
   // actually can have no content. This never happened before, and
   // as one might expect, caused very weird behaviour when it did:
@@ -574,48 +574,48 @@ export function addOriginatorNeedToLoad(
     let parsedMessage = parseMessage(
       wonMessage,
       alreadyProcessed,
-      insertIntoConnUri && insertIntoNeedUri
+      insertIntoConnUri && insertIntoAtomUri
     );
     if (parsedMessage) {
       const connectionUri =
         insertIntoConnUri || parsedMessage.get("belongsToUri");
 
-      let needUri = insertIntoNeedUri;
-      if (!needUri && parsedMessage.getIn(["data", "outgoingMessage"])) {
-        // needUri is the message's hasSenderNeed
-        needUri = wonMessage.getSenderNeed();
-      } else if (!needUri) {
-        // needUri is the remote message's hasReceiverNeed
-        needUri = wonMessage.getReceiverNeed();
+      let atomUri = insertIntoAtomUri;
+      if (!atomUri && parsedMessage.getIn(["data", "outgoingMessage"])) {
+        // atomUri is the message's senderAtom
+        atomUri = wonMessage.getSenderAtom();
+      } else if (!atomUri) {
+        // atomUri is the remote message's recipientAtom
+        atomUri = wonMessage.getRecipientAtom();
       }
 
       const originatorUri = parsedMessage.getIn(["data", "originatorUri"]);
 
       if (originatorUri) {
-        //Message is originally from another need, we might need to add the need as well
-        if (!processUtils.isNeedLoaded(processState, originatorUri)) {
+        //Message is originally from another atom, we might atom to add the atom as well
+        if (!processUtils.isAtomLoaded(processState, originatorUri)) {
           console.debug(
-            "Originator Need is not in the state yet, we need to add it"
+            "Originator Atom is not in the state yet, we need to add it"
           );
-          processState = updateNeedProcess(processState, originatorUri, {
+          processState = updateAtomProcess(processState, originatorUri, {
             toLoad: true,
             loading: false,
           });
         }
       }
 
-      if (needUri) {
+      if (atomUri) {
         const hasContainedForwardedWonMessages = wonMessage.hasContainedForwardedWonMessages();
 
         if (hasContainedForwardedWonMessages) {
           const containedForwardedWonMessages = wonMessage.getContainedForwardedWonMessages();
           containedForwardedWonMessages.map(forwardedWonMessage => {
-            processState = addOriginatorNeedToLoad(
+            processState = addOriginatorAtomToLoad(
               processState,
               forwardedWonMessage,
               true,
               connectionUri,
-              needUri
+              atomUri
             );
             //PARSE MESSAGE DIFFERENTLY FOR FORWARDED MESSAGES
           });

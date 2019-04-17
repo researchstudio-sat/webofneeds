@@ -19,8 +19,8 @@ public interface UserRepository extends WonRepository<User> {
 
     // for the syntax, this helps:
     // http://en.wikibooks.org/wiki/Java_Persistence/Querying#JPQL
-    @Query(value = "SELECT u from User u JOIN u.userNeeds n where n.uri = ?1")
-    public User findByNeedUri(URI needUri);
+    @Query(value = "SELECT u from User u JOIN u.userAtoms n where n.uri = ?1")
+    public User findByAtomUri(URI atomUri);
 
     @Query(value = "SELECT u from User u JOIN FETCH u.keystorePasswordHolder LEFT JOIN FETCH u.recoverableKeystorePasswordHolder where u.username = ?1 ")
     public User findByUsernameWithKeystorePassword(String username);

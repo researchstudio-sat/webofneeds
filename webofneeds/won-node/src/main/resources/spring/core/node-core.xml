@@ -32,13 +32,13 @@
         <property name="connectionResourceURIPrefix" value="${uri.prefix.connection}" />
         <property name="eventResourceURIPrefix" value="${uri.prefix.event}" />
         <property name="attachmentResourceURIPrefix" value="${uri.prefix.attachment}" />
-        <property name="needResourceURIPrefix" value="${uri.prefix.need}" />
+        <property name="atomResourceURIPrefix" value="${uri.prefix.atom}" />
         <property name="pageURIPrefix" value="${uri.prefix.page}" />
         <property name="generalURIPrefix" value="${uri.prefix}" />
     </bean>
 
     <!-- Model Mapper for RDF -->
-    <bean id="needModelMapper" class="won.protocol.model.NeedModelMapper"></bean>
+    <bean id="atomModelMapper" class="won.protocol.model.AtomModelMapper"></bean>
     <bean id="connectionModelMapper" class="won.protocol.model.ConnectionModelMapper"></bean>
 
     
@@ -46,28 +46,28 @@
     <bean id="unreadInformationService" class="won.protocol.service.impl.UnreadInformationService" />
 
     <bean id="linkedDataService" class="won.node.service.impl.LinkedDataServiceImpl">
-        <property name="needInformationService" ref="needInformationService" />
+        <property name="atomInformationService" ref="atomInformationService" />
         <property name="resourceURIPrefix" value="${uri.prefix.resource}" />
         <property name="dataURIPrefix" value="${uri.prefix.data}" />
         <property name="connectionResourceURIPrefix" value="${uri.prefix.connection}" />
-        <property name="needResourceURIPrefix" value="${uri.prefix.need}" />
+        <property name="atomResourceURIPrefix" value="${uri.prefix.atom}" />
         <property name="eventResourceURIPrefix" value="${uri.prefix.event}" />
         <property name="pageURIPrefix" value="${uri.prefix.page}" />
-        <property name="needProtocolEndpoint" value="${uri.protocol.need}" />
+        <property name="atomProtocolEndpoint" value="${uri.protocol.atom}" />
         <property name="matcherProtocolEndpoint" value="${uri.protocol.matcher}" />
         <property name="ownerProtocolEndpoint" value="${uri.protocol.owner}" />
         <property name="activeMqEndpoint" value="${uri.protocol.activemq}" />
-        <property name="activeMqNeedProtcolQueueName" value="${activemq.queuename.need.incoming}" />
+        <property name="activeMqAtomProtcolQueueName" value="${activemq.queuename.atom.incoming}" />
         <property name="activeMqOwnerProtcolQueueName" value="${activemq.queuename.owner.incoming}" />
         <property name="activeMqMatcherPrtotocolQueueName" value="${activemq.queuename.matcher.incoming}"/>
-        <property name="activeMqMatcherProtocolTopicNameNeedActivated"
-                  value="${activemq.matcher.outgoing.topicname.need.activated}"/>
-        <property name="activeMqMatcherProtocolTopicNameNeedCreated"
-                  value="${activemq.matcher.outgoing.topicname.need.created}"/>
-        <property name="activeMqMatcherProtocolTopicNameNeedDeactivated"
-                  value="${activemq.matcher.outgoing.topicname.need.deactivated}"/>
-        <property name="activeMqMatcherProtocolTopicNameNeedDeleted"
-                  value="${activemq.matcher.outgoing.topicname.need.deleted}"/>
+        <property name="activeMqMatcherProtocolTopicNameAtomActivated"
+                  value="${activemq.matcher.outgoing.topicname.atom.activated}"/>
+        <property name="activeMqMatcherProtocolTopicNameAtomCreated"
+                  value="${activemq.matcher.outgoing.topicname.atom.created}"/>
+        <property name="activeMqMatcherProtocolTopicNameAtomDeactivated"
+                  value="${activemq.matcher.outgoing.topicname.atom.deactivated}"/>
+        <property name="activeMqMatcherProtocolTopicNameAtomDeleted"
+                  value="${activemq.matcher.outgoing.topicname.atom.deleted}"/>
         <property name="uriService" ref="uriService" />
     </bean>
 
@@ -85,14 +85,14 @@
     </bean>
 
 
-    <bean id="needInformationService" class="won.node.service.impl.NeedInformationServiceImpl">
+    <bean id="atomInformationService" class="won.node.service.impl.AtomInformationServiceImpl">
         <property name="pageSize" value="${linkeddata.pagesize}" />
     </bean>
 
     <bean id="ownerManagementService" class="won.node.service.impl.OwnerManagementServiceImpl"/>
     
     
-    <bean id="facetService" class="won.node.facet.FacetService" />
+    <bean id="socketService" class="won.node.socket.SocketService" />
     <!--
     <bean id="keyStoreService" class="won.cryptography.service.keystore.FileBasedKeyStoreService" init-method="init">
         <constructor-arg type="java.lang.String" value="${keystore.location}" />

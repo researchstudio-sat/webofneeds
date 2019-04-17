@@ -66,9 +66,9 @@ export const rehearsalRoomSearch = {
             xsd: won.defaultContext["xsd"],
           },
           operations: [
-            `${resultName} a won:Need.`,
+            `${resultName} a won:Atom.`,
             `${resultName} a won:RehearsalRoomRentOffer.`,
-            `${resultName} (won:hasLocation|s:location) ?location.`,
+            `${resultName} (won:location|s:location) ?location.`,
             "?location s:geo ?location_geo.",
             "?location_geo s:latitude ?location_lat;",
             "s:longitude ?location_lon;",
@@ -109,7 +109,7 @@ export const rehearsalRoomSearch = {
             rdf: won.defaultContext["rdf"],
           },
           operations: [
-            `${resultName} a won:Need.`,
+            `${resultName} a won:Atom.`,
             `${resultName} a won:RehearsalRoomRentOffer.`,
           ],
         },

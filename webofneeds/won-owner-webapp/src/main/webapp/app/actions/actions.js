@@ -40,20 +40,20 @@ import { tree2constants } from "../utils.js";
 import { hierarchy2Creators } from "./action-utils.js";
 
 import {
-  needCreate,
-  needEdit,
+  atomCreate,
+  atomEdit,
   createWhatsAround,
-} from "./create-need-action.js";
+} from "./create-atom-action.js";
 
 import {
-  needsConnect,
-  fetchUnloadedNeeds,
-  fetchUnloadedNeed,
-  needsClose,
-  needsDelete,
-  needsOpen,
-  needsClosedBySystem,
-} from "./needs-actions.js";
+  atomsConnect,
+  fetchUnloadedAtoms,
+  fetchUnloadedAtom,
+  atomsClose,
+  atomsDelete,
+  atomsOpen,
+  atomsClosedBySystem,
+} from "./atoms-actions.js";
 
 import {
   stateBack,
@@ -88,7 +88,7 @@ import * as configActions from "./config-actions.js";
 
 import {
   pageLoadAction,
-  loadAllActiveNeedUrisFromOwner,
+  loadAllActiveAtomUrisFromOwner,
 } from "./load-action.js";
 import { stateGo, stateReload } from "redux-ui-router";
 import {
@@ -111,7 +111,7 @@ const actionHierarchy = {
   connections: {
     open: cnct.connectionsOpen,
     connectAdHoc: cnct.connectionsConnectAdHoc,
-    connectReactionNeed: cnct.connectionsConnectReactionNeed,
+    connectReactionAtom: cnct.connectionsConnectReactionAtom,
     close: cnct.connectionsClose,
     closeRemote: cnct.connectionsCloseRemote,
     rate: cnct.connectionsRate,
@@ -141,26 +141,26 @@ const actionHierarchy = {
 
     storeUriFailed: INJ_DEFAULT,
   },
-  needs: {
+  atoms: {
     received: INJ_DEFAULT,
     connectionsReceived: INJ_DEFAULT,
-    create: needCreate,
-    edit: needEdit,
+    create: atomCreate,
+    edit: atomEdit,
     editSuccessful: INJ_DEFAULT,
     editFailure: INJ_DEFAULT,
     whatsAround: createWhatsAround,
     createSuccessful: INJ_DEFAULT,
-    reopen: needsOpen,
-    close: needsClose,
-    delete: needsDelete,
-    closedBySystem: needsClosedBySystem,
+    reopen: atomsOpen,
+    close: atomsClose,
+    delete: atomsDelete,
+    closedBySystem: atomsClosedBySystem,
     failed: INJ_DEFAULT,
-    connect: needsConnect,
-    fetchUnloadedNeeds: fetchUnloadedNeeds,
-    fetchUnloadedNeed: fetchUnloadedNeed,
+    connect: atomsConnect,
+    fetchUnloadedAtoms: fetchUnloadedAtoms,
+    fetchUnloadedAtom: fetchUnloadedAtom,
 
-    loadAllActiveNeedUrisFromOwner: loadAllActiveNeedUrisFromOwner,
-    storeNeedUrisFromOwner: INJ_DEFAULT,
+    loadAllActiveAtomUrisFromOwner: loadAllActiveAtomUrisFromOwner,
+    storeAtomUrisFromOwner: INJ_DEFAULT,
 
     storeOwnedInactiveUris: INJ_DEFAULT,
     storeOwnedInactiveUrisInLoading: INJ_DEFAULT,
@@ -205,7 +205,7 @@ const actionHierarchy = {
     /* websocket messages, e.g. post-creation, chatting */
     //TODO get rid of send and rename to receivedMessage
 
-    send: INJ_DEFAULT, //TODO this should be part of proper, user-story-level actions (e.g. need.publish or sendCnctMsg)
+    send: INJ_DEFAULT, //TODO this should be part of proper, user-story-level actions (e.g. atom.publish or sendCnctMsg)
 
     /*
          * posting things to the server should be optimistic and assume
@@ -243,13 +243,13 @@ const actionHierarchy = {
       successOwn: INJ_DEFAULT, //1st successResponse
       failure: INJ_DEFAULT,
     },
-    closeNeed: {
-      success: messages.successfulCloseNeed,
-      failure: messages.failedCloseNeed,
+    closeAtom: {
+      success: messages.successfulCloseAtom,
+      failure: messages.failedCloseAtom,
     },
-    reopenNeed: {
-      success: messages.successfulReopenNeed,
-      failure: messages.failedReopenNeed,
+    reopenAtom: {
+      success: messages.successfulReopenAtom,
+      failure: messages.failedReopenAtom,
     },
     markAsRead: INJ_DEFAULT,
     messageStatus: {
@@ -271,7 +271,7 @@ const actionHierarchy = {
     processConnectionMessage: messages.processConnectionMessage,
     processChangeNotificationMessage: messages.processChangeNotificationMessage,
     processAgreementMessage: messages.processAgreementMessage,
-    needMessageReceived: messages.needMessageReceived,
+    atomMessageReceived: messages.atomMessageReceived,
     processConnectMessage: messages.processConnectMessage,
     connectMessageReceived: INJ_DEFAULT,
     connectMessageSent: INJ_DEFAULT,
@@ -361,7 +361,7 @@ const actionHierarchy = {
   view: {
     toggleRdf: INJ_DEFAULT,
 
-    toggleClosedNeeds: INJ_DEFAULT,
+    toggleClosedAtoms: INJ_DEFAULT,
 
     showMainMenu: INJ_DEFAULT,
     hideMainMenu: INJ_DEFAULT,
@@ -402,7 +402,7 @@ const actionHierarchy = {
   tick: startTicking,
 };
 
-//as string constans, e.g. actionTypes.needs.close === "needs.close"
+//as string constans, e.g. actionTypes.atoms.close === "atoms.close"
 export const actionTypes = tree2constants(actionHierarchy);
 
 /**

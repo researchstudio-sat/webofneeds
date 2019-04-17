@@ -1,0 +1,26 @@
+package won.node.camel.processor.socket.chatSocket;
+
+import org.apache.camel.Exchange;
+import org.springframework.stereotype.Component;
+import won.node.camel.processor.AbstractCamelProcessor;
+import won.node.camel.processor.annotation.DefaultSocketMessageProcessor;
+import won.node.camel.processor.annotation.SocketMessageProcessor;
+import won.protocol.message.WonMessage;
+import won.protocol.message.processor.camel.WonCamelConstants;
+import won.protocol.vocabulary.WON;
+import won.protocol.vocabulary.WONMSG;
+
+/**
+ * User: syim Date: 05.03.2015
+ */
+@Component
+@DefaultSocketMessageProcessor(direction = WONMSG.FromOwnerString, messageType = WONMSG.ConnectMessageString)
+@SocketMessageProcessor(socketType = WON.ChatSocketString, direction = WONMSG.FromOwnerString, messageType = WONMSG.ConnectMessageString)
+public class ConnectFromOwnerChatSocketImpl extends AbstractCamelProcessor {
+    @Override
+    public void process(final Exchange exchange) {
+        logger.debug("default socket implementation, not doing anything");
+        final WonMessage wonMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
+        logger.debug("message with socket {}", wonMessage.getSenderSocketURI());
+    }
+}

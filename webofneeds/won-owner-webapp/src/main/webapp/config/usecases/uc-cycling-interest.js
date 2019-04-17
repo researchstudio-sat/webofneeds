@@ -66,7 +66,7 @@ export const cyclingInterest = {
       variables: [resultName, "?score"],
       subQueries: subQueries,
       where: [
-        `${resultName} rdf:type won:Need.`,
+        `${resultName} rdf:type won:Atom.`,
         `${resultName} rdf:type s:PlanAction.`,
         `${resultName} s:object ?planObject.`,
         `?planObject s:about <http://dbpedia.org/resource/Cycling>`,

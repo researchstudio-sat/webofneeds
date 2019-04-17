@@ -10,9 +10,9 @@ import org.apache.jena.rdf.model.Model;
  * Date: 23.06.2015
  */
 public class HintEvent implements Serializable {
-    private String fromNeedUri;
+    private String fromAtomUri;
     private String fromWonNodeUri;
-    private String toNeedUri;
+    private String toAtomUri;
     private String toWonNodeUri;
     private String matcherUri;
     private double score;
@@ -21,22 +21,22 @@ public class HintEvent implements Serializable {
     private String serializationLangName;
     private String serializationLangContentType;
 
-    public HintEvent(String fromWonNodeUri, String fromNeedUri, String toWonNodeUri, String toNeedUri,
+    public HintEvent(String fromWonNodeUri, String fromAtomUri, String toWonNodeUri, String toAtomUri,
                     String matcherUri, double score) {
         this.fromWonNodeUri = fromWonNodeUri;
-        this.fromNeedUri = fromNeedUri;
+        this.fromAtomUri = fromAtomUri;
         this.toWonNodeUri = toWonNodeUri;
-        this.toNeedUri = toNeedUri;
+        this.toAtomUri = toAtomUri;
         this.matcherUri = matcherUri;
         this.score = score;
     }
 
-    public String getFromNeedUri() {
-        return fromNeedUri;
+    public String getFromAtomUri() {
+        return fromAtomUri;
     }
 
-    public String getToNeedUri() {
-        return toNeedUri;
+    public String getToAtomUri() {
+        return toAtomUri;
     }
 
     public String getFromWonNodeUri() {
@@ -81,7 +81,7 @@ public class HintEvent implements Serializable {
 
     @Override
     public HintEvent clone() {
-        HintEvent e = new HintEvent(fromWonNodeUri, fromNeedUri, toWonNodeUri, toNeedUri, matcherUri, score);
+        HintEvent e = new HintEvent(fromWonNodeUri, fromAtomUri, toWonNodeUri, toAtomUri, matcherUri, score);
         e.setGeneratedEventUri(this.getGeneratedEventUri());
         e.setSerializationLangContentType(this.serializationLangContentType);
         e.setSerializationLangName(this.serializationLangName);
@@ -91,7 +91,7 @@ public class HintEvent implements Serializable {
 
     @Override
     public String toString() {
-        return "HintEvent: (" + getFromWonNodeUri() + ", " + getFromNeedUri() + ", " + getToWonNodeUri() + ", "
-                        + getToNeedUri() + ", " + getMatcherUri() + ", " + getScore() + ")";
+        return "HintEvent: (" + getFromWonNodeUri() + ", " + getFromAtomUri() + ", " + getToWonNodeUri() + ", "
+                        + getToAtomUri() + ", " + getMatcherUri() + ", " + getScore() + ")";
     }
 }

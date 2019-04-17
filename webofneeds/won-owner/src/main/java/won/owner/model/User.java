@@ -74,8 +74,8 @@ public class User implements UserDetails, Persistable<Long> {
 
     @OneToMany(fetch = FetchType.EAGER)
     @OrderBy("creationDate desc")
-    @JoinTable(name = "wonuser_userneed", joinColumns = { @JoinColumn(name = "wonuser_id") })
-    private List<UserNeed> userNeeds;
+    @JoinTable(name = "wonuser_useratom", joinColumns = { @JoinColumn(name = "wonuser_id") })
+    private List<UserAtom> userAtoms;
     @Column(name = "role")
     private String role;
     @Column(name = "email")
@@ -213,26 +213,26 @@ public class User implements UserDetails, Persistable<Long> {
     }
 
     /*
-     * public List<Need> getNeeds() { return needs; }
+     * public List<Atom> getAtoms() { return atoms; }
      */
-    public void addNeedUri(UserNeed userNeed) {
-        this.userNeeds.add(userNeed);
+    public void addAtomUri(UserAtom userAtom) {
+        this.userAtoms.add(userAtom);
     }
 
-    public void deleteNeedUri(UserNeed userNeed) {
-        for (int i = 0; i < this.userNeeds.size(); i++) {
-            if (this.userNeeds.get(i).getUri().equals(userNeed.getUri())) {
-                this.userNeeds.remove(i);
+    public void deleteAtomUri(UserAtom userAtom) {
+        for (int i = 0; i < this.userAtoms.size(); i++) {
+            if (this.userAtoms.get(i).getUri().equals(userAtom.getUri())) {
+                this.userAtoms.remove(i);
             }
         }
     }
 
-    public List<UserNeed> getUserNeeds() {
-        return userNeeds;
+    public List<UserAtom> getUserAtoms() {
+        return userAtoms;
     }
 
-    public void setUserNeeds(final List<UserNeed> userNeeds) {
-        this.userNeeds = userNeeds;
+    public void setUserAtoms(final List<UserAtom> userAtoms) {
+        this.userAtoms = userAtoms;
     }
 
     public String getEmail() {
@@ -256,7 +256,7 @@ public class User implements UserDetails, Persistable<Long> {
     }
 
     /*
-     * public void setNeeds(final List<Need> needs) { this.needs = needs; }
+     * public void setAtoms(final List<Atom> atoms) { this.atoms = atoms; }
      */
     public void setDrafts(final Set<URI> draftURIs) {
         this.draftURIs = draftURIs;
@@ -314,7 +314,7 @@ public class User implements UserDetails, Persistable<Long> {
         final User user = (User) o;
         if (id != null ? !id.equals(user.id) : user.id != null)
             return false;
-        if (userNeeds != null ? !userNeeds.equals(user.userNeeds) : user.userNeeds != null)
+        if (userAtoms != null ? !userAtoms.equals(user.userAtoms) : user.userAtoms != null)
             return false;
         if (password != null ? !password.equals(user.password) : user.password != null)
             return false;
@@ -332,7 +332,7 @@ public class User implements UserDetails, Persistable<Long> {
         int result = id != null ? id.hashCode() : 0;
         result = 31 * result + (username != null ? username.hashCode() : 0);
         result = 31 * result + (password != null ? password.hashCode() : 0);
-        result = 31 * result + (userNeeds != null ? userNeeds.hashCode() : 0);
+        result = 31 * result + (userAtoms != null ? userAtoms.hashCode() : 0);
         result = 31 * result + (role != null ? role.hashCode() : 0);
         result = 31 * result + (email != null ? email.hashCode() : 0);
         return result;

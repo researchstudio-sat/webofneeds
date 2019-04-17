@@ -58,7 +58,7 @@ let _loginInProcessFor;
 /**
  *
  * @param credentials either {email, password} or {privateId}
- * @param redirectToFeed def. false, whether or not to redirect to the feed after signing in (needs `redirects` to be true)
+ * @param redirectToFeed def. false, whether or not to redirect to the feed after signing in (atoms `redirects` to be true)
  * @returns {Function}
  */
 export function accountLogin(credentials, redirectToFeed = false) {

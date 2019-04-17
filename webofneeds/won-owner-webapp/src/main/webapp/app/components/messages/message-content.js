@@ -5,7 +5,7 @@ import { connect2Redux } from "../../won-utils.js";
 import * as useCaseUtils from "../../usecase-utils.js";
 import { attach, getIn, get } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
-import { getOwnedNeedByConnectionUri } from "../../selectors/general-selectors.js";
+import { getOwnedAtomByConnectionUri } from "../../selectors/general-selectors.js";
 import "angular-marked";
 
 import "style/_message-content.scss";
@@ -42,11 +42,11 @@ function genComponentConf() {
       this.allDetails = useCaseUtils.getAllDetails();
 
       const selectFromState = state => {
-        const ownedNeed =
+        const ownedAtom =
           this.connectionUri &&
-          getOwnedNeedByConnectionUri(state, this.connectionUri);
+          getOwnedAtomByConnectionUri(state, this.connectionUri);
         const connection =
-          ownedNeed && ownedNeed.getIn(["connections", this.connectionUri]);
+          ownedAtom && ownedAtom.getIn(["connections", this.connectionUri]);
         const message =
           connection &&
           this.messageUri &&

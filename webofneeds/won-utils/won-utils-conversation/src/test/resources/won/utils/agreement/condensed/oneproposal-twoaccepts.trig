@@ -1,18 +1,18 @@
-@prefix msg:   <http://purl.org/webofneeds/message#> .
+@prefix msg:   <https://w3id.org/won/message#> .
 @prefix conn:  <https://localhost:8443/won/resource/connection/> .
-@prefix need:  <https://localhost:8443/won/resource/need/> .
-@prefix woncrypt: <http://purl.org/webofneeds/woncrypt#> .
+@prefix atom:  <https://localhost:8443/won/resource/atom/> .
+@prefix woncrypt: <https://w3id.org/won/core#> .
 @prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
 @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix cert:  <http://www.w3.org/ns/auth/cert#> .
-@prefix agr:   <http://purl.org/webofneeds/agreement#> .
+@prefix agr:   <https://w3id.org/won/agreement#> .
 @prefix local: <https://localhost:8443/won/resource/> .
 @prefix geo:   <http://www.w3.org/2003/01/geo/wgs84_pos#> .
 @prefix sig:   <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#> .
 @prefix s:     <http://schema.org/> .
 @prefix sh:    <http://www.w3.org/ns/shacl#> .
 @prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-@prefix won:   <http://purl.org/webofneeds/model#> .
+@prefix won:   <https://w3id.org/won/core#> .
 @prefix ldp:   <http://www.w3.org/ns/ldp#> .
 @prefix event: <https://localhost:8443/won/resource/event/> .
 @prefix dc:    <http://purl.org/dc/elements/1.1/> .
@@ -20,162 +20,162 @@
 
 <https://localhost:8443/won/resource/event/6671551888677331000#data> {
     event:6671551888677331000
-            msg:hasContent       <https://localhost:8443/won/resource/event/6671551888677331000#content> ;
-            msg:hasMessageType   msg:ConnectMessage ;
-            msg:hasReceiverNeed  need:nte803gz4pbiw6equ3qa ;
-            msg:hasSender        conn:xq6jofxo2w8o05io6dre ;
-            msg:hasSenderNeed    need:7820503869697675000 .
+            msg:content       <https://localhost:8443/won/resource/event/6671551888677331000#content> ;
+            msg:messageType   msg:ConnectMessage ;
+            msg:recipientAtom  atom:nte803gz4pbiw6equ3qa ;
+            msg:sender        conn:xq6jofxo2w8o05io6dre ;
+            msg:senderAtom    atom:7820503869697675000 .
 }
 
 <https://localhost:8443/won/resource/event/qy3k0igvj310ejofcqa9#envelope-1vve> {
     event:qy3k0igvj310ejofcqa9
-            msg:hasCorrespondingRemoteMessage
+            msg:correspondingRemoteMessage
                     event:thb06izkap5889x5gi2y ;
-            msg:hasMessageType      msg:SuccessResponse ;
-            msg:hasPreviousMessage  event:2kt4vylzjcvoz4rtn5tn ;
-            msg:hasReceiver         conn:4t9deo4t6bqx83jxk5ex ;
-            msg:hasReceiverNeed     need:nte803gz4pbiw6equ3qa ;
-            msg:hasSender           conn:xq6jofxo2w8o05io6dre ;
-            msg:hasSenderNeed       need:7820503869697675000 .
+            msg:messageType      msg:SuccessResponse ;
+            msg:previousMessage  event:2kt4vylzjcvoz4rtn5tn ;
+            msg:recipient         conn:4t9deo4t6bqx83jxk5ex ;
+            msg:recipientAtom     atom:nte803gz4pbiw6equ3qa ;
+            msg:sender           conn:xq6jofxo2w8o05io6dre ;
+            msg:senderAtom       atom:7820503869697675000 .
 }
 
 <https://localhost:8443/won/resource/event/mt1f8i41bogt7kc91fi6#envelope-vnv7> {
     event:mt1f8i41bogt7kc91fi6
-            msg:hasCorrespondingRemoteMessage
+            msg:correspondingRemoteMessage
                     event:wpvw8lkvi5tcgccuq2dc ;
-            msg:hasPreviousMessage  event:attqb66yn0hd7rj0m483 .
+            msg:previousMessage  event:attqb66yn0hd7rj0m483 .
 }
 
 <https://localhost:8443/won/resource/event/5669098069340991000#data> {
     event:5669098069340991000
-            msg:hasContent       <https://localhost:8443/won/resource/event/5669098069340991000#content> ;
-            msg:hasMessageType   msg:ConnectionMessage ;
-            msg:hasReceiver      conn:4t9deo4t6bqx83jxk5ex ;
-            msg:hasReceiverNeed  need:nte803gz4pbiw6equ3qa ;
-            msg:hasSender        conn:xq6jofxo2w8o05io6dre ;
-            msg:hasSenderNeed    need:7820503869697675000 .
+            msg:content       <https://localhost:8443/won/resource/event/5669098069340991000#content> ;
+            msg:messageType   msg:ConnectionMessage ;
+            msg:recipient      conn:4t9deo4t6bqx83jxk5ex ;
+            msg:recipientAtom  atom:nte803gz4pbiw6equ3qa ;
+            msg:sender        conn:xq6jofxo2w8o05io6dre ;
+            msg:senderAtom    atom:7820503869697675000 .
 }
 
 <https://localhost:8443/won/resource/event/cl6l8nmpfd357179u8ks#envelope-2w83> {
     event:cl6l8nmpfd357179u8ks
-            msg:hasPreviousMessage  event:whryytxsc7il9og0zs2z , event:mt1f8i41bogt7kc91fi6 .
+            msg:previousMessage  event:whryytxsc7il9og0zs2z , event:mt1f8i41bogt7kc91fi6 .
 }
 
 <https://localhost:8443/won/resource/event/gha3693zdigediknod00#envelope-u2li> {
     event:gha3693zdigediknod00
-            msg:hasCorrespondingRemoteMessage
+            msg:correspondingRemoteMessage
                     event:cl6l8nmpfd357179u8ks ;
-            msg:hasMessageType      msg:SuccessResponse ;
-            msg:hasPreviousMessage  event:wpvw8lkvi5tcgccuq2dc ;
-            msg:hasReceiver         conn:4t9deo4t6bqx83jxk5ex ;
-            msg:hasReceiverNeed     need:nte803gz4pbiw6equ3qa ;
-            msg:hasSender           conn:xq6jofxo2w8o05io6dre ;
-            msg:hasSenderNeed       need:7820503869697675000 .
+            msg:messageType      msg:SuccessResponse ;
+            msg:previousMessage  event:wpvw8lkvi5tcgccuq2dc ;
+            msg:recipient         conn:4t9deo4t6bqx83jxk5ex ;
+            msg:recipientAtom     atom:nte803gz4pbiw6equ3qa ;
+            msg:sender           conn:xq6jofxo2w8o05io6dre ;
+            msg:senderAtom       atom:7820503869697675000 .
 }
 
 <https://localhost:8443/won/resource/event/attqb66yn0hd7rj0m483#envelope-dm4n> {
     event:attqb66yn0hd7rj0m483
-            msg:hasCorrespondingRemoteMessage
+            msg:correspondingRemoteMessage
                     event:fbsnd9ilwhqg8f4l2tjg ;
-            msg:hasMessageType      msg:SuccessResponse ;
-            msg:hasPreviousMessage  event:g4lse5fmv91tlzlc1zms ;
-            msg:hasReceiver         conn:xq6jofxo2w8o05io6dre ;
-            msg:hasReceiverNeed     need:7820503869697675000 ;
-            msg:hasSender           conn:4t9deo4t6bqx83jxk5ex ;
-            msg:hasSenderNeed       need:nte803gz4pbiw6equ3qa .
+            msg:messageType      msg:SuccessResponse ;
+            msg:previousMessage  event:g4lse5fmv91tlzlc1zms ;
+            msg:recipient         conn:xq6jofxo2w8o05io6dre ;
+            msg:recipientAtom     atom:7820503869697675000 ;
+            msg:sender           conn:4t9deo4t6bqx83jxk5ex ;
+            msg:senderAtom       atom:nte803gz4pbiw6equ3qa .
 }
 
 <https://localhost:8443/won/resource/event/75z0ck8d0ijloyvzyo05#envelope-jglh> {
     event:75z0ck8d0ijloyvzyo05
-            msg:hasPreviousMessage  event:4240608697617289000 ;
-            msg:hasReceiver         conn:xq6jofxo2w8o05io6dre .
+            msg:previousMessage  event:4240608697617289000 ;
+            msg:recipient         conn:xq6jofxo2w8o05io6dre .
 }
 
 <https://localhost:8443/won/resource/event/cl6l8nmpfd357179u8ks#envelope-z6ph> {
     event:cl6l8nmpfd357179u8ks
-            msg:hasCorrespondingRemoteMessage
+            msg:correspondingRemoteMessage
                     event:gha3693zdigediknod00 .
 }
 
 <https://localhost:8443/won/resource/event/00d5wzbbf8hzzt2eewcc#envelope-1ltm> {
     event:00d5wzbbf8hzzt2eewcc
-            msg:hasContent       <https://localhost:8443/won/resource/event/00d5wzbbf8hzzt2eewcc#content-tbn3> ;
-            msg:hasMessageType   msg:ConnectionMessage ;
-            msg:hasReceiver      conn:xq6jofxo2w8o05io6dre ;
-            msg:hasReceiverNeed  need:7820503869697675000 ;
-            msg:hasSender        conn:4t9deo4t6bqx83jxk5ex ;
-            msg:hasSenderNeed    need:nte803gz4pbiw6equ3qa .
+            msg:content       <https://localhost:8443/won/resource/event/00d5wzbbf8hzzt2eewcc#content-tbn3> ;
+            msg:messageType   msg:ConnectionMessage ;
+            msg:recipient      conn:xq6jofxo2w8o05io6dre ;
+            msg:recipientAtom  atom:7820503869697675000 ;
+            msg:sender        conn:4t9deo4t6bqx83jxk5ex ;
+            msg:senderAtom    atom:nte803gz4pbiw6equ3qa .
 }
 
 <https://localhost:8443/won/resource/event/oy525npzylaeic4w4kvg#envelope-dec7> {
     event:oy525npzylaeic4w4kvg
-            msg:hasContent      <https://localhost:8443/won/resource/event/oy525npzylaeic4w4kvg#content-3ssv> ;
-            msg:hasMessageType  msg:CreateMessage ;
-            msg:hasSenderNeed   need:nte803gz4pbiw6equ3qa .
+            msg:content      <https://localhost:8443/won/resource/event/oy525npzylaeic4w4kvg#content-3ssv> ;
+            msg:messageType  msg:CreateMessage ;
+            msg:senderAtom   atom:nte803gz4pbiw6equ3qa .
 }
 
 <https://localhost:8443/won/resource/event/sdx8rv6g1ff2krzf8fpd#envelope-0irr> {
     event:sdx8rv6g1ff2krzf8fpd
-            msg:hasPreviousMessage  event:557600936467257340 , event:diabwxkvjvkh53zrrwjd .
+            msg:previousMessage  event:557600936467257340 , event:diabwxkvjvkh53zrrwjd .
 }
 
 <https://localhost:8443/won/resource/event/4672813835273634000#envelope-jrbj> {
     event:4672813835273634000
-            msg:hasPreviousMessage  event:75z0ck8d0ijloyvzyo05 .
+            msg:previousMessage  event:75z0ck8d0ijloyvzyo05 .
 }
 
 <https://localhost:8443/won/resource/event/75z0ck8d0ijloyvzyo05#content-y1fe> {
     event:75z0ck8d0ijloyvzyo05
-            won:hasFacet             won:ChatFacet ;
-            won:hasMatchCounterpart  need:nte803gz4pbiw6equ3qa ;
-            won:hasMatchScore        "0.9"^^xsd:double ;
-            won:hasRemoteFacet       won:ChatFacet .
+            won:socket             won:ChatSocket ;
+            won:matchCounterpart  atom:nte803gz4pbiw6equ3qa ;
+            won:matchScore        "0.9"^^xsd:double ;
+            won:targetSocket       won:ChatSocket .
 }
 
 <https://localhost:8443/won/resource/event/1zp49xutzuw6w7etotxk#envelope-30wn> {
     event:1zp49xutzuw6w7etotxk
-            msg:hasMessageType      msg:SuccessResponse ;
-            msg:hasPreviousMessage  event:4672813835273634000 ;
-            msg:hasReceiver         conn:xq6jofxo2w8o05io6dre ;
-            msg:hasReceiverNeed     need:7820503869697675000 ;
-            msg:hasSender           conn:xq6jofxo2w8o05io6dre ;
-            msg:hasSenderNeed       need:7820503869697675000 .
+            msg:messageType      msg:SuccessResponse ;
+            msg:previousMessage  event:4672813835273634000 ;
+            msg:recipient         conn:xq6jofxo2w8o05io6dre ;
+            msg:recipientAtom     atom:7820503869697675000 ;
+            msg:sender           conn:xq6jofxo2w8o05io6dre ;
+            msg:senderAtom       atom:7820503869697675000 .
 }
 
 <https://localhost:8443/won/resource/event/usi9yhill1lo2xi70sjx#envelope-0sio> {
     event:usi9yhill1lo2xi70sjx
-            msg:hasCorrespondingRemoteMessage
+            msg:correspondingRemoteMessage
                     event:2kt4vylzjcvoz4rtn5tn ;
-            msg:hasPreviousMessage  event:qxy7d1ql59uzorccngdo .
+            msg:previousMessage  event:qxy7d1ql59uzorccngdo .
 }
 
 <https://localhost:8443/won/resource/event/krcmdz8802701wpzlzl8#envelope-blu1> {
     event:krcmdz8802701wpzlzl8
-            msg:hasCorrespondingRemoteMessage
+            msg:correspondingRemoteMessage
                     event:00d5wzbbf8hzzt2eewcc .
 }
 
 <https://localhost:8443/won/resource/event/bri4ydc53o2dkyskug32#envelope-ockj> {
     event:bri4ydc53o2dkyskug32
-            msg:hasCorrespondingRemoteMessage
+            msg:correspondingRemoteMessage
                     event:to1pxp688kcn0wo30yu6 .
 }
 
 <https://localhost:8443/won/resource/event/1435888415723958200#data> {
     event:1435888415723958200
-            msg:hasContent       <https://localhost:8443/won/resource/event/1435888415723958200#content> ;
-            msg:hasMessageType   msg:ConnectionMessage ;
-            msg:hasReceiver      conn:4t9deo4t6bqx83jxk5ex ;
-            msg:hasReceiverNeed  need:nte803gz4pbiw6equ3qa ;
-            msg:hasSender        conn:xq6jofxo2w8o05io6dre ;
-            msg:hasSenderNeed    need:7820503869697675000 .
+            msg:content       <https://localhost:8443/won/resource/event/1435888415723958200#content> ;
+            msg:messageType   msg:ConnectionMessage ;
+            msg:recipient      conn:4t9deo4t6bqx83jxk5ex ;
+            msg:recipientAtom  atom:nte803gz4pbiw6equ3qa ;
+            msg:sender        conn:xq6jofxo2w8o05io6dre ;
+            msg:senderAtom    atom:7820503869697675000 .
 }
 
-<https://localhost:8443/won/resource/event/4240608697617289000#need> {
-    need:7820503869697675000
-            a             won:Need ;
-            won:hasFacet  won:ChatFacet ;
-            won:hasFlag   won:UsedForTesting ;
+<https://localhost:8443/won/resource/event/4240608697617289000#atom> {
+    atom:7820503869697675000
+            a             won:Atom ;
+            won:socket  won:ChatSocket ;
+            won:flag   won:UsedForTesting ;
             dc:title "More Coffee" ;
             dc:title "More Coffee" ;
             dc:title "More Coffee" ;
@@ -201,14 +201,14 @@
 
 <https://localhost:8443/won/resource/event/1435888415723958200#content> {
     event:1435888415723958200
-            won:hasTextMessage  "validate" .
+            won:textMessage  "validate" .
 }
 
 <https://localhost:8443/won/resource/event/oy525npzylaeic4w4kvg#content-3ssv> {
-    need:nte803gz4pbiw6equ3qa
-            a             won:Need ;
-            won:hasFacet  won:ChatFacet ;
-            dc:description  "This is a need automatically created by the DebugBot." ;             dc:title        "Debugging with initial hint: More Coffee" ;             dc:description  "This is a need automatically created by the DebugBot." ;             dc:title        "Debugging with initial hint: More Coffee" ;             dc:description  "This is a need automatically created by the DebugBot." ;             dc:title        "Debugging with initial hint: More Coffee" ;
+    atom:nte803gz4pbiw6equ3qa
+            a             won:Atom ;
+            won:socket  won:ChatSocket ;
+            dc:description  "This is an atom automatically created by the DebugBot." ;             dc:title        "Debugging with initial hint: More Coffee" ;             dc:description  "This is an atom automatically created by the DebugBot." ;             dc:title        "Debugging with initial hint: More Coffee" ;             dc:description  "This is an atom automatically created by the DebugBot." ;             dc:title        "Debugging with initial hint: More Coffee" ;
             won:seeks     _:b1 , _:b2 , _:b0 ;
             cert:key      [ cert:PublicKey  [ a                       woncrypt:ECCPublicKey ;
                                               woncrypt:ecc_algorithm  "EC" ;
@@ -229,472 +229,472 @@
                                               woncrypt:ecc_qy         "71b5c247464363dd3a5b6727d1bcbaf89df20bab39664c334124dfb99a2a21467b9c575d9f4f54e8f86941eee142d8e0"
                                             ] ] .
     
-    _:b1    dc:description  "This is a need automatically created by the DebugBot." ;
+    _:b1    dc:description  "This is an atom automatically created by the DebugBot." ;
             dc:title        "Debugging with initial hint: More Coffee" .
     
-    _:b2    dc:description  "This is a need automatically created by the DebugBot." ;
+    _:b2    dc:description  "This is an atom automatically created by the DebugBot." ;
             dc:title        "Debugging with initial hint: More Coffee" .
     
-    _:b0    dc:description  "This is a need automatically created by the DebugBot." ;
+    _:b0    dc:description  "This is an atom automatically created by the DebugBot." ;
             dc:title        "Debugging with initial hint: More Coffee" .
 }
 
 <https://localhost:8443/won/resource/event/qzgytpo0swmz6korntqu#envelope-udnz> {
     event:qzgytpo0swmz6korntqu
-            msg:hasCorrespondingRemoteMessage
+            msg:correspondingRemoteMessage
                     event:ow321nn1va6clfidc4s0 .
 }
 
 <https://localhost:8443/won/resource/event/6671551888677331000#content> {
     event:6671551888677331000
-            won:hasFacet        won:ChatFacet ;
-            won:hasRemoteFacet  won:ChatFacet ;
-            won:hasTextMessage  "hi" .
+            won:socket        won:ChatSocket ;
+            won:targetSocket  won:ChatSocket ;
+            won:textMessage  "hi" .
 }
 
 <https://localhost:8443/won/resource/event/2kt4vylzjcvoz4rtn5tn#envelope-ikk0> {
     event:2kt4vylzjcvoz4rtn5tn
-            msg:hasPreviousMessage  event:cmhmvboee8han65q5si5 ;
-            msg:hasReceiver         conn:xq6jofxo2w8o05io6dre .
+            msg:previousMessage  event:cmhmvboee8han65q5si5 ;
+            msg:recipient         conn:xq6jofxo2w8o05io6dre .
 }
 
 <https://localhost:8443/won/resource/event/dt0zlr5lc7zreq741bqn#envelope-ipo5> {
     event:dt0zlr5lc7zreq741bqn
-            msg:hasCorrespondingRemoteMessage
+            msg:correspondingRemoteMessage
                     event:omh6mnwfqczgjimg3sch .
 }
 
 <https://localhost:8443/won/resource/event/lkf3jxkjp5v9o71t8bsb#envelope-twcq> {
     event:lkf3jxkjp5v9o71t8bsb
-            msg:hasMessageType      msg:SuccessResponse ;
-            msg:hasPreviousMessage  event:oy525npzylaeic4w4kvg ;
-            msg:hasReceiverNeed     need:nte803gz4pbiw6equ3qa ;
-            msg:hasSenderNeed       need:nte803gz4pbiw6equ3qa .
+            msg:messageType      msg:SuccessResponse ;
+            msg:previousMessage  event:oy525npzylaeic4w4kvg ;
+            msg:recipientAtom     atom:nte803gz4pbiw6equ3qa ;
+            msg:senderAtom       atom:nte803gz4pbiw6equ3qa .
 }
 
 <https://localhost:8443/won/resource/event/9fhq1ef81bw0vwps12c5#envelope-u0yx> {
     event:9fhq1ef81bw0vwps12c5
-            msg:hasCorrespondingRemoteMessage
+            msg:correspondingRemoteMessage
                     event:sdx8rv6g1ff2krzf8fpd ;
-            msg:hasMessageType      msg:SuccessResponse ;
-            msg:hasPreviousMessage  event:hp6hw2wa3bbww4wo8gfo ;
-            msg:hasReceiver         conn:xq6jofxo2w8o05io6dre ;
-            msg:hasReceiverNeed     need:7820503869697675000 ;
-            msg:hasSender           conn:4t9deo4t6bqx83jxk5ex ;
-            msg:hasSenderNeed       need:nte803gz4pbiw6equ3qa .
+            msg:messageType      msg:SuccessResponse ;
+            msg:previousMessage  event:hp6hw2wa3bbww4wo8gfo ;
+            msg:recipient         conn:xq6jofxo2w8o05io6dre ;
+            msg:recipientAtom     atom:7820503869697675000 ;
+            msg:sender           conn:4t9deo4t6bqx83jxk5ex ;
+            msg:senderAtom       atom:nte803gz4pbiw6equ3qa .
 }
 
 <https://localhost:8443/won/resource/event/qxy7d1ql59uzorccngdo#envelope-tico> {
     event:qxy7d1ql59uzorccngdo
-            msg:hasCorrespondingRemoteMessage
+            msg:correspondingRemoteMessage
                     event:cmhmvboee8han65q5si5 ;
-            msg:hasMessageType      msg:SuccessResponse ;
-            msg:hasPreviousMessage  event:v847jsnvnzhfjj43hdbh ;
-            msg:hasReceiver         conn:xq6jofxo2w8o05io6dre ;
-            msg:hasReceiverNeed     need:7820503869697675000 ;
-            msg:hasSender           conn:4t9deo4t6bqx83jxk5ex ;
-            msg:hasSenderNeed       need:nte803gz4pbiw6equ3qa .
+            msg:messageType      msg:SuccessResponse ;
+            msg:previousMessage  event:v847jsnvnzhfjj43hdbh ;
+            msg:recipient         conn:xq6jofxo2w8o05io6dre ;
+            msg:recipientAtom     atom:7820503869697675000 ;
+            msg:sender           conn:4t9deo4t6bqx83jxk5ex ;
+            msg:senderAtom       atom:nte803gz4pbiw6equ3qa .
 }
 
 <https://localhost:8443/won/resource/event/ljkwmhkooz54bshrx1m5#envelope-baaw> {
     event:ljkwmhkooz54bshrx1m5
-            msg:hasMessageType      msg:SuccessResponse ;
-            msg:hasPreviousMessage  event:usi9yhill1lo2xi70sjx ;
-            msg:hasReceiver         conn:4t9deo4t6bqx83jxk5ex ;
-            msg:hasReceiverNeed     need:nte803gz4pbiw6equ3qa ;
-            msg:hasSender           conn:4t9deo4t6bqx83jxk5ex ;
-            msg:hasSenderNeed       need:nte803gz4pbiw6equ3qa .
+            msg:messageType      msg:SuccessResponse ;
+            msg:previousMessage  event:usi9yhill1lo2xi70sjx ;
+            msg:recipient         conn:4t9deo4t6bqx83jxk5ex ;
+            msg:recipientAtom     atom:nte803gz4pbiw6equ3qa ;
+            msg:sender           conn:4t9deo4t6bqx83jxk5ex ;
+            msg:senderAtom       atom:nte803gz4pbiw6equ3qa .
 }
 
 <https://localhost:8443/won/resource/event/krcmdz8802701wpzlzl8#envelope-qdj9> {
     event:krcmdz8802701wpzlzl8
-            msg:hasPreviousMessage  event:nmnetfuihnx70r0do0id .
+            msg:previousMessage  event:nmnetfuihnx70r0do0id .
 }
 
 <https://localhost:8443/won/resource/event/thb06izkap5889x5gi2y#envelope-lv03> {
     event:thb06izkap5889x5gi2y
-            msg:hasCorrespondingRemoteMessage
+            msg:correspondingRemoteMessage
                     event:qy3k0igvj310ejofcqa9 .
 }
 
 <https://localhost:8443/won/resource/event/hp6hw2wa3bbww4wo8gfo#envelope-iy82> {
     event:hp6hw2wa3bbww4wo8gfo
-            msg:hasPreviousMessage  event:dt0zlr5lc7zreq741bqn .
+            msg:previousMessage  event:dt0zlr5lc7zreq741bqn .
 }
 
 <https://localhost:8443/won/resource/event/ow321nn1va6clfidc4s0#envelope-l74h> {
     event:ow321nn1va6clfidc4s0
-            msg:hasCorrespondingRemoteMessage
+            msg:correspondingRemoteMessage
                     event:qzgytpo0swmz6korntqu ;
-            msg:hasPreviousMessage  event:9fhq1ef81bw0vwps12c5 .
+            msg:previousMessage  event:9fhq1ef81bw0vwps12c5 .
 }
 
 <https://localhost:8443/won/resource/event/ej27d16ryg5cg6hos72l#envelope-ibiq> {
     event:ej27d16ryg5cg6hos72l
-            msg:hasCorrespondingRemoteMessage
+            msg:correspondingRemoteMessage
                     event:5669098069340991000 .
 }
 
 <https://localhost:8443/won/resource/event/usi9yhill1lo2xi70sjx#envelope-kn0t> {
     event:usi9yhill1lo2xi70sjx
-            msg:hasContent       <https://localhost:8443/won/resource/event/usi9yhill1lo2xi70sjx#content-klsc> ;
-            msg:hasMessageType   msg:OpenMessage ;
-            msg:hasReceiver      conn:xq6jofxo2w8o05io6dre ;
-            msg:hasReceiverNeed  need:7820503869697675000 ;
-            msg:hasSender        conn:4t9deo4t6bqx83jxk5ex ;
-            msg:hasSenderNeed    need:nte803gz4pbiw6equ3qa .
+            msg:content       <https://localhost:8443/won/resource/event/usi9yhill1lo2xi70sjx#content-klsc> ;
+            msg:messageType   msg:OpenMessage ;
+            msg:recipient      conn:xq6jofxo2w8o05io6dre ;
+            msg:recipientAtom  atom:7820503869697675000 ;
+            msg:sender        conn:4t9deo4t6bqx83jxk5ex ;
+            msg:senderAtom    atom:nte803gz4pbiw6equ3qa .
 }
 
 <https://localhost:8443/won/resource/event/2gwtnta4od8xzqdubbkg#envelope-h151> {
     event:2gwtnta4od8xzqdubbkg
-            msg:hasCorrespondingRemoteMessage
+            msg:correspondingRemoteMessage
                     event:nmnetfuihnx70r0do0id ;
-            msg:hasMessageType      msg:SuccessResponse ;
-            msg:hasPreviousMessage  event:ej27d16ryg5cg6hos72l ;
-            msg:hasReceiver         conn:xq6jofxo2w8o05io6dre ;
-            msg:hasReceiverNeed     need:7820503869697675000 ;
-            msg:hasSender           conn:4t9deo4t6bqx83jxk5ex ;
-            msg:hasSenderNeed       need:nte803gz4pbiw6equ3qa .
+            msg:messageType      msg:SuccessResponse ;
+            msg:previousMessage  event:ej27d16ryg5cg6hos72l ;
+            msg:recipient         conn:xq6jofxo2w8o05io6dre ;
+            msg:recipientAtom     atom:7820503869697675000 ;
+            msg:sender           conn:4t9deo4t6bqx83jxk5ex ;
+            msg:senderAtom       atom:nte803gz4pbiw6equ3qa .
 }
 
 <https://localhost:8443/won/resource/event/ow321nn1va6clfidc4s0#content-1o90> {
     event:ow321nn1va6clfidc4s0
             agr:accepts         event:557600936467257340 ;
-            won:hasTextMessage  "Please go on." .
+            won:textMessage  "Please go on." .
 }
 
 <https://localhost:8443/won/resource/event/fbsnd9ilwhqg8f4l2tjg#envelope-jfhm> {
     event:fbsnd9ilwhqg8f4l2tjg
-            msg:hasCorrespondingRemoteMessage
+            msg:correspondingRemoteMessage
                     event:attqb66yn0hd7rj0m483 .
 }
 
 <https://localhost:8443/won/resource/event/5669098069340991000#content> {
     event:5669098069340991000
-            won:hasTextMessage  "one" .
+            won:textMessage  "one" .
 }
 
 <https://localhost:8443/won/resource/event/6671551888677331000#envelope-pj9k> {
     event:6671551888677331000
-            msg:hasCorrespondingRemoteMessage
+            msg:correspondingRemoteMessage
                     event:v847jsnvnzhfjj43hdbh ;
-            msg:hasPreviousMessage  event:1zp49xutzuw6w7etotxk ;
-            msg:hasSender           conn:xq6jofxo2w8o05io6dre .
+            msg:previousMessage  event:1zp49xutzuw6w7etotxk ;
+            msg:sender           conn:xq6jofxo2w8o05io6dre .
 }
 
 <https://localhost:8443/won/resource/event/cmhmvboee8han65q5si5#envelope-yk2t> {
     event:cmhmvboee8han65q5si5
-            msg:hasCorrespondingRemoteMessage
+            msg:correspondingRemoteMessage
                     event:qxy7d1ql59uzorccngdo .
 }
 
 <https://localhost:8443/won/resource/event/sdx8rv6g1ff2krzf8fpd#envelope-i09i> {
     event:sdx8rv6g1ff2krzf8fpd
-            msg:hasCorrespondingRemoteMessage
+            msg:correspondingRemoteMessage
                     event:9fhq1ef81bw0vwps12c5 .
 }
 
 <https://localhost:8443/won/resource/event/557600936467257340#content> {
     event:557600936467257340
             agr:proposes        event:5669098069340991000 ;
-            won:hasTextMessage  "two" .
+            won:textMessage  "two" .
 }
 
 <https://localhost:8443/won/resource/event/mt1f8i41bogt7kc91fi6#envelope-ua55> {
     event:mt1f8i41bogt7kc91fi6
-            msg:hasContent       <https://localhost:8443/won/resource/event/mt1f8i41bogt7kc91fi6#content-lqq1> ;
-            msg:hasMessageType   msg:ConnectionMessage ;
-            msg:hasReceiver      conn:xq6jofxo2w8o05io6dre ;
-            msg:hasReceiverNeed  need:7820503869697675000 ;
-            msg:hasSender        conn:4t9deo4t6bqx83jxk5ex ;
-            msg:hasSenderNeed    need:nte803gz4pbiw6equ3qa .
+            msg:content       <https://localhost:8443/won/resource/event/mt1f8i41bogt7kc91fi6#content-lqq1> ;
+            msg:messageType   msg:ConnectionMessage ;
+            msg:recipient      conn:xq6jofxo2w8o05io6dre ;
+            msg:recipientAtom  atom:7820503869697675000 ;
+            msg:sender        conn:4t9deo4t6bqx83jxk5ex ;
+            msg:senderAtom    atom:nte803gz4pbiw6equ3qa .
 }
 
 <https://localhost:8443/won/resource/event/tggbraefz9y07d2npt2m#envelope-engq> {
     event:tggbraefz9y07d2npt2m
-            msg:hasMessageType      msg:SuccessResponse ;
-            msg:hasPreviousMessage  event:ow321nn1va6clfidc4s0 ;
-            msg:hasReceiver         conn:4t9deo4t6bqx83jxk5ex ;
-            msg:hasReceiverNeed     need:nte803gz4pbiw6equ3qa ;
-            msg:hasSender           conn:4t9deo4t6bqx83jxk5ex ;
-            msg:hasSenderNeed       need:nte803gz4pbiw6equ3qa .
+            msg:messageType      msg:SuccessResponse ;
+            msg:previousMessage  event:ow321nn1va6clfidc4s0 ;
+            msg:recipient         conn:4t9deo4t6bqx83jxk5ex ;
+            msg:recipientAtom     atom:nte803gz4pbiw6equ3qa ;
+            msg:sender           conn:4t9deo4t6bqx83jxk5ex ;
+            msg:senderAtom       atom:nte803gz4pbiw6equ3qa .
 }
 
 <https://localhost:8443/won/resource/event/wpvw8lkvi5tcgccuq2dc#envelope-v0ww> {
     event:wpvw8lkvi5tcgccuq2dc
-            msg:hasCorrespondingRemoteMessage
+            msg:correspondingRemoteMessage
                     event:mt1f8i41bogt7kc91fi6 .
 }
 
 <https://localhost:8443/won/resource/event/2i6eieqj3z44fc62loe3#envelope-m8nh> {
     event:2i6eieqj3z44fc62loe3
-            msg:hasMessageType      msg:SuccessResponse ;
-            msg:hasPreviousMessage  event:6671551888677331000 ;
-            msg:hasReceiver         conn:xq6jofxo2w8o05io6dre ;
-            msg:hasReceiverNeed     need:7820503869697675000 ;
-            msg:hasSender           conn:xq6jofxo2w8o05io6dre ;
-            msg:hasSenderNeed       need:7820503869697675000 .
+            msg:messageType      msg:SuccessResponse ;
+            msg:previousMessage  event:6671551888677331000 ;
+            msg:recipient         conn:xq6jofxo2w8o05io6dre ;
+            msg:recipientAtom     atom:7820503869697675000 ;
+            msg:sender           conn:xq6jofxo2w8o05io6dre ;
+            msg:senderAtom       atom:7820503869697675000 .
 }
 
 <https://localhost:8443/won/resource/event/nmnetfuihnx70r0do0id#envelope-o1fy> {
     event:nmnetfuihnx70r0do0id
-            msg:hasCorrespondingRemoteMessage
+            msg:correspondingRemoteMessage
                     event:2gwtnta4od8xzqdubbkg .
 }
 
 <https://localhost:8443/won/resource/event/v847jsnvnzhfjj43hdbh#envelope-gdsa> {
     event:v847jsnvnzhfjj43hdbh
-            msg:hasPreviousMessage  event:oy525npzylaeic4w4kvg ;
-            msg:hasReceiver         conn:4t9deo4t6bqx83jxk5ex .
+            msg:previousMessage  event:oy525npzylaeic4w4kvg ;
+            msg:recipient         conn:4t9deo4t6bqx83jxk5ex .
 }
 
 <https://localhost:8443/won/resource/event/whryytxsc7il9og0zs2z#envelope-yk1e> {
     event:whryytxsc7il9og0zs2z
-            msg:hasMessageType      msg:SuccessResponse ;
-            msg:hasPreviousMessage  event:mt1f8i41bogt7kc91fi6 ;
-            msg:hasReceiver         conn:4t9deo4t6bqx83jxk5ex ;
-            msg:hasReceiverNeed     need:nte803gz4pbiw6equ3qa ;
-            msg:hasSender           conn:4t9deo4t6bqx83jxk5ex ;
-            msg:hasSenderNeed       need:nte803gz4pbiw6equ3qa .
+            msg:messageType      msg:SuccessResponse ;
+            msg:previousMessage  event:mt1f8i41bogt7kc91fi6 ;
+            msg:recipient         conn:4t9deo4t6bqx83jxk5ex ;
+            msg:recipientAtom     atom:nte803gz4pbiw6equ3qa ;
+            msg:sender           conn:4t9deo4t6bqx83jxk5ex ;
+            msg:senderAtom       atom:nte803gz4pbiw6equ3qa .
 }
 
 <https://localhost:8443/won/resource/event/hp6hw2wa3bbww4wo8gfo#envelope-gpzu> {
     event:hp6hw2wa3bbww4wo8gfo
-            msg:hasCorrespondingRemoteMessage
+            msg:correspondingRemoteMessage
                     event:557600936467257340 .
 }
 
 <https://localhost:8443/won/resource/event/to1pxp688kcn0wo30yu6#envelope-kxkb> {
     event:to1pxp688kcn0wo30yu6
-            msg:hasCorrespondingRemoteMessage
+            msg:correspondingRemoteMessage
                     event:bri4ydc53o2dkyskug32 ;
-            msg:hasMessageType      msg:SuccessResponse ;
-            msg:hasPreviousMessage  event:qzgytpo0swmz6korntqu ;
-            msg:hasReceiver         conn:4t9deo4t6bqx83jxk5ex ;
-            msg:hasReceiverNeed     need:nte803gz4pbiw6equ3qa ;
-            msg:hasSender           conn:xq6jofxo2w8o05io6dre ;
-            msg:hasSenderNeed       need:7820503869697675000 .
+            msg:messageType      msg:SuccessResponse ;
+            msg:previousMessage  event:qzgytpo0swmz6korntqu ;
+            msg:recipient         conn:4t9deo4t6bqx83jxk5ex ;
+            msg:recipientAtom     atom:nte803gz4pbiw6equ3qa ;
+            msg:sender           conn:xq6jofxo2w8o05io6dre ;
+            msg:senderAtom       atom:7820503869697675000 .
 }
 
 <https://localhost:8443/won/resource/event/q3wcoxjougj7awlo805f#envelope-5mhl> {
     event:q3wcoxjougj7awlo805f
-            msg:hasMessageType      msg:SuccessResponse ;
-            msg:hasPreviousMessage  event:00d5wzbbf8hzzt2eewcc ;
-            msg:hasReceiver         conn:4t9deo4t6bqx83jxk5ex ;
-            msg:hasReceiverNeed     need:nte803gz4pbiw6equ3qa ;
-            msg:hasSender           conn:4t9deo4t6bqx83jxk5ex ;
-            msg:hasSenderNeed       need:nte803gz4pbiw6equ3qa .
+            msg:messageType      msg:SuccessResponse ;
+            msg:previousMessage  event:00d5wzbbf8hzzt2eewcc ;
+            msg:recipient         conn:4t9deo4t6bqx83jxk5ex ;
+            msg:recipientAtom     atom:nte803gz4pbiw6equ3qa ;
+            msg:sender           conn:4t9deo4t6bqx83jxk5ex ;
+            msg:senderAtom       atom:nte803gz4pbiw6equ3qa .
 }
 
 <https://localhost:8443/won/resource/event/bdlertk71nx2mtu6tgou#envelope-z4jb> {
     event:bdlertk71nx2mtu6tgou
-            msg:hasMessageType      msg:SuccessResponse ;
-            msg:hasPreviousMessage  event:4240608697617289000 ;
-            msg:hasReceiverNeed     need:7820503869697675000 ;
-            msg:hasSenderNeed       need:7820503869697675000 .
+            msg:messageType      msg:SuccessResponse ;
+            msg:previousMessage  event:4240608697617289000 ;
+            msg:recipientAtom     atom:7820503869697675000 ;
+            msg:senderAtom       atom:7820503869697675000 .
 }
 
 <https://localhost:8443/won/resource/event/75z0ck8d0ijloyvzyo05#envelope-trus> {
     event:75z0ck8d0ijloyvzyo05
-            msg:hasContent       <https://localhost:8443/won/resource/event/75z0ck8d0ijloyvzyo05#content-y1fe> ;
-            msg:hasMessageType   msg:HintMessage ;
-            msg:hasReceiverNeed  need:7820503869697675000 .
+            msg:content       <https://localhost:8443/won/resource/event/75z0ck8d0ijloyvzyo05#content-y1fe> ;
+            msg:messageType   msg:HintMessage ;
+            msg:recipientAtom  atom:7820503869697675000 .
 }
 
 <https://localhost:8443/won/resource/event/wpvw8lkvi5tcgccuq2dc#envelope-3j0q> {
     event:wpvw8lkvi5tcgccuq2dc
-            msg:hasPreviousMessage  event:fbsnd9ilwhqg8f4l2tjg .
+            msg:previousMessage  event:fbsnd9ilwhqg8f4l2tjg .
 }
 
 <https://localhost:8443/won/resource/event/dt0zlr5lc7zreq741bqn#envelope-pgen> {
     event:dt0zlr5lc7zreq741bqn
-            msg:hasPreviousMessage  event:00d5wzbbf8hzzt2eewcc , event:q3wcoxjougj7awlo805f .
+            msg:previousMessage  event:00d5wzbbf8hzzt2eewcc , event:q3wcoxjougj7awlo805f .
 }
 
 <https://localhost:8443/won/resource/event/omh6mnwfqczgjimg3sch#envelope-b7qv> {
     event:omh6mnwfqczgjimg3sch
-            msg:hasCorrespondingRemoteMessage
+            msg:correspondingRemoteMessage
                     event:dt0zlr5lc7zreq741bqn ;
-            msg:hasMessageType      msg:SuccessResponse ;
-            msg:hasPreviousMessage  event:krcmdz8802701wpzlzl8 ;
-            msg:hasReceiver         conn:4t9deo4t6bqx83jxk5ex ;
-            msg:hasReceiverNeed     need:nte803gz4pbiw6equ3qa ;
-            msg:hasSender           conn:xq6jofxo2w8o05io6dre ;
-            msg:hasSenderNeed       need:7820503869697675000 .
+            msg:messageType      msg:SuccessResponse ;
+            msg:previousMessage  event:krcmdz8802701wpzlzl8 ;
+            msg:recipient         conn:4t9deo4t6bqx83jxk5ex ;
+            msg:recipientAtom     atom:nte803gz4pbiw6equ3qa ;
+            msg:sender           conn:xq6jofxo2w8o05io6dre ;
+            msg:senderAtom       atom:7820503869697675000 .
 }
 
 <https://localhost:8443/won/resource/event/cmhmvboee8han65q5si5#envelope-763m> {
     event:cmhmvboee8han65q5si5
-            msg:hasPreviousMessage  event:6671551888677331000 , event:2i6eieqj3z44fc62loe3 .
+            msg:previousMessage  event:6671551888677331000 , event:2i6eieqj3z44fc62loe3 .
 }
 
 <https://localhost:8443/won/resource/event/thb06izkap5889x5gi2y#envelope-h59i> {
     event:thb06izkap5889x5gi2y
-            msg:hasPreviousMessage  event:usi9yhill1lo2xi70sjx , event:ljkwmhkooz54bshrx1m5 .
+            msg:previousMessage  event:usi9yhill1lo2xi70sjx , event:ljkwmhkooz54bshrx1m5 .
 }
 
 <https://localhost:8443/won/resource/event/4240608697617289000#envelope> {
     event:4240608697617289000
-            msg:hasContent      <https://localhost:8443/won/resource/event/4240608697617289000#need> ;
-            msg:hasMessageType  msg:CreateMessage ;
-            msg:hasSenderNeed   need:7820503869697675000 .
+            msg:content      <https://localhost:8443/won/resource/event/4240608697617289000#atom> ;
+            msg:messageType  msg:CreateMessage ;
+            msg:senderAtom   atom:7820503869697675000 .
 }
 
 <https://localhost:8443/won/resource/event/557600936467257340#envelope-xg0i> {
     event:557600936467257340
-            msg:hasCorrespondingRemoteMessage
+            msg:correspondingRemoteMessage
                     event:hp6hw2wa3bbww4wo8gfo ;
-            msg:hasPreviousMessage  event:omh6mnwfqczgjimg3sch .
+            msg:previousMessage  event:omh6mnwfqczgjimg3sch .
 }
 
 <https://localhost:8443/won/resource/event/5669098069340991000#envelope-ma7y> {
     event:5669098069340991000
-            msg:hasCorrespondingRemoteMessage
+            msg:correspondingRemoteMessage
                     event:ej27d16ryg5cg6hos72l ;
-            msg:hasPreviousMessage  event:qy3k0igvj310ejofcqa9 .
+            msg:previousMessage  event:qy3k0igvj310ejofcqa9 .
 }
 
 <https://localhost:8443/won/resource/event/4672813835273634000#data> {
     event:4672813835273634000
-            msg:hasContent       <https://localhost:8443/won/resource/event/4672813835273634000#content> ;
-            msg:hasMessageType   msg:HintFeedbackMessage ;
-            msg:hasReceiverNeed  need:nte803gz4pbiw6equ3qa ;
-            msg:hasSender        conn:xq6jofxo2w8o05io6dre ;
-            msg:hasSenderNeed    need:7820503869697675000 .
+            msg:content       <https://localhost:8443/won/resource/event/4672813835273634000#content> ;
+            msg:messageType   msg:HintFeedbackMessage ;
+            msg:recipientAtom  atom:nte803gz4pbiw6equ3qa ;
+            msg:sender        conn:xq6jofxo2w8o05io6dre ;
+            msg:senderAtom    atom:7820503869697675000 .
 }
 
 <https://localhost:8443/won/resource/event/usi9yhill1lo2xi70sjx#content-klsc> {
     event:usi9yhill1lo2xi70sjx
-            won:hasTextMessage  "Greetings! \nI am the DebugBot. I can simulate multiple other users so you can test things. I understand a few commands. \nTo see which ones, type \n\n'usage'\n\n (without the quotes)." .
+            won:textMessage  "Greetings! \nI am the DebugBot. I can simulate multiple other users so you can test things. I understand a few commands. \nTo see which ones, type \n\n'usage'\n\n (without the quotes)." .
 }
 
 <https://localhost:8443/won/resource/event/2kt4vylzjcvoz4rtn5tn#envelope-1xbk> {
     event:2kt4vylzjcvoz4rtn5tn
-            msg:hasCorrespondingRemoteMessage
+            msg:correspondingRemoteMessage
                     event:usi9yhill1lo2xi70sjx .
 }
 
 <https://localhost:8443/won/resource/event/qzgytpo0swmz6korntqu#envelope-7ezq> {
     event:qzgytpo0swmz6korntqu
-            msg:hasPreviousMessage  event:sdx8rv6g1ff2krzf8fpd .
+            msg:previousMessage  event:sdx8rv6g1ff2krzf8fpd .
 }
 
 <https://localhost:8443/won/resource/event/ej27d16ryg5cg6hos72l#envelope-xm9b> {
     event:ej27d16ryg5cg6hos72l
-            msg:hasPreviousMessage  event:thb06izkap5889x5gi2y .
+            msg:previousMessage  event:thb06izkap5889x5gi2y .
 }
 
 <https://localhost:8443/won/resource/event/4672813835273634000#content> {
     event:4672813835273634000
-            won:hasFeedback  [ won:forResource      conn:xq6jofxo2w8o05io6dre ;
-                               won:hasBinaryRating  won:Good
+            won:feedback  [ won:forResource      conn:xq6jofxo2w8o05io6dre ;
+                               won:binaryRating  won:Good
                              ] .
 }
 
 <https://localhost:8443/won/resource/event/diabwxkvjvkh53zrrwjd#envelope-pc7l> {
     event:diabwxkvjvkh53zrrwjd
-            msg:hasMessageType      msg:SuccessResponse ;
-            msg:hasPreviousMessage  event:557600936467257340 ;
-            msg:hasReceiver         conn:xq6jofxo2w8o05io6dre ;
-            msg:hasReceiverNeed     need:7820503869697675000 ;
-            msg:hasSender           conn:xq6jofxo2w8o05io6dre ;
-            msg:hasSenderNeed       need:7820503869697675000 .
+            msg:messageType      msg:SuccessResponse ;
+            msg:previousMessage  event:557600936467257340 ;
+            msg:recipient         conn:xq6jofxo2w8o05io6dre ;
+            msg:recipientAtom     atom:7820503869697675000 ;
+            msg:sender           conn:xq6jofxo2w8o05io6dre ;
+            msg:senderAtom       atom:7820503869697675000 .
 }
 
 <https://localhost:8443/won/resource/event/g4lse5fmv91tlzlc1zms#envelope-ed0k> {
     event:g4lse5fmv91tlzlc1zms
-            msg:hasPreviousMessage  event:bri4ydc53o2dkyskug32 .
+            msg:previousMessage  event:bri4ydc53o2dkyskug32 .
 }
 
 <https://localhost:8443/won/resource/event/00d5wzbbf8hzzt2eewcc#content-tbn3> {
     event:00d5wzbbf8hzzt2eewcc
-            won:hasTextMessage  "I'm not sure I understand you fully." .
+            won:textMessage  "I'm not sure I understand you fully." .
 }
 
 <https://localhost:8443/won/resource/event/mt1f8i41bogt7kc91fi6#content-lqq1> {
     event:mt1f8i41bogt7kc91fi6
             agr:accepts         event:557600936467257340 ;
-            won:hasTextMessage  "Ok, I'm going to validate the data in our connection. This may take a while." .
+            won:textMessage  "Ok, I'm going to validate the data in our connection. This may take a while." .
 }
 
 <https://localhost:8443/won/resource/event/3jaz102f0678yab8vwx2#envelope-7byg> {
     event:3jaz102f0678yab8vwx2
-            msg:hasMessageType      msg:SuccessResponse ;
-            msg:hasPreviousMessage  event:1435888415723958200 ;
-            msg:hasReceiver         conn:xq6jofxo2w8o05io6dre ;
-            msg:hasReceiverNeed     need:7820503869697675000 ;
-            msg:hasSender           conn:xq6jofxo2w8o05io6dre ;
-            msg:hasSenderNeed       need:7820503869697675000 .
+            msg:messageType      msg:SuccessResponse ;
+            msg:previousMessage  event:1435888415723958200 ;
+            msg:recipient         conn:xq6jofxo2w8o05io6dre ;
+            msg:recipientAtom     atom:7820503869697675000 ;
+            msg:sender           conn:xq6jofxo2w8o05io6dre ;
+            msg:senderAtom       atom:7820503869697675000 .
 }
 
 <https://localhost:8443/won/resource/event/00d5wzbbf8hzzt2eewcc#envelope-r04c> {
     event:00d5wzbbf8hzzt2eewcc
-            msg:hasCorrespondingRemoteMessage
+            msg:correspondingRemoteMessage
                     event:krcmdz8802701wpzlzl8 ;
-            msg:hasPreviousMessage  event:2gwtnta4od8xzqdubbkg .
+            msg:previousMessage  event:2gwtnta4od8xzqdubbkg .
 }
 
 <https://localhost:8443/won/resource/event/g4lse5fmv91tlzlc1zms#envelope-5y8i> {
     event:g4lse5fmv91tlzlc1zms
-            msg:hasCorrespondingRemoteMessage
+            msg:correspondingRemoteMessage
                     event:1435888415723958200 .
 }
 
 <https://localhost:8443/won/resource/event/bri4ydc53o2dkyskug32#envelope-egj9> {
     event:bri4ydc53o2dkyskug32
-            msg:hasPreviousMessage  event:tggbraefz9y07d2npt2m , event:ow321nn1va6clfidc4s0 .
+            msg:previousMessage  event:tggbraefz9y07d2npt2m , event:ow321nn1va6clfidc4s0 .
 }
 
 <https://localhost:8443/won/resource/event/v847jsnvnzhfjj43hdbh#envelope-ah7x> {
     event:v847jsnvnzhfjj43hdbh
-            msg:hasCorrespondingRemoteMessage
+            msg:correspondingRemoteMessage
                     event:6671551888677331000 ;
-            msg:hasSender  conn:xq6jofxo2w8o05io6dre .
+            msg:sender  conn:xq6jofxo2w8o05io6dre .
 }
 
 <https://localhost:8443/won/resource/event/nmnetfuihnx70r0do0id#envelope-4o4g> {
     event:nmnetfuihnx70r0do0id
-            msg:hasPreviousMessage  event:5669098069340991000 , event:t1h3u3s5q6is5sewv843 .
+            msg:previousMessage  event:5669098069340991000 , event:t1h3u3s5q6is5sewv843 .
 }
 
 <https://localhost:8443/won/resource/event/1435888415723958200#envelope-wq0v> {
     event:1435888415723958200
-            msg:hasCorrespondingRemoteMessage
+            msg:correspondingRemoteMessage
                     event:g4lse5fmv91tlzlc1zms ;
-            msg:hasPreviousMessage  event:to1pxp688kcn0wo30yu6 .
+            msg:previousMessage  event:to1pxp688kcn0wo30yu6 .
 }
 
 <https://localhost:8443/won/resource/event/fbsnd9ilwhqg8f4l2tjg#envelope-ue8u> {
     event:fbsnd9ilwhqg8f4l2tjg
-            msg:hasPreviousMessage  event:1435888415723958200 , event:3jaz102f0678yab8vwx2 .
+            msg:previousMessage  event:1435888415723958200 , event:3jaz102f0678yab8vwx2 .
 }
 
 <https://localhost:8443/won/resource/event/557600936467257340#data> {
     event:557600936467257340
-            msg:hasContent       <https://localhost:8443/won/resource/event/557600936467257340#content> ;
-            msg:hasMessageType   msg:ConnectionMessage ;
-            msg:hasReceiver      conn:4t9deo4t6bqx83jxk5ex ;
-            msg:hasReceiverNeed  need:nte803gz4pbiw6equ3qa ;
-            msg:hasSender        conn:xq6jofxo2w8o05io6dre ;
-            msg:hasSenderNeed    need:7820503869697675000 .
+            msg:content       <https://localhost:8443/won/resource/event/557600936467257340#content> ;
+            msg:messageType   msg:ConnectionMessage ;
+            msg:recipient      conn:4t9deo4t6bqx83jxk5ex ;
+            msg:recipientAtom  atom:nte803gz4pbiw6equ3qa ;
+            msg:sender        conn:xq6jofxo2w8o05io6dre ;
+            msg:senderAtom    atom:7820503869697675000 .
 }
 
 <https://localhost:8443/won/resource/event/t1h3u3s5q6is5sewv843#envelope-i81z> {
     event:t1h3u3s5q6is5sewv843
-            msg:hasMessageType      msg:SuccessResponse ;
-            msg:hasPreviousMessage  event:5669098069340991000 ;
-            msg:hasReceiver         conn:xq6jofxo2w8o05io6dre ;
-            msg:hasReceiverNeed     need:7820503869697675000 ;
-            msg:hasSender           conn:xq6jofxo2w8o05io6dre ;
-            msg:hasSenderNeed       need:7820503869697675000 .
+            msg:messageType      msg:SuccessResponse ;
+            msg:previousMessage  event:5669098069340991000 ;
+            msg:recipient         conn:xq6jofxo2w8o05io6dre ;
+            msg:recipientAtom     atom:7820503869697675000 ;
+            msg:sender           conn:xq6jofxo2w8o05io6dre ;
+            msg:senderAtom       atom:7820503869697675000 .
 }
 
 <https://localhost:8443/won/resource/event/ow321nn1va6clfidc4s0#envelope-w5bl> {
     event:ow321nn1va6clfidc4s0
-            msg:hasContent       <https://localhost:8443/won/resource/event/ow321nn1va6clfidc4s0#content-1o90> ;
-            msg:hasMessageType   msg:ConnectionMessage ;
-            msg:hasReceiver      conn:xq6jofxo2w8o05io6dre ;
-            msg:hasReceiverNeed  need:7820503869697675000 ;
-            msg:hasSender        conn:4t9deo4t6bqx83jxk5ex ;
-            msg:hasSenderNeed    need:nte803gz4pbiw6equ3qa .
+            msg:content       <https://localhost:8443/won/resource/event/ow321nn1va6clfidc4s0#content-1o90> ;
+            msg:messageType   msg:ConnectionMessage ;
+            msg:recipient      conn:xq6jofxo2w8o05io6dre ;
+            msg:recipientAtom  atom:7820503869697675000 ;
+            msg:sender        conn:4t9deo4t6bqx83jxk5ex ;
+            msg:senderAtom    atom:nte803gz4pbiw6equ3qa .
 }

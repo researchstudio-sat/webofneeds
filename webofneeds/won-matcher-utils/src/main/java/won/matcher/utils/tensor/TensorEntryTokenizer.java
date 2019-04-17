@@ -25,7 +25,7 @@ public class TensorEntryTokenizer implements TensorEntryGenerator {
         for (TensorEntry entry : tensorEntries) {
             String tokens[] = tokenizer.extractWordTokens(entry.getValue());
             for (String token : tokens) {
-                TensorEntry newEntry = new TensorEntry(entry.getSliceName(), entry.getNeedUri(), token);
+                TensorEntry newEntry = new TensorEntry(entry.getSliceName(), entry.getAtomUri(), token);
                 tokenEntries.add(newEntry);
             }
         }

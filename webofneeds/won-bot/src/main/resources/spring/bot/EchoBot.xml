@@ -21,19 +21,19 @@
 
     <import resource="classpath:spring/component/nodeurisource/nodeurisource-random.xml"/>
     <import resource="classpath:spring/component/botContext/botContext.xml"/>
-    <import resource="classpath:/spring/component/needproducer/needproducer-mixed.xml"/>
+    <import resource="classpath:/spring/component/atomproducer/atomproducer-mixed.xml"/>
 
     <bean id="mailBasedSimpleReactiveBot" class="won.bot.impl.EchoBot">
-        <!-- optional property, by default one echo need per each need will be created -->
-        <property name="numberOfEchoNeedsPerNeed" value="3"/>
+        <!-- optional property, by default one echo atom per each atom will be created -->
+        <property name="numberOfEchoAtomsPerAtom" value="3"/>
         <property name="taskScheduler" ref="taskScheduler"/>
         <property name="botContextWrapper" ref="botContextWrapper"/>
-        <!--property name="needProducer" ref="needProducerFromMails" /-->
+        <!--property name="atomProducer" ref="atomProducerFromMails" /-->
         <!--property name="nodeURISource" ref="nodeUriSourceRandom" /-->
         <property name="matcherNodeURISource" ref="matcherNodeURISource"/>
-        <!-- expects a bean named "ownerProtocolNeedServiceClient" in the context -->
-        <!--property name="ownerService" ref="ownerProtocolNeedServiceClient" /-->
-        <property name="matcherProtocolNeedServiceClient" ref="matcherProtocolNeedServiceClient"/>
+        <!-- expects a bean named "ownerProtocolAtomServiceClient" in the context -->
+        <!--property name="ownerService" ref="ownerProtocolAtomServiceClient" /-->
+        <property name="matcherProtocolAtomServiceClient" ref="matcherProtocolAtomServiceClient"/>
         <property name="matcherProtocolMatcherService" ref="matcherProtocolMatcherServiceJMSBased"/>
         <property name="registrationMatcherRetryInterval" value="5000"/>
 

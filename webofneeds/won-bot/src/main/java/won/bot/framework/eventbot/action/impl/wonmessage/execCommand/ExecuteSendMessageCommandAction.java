@@ -15,8 +15,8 @@ import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.action.EventBotActionUtils;
 import won.bot.framework.eventbot.event.ConnectionSpecificEvent;
 import won.bot.framework.eventbot.event.Event;
-import won.bot.framework.eventbot.event.NeedSpecificEvent;
-import won.bot.framework.eventbot.event.RemoteNeedSpecificEvent;
+import won.bot.framework.eventbot.event.AtomSpecificEvent;
+import won.bot.framework.eventbot.event.TargetAtomSpecificEvent;
 import won.bot.framework.eventbot.event.impl.command.MessageCommandEvent;
 import won.bot.framework.eventbot.event.impl.command.MessageCommandFailureEvent;
 import won.bot.framework.eventbot.event.impl.command.MessageCommandNotSentEvent;
@@ -176,11 +176,11 @@ public abstract class ExecuteSendMessageCommandAction<T extends MessageCommandEv
         StringBuilder sb = new StringBuilder();
         MessageCommandEvent messageCommandEvent = (MessageCommandEvent) event;
         sb.append("sending message of type ").append(messageCommandEvent.getWonMessageType());
-        if (event instanceof NeedSpecificEvent) {
-            sb.append(" on behalf of need ").append(((NeedSpecificEvent) event).getNeedURI());
+        if (event instanceof AtomSpecificEvent) {
+            sb.append(" on behalf of atom ").append(((AtomSpecificEvent) event).getAtomURI());
         }
-        if (event instanceof RemoteNeedSpecificEvent) {
-            sb.append(" to need ").append(((RemoteNeedSpecificEvent) event).getRemoteNeedURI());
+        if (event instanceof TargetAtomSpecificEvent) {
+            sb.append(" to atom ").append(((TargetAtomSpecificEvent) event).getTargetAtomURI());
         }
         if (event instanceof ConnectionSpecificEvent) {
             sb.append(" in connection ").append(((ConnectionSpecificEvent) event).getConnectionURI());

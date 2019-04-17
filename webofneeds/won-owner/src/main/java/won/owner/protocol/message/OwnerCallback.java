@@ -21,15 +21,15 @@ import won.protocol.model.Match;
  * messages and sending generic messages.
  */
 public interface OwnerCallback {
-    public void onConnectFromOtherNeed(Connection con, final WonMessage wonMessage);
+    public void onConnectFromOtherAtom(Connection con, final WonMessage wonMessage);
 
-    public void onOpenFromOtherNeed(Connection con, final WonMessage wonMessage);
+    public void onOpenFromOtherAtom(Connection con, final WonMessage wonMessage);
 
-    public void onCloseFromOtherNeed(Connection con, final WonMessage wonMessage);
+    public void onCloseFromOtherAtom(Connection con, final WonMessage wonMessage);
 
     public void onHintFromMatcher(Match match, final WonMessage wonMessage);
 
-    public void onMessageFromOtherNeed(Connection con, final WonMessage wonMessage);
+    public void onMessageFromOtherAtom(Connection con, final WonMessage wonMessage);
 
     /**
      * Called when a message is received that indicates some error during processing

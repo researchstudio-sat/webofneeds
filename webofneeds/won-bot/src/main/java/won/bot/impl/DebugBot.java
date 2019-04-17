@@ -21,25 +21,25 @@ import won.bot.framework.eventbot.action.EventBotAction;
 import won.bot.framework.eventbot.action.impl.MultipleActions;
 import won.bot.framework.eventbot.action.impl.RandomDelayedAction;
 import won.bot.framework.eventbot.action.impl.debugbot.AnswerWithElizaAction;
-import won.bot.framework.eventbot.action.impl.debugbot.CreateDebugNeedWithFacetsAction;
+import won.bot.framework.eventbot.action.impl.debugbot.CreateDebugAtomWithSocketsAction;
 import won.bot.framework.eventbot.action.impl.debugbot.DebugBotIncomingMessageToEventMappingAction;
 import won.bot.framework.eventbot.action.impl.debugbot.MessageTimingManager;
 import won.bot.framework.eventbot.action.impl.debugbot.OpenConnectionDebugAction;
 import won.bot.framework.eventbot.action.impl.debugbot.PublishSetChattinessEventAction;
 import won.bot.framework.eventbot.action.impl.debugbot.RecordMessageReceivedTimeAction;
 import won.bot.framework.eventbot.action.impl.debugbot.RecordMessageSentTimeAction;
-import won.bot.framework.eventbot.action.impl.debugbot.ReplaceDebugNeedContentAction;
+import won.bot.framework.eventbot.action.impl.debugbot.ReplaceDebugAtomContentAction;
 import won.bot.framework.eventbot.action.impl.debugbot.SendChattyMessageAction;
 import won.bot.framework.eventbot.action.impl.debugbot.SendNDebugMessagesAction;
 import won.bot.framework.eventbot.action.impl.debugbot.SetChattinessAction;
 import won.bot.framework.eventbot.action.impl.matcher.RegisterMatcherAction;
-import won.bot.framework.eventbot.action.impl.wonmessage.ConnectWithAssociatedNeedAction;
-import won.bot.framework.eventbot.action.impl.wonmessage.HintAssociatedNeedAction;
+import won.bot.framework.eventbot.action.impl.wonmessage.ConnectWithAssociatedAtomAction;
+import won.bot.framework.eventbot.action.impl.wonmessage.HintAssociatedAtomAction;
 import won.bot.framework.eventbot.action.impl.wonmessage.SendMultipleMessagesAction;
 import won.bot.framework.eventbot.behaviour.BotBehaviour;
 import won.bot.framework.eventbot.behaviour.CloseBevahiour;
 import won.bot.framework.eventbot.behaviour.ConnectionMessageBehaviour;
-import won.bot.framework.eventbot.behaviour.DeactivateNeedBehaviour;
+import won.bot.framework.eventbot.behaviour.DeactivateAtomBehaviour;
 import won.bot.framework.eventbot.behaviour.EagerlyPopulateCacheBehaviour;
 import won.bot.framework.eventbot.behaviour.ExecuteWonMessageCommandBehaviour;
 import won.bot.framework.eventbot.bus.EventBus;
@@ -48,47 +48,47 @@ import won.bot.framework.eventbot.event.impl.command.close.CloseCommandSuccessEv
 import won.bot.framework.eventbot.event.impl.debugbot.ConnectDebugCommandEvent;
 import won.bot.framework.eventbot.event.impl.debugbot.HintDebugCommandEvent;
 import won.bot.framework.eventbot.event.impl.debugbot.MessageToElizaEvent;
-import won.bot.framework.eventbot.event.impl.debugbot.NeedCreatedEventForDebugConnect;
-import won.bot.framework.eventbot.event.impl.debugbot.NeedCreatedEventForDebugHint;
-import won.bot.framework.eventbot.event.impl.debugbot.ReplaceDebugNeedContentCommandEvent;
+import won.bot.framework.eventbot.event.impl.debugbot.AtomCreatedEventForDebugConnect;
+import won.bot.framework.eventbot.event.impl.debugbot.AtomCreatedEventForDebugHint;
+import won.bot.framework.eventbot.event.impl.debugbot.ReplaceDebugAtomContentCommandEvent;
 import won.bot.framework.eventbot.event.impl.debugbot.SendNDebugCommandEvent;
 import won.bot.framework.eventbot.event.impl.debugbot.SetCacheEagernessCommandEvent;
 import won.bot.framework.eventbot.event.impl.debugbot.SetChattinessDebugCommandEvent;
 import won.bot.framework.eventbot.event.impl.debugbot.UsageDebugCommandEvent;
 import won.bot.framework.eventbot.event.impl.lifecycle.ActEvent;
 import won.bot.framework.eventbot.event.impl.matcher.MatcherRegisterFailedEvent;
-import won.bot.framework.eventbot.event.impl.matcher.NeedCreatedEventForMatcher;
-import won.bot.framework.eventbot.event.impl.wonmessage.CloseFromOtherNeedEvent;
-import won.bot.framework.eventbot.event.impl.wonmessage.ConnectFromOtherNeedEvent;
-import won.bot.framework.eventbot.event.impl.wonmessage.MessageFromOtherNeedEvent;
-import won.bot.framework.eventbot.event.impl.wonmessage.OpenFromOtherNeedEvent;
+import won.bot.framework.eventbot.event.impl.matcher.AtomCreatedEventForMatcher;
+import won.bot.framework.eventbot.event.impl.wonmessage.CloseFromOtherAtomEvent;
+import won.bot.framework.eventbot.event.impl.wonmessage.ConnectFromOtherAtomEvent;
+import won.bot.framework.eventbot.event.impl.wonmessage.MessageFromOtherAtomEvent;
+import won.bot.framework.eventbot.event.impl.wonmessage.OpenFromOtherAtomEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.WonMessageReceivedOnConnectionEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.WonMessageSentOnConnectionEvent;
-import won.bot.framework.eventbot.filter.impl.NeedUriInNamedListFilter;
+import won.bot.framework.eventbot.filter.impl.AtomUriInNamedListFilter;
 import won.bot.framework.eventbot.filter.impl.NotFilter;
 import won.bot.framework.eventbot.listener.BaseEventListener;
 import won.bot.framework.eventbot.listener.EventListener;
 import won.bot.framework.eventbot.listener.impl.ActionOnEventListener;
-import won.protocol.model.FacetType;
+import won.protocol.model.SocketType;
 
 /**
- * Bot that reacts to each new need that is created in the system by creating
- * two needs, it sends a connect message from one of these needs, and a hint
- * message for original need offering match to another of these needs.
+ * Bot that reacts to each new atom that is created in the system by creating
+ * two atoms, it sends a connect message from one of these atoms, and a hint
+ * message for original atom offering match to another of these atoms.
  * Additionally, it reacts to certain commands send via text messages on the
- * connections with the created by the bot needs.
+ * connections with the created by the bot atoms.
  */
 public class DebugBot extends EventBot {
     private static final long CONNECT_DELAY_MILLIS = 0;
     private static final long DELAY_BETWEEN_N_MESSAGES = 1000;
     private static final double CHATTY_MESSAGE_PROBABILITY = 0.1;
     private BaseEventListener matcherRegistrator;
-    protected BaseEventListener needCreator;
-    protected BaseEventListener needConnector;
-    protected BaseEventListener needHinter;
+    protected BaseEventListener atomCreator;
+    protected BaseEventListener atomConnector;
+    protected BaseEventListener atomHinter;
     protected BaseEventListener autoOpener;
-    protected BaseEventListener needCloser;
-    protected BaseEventListener messageFromOtherNeedListener;
+    protected BaseEventListener atomCloser;
+    protected BaseEventListener messageFromOtherAtomListener;
     protected BaseEventListener usageMessageSender;
     private int registrationMatcherRetryInterval;
 
@@ -130,7 +130,7 @@ public class DebugBot extends EventBot {
         // messages
         ExecuteWonMessageCommandBehaviour wonMessageCommandBehaviour = new ExecuteWonMessageCommandBehaviour(ctx);
         wonMessageCommandBehaviour.activate();
-        // register with WoN nodes, be notified when new needs are created
+        // register with WoN nodes, be notified when new atoms are created
         RegisterMatcherAction registerMatcherAction = new RegisterMatcherAction(ctx);
         this.matcherRegistrator = new ActionOnEventListener(ctx, registerMatcherAction, 1);
         bus.subscribe(ActEvent.class, this.matcherRegistrator);
@@ -138,50 +138,50 @@ public class DebugBot extends EventBot {
                         registrationMatcherRetryInterval, 0, registerMatcherAction);
         ActionOnEventListener matcherRetryRegistrator = new ActionOnEventListener(ctx, delayedRegistration);
         bus.subscribe(MatcherRegisterFailedEvent.class, matcherRetryRegistrator);
-        // create the echo need for debug initial connect - if we're not reacting to the
-        // creation of our own echo need.
-        CreateDebugNeedWithFacetsAction needForInitialConnectAction = new CreateDebugNeedWithFacetsAction(ctx, true,
+        // create the echo atom for debug initial connect - if we're not reacting to the
+        // creation of our own echo atom.
+        CreateDebugAtomWithSocketsAction atomForInitialConnectAction = new CreateDebugAtomWithSocketsAction(ctx, true,
                         true);
-        needForInitialConnectAction.setIsInitialForConnect(true);
+        atomForInitialConnectAction.setIsInitialForConnect(true);
         ActionOnEventListener initialConnector = new ActionOnEventListener(ctx,
-                        new NotFilter(new NeedUriInNamedListFilter(ctx,
-                                        ctx.getBotContextWrapper().getNeedCreateListName())),
-                        needForInitialConnectAction);
-        bus.subscribe(NeedCreatedEventForMatcher.class, initialConnector);
-        // create the echo need for debug initial hint - if we're not reacting to the
-        // creation of our own echo need.
-        CreateDebugNeedWithFacetsAction initialHinter = new CreateDebugNeedWithFacetsAction(ctx, true, true);
+                        new NotFilter(new AtomUriInNamedListFilter(ctx,
+                                        ctx.getBotContextWrapper().getAtomCreateListName())),
+                        atomForInitialConnectAction);
+        bus.subscribe(AtomCreatedEventForMatcher.class, initialConnector);
+        // create the echo atom for debug initial hint - if we're not reacting to the
+        // creation of our own echo atom.
+        CreateDebugAtomWithSocketsAction initialHinter = new CreateDebugAtomWithSocketsAction(ctx, true, true);
         initialHinter.setIsInitialForHint(true);
-        ActionOnEventListener needForInitialHintListener = new ActionOnEventListener(ctx, new NotFilter(
-                        new NeedUriInNamedListFilter(ctx, ctx.getBotContextWrapper().getNeedCreateListName())),
+        ActionOnEventListener atomForInitialHintListener = new ActionOnEventListener(ctx, new NotFilter(
+                        new AtomUriInNamedListFilter(ctx, ctx.getBotContextWrapper().getAtomCreateListName())),
                         initialHinter);
-        bus.subscribe(NeedCreatedEventForMatcher.class, needForInitialHintListener);
-        // as soon as the echo need triggered by debug connect created, connect to
+        bus.subscribe(AtomCreatedEventForMatcher.class, atomForInitialHintListener);
+        // as soon as the echo atom triggered by debug connect created, connect to
         // original
-        this.needConnector = new ActionOnEventListener(ctx, "needConnector",
+        this.atomConnector = new ActionOnEventListener(ctx, "atomConnector",
                         new RandomDelayedAction(ctx, CONNECT_DELAY_MILLIS, CONNECT_DELAY_MILLIS, 1,
-                                        new ConnectWithAssociatedNeedAction(ctx, FacetType.ChatFacet.getURI(),
-                                                        FacetType.ChatFacet.getURI(),
+                                        new ConnectWithAssociatedAtomAction(ctx, SocketType.ChatSocket.getURI(),
+                                                        SocketType.ChatSocket.getURI(),
                                                         welcomeMessage + " " + welcomeHelpMessage)));
-        bus.subscribe(NeedCreatedEventForDebugConnect.class, this.needConnector);
-        // as soon as the echo need triggered by debug hint command created, hint to
+        bus.subscribe(AtomCreatedEventForDebugConnect.class, this.atomConnector);
+        // as soon as the echo atom triggered by debug hint command created, hint to
         // original
-        this.needHinter = new ActionOnEventListener(ctx, "needHinter", new RandomDelayedAction(ctx,
-                        CONNECT_DELAY_MILLIS, CONNECT_DELAY_MILLIS, 1, new HintAssociatedNeedAction(ctx, matcherUri)));
-        bus.subscribe(NeedCreatedEventForDebugHint.class, this.needHinter);
-        // if the original need wants to connect - always open
+        this.atomHinter = new ActionOnEventListener(ctx, "atomHinter", new RandomDelayedAction(ctx,
+                        CONNECT_DELAY_MILLIS, CONNECT_DELAY_MILLIS, 1, new HintAssociatedAtomAction(ctx, matcherUri)));
+        bus.subscribe(AtomCreatedEventForDebugHint.class, this.atomHinter);
+        // if the original atom wants to connect - always open
         this.autoOpener = new ActionOnEventListener(ctx,
                         new MultipleActions(ctx, new OpenConnectionDebugAction(ctx, welcomeMessage, welcomeHelpMessage),
                                         new PublishSetChattinessEventAction(ctx, true)));
-        bus.subscribe(ConnectFromOtherNeedEvent.class, this.autoOpener);
+        bus.subscribe(ConnectFromOtherAtomEvent.class, this.autoOpener);
         EventBotAction userCommandAction = new DebugBotIncomingMessageToEventMappingAction(ctx);
         // if the remote side opens, send a greeting and set to chatty.
-        bus.subscribe(OpenFromOtherNeedEvent.class, new ActionOnEventListener(ctx,
+        bus.subscribe(OpenFromOtherAtomEvent.class, new ActionOnEventListener(ctx,
                         new MultipleActions(ctx, userCommandAction, new PublishSetChattinessEventAction(ctx, true))));
         // if the bot receives a text message - try to map the command of the text
         // message to a DebugEvent
-        messageFromOtherNeedListener = new ActionOnEventListener(ctx, userCommandAction);
-        bus.subscribe(MessageFromOtherNeedEvent.class, messageFromOtherNeedListener);
+        messageFromOtherAtomListener = new ActionOnEventListener(ctx, userCommandAction);
+        bus.subscribe(MessageFromOtherAtomEvent.class, messageFromOtherAtomListener);
         // react to usage command event
         this.usageMessageSender = new ActionOnEventListener(ctx, new SendMultipleMessagesAction(ctx,
                         DebugBotIncomingMessageToEventMappingAction.USAGE_MESSAGES));
@@ -189,14 +189,14 @@ public class DebugBot extends EventBot {
         bus.subscribe(CloseCommandSuccessEvent.class, new ActionOnEventListener(ctx, "chattiness off",
                         new PublishSetChattinessEventAction(ctx, false)));
         // react to close event: set connection to not chatty
-        bus.subscribe(CloseFromOtherNeedEvent.class,
+        bus.subscribe(CloseFromOtherAtomEvent.class,
                         new ActionOnEventListener(ctx, new PublishSetChattinessEventAction(ctx, false)));
-        // react to the hint and connect commands by creating a need (it will fire
-        // correct need created for connect/hint
+        // react to the hint and connect commands by creating an atom (it will fire
+        // correct atom created for connect/hint
         // events)
-        needCreator = new ActionOnEventListener(ctx, new CreateDebugNeedWithFacetsAction(ctx, true, true));
-        bus.subscribe(HintDebugCommandEvent.class, needCreator);
-        bus.subscribe(ConnectDebugCommandEvent.class, needCreator);
+        atomCreator = new ActionOnEventListener(ctx, new CreateDebugAtomWithSocketsAction(ctx, true, true));
+        bus.subscribe(HintDebugCommandEvent.class, atomCreator);
+        bus.subscribe(ConnectDebugCommandEvent.class, atomCreator);
         bus.subscribe(SendNDebugCommandEvent.class, new ActionOnEventListener(ctx, new SendNDebugMessagesAction(ctx,
                         DELAY_BETWEEN_N_MESSAGES, DebugBotIncomingMessageToEventMappingAction.N_MESSAGES)));
         MessageTimingManager timingManager = new MessageTimingManager(ctx, 20);
@@ -218,13 +218,13 @@ public class DebugBot extends EventBot {
         bus.subscribe(WonMessageReceivedOnConnectionEvent.class,
                         new ActionOnEventListener(ctx, new RecordMessageReceivedTimeAction(ctx, timingManager)));
         // initialize the sent timestamp when the open message is received
-        bus.subscribe(OpenFromOtherNeedEvent.class,
+        bus.subscribe(OpenFromOtherAtomEvent.class,
                         new ActionOnEventListener(ctx, new RecordMessageSentTimeAction(ctx, timingManager)));
         // initialize the sent timestamp when the connect message is received
-        bus.subscribe(ConnectFromOtherNeedEvent.class,
+        bus.subscribe(ConnectFromOtherAtomEvent.class,
                         new ActionOnEventListener(ctx, new RecordMessageSentTimeAction(ctx, timingManager)));
-        bus.subscribe(ReplaceDebugNeedContentCommandEvent.class,
-                        new ActionOnEventListener(ctx, new ReplaceDebugNeedContentAction(ctx)));
+        bus.subscribe(ReplaceDebugAtomContentCommandEvent.class,
+                        new ActionOnEventListener(ctx, new ReplaceDebugAtomContentAction(ctx)));
     }
 
     public static void main(String[] args) {

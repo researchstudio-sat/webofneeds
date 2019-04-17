@@ -80,16 +80,16 @@ public class CrawlConnectionDataBehaviour extends BotBehaviour {
         logger.debug("will deactivate autmatically after " + abortTimeout);
         LinkedDataSource linkedDataSource = context.getLinkedDataSource();
         if (linkedDataSource instanceof CachingLinkedDataSource) {
-            URI toInvalidate = WonLinkedDataUtils.getEventContainerURIforConnectionURI(command.getConnectionURI(),
+            URI toInvalidate = WonLinkedDataUtils.getMessageContainerURIforConnectionURI(command.getConnectionURI(),
                             linkedDataSource);
             ((CachingLinkedDataSource) linkedDataSource).invalidate(toInvalidate);
-            ((CachingLinkedDataSource) linkedDataSource).invalidate(toInvalidate, command.getNeedURI());
-            URI remoteConnectionUri = WonLinkedDataUtils
-                            .getRemoteConnectionURIforConnectionURI(command.getConnectionURI(), linkedDataSource);
-            toInvalidate = WonLinkedDataUtils.getEventContainerURIforConnectionURI(remoteConnectionUri,
+            ((CachingLinkedDataSource) linkedDataSource).invalidate(toInvalidate, command.getAtomURI());
+            URI targetConnectionUri = WonLinkedDataUtils
+                            .getTargetConnectionURIforConnectionURI(command.getConnectionURI(), linkedDataSource);
+            toInvalidate = WonLinkedDataUtils.getMessageContainerURIforConnectionURI(targetConnectionUri,
                             linkedDataSource);
             ((CachingLinkedDataSource) linkedDataSource).invalidate(toInvalidate);
-            ((CachingLinkedDataSource) linkedDataSource).invalidate(toInvalidate, command.getNeedURI());
+            ((CachingLinkedDataSource) linkedDataSource).invalidate(toInvalidate, command.getAtomURI());
         }
         context.getTaskScheduler().schedule(new Runnable() {
             @Override
@@ -103,39 +103,37 @@ public class CrawlConnectionDataBehaviour extends BotBehaviour {
         pmap.withDefaultMappings(PrefixMapping.Standard);
         pmap.setNsPrefix("won", WON.getURI());
         pmap.setNsPrefix("msg", WONMSG.getURI());
-        propertyPaths.add(PathParser.parse("won:hasEventContainer", pmap));
-        propertyPaths.add(PathParser.parse("won:hasEventContainer/rdfs:member", pmap));
-        CrawlCommandEvent crawlNeedCommandEvent = new CrawlCommandEvent(command.getNeedURI(), command.getNeedURI(),
+        propertyPaths.add(PathParser.parse("won:messageContainer", pmap));
+        propertyPaths.add(PathParser.parse("won:messageContainer/rdfs:member", pmap));
+        CrawlCommandEvent crawlAtomCommandEvent = new CrawlCommandEvent(command.getAtomURI(), command.getAtomURI(),
                         propertyPaths, 10000, 5);
         propertyPaths = new ArrayList();
-        propertyPaths.add(PathParser.parse("won:hasEventContainer", pmap));
-        propertyPaths.add(PathParser.parse("won:hasEventContainer/rdfs:member", pmap));
-        propertyPaths.add(
-                        PathParser.parse("won:hasEventContainer/rdfs:member/msg:hasCorrespondingRemoteMessage", pmap));
-        propertyPaths.add(PathParser.parse("won:hasRemoteNeed", pmap));
-        propertyPaths.add(PathParser.parse("won:hasRemoteNeed/won:hasEventContainer", pmap));
-        propertyPaths.add(PathParser.parse("won:hasRemoteNeed/won:hasEventContainer/rdfs:member", pmap));
-        propertyPaths.add(PathParser.parse("won:hasRemoteConnection", pmap));
-        propertyPaths.add(PathParser.parse("won:hasRemoteConnection/won:hasEventContainer", pmap));
-        propertyPaths.add(PathParser.parse("won:hasRemoteConnection/won:hasEventContainer/rdfs:member", pmap));
+        propertyPaths.add(PathParser.parse("won:messageContainer", pmap));
+        propertyPaths.add(PathParser.parse("won:messageContainer/rdfs:member", pmap));
+        propertyPaths.add(PathParser.parse("won:messageContainer/rdfs:member/msg:correspondingRemoteMessage", pmap));
+        propertyPaths.add(PathParser.parse("won:targetAtom", pmap));
+        propertyPaths.add(PathParser.parse("won:targetAtom/won:messageContainer", pmap));
+        propertyPaths.add(PathParser.parse("won:targetAtom/won:messageContainer/rdfs:member", pmap));
+        propertyPaths.add(PathParser.parse("won:targetConnection", pmap));
+        propertyPaths.add(PathParser.parse("won:targetConnection/won:messageContainer", pmap));
+        propertyPaths.add(PathParser.parse("won:targetConnection/won:messageContainer/rdfs:member", pmap));
         propertyPaths.add(PathParser.parse(
-                        "won:hasRemoteConnection/won:hasEventContainer/rdfs:member/msg:hasCorrespondingRemoteMessage",
-                        pmap));
-        CrawlCommandEvent crawlConnectionCommandEvent = new CrawlCommandEvent(command.getNeedURI(),
+                        "won:targetConnection/won:messageContainer/rdfs:member/msg:correspondingRemoteMessage", pmap));
+        CrawlCommandEvent crawlConnectionCommandEvent = new CrawlCommandEvent(command.getAtomURI(),
                         command.getConnectionURI(), propertyPaths, 10000, 5);
         Dataset crawledData = DatasetFactory.createGeneral();
         // add crawlcommand listener
         this.subscribeWithAutoCleanup(CrawlCommandEvent.class,
                         new ActionOnEventListener(context,
-                                        new OrFilter(new SameEventFilter(crawlNeedCommandEvent),
+                                        new OrFilter(new SameEventFilter(crawlAtomCommandEvent),
                                                         new SameEventFilter(crawlConnectionCommandEvent)),
                                         new CrawlAction(context)));
         // when the first crawl succeeds, start the second
         this.subscribeWithAutoCleanup(CrawlCommandSuccessEvent.class, new ActionOnEventListener(context,
-                        new CommandResultFilter(crawlNeedCommandEvent), new BaseEventBotAction(context) {
+                        new CommandResultFilter(crawlAtomCommandEvent), new BaseEventBotAction(context) {
                             @Override
                             protected void doRun(Event event, EventListener executingListener) throws Exception {
-                                logger.debug("finished crawling need data. ");
+                                logger.debug("finished crawling atom data. ");
                                 Dataset dataset = ((CrawlCommandSuccessEvent) event).getCrawledData();
                                 RdfUtils.addDatasetToDataset(crawledData, dataset);
                                 // now crawl connection data
@@ -147,7 +145,7 @@ public class CrawlConnectionDataBehaviour extends BotBehaviour {
                         new CommandResultFilter(crawlConnectionCommandEvent), new BaseEventBotAction(context) {
                             @Override
                             protected void doRun(Event event, EventListener executingListener) throws Exception {
-                                logger.debug("finished crawling need data for connection {}",
+                                logger.debug("finished crawling atom data for connection {}",
                                                 command.getConnectionURI());
                                 Dataset dataset = ((CrawlCommandSuccessEvent) event).getCrawledData();
                                 RdfUtils.addDatasetToDataset(crawledData, dataset);
@@ -160,7 +158,7 @@ public class CrawlConnectionDataBehaviour extends BotBehaviour {
         this.subscribeWithAutoCleanup(CrawlCommandFailureEvent.class,
                         new ActionOnFirstEventListener(context,
                                         new OrFilter(new CommandResultFilter(crawlConnectionCommandEvent),
-                                                        new CommandResultFilter(crawlNeedCommandEvent)),
+                                                        new CommandResultFilter(crawlAtomCommandEvent)),
                                         new BaseEventBotAction(context) {
                                             @Override
                                             protected void doRun(Event event, EventListener executingListener)
@@ -173,9 +171,9 @@ public class CrawlConnectionDataBehaviour extends BotBehaviour {
                                                 deactivate();
                                             }
                                         }));
-        // start crawling the need - connection will be crawled when need crawling is
+        // start crawling the atom - connection will be crawled when atom crawling is
         // done
-        context.getEventBus().publish(crawlNeedCommandEvent);
+        context.getEventBus().publish(crawlAtomCommandEvent);
     }
 
     public void onResult(EventBotAction task) {

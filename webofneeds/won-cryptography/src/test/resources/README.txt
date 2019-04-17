@@ -19,7 +19,7 @@ Next steps:
 Use algorithm from signingframework but change signature and signed data representation a bit,
 namely, don't use nested graphs.
 
-for that one need:
+for that one atom:
 - add class similar to Assembler class and implement own assemble() method by adding signature triples
 in the default graph with the signed data graph as subject (not to use nested graphs)
 - subclass all classes implementing Signing algorithm and override assemble() method to call
@@ -30,8 +30,8 @@ separate graphs and perform on each of them the canonicalize/hash/sign/assemble 
 of the algorithm, and then merge the graphs and signature triples together into one dataset
 
 
-Define more clear the versioning scenario (connections and won need):
-- possible simple solution for won need:
+Define more clear the versioning scenario (connections and won atom):
+- possible simple solution for won atom:
   HTTP:
   example.com/resource12/ -> 303 example.com/resource12.rdf -> example.com/resource12/20140705120036.rdf
   example.com/resource12/20140705120036/ -> 303 example.com/resource12/20140705120036.rdf
@@ -39,14 +39,14 @@ Define more clear the versioning scenario (connections and won need):
   @prefix dc:      <http://purl.org/dc/elements/1.1/> .
   @prefix pav:     <http://purl.org/pav/> .
   @prefix owl:     <http://www.w3.org/2002/07/owl#> .
-  _:wonneed owl:sameAs <example.com/resource12/20140705120036/>;
+  _:wonatom owl:sameAs <example.com/resource12/20140705120036/>;
             dc:isVersionOf <example.com/resource12/>
             pav:previousVersion <http://www.example.com/resource12/20140617095504>;
 
 
 Define how we represent the signature
 - already decided: named graphs
-- to be done: make an example in trig for different stages of the need (creation by owner,
+- to be done: make an example in trig for different stages of the atom (creation by owner,
 final creation by won node, after connections are added, etc.) with the signature(s), then
 it will be clear what we are still missing in our signature definition
 - to be done: find which signature rdf vocabulary to use or define own own

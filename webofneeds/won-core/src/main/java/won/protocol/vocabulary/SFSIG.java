@@ -34,13 +34,13 @@ public class SFSIG {
     public static final Resource SIGNATURE_METHOD_ECDSA = m
                     .createResource(BASE_URI + PREFIX_SIGNATURE_METHOD + "ecdsa");
     public static final Property HAS_GRAPH_SIGNING_METHOD = m.createProperty(BASE_URI, "hasGraphSigningMethod");
-    public static final Property HAS_SIGNATURE_VALUE = m.createProperty(BASE_URI, "hasSignatureValue");
+    public static final Property HAS_SIGNATURE_VALUE = m.createProperty(BASE_URI, "signatureValue");
     public static final Property HAS_VERIFICATION_CERT = m.createProperty(BASE_URI, "hasVerificationCertificate");
     public static final Property HAS_DIGEST_METHOD = m.createProperty(BASE_URI, "hasDigestMethod");
     public static final Property HAS_GRAPH_CANONICALIZATION_METHOD = m.createProperty(BASE_URI,
-                    "hasGraphCanonicalizationMethod");
-    public static final Property HAS_GRAPH_DIGEST_METHOD = m.createProperty(BASE_URI, "hasGraphDigestMethod");
+                    "graphCanonicalizationMethod");
+    public static final Property HAS_GRAPH_DIGEST_METHOD = m.createProperty(BASE_URI, "graphDigestMethod");
     public static final Property HAS_GRAPH_SERIALIZATION_METHOD = m.createProperty(BASE_URI,
-                    "hasGraphSerializationMethod");
+                    "graphSerializationMethod");
     public static final Property HAS_SIGNATURE_METHOD = m.createProperty(BASE_URI, "hasSignatureMethod");
 }

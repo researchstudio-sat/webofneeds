@@ -1,17 +1,17 @@
-prefix won: <http://purl.org/webofneeds/model#>
+prefix won: <https://w3id.org/won/core#>
 prefix rdfs: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 
-SELECT DISTINCT ?slice ?need ?value WHERE { # value is the remote need
+SELECT DISTINCT ?slice ?atom ?value WHERE { # value is the remote atom
     BIND('connection' as ?slice)
     ?connectionUri rdfs:type won:Connection.
     ?connectionUri won:crawlStatus 'DONE'.
     ?connectionUri won:crawlDate ?date.
-    ?connectionUri won:belongsToNeed ?need.
-    ?connectionUri won:hasRemoteNeed ?value.
-    ?rating won:hasBinaryRating won:Good.
+    ?connectionUri won:sourceAtom ?atom.
+    ?connectionUri won:targetAtom ?value.
+    ?rating won:binaryRating won:Good.
     ?rating won:forResource ?connectionUri.
-    OPTIONAL {?need won:hasFlag ?flag1}.
-    OPTIONAL {?value won:hasFlag ?flag2}.
+    OPTIONAL {?atom won:flag ?flag1}.
+    OPTIONAL {?value won:flag ?flag2}.
     FILTER (!bound(?flag1) || (?flag1 != won:DoNotMatch && ?flag1 != won:UsedForTesting))
     FILTER (!bound(?flag2) || (?flag2 != won:DoNotMatch && ?flag2 != won:UsedForTesting))
     FILTER (?date >= ?from && ?date < ?to) # bind variables ?from and ?to here

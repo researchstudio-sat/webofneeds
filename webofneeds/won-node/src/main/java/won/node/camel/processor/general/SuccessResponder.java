@@ -24,8 +24,8 @@ import won.protocol.message.processor.exception.WonMessageProcessingException;
 
 /**
  * Sends a success response message back to the sender of the original message,
- * if that message was sent on behalf of a specified need (i.e. its
- * senderNeedURI is set).
+ * if that message was sent on behalf of a specified atom (i.e. its
+ * senderAtomURI is set).
  */
 public class SuccessResponder extends AbstractCamelProcessor {
     @Override
@@ -35,13 +35,13 @@ public class SuccessResponder extends AbstractCamelProcessor {
             throw new WonMessageProcessingException("did not find the original message in the " + "exchange header '"
                             + WonCamelConstants.MESSAGE_HEADER + "'");
         // only send success message if the original message was sent on behalf of a
-        // need (otherwise we have to find out
+        // atom (otherwise we have to find out
         // with other means which ownerapplications to send the response to.
-        if (originalMessage.getSenderNeedURI() == null)
+        if (originalMessage.getSenderAtomURI() == null)
             return;
         if (originalMessage.getMessageType() == WonMessageType.HINT_MESSAGE) {
             // we don't want to send a SuccessResponse for a hint message as matchers
-            // are not fully compatible messaging agents (needs), so sending this message
+            // are not fully compatible messaging agents (atoms), so sending this message
             // will fail.
             logger.debug("suppressing success response for HINT message");
             return;

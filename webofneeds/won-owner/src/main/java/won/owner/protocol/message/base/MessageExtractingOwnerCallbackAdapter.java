@@ -53,10 +53,10 @@ public class MessageExtractingOwnerCallbackAdapter extends OwnerCallbackAdapter 
      */
     private Connection toConnection(WonMessage wonMessage) {
         Connection con = new Connection();
-        con.setConnectionURI(wonMessage.getReceiverURI());
-        con.setRemoteConnectionURI(wonMessage.getSenderURI());
-        con.setNeedURI(wonMessage.getReceiverNeedURI());
-        con.setRemoteNeedURI(wonMessage.getSenderNeedURI());
+        con.setConnectionURI(wonMessage.getRecipientURI());
+        con.setTargetConnectionURI(wonMessage.getSenderURI());
+        con.setAtomURI(wonMessage.getRecipientAtomURI());
+        con.setTargetAtomURI(wonMessage.getSenderAtomURI());
         return con;
     }
 

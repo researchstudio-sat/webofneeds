@@ -10,7 +10,7 @@ import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.action.impl.mail.model.SubscribeStatus;
 import won.bot.framework.eventbot.bus.EventBus;
 import won.bot.framework.eventbot.event.Event;
-import won.bot.framework.eventbot.event.impl.mail.CreateNeedFromMailEvent;
+import won.bot.framework.eventbot.event.impl.mail.CreateAtomFromMailEvent;
 import won.bot.framework.eventbot.event.impl.mail.SubscribeUnsubscribeEvent;
 import won.bot.framework.eventbot.listener.EventListener;
 
@@ -33,12 +33,12 @@ public class SubscribeUnsubscribeAction extends BaseEventBotAction {
             String senderMailAddress = MailContentExtractor.getMailSender(subscribeEvent.getMessage());
             botContextWrapper.setSubscribeStatusForMailAddress(senderMailAddress, subscribeStatus);
             // depending on the new subscribe status of the user publish his cached mails as
-            // needs or delete the cache
+            // atoms or delete the cache
             if (SubscribeStatus.SUBSCRIBED.equals(subscribeStatus)) {
                 EventBus bus = getEventListenerContext().getEventBus();
                 Collection<MimeMessage> cachedMessages = botContextWrapper
                                 .loadCachedMailsForMailAddress(senderMailAddress);
-                cachedMessages.stream().forEach(message -> bus.publish(new CreateNeedFromMailEvent(message)));
+                cachedMessages.stream().forEach(message -> bus.publish(new CreateAtomFromMailEvent(message)));
             } else if (SubscribeStatus.UNSUBSCRIBED.equals(subscribeStatus)) {
                 botContextWrapper.removeCachedMailsForMailAddress(senderMailAddress);
             }

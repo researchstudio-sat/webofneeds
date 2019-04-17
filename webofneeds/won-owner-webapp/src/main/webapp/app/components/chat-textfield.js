@@ -13,7 +13,7 @@ import ngAnimate from "angular-animate";
 import { dispatchEvent, attach, delay, get } from "../utils.js";
 import won from "../won-es6.js";
 import {
-  getOwnedNeedByConnectionUri,
+  getOwnedAtomByConnectionUri,
   getOwnedPersonas,
 } from "../selectors/general-selectors.js";
 import { getMessagesByConnectionUri } from "../selectors/message-selectors.js";
@@ -31,7 +31,7 @@ import * as useCaseUtils from "../usecase-utils.js";
 import autoresizingTextareaModule from "../directives/textarea-autogrow.js";
 import { actionCreators } from "../actions/actions.js";
 import labelledHrModule from "./labelled-hr.js";
-import { getHumanReadableStringFromMessage } from "../reducers/need-reducer/parse-message.js";
+import { getHumanReadableStringFromMessage } from "../reducers/atom-reducer/parse-message.js";
 import { isChatToGroup } from "../connection-utils.js";
 import * as accountUtils from "../account-utils.js";
 
@@ -302,13 +302,13 @@ function genComponentConf() {
       const selectFromState = state => {
         const post =
           this.connectionUri &&
-          getOwnedNeedByConnectionUri(state, this.connectionUri);
+          getOwnedAtomByConnectionUri(state, this.connectionUri);
         const connection =
           post && post.getIn(["connections", this.connectionUri]);
         const connectionState = connection && connection.get("state");
 
         const isGroupChatConnection = isChatToGroup(
-          state.get("needs"),
+          state.get("atoms"),
           get(post, "uri"),
           this.connectionUri
         );
@@ -564,7 +564,7 @@ function genComponentConf() {
           this.messages__viewState__markAsSelected({
             messageUri: msg.get("uri"),
             connectionUri: this.connectionUri,
-            needUri: this.post.get("uri"),
+            atomUri: this.post.get("uri"),
             isSelected: true,
           });
         });
@@ -615,7 +615,7 @@ function genComponentConf() {
       this.messages__viewState__markAsSelected({
         messageUri: msg.get("uri"),
         connectionUri: this.connectionUri,
-        needUri: this.post.get("uri"),
+        atomUri: this.post.get("uri"),
         isSelected: false,
       });
     }

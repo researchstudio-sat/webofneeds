@@ -20,11 +20,11 @@ import org.apache.jena.query.Dataset;
 public interface MatcherProtocolMatcherServiceCallback {
     void onRegistered(URI wonNodeUri);
 
-    void onNewNeed(final URI wonNodeURI, URI needURI, Dataset content);
+    void onNewAtom(final URI wonNodeURI, URI atomURI, Dataset content);
 
-    void onNeedModified(final URI wonNodeURI, URI needURI);
+    void onAtomModified(final URI wonNodeURI, URI atomURI);
 
-    void onNeedActivated(final URI wonNodeURI, URI needURI);
+    void onAtomActivated(final URI wonNodeURI, URI atomURI);
 
-    void onNeedDeactivated(final URI wonNodeURI, URI needURI);
+    void onAtomDeactivated(final URI wonNodeURI, URI atomURI);
 }

@@ -21,7 +21,7 @@ import won.protocol.vocabulary.WONMSG;
  * User: syim Date: 02.03.2015
  */
 @Component
-@FixedMessageProcessor(direction = WONMSG.TYPE_FROM_OWNER_STRING, messageType = WONMSG.TYPE_CLOSE_STRING)
+@FixedMessageProcessor(direction = WONMSG.FromOwnerString, messageType = WONMSG.CloseMessageString)
 public class CloseMessageFromOwnerProcessor extends AbstractCamelProcessor {
     public void process(final Exchange exchange) throws Exception {
         Message message = exchange.getIn();
@@ -31,19 +31,19 @@ public class CloseMessageFromOwnerProcessor extends AbstractCamelProcessor {
         ConnectionState originalState = con.getState();
         con = dataService.nextConnectionState(con, ConnectionEventType.OWNER_CLOSE);
         // if the connection was in suggested state, don't send a close message to the
-        // remote need
+        // remote atom
         if (originalState != ConnectionState.SUGGESTED) {
             // prepare the message to pass to the remote node
             // create the message to send to the remote node
-            URI remoteMessageURI = wonNodeInformationService.generateEventURI(wonMessage.getReceiverNodeURI());
+            URI remoteMessageURI = wonNodeInformationService.generateEventURI(wonMessage.getRecipientNodeURI());
             OutboundMessageCreator outboundMessageCreator = new OutboundMessageCreator(remoteMessageURI);
             // put it into the 'outbound message' header (so the persister doesn't pick up
             // the wrong one).
             message.setHeader(WonCamelConstants.OUTBOUND_MESSAGE_FACTORY_HEADER, outboundMessageCreator);
             // set the sender uri in the envelope TODO: TwoMsgs: do not set sender here
-            wonMessage.addMessageProperty(WONMSG.SENDER_PROPERTY, con.getConnectionURI());
+            wonMessage.addMessageProperty(WONMSG.sender, con.getConnectionURI());
             // add the information about the corresponding message to the local one
-            wonMessage.addMessageProperty(WONMSG.HAS_CORRESPONDING_REMOTE_MESSAGE, remoteMessageURI);
+            wonMessage.addMessageProperty(WONMSG.correspondingRemoteMessage, remoteMessageURI);
             // the persister will pick it up later from the header
         }
     }

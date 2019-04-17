@@ -58,7 +58,7 @@
     verification step is not needed, and we can be more open about caching.
      -->
     <sec:http request-matcher="regex"
-              pattern="/(resource|data|page)/((event/.+)|(need/[a-zA-Z0-9]+/((deep.*)|(events/.+)|unread))|(connection/[a-zA-Z0-9]+/events.*))"
+              pattern="/(resource|data|page)/((event/.+)|(atom/[a-zA-Z0-9]+/((deep.*)|(events/.+)|unread))|(connection/[a-zA-Z0-9]+/events.*))"
               entry-point-ref="authorizationEntryPoint"
               authentication-manager-ref="clientCertificateWebIdAuthenticationManager"
               access-decision-manager-ref="webIdBasedAccessDecisionManager">
@@ -72,7 +72,7 @@
          extension of the X.509 filter -->
         <sec:custom-filter ref="clientCertificateWebIdFilter" position="X509_FILTER" />
         <sec:intercept-url pattern=".*" access="hasRole('ROLE_WEBID')" />
-        <!-- we do not need CSRF protection for these resources as accessing them is not state-changing -->
+        <!-- we do not atom CSRF protection for these resources as accessing them is not state-changing -->
         <sec:csrf disabled="true" />
     </sec:http>
 
@@ -93,9 +93,9 @@
         <!-- we want to extract client certs from a header field if we're behind a reverse proxy, so we need a custom
          extension of the X.509 filter -->
         <sec:custom-filter ref="clientCertificateNoWebIdFilter" position="X509_FILTER" />
-        <!-- we allow self-signed certificates that need not be webids -->
+        <!-- we allow self-signed certificates that atom not be webids -->
         <sec:intercept-url pattern=".*" access="hasRole('ROLE_CLIENT_CERTIFICATE_PRESENTED')" />
-        <!-- we do not need CSRF protection for 'register': the client does not necessarily make
+        <!-- we do not atom CSRF protection for 'register': the client does not necessarily make
             a call to the server prior to registering, so there may be no way to pass a X-CSRF-Token to the client.
             Also, we do not rely on sessions for registering -->
         <sec:csrf disabled="true" />
@@ -112,11 +112,11 @@
             <sec:frame-options />
             <sec:xss-protection />
         </sec:headers>
-        <sec:intercept-url pattern="/(resource|data|page)(/need)?(((\?.*)|/)?)" access="permitAll"/>
+        <sec:intercept-url pattern="/(resource|data|page)(/atom)?(((\?.*)|/)?)" access="permitAll"/>
         <sec:intercept-url pattern="/(resource|data|page)/connection(((\?.*)|/)?)" access="permitAll"/>
-        <sec:intercept-url pattern="/(resource|data|page)/((need/[a-zA-Z0-9]+(/connections)?)|(connection/[a-zA-Z0-9]+))(((\?.*)|/)?)" access="permitAll"/>
+        <sec:intercept-url pattern="/(resource|data|page)/((atom/[a-zA-Z0-9]+(/connections)?)|(connection/[a-zA-Z0-9]+))(((\?.*)|/)?)" access="permitAll"/>
         <sec:intercept-url pattern=".*" access="denyAll"/>
-        <!-- we do not need CSRF protection for publicly accessible resources, as accessing them is not state-changing -->
+        <!-- we do not atom CSRF protection for publicly accessible resources, as accessing them is not state-changing -->
         <sec:csrf disabled="true" />
     </sec:http>
 

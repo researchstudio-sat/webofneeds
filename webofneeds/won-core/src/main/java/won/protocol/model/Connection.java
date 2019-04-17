@@ -40,11 +40,11 @@ import won.protocol.model.parentaware.VersionedEntity;
  */
 @Entity
 @Table(name = "connection", indexes = {
-                @Index(name = "IDX_CONNECTION_NEEDURI_REMOTENEEDURI", columnList = "needURI, remoteNeedURI"), }, uniqueConstraints = {
-                                @UniqueConstraint(name = "IDX_CONNECTION_UNIQUE_EVENT_CONTAINER_ID", columnNames = "event_container_id"),
+                @Index(name = "IDX_CONNECTION_ATOMURI_TARGETATOMURI", columnList = "atomURI, targetAtomURI"), }, uniqueConstraints = {
+                                @UniqueConstraint(name = "IDX_CONNECTION_UNIQUE_MESSAGE_CONTAINER_ID", columnNames = "message_container_id"),
                                 @UniqueConstraint(name = "IDX_CONNECTION_UNIQUE_DATASETHOLDER_ID", columnNames = "datasetholder_id"),
-                                @UniqueConstraint(name = "IDX_UNIQUE_CONNECTION", columnNames = { "needURI",
-                                                "remoteNeedURI", "facetURI", "remoteFacetURI" }) })
+                                @UniqueConstraint(name = "IDX_UNIQUE_CONNECTION", columnNames = { "atomURI",
+                                                "targetAtomURI", "socketURI", "targetSocketURI" }) })
 public class Connection implements ParentAware<ConnectionContainer>, VersionedEntity {
     @Id
     @GeneratedValue
@@ -59,61 +59,61 @@ public class Connection implements ParentAware<ConnectionContainer>, VersionedEn
     @Column(name = "connectionURI", unique = true)
     @Convert(converter = URIConverter.class)
     private URI connectionURI;
-    /* The uri of the connection's need object */
-    @Column(name = "needURI")
+    /* The uri of the connection's atom object */
+    @Column(name = "atomURI")
     @Convert(converter = URIConverter.class)
-    private URI needURI;
-    /* The uri of the facet's type */
+    private URI atomURI;
+    /* The uri of the socket's type */
     @Column(name = "typeURI")
     @Convert(converter = URIConverter.class)
     private URI typeURI;
     /*
-     * The uri of the facet. This must be a resource defined in the need's content.
+     * The uri of the socket. This must be a resource defined in the atom's content.
      * The type of that resource is the typeURI
      */
-    @Column(name = "facetURI")
+    @Column(name = "socketURI")
     @Convert(converter = URIConverter.class)
-    private URI facetURI;
+    private URI socketURI;
     /*
-     * The uri of the remote facet. This must be a resource defined in the remote
-     * need's content or null, if we don't know it yet
+     * The uri of the remote socket. This must be a resource defined in the remote
+     * atom's content or null, if we don't know it yet
      */
-    @Column(name = "remoteFacetURI")
+    @Column(name = "targetSocketURI")
     @Convert(converter = URIConverter.class)
-    private URI remoteFacetURI;
+    private URI targetSocketURI;
     /* The URI of the remote connection */
     /* Caution: on the owner side, the remote connection URI is never known. */
-    @Column(name = "remoteConnectionURI")
+    @Column(name = "targetConnectionURI")
     @Convert(converter = URIConverter.class)
-    private URI remoteConnectionURI;
-    /* The URI of the remote need */
-    @Column(name = "remoteNeedURI")
+    private URI targetConnectionURI;
+    /* The URI of the remote atom */
+    @Column(name = "targetAtomURI")
     @Convert(converter = URIConverter.class)
-    private URI remoteNeedURI;
+    private URI targetAtomURI;
     /* The state of the connection */
     @Column(name = "state")
     @Enumerated(EnumType.STRING)
     private ConnectionState state;
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "parent_need_id")
+    @JoinColumn(name = "parent_atom_id")
     private ConnectionContainer parent;
     @OneToOne(fetch = FetchType.LAZY)
     private DatasetHolder datasetHolder;
-    @JoinColumn(name = "event_container_id")
+    @JoinColumn(name = "message_container_id")
     @OneToOne(fetch = FetchType.LAZY, optional = false, cascade = CascadeType.ALL, orphanRemoval = true)
-    private ConnectionEventContainer eventContainer = null;
+    private ConnectionMessageContainer messageContainer = null;
 
     @Override
     public ConnectionContainer getParent() {
         return this.parent;
     }
 
-    public ConnectionEventContainer getEventContainer() {
-        return eventContainer;
+    public ConnectionMessageContainer getMessageContainer() {
+        return messageContainer;
     }
 
-    public void setEventContainer(final ConnectionEventContainer eventContainer) {
-        this.eventContainer = eventContainer;
+    public void setMessageContainer(final ConnectionMessageContainer messageContainer) {
+        this.messageContainer = messageContainer;
     }
 
     public void setParent(final ConnectionContainer parent) {
@@ -135,9 +135,9 @@ public class Connection implements ParentAware<ConnectionContainer>, VersionedEn
 
     @Override
     public String toString() {
-        return "Connection [id=" + id + ", connectionURI=" + connectionURI + ", needURI=" + needURI + ", typeURI="
-                        + typeURI + ", facetURI=" + facetURI + ", remoteFacetURI=" + remoteFacetURI
-                        + ", remoteConnectionURI=" + remoteConnectionURI + ", remoteNeedURI=" + remoteNeedURI
+        return "Connection [id=" + id + ", connectionURI=" + connectionURI + ", atomURI=" + atomURI + ", typeURI="
+                        + typeURI + ", socketURI=" + socketURI + ", targetSocketURI=" + targetSocketURI
+                        + ", targetConnectionURI=" + targetConnectionURI + ", targetAtomURI=" + targetAtomURI
                         + ", state=" + state + "]";
     }
 
@@ -145,20 +145,20 @@ public class Connection implements ParentAware<ConnectionContainer>, VersionedEn
         this.typeURI = typeURI;
     }
 
-    public URI getFacetURI() {
-        return facetURI;
+    public URI getSocketURI() {
+        return socketURI;
     }
 
-    public void setFacetURI(URI facetURI) {
-        this.facetURI = facetURI;
+    public void setSocketURI(URI socketURI) {
+        this.socketURI = socketURI;
     }
 
-    public URI getRemoteFacetURI() {
-        return remoteFacetURI;
+    public URI getTargetSocketURI() {
+        return targetSocketURI;
     }
 
-    public void setRemoteFacetURI(URI remoteFacetURI) {
-        this.remoteFacetURI = remoteFacetURI;
+    public void setTargetSocketURI(URI targetSocketURI) {
+        this.targetSocketURI = targetSocketURI;
     }
 
     public Long getId() {
@@ -177,28 +177,28 @@ public class Connection implements ParentAware<ConnectionContainer>, VersionedEn
         this.connectionURI = connectionURI;
     }
 
-    public URI getNeedURI() {
-        return needURI;
+    public URI getAtomURI() {
+        return atomURI;
     }
 
-    public void setNeedURI(final URI needURI) {
-        this.needURI = needURI;
+    public void setAtomURI(final URI atomURI) {
+        this.atomURI = atomURI;
     }
 
-    public URI getRemoteConnectionURI() {
-        return remoteConnectionURI;
+    public URI getTargetConnectionURI() {
+        return targetConnectionURI;
     }
 
-    public void setRemoteConnectionURI(final URI remoteConnectionURI) {
-        this.remoteConnectionURI = remoteConnectionURI;
+    public void setTargetConnectionURI(final URI targetConnectionURI) {
+        this.targetConnectionURI = targetConnectionURI;
     }
 
-    public URI getRemoteNeedURI() {
-        return remoteNeedURI;
+    public URI getTargetAtomURI() {
+        return targetAtomURI;
     }
 
-    public void setRemoteNeedURI(final URI remoteNeedURI) {
-        this.remoteNeedURI = remoteNeedURI;
+    public void setTargetAtomURI(final URI targetAtomURI) {
+        this.targetAtomURI = targetAtomURI;
     }
 
     public ConnectionState getState() {
@@ -242,12 +242,12 @@ public class Connection implements ParentAware<ConnectionContainer>, VersionedEn
         final Connection that = (Connection) o;
         if (connectionURI != null ? !connectionURI.equals(that.connectionURI) : that.connectionURI != null)
             return false;
-        if (needURI != null ? !needURI.equals(that.needURI) : that.needURI != null)
+        if (atomURI != null ? !atomURI.equals(that.atomURI) : that.atomURI != null)
             return false;
-        if (remoteConnectionURI != null ? !remoteConnectionURI.equals(that.remoteConnectionURI)
-                        : that.remoteConnectionURI != null)
+        if (targetConnectionURI != null ? !targetConnectionURI.equals(that.targetConnectionURI)
+                        : that.targetConnectionURI != null)
             return false;
-        if (remoteNeedURI != null ? !remoteNeedURI.equals(that.remoteNeedURI) : that.remoteNeedURI != null)
+        if (targetAtomURI != null ? !targetAtomURI.equals(that.targetAtomURI) : that.targetAtomURI != null)
             return false;
         if (state != that.state)
             return false;
@@ -257,9 +257,9 @@ public class Connection implements ParentAware<ConnectionContainer>, VersionedEn
     @Override
     public int hashCode() {
         int result = connectionURI != null ? connectionURI.hashCode() : 0;
-        result = 31 * result + (needURI != null ? needURI.hashCode() : 0);
-        result = 31 * result + (remoteConnectionURI != null ? remoteConnectionURI.hashCode() : 0);
-        result = 31 * result + (remoteNeedURI != null ? remoteNeedURI.hashCode() : 0);
+        result = 31 * result + (atomURI != null ? atomURI.hashCode() : 0);
+        result = 31 * result + (targetConnectionURI != null ? targetConnectionURI.hashCode() : 0);
+        result = 31 * result + (targetAtomURI != null ? targetAtomURI.hashCode() : 0);
         result = 31 * result + (state != null ? state.hashCode() : 0);
         return result;
     }

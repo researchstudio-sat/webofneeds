@@ -25,14 +25,14 @@ import won.protocol.message.processor.WonMessageProcessor;
 import won.protocol.message.processor.exception.EventAlreadyProcessedException;
 import won.protocol.message.processor.exception.UriAlreadyInUseException;
 import won.protocol.model.MessageEventPlaceholder;
-import won.protocol.model.Need;
+import won.protocol.model.Atom;
 import won.protocol.repository.MessageEventRepository;
-import won.protocol.repository.NeedRepository;
+import won.protocol.repository.AtomRepository;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 
 /**
- * Checks whether the event or need URI is already used. It is possible that
+ * Checks whether the event or atom URI is already used. It is possible that
  * while this check succeeds for the uri, when the time comes to save this uri
  * into the repository, this uri by that time will be used. TODO Therefore, the
  * UriAlreadyInUseException or EventAlreadyProcessedException has to also be
@@ -46,23 +46,23 @@ public class UriAlreadyUsedCheckingWonMessageProcessor implements WonMessageProc
     @Autowired
     private MessageEventRepository messageEventRepository;
     @Autowired
-    protected NeedRepository needRepository;
+    protected AtomRepository atomRepository;
 
     @Override
     public WonMessage process(final WonMessage message) throws UriAlreadyInUseException {
         checkEventURI(message);
-        checkNeedURI(message);
+        checkAtomURI(message);
         return message;
     }
 
-    private void checkNeedURI(final WonMessage message) {
-        if (message.getMessageType() == WonMessageType.CREATE_NEED) {
-            URI needURI = WonRdfUtils.NeedUtils.getNeedURI(message.getCompleteDataset());
-            Need need = needRepository.findOneByNeedURI(needURI);
-            if (need == null) {
+    private void checkAtomURI(final WonMessage message) {
+        if (message.getMessageType() == WonMessageType.CREATE_ATOM) {
+            URI atomURI = WonRdfUtils.AtomUtils.getAtomURI(message.getCompleteDataset());
+            Atom atom = atomRepository.findOneByAtomURI(atomURI);
+            if (atom == null) {
                 return;
             } else {
-                throw new UriAlreadyInUseException(message.getSenderNeedURI().toString());
+                throw new UriAlreadyInUseException(message.getSenderAtomURI().toString());
             }
         }
         return;
@@ -124,14 +124,14 @@ public class UriAlreadyUsedCheckingWonMessageProcessor implements WonMessageProc
     }
 
     private boolean hasSameEnvelopeData(final WonMessage processedMessage, final WonMessage message) {
-        if (equalsOrBothNull(processedMessage.getSenderNeedURI(), message.getSenderNeedURI())
-                        && equalsOrBothNull(processedMessage.getReceiverNeedURI(), message.getReceiverNeedURI())
+        if (equalsOrBothNull(processedMessage.getSenderAtomURI(), message.getSenderAtomURI())
+                        && equalsOrBothNull(processedMessage.getRecipientAtomURI(), message.getRecipientAtomURI())
                         // the receiving side can add this info
                         // &&
                         // equalsOrBothNull(processedMessage.getSenderURI(), message.getSenderURI())
-                        && equalsOrBothNull(processedMessage.getReceiverURI(), message.getReceiverURI())
+                        && equalsOrBothNull(processedMessage.getRecipientURI(), message.getRecipientURI())
                         && equalsOrBothNull(processedMessage.getSenderNodeURI(), message.getSenderNodeURI())
-                        && equalsOrBothNull(processedMessage.getReceiverNodeURI(), message.getReceiverNodeURI())
+                        && equalsOrBothNull(processedMessage.getRecipientNodeURI(), message.getRecipientNodeURI())
                         // the receiving side can add this info
                         // &&
                         // equalsOrBothNull(processedMessage.getCorrespondingRemoteMessageURI(),

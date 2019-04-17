@@ -28,7 +28,7 @@ public class URISerializeVsToStringTest {
         StopWatch readWatch = new StopWatch();
         StopWatch writeWatch = new StopWatch();
         StopWatch stopWatch = new StopWatch();
-        String myuri = "https://192.168.124.49:8443/won/resource/need/561548487155823600";
+        String myuri = "https://192.168.124.49:8443/won/resource/atom/561548487155823600";
         readWatch.start();
         readWatch.suspend();
         writeWatch.start();

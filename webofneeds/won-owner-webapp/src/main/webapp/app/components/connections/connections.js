@@ -19,7 +19,7 @@ import * as srefUtils from "../../sref-utils.js";
 
 import "style/_connections.scss";
 import "style/_responsiveness-utils.scss";
-import "style/_need-overlay.scss";
+import "style/_atom-overlay.scss";
 import "style/_connection-overlay.scss";
 
 const serviceDependencies = ["$element", "$ngRedux", "$scope", "$state"];
@@ -33,10 +33,10 @@ class ConnectionsController {
 
     const selectFromState = state => {
       const viewConnUri = generalSelectors.getViewConnectionUriFromRoute(state);
-      const viewNeedUri = generalSelectors.getViewNeedUriFromRoute(state);
+      const viewAtomUri = generalSelectors.getViewAtomUriFromRoute(state);
       const selectedPostUri = generalSelectors.getPostUriFromRoute(state);
       const selectedPost =
-        selectedPostUri && getIn(state, ["needs", selectedPostUri]);
+        selectedPostUri && getIn(state, ["atoms", selectedPostUri]);
 
       const useCase = generalSelectors.getUseCaseFromRoute(state);
       const useCaseGroup = generalSelectors.getUseCaseGroupFromRoute(state);
@@ -44,37 +44,37 @@ class ConnectionsController {
       const selectedConnectionUri = generalSelectors.getConnectionUriFromRoute(
         state
       );
-      const fromNeedUri = generalSelectors.getFromNeedUriFromRoute(state);
+      const fromAtomUri = generalSelectors.getFromAtomUriFromRoute(state);
       const mode = generalSelectors.getModeFromRoute(state);
 
-      const need =
+      const atom =
         selectedConnectionUri &&
-        generalSelectors.getOwnedNeedByConnectionUri(
+        generalSelectors.getOwnedAtomByConnectionUri(
           state,
           selectedConnectionUri
         );
-      const selectedConnection = getIn(need, [
+      const selectedConnection = getIn(atom, [
         "connections",
         selectedConnectionUri,
       ]);
       const isSelectedConnectionGroupChat = isChatToGroup(
-        state.get("needs"),
-        get(need, "uri"),
+        state.get("atoms"),
+        get(atom, "uri"),
         selectedConnectionUri
       );
 
       const selectedConnectionState = getIn(selectedConnection, ["state"]);
 
-      const ownedNeeds = generalSelectors.getOwnedNeeds(state);
+      const ownedAtoms = generalSelectors.getOwnedAtoms(state);
 
-      const hasOwnedNeeds = ownedNeeds && ownedNeeds.size > 0;
+      const hasOwnedAtoms = ownedAtoms && ownedAtoms.size > 0;
 
       const theme = getIn(state, ["config", "theme"]);
       const themeName = get(theme, "name");
       const appTitle = get(theme, "title");
       const welcomeTemplate = get(theme, "welcomeTemplate");
 
-      const showCreateFromPost = !!(fromNeedUri && mode);
+      const showCreateFromPost = !!(fromAtomUri && mode);
 
       return {
         appTitle,
@@ -137,18 +137,18 @@ class ConnectionsController {
         showPostInfo: selectedPost && !useCaseGroup,
         showSlideIns:
           viewSelectors.hasSlideIns(state) && viewSelectors.showSlideIns(state),
-        showNeedOverlay: !!viewNeedUri,
+        showAtomOverlay: !!viewAtomUri,
         showConnectionOverlay: !!viewConnUri,
-        viewNeedUri,
+        viewAtomUri,
         viewConnUri,
         hideListSideInResponsive:
           showCreateFromPost ||
-          !hasOwnedNeeds ||
+          !hasOwnedAtoms ||
           selectedConnection ||
           selectedPost ||
           !!useCaseGroup ||
           !!useCase,
-        hideWelcomeSideInResponsive: hasOwnedNeeds,
+        hideWelcomeSideInResponsive: hasOwnedAtoms,
         hideFooterInResponsive: selectedConnection,
       };
     };
@@ -159,13 +159,13 @@ class ConnectionsController {
     this.$scope.$on("$destroy", disconnect);
   }
 
-  selectNeed(needUri) {
+  selectAtom(atomUri) {
     this.router__stateGoCurrent({
       connectionUri: undefined,
-      postUri: needUri,
+      postUri: atomUri,
       useCase: undefined,
       useCaseGroup: undefined,
-      fromNeedUri: undefined,
+      fromAtomUri: undefined,
       mode: undefined,
     });
   }
@@ -177,26 +177,26 @@ class ConnectionsController {
       postUri: undefined,
       useCase: undefined,
       useCaseGroup: undefined,
-      fromNeedUri: undefined,
+      fromAtomUri: undefined,
       mode: undefined,
     });
   }
 
   markAsRead(connectionUri) {
-    const need = generalSelectors.getOwnedNeedByConnectionUri(
+    const atom = generalSelectors.getOwnedAtomByConnectionUri(
       this.$ngRedux.getState(),
       connectionUri
     );
 
-    const connUnread = getIn(need, ["connections", connectionUri, "unread"]);
+    const connUnread = getIn(atom, ["connections", connectionUri, "unread"]);
     const connNotConnected =
-      getIn(need, ["connections", connectionUri, "state"]) !==
+      getIn(atom, ["connections", connectionUri, "state"]) !==
       won.WON.Connected;
 
     if (connUnread && connNotConnected) {
       const payload = {
         connectionUri: connectionUri,
-        needUri: need.get("uri"),
+        atomUri: atom.get("uri"),
       };
 
       this.connections__markAsRead(payload);

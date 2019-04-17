@@ -65,15 +65,15 @@
     <int:service-activator input-channel="receiveEmailChannel" ref="mail2wonBot" method="receive"/>
 
     <bean id="mail2wonBot" class="won.bot.impl.Mail2WonBot">
-        <!-- optional property, by default one echo need per each need will be created -->
+        <!-- optional property, by default one echo atom per each atom will be created -->
 
         <property name="botContextWrapper" ref="botContextWrapper"/>
         <property name="taskScheduler" ref="taskScheduler"/>
         <property name="receiveEmailChannel" ref="receiveEmailChannel"/>
         <property name="sendEmailChannel" ref="sendEmailChannel"/>
         <property name="mailGenerator" ref="mailGenerator"/>
-        <property name="needProducer">
-            <bean class="won.bot.framework.component.needproducer.impl.NopNeedProducer" />
+        <property name="atomProducer">
+            <bean class="won.bot.framework.component.atomproducer.impl.NopAtomProducer" />
         </property>
 
 
@@ -81,9 +81,9 @@
         <!--property name="nodeURISource" ref="nodeUriSourceRandom" /-->
         <!--<property name="matcherNodeURISource" ref="matcherNodeURISource"/>-->
         <!--<property name="matcherUri" value="${matcher.uri}" />-->
-        <!-- expects a bean named "ownerProtocolNeedServiceClient" in the context -->
-        <!--property name="ownerService" ref="ownerProtocolNeedServiceClient" /-->
-        <!--<property name="matcherProtocolNeedServiceClient" ref="matcherProtocolNeedServiceClient"/>-->
+        <!-- expects a bean named "ownerProtocolAtomServiceClient" in the context -->
+        <!--property name="ownerService" ref="ownerProtocolAtomServiceClient" /-->
+        <!--<property name="matcherProtocolAtomServiceClient" ref="matcherProtocolAtomServiceClient"/>-->
         <!--<property name="matcherProtocolMatcherService" ref="matcherProtocolMatcherServiceJMSBased"/>-->
         <property name="trigger">
             <bean class="org.springframework.scheduling.support.PeriodicTrigger">

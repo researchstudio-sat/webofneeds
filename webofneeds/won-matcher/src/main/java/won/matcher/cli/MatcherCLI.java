@@ -9,9 +9,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 
-import won.matcher.protocol.impl.MatcherProtocolNeedServiceClient;
-import won.protocol.exception.IllegalMessageForNeedStateException;
-import won.protocol.exception.NoSuchNeedException;
+import won.matcher.protocol.impl.MatcherProtocolAtomServiceClient;
+import won.protocol.exception.IllegalMessageForAtomStateException;
+import won.protocol.exception.NoSuchAtomException;
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
@@ -26,7 +26,7 @@ import won.protocol.util.linkeddata.WonLinkedDataUtils;
 public class MatcherCLI implements CommandLineRunner {
     private static final Logger logger = LoggerFactory.getLogger(MatcherCLI.class);
     @Autowired
-    private MatcherProtocolNeedServiceClient client;
+    private MatcherProtocolAtomServiceClient client;
     @Autowired
     private WonNodeInformationService wonNodeInformationService;
     @Autowired
@@ -34,18 +34,18 @@ public class MatcherCLI implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        String need1 = "http://localhost:8080/won/resource/need/1";
-        String need2 = "http://localhost:8080/won/resource/need/2";
+        String atom1 = "http://localhost:8080/won/resource/atom/1";
+        String atom2 = "http://localhost:8080/won/resource/atom/2";
         String org = "http://localhost:8080/matcher";
         double score = 1;
         for (int i = 0; i < args.length; i++) {
             if (args[i].equals("-h")) {
-                System.out.println("USAGE: java MatcherCLI [-n1 need1] [-n2 need2] [-o originator] [-s score] [-h]");
+                System.out.println("USAGE: java MatcherCLI [-n1 atom1] [-n2 atom2] [-o originator] [-s score] [-h]");
                 System.exit(0);
             } else if (args[i].equals("-n1")) {
-                need1 = args[++i];
+                atom1 = args[++i];
             } else if (args[i].equals("-n2")) {
-                need2 = args[++i];
+                atom2 = args[++i];
             } else if (args[i].equals("-o")) {
                 org = args[++i];
             } else if (args[i].equals("-s")) {
@@ -54,30 +54,30 @@ public class MatcherCLI implements CommandLineRunner {
         }
         try {
             // TODO: Add rdf content
-            client.hint(new URI(need1), new URI(need2), score, new URI(org), null,
-                            createWonMessage(URI.create(need1), URI.create(need2), score, URI.create(org)));
+            client.hint(new URI(atom1), new URI(atom2), score, new URI(org), null,
+                            createWonMessage(URI.create(atom1), URI.create(atom2), score, URI.create(org)));
         } catch (URISyntaxException e) {
             logger.error("Exception caught:", e);
-        } catch (IllegalMessageForNeedStateException e) {
+        } catch (IllegalMessageForAtomStateException e) {
             logger.error("Exception caught:", e);
-        } catch (NoSuchNeedException e) {
+        } catch (NoSuchAtomException e) {
             logger.error("Exception caught:", e);
         } catch (Exception e) {
             e.printStackTrace(); // To change body of catch statement use File | Settings | File Templates.
         }
     }
 
-    public void setClient(MatcherProtocolNeedServiceClient client) {
+    public void setClient(MatcherProtocolAtomServiceClient client) {
         this.client = client;
     }
 
-    private WonMessage createWonMessage(URI needURI, URI otherNeedURI, double score, URI originator)
+    private WonMessage createWonMessage(URI atomURI, URI otherAtomURI, double score, URI originator)
                     throws WonMessageBuilderException {
-        URI wonNode = WonLinkedDataUtils.getWonNodeURIForNeedOrConnection(needURI,
-                        linkedDataSource.getDataForResource(needURI));
+        URI wonNode = WonLinkedDataUtils.getWonNodeURIForAtomOrConnection(atomURI,
+                        linkedDataSource.getDataForResource(atomURI));
         return WonMessageBuilder
-                        .setMessagePropertiesForHint(wonNodeInformationService.generateEventURI(wonNode), needURI,
-                                        Optional.empty(), wonNode, otherNeedURI, Optional.empty(), originator, score)
+                        .setMessagePropertiesForHint(wonNodeInformationService.generateEventURI(wonNode), atomURI,
+                                        Optional.empty(), wonNode, otherAtomURI, Optional.empty(), originator, score)
                         .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL).build();
     }
 }

@@ -1,5 +1,5 @@
 # A Response must always reference the message that it is a response to.
-PREFIX msg: <http://purl.org/webofneeds/message#>
+PREFIX msg: <https://w3id.org/won/message#>
 SELECT * WHERE {
   {
   	?resp a msg:FromSystem .
@@ -12,11 +12,11 @@ SELECT * WHERE {
 	?resp msg:isRemoteResponseTo ?msg .
   }
   {
-  	?resp msg:hasMessageType msg:SuccessResponse.
+  	?resp msg:messageType msg:SuccessResponse.
   } UNION {
-    ?resp msg:hasMessageType msg:FailureResponse.
+    ?resp msg:messageType msg:FailureResponse.
   }
   FILTER NOT EXISTS {
-  	?resp msg:hasPreviousMessage ?msg.
+  	?resp msg:previousMessage ?msg.
   }
 }

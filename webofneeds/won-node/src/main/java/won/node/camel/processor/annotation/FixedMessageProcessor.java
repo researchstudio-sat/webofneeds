@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
  * cause ordering inconsistencies if new messages are sent before the current
  * message has been processed completely. If new messages are to be sent, this
  * is to be done in a FixedMessageReactionProcessor. This implementation is
- * always executed before the corresponding FacetMessageProcessor.
+ * always executed before the corresponding SocketMessageProcessor.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)

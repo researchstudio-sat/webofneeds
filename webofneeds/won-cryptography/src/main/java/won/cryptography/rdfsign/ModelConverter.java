@@ -34,11 +34,11 @@ public class ModelConverter {
      * prefixes just looks whether the resource uri starts with that prefix uri,
      * which would be true in both cases below:
      * 
-     * @prefix : <http://www.example.com/resource/need/12#> .
-     * @prefix need: <http://www.example.com/resource/need/12> . Also, applying
+     * @prefix : <http://www.example.com/resource/atom/12#> .
+     * @prefix atom: <http://www.example.com/resource/atom/12> . Also, applying
      * prefixes in NamedGraph in cases like
-     * @prefix : <http://www.example.com/resource/need/12/>
-     * <http://www.example.com/resource/need/12/connections/> a ldp:Container .
+     * @prefix : <http://www.example.com/resource/atom/12/>
+     * <http://www.example.com/resource/atom/12/connections/> a ldp:Container .
      * would result in a wrong RDF triple: :connections/ a ldp:Container .
      */
     public static Model namedGraphToModel(String graphName, GraphCollection gc) throws Exception {
@@ -127,10 +127,10 @@ public class ModelConverter {
         }
         // don't apply prefixes since it can result in funny things like:
         // pref:/connections/, and also the collision on the prefix uris
-        // that starts the same. E.g. having prefixes below in need rdf
+        // that starts the same. E.g. having prefixes below in atom rdf
         // would cause errors
-        // @prefix : <http://www.example.com/resource/need/12#> .
-        // @prefix need: <http://www.example.com/resource/need/12> .
+        // @prefix : <http://www.example.com/resource/atom/12#> .
+        // @prefix atom: <http://www.example.com/resource/atom/12> .
         // graphc.applyPrefixes();
         return graphc;
     }
@@ -150,7 +150,7 @@ public class ModelConverter {
         } else if (rdfNode.isAnon()) {
             result = enclose(rdfNode.asResource().getId().getLabelString(), "_:", "");
         } else {
-            // TODO It might need to be improved as some syntax cases might not be covered
+            // TODO It might atom to be improved as some syntax cases might not be covered
             // so far
             // a collection??
             throw new UnsupportedOperationException("support missing for converting: " + rdfNode.toString());

@@ -29,7 +29,7 @@ import won.protocol.util.WonRdfUtils;
 
 /**
  * Sends a error response message back to the sender of the original message, if
- * that message was sent on behalf of a specified need (i.e. its senderNeedURI
+ * that message was sent on behalf of a specified atom (i.e. its senderAtomURI
  * is set).
  */
 public class FailResponder extends AbstractCamelProcessor {
@@ -64,7 +64,7 @@ public class FailResponder extends AbstractCamelProcessor {
             }
             if (originalMessage.getMessageType() == WonMessageType.HINT_MESSAGE) {
                 // we don't want to send a FailureResponse for a hint message as matchers
-                // are not fully compatible messaging agents (needs), so sending this message
+                // are not fully compatible messaging agents (atoms), so sending this message
                 // will fail.
                 logger.debug("suppressing failure response for HINT message", exception);
                 return;
