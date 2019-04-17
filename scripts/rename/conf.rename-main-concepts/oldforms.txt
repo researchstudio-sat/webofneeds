@@ -1,10 +1,10 @@
 # This file contains one expression per line that is replaced by the 
 # corresponding line in newforms.txt.
 # Before processing, all lines starting with '#' are stripped.
-http://purl.org/webofneeds#model
-http\\://purl.org/webofneeds#model
-http://purl.org/webofneeds#woncrypt
-http\\://purl.org/webofneeds#woncrypt
+http://purl.org/webofneeds/model
+http\\://purl.org/webofneeds/model
+http://purl.org/webofneeds/woncrypt
+http\\://purl.org/webofneeds/woncrypt
 http://purl.org/webofneeds
 http\\://purl.org/webofneeds
 # now change a number of concept names

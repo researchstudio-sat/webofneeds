@@ -1,11 +1,19 @@
 #!/usr/bin/perl -w
 foreach my $line ( <STDIN> ) {
     chomp( $line );
-	print $line . "\n";
 	if ($line =~ /^#/){
-		#don't expand comments
+		#delete comments
 		next;
 	}
+	if ($line =~ /^!/){
+		#don't expand lines starting with '!'
+		$out = $line;
+		$out =~ s/^!//;
+		print $out . "\n";
+		next;
+	}
+	# use the original line in the result
+	print $line . "\n";
 	#uppercase first letter
 	$out = $line;
 	$out =~ s/^(\p{IsLower})/uc($1)/ge;

@@ -59,7 +59,7 @@ cd ../../../../
 
 #### Set up the DB migration
 
-**Note:** if the generated sql file is empty, you either did not manage to connect to the db or there is nothing to migrate. Check the script's output for `psql:FATAL` messages and decide.
+**Note:** if the generated sql file is empty, it means there is nothing to migrate. However, check if there is an output line say if you provided the wrong password, 
 
 ```
 ./scripts/rename/generate-db-migration-files.sh

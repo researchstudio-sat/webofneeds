@@ -2,15 +2,36 @@
 
 script_path="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
-oldforms_file=${script_path}/oldforms.txt
-newforms_file=${script_path}/newforms.txt
-oldforms_file_expanded=${script_path}/generated/oldforms-expanded.txt
-newforms_file_expanded=${script_path}/generated/newforms-expanded.txt
-sed_script_file=${script_path}/generated/sed-changefile-regexes.txt
-sed_script_file_db_migration=${script_path}/generated/sed-db-migration-regexes.txt
-grep_script_file=${script_path}/generated/grep-checkfile-regex.txt
+if [[ -z "$1" ]]
+then
+	echo "Error: no config directory specified" >&2
+	cat << EOF
+usage: $0 <config-directory>
 
-mkdir ${script_path}/generated
+	Processes the config for rename.sh found in [config-directory], generating the respective files in
+	[config-directory]/generated
+
+EOF
+	exit 1	
+fi
+
+confdir="$( cd "$1" >/dev/null 2>&1 && pwd )"
+
+if [[ ! -f "$confdir/oldforms.txt" ]]
+then
+	echo "Error: $confdir does not seem to be a valid conf directory for $0" >&2
+	exit 1	
+fi
+
+oldforms_file=${confdir}/oldforms.txt
+newforms_file=${confdir}/newforms.txt
+oldforms_file_expanded=${confdir}/generated/oldforms-expanded.txt
+newforms_file_expanded=${confdir}/generated/newforms-expanded.txt
+sed_script_file=${confdir}/generated/sed-changefile-regexes.txt
+sed_script_file_db_migration=${confdir}/generated/sed-db-migration-regexes.txt
+grep_script_file=${confdir}/generated/grep-checkfile-regex.txt
+
+mkdir -p ${confdir}/generated
 
 function join_by { local IFS="$1"; shift; echo "$*"; }
 

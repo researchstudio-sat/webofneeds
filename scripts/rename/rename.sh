@@ -2,10 +2,35 @@
 
 script_path="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
-sed_script_file=${script_path}/generated/sed-changefile-regexes.txt
-grep_script_file=${script_path}/generated/grep-checkfile-regex.txt
 
-${script_path}/generate-regex-files.sh || exit 1
+
+
+if [[ -z "$1" ]]
+then
+	echo "Error: no config directory specified" >&2
+	cat << EOF
+usage: $0 <config-directory> [FORCE]
+
+	Performs recursive renaming of files, directories and file contents according to 
+	the configuration found in config-directory
+
+EOF
+	exit 1	
+fi
+
+confdir="$( cd "$1" >/dev/null 2>&1 && pwd )"
+
+if [[ ! -f "$confdir/oldforms.txt" ]]
+then
+	echo "Error: $confdir does not seem to be a valid conf directory for $0" >&2
+	exit 1	
+fi
+
+
+${script_path}/generate-regex-files.sh "$confdir" || exit 1
+
+sed_script_file=${confdir}/generated/sed-changefile-regexes.txt
+grep_script_file=${confdir}/generated/grep-checkfile-regex.txt
 
 
 # writing list of changed files to this file
@@ -60,7 +85,7 @@ process_replace (){
 	done
 }
 
-if [[ $1 != "FORCE" ]]
+if [[ $2 != "FORCE" ]]
 then
 	FORCE=false
 	echo "Dry run. If you actually want to do this, add the parameter 'FORCE'" >&2
@@ -70,11 +95,11 @@ else
 fi 
 
 # list all files, filter using our file filter, and pass to replace
-find . -type f | grep -v -E -f "${script_path}/rename-file-filter.txt" | process_replace
+find . -type f | grep -v -E -f "${confdir}/renameignore" | process_replace
 
 # list all directories, filter by our file filter, compute length of string with awk and add as first attribute,
 # sort whole output longest first, remove length attribute, and pass to replace
 # have to do it this way so that nested folders get renamed first
-find . -type d | grep -v -E -f "${script_path}/rename-file-filter.txt" | awk '{ print length($0) " " $0; }' | sort -r -n | cut -d ' ' -f 2- | process_replace
+find . -type d | grep -v -E -f "${confdir}/renameignore" | awk '{ print length($0) " " $0; }' | sort -r -n | cut -d ' ' -f 2- | process_replace
 
 
