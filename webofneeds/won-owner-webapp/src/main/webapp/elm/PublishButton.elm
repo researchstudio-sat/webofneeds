@@ -192,7 +192,7 @@ personaList personas =
 
         personaEntries =
             personas
-                |> List.sortBy .name
+                |> List.sortBy (.name >> String.toLower)
                 |> List.map personaEntry
 
         anonymousEntry =

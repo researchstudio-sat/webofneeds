@@ -194,7 +194,7 @@ personaList : List Persona -> Model -> Html Msg
 personaList personas model =
     ul [ Attributes.class "won-persona-list" ]
         (personas
-            |> List.sortBy (.created >> Time.posixToMillis)
+            |> List.sortBy (.name >> String.toLower)
             |> List.reverse
             |> List.map (personaView model)
         )

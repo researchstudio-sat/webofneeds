@@ -536,6 +536,7 @@ listPersonas { skin, viewedUrl, personas } =
             |> List.sortBy
                 (\persona ->
                     NonEmpty.get persona.data.displayName
+                        |> String.toLower
                 )
             |> List.map
                 (\{ url, data } ->
