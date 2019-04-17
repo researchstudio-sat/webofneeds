@@ -72,8 +72,8 @@ popd
 
 ```
 ./scripts/rename/generate-db-migration-files.sh
-cp ./scripts/rename/generated/rename-migration-node.sql webofneeds/won-node/src/main/resources/db/migration/V #[complete with approproate file name]
-cp ./scripts/rename/generated/rename-migration-owner.sql webofneeds/won-owner/src/main/resources/db/migration/V #[complete with approproate file name]
+cp ./scripts/rename/conf.rename-001-main-concepts/generated/rename-migration-node.sql webofneeds/won-node/src/main/resources/db/migration/V #[complete with approproate file name]
+cp ./scripts/rename/conf.rename-001-main-concepts/generated/rename-migration-owner.sql webofneeds/won-owner/src/main/resources/db/migration/V1 #[complete with approproate file name]
 ```
 
 
