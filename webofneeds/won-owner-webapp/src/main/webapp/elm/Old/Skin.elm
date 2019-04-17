@@ -115,7 +115,6 @@ type alias Model model =
 type Msg msg
     = MsgReceived msg
     | SkinReceived Skin
-    | NoOp
 
 
 type alias SkinFlags =
@@ -179,9 +178,6 @@ skinnedElement { init, update, subscriptions, view } =
                           }
                         , Cmd.none
                         )
-
-                    NoOp ->
-                        ( model, Cmd.none )
         , view =
             \model ->
                 view model.skin model.model

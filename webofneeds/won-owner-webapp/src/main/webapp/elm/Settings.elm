@@ -3,7 +3,6 @@ module Settings exposing (main)
 import Browser.Events exposing (onResize)
 import Element exposing (..)
 import Element.Background as Background
-import Element.Events as Events
 import Element.Font as Font
 import Element.Input as Input
 import Elements
