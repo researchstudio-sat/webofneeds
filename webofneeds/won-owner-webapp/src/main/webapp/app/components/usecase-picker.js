@@ -45,20 +45,14 @@ function genComponentConf() {
 
         <!-- WHAT'S AROUND -->
         <div class="ucp__createx">
-            <button class="ucp__createx__button--pending won-button--filled red"
-                    ng-if="self.processingPublish"
-                    ng-disabled="self.processingPublish">
-                <span>Finding out what's going on&hellip;</span>
-            </button>
-
             <button class="won-button--filled red ucp__createx__button"
-                    ng-if="!self.processingPublish"
                     ng-click="self.createWhatsAround()"
                     ng-disabled="self.processingPublish">
                 <svg class="won-button-icon" style="--local-primary:white;">
                     <use xlink:href="#ico36_location_current" href="#ico36_location_current"></use>
                 </svg>
-                <span>What's in your Area?</span>
+                <span ng-if="!self.processingPublish">What's in your Area?</span>
+                <span ng-if="self.processingPublish">Finding out what's going on&hellip;</span>
             </button>
             <button class="won-button--filled red ucp__createx__button"
                     ng-click="self.router__stateGo('overview')">

@@ -67,20 +67,14 @@
         <h2 class="about__howto__title">Ready to start?</h2>
         <h3 class="about__howto__subtitle">Post your need or offer and let {{ self.appTitle }} do the rest</h3>
         <div class="about__howto__createx">
-            <button class="about__howto__createx__button--pending won-button--filled red"
-                    ng-if="self.processingPublish"
-                    ng-disabled="self.processingPublish">
-                <span>Finding out what's going on&hellip;</span>
-            </button>
-
             <button class="won-button--filled red about__howto__createx__button"
-                    ng-if="!self.processingPublish"
                     ng-click="self.createWhatsAround()"
                     ng-disabled="self.processingPublish">
                 <svg class="won-button-icon" style="--local-primary:white;">
                     <use xlink:href="#ico36_location_current" href="#ico36_location_current"></use>
                 </svg>
-                <span>What's in your Area?</span>
+                <span ng-if="!self.processingPublish">What's in your Area?</span>
+                <span ng-if="self.processingPublish">Finding out what's going on&hellip;</span>
             </button>
             <button class="won-button--filled red about__howto__createx__button"
                     ng-click="self.router__stateGo('overview')">
