@@ -17,6 +17,13 @@ import processReducer from "./process-reducer.js";
  */
 import { router } from "redux-ui-router";
 
+const initialOwnerState = Immutable.fromJS({
+  needUris: Immutable.Set(),
+  lastNeedUrisUpdateTime: undefined,
+});
+
+const initialConfigState = Immutable.fromJS({ theme: { name: "current" } });
+
 const reducers = {
   router,
 
@@ -44,10 +51,7 @@ const reducers = {
   // lastUpdateTime: (state = Date.now(), action = {}) => Date.now(),
   lastUpdateTime: () => Date.now(),
 
-  config: (
-    config = Immutable.fromJS({ theme: { name: "current" } }),
-    action = {}
-  ) => {
+  config: (config = initialConfigState, action = {}) => {
     switch (action.type) {
       case actionTypes.config.init:
       case actionTypes.config.update:
@@ -57,14 +61,11 @@ const reducers = {
         return config;
     }
   },
-  owner: (
-    owner = Immutable.fromJS({
-      needUris: Immutable.Set(),
-      lastNeedUrisUpdateTime: undefined,
-    }),
-    action = {}
-  ) => {
+  owner: (owner = initialOwnerState, action = {}) => {
     switch (action.type) {
+      case actionTypes.account.reset:
+        return initialOwnerState;
+
       case actionTypes.needs.storeNeedUrisFromOwner: {
         const fetchedNeedUris = action.payload.get("uris");
         let ownerNeedUris = owner.get("needUris");
