@@ -110,7 +110,8 @@ function genComponentConf() {
                 showPersonas: self.isHoldable && self.loggedIn,
                 personas: self.personas
               }"
-              on-action="self.publish(payload)" >
+              on-action="self.publish(payload)"
+              ng-if="self.showCreateInput && !self.isEditFromNeed">
             </won-elm>
             <div class="cp__footer__edit" ng-if="self.loggedIn && self.showCreateInput && self.isEditFromNeed && self.isFromNeedEditable">
               <button class="cp__footer__edit__save won-button--filled red" ng-click="self.save()" ng-disabled="!self.isValid()">
