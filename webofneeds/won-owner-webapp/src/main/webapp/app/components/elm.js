@@ -2,14 +2,17 @@ import angular from "angular";
 import { currentSkin } from "../selectors/general-selectors";
 import { actionCreators } from "../actions/actions";
 
-import "../../style/_elm-ui-shim.scss";
+import "./svg-icon.js";
+
+import "../../style/_elm.scss";
+import { getIn } from "../utils";
 
 function genComponentConf($ngRedux) {
   return {
     restrict: "E",
     scope: {
       module: "<",
-      attributes: "<",
+      props: "<",
       onAction: "&",
     },
     link: (scope, element) => {
@@ -18,25 +21,24 @@ function genComponentConf($ngRedux) {
       const elmApp = scope.module.init({
         node: childElement,
         flags: {
-          state: $ngRedux.getState().toJS(),
-          attributes: scope.attributes,
+          props: scope.props,
           style: currentSkin(),
         },
       });
 
-      const disconnectState = $ngRedux.connect(state => ({ state: state }))(
-        ({ state }) =>
-          window.requestAnimationFrame(() => {
-            elmApp.ports.inPort.send({
-              newState: state.toJS(),
-              newStyle: currentSkin(),
-            });
-          })
+      const disconnectState = $ngRedux.connect(state => ({
+        skin: getIn(state, ["config", "theme"]),
+      }))(() =>
+        window.requestAnimationFrame(() => {
+          elmApp.ports.inPort.send({
+            newStyle: currentSkin(),
+          });
+        })
       );
 
-      scope.$watch("attributes", attributes => {
+      scope.$watch("props", props => {
         elmApp.ports.inPort.send({
-          newAttributes: attributes,
+          newProps: props,
         });
       });
 

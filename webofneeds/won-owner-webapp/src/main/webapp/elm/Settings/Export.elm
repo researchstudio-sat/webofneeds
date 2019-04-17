@@ -22,10 +22,6 @@ type alias Model =
     }
 
 
-type alias HasFailed =
-    Bool
-
-
 type ExportState
     = EnteringPassword String
     | StartingExport

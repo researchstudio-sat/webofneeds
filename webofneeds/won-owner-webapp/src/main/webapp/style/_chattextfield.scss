@@ -195,13 +195,24 @@ chat-textfield {
     grid-column: 3 / span 1;
     display: block;
     height: 100%;
+
+    .won-publish-button {
+      width: auto;
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+
+      .submit-button {
+        flex-shrink: 1;
+        line-height: 1em;
+        border-radius: 0;
+        padding: 0 0.5em;
+      }
+    }
   }
   .cts__additionalcontent {
     grid-area: additionalcontent;
     grid-column: 1 / span 3;
     font-size: $smallFontSize;
-    &__header {
-    }
     &__list {
       display: flex;
       flex-wrap: wrap;

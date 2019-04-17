@@ -38,6 +38,15 @@ function genComponentConf() {
               <span class="post-menu__item__rating" ng-if="self.personaAggregateRatingString">(★ {{ self.personaAggregateRatingString }})</span>
             </div>
             <div class="post-menu__item"
+              ng-if="!self.hasHeldBy && self.isHoldable && self.isOwned"
+              ng-click="self.selectTab('HELDBY')"
+              ng-class="{
+                'post-menu__item--selected': self.isSelectedTab('HELDBY'),
+              }">
+              <span class="post-menu__item__label">+ Persona</span>
+              <span class="post-menu__item__rating" ng-if="self.personaAggregateRatingString">(★ {{ self.personaAggregateRatingString }})</span>
+            </div>
+            <div class="post-menu__item"
               ng-if="self.hasGroupFacet && !self.isOwned"
               ng-click="self.selectTab('PARTICIPANTS')"
               ng-class="{
@@ -170,6 +179,7 @@ function genComponentConf() {
         return {
           post,
           isPersona,
+          isHoldable: needUtils.hasHoldableFacet(post),
           isOwned,
           hasHeldBy,
           personaHasReviewFacet,

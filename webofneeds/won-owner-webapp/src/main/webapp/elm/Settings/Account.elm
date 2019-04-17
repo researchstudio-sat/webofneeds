@@ -9,7 +9,6 @@ port module Settings.Account exposing
 
 import Element exposing (..)
 import Element.Background as Background
-import Element.Border as Border
 import Element.Font as Font
 import Element.Input as Input
 import Elements
@@ -35,10 +34,6 @@ type alias PasswordList =
 type alias AccountInfo =
     { email : String
     }
-
-
-type alias HasFailed =
-    Bool
 
 
 type AccountState
@@ -67,8 +62,7 @@ init () =
 
 
 type Msg
-    = PasswordChanged PasswordList
-    | OldPasswordChanged String
+    = OldPasswordChanged String
     | NewPasswordChanged String
     | NewPasswordRepeatChanged String
     | AccountInfoChanged AccountInfo
@@ -79,9 +73,6 @@ type Msg
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        PasswordChanged newPasswordList ->
-            updatePasswordList newPasswordList model
-
         NewPasswordChanged newPwd ->
             updateNewPassword newPwd model
 
@@ -145,20 +136,6 @@ changeRequest ( { newPassword, oldPassword }, model ) =
                     ]
         , expect = Http.expectWhatever ChangeRequestReturned
         }
-
-
-updatePasswordList : PasswordList -> Model -> ( Model, Cmd Msg )
-updatePasswordList newPasswordList model =
-    ( case model.accountState of
-        EnteringPassword _ ->
-            { model
-                | accountState = EnteringPassword newPasswordList
-            }
-
-        _ ->
-            model
-    , Cmd.none
-    )
 
 
 updateNewPassword : String -> Model -> ( Model, Cmd Msg )

@@ -1,42 +1,43 @@
-port module Actions exposing
-    ( connectPersona
-    , disconnectPersona
-    )
+port module Actions exposing (Action, Event, emitEvent, startAction)
 
-import Application exposing (Id)
-import Json.Encode as Encode exposing (Value)
+import Json.Encode exposing (Value)
 
 
-port outPort : { action : String, payload : Value } -> Cmd msg
+
+---- PORT ----
 
 
-connectPersona :
-    { personaUrl : Id
-    , needUrl : Id
+port outPort : Action -> Cmd msg
+
+
+
+---- DATA ----
+
+
+type alias Action =
+    { action : String
+    , payload : Value
     }
-    -> Cmd msg
-connectPersona { personaUrl, needUrl } =
+
+
+type alias Event =
+    { eventName : String
+    , payload : Value
+    }
+
+
+
+---- ACTIONS ----
+
+
+emitEvent : Event -> Cmd msg
+emitEvent { eventName, payload } =
     outPort
-        { action = "personas__connect"
-        , payload =
-            Encode.list Encode.string
-                [ needUrl
-                , personaUrl
-                ]
+        { action = eventName
+        , payload = payload
         }
 
 
-disconnectPersona :
-    { personaUrl : Id
-    , needUrl : Id
-    }
-    -> Cmd msg
-disconnectPersona { personaUrl, needUrl } =
-    outPort
-        { action = "personas__disconnect"
-        , payload =
-            Encode.list Encode.string
-                [ needUrl
-                , personaUrl
-                ]
-        }
+startAction : Action -> Cmd msg
+startAction action =
+    outPort action

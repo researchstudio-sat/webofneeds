@@ -10,11 +10,11 @@ import * as generalSelectors from "../selectors/general-selectors.js";
 import * as needUtils from "../need-utils.js";
 import * as processUtils from "../process-utils.js";
 import { actionCreators } from "../actions/actions.js";
-import ratingView from "./rating-view.js";
 import squareImageModule from "./square-image.js";
 import descriptionDetailViewerModule from "./details/viewer/description-viewer.js";
 import { details } from "../../config/detail-definitions.js";
-import { Elm } from "../../elm/EditNeed.elm";
+
+import { Elm } from "../../elm/RatingView.elm";
 import elmModule from "./elm.js";
 
 import "style/_post-content-persona.scss";
@@ -41,7 +41,13 @@ function genComponentConf() {
           <span class="pcp__rating__label__title">Rating</span>
           <span class="pcp__rating__label__aggregate" ng-if="self.aggregateRatingString">(★ {{self.aggregateRatingString}})</span>
         </div>
-        <won-rating-view rating="self.aggregateRatingRounded" rating-connection-uri="self.ratingConnectionUri"></won-rating-view>
+        <won-elm
+          module="self.ratingView"
+          props="{
+            rating: self.aggregateRatingRounded,
+            connectionUri: self.ratingConnectionUri
+          }"
+        ></won-elm>
         <div class="pcp__rating__reviewcount" ng-if="self.reviewCount">{{ self.reviewCount }} Reviews</div>
         <button class="pcp__rating__view won-button--filled red" ng-if="self.reviewCount" ng-click="self.viewPersonaReviews()">View</button>
       </div>
@@ -50,7 +56,7 @@ function genComponentConf() {
         <button class="pcp__holds__view won-button--filled red" ng-click="self.viewPersonaPosts()">View</button>
       </div>
       <won-description-viewer detail="::self.descriptionDetail" content="self.personaDescription" ng-if="self.descriptionDetail && self.personaDescription"></won-description-viewer>
-      <won-elm module="self.editNeedModule" ng-if="self.postIsOwned && self.postHasHoldableFacet" attributes="self.post.get('uri')"></won-elm>
+      <button ng-if="self.postIsOwned" class="won-button--filled red" ng-click="self.removePersona()">Remove Persona</button>
     `;
 
   class Controller {
@@ -58,7 +64,7 @@ function genComponentConf() {
       attach(this, serviceDependencies, arguments);
       window.pcp4dbg = this;
 
-      this.editNeedModule = Elm.EditNeed;
+      this.ratingView = Elm.RatingView;
 
       const selectFromState = state => {
         const connectionUri = generalSelectors.getConnectionUriFromRoute(state);
@@ -119,6 +125,10 @@ function genComponentConf() {
       connect2Redux(selectFromState, actionCreators, ["self.holdsUri"], this);
     }
 
+    removePersona() {
+      this.personas__disconnect(this.holdsUri, this.personaUri);
+    }
+
     viewPersonaPosts() {
       this.needs__selectTab(
         Immutable.fromJS({ needUri: this.personaUri, selectTab: "HOLDS" })
@@ -155,9 +165,8 @@ function genComponentConf() {
 
 export default angular
   .module("won.owner.components.postContentPersona", [
-    ratingView,
+    elmModule,
     squareImageModule,
     descriptionDetailViewerModule,
-    elmModule,
   ])
   .directive("wonPostContentPersona", genComponentConf).name;

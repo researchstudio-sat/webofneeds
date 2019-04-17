@@ -1,55 +1,63 @@
 module Icons exposing
     ( arrowDown
     , arrowUp
+    , icon
+    , identicon
+    , plus
     )
 
 import Color exposing (Color)
-import Element.Styled as Element exposing (..)
-import Html
+import Html exposing (Attribute, Html)
 import Html.Attributes as HA
 
 
+type Icon
+    = Icon String
+
+
+icon : Icon -> Color -> Html msg
+icon (Icon name) color =
+    Html.node "won-svg-icon"
+        [ HA.attribute "icon" name
+        , HA.attribute "color" (Color.toCssString color)
+        , HA.style "width" "100%"
+        , HA.style "height" "100%"
+        ]
+        []
+
+
+
+-- icon : Icon -> Color -> Element msg
+-- icon name color =
+--     el
+--         [ width fill
+--         , height fill
+--         , htmlAttribute <| HA.style "height" "100%"
+--         ]
+--     <|
+--         html <|
+--             htmlIcon name color
+
+
 arrowDown =
-    svgIcon "ico16_arrow_down"
+    Icon "ico16_arrow_down"
 
 
 arrowUp =
-    svgIcon "ico16_arrow_up"
+    Icon "ico16_arrow_up"
 
 
-svgIcon : String -> Color -> Element msg
-svgIcon name color =
-    el
-        [ width fill
-        , height fill
-        , htmlAttribute <| HA.style "height" "100%"
-        ]
-    <|
-        html <|
-            Html.node "won-svg-icon"
-                [ HA.attribute "icon" name
-                , HA.attribute "color" (Color.toCssString color)
-                , HA.style "width" "100%"
-                , HA.style "height" "100%"
-                ]
-                []
+plus =
+    Icon "ico36_plus"
 
 
-
--- svgIcon :
---     List (Attribute msg)
---     ->
---         { color : Color
---         , name : String
---         }
---     -> Element msg
--- svgIcon attributes { color, name } =
---     el attributes <|
---         html <|
---             Html.node "won-svg-icon"
---                 [ HA.attribute "icon" name
---                 , HA.attribute "color" (Skin.cssColor color)
---                 , HA.style "width" "100%"
---                 , HA.style "height" "100%"
---                 ]
---                 []
+identicon : List (Attribute msg) -> String -> Html msg
+identicon attrs data =
+    Html.node "won-identicon"
+        (attrs
+            ++ [ HA.attribute "data" data
+               , HA.style "width" "100%"
+               , HA.style "height" "100%"
+               ]
+        )
+        []

@@ -18,11 +18,15 @@ import * as needUtils from "../need-utils.js";
 import * as viewUtils from "../view-utils.js";
 import * as processUtils from "../process-utils.js";
 import * as connectionSelectors from "../selectors/connection-selectors.js";
-import * as generalSelectors from "../selectors/general-selectors.js";
+import {
+  getOwnedPersonas,
+  getConnectionUriFromRoute,
+  isNeedOwned,
+} from "../selectors/general-selectors.js";
 import { actionCreators } from "../actions/actions.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
 import ngAnimate from "angular-animate";
-import { Elm } from "../../elm/EditNeed.elm";
+import { Elm } from "../../elm/AddPersona.elm";
 
 import "style/_post-content.scss";
 import "style/_rdflink.scss";
@@ -74,10 +78,10 @@ function genComponentConf() {
           <won-post-is-or-seeks-info branch="::'content'" ng-if="self.isSelectedTab('DETAIL') && self.hasContent" post-uri="self.postUri"></won-post-is-or-seeks-info>
           <won-labelled-hr label="::'Search'" class="cp__labelledhr" ng-show="self.isSelectedTab('DETAIL') && self.hasContent && self.hasSeeksBranch"></won-labelled-hr>
           <won-post-is-or-seeks-info branch="::'seeks'" ng-if="self.isSelectedTab('DETAIL') && self.hasSeeksBranch" post-uri="self.postUri"></won-post-is-or-seeks-info>
-          <won-elm module="self.editNeedModule" ng-if="self.isOwned && self.hasHoldableFacet && self.isSelectedTab('DETAIL') && !self.post.get('heldBy')" attributes="self.post.get('uri')"></won-elm>
 
           <!-- PERSONA INFORMATION -->
-          <won-post-content-persona ng-if="self.isSelectedTab('HELDBY')" holds-uri="self.postUri"></won-post-content-persona>
+          <won-post-content-persona ng-if="self.isSelectedTab('HELDBY') && self.post.get('heldBy')" holds-uri="self.postUri"></won-post-content-persona>
+          <won-elm module="self.addPersonaModule" ng-if="self.isSelectedTab('HELDBY') && self.isOwned && self.hasHoldableFacet && !self.post.get('heldBy')" props="{post: self.post.toJS(), personas: self.personas.toJS()}"></won-elm>
           
           <!-- PARTICIPANT INFORMATION -->
           <won-post-content-participants ng-if="self.isSelectedTab('PARTICIPANTS')" post-uri="self.postUri"></won-post-content-participants>
@@ -173,15 +177,13 @@ function genComponentConf() {
       this.won = won;
       window.postcontent4dbg = this;
 
-      this.editNeedModule = Elm.EditNeed;
+      this.addPersonaModule = Elm.AddPersona;
 
       const selectFromState = state => {
-        const openConnectionUri = generalSelectors.getConnectionUriFromRoute(
-          state
-        );
+        const openConnectionUri = getConnectionUriFromRoute(state);
         const post = getIn(state, ["needs", this.postUri]);
         const isPersona = needUtils.isPersona(post);
-        const isOwned = generalSelectors.isNeedOwned(state, this.postUri);
+        const isOwned = isNeedOwned(state, this.postUri);
         const content = get(post, "content");
 
         //TODO it will be possible to have more than one seeks
@@ -226,6 +228,7 @@ function genComponentConf() {
           fromConnection: !!openConnectionUri,
           openConnectionUri,
           visibleTab: viewUtils.getVisibleTabByNeedUri(viewState, this.postUri),
+          personas: getOwnedPersonas(state),
         };
       };
       connect2Redux(selectFromState, actionCreators, ["self.postUri"], this);

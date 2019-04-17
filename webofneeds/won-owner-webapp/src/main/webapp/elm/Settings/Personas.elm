@@ -7,18 +7,14 @@ module Settings.Personas exposing
     , view
     )
 
-import Browser
 import Dict exposing (Dict)
 import Element exposing (..)
 import Element.Background as Background
 import Element.Border as Border
-import Element.Events as Events
 import Element.Font as Font
 import Element.Input as Input
 import Elements
-import Html exposing (Html, node)
 import Html.Attributes as HA
-import Json.Decode as Decode exposing (Value)
 import Markdown
 import NonEmpty
 import Old.Persona as Persona exposing (Persona, PersonaData, SaveState(..))
@@ -27,7 +23,7 @@ import Regex
 import String.Extra as String
 import Time
 import Url
-import Validate exposing (Valid, Validator)
+import Validate exposing (Validator)
 
 
 
@@ -168,7 +164,7 @@ update msg model =
             case model.viewState of
                 Creating draft ->
                     case saveDraft draft of
-                        Just ( persona, cmd ) ->
+                        Just ( _, cmd ) ->
                             ( { model
                                 | viewState = Inactive
                               }
@@ -231,15 +227,6 @@ update msg model =
 
         NoOp ->
             ( model, Cmd.none )
-
-
-pruneSaveQueue : Dict Url Persona -> List PersonaData -> List PersonaData
-pruneSaveQueue personas queue =
-    let
-        newData =
-            List.map Persona.data (Dict.values personas)
-    in
-    List.filter (\persona -> not <| List.member persona newData) queue
 
 
 saveDraft : Draft -> Maybe ( PersonaData, Cmd Msg )
@@ -428,7 +415,7 @@ personaForm skin draft =
         validated =
             Validate.validate personaValidator draft
 
-        ( isValid, errors ) =
+        ( _, errors ) =
             case validated of
                 Ok _ ->
                     ( True, [] )
@@ -546,21 +533,10 @@ listPersonas { skin, viewedUrl, personas } =
                         Unsaved ->
                             Nothing
                 )
-            |> List.sortWith
-                (\left right ->
-                    case
-                        compare
-                            (Time.posixToMillis left.timestamp)
-                            (Time.posixToMillis right.timestamp)
-                    of
-                        LT ->
-                            GT
-
-                        GT ->
-                            LT
-
-                        EQ ->
-                            EQ
+            |> List.sortBy
+                (\persona ->
+                    NonEmpty.get persona.data.displayName
+                        |> String.toLower
                 )
             |> List.map
                 (\{ url, data } ->
