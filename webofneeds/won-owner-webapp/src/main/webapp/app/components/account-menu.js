@@ -79,7 +79,7 @@ function genLogoutConf() {
         return {
           loggedIn: accountUtils.isLoggedIn(accountState),
           email: accountUtils.getEmail(accountState),
-          isAnonymous: accountUtils.isLoggedIn(accountState),
+          isAnonymous: accountUtils.isAnonymous(accountState),
         };
       };
 
