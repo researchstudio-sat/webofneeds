@@ -533,21 +533,9 @@ listPersonas { skin, viewedUrl, personas } =
                         Unsaved ->
                             Nothing
                 )
-            |> List.sortWith
-                (\left right ->
-                    case
-                        compare
-                            (Time.posixToMillis left.timestamp)
-                            (Time.posixToMillis right.timestamp)
-                    of
-                        LT ->
-                            GT
-
-                        GT ->
-                            LT
-
-                        EQ ->
-                            EQ
+            |> List.sortBy
+                (\persona ->
+                    NonEmpty.get persona.data.displayName
                 )
             |> List.map
                 (\{ url, data } ->
