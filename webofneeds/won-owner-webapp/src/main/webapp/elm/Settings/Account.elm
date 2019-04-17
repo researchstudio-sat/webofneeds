@@ -363,7 +363,6 @@ changeView skin model =
                     [ Elements.mainButton
                         skin
                         [ width <| maximum 320 fill
-                        , padding 5
                         ]
                         { onPress =
                             if String.isEmpty oldPassword then
