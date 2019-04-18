@@ -39,6 +39,8 @@ See the files for a given extension (optionally, print affected lines: -p option
 
 ### Rename
 
+In a shell, move to the top directory you want to rename, then type 
+
 ```
 ./scripts/rename/rename.sh <config-dir> FORCE
 ```
