@@ -184,7 +184,9 @@ export default function(processState = initialState, action = {}) {
       return processState.set("processingLogout", true);
 
     case actionTypes.account.logoutFinished:
-      return processState.set("processingLogout", false);
+      return processState
+        .set("processingLogout", false)
+        .set("processingInitialLoad", false);
 
     case actionTypes.account.loginStarted:
       return processState
