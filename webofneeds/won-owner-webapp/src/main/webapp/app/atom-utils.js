@@ -51,7 +51,7 @@ export function hasImages(atom) {
   );
 }
 
-export function location(atom) {
+export function hasLocation(atom) {
   return (
     !!getIn(atom, ["content", "location"]) ||
     !!getIn(atom, ["seeks", "location"])
@@ -59,7 +59,7 @@ export function location(atom) {
 }
 
 export function getLocation(atom) {
-  if (location(atom)) {
+  if (hasLocation(atom)) {
     return (
       getIn(atom, ["content", "location"]) || getIn(atom, ["seeks", "location"])
     );
@@ -149,26 +149,26 @@ export function isAtom(atom) {
 }
 
 export function hasChatSocket(atom) {
-  return socket(atom, won.WON.ChatSocketCompacted);
+  return hasSocket(atom, won.WON.ChatSocketCompacted);
 }
 
 export function hasGroupSocket(atom) {
-  return socket(atom, won.WON.GroupSocketCompacted);
+  return hasSocket(atom, won.WON.GroupSocketCompacted);
 }
 
 export function hasHoldableSocket(atom) {
-  return socket(atom, won.WON.HoldableSocketCompacted);
+  return hasSocket(atom, won.WON.HoldableSocketCompacted);
 }
 
 export function hasHolderSocket(atom) {
-  return socket(atom, won.WON.HolderSocketCompacted);
+  return hasSocket(atom, won.WON.HolderSocketCompacted);
 }
 
 export function hasReviewSocket(atom) {
-  return socket(atom, won.WON.ReviewSocketCompacted);
+  return hasSocket(atom, won.WON.ReviewSocketCompacted);
 }
 
-export function socket(atom, socket) {
+export function hasSocket(atom, socket) {
   return (
     getIn(atom, ["content", "sockets"]) &&
     getIn(atom, ["content", "sockets"]).contains(socket)
@@ -182,7 +182,7 @@ export function hasSuggestedConnections(atom) {
   );
 }
 
-export function unreadSuggestedConnections(atom) {
+export function hasUnreadSuggestedConnections(atom) {
   return (
     get(atom, "connections") &&
     !!get(atom, "connections").find(
