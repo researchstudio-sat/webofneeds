@@ -95,7 +95,7 @@ function genComponentConf() {
                 </div>
                 <div class="co__item__connections__item nonsticky" ng-if="self.hasChatSocket(atomUri) && self.hasSuggestedConnections(atomUri)"
                   ng-class="{
-                    'won-unread': self.unreadSuggestedConnections(atomUri),
+                    'won-unread': self.hasUnreadSuggestedConnections(atomUri),
                     'selected': self.isShowingSuggestions(atomUri),
                   }">
                   <won-suggestion-selection-item
@@ -317,9 +317,9 @@ function genComponentConf() {
       return atomUtils.hasSuggestedConnections(atom);
     }
 
-    unreadSuggestedConnections(atomUri) {
+    hasUnreadSuggestedConnections(atomUri) {
       const atom = get(this.allAtoms, atomUri);
-      return atomUtils.unreadSuggestedConnections(atom);
+      return atomUtils.hasUnreadSuggestedConnections(atom);
     }
 
     isUnread(atomUri) {
