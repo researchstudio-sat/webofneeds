@@ -24,7 +24,6 @@ import won.protocol.vocabulary.SCHEMA;
 import won.protocol.vocabulary.SFSIG;
 import won.protocol.vocabulary.SIOC;
 import won.protocol.vocabulary.WON;
-import won.protocol.vocabulary.WONCRYPT;
 import won.protocol.vocabulary.WONMSG;
 
 /**
@@ -46,16 +45,15 @@ public class DefaultPrefixUtils {
      * @param prefixMapping
      */
     public static void setDefaultPrefixes(PrefixMapping prefixMapping) {
-        prefixMapping.setNsPrefix("won", WON.getURI());
+        prefixMapping.setNsPrefix(WON.DEFAULT_PREFIX, WON.getURI());
         prefixMapping.setNsPrefix(WONMSG.DEFAULT_PREFIX, WONMSG.getURI());
-        prefixMapping.setNsPrefix(WONCRYPT.DEFAULT_PREFIX, WONCRYPT.getURI());
         prefixMapping.setNsPrefix(SFSIG.DEFAULT_PREFIX, SFSIG.getURI());
         prefixMapping.setNsPrefix(CERT.DEFAULT_PREFIX, CERT.getURI());
-        prefixMapping.setNsPrefix("sioc", SIOC.getURI());
+        prefixMapping.setNsPrefix(SIOC.DEFAULT_PREFIX, SIOC.getURI());
         prefixMapping.setNsPrefix("rdf", RDF.getURI());
-        prefixMapping.setNsPrefix("ldp", LDP.getURI());
+        prefixMapping.setNsPrefix(LDP.DEFAULT_PREFIX, LDP.getURI());
         prefixMapping.setNsPrefix("rdfs", RDFS.getURI());
-        prefixMapping.setNsPrefix("geo", GEO.getURI());
+        prefixMapping.setNsPrefix(GEO.DEFAULT_PREFIX, GEO.getURI());
         prefixMapping.setNsPrefix("xsd", XSD.getURI());
         prefixMapping.setNsPrefix("dc", DC.getURI());
         prefixMapping.setNsPrefix(SCHEMA.DEFAULT_PREFIX, SCHEMA.getURI());
