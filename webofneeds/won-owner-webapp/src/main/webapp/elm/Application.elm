@@ -20,6 +20,7 @@ port inPort :
 type alias ExternalData props =
     { style : Maybe Style
     , props : Maybe props
+    , unmount : Bool
     }
 
 
@@ -32,6 +33,10 @@ externalUpdateDecoder propsDecoder =
     Decode.succeed ExternalData
         |> optional "newStyle" styleDecoder
         |> optional "newProps" propsDecoder
+        |> DP.custom
+            (Decode.maybe (Decode.field "unmount" Decode.bool)
+                |> Decode.map (Maybe.withDefault False)
+            )
 
 
 port errorPort : String -> Cmd msg
@@ -66,12 +71,14 @@ type Model props subModel
         , props : props
         , style : Style
         }
+    | Unmounted
 
 
 type Msg props subMsg
     = SubMsg subMsg
     | ParsingError String
     | ExternalUpdate (ExternalData props)
+    | BeingUnmounted
 
 
 
@@ -119,6 +126,9 @@ element options =
                             , props = props
                             }
 
+                Unmounted ->
+                    Html.span [] []
+
         -- UPDATE
         update msg modelWrapper =
             case modelWrapper of
@@ -147,18 +157,28 @@ element options =
                             , logError <| "Error on update:\n" ++ message
                             )
 
-                        ExternalUpdate { props, style } ->
-                            ( Model
-                                { model
-                                    | style =
-                                        style
-                                            |> Maybe.withDefault model.style
-                                    , props =
-                                        props
-                                            |> Maybe.withDefault model.props
-                                }
-                            , Cmd.none
-                            )
+                        ExternalUpdate { props, style, unmount } ->
+                            if unmount then
+                                ( Unmounted, Cmd.none )
+
+                            else
+                                ( Model
+                                    { model
+                                        | style =
+                                            style
+                                                |> Maybe.withDefault model.style
+                                        , props =
+                                            props
+                                                |> Maybe.withDefault model.props
+                                    }
+                                , Cmd.none
+                                )
+
+                        BeingUnmounted ->
+                            ( Unmounted, Cmd.none )
+
+                Unmounted ->
+                    ( modelWrapper, Cmd.none )
 
         -- SUBSCRIPTIONS
         subscriptions model =
@@ -182,6 +202,9 @@ element options =
                                         )
                             )
                         ]
+
+                Unmounted ->
+                    Sub.none
 
         -- INIT
         init { props, style } =

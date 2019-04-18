@@ -56,7 +56,10 @@ function genComponentConf($ngRedux) {
         console.error(error);
       });
 
-      scope.$on("destroy", () => {
+      scope.$on("$destroy", () => {
+        elmApp.ports.inPort.send({
+          unmount: true,
+        });
         disconnectState();
         if (elmApp.ports.outPort) {
           elmApp.ports.outPort.unsubscribe();
