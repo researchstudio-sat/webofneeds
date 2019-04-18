@@ -1,43 +1,22 @@
 #!/bin/bash
 
-script_path="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-
-
-
-
-if [[ -z "$1" ]]
-then
-	echo "Error: no config directory specified" >&2
-	cat << EOF
+usage(){
+cat << EOF
 usage: $0 <config-directory> [FORCE]
 
 	Performs recursive renaming of files, directories and file contents according to 
 	the configuration found in config-directory
 
 EOF
-	exit 1	
-fi
+}
+script_path="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
-confdir="$( cd "$1" >/dev/null 2>&1 && pwd )"
-
-if [[ ! -f "$confdir/oldforms.txt" ]]
-then
-	echo "Error: $confdir does not seem to be a valid conf directory for $0" >&2
-	exit 1	
-fi
-
+source ${script_path}/common.sh $* 
 
 ${script_path}/generate-regex-files.sh "$confdir" || exit 1
 
 sed_script_file=${confdir}/generated/sed-changefile-regexes.txt
 grep_script_file=${confdir}/generated/grep-checkfile-regex.txt
-
-
-# writing list of changed files to this file
-changedFilesList="changedFiles.tmp"
-rm -f ${changedFilesList}
-touch ${changedFilesList}
-echo "writing changed files to ${changedFilesList}" >&2
 
 # Parameters: 
 # $1: the file to process
@@ -67,9 +46,7 @@ process_replace (){
 			fi
 			if [[ ${baseName} != ${newBaseName} ]]
 			then
-
-				git ls-files --error-unmatch ${currentFile} > /dev/null 2>&1
-				managedByGit=$?
+				git ls-files --error-unmatch ${currentFile} > /dev/null 2>&1 && managedByGit=$? || managedByGit=$?
 				if [[ ${managedByGit} -eq 0 ]]
 				then 
 					echo -en "\e[96mgit-mv\e[0m to ${newBaseName} ... " >&2	
@@ -80,15 +57,14 @@ process_replace (){
 				fi
 			fi
 		fi
-		echo "${currentFile} -> ${newFileName}" >> ${changedFilesList}
 		echo -e "\e[32mdone\e[0m" >&2
 	done
 }
 
-if [[ $2 != "FORCE" ]]
+if [[ -z ${2+x} || $2 != "FORCE" ]]
 then
 	FORCE=false
-	echo "Dry run. If you actually want to do this, add the parameter 'FORCE'" >&2
+	echo -e "\e[32mDry run.\e[0m If you actually want to do this, add the parameter 'FORCE'" >&2
 else 
 	FORCE=true
 	echo "You said 'FORCE'. Starting the replacement process" >&2
@@ -112,4 +88,4 @@ find . -type f | grep -E -f "${confdir}/renameselect" | grep -v -E -f "${confdir
 # have to do it this way so that nested folders get renamed first
 find . -type d | grep -E -f "${confdir}/renameselect" | grep -v -E -f "${confdir}/renameignore" | awk '{ print length($0) " " $0; }' | sort -r -n | cut -d ' ' -f 2- | process_replace
 
-
+echo -e "\e[32mAll done.\e[0m"

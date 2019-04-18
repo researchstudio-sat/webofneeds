@@ -1,26 +1,15 @@
 #!/bin/bash
 
-script_path="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-
-if [[ -z "$1" ]]
-then
-	echo "Error: no config directory specified" >&2
-	cat << EOF
+usage (){	
+cat << EOF
 usage: $0 <config-director>
 
 	Lists all the file extensions of files that will be 
 	processed by rename.sh when using config in config-dir
 EOF
-	exit 1	
-fi
-
-confdir="$( cd "$1" >/dev/null 2>&1 && pwd )"
-
-if [[ ! -f "$confdir/oldforms.txt" ]]
-then
-	echo "Error: $confdir does not seem to be a valid conf directory for $0" >&2
-	exit 1	
-fi
+}
+script_path="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+source ${script_path}/common.sh $* 
 
 if [[ ! -e "${confdir}/renameignore" ]]
 then

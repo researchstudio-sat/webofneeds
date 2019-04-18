@@ -1,27 +1,17 @@
 #!/bin/bash
 
-script_path="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-
-if [[ -z "$1" ]]
-then
-	echo "Error: no config directory specified" >&2
-	cat << EOF
+usage() {
+cat << EOF
 usage: $0 <config-directory>
 
 	Processes the config for rename.sh found in [config-directory], generating the database migration files in
 	[config-directory]/generated
 
 EOF
-	exit 1	
-fi
+}
 
-confdir="$( cd "$1" >/dev/null 2>&1 && pwd )"
-
-if [[ ! -f "$confdir/oldforms.txt" ]]
-then
-	echo "Error: $confdir does not seem to be a valid conf directory for $0" >&2
-	exit 1	
-fi
+script_path="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+source ${script_path}/common.sh $*
 
 # make sure we have up-to-date regex files
 ${script_path}/generate-regex-files.sh $confdir || exit 1
