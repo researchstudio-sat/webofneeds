@@ -40,7 +40,7 @@ function genComponentConf() {
                     <button
                         class="won-button--outlined thin red"
                         ng-if="!self.isSuggested"
-                        ng-click="self.goToPost(self.connection.get('remoteNeedUri'))">
+                        ng-click="self.goToPost(self.connection.get('targetAtomUri'))">
                         Show Details
                     </button>
                     <button
@@ -57,14 +57,14 @@ function genComponentConf() {
                     </button>
                     <button
                         class="won-button--outlined thin red"
-                        ng-if="self.isRemoteNeedUsableAsTemplate"
-                        ng-click="self.router__stateGoAbs('connections', {fromNeedUri: self.remoteNeedUri, mode: 'DUPLICATE'})">
+                        ng-if="self.isTargetAtomUsableAsTemplate"
+                        ng-click="self.router__stateGoAbs('connections', {fromAtomUri: self.targetAtomUri, mode: 'DUPLICATE'})">
                         Post this too!
                     </button>
                     <button
                         class="won-button--outlined thin red"
-                        ng-if="self.isRemoteNeedEditable"
-                        ng-click="self.router__stateGoAbs('connections', {fromNeedUri: self.needUri, mode: 'EDIT'})">
+                        ng-if="self.isTargetAtomEditable"
+                        ng-click="self.router__stateGoAbs('connections', {fromAtomUri: self.atomUri, mode: 'EDIT'})">
                         Edit
                     </button>
                     <a class="won-button--outlined thin red"
@@ -90,14 +90,14 @@ function genComponentConf() {
 
         const post =
           connectionUri &&
-          generalSelectors.getOwnedNeedByConnectionUri(state, connectionUri);
+          generalSelectors.getOwnedAtomByConnectionUri(state, connectionUri);
         const connection = post && post.getIn(["connections", connectionUri]);
 
-        const remoteNeedUri = getIn(connection, ["remoteNeedUri"]);
+        const targetAtomUri = getIn(connection, ["targetAtomUri"]);
 
         let linkToPost;
-        if (ownerBaseUrl && remoteNeedUri) {
-          const path = "#!post/" + `?postUri=${encodeURI(remoteNeedUri)}`;
+        if (ownerBaseUrl && targetAtomUri) {
+          const path = "#!post/" + `?postUri=${encodeURI(targetAtomUri)}`;
 
           linkToPost = toAbsoluteURL(ownerBaseUrl).toString() + path;
         }
@@ -107,10 +107,10 @@ function genComponentConf() {
           connection,
           connectionUri,
           adminEmail: getIn(state, ["config", "theme", "adminEmail"]),
-          remoteNeedUri,
+          targetAtomUri,
           linkToPost,
           isConnectionToGroup: connectionUtils.isChatToGroup(
-            state.get("needs"),
+            state.get("atoms"),
             get(post, "uri"),
             connectionUri
           ),
@@ -119,13 +119,13 @@ function genComponentConf() {
           isSentRequest: connectionUtils.isRequestSent(connection),
           isReceivedRequest: connectionUtils.isRequestReceived(connection),
           isSuggested: connectionUtils.isSuggested(connection),
-          isRemoteNeedUsableAsTemplate: generalSelectors.isNeedUsableAsTemplate(
+          isTargetAtomUsableAsTemplate: generalSelectors.isAtomUsableAsTemplate(
             state,
-            remoteNeedUri
+            targetAtomUri
           ),
-          isRemoteNeedEditable: generalSelectors.isNeedEditable(
+          isTargetAtomEditable: generalSelectors.isAtomEditable(
             state,
-            remoteNeedUri
+            targetAtomUri
           ),
           connectionLoading:
             !connection ||
@@ -154,7 +154,7 @@ function genComponentConf() {
     }
 
     generateReportPostMailParams() {
-      const subject = `[Report Post] - ${this.remoteNeedUri}`;
+      const subject = `[Report Post] - ${this.targetAtomUri}`;
       const body = `Link to Post: ${this.linkToPost}%0D%0AReason:%0D%0A`; //hint: %0D%0A adds a linebreak
 
       return `subject=${subject}&body=${body}`;
@@ -171,7 +171,7 @@ function genComponentConf() {
     goToPost(postUri) {
       this.router__stateGoCurrent({
         useCase: undefined,
-        viewNeedUri: postUri,
+        viewAtomUri: postUri,
         viewConnUri: undefined,
       });
     }

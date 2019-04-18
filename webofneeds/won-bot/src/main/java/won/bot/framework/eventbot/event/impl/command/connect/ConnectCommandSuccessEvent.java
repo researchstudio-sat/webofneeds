@@ -27,14 +27,14 @@ public class ConnectCommandSuccessEvent extends AbstractMessageCommandResultEven
         super(originalCommandEvent, con);
     }
 
-    public ConnectCommandSuccessEvent(MessageCommandEvent originalCommandEvent, URI needURI, URI remoteNeedURI,
+    public ConnectCommandSuccessEvent(MessageCommandEvent originalCommandEvent, URI atomURI, URI targetAtomURI,
                     URI connectionURI) {
-        super(originalCommandEvent, needURI, remoteNeedURI, connectionURI);
+        super(originalCommandEvent, atomURI, targetAtomURI, connectionURI);
     }
 
-    public ConnectCommandSuccessEvent(MessageCommandEvent originalCommandEvent, URI needURI, URI remoteNeedURI,
+    public ConnectCommandSuccessEvent(MessageCommandEvent originalCommandEvent, URI atomURI, URI targetAtomURI,
                     URI connectionURI, String message) {
-        super(originalCommandEvent, needURI, remoteNeedURI, connectionURI, message);
+        super(originalCommandEvent, atomURI, targetAtomURI, connectionURI, message);
     }
 
     public ConnectCommandSuccessEvent(MessageCommandEvent originalCommandEvent, Connection con, String message) {

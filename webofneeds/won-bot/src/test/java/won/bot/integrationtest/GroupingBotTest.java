@@ -38,7 +38,7 @@ import won.bot.impl.GroupingBot;
  * Integration test.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "classpath:/spring/app/simple2NeedGroupingTest.xml" })
+@ContextConfiguration(locations = { "classpath:/spring/app/simple2AtomGroupingTest.xml" })
 public class GroupingBotTest {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private static final int RUN_ONCE = 1;
@@ -61,7 +61,7 @@ public class GroupingBotTest {
             bot = (MyBot) beanFactory.autowire(MyBot.class, AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, false);
             Object botBean = beanFactory.initializeBean(bot, "mybot");
             bot = (MyBot) botBean;
-            // the bot also needs a trigger so its act() method is called regularly.
+            // the bot also atoms a trigger so its act() method is called regularly.
             // (there is no trigger bean in the context)
             PeriodicTrigger trigger = new PeriodicTrigger(ACT_LOOP_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
             trigger.setInitialDelay(ACT_LOOP_INITIAL_DELAY_MILLIS);
@@ -93,16 +93,16 @@ public class GroupingBotTest {
      */
     @Test
     public void testGroupingBot() throws Exception {
-        logger.info("starting test case testCreate2NeedsGroupingBot");
+        logger.info("starting test case testCreate2AtomsGroupingBot");
         this.bot.executeAsserts();
-        logger.info("finishing test case testCreate2NeedsGroupingBot");
+        logger.info("finishing test case testCreate2AtomsGroupingBot");
     }
 
     /*
      * @Test public void testGroupRDFBot() throws Exception {
-     * logger.info("starting test case testCreate2NeedsGroupingBot");
+     * logger.info("starting test case testCreate2AtomsGroupingBot");
      * this.bot.executeGroupRDFValidationAssert();
-     * logger.info("finishing test case testCreate2NeedsGroupingBot"); }
+     * logger.info("finishing test case testCreate2AtomsGroupingBot"); }
      */
     /**
      * We create a subclass of the bot we want to test here so that we can add a
@@ -119,7 +119,7 @@ public class GroupingBotTest {
                         + "PREFIX geo:   <http://www.w3.org/2003/01/geo/wgs84_pos#>"
                         + "PREFIX xsd:   <http://www.w3.org/2001/XMLSchema#>"
                         + "PREFIX rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
-                        + "PREFIX won:   <http://purl.org/webofneeds/model#>"
+                        + "PREFIX won:   <https://w3id.org/won/core#>"
                         + "PREFIX gr:    <http://purl.org/goodrelations/v1#>"
                         + "PREFIX ldp:   <http://www.w3.org/ns/ldp#>";
 
@@ -151,12 +151,12 @@ public class GroupingBotTest {
             // 2 act events
             Assert.assertEquals(NO_OF_GROUPMEMBERS, this.groupMemberCreator.getEventCount());
             Assert.assertEquals(0, this.groupMemberCreator.getExceptionCount());
-            // 2 create need events
+            // 2 create atom events
             Assert.assertEquals(NO_OF_GROUPMEMBERS, this.groupCreator.getEventCount());
             Assert.assertEquals(0, this.groupCreator.getExceptionCount());
             // 1 create group events
-            Assert.assertEquals(NO_OF_GROUPMEMBERS + 1, this.needConnector.getEventCount());
-            Assert.assertEquals(0, this.needConnector.getExceptionCount());
+            Assert.assertEquals(NO_OF_GROUPMEMBERS + 1, this.atomConnector.getEventCount());
+            Assert.assertEquals(0, this.atomConnector.getExceptionCount());
             // 2 connect, 2 open
             Assert.assertEquals(NO_OF_GROUPMEMBERS, this.autoOpener.getEventCount());
             Assert.assertEquals(0, this.autoOpener.getExceptionCount());
@@ -173,12 +173,12 @@ public class GroupingBotTest {
                 Assert.assertEquals(NO_OF_MESSAGES, ((CountingListener) autoResponder).getCount());
                 Assert.assertEquals(0, autoResponder.getExceptionCount());
             }
-            // 4 NeedDeactivated events
+            // 4 AtomDeactivated events
             Assert.assertEquals(NO_OF_GROUPMEMBERS, this.workDoneSignaller.getEventCount());
             Assert.assertEquals(0, this.workDoneSignaller.getExceptionCount());
             // TODO: there is more to check:
             // * what does the RDF look like?
-            // --> pull it from the needURI/ConnectionURI and check contents
+            // --> pull it from the atomURI/ConnectionURI and check contents
             // * what does the database look like? */
         }
     }

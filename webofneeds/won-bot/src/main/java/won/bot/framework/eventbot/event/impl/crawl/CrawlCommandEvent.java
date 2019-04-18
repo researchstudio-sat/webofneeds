@@ -15,21 +15,21 @@ import java.util.List;
 
 import org.apache.jena.sparql.path.Path;
 
-import won.bot.framework.eventbot.event.BaseNeedSpecificEvent;
+import won.bot.framework.eventbot.event.BaseAtomSpecificEvent;
 import won.bot.framework.eventbot.event.impl.cmd.CommandEvent;
 
 /**
- * Initiates the crawling of linked data. The WebID of the specified need is
+ * Initiates the crawling of linked data. The WebID of the specified atom is
  * used.
  */
-public class CrawlCommandEvent extends BaseNeedSpecificEvent implements CommandEvent {
+public class CrawlCommandEvent extends BaseAtomSpecificEvent implements CommandEvent {
     private List<Path> propertyPaths;
     private URI startURI;
     private int getMaxRequest = 1000;
     private int maxDepth = 5;
 
-    public CrawlCommandEvent(URI needURI, URI startURI, List<Path> propertyPaths, int getMaxRequest, int maxDepth) {
-        super(needURI);
+    public CrawlCommandEvent(URI atomURI, URI startURI, List<Path> propertyPaths, int getMaxRequest, int maxDepth) {
+        super(atomURI);
         this.propertyPaths = propertyPaths;
         this.startURI = startURI;
         this.getMaxRequest = getMaxRequest;

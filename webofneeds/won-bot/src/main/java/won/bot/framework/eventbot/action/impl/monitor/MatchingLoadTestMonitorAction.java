@@ -23,7 +23,7 @@ import org.javasimon.Stopwatch;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.event.Event;
-import won.bot.framework.eventbot.event.impl.needlifecycle.NeedCreatedEvent;
+import won.bot.framework.eventbot.event.impl.atomlifecycle.AtomCreatedEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.HintFromMatcherEvent;
 import won.bot.framework.eventbot.listener.EventListener;
 
@@ -31,9 +31,9 @@ import won.bot.framework.eventbot.listener.EventListener;
  * Created by hfriedrich on 02.10.2015.
  */
 public class MatchingLoadTestMonitorAction extends BaseEventBotAction {
-    Map<String, Long> needEventStartTime = Collections.synchronizedMap(new HashMap<>());
+    Map<String, Long> atomEventStartTime = Collections.synchronizedMap(new HashMap<>());
     Map<String, List<Long>> hintEventReceivedTime = Collections.synchronizedMap(new HashMap<>());
-    Map<String, Split> needSplits = Collections.synchronizedMap(new HashMap<>());
+    Map<String, Split> atomSplits = Collections.synchronizedMap(new HashMap<>());
     private long startTestTime = -1;
 
     public MatchingLoadTestMonitorAction(final EventListenerContext eventListenerContext) {
@@ -42,35 +42,35 @@ public class MatchingLoadTestMonitorAction extends BaseEventBotAction {
 
     @Override
     protected void doRun(final Event event, EventListener executingListener) throws Exception {
-        Stopwatch stopwatch = SimonManager.getStopwatch("needHintFullRoundtrip");
-        if (event instanceof NeedCreatedEvent) {
+        Stopwatch stopwatch = SimonManager.getStopwatch("atomHintFullRoundtrip");
+        if (event instanceof AtomCreatedEvent) {
             Split split = stopwatch.start();
-            needSplits.put(((NeedCreatedEvent) event).getNeedURI().toString(), split);
-            logger.info("RECEIVED EVENT {} for uri {}", event, ((NeedCreatedEvent) event).getNeedURI().toString());
+            atomSplits.put(((AtomCreatedEvent) event).getAtomURI().toString(), split);
+            logger.info("RECEIVED EVENT {} for uri {}", event, ((AtomCreatedEvent) event).getAtomURI().toString());
             long startTime = System.currentTimeMillis();
-            String needUri = ((NeedCreatedEvent) event).getNeedURI().toString();
-            needEventStartTime.put(needUri, startTime);
+            String atomUri = ((AtomCreatedEvent) event).getAtomURI().toString();
+            atomEventStartTime.put(atomUri, startTime);
         } else if (event instanceof HintFromMatcherEvent) {
             logger.info("RECEIVED EVENT {} for uri {}", event,
-                            ((HintFromMatcherEvent) event).getMatch().getFromNeed().toString());
+                            ((HintFromMatcherEvent) event).getMatch().getFromAtom().toString());
             long hintReceivedTime = System.currentTimeMillis();
-            String needUri = ((HintFromMatcherEvent) event).getMatch().getFromNeed().toString();
-            needSplits.get(((HintFromMatcherEvent) event).getMatch().getFromNeed().toString()).stop();
-            if (hintEventReceivedTime.get(needUri) == null) {
-                hintEventReceivedTime.put(needUri, new LinkedList<Long>());
+            String atomUri = ((HintFromMatcherEvent) event).getMatch().getFromAtom().toString();
+            atomSplits.get(((HintFromMatcherEvent) event).getMatch().getFromAtom().toString()).stop();
+            if (hintEventReceivedTime.get(atomUri) == null) {
+                hintEventReceivedTime.put(atomUri, new LinkedList<Long>());
             }
-            hintEventReceivedTime.get(needUri).add(hintReceivedTime);
+            hintEventReceivedTime.get(atomUri).add(hintReceivedTime);
         }
         if (startTestTime == -1) {
             startTestTime = System.currentTimeMillis();
         }
-        logger.info("Number of Needs: {}", needEventStartTime.size());
+        logger.info("Number of Atoms: {}", atomEventStartTime.size());
         logger.info("Number of Hints: {}", getTotalHints());
-        logger.info("Number of Needs with Hints: {}", getNeedsWithHints());
+        logger.info("Number of Atoms with Hints: {}", getAtomsWithHints());
         logger.info("Average Duration: {}", getAverageHintDuration());
         logger.info("Minimum Duration: {}", getMinHintDuration());
         logger.info("Maximum Duration: {}", getMaxHintDuration());
-        logger.info("Needs with Hints per Second: {}", getNeedsWithNeedsPerSecond(startTestTime));
+        logger.info("Atoms with Hints per Second: {}", getAtomsWithAtomsPerSecond(startTestTime));
         logger.info("Hints per Second: {}", getHintsPerSecondThroughput(startTestTime));
     }
 
@@ -85,9 +85,9 @@ public class MatchingLoadTestMonitorAction extends BaseEventBotAction {
     private long getAverageHintDuration() {
         long num = 0;
         long duration = 0;
-        for (String needUri : hintEventReceivedTime.keySet()) {
-            long started = needEventStartTime.get(needUri);
-            for (Long received : hintEventReceivedTime.get(needUri)) {
+        for (String atomUri : hintEventReceivedTime.keySet()) {
+            long started = atomEventStartTime.get(atomUri);
+            for (Long received : hintEventReceivedTime.get(atomUri)) {
                 num++;
                 duration += (received - started);
             }
@@ -97,9 +97,9 @@ public class MatchingLoadTestMonitorAction extends BaseEventBotAction {
 
     private long getMinHintDuration() {
         long min = Long.MAX_VALUE;
-        for (String needUri : hintEventReceivedTime.keySet()) {
-            long started = needEventStartTime.get(needUri);
-            for (Long received : hintEventReceivedTime.get(needUri)) {
+        for (String atomUri : hintEventReceivedTime.keySet()) {
+            long started = atomEventStartTime.get(atomUri);
+            for (Long received : hintEventReceivedTime.get(atomUri)) {
                 long duration = received - started;
                 if (duration < min) {
                     min = duration;
@@ -111,9 +111,9 @@ public class MatchingLoadTestMonitorAction extends BaseEventBotAction {
 
     private long getMaxHintDuration() {
         long max = 0;
-        for (String needUri : hintEventReceivedTime.keySet()) {
-            long started = needEventStartTime.get(needUri);
-            for (Long received : hintEventReceivedTime.get(needUri)) {
+        for (String atomUri : hintEventReceivedTime.keySet()) {
+            long started = atomEventStartTime.get(atomUri);
+            for (Long received : hintEventReceivedTime.get(atomUri)) {
                 long duration = received - started;
                 if (duration > max) {
                     max = duration;
@@ -123,14 +123,14 @@ public class MatchingLoadTestMonitorAction extends BaseEventBotAction {
         return max;
     }
 
-    private long getNeedsWithHints() {
-        long numNeedsWithHints = 0;
-        for (String needUri : hintEventReceivedTime.keySet()) {
-            if (hintEventReceivedTime.get(needUri).size() != 0) {
-                numNeedsWithHints++;
+    private long getAtomsWithHints() {
+        long numAtomsWithHints = 0;
+        for (String atomUri : hintEventReceivedTime.keySet()) {
+            if (hintEventReceivedTime.get(atomUri).size() != 0) {
+                numAtomsWithHints++;
             }
         }
-        return numNeedsWithHints;
+        return numAtomsWithHints;
     }
 
     private float getHintsPerSecondThroughput(long startTime) {
@@ -138,8 +138,8 @@ public class MatchingLoadTestMonitorAction extends BaseEventBotAction {
         return ((float) getTotalHints() * 1000) / duration;
     }
 
-    private float getNeedsWithNeedsPerSecond(long startTime) {
+    private float getAtomsWithAtomsPerSecond(long startTime) {
         long duration = System.currentTimeMillis() - startTime;
-        return ((float) getNeedsWithHints() * 1000) / duration;
+        return ((float) getAtomsWithHints() * 1000) / duration;
     }
 }

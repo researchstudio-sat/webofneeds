@@ -52,7 +52,7 @@
                         </goals>
                         <configuration>
                             <message>Note: this build is slow because a
-                                shaded jar is created. If you don't need
+                                shaded jar is created. If you don't atom
                                 that (you will know if you do), you can
                                 skip it by using the profile
                                 'skip-bot-uberjar'</message>
@@ -128,7 +128,7 @@
         <!-- WON stuff -->
         <dependency>
             <groupId>at.researchstudio.sat</groupId>
-            <artifactId>won-facets-tx</artifactId>
+            <artifactId>won-sockets-tx</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

@@ -19,7 +19,7 @@
 		<intercept-url pattern="/rest/linked-data/**" access="permitAll()"/>
 		<intercept-url pattern="/**" access="denyAll" />
 		<custom-filter ref="sessionRepositoryFilter" before="FIRST" />
-		<!-- we do not need CSRF protection for these resources as accessing them is not state-changing - however, it would be better to have it.. -->
+		<!-- we do not atom CSRF protection for these resources as accessing them is not state-changing - however, it would be better to have it.. -->
 		<csrf disabled="true" />
 	</http>
 
@@ -37,7 +37,7 @@
 			<header name="Cache-Control" value="max-age=86400" />
 		</headers>
 		<intercept-url pattern=".*" access="permitAll()" />
-		<!-- we do not need CSRF protection for these resources as accessing them is not state-changing -->
+		<!-- we do not atom CSRF protection for these resources as accessing them is not state-changing -->
 		<csrf disabled="true" />
 	</http>
 
@@ -59,8 +59,8 @@
         <intercept-url pattern="/rest/users/email" access="isAuthenticated()"/>
         <intercept-url pattern="/rest/users/settings" access="isAuthenticated()"/>
         <intercept-url pattern="/rest/users/acceptTermsOfService" access="isAuthenticated()"/>
-        <intercept-url pattern="/rest/needs/drafts/*" access="hasRole('ROLE_ACCOUNT')"/>
-        <intercept-url pattern="/rest/needs/all" access="permitAll()"/>
+        <intercept-url pattern="/rest/atoms/drafts/*" access="hasRole('ROLE_ACCOUNT')"/>
+        <intercept-url pattern="/rest/atoms/all" access="permitAll()"/>
         <intercept-url pattern="/rest/**" access="isAuthenticated()"/>
         <intercept-url pattern="/**"  requires-channel="https"/>
         <!--intercept-url pattern="/rest/**" access="isAuthenticated()" /-->
@@ -94,7 +94,7 @@
 		<!-- see http://docs.spring.io/spring-security/site/docs/3.2.9.RELEASE/reference/htmlsingle/#headers for
 		configuration in spring-security-3.2.9 -->
 		<headers />
-		<!-- TODO: we actually do need CSRF protection here (see https://github.com/researchstudio-sat/webofneeds/issues/1141) -->
+		<!-- TODO: we actually do atom CSRF protection here (see https://github.com/researchstudio-sat/webofneeds/issues/1141) -->
 		<csrf disabled="true" />
 	</http>
 

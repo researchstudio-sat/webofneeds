@@ -1,0 +1,77 @@
+@prefix msg:   <https://w3id.org/won/message#> .
+@prefix conn:  <https://satvm05.researchstudio.at/won/resource/connection/> .
+@prefix atom:  <https://satvm05.researchstudio.at/won/resource/atom/> .
+@prefix woncrypt: <https://w3id.org/won/core#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix cert:  <http://www.w3.org/ns/auth/cert#> .
+@prefix local: <https://satvm05.researchstudio.at/won/resource/> .
+@prefix geo:   <http://www.w3.org/2003/01/geo/wgs84_pos#> .
+@prefix sig:   <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#> .
+@prefix s:     <http://schema.org/> .
+@prefix sh:    <http://www.w3.org/ns/shacl#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix won:   <https://w3id.org/won/core#> .
+@prefix ldp:   <http://www.w3.org/ns/ldp#> .
+@prefix event: <https://satvm05.researchstudio.at/won/resource/event/> .
+@prefix dc:    <http://purl.org/dc/elements/1.1/> .
+@prefix sioc:  <http://rdfs.org/sioc/ns#> .
+
+<https://satvm05.researchstudio.at/won/resource/atom/qhj15b6jojuk#sysinfo> {
+    atom:qhj15b6jojuk
+            a                      won:Atom ;
+            <http://purl.org/dc/terms/created>
+                    "2018-09-19T14:27:33.676Z"^^xsd:dateTime ;
+            <http://purl.org/dc/terms/modified>
+                    "2018-09-19T14:27:33.685Z"^^xsd:dateTime ;
+            won:connections     <https://satvm05.researchstudio.at/won/resource/atom/qhj15b6jojuk/connections> ;
+            won:contentGraph    <https://satvm05.researchstudio.at/won/resource/event/fphids6pr0hw#envelope-sig> , <https://satvm05.researchstudio.at/won/resource/event/fphids6pr0hw#atom> ;
+            won:messageContainer  <https://satvm05.researchstudio.at/won/resource/atom/qhj15b6jojuk#events> ;
+            won:wonNode         <https://satvm05.researchstudio.at/won/resource> ;
+            won:atomState          won:Active .
+
+    <https://satvm05.researchstudio.at/won/resource/atom/qhj15b6jojuk#events>
+            a            won:MessageContainer ;
+            rdfs:member  event:qrtp1dh4le0kxcl9vjck , event:fphids6pr0hw .
+
+    <https://satvm05.researchstudio.at/won/resource/atom/qhj15b6jojuk#sysinfo>
+            <http://www.w3.org/2004/03/trix/rdfg-1/subGraphOf>
+                    atom:qhj15b6jojuk .
+}
+
+<https://satvm05.researchstudio.at/won/resource/event/fphids6pr0hw#envelope-sig> {
+    <https://satvm05.researchstudio.at/won/resource/event/fphids6pr0hw#envelope-sig>
+            a                               sig:Signature ;
+            sig:signatureValue           "MGQCMFM6ohszJQiY6YG5xvZOqo7mbqIhxdpeLCc/mtTITzOnYENbL0rr7NTNRFLmHMDjWwIwWLsKDGVOnFgoxqzPLUYsAIfKfIU1lEiISCxg2ajed2vg7/OAsABSpUPP24XqJr4j" ;
+            sig:hasVerificationCertificate  atom:qhj15b6jojuk ;
+            msg:hash                     "WWPf6z5r+jpYfHwqjun6oZ1EZKP4piAZ3gyiQQiM/Cpzz4ONbngFfqvwe0ApX79IeZtPcqXh4V2xu1B44nFZpifbmixAXFtCA5d3iTDm8Klhs9CHtKyOIgOnEfqJO7TsynaF2+T+jvULuRA+tvXn+VZxX5djG69fdFCBXlsEtY8=" ;
+            msg:publicKeyFingerprint     "kD2tlIdMfO9+ZfC6zVKrPbZ/tmjRGw7O16tyoU6Plxw=" ;
+            msg:signedGraph              <https://satvm05.researchstudio.at/won/resource/event/fphids6pr0hw#envelope> .
+}
+
+<https://satvm05.researchstudio.at/won/resource/event/fphids6pr0hw#atom> {
+    <https://satvm05.researchstudio.at/won/resource/atom/qhj15b6jojuk/rentRange/wjcmtrhwuh>
+            a                s:CompoundPriceSpecification ;
+            s:description    "total rent per month in between min/max" ;
+            s:maxPrice       "600"^^xsd:float ;
+            s:minPrice       "500"^^xsd:float ;
+            s:priceCurrency  "EUR" ;
+            s:unitCode       "MON" .
+
+    atom:qhj15b6jojuk
+            a                    won:Atom ;
+            won:doNotMatchAfter  "2018-09-19T14:57:31.676Z"^^xsd:dateTime ;
+            won:socket         won:ChatSocket ;
+            a           won:RealEstateRentDemand ;
+            won:tag  "SearchRealEstateToRent" ;
+            won:seeks            [ a                     won:RealEstateRentOffer ;
+                                   won:tag            "RentOutRealEstate" ;
+                                   s:priceSpecification  <https://satvm05.researchstudio.at/won/resource/atom/qhj15b6jojuk/rentRange/wjcmtrhwuh>
+                                 ] ;
+            cert:key             [ cert:PublicKey  [ a                       woncrypt:ECCPublicKey ;
+                                                     woncrypt:ecc_algorithm  "EC" ;
+                                                     woncrypt:ecc_curveId    "secp384r1" ;
+                                                     woncrypt:ecc_qx         "85c9e3369a1bdeae322a0e981de49857b3af8d152b6bc84a20b23da7e2ee5bdbdc29dc92937c6fde6935fef79a9d0a81" ;
+                                                     woncrypt:ecc_qy         "2af2741e5414c3d63e53f0ebd2aacd7c3191193f54d5ae5f860b4fc84dc7a1f11cb3a5de4dd1d6ea1924fdf5b14cc03e"
+                                                   ] ] .
+}

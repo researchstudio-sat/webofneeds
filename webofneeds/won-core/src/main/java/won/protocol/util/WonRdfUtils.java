@@ -66,7 +66,7 @@ import won.protocol.message.WonMessageDirection;
 import won.protocol.message.WonSignatureData;
 import won.protocol.model.ConnectionState;
 import won.protocol.model.Match;
-import won.protocol.model.NeedGraphType;
+import won.protocol.model.AtomGraphType;
 import won.protocol.service.WonNodeInfo;
 import won.protocol.service.WonNodeInfoBuilder;
 import won.protocol.vocabulary.SCHEMA;
@@ -103,7 +103,7 @@ public class WonRdfUtils {
         public static String getSignedGraphUri(String signatureGraphUri, Model signatureGraph) {
             String signedGraphUri = null;
             Resource resource = signatureGraph.getResource(signatureGraphUri);
-            NodeIterator ni = signatureGraph.listObjectsOfProperty(resource, WONMSG.HAS_SIGNED_GRAPH_PROPERTY);
+            NodeIterator ni = signatureGraph.listObjectsOfProperty(resource, WONMSG.signedGraph);
             if (ni.hasNext()) {
                 signedGraphUri = ni.next().asResource().getURI();
             }
@@ -125,13 +125,13 @@ public class WonRdfUtils {
         }
 
         public static WonSignatureData extractWonSignatureData(final Resource resource) {
-            Statement stmt = resource.getRequiredProperty(WONMSG.HAS_SIGNED_GRAPH_PROPERTY);
+            Statement stmt = resource.getRequiredProperty(WONMSG.signedGraph);
             String signedGraphUri = stmt.getObject().asResource().getURI();
             stmt = resource.getRequiredProperty(SFSIG.HAS_SIGNATURE_VALUE);
             String signatureValue = stmt.getObject().asLiteral().getString();
-            stmt = resource.getRequiredProperty(WONMSG.HAS_HASH_PROPERTY);
+            stmt = resource.getRequiredProperty(WONMSG.hash);
             String hash = stmt.getObject().asLiteral().getString();
-            stmt = resource.getRequiredProperty(WONMSG.HAS_PUBLIC_KEY_FINGERPRINT_PROPERTY);
+            stmt = resource.getRequiredProperty(WONMSG.publicKeyFingerprint);
             String fingerprint = stmt.getObject().asLiteral().getString();
             stmt = resource.getRequiredProperty(SFSIG.HAS_VERIFICATION_CERT);
             String cert = stmt.getObject().asResource().getURI();
@@ -153,11 +153,11 @@ public class WonRdfUtils {
             assert wonSignatureData.getVerificationCertificateUri() != null;
             Model containingGraph = subject.getModel();
             subject.addProperty(RDF.type, SFSIG.SIGNATURE);
-            subject.addProperty(WONMSG.HAS_HASH_PROPERTY, wonSignatureData.getHash());
+            subject.addProperty(WONMSG.hash, wonSignatureData.getHash());
             subject.addProperty(SFSIG.HAS_SIGNATURE_VALUE, wonSignatureData.getSignatureValue());
-            subject.addProperty(WONMSG.HAS_SIGNED_GRAPH_PROPERTY,
+            subject.addProperty(WONMSG.signedGraph,
                             containingGraph.createResource(wonSignatureData.getSignedGraphUri()));
-            subject.addProperty(WONMSG.HAS_PUBLIC_KEY_FINGERPRINT_PROPERTY, wonSignatureData.getPublicKeyFingerprint());
+            subject.addProperty(WONMSG.publicKeyFingerprint, wonSignatureData.getPublicKeyFingerprint());
             subject.addProperty(SFSIG.HAS_VERIFICATION_CERT,
                             containingGraph.createResource(wonSignatureData.getVerificationCertificateUri()));
         }
@@ -166,7 +166,7 @@ public class WonRdfUtils {
     public static class WonNodeUtils {
         /**
          * Creates a WonNodeInfo object based on the specified dataset. The first model
-         * found in the dataset that seems to contain the data needed for a WonNodeInfo
+         * found in the dataset that seems to contain the datan needed for a WonNodeInfo
          * object is used.
          * 
          * @param wonNodeUri
@@ -182,37 +182,37 @@ public class WonRdfUtils {
                     // use the first blank node found for [wonNodeUri]
                     // won:hasUriPatternSpecification [blanknode]
                     NodeIterator it = model.listObjectsOfProperty(model.getResource(wonNodeUri.toString()),
-                                    WON.HAS_URI_PATTERN_SPECIFICATION);
+                                    WON.uriPrefixSpecification);
                     if (!it.hasNext())
                         return null;
                     WonNodeInfoBuilder wonNodeInfoBuilder = new WonNodeInfoBuilder();
                     wonNodeInfoBuilder.setWonNodeURI(wonNodeUri.toString());
                     RDFNode node = it.next();
                     // set the URI prefixes
-                    it = model.listObjectsOfProperty(node.asResource(), WON.HAS_NEED_URI_PREFIX);
+                    it = model.listObjectsOfProperty(node.asResource(), WON.atomUriPrefix);
                     if (!it.hasNext())
                         return null;
-                    String needUriPrefix = it.next().asLiteral().getString();
-                    wonNodeInfoBuilder.setNeedURIPrefix(needUriPrefix);
-                    it = model.listObjectsOfProperty(node.asResource(), WON.HAS_CONNECTION_URI_PREFIX);
+                    String atomUriPrefix = it.next().asLiteral().getString();
+                    wonNodeInfoBuilder.setAtomURIPrefix(atomUriPrefix);
+                    it = model.listObjectsOfProperty(node.asResource(), WON.connectionUriPrefix);
                     if (!it.hasNext())
                         return null;
                     wonNodeInfoBuilder.setConnectionURIPrefix(it.next().asLiteral().getString());
-                    it = model.listObjectsOfProperty(node.asResource(), WON.HAS_EVENT_URI_PREFIX);
+                    it = model.listObjectsOfProperty(node.asResource(), WON.eventUriPrefix);
                     if (!it.hasNext())
                         return null;
                     wonNodeInfoBuilder.setEventURIPrefix(it.next().asLiteral().getString());
-                    // set the need list URI
-                    it = model.listObjectsOfProperty(model.getResource(wonNodeUri.toString()), WON.HAS_NEED_LIST);
+                    // set the atom list URI
+                    it = model.listObjectsOfProperty(model.getResource(wonNodeUri.toString()), WON.atomList);
                     if (it.hasNext()) {
-                        wonNodeInfoBuilder.setNeedListURI(it.next().asNode().getURI());
+                        wonNodeInfoBuilder.setAtomListURI(it.next().asNode().getURI());
                     } else {
-                        wonNodeInfoBuilder.setNeedListURI(needUriPrefix);
+                        wonNodeInfoBuilder.setAtomListURI(atomUriPrefix);
                     }
                     // set the supported protocol implementations
                     String queryString = "SELECT ?protocol ?param ?value WHERE { ?a <%s> ?c. "
                                     + "?c <%s> ?protocol. ?c ?param ?value. FILTER ( ?value != ?protocol ) }";
-                    queryString = String.format(queryString, WON.SUPPORTS_WON_PROTOCOL_IMPL.toString(),
+                    queryString = String.format(queryString, WON.supportsWonProtocolImpl.toString(),
                                     RDF.getURI() + "type");
                     Query protocolQuery = QueryFactory.create(queryString);
                     try (QueryExecution qexec = QueryExecutionFactory.create(protocolQuery, model)) {
@@ -242,14 +242,14 @@ public class WonRdfUtils {
 
     public static class MessageUtils {
         /**
-         * Adds the specified text as a won:hasTextMessage to the model's base resource.
+         * Adds the specified text as a won:textMessage to the model's base resource.
          * 
          * @param message
          * @return
          */
         public static Model addMessage(Model model, String message) {
             Resource baseRes = RdfUtils.findOrCreateBaseResource(model);
-            baseRes.addProperty(WON.HAS_TEXT_MESSAGE, message, XSDDatatype.XSDstring);
+            baseRes.addProperty(WON.textMessage, message, XSDDatatype.XSDstring);
             return model;
         }
 
@@ -262,7 +262,7 @@ public class WonRdfUtils {
         public static Model textMessage(String message) {
             Model messageModel = createModelWithBaseResource();
             Resource baseRes = messageModel.createResource(messageModel.getNsPrefixURI(""));
-            baseRes.addProperty(WON.HAS_TEXT_MESSAGE, message, XSDDatatype.XSDstring);
+            baseRes.addProperty(WON.textMessage, message, XSDDatatype.XSDstring);
             return messageModel;
         }
 
@@ -294,7 +294,7 @@ public class WonRdfUtils {
         public static Model genericMessage(Property predicate, Resource object) {
             Model messageModel = createModelWithBaseResource();
             Resource baseRes = RdfUtils.getBaseResource(messageModel);
-            baseRes.addProperty(RDF.type, WONMSG.TYPE_CONNECTION_MESSAGE);
+            baseRes.addProperty(RDF.type, WONMSG.ConnectionMessage);
             baseRes.addProperty(predicate, object);
             return messageModel;
         }
@@ -331,7 +331,7 @@ public class WonRdfUtils {
                 return messageModel;
             for (URI uri : toRetract) {
                 if (uri != null) {
-                    baseRes.addProperty(WONMOD.RETRACTS, baseRes.getModel().getResource(uri.toString()));
+                    baseRes.addProperty(WONMOD.retracts, baseRes.getModel().getResource(uri.toString()));
                 }
             }
             return messageModel;
@@ -343,7 +343,7 @@ public class WonRdfUtils {
                 return messageModel;
             for (URI uri : toPropose) {
                 if (uri != null) {
-                    baseRes.addProperty(WONAGR.PROPOSES, baseRes.getModel().getResource(uri.toString()));
+                    baseRes.addProperty(WONAGR.proposes, baseRes.getModel().getResource(uri.toString()));
                 }
             }
             return messageModel;
@@ -355,7 +355,7 @@ public class WonRdfUtils {
                 return messageModel;
             for (URI uri : toReject) {
                 if (uri != null) {
-                    baseRes.addProperty(WONAGR.REJECTS, baseRes.getModel().getResource(uri.toString()));
+                    baseRes.addProperty(WONAGR.rejects, baseRes.getModel().getResource(uri.toString()));
                 }
             }
             return messageModel;
@@ -371,7 +371,7 @@ public class WonRdfUtils {
                         logger.debug("checking uri for addProposesToCancel{} with uri {} ({} of {})",
                                         new Object[] { uri });
                     }
-                    baseRes.addProperty(WONAGR.ACCEPTS, baseRes.getModel().getResource(uri.toString()));
+                    baseRes.addProperty(WONAGR.accepts, baseRes.getModel().getResource(uri.toString()));
                 }
             }
             return messageModel;
@@ -387,7 +387,7 @@ public class WonRdfUtils {
                         logger.debug("checking uri for addProposesToCancel{} with uri {} ({} of {})",
                                         new Object[] { uri });
                     }
-                    baseRes.addProperty(WONAGR.PROPOSES_TO_CANCEL, baseRes.getModel().getResource(uri.toString()));
+                    baseRes.addProperty(WONAGR.proposesToCancel, baseRes.getModel().getResource(uri.toString()));
                 }
             }
             return messageModel;
@@ -403,22 +403,22 @@ public class WonRdfUtils {
             Model messageModel = createModelWithBaseResource();
             Resource baseRes = RdfUtils.getBaseResource(messageModel);
             Resource feedbackNode = messageModel.createResource();
-            baseRes.addProperty(WON.HAS_FEEDBACK, feedbackNode);
-            feedbackNode.addProperty(WON.HAS_BINARY_RATING, isFeedbackPositive ? WON.GOOD : WON.BAD);
-            feedbackNode.addProperty(WON.FOR_RESOURCE, messageModel.createResource(forResource.toString()));
+            baseRes.addProperty(WON.feedback, feedbackNode);
+            feedbackNode.addProperty(WON.binaryRating, isFeedbackPositive ? WON.Good : WON.Bad);
+            feedbackNode.addProperty(WON.forResource, messageModel.createResource(forResource.toString()));
             return messageModel;
         }
 
         /**
-         * Returns the first won:hasTextMessage object, or null if none is found. Won't
-         * work on WonMessage models, removal depends on refactoring of BA facet code
+         * Returns the first won:textMessage object, or null if none is found. Won't
+         * work on WonMessage models, removal depends on refactoring of BA socket code
          * 
          * @param model
          * @return
          */
         @Deprecated
         public static String getTextMessage(Model model) {
-            Statement stmt = model.getProperty(RdfUtils.getBaseResource(model), WON.HAS_TEXT_MESSAGE);
+            Statement stmt = model.getProperty(RdfUtils.getBaseResource(model), WON.textMessage);
             if (stmt != null) {
                 return stmt.getObject().asLiteral().getLexicalForm();
             }
@@ -426,7 +426,7 @@ public class WonRdfUtils {
         }
 
         /**
-         * Returns all won:hasTextMessage objects, or an empty set if none is found. The
+         * Returns all won:textMessage objects, or an empty set if none is found. The
          * specified model has to be a message's content graph.
          * 
          * @param model
@@ -434,7 +434,7 @@ public class WonRdfUtils {
          */
         public static Set<String> getTextMessages(Model model, URI messageUri) {
             Set<String> ret = new HashSet<>();
-            StmtIterator stmtIt = model.listStatements(model.getResource(messageUri.toString()), WON.HAS_TEXT_MESSAGE,
+            StmtIterator stmtIt = model.listStatements(model.getResource(messageUri.toString()), WON.textMessage,
                             (RDFNode) null);
             while (stmtIt.hasNext()) {
                 RDFNode node = stmtIt.next().getObject();
@@ -446,9 +446,9 @@ public class WonRdfUtils {
         }
 
         /**
-         * Returns the first won:hasTextMessage object, or null if none is found. tries
-         * the message, its corresponding remote message, and any forwarded message, if
-         * any of those are contained in the dataset
+         * Returns the first won:textMessage object, or null if none is found. tries the
+         * message, its corresponding remote message, and any forwarded message, if any
+         * of those are contained in the dataset
          *
          * @param wonMessage
          * @return
@@ -457,37 +457,36 @@ public class WonRdfUtils {
             URI messageURI = wonMessage.getMessageURI();
             // find the text message in the message, the remote message, or any forwarded
             // message
-            String queryString = "prefix msg: <http://purl.org/webofneeds/message#>\n"
-                            + "prefix won: <http://purl.org/webofneeds/model#>\n" + "\n"
-                            + "SELECT distinct ?txt WHERE {\n" + "  {\n"
-                            + "    graph ?gA { ?msg won:hasTextMessage ?txt }\n" + "  } union {\n"
-                            + "    graph ?gB { ?msg msg:hasCorrespondingRemoteMessage ?msg2 }\n"
-                            + "    graph ?gA { ?msg2 won:hasTextMessage ?txt }\n" + "  } union {\n"
-                            + "    graph ?gC { ?msg msg:hasForwardedMessage ?msg2 }\n"
-                            + "    graph ?gB { ?msg2 msg:hasCorrespondingRemoteMessage ?msg3 }\n"
-                            + "    graph ?gA { ?msg3 won:hasTextMessage ?txt }\n" + "  } union {\n"
-                            + "    graph ?gD { ?msg msg:hasCorrespondingRemoteMessage ?msg2 }\n"
-                            + "    graph ?gC { ?msg2 msg:hasForwardedMessage ?msg3 }\n"
-                            + "    graph ?gB { ?msg3 msg:hasCorrespondingRemoteMessage ?msg4 }\n"
-                            + "    graph ?gA { ?msg4 won:hasTextMessage ?txt }\n" + "  } union {\n"
-                            + "    graph ?gE { ?msg msg:hasForwardedMessage ?msg2 }\n"
-                            + "    graph ?gD { ?msg2 msg:hasCorrespondingRemoteMessage ?msg3 }\n"
-                            + "    graph ?gC { ?msg3 msg:hasForwardedMessage ?msg4 }\n"
-                            + "    graph ?gB { ?msg4 msg:hasCorrespondingRemoteMessage ?msg5 }\n"
-                            + "    graph ?gA { ?msg5 won:hasTextMessage ?txt }\n" + "  } union {\n"
-                            + "    graph ?gF { ?msg msg:hasCorrespondingRemoteMessage ?msg2 }\n"
-                            + "    graph ?gE { ?msg2 msg:hasForwardedMessage ?msg3 }\n"
-                            + "    graph ?gD { ?msg3 msg:hasCorrespondingRemoteMessage ?msg4 }\n"
-                            + "    graph ?gC { ?msg4 msg:hasForwardedMessage ?msg5 }\n"
-                            + "    graph ?gB { ?msg5 msg:hasCorrespondingRemoteMessage ?msg6 }\n"
-                            + "    graph ?gA { ?msg6 won:hasTextMessage ?txt }\n" + "  } union {\n"
-                            + "    graph ?gG { ?msg msg:hasForwardedMessage ?msg2 }\n"
-                            + "    graph ?gF { ?msg2 msg:hasCorrespondingRemoteMessage ?msg3 }\n"
-                            + "    graph ?gE { ?msg3 msg:hasForwardedMessage ?msg4 }\n"
-                            + "    graph ?gD { ?msg4 msg:hasCorrespondingRemoteMessage ?msg5 }\n"
-                            + "    graph ?gC { ?msg5 msg:hasForwardedMessage ?msg6 }\n"
-                            + "    graph ?gB { ?msg6 msg:hasCorrespondingRemoteMessage ?msg7 }\n"
-                            + "    graph ?gA { ?msg7 won:hasTextMessage ?txt }\n" + "  }\n" + "\n" + "}";
+            String queryString = "prefix msg: <https://w3id.org/won/message#>\n"
+                            + "prefix won: <https://w3id.org/won/core#>\n" + "\n" + "SELECT distinct ?txt WHERE {\n"
+                            + "  {\n" + "    graph ?gA { ?msg won:textMessage ?txt }\n" + "  } union {\n"
+                            + "    graph ?gB { ?msg msg:correspondingRemoteMessage ?msg2 }\n"
+                            + "    graph ?gA { ?msg2 won:textMessage ?txt }\n" + "  } union {\n"
+                            + "    graph ?gC { ?msg msg:forwardedMessage ?msg2 }\n"
+                            + "    graph ?gB { ?msg2 msg:correspondingRemoteMessage ?msg3 }\n"
+                            + "    graph ?gA { ?msg3 won:textMessage ?txt }\n" + "  } union {\n"
+                            + "    graph ?gD { ?msg msg:correspondingRemoteMessage ?msg2 }\n"
+                            + "    graph ?gC { ?msg2 msg:forwardedMessage ?msg3 }\n"
+                            + "    graph ?gB { ?msg3 msg:correspondingRemoteMessage ?msg4 }\n"
+                            + "    graph ?gA { ?msg4 won:textMessage ?txt }\n" + "  } union {\n"
+                            + "    graph ?gE { ?msg msg:forwardedMessage ?msg2 }\n"
+                            + "    graph ?gD { ?msg2 msg:correspondingRemoteMessage ?msg3 }\n"
+                            + "    graph ?gC { ?msg3 msg:forwardedMessage ?msg4 }\n"
+                            + "    graph ?gB { ?msg4 msg:correspondingRemoteMessage ?msg5 }\n"
+                            + "    graph ?gA { ?msg5 won:textMessage ?txt }\n" + "  } union {\n"
+                            + "    graph ?gF { ?msg msg:correspondingRemoteMessage ?msg2 }\n"
+                            + "    graph ?gE { ?msg2 msg:forwardedMessage ?msg3 }\n"
+                            + "    graph ?gD { ?msg3 msg:correspondingRemoteMessage ?msg4 }\n"
+                            + "    graph ?gC { ?msg4 msg:forwardedMessage ?msg5 }\n"
+                            + "    graph ?gB { ?msg5 msg:correspondingRemoteMessage ?msg6 }\n"
+                            + "    graph ?gA { ?msg6 won:textMessage ?txt }\n" + "  } union {\n"
+                            + "    graph ?gG { ?msg msg:forwardedMessage ?msg2 }\n"
+                            + "    graph ?gF { ?msg2 msg:correspondingRemoteMessage ?msg3 }\n"
+                            + "    graph ?gE { ?msg3 msg:forwardedMessage ?msg4 }\n"
+                            + "    graph ?gD { ?msg4 msg:correspondingRemoteMessage ?msg5 }\n"
+                            + "    graph ?gC { ?msg5 msg:forwardedMessage ?msg6 }\n"
+                            + "    graph ?gB { ?msg6 msg:correspondingRemoteMessage ?msg7 }\n"
+                            + "    graph ?gA { ?msg7 won:textMessage ?txt }\n" + "  }\n" + "\n" + "}";
             Query query = QueryFactory.create(queryString);
             QuerySolutionMap initialBinding = new QuerySolutionMap();
             Model tmpModel = ModelFactory.createDefaultModel();
@@ -515,8 +514,8 @@ public class WonRdfUtils {
 
         public static List<URI> getAcceptedEvents(final Dataset messageDataset) {
             List<URI> acceptedEvents = new ArrayList<>();
-            String queryString = "prefix msg:   <http://purl.org/webofneeds/message#>\n"
-                            + "prefix agr:   <http://purl.org/webofneeds/agreement#>\n" + "SELECT ?eventUri where {\n"
+            String queryString = "prefix msg:   <https://w3id.org/won/message#>\n"
+                            + "prefix agr:   <https://w3id.org/won/agreement#>\n" + "SELECT ?eventUri where {\n"
                             + " graph ?g {" + "  ?s agr:accepts ?eventUri .\n" + "}}";
             Query query = QueryFactory.create(queryString);
             try (QueryExecution qexec = QueryExecutionFactory.create(query, messageDataset)) {
@@ -534,9 +533,9 @@ public class WonRdfUtils {
         }
 
         public static boolean isProcessingMessage(final WonMessage wonMessage) {
-            String queryString = "prefix msg:   <http://purl.org/webofneeds/message#>\n"
-                            + "prefix won:   <http://purl.org/webofneeds/model#>\n" + "SELECT ?text where {\n"
-                            + " graph ?g {" + "  ?s won:isProcessing ?text .\n" + "}}";
+            String queryString = "prefix msg:   <https://w3id.org/won/message#>\n"
+                            + "prefix won:   <https://w3id.org/won/core#>\n" + "SELECT ?text where {\n" + " graph ?g {"
+                            + "  ?s won:isProcessing ?text .\n" + "}}";
             Query query = QueryFactory.create(queryString);
             try (QueryExecution qexec = QueryExecutionFactory.create(query, wonMessage.getCompleteDataset())) {
                 qexec.getContext().set(TDB.symUnionDefaultGraph, true);
@@ -553,14 +552,14 @@ public class WonRdfUtils {
         }
 
         /**
-         * Adds the specified text as a won:hasTextMessage to the model's base resource.
+         * Adds the specified text as a won:textMessage to the model's base resource.
          * 
          * @param message
          * @return
          */
         public static Model addProcessing(Model model, String message) {
             Resource baseRes = RdfUtils.findOrCreateBaseResource(model);
-            baseRes.addProperty(WON.IS_PROCESSING, message, XSDDatatype.XSDstring);
+            baseRes.addProperty(WON.isProcessing, message, XSDDatatype.XSDstring);
             return model;
         }
 
@@ -570,8 +569,8 @@ public class WonRdfUtils {
 
         public static List<URI> getProposesEvents(final Dataset messageDataset) {
             List<URI> proposesToCancelEvents = new ArrayList<>();
-            String queryString = "prefix msg:   <http://purl.org/webofneeds/message#>\n"
-                            + "prefix agr:   <http://purl.org/webofneeds/agreement#>\n" + "SELECT ?eventUri where {\n"
+            String queryString = "prefix msg:   <https://w3id.org/won/message#>\n"
+                            + "prefix agr:   <https://w3id.org/won/agreement#>\n" + "SELECT ?eventUri where {\n"
                             + " graph ?g {" + "  ?s agr:proposes ?eventUri .\n" + "}}";
             Query query = QueryFactory.create(queryString);
             try (QueryExecution qexec = QueryExecutionFactory.create(query, messageDataset)) {
@@ -594,8 +593,8 @@ public class WonRdfUtils {
 
         public static List<URI> getProposesToCancelEvents(final Dataset messageDataset) {
             List<URI> proposesToCancelEvents = new ArrayList<>();
-            String queryString = "prefix msg:   <http://purl.org/webofneeds/message#>\n"
-                            + "prefix agr:   <http://purl.org/webofneeds/agreement#>\n" + "SELECT ?eventUri where {\n"
+            String queryString = "prefix msg:   <https://w3id.org/won/message#>\n"
+                            + "prefix agr:   <https://w3id.org/won/agreement#>\n" + "SELECT ?eventUri where {\n"
                             + " graph ?g {" + "  ?s agr:proposesToCancel ?eventUri .\n" + "}}";
             Query query = QueryFactory.create(queryString);
             try (QueryExecution qexec = QueryExecutionFactory.create(query, messageDataset)) {
@@ -620,11 +619,10 @@ public class WonRdfUtils {
          */
         public static List<URI> getPreviousMessageUrisIncludingRemote(final WonMessage wonMessage) {
             List<URI> uris = new ArrayList<>();
-            String queryString = "prefix msg:   <http://purl.org/webofneeds/message#>\n"
-                            + "prefix agr:   <http://purl.org/webofneeds/agreement#>\n"
-                            + "SELECT distinct ?prev where {\n" + "   {" + "    ?msg msg:hasPreviousMessage ?prev .\n"
-                            + "   } union {"
-                            + "    ?msg msg:hasCorrespondingRemoteMessage/msg:hasPreviousMessage ?prev " + "  }" + "}";
+            String queryString = "prefix msg:   <https://w3id.org/won/message#>\n"
+                            + "prefix agr:   <https://w3id.org/won/agreement#>\n" + "SELECT distinct ?prev where {\n"
+                            + "   {" + "    ?msg msg:previousMessage ?prev .\n" + "   } union {"
+                            + "    ?msg msg:correspondingRemoteMessage/msg:previousMessage ?prev " + "  }" + "}";
             Query query = QueryFactory.create(queryString);
             try (QueryExecution qexec = QueryExecutionFactory.create(query, wonMessage.getCompleteDataset())) {
                 qexec.getContext().set(TDB.symUnionDefaultGraph, true);
@@ -695,13 +693,13 @@ public class WonRdfUtils {
         private static RDFNode getTextMessageForResource(Dataset dataset, URI uri) {
             if (uri == null)
                 return null;
-            return RdfUtils.findFirstPropertyFromResource(dataset, uri, WON.HAS_TEXT_MESSAGE);
+            return RdfUtils.findFirstPropertyFromResource(dataset, uri, WON.textMessage);
         }
 
         private static RDFNode getTextMessageForResource(Dataset dataset, Resource resource) {
             if (resource == null)
                 return null;
-            return RdfUtils.findFirstPropertyFromResource(dataset, resource, WON.HAS_TEXT_MESSAGE);
+            return RdfUtils.findFirstPropertyFromResource(dataset, resource, WON.textMessage);
         }
 
         /**
@@ -711,22 +709,21 @@ public class WonRdfUtils {
          * @return a match object or null if the message is not a hint message.
          */
         public static Match toMatch(final WonMessage wonMessage) {
-            if (!WONMSG.TYPE_HINT.equals(wonMessage.getMessageType().getResource())) {
+            if (!WONMSG.HintMessage.equals(wonMessage.getMessageType().getResource())) {
                 return null;
             }
             Match match = new Match();
-            match.setFromNeed(wonMessage.getReceiverNeedURI());
+            match.setFromAtom(wonMessage.getRecipientAtomURI());
             Dataset messageContent = wonMessage.getMessageContent();
-            RDFNode score = findOnePropertyFromResource(messageContent, wonMessage.getMessageURI(),
-                            WON.HAS_MATCH_SCORE);
+            RDFNode score = findOnePropertyFromResource(messageContent, wonMessage.getMessageURI(), WON.matchScore);
             if (!score.isLiteral())
                 return null;
             match.setScore(score.asLiteral().getDouble());
             RDFNode counterpart = findOnePropertyFromResource(messageContent, wonMessage.getMessageURI(),
-                            WON.HAS_MATCH_COUNTERPART);
+                            WON.matchCounterpart);
             if (!counterpart.isResource())
                 return null;
-            match.setToNeed(URI.create(counterpart.asResource().getURI()));
+            match.setToAtom(URI.create(counterpart.asResource().getURI()));
             return match;
         }
 
@@ -737,36 +734,36 @@ public class WonRdfUtils {
         }
     }
 
-    public static class FacetUtils {
+    public static class SocketUtils {
         /**
-         * Returns the facet in a connect message. Attempts to get it from the specified
-         * message itself. If no such facet is found there, the remoteFacet of the
-         * correspondingRemoteMessage is used.
+         * Returns the socket in a connect message. Attempts to get it from the
+         * specified message itself. If no such socket is found there, the targetSocket
+         * of the correspondingRemoteMessage is used.
          * 
          * @param message
          * @return
          */
-        public static URI getFacet(WonMessage message) {
+        public static URI getSocket(WonMessage message) {
             if (message.getEnvelopeType() == WonMessageDirection.FROM_EXTERNAL) {
-                return message.getReceiverFacetURI();
+                return message.getRecipientSocketURI();
             } else {
-                return message.getSenderFacetURI();
+                return message.getSenderSocketURI();
             }
         }
 
         /**
-         * Returns the remoteFacet in a connect message. Attempts to get it from the
-         * specified message itself. If no such facet is found there, the facet of the
+         * Returns the targetSocket in a connect message. Attempts to get it from the
+         * specified message itself. If no such socket is found there, the socket of the
          * correspondingRemoteMessage is used.
          * 
          * @param message
          * @return
          */
-        public static URI getRemoteFacet(WonMessage message) {
+        public static URI getTargetSocket(WonMessage message) {
             if (message.getEnvelopeType() == WonMessageDirection.FROM_EXTERNAL) {
-                return message.getSenderFacetURI();
+                return message.getSenderSocketURI();
             } else {
-                return message.getReceiverFacetURI();
+                return message.getRecipientSocketURI();
             }
         }
 
@@ -811,15 +808,15 @@ public class WonRdfUtils {
         }
 
         /**
-         * Returns all facets found in the model, attached to the null relative URI
-         * '<>'. Returns an empty collection if there is no such facet.
+         * Returns all sockets found in the model, attached to the null relative URI
+         * '<>'. Returns an empty collection if there is no such socket.
          * 
          * @param content
          * @return
          */
-        public static Collection<URI> getFacets(Model content) {
+        public static Collection<URI> getSockets(Model content) {
             Resource baseRes = RdfUtils.getBaseResource(content);
-            StmtIterator stmtIterator = baseRes.listProperties(WON.HAS_FACET);
+            StmtIterator stmtIterator = baseRes.listProperties(WON.socket);
             LinkedList<URI> ret = new LinkedList<URI>();
             while (stmtIterator.hasNext()) {
                 RDFNode object = stmtIterator.nextStatement().getObject();
@@ -831,86 +828,86 @@ public class WonRdfUtils {
         }
 
         /**
-         * Returns all facets found in the model, attached to the null relative URI
-         * '<>'. Returns an empty collection if there is no such facet.
+         * Returns all sockets found in the model, attached to the null relative URI
+         * '<>'. Returns an empty collection if there is no such socket.
          * 
          * @param content
          * @return
          */
-        public static Optional<URI> getTypeOfFacet(Model content, URI facet) {
-            Resource resource = content.getResource(facet.toString());
-            Resource facetType = resource.getPropertyResourceValue(RDF.type);
-            if (facetType != null && facetType.isURIResource()) {
-                return Optional.of(URI.create(facetType.asResource().getURI()));
+        public static Optional<URI> getTypeOfSocket(Model content, URI socket) {
+            Resource resource = content.getResource(socket.toString());
+            Resource socketType = resource.getPropertyResourceValue(RDF.type);
+            if (socketType != null && socketType.isURIResource()) {
+                return Optional.of(URI.create(socketType.asResource().getURI()));
             }
             return Optional.empty();
         }
 
-        public static Optional<URI> getTypeOfFacet(Dataset content, final URI facet) {
-            return Optional.ofNullable(RdfUtils.findFirst(content, m -> getTypeOfFacet(m, facet).orElse(null)));
+        public static Optional<URI> getTypeOfSocket(Dataset content, final URI socket) {
+            return Optional.ofNullable(RdfUtils.findFirst(content, m -> getTypeOfSocket(m, socket).orElse(null)));
         }
 
         /**
-         * Returns all facets of the base resource of the given type.
+         * Returns all sockets of the base resource of the given type.
          * 
          * @param model
          * @param subject
-         * @param facetType
+         * @param socketType
          * @return
          */
-        public static Collection<URI> getFacetsOfType(Model model, URI facetType) {
-            return getFacetsOfType(model, RdfUtils.getBaseResource(model), facetType);
+        public static Collection<URI> getSocketsOfType(Model model, URI socketType) {
+            return getSocketsOfType(model, RdfUtils.getBaseResource(model), socketType);
         }
 
         /**
-         * Returns all facets of subject with the given type found in the model.
+         * Returns all sockets of subject with the given type found in the model.
          * 
          * @param model
-         * @param facetType
+         * @param socketType
          * @return
          */
-        public static Collection<URI> getFacetsOfType(Model model, URI subject, URI facetType) {
-            return getFacetsOfType(model, model.getResource(subject.toString()), facetType);
+        public static Collection<URI> getSocketsOfType(Model model, URI subject, URI socketType) {
+            return getSocketsOfType(model, model.getResource(subject.toString()), socketType);
         }
 
         /**
-         * Returns all facets of the given type found in the model.
+         * Returns all sockets of the given type found in the model.
          * 
          * @param model
-         * @param facetType
+         * @param socketType
          * @return
          */
-        public static Collection<URI> getFacetsOfType(Model model, Resource subject, URI facetType) {
-            StmtIterator stmtIterator = subject.listProperties(WON.HAS_FACET);
-            Resource facetTypeResource = model.getResource(facetType.toString());
+        public static Collection<URI> getSocketsOfType(Model model, Resource subject, URI socketType) {
+            StmtIterator stmtIterator = subject.listProperties(WON.socket);
+            Resource socketTypeResource = model.getResource(socketType.toString());
             LinkedList<URI> ret = new LinkedList<URI>();
             while (stmtIterator.hasNext()) {
-                RDFNode facet = stmtIterator.nextStatement().getObject();
-                if (facet.isResource() && facet.isURIResource()) {
-                    if (facet.asResource().hasProperty(RDF.type, facetTypeResource)) {
-                        ret.add(URI.create(facet.toString()));
+                RDFNode socket = stmtIterator.nextStatement().getObject();
+                if (socket.isResource() && socket.isURIResource()) {
+                    if (socket.asResource().hasProperty(RDF.type, socketTypeResource)) {
+                        ret.add(URI.create(socket.toString()));
                     }
                 }
             }
             return ret;
         }
 
-        public static Collection<URI> getFacetsOfType(Dataset needDataset, URI needURI, URI facetType) {
-            return RdfUtils.visitFlattenedToList(needDataset, m -> getFacetsOfType(m, needURI, facetType));
+        public static Collection<URI> getSocketsOfType(Dataset atomDataset, URI atomURI, URI socketType) {
+            return RdfUtils.visitFlattenedToList(atomDataset, m -> getSocketsOfType(m, atomURI, socketType));
         }
 
-        public static Optional<URI> getDefaultFacet(Model model, boolean returnAnyIfNoDefaultFound) {
-            return getDefaultFacet(model, RdfUtils.getBaseResource(model), returnAnyIfNoDefaultFound);
+        public static Optional<URI> getDefaultSocket(Model model, boolean returnAnyIfNoDefaultFound) {
+            return getDefaultSocket(model, RdfUtils.getBaseResource(model), returnAnyIfNoDefaultFound);
         }
 
-        public static Optional<URI> getDefaultFacet(Model model, URI subject, boolean returnAnyIfNoDefaultFound) {
-            return getDefaultFacet(model, model.getResource(subject.toString()), returnAnyIfNoDefaultFound);
+        public static Optional<URI> getDefaultSocket(Model model, URI subject, boolean returnAnyIfNoDefaultFound) {
+            return getDefaultSocket(model, model.getResource(subject.toString()), returnAnyIfNoDefaultFound);
         }
 
         /**
-         * Returns the default facet found in the model. If there is no default facet,
+         * Returns the default socket found in the model. If there is no default socket,
          * the result is empty. unless returnAnyIfNoDefaultFound is true, in which case
-         * any facet may be returned. and there is no default facet, any facet may be
+         * any socket may be returned. and there is no default socket, any socket may be
          * returned
          * 
          * @param model
@@ -918,85 +915,86 @@ public class WonRdfUtils {
          * @param boolean returnAnyIfNoDefaultFound
          * @return
          */
-        public static Optional<URI> getDefaultFacet(Model model, Resource subject, boolean returnAnyIfNoDefaultFound) {
-            RDFNode facet = subject.getPropertyResourceValue(WON.HAS_DEFAULT_FACET);
-            if (facet != null && facet.isURIResource()) {
-                return Optional.of(URI.create(facet.toString()));
+        public static Optional<URI> getDefaultSocket(Model model, Resource subject, boolean returnAnyIfNoDefaultFound) {
+            RDFNode socket = subject.getPropertyResourceValue(WON.defaultSocket);
+            if (socket != null && socket.isURIResource()) {
+                return Optional.of(URI.create(socket.toString()));
             }
             if (returnAnyIfNoDefaultFound) {
-                StmtIterator stmtIterator = subject.listProperties(WON.HAS_FACET);
+                StmtIterator stmtIterator = subject.listProperties(WON.socket);
                 while (stmtIterator.hasNext()) {
-                    facet = stmtIterator.next().getObject();
-                    if (facet.isResource() && facet.isURIResource()) {
-                        return Optional.of(URI.create(facet.toString()));
+                    socket = stmtIterator.next().getObject();
+                    if (socket.isResource() && socket.isURIResource()) {
+                        return Optional.of(URI.create(socket.toString()));
                     }
                 }
             }
             return Optional.empty();
         }
 
-        public static Optional<URI> getDefaultFacet(Dataset needDataset, URI needURI,
+        public static Optional<URI> getDefaultSocket(Dataset atomDataset, URI atomURI,
                         boolean returnAnyIfNoDefaultFound) {
-            return Optional.ofNullable(RdfUtils.findFirst(needDataset,
-                            m -> getDefaultFacet(m, needURI, returnAnyIfNoDefaultFound).orElse(null)));
+            return Optional.ofNullable(RdfUtils.findFirst(atomDataset,
+                            m -> getDefaultSocket(m, atomURI, returnAnyIfNoDefaultFound).orElse(null)));
         }
 
         /**
-         * Adds a triple to the model of the form <> won:hasFacet [facetURI].
+         * Adds a triple to the model of the form <> won:socket [socketURI].
          * 
          * @param model
-         * @param facetURI
+         * @param socketURI
          */
-        public static void addFacet(final Model model, final URI facetURI, final URI facetTypeURI,
-                        final boolean isDefaultFacet) {
+        public static void addSocket(final Model model, final URI socketURI, final URI socketTypeURI,
+                        final boolean isDefaultSocket) {
             Resource baseRes = RdfUtils.getBaseResource(model);
-            Resource facet = model.createResource(facetURI.toString());
-            baseRes.addProperty(WON.HAS_FACET, facet);
-            facet.addProperty(RDF.type, model.createResource(facetTypeURI.toString()));
-            if (isDefaultFacet) {
-                if (baseRes.hasProperty(WON.HAS_DEFAULT_FACET)) {
-                    baseRes.removeAll(WON.HAS_DEFAULT_FACET);
+            Resource socket = model.createResource(socketURI.toString());
+            baseRes.addProperty(WON.socket, socket);
+            socket.addProperty(RDF.type, model.createResource(socketTypeURI.toString()));
+            if (isDefaultSocket) {
+                if (baseRes.hasProperty(WON.defaultSocket)) {
+                    baseRes.removeAll(WON.defaultSocket);
                 }
-                baseRes.addProperty(WON.HAS_DEFAULT_FACET, facet);
+                baseRes.addProperty(WON.defaultSocket, socket);
             }
         }
 
-        public static void addFacet(final Dataset dataset, final URI facetURI, final URI facetTypeURI,
-                        final boolean isDefaultFacet) {
+        public static void addSocket(final Dataset dataset, final URI socketURI, final URI socketTypeURI,
+                        final boolean isDefaultSocket) {
             visit(dataset, model -> {
-                addFacet(model, facetURI, facetTypeURI, isDefaultFacet);
+                addSocket(model, socketURI, socketTypeURI, isDefaultSocket);
                 return null;
             });
         }
 
         /**
-         * Adds a triple to the model of the form <> won:hasRemoteFacet [facetURI].
+         * Adds a triple to the model of the form <> won:targetSocket [socketURI].
          * 
          * @param content
-         * @param facetURI
+         * @param socketURI
          */
-        public static void addRemoteFacet(final Model content, final URI facetURI) {
+        public static void addTargetSocket(final Model content, final URI socketURI) {
             Resource baseRes = RdfUtils.getBaseResource(content);
-            baseRes.addProperty(WON.HAS_REMOTE_FACET, content.createResource(facetURI.toString()));
+            baseRes.addProperty(WON.targetSocket, content.createResource(socketURI.toString()));
         }
 
         /**
-         * Creates a model for connecting two facets. Both facets are optional, if none
-         * are given the returned Optional is empty
+         * Creates a model for connecting two sockets. Both sockets are optional, if
+         * none are given the returned Optional is empty
          * 
          * @return
          */
-        public static Optional<Model> createFacetModelForHintOrConnect(Optional<URI> facet, Optional<URI> remoteFacet) {
-            if (!facet.isPresent() && !remoteFacet.isPresent()) {
+        public static Optional<Model> createSocketModelForHintOrConnect(Optional<URI> socket,
+                        Optional<URI> targetSocket) {
+            if (!socket.isPresent() && !targetSocket.isPresent()) {
                 return Optional.empty();
             }
             Model model = ModelFactory.createDefaultModel();
             Resource baseResource = findOrCreateBaseResource(model);
-            if (facet.isPresent()) {
-                baseResource.addProperty(WON.HAS_FACET, model.getResource(facet.toString()));
+            if (socket.isPresent()) {
+                baseResource.addProperty(WON.socket, model.getResource(socket.toString()));
             }
-            if (remoteFacet.isPresent()) {
-                baseResource.addProperty(WON.HAS_REMOTE_FACET, model.getResource(remoteFacet.toString()));
+            if (targetSocket.isPresent()) {
+                baseResource.addProperty(WON.targetSocket, model.getResource(targetSocket.toString()));
             }
             return Optional.of(model);
         }
@@ -1009,47 +1007,46 @@ public class WonRdfUtils {
         }
 
         public static URI getConnectionState(Dataset connectionDataset, URI connectionUri) {
-            Path statePath = PathParser.parse("won:hasConnectionState", DefaultPrefixUtils.getDefaultPrefixes());
+            Path statePath = PathParser.parse("won:connectionState", DefaultPrefixUtils.getDefaultPrefixes());
             return RdfUtils.getURIPropertyForPropertyPath(connectionDataset, connectionUri, statePath);
         }
 
         /**
-         * return the needURI of a connection
+         * return the atomURI of a connection
          *
          * @param dataset <code>Dataset</code> object which contains connection
          * information
          * @param connectionURI
-         * @return <code>URI</code> of the need
+         * @return <code>URI</code> of the atom
          */
-        public static URI getLocalNeedURIFromConnection(Dataset dataset, final URI connectionURI) {
-            return URI.create(findOnePropertyFromResource(dataset, connectionURI, WON.BELONGS_TO_NEED).asResource()
-                            .getURI());
+        public static URI getLocalAtomURIFromConnection(Dataset dataset, final URI connectionURI) {
+            return URI.create(
+                            findOnePropertyFromResource(dataset, connectionURI, WON.sourceAtom).asResource().getURI());
         }
 
-        public static URI getRemoteNeedURIFromConnection(Dataset dataset, final URI connectionURI) {
-            return URI.create(findOnePropertyFromResource(dataset, connectionURI, WON.HAS_REMOTE_NEED).asResource()
-                            .getURI());
+        public static URI getTargetAtomURIFromConnection(Dataset dataset, final URI connectionURI) {
+            return URI.create(
+                            findOnePropertyFromResource(dataset, connectionURI, WON.targetAtom).asResource().getURI());
         }
 
         public static URI getWonNodeURIFromConnection(Dataset dataset, final URI connectionURI) {
-            return URI.create(findOnePropertyFromResource(dataset, connectionURI, WON.HAS_WON_NODE).asResource()
+            return URI.create(findOnePropertyFromResource(dataset, connectionURI, WON.wonNode).asResource().getURI());
+        }
+
+        public static URI getWonNodeURIFromAtom(Dataset dataset, final URI atomURI) {
+            return URI.create(findOnePropertyFromResource(dataset, atomURI, WON.wonNode).asResource().getURI());
+        }
+
+        public static URI getTargetConnectionURIFromConnection(Dataset dataset, final URI connectionURI) {
+            return URI.create(findOnePropertyFromResource(dataset, connectionURI, WON.targetConnection).asResource()
                             .getURI());
         }
 
-        public static URI getWonNodeURIFromNeed(Dataset dataset, final URI needURI) {
-            return URI.create(findOnePropertyFromResource(dataset, needURI, WON.HAS_WON_NODE).asResource().getURI());
-        }
-
-        public static URI getRemoteConnectionURIFromConnection(Dataset dataset, final URI connectionURI) {
-            return URI.create(findOnePropertyFromResource(dataset, connectionURI, WON.HAS_REMOTE_CONNECTION)
-                            .asResource().getURI());
-        }
-
-        public static URI getLastMessageSentByLocalNeed(Dataset dataset, final URI connectionURI) {
+        public static URI getLastMessageSentByLocalAtom(Dataset dataset, final URI connectionURI) {
             throw new NotYetImplementedException();
         }
 
-        public static URI getLastMessageSentByRemoteNeed(Dataset dataset, final URI connectionURI) {
+        public static URI getLastMessageSentByTargetAtom(Dataset dataset, final URI connectionURI) {
             throw new NotYetImplementedException();
         }
 
@@ -1065,53 +1062,53 @@ public class WonRdfUtils {
         return model;
     }
 
-    public static class NeedUtils {
+    public static class AtomUtils {
         /**
-         * searches for a subject of type won:Need and returns the NeedURI
+         * searches for a subject of type won:Atom and returns the AtomURI
          *
          * @param dataset <code>Dataset</code> object which will be searched for the
-         * NeedURI
-         * @return <code>URI</code> which is of type won:Need
+         * AtomURI
+         * @return <code>URI</code> which is of type won:Atom
          */
-        public static URI getNeedURI(Dataset dataset) {
+        public static URI getAtomURI(Dataset dataset) {
             return RdfUtils.findOne(dataset, new RdfUtils.ModelVisitor<URI>() {
                 @Override
                 public URI visit(final Model model) {
-                    return getNeedURI(model);
+                    return getAtomURI(model);
                 }
             }, true);
         }
 
         /**
-         * searches for a subject of type won:Need and returns the NeedURI
+         * searches for a subject of type won:Atom and returns the AtomURI
          *
-         * @param model <code>Model</code> object which will be searched for the NeedURI
-         * @return <code>URI</code> which is of type won:Need
+         * @param model <code>Model</code> object which will be searched for the AtomURI
+         * @return <code>URI</code> which is of type won:Atom
          */
-        public static URI getNeedURI(Model model) {
-            Resource res = getNeedResource(model);
+        public static URI getAtomURI(Model model) {
+            Resource res = getAtomResource(model);
             return res == null ? null : URI.create(res.getURI());
         }
 
         /**
-         * searches for a subject of type won:Need and returns the NeedURI
+         * searches for a subject of type won:Atom and returns the AtomURI
          *
-         * @param model <code>Model</code> object which will be searched for the NeedURI
-         * @return <code>URI</code> which is of type won:Need
+         * @param model <code>Model</code> object which will be searched for the AtomURI
+         * @return <code>URI</code> which is of type won:Atom
          */
-        public static Resource getNeedResource(Model model) {
-            List<Resource> needURIs = new ArrayList<>();
-            ResIterator iterator = model.listSubjectsWithProperty(RDF.type, WON.NEED);
+        public static Resource getAtomResource(Model model) {
+            List<Resource> atomURIs = new ArrayList<>();
+            ResIterator iterator = model.listSubjectsWithProperty(RDF.type, WON.Atom);
             while (iterator.hasNext()) {
-                needURIs.add(iterator.next());
+                atomURIs.add(iterator.next());
             }
-            if (needURIs.size() == 0)
+            if (atomURIs.size() == 0)
                 return null;
-            else if (needURIs.size() == 1)
-                return needURIs.get(0);
-            else if (needURIs.size() > 1) {
-                Resource u = needURIs.get(0);
-                for (Resource uri : needURIs) {
+            else if (atomURIs.size() == 1)
+                return atomURIs.get(0);
+            else if (atomURIs.size() > 1) {
+                Resource u = atomURIs.get(0);
+                for (Resource uri : atomURIs) {
                     if (!uri.equals(u))
                         throw new IncorrectPropertyCountException(1, 2);
                 }
@@ -1121,51 +1118,51 @@ public class WonRdfUtils {
         }
 
         /**
-         * searches for a subject of type won:Need and returns the NeedURI
+         * searches for a subject of type won:Atom and returns the AtomURI
          *
          * @param dataset <code>Dataset</code> object which will be searched for the
-         * NeedURI
-         * @return <code>URI</code> which is of type won:Need
+         * AtomURI
+         * @return <code>URI</code> which is of type won:Atom
          */
-        public static Resource getNeedResource(Dataset dataset) {
-            Model model = new NeedModelWrapper(dataset).copyNeedModel(NeedGraphType.NEED);
-            return getNeedResource(model);
+        public static Resource getAtomResource(Dataset dataset) {
+            Model model = new AtomModelWrapper(dataset).copyAtomModel(AtomGraphType.ATOM);
+            return getAtomResource(model);
         }
 
-        public static URI getWonNodeURIFromNeed(Dataset dataset, final URI needURI) {
-            return URI.create(findOnePropertyFromResource(dataset, needURI, WON.HAS_WON_NODE).asResource().getURI());
+        public static URI getWonNodeURIFromAtom(Dataset dataset, final URI atomURI) {
+            return URI.create(findOnePropertyFromResource(dataset, atomURI, WON.wonNode).asResource().getURI());
         }
 
         /**
          * 
          */
-        public static Iterator<URI> getConnectedNeeds(Dataset dataset, final URI needURI) {
+        public static Iterator<URI> getConnectedAtoms(Dataset dataset, final URI atomURI) {
             PrefixMapping pmap = new PrefixMappingImpl();
             pmap.withDefaultMappings(PrefixMapping.Standard);
             pmap.setNsPrefix("won", WON.getURI());
             pmap.setNsPrefix("msg", WONMSG.getURI());
-            Path path = PathParser.parse("won:hasConnectionContainer/rdfs:member/won:hasRemoteNeed", pmap);
-            return RdfUtils.getURIsForPropertyPath(dataset, needURI, path);
+            Path path = PathParser.parse("won:hasConnectionContainer/rdfs:member/won:targetAtom", pmap);
+            return RdfUtils.getURIsForPropertyPath(dataset, atomURI, path);
         }
 
         /**
-         * Assumes that the dataset contains a need's connection information, looks for
-         * the specified remote needs and returns the remote connection uris. Optionally
+         * Assumes that the dataset contains an atom's connection information, looks for
+         * the specified remote atoms and returns the remote connection uris. Optionally
          * the result can be filtered by connection state.
          */
-        public static Set<URI> getRemoteConnectionURIsForRemoteNeeds(Dataset dataset, final Collection<URI> remoteNeeds,
+        public static Set<URI> getTargetConnectionURIsForTargetAtoms(Dataset dataset, final Collection<URI> targetAtoms,
                         final Optional<ConnectionState> state) {
-            Optional<Object> unions = remoteNeeds.stream().map(uri -> {
+            Optional<Object> unions = targetAtoms.stream().map(uri -> {
                 BasicPattern pattern = new BasicPattern();
                 pattern.add(Triple.create(Var.alloc("localCon"),
-                                NodeFactory.createURI("http://purl.org/webofneeds/model#hasRemoteNeed"),
+                                NodeFactory.createURI("https://w3id.org/won/core#targetAtom"),
                                 NodeFactory.createURI(uri.toString())));
                 pattern.add(Triple.create(Var.alloc("localCon"),
-                                NodeFactory.createURI("http://purl.org/webofneeds/model#hasRemoteConnection"),
+                                NodeFactory.createURI("https://w3id.org/won/core#targetConnection"),
                                 Var.alloc("remoteCon")));
                 if (state.isPresent()) {
                     pattern.add(Triple.create(Var.alloc("localCon"),
-                                    NodeFactory.createURI("http://purl.org/webofneeds/model#hasConnectionState"),
+                                    NodeFactory.createURI("https://w3id.org/won/core#connectionState"),
                                     NodeFactory.createURI(state.get().getURI().toString())));
                 }
                 return pattern;

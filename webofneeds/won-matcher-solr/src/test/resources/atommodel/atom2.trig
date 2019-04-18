@@ -1,0 +1,50 @@
+@prefix msg:   <https://w3id.org/won/message#> .
+@prefix conn:  <https://node.matchat.org/won/resource/connection/> .
+@prefix woncrypt: <https://w3id.org/won/core#> .
+@prefix atom:  <https://node.matchat.org/won/resource/atom/> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix cert:  <http://www.w3.org/ns/auth/cert#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix local: <https://node.matchat.org/won/resource/> .
+@prefix sig:   <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#> .
+@prefix geo:   <http://www.w3.org/2003/01/geo/wgs84_pos#> .
+@prefix s:     <http://schema.org/> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix won:   <https://w3id.org/won/core#> .
+@prefix ldp:   <http://www.w3.org/ns/ldp#> .
+@prefix event: <https://node.matchat.org/won/resource/event/> .
+@prefix sioc:  <http://rdfs.org/sioc/ns#> .
+@prefix dc:    <http://purl.org/dc/elements/1.1/> .
+
+<https://node.matchat.org/won/resource/event/6899375303355711001#atom> {
+    atom:3030440624813201401
+        a                       won:Atom ;
+        won:flag             won:UsedForTesting ;
+        won:matchingContext  "uki", "matchat" ;
+        won:hasMatchingBehavior won:Mutual ;
+        dc:title                "title1"  ;
+        won:seeks               _:is_and_seeks ;
+        won:seeks               [
+                                    a           won:AtomContent ;
+                                    dc:title    "title2" ;
+                                ] .
+    _:is_and_seeks
+        a                       won:AtomContent ;
+        dc:title                "title1" .
+}
+
+<https://node.matchat.org/won/resource/atom/3030440624813201401#sysinfo> {
+    <https://node.matchat.org/won/resource/atom/3030440624813201400#events>
+            a            won:MessageContainer ;
+            rdfs:member  event:n0ahybs7f0kmt6lojhnf , event:6899375303355711000 .
+
+    atom:3030440624813201401
+            a                      won:Atom ;
+            <http://purl.org/dc/terms/created>
+                    "2017-02-07T08:46:32.917Z"^^xsd:dateTime ;
+            won:connections     <https://node.matchat.org/won/resource/atom/3030440624813201400/connections> ;
+            won:messageContainer  <https://node.matchat.org/won/resource/atom/3030440624813201400#events> ;
+            won:wonNode         <https://node.matchat.org/won/resource> ;
+            won:atomState          won:Active .
+}
+

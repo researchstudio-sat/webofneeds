@@ -1,17 +1,17 @@
 Hi there,
 
-We have news regarding your post '$localNeedTitle' on $serviceName:
+We have news regarding your post '$localAtomTitle' on $serviceName:
 
-The conversation between '$remoteNeedTitle' and your post
-        '$localNeedTitle' was closed by your server.
+The conversation between '$targetAtomTitle' and your post
+        '$localAtomTitle' was closed by your server.
 #if ($textMsg)
 Explanation:<br/>
     $textMsg
 #end
     
 View the conversation: $linkConnection
-View your post: $linkLocalNeed  
-View their post: $linkRemoteNeed
+View your post: $linkLocalAtom  
+View their post: $linkTargetAtom
 
 Best wishes, 
 

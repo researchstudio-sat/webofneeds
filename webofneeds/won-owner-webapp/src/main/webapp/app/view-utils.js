@@ -25,8 +25,8 @@ export function showRdf(viewState) {
   return get(viewState, "showRdf");
 }
 
-export function showClosedNeeds(viewState) {
-  return get(viewState, "showClosedNeeds");
+export function showClosedAtoms(viewState) {
+  return get(viewState, "showClosedAtoms");
 }
 
 export function isAnonymousLinkSent(viewState) {
@@ -46,18 +46,18 @@ export function showAnonymousSlideInEmailInput(viewState) {
 }
 
 /**
- * Return the visible Tab of a certain need, and if there was no tab stored in the state, return
+ * Return the visible Tab of a certain atom, and if there was no tab stored in the state, return
  * the notFoundTab, which defaults to DETAIL
  * @param viewState
- * @param needUri
+ * @param atomUri
  * @param notFoundTab
  * @returns {*|string}
  */
-export function getVisibleTabByNeedUri(
+export function getVisibleTabByAtomUri(
   viewState,
-  needUri,
+  atomUri,
   notFoundTab = "DETAIL"
 ) {
-  const tab = getIn(viewState, ["needs", needUri, "visibleTab"]);
+  const tab = getIn(viewState, ["atoms", atomUri, "visibleTab"]);
   return tab || notFoundTab;
 }

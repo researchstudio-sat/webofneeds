@@ -27,7 +27,7 @@
 
     <!--bean id="activemqConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory"
            depends-on="embeddedBroker" -->
-        <!-- note: this URI does not need to be configurable via the
+        <!-- note: this URI does not atom to be configurable via the
         config file, it will be the same on any system -->
         <!--property name="brokerURL" value="${uri.protocol.activemq}?useLocalHost=false"/>
     </bean-->
@@ -73,7 +73,7 @@
     </bean>
 
     <bean id="activeMQService" class="won.protocol.jms.ActiveMQServiceImpl">
-        <constructor-arg name="type" value="NeedProtocol"/>
+        <constructor-arg name="type" value="AtomProtocol"/>
     </bean>
     <bean id="brokerComponentFactory" class="won.protocol.jms.BrokerComponentFactory"/>
 
@@ -97,14 +97,14 @@
     
 
     <!--bean id="activemq" class="org.apache.activemq.camel.component.ActiveMQComponent"-->
-        <!-- note: this URI does not need to be configurable via the
+        <!-- note: this URI does not atom to be configurable via the
         config file, it will be the same on any system -->
 
         <!--property name="brokerURL" value="tcp://localhost:${activemq.broker.port}"/>
         <property name="connectionFactory" ref="cachedConnectionFactory"/>
     </bean-->
-    <!--bean id="needProtocolCommunicationService" class="won.node.camel.NeedProtocolCommunicationServiceImpl"-->
-    <bean id="needProtocolCommunicationService" class="won.node.camel.NeedProtocolCommunicationServiceImpl">
+    <!--bean id="atomProtocolCommunicationService" class="won.node.camel.AtomProtocolCommunicationServiceImpl"-->
+    <bean id="atomProtocolCommunicationService" class="won.node.camel.AtomProtocolCommunicationServiceImpl">
         <property name="registrationClient" ref="registrationClient" />
     </bean>
 
@@ -112,15 +112,15 @@
         <property name="queueManagementService" ref="queueManagementService"/>
     </bean>
 
-    <bean name="needProtocolCamelConfigurator" class="won.node.camel.NeedProtocolCamelConfiguratorImpl">
+    <bean name="atomProtocolCamelConfigurator" class="won.node.camel.AtomProtocolCamelConfiguratorImpl">
         <property name="componentName" value="activemq"/>
         <property name="messagingContext" ref="messagingContext"/>
     </bean>
 
     <bean id="messageReferencer" class="won.node.camel.processor.general.MessageReferencer" />
 
-    <bean id="needProtocolOutgoingMessagesProcessor"
-          class="won.node.camel.processor.general.NeedProtocolOutgoingMessagesProcessor" />
+    <bean id="atomProtocolOutgoingMessagesProcessor"
+          class="won.node.camel.processor.general.AtomProtocolOutgoingMessagesProcessor" />
 
     <bean id="successResponder"
           class="won.node.camel.processor.general.SuccessResponder" />
@@ -133,8 +133,8 @@
           class="won.node.camel.processor.general.ToOwnerEchoer" />          
     <bean id="wonMessageCloner"
           class="won.node.camel.processor.general.WonMessageCloner" />
-    <bean id="facetExtractor"
-          class="won.protocol.message.processor.camel.FacetTypeExtractingCamelProcessor" />
+    <bean id="socketExtractor"
+          class="won.protocol.message.processor.camel.SocketTypeExtractingCamelProcessor" />
 
 
     <!-- won-specific processors -->
@@ -185,13 +185,13 @@
             <bean class="won.node.camel.processor.general.EnvelopeAddingWonMessageProcessor"/>
         </constructor-arg>
     </bean>
-  <!-- processor for checking if message event, create need, or create connection uri is well-formed -->
+  <!-- processor for checking if message event, create atom, or create connection uri is well-formed -->
   <bean name="uriNodePathChecker" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
      <constructor-arg>
        <bean class="won.protocol.message.processor.impl.UriConsistencyCheckingWonMessageProcessor" />
      </constructor-arg>
   </bean>
-  <!-- processor for checking if message event, create need, or create connection uri is already in use -->
+  <!-- processor for checking if message event, create atom, or create connection uri is already in use -->
   <bean name="uriInUseChecker" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
     <constructor-arg>
       <bean class="won.node.camel.processor.general.UriAlreadyUsedCheckingWonMessageProcessor"/>
@@ -246,15 +246,15 @@
           <bean class="won.node.camel.processor.general.LockMessageParentWonMessageProcessor" />
       </constructor-arg>
   </bean>
-  <!-- routing logic for wonMessages, computing which facet-specific processor to use -->
-  <bean name="facetTypeSlip" class="won.node.camel.processor.general.FacetTypeSlipComputer"/>
+  <!-- routing logic for wonMessages, computing which socket-specific processor to use -->
+  <bean name="socketTypeSlip" class="won.node.camel.processor.general.SocketTypeSlipComputer"/>
   
   <!-- extraction of connection state for data derivation -->
   <bean name="connectionStateChangeBuilder" class="won.node.camel.processor.general.ConnectionStateChangeBuilderCamelProcessor" />
   
   <!--  data derivation processor -->
-  <bean name="dataDeriver" class="won.node.camel.processor.general.FacetDerivationProcessor" />
+  <bean name="dataDeriver" class="won.node.camel.processor.general.SocketDerivationProcessor" />
   
   <!--  delete message processor -->
-  <bean name="needDeleter" class="won.node.camel.processor.general.DeleteNeedMessageProcessor" />
+  <bean name="atomDeleter" class="won.node.camel.processor.general.DeleteAtomMessageProcessor" />
 </beans>

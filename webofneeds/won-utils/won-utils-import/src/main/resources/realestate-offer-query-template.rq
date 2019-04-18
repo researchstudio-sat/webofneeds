@@ -1,14 +1,14 @@
-PREFIX won: <http://purl.org/webofneeds/model#>
+PREFIX won: <https://w3id.org/won/core#>
 PREFIX s: <http://schema.org/>
 PREFIX geo: <http://www.bigdata.com/rdf/geospatial#>
 PREFIX geoliteral: <http://www.bigdata.com/rdf/geospatial/literals/v1#>
 prefix sh:    <http://www.w3.org/ns/shacl#> 
 
-# query for real estate offers, finding real estate needs
+# query for real estate offers, finding real estate atoms
 
 SELECT DISTINCT ?result WHERE {
-  ?result a won:Need ;
-  won:isInState won:Active ;
+  ?result a won:Atom ;
+  won:atomState won:Active ;
   won:seeks ?seeks .
     
   optional {
@@ -58,7 +58,7 @@ SELECT DISTINCT ?result WHERE {
   
   # if we make the location query optional, it
   # just takes too long
-  ?seeks (won:hasLocation|s:location) ?location.
+  ?seeks (won:location|s:location) ?location.
   ?location s:geo ?location_geo.
   SERVICE geo:search {
     ?location_geo geo:search "inCircle".

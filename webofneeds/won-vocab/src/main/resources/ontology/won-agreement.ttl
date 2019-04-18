@@ -1,50 +1,50 @@
-@prefix : <http://purl.org/webofneeds/agreement#> .
+@prefix : <https://w3id.org/won/agreement#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix xml: <http://www.w3.org/XML/1998/namespace> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-@base <http://purl.org/webofneeds/agreement#> .
+@base <https://w3id.org/won/agreement#> .
 
-<http://purl.org/webofneeds/agreement#> rdf:type owl:Ontology .
+<https://w3id.org/won/agreement#> rdf:type owl:Ontology .
 
 #################################################################
 #    Object Properties
 #################################################################
 
-###  http://purl.org/webofneeds/agreement#accepts
-<http://purl.org/webofneeds/agreement#accepts> rdf:type owl:ObjectProperty ;
-                                               rdfs:domain <http://purl.org/webofneeds/agreement#Agreement> ;
+###  https://w3id.org/won/agreement#accepts
+<https://w3id.org/won/agreement#accepts> rdf:type owl:ObjectProperty ;
+                                               rdfs:domain <https://w3id.org/won/agreement#Agreement> ;
                                                rdfs:comment """Used to link two message resources. The message in the subject accepts the message in the object. This only makes sense if the object references a proposal.
 
 During the projection from the edited conversation dataset to the agreement dataset, the validity of agreements is checked. Proposal messages that were not accepted are dropped, as are invalid or cancelled Agreements."""@en .
 
 
-###  http://purl.org/webofneeds/agreement#proposes
-<http://purl.org/webofneeds/agreement#proposes> rdf:type owl:ObjectProperty ;
-                                                rdfs:domain <http://purl.org/webofneeds/agreement#Proposal> .
+###  https://w3id.org/won/agreement#proposes
+<https://w3id.org/won/agreement#proposes> rdf:type owl:ObjectProperty ;
+                                                rdfs:domain <https://w3id.org/won/agreement#Proposal> .
 
 
-###  http://purl.org/webofneeds/agreement#proposesToCancel
-<http://purl.org/webofneeds/agreement#proposesToCancel> rdf:type owl:ObjectProperty ;
-                                                        rdfs:domain <http://purl.org/webofneeds/agreement#Proposal> .
+###  https://w3id.org/won/agreement#proposesToCancel
+<https://w3id.org/won/agreement#proposesToCancel> rdf:type owl:ObjectProperty ;
+                                                        rdfs:domain <https://w3id.org/won/agreement#Proposal> .
 
 
-###  http://purl.org/webofneeds/agreement#rejects
-<http://purl.org/webofneeds/agreement#reject> rdf:type owl:ObjectProperty ;
-                                                        rdfs:domain <http://purl.org/webofneeds/agreement#Proposal> .
+###  https://w3id.org/won/agreement#rejects
+<https://w3id.org/won/agreement#reject> rdf:type owl:ObjectProperty ;
+                                                        rdfs:domain <https://w3id.org/won/agreement#Proposal> .
 
 #################################################################
 #    Classes
 #################################################################
 
-###  http://purl.org/webofneeds/agreement#Agreement
-<http://purl.org/webofneeds/agreement#Agreement> rdf:type owl:Class ;
+###  https://w3id.org/won/agreement#Agreement
+<https://w3id.org/won/agreement#Agreement> rdf:type owl:Class ;
                                                  rdfs:comment "The message that accepts a proposal concludes an agreement. It is the last message that is taken into account when calculating the content of the agreement, which makes it suitable for identifying the agreement. Therefore, it is given the type Agreement."@en .
 
 
-###  http://purl.org/webofneeds/agreement#Proposal
-<http://purl.org/webofneeds/agreement#Proposal> rdf:type owl:Class ;
+###  https://w3id.org/won/agreement#Proposal
+<https://w3id.org/won/agreement#Proposal> rdf:type owl:Class ;
                                                 rdfs:comment "The message that proposes other messages or proposes to cancel agreements is a Proposal."@en .
 
 

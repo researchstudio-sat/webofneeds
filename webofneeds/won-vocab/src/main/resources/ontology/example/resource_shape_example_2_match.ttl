@@ -1,42 +1,42 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix won: <http://purl.org/webofneeds/model#> .
+@prefix won: <https://w3id.org/won/core#> .
 @prefix oslc: <http://open-services.net/ns/core#> .
 @prefix dcterms: <http://purl.org/dc/terms/>
 @prefix clothing: <http://example.org/clothing#> .
 @prefix ex: <http://example.org/example_2#> .
 
-ex:Need2 
-	a won:Need ;
-	won:hasContent ex:Need2_Content2 ;
-	won:hasMatchingConstraint ex:Need2_Constraint2.
+ex:Atom2 
+	a won:Atom ;
+	won:content ex:Atom2_Content2 ;
+	won:hasMatchingConstraint ex:Atom2_Constraint2.
 	
-ex:Need2_Content2 dc:description "Zu verschenken, 1 Jacke, hellgrün ist Gr. 22 (Gr. 44 - Kurzgröße) und hat goldene Knöpfe."^^xsd:string
+ex:Atom2_Content2 dc:description "Zu verschenken, 1 Jacke, hellgrün ist Gr. 22 (Gr. 44 - Kurzgröße) und hat goldene Knöpfe."^^xsd:string
 
-ex:Need2_Constraint2 
+ex:Atom2_Constraint2 
 	a oslc:ResourceShape ;
 	oslc:describes clothing:Jacket
-	oslc:property ex:Need2_Constraint2_Prop1, ex:Need2_Constraint2_Prop2, ex:Need2_Constraint2_Prop3, ex:Need2_Constraint2_Prop4 . 
+	oslc:property ex:Atom2_Constraint2_Prop1, ex:Atom2_Constraint2_Prop2, ex:Atom2_Constraint2_Prop3, ex:Atom2_Constraint2_Prop4 . 
 	
-ex:Need2_Constraint2_Prop1 
+ex:Atom2_Constraint2_Prop1 
 	a oscl:Property ;
 	oslc:propertyDefinition clothing:type ;
 	oslc:occurs oslc:Exactly-one ;
 	oslc:allowedValue clothing:Jacket .
 
-ex:Need2_Constraint2_Prop2 
+ex:Atom2_Constraint2_Prop2 
 	a oscl:Property ;
 	oslc:propertyDefinition clothing:amount ;
 	oslc:occurs oslc:Exactly-one ;
 	oslc:allowedValue "1"^^xsd:integer .
 	
-ex:Need2_Constraint2_Prop3
+ex:Atom2_Constraint2_Prop3
 	a oscl:Property ;
 	oslc:propertyDefinition clothing:size ;
 	oslc:occurs oslc:Exactly-one ;	
 	oslc:allowedValue "22"^^rdfs:integer .
 	
-ex:Need2_Constraint2_Prop4
+ex:Atom2_Constraint2_Prop4
 	a oscl:Property ;
 	oslc:propertyDefinition travel:colour ;
 	oslc:occurs oslc:Exactly-one ;	

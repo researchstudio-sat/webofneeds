@@ -37,7 +37,7 @@
         <property name="registrationClient" ref="registrationClient" />
     </bean>
 
-    <!--bean id="needProtocolCamelConfigurator" class="won.matcher.messaging.MatcherProtocolCamelConfiguratorImpl"/-->
+    <!--bean id="atomProtocolCamelConfigurator" class="won.matcher.messaging.MatcherProtocolCamelConfiguratorImpl"/-->
     <bean id="matcherActiveMQService" class="won.protocol.jms.MatcherActiveMQServiceImpl">
         <constructor-arg name="type" value="MatcherProtocol"/>
     </bean>

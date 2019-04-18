@@ -12,7 +12,7 @@ package won.bot.framework.eventbot.event.impl.command.base;
 
 import java.net.URI;
 
-import won.bot.framework.eventbot.event.BaseNeedAndConnectionSpecificEvent;
+import won.bot.framework.eventbot.event.BaseAtomAndConnectionSpecificEvent;
 import won.bot.framework.eventbot.event.impl.command.MessageCommandEvent;
 import won.bot.framework.eventbot.event.impl.command.MessageCommandResultEvent;
 import won.protocol.model.Connection;
@@ -20,7 +20,7 @@ import won.protocol.model.Connection;
 /**
  * Base class for command results (failure and successes).
  */
-public abstract class AbstractMessageCommandResultEvent extends BaseNeedAndConnectionSpecificEvent
+public abstract class AbstractMessageCommandResultEvent extends BaseAtomAndConnectionSpecificEvent
                 implements MessageCommandResultEvent {
     private MessageCommandEvent originalCommandEvent;
     private String message = null;
@@ -29,14 +29,14 @@ public abstract class AbstractMessageCommandResultEvent extends BaseNeedAndConne
         this(originalCommandEvent, con, null);
     }
 
-    public AbstractMessageCommandResultEvent(MessageCommandEvent originalCommandEvent, URI needURI, URI remoteNeedURI,
+    public AbstractMessageCommandResultEvent(MessageCommandEvent originalCommandEvent, URI atomURI, URI targetAtomURI,
                     URI connectionURI) {
-        this(originalCommandEvent, makeConnection(needURI, remoteNeedURI, connectionURI));
+        this(originalCommandEvent, makeConnection(atomURI, targetAtomURI, connectionURI));
     }
 
-    public AbstractMessageCommandResultEvent(MessageCommandEvent originalCommandEvent, URI needURI, URI remoteNeedURI,
+    public AbstractMessageCommandResultEvent(MessageCommandEvent originalCommandEvent, URI atomURI, URI targetAtomURI,
                     URI connectionURI, String message) {
-        this(originalCommandEvent, makeConnection(needURI, remoteNeedURI, connectionURI), message);
+        this(originalCommandEvent, makeConnection(atomURI, targetAtomURI, connectionURI), message);
     }
 
     public AbstractMessageCommandResultEvent(MessageCommandEvent originalCommandEvent, Connection con, String message) {
@@ -55,11 +55,11 @@ public abstract class AbstractMessageCommandResultEvent extends BaseNeedAndConne
         return null;
     }
 
-    protected static Connection makeConnection(URI needURI, URI remoteNeedURI, URI connectionURI) {
+    protected static Connection makeConnection(URI atomURI, URI targetAtomURI, URI connectionURI) {
         Connection con = new Connection();
         con.setConnectionURI(connectionURI);
-        con.setNeedURI(needURI);
-        con.setRemoteNeedURI(remoteNeedURI);
+        con.setAtomURI(atomURI);
+        con.setTargetAtomURI(targetAtomURI);
         return con;
     }
 }

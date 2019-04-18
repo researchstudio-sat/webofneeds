@@ -25,15 +25,15 @@ public class BotOwnerCallback implements OwnerCallback {
     TaskScheduler taskScheduler;
 
     @Override
-    public void onCloseFromOtherNeed(final Connection con, final WonMessage wonMessage) {
+    public void onCloseFromOtherAtom(final Connection con, final WonMessage wonMessage) {
         taskScheduler.schedule(new Runnable() {
             public void run() {
                 try {
-                    logger.debug("onCloseFromOtherNeed received for connection {}, message {} ", con.getConnectionURI(),
+                    logger.debug("onCloseFromOtherAtom received for connection {}, message {} ", con.getConnectionURI(),
                                     wonMessage.getMessageURI());
-                    getBotForNeedUri(con.getNeedURI()).onCloseFromOtherNeed(con, wonMessage);
+                    getBotForAtomUri(con.getAtomURI()).onCloseFromOtherAtom(con, wonMessage);
                 } catch (Exception e) {
-                    logger.warn("error while handling onCloseFromOtherNeed()", e);
+                    logger.warn("error while handling onCloseFromOtherAtom()", e);
                 }
             }
         }, new Date());
@@ -44,7 +44,7 @@ public class BotOwnerCallback implements OwnerCallback {
         taskScheduler.schedule(new Runnable() {
             public void run() {
                 try {
-                    getBotForNeedUri(match.getFromNeed()).onHintFromMatcher(match, wonMessage);
+                    getBotForAtomUri(match.getFromAtom()).onHintFromMatcher(match, wonMessage);
                 } catch (Exception e) {
                     logger.warn("error while handling onHintFromMatcher()", e);
                 }
@@ -53,43 +53,43 @@ public class BotOwnerCallback implements OwnerCallback {
     }
 
     @Override
-    public void onConnectFromOtherNeed(final Connection con, final WonMessage wonMessage) {
+    public void onConnectFromOtherAtom(final Connection con, final WonMessage wonMessage) {
         taskScheduler.schedule(new Runnable() {
             public void run() {
                 try {
-                    logger.debug("onConnectFromOtherNeed called for connection {}, message {}", con.getConnectionURI(),
+                    logger.debug("onConnectFromOtherAtom called for connection {}, message {}", con.getConnectionURI(),
                                     wonMessage.getMessageURI());
-                    getBotForNeedUri(con.getNeedURI()).onConnectFromOtherNeed(con, wonMessage);
+                    getBotForAtomUri(con.getAtomURI()).onConnectFromOtherAtom(con, wonMessage);
                 } catch (Exception e) {
-                    logger.warn("error while handling onConnectFromOtherNeed()", e);
+                    logger.warn("error while handling onConnectFromOtherAtom()", e);
                 }
             }
         }, new Date());
     }
 
     @Override
-    public void onOpenFromOtherNeed(final Connection con, final WonMessage wonMessage) {
+    public void onOpenFromOtherAtom(final Connection con, final WonMessage wonMessage) {
         taskScheduler.schedule(new Runnable() {
             public void run() {
                 try {
-                    getBotForNeedUri(con.getNeedURI()).onOpenFromOtherNeed(con, wonMessage);
+                    getBotForAtomUri(con.getAtomURI()).onOpenFromOtherAtom(con, wonMessage);
                 } catch (Exception e) {
-                    logger.warn("error while handling onOpenFromOtherNeed()", e);
+                    logger.warn("error while handling onOpenFromOtherAtom()", e);
                 }
             }
         }, new Date());
     }
 
     @Override
-    public void onMessageFromOtherNeed(final Connection con, final WonMessage wonMessage) {
+    public void onMessageFromOtherAtom(final Connection con, final WonMessage wonMessage) {
         taskScheduler.schedule(new Runnable() {
             public void run() {
                 try {
-                    logger.debug("onMessageFromOtherNeed for Connection {}, message {}", con.getConnectionURI(),
+                    logger.debug("onMessageFromOtherAtom for Connection {}, message {}", con.getConnectionURI(),
                                     wonMessage.getMessageURI());
-                    getBotForNeedUri(con.getNeedURI()).onMessageFromOtherNeed(con, wonMessage);
+                    getBotForAtomUri(con.getAtomURI()).onMessageFromOtherAtom(con, wonMessage);
                 } catch (Exception e) {
-                    logger.warn("error while handling onMessageFromOtherNeed()", e);
+                    logger.warn("error while handling onMessageFromOtherAtom()", e);
                 }
             }
         }, new Date());
@@ -101,8 +101,8 @@ public class BotOwnerCallback implements OwnerCallback {
             public void run() {
                 try {
                     logger.debug("onSuccessResponse for message {} ", successfulMessageUri);
-                    URI needUri = wonMessage.getReceiverNeedURI();
-                    getBotForNeedUri(needUri).onSuccessResponse(successfulMessageUri, wonMessage);
+                    URI atomUri = wonMessage.getRecipientAtomURI();
+                    getBotForAtomUri(atomUri).onSuccessResponse(successfulMessageUri, wonMessage);
                 } catch (Exception e) {
                     logger.warn("error while handling onSuccessResponse()", e);
                 }
@@ -116,8 +116,8 @@ public class BotOwnerCallback implements OwnerCallback {
             public void run() {
                 try {
                     logger.debug("onFailureResponse for message {} ", failedMessageUri);
-                    URI needUri = wonMessage.getReceiverNeedURI();
-                    getBotForNeedUri(needUri).onFailureResponse(failedMessageUri, wonMessage);
+                    URI atomUri = wonMessage.getRecipientAtomURI();
+                    getBotForAtomUri(atomUri).onFailureResponse(failedMessageUri, wonMessage);
                 } catch (Exception e) {
                     logger.warn("error while handling onFailureResponse()", e);
                 }
@@ -133,12 +133,12 @@ public class BotOwnerCallback implements OwnerCallback {
         this.taskScheduler = taskScheduler;
     }
 
-    private Bot getBotForNeedUri(URI needUri) {
-        Bot bot = botManager.getBotForNeedURI(needUri);
+    private Bot getBotForAtomUri(URI atomUri) {
+        Bot bot = botManager.getBotForAtomURI(atomUri);
         if (bot == null)
-            throw new IllegalStateException("No bot registered for uri " + needUri);
+            throw new IllegalStateException("No bot registered for uri " + atomUri);
         if (!bot.getLifecyclePhase().isActive()) {
-            throw new IllegalStateException("bot responsible for need " + needUri
+            throw new IllegalStateException("bot responsible for atom " + atomUri
                             + " is not active (lifecycle phase is: " + bot.getLifecyclePhase() + ")");
         }
         return bot;

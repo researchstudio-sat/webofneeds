@@ -1,0 +1,128 @@
+@prefix dc:    <http://purl.org/dc/elements/1.1/> .
+@prefix atom:  <http://localhost:8080/won/resource/atom/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix geo:   <http://www.w3.org/2003/01/geo/wgs84_pos#> .
+@prefix conn:  <http://localhost:8080/won/resource/connection/> .
+@prefix event: <http://localhost:8080/won/resource/event/> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix won:   <https://w3id.org/won/core#> .
+@prefix local: <http://localhost:8080/won/resource/> .
+@prefix msg:   <https://w3id.org/won/message#> .
+@prefix ldp:   <http://www.w3.org/ns/ldp#> .
+@prefix signature: <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#> .
+@prefix cert: <http://www.w3.org/ns/auth/cert#> .
+@prefix woncrypt:   <https://w3id.org/won/core#> .
+
+
+
+# ATOM DATA GRAPH
+<http://localhost:8080/won/resource/atom/3144709509622353000/core/#data>
+{
+    atom:3144709509622353000
+            a                     won:Atom ;
+            won:hasBasicAtomType  won:Supply ;
+            won:content        [ a                          won:AtomContent ;
+                                    dc:title                   "salat offer a" ;
+                                    won:contentDescription  [ a                             won:AtomModality ;
+                                                                 won:locationSpecification  [ a               geo:Point ;
+                                                                                                 won:hasAddress  "" ;
+                                                                                                 geo:latitude    "0.000000"^^xsd:float ;
+                                                                                                 geo:longitude   "0.000000"
+                                                                                               ]
+                                                               ] ;
+                                    won:tag                 "aaa" ;
+                                    dc:description     "a"
+                                  ] ;
+            won:socket          won:ChatSocket ;
+            cert:key [ cert:PublicKey
+                                [
+                                    a woncrypt:ECCPublicKey ;
+                                    woncrypt:ecc_curveId "brainpoolp384r1" ;
+                                    woncrypt:ecc_algorithm "EC" ;
+                                    woncrypt:ecc_qx "479d76295f6f84c9b7a48c3c542057642a4fec7b46c22c3846424d51aa5bab1eabd714caea113a2a919e1790963e10ff" ;
+                                    woncrypt:ecc_qy "239351cbda7c3366110f24d203395a2fb86226b98701276cefbe1d4428c927b681e572d0bee2913bbdcdbb41ac442794" ;
+                                ]
+            ] .
+}
+
+#  ATOM DATA GRAPH SIGNATURE
+<http://localhost:8080/won/resource/atom/3144709509622353000/core/#data-sig> {
+    <http://localhost:8080/won/resource/atom/3144709509622353000/core/#data-sig>
+            a                            signature:Signature ;
+            signature:hasGraphSigningMethod
+                    [ a                               signature:GraphSigningMethod ;
+                      signature:hasDigestMethod       signature:dm-sha-256 ;
+                      signature:graphCanonicalizationMethod
+                              signature:gcm-fisteus-2010 ;
+                      signature:graphDigestMethod  signature:gdm-fisteus-2010 ;
+                      signature:graphSerializationMethod
+                              signature:gsm-trig ;
+                      signature:hasSignatureMethod    signature:sm-ecdsa
+                    ] ;
+            signature:signatureValue  "MGQCMApLBtpACkkLTNTTW6pHl7Uu8Nv9z2WTr1CGKfBIOwTtM7/cyNf42LAWVCj+w+Vr0gIwNFN8kS3fRY3H37Kw1G+sHYwxhNKE+zzXG6eDadKAjrPa0VbvzZtUx7iDh4z/Uctf" ;
+            signature:hasVerificationCertificate
+                    atom:3144709509622353000 ;
+            msg:signedGraph           <http://localhost:8080/won/resource/atom/3144709509622353000/core/#data> .
+}
+
+
+
+
+# 1st ENVELOPE GRAPH
+<http://localhost:8080/won/resource/event/7719577021233193000#data> {
+    <http://localhost:8080/won/resource/event/7719577021233193000#data>
+            a       msg:EnvelopeGraph ;
+            <http://www.w3.org/2004/03/trix/rdfg-1/subGraphOf>
+                    event:7719577021233193000 .
+
+    event:7719577021233193000
+            a                        msg:OwnerToNodeEnvelope ;
+            msg:content           <http://localhost:8080/won/resource/atom/3144709509622353000/core/#data> ;
+            msg:messageType       msg:CreateMessage ;
+            msg:recipientNode      <http://localhost:8080/won/resource> ;
+            msg:senderAtom        atom:3144709509622353000 ;
+            msg:containsSignature  [ msg:signatureGraph  <http://localhost:8080/won/resource/atom/3144709509622353000/core/#data-sig> ;
+                                       msg:signatureValue  "MGQCMApLBtpACkkLTNTTW6pHl7Uu8Nv9z2WTr1CGKfBIOwTtM7/cyNf42LAWVCj+w+Vr0gIwNFN8kS3fRY3H37Kw1G+sHYwxhNKE+zzXG6eDadKAjrPa0VbvzZtUx7iDh4z/Uctf" ;
+                                       msg:signedGraph     <http://localhost:8080/won/resource/atom/3144709509622353000/core/#data>
+                                     ] .
+}
+
+
+<http://localhost:8080/won/resource/event/7719577021233193000#data-sig> {
+    <http://localhost:8080/won/resource/event/7719577021233193000#data-sig>
+            a                            signature:Signature ;
+            signature:hasGraphSigningMethod
+                    [ a                               signature:GraphSigningMethod ;
+                      signature:hasDigestMethod       signature:dm-sha-256 ;
+                      signature:graphCanonicalizationMethod
+                              signature:gcm-fisteus-2010 ;
+                      signature:graphDigestMethod  signature:gdm-fisteus-2010 ;
+                      signature:graphSerializationMethod
+                              signature:gsm-trig ;
+                      signature:hasSignatureMethod    signature:sm-ecdsa
+                    ] ;
+            signature:signatureValue  "MGQCMHw9a4Ywimark0jWvu35Q12K/Xm5KpPlGvQ1KUQbRMukjTIEzSGheTMQ/AfkO9IUyAIwEb3pLZmlFKfvXky0Ss3j8Z7EieHbPZCw8VKhit2eYvYvWTvlWSmx6SHs+/bUHY6W" ;
+            signature:hasVerificationCertificate
+                    atom:3144709509622353000 ;
+            msg:signedGraph           <http://localhost:8080/won/resource/event/7719577021233193000#data> .
+}
+
+
+
+
+# 2nd ENVELOPE GRAPH
+<http://localhost:8080/won/resource/event/7719577021233193000#envelope-s7gl>
+{
+    <http://localhost:8080/won/resource/event/7719577021233193000#envelope-s7gl>
+            a                     msg:EnvelopeGraph ;
+            msg:containsEnvelope  <http://localhost:8080/won/resource/event/7719577021233193000#data> ;
+            <http://www.w3.org/2004/03/trix/rdfg-1/subGraphOf>
+                    event:7719577021233193000 .
+    
+    event:7719577021233193000
+            a                 msg:NodeToNodeEnvelope ;
+            msg:timestamp  "1426858925851"^^xsd:long .
+
+}
+

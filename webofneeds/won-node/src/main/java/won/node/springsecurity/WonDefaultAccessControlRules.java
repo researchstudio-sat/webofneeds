@@ -9,9 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import won.cryptography.webid.AccessControlRules;
 import won.node.service.impl.URIService;
-import won.protocol.repository.ConnectionEventContainerRepository;
+import won.protocol.repository.ConnectionMessageContainerRepository;
 import won.protocol.repository.MessageEventRepository;
-import won.protocol.repository.NeedEventContainerRepository;
+import won.protocol.repository.AtomMessageContainerRepository;
 
 /**
  * User: ypanchenko Date: 28.07.2015
@@ -22,9 +22,9 @@ public class WonDefaultAccessControlRules implements AccessControlRules {
     @Autowired
     protected MessageEventRepository messageEventRepository;
     @Autowired
-    protected NeedEventContainerRepository needEventContainerRepository;
+    protected AtomMessageContainerRepository atomMessageContainerRepository;
     @Autowired
-    protected ConnectionEventContainerRepository connectionEventContainerRepository;
+    protected ConnectionMessageContainerRepository connectionMessageContainerRepository;
     @Autowired
     protected URIService uriService;
 
@@ -52,22 +52,22 @@ public class WonDefaultAccessControlRules implements AccessControlRules {
                 logger.debug("checking access for connectionEvent{} with webID {} ({} of {})",
                                 new Object[] { resourceUri, firstWebId, 1, requesterWebIDs.size() });
             }
-            return connectionEventContainerRepository.isReadPermittedForWebID(
+            return connectionMessageContainerRepository.isReadPermittedForWebID(
                             uriService.getConnectionURIofConnectionEventsURI(resourceUri), webId);
-        } else if (uriService.isNeedEventsURI(resourceUri)) {
+        } else if (uriService.isAtomEventsURI(resourceUri)) {
             if (logger.isDebugEnabled()) {
-                logger.debug("checking access for needEvent {} with webID {} ({} of {})",
+                logger.debug("checking access for atomEvent {} with webID {} ({} of {})",
                                 new Object[] { resourceUri, firstWebId, 1, requesterWebIDs.size() });
             }
-            return this.needEventContainerRepository
-                            .isReadPermittedForWebID(uriService.getNeedURIofNeedEventsURI(resourceUri), webId);
-        } else if (uriService.isNeedUnreadURI(resourceUri)) {
+            return this.atomMessageContainerRepository
+                            .isReadPermittedForWebID(uriService.getAtomURIofAtomEventsURI(resourceUri), webId);
+        } else if (uriService.isAtomUnreadURI(resourceUri)) {
             if (logger.isDebugEnabled()) {
                 logger.debug("checking access for unreadEventsRequest {} with webID {} ({} of {})",
                                 new Object[] { resourceUri, firstWebId, 1, requesterWebIDs.size() });
             }
-            // only the need itself can get unread events
-            return webId.equals(uriService.getNeedURIofNeedUnreadURI(resourceUri));
+            // only the atom itself can get unread events
+            return webId.equals(uriService.getAtomURIofAtomUnreadURI(resourceUri));
         }
         if (logger.isDebugEnabled()) {
             logger.debug("request could not be categorized, denying: {} with webID {} ({} of {})",

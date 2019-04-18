@@ -1,0 +1,359 @@
+/**
+ * Created by fsuda on 08.11.2018.
+ */
+
+import won from "./won-es6.js";
+import { get, getIn } from "./utils.js";
+import { labels } from "./won-label-utils.js";
+import * as connectionUtils from "./connection-utils.js";
+import * as useCaseUtils from "./usecase-utils.js";
+
+/**
+ * Determines if a given atom is a Active
+ * @param atom
+ * @returns {*|boolean}
+ */
+export function isActive(atom) {
+  return get(atom, "state") && get(atom, "state") === won.WON.ActiveCompacted;
+}
+
+export function getIdenticonSvg(atom) {
+  return get(atom, "identiconSvg");
+}
+
+export function getMatchedUseCaseIcon(atom) {
+  return getIn(atom, ["matchedUseCase", "icon"]);
+}
+
+export function getBackground(atom) {
+  return get(atom, "background");
+}
+
+export function getMatchedUseCaseIdentifier(atom) {
+  return getIn(atom, ["matchedUseCase", "identifier"]);
+}
+
+export function getReactionUseCases(atom) {
+  return getIn(atom, ["matchedUseCase", "reactionUseCases"]);
+}
+
+export function getEnabledUseCases(atom) {
+  return getIn(atom, ["matchedUseCase", "enabledUseCases"]);
+}
+
+export function hasMatchedUseCase(atom) {
+  return !!getIn(atom, ["matchedUseCase", "identifier"]);
+}
+
+export function hasImages(atom) {
+  return (
+    !!getIn(atom, ["content", "images"]) || !!getIn(atom, ["seeks", "images"])
+  );
+}
+
+export function location(atom) {
+  return (
+    !!getIn(atom, ["content", "location"]) ||
+    !!getIn(atom, ["seeks", "location"])
+  );
+}
+
+export function getLocation(atom) {
+  if (location(atom)) {
+    return (
+      getIn(atom, ["content", "location"]) || getIn(atom, ["seeks", "location"])
+    );
+  }
+  return undefined;
+}
+
+/**
+ * Returns the "Default" Image (currently the content branch is checked before seeks) of an atom
+ * if the atom does not have any images we return undefined
+ * @param atom
+ */
+export function getDefaultImage(atom) {
+  if (hasImages(atom)) {
+    const contentImages = getIn(atom, ["content", "images"]);
+
+    if (contentImages) {
+      const defaultImage = contentImages.find(image => get(image, "default"));
+
+      if (defaultImage) {
+        return defaultImage;
+      }
+    }
+
+    const seeksImages = getIn(atom, ["content", "images"]);
+
+    if (seeksImages) {
+      const defaultImage = seeksImages.find(image => get(image, "default"));
+
+      if (defaultImage) {
+        return defaultImage;
+      } else {
+        return seeksImages.first();
+      }
+    } else {
+      return contentImages.first();
+    }
+  }
+  return undefined;
+}
+
+/**
+ * Determines if a given atom is a Inactive
+ * @param atom
+ * @returns {*|boolean}
+ */
+export function isInactive(atom) {
+  return get(atom, "state") && get(atom, "state") === won.WON.InactiveCompacted;
+}
+
+/**
+ * Determines if a given atom is a WhatsAround-Atom
+ * @param atom
+ * @returns {*|boolean}
+ */
+export function isWhatsAroundAtom(atom) {
+  return (
+    getIn(atom, ["content", "flags"]) &&
+    getIn(atom, ["content", "flags"]).contains("won:WhatsAround")
+  );
+}
+
+/**
+ * Determines if a given atom is a DirectResponse-Atom
+ * @param atom
+ * @returns {*|boolean}
+ */
+export function isDirectResponseAtom(atom) {
+  return (
+    getIn(atom, ["content", "flags"]) &&
+    getIn(atom, ["content", "flags"]).contains("won:DirectResponse")
+  );
+}
+
+export function isPersona(atom) {
+  return (
+    getIn(atom, ["content", "type"]) &&
+    getIn(atom, ["content", "type"]).has("won:Persona")
+  );
+}
+
+export function isAtom(atom) {
+  return (
+    getIn(atom, ["content", "type"]) &&
+    getIn(atom, ["content", "type"]).has("won:Atom")
+  );
+}
+
+export function hasChatSocket(atom) {
+  return socket(atom, won.WON.ChatSocketCompacted);
+}
+
+export function hasGroupSocket(atom) {
+  return socket(atom, won.WON.GroupSocketCompacted);
+}
+
+export function hasHoldableSocket(atom) {
+  return socket(atom, won.WON.HoldableSocketCompacted);
+}
+
+export function hasHolderSocket(atom) {
+  return socket(atom, won.WON.HolderSocketCompacted);
+}
+
+export function hasReviewSocket(atom) {
+  return socket(atom, won.WON.ReviewSocketCompacted);
+}
+
+export function socket(atom, socket) {
+  return (
+    getIn(atom, ["content", "sockets"]) &&
+    getIn(atom, ["content", "sockets"]).contains(socket)
+  );
+}
+
+export function hasSuggestedConnections(atom) {
+  return (
+    get(atom, "connections") &&
+    !!get(atom, "connections").find(conn => connectionUtils.isSuggested(conn))
+  );
+}
+
+export function unreadSuggestedConnections(atom) {
+  return (
+    get(atom, "connections") &&
+    !!get(atom, "connections").find(
+      conn => connectionUtils.isSuggested(conn) && get(conn, "unread")
+    )
+  );
+}
+
+/**
+ * Determines if a given atom is a Search-Atom (see draft in create-search.js)
+ * @param atom
+ * @returns {*|boolean}
+ */
+export function isSearchAtom(atom) {
+  return (
+    getIn(atom, ["content", "type"]) &&
+    getIn(atom, ["content", "type"]).has("won:PureSearch")
+  );
+}
+
+/**
+ * Generates an array that contains all atom flags, using a human readable label if available.
+ */
+export function generateFullAtomFlags(atomImm) {
+  const flags = atomImm && atomImm.getIn(["content", "flags"]);
+  const flagsArray =
+    flags &&
+    flags
+      .toArray()
+      // use nicer socket labels if available
+      // TODO: remove this to match RDF state?
+      .map(flag => (labels.flags[flag] ? labels.flags[flag] : flag));
+  return flagsArray;
+}
+
+/**
+ * Generates an array that contains all atom sockets, using a human readable label if available.
+ */
+export function generateFullAtomSockets(atomImm) {
+  const sockets = atomImm && atomImm.getIn(["content", "sockets"]);
+  const socketsArray =
+    sockets &&
+    sockets
+      .toArray()
+      // use nicer socket labels if available
+      // TODO: remove this to match RDF state?
+      .map(
+        socket => (labels.sockets[socket] ? labels.sockets[socket] : socket)
+      );
+  return socketsArray;
+}
+
+/**
+ * Retrieves the Label of the used useCase as an atomType, if no usecase is specified we check if atom is a searchAtom or DirectResponseAtom
+ * @param {*} atomImm the atom as saved in the state
+ */
+export function generateAtomTypeLabel(atomImm) {
+  const useCase = useCaseUtils.getUseCase(getMatchedUseCaseIdentifier(atomImm));
+
+  if (useCase) {
+    return useCase.label;
+  } else {
+    if (isSearchAtom(atomImm)) {
+      return "Search";
+    } else if (isDirectResponseAtom(atomImm)) {
+      return "Direct Response";
+    }
+
+    return "";
+  }
+}
+
+/**
+ * Generates an array that contains some atom sockets, using a human readable label if possible.
+ */
+export function generateShortAtomSockets(atomImm) {
+  const sockets = atomImm && atomImm.get(["content", "sockets"]);
+  const socketsArray =
+    sockets &&
+    sockets
+      .toArray()
+      // rename sockets
+      // TODO: check if this can be used anywhere or whether it should be Group Chat Enabled
+      .map(socket => {
+        if (socket === won.WON.GroupSocketCompacted) {
+          return "Group Chat";
+        } else {
+          return "";
+        }
+      })
+      .filter(socket => socket.length > 0);
+  return socketsArray;
+}
+
+/**
+ * Generates an array that contains some atom flags, using a human readable label if possible.
+ */
+export function generateShortAtomFlags(atomImm) {
+  const flags = atomImm && atomImm.getIn(["content", "flags"]);
+  const flagsArray =
+    flags &&
+    flags
+      .toArray()
+      // rename flags
+      // TODO: flags should have explanatory hovertext
+      .map(flag => {
+        if (flag === won.WON.NoHintForCounterpartCompacted) {
+          return "Invisible";
+        }
+        if (flag === won.WON.NoHintForMeCompacted) {
+          return "Silent";
+        } else {
+          return "";
+        }
+      })
+      .filter(flag => flag.length > 0);
+  return flagsArray;
+}
+
+export function getSocketsWithKeysReset(atomImm) {
+  const sockets = getIn(atomImm, ["content", "sockets"]);
+
+  if (sockets) {
+    return getSocketKeysReset(sockets);
+  }
+  return undefined;
+}
+
+export function getDefaultSocketWithKeyReset(atomImm) {
+  const defaultSocket = getIn(atomImm, ["content", "defaultSocket"]);
+
+  if (defaultSocket) {
+    return getSocketKeysReset(defaultSocket);
+  }
+  return undefined;
+}
+
+export function getSeeksSocketsWithKeysReset(atomImm) {
+  const sockets = getIn(atomImm, ["seeks", "sockets"]);
+
+  if (sockets) {
+    return getSocketKeysReset(sockets);
+  }
+  return undefined;
+}
+
+export function getSeeksDefaultSocketWithKeyReset(atomImm) {
+  const defaultSocket = getIn(atomImm, ["seeks", "defaultSocket"]);
+
+  if (defaultSocket) {
+    return getSocketKeysReset(defaultSocket);
+  }
+  return undefined;
+}
+
+function getSocketKeysReset(socketsImm) {
+  return socketsImm.mapKeys((key, value) => {
+    if (value === "won:ChatSocket") {
+      return "#chatSocket";
+    }
+    if (value === "won:GroupSocket") {
+      return "#groupSocket";
+    }
+    if (value === "won:HolderSocket") {
+      return "#holderSocket";
+    }
+    if (value === "won:HoldableSocket") {
+      return "#holdableSocket";
+    }
+    if (value === "won:ReviewSocket") {
+      return "#reviewSocket";
+    }
+  });
+}

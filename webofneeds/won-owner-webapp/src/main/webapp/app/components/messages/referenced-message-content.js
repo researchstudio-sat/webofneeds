@@ -5,7 +5,7 @@ import won from "../../won-es6.js";
 import { connect2Redux } from "../../won-utils.js";
 import { attach, getIn } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
-import { getOwnedNeedByConnectionUri } from "../../selectors/general-selectors.js";
+import { getOwnedAtomByConnectionUri } from "../../selectors/general-selectors.js";
 import { labels } from "../../won-label-utils.js";
 import { fetchMessage } from "../../won-message-utils.js";
 import { classOnComponentRoot } from "../../cstm-ng-utils.js";
@@ -211,11 +211,11 @@ function genComponentConf() {
       this.labels = labels;
 
       const selectFromState = state => {
-        const ownedNeed =
+        const ownedAtom =
           this.connectionUri &&
-          getOwnedNeedByConnectionUri(state, this.connectionUri);
+          getOwnedAtomByConnectionUri(state, this.connectionUri);
         const connection =
-          ownedNeed && ownedNeed.getIn(["connections", this.connectionUri]);
+          ownedAtom && ownedAtom.getIn(["connections", this.connectionUri]);
         const message =
           connection && this.messageUri
             ? getIn(connection, ["messages", this.messageUri])
@@ -248,7 +248,7 @@ function genComponentConf() {
         const claimUrisSize = claimUris ? claimUris.size : 0;
 
         return {
-          ownedNeedUri: ownedNeed && ownedNeed.get("uri"),
+          ownedAtomUri: ownedAtom && ownedAtom.get("uri"),
           message,
           chatMessages: chatMessages,
           connection,
@@ -315,7 +315,7 @@ function genComponentConf() {
         this.messages__viewState__markExpandReference({
           messageUri: this.messageUri,
           connectionUri: this.connectionUri,
-          needUri: this.ownedNeedUri,
+          atomUri: this.ownedAtomUri,
           isExpanded: !currentExpansionState,
           reference: reference,
         });
@@ -341,12 +341,12 @@ function genComponentConf() {
     }
 
     addMessageToState(eventUri) {
-      const ownedNeedUri = this.ownedNeedUri;
-      return fetchMessage(ownedNeedUri, eventUri).then(response => {
+      const ownedAtomUri = this.ownedAtomUri;
+      return fetchMessage(ownedAtomUri, eventUri).then(response => {
         won.wonMessageFromJsonLd(response).then(msg => {
-          if (msg.isFromOwner() && msg.getReceiverNeed() === ownedNeedUri) {
-            /*if we find out that the receiverneed of the crawled event is actually our
-             need we will call the method again but this time with the correct eventUri
+          if (msg.isFromOwner() && msg.getRecipientAtom() === ownedAtomUri) {
+            /*if we find out that the recipientatom of the crawled event is actually our
+             atom we will call the method again but this time with the correct eventUri
              */
             this.addMessageToState(msg.getRemoteMessageUri());
           } else {

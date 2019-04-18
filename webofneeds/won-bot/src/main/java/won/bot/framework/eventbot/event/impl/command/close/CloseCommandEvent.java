@@ -12,15 +12,15 @@ package won.bot.framework.eventbot.event.impl.command.close;
 
 import java.net.URI;
 
-import won.bot.framework.eventbot.event.BaseNeedAndConnectionSpecificEvent;
+import won.bot.framework.eventbot.event.BaseAtomAndConnectionSpecificEvent;
 import won.bot.framework.eventbot.event.impl.command.MessageCommandEvent;
 import won.protocol.message.WonMessageType;
 import won.protocol.model.Connection;
 
 /**
- * Instructs the bot to close the specified connection behalf of the need.
+ * Instructs the bot to close the specified connection behalf of the atom.
  */
-public class CloseCommandEvent extends BaseNeedAndConnectionSpecificEvent implements MessageCommandEvent {
+public class CloseCommandEvent extends BaseAtomAndConnectionSpecificEvent implements MessageCommandEvent {
     private String closeMessage;
 
     public CloseCommandEvent(Connection con, String closeMessage) {
@@ -32,12 +32,12 @@ public class CloseCommandEvent extends BaseNeedAndConnectionSpecificEvent implem
         this(con, "Hello!");
     }
 
-    public CloseCommandEvent(URI needURI, URI remoteNeedURI, URI connectionURI, String closeMessage) {
-        this(makeConnection(needURI, remoteNeedURI, connectionURI), closeMessage);
+    public CloseCommandEvent(URI atomURI, URI targetAtomURI, URI connectionURI, String closeMessage) {
+        this(makeConnection(atomURI, targetAtomURI, connectionURI), closeMessage);
     }
 
-    public CloseCommandEvent(URI needURI, URI remoteNeedURI, URI connectionURI) {
-        this(needURI, remoteNeedURI, connectionURI, "Hello!");
+    public CloseCommandEvent(URI atomURI, URI targetAtomURI, URI connectionURI) {
+        this(atomURI, targetAtomURI, connectionURI, "Hello!");
     }
 
     @Override

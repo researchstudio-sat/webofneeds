@@ -11,8 +11,8 @@ public class WonNodeInfoBuilder {
     private String wonNodeURI;
     private String eventURIPrefix;
     private String connectionURIPrefix;
-    private String needURIPrefix;
-    private String needListURI;
+    private String atomURIPrefix;
+    private String atomListURI;
     private Map<String, Map<String, String>> supportedProtocolImpl;
 
     public WonNodeInfoBuilder() {
@@ -34,13 +34,13 @@ public class WonNodeInfoBuilder {
         return this;
     }
 
-    public WonNodeInfoBuilder setNeedURIPrefix(final String needURIPrefix) {
-        this.needURIPrefix = needURIPrefix;
+    public WonNodeInfoBuilder setAtomURIPrefix(final String atomURIPrefix) {
+        this.atomURIPrefix = atomURIPrefix;
         return this;
     }
 
-    public WonNodeInfoBuilder setNeedListURI(final String needListURI) {
-        this.needListURI = needListURI;
+    public WonNodeInfoBuilder setAtomListURI(final String atomListURI) {
+        this.atomListURI = atomListURI;
         return this;
     }
 
@@ -55,7 +55,7 @@ public class WonNodeInfoBuilder {
     }
 
     public WonNodeInfo build() {
-        return new WonNodeInfo(wonNodeURI, eventURIPrefix, connectionURIPrefix, needURIPrefix, needListURI,
+        return new WonNodeInfo(wonNodeURI, eventURIPrefix, connectionURIPrefix, atomURIPrefix, atomListURI,
                         supportedProtocolImpl);
     }
 }

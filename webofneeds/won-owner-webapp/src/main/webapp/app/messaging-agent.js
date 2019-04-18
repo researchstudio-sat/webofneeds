@@ -177,7 +177,7 @@ export function runMessagingAgent(redux) {
                      */
           redux.dispatch(
             actionCreators.router__stateGoAbs("connections", {
-              postUri: message.getSenderNeed(),
+              postUri: message.getSenderAtom(),
               connectionUri: message.getSender(),
             })
           );
@@ -207,10 +207,10 @@ export function runMessagingAgent(redux) {
     function(message) {
       if (message.isResponseToActivateMessage()) {
         if (message.isSuccessResponse()) {
-          redux.dispatch(actionCreators.messages__reopenNeed__success(message));
+          redux.dispatch(actionCreators.messages__reopenAtom__success(message));
           return true;
         } else {
-          redux.dispatch(actionCreators.messages__reopenNeed__failure(message));
+          redux.dispatch(actionCreators.messages__reopenAtom__failure(message));
           return true;
         }
       }
@@ -219,18 +219,18 @@ export function runMessagingAgent(redux) {
     function(message) {
       if (message.isResponseToDeactivateMessage()) {
         if (message.isSuccessResponse()) {
-          redux.dispatch(actionCreators.messages__closeNeed__success(message));
+          redux.dispatch(actionCreators.messages__closeAtom__success(message));
           return true;
         } else {
-          redux.dispatch(actionCreators.messages__closeNeed__failure(message));
+          redux.dispatch(actionCreators.messages__closeAtom__failure(message));
           return true;
         }
       }
       return false;
     },
     function(message) {
-      if (message.isFromSystem() && message.isNeedMessage()) {
-        redux.dispatch(actionCreators.messages__needMessageReceived(message));
+      if (message.isFromSystem() && message.isAtomMessage()) {
+        redux.dispatch(actionCreators.messages__atomMessageReceived(message));
         return true;
       }
       return false;
@@ -248,12 +248,12 @@ export function runMessagingAgent(redux) {
     function(message) {
       if (message.isFromSystem() && message.isDeactivateMessage()) {
         //dispatch an action that is suitable for displaying a toast
-        redux.dispatch(actionCreators.needs__closedBySystem(message));
+        redux.dispatch(actionCreators.atoms__closedBySystem(message));
         //adapt the state and GUI
         redux.dispatch({
-          type: actionTypes.needs.close,
+          type: actionTypes.atoms.close,
           payload: {
-            ownedNeedUri: message.getReceiverNeed(),
+            ownedAtomUri: message.getRecipientAtom(),
           },
         });
         return true;
@@ -270,12 +270,12 @@ export function runMessagingAgent(redux) {
       if (message.isResponseToDeleteMessage()) {
         if (message.isSuccessResponse()) {
           redux.dispatch(
-            actionCreators.needs__delete(message.getReceiverNeed())
+            actionCreators.atoms__delete(message.getRecipientAtom())
           );
           /*redux.dispatch({
-            type: actionTypes.needs.delete,
+            type: actionTypes.atoms.delete,
             payload: {
-              ownedNeedUri: message.getReceiverNeed(),
+              ownedAtomUri: message.getRecipientAtom(),
             },
           });*/
           return true;

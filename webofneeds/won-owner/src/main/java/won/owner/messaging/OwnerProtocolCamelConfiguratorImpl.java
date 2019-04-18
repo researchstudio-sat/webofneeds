@@ -34,7 +34,7 @@ import won.protocol.jms.BrokerComponentFactory;
 import won.protocol.jms.OwnerProtocolCamelConfigurator;
 import won.protocol.model.MessagingType;
 import won.protocol.repository.ConnectionRepository;
-import won.protocol.repository.NeedRepository;
+import won.protocol.repository.AtomRepository;
 
 /**
  * User: LEIH-NB Date: 28.01.14
@@ -43,7 +43,7 @@ public class OwnerProtocolCamelConfiguratorImpl implements OwnerProtocolCamelCon
     private CamelContext camelContext;
     private MessagingContext messagingContext;
     @Autowired
-    private NeedRepository needRepository;
+    private AtomRepository atomRepository;
     @Autowired
     private ConnectionRepository connectionRepository;
     @Autowired
@@ -59,7 +59,7 @@ public class OwnerProtocolCamelConfiguratorImpl implements OwnerProtocolCamelCon
     protected OwnerProtocolCamelConfiguratorImpl() {
     }
 
-    // TODO duplicate - see if can be mergerd with needbased - very similar code...
+    // TODO duplicate - see if can be mergerd with atombased - very similar code...
     @Override
     public synchronized final String configureCamelEndpointForNodeURI(URI wonNodeURI, URI brokerURI,
                     String ownerProtocolQueueName) throws CamelConfigurationFailedException {
@@ -81,7 +81,7 @@ public class OwnerProtocolCamelConfiguratorImpl implements OwnerProtocolCamelCon
     @Override
     public synchronized void addRemoteQueueListener(String endpoint, URI remoteEndpoint)
                     throws CamelConfigurationFailedException {
-        // sending and receiving endpoint need to have the same scheme
+        // sending and receiving endpoint atom to have the same scheme
         endpoint = remoteEndpoint.getScheme() + endpoint;
         if (camelContext.hasEndpoint(endpoint) != null) {
             logger.debug("route for listening to remote queue {} already configured", remoteEndpoint);
@@ -121,10 +121,10 @@ public class OwnerProtocolCamelConfiguratorImpl implements OwnerProtocolCamelCon
     }
 
     // todo: the method is activemq specific. refactor it to support other brokers.
-    // TODO some duplicate code between here and NeedBasedCamelConfiguratorImpl
+    // TODO some duplicate code between here and AtomBasedCamelConfiguratorImpl
     // (setup broker name) - i.e.
     // this method can probably be shared and owner's configurator can probably
-    // extend needbased...
+    // extend atombased...
     public synchronized void addCamelComponentForWonNodeBroker(URI brokerURI, String brokerComponentName) {
         if (camelContext.getComponent(brokerComponentName, false) == null) {
             ActiveMQComponent activeMQComponent = (ActiveMQComponent) brokerComponentFactory
@@ -197,7 +197,7 @@ public class OwnerProtocolCamelConfiguratorImpl implements OwnerProtocolCamelCon
         return endpointMap.get(wonNodeUri);
     }
 
-    // TODO: duplicate with needbasedcamelconfigimpl...
+    // TODO: duplicate with atombasedcamelconfigimpl...
     @Override
     public String setupBrokerComponentName(URI brokerUri) {
         return this.componentName + brokerUri.toString().replaceAll("[/:]", "");

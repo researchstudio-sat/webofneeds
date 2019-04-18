@@ -12,7 +12,7 @@ package won.bot.framework.eventbot.action.impl.debugbot;
 
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
-import won.bot.framework.eventbot.event.BaseNeedAndConnectionSpecificEvent;
+import won.bot.framework.eventbot.event.BaseAtomAndConnectionSpecificEvent;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.impl.debugbot.SetChattinessDebugCommandEvent;
 import won.bot.framework.eventbot.listener.EventListener;
@@ -32,8 +32,8 @@ public class PublishSetChattinessEventAction extends BaseEventBotAction {
 
     @Override
     protected void doRun(final Event event, EventListener executingListener) throws Exception {
-        if (event instanceof BaseNeedAndConnectionSpecificEvent) {
-            Connection con = ((BaseNeedAndConnectionSpecificEvent) event).getCon();
+        if (event instanceof BaseAtomAndConnectionSpecificEvent) {
+            Connection con = ((BaseAtomAndConnectionSpecificEvent) event).getCon();
             getEventListenerContext().getEventBus().publish(new SetChattinessDebugCommandEvent(con, isChatty));
         }
     }

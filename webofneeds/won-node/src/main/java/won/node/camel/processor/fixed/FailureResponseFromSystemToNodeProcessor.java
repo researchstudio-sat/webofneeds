@@ -29,15 +29,15 @@ import won.protocol.vocabulary.WONMSG;
  * side.
  */
 @Component
-@FixedMessageProcessor(direction = WONMSG.TYPE_FROM_SYSTEM_STRING, messageType = WONMSG.TYPE_FAILURE_RESPONSE_STRING)
+@FixedMessageProcessor(direction = WONMSG.FromSystemString, messageType = WONMSG.FailureResponseString)
 public class FailureResponseFromSystemToNodeProcessor extends AbstractCamelProcessor {
     @Override
     public void process(Exchange exchange) throws Exception {
         WonMessage wonMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
         // prepare the message to pass to the remote node
-        URI remoteMessageUri = wonNodeInformationService.generateEventURI(wonMessage.getReceiverNodeURI());
+        URI remoteMessageUri = wonNodeInformationService.generateEventURI(wonMessage.getRecipientNodeURI());
         // add the information about the corresponding message to the local one
-        wonMessage.addMessageProperty(WONMSG.HAS_CORRESPONDING_REMOTE_MESSAGE, remoteMessageUri);
+        wonMessage.addMessageProperty(WONMSG.correspondingRemoteMessage, remoteMessageUri);
         // the persister will pick it up later
         // put the factory into the outbound message factory header. It will be used to
         // generate the outbound message

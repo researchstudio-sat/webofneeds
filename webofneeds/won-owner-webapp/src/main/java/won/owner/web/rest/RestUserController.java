@@ -49,7 +49,7 @@ import won.owner.model.EmailVerificationToken;
 import won.owner.model.KeyStoreIOException;
 import won.owner.model.TokenPurpose;
 import won.owner.model.User;
-import won.owner.model.UserNeed;
+import won.owner.model.UserAtom;
 import won.owner.pojo.AnonymousLinkPojo;
 import won.owner.pojo.ChangePasswordPojo;
 import won.owner.pojo.ResetPasswordPojo;
@@ -59,7 +59,7 @@ import won.owner.pojo.UserPojo;
 import won.owner.pojo.UserSettingsPojo;
 import won.owner.pojo.UsernamePojo;
 import won.owner.pojo.VerificationTokenPojo;
-import won.owner.repository.UserNeedRepository;
+import won.owner.repository.UserAtomRepository;
 import won.owner.service.impl.IncorrectPasswordException;
 import won.owner.service.impl.KeystoreEnabledPersistentRememberMeServices;
 import won.owner.service.impl.KeystoreEnabledUserDetails;
@@ -87,7 +87,7 @@ public class RestUserController {
     private UserRegisterValidator userRegisterValidator;
     private PasswordChangeValidator passwordChangeValidator;
     private ResetPasswordValidator resetPasswordValidator;
-    private UserNeedRepository userNeedRepository;
+    private UserAtomRepository userAtomRepository;
     @Autowired
     private UserService userService;
     @Autowired
@@ -106,13 +106,13 @@ public class RestUserController {
                     final SecurityContextRepository securityContextRepository,
                     final UserRegisterValidator userRegisterValidator,
                     final PasswordChangeValidator passwordChangeValidator,
-                    final ResetPasswordValidator resetPasswordValidator, final UserNeedRepository userNeedRepository) {
+                    final ResetPasswordValidator resetPasswordValidator, final UserAtomRepository userAtomRepository) {
         this.authenticationManager = authenticationManager;
         this.securityContextRepository = securityContextRepository;
         this.userRegisterValidator = userRegisterValidator;
         this.passwordChangeValidator = passwordChangeValidator;
         this.resetPasswordValidator = resetPasswordValidator;
-        this.userNeedRepository = userNeedRepository;
+        this.userAtomRepository = userAtomRepository;
     }
 
     /**
@@ -267,7 +267,7 @@ public class RestUserController {
                     WebRequest request) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         // cannot use user object from context since hw doesn't know about created in
-        // this session need,
+        // this session atom,
         // therefore, we have to retrieve the user object from the user repository
         User user = userService.getByUsername(username);
         if (user == null && !transferUserPojo.getPrivateUsername().equals(user.getUsername())) {
@@ -314,24 +314,24 @@ public class RestUserController {
     public UserSettingsPojo getUserSettings(@RequestParam("uri") String uri) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         // cannot use user object from context since hw doesn't know about created in
-        // this session need,
+        // this session atom,
         // therefore, we have to retrieve the user object from the user repository
         User user = userService.getByUsername(username);
         UserSettingsPojo userSettingsPojo = new UserSettingsPojo(user.getUsername(), user.getEmail());
-        URI needUri = null;
+        URI atomUri = null;
         try {
-            needUri = new URI(uri);
-            userSettingsPojo.setNeedUri(uri);
-            for (UserNeed userNeed : user.getUserNeeds()) {
-                if (userNeed.getUri().equals(needUri)) {
-                    userSettingsPojo.setNotify(userNeed.isMatches(), userNeed.isRequests(), userNeed.isConversations());
+            atomUri = new URI(uri);
+            userSettingsPojo.setAtomUri(uri);
+            for (UserAtom userAtom : user.getUserAtoms()) {
+                if (userAtom.getUri().equals(atomUri)) {
+                    userSettingsPojo.setNotify(userAtom.isMatches(), userAtom.isRequests(), userAtom.isConversations());
                     // userSettingsPojo.setEmail(user.getEmail());
                     break;
                 }
             }
         } catch (URISyntaxException e) {
             // TODO error response
-            logger.warn(uri + " need uri problem", e);
+            logger.warn(uri + " atom uri problem", e);
         }
         return userSettingsPojo;
     }
@@ -343,7 +343,7 @@ public class RestUserController {
     public ResponseEntity setUserSettings(@RequestBody UserSettingsPojo userSettingsPojo) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         // cannot use user object from context since hw doesn't know about created in
-        // this session need,
+        // this session atom,
         // therefore, we have to retrieve the user object from the user repository
         User user = userService.getByUsername(username);
         if (!user.getUsername().equals(userSettingsPojo.getUsername())) {
@@ -361,22 +361,22 @@ public class RestUserController {
             userService.save(user);
             logger.info("change email requested - email changed");
         }
-        // retrieve UserNeed
-        URI needUri = null;
+        // retrieve UserAtom
+        URI atomUri = null;
         try {
-            needUri = new URI(userSettingsPojo.getNeedUri());
-            for (UserNeed userNeed : user.getUserNeeds()) {
-                if (userNeed.getUri().equals(needUri)) {
-                    userNeed.setMatches(userSettingsPojo.isNotifyMatches());
-                    userNeed.setRequests(userSettingsPojo.isNotifyRequests());
-                    userNeed.setConversations(userSettingsPojo.isNotifyConversations());
-                    userNeedRepository.save(userNeed);
+            atomUri = new URI(userSettingsPojo.getAtomUri());
+            for (UserAtom userAtom : user.getUserAtoms()) {
+                if (userAtom.getUri().equals(atomUri)) {
+                    userAtom.setMatches(userSettingsPojo.isNotifyMatches());
+                    userAtom.setRequests(userSettingsPojo.isNotifyRequests());
+                    userAtom.setConversations(userSettingsPojo.isNotifyConversations());
+                    userAtomRepository.save(userAtom);
                     break;
                 }
             }
         } catch (URISyntaxException e) {
-            logger.warn(userSettingsPojo.getNeedUri() + " need uri problem.", e);
-            return new ResponseEntity("\"" + userSettingsPojo.getNeedUri() + " need uri problem.\"",
+            logger.warn(userSettingsPojo.getAtomUri() + " atom uri problem.", e);
+            return new ResponseEntity("\"" + userSettingsPojo.getAtomUri() + " atom uri problem.\"",
                             HttpStatus.BAD_REQUEST);
         }
         return generateStatusResponse(RestStatusResponse.SETTINGS_CREATED);
@@ -527,7 +527,7 @@ public class RestUserController {
     public ResponseEntity acceptTermsOfService() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         // cannot use user object from context since hw doesn't know about created in
-        // this session need,
+        // this session atom,
         // therefore, we have to retrieve the user object from the user repository
         User user = userService.getByUsername(username);
         if (user == null) {

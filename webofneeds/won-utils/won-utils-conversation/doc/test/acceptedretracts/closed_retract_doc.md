@@ -12,7 +12,7 @@
 ```
 <https://localhost:8443/won/resource/event/4055709708568209400#content> {
     event:4055709708568209400
-            won:hasTextMessage  "two" ;
+            won:textMessage  "two" ;
             mod:retracts event:6149800720990867000 .
 }
 
@@ -46,12 +46,12 @@
 
 <https://localhost:8443/won/resource/event/cbcccoqqqbec6bxkl3y3#content-3j4j> {
      event:cbcccoqqqbec6bxkl3y3
-            won:hasTextMessage  "You are connected to the debug bot. You can issue commands that will cause interactions with your need." .
+            won:textMessage  "You are connected to the debug bot. You can issue commands that will cause interactions with your atom." .
  }
 
 <https://localhost:8443/won/resource/event/m8b6jvgclclzy48p7wqd#content-9icc> {
      event:m8b6jvgclclzy48p7wqd
-            won:hasTextMessage  "    'hint':        create a new need and send hint to it" ;
+            won:textMessage  "    'hint':        create a new atom and send hint to it" ;
             mod:retracts event:cbcccoqqqbec6bxkl3y3 .  
 ```
 
@@ -71,12 +71,12 @@ event:m8b6jvgclclzy48p7wqd  mod:retracts event:cbcccoqqqbec6bxkl3y3 .
 ```
  <https://localhost:8443/won/resource/event/8h7v5ml1aflqmoyem61a#content-7rw4> {
      event:8h7v5ml1aflqmoyem61a
-            won:hasTextMessage  "Usage:" .
+            won:textMessage  "Usage:" .
  }
 
  <https://localhost:8443/won/resource/event/m8b6jvgclclzy48p7wqd#content-9icc> {
      event:m8b6jvgclclzy48p7wqd
-             won:hasTextMessage  "    'hint':        create a new need and send hint to it" ;
+             won:textMessage  "    'hint':        create a new atom and send hint to it" ;
            mod:retracts event:8h7v5ml1aflqmoyem61a .
            
  }
@@ -98,18 +98,18 @@ event:m8b6jvgclclzy48p7wqd   mod:retracts event:8h7v5ml1aflqmoyem61a .
 ```
  <https://localhost:8443/won/resource/event/cbcccoqqqbec6bxkl3y3#content-3j4j> {
     event:cbcccoqqqbec6bxkl3y3
-             won:hasTextMessage  "You are connected to the debug bot. You can issue commands that will cause interactions with your need." .
+             won:textMessage  "You are connected to the debug bot. You can issue commands that will cause interactions with your atom." .
  }
 
  <https://localhost:8443/won/resource/event/orj8iruy8pcer6zzxlra#content-wi31> {
      event:orj8iruy8pcer6zzxlra
-             won:hasTextMessage  "    'close':       close the current connection" ;
+             won:textMessage  "    'close':       close the current connection" ;
              mod:retracts event:m8b6jvgclclzy48p7wqd .
  }
 
  <https://localhost:8443/won/resource/event/m8b6jvgclclzy48p7wqd#content-9icc> {
      event:m8b6jvgclclzy48p7wqd
-             won:hasTextMessage  "    'hint':        create a new need and send hint to it" ;
+             won:textMessage  "    'hint':        create a new atom and send hint to it" ;
            mod:retracts event:cbcccoqqqbec6bxkl3y3 .
  }   
 ```
@@ -137,13 +137,13 @@ event:m8b6jvgclclzy48p7wqd mod:retracts event:cbcccoqqqbec6bxkl3y3 .
 
 <https://localhost:8443/won/resource/event/gv6zk2yqk6o8bl574n36#content-paqe> {
     event:gv6zk2yqk6o8bl574n36
-            won:hasTextMessage  "Greetings! \nI am the DebugBot. I can simulate multiple other users so you can test things. I understand a few commands. \nTo see which ones, type \n\n'usage'\n\n (without the quotes)." .
+            won:textMessage  "Greetings! \nI am the DebugBot. I can simulate multiple other users so you can test things. I understand a few commands. \nTo see which ones, type \n\n'usage'\n\n (without the quotes)." .
 }
 
 <https://localhost:8443/won/resource/event/4846251213444807000#envelope-tsng> {
     event:4846251213444807000
             a                         msg:FromOwner ;
-            msg:hasCorrespondingRemoteMessage
+            msg:correspondingRemoteMessage
                     event:5s66o8cqv4rxv74xfepg ;
 ```
 
@@ -160,23 +160,23 @@ event:m8b6jvgclclzy48p7wqd mod:retracts event:cbcccoqqqbec6bxkl3y3 .
 ```
 <https://localhost:8443/won/resource/event/8h7v5ml1aflqmoyem61a#content-7rw4> {
     event:8h7v5ml1aflqmoyem61a
-            won:hasTextMessage  "Usage:" ;
+            won:textMessage  "Usage:" ;
             mod:retracts event:6149800720990867000 .
 }
 
 <https://localhost:8443/won/resource/event/yrizizmtaxehctdi1m1n#envelope-8gf6> {
     event:yrizizmtaxehctdi1m1n
             a                     msg:FromExternal ;
-            msg:hasCorrespondingRemoteMessage
+            msg:correspondingRemoteMessage
                     event:8h7v5ml1aflqmoyem61a ;
-            msg:hasSentTimestamp  1513170817983 ;
+            msg:sentTimestamp  1513170817983 ;
             msg:protocolVersion   "1.0" .
 
 <https://localhost:8443/won/resource/event/6149800720990867000#content> {
     event:6149800720990867000
-            won:hasFacet        won:OwnerFacet ;
-            won:hasRemoteFacet  won:OwnerFacet ;
-            won:hasTextMessage  "Hello, debugbot!" .
+            won:socket        won:OwnerSocket ;
+            won:targetSocket  won:OwnerSocket ;
+            won:textMessage  "Hello, debugbot!" .
 }
 ```
 
@@ -192,13 +192,13 @@ event:m8b6jvgclclzy48p7wqd mod:retracts event:cbcccoqqqbec6bxkl3y3 .
 ```
 <https://localhost:8443/won/resource/event/8h7v5ml1aflqmoyem61a#content-7rw4> {
     event:8h7v5ml1aflqmoyem61a
-            won:hasTextMessage  "Usage:" ;
+            won:textMessage  "Usage:" ;
             mod:retracts event:m8b6jvgclclzy48p7wqd .
 }
 
 <https://localhost:8443/won/resource/event/m8b6jvgclclzy48p7wqd#content-9icc> {
     event:m8b6jvgclclzy48p7wqd
-            won:hasTextMessage  "    'hint':        create a new need and send hint to it" .
+            won:textMessage  "    'hint':        create a new atom and send hint to it" .
 }
 ```
 
@@ -214,7 +214,7 @@ event:m8b6jvgclclzy48p7wqd mod:retracts event:cbcccoqqqbec6bxkl3y3 .
 ```
 <https://localhost:8443/won/resource/event/8h7v5ml1aflqmoyem61a#content-7rw4> {
     event:8h7v5ml1aflqmoyem61a
-            won:hasTextMessage  "Usage:" ;
+            won:textMessage  "Usage:" ;
             mod:retracts event:8h7v5ml1aflqmoyem61a .
 }
 ```
@@ -231,13 +231,13 @@ event:m8b6jvgclclzy48p7wqd mod:retracts event:cbcccoqqqbec6bxkl3y3 .
 ```
 <https://localhost:8443/won/resource/event/4846251213444807000#content> {
     event:4846251213444807000
-            won:hasTextMessage  "one" ;
+            won:textMessage  "one" ;
             mod:retracts event:8h7v5ml1aflqmoyem61a .
 }
 
 <https://localhost:8443/won/resource/event/8h7v5ml1aflqmoyem61a#content-7rw4> {
     event:8h7v5ml1aflqmoyem61a
-            won:hasTextMessage  "Usage:" .
+            won:textMessage  "Usage:" .
 }
 ```
 
@@ -253,13 +253,13 @@ event:m8b6jvgclclzy48p7wqd mod:retracts event:cbcccoqqqbec6bxkl3y3 .
 ```
 <https://localhost:8443/won/resource/event/4846251213444807000#content> {
     event:4846251213444807000
-            won:hasTextMessage  "one" ;
+            won:textMessage  "one" ;
             mod:retracts event:4055709708568209400 .
 }
 
 <https://localhost:8443/won/resource/event/4055709708568209400#content> {
     event:4055709708568209400
-            won:hasTextMessage  "two" .
+            won:textMessage  "two" .
 }
 ```
 
@@ -275,7 +275,7 @@ event:m8b6jvgclclzy48p7wqd mod:retracts event:cbcccoqqqbec6bxkl3y3 .
 ```
 <https://localhost:8443/won/resource/event/4055709708568209400#content> {
     event:4055709708568209400
-            won:hasTextMessage  "two" ;
+            won:textMessage  "two" ;
             mod:retracts event:4055709708568209400 .
 }
 ```

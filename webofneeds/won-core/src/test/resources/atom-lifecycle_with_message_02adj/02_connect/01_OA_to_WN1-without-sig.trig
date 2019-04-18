@@ -1,0 +1,39 @@
+##################################################################
+#       CONNECT - MESSAGE FROM OWNER APPLICATION TO WON NODE     #
+##################################################################
+
+@prefix :       <http://www.example.com/resource/atom/randomAtomID_1> .
+@prefix remote: <http://www.remote-example.com/resource/atom/randomAtomID_2> .
+@prefix webID:  <http://www.example.com/webids/> .
+
+@prefix won:    <https://w3id.org/won/core#> .
+@prefix crypt:  <https://w3id.org/won/cryptography#> .
+@prefix msg:    <https://w3id.org/won/message#> .
+
+@prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix tio:    <http://purl.org/tio/ns#> .
+@prefix gr:     <http://purl.org/goodrelations/v1#> .
+
+
+
+############# MESSAGE HEADER ##############
+<http://www.example.com/resource/atom/randomAtomID_1/connection/randomConnectionID_1_1/event/0#data> rdf:type
+msg:EnvelopeGraph .
+
+############# Message Event ##############
+
+#GRAPH
+<http://www.example.com/resource/atom/randomAtomID_1/connection/randomConnectionID_1_1/event/0#data> {
+
+  <http://www.example.com/resource/atom/randomAtomID_1/connection/randomConnectionID_1_1/event/0>
+    a msg:ConnectMessage ;
+
+    msg:sender <http://www.example.com/resource/atom/randomAtomID_1/connection/randomConnectionID_1_1> ;
+    msg:senderAtom <http://www.example.com/resource/atom/randomAtomID_1> ;
+    msg:senderNode <http://www.example.com>;
+    msg:receiver <http://www.remote-example.com/resource/atom/randomAtomID_2/sockets#owner> ;
+    msg:recipientAtom <http://www.remote-example.com/resource/atom/randomAtomID_2> ;
+    msg:recipientNode <http://www.remote-example.com> .
+
+}
+

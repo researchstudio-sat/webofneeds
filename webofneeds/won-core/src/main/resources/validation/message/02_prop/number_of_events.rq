@@ -3,13 +3,13 @@ prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
 prefix geo:   <http://www.w3.org/2003/01/geo/wgs84_pos#>
 prefix conn:  <http://localhost:8080/won/resource/connection/>
 prefix event: <http://localhost:8080/won/resource/event/>
-prefix woncrypt: <http://purl.org/webofneeds/woncrypt#>
+prefix woncrypt: <https://w3id.org/won/core#>
 prefix xsd:   <http://www.w3.org/2001/XMLSchema#>
 prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 prefix rdfg:   <http://www.w3.org/2004/03/trix/rdfg-1/>
 prefix local: <http://localhost:8080/won/resource/>
-prefix won:   <http://purl.org/webofneeds/model#>
-prefix msg:   <http://purl.org/webofneeds/message#>
+prefix won:   <https://w3id.org/won/core#>
+prefix msg:   <https://w3id.org/won/message#>
 prefix signature: <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#>
 prefix ldp:   <http://www.w3.org/ns/ldp#>
 
@@ -17,7 +17,7 @@ prefix ldp:   <http://www.w3.org/ns/ldp#>
 #there should be only 1 or 2 message events
 #if there are more than 1 events, one of them should be specified in the second one
 #as remoteEvent event
-#if there is a remote event - only it should have msgType/receiverNodeOrNeed/senderNodeOrNeed specified
+#if there is a remote event - only it should have msgType/recipientNodeOrAtom/senderNodeOrAtom specified
 
 #ASK
 #{
@@ -56,7 +56,7 @@ prefix ldp:   <http://www.w3.org/ns/ldp#>
           GRAPH ?envelope
           {
             ?envelope rdf:type msg:EnvelopeGraph .
-            ?event msg:hasMessageType ?type .
+            ?event msg:messageType ?type .
           } .
         }
       }
@@ -68,13 +68,13 @@ prefix ldp:   <http://www.w3.org/ns/ldp#>
           GRAPH ?envelope
           {
             ?envelope rdf:type msg:EnvelopeGraph .
-            ?event msg:hasCorrespondingRemoteMessage ?revent .
+            ?event msg:correspondingRemoteMessage ?revent .
           } .
           GRAPH ?renvelope
           {
             ?renvelope rdf:type msg:EnvelopeGraph .
-            ?revent msg:hasReceiverNeed|msg:hasSenderNeed|msg:hasReceiverNode|msg:hasSenderNode ?uri .
-            ?revent msg:hasMessageType ?type .
+            ?revent msg:recipientAtom|msg:senderAtom|msg:recipientNode|msg:senderNode ?uri .
+            ?revent msg:messageType ?type .
             ?renvelope rdfg:subGraphOf ?revent .
           } .
         }
@@ -87,7 +87,7 @@ prefix ldp:   <http://www.w3.org/ns/ldp#>
           GRAPH ?envelope
           {
             ?envelope rdf:type msg:EnvelopeGraph .
-            ?event msg:hasForwardedMessage ?revent .
+            ?event msg:forwardedMessage ?revent .
           } .
           GRAPH ?renvelope
           {

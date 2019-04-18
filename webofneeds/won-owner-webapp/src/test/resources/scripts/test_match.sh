@@ -1,6 +1,6 @@
 #!/bin/bash
-# creates two users with one need each. 
-# the needs are expected to be matched by an external matching system 
+# creates two users with one atom each. 
+# the atoms are expected to be matched by an external matching system 
 . data.sh
 . rest-lib.sh
 
@@ -13,36 +13,36 @@ createUser $USER1 $PASSWORD1 $PASSWORD1 $SERVER
 	assertHttpStatusCodeEquals 201
 signIn $USER1 $PASSWORD1 $SERVER 200
 	assertHttpStatusCodeEquals 200
-createNeed $USER1 $SERVER "$JSON_NEED_DEMAND_A" 201
+createAtom $USER1 $SERVER "$JSON_ATOM_DEMAND_A" 201
 	assertHttpStatusCodeEquals 201
-	USER1NeedId1=`extractValueFromResponseJson "needId"`
-	USER1NeedUri1=`extractValueFromResponseJson "needURI"`
-	echo " --> Created need ${USER1NeedId1} for user ${USER1}"
+	USER1AtomId1=`extractValueFromResponseJson "atomId"`
+	USER1AtomUri1=`extractValueFromResponseJson "atomURI"`
+	echo " --> Created atom ${USER1AtomId1} for user ${USER1}"
 	
 createUser $USER2 $PASSWORD2 $PASSWORD2 $SERVER
 	assertHttpStatusCodeEquals 201
 signIn $USER2 $PASSWORD2 $SERVER 200
 	assertHttpStatusCodeEquals 200
-createNeed $USER2 $SERVER "$JSON_NEED_SUPPLY_A" 201
+createAtom $USER2 $SERVER "$JSON_ATOM_SUPPLY_A" 201
 	assertHttpStatusCodeEquals 201
-	USER2NeedId1=`extractValueFromResponseJson "needId"`
-	USER2NeedUri1=`extractValueFromResponseJson "needURI"`
-	echo " --> Created need ${USER2NeedId1} for user ${USER2}"
+	USER2AtomId1=`extractValueFromResponseJson "atomId"`
+	USER2AtomUri1=`extractValueFromResponseJson "atomURI"`
+	echo " --> Created atom ${USER2AtomId1} for user ${USER2}"
 
 
-listMatches $USER1 $SERVER $USER2NeedId1	
+listMatches $USER1 $SERVER $USER2AtomId1	
 	assertHttpStatusCodeEquals 403
-listMatches $USER2 $SERVER $USER1NeedId1	
+listMatches $USER2 $SERVER $USER1AtomId1	
 	assertHttpStatusCodeEquals 403
 sleep 5
-listMatches $USER1 $SERVER $USER1NeedId1	
+listMatches $USER1 $SERVER $USER1AtomId1	
 	assertHttpStatusCodeEquals 200
-	USER1RemoteNeedUri1=`extractValueFromResponseJson "remoteNeedURI"`
-	echo " --> Received hint on ${USER1NeedId1} for user ${USER1} to remote need ${USER1RemoteNeedUri1}"
-listMatches $USER2 $SERVER $USER2NeedId1	
+	USER1TargetAtomUri1=`extractValueFromResponseJson "targetAtomURI"`
+	echo " --> Received hint on ${USER1AtomId1} for user ${USER1} to remote atom ${USER1TargetAtomUri1}"
+listMatches $USER2 $SERVER $USER2AtomId1	
 	assertHttpStatusCodeEquals 200
-	USER2RemoteNeedUri1=`extractValueFromResponseJson "remoteNeedURI"`
-	echo " --> Received hint on ${USER2NeedId1} for user ${USER2} to remote need ${USER2RemoteNeedUri1}"
+	USER2TargetAtomUri1=`extractValueFromResponseJson "targetAtomURI"`
+	echo " --> Received hint on ${USER2AtomId1} for user ${USER2} to remote atom ${USER2TargetAtomUri1}"
 	
 deleteCookies $USER1
 deleteCookies $USER2

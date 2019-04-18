@@ -1,4 +1,4 @@
-PREFIX won: <http://purl.org/webofneeds/model#>
+PREFIX won: <https://w3id.org/won/core#>
 PREFIX s: <http://schema.org/>
 PREFIX dct: <http://purl.org/dc/terms/>
 SELECT ?result ?score WHERE {
@@ -9,7 +9,7 @@ SELECT ?result ?score WHERE {
        + MINUTES(?created) * 60
        + SECONDS(?created)
         as ?score)
-  ?result <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> won:Need.
-  ?result won:isInState  won:Active .
+  ?result <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> won:Atom.
+  ?result won:atomState  won:Active .
   ?result dct:created ?created.
 }

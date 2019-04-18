@@ -1,7 +1,7 @@
-@prefix msg:   <http://purl.org/webofneeds/message#> .
+@prefix msg:   <https://w3id.org/won/message#> .
 @prefix conn:  <https://satvm05.researchstudio.at/won/resource/connection/> .
-@prefix need:  <https://satvm05.researchstudio.at/won/resource/need/> .
-@prefix woncrypt: <http://purl.org/webofneeds/woncrypt#> .
+@prefix atom:  <https://satvm05.researchstudio.at/won/resource/atom/> .
+@prefix woncrypt: <https://w3id.org/won/core#> .
 @prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
 @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix cert:  <http://www.w3.org/ns/auth/cert#> .
@@ -11,7 +11,7 @@
 @prefix s:     <http://schema.org/> .
 @prefix sh:    <http://www.w3.org/ns/shacl#> .
 @prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-@prefix won:   <http://purl.org/webofneeds/model#> .
+@prefix won:   <https://w3id.org/won/core#> .
 @prefix ldp:   <http://www.w3.org/ns/ldp#> .
 @prefix event: <https://satvm05.researchstudio.at/won/resource/event/> .
 @prefix dc:    <http://purl.org/dc/elements/1.1/> .
@@ -22,25 +22,25 @@
 <https://satvm05.researchstudio.at/won/resource/event/7684802668741646000#envelope-sig> {
     <https://satvm05.researchstudio.at/won/resource/event/7684802668741646000#envelope-sig>
             a                               sig:Signature ;
-            sig:hasSignatureValue           "MGQCMAzda/lBqGSJooCjNlbh1T1/HNUJkAenddz7RiPjuVux/Axidt7iTD5sC+oZMYUgOQIwfp6qafpB1TiX9CO3WzPCXvVWir+EoCpZRIPhHV6lghk9u2LmP4bY3cwfIyWx3H2D" ;
-            sig:hasVerificationCertificate  need:1196850096998977500 ;
-            msg:hasHash                     "VtB15TtDYg102taFc5PYGL6y/1OEsk1RgPJBxvOJp1DAPme0QbuVikuLvOB16jlxnwpvRgurtUwtAdFuxlcRKFyE3AzAV5/7+Rs4N8qWwbkmZdUf+rhW+MAj2v+dQ/NCizSAZA48ZYbX9pCBn45MDIkKMUMHJ+ghAP7wuxgrspQ=" ;
-            msg:hasPublicKeyFingerprint     "l/HpKKFqtQrTvP75OOuOGJlypz5fucujvPCZuQk2BzE=" ;
-            msg:hasSignedGraph              <https://satvm05.researchstudio.at/won/resource/event/7684802668741646000#envelope> .
+            sig:signatureValue           "MGQCMAzda/lBqGSJooCjNlbh1T1/HNUJkAenddz7RiPjuVux/Axidt7iTD5sC+oZMYUgOQIwfp6qafpB1TiX9CO3WzPCXvVWir+EoCpZRIPhHV6lghk9u2LmP4bY3cwfIyWx3H2D" ;
+            sig:hasVerificationCertificate  atom:1196850096998977500 ;
+            msg:hash                     "VtB15TtDYg102taFc5PYGL6y/1OEsk1RgPJBxvOJp1DAPme0QbuVikuLvOB16jlxnwpvRgurtUwtAdFuxlcRKFyE3AzAV5/7+Rs4N8qWwbkmZdUf+rhW+MAj2v+dQ/NCizSAZA48ZYbX9pCBn45MDIkKMUMHJ+ghAP7wuxgrspQ=" ;
+            msg:publicKeyFingerprint     "l/HpKKFqtQrTvP75OOuOGJlypz5fucujvPCZuQk2BzE=" ;
+            msg:signedGraph              <https://satvm05.researchstudio.at/won/resource/event/7684802668741646000#envelope> .
 }
 
-<https://satvm05.researchstudio.at/won/resource/event/7684802668741646000#need> {
-    need:1196850096998977500
-            a             won:Need ;
-            won:hasFacet  won:ChatFacet ;
+<https://satvm05.researchstudio.at/won/resource/event/7684802668741646000#atom> {
+    atom:1196850096998977500
+            a             won:Atom ;
+            won:socket  won:ChatSocket ;
             won:seeks     [ dc:title         "Taxi" ;
                             s:location  [ a                   s:Place ;
-                                               won:hasBoundingBox  [
-                                                                    won:hasNorthWestCorner  [ a            s:GeoCoordinates ;
+                                               won:boundingBox  [
+                                                                    won:northWestCorner  [ a            s:GeoCoordinates ;
                                                                                                s:latitude   "48.218727" ;
                                                                                                s:longitude  "16.360141"
                                                                                              ] ;
-                                                                    won:hasSouthEastCorner  [ a            s:GeoCoordinates ;
+                                                                    won:southEastCorner  [ a            s:GeoCoordinates ;
                                                                                                s:latitude   "48.218828" ;
                                                                                                s:longitude  "16.360241"
                                                                                              ]
@@ -60,19 +60,19 @@
                                             ] ] .
 }
 
-<https://satvm05.researchstudio.at/won/resource/need/1196850096998977500#sysinfo> {
-    need:1196850096998977500
-            a                      won:Need ;
+<https://satvm05.researchstudio.at/won/resource/atom/1196850096998977500#sysinfo> {
+    atom:1196850096998977500
+            a                      won:Atom ;
             <http://purl.org/dc/terms/created>
                     "2018-02-06T09:58:28.707Z"^^xsd:dateTime ;
             <http://purl.org/dc/terms/modified>
                     "2018-02-06T09:58:28.715Z"^^xsd:dateTime ;
-            won:hasConnections     <https://satvm05.researchstudio.at/won/resource/need/1196850096998977500/connections> ;
-            won:hasEventContainer  <https://satvm05.researchstudio.at/won/resource/need/1196850096998977500#events> ;
-            won:hasWonNode         <https://satvm05.researchstudio.at/won/resource> ;
-            won:isInState          won:Active .
+            won:connections     <https://satvm05.researchstudio.at/won/resource/atom/1196850096998977500/connections> ;
+            won:messageContainer  <https://satvm05.researchstudio.at/won/resource/atom/1196850096998977500#events> ;
+            won:wonNode         <https://satvm05.researchstudio.at/won/resource> ;
+            won:atomState          won:Active .
 
-    <https://satvm05.researchstudio.at/won/resource/need/1196850096998977500#events>
-            a            won:EventContainer ;
+    <https://satvm05.researchstudio.at/won/resource/atom/1196850096998977500#events>
+            a            won:MessageContainer ;
             rdfs:member  event:7684802668741646000 , event:52gobium7bjl5h0yorb0 .
 }

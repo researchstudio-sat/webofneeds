@@ -7,7 +7,7 @@ import Immutable from "immutable";
 import { attach, getIn, get } from "../utils.js";
 import { labels } from "../won-label-utils.js";
 import { connect2Redux } from "../won-utils.js";
-import * as needUtils from "../need-utils.js";
+import * as atomUtils from "../atom-utils.js";
 import * as viewUtils from "../view-utils.js";
 import * as processUtils from "../process-utils.js";
 import * as connectionSelectors from "../selectors/connection-selectors.js";
@@ -47,17 +47,17 @@ function genComponentConf() {
               <span class="post-menu__item__rating" ng-if="self.personaAggregateRatingString">(★ {{ self.personaAggregateRatingString }})</span>
             </div>
             <div class="post-menu__item"
-              ng-if="self.hasGroupFacet && !self.isOwned"
+              ng-if="self.hasGroupSocket && !self.isOwned"
               ng-click="self.selectTab('PARTICIPANTS')"
               ng-class="{
                 'post-menu__item--selected': self.isSelectedTab('PARTICIPANTS'),
-                'post-menu__item--inactive': !self.hasGroupMembers,
+                'post-menu__item--inactive': !self.groupMembers,
               }">
               <span class="post-menu__item__label">Group Members</span>
               <span class="post-menu__item__count">({{self.groupMembersSize}})</span>
             </div>
             <div class="post-menu__item"
-              ng-if="self.hasGroupFacet && self.isOwned"
+              ng-if="self.hasGroupSocket && self.isOwned"
               ng-click="self.selectTab('PARTICIPANTS')"
               ng-class="{
                 'post-menu__item--unread': self.hasUnreadGroupChatRequests,
@@ -68,7 +68,7 @@ function genComponentConf() {
               <span class="post-menu__item__count" ng-if="self.connectedGroupChatConnectionsSize">({{self.connectedGroupChatConnectionsSize}})</span>
             </div>
             <div class="post-menu__item"
-              ng-if="self.isOwned && self.hasChatFacet"
+              ng-if="self.isOwned && self.hasChatSocket"
               ng-click="self.selectTab('SUGGESTIONS')"
               ng-class="{
                 'post-menu__item--selected': self.isSelectedTab('SUGGESTIONS'),
@@ -80,7 +80,7 @@ function genComponentConf() {
               <span class="post-menu__item__count">({{self.suggestionsSize}})</span>
             </div>
             <div class="post-menu__item"
-              ng-if="self.hasHolderFacet"
+              ng-if="self.hasHolderSocket"
               ng-click="self.selectTab('HOLDS')"
               ng-class="{
                 'post-menu__item--selected': self.isSelectedTab('HOLDS'),
@@ -90,7 +90,7 @@ function genComponentConf() {
               <span class="post-menu__item__count">({{self.heldPostsSize}})</span>
             </div>
             <div class="post-menu__item"
-              ng-if="self.hasReviewFacet"
+              ng-if="self.hasReviewSocket"
               ng-click="self.selectTab('REVIEWS')"
               ng-class="{
                 'post-menu__item--selected': self.isSelectedTab('REVIEWS'),
@@ -117,21 +117,21 @@ function genComponentConf() {
       window.postcontent4dbg = this;
 
       const selectFromState = state => {
-        const post = getIn(state, ["needs", this.postUri]);
-        const isPersona = needUtils.isPersona(post);
-        const isOwned = generalSelectors.isNeedOwned(state, this.postUri);
+        const post = getIn(state, ["atoms", this.postUri]);
+        const isPersona = atomUtils.isPersona(post);
+        const isOwned = generalSelectors.isAtomOwned(state, this.postUri);
 
-        const hasHolderFacet = needUtils.hasHolderFacet(post);
-        const hasGroupFacet = needUtils.hasGroupFacet(post);
-        const hasReviewFacet = needUtils.hasReviewFacet(post);
+        const hasHolderSocket = atomUtils.hasHolderSocket(post);
+        const hasGroupSocket = atomUtils.hasGroupSocket(post);
+        const hasReviewSocket = atomUtils.hasReviewSocket(post);
         const reviewCount =
-          hasReviewFacet && getIn(post, ["rating", "reviewCount"]);
+          hasReviewSocket && getIn(post, ["rating", "reviewCount"]);
 
-        const groupMembers = hasGroupFacet && get(post, "groupMembers");
+        const groupMembers = hasGroupSocket && get(post, "groupMembers");
         const groupChatConnections =
           isOwned &&
-          hasGroupFacet &&
-          connectionSelectors.getGroupChatConnectionsByNeedUri(
+          hasGroupSocket &&
+          connectionSelectors.getGroupChatConnectionsByAtomUri(
             state,
             this.postUri
           );
@@ -152,19 +152,19 @@ function genComponentConf() {
 
         //TODO: BLARGH GROUPCHATCONN FILTER
 
-        const heldPosts = hasHolderFacet && get(post, "holds");
+        const heldPosts = hasHolderSocket && get(post, "holds");
         const heldByUri =
-          needUtils.hasHoldableFacet(post) && get(post, "heldBy");
+          atomUtils.hasHoldableSocket(post) && get(post, "heldBy");
         const hasHeldBy = !!heldByUri; //aka Persona that holds this post
-        const persona = hasHeldBy && getIn(state, ["needs", heldByUri]);
-        const personaHasReviewFacet = needUtils.hasReviewFacet(persona);
+        const persona = hasHeldBy && getIn(state, ["atoms", heldByUri]);
+        const personaHasReviewSocket = atomUtils.hasReviewSocket(persona);
         const personaAggregateRating =
-          personaHasReviewFacet &&
+          personaHasReviewSocket &&
           getIn(persona, ["rating", "aggregateRating"]);
 
         const suggestions =
           isOwned &&
-          connectionSelectors.getSuggestedConnectionsByNeedUri(
+          connectionSelectors.getSuggestedConnectionsByAtomUri(
             state,
             this.postUri
           );
@@ -179,21 +179,21 @@ function genComponentConf() {
         return {
           post,
           isPersona,
-          isHoldable: needUtils.hasHoldableFacet(post),
+          isHoldable: atomUtils.hasHoldableSocket(post),
           isOwned,
           hasHeldBy,
-          personaHasReviewFacet,
+          personaHasReviewSocket,
           personaAggregateRatingString:
             personaAggregateRating && personaAggregateRating.toFixed(1),
           hasHeldPosts: heldPostsSize > 0,
           heldPostsSize,
-          hasHolderFacet,
-          hasGroupFacet,
-          hasReviewFacet,
+          hasHolderSocket,
+          hasGroupSocket,
+          hasReviewSocket,
           hasReviews: reviewCount > 0,
           reviewCount,
-          hasChatFacet: needUtils.hasChatFacet(post),
-          hasGroupMembers: groupMembersSize > 0,
+          hasChatSocket: atomUtils.hasChatSocket(post),
+          groupMembers: groupMembersSize > 0,
           groupMembersSize,
           connectedGroupChatConnectionsSize:
             connectedGroupChatConnections && connectedGroupChatConnections.size,
@@ -209,11 +209,11 @@ function genComponentConf() {
               : false,
           suggestionsSize,
           postLoading:
-            !post || processUtils.isNeedLoading(process, this.postUri),
+            !post || processUtils.isAtomLoading(process, this.postUri),
           postFailedToLoad:
-            post && processUtils.hasNeedFailedToLoad(process, this.postUri),
+            post && processUtils.hasAtomFailedToLoad(process, this.postUri),
           shouldShowRdf: viewUtils.showRdf(viewState),
-          visibleTab: viewUtils.getVisibleTabByNeedUri(viewState, this.postUri),
+          visibleTab: viewUtils.getVisibleTabByAtomUri(viewState, this.postUri),
         };
       };
       connect2Redux(selectFromState, actionCreators, ["self.postUri"], this);
@@ -231,8 +231,8 @@ function genComponentConf() {
     }
 
     selectTab(tabName) {
-      this.needs__selectTab(
-        Immutable.fromJS({ needUri: get(this.post, "uri"), selectTab: tabName })
+      this.atoms__selectTab(
+        Immutable.fromJS({ atomUri: get(this.post, "uri"), selectTab: tabName })
       );
     }
   }

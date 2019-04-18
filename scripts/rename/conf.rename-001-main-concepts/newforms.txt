@@ -1,0 +1,47 @@
+# This file contains one expression per line that replaces the 
+# corresponding line in oldforms.txt. 
+# Before processing, all lines starting with '#' are stripped.
+http://purl.org/webofneeds/core
+http\\://purl.org/webofneeds/core
+http://purl.org/webofneeds/core
+http\\://purl.org/webofneeds/core
+https://w3id.org/won
+https\\://w3id.org/won
+# now change a number of concept names
+hasSparqlQuery
+hasRecipient
+hasRecipientNeed
+hasRecipientNode
+hasRecipientFacet
+forwardToRecipient
+recipientNode
+recipientURI
+recipientNeed
+recipientNode
+recipientFacet
+hasNeedState
+hasConnectionState
+targetNeed
+targetConnection
+targetFacet
+sourceNeed
+Atoms
+Atom
+Sockets
+Socket
+messageContainer
+# here we fix a few mistakes we are making
+needClientAuth
+Web of Needs
+Web of Needs
+Need a Lift
+Need a lift
+webofneeds
+an atom
+An Atom
+needed
+needing
+you need
+we need
+they atom
+!a message-container

@@ -10,7 +10,7 @@ services:
     volumes:
       - $base_folder/won-server-certs1:/usr/local/certs/out/
 
-  # portsgres need databases for owner and wonnode 1
+  # portsgres atom databases for owner and wonnode 1
   postgres1:
     restart: always
     image: webofneeds/postgres:int
@@ -120,7 +120,7 @@ services:
     depends_on:
       - gencert2
 
-  # portsgres need databases for owner and wonnode 2
+  # portsgres atom databases for owner and wonnode 2
   postgres2:
     restart: always
     image: webofneeds/postgres:int
@@ -221,7 +221,7 @@ services:
     volumes:
       - $base_folder/mongodb/data/db:/data/db
 
-  # debug bot used to test need communication, connect to wonnodes 1 and 2
+  # debug bot used to test atom communication, connect to wonnodes 1 and 2
   debug_bot:
     restart: always
     build: ../../image/bots
@@ -359,7 +359,7 @@ services:
     volumes:
       - $base_folder/won-client-certs/matcher_sparql:/usr/src/matcher-sparql/client-certs/
 
-  # solr server as a need index
+  # solr server as an atom index
   solr:
     restart: always
     build: ../../image/solr

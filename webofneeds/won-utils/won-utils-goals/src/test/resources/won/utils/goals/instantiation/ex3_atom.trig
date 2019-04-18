@@ -1,0 +1,232 @@
+# example 3: multiple goals can be fulfilled and some cannot be fulfilled
+
+@prefix msg:   <https://w3id.org/won/message#> .
+@prefix conn:  <https://localhost:8443/won/resource/connection/> .
+@prefix atom:  <https://localhost:8443/won/resource/atom/> .
+@prefix woncrypt: <https://w3id.org/won/core#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix cert:  <http://www.w3.org/ns/auth/cert#> .
+@prefix local: <https://localhost:8443/won/resource/> .
+@prefix geo:   <http://www.w3.org/2003/01/geo/wgs84_pos#> .
+@prefix sig:   <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#> .
+@prefix s:     <http://schema.org/> .
+@prefix sh:    <http://www.w3.org/ns/shacl#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix won:   <https://w3id.org/won/core#> .
+@prefix ldp:   <http://www.w3.org/ns/ldp#> .
+@prefix event: <https://localhost:8443/won/resource/event/> .
+@prefix dc:    <http://purl.org/dc/elements/1.1/> .
+@prefix sioc:  <http://rdfs.org/sioc/ns#> .
+
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix ex1: <http://example.org/1/> .
+@prefix ex2: <http://example.org/2/> .
+@prefix taxi: <http://example.org/taxi/> .
+
+<https://localhost:8443/won/resource/atom/6462959329580403000#sysinfo> {
+    atom:6462959329580403000
+            a                      won:Atom ;
+            <http://purl.org/dc/terms/created>
+                    "2017-12-11T16:20:31.291Z"^^xsd:dateTime ;
+            <http://purl.org/dc/terms/modified>
+                    "2017-12-11T16:20:31.297Z"^^xsd:dateTime ;
+            won:connections     <https://localhost:8443/won/resource/atom/6462959329580403000/connections> ;
+            won:messageContainer  <https://localhost:8443/won/resource/atom/6462959329580403000#events> ;
+            won:wonNode         <https://localhost:8443/won/resource> ;
+            won:atomState          won:Active .
+    
+    <https://localhost:8443/won/resource/atom/6462959329580403000#events>
+            a            won:MessageContainer ;
+            rdfs:member  event:8297793462831835000 , event:ndttvcswhr5mli9x4cwv .
+}
+
+<https://localhost:8443/won/resource/event/8297793462831835000#envelope-sig> {
+    <https://localhost:8443/won/resource/event/8297793462831835000#envelope-sig>
+            a                               sig:Signature ;
+            sig:signatureValue           "MGQCMFU/riyDJEiknnVupxHs8NQlT4gu66JDeGKAcPZnVqb+GjyYw9yyFIU1HhuVto3sZQIwQoShiIffxFAfnai+u5bnVVjzcs44hF8Wer70y/TBDklieG6gF3u7KeqdEO0TPyZO" ;
+            sig:hasVerificationCertificate  atom:6462959329580403000 ;
+            msg:hash                     "AIaFN76/Vo0J71D8xsBKKocpIL+SYUVk8vdVyVPYu5K0awRci0xFZEjTI2EVzb/C32I4wTV3eKihWMFtcSRsII9CpmdCJw/xgmFuRlSIGJF72eKOm9t35MVK5s/VH+cT1lMEmXafW7B8P5cCdN74nloBk3iOwIn9lqQDlRFvaKVv" ;
+            msg:publicKeyFingerprint     "lpT4VEyi1WSXpfxqojE03HRE6MmjNJXOqDr2eCc1AgI=" ;
+            msg:signedGraph              <https://localhost:8443/won/resource/event/8297793462831835000#envelope> .
+}
+
+<https://localhost:8443/won/resource/event/8297793462831835000#atom> {
+    atom:6462959329580403000
+            a             won:Atom ;
+            won:socket  won:ChatSocket ;
+            won:flag   won:UsedForTesting ;
+            won:seeks     [ dc:description   "next 10 minutes" ;
+                            dc:title         "taxi in Vienna" ;
+                            s:location  [ a                   s:Place ;
+                                               won:boundingBox  [ won:northWestCorner  [ a            s:GeoCoordinates ;
+                                                                                               s:latitude   "48.218727" ;
+                                                                                               s:longitude  "16.360141"
+                                                                                             ] ;
+                                                                     won:southEastCorner  [ a            s:GeoCoordinates ;
+                                                                                               s:latitude   "48.218828" ;
+                                                                                               s:longitude  "16.360241"
+                                                                                             ]
+                                                                   ] ;
+                                               s:geo               [ a            s:GeoCoordinates ;
+                                                                     s:latitude   "48.218778" ;
+                                                                     s:longitude  "16.360191"
+                                                                   ] ;
+                                               s:name              "8, Thurngasse, KG Alsergrund, Alsergrund, Wien, 1090, Österreich"
+                                             ]
+                          ] ;
+            cert:key      [ cert:PublicKey  [ a                       woncrypt:ECCPublicKey ;
+                                              woncrypt:ecc_algorithm  "EC" ;
+                                              woncrypt:ecc_curveId    "secp384r1" ;
+                                              woncrypt:ecc_qx         "98c9c27c5075a982c00bd4f00951571889af21c71d28df01cb9f41ca99572c6e4787ea910b4bed2585f5cdf986cb1045" ;
+                                              woncrypt:ecc_qy         "a3de3c56f1247b302cfd02e11f95db9ef5cca91f8fa24151e4776625e63036817066d250eeee592f6ef23f1e6286cd4c"
+                                            ] ] ;
+
+            # this goal should be fulfilled with the first goal of the other atom
+            won:goal [
+                won:shapesGraph ex2:p2g-shapes ;
+                won:dataGraph ex2:p2g-data ;
+            ] ;
+
+            # ex2:p3g-shapes is a subset of ex2:p2g-shapes so it should be able to satisfy this goal as well
+            won:goal [
+                won:shapesGraph ex2:p3g-shapes ;
+                won:dataGraph ex2:p2g-data ;
+            ] ;
+
+            # ex2:p4g-shapes is a shape which should not be fulfilled
+            won:goal [
+                won:shapesGraph ex2:p4g-shapes ;
+                won:dataGraph ex2:p2g-data ;
+            ] ;
+
+            # this goal should be fulfilled with the second goal of the other atom (=> shape ex1:p2g-shapes)
+            won:goal [
+                won:shapesGraph ex2:p5g-shapes ;
+                won:dataGraph ex2:p5g-data ;
+            ] .
+}
+
+ex2:p2g-data {
+	ex2:myRide a taxi:Ride.
+    ex2:myRide taxi:hasClient atom:6462959329580403000 . 			# note: p2 links her own identifier to the structure
+    ex2:myRide taxi:hasPickupLocation ex2:myPickupLocation .
+    ex2:myRide taxi:hasPickupTime "2017-11-23T09:30:00Z"^^xsd:dateTime .
+    ex2:myPickupLocation a s:GeoCoordinates ;
+        s:latitude   "48.213814" ;
+        s:longitude  "16.340870" .
+}
+
+ex2:p2g-shapes {
+
+   ex2:selfShape
+    a sh:NodeShape ;
+    sh:targetNode atom:6462959329580403000 ;
+    sh:property [
+        sh:path [ sh:inversePath taxi:hasClient ];
+        sh:class taxi:Ride ;
+    ] .
+
+  ex2:TaxiRideShape
+	a sh:NodeShape;
+    sh:targetClass taxi:Ride ;
+	sh:property [
+		sh:path taxi:hasPickupTime;
+		sh:minCount 1 ;
+		sh:maxCount 1 ;
+        sh:datatype xsd:dateTime;
+	] ;
+	sh:property [
+		sh:path taxi:hasPickupLocation ;
+		sh:minCount 1 ;
+		sh:maxCount 1 ;
+        sh:class s:GeoCoordinates
+	] ;
+	sh:property [
+		sh:path taxi:hasClient;
+		sh:minCount 1 ;
+		sh:maxCount 1 ;
+		sh:hasValue atom:6462959329580403000 ;
+	] ;
+	sh:property [
+		sh:path taxi:hasDriver;
+		sh:minCount 1 ;
+		sh:maxCount 1 ;
+		sh:nodeKind sh:IRI ;
+	] ;
+	sh:ignoredProperties ( rdf:type ) ;
+	sh:closed true .
+}
+
+ex2:p3g-shapes {
+
+   ex2:selfShape
+    a sh:NodeShape ;
+    sh:targetNode atom:6462959329580403000 ;
+    sh:property [
+        sh:path [ sh:inversePath taxi:hasClient ];
+        sh:class taxi:Ride ;
+    ] .
+
+    ex2:TaxiRideShape
+    a sh:NodeShape;
+    sh:targetClass taxi:Ride ;
+    sh:property [
+        sh:path taxi:hasClient;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:hasValue atom:6462959329580403000 ;
+    ] ;
+    sh:property [
+        sh:path taxi:hasDriver;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:nodeKind sh:IRI ;
+    ] ;
+}
+
+ex2:p4g-shapes {
+
+   ex2:TaxiRideShape
+   	a sh:NodeShape;
+       sh:targetClass taxi:Ride ;
+   	sh:property [
+   		sh:path taxi:hasPickupTime;
+   		sh:minCount 2 ; # two pickup times => should not be valid
+   		sh:maxCount 2 ;
+           sh:datatype xsd:dateTime;
+   	] ;
+}
+
+ex2:p5g-shapes {
+
+  ex2:selfShape
+      a sh:NodeShape ;
+      sh:targetNode atom:6462959329580403000 ;
+      sh:property [
+          sh:path [ sh:inversePath taxi:hasClient ];
+          sh:class taxi:AlternativeRide ;
+      ] .
+
+   ex2:TaxiRideShape
+   	a sh:NodeShape;
+       sh:targetClass taxi:AlternativeRide ;
+   	sh:property [
+    		sh:path taxi:hasClient;
+    		sh:minCount 1 ;
+    		sh:maxCount 1 ;
+    		sh:hasValue atom:6462959329580403000 ;
+    	] ;
+    sh:property [
+        		sh:path taxi:hasNumberOfSeats;
+        		sh:minCount 1 ;
+        		sh:maxCount 1 ;
+        		sh:hasValue 6 ;
+        	] ;
+}
+
+ex2:p5g-data {
+	ex2:myAlternativeRide a taxi:AlternativeRide.
+    ex2:myAlternativeRide taxi:hasClient atom:6462959329580403000 .
+    ex2:myAlternativeRide taxi:hasNumberOfSeats 6 .
+}

@@ -56,7 +56,7 @@ public class WonMessageTest {
                         msg.getSenderURI());
         Assert.assertEquals(
                         URI.create("https://satvm05.researchstudio.at/won/resource/connection/nz3dg71sop2v5f82j3lm"),
-                        msg.getReceiverURI());
+                        msg.getRecipientURI());
         Assert.assertEquals(URI.create("https://satvm05.researchstudio.at/won/resource/event/e5syo59w9t3if0y428r8"),
                         msg.getForwardedMessageURI());
         Assert.assertEquals(WonMessageDirection.FROM_EXTERNAL, msg.getEnvelopeType());

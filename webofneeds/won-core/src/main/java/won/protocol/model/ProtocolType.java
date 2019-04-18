@@ -5,7 +5,7 @@ package won.protocol.model;
  * change this template use File | Settings | File Templates.
  */
 public enum ProtocolType {
-    OwnerProtocol("OwnerProtocol"), NeedProtocol("NeedProtocol"), MatcherProtocol("MatcherProtocol");
+    OwnerProtocol("OwnerProtocol"), AtomProtocol("AtomProtocol"), MatcherProtocol("MatcherProtocol");
     private String name;
 
     private ProtocolType(String name) {

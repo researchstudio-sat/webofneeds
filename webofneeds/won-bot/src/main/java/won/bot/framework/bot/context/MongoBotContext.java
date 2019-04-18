@@ -22,7 +22,7 @@ import org.springframework.data.mongodb.core.query.Update;
  * Created by hfriedrich on 27.10.2016.
  */
 public class MongoBotContext implements BotContext {
-    protected static final String NEED_URI_COLLECTION = "need_uris";
+    protected static final String ATOM_URI_COLLECTION = "atom_uris";
     protected static final String NODE_URI_COLLECTION = "node_uris";
     @Autowired
     private MongoTemplate template;
@@ -32,10 +32,10 @@ public class MongoBotContext implements BotContext {
     }
 
     @Override
-    public Set<URI> retrieveAllNeedUris() {
+    public Set<URI> retrieveAllAtomUris() {
         Set<URI> uris = new HashSet<>();
         List<MongoContextObjectList> contextObjects = template.findAll(MongoContextObjectList.class,
-                        NEED_URI_COLLECTION);
+                        ATOM_URI_COLLECTION);
         for (MongoContextObjectList mco : contextObjects) {
             List<Object> objectList = mco.getList();
             if (objectList != null) {
@@ -47,31 +47,31 @@ public class MongoBotContext implements BotContext {
     }
 
     @Override
-    public boolean isNeedKnown(final URI needURI) {
+    public boolean isAtomKnown(final URI atomURI) {
         // query the field "objectList" since this is the name of the member variable of
         // MongoContextObjectList
-        Query query = new Query(Criteria.where("objectList.string").is(needURI.toString()));
-        return null != template.find(query, String.class, NEED_URI_COLLECTION);
+        Query query = new Query(Criteria.where("objectList.string").is(atomURI.toString()));
+        return null != template.find(query, String.class, ATOM_URI_COLLECTION);
     }
 
     @Override
-    public void removeNeedUriFromNamedNeedUriList(final URI uri, final String name) {
+    public void removeAtomUriFromNamedAtomUriList(final URI uri, final String name) {
         template.remove(uri, name);
     }
 
     @Override
-    public void appendToNamedNeedUriList(final URI uri, final String name) {
+    public void appendToNamedAtomUriList(final URI uri, final String name) {
         template.insert(uri, name);
     }
 
     @Override
-    public List<URI> getNamedNeedUriList(final String name) {
+    public List<URI> getNamedAtomUriList(final String name) {
         return template.findAll(URI.class, name);
     }
 
     @Override
-    public boolean isInNamedNeedUriList(URI uri, String name) {
-        List<URI> uris = getNamedNeedUriList(name);
+    public boolean isInNamedAtomUriList(URI uri, String name) {
+        List<URI> uris = getNamedAtomUriList(name);
         for (URI tmpUri : uris) {
             if (tmpUri.equals(uri)) {
                 return true;
@@ -96,16 +96,16 @@ public class MongoBotContext implements BotContext {
     }
 
     /**
-     * Use this method to make sure that certain collections (need and node uris)
+     * Use this method to make sure that certain collections (atom and node uris)
      * are only accessed with non-generic methods
      *
      * @param collectionName
      */
     private void checkValidCollectionName(String collectionName) {
-        if (collectionName == null || collectionName.equals(NEED_URI_COLLECTION)
+        if (collectionName == null || collectionName.equals(ATOM_URI_COLLECTION)
                         || collectionName.equals(NODE_URI_COLLECTION) || collectionName.trim().isEmpty()) {
             throw new IllegalArgumentException("Generic collection name must be valid and not one of the following:"
-                            + " " + NODE_URI_COLLECTION + ", " + NEED_URI_COLLECTION);
+                            + " " + NODE_URI_COLLECTION + ", " + ATOM_URI_COLLECTION);
         }
     }
 

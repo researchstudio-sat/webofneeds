@@ -182,7 +182,7 @@ public class WonVerifier {
 
     private void addSignatureReferenceToResult(final String graphURI, final Model model) {
         RDFNode tempNode = null;
-        StmtIterator si = model.listStatements(null, WONMSG.CONTAINS_SIGNATURE_PROPERTY, tempNode);
+        StmtIterator si = model.listStatements(null, WONMSG.containsSignature, tempNode);
         while (si.hasNext()) {
             WonSignatureData sigRef = WonRdfUtils.SignatureUtils
                             .extractWonSignatureData(si.nextStatement().getObject().asResource());

@@ -1,29 +1,29 @@
-@prefix need:  <http://localhost:8080/won/resource/need/> .
+@prefix atom:  <http://localhost:8080/won/resource/atom/> .
 @prefix dc:    <http://purl.org/dc/elements/1.1/> .
 @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix geo:   <http://www.w3.org/2003/01/geo/wgs84_pos#> .
 @prefix conn:  <http://localhost:8080/won/resource/connection/> .
 @prefix event: <http://localhost:8080/won/resource/event/> .
-@prefix woncrypt: <http://purl.org/webofneeds/woncrypt#> .
+@prefix woncrypt: <https://w3id.org/won/core#> .
 @prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
 @prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix local: <http://localhost:8080/won/resource/> .
-@prefix won:   <http://purl.org/webofneeds/model#> .
-@prefix msg:   <http://purl.org/webofneeds/message#> .
+@prefix won:   <https://w3id.org/won/core#> .
+@prefix msg:   <https://w3id.org/won/message#> .
 @prefix signature: <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#> .
 @prefix ldp:   <http://www.w3.org/ns/ldp#> .
 
 {
 # !!!!!!!!!ERROR: triples in the default graph
 event:2100661890849016800error
-            msg:hasContent           <http://localhost:8080/won/resource/need/7680710295659487000/core/#error> .
+            msg:content           <http://localhost:8080/won/resource/atom/7680710295659487000/core/#error> .
 }
 
-<http://localhost:8080/won/resource/need/7680710295659487000/core/#data-sig> {
-    <http://localhost:8080/won/resource/need/7680710295659487000/core/#data-sig>
+<http://localhost:8080/won/resource/atom/7680710295659487000/core/#data-sig> {
+    <http://localhost:8080/won/resource/atom/7680710295659487000/core/#data-sig>
             a                            signature:Signature ;
             # !!!!!!!!!ERROR: signature is missing triples
-            msg:hasSignedGraph           <http://localhost:8080/won/resource/need/7680710295659487000/core/#data> .
+            msg:signedGraph           <http://localhost:8080/won/resource/atom/7680710295659487000/core/#data> .
 }
 
 <http://localhost:8080/won/resource/event/2100661890849016800#envelope-c2l9-sig> {
@@ -32,25 +32,25 @@ event:2100661890849016800error
             signature:hasGraphSigningMethod
                     [ a                               signature:GraphSigningMethod ;
                       signature:hasDigestMethod       signature:dm-sha-256 ;
-                      signature:hasGraphCanonicalizationMethod
+                      signature:graphCanonicalizationMethod
                               signature:gcm-fisteus-2010 ;
-                      signature:hasGraphDigestMethod  signature:gdm-fisteus-2010 ;
-                      signature:hasGraphSerializationMethod
+                      signature:graphDigestMethod  signature:gdm-fisteus-2010 ;
+                      signature:graphSerializationMethod
                               signature:gsm-trig ;
                       signature:hasSignatureMethod    signature:sm-ecdsa
                     ] ;
-            signature:hasSignatureValue  "MGQCMDCEWuby6uFNKs05lIhKefMZA5JtpYRQYz3BFwqd3WfmgaA7RxSoRvhZ64YPaHS6aQIwFyGGOfH5XumfYW74LNV4WGpxq/CVqBFxHumKCnPlxWDZnZCVDHwUs5OPsio/yHqk" ;
+            signature:signatureValue  "MGQCMDCEWuby6uFNKs05lIhKefMZA5JtpYRQYz3BFwqd3WfmgaA7RxSoRvhZ64YPaHS6aQIwFyGGOfH5XumfYW74LNV4WGpxq/CVqBFxHumKCnPlxWDZnZCVDHwUs5OPsio/yHqk" ;
             signature:hasVerificationCertificate
                     <http://localhost:8080/won/resource> ;
-            msg:hasSignedGraph           <http://localhost:8080/won/resource/event/2100661890849016800#envelope-c2l9> .
+            msg:signedGraph           <http://localhost:8080/won/resource/event/2100661890849016800#envelope-c2l9> .
 }
 
 <http://localhost:8080/won/resource/event/2100661890849016800#data> {
     event:2100661890849016800
             # !!!!!!!!!!!!ERROR: no reference from any envelope to content
             # !!!!!!!!!!!!ERROR: missing message type
-            msg:hasReceiverNode      <http://localhost:8080/won/resource> ;
-            msg:hasSenderNeed        need:7680710295659487000 .
+            msg:recipientNode      <http://localhost:8080/won/resource> ;
+            msg:senderAtom        atom:7680710295659487000 .
     
     <http://localhost:8080/won/resource/event/2100661890849016800#data>
             a       msg:EnvelopeGraph ;
@@ -70,9 +70,9 @@ event:2100661890849016800error
             # !!!!!!!!!!!!ERROR: no reference from any envelope to more than 1 envelopes
             <http://www.w3.org/2004/03/trix/rdfg-1/subGraphOf>
                     event:2100661890849016800;
-     msg:containsSignature   [ msg:hasSignatureGraph  <http://localhost:8080/won/resource/event/2100661890849016800#data-sig> ;
-                                                                                       msg:hasSignatureValue  "MGQCMHTxwGWSzhYAa5+hDFelxLJe6XGN16DP1kcVOsTwWoK9MRJom4D6AcPz7xXI7nT4lwIwKHMkENo9LE4q3CKGcra4b+ceSvdVY+hLGxoz4OD4a7zMYUgeMbXZ+/fAJLejAZ99" ;
-                                                                                       msg:hasSignedGraph     <http://localhost:8080/won/resource/event/2100661890849016800#data>
+     msg:containsSignature   [ msg:signatureGraph  <http://localhost:8080/won/resource/event/2100661890849016800#data-sig> ;
+                                                                                       msg:signatureValue  "MGQCMHTxwGWSzhYAa5+hDFelxLJe6XGN16DP1kcVOsTwWoK9MRJom4D6AcPz7xXI7nT4lwIwKHMkENo9LE4q3CKGcra4b+ceSvdVY+hLGxoz4OD4a7zMYUgeMbXZ+/fAJLejAZ99" ;
+                                                                                       msg:signedGraph     <http://localhost:8080/won/resource/event/2100661890849016800#data>
                                                                                      ] .
 }
 
@@ -82,36 +82,36 @@ event:2100661890849016800error
             signature:hasGraphSigningMethod
                     [ a                               signature:GraphSigningMethod ;
                       signature:hasDigestMethod       signature:dm-sha-256 ;
-                      signature:hasGraphCanonicalizationMethod
+                      signature:graphCanonicalizationMethod
                               signature:gcm-fisteus-2010 ;
-                      signature:hasGraphDigestMethod  signature:gdm-fisteus-2010 ;
-                      signature:hasGraphSerializationMethod
+                      signature:graphDigestMethod  signature:gdm-fisteus-2010 ;
+                      signature:graphSerializationMethod
                               signature:gsm-trig ;
                       signature:hasSignatureMethod    signature:sm-ecdsa
                     ] ;
-            signature:hasSignatureValue  "MGQCMHTxwGWSzhYAa5+hDFelxLJe6XGN16DP1kcVOsTwWoK9MRJom4D6AcPz7xXI7nT4lwIwKHMkENo9LE4q3CKGcra4b+ceSvdVY+hLGxoz4OD4a7zMYUgeMbXZ+/fAJLejAZ99" ;
+            signature:signatureValue  "MGQCMHTxwGWSzhYAa5+hDFelxLJe6XGN16DP1kcVOsTwWoK9MRJom4D6AcPz7xXI7nT4lwIwKHMkENo9LE4q3CKGcra4b+ceSvdVY+hLGxoz4OD4a7zMYUgeMbXZ+/fAJLejAZ99" ;
             signature:hasVerificationCertificate
-                    need:7680710295659487000 ;
-            msg:hasSignedGraph           <http://localhost:8080/won/resource/event/2100661890849016800#data> .
+                    atom:7680710295659487000 ;
+            msg:signedGraph           <http://localhost:8080/won/resource/event/2100661890849016800#data> .
 }
 
-<http://localhost:8080/won/resource/need/7680710295659487000/core/#data> {
-    need:7680710295659487000
-            a                     won:Need ;
-            won:hasBasicNeedType  won:Supply ;
-            won:hasContent        [ a                          won:NeedContent ;
+<http://localhost:8080/won/resource/atom/7680710295659487000/core/#data> {
+    atom:7680710295659487000
+            a                     won:Atom ;
+            won:hasBasicAtomType  won:Supply ;
+            won:content        [ a                          won:AtomContent ;
                                     dc:title                   "offer fish" ;
-                                    won:hasContentDescription  [ a                             won:NeedModality ;
-                                                                 won:hasLocationSpecification  [ a               geo:Point ;
+                                    won:contentDescription  [ a                             won:AtomModality ;
+                                                                 won:locationSpecification  [ a               geo:Point ;
                                                                                                  won:hasAddress  "" ;
                                                                                                  geo:latitude    "0.000000"^^xsd:float ;
                                                                                                  geo:longitude   "0.000000"
                                                                                                ]
                                                                ] ;
-                                    won:hasTag                 "fish" ;
+                                    won:tag                 "fish" ;
                                     dc:description     "fish"
                                   ] ;
-            won:hasFacet          won:ChatFacet ;
+            won:socket          won:ChatSocket ;
             <http://www.w3.org/ns/auth/cert#key>
                     [ <http://www.w3.org/ns/auth/cert#PublicKey>
                               [ a                       woncrypt:ECCPublicKey ;

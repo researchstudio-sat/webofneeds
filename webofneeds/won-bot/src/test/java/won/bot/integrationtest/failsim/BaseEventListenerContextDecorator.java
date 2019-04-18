@@ -17,13 +17,13 @@ import org.springframework.scheduling.TaskScheduler;
 
 import won.bot.framework.bot.context.BotContext;
 import won.bot.framework.bot.context.BotContextWrapper;
-import won.bot.framework.component.needproducer.NeedProducer;
+import won.bot.framework.component.atomproducer.AtomProducer;
 import won.bot.framework.component.nodeurisource.NodeURISource;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.bus.EventBus;
 import won.matcher.component.MatcherNodeURISource;
 import won.matcher.protocol.impl.MatcherProtocolMatcherServiceImplJMSBased;
-import won.protocol.matcher.MatcherProtocolNeedServiceClientSide;
+import won.protocol.matcher.MatcherProtocolAtomServiceClientSide;
 import won.protocol.message.sender.WonMessageSender;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.linkeddata.LinkedDataSource;
@@ -65,8 +65,8 @@ public abstract class BaseEventListenerContextDecorator implements EventListener
     }
 
     @Override
-    public MatcherProtocolNeedServiceClientSide getMatcherProtocolNeedServiceClient() {
-        return delegate.getMatcherProtocolNeedServiceClient();
+    public MatcherProtocolAtomServiceClientSide getMatcherProtocolAtomServiceClient() {
+        return delegate.getMatcherProtocolAtomServiceClient();
     }
 
     @Override
@@ -75,8 +75,8 @@ public abstract class BaseEventListenerContextDecorator implements EventListener
     }
 
     @Override
-    public NeedProducer getNeedProducer() {
-        return delegate.getNeedProducer();
+    public AtomProducer getAtomProducer() {
+        return delegate.getAtomProducer();
     }
 
     @Override

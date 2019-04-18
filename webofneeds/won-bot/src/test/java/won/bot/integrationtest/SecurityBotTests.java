@@ -42,7 +42,7 @@ import won.bot.framework.manager.BotManager;
 import won.bot.integrationtest.security.DelayedDuplicateMessageSendingConversationBot;
 import won.bot.integrationtest.security.DuplicateMessageSendingConversationBot;
 import won.bot.integrationtest.security.DuplicateMessageURIFailureBot;
-import won.bot.integrationtest.security.DuplicateNeedURIFailureBot;
+import won.bot.integrationtest.security.DuplicateAtomURIFailureBot;
 
 /**
  * Integration test.
@@ -57,8 +57,8 @@ public class SecurityBotTests {
     ApplicationContext applicationContext;
 
     @Test
-    public void testDuplicateNeedUri() throws Exception {
-        runBot(DuplicateNeedURIFailureBot.class);
+    public void testDuplicateAtomUri() throws Exception {
+        runBot(DuplicateAtomURIFailureBot.class);
     }
 
     @Test
@@ -83,7 +83,7 @@ public class SecurityBotTests {
         bot = (IntegrationtestBot) beanFactory.autowire(botClass, AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, false);
         Object botBean = beanFactory.initializeBean(bot, "theBot");
         bot = (IntegrationtestBot) botBean;
-        // the bot also needs a trigger so its act() method is called regularly.
+        // the bot also atoms a trigger so its act() method is called regularly.
         // (there is no trigger bean in the context)
         PeriodicTrigger trigger = new PeriodicTrigger(500, TimeUnit.MILLISECONDS);
         trigger.setInitialDelay(100);

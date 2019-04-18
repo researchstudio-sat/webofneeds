@@ -150,7 +150,7 @@ public class WonAssembler {
         NamedGraph sigGraph = new NamedGraph(SIG_GRAPH_NAME_TEMP, 0, null);
         ArrayList<Triple> sigGraphTriples = sigGraph.getTriples();
         // this graph is signed by the signature
-        sigGraphTriples.add(new Triple(SIG_BNODE_NAME, "<" + WONMSG.HAS_SIGNED_GRAPH_PROPERTY + ">", name));
+        sigGraphTriples.add(new Triple(SIG_BNODE_NAME, "<" + WONMSG.signedGraph + ">", name));
         for (Triple t : o.getTriples()) {
             String subj = t.getSubject();
             sigGraphTriples.add(new Triple(subj, t.getPredicate(), t.getObject()));
@@ -169,7 +169,7 @@ public class WonAssembler {
         NamedGraph sigGraph = new NamedGraph(SIG_GRAPH_NAME_TEMP, 0, null);
         ArrayList<Triple> sigGraphTriples = sigGraph.getTriples();
         // this graph is signed by the signature
-        sigGraphTriples.add(new Triple("<" + sigGraphURI + ">", "<" + WONMSG.HAS_SIGNED_GRAPH_PROPERTY + ">", name));
+        sigGraphTriples.add(new Triple("<" + sigGraphURI + ">", "<" + WONMSG.signedGraph + ">", name));
         for (Triple t : o.getTriples()) {
             String subj = t.getSubject();
             if (subj.equals(SIG_BNODE_NAME)) {

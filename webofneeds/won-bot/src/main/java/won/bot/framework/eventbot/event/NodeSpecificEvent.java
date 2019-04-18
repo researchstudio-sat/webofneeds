@@ -13,7 +13,7 @@ package won.bot.framework.eventbot.event;
 import java.net.URI;
 
 /**
- * Interface for events that are need-specific.
+ * Interface for events that are atom-specific.
  */
 public interface NodeSpecificEvent {
     public URI getNodeURI();

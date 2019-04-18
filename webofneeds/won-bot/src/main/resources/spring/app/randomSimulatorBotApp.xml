@@ -29,7 +29,7 @@
     <context:property-placeholder location="file:${WON_CONFIG_DIR}/bot.properties"
                                   ignore-unresolvable="true"/> <!-- was in botRunner.xml -->
     <context:property-placeholder location="file:${WON_CONFIG_DIR}/mail-dir-bot.properties"
-                                  ignore-unresolvable="true"/> <!-- was in needproducer-mails-nonstop.xml within randomSimulatorBot.xml -->
+                                  ignore-unresolvable="true"/> <!-- was in atomproducer-mails-nonstop.xml within randomSimulatorBot.xml -->
     <context:property-placeholder location="file:${WON_CONFIG_DIR}/node-uri-source.properties"
                                   ignore-unresolvable="true"/> <!-- was in nodeurisource-random.xml within randomSimulatorBot.xml  and in ownerCallback.xml and noderurisource-roundrobin.xml and matcherProtocolMatcherServiceHandler.xml within botRunner.xml-->
     <context:property-placeholder location="file:${WON_CONFIG_DIR}/matcher.properties"

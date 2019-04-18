@@ -20,31 +20,31 @@
 ```
 <https://localhost:8443/won/resource/event/6671551888677331000#content> {
     event:6671551888677331000
-            won:hasFacet        won:OwnerFacet ;
-            won:hasRemoteFacet  won:OwnerFacet ;
-            won:hasTextMessage  "hi" .
+            won:socket        won:OwnerSocket ;
+            won:targetSocket  won:OwnerSocket ;
+            won:textMessage  "hi" .
 }
 
 <https://localhost:8443/won/resource/event/5669098069340991000#content> {
     event:5669098069340991000
-            won:hasTextMessage  "one" .
+            won:textMessage  "one" .
 }
 
 <https://localhost:8443/won/resource/event/usi9yhill1lo2xi70sjx#content-klsc> {
     event:usi9yhill1lo2xi70sjx
-            won:hasTextMessage  "Greetings! \nI am the DebugBot. I can simulate multiple other users so you can test things. I understand a few commands. \nTo see which ones, type \n\n'usage'\n\n (without the quotes)." ;
+            won:textMessage  "Greetings! \nI am the DebugBot. I can simulate multiple other users so you can test things. I understand a few commands. \nTo see which ones, type \n\n'usage'\n\n (without the quotes)." ;
             agr:proposes event:6671551888677331000 .
 }
 
 <https://localhost:8443/won/resource/event/00d5wzbbf8hzzt2eewcc#content-tbn3> {
     event:00d5wzbbf8hzzt2eewcc
-            won:hasTextMessage  "I'm not sure I understand you fully." ;
+            won:textMessage  "I'm not sure I understand you fully." ;
             agr:proposes event:5669098069340991000 .
 }
 
 <https://localhost:8443/won/resource/event/557600936467257340#content> {
     event:557600936467257340
-            won:hasTextMessage  "two" ;
+            won:textMessage  "two" ;
             agr:accepts event:usi9yhill1lo2xi70sjx .
 }
 ```
@@ -67,26 +67,26 @@
 ```
 <https://localhost:8443/won/resource/event/5669098069340991000#content> {
     event:5669098069340991000
-            won:hasTextMessage  "one" .
+            won:textMessage  "one" .
 }
 
 <https://localhost:8443/won/resource/event/6671551888677331000#content> {
     event:6671551888677331000
-            won:hasFacet        won:OwnerFacet ;
-            won:hasRemoteFacet  won:OwnerFacet ;
-            won:hasTextMessage  "hi" .
+            won:socket        won:OwnerSocket ;
+            won:targetSocket  won:OwnerSocket ;
+            won:textMessage  "hi" .
 }
 
 
 <https://localhost:8443/won/resource/event/00d5wzbbf8hzzt2eewcc#content-tbn3> {
     event:00d5wzbbf8hzzt2eewcc
-            won:hasTextMessage  "I'm not sure I understand you fully." ;
+            won:textMessage  "I'm not sure I understand you fully." ;
             agr:proposes event:5669098069340991000 .
 }
 
 <https://localhost:8443/won/resource/event/usi9yhill1lo2xi70sjx#content-klsc> {
     event:usi9yhill1lo2xi70sjx
-            won:hasTextMessage  "Greetings! \nI am the DebugBot. I can simulate multiple other users so you can test things. I understand a few commands. \nTo see which ones, type \n\n'usage'\n\n (without the quotes)." ;
+            won:textMessage  "Greetings! \nI am the DebugBot. I can simulate multiple other users so you can test things. I understand a few commands. \nTo see which ones, type \n\n'usage'\n\n (without the quotes)." ;
             agr:proposes event:6671551888677331000 .
 }
 ```

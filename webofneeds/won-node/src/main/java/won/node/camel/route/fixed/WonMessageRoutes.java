@@ -17,7 +17,7 @@ import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.orm.jpa.JpaSystemException;
 
 import won.node.camel.predicate.IsResponseMessagePredicate;
-import won.node.camel.predicate.ShouldCallFacetImplForMessagePredicate;
+import won.node.camel.predicate.ShouldCallSocketImplForMessagePredicate;
 import won.node.camel.predicate.ShouldEchoToOwnerPredicate;
 import won.protocol.message.WonMessage;
 import won.protocol.message.processor.camel.WonCamelConstants;
@@ -98,9 +98,9 @@ public class WonMessageRoutes extends RouteBuilder {
                         .transacted("PROPAGATION_REQUIRES_NEW").routeId("direct:reference-sign-persist")
                         .to("bean:parentLocker").to("bean:referenceAdder").to("bean:signatureAdder")
                         .to("bean:persister");
-        from("direct:deleteNeedIfNecessary").errorHandler(noErrorHandler()) // let the exception bubble up
-                        .transacted("PROPAGATION_REQUIRES_NEW").routeId("direct:deleteNeedIfNecessary")
-                        .to("bean:needDeleter");
+        from("direct:deleteAtomIfNecessary").errorHandler(noErrorHandler()) // let the exception bubble up
+                        .transacted("PROPAGATION_REQUIRES_NEW").routeId("direct:deleteAtomIfNecessary")
+                        .to("bean:atomDeleter");
         from("direct:sendToOwner").transacted("PROPAGATION_REQUIRES_NEW").routeId("direct:sendToOwner")
                         // we wait until we obtain a lock on the message's parent
                         // so that we can be sure that processing the message is finished before we send
@@ -114,7 +114,7 @@ public class WonMessageRoutes extends RouteBuilder {
                         // now, we expect the message we want to pass on to the owner in the exchange's
                         // in header.
                         .to("bean:toOwnerSender"); // --> seda:OwnerProtocolOut
-        // sends the message to the owner of the connection in the won:hasSender
+        // sends the message to the owner of the connection in the won:sender
         // property.
         // In the case of an outbound message, this is an echo of the message back to
         // the owner, in the
@@ -150,7 +150,7 @@ public class WonMessageRoutes extends RouteBuilder {
         from("activemq:queue:OwnerProtocol.in?concurrentConsumers=5").routeId("activemq:queue:OwnerProtocol.in")
                         .transacted("PROPAGATION_NEVER")
                         .setHeader(WonCamelConstants.DIRECTION_HEADER,
-                                        new ConstantURIExpression(URI.create(WONMSG.TYPE_FROM_OWNER_STRING)))
+                                        new ConstantURIExpression(URI.create(WONMSG.FromOwnerString)))
                         .to("bean:wonMessageIntoCamelProcessor").to("direct:checkMessage")
                         .to("direct:addEnvelopeAndTimestamp").to("bean:directionFromOwnerAdder")
                         // route to msg processing logic
@@ -169,31 +169,31 @@ public class WonMessageRoutes extends RouteBuilder {
                         .log("failure during seda:OwnerProtocolOut, ignoring. Exception message: ${exception.messsage}")
                         .handled(true).stop().end().transacted("PROPAGATION_NEVER").routeId("seda:OwnerProtocolOut")
                         .to("bean:ownerProtocolOutgoingMessagesProcessor").recipientList(header("ownerApplicationIDs"));
-        // .to("bean:needDeleter"); // --> check if the outgoing message is a success
-        // response to a delete message so we can delete the need data
+        // .to("bean:atomDeleter"); // --> check if the outgoing message is a success
+        // response to a delete message so we can delete the atom data
         /**
          * System messages: add timestamp, sign and then process completely
          */
         from("seda:SystemMessageIn?concurrentConsumers=5").routeId("seda:SystemMessageIn")
                         .transacted("PROPAGATION_NEVER").to("bean:wonMessageIntoCamelProcessor")
                         .setHeader(WonCamelConstants.DIRECTION_HEADER,
-                                        new ConstantURIExpression(URI.create(WONMSG.TYPE_FROM_SYSTEM_STRING)))
+                                        new ConstantURIExpression(URI.create(WONMSG.FromSystemString)))
                         .to("bean:receivedTimestampAdder")
                         // route to message processing logic
                         .to("direct:OwnerProtocolLogic");
         /**
          * System-to-owner messages: add timestamp, sign but do not process effects etc
-         * - just send to owner. Intended for messages that do not need facet processing
-         * (like response messages).
+         * - just send to owner. Intended for messages that do not atom socket
+         * processing (like response messages).
          */
         from("seda:SystemMessageToOwner?concurrentConsumers=5").routeId("seda:SystemMessageToOwner")
                         .transacted("PROPAGATION_NEVER").to("bean:wonMessageIntoCamelProcessor")
                         .setHeader(WonCamelConstants.DIRECTION_HEADER,
-                                        new ConstantURIExpression(URI.create(WONMSG.TYPE_FROM_SYSTEM_STRING)))
+                                        new ConstantURIExpression(URI.create(WONMSG.FromSystemString)))
                         // TODO: as soon as messages are signed when they reach this route, perform
                         // signature/wellformedness checks here?
                         .to("bean:receivedTimestampAdder").to("direct:reference-sign-persist")
-                        .to("direct:deleteNeedIfNecessary").to("bean:toOwnerSender"); // --> seda:OwnerProtocolOut
+                        .to("direct:deleteAtomIfNecessary").to("bean:toOwnerSender"); // --> seda:OwnerProtocolOut
         /**
          * Message processing: expects messages from OwnerProtocolIn and SystemMessageIn
          * routes. Messages will be processed, effects executed, and then sent to
@@ -213,7 +213,7 @@ public class WonMessageRoutes extends RouteBuilder {
                         .choice().when(
                                         // we want to send a FROM_SYSTEM message to the owner if it is addressed at the
                                         // owner.
-                                        // this is the case if senderURI equals receiverURI and both are non-null.
+                                        // this is the case if senderURI equals recipientURI and both are non-null.
                                         PredicateBuilder.and(
                                                         header(WonCamelConstants.ORIGINAL_MESSAGE_HEADER).isNotNull(),
                                                         new ShouldEchoToOwnerPredicate()))
@@ -224,7 +224,7 @@ public class WonMessageRoutes extends RouteBuilder {
                         // it is a copy of an outgoing message
                         .to("direct:echoToOwner") // --> seda:OwnerProtocolOut
                         .endChoice().end()
-                        // now if the outbound message is one that facet implementations can
+                        // now if the outbound message is one that socket implementations can
                         // process, let them do that, then send the resulting message to the remote end.
                         .choice().when(
                                         // check if the outbound message header is set, otherwise we don't have anything
@@ -237,25 +237,25 @@ public class WonMessageRoutes extends RouteBuilder {
                         // the normal
                         // header.
                         .setHeader(WonCamelConstants.MESSAGE_HEADER, header(WonCamelConstants.OUTBOUND_MESSAGE_HEADER))
-                        .to("direct:sendToNode") // --> seda:NeedProtocolOut
+                        .to("direct:sendToNode") // --> seda:AtomProtocolOut
                         .endChoice().end()
                         // if we didn't raise an exception so far, send a success response
                         // for that, we have to re-instate the original (not the outbound) messagge, so
                         // we reply to the right one
                         // this may or may not already have happened
                         .setHeader(WonCamelConstants.MESSAGE_HEADER, header(WonCamelConstants.ORIGINAL_MESSAGE_HEADER))
-                        // now, call the facet implementation
+                        // now, call the socket implementation
                         .choice()
                         .when(PredicateBuilder.and(
                                         header(WonCamelConstants.DIRECTION_HEADER)
-                                                        .isEqualTo(URI.create(WONMSG.TYPE_FROM_OWNER_STRING)),
+                                                        .isEqualTo(URI.create(WONMSG.FromOwnerString)),
                                         PredicateBuilder.and(header(WonCamelConstants.MESSAGE_HEADER).isNotNull(),
-                                                        new ShouldCallFacetImplForMessagePredicate())))
+                                                        new ShouldCallSocketImplForMessagePredicate())))
                         // put the local connection URI into the header
                         .setHeader(WonCamelConstants.CONNECTION_URI_HEADER,
                                         new GetEnvelopePropertyExpression(WonCamelConstants.ORIGINAL_MESSAGE_HEADER,
-                                                        URI.create(WONMSG.SENDER_PROPERTY.getURI().toString())))
-                        .to("direct:invokeFacetLogic").endChoice() // end choice
+                                                        URI.create(WONMSG.sender.getURI().toString())))
+                        .to("direct:invokeSocketLogic").endChoice() // end choice
                         .end().choice()
                         .when(isNotEqualTo(header(WonCamelConstants.SUPPRESS_MESSAGE_REACTION),
                                         ExpressionBuilder.constantExpression(Boolean.TRUE)))
@@ -264,17 +264,17 @@ public class WonMessageRoutes extends RouteBuilder {
                                         "suppressing sending of message to owner because the header '"
                                                         + WonCamelConstants.SUPPRESS_MESSAGE_TO_OWNER + "' is 'true'")
                         .endChoice().end();
-        from("direct:invokeFacetLogic").transacted("PROPAGATION_REQUIRES_NEW").routeId("direct:invokeFacetLogic")
-                        // look into the db to find the facet we are using
-                        .to("bean:parentLocker").to("bean:facetExtractor")
-                        // find and execute the facet-specific processor
-                        .routingSlip(method("facetTypeSlip"));
+        from("direct:invokeSocketLogic").transacted("PROPAGATION_REQUIRES_NEW").routeId("direct:invokeSocketLogic")
+                        // look into the db to find the socket we are using
+                        .to("bean:parentLocker").to("bean:socketExtractor")
+                        // find and execute the socket-specific processor
+                        .routingSlip(method("socketTypeSlip"));
         from("direct:reactToMessage").transacted("PROPAGATION_REQUIRES_NEW").routeId("direct:reactToMessage")
                         .to("bean:parentLocker").routingSlip(method("fixedMessageReactionProcessorSlip"));
         /**
-         * Need protocol, incoming
+         * Atom protocol, incoming
          */
-        from("activemq:queue:NeedProtocol.in?concurrentConsumers=5").routeId("WonMessageNodeRoute").choice()
+        from("activemq:queue:AtomProtocol.in?concurrentConsumers=5").routeId("WonMessageNodeRoute").choice()
                         // (won nodes register the same way as owner applications do)
                         .when(header("methodName").isEqualTo("register"))
                         .to("bean:ownerManagementService?method=registerOwnerApplication")
@@ -282,14 +282,14 @@ public class WonMessageRoutes extends RouteBuilder {
                         .to("bean:queueManagementService?method=getEndpointsForOwnerApplication").otherwise()
                         .to("bean:wonMessageIntoCamelProcessor")
                         .setHeader(WonCamelConstants.DIRECTION_HEADER,
-                                        new ConstantURIExpression(URI.create(WONMSG.TYPE_FROM_EXTERNAL.getURI())))
+                                        new ConstantURIExpression(URI.create(WONMSG.FromExternal.getURI())))
                         .to("direct:checkMessage").to("direct:addEnvelopeAndTimestamp")
                         .to("bean:directionFromExternalAdder").to("direct:storeAndRespond")
                         // put the local connection URI into the header
                         .setHeader(WonCamelConstants.CONNECTION_URI_HEADER,
                                         new GetEnvelopePropertyExpression(WonCamelConstants.MESSAGE_HEADER,
-                                                        URI.create(WONMSG.RECEIVER_PROPERTY.getURI().toString())))
-                        .to("direct:invokeFacetLogic").choice()
+                                                        URI.create(WONMSG.recipient.getURI().toString())))
+                        .to("direct:invokeSocketLogic").choice()
                         .when(isNotEqualTo(header(WonCamelConstants.SUPPRESS_MESSAGE_TO_OWNER),
                                         ExpressionBuilder.constantExpression(Boolean.TRUE)))
                         .to("direct:sendToOwner").otherwise()
@@ -305,12 +305,12 @@ public class WonMessageRoutes extends RouteBuilder {
                                                         + WonCamelConstants.SUPPRESS_MESSAGE_TO_OWNER + "' is 'true'")
                         .endChoice().end();
         /**
-         * Need protocol, outgoing We add our signature, but we can't persist the
+         * Atom protocol, outgoing We add our signature, but we can't persist the
          * message in this form because its URI says it lives on the recipient node. The
          * recipient will persist it.
          */
-        from("seda:NeedProtocolOut?concurrentConsumers=5").routeId("seda:NeedProtocolOut").to("bean:signatureAdder")
-                        .to("bean:needProtocolOutgoingMessagesProcessor");
+        from("seda:AtomProtocolOut?concurrentConsumers=5").routeId("seda:AtomProtocolOut").to("bean:signatureAdder")
+                        .to("bean:atomProtocolOutgoingMessagesProcessor");
         /**
          * Matcher protocol, incoming
          */
@@ -318,7 +318,7 @@ public class WonMessageRoutes extends RouteBuilder {
                         .routeId("activemq:queue:MatcherProtocol.in").to("bean:wonMessageIntoCamelProcessor").choice()
                         // we only handle hint messages
                         .when(header(WonCamelConstants.MESSAGE_TYPE_HEADER)
-                                        .isEqualTo(URI.create(WONMSG.TYPE_HINT.getURI().toString())))
+                                        .isEqualTo(URI.create(WONMSG.HintMessage.getURI().toString())))
                         // TODO as soon as Matcher can sign his messages, perform here
                         // .to("bean:wellformednessChecker") and .to("bean:signatureChecker")
                         .to("bean:uriNodePathChecker").to("bean:uriInUseChecker").to("bean:envelopeAdder")
@@ -340,7 +340,7 @@ public class WonMessageRoutes extends RouteBuilder {
          * Matcher protocol, outgoing
          */
         from("seda:MatcherProtocolOut?concurrentConsumers=5").routeId("seda:MatcherProtocolOut")
-                        .transacted("PROPAGATION_NEVER").to("activemq:topic:MatcherProtocol.Out.Need");
+                        .transacted("PROPAGATION_NEVER").to("activemq:topic:MatcherProtocol.Out.Atom");
     }
 
     private class ConstantURIExpression implements Expression {

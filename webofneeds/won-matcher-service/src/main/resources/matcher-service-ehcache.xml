@@ -458,7 +458,7 @@ Here is an example of CacheManager level resource tuning, which will use up to 4
         transactionMode="local" - high performance local transactions involving caches only
         transactionalMode="off" - the default, no transactions
 
-        If set, all cache operations will need to be done through transactions.
+        If set, all cache operations will atom to be done through transactions.
 
         To prevent users keeping references on stored elements and modifying them outside of any transaction's control,
         transactions also require the cache to be configured copyOnRead and copyOnWrite.
@@ -639,7 +639,7 @@ Here is an example of CacheManager level resource tuning, which will use up to 4
         Sample cache named sampleCache2
         This cache has a maximum of 1000 elements in memory. There is no overflow to disk, so 1000
         is also the maximum cache size. Note that when a cache is eternal, timeToLive and
-        timeToIdle are not used and do not need to be specified.
+        timeToIdle are not used and do not atom to be specified.
         -->
     <!--cache name="sampleCache2" maxEntriesLocalHeap="1000" eternal="true" memoryStoreEvictionPolicy="FIFO"/-->
     <!--

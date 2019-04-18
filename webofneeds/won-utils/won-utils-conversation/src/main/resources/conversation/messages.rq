@@ -1,17 +1,17 @@
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-PREFIX msg: <http://purl.org/webofneeds/message#>
-PREFIX won: <http://purl.org/webofneeds/model#>
-PREFIX agr: <http://purl.org/webofneeds/agreement#>
-PREFIX mod: <http://purl.org/webofneeds/modification#> 
+PREFIX msg: <https://w3id.org/won/message#>
+PREFIX won: <https://w3id.org/won/core#>
+PREFIX agr: <https://w3id.org/won/agreement#>
+PREFIX mod: <https://w3id.org/won/modification#> 
 
-SELECT distinct (?msg as ?uri) ?timestamp ?msgType ?text ?senderNeed ?retracts ?accepts ?proposes ?proposesToCancel WHERE {
+SELECT distinct (?msg as ?uri) ?timestamp ?msgType ?text ?senderAtom ?retracts ?accepts ?proposes ?proposesToCancel WHERE {
  
  GRAPH <urn:x-arq:UnionGraph> {
-   ?msg msg:hasSenderNeed ?senderNeed.
-   ?msg msg:hasMessageType ?msgType.
-   ?msg msg:hasReceivedTimestamp ?timestamp.
+   ?msg msg:senderAtom ?senderAtom.
+   ?msg msg:messageType ?msgType.
+   ?msg msg:receivedTimestamp ?timestamp.
    OPTIONAL {
-    ?msg won:hasTextMessage ?text.
+    ?msg won:textMessage ?text.
    }
    OPTIONAL {
     ?msg agr:proposes ?proposes.

@@ -10,11 +10,11 @@ import org.apache.jena.query.Dataset;
 public interface MatcherProtocolMatcherService {
     public void onMatcherRegistration(URI wonNodeUri);
 
-    public void onNewNeed(final URI wonNodeURI, URI needURI, Dataset content);
+    public void onNewAtom(final URI wonNodeURI, URI atomURI, Dataset content);
 
-    public void onNeedModified(final URI wonNodeURI, URI needURI);
+    public void onAtomModified(final URI wonNodeURI, URI atomURI);
 
-    public void onNeedActivated(final URI wonNodeURI, URI needURI);
+    public void onAtomActivated(final URI wonNodeURI, URI atomURI);
 
-    public void onNeedDeactivated(final URI wonNodeURI, URI needURI);
+    public void onAtomDeactivated(final URI wonNodeURI, URI atomURI);
 }

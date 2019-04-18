@@ -15,6 +15,6 @@ public class CommentBotContextWrapper extends BotContextWrapper {
     }
 
     public List<URI> getCommentList() {
-        return getBotContext().getNamedNeedUriList(commentListName);
+        return getBotContext().getNamedAtomUriList(commentListName);
     }
 }

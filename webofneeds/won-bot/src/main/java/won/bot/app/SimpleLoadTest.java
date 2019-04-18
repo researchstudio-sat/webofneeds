@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 public class SimpleLoadTest {
     public static void main(String[] args) throws Exception {
         SpringApplication app = new SpringApplication(
-                        new Object[] { "classpath:/spring/app/simple2NeedConversationTest.xml" });
+                        new Object[] { "classpath:/spring/app/simple2AtomConversationTest.xml" });
         app.setWebEnvironment(false);
         ConfigurableApplicationContext applicationContext = app.run(args);
         Thread.sleep(5 * 60 * 1000);

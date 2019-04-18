@@ -55,7 +55,7 @@ public class MatcherBotTest {
         // create a bot instance and auto-wire it
         this.bot = (MyBot) applicationContext.getAutowireCapableBeanFactory().autowire(MyBot.class,
                         AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, false);
-        // the bot also needs a trigger so its act() method is called regularly.
+        // the bot also atoms a trigger so its act() method is called regularly.
         // (there is no trigger bean in the context)
         PeriodicTrigger trigger = new PeriodicTrigger(ACT_LOOP_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
         trigger.setInitialDelay(ACT_LOOP_INITIAL_DELAY_MILLIS);
@@ -124,21 +124,21 @@ public class MatcherBotTest {
             Assert.assertEquals(1, this.matcherRegistrator.getEventCount());
             Assert.assertEquals(0, this.matcherRegistrator.getExceptionCount());
             // 1 act events
-            Assert.assertEquals(2, this.needCreator.getEventCount());
-            Assert.assertEquals(0, this.needCreator.getExceptionCount());
+            Assert.assertEquals(2, this.atomCreator.getEventCount());
+            Assert.assertEquals(0, this.atomCreator.getExceptionCount());
             Assert.assertEquals(4, this.matcherNotifier.getEventCount());
             Assert.assertEquals(0, this.matcherNotifier.getExceptionCount());
-            // 1 create need events
+            // 1 create atom events
             Assert.assertEquals(2, this.matcher.getEventCount());
             Assert.assertEquals(0, this.matcher.getExceptionCount());
-            Assert.assertEquals(1, this.allNeedsDeactivator.getEventCount());
-            Assert.assertEquals(0, this.allNeedsDeactivator.getExceptionCount());
-            // 4 NeedDeactivated events
+            Assert.assertEquals(1, this.allAtomsDeactivator.getEventCount());
+            Assert.assertEquals(0, this.allAtomsDeactivator.getExceptionCount());
+            // 4 AtomDeactivated events
             Assert.assertEquals(4, this.workDoneSignaller.getEventCount());
             Assert.assertEquals(0, this.workDoneSignaller.getExceptionCount());
             // TODO: there is more to check:
             // * what does the RDF look like?
-            // --> pull it from the needURI/ConnectionURI and check contents
+            // --> pull it from the atomURI/ConnectionURI and check contents
             // * what does the database look like? */
         }
     }

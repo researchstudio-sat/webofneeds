@@ -16,9 +16,9 @@ public abstract class FactoryBot extends EventBot {
             logger.error("FactoryBot does not work without a FactoryBotContextWrapper");
             throw new IllegalStateException("FactoryBot does not work without a FactoryBotContextWrapper");
         }
-        if (getNeedProducer() == null) {
-            logger.error("FactoryBots do not work without a set needProducer");
-            throw new IllegalStateException("FactoryBots do not work without a set needProducer");
+        if (getAtomProducer() == null) {
+            logger.error("FactoryBots do not work without a set atomProducer");
+            throw new IllegalStateException("FactoryBots do not work without a set atomProducer");
         }
         EventListenerContext ctx = getEventListenerContext();
         BotBehaviour factoryBotInitBehaviour = new FactoryBotInitBehaviour(ctx);

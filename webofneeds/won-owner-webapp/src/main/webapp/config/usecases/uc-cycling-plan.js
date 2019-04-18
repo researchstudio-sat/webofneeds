@@ -21,11 +21,11 @@ export const cyclingPlan = {
         type: ["s:PlanAction"],
         title: "Let's go for a bike ride!",
         eventObject: "http://dbpedia.org/resource/Cycling",
-        facets: {
-          "#groupFacet": won.WON.GroupFacetCompacted,
-          "#holdableFacet": won.WON.HoldableFacetCompacted,
+        sockets: {
+          "#groupSocket": won.WON.GroupSocketCompacted,
+          "#holdableSocket": won.WON.HoldableSocketCompacted,
         },
-        defaultFacet: { "#groupFacet": won.WON.GroupFacetCompacted },
+        defaultSocket: { "#groupSocket": won.WON.GroupSocketCompacted },
       },
       seeks: {},
     }),

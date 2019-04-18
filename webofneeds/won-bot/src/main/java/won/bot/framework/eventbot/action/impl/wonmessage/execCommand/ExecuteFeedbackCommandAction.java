@@ -31,8 +31,8 @@ import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WON;
 
 /**
- * Action executing a ConnectCommandEvent, connecting to the remoteNeed on
- * behalf of the need.
+ * Action executing a ConnectCommandEvent, connecting to the targetAtom on
+ * behalf of the atom.
  */
 public class ExecuteFeedbackCommandAction extends ExecuteSendMessageCommandAction<FeedbackCommandEvent> {
     public ExecuteFeedbackCommandAction(final EventListenerContext eventListenerContext) {
@@ -54,8 +54,8 @@ public class ExecuteFeedbackCommandAction extends ExecuteSendMessageCommandActio
     @Override
     protected MessageCommandFailureEvent createLocalNodeFailureEvent(FeedbackCommandEvent originalCommand,
                     WonMessage messageSent, FailureResponseEvent failureResponseEvent) {
-        return new FeedbackCommandFailureEvent(originalCommand, failureResponseEvent.getNeedURI(),
-                        failureResponseEvent.getRemoteNeedURI(), failureResponseEvent.getConnectionURI());
+        return new FeedbackCommandFailureEvent(originalCommand, failureResponseEvent.getAtomURI(),
+                        failureResponseEvent.getTargetAtomURI(), failureResponseEvent.getConnectionURI());
     }
 
     @Override
@@ -74,11 +74,11 @@ public class ExecuteFeedbackCommandAction extends ExecuteSendMessageCommandActio
         URI connectionURI = feedbackCommandEvent.getConnectionURI();
         WonNodeInformationService wonNodeInformationService = getEventListenerContext().getWonNodeInformationService();
         Dataset connectionRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(connectionURI);
-        URI localNeed = WonRdfUtils.ConnectionUtils.getLocalNeedURIFromConnection(connectionRDF, connectionURI);
+        URI localAtom = WonRdfUtils.ConnectionUtils.getLocalAtomURIFromConnection(connectionRDF, connectionURI);
         URI wonNode = WonRdfUtils.ConnectionUtils.getWonNodeURIFromConnection(connectionRDF, connectionURI);
         // TODO: make more generic by using the URIs specified in the command.
         return WonMessageBuilder.setMessagePropertiesForHintFeedback(
-                        wonNodeInformationService.generateEventURI(wonNode), connectionURI, localNeed, wonNode,
-                        URI.create(WON.GOOD.getURI()).equals(feedbackCommandEvent.getValue())).build();
+                        wonNodeInformationService.generateEventURI(wonNode), connectionURI, localAtom, wonNode,
+                        URI.create(WON.Good.getURI()).equals(feedbackCommandEvent.getValue())).build();
     }
 }

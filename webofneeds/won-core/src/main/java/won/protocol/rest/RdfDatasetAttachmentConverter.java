@@ -71,7 +71,7 @@ public class RdfDatasetAttachmentConverter extends AbstractHttpMessageConverter<
                 String content = getObjectOfPropertyAsString(model, CNT.BYTES);
                 if (content == null)
                     return null;
-                String contentType = getObjectOfPropertyAsString(model, WONMSG.CONTENT_TYPE);
+                String contentType = getObjectOfPropertyAsString(model, WONMSG.contentType);
                 return new ContentAndMimeType(content, contentType);
             }
         }, false);

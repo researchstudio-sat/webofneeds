@@ -51,16 +51,16 @@ public class DeliveryResponseEvent extends BaseEvent implements ResponseEvent {
 
     @Override
     public URI getConnectionURI() {
-        return message.getReceiverURI();
+        return message.getRecipientURI();
     }
 
     @Override
-    public URI getRemoteNeedURI() {
-        return message.getSenderNeedURI();
+    public URI getTargetAtomURI() {
+        return message.getSenderAtomURI();
     }
 
     @Override
-    public URI getNeedURI() {
-        return message.getReceiverNeedURI();
+    public URI getAtomURI() {
+        return message.getRecipientAtomURI();
     }
 }

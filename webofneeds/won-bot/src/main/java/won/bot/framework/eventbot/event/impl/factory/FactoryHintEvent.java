@@ -5,22 +5,22 @@ import java.net.URI;
 import won.bot.framework.eventbot.event.BaseEvent;
 
 /**
- * Event used when a hintevent is called on a factory need
+ * Event used when a hintevent is called on a factory atom
  */
 public class FactoryHintEvent extends BaseEvent {
     private URI requesterURI;
-    private URI factoryNeedURI;
+    private URI factoryAtomURI;
 
-    public FactoryHintEvent(URI requesterURI, URI factoryNeedURI) {
+    public FactoryHintEvent(URI requesterURI, URI factoryAtomURI) {
         this.requesterURI = requesterURI;
-        this.factoryNeedURI = factoryNeedURI;
+        this.factoryAtomURI = factoryAtomURI;
     }
 
     public URI getRequesterURI() {
         return requesterURI;
     }
 
-    public URI getFactoryNeedURI() {
-        return factoryNeedURI;
+    public URI getFactoryAtomURI() {
+        return factoryAtomURI;
     }
 }

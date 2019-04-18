@@ -7,7 +7,7 @@ import { get, getIn } from "../utils.js";
 
 const initialState = Immutable.fromJS({
   showRdf: false,
-  showClosedNeeds: false,
+  showClosedAtoms: false,
   showMainMenu: false,
   showAddMessageContent: false,
   selectedAddMessageContent: undefined,
@@ -22,10 +22,10 @@ const initialState = Immutable.fromJS({
     linkCopied: false,
   },
   showSlideIns: true,
-  needs: new Immutable.Map(),
+  atoms: new Immutable.Map(),
 });
 
-const initialNeedState = Immutable.fromJS({
+const initialAtomState = Immutable.fromJS({
   showGeneralInfo: false,
   visibleTab: "DETAIL",
 });
@@ -68,10 +68,10 @@ export default function(viewState = initialState, action = {}) {
         .set("showRdf", !viewState.get("showRdf"))
         .set("showMainMenu", false);
 
-    case actionTypes.view.toggleClosedNeeds:
+    case actionTypes.view.toggleClosedAtoms:
       return viewState.set(
-        "showClosedNeeds",
-        !viewState.get("showClosedNeeds")
+        "showClosedAtoms",
+        !viewState.get("showClosedAtoms")
       );
 
     case actionTypes.view.toggleAddMessageContent:
@@ -164,14 +164,14 @@ export default function(viewState = initialState, action = {}) {
         .setIn(["anonymousSlideIn", "linkCopied"], true)
         .setIn(["anonymousSlideIn", "linkSent"], false);
 
-    case actionTypes.needs.selectTab: {
-      const needUri = action.payload.get("needUri");
+    case actionTypes.atoms.selectTab: {
+      const atomUri = action.payload.get("atomUri");
       const selectTab = action.payload.get("selectTab");
 
       return viewState.updateIn(
-        ["needs", needUri],
-        initialNeedState,
-        needState => needState.update("visibleTab", () => selectTab)
+        ["atoms", atomUri],
+        initialAtomState,
+        atomState => atomState.update("visibleTab", () => selectTab)
       );
     }
 

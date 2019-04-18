@@ -21,14 +21,14 @@ import won.protocol.vocabulary.WONMSG;
  * User: syim Date: 02.03.2015
  */
 @Component
-@FixedMessageProcessor(direction = WONMSG.TYPE_FROM_EXTERNAL_STRING, messageType = WONMSG.TYPE_CONNECTION_MESSAGE_STRING)
+@FixedMessageProcessor(direction = WONMSG.FromExternalString, messageType = WONMSG.ConnectionMessageString)
 public class SendMessageFromNodeProcessor extends AbstractCamelProcessor {
     public void process(final Exchange exchange) throws Exception {
         Message message = exchange.getIn();
         WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.MESSAGE_HEADER);
-        URI connectionUri = wonMessage.getReceiverURI();
+        URI connectionUri = wonMessage.getRecipientURI();
         if (connectionUri == null) {
-            throw new MissingMessagePropertyException(URI.create(WONMSG.RECEIVER_PROPERTY.toString()));
+            throw new MissingMessagePropertyException(URI.create(WONMSG.recipient.toString()));
         }
         Connection con = connectionRepository.findOneByConnectionURIForUpdate(connectionUri).get();
         if (con.getState() != ConnectionState.CONNECTED) {

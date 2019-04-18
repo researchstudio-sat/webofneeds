@@ -1,9 +1,9 @@
-PREFIX won:<http://purl.org/webofneeds/model#> 
+PREFIX won:<https://w3id.org/won/core#> 
 SELECT DISTINCT  *
 WHERE
   { SELECT  ?result
     WHERE
-      { ?result a won:Need.
+      { ?result a won:Atom.
         ?result ?prop ?textSearchTarget.
         FILTER contains(lcase(?textSearchTarget), "wtf")
       }

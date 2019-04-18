@@ -15,8 +15,8 @@ import java.net.URI;
 import won.bot.framework.eventbot.event.impl.command.MessageCommandResultEvent;
 
 /**
- * Tags a result event of a CreateNeedCommand.
+ * Tags a result event of a CreateAtomCommand.
  */
 public interface ReplaceCommandResultEvent extends MessageCommandResultEvent {
-    URI getNeedURI();
+    URI getAtomURI();
 }

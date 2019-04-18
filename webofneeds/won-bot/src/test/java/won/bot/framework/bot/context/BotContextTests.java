@@ -62,49 +62,49 @@ public class BotContextTests {
     }
 
     @Test
-    public void testNamedNeedUriMethods() {
-        botContext.dropCollection(MongoBotContext.NEED_URI_COLLECTION);
+    public void testNamedAtomUriMethods() {
+        botContext.dropCollection(MongoBotContext.ATOM_URI_COLLECTION);
         botContext.dropCollection(MongoBotContext.NODE_URI_COLLECTION);
-        Assert.assertNotNull(botContext.retrieveAllNeedUris());
-        Assert.assertEquals(0, botContext.retrieveAllNeedUris().size());
-        botContext.appendToNamedNeedUriList(URI1, "uri1");
-        Assert.assertEquals(1, botContext.retrieveAllNeedUris().size());
-        Assert.assertEquals(URI1, botContext.retrieveAllNeedUris().iterator().next());
-        Assert.assertEquals(1, botContext.getNamedNeedUriList("uri1").size());
-        Assert.assertEquals(URI1, botContext.getNamedNeedUriList("uri1").get(0));
-        botContext.appendToNamedNeedUriList(URI2, "uri2");
-        botContext.appendToNamedNeedUriList(URI3, "uri1");
-        Assert.assertEquals(3, botContext.retrieveAllNeedUris().size());
-        Assert.assertEquals(2, botContext.getNamedNeedUriList("uri1").size());
-        Assert.assertTrue(botContext.getNamedNeedUriList("uri1").contains(URI1));
-        Assert.assertTrue(botContext.getNamedNeedUriList("uri2").contains(URI2));
-        Assert.assertTrue(botContext.getNamedNeedUriList("uri1").contains(URI3));
-        Assert.assertFalse(botContext.getNamedNeedUriList("uri2").contains(URI1));
-        Assert.assertFalse(botContext.getNamedNeedUriList("uri1").contains(URI2));
-        Assert.assertFalse(botContext.getNamedNeedUriList("uri2").contains(URI3));
-        Assert.assertTrue(botContext.isNeedKnown(URI1));
-        Assert.assertTrue(botContext.isNeedKnown(URI2));
-        Assert.assertTrue(botContext.isNeedKnown(URI3));
-        botContext.appendToNamedNeedUriList(URI1, "uri2");
-        Assert.assertEquals(3, botContext.retrieveAllNeedUris().size());
-        Assert.assertEquals(2, botContext.getNamedNeedUriList("uri1").size());
-        Assert.assertEquals(2, botContext.getNamedNeedUriList("uri2").size());
-        Assert.assertTrue(botContext.getNamedNeedUriList("uri1").contains(URI1));
-        botContext.removeNeedUriFromNamedNeedUriList(URI1, "uri2"); // removes URI1 from uri1 but not from uri2
-        botContext.removeNeedUriFromNamedNeedUriList(URI2, "uri1");
-        botContext.removeNeedUriFromNamedNeedUriList(URI3, "uri1");
-        Assert.assertEquals(2, botContext.retrieveAllNeedUris().size()); // URI1 and URI2 should still be there in the
+        Assert.assertNotNull(botContext.retrieveAllAtomUris());
+        Assert.assertEquals(0, botContext.retrieveAllAtomUris().size());
+        botContext.appendToNamedAtomUriList(URI1, "uri1");
+        Assert.assertEquals(1, botContext.retrieveAllAtomUris().size());
+        Assert.assertEquals(URI1, botContext.retrieveAllAtomUris().iterator().next());
+        Assert.assertEquals(1, botContext.getNamedAtomUriList("uri1").size());
+        Assert.assertEquals(URI1, botContext.getNamedAtomUriList("uri1").get(0));
+        botContext.appendToNamedAtomUriList(URI2, "uri2");
+        botContext.appendToNamedAtomUriList(URI3, "uri1");
+        Assert.assertEquals(3, botContext.retrieveAllAtomUris().size());
+        Assert.assertEquals(2, botContext.getNamedAtomUriList("uri1").size());
+        Assert.assertTrue(botContext.getNamedAtomUriList("uri1").contains(URI1));
+        Assert.assertTrue(botContext.getNamedAtomUriList("uri2").contains(URI2));
+        Assert.assertTrue(botContext.getNamedAtomUriList("uri1").contains(URI3));
+        Assert.assertFalse(botContext.getNamedAtomUriList("uri2").contains(URI1));
+        Assert.assertFalse(botContext.getNamedAtomUriList("uri1").contains(URI2));
+        Assert.assertFalse(botContext.getNamedAtomUriList("uri2").contains(URI3));
+        Assert.assertTrue(botContext.isAtomKnown(URI1));
+        Assert.assertTrue(botContext.isAtomKnown(URI2));
+        Assert.assertTrue(botContext.isAtomKnown(URI3));
+        botContext.appendToNamedAtomUriList(URI1, "uri2");
+        Assert.assertEquals(3, botContext.retrieveAllAtomUris().size());
+        Assert.assertEquals(2, botContext.getNamedAtomUriList("uri1").size());
+        Assert.assertEquals(2, botContext.getNamedAtomUriList("uri2").size());
+        Assert.assertTrue(botContext.getNamedAtomUriList("uri1").contains(URI1));
+        botContext.removeAtomUriFromNamedAtomUriList(URI1, "uri2"); // removes URI1 from uri1 but not from uri2
+        botContext.removeAtomUriFromNamedAtomUriList(URI2, "uri1");
+        botContext.removeAtomUriFromNamedAtomUriList(URI3, "uri1");
+        Assert.assertEquals(2, botContext.retrieveAllAtomUris().size()); // URI1 and URI2 should still be there in the
                                                                          // general list
-        Assert.assertEquals(1, botContext.getNamedNeedUriList("uri1").size());
-        Assert.assertTrue(botContext.getNamedNeedUriList("uri1").contains(URI1));
-        Assert.assertEquals(1, botContext.getNamedNeedUriList("uri2").size());
-        Assert.assertTrue(botContext.getNamedNeedUriList("uri2").contains(URI2));
-        botContext.removeNeedUriFromNamedNeedUriList(URI1, "uri1");
-        botContext.removeNeedUriFromNamedNeedUriList(URI2, "uri2");
-        Assert.assertNotNull(botContext.getNamedNeedUriList("uri1"));
-        Assert.assertEquals(0, botContext.getNamedNeedUriList("uri1").size());
-        Assert.assertNotNull(botContext.retrieveAllNeedUris());
-        Assert.assertEquals(0, botContext.retrieveAllNeedUris().size());
+        Assert.assertEquals(1, botContext.getNamedAtomUriList("uri1").size());
+        Assert.assertTrue(botContext.getNamedAtomUriList("uri1").contains(URI1));
+        Assert.assertEquals(1, botContext.getNamedAtomUriList("uri2").size());
+        Assert.assertTrue(botContext.getNamedAtomUriList("uri2").contains(URI2));
+        botContext.removeAtomUriFromNamedAtomUriList(URI1, "uri1");
+        botContext.removeAtomUriFromNamedAtomUriList(URI2, "uri2");
+        Assert.assertNotNull(botContext.getNamedAtomUriList("uri1"));
+        Assert.assertEquals(0, botContext.getNamedAtomUriList("uri1").size());
+        Assert.assertNotNull(botContext.retrieveAllAtomUris());
+        Assert.assertEquals(0, botContext.retrieveAllAtomUris().size());
     }
 
     @Test
@@ -214,7 +214,7 @@ public class BotContextTests {
         botContext.saveToObjectMap("uriList", "list1", uriList);
         List<URI> uriListCopy = (List<URI>) botContext.loadFromObjectMap("uriList", "list1");
         Assert.assertEquals(uriList, uriListCopy);
-        // HashMap needs to be serialized (here only non-complex keys are allowed in
+        // HashMap atoms to be serialized (here only non-complex keys are allowed in
         // maps)
         botContext.dropCollection("uriMap");
         HashMap<String, URI> uriHashMap = new HashMap<>();

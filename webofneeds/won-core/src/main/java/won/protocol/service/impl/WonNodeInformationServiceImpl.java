@@ -36,8 +36,8 @@ public class WonNodeInformationServiceImpl implements WonNodeInformationService 
     }
 
     @Override
-    public URI generateNeedURI() {
-        return generateNeedURI(getDefaultWonNodeURI());
+    public URI generateAtomURI() {
+        return generateAtomURI(getDefaultWonNodeURI());
     }
 
     @Override
@@ -85,20 +85,20 @@ public class WonNodeInformationServiceImpl implements WonNodeInformationService 
     }
 
     @Override
-    public URI generateNeedURI(URI wonNodeURI) {
+    public URI generateAtomURI(URI wonNodeURI) {
         WonNodeInfo wonNodeInformation = getWonNodeInformation(wonNodeURI);
-        return URI.create(wonNodeInformation.getNeedURIPrefix() + "/" + generateRandomID());
+        return URI.create(wonNodeInformation.getAtomURIPrefix() + "/" + generateRandomID());
     }
 
     @Override
-    public boolean isValidNeedURI(URI needURI) {
-        return isValidNeedURI(needURI, getDefaultWonNodeURI());
+    public boolean isValidAtomURI(URI atomURI) {
+        return isValidAtomURI(atomURI, getDefaultWonNodeURI());
     }
 
     @Override
-    public boolean isValidNeedURI(URI needURI, URI wonNodeURI) {
+    public boolean isValidAtomURI(URI atomURI, URI wonNodeURI) {
         WonNodeInfo wonNodeInformation = getWonNodeInformation(wonNodeURI);
-        return isValidURI(needURI, wonNodeInformation.getNeedURIPrefix());
+        return isValidURI(atomURI, wonNodeInformation.getAtomURIPrefix());
     }
 
     private boolean isValidURI(URI uri, String prefix) {
@@ -107,7 +107,7 @@ public class WonNodeInformationServiceImpl implements WonNodeInformationService 
 
     @Override
     public URI getWonNodeUri(final URI resourceURI) {
-        URI wonNodeURI = WonLinkedDataUtils.getWonNodeURIForNeedOrConnectionURI(resourceURI, linkedDataSource);
+        URI wonNodeURI = WonLinkedDataUtils.getWonNodeURIForAtomOrConnectionURI(resourceURI, linkedDataSource);
         if (wonNodeURI == null)
             throw new IllegalStateException("Could not obtain WoN node URI for resource " + resourceURI);
         return wonNodeURI;

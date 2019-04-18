@@ -16,12 +16,12 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.stereotype.Component;
 
-import won.bot.framework.component.needprosumer.NeedProsumer;
+import won.bot.framework.component.atomprosumer.AtomProsumer;
 
 @Component
 public class SimpleMaildirToOwnerBot implements CommandLineRunner {
     @Autowired
-    private NeedProsumer prosumer;
+    private AtomProsumer prosumer;
     @Autowired
     CamelContext camelContext;
 

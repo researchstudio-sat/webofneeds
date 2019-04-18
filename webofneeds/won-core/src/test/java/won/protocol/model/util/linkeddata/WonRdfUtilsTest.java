@@ -52,33 +52,33 @@ public class WonRdfUtilsTest {
     }
 
     @Test
-    public void testGetNeedURI() {
-        Dataset needDataset = loadTestDatasetFromClasspathResource("wonrdfutils/need1.trig");
-        URI needURI = WonRdfUtils.NeedUtils.getNeedURI(needDataset);
-        Assert.assertEquals(URI.create("https://192.168.124.49:8443/won/resource/need/cbfgi37je6kr"), needURI);
+    public void testGetAtomURI() {
+        Dataset atomDataset = loadTestDatasetFromClasspathResource("wonrdfutils/atom1.trig");
+        URI atomURI = WonRdfUtils.AtomUtils.getAtomURI(atomDataset);
+        Assert.assertEquals(URI.create("https://192.168.124.49:8443/won/resource/atom/cbfgi37je6kr"), atomURI);
     }
 
     @Test
-    public void testGetFacetsOfTypeOneFacet() {
-        Dataset needDataset = loadTestDatasetFromClasspathResource("wonrdfutils/need1.trig");
-        URI needURI = WonRdfUtils.NeedUtils.getNeedURI(needDataset);
-        Collection<URI> facets = WonRdfUtils.FacetUtils.getFacetsOfType(needDataset, needURI,
-                        URI.create(WON.CHAT_FACET_STRING));
-        Assert.assertEquals(1, facets.size());
-        Assert.assertEquals(URI.create("https://192.168.124.49:8443/won/resource/need/cbfgi37je6kr#chatFacet"),
-                        facets.stream().findFirst().get());
+    public void testGetSocketsOfTypeOneSocket() {
+        Dataset atomDataset = loadTestDatasetFromClasspathResource("wonrdfutils/atom1.trig");
+        URI atomURI = WonRdfUtils.AtomUtils.getAtomURI(atomDataset);
+        Collection<URI> sockets = WonRdfUtils.SocketUtils.getSocketsOfType(atomDataset, atomURI,
+                        URI.create(WON.ChatSocketString));
+        Assert.assertEquals(1, sockets.size());
+        Assert.assertEquals(URI.create("https://192.168.124.49:8443/won/resource/atom/cbfgi37je6kr#chatSocket"),
+                        sockets.stream().findFirst().get());
     }
 
     @Test
-    public void testGetFacetsOfTypeTwoFacets() {
-        Dataset needDataset = loadTestDatasetFromClasspathResource("wonrdfutils/need1.trig");
-        URI needURI = WonRdfUtils.NeedUtils.getNeedURI(needDataset);
-        Collection<URI> facets = WonRdfUtils.FacetUtils.getFacetsOfType(needDataset, needURI,
-                        URI.create(WON.GROUP_FACET_STRING));
-        Assert.assertEquals(2, facets.size());
-        Assert.assertTrue(facets.contains(
-                        URI.create("https://192.168.124.49:8443/won/resource/need/cbfgi37je6kr#groupFacet1")));
-        Assert.assertTrue(facets.contains(
-                        URI.create("https://192.168.124.49:8443/won/resource/need/cbfgi37je6kr#groupFacet1")));
+    public void testGetSocketsOfTypeTwoSockets() {
+        Dataset atomDataset = loadTestDatasetFromClasspathResource("wonrdfutils/atom1.trig");
+        URI atomURI = WonRdfUtils.AtomUtils.getAtomURI(atomDataset);
+        Collection<URI> sockets = WonRdfUtils.SocketUtils.getSocketsOfType(atomDataset, atomURI,
+                        URI.create(WON.GroupSocketString));
+        Assert.assertEquals(2, sockets.size());
+        Assert.assertTrue(sockets.contains(
+                        URI.create("https://192.168.124.49:8443/won/resource/atom/cbfgi37je6kr#groupSocket1")));
+        Assert.assertTrue(sockets.contains(
+                        URI.create("https://192.168.124.49:8443/won/resource/atom/cbfgi37je6kr#groupSocket1")));
     }
 }

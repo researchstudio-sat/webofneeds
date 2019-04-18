@@ -20,7 +20,7 @@ import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.event.Event;
 
 /**
- * Event filter that accepts need specific events the URI of which is found in
+ * Event filter that accepts atom specific events the URI of which is found in
  * the specified named URI list.
  */
 public abstract class AbstractNamedUriListFilter extends EventListenerContextAwareFilter {
@@ -37,9 +37,9 @@ public abstract class AbstractNamedUriListFilter extends EventListenerContextAwa
         URI uri = getURIFromEvent(event);
         if (uri == null)
             return false;
-        Collection<URI> uris = getContext().getBotContext().getNamedNeedUriList(listname);
+        Collection<URI> uris = getContext().getBotContext().getNamedAtomUriList(listname);
         if (uris == null) {
-            logger.debug("filtering by named need uri list, but no list found with name '{}'", listname);
+            logger.debug("filtering by named atom uri list, but no list found with name '{}'", listname);
             return false;
         }
         return uris.contains(uri);

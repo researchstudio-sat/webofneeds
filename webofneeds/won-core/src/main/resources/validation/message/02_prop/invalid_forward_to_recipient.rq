@@ -1,0 +1,25 @@
+prefix dc:    <http://purl.org/dc/elements/1.1/>
+prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
+prefix geo:   <http://www.w3.org/2003/01/geo/wgs84_pos#>
+prefix conn:  <http://localhost:8080/won/resource/connection/>
+prefix event: <http://localhost:8080/won/resource/event/>
+prefix woncrypt: <https://w3id.org/won/core#>
+prefix xsd:   <http://www.w3.org/2001/XMLSchema#>
+prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+prefix local: <http://localhost:8080/won/resource/>
+prefix won:   <https://w3id.org/won/core#>
+prefix msg:   <https://w3id.org/won/message#>
+prefix signature: <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#>
+prefix ldp:   <http://www.w3.org/ns/ldp#>
+
+# The msg:hasForwardToRecipient property is only allowed in msg:ConnectionMessage envelopes.
+SELECT * WHERE {
+  GRAPH ?graph
+  {
+      ?offendingMessage msg:messageType ?type .
+      optional {
+          ?offendingMessage msg:hasForwardToRecipient ?forwardReceiver .
+      }
+      bind(if (bound(?forwardReceiver) && ?type != msg:ConnectionMessage, "FAIL", "OK") as ?check)
+  }
+}

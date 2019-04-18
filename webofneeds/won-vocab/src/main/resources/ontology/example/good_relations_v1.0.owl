@@ -299,7 +299,7 @@ Note 2: You can use greater signs or slashes to informally indicate a category h
         </owl:unionOf>
       </owl:Class>
     </rdfs:domain>
-    <rdfs:comment xml:lang="en">This property states that the respective gr:Location is a point of sale for the respective gr:BusinessEntity. It allows linking those two types of entities without the need for a particular gr:Offering.</rdfs:comment>
+    <rdfs:comment xml:lang="en">This property states that the respective gr:Location is a point of sale for the respective gr:BusinessEntity. It allows linking those two types of entities without the atom for a particular gr:Offering.</rdfs:comment>
     <rdfs:isDefinedBy rdf:resource="http://purl.org/goodrelations/v1"/>
   </owl:ObjectProperty>
   <owl:DatatypeProperty rdf:about="http://purl.org/goodrelations/v1#availabilityEnds">
@@ -545,7 +545,7 @@ The difference to the gr:validFrom and gr:validThrough properties is that those 
     </rdfs:domain>
     <rdfs:comment xml:lang="en">This property can be used to indicate the transaction volume, in a monetary unit, for which the gr:Offering or gr:PriceSpecification is valid. This is mostly used to specify a minimal purchasing volume, to express free shipping above a certain order volume, or to limit the acceptance of credit cards to purchases above a certain amount.
 
-The object is a gr:PriceSpecification that uses the properties gr:hasMaxCurrencyValue and gr:hasMinCurrencyValue to indicate the lower and upper boundaries and gr:hasCurrency to indicate the currency using the ISO 4217 standard (3 characters).</rdfs:comment>
+The object is a gr:PriceSpecification that uses the properties gr:hasMaxCurrencyValue and gr:hasMinCurrencyValue to indicate the lower and upper boundaries and gr:currency to indicate the currency using the ISO 4217 standard (3 characters).</rdfs:comment>
     <rdfs:isDefinedBy rdf:resource="http://purl.org/goodrelations/v1"/>
   </owl:ObjectProperty>
   <owl:DatatypeProperty rdf:about="http://purl.org/goodrelations/v1#durationOfWarrantyInMonths">
@@ -605,7 +605,7 @@ Note: This is just a rough classification for filtering offers. It is up to the 
     <rdfs:isDefinedBy rdf:resource="http://purl.org/goodrelations/v1"/>
     <rdfs:label xml:lang="en">Parts and labor / pick up (warranty scope)</rdfs:label>
   </gr:WarrantyScope>
-  <owl:ObjectProperty rdf:about="http://purl.org/goodrelations/v1#hasPriceSpecification">
+  <owl:ObjectProperty rdf:about="http://purl.org/goodrelations/v1#priceSpecification">
     <rdfs:range rdf:resource="http://purl.org/goodrelations/v1#PriceSpecification"/>
     <rdfs:label xml:lang="en">has price specification (0..*)</rdfs:label>
     <rdfs:domain>
@@ -1225,7 +1225,7 @@ This property is semantically equivalent to dcterms:title and rdfs:label and jus
     <rdfs:isDefinedBy rdf:resource="http://purl.org/goodrelations/v1"/>
     <rdfs:label xml:lang="en">Lease Out (business function)</rdfs:label>
   </gr:BusinessFunction>
-  <owl:DatatypeProperty rdf:about="http://purl.org/goodrelations/v1#hasCurrencyValue">
+  <owl:DatatypeProperty rdf:about="http://purl.org/goodrelations/v1#currencyValue">
     <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#float"/>
     <rdfs:label xml:lang="en">has currency value (0..1)</rdfs:label>
     <rdfs:domain rdf:resource="http://purl.org/goodrelations/v1#PriceSpecification"/>
@@ -1235,7 +1235,7 @@ For a gr:UnitPriceSpecification, this is the price for one unit or bundle (as sp
 
 GoodRelations also supports giving price information as intervals only. If this is needed, use gr:hasMaxCurrencyValue for the upper bound and gr:hasMinCurrencyValue for the lower bound. 
 
-Using gr:hasCurrencyValue sets the upper and lower bounds to the same given value, i.e., x gr:hasCurrencyValue y implies x gr:hasMinCurrencyValue y, x gr:hasMaxCurrencyValue y.</rdfs:comment>
+Using gr:currencyValue sets the upper and lower bounds to the same given value, i.e., x gr:currencyValue y implies x gr:hasMinCurrencyValue y, x gr:hasMaxCurrencyValue y.</rdfs:comment>
     <rdfs:isDefinedBy rdf:resource="http://purl.org/goodrelations/v1"/>
     <rdfs:subPropertyOf>
       <owl:DatatypeProperty rdf:about="http://purl.org/goodrelations/v1#hasMinCurrencyValue">
@@ -1245,7 +1245,7 @@ Using gr:hasCurrencyValue sets the upper and lower bounds to the same given valu
         <rdfs:comment xml:lang="en">This property specifies the LOWER BOUND of the amount of money for a price RANGE per unit, shipping charges, or payment charges. The currency and other relevant details are attached to the respective gr:PriceSpecification etc.
 For a gr:UnitPriceSpecification, this is the LOWER BOUND for the price for one unit or bundle (as specified in the unit of measurement of the unit price specification) of the respective gr:ProductOrService. For a gr:DeliveryChargeSpecification or a gr:PaymentChargeSpecification, it is the LOWER BOUND of the price per delivery or payment.
 
-Using gr:hasCurrencyValue sets the upper and lower bounds to the same given value, i.e., x gr:hasCurrencyValue y implies x gr:hasMinCurrencyValue y, x gr:hasMaxCurrencyValue y.</rdfs:comment>
+Using gr:currencyValue sets the upper and lower bounds to the same given value, i.e., x gr:currencyValue y implies x gr:hasMinCurrencyValue y, x gr:hasMaxCurrencyValue y.</rdfs:comment>
         <rdfs:isDefinedBy rdf:resource="http://purl.org/goodrelations/v1"/>
       </owl:DatatypeProperty>
     </rdfs:subPropertyOf>
@@ -1257,12 +1257,12 @@ Using gr:hasCurrencyValue sets the upper and lower bounds to the same given valu
         <rdfs:comment xml:lang="en">This property specifies the UPPER BOUND of the amount of money for a price RANGE per unit, shipping charges, or payment charges. The currency and other relevant details are attached to the respective gr:PriceSpecification etc.
 For a gr:UnitPriceSpecification, this is the UPPER BOUND for the price for one unit or bundle (as specified in the unit of measurement of the unit price specification) of the respective gr:ProductOrService. For a gr:DeliveryChargeSpecification or a gr:PaymentChargeSpecification, it is the UPPER BOUND of the price per delivery or payment.
 
-Using gr:hasCurrencyValue sets the upper and lower bounds to the same given value, i.e., x gr:hasCurrencyValue y implies x gr:hasMinCurrencyValue y, x gr:hasMaxCurrencyValue y.</rdfs:comment>
+Using gr:currencyValue sets the upper and lower bounds to the same given value, i.e., x gr:currencyValue y implies x gr:hasMinCurrencyValue y, x gr:hasMaxCurrencyValue y.</rdfs:comment>
         <rdfs:isDefinedBy rdf:resource="http://purl.org/goodrelations/v1"/>
       </owl:DatatypeProperty>
     </rdfs:subPropertyOf>
   </owl:DatatypeProperty>
-  <owl:DatatypeProperty rdf:about="http://purl.org/goodrelations/v1#hasCurrency">
+  <owl:DatatypeProperty rdf:about="http://purl.org/goodrelations/v1#currency">
     <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
     <rdfs:label xml:lang="en">has currency (1..1)</rdfs:label>
     <rdfs:domain rdf:resource="http://purl.org/goodrelations/v1#PriceSpecification"/>
@@ -1831,7 +1831,7 @@ A gr:Offering may be linked to multiple gr:DeliveryChargeSpecification nodes tha
 
 Examples: Delivery by direct download is free of charge worldwide, delivery by UPS to Germany is 10 Euros per order, delivery by mail within the US is 5 Euros per order.
 
-The total amount of this charge is specified as a float value of the gr:hasCurrencyValue property. The currency is specified via the gr:hasCurrency datatype property. Whether the price includes VAT or not is indicated by the gr:valueAddedTaxIncluded property. The gr:DeliveryMethod to which this charge applies is specified using the gr:appliesToDeliveryMethod object property. The region or regions to which this charge applies is specified using the gr:eligibleRegions property, which uses ISO 3166-1 and ISO 3166-2 codes.
+The total amount of this charge is specified as a float value of the gr:currencyValue property. The currency is specified via the gr:currency datatype property. Whether the price includes VAT or not is indicated by the gr:valueAddedTaxIncluded property. The gr:DeliveryMethod to which this charge applies is specified using the gr:appliesToDeliveryMethod object property. The region or regions to which this charge applies is specified using the gr:eligibleRegions property, which uses ISO 3166-1 and ISO 3166-2 codes.
 
 If the price can only be given as a range, use gr:hasMaxCurrencyValue and gr:hasMinCurrencyValue for the upper and lower bounds.
 
@@ -2017,7 +2017,7 @@ A gr:Offering may be linked to multiple payment charge specifications that speci
 
 Examples: Payment by VISA or Mastercard costs a fee of 3 Euros including VAT, payment by bank transfer in advance is free of charge.
 
-The total amount of this surcharge is specified as a float value of the gr:hasCurrencyValue property. The currency is specified via the gr:hasCurrency datatype property. Whether the price includes VAT or not is indicated by the gr:valueAddedTaxIncluded datatype property. The gr:PaymentMethod to which this charge applies is specified using the gr:appliesToPaymentMethod object property.
+The total amount of this surcharge is specified as a float value of the gr:currencyValue property. The currency is specified via the gr:currency datatype property. Whether the price includes VAT or not is indicated by the gr:valueAddedTaxIncluded datatype property. The gr:PaymentMethod to which this charge applies is specified using the gr:appliesToPaymentMethod object property.
 
 If the price can only be given as a range, use gr:hasMaxCurrencyValue and gr:hasMinCurrencyValue for the upper and lower bounds.
 
@@ -2035,7 +2035,7 @@ A unit price specification is characterized by (1) the lower and upper limits an
 	
 Example: The price, including VAT, for 1 kg of a given material is 5 Euros per kg for 0 - 5 kg and 4 Euros for quantities above 5 kg.
 
-The eligible quantity interval for a given price is specified using the object property gr:hasEligibleQuantity, which points to an instance of gr:QuantitativeValue. The currency is specified using the gr:hasCurrency property, which points to an ISO 4217 currency code. The unit of measurement for the eligible quantity is specified using the gr:hasUnitOfMeasurement datatype property, which points to an UN/CEFACT Common Code (3 characters).
+The eligible quantity interval for a given price is specified using the object property gr:hasEligibleQuantity, which points to an instance of gr:QuantitativeValue. The currency is specified using the gr:currency property, which points to an ISO 4217 currency code. The unit of measurement for the eligible quantity is specified using the gr:hasUnitOfMeasurement datatype property, which points to an UN/CEFACT Common Code (3 characters).
 	
 In most cases, the appropriate unit of measurement is the UN/CEFACT Common Code "C62" for "Unit or piece", since a gr:Offering is defined by the quantity and unit of measurement of all items included (e.g. "1 kg of bananas plus a 2 kg of apples"). As long at the offering consists of only one item, it is also possible to use an unit of measurement of choice for specifying the price per unit. For bundles, however, only  "C62" for "Unit or piece" is a valid unit of measurement.
 
@@ -2043,7 +2043,7 @@ You can assume that the price is given per unit or piece if there is no gr:hasUn
 	
 Whether VAT and sales taxes are included in this price is specified using the property gr:valueAddedTaxIncluded (xsd:boolean).
 	
-The price per unit of measurement is specified as a float value of the gr:hasCurrencyValue property. The currency is specified via the gr:hasCurrency datatype property. Whether the price includes VAT or not is indicated by the gr:valueAddedTaxIncluded datatype property.
+The price per unit of measurement is specified as a float value of the gr:currencyValue property. The currency is specified via the gr:currency datatype property. Whether the price includes VAT or not is indicated by the gr:valueAddedTaxIncluded datatype property.
 
 The property priceType can be used to indicate that the price is a retail price recommendation only (i.e. a list price). 
 

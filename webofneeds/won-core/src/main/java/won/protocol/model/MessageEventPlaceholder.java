@@ -32,29 +32,29 @@ import won.protocol.model.parentaware.ParentAware;
                 @Index(name = "IDX_ME_PARENT_URI", columnList = "parentURI"),
                 @Index(name = "IDX_ME_PARENT_URI_MESSAGE_TYPE", columnList = "parentURI, messageType"),
                 @Index(name = "IDX_ME_PARENT_URI_REFERENCED_BY_OTHER_MESSAGE", columnList = "parentURI, referencedByOtherMessage"),
-                @Index(name = "IDX_ME_INNERMOST_MESSAGE_URI_RECEIVER_NEED_URI", columnList = "messageURI, receiverNeedURI, innermostMessageURI, correspondingRemoteMessageURI") }, uniqueConstraints = {
+                @Index(name = "IDX_ME_INNERMOST_MESSAGE_URI_RECIPIENT_ATOM_URI", columnList = "messageURI, recipientAtomURI, innermostMessageURI, correspondingRemoteMessageURI") }, uniqueConstraints = {
                                 @UniqueConstraint(name = "IDX_ME_UNIQUE_MESSAGE_URI", columnNames = "messageURI"),
                                 @UniqueConstraint(name = "IDX_ME_UNIQUE_CORREXPONDING_REMOTE_MESSAGE_URI", columnNames = "correspondingRemoteMessageURI"),
                                 @UniqueConstraint(name = "IDX_ME_UNIQUE_DATASETHOLDER_ID", columnNames = "datasetholder_id") })
-public class MessageEventPlaceholder implements ParentAware<EventContainer> {
+public class MessageEventPlaceholder implements ParentAware<MessageContainer> {
     public MessageEventPlaceholder() {
     }
 
-    public MessageEventPlaceholder(URI parentURI, WonMessage wonMessage, EventContainer eventContainer) {
+    public MessageEventPlaceholder(URI parentURI, WonMessage wonMessage, MessageContainer messageContainer) {
         this.parentURI = parentURI;
         this.messageURI = wonMessage.getMessageURI();
         this.messageType = wonMessage.getMessageType();
         this.senderURI = wonMessage.getSenderURI();
-        this.senderNeedURI = wonMessage.getSenderNeedURI();
+        this.senderAtomURI = wonMessage.getSenderAtomURI();
         this.senderNodeURI = wonMessage.getSenderNodeURI();
-        this.receiverURI = wonMessage.getReceiverURI();
-        this.receiverNeedURI = wonMessage.getReceiverNeedURI();
-        this.receiverNodeURI = wonMessage.getReceiverNodeURI();
+        this.recipientURI = wonMessage.getRecipientURI();
+        this.recipientAtomURI = wonMessage.getRecipientAtomURI();
+        this.recipientNodeURI = wonMessage.getRecipientNodeURI();
         this.creationDate = new Date();
         this.correspondingRemoteMessageURI = wonMessage.getCorrespondingRemoteMessageURI();
         this.referencedByOtherMessage = false;
         this.innermostMessageURI = wonMessage.getInnermostMessageURI();
-        this.eventContainer = eventContainer;
+        this.messageContainer = messageContainer;
     }
 
     @Id
@@ -65,12 +65,12 @@ public class MessageEventPlaceholder implements ParentAware<EventContainer> {
     @Column(name = "version", columnDefinition = "integer DEFAULT 0", nullable = false)
     private int version = 0;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "eventcontainer_id")
-    private EventContainer eventContainer;
+    @JoinColumn(name = "messagecontainer_id")
+    private MessageContainer messageContainer;
     @Column(name = "messageURI")
     @Convert(converter = URIConverter.class)
     private URI messageURI;
-    // this URI refers to the need (in case of create, de-/activate) or connection
+    // this URI refers to the atom (in case of create, de-/activate) or connection
     // (in case of hint, open,
     // close, etc.)
     @Column(name = "parentURI")
@@ -78,25 +78,25 @@ public class MessageEventPlaceholder implements ParentAware<EventContainer> {
     private URI parentURI;
     @Column(name = "messageType")
     @Enumerated(EnumType.STRING)
-    private WonMessageType messageType; // ConnectMessage, CreateMessage, NeedStateMessage
+    private WonMessageType messageType; // ConnectMessage, CreateMessage, AtomStateMessage
     @Column(name = "senderURI")
     @Convert(converter = URIConverter.class)
     private URI senderURI;
-    @Column(name = "senderNeedURI")
+    @Column(name = "senderAtomURI")
     @Convert(converter = URIConverter.class)
-    private URI senderNeedURI;
+    private URI senderAtomURI;
     @Column(name = "senderNodeURI")
     @Convert(converter = URIConverter.class)
     private URI senderNodeURI;
-    @Column(name = "receiverURI")
+    @Column(name = "recipientURI")
     @Convert(converter = URIConverter.class)
-    private URI receiverURI;
-    @Column(name = "receiverNeedURI")
+    private URI recipientURI;
+    @Column(name = "recipientAtomURI")
     @Convert(converter = URIConverter.class)
-    private URI receiverNeedURI;
-    @Column(name = "receiverNodeURI")
+    private URI recipientAtomURI;
+    @Column(name = "recipientNodeURI")
     @Convert(converter = URIConverter.class)
-    private URI receiverNodeURI;
+    private URI recipientNodeURI;
     @Column(name = "creationDate")
     private Date creationDate;
     @Column(name = "correspondingRemoteMessageURI")
@@ -120,12 +120,12 @@ public class MessageEventPlaceholder implements ParentAware<EventContainer> {
     }
 
     @Override
-    public EventContainer getParent() {
-        return getEventContainer();
+    public MessageContainer getParent() {
+        return getMessageContainer();
     }
 
-    public EventContainer getEventContainer() {
-        return eventContainer;
+    public MessageContainer getMessageContainer() {
+        return messageContainer;
     }
 
     public int getVersion() {
@@ -173,12 +173,12 @@ public class MessageEventPlaceholder implements ParentAware<EventContainer> {
         this.senderURI = senderURI;
     }
 
-    public URI getSenderNeedURI() {
-        return senderNeedURI;
+    public URI getSenderAtomURI() {
+        return senderAtomURI;
     }
 
-    public void setSenderNeedURI(final URI senderNeedURI) {
-        this.senderNeedURI = senderNeedURI;
+    public void setSenderAtomURI(final URI senderAtomURI) {
+        this.senderAtomURI = senderAtomURI;
     }
 
     public URI getSenderNodeURI() {
@@ -189,28 +189,28 @@ public class MessageEventPlaceholder implements ParentAware<EventContainer> {
         this.senderNodeURI = senderNodeURI;
     }
 
-    public URI getReceiverURI() {
-        return receiverURI;
+    public URI getRecipientURI() {
+        return recipientURI;
     }
 
-    public void setReceiverURI(final URI receiverURI) {
-        this.receiverURI = receiverURI;
+    public void setRecipientURI(final URI recipientURI) {
+        this.recipientURI = recipientURI;
     }
 
-    public URI getReceiverNeedURI() {
-        return receiverNeedURI;
+    public URI getRecipientAtomURI() {
+        return recipientAtomURI;
     }
 
-    public void setReceiverNeedURI(final URI receiverNeedURI) {
-        this.receiverNeedURI = receiverNeedURI;
+    public void setRecipientAtomURI(final URI recipientAtomURI) {
+        this.recipientAtomURI = recipientAtomURI;
     }
 
-    public URI getReceiverNodeURI() {
-        return receiverNodeURI;
+    public URI getRecipientNodeURI() {
+        return recipientNodeURI;
     }
 
-    public void setReceiverNodeURI(final URI receiverNodeURI) {
-        this.receiverNodeURI = receiverNodeURI;
+    public void setRecipientNodeURI(final URI recipientNodeURI) {
+        this.recipientNodeURI = recipientNodeURI;
     }
 
     public Date getCreationDate() {
@@ -272,7 +272,7 @@ public class MessageEventPlaceholder implements ParentAware<EventContainer> {
             return false;
         if (messageURI != null ? !messageURI.equals(that.messageURI) : that.messageURI != null)
             return false;
-        if (receiverURI != null ? !receiverURI.equals(that.receiverURI) : that.receiverURI != null)
+        if (recipientURI != null ? !recipientURI.equals(that.recipientURI) : that.recipientURI != null)
             return false;
         if (senderURI != null ? !senderURI.equals(that.senderURI) : that.senderURI != null)
             return false;
@@ -286,7 +286,7 @@ public class MessageEventPlaceholder implements ParentAware<EventContainer> {
         int result = messageURI != null ? messageURI.hashCode() : 0;
         result = 31 * result + (messageType != null ? messageType.hashCode() : 0);
         result = 31 * result + (senderURI != null ? senderURI.hashCode() : 0);
-        result = 31 * result + (receiverURI != null ? receiverURI.hashCode() : 0);
+        result = 31 * result + (recipientURI != null ? recipientURI.hashCode() : 0);
         return result;
     }
 }

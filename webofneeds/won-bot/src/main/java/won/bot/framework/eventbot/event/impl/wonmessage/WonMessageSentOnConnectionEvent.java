@@ -13,15 +13,15 @@ package won.bot.framework.eventbot.event.impl.wonmessage;
 import java.net.URI;
 
 import won.bot.framework.eventbot.event.ConnectionSpecificEvent;
-import won.bot.framework.eventbot.event.NeedSpecificEvent;
-import won.bot.framework.eventbot.event.RemoteNeedSpecificEvent;
+import won.bot.framework.eventbot.event.AtomSpecificEvent;
+import won.bot.framework.eventbot.event.TargetAtomSpecificEvent;
 import won.protocol.message.WonMessage;
 
 /**
  * Created by fkleedorfer on 14.06.2016.
  */
 public class WonMessageSentOnConnectionEvent extends WonMessageSentEvent
-                implements ConnectionSpecificEvent, NeedSpecificEvent, RemoteNeedSpecificEvent {
+                implements ConnectionSpecificEvent, AtomSpecificEvent, TargetAtomSpecificEvent {
     public WonMessageSentOnConnectionEvent(final WonMessage message) {
         super(message);
     }
@@ -32,12 +32,12 @@ public class WonMessageSentOnConnectionEvent extends WonMessageSentEvent
     }
 
     @Override
-    public URI getNeedURI() {
-        return getWonMessage().getSenderNeedURI();
+    public URI getAtomURI() {
+        return getWonMessage().getSenderAtomURI();
     }
 
     @Override
-    public URI getRemoteNeedURI() {
-        return getWonMessage().getReceiverNeedURI();
+    public URI getTargetAtomURI() {
+        return getWonMessage().getRecipientAtomURI();
     }
 }

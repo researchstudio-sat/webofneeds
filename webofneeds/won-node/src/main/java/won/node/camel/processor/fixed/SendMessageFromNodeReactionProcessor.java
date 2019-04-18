@@ -23,9 +23,9 @@ import won.protocol.util.linkeddata.WonLinkedDataUtils;
 import won.protocol.vocabulary.WONMSG;
 
 @Component
-@FixedMessageReactionProcessor(direction = WONMSG.TYPE_FROM_EXTERNAL_STRING, messageType = WONMSG.TYPE_CONNECTION_MESSAGE_STRING)
+@FixedMessageReactionProcessor(direction = WONMSG.FromExternalString, messageType = WONMSG.ConnectionMessageString)
 /**
- * If the message has a msg:hasInjectIntoConnection property, try to forward it.
+ * If the message has a msg:injectIntoConnection property, try to forward it.
  */
 public class SendMessageFromNodeReactionProcessor extends AbstractCamelProcessor {
     private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -45,13 +45,13 @@ public class SendMessageFromNodeReactionProcessor extends AbstractCamelProcessor
         injectTargets.forEach(target -> {
             try {
                 // don't inject into the connection we're currently on.
-                if (target.equals(wonMessage.getReceiverURI())) {
+                if (target.equals(wonMessage.getRecipientURI())) {
                     return;
                 }
-                // only inject into those connections that belong to the receiver need of this
+                // only inject into those connections that belong to the receiver atom of this
                 // message
                 Connection con = connectionRepository.findOneByConnectionURI(target);
-                if (con.getNeedURI().equals(wonMessage.getReceiverNeedURI())) {
+                if (con.getAtomURI().equals(wonMessage.getRecipientAtomURI())) {
                     forward(wonMessage, con);
                 }
             } catch (Exception e) {
@@ -66,17 +66,17 @@ public class SendMessageFromNodeReactionProcessor extends AbstractCamelProcessor
             return;
         }
         if (logger.isDebugEnabled()) {
-            logger.debug("injecting message {} received from need {} to connection {}",
-                            new Object[] { wonMessage.getMessageURI(), wonMessage.getSenderNeedURI(),
+            logger.debug("injecting message {} received from atom {} to connection {}",
+                            new Object[] { wonMessage.getMessageURI(), wonMessage.getSenderAtomURI(),
                                             conToSendTo.getConnectionURI() });
         }
-        URI injectedMessageURI = wonNodeInformationService.generateEventURI(wonMessage.getReceiverNodeURI());
+        URI injectedMessageURI = wonNodeInformationService.generateEventURI(wonMessage.getRecipientNodeURI());
         URI remoteWonNodeUri = WonLinkedDataUtils
-                        .getWonNodeURIForNeedOrConnectionURI(conToSendTo.getRemoteConnectionURI(), linkedDataSource);
+                        .getWonNodeURIForAtomOrConnectionURI(conToSendTo.getTargetConnectionURI(), linkedDataSource);
         WonMessage newWonMessage = WonMessageBuilder.forwardReceivedNodeToNodeMessageAsNodeToNodeMessage(
-                        injectedMessageURI, wonMessage, conToSendTo.getConnectionURI(), conToSendTo.getNeedURI(),
-                        wonMessage.getReceiverNodeURI(), conToSendTo.getRemoteConnectionURI(),
-                        conToSendTo.getRemoteNeedURI(), remoteWonNodeUri);
+                        injectedMessageURI, wonMessage, conToSendTo.getConnectionURI(), conToSendTo.getAtomURI(),
+                        wonMessage.getRecipientNodeURI(), conToSendTo.getTargetConnectionURI(),
+                        conToSendTo.getTargetAtomURI(), remoteWonNodeUri);
         if (logger.isDebugEnabled()) {
             logger.debug("injecting this message: {} ", RdfUtils.toString(newWonMessage.getCompleteDataset()));
         }

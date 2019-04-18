@@ -36,8 +36,8 @@ public abstract class BaseBot implements Bot {
     private BotContextWrapper botContextWrapper;
 
     @Override
-    public boolean knowsNeedURI(final URI needURI) {
-        return this.botContextWrapper.getBotContext().isNeedKnown(needURI);
+    public boolean knowsAtomURI(final URI atomURI) {
+        return this.botContextWrapper.getBotContext().isAtomKnown(atomURI);
     }
 
     @Override
@@ -108,23 +108,23 @@ public abstract class BaseBot implements Bot {
     }
 
     @Override
-    public abstract void onNewNeedCreated(final URI needUri, final URI wonNodeUri, final Dataset needDataset)
+    public abstract void onNewAtomCreated(final URI atomUri, final URI wonNodeUri, final Dataset atomDataset)
                     throws Exception;
 
     @Override
-    public abstract void onConnectFromOtherNeed(Connection con, final WonMessage wonMessage);
+    public abstract void onConnectFromOtherAtom(Connection con, final WonMessage wonMessage);
 
     @Override
-    public abstract void onOpenFromOtherNeed(Connection con, final WonMessage wonMessage);
+    public abstract void onOpenFromOtherAtom(Connection con, final WonMessage wonMessage);
 
     @Override
-    public abstract void onCloseFromOtherNeed(Connection con, final WonMessage wonMessage);
+    public abstract void onCloseFromOtherAtom(Connection con, final WonMessage wonMessage);
 
     @Override
     public abstract void onHintFromMatcher(Match match, final WonMessage wonMessage);
 
     @Override
-    public abstract void onMessageFromOtherNeed(Connection con, final WonMessage wonMessage);
+    public abstract void onMessageFromOtherAtom(Connection con, final WonMessage wonMessage);
 
     @Override
     public abstract void onFailureResponse(final URI failedMessageUri, final WonMessage wonMessage);
@@ -136,14 +136,14 @@ public abstract class BaseBot implements Bot {
     public abstract void onMatcherRegistered(final URI wonNodeUri);
 
     @Override
-    public abstract void onNewNeedCreatedNotificationForMatcher(final URI wonNodeURI, final URI needURI,
-                    final Dataset needDataset);
+    public abstract void onNewAtomCreatedNotificationForMatcher(final URI wonNodeURI, final URI atomURI,
+                    final Dataset atomDataset);
 
     @Override
-    public abstract void onNeedActivatedNotificationForMatcher(final URI wonNodeURI, final URI needURI);
+    public abstract void onAtomActivatedNotificationForMatcher(final URI wonNodeURI, final URI atomURI);
 
     @Override
-    public abstract void onNeedDeactivatedNotificationForMatcher(final URI wonNodeURI, final URI needURI);
+    public abstract void onAtomDeactivatedNotificationForMatcher(final URI wonNodeURI, final URI atomURI);
 
     @Override
     public abstract void act() throws Exception;

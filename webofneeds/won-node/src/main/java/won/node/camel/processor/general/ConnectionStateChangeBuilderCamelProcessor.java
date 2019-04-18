@@ -41,7 +41,7 @@ public class ConnectionStateChangeBuilderCamelProcessor implements Processor {
         if (conUri == null) {
             // not found. get it from the message and put it in the header
             WonMessage wonMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
-            conUri = wonMessage.getEnvelopeType() == WonMessageDirection.FROM_EXTERNAL ? wonMessage.getReceiverURI()
+            conUri = wonMessage.getEnvelopeType() == WonMessageDirection.FROM_EXTERNAL ? wonMessage.getRecipientURI()
                             : wonMessage.getSenderURI();
         }
         if (conUri != null) {

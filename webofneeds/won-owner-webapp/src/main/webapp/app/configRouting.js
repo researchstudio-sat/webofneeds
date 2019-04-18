@@ -24,14 +24,14 @@ import * as processUtils from "./process-utils.js";
  */
 export const resetParams = Object.freeze({
   connectionUri: undefined,
-  viewNeedUri: undefined,
+  viewAtomUri: undefined,
   viewConnUri: undefined,
   postUri: undefined,
   useCase: undefined,
   useCaseGroup: undefined,
   token: undefined,
   privateId: undefined,
-  fromNeedUri: undefined,
+  fromAtomUri: undefined,
   mode: undefined,
 });
 
@@ -66,17 +66,17 @@ export const configRouting = [
 
     [
       { path: "/about?aboutSection", component: "about" },
-      { path: "/overview?viewNeedUri?viewConnUri", component: "overview" },
+      { path: "/overview?viewAtomUri?viewConnUri", component: "overview" },
       { path: "/signup", component: "signup" },
       { path: "/settings", component: "settings" },
       {
         path:
-          "/connections?privateId?postUri?connectionUri?useCase?useCaseGroup?token?viewNeedUri?viewConnUri?fromNeedUri?mode",
+          "/connections?privateId?postUri?connectionUri?useCase?useCaseGroup?token?viewAtomUri?viewConnUri?fromAtomUri?mode",
         component: "connections",
         as: "connections",
       },
       {
-        path: "/post/?postUri?viewNeedUri?viewConnUri",
+        path: "/post/?postUri?viewAtomUri?viewConnUri",
         component: "post",
         as: "post",
       },

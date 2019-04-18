@@ -41,26 +41,26 @@ public class MatcherProtocolMatcherServiceImplJMSBased {// implements MatcherPro
 
     // TODO: [msg-refactoring] process only WonMessage, don't send additional
     // headers
-    public void needCreated(@Header("wonNodeURI") final String wonNodeURI, @Header("needURI") final String needURI,
+    public void atomCreated(@Header("wonNodeURI") final String wonNodeURI, @Header("atomURI") final String atomURI,
                     @Body final String content) {
-        logger.debug("new need received: {} with content {}", needURI, content);
-        delegate.onNewNeed(URI.create(wonNodeURI), URI.create(needURI), RdfUtils.toDataset(content));
+        logger.debug("new atom received: {} with content {}", atomURI, content);
+        delegate.onNewAtom(URI.create(wonNodeURI), URI.create(atomURI), RdfUtils.toDataset(content));
     }
 
-    public void needModified(@Header("wonNodeURI") final String wonNodeURI, @Header("needURI") final String needURI) {
-        logger.debug("need modified message received: {}", needURI);
-        delegate.onNeedModified(URI.create(wonNodeURI), URI.create(needURI));
+    public void atomModified(@Header("wonNodeURI") final String wonNodeURI, @Header("atomURI") final String atomURI) {
+        logger.debug("atom modified message received: {}", atomURI);
+        delegate.onAtomModified(URI.create(wonNodeURI), URI.create(atomURI));
     }
 
-    public void needActivated(@Header("wonNodeURI") final String wonNodeURI, @Header("needURI") final String needURI) {
-        logger.debug("need activated message received: {}", needURI);
-        delegate.onNeedActivated(URI.create(wonNodeURI), URI.create(needURI));
+    public void atomActivated(@Header("wonNodeURI") final String wonNodeURI, @Header("atomURI") final String atomURI) {
+        logger.debug("atom activated message received: {}", atomURI);
+        delegate.onAtomActivated(URI.create(wonNodeURI), URI.create(atomURI));
     }
 
-    public void needDeactivated(@Header("wonNodeURI") final String wonNodeURI,
-                    @Header("needURI") final String needURI) {
-        logger.debug("need deactivated message received: {}", needURI);
-        delegate.onNeedDeactivated(URI.create(wonNodeURI), URI.create(needURI));
+    public void atomDeactivated(@Header("wonNodeURI") final String wonNodeURI,
+                    @Header("atomURI") final String atomURI) {
+        logger.debug("atom deactivated message received: {}", atomURI);
+        delegate.onAtomDeactivated(URI.create(wonNodeURI), URI.create(atomURI));
     }
 
     private Set<String> configureMatcherProtocolOutTopics(URI nodeUri) throws CamelConfigurationFailedException {

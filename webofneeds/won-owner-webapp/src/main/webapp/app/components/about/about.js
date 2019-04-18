@@ -23,9 +23,9 @@ const serviceDependencies = [
 const howItWorksSteps = [
   {
     svgSrc: "#ico36_description",
-    title: "Post your need anonymously",
+    title: "Post your atom anonymously",
     text:
-      "Needs can be very personal, so privacy is important. You don't have to reveal your identity here.",
+      "Atoms can be very personal, so privacy is important. You don't have to reveal your identity here.",
   },
   {
     svgSrc: "#ico36_match",
@@ -80,7 +80,7 @@ const questions = [
   {
     title: "What about my privacy?",
     detail:
-      "All the data you provide in a need description is" +
+      "All the data you provide in an atom description is" +
       " public and unencrypted. All the messages in a conversation are unencrypted but only visible to us (operating" +
       " the" +
       " servers) and to you and your conversation partner.",
@@ -89,7 +89,7 @@ const questions = [
     title: "Will the people I talk to see my identity?",
     detail:
       "If everything" +
-      " works as intended, no. Each need has its own cryptographic identity. They will know that the person who" +
+      " works as intended, no. Each atom has its own cryptographic identity. They will know that the person who" +
       " wrote the posting is the one sending them messages. As long as you do not provide any" +
       " information that identifies you, others will not easily find out who you really are. But please do not think" +
       " that you are fully anonymous here. Even if you are behind a proxy or an anonymization network, there might be" +
@@ -160,12 +160,12 @@ const questions = [
       " counterpart's WoN node and your counterpart's Owner Application. Each one of" +
       " these communication channels are secured with TLS, so the data is encrypted as it is transmitted. Once your" +
       " messages reach your Owner Application, they are signed using asymmetric cryptography so your counterpart can " +
-      "verify that the message was written by the same person who created the need in the first place. As messages are" +
+      "verify that the message was written by the same person who created the atom in the first place. As messages are" +
       " forwarded to the next processing node, signatures are added by " +
       "the receiving node. Messages sent later contain the signatures of earlier messages, so it becomes impossible " +
       "to change the content of messages or pretend they were never sent or received." +
-      " The Owner Application creates a new key pair for every need you" +
-      " create, so others should not be able to find out which needs are yours and which needs are from other" +
+      " The Owner Application creates a new key pair for every atom you" +
+      " create, so others should not be able to find out which atoms are yours and which atoms are from other" +
       " people. Note that this system has not had an independent security audit. If you are interested in" +
       " assessing the security of our approach, or if you have feedback for us, please contact us.",
   },
@@ -253,13 +253,13 @@ class AboutController {
     }
 
     if (this.loggedIn) {
-      this.needs__whatsAround();
+      this.atoms__whatsAround();
     } else {
       this.view__showTermsDialog(
         Immutable.fromJS({
           acceptCallback: () => {
             this.view__hideModalDialog();
-            this.needs__whatsAround();
+            this.atoms__whatsAround();
           },
           cancelCallback: () => {
             this.view__hideModalDialog();

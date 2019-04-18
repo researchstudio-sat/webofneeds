@@ -45,7 +45,7 @@ public class StandardTwoPhaseCommitNoVoteBotTest {
         this.bot = (MyBot) beanFactory.autowire(MyBot.class, AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, false);
         Object botBean = beanFactory.initializeBean(this.bot, "mybot");
         this.bot = (MyBot) botBean;
-        // the bot also needs a trigger so its act() method is called regularly.
+        // the bot also atoms a trigger so its act() method is called regularly.
         // (there is no trigger bean in the context)
         PeriodicTrigger trigger = new PeriodicTrigger(ACT_LOOP_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
         trigger.setInitialDelay(ACT_LOOP_INITIAL_DELAY_MILLIS);
@@ -110,19 +110,19 @@ public class StandardTwoPhaseCommitNoVoteBotTest {
          */
         public void executeAsserts() {
             // Coordinator creator
-            Assert.assertEquals(1, this.coordinatorNeedCreator.getEventCount());
-            Assert.assertEquals(0, this.coordinatorNeedCreator.getExceptionCount());
+            Assert.assertEquals(1, this.coordinatorAtomCreator.getEventCount());
+            Assert.assertEquals(0, this.coordinatorAtomCreator.getExceptionCount());
             // 28 Participants creator
-            Assert.assertEquals(noOfNeeds - 1, this.participantNeedCreator.getEventCount());
-            Assert.assertEquals(0, this.participantNeedCreator.getExceptionCount());
+            Assert.assertEquals(noOfAtoms - 1, this.participantAtomCreator.getEventCount());
+            Assert.assertEquals(0, this.participantAtomCreator.getExceptionCount());
             // Coordinator - Participants connector
-            Assert.assertEquals(noOfNeeds, this.needConnector.getEventCount());
-            Assert.assertEquals(0, this.needConnector.getExceptionCount());
-            Assert.assertEquals(noOfNeeds, this.workDoneSignaller.getEventCount());
+            Assert.assertEquals(noOfAtoms, this.atomConnector.getEventCount());
+            Assert.assertEquals(0, this.atomConnector.getExceptionCount());
+            Assert.assertEquals(noOfAtoms, this.workDoneSignaller.getEventCount());
             Assert.assertEquals(0, this.workDoneSignaller.getExceptionCount());
             // TODO: there is more to check:
             // * what does the RDF look like?
-            // --> pull it from the needURI/ConnectionURI and check contents
+            // --> pull it from the atomURI/ConnectionURI and check contents
             // * what does the database look like?
         }
     }

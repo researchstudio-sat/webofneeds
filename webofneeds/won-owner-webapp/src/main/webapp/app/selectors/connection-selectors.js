@@ -4,10 +4,10 @@
 
 import Immutable from "immutable";
 import {
-  getOwnedNeedByConnectionUri,
-  getOwnedNeeds,
+  getOwnedAtomByConnectionUri,
+  getOwnedAtoms,
   getOwnedPosts,
-  getNeeds,
+  getAtoms,
 } from "./general-selectors.js";
 import * as connectionUtils from "../connection-utils.js";
 import won from "../won-es6.js";
@@ -20,17 +20,17 @@ import * as processUtils from "../process-utils.js";
  * @param connectionUri to find corresponding connection for
  */
 export function getOwnedConnectionByUri(state, connectionUri) {
-  let need = getOwnedNeedByConnectionUri(state, connectionUri);
-  return getIn(need, ["connections", connectionUri]);
+  let atom = getOwnedAtomByConnectionUri(state, connectionUri);
+  return getIn(atom, ["connections", connectionUri]);
 }
 
 /**
- * Get all connections stored within your own needs as a map
+ * Get all connections stored within your own atoms as a map
  * @returns Immutable.Map with all connections
  */
 export function getOwnedConnections(state) {
-  const needs = getOwnedNeeds(state); //we only check own needs as these are the only ones who have connections stored
-  const connections = needs && needs.flatMap(need => need.get("connections"));
+  const atoms = getOwnedAtoms(state); //we only check own atoms as these are the only ones who have connections stored
+  const connections = atoms && atoms.flatMap(atom => atom.get("connections"));
   return connections;
 }
 
@@ -42,10 +42,10 @@ export function getOwnedConnectionUris(state) {
   return connections && connections.keySeq().toSet();
 }
 
-export function getChatConnectionsByNeedUri(state, needUri) {
-  const needs = getNeeds(state);
-  const need = needs && needs.get(needUri);
-  const connections = need && need.get("connections");
+export function getChatConnectionsByAtomUri(state, atomUri) {
+  const atoms = getAtoms(state);
+  const atom = atoms && atoms.get(atomUri);
+  const connections = atom && atom.get("connections");
 
   return (
     connections &&
@@ -53,20 +53,20 @@ export function getChatConnectionsByNeedUri(state, needUri) {
   );
 }
 
-export function getGroupChatConnectionsByNeedUri(state, needUri) {
-  const needs = getNeeds(state);
-  const need = needs && needs.get(needUri);
-  const connections = need && need.get("connections");
+export function getGroupChatConnectionsByAtomUri(state, atomUri) {
+  const atoms = getAtoms(state);
+  const atom = atoms && atoms.get(atomUri);
+  const connections = atom && atom.get("connections");
 
   return connections
     ? connections.filter(conn => connectionUtils.isGroupChatConnection(conn))
     : Immutable.Map();
 }
 
-export function getSuggestedConnectionsByNeedUri(state, needUri) {
-  const needs = getNeeds(state);
-  const need = needs && needs.get(needUri);
-  const connections = need && need.get("connections");
+export function getSuggestedConnectionsByAtomUri(state, atomUri) {
+  const atoms = getAtoms(state);
+  const atom = atoms && atoms.get(atomUri);
+  const connections = atom && atom.get("connections");
 
   return connections
     ? connections
@@ -84,9 +84,9 @@ export function getSuggestedConnectionsByNeedUri(state, needUri) {
  * @returns {Immutable.Map|*}
  */
 export function getChatConnectionsToCrawl(state) {
-  const needs = getOwnedPosts(state); //we only check own posts as these are the only ones who have connections stored
+  const atoms = getOwnedPosts(state); //we only check own posts as these are the only ones who have connections stored
   const allConnections =
-    needs && needs.flatMap(need => need.get("connections"));
+    atoms && atoms.flatMap(atom => atom.get("connections"));
   const chatConnections =
     allConnections &&
     allConnections

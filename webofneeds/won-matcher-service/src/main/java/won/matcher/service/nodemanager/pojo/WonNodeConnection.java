@@ -4,22 +4,22 @@ import akka.actor.ActorRef;
 import won.protocol.service.WonNodeInfo;
 
 /**
- * Class represents all data needed to connect with a won node, receive need
+ * Class represents all datan needed to connect with a won node, receive atom
  * updates and send hints User: hfriedrich Date: 18.05.2015
  */
 public class WonNodeConnection {
     private WonNodeInfo wonNodeInfo;
-    private ActorRef needCreatedConsumer;
-    private ActorRef needActivatedConsumer;
-    private ActorRef needDeactivatedConsumer;
+    private ActorRef atomCreatedConsumer;
+    private ActorRef atomActivatedConsumer;
+    private ActorRef atomDeactivatedConsumer;
     private ActorRef hintProducer;
 
-    public WonNodeConnection(WonNodeInfo info, ActorRef needCreatedConsumer, ActorRef needActivatedConsumer,
-                    ActorRef needDeactivatedConsumer, ActorRef hintProducer) {
+    public WonNodeConnection(WonNodeInfo info, ActorRef atomCreatedConsumer, ActorRef atomActivatedConsumer,
+                    ActorRef atomDeactivatedConsumer, ActorRef hintProducer) {
         wonNodeInfo = info;
-        this.needCreatedConsumer = needCreatedConsumer;
-        this.needActivatedConsumer = needActivatedConsumer;
-        this.needDeactivatedConsumer = needDeactivatedConsumer;
+        this.atomCreatedConsumer = atomCreatedConsumer;
+        this.atomActivatedConsumer = atomActivatedConsumer;
+        this.atomDeactivatedConsumer = atomDeactivatedConsumer;
         this.hintProducer = hintProducer;
     }
 
@@ -27,16 +27,16 @@ public class WonNodeConnection {
         return wonNodeInfo;
     }
 
-    public ActorRef getNeedCreatedConsumer() {
-        return needCreatedConsumer;
+    public ActorRef getAtomCreatedConsumer() {
+        return atomCreatedConsumer;
     }
 
-    public ActorRef getNeedActivatedConsumer() {
-        return needActivatedConsumer;
+    public ActorRef getAtomActivatedConsumer() {
+        return atomActivatedConsumer;
     }
 
-    public ActorRef getNeedDeactivatedConsumer() {
-        return needDeactivatedConsumer;
+    public ActorRef getAtomDeactivatedConsumer() {
+        return atomDeactivatedConsumer;
     }
 
     public ActorRef getHintProducer() {

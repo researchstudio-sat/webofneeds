@@ -20,7 +20,7 @@ import akka.camel.CamelExtension;
 import won.cryptography.ssl.MessagingContext;
 import won.matcher.service.common.spring.SpringExtension;
 import won.matcher.service.nodemanager.actor.HintProducerProtocolActor;
-import won.matcher.service.nodemanager.actor.NeedConsumerProtocolActor;
+import won.matcher.service.nodemanager.actor.AtomConsumerProtocolActor;
 import won.matcher.service.nodemanager.pojo.WonNodeConnection;
 import won.protocol.service.WonNodeInfo;
 import won.protocol.vocabulary.WON;
@@ -48,16 +48,16 @@ public class ActiveMqWonNodeConnectionFactory {
     public static WonNodeConnection createWonNodeConnection(UntypedActorContext context, WonNodeInfo wonNodeInfo,
                     MessagingContext messagingContext) {
         // read won node info
-        String activeMq = WON.WON_OVER_ACTIVE_MQ.toString();
-        String brokerUri = wonNodeInfo.getSupportedProtocolImplParamValue(activeMq, WON.HAS_BROKER_URI.toString());
+        String activeMq = WON.WonOverActiveMq.toString();
+        String brokerUri = wonNodeInfo.getSupportedProtocolImplParamValue(activeMq, WON.brokerUri.toString());
         String createdTopic = wonNodeInfo.getSupportedProtocolImplParamValue(activeMq,
-                        WON.HAS_ACTIVEMQ_MATCHER_PROTOCOL_OUT_NEED_CREATED_TOPIC_NAME.toString());
+                        WON.activeMQMatcherProtocolOutAtomCreatedTopicName.toString());
         String activatedTopic = wonNodeInfo.getSupportedProtocolImplParamValue(activeMq,
-                        WON.HAS_ACTIVEMQ_MATCHER_PROTOCOL_OUT_NEED_ACTIVATED_TOPIC_NAME.toString());
+                        WON.activeMQMatcherProtocolOutAtomActivatedTopicName.toString());
         String deactivatedTopic = wonNodeInfo.getSupportedProtocolImplParamValue(activeMq,
-                        WON.HAS_ACTIVEMQ_MATCHER_PROTOCOL_OUT_NEED_DEACTIVATED_TOPIC_NAME.toString());
+                        WON.activeMQMatcherProtocolOutAtomDeactivatedTopicName.toString());
         String hintQueue = wonNodeInfo.getSupportedProtocolImplParamValue(activeMq,
-                        WON.HAS_ACTIVEMQ_MATCHER_PROTOCOL_QUEUE_NAME.toString());
+                        WON.activeMQMatcherProtocolQueueName.toString());
         // create the activemq component for this won node
         String uuid = UUID.randomUUID().toString();
         String componentName = "activemq-" + uuid;
@@ -65,19 +65,19 @@ public class ActiveMqWonNodeConnectionFactory {
         // connectionFactory.setExceptionListener( ... )
         Camel camel = CamelExtension.get(context.system());
         camel.context().addComponent(componentName, JmsComponent.jmsComponent(connectionFactory));
-        // create the actors that receive the messages (need events)
+        // create the actors that receive the messages (atom events)
         String createdComponent = componentName + ":topic:" + createdTopic + "?testConnectionOnStartup=false";
         Props createdProps = SpringExtension.SpringExtProvider.get(context.system())
-                        .props(NeedConsumerProtocolActor.class, createdComponent);
-        ActorRef created = context.actorOf(createdProps, "ActiveMqNeedCreatedConsumerProtocolActor-" + uuid);
+                        .props(AtomConsumerProtocolActor.class, createdComponent);
+        ActorRef created = context.actorOf(createdProps, "ActiveMqAtomCreatedConsumerProtocolActor-" + uuid);
         log.info("Create camel component JMS listener {} for won node {}", createdComponent,
                         wonNodeInfo.getWonNodeURI());
         ActorRef activated = created;
         if (!activatedTopic.equals(createdTopic)) {
             String activatedComponent = componentName + ":topic:" + activatedTopic + "?testConnectionOnStartup=false";
             Props activatedProps = SpringExtension.SpringExtProvider.get(context.system())
-                            .props(NeedConsumerProtocolActor.class, activatedComponent);
-            activated = context.actorOf(activatedProps, "ActiveMqNeedActivatedConsumerProtocolActor-" + uuid);
+                            .props(AtomConsumerProtocolActor.class, activatedComponent);
+            activated = context.actorOf(activatedProps, "ActiveMqAtomActivatedConsumerProtocolActor-" + uuid);
             log.info("Create camel component JMS listener {} for won node {}", activatedComponent,
                             wonNodeInfo.getWonNodeURI());
         }
@@ -90,8 +90,8 @@ public class ActiveMqWonNodeConnectionFactory {
             String deactivatedComponent = componentName + ":topic:" + deactivatedTopic
                             + "?testConnectionOnStartup=false";
             Props deactivatedProps = SpringExtension.SpringExtProvider.get(context.system())
-                            .props(NeedConsumerProtocolActor.class, deactivatedComponent);
-            deactivated = context.actorOf(deactivatedProps, "ActiveMqNeedDeactivatedConsumerProtocolActor-" + uuid);
+                            .props(AtomConsumerProtocolActor.class, deactivatedComponent);
+            deactivated = context.actorOf(deactivatedProps, "ActiveMqAtomDeactivatedConsumerProtocolActor-" + uuid);
             log.info("Create camel component JMS listener {} for won node {}", deactivatedComponent,
                             wonNodeInfo.getWonNodeURI());
         }

@@ -390,9 +390,9 @@ public class RdfUtils {
         // the public resource URI which, when de-referenced, returns that graph. So,
         // triples referring to the 'null relative URI'
         // (see http://www.w3.org/2012/ldp/track/issues/20 ) will be changed to refer to
-        // the newly created need URI instead.
+        // the newly created atom URI instead.
         // this implies that the default URI prefix of the document (if set) will have
-        // to be changed to the need URI.
+        // to be changed to the atom URI.
         // check if there is a default URI prefix.
         // - If not, we just change the default prefix and that should automatically
         // alter all
@@ -406,7 +406,7 @@ public class RdfUtils {
             }
             ResourceUtils.renameResource(oldBase, baseURI);
         }
-        // whatever the base uri (default URI prefix) was, set it to the need URI.
+        // whatever the base uri (default URI prefix) was, set it to the atom URI.
         model.setNsPrefix("", baseURI);
     }
 

@@ -55,16 +55,16 @@ public class WonMessage implements Serializable {
     private URI outerEnvelopeGraphURI;
     private Model outerEnvelopeGraph;
     private URI messageURI;
-    private WonMessageType messageType; // ConnectMessage, CreateMessage, NeedStateMessage
+    private WonMessageType messageType; // ConnectMessage, CreateMessage, AtomStateMessage
     private WonMessageDirection envelopeType;
     private URI senderURI;
-    private URI senderNeedURI;
+    private URI senderAtomURI;
     private URI senderNodeURI;
-    private URI senderFacetURI;
-    private URI receiverURI;
-    private URI receiverNeedURI;
-    private URI receiverNodeURI;
-    private URI receiverFacetURI;
+    private URI senderSocketURI;
+    private URI recipientURI;
+    private URI recipientAtomURI;
+    private URI recipientNodeURI;
+    private URI recipientSocketURI;
     private List<URI> refersTo = null;
     private List<URI> previousMessages = null;
     private List<URI> injectIntoConnections = null;
@@ -202,7 +202,7 @@ public class WonMessage implements Serializable {
             // TODO: this deletion is no longer necessary, right?
             Model newDefaultModel = ModelFactory.createDefaultModel();
             newDefaultModel.add(this.completeDataset.getDefaultModel());
-            StmtIterator it = newDefaultModel.listStatements(null, RDF.type, WONMSG.ENVELOPE_GRAPH);
+            StmtIterator it = newDefaultModel.listStatements(null, RDF.type, WONMSG.EnvelopeGraph);
             while (it.hasNext()) {
                 Statement stmt = it.nextStatement();
                 String subjString = stmt.getSubject().toString();
@@ -231,12 +231,12 @@ public class WonMessage implements Serializable {
         String queryString = "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#>\n"
                         + "prefix xsd:   <http://www.w3.org/2001/XMLSchema#>\n"
                         + "prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n"
-                        + "prefix won:   <http://purl.org/webofneeds/model#>\n"
-                        + "prefix msg:   <http://purl.org/webofneeds/message#>\n"
+                        + "prefix won:   <https://w3id.org/won/core#>\n"
+                        + "prefix msg:   <https://w3id.org/won/message#>\n"
                         + "prefix sig:   <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#>\n" + "\n"
                         + "select ?attachmentSigGraphUri ?attachmentGraphUri ?envelopeGraphUri ?attachmentDestinationUri where { \n"
                         + "graph ?attachmentSigGraphUri {?attachmentSigGraphUri " + "              a sig:Signature; \n"
-                        + "              msg:hasSignedGraph ?attachmentGraphUri.\n" + "}\n"
+                        + "              msg:signedGraph ?attachmentGraphUri.\n" + "}\n"
                         + "graph ?envelopeGraphUri {?envelopeGraphUri rdf:type msg:EnvelopeGraph.  \n"
                         + "    ?messageUri msg:hasAttachment ?attachmentData. \n"
                         + "?attachmentData msg:hasDestinationUri ?attachmentDestinationUri; \n"
@@ -369,7 +369,7 @@ public class WonMessage implements Serializable {
     private synchronized List<String> findContainedEnvelopeUris(final Model envelopeGraph,
                     final String envelopeGraphUri) {
         Resource envelopeGraphResource = envelopeGraph.getResource(envelopeGraphUri);
-        StmtIterator it = envelopeGraphResource.listProperties(WONMSG.CONTAINS_ENVELOPE);
+        StmtIterator it = envelopeGraphResource.listProperties(WONMSG.containsEnvelope);
         if (it.hasNext()) {
             List ret = new ArrayList<String>();
             while (it.hasNext()) {
@@ -381,7 +381,7 @@ public class WonMessage implements Serializable {
     }
 
     public boolean isEnvelopeGraph(final String modelUri, final Model model) {
-        return model.contains(model.getResource(modelUri), RDF.type, WONMSG.ENVELOPE_GRAPH);
+        return model.contains(model.getResource(modelUri), RDF.type, WONMSG.EnvelopeGraph);
     }
 
     public synchronized List<String> getEnvelopeGraphURIs() {
@@ -402,7 +402,7 @@ public class WonMessage implements Serializable {
     }
 
     private synchronized NodeIterator getContentGraphReferences(Model model, Resource envelopeGraphResource) {
-        return model.listObjectsOfProperty(envelopeGraphResource, WONMSG.HAS_CONTENT_PROPERTY);
+        return model.listObjectsOfProperty(envelopeGraphResource, WONMSG.content);
     }
 
     public synchronized URI getMessageURI() {
@@ -414,7 +414,7 @@ public class WonMessage implements Serializable {
 
     public synchronized WonMessageType getMessageType() {
         if (this.messageType == null) {
-            URI type = getEnvelopePropertyURIValue(WONMSG.HAS_MESSAGE_TYPE_PROPERTY);
+            URI type = getEnvelopePropertyURIValue(WONMSG.messageType);
             this.messageType = WonMessageType.getWonMessageType(type);
         }
         return this.messageType;
@@ -432,105 +432,105 @@ public class WonMessage implements Serializable {
 
     public synchronized URI getSenderURI() {
         if (this.senderURI == null) {
-            this.senderURI = getEnvelopePropertyURIValue(WONMSG.SENDER_PROPERTY);
+            this.senderURI = getEnvelopePropertyURIValue(WONMSG.sender);
         }
         return this.senderURI;
     }
 
-    public synchronized URI getSenderNeedURI() {
-        if (this.senderNeedURI == null) {
-            this.senderNeedURI = getEnvelopePropertyURIValue(WONMSG.SENDER_NEED_PROPERTY);
+    public synchronized URI getSenderAtomURI() {
+        if (this.senderAtomURI == null) {
+            this.senderAtomURI = getEnvelopePropertyURIValue(WONMSG.senderAtom);
         }
-        return this.senderNeedURI;
+        return this.senderAtomURI;
     }
 
     public synchronized URI getSenderNodeURI() {
         if (this.senderNodeURI == null) {
-            this.senderNodeURI = getEnvelopePropertyURIValue(WONMSG.SENDER_NODE_PROPERTY);
+            this.senderNodeURI = getEnvelopePropertyURIValue(WONMSG.senderNode);
         }
         return this.senderNodeURI;
     }
 
-    public synchronized URI getSenderFacetURI() {
-        if (this.senderFacetURI == null) {
-            this.senderFacetURI = getEnvelopePropertyURIValue(WONMSG.HAS_SENDER_FACET);
+    public synchronized URI getSenderSocketURI() {
+        if (this.senderSocketURI == null) {
+            this.senderSocketURI = getEnvelopePropertyURIValue(WONMSG.senderSocket);
         }
-        return this.senderFacetURI;
+        return this.senderSocketURI;
     }
 
-    public synchronized URI getReceiverURI() {
-        if (this.receiverURI == null) {
-            this.receiverURI = getEnvelopePropertyURIValue(WONMSG.RECEIVER_PROPERTY);
+    public synchronized URI getRecipientURI() {
+        if (this.recipientURI == null) {
+            this.recipientURI = getEnvelopePropertyURIValue(WONMSG.recipient);
         }
-        return this.receiverURI;
+        return this.recipientURI;
     }
 
-    public synchronized URI getReceiverNeedURI() {
-        if (this.receiverNeedURI == null) {
-            this.receiverNeedURI = getEnvelopePropertyURIValue(WONMSG.RECEIVER_NEED_PROPERTY);
+    public synchronized URI getRecipientAtomURI() {
+        if (this.recipientAtomURI == null) {
+            this.recipientAtomURI = getEnvelopePropertyURIValue(WONMSG.recipientAtom);
         }
-        return this.receiverNeedURI;
+        return this.recipientAtomURI;
     }
 
-    public synchronized URI getReceiverNodeURI() {
-        if (this.receiverNodeURI == null) {
-            this.receiverNodeURI = getEnvelopePropertyURIValue(WONMSG.RECEIVER_NODE_PROPERTY);
+    public synchronized URI getRecipientNodeURI() {
+        if (this.recipientNodeURI == null) {
+            this.recipientNodeURI = getEnvelopePropertyURIValue(WONMSG.recipientNode);
         }
-        return this.receiverNodeURI;
+        return this.recipientNodeURI;
     }
 
-    public synchronized URI getReceiverFacetURI() {
-        if (this.receiverFacetURI == null) {
-            this.receiverFacetURI = getEnvelopePropertyURIValue(WONMSG.HAS_RECEIVER_FACET);
+    public synchronized URI getRecipientSocketURI() {
+        if (this.recipientSocketURI == null) {
+            this.recipientSocketURI = getEnvelopePropertyURIValue(WONMSG.recipientSocket);
         }
-        return this.receiverFacetURI;
+        return this.recipientSocketURI;
     }
 
     public synchronized List<URI> getRefersTo() {
         if (this.refersTo == null) {
-            this.refersTo = getEnvelopePropertyURIValues(WONMSG.REFERS_TO_PROPERTY);
+            this.refersTo = getEnvelopePropertyURIValues(WONMSG.refersTo);
         }
         return this.refersTo;
     }
 
     public synchronized List<URI> getInjectIntoConnectionURIs() {
         if (this.injectIntoConnections == null) {
-            this.injectIntoConnections = getEnvelopePropertyURIValues(WONMSG.HAS_INJECT_INTO_CONNECTION);
+            this.injectIntoConnections = getEnvelopePropertyURIValues(WONMSG.injectIntoConnection);
         }
         return this.injectIntoConnections;
     }
 
     public synchronized List<URI> getPreviousMessageURIs() {
         if (this.previousMessages == null) {
-            this.previousMessages = getEnvelopePropertyURIValues(WONMSG.HAS_PREVIOUS_MESSAGE_PROPERTY);
+            this.previousMessages = getEnvelopePropertyURIValues(WONMSG.previousMessage);
         }
         return this.previousMessages;
     }
 
     public synchronized URI getIsResponseToMessageURI() {
         if (this.isResponseToMessageURI == null) {
-            this.isResponseToMessageURI = getEnvelopePropertyURIValue(WONMSG.IS_RESPONSE_TO);
+            this.isResponseToMessageURI = getEnvelopePropertyURIValue(WONMSG.isResponseTo);
         }
         return this.isResponseToMessageURI;
     }
 
     public synchronized URI getIsRemoteResponseToMessageURI() {
         if (this.isRemoteResponseToMessageURI == null) {
-            this.isRemoteResponseToMessageURI = getEnvelopePropertyURIValue(WONMSG.IS_REMOTE_RESPONSE_TO);
+            this.isRemoteResponseToMessageURI = getEnvelopePropertyURIValue(WONMSG.isRemoteResponseTo);
         }
         return this.isRemoteResponseToMessageURI;
     }
 
     public synchronized URI getCorrespondingRemoteMessageURI() {
         if (this.correspondingRemoteMessageURI == null) {
-            this.correspondingRemoteMessageURI = getEnvelopePropertyURIValue(WONMSG.HAS_CORRESPONDING_REMOTE_MESSAGE);
+            this.correspondingRemoteMessageURI = getEnvelopePropertyURIValue(WONMSG.correspondingRemoteMessage);
         }
         return this.correspondingRemoteMessageURI;
     }
 
     public synchronized URI getForwardedMessageURI() {
         if (this.forwardedMessageURI == null) {
-            this.forwardedMessageURI = getEnvelopePropertyURIValue(WONMSG.HAS_FORWARDED_MESSAGE);
+            this.forwardedMessageURI = getEnvelopePropertyURIValue(WONMSG.forwardedMessage);
         }
         return this.forwardedMessageURI;
     }
@@ -545,7 +545,7 @@ public class WonMessage implements Serializable {
 
     public synchronized WonMessageType getIsResponseToMessageType() {
         if (this.isResponseToMessageType == null) {
-            URI typeURI = getEnvelopePropertyURIValue(WONMSG.IS_RESPONSE_TO_MESSAGE_TYPE);
+            URI typeURI = getEnvelopePropertyURIValue(WONMSG.isResponseToMessageType);
             if (typeURI != null) {
                 this.isResponseToMessageType = WonMessageType.getWonMessageType(typeURI);
             }
@@ -574,7 +574,7 @@ public class WonMessage implements Serializable {
                 return URI.create(it.nextStatement().getObject().asResource().toString());
             }
             // move to the next envelope
-            currentEnvelopeUri = RdfUtils.findFirstObjectUri(currentEnvelope, WONMSG.CONTAINS_ENVELOPE, null, true,
+            currentEnvelopeUri = RdfUtils.findFirstObjectUri(currentEnvelope, WONMSG.containsEnvelope, null, true,
                             true);
             currentEnvelope = null;
             if (currentEnvelopeUri != null) {
@@ -607,7 +607,7 @@ public class WonMessage implements Serializable {
             while (it.hasNext()) {
                 values.add(URI.create(it.nextStatement().getObject().asResource().toString()));
             }
-            currentEnvelopeUri = RdfUtils.findFirstObjectUri(currentEnvelope, WONMSG.CONTAINS_ENVELOPE, null, true,
+            currentEnvelopeUri = RdfUtils.findFirstObjectUri(currentEnvelope, WONMSG.containsEnvelope, null, true,
                             true);
             currentEnvelope = null;
             if (currentEnvelopeUri != null) {

@@ -13,7 +13,7 @@ const initialState = Immutable.fromJS({
   isAnonymous: false,
   acceptedTermsOfService: false,
   acceptedDisclaimer: isDisclaimerAccepted(),
-  ownedNeedUris: Immutable.Set(),
+  ownedAtomUris: Immutable.Set(),
 });
 
 export default function(userData = initialState, action = {}) {
@@ -35,31 +35,31 @@ export default function(userData = initialState, action = {}) {
         .set("isAnonymous", isAnonymous)
         .set("privateId", privateId);
     }
-    case actionTypes.needs.storeOwnedInactiveUris:
-    case actionTypes.needs.storeOwnedActiveUris: {
-      const ownedNeedUris = userData.get("ownedNeedUris");
+    case actionTypes.atoms.storeOwnedInactiveUris:
+    case actionTypes.atoms.storeOwnedActiveUris: {
+      const ownedAtomUris = userData.get("ownedAtomUris");
       return userData.set(
-        "ownedNeedUris",
-        ownedNeedUris.merge(action.payload.get("uris"))
+        "ownedAtomUris",
+        ownedAtomUris.merge(action.payload.get("uris"))
       );
     }
 
-    case actionTypes.needs.removeDeleted:
+    case actionTypes.atoms.removeDeleted:
     case actionTypes.personas.removeDeleted:
-    case actionTypes.needs.delete: {
-      const needUri = action.payload.get("uri");
+    case actionTypes.atoms.delete: {
+      const atomUri = action.payload.get("uri");
 
-      const ownedNeedUris = userData.get("ownedNeedUris");
-      return userData.set("ownedNeedUris", ownedNeedUris.remove(needUri));
+      const ownedAtomUris = userData.get("ownedAtomUris");
+      return userData.set("ownedAtomUris", ownedAtomUris.remove(atomUri));
     }
 
-    case actionTypes.needs.create: //for optimistic additions
+    case actionTypes.atoms.create: //for optimistic additions
     case actionTypes.personas.create: //for optimistic additions
-    case actionTypes.needs.createSuccessful: {
-      const ownedNeedUris = userData.get("ownedNeedUris");
+    case actionTypes.atoms.createSuccessful: {
+      const ownedAtomUris = userData.get("ownedAtomUris");
       return userData.set(
-        "ownedNeedUris",
-        ownedNeedUris.add(action.payload.needUri)
+        "ownedAtomUris",
+        ownedAtomUris.add(action.payload.atomUri)
       );
     }
 

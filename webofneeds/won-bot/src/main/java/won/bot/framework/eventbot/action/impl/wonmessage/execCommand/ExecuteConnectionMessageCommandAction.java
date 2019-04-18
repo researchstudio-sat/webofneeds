@@ -70,20 +70,20 @@ public class ExecuteConnectionMessageCommandAction
         Model localMessageModel = RdfUtils.cloneModel(messageCommandEvent.getMessageModel());
         Dataset connectionRDF = getEventListenerContext().getLinkedDataSource()
                         .getDataForResource(messageCommandEvent.getConnectionURI());
-        URI remoteNeed = WonRdfUtils.ConnectionUtils.getRemoteNeedURIFromConnection(connectionRDF,
+        URI targetAtom = WonRdfUtils.ConnectionUtils.getTargetAtomURIFromConnection(connectionRDF,
                         messageCommandEvent.getConnectionURI());
-        URI localNeed = WonRdfUtils.ConnectionUtils.getLocalNeedURIFromConnection(connectionRDF,
+        URI localAtom = WonRdfUtils.ConnectionUtils.getLocalAtomURIFromConnection(connectionRDF,
                         messageCommandEvent.getConnectionURI());
         URI wonNode = WonRdfUtils.ConnectionUtils.getWonNodeURIFromConnection(connectionRDF,
                         messageCommandEvent.getConnectionURI());
-        Dataset remoteNeedRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(remoteNeed);
+        Dataset targetAtomRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(targetAtom);
         URI messageURI = wonNodeInformationService.generateEventURI(wonNode);
         RdfUtils.replaceBaseURI(localMessageModel, messageURI.toString());
         WonMessageBuilder wmb = WonMessageBuilder.setMessagePropertiesForConnectionMessage(messageURI,
-                        messageCommandEvent.getConnectionURI(), localNeed, wonNode,
-                        WonRdfUtils.ConnectionUtils.getRemoteConnectionURIFromConnection(connectionRDF,
+                        messageCommandEvent.getConnectionURI(), localAtom, wonNode,
+                        WonRdfUtils.ConnectionUtils.getTargetConnectionURIFromConnection(connectionRDF,
                                         messageCommandEvent.getConnectionURI()),
-                        remoteNeed, WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(remoteNeedRDF, remoteNeed),
+                        targetAtom, WonRdfUtils.AtomUtils.getWonNodeURIFromAtom(targetAtomRDF, targetAtom),
                         localMessageModel);
         Set<URI> injectionTargets = messageCommandEvent.getInjectIntoConnections();
         if (!injectionTargets.isEmpty()) {

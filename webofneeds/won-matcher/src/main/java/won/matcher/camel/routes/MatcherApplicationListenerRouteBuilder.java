@@ -52,12 +52,12 @@ public class MatcherApplicationListenerRouteBuilder extends RouteBuilder {
     public void configure() throws Exception {
         for (int i = 0; i < endpoints.size(); i++) {
             from(endpoints.get(i)).routeId("Node2MatcherRoute" + brokerUri + i).choice()
-                            .when(header("methodName").isEqualTo("needCreated"))
-                            .to("bean:matcherProtocolMatcherServiceJMSBased?method=needCreated")
-                            .when(header("methodName").isEqualTo("needActivated"))
-                            .to("bean:matcherProtocolMatcherServiceJMSBased?method=needActivated")
-                            .when(header("methodName").isEqualTo("needDeactivated"))
-                            .to("bean:matcherProtocolMatcherServiceJMSBased?method=needDeactivated").otherwise()
+                            .when(header("methodName").isEqualTo("atomCreated"))
+                            .to("bean:matcherProtocolMatcherServiceJMSBased?method=atomCreated")
+                            .when(header("methodName").isEqualTo("atomActivated"))
+                            .to("bean:matcherProtocolMatcherServiceJMSBased?method=atomActivated")
+                            .when(header("methodName").isEqualTo("atomDeactivated"))
+                            .to("bean:matcherProtocolMatcherServiceJMSBased?method=atomDeactivated").otherwise()
                             .to("log:Message Type Not Supported");
         }
     }

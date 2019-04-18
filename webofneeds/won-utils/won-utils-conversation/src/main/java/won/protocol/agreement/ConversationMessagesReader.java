@@ -50,31 +50,31 @@ public class ConversationMessagesReader {
 
     static {
         Map<Property, BiConsumer<Map<URI, ConversationMessage>, Statement>> inithandlers = new HashMap<>();
-        inithandlers.put(WONMSG.SENDER_NEED_PROPERTY,
+        inithandlers.put(WONMSG.senderAtom,
                         (Map<URI, ConversationMessage> messages,
                                         Statement s) -> getOrCreateMessage(messages, getUri(s.getSubject()))
-                                                        .setSenderNeedURI(getUri(s.getObject())));
-        inithandlers.put(WONMSG.HAS_CORRESPONDING_REMOTE_MESSAGE,
+                                                        .setSenderAtomURI(getUri(s.getObject())));
+        inithandlers.put(WONMSG.correspondingRemoteMessage,
                         (Map<URI, ConversationMessage> messages,
                                         Statement s) -> getOrCreateMessage(messages, getUri(s.getSubject()))
                                                         .setCorrespondingRemoteMessageURI(getUri(s.getObject())));
-        inithandlers.put(WONMSG.HAS_FORWARDED_MESSAGE,
+        inithandlers.put(WONMSG.forwardedMessage,
                         (Map<URI, ConversationMessage> messages,
                                         Statement s) -> getOrCreateMessage(messages, getUri(s.getSubject()))
                                                         .addForwarded(getUri(s.getObject())));
-        inithandlers.put(WONMSG.HAS_PREVIOUS_MESSAGE_PROPERTY,
+        inithandlers.put(WONMSG.previousMessage,
                         (Map<URI, ConversationMessage> messages,
                                         Statement s) -> getOrCreateMessage(messages, getUri(s.getSubject()))
                                                         .addPrevious(getUri(s.getObject())));
-        inithandlers.put(WONMSG.IS_RESPONSE_TO,
+        inithandlers.put(WONMSG.isResponseTo,
                         (Map<URI, ConversationMessage> messages,
                                         Statement s) -> getOrCreateMessage(messages, getUri(s.getSubject()))
                                                         .setIsResponseTo(getUri(s.getObject())));
-        inithandlers.put(WONMSG.IS_REMOTE_RESPONSE_TO,
+        inithandlers.put(WONMSG.isRemoteResponseTo,
                         (Map<URI, ConversationMessage> messages,
                                         Statement s) -> getOrCreateMessage(messages, getUri(s.getSubject()))
                                                         .setIsRemoteResponseTo(getUri(s.getObject())));
-        inithandlers.put(WONMSG.HAS_MESSAGE_TYPE_PROPERTY, (Map<URI, ConversationMessage> messages, Statement s) -> {
+        inithandlers.put(WONMSG.messageType, (Map<URI, ConversationMessage> messages, Statement s) -> {
             URI uri = getUri(s.getObject());
             if (uri == null) {
                 return;
@@ -96,31 +96,31 @@ public class ConversationMessagesReader {
             }
             getOrCreateMessage(messages, getUri(s.getSubject())).setDirection(direction);
         });
-        inithandlers.put(WONMSG.HAS_CONTENT_PROPERTY,
+        inithandlers.put(WONMSG.content,
                         (Map<URI, ConversationMessage> messages,
                                         Statement s) -> getOrCreateMessage(messages, getUri(s.getSubject()))
                                                         .addContentGraph(getUri(s.getObject())));
-        inithandlers.put(WONMOD.RETRACTS,
+        inithandlers.put(WONMOD.retracts,
                         (Map<URI, ConversationMessage> messages,
                                         Statement s) -> getOrCreateMessage(messages, getUri(s.getSubject()))
                                                         .addRetracts(getUri(s.getObject())));
-        inithandlers.put(WONAGR.PROPOSES,
+        inithandlers.put(WONAGR.proposes,
                         (Map<URI, ConversationMessage> messages,
                                         Statement s) -> getOrCreateMessage(messages, getUri(s.getSubject()))
                                                         .addProposes(getUri(s.getObject())));
-        inithandlers.put(WONAGR.CLAIMS,
+        inithandlers.put(WONAGR.claims,
                         (Map<URI, ConversationMessage> messages,
                                         Statement s) -> getOrCreateMessage(messages, getUri(s.getSubject()))
                                                         .addClaims(getUri(s.getObject())));
-        inithandlers.put(WONAGR.PROPOSES_TO_CANCEL,
+        inithandlers.put(WONAGR.proposesToCancel,
                         (Map<URI, ConversationMessage> messages,
                                         Statement s) -> getOrCreateMessage(messages, getUri(s.getSubject()))
                                                         .addProposesToCancel(getUri(s.getObject())));
-        inithandlers.put(WONAGR.REJECTS,
+        inithandlers.put(WONAGR.rejects,
                         (Map<URI, ConversationMessage> messages,
                                         Statement s) -> getOrCreateMessage(messages, getUri(s.getSubject()))
                                                         .addRejects(getUri(s.getObject())));
-        inithandlers.put(WONAGR.ACCEPTS,
+        inithandlers.put(WONAGR.accepts,
                         (Map<URI, ConversationMessage> messages,
                                         Statement s) -> getOrCreateMessage(messages, getUri(s.getSubject()))
                                                         .addAccepts(getUri(s.getObject())));

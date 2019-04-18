@@ -22,14 +22,14 @@
 
     <import resource="classpath:/spring/component/scheduling/node-scheduling.xml"/>
 
-    <bean id="needManagementService" class="won.node.service.impl.NeedManagementService"/>
+    <bean id="atomManagementService" class="won.node.service.impl.AtomManagementService"/>
 
-    <bean id="inactivityChecker" class="won.node.maintenance.NeedInactivityChecker">
+    <bean id="inactivityChecker" class="won.node.maintenance.AtomInactivityChecker">
         <property name="taskScheduler" ref="taskScheduler"/>
-        <property name="inactivityCheckInterval" value="${need.inactivity.check.interval}"/>
-        <property name="warnTimeout" value="${need.inactivity.warn.timeout}"/>
-        <property name="deactivateTimeout" value="${need.inactivity.deactivate.timeout}"/>
-        <property name="deactivateTimeoutDespiteEstablishedConnections" value="${need.inactivity.deactivateDespiteEstablishedConnections.timeout}" />
+        <property name="inactivityCheckInterval" value="${atom.inactivity.check.interval}"/>
+        <property name="warnTimeout" value="${atom.inactivity.warn.timeout}"/>
+        <property name="deactivateTimeout" value="${atom.inactivity.deactivate.timeout}"/>
+        <property name="deactivateTimeoutDespiteEstablishedConnections" value="${atom.inactivity.deactivateDespiteEstablishedConnections.timeout}" />
     </bean>
 
 </beans>

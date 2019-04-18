@@ -10,7 +10,7 @@ import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageType;
 import won.protocol.message.processor.WonMessageProcessor;
 import won.protocol.message.processor.exception.WonMessageProcessingException;
-import won.protocol.util.NeedModelWrapper;
+import won.protocol.util.AtomModelWrapper;
 import won.protocol.util.linkeddata.CachingLinkedDataSource;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
 
@@ -25,12 +25,12 @@ public class LinkedDataCacheInvalidator implements WonMessageProcessor {
         this.linkedDataSource = linkedDataSource;
     }
 
-    public void setLinkedDataSourceOnBehalfOfNeed(CachingLinkedDataSource linkedDataSourceOnBehalfOfNeed) {
-        this.linkedDataSourceOnBehalfOfNeed = linkedDataSourceOnBehalfOfNeed;
+    public void setLinkedDataSourceOnBehalfOfAtom(CachingLinkedDataSource linkedDataSourceOnBehalfOfAtom) {
+        this.linkedDataSourceOnBehalfOfAtom = linkedDataSourceOnBehalfOfAtom;
     }
 
     private CachingLinkedDataSource linkedDataSource;
-    private CachingLinkedDataSource linkedDataSourceOnBehalfOfNeed;
+    private CachingLinkedDataSource linkedDataSourceOnBehalfOfAtom;
 
     @Override
     public WonMessage process(final WonMessage message) throws WonMessageProcessingException {
@@ -38,32 +38,32 @@ public class LinkedDataCacheInvalidator implements WonMessageProcessor {
         if (type == WonMessageType.SUCCESS_RESPONSE) {
             type = message.getIsResponseToMessageType();
         }
-        URI webId = message.getReceiverNeedURI();
-        if (message.getReceiverURI() != null) {
-            // the cached list of events of the receiver need for the involved connection
+        URI webId = message.getRecipientAtomURI();
+        if (message.getRecipientURI() != null) {
+            // the cached list of events of the receiver atom for the involved connection
             // should be invalidated, since one more
             // message was created
-            logger.debug("invalidating events list for need " + message.getReceiverNeedURI() + " for connection "
-                            + message.getReceiverURI());
-            URI eventContainerUri = WonLinkedDataUtils.getEventContainerURIforConnectionURI(message.getReceiverURI(),
-                            linkedDataSource);
-            invalidate(eventContainerUri, webId);
+            logger.debug("invalidating events list for atom " + message.getRecipientAtomURI() + " for connection "
+                            + message.getRecipientURI());
+            URI messageContainerUri = WonLinkedDataUtils
+                            .getMessageContainerURIforConnectionURI(message.getRecipientURI(), linkedDataSource);
+            invalidate(messageContainerUri, webId);
             if (type.causesConnectionStateChange()) {
-                invalidate(message.getReceiverURI(), webId);
+                invalidate(message.getRecipientURI(), webId);
             }
         }
         if (type.causesNewConnection()) {
-            // the list of connections of the receiver need should be invalidated, since
+            // the list of connections of the receiver atom should be invalidated, since
             // these type
             // of messages mean that the new connection has been created recently
-            logger.debug("invalidating connections list for need " + message.getReceiverNeedURI());
-            Dataset need = linkedDataSource.getDataForResource(message.getReceiverNeedURI());
-            NeedModelWrapper wrapper = new NeedModelWrapper(need);
+            logger.debug("invalidating connections list for atom " + message.getRecipientAtomURI());
+            Dataset atom = linkedDataSource.getDataForResource(message.getRecipientAtomURI());
+            AtomModelWrapper wrapper = new AtomModelWrapper(atom);
             URI connectionsListUri = URI.create(wrapper.getConnectionContainerUri());
             invalidate(connectionsListUri, webId);
         }
-        if (type.causesNeedStateChange()) {
-            invalidate(message.getReceiverNeedURI(), webId);
+        if (type.causesAtomStateChange()) {
+            invalidate(message.getRecipientAtomURI(), webId);
         }
         return message;
     }
@@ -73,9 +73,9 @@ public class LinkedDataCacheInvalidator implements WonMessageProcessor {
             return;
         linkedDataSource.invalidate(uri);
         linkedDataSource.invalidate(uri, webId);
-        if (linkedDataSourceOnBehalfOfNeed != linkedDataSource) {
-            linkedDataSourceOnBehalfOfNeed.invalidate(uri);
-            linkedDataSourceOnBehalfOfNeed.invalidate(uri, webId);
+        if (linkedDataSourceOnBehalfOfAtom != linkedDataSource) {
+            linkedDataSourceOnBehalfOfAtom.invalidate(uri);
+            linkedDataSourceOnBehalfOfAtom.invalidate(uri, webId);
         }
     }
 }

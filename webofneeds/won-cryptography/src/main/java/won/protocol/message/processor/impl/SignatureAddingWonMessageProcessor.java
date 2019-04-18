@@ -39,13 +39,13 @@ public class SignatureAddingWonMessageProcessor implements WonMessageProcessor {
         }
     }
 
-    public WonMessage processOnBehalfOfNeed(final WonMessage message) throws WonMessageProcessingException {
-        // use senderNeed key for signing
-        String alias = keyPairAliasDerivationStrategy.getAliasForNeedUri(message.getSenderNeedURI().toString());
+    public WonMessage processOnBehalfOfAtom(final WonMessage message) throws WonMessageProcessingException {
+        // use senderAtom key for signing
+        String alias = keyPairAliasDerivationStrategy.getAliasForAtomUri(message.getSenderAtomURI().toString());
         PrivateKey privateKey = cryptographyService.getPrivateKey(alias);
         PublicKey publicKey = cryptographyService.getPublicKey(alias);
         try {
-            return processWithKey(message, message.getSenderNeedURI().toString(), privateKey, publicKey);
+            return processWithKey(message, message.getSenderAtomURI().toString(), privateKey, publicKey);
         } catch (Exception e) {
             logger.error("Failed to sign", e);
             throw new WonMessageProcessingException("Failed to sign message " + message.getMessageURI().toString());

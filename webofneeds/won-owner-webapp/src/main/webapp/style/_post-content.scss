@@ -48,14 +48,14 @@ won-post-content {
       }
     }
 
-    .post-content__otherneeds {
+    .post-content__otheratoms {
       &__empty {
         color: $won-line-gray;
         padding: 0.5rem;
         text-align: center;
       }
 
-      & .post-content__otherneeds__otherneed {
+      & .post-content__otheratoms__otheratom {
         padding: 0.5rem;
         border: $thinGrayBorder;
         background: $won-light-gray;

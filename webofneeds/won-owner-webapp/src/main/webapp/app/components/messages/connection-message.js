@@ -6,7 +6,7 @@ import Immutable from "immutable";
 import squareImageModule from "../square-image.js";
 import connectionMessageStatusModule from "./connection-message-status.js";
 import connectionMessageActionsModule from "./connection-message-actions.js";
-import messageContentModule from "./message-content.js"; // due to our need of recursivley integrating the combinedMessageContentModule within referencedMessageModule, we need to import the components here otherwise we will not be able to generate the component
+import messageContentModule from "./message-content.js"; // due to our atom of recursivley integrating the combinedMessageContentModule within referencedMessageModule, we need to import the components here otherwise we will not be able to generate the component
 import referencedMessageContentModule from "./referenced-message-content.js";
 import combinedMessageContentModule from "./combined-message-content.js";
 import labelledHrModule from "../labelled-hr.js";
@@ -14,7 +14,7 @@ import labelledHrModule from "../labelled-hr.js";
 import { connect2Redux } from "../../won-utils.js";
 import { attach, getIn, get } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
-import { getOwnedNeedByConnectionUri } from "../../selectors/general-selectors.js";
+import { getOwnedAtomByConnectionUri } from "../../selectors/general-selectors.js";
 import * as messageUtils from "../../message-utils.js";
 import { classOnComponentRoot } from "../../cstm-ng-utils.js";
 
@@ -32,14 +32,14 @@ function genComponentConf() {
   let template = `
         <won-square-image
             class="clickable"
-            uri="::self.theirNeed.get('uri')"
-            ng-click="!self.multiSelectType && self.router__stateGoCurrent({viewNeedUri: self.theirNeed.get('uri'), viewConnUri: undefined})"
+            uri="::self.theirAtom.get('uri')"
+            ng-click="!self.multiSelectType && self.router__stateGoCurrent({viewAtomUri: self.theirAtom.get('uri'), viewConnUri: undefined})"
             ng-if="!self.isChangeNotificationMessage && !self.isSent && !(self.isGroupChatMessage && self.originatorUri)">
         </won-square-image>
         <won-square-image
             class="clickable"
             uri="::self.originatorUri"
-            ng-click="!self.multiSelectType && self.router__stateGoCurrent({viewNeedUri: self.originatorUri, viewConnUri: undefined})"
+            ng-click="!self.multiSelectType && self.router__stateGoCurrent({viewAtomUri: self.originatorUri, viewConnUri: undefined})"
             ng-if="!self.isChangeNotificationMessage && self.isReceived && self.isGroupChatMessage && self.originatorUri">
         </won-square-image>
         <won-square-image
@@ -106,16 +106,16 @@ function genComponentConf() {
       this.won = won;
 
       const selectFromState = state => {
-        const ownedNeed =
+        const ownedAtom =
           this.connectionUri &&
-          getOwnedNeedByConnectionUri(state, this.connectionUri);
-        const connection = getIn(ownedNeed, [
+          getOwnedAtomByConnectionUri(state, this.connectionUri);
+        const connection = getIn(ownedAtom, [
           "connections",
           this.connectionUri,
         ]);
-        const theirNeed = getIn(state, [
-          "needs",
-          get(connection, "remoteNeedUri"),
+        const theirAtom = getIn(state, [
+          "atoms",
+          get(connection, "targetAtomUri"),
         ]);
         const message =
           connection && this.messageUri
@@ -125,11 +125,11 @@ function genComponentConf() {
         const shouldShowRdf = getIn(state, ["view", "showRdf"]);
 
         let rdfLinkURL;
-        if (shouldShowRdf && ownerBaseUrl && ownedNeed && message) {
+        if (shouldShowRdf && ownerBaseUrl && ownedAtom && message) {
           rdfLinkURL = urljoin(
             ownerBaseUrl,
             "/rest/linked-data/",
-            `?requester=${this.encodeParam(get(ownedNeed, "uri"))}`,
+            `?requester=${this.encodeParam(get(ownedAtom, "uri"))}`,
             `&uri=${this.encodeParam(get(message, "uri"))}`,
             get(message, "outgoingMessage") ? "&deep=true" : ""
           );
@@ -154,8 +154,8 @@ function genComponentConf() {
         const injectInto = get(message, "injectInto");
 
         return {
-          ownedNeed,
-          theirNeed,
+          ownedAtom,
+          theirAtom,
           message,
           messageSenderUri: get(message, "senderUri"),
           isGroupChatMessage: this.groupChatMessage,
@@ -249,7 +249,7 @@ function genComponentConf() {
         this.messages__viewState__markAsCollapsed({
           messageUri: get(this.message, "uri"),
           connectionUri: this.connectionUri,
-          needUri: get(this.ownedNeed, "uri"),
+          atomUri: get(this.ownedAtom, "uri"),
           isCollapsed: false,
         });
       }
@@ -259,7 +259,7 @@ function genComponentConf() {
       this.messages__viewState__markShowActions({
         messageUri: get(this.message, "uri"),
         connectionUri: this.connectionUri,
-        needUri: get(this.ownedNeed, "uri"),
+        atomUri: get(this.ownedAtom, "uri"),
         showActions: !this.showActions,
       });
     }
@@ -317,7 +317,7 @@ function genComponentConf() {
         const payload = {
           messageUri: this.messageUri,
           connectionUri: this.connectionUri,
-          needUri: get(this.ownedNeed, "uri"),
+          atomUri: get(this.ownedAtom, "uri"),
         };
 
         const tmp_messages__markAsRead = this.messages__markAsRead;

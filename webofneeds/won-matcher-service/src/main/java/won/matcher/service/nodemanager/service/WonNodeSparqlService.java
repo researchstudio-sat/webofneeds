@@ -41,10 +41,10 @@ public class WonNodeSparqlService extends SparqlService {
      */
     public Set<WonNodeInfo> retrieveAllWonNodeInfo() {
         Set<WonNodeInfo> wonNodeInfos = new HashSet<>();
-        String queryString = "SELECT ?graphUri ?nodeUri WHERE { GRAPH ?graphUri {?nodeUri won:hasUriPrefixSpecification ?c} }";
+        String queryString = "SELECT ?graphUri ?nodeUri WHERE { GRAPH ?graphUri {?nodeUri won:uriPrefixSpecification ?c} }";
         ParameterizedSparqlString pps = new ParameterizedSparqlString();
         pps.setCommandText(queryString);
-        pps.setNsPrefix("won", "http://purl.org/webofneeds/model#");
+        pps.setNsPrefix("won", "https://w3id.org/won/core#");
         log.debug("Query SPARQL Endpoint: {}", sparqlEndpoint);
         log.debug("Execute query: {}", pps.toString());
         try (QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, pps.asQuery())) {
@@ -88,8 +88,8 @@ public class WonNodeSparqlService extends SparqlService {
     private String getWonNodeUriFromDataset(Dataset ds) {
         if (ds.listNames().hasNext()) {
             Model model = ds.getNamedModel(ds.listNames().next());
-            if (model.listSubjectsWithProperty(WON.HAS_URI_PATTERN_SPECIFICATION).hasNext()) {
-                return model.listSubjectsWithProperty(WON.HAS_URI_PATTERN_SPECIFICATION).nextResource().toString();
+            if (model.listSubjectsWithProperty(WON.uriPrefixSpecification).hasNext()) {
+                return model.listSubjectsWithProperty(WON.uriPrefixSpecification).nextResource().toString();
             }
         }
         return null;

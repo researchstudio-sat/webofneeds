@@ -77,16 +77,16 @@ public class PetriNetTest {
     public void testLoadFromString() {
         String pnml = getResourceAsString("won/protocol/petrinet/petrinet-taxi.xml");
         PetriNet net = new PetriNetLoader().readPNML(pnml);
-        Assert.assertTrue(net.getPlaces().stream().anyMatch(
-                        place -> place.getId().equals("http://purl.org/webofneeds/process/taxi#PassengerReady")));
+        Assert.assertTrue(net.getPlaces().stream()
+                        .anyMatch(place -> place.getId().equals("https://w3id.org/won/process/taxi#PassengerReady")));
     }
 
     @Test
     public void testLoadFromBase64String() {
         String pnml = getResourceAsString("won/protocol/petrinet/petrinet-taxi-base64.txt");
         PetriNet net = new PetriNetLoader().readBase64EncodedPNML(pnml);
-        Assert.assertTrue(net.getPlaces().stream().anyMatch(
-                        place -> place.getId().equals("http://purl.org/webofneeds/process/taxi#PassengerReady")));
+        Assert.assertTrue(net.getPlaces().stream()
+                        .anyMatch(place -> place.getId().equals("https://w3id.org/won/process/taxi#PassengerReady")));
     }
 
     private PetriNet getTaxiNet() {
@@ -100,10 +100,10 @@ public class PetriNetTest {
         PetriNet net = getTaxiNet();
         PetriNetAnimator animator = new PetriNetAnimator(net);
         Set<Transition> transitions = animator.getEnabledTransitions();
-        Assert.assertTrue(transitions.stream().anyMatch(t -> t.getId()
-                        .equals("http://purl.org/webofneeds/process/taxi#PassengerArrivedAtPickupLocation")));
-        Assert.assertTrue(transitions.stream().anyMatch(t -> t.getId()
-                        .equals("http://purl.org/webofneeds/process/taxi#DriverArrivedAtPickupLocation")));
+        Assert.assertTrue(transitions.stream().anyMatch(
+                        t -> t.getId().equals("https://w3id.org/won/process/taxi#PassengerArrivedAtPickupLocation")));
+        Assert.assertTrue(transitions.stream().anyMatch(
+                        t -> t.getId().equals("https://w3id.org/won/process/taxi#DriverArrivedAtPickupLocation")));
     }
 
     private Set<Place> getMarkedPlaces(PetriNet net) {
@@ -116,51 +116,50 @@ public class PetriNetTest {
         PetriNetAnimator animator = new PetriNetAnimator(net);
         Set<Transition> transitions = animator.getEnabledTransitions();
         // expected enabled transitions:
-        Assert.assertTrue(transitions.stream().anyMatch(t -> t.getId()
-                        .equals("http://purl.org/webofneeds/process/taxi#PassengerArrivedAtPickupLocation")));
-        Assert.assertTrue(transitions.stream().anyMatch(t -> t.getId()
-                        .equals("http://purl.org/webofneeds/process/taxi#DriverArrivedAtPickupLocation")));
+        Assert.assertTrue(transitions.stream().anyMatch(
+                        t -> t.getId().equals("https://w3id.org/won/process/taxi#PassengerArrivedAtPickupLocation")));
+        Assert.assertTrue(transitions.stream().anyMatch(
+                        t -> t.getId().equals("https://w3id.org/won/process/taxi#DriverArrivedAtPickupLocation")));
         Assert.assertEquals(2, transitions.size());
         // actual transition: passenger arrives
-        animator.fireTransition(transitions.stream()
-                        .filter(t -> t.getId().equals(
-                                        "http://purl.org/webofneeds/process/taxi#PassengerArrivedAtPickupLocation"))
-                        .findFirst().get());
-        transitions = animator.getEnabledTransitions();
-        // expected enabled transitions:
-        Assert.assertTrue(transitions.stream().anyMatch(
-                        t -> t.getId().equals("http://purl.org/webofneeds/process/taxi#PassengerStoppedWaiting")));
-        Assert.assertTrue(transitions.stream().anyMatch(t -> t.getId()
-                        .equals("http://purl.org/webofneeds/process/taxi#DriverArrivedAtPickupLocation")));
-        Assert.assertEquals(2, transitions.size());
-        // actual transition: driver arrives
         animator.fireTransition(transitions.stream().filter(
-                        t -> t.getId().equals("http://purl.org/webofneeds/process/taxi#DriverArrivedAtPickupLocation"))
-                        .findFirst().get());
-        transitions = animator.getEnabledTransitions();
-        // expected enabled transitions:
-        Assert.assertTrue(transitions.stream().anyMatch(
-                        t -> t.getId().equals("http://purl.org/webofneeds/process/taxi#ArrivedAtDestination")));
-        Assert.assertEquals(1, transitions.size());
-        // actual transition: arrive at destination
-        animator.fireTransition(transitions.stream()
-                        .filter(t -> t.getId().equals("http://purl.org/webofneeds/process/taxi#ArrivedAtDestination"))
+                        t -> t.getId().equals("https://w3id.org/won/process/taxi#PassengerArrivedAtPickupLocation"))
                         .findFirst().get());
         transitions = animator.getEnabledTransitions();
         // expected enabled transitions:
         Assert.assertTrue(transitions.stream()
-                        .anyMatch(t -> t.getId().equals("http://purl.org/webofneeds/process/taxi#PaymentMade")));
-        Assert.assertEquals(1, transitions.size());
-        // actual transition: payment is made
-        animator.fireTransition(transitions.stream()
-                        .filter(t -> t.getId().equals("http://purl.org/webofneeds/process/taxi#PaymentMade"))
+                        .anyMatch(t -> t.getId().equals("https://w3id.org/won/process/taxi#PassengerStoppedWaiting")));
+        Assert.assertTrue(transitions.stream().anyMatch(
+                        t -> t.getId().equals("https://w3id.org/won/process/taxi#DriverArrivedAtPickupLocation")));
+        Assert.assertEquals(2, transitions.size());
+        // actual transition: driver arrives
+        animator.fireTransition(transitions.stream().filter(
+                        t -> t.getId().equals("https://w3id.org/won/process/taxi#DriverArrivedAtPickupLocation"))
                         .findFirst().get());
         transitions = animator.getEnabledTransitions();
         // expected enabled transitions:
-        Assert.assertTrue(transitions.stream().anyMatch(
-                        t -> t.getId().equals("http://purl.org/webofneeds/process/taxi#PassengerReviewedDriver")));
-        Assert.assertTrue(transitions.stream().anyMatch(
-                        t -> t.getId().equals("http://purl.org/webofneeds/process/taxi#DriverReviewedPassenger")));
+        Assert.assertTrue(transitions.stream()
+                        .anyMatch(t -> t.getId().equals("https://w3id.org/won/process/taxi#ArrivedAtDestination")));
+        Assert.assertEquals(1, transitions.size());
+        // actual transition: arrive at destination
+        animator.fireTransition(transitions.stream()
+                        .filter(t -> t.getId().equals("https://w3id.org/won/process/taxi#ArrivedAtDestination"))
+                        .findFirst().get());
+        transitions = animator.getEnabledTransitions();
+        // expected enabled transitions:
+        Assert.assertTrue(transitions.stream()
+                        .anyMatch(t -> t.getId().equals("https://w3id.org/won/process/taxi#PaymentMade")));
+        Assert.assertEquals(1, transitions.size());
+        // actual transition: payment is made
+        animator.fireTransition(transitions.stream()
+                        .filter(t -> t.getId().equals("https://w3id.org/won/process/taxi#PaymentMade")).findFirst()
+                        .get());
+        transitions = animator.getEnabledTransitions();
+        // expected enabled transitions:
+        Assert.assertTrue(transitions.stream()
+                        .anyMatch(t -> t.getId().equals("https://w3id.org/won/process/taxi#PassengerReviewedDriver")));
+        Assert.assertTrue(transitions.stream()
+                        .anyMatch(t -> t.getId().equals("https://w3id.org/won/process/taxi#DriverReviewedPassenger")));
         Assert.assertEquals(2, transitions.size());
     }
 
@@ -189,8 +188,8 @@ public class PetriNetTest {
         PetriNetState state = states.iterator().next();
         Set<URI> marked = state.getMarkedPlaces();
         Assert.assertEquals(3, marked.size());
-        Assert.assertTrue(marked.contains(URI.create("http://purl.org/webofneeds/process/taxi#TaxiNoShow")));
-        Assert.assertTrue(marked.contains(URI.create("http://purl.org/webofneeds/process/taxi#PassengerCanReview")));
-        Assert.assertTrue(marked.contains(URI.create("http://purl.org/webofneeds/process/taxi#DriverCanReview")));
+        Assert.assertTrue(marked.contains(URI.create("https://w3id.org/won/process/taxi#TaxiNoShow")));
+        Assert.assertTrue(marked.contains(URI.create("https://w3id.org/won/process/taxi#PassengerCanReview")));
+        Assert.assertTrue(marked.contains(URI.create("https://w3id.org/won/process/taxi#DriverCanReview")));
     }
 }

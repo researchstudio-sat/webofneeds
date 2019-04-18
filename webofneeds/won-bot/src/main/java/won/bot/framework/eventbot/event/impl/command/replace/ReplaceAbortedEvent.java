@@ -13,15 +13,15 @@ package won.bot.framework.eventbot.event.impl.command.replace;
 import java.net.URI;
 
 /**
- * Indicates that replacing the need content was aborted before sending a
+ * Indicates that replacing the atom content was aborted before sending a
  * message to a WoN node.
  */
 public class ReplaceAbortedEvent extends ReplaceCommandFailureEvent {
-    public ReplaceAbortedEvent(URI needURI, ReplaceCommandEvent replaceCommandEvent, String message) {
-        super(needURI, replaceCommandEvent, message);
+    public ReplaceAbortedEvent(URI atomURI, ReplaceCommandEvent replaceCommandEvent, String message) {
+        super(atomURI, replaceCommandEvent, message);
     }
 
-    public ReplaceAbortedEvent(URI needURI, ReplaceCommandEvent replaceCommandEvent) {
-        super(needURI, replaceCommandEvent);
+    public ReplaceAbortedEvent(URI atomURI, ReplaceCommandEvent replaceCommandEvent) {
+        super(atomURI, replaceCommandEvent);
     }
 }

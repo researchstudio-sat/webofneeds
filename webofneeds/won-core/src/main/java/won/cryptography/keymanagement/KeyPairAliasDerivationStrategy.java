@@ -11,16 +11,16 @@
 package won.cryptography.keymanagement;
 
 /**
- * Encapsulates the derivation of an alias for a given Need URI.
+ * Encapsulates the derivation of an alias for a given Atom URI.
  */
 public interface KeyPairAliasDerivationStrategy {
     /**
      * Returns an Alias usable in a KeyStore.
      * 
-     * @param needURI
+     * @param atomURI
      * @return always a valid alias string
      * @throws IllegalArgumentException if the argument cannot be converted to an
      * alias.
      */
-    public String getAliasForNeedUri(String needURI);
+    public String getAliasForAtomUri(String atomURI);
 }

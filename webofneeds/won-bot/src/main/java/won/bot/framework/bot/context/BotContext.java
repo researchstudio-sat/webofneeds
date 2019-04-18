@@ -7,55 +7,55 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Used by a bot to remember which needs and nodes and it knows. Additionally
+ * Used by a bot to remember which atoms and nodes and it knows. Additionally
  * generic Java objects can be saved and retrieved.
  */
 public interface BotContext {
-    String DEFAULT_NEED_LIST_NAME = "need_uris";
+    String DEFAULT_ATOM_LIST_NAME = "atom_uris";
 
     // ===============================
     // application specific methods
     // ===============================
     /**
-     * Return a set of all known need uris stored in all named need uri lists
+     * Return a set of all known atom uris stored in all named atom uri lists
      *
      * @return
      */
-    Set<URI> retrieveAllNeedUris();
+    Set<URI> retrieveAllAtomUris();
 
     /**
-     * Check if need uri is known among all stored need uris
+     * Check if atom uri is known among all stored atom uris
      *
-     * @param needURI
+     * @param atomURI
      * @return
      */
-    boolean isNeedKnown(final URI needURI);
+    boolean isAtomKnown(final URI atomURI);
 
     /**
-     * removeFromObjectMap a need uri from a named need uri list
+     * removeFromObjectMap an atom uri from a named atom uri list
      *
      * @param uri
      * @param name
      */
-    void removeNeedUriFromNamedNeedUriList(URI uri, String name);
+    void removeAtomUriFromNamedAtomUriList(URI uri, String name);
 
     /**
-     * add a need uri to a named need uri list
+     * add an atom uri to a named atom uri list
      *
      * @param uri
      * @param name
      */
-    void appendToNamedNeedUriList(URI uri, String name);
+    void appendToNamedAtomUriList(URI uri, String name);
 
-    boolean isInNamedNeedUriList(URI uri, String name);
+    boolean isInNamedAtomUriList(URI uri, String name);
 
     /**
-     * loadFromObjectMap all the need from a named need uri list
+     * loadFromObjectMap all the atom from a named atom uri list
      *
      * @param name
      * @return
      */
-    List<URI> getNamedNeedUriList(String name);
+    List<URI> getNamedAtomUriList(String name);
 
     /**
      * check if a node uri is known among all stored nodes

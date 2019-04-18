@@ -49,7 +49,7 @@
 		<constructor-arg name="registrationQuery" value="?register=owner" />
 	</bean>
 
-	<bean id="CryptographyServiceOnBehalfOfNeed" class="won.cryptography.service.CryptographyService">
+	<bean id="CryptographyServiceOnBehalfOfAtom" class="won.cryptography.service.CryptographyService">
 		<constructor-arg ref="perUserKeyStoreService" />
 		<!-- we don't set a default alias - that's not needed for the owner webapp -->
 	</bean>
@@ -61,8 +61,8 @@
 
 
 	<!-- if the fixedPrivateKeyAlias is empty or null, the processor generates 
-		a new Keypair for every need, if it is a string, the processor uses the same 
-		key pair for all needs and storese it under the specified alias -->
+		a new Keypair for every atom, if it is a string, the processor uses the same 
+		key pair for all atoms and storese it under the specified alias -->
 	<bean id="keyPairAliasDerivationStrategyFactory"
 		class="won.cryptography.keymanagement.KeyPairAliasDerivationStrategyFactory">
 		<property name="predefinedAlias" value="${owner.fixedPrivateKeyAlias}" />
@@ -78,7 +78,7 @@
 			ref="ownerUriAliasStrategy" />
 	</bean>
 
-	<bean id="linkedDataRestClientOnBehalfOfNeed" class="won.protocol.rest.LinkedDataRestClientHttps">
+	<bean id="linkedDataRestClientOnBehalfOfAtom" class="won.protocol.rest.LinkedDataRestClientHttps">
 		<constructor-arg ref="perUserKeyStoreService" />
 		<constructor-arg ref="trustStoreService" />
 		<constructor-arg name="trustStrategy">
@@ -106,7 +106,7 @@
 		<constructor-arg name="keyPairAliasDerivationStrategy" ref="ownerUriAliasStrategy" />
 	</bean>
 	
-	<bean id="linkedDataRestBridgeOnBehalfOfNeed" class="won.protocol.rest.LinkedDataRestBridge">
+	<bean id="linkedDataRestBridgeOnBehalfOfAtom" class="won.protocol.rest.LinkedDataRestBridge">
         <constructor-arg ref="perUserKeyStoreService" />
         <constructor-arg ref="trustStoreService" />
         <constructor-arg name="trustStrategy">

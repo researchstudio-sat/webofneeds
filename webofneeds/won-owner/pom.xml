@@ -16,7 +16,7 @@
             section in the parent pom! -->
         <dependency>
             <groupId>at.researchstudio.sat</groupId>
-            <artifactId>won-facets-tx</artifactId>
+            <artifactId>won-sockets-tx</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

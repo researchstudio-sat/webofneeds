@@ -55,13 +55,13 @@ public class WonNodeInformationServiceDecorator implements WonNodeInformationSer
     }
 
     @Override
-    public URI generateNeedURI() {
-        return delegate.generateNeedURI();
+    public URI generateAtomURI() {
+        return delegate.generateAtomURI();
     }
 
     @Override
-    public URI generateNeedURI(URI wonNodeURI) {
-        return delegate.generateNeedURI(wonNodeURI);
+    public URI generateAtomURI(URI wonNodeURI) {
+        return delegate.generateAtomURI(wonNodeURI);
     }
 
     @Override
@@ -76,7 +76,7 @@ public class WonNodeInformationServiceDecorator implements WonNodeInformationSer
 
     @Override
     public boolean isValidEventURI(URI eventURI) {
-        return delegate.isValidNeedURI(eventURI);
+        return delegate.isValidAtomURI(eventURI);
     }
 
     @Override
@@ -95,12 +95,12 @@ public class WonNodeInformationServiceDecorator implements WonNodeInformationSer
     }
 
     @Override
-    public boolean isValidNeedURI(URI needURI) {
-        return delegate.isValidNeedURI(needURI);
+    public boolean isValidAtomURI(URI atomURI) {
+        return delegate.isValidAtomURI(atomURI);
     }
 
     @Override
-    public boolean isValidNeedURI(URI needURI, URI wonNodeURI) {
-        return delegate.isValidNeedURI(needURI, wonNodeURI);
+    public boolean isValidAtomURI(URI atomURI, URI wonNodeURI) {
+        return delegate.isValidAtomURI(atomURI, wonNodeURI);
     }
 }

@@ -1,31 +1,31 @@
-@prefix :      <http://localhost:8080/won/resource/need/1> .
+@prefix :      <http://localhost:8080/won/resource/atom/1> .
 @prefix dc:    <http://purl.org/dc/elements/1.1/> .
 @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix geo:   <http://www.w3.org/2003/01/geo/wgs84_pos#> .
 @prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
 @prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-@prefix won:   <http://purl.org/webofneeds/model#> .
+@prefix won:   <https://w3id.org/won/core#> .
 @prefix gr:    <http://purl.org/goodrelations/v1#> .
 @prefix ldp:   <http://www.w3.org/ns/ldp#> .
 
-:       a                            won:Need ;
-        won:hasBasicNeedType         won:Demand ;
-        won:hasContent               [ a                       won:NeedContent ;
+:       a                            won:Atom ;
+        won:hasBasicAtomType         won:Demand ;
+        won:content               [ a                       won:AtomContent ;
                                        dc:title                "Test ranges"^^xsd:string ;
                                        dc:description  "I'm just testing ranges here."^^xsd:string
                                      ] ;
-        won:hasNeedModality          [ a                          won:NeedModality ;
-                                       won:hasPriceSpecification  [ a                       won:PriceSpecification ;
-                                                                    won:hasLowerPriceLimit  "50.0"^^xsd:float ;
-                                                                    won:hasUpperPriceLimit  "150.0"^^xsd:float
+        won:atomModality          [ a                          won:AtomModality ;
+                                       won:priceSpecification  [ a                       won:PriceSpecification ;
+                                                                    won:lowerPriceLimit  "50.0"^^xsd:float ;
+                                                                    won:upperPriceLimit  "150.0"^^xsd:float
                                                                   ] ;
-                                       won:hasTimeSpecification   [ a                          won:TimeSpecification ;
-                                                                    won:hasEndTime             "2013-12-15T00:01:00Z"^^xsd:dateTime ;
-                                                                    won:hasStartTime           "2013-08-15T00:01:00Z"^^xsd:dateTime
+                                       won:timeSpecification   [ a                          won:TimeSpecification ;
+                                                                    won:endTime             "2013-12-15T00:01:00Z"^^xsd:dateTime ;
+                                                                    won:startTime           "2013-08-15T00:01:00Z"^^xsd:dateTime
                                                                   ]
                                      ] ;
-        won:isInState                won:Active ;
+        won:atomState                won:Active ;
         won:matcherProtocolEndpoint  <http://localhost:8080/won/protocol/matcher> ;
-        won:needCreationDate         "2013-10-23T16:01:59.886Z"^^xsd:dateTime ;
-        won:needProtocolEndpoint     <http://localhost:8080/won/protocol/need> ;
+        won:atomCreationDate         "2013-10-23T16:01:59.886Z"^^xsd:dateTime ;
+        won:atomProtocolEndpoint     <http://localhost:8080/won/protocol/atom> ;
         won:ownerProtocolEndpoint    <http://localhost:8080/won/protocol/owner> .

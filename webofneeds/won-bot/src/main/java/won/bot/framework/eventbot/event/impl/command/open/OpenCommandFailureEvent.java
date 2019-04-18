@@ -27,14 +27,14 @@ public class OpenCommandFailureEvent extends AbstractMessageCommandResultEvent
         super(originalCommandEvent, con);
     }
 
-    public OpenCommandFailureEvent(MessageCommandEvent originalCommandEvent, URI needURI, URI remoteNeedURI,
+    public OpenCommandFailureEvent(MessageCommandEvent originalCommandEvent, URI atomURI, URI targetAtomURI,
                     URI connectionURI) {
-        super(originalCommandEvent, needURI, remoteNeedURI, connectionURI);
+        super(originalCommandEvent, atomURI, targetAtomURI, connectionURI);
     }
 
-    public OpenCommandFailureEvent(MessageCommandEvent originalCommandEvent, URI needURI, URI remoteNeedURI,
+    public OpenCommandFailureEvent(MessageCommandEvent originalCommandEvent, URI atomURI, URI targetAtomURI,
                     URI connectionURI, String message) {
-        super(originalCommandEvent, needURI, remoteNeedURI, connectionURI, message);
+        super(originalCommandEvent, atomURI, targetAtomURI, connectionURI, message);
     }
 
     public OpenCommandFailureEvent(MessageCommandEvent originalCommandEvent, Connection con, String message) {

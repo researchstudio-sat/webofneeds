@@ -103,7 +103,7 @@ public class MessageTypeSlipComputer implements InitializingBean, ApplicationCon
                                         messageType, direction));
     }
 
-    private boolean matches(Annotation annotation, URI messageType, URI direction, URI facetType)
+    private boolean matches(Annotation annotation, URI messageType, URI direction, URI socketType)
                     throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         if (annotation == null || messageType == null || direction == null)
             return false;
@@ -111,7 +111,7 @@ public class MessageTypeSlipComputer implements InitializingBean, ApplicationCon
                         || annotationFeatureMismatch(annotation, direction.toString(), "direction")) {
             return false;
         }
-        if (facetType != null && annotationFeatureMismatch(annotation, facetType.toString(), "facetType")) {
+        if (socketType != null && annotationFeatureMismatch(annotation, socketType.toString(), "socketType")) {
             return false;
         }
         return true;

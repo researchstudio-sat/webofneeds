@@ -8,7 +8,7 @@ import { classOnComponentRoot } from "../cstm-ng-utils.js";
 import * as generalSelectors from "../selectors/general-selectors.js";
 import { connect2Redux } from "../won-utils.js";
 import { attach, get, getIn } from "../utils.js";
-import * as needUtils from "../need-utils.js";
+import * as atomUtils from "../atom-utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { getUseCaseLabel, getUseCaseIcon } from "../usecase-utils.js";
 import * as accountUtils from "../account-utils.js";
@@ -32,7 +32,7 @@ function genComponentConf() {
             <div
                 class="post-info__footer__infolabel"
                 ng-if="self.isInactive">
-                Need is inactive, no requests allowed
+                Atom is inactive, no requests allowed
             </div>
             <!-- Reaction Use Cases -->
             <won-labelled-hr label="::'Or'" class="pm__footer__labelledhr"  ng-if="self.hasReactionUseCases"></won-labelled-hr>
@@ -65,38 +65,38 @@ function genComponentConf() {
 
       const selectFromState = state => {
         const postUriToConnectTo = generalSelectors.getPostUriFromRoute(state);
-        const displayedPost = state.getIn(["needs", postUriToConnectTo]);
+        const displayedPost = state.getIn(["atoms", postUriToConnectTo]);
 
-        const post = state.getIn(["needs", postUriToConnectTo]);
-        const isOwned = generalSelectors.isNeedOwned(state, postUriToConnectTo);
+        const post = state.getIn(["atoms", postUriToConnectTo]);
+        const isOwned = generalSelectors.isAtomOwned(state, postUriToConnectTo);
 
         const reactionUseCases =
-          post && !isOwned && needUtils.getReactionUseCases(post);
+          post && !isOwned && atomUtils.getReactionUseCases(post);
         const hasReactionUseCases =
           reactionUseCases && reactionUseCases.size > 0;
 
         const enabledUseCases =
-          post && isOwned && needUtils.getEnabledUseCases(post);
+          post && isOwned && atomUtils.getEnabledUseCases(post);
         const hasEnabledUseCases = enabledUseCases && enabledUseCases.size > 0;
 
         return {
           loggedIn: accountUtils.isLoggedIn(get(state, "account")),
           displayedPost,
           postUriToConnectTo,
-          isInactive: needUtils.isInactive(displayedPost),
+          isInactive: atomUtils.isInactive(displayedPost),
           hasReactionUseCases,
           reactionUseCasesArray: reactionUseCases && reactionUseCases.toArray(),
           hasEnabledUseCases,
           enabledUseCasesArray: enabledUseCases && enabledUseCases.toArray(),
           showRequestField:
-            needUtils.isActive(displayedPost) &&
-            (needUtils.hasChatFacet(displayedPost) ||
-              needUtils.hasGroupFacet(displayedPost)),
+            atomUtils.isActive(displayedPost) &&
+            (atomUtils.hasChatSocket(displayedPost) ||
+              atomUtils.hasGroupSocket(displayedPost)),
           postLoading:
             !displayedPost ||
             getIn(state, [
               "process",
-              "needs",
+              "atoms",
               displayedPost.get("uri"),
               "loading",
             ]),
@@ -112,8 +112,8 @@ function genComponentConf() {
         useCase: ucIdentifier,
         useCaseGroup: undefined,
         postUri: undefined,
-        fromNeedUri: this.postUriToConnectTo,
-        viewNeedUri: undefined,
+        fromAtomUri: this.postUriToConnectTo,
+        viewAtomUri: undefined,
         viewConnUri: undefined,
         mode: "CONNECT",
       });

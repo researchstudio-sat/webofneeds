@@ -1,0 +1,22 @@
+Atom Information:
+#if($targetAtomTitle)
+>Title:
+>$targetAtomTitle
+>
+#end
+#if($targetAtomDescription)
+>Description:
+>$targetAtomDescription
+>
+#end
+#if($targetAtomTags)
+>Tags:
+#foreach($targetAtomTag in $targetAtomTags)
+>$targetAtomTag
+#end
+>
+#end
+#if($targetAtomUri)
+>AtomURI:
+>$targetAtomUri
+#end

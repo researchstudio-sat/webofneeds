@@ -35,10 +35,10 @@ import won.protocol.jms.MessagingService;
 import won.protocol.jms.OwnerProtocolCamelConfigurator;
 import won.protocol.jms.OwnerProtocolCommunicationService;
 import won.protocol.model.Connection;
-import won.protocol.model.Need;
+import won.protocol.model.Atom;
 import won.protocol.model.WonNode;
 import won.protocol.repository.ConnectionRepository;
-import won.protocol.repository.NeedRepository;
+import won.protocol.repository.AtomRepository;
 import won.protocol.repository.WonNodeRepository;
 import won.protocol.util.DataAccessUtils;
 import won.protocol.util.LoggingUtils;
@@ -51,7 +51,7 @@ public class OwnerProtocolCommunicationServiceImpl implements OwnerProtocolCommu
     private OwnerProtocolCamelConfiguratorImpl ownerProtocolCamelConfigurator;
     private ActiveMQService activeMQService;
     @Autowired
-    private NeedRepository needRepository;
+    private AtomRepository atomRepository;
     @Autowired
     private ConnectionRepository connectionRepository;
     @Autowired
@@ -224,15 +224,15 @@ public class OwnerProtocolCommunicationServiceImpl implements OwnerProtocolCommu
     public synchronized URI getWonNodeUriWithConnectionUri(URI connectionUri) throws NoSuchConnectionException {
         // TODO: make this more efficient
         Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionUri);
-        URI needURI = con.getNeedURI();
-        Need need = needRepository.findByNeedURI(needURI).get(0);
-        return need.getWonNodeURI();
+        URI atomURI = con.getAtomURI();
+        Atom atom = atomRepository.findByAtomURI(atomURI).get(0);
+        return atom.getWonNodeURI();
     }
 
     @Override
-    public synchronized URI getWonNodeUriWithNeedUri(URI needUri) throws NoSuchConnectionException {
-        Need need = needRepository.findByNeedURI(needUri).get(0);
-        return need.getWonNodeURI();
+    public synchronized URI getWonNodeUriWithAtomUri(URI atomUri) throws NoSuchConnectionException {
+        Atom atom = atomRepository.findByAtomURI(atomUri).get(0);
+        return atom.getWonNodeURI();
     }
 
     @Override

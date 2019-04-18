@@ -23,15 +23,15 @@ import won.protocol.message.WonMessageType;
 import won.protocol.message.WonMessageUtils;
 import won.protocol.message.processor.WonMessageProcessor;
 import won.protocol.message.processor.exception.WonMessageProcessingException;
-import won.protocol.model.ConnectionEventContainer;
+import won.protocol.model.ConnectionMessageContainer;
 import won.protocol.model.DatasetHolder;
-import won.protocol.model.EventContainer;
+import won.protocol.model.MessageContainer;
 import won.protocol.model.MessageEventPlaceholder;
-import won.protocol.model.NeedEventContainer;
-import won.protocol.repository.ConnectionEventContainerRepository;
+import won.protocol.model.AtomMessageContainer;
+import won.protocol.repository.ConnectionMessageContainerRepository;
 import won.protocol.repository.DatasetHolderRepository;
 import won.protocol.repository.MessageEventRepository;
-import won.protocol.repository.NeedEventContainerRepository;
+import won.protocol.repository.AtomMessageContainerRepository;
 
 /**
  * Persists the specified WonMessage.
@@ -41,9 +41,9 @@ public class PersistingWonMessageProcessor implements WonMessageProcessor {
     @Autowired
     protected MessageEventRepository messageEventRepository;
     @Autowired
-    protected ConnectionEventContainerRepository connectionEventContainerRepository;
+    protected ConnectionMessageContainerRepository connectionMessageContainerRepository;
     @Autowired
-    protected NeedEventContainerRepository needEventContainerRepository;
+    protected AtomMessageContainerRepository atomMessageContainerRepository;
     @Autowired
     protected DatasetHolderRepository datasetHolderRepository;
     @Autowired
@@ -70,8 +70,8 @@ public class PersistingWonMessageProcessor implements WonMessageProcessor {
         URI originalMessageURI = message.getIsResponseToMessageURI();
         if (originalMessageURI != null) {
             // update the message it responds to with the uri of the response
-            messageEventRepository.lockConnectionAndEventContainerByContainedMessageForUpdate(originalMessageURI);
-            messageEventRepository.lockNeedAndEventContainerByContainedMessageForUpdate(originalMessageURI);
+            messageEventRepository.lockConnectionAndMessageContainerByContainedMessageForUpdate(originalMessageURI);
+            messageEventRepository.lockAtomAndMessageContainerByContainedMessageForUpdate(originalMessageURI);
             MessageEventPlaceholder event = messageEventRepository.findOneByMessageURIforUpdate(originalMessageURI);
             if (event != null) {
                 // we may not have saved the event yet if the current message is a
@@ -86,7 +86,7 @@ public class PersistingWonMessageProcessor implements WonMessageProcessor {
 
     private void saveMessage(final WonMessage wonMessage, URI parent) {
         logger.debug("STORING message with uri {} and parent uri", wonMessage.getMessageURI(), parent);
-        EventContainer container = loadOrCreateEventContainer(wonMessage, parent);
+        MessageContainer container = loadOrCreateMessageContainer(wonMessage, parent);
         DatasetHolder datasetHolder = new DatasetHolder(wonMessage.getMessageURI(),
                         WonMessageEncoder.encodeAsDataset(wonMessage));
         MessageEventPlaceholder event = new MessageEventPlaceholder(parent, wonMessage, container);
@@ -94,32 +94,32 @@ public class PersistingWonMessageProcessor implements WonMessageProcessor {
         messageEventRepository.save(event);
     }
 
-    private EventContainer loadOrCreateEventContainer(final WonMessage wonMessage, final URI parent) {
+    private MessageContainer loadOrCreateMessageContainer(final WonMessage wonMessage, final URI parent) {
         WonMessageType type = wonMessage.getMessageType();
-        if (WonMessageType.CREATE_NEED.equals(type)) {
-            // create a need event container with null parent (because it will only be
+        if (WonMessageType.CREATE_ATOM.equals(type)) {
+            // create an atom event container with null parent (because it will only be
             // persisted at a later point in time)
-            EventContainer container = needEventContainerRepository.findOneByParentUriForUpdate(parent);
+            MessageContainer container = atomMessageContainerRepository.findOneByParentUriForUpdate(parent);
             if (container != null)
                 return container;
-            NeedEventContainer nec = new NeedEventContainer(null, parent);
-            needEventContainerRepository.saveAndFlush(nec);
+            AtomMessageContainer nec = new AtomMessageContainer(null, parent);
+            atomMessageContainerRepository.saveAndFlush(nec);
             return nec;
         } else if (WonMessageType.CONNECT.equals(type) || WonMessageType.HINT_MESSAGE.equals(type)) {
             // create a connection event container witn null parent (because it will only be
             // persisted at a later point in
             // time)
-            EventContainer container = connectionEventContainerRepository.findOneByParentUriForUpdate(parent);
+            MessageContainer container = connectionMessageContainerRepository.findOneByParentUriForUpdate(parent);
             if (container != null)
                 return container;
-            ConnectionEventContainer cec = new ConnectionEventContainer(null, parent);
-            connectionEventContainerRepository.saveAndFlush(cec);
+            ConnectionMessageContainer cec = new ConnectionMessageContainer(null, parent);
+            connectionMessageContainerRepository.saveAndFlush(cec);
             return cec;
         }
-        EventContainer container = needEventContainerRepository.findOneByParentUriForUpdate(parent);
+        MessageContainer container = atomMessageContainerRepository.findOneByParentUriForUpdate(parent);
         if (container != null)
             return container;
-        container = connectionEventContainerRepository.findOneByParentUriForUpdate(parent);
+        container = connectionMessageContainerRepository.findOneByParentUriForUpdate(parent);
         if (container != null)
             return container;
         // let's see if we can find the event conta

@@ -28,16 +28,16 @@ import won.bot.framework.eventbot.bus.EventBus;
 import won.bot.framework.eventbot.event.ConnectionSpecificEvent;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.MessageEvent;
-import won.bot.framework.eventbot.event.NeedSpecificEvent;
-import won.bot.framework.eventbot.event.RemoteNeedSpecificEvent;
+import won.bot.framework.eventbot.event.AtomSpecificEvent;
+import won.bot.framework.eventbot.event.TargetAtomSpecificEvent;
 import won.bot.framework.eventbot.event.impl.analyzation.agreement.AgreementCancellationAcceptedEvent;
 import won.bot.framework.eventbot.event.impl.analyzation.agreement.ProposalAcceptedEvent;
 import won.bot.framework.eventbot.event.impl.analyzation.precondition.PreconditionMetEvent;
 import won.bot.framework.eventbot.event.impl.analyzation.precondition.PreconditionUnmetEvent;
 import won.bot.framework.eventbot.event.impl.analyzation.proposal.ProposalReceivedEvent;
 import won.bot.framework.eventbot.event.impl.command.connectionmessage.ConnectionMessageCommandSuccessEvent;
-import won.bot.framework.eventbot.event.impl.wonmessage.MessageFromOtherNeedEvent;
-import won.bot.framework.eventbot.event.impl.wonmessage.OpenFromOtherNeedEvent;
+import won.bot.framework.eventbot.event.impl.wonmessage.MessageFromOtherAtomEvent;
+import won.bot.framework.eventbot.event.impl.wonmessage.OpenFromOtherAtomEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.WonMessageReceivedOnConnectionEvent;
 import won.bot.framework.eventbot.listener.EventListener;
 import won.bot.framework.eventbot.listener.impl.ActionOnEventListener;
@@ -45,7 +45,7 @@ import won.protocol.agreement.AgreementProtocolState;
 import won.protocol.agreement.effect.MessageEffect;
 import won.protocol.message.WonMessage;
 import won.protocol.model.Connection;
-import won.protocol.util.NeedModelWrapper;
+import won.protocol.util.AtomModelWrapper;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
@@ -89,8 +89,8 @@ public class AnalyzeBehaviour extends BotBehaviour {
     @Override
     protected void onActivate(Optional<Object> message) {
         ActionOnEventListener analyzeAction = new ActionOnEventListener(context, new AnalyzeAction(context));
-        this.subscribeWithAutoCleanup(MessageFromOtherNeedEvent.class, analyzeAction);
-        this.subscribeWithAutoCleanup(OpenFromOtherNeedEvent.class, analyzeAction);
+        this.subscribeWithAutoCleanup(MessageFromOtherAtomEvent.class, analyzeAction);
+        this.subscribeWithAutoCleanup(OpenFromOtherAtomEvent.class, analyzeAction);
         this.subscribeWithAutoCleanup(ConnectionMessageCommandSuccessEvent.class, analyzeAction);
     }
 
@@ -122,16 +122,16 @@ public class AnalyzeBehaviour extends BotBehaviour {
                 logger.trace("################################## ANALYZING COMPLETE #########################################");
                 return;
             }
-            URI needUri = ((NeedSpecificEvent) eventToAnalyze).getNeedURI();
-            URI remoteNeedUri = ((RemoteNeedSpecificEvent) eventToAnalyze).getRemoteNeedURI();
+            URI atomUri = ((AtomSpecificEvent) eventToAnalyze).getAtomURI();
+            URI targetAtomUri = ((TargetAtomSpecificEvent) eventToAnalyze).getTargetAtomURI();
             URI connectionUri = ((ConnectionSpecificEvent) eventToAnalyze).getConnectionURI();
-            Connection connection = makeConnection(needUri, remoteNeedUri, connectionUri);
+            Connection connection = makeConnection(atomUri, targetAtomUri, connectionUri);
             logger.trace("Message Information ------");
             logger.trace("Message Type: " + (receivedMessage ? "RECEIVED" : "SENT"));
             logger.trace("MessageUri: " + wonMessage.getMessageURI());
             logger.trace("CorrespondingRemoteMessageURI: " + wonMessage.getCorrespondingRemoteMessageURI());
-            logger.trace("NeedUri: " + needUri);
-            logger.trace("remoteNeedUri: " + remoteNeedUri);
+            logger.trace("AtomUri: " + atomUri);
+            logger.trace("targetAtomUri: " + targetAtomUri);
             logger.trace("connectionUri: " + connectionUri);
             logger.trace("WonMessage Dataset: ");
             logger.trace(getWonMessageString(wonMessage, Lang.TRIG));
@@ -141,9 +141,9 @@ public class AnalyzeBehaviour extends BotBehaviour {
                 logger.trace("################################## ANALYZING COMPLETE #########################################");
                 return;
             }
-            Dataset needDataset = linkedDataSource.getDataForResource(needUri);
-            Collection<Resource> goalsInNeed = new NeedModelWrapper(needDataset).getGoals();
-            logger.trace("Preconditions in Need: " + goalsInNeed.size());
+            Dataset atomDataset = linkedDataSource.getDataForResource(atomUri);
+            Collection<Resource> goalsInAtom = new AtomModelWrapper(atomDataset).getGoals();
+            logger.trace("Preconditions in Atom: " + goalsInAtom.size());
             AgreementProtocolState agreementProtocolState = AgreementProtocolState.of(connectionUri,
                             getEventListenerContext().getLinkedDataSource()); // Initialize with null, to ensure some
                                                                               // form of lazy init
@@ -186,17 +186,17 @@ public class AnalyzeBehaviour extends BotBehaviour {
                                                                                                             // AS WELL
                         if (!proposalModel.isEmpty()) {
                             logger.trace("\t\tProposal: " + proposal);
-                            for (Resource goal : goalsInNeed) {
-                                String preconditionUri = getUniqueGoalId(goal, needDataset);
+                            for (Resource goal : goalsInAtom) {
+                                String preconditionUri = getUniqueGoalId(goal, atomDataset);
                                 logger.trace("\t\t\tPreconditionUri: " + preconditionUri);
                                 if (!AnalyzeBehaviour.this.hasPreconditionProposalRelation(preconditionUri,
                                                 proposal.getUri().toString())) {
                                     GoalInstantiationResult result = GoalInstantiationProducer
-                                                    .findInstantiationForGoalInDataset(needDataset, goal,
+                                                    .findInstantiationForGoalInDataset(atomDataset, goal,
                                                                     proposalModel);
                                     Precondition precondition = new Precondition(preconditionUri, result.isConform());
                                     logger.trace("\t\t\tPrecondition: " + precondition);
-                                    // TODO: WE MIGHT NEED TO CHECK WHETHER THE PRECONDITION IS ACTUALLY FULFILLED
+                                    // TODO: WE MIGHT ATOM TO CHECK WHETHER THE PRECONDITION IS ACTUALLY FULFILLED
                                     // OR NOT BEFORE WE REMOVE THE TEMP STATUS
                                     if (AnalyzeBehaviour.this.isPreconditionMetPending(preconditionUri)) {
                                         logger.trace("\t\t\tRemove PreconditionMetPending Entry");
@@ -243,13 +243,13 @@ public class AnalyzeBehaviour extends BotBehaviour {
             logger.trace("--------------------------");
             // Things to do for each individual message regardless of it being received or
             // sent
-            Dataset remoteNeedDataset = ctx.getLinkedDataSource().getDataForResource(remoteNeedUri);
+            Dataset targetAtomDataset = ctx.getLinkedDataSource().getDataForResource(targetAtomUri);
             Dataset conversationDataset = null; // Initialize with null, to ensure some form of lazy init for the
                                                 // conversationDataset
             GoalInstantiationProducer goalInstantiationProducer = null;
             logger.trace("Conversation Information ------");
-            for (Resource goal : goalsInNeed) {
-                String preconditionUri = getUniqueGoalId(goal, needDataset);
+            for (Resource goal : goalsInAtom) {
+                String preconditionUri = getUniqueGoalId(goal, atomDataset);
                 logger.trace("\tPreconditionUri: " + preconditionUri);
                 if (AnalyzeBehaviour.this.isPreconditionMetInProposals(preconditionUri)) {
                     logger.trace("\t\tPrecondition already met in a proposal/agreement");
@@ -265,7 +265,7 @@ public class AnalyzeBehaviour extends BotBehaviour {
                     // CHANGE HAPPENED
                     conversationDataset = getConversationDatasetLazyInit(conversationDataset, connectionUri);
                     goalInstantiationProducer = getGoalInstantiationProducerLazyInit(goalInstantiationProducer,
-                                    needDataset, remoteNeedDataset, conversationDataset);
+                                    atomDataset, targetAtomDataset, conversationDataset);
                     GoalInstantiationResult result = goalInstantiationProducer.findInstantiationForGoal(goal);
                     Boolean oldGoalState = AnalyzeBehaviour.this.getPreconditionConversationState(preconditionUri);
                     boolean newGoalState = result.getShaclReportWrapper().isConform();
@@ -302,10 +302,10 @@ public class AnalyzeBehaviour extends BotBehaviour {
         }
 
         private GoalInstantiationProducer getGoalInstantiationProducerLazyInit(
-                        GoalInstantiationProducer goalInstantiationProducer, Dataset needDataset,
-                        Dataset remoteNeedDataset, Dataset conversationDataset) {
+                        GoalInstantiationProducer goalInstantiationProducer, Dataset atomDataset,
+                        Dataset targetAtomDataset, Dataset conversationDataset) {
             if (goalInstantiationProducer == null) {
-                return new GoalInstantiationProducer(needDataset, remoteNeedDataset, conversationDataset,
+                return new GoalInstantiationProducer(atomDataset, targetAtomDataset, conversationDataset,
                                 "http://example.org/", "http://example.org/blended/");
             } else {
                 return goalInstantiationProducer;
@@ -313,26 +313,26 @@ public class AnalyzeBehaviour extends BotBehaviour {
         }
     }
 
-    private static String getUniqueGoalId(Resource goal, Dataset needDataset) {
+    private static String getUniqueGoalId(Resource goal, Dataset atomDataset) {
         if (goal.getURI() != null) {
             return goal.getURI();
         } else {
-            NeedModelWrapper needWrapper = new NeedModelWrapper(needDataset);
-            Model dataModel = needWrapper.getDataGraph(goal);
-            Model shapesModel = needWrapper.getShapesGraph(goal);
+            AtomModelWrapper atomWrapper = new AtomModelWrapper(atomDataset);
+            Model dataModel = atomWrapper.getDataGraph(goal);
+            Model shapesModel = atomWrapper.getShapesGraph(goal);
             String strGraphs = "";
             if (dataModel != null) {
                 StringWriter sw = new StringWriter();
                 RDFDataMgr.write(sw, dataModel, Lang.NQUADS);
                 String content = sw.toString();
-                String dataGraphName = needWrapper.getDataGraphName(goal);
+                String dataGraphName = atomWrapper.getDataGraphName(goal);
                 strGraphs += replaceBlankNode(content, dataGraphName);
             }
             if (shapesModel != null) {
                 StringWriter sw = new StringWriter();
                 RDFDataMgr.write(sw, shapesModel, Lang.NQUADS);
                 String content = sw.toString();
-                String shapesGraphName = needWrapper.getShapesGraphName(goal);
+                String shapesGraphName = atomWrapper.getShapesGraphName(goal);
                 strGraphs += replaceBlankNode(content, shapesGraphName);
             }
             String[] statements = strGraphs.split("\n");
@@ -365,11 +365,11 @@ public class AnalyzeBehaviour extends BotBehaviour {
         return writer.toString();
     }
 
-    private static Connection makeConnection(URI needURI, URI remoteNeedURI, URI connectionURI) {
+    private static Connection makeConnection(URI atomURI, URI targetAtomURI, URI connectionURI) {
         Connection con = new Connection();
         con.setConnectionURI(connectionURI);
-        con.setNeedURI(needURI);
-        con.setRemoteNeedURI(remoteNeedURI);
+        con.setAtomURI(atomURI);
+        con.setTargetAtomURI(targetAtomURI);
         return con;
     }
 

@@ -15,10 +15,10 @@ import java.net.URI;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.event.ConnectionSpecificEvent;
 import won.bot.framework.eventbot.event.Event;
-import won.bot.framework.eventbot.event.NeedSpecificEvent;
+import won.bot.framework.eventbot.event.AtomSpecificEvent;
 
 /**
- * Filter that accepts ConnectionSpecificEvents if their needURI is in the
+ * Filter that accepts ConnectionSpecificEvents if their atomURI is in the
  * specified named list.
  */
 public class ConnectionUriInNamedListFilter extends AbstractNamedUriListFilter {
@@ -28,7 +28,7 @@ public class ConnectionUriInNamedListFilter extends AbstractNamedUriListFilter {
 
     @Override
     protected URI getURIFromEvent(final Event event) {
-        if (event instanceof NeedSpecificEvent) {
+        if (event instanceof AtomSpecificEvent) {
             return ((ConnectionSpecificEvent) event).getConnectionURI();
         }
         return null;

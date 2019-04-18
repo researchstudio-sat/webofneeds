@@ -25,10 +25,10 @@ import won.protocol.util.linkeddata.LinkedDataSource;
 public class PetriNetController {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     @Autowired
-    private LinkedDataSource linkedDataSourceOnBehalfOfNeed;
+    private LinkedDataSource linkedDataSourceOnBehalfOfAtom;
 
     public void setLinkedDataSource(LinkedDataSource linkedDataSource) {
-        this.linkedDataSourceOnBehalfOfNeed = linkedDataSource;
+        this.linkedDataSourceOnBehalfOfAtom = linkedDataSource;
     }
 
     @RequestMapping(value = "/getPetriNetUris", method = RequestMethod.GET)
@@ -40,7 +40,7 @@ public class PetriNetController {
     private AgreementProtocolState getAgreementProtocolState(URI connectionUri) {
         try {
             AuthenticationThreadLocal.setAuthentication(SecurityContextHolder.getContext().getAuthentication());
-            return WonConversationUtils.getAgreementProtocolState(connectionUri, linkedDataSourceOnBehalfOfNeed);
+            return WonConversationUtils.getAgreementProtocolState(connectionUri, linkedDataSourceOnBehalfOfAtom);
         } finally {
             // be sure to remove the principal from the threadlocal
             AuthenticationThreadLocal.remove();

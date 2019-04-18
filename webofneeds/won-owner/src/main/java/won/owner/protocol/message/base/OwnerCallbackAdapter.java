@@ -68,16 +68,16 @@ public abstract class OwnerCallbackAdapter implements WonMessageProcessor {
                 adaptee.onHintFromMatcher(makeMatch(message), message);
                 break;
             case CONNECT:
-                adaptee.onConnectFromOtherNeed(makeConnection(message), message);
+                adaptee.onConnectFromOtherAtom(makeConnection(message), message);
                 break;
             case OPEN:
-                adaptee.onOpenFromOtherNeed(makeConnection(message), message);
+                adaptee.onOpenFromOtherAtom(makeConnection(message), message);
                 break;
             case CONNECTION_MESSAGE:
-                adaptee.onMessageFromOtherNeed(makeConnection(message), message);
+                adaptee.onMessageFromOtherAtom(makeConnection(message), message);
                 break;
             case CLOSE:
-                adaptee.onCloseFromOtherNeed(makeConnection(message), message);
+                adaptee.onCloseFromOtherAtom(makeConnection(message), message);
                 break;
             case SUCCESS_RESPONSE:
                 // logger.info("Not handling successResponse for message {}", message);
@@ -86,8 +86,8 @@ public abstract class OwnerCallbackAdapter implements WonMessageProcessor {
             case FAILURE_RESPONSE:
                 adaptee.onFailureResponse(message.getIsResponseToMessageURI(), message);
                 break;
-            case CREATE_NEED:
-                logger.info("Handling CREATE_NEED for message {}", message);
+            case CREATE_ATOM:
+                logger.info("Handling CREATE_ATOM for message {}", message);
                 break;
             default:
                 logger.info("could not find callback method for wonMessage of type {}", messageType);

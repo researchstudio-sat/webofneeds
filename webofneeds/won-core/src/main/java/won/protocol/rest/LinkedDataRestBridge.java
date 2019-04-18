@@ -10,7 +10,7 @@ import org.springframework.web.client.DefaultResponseErrorHandler;
 import org.springframework.web.client.RestTemplate;
 
 import won.cryptography.keymanagement.KeyPairAliasDerivationStrategy;
-import won.cryptography.keymanagement.NeedUriAsAliasStrategy;
+import won.cryptography.keymanagement.AtomUriAsAliasStrategy;
 import won.cryptography.service.CryptographyUtils;
 import won.cryptography.service.TrustStoreService;
 import won.cryptography.service.keystore.KeyStoreService;
@@ -27,7 +27,7 @@ public class LinkedDataRestBridge {
     private KeyStoreService keyStoreService;
     private TrustStoreService trustStoreService;
     private TrustStrategy trustStrategy;
-    private KeyPairAliasDerivationStrategy keyPairAliasDerivationStrategy = new NeedUriAsAliasStrategy();
+    private KeyPairAliasDerivationStrategy keyPairAliasDerivationStrategy = new AtomUriAsAliasStrategy();
 
     public LinkedDataRestBridge(KeyStoreService keyStoreService, TrustStoreService trustStoreService,
                     TrustStrategy trustStrategy, KeyPairAliasDerivationStrategy keyPairAliasDerivationStrategy) {
@@ -41,7 +41,7 @@ public class LinkedDataRestBridge {
 
     @PostConstruct
     public void initialize() {
-        String defaultAlias = keyPairAliasDerivationStrategy.getAliasForNeedUri(null);
+        String defaultAlias = keyPairAliasDerivationStrategy.getAliasForAtomUri(null);
         if (defaultAlias != null) {
             // we are using a fixed alias strategy (or at least, there is a default alias
             // set)
@@ -81,7 +81,7 @@ public class LinkedDataRestBridge {
     private RestTemplate createRestTemplateForReadingLinkedData(String webID) throws Exception {
         RestTemplate template = CryptographyUtils.createSslRestTemplate(this.keyStoreService.getUnderlyingKeyStore(),
                         this.keyStoreService.getPassword(),
-                        new PredefinedAliasPrivateKeyStrategy(keyPairAliasDerivationStrategy.getAliasForNeedUri(webID)),
+                        new PredefinedAliasPrivateKeyStrategy(keyPairAliasDerivationStrategy.getAliasForAtomUri(webID)),
                         this.trustStoreService.getUnderlyingKeyStore(), this.trustStrategy, readTimeout,
                         connectionTimeout, true);
         // prevent the RestTemplate from throwing an exception when the server responds

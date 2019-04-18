@@ -45,10 +45,10 @@ import won.protocol.vocabulary.WON;
  */
 public class DatasetBackedOwnerCallbackAdapter extends OwnerCallbackAdapter {
     // TODO move to the queries object!
-    private static final String QUERY_CONNECTION = "SELECT ?con ?need ?state ?remoteCon ?remoteNeed ?type where { "
-                    + "  ?con won:belongsToNeed ?need; " + "     won:isInState ?state; " + "     won:hasFacet ?type; "
-                    + "     won:hasRemoteNeed ?remoteNeed." + "  OPTIONAL { "
-                    + "    ?con won:hasRemoteConnection ?remoteCon" + "  } " + "} ";
+    private static final String QUERY_CONNECTION = "SELECT ?con ?atom ?state ?remoteCon ?targetAtom ?type where { "
+                    + "  ?con won:sourceAtom ?atom; " + "     won:atomState ?state; " + "     won:socket ?type; "
+                    + "     won:targetAtom ?targetAtom." + "  OPTIONAL { " + "    ?con won:targetConnection ?remoteCon"
+                    + "  } " + "} ";
     private final Logger logger = LoggerFactory.getLogger(getClass());
     @Autowired
     private Dataset dataset;
@@ -75,7 +75,7 @@ public class DatasetBackedOwnerCallbackAdapter extends OwnerCallbackAdapter {
 
     @Override
     protected Connection makeConnection(final WonMessage wonMessage) {
-        URI connUri = wonMessage.getReceiverURI();
+        URI connUri = wonMessage.getRecipientURI();
         ParameterizedSparqlString pss = new ParameterizedSparqlString();
         pss.setNsPrefix("won", WON.BASE_URI);
         pss.setCommandText(QUERY_CONNECTION);
@@ -93,10 +93,10 @@ public class DatasetBackedOwnerCallbackAdapter extends OwnerCallbackAdapter {
                 con = new Connection();
                 con.setConnectionURI(getURIFromSolution(soln, "con"));
                 con.setTypeURI(getURIFromSolution(soln, "type"));
-                con.setNeedURI(getURIFromSolution(soln, "need"));
+                con.setAtomURI(getURIFromSolution(soln, "atom"));
                 con.setState(ConnectionState.fromURI(getURIFromSolution(soln, "state")));
-                con.setRemoteNeedURI(getURIFromSolution(soln, "remoteNeed"));
-                con.setRemoteConnectionURI(getURIFromSolution(soln, "remoteCon"));
+                con.setTargetAtomURI(getURIFromSolution(soln, "targetAtom"));
+                con.setTargetConnectionURI(getURIFromSolution(soln, "remoteCon"));
             }
             return con;
         }

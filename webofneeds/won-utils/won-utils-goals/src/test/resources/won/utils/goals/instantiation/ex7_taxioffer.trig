@@ -1,7 +1,7 @@
-@prefix msg:   <http://purl.org/webofneeds/message#> .
+@prefix msg:   <https://w3id.org/won/message#> .
 @prefix conn:  <https://satvm05.researchstudio.at/won/resource/connection/> .
-@prefix need:  <https://satvm05.researchstudio.at/won/resource/need/> .
-@prefix woncrypt: <http://purl.org/webofneeds/woncrypt#> .
+@prefix atom:  <https://satvm05.researchstudio.at/won/resource/atom/> .
+@prefix woncrypt: <https://w3id.org/won/core#> .
 @prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
 @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix cert:  <http://www.w3.org/ns/auth/cert#> .
@@ -11,19 +11,19 @@
 @prefix s:     <http://schema.org/> .
 @prefix sh:    <http://www.w3.org/ns/shacl#> .
 @prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-@prefix won:   <http://purl.org/webofneeds/model#> .
+@prefix won:   <https://w3id.org/won/core#> .
 @prefix ldp:   <http://www.w3.org/ns/ldp#> .
 @prefix event: <https://satvm05.researchstudio.at/won/resource/event/> .
 @prefix dc:    <http://purl.org/dc/elements/1.1/> .
 @prefix sioc:  <http://rdfs.org/sioc/ns#> .
 
 <https://satvm05.researchstudio.at/won/resource/event/qkrivynfftr9gtl3u8im#content-nfp3> {
-    need:ize9ntwo0vjyqbdvb4cu
-            a             won:Need ;
-            won:goal      [ won:hasShapesGraph  <https://satvm05.researchstudio.at/won/resource/event/qkrivynfftr9gtl3u8im#content-fsw0> ] ;
-            won:hasFacet  won:ChatFacet ;
-            won:hasFlag   won:NoHintForCounterpart , won:NoHintForMe ;
-            dc:description  "This is a automatically created need by the TaxiBot" ;
+    atom:ize9ntwo0vjyqbdvb4cu
+            a             won:Atom ;
+            won:goal      [ won:shapesGraph  <https://satvm05.researchstudio.at/won/resource/event/qkrivynfftr9gtl3u8im#content-fsw0> ] ;
+            won:socket  won:ChatSocket ;
+            won:flag   won:NoHintForCounterpart , won:NoHintForMe ;
+            dc:description  "This is a automatically created atom by the TaxiBot" ;
             dc:title        "Taxi in Wien<->Taxi" ;
 
             cert:key      [ cert:PublicKey  [ a                       woncrypt:ECCPublicKey ;
@@ -37,28 +37,28 @@
 <https://satvm05.researchstudio.at/won/resource/event/qkrivynfftr9gtl3u8im#envelope-uhuo-sig> {
     <https://satvm05.researchstudio.at/won/resource/event/qkrivynfftr9gtl3u8im#envelope-uhuo-sig>
             a                               sig:Signature ;
-            sig:hasSignatureValue           "MGQCMAUd2kqL2fwONeaCKPYSlteJ0jccZuNYHWCMfzdXmOlDC3by1bWIm0CnACIdlMzPHwIwdOWItUGJnS4k/ZQN7ej0n1pW/+fYpaHZ2Q/W6Ose3YzmbyPfHCPWRvYDjV7+1Uz1" ;
-            sig:hasVerificationCertificate  need:ize9ntwo0vjyqbdvb4cu ;
-            msg:hasHash                     "ekR9ls5KaS9yp2W3mFvw7wnBJsvIemm0eFnO/Kjx1wWcFAqgTaFviFL3Q7dq264FHmJnn54D8yj7d1V6GL/RDXJOpmkz9M4553PSz13omWVjgycjs47MhjZOmAxYfKmGipSVaooFsRY09HwVFFC9Nie/Vd6Q1QWEhoUjqIdLCvw=" ;
-            msg:hasPublicKeyFingerprint     "5s/qPiYhn2Gs+gJW9HWEpt9VzV+8SHAYV8c4LiJ7e+g=" ;
-            msg:hasSignedGraph              <https://satvm05.researchstudio.at/won/resource/event/qkrivynfftr9gtl3u8im#envelope-uhuo> .
+            sig:signatureValue           "MGQCMAUd2kqL2fwONeaCKPYSlteJ0jccZuNYHWCMfzdXmOlDC3by1bWIm0CnACIdlMzPHwIwdOWItUGJnS4k/ZQN7ej0n1pW/+fYpaHZ2Q/W6Ose3YzmbyPfHCPWRvYDjV7+1Uz1" ;
+            sig:hasVerificationCertificate  atom:ize9ntwo0vjyqbdvb4cu ;
+            msg:hash                     "ekR9ls5KaS9yp2W3mFvw7wnBJsvIemm0eFnO/Kjx1wWcFAqgTaFviFL3Q7dq264FHmJnn54D8yj7d1V6GL/RDXJOpmkz9M4553PSz13omWVjgycjs47MhjZOmAxYfKmGipSVaooFsRY09HwVFFC9Nie/Vd6Q1QWEhoUjqIdLCvw=" ;
+            msg:publicKeyFingerprint     "5s/qPiYhn2Gs+gJW9HWEpt9VzV+8SHAYV8c4LiJ7e+g=" ;
+            msg:signedGraph              <https://satvm05.researchstudio.at/won/resource/event/qkrivynfftr9gtl3u8im#envelope-uhuo> .
 }
 
-<https://satvm05.researchstudio.at/won/resource/need/ize9ntwo0vjyqbdvb4cu#sysinfo> {
-    <https://satvm05.researchstudio.at/won/resource/need/ize9ntwo0vjyqbdvb4cu#events>
-            a            won:EventContainer ;
+<https://satvm05.researchstudio.at/won/resource/atom/ize9ntwo0vjyqbdvb4cu#sysinfo> {
+    <https://satvm05.researchstudio.at/won/resource/atom/ize9ntwo0vjyqbdvb4cu#events>
+            a            won:MessageContainer ;
             rdfs:member  event:qkrivynfftr9gtl3u8im , event:eib70oqplhbcs5hxu1ex .
 
-    need:ize9ntwo0vjyqbdvb4cu
-            a                      won:Need ;
+    atom:ize9ntwo0vjyqbdvb4cu
+            a                      won:Atom ;
             <http://purl.org/dc/terms/created>
                     "2018-02-07T07:30:38.761Z"^^xsd:dateTime ;
             <http://purl.org/dc/terms/modified>
                     "2018-02-07T07:30:38.766Z"^^xsd:dateTime ;
-            won:hasConnections     <https://satvm05.researchstudio.at/won/resource/need/ize9ntwo0vjyqbdvb4cu/connections> ;
-            won:hasEventContainer  <https://satvm05.researchstudio.at/won/resource/need/ize9ntwo0vjyqbdvb4cu#events> ;
-            won:hasWonNode         <https://satvm05.researchstudio.at/won/resource> ;
-            won:isInState          won:Active .
+            won:connections     <https://satvm05.researchstudio.at/won/resource/atom/ize9ntwo0vjyqbdvb4cu/connections> ;
+            won:messageContainer  <https://satvm05.researchstudio.at/won/resource/atom/ize9ntwo0vjyqbdvb4cu#events> ;
+            won:wonNode         <https://satvm05.researchstudio.at/won/resource> ;
+            won:atomState          won:Active .
 }
 
 <https://satvm05.researchstudio.at/won/resource/event/qkrivynfftr9gtl3u8im#content-fsw0> {
@@ -75,13 +75,13 @@
             sh:closed             false ;
             sh:ignoredProperties  ( rdf:type ) ;
             sh:property [
-                            sh:path (won:hasBoundingBox won:hasSouthEastCorner);
+                            sh:path (won:boundingBox won:southEastCorner);
                             sh:class s:GeoCoordinates ;
                             sh:minCount 0;
                             sh:maxCount 1;
                         ] ;
             sh:property [
-                            sh:path (won:hasBoundingBox won:hasNorthWestCorner);
+                            sh:path (won:boundingBox won:northWestCorner);
                             sh:class s:GeoCoordinates ;
                             sh:minCount 1;
                             sh:maxCount 1;

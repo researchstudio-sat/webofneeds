@@ -29,13 +29,13 @@ function genComponentConf() {
       window.pcm4dbg = this;
 
       const selectFromState = state => {
-        const post = this.postUri && state.getIn(["needs", this.postUri]);
+        const post = this.postUri && state.getIn(["atoms", this.postUri]);
 
         return {
           post,
           postLoading:
             !post ||
-            getIn(state, ["process", "needs", post.get("uri"), "loading"]),
+            getIn(state, ["process", "atoms", post.get("uri"), "loading"]),
         };
       };
 

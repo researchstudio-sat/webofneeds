@@ -108,7 +108,7 @@ public class GetAgreementsTest {
     // an envelope with an agr:accepts predicate, and an envelope with an
     // agr:proposes predicate, but a
     // agr:proposes predicate that references an non-existent object or message
-    // envelope. To do this I deleted the event envelope with msg:hasTextMessage
+    // envelope. To do this I deleted the event envelope with msg:textMessage
     // predicate and non-existent object
     // as the subject.
     @Test
@@ -135,7 +135,7 @@ public class GetAgreementsTest {
     // This tries to cancel an agreement that accepts two proposals. However, there
     // is an error in the agreement since one of the accepted agreements is not a
     // proposal, but a message.
-    // The file name needs to be changed..this should produce an empty file
+    // The file name atoms to be changed..this should produce an empty file
     // I discovered that it creates problems to use event:6671551888677331000
     @Test
     public void twoProposalOneAgreementOneCancellationmsgError() throws IOException {

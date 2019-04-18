@@ -21,10 +21,10 @@ import won.cryptography.utils.TestingKeys;
  */
 @Ignore
 public class WonKeysReaderWriterTest {
-    private static final String NEED_URI = "http://localhost:8080/won/resource/need/3144709509622353000";
-    private static final String RESOURCE_FILE = "/won-signed-messages/create-need-msg.trig";
-    private static final String NEED_FILE = "/won-signed-messages/need-core-nosig.trig";
-    private static final String NEED_CORE_DATA_URI = "http://localhost:8080/won/resource/need/3144709509622353000/core/#data";
+    private static final String ATOM_URI = "http://localhost:8080/won/resource/atom/3144709509622353000";
+    private static final String RESOURCE_FILE = "/won-signed-messages/create-atom-msg.trig";
+    private static final String ATOM_FILE = "/won-signed-messages/atom-core-nosig.trig";
+    private static final String ATOM_CORE_DATA_URI = "http://localhost:8080/won/resource/atom/3144709509622353000/core/#data";
     private TestingKeys keys;
     private WonKeysReaderWriter extractor;
 
@@ -35,16 +35,16 @@ public class WonKeysReaderWriterTest {
     }
 
     @Test
-    public void testReadNeedPublicKey() throws Exception {
+    public void testReadAtomPublicKey() throws Exception {
         // create dataset
         Dataset tempDataset = TestSigningUtils.prepareTestDataset(RESOURCE_FILE);
         // extract public keys
         Map<String, PublicKey> constructedKeys = extractor.readFromDataset(tempDataset);
         Assert.assertEquals(1, constructedKeys.size());
         // expected public key
-        ECPublicKey expectedKey = (ECPublicKey) keys.getPublicKey(TestSigningUtils.needCertUri);
+        ECPublicKey expectedKey = (ECPublicKey) keys.getPublicKey(TestSigningUtils.atomCertUri);
         // reconstructed public key
-        ECPublicKey constructedKey = (ECPublicKey) constructedKeys.get(NEED_URI);
+        ECPublicKey constructedKey = (ECPublicKey) constructedKeys.get(ATOM_URI);
         // KeyInformationExtractor info = new KeyInformationExtractorBouncyCastle();
         // Assert.assertTrue(info.getQX(expectedKey).equals(info.getQX(constructedKey)));
         // Assert.assertTrue(info.getQY(expectedKey).equals(info.getQY(constructedKey)));
@@ -58,15 +58,15 @@ public class WonKeysReaderWriterTest {
     }
 
     @Test
-    public void testWriteNeedPublicKey() throws Exception {
-        Dataset testDataset = TestSigningUtils.prepareTestDatasetFromNamedGraphs(NEED_FILE,
-                        new String[] { NEED_CORE_DATA_URI });
+    public void testWriteAtomPublicKey() throws Exception {
+        Dataset testDataset = TestSigningUtils.prepareTestDatasetFromNamedGraphs(ATOM_FILE,
+                        new String[] { ATOM_CORE_DATA_URI });
         Dataset datasetWithExpectedModel = TestSigningUtils.prepareTestDatasetFromNamedGraphs(RESOURCE_FILE,
-                        new String[] { NEED_CORE_DATA_URI });
-        Model testModel = testDataset.getNamedModel(NEED_CORE_DATA_URI);
-        Resource keySubj = testModel.createResource(NEED_URI);
-        extractor.writeToModel(testModel, keySubj, keys.getPublicKey(TestSigningUtils.needCertUri));
-        Assert.assertTrue(testModel.isIsomorphicWith(datasetWithExpectedModel.getNamedModel(NEED_CORE_DATA_URI)));
+                        new String[] { ATOM_CORE_DATA_URI });
+        Model testModel = testDataset.getNamedModel(ATOM_CORE_DATA_URI);
+        Resource keySubj = testModel.createResource(ATOM_URI);
+        extractor.writeToModel(testModel, keySubj, keys.getPublicKey(TestSigningUtils.atomCertUri));
+        Assert.assertTrue(testModel.isIsomorphicWith(datasetWithExpectedModel.getNamedModel(ATOM_CORE_DATA_URI)));
         // write for debugging
         // TestSigningUtils.writeToTempFile(testDataset);
     }

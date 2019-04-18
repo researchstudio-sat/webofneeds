@@ -19,7 +19,7 @@ import won.protocol.exception.NoSuchConnectionException;
  */
 public interface ProtocolCommunicationService {
     /**
-     * @param resourceUri is either wonNodeUri or needUri
+     * @param resourceUri is either wonNodeUri or atomUri
      * @return
      * @throws NoSuchConnectionException
      */

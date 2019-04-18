@@ -18,7 +18,7 @@ import won.protocol.exception.CamelConfigurationFailedException;
 /**
  * User: LEIH-NB Date: 10.03.14
  */
-public interface MatcherProtocolCamelConfigurator extends NeedProtocolCamelConfigurator {
+public interface MatcherProtocolCamelConfigurator extends AtomProtocolCamelConfigurator {
     public void addRemoteTopicListeners(Set<String> endpoints, URI remoteEndpoint)
                     throws CamelConfigurationFailedException;
 

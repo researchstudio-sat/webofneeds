@@ -28,7 +28,7 @@ public class HokifyJobBotContextWrapper extends BotContextWrapper {
         return (String) getBotContext().loadFromObjectMap(uriJobURLRelationsName, uri.toString());
     }
 
-    public String getNeedUriForJobURL(String jobURL) {
+    public String getAtomUriForJobURL(String jobURL) {
         return (String) getBotContext().loadFromObjectMap(jobUrlUriRelationsName, jobURL);
     }
 }

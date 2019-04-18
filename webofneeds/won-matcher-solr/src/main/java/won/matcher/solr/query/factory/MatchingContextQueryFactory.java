@@ -6,7 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class MatchingContextQueryFactory extends SolrQueryFactory {
-    public static final String MATCHING_CONTEXT_SOLR_FIELD = "_graph.http___purl.org_webofneeds_model_hasMatchingContext";
+    public static final String MATCHING_CONTEXT_SOLR_FIELD = "_graph.http___purl.org_webofneeds_model_matchingContext";
     Collection<String> matchingContexts;
 
     public MatchingContextQueryFactory(Collection<String> matchingContexts) {

@@ -5,7 +5,7 @@ package won.owner.pojo;
  */
 public class UserSettingsPojo extends UsernamePojo {
     private String email;
-    private String needUri;
+    private String atomUri;
     private boolean notifyMatches;
     private boolean notifyRequests;
     private boolean notifyConversations;
@@ -50,12 +50,12 @@ public class UserSettingsPojo extends UsernamePojo {
         this.notifyConversations = notifyConversations;
     }
 
-    public String getNeedUri() {
-        return needUri;
+    public String getAtomUri() {
+        return atomUri;
     }
 
-    public void setNeedUri(final String needUri) {
-        this.needUri = needUri;
+    public void setAtomUri(final String atomUri) {
+        this.atomUri = atomUri;
     }
 
     public void setNotify(final boolean notifyMatches, final boolean notifyRequests,

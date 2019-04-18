@@ -22,16 +22,16 @@ import won.bot.framework.eventbot.behaviour.ConnectBehaviour;
 import won.bot.framework.eventbot.behaviour.ConnectionMessageBehaviour;
 import won.bot.framework.eventbot.bus.EventBus;
 import won.bot.framework.eventbot.event.impl.telegram.SendHelpEvent;
-import won.bot.framework.eventbot.event.impl.telegram.TelegramCreateNeedEvent;
+import won.bot.framework.eventbot.event.impl.telegram.TelegramCreateAtomEvent;
 import won.bot.framework.eventbot.event.impl.telegram.TelegramMessageReceivedEvent;
-import won.bot.framework.eventbot.event.impl.wonmessage.ConnectFromOtherNeedEvent;
+import won.bot.framework.eventbot.event.impl.wonmessage.ConnectFromOtherAtomEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.HintFromMatcherEvent;
-import won.bot.framework.eventbot.event.impl.wonmessage.MessageFromOtherNeedEvent;
+import won.bot.framework.eventbot.event.impl.wonmessage.MessageFromOtherAtomEvent;
 import won.bot.framework.eventbot.listener.impl.ActionOnEventListener;
 
 /**
  * This Bot checks the Telegram-Messages sent to a given telegram-bot and
- * creates Needs that represent the sent messages Created by fsuda on
+ * creates Atoms that represent the sent messages Created by fsuda on
  * 14.12.2016.
  */
 public class Telegram2WonBot extends EventBot {
@@ -68,14 +68,14 @@ public class Telegram2WonBot extends EventBot {
                             new TelegramMessageReceivedAction(ctx, wonTelegramBotHandler, telegramContentExtractor)));
             bus.subscribe(SendHelpEvent.class, new ActionOnEventListener(ctx, "TelegramHelpAction",
                             new TelegramHelpAction(ctx, wonTelegramBotHandler)));
-            bus.subscribe(TelegramCreateNeedEvent.class, new ActionOnEventListener(ctx, "TelegramCreateAction",
+            bus.subscribe(TelegramCreateAtomEvent.class, new ActionOnEventListener(ctx, "TelegramCreateAction",
                             new TelegramCreateAction(ctx, wonTelegramBotHandler, telegramContentExtractor)));
             // WON initiated Events
             bus.subscribe(HintFromMatcherEvent.class, new ActionOnEventListener(ctx, "HintReceived",
                             new Hint2TelegramAction(ctx, wonTelegramBotHandler)));
-            bus.subscribe(ConnectFromOtherNeedEvent.class, new ActionOnEventListener(ctx, "ConnectReceived",
+            bus.subscribe(ConnectFromOtherAtomEvent.class, new ActionOnEventListener(ctx, "ConnectReceived",
                             new Connect2TelegramAction(ctx, wonTelegramBotHandler)));
-            bus.subscribe(MessageFromOtherNeedEvent.class, new ActionOnEventListener(ctx, "ReceivedTextMessage",
+            bus.subscribe(MessageFromOtherAtomEvent.class, new ActionOnEventListener(ctx, "ReceivedTextMessage",
                             new Message2TelegramAction(ctx, wonTelegramBotHandler)));
         } catch (TelegramApiRequestException e) {
             logger.error(e.getMessage());

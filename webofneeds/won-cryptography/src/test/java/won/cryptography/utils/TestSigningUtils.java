@@ -45,7 +45,7 @@ public class TestSigningUtils {
     private final static Logger LOGGER = LoggerFactory.getLogger(TestSigningUtils.class);
     public static final String KEYS_FILE = "/won-signed-messages/test-keys.jks";
     // theoretically can be a public key WebID...
-    public static String needCertUri = "http://localhost:8080/won/resource/need/3144709509622353000";
+    public static String atomCertUri = "http://localhost:8080/won/resource/atom/3144709509622353000";
     public static String ownerCertUri = "http://localhost:8080/owner/certificate";
     public static String nodeCertUri = "http://localhost:8080/node/certificate";
 
@@ -69,7 +69,7 @@ public class TestSigningUtils {
 
     public static Dataset prepareTestDatasetFromNamedGraphs(String resourceFile, final String[] graphNames)
                     throws IOException {
-        // read dataset with created need
+        // read dataset with created atom
         InputStream is = TestSigningUtils.class.getResourceAsStream(resourceFile);
         Dataset dataset = DatasetFactory.createGeneral();
         RDFDataMgr.read(dataset, is, RDFFormat.TRIG.getLang());
@@ -83,7 +83,7 @@ public class TestSigningUtils {
     }
 
     public static Dataset prepareTestDataset(String resourceFile) throws IOException {
-        // read dataset with created need
+        // read dataset with created atom
         InputStream is = TestSigningUtils.class.getResourceAsStream(resourceFile);
         Dataset dataset = DatasetFactory.createGeneral();
         RDFDataMgr.read(dataset, is, RDFFormat.TRIG.getLang());
@@ -128,7 +128,7 @@ public class TestSigningUtils {
         storeService.init();
         KeyPairService keyPairService = new KeyPairService();
         CertificateService certificateService = new CertificateService();
-        addKeyByUri(needCertUri, keyPairService, certificateService, storeService);
+        addKeyByUri(atomCertUri, keyPairService, certificateService, storeService);
         addKeyByUri(ownerCertUri, keyPairService, certificateService, storeService);
         addKeyByUri(nodeCertUri, keyPairService, certificateService, storeService);
     }
@@ -168,7 +168,7 @@ public class TestSigningUtils {
         // load public keys:
         File keysFile = new File(this.getClass().getResource(TestSigningUtils.KEYS_FILE).getFile());
         KeyStoreService storeService = new FileBasedKeyStoreService(keysFile, "temp");
-        printCerificate(storeService, needCertUri, needCertUri);
+        printCerificate(storeService, atomCertUri, atomCertUri);
         printCerificate(storeService, ownerCertUri, ownerCertUri);
         printCerificate(storeService, ownerCertUri, nodeCertUri);
     }
@@ -222,7 +222,7 @@ public class TestSigningUtils {
     }
     // generate key pair
     // CryptographyService crypService = new CryptographyService();
-    // KeyPair keyPair = crypService.createNewNeedKeyPair(URI.create(NEED_URI));
+    // KeyPair keyPair = crypService.createNewAtomKeyPair(URI.create(ATOM_URI));
     // KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
     // kpg.initialize(2048);
     // KeyPair keyPair = kpg.genKeyPair();

@@ -47,7 +47,7 @@
             http://activemq.apache.org/producer-flow-control.html
         -->
         <!--destinations>
-            <queue physicalName="WON.CREATENEED"></queue>
+            <queue physicalName="WON.CREATEATOM"></queue>
         </destinations-->
         <destinationPolicy>
             <policyMap>

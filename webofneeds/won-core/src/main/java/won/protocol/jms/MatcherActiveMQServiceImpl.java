@@ -35,25 +35,25 @@ public class MatcherActiveMQServiceImpl extends ActiveMQServiceImpl implements M
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private List<String> matcherProtocolTopicList;
     private String pathInformation;
-    private static final String PATH_MATCHER_PROTOCOL_OUT_NEED_CREATED = "<" + WON.SUPPORTS_WON_PROTOCOL_IMPL + ">/<"
-                    + WON.HAS_ACTIVEMQ_MATCHER_PROTOCOL_OUT_NEED_CREATED_TOPIC_NAME + ">";
-    private static final String PATH_MATCHER_PROTOCOL_OUT_NEED_ACTIVATED = "<" + WON.SUPPORTS_WON_PROTOCOL_IMPL + ">/<"
-                    + WON.HAS_ACTIVEMQ_MATCHER_PROTOCOL_OUT_NEED_ACTIVATED_TOPIC_NAME + ">";
-    private static final String PATH_MATCHER_PROTOCOL_OUT_NEED_DEACTIVATED = "<" + WON.SUPPORTS_WON_PROTOCOL_IMPL
-                    + ">/<" + WON.HAS_ACTIVEMQ_MATCHER_PROTOCOL_OUT_NEED_DEACTIVATED_TOPIC_NAME + ">";
-    private static final String PATH_MATCHER_PROTOCOL_OUT_MATCHER_REGISTERED = "<" + WON.SUPPORTS_WON_PROTOCOL_IMPL
-                    + ">/<" + WON.HAS_ACTIVEMQ_MATCHER_PROTOCOL_OUT_MATCHER_REGISTERED_TOPIC_NAME + ">";
-    private static final String PATH_MATCHER_PROTOCOL_QUEUE_NAME = "<" + WON.SUPPORTS_WON_PROTOCOL_IMPL + ">/<"
-                    + WON.HAS_ACTIVEMQ_MATCHER_PROTOCOL_QUEUE_NAME + ">";
+    private static final String PATH_MATCHER_PROTOCOL_OUT_ATOM_CREATED = "<" + WON.supportsWonProtocolImpl + ">/<"
+                    + WON.activeMQMatcherProtocolOutAtomCreatedTopicName + ">";
+    private static final String PATH_MATCHER_PROTOCOL_OUT_ATOM_ACTIVATED = "<" + WON.supportsWonProtocolImpl + ">/<"
+                    + WON.activeMQMatcherProtocolOutAtomActivatedTopicName + ">";
+    private static final String PATH_MATCHER_PROTOCOL_OUT_ATOM_DEACTIVATED = "<" + WON.supportsWonProtocolImpl + ">/<"
+                    + WON.activeMQMatcherProtocolOutAtomDeactivatedTopicName + ">";
+    private static final String PATH_MATCHER_PROTOCOL_OUT_MATCHER_REGISTERED = "<" + WON.supportsWonProtocolImpl + ">/<"
+                    + WON.activeMQMatcherProtocolOutMatcherRegisteredTopicName + ">";
+    private static final String PATH_MATCHER_PROTOCOL_QUEUE_NAME = "<" + WON.supportsWonProtocolImpl + ">/<"
+                    + WON.activeMQMatcherProtocolQueueName + ">";
 
     public MatcherActiveMQServiceImpl(ProtocolType type) {
         super(type);
         queueNamePath = PATH_MATCHER_PROTOCOL_QUEUE_NAME;
         // pathInformation = "/resource";
         matcherProtocolTopicList = new ArrayList<>();
-        matcherProtocolTopicList.add(PATH_MATCHER_PROTOCOL_OUT_NEED_ACTIVATED);
-        matcherProtocolTopicList.add(PATH_MATCHER_PROTOCOL_OUT_NEED_CREATED);
-        matcherProtocolTopicList.add(PATH_MATCHER_PROTOCOL_OUT_NEED_DEACTIVATED);
+        matcherProtocolTopicList.add(PATH_MATCHER_PROTOCOL_OUT_ATOM_ACTIVATED);
+        matcherProtocolTopicList.add(PATH_MATCHER_PROTOCOL_OUT_ATOM_CREATED);
+        matcherProtocolTopicList.add(PATH_MATCHER_PROTOCOL_OUT_ATOM_DEACTIVATED);
     }
 
     public final Set<String> getMatcherProtocolTopicNamesWithResource(URI resourceURI) {

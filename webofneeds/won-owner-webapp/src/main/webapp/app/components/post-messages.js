@@ -11,7 +11,7 @@ import labelledHrModule from "./labelled-hr.js";
 import connectionContextDropdownModule from "./connection-context-dropdown.js";
 import { connect2Redux } from "../won-utils.js";
 import { attach, delay, getIn, get } from "../utils.js";
-import * as needUtils from "../need-utils.js";
+import * as atomUtils from "../atom-utils.js";
 import * as processUtils from "../process-utils.js";
 import * as connectionUtils from "../connection-utils.js";
 import * as messageUtils from "../message-utils.js";
@@ -69,7 +69,7 @@ function genComponentConf() {
             <won-connection-header
                 connection-uri="self.selectedConnectionUri">
             </won-connection-header>
-            <won-share-dropdown need-uri="self.remoteNeedUri"></won-share-dropdown>
+            <won-share-dropdown atom-uri="self.targetAtomUri"></won-share-dropdown>
             <won-connection-context-dropdown show-petri-net-data-field="::self.showPetriNetDataField()" show-agreement-data-field="::self.showAgreementDataField()"></won-connection-context-dropdown>
         </div>
         <div class="pm__header" ng-if="self.showAgreementData">
@@ -117,7 +117,7 @@ function genComponentConf() {
             </div>
             <won-post-content-message
               ng-if="self.showPostContentMessage"
-              post-uri="self.remoteNeedUri"
+              post-uri="self.targetAtomUri"
               connection-uri="self.selectedConnectionUri">
             </won-post-content-message>
             <div class="pm__content__loadspinner"
@@ -252,7 +252,7 @@ function genComponentConf() {
                 on-submit="::self.sendRequest(value, selectedPersona)"
                 allow-details="::false"
                 allow-empty-submit="::true"
-                show-personas="self.isOwnedNeedWhatsX"
+                show-personas="self.isOwnedAtomWhatsX"
                 submit-button-label="::'Ask&#160;to&#160;Chat'"
             >
             </chat-textfield>
@@ -298,7 +298,7 @@ function genComponentConf() {
         "for prefixes that will be added automatically. E.g." +
         `\`<${
           won.WONMSG.uriPlaceholder.event
-        }> won:hasTextMessage "hello world!". \``;
+        }> won:textMessage "hello world!". \``;
 
       this.scrollContainer().addEventListener("scroll", e => this.onScroll(e));
 
@@ -306,17 +306,17 @@ function genComponentConf() {
         const selectedConnectionUri = this.connectionUri
           ? this.connectionUri
           : generalSelectors.getConnectionUriFromRoute(state);
-        const ownedNeed = generalSelectors.getOwnedNeedByConnectionUri(
+        const ownedAtom = generalSelectors.getOwnedAtomByConnectionUri(
           state,
           selectedConnectionUri
         );
         const connection =
-          ownedNeed && ownedNeed.getIn(["connections", selectedConnectionUri]);
-        const isOwnedNeedWhatsX =
-          ownedNeed && needUtils.isWhatsAroundNeed(ownedNeed);
-        const remoteNeedUri = connection && connection.get("remoteNeedUri");
-        const remoteNeed =
-          remoteNeedUri && state.getIn(["needs", remoteNeedUri]);
+          ownedAtom && ownedAtom.getIn(["connections", selectedConnectionUri]);
+        const isOwnedAtomWhatsX =
+          ownedAtom && atomUtils.isWhatsAroundAtom(ownedAtom);
+        const targetAtomUri = connection && connection.get("targetAtomUri");
+        const targetAtom =
+          targetAtomUri && state.getIn(["atoms", targetAtomUri]);
         const chatMessages =
           connection &&
           connection.get("messages") &&
@@ -377,30 +377,30 @@ function genComponentConf() {
 
         const process = get(state, "process");
 
-        const isRemoteNeedOwned = generalSelectors.isNeedOwned(
+        const isTargetAtomOwned = generalSelectors.isAtomOwned(
           state,
-          remoteNeedUri
+          targetAtomUri
         );
         const reactionUseCases =
-          remoteNeed &&
-          !isRemoteNeedOwned &&
-          needUtils.getReactionUseCases(remoteNeed);
+          targetAtom &&
+          !isTargetAtomOwned &&
+          atomUtils.getReactionUseCases(targetAtom);
         const hasReactionUseCases =
           reactionUseCases && reactionUseCases.size > 0;
 
         const enabledUseCases =
-          remoteNeed &&
-          isRemoteNeedOwned &&
-          needUtils.getEnabledUseCases(remoteNeed);
+          targetAtom &&
+          isTargetAtomOwned &&
+          atomUtils.getEnabledUseCases(targetAtom);
         const hasEnabledUseCases = enabledUseCases && enabledUseCases.size > 0;
 
         return {
-          ownedNeed,
-          remoteNeed,
-          remoteNeedUri,
+          ownedAtom,
+          targetAtom,
+          targetAtomUri,
           selectedConnectionUri,
           connection,
-          isOwnedNeedWhatsX,
+          isOwnedAtomWhatsX,
           hasReactionUseCases,
           reactionUseCasesArray: reactionUseCases && reactionUseCases.toArray(),
           hasEnabledUseCases,
@@ -467,19 +467,19 @@ function genComponentConf() {
           cancellationPendingMessageUris:
             cancellationPendingMessages &&
             cancellationPendingMessages.toArray(),
-          connectionOrNeedsLoading:
+          connectionOrAtomsLoading:
             !connection ||
-            !remoteNeed ||
-            !ownedNeed ||
-            processUtils.isNeedLoading(process, ownedNeed.get("uri")) ||
-            processUtils.isNeedLoading(process, remoteNeedUri) ||
+            !targetAtom ||
+            !ownedAtom ||
+            processUtils.isAtomLoading(process, ownedAtom.get("uri")) ||
+            processUtils.isAtomLoading(process, targetAtomUri) ||
             processUtils.isConnectionLoading(process, selectedConnectionUri),
           isConnectionLoading: processUtils.isConnectionLoading(
             process,
             selectedConnectionUri
           ),
           showPostContentMessage:
-            showChatData && !multiSelectType && remoteNeedUri,
+            showChatData && !multiSelectType && targetAtomUri,
           showOverlayConnection: !!this.connectionUri,
         };
       };
@@ -511,7 +511,7 @@ function genComponentConf() {
 
       classOnComponentRoot(
         "won-is-loading",
-        () => this.connectionOrNeedsLoading,
+        () => this.connectionOrAtomsLoading,
         this
       );
     }
@@ -754,7 +754,7 @@ function genComponentConf() {
             this.messages__updateMessageStatus({
               messageUri: msgUri,
               connectionUri: this.selectedConnectionUri,
-              needUri: this.ownedNeed.get("uri"),
+              atomUri: this.ownedAtom.get("uri"),
               messageStatus: messageStatus,
             });
           });
@@ -867,12 +867,12 @@ function genComponentConf() {
     }
 
     addMessageToState(eventUri, key) {
-      const ownedNeedUri = this.ownedNeed.get("uri");
-      return fetchMessage(ownedNeedUri, eventUri).then(response => {
+      const ownedAtomUri = this.ownedAtom.get("uri");
+      return fetchMessage(ownedAtomUri, eventUri).then(response => {
         won.wonMessageFromJsonLd(response).then(msg => {
-          if (msg.isFromOwner() && msg.getReceiverNeed() === ownedNeedUri) {
-            /*if we find out that the receiverneed of the crawled event is actually our
-              need we will call the method again but this time with the correct eventUri
+          if (msg.isFromOwner() && msg.getRecipientAtom() === ownedAtomUri) {
+            /*if we find out that the recipientatom of the crawled event is actually our
+              atom we will call the method again but this time with the correct eventUri
             */
             this.addMessageToState(msg.getRemoteMessageUri(), key);
           } else {
@@ -890,16 +890,16 @@ function genComponentConf() {
     }
 
     sendRequest(message, persona) {
-      if (!this.connection || this.isOwnedNeedWhatsX) {
+      if (!this.connection || this.isOwnedAtomWhatsX) {
         this.router__stateGoResetParams("connections");
 
-        if (this.isOwnedNeedWhatsX) {
-          //Close the connection if there was a present connection for a whatsaround need
+        if (this.isOwnedAtomWhatsX) {
+          //Close the connection if there was a present connection for a whatsaround atom
           this.connections__close(this.selectedConnectionUri);
         }
 
-        if (this.remoteNeedUri) {
-          this.connections__connectAdHoc(this.remoteNeedUri, message, persona);
+        if (this.targetAtomUri) {
+          this.connections__connectAdHoc(this.targetAtomUri, message, persona);
         }
 
         //this.router__stateGoCurrent({connectionUri: null, sendAdHocRequest: null});
@@ -908,10 +908,10 @@ function genComponentConf() {
           this.selectedConnectionUri,
           won.WON.binaryRatingGood
         );
-        this.needs__connect(
-          this.ownedNeed.get("uri"),
+        this.atoms__connect(
+          this.ownedAtom.get("uri"),
           this.selectedConnectionUri,
-          this.remoteNeedUri,
+          this.targetAtomUri,
           message
         );
         if (this.showOverlayConnection) {
@@ -944,8 +944,8 @@ function genComponentConf() {
         useCase: ucIdentifier,
         useCaseGroup: undefined,
         postUri: undefined,
-        fromNeedUri: this.remoteNeedUri,
-        viewNeedUri: undefined,
+        fromAtomUri: this.targetAtomUri,
+        viewAtomUri: undefined,
         viewConnUri: undefined,
         mode: "CONNECT",
       });
@@ -958,7 +958,7 @@ function genComponentConf() {
         this.messages__viewState__markAsSelected({
           messageUri: msgUri,
           connectionUri: this.connection.get("uri"),
-          needUri: this.ownedNeed.get("uri"),
+          atomUri: this.ownedAtom.get("uri"),
           isSelected: !msg.getIn(["viewState", "isSelected"]),
         });
       }

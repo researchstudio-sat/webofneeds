@@ -1,4 +1,4 @@
-PREFIX won: <http://purl.org/webofneeds/model#>
+PREFIX won: <https://w3id.org/won/core#>
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX s: <http://schema.org/>
 PREFIX geo: <http://www.bigdata.com/rdf/geospatial#>
@@ -32,7 +32,7 @@ SELECT DISTINCT ?result WHERE {
       FILTER(?skills_jaccardIndex > 0 )
     }
   }
-  ?result rdf:type won:Need.
+  ?result rdf:type won:Atom.
   ?result (won:is/rdf:type) s:JobPosting.
   BIND((((((COALESCE(?industry_jaccardIndex, 0 )) + (COALESCE(?skills_jaccardIndex, 0 ))) + (COALESCE(?organizationName_jaccardIndex, 0 ))) + (COALESCE(?employmentTypes_jaccardIndex, 0 ))) + (COALESCE(?jobLocation_geoScore, 0 ))) / 5  AS ?aggregatedScore)
 }

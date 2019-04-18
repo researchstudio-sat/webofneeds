@@ -4,11 +4,11 @@
 @prefix geo:     <http://www.w3.org/2003/01/geo/wgs84_pos#> .
 @prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
 @prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-@prefix won:     <http://purl.org/webofneeds/model#> .
+@prefix won:     <https://w3id.org/won/core#> .
 @prefix gr:      <http://purl.org/goodrelations/v1#> .
 @prefix ldp:     <http://www.w3.org/ns/ldp#> .
 
 <>
-      a                       won:Need ;
-      won:hasFlag             won:UsedForTesting ;
+      a                       won:Atom ;
+      won:flag             won:UsedForTesting ;
       won:hasMatchingBehavior won:Mutual .

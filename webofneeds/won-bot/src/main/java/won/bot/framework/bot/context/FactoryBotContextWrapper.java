@@ -15,7 +15,7 @@ import java.net.URI;
 public class FactoryBotContextWrapper extends BotContextWrapper {
     private final String factoryListName = getBotName() + ":factoryList";
     private final String factoryInternalIdName = getBotName() + ":factoryInternalId";
-    private final String factoryOfferToFactoryNeedMapName = getBotName() + ":factoryOfferToFactoryNeedMap";
+    private final String factoryOfferToFactoryAtomMapName = getBotName() + ":factoryOfferToFactoryAtomMap";
 
     public FactoryBotContextWrapper(BotContext botContext, String botName) {
         super(botContext, botName);
@@ -25,8 +25,8 @@ public class FactoryBotContextWrapper extends BotContextWrapper {
         return factoryListName;
     }
 
-    public boolean isFactoryNeed(URI uri) {
-        return getBotContext().isInNamedNeedUriList(uri, factoryListName);
+    public boolean isFactoryAtom(URI uri) {
+        return getBotContext().isInNamedAtomUriList(uri, factoryListName);
     }
 
     public URI getURIFromInternal(URI uri) {
@@ -37,11 +37,11 @@ public class FactoryBotContextWrapper extends BotContextWrapper {
         getBotContext().saveToObjectMap(factoryInternalIdName, internalUri.toString(), uri);
     }
 
-    public URI getFactoryNeedURIFromOffer(URI offerURI) {
-        return (URI) getBotContext().loadFromObjectMap(factoryOfferToFactoryNeedMapName, offerURI.toString());
+    public URI getFactoryAtomURIFromOffer(URI offerURI) {
+        return (URI) getBotContext().loadFromObjectMap(factoryOfferToFactoryAtomMapName, offerURI.toString());
     }
 
-    public void addFactoryNeedURIOfferRelation(URI offerURI, URI factoryNeedURI) {
-        getBotContext().saveToObjectMap(factoryOfferToFactoryNeedMapName, offerURI.toString(), factoryNeedURI);
+    public void addFactoryAtomURIOfferRelation(URI offerURI, URI factoryAtomURI) {
+        getBotContext().saveToObjectMap(factoryOfferToFactoryAtomMapName, offerURI.toString(), factoryAtomURI);
     }
 }

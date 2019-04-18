@@ -1,12 +1,12 @@
 prefix s:     <http://schema.org/>
-prefix won:   <http://purl.org/webofneeds/model#>
+prefix won:   <https://w3id.org/won/core#>
 
 Select ?lat ?lon
 
 where {
 	?main a s:Place;
-          won:hasBoundingBox ?boundingBox .
-    ?boundingBox won:hasNorthWestCorner ?geoCoordinates .
+          won:boundingBox ?boundingBox .
+    ?boundingBox won:northWestCorner ?geoCoordinates .
     ?geoCoordinates s:latitude ?lat;
                     s:longitude ?lon.
 }

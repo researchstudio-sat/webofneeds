@@ -10,9 +10,9 @@ createUser $USER1 $PASSWORD1 $PASSWORD1 $SERVER
 	assertHttpStatusCodeEquals 201
 signIn $USER1 $PASSWORD1 $SERVER 200
 	assertHttpStatusCodeEquals 200
-createNeed $USER1 $SERVER "$JSON_NEED_DEMAND_A" 201
+createAtom $USER1 $SERVER "$JSON_ATOM_DEMAND_A" 201
 	assertHttpStatusCodeEquals 201
 	assertHttpHeaderExists "Location" 
-	extractValueFromResponseJson "needId"
+	extractValueFromResponseJson "atomId"
 deleteCookies $USER1
 cleanup

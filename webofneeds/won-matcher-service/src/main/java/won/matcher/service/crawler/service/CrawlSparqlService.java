@@ -20,12 +20,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-import won.matcher.service.common.event.BulkNeedEvent;
-import won.matcher.service.common.event.NeedEvent;
+import won.matcher.service.common.event.BulkAtomEvent;
+import won.matcher.service.common.event.AtomEvent;
 import won.matcher.service.common.service.sparql.SparqlService;
 import won.matcher.service.crawler.config.CrawlConfig;
 import won.matcher.service.crawler.msg.CrawlUriMessage;
-import won.protocol.util.NeedModelWrapper;
+import won.protocol.util.AtomModelWrapper;
 
 /**
  * Sparql service extended with methods for crawling
@@ -89,7 +89,7 @@ public class CrawlSparqlService extends SparqlService {
         builder.append("}};\n");
         ParameterizedSparqlString pss = new ParameterizedSparqlString();
         pss.setCommandText(builder.toString());
-        pss.setNsPrefix("won", "http://purl.org/webofneeds/model#");
+        pss.setNsPrefix("won", "https://w3id.org/won/core#");
         pss.setIri("msgUri", msg.getUri());
         pss.setLiteral("crawlDate", msg.getCrawlDate());
         pss.setLiteral("crawlStatus", msg.getStatus().toString());
@@ -133,7 +133,7 @@ public class CrawlSparqlService extends SparqlService {
                         + " OPTIONAL { ?uri won:wonNodeUri ?wonNode }\n"
                         + " OPTIONAL { ?uri won:resourceETagValue ?etag }}}\n" + " GROUP BY ?uri ?base ?wonNode\n";
         ParameterizedSparqlString pps = new ParameterizedSparqlString();
-        pps.setNsPrefix("won", "http://purl.org/webofneeds/model#");
+        pps.setNsPrefix("won", "https://w3id.org/won/core#");
         pps.setCommandText(queryString);
         pps.setLiteral("status", status.toString());
         log.debug("Query SPARQL Endpoint: {}", sparqlEndpoint);
@@ -216,11 +216,11 @@ public class CrawlSparqlService extends SparqlService {
         long crawlDate = System.currentTimeMillis();
         // we have to query the baseUri with and without trailing slahes cause we don't
         // know how the RDF data
-        // is described in detail. Usually the "need" prefix ends with a trailing
+        // is described in detail. Usually the "atom" prefix ends with a trailing
         // "slash" but we don't assume
         // here that is always the case, so we query both variants: with and without
         // trailing slashes.
-        // Check the need list with its need: rdfs:member entries for example
+        // Check the atom list with its atom: rdfs:member entries for example
         String queryString = "SELECT ?uri (group_concat(distinct ?etag;separator=\"" + HTTP_HEADER_SEPARATOR
                         + "\") as ?etags) WHERE {\n" + "{ ?baseUriWithTrailingSlash " + propertyPath + " ?uri. } \n" + // propertyPath
                                                                                                                        // has
@@ -249,7 +249,7 @@ public class CrawlSparqlService extends SparqlService {
                                                                                                  // injection risk
                         " OPTIONAL {?uri won:resourceETagValue ?etag. }}\n" + " GROUP BY ?uri\n";
         ParameterizedSparqlString pps = new ParameterizedSparqlString();
-        pps.setNsPrefix("won", "http://purl.org/webofneeds/model#");
+        pps.setNsPrefix("won", "https://w3id.org/won/core#");
         pps.setCommandText(queryString);
         baseUri = baseUri.trim();
         if (baseUri.endsWith("/")) {
@@ -286,20 +286,19 @@ public class CrawlSparqlService extends SparqlService {
 
     /**
      * To start crawling (http modification query) from a certain point in time,
-     * take last modification date from a need known in the database that is in
+     * take last modification date from an atom known in the database that is in
      * status 'DONE' which means it has been crawled.
      *
-     * @param wonNodeUri won node uri for which need modification dates should be
+     * @param wonNodeUri won node uri for which atom modification dates should be
      * retrieved
      * @return modification date to start crawling from or null if none exists
      */
-    public String retrieveNeedModificationDateForCrawling(String wonNodeUri) {
-        String queryString = "SELECT ?modificationDate WHERE {\n" + " ?needUri a won:Need.\n"
-                        + " ?needUri won:hasWonNode ?wonNodeUri. \n"
-                        + " ?needUri dcterms:modified ?modificationDate. \n" + " ?needUri won:crawlStatus 'DONE'. \n"
-                        + "} ORDER BY DESC(?modificationDate) LIMIT 1\n";
+    public String retrieveAtomModificationDateForCrawling(String wonNodeUri) {
+        String queryString = "SELECT ?modificationDate WHERE {\n" + " ?atomUri a won:Atom.\n"
+                        + " ?atomUri won:wonNode ?wonNodeUri. \n" + " ?atomUri dcterms:modified ?modificationDate. \n"
+                        + " ?atomUri won:crawlStatus 'DONE'. \n" + "} ORDER BY DESC(?modificationDate) LIMIT 1\n";
         ParameterizedSparqlString pps = new ParameterizedSparqlString();
-        pps.setNsPrefix("won", "http://purl.org/webofneeds/model#");
+        pps.setNsPrefix("won", "https://w3id.org/won/core#");
         pps.setNsPrefix("dcterms", "http://purl.org/dc/terms/");
         pps.setCommandText(queryString);
         pps.setIri("wonNodeUri", wonNodeUri);
@@ -325,11 +324,11 @@ public class CrawlSparqlService extends SparqlService {
      */
     public String retrieveConnectionModificationDateForCrawling(String wonNodeUri) {
         String queryString = "SELECT ?modificationDate WHERE {\n" + " ?connectionUri a won:Connection.\n"
-                        + " ?connectionUri won:hasWonNode ?wonNodeUri. \n"
+                        + " ?connectionUri won:wonNode ?wonNodeUri. \n"
                         + " ?connectionUri dcterms:modified ?modificationDate. \n"
                         + " ?connectionUri won:crawlStatus 'DONE'. \n" + "} ORDER BY DESC(?modificationDate) LIMIT 1\n";
         ParameterizedSparqlString pps = new ParameterizedSparqlString();
-        pps.setNsPrefix("won", "http://purl.org/webofneeds/model#");
+        pps.setNsPrefix("won", "https://w3id.org/won/core#");
         pps.setNsPrefix("dcterms", "http://purl.org/dc/terms/");
         pps.setCommandText(queryString);
         pps.setIri("wonNodeUri", wonNodeUri);
@@ -344,20 +343,20 @@ public class CrawlSparqlService extends SparqlService {
         }
     }
 
-    public BulkNeedEvent retrieveActiveNeedEvents(long fromDate, long toDate, int offset, int limit,
+    public BulkAtomEvent retrieveActiveAtomEvents(long fromDate, long toDate, int offset, int limit,
                     boolean sortAscending) {
-        // query template to retrieve all alctive cralwed/saved needs in a certain date
+        // query template to retrieve all alctive cralwed/saved atoms in a certain date
         // range
         String orderClause = sortAscending ? "ORDER BY ?date\n" : "ORDER BY DESC(?date)\n";
-        log.debug("bulk load need data from sparql endpoint in date range: [{},{}]", fromDate, toDate);
-        String queryTemplate = "SELECT ?needUri ?wonNodeUri ?date WHERE {  \n" + "  ?needUri a won:Need. \n"
-                        + "  ?needUri won:crawlDate ?date.  \n" + "  ?needUri won:isInState won:Active. \n"
-                        + "  ?needUri won:hasWonNode ?wonNodeUri. \n"
-                        + "  {?needUri won:crawlStatus 'SAVE'.} UNION {?needUri won:crawlStatus 'DONE'.}\n"
+        log.debug("bulk load atom data from sparql endpoint in date range: [{},{}]", fromDate, toDate);
+        String queryTemplate = "SELECT ?atomUri ?wonNodeUri ?date WHERE {  \n" + "  ?atomUri a won:Atom. \n"
+                        + "  ?atomUri won:crawlDate ?date.  \n" + "  ?atomUri won:atomState won:Active. \n"
+                        + "  ?atomUri won:wonNode ?wonNodeUri. \n"
+                        + "  {?atomUri won:crawlStatus 'SAVE'.} UNION {?atomUri won:crawlStatus 'DONE'.}\n"
                         + "  FILTER (?date >= ?fromDate && ?date < ?toDate ) \n" + "} " + orderClause
                         + " OFFSET ?offset\n" + " LIMIT ?limit";
         ParameterizedSparqlString pps = new ParameterizedSparqlString();
-        pps.setNsPrefix("won", "http://purl.org/webofneeds/model#");
+        pps.setNsPrefix("won", "https://w3id.org/won/core#");
         pps.setCommandText(queryTemplate);
         pps.setLiteral("fromDate", fromDate);
         pps.setLiteral("toDate", toDate);
@@ -367,24 +366,24 @@ public class CrawlSparqlService extends SparqlService {
         log.debug("Execute query: {}", pps.toString());
         try (QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, pps.asQuery())) {
             ResultSet results = qexec.execSelect();
-            // load all the needs into one bulk need event
-            BulkNeedEvent bulkNeedEvent = new BulkNeedEvent();
+            // load all the atoms into one bulk atom event
+            BulkAtomEvent bulkAtomEvent = new BulkAtomEvent();
             while (results.hasNext()) {
                 QuerySolution qs = results.nextSolution();
-                String needUri = qs.get("needUri").asResource().getURI();
+                String atomUri = qs.get("atomUri").asResource().getURI();
                 String wonNodeUri = qs.get("wonNodeUri").asResource().getURI();
                 long crawlDate = qs.getLiteral("date").getLong();
-                Dataset ds = retrieveNeedDataset(needUri);
-                if (NeedModelWrapper.isANeed(ds)) {
+                Dataset ds = retrieveAtomDataset(atomUri);
+                if (AtomModelWrapper.isAAtom(ds)) {
                     StringWriter sw = new StringWriter();
                     RDFDataMgr.write(sw, ds, RDFFormat.TRIG.getLang());
-                    NeedEvent needEvent = new NeedEvent(needUri, wonNodeUri, NeedEvent.TYPE.ACTIVE, crawlDate,
+                    AtomEvent atomEvent = new AtomEvent(atomUri, wonNodeUri, AtomEvent.TYPE.ACTIVE, crawlDate,
                                     sw.toString(), RDFFormat.TRIG.getLang());
-                    bulkNeedEvent.addNeedEvent(needEvent);
+                    bulkAtomEvent.addAtomEvent(atomEvent);
                 }
             }
-            log.debug("number of need events created: " + bulkNeedEvent.getNeedEvents().size());
-            return bulkNeedEvent;
+            log.debug("number of atom events created: " + bulkAtomEvent.getAtomEvents().size());
+            return bulkAtomEvent;
         }
     }
 }

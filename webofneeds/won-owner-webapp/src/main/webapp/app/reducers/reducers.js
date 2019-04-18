@@ -7,7 +7,7 @@ import Immutable from "immutable";
 import { messagesReducer } from "./message-reducers.js";
 //import { isChatConnection } from "../connection-utils.js";
 import reduceReducers from "reduce-reducers";
-import needReducer from "./need-reducer/need-reducer-main.js";
+import atomReducer from "./atom-reducer/atom-reducer-main.js";
 import accountReducer from "./account-reducer.js";
 import toastReducer from "./toast-reducer.js";
 import viewReducer from "./view-reducer.js";
@@ -18,8 +18,8 @@ import processReducer from "./process-reducer.js";
 import { router } from "redux-ui-router";
 
 const initialOwnerState = Immutable.fromJS({
-  needUris: Immutable.Set(),
-  lastNeedUrisUpdateTime: undefined,
+  atomUris: Immutable.Set(),
+  lastAtomUrisUpdateTime: undefined,
 });
 
 const initialConfigState = Immutable.fromJS({ theme: { name: "current" } });
@@ -41,7 +41,7 @@ const reducers = {
     */
 
   account: accountReducer,
-  needs: needReducer,
+  atoms: atomReducer,
   messages: messagesReducer,
   toasts: toastReducer,
   view: viewReducer,
@@ -66,27 +66,27 @@ const reducers = {
       case actionTypes.account.reset:
         return initialOwnerState;
 
-      case actionTypes.needs.storeNeedUrisFromOwner: {
-        const fetchedNeedUris = action.payload.get("uris");
-        let ownerNeedUris = owner.get("needUris");
+      case actionTypes.atoms.storeAtomUrisFromOwner: {
+        const fetchedAtomUris = action.payload.get("uris");
+        let ownerAtomUris = owner.get("atomUris");
 
-        fetchedNeedUris &&
-          fetchedNeedUris.forEach(
-            needUri => (ownerNeedUris = ownerNeedUris.add(needUri))
+        fetchedAtomUris &&
+          fetchedAtomUris.forEach(
+            atomUri => (ownerAtomUris = ownerAtomUris.add(atomUri))
           );
 
         return owner
-          .set("needUris", ownerNeedUris)
-          .set("lastNeedUrisUpdateTime", Date.now());
+          .set("atomUris", ownerAtomUris)
+          .set("lastAtomUrisUpdateTime", Date.now());
       }
 
-      case actionTypes.needs.removeDeleted:
+      case actionTypes.atoms.removeDeleted:
       case actionTypes.personas.removeDeleted:
-      case actionTypes.needs.delete: {
-        const needUri = action.payload.get("uri");
-        const needUris = owner.get("needUris");
+      case actionTypes.atoms.delete: {
+        const atomUri = action.payload.get("uri");
+        const atomUris = owner.get("atomUris");
 
-        return owner.set("needUris", needUris.remove(needUri));
+        return owner.set("atomUris", atomUris.remove(atomUri));
       }
 
       default:
@@ -134,14 +134,14 @@ export default reduceReducers(
       /**
        * Add all actions that load connections
        * and their events. The reducer here makes
-       * sure that no connections between two needs
+       * sure that no connections between two atoms
        * that both are owned by the user, remain
        * in the state.
        */
       case actionTypes.connections.storeActive:
       case actionTypes.account.loginFinished:
       case actionTypes.initialLoadFinished:
-        return deleteChatConnectionsBetweenOwnedNeeds(state);
+        return deleteChatConnectionsBetweenOwnedAtoms(state);
 
       default:
         return state;
@@ -152,27 +152,27 @@ export default reduceReducers(
 
 window.Immutable4dbg = Immutable;
 
-function deleteChatConnectionsBetweenOwnedNeeds(state) {
-  let needs = state.get("needs");
+function deleteChatConnectionsBetweenOwnedAtoms(state) {
+  let atoms = state.get("atoms");
 
-  if (needs) {
-    needs = needs.map(function(need) {
-      let connections = need.get("connections");
+  if (atoms) {
+    atoms = atoms.map(function(atom) {
+      let connections = atom.get("connections");
 
-      //TODO: FIXME, use special case handling for this, currently dont strip any connections between needs for debug reasons
+      //TODO: FIXME, use special case handling for this, currently dont strip any connections between atoms for debug reasons
       /*connections =
         connections &&
         connections.filter(function(conn) {
-          //Any connection that is not of type chatFacet will be exempt from deletion
+          //Any connection that is not of type chatSocket will be exempt from deletion
           if (isChatConnection(conn)) {
-            //Any other connection will be checked if it would be connected to the ownedNeed, if so we remove it.
-            return !generalSelectors.isNeedOwned(state, conn.get("remoteNeedUri"));
+            //Any other connection will be checked if it would be connected to the ownedAtom, if so we remove it.
+            return !generalSelectors.isAtomOwned(state, conn.get("targetAtomUri"));
           }
           return true;
         });*/
-      return need.set("connections", connections);
+      return atom.set("connections", connections);
     });
-    return state.set("needs", needs);
+    return state.set("atoms", atoms);
   }
 
   return state;

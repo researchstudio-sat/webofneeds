@@ -28,13 +28,13 @@ public class BAState {
     @Column(name = "participantURI")
     @Convert(converter = URIConverter.class)
     private URI participantURI;
-    /* The state of the need */
+    /* The state of the atom */
     @Column(name = "baStateURI")
     @Convert(converter = URIConverter.class)
     private URI baStateURI;
-    @Column(name = "facetTypeURI")
+    @Column(name = "socketTypeURI")
     @Convert(converter = URIConverter.class)
-    private URI facetTypeURI;
+    private URI socketTypeURI;
     @Column(name = "baPhase")
     @Convert(converter = URIConverter.class)
     private URI baPhaseURI;
@@ -50,7 +50,7 @@ public class BAState {
             return false;
         if (coordinatorURI != null ? !coordinatorURI.equals(baState.coordinatorURI) : baState.coordinatorURI != null)
             return false;
-        if (facetTypeURI != null ? !facetTypeURI.equals(baState.facetTypeURI) : baState.facetTypeURI != null)
+        if (socketTypeURI != null ? !socketTypeURI.equals(baState.socketTypeURI) : baState.socketTypeURI != null)
             return false;
         if (id != null ? !id.equals(baState.id) : baState.id != null)
             return false;
@@ -67,7 +67,7 @@ public class BAState {
         result = 31 * result + (coordinatorURI != null ? coordinatorURI.hashCode() : 0);
         result = 31 * result + (participantURI != null ? participantURI.hashCode() : 0);
         result = 31 * result + (baStateURI != null ? baStateURI.hashCode() : 0);
-        result = 31 * result + (facetTypeURI != null ? facetTypeURI.hashCode() : 0);
+        result = 31 * result + (socketTypeURI != null ? socketTypeURI.hashCode() : 0);
         result = 31 * result + (baPhaseURI != null ? baPhaseURI.hashCode() : 0);
         return result;
     }
@@ -104,12 +104,12 @@ public class BAState {
         this.id = id;
     }
 
-    public URI getFacetTypeURI() {
-        return facetTypeURI;
+    public URI getSocketTypeURI() {
+        return socketTypeURI;
     }
 
-    public void setFacetTypeURI(final URI facetTypeURI) {
-        this.facetTypeURI = facetTypeURI;
+    public void setSocketTypeURI(final URI socketTypeURI) {
+        this.socketTypeURI = socketTypeURI;
     }
 
     public URI getBaPhaseURI() {

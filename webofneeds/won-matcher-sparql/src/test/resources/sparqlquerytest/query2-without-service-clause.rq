@@ -6,16 +6,16 @@ WHERE
           WHERE
             { { SELECT  *
                     WHERE
-                      { ?result  a                     <http://purl.org/webofneeds/model#Need> ;
-                                 <http://purl.org/webofneeds/model#isInState>  <http://purl.org/webofneeds/model#Active> ;
-                                 <http://purl.org/webofneeds/model#seeks>  ?seeks .
-                        ?seeks <http://purl.org/webofneeds/model#travelAction>/<http://schema.org/fromLocation> ?fromLocation .
+                      { ?result  a                     <https://w3id.org/won/core#Atom> ;
+                                 <https://w3id.org/won/core#atomState>  <https://w3id.org/won/core#Active> ;
+                                 <https://w3id.org/won/core#seeks>  ?seeks .
+                        ?seeks <https://w3id.org/won/core#travelAction>/<http://schema.org/fromLocation> ?fromLocation .
                         ?fromLocation
                                   <http://schema.org/geo>  ?fromLocation_geo
                       }
                     ORDER BY ?fromLocation_geoDistance
                   }
-                  FILTER NOT EXISTS { ?result  <http://purl.org/webofneeds/model#hasFlag>  <http://purl.org/webofneeds/model#NoHintForCounterpart> }
+                  FILTER NOT EXISTS { ?result  <https://w3id.org/won/core#flag>  <https://w3id.org/won/core#NoHintForCounterpart> }
                 
             }
           OFFSET  0

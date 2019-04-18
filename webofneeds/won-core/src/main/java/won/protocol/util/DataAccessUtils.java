@@ -15,14 +15,14 @@ import java.text.MessageFormat;
 import java.util.List;
 
 import won.protocol.exception.NoSuchConnectionException;
-import won.protocol.exception.NoSuchNeedException;
+import won.protocol.exception.NoSuchAtomException;
 import won.protocol.exception.NoSuchOwnerApplicationException;
 import won.protocol.model.Connection;
-import won.protocol.model.Need;
+import won.protocol.model.Atom;
 import won.protocol.model.OwnerApplication;
 import won.protocol.model.WonNode;
 import won.protocol.repository.ConnectionRepository;
-import won.protocol.repository.NeedRepository;
+import won.protocol.repository.AtomRepository;
 import won.protocol.repository.OwnerApplicationRepository;
 import won.protocol.repository.WonNodeRepository;
 
@@ -31,28 +31,28 @@ import won.protocol.repository.WonNodeRepository;
  */
 public class DataAccessUtils {
     /**
-     * Loads the specified need from the database and raises an exception if it is
+     * Loads the specified atom from the database and raises an exception if it is
      * not found.
      *
-     * @param needURI
-     * @throws won.protocol.exception.NoSuchNeedException
+     * @param atomURI
+     * @throws won.protocol.exception.NoSuchAtomException
      * @return the connection
      */
-    public static Need loadNeed(NeedRepository needRepository, final URI needURI) throws NoSuchNeedException {
-        List<Need> needs = needRepository.findByNeedURI(needURI);
-        if (needs.size() == 0)
-            throw new NoSuchNeedException(needURI);
-        if (needs.size() > 1)
+    public static Atom loadAtom(AtomRepository atomRepository, final URI atomURI) throws NoSuchAtomException {
+        List<Atom> atoms = atomRepository.findByAtomURI(atomURI);
+        if (atoms.size() == 0)
+            throw new NoSuchAtomException(atomURI);
+        if (atoms.size() > 1)
             throw new IllegalStateException(MessageFormat.format(
-                            "Inconsistent database state detected: multiple needs found with URI {0}", needURI));
-        return needs.get(0);
+                            "Inconsistent database state detected: multiple atoms found with URI {0}", atomURI));
+        return atoms.get(0);
     }
 
     /**
      * Loads the specified wonNode from the database.
      *
      * @param wonNodeURI
-     * @throws won.protocol.exception.NoSuchNeedException
+     * @throws won.protocol.exception.NoSuchAtomException
      * @return the wonNode or null if none is found
      */
     public static WonNode loadWonNode(WonNodeRepository repository, final URI wonNodeURI) {
@@ -61,7 +61,7 @@ public class DataAccessUtils {
             return null;
         if (nodes.size() > 1)
             throw new IllegalStateException(MessageFormat.format(
-                            "Inconsistent database state detected: multiple needs found with URI {0}", wonNodeURI));
+                            "Inconsistent database state detected: multiple atoms found with URI {0}", wonNodeURI));
         return nodes.get(0);
     }
 

@@ -71,20 +71,20 @@ function signOut {
 	sendUserRequest "$operation" "$user" "$server" "/rest/users/signout/" "$json" POST 
 }
 
-function createNeed {
+function createAtom {
 	user=$1
 	server=$2
 	json=$3
-	operation="creating a need for user $user on server $server"
-	sendUserRequest "$operation" "$user" "$server" "/rest/needs/" "$json" POST 
+	operation="creating an atom for user $user on server $server"
+	sendUserRequest "$operation" "$user" "$server" "/rest/atoms/" "$json" POST 
 }
 
 function listMatches {
 	user=$1
 	server=$2
-	needId=$3
-	operation="listing matches for need ${needId} for user $user on server $server"
-	sendUserRequest "$operation" "$user" "$server" "/rest/needs/${needId}/matches/" "" GET 
+	atomId=$3
+	operation="listing matches for atom ${atomId} for user $user on server $server"
+	sendUserRequest "$operation" "$user" "$server" "/rest/atoms/${atomId}/matches/" "" GET 
 }
 	
 function deleteCookies {	
@@ -100,7 +100,7 @@ function cleanup {
 
 
 
-function extractNeedIdFromCreateResponse {
+function extractAtomIdFromCreateResponse {
 	response=$1
 	echo "$response"
 }

@@ -39,19 +39,19 @@ public class DeliveryChain {
             return false;
         switch (this.head.getMessageType()) {
             // cases in which there is no remote message:
-            case CREATE_NEED:
+            case CREATE_ATOM:
             case DEACTIVATE:
             case ACTIVATE:
             case HINT_FEEDBACK_MESSAGE:
             case HINT_NOTIFICATION:
-            case NEED_CREATED_NOTIFICATION:
+            case ATOM_CREATED_NOTIFICATION:
                 return head.hasResponse();
             default:
                 // all other message types have remote messages and responses
-                return head.hasResponse() && head.hasCorrespondingRemoteMessage()
+                return head.hasResponse() && head.correspondingRemoteMessage()
                                 && head.getCorrespondingRemoteMessageRef().hasResponse()
                                 && head.getCorrespondingRemoteMessageRef().getIsResponseToInverseRef()
-                                                .hasCorrespondingRemoteMessage();
+                                                .correspondingRemoteMessage();
         }
     }
 
@@ -60,16 +60,16 @@ public class DeliveryChain {
             return null;
         switch (this.head.getMessageType()) {
             // cases in which there is no remote message:
-            case CREATE_NEED:
+            case CREATE_ATOM:
             case DEACTIVATE:
             case ACTIVATE:
             case HINT_FEEDBACK_MESSAGE:
             case HINT_NOTIFICATION:
-            case NEED_CREATED_NOTIFICATION:
+            case ATOM_CREATED_NOTIFICATION:
                 return head.getIsResponseToInverseRef();
             default:
                 // all other message types have remote messages and responses
-                if (head.hasResponse() && head.hasCorrespondingRemoteMessage()
+                if (head.hasResponse() && head.correspondingRemoteMessage()
                                 && head.getCorrespondingRemoteMessageRef().hasResponse()) {
                     return head.getCorrespondingRemoteMessageRef().getIsResponseToInverseRef()
                                     .getCorrespondingRemoteMessageRef();
@@ -92,7 +92,7 @@ public class DeliveryChain {
         // is the head before msg?
         this.getHead().isMessageOnPathToRoot(msg)
                         // is the remote message of head before msg?
-                        || (this.getHead().hasCorrespondingRemoteMessage() && this.getHead()
+                        || (this.getHead().correspondingRemoteMessage() && this.getHead()
                                         .getCorrespondingRemoteMessageRef().isMessageOnPathToRoot(msg)));
     }
 
@@ -112,10 +112,10 @@ public class DeliveryChain {
         return other.getMessages().stream().allMatch(msg -> {
             // is the head before and the end after msg?
             boolean isHeadBeforeAllOtherMsgs = msg.isMessageOnPathToRoot(this.getHead())
-                            || (getHead().hasCorrespondingRemoteMessage()
+                            || (getHead().correspondingRemoteMessage()
                                             && msg.isMessageOnPathToRoot(getHead().getCorrespondingRemoteMessageRef()));
             boolean isEndAfterAllOtherMsgs = getEnd().isMessageOnPathToRoot(msg)
-                            || (getEnd().hasCorrespondingRemoteMessage()
+                            || (getEnd().correspondingRemoteMessage()
                                             && getEnd().getCorrespondingRemoteMessageRef().isMessageOnPathToRoot(msg));
             return isHeadBeforeAllOtherMsgs && isEndAfterAllOtherMsgs;
         });

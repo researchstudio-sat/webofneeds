@@ -15,7 +15,7 @@ import java.net.URI;
 /**
  * Interface for events that are raised because a response message was received.
  */
-public interface ResponseEvent extends NeedSpecificEvent, ConnectionSpecificEvent, RemoteNeedSpecificEvent {
+public interface ResponseEvent extends AtomSpecificEvent, ConnectionSpecificEvent, TargetAtomSpecificEvent {
     /**
      * Returns the URI of the message that caused the response.
      * 

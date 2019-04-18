@@ -43,7 +43,7 @@ import won.protocol.util.linkeddata.LinkedDataSource;
 /**
  * Actor that knows all won nodes the matching service is communicating with. It
  * gets informed about new won nodes over the event stream (e.g. by he crawler)
- * and decides which won nodes to crawl and to register with for receiving need
+ * and decides which won nodes to crawl and to register with for receiving atom
  * events. There should only exist a single instance of this actor that has the
  * global view of all connected won nodes.
  * <p>
@@ -55,7 +55,7 @@ public class WonNodeControllerActor extends UntypedActor {
     private LoggingAdapter log = Logging.getLogger(getContext().system(), this);
     private ActorRef pubSubMediator;
     private ActorRef crawler;
-    private ActorRef saveNeedActor;
+    private ActorRef saveAtomActor;
     private Map<String, WonNodeConnection> crawlWonNodes = new HashMap<>();
     private Set<String> skipWonNodeUris = new HashSet<>();
     private Set<String> failedWonNodeUris = new HashSet<>();
@@ -123,10 +123,10 @@ public class WonNodeControllerActor extends UntypedActor {
         crawler = getContext().actorOf(
                         SpringExtension.SpringExtProvider.get(getContext().system()).props(MasterCrawlerActor.class),
                         "MasterCrawlerActor");
-        // initialize the need event save actor
-        saveNeedActor = getContext().actorOf(
-                        SpringExtension.SpringExtProvider.get(getContext().system()).props(SaveNeedEventActor.class),
-                        "SaveNeedEventActor");
+        // initialize the atom event save actor
+        saveAtomActor = getContext().actorOf(
+                        SpringExtension.SpringExtProvider.get(getContext().system()).props(SaveAtomEventActor.class),
+                        "SaveAtomEventActor");
     }
 
     /**
@@ -283,15 +283,15 @@ public class WonNodeControllerActor extends UntypedActor {
             log.error("Exception message: {} \nCause: {} ", e.getMessage(), e.getCause());
             return null;
         }
-        // try subscribe need updates at won node
+        // try subscribe atom updates at won node
         try {
-            con = subscribeNeedUpdates(nodeInfo);
+            con = subscribeAtomUpdates(nodeInfo);
             crawlWonNodes.put(nodeInfo.getWonNodeURI(), con);
             failedWonNodeUris.remove(nodeInfo.getWonNodeURI());
             log.info("registered won node {} and start crawling it", nodeInfo.getWonNodeURI());
         } catch (Exception e) {
             addFailedWonNode(wonNodeUri, con);
-            log.error("Error subscribing for need updates at won node {}", wonNodeUri);
+            log.error("Error subscribing for atom updates at won node {}", wonNodeUri);
             log.error("Exception message: {} \nCause: {} ", e.getMessage(), e.getCause());
         }
         return con;
@@ -319,20 +319,20 @@ public class WonNodeControllerActor extends UntypedActor {
      */
     private void addFailedWonNode(String wonNodeUri, WonNodeConnection con) {
         if (con != null) {
-            getContext().stop(con.getNeedCreatedConsumer());
-            getContext().stop(con.getNeedActivatedConsumer());
-            getContext().stop(con.getNeedDeactivatedConsumer());
+            getContext().stop(con.getAtomCreatedConsumer());
+            getContext().stop(con.getAtomActivatedConsumer());
+            getContext().stop(con.getAtomDeactivatedConsumer());
         }
         crawlWonNodes.remove(wonNodeUri);
         failedWonNodeUris.add(wonNodeUri);
     }
 
-    private WonNodeConnection subscribeNeedUpdates(WonNodeInfo wonNodeInfo) {
+    private WonNodeConnection subscribeAtomUpdates(WonNodeInfo wonNodeInfo) {
         return ActiveMqWonNodeConnectionFactory.createWonNodeConnection(getContext(), wonNodeInfo, messagingContext);
     }
 
     /**
-     * Handles connections errors that occur when the need consumer actors are
+     * Handles connections errors that occur when the atom consumer actors are
      * terminated.
      *
      * @param t messages that holds a reference to consumer actor that was
@@ -342,14 +342,14 @@ public class WonNodeControllerActor extends UntypedActor {
         for (String uri : crawlWonNodes.keySet()) {
             WonNodeConnection con = crawlWonNodes.get(uri);
             if (con != null) {
-                if (con.getNeedCreatedConsumer().equals(t.getActor())) {
-                    log.error("NeedCreatedConsumer '{}' of won '{}' has been shut down", t.getActor(), uri);
+                if (con.getAtomCreatedConsumer().equals(t.getActor())) {
+                    log.error("AtomCreatedConsumer '{}' of won '{}' has been shut down", t.getActor(), uri);
                     addFailedWonNode(con.getWonNodeInfo().getWonNodeURI(), con);
-                } else if (con.getNeedActivatedConsumer().equals(t.getActor())) {
-                    log.error("NeedActivatedConsumer '{}' of won '{}' has been shut down", t.getActor(), uri);
+                } else if (con.getAtomActivatedConsumer().equals(t.getActor())) {
+                    log.error("AtomActivatedConsumer '{}' of won '{}' has been shut down", t.getActor(), uri);
                     addFailedWonNode(con.getWonNodeInfo().getWonNodeURI(), con);
-                } else if (con.getNeedDeactivatedConsumer().equals(t.getActor())) {
-                    log.error("NeedDeactivatedConsumer '{}' of won '{}' has been shut down", t.getActor(), uri);
+                } else if (con.getAtomDeactivatedConsumer().equals(t.getActor())) {
+                    log.error("AtomDeactivatedConsumer '{}' of won '{}' has been shut down", t.getActor(), uri);
                     addFailedWonNode(con.getWonNodeInfo().getWonNodeURI(), con);
                 } else if (con.getHintProducer().equals(t.getActor())) {
                     log.error("HintProducer '{}' of won '{}' has been shut down", t.getActor(), uri);

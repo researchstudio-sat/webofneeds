@@ -76,7 +76,7 @@ export const petriNetWorkflow = {
         "@type": "s:FileObject",
         "s:name": value.name,
         "s:type": value.type,
-        "wf:hasInlinePetriNetDefinition": value.data,
+        "wf:inlinePetriNetDefinition": value.data,
       };
 
       return { "won:hasPetriNet": workflow };
@@ -90,7 +90,7 @@ export const petriNetWorkflow = {
       processURI: get(wflw, "@id"),
       name: get(wflw, "s:name"),
       type: get(wflw, "s:type"),
-      data: get(wflw, "wf:hasInlinePetriNetDefinition"),
+      data: get(wflw, "wf:inlinePetriNetDefinition"),
     };
     if (workflow.name && workflow.data) {
       //do not check for value.type might not be present on some systems
@@ -106,8 +106,8 @@ export const petriNetWorkflow = {
     return undefined;
   },
 };
-/*<https://192.168.124.49:8443/won/resource/event/xlifb1yz7opl/petrinetWorkflow/fzkwlb9xdp> wf:firesTransition <http://purl.org/webofneeds/process/taxi#DriverArrivedAtPickupLocation> .
- <this:eventuri> won:hasTextMessage "Dear passenger, I'm waiting at the pickup location. You have 5 minutes." .*/
+/*<https://192.168.124.49:8443/won/resource/event/xlifb1yz7opl/petrinetWorkflow/fzkwlb9xdp> wf:firesTransition <https://w3id.org/won/process/taxi#DriverArrivedAtPickupLocation> .
+ <this:eventuri> won:textMessage "Dear passenger, I'm waiting at the pickup location. You have 5 minutes." .*/
 
 export const petriNetTransition = {
   identifier: "petriNetTransition",
@@ -125,7 +125,7 @@ export const petriNetTransition = {
         },
       };
     } else {
-      //we need to return this predicate object part so we do not run into troubles on creating needs/messages
+      //we need to return this predicate object part so we do not run into troubles on creating atoms/messages
       return undefined;
     }
   },

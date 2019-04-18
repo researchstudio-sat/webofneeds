@@ -12,7 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class builds up the relations between needs and attributes. It to builds
+ * This class builds up the relations between atoms and attributes. It to builds
  * an internal tensor data structure (RESCAL three-way-tensor). The data
  * structure can be build incrementally and when finished written to file system
  * for further processing by the RESCAL algorithm or evaluation algorithms.
@@ -22,27 +22,27 @@ public class TensorMatchingData {
     private static final Logger logger = LoggerFactory.getLogger(TensorMatchingData.class);
     private static final int MAX_DIMENSION = 1000000;
     public static final String HEADERS_FILE = "headers.txt";
-    public static final String NEED_INDICES_FILE = "needIndices.txt";
+    public static final String ATOM_INDICES_FILE = "atomIndices.txt";
     public static final String CONNECTION_SLICE_NAME = "connection";
     private ThirdOrderSparseTensor tensor;
-    private ArrayList<String> needs;
+    private ArrayList<String> atoms;
     private ArrayList<String> attributes;
     private ArrayList<String> slices;
     private int nextIndex = 0;
 
     public TensorMatchingData() {
         tensor = new ThirdOrderSparseTensor(MAX_DIMENSION, MAX_DIMENSION);
-        needs = new ArrayList<>();
+        atoms = new ArrayList<>();
         attributes = new ArrayList<>();
         slices = new ArrayList<>();
     }
 
-    public void addNeedConnection(String need1, String need2, boolean addOnlyIfNeedsExist) {
-        checkAttributeOrNeedName(need1);
-        checkAttributeOrNeedName(need2);
-        if (!addOnlyIfNeedsExist || (addOnlyIfNeedsExist && needs.contains(need1) && needs.contains(need2))) {
-            int x1 = addNeed(need1);
-            int x2 = addNeed(need2);
+    public void addAtomConnection(String atom1, String atom2, boolean addOnlyIfAtomsExist) {
+        checkAttributeOrAtomName(atom1);
+        checkAttributeOrAtomName(atom2);
+        if (!addOnlyIfAtomsExist || (addOnlyIfAtomsExist && atoms.contains(atom1) && atoms.contains(atom2))) {
+            int x1 = addAtom(atom1);
+            int x2 = addAtom(atom2);
             int x3 = addSlice(CONNECTION_SLICE_NAME);
             // connections are bidirectional
             tensor.setEntry(1.0d, x1, x2, x3);
@@ -50,26 +50,26 @@ public class TensorMatchingData {
         }
     }
 
-    public void addNeedAttribute(String sliceName, String needUri, String attributeValue) {
-        checkAttributeOrNeedName(needUri);
-        checkAttributeOrNeedName(attributeValue);
+    public void addAtomAttribute(String sliceName, String atomUri, String attributeValue) {
+        checkAttributeOrAtomName(atomUri);
+        checkAttributeOrAtomName(attributeValue);
         checkSliceName(sliceName, false);
-        int x1 = addNeed(needUri);
+        int x1 = addAtom(atomUri);
         int x2 = addAttribute(attributeValue);
         int x3 = addSlice(sliceName);
         tensor.setEntry(1.0d, x1, x2, x3);
     }
 
-    public void addNeedAttribute(TensorEntry entry) {
-        addNeedAttribute(entry.getSliceName(), entry.getNeedUri(), entry.getValue());
+    public void addAtomAttribute(TensorEntry entry) {
+        addAtomAttribute(entry.getSliceName(), entry.getAtomUri(), entry.getValue());
     }
 
-    public String getFirstAttributeOfNeed(String need, String slice) {
-        int needIndex = needs.indexOf(need);
-        if (needIndex < 0) {
+    public String getFirstAttributeOfAtom(String atom, String slice) {
+        int atomIndex = atoms.indexOf(atom);
+        if (atomIndex < 0) {
             return null;
         }
-        Iterator<Integer> iter = tensor.getNonZeroIndicesOfRow(needIndex, slices.indexOf(slice)).iterator();
+        Iterator<Integer> iter = tensor.getNonZeroIndicesOfRow(atomIndex, slices.indexOf(slice)).iterator();
         if (iter.hasNext()) {
             return attributes.get(iter.next());
         }
@@ -77,7 +77,7 @@ public class TensorMatchingData {
     }
 
     public boolean isValidTensor() {
-        return (needs.size() > 0 && attributes.size() > 0 && slices.size() > 0
+        return (atoms.size() > 0 && attributes.size() > 0 && slices.size() > 0
                         && getSliceIndex(CONNECTION_SLICE_NAME) != -1);
     }
 
@@ -86,30 +86,30 @@ public class TensorMatchingData {
     }
 
     /**
-     * remove empty needs without attributes and their connections by building up a
-     * new matching data object and add only non-empty needs and connections between
+     * remove empty atoms without attributes and their connections by building up a
+     * new matching data object and add only non-empty atoms and connections between
      * those
      */
-    protected TensorMatchingData removeEmptyNeedsAndConnections() {
+    protected TensorMatchingData removeEmptyAtomsAndConnections() {
         // build up a new tensor
         TensorMatchingData cleanedMatchingData = new TensorMatchingData();
-        // add the non-empty needs
-        for (int i = 0; i < needs.size(); i++) {
-            String need = needs.get(i);
-            if ((need != null) && needHasAttributes(i)) {
-                cleanedMatchingData.addNeed(need);
+        // add the non-empty atoms
+        for (int i = 0; i < atoms.size(); i++) {
+            String atom = atoms.get(i);
+            if ((atom != null) && atomHasAttributes(i)) {
+                cleanedMatchingData.addAtom(atom);
             }
         }
-        // add all attributes and connections to non-empty needs
-        for (int i = 0; i < needs.size(); i++) {
-            String need = needs.get(i);
-            if ((need != null) && needHasAttributes(i)) {
+        // add all attributes and connections to non-empty atoms
+        for (int i = 0; i < atoms.size(); i++) {
+            String atom = atoms.get(i);
+            if ((atom != null) && atomHasAttributes(i)) {
                 for (int sliceIndex = 0; sliceIndex < slices.size(); sliceIndex++) {
                     for (int attrIndex : tensor.getNonZeroIndicesOfRow(i, sliceIndex)) {
                         if (slices.get(sliceIndex).equals(CONNECTION_SLICE_NAME)) {
-                            cleanedMatchingData.addNeedConnection(need, needs.get(attrIndex), true);
+                            cleanedMatchingData.addAtomConnection(atom, atoms.get(attrIndex), true);
                         } else {
-                            cleanedMatchingData.addNeedAttribute(slices.get(sliceIndex), need,
+                            cleanedMatchingData.addAtomAttribute(slices.get(sliceIndex), atom,
                                             attributes.get(attrIndex));
                         }
                     }
@@ -120,18 +120,18 @@ public class TensorMatchingData {
     }
 
     /**
-     * Add a need to the need list
+     * Add an atom to the atom list
      *
-     * @param need
+     * @param atom
      * @return
      */
-    private int addNeed(String need) {
-        if (!needs.contains(need)) {
-            needs.add(nextIndex, need);
+    private int addAtom(String atom) {
+        if (!atoms.contains(atom)) {
+            atoms.add(nextIndex, atom);
             attributes.add(nextIndex, null);
             nextIndex++;
         }
-        return needs.indexOf(need);
+        return atoms.indexOf(atom);
     }
 
     /**
@@ -143,7 +143,7 @@ public class TensorMatchingData {
     private int addAttribute(String attr) {
         if (!attributes.contains(attr)) {
             attributes.add(nextIndex, attr);
-            needs.add(nextIndex, null);
+            atoms.add(nextIndex, null);
             nextIndex++;
         }
         return attributes.indexOf(attr);
@@ -157,13 +157,13 @@ public class TensorMatchingData {
     }
 
     /**
-     * check if names of needs/attributes are well-formed
+     * check if names of atoms/attributes are well-formed
      *
      * @param name
      */
-    private void checkAttributeOrNeedName(String name) {
+    private void checkAttributeOrAtomName(String name) {
         if (name == null || name.isEmpty()) {
-            throw new IllegalArgumentException("Need/Attribute is not allowed to be null or empty");
+            throw new IllegalArgumentException("Atom/Attribute is not allowed to be null or empty");
         }
     }
 
@@ -188,15 +188,15 @@ public class TensorMatchingData {
     }
 
     /**
-     * After all the needs, connections and attributes have been added, this method
+     * After all the atoms, connections and attributes have been added, this method
      * is used before writing the tensor out to disk, to resize it to the right
-     * dimensions and remove connections of empty needs that do not have any
+     * dimensions and remove connections of empty atoms that do not have any
      * attributes.
      *
      * @return
      */
     protected ThirdOrderSparseTensor createFinalTensor() {
-        int dim = getNeeds().size() + getAttributes().size();
+        int dim = getAtoms().size() + getAttributes().size();
         tensor.resize(dim, dim);
         return tensor;
     }
@@ -206,29 +206,29 @@ public class TensorMatchingData {
     }
 
     /**
-     * check if a need with a certain index has any attributes
+     * check if an atom with a certain index has any attributes
      *
-     * @param needIndex
+     * @param atomIndex
      * @return
      */
-    private boolean needHasAttributes(int needIndex) {
+    private boolean atomHasAttributes(int atomIndex) {
         for (int i = 0; i < slices.size(); i++) {
-            if (tensor.hasNonZeroEntryInRow(needIndex, i) && getSliceIndex(CONNECTION_SLICE_NAME) != i) {
+            if (tensor.hasNonZeroEntryInRow(atomIndex, i) && getSliceIndex(CONNECTION_SLICE_NAME) != i) {
                 return true;
             }
         }
         return false;
     }
 
-    public ArrayList<String> getNeedHeaders() {
-        return (ArrayList<String>) needs.clone();
+    public ArrayList<String> getAtomHeaders() {
+        return (ArrayList<String>) atoms.clone();
     }
 
-    public List<String> getNeeds() {
+    public List<String> getAtoms() {
         ArrayList<String> continuousList = new ArrayList<String>();
-        for (String need : needs) {
-            if (need != null) {
-                continuousList.add(need);
+        for (String atom : atoms) {
+            if (atom != null) {
+                continuousList.add(atom);
             }
         }
         return continuousList;
@@ -256,7 +256,7 @@ public class TensorMatchingData {
     }
 
     /**
-     * Same as {@link #writeCleanedOutputFiles(String)} but removes empty needs and
+     * Same as {@link #writeCleanedOutputFiles(String)} but removes empty atoms and
      * their connections before writing the tensor
      *
      * @param folder
@@ -267,10 +267,10 @@ public class TensorMatchingData {
         if (!isValidTensor()) {
             throw new IllegalStateException("Tensor must filled with data before it can be written");
         }
-        logger.info("remove empty needs and connections ...");
-        TensorMatchingData cleanedMatchingData = removeEmptyNeedsAndConnections();
-        logger.info("Number of needs before cleaning: " + getNeeds().size());
-        logger.info("Number of needs after cleaning: " + cleanedMatchingData.getNeeds().size());
+        logger.info("remove empty atoms and connections ...");
+        TensorMatchingData cleanedMatchingData = removeEmptyAtomsAndConnections();
+        logger.info("Number of atoms before cleaning: " + getAtoms().size());
+        logger.info("Number of atoms after cleaning: " + cleanedMatchingData.getAtoms().size());
         logger.info("Number of attributes before cleaning: " + getAttributes().size());
         logger.info("Number of attributes after cleaning: " + cleanedMatchingData.getAttributes().size());
         logger.info("Number of connections before cleaning: " + getNumberOfConnections());
@@ -281,9 +281,9 @@ public class TensorMatchingData {
 
     /**
      * Write the tensor out to the file system for further processing. Create the
-     * following files: - header.txt file with the need/attribute names that
+     * following files: - header.txt file with the atom/attribute names that
      * correspond to the index in the tensor. - <Slice>.mtx files for the different
-     * slices e.g. connections, need type, title and other attributes
+     * slices e.g. connections, atom type, title and other attributes
      *
      * @param folder
      * @throws IOException
@@ -295,7 +295,7 @@ public class TensorMatchingData {
             return;
         }
         // write the data file
-        // remove the needs without attributes first
+        // remove the atoms without attributes first
         logger.info("create final tensor ...");
         createFinalTensor();
         int dim = tensor.getDimensions()[0];
@@ -312,20 +312,20 @@ public class TensorMatchingData {
         FileOutputStream fos = new FileOutputStream(new File(folder + "/" + HEADERS_FILE));
         OutputStreamWriter os = new OutputStreamWriter(fos, "UTF-8");
         for (int i = 0; i < nextIndex; i++) {
-            String entity = (needs.get(i) != null) ? needs.get(i) : attributes.get(i);
+            String entity = (atoms.get(i) != null) ? atoms.get(i) : attributes.get(i);
             os.append(entity + "\n");
         }
         os.close();
-        // write the need indices file
-        fos = new FileOutputStream(new File(folder + "/" + NEED_INDICES_FILE));
+        // write the atom indices file
+        fos = new FileOutputStream(new File(folder + "/" + ATOM_INDICES_FILE));
         os = new OutputStreamWriter(fos, "UTF-8");
         for (int i = 0; i < nextIndex; i++) {
-            if (needs.get(i) != null) {
+            if (atoms.get(i) != null) {
                 os.append(i + "\n");
             }
         }
         os.close();
-        logger.info("- needs: {}", getNeeds().size());
+        logger.info("- atoms: {}", getAtoms().size());
         logger.info("- attributes: {}", getAttributes().size());
         logger.info("- connections: {}", tensor.getNonZeroEntries(slices.indexOf(CONNECTION_SLICE_NAME)) / 2);
         logger.info("- tensor size: {} x {} x " + tensor.getDimensions()[2], tensor.getDimensions()[0],

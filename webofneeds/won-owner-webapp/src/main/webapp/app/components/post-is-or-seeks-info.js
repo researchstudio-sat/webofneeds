@@ -42,7 +42,7 @@ function genComponentConf() {
       this.allDetails = useCaseUtils.getAllDetails();
 
       const selectFromState = state => {
-        const post = this.postUri && state.getIn(["needs", this.postUri]);
+        const post = this.postUri && state.getIn(["atoms", this.postUri]);
         const details = this.branch && post && post.get(this.branch);
 
         return {
@@ -94,7 +94,7 @@ function genComponentConf() {
   };
 }
 
-export default //.controller('CreateNeedController', [...serviceDependencies, CreateNeedController])
+export default //.controller('CreateAtomController', [...serviceDependencies, CreateAtomController])
 angular
   .module("won.owner.components.postIsOrSeeksInfo", [])
   .directive("detailViewerElement", [

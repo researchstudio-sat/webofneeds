@@ -25,8 +25,8 @@ public class TelegramHelpAction extends BaseEventBotAction {
              * Update update = ((SendHelpEvent) event).getUpdate(); Message message =
              * update.getMessage(); Long chatId = message.getChatId(); ReplyKeyboardMarkup
              * replyKeyboardMarkup = new ReplyKeyboardMarkup(); List<KeyboardRow> commands =
-             * new ArrayList<>(); KeyboardRow kb = new KeyboardRow(); kb.add("create need");
-             * KeyboardRow kb1 = new KeyboardRow(); kb1.add("list your needs");
+             * new ArrayList<>(); KeyboardRow kb = new KeyboardRow(); kb.add("create atom");
+             * KeyboardRow kb1 = new KeyboardRow(); kb1.add("list your atoms");
              * commands.add(kb); commands.add(kb1);
              * replyKeyboardMarkup.setResizeKeyboard(true);
              * replyKeyboardMarkup.setKeyboard(commands); SendMessage sendMessage = new

@@ -1,9 +1,9 @@
 ## WoN Message Signatures and their usage
 
 
-All the messages in WoN are issued by Node, Need, or Matcher. The messages issued by Need and Node are signed by them.
+All the messages in WoN are issued by Node, Atom, or Matcher. The messages issued by Atom and Node are signed by them.
  It is planned that messages from Matcher are also signed, as soon as we expose the Matcher's 
- [web identity](web-identity.md) in the way we do for Node and Need.
+ [web identity](web-identity.md) in the way we do for Node and Atom.
   
 The receiving or viewing party processes the WoN message (or data that is part of the message) only if it is 
 well-formed and verifies against the expected signers. The node always publishes the messages it receives or 
@@ -26,7 +26,7 @@ graph has to be verified using the signature value, the public key of the signer
 Below is an example of the signature graph referencing another graph that it signs (the referenced graph is not shown).
 
 ```
-@prefix msg:   <http://purl.org/webofneeds/message#> .
+@prefix msg:   <https://w3id.org/won/message#> .
 @prefix signature: <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#> .
 @prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
 @prefix cert:  <http://www.w3.org/ns/auth/cert#> .
@@ -39,23 +39,23 @@ Below is an example of the signature graph referencing another graph that it sig
             signature:hasGraphSigningMethod
                     [ a                               signature:GraphSigningMethod ;
                       signature:hasDigestMethod       signature:dm-sha-256 ;
-                      signature:hasGraphCanonicalizationMethod
+                      signature:graphCanonicalizationMethod
                               signature:gcm-fisteus-2010 ;
-                      signature:hasGraphDigestMethod  signature:gdm-fisteus-2010 ;
-                      signature:hasGraphSerializationMethod
+                      signature:graphDigestMethod  signature:gdm-fisteus-2010 ;
+                      signature:graphSerializationMethod
                               signature:gsm-trig ;
                       signature:hasSignatureMethod    signature:sm-ecdsa
                     ] ;
-            signature:hasSignatureValue  "MGUCMAfOwjpbp8F+YCDhYAfEzHYdjlBG+qvvLzZGusoxr31xjm8BlKVR230M2PS4s8tylwIxAMgCWkHPZTvy5bCVd6+3WNikkCSeCNNR/Jck+LPYU8vCfughKrXTaTrAWOTnX0e9hw==" ;
+            signature:signatureValue  "MGUCMAfOwjpbp8F+YCDhYAfEzHYdjlBG+qvvLzZGusoxr31xjm8BlKVR230M2PS4s8tylwIxAMgCWkHPZTvy5bCVd6+3WNikkCSeCNNR/Jck+LPYU8vCfughKrXTaTrAWOTnX0e9hw==" ;
             signature:hasVerificationCertificate <https://localhost:8889/won/resource> ;
-            msg:hasSignedGraph   <https://localhost:8889/won/resource/event/n8s7pk2y0nxdyg20s0rc#envelope-cw1d> .
+            msg:signedGraph   <https://localhost:8889/won/resource/event/n8s7pk2y0nxdyg20s0rc#envelope-cw1d> .
 }
 ```
 
 
 We use vocabulary from 
 [Signingframework library](https://github.com/akasten/signingframework/blob/master/ontologies/signature.owl) for 
-representing the signature, and additionally have defined our own property **msg:hasSignedGraph** to be able to 
+representing the signature, and additionally have defined our own property **msg:signedGraph** to be able to 
 reference the signed named graph.
 
 Assigning a URI to a signature makes it possible to reference signatures, both from the same message and from other documents. 
@@ -73,17 +73,17 @@ and two signatures:
 
 
 ```
-@prefix msg:   <http://purl.org/webofneeds/message#> .
+@prefix msg:   <https://w3id.org/won/message#> .
 @prefix conn:  <https://localhost8889/won/resource/connection/> .
 @prefix signature: <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#> .
-@prefix woncrypt: <http://purl.org/webofneeds/woncrypt#> .
-@prefix need:  <https://localhost8889/won/resource/need/> .
+@prefix woncrypt: <https://w3id.org/won/core#> .
+@prefix atom:  <https://localhost8889/won/resource/atom/> .
 @prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
 @prefix cert:  <http://www.w3.org/ns/auth/cert#> .
 @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix geo:   <http://www.w3.org/2003/01/geo/wgs84_pos#> .
 @prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-@prefix won:   <http://purl.org/webofneeds/model#> .
+@prefix won:   <https://w3id.org/won/core#> .
 @prefix ldp:   <http://www.w3.org/ns/ldp#> .
 @prefix event: <https://localhost8889/won/resource/event/> .
 @prefix sioc:  <http://rdfs.org/sioc/ns#> .
@@ -98,13 +98,13 @@ and two signatures:
     
     event:n8s7pk2y0nxdyg20s0rc
             a                            msg:FromSystem ;
-            msg:hasMessageType           msg:SuccessResponse ;
-            msg:hasReceiver              <https://localhost:8889/won/resource/connection/tpnfpv7jllafv9of2keu> ;
-            msg:hasReceiverNeed          <https://localhost:8889/won/resource/need/2522931766117794000> ;
-            msg:hasReceiverNode          <https://localhost:8889/won/resource> ;
-            msg:hasSender                conn:itdt8y3re7fy161g0c4j ;
-            msg:hasSenderNeed            need:qlk9kwp0l2i8o6m9a8dg ;
-            msg:hasSenderNode            <https://localhost8889/won/resource> ;
+            msg:messageType           msg:SuccessResponse ;
+            msg:recipient              <https://localhost:8889/won/resource/connection/tpnfpv7jllafv9of2keu> ;
+            msg:recipientAtom          <https://localhost:8889/won/resource/atom/2522931766117794000> ;
+            msg:recipientNode          <https://localhost:8889/won/resource> ;
+            msg:sender                conn:itdt8y3re7fy161g0c4j ;
+            msg:senderAtom            atom:qlk9kwp0l2i8o6m9a8dg ;
+            msg:senderNode            <https://localhost8889/won/resource> ;
             msg:isRemoteResponseTo       <https://localhost:8889/won/resource/event/3803545276954706000> ;
             msg:isResponseTo             event:r0bna8i52znu7epammor ;
             msg:isResponseToMessageType  msg:OpenMessage .
@@ -116,17 +116,17 @@ and two signatures:
             signature:hasGraphSigningMethod
                     [ a                               signature:GraphSigningMethod ;
                       signature:hasDigestMethod       signature:dm-sha-256 ;
-                      signature:hasGraphCanonicalizationMethod
+                      signature:graphCanonicalizationMethod
                               signature:gcm-fisteus-2010 ;
-                      signature:hasGraphDigestMethod  signature:gdm-fisteus-2010 ;
-                      signature:hasGraphSerializationMethod
+                      signature:graphDigestMethod  signature:gdm-fisteus-2010 ;
+                      signature:graphSerializationMethod
                               signature:gsm-trig ;
                       signature:hasSignatureMethod    signature:sm-ecdsa
                     ] ;
-            signature:hasSignatureValue  "MGUCMAfOwjpbp8F+YCDhYAfEzHYdjlBG+qvvLzZGusoxr31xjm8BlKVR230M2PS4s8tylwIxAMgCWkHPZTvy5bCVd6+3WNikkCSeCNNR/Jck+LPYU8vCfughKrXTaTrAWOTnX0e9hw==" ;
+            signature:signatureValue  "MGUCMAfOwjpbp8F+YCDhYAfEzHYdjlBG+qvvLzZGusoxr31xjm8BlKVR230M2PS4s8tylwIxAMgCWkHPZTvy5bCVd6+3WNikkCSeCNNR/Jck+LPYU8vCfughKrXTaTrAWOTnX0e9hw==" ;
             signature:hasVerificationCertificate
                     <https://localhost8889/won/resource> ;
-            msg:hasSignedGraph           <https://localhost8889/won/resource/event/n8s7pk2y0nxdyg20s0rc#envelope-cw1d> .
+            msg:signedGraph           <https://localhost8889/won/resource/event/n8s7pk2y0nxdyg20s0rc#envelope-cw1d> .
 }
 
 <https://localhost8889/won/resource/event/n8s7pk2y0nxdyg20s0rc#envelope-05af> {
@@ -138,10 +138,10 @@ and two signatures:
     
     event:n8s7pk2y0nxdyg20s0rc
             a                         msg:FromSystem ;
-            msg:hasReceivedTimestamp  "1458127303119"^^xsd:long ;
-            msg:containsSignature   [ msg:hasSignatureGraph  <https://localhost8889/won/resource/event/n8s7pk2y0nxdyg20s0rc#envelope-cw1d-sig> ;
-                                        msg:hasSignatureValue  "MGUCMAfOwjpbp8F+YCDhYAfEzHYdjlBG+qvvLzZGusoxr31xjm8BlKVR230M2PS4s8tylwIxAMgCWkHPZTvy5bCVd6+3WNikkCSeCNNR/Jck+LPYU8vCfughKrXTaTrAWOTnX0e9hw==" ;
-                                        msg:hasSignedGraph     <https://localhost8889/won/resource/event/n8s7pk2y0nxdyg20s0rc#envelope-cw1d>
+            msg:receivedTimestamp  "1458127303119"^^xsd:long ;
+            msg:containsSignature   [ msg:signatureGraph  <https://localhost8889/won/resource/event/n8s7pk2y0nxdyg20s0rc#envelope-cw1d-sig> ;
+                                        msg:signatureValue  "MGUCMAfOwjpbp8F+YCDhYAfEzHYdjlBG+qvvLzZGusoxr31xjm8BlKVR230M2PS4s8tylwIxAMgCWkHPZTvy5bCVd6+3WNikkCSeCNNR/Jck+LPYU8vCfughKrXTaTrAWOTnX0e9hw==" ;
+                                        msg:signedGraph     <https://localhost8889/won/resource/event/n8s7pk2y0nxdyg20s0rc#envelope-cw1d>
                                       ] .
 }
 
@@ -151,17 +151,17 @@ and two signatures:
             signature:hasGraphSigningMethod
                     [ a                               signature:GraphSigningMethod ;
                       signature:hasDigestMethod       signature:dm-sha-256 ;
-                      signature:hasGraphCanonicalizationMethod
+                      signature:graphCanonicalizationMethod
                               signature:gcm-fisteus-2010 ;
-                      signature:hasGraphDigestMethod  signature:gdm-fisteus-2010 ;
-                      signature:hasGraphSerializationMethod
+                      signature:graphDigestMethod  signature:gdm-fisteus-2010 ;
+                      signature:graphSerializationMethod
                               signature:gsm-trig ;
                       signature:hasSignatureMethod    signature:sm-ecdsa
                     ] ;
-            signature:hasSignatureValue  "MGUCMC2hvYxP4EKcj7lQBKyC8v4hen3Dokkt+wJYa146TfSfMpEvjeoVVpDkh66qp9EVwQIxAPrAKN0XT1kMuJOnOcuPbbrgyDPiN6okFhiEUdlUQugzgyD+7q6An7Yjg+qFHUpTYQ==" ;
+            signature:signatureValue  "MGUCMC2hvYxP4EKcj7lQBKyC8v4hen3Dokkt+wJYa146TfSfMpEvjeoVVpDkh66qp9EVwQIxAPrAKN0XT1kMuJOnOcuPbbrgyDPiN6okFhiEUdlUQugzgyD+7q6An7Yjg+qFHUpTYQ==" ;
             signature:hasVerificationCertificate
                     <https://localhost8889/won/resource> ;
-            msg:hasSignedGraph           <https://localhost8889/won/resource/event/n8s7pk2y0nxdyg20s0rc#envelope-05af> .
+            msg:signedGraph           <https://localhost8889/won/resource/event/n8s7pk2y0nxdyg20s0rc#envelope-05af> .
 }
 
 ```
@@ -206,8 +206,8 @@ protocol the exact processing steps of the incoming and outgoing messages. The p
 verification, message wellformedness checks, signature adding.
 
 The example fragment of the communication between WoN communicating entities is represented below.
-URI1/R/ represents that need published at server URI1, the URI1 server's publishing service is represented by URI1/S/. 
-Another need is represented by URI2/O/ with its publishing service URI2/S/. These are four participants in our 
+URI1/R/ represents that atom published at server URI1, the URI1 server's publishing service is represented by URI1/S/. 
+Another atom is represented by URI2/O/ with its publishing service URI2/S/. These are four participants in our 
 example conversation, marked by A. These participants have their certificates and make their public key available 
 under their resource URIs.
 
@@ -215,7 +215,7 @@ under their resource URIs.
 <img src="chat-interaction.png" width="400"/>
 
 *  steps marked by **B**:
-  * The need URI1/R/ sends a message to the need URI2/O/ asking about the price. the message URI is URL1/R/m1. This 
+  * The atom URI1/R/ sends a message to the atom URI2/O/ asking about the price. the message URI is URL1/R/m1. This 
 message is first received by the publishing service URI1/S/. The service verifies the message and the signatures, it 
 can also add its own data to the message, such as received time. It signs the added data and publishes the message. 
 
@@ -235,9 +235,9 @@ message, publishes it. Finally it is sent to its destination, URL2/O/.
 service also issues, signs and sends a success response message for the original sender, URL1/R/m1r2, which, in 
 turn, is received, published and directed to URL1/R/ by its publishing service URL1/S/. 
 
-At some point the owner of the need reads the message and sends an answer message back, telling the price. The 
+At some point the owner of the atom reads the message and sends an answer message back, telling the price. The 
 resulted messages and their transportation are marked by F, G, H and I . If the conversation continues, the following
-messages generated between the needs are processed and transported in a similar way. 
+messages generated between the atoms are processed and transported in a similar way. 
 
 
  

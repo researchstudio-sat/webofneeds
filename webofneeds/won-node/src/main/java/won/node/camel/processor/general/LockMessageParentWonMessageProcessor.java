@@ -22,10 +22,10 @@ import won.protocol.message.WonMessageUtils;
 import won.protocol.message.processor.WonMessageProcessor;
 import won.protocol.message.processor.exception.WonMessageProcessingException;
 import won.protocol.model.Connection;
-import won.protocol.repository.ConnectionEventContainerRepository;
+import won.protocol.repository.ConnectionMessageContainerRepository;
 import won.protocol.repository.ConnectionRepository;
-import won.protocol.repository.NeedEventContainerRepository;
-import won.protocol.repository.NeedRepository;
+import won.protocol.repository.AtomMessageContainerRepository;
+import won.protocol.repository.AtomRepository;
 
 /**
  * Acquires a pessimistic read lock on the message's parent.
@@ -35,11 +35,11 @@ public class LockMessageParentWonMessageProcessor implements WonMessageProcessor
     @Autowired
     ConnectionRepository connectionRepository;
     @Autowired
-    NeedRepository needRepository;
+    AtomRepository atomRepository;
     @Autowired
-    ConnectionEventContainerRepository connectionEventContainerRepository;
+    ConnectionMessageContainerRepository connectionMessageContainerRepository;
     @Autowired
-    NeedEventContainerRepository needEventContainerRepository;
+    AtomMessageContainerRepository atomMessageContainerRepository;
 
     @Override
     public WonMessage process(WonMessage message) throws WonMessageProcessingException {
@@ -59,15 +59,15 @@ public class LockMessageParentWonMessageProcessor implements WonMessageProcessor
     }
 
     private void lockParent(WonMessage message) {
-        // get the parent's URI (either a connection or a need
+        // get the parent's URI (either a connection or an atom
         URI parentURI = WonMessageUtils.getParentEntityUri(message);
         // try a connection:
         Optional<Connection> con = connectionRepository.findOneByConnectionURIForUpdate(parentURI);
         if (con.isPresent()) {
-            connectionEventContainerRepository.findOneByParentUriForUpdate(parentURI);
+            connectionMessageContainerRepository.findOneByParentUriForUpdate(parentURI);
         } else {
-            needRepository.findOneByNeedURIForUpdate(parentURI);
-            needEventContainerRepository.findOneByParentUriForUpdate(parentURI);
+            atomRepository.findOneByAtomURIForUpdate(parentURI);
+            atomMessageContainerRepository.findOneByParentUriForUpdate(parentURI);
         }
     }
 }

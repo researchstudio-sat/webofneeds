@@ -33,8 +33,8 @@ public class EventBotActionUtils {
 
     public static void rememberInList(EventListenerContext ctx, URI uri, String uriListName) {
         if (uriListName != null && uriListName.trim().length() > 0) {
-            ctx.getBotContext().appendToNamedNeedUriList(uri, uriListName);
-            logger.debug("remembering need in NamedNeedList {} ", uri);
+            ctx.getBotContext().appendToNamedAtomUriList(uri, uriListName);
+            logger.debug("remembering atom in NamedAtomList {} ", uri);
         } else {
             throw new IllegalArgumentException("'uriListName' must not not be null or empty");
         }
@@ -46,8 +46,8 @@ public class EventBotActionUtils {
 
     public static void removeFromList(EventListenerContext ctx, URI uri, String uriListName) {
         if (uriListName != null && uriListName.trim().length() > 0) {
-            ctx.getBotContext().removeNeedUriFromNamedNeedUriList(uri, uriListName);
-            logger.debug("removing need from NamedNeedList {} ", uri);
+            ctx.getBotContext().removeAtomUriFromNamedAtomUriList(uri, uriListName);
+            logger.debug("removing atom from NamedAtomList {} ", uri);
         } else {
             throw new IllegalArgumentException("'uriListName' must not not be null or empty");
         }

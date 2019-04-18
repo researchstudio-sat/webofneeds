@@ -17,26 +17,26 @@ import org.apache.jena.query.Dataset;
 import won.owner.protocol.message.OwnerCallback;
 
 /**
- * A bot that manipulates needs. Note: Methods may throw runtime exceptions,
+ * A bot that manipulates atoms. Note: Methods may throw runtime exceptions,
  * which will be handled by the execution framework.
  */
 public interface Bot extends OwnerCallback {
-    public boolean knowsNeedURI(URI needURI);
+    public boolean knowsAtomURI(URI atomURI);
 
     public boolean knowsNodeURI(URI wonNodeURI);
 
-    public void onNewNeedCreated(final URI needUri, final URI wonNodeUri, final Dataset needModel) throws Exception;
+    public void onNewAtomCreated(final URI atomUri, final URI wonNodeUri, final Dataset atomModel) throws Exception;
 
     public void onMatcherRegistered(URI wonNodeUri);
 
-    public void onNewNeedCreatedNotificationForMatcher(final URI wonNodeURI, final URI needURI,
-                    final Dataset needModel);
+    public void onNewAtomCreatedNotificationForMatcher(final URI wonNodeURI, final URI atomURI,
+                    final Dataset atomModel);
 
-    public void onNeedModifiedNotificationForMatcher(final URI wonNodeURI, final URI needURI);
+    public void onAtomModifiedNotificationForMatcher(final URI wonNodeURI, final URI atomURI);
 
-    public void onNeedActivatedNotificationForMatcher(final URI wonNodeURI, final URI needURI);
+    public void onAtomActivatedNotificationForMatcher(final URI wonNodeURI, final URI atomURI);
 
-    public void onNeedDeactivatedNotificationForMatcher(final URI wonNodeURI, final URI needURI);
+    public void onAtomDeactivatedNotificationForMatcher(final URI wonNodeURI, final URI atomURI);
 
     /**
      * Init method, called exactly once by the framework before any other method is

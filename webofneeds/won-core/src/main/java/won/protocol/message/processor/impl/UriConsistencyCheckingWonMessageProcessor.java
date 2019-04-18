@@ -17,7 +17,7 @@ import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.WonRdfUtils;
 
 /**
- * Check if the event, graph or need uri is well-formed according the node's
+ * Check if the event, graph or atom uri is well-formed according the node's
  * domain and its path conventions User: ypanchenko Date: 23.04.2015
  */
 public class UriConsistencyCheckingWonMessageProcessor implements WonMessageProcessor {
@@ -29,29 +29,29 @@ public class UriConsistencyCheckingWonMessageProcessor implements WonMessageProc
     public WonMessage process(final WonMessage message) throws UriAlreadyInUseException {
         // extract info about own, sender and receiver nodes:
         URI senderNode = message.getSenderNodeURI();
-        URI receiverNode = message.getReceiverNodeURI();
+        URI recipientNode = message.getRecipientNodeURI();
         WonNodeInfo senderNodeInfo = null;
-        WonNodeInfo receiverNodeInfo = null;
+        WonNodeInfo recipientNodeInfo = null;
         if (senderNode != null && !WonMessageType.HINT_MESSAGE.equals(message.getMessageType())) {
             // do not check the sender node for a hint
             // TODO: change this behaviour as soon as a matcher uses a WoN node
             senderNodeInfo = wonNodeInformationService.getWonNodeInformation(senderNode);
         }
-        if (receiverNode != null) {
-            receiverNodeInfo = wonNodeInformationService.getWonNodeInformation(receiverNode);
+        if (recipientNode != null) {
+            recipientNodeInfo = wonNodeInformationService.getWonNodeInformation(recipientNode);
         }
         WonNodeInfo ownNodeInfo = null;
         URI msgUri = message.getMessageURI();
         if (msgUri.getScheme().equals(senderNode.getScheme())
                         && msgUri.getAuthority().equals(senderNode.getAuthority())) {
             ownNodeInfo = senderNodeInfo;
-        } else if (msgUri.getScheme().equals(receiverNode.getScheme())
-                        && msgUri.getAuthority().equals(receiverNode.getAuthority())) {
-            ownNodeInfo = receiverNodeInfo;
+        } else if (msgUri.getScheme().equals(recipientNode.getScheme())
+                        && msgUri.getAuthority().equals(recipientNode.getAuthority())) {
+            ownNodeInfo = recipientNodeInfo;
         }
         URI ownNode = URI.create(ownNodeInfo.getWonNodeURI());
         // do checks for consistency between these nodes and message direction, as well
-        // as needs,
+        // as atoms,
         // events and connection uris:
         // my node should be either receiver or sender node
         checkHasMyNode(message, ownNode);
@@ -61,12 +61,13 @@ public class UriConsistencyCheckingWonMessageProcessor implements WonMessageProc
         checkLocalEventURI(message, ownNodeInfo);
         // Check that remote URI, if any, correspond to ?senderNode's event pattern
         checkRemoteEventURI(message, senderNodeInfo);
-        // Check that need URI for create_need message corresponds to my pattern
-        checkCreateMsgNeedURI(message, ownNodeInfo);
-        // Specified sender-receiverNeed/Connection must conform to sender-receiverNode
+        // Check that atom URI for create_atom message corresponds to my pattern
+        checkCreateMsgAtomURI(message, ownNodeInfo);
+        // Specified sender-recipientAtom/Connection must conform to
+        // sender-recipientNode
         // URI pattern
         checkSenders(senderNodeInfo, message);
-        checkReceivers(receiverNodeInfo, message);
+        checkReceivers(recipientNodeInfo, message);
         // Check that my node is sender or receiver node URI, depending on the message
         // direction
         checkDirection(message, ownNode);
@@ -74,29 +75,29 @@ public class UriConsistencyCheckingWonMessageProcessor implements WonMessageProc
     }
 
     private void checkHasMyNode(final WonMessage message, URI ownNode) {
-        if (!ownNode.equals(message.getSenderNodeURI()) && !ownNode.equals(message.getReceiverNodeURI())) {
+        if (!ownNode.equals(message.getSenderNodeURI()) && !ownNode.equals(message.getRecipientNodeURI())) {
             throw new UriNodePathException("neither sender nor receiver is " + ownNode);
         }
     }
 
-    private void checkReceivers(final WonNodeInfo receiverNodeInfo, final WonMessage message) {
-        checkNodeConformance(receiverNodeInfo, message.getReceiverNeedURI(), message.getReceiverURI(), null);
+    private void checkReceivers(final WonNodeInfo recipientNodeInfo, final WonMessage message) {
+        checkNodeConformance(recipientNodeInfo, message.getRecipientAtomURI(), message.getRecipientURI(), null);
     }
 
     private void checkSenders(final WonNodeInfo senderNodeInfo, final WonMessage message) {
-        checkNodeConformance(senderNodeInfo, message.getSenderNeedURI(), message.getSenderURI(), null);
+        checkNodeConformance(senderNodeInfo, message.getSenderAtomURI(), message.getSenderURI(), null);
     }
 
     private void checkDirection(final WonMessage message, final URI ownNode) {
         WonMessageDirection direction = message.getEnvelopeType();
-        URI receiverNode = message.getReceiverNodeURI();
+        URI recipientNode = message.getRecipientNodeURI();
         URI senderNode = message.getSenderNodeURI();
         URI node;
         switch (direction) {
             case FROM_EXTERNAL:
                 // my node should be a receiver node
-                if (!ownNode.equals(receiverNode)) {
-                    throw new UriNodePathException(receiverNode + " is expected to be " + ownNode);
+                if (!ownNode.equals(recipientNode)) {
+                    throw new UriNodePathException(recipientNode + " is expected to be " + ownNode);
                 }
                 break;
             case FROM_OWNER:
@@ -122,28 +123,28 @@ public class UriConsistencyCheckingWonMessageProcessor implements WonMessageProc
         checkNodeConformance(senderNodeInfo, null, null, message.getCorrespondingRemoteMessageURI());
     }
 
-    private void checkCreateMsgNeedURI(final WonMessage message, final WonNodeInfo ownNodeInfo) {
+    private void checkCreateMsgAtomURI(final WonMessage message, final WonNodeInfo ownNodeInfo) {
         // check only for create message
-        if (message.getMessageType() == WonMessageType.CREATE_NEED) {
-            URI needURI = WonRdfUtils.NeedUtils.getNeedURI(message.getCompleteDataset());
-            checkNodeConformance(ownNodeInfo, needURI, null, null);
+        if (message.getMessageType() == WonMessageType.CREATE_ATOM) {
+            URI atomURI = WonRdfUtils.AtomUtils.getAtomURI(message.getCompleteDataset());
+            checkNodeConformance(ownNodeInfo, atomURI, null, null);
         }
         return;
     }
 
-    private void checkNodeConformance(final WonNodeInfo info, final URI needURI, final URI connURI,
+    private void checkNodeConformance(final WonNodeInfo info, final URI atomURI, final URI connURI,
                     final URI eventURI) {
         if (info == null) {
             return;
         }
-        if (needURI == null && connURI == null && eventURI == null) {
+        if (atomURI == null && connURI == null && eventURI == null) {
             return;
         }
-        String needPrefix = info.getNeedURIPrefix();
+        String atomPrefix = info.getAtomURIPrefix();
         String connPrefix = info.getConnectionURIPrefix();
         String eventPrefix = info.getEventURIPrefix();
-        if (needURI != null) {
-            checkPrefix(needURI, needPrefix);
+        if (atomURI != null) {
+            checkPrefix(atomURI, atomPrefix);
         }
         if (connURI != null) {
             checkPrefix(connURI, connPrefix);
@@ -153,8 +154,8 @@ public class UriConsistencyCheckingWonMessageProcessor implements WonMessageProc
         }
     }
 
-    private String getPrefix(final URI needURI) {
-        return needURI.toString().substring(0, needURI.toString().lastIndexOf("/"));
+    private String getPrefix(final URI atomURI) {
+        return atomURI.toString().substring(0, atomURI.toString().lastIndexOf("/"));
     }
 
     private void checkPrefix(URI uri, String expectedPrefix) {

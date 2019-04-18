@@ -1,8 +1,8 @@
-PREFIX mod: <http://purl.org/webofneeds/modification#>
-PREFIX agr: <http://purl.org/webofneeds/agreement#>
+PREFIX mod: <https://w3id.org/won/modification#>
+PREFIX agr: <https://w3id.org/won/agreement#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-PREFIX msg: <http://purl.org/webofneeds/message#>
-PREFIX won: <http://purl.org/webofneeds/model#>
+PREFIX msg: <https://w3id.org/won/message#>
+PREFIX won: <https://w3id.org/won/core#>
 
 # Select ?prop (the proposal message subject)
 CONSTRUCT { ?prop rdfs:comment "Proposal" . }
@@ -15,7 +15,7 @@ WHERE {
     }
     
     GRAPH <urn:x-arq:UnionGraph> {
-           ?prop msg:hasPreviousMessage+/msg:hasCorrespondingRemoteMessage? ?clause .
+           ?prop msg:previousMessage+/msg:correspondingRemoteMessage? ?clause .
     }
 
 }

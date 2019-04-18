@@ -14,7 +14,7 @@ import opennlp.tools.tokenize.Tokenizer;
 
 /**
  * Class uses OpenNLP to extract tokens from a text. Used for pre-processing the
- * need attribute content. User: hfriedrich Date: 13.06.2015
+ * atom attribute content. User: hfriedrich Date: 13.06.2015
  */
 public class OpenNlpTokenExtraction {
     Tokenizer tokenizer = SimpleTokenizer.INSTANCE;

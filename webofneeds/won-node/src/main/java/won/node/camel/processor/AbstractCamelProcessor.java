@@ -25,23 +25,23 @@ import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import won.cryptography.service.RandomNumberService;
-import won.node.facet.FacetService;
+import won.node.socket.SocketService;
 import won.node.protocol.MatcherProtocolMatcherServiceClientSide;
 import won.node.service.DataAccessService;
-import won.protocol.exception.IncompatibleFacetTypesException;
+import won.protocol.exception.IncompatibleSocketTypesException;
 import won.protocol.jms.MessagingService;
 import won.protocol.message.WonMessage;
 import won.protocol.message.processor.camel.WonCamelConstants;
-import won.protocol.model.Need;
+import won.protocol.model.Atom;
 import won.protocol.model.OwnerApplication;
 import won.protocol.repository.ConnectionContainerRepository;
-import won.protocol.repository.ConnectionEventContainerRepository;
+import won.protocol.repository.ConnectionMessageContainerRepository;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.DatasetHolderRepository;
-import won.protocol.repository.FacetRepository;
+import won.protocol.repository.SocketRepository;
 import won.protocol.repository.MessageEventRepository;
-import won.protocol.repository.NeedEventContainerRepository;
-import won.protocol.repository.NeedRepository;
+import won.protocol.repository.AtomMessageContainerRepository;
+import won.protocol.repository.AtomRepository;
 import won.protocol.repository.OwnerApplicationRepository;
 import won.protocol.service.LinkedDataService;
 import won.protocol.service.WonNodeInformationService;
@@ -61,17 +61,17 @@ public abstract class AbstractCamelProcessor implements Processor {
     @Autowired
     protected DatasetHolderRepository datasetHolderRepository;
     @Autowired
-    protected NeedRepository needRepository;
+    protected AtomRepository atomRepository;
     @Autowired
     protected ConnectionContainerRepository connectionContainerRepository;
     @Autowired
-    protected NeedEventContainerRepository needEventContainerRepository;
+    protected AtomMessageContainerRepository atomMessageContainerRepository;
     @Autowired
     protected ConnectionRepository connectionRepository;
     @Autowired
-    protected ConnectionEventContainerRepository connectionEventContainerRepository;
+    protected ConnectionMessageContainerRepository connectionMessageContainerRepository;
     @Autowired
-    protected FacetRepository facetRepository;
+    protected SocketRepository socketRepository;
     @Autowired
     protected OwnerApplicationRepository ownerApplicationRepository;
     @Autowired
@@ -89,11 +89,11 @@ public abstract class AbstractCamelProcessor implements Processor {
     @Autowired
     protected ExecutorService executorService;
     @Autowired
-    protected FacetService facetService;
+    protected SocketService socketService;
 
-    protected void sendMessageToOwner(WonMessage message, URI needURI, String fallbackOwnerApplicationId) {
-        Need need = needRepository.findOneByNeedURI(needURI);
-        List<OwnerApplication> ownerApplications = need != null ? need.getAuthorizedApplications()
+    protected void sendMessageToOwner(WonMessage message, URI atomURI, String fallbackOwnerApplicationId) {
+        Atom atom = atomRepository.findOneByAtomURI(atomURI);
+        List<OwnerApplication> ownerApplications = atom != null ? atom.getAuthorizedApplications()
                         : Collections.EMPTY_LIST;
         List<String> ownerApplicationIds = toStringIds(ownerApplications);
         // if no owner application ids are authorized, we use the fallback specified (if
@@ -125,11 +125,11 @@ public abstract class AbstractCamelProcessor implements Processor {
     protected void sendMessageToNode(WonMessage message) {
         Map headerMap = new HashMap<String, Object>();
         headerMap.put(WonCamelConstants.MESSAGE_HEADER, message);
-        messagingService.sendInOnlyMessage(null, headerMap, null, "seda:NeedProtocolOut");
+        messagingService.sendInOnlyMessage(null, headerMap, null, "seda:AtomProtocolOut");
     }
 
     /**
-     * Processes the system message (allowing facet implementations) and delivers
+     * Processes the system message (allowing socket implementations) and delivers
      * it, depending on its receiver settings.
      *
      * @param message
@@ -141,7 +141,7 @@ public abstract class AbstractCamelProcessor implements Processor {
     }
 
     /**
-     * Sends a system message to the owner without facet processing. Useful for
+     * Sends a system message to the owner without socket processing. Useful for
      * Response messages.
      * 
      * @param message
@@ -151,11 +151,11 @@ public abstract class AbstractCamelProcessor implements Processor {
     }
 
     /**
-     * Sends a system message to the owner without facet processing. Useful for
+     * Sends a system message to the owner without socket processing. Useful for
      * Response messages. Allows for adding the ownerApplicationId to the exchange
      * used during creation and sending of the system message. This is useful for
      * cases in which the owner application cannot determined otherwise, which can
-     * happen when need creation fails. If that value is non-null, it is set as the
+     * happen when atom creation fails. If that value is non-null, it is set as the
      * 'ownerApplicationId' header, which is used in
      * AbstractCamelProcessor#sendMessageToOwner(..) as a fallback to determine the
      * recipients of the message to be sent.
@@ -180,21 +180,23 @@ public abstract class AbstractCamelProcessor implements Processor {
         return ownerApplicationIds;
     }
 
-    protected void failForIncompatibleFacets(URI facetURI, URI facetTypeURI, URI remoteFacetURI)
-                    throws IncompatibleFacetTypesException {
-        Optional<URI> remoteFacetType = WonLinkedDataUtils.getTypeOfFacet(remoteFacetURI, linkedDataSource);
-        if (!remoteFacetType.isPresent()) {
-            throw new IllegalStateException("Could not determine type of remote facet " + remoteFacetURI);
+    protected void failForIncompatibleSockets(URI socketURI, URI socketTypeURI, URI targetSocketURI)
+                    throws IncompatibleSocketTypesException {
+        Optional<URI> targetSocketType = WonLinkedDataUtils.getTypeOfSocket(targetSocketURI, linkedDataSource);
+        if (!targetSocketType.isPresent()) {
+            throw new IllegalStateException("Could not determine type of remote socket " + targetSocketURI);
         }
-        if (!facetService.isConnectionAllowedToType(facetTypeURI, remoteFacetType.get())) {
-            throw new IncompatibleFacetTypesException(facetURI, facetTypeURI, remoteFacetURI, remoteFacetType.get());
+        if (!socketService.isConnectionAllowedToType(socketTypeURI, targetSocketType.get())) {
+            throw new IncompatibleSocketTypesException(socketURI, socketTypeURI, targetSocketURI,
+                            targetSocketType.get());
         }
     }
 
-    protected void failIfIsNotFacetOfNeed(Optional<URI> facetURI, Optional<URI> needURI) {
-        if (facetURI.isPresent() && needURI.isPresent()
-                        && !facetURI.get().toString().startsWith(needURI.get().toString())) {
-            throw new IllegalArgumentException("User-defined facet " + facetURI + " is not a facet of need " + needURI);
+    protected void failIfIsNotSocketOfAtom(Optional<URI> socketURI, Optional<URI> atomURI) {
+        if (socketURI.isPresent() && atomURI.isPresent()
+                        && !socketURI.get().toString().startsWith(atomURI.get().toString())) {
+            throw new IllegalArgumentException(
+                            "User-defined socket " + socketURI + " is not a socket of atom " + atomURI);
         }
     }
 }

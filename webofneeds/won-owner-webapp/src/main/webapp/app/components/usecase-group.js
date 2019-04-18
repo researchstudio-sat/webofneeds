@@ -110,7 +110,7 @@ function genComponentConf() {
   };
 }
 
-export default //.controller('CreateNeedController', [...serviceDependencies, CreateNeedController])
+export default //.controller('CreateAtomController', [...serviceDependencies, CreateAtomController])
 angular
   .module("won.owner.components.usecaseGroup", [ngAnimate, labelledHrModule])
   .directive("wonUsecaseGroup", genComponentConf).name;

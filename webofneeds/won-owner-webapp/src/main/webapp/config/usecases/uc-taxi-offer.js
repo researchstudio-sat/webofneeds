@@ -37,7 +37,7 @@ export const taxiOffer = {
           xsd: won.defaultContext["xsd"],
         },
         operations: [
-          `${resultName} a won:Need.`,
+          `${resultName} a won:Atom.`,
           `${resultName} a won:PersonalTransportSearch.`,
           `${resultName} won:seeks ?seeks.`,
           "?seeks won:travelAction/s:fromLocation ?fromLocation.",
@@ -74,7 +74,7 @@ export const taxiOffer = {
           won: won.defaultContext["won"],
         },
         operations: [
-          `${resultName} a won:Need.`,
+          `${resultName} a won:Atom.`,
           `${resultName} a won:PersonalTransportSearch.`,
         ],
       };

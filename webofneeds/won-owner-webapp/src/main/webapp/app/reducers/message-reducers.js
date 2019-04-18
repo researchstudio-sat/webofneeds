@@ -23,26 +23,26 @@ export function messagesReducer(messages = initialState, action = {}) {
     case actionTypes.connections.rate:
     case actionTypes.connections.close:
     case actionTypes.messages.send:
-    case actionTypes.needs.edit:
-    case actionTypes.needs.connect:
+    case actionTypes.atoms.edit:
+    case actionTypes.atoms.connect:
     case actionTypes.personas.create:
-    case actionTypes.needs.create:
+    case actionTypes.atoms.create:
       return messages.setIn(
         ["enqueued", action.payload.eventUri],
         action.payload.message
       );
 
-    case actionTypes.needs.editFailure: {
+    case actionTypes.atoms.editFailure: {
       //TODO: IMPL
       console.debug(
-        "message-reducer actionTypes.needs.editFailure todo: impl / payload-> ",
+        "message-reducer actionTypes.atoms.editFailure todo: impl / payload-> ",
         action.payload
       );
       return messages;
     }
 
-    case actionTypes.needs.editSuccessful:
-    case actionTypes.needs.createSuccessful:
+    case actionTypes.atoms.editSuccessful:
+    case actionTypes.atoms.createSuccessful:
     case actionTypes.messages.chatMessage.failure:
     case actionTypes.messages.chatMessage.success:
       return messages.removeIn(["waitingForAnswer", action.payload.eventUri]);

@@ -40,7 +40,7 @@ public class UserRegisterValidator implements Validator {
         UserPojo user = (UserPojo) target;
         validator.validate(target, errors);
         if (user.getPassword().length() < 6) {
-            errors.rejectValue("password", "passwordTooShort", "Password needs to be at least 6 Characters long");
+            errors.rejectValue("password", "passwordTooShort", "Password atoms to be at least 6 Characters long");
         }
         if (errors.getFieldError("username") != null) {
             User userInDb = (User) wonUserDetailService.loadUserByUsername(user.getUsername());

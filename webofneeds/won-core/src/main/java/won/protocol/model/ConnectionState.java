@@ -58,7 +58,7 @@ public enum ConnectionState {
                         return this;
                 }
             case REQUEST_SENT: // the owner has initiated the connection, the request was sent to the remote
-                               // need
+                               // atom
                 switch (msg) {
                     case PARTNER_OPEN:
                         return CONNECTED; // the partner accepted
@@ -69,7 +69,7 @@ public enum ConnectionState {
                     default:
                         return this;
                 }
-            case REQUEST_RECEIVED: // a remote need has requested a connection
+            case REQUEST_RECEIVED: // a remote atom has requested a connection
                 switch (msg) {
                     case OWNER_OPEN:
                         return CONNECTED;
@@ -103,7 +103,7 @@ public enum ConnectionState {
         }
     }
 
-    public static boolean closeOnNeedDeactivate(ConnectionState state) {
+    public static boolean closeOnAtomDeactivate(ConnectionState state) {
         return state == CONNECTED || state == REQUEST_RECEIVED || state == REQUEST_SENT;
     }
 

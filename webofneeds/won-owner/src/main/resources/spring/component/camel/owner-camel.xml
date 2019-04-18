@@ -18,7 +18,7 @@
         </camel:packageScan>
         <camel:template id="producerTemplate" defaultEndpoint="direct:OUTMSG1"/>
         <camel:endpoint id="outgoingMessages" uri="seda:OUTMSG"/>
-        <camel:endpoint id="needMessageQueue" uri="activemq:WON.MSG" pattern="InOut"></camel:endpoint>
+        <camel:endpoint id="atomMessageQueue" uri="activemq:WON.MSG" pattern="InOut"></camel:endpoint>
     </camel:camelContext>
 
 
@@ -29,7 +29,7 @@
     <context:component-scan base-package="won.protocol.exception"/>
     <context:component-scan base-package="won.protocol.matcher"/>
     <context:component-scan base-package="won.protocol.model"/>
-    <context:component-scan base-package="won.protocol.need"/>
+    <context:component-scan base-package="won.protocol.atom"/>
     <context:component-scan base-package="won.protocol.owner"/>
     <context:component-scan base-package="won.protocol.repository"/>
     <context:component-scan base-package="won.protocol.service"/>
@@ -63,15 +63,15 @@
 
     <!-- processor for signing messages -->
     <bean id="signatureAddingProcessor" class="won.protocol.message.processor.impl.SignatureAddingWonMessageProcessor">
-        <property name="cryptographyService" ref="CryptographyServiceOnBehalfOfNeed"/>
+        <property name="cryptographyService" ref="CryptographyServiceOnBehalfOfAtom"/>
         <property name="keyPairAliasDerivationStrategy" ref="keyPairAliasDerivationStrategy" />
     </bean>
     <bean name="signatureAdder" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
         <constructor-arg ref="signatureAddingProcessor"/>
     </bean>
-    <!-- processor for generating and adding keys for just created needs -->
-    <bean name="needKeyGeneratorAndAdder" class="won.protocol.message.processor.impl.KeyForNewNeedAddingProcessor">
-        <property name="cryptographyService" ref="CryptographyServiceOnBehalfOfNeed"/>
+    <!-- processor for generating and adding keys for just created atoms -->
+    <bean name="atomKeyGeneratorAndAdder" class="won.protocol.message.processor.impl.KeyForNewAtomAddingProcessor">
+        <property name="cryptographyService" ref="CryptographyServiceOnBehalfOfAtom"/>
         <property name="keyPairAliasDerivationStrategy" ref="keyPairAliasDerivationStrategy" />
     </bean>
 
@@ -84,7 +84,7 @@
           class="won.owner.protocol.message.LinkedDataCacheInvalidator">
         <!--property name="wonUserDetailService" ref="wonUserDetailService" /-->
         <property name="linkedDataSource" ref="linkedDataSource"/>
-        <property name="linkedDataSourceOnBehalfOfNeed" ref="linkedDataSourceOnBehalfOfNeed" />
+        <property name="linkedDataSourceOnBehalfOfAtom" ref="linkedDataSourceOnBehalfOfAtom" />
     </bean>
      <!-- necessary when linked data source is a caching data source -->
     <bean name="linkedDataCacheUpdater"
@@ -93,7 +93,7 @@
     </bean>
     <bean name="ldCacheUpdatingProcessor"
           class="won.owner.protocol.message.LinkedDataCacheUpdater">
-        <property name="linkedDataSourceOnBehalfOfNeed" ref="linkedDataSourceOnBehalfOfNeed" />
+        <property name="linkedDataSourceOnBehalfOfAtom" ref="linkedDataSourceOnBehalfOfAtom" />
     </bean>
 
 </beans>

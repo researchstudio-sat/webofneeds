@@ -35,7 +35,7 @@ public class SigningFrameworkTest {
     };
     private static final String SIGNING_FW_TEST_1_FILE_SIGNED = "/example_01-signed.trig";
     private static final String RESOURCE_FILE = "/test_12_content_cupboard_45_45_15.ttl";
-    private static final String RESOURCE_URI = "http://www.example.com/resource/need/12";
+    private static final String RESOURCE_URI = "http://www.example.com/resource/atom/12";
 
     // read write from signingframework by signingframework produces orig input?
     // yes

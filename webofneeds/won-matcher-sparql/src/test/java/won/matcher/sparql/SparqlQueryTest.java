@@ -57,7 +57,7 @@ public class SparqlQueryTest {
     @Ignore // useful for trying things out, does not make so much sense as a unit test
     public void testQuery() throws Exception {
         Dataset dataset = DatasetFactory.create();
-        RDFDataMgr.read(dataset, getResourceAsStream("sparqlquerytest/need2.trig"), Lang.TRIG);
+        RDFDataMgr.read(dataset, getResourceAsStream("sparqlquerytest/atom2.trig"), Lang.TRIG);
         String queryString = getResourceAsString("sparqlquerytest/jobquery-orig.rq");
         Query query = QueryFactory.create(queryString);
         Op queryOp = Algebra.compile(query);
@@ -73,14 +73,14 @@ public class SparqlQueryTest {
         try (QueryExecution execution = QueryExecutionFactory.create(query, dataset)) {
             execution.getContext().set(TDB.symUnionDefaultGraph, true);
             ResultSet result = execution.execSelect();
-            Set<String> resultNeeds = new HashSet<>();
+            Set<String> resultAtoms = new HashSet<>();
             while (result.hasNext()) {
                 QuerySolution solution = result.next();
                 System.out.println("solution:" + solution);
-                String foundNeedURI = solution.get("result").toString();
-                resultNeeds.add(foundNeedURI);
+                String foundAtomURI = solution.get("result").toString();
+                resultAtoms.add(foundAtomURI);
             }
-            System.out.println(resultNeeds);
+            System.out.println(resultAtoms);
         }
     }
 

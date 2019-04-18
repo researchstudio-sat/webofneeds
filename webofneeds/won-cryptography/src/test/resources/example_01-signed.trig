@@ -2,13 +2,13 @@
 @prefix signature: <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#> .
 signature:sigGraph1 {
 	_:gsm-1 signature:hasDigestMethod signature:dm-sha-256 .
-	_:gsm-1 signature:hasGraphCanonicalizationMethod signature:gcm-fisteus-2010 .
-	_:gsm-1 signature:hasGraphDigestMethod signature:gdm-fisteus-2010 .
-	_:gsm-1 signature:hasGraphSerializationMethod signature:gsm-trig .
+	_:gsm-1 signature:graphCanonicalizationMethod signature:gcm-fisteus-2010 .
+	_:gsm-1 signature:graphDigestMethod signature:gdm-fisteus-2010 .
+	_:gsm-1 signature:graphSerializationMethod signature:gsm-trig .
 	_:gsm-1 signature:hasSignatureMethod signature:sm-rsa .
 	_:gsm-1 a signature:GraphSigningMethod .
 	_:sig-1 signature:hasGraphSigningMethod _:gsm-1 .
-	_:sig-1 signature:hasSignatureValue "cLqKJeYcOXom+C5CthXcwXL3xAGG0H0kujNa/Z4djSZGOr7VAO0GzQGHJ6s8YfePQ43Whol0aRw27JZAsHNKd9EtE1kfNCaVayc6hMr4U5hp5rUIQyJ2Mj/4D3Xtn0XrOJ2wvVoja9g9xEqcw2CeeNo0+lBpR+Chjst59u7FIHflaq3nM26l5iYp03aherbchiQVxEC9zhVYx2ytW+ZvQABG/vq67BCwvPQfSntzePXEd0tJpEz/VDjTPoXwN1Vq9gDVeJdAaBLHAQVxUo4FQEfE/1KOM/MVOLECVHGjbhNX3LTk/8w+iN6AW1H0Iz7thBzMIEFppW/XuE6Y6Xs0cg==" .
+	_:sig-1 signature:signatureValue "cLqKJeYcOXom+C5CthXcwXL3xAGG0H0kujNa/Z4djSZGOr7VAO0GzQGHJ6s8YfePQ43Whol0aRw27JZAsHNKd9EtE1kfNCaVayc6hMr4U5hp5rUIQyJ2Mj/4D3Xtn0XrOJ2wvVoja9g9xEqcw2CeeNo0+lBpR+Chjst59u7FIHflaq3nM26l5iYp03aherbchiQVxEC9zhVYx2ytW+ZvQABG/vq67BCwvPQfSntzePXEd0tJpEz/VDjTPoXwN1Vq9gDVeJdAaBLHAQVxUo4FQEfE/1KOM/MVOLECVHGjbhNX3LTk/8w+iN6AW1H0Iz7thBzMIEFppW/XuE6Y6Xs0cg==" .
 	_:sig-1 signature:hasVerificationCertificate "cert" .
 	_:sig-1 a signature:Signature .
 	eg:subject4 eg:predicateD "crazy literal \" \\ bla \" '  ' \"" .

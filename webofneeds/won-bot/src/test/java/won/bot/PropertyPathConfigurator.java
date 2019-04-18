@@ -25,12 +25,12 @@ import won.protocol.vocabulary.WON;
 public class PropertyPathConfigurator {
     public static List<Path> configurePropertyPaths() {
         List<Path> propertyPaths = new ArrayList<>();
-        addPropertyPath(propertyPaths, "<" + WON.HAS_CONNECTIONS + ">");
-        addPropertyPath(propertyPaths, "<" + WON.HAS_CONNECTIONS + ">" + "/" + "rdfs:member");
+        addPropertyPath(propertyPaths, "<" + WON.connections + ">");
+        addPropertyPath(propertyPaths, "<" + WON.connections + ">" + "/" + "rdfs:member");
         addPropertyPath(propertyPaths,
-                        "<" + WON.HAS_CONNECTIONS + ">" + "/" + "rdfs:member" + "/<" + WON.HAS_REMOTE_CONNECTION + ">");
-        addPropertyPath(propertyPaths, "<" + WON.HAS_CONNECTIONS + ">" + "/" + "rdfs:member" + "/<"
-                        + WON.HAS_REMOTE_CONNECTION + ">/<" + WON.BELONGS_TO_NEED + ">");
+                        "<" + WON.connections + ">" + "/" + "rdfs:member" + "/<" + WON.targetConnection + ">");
+        addPropertyPath(propertyPaths, "<" + WON.connections + ">" + "/" + "rdfs:member" + "/<" + WON.targetConnection
+                        + ">/<" + WON.sourceAtom + ">");
         return propertyPaths;
     }
 

@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import won.protocol.model.Coordinate;
-import won.protocol.util.NeedModelWrapper;
+import won.protocol.util.AtomModelWrapper;
 import won.utils.goals.GoalInstantiationProducer;
 import won.utils.goals.GoalInstantiationResult;
 
@@ -44,28 +44,28 @@ public class GoalInstantiationTest {
 
     @Test
     public void example1_allInfoInTwoGoals() throws IOException {
-        Dataset need1 = loadDataset(baseFolder + "ex1_need.trig");
-        Dataset need2 = loadDataset(baseFolder + "ex1_need_debug.trig");
+        Dataset atom1 = loadDataset(baseFolder + "ex1_atom.trig");
+        Dataset atom2 = loadDataset(baseFolder + "ex1_atom_debug.trig");
         Dataset conversation = loadDataset(baseFolder + "ex1_conversation.trig");
-        GoalInstantiationProducer goalInstantiation = new GoalInstantiationProducer(need1, need2, conversation,
+        GoalInstantiationProducer goalInstantiation = new GoalInstantiationProducer(atom1, atom2, conversation,
                         "http://example.org/", "http://example.org/blended/");
         Collection<GoalInstantiationResult> results = goalInstantiation.createAllGoalCombinationInstantiationResults();
         // instantiation of combined goals must be conform
         Assert.assertEquals(1, results.size());
         System.out.println(results.iterator().next().toString());
         Assert.assertTrue(results.iterator().next().isConform());
-        // instantiation of goal of need1 fails cause driver is missing
-        NeedModelWrapper needWrapper1 = new NeedModelWrapper(need1);
-        Resource goal = needWrapper1.getGoals().iterator().next();
+        // instantiation of goal of atom1 fails cause driver is missing
+        AtomModelWrapper atomWrapper1 = new AtomModelWrapper(atom1);
+        Resource goal = atomWrapper1.getGoals().iterator().next();
         GoalInstantiationResult result = goalInstantiation.findInstantiationForGoal(goal);
         System.out.println(result.toString());
         Assert.assertFalse(result.isConform());
         Assert.assertEquals("hasDriver", result.getShaclReportWrapper().getValidationResults().iterator().next()
                         .getResultPath().getLocalName());
-        // instantiation of goal of need2 fails cause 3 attributes are missing:
+        // instantiation of goal of atom2 fails cause 3 attributes are missing:
         // location, time, client
-        NeedModelWrapper needWrapper2 = new NeedModelWrapper(need2);
-        goal = needWrapper2.getGoals().iterator().next();
+        AtomModelWrapper atomWrapper2 = new AtomModelWrapper(atom2);
+        goal = atomWrapper2.getGoals().iterator().next();
         result = goalInstantiation.findInstantiationForGoal(goal);
         System.out.println(result.toString());
         Assert.assertFalse(result.isConform());
@@ -74,13 +74,13 @@ public class GoalInstantiationTest {
 
     @Test
     public void example2_allInfoInTwoGoalsAndMessage() throws IOException {
-        Dataset need1 = loadDataset(baseFolder + "ex2_need.trig");
-        Dataset need2 = loadDataset(baseFolder + "ex2_need_debug.trig");
+        Dataset atom1 = loadDataset(baseFolder + "ex2_atom.trig");
+        Dataset atom2 = loadDataset(baseFolder + "ex2_atom_debug.trig");
         Dataset conversationWithoutPickupTime = loadDataset(baseFolder + "ex1_conversation.trig");
         Dataset conversationWithPickupTime = loadDataset(baseFolder + "ex2_conversation.trig");
         // this conversation doas not contain the missing pickup time info so the goals
         // cannot be fulfilled
-        GoalInstantiationProducer goalInstantiation = new GoalInstantiationProducer(need1, need2,
+        GoalInstantiationProducer goalInstantiation = new GoalInstantiationProducer(atom1, atom2,
                         conversationWithoutPickupTime, "http://example.org/", "http://example.org/blended/");
         Collection<GoalInstantiationResult> results = goalInstantiation.createAllGoalCombinationInstantiationResults();
         Assert.assertEquals(1, results.size());
@@ -88,24 +88,24 @@ public class GoalInstantiationTest {
         Assert.assertFalse(results.iterator().next().isConform());
         // this conversation contains the missing pickup info so the goals can be
         // fulfilled
-        goalInstantiation = new GoalInstantiationProducer(need1, need2, conversationWithPickupTime,
+        goalInstantiation = new GoalInstantiationProducer(atom1, atom2, conversationWithPickupTime,
                         "http://example.org/", "http://example.org/blended/");
         results = goalInstantiation.createAllGoalCombinationInstantiationResults();
         Assert.assertEquals(1, results.size());
         System.out.println(results.iterator().next().toString());
         Assert.assertTrue(results.iterator().next().isConform());
-        // instantiation of goal of need1 fails cause driver is missing
-        NeedModelWrapper needWrapper1 = new NeedModelWrapper(need1);
-        Resource goal = needWrapper1.getGoals().iterator().next();
+        // instantiation of goal of atom1 fails cause driver is missing
+        AtomModelWrapper atomWrapper1 = new AtomModelWrapper(atom1);
+        Resource goal = atomWrapper1.getGoals().iterator().next();
         GoalInstantiationResult result = goalInstantiation.findInstantiationForGoal(goal);
         System.out.println(result.toString());
         Assert.assertFalse(result.isConform());
         Assert.assertEquals("hasDriver", result.getShaclReportWrapper().getValidationResults().iterator().next()
                         .getResultPath().getLocalName());
-        // instantiation of goal of need2 fails cause 3 attributes are missing:
+        // instantiation of goal of atom2 fails cause 3 attributes are missing:
         // location, time, client
-        NeedModelWrapper needWrapper2 = new NeedModelWrapper(need2);
-        goal = needWrapper2.getGoals().iterator().next();
+        AtomModelWrapper atomWrapper2 = new AtomModelWrapper(atom2);
+        goal = atomWrapper2.getGoals().iterator().next();
         result = goalInstantiation.findInstantiationForGoal(goal);
         System.out.println(result.toString());
         Assert.assertFalse(result.isConform());
@@ -114,10 +114,10 @@ public class GoalInstantiationTest {
 
     @Test
     public void example3_multipleGoalsFulfilled() throws IOException {
-        Dataset need1 = loadDataset(baseFolder + "ex3_need.trig");
-        Dataset need2 = loadDataset(baseFolder + "ex3_need_debug.trig");
+        Dataset atom1 = loadDataset(baseFolder + "ex3_atom.trig");
+        Dataset atom2 = loadDataset(baseFolder + "ex3_atom_debug.trig");
         Dataset conversation = loadDataset(baseFolder + "ex3_conversation.trig");
-        GoalInstantiationProducer goalInstantiation = new GoalInstantiationProducer(need1, need2, conversation,
+        GoalInstantiationProducer goalInstantiation = new GoalInstantiationProducer(atom1, atom2, conversation,
                         "http://example.org/", "http://example.org/blended/");
         Collection<GoalInstantiationResult> results = goalInstantiation.createAllGoalCombinationInstantiationResults();
         // We have 4 and 2 goals so we expected 8 results
@@ -137,10 +137,10 @@ public class GoalInstantiationTest {
 
     @Test
     public void example4_geoCoordinatesFulfilled() throws IOException {
-        Dataset need1 = loadDataset(baseFolder + "ex4_need.trig");
-        Dataset need2 = loadDataset(baseFolder + "ex4_need_debug.trig");
+        Dataset atom1 = loadDataset(baseFolder + "ex4_atom.trig");
+        Dataset atom2 = loadDataset(baseFolder + "ex4_atom_debug.trig");
         Dataset conversation = loadDataset(baseFolder + "ex4_conversation.trig");
-        GoalInstantiationProducer goalInstantiation = new GoalInstantiationProducer(need1, need2, conversation,
+        GoalInstantiationProducer goalInstantiation = new GoalInstantiationProducer(atom1, atom2, conversation,
                         "http://example.org/", "http://example.org/blended/");
         Collection<GoalInstantiationResult> results = goalInstantiation.createAllGoalCombinationInstantiationResults();
         // We have only one goal on each side so we expect only one result
@@ -160,20 +160,20 @@ public class GoalInstantiationTest {
 
     @Test
     public void example5_singleGoalsValidity() throws IOException {
-        // check that the goals from each need can be validated successfully without
+        // check that the goals from each atom can be validated successfully without
         // each other
-        Dataset need1 = loadDataset(baseFolder + "ex5_need.trig");
-        Dataset need2 = loadDataset(baseFolder + "ex5_need_debug.trig");
+        Dataset atom1 = loadDataset(baseFolder + "ex5_atom.trig");
+        Dataset atom2 = loadDataset(baseFolder + "ex5_atom_debug.trig");
         Dataset conversation = loadDataset(baseFolder + "ex5_conversation.trig");
-        GoalInstantiationProducer goalInstantiation = new GoalInstantiationProducer(need1, need2, conversation,
+        GoalInstantiationProducer goalInstantiation = new GoalInstantiationProducer(atom1, atom2, conversation,
                         "http://example.org/", "http://example.org/blended/");
         Collection<GoalInstantiationResult> results = goalInstantiation.createAllGoalCombinationInstantiationResults();
-        NeedModelWrapper needWrapper1 = new NeedModelWrapper(need1);
-        Resource goal = needWrapper1.getGoals().iterator().next();
+        AtomModelWrapper atomWrapper1 = new AtomModelWrapper(atom1);
+        Resource goal = atomWrapper1.getGoals().iterator().next();
         GoalInstantiationResult result = goalInstantiation.findInstantiationForGoal(goal);
         Assert.assertTrue(result.isConform());
-        NeedModelWrapper needWrapper2 = new NeedModelWrapper(need2);
-        goal = needWrapper1.getGoals().iterator().next();
+        AtomModelWrapper atomWrapper2 = new AtomModelWrapper(atom2);
+        goal = atomWrapper1.getGoals().iterator().next();
         result = goalInstantiation.findInstantiationForGoal(goal);
         Assert.assertTrue(result.isConform());
     }
@@ -196,7 +196,7 @@ public class GoalInstantiationTest {
         Dataset taxiDemand = loadDataset(baseFolder + "exCorrect_taxi.trig");
         GoalInstantiationProducer goalInstantiation = new GoalInstantiationProducer(taxiOffer, taxiDemand, null,
                         "http://example.org/", "http://example.org/blended/");
-        Collection<GoalInstantiationResult> results = goalInstantiation.createGoalInstantiationResultsForNeed1();
+        Collection<GoalInstantiationResult> results = goalInstantiation.createGoalInstantiationResultsForAtom1();
         for (GoalInstantiationResult res : results) {
             System.out.println("Result::::::::::::::::::::::::::::::" + res.isConform());
             System.out.println(res.toString());
@@ -217,8 +217,8 @@ public class GoalInstantiationTest {
                 // Assert.assertEquals(destinationAddress, new Coordinate(12.0f, 13.0f));
             }
         }
-        NeedModelWrapper needWrapper1 = new NeedModelWrapper(taxiOffer);
-        Resource goal = needWrapper1.getGoals().iterator().next();
+        AtomModelWrapper atomWrapper1 = new AtomModelWrapper(taxiOffer);
+        Resource goal = atomWrapper1.getGoals().iterator().next();
         GoalInstantiationResult result = goalInstantiation.findInstantiationForGoal(goal);
         Assert.assertTrue(result.isConform());
         GoalInstantiationResult recheckResultModel = GoalInstantiationProducer
@@ -234,7 +234,7 @@ public class GoalInstantiationTest {
         Dataset taxiDemandTwoLoc = loadDataset(baseFolder + "ex6_taxi_twoloc.trig");
         GoalInstantiationProducer goalInstantiation = new GoalInstantiationProducer(taxiOffer, taxiDemand, null,
                         "http://example.org/", "http://example.org/blended/");
-        Collection<GoalInstantiationResult> results = goalInstantiation.createGoalInstantiationResultsForNeed1();
+        Collection<GoalInstantiationResult> results = goalInstantiation.createGoalInstantiationResultsForAtom1();
         for (GoalInstantiationResult res : results) {
             System.out.println("Result::::::::::::::::::::::::::::::" + res.isConform());
             System.out.println(res.toString());
@@ -249,8 +249,8 @@ public class GoalInstantiationTest {
                 Assert.assertEquals(new Coordinate(12.0f, 13.0f), destinationAddress);
             }
         }
-        NeedModelWrapper needWrapper1 = new NeedModelWrapper(taxiOffer);
-        Resource goal = needWrapper1.getGoals().iterator().next();
+        AtomModelWrapper atomWrapper1 = new AtomModelWrapper(taxiOffer);
+        Resource goal = atomWrapper1.getGoals().iterator().next();
         GoalInstantiationResult result = goalInstantiation.findInstantiationForGoal(goal);
         Assert.assertTrue(result.isConform());
         GoalInstantiationResult recheckResultModel = GoalInstantiationProducer
@@ -258,13 +258,13 @@ public class GoalInstantiationTest {
         Assert.assertTrue(recheckResultModel.isConform());
         goalInstantiation = new GoalInstantiationProducer(taxiOffer, taxiDemandNoLoc, null, "http://example.org/",
                         "http://example.org/blended/");
-        results = goalInstantiation.createGoalInstantiationResultsForNeed1();
+        results = goalInstantiation.createGoalInstantiationResultsForAtom1();
         for (GoalInstantiationResult res : results) {
             Assert.assertFalse(res.isConform());
         }
         goalInstantiation = new GoalInstantiationProducer(taxiOffer, taxiDemandTwoLoc, null, "http://example.org/",
                         "http://example.org/blended/");
-        results = goalInstantiation.createGoalInstantiationResultsForNeed1();
+        results = goalInstantiation.createGoalInstantiationResultsForAtom1();
         for (GoalInstantiationResult res : results) {
             Assert.assertFalse(res.isConform());
         }
@@ -276,7 +276,7 @@ public class GoalInstantiationTest {
         Dataset taxiDemand = loadDataset(baseFolder + "ex7_taxi.trig");
         GoalInstantiationProducer goalInstantiation = new GoalInstantiationProducer(taxiOffer, taxiDemand, null,
                         "http://example.org/", "http://example.org/blended/");
-        Collection<GoalInstantiationResult> results = goalInstantiation.createGoalInstantiationResultsForNeed1();
+        Collection<GoalInstantiationResult> results = goalInstantiation.createGoalInstantiationResultsForAtom1();
         for (GoalInstantiationResult res : results) {
             res.getInstanceModel().write(System.out, "TRIG");
             Assert.assertTrue(res.isConform());
@@ -289,8 +289,8 @@ public class GoalInstantiationTest {
             Assert.assertEquals(departureAddress, new Coordinate(48.218727f, 16.360141f));
             Assert.assertEquals(destinationAddress, new Coordinate(48.218828f, 16.360241f));
         }
-        NeedModelWrapper needWrapper1 = new NeedModelWrapper(taxiOffer);
-        Resource goal = needWrapper1.getGoals().iterator().next();
+        AtomModelWrapper atomWrapper1 = new AtomModelWrapper(taxiOffer);
+        Resource goal = atomWrapper1.getGoals().iterator().next();
         GoalInstantiationResult result = goalInstantiation.findInstantiationForGoal(goal);
         Assert.assertTrue(result.isConform());
         GoalInstantiationResult recheckResultModel = GoalInstantiationProducer

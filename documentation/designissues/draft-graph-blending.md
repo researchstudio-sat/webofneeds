@@ -34,7 +34,7 @@ variable nodes are present in either graph.
 
 It is currently unclear how the constant/variable/unblendable property 
 should be expressed. My intuition is that in most practical use cases, 
-most nodes need to be unblendable (ontology/TBox resources, properties 
+most nodes atom to be unblendable (ontology/TBox resources, properties 
 in general), therefore it would be more economical to assume nodes to be 
 unblendable by default. Then, variable/constant nodes have to be 
 annotated as such explicitly.

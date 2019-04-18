@@ -1,43 +1,43 @@
  <https://satvm05.researchstudio.at/won/resource/event/n3j4mhrrypppoymsa5xp#envelope-s7ns> {
     <https://satvm05.researchstudio.at/won/resource/event/n3j4mhrrypppoymsa5xp>
-            a       <http://purl.org/webofneeds/message#FromSystem> ;
-            <http://purl.org/webofneeds/message#hasContent>
+            a       <https://w3id.org/won/message#FromSystem> ;
+            <https://w3id.org/won/message#content>
                     <https://satvm05.researchstudio.at/won/resource/event/n3j4mhrrypppoymsa5xp#content-vybl> ;
-            <http://purl.org/webofneeds/message#hasMessageType>
-                    <http://purl.org/webofneeds/message#FailureResponse> ;
-            <http://purl.org/webofneeds/message#hasReceivedTimestamp>
+            <https://w3id.org/won/message#messageType>
+                    <https://w3id.org/won/message#FailureResponse> ;
+            <https://w3id.org/won/message#receivedTimestamp>
                     "1537253096017"^^<http://www.w3.org/2001/XMLSchema#long> ;
-            <http://purl.org/webofneeds/message#hasReceiverNeed>
-                    <https://satvm05.researchstudio.at/won/resource/need/fw1tqsz1grkz> ;
-            <http://purl.org/webofneeds/message#hasReceiverNode>
+            <https://w3id.org/won/message#recipientAtom>
+                    <https://satvm05.researchstudio.at/won/resource/atom/fw1tqsz1grkz> ;
+            <https://w3id.org/won/message#recipientNode>
                     <https://satvm05.researchstudio.at/won/resource> ;
-            <http://purl.org/webofneeds/message#hasSenderNeed>
-                    <https://satvm05.researchstudio.at/won/resource/need/fw1tqsz1grkz> ;
-            <http://purl.org/webofneeds/message#hasSenderNode>
+            <https://w3id.org/won/message#senderAtom>
+                    <https://satvm05.researchstudio.at/won/resource/atom/fw1tqsz1grkz> ;
+            <https://w3id.org/won/message#senderNode>
                     <https://satvm05.researchstudio.at/won/resource> ;
-            <http://purl.org/webofneeds/message#isResponseTo>
+            <https://w3id.org/won/message#isResponseTo>
                     <https://satvm05.researchstudio.at/won/resource/event/wh698cvrukwu> ;
-            <http://purl.org/webofneeds/message#isResponseToMessageType>
-                    <http://purl.org/webofneeds/message#CreateMessage> ;
-            <http://purl.org/webofneeds/message#protocolVersion>
+            <https://w3id.org/won/message#isResponseToMessageType>
+                    <https://w3id.org/won/message#CreateMessage> ;
+            <https://w3id.org/won/message#protocolVersion>
                     "1.0" .
 
     <https://satvm05.researchstudio.at/won/resource/event/n3j4mhrrypppoymsa5xp#content-vybl-sig>
             a       <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature> ;
-            <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#hasSignatureValue>
+            <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#signatureValue>
                     "MGQCMD3CKWuW5ff5i8ql0J6EGdL90hcLxxbdsYyN0KcuPqWVRHkBzq2pHr39GsCa2V+Z4gIwQx+v4Car6TH4AGfWBkEEXedMewak9JvTHVow75LWB5WqX2aP5FlXFbGYf3E3qtSH" ;
             <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#hasVerificationCertificate>
                     <https://satvm05.researchstudio.at/won/resource> ;
-            <http://purl.org/webofneeds/message#hasHash>
+            <https://w3id.org/won/message#hash>
                     "CmQy9dD0cdqcsHTu1IgVMQXQmWLCRqnzFn90Ab4EAt2bw68vwLPnx8mD9o3nvxGpgrUHLTv6AglLGyCEdc9QNg==" ;
-            <http://purl.org/webofneeds/message#hasPublicKeyFingerprint>
+            <https://w3id.org/won/message#publicKeyFingerprint>
                     "FZGJ+/2woeEfpN0PRvaeKMhC9D5PXEzKB4AXXq85ftI=" ;
-            <http://purl.org/webofneeds/message#hasSignedGraph>
+            <https://w3id.org/won/message#signedGraph>
                     <https://satvm05.researchstudio.at/won/resource/event/n3j4mhrrypppoymsa5xp#content-vybl> .
 
     <https://satvm05.researchstudio.at/won/resource/event/n3j4mhrrypppoymsa5xp#envelope-s7ns>
-            a       <http://purl.org/webofneeds/message#EnvelopeGraph> ;
-            <http://purl.org/webofneeds/message#containsSignature>
+            a       <https://w3id.org/won/message#EnvelopeGraph> ;
+            <https://w3id.org/won/message#containsSignature>
                     <https://satvm05.researchstudio.at/won/resource/event/n3j4mhrrypppoymsa5xp#content-vybl-sig> ;
             <http://www.w3.org/2004/03/trix/rdfg-1/subGraphOf>
                     <https://satvm05.researchstudio.at/won/resource/event/n3j4mhrrypppoymsa5xp> .
@@ -45,21 +45,21 @@
 
 <https://satvm05.researchstudio.at/won/resource/event/n3j4mhrrypppoymsa5xp#content-vybl> {
     <https://satvm05.researchstudio.at/won/resource/event/n3j4mhrrypppoymsa5xp>
-            <http://purl.org/webofneeds/model#hasTextMessage>
+            <https://w3id.org/won/core#textMessage>
                     "some failure" .
 }
 
 <https://satvm05.researchstudio.at/won/resource/event/n3j4mhrrypppoymsa5xp#envelope-s7ns-sig> {
     <https://satvm05.researchstudio.at/won/resource/event/n3j4mhrrypppoymsa5xp#envelope-s7ns-sig>
             a       <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature> ;
-            <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#hasSignatureValue>
+            <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#signatureValue>
                     "MGUCMQDMGuWRvYLp0CLG8aL3RG0hNGLTBJA/tkajBUzE1FzNihMruVlDEPWfeYN2P+MeAtoCMGRBPcVtR6rLN26NOQ1zMPkWYuJUjmZ/o72qA2zOiFv5oJKa5fcmJiBVNRNu20lEQg==" ;
             <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#hasVerificationCertificate>
                     <https://satvm05.researchstudio.at/won/resource> ;
-            <http://purl.org/webofneeds/message#hasHash>
+            <https://w3id.org/won/message#hash>
                     "AI+pXoNsFzC00zjsRYRudu5cFd1aIqiWIxyJ69OMz4IDbz6JfhWDr5SH/CJaGIJ5BZMTxR41BEr+7mC5ljmeMMXav2gLJ/AnIro4vi7uQWb9cV0cjFJkBB5I58OCm2gp3ZX/FG7UENIqMEMVDrf1OLcPRLFRSXuN/z/IEAb9gY8Z" ;
-            <http://purl.org/webofneeds/message#hasPublicKeyFingerprint>
+            <https://w3id.org/won/message#publicKeyFingerprint>
                     "FZGJ+/2woeEfpN0PRvaeKMhC9D5PXEzKB4AXXq85ftI=" ;
-            <http://purl.org/webofneeds/message#hasSignedGraph>
+            <https://w3id.org/won/message#signedGraph>
                     <https://satvm05.researchstudio.at/won/resource/event/n3j4mhrrypppoymsa5xp#envelope-s7ns> .
 }

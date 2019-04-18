@@ -1,7 +1,7 @@
-@prefix msg:   <http://purl.org/webofneeds/message#> .
+@prefix msg:   <https://w3id.org/won/message#> .
 @prefix conn:  <https://localhost:8443/won/resource/connection/> .
-@prefix woncrypt: <http://purl.org/webofneeds/woncrypt#> .
-@prefix need:  <https://localhost:8443/won/resource/need/> .
+@prefix woncrypt: <https://w3id.org/won/core#> .
+@prefix atom:  <https://localhost:8443/won/resource/atom/> .
 @prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
 @prefix cert:  <http://www.w3.org/ns/auth/cert#> .
 @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
@@ -11,20 +11,20 @@
 @prefix s:     <http://schema.org/> .
 @prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix sh:    <http://www.w3.org/ns/shacl#> .
-@prefix won:   <http://purl.org/webofneeds/model#> .
+@prefix won:   <https://w3id.org/won/core#> .
 @prefix ldp:   <http://www.w3.org/ns/ldp#> .
 @prefix event: <https://localhost:8443/won/resource/event/> .
 @prefix sioc:  <http://rdfs.org/sioc/ns#> .
 @prefix dc:    <http://purl.org/dc/elements/1.1/> .
-@prefix agr: <http://purl.org/webofneeds/agreement#> .
+@prefix agr: <https://w3id.org/won/agreement#> .
 
 <https://localhost:8443/won/resource/event/5669098069340991000> {
     <https://localhost:8443/won/resource/event/4672813835273634000>
-            <http://purl.org/webofneeds/model#hasFeedback>
-                    [ <http://purl.org/webofneeds/model#forResource>
+            <https://w3id.org/won/core#feedback>
+                    [ <https://w3id.org/won/core#forResource>
                               <https://localhost:8443/won/resource/connection/xq6jofxo2w8o05io6dre> ;
-                      <http://purl.org/webofneeds/model#hasBinaryRating>
-                              <http://purl.org/webofneeds/model#Good>
+                      <https://w3id.org/won/core#binaryRating>
+                              <https://w3id.org/won/core#Good>
                     ] .
 }
 

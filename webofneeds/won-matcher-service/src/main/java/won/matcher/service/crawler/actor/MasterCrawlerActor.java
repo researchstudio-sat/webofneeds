@@ -79,10 +79,10 @@ public class MasterCrawlerActor extends UntypedActor {
                         SpringExtension.SpringExtProvider.get(getContext().system()).props(UpdateMetadataActor.class),
                         "MetaDataUpdateWorker");
         getContext().watch(updateMetaDataWorker);
-        // create an need loading actor
+        // create an atom loading actor
         getContext().actorOf(
-                        SpringExtension.SpringExtProvider.get(getContext().system()).props(NeedEventLoaderActor.class),
-                        "NeedEventLoader");
+                        SpringExtension.SpringExtProvider.get(getContext().system()).props(AtomEventLoaderActor.class),
+                        "AtomEventLoader");
         // subscribe for won node events
         pubSubMediator = DistributedPubSub.get(getContext().system()).mediator();
         pubSubMediator.tell(new DistributedPubSubMediator.Subscribe(WonNodeEvent.class.getName(), getSelf()),
@@ -99,14 +99,14 @@ public class MasterCrawlerActor extends UntypedActor {
                 crawlingWorker.tell(msg, getSelf());
             }
         } catch (Exception e) {
-            log.info("caught exception while obtaining unfinished crawl URIs, we may be missing some needs", e);
+            log.info("caught exception while obtaining unfinished crawl URIs, we may be missing some atoms", e);
         }
         try {
             for (CrawlUriMessage msg : sparqlService.retrieveMessagesForCrawling(CrawlUriMessage.STATUS.FAILED)) {
                 getSelf().tell(msg, getSelf());
             }
         } catch (Exception e) {
-            log.info("caught exception while obtaining failed crawl URIs, we may be missing some needs", e);
+            log.info("caught exception while obtaining failed crawl URIs, we may be missing some atoms", e);
         }
     }
 
@@ -285,25 +285,25 @@ public class MasterCrawlerActor extends UntypedActor {
     }
 
     /**
-     * Start crawling a won node starting at the need list
+     * Start crawling a won node starting at the atom list
      *
      * @param wonNodeInfo
      */
     private void startCrawling(WonNodeInfo wonNodeInfo) {
-        // get the last known need modification date and start crawling from this point
+        // get the last known atom modification date and start crawling from this point
         // again
         log.info("start crawling won node: {} ...", wonNodeInfo.getWonNodeURI());
-        String lastNeedModificationDate = sparqlService
-                        .retrieveNeedModificationDateForCrawling(wonNodeInfo.getWonNodeURI());
-        if (lastNeedModificationDate != null) {
-            String needListUri = removeEndingSlash(wonNodeInfo.getNeedListURI());
-            String modifiedUri = needListUri + "?modifiedafter=" + lastNeedModificationDate;
-            self().tell(new CrawlUriMessage(modifiedUri, needListUri, wonNodeInfo.getWonNodeURI(),
+        String lastAtomModificationDate = sparqlService
+                        .retrieveAtomModificationDateForCrawling(wonNodeInfo.getWonNodeURI());
+        if (lastAtomModificationDate != null) {
+            String atomListUri = removeEndingSlash(wonNodeInfo.getAtomListURI());
+            String modifiedUri = atomListUri + "?modifiedafter=" + lastAtomModificationDate;
+            self().tell(new CrawlUriMessage(modifiedUri, atomListUri, wonNodeInfo.getWonNodeURI(),
                             CrawlUriMessage.STATUS.PROCESS, System.currentTimeMillis(), null), getSelf());
         } else {
-            // or else if we didn't crawl needs yet start crawling the whole won node
-            String needListUri = removeEndingSlash(wonNodeInfo.getNeedListURI());
-            self().tell(new CrawlUriMessage(needListUri, needListUri, wonNodeInfo.getWonNodeURI(),
+            // or else if we didn't crawl atoms yet start crawling the whole won node
+            String atomListUri = removeEndingSlash(wonNodeInfo.getAtomListURI());
+            self().tell(new CrawlUriMessage(atomListUri, atomListUri, wonNodeInfo.getWonNodeURI(),
                             CrawlUriMessage.STATUS.PROCESS, System.currentTimeMillis(), null), getSelf());
         }
         // get the last known connection modification date and start crawling from this

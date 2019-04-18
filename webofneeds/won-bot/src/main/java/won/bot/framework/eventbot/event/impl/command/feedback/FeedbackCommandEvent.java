@@ -12,15 +12,15 @@ package won.bot.framework.eventbot.event.impl.command.feedback;
 
 import java.net.URI;
 
-import won.bot.framework.eventbot.event.BaseNeedAndConnectionSpecificEvent;
+import won.bot.framework.eventbot.event.BaseAtomAndConnectionSpecificEvent;
 import won.bot.framework.eventbot.event.impl.command.MessageCommandEvent;
 import won.protocol.message.WonMessageType;
 import won.protocol.model.Connection;
 
 /**
- * Instructs the bot to open the specified connection behalf of the need.
+ * Instructs the bot to open the specified connection behalf of the atom.
  */
-public class FeedbackCommandEvent extends BaseNeedAndConnectionSpecificEvent implements MessageCommandEvent {
+public class FeedbackCommandEvent extends BaseAtomAndConnectionSpecificEvent implements MessageCommandEvent {
     private URI forResource;
     private URI feedbackProperty;
     private URI value;

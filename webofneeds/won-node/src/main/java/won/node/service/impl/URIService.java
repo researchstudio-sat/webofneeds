@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
 import org.springframework.beans.factory.InitializingBean;
 
 import won.protocol.model.Connection;
-import won.protocol.model.Need;
+import won.protocol.model.Atom;
 
 /**
  * User: fkleedorfer Date: 06.11.12
@@ -25,8 +25,8 @@ import won.protocol.model.Need;
 public class URIService implements InitializingBean {
     // prefix of any URI
     private String generalURIPrefix;
-    // prefix of a need resource
-    private String needResourceURIPrefix;
+    // prefix of an atom resource
+    private String atomResourceURIPrefix;
     // prefix of a connection resource
     private String connectionResourceURIPrefix;
     // prefix of an event resource
@@ -41,17 +41,17 @@ public class URIService implements InitializingBean {
     private String pageURIPrefix;
     private Pattern connectionEventsPattern;
     private Pattern connectionUriPattern;
-    private Pattern needEventsPattern;
-    private Pattern needUnreadPattern;
-    private Pattern needUriPattern;
+    private Pattern atomEventsPattern;
+    private Pattern atomUnreadPattern;
+    private Pattern atomUriPattern;
 
     @Override
     public void afterPropertiesSet() throws Exception {
         this.connectionEventsPattern = Pattern.compile(connectionResourceURIPrefix + "/[a-zA-Z0-9]+/events");
         this.connectionUriPattern = Pattern.compile(connectionResourceURIPrefix + "/[a-zA-Z0-9]+");
-        this.needEventsPattern = Pattern.compile(needResourceURIPrefix + "/[a-zA-Z0-9]+/events");
-        this.needUnreadPattern = Pattern.compile(needResourceURIPrefix + "/[a-zA-Z0-9]+/unread");
-        this.needUriPattern = Pattern.compile(needResourceURIPrefix + "/[a-zA-Z0-9]+");
+        this.atomEventsPattern = Pattern.compile(atomResourceURIPrefix + "/[a-zA-Z0-9]+/events");
+        this.atomUnreadPattern = Pattern.compile(atomResourceURIPrefix + "/[a-zA-Z0-9]+/unread");
+        this.atomUriPattern = Pattern.compile(atomResourceURIPrefix + "/[a-zA-Z0-9]+");
     }
 
     public boolean isEventURI(URI toCheck) {
@@ -60,10 +60,10 @@ public class URIService implements InitializingBean {
         return toCheck.toString().startsWith(eventResourceURIPrefix);
     }
 
-    public boolean isNeedURI(URI toCheck) {
+    public boolean isAtomURI(URI toCheck) {
         if (toCheck == null)
             return false;
-        return toCheck.toString().startsWith(needResourceURIPrefix);
+        return toCheck.toString().startsWith(atomResourceURIPrefix);
     }
 
     public boolean isConnectionURI(URI toCheck) {
@@ -72,17 +72,17 @@ public class URIService implements InitializingBean {
         return toCheck.toString().startsWith(connectionResourceURIPrefix);
     }
 
-    public boolean isNeedEventsURI(URI toCheck) {
+    public boolean isAtomEventsURI(URI toCheck) {
         if (toCheck == null)
             return false;
-        Matcher m = needEventsPattern.matcher(toCheck.toString());
+        Matcher m = atomEventsPattern.matcher(toCheck.toString());
         return m.lookingAt();
     }
 
-    public boolean isNeedUnreadURI(URI toCheck) {
+    public boolean isAtomUnreadURI(URI toCheck) {
         if (toCheck == null)
             return false;
-        Matcher m = needUnreadPattern.matcher(toCheck.toString());
+        Matcher m = atomUnreadPattern.matcher(toCheck.toString());
         return m.lookingAt();
     }
 
@@ -101,18 +101,18 @@ public class URIService implements InitializingBean {
         return URI.create(m.group());
     }
 
-    public URI getNeedURIofNeedEventsURI(URI needEventsURI) {
-        if (needEventsURI == null)
+    public URI getAtomURIofAtomEventsURI(URI atomEventsURI) {
+        if (atomEventsURI == null)
             return null;
-        Matcher m = needUriPattern.matcher(needEventsURI.toString());
+        Matcher m = atomUriPattern.matcher(atomEventsURI.toString());
         m.find();
         return URI.create(m.group());
     }
 
-    public URI getNeedURIofNeedUnreadURI(URI needUnreadURI) {
-        if (needUnreadURI == null)
+    public URI getAtomURIofAtomUnreadURI(URI atomUnreadURI) {
+        if (atomUnreadURI == null)
             return null;
-        Matcher m = needUriPattern.matcher(needUnreadURI.toString());
+        Matcher m = atomUriPattern.matcher(atomUnreadURI.toString());
         m.find();
         return URI.create(m.group());
     }
@@ -180,12 +180,12 @@ public class URIService implements InitializingBean {
         return URI.create(generalURIPrefix).resolve(uri).toString();
     }
 
-    public URI createNeedURIForId(String id) {
-        return URI.create(needResourceURIPrefix.toString() + "/" + id);
+    public URI createAtomURIForId(String id) {
+        return URI.create(atomResourceURIPrefix.toString() + "/" + id);
     }
 
-    public URI createConnectionsURIForNeed(URI needURI) {
-        return URI.create(needURI.toString() + "/connections");
+    public URI createConnectionsURIForAtom(URI atomURI) {
+        return URI.create(atomURI.toString() + "/connections");
     }
 
     public URI createEventsURIForConnection(URI connURI) {
@@ -204,16 +204,16 @@ public class URIService implements InitializingBean {
         return URI.create(attachmentResourceURIPrefix.toString() + "/" + id);
     }
 
-    public URI createNeedURI(Need need) {
-        return URI.create(needResourceURIPrefix.toString() + "/" + need.getId());
+    public URI createAtomURI(Atom atom) {
+        return URI.create(atomResourceURIPrefix.toString() + "/" + atom.getId());
     }
 
     public URI createConnectionURI(Connection con) {
         return URI.create(connectionResourceURIPrefix.toString() + "/" + con.getId());
     }
 
-    public void setNeedResourceURIPrefix(final String needResourceURIPrefix) {
-        this.needResourceURIPrefix = needResourceURIPrefix;
+    public void setAtomResourceURIPrefix(final String atomResourceURIPrefix) {
+        this.atomResourceURIPrefix = atomResourceURIPrefix;
     }
 
     public void setConnectionResourceURIPrefix(final String connectionResourceURIPrefix) {
@@ -244,11 +244,11 @@ public class URIService implements InitializingBean {
         this.generalURIPrefix = generalURIPrefix;
     }
 
-    public URI createNeedSysInfoGraphURI(final URI needURI) {
-        // TODO: [SECURITY] it's possible to submit need data that clashes with this
+    public URI createAtomSysInfoGraphURI(final URI atomURI) {
+        // TODO: [SECURITY] it's possible to submit atom data that clashes with this
         // name,
         // which may lead to undefined behavior
-        return URI.create(needURI.toString() + "#sysinfo");
+        return URI.create(atomURI.toString() + "#sysinfo");
     }
 
     /**

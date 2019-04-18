@@ -78,7 +78,7 @@
         <module>won-matcher-rescal</module>
         <module>won-ontology-validator</module>
         <module>won-bot</module>
-        <module>won-facets</module>
+        <module>won-sockets</module>
         <module>won-cryptography</module>
         <module>won-utils</module>
         <module>won-vocab</module>

@@ -24,11 +24,11 @@ public class TestingKeys {
         File keysFile = new File(this.getClass().getResource(TestSigningUtils.KEYS_FILE).getFile());
         FileBasedKeyStoreService storeService = new FileBasedKeyStoreService(keysFile, "temp");
         storeService.init();
-        privateKeys.put(TestSigningUtils.needCertUri, storeService.getPrivateKey(TestSigningUtils.needCertUri));
+        privateKeys.put(TestSigningUtils.atomCertUri, storeService.getPrivateKey(TestSigningUtils.atomCertUri));
         privateKeys.put(TestSigningUtils.ownerCertUri, storeService.getPrivateKey(TestSigningUtils.ownerCertUri));
         privateKeys.put(TestSigningUtils.nodeCertUri, storeService.getPrivateKey(TestSigningUtils.nodeCertUri));
-        publicKeys.put(TestSigningUtils.needCertUri,
-                        storeService.getCertificate(TestSigningUtils.needCertUri).getPublicKey());
+        publicKeys.put(TestSigningUtils.atomCertUri,
+                        storeService.getCertificate(TestSigningUtils.atomCertUri).getPublicKey());
         publicKeys.put(TestSigningUtils.ownerCertUri,
                         storeService.getCertificate(TestSigningUtils.ownerCertUri).getPublicKey());
         publicKeys.put(TestSigningUtils.nodeCertUri,

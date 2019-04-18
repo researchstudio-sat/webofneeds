@@ -2,7 +2,7 @@ import { getIn, get, generateIdString } from "../utils";
 import won from "../won-es6";
 import { getRandomWonId } from "../won-utils";
 import { actionTypes } from "./actions";
-import { getOwnedNeedByConnectionUri } from "../selectors/general-selectors";
+import { getOwnedAtomByConnectionUri } from "../selectors/general-selectors";
 import { getOwnedConnectionByUri } from "../selectors/connection-selectors";
 import { buildConnectMessage, buildCloseMessage } from "../won-message-utils";
 
@@ -13,24 +13,24 @@ export function createPersona(persona, nodeUri) {
       nodeUri = getIn(state, ["config", "defaultNodeUri"]);
     }
 
-    const publishedContentUri = nodeUri + "/need/" + getRandomWonId();
+    const publishedContentUri = nodeUri + "/atom/" + getRandomWonId();
     const msgUri = nodeUri + "/event/" + getRandomWonId();
 
-    //FIXME: THIS SHOULD NOT USE ANY OF THE CODE BELOW BUT EXECUTE OUR ALREADY PRESENT NEED-CREATION WITH A GIVEN DRAFT INSTEAD
+    //FIXME: THIS SHOULD NOT USE ANY OF THE CODE BELOW BUT EXECUTE OUR ALREADY PRESENT ATOM-CREATION WITH A GIVEN DRAFT INSTEAD
     const graph = {
       "@id": publishedContentUri,
-      "@type": ["won:Need", "won:Persona"],
-      "won:hasFacet": [
+      "@type": ["won:Atom", "won:Persona"],
+      "won:socket": [
         {
-          "@id": "#holderFacet",
-          "@type": "won:HolderFacet",
+          "@id": "#holderSocket",
+          "@type": "won:HolderSocket",
         },
         {
-          "@id": "#reviewFacet",
-          "@type": "won:ReviewFacet",
+          "@id": "#reviewSocket",
+          "@type": "won:ReviewSocket",
         },
       ],
-      "won:hasFlag": [
+      "won:flag": [
         { "@id": "won:NoHintForCounterpart" },
         { "@id": "won:NoHintForMe" },
       ],
@@ -43,7 +43,7 @@ export function createPersona(persona, nodeUri) {
     };
 
     const msg = won.buildMessageRdf(graphEnvelope, {
-      receiverNode: nodeUri, //mandatory
+      recipientNode: nodeUri, //mandatory
       senderNode: nodeUri, //mandatory
       msgType: won.WONMSG.createMessage, //mandatory
       publishedContentUri: publishedContentUri, //mandatory
@@ -57,7 +57,7 @@ export function createPersona(persona, nodeUri) {
       payload: {
         eventUri: msgUri,
         message: msg,
-        needUri: publishedContentUri,
+        atomUri: publishedContentUri,
         persona: graph,
       },
     });
@@ -71,34 +71,34 @@ async function connectReview(
   connectMessage,
   connectionUri = undefined
 ) {
-  const getFacet = persona => {
-    const reviewFacet = persona
-      .getIn(["content", "facets"])
-      .filter(facetType => facetType == "won:ReviewFacet")
+  const getSocket = persona => {
+    const reviewSocket = persona
+      .getIn(["content", "sockets"])
+      .filter(socketType => socketType == "won:ReviewSocket")
       .keySeq()
       .first();
 
-    if (!reviewFacet) {
+    if (!reviewSocket) {
       throw new Error(
-        `Persona ${persona.get("uri")} does not have a review facet`
+        `Persona ${persona.get("uri")} does not have a review socket`
       );
     }
-    return reviewFacet;
+    return reviewSocket;
   };
 
   const cnctMsg = buildConnectMessage({
-    ownedNeedUri: ownPersona.get("uri"),
-    theirNeedUri: foreignPersona.get("uri"),
+    ownedAtomUri: ownPersona.get("uri"),
+    theirAtomUri: foreignPersona.get("uri"),
     ownNodeUri: ownPersona.get("nodeUri"),
     theirNodeUri: foreignPersona.get("nodeUri"),
     connectMessage: connectMessage,
     optionalOwnConnectionUri: connectionUri,
-    ownFacet: getFacet(ownPersona),
-    theirFacet: getFacet(foreignPersona),
+    ownSocket: getSocket(ownPersona),
+    theirSocket: getSocket(foreignPersona),
   });
   const optimisticEvent = await won.wonMessageFromJsonLd(cnctMsg.message);
   dispatch({
-    type: actionTypes.needs.connect,
+    type: actionTypes.atoms.connect,
     payload: {
       eventUri: cnctMsg.eventUri,
       message: cnctMsg.message,
@@ -108,7 +108,7 @@ async function connectReview(
   });
 }
 
-export function connectPersona(needUri, personaUri) {
+export function connectPersona(atomUri, personaUri) {
   return async dispatch => {
     const response = await fetch("rest/action/connect", {
       method: "POST",
@@ -118,11 +118,11 @@ export function connectPersona(needUri, personaUri) {
       body: JSON.stringify([
         {
           pending: false,
-          facet: `${personaUri}#holderFacet`,
+          socket: `${personaUri}#holderSocket`,
         },
         {
           pending: false,
-          facet: `${needUri}#holdableFacet`,
+          socket: `${atomUri}#holdableSocket`,
         },
       ]),
       credentials: "include",
@@ -134,25 +134,25 @@ export function connectPersona(needUri, personaUri) {
     dispatch({
       type: actionTypes.personas.connect,
       payload: {
-        needUri: needUri,
+        atomUri: atomUri,
         personaUri: personaUri,
       },
     });
   };
 }
 
-export function disconnectPersona(needUri, personaUri) {
+export function disconnectPersona(atomUri, personaUri) {
   return (dispatch, getState) => {
     const state = getState();
-    const persona = state.getIn(["needs", personaUri]);
-    const need = state.getIn(["needs", needUri]);
+    const persona = state.getIn(["atoms", personaUri]);
+    const atom = state.getIn(["atoms", atomUri]);
 
     const connectionUri = persona
       .get("connections")
       .filter(
         connection =>
-          connection.get("remoteNeedUri") == need.get("uri") &&
-          connection.get("facet") == won.WON.HolderFacetCompacted
+          connection.get("targetAtomUri") == atom.get("uri") &&
+          connection.get("socket") == won.WON.HolderSocketCompacted
       )
       .keySeq()
       .first();
@@ -162,10 +162,10 @@ export function disconnectPersona(needUri, personaUri) {
     buildCloseMessage(
       connectionUri,
       personaUri,
-      needUri,
+      atomUri,
       persona.get("nodeUri"),
-      need.get("nodeUri"),
-      connection.get("remoteConnectionUri")
+      atom.get("nodeUri"),
+      connection.get("targetConnectionUri")
     ).then(({ eventUri, message }) => {
       dispatch({
         type: actionTypes.connections.close,
@@ -184,13 +184,13 @@ export function reviewPersona(reviewableConnectionUri, review) {
     const state = getState();
     const connection = getOwnedConnectionByUri(state, reviewableConnectionUri);
 
-    const ownNeed = getOwnedNeedByConnectionUri(state, reviewableConnectionUri);
-    const foreignNeedUri = get(connection, "remoteNeedUri");
-    const foreignNeed = getIn(state, ["needs", foreignNeedUri]);
+    const ownAtom = getOwnedAtomByConnectionUri(state, reviewableConnectionUri);
+    const foreignAtomUri = get(connection, "targetAtomUri");
+    const foreignAtom = getIn(state, ["atoms", foreignAtomUri]);
 
-    const getPersona = need => {
-      const personaUri = get(need, "heldBy");
-      const persona = state.getIn(["needs", personaUri]);
+    const getPersona = atom => {
+      const personaUri = get(atom, "heldBy");
+      const persona = state.getIn(["atoms", personaUri]);
 
       return persona;
     };
@@ -200,15 +200,15 @@ export function reviewPersona(reviewableConnectionUri, review) {
         .get("connections")
         .filter(
           connection =>
-            connection.get("remoteNeedUri") == foreignPersona.get("uri") &&
-            connection.get("facet") == won.WON.ReviewFacet
+            connection.get("targetAtomUri") == foreignPersona.get("uri") &&
+            connection.get("socket") == won.WON.ReviewSocket
         )
         .keySeq()
         .first();
     };
 
-    const ownPersona = getPersona(ownNeed);
-    const foreignPersona = getPersona(foreignNeed);
+    const ownPersona = getPersona(ownAtom);
+    const foreignPersona = getPersona(foreignAtom);
     const identifier = "review";
     const reviewRdf = {
       "s:review": {

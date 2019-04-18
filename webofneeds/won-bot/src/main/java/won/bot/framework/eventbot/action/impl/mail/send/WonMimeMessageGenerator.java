@@ -34,7 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.impl.mail.receive.MailContentExtractor;
-import won.protocol.util.DefaultNeedModelWrapper;
+import won.protocol.util.DefaultAtomModelWrapper;
 import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.sparql.WonQueries;
 
@@ -63,29 +63,29 @@ public class WonMimeMessageGenerator {
     }
 
     /**
-     * Creates Response Message that is sent when a need tries to connect with
-     * another need
+     * Creates Response Message that is sent when an atom tries to connect with
+     * another atom
      */
-    public WonMimeMessage createConnectMail(MimeMessage msgToRespondTo, URI remoteNeedUri)
+    public WonMimeMessage createConnectMail(MimeMessage msgToRespondTo, URI targetAtomUri)
                     throws MessagingException, IOException {
-        VelocityContext velocityContext = putDefaultContent(msgToRespondTo, remoteNeedUri);
+        VelocityContext velocityContext = putDefaultContent(msgToRespondTo, targetAtomUri);
         return generateWonMimeMessage(msgToRespondTo, velocityEngine.getTemplate("mail-templates/connect-mail.vm"),
-                        velocityContext, remoteNeedUri);
+                        velocityContext, targetAtomUri);
     }
 
-    public WonMimeMessage createHintMail(MimeMessage msgToRespondTo, URI remoteNeedUri)
+    public WonMimeMessage createHintMail(MimeMessage msgToRespondTo, URI targetAtomUri)
                     throws MessagingException, IOException {
-        VelocityContext velocityContext = putDefaultContent(msgToRespondTo, remoteNeedUri);
+        VelocityContext velocityContext = putDefaultContent(msgToRespondTo, targetAtomUri);
         return generateWonMimeMessage(msgToRespondTo, velocityEngine.getTemplate("mail-templates/hint-mail.vm"),
-                        velocityContext, remoteNeedUri);
+                        velocityContext, targetAtomUri);
     }
 
-    public WonMimeMessage createMessageMail(MimeMessage msgToRespondTo, URI requesterId, URI remoteNeedUri,
+    public WonMimeMessage createMessageMail(MimeMessage msgToRespondTo, URI requesterId, URI targetAtomUri,
                     URI connectionUri) throws MessagingException, IOException {
-        VelocityContext velocityContext = putDefaultContent(msgToRespondTo, remoteNeedUri);
+        VelocityContext velocityContext = putDefaultContent(msgToRespondTo, targetAtomUri);
         putMessages(velocityContext, connectionUri, requesterId);
         return generateWonMimeMessage(msgToRespondTo, velocityEngine.getTemplate("mail-templates/message-mail.vm"),
-                        velocityContext, remoteNeedUri);
+                        velocityContext, targetAtomUri);
     }
 
     public WonMimeMessage createWelcomeMail(MimeMessage msgToRespondTo) throws IOException, MessagingException {
@@ -105,33 +105,33 @@ public class WonMimeMessageGenerator {
 
     /**
      * Creates the DefaultContext and fills in all relevant Infos which are used in
-     * every Mail, in our Case this is the NeedInfo and the quoted Original Message
+     * every Mail, in our Case this is the AtomInfo and the quoted Original Message
      * 
      * @param msgToRespondTo Message that the new Mail is in ResponseTo (to extract
      * the mailtext)
-     * @param remoteNeedUri To extract the corresponding Need Data
+     * @param targetAtomUri To extract the corresponding Atom Data
      * @return VelocityContext that has prefilled all the necessary Data
      * @throws IOException
      * @throws MessagingException
      */
-    private VelocityContext putDefaultContent(MimeMessage msgToRespondTo, URI remoteNeedUri)
+    private VelocityContext putDefaultContent(MimeMessage msgToRespondTo, URI targetAtomUri)
                     throws IOException, MessagingException {
         VelocityContext velocityContext = new VelocityContext();
-        putRemoteNeedInfo(velocityContext, remoteNeedUri);
+        putTargetAtomInfo(velocityContext, targetAtomUri);
         putQuotedMail(velocityContext, msgToRespondTo);
         return velocityContext;
     }
 
     private WonMimeMessage generateWonMimeMessage(MimeMessage msgToRespondTo, Template template,
-                    VelocityContext velocityContext, URI remoteNeedUri)
+                    VelocityContext velocityContext, URI targetAtomUri)
                     throws MessagingException, UnsupportedEncodingException {
-        Dataset remoteNeedRDF = eventListenerContext.getLinkedDataSource().getDataForResource(remoteNeedUri);
-        DefaultNeedModelWrapper needModelWrapper = new DefaultNeedModelWrapper(remoteNeedRDF);
+        Dataset targetAtomRDF = eventListenerContext.getLinkedDataSource().getDataForResource(targetAtomUri);
+        DefaultAtomModelWrapper atomModelWrapper = new DefaultAtomModelWrapper(targetAtomRDF);
         MimeMessage answerMessage = (MimeMessage) msgToRespondTo.reply(false);
         answerMessage.setFrom(new InternetAddress(sentFrom, sentFromName));
         answerMessage.setText("");
         answerMessage.setSubject(answerMessage.getSubject() + " <-> "
-                        + StringUtils.trim(needModelWrapper.getSomeTitleFromIsOrAll("en", "de")));
+                        + StringUtils.trim(atomModelWrapper.getSomeTitleFromIsOrAll("en", "de")));
         // We need to create an instance of our own MimeMessage Implementation in order
         // to have the Unique Message Id set before sending
         WonMimeMessage wonAnswerMessage = new WonMimeMessage(answerMessage);
@@ -150,21 +150,21 @@ public class WonMimeMessageGenerator {
     }
 
     /**
-     * Responsible for filling inc/remote-need-info.vm template
+     * Responsible for filling inc/target-atom-info.vm template
      * 
      * @param velocityContext context to put template-vars in
-     * @param remoteNeedUri uri for the remote need
+     * @param targetAtomUri uri for the remote atom
      */
-    private void putRemoteNeedInfo(VelocityContext velocityContext, URI remoteNeedUri) {
-        Dataset remoteNeedRDF = eventListenerContext.getLinkedDataSource().getDataForResource(remoteNeedUri);
-        DefaultNeedModelWrapper needModelWrapper = new DefaultNeedModelWrapper(remoteNeedRDF);
-        velocityContext.put("remoteNeedTitle", StringUtils.trim(needModelWrapper.getSomeTitleFromIsOrAll("en", "de"))
+    private void putTargetAtomInfo(VelocityContext velocityContext, URI targetAtomUri) {
+        Dataset targetAtomRDF = eventListenerContext.getLinkedDataSource().getDataForResource(targetAtomUri);
+        DefaultAtomModelWrapper atomModelWrapper = new DefaultAtomModelWrapper(targetAtomRDF);
+        velocityContext.put("targetAtomTitle", StringUtils.trim(atomModelWrapper.getSomeTitleFromIsOrAll("en", "de"))
                         .replaceAll("\\n", "\n" + QUOTE_CHAR));
-        velocityContext.put("remoteNeedDescription", StringUtils.trim(needModelWrapper.getSomeDescription("en", "de"))
+        velocityContext.put("targetAtomDescription", StringUtils.trim(atomModelWrapper.getSomeDescription("en", "de"))
                         .replaceAll("\\n", "\n" + QUOTE_CHAR));
-        Collection<String> tags = needModelWrapper.getAllTags();
-        velocityContext.put("remoteNeedTags", tags.size() > 0 ? tags : null);
-        velocityContext.put("remoteNeedUri", remoteNeedUri);
+        Collection<String> tags = atomModelWrapper.getAllTags();
+        velocityContext.put("targetAtomTags", tags.size() > 0 ? tags : null);
+        velocityContext.put("targetAtomUri", targetAtomUri);
     }
 
     /**
@@ -205,7 +205,7 @@ public class WonMimeMessageGenerator {
      * 
      * @param velocityContext context to put template-vars in
      * @param connectionUri connectionUri to retrieve events from
-     * @param requesterUri determines your need uri (to know which messages are from
+     * @param requesterUri determines your atom uri (to know which messages are from
      * you)
      */
     private void putMessages(VelocityContext velocityContext, URI connectionUri, URI requesterUri) {
@@ -276,14 +276,14 @@ public class WonMimeMessageGenerator {
     /**
      * Determines the Source of the Message
      * 
-     * @param soln to retrieve the needUri
-     * @param requesterUri determines your need uri (to know which messages are from
+     * @param soln to retrieve the atomUri
+     * @param requesterUri determines your atom uri (to know which messages are from
      * you)
      * @return true if the message came from you, false if the message did not come
      * from you
      */
     private static boolean isYourMessage(QuerySolution soln, URI requesterUri) {
-        return requesterUri.toString().equals(soln.get("needUri").asResource().getURI());
+        return requesterUri.toString().equals(soln.get("atomUri").asResource().getURI());
     }
 
     public void setVelocityEngine(VelocityEngine velocityEngine) {

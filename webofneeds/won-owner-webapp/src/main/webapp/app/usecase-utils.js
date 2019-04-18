@@ -33,22 +33,22 @@ export function getAllDetails() {
 }
 
 /**
- * Returns the corresponding UseCase to a given need,
+ * Returns the corresponding UseCase to a given atom,
  * return undefined if no useCase is found,
- * @param needImm
+ * @param atomImm
  */
-export function findUseCaseByNeed(needImm) {
+export function findUseCaseByAtom(atomImm) {
   const seeksTypes =
-    getIn(needImm, ["seeks", "type"]) &&
-    getIn(needImm, ["seeks", "type"])
+    getIn(atomImm, ["seeks", "type"]) &&
+    getIn(atomImm, ["seeks", "type"])
       .toSet()
-      .remove("won:Need");
+      .remove("won:Atom");
 
   const contentTypes =
-    getIn(needImm, ["content", "type"]) &&
-    getIn(needImm, ["content", "type"])
+    getIn(atomImm, ["content", "type"]) &&
+    getIn(atomImm, ["content", "type"])
       .toSet()
-      .remove("won:Need");
+      .remove("won:Atom");
   const useCases = useCaseDefinitions.getAllUseCases();
 
   if (hasSubElements(useCases)) {
@@ -62,7 +62,7 @@ export function findUseCaseByNeed(needImm) {
           useCase
             .getIn(["draft", branch, "type"])
             .toSet()
-            .remove("won:Need");
+            .remove("won:Atom");
 
         const ucTypesSize = ucTypes ? ucTypes.size : 0;
 
@@ -90,11 +90,11 @@ export function findUseCaseByNeed(needImm) {
           if (Immutable.List.isList(eventObject)) {
             const eventObjectSize = eventObject.size;
             const matchingEventObjectSize = eventObject.filter(object =>
-              getIn(needImm, ["content", "eventObject"]).includes(object)
+              getIn(atomImm, ["content", "eventObject"]).includes(object)
             ).size;
             return eventObjectSize == matchingEventObjectSize;
           }
-          return getIn(needImm, ["content", "eventObject"]).includes(
+          return getIn(atomImm, ["content", "eventObject"]).includes(
             eventObject
           );
         });
@@ -119,18 +119,18 @@ export function findUseCaseByNeed(needImm) {
             //Fixme: work with check for all list objects
             const eventObjectSize = eventObject.size;
             const matchingEventObjectSize = eventObject.filter(object =>
-              getIn(needImm, ["seeks", "eventObject"]).includes(object)
+              getIn(atomImm, ["seeks", "eventObject"]).includes(object)
             ).size;
             return eventObjectSize == matchingEventObjectSize;
           }
-          return getIn(needImm, ["seeks", "eventObject"]).includes(eventObject);
+          return getIn(atomImm, ["seeks", "eventObject"]).includes(eventObject);
         });
       }
 
       if (matchingUseCases.size > 1) {
         console.warn(
           "Found multiple matching UseCases for: ",
-          needImm,
+          atomImm,
           " matching UseCases: ",
           matchingUseCases,
           " -> returning undefined"
@@ -141,7 +141,7 @@ export function findUseCaseByNeed(needImm) {
       } else {
         console.warn(
           "Found no matching UseCase for:",
-          needImm,
+          atomImm,
           " within, ",
           useCases,
           " -> returning undefined"
@@ -154,7 +154,7 @@ export function findUseCaseByNeed(needImm) {
   return undefined;
 }
 
-window.findUseCaseByNeed4Dbg = findUseCaseByNeed;
+window.findUseCaseByAtom4Dbg = findUseCaseByAtom;
 /**
  * Returns all the details that are defined in any useCase in the useCaseDefinitions
  * and has the messageEnabled Flag set to true
@@ -306,7 +306,7 @@ export function isDisplayableItem(item) {
 
 /**
  * return if the given useCaseGroup is displayable or not
- * needs to have at least one displayable UseCase
+ * atoms to have at least one displayable UseCase
  * @param useCase
  * @returns {*}
  */
@@ -405,9 +405,9 @@ export function isHoldable(useCase) {
     useCase &&
     useCase.draft &&
     useCase.draft.content &&
-    useCase.draft.content.facets &&
-    values(useCase.draft.content.facets).includes(
-      won.WON.HoldableFacetCompacted
+    useCase.draft.content.sockets &&
+    values(useCase.draft.content.sockets).includes(
+      won.WON.HoldableSocketCompacted
     )
   );
 }

@@ -9,8 +9,8 @@
         <div class="about__welcome__title">What is the Web of Needs?</div>
         <won-flex-grid class="about__welcome__grid" items="::self.peopleGrid"></won-flex-grid>
         <div class="about__welcome__description">
-            <span class="about__welcome__description__title">What is a &laquo;need&raquo;?</span>
-            <span class="about__welcome__description__text">A need helps you find people who can help you - or who share your interest.</span>
+            <span class="about__welcome__description__title">What is a &laquo;atom&raquo;?</span>
+            <span class="about__welcome__description__text">An atom helps you find people who can help you - or who share your interest.</span>
             <span class="about__welcome__description__more clickable" ng-click="::self.toggleMoreInfo()">Read more</span>
 
             <svg style="--local-primary:var(--won-primary-color);" class="about__welcome__description__arrow clickable" ng-click="::self.toggleMoreInfo()" ng-show="!self.moreInfo">
@@ -21,7 +21,7 @@
                 <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
             </svg>
 
-            <span class="about__welcome__description__text" ng-show="self.moreInfo">A need is much like an automatic classified ad. You say what you are looking for, and other such ads will be
+            <span class="about__welcome__description__text" ng-show="self.moreInfo">An atom is much like an automatic classified ad. You say what you are looking for, and other such ads will be
                 matched with yours. You could think of it as of a long-lived search query that can itself be found by others.
                 Once you found a useful match, you can connect to it and start to chat.</span>
         </div>
@@ -65,7 +65,7 @@
             </svg>
         </div>
         <h2 class="about__howto__title">Ready to start?</h2>
-        <h3 class="about__howto__subtitle">Post your need or offer and let {{ self.appTitle }} do the rest</h3>
+        <h3 class="about__howto__subtitle">Post your atom or offer and let {{ self.appTitle }} do the rest</h3>
         <div class="about__howto__createx">
             <button class="won-button--filled red about__howto__createx__button"
                     ng-click="self.createWhatsAround()"

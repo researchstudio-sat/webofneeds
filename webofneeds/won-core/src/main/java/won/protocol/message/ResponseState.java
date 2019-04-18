@@ -5,10 +5,10 @@ import org.apache.jena.rdf.model.Resource;
 import won.protocol.vocabulary.WONMSG;
 
 public enum ResponseState {
-    SUCCESS(WONMSG.TYPE_RESPONSE_STATE_SUCCESS), FAILURE(WONMSG.TYPE_RESPONSE_STATE_FAILURE),
-    DUPLICATE_NEED_ID(WONMSG.TYPE_RESPONSE_STATE_DUPLICATE_NEED_ID),
-    DUPLICATE_CONNECTION_ID(WONMSG.TYPE_RESPONSE_STATE_DUPLICATE_CONNECTION_ID),
-    DUPLICATE_MESSAGE_ID(WONMSG.TYPE_RESPONSE_STATE_DUPLICATE_MESSAGE_ID);
+    SUCCESS(WONMSG.SuccessResponseState), FAILURE(WONMSG.FailureResponseState),
+    DUPLICATE_ATOM_ID(WONMSG.DuplicateAtomIdResponseState),
+    DUPLICATE_CONNECTION_ID(WONMSG.DuplicateConnectionIdResponseState),
+    DUPLICATE_MESSAGE_ID(WONMSG.DuplicateMessageIdResponseState);
     private Resource resource;
 
     private ResponseState(Resource resource) {
@@ -20,15 +20,15 @@ public enum ResponseState {
     }
 
     public static ResponseState getResponseState(Resource resource) {
-        if (WONMSG.TYPE_RESPONSE_STATE_SUCCESS.equals(resource))
+        if (WONMSG.SuccessResponseState.equals(resource))
             return SUCCESS;
-        if (WONMSG.TYPE_RESPONSE_STATE_FAILURE.equals(resource))
+        if (WONMSG.FailureResponseState.equals(resource))
             return FAILURE;
-        if (WONMSG.TYPE_RESPONSE_STATE_DUPLICATE_NEED_ID.equals(resource))
-            return DUPLICATE_NEED_ID;
-        if (WONMSG.TYPE_RESPONSE_STATE_DUPLICATE_CONNECTION_ID.equals(resource))
+        if (WONMSG.DuplicateAtomIdResponseState.equals(resource))
+            return DUPLICATE_ATOM_ID;
+        if (WONMSG.DuplicateConnectionIdResponseState.equals(resource))
             return DUPLICATE_CONNECTION_ID;
-        if (WONMSG.TYPE_RESPONSE_STATE_DUPLICATE_MESSAGE_ID.equals(resource))
+        if (WONMSG.DuplicateMessageIdResponseState.equals(resource))
             return DUPLICATE_MESSAGE_ID;
         return null;
     }

@@ -12,26 +12,26 @@ package won.bot.framework.eventbot.event.impl.command.replace;
 
 import java.net.URI;
 
-import won.bot.framework.eventbot.event.BaseNeedSpecificEvent;
+import won.bot.framework.eventbot.event.BaseAtomSpecificEvent;
 import won.bot.framework.eventbot.event.impl.command.MessageCommandEvent;
 import won.bot.framework.eventbot.event.impl.command.MessageCommandFailureEvent;
 
 /**
- * Indicates that need creation failed.
+ * Indicates that atom creation failed.
  */
-public class ReplaceCommandFailureEvent extends BaseNeedSpecificEvent
+public class ReplaceCommandFailureEvent extends BaseAtomSpecificEvent
                 implements MessageCommandFailureEvent, ReplaceCommandResultEvent {
     private ReplaceCommandEvent replaceCommandEvent;
     private String message;
 
-    public ReplaceCommandFailureEvent(URI needURI, ReplaceCommandEvent replaceCommandEvent, String message) {
-        super(needURI);
+    public ReplaceCommandFailureEvent(URI atomURI, ReplaceCommandEvent replaceCommandEvent, String message) {
+        super(atomURI);
         this.replaceCommandEvent = replaceCommandEvent;
         this.message = message;
     }
 
-    public ReplaceCommandFailureEvent(URI needURI, ReplaceCommandEvent replaceCommandEvent) {
-        super(needURI);
+    public ReplaceCommandFailureEvent(URI atomURI, ReplaceCommandEvent replaceCommandEvent) {
+        super(atomURI);
         this.replaceCommandEvent = replaceCommandEvent;
     }
 

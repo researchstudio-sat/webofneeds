@@ -17,7 +17,7 @@ import won from "./won.js";
    * @returns {{@graph: Array, @context}}
    */
   won.buildMessageRdf = function(contentRdf, args) {
-    const needGraphId = args.msgUri + "#need";
+    const atomGraphId = args.msgUri + "#atom";
     const msgDataUri = args.msgUri + "#envelope";
     const msgGraph = [];
 
@@ -27,13 +27,13 @@ import won from "./won.js";
       return args.msgUri + "#attachment-" + i;
     });
     const nonEnvelopeGraphIds = Array.prototype.concat(
-      [needGraphId],
+      [atomGraphId],
       attachmentGraphIds
     );
 
     msgGraph.push({
       // content
-      "@id": needGraphId,
+      "@id": atomGraphId,
       "@graph": contentRdf["@graph"],
     });
 
@@ -71,14 +71,14 @@ import won from "./won.js";
       {
         "@id": args.msgUri,
         "@type": "msg:FromOwner",
-        "msg:hasSentTimestamp": new Date().getTime(),
-        "msg:hasMessageType": { "@id": args.msgType },
-        "msg:hasContent": nonEnvelopeGraphIds.map(function(graphId) {
+        "msg:sentTimestamp": new Date().getTime(),
+        "msg:messageType": { "@id": args.msgType },
+        "msg:content": nonEnvelopeGraphIds.map(function(graphId) {
           return { "@id": graphId };
         }),
-        "msg:hasReceiverNode": { "@id": args.receiverNode },
-        "msg:hasSenderNode": { "@id": args.senderNode },
-        "msg:hasSenderNeed": { "@id": args.publishedContentUri },
+        "msg:recipientNode": { "@id": args.recipientNode },
+        "msg:senderNode": { "@id": args.senderNode },
+        "msg:senderAtom": { "@id": args.publishedContentUri },
         "msg:hasAttachment": attachmentBlankNodes.map(function(n) {
           return { "@id": n["@id"] };
         }),
@@ -97,7 +97,7 @@ import won from "./won.js";
     });
 
     /*
-         //TODO in need: links to both unsigned (plain pngs) and signed (in rdf) attachments
+         //TODO in atom: links to both unsigned (plain pngs) and signed (in rdf) attachments
          */
 
     return {
@@ -117,7 +117,7 @@ import won from "./won.js";
       cnt: "http://www.w3.org/2011/content#",
     };
     o[won.WONMSG.EnvelopeGraphCompacted] = {
-      "@id": "http://purl.org/webofneeds/message#EnvelopeGraph",
+      "@id": "https://w3id.org/won/message#EnvelopeGraph",
       "@type": "@id",
     };
     return o;
@@ -135,18 +135,18 @@ import won from "./won.js";
 
 /*
  //TODO it should be possible to do the creation without initialising two message builders.
- --> CreateMessageBuilder that passes through calls to it's internal needmsgbuilder
+ --> CreateMessageBuilder that passes through calls to it's internal atommsgbuilder
  and then builds the messsage from that?
  */
 /*
 
  problem: file-read is asynch, but i'd like to contain *all* the details
  of the message format in this class (e.g. the data's encoding) :|
- {need} --toCreateMsg--> {msg} //(async) functional instead of OO-style msgbuilder?
+ {atom} --toCreateMsg--> {msg} //(async) functional instead of OO-style msgbuilder?
 
  where:
 
- need = { title: '...', ..., images: [fileHandle1, fileHandle2]  }
+ atom = { title: '...', ..., images: [fileHandle1, fileHandle2]  }
 
  this would be very implementation specific.
 
@@ -161,17 +161,17 @@ import won from "./won.js";
 
  forEnvelopeData(?)
 
- hasSender
- hasSenderNode
- hasSenderNeed (used)
+ sender
+ senderNode
+ senderAtom (used)
 
- hasReceiver
- hasReceiverNeed
- hasReceiverNode (used)
+ recipient
+ recipientAtom
+ recipientNode (used)
 
- hasFacet (used, in needbuilder)
- hasRemoteFacet
+ socket (used, in atombuilder)
+ targetSocket
 
- hasTextMessage
+ textMessage
  addContentGraphData(?) //who thought this was a good idea?
  */

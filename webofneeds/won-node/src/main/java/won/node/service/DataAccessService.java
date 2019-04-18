@@ -19,39 +19,40 @@ import org.apache.jena.rdf.model.Resource;
 import won.node.service.impl.URIService;
 import won.protocol.exception.ConnectionAlreadyExistsException;
 import won.protocol.exception.IllegalMessageForConnectionStateException;
-import won.protocol.exception.IllegalMessageForNeedStateException;
+import won.protocol.exception.IllegalMessageForAtomStateException;
 import won.protocol.exception.NoSuchConnectionException;
-import won.protocol.exception.NoSuchNeedException;
+import won.protocol.exception.NoSuchAtomException;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionEventType;
 import won.protocol.model.ConnectionState;
-import won.protocol.model.Facet;
+import won.protocol.model.Socket;
 
 /**
  * User: fkleedorfer Date: 18.04.14
  */
 public interface DataAccessService {
-    public Optional<Facet> getDefaultFacet(URI needUri) throws NoSuchNeedException;
+    public Optional<Socket> getDefaultSocket(URI atomUri) throws NoSuchAtomException;
 
     /**
-     * Get the specified facet or the default facet, or any of the facets, or throw
-     * a runtime exception.
+     * Get the specified socket or the default socket, or any of the sockets, or
+     * throw a runtime exception.
      * 
-     * @param needURI
-     * @param facetUri
+     * @param atomURI
+     * @param socketUri
      * @return
-     * @throws NoSuchNeedException
+     * @throws NoSuchAtomException
      * @throws IllegalArgumentException
      */
-    public Facet getFacet(URI needURI, Optional<URI> facetUri) throws IllegalArgumentException, NoSuchNeedException;
+    public Socket getSocket(URI atomURI, Optional<URI> socketUri) throws IllegalArgumentException, NoSuchAtomException;
 
-    Connection getConnection(List<Connection> connections, URI facetURI, ConnectionEventType eventType)
+    Connection getConnection(List<Connection> connections, URI socketURI, ConnectionEventType eventType)
                     throws ConnectionAlreadyExistsException;
 
-    public Connection createConnection(final URI connectionURI, final URI needURI, final URI otherNeedURI,
-                    final URI otherConnectionURI, final URI facetURI, final URI facetTypeURI, final URI remoteFacetURI,
-                    final ConnectionState connectionState, final ConnectionEventType connectionEventType)
-                    throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException;
+    public Connection createConnection(final URI connectionURI, final URI atomURI, final URI otherAtomURI,
+                    final URI otherConnectionURI, final URI socketURI, final URI socketTypeURI,
+                    final URI targetSocketURI, final ConnectionState connectionState,
+                    final ConnectionEventType connectionEventType)
+                    throws NoSuchAtomException, IllegalMessageForAtomStateException, ConnectionAlreadyExistsException;
 
     Connection nextConnectionState(URI connectionURI, ConnectionEventType connectionEventType)
                     throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
@@ -69,7 +70,7 @@ public interface DataAccessService {
      */
     boolean addFeedback(Connection connection, Resource feedback);
 
-    void updateRemoteConnectionURI(Connection con, URI remoteConnectionURI);
+    void updateTargetConnectionURI(Connection con, URI targetConnectionURI);
 
     void setURIService(URIService URIService);
 }

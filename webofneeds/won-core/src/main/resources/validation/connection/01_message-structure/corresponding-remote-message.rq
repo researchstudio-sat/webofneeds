@@ -1,15 +1,15 @@
 # all messages that are passed to the other node
 # must have a corresponding remote message
 # special case: Response messages must either have CRM and IRR (remote response) or none of them (local response)
-PREFIX msg: <http://purl.org/webofneeds/message#>
+PREFIX msg: <https://w3id.org/won/message#>
 SELECT ?msg ?msgType WHERE {
   {
-  	 ?msg msg:hasMessageType ?msgType .
+  	 ?msg msg:messageType ?msgType .
      OPTIONAL {
      	?msg msg:isRemoteResponseTo ?remoteResponseTo .
      }
      OPTIONAL {
-        ?msg msg:hasCorrespondingRemoteMessage ?msg2
+        ?msg msg:correspondingRemoteMessage ?msg2
      }
 
      FILTER (?msgType in (msg:SuccessResponse, msg:FailureResponse) && !bound (?msg2) && bound(?remoteResponseTo)

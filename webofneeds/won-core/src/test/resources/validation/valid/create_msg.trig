@@ -1,16 +1,16 @@
 @prefix dc:    <http://purl.org/dc/elements/1.1/> .
-@prefix need:  <http://localhost:8080/won/resource/need/> .
+@prefix atom:  <http://localhost:8080/won/resource/atom/> .
 @prefix geo:   <http://www.w3.org/2003/01/geo/wgs84_pos#> .
 @prefix conn:  <http://localhost:8080/won/resource/connection/> .
-@prefix msg:   <http://purl.org/webofneeds/message#> .
+@prefix msg:   <https://w3id.org/won/message#> .
 @prefix sioc:  <http://rdfs.org/sioc/ns#> .
 @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix cert:  <http://www.w3.org/ns/auth/cert#> .
 @prefix event: <http://localhost:8080/won/resource/event/> .
-@prefix woncrypt: <http://purl.org/webofneeds/woncrypt#> .
+@prefix woncrypt: <https://w3id.org/won/core#> .
 @prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
 @prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-@prefix won:   <http://purl.org/webofneeds/model#> .
+@prefix won:   <https://w3id.org/won/core#> .
 @prefix local: <http://localhost:8080/won/resource/> .
 @prefix signature: <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#> .
 @prefix ldp:   <http://www.w3.org/ns/ldp#> .
@@ -18,15 +18,15 @@
 
 
 <http://localhost:8080/won/resource/event/td3u9uqz1pismn4qtn92#content-9ti7> {
-    need:o1ybhchandwvg6c8pv81
-            a                     won:Need ;
-            won:hasBasicNeedType  won:Supply ;
-            won:hasContent        [ a                       won:NeedContent ;
+    atom:o1ybhchandwvg6c8pv81
+            a                     won:Atom ;
+            won:hasBasicAtomType  won:Supply ;
+            won:content        [ a                       won:AtomContent ;
                                     dc:title                "[FCNYC] OFFER:   Trifle Dessert Bowl (UES/90th Street)"^^xsd:string ;
                                     dc:description  "8\" diameter, bowl is 5\" deep, whole bowl stands 9\" tall\r\n\r\n\r\nLooks like This:\r\n\r\n\r\nhttp://www.pier1.com/Large-Trifle-Bowl/2292937,default,pd.html?utm_source=Google&utm_medium=PLA&utm_campaign=google_pla&utm_content=2292937&s_cid=pla0000001&kpid=2292937\r\n\r\nPick up after noon on Sunday\r\n"^^xsd:string
                                   ] ;
-            won:hasFacet          won:ChatFacet ;
-            won:hasNeedModality   [ a  won:NeedModality ] ;
+            won:socket          won:ChatSocket ;
+            won:atomModality   [ a  won:AtomModality ] ;
             cert:key              [ cert:PublicKey  [ a                       woncrypt:ECCPublicKey ;
                                                       woncrypt:ecc_algorithm  "EC" ;
                                                       woncrypt:ecc_curveId    "brainpoolp384r1" ;
@@ -43,14 +43,14 @@
 
     event:td3u9uqz1pismn4qtn92
             a                        msg:FromOwner ;
-            msg:hasContent           <http://localhost:8080/won/resource/event/td3u9uqz1pismn4qtn92#content-9ti7> ;
-            msg:hasMessageType       msg:CreateMessage ;
-            msg:hasReceiverNode      <http://localhost:8080/won/resource> ;
-            msg:hasSenderNeed        need:o1ybhchandwvg6c8pv81 ;
-            msg:hasSentTimestamp     "1433774711093"^^xsd:long ;
-            msg:containsSignature  [ msg:hasSignatureGraph  <http://localhost:8080/won/resource/event/td3u9uqz1pismn4qtn92#content-9ti7-sig> ;
-                                       msg:hasSignatureValue  "MGQCMDL5IYmwJcvsWWlni4PjJBf+prAiOxwdkmhJQZtievCDyVnvsBYQNNpbeVpYdoH3tQIwTCwZDCNOo3cO2TqxQqMd7Uo8xqy9am7RfMdjeXrLAUbOQMoYmmss5ayuxGuNvzhD" ;
-                                       msg:hasSignedGraph     <http://localhost:8080/won/resource/event/td3u9uqz1pismn4qtn92#content-9ti7>
+            msg:content           <http://localhost:8080/won/resource/event/td3u9uqz1pismn4qtn92#content-9ti7> ;
+            msg:messageType       msg:CreateMessage ;
+            msg:recipientNode      <http://localhost:8080/won/resource> ;
+            msg:senderAtom        atom:o1ybhchandwvg6c8pv81 ;
+            msg:sentTimestamp     "1433774711093"^^xsd:long ;
+            msg:containsSignature  [ msg:signatureGraph  <http://localhost:8080/won/resource/event/td3u9uqz1pismn4qtn92#content-9ti7-sig> ;
+                                       msg:signatureValue  "MGQCMDL5IYmwJcvsWWlni4PjJBf+prAiOxwdkmhJQZtievCDyVnvsBYQNNpbeVpYdoH3tQIwTCwZDCNOo3cO2TqxQqMd7Uo8xqy9am7RfMdjeXrLAUbOQMoYmmss5ayuxGuNvzhD" ;
+                                       msg:signedGraph     <http://localhost:8080/won/resource/event/td3u9uqz1pismn4qtn92#content-9ti7>
                                      ] .
 }
 
@@ -63,10 +63,10 @@
 
     event:td3u9uqz1pismn4qtn92
             a                         msg:FromOwner ;
-            msg:hasReceivedTimestamp  "1433774714580"^^xsd:long ;
-            msg:containsSignature   [ msg:hasSignatureGraph  <http://localhost:8080/won/resource/event/td3u9uqz1pismn4qtn92#envelope-lxzj-sig> ;
-                                        msg:hasSignatureValue  "MGQCMExcdxNcScRr0xGW9GBSHnO41uQAMvO2nPx9wB1882PX9tlsMflxlvi2mbYRwezZuAIwPmlEZoI/FucXnE5GtzNQiE5B5rxaeZ89eg+9V+f0U4pR4N63aejHlWPCeoDW4Ny9" ;
-                                        msg:hasSignedGraph     <http://localhost:8080/won/resource/event/td3u9uqz1pismn4qtn92#envelope-lxzj>
+            msg:receivedTimestamp  "1433774714580"^^xsd:long ;
+            msg:containsSignature   [ msg:signatureGraph  <http://localhost:8080/won/resource/event/td3u9uqz1pismn4qtn92#envelope-lxzj-sig> ;
+                                        msg:signatureValue  "MGQCMExcdxNcScRr0xGW9GBSHnO41uQAMvO2nPx9wB1882PX9tlsMflxlvi2mbYRwezZuAIwPmlEZoI/FucXnE5GtzNQiE5B5rxaeZ89eg+9V+f0U4pR4N63aejHlWPCeoDW4Ny9" ;
+                                        msg:signedGraph     <http://localhost:8080/won/resource/event/td3u9uqz1pismn4qtn92#envelope-lxzj>
                                       ] .
 }
 
@@ -79,17 +79,17 @@
             signature:hasGraphSigningMethod
                     [ a                               signature:GraphSigningMethod ;
                       signature:hasDigestMethod       signature:dm-sha-256 ;
-                      signature:hasGraphCanonicalizationMethod
+                      signature:graphCanonicalizationMethod
                               signature:gcm-fisteus-2010 ;
-                      signature:hasGraphDigestMethod  signature:gdm-fisteus-2010 ;
-                      signature:hasGraphSerializationMethod
+                      signature:graphDigestMethod  signature:gdm-fisteus-2010 ;
+                      signature:graphSerializationMethod
                               signature:gsm-trig ;
                       signature:hasSignatureMethod    signature:sm-ecdsa
                     ] ;
-            signature:hasSignatureValue  "MGQCMDL5IYmwJcvsWWlni4PjJBf+prAiOxwdkmhJQZtievCDyVnvsBYQNNpbeVpYdoH3tQIwTCwZDCNOo3cO2TqxQqMd7Uo8xqy9am7RfMdjeXrLAUbOQMoYmmss5ayuxGuNvzhD" ;
+            signature:signatureValue  "MGQCMDL5IYmwJcvsWWlni4PjJBf+prAiOxwdkmhJQZtievCDyVnvsBYQNNpbeVpYdoH3tQIwTCwZDCNOo3cO2TqxQqMd7Uo8xqy9am7RfMdjeXrLAUbOQMoYmmss5ayuxGuNvzhD" ;
             signature:hasVerificationCertificate
-                    need:o1ybhchandwvg6c8pv81 ;
-            msg:hasSignedGraph           <http://localhost:8080/won/resource/event/td3u9uqz1pismn4qtn92#content-9ti7> .
+                    atom:o1ybhchandwvg6c8pv81 ;
+            msg:signedGraph           <http://localhost:8080/won/resource/event/td3u9uqz1pismn4qtn92#content-9ti7> .
 }
 
 <http://localhost:8080/won/resource/event/td3u9uqz1pismn4qtn92#envelope-lxzj-sig> {
@@ -98,17 +98,17 @@
             signature:hasGraphSigningMethod
                     [ a                               signature:GraphSigningMethod ;
                       signature:hasDigestMethod       signature:dm-sha-256 ;
-                      signature:hasGraphCanonicalizationMethod
+                      signature:graphCanonicalizationMethod
                               signature:gcm-fisteus-2010 ;
-                      signature:hasGraphDigestMethod  signature:gdm-fisteus-2010 ;
-                      signature:hasGraphSerializationMethod
+                      signature:graphDigestMethod  signature:gdm-fisteus-2010 ;
+                      signature:graphSerializationMethod
                               signature:gsm-trig ;
                       signature:hasSignatureMethod    signature:sm-ecdsa
                     ] ;
-            signature:hasSignatureValue  "MGQCMExcdxNcScRr0xGW9GBSHnO41uQAMvO2nPx9wB1882PX9tlsMflxlvi2mbYRwezZuAIwPmlEZoI/FucXnE5GtzNQiE5B5rxaeZ89eg+9V+f0U4pR4N63aejHlWPCeoDW4Ny9" ;
+            signature:signatureValue  "MGQCMExcdxNcScRr0xGW9GBSHnO41uQAMvO2nPx9wB1882PX9tlsMflxlvi2mbYRwezZuAIwPmlEZoI/FucXnE5GtzNQiE5B5rxaeZ89eg+9V+f0U4pR4N63aejHlWPCeoDW4Ny9" ;
             signature:hasVerificationCertificate
-                    need:o1ybhchandwvg6c8pv81 ;
-            msg:hasSignedGraph           <http://localhost:8080/won/resource/event/td3u9uqz1pismn4qtn92#envelope-lxzj> .
+                    atom:o1ybhchandwvg6c8pv81 ;
+            msg:signedGraph           <http://localhost:8080/won/resource/event/td3u9uqz1pismn4qtn92#envelope-lxzj> .
 }
 
 <http://localhost:8080/won/resource/event/td3u9uqz1pismn4qtn92#envelope-6dv8-sig> {
@@ -117,15 +117,15 @@
             signature:hasGraphSigningMethod
                     [ a                               signature:GraphSigningMethod ;
                       signature:hasDigestMethod       signature:dm-sha-256 ;
-                      signature:hasGraphCanonicalizationMethod
+                      signature:graphCanonicalizationMethod
                               signature:gcm-fisteus-2010 ;
-                      signature:hasGraphDigestMethod  signature:gdm-fisteus-2010 ;
-                      signature:hasGraphSerializationMethod
+                      signature:graphDigestMethod  signature:gdm-fisteus-2010 ;
+                      signature:graphSerializationMethod
                               signature:gsm-trig ;
                       signature:hasSignatureMethod    signature:sm-ecdsa
                     ] ;
-            signature:hasSignatureValue  "MGQCMAFFu5fIY5luGtaQ5rsGvfHbvhlAxc31b/Er9LOxtz9e2ffUP7vPndcGRC88jYkV8AIwfBAAPerPwJEeQgwDE4N0+6fNNe811/EujrJSh4cp06RIOCKCe6i2nZh2zyf6EiWu" ;
+            signature:signatureValue  "MGQCMAFFu5fIY5luGtaQ5rsGvfHbvhlAxc31b/Er9LOxtz9e2ffUP7vPndcGRC88jYkV8AIwfBAAPerPwJEeQgwDE4N0+6fNNe811/EujrJSh4cp06RIOCKCe6i2nZh2zyf6EiWu" ;
             signature:hasVerificationCertificate
                     <http://localhost:8080/won/resource> ;
-            msg:hasSignedGraph           <http://localhost:8080/won/resource/event/td3u9uqz1pismn4qtn92#envelope-6dv8> .
+            msg:signedGraph           <http://localhost:8080/won/resource/event/td3u9uqz1pismn4qtn92#envelope-6dv8> .
 }

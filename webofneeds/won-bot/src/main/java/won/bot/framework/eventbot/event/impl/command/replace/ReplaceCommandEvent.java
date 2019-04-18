@@ -16,14 +16,14 @@ import won.bot.framework.eventbot.event.impl.command.MessageCommandEvent;
 import won.protocol.message.WonMessageType;
 
 /**
- * Instructs the bot to replace a need's content
+ * Instructs the bot to replace an atom's content
  */
 public class ReplaceCommandEvent implements MessageCommandEvent {
     // the content to set instead of the current content
-    private Dataset needDataset;
+    private Dataset atomDataset;
 
-    public ReplaceCommandEvent(Dataset needDataset) {
-        this.needDataset = needDataset;
+    public ReplaceCommandEvent(Dataset atomDataset) {
+        this.atomDataset = atomDataset;
     }
 
     @Override
@@ -31,7 +31,7 @@ public class ReplaceCommandEvent implements MessageCommandEvent {
         return WonMessageType.REPLACE;
     }
 
-    public Dataset getNeedDataset() {
-        return needDataset;
+    public Dataset getAtomDataset() {
+        return atomDataset;
     }
 }

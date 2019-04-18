@@ -180,13 +180,13 @@ function genComponentConf() {
       }
 
       if (this.loggedIn) {
-        this.needs__whatsAround();
+        this.atoms__whatsAround();
       } else {
         this.view__showTermsDialog(
           Immutable.fromJS({
             acceptCallback: () => {
               this.view__hideModalDialog();
-              this.needs__whatsAround();
+              this.atoms__whatsAround();
             },
             cancelCallback: () => {
               this.view__hideModalDialog();
@@ -293,7 +293,7 @@ function genComponentConf() {
   };
 }
 
-export default //.controller('CreateNeedController', [...serviceDependencies, CreateNeedController])
+export default //.controller('CreateAtomController', [...serviceDependencies, CreateAtomController])
 angular
   .module("won.owner.components.usecasePicker", [ngAnimate, labelledHrModule])
   .directive("wonUsecasePicker", genComponentConf).name;

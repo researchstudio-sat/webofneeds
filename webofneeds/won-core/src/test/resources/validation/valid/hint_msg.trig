@@ -1,26 +1,26 @@
 <https://nodeblue.master.matchat.org/won/resource/event/b61f2188yjicxqtkg1vc#content-mrv9> {
     <https://nodeblue.master.matchat.org/won/resource/event/b61f2188yjicxqtkg1vc>
-            <http://purl.org/webofneeds/model#hasFacet>
-                    <http://purl.org/webofneeds/model#ChatFacet> ;
-            <http://purl.org/webofneeds/model#hasMatchCounterpart>
-                    <https://nodeblue.master.matchat.org/won/resource/need/z1ty6w768lb32t4lbr7c> ;
-            <http://purl.org/webofneeds/model#hasMatchScore>
+            <https://w3id.org/won/core#socket>
+                    <https://w3id.org/won/core#ChatSocket> ;
+            <https://w3id.org/won/core#matchCounterpart>
+                    <https://nodeblue.master.matchat.org/won/resource/atom/z1ty6w768lb32t4lbr7c> ;
+            <https://w3id.org/won/core#matchScore>
                     "1.0"^^<http://www.w3.org/2001/XMLSchema#double> ;
-            <http://purl.org/webofneeds/model#hasRemoteFacet>
-                    <http://purl.org/webofneeds/model#ChatFacet> .
+            <https://w3id.org/won/core#targetSocket>
+                    <https://w3id.org/won/core#ChatSocket> .
 }
 
 <https://nodeblue.master.matchat.org/won/resource/event/b61f2188yjicxqtkg1vc#envelope-7ema> {
     <https://nodeblue.master.matchat.org/won/resource/event/b61f2188yjicxqtkg1vc>
-            a       <http://purl.org/webofneeds/message#FromExternal> ;
-            <http://purl.org/webofneeds/message#hasReceivedTimestamp>
+            a       <https://w3id.org/won/message#FromExternal> ;
+            <https://w3id.org/won/message#receivedTimestamp>
                     "1537172373064"^^<http://www.w3.org/2001/XMLSchema#long> ;
-            <http://purl.org/webofneeds/message#protocolVersion>
+            <https://w3id.org/won/message#protocolVersion>
                     "1.0" .
 
     <https://nodeblue.master.matchat.org/won/resource/event/b61f2188yjicxqtkg1vc#envelope-7ema>
-            a       <http://purl.org/webofneeds/message#EnvelopeGraph> ;
-            <http://purl.org/webofneeds/message#containsEnvelope>
+            a       <https://w3id.org/won/message#EnvelopeGraph> ;
+            <https://w3id.org/won/message#containsEnvelope>
                     <https://nodeblue.master.matchat.org/won/resource/event/b61f2188yjicxqtkg1vc#envelope-0w69> ;
             <http://www.w3.org/2004/03/trix/rdfg-1/subGraphOf>
                     <https://nodeblue.master.matchat.org/won/resource/event/b61f2188yjicxqtkg1vc> .
@@ -28,24 +28,24 @@
 
 <https://nodeblue.master.matchat.org/won/resource/event/b61f2188yjicxqtkg1vc#envelope-0w69> {
     <https://nodeblue.master.matchat.org/won/resource/event/b61f2188yjicxqtkg1vc#envelope-0w69>
-            a       <http://purl.org/webofneeds/message#EnvelopeGraph> ;
+            a       <https://w3id.org/won/message#EnvelopeGraph> ;
             <http://www.w3.org/2004/03/trix/rdfg-1/subGraphOf>
                     <https://nodeblue.master.matchat.org/won/resource/event/b61f2188yjicxqtkg1vc> .
 
     <https://nodeblue.master.matchat.org/won/resource/event/b61f2188yjicxqtkg1vc>
-            a       <http://purl.org/webofneeds/message#FromExternal> ;
-            <http://purl.org/webofneeds/message#hasContent>
+            a       <https://w3id.org/won/message#FromExternal> ;
+            <https://w3id.org/won/message#content>
                     <https://nodeblue.master.matchat.org/won/resource/event/b61f2188yjicxqtkg1vc#content-mrv9> ;
-            <http://purl.org/webofneeds/message#hasMessageType>
-                    <http://purl.org/webofneeds/message#HintMessage> ;
-            <http://purl.org/webofneeds/message#hasReceiverNeed>
-                    <https://nodeblue.master.matchat.org/won/resource/need/jzrdhsedqf8b> ;
-            <http://purl.org/webofneeds/message#hasReceiverNode>
+            <https://w3id.org/won/message#messageType>
+                    <https://w3id.org/won/message#HintMessage> ;
+            <https://w3id.org/won/message#recipientAtom>
+                    <https://nodeblue.master.matchat.org/won/resource/atom/jzrdhsedqf8b> ;
+            <https://w3id.org/won/message#recipientNode>
                     <https://nodeblue.master.matchat.org/won/resource> ;
-            <http://purl.org/webofneeds/message#hasSenderNode>
+            <https://w3id.org/won/message#senderNode>
                     <http://localhost:8983/sparql/> ;
-            <http://purl.org/webofneeds/message#hasSentTimestamp>
+            <https://w3id.org/won/message#sentTimestamp>
                     "1537172135089"^^<http://www.w3.org/2001/XMLSchema#long> ;
-            <http://purl.org/webofneeds/message#protocolVersion>
+            <https://w3id.org/won/message#protocolVersion>
                     "1.0" .
 }

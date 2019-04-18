@@ -1,23 +1,23 @@
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-PREFIX msg: <http://purl.org/webofneeds/message#>
-PREFIX won: <http://purl.org/webofneeds/model#>
+PREFIX msg: <https://w3id.org/won/message#>
+PREFIX won: <https://w3id.org/won/core#>
 SELECT distinct ?first ?msg ?distance ?text ?msgType ?time ?rem WHERE {
  {
    SELECT distinct ?first ?msg (count (?mid) as ?distance) WHERE {
-     ?msg msg:hasPreviousMessage* ?mid .
-     ?mid msg:hasPreviousMessage+ ?first .
-     FILTER NOT EXISTS {?first msg:hasPreviousMessage ?none}            
+     ?msg msg:previousMessage* ?mid .
+     ?mid msg:previousMessage+ ?first .
+     FILTER NOT EXISTS {?first msg:previousMessage ?none}            
    }
    GROUP BY ?msg ?first 
  }
  OPTIONAL {
-   ?msg won:hasTextMessage ?text.
-   ?msg msg:hasMessageType ?msgType.
+   ?msg won:textMessage ?text.
+   ?msg msg:messageType ?msgType.
  }
  OPTIONAL {
-    ?msg msg:hasCorrespondingRemoteMessage ?rem . 
-    ?rem won:hasTextMessage ?text.
-    ?rem msg:hasMessageType ?msgType.
+    ?msg msg:correspondingRemoteMessage ?rem . 
+    ?rem won:textMessage ?text.
+    ?rem msg:messageType ?msgType.
  }
- ?msg msg:hasReceivedTimestamp ?time.  
+ ?msg msg:receivedTimestamp ?time.  
 } ORDER BY ?first ?distance ?time

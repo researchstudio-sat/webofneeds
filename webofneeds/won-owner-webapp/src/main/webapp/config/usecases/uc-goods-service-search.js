@@ -87,7 +87,7 @@ export const goodsServiceSearch = {
         let tagsSQ = textSearchSubQuery({
           resultName: resultName,
           bindScoreAs: "?tags_" + keyword + "_index",
-          pathToText: "won:hasTags",
+          pathToText: "won:tags",
           prefixesInPath: {},
           keyword: keyword,
         });
@@ -138,7 +138,7 @@ export const goodsServiceSearch = {
           won: won.defaultContext["won"],
         },
         operations: [
-          `${resultName} rdf:type won:Need.`,
+          `${resultName} rdf:type won:Atom.`,
           `${resultName} rdf:type s:Offer.`,
           `BIND( ( ` +
           subScoreString + // contains all COALESCE statements for text search results

@@ -3,12 +3,12 @@ prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
 prefix geo:   <http://www.w3.org/2003/01/geo/wgs84_pos#>
 prefix conn:  <http://localhost:8080/won/resource/connection/>
 prefix event: <http://localhost:8080/won/resource/event/>
-prefix woncrypt: <http://purl.org/webofneeds/woncrypt#>
+prefix woncrypt: <https://w3id.org/won/core#>
 prefix xsd:   <http://www.w3.org/2001/XMLSchema#>
 prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 prefix local: <http://localhost:8080/won/resource/>
-prefix won:   <http://purl.org/webofneeds/model#>
-prefix msg:   <http://purl.org/webofneeds/message#>
+prefix won:   <https://w3id.org/won/core#>
+prefix msg:   <https://w3id.org/won/message#>
 prefix signature: <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#>
 prefix ldp:   <http://www.w3.org/ns/ldp#>
 
@@ -21,14 +21,14 @@ ASK
   {
     GRAPH ?graph
     {
-            ?event msg:hasMessageType|msg:hasContent|msg:hasReceivedTimestamp|msg:hasSentTimestamp|msg:hasReceiver|msg:hasSender|msg:hasReceiverNeed|msg:hasSenderNeed|msg:hasReceiverNode|msg:hasSenderNode|msg:isResponseTo|msg:isRemoteResponseTo|msg:isResponseToMessageType|msg:containsSignature ?propobj .
+            ?event msg:messageType|msg:content|msg:receivedTimestamp|msg:sentTimestamp|msg:recipient|msg:sender|msg:recipientAtom|msg:senderAtom|msg:recipientNode|msg:senderNode|msg:isResponseTo|msg:isRemoteResponseTo|msg:isResponseToMessageType|msg:containsSignature ?propobj .
             {
-              ?event msg:hasReceivedTimestamp|msg:hasSentTimestamp ?timestamp
+              ?event msg:receivedTimestamp|msg:sentTimestamp ?timestamp
             }
             UNION
             {
-              ?event2 msg:hasCorrespondingRemoteMessage ?event .
-              ?event msg:hasReceivedTimestamp ?timestamp
+              ?event2 msg:correspondingRemoteMessage ?event .
+              ?event msg:receivedTimestamp ?timestamp
             }
     } .
   }

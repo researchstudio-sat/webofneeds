@@ -7,13 +7,13 @@ import java.util.Set;
 
 import org.apache.jena.rdf.model.Model;
 
-import won.bot.framework.eventbot.event.BaseNeedAndConnectionSpecificEvent;
+import won.bot.framework.eventbot.event.BaseAtomAndConnectionSpecificEvent;
 import won.bot.framework.eventbot.event.ConnectionSpecificEvent;
 import won.bot.framework.eventbot.event.impl.command.MessageCommandEvent;
 import won.protocol.message.WonMessageType;
 import won.protocol.model.Connection;
 
-public class ConnectionMessageCommandEvent extends BaseNeedAndConnectionSpecificEvent
+public class ConnectionMessageCommandEvent extends BaseAtomAndConnectionSpecificEvent
                 implements MessageCommandEvent, ConnectionSpecificEvent {
     private Model messageModel;
     private Set<URI> injectIntoConnections = new HashSet<>();

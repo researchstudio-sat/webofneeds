@@ -1,15 +1,15 @@
-prefix won: <http://purl.org/webofneeds/model#>
+prefix won: <https://w3id.org/won/core#>
 prefix rdfs: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 prefix dc: <http://purl.org/dc/elements/1.1/>
 
-SELECT DISTINCT ?slice ?need ?value WHERE {
+SELECT DISTINCT ?slice ?atom ?value WHERE {
     BIND('seeks_title' as ?slice)
-    ?need rdfs:type won:Need.
-    ?need won:crawlStatus ?crawlStatus.
-    ?need won:crawlDate ?date.
-    ?need won:isInState won:Active.
-    ?need won:seeks/dc:title ?value.
-    OPTIONAL {?needUri won:hasFlag ?flag}.
+    ?atom rdfs:type won:Atom.
+    ?atom won:crawlStatus ?crawlStatus.
+    ?atom won:crawlDate ?date.
+    ?atom won:atomState won:Active.
+    ?atom won:seeks/dc:title ?value.
+    OPTIONAL {?atomUri won:flag ?flag}.
     FILTER (!bound(?flag) || (?flag != won:DoNotMatch && ?flag != won:UsedForTesting))
     FILTER (?date >= ?from && ?date < ?to)  # bind variables ?from and ?to here
     FILTER (?crawlStatus = 'DONE' || ?crawlStatus = 'SAVE')

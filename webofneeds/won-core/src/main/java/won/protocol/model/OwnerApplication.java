@@ -27,8 +27,8 @@ public class OwnerApplication {
     @GeneratedValue
     @Column(name = "id")
     private Long id;
-    @ManyToMany(mappedBy = "authorizedApplications", targetEntity = Need.class, fetch = FetchType.LAZY, cascade = CascadeType.DETACH)
-    private List<Need> needs;
+    @ManyToMany(mappedBy = "authorizedApplications", targetEntity = Atom.class, fetch = FetchType.LAZY, cascade = CascadeType.DETACH)
+    private List<Atom> atoms;
     @ElementCollection(fetch = FetchType.EAGER) // required eager as the object is passed out of a hibernate session in
     // OwnerProtocolOutgoingMessagesProcessor
     @Fetch(value = FetchMode.SUBSELECT)
@@ -56,12 +56,12 @@ public class OwnerApplication {
         this.ownerApplicationId = ownerApplicationId;
     }
 
-    // public List<Need> getNeeds() {
-    // return needs;
+    // public List<Atom> getAtoms() {
+    // return atoms;
     // }
     //
-    // public void setNeeds(List<Need> needs) {
-    // this.needs = needs;
+    // public void setAtoms(List<Atom> atoms) {
+    // this.atoms = atoms;
     // }
     public List<String> getQueueNames() {
         return queueNames;

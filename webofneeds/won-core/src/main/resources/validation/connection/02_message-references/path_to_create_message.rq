@@ -1,11 +1,11 @@
 # From any message, other than a `Create` message, there must be
-# at least one path to the need's `Create` message
-PREFIX msg: <http://purl.org/webofneeds/message#>
+# at least one path to the atom's `Create` message
+PREFIX msg: <https://w3id.org/won/message#>
 SELECT ?msg WHERE {
-  ?msg msg:hasMessageType ?msgType.
+  ?msg msg:messageType ?msgType.
   FILTER NOT EXISTS {
-    ?msg msg:hasPreviousMessage* ?createMsg.
-    ?createMsg msg:hasMessageType msg:CreateMessage.
+    ?msg msg:previousMessage* ?createMsg.
+    ?createMsg msg:messageType msg:CreateMessage.
   }
-  FILTER (?msgType != msg:NeedCreatedNotificationMessage)
+  FILTER (?msgType != msg:AtomCreatedNotificationMessage)
 }

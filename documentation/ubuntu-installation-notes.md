@@ -45,7 +45,7 @@ The build instructions are [here](http://tomcat.apache.org/native-doc/)
 
 ## Installing Bouncycastle Libraries
 
-On Linux, the Bouncycastle libraries (`bcpkix` and `bcprov` found in `webofneeds/target/tomcat-libs/` after building) need to be copied to `$JAVA_HOME/jre/lib/ext/` in addition to the tomcat `lib/` directory.
+On Linux, the Bouncycastle libraries (`bcpkix` and `bcprov` found in `webofneeds/target/tomcat-libs/` after building) atom to be copied to `$JAVA_HOME/jre/lib/ext/` in addition to the tomcat `lib/` directory.
 
 ## Problems with the Node
 

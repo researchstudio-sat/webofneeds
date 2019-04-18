@@ -1,13 +1,13 @@
 # Source and target of a Message reference must be in the same
-# eventContainerwith the exception of references pointing to
+# messageContainerwith the exception of references pointing to
 # the `Create` message.
 prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-prefix msg: <http://purl.org/webofneeds/message#>
-prefix won: <http://purl.org/webofneeds/model#>
+prefix msg: <https://w3id.org/won/message#>
+prefix won: <https://w3id.org/won/core#>
 select * where {
   ?cnt rdfs:member ?msg .
   ?cnt2 rdfs:member ?msg2 .
-  ?msg msg:hasPreviousMessage ?msg2 .
-  ?msg2 msg:hasMessageType ?targetType .
+  ?msg msg:previousMessage ?msg2 .
+  ?msg2 msg:messageType ?targetType .
   filter (?cnt != ?cnt2 && ?targetType != msg:CreateMessage)
 }

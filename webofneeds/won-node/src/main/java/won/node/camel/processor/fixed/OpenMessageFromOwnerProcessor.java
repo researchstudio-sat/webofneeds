@@ -24,7 +24,7 @@ import won.protocol.vocabulary.WONMSG;
  * User: syim Date: 02.03.2015
  */
 @Component
-@FixedMessageProcessor(direction = WONMSG.TYPE_FROM_OWNER_STRING, messageType = WONMSG.TYPE_OPEN_STRING)
+@FixedMessageProcessor(direction = WONMSG.FromOwnerString, messageType = WONMSG.OpenMessageString)
 public class OpenMessageFromOwnerProcessor extends AbstractCamelProcessor {
     public void process(final Exchange exchange) throws Exception {
         Message message = exchange.getIn();
@@ -32,61 +32,61 @@ public class OpenMessageFromOwnerProcessor extends AbstractCamelProcessor {
         logger.debug("OPEN received from the owner side for connection {}", wonMessage.getSenderURI());
         Connection con = connectionRepository.findOneByConnectionURI(wonMessage.getSenderURI());
         Objects.requireNonNull(con);
-        Objects.requireNonNull(con.getRemoteNeedURI());
-        if (!con.getRemoteNeedURI().equals(wonMessage.getReceiverNeedURI()))
-            throw new IllegalStateException("remote need uri must be equal to receiver need uri");
+        Objects.requireNonNull(con.getTargetAtomURI());
+        if (!con.getTargetAtomURI().equals(wonMessage.getRecipientAtomURI()))
+            throw new IllegalStateException("remote atom uri must be equal to receiver atom uri");
         if (con.getConnectionURI() == null)
             throw new IllegalStateException("connection uri must not be null");
-        if (con.getFacetURI() == null)
-            throw new IllegalStateException("connection's facet uri must not be null");
+        if (con.getSocketURI() == null)
+            throw new IllegalStateException("connection's socket uri must not be null");
         if (!con.getConnectionURI().equals(wonMessage.getSenderURI()))
             throw new IllegalStateException("connection uri must be equal to sender uri");
-        if (wonMessage.getReceiverURI() != null) {
-            if (!wonMessage.getReceiverURI().equals(con.getRemoteConnectionURI())) {
+        if (wonMessage.getRecipientURI() != null) {
+            if (!wonMessage.getRecipientURI().equals(con.getTargetConnectionURI())) {
                 throw new IllegalStateException("remote connection uri must be equal to receiver uri");
             }
         }
-        // facets: the remote facet in the connection may be null before the open.
-        // check if the owner sent a remote facet. there must not be a clash
-        Optional<URI> userDefinedRemoteFacetURI = Optional
-                        .ofNullable(WonRdfUtils.FacetUtils.getRemoteFacet(wonMessage));
-        Optional<URI> userDefinedFacetURI = Optional.ofNullable(WonRdfUtils.FacetUtils.getFacet(wonMessage));
-        failIfIsNotFacetOfNeed(userDefinedFacetURI, Optional.of(wonMessage.getSenderNeedURI()));
-        failIfIsNotFacetOfNeed(userDefinedRemoteFacetURI, Optional.of(wonMessage.getReceiverNeedURI()));
-        Optional<URI> connectionsRemoteFacetURI = Optional.ofNullable(con.getRemoteFacetURI());
-        // check remote facet info
-        if (userDefinedRemoteFacetURI.isPresent()) {
-            if (connectionsRemoteFacetURI.isPresent()) {
-                if (!userDefinedRemoteFacetURI.get().equals(connectionsRemoteFacetURI.get())) {
+        // sockets: the remote socket in the connection may be null before the open.
+        // check if the owner sent a remote socket. there must not be a clash
+        Optional<URI> userDefinedTargetSocketURI = Optional
+                        .ofNullable(WonRdfUtils.SocketUtils.getTargetSocket(wonMessage));
+        Optional<URI> userDefinedSocketURI = Optional.ofNullable(WonRdfUtils.SocketUtils.getSocket(wonMessage));
+        failIfIsNotSocketOfAtom(userDefinedSocketURI, Optional.of(wonMessage.getSenderAtomURI()));
+        failIfIsNotSocketOfAtom(userDefinedTargetSocketURI, Optional.of(wonMessage.getRecipientAtomURI()));
+        Optional<URI> connectionsTargetSocketURI = Optional.ofNullable(con.getTargetSocketURI());
+        // check remote socket info
+        if (userDefinedTargetSocketURI.isPresent()) {
+            if (connectionsTargetSocketURI.isPresent()) {
+                if (!userDefinedTargetSocketURI.get().equals(connectionsTargetSocketURI.get())) {
                     throw new IllegalArgumentException(
-                                    "Cannot process OPEN FROM_OWNER: remote facet uri clashes with value already set in connection");
+                                    "Cannot process OPEN FROM_OWNER: remote socket uri clashes with value already set in connection");
                 }
             } else {
                 // use the one from the message
-                con.setRemoteFacetURI(userDefinedRemoteFacetURI.get());
+                con.setTargetSocketURI(userDefinedTargetSocketURI.get());
             }
         } else {
-            // check if neither the message nor the connection have a remote facet set
-            if (!connectionsRemoteFacetURI.isPresent()) {
-                // none defined at all: look up default remote facet
-                con.setRemoteFacetURI(lookupDefaultFacet(con.getRemoteNeedURI()));
+            // check if neither the message nor the connection have a remote socket set
+            if (!connectionsTargetSocketURI.isPresent()) {
+                // none defined at all: look up default remote socket
+                con.setTargetSocketURI(lookupDefaultSocket(con.getTargetAtomURI()));
             }
         }
-        failForIncompatibleFacets(con.getFacetURI(), con.getTypeURI(), con.getRemoteFacetURI());
+        failForIncompatibleSockets(con.getSocketURI(), con.getTypeURI(), con.getTargetSocketURI());
         con.setState(con.getState().transit(ConnectionEventType.OWNER_OPEN));
         connectionRepository.save(con);
-        URI remoteMessageUri = wonNodeInformationService.generateEventURI(wonMessage.getReceiverNodeURI());
-        // add the facets to the message if necessary
-        if (!userDefinedFacetURI.isPresent()) {
-            // the user did not specify a facet uri. we have to add it
-            wonMessage.addMessageProperty(WONMSG.HAS_SENDER_FACET, con.getFacetURI());
+        URI remoteMessageUri = wonNodeInformationService.generateEventURI(wonMessage.getRecipientNodeURI());
+        // add the sockets to the message if necessary
+        if (!userDefinedSocketURI.isPresent()) {
+            // the user did not specify a socket uri. we have to add it
+            wonMessage.addMessageProperty(WONMSG.senderSocket, con.getSocketURI());
         }
-        if (!userDefinedRemoteFacetURI.isPresent()) {
+        if (!userDefinedTargetSocketURI.isPresent()) {
             // the user did not specify a remote uri. we have to add it
-            wonMessage.addMessageProperty(WONMSG.HAS_RECEIVER_FACET, con.getRemoteFacetURI());
+            wonMessage.addMessageProperty(WONMSG.recipientSocket, con.getTargetSocketURI());
         }
         // add the information about the corresponding message to the local one
-        wonMessage.addMessageProperty(WONMSG.HAS_CORRESPONDING_REMOTE_MESSAGE, remoteMessageUri);
+        wonMessage.addMessageProperty(WONMSG.correspondingRemoteMessage, remoteMessageUri);
         // the persister will pick it up later
         // put the factory into the outbound message factory header. It will be used to
         // generate the outbound message
@@ -97,10 +97,10 @@ public class OpenMessageFromOwnerProcessor extends AbstractCamelProcessor {
         exchange.getIn().setHeader(WonCamelConstants.OUTBOUND_MESSAGE_FACTORY_HEADER, outboundMessageFactory);
     }
 
-    private URI lookupDefaultFacet(URI needURI) {
-        // look up the default facet and use that one
-        return WonLinkedDataUtils.getDefaultFacet(needURI, true, linkedDataSource)
-                        .orElseThrow(() -> new IllegalStateException("No default facet found on " + needURI));
+    private URI lookupDefaultSocket(URI atomURI) {
+        // look up the default socket and use that one
+        return WonLinkedDataUtils.getDefaultSocket(atomURI, true, linkedDataSource)
+                        .orElseThrow(() -> new IllegalStateException("No default socket found on " + atomURI));
     }
 
     private class OutboundMessageFactory extends OutboundMessageFactoryProcessor {

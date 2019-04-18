@@ -44,50 +44,50 @@ public class MatcherProtocolMatcherClientImplJMSBased implements MatcherProtocol
     }
 
     @Override
-    public void needCreated(final URI needURI, final Model content, final WonMessage wonMessage) {
+    public void atomCreated(final URI atomURI, final Model content, final WonMessage wonMessage) {
         Map headerMap = new HashMap<String, String>();
-        headerMap.put("needURI", needURI.toString());
-        headerMap.put("methodName", "needCreated");
+        headerMap.put("atomURI", atomURI.toString());
+        headerMap.put("methodName", "atomCreated");
         headerMap.put("wonNodeURI", uriService.getGeneralURIPrefix() + "/resource");
         messagingService.sendInOnlyMessage(null, headerMap, WonMessageEncoder.encode(wonMessage, Lang.TRIG),
                         "seda:MatcherProtocolOut");
     }
 
     @Override
-    public void needModified(final URI needURI, final WonMessage wonMessage) {
+    public void atomModified(final URI atomURI, final WonMessage wonMessage) {
         Map headerMap = new HashMap<String, String>();
-        headerMap.put("needURI", needURI.toString());
-        headerMap.put("methodName", "needModified");
+        headerMap.put("atomURI", atomURI.toString());
+        headerMap.put("methodName", "atomModified");
         headerMap.put("wonNodeURI", uriService.getGeneralURIPrefix() + "/resource");
         messagingService.sendInOnlyMessage(null, headerMap, WonMessageEncoder.encode(wonMessage, Lang.TRIG),
                         "seda:MatcherProtocolOut");
     }
 
     @Override
-    public void needActivated(final URI needURI, final WonMessage wonMessage) {
+    public void atomActivated(final URI atomURI, final WonMessage wonMessage) {
         Map headerMap = new HashMap<String, String>();
-        headerMap.put("needURI", needURI.toString());
-        headerMap.put("methodName", "needActivated");
+        headerMap.put("atomURI", atomURI.toString());
+        headerMap.put("methodName", "atomActivated");
         headerMap.put("wonNodeURI", uriService.getGeneralURIPrefix() + "/resource");
         messagingService.sendInOnlyMessage(null, headerMap, WonMessageEncoder.encode(wonMessage, Lang.TRIG),
                         "seda:MatcherProtocolOut");
     }
 
     @Override
-    public void needDeactivated(final URI needURI, final WonMessage wonMessage) {
+    public void atomDeactivated(final URI atomURI, final WonMessage wonMessage) {
         Map headerMap = new HashMap<String, String>();
-        headerMap.put("needURI", needURI.toString());
-        headerMap.put("methodName", "needDeactivated");
+        headerMap.put("atomURI", atomURI.toString());
+        headerMap.put("methodName", "atomDeactivated");
         headerMap.put("wonNodeURI", uriService.getGeneralURIPrefix() + "/resource");
         messagingService.sendInOnlyMessage(null, headerMap, WonMessageEncoder.encode(wonMessage, Lang.TRIG),
                         "seda:MatcherProtocolOut");
     }
 
     @Override
-    public void needDeleted(final URI needURI, final WonMessage wonMessage) {
+    public void atomDeleted(final URI atomURI, final WonMessage wonMessage) {
         Map headerMap = new HashMap<String, String>();
-        headerMap.put("needURI", needURI.toString());
-        headerMap.put("methodName", "needDeleted");
+        headerMap.put("atomURI", atomURI.toString());
+        headerMap.put("methodName", "atomDeleted");
         headerMap.put("wonNodeURI", uriService.getGeneralURIPrefix() + "/resource");
         messagingService.sendInOnlyMessage(null, headerMap, WonMessageEncoder.encode(wonMessage, Lang.TRIG),
                         "seda:MatcherProtocolOut");

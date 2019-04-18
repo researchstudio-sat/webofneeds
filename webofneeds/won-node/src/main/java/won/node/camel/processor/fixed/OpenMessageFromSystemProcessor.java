@@ -12,11 +12,11 @@ import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.vocabulary.WONMSG;
 
 /**
- * Required for auto-open facets. Delegates the processing method to the
+ * Required for auto-open sockets. Delegates the processing method to the
  * OpenMessageFromOwnerProcessor.
  */
 @Component
-@FixedMessageProcessor(direction = WONMSG.TYPE_FROM_SYSTEM_STRING, messageType = WONMSG.TYPE_OPEN_STRING)
+@FixedMessageProcessor(direction = WONMSG.FromSystemString, messageType = WONMSG.OpenMessageString)
 public class OpenMessageFromSystemProcessor extends AbstractCamelProcessor {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     @Autowired
