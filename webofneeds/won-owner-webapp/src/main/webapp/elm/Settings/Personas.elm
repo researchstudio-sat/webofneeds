@@ -586,6 +586,8 @@ viewUnsaved { skin, data, url } =
                 [ Elements.identicon
                     [ width (px 50)
                     , height (px 50)
+                    , Border.rounded 25
+                    , clip
                     ]
                     url
                 , el
@@ -627,6 +629,8 @@ viewPersona { skin, open, url, data } =
                 [ Elements.identicon
                     [ width (px 50)
                     , height (px 50)
+                    , Border.rounded 25
+                    , clip
                     ]
                     url
                 , column
