@@ -17,6 +17,16 @@ The lines of the two files are aligned - each line in `oldforms.txt` has a corre
 
 
 # Usage
+
+## Fast track: apply a rename to a conf directory
+
+To apply rename conf 001 to your local config directory, assumed in `{won-dir}/webofneeds/conf.local`
+```
+cd webofneeds/webofneeds/conf.local 
+../../scripts/rename/rename.sh ../../scripts/rename/conf.rename-001-main-concepts/ FORCE
+```
+Make sure to apply all rename jobs you've missed.
+
 ## Try a dry run
 
 ```
