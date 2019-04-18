@@ -683,7 +683,6 @@ won.defaultContext = {
   sioc: "http://rdfs.org/sioc/ns#",
   dct: "http://purl.org/dc/terms/",
   cert: "http://www.w3.org/ns/auth/cert#",
-  woncrypt: "https://w3id.org/won/core#",
   s: "http://schema.org/",
   sh: "http://www.w3.org/ns/shacl#",
   foaf: "http://xmlns.com/foaf/0.1/",

@@ -23,8 +23,7 @@ import org.springframework.security.authentication.InternalAuthenticationService
 import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter;
 import org.springframework.security.web.authentication.preauth.x509.SubjectDnX509PrincipalExtractor;
 import org.springframework.security.web.authentication.preauth.x509.X509PrincipalExtractor;
-
-import won.protocol.vocabulary.WONCRYPT;
+import won.protocol.vocabulary.WON;
 
 /**
  * Created by fkleedorfer on 28.11.2016.
@@ -66,7 +65,7 @@ public class ReverseProxyCompatibleX509AuthenticationFilter extends AbstractPreA
             } catch (CertificateException e) {
                 throw new InternalAuthenticationServiceException("could not extract certificate from request", e);
             }
-            String certificateHeader = request.getHeader(WONCRYPT.CLIENT_CERTIFICATE_HEADER);
+            String certificateHeader = request.getHeader(WON.CLIENT_CERTIFICATE_HEADER);
             if (certificateHeader == null) {
                 throw new AuthenticationCredentialsNotFoundException(
                                 "No HTTP header 'X-Client-Certificate' set that contains client authentication certificate! If property "
@@ -82,9 +81,9 @@ public class ReverseProxyCompatibleX509AuthenticationFilter extends AbstractPreA
                             .replaceAll("(?<!-----BEGIN|-----END)\\s+", System.lineSeparator())
                             .replaceAll("\\t+", System.lineSeparator());
             if (logger.isDebugEnabled()) {
-                logger.debug("found this certificate in the " + WONCRYPT.CLIENT_CERTIFICATE_HEADER + " header: "
+                logger.debug("found this certificate in the " + WON.CLIENT_CERTIFICATE_HEADER + " header: "
                                 + certificateHeader);
-                logger.debug("found this certificate in the " + WONCRYPT.CLIENT_CERTIFICATE_HEADER
+                logger.debug("found this certificate in the " + WON.CLIENT_CERTIFICATE_HEADER
                                 + " header (after whitespace replacement): " + certificateContent);
             }
             X509Certificate[] userCertificate = new X509Certificate[1];

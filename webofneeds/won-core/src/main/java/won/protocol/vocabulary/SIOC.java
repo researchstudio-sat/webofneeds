@@ -20,6 +20,7 @@ import org.apache.jena.rdf.model.Resource;
  */
 public class SIOC {
     public static final String BASE_URI = "http://rdfs.org/sioc/ns#";
+    public static final String DEFAULT_PREFIX = "sioc";
     private static Model m = ModelFactory.createDefaultModel();
     public static final Resource POST = m.createResource(BASE_URI + "Post");
     public static final Property HAS_REPLY = m.createProperty(BASE_URI, "hasReply");

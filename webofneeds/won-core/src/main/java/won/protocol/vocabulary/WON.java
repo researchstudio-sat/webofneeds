@@ -23,6 +23,7 @@ import won.protocol.model.AtomState;
  */
 public class WON {
     public static final String BASE_URI = "https://w3id.org/won/core#";
+    public static final String DEFAULT_PREFIX = "won";
     private static Model m = ModelFactory.createDefaultModel();
     public static final Resource Atom = m.createResource(BASE_URI + "Atom");
     public static final Property wonNode = m.createProperty(BASE_URI, "wonNode");
@@ -201,6 +202,13 @@ public class WON {
     public static final Property unreadOldestTimestamp = m.createProperty(BASE_URI + "unreadOldestTimestamp");
     public static final Property unreadNewestTimestamp = m.createProperty(BASE_URI + "unreadNewestTimestamp");
     public static final Property unreadCount = m.createProperty(BASE_URI + "unreadCount");
+    // crypt information
+    public static final Resource ECCPublicKey = m.createResource(BASE_URI + "ECCPublicKey");
+    public static final Property ecc_curveId = m.createProperty(BASE_URI, "ecc_curveId");
+    public static final Property ecc_algorithm = m.createProperty(BASE_URI, "ecc_algorithm");
+    public static final Property ecc_qx = m.createProperty(BASE_URI, "ecc_qx");
+    public static final Property ecc_qy = m.createProperty(BASE_URI, "ecc_qy");
+    public static final String CLIENT_CERTIFICATE_HEADER = "X-Client-Certificate";
 
     /**
      * Returns the base URI for this schema.
