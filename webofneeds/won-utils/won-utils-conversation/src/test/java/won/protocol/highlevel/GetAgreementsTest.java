@@ -79,7 +79,7 @@ public class GetAgreementsTest {
     public void oneAgreementOneCancellationTestProposalError() throws IOException {
         Dataset input = loadDataset(inputFolder + "one-agreement-one-cancellation-proposal-error.trig");
         Dataset expectedOutput = loadDataset(
-                        expectedOutputFolder + "one-agreement-one-cancellation-proposal-error.trig");
+                expectedOutputFolder + "one-agreement-one-cancellation-proposal-error.trig");
         test(input, expectedOutput);
     }
 
@@ -135,13 +135,13 @@ public class GetAgreementsTest {
     // This tries to cancel an agreement that accepts two proposals. However, there
     // is an error in the agreement since one of the accepted agreements is not a
     // proposal, but a message.
-    // The file name atoms to be changed..this should produce an empty file
+    // The file name needs to be changed..this should produce an empty file
     // I discovered that it creates problems to use event:6671551888677331000
     @Test
     public void twoProposalOneAgreementOneCancellationmsgError() throws IOException {
         Dataset input = loadDataset(inputFolder + "2proposal-one-agreement-one-cancellation-msgerror.trig");
         Dataset expectedOutput = loadDataset(
-                        expectedOutputFolder + "2proposal-one-agreement-one-cancellation-msgerror.trig");
+                expectedOutputFolder + "2proposal-one-agreement-one-cancellation-msgerror.trig");
         test(input, expectedOutput);
     }
 
@@ -164,7 +164,7 @@ public class GetAgreementsTest {
     public void twoProposalOneAgreementOneCancellationError() throws IOException {
         Dataset input = loadDataset(inputFolder + "2proposal-one-agreement-errormsg-one-cancellation.trig");
         Dataset expectedOutput = loadDataset(
-                        expectedOutputFolder + "2proposal-one-agreement-errormsg-one-cancellation.trig");
+                expectedOutputFolder + "2proposal-one-agreement-errormsg-one-cancellation.trig");
         test(input, expectedOutput);
     }
 
@@ -183,7 +183,7 @@ public class GetAgreementsTest {
     public void oneAgreementTwoCancellationSameAgreement() throws IOException {
         Dataset input = loadDataset(inputFolder + "one-agreement-two-cancellation-same-agreement.trig");
         Dataset expectedOutput = loadDataset(
-                        expectedOutputFolder + "one-agreement-two-cancellation-same-agreement.trig");
+                expectedOutputFolder + "one-agreement-two-cancellation-same-agreement.trig");
         test(input, expectedOutput);
     }
     // This is two proposals and two accepts (two agreements), with one
@@ -280,7 +280,7 @@ public class GetAgreementsTest {
     public void agreementConnectMessageProposesHintFeedbackMessage() throws IOException {
         Dataset input = loadDataset(inputFolder + "agreementConnectMessageProposesHintFeedbackMessage.trig");
         Dataset expectedOutput = loadDataset(
-                        expectedOutputFolder + "agreementConnectMessageProposesHintFeedbackMessage.trig");
+                expectedOutputFolder + "agreementConnectMessageProposesHintFeedbackMessage.trig");
         test(input, expectedOutput);
     }
 
@@ -290,7 +290,7 @@ public class GetAgreementsTest {
     public void twoAgreementsSharingEnvelopeforAcceptsPurposes() throws IOException {
         Dataset input = loadDataset(inputFolder + "two-Agreements-Sharing-Envelopes-for-Accepts-Purposes.trig");
         Dataset expectedOutput = loadDataset(
-                        expectedOutputFolder + "two-Agreements-Sharing-Envelopes-for-Accepts-Purposes.trig");
+                expectedOutputFolder + "two-Agreements-Sharing-Envelopes-for-Accepts-Purposes.trig");
         test(input, expectedOutput);
     }
 
@@ -299,9 +299,9 @@ public class GetAgreementsTest {
     @Test
     public void cancelledTwoAgreementsSharingEnvelopesforAcceptsPurposes() throws IOException {
         Dataset input = loadDataset(
-                        inputFolder + "cancelled-Two-Agreements-Sharing-Envelopes-for-Accepts-Purposes.trig");
+                inputFolder + "cancelled-Two-Agreements-Sharing-Envelopes-for-Accepts-Purposes.trig");
         Dataset expectedOutput = loadDataset(
-                        expectedOutputFolder + "cancelled-Two-Agreements-Sharing-Envelopes-for-Accepts-Purposes.trig");
+                expectedOutputFolder + "cancelled-Two-Agreements-Sharing-Envelopes-for-Accepts-Purposes.trig");
         test(input, expectedOutput);
     }
 
@@ -325,9 +325,9 @@ public class GetAgreementsTest {
     @Test
     public void selfCancelledTwoAgreementsSharingEnvelopesforAcceptsPurposes() throws IOException {
         Dataset input = loadDataset(
-                        inputFolder + "self-cancelled-Two-Agreements-Sharing-Envelopes-for-Accepts-Purposes.trig");
-        Dataset expectedOutput = loadDataset(expectedOutputFolder
-                        + "self-cancelled-Two-Agreements-Sharing-Envelopes-for-Accepts-Purposes.trig");
+                inputFolder + "self-cancelled-Two-Agreements-Sharing-Envelopes-for-Accepts-Purposes.trig");
+        Dataset expectedOutput = loadDataset(
+                expectedOutputFolder + "self-cancelled-Two-Agreements-Sharing-Envelopes-for-Accepts-Purposes.trig");
         test(input, expectedOutput);
     }
 
@@ -352,7 +352,7 @@ public class GetAgreementsTest {
     public void oneAgreementProposalRetractedInterleaved() throws IOException {
         Dataset input = loadDataset(inputFolder + "one-agreement-proposes-retracted-interleaved.trig");
         Dataset expectedOutput = loadDataset(
-                        expectedOutputFolder + "one-agreement-proposes-retracted-interleaved.trig");
+                expectedOutputFolder + "one-agreement-proposes-retracted-interleaved.trig");
         test(input, expectedOutput);
     }
 
@@ -361,7 +361,7 @@ public class GetAgreementsTest {
     public void oneAgreementAcceptContainsRetract() throws IOException {
         Dataset input = loadDataset(inputFolder + "one-agreement-proposes-accept-contains-retract.trig");
         Dataset expectedOutput = loadDataset(
-                        expectedOutputFolder + "one-agreement-proposes-accept-contains-retract.trig");
+                expectedOutputFolder + "one-agreement-proposes-accept-contains-retract.trig");
         test(input, expectedOutput);
     }
 
@@ -370,7 +370,7 @@ public class GetAgreementsTest {
     public void oneProposalTwoAcceptsFirstRetractedFirstCancelled() throws IOException {
         Dataset input = loadDataset(inputFolder + "oneProposalTwoAcceptsFirstRetractedFirstCancelled.trig");
         Dataset expectedOutput = loadDataset(
-                        expectedOutputFolder + "oneProposalTwoAcceptsFirstRetractedFirstCancelled.trig");
+                expectedOutputFolder + "oneProposalTwoAcceptsFirstRetractedFirstCancelled.trig");
         test(input, expectedOutput);
     }
 

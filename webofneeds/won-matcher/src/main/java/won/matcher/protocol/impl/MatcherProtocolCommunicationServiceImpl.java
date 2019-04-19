@@ -33,7 +33,7 @@ public class MatcherProtocolCommunicationServiceImpl implements MatcherProtocolC
 
     @Override
     public synchronized CamelConfiguration configureCamelEndpoint(URI nodeUri, String startingEndpoint)
-                    throws Exception {
+            throws Exception {
         String matcherProtocolQueueName;
         CamelConfiguration camelConfiguration = new CamelConfiguration();
         URI atomBrokerUri = activeMQService.getBrokerEndpoint(nodeUri);
@@ -45,27 +45,26 @@ public class MatcherProtocolCommunicationServiceImpl implements MatcherProtocolC
                 matcherProtocolCamelConfigurator.addRouteForEndpoint(startingEndpoint, atomBrokerUri);
                 matcherProtocolQueueName = activeMQService.getProtocolQueueNameWithResource(nodeUri);
                 // register with remote node. If at some point the same trust strategy will
-                // be used when doing GET on won resource, we don't atom this separate register
+                // be used when doing GET on won resource, we don't need this separate register
                 // step for node
                 registrationClient.register(nodeUri.toString());
                 endpoint = matcherProtocolCamelConfigurator.configureCamelEndpointForAtomUri(nodeUri, atomBrokerUri,
-                                matcherProtocolQueueName);
+                        matcherProtocolQueueName);
                 camelConfiguration.setEndpoint(endpoint);
             }
             camelConfiguration.setBrokerComponentName(
-                            matcherProtocolCamelConfigurator.getBrokerComponentNameWithBrokerUri(atomBrokerUri));
+                    matcherProtocolCamelConfigurator.getBrokerComponentNameWithBrokerUri(atomBrokerUri));
         } else {
             URI resourceUri = nodeUri;
             URI brokerUri = atomBrokerUri;
             matcherProtocolQueueName = activeMQService.getProtocolQueueNameWithResource(resourceUri);
             camelConfiguration.setEndpoint(matcherProtocolCamelConfigurator
-                            .configureCamelEndpointForAtomUri(resourceUri, brokerUri, matcherProtocolQueueName));
+                    .configureCamelEndpointForAtomUri(resourceUri, brokerUri, matcherProtocolQueueName));
             matcherProtocolCamelConfigurator.addRouteForEndpoint(startingEndpoint, brokerUri);
             camelConfiguration.setBrokerComponentName(
-                            matcherProtocolCamelConfigurator.getBrokerComponentNameWithBrokerUri(brokerUri));
+                    matcherProtocolCamelConfigurator.getBrokerComponentNameWithBrokerUri(brokerUri));
             ActiveMQComponent activeMQComponent = (ActiveMQComponent) matcherProtocolCamelConfigurator.getCamelContext()
-                            .getComponent(matcherProtocolCamelConfigurator
-                                            .getBrokerComponentNameWithBrokerUri(brokerUri));
+                    .getComponent(matcherProtocolCamelConfigurator.getBrokerComponentNameWithBrokerUri(brokerUri));
             logger.info("ActiveMQ Service Status : {}", activeMQComponent.getStatus().toString());
             activeMQComponent.start();
         }
@@ -75,20 +74,20 @@ public class MatcherProtocolCommunicationServiceImpl implements MatcherProtocolC
     @Override
     public synchronized Set<String> getMatcherProtocolOutTopics(URI wonNodeURI) {
         Set<String> matcherProtocolTopics = ((MatcherActiveMQService) activeMQService)
-                        .getMatcherProtocolTopicNamesWithResource(wonNodeURI);
+                .getMatcherProtocolTopicNamesWithResource(wonNodeURI);
         return matcherProtocolTopics;
     }
 
     @Override
     public synchronized void addRemoteTopicListeners(final Set<String> endpoints, final URI wonNodeUri)
-                    throws CamelConfigurationFailedException {
+            throws CamelConfigurationFailedException {
         try {
             registrationClient.register(wonNodeUri.toString());
             URI remoteEndpoint = activeMQService.getBrokerEndpoint(wonNodeUri);
             String remoteComponentName = matcherProtocolCamelConfigurator.setupBrokerComponentName(remoteEndpoint);
             logger.debug("remoteComponentName: {}", remoteComponentName);
             matcherProtocolCamelConfigurator.addCamelComponentForWonNodeBrokerForTopics(remoteEndpoint,
-                            remoteComponentName);
+                    remoteComponentName);
             matcherProtocolCamelConfigurator.addRemoteTopicListeners(endpoints, remoteEndpoint);
         } catch (CamelConfigurationFailedException ex) {
             throw ex;

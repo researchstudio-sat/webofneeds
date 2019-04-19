@@ -19,7 +19,7 @@ public interface KeyStoreService {
     PublicKey getPublicKey(String alias);
 
     // TODO is it OK to expose password like this? or should I specify password in
-    // config for each class that atoms to
+    // config for each class that needs to
     // access the 'underlayingkeystore' - key managers etc.
     String getPassword();
 

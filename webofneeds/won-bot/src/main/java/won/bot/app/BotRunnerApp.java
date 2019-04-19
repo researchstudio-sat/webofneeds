@@ -40,7 +40,7 @@ public class BotRunnerApp {
         bot = (Bot) beanFactory.autowire(Class.forName(botClass), AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, false);
         Object botBean = beanFactory.initializeBean(bot, "theBot");
         bot = (Bot) botBean;
-        // the bot also atoms a trigger so its act() method is called regularly.
+        // the bot also needs a trigger so its act() method is called regularly.
         // (there is no trigger bean in the context)
         if (bot instanceof TriggeredBot) {
             PeriodicTrigger trigger = new PeriodicTrigger(5000, TimeUnit.MILLISECONDS);

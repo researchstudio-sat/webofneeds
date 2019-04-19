@@ -71,18 +71,21 @@ public abstract class AbstractSocket implements SocketLogic {
      * connection which is identified by the connection object con. A rdf graph can
      * be sent along with the request.
      *
-     * @param con the connection object
+     * @param con     the connection object
      * @param content a rdf graph describing properties of the event. The null
-     * releative URI ('<>') inside that graph, as well as the base URI of the graph
-     * will be attached to the resource identifying the event.
-     * @throws NoSuchConnectionException if connectionURI does not refer to an
-     * existing connection
+     *                releative URI ('<>') inside that graph, as well as the base
+     *                URI of the graph will be attached to the resource identifying
+     *                the event.
+     * @throws NoSuchConnectionException                 if connectionURI does not
+     *                                                   refer to an existing
+     *                                                   connection
      * @throws IllegalMessageForConnectionStateException if the message is not
-     * allowed in the current state of the connection
+     *                                                   allowed in the current
+     *                                                   state of the connection
      */
     @Override
     public void openFromOwner(final Connection con, final Model content, final WonMessage wonMessage)
-                    throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+            throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
         // inform the other side
         // in an 'open' call the local and the remote connection URI are always known
         // and must be present
@@ -107,18 +110,21 @@ public abstract class AbstractSocket implements SocketLogic {
      * connection which is identified by the connection object con. A rdf graph can
      * be sent along with the request.
      *
-     * @param con the connection object
+     * @param con     the connection object
      * @param content a rdf graph describing properties of the event. The null
-     * releative URI ('<>') inside that graph, as well as the base URI of the graph
-     * will be attached to the resource identifying the event.
-     * @throws NoSuchConnectionException if connectionURI does not refer to an
-     * existing connection
+     *                releative URI ('<>') inside that graph, as well as the base
+     *                URI of the graph will be attached to the resource identifying
+     *                the event.
+     * @throws NoSuchConnectionException                 if connectionURI does not
+     *                                                   refer to an existing
+     *                                                   connection
      * @throws IllegalMessageForConnectionStateException if the message is not
-     * allowed in the current state of the connection
+     *                                                   allowed in the current
+     *                                                   state of the connection
      */
     @Override
     public void closeFromOwner(final Connection con, final Model content, final WonMessage wonMessage)
-                    throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+            throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
         // //inform the other side
         // //TODO: don't inform the other side if there is none (suggested, request_sent
         // states)
@@ -144,16 +150,18 @@ public abstract class AbstractSocket implements SocketLogic {
      * sending of a chat message with by the specified connection object con to the
      * remote partner.
      *
-     * @param con the connection object
+     * @param con     the connection object
      * @param message the chat message
-     * @throws NoSuchConnectionException if connectionURI does not refer to an
-     * existing connection
+     * @throws NoSuchConnectionException                 if connectionURI does not
+     *                                                   refer to an existing
+     *                                                   connection
      * @throws IllegalMessageForConnectionStateException if the message is not
-     * allowed in the current state of the connection
+     *                                                   allowed in the current
+     *                                                   state of the connection
      */
     @Override
     public void sendMessageFromOwner(final Connection con, final Model message, final WonMessage wonMessage)
-                    throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+            throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
         // inform the other side
         executorService.execute(new Runnable() {
             @Override
@@ -173,18 +181,21 @@ public abstract class AbstractSocket implements SocketLogic {
      * open a connection which is identified by the connection object con. A rdf
      * graph can be sent along with the request.
      *
-     * @param con the connection object
+     * @param con     the connection object
      * @param content a rdf graph describing properties of the event. The null
-     * releative URI ('<>') inside that graph, as well as the base URI of the graph
-     * will be attached to the resource identifying the event.
-     * @throws NoSuchConnectionException if connectionURI does not refer to an
-     * existing connection
+     *                releative URI ('<>') inside that graph, as well as the base
+     *                URI of the graph will be attached to the resource identifying
+     *                the event.
+     * @throws NoSuchConnectionException                 if connectionURI does not
+     *                                                   refer to an existing
+     *                                                   connection
      * @throws IllegalMessageForConnectionStateException if the message is not
-     * allowed in the current state of the connection
+     *                                                   allowed in the current
+     *                                                   state of the connection
      */
     @Override
     public void openFromAtom(final Connection con, final Model content, final WonMessage wonMessage)
-                    throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+            throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
         // inform the atom side
         executorService.execute(new Runnable() {
             @Override
@@ -206,18 +217,21 @@ public abstract class AbstractSocket implements SocketLogic {
      * close a connection which is identified by the connection object con. A rdf
      * graph can be sent along with the request.
      *
-     * @param con the connection object
+     * @param con     the connection object
      * @param content a rdf graph describing properties of the event. The null
-     * releative URI ('<>') inside that graph, as well as the base URI of the graph
-     * will be attached to the resource identifying the event.
-     * @throws NoSuchConnectionException if connectionURI does not refer to an
-     * existing connection
+     *                releative URI ('<>') inside that graph, as well as the base
+     *                URI of the graph will be attached to the resource identifying
+     *                the event.
+     * @throws NoSuchConnectionException                 if connectionURI does not
+     *                                                   refer to an existing
+     *                                                   connection
      * @throws IllegalMessageForConnectionStateException if the message is not
-     * allowed in the current state of the connection
+     *                                                   allowed in the current
+     *                                                   state of the connection
      */
     @Override
     public void closeFromAtom(final Connection con, final Model content, final WonMessage wonMessage)
-                    throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+            throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
         // inform the atom side
         executorService.execute(new Runnable() {
             @Override
@@ -238,16 +252,18 @@ public abstract class AbstractSocket implements SocketLogic {
      * indicate the sending of a chat message with by the specified connection
      * object con to the remote partner.
      *
-     * @param con the connection object
+     * @param con     the connection object
      * @param message the chat message
-     * @throws NoSuchConnectionException if connectionURI does not refer to an
-     * existing connection
+     * @throws NoSuchConnectionException                 if connectionURI does not
+     *                                                   refer to an existing
+     *                                                   connection
      * @throws IllegalMessageForConnectionStateException if the message is not
-     * allowed in the current state of the connection
+     *                                                   allowed in the current
+     *                                                   state of the connection
      */
     @Override
     public void sendMessageFromAtom(final Connection con, final Model message, final WonMessage wonMessage)
-                    throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+            throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
         // send to the atom side
         executorService.execute(new Runnable() {
             @Override
@@ -269,22 +285,27 @@ public abstract class AbstractSocket implements SocketLogic {
      * the entity making the call. Normally, originator is a matching service. A rdf
      * graph can be sent along with the request.
      *
-     * @param con the connection object
-     * @param score match score between 0.0 (bad) and 1.0 (good). Implementations
-     * treat lower values as 0.0 and higher values as 1.0.
+     * @param con        the connection object
+     * @param score      match score between 0.0 (bad) and 1.0 (good).
+     *                   Implementations treat lower values as 0.0 and higher values
+     *                   as 1.0.
      * @param originator an URI identifying the calling entity
-     * @param content (optional) an optional RDF graph containing more detailed
-     * information about the hint. The null releative URI ('<>') inside that graph,
-     * as well as the base URI of the graph will be attached to the resource
-     * identifying the match event.
-     * @throws won.protocol.exception.NoSuchAtomException if atomURI is not a known
-     * atom URI
+     * @param content    (optional) an optional RDF graph containing more detailed
+     *                   information about the hint. The null releative URI ('<>')
+     *                   inside that graph, as well as the base URI of the graph
+     *                   will be attached to the resource identifying the match
+     *                   event.
+     * @throws won.protocol.exception.NoSuchAtomException                 if atomURI
+     *                                                                    is not a
+     *                                                                    known atom
+     *                                                                    URI
      * @throws won.protocol.exception.IllegalMessageForAtomStateException if the
-     * atom is not active
+     *                                                                    atom is
+     *                                                                    not active
      */
     @Override
     public void hint(final Connection con, final double score, final URI originator, final Model content,
-                    final WonMessage wonMessage) throws NoSuchAtomException, IllegalMessageForAtomStateException {
+            final WonMessage wonMessage) throws NoSuchAtomException, IllegalMessageForAtomStateException {
         Model targetSocketModelCandidate = content;
         if (wonMessage == null)
             targetSocketModelCandidate = changeHasTargetSocketToHasSocket(content);
@@ -293,7 +314,7 @@ public abstract class AbstractSocket implements SocketLogic {
             executorService.execute(new Runnable() {
                 @Override
                 public void run() {
-                    // here, we don't really atom to handle exceptions, as we don't want to flood
+                    // here, we don't really need to handle exceptions, as we don't want to flood
                     // matching services with error messages
                     // try {
                     // ownerProtocolOwnerService.hint(
@@ -319,18 +340,21 @@ public abstract class AbstractSocket implements SocketLogic {
      * is identified by the connection object con. A rdf graph can be sent along
      * with the request.
      *
-     * @param con the connection object
+     * @param con     the connection object
      * @param content a rdf graph describing properties of the event. The null
-     * releative URI ('<>') inside that graph, as well as the base URI of the graph
-     * will be attached to the resource identifying the event.
-     * @throws NoSuchConnectionException if connectionURI does not refer to an
-     * existing connection
+     *                releative URI ('<>') inside that graph, as well as the base
+     *                URI of the graph will be attached to the resource identifying
+     *                the event.
+     * @throws NoSuchConnectionException                 if connectionURI does not
+     *                                                   refer to an existing
+     *                                                   connection
      * @throws IllegalMessageForConnectionStateException if the message is not
-     * allowed in the current state of the connection
+     *                                                   allowed in the current
+     *                                                   state of the connection
      */
     @Override
     public void connectFromAtom(final Connection con, final Model content, final WonMessage wonMessage)
-                    throws NoSuchAtomException, IllegalMessageForAtomStateException, ConnectionAlreadyExistsException {
+            throws NoSuchAtomException, IllegalMessageForAtomStateException, ConnectionAlreadyExistsException {
         final Connection connectionForRunnable = con;
         executorService.execute(new Runnable() {
             @Override
@@ -367,18 +391,21 @@ public abstract class AbstractSocket implements SocketLogic {
      * identified by the connection object con. A rdf graph can be sent along with
      * the request.
      *
-     * @param con the connection object
+     * @param con     the connection object
      * @param content a rdf graph describing properties of the event. The null
-     * releative URI ('<>') inside that graph, as well as the base URI of the graph
-     * will be attached to the resource identifying the event.
-     * @throws NoSuchConnectionException if connectionURI does not refer to an
-     * existing connection
+     *                releative URI ('<>') inside that graph, as well as the base
+     *                URI of the graph will be attached to the resource identifying
+     *                the event.
+     * @throws NoSuchConnectionException                 if connectionURI does not
+     *                                                   refer to an existing
+     *                                                   connection
      * @throws IllegalMessageForConnectionStateException if the message is not
-     * allowed in the current state of the connection
+     *                                                   allowed in the current
+     *                                                   state of the connection
      */
     @Override
     public void connectFromOwner(final Connection con, final Model content, WonMessage wonMessage)
-                    throws NoSuchAtomException, IllegalMessageForAtomStateException, ConnectionAlreadyExistsException {
+            throws NoSuchAtomException, IllegalMessageForAtomStateException, ConnectionAlreadyExistsException {
         Model targetSocketModel = null;
         targetSocketModel = changeHasTargetSocketToHasSocket(content);
         final Connection connectionForRunnable = con;
@@ -518,7 +545,7 @@ public abstract class AbstractSocket implements SocketLogic {
             StringWriter newModelAsString = new StringWriter();
             RDFDataMgr.write(newModelAsString, model, Lang.TTL);
             logger.debug("changed targetSocket to socket. Old: \n{},\n new: \n{}", modelAsString.toString(),
-                            newModelAsString.toString());
+                    newModelAsString.toString());
         }
         return newModel;
     }

@@ -84,7 +84,7 @@ public class CloseMessageFromSystemProcessor extends AbstractCamelProcessor {
 
         @Override
         public WonMessage process(WonMessage message) throws WonMessageProcessingException {
-            // there atom not be a remote connection. Don't create a message if this is the
+            // there need not be a remote connection. Don't create a message if this is the
             // case.
             if (connection.getTargetConnectionURI() == null)
                 return null;
@@ -92,10 +92,10 @@ public class CloseMessageFromSystemProcessor extends AbstractCamelProcessor {
             URI localNodeURI = wonNodeInformationService.getWonNodeUri(connection.getConnectionURI());
             // create the message to send to the remote node
             return WonMessageBuilder.setPropertiesForPassingMessageToRemoteNode(message, getMessageURI())
-                            .setSenderNodeURI(localNodeURI).setSenderURI(connection.getConnectionURI())
-                            .setSenderAtomURI(connection.getAtomURI()).setRecipientNodeURI(remoteNodeURI)
-                            .setRecipientURI(connection.getTargetConnectionURI())
-                            .setRecipientAtomURI(connection.getTargetAtomURI()).build();
+                    .setSenderNodeURI(localNodeURI).setSenderURI(connection.getConnectionURI())
+                    .setSenderAtomURI(connection.getAtomURI()).setRecipientNodeURI(remoteNodeURI)
+                    .setRecipientURI(connection.getTargetConnectionURI())
+                    .setRecipientAtomURI(connection.getTargetAtomURI()).build();
         }
     }
 }
