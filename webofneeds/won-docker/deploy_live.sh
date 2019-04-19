@@ -40,7 +40,7 @@ echo run docker containers using docker-compose:
 docker-compose --tlsverify --tlscacert=/var/lib/jenkins/.docker/ca.pem --tlscert=/var/lib/jenkins/.docker/cert.pem --tlskey=/var/lib/jenkins/.docker/key.pem -H satvm01.researchstudio.at:2376 down
 docker-compose --tlsverify --tlscacert=/var/lib/jenkins/.docker/ca.pem --tlscert=/var/lib/jenkins/.docker/cert.pem --tlskey=/var/lib/jenkins/.docker/key.pem -H satvm01.researchstudio.at:2376 up -d
 
-echo [currently deactivated:] push automatically built webobofatoms images to docker hub
+echo [currently deactivated:] push automatically built webobofneeds images to docker hub
 # 
 #docker --tlsverify -H satvm01.researchstudio.at:2376 login --username=$DOCKER_USER --password=$DOCKER_PASS
 #docker --tlsverify -H satvm01.researchstudio.at:2376 push webofneeds/gencert:live

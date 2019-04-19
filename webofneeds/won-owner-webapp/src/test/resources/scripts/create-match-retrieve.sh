@@ -6,8 +6,8 @@ SERVER=http://localhost:8080/owner
 
 JSON_CREATE_USER='{"username":"<NAME>", "password":"abc"}'
 JSON_SIGN_IN='{"username":"<NAME>", "password":"abc"}'
-JSON_ATOM_DEMAND_A='{"title":"couch", "textDescription":"I atom a couch", "basicAtomType":"DEMAND"}'
-JSON_ATOM_SUPPLY_A='{"title":"couch", "textDescription":"I atom a couch", "basicAtomType":"SUPPLY"}'
+JSON_ATOM_DEMAND_A='{"title":"couch", "textDescription":"I need a couch", "basicAtomType":"DEMAND"}'
+JSON_ATOM_SUPPLY_A='{"title":"couch", "textDescription":"I need a couch", "basicAtomType":"SUPPLY"}'
 
 function outputResponseIfNotOk {
 	output=$1

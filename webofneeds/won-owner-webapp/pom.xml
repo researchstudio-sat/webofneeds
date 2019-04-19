@@ -1,537 +1,483 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <parent>
-        <artifactId>webofneeds</artifactId>
-        <groupId>at.researchstudio.sat</groupId>
-        <version>0.4-SNAPSHOT</version>
-    </parent>
-    <packaging>war</packaging>
-    <name>Owner Webapp</name>
-    <modelVersion>4.0.0</modelVersion>
-    <artifactId>won-owner-webapp</artifactId>
-
-    <repositories>
-        <!--<repository> <id>spring-snapshot</id> <url>https://repo.spring.io/libs-milestone</url> 
-            </repository> -->
-        <repository>
-            <id>spring-snapshot</id>
-            <url>https://repo.spring.io/libs-snapshot</url>
-        </repository>
-    </repositories>
-
-
-    <dependencies>
-        <!-- Warning! Only to be used in connection with the <dependencyManagement> 
+<project 
+	xmlns="http://maven.apache.org/POM/4.0.0" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<parent>
+		<artifactId>webofneeds</artifactId>
+		<groupId>at.researchstudio.sat</groupId>
+		<version>0.4-SNAPSHOT</version>
+	</parent>
+	<packaging>war</packaging>
+	<name>Owner Webapp</name>
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>won-owner-webapp</artifactId>
+	<repositories>
+		<!--<repository><id>spring-snapshot</id><url>https://repo.spring.io/libs-milestone</url></repository> -->
+		<repository>
+			<id>spring-snapshot</id>
+			<url>https://repo.spring.io/libs-snapshot</url>
+		</repository>
+	</repositories>
+	<dependencies>
+		<!-- Warning! Only to be used in connection with the <dependencyManagement> 
             section in the parent pom! -->
-        <dependency>
-            <groupId>at.researchstudio.sat</groupId>
-            <artifactId>won-owner</artifactId>
-            <version>${project.version}</version>
-            <scope>${dependencies.scope}</scope>
-        </dependency>
-        <dependency>
-            <groupId>at.researchstudio.sat</groupId>
-            <artifactId>won-matcher</artifactId>
-            <version>${project.version}</version>
-            <scope>${dependencies.scope}</scope>
-        </dependency>
-        <dependency>
-            <groupId>at.researchstudio.sat</groupId>
-            <artifactId>won-utils-mail</artifactId>
-            <version>${project.version}</version>
-            <scope>${dependencies.scope}</scope>
-        </dependency>
-        <dependency>
-            <groupId>at.researchstudio.sat</groupId>
-            <artifactId>won-utils-goals</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>at.researchstudio.sat</groupId>
-            <artifactId>won-utils-conversation</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <!-- JSTL/Servlet -->
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>jstl</artifactId>
-            <scope>${dependencies.scope}</scope>
-        </dependency>
-
-        <!-- mail -->
-        <dependency>
-            <groupId>org.apache.velocity</groupId>
-            <artifactId>velocity</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>oro</groupId>
-            <artifactId>oro</artifactId>
-        </dependency>
-
-        <!-- sitemaps -->
-        <dependency>
-            <groupId>com.github.dfabulich</groupId>
-            <artifactId>sitemapgen4j</artifactId>
-            <version>1.0.6</version>
-        </dependency>
-
-        <!-- Spring -->
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-web</artifactId>
-            <scope>${dependencies.scope}</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-webmvc</artifactId>
-            <scope>${dependencies.scope}</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-web</artifactId>
-            <scope>${dependencies.scope}</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-config</artifactId>
-            <scope>${dependencies.scope}</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-taglibs</artifactId>
-            <scope>${dependencies.scope}</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-websocket</artifactId>
-            <scope>${dependencies.scope}</scope>
-        </dependency>
-        <!-- Hibernate Validator -->
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-validator</artifactId>
-            <scope>${dependencies.scope}</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>javax.validation</groupId>
-            <artifactId>validation-api</artifactId>
-            <scope>${dependencies.scope}</scope>
-        </dependency>
-
-
-
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <scope>${dependencies.scope}</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            <scope>${dependencies.scope}</scope>
-        </dependency>
-
-        <!-- spring-session -->
-        <dependency>
-            <groupId>org.springframework.session</groupId>
-            <artifactId>spring-session</artifactId>
-            <version>1.0.0.RC1</version>
-        </dependency>
-
-        <!-- TESTING -->
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-test</artifactId>
-        </dependency>
-
-    </dependencies>
-
-
-    <build>
-        <finalName>owner</finalName>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-            </resource>
-        </resources>
-        <testResources>
-            <testResource>
-                <directory>src/test/resources</directory>
-            </testResource>
-        </testResources>
-        <plugins>
-            <plugin>
-                <groupId>net.revelc.code.formatter</groupId>
-                <artifactId>formatter-maven-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-war-plugin</artifactId>
-                <configuration>
-                    <warSourceExcludes>bower_components/**,jspm_packages/**,node_modules/**,node/**,scripts/**</warSourceExcludes>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>build-owner-webapp-war</id>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>copy-dependencies-to-owner-webapp</id>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>copy-dependencies</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${project.build.directory}/${project.build.finalName}/WEB-INF/lib</outputDirectory>
-                            <overWriteReleases>true</overWriteReleases>
-                            <overWriteSnapshots>true</overWriteSnapshots>
-                            <overWriteIfNewer>true</overWriteIfNewer>
-                            <includeGroupIds>${project.groupId}</includeGroupIds>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>com.github.eirslett</groupId>
-                <artifactId>frontend-maven-plugin</artifactId>
-                <!-- optional -->
-                <configuration>
-                    <workingDirectory>src/main/webapp</workingDirectory>
-                </configuration>
-                <executions>
-                    <execution>
-                        <!-- optional: you don't really atom execution ids, 
+		<dependency>
+			<groupId>at.researchstudio.sat</groupId>
+			<artifactId>won-owner</artifactId>
+			<version>${project.version}</version>
+			<scope>${dependencies.scope}</scope>
+		</dependency>
+		<dependency>
+			<groupId>at.researchstudio.sat</groupId>
+			<artifactId>won-matcher</artifactId>
+			<version>${project.version}</version>
+			<scope>${dependencies.scope}</scope>
+		</dependency>
+		<dependency>
+			<groupId>at.researchstudio.sat</groupId>
+			<artifactId>won-utils-mail</artifactId>
+			<version>${project.version}</version>
+			<scope>${dependencies.scope}</scope>
+		</dependency>
+		<dependency>
+			<groupId>at.researchstudio.sat</groupId>
+			<artifactId>won-utils-goals</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>at.researchstudio.sat</groupId>
+			<artifactId>won-utils-conversation</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<!-- JSTL/Servlet -->
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>jstl</artifactId>
+			<scope>${dependencies.scope}</scope>
+		</dependency>
+		<!-- mail -->
+		<dependency>
+			<groupId>org.apache.velocity</groupId>
+			<artifactId>velocity</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>oro</groupId>
+			<artifactId>oro</artifactId>
+		</dependency>
+		<!-- sitemaps -->
+		<dependency>
+			<groupId>com.github.dfabulich</groupId>
+			<artifactId>sitemapgen4j</artifactId>
+			<version>1.0.6</version>
+		</dependency>
+		<!-- Spring -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-web</artifactId>
+			<scope>${dependencies.scope}</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-webmvc</artifactId>
+			<scope>${dependencies.scope}</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-web</artifactId>
+			<scope>${dependencies.scope}</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-config</artifactId>
+			<scope>${dependencies.scope}</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-taglibs</artifactId>
+			<scope>${dependencies.scope}</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-websocket</artifactId>
+			<scope>${dependencies.scope}</scope>
+		</dependency>
+		<!-- Hibernate Validator -->
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-validator</artifactId>
+			<scope>${dependencies.scope}</scope>
+		</dependency>
+		<dependency>
+			<groupId>javax.validation</groupId>
+			<artifactId>validation-api</artifactId>
+			<scope>${dependencies.scope}</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<scope>${dependencies.scope}</scope>
+		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<scope>${dependencies.scope}</scope>
+		</dependency>
+		<!-- spring-session -->
+		<dependency>
+			<groupId>org.springframework.session</groupId>
+			<artifactId>spring-session</artifactId>
+			<version>1.0.0.RC1</version>
+		</dependency>
+		<!-- TESTING -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+		</dependency>
+	</dependencies>
+	<build>
+		<finalName>owner</finalName>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+			</resource>
+		</resources>
+		<testResources>
+			<testResource>
+				<directory>src/test/resources</directory>
+			</testResource>
+		</testResources>
+		<plugins>
+			<plugin>
+				<groupId>net.revelc.code.formatter</groupId>
+				<artifactId>formatter-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<configuration>
+					<warSourceExcludes>bower_components/**,jspm_packages/**,node_modules/**,node/**,scripts/**</warSourceExcludes>
+				</configuration>
+				<executions>
+					<execution>
+						<id>build-owner-webapp-war</id>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copy-dependencies-to-owner-webapp</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.build.directory}/${project.build.finalName}/WEB-INF/lib</outputDirectory>
+							<overWriteReleases>true</overWriteReleases>
+							<overWriteSnapshots>true</overWriteSnapshots>
+							<overWriteIfNewer>true</overWriteIfNewer>
+							<includeGroupIds>${project.groupId}</includeGroupIds>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>com.github.eirslett</groupId>
+				<artifactId>frontend-maven-plugin</artifactId>
+				<!-- optional -->
+				<configuration>
+					<workingDirectory>src/main/webapp</workingDirectory>
+				</configuration>
+				<executions>
+					<execution>
+						<!-- optional: you don't really need execution ids, 
                             but it looks nice in your build log. -->
-                        <id>install-node-and-npm</id>
-                        <goals>
-                            <goal>install-node-and-npm</goal>
-                        </goals>
-                        <!-- optional: default phase is "generate-resources" -->
-                        <phase>initialize</phase>
-                        <configuration>
-                            <nodeVersion>v11.5.0</nodeVersion>
-                            <npmVersion>6.5.0</npmVersion>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>npm-install</id>
-                        <goals>
-                            <!-- everything else is executed by the postinstall 
+						<id>install-node-and-npm</id>
+						<goals>
+							<goal>install-node-and-npm</goal>
+						</goals>
+						<!-- optional: default phase is "generate-resources" -->
+						<phase>initialize</phase>
+						<configuration>
+							<nodeVersion>v11.5.0</nodeVersion>
+							<npmVersion>6.5.0</npmVersion>
+						</configuration>
+					</execution>
+					<execution>
+						<id>npm-install</id>
+						<goals>
+							<!-- everything else is executed by the postinstall 
                                 hook in package.json -->
-                            <goal>npm</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>npm-build</id>
-                        <goals>
-                            <goal>npm</goal>
-                        </goals>
-                        <configuration>
-                            <arguments>run build</arguments>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>npm-run-clean</id>
-                        <goals>
-                            <goal>npm</goal>
-                        </goals>
-                        <phase>clean</phase>
-                        <configuration>
-                            <arguments>run clean</arguments>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <!-- Configuration that starts the watch task. This 
+							<goal>npm</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>npm-build</id>
+						<goals>
+							<goal>npm</goal>
+						</goals>
+						<configuration>
+							<arguments>run build</arguments>
+						</configuration>
+					</execution>
+					<execution>
+						<id>npm-run-clean</id>
+						<goals>
+							<goal>npm</goal>
+						</goals>
+						<phase>clean</phase>
+						<configuration>
+							<arguments>run clean</arguments>
+						</configuration>
+					</execution>
+					<execution>
+						<!-- Configuration that starts the watch task. This 
                             causes a build when resources change. Not run during any phase, must be started 
                             explicitly using 'mvn frontend:npm@watch' -->
-                        <id>watch</id>
-                        <goals>
-                            <goal>npm</goal>
-                        </goals>
-                        <phase>none</phase>
-                        <configuration>
-                            <arguments>run watch</arguments>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
-    <profiles>
-        <profile>
-            <id>skip-owner-webapp-war</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>com.github.ekryd.echo-maven-plugin</groupId>
-                        <artifactId>echo-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>skip-owner-webapp-jar-before</id>
-                                <phase>validate</phase>
-                                <goals>
-                                    <goal>echo</goal>
-                                </goals>
-                                <configuration>
-                                    <message>Note: building the
-                                        won-owner-webapp war file is
-                                        skipped. This is done because
-                                        the profile
-                                        'skip-owner-webapp-war' is
-                                        active ('-P
-                                        skip-owner-webapp-war' on the
-                                        command line)</message>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <!-- use the same config as above but set the phase to 
+						<id>watch</id>
+						<goals>
+							<goal>npm</goal>
+						</goals>
+						<phase>none</phase>
+						<configuration>
+							<arguments>run watch</arguments>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+	<profiles>
+		<profile>
+			<id>skip-owner-webapp-war</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>com.github.ekryd.echo-maven-plugin</groupId>
+						<artifactId>echo-maven-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>skip-owner-webapp-jar-before</id>
+								<phase>validate</phase>
+								<goals>
+									<goal>echo</goal>
+								</goals>
+								<configuration>
+									<message>Note: building the                                        won-owner-webapp war file is                                        skipped. This is done because                                        the profile                                        'skip-owner-webapp-war' is                                        active ('-P                                        skip-owner-webapp-war' on the                                        command line)</message>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<!-- use the same config as above but set the phase to 
                         'none' -->
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-war-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>default-war</id>
-                                <phase>none</phase>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-dependency-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>copy-dependencies-to-owner-webapp</id>
-                                <phase>none</phase>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>skip-owner-webapp-war-but-explode</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>com.github.ekryd.echo-maven-plugin</groupId>
-                        <artifactId>echo-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>skip-owner-webapp-war-but-explode-before</id>
-                                <phase>validate</phase>
-                                <goals>
-                                    <goal>echo</goal>
-                                </goals>
-                                <configuration>
-                                    <message>Note: building the
-                                        won-owner-webapp war file is
-                                        skipped, but the webapp is built
-                                        in 'exploded' mode. This is done
-                                        because the profile
-                                        'skip-owner-webapp-war-but-explode'
-                                        is active ('-P
-                                        skip-owner-webapp-war-but-explode'
-                                        on the command line)</message>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <!-- use the same config as above but set the phase to 
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-war-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>default-war</id>
+								<phase>none</phase>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-dependency-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>copy-dependencies-to-owner-webapp</id>
+								<phase>none</phase>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>skip-owner-webapp-war-but-explode</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>com.github.ekryd.echo-maven-plugin</groupId>
+						<artifactId>echo-maven-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>skip-owner-webapp-war-but-explode-before</id>
+								<phase>validate</phase>
+								<goals>
+									<goal>echo</goal>
+								</goals>
+								<configuration>
+									<message>Note: building the                                        won-owner-webapp war file is                                        skipped, but the webapp is built                                        in 'exploded' mode. This is done                                        because the profile                                        'skip-owner-webapp-war-but-explode'                                        is active ('-P                                        skip-owner-webapp-war-but-explode'                                        on the command line)</message>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<!-- use the same config as above but set the phase to 
                         'none' -->
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-war-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>default-war</id>
-                                <phase>none</phase>
-                            </execution>
-                            <execution>
-                                <id>default-exploded</id>
-                                <configuration>
-                                    <warSourceExcludes>bower_components/**,jspm_packages/**,node_modules/**,node/**,scripts/**</warSourceExcludes>
-                                </configuration>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>exploded</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>skip-frontend</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>com.github.ekryd.echo-maven-plugin</groupId>
-                        <artifactId>echo-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>frontend-gulp-before</id>
-                                <phase>validate</phase>
-                                <goals>
-                                    <goal>echo</goal>
-                                </goals>
-                                <configuration>
-                                    <message>Note: the install and build
-                                        process for the javascript
-                                        frontend is skipped completely.
-                                        This is done because the profile
-                                        'skip-frontend' is active ('-P
-                                        skip-frontend' on the command
-                                        line)</message>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <!-- use the same config as above but set the phase to 
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-war-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>default-war</id>
+								<phase>none</phase>
+							</execution>
+							<execution>
+								<id>default-exploded</id>
+								<configuration>
+									<warSourceExcludes>bower_components/**,jspm_packages/**,node_modules/**,node/**,scripts/**</warSourceExcludes>
+								</configuration>
+								<phase>package</phase>
+								<goals>
+									<goal>exploded</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>skip-frontend</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>com.github.ekryd.echo-maven-plugin</groupId>
+						<artifactId>echo-maven-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>frontend-gulp-before</id>
+								<phase>validate</phase>
+								<goals>
+									<goal>echo</goal>
+								</goals>
+								<configuration>
+									<message>Note: the install and build                                        process for the javascript                                        frontend is skipped completely.                                        This is done because the profile                                        'skip-frontend' is active ('-P                                        skip-frontend' on the command                                        line)</message>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<!-- use the same config as above but set the phase to 
                         'none' -->
-                    <plugin>
-                        <groupId>com.github.eirslett</groupId>
-                        <artifactId>frontend-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>install-node-and-npm</id>
-                                <phase>none</phase>
-                            </execution>
-                            <execution>
-                                <id>npm-install</id>
-                                <phase>none</phase>
-                            </execution>
-                            <execution>
-                                <id>npm-build</id>
-                                <phase>none</phase>
-                            </execution>
-                            <execution>
-                                <id>npm-run-clean</id>
-                                <phase>none</phase>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>skip-frontend-all-but-gulp</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>com.github.ekryd.echo-maven-plugin</groupId>
-                        <artifactId>echo-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>frontend-gulp-before</id>
-                                <phase>validate</phase>
-                                <goals>
-                                    <goal>echo</goal>
-                                </goals>
-                                <configuration>
-                                    <message>Note: the install process
-                                        for the javascript frontend is
-                                        skipped but 'gulp build' and
-                                        'gulp clean' are still executed.
-                                        This is done because the profile
-                                        'skip-frontend-all-but-gulp' is
-                                        active ('-P
-                                        skip-frontend-all-but-gulp' on
-                                        the command line)</message>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <!-- use the same config as above but set the phase to 
+					<plugin>
+						<groupId>com.github.eirslett</groupId>
+						<artifactId>frontend-maven-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>install-node-and-npm</id>
+								<phase>none</phase>
+							</execution>
+							<execution>
+								<id>npm-install</id>
+								<phase>none</phase>
+							</execution>
+							<execution>
+								<id>npm-build</id>
+								<phase>none</phase>
+							</execution>
+							<execution>
+								<id>npm-run-clean</id>
+								<phase>none</phase>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>skip-frontend-all-but-gulp</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>com.github.ekryd.echo-maven-plugin</groupId>
+						<artifactId>echo-maven-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>frontend-gulp-before</id>
+								<phase>validate</phase>
+								<goals>
+									<goal>echo</goal>
+								</goals>
+								<configuration>
+									<message>Note: the install process                                        for the javascript frontend is                                        skipped but 'gulp build' and                                        'gulp clean' are still executed.                                        This is done because the profile                                        'skip-frontend-all-but-gulp' is                                        active ('-P                                        skip-frontend-all-but-gulp' on                                        the command line)</message>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<!-- use the same config as above but set the phase to 
                         'none' -->
-                    <plugin>
-                        <groupId>com.github.eirslett</groupId>
-                        <artifactId>frontend-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>install-node-and-npm</id>
-                                <phase>none</phase>
-                            </execution>
-                            <execution>
-                                <id>npm-install</id>
-                                <phase>none</phase>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>suppress-npm-clean</id>
-            <activation>
-                <file>
-                    <missing>src/main/webapp/node</missing>
-                </file>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>com.github.ekryd.echo-maven-plugin</groupId>
-                        <artifactId>echo-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>frontend-suppress-npm-clean</id>
-                                <phase>validate</phase>
-                                <goals>
-                                    <goal>echo</goal>
-                                </goals>
-                                <configuration>
-                                    <message>Note: the profile
-                                        'suppress-npm-clean' is active
-                                        because the local installation
-                                        of nodejs was not found in
-                                        'src/main/webapp/node'. 'npm run
-                                        clean' will not be executed.</message>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>com.github.eirslett</groupId>
-                        <artifactId>frontend-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>npm-run-clean</id>
-                                <goals>
-                                    <goal>npm</goal>
-                                </goals>
-                                <phase>none</phase>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
+					<plugin>
+						<groupId>com.github.eirslett</groupId>
+						<artifactId>frontend-maven-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>install-node-and-npm</id>
+								<phase>none</phase>
+							</execution>
+							<execution>
+								<id>npm-install</id>
+								<phase>none</phase>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>suppress-npm-clean</id>
+			<activation>
+				<file>
+					<missing>src/main/webapp/node</missing>
+				</file>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>com.github.ekryd.echo-maven-plugin</groupId>
+						<artifactId>echo-maven-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>frontend-suppress-npm-clean</id>
+								<phase>validate</phase>
+								<goals>
+									<goal>echo</goal>
+								</goals>
+								<configuration>
+									<message>Note: the profile                                        'suppress-npm-clean' is active                                        because the local installation                                        of nodejs was not found in                                        'src/main/webapp/node'. 'npm run                                        clean' will not be executed.</message>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>com.github.eirslett</groupId>
+						<artifactId>frontend-maven-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>npm-run-clean</id>
+								<goals>
+									<goal>npm</goal>
+								</goals>
+								<phase>none</phase>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 </project>
