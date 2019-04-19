@@ -22,6 +22,6 @@ We do not use TRACE (see http://www.slf4j.org/faq.html#trace).
 * If you need expensive calculations to get the logging string make use of the `logger.isDebugEnabled()`, etc. function.
 
 # Exceptions
-Each exception has to be logged with an according message besides the stack trace. If there is no atom for a special message use 
+Each exception has to be logged with an according message besides the stack trace. If there is no need for a special message use 
 `logger.warn("caught <NameOfException>:", e)`
 

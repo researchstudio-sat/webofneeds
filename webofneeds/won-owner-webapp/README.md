@@ -2,7 +2,7 @@
 
 We're using the redux-architecture for the client.
 
-**Before you read anything else, check out [redux](http://redux.js.org/) and [ng-redux](https://github.com/wbuchwalter/ng-redux)**. The documentation on these two pages is very good and there's no atom to repeat them here. Thus anything below will assume you have a basic understanding of actions, reducers, the store and components, as well as how they look like in angular. The purpose of this text is to document additional architectural details, specific coding style and learnings not documented in these two as well as any cases in which our architecture diverges from theirs.
+**Before you read anything else, check out [redux](http://redux.js.org/) and [ng-redux](https://github.com/wbuchwalter/ng-redux)**. The documentation on these two pages is very good and there's no need to repeat them here. Thus anything below will assume you have a basic understanding of actions, reducers, the store and components, as well as how they look like in angular. The purpose of this text is to document additional architectural details, specific coding style and learnings not documented in these two as well as any cases in which our architecture diverges from theirs.
 
 ![redux architecture in client-side owner-app](http://researchstudio-sat.github.io/webofneeds/images/owner_app_redux_architecture.svg)
 
@@ -10,7 +10,7 @@ We're using the redux-architecture for the client.
 
 Can be found in `app/actions/actions.js`
 
-Anything that can cause **side-effects** or is **asynchronous** should happen in these (tough it atomn't necessarily - see `INJ_DEFAULT`)
+Anything that can cause **side-effects** or is **asynchronous** should happen in these (tough it needn't necessarily - see `INJ_DEFAULT`)
 They should only be triggered by either the user or a push from the server via the `messagingAgent.js`.
 In both cases they cause a **single**(!) action to be dispatched (~= passed as input to the reducer).
 
@@ -48,7 +48,7 @@ These are **side-effect-free**. Thus as much of the implementation as possible s
 They live in `app/components/`.
 
 Top-level components (views in the angular-sense) have their own folders (e.g. `app/components/create-atom/` and are split in two files).
-You'll atom to add them to the routing (see below) to be able to switch the routing-state to these.
+You'll need to add them to the routing (see below) to be able to switch the routing-state to these.
 
 Non-top-level components are implemented as directives.
 
@@ -340,7 +340,7 @@ If it's **REST**-style, just use `fetch(...).then(...dispatch...)` in an action-
 If it's **linked-data-related**, use the utilities in `linkeddata-service-won.js`.
 They'll do standard HTTP(S) but will make sure to cache as much as possible via the local triplestore.
 
-If atoms to **push to the web-socket**, add a hook for the respective _user(!)_-action in `message-reducers.js`.
+If it's **push to the web-socket**, add a hook for the respective _user(!)_-action in `message-reducers.js`.
 The `messaging-agent.js` will pick up any messages in `$ngRedux.getState().getIn(['messages', 'enqueued'])`
 and push them to it's websocket. This solution appears rather hacky to me (see 'high-level interactions' under 'Action Creators') and I'd be thrilled to hear any alternative solutions :)
 

@@ -10,7 +10,7 @@ To build the project, go to the webofneeds folder and type
 `mvn install`
 
 
-This will build the whole project, including some larger artifacts that you may or may not atom. To skip building all of those, use 
+This will build the whole project, including some larger artifacts that you may or may not need. To skip building all of those, use 
 
 `mvn install -P skip-frontend,skip-matcher-uberjar,skip-bot-uberjar,skip-matcher-rescal-uberjar,skip-node-webapp-war,skip-owner-webapp-war,skip-tests`
 
@@ -46,7 +46,7 @@ Follow the guide in the [`won-docker README`](../webofneeds/won-docker/README.md
 
 
 # Speeding up server startup
-At startup, the jasper compiler seems to scan all jar files that are not explicitly excluded for tag library descriptors. We don't really atom this, as we don't use JSPs. Therefore, all our common libs should be excluded from scanning. A list of these files can be found in 
+At startup, the jasper compiler seems to scan all jar files that are not explicitly excluded for tag library descriptors. We don't really need this, as we don't use JSPs. Therefore, all our common libs should be excluded from scanning. A list of these files can be found in 
 ```
 /toolconfig/tomcat/tomcat-jasper-scan-exclude-jars.txt
 ```

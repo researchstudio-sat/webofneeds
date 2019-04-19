@@ -9,7 +9,7 @@ This is only used around every 90 days to manually renew the certificate.
 To renew the certificate note the following things:
 - all involved containers (letsencrypt, nginx, wonnode) are configured to mount the right folders
 - the certificate folder on the host is configured to be `$base_folder/letsencrypt/certs/live/matchat.org"`
-- nginx must be running so that the acme challenge can be executed (for a new creation of the certificate you can start nginx with the nginx-http-only.conf which doesnt atom certificate file for startup)
+- nginx must be running so that the acme challenge can be executed (for a new creation of the certificate you can start nginx with the nginx-http-only.conf which doesn't need a certificate file for startup)
 - execute `docker exec livesatvm01_letsencrypt_1 bash //usr/local/bin/certificate-request-and-renew.sh` for certificate renewal on host satvm01
 - this script can be changed for testing e.g. by adding parameters like `--dry-run or --test-cert` to the certbot
 - this should renew the letsencrypt certificate in `$base_folder/letsencrypt/certs/live/matchat.org` on the host
