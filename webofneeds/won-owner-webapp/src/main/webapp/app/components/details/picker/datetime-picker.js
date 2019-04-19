@@ -13,7 +13,7 @@ import "style/_datetimepicker.scss";
 const serviceDependencies = ["$scope", "$element"];
 function genComponentConf() {
   let template = `
-      <!-- TODO: add some indication that both date and time atom to be specified -->
+      <!-- TODO: add some indication that both date and time need to be specified -->
       <button class="datetimep__button won-button--filled red"
         ng-click="self.currentDatetime()">
           Now

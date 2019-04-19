@@ -48,7 +48,7 @@ import { activitiesGroup } from "./usecases/group-activities";
  *
  * A `generateQuery` is a function that takes the current atom draft and the name of the result variable and returns a sparqljs json representation of the query. This can be created either programmatically or by using the Parser class from the sparqljs library.
  *
- * The query atoms to be a SELECT query and select only the resultName variable.
+ * The query needs to be a SELECT query and select only the resultName variable.
  * This will be automatically enforced by the atom builder.
  */
 

@@ -46,7 +46,7 @@ import { Generator } from "sparqljs";
    *    // the URIs where attachments can be found / will be published
    *    args.attachmentUris = ['http://example.org/.../1234.png', 'http://example.org/.../1234.pdf']
    *
-   *    // the triples will be put in the graph that's build here anyway, so there's no atom to pass graph-uri
+   *    // the triples will be put in the graph that's build here anyway, so there's no need to pass graph-uri
    *    args.arbitraryJsonLdGraph = [{ '@id': 'http://example.org/.../1234', 'dc:title': 'hi}, {...}, {...}]
    *
    *    args.recurInfinite =

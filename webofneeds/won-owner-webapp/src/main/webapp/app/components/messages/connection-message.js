@@ -6,7 +6,7 @@ import Immutable from "immutable";
 import squareImageModule from "../square-image.js";
 import connectionMessageStatusModule from "./connection-message-status.js";
 import connectionMessageActionsModule from "./connection-message-actions.js";
-import messageContentModule from "./message-content.js"; // due to our atom of recursivley integrating the combinedMessageContentModule within referencedMessageModule, we need to import the components here otherwise we will not be able to generate the component
+import messageContentModule from "./message-content.js"; // due to our need of recursivley integrating the combinedMessageContentModule within referencedMessageModule, we need to import the components here otherwise we will not be able to generate the component
 import referencedMessageContentModule from "./referenced-message-content.js";
 import combinedMessageContentModule from "./combined-message-content.js";
 import labelledHrModule from "../labelled-hr.js";

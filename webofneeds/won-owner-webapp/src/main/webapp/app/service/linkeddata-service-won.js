@@ -530,7 +530,7 @@ import won from "./won.js";
          */
     const partialFetch = fetchesPartialRessource(fetchParams);
 
-    // we might not even atom to aquire a lock, if another call to ensureLoaded
+    // we might not even need to aquire a lock, if another call to ensureLoaded
     // has already finished.
     if (cacheItemIsOkOrUnresolvableOrFetching(uri)) {
       cacheItemMarkAccessed(uri);
@@ -541,13 +541,13 @@ import won from "./won.js";
     await lock.acquireUpdateLock();
 
     try {
-      // lock has been aquired, but do we still atom to load the resource?
+      // lock has been aquired, but do we still need to load the resource?
       if (cacheItemIsOkOrUnresolvableOrFetching(uri)) {
         // another call to ensureLoaded has finished while we have been aquiring the lock.
         cacheItemMarkAccessed(uri);
         return uri;
       } else {
-        // ok, we actually atom to load the resource
+        // ok, we actually need to load the resource
         cacheItemMarkFetching(uri);
         const dataset = await loadFromOwnServerIntoCache(
           uri,
@@ -817,7 +817,7 @@ import won from "./won.js";
    * (our rdf-store.js can't do cross-graph queries), saves it into it's seperate
    * graphs for later retrieval on a graph-level (e.g. when retrieving the
    * content-graph of a message), and saves it once into a graph with the documentUri
-   * to be able to retrieve all triples belonging to a document (e.g. when it atoms to
+   * to be able to retrieve all triples belonging to a document (e.g. when it needs to
    * update the cache for a document).
    *
    * @param {*} data
@@ -1219,7 +1219,7 @@ import won from "./won.js";
             e
           );
         } finally {
-          //we don't atom to release after a promise resolves because
+          //we don't need to release after a promise resolves because
           //this function isn't deferred.
           lock.releaseReadLock();
         }
@@ -1253,7 +1253,7 @@ import won from "./won.js";
           /*
                  * if there's only a single rdfs:member in the event
                  * container, getNode will not return an array, so we
-                 * atom to make sure it's one from here on out.
+                 * need to make sure it's one from here on out.
                  */
           connection.hasEvents = is("Array", messageContainer.member)
             ? messageContainer.member
@@ -1470,7 +1470,7 @@ import won from "./won.js";
       })
       .then(() => {
         if (removeCacheItem) {
-          // e.g. `ensureLoaded` atoms to clear the store but
+          // e.g. `ensureLoaded` needs to clear the store but
           // not the cache-status, as it handles that itself
           cacheItemRemove(documentUri);
         }
