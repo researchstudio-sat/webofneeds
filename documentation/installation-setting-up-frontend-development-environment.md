@@ -17,9 +17,9 @@ mvn install
 ```
 once. It will fail, that's ok.
 
-Now install node in the won-owner-webapp module. You'll atom to modify *that* node installation, but you need Administrator privileges to do so.
+Now install node in the won-owner-webapp module. You'll need to modify *that* node installation, but you need Administrator privileges to do so.
 
-You'll atom to run `npm install -g windows-build-tools` (otherwise building `node-sass` and `rdf-canonize` might fail later with a message about not finding VCBuild.exe. the command will install a python-environment and dotnet)
+You'll need to run `npm install -g windows-build-tools` (otherwise building `node-sass` and `rdf-canonize` might fail later with a message about not finding VCBuild.exe. the command will install a python-environment and dotnet)
 
 Open a windows power shell with admin permissions and run these commmand (possibly adapting the path for your settings):
 
@@ -28,7 +28,7 @@ $env:PATH = "C:\DATA\DEV\workspace\webofneeds\webofneeds\won-owner-webapp\src\ma
 npm install -g windows-build-tools
 ```
 
-If your Windows User does not have admin permissions, installing `windows-build-tools` with an admin user will unfortunately install them only for that user. (Further info at https://github.com/researchstudio-sat/webofneeds/pull/1743) The Visual Studio build tools are installed correctly however, so you only atom to fix your Python installation:
+If your Windows User does not have admin permissions, installing `windows-build-tools` with an admin user will unfortunately install them only for that user. (Further info at https://github.com/researchstudio-sat/webofneeds/pull/1743) The Visual Studio build tools are installed correctly however, so you only need to fix your Python installation:
 
 1. Go to https://www.python.org/downloads/ and download and install Python 2.7 (Python 3 will not work!)
 2. Locate your Python installation, e.g., `c:\Python27\python.exe`
@@ -62,7 +62,7 @@ If your Windows User does not have admin permissions, installing `windows-build-
         * `apache-solr-3.5.0.war` as `/siren`
 1. Make your tomcat deploy-configuration depend on the gulp configuration (don't forget to insert it *before* the packing of the `.war`-files) [1]
 
-[1]: If you don't want to develop at the SCSS, you can skip these steps. Maven install will run gulp. If you do want to develop at the SCSS: Sadly there doesn't seem to be a way to run the gulp configuration when just reloading resources. During development you either atom to run gulp manually (there's a handy `watch`-task in gulp) or restart the server every time to see the changes in the scss.
+[1]: If you don't want to develop at the SCSS, you can skip these steps. Maven install will run gulp. If you do want to develop at the SCSS: Sadly there doesn't seem to be a way to run the gulp configuration when just reloading resources. During development you either need to run gulp manually (there's a handy `watch`-task in gulp) or restart the server every time to see the changes in the scss.
 
 [2]: Should be automatically installed during maven-install thanks to the [frontend-maven-plugin](https://github.com/eirslett/frontend-maven-plugin)
 

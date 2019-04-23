@@ -30,7 +30,7 @@ public class WebSocketConfig implements WebSocketConfigurer// extends AbstractWe
     @Override
     public void registerWebSocketHandlers(final WebSocketHandlerRegistry registry) {
         registry.addHandler(this.wonWebSocketHandler, "/msg").addInterceptors(new WonHandshakeInterceptor())
-                        .withSockJS();
+                .withSockJS();
     }
 
     @Autowired
@@ -51,7 +51,7 @@ public class WebSocketConfig implements WebSocketConfigurer// extends AbstractWe
         // seem to be another way.
         int bufferSize = 4 * 1024 * 1024; // 4MB, so we can have attachments (images)
         container.setMaxTextMessageBufferSize(bufferSize);
-        // don't atom a binary buffer - or so we think: beware, if this is too small,
+        // don't need a binary buffer - or so we think: beware, if this is too small,
         // our application fails - silently. How
         // great is that?
         container.setMaxBinaryMessageBufferSize(bufferSize);

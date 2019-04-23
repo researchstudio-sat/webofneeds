@@ -36,10 +36,11 @@ public class ModelConverter {
      * 
      * @prefix : <http://www.example.com/resource/atom/12#> .
      * @prefix atom: <http://www.example.com/resource/atom/12> . Also, applying
-     * prefixes in NamedGraph in cases like
+     *         prefixes in NamedGraph in cases like
      * @prefix : <http://www.example.com/resource/atom/12/>
-     * <http://www.example.com/resource/atom/12/connections/> a ldp:Container .
-     * would result in a wrong RDF triple: :connections/ a ldp:Container .
+     *         <http://www.example.com/resource/atom/12/connections/> a
+     *         ldp:Container . would result in a wrong RDF triple: :connections/ a
+     *         ldp:Container .
      */
     public static Model namedGraphToModel(String graphName, GraphCollection gc) throws Exception {
         NamedGraph graph = null;
@@ -150,7 +151,7 @@ public class ModelConverter {
         } else if (rdfNode.isAnon()) {
             result = enclose(rdfNode.asResource().getId().getLabelString(), "_:", "");
         } else {
-            // TODO It might atom to be improved as some syntax cases might not be covered
+            // TODO It might need to be improved as some syntax cases might not be covered
             // so far
             // a collection??
             throw new UnsupportedOperationException("support missing for converting: " + rdfNode.toString());

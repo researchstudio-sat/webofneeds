@@ -79,7 +79,7 @@ public class GroupingBot extends EventBot {
         // to messages directed at that atom
         // create a filter that only accepts events for atoms in the group:
         AtomUriInNamedListFilter groupMemberFilter = new AtomUriInNamedListFilter(ctx,
-                        botContextWrapper.getGroupMembersListName());
+                botContextWrapper.getGroupMembersListName());
         // remember the auto-responders in a list
         this.autoResponders = new ArrayList<BaseEventListener>();
         // remember the listeners that wait for all messages
@@ -97,33 +97,31 @@ public class GroupingBot extends EventBot {
                 // URI. We let it send NO_OF_MESSAGES messages
                 logger.debug("created auto responder");
                 AutomaticMessageResponderListener listener = new AutomaticMessageResponderListener(ctx, "autoResponder",
-                                AtomUriEventFilter.forEvent(event), NO_OF_MESSAGES, MILLIS_BETWEEN_MESSAGES);
+                        AtomUriEventFilter.forEvent(event), NO_OF_MESSAGES, MILLIS_BETWEEN_MESSAGES);
                 // create a listener that publishes a FinishedEvent after having received all
                 // messages from the group
                 WaitForNEventsListener waitForMessagesListener = new WaitForNEventsListener(ctx, "messageCounter",
-                                AtomUriEventFilter.forEvent(event), NO_OF_MESSAGES * (NO_OF_GROUPMEMBERS - 1));
+                        AtomUriEventFilter.forEvent(event), NO_OF_MESSAGES * (NO_OF_GROUPMEMBERS - 1));
                 messageCounters.add(waitForMessagesListener);
                 // add a filter that will wait for the FinishedEvent emitted by that listener
                 // wrap it in an acceptonce filter to make extra sure we count each listener
                 // only once.
                 mainAutoResponderFilter
-                                .addFilter(new AcceptOnceFilter(new FinishedEventFilter(waitForMessagesListener)));
+                        .addFilter(new AcceptOnceFilter(new FinishedEventFilter(waitForMessagesListener)));
                 ActionOnEventListener debugger = new ActionOnEventListener(ctx, AtomUriEventFilter.forEvent(event),
-                                new BaseEventBotAction(ctx) {
-                                    @Override
-                                    protected void doRun(Event event, EventListener executingListener)
-                                                    throws Exception {
-                                        if (event instanceof MessageFromOtherAtomEvent) {
-                                            MessageFromOtherAtomEvent msg = (MessageFromOtherAtomEvent) event;
-                                            logger.debug("processing event {} wonMessage {} - text message '{}', sent by {} to {}",
-                                                            new Object[] { event.toString(),
-                                                                            msg.getWonMessage().getMessageURI(),
-                                                                            WonRdfUtils.MessageUtils.getTextMessage(
-                                                                                            msg.getWonMessage()),
-                                                                            msg.getTargetAtomURI(), msg.getAtomURI() });
-                                        }
-                                    }
-                                });
+                        new BaseEventBotAction(ctx) {
+                            @Override
+                            protected void doRun(Event event, EventListener executingListener) throws Exception {
+                                if (event instanceof MessageFromOtherAtomEvent) {
+                                    MessageFromOtherAtomEvent msg = (MessageFromOtherAtomEvent) event;
+                                    logger.debug(
+                                            "processing event {} wonMessage {} - text message '{}', sent by {} to {}",
+                                            new Object[] { event.toString(), msg.getWonMessage().getMessageURI(),
+                                                    WonRdfUtils.MessageUtils.getTextMessage(msg.getWonMessage()),
+                                                    msg.getTargetAtomURI(), msg.getAtomURI() });
+                                }
+                            }
+                        });
                 getEventBus().subscribe(MessageFromOtherAtomEvent.class, debugger);
                 // finally, subscribe to the message events
                 getEventBus().subscribe(MessageFromOtherAtomEvent.class, waitForMessagesListener);
@@ -134,48 +132,47 @@ public class GroupingBot extends EventBot {
         // count until N atoms were created, then create atom with group socket (the
         // others will connect to that socket)
         this.groupCreator = new ActionOnceAfterNEventsListener(ctx, "groupCreator", NO_OF_GROUPMEMBERS,
-                        new CreateAtomWithSocketsAction(ctx, botContextWrapper.getGroupListName(),
-                                        SocketType.GroupSocket.getURI()));
+                new CreateAtomWithSocketsAction(ctx, botContextWrapper.getGroupListName(),
+                        SocketType.GroupSocket.getURI()));
         bus.subscribe(AtomCreatedEvent.class, this.groupCreator);
         // wait for N+1 atomCreatedEvents, then connect the members with the group
         // socket
         // of the third atom
         this.atomConnector = new ActionOnceAfterNEventsListener(ctx, "atomConnector", NO_OF_GROUPMEMBERS + 1,
-                        new ConnectFromListToListAction(ctx, botContextWrapper.getGroupListName(),
-                                        botContextWrapper.getGroupMembersListName(), SocketType.GroupSocket.getURI(),
-                                        SocketType.ChatSocket.getURI(), MILLIS_BETWEEN_MESSAGES,
-                                        "Hi from the " + "GroupingBot!"));
+                new ConnectFromListToListAction(ctx, botContextWrapper.getGroupListName(),
+                        botContextWrapper.getGroupMembersListName(), SocketType.GroupSocket.getURI(),
+                        SocketType.ChatSocket.getURI(), MILLIS_BETWEEN_MESSAGES, "Hi from the " + "GroupingBot!"));
         bus.subscribe(AtomCreatedEvent.class, this.atomConnector);
         // add a listener that is informed of the connect/open events and that
         // auto-opens
         // subscribe it to:
         // * connect events - so it responds with open
         // * open events - so it responds with open (if the open received was the first
-        // open, and we still atom to accept the connection)
+        // open, and we still need to accept the connection)
         this.autoOpener = new ActionOnEventListener(ctx, new OpenConnectionAction(ctx, "Hi from the GroupingBot!"));
         bus.subscribe(ConnectFromOtherAtomEvent.class, this.autoOpener);
         // now, once all connections have been opened, make 1 bot send a message to the
         // group, the subsequent listener will cause let wild chatting to begin
         this.conversationStarter = new ActionOnceAfterNEventsListener(ctx, "conversationStarter", NO_OF_GROUPMEMBERS,
-                        new RespondToMessageAction(ctx, MILLIS_BETWEEN_MESSAGES));
+                new RespondToMessageAction(ctx, MILLIS_BETWEEN_MESSAGES));
         bus.subscribe(OpenFromOtherAtomEvent.class, this.conversationStarter);
         // for each group member, there are 2 listeners waiting for messages. when they
         // are all finished, we're done.
         this.messagesDoneListener = new ActionOnceAfterNEventsListener(ctx, "messagesDoneListener",
-                        mainAutoResponderFilter, NO_OF_GROUPMEMBERS,
-                        new DeactivateAllAtomsOfListAction(ctx, botContextWrapper.getGroupMembersListName()));
+                mainAutoResponderFilter, NO_OF_GROUPMEMBERS,
+                new DeactivateAllAtomsOfListAction(ctx, botContextWrapper.getGroupMembersListName()));
         bus.subscribe(FinishedEvent.class, this.messagesDoneListener);
         // When the group socket atom is deactivated, all connections are closed. wait
         // for the close events and signal work done.
         this.workDoneSignaller = new ActionOnceAfterNEventsListener(ctx, "workDoneSignaller", NO_OF_GROUPMEMBERS,
-                        new SignalWorkDoneAction(ctx));
+                new SignalWorkDoneAction(ctx));
         bus.subscribe(CloseFromOtherAtomEvent.class, this.workDoneSignaller);
         // start the whole thing:
         // create atoms every trigger execution until N atoms are created
         this.groupMemberCreator = new ActionOnEventListener(
-                        ctx, "groupMemberCreator", new CreateAtomWithSocketsAction(ctx,
-                                        botContextWrapper.getGroupMembersListName(), SocketType.ChatSocket.getURI()),
-                        NO_OF_GROUPMEMBERS);
+                ctx, "groupMemberCreator", new CreateAtomWithSocketsAction(ctx,
+                        botContextWrapper.getGroupMembersListName(), SocketType.ChatSocket.getURI()),
+                NO_OF_GROUPMEMBERS);
         bus.subscribe(ActEvent.class, this.groupMemberCreator);
     }
 }

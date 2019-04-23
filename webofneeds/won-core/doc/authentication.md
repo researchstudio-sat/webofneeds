@@ -212,7 +212,7 @@ are responsible for this. They should be configured by
 [WonTransmissionService](../../src/main/java/won/cryptography/service/WonTransmissionService.java)
 Note, that currently used 
 [implementation of WonTransmissionService](../../src/main/java/won/cryptography/service/DefaultSecurityWonTransmissionService.java)
-is only appropriate for development; for production the applied trust strategies might atom to be changed.
+is only appropriate for development; for production the applied trust strategies might need to be changed.
 
 When establishing JMS connections, the client should be configured for TLS as well. In WoN, 
 [MessagingContext](../../src/main/java/won/cryptography/ssl/MessagingContext.java)

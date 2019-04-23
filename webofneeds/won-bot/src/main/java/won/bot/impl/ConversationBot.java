@@ -60,25 +60,23 @@ public class ConversationBot extends EventBot {
         EventBus bus = getEventBus();
         // create atoms every trigger execution until 2 atoms are created
         this.atomCreator = new ActionOnEventListener(ctx,
-                        new CreateAtomWithSocketsAction(ctx, getBotContextWrapper().getAtomCreateListName()),
-                        NO_OF_ATOMS);
+                new CreateAtomWithSocketsAction(ctx, getBotContextWrapper().getAtomCreateListName()), NO_OF_ATOMS);
         bus.subscribe(ActEvent.class, this.atomCreator);
         // count until 2 atoms were created, then
         // * connect the 2 atoms
         this.atomConnector = new ActionOnceAfterNEventsListener(ctx, "atomConnector", NO_OF_ATOMS,
-                        new ConnectFromListToListAction(ctx, ctx.getBotContextWrapper().getAtomCreateListName(),
-                                        ctx.getBotContextWrapper().getAtomCreateListName(),
-                                        SocketType.ChatSocket.getURI(), SocketType.ChatSocket.getURI(),
-                                        MILLIS_BETWEEN_MESSAGES, "Hi, I am the ConversationBot."));
+                new ConnectFromListToListAction(ctx, ctx.getBotContextWrapper().getAtomCreateListName(),
+                        ctx.getBotContextWrapper().getAtomCreateListName(), SocketType.ChatSocket.getURI(),
+                        SocketType.ChatSocket.getURI(), MILLIS_BETWEEN_MESSAGES, "Hi, I am the ConversationBot."));
         bus.subscribe(AtomCreatedEvent.class, this.atomConnector);
         // add a listener that is informed of the connect/open events and that
         // auto-opens
         // subscribe it to:
         // * connect events - so it responds with open
         // * open events - so it responds with open (if the open received was the first
-        // open, and we still atom to accept the connection)
+        // open, and we still need to accept the connection)
         this.autoOpener = new ActionOnEventListener(ctx,
-                        new OpenConnectionAction(ctx, "Hi, I " + "am the ConversationBot, too!"));
+                new OpenConnectionAction(ctx, "Hi, I " + "am the ConversationBot, too!"));
         bus.subscribe(ConnectFromOtherAtomEvent.class, this.autoOpener);
         // add a listener that auto-responds to messages by a message
         // after 10 messages, it unsubscribes from all events
@@ -90,11 +88,11 @@ public class ConversationBot extends EventBot {
         bus.subscribe(MessageFromOtherAtomEvent.class, this.autoResponder);
         // add a listener that closes the connection after it has seen 10 messages
         this.connectionCloser = new ActionOnceAfterNEventsListener(ctx, NO_OF_MESSAGES,
-                        new CloseConnectionAction(ctx, "Bye!"));
+                new CloseConnectionAction(ctx, "Bye!"));
         bus.subscribe(MessageFromOtherAtomEvent.class, this.connectionCloser);
         // add a listener that closes the connection when a failureEvent occurs
         EventListener onFailureConnectionCloser = new ActionOnEventListener(ctx,
-                        new CloseConnectionAction(ctx, "Bye!"));
+                new CloseConnectionAction(ctx, "Bye!"));
         bus.subscribe(FailureResponseEvent.class, onFailureConnectionCloser);
         // add a listener that auto-responds to a close message with a deactivation of
         // both atoms.

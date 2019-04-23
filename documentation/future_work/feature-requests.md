@@ -14,7 +14,7 @@ Requested by just about anyone who tries the demonstrator.
 Simple feedback form or any other functionality to allow users to report problems with the owner webapp.
 
 ## No-chat Atoms
-In some cases, users just atom information, and it would be nonsensical to start to chat with the item that is matched that contains the needed information. We used to think that WoN is not a system for satisfying pure information atoms, but it may be worth thinking about atoms that don't allow connecting - and in that case, displaying them differently.
+In some cases, users just need information, and it would be nonsensical to start to chat with the item that is matched that contains the needed information. We used to think that WoN is not a system for satisfying pure information needs, but it may be worth thinking about atoms that don't allow connecting - and in that case, displaying them differently.
 
 ## Configurable Expiration Date
 Currently we have a default expiration date. Allowing users to set one would be more appropriate in many contexts.

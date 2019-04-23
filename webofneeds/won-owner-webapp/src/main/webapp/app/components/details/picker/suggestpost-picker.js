@@ -297,7 +297,7 @@ function genComponentConf() {
       initialValue: "=",
       detail: "=",
       excludedUris: "=", //list of uris that should be excluded from the suggestions
-      allowedSockets: "=", //list of sockets where at least one socket atoms to be present in the atom for it to be allowed as a suggestion
+      allowedSockets: "=", //list of sockets where at least one socket needs to be present in the atom for it to be allowed as a suggestion
       notAllowedSocketText: "=", //error message to display if atom does not have any allowed sockets
       excludedText: "=", //error message to display when excluded atom is added via the fetch input
       noSuggestionsText: "=", //Text to display when no suggestions are available

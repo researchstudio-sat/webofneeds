@@ -119,7 +119,7 @@ export function connectionsChatMessage(
 
     let referencedContentUris = undefined;
     /*TODO: Since we set messages to be (successfully) claimed/proposed/accepted... before we even know if the transition was successful we might
-     atom to rethink this implementation in favor of a dirtyState somehow, and remove the dirty state on successRemote of the message -> handling is in
+     need to rethink this implementation in favor of a dirtyState somehow, and remove the dirty state on successRemote of the message -> handling is in
      messages-actions.js (dispatchActionOnSuccessRemote part if(toRefreshData) ... but for now this will do*/
     if (referencedContent) {
       referencedContentUris = new Map();
@@ -803,7 +803,7 @@ export function loadLatestMessagesOfConnection({
  * @param connectionUri
  * @param numberOfEvents
  *   The approximate number of chat-message
- *   that the view atoms. Note that the
+ *   that the view needs. Note that the
  *   actual number varies due the varying number
  *   of success-responses the server includes and
  *   because the API only accepts a count of

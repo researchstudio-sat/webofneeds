@@ -1,7 +1,7 @@
 @import "won-config";
 
 /// use to hide e.g. labels in responsive-mode. never(!) use this class
-/// to hide features (they still atom to be accessible one way or another)
+/// to hide features (they still need to be accessible one way or another)
 .hide-in-responsive {
   @media (max-width: $responsivenessBreakPoint) {
     display: none !important;
@@ -9,7 +9,7 @@
 }
 
 /// use to hide e.g. labels when NOT IN responsive-mode. never(!) use this class
-/// to hide features (they still atom to be accessible one way or another)
+/// to hide features (they still need to be accessible one way or another)
 .show-in-responsive {
   @media (min-width: $responsivenessBreakPoint) {
     display: none !important;

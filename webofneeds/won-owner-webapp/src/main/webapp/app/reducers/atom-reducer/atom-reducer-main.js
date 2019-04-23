@@ -262,7 +262,7 @@ export default function(allAtomsInState = initialState, action = {}) {
           connSenderSocket = won.WON.GroupSocketCompacted; //assume the connection is from group to x if the atom has the group but not the chat socket
         }
 
-        //atom to wait for success-response to set that
+        //need to wait for success-response to set that
         const optimisticConnection = Immutable.fromJS({
           uri: tmpConnectionUri,
           usingTemporaryUri: true,

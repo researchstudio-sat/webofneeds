@@ -963,7 +963,7 @@ export function prefixOfUri(uri) {
 
 /**
  * Sorts the elements by Date (default order is descending)
- * @param elementsImm elements from state that atom to be returned as a sorted array
+ * @param elementsImm elements from state that need to be returned as a sorted array
  * @param selector selector for the date that will be used to sort the elements (default is "lastUpdateDate")
  * @param order if "ASC" then the order will be ascending, everything else resorts to the default sort of descending order
  * @returns {*} sorted Elements array
@@ -993,7 +993,7 @@ export function sortByDate(
 
 /**
  * Sorts the elements by Selector (default order is ascending)
- * @param elementsImm elements from state that atom to be returned as a sorted array
+ * @param elementsImm elements from state that need to be returned as a sorted array
  * @param selector selector for the date that will be used to sort the elements (default is "lastUpdateDate")
  * @param order if "ASC" then the order will be ascending, everything else resorts to the default sort of descending order
  * @returns {*} sorted Elements array

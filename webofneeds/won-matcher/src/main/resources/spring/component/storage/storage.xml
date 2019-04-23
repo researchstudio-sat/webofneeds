@@ -14,65 +14,51 @@
   ~    See the License for the specific language governing permissions and
   ~    limitations under the License.
   -->
-
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:context="http://www.springframework.org/schema/context"
-       xmlns:tx="http://www.springframework.org/schema/tx"
-       xmlns:jpa="http://www.springframework.org/schema/data/jpa"
-       xsi:schemaLocation=
-               "http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
-                http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa.xsd
-                http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.1.xsd
-                http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.1.xsd
-                ">
-    <context:annotation-config />
-
-    <!-- Defines where to search for annotated components -->
-    <!-- TODO: we may only atom the model package here. Try that. -->
-    <context:component-scan base-package="won.protocol.exception" />
-    <context:component-scan base-package="won.protocol.matcher" />
-    <context:component-scan base-package="won.protocol.model" />
-    <context:component-scan base-package="won.protocol.atom" />
-    <context:component-scan base-package="won.protocol.owner" />
-    <context:component-scan base-package="won.protocol.repository" />
-    <context:component-scan base-package="won.protocol.service" />
-    <context:component-scan base-package="won.protocol.util" />
+<beans 
+	xmlns="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:context="http://www.springframework.org/schema/context" 
+	xmlns:tx="http://www.springframework.org/schema/tx" 
+	xmlns:jpa="http://www.springframework.org/schema/data/jpa" xsi:schemaLocation=               "http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.1.xsd                http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa.xsd                http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.1.xsd                http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.1.xsd                ">
+	<context:annotation-config />
+	<!-- Defines where to search for annotated components -->
+	<!-- TODO: we may only need the model package here. Try that. -->
+	<context:component-scan base-package="won.protocol.exception" />
+	<context:component-scan base-package="won.protocol.matcher" />
+	<context:component-scan base-package="won.protocol.model" />
+	<context:component-scan base-package="won.protocol.atom" />
+	<context:component-scan base-package="won.protocol.owner" />
+	<context:component-scan base-package="won.protocol.repository" />
+	<context:component-scan base-package="won.protocol.service" />
+	<context:component-scan base-package="won.protocol.util" />
 	<context:component-scan base-package="won.owner.model"/>
 	<context:component-scan base-package="won.owner.repository"/>
-
-
 	<!-- Database connection -->
-    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
-        <property name="driverClass" value="${db.sql.jdbcDriverClass}" />
-        <property name="jdbcUrl" value="${db.sql.jdbcUrl}"/>
-        <property name="user" value="${db.sql.user}" />
-        <property name="password" value="${db.sql.password}" />
-    </bean>
-
-
-    <!-- Hibernate is used as JPA vendor-->
-    <bean id="hibernateJpaVendorAdapter" class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
-        <property name="generateDdl" value="true" /> <!-- Automatically create tables for the entity classes. Don't do this in production! -->
-        <property name="showSql" value="false" /> <!-- Set this to true for analyzing SQL queries -->
-    </bean>
-
-    <!-- Entity manager -->
-    <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
-        <property name="dataSource" ref="dataSource" />
-        <property name="jpaVendorAdapter" ref="hibernateJpaVendorAdapter" />
-        <property name="packagesToScan" value="won.protocol.model,won.owner.model" />
-    </bean>
-
-    <!-- Configure transaction management -->
-    <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
-        <property name="entityManagerFactory" ref="entityManagerFactory" />
-    </bean>
-
-    <tx:annotation-driven transaction-manager="transactionManager" />
-
-    <!-- Defines where repositories are placed -->
-    <jpa:repositories base-package="won.protocol.repository"/>
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+		<property name="driverClass" value="${db.sql.jdbcDriverClass}" />
+		<property name="jdbcUrl" value="${db.sql.jdbcUrl}"/>
+		<property name="user" value="${db.sql.user}" />
+		<property name="password" value="${db.sql.password}" />
+	</bean>
+	<!-- Hibernate is used as JPA vendor-->
+	<bean id="hibernateJpaVendorAdapter" class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
+		<property name="generateDdl" value="true" />
+		<!-- Automatically create tables for the entity classes. Don't do this in production! -->
+		<property name="showSql" value="false" />
+		<!-- Set this to true for analyzing SQL queries -->
+	</bean>
+	<!-- Entity manager -->
+	<bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="jpaVendorAdapter" ref="hibernateJpaVendorAdapter" />
+		<property name="packagesToScan" value="won.protocol.model,won.owner.model" />
+	</bean>
+	<!-- Configure transaction management -->
+	<bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+		<property name="entityManagerFactory" ref="entityManagerFactory" />
+	</bean>
+	<tx:annotation-driven transaction-manager="transactionManager" />
+	<!-- Defines where repositories are placed -->
+	<jpa:repositories base-package="won.protocol.repository"/>
 	<jpa:repositories base-package="won.owner.repository"/>
-
 </beans>

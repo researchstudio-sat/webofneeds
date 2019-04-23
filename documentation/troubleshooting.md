@@ -7,7 +7,7 @@ Reason: we use tomcat APR. This means that in conf/server.xml, the following lin
 ```
 <Listener className="org.apache.catalina.core.AprLifecycleListener" SSLEngine="on" />
 ```
-and the apache tomcat native libarary atoms to be installed. On Windows, this means you find the file `tcnative-1.dll` in tomcats `lib` folder,
+and the apache tomcat native library needs to be installed. On Windows, this means you find the file `tcnative-1.dll` in tomcats `lib` folder,
 
 for more information, see http://tomcat.apache.org/native-doc/
 

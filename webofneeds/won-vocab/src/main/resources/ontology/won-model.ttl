@@ -360,7 +360,7 @@ sought to fulfill the atom in contrast to the part that is available.""" ;
 
 ###  https://w3id.org/won/core#Atom
 :Atom rdf:type owl:Class ;
-      rdfs:comment """An atom is an online entity controlled by a person or organization. Its purpose is to be connected to other such atoms via Connections, so it can be said that it represents the atom to interact with others.
+      rdfs:comment """An atom is an online entity controlled by a person or organization. Its purpose is to be connected to other such atoms via Connections, so it can be said that it represents the need to interact with others.
 It specifies a content - what the atom is about, which may be something that is offered for sale, sought for rental etc."""@en ;
       rdfs:isDefinedBy <https://w3id.org/won/core> ;
       rdfs:label "Atom" .

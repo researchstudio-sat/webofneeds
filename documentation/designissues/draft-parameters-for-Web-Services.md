@@ -10,7 +10,7 @@ The question we want to answer here is: How can such a mechanism work and where 
 
 ## Assumptions 
 
-1. The bot somehow has received the information that some counterpart atom AtomX is suitable for engaging in a conversation.  
+1. The bot somehow has received the information that some counterpart AtomX is suitable for engaging in a conversation.  
 1. The bot is able to create an atom specifically for this conversation, and connect with AtomX.
 1. The bot is able to construct an rdf dataset containing all the information relevant to the connection (the dataset that is used to generat the data graph when [Stating Information Requirements](draft-stating-information-requirements.md))
 1. The bot is able to communicate its information requirements and to determine when they are met (again, see [Stating Information Requirements](draft-stating-information-requirements.md))

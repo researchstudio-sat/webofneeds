@@ -152,7 +152,7 @@ function genComponentConf() {
       // only works if we have access to the current location
       this.determineCurrentLocation();
 
-      // atoms to happen after constructor finishes, otherwise
+      // needs to happen after constructor finishes, otherwise
       // the component's callbacks won't be registered.
       delay(0).then(() => this.showInitialLocations());
 

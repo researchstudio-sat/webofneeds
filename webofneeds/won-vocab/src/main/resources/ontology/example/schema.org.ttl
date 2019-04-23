@@ -3385,7 +3385,7 @@ schema:additionalType a rdf:Property;
     .
 schema:additionalVariable a rdf:Property;
     rdfs:label "Additional Variable"@en;
-    rdfs:comment "Any additional component of the exercise prescription that may atom to be articulated to the patient. This may include the order of exercises, the number of repetitions of movement, quantitative distance, progressions over time, etc."@en;
+    rdfs:comment "Any additional component of the exercise prescription that may need to be articulated to the patient. This may include the order of exercises, the number of repetitions of movement, quantitative distance, progressions over time, etc."@en;
     rdfs:domain schema:ExercisePlan;
     rdfs:range xsd:string;
     rdfs:isDefinedBy <http://schema.org/ExercisePlan>;

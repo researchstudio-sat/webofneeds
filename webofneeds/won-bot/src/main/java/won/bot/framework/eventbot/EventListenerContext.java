@@ -29,7 +29,7 @@ import won.protocol.util.linkeddata.LinkedDataSource;
 
 /**
  * Class holding references to all important services that EventListeners inside
- * bots atom to access.
+ * bots need to access.
  */
 public interface EventListenerContext {
     /**

@@ -214,7 +214,7 @@ public class BotContextTests {
         botContext.saveToObjectMap("uriList", "list1", uriList);
         List<URI> uriListCopy = (List<URI>) botContext.loadFromObjectMap("uriList", "list1");
         Assert.assertEquals(uriList, uriListCopy);
-        // HashMap atoms to be serialized (here only non-complex keys are allowed in
+        // HashMap needs to be serialized (here only non-complex keys are allowed in
         // maps)
         botContext.dropCollection("uriMap");
         HashMap<String, URI> uriHashMap = new HashMap<>();
@@ -263,7 +263,7 @@ public class BotContextTests {
         Assert.assertEquals(message.getHeader("test1")[0], messageCopy.getHeader("test1")[0]);
         Assert.assertEquals(message.getAllHeaderLines().nextElement(), messageCopy.getAllHeaderLines().nextElement());
         Assert.assertEquals(message.getRecipients(Message.RecipientType.TO)[0],
-                        messageCopy.getRecipients(Message.RecipientType.TO)[0]);
+                messageCopy.getRecipients(Message.RecipientType.TO)[0]);
         Assert.assertEquals(message.getSubject(), messageCopy.getSubject());
         Assert.assertEquals(message.getDescription(), messageCopy.getDescription());
         Assert.assertEquals(message.getSentDate(), messageCopy.getSentDate());

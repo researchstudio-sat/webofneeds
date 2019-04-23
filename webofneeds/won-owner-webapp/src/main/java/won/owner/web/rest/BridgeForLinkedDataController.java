@@ -88,13 +88,14 @@ public class BridgeForLinkedDataController implements InitializingBean {
      * //for some reason this cannot be used as parameter in restTemplate.execute()
      * private final ResponseExtractor httpResponseResponseExtractor = new
      * ResponseExtractor<ClientHttpResponse>() {
+     * 
      * @Override public ClientHttpResponse extractData(final ClientHttpResponse
      * response) throws IOException { return response; } };
      */
     @RequestMapping(value = { "/", "" }, method = RequestMethod.GET, produces = { "*/*" })
     public void fetchResource(@RequestParam("uri") String resourceUri,
-                    @RequestParam(value = "requester", required = false) String requesterWebId,
-                    final HttpServletResponse response, final HttpServletRequest request) throws IOException {
+            @RequestParam(value = "requester", required = false) String requesterWebId,
+            final HttpServletResponse response, final HttpServletRequest request) throws IOException {
         // prepare restTestmplate that can deal with webID certificate
         RestTemplate restTemplate = null;
         // no webID requested? - don't use one!
@@ -106,7 +107,7 @@ public class BridgeForLinkedDataController implements InitializingBean {
                 new URI(requesterWebId);
             } catch (URISyntaxException e) {
                 throw new IllegalArgumentException(
-                                "Parameter 'requester' must be a URI. Actual value was: '" + requesterWebId + "'");
+                        "Parameter 'requester' must be a URI. Actual value was: '" + requesterWebId + "'");
             }
             // check if the currently logged in user owns that webid:
             if (currentUserHasIdentity(requesterWebId)) {
@@ -128,7 +129,7 @@ public class BridgeForLinkedDataController implements InitializingBean {
             @Override
             public ClientHttpResponse extractData(final ClientHttpResponse originalResponse) throws IOException {
                 prepareBridgeResponseOutputStream(originalResponse, response);
-                // we don't really atom to return anything, so we don't
+                // we don't really need to return anything, so we don't
                 return null;
             }
         });
@@ -137,7 +138,7 @@ public class BridgeForLinkedDataController implements InitializingBean {
     }
 
     private void prepareBridgeResponseOutputStream(final ClientHttpResponse originalResponse,
-                    final HttpServletResponse response) throws IOException {
+            final HttpServletResponse response) throws IOException {
         // create response headers
         MediaType originalResponseMediaType = originalResponse.getHeaders().getContentType();
         if (originalResponseMediaType == null) {
@@ -145,7 +146,8 @@ public class BridgeForLinkedDataController implements InitializingBean {
             // this only happens
             // with 304 NOT MODIFIED responses. We don't copy the body to the response. We
             // log a debug message though
-            logger.debug("no Content-Type header found in response from server. Assuming no body, not attempting to copy "
+            logger.debug(
+                    "no Content-Type header found in response from server. Assuming no body, not attempting to copy "
                             + "body");
             copyLinkedDataResponseRelevantHeaders(originalResponse.getHeaders(), response);
             response.setStatus(originalResponse.getRawStatusCode());
@@ -175,7 +177,7 @@ public class BridgeForLinkedDataController implements InitializingBean {
     }
 
     private void copyResponseBody(final ClientHttpResponse fromResponse, final HttpServletResponse toResponse)
-                    throws IOException {
+            throws IOException {
         InputStream is = fromResponse.getBody();
         if (is == null) {
             return;
@@ -189,7 +191,7 @@ public class BridgeForLinkedDataController implements InitializingBean {
     }
 
     private void copyResponseFiltered(final HttpServletResponse toResponse, InputStream is, MediaType contentType)
-                    throws IOException {
+            throws IOException {
         Lang lang = RDFLanguages.contentTypeToLang(contentType.toString());
         Dataset ds = DatasetFactory.createGeneral();
         RDFDataMgr.read(ds, is, lang);
@@ -220,11 +222,11 @@ public class BridgeForLinkedDataController implements InitializingBean {
      * @param toResponse
      */
     private void copyLinkedDataResponseRelevantHeaders(final HttpHeaders fromHeaders,
-                    final HttpServletResponse toResponse) {
+            final HttpServletResponse toResponse) {
         for (String headerName : fromHeaders.keySet()) {
             for (String headerValue : fromHeaders.get(headerName)) {
                 if ((headerName != "Transfer-Encoding")
-                                || (headerValue != "chunked") && !toResponse.containsHeader(headerName)) {
+                        || (headerValue != "chunked") && !toResponse.containsHeader(headerName)) {
                     // we allow all transfer codings except chunked, because we don't do chunking
                     // here!
                     toResponse.setHeader(headerName, headerValue);
@@ -252,7 +254,7 @@ public class BridgeForLinkedDataController implements InitializingBean {
     }
 
     private void copyHeader(final String headerName, final HttpServletRequest fromRequest,
-                    final HttpHeaders toHeaders) {
+            final HttpHeaders toHeaders) {
         Enumeration<String> values = fromRequest.getHeaders(headerName);
         while (values.hasMoreElements()) {
             toHeaders.add(headerName, values.nextElement());

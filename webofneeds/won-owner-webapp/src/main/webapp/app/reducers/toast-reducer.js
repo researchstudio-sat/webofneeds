@@ -136,7 +136,7 @@ export default function(allToasts = initialState, action = {}) {
     case actionTypes.failedToGetLocation: {
       return pushNewToast(
         allToasts,
-        "Could not get location. You may atom to allow this in your browser",
+        "Could not get location. You may need to allow this in your browser",
         won.WON.errorToast
       );
     }

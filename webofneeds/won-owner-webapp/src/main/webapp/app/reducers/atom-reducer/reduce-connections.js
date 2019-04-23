@@ -16,7 +16,7 @@ export function storeConnectionsData(state, connectionsToStore) {
 }
 
 /**
- * Add's the connection to the atoms connections.
+ * Adds the connection to the atoms connections.
  *
  * @param state
  * @param connection
@@ -57,7 +57,7 @@ function addConnectionFull(state, connection) {
           }
         }
       } else if (realSocket === won.WON.HoldableSocketCompacted) {
-        //holdableSocket Connection from atom to persona -> atom to add heldBy targetAtomUri to the atom
+        //holdableSocket Connection from atom to persona -> need to add heldBy targetAtomUri to the atom
         const heldByUri = targetAtomUri;
         console.debug(
           "Handling a holdableSocket-connection within atom: ",
