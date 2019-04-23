@@ -268,10 +268,9 @@ export function generateShortAtomSockets(atomImm) {
       // TODO: check if this can be used anywhere or whether it should be Group Chat Enabled
       .map(socket => {
         if (socket === won.WON.GroupSocketCompacted) {
-          return "Group Chat";
-        } else {
-          return "";
+          return labels.sockets[socket] ? labels.sockets[socket] : socket;
         }
+        return "";
       })
       .filter(socket => socket.length > 0);
   return socketsArray;
@@ -290,13 +289,12 @@ export function generateShortAtomFlags(atomImm) {
       // TODO: flags should have explanatory hovertext
       .map(flag => {
         if (flag === won.WON.NoHintForCounterpartCompacted) {
-          return "Invisible";
+          return labels.flags[flag] ? labels.flags[flag] : flag;
         }
         if (flag === won.WON.NoHintForMeCompacted) {
-          return "Silent";
-        } else {
-          return "";
+          return labels.flags[flag] ? labels.flags[flag] : flag;
         }
+        return "";
       })
       .filter(flag => flag.length > 0);
   return flagsArray;
