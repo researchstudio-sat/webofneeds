@@ -9,13 +9,15 @@ import won from "../../won-es6.js";
 import { actionCreators } from "../../actions/actions.js";
 import postMessagesModule from "../post-messages.js";
 import atomCardModule from "../atom-card.js";
+import atomMapModule from "../atom-map.js";
 import postHeaderModule from "../post-header.js";
 import * as generalSelectors from "../../selectors/general-selectors.js";
 import * as viewSelectors from "../../selectors/view-selectors.js";
 import * as processUtils from "../../process-utils.js";
 import * as wonLabelUtils from "../../won-label-utils.js";
+import * as atomUtils from "../../atom-utils.js";
 
-import "style/_overview.scss";
+import "style/_map.scss";
 import "style/_atom-overlay.scss";
 import "style/_connection-overlay.scss";
 
@@ -24,7 +26,7 @@ class Controller {
   constructor() {
     attach(this, serviceDependencies, arguments);
     this.selection = 0;
-    window.overview4dbg = this;
+    window.ownermap4dbg = this;
     this.WON = won.WON;
 
     const selectFromState = state => {
@@ -44,7 +46,20 @@ class Controller {
       const isOwnerAtomUrisToLoad =
         !lastAtomUrisUpdateDate && !isOwnerAtomUrisLoading;
 
+      const atomsWithLocation = getIn(state, ["atoms"]).filter(atom =>
+        atomUtils.hasLocation(atom)
+      );
+
+      let locations = [];
+      atomsWithLocation &&
+        atomsWithLocation.map(atom => {
+          const atomLocation = atomUtils.getLocation(atom);
+          locations.push(atomLocation);
+        });
+
       return {
+        locations,
+        atomsWithLocation,
         lastAtomUrisUpdateDate,
         friendlyLastAtomUrisUpdateTimestamp:
           lastAtomUrisUpdateDate &&
@@ -93,6 +108,7 @@ export default angular
   .module("won.owner.components.map", [
     ngAnimate,
     postMessagesModule,
+    atomMapModule,
     atomCardModule,
     postHeaderModule,
   ])
