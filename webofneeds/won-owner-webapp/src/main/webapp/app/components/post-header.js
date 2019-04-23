@@ -130,7 +130,7 @@ function genComponentConf() {
         return {
           responseToAtom,
           atom,
-          atomTypeLabel: atom && atomUtils.generateAtomTypeLabel(atom),
+          atomTypeLabel: atom && atomUtils.generateTypeLabel(atom),
           personaName,
           atomLoading:
             !atom || processUtils.isAtomLoading(process, this.atomUri),

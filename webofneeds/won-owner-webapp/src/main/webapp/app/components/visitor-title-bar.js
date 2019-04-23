@@ -69,7 +69,7 @@ function genComponentConf() {
           responseToAtom,
           isGroupChatEnabled: atomUtils.hasGroupSocket(post),
           isChatEnabled: atomUtils.hasChatSocket(post),
-          atomTypeLabel: post && atomUtils.generateAtomTypeLabel(post),
+          atomTypeLabel: post && atomUtils.generateTypeLabel(post),
         };
       };
       connect2Redux(selectFromState, actionCreators, [], this);

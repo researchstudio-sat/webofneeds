@@ -179,7 +179,7 @@ function genComponentConf() {
           //General
           responseToAtom,
           atom,
-          atomTypeLabel: atom && atomUtils.generateAtomTypeLabel(atom),
+          atomTypeLabel: atom && atomUtils.generateTypeLabel(atom),
           personaUri,
           persona,
           personaName,

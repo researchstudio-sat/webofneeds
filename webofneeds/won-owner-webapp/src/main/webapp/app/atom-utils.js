@@ -206,7 +206,7 @@ export function isSearchAtom(atom) {
 /**
  * Generates an array that contains all atom flags, using a human readable label if available.
  */
-export function generateFullAtomFlags(atomImm) {
+export function generateFullFlagLabels(atomImm) {
   const flags = atomImm && atomImm.getIn(["content", "flags"]);
   const flagsArray =
     flags &&
@@ -221,7 +221,7 @@ export function generateFullAtomFlags(atomImm) {
 /**
  * Generates an array that contains all atom sockets, using a human readable label if available.
  */
-export function generateFullAtomSockets(atomImm) {
+export function generateFullSocketLabels(atomImm) {
   const sockets = atomImm && atomImm.getIn(["content", "sockets"]);
   const socketsArray =
     sockets &&
@@ -239,7 +239,7 @@ export function generateFullAtomSockets(atomImm) {
  * Retrieves the Label of the used useCase as an atomType, if no usecase is specified we check if atom is a searchAtom or DirectResponseAtom
  * @param {*} atomImm the atom as saved in the state
  */
-export function generateAtomTypeLabel(atomImm) {
+export function generateTypeLabel(atomImm) {
   const useCase = useCaseUtils.getUseCase(getMatchedUseCaseIdentifier(atomImm));
 
   if (useCase) {
@@ -258,7 +258,7 @@ export function generateAtomTypeLabel(atomImm) {
 /**
  * Generates an array that contains some atom sockets, using a human readable label if possible.
  */
-export function generateShortAtomSockets(atomImm) {
+export function generateShortSocketLabels(atomImm) {
   const sockets = atomImm && atomImm.get(["content", "sockets"]);
   const socketsArray =
     sockets &&
@@ -268,10 +268,9 @@ export function generateShortAtomSockets(atomImm) {
       // TODO: check if this can be used anywhere or whether it should be Group Chat Enabled
       .map(socket => {
         if (socket === won.WON.GroupSocketCompacted) {
-          return "Group Chat";
-        } else {
-          return "";
+          return labels.sockets[socket] ? labels.sockets[socket] : socket;
         }
+        return "";
       })
       .filter(socket => socket.length > 0);
   return socketsArray;
@@ -280,7 +279,7 @@ export function generateShortAtomSockets(atomImm) {
 /**
  * Generates an array that contains some atom flags, using a human readable label if possible.
  */
-export function generateShortAtomFlags(atomImm) {
+export function generateShortFlagLabels(atomImm) {
   const flags = atomImm && atomImm.getIn(["content", "flags"]);
   const flagsArray =
     flags &&
@@ -290,13 +289,12 @@ export function generateShortAtomFlags(atomImm) {
       // TODO: flags should have explanatory hovertext
       .map(flag => {
         if (flag === won.WON.NoHintForCounterpartCompacted) {
-          return "Invisible";
+          return labels.flags[flag] ? labels.flags[flag] : flag;
         }
         if (flag === won.WON.NoHintForMeCompacted) {
-          return "Silent";
-        } else {
-          return "";
+          return labels.flags[flag] ? labels.flags[flag] : flag;
         }
+        return "";
       })
       .filter(flag => flag.length > 0);
   return flagsArray;
