@@ -134,7 +134,6 @@ won.WON.BasicAtomTypeCombined = won.WON.baseUri + "Combined";
 won.WON.BasicAtomTypeCombinedCompacted = won.WON.baseUri + ":Combined";
 won.WON.BasicAtomTypeCritique = won.WON.baseUri + "Critique";
 won.WON.BasicAtomTypeCritiqueCompacted = won.WON.prefix + ":Critique";
-won.WON.BasicAtomTypeWhatsAroundCompacted = won.WON.prefix + ":WhatsAround";
 won.WON.NoHintForCounterpartCompacted =
   won.WON.prefix + ":NoHintForCounterpart";
 won.WON.UsedForTestingCompacted = won.WON.prefix + ":UsedForTesting";

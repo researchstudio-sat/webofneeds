@@ -1,0 +1,34 @@
+<won-modal-dialog ng-if="self.showModalDialog"></won-modal-dialog>
+<div class="won-modal-atomview" ng-if="self.showAtomOverlay">
+    <won-post-info include-header="true" atom-uri="self.viewAtomUri"></won-post-info>
+</div>
+<div class="won-modal-connectionview" ng-if="self.showConnectionOverlay">
+    <won-post-messages connection-uri="self.viewConnUri"></won-post-messages>
+</div>
+<header>
+    <won-topnav></won-topnav>
+</header>
+<won-toasts></won-toasts>
+<won-slide-in ng-if="self.showSlideIns"></won-slide-in>
+<main class="owneroverview">
+    <div class="owneroverview__header">
+        <div class="owneroverview__header__title">
+            What's around? <span class="owneroverview__header__title__count" ng-if="!self.isOwnerAtomUrisLoading">({{ self.atomUrisSize }})</span>
+        </div>
+        <div class="owneroverview__header__loading" ng-if="self.isOwnerAtomUrisLoading">
+            Loading...
+        </div>
+        <div class="owneroverview__header__updated" ng-if="!self.isOwnerAtomUrisLoading">
+            <div class="owneroverview__header__updated__time">
+                Updated: {{ self.friendlyLastAtomUrisUpdateTimestamp }}
+            </div>
+            <div class="owneroverview__header__updated__reload won-button--filled red" ng-click="self.reload()">
+                Reload
+            </div>
+        </div>
+    </div>
+    <div class="owneroverview__content">
+        <won-atom-card class="owneroverview__content__atom" atom-uri="atomUri" ng-repeat="atomUri in self.atomUrisArray track by atomUri"></won-atom-card>
+    </div>
+</main>
+<won-footer></won-footer>

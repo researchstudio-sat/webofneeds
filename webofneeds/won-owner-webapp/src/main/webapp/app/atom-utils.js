@@ -111,18 +111,6 @@ export function isInactive(atom) {
 }
 
 /**
- * Determines if a given atom is a WhatsAround-Atom
- * @param atom
- * @returns {*|boolean}
- */
-export function isWhatsAroundAtom(atom) {
-  return (
-    getIn(atom, ["content", "flags"]) &&
-    getIn(atom, ["content", "flags"]).contains("won:WhatsAround")
-  );
-}
-
-/**
  * Determines if a given atom is a DirectResponse-Atom
  * @param atom
  * @returns {*|boolean}

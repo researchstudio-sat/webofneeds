@@ -39,11 +39,7 @@
 import { tree2constants } from "../utils.js";
 import { hierarchy2Creators } from "./action-utils.js";
 
-import {
-  atomCreate,
-  atomEdit,
-  createWhatsAround,
-} from "./create-atom-action.js";
+import { atomCreate, atomEdit } from "./create-atom-action.js";
 
 import {
   atomsConnect,
@@ -148,7 +144,6 @@ const actionHierarchy = {
     edit: atomEdit,
     editSuccessful: INJ_DEFAULT,
     editFailure: INJ_DEFAULT,
-    whatsAround: createWhatsAround,
     createSuccessful: INJ_DEFAULT,
     reopen: atomsOpen,
     close: atomsClose,

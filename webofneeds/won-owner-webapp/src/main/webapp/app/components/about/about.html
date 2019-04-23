@@ -117,24 +117,18 @@
     <div class="about__howto__createx">
       <button
         class="won-button--filled red about__howto__createx__button"
-        ng-click="self.createWhatsAround()"
-        ng-disabled="self.processingPublish"
-      >
+        ng-click="self.router__stateGo('map')">
         <svg class="won-button-icon" style="--local-primary:white;">
           <use
             xlink:href="#ico36_location_current"
             href="#ico36_location_current"
           ></use>
         </svg>
-        <span ng-if="!self.processingPublish">What's in your Area?</span>
-        <span ng-if="self.processingPublish"
-          >Finding out what's going on&hellip;</span
-        >
+        <span>What's in your Area?</span>
       </button>
       <button
         class="won-button--filled red about__howto__createx__button"
-        ng-click="self.router__stateGo('overview')"
-      >
+        ng-click="self.router__stateGo('overview')">
         <span>What's new?</span>
       </button>
       <won-labelled-hr

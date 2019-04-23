@@ -143,7 +143,6 @@ export default function(processState = initialState, action = {}) {
 
     case actionTypes.personas.create:
     case actionTypes.atoms.create:
-    case actionTypes.atoms.whatsAround:
       return processState.set("processingPublish", true);
 
     case actionTypes.failedToGetLocation:

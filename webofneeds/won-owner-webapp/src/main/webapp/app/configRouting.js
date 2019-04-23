@@ -67,6 +67,7 @@ export const configRouting = [
     [
       { path: "/about?aboutSection", component: "about" },
       { path: "/overview?viewAtomUri?viewConnUri", component: "overview" },
+      { path: "/map?viewAtomUri?viewConnUri", component: "map" },
       { path: "/signup", component: "signup" },
       { path: "/settings", component: "settings" },
       {
@@ -175,6 +176,7 @@ export function accessControl({
       return;
 
     case "overview":
+    case "map":
     case "signup":
     case "about":
       return; // can always access these pages.

@@ -9,7 +9,6 @@ export const labels = deepFreeze({
     //TODO: Find right declaration
     [won.WON.BasicAtomTypeCombinedCompacted]: "Post + Search", //'I want to post and search',
     [won.WON.BasicAtomTypeCritiqueCompacted]: "Post", //'I want to change something',
-    [won.WON.BasicAtomTypeWhatsAroundCompacted]: "What's Around",
   },
   connectionState: {
     [won.WON.Suggested]: "Conversation suggested.",
@@ -27,7 +26,6 @@ export const labels = deepFreeze({
     [won.WONMSG.hintFeedbackMessage]: "Hint Feedback Message",
   },
   flags: {
-    [won.WON.BasicAtomTypeWhatsAroundCompacted]: "What's Around",
     [won.WON.NoHintForCounterpartCompacted]: "Invisible",
     [won.WON.NoHintForMeCompacted]: "Silent",
     [won.WON.UsedForTestingCompacted]: "Used For Testing",

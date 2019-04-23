@@ -1,11 +1,7 @@
 import Immutable from "immutable";
 import won from "../../won-es6.js";
 import * as useCaseUtils from "../../usecase-utils.js";
-import {
-  isWhatsAroundAtom,
-  isSearchAtom,
-  isPersona,
-} from "../../atom-utils.js";
+import { isSearchAtom, isPersona } from "../../atom-utils.js";
 import { generateHexColor, generateRgbColorArray, getIn } from "../../utils.js";
 import shajs from "sha.js";
 import Identicon from "identicon.js";
@@ -223,23 +219,6 @@ function getHumanReadableStringFromAtom(atom, detailsToParse) {
 
     if (isPersona(atom)) {
       return getIn(atom, ["content", "personaName"]);
-    } else if (isWhatsAroundAtom(immAtom)) {
-      let location =
-        (atomContent && atomContent["location"]) ||
-        (seeksBranch && seeksBranch["location"]);
-
-      const locationJS =
-        location && Immutable.Iterable.isIterable(location)
-          ? location.toJS()
-          : location;
-
-      return (
-        "What's Around " +
-        detailsToParse["location"].generateHumanReadable({
-          value: locationJS,
-          includeLabel: false,
-        })
-      );
     } else if (isSearchAtom(immAtom)) {
       const searchString = atom && atom.content && atom.content.searchString;
 
