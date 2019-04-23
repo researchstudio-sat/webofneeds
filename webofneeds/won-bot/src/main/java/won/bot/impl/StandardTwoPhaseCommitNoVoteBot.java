@@ -48,22 +48,24 @@ public class StandardTwoPhaseCommitNoVoteBot extends EventBot {
         EventBus bus = getEventBus();
         ParticipantCoordinatorBotContextWrapper botContextWrapper = (ParticipantCoordinatorBotContextWrapper) getBotContextWrapper();
         // create atoms every trigger execution until noOfAtoms are created
-        this.participantAtomCreator = new ActionOnEventListener(
-                ctx, "participantCreator", new CreateAtomWithSocketsAction(ctx,
-                        botContextWrapper.getParticipantListName(), SocketType.ParticipantSocket.getURI()),
-                noOfAtoms - 1);
+        this.participantAtomCreator = new ActionOnEventListener(ctx, "participantCreator",
+                        new CreateAtomWithSocketsAction(ctx, botContextWrapper.getParticipantListName(),
+                                        SocketType.ParticipantSocket.getURI()),
+                        noOfAtoms - 1);
         bus.subscribe(ActEvent.class, this.participantAtomCreator);
         // when done, create one coordinator atom
         this.coordinatorAtomCreator = new ActionOnEventListener(ctx, "coordinatorCreator",
-                new FinishedEventFilter(participantAtomCreator), new CreateAtomWithSocketsAction(ctx,
-                        botContextWrapper.getCoordinatorListName(), SocketType.CoordinatorSocket.getURI()),
-                1);
+                        new FinishedEventFilter(participantAtomCreator),
+                        new CreateAtomWithSocketsAction(ctx, botContextWrapper.getCoordinatorListName(),
+                                        SocketType.CoordinatorSocket.getURI()),
+                        1);
         bus.subscribe(FinishedEvent.class, this.coordinatorAtomCreator);
         // when done, connect the participants to the coordinator
         this.atomConnector = new ActionOnceAfterNEventsListener(ctx, "atomConnector", noOfAtoms,
-                new ConnectFromListToListAction(ctx, botContextWrapper.getCoordinatorListName(),
-                        botContextWrapper.getParticipantListName(), SocketType.CoordinatorSocket.getURI(),
-                        SocketType.ParticipantSocket.getURI(), MILLIS_BETWEEN_MESSAGES, "Hi!"));
+                        new ConnectFromListToListAction(ctx, botContextWrapper.getCoordinatorListName(),
+                                        botContextWrapper.getParticipantListName(),
+                                        SocketType.CoordinatorSocket.getURI(), SocketType.ParticipantSocket.getURI(),
+                                        MILLIS_BETWEEN_MESSAGES, "Hi!"));
         bus.subscribe(AtomCreatedEvent.class, this.atomConnector);
         // add a listener that is informed of the connect/open events and that
         // auto-opens
@@ -75,7 +77,7 @@ public class StandardTwoPhaseCommitNoVoteBot extends EventBot {
         bus.subscribe(OpenFromOtherAtomEvent.class, this.autoOpener);
         bus.subscribe(ConnectFromOtherAtomEvent.class, this.autoOpener);
         this.autoCloser = new ActionOnceAfterNEventsListener(ctx, "autoCloser", noOfAtoms - 3,
-                new CloseConnectionAction(ctx, "Bye!"));
+                        new CloseConnectionAction(ctx, "Bye!"));
         bus.subscribe(ConnectFromOtherAtomEvent.class, this.autoCloser);
         // after the last connect event, all connections are closed!
         this.atomDeactivator = new ActionOnEventListener(ctx, new TwoPhaseCommitNoVoteDeactivateAllAtomsAction(ctx), 1);

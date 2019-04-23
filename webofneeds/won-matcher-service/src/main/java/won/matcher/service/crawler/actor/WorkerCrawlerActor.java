@@ -81,7 +81,7 @@ public class WorkerCrawlerActor extends UntypedActor {
         }
         CrawlUriMessage uriMsg = (CrawlUriMessage) msg;
         if (!uriMsg.getStatus().equals(CrawlUriMessage.STATUS.PROCESS)
-                && !uriMsg.getStatus().equals(CrawlUriMessage.STATUS.SAVE)) {
+                        && !uriMsg.getStatus().equals(CrawlUriMessage.STATUS.SAVE)) {
             unhandled(msg);
             return;
         }
@@ -101,7 +101,7 @@ public class WorkerCrawlerActor extends UntypedActor {
                     // just want to save it in the RDF
                     // store? How to insert this serialized resource into the SPARQL endpoint?
                     ds = SparqlService.deserializeDataset(resMsg.getSerializedResource(),
-                            resMsg.getSerializationFormat());
+                                    resMsg.getSerializationFormat());
                 }
             }
             // download resource if not already downloaded
@@ -110,11 +110,11 @@ public class WorkerCrawlerActor extends UntypedActor {
                 HttpHeaders httpHeaders = new HttpHeaders();
                 if (uriMsg.getResourceETagHeaderValues() != null && !uriMsg.getResourceETagHeaderValues().isEmpty()) {
                     String ifNoneMatchHeaderValue = StringUtils
-                            .collectionToDelimitedString(uriMsg.getResourceETagHeaderValues(), ", ");
+                                    .collectionToDelimitedString(uriMsg.getResourceETagHeaderValues(), ", ");
                     httpHeaders.add("If-None-Match", ifNoneMatchHeaderValue);
                 }
                 DatasetResponseWithStatusCodeAndHeaders datasetWithHeaders = linkedDataSource
-                        .getDatasetWithHeadersForResource(URI.create(uriMsg.getUri()), httpHeaders);
+                                .getDatasetWithHeadersForResource(URI.create(uriMsg.getUri()), httpHeaders);
                 ds = datasetWithHeaders.getDataset();
                 etags = datasetWithHeaders.getResponseHeaders().get("ETag");
                 // if dataset was not modified (304) we can treat the current crawl uri as done
@@ -128,7 +128,8 @@ public class WorkerCrawlerActor extends UntypedActor {
                 String prevLink = linkedDataSource.getPreviousLinkFromDatasetWithHeaders(datasetWithHeaders);
                 if (prevLink != null) {
                     CrawlUriMessage newUriMsg = new CrawlUriMessage(uriMsg.getBaseUri(), prevLink,
-                            uriMsg.getWonNodeUri(), CrawlUriMessage.STATUS.PROCESS, System.currentTimeMillis(), null);
+                                    uriMsg.getWonNodeUri(), CrawlUriMessage.STATUS.PROCESS, System.currentTimeMillis(),
+                                    null);
                     getSender().tell(newUriMsg, getSelf());
                 }
             }
@@ -149,7 +150,7 @@ public class WorkerCrawlerActor extends UntypedActor {
             // sender
             log.debug("Extract URIs from message {}", uriMsg);
             Set<CrawlUriMessage> newCrawlMessages = sparqlService.extractCrawlUriMessages(uriMsg.getBaseUri(),
-                    wonNodeUri);
+                            wonNodeUri);
             for (CrawlUriMessage newMsg : newCrawlMessages) {
                 getSender().tell(newMsg, getSelf());
             }
@@ -169,7 +170,7 @@ public class WorkerCrawlerActor extends UntypedActor {
                 long crawlDate = System.currentTimeMillis();
                 AtomEvent atomEvent = new AtomEvent(uriMsg.getUri(), wonNodeUri, type, crawlDate, ds);
                 pubSubMediator.tell(new DistributedPubSubMediator.Publish(atomEvent.getClass().getName(), atomEvent),
-                        getSelf());
+                                getSelf());
             }
         } catch (RestClientException e1) {
             // usually happens if the fetch of the dataset fails e.g.
@@ -189,10 +190,10 @@ public class WorkerCrawlerActor extends UntypedActor {
     /**
      * Extract won node uri from a won resource
      *
-     * @param ds  resource as dataset
+     * @param ds resource as dataset
      * @param uri uri that represents resource
      * @return won node uri or null if link to won node is not linked in the
-     *         resource
+     * resource
      */
     private String extractWonNodeUri(Dataset ds, String uri) {
         try {
@@ -205,13 +206,13 @@ public class WorkerCrawlerActor extends UntypedActor {
     private void sendDoneUriMessage(CrawlUriMessage sourceUriMessage, String wonNodeUri, Collection<String> etags) {
         long crawlDate = System.currentTimeMillis();
         CrawlUriMessage uriDoneMsg = new CrawlUriMessage(sourceUriMessage.getUri(), sourceUriMessage.getBaseUri(),
-                wonNodeUri, CrawlUriMessage.STATUS.DONE, crawlDate, etags);
+                        wonNodeUri, CrawlUriMessage.STATUS.DONE, crawlDate, etags);
         String ifNoneMatch = sourceUriMessage.getResourceETagHeaderValues() != null
-                ? String.join(", ", sourceUriMessage.getResourceETagHeaderValues())
-                : "<None>";
+                        ? String.join(", ", sourceUriMessage.getResourceETagHeaderValues())
+                        : "<None>";
         String responseETags = etags != null ? String.join(", ", etags) : "<None>";
         log.debug("Crawling done for URI {} with ETag Header Values {} (If-None-Match request value: {})",
-                uriDoneMsg.getUri(), responseETags, ifNoneMatch);
+                        uriDoneMsg.getUri(), responseETags, ifNoneMatch);
         getSender().tell(uriDoneMsg, getSelf());
     }
 

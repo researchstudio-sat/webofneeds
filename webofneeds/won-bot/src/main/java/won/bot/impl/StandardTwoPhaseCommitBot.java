@@ -50,26 +50,28 @@ public class StandardTwoPhaseCommitBot extends EventBot {
         EventBus bus = getEventBus();
         ParticipantCoordinatorBotContextWrapper botContextWrapper = (ParticipantCoordinatorBotContextWrapper) getBotContextWrapper();
         // create atoms every trigger execution until noOfAtoms are created
-        this.participantAtomCreator = new ActionOnEventListener(
-                ctx, "participantCreator", new CreateAtomWithSocketsAction(ctx,
-                        botContextWrapper.getParticipantListName(), SocketType.ParticipantSocket.getURI()),
-                noOfAtoms - 1);
+        this.participantAtomCreator = new ActionOnEventListener(ctx, "participantCreator",
+                        new CreateAtomWithSocketsAction(ctx, botContextWrapper.getParticipantListName(),
+                                        SocketType.ParticipantSocket.getURI()),
+                        noOfAtoms - 1);
         bus.subscribe(ActEvent.class, this.participantAtomCreator);
         // when done, create one coordinator atom
         this.coordinatorAtomCreator = new ActionOnEventListener(ctx, "coordinatorCreator",
-                new FinishedEventFilter(participantAtomCreator), new CreateAtomWithSocketsAction(ctx,
-                        botContextWrapper.getCoordinatorListName(), SocketType.CoordinatorSocket.getURI()),
-                1);
+                        new FinishedEventFilter(participantAtomCreator),
+                        new CreateAtomWithSocketsAction(ctx, botContextWrapper.getCoordinatorListName(),
+                                        SocketType.CoordinatorSocket.getURI()),
+                        1);
         bus.subscribe(FinishedEvent.class, this.coordinatorAtomCreator);
         // wait for N AtomCreatedEvents
         creationWaiter = new WaitForNEventsListener(ctx, noOfAtoms);
         bus.subscribe(AtomCreatedEvent.class, creationWaiter);
         // when done, connect the participants to the coordinator
         this.atomConnector = new ActionOnEventListener(ctx, "atomConnector", new FinishedEventFilter(creationWaiter),
-                new ConnectFromListToListAction(ctx, botContextWrapper.getCoordinatorListName(),
-                        botContextWrapper.getParticipantListName(), SocketType.CoordinatorSocket.getURI(),
-                        SocketType.ParticipantSocket.getURI(), MILLIS_BETWEEN_MESSAGES, "Hi!"),
-                1);
+                        new ConnectFromListToListAction(ctx, botContextWrapper.getCoordinatorListName(),
+                                        botContextWrapper.getParticipantListName(),
+                                        SocketType.CoordinatorSocket.getURI(), SocketType.ParticipantSocket.getURI(),
+                                        MILLIS_BETWEEN_MESSAGES, "Hi!"),
+                        1);
         bus.subscribe(FinishedEvent.class, this.atomConnector);
         // add a listener that is informed of the connect/open events and that
         // auto-opens
@@ -78,17 +80,17 @@ public class StandardTwoPhaseCommitBot extends EventBot {
         // * open events - so it responds with open (if the open received was the first
         // open, and we need need to accept the connection)
         this.autoOpener = new ActionOnEventListener(ctx,
-                new AtomUriInNamedListFilter(ctx, botContextWrapper.getParticipantListName()),
-                new OpenConnectionAction(ctx, "Hi!"));
+                        new AtomUriInNamedListFilter(ctx, botContextWrapper.getParticipantListName()),
+                        new OpenConnectionAction(ctx, "Hi!"));
         bus.subscribe(ConnectFromOtherAtomEvent.class, this.autoOpener);
         // after the last connect event, all connections are closed!
         this.participantDeactivator = new ActionOnEventListener(ctx, "participantDeactivator",
-                new AtomUriInNamedListFilter(ctx, botContextWrapper.getParticipantListName()),
-                new TwoPhaseCommitDeactivateOnCloseAction(ctx), noOfAtoms - 1);
+                        new AtomUriInNamedListFilter(ctx, botContextWrapper.getParticipantListName()),
+                        new TwoPhaseCommitDeactivateOnCloseAction(ctx), noOfAtoms - 1);
         bus.subscribe(CloseFromOtherAtomEvent.class, this.participantDeactivator);
         coordinatorDeactivator = new ActionOnEventListener(ctx, "coordinatorDeactivator",
-                new FinishedEventFilter(participantDeactivator),
-                new DeactivateAllAtomsOfListAction(ctx, botContextWrapper.getCoordinatorListName()), 1);
+                        new FinishedEventFilter(participantDeactivator),
+                        new DeactivateAllAtomsOfListAction(ctx, botContextWrapper.getCoordinatorListName()), 1);
         bus.subscribe(FinishedEvent.class, coordinatorDeactivator);
         // add a listener that counts two AtomDeactivatedEvents and then tells the
         // framework that the bot's work is done

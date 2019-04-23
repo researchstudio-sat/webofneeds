@@ -30,7 +30,7 @@ public class WebSocketConfig implements WebSocketConfigurer// extends AbstractWe
     @Override
     public void registerWebSocketHandlers(final WebSocketHandlerRegistry registry) {
         registry.addHandler(this.wonWebSocketHandler, "/msg").addInterceptors(new WonHandshakeInterceptor())
-                .withSockJS();
+                        .withSockJS();
     }
 
     @Autowired

@@ -91,24 +91,24 @@ public class BotTrigger {
             return;
         // make the stop listener
         this.stopListener = new ActionOnFirstEventListener(this.context, new BotTriggerFilter(this),
-                new BaseEventBotAction(BotTrigger.this.context) {
-                    @Override
-                    protected void doRun(Event event, EventListener executingListener) throws Exception {
-                        // unregister all listeners
-                        BotTrigger.this.context.getEventBus().unsubscribe(BotTrigger.this.startListener);
-                        BotTrigger.this.context.getEventBus().unsubscribe(BotTrigger.this.stopListener);
-                        BotTrigger.this.cancelableTask.cancel(true);
-                        BotTrigger.this.active.set(false);
-                    }
-                });
+                        new BaseEventBotAction(BotTrigger.this.context) {
+                            @Override
+                            protected void doRun(Event event, EventListener executingListener) throws Exception {
+                                // unregister all listeners
+                                BotTrigger.this.context.getEventBus().unsubscribe(BotTrigger.this.startListener);
+                                BotTrigger.this.context.getEventBus().unsubscribe(BotTrigger.this.stopListener);
+                                BotTrigger.this.cancelableTask.cancel(true);
+                                BotTrigger.this.active.set(false);
+                            }
+                        });
         // make the start listener
         this.startListener = new ActionOnFirstEventListener(this.context, new BotTriggerFilter(this),
-                new BaseEventBotAction(BotTrigger.this.context) {
-                    @Override
-                    protected void doRun(Event event, EventListener executingListener) throws Exception {
-                        reschedule();
-                    }
-                });
+                        new BaseEventBotAction(BotTrigger.this.context) {
+                            @Override
+                            protected void doRun(Event event, EventListener executingListener) throws Exception {
+                                reschedule();
+                            }
+                        });
         // register both listeners
         context.getEventBus().subscribe(StopBotTriggerCommandEvent.class, stopListener);
         context.getEventBus().subscribe(StartBotTriggerCommandEvent.class, startListener);

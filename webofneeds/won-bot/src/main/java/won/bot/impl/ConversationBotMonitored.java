@@ -70,16 +70,18 @@ public class ConversationBotMonitored extends EventBot {
         EventBus bus = getEventBus();
         // create atoms every trigger execution until 2 atoms are created
         this.atomCreator = new ActionOnEventListener(ctx,
-                new CreateAtomWithSocketsAction(ctx, getBotContextWrapper().getAtomCreateListName()), NO_OF_ATOMS);
+                        new CreateAtomWithSocketsAction(ctx, getBotContextWrapper().getAtomCreateListName()),
+                        NO_OF_ATOMS);
         bus.subscribe(ActEvent.class, this.atomCreator);
         // count until 2 atoms were created, then
         // * connect the 2 atoms
         this.atomConnector = new ActionOnceAfterNEventsListener(ctx, "atomConnector", NO_OF_ATOMS,
-                new ConnectFromListToListAction(ctx, ctx.getBotContextWrapper().getAtomCreateListName(),
-                        ctx.getBotContextWrapper().getAtomCreateListName(), SocketType.ChatSocket.getURI(),
-                        SocketType.ChatSocket.getURI(), MILLIS_BETWEEN_MESSAGES,
-                        "Hello," + "I am the ConversationBot, a simple bot that will exchange "
-                                + "messages and deactivate its atoms after some time."));
+                        new ConnectFromListToListAction(ctx, ctx.getBotContextWrapper().getAtomCreateListName(),
+                                        ctx.getBotContextWrapper().getAtomCreateListName(),
+                                        SocketType.ChatSocket.getURI(), SocketType.ChatSocket.getURI(),
+                                        MILLIS_BETWEEN_MESSAGES,
+                                        "Hello," + "I am the ConversationBot, a simple bot that will exchange "
+                                                        + "messages and deactivate its atoms after some time."));
         bus.subscribe(AtomCreatedEvent.class, this.atomConnector);
         // add a listener that is informed of the connect/open events and that
         // auto-opens
@@ -88,7 +90,7 @@ public class ConversationBotMonitored extends EventBot {
         // * open events - so it responds with open (if the open received was the first
         // open, and we still need to accept the connection)
         this.autoOpener = new ActionOnEventListener(ctx,
-                new OpenConnectionAction(ctx, "Hi, I am the ConverssationBot."));
+                        new OpenConnectionAction(ctx, "Hi, I am the ConverssationBot."));
         bus.subscribe(ConnectFromOtherAtomEvent.class, this.autoOpener);
         // add a listener that auto-responds to messages by a message and at different
         // stages of messages processing fires
@@ -98,16 +100,16 @@ public class ConversationBotMonitored extends EventBot {
         // * message events - so it responds
         // * open events - so it initiates the chain reaction of responses
         this.autoResponder = new AutomaticMonitoredMessageResponderListener(ctx, NO_OF_MESSAGES,
-                MILLIS_BETWEEN_MESSAGES);
+                        MILLIS_BETWEEN_MESSAGES);
         bus.subscribe(OpenFromOtherAtomEvent.class, this.autoResponder);
         bus.subscribe(MessageFromOtherAtomEvent.class, this.autoResponder);
         // add a listener that closes the connection after it has seen 10 messages
         this.connectionCloser = new ActionOnceAfterNEventsListener(ctx, NO_OF_MESSAGES,
-                new CloseConnectionAction(ctx, "Farewell!"));
+                        new CloseConnectionAction(ctx, "Farewell!"));
         bus.subscribe(MessageFromOtherAtomEvent.class, this.connectionCloser);
         // add a listener that closes the connection when a failureEvent occurs
         EventListener onFailureConnectionCloser = new ActionOnEventListener(ctx,
-                new CloseConnectionAction(ctx, "Farewell!"));
+                        new CloseConnectionAction(ctx, "Farewell!"));
         bus.subscribe(FailureResponseEvent.class, onFailureConnectionCloser);
         // add a listener that auto-responds to a close message with a deactivation of
         // both atoms.

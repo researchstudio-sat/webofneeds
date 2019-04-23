@@ -100,7 +100,7 @@ public abstract class EventBot extends TriggeredBot {
             eventBus.publish(new ActEvent());
         } else {
             logger.info("not publishing event for call to act() as the bot is not in state {} but {}",
-                    BotLifecyclePhase.ACTIVE, getLifecyclePhase());
+                            BotLifecyclePhase.ACTIVE, getLifecyclePhase());
         }
     }
 
@@ -109,9 +109,8 @@ public abstract class EventBot extends TriggeredBot {
         if (getLifecyclePhase().isActive()) {
             eventBus.publish(new MessageFromOtherAtomEvent(con, wonMessage));
         } else {
-            logger.info(
-                    "not publishing event for call to onMessageFromOtherAtom() as the bot is not in state {} but {}",
-                    BotLifecyclePhase.ACTIVE, getLifecyclePhase());
+            logger.info("not publishing event for call to onMessageFromOtherAtom() as the bot is not in state {} but {}",
+                            BotLifecyclePhase.ACTIVE, getLifecyclePhase());
         }
     }
 
@@ -121,7 +120,7 @@ public abstract class EventBot extends TriggeredBot {
             eventBus.publish(new HintFromMatcherEvent(match, wonMessage));
         } else {
             logger.info("not publishing event for call to onHintFromMatcher() as the bot is not in state {} but {}",
-                    BotLifecyclePhase.ACTIVE, getLifecyclePhase());
+                            BotLifecyclePhase.ACTIVE, getLifecyclePhase());
         }
     }
 
@@ -131,7 +130,7 @@ public abstract class EventBot extends TriggeredBot {
             eventBus.publish(new CloseFromOtherAtomEvent(con, wonMessage));
         } else {
             logger.info("not publishing event for call to onClose() as the bot is not in state {} but {}",
-                    BotLifecyclePhase.ACTIVE, getLifecyclePhase());
+                            BotLifecyclePhase.ACTIVE, getLifecyclePhase());
         }
     }
 
@@ -141,7 +140,7 @@ public abstract class EventBot extends TriggeredBot {
             eventBus.publish(new OpenFromOtherAtomEvent(con, wonMessage));
         } else {
             logger.info("not publishing event for call to onOpenFromOtherAtom() as the bot is not in state {} but {}",
-                    BotLifecyclePhase.ACTIVE, getLifecyclePhase());
+                            BotLifecyclePhase.ACTIVE, getLifecyclePhase());
         }
     }
 
@@ -150,32 +149,31 @@ public abstract class EventBot extends TriggeredBot {
         if (getLifecyclePhase().isActive()) {
             eventBus.publish(new ConnectFromOtherAtomEvent(con, wonMessage));
         } else {
-            logger.info(
-                    "not publishing event for call to onConnectFromOtherAtom() as the bot is not in state {} but {}",
-                    BotLifecyclePhase.ACTIVE, getLifecyclePhase());
+            logger.info("not publishing event for call to onConnectFromOtherAtom() as the bot is not in state {} but {}",
+                            BotLifecyclePhase.ACTIVE, getLifecyclePhase());
         }
     }
 
     @Override
     public final void onNewAtomCreated(final URI atomUri, final URI wonNodeUri, final Dataset atomDataset)
-            throws Exception {
+                    throws Exception {
         if (getLifecyclePhase().isActive()) {
             eventBus.publish(new AtomCreatedEvent(atomUri, wonNodeUri, atomDataset, SocketType.ChatSocket));
         } else {
             logger.info("not publishing event for call to onNewAtomCreated() as the bot is not in state {} but {}",
-                    BotLifecyclePhase.ACTIVE, getLifecyclePhase());
+                            BotLifecyclePhase.ACTIVE, getLifecyclePhase());
         }
     }
 
     @Override
     public final void onNewAtomCreatedNotificationForMatcher(final URI wonNodeURI, final URI atomUri,
-            final Dataset wonMessageDataset) {
+                    final Dataset wonMessageDataset) {
         if (getLifecyclePhase().isActive()) {
             Dataset dataset = getEventListenerContext().getLinkedDataSource().getDataForResource(atomUri);
             eventBus.publish(new AtomCreatedEventForMatcher(atomUri, dataset));
         } else {
             logger.info("not publishing event for call to onNewAtomCreated() as the bot is not in state {} but {}",
-                    BotLifecyclePhase.ACTIVE, getLifecyclePhase());
+                            BotLifecyclePhase.ACTIVE, getLifecyclePhase());
         }
     }
 
@@ -186,7 +184,7 @@ public abstract class EventBot extends TriggeredBot {
             eventBus.publish(new MatcherRegisteredEvent(wonNodeUri));
         } else {
             logger.info("not publishing event for call to onNewAtomCreated() as the bot is not in state {} but {}",
-                    BotLifecyclePhase.ACTIVE, getLifecyclePhase());
+                            BotLifecyclePhase.ACTIVE, getLifecyclePhase());
         }
     }
 
@@ -196,7 +194,7 @@ public abstract class EventBot extends TriggeredBot {
             eventBus.publish(new AtomModifiedEventForMatcher(atomURI));
         } else {
             logger.info("not publishing event for call to onNewAtomCreated() as the bot is not in state {} but {}",
-                    BotLifecyclePhase.ACTIVE, getLifecyclePhase());
+                            BotLifecyclePhase.ACTIVE, getLifecyclePhase());
         }
     }
 
@@ -206,7 +204,7 @@ public abstract class EventBot extends TriggeredBot {
             eventBus.publish(new AtomActivatedEventForMatcher(atomURI));
         } else {
             logger.info("not publishing event for call to onNewAtomCreated() as the bot is not in state {} but {}",
-                    BotLifecyclePhase.ACTIVE, getLifecyclePhase());
+                            BotLifecyclePhase.ACTIVE, getLifecyclePhase());
         }
     }
 
@@ -216,7 +214,7 @@ public abstract class EventBot extends TriggeredBot {
             eventBus.publish(new AtomDeactivatedEventForMatcher(atomURI));
         } else {
             logger.info("not publishing event for call to onNewAtomCreated() as the bot is not in state {} but {}",
-                    BotLifecyclePhase.ACTIVE, getLifecyclePhase());
+                            BotLifecyclePhase.ACTIVE, getLifecyclePhase());
         }
     }
 
@@ -226,7 +224,7 @@ public abstract class EventBot extends TriggeredBot {
             eventBus.publish(new FailureResponseEvent(failedMessageUri, wonMessage));
         } else {
             logger.info("not publishing event for call to onFailureResponse() as the bot is not in state {} but {}",
-                    BotLifecyclePhase.ACTIVE, getLifecyclePhase());
+                            BotLifecyclePhase.ACTIVE, getLifecyclePhase());
         }
     }
 
@@ -236,7 +234,7 @@ public abstract class EventBot extends TriggeredBot {
             eventBus.publish(new SuccessResponseEvent(successfulMessageUri, wonMessage));
         } else {
             logger.info("not publishing event for call to onSuccessResponse() as the bot is not in state {} but {}",
-                    BotLifecyclePhase.ACTIVE, getLifecyclePhase());
+                            BotLifecyclePhase.ACTIVE, getLifecyclePhase());
         }
     }
 
@@ -372,7 +370,7 @@ public abstract class EventBot extends TriggeredBot {
     private EventGeneratingWonMessageSenderWrapper getWonMessageSenderWrapperLazily() {
         if (this.wonMessageSenderWrapper == null) {
             this.wonMessageSenderWrapper = new EventGeneratingWonMessageSenderWrapper(
-                    EventBot.this.getWonMessageSender());
+                            EventBot.this.getWonMessageSender());
         }
         return wonMessageSenderWrapper;
     }
@@ -415,14 +413,14 @@ public abstract class EventBot extends TriggeredBot {
             Event event = null;
             // if the event is connection specific, raise a more specialized event
             switch (type) {
-            case CLOSE:
-            case CONNECT:
-            case CONNECTION_MESSAGE:
-            case OPEN:
-                event = new WonMessageSentOnConnectionEvent(message);
-                break;
-            default:
-                event = new WonMessageSentEvent(message);
+                case CLOSE:
+                case CONNECT:
+                case CONNECTION_MESSAGE:
+                case OPEN:
+                    event = new WonMessageSentOnConnectionEvent(message);
+                    break;
+                default:
+                    event = new WonMessageSentEvent(message);
             }
             getEventBus().publish(event);
         }

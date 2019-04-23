@@ -51,13 +51,12 @@ public class AtomCreatorBot extends EventBot {
         // reached
         // in this case, 0 unfinished atom creations means that all atoms were created
         final Counter creationUnfinishedCounter = new TargetCounterDecorator(ctx, new CounterImpl("creationUnfinished"),
-                0);
+                        0);
         // create atoms every trigger execution until the atom producer is exhausted
-        this.groupMemberCreator = new ActionOnEventListener(ctx, "groupMemberCreator",
-                new MultipleActions(ctx, new IncrementCounterAction(ctx, atomCreationStartedCounter),
+        this.groupMemberCreator = new ActionOnEventListener(ctx, "groupMemberCreator", new MultipleActions(ctx,
+                        new IncrementCounterAction(ctx, atomCreationStartedCounter),
                         new IncrementCounterAction(ctx, creationUnfinishedCounter),
-                        new CreateAtomWithSocketsAction(ctx, getBotContextWrapper().getAtomCreateListName())),
-                -1);
+                        new CreateAtomWithSocketsAction(ctx, getBotContextWrapper().getAtomCreateListName())), -1);
         bus.subscribe(ActEvent.class, this.groupMemberCreator);
         bus.subscribe(AtomCreatedEvent.class, new ActionOnEventListener(ctx, "logger", new BaseEventBotAction(ctx) {
             int lastOutput = 0;
@@ -69,24 +68,23 @@ public class AtomCreatorBot extends EventBot {
                 int successCnt = atomCreationSuccessfulCounter.getCount();
                 int failedCnt = atomCreationFailedCounter.getCount();
                 if (cnt - lastOutput >= 1) {
-                    logger.info(
-                            "started creation of {} atoms, creation not yet finished for {}. Successful: {}, failed: {}",
-                            new Object[] { cnt, unfinishedCount, successCnt, failedCnt });
+                    logger.info("started creation of {} atoms, creation not yet finished for {}. Successful: {}, failed: {}",
+                                    new Object[] { cnt, unfinishedCount, successCnt, failedCnt });
                     lastOutput = cnt;
                 }
             }
         }));
         // When the atomproducer is exhausted, stop the creator.
         getEventBus().subscribe(AtomProducerExhaustedEvent.class,
-                new ActionOnEventListener(ctx, new UnsubscribeListenerAction(ctx, groupMemberCreator)));
+                        new ActionOnEventListener(ctx, new UnsubscribeListenerAction(ctx, groupMemberCreator)));
         // also, keep track of what worked and what didn't
         bus.subscribe(AtomCreationFailedEvent.class,
-                new ActionOnEventListener(ctx, new IncrementCounterAction(ctx, atomCreationFailedCounter)));
+                        new ActionOnEventListener(ctx, new IncrementCounterAction(ctx, atomCreationFailedCounter)));
         bus.subscribe(AtomCreatedEvent.class,
-                new ActionOnEventListener(ctx, new IncrementCounterAction(ctx, atomCreationSuccessfulCounter)));
+                        new ActionOnEventListener(ctx, new IncrementCounterAction(ctx, atomCreationSuccessfulCounter)));
         // when an atom is created (or it failed), decrement the halfCreatedAtom counter
         EventListener downCounter = new ActionOnEventListener(ctx, "downCounter",
-                new DecrementCounterAction(ctx, creationUnfinishedCounter));
+                        new DecrementCounterAction(ctx, creationUnfinishedCounter));
         // count a successful atom creation
         bus.subscribe(AtomCreatedEvent.class, downCounter);
         // if a creation failed, we don't want to keep us from keeping the correct count
@@ -96,7 +94,7 @@ public class AtomCreatorBot extends EventBot {
         // once for that, too.
         bus.subscribe(AtomProducerExhaustedEvent.class, downCounter);
         EventListener loadTestMonitor = new ActionOnEventListener(ctx, "loadTestMonitor",
-                new MatchingLoadTestMonitorAction(ctx));
+                        new MatchingLoadTestMonitorAction(ctx));
         bus.subscribe(AtomCreatedEvent.class, loadTestMonitor);
         bus.subscribe(HintFromMatcherEvent.class, loadTestMonitor);
         // wait for the targetCountReached event of the finishedCounter. We don't use

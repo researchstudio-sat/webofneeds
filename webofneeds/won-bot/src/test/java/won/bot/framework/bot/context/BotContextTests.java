@@ -263,7 +263,7 @@ public class BotContextTests {
         Assert.assertEquals(message.getHeader("test1")[0], messageCopy.getHeader("test1")[0]);
         Assert.assertEquals(message.getAllHeaderLines().nextElement(), messageCopy.getAllHeaderLines().nextElement());
         Assert.assertEquals(message.getRecipients(Message.RecipientType.TO)[0],
-                messageCopy.getRecipients(Message.RecipientType.TO)[0]);
+                        messageCopy.getRecipients(Message.RecipientType.TO)[0]);
         Assert.assertEquals(message.getSubject(), messageCopy.getSubject());
         Assert.assertEquals(message.getDescription(), messageCopy.getDescription());
         Assert.assertEquals(message.getSentDate(), messageCopy.getSentDate());
