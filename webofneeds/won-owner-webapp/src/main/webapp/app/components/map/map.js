@@ -33,8 +33,12 @@ class Controller {
       const viewAtomUri = generalSelectors.getViewAtomUriFromRoute(state);
       const viewConnUri = generalSelectors.getViewConnectionUriFromRoute(state);
 
-      const atoms = getIn(state, ["owner", "atoms"]);
-      const atomUris = getIn(state, ["owner", "atomUris"]);
+      const atomsWithLocation = getIn(state, ["owner", "atoms"]).filter(
+        metaAtom => atomUtils.hasLocation(metaAtom)
+      );
+
+      const atomUrisArray = atomsWithLocation && [...atomsWithLocation.keys()];
+
       const lastAtomUrisUpdateDate = getIn(state, [
         "owner",
         "lastAtomsUpdateTime",
@@ -47,10 +51,6 @@ class Controller {
       const isOwnerAtomUrisToLoad =
         !lastAtomUrisUpdateDate && !isOwnerAtomUrisLoading;
 
-      const atomsWithLocation = getIn(state, ["atoms"]).filter(atom =>
-        atomUtils.hasLocation(atom)
-      );
-
       let locations = [];
       atomsWithLocation &&
         atomsWithLocation.map(atom => {
@@ -59,7 +59,6 @@ class Controller {
         });
 
       return {
-        atoms,
         locations,
         atomsWithLocation,
         lastAtomUrisUpdateDate,
@@ -69,8 +68,8 @@ class Controller {
             generalSelectors.selectLastUpdateTime(state),
             lastAtomUrisUpdateDate
           ),
-        atomUrisArray: atomUris && atomUris.toArray().splice(0, 200), //FIXME: CURRENTLY LIMIT TO 200 entries
-        atomUrisSize: atomUris ? atomUris.size : 0,
+        atomUrisArray,
+        atomUrisSize: atomsWithLocation ? atomsWithLocation.size : 0,
         isOwnerAtomUrisLoading,
         isOwnerAtomUrisToLoad,
         showSlideIns:
