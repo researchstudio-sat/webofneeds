@@ -28,9 +28,10 @@ import org.apache.jena.shared.PrefixMapping;
 import org.apache.jena.shared.impl.PrefixMappingImpl;
 import org.apache.jena.sparql.path.Path;
 import org.apache.jena.sparql.path.PathParser;
+import org.apache.jena.vocabulary.RDFS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import won.protocol.service.WonNodeInfo;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WON;
@@ -86,6 +87,20 @@ public class WonLinkedDataUtils {
 
     public static Dataset getConversationAndAtomsDataset(String connectionURI, LinkedDataSource linkedDataSource) {
         return getConversationAndAtomsDataset(URI.create(connectionURI), linkedDataSource);
+    }
+
+    public static List<URI> getNodeAtomUris(URI nodeURI, LinkedDataSource linkedDataSource) {
+        Dataset nodeDataset = getDataForResource(nodeURI, linkedDataSource);
+        WonNodeInfo wonNodeInfo = WonRdfUtils.WonNodeUtils.getWonNodeInfo(nodeURI, nodeDataset);
+        Dataset atomListDataset = getDataForResource(URI.create(wonNodeInfo.getAtomListURI()), linkedDataSource);
+        return RdfUtils.visitFlattenedToList(atomListDataset, model -> {
+            StmtIterator it = model.listStatements((Resource) null, RDFS.member, (RDFNode) null);
+            List<URI> ret = new ArrayList<>();
+            while (it.hasNext()) {
+                ret.add(URI.create(it.next().getObject().toString()));
+            }
+            return ret;
+        });
     }
 
     public static Dataset getFullAtomDataset(URI atomURI, LinkedDataSource linkedDataSource) {
