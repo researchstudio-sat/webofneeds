@@ -1,7 +1,6 @@
 module PublishButton exposing (main)
 
 import Actions
-import Application
 import Browser.Dom as Dom exposing (Element)
 import Browser.Events
 import Color
@@ -17,10 +16,11 @@ import Persona exposing (Persona)
 import Random
 import Task
 import Uuid exposing (Uuid)
+import Widget
 
 
 main =
-    Application.element
+    Widget.widget
         { init = init
         , subscriptions = subscriptions
         , update = update
@@ -396,7 +396,7 @@ update msg { model, props } =
 
         FailedToGetDimensions error ->
             ( model
-            , Application.logError
+            , Widget.logError
                 (case error of
                     Dom.NotFound id ->
                         "Could not find element id " ++ id

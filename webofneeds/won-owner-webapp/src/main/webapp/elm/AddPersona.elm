@@ -1,6 +1,5 @@
 module AddPersona exposing (main)
 
-import Application
 import Html exposing (..)
 import Html.Attributes as Attributes
 import Html.Events as Events
@@ -9,6 +8,17 @@ import Json.Decode.Extra as Decode
 import Maybe.Extra as Maybe
 import Palette
 import Persona exposing (Persona)
+import Widget
+
+
+main =
+    Widget.widget
+        { init = init
+        , update = update
+        , view = view
+        , subscriptions = \_ -> Sub.none
+        , propDecoder = propDecoder
+        }
 
 
 
@@ -210,17 +220,3 @@ personaView model persona =
             ]
         ]
         persona
-
-
-
----- MAIN ----
-
-
-main =
-    Application.element
-        { init = init
-        , update = update
-        , view = view
-        , subscriptions = \_ -> Sub.none
-        , propDecoder = propDecoder
-        }

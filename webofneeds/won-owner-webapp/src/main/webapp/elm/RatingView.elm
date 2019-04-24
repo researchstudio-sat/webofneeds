@@ -1,17 +1,16 @@
 module RatingView exposing (main)
 
-import Application
-import Element exposing (..)
 import Html exposing (Html)
 import Html.Attributes as HA
 import Html.Events as HE
 import Json.Decode as Decode exposing (Decoder)
 import Palette
 import Persona
+import Widget
 
 
 main =
-    Application.element
+    Widget.widget
         { init = init
         , update = update
         , subscriptions = always Sub.none

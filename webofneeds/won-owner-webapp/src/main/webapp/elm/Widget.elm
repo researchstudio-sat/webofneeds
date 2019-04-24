@@ -1,4 +1,4 @@
-port module Application exposing (element, logError)
+port module Widget exposing (logError, widget)
 
 import Browser
 import Html exposing (Html)
@@ -65,10 +65,10 @@ type Msg props subMsg
 
 
 
----- APPLICATION ----
+---- WIDGET ----
 
 
-element :
+widget :
     { view :
         { props : props
         , model : subModel
@@ -86,7 +86,7 @@ element :
     , propDecoder : Decoder props
     }
     -> Program Value (Model props subModel) (Msg props subMsg)
-element options =
+widget options =
     let
         -- VIEW
         view model =
