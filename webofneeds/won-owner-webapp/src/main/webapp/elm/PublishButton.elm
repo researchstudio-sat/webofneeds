@@ -419,13 +419,17 @@ update msg { model, props } =
 publish : SelectedPersona -> Cmd msg
 publish personaChoice =
     Widget.emitEvent
-        "publish"
-        (case personaChoice of
-            Persona personaId ->
-                Encode.string personaId
+        "onPublish"
+        (Encode.object
+            [ ( "personaId"
+              , case personaChoice of
+                    Persona personaId ->
+                        Encode.string personaId
 
-            Anonymous ->
-                Encode.null
+                    Anonymous ->
+                        Encode.null
+              )
+            ]
         )
 
 

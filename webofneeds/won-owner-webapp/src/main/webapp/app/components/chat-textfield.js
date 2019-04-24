@@ -228,7 +228,7 @@ function genComponentConf() {
               personas: self.personas,
               label: self.submitButtonLabel
             }"
-            on-action="self.submit(payload)" >
+            on-publish="self.submit(personaId)" >
           </won-elm>
       <!-- PERSONA SELECTION END -->
 

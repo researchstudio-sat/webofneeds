@@ -110,7 +110,7 @@ function genComponentConf() {
                 showPersonas: self.isHoldable && self.loggedIn,
                 personas: self.personas
               }"
-              on-action="self.publish(payload)"
+              on-publish="self.publish(personaId)"
               ng-if="self.showCreateInput && !self.isEditFromAtom">
             </won-elm>
             <div class="cp__footer__edit" ng-if="self.loggedIn && self.showCreateInput && self.isEditFromAtom && self.isFromAtomEditable">

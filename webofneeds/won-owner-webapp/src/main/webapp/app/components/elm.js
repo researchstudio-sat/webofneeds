@@ -39,12 +39,23 @@ function genComponentConf($ngRedux) {
                 console.error(`Could not find action "${message.name}"`);
               }
               break;
-            case "event":
-              scope.onAction({
-                action: message.name,
-                payload: message.payload,
-              });
+            case "event": {
+              const eventAttrName = message.name
+                .replace(/([A-Z])/g, "-$1")
+                .toLowerCase();
+              if (element[0].hasAttribute(eventAttrName)) {
+                scope.$parent.$eval(
+                  element[0].getAttribute(eventAttrName),
+                  message.payload
+                );
+              } else {
+                console.error(
+                  `Could not find attribute ${eventAttrName}`,
+                  element[0]
+                );
+              }
               break;
+            }
             default:
               console.error(`Could not read message "${message}"`);
           }
