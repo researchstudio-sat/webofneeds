@@ -1,4 +1,4 @@
-port module Application exposing (Style, element, logError)
+port module Application exposing (element, logError)
 
 import Browser
 import Html exposing (Html)
@@ -18,8 +18,7 @@ port inPort :
 
 
 type alias ExternalData props =
-    { style : Maybe Style
-    , props : Maybe props
+    { props : Maybe props
     , unmount : Bool
     }
 
@@ -31,7 +30,6 @@ externalUpdateDecoder propsDecoder =
             DP.optional field (Decode.map Just dec) Nothing
     in
     Decode.succeed ExternalData
-        |> optional "newStyle" styleDecoder
         |> optional "newProps" propsDecoder
         |> DP.custom
             (Decode.maybe (Decode.field "unmount" Decode.bool)
@@ -48,19 +46,6 @@ logError =
 
 
 
----- STYLE ----
-
-
-type alias Style =
-    {}
-
-
-styleDecoder : Decoder Style
-styleDecoder =
-    Decode.succeed {}
-
-
-
 ---- MODEL ----
 
 
@@ -69,7 +54,6 @@ type Model props subModel
     | Model
         { subModel : subModel
         , props : props
-        , style : Style
         }
     | Unmounted
 
@@ -78,7 +62,6 @@ type Msg props subMsg
     = SubMsg subMsg
     | ParsingError String
     | ExternalUpdate (ExternalData props)
-    | BeingUnmounted
 
 
 
@@ -87,8 +70,7 @@ type Msg props subMsg
 
 element :
     { view :
-        { style : Style
-        , props : props
+        { props : props
         , model : subModel
         }
         -> Html subMsg
@@ -103,13 +85,7 @@ element :
     , subscriptions : subModel -> Sub subMsg
     , propDecoder : Decoder props
     }
-    ->
-        Program
-            { props : Value
-            , style : Value
-            }
-            (Model props subModel)
-            (Msg props subMsg)
+    -> Program Value (Model props subModel) (Msg props subMsg)
 element options =
     let
         -- VIEW
@@ -118,11 +94,10 @@ element options =
                 ParsingFailed _ ->
                     Html.text "Parsing the arguments failed, please look at the log for errors"
 
-                Model { props, style, subModel } ->
+                Model { props, subModel } ->
                     Html.map SubMsg <|
                         options.view
-                            { style = style
-                            , model = subModel
+                            { model = subModel
                             , props = props
                             }
 
@@ -157,25 +132,19 @@ element options =
                             , logError <| "Error on update:\n" ++ message
                             )
 
-                        ExternalUpdate { props, style, unmount } ->
+                        ExternalUpdate { props, unmount } ->
                             if unmount then
                                 ( Unmounted, Cmd.none )
 
                             else
                                 ( Model
                                     { model
-                                        | style =
-                                            style
-                                                |> Maybe.withDefault model.style
-                                        , props =
+                                        | props =
                                             props
                                                 |> Maybe.withDefault model.props
                                     }
                                 , Cmd.none
                                 )
-
-                        BeingUnmounted ->
-                            ( Unmounted, Cmd.none )
 
                 Unmounted ->
                     ( modelWrapper, Cmd.none )
@@ -207,23 +176,21 @@ element options =
                     Sub.none
 
         -- INIT
-        init { props, style } =
-            Result.map2
-                (\sty pr ->
-                    let
-                        ( subModel, subCmd ) =
-                            options.init pr
-                    in
-                    ( Model
-                        { style = sty
-                        , subModel = subModel
-                        , props = pr
-                        }
-                    , Cmd.map SubMsg subCmd
+        init props =
+            Decode.decodeValue options.propDecoder props
+                |> Result.map
+                    (\pr ->
+                        let
+                            ( subModel, subCmd ) =
+                                options.init pr
+                        in
+                        ( Model
+                            { subModel = subModel
+                            , props = pr
+                            }
+                        , Cmd.map SubMsg subCmd
+                        )
                     )
-                )
-                (Decode.decodeValue styleDecoder style)
-                (Decode.decodeValue options.propDecoder props)
                 |> Result.extract
                     (\e ->
                         let

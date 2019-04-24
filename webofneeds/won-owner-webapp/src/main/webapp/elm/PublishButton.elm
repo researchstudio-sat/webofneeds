@@ -169,7 +169,6 @@ popupDirection buttonPosition =
 view :
     { model : Model
     , props : Props
-    , style : Application.Style
     }
     -> Html Msg
 view { model, props } =

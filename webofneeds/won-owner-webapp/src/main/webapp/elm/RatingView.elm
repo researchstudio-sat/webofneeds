@@ -1,6 +1,6 @@
 module RatingView exposing (main)
 
-import Application exposing (Style)
+import Application
 import Element exposing (..)
 import Html exposing (Html)
 import Html.Attributes as HA
@@ -305,7 +305,6 @@ viewMaybeRating maybeRating =
 view :
     { props : Props
     , model : Model
-    , style : Style
     }
     -> Html Msg
 view { model, props } =

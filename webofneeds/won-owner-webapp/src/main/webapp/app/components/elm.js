@@ -1,11 +1,9 @@
 import angular from "angular";
-import { currentSkin } from "../selectors/general-selectors";
 import { actionCreators } from "../actions/actions";
 
 import "./svg-icon.js";
 
 import "../../style/_elm.scss";
-import { getIn } from "../utils";
 
 function genComponentConf($ngRedux) {
   return {
@@ -20,21 +18,8 @@ function genComponentConf($ngRedux) {
       element[0].appendChild(childElement);
       const elmApp = scope.module.init({
         node: childElement,
-        flags: {
-          props: scope.props,
-          style: currentSkin(),
-        },
+        flags: scope.props,
       });
-
-      const disconnectState = $ngRedux.connect(state => ({
-        skin: getIn(state, ["config", "theme"]),
-      }))(() =>
-        window.requestAnimationFrame(() => {
-          elmApp.ports.inPort.send({
-            newStyle: currentSkin(),
-          });
-        })
-      );
 
       scope.$watch("props", props => {
         elmApp.ports.inPort.send({
@@ -60,7 +45,6 @@ function genComponentConf($ngRedux) {
         elmApp.ports.inPort.send({
           unmount: true,
         });
-        disconnectState();
         if (elmApp.ports.outPort) {
           elmApp.ports.outPort.unsubscribe();
         }

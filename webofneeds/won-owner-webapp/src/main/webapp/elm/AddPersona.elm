@@ -1,6 +1,6 @@
 module AddPersona exposing (main)
 
-import Application exposing (Style)
+import Application
 import Html exposing (..)
 import Html.Attributes as Attributes
 import Html.Events as Events
@@ -9,7 +9,6 @@ import Json.Decode.Extra as Decode
 import Maybe.Extra as Maybe
 import Palette
 import Persona exposing (Persona)
-import Time
 
 
 
@@ -122,8 +121,7 @@ update msg { model, props } =
 
 
 view :
-    { style : Style
-    , model : Model
+    { model : Model
     , props : Props
     }
     -> Html Msg
