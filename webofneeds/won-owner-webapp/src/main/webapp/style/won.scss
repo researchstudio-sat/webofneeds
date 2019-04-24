@@ -10,7 +10,7 @@ body {
   @include default-font;
   background-color: $won-lighter-gray;
 
-  > section.ng-scope {
+  >section.ng-scope {
     display: grid;
     min-height: 100vh;
 
@@ -33,14 +33,11 @@ body {
         "footer footer footer footer";
       grid-template-rows: min-content min-content max-content 1fr min-content;
       grid-template-columns:
-        1fr minmax(min-content, $maxContentWidth/2) minmax(
-          min-content,
-          $maxContentWidth/2
-        )
-        1fr;
+        1fr minmax(min-content, $maxContentWidth/2) minmax(min-content,
+        $maxContentWidth/2) 1fr;
     }
 
-    > header {
+    >header {
       grid-area: header;
       position: sticky;
       top: 0;
@@ -51,55 +48,67 @@ body {
       background: white;
     }
 
-    > won-toasts,
-    > won-slide-in {
+    >won-toasts,
+    >won-slide-in {
       grid-area: info;
     }
 
-    > aside.overview__left {
+    >aside.overview__left {
       grid-area: list;
       z-index: 2;
     }
 
-    > main.overview__right {
+    >main.overview__right {
       grid-area: content;
 
-      > * {
+      >* {
         box-sizing: border-box;
         position: sticky;
         top: var(--headerHeight);
 
         border-right: $thinGrayBorder;
         border-bottom: $thinGrayBorder;
+
         @media (max-width: $responsivenessBreakPoint) {
           border-right: none;
         }
+
         background: white;
       }
 
-      > won-group-administration,
-      > won-group-post-messages,
-      > won-post-messages {
+      >won-group-administration,
+      >won-group-post-messages,
+      >won-post-messages {
         height: calc(100vh - var(--headerHeight));
       }
     }
 
-    > main.signup,
-    > main.about {
+    >main.signup,
+    >main.about {
       grid-area: list;
+
       @media (min-width: $responsivenessBreakPoint) {
         grid-column: 1 / -1;
       }
     }
 
-    > main.settings {
+    >main.settings {
       grid-area: list;
+
       @media (min-width: $responsivenessBreakPoint) {
         grid-column: 2 / 4;
       }
     }
 
-    > won-footer {
+    >main.forgotPassword {
+      grid-area: list;
+
+      @media (min-width: $responsivenessBreakPoint) {
+        grid-column: 2 / 4;
+      }
+    }
+
+    >won-footer {
       grid-area: footer;
     }
   }
@@ -153,6 +162,7 @@ a {
   //color: $won-primary-color;
   color: $won-secondary-color-lighter;
   text-decoration: none;
+
   &:visited {
     //color: darken($won-primary-color, 30%);
     color: $won-secondary-color-light;

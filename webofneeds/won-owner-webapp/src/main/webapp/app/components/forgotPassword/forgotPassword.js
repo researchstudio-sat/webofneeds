@@ -1,47 +1,26 @@
-/**
- * Created by ksinger on 21.08.2017.
- */
 import angular from "angular";
 import ngAnimate from "angular-animate";
-import { attach, getIn } from "../../utils.js";
-import { actionCreators } from "../../actions/actions.js";
-import forgotPaswordWrapper from "./forgot-password-wrapper.js";
-import * as viewSelectors from "../../selectors/view-selectors.js";
-
-import * as srefUtils from "../../sref-utils.js";
+import { Elm } from "../../../elm/ForgotPassword.elm";
+import { currentSkin } from "../../selectors/general-selectors.js";
 
 import "style/_signup.scss";
 
-const serviceDependencies = [
-  "$ngRedux",
-  "$scope",
-  "$state" /*'$routeParams' /*injections as strings here*/,
-];
+const serviceDependencies = ["$element"];
 
 class ForgotPasswordController {
-  constructor(/* arguments <- serviceDependencies */) {
-    attach(this, serviceDependencies, arguments);
-    this.rememberMe = false;
-    Object.assign(this, srefUtils); // bind srefUtils to scope
-
-    const select = state => {
-      return {
-        appTitle: getIn(state, ["config", "theme", "title"]),
-        showModalDialog: state.getIn(["view", "showModalDialog"]),
-        showSlideIns:
-          viewSelectors.hasSlideIns(state) && viewSelectors.showSlideIns(state),
-      };
-    };
-    const disconnect = this.$ngRedux.connect(select, actionCreators)(this);
-    this.$scope.$on("$destroy", disconnect);
+  constructor(element) {
+    Elm.ForgotPassword.init({
+      node: element[0].querySelector(".elmHost"),
+      flags: {
+        skin: currentSkin(),
+        flags: null,
+      },
+    });
   }
 }
 
 export default angular
-  .module("won.owner.components.forgotPassword", [
-    forgotPaswordWrapper,
-    ngAnimate,
-  ])
+  .module("won.owner.components.forgotPassword", [ngAnimate])
   .controller("ForgotPasswordController", [
     ...serviceDependencies,
     ForgotPasswordController,

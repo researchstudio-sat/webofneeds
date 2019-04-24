@@ -8,9 +8,9 @@ import Element.Font as Font
 import Element.Input as Input
 import Elements
 import Html exposing (Html)
+import Http
+import Json.Encode as Encode
 import Old.Skin as Skin exposing (Skin)
-import Settings.Export as Export
-import Settings.Personas as Personas
 
 
 main =
@@ -18,79 +18,47 @@ main =
         { init = init
         , update = update
         , view = view
-        , subscriptions = subscriptions
+        , subscriptions = always Sub.none
         }
+
+
+type alias Model =
+    { resetState : ResetState
+    , credentials : Credentials
+    }
+
+
+type ResetState
+    = EnteringCredentials
+    | ResettingPassword
+    | ResetFailed
+
+
+type alias Credentials =
+    { newPassword : String
+    , email : String
+    , recoveryKey : String
+    }
+
+
+type Msg
+    = ResetButtonPressed
+    | MailStringChanged String
+    | NewPasswordChanged String
+    | RecoveryKeyChanged String
+    | ExportRequestReturned (Result Http.Error ())
 
 
 
 ---- MODEL ----
 
 
-type DeviceClass
-    = Mobile
-    | Desktop
-
-
-classifyDevice : { window | width : Int, height : Int } -> DeviceClass
-classifyDevice { width } =
-    if width > 600 then
-        Desktop
-
-    else
-        Mobile
-
-
-type alias Size =
-    { width : Int
-    , height : Int
-    }
-
-
-type alias Model =
-    { page : Page
-    , menuOpen : Bool
-    , size : Size
-    }
-
-
-type Page
-    = Personas Personas.Model
-    | Export Export.Model
-
-
-type Route
-    = PersonasR
-    | ExportR
-
-
-toRoute : Page -> Route
-toRoute page =
-    case page of
-        Personas _ ->
-            PersonasR
-
-        Export _ ->
-            ExportR
-
-
-init : { width : Int, height : Int } -> ( Model, Cmd Msg )
-init size =
-    let
-        ( model, cmd ) =
-            Personas.init ()
-    in
-    ( { size = size
-      , page = Personas model
-      , menuOpen = True
+init : () -> ( Model, Cmd Msg )
+init () =
+    ( { resetState = EnteringCredentials
+      , credentials = { newPassword = "", email = "", recoveryKey = "" }
       }
-    , Cmd.map PersonasMsg cmd
-    )
-
-
-subInit : (model -> Page) -> (msg -> Msg) -> ( model, Cmd msg ) -> ( Page, Cmd Msg )
-subInit toPage toMsg ( subModel, cmd ) =
-    ( toPage subModel
-    , Cmd.map toMsg cmd
+    , Cmd.none
     )
 
 
@@ -98,223 +66,303 @@ subInit toPage toMsg ( subModel, cmd ) =
 ---- UPDATE ----
 
 
-type Msg
-    = PersonasMsg Personas.Msg
-    | ExportMsg Export.Msg
-    | ChangeRoute Route
-    | Resized Size
-    | Back
-
-
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    case ( msg, model.page ) of
-        ( PersonasMsg subMsg, Personas subModel ) ->
-            Personas.update subMsg subModel
-                |> updateWith Personas PersonasMsg model
+    case msg of
+        ResetButtonPressed ->
+            startReset model
 
-        ( ExportMsg subMsg, Export subModel ) ->
-            Export.update subMsg subModel
-                |> updateWith Export ExportMsg model
+        MailStringChanged mailString ->
+            updateMailString mailString model
 
-        ( ChangeRoute newRoute, _ ) ->
-            if toRoute model.page == newRoute then
-                ( { model
-                    | menuOpen = False
-                  }
-                , Cmd.none
-                )
+        NewPasswordChanged newPasswordString ->
+            updatePasswordString newPasswordString model
 
-            else
-                changeRoute newRoute model
+        RecoveryKeyChanged recoveryKeyString ->
+            updateRecoveryKey recoveryKeyString model
 
-        ( Resized size, _ ) ->
+        ExportRequestReturned result ->
+            case result of
+                Ok () ->
+                    ( { model
+                        | resetState = ResettingPassword
+                      }
+                    , Cmd.none
+                    )
+
+                Err _ ->
+                    ( { model
+                        | resetState = ResetFailed
+                      }
+                    , Cmd.none
+                    )
+
+
+updateMailString : String -> Model -> ( Model, Cmd Msg )
+updateMailString newEnteredMailString model =
+    ( case model.resetState of
+        EnteringCredentials ->
+            { model
+                | credentials = { email = newEnteredMailString, newPassword = model.credentials.newPassword, recoveryKey = model.credentials.recoveryKey }
+            }
+
+        _ ->
+            model
+    , Cmd.none
+    )
+
+
+updatePasswordString : String -> Model -> ( Model, Cmd Msg )
+updatePasswordString newPasswordString model =
+    ( case model.resetState of
+        EnteringCredentials ->
+            { model
+                | credentials = { email = model.credentials.email, newPassword = newPasswordString, recoveryKey = model.credentials.recoveryKey }
+            }
+
+        _ ->
+            model
+    , Cmd.none
+    )
+
+
+updateRecoveryKey : String -> Model -> ( Model, Cmd Msg )
+updateRecoveryKey newRecoveryKeyString model =
+    ( case model.resetState of
+        EnteringCredentials ->
+            { model
+                | credentials = { email = model.credentials.email, newPassword = model.credentials.newPassword, recoveryKey = newRecoveryKeyString }
+            }
+
+        _ ->
+            model
+    , Cmd.none
+    )
+
+
+startReset : Model -> ( Model, Cmd Msg )
+startReset model =
+    case model.resetState of
+        EnteringCredentials ->
             ( { model
-                | size = size
+                | resetState = ResettingPassword
               }
-            , Cmd.none
+            , resetRequest model.credentials
             )
 
-        ( Back, _ ) ->
-            ( { model
-                | menuOpen = True
-              }
-            , Cmd.none
-            )
-
-        ( _, _ ) ->
+        _ ->
             ( model, Cmd.none )
 
 
-changeRoute : Route -> Model -> ( Model, Cmd Msg )
-changeRoute route model =
-    let
-        ( newPage, cmd ) =
-            case route of
-                ExportR ->
-                    subInit Export ExportMsg (Export.init ())
-
-                PersonasR ->
-                    subInit Personas PersonasMsg (Personas.init ())
-    in
-    ( { model
-        | page = newPage
-        , menuOpen = False
-      }
-    , cmd
-    )
-
-
-updateWith : (subModel -> Page) -> (subMsg -> Msg) -> Model -> ( subModel, Cmd subMsg ) -> ( Model, Cmd Msg )
-updateWith toModel toMsg model ( subModel, subCmd ) =
-    ( { model
-        | page = toModel subModel
-      }
-    , Cmd.map toMsg subCmd
-    )
+resetRequest : Credentials -> Cmd Msg
+resetRequest credentials =
+    Http.post
+        { url = "./rest/users/resetPassword"
+        , body =
+            Http.jsonBody <|
+                Encode.object
+                    [ ( "username", Encode.string credentials.email )
+                    , ( "recoveryKey", Encode.string credentials.recoveryKey )
+                    , ( "newPassword", Encode.string credentials.newPassword )
+                    , ( "verificationToken", Encode.string "" )
+                    ]
+        , expect = Http.expectWhatever ExportRequestReturned
+        }
 
 
 
 ---- VIEW ----
 
 
-view : Skin -> Model -> Html Msg
-view skin model =
-    layout [ width (minimum 0 shrink) ] <|
-        let
-            deviceClass =
-                classifyDevice model.size
-
-            viewPage toMsg viewFunc viewModel =
-                case deviceClass of
-                    Desktop ->
-                        row
-                            [ width fill
-                            , spacing 20
-                            , padding 10
-                            ]
-                            [ navigation deviceClass skin (toRoute model.page)
-                            , Element.map toMsg (viewFunc skin viewModel)
-                            ]
-
-                    Mobile ->
-                        if model.menuOpen then
-                            navigation deviceClass skin (toRoute model.page)
-
-                        else
-                            column
-                                [ width fill
-                                , spacing 10
-                                ]
-                                [ row
-                                    [ width fill
-                                    , height (px 50)
-                                    , Background.color Skin.white
-                                    ]
-                                    [ Input.button
-                                        [ padding 5
-                                        , width (px 50)
-                                        , height (px 50)
-                                        ]
-                                        { onPress = Just Back
-                                        , label =
-                                            Elements.svgIcon
-                                                []
-                                                { color = skin.primaryColor
-                                                , name = "ico36_backarrow"
-                                                }
-                                        }
-                                    , text (routeLabel <| toRoute model.page)
-                                    ]
-                                , el [ padding 10 ] <|
-                                    Element.map toMsg (viewFunc skin viewModel)
-                                ]
-        in
-        case model.page of
-            Personas subModel ->
-                viewPage PersonasMsg Personas.view subModel
-
-            Export subModel ->
-                viewPage ExportMsg Export.view subModel
-
-
-navigation : DeviceClass -> Skin -> Route -> Element Msg
-navigation deviceClass skin route =
-    let
-        attrs =
-            case deviceClass of
-                Desktop ->
-                    [ alignTop ]
-
-                Mobile ->
-                    [ width fill ]
-
-        navItem targetRoute =
-            let
-                ( bgColor, textColor ) =
-                    if
-                        targetRoute
-                            == route
-                            && deviceClass
-                            == Desktop
-                    then
-                        ( skin.primaryColor, Skin.white )
-
-                    else
-                        ( Skin.setAlpha 0 Skin.white, Skin.black )
-            in
-            Input.button
-                [ Background.color bgColor
-                , Font.color textColor
-                , width fill
-                , padding 10
-                ]
-                { onPress = Just (ChangeRoute targetRoute)
-                , label = text <| routeLabel targetRoute
-                }
-    in
+progressView : Skin -> Model -> Element Msg
+progressView skin model =
     column
-        attrs
-        [ navItem PersonasR
-        , navItem ExportR
+        [ width fill
+        , spacing 20
+        , Font.size 16
+        ]
+        [ el
+            [ width fill
+            , Background.color skin.lineGray
+            , Font.color Skin.white
+            , padding 20
+            ]
+          <|
+            text "Reset Request sent."
+        , textColumn
+            [ width fill ]
+            [ text "bla bla key here"
+            ]
         ]
 
 
-routeLabel : Route -> String
-routeLabel route =
-    case route of
-        ExportR ->
-            "Tab 1"
+changeFailedView : Skin -> Model -> Element Msg
+changeFailedView skin model =
+    el
+        [ width fill
+        , Background.color skin.primaryColor
+        , Font.color Skin.white
+        , padding 20
+        ]
+    <|
+        text "Reset request could not been send"
 
-        PersonasR ->
-            "Tab 2"
+
+changeView : Skin -> Model -> Element Msg
+changeView skin model =
+    column
+        [ width fill
+        , spacing 20
+        , Font.size 16
+        ]
+        [ textColumn
+            [ width fill
+            , spacing 10
+            ]
+            [ paragraph [ width fill ]
+                [ text "Reset your password here."
+                ]
+            ]
+        , row
+            [ spacing 10
+            ]
+            [ Input.email
+                [ width fill
+                , paddingEach
+                    { left = 0
+                    , top = 0
+                    , bottom = 0
+                    , right = 0
+                    }
+                ]
+                { onChange = MailStringChanged
+                , text = model.credentials.email
+                , placeholder = Nothing
+                , label =
+                    Input.labelLeft
+                        [ centerY
+                        , Font.size 14
+                        , paddingEach
+                            { left = 0
+                            , top = 0
+                            , bottom = 0
+                            , right = 60
+                            }
+                        ]
+                        (text "Email:")
+                }
+            ]
+        , row
+            [ spacing 10
+            ]
+            [ Input.text
+                [ width fill
+                , paddingEach
+                    { left = 0
+                    , top = 0
+                    , bottom = 0
+                    , right = 0
+                    }
+                ]
+                { onChange = RecoveryKeyChanged
+                , text = model.credentials.recoveryKey
+                , placeholder = Nothing
+                , label =
+                    Input.labelLeft
+                        [ centerY
+                        , Font.size 14
+                        , paddingEach
+                            { left = 0
+                            , top = 0
+                            , bottom = 0
+                            , right = 60
+                            }
+                        ]
+                        (text "Recovery Key:")
+                }
+            ]
+        , row
+            [ spacing 10
+            ]
+            [ Input.newPassword
+                [ width fill
+                , paddingEach
+                    { left = 0
+                    , top = 0
+                    , bottom = 0
+                    , right = 0
+                    }
+                ]
+                { onChange = NewPasswordChanged
+                , text = model.credentials.newPassword
+                , placeholder = Nothing
+                , label =
+                    Input.labelLeft
+                        [ centerY
+                        , Font.size 14
+                        , paddingEach
+                            { left = 0
+                            , top = 0
+                            , bottom = 0
+                            , right = 60
+                            }
+                        ]
+                        (text "New Password:")
+                , show = False
+                }
+            ]
+        , if String.length model.credentials.newPassword > 0 && String.length model.credentials.newPassword < 6 then
+            row [ spacing 10 ]
+                [ el
+                    [ width fill
+                    , Font.color skin.primaryColor
+                    , Font.size 10
+                    ]
+                  <|
+                    text "Password too short, must be at least 6 Characters"
+                ]
+
+          else
+            none
+        , row
+            [ width fill
+            , spacing 20
+            ]
+            [ Elements.mainButton
+                skin
+                [ width <| maximum 320 fill
+                ]
+                { onPress =
+                    Just ResetButtonPressed
+                , label =
+                    el
+                        [ centerX
+                        ]
+                    <|
+                        text "Reset Password"
+                }
+            ]
+        ]
+
+
+view : Skin -> Model -> Html Msg
+view skin model =
+    layout [ width fill ] <|
+        el
+            [ width <| maximum 800 fill
+            , centerX
+            ]
+        <|
+            case model.resetState of
+                EnteringCredentials ->
+                    changeView skin model
+
+                ResettingPassword ->
+                    progressView skin model
+
+                ResetFailed ->
+                    changeFailedView skin model
 
 
 
 ---- SUBSCRIPTIONS ----
-
-
-subSubscriptions : Page -> Sub Msg
-subSubscriptions page =
-    case page of
-        Personas subModel ->
-            Personas.subscriptions subModel
-                |> Sub.map PersonasMsg
-
-        Export _ ->
-            Export.subscriptions
-                |> Sub.map ExportMsg
-
-
-subscriptions : Model -> Sub Msg
-subscriptions model =
-    Sub.batch
-        [ subSubscriptions model.page
-        , onResize
-            (\width height ->
-                Resized
-                    { width = width
-                    , height = height
-                    }
-            )
-        ]

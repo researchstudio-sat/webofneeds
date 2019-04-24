@@ -220,11 +220,8 @@ public class RestUserController {
     @Transactional(propagation = Propagation.REQUIRED)
     public ResponseEntity resetPassword(@RequestBody ResetPasswordPojo resetPasswordPojo, Errors errors,
                     HttpServletRequest request, HttpServletResponse response) {
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        String username = resetPasswordPojo.getUsername();
         if (username == null) {
-            return generateStatusResponse(RestStatusResponse.USER_NOT_SIGNED_IN);
-        }
-        if (!username.equals(resetPasswordPojo.getUsername())) {
             return generateStatusResponse(RestStatusResponse.USERNAME_MISMATCH);
         }
         try {
