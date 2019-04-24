@@ -28,11 +28,25 @@ function genComponentConf($ngRedux) {
       });
 
       if (elmApp.ports.outPort) {
-        elmApp.ports.outPort.subscribe(({ action, payload }) => {
-          if (actionCreators[action]) {
-            $ngRedux.dispatch(actionCreators[action](...payload));
-          } else {
-            scope.onAction({ action, payload });
+        elmApp.ports.outPort.subscribe(message => {
+          switch (message.type) {
+            case "action":
+              if (actionCreators[message.name]) {
+                $ngRedux.dispatch(
+                  actionCreators[message.name](...message.arguments)
+                );
+              } else {
+                console.error(`Could not find action "${message.name}"`);
+              }
+              break;
+            case "event":
+              scope.onAction({
+                action: message.name,
+                payload: message.payload,
+              });
+              break;
+            default:
+              console.error(`Could not read message "${message}"`);
           }
         });
       }

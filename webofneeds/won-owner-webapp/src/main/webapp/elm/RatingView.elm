@@ -264,6 +264,7 @@ updatePopup connectionUri msg popupState =
                                     , message = state.reviewText
                                     }
                                 }
+                                |> Widget.performAction
                             )
 
                         Nothing ->

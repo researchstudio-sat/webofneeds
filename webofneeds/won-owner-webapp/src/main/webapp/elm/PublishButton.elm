@@ -1,6 +1,5 @@
 module PublishButton exposing (main)
 
-import Actions
 import Browser.Dom as Dom exposing (Element)
 import Browser.Events
 import Color
@@ -419,16 +418,15 @@ update msg { model, props } =
 
 publish : SelectedPersona -> Cmd msg
 publish personaChoice =
-    Actions.emitEvent
-        { eventName = "publish"
-        , payload =
-            case personaChoice of
-                Persona personaId ->
-                    Encode.string personaId
+    Widget.emitEvent
+        "publish"
+        (case personaChoice of
+            Persona personaId ->
+                Encode.string personaId
 
-                Anonymous ->
-                    Encode.null
-        }
+            Anonymous ->
+                Encode.null
+        )
 
 
 getRandomId : Cmd Msg

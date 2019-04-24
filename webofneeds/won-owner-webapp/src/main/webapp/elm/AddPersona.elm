@@ -112,6 +112,7 @@ update msg { model, props } =
                                 { persona = persona
                                 , atomUrl = props.postUri
                                 }
+                                |> Widget.performAction
                             )
 
                         Nothing ->

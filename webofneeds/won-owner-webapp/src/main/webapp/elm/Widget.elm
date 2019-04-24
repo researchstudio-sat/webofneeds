@@ -1,15 +1,61 @@
-port module Widget exposing (logError, widget)
+port module Widget exposing
+    ( Action
+    , customAction
+    , emitEvent
+    , logError
+    , performAction
+    , widget
+    )
 
 import Browser
 import Html exposing (Html)
 import Json.Decode as Decode exposing (Decoder, Value)
 import Json.Decode.Extra as Decode
 import Json.Decode.Pipeline as DP
+import Json.Encode as Encode
 import Result.Extra as Result
 
 
 
 ---- PORTS ----
+
+
+port outPort : Value -> Cmd msg
+
+
+type Action
+    = Action
+        { name : String
+        , arguments : List Value
+        }
+
+
+customAction : String -> List Value -> Action
+customAction name arguments =
+    Action
+        { name = name
+        , arguments = arguments
+        }
+
+
+performAction : Action -> Cmd msg
+performAction (Action action) =
+    outPort <|
+        Encode.object
+            [ ( "type", Encode.string "action" )
+            , ( "name", Encode.string action.name )
+            , ( "arguments", Encode.list identity action.arguments )
+            ]
+
+
+emitEvent : String -> Value -> Cmd msg
+emitEvent name payload =
+    outPort <|
+        Encode.object
+            [ ( "type", Encode.string "event" )
+            , ( "name", Encode.string name )
+            , ( "payload", payload )
+            ]
 
 
 port inPort :
