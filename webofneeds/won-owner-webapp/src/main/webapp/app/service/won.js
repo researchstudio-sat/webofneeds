@@ -62,6 +62,9 @@ won.WON.ClosedCompacted = won.WON.prefix + ":Closed";
 won.WON.Inactive = won.WON.baseUri + "Inactive";
 won.WON.InactiveCompacted = won.WON.prefix + ":Inactive";
 
+won.WON.Deleted = won.WON.baseUri + "Deleted";
+won.WON.DeletedCompacted = won.WON.prefix + ":Deleted";
+
 won.WON.atomState = won.WON.baseUri + "atomState";
 won.WON.atomStateCompacted = won.WON.prefix + ":atomState";
 won.WON.socket = won.WON.baseUri + "socket";
