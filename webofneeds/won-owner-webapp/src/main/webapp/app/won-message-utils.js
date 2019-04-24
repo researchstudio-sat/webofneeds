@@ -4,7 +4,7 @@
 
 import won from "./won-es6.js";
 import Immutable from "immutable";
-import { checkHttpStatus, urisToLookupMap, is, getIn } from "./utils.js";
+import { checkHttpStatus, urisToLookupMap, is } from "./utils.js";
 
 import { ownerBaseUrl } from "config";
 import urljoin from "url-join";
@@ -580,91 +580,48 @@ export function fetchOwnedData(dispatch) {
     .then(atomUris => fetchDataForOwnedAtoms(atomUris, dispatch));
 }
 
-export function fetchAllActiveAtomUrisFromOwner(dispatch, getState) {
-  return fetchAllAtomUrisFromNode(getState).then(atomUris => {
-    //return fetchAllAtomUrisFromOwner().then(atomUris => { //FIXME: use this instead once we store more uris on the owner itself
+export function fetchAllActiveAtomUrisFromOwner(dispatch) {
+  return fetchAllAtomUrisFromOwner().then(atoms => {
+    const atomsImm = Immutable.fromJS(atoms);
+    const atomUris = [...atomsImm.keys()];
+    console.debug("AtomUris: ", atomUris);
+
     dispatch({
       type: actionTypes.atoms.storeAtomUrisFromOwner,
-      payload: Immutable.fromJS({ uris: atomUris }),
+      payload: Immutable.fromJS({ metaAtoms: atoms }),
     });
     return atomUris;
   });
-} /*function fetchAllAtomUrisFromOwner(state = "ACTIVE") {
-  return fetch(urljoin(ownerBaseUrl, "/rest/atoms/all?state=" + state), {
-    method: "get",
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-    },
-    credentials: "include",
-  })
-    .then(checkHttpStatus)
-    .then(response => response.json());
-}*/ //FIXME: use this once we store more uris on the owner itself
+}
 
-/**
- * Calls the restendpoint of the owner webapp, to retrieve all atomUris stored
- * on this instance
- * @param state ACTIVE or INACTIVE, default is ACTIVE
- * @returns {*}
- */ function fetchAllAtomUrisFromNode(getState) {
-  const nodeUri = getIn(getState(), ["config", "defaultNodeUri"]) + "/atom";
-  //const nodeUri = "https://node.matchat.org/won/resource/atom"; //for testing purposes
-
+function fetchAllAtomUrisFromOwner(state = "ACTIVE", limit = 200) {
   const DAYS_BEFORE = 30;
   const modifiedAfterDate = new Date(
     Date.now() - DAYS_BEFORE * 24 * 60 * 60 * 1000
   );
 
   return fetch(
-    "/owner/rest/linked-data/?uri=" +
-      encodeURIComponent(
-        nodeUri +
-          "?state=Active&modifiedafter=" +
-          modifiedAfterDate.toISOString()
-      ),
+    urljoin(
+      ownerBaseUrl,
+      "/rest/atoms/all?state=" +
+        state +
+        "&modifiedafter=" +
+        modifiedAfterDate.toISOString() +
+        "&limit=" +
+        limit
+    ),
     {
       method: "get",
-      //credentials: "same-origin",
       headers: {
-        Accept: "application/ld+json",
-        "Content-Type": "application/ld+json",
-        //Prefer: `return=representation; max-member-count="2000"`,
-        Prefer: undefined,
+        Accept: "application/json",
+        "Content-Type": "application/json",
       },
+      credentials: "include",
     }
   )
-    .then(response => {
-      if (response.status === 200) return response;
-      else
-        throw new Error(
-          `${response.status} - ${
-            response.statusText
-          } for fetchAllAtomUrisFromNode-request`
-        );
-    })
-    .then(dataset => dataset.json())
-    .then(dataset => {
-      const datasetImm = Immutable.fromJS(dataset);
-      const datasetGraph = datasetImm && datasetImm.get("@graph");
-      const firstDatasetGraph = datasetGraph && datasetGraph.first();
-      const rdfsMembers =
-        firstDatasetGraph && firstDatasetGraph.get("rdfs:member");
-
-      if (rdfsMembers && rdfsMembers.size > 0) {
-        return datasetImm
-          .get("@graph")
-          .first()
-          .get("rdfs:member")
-          .map(member => nodeUri + "/" + member.get("@id").split(":")[1])
-          .toJS();
-      } else {
-        return [];
-      }
-    });
+    .then(checkHttpStatus)
+    .then(response => response.json());
 }
-
-window.fetchAllAtomUrisFromNode4dbg = fetchAllAtomUrisFromNode;
 
 function fetchOwnedInactiveAtomUris() {
   return fetch(urljoin(ownerBaseUrl, "/rest/atoms?state=INACTIVE"), {

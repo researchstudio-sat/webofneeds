@@ -33,10 +33,11 @@ class Controller {
       const viewAtomUri = generalSelectors.getViewAtomUriFromRoute(state);
       const viewConnUri = generalSelectors.getViewConnectionUriFromRoute(state);
 
+      const atoms = getIn(state, ["owner", "atoms"]);
       const atomUris = getIn(state, ["owner", "atomUris"]);
       const lastAtomUrisUpdateDate = getIn(state, [
         "owner",
-        "lastAtomUrisUpdateTime",
+        "lastAtomsUpdateTime",
       ]);
 
       const process = get(state, "process");
@@ -58,6 +59,7 @@ class Controller {
         });
 
       return {
+        atoms,
         locations,
         atomsWithLocation,
         lastAtomUrisUpdateDate,

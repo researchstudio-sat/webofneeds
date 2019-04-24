@@ -129,7 +129,8 @@ export default function(processState = initialState, action = {}) {
       return processState.set("processingAtomUrisFromOwnerLoad", true);
 
     case actionTypes.atoms.storeAtomUrisFromOwner: {
-      const atomUris = action.payload.get("uris");
+      const metaAtoms = action.payload.get("metaAtoms");
+      const atomUris = metaAtoms && [...metaAtoms.keys()];
       atomUris &&
         atomUris.forEach(atomUri => {
           if (!processUtils.isAtomLoaded(processState, atomUri)) {
