@@ -19,8 +19,7 @@ import { parseMetaAtom } from "./atom-reducer/parse-atom.js";
 import { router } from "redux-ui-router";
 
 const initialOwnerState = Immutable.fromJS({
-  atoms: Immutable.Map(),
-  atomUris: Immutable.Set(),
+  metaAtoms: Immutable.Map(),
   lastAtomsUpdateTime: undefined,
 });
 
@@ -70,27 +69,21 @@ const reducers = {
 
       case actionTypes.atoms.storeAtomUrisFromOwner: {
         const metaAtoms = action.payload.get("metaAtoms");
-        const fetchedAtomUris = metaAtoms && [...metaAtoms.keys()];
-
-        let ownerAtomUris = owner.get("atomUris");
-        let ownerAtoms = owner.get("atoms");
-
-        fetchedAtomUris &&
-          fetchedAtomUris.forEach(
-            atomUri => (ownerAtomUris = ownerAtomUris.add(atomUri))
-          );
+        let ownerMetaAtoms = owner.get("metaAtoms");
 
         metaAtoms &&
           metaAtoms.map(metaAtom => {
             const metaAtomImm = parseMetaAtom(metaAtom);
             if (metaAtomImm) {
-              ownerAtoms = ownerAtoms.set(metaAtomImm.get("uri"), metaAtomImm);
+              ownerMetaAtoms = ownerMetaAtoms.set(
+                metaAtomImm.get("uri"),
+                metaAtomImm
+              );
             }
           });
 
         return owner
-          .set("atoms", ownerAtoms)
-          .set("atomUris", ownerAtomUris)
+          .set("metaAtoms", ownerMetaAtoms)
           .set("lastAtomsUpdateTime", Date.now());
       }
 

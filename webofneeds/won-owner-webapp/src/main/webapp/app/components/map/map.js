@@ -33,7 +33,7 @@ class Controller {
       const viewAtomUri = generalSelectors.getViewAtomUriFromRoute(state);
       const viewConnUri = generalSelectors.getViewConnectionUriFromRoute(state);
 
-      const atomsWithLocation = getIn(state, ["owner", "atoms"]).filter(
+      const atomsWithLocation = getIn(state, ["owner", "metaAtoms"]).filter(
         metaAtom => atomUtils.hasLocation(metaAtom)
       );
 
