@@ -13,11 +13,12 @@ package won.owner.web.rest;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.jena.query.Dataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,17 +35,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-
 import won.owner.model.Draft;
 import won.owner.model.User;
 import won.owner.model.UserAtom;
+import won.owner.pojo.AtomPojo;
 import won.owner.pojo.CreateDraftPojo;
 import won.owner.repository.DraftRepository;
-import won.owner.repository.UserAtomRepository;
 import won.owner.repository.UserRepository;
-import won.owner.service.impl.URIService;
 import won.owner.service.impl.WONUserDetailService;
 import won.protocol.model.AtomState;
+import won.protocol.rest.LinkedDataFetchingException;
+import won.protocol.service.WonNodeInformationService;
+import won.protocol.util.linkeddata.LinkedDataSource;
+import won.protocol.util.linkeddata.WonLinkedDataUtils;
 
 @Controller
 @RequestMapping("/rest/atoms")
@@ -53,13 +56,13 @@ public class RestAtomController {
     @Autowired
     private DraftRepository draftRepository;
     @Autowired
-    private URIService uriService;
-    @Autowired
     private WONUserDetailService wonUserDetailService;
     @Autowired
     UserRepository userRepository;
     @Autowired
-    UserAtomRepository userAtomRepository;
+    private LinkedDataSource linkedDataSource;
+    @Autowired
+    private WonNodeInformationService wonNodeInformationService;
 
     /**
      * returns a List containing atoms belonging to the user
@@ -118,29 +121,46 @@ public class RestAtomController {
     }
 
     /**
-     * returns a List containing atoms belonging to the user
-     *
-     * @return JSON List of atom objects
+     * Returns a Map of atoms (key is the atomUri), value is the atom including (meta)data
+     * @param state only return atoms with the given AtomState
+     * @param modifiedAfterIsoString only return atoms that have been modified after this timestamp (ISO 8601 format (UTC): yyyy-MM-dd'T'HH:mm:ss.SSS'Z')
+     * @param createdAfterIsoString only return atoms that have been created after this timestamp (ISO 8601 format (UTC): yyyy-MM-dd'T'HH:mm:ss.SSS'Z')
+     * @param limit limit results to this size (if null, 0, or negative value do not limit at all)
+     * @return Map of AtomPojos -> atoms with certain metadata @see won.owner.pojo.AtomPojo
      */
     @ResponseBody
     @RequestMapping(value = "/all", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
-    public List<URI> getAllAtoms(@RequestParam(value = "state", required = false) AtomState state) {
-        List<UserAtom> allAtoms = userAtomRepository.findAllAtoms();
-        List<URI> atomUris = new ArrayList(allAtoms.size());
-        if (state == null) {
-            logger.debug("Getting all atomuris");
-            for (UserAtom userAtom : allAtoms) {
-                atomUris.add(userAtom.getUri());
-            }
-        } else {
-            logger.debug("Getting all atomuris filtered by state: " + state);
-            for (UserAtom userAtom : allAtoms) {
-                if (state.equals(userAtom.getState())) {
-                    atomUris.add(userAtom.getUri());
+    public Map<URI, AtomPojo> getAllAtoms(@RequestParam(value = "state", required = false) AtomState state,
+                    @RequestParam(value = "modifiedafter", required = false) String modifiedAfterIsoString,
+                    @RequestParam(value = "createdafter", required = false) String createdAfterIsoString,
+                    @RequestParam(value = "limit", required = false) int limit) {
+        // the #atomList and fetch these as well
+        // TODO: fetch with modifiedafter parameter and not only the uri
+        ZonedDateTime modifiedAfter = StringUtils.isNotBlank(modifiedAfterIsoString)
+                        ? ZonedDateTime.parse(modifiedAfterIsoString, DateTimeFormatter.ISO_DATE_TIME)
+                        : null;
+        ZonedDateTime createdAfter = StringUtils.isNotBlank(createdAfterIsoString)
+                        ? ZonedDateTime.parse(createdAfterIsoString, DateTimeFormatter.ISO_DATE_TIME)
+                        : null;
+        URI nodeURI = wonNodeInformationService.getDefaultWonNodeURI();
+        List<URI> atomUris = WonLinkedDataUtils.getNodeAtomUris(nodeURI, linkedDataSource);
+        Map<URI, AtomPojo> atomMap = new HashMap<>();
+        for (URI atomUri : atomUris) {
+            try {
+                Dataset atomDataset = WonLinkedDataUtils.getDataForResource(atomUri, linkedDataSource);
+                AtomPojo atom = new AtomPojo(atomDataset);
+                if (state == null || atom.getState().equals(state)
+                                && ((modifiedAfter == null) || modifiedAfter.isBefore(atom.getModifiedZonedDateTime()))
+                                && ((createdAfter == null) || createdAfter.isBefore(atom.getCreationZonedDateTime()))) {
+                    atomMap.put(atom.getUri(), atom);
+                    if (limit > 0 && atomMap.size() >= limit)
+                        break; // break fetching if the limit has been reached
                 }
+            } catch (LinkedDataFetchingException e) {
+                logger.debug("Could not retrieve atom<" + atomUri + "> cause: " + e.getMessage());
             }
         }
-        return atomUris;
+        return atomMap;
     }
 
     /**
@@ -229,5 +249,9 @@ public class RestAtomController {
             logger.warn("draft uri problem.", e);
             return ResponseEntity.badRequest().body("draft uri problem");
         }
+    }
+
+    public void setLinkedDataSource(LinkedDataSource linkedDataSource) {
+        this.linkedDataSource = linkedDataSource;
     }
 }
