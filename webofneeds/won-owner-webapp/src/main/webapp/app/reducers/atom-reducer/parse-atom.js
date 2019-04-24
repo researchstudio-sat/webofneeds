@@ -2,7 +2,12 @@ import Immutable from "immutable";
 import won from "../../won-es6.js";
 import * as useCaseUtils from "../../usecase-utils.js";
 import { isSearchAtom, isPersona } from "../../atom-utils.js";
-import { generateHexColor, generateRgbColorArray, getIn } from "../../utils.js";
+import {
+  generateHexColor,
+  generateRgbColorArray,
+  getIn,
+  get,
+} from "../../utils.js";
 import shajs from "sha.js";
 import Identicon from "identicon.js";
 
@@ -90,6 +95,90 @@ export function parseAtom(jsonldAtom) {
     return undefined;
   }
 }
+
+/**
+ * Tries to extract all the metaData of a given metaAtom into a state that is similar to the ones we use for the parseAtom
+ * in general, metaAtoms are retrieved when accessing whatsNew and whatsAround (for now) and are json structures based on the
+ * AtomPojo of the owner app.
+ * @param metaAtom
+ * @returns {*}
+ */
+export function parseMetaAtom(metaAtom) {
+  const metaAtomImm = Immutable.fromJS(metaAtom);
+
+  const extractTypes = types =>
+    types &&
+    Immutable.Set(
+      types.map(type =>
+        type
+          .replace("https://w3id.org/won/core#", "won:")
+          .replace("http://schema.org/", "s:")
+      )
+    );
+  const extractFlags = flags =>
+    flags &&
+    flags.map(flag =>
+      flag
+        .replace("https://w3id.org/won/core#", "won:")
+        .replace("http://schema.org/", "s:")
+    );
+  const extractLocation = location =>
+    location && {
+      address: "",
+      lat: get(location, "latitude"),
+      lng: get(location, "longitude"),
+    };
+  const extractStateFromMeta = state => {
+    switch (state) {
+      case "ACTIVE":
+        return won.WON.ActiveCompacted;
+      case "INACTIVE":
+        return won.WON.InactiveCompacted;
+      case "DELETED":
+        return won.WON.DeletedCompacted;
+      default:
+        return undefined;
+    }
+  };
+
+  if (metaAtomImm) {
+    let parsedMetaAtom = {
+      uri: get(metaAtomImm, "uri"),
+      state: extractStateFromMeta(get(metaAtomImm, "state")),
+      content: {
+        type: extractTypes(get(metaAtomImm, "types")),
+        flags: extractFlags(get(metaAtomImm, "flags")),
+        location: extractLocation(get(metaAtomImm, "location")),
+      },
+      seeks: {
+        type: extractTypes(get(metaAtomImm, "seeksTypes")),
+      },
+      modifiedDate:
+        get(metaAtomImm, "modifiedDate") &&
+        new Date(get(metaAtomImm, "modifiedDate")),
+      creationDate:
+        get(metaAtomImm, "creationDate") &&
+        new Date(get(metaAtomImm, "creationDate")),
+    };
+
+    if (
+      parsedMetaAtom.state &&
+      parsedMetaAtom.modifiedDate &&
+      parsedMetaAtom.creationDate
+    ) {
+      return Immutable.fromJS(parsedMetaAtom);
+    } else {
+      console.error(
+        "Cant parse metaAtom, data is an invalid atom-object: ",
+        metaAtomImm && metaAtomImm.toJS()
+      );
+      return undefined;
+    }
+  }
+  return undefined;
+}
+
+window.parseMetaAtom4dbg = parseMetaAtom;
 
 /**
  * Tries to extract all the detailsToParse from the given contentJsonLd
