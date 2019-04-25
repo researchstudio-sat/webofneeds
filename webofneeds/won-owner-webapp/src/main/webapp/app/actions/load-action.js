@@ -34,18 +34,22 @@ function loadingWhileSignedIn(dispatch) {
   return wonMessageUtils.fetchOwnedData(dispatch);
 }
 
-export const fetchWhatsNew = () => (dispatch, getState) => {
+export const fetchWhatsNew = modifiedAfterDate => (dispatch, getState) => {
   dispatch({
     type: actionTypes.atoms.fetchWhatsNew,
   });
-  return wonMessageUtils.fetchWhatsNew(dispatch, getState);
+  return wonMessageUtils.fetchWhatsNew(dispatch, getState, modifiedAfterDate);
 };
 
-export const fetchWhatsAround = () => (dispatch, getState) => {
+export const fetchWhatsAround = modifiedAfterDate => (dispatch, getState) => {
   dispatch({
     type: actionTypes.atoms.fetchWhatsAround,
   });
-  return wonMessageUtils.fetchWhatsAround(dispatch, getState);
+  return wonMessageUtils.fetchWhatsAround(
+    dispatch,
+    getState,
+    modifiedAfterDate
+  );
 };
 /*
  Simply prints a logline and resolves the promise so we can go on in the chain

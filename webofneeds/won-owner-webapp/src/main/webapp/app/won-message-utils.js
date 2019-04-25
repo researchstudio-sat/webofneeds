@@ -580,11 +580,14 @@ export function fetchOwnedData(dispatch) {
     .then(atomUris => fetchDataForOwnedAtoms(atomUris, dispatch));
 }
 
-export function fetchWhatsNew(dispatch) {
-  return fetchAllMetaAtoms().then(atoms => {
+export function fetchWhatsNew(
+  dispatch,
+  getState,
+  modifiedAfterDate = new Date(Date.now() - 30 /*Days before*/ * 86400000)
+) {
+  return fetchAllMetaAtoms(modifiedAfterDate).then(atoms => {
     const atomsImm = Immutable.fromJS(atoms);
     const atomUris = [...atomsImm.keys()];
-    console.debug("AtomUris: ", atomUris);
 
     dispatch({
       type: actionTypes.atoms.storeWhatsNew,
@@ -594,18 +597,15 @@ export function fetchWhatsNew(dispatch) {
   });
 }
 
-function fetchAllMetaAtoms(
-  modifiedAfterDate = new Date(Date.now() - 30 /*Days before*/ * 86400000),
-  state = "ACTIVE",
-  limit = 200
-) {
+function fetchAllMetaAtoms(modifiedAfterDate, state = "ACTIVE", limit = 200) {
   return fetch(
     urljoin(
       ownerBaseUrl,
       "/rest/atoms/all?state=" +
         state +
-        "&modifiedafter=" +
-        modifiedAfterDate.toISOString() +
+        (modifiedAfterDate
+          ? "&modifiedafter=" + modifiedAfterDate.toISOString()
+          : "") +
         "&limit=" +
         limit
     ),
@@ -622,11 +622,10 @@ function fetchAllMetaAtoms(
     .then(response => response.json());
 }
 
-export function fetchWhatsAround(dispatch) {
-  return fetchAllMetaAtomsNear().then(atoms => {
+export function fetchWhatsAround(dispatch, getState, modifiedAfterDate) {
+  return fetchAllMetaAtomsNear(modifiedAfterDate).then(atoms => {
     const atomsImm = Immutable.fromJS(atoms);
     const atomUris = [...atomsImm.keys()];
-    console.debug("AtomUris: ", atomUris);
 
     dispatch({
       type: actionTypes.atoms.storeWhatsAround,
@@ -637,6 +636,7 @@ export function fetchWhatsAround(dispatch) {
 }
 
 function fetchAllMetaAtomsNear(
+  modifiedAfterDate,
   location,
   state = "ACTIVE",
   limit = 200,
@@ -657,7 +657,10 @@ function fetchAllMetaAtomsNear(
           "&longitude=" +
           location.lng +
           "&maxDistance" +
-          maxDistance
+          maxDistance +
+          (modifiedAfterDate
+            ? "&modifiedafter=" + modifiedAfterDate.toISOString()
+            : "")
       ),
       {
         method: "get",

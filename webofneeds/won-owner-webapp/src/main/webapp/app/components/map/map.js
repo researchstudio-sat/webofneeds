@@ -98,7 +98,11 @@ class Controller {
 
   reload() {
     if (!this.isOwnerAtomUrisLoading) {
-      this.atoms__fetchWhatsAround();
+      if (this.lastAtomUrisUpdateDate) {
+        this.atoms__fetchWhatsAround(new Date(this.lastAtomUrisUpdateDate));
+      } else {
+        this.atoms__fetchWhatsAround();
+      }
     }
   }
 }

@@ -96,7 +96,10 @@ class Controller {
 
   reload() {
     if (!this.isOwnerAtomUrisLoading) {
-      this.atoms__fetchWhatsNew();
+      const modifiedAfterDate =
+        new Date(this.lastAtomUrisUpdateDate) ||
+        new Date(Date.now() - 30 /*Days before*/ * 86400000);
+      this.atoms__fetchWhatsNew(modifiedAfterDate);
     }
   }
 }
