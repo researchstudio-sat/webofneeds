@@ -41,7 +41,7 @@ public enum AtomState {
      */
     public static AtomState parseString(final String fragment) {
         for (AtomState state : values())
-            if (state.name.equals(fragment))
+            if (state.name.equalsIgnoreCase(fragment))
                 return state;
         logger.warn("No enum could be matched for: {}", fragment);
         return null;
