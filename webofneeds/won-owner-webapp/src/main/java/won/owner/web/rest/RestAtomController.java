@@ -44,6 +44,7 @@ import won.owner.repository.DraftRepository;
 import won.owner.repository.UserRepository;
 import won.owner.service.impl.WONUserDetailService;
 import won.protocol.model.AtomState;
+import won.protocol.model.Coordinate;
 import won.protocol.rest.LinkedDataFetchingException;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.linkeddata.LinkedDataSource;
@@ -52,6 +53,7 @@ import won.protocol.util.linkeddata.WonLinkedDataUtils;
 @Controller
 @RequestMapping("/rest/atoms")
 public class RestAtomController {
+    private static final int DEFAULT_MAX_DISTANCE = 5000;
     final Logger logger = LoggerFactory.getLogger(getClass());
     @Autowired
     private DraftRepository draftRepository;
@@ -139,6 +141,9 @@ public class RestAtomController {
     public Map<URI, AtomPojo> getAllAtoms(@RequestParam(value = "state", required = false) AtomState state,
                     @RequestParam(value = "modifiedafter", required = false) String modifiedAfterIsoString,
                     @RequestParam(value = "createdafter", required = false) String createdAfterIsoString,
+                    @RequestParam(value = "latitude", required = false) Float latitude,
+                    @RequestParam(value = "longitude", required = false) Float longitude,
+                    @RequestParam(value = "maxDistance", required = false) Integer maxDistance,
                     @RequestParam(value = "limit", required = false) int limit) {
         // the #atomList and fetch these as well
         // TODO: fetch with modifiedafter parameter and not only the uri
@@ -148,6 +153,7 @@ public class RestAtomController {
         ZonedDateTime createdAfter = StringUtils.isNotBlank(createdAfterIsoString)
                         ? ZonedDateTime.parse(createdAfterIsoString, DateTimeFormatter.ISO_DATE_TIME)
                         : null;
+        Coordinate nearLocation = (latitude != null && longitude != null) ? new Coordinate(latitude, longitude) : null;
         URI nodeURI = wonNodeInformationService.getDefaultWonNodeURI();
         List<URI> atomUris = WonLinkedDataUtils.getNodeAtomUris(nodeURI, modifiedAfter, createdAfter, state,
                         linkedDataSource);
@@ -158,7 +164,9 @@ public class RestAtomController {
                 AtomPojo atom = new AtomPojo(atomDataset);
                 if (state == null || atom.getState().equals(state)
                                 && ((modifiedAfter == null) || modifiedAfter.isBefore(atom.getModifiedZonedDateTime()))
-                                && ((createdAfter == null) || createdAfter.isBefore(atom.getCreationZonedDateTime()))) {
+                                && ((createdAfter == null) || createdAfter.isBefore(atom.getCreationZonedDateTime()))
+                                && ((nearLocation == null)
+                                                || (isNearLocation(nearLocation, atom.getLocation(), maxDistance)))) {
                     atomMap.put(atom.getUri(), atom);
                     if (limit > 0 && atomMap.size() >= limit)
                         break; // break fetching if the limit has been reached
@@ -168,6 +176,34 @@ public class RestAtomController {
             }
         }
         return atomMap;
+    }
+
+    /**
+     * Calculated the distance between two coordinates in meters, and returns true
+     * if the distance is below or equal to the maxDistance parameter, if the
+     * parameter is null we use 5000meters as the maxDistance
+     * 
+     * @param nearLocation
+     * @param atomLocation
+     * @param maxDistance
+     * @return
+     */
+    private boolean isNearLocation(Coordinate nearLocation, Coordinate atomLocation, Integer maxDistance) {
+        if (atomLocation != null) {
+            if (maxDistance == null) {
+                maxDistance = DEFAULT_MAX_DISTANCE;
+            }
+            double earthRadius = 6371000; // meters
+            double dLat = Math.toRadians(nearLocation.getLatitude() - atomLocation.getLatitude());
+            double dLng = Math.toRadians(nearLocation.getLongitude() - atomLocation.getLongitude());
+            double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(Math.toRadians(atomLocation.getLatitude()))
+                            * Math.cos(Math.toRadians(nearLocation.getLatitude())) * Math.sin(dLng / 2)
+                            * Math.sin(dLng / 2);
+            double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            double distance = earthRadius * c;
+            return distance <= maxDistance;
+        }
+        return false;
     }
 
     /**
