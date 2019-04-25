@@ -29,6 +29,34 @@ class Controller {
     window.ownermap4dbg = this;
     this.WON = won.WON;
 
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        currentLocation => {
+          const lat = currentLocation.coords.latitude;
+          const lng = currentLocation.coords.longitude;
+
+          this.currentLocation = { lat, lng };
+        },
+        error => {
+          //error handler
+          console.error(
+            "Could not retrieve geolocation due to error: ",
+            error.code,
+            ", continuing map initialization without currentLocation. fullerror:",
+            error
+          );
+          console.error("LOCATION COULD NOT BE RETRIEVED");
+        },
+        {
+          //options
+          enableHighAccuracy: true,
+          maximumAge: 30 * 60 * 1000, //use if cache is not older than 30min
+        }
+      );
+    } else {
+      console.error("LOCATION COULD NOT BE RETRIEVED");
+    }
+
     const selectFromState = state => {
       const viewAtomUri = generalSelectors.getViewAtomUriFromRoute(state);
       const viewConnUri = generalSelectors.getViewConnectionUriFromRoute(state);
@@ -91,17 +119,21 @@ class Controller {
   }
 
   ensureAtomUrisLoaded() {
-    if (this.isOwnerAtomUrisToLoad) {
-      this.atoms__fetchWhatsAround();
+    if (this.isOwnerAtomUrisToLoad && this.currentLocation) {
+      this.atoms__fetchWhatsAround(undefined, this.currentLocation, 5000);
     }
   }
 
   reload() {
     if (!this.isOwnerAtomUrisLoading) {
       if (this.lastAtomUrisUpdateDate) {
-        this.atoms__fetchWhatsAround(new Date(this.lastAtomUrisUpdateDate));
+        this.atoms__fetchWhatsAround(
+          new Date(this.lastAtomUrisUpdateDate),
+          this.currentLocation,
+          5000
+        );
       } else {
-        this.atoms__fetchWhatsAround();
+        this.atoms__fetchWhatsAround(undefined, this.currentLocation, 5000);
       }
     }
   }

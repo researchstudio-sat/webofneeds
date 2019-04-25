@@ -41,14 +41,19 @@ export const fetchWhatsNew = modifiedAfterDate => (dispatch, getState) => {
   return wonMessageUtils.fetchWhatsNew(dispatch, getState, modifiedAfterDate);
 };
 
-export const fetchWhatsAround = modifiedAfterDate => (dispatch, getState) => {
+export const fetchWhatsAround = (modifiedAfterDate, location, maxDistance) => (
+  dispatch,
+  getState
+) => {
   dispatch({
     type: actionTypes.atoms.fetchWhatsAround,
   });
   return wonMessageUtils.fetchWhatsAround(
     dispatch,
     getState,
-    modifiedAfterDate
+    modifiedAfterDate,
+    location,
+    maxDistance
   );
 };
 /*

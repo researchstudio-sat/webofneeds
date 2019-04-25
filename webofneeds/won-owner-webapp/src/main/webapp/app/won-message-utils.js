@@ -622,28 +622,34 @@ function fetchAllMetaAtoms(modifiedAfterDate, state = "ACTIVE", limit = 200) {
     .then(response => response.json());
 }
 
-export function fetchWhatsAround(dispatch, getState, modifiedAfterDate) {
-  return fetchAllMetaAtomsNear(modifiedAfterDate).then(atoms => {
-    const atomsImm = Immutable.fromJS(atoms);
-    const atomUris = [...atomsImm.keys()];
+export function fetchWhatsAround(
+  dispatch,
+  getState,
+  modifiedAfterDate,
+  location,
+  maxDistance
+) {
+  return fetchAllMetaAtomsNear(modifiedAfterDate, location, maxDistance).then(
+    atoms => {
+      const atomsImm = Immutable.fromJS(atoms);
+      const atomUris = [...atomsImm.keys()];
 
-    dispatch({
-      type: actionTypes.atoms.storeWhatsAround,
-      payload: Immutable.fromJS({ metaAtoms: atoms }),
-    });
-    return atomUris;
-  });
+      dispatch({
+        type: actionTypes.atoms.storeWhatsAround,
+        payload: Immutable.fromJS({ metaAtoms: atoms }),
+      });
+      return atomUris;
+    }
+  );
 }
 
 function fetchAllMetaAtomsNear(
   modifiedAfterDate,
   location,
-  state = "ACTIVE",
+  maxDistance = 5000,
   limit = 200,
-  maxDistance = 5000
+  state = "ACTIVE"
 ) {
-  location = { lat: 48.210033, lng: 16.363449 };
-
   if (location && location.lat && location.lng) {
     return fetch(
       urljoin(
