@@ -67,7 +67,7 @@ const reducers = {
       case actionTypes.account.reset:
         return initialOwnerState;
 
-      case actionTypes.atoms.storeAtomUrisFromOwner: {
+      case actionTypes.atoms.storeMetaAtoms: {
         const metaAtoms = action.payload.get("metaAtoms");
         let ownerMetaAtoms = owner.get("metaAtoms");
 

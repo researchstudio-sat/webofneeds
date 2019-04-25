@@ -125,10 +125,11 @@ export default function(processState = initialState, action = {}) {
       return processState;
     }
 
-    case actionTypes.atoms.loadAllActiveAtomUrisFromOwner:
+    case actionTypes.atoms.loadAllMetaAtomsFromOwnerNear:
+    case actionTypes.atoms.loadAllMetaAtomsFromOwner:
       return processState.set("processingAtomUrisFromOwnerLoad", true);
 
-    case actionTypes.atoms.storeAtomUrisFromOwner: {
+    case actionTypes.atoms.storeMetaAtoms: {
       const metaAtoms = action.payload.get("metaAtoms");
       const atomUris = metaAtoms && [...metaAtoms.keys()];
       atomUris &&

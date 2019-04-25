@@ -92,13 +92,13 @@ class Controller {
 
   ensureAtomUrisLoaded() {
     if (this.isOwnerAtomUrisToLoad) {
-      this.atoms__loadAllActiveAtomUrisFromOwner();
+      this.atoms__loadAllMetaAtomsFromOwner();
     }
   }
 
   reload() {
     if (!this.isOwnerAtomUrisLoading) {
-      this.atoms__loadAllActiveAtomUrisFromOwner();
+      this.atoms__loadAllMetaAtomsFromOwner();
     }
   }
 }

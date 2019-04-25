@@ -580,26 +580,25 @@ export function fetchOwnedData(dispatch) {
     .then(atomUris => fetchDataForOwnedAtoms(atomUris, dispatch));
 }
 
-export function fetchAllActiveAtomUrisFromOwner(dispatch) {
-  return fetchAllAtomUrisFromOwner().then(atoms => {
+export function fetchAllMetaAtomsFromOwner(dispatch) {
+  return fetchAllMetaAtoms().then(atoms => {
     const atomsImm = Immutable.fromJS(atoms);
     const atomUris = [...atomsImm.keys()];
     console.debug("AtomUris: ", atomUris);
 
     dispatch({
-      type: actionTypes.atoms.storeAtomUrisFromOwner,
+      type: actionTypes.atoms.storeMetaAtoms,
       payload: Immutable.fromJS({ metaAtoms: atoms }),
     });
     return atomUris;
   });
 }
 
-function fetchAllAtomUrisFromOwner(state = "ACTIVE", limit = 200) {
-  const DAYS_BEFORE = 30;
-  const modifiedAfterDate = new Date(
-    Date.now() - DAYS_BEFORE * 24 * 60 * 60 * 1000
-  );
-
+function fetchAllMetaAtoms(
+  modifiedAfterDate = new Date(Date.now() - 30 /*Days before*/ * 86400000),
+  state = "ACTIVE",
+  limit = 200
+) {
   return fetch(
     urljoin(
       ownerBaseUrl,
@@ -621,6 +620,60 @@ function fetchAllAtomUrisFromOwner(state = "ACTIVE", limit = 200) {
   )
     .then(checkHttpStatus)
     .then(response => response.json());
+}
+
+export function fetchAllMetaAtomsFromOwnerNear(dispatch) {
+  return fetchAllMetaAtomsNear().then(atoms => {
+    const atomsImm = Immutable.fromJS(atoms);
+    const atomUris = [...atomsImm.keys()];
+    console.debug("AtomUris: ", atomUris);
+
+    dispatch({
+      type: actionTypes.atoms.storeMetaAtoms,
+      payload: Immutable.fromJS({ metaAtoms: atoms }),
+    });
+    return atomUris;
+  });
+}
+
+function fetchAllMetaAtomsNear(
+  location,
+  state = "ACTIVE",
+  limit = 200,
+  maxDistance = 5000
+) {
+  location = { lat: 48.210033, lng: 16.363449 };
+
+  if (location && location.lat && location.lng) {
+    return fetch(
+      urljoin(
+        ownerBaseUrl,
+        "/rest/atoms/all?state=" +
+          state +
+          "&limit=" +
+          limit +
+          "&latitude=" +
+          location.lat +
+          "&longitude=" +
+          location.lng +
+          "&maxDistance" +
+          maxDistance
+      ),
+      {
+        method: "get",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(),
+        credentials: "include",
+      }
+    )
+      .then(checkHttpStatus)
+      .then(response => response.json());
+  } else {
+    return Promise.reject();
+  }
 }
 
 function fetchOwnedInactiveAtomUris() {

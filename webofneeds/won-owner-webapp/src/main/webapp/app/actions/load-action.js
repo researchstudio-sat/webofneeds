@@ -34,11 +34,18 @@ function loadingWhileSignedIn(dispatch) {
   return wonMessageUtils.fetchOwnedData(dispatch);
 }
 
-export const loadAllActiveAtomUrisFromOwner = () => (dispatch, getState) => {
+export const loadAllMetaAtomsFromOwner = () => (dispatch, getState) => {
   dispatch({
-    type: actionTypes.atoms.loadAllActiveAtomUrisFromOwner,
+    type: actionTypes.atoms.loadAllMetaAtomsFromOwner,
   });
-  return wonMessageUtils.fetchAllActiveAtomUrisFromOwner(dispatch, getState);
+  return wonMessageUtils.fetchAllMetaAtomsFromOwner(dispatch, getState);
+};
+
+export const loadAllMetaAtomsFromOwnerNear = () => (dispatch, getState) => {
+  dispatch({
+    type: actionTypes.atoms.loadAllMetaAtomsFromOwnerNear,
+  });
+  return wonMessageUtils.fetchAllMetaAtomsFromOwnerNear(dispatch, getState);
 };
 /*
  Simply prints a logline and resolves the promise so we can go on in the chain
