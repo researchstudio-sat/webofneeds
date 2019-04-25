@@ -29,34 +29,6 @@ class Controller {
     window.ownermap4dbg = this;
     this.WON = won.WON;
 
-    if ("geolocation" in navigator) {
-      navigator.geolocation.getCurrentPosition(
-        currentLocation => {
-          const lat = currentLocation.coords.latitude;
-          const lng = currentLocation.coords.longitude;
-
-          this.currentLocation = { lat, lng };
-        },
-        error => {
-          //error handler
-          console.error(
-            "Could not retrieve geolocation due to error: ",
-            error.code,
-            ", continuing map initialization without currentLocation. fullerror:",
-            error
-          );
-          console.error("LOCATION COULD NOT BE RETRIEVED");
-        },
-        {
-          //options
-          enableHighAccuracy: true,
-          maximumAge: 30 * 60 * 1000, //use if cache is not older than 30min
-        }
-      );
-    } else {
-      console.error("LOCATION COULD NOT BE RETRIEVED");
-    }
-
     const selectFromState = state => {
       const viewAtomUri = generalSelectors.getViewAtomUriFromRoute(state);
       const viewConnUri = generalSelectors.getViewConnectionUriFromRoute(state);
@@ -119,21 +91,73 @@ class Controller {
   }
 
   ensureAtomUrisLoaded() {
-    if (this.isOwnerAtomUrisToLoad && this.currentLocation) {
-      this.atoms__fetchWhatsAround(undefined, this.currentLocation, 5000);
+    if (this.isOwnerAtomUrisToLoad) {
+      if ("geolocation" in navigator) {
+        navigator.geolocation.getCurrentPosition(
+          currentLocation => {
+            const lat = currentLocation.coords.latitude;
+            const lng = currentLocation.coords.longitude;
+
+            this.atoms__fetchWhatsAround(undefined, { lat, lng }, 5000);
+          },
+          error => {
+            //error handler
+            console.error(
+              "Could not retrieve geolocation due to error: ",
+              error.code,
+              ", continuing map initialization without currentLocation. fullerror:",
+              error
+            );
+            console.error("LOCATION COULD NOT BE RETRIEVED");
+          },
+          {
+            //options
+            enableHighAccuracy: true,
+            maximumAge: 30 * 60 * 1000, //use if cache is not older than 30min
+          }
+        );
+      } else {
+        console.error("LOCATION COULD NOT BE RETRIEVED");
+      }
     }
   }
 
   reload() {
     if (!this.isOwnerAtomUrisLoading) {
-      if (this.lastAtomUrisUpdateDate) {
-        this.atoms__fetchWhatsAround(
-          new Date(this.lastAtomUrisUpdateDate),
-          this.currentLocation,
-          5000
+      if ("geolocation" in navigator) {
+        navigator.geolocation.getCurrentPosition(
+          currentLocation => {
+            const lat = currentLocation.coords.latitude;
+            const lng = currentLocation.coords.longitude;
+
+            if (this.lastAtomUrisUpdateDate) {
+              this.atoms__fetchWhatsAround(
+                new Date(this.lastAtomUrisUpdateDate),
+                { lat, lng },
+                5000
+              );
+            } else {
+              this.atoms__fetchWhatsAround(undefined, { lat, lng }, 5000);
+            }
+          },
+          error => {
+            //error handler
+            console.error(
+              "Could not retrieve geolocation due to error: ",
+              error.code,
+              ", continuing map initialization without currentLocation. fullerror:",
+              error
+            );
+            console.error("LOCATION COULD NOT BE RETRIEVED");
+          },
+          {
+            //options
+            enableHighAccuracy: true,
+            maximumAge: 30 * 60 * 1000, //use if cache is not older than 30min
+          }
         );
       } else {
-        this.atoms__fetchWhatsAround(undefined, this.currentLocation, 5000);
+        console.error("LOCATION COULD NOT BE RETRIEVED");
       }
     }
   }
