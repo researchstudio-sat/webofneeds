@@ -38,14 +38,14 @@ export const fetchWhatsNew = () => (dispatch, getState) => {
   dispatch({
     type: actionTypes.atoms.fetchWhatsNew,
   });
-  return wonMessageUtils.fetchAllMetaAtomsFromOwner(dispatch, getState);
+  return wonMessageUtils.fetchWhatsNew(dispatch, getState);
 };
 
 export const fetchWhatsAround = () => (dispatch, getState) => {
   dispatch({
     type: actionTypes.atoms.fetchWhatsAround,
   });
-  return wonMessageUtils.fetchAllMetaAtomsFromOwnerNear(dispatch, getState);
+  return wonMessageUtils.fetchWhatsAround(dispatch, getState);
 };
 /*
  Simply prints a logline and resolves the promise so we can go on in the chain

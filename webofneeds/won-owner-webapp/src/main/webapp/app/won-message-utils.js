@@ -580,7 +580,7 @@ export function fetchOwnedData(dispatch) {
     .then(atomUris => fetchDataForOwnedAtoms(atomUris, dispatch));
 }
 
-export function fetchAllMetaAtomsFromOwner(dispatch) {
+export function fetchWhatsNew(dispatch) {
   return fetchAllMetaAtoms().then(atoms => {
     const atomsImm = Immutable.fromJS(atoms);
     const atomUris = [...atomsImm.keys()];
@@ -622,7 +622,7 @@ function fetchAllMetaAtoms(
     .then(response => response.json());
 }
 
-export function fetchAllMetaAtomsFromOwnerNear(dispatch) {
+export function fetchWhatsAround(dispatch) {
   return fetchAllMetaAtomsNear().then(atoms => {
     const atomsImm = Immutable.fromJS(atoms);
     const atomUris = [...atomsImm.keys()];
