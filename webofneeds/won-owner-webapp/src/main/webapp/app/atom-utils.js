@@ -122,6 +122,18 @@ export function isDirectResponseAtom(atom) {
   );
 }
 
+/**
+ * Determines if a given atom is Invisible (contains the no hint for counterpart flag)
+ * @param atom
+ * @returns {*|boolean}
+ */
+export function isInvisibleAtom(atom) {
+  return (
+    getIn(atom, ["content", "flags"]) &&
+    getIn(atom, ["content", "flags"]).contains("won:NoHintForCounterpart")
+  );
+}
+
 export function isPersona(atom) {
   return (
     getIn(atom, ["content", "type"]) &&
