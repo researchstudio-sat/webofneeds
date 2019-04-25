@@ -3,7 +3,7 @@
  */
 import angular from "angular";
 import ngAnimate from "angular-animate";
-import { attach, getIn, get, delay } from "../../utils.js";
+import { attach, getIn, get, delay, sortByDate } from "../../utils.js";
 import { connect2Redux } from "../../won-utils.js";
 import won from "../../won-es6.js";
 import { actionCreators } from "../../actions/actions.js";
@@ -14,6 +14,7 @@ import * as generalSelectors from "../../selectors/general-selectors.js";
 import * as viewSelectors from "../../selectors/view-selectors.js";
 import * as processUtils from "../../process-utils.js";
 import * as wonLabelUtils from "../../won-label-utils.js";
+import * as atomUtils from "../../atom-utils.js";
 
 import "style/_overview.scss";
 import "style/_atom-overlay.scss";
@@ -31,8 +32,20 @@ class Controller {
       const viewAtomUri = generalSelectors.getViewAtomUriFromRoute(state);
       const viewConnUri = generalSelectors.getViewConnectionUriFromRoute(state);
 
-      const atoms = getIn(state, ["owner", "metaAtoms"]);
-      const atomUrisArray = atoms && [...atoms.keys()];
+      const whatsNewMetaAtoms = getIn(state, ["owner", "metaAtoms"])
+        .filter(metaAtom => atomUtils.isActive(metaAtom))
+        .filter(metaAtom => !atomUtils.isSearchAtom(metaAtom))
+        .filter(metaAtom => !atomUtils.isDirectResponseAtom(metaAtom))
+        .filter(metaAtom => !atomUtils.isInvisibleAtom(metaAtom))
+        .filter(
+          (metaAtom, metaAtomUri) =>
+            !generalSelectors.isAtomOwned(state, metaAtomUri)
+        );
+
+      const sortedVisibleAtoms = sortByDate(whatsNewMetaAtoms, "creationDate");
+      const sortedVisibleAtomUriArray = sortedVisibleAtoms && [
+        ...sortedVisibleAtoms.flatMap(visibleAtom => get(visibleAtom, "uri")),
+      ];
       const lastAtomUrisUpdateDate = getIn(state, [
         "owner",
         "lastAtomsUpdateTime",
@@ -46,7 +59,6 @@ class Controller {
         !lastAtomUrisUpdateDate && !isOwnerAtomUrisLoading;
 
       return {
-        atoms,
         lastAtomUrisUpdateDate,
         friendlyLastAtomUrisUpdateTimestamp:
           lastAtomUrisUpdateDate &&
@@ -54,8 +66,10 @@ class Controller {
             generalSelectors.selectLastUpdateTime(state),
             lastAtomUrisUpdateDate
           ),
-        atomUrisArray,
-        atomUrisSize: atoms ? atoms.size : 0,
+        sortedVisibleAtomUriArray,
+        sortedVisibleAtomUriSize: sortedVisibleAtomUriArray
+          ? sortedVisibleAtomUriArray.length
+          : 0,
         isOwnerAtomUrisLoading,
         isOwnerAtomUrisToLoad,
         showSlideIns:
