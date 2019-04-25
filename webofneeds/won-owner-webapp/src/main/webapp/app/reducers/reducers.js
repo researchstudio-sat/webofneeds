@@ -87,7 +87,7 @@ const reducers = {
 
         return owner
           .set("whatsNew", ownerMetaAtoms)
-          .set("lastWhatsAroundUpdateTime", Date.now());
+          .set("lastWhatsNewUpdateTime", Date.now());
       }
 
       case actionTypes.atoms.storeWhatsAround: {
@@ -107,7 +107,7 @@ const reducers = {
 
         return owner
           .set("whatsAround", ownerMetaAtoms)
-          .set("lastWhatsNewUpdateTime", Date.now());
+          .set("lastWhatsAroundUpdateTime", Date.now());
       }
 
       case actionTypes.atoms.removeDeleted:
