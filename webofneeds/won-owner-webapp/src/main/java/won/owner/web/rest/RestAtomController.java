@@ -149,7 +149,8 @@ public class RestAtomController {
                         ? ZonedDateTime.parse(createdAfterIsoString, DateTimeFormatter.ISO_DATE_TIME)
                         : null;
         URI nodeURI = wonNodeInformationService.getDefaultWonNodeURI();
-        List<URI> atomUris = WonLinkedDataUtils.getNodeAtomUris(nodeURI, linkedDataSource);
+        List<URI> atomUris = WonLinkedDataUtils.getNodeAtomUris(nodeURI, modifiedAfter, createdAfter, state,
+                        linkedDataSource);
         Map<URI, AtomPojo> atomMap = new HashMap<>();
         for (URI atomUri : atomUris) {
             try {
