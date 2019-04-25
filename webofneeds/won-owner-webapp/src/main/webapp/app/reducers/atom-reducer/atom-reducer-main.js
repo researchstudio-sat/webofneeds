@@ -75,7 +75,8 @@ export default function(allAtomsInState = initialState, action = {}) {
         won.WON.InactiveCompacted
       );
     }
-    case actionTypes.atoms.storeMetaAtoms: {
+    case actionTypes.atoms.storeWhatsNew:
+    case actionTypes.atoms.storeWhatsAround: {
       const metaAtoms = action.payload.get("metaAtoms");
       const atomUris = metaAtoms && [...metaAtoms.keys()];
       return addAtomStubs(allAtomsInState, atomUris);

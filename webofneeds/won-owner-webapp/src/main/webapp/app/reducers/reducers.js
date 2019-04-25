@@ -19,8 +19,11 @@ import { parseMetaAtom } from "./atom-reducer/parse-atom.js";
 import { router } from "redux-ui-router";
 
 const initialOwnerState = Immutable.fromJS({
-  metaAtoms: Immutable.Map(),
-  lastAtomsUpdateTime: undefined,
+  whatsNew: Immutable.Map(),
+  whatsAround: Immutable.Map(),
+  lastWhatsNewUpdateTime: undefined,
+  lastWhatsAroundUpdateTime: undefined,
+  lastWhatsAroundLocation: undefined,
 });
 
 const initialConfigState = Immutable.fromJS({ theme: { name: "current" } });
@@ -67,9 +70,9 @@ const reducers = {
       case actionTypes.account.reset:
         return initialOwnerState;
 
-      case actionTypes.atoms.storeMetaAtoms: {
+      case actionTypes.atoms.storeWhatsNew: {
         const metaAtoms = action.payload.get("metaAtoms");
-        let ownerMetaAtoms = owner.get("metaAtoms");
+        let ownerMetaAtoms = owner.get("whatsNew");
 
         metaAtoms &&
           metaAtoms.map(metaAtom => {
@@ -83,8 +86,28 @@ const reducers = {
           });
 
         return owner
-          .set("metaAtoms", ownerMetaAtoms)
-          .set("lastAtomsUpdateTime", Date.now());
+          .set("whatsNew", ownerMetaAtoms)
+          .set("lastWhatsAroundUpdateTime", Date.now());
+      }
+
+      case actionTypes.atoms.storeWhatsAround: {
+        const metaAtoms = action.payload.get("metaAtoms");
+        let ownerMetaAtoms = owner.get("whatsAround");
+
+        metaAtoms &&
+          metaAtoms.map(metaAtom => {
+            const metaAtomImm = parseMetaAtom(metaAtom);
+            if (metaAtomImm) {
+              ownerMetaAtoms = ownerMetaAtoms.set(
+                metaAtomImm.get("uri"),
+                metaAtomImm
+              );
+            }
+          });
+
+        return owner
+          .set("whatsAround", ownerMetaAtoms)
+          .set("lastWhatsNewUpdateTime", Date.now());
       }
 
       case actionTypes.atoms.removeDeleted:

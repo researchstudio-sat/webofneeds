@@ -84,8 +84,8 @@ import * as configActions from "./config-actions.js";
 
 import {
   pageLoadAction,
-  loadAllMetaAtomsFromOwner,
-  loadAllMetaAtomsFromOwnerNear,
+  fetchWhatsNew,
+  fetchWhatsAround,
 } from "./load-action.js";
 import { stateGo, stateReload } from "redux-ui-router";
 import {
@@ -155,9 +155,10 @@ const actionHierarchy = {
     fetchUnloadedAtoms: fetchUnloadedAtoms,
     fetchUnloadedAtom: fetchUnloadedAtom,
 
-    loadAllMetaAtomsFromOwner: loadAllMetaAtomsFromOwner,
-    loadAllMetaAtomsFromOwnerNear: loadAllMetaAtomsFromOwnerNear,
-    storeMetaAtoms: INJ_DEFAULT,
+    fetchWhatsNew: fetchWhatsNew,
+    fetchWhatsAround: fetchWhatsAround,
+    storeWhatsNew: INJ_DEFAULT,
+    storeWhatsAround: INJ_DEFAULT,
 
     storeOwnedInactiveUris: INJ_DEFAULT,
     storeOwnedInactiveUrisInLoading: INJ_DEFAULT,

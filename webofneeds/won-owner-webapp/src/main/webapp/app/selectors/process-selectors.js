@@ -14,7 +14,8 @@ export function isLoading(state) {
 
   return (
     processUtils.isProcessingInitialLoad(process) ||
-    processUtils.isProcessingAtomUrisFromOwnerLoad(process) ||
+    processUtils.isProcessingWhatsAround(process) ||
+    processUtils.isProcessingWhatsNew(process) ||
     processUtils.isProcessingLogin(process) ||
     processUtils.isProcessingLogout(process) ||
     processUtils.isProcessingPublish(process) ||

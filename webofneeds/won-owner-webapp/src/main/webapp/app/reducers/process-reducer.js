@@ -18,7 +18,8 @@ const initialState = Immutable.fromJS({
   processingVerifyEmailAddress: false,
   processingResendVerificationEmail: false,
   processingSendAnonymousLinkEmail: false,
-  processingAtomUrisFromOwnerLoad: false,
+  processingWhatsNew: false,
+  processingWhatsAround: false,
   atoms: Immutable.Map(),
   connections: Immutable.Map(),
 });
@@ -125,11 +126,13 @@ export default function(processState = initialState, action = {}) {
       return processState;
     }
 
-    case actionTypes.atoms.loadAllMetaAtomsFromOwnerNear:
-    case actionTypes.atoms.loadAllMetaAtomsFromOwner:
-      return processState.set("processingAtomUrisFromOwnerLoad", true);
+    case actionTypes.atoms.fetchWhatsAround:
+      return processState.set("processingWhatsAround", true);
 
-    case actionTypes.atoms.storeMetaAtoms: {
+    case actionTypes.atoms.fetchWhatsNew:
+      return processState.set("processingWhatsNew", true);
+
+    case actionTypes.atoms.storeWhatsNew: {
       const metaAtoms = action.payload.get("metaAtoms");
       const atomUris = metaAtoms && [...metaAtoms.keys()];
       atomUris &&
@@ -140,7 +143,21 @@ export default function(processState = initialState, action = {}) {
             });
           }
         });
-      return processState.set("processingAtomUrisFromOwnerLoad", false);
+      return processState.set("processingWhatsNew", false);
+    }
+
+    case actionTypes.atoms.storeWhatsAround: {
+      const metaAtoms = action.payload.get("metaAtoms");
+      const atomUris = metaAtoms && [...metaAtoms.keys()];
+      atomUris &&
+        atomUris.forEach(atomUri => {
+          if (!processUtils.isAtomLoaded(processState, atomUri)) {
+            processState = updateAtomProcess(processState, atomUri, {
+              toLoad: true,
+            });
+          }
+        });
+      return processState.set("processingWhatsAround", false);
     }
 
     case actionTypes.personas.create:

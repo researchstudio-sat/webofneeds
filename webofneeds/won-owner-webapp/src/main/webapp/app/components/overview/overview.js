@@ -32,7 +32,7 @@ class Controller {
       const viewAtomUri = generalSelectors.getViewAtomUriFromRoute(state);
       const viewConnUri = generalSelectors.getViewConnectionUriFromRoute(state);
 
-      const whatsNewMetaAtoms = getIn(state, ["owner", "metaAtoms"])
+      const whatsNewMetaAtoms = getIn(state, ["owner", "whatsNew"])
         .filter(metaAtom => atomUtils.isActive(metaAtom))
         .filter(metaAtom => !atomUtils.isSearchAtom(metaAtom))
         .filter(metaAtom => !atomUtils.isDirectResponseAtom(metaAtom))
@@ -48,13 +48,11 @@ class Controller {
       ];
       const lastAtomUrisUpdateDate = getIn(state, [
         "owner",
-        "lastAtomsUpdateTime",
+        "lastWhatsNewUpdateTime",
       ]);
 
       const process = get(state, "process");
-      const isOwnerAtomUrisLoading = processUtils.isProcessingAtomUrisFromOwnerLoad(
-        process
-      );
+      const isOwnerAtomUrisLoading = processUtils.isProcessingWhatsNew(process);
       const isOwnerAtomUrisToLoad =
         !lastAtomUrisUpdateDate && !isOwnerAtomUrisLoading;
 
@@ -92,13 +90,13 @@ class Controller {
 
   ensureAtomUrisLoaded() {
     if (this.isOwnerAtomUrisToLoad) {
-      this.atoms__loadAllMetaAtomsFromOwner();
+      this.atoms__fetchWhatsNew();
     }
   }
 
   reload() {
     if (!this.isOwnerAtomUrisLoading) {
-      this.atoms__loadAllMetaAtomsFromOwner();
+      this.atoms__fetchWhatsNew();
     }
   }
 }

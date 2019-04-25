@@ -587,7 +587,7 @@ export function fetchAllMetaAtomsFromOwner(dispatch) {
     console.debug("AtomUris: ", atomUris);
 
     dispatch({
-      type: actionTypes.atoms.storeMetaAtoms,
+      type: actionTypes.atoms.storeWhatsNew,
       payload: Immutable.fromJS({ metaAtoms: atoms }),
     });
     return atomUris;
@@ -629,7 +629,7 @@ export function fetchAllMetaAtomsFromOwnerNear(dispatch) {
     console.debug("AtomUris: ", atomUris);
 
     dispatch({
-      type: actionTypes.atoms.storeMetaAtoms,
+      type: actionTypes.atoms.storeWhatsAround,
       payload: Immutable.fromJS({ metaAtoms: atoms }),
     });
     return atomUris;

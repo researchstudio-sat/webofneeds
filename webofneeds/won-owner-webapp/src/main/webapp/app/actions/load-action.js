@@ -34,16 +34,16 @@ function loadingWhileSignedIn(dispatch) {
   return wonMessageUtils.fetchOwnedData(dispatch);
 }
 
-export const loadAllMetaAtomsFromOwner = () => (dispatch, getState) => {
+export const fetchWhatsNew = () => (dispatch, getState) => {
   dispatch({
-    type: actionTypes.atoms.loadAllMetaAtomsFromOwner,
+    type: actionTypes.atoms.fetchWhatsNew,
   });
   return wonMessageUtils.fetchAllMetaAtomsFromOwner(dispatch, getState);
 };
 
-export const loadAllMetaAtomsFromOwnerNear = () => (dispatch, getState) => {
+export const fetchWhatsAround = () => (dispatch, getState) => {
   dispatch({
-    type: actionTypes.atoms.loadAllMetaAtomsFromOwnerNear,
+    type: actionTypes.atoms.fetchWhatsAround,
   });
   return wonMessageUtils.fetchAllMetaAtomsFromOwnerNear(dispatch, getState);
 };
