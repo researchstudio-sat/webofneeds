@@ -324,11 +324,11 @@ export const sockets = {
       label: "GroupSocket",
     },
     {
-      value: { "#holderSocket": "won:HolderSocket" },
+      value: { "#holderSocket": "hold:HolderSocket" },
       label: "HolderSocket",
     },
     {
-      value: { "#holdableSocket": "won:HoldableSocket" },
+      value: { "#holdableSocket": "hold:HoldableSocket" },
       label: "HoldableSocket",
     },
     {

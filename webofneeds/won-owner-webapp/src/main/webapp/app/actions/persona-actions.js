@@ -23,7 +23,7 @@ export function createPersona(persona, nodeUri) {
       "won:socket": [
         {
           "@id": "#holderSocket",
-          "@type": "won:HolderSocket",
+          "@type": "hold:HolderSocket",
         },
         {
           "@id": "#reviewSocket",
@@ -152,7 +152,7 @@ export function disconnectPersona(atomUri, personaUri) {
       .filter(
         connection =>
           connection.get("targetAtomUri") == atom.get("uri") &&
-          connection.get("socket") == won.WON.HolderSocketCompacted
+          connection.get("socket") == won.HOLD.HolderSocketCompacted
       )
       .keySeq()
       .first();

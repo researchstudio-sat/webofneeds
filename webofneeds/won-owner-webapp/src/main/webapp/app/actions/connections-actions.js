@@ -359,14 +359,14 @@ function connectReactionAtom(
               persona,
               "content",
               "sockets",
-            ]).keyOf("won:HolderSocket"),
+            ]).keyOf("hold:HolderSocket"),
           },
           {
             pending: true,
             socket: `${atomUri}#holdableSocket`,
             // FIXME: does not work as new atom is not in state yet
             //socket: getIn(state, ["atoms", atomUri, "content", "sockets"]).keyOf(
-            //  "won:HoldableSocket"
+            //  "hold:HoldableSocket"
             //),
           },
         ]),
@@ -473,14 +473,14 @@ function connectAdHoc(theirAtomUri, textMessage, persona, dispatch, getState) {
               persona,
               "content",
               "sockets",
-            ]).keyOf("won:HolderSocket"),
+            ]).keyOf("hold:HolderSocket"),
           },
           {
             pending: true,
             socket: `${atomUri}#holdableSocket`,
             // FIXME: does not work as new atom is not in state yet
             //socket: getIn(state, ["atoms", atomUri, "content", "sockets"]).keyOf(
-            //  "won:HoldableSocket"
+            //  "hold:HoldableSocket"
             //),
           },
         ]),

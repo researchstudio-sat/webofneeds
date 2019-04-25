@@ -172,7 +172,7 @@ import { Generator } from "sparqljs";
       "won:socket": !(args.content && args.content.sockets)
         ? [
             { "@id": "#chatSocket", "@type": "won:ChatSocket" },
-            { "@id": "#holdableSocket", "@type": "won:HoldableSocket" },
+            { "@id": "#holdableSocket", "@type": "hold:HoldableSocket" },
           ]
         : undefined,
       "won:defaultSocket": !(args.content && args.content.defaultSocket)

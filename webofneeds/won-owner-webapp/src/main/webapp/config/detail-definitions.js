@@ -16,7 +16,7 @@ const emptyDraftImm = Immutable.fromJS({
   content: {
     sockets: {
       "#chatSocket": "won:ChatSocket",
-      "#holdableSocket": "won:HoldableSocket",
+      "#holdableSocket": "hold:HoldableSocket",
     },
     defaultSocket: { "#chatSocket": "won:ChatSocket" },
   },

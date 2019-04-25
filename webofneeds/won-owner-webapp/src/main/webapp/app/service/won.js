@@ -141,10 +141,6 @@ won.WON.NoHintForCounterpartCompacted =
   won.WON.prefix + ":NoHintForCounterpart";
 won.WON.UsedForTestingCompacted = won.WON.prefix + ":UsedForTesting";
 won.WON.NoHintForMeCompacted = won.WON.prefix + ":NoHintForMe";
-won.WON.HoldableSocket = won.WON.baseUri + "HoldableSocket";
-won.WON.HoldableSocketCompacted = won.WON.prefix + ":HoldableSocket";
-won.WON.HolderSocket = won.WON.baseUri + "HolderSocket";
-won.WON.HolderSocketCompacted = won.WON.prefix + ":HolderSocket";
 won.WON.ReviewSocket = won.WON.baseUri + "ReviewSocket";
 won.WON.ReviewSocketCompacted = won.WON.prefix + ":ReviewSocket";
 won.WON.ChatSocket = won.WON.baseUri + "ChatSocket";
@@ -297,6 +293,14 @@ won.WONMSG.successResponse = won.WONMSG.baseUri + "SuccessResponse";
 won.WONMSG.successResponseCompacted = won.WONMSG.prefix + ":SuccessResponse";
 won.WONMSG.failureResponse = won.WONMSG.baseUri + "FailureResponse";
 won.WONMSG.failureResponseCompacted = won.WONMSG.prefix + ":FailureResponse";
+
+won.HOLD.baseUri = "https://w3id.org/won/ext/hold#";
+won.HOLD.prefix = "hold";
+won.HOLD.HoldableSocket = won.HOLD.baseUri + "HoldableSocket";
+won.HOLD.HoldableSocketCompacted = won.HOLD.prefix + ":HoldableSocket";
+won.HOLD.HolderSocket = won.HOLD.baseUri + "HolderSocket";
+won.HOLD.HolderSocketCompacted = won.HOLD.prefix + ":HolderSocket";
+
 
 won.EVENT = {};
 won.EVENT.WON_MESSAGE_RECEIVED = "WonMessageReceived";
@@ -663,6 +667,7 @@ function context2ttlPrefixes(jsonldContext) {
 won.minimalContext = {
   msg: "https://w3id.org/won/message#",
   won: "https://w3id.org/won/core#",
+  hold: won.HOLD.baseUri,
   rdf: "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
   agr: "https://w3id.org/won/agreement#",
   pay: "https://w3id.org/won/payment#",

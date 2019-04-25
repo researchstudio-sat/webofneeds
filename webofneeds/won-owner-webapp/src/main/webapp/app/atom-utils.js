@@ -163,11 +163,11 @@ export function hasGroupSocket(atom) {
 }
 
 export function hasHoldableSocket(atom) {
-  return hasSocket(atom, won.WON.HoldableSocketCompacted);
+  return hasSocket(atom, won.HOLD.HoldableSocketCompacted);
 }
 
 export function hasHolderSocket(atom) {
-  return hasSocket(atom, won.WON.HolderSocketCompacted);
+  return hasSocket(atom, won.HOLD.HolderSocketCompacted);
 }
 
 export function hasReviewSocket(atom) {
@@ -376,10 +376,10 @@ function getSocketKeysReset(socketsImm) {
     if (value === "won:GroupSocket") {
       return "#groupSocket";
     }
-    if (value === "won:HolderSocket") {
+    if (value === "hold:HolderSocket") {
       return "#holderSocket";
     }
-    if (value === "won:HoldableSocket") {
+    if (value === "hold:HoldableSocket") {
       return "#holdableSocket";
     }
     if (value === "won:ReviewSocket") {

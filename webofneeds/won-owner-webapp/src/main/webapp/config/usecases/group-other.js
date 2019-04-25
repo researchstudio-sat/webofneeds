@@ -23,7 +23,7 @@ export const otherGroup = {
           content: {
             sockets: {
               "#groupSocket": won.WON.GroupSocketCompacted,
-              "#holdableSocket": won.WON.HoldableSocketCompacted,
+              "#holdableSocket": won.HOLD.HoldableSocketCompacted,
             },
             defaultSocket: { "#groupSocket": won.WON.GroupSocketCompacted },
           },

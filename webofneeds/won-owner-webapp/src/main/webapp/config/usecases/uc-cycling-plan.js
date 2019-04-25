@@ -23,7 +23,7 @@ export const cyclingPlan = {
         eventObject: "http://dbpedia.org/resource/Cycling",
         sockets: {
           "#groupSocket": won.WON.GroupSocketCompacted,
-          "#holdableSocket": won.WON.HoldableSocketCompacted,
+          "#holdableSocket": won.HOLD.HoldableSocketCompacted,
         },
         defaultSocket: { "#groupSocket": won.WON.GroupSocketCompacted },
       },
