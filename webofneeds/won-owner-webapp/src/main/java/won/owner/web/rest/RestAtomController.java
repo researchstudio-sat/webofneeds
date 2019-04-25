@@ -121,12 +121,18 @@ public class RestAtomController {
     }
 
     /**
-     * Returns a Map of atoms (key is the atomUri), value is the atom including (meta)data
+     * Returns a Map of atoms (key is the atomUri), value is the atom including
+     * (meta)data
+     * 
      * @param state only return atoms with the given AtomState
-     * @param modifiedAfterIsoString only return atoms that have been modified after this timestamp (ISO 8601 format (UTC): yyyy-MM-dd'T'HH:mm:ss.SSS'Z')
-     * @param createdAfterIsoString only return atoms that have been created after this timestamp (ISO 8601 format (UTC): yyyy-MM-dd'T'HH:mm:ss.SSS'Z')
-     * @param limit limit results to this size (if null, 0, or negative value do not limit at all)
-     * @return Map of AtomPojos -> atoms with certain metadata @see won.owner.pojo.AtomPojo
+     * @param modifiedAfterIsoString only return atoms that have been modified after
+     * this timestamp (ISO 8601 format (UTC): yyyy-MM-dd'T'HH:mm:ss.SSS'Z')
+     * @param createdAfterIsoString only return atoms that have been created after
+     * this timestamp (ISO 8601 format (UTC): yyyy-MM-dd'T'HH:mm:ss.SSS'Z')
+     * @param limit limit results to this size (if null, 0, or negative value do not
+     * limit at all)
+     * @return Map of AtomPojos -> atoms with certain metadata @see
+     * won.owner.pojo.AtomPojo
      */
     @ResponseBody
     @RequestMapping(value = "/all", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
