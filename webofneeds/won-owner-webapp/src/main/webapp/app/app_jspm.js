@@ -38,12 +38,12 @@ import footer from "./components/footer.js";
 import modalDialog from "./components/modal-dialog.js";
 import toasts from "./components/toasts.js";
 import slideIn from "./components/slide-in.js";
-import connectionsComponent from "./components/connections/connections.js";
-import overviewComponent from "./components/overview/overview.js";
-import postComponent from "./components/post/post.js";
-import aboutComponent from "./components/about/about.js";
-import signupComponent from "./components/signup/signup.js";
-import settingsComponent from "./components/settings/settings.js";
+import connectionsComponent from "./components/connections/connections.jsx";
+import overviewComponent from "./components/overview/overview.jsx";
+import postComponent from "./components/post/post.jsx";
+import aboutComponent from "./components/about/about.jsx";
+import signupComponent from "./components/signup/signup.jsx";
+import settingsComponent from "./components/settings/settings.jsx";
 
 //won import (used so you can access the debugmode variable without reloading the page)
 import won from "./service/won.js";
@@ -78,12 +78,12 @@ let app = angular.module("won.owner", [
   ...detailModules,
 
   //views
-  connectionsComponent,
-  overviewComponent,
-  postComponent,
-  aboutComponent,
-  signupComponent,
-  settingsComponent,
+  connectionsComponent.module,
+  overviewComponent.module,
+  postComponent.module,
+  aboutComponent.module,
+  signupComponent.module,
+  settingsComponent.module,
 ]);
 
 /* create store, register middlewares, set up redux-devtool-support, etc */

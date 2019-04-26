@@ -10,6 +10,7 @@
     ]
   ],
   "plugins": [
+    "transform-react-jsx",
     "transform-object-rest-spread",
     "transform-custom-element-classes"
   ]

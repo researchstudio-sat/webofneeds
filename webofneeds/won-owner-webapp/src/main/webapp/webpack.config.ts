@@ -65,7 +65,7 @@ function config(env, argv): Configuration {
           use: "exports-loader?rdfstore",
         },
         {
-          test: /\.js$/,
+          test: /\.jsx?$/,
           exclude: [/node_modules/, /rdf_store\.js/],
           use: [
             {

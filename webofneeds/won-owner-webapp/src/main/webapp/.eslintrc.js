@@ -1,6 +1,10 @@
 module.exports = {
   root: true,
-  extends: ["plugin:prettier/recommended", "eslint:recommended"],
+  extends: [
+    "plugin:prettier/recommended",
+    "eslint:recommended",
+    "plugin:react/recommended",
+  ],
   parser: "babel-eslint",
   env: {
     browser: true,
@@ -9,6 +13,9 @@ module.exports = {
   parserOptions: {
     sourceType: "module",
     ecmaVersion: 2017,
+    ecmaFeatures: {
+      jsx: true,
+    },
   },
   rules: {
     //Deactivating console errors

@@ -1,3 +1,5 @@
+/** @jsx h */
+
 /**
  * Created by quasarchimaere on 04.04.2019.
  */
@@ -14,10 +16,72 @@ import * as generalSelectors from "../../selectors/general-selectors.js";
 import * as viewSelectors from "../../selectors/view-selectors.js";
 import * as processUtils from "../../process-utils.js";
 import * as wonLabelUtils from "../../won-label-utils.js";
+import { h } from "preact";
 
 import "style/_overview.scss";
 import "style/_atom-overlay.scss";
 import "style/_connection-overlay.scss";
+
+const template = (
+  <container>
+    <won-modal-dialog ng-if="self.showModalDialog" />
+    <div className="won-modal-atomview" ng-if="self.showAtomOverlay">
+      <won-post-info include-header="true" atom-uri="self.viewAtomUri" />
+    </div>
+    <div
+      className="won-modal-connectionview"
+      ng-if="self.showConnectionOverlay"
+    >
+      <won-post-messages connection-uri="self.viewConnUri" />
+    </div>
+    <header>
+      <won-topnav />
+    </header>
+    <won-toasts />
+    <won-slide-in ng-if="self.showSlideIns" />
+    <main className="owneroverview">
+      <div className="owneroverview__header">
+        <div className="owneroverview__header__title">
+          {"What's new? "}
+          <span
+            className="owneroverview__header__title__count"
+            ng-if="!self.isOwnerAtomUrisLoading"
+          >
+            {"{{ self.atomUrisSize }}"}
+          </span>
+        </div>
+        <div
+          className="owneroverview__header__loading"
+          ng-if="self.isOwnerAtomUrisLoading"
+        >
+          Loading...
+        </div>
+        <div
+          className="owneroverview__header__updated"
+          ng-if="!self.isOwnerAtomUrisLoading"
+        >
+          <div className="owneroverview__header__updated__time">
+            {"Updated: {{ self.friendlyLastAtomUrisUpdateTimestamp }}"}
+          </div>
+          <div
+            className="owneroverview__header__updated__reload won-button--filled red"
+            ng-click="self.reload()"
+          >
+            Reload
+          </div>
+        </div>
+      </div>
+      <div className="owneroverview__content">
+        <won-atom-card
+          class="owneroverview__content__atom"
+          atom-uri="atomUri"
+          ng-repeat="atomUri in self.atomUrisArray track by atomUri"
+        />
+      </div>
+    </main>
+    <won-footer />
+  </container>
+);
 
 const serviceDependencies = ["$ngRedux", "$scope"];
 class Controller {
@@ -89,11 +153,15 @@ class Controller {
 
 Controller.$inject = serviceDependencies;
 
-export default angular
-  .module("won.owner.components.overview", [
-    ngAnimate,
-    postMessagesModule,
-    atomCardModule,
-    postHeaderModule,
-  ])
-  .controller("OverviewController", Controller).name;
+export default {
+  module: angular
+    .module("won.owner.components.overview", [
+      ngAnimate,
+      postMessagesModule,
+      atomCardModule,
+      postHeaderModule,
+    ])
+    .controller("OverviewController", Controller).name,
+  controller: "OverviewController",
+  template: template,
+};
