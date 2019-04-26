@@ -315,6 +315,10 @@ update :
         }
     -> ( Model, Cmd Msg )
 update msg { model, props } =
+    let
+        noOp =
+            ( model, Cmd.none )
+    in
     case msg of
         ToggleDropdown ->
             ( { model
@@ -364,7 +368,7 @@ update msg { model, props } =
                     )
 
                 _ ->
-                    ( model, Cmd.none )
+                    noOp
 
         GotDimensions element ->
             case model.buttonPosition of
@@ -391,16 +395,10 @@ update msg { model, props } =
                     )
 
                 NotQueried ->
-                    ( model, Cmd.none )
+                    noOp
 
         FailedToGetDimensions error ->
-            ( model
-            , Widget.logError
-                (case error of
-                    Dom.NotFound id ->
-                        "Could not find element id " ++ id
-                )
-            )
+            noOp
 
         GotAnimationFrame ->
             ( model

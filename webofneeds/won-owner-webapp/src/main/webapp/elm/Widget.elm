@@ -2,7 +2,6 @@ port module Widget exposing
     ( Action
     , customAction
     , emitEvent
-    , logError
     , performAction
     , widget
     )
