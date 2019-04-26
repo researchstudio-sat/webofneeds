@@ -7,6 +7,13 @@
 /* jshint esnext: true */
 
 //---- app.js-Dependencies ----
+import "babel-polyfill";
+
+/* global require */
+require.context("../images/won-icons", false, /\.svg$/);
+
+import "../style/won.scss";
+
 import angular from "angular";
 window.angular = angular; // for compatibility with pre-ES6/commonjs scripts
 

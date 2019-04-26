@@ -18,7 +18,7 @@ function config(env, argv): Configuration {
   const nodeEnv = process.env.WON_DEPLOY_NODE_ENV || "default";
 
   return {
-    entry: "./app/app_webpack.js",
+    entry: "./app/app.js",
     mode: mode,
     optimization: {
       minimizer: [
@@ -31,7 +31,6 @@ function config(env, argv): Configuration {
     },
     output: {
       path: path.resolve(__dirname, "generated"),
-      filename: "app_jspm.bundle.js",
     },
     resolve: {
       modules: [__dirname, "node_modules"],
