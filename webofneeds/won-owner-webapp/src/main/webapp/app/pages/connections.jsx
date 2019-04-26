@@ -2,22 +2,22 @@
 
 import angular from "angular";
 import ngAnimate from "angular-animate";
-import won from "../../won-es6.js";
-import sendRequestModule from "../send-request.js";
-import postMessagesModule from "../post-messages.js";
-import groupPostMessagesModule from "../group-post-messages.js";
-import postInfoModule from "../post-info.js";
-import connectionsOverviewModule from "../connections-overview.js";
-import createPostModule from "../create-post.js";
-import createSearchModule from "../create-search.js";
-import usecasePickerModule from "../usecase-picker.js";
-import usecaseGroupModule from "../usecase-group.js";
-import { attach, getIn, get } from "../../utils.js";
-import { actionCreators } from "../../actions/actions.js";
-import * as generalSelectors from "../../selectors/general-selectors.js";
-import { isChatToGroup } from "../../connection-utils.js";
-import * as viewSelectors from "../../selectors/view-selectors.js";
-import * as srefUtils from "../../sref-utils.js";
+import won from "../won-es6.js";
+import sendRequestModule from "../components/send-request.js";
+import postMessagesModule from "../components/post-messages.js";
+import groupPostMessagesModule from "../components/group-post-messages.js";
+import postInfoModule from "../components/post-info.js";
+import connectionsOverviewModule from "../components/connections-overview.js";
+import createPostModule from "../components/create-post.js";
+import createSearchModule from "../components/create-search.js";
+import usecasePickerModule from "../components/usecase-picker.js";
+import usecaseGroupModule from "../components/usecase-group.js";
+import { attach, getIn, get } from "../utils.js";
+import { actionCreators } from "../actions/actions.js";
+import * as generalSelectors from "../selectors/general-selectors.js";
+import { isChatToGroup } from "../connection-utils.js";
+import * as viewSelectors from "../selectors/view-selectors.js";
+import * as srefUtils from "../sref-utils.js";
 import { h } from "preact";
 
 import "style/_connections.scss";

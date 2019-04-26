@@ -38,12 +38,12 @@ import footer from "./components/footer.js";
 import modalDialog from "./components/modal-dialog.js";
 import toasts from "./components/toasts.js";
 import slideIn from "./components/slide-in.js";
-import connectionsComponent from "./components/connections/connections.jsx";
-import overviewComponent from "./components/overview/overview.jsx";
-import postComponent from "./components/post/post.jsx";
-import aboutComponent from "./components/about/about.jsx";
-import signupComponent from "./components/signup/signup.jsx";
-import settingsComponent from "./components/settings/settings.jsx";
+import connectionsComponent from "./pages/connections.jsx";
+import overviewComponent from "./pages/overview.jsx";
+import postComponent from "./pages/post.jsx";
+import aboutComponent from "./pages/about.jsx";
+import signupComponent from "./pages/signup.jsx";
+import settingsComponent from "./pages/settings.jsx";
 
 //won import (used so you can access the debugmode variable without reloading the page)
 import won from "./service/won.js";

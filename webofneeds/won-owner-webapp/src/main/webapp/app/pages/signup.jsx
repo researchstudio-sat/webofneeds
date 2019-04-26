@@ -5,15 +5,15 @@
  */
 import angular from "angular";
 import ngAnimate from "angular-animate";
-import { attach, get } from "../../utils.js";
-import { actionCreators } from "../../actions/actions.js";
+import { attach, get } from "../utils.js";
+import { actionCreators } from "../actions/actions.js";
 
-import signupTitleBarModule from "../signup-title-bar.js";
-import labelledHrModule from "../labelled-hr.js";
+import signupTitleBarModule from "../components/signup-title-bar.js";
+import labelledHrModule from "../components/labelled-hr.js";
 
-import * as srefUtils from "../../sref-utils.js";
-import * as accountUtils from "../../account-utils.js";
-import * as viewSelectors from "../../selectors/view-selectors.js";
+import * as srefUtils from "../sref-utils.js";
+import * as accountUtils from "../account-utils.js";
+import * as viewSelectors from "../selectors/view-selectors.js";
 import { h } from "preact";
 
 import "style/_signup.scss";

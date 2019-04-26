@@ -4,19 +4,19 @@
  */
 import angular from "angular";
 import ngAnimate from "angular-animate";
-import { attach, getIn, get, delay } from "../../utils.js";
-import { connect2Redux } from "../../won-utils.js";
-import won from "../../won-es6.js";
+import { attach, getIn, get, delay } from "../utils.js";
+import { connect2Redux } from "../won-utils.js";
+import won from "../won-es6.js";
 
-import { actionCreators } from "../../actions/actions.js";
-import sendRequestModule from "../send-request.js";
-import postMessagesModule from "../post-messages.js";
-import groupPostMessagesModule from "../group-post-messages.js";
-import visitorTitleBarModule from "../visitor-title-bar.js";
-import * as generalSelectors from "../../selectors/general-selectors.js";
-import * as viewSelectors from "../../selectors/view-selectors.js";
-import * as processUtils from "../../process-utils.js";
-import * as srefUtils from "../../sref-utils.js";
+import { actionCreators } from "../actions/actions.js";
+import sendRequestModule from "../components/send-request.js";
+import postMessagesModule from "../components/post-messages.js";
+import groupPostMessagesModule from "../components/group-post-messages.js";
+import visitorTitleBarModule from "../components/visitor-title-bar.js";
+import * as generalSelectors from "../selectors/general-selectors.js";
+import * as viewSelectors from "../selectors/view-selectors.js";
+import * as processUtils from "../process-utils.js";
+import * as srefUtils from "../sref-utils.js";
 import { h } from "preact";
 
 import "style/_post-visitor.scss";

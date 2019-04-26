@@ -5,17 +5,17 @@
  */
 import angular from "angular";
 import ngAnimate from "angular-animate";
-import { attach, getIn, get, delay } from "../../utils.js";
-import { connect2Redux } from "../../won-utils.js";
-import won from "../../won-es6.js";
-import { actionCreators } from "../../actions/actions.js";
-import postMessagesModule from "../post-messages.js";
-import atomCardModule from "../atom-card.js";
-import postHeaderModule from "../post-header.js";
-import * as generalSelectors from "../../selectors/general-selectors.js";
-import * as viewSelectors from "../../selectors/view-selectors.js";
-import * as processUtils from "../../process-utils.js";
-import * as wonLabelUtils from "../../won-label-utils.js";
+import { attach, getIn, get, delay } from "../utils.js";
+import { connect2Redux } from "../won-utils.js";
+import won from "../won-es6.js";
+import { actionCreators } from "../actions/actions.js";
+import postMessagesModule from "../components/post-messages.js";
+import atomCardModule from "../components/atom-card.js";
+import postHeaderModule from "../components/post-header.js";
+import * as generalSelectors from "../selectors/general-selectors.js";
+import * as viewSelectors from "../selectors/view-selectors.js";
+import * as processUtils from "../process-utils.js";
+import * as wonLabelUtils from "../won-label-utils.js";
 import { h } from "preact";
 
 import "style/_overview.scss";

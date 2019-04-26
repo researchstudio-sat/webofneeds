@@ -3,16 +3,16 @@
 import angular from "angular";
 import Immutable from "immutable";
 import ngAnimate from "angular-animate";
-import compareToModule from "../../directives/compareTo.js";
-import accordionModule from "../accordion.js";
-import flexGridModule from "../flexgrid.js";
-import { attach, get, getIn, toAbsoluteURL } from "../../utils.js";
-import { actionCreators } from "../../actions/actions.js";
+import compareToModule from "../directives/compareTo.js";
+import accordionModule from "../components/accordion.js";
+import flexGridModule from "../components/flexgrid.js";
+import { attach, get, getIn, toAbsoluteURL } from "../utils.js";
+import { actionCreators } from "../actions/actions.js";
 import { ownerBaseUrl } from "config";
-import * as srefUtils from "../../sref-utils.js";
-import { getAboutSectionFromRoute } from "../../selectors/general-selectors.js";
-import * as viewSelectors from "../../selectors/view-selectors.js";
-import * as accountUtils from "../../account-utils.js";
+import * as srefUtils from "../sref-utils.js";
+import { getAboutSectionFromRoute } from "../selectors/general-selectors.js";
+import * as viewSelectors from "../selectors/view-selectors.js";
+import * as accountUtils from "../account-utils.js";
 import { h } from "preact";
 
 import "style/_about.scss";

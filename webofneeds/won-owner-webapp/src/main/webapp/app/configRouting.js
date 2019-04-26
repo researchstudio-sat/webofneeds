@@ -13,12 +13,12 @@ import { get, getIn } from "./utils.js";
 import * as accountUtils from "./account-utils.js";
 import * as processUtils from "./process-utils.js";
 
-import settingsComponent from "./components/settings/settings.jsx";
-import postComponent from "./components/post/post.jsx";
-import overviewComponent from "./components/overview/overview.jsx";
-import aboutComponent from "./components/about/about.jsx";
-import connectionsComponent from "./components/connections/connections.jsx";
-import signupComponent from "./components/signup/signup.jsx";
+import settingsComponent from "./pages/settings.jsx";
+import postComponent from "./pages/post.jsx";
+import overviewComponent from "./pages/overview.jsx";
+import aboutComponent from "./pages/about.jsx";
+import connectionsComponent from "./pages/connections.jsx";
+import signupComponent from "./pages/signup.jsx";
 
 import jsxRenderer from "@depack/render";
 

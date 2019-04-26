@@ -1,13 +1,13 @@
 import angular from "angular";
-import { Elm } from "../../../elm/Settings.elm";
-import { actionCreators } from "../../actions/actions";
-import "../identicon.js";
+import { Elm } from "../../elm/Settings.elm";
+import { actionCreators } from "../actions/actions";
+import "./identicon.js";
 import {
   getOwnedPersonas,
   currentSkin,
-} from "../../selectors/general-selectors.js";
-import { get } from "../../utils";
-import * as accountUtils from "../../account-utils.js";
+} from "../selectors/general-selectors.js";
+import { get } from "../utils";
+import * as accountUtils from "../account-utils.js";
 
 function genComponentConf($ngRedux) {
   return {

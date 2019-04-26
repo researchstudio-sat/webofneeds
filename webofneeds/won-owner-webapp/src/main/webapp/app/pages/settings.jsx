@@ -5,13 +5,13 @@
  */
 import angular from "angular";
 import ngAnimate from "angular-animate";
-import { attach, getIn } from "../../utils.js";
-import { actionCreators } from "../../actions/actions.js";
-import settingsWrapper from "./settings-wrapper.js";
-import * as viewSelectors from "../../selectors/view-selectors.js";
+import { attach, getIn } from "../utils.js";
+import { actionCreators } from "../actions/actions.js";
+import settingsWrapper from "../components/settings-wrapper.js";
+import * as viewSelectors from "../selectors/view-selectors.js";
 import { h } from "preact";
 
-import * as srefUtils from "../../sref-utils.js";
+import * as srefUtils from "../sref-utils.js";
 
 import "style/_signup.scss";
 
