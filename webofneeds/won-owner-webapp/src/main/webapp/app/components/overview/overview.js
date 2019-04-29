@@ -5,7 +5,6 @@ import angular from "angular";
 import ngAnimate from "angular-animate";
 import { attach, getIn, get, delay, sortByDate } from "../../utils.js";
 import { connect2Redux } from "../../won-utils.js";
-import won from "../../won-es6.js";
 import { actionCreators } from "../../actions/actions.js";
 import postMessagesModule from "../post-messages.js";
 import atomCardModule from "../atom-card.js";
@@ -26,7 +25,6 @@ class Controller {
     attach(this, serviceDependencies, arguments);
     this.selection = 0;
     window.overview4dbg = this;
-    this.WON = won.WON;
 
     const selectFromState = state => {
       const viewAtomUri = generalSelectors.getViewAtomUriFromRoute(state);
