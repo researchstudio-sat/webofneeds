@@ -44,12 +44,12 @@
 
 ###  http://example.com/won/ext/hold#MyConcreteHoldableSocket
 <http://example.com/won/ext/hold#MyConcreteHoldableSocket> rdf:type owl:NamedIndividual ;
-                                                           won:socketDefinition :HoldableSocketDefinition .
+                                                           won:socketDefinition :HoldableSocket .
 
 
 ###  http://example.com/won/ext/hold#MyConcreteHolderSocket
 <http://example.com/won/ext/hold#MyConcreteHolderSocket> rdf:type owl:NamedIndividual ;
-                                                         won:socketDefinition :HolderSocketDefinition .
+                                                         won:socketDefinition :HolderSocket .
 
 
 ###  https://w3id.org/won/ext/hold#HoldableSocket
@@ -57,7 +57,7 @@
                          won:SocketDefinition ;
                 rdfs:comment "An Atom uses a Socket with this configuration to connect to the Persona Atom that holds it."@en ;
                 won:autoOpen "false"^^xsd:boolean ;
-                won:compatibleSocketDefinition :HolderSocketDefinition ;
+                won:compatibleSocketDefinition :HolderSocket ;
                 won:derivesAtomProperty :holds ;
                 won:socketCapacity 1 .
 
@@ -67,7 +67,7 @@
                        won:SocketDefinition ;
               rdfs:comment "A Persona Atom uses a Socket with this configuration to connect to Atoms it holds."@en ;
               won:autoOpen "false"^^xsd:boolean ;
-              won:compatibleSocketDefinition :HoldableSocketDefinition ;
+              won:compatibleSocketDefinition :HoldableSocket ;
               won:derivesAtomProperty :heldBy .
 
 
