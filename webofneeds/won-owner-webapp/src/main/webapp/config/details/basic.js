@@ -316,11 +316,11 @@ export const sockets = {
   multiSelect: true,
   options: [
     {
-      value: { "#chatSocket": "won:ChatSocket" },
+      value: { "#chatSocket": "chat:ChatSocket" },
       label: "ChatSocket",
     },
     {
-      value: { "#groupSocket": "won:GroupSocket" },
+      value: { "#groupSocket": "group:GroupSocket" },
       label: "GroupSocket",
     },
     {
@@ -332,7 +332,7 @@ export const sockets = {
       label: "HoldableSocket",
     },
     {
-      value: { "#reviewSocket": "won:ReviewSocket" },
+      value: { "#reviewSocket": "review:ReviewSocket" },
       label: "ReviewSocket",
     },
   ],
@@ -360,7 +360,10 @@ export const sockets = {
     if (wonHasSockets) {
       if (Immutable.List.isList(wonHasSockets)) {
         wonHasSockets.map(socket => {
-          sockets = sockets.set(get(socket, "@id"), get(socket, "won:socketDefinition"));
+          sockets = sockets.set(
+            get(socket, "@id"),
+            get(socket, "won:socketDefinition")
+          );
         });
         if (sockets.size > 0) {
           return sockets;

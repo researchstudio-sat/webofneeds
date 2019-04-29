@@ -31,11 +31,11 @@ export const labels = deepFreeze({
     [won.WON.UsedForTestingCompacted]: "Used For Testing",
   },
   sockets: {
-    [won.WON.GroupSocketCompacted]: "Group Chat enabled",
-    [won.WON.ChatSocketCompacted]: "Chat enabled",
+    [won.GROUP.GroupSocketCompacted]: "Group Chat enabled",
+    [won.CHAT.ChatSocketCompacted]: "Chat enabled",
     [won.HOLD.HoldableSocketCompacted]: "Holdable",
     [won.HOLD.HolderSocketCompacted]: "Holder",
-    [won.WON.ReviewSocketCompacted]: "Review enabled",
+    [won.REVIEW.ReviewSocketCompacted]: "Review enabled",
   },
 });
 

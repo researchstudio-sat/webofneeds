@@ -106,5 +106,4 @@ public class SendMessageFromNodeGroupSocketImpl extends AbstractCamelProcessor {
             }
         }
     }
-
 }

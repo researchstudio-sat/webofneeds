@@ -22,10 +22,10 @@ export const cyclingPlan = {
         title: "Let's go for a bike ride!",
         eventObject: "http://dbpedia.org/resource/Cycling",
         sockets: {
-          "#groupSocket": won.WON.GroupSocketCompacted,
+          "#groupSocket": won.GROUP.GroupSocketCompacted,
           "#holdableSocket": won.HOLD.HoldableSocketCompacted,
         },
-        defaultSocket: { "#groupSocket": won.WON.GroupSocketCompacted },
+        defaultSocket: { "#groupSocket": won.GROUP.GroupSocketCompacted },
       },
       seeks: {},
     }),

@@ -382,12 +382,12 @@ export function addConnectionToLoad(state, atomUri, conn) {
     !!storedAtom.getIn(["connections", conn.get("connectionUri")]);
 
   const socketTypeToCompacted = socketType => {
-    if (socketType === won.WON.ChatSocket) {
-      return won.WON.ChatSocketCompacted;
-    } else if (socketType === won.WON.GroupSocket) {
-      return won.WON.GroupSocketCompacted;
-    } else if (socketType === won.WON.ReviewSocket) {
-      return won.WON.ReviewSocketCompacted;
+    if (socketType === won.CHAT.ChatSocket) {
+      return won.CHAT.ChatSocketCompacted;
+    } else if (socketType === won.GROUP.GroupSocket) {
+      return won.GROUP.GroupSocketCompacted;
+    } else if (socketType === won.REVIEW.ReviewSocket) {
+      return won.REVIEW.ReviewSocketCompacted;
     } else if (socketType === won.HOLD.HolderSocket) {
       return won.HOLD.HolderSocketCompacted;
     } else if (socketType === won.HOLD.HoldableSocket) {
