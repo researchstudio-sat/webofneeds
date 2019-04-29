@@ -57,11 +57,11 @@
                                                    ] ] .
     
     <https://192.168.124.49:8443/won/resource/atom/cbfgi37je6kr#chatSocket>
-            a       won:ChatSocket .
+            won:socketDefinition       won:ChatSocket .
     <https://192.168.124.49:8443/won/resource/atom/cbfgi37je6kr#groupSocket1>
-            a       won:GroupSocket .
+            won:socketDefinition       won:GroupSocket .
     <https://192.168.124.49:8443/won/resource/atom/cbfgi37je6kr#groupSocket2>
-            a       won:GroupSocket .
+            won:socketDefinition       won:GroupSocket .
 }
 
 <https://192.168.124.49:8443/won/resource/event/tb06f3a5l8vw#envelope-sig> {
