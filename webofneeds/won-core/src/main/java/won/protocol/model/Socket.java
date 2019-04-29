@@ -45,16 +45,6 @@ public class Socket {
         return atomURI;
     }
 
-    /**
-     * Not safe to use unless we know the typeURI is a known socket type. Use
-     * getTypeURI instead.
-     * 
-     * @Deprecated
-     */
-    public SocketType getSocketType() {
-        return SocketType.getSocketType(typeURI);
-    }
-
     public void setAtomURI(URI atomURI) {
         this.atomURI = atomURI;
     }

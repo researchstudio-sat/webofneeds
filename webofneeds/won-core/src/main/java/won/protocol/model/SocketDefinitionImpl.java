@@ -8,8 +8,7 @@ import java.util.Set;
 
 public class SocketDefinitionImpl implements SocketDefinition {
     private final URI socketURI;
-    private Set<URI> socketTypes = new HashSet<>();
-    private Set<URI> configurationUris = new HashSet<>();
+    private Optional<URI> socketDefinition = Optional.empty();
     private Set<URI> derivationProperties = new HashSet<>();
     private Set<URI> compatibleSocketTypes = new HashSet<>();
     private Optional<Boolean> autoOpen = Optional.empty();
@@ -25,9 +24,8 @@ public class SocketDefinitionImpl implements SocketDefinition {
         return socketURI;
     }
 
-    @Override
-    public Collection<URI> getSocketTypes() {
-        return socketTypes;
+    public Optional<URI> getSocketDefinitionURI() {
+        return socketDefinition;
     }
 
     @Override
@@ -37,9 +35,18 @@ public class SocketDefinitionImpl implements SocketDefinition {
 
     @Override
     public boolean isCompatibleWith(SocketDefinition other) {
-        return compatibleSocketTypes.stream().anyMatch(compatible -> other.getSocketTypes().contains(compatible))
-                        && other.compatibleTypes().stream()
-                                        .anyMatch(compatible -> this.getSocketTypes().contains(compatible));
+        boolean selfIsUnrestricted = true;
+        boolean otherIsUnrestricted = true;
+        if (this.compatibleSocketTypes.isEmpty()) {
+            selfIsUnrestricted = false;
+        }
+        if (other.compatibleTypes().isEmpty()) {
+            otherIsUnrestricted = false;
+        }
+        return (selfIsUnrestricted || other.getSocketDefinitionURI().isPresent()
+                        && this.compatibleSocketTypes.contains(other.getSocketDefinitionURI().get()))
+                        && (otherIsUnrestricted || this.getSocketDefinitionURI().isPresent()
+                                        && other.compatibleTypes().contains(this.getSocketDefinitionURI().get()));
     }
 
     @Override
@@ -86,22 +93,8 @@ public class SocketDefinitionImpl implements SocketDefinition {
         this.capacity = capacity;
     }
 
-    public void setSocketTypes(Set<URI> socketTypes) {
-        this.socketTypes = socketTypes;
-    }
-
     public void addInconsistentProperty(URI property) {
         this.inconsistentProperties.add(property);
-    }
-
-    public void setConfigurationURIs(Collection<URI> configurationUris) {
-        this.configurationUris.clear();
-        this.configurationUris.addAll(configurationUris);
-    }
-
-    @Override
-    public Set<URI> getConfigurationURIs() {
-        return configurationUris;
     }
 
     @Override

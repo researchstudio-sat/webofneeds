@@ -1,7 +1,6 @@
 package won.protocol.model;
 
 import java.net.URI;
-import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
 
@@ -15,12 +14,7 @@ public interface SocketDefinition {
      * If this configuration is identified by a URI, returns it, otherwise, i.e. if
      * the configuration is specified via a blank node, returns Optional.empty.
      */
-    public Set<URI> getConfigurationURIs();
-
-    /**
-     * Returns the types of the socket.
-     */
-    public Collection<URI> getSocketTypes();
+    public Optional<URI> getSocketDefinitionURI();
 
     /**
      * Returns the set of derivation properties to be used for this type.

@@ -107,7 +107,4 @@ public class SendMessageFromNodeGroupSocketImpl extends AbstractCamelProcessor {
         }
     }
 
-    public SocketType getSocketType() {
-        return SocketType.GroupSocket;
-    }
 }

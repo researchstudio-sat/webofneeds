@@ -161,7 +161,7 @@ public class ReplaceAtomMessageProcessor extends AbstractCamelProcessor {
             Optional<URI> newSocketType = atomModelWrapper.getSocketType(socket.getSocketURI().toString())
                             .map(f -> URI.create(f));
             boolean typeChanged = newSocketType.isPresent()
-                            && !socket.getSocketType().getURI().equals(newSocketType.get());
+                            && !newSocketType.get().equals(socket.getTypeURI());
             if (typeChanged) {
                 // socket's type has changed
                 socket.setTypeURI(newSocketType.get());
