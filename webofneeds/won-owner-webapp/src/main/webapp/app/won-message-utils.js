@@ -636,7 +636,11 @@ export function fetchWhatsAround(
 
       dispatch({
         type: actionTypes.atoms.storeWhatsAround,
-        payload: Immutable.fromJS({ metaAtoms: atoms }),
+        payload: Immutable.fromJS({
+          metaAtoms: atoms,
+          location: location,
+          maxDistance: maxDistance,
+        }),
       });
       return atomUris;
     }

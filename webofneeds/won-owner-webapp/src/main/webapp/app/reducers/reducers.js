@@ -24,6 +24,7 @@ const initialOwnerState = Immutable.fromJS({
   lastWhatsNewUpdateTime: undefined,
   lastWhatsAroundUpdateTime: undefined,
   lastWhatsAroundLocation: undefined,
+  lastWhatsAroundMaxDistance: undefined,
 });
 
 const initialConfigState = Immutable.fromJS({ theme: { name: "current" } });
@@ -92,6 +93,9 @@ const reducers = {
 
       case actionTypes.atoms.storeWhatsAround: {
         const metaAtoms = action.payload.get("metaAtoms");
+        const location = action.payload.get("location");
+        const maxDistance = action.payload.get("maxDistance");
+
         let ownerMetaAtoms = owner.get("whatsAround");
 
         metaAtoms &&
@@ -107,6 +111,8 @@ const reducers = {
 
         return owner
           .set("whatsAround", ownerMetaAtoms)
+          .set("lastWhatsAroundMaxDistance", maxDistance)
+          .set("lastWhatsAroundLocation", location)
           .set("lastWhatsAroundUpdateTime", Date.now());
       }
 
