@@ -3,9 +3,8 @@
  */
 import angular from "angular";
 import ngAnimate from "angular-animate";
-import { attach, getIn, get, delay } from "../../utils.js";
+import { attach, getIn, get, delay, sortByDate } from "../../utils.js";
 import { connect2Redux } from "../../won-utils.js";
-import won from "../../won-es6.js";
 import { actionCreators } from "../../actions/actions.js";
 import postMessagesModule from "../post-messages.js";
 import atomCardModule from "../atom-card.js";
@@ -27,17 +26,26 @@ class Controller {
     attach(this, serviceDependencies, arguments);
     this.selection = 0;
     window.ownermap4dbg = this;
-    this.WON = won.WON;
 
     const selectFromState = state => {
       const viewAtomUri = generalSelectors.getViewAtomUriFromRoute(state);
       const viewConnUri = generalSelectors.getViewConnectionUriFromRoute(state);
 
-      const atomsWithLocation = getIn(state, ["owner", "whatsAround"]).filter(
-        metaAtom => atomUtils.hasLocation(metaAtom)
-      );
+      const whatsNewMetaAtoms = getIn(state, ["owner", "whatsAround"])
+        .filter(metaAtom => atomUtils.isActive(metaAtom))
+        .filter(metaAtom => !atomUtils.isSearchAtom(metaAtom))
+        .filter(metaAtom => !atomUtils.isDirectResponseAtom(metaAtom))
+        .filter(metaAtom => !atomUtils.isInvisibleAtom(metaAtom))
+        .filter(
+          (metaAtom, metaAtomUri) =>
+            !generalSelectors.isAtomOwned(state, metaAtomUri)
+        )
+        .filter(metaAtom => atomUtils.hasLocation(metaAtom));
 
-      const atomUrisArray = atomsWithLocation && [...atomsWithLocation.keys()];
+      const sortedVisibleAtoms = sortByDate(whatsNewMetaAtoms, "creationDate");
+      const sortedVisibleAtomUriArray = sortedVisibleAtoms && [
+        ...sortedVisibleAtoms.flatMap(visibleAtom => get(visibleAtom, "uri")),
+      ];
 
       const lastAtomUrisUpdateDate = getIn(state, [
         "owner",
@@ -52,15 +60,14 @@ class Controller {
         !lastAtomUrisUpdateDate && !isOwnerAtomUrisLoading;
 
       let locations = [];
-      atomsWithLocation &&
-        atomsWithLocation.map(atom => {
+      whatsNewMetaAtoms &&
+        whatsNewMetaAtoms.map(atom => {
           const atomLocation = atomUtils.getLocation(atom);
           locations.push(atomLocation);
         });
 
       return {
         locations,
-        atomsWithLocation,
         lastAtomUrisUpdateDate,
         friendlyLastAtomUrisUpdateTimestamp:
           lastAtomUrisUpdateDate &&
@@ -68,8 +75,10 @@ class Controller {
             generalSelectors.selectLastUpdateTime(state),
             lastAtomUrisUpdateDate
           ),
-        atomUrisArray,
-        atomUrisSize: atomsWithLocation ? atomsWithLocation.size : 0,
+        sortedVisibleAtomUriArray,
+        sortedVisibleAtomUriSize: sortedVisibleAtomUriArray
+          ? sortedVisibleAtomUriArray.length
+          : 0,
         isOwnerAtomUrisLoading,
         isOwnerAtomUrisToLoad,
         showSlideIns:
