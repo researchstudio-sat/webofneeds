@@ -140,6 +140,19 @@ app.run([
   $ngRedux => $ngRedux.dispatch(actionCreators.config__init()),
 ]);
 
+app.run([
+  "$ngRedux",
+  $ngRedux => {
+    navigator.permissions
+      .query({ name: "geolocation" })
+      .then(permissionStatus => {
+        if (permissionStatus && permissionStatus.state === "denied") {
+          return $ngRedux.dispatch(actionCreators.view__locationAccessDenied());
+        }
+      });
+  },
+]);
+
 app.run(runAccessControl);
 
 //check login status. TODO: this should actually be baked-in data (to avoid the extra roundtrip)

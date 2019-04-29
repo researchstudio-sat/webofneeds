@@ -31,7 +31,11 @@ class Controller {
       const viewAtomUri = generalSelectors.getViewAtomUriFromRoute(state);
       const viewConnUri = generalSelectors.getViewConnectionUriFromRoute(state);
 
-      const whatsAroundLocation = getIn(state, [
+      const isLocationAccessDenied = generalSelectors.isLocationAccessDenied(
+        state
+      );
+
+      const currentLocation = getIn(state, [
         "owner",
         "lastWhatsAroundLocation",
       ]);
@@ -53,7 +57,7 @@ class Controller {
         .filter(metaAtom => {
           const distanceFrom = atomUtils.getDistanceFrom(
             metaAtom,
-            whatsAroundLocation
+            currentLocation
           );
           if (distanceFrom) {
             return distanceFrom <= whatsAroundMaxDistance;
@@ -63,7 +67,7 @@ class Controller {
 
       const sortedVisibleAtoms = atomUtils.sortByDistanceFrom(
         whatsNewMetaAtoms,
-        whatsAroundLocation
+        currentLocation
       );
       const sortedVisibleAtomUriArray = sortedVisibleAtoms && [
         ...sortedVisibleAtoms.flatMap(visibleAtom => get(visibleAtom, "uri")),
@@ -89,6 +93,8 @@ class Controller {
         });
 
       return {
+        isLocationAccessDenied,
+        currentLocation,
         locations,
         lastAtomUrisUpdateDate,
         friendlyLastAtomUrisUpdateTimestamp:
@@ -122,34 +128,8 @@ class Controller {
   }
 
   ensureAtomUrisLoaded() {
-    if (this.isOwnerAtomUrisToLoad) {
-      if ("geolocation" in navigator) {
-        navigator.geolocation.getCurrentPosition(
-          currentLocation => {
-            const lat = currentLocation.coords.latitude;
-            const lng = currentLocation.coords.longitude;
-
-            this.atoms__fetchWhatsAround(undefined, { lat, lng }, 5000);
-          },
-          error => {
-            //error handler
-            console.error(
-              "Could not retrieve geolocation due to error: ",
-              error.code,
-              ", continuing map initialization without currentLocation. fullerror:",
-              error
-            );
-            console.error("LOCATION COULD NOT BE RETRIEVED");
-          },
-          {
-            //options
-            enableHighAccuracy: true,
-            maximumAge: 30 * 60 * 1000, //use if cache is not older than 30min
-          }
-        );
-      } else {
-        console.error("LOCATION COULD NOT BE RETRIEVED");
-      }
+    if (this.isOwnerAtomUrisToLoad && this.currentLocation) {
+      this.atoms__fetchWhatsAround(undefined, this.currentLocation, 5000);
     }
   }
 
@@ -180,6 +160,10 @@ class Controller {
               error
             );
             console.error("LOCATION COULD NOT BE RETRIEVED");
+            if (error.code == 1) {
+              console.error("User Denied access");
+            }
+            this.view__locationAccessDenied();
           },
           {
             //options
@@ -189,6 +173,7 @@ class Controller {
         );
       } else {
         console.error("LOCATION COULD NOT BE RETRIEVED");
+        this.view__locationAccessDenied();
       }
     }
   }

@@ -11,7 +11,20 @@
 <won-toasts></won-toasts>
 <won-slide-in ng-if="self.showSlideIns"></won-slide-in>
 <main class="ownermap">
-    <div class="ownermap__header">
+    <div class="ownermap__deniedlocation" ng-if="self.isLocationAccessDenied">
+        <svg class="ownermap__deniedlocation__icon">
+            <use xlink:href="#ico16_indicator_error" href="#ico16_indicator_error"></use>
+        </svg>
+        <div class="ownermap__deniedlocation__label">You prohibit us from retrieving your location, so we won't be able to show you what's around. If you want to change that, grant access to the location in your browser and reload the page.</div>
+    </div>
+    <div class="ownermap__nolocation" ng-if="!self.currentLocation && !self.isLocationAccessDenied">
+        <svg class="ownermap__nolocation__icon">
+            <use xlink:href="#ico36_detail_location" href="#ico36_detail_location"></use>
+        </svg>
+        <div class="ownermap__nolocation__label">You did not grant location access yet. <span class="show-in-responsive">Tap</span><span class="hide-in-responsive">Click</span> the button below and accept the location access to see what is going on around you.</div>
+        <div class="ownermap__nolocation__button won-button--filled red" ng-click="self.reload()">See What's Around</div>
+    </div>
+    <div class="ownermap__header" ng-if="self.currentLocation && !self.isLocationAccessDenied">
         <div class="ownermap__header__title">
             What's around? <span class="ownermap__header__title__count" ng-if="!self.isOwnerAtomUrisLoading">({{ self.sortedVisibleAtomUriSize }})</span>
         </div>
@@ -27,9 +40,9 @@
             </div>
         </div>
     </div>
-    <won-atom-map class="ownermap__map hide-in-responsive" locations="self.locations" add-current-location ng-if="!self.isOwnerAtomUrisToLoad">
+    <won-atom-map class="ownermap__map hide-in-responsive" locations="self.locations" add-current-location ng-if="!self.isOwnerAtomUrisToLoad && self.currentLocation && !self.isLocationAccessDenied">
     </won-atom-map>
-    <div class="ownermap__content">
+    <div class="ownermap__content" ng-if="self.currentLocation && !self.isLocationAccessDenied">
         <won-atom-card class="ownermap__content__atom" atom-uri="atomUri" ng-repeat="atomUri in self.sortedVisibleAtomUriArray track by atomUri"></won-atom-card>
     </div>
 </main>

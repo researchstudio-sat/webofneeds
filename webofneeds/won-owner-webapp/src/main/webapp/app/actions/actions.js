@@ -377,6 +377,8 @@ const actionHierarchy = {
     clearLoginError: INJ_DEFAULT,
     clearRegisterError: INJ_DEFAULT,
 
+    locationAccessDenied: INJ_DEFAULT,
+
     anonymousSlideIn: {
       show: INJ_DEFAULT,
       hide: INJ_DEFAULT,

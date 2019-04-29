@@ -49,6 +49,28 @@ main.ownermap {
     }
   }
 
+  .ownermap__deniedlocation,
+  .ownermap__nolocation {
+    display: grid;
+    padding: 1rem;
+    justify-items: center;
+
+    &__label {
+      margin-top: 1rem;
+      max-width: 25rem;
+      text-align: center;
+    }
+
+    &__icon {
+      --local-primary: #{$won-disabled-color};
+    }
+
+    &__button {
+      margin-top: 1rem;
+      padding: 0.5rem;
+    }
+  }
+
   .ownermap__map {
     display: block;
     height: 50vh;
