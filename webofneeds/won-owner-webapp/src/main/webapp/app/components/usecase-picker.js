@@ -6,13 +6,11 @@ import ngAnimate from "angular-animate";
 import labelledHrModule from "./labelled-hr.js";
 
 import "ng-redux";
+import Immutable from "immutable";
 import { attach, get } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { connect2Redux } from "../won-utils.js";
-import {
-  selectIsConnected,
-  getUseCaseGroupFromRoute,
-} from "../selectors/general-selectors.js";
+import * as generalSelectors from "../selectors/general-selectors.js";
 import * as useCaseUtils from "../usecase-utils.js";
 import * as accountUtils from "../account-utils.js";
 
@@ -45,14 +43,14 @@ function genComponentConf() {
         <!-- WHAT'S AROUND -->
         <div class="ucp__createx">
             <button class="won-button--filled red ucp__createx__button"
-                    ng-click="self.router__stateGo('map')">
+                    ng-click="self.viewWhatsAround()">
                 <svg class="won-button-icon" style="--local-primary:white;">
                     <use xlink:href="#ico36_location_current" href="#ico36_location_current"></use>
                 </svg>
                 <span>What's in your Area?</span>
             </button>
             <button class="won-button--filled red ucp__createx__button"
-                    ng-click="self.router__stateGo('overview')">
+                    ng-click="self.viewWhatsNew()">
                 <span>What's new?</span>
             </button>
 
@@ -151,9 +149,12 @@ function genComponentConf() {
         const showGroupsThreshold = 1; // only show groups with more than 1 use case(s) as groups
 
         return {
+          isLocationAccessDenied: generalSelectors.isLocationAccessDenied(
+            state
+          ),
           loggedIn: accountUtils.isLoggedIn(get(state, "account")),
-          showAll: getUseCaseGroupFromRoute(state) === "all",
-          connectionHasBeenLost: !selectIsConnected(state),
+          showAll: generalSelectors.getUseCaseGroupFromRoute(state) === "all",
+          connectionHasBeenLost: !generalSelectors.selectIsConnected(state),
           useCaseGroups: useCaseUtils.getUseCaseGroups(),
           customUseCase: useCaseUtils.getCustomUseCase(),
           showGroupsThreshold,
@@ -248,6 +249,56 @@ function genComponentConf() {
         );
       }
       return this._searchInput;
+    }
+
+    viewWhatsAround() {
+      this.viewWhatsX(() => {
+        this.router__stateGo("map");
+      });
+    }
+
+    viewWhatsNew() {
+      this.viewWhatsX(() => {
+        this.router__stateGo("overview");
+      });
+    }
+
+    viewWhatsX(callback) {
+      if (this.isLocationAccessDenied) {
+        callback();
+      } else if ("geolocation" in navigator) {
+        navigator.geolocation.getCurrentPosition(
+          currentLocation => {
+            const lat = currentLocation.coords.latitude;
+            const lng = currentLocation.coords.longitude;
+
+            this.view__updateCurrentLocation(
+              Immutable.fromJS({ location: { lat, lng } })
+            );
+            callback();
+          },
+          error => {
+            //error handler
+            console.error(
+              "Could not retrieve geolocation due to error: ",
+              error.code,
+              ", continuing map initialization without currentLocation. fullerror:",
+              error
+            );
+            this.view__locationAccessDenied();
+            callback();
+          },
+          {
+            //options
+            enableHighAccuracy: true,
+            maximumAge: 30 * 60 * 1000, //use if cache is not older than 30min
+          }
+        );
+      } else {
+        console.error("LOCATION COULD NOT BE RETRIEVED");
+        this.view__locationAccessDenied();
+        callback();
+      }
     }
   }
 

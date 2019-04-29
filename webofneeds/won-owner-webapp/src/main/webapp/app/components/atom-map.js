@@ -42,50 +42,25 @@ function genComponentConf() {
         : {};
 
       this.map = initLeaflet(this.mapMount(), overrideOptions);
-      this.addCurrentLocation = this.$element[0].hasAttribute(
-        "add-current-location"
-      );
 
-      this.$scope.$watch("self.locations", newLocations => {
-        if (newLocations) {
-          if (this.addCurrentLocation && "geolocation" in navigator) {
-            navigator.geolocation.getCurrentPosition(
-              currentLocation => {
-                const lat = currentLocation.coords.latitude;
-                const lng = currentLocation.coords.longitude;
-
-                this.updateMap(newLocations, [lat, lng]);
-                this._mapHasBeenAutoCentered = true;
-              },
-              error => {
-                //error handler
-                console.error(
-                  "Could not retrieve geolocation due to error: ",
-                  error.code,
-                  ", continuing map initialization without currentLocation. fullerror:",
-                  error
-                );
-                this.updateMap(newLocations);
-                this._mapHasBeenAutoCentered = true;
-              },
-              {
-                //options
-                enableHighAccuracy: true,
-                maximumAge: 30 * 60 * 1000, //use if cache is not older than 30min
-              }
-            );
-          } else {
-            this.updateMap(newLocations);
-            this._mapHasBeenAutoCentered = true;
-          }
+      this.$scope.$watchGroup(
+        ["self.locations", "self.currentLocation"],
+        newValues => {
+          this.updateMap(newValues[0]);
+          this._mapHasBeenAutoCentered = true;
         }
-      });
+      );
 
       const selectFromState = () => {
         return {};
       };
 
-      connect2Redux(selectFromState, actionCreators, ["self.locations"], this);
+      connect2Redux(
+        selectFromState,
+        actionCreators,
+        ["self.locations", "self.currentLocation"],
+        this
+      );
     }
 
     mapInView(inviewInfo) {
@@ -94,7 +69,9 @@ function genComponentConf() {
       }
     }
 
-    updateMap(locations, currentLatLng) {
+    updateMap(locations) {
+      console.debug("locations: ", locations);
+      console.debug("currentLocation: ", this.currentLocation);
       let markedLocations = [];
 
       for (let location of locations) {
@@ -106,11 +83,11 @@ function genComponentConf() {
         markedLocations.push(location);
       }
 
-      if (markedLocations.length === 0 && !this.addCurrentLocation) {
+      if (markedLocations.length === 0 && !this.currentLocation) {
         console.warn("no markers set for locations: ", locations);
         return;
       }
-      this.placeMarkers(markedLocations, currentLatLng);
+      this.placeMarkers(markedLocations);
 
       if (this.markers.length === 0) {
         console.warn("no map coordinates found for locations: ", locations);
@@ -121,13 +98,13 @@ function genComponentConf() {
         L.featureGroup(this.markers)
           .getBounds()
           .pad(0.5),
-        this.addCurrentLocation ? {} : { maxZoom: 14 }
+        this.currentLocation ? {} : { maxZoom: 14 }
       );
 
       this.mapAlreadyInitialized = true;
     }
 
-    placeMarkers(locations, currentLatLng) {
+    placeMarkers(locations) {
       if (this.markers) {
         //remove previously placed markers
         for (let m of this.markers) {
@@ -139,13 +116,20 @@ function genComponentConf() {
         location => L.marker([location.get("lat"), location.get("lng")]) //.bindPopup(location.name)
       );
 
-      if (currentLatLng) {
+      if (
+        this.currentLocation &&
+        this.currentLocation.get("lat") &&
+        this.currentLocation.get("lng")
+      ) {
         const currentLocationMarkerIcon = L.divIcon({
           className: "wonCurrentLocationMarkerIcon",
         });
 
         this.markers.push(
-          L.marker(currentLatLng, { icon: currentLocationMarkerIcon })
+          L.marker(
+            [this.currentLocation.get("lat"), this.currentLocation.get("lng")],
+            { icon: currentLocationMarkerIcon }
+          )
         );
       }
 
@@ -170,6 +154,7 @@ function genComponentConf() {
     template: template,
     scope: {
       locations: "=",
+      currentLocation: "=",
     },
   };
 }

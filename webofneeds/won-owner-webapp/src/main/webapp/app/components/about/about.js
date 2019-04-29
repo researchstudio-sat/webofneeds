@@ -1,4 +1,5 @@
 import angular from "angular";
+import Immutable from "immutable";
 import ngAnimate from "angular-animate";
 import compareToModule from "../../directives/compareTo.js";
 import accordionModule from "../accordion.js";
@@ -7,7 +8,7 @@ import { attach, get, getIn, toAbsoluteURL } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
 import { ownerBaseUrl } from "config";
 import * as srefUtils from "../../sref-utils.js";
-import { getAboutSectionFromRoute } from "../../selectors/general-selectors.js";
+import * as generalSelectors from "../../selectors/general-selectors.js";
 import * as viewSelectors from "../../selectors/view-selectors.js";
 import * as accountUtils from "../../account-utils.js";
 
@@ -196,9 +197,10 @@ class AboutController {
     window.ab4dbg = this;
 
     const select = state => {
-      const visibleSection = getAboutSectionFromRoute(state);
+      const visibleSection = generalSelectors.getAboutSectionFromRoute(state);
       const themeName = getIn(state, ["config", "theme", "name"]);
       return {
+        isLocationAccessDenied: generalSelectors.isLocationAccessDenied(state),
         loggedIn: accountUtils.isLoggedIn(get(state, "account")),
         themeName,
         visibleSection,
@@ -251,6 +253,56 @@ class AboutController {
 
   getSvgIconFromItem(item) {
     return item.svgSrc ? item.svgSrc : "#ico36_uc_question";
+  }
+
+  viewWhatsAround() {
+    this.viewWhatsX(() => {
+      this.router__stateGo("map");
+    });
+  }
+
+  viewWhatsNew() {
+    this.viewWhatsX(() => {
+      this.router__stateGo("overview");
+    });
+  }
+
+  viewWhatsX(callback) {
+    if (this.isLocationAccessDenied) {
+      callback();
+    } else if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        currentLocation => {
+          const lat = currentLocation.coords.latitude;
+          const lng = currentLocation.coords.longitude;
+
+          this.view__updateCurrentLocation(
+            Immutable.fromJS({ location: { lat, lng } })
+          );
+          callback();
+        },
+        error => {
+          //error handler
+          console.error(
+            "Could not retrieve geolocation due to error: ",
+            error.code,
+            ", continuing map initialization without currentLocation. fullerror:",
+            error
+          );
+          this.view__locationAccessDenied();
+          callback();
+        },
+        {
+          //options
+          enableHighAccuracy: true,
+          maximumAge: 30 * 60 * 1000, //use if cache is not older than 30min
+        }
+      );
+    } else {
+      console.error("LOCATION COULD NOT BE RETRIEVED");
+      this.view__locationAccessDenied();
+      callback();
+    }
   }
 }
 

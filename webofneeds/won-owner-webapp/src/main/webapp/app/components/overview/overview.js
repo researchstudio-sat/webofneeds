@@ -55,6 +55,7 @@ class Controller {
         !lastAtomUrisUpdateDate && !isOwnerAtomUrisLoading;
 
       return {
+        currentLocation: generalSelectors.getCurrentLocation(state),
         lastAtomUrisUpdateDate,
         friendlyLastAtomUrisUpdateTimestamp:
           lastAtomUrisUpdateDate &&

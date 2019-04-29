@@ -41,7 +41,7 @@ class Controller {
         state
       );
 
-      const currentLocation = getIn(state, [
+      const lastWhatsAroundLocation = getIn(state, [
         "owner",
         "lastWhatsAroundLocation",
       ]);
@@ -63,7 +63,7 @@ class Controller {
         .filter(metaAtom => {
           const distanceFrom = atomUtils.getDistanceFrom(
             metaAtom,
-            currentLocation
+            lastWhatsAroundLocation
           );
           if (distanceFrom) {
             return distanceFrom <= whatsAroundMaxDistance;
@@ -73,7 +73,7 @@ class Controller {
 
       const sortedVisibleAtoms = atomUtils.sortByDistanceFrom(
         whatsNewMetaAtoms,
-        currentLocation
+        lastWhatsAroundLocation
       );
       const sortedVisibleAtomUriArray = sortedVisibleAtoms && [
         ...sortedVisibleAtoms.flatMap(visibleAtom => get(visibleAtom, "uri")),
@@ -100,7 +100,7 @@ class Controller {
 
       return {
         isLocationAccessDenied,
-        currentLocation,
+        lastWhatsAroundLocation,
         locations,
         lastAtomUrisUpdateDate,
         friendlyLastAtomUrisUpdateTimestamp:
@@ -135,27 +135,31 @@ class Controller {
     );
 
     this.$scope.$watch(
-      () => this.currentLocation,
-      () => delay(0).then(() => this.getCurrentLocationName())
+      () => this.lastWhatsAroundLocation,
+      () => delay(0).then(() => this.getLastWhatsAroundLocationName())
     );
   }
 
   ensureAtomUrisLoaded() {
-    if (this.isOwnerAtomUrisToLoad && this.currentLocation) {
-      this.atoms__fetchWhatsAround(undefined, this.currentLocation, 5000);
+    if (this.isOwnerAtomUrisToLoad && this.lastWhatsAroundLocation) {
+      this.atoms__fetchWhatsAround(
+        undefined,
+        this.lastWhatsAroundLocation,
+        5000
+      );
     }
   }
 
-  getCurrentLocationName() {
-    if (this.currentLocation) {
+  getLastWhatsAroundLocationName() {
+    if (this.lastWhatsAroundLocation) {
       reverseSearchNominatim(
-        this.currentLocation.get("lat"),
-        this.currentLocation.get("lng"),
+        this.lastWhatsAroundLocation.get("lat"),
+        this.lastWhatsAroundLocation.get("lng"),
         13
       ).then(searchResult => {
         const displayName = searchResult.display_name;
         this.$scope.$apply(() => {
-          this.currentLocationName = displayName;
+          this.lastWhatsAroundLocationName = displayName;
         });
       });
     }

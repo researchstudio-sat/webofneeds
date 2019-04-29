@@ -28,7 +28,7 @@
         </div>
     </div>
     <div class="owneroverview__content" ng-if="self.hasVisibleAtomUris">
-        <won-atom-card class="owneroverview__content__atom" atom-uri="atomUri" ng-repeat="atomUri in self.sortedVisibleAtomUriArray track by atomUri"></won-atom-card>
+        <won-atom-card class="owneroverview__content__atom" atom-uri="atomUri" current-location="self.currentLocation" ng-repeat="atomUri in self.sortedVisibleAtomUriArray track by atomUri"></won-atom-card>
     </div>
     <div class="owneroverview__noresults" ng-if="!self.hasVisibleAtomUris">
         <span class="owneroverview__noresults__label">Nothing new found.</span>

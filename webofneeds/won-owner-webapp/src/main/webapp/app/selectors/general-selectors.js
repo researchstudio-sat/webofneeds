@@ -284,3 +284,8 @@ export function isLocationAccessDenied(state) {
   const viewState = get(state, "view");
   return viewState && viewUtils.isLocationAccessDenied(viewState);
 }
+
+export function getCurrentLocation(state) {
+  const viewState = get(state, "view");
+  return viewState && viewUtils.getCurrentLocation(viewState);
+}
