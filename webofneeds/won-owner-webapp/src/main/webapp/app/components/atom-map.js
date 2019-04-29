@@ -99,6 +99,8 @@ function genComponentConf() {
     }
 
     updateMap(locations, currentLatLng) {
+      if (!locations) return;
+
       let markedLocations = [];
 
       for (let location of locations) {
@@ -111,16 +113,13 @@ function genComponentConf() {
       }
 
       if (markedLocations.length === 0) {
-        console.warn("no markers set for locations: ", locations.toJS());
+        console.warn("no markers set for locations: ", locations);
         return;
       }
       this.placeMarkers(markedLocations, currentLatLng);
 
       if (this.markers.length === 0) {
-        console.warn(
-          "no map coordinates found for locations: ",
-          locations.toJS()
-        );
+        console.warn("no map coordinates found for locations: ", locations);
         return;
       }
 
