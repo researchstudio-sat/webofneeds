@@ -1,5 +1,6 @@
 module ForgotPassword exposing (main)
 
+import Basics
 import Browser.Events exposing (onResize)
 import Element exposing (..)
 import Element.Background as Background
@@ -9,6 +10,7 @@ import Element.Input as Input
 import Elements
 import Html exposing (Html)
 import Http
+import Json.Decode as Decode
 import Json.Encode as Encode
 import Old.Skin as Skin exposing (Skin)
 
@@ -31,6 +33,7 @@ type alias Model =
 type ResetState
     = EnteringCredentials
     | ResettingPassword
+    | ResetSuccessful
     | ResetFailed
 
 
@@ -38,6 +41,12 @@ type alias Credentials =
     { newPassword : String
     , email : String
     , recoveryKey : String
+    }
+
+
+type alias Response =
+    { code : Int
+    , message : String
     }
 
 
@@ -85,17 +94,24 @@ update msg model =
             case result of
                 Ok () ->
                     ( { model
-                        | resetState = ResettingPassword
+                        | resetState = ResetSuccessful
                       }
                     , Cmd.none
                     )
 
-                Err _ ->
+                Err err ->
                     ( { model
                         | resetState = ResetFailed
                       }
                     , Cmd.none
                     )
+
+
+decodeResponse : Decode.Decoder Response
+decodeResponse =
+    Decode.map2 Response
+        (Decode.field "code" Decode.int)
+        (Decode.field "message" Decode.string)
 
 
 updateMailString : String -> Model -> ( Model, Cmd Msg )
@@ -176,6 +192,18 @@ resetRequest credentials =
 
 progressView : Skin -> Model -> Element Msg
 progressView skin model =
+    el
+        [ width fill
+        , Background.color skin.lineGray
+        , Font.color Skin.white
+        , padding 20
+        ]
+    <|
+        text "Resetting Password..."
+
+
+changeFailedView : Skin -> Model -> Element Msg
+changeFailedView skin model =
     column
         [ width fill
         , spacing 20
@@ -183,29 +211,39 @@ progressView skin model =
         ]
         [ el
             [ width fill
-            , Background.color skin.lineGray
+            , Background.color skin.primaryColor
             , Font.color Skin.white
             , padding 20
             ]
           <|
-            text "Reset Request sent."
+            text "Could not reset password"
         , textColumn
             [ width fill ]
-            [ text "bla bla key here"
+            [ text "Reasons: Wrong email address/password/recovery key"
             ]
         ]
 
 
-changeFailedView : Skin -> Model -> Element Msg
-changeFailedView skin model =
-    el
+successView : Skin -> Model -> Element Msg
+successView skin model =
+    column
         [ width fill
-        , Background.color skin.primaryColor
-        , Font.color Skin.white
-        , padding 20
+        , spacing 20
+        , Font.size 16
         ]
-    <|
-        text "Reset request could not been send"
+        [ el
+            [ width fill
+            , Background.color skin.secondaryColorLighter
+            , Font.color Skin.white
+            , padding 20
+            ]
+          <|
+            text "Password reset successful"
+        , textColumn
+            [ width fill ]
+            [ text "Check your email account for your new Recovery Key"
+            ]
+        ]
 
 
 changeView : Skin -> Model -> Element Msg
@@ -220,7 +258,7 @@ changeView skin model =
             , spacing 10
             ]
             [ paragraph [ width fill ]
-                [ text "Reset your password here."
+                [ text "Reset your password here:"
                 ]
             ]
         , row
@@ -246,39 +284,10 @@ changeView skin model =
                             { left = 0
                             , top = 0
                             , bottom = 0
-                            , right = 60
+                            , right = 70
                             }
                         ]
                         (text "Email:")
-                }
-            ]
-        , row
-            [ spacing 10
-            ]
-            [ Input.text
-                [ width fill
-                , paddingEach
-                    { left = 0
-                    , top = 0
-                    , bottom = 0
-                    , right = 0
-                    }
-                ]
-                { onChange = RecoveryKeyChanged
-                , text = model.credentials.recoveryKey
-                , placeholder = Nothing
-                , label =
-                    Input.labelLeft
-                        [ centerY
-                        , Font.size 14
-                        , paddingEach
-                            { left = 0
-                            , top = 0
-                            , bottom = 0
-                            , right = 60
-                            }
-                        ]
-                        (text "Recovery Key:")
                 }
             ]
         , row
@@ -304,7 +313,7 @@ changeView skin model =
                             { left = 0
                             , top = 0
                             , bottom = 0
-                            , right = 60
+                            , right = 10
                             }
                         ]
                         (text "New Password:")
@@ -325,6 +334,35 @@ changeView skin model =
           else
             none
         , row
+            [ spacing 10
+            ]
+            [ Input.text
+                [ width fill
+                , paddingEach
+                    { left = 0
+                    , top = 0
+                    , bottom = 0
+                    , right = 0
+                    }
+                ]
+                { onChange = RecoveryKeyChanged
+                , text = model.credentials.recoveryKey
+                , placeholder = Nothing
+                , label =
+                    Input.labelLeft
+                        [ centerY
+                        , Font.size 14
+                        , paddingEach
+                            { left = 0
+                            , top = 0
+                            , bottom = 0
+                            , right = 20
+                            }
+                        ]
+                        (text "Recovery Key:")
+                }
+            ]
+        , row
             [ width fill
             , spacing 20
             ]
@@ -333,7 +371,20 @@ changeView skin model =
                 [ width <| maximum 320 fill
                 ]
                 { onPress =
-                    Just ResetButtonPressed
+                    if String.isEmpty model.credentials.newPassword then
+                        Nothing
+
+                    else if String.isEmpty model.credentials.email then
+                        Nothing
+
+                    else if String.isEmpty model.credentials.recoveryKey then
+                        Nothing
+
+                    else if String.length model.credentials.newPassword < 6 then
+                        Nothing
+
+                    else
+                        Just ResetButtonPressed
                 , label =
                     el
                         [ centerX
@@ -351,6 +402,7 @@ view skin model =
         el
             [ width <| maximum 800 fill
             , centerX
+            , padding 10
             ]
         <|
             case model.resetState of
@@ -359,6 +411,9 @@ view skin model =
 
                 ResettingPassword ->
                     progressView skin model
+
+                ResetSuccessful ->
+                    successView skin model
 
                 ResetFailed ->
                     changeFailedView skin model
