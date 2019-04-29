@@ -99,8 +99,6 @@ function genComponentConf() {
     }
 
     updateMap(locations, currentLatLng) {
-      if (!locations) return;
-
       let markedLocations = [];
 
       for (let location of locations) {
@@ -112,7 +110,7 @@ function genComponentConf() {
         markedLocations.push(location);
       }
 
-      if (markedLocations.length === 0) {
+      if (markedLocations.length === 0 && !this.addCurrentLocation) {
         console.warn("no markers set for locations: ", locations);
         return;
       }

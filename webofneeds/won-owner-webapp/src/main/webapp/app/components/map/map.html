@@ -26,7 +26,13 @@
     </div>
     <div class="ownermap__header" ng-if="self.currentLocation && !self.isLocationAccessDenied">
         <div class="ownermap__header__title">
-            What's around? <span class="ownermap__header__title__count" ng-if="!self.isOwnerAtomUrisLoading">({{ self.sortedVisibleAtomUriSize }})</span>
+            <span class="ownermap__header__title__label">What's around:</span>
+            <span class="ownermap__header__title__location">
+                <svg class="ownermap__header__title__location__icon">
+                    <use xlink:href="#ico36_detail_location" href="#ico36_detail_location"></use>
+                </svg>
+                <span class="ownermap__header__title__location__label">{{self.currentLocationName}}</span>
+            </span>
         </div>
         <div class="ownermap__header__loading" ng-if="self.isOwnerAtomUrisLoading">
             Loading...
@@ -42,8 +48,11 @@
     </div>
     <won-atom-map class="ownermap__map hide-in-responsive" locations="self.locations" add-current-location ng-if="!self.isOwnerAtomUrisToLoad && self.currentLocation && !self.isLocationAccessDenied">
     </won-atom-map>
-    <div class="ownermap__content" ng-if="self.currentLocation && !self.isLocationAccessDenied">
-        <won-atom-card class="ownermap__content__atom" atom-uri="atomUri" ng-repeat="atomUri in self.sortedVisibleAtomUriArray track by atomUri"></won-atom-card>
+    <div class="ownermap__content" ng-if="self.currentLocation && !self.isLocationAccessDenied && self.hasVisibleAtomUris">
+        <won-atom-card class="ownermap__content__atom" atom-uri="atomUri" ng-repeat="atomUri in self.sortedVisibleAtomUriArray track by atomUri" ng-if="self.hasVisibleAtomUris"></won-atom-card>
+    </div>
+    <div class="ownermap__noresults" ng-if="self.currentLocation && !self.isLocationAccessDenied && !self.hasVisibleAtomUris">
+        Nothing around this location, you can try another location by clicking on the location in the header.
     </div>
 </main>
 <won-footer></won-footer>

@@ -3,7 +3,13 @@
  */
 import angular from "angular";
 import ngAnimate from "angular-animate";
-import { attach, getIn, get, delay } from "../../utils.js";
+import {
+  attach,
+  getIn,
+  get,
+  delay,
+  reverseSearchNominatim,
+} from "../../utils.js";
 import { connect2Redux } from "../../won-utils.js";
 import { actionCreators } from "../../actions/actions.js";
 import postMessagesModule from "../post-messages.js";
@@ -104,6 +110,8 @@ class Controller {
             lastAtomUrisUpdateDate
           ),
         sortedVisibleAtomUriArray,
+        hasVisibleAtomUris:
+          sortedVisibleAtomUriArray && sortedVisibleAtomUriArray.length > 0,
         sortedVisibleAtomUriSize: sortedVisibleAtomUriArray
           ? sortedVisibleAtomUriArray.length
           : 0,
@@ -125,11 +133,31 @@ class Controller {
       () => this.isOwnerAtomUrisToLoad,
       () => delay(0).then(() => this.ensureAtomUrisLoaded())
     );
+
+    this.$scope.$watch(
+      () => this.currentLocation,
+      () => delay(0).then(() => this.getCurrentLocationName())
+    );
   }
 
   ensureAtomUrisLoaded() {
     if (this.isOwnerAtomUrisToLoad && this.currentLocation) {
       this.atoms__fetchWhatsAround(undefined, this.currentLocation, 5000);
+    }
+  }
+
+  getCurrentLocationName() {
+    if (this.currentLocation) {
+      reverseSearchNominatim(
+        this.currentLocation.get("lat"),
+        this.currentLocation.get("lng"),
+        13
+      ).then(searchResult => {
+        const displayName = searchResult.display_name;
+        this.$scope.$apply(() => {
+          this.currentLocationName = displayName;
+        });
+      });
     }
   }
 
