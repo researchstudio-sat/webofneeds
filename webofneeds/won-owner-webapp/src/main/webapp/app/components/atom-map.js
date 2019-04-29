@@ -110,17 +110,14 @@ function genComponentConf() {
         markedLocations.push(location);
       }
 
-      if (markedLocations.length === 0) {
-        console.warn("no markers set for locations: ", locations.toJS());
+      if (markedLocations.length === 0 && !this.addCurrentLocation) {
+        console.warn("no markers set for locations: ", locations);
         return;
       }
       this.placeMarkers(markedLocations, currentLatLng);
 
       if (this.markers.length === 0) {
-        console.warn(
-          "no map coordinates found for locations: ",
-          locations.toJS()
-        );
+        console.warn("no map coordinates found for locations: ", locations);
         return;
       }
 

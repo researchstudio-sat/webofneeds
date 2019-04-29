@@ -62,6 +62,9 @@ won.WON.ClosedCompacted = won.WON.prefix + ":Closed";
 won.WON.Inactive = won.WON.baseUri + "Inactive";
 won.WON.InactiveCompacted = won.WON.prefix + ":Inactive";
 
+won.WON.Deleted = won.WON.baseUri + "Deleted";
+won.WON.DeletedCompacted = won.WON.prefix + ":Deleted";
+
 won.WON.atomState = won.WON.baseUri + "atomState";
 won.WON.atomStateCompacted = won.WON.prefix + ":atomState";
 won.WON.socket = won.WON.baseUri + "socket";
@@ -134,7 +137,6 @@ won.WON.BasicAtomTypeCombined = won.WON.baseUri + "Combined";
 won.WON.BasicAtomTypeCombinedCompacted = won.WON.baseUri + ":Combined";
 won.WON.BasicAtomTypeCritique = won.WON.baseUri + "Critique";
 won.WON.BasicAtomTypeCritiqueCompacted = won.WON.prefix + ":Critique";
-won.WON.BasicAtomTypeWhatsAroundCompacted = won.WON.prefix + ":WhatsAround";
 won.WON.NoHintForCounterpartCompacted =
   won.WON.prefix + ":NoHintForCounterpart";
 won.WON.UsedForTestingCompacted = won.WON.prefix + ":UsedForTesting";

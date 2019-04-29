@@ -252,7 +252,7 @@ function genComponentConf() {
                 on-submit="::self.sendRequest(value, selectedPersona)"
                 allow-details="::false"
                 allow-empty-submit="::true"
-                show-personas="self.isOwnedAtomWhatsX"
+                show-personas="!self.connection"
                 submit-button-label="::'Ask&#160;to&#160;Chat'"
             >
             </chat-textfield>
@@ -312,8 +312,6 @@ function genComponentConf() {
         );
         const connection =
           ownedAtom && ownedAtom.getIn(["connections", selectedConnectionUri]);
-        const isOwnedAtomWhatsX =
-          ownedAtom && atomUtils.isWhatsAroundAtom(ownedAtom);
         const targetAtomUri = connection && connection.get("targetAtomUri");
         const targetAtom =
           targetAtomUri && state.getIn(["atoms", targetAtomUri]);
@@ -400,7 +398,6 @@ function genComponentConf() {
           targetAtomUri,
           selectedConnectionUri,
           connection,
-          isOwnedAtomWhatsX,
           hasReactionUseCases,
           reactionUseCasesArray: reactionUseCases && reactionUseCases.toArray(),
           hasEnabledUseCases,
@@ -890,13 +887,8 @@ function genComponentConf() {
     }
 
     sendRequest(message, persona) {
-      if (!this.connection || this.isOwnedAtomWhatsX) {
+      if (!this.connection) {
         this.router__stateGoResetParams("connections");
-
-        if (this.isOwnedAtomWhatsX) {
-          //Close the connection if there was a present connection for a whatsaround atom
-          this.connections__close(this.selectedConnectionUri);
-        }
 
         if (this.targetAtomUri) {
           this.connections__connectAdHoc(this.targetAtomUri, message, persona);

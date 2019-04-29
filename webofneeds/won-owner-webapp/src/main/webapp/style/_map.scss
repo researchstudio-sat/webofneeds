@@ -3,7 +3,7 @@
 @import "fonts";
 @import "flex-layout";
 
-main.owneroverview {
+main.ownermap {
   grid-column: 1 / -1;
   padding: 0;
   box-sizing: border-box;
@@ -12,7 +12,7 @@ main.owneroverview {
   width: 100%;
   margin: 0 auto;
 
-  & .owneroverview__header {
+  & .ownermap__header {
     @media (min-width: $responsivenessBreakPoint) {
       display: grid;
       grid-template-columns: 1fr min-content;
@@ -22,7 +22,25 @@ main.owneroverview {
       align-items: center;
 
       &__title {
+        display: flex;
         font-size: $mediumFontSize;
+
+        &__location {
+          display: flex;
+          align-items: center;
+          cursor: pointer;
+          color: $won-primary-color;
+          --local-primary: #{$won-primary-color};
+
+          &:hover {
+            color: $won-primary-color-light;
+            --local-primary: #{$won-primary-color-light};
+          }
+
+          &__icon {
+            @include fixed-square($mediumFontSize);
+          }
+        }
       }
 
       &__updated {
@@ -49,6 +67,7 @@ main.owneroverview {
         }
       }
     }
+
     @media (max-width: $responsivenessBreakPoint) {
       display: grid;
       grid-template-columns: 1fr;
@@ -59,7 +78,28 @@ main.owneroverview {
       align-items: center;
 
       &__title {
+        display: flex;
+        flex-direction: column;
         font-size: $normalFontSize;
+
+        &__location {
+          display: flex;
+          align-items: flex-start;
+          margin-top: 0.3rem;
+          cursor: pointer;
+          color: $won-primary-color;
+          --local-primary: #{$won-primary-color};
+
+          &:hover {
+            color: $won-primary-color-light;
+            --local-primary: #{$won-primary-color-light};
+          }
+
+          &__icon {
+            margin-top: 0.25rem;
+            @include fixed-square($normalFontSize);
+          }
+        }
       }
 
       &__updated {
@@ -89,7 +129,40 @@ main.owneroverview {
     }
   }
 
-  .owneroverview__noresults {
+  .ownermap__deniedlocation,
+  .ownermap__nolocation {
+    display: grid;
+    padding: 1rem;
+    justify-items: center;
+
+    &__label {
+      margin-top: 1rem;
+      max-width: 25rem;
+      text-align: center;
+    }
+
+    &__icon {
+      --local-primary: #{$won-disabled-color};
+    }
+
+    &__button {
+      margin-top: 1rem;
+      padding: 0.5rem;
+    }
+  }
+
+  .ownermap__map {
+    display: block;
+    height: 50vh;
+    width: 100%;
+
+    .atom-map__mapmount {
+      width: 100%;
+      height: 50vh;
+    }
+  }
+
+  .ownermap__noresults {
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
@@ -103,12 +176,12 @@ main.owneroverview {
     }
   }
 
-  .owneroverview__content {
+  .ownermap__content {
     display: flex;
     flex-wrap: wrap;
     padding: 0.5rem;
 
-    won-atom-card.owneroverview__content__atom {
+    won-atom-card.ownermap__content__atom {
       border: $thinGrayBorder;
       background: $won-light-gray;
 
@@ -119,7 +192,7 @@ main.owneroverview {
     @media (max-width: $responsivenessBreakPoint) {
       display: block;
 
-      won-atom-card.owneroverview__content__atom {
+      won-atom-card.ownermap__content__atom {
         margin-right: 0;
       }
     }
