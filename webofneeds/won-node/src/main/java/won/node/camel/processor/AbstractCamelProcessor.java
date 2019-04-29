@@ -180,8 +180,7 @@ public abstract class AbstractCamelProcessor implements Processor {
         return ownerApplicationIds;
     }
 
-    protected void failForIncompatibleSockets(URI socketURI, URI targetSocketURI)
-                    throws IncompatibleSocketsException {
+    protected void failForIncompatibleSockets(URI socketURI, URI targetSocketURI) throws IncompatibleSocketsException {
         if (!socketService.isCompatible(socketURI, targetSocketURI)) {
             throw new IncompatibleSocketsException(socketURI, targetSocketURI);
         }
