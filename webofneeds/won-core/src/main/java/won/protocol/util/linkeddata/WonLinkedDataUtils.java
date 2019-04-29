@@ -30,12 +30,13 @@ import org.apache.jena.shared.PrefixMapping;
 import org.apache.jena.shared.impl.PrefixMappingImpl;
 import org.apache.jena.sparql.path.Path;
 import org.apache.jena.sparql.path.PathParser;
-import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import won.protocol.model.AtomState;
+import won.protocol.model.SocketDefinition;
+import won.protocol.model.SocketDefinitionImpl;
 import won.protocol.service.WonNodeInfo;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
@@ -326,24 +327,23 @@ public class WonLinkedDataUtils {
                         socketTypeURI);
     }
 
-    public static Optional<SocketConfiguration> getSocketConfiguration(LinkedDataSource linkedDataSource, URI socket) {
+    public static Optional<SocketDefinition> getSocketDefinition(LinkedDataSource linkedDataSource, URI socket) {
         Dataset ontology = linkedDataSource.getDataForResource(socket);
         // load all data for configurations
         List<URI> configURIs = RdfUtils.getObjectsOfProperty(ontology, socket,
-                        URI.create(WON.socketConfiguration.getURI()),
+                        URI.create(WON.socketDefinition.getURI()),
                         node -> node.isURIResource() ? URI.create(node.asResource().getURI()) : null);
         configURIs.stream().forEach(configURI -> {
             Dataset ds = linkedDataSource.getDataForResource(configURI);
             RdfUtils.addDatasetToDataset(ontology, ds);
         });
-        SocketConfigurationImpl socketConfig = new SocketConfigurationImpl(socket);
-        socketConfig.setConfigurationURIs(configURIs);
-        WonRdfUtils.SocketUtils.setSocketTypes(socketConfig, ontology, socket);
-        WonRdfUtils.SocketUtils.setCompatibleSocketTypes(socketConfig, ontology, socket);
-        WonRdfUtils.SocketUtils.setAutoOpen(socketConfig, ontology, socket);
-        WonRdfUtils.SocketUtils.setSocketCapacity(socketConfig, ontology, socket);
-        WonRdfUtils.SocketUtils.setDerivationProperties(socketConfig, ontology, socket);
-        return Optional.of(socketConfig);
+        SocketDefinitionImpl socketDef = new SocketDefinitionImpl(socket);
+        socketDef.setConfigurationURIs(configURIs);
+        WonRdfUtils.SocketUtils.setCompatibleSocketDefinitions(socketDef, ontology, socket);
+        WonRdfUtils.SocketUtils.setAutoOpen(socketDef, ontology, socket);
+        WonRdfUtils.SocketUtils.setSocketCapacity(socketDef, ontology, socket);
+        WonRdfUtils.SocketUtils.setDerivationProperties(socketDef, ontology, socket);
+        return Optional.of(socketDef);
     }
 
     public static Optional<URI> getTypeOfSocket(URI socketURI, LinkedDataSource linkedDataSource) {

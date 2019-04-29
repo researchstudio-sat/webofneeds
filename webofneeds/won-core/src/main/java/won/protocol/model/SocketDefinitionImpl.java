@@ -6,7 +6,7 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
-public class SocketConfigurationImpl implements SocketConfiguration {
+public class SocketDefinitionImpl implements SocketDefinition {
     private final URI socketURI;
     private Set<URI> socketTypes = new HashSet<>();
     private Set<URI> configurationUris = new HashSet<>();
@@ -16,7 +16,7 @@ public class SocketConfigurationImpl implements SocketConfiguration {
     private Optional<Integer> capacity = Optional.empty();
     private Set<URI> inconsistentProperties = new HashSet<URI>();
 
-    public SocketConfigurationImpl(URI socketURI) {
+    public SocketDefinitionImpl(URI socketURI) {
         this.socketURI = socketURI;
     }
 
@@ -36,7 +36,7 @@ public class SocketConfigurationImpl implements SocketConfiguration {
     }
 
     @Override
-    public boolean isCompatibleWith(SocketConfiguration other) {
+    public boolean isCompatibleWith(SocketDefinition other) {
         return compatibleSocketTypes.stream().anyMatch(compatible -> other.getSocketTypes().contains(compatible))
                         && other.compatibleTypes().stream()
                                         .anyMatch(compatible -> this.getSocketTypes().contains(compatible));

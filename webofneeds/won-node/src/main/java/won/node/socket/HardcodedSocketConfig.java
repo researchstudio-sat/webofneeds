@@ -7,12 +7,12 @@ import java.util.Set;
 
 import won.protocol.model.OverloadPolicy;
 import won.protocol.model.SchedulingPolicy;
-import won.protocol.model.SocketConfiguration;
+import won.protocol.model.SocketDefinition;
 
 /**
  * Subclasses are expected to hardcode their config in their constructor.
  */
-public abstract class HardcodedSocketConfig implements SocketConfiguration {
+public abstract class HardcodedSocketConfig implements SocketDefinition {
     private URI socketType;
     protected Set<URI> derivationProperties = new HashSet<>();
 

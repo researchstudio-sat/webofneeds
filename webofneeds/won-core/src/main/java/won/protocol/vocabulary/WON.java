@@ -81,8 +81,8 @@ public class WON {
     public static final Property socket = m.createProperty(BASE_URI, "socket");
     public static final Property defaultSocket = m.createProperty(BASE_URI, "defaultSocket");
     public static final Resource Socket = m.createResource(BASE_URI + "Socket");
-    public static final Property compatibleSocketType = m.createProperty(BASE_URI + "allowedTargetSocket");
-    public static final Property socketConfiguration = m.createProperty(BASE_URI, "socketConfiguration");
+    public static final Property compatibleSocketDefinition = m.createProperty(BASE_URI + "compatibleSocketDefinition");
+    public static final Property socketDefinition = m.createProperty(BASE_URI, "socketDefinition");
     public static final Property derivesAtomProperty = m.createProperty(BASE_URI + "derivesAtomProperty");
     public static final Property socketCapacity = m.createProperty(BASE_URI, "socketCapacity");
     public static final Property autoOpen = m.createProperty(BASE_URI, "autoOpen");

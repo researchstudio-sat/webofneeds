@@ -69,7 +69,7 @@ import won.protocol.message.WonSignatureData;
 import won.protocol.model.AtomGraphType;
 import won.protocol.model.ConnectionState;
 import won.protocol.model.Match;
-import won.protocol.model.SocketConfigurationImpl;
+import won.protocol.model.SocketDefinitionImpl;
 import won.protocol.service.WonNodeInfo;
 import won.protocol.service.WonNodeInfoBuilder;
 import won.protocol.vocabulary.SCHEMA;
@@ -1002,40 +1002,33 @@ public class WonRdfUtils {
             return Optional.of(model);
         }
 
-        public static void setSocketTypes(SocketConfigurationImpl socketConfiguration, Dataset dataset, URI socketURI) {
-            socketConfiguration.setCompatibleSocketTypes(RdfUtils.getObjectStreamOfProperty(dataset, socketURI,
-                            URI.create(RDF.type.getURI()),
-                            node -> node.isURIResource() ? URI.create(node.asResource().getURI()) : null)
-                            .collect(Collectors.toSet()));
-        }
-
-        public static void setCompatibleSocketTypes(SocketConfigurationImpl socketConfiguration, Dataset dataset,
+        public static void setCompatibleSocketDefinitions(SocketDefinitionImpl socketConfiguration, Dataset dataset,
                         URI socketURI) {
             socketConfiguration
                             .setCompatibleSocketTypes(RdfUtils
                                             .getObjectStreamForPropertyPath(dataset, socketURI,
-                                                            PathParser.parse("<" + WON.socketConfiguration.getURI()
-                                                                            + ">/<" + WON.compatibleSocketType + ">",
+                                                            PathParser.parse("<" + WON.socketDefinition.getURI()
+                                                                            + ">/<" + WON.compatibleSocketDefinition + ">",
                                                                             DefaultPrefixUtils.getDefaultPrefixes()),
                                                             node -> node.isURI() ? URI.create(node.getURI()) : null)
                                             .collect(Collectors.toSet()));
         }
 
-        public static void setDerivationProperties(SocketConfigurationImpl socketConfiguration, Dataset dataset,
+        public static void setDerivationProperties(SocketDefinitionImpl socketConfiguration, Dataset dataset,
                         URI socketURI) {
             socketConfiguration
                             .setDerivationProperties(RdfUtils
                                             .getObjectStreamForPropertyPath(dataset, socketURI,
-                                                            PathParser.parse("<" + WON.socketConfiguration.getURI()
+                                                            PathParser.parse("<" + WON.socketDefinition.getURI()
                                                                             + ">/<" + WON.derivesAtomProperty + ">",
                                                                             DefaultPrefixUtils.getDefaultPrefixes()),
                                                             node -> node.isURI() ? URI.create(node.getURI()) : null)
                                             .collect(Collectors.toSet()));
         }
 
-        public static void setAutoOpen(SocketConfigurationImpl socketConfiguration, Dataset dataset, URI socketURI) {
+        public static void setAutoOpen(SocketDefinitionImpl socketConfiguration, Dataset dataset, URI socketURI) {
             Set<Boolean> autoOpens = RdfUtils.getObjectStreamForPropertyPath(dataset, socketURI,
-                            PathParser.parse("<" + WON.socketConfiguration.getURI() + ">/<" + WON.autoOpen + ">",
+                            PathParser.parse("<" + WON.socketDefinition.getURI() + ">/<" + WON.autoOpen + ">",
                                             DefaultPrefixUtils.getDefaultPrefixes()),
                             node -> node.isLiteral() && node.getLiteral().getValue() instanceof Boolean
                                             ? (Boolean) node.getLiteral().getValue()
@@ -1048,10 +1041,10 @@ public class WonRdfUtils {
             }
         }
 
-        public static void setSocketCapacity(SocketConfigurationImpl socketConfiguration, Dataset dataset,
+        public static void setSocketCapacity(SocketDefinitionImpl socketConfiguration, Dataset dataset,
                         URI socketURI) {
             Set<Integer> socketCapacities = RdfUtils.getObjectStreamForPropertyPath(dataset, socketURI,
-                            PathParser.parse("<" + WON.socketConfiguration.getURI() + ">/<" + WON.socketCapacity + ">",
+                            PathParser.parse("<" + WON.socketDefinition.getURI() + ">/<" + WON.socketCapacity + ">",
                                             DefaultPrefixUtils.getDefaultPrefixes()),
                             node -> node.isLiteral() && node.getLiteral().getValue() instanceof Integer
                                             ? (Integer) node.getLiteral().getValue()

@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 
 import won.protocol.model.Atom;
 import won.protocol.model.Connection;
-import won.protocol.model.SocketConfiguration;
+import won.protocol.model.SocketDefinition;
 import won.protocol.repository.AtomRepository;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
@@ -32,14 +32,14 @@ public class SocketService {
     AtomRepository atomRepository;
     @Autowired
     LinkedDataSource linkedDataSource;
-    Map<URI, SocketConfiguration> knownSockets = new HashMap<>();
+    Map<URI, SocketDefinition> knownSockets = new HashMap<>();
 
     public SocketService() {
     }
 
     public boolean isCompatible(URI localSocket, URI targetSocket) {
-        Optional<SocketConfiguration> localConfig = getSocketConfig(localSocket);
-        Optional<SocketConfiguration> targetConfig = getSocketConfig(targetSocket);
+        Optional<SocketDefinition> localConfig = getSocketConfig(localSocket);
+        Optional<SocketDefinition> targetConfig = getSocketConfig(targetSocket);
         if (localConfig.isPresent() && targetConfig.isPresent()) {
             return localConfig.get().isCompatibleWith(targetConfig.get());
         }
@@ -47,7 +47,7 @@ public class SocketService {
     }
 
     public boolean isAutoOpen(URI localSocket) {
-        Optional<SocketConfiguration> socketConfig = getSocketConfig(localSocket);
+        Optional<SocketDefinition> socketConfig = getSocketConfig(localSocket);
         if (socketConfig.isPresent()) {
             return socketConfig.get().isAutoOpen();
         }
@@ -65,7 +65,7 @@ public class SocketService {
             }
             final Model modelToManipulate = derivationModel;
             URI socketType = con.getTypeURI();
-            Optional<SocketConfiguration> socketConfig = getSocketConfig(socketType);
+            Optional<SocketDefinition> socketConfig = getSocketConfig(socketType);
             if (socketConfig.isPresent()) {
                 Resource atomRes = derivationModel.getResource(atom.getAtomURI().toString());
                 Resource targetAtomRes = derivationModel.getResource(con.getTargetAtomURI().toString());
@@ -87,9 +87,9 @@ public class SocketService {
         }
     }
 
-    private Optional<SocketConfiguration> getSocketConfig(URI socketType) {
+    private Optional<SocketDefinition> getSocketConfig(URI socketType) {
         try {
-            return WonLinkedDataUtils.getSocketConfiguration(linkedDataSource, socketType);
+            return WonLinkedDataUtils.getSocketDefinition(linkedDataSource, socketType);
         } catch (Exception e) {
             logger.info("Failed to load configuation for socket type " + socketType, e);
         }

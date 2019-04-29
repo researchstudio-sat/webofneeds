@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
 
-public interface SocketConfiguration {
+public interface SocketDefinition {
     /**
      * The concrete socket of this configuration.
      */
@@ -37,7 +37,7 @@ public interface SocketConfiguration {
      * Indicates whether this socket configuration supports connecting to the other
      * one.
      */
-    public boolean isCompatibleWith(SocketConfiguration other);
+    public boolean isCompatibleWith(SocketDefinition other);
 
     /**
      * If true, the atom will automatically accept connection requests if the
