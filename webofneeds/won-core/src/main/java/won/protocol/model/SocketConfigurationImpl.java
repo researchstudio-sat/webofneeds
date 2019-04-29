@@ -6,20 +6,28 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
-import org.apache.jena.rdf.model.Property;
-
 public class SocketConfigurationImpl implements SocketConfiguration {
-    private URI socketType;
+    private final URI socketURI;
+    private Set<URI> socketTypes = new HashSet<>();
+    private Set<URI> configurationUris = new HashSet<>();
     private Set<URI> derivationProperties = new HashSet<>();
-    private Set<URI> allowedTargetSocketTypes = new HashSet<>();
+    private Set<URI> compatibleSocketTypes = new HashSet<>();
     private Optional<Boolean> autoOpen = Optional.empty();
     private Optional<Integer> capacity = Optional.empty();
-    private Optional<OverloadPolicy> overloadPolicy = Optional.empty();
-    private Optional<SchedulingPolicy> schedulingPolicy = Optional.empty();
+    private Set<URI> inconsistentProperties = new HashSet<URI>();
+
+    public SocketConfigurationImpl(URI socketURI) {
+        this.socketURI = socketURI;
+    }
 
     @Override
-    public URI getSocketType() {
-        return socketType;
+    public URI getSocketURI() {
+        return socketURI;
+    }
+
+    @Override
+    public Collection<URI> getSocketTypes() {
+        return socketTypes;
     }
 
     @Override
@@ -28,14 +36,14 @@ public class SocketConfigurationImpl implements SocketConfiguration {
     }
 
     @Override
-    public boolean isConnectionAllowedToType(URI targetSocketType) {
-        if (allowedTargetSocketTypes.isEmpty())
-            return true;
-        return allowedTargetSocketTypes.contains(targetSocketType);
+    public boolean isCompatibleWith(SocketConfiguration other) {
+        return compatibleSocketTypes.stream().anyMatch(compatible -> other.getSocketTypes().contains(compatible))
+                        && other.compatibleTypes().stream()
+                                        .anyMatch(compatible -> this.getSocketTypes().contains(compatible));
     }
 
     @Override
-    public boolean isAutoOpen(URI targetSocketType) {
+    public boolean isAutoOpen() {
         return autoOpen.orElse(false);
     }
 
@@ -44,21 +52,8 @@ public class SocketConfigurationImpl implements SocketConfiguration {
         return capacity;
     }
 
-    @Override
-    public OverloadPolicy getOverloadPolicy() {
-        return overloadPolicy.orElse(OverloadPolicy.ON_OVERLOAD_DENY);
-    }
-
-    @Override
-    public Optional<SchedulingPolicy> getSchedulingPolicy() {
-        return schedulingPolicy;
-    }
-
-    public void setSocketType(URI socketType) {
-        this.socketType = socketType;
-    }
-
     public void setDerivationProperties(Collection<URI> derivationProperties) {
+        this.derivationProperties.clear();
         this.derivationProperties.addAll(derivationProperties);
     }
 
@@ -66,12 +61,13 @@ public class SocketConfigurationImpl implements SocketConfiguration {
         this.derivationProperties.add(p);
     }
 
-    public void setAllowedTargetSocketTypes(Collection<URI> allowedTargetSocketTypes) {
-        this.allowedTargetSocketTypes.addAll(allowedTargetSocketTypes);
+    public void setCompatibleSocketTypes(Collection<URI> allowedTargetSocketTypes) {
+        this.compatibleSocketTypes.clear();
+        this.compatibleSocketTypes.addAll(allowedTargetSocketTypes);
     }
 
-    public void addAllowedTargetSocketType(URI target) {
-        this.allowedTargetSocketTypes.add(target);
+    public void addCompatibleSocketType(URI target) {
+        this.compatibleSocketTypes.add(target);
     }
 
     public void setAutoOpen(boolean autoOpen) {
@@ -90,19 +86,33 @@ public class SocketConfigurationImpl implements SocketConfiguration {
         this.capacity = capacity;
     }
 
-    public void setOverloadPolicy(OverloadPolicy overloadPolicy) {
-        this.overloadPolicy = Optional.of(overloadPolicy);
+    public void setSocketTypes(Set<URI> socketTypes) {
+        this.socketTypes = socketTypes;
     }
 
-    public void setOverloadPolicy(Optional<OverloadPolicy> overloadPolicy) {
-        this.overloadPolicy = overloadPolicy;
+    public void addInconsistentProperty(URI property) {
+        this.inconsistentProperties.add(property);
     }
 
-    public void setSchedulingPolicy(SchedulingPolicy schedulingPolicy) {
-        this.schedulingPolicy = Optional.of(schedulingPolicy);
+    public void setConfigurationURIs(Collection<URI> configurationUris) {
+        this.configurationUris.clear();
+        this.configurationUris.addAll(configurationUris);
     }
 
-    public void setSchedulingPolicy(Optional<SchedulingPolicy> schedulingPolicy) {
-        this.schedulingPolicy = schedulingPolicy;
+    @Override
+    public Set<URI> getConfigurationURIs() {
+        return configurationUris;
+    }
+
+    @Override
+    public Set<URI> compatibleTypes() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Set<URI> getInconsistentProperties() {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

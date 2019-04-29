@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.graph.NodeFactory;
@@ -57,6 +58,7 @@ import org.apache.jena.sparql.path.PathParser;
 import org.apache.jena.tdb.TDB;
 import org.apache.jena.vocabulary.RDF;
 import org.hibernate.cfg.NotYetImplementedException;
+import org.hibernate.hql.internal.ast.tree.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,8 +69,7 @@ import won.protocol.message.WonSignatureData;
 import won.protocol.model.AtomGraphType;
 import won.protocol.model.ConnectionState;
 import won.protocol.model.Match;
-import won.protocol.model.OverloadPolicy;
-import won.protocol.model.SchedulingPolicy;
+import won.protocol.model.SocketConfigurationImpl;
 import won.protocol.service.WonNodeInfo;
 import won.protocol.service.WonNodeInfoBuilder;
 import won.protocol.vocabulary.SCHEMA;
@@ -1001,38 +1002,66 @@ public class WonRdfUtils {
             return Optional.of(model);
         }
 
-        public static List<URI> getAllowedTargetSocketTypes(Dataset dataset, URI socketType) {
-            return RdfUtils.getObjectsOfProperty(dataset, socketType, URI.create(WON.allowedTargetSocket.toString()),
-                            node -> node.isURIResource() ? URI.create(node.asResource().getURI()) : null);
+        public static void setSocketTypes(SocketConfigurationImpl socketConfiguration, Dataset dataset, URI socketURI) {
+            socketConfiguration.setCompatibleSocketTypes(RdfUtils.getObjectStreamOfProperty(dataset, socketURI,
+                            URI.create(RDF.type.getURI()),
+                            node -> node.isURIResource() ? URI.create(node.asResource().getURI()) : null)
+                            .collect(Collectors.toSet()));
         }
 
-        public static List<URI> getDerivationProperties(Dataset dataset, URI socketType) {
-            return RdfUtils.getObjectsOfProperty(dataset, socketType, URI.create(WON.derivesAtomProperty.toString()),
-                            node -> node.isURIResource() ? URI.create(node.asResource().getURI()) : null);
+        public static void setCompatibleSocketTypes(SocketConfigurationImpl socketConfiguration, Dataset dataset,
+                        URI socketURI) {
+            socketConfiguration
+                            .setCompatibleSocketTypes(RdfUtils
+                                            .getObjectStreamForPropertyPath(dataset, socketURI,
+                                                            PathParser.parse("<" + WON.socketConfiguration.getURI()
+                                                                            + ">/<" + WON.compatibleSocketType + ">",
+                                                                            DefaultPrefixUtils.getDefaultPrefixes()),
+                                                            node -> node.isURI() ? URI.create(node.getURI()) : null)
+                                            .collect(Collectors.toSet()));
         }
 
-        public static Optional<OverloadPolicy> getOverloadPolicy(Dataset datset, URI socketType) {
-            return RdfUtils.getFirstObjectOfProperty(datset, socketType, URI.create(WON.overloadPolicy.toString()),
-                            node -> node.isURIResource()
-                                            ? OverloadPolicy.fromURI(URI.create(node.asResource().getURI()))
-                                            : null);
+        public static void setDerivationProperties(SocketConfigurationImpl socketConfiguration, Dataset dataset,
+                        URI socketURI) {
+            socketConfiguration
+                            .setDerivationProperties(RdfUtils
+                                            .getObjectStreamForPropertyPath(dataset, socketURI,
+                                                            PathParser.parse("<" + WON.socketConfiguration.getURI()
+                                                                            + ">/<" + WON.derivesAtomProperty + ">",
+                                                                            DefaultPrefixUtils.getDefaultPrefixes()),
+                                                            node -> node.isURI() ? URI.create(node.getURI()) : null)
+                                            .collect(Collectors.toSet()));
         }
 
-        public static Optional<SchedulingPolicy> getSchedulingPolicy(Dataset datset, URI socketType) {
-            return RdfUtils.getFirstObjectOfProperty(datset, socketType, URI.create(WON.schedulingPolicy.toString()),
-                            node -> node.isURIResource()
-                                            ? SchedulingPolicy.fromURI(URI.create(node.asResource().getURI()))
-                                            : null);
+        public static void setAutoOpen(SocketConfigurationImpl socketConfiguration, Dataset dataset, URI socketURI) {
+            Set<Boolean> autoOpens = RdfUtils.getObjectStreamForPropertyPath(dataset, socketURI,
+                            PathParser.parse("<" + WON.socketConfiguration.getURI() + ">/<" + WON.autoOpen + ">",
+                                            DefaultPrefixUtils.getDefaultPrefixes()),
+                            node -> node.isLiteral() && node.getLiteral().getValue() instanceof Boolean
+                                            ? (Boolean) node.getLiteral().getValue()
+                                            : null)
+                            .collect(Collectors.toSet());
+            if (autoOpens.size() > 1) {
+                socketConfiguration.addInconsistentProperty(URI.create(WON.autoOpen.getURI()));
+            } else if (autoOpens.size() == 1) {
+                socketConfiguration.setAutoOpen(autoOpens.iterator().next());
+            }
         }
 
-        public static Optional<Boolean> getAutoOpen(Dataset datset, URI socketType) {
-            return RdfUtils.getFirstObjectOfProperty(datset, socketType, URI.create(WON.autoOpen.toString()),
-                            node -> node.isLiteral() ? node.asLiteral().getBoolean() : null);
-        }
-
-        public static Optional<Integer> getSocketCapacity(Dataset datset, URI socketType) {
-            return RdfUtils.getFirstObjectOfProperty(datset, socketType, URI.create(WON.socketCapacity.toString()),
-                            node -> node.isLiteral() ? node.asLiteral().getInt() : null);
+        public static void setSocketCapacity(SocketConfigurationImpl socketConfiguration, Dataset dataset,
+                        URI socketURI) {
+            Set<Integer> socketCapacities = RdfUtils.getObjectStreamForPropertyPath(dataset, socketURI,
+                            PathParser.parse("<" + WON.socketConfiguration.getURI() + ">/<" + WON.socketCapacity + ">",
+                                            DefaultPrefixUtils.getDefaultPrefixes()),
+                            node -> node.isLiteral() && node.getLiteral().getValue() instanceof Integer
+                                            ? (Integer) node.getLiteral().getValue()
+                                            : null)
+                            .collect(Collectors.toSet());
+            if (socketCapacities.size() > 1) {
+                socketConfiguration.addInconsistentProperty(URI.create(WON.socketCapacity.getURI()));
+            } else if (socketCapacities.size() == 1) {
+                socketConfiguration.setCapacity(socketCapacities.iterator().next());
+            }
         }
     }
 

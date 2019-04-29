@@ -28,7 +28,7 @@ import won.cryptography.service.RandomNumberService;
 import won.node.socket.SocketService;
 import won.node.protocol.MatcherProtocolMatcherServiceClientSide;
 import won.node.service.DataAccessService;
-import won.protocol.exception.IncompatibleSocketTypesException;
+import won.protocol.exception.IncompatibleSocketsException;
 import won.protocol.jms.MessagingService;
 import won.protocol.message.WonMessage;
 import won.protocol.message.processor.camel.WonCamelConstants;
@@ -180,15 +180,10 @@ public abstract class AbstractCamelProcessor implements Processor {
         return ownerApplicationIds;
     }
 
-    protected void failForIncompatibleSockets(URI socketURI, URI socketTypeURI, URI targetSocketURI)
-                    throws IncompatibleSocketTypesException {
-        Optional<URI> targetSocketType = WonLinkedDataUtils.getTypeOfSocket(targetSocketURI, linkedDataSource);
-        if (!targetSocketType.isPresent()) {
-            throw new IllegalStateException("Could not determine type of remote socket " + targetSocketURI);
-        }
-        if (!socketService.isConnectionAllowedToType(socketTypeURI, targetSocketType.get())) {
-            throw new IncompatibleSocketTypesException(socketURI, socketTypeURI, targetSocketURI,
-                            targetSocketType.get());
+    protected void failForIncompatibleSockets(URI socketURI, URI targetSocketURI)
+                    throws IncompatibleSocketsException {
+        if (!socketService.isCompatible(socketURI, targetSocketURI)) {
+            throw new IncompatibleSocketsException(socketURI, targetSocketURI);
         }
     }
 

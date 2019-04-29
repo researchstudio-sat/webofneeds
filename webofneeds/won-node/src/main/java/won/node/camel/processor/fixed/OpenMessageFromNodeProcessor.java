@@ -87,7 +87,7 @@ public class OpenMessageFromNodeProcessor extends AbstractCamelProcessor {
         }
         if (!con.get().getTargetConnectionURI().equals(wonMessage.getSenderURI()))
             throw new IllegalStateException("the sender uri of the message must be equal to the remote connection uri");
-        failForIncompatibleSockets(con.get().getSocketURI(), con.get().getTypeURI(), con.get().getTargetSocketURI());
+        failForIncompatibleSockets(con.get().getSocketURI(), con.get().getTargetSocketURI());
         con.get().setState(con.get().getState().transit(ConnectionEventType.PARTNER_OPEN));
         connectionRepository.save(con.get());
         // set the receiver to the local connection uri

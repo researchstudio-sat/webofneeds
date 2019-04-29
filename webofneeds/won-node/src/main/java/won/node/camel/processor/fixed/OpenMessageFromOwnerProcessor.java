@@ -72,7 +72,7 @@ public class OpenMessageFromOwnerProcessor extends AbstractCamelProcessor {
                 con.setTargetSocketURI(lookupDefaultSocket(con.getTargetAtomURI()));
             }
         }
-        failForIncompatibleSockets(con.getSocketURI(), con.getTypeURI(), con.getTargetSocketURI());
+        failForIncompatibleSockets(con.getSocketURI(), con.getTargetSocketURI());
         con.setState(con.getState().transit(ConnectionEventType.OWNER_OPEN));
         connectionRepository.save(con);
         URI remoteMessageUri = wonNodeInformationService.generateEventURI(wonMessage.getRecipientNodeURI());

@@ -35,50 +35,21 @@ public class SocketService {
     Map<URI, SocketConfiguration> knownSockets = new HashMap<>();
 
     public SocketService() {
-        addSocket(new GroupSocketConfig());
-        addSocket(new ChatSocketConfig());
-        addSocket(new ReviewSocketConfig());
     }
 
-    private void addSocket(SocketConfiguration socket) {
-        this.knownSockets.put(socket.getSocketType(), socket);
-    }
-
-    private Optional<SocketConfiguration> getSocket(URI socketType) {
-        if (knownSockets.containsKey(socketType)) {
-            return Optional.of(knownSockets.get(socketType));
-        }
-        attemptToLoadSocketConfig(socketType);
-        if (knownSockets.containsKey(socketType)) {
-            return Optional.of(knownSockets.get(socketType));
-        }
-        return Optional.empty();
-    }
-
-    private void attemptToLoadSocketConfig(URI socketType) {
-        try {
-            Optional<SocketConfiguration> config = WonLinkedDataUtils.getSocketConfiguration(linkedDataSource,
-                            socketType);
-            if (config.isPresent()) {
-                this.knownSockets.put(socketType, config.get());
-            }
-        } catch (Exception e) {
-            logger.info("Failed to load configuation for socket type " + socketType, e);
-        }
-    }
-
-    public boolean isConnectionAllowedToType(URI localSocketType, URI targetSocketType) {
-        Optional<SocketConfiguration> socketConfig = getSocket(localSocketType);
-        if (socketConfig.isPresent()) {
-            return socketConfig.get().isConnectionAllowedToType(targetSocketType);
+    public boolean isCompatible(URI localSocket, URI targetSocket) {
+        Optional<SocketConfiguration> localConfig = getSocketConfig(localSocket);
+        Optional<SocketConfiguration> targetConfig = getSocketConfig(targetSocket);
+        if (localConfig.isPresent() && targetConfig.isPresent()) {
+            return localConfig.get().isCompatibleWith(targetConfig.get());
         }
         return false;
     }
 
-    public boolean isAutoOpen(URI localSocketType, URI targetSocketType) {
-        Optional<SocketConfiguration> socketConfig = getSocket(localSocketType);
+    public boolean isAutoOpen(URI localSocket) {
+        Optional<SocketConfiguration> socketConfig = getSocketConfig(localSocket);
         if (socketConfig.isPresent()) {
-            return socketConfig.get().isAutoOpen(targetSocketType);
+            return socketConfig.get().isAutoOpen();
         }
         return false;
     }
@@ -94,7 +65,7 @@ public class SocketService {
             }
             final Model modelToManipulate = derivationModel;
             URI socketType = con.getTypeURI();
-            Optional<SocketConfiguration> socketConfig = getSocket(socketType);
+            Optional<SocketConfiguration> socketConfig = getSocketConfig(socketType);
             if (socketConfig.isPresent()) {
                 Resource atomRes = derivationModel.getResource(atom.getAtomURI().toString());
                 Resource targetAtomRes = derivationModel.getResource(con.getTargetAtomURI().toString());
@@ -114,5 +85,14 @@ public class SocketService {
             atom.getDatatsetHolder().setDataset(atomDataset);
             atomRepository.save(atom);
         }
+    }
+
+    private Optional<SocketConfiguration> getSocketConfig(URI socketType) {
+        try {
+            return WonLinkedDataUtils.getSocketConfiguration(linkedDataSource, socketType);
+        } catch (Exception e) {
+            logger.info("Failed to load configuation for socket type " + socketType, e);
+        }
+        return Optional.empty();
     }
 }

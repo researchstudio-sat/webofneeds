@@ -326,22 +326,23 @@ public class WonLinkedDataUtils {
                         socketTypeURI);
     }
 
-    public static Optional<SocketConfiguration> getSocketConfiguration(LinkedDataSource linkedDataSource,
-                    URI socketType) {
-        Dataset ontology = linkedDataSource.getDataForResource(socketType);
-        SocketConfigurationImpl socketConfig = new SocketConfigurationImpl();
-        socketConfig.setSocketType(socketType);
-        List<Resource> res = RdfUtils.getObjectsOfProperty(ontology, socketType, URI.create(RDF.type.toString()),
-                        node -> node.asResource());
-        if (!res.contains(WON.Socket))
-            return Optional.empty();
-        socketConfig.setAllowedTargetSocketTypes(
-                        WonRdfUtils.SocketUtils.getAllowedTargetSocketTypes(ontology, socketType));
-        socketConfig.setAutoOpen(WonRdfUtils.SocketUtils.getAutoOpen(ontology, socketType));
-        socketConfig.setCapacity(WonRdfUtils.SocketUtils.getSocketCapacity(ontology, socketType));
-        socketConfig.setDerivationProperties(WonRdfUtils.SocketUtils.getDerivationProperties(ontology, socketType));
-        socketConfig.setOverloadPolicy(WonRdfUtils.SocketUtils.getOverloadPolicy(ontology, socketType));
-        socketConfig.setSchedulingPolicy(WonRdfUtils.SocketUtils.getSchedulingPolicy(ontology, socketType));
+    public static Optional<SocketConfiguration> getSocketConfiguration(LinkedDataSource linkedDataSource, URI socket) {
+        Dataset ontology = linkedDataSource.getDataForResource(socket);
+        // load all data for configurations
+        List<URI> configURIs = RdfUtils.getObjectsOfProperty(ontology, socket,
+                        URI.create(WON.socketConfiguration.getURI()),
+                        node -> node.isURIResource() ? URI.create(node.asResource().getURI()) : null);
+        configURIs.stream().forEach(configURI -> {
+            Dataset ds = linkedDataSource.getDataForResource(configURI);
+            RdfUtils.addDatasetToDataset(ontology, ds);
+        });
+        SocketConfigurationImpl socketConfig = new SocketConfigurationImpl(socket);
+        socketConfig.setConfigurationURIs(configURIs);
+        WonRdfUtils.SocketUtils.setSocketTypes(socketConfig, ontology, socket);
+        WonRdfUtils.SocketUtils.setCompatibleSocketTypes(socketConfig, ontology, socket);
+        WonRdfUtils.SocketUtils.setAutoOpen(socketConfig, ontology, socket);
+        WonRdfUtils.SocketUtils.setSocketCapacity(socketConfig, ontology, socket);
+        WonRdfUtils.SocketUtils.setDerivationProperties(socketConfig, ontology, socket);
         return Optional.of(socketConfig);
     }
 
