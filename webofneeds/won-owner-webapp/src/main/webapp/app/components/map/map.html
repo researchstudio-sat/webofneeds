@@ -17,12 +17,12 @@
         </svg>
         <div class="ownermap__deniedlocation__label">You prohibit us from retrieving your location, so we won't be able to show you what's around. If you want to change that, grant access to the location in your browser and reload the page.</div>
     </div>
-    <div class="ownermap__nolocation" ng-if="!self.lastWhatsAroundLocation && !self.isLocationAccessDenied">
+    <div class="ownermap__nolocation" ng-if="!self.currentLocation && !self.isLocationAccessDenied">
         <svg class="ownermap__nolocation__icon">
             <use xlink:href="#ico36_detail_location" href="#ico36_detail_location"></use>
         </svg>
         <div class="ownermap__nolocation__label">You did not grant location access yet. <span class="show-in-responsive">Tap</span><span class="hide-in-responsive">Click</span> the button below and accept the location access to see what is going on around you.</div>
-        <div class="ownermap__nolocation__button won-button--filled red" ng-click="self.reload()">See What's Around</div>
+        <div class="ownermap__nolocation__button won-button--filled red" ng-click="self.fetchCurrentLocationAndReload()">See What's Around</div>
     </div>
     <div class="ownermap__header" ng-if="self.lastWhatsAroundLocation && !self.isLocationAccessDenied">
         <div class="ownermap__header__title">

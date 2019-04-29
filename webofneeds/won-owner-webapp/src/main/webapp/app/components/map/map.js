@@ -10,6 +10,7 @@ import {
   delay,
   reverseSearchNominatim,
 } from "../../utils.js";
+import Immutable from "immutable";
 import { connect2Redux } from "../../won-utils.js";
 import { actionCreators } from "../../actions/actions.js";
 import postMessagesModule from "../post-messages.js";
@@ -40,6 +41,7 @@ class Controller {
       const isLocationAccessDenied = generalSelectors.isLocationAccessDenied(
         state
       );
+      const currentLocation = generalSelectors.getCurrentLocation(state);
 
       const lastWhatsAroundLocation = getIn(state, [
         "owner",
@@ -99,6 +101,7 @@ class Controller {
         });
 
       return {
+        currentLocation,
         isLocationAccessDenied,
         lastWhatsAroundLocation,
         locations,
@@ -130,7 +133,7 @@ class Controller {
     connect2Redux(selectFromState, actionCreators, [], this);
 
     this.$scope.$watch(
-      () => this.isOwnerAtomUrisToLoad,
+      () => this.isOwnerAtomUrisToLoad && this.currentLocation,
       () => delay(0).then(() => this.ensureAtomUrisLoaded())
     );
 
@@ -141,12 +144,12 @@ class Controller {
   }
 
   ensureAtomUrisLoaded() {
-    if (this.isOwnerAtomUrisToLoad && this.lastWhatsAroundLocation) {
-      this.atoms__fetchWhatsAround(
-        undefined,
-        this.lastWhatsAroundLocation,
-        5000
-      );
+    if (this.isOwnerAtomUrisToLoad && this.currentLocation) {
+      const latlng = {
+        lat: this.currentLocation.get("lat"),
+        lng: this.currentLocation.get("lng"),
+      };
+      this.atoms__fetchWhatsAround(undefined, latlng, 5000);
     }
   }
 
@@ -165,13 +168,16 @@ class Controller {
     }
   }
 
-  reload() {
-    if (!this.isOwnerAtomUrisLoading) {
+  fetchCurrentLocationAndReload() {
+    if (!this.currentLocation && !this.isOwnerAtomUrisLoading) {
       if ("geolocation" in navigator) {
         navigator.geolocation.getCurrentPosition(
           currentLocation => {
             const lat = currentLocation.coords.latitude;
             const lng = currentLocation.coords.longitude;
+            this.view__updateCurrentLocation(
+              Immutable.fromJS({ location: { lat, lng } })
+            );
 
             if (this.lastAtomUrisUpdateDate) {
               this.atoms__fetchWhatsAround(
@@ -206,6 +212,24 @@ class Controller {
       } else {
         console.error("LOCATION COULD NOT BE RETRIEVED");
         this.view__locationAccessDenied();
+      }
+    }
+  }
+
+  reload() {
+    if (!this.isOwnerAtomUrisLoading && this.lastWhatsAroundLocation) {
+      const latlng = {
+        lat: this.lastWhatsAroundLocation.get("lat"),
+        lng: this.lastWhatsAroundLocation.get("lng"),
+      };
+      if (this.lastAtomUrisUpdateDate) {
+        this.atoms__fetchWhatsAround(
+          new Date(this.lastAtomUrisUpdateDate),
+          latlng,
+          5000
+        );
+      } else {
+        this.atoms__fetchWhatsAround(undefined, latlng, 5000);
       }
     }
   }
