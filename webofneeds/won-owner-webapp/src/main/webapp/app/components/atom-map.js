@@ -70,8 +70,6 @@ function genComponentConf() {
     }
 
     updateMap(locations) {
-      console.debug("locations: ", locations);
-      console.debug("currentLocation: ", this.currentLocation);
       let markedLocations = [];
 
       for (let location of locations) {
