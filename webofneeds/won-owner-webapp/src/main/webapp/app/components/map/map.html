@@ -53,7 +53,7 @@
         <won-atom-card class="ownermap__content__atom" atom-uri="atomUri" ng-repeat="atomUri in self.sortedVisibleAtomUriArray track by atomUri" ng-if="self.hasVisibleAtomUris"></won-atom-card>
     </div>
     <div class="ownermap__noresults" ng-if="self.currentLocation && !self.isLocationAccessDenied && !self.hasVisibleAtomUris">
-        Nothing around this location, you can try another location by clicking on the location in the header.
+        <span class="ownermap__noresults__label">Nothing around this location, you can try another location by clicking on the location in the header.</span>
     </div>
 </main>
 <won-footer></won-footer>

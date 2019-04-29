@@ -31,7 +31,7 @@
         <won-atom-card class="owneroverview__content__atom" atom-uri="atomUri" ng-repeat="atomUri in self.sortedVisibleAtomUriArray track by atomUri"></won-atom-card>
     </div>
     <div class="owneroverview__noresults" ng-if="!self.hasVisibleAtomUris">
-        Nothing new found.
+        <span class="owneroverview__noresults__label">Nothing new found.</span>
     </div>
 </main>
 <won-footer></won-footer>

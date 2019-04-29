@@ -89,15 +89,18 @@ main.owneroverview {
     }
   }
 
-  .ownermap__noresults {
+  .owneroverview__noresults {
     display: flex;
+    justify-content: center;
     flex-wrap: wrap;
     padding: 0.5rem;
-    font-size: $normalFontSize;
-    color: $won-disabled-color;
-    text-align: center;
-    max-width: 25rem;
-    margin: 0 auto;
+
+    &__label {
+      font-size: $normalFontSize;
+      color: $won-disabled-color;
+      text-align: center;
+      max-width: 25rem;
+    }
   }
 
   .owneroverview__content {
