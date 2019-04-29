@@ -3,7 +3,7 @@
  */
 
 import won from "./won-es6.js";
-import { get, getIn } from "./utils.js";
+import { get, getIn, calculateDistance } from "./utils.js";
 import { labels } from "./won-label-utils.js";
 import * as connectionUtils from "./connection-utils.js";
 import * as useCaseUtils from "./usecase-utils.js";
@@ -65,6 +65,12 @@ export function getLocation(atom) {
     );
   }
   return undefined;
+}
+
+export function getDistanceFrom(atom, location) {
+  const atomLocation = getLocation(atom);
+
+  return calculateDistance(atomLocation, location);
 }
 
 /**
