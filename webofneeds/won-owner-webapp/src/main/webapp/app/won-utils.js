@@ -29,11 +29,7 @@ import * as useCaseUtils from "./usecase-utils.js";
 
 import won from "./won-es6.js";
 
-export function initLeaflet(
-  mapMount,
-  overrideOptions,
-  defaultLayerOnly = false
-) {
+export function initLeaflet(mapMount, overrideOptions) {
   if (!L) {
     throw new Error(
       "Tried to initialize a leaflet widget while leaflet wasn't loaded."
@@ -58,10 +54,6 @@ export function initLeaflet(
   //map.fitWorld() // shows every continent twice :|
   map.fitBounds([[-80, -190], [80, 190]]); // fitWorld without repetition
 
-  if (!defaultLayerOnly) {
-    L.control.layers(baseMaps).addTo(map);
-  }
-
   // Force it to adapt to actual size
   // for some reason this doesn't happen by default
   // when the map is within a tag.
@@ -77,23 +69,16 @@ export function initLeafletBaseMaps() {
       "Tried to initialize leaflet map-sources while leaflet wasn't loaded."
     );
   }
+
   //const secureOsmSource = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"; // secure osm.org
   const secureOsmSource = "https://www.matchat.org/tile/{z}/{x}/{y}.png"; // TODO: use own tile server instead of proxy
   const secureOsm = L.tileLayer(secureOsmSource, {
     attribution:
-      '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
-  });
-
-  const transportSource =
-    "http://{s}.tile2.opencyclemap.org/transport/{z}/{x}/{y}.png";
-  const transport = L.tileLayer(transportSource, {
-    attribution:
-      'Maps &copy; <a href="http://www.thunderforest.com">Thunderforest</a>, Data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>',
+      '&copy; <a href="http://osm.org/copyright" target="_blank">OpenStreetMap</a> contributors',
   });
 
   const baseMaps = {
     "Detailed default map": secureOsm,
-    "Transport (Insecurely loaded!)": transport,
   };
 
   return baseMaps;

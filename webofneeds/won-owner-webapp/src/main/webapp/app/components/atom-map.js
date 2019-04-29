@@ -41,11 +41,7 @@ function genComponentConf() {
           }
         : {};
 
-      this.map = initLeaflet(
-        this.mapMount(),
-        overrideOptions,
-        this.$element[0].hasAttribute("default-layer-only")
-      );
+      this.map = initLeaflet(this.mapMount(), overrideOptions);
       this.addCurrentLocation = this.$element[0].hasAttribute(
         "add-current-location"
       );
