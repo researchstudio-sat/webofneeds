@@ -38,13 +38,6 @@ xsd:duration rdf:type rdfs:Datatype .
                 rdfs:isDefinedBy <https://w3id.org/won/core> .
 
 
-###  https://w3id.org/won/core#allowedTargetSocket
-:allowedTargetSocket rdf:type owl:ObjectProperty ;
-                     rdfs:domain :Socket ;
-                     rdfs:range :Socket ;
-                     rdfs:comment "Links to a Socket type that this Socket allows connections with."@en .
-
-
 ###  https://w3id.org/won/core#atomProtocolEndpoint
 :atomProtocolEndpoint rdf:type owl:ObjectProperty ;
                       rdfs:subPropertyOf owl:topObjectProperty ;
@@ -66,6 +59,11 @@ xsd:duration rdf:type rdfs:Datatype .
            rdfs:domain :WonOverActiveMq ;
            rdfs:comment "Specifies the ActiveMQ broker URI to be used to contact the atom."@en ;
            rdfs:isDefinedBy <https://w3id.org/won/core> .
+
+
+###  https://w3id.org/won/core#compatibleSocketType
+:compatibleSocketType rdf:type owl:ObjectProperty ;
+                      rdfs:domain :SocketConfiguration .
 
 
 ###  https://w3id.org/won/core#connectionState
@@ -95,6 +93,7 @@ xsd:duration rdf:type rdfs:Datatype .
 
 ###  https://w3id.org/won/core#derivesAtomProperty
 :derivesAtomProperty rdf:type owl:ObjectProperty ;
+                     rdfs:domain :SocketConfiguration ;
                      rdfs:comment "Defines a property to be 'derived' when the connection is established. The property will be used to derive a triple '[sourceAtom] [property] [targetAtom]'."@en .
 
 
@@ -106,14 +105,6 @@ xsd:duration rdf:type rdfs:Datatype .
       rdfs:comment "Links an Atom to its Flags"@en ,
                    "Specifies a 'matching context' for the Atom. Matchers should only send hints to this Atom if the counterpart specifies the same matching context. If no matching context is specified, matching is not restricted, and matchers may send hints with counterparts that do specify matching contexts."@en ;
       rdfs:isDefinedBy <https://w3id.org/won/core> .
-
-
-###  https://w3id.org/won/core#heldBy
-:heldBy rdf:type owl:ObjectProperty .
-
-
-###  https://w3id.org/won/core#holds
-:holds rdf:type owl:ObjectProperty .
 
 
 ###  https://w3id.org/won/core#location
@@ -146,7 +137,8 @@ xsd:duration rdf:type rdfs:Datatype .
 
 
 ###  https://w3id.org/won/core#overloadPolicy
-:overloadPolicy rdf:type owl:ObjectProperty .
+:overloadPolicy rdf:type owl:ObjectProperty ;
+                rdfs:domain :SocketConfiguration .
 
 
 ###  https://w3id.org/won/core#owner
@@ -164,7 +156,8 @@ xsd:duration rdf:type rdfs:Datatype .
 
 
 ###  https://w3id.org/won/core#schedulingPolicy
-:schedulingPolicy rdf:type owl:ObjectProperty .
+:schedulingPolicy rdf:type owl:ObjectProperty ;
+                  rdfs:domain :SocketConfiguration .
 
 
 ###  https://w3id.org/won/core#seeks
@@ -181,6 +174,12 @@ sought to fulfill the atom in contrast to the part that is available.""" ;
         rdfs:range :Socket ;
         rdfs:comment "Indicates that an atom or connection supports the specified socket (=behavior)."@en ;
         rdfs:isDefinedBy <https://w3id.org/won/core> .
+
+
+###  https://w3id.org/won/core#socketConfiguration
+:socketConfiguration rdf:type owl:ObjectProperty ;
+                     rdfs:domain :Socket ;
+                     rdfs:range :SocketConfiguration .
 
 
 ###  https://w3id.org/won/core#supportsWonProtocolImpl
@@ -216,6 +215,8 @@ sought to fulfill the atom in contrast to the part that is available.""" ;
 
 ###  https://w3id.org/won/core#targetSocket
 :targetSocket rdf:type owl:ObjectProperty ;
+              rdfs:domain :Connection ;
+              rdfs:range :Socket ;
               rdfs:comment "Indicates that a remote atom or remote connection supports the specified socket (=behavior) or specifies the remote socket to connect with."@en ;
               rdfs:isDefinedBy <https://w3id.org/won/core> .
 
@@ -270,7 +271,7 @@ sought to fulfill the atom in contrast to the part that is available.""" ;
 
 ###  https://w3id.org/won/core#autoOpen
 :autoOpen rdf:type owl:DatatypeProperty ;
-          rdfs:domain :Socket ;
+          rdfs:domain :SocketConfiguration ;
           rdfs:range xsd:boolean ;
           rdfs:comment "Indicates that any incoming CONNECT/OPEN message will be answered with OPEN unless the facet configuration forbids it."@en .
 
@@ -331,7 +332,7 @@ sought to fulfill the atom in contrast to the part that is available.""" ;
 
 ###  https://w3id.org/won/core#socketCapacity
 :socketCapacity rdf:type owl:DatatypeProperty ;
-                rdfs:domain :Socket ;
+                rdfs:domain :SocketConfiguration ;
                 rdfs:range xsd:integer ;
                 rdfs:comment "Defines the maximum number of established connections supported by the socket."@en .
 
@@ -420,16 +421,12 @@ It specifies a content - what the atom is about, which may be something that is 
                        rdfs:comment "Specifies where an Atom is available."@en ;
                        rdfs:isDefinedBy <https://w3id.org/won/core> .
 
+
 ###  https://w3id.org/won/core#MessageContainer
 :MessageContainer rdf:type owl:Class ;
                   rdfs:subClassOf <http://www.w3.org/ns/ldp#CompositeContainer> ;
                   rdfs:comment "Container for Events."@en ;
                   rdfs:isDefinedBy <https://w3id.org/won/core> .
-
-
-###  https://w3id.org/won/core#OverloadPolicy
-:OverloadPolicy rdf:type owl:Class ;
-                rdfs:comment "If the socket's capacity is reached, and another connection is requested, the OverloadPolicy defines how the Atom will react."@en .
 
 
 ###  https://w3id.org/won/core#Region
@@ -438,15 +435,14 @@ It specifies a content - what the atom is about, which may be something that is 
         rdfs:isDefinedBy <https://w3id.org/won/core> .
 
 
-###  https://w3id.org/won/core#SchedulingPolicy
-:SchedulingPolicy rdf:type owl:Class ;
-                  rdfs:comment "If a there is a queue of waiting connections and the Atom can accept one, the SchedulingPolicy defines how that connection is chosen,"@en .
-
-
 ###  https://w3id.org/won/core#Socket
 :Socket rdf:type owl:Class ;
         rdfs:comment "An Atom defines how Connections can be established using any number of Socket individuals. Each connection between two Atoms must specify the Socket it is attached to on each side."@en ;
         rdfs:isDefinedBy <https://w3id.org/won/core> .
+
+
+###  https://w3id.org/won/core#SocketConfiguration
+:SocketConfiguration rdf:type owl:Class .
 
 
 ###  https://w3id.org/won/core#TimeSpecification
@@ -507,12 +503,6 @@ It specifies a content - what the atom is about, which may be something that is 
            rdfs:isDefinedBy <https://w3id.org/won/core> .
 
 
-###  https://w3id.org/won/core#FIFOScheduling
-:FIFOScheduling rdf:type owl:NamedIndividual ,
-                         :SchedulingPolicy ;
-                rdfs:comment "First In First Out: As the Socket's connection count drops below its capacity, the connection with the longest waiting time is chosen from the Socket's queue."@en .
-
-
 ###  https://w3id.org/won/core#GroupSocket
 :GroupSocket rdf:type owl:NamedIndividual ,
                       :Socket ;
@@ -520,20 +510,11 @@ It specifies a content - what the atom is about, which may be something that is 
              rdfs:isDefinedBy <https://w3id.org/won/core> .
 
 
-
-
-
 ###  https://w3id.org/won/core#Inactive
 :Inactive rdf:type owl:NamedIndividual ,
                    :AtomState ;
           rdfs:comment "The incative state. Atoms do not communicate in this state. Intended to stop receiving messages for something not currently of interest."@en ;
           rdfs:isDefinedBy <https://w3id.org/won/core> .
-
-
-###  https://w3id.org/won/core#LIFOScheduling
-:LIFOScheduling rdf:type owl:NamedIndividual ,
-                         :SchedulingPolicy ;
-                rdfs:comment "Last In First Out: As the Socket's connection count drops below its capacity, the connection with the shortest waiting time is chosen from the Socket's queue."@en .
 
 
 ###  https://w3id.org/won/core#NoHintForCounterpart
@@ -548,42 +529,6 @@ It specifies a content - what the atom is about, which may be something that is 
                       :Flag ;
              rdfs:comment "An Atom specifying this flag indicates that matchers should not send Hint messages to that Atom. If the NoHintForCounterpart flag is also present, matchers should disregard this atom completely."@en ;
              rdfs:isDefinedBy <https://w3id.org/won/core> .
-
-
-###  https://w3id.org/won/core#OnOverloadDeny
-:OnOverloadDeny rdf:type owl:NamedIndividual ,
-                         :OverloadPolicy ;
-                rdfs:comment "If the socket's capacity is reached and another connection is requested, the request is denied."@en .
-
-
-###  https://w3id.org/won/core#OnOverloadQueue
-:OnOverloadQueue rdf:type owl:NamedIndividual ,
-                          :OverloadPolicy ;
-                 rdfs:comment "If the socket's capacity is reached and another connection is requested, that connection is queued. The SchedulingPolicy dictates which connection is chosen from the queue as space becomes available."@en .
-
-
-###  https://w3id.org/won/core#OnOverloadReplaceNewest
-:OnOverloadReplaceNewest rdf:type owl:NamedIndividual ,
-                                  :OverloadPolicy ;
-                         rdfs:comment "If the socket's capacity is reached and another connection is requested, the newest connection is closed in favor of the new one."@en .
-
-
-###  https://w3id.org/won/core#OnOverloadReplaceOldest
-:OnOverloadReplaceOldest rdf:type owl:NamedIndividual ,
-                                  :OverloadPolicy ;
-                         rdfs:comment "If the socket's capacity is reached and another connection is requested, the oldest connection is closed in favor of the new one." .
-
-
-###  https://w3id.org/won/core#OnOverloadReplaceRandom
-:OnOverloadReplaceRandom rdf:type owl:NamedIndividual ,
-                                  :OverloadPolicy ;
-                         rdfs:comment "If the socket's capacity is reached and another connection is requested, one randomly chosen connection is closed in favor of the new one."@en .
-
-
-###  https://w3id.org/won/core#RandomScheduling
-:RandomScheduling rdf:type owl:NamedIndividual ,
-                           :SchedulingPolicy ;
-                  rdfs:comment "As the Socket's connection count drops below its capacity, a connection is chosen at random from the Socket's queue."@en .
 
 
 ###  https://w3id.org/won/core#RequestReceived
