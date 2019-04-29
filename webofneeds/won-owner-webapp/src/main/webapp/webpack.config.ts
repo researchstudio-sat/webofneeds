@@ -8,6 +8,7 @@ import * as CopyWebpackPlugin from "copy-webpack-plugin";
 import * as WatchTimePlugin from "webpack-watch-time-plugin";
 import * as UnusedWebpackPlugin from "unused-webpack-plugin";
 import * as DartSass from "dart-sass";
+import * as HtmlWebpackPlugin from "html-webpack-plugin";
 
 export default config;
 
@@ -31,6 +32,7 @@ function config(env, argv): Configuration {
     },
     output: {
       path: path.resolve(__dirname, "generated"),
+      filename: "[name].[contenthash].js",
     },
     resolve: {
       modules: [__dirname, "node_modules"],
@@ -82,19 +84,21 @@ function config(env, argv): Configuration {
             {
               loader: "css-loader",
               options: {
-                sourceMap: mode == "development",
+                sourceMap: true,
                 minimize: true,
                 import: false,
-                url: false,
               },
             },
             {
               loader: "postcss-loader",
+              options: {
+                sourceMap: true,
+              },
             },
             {
               loader: "sass-loader",
               options: {
-                sourceMap: mode == "development",
+                sourceMap: true,
                 implementation: DartSass,
               },
             },
@@ -102,12 +106,13 @@ function config(env, argv): Configuration {
         },
         {
           test: /\.svg$/,
+          include: [path.resolve(__dirname, "images", "won-icons")],
           use: [
             {
               loader: "svg-sprite-loader",
               options: {
                 extract: true,
-                spriteFilename: "symbol/svg/sprite.symbol.svg",
+                spriteFilename: "spritesheet.[hash].svg",
               },
             },
             {
@@ -126,23 +131,45 @@ function config(env, argv): Configuration {
             },
           },
         },
+        {
+          test: /\.(woff2?|ttf)$/,
+          exclude: [path.resolve(__dirname, "images", "won-icons")],
+          use: {
+            loader: "file-loader",
+            options: {
+              outputPath: "fonts",
+            },
+          },
+        },
+        {
+          test: /\.(png|svg)$/,
+          exclude: [path.resolve(__dirname, "images", "won-icons")],
+          use: {
+            loader: "file-loader",
+            options: {
+              outputPath: "images",
+            },
+          },
+        },
       ],
     },
     plugins: [
+      new HtmlWebpackPlugin({
+        template: path.resolve(__dirname, "template.ejs"),
+      }),
       new MiniCssExtractPlugin({
-        filename: "won.min.css",
+        filename: "[name].[contenthash].css",
       }),
       new SpriteLoaderPlugin({ plainSprite: true }),
       new CopyWebpackPlugin(
         [
           {
-            context: path.resolve(
-              path.dirname(require.resolve("leaflet/package.json")),
-              "dist",
-              "images"
-            ),
-            from: "**/*",
-            to: "./images/",
+            from: "WEB-INF",
+            to: "WEB-INF",
+          },
+          {
+            from: "skin",
+            to: "skin",
           },
         ],
         {}
@@ -159,8 +186,6 @@ function config(env, argv): Configuration {
           path.join(__dirname, "app"),
           path.join(__dirname, "style"),
         ],
-        // Exclude patterns
-        exclude: ["*.html"],
         // Root directory (optional)
         root: __dirname,
       }),

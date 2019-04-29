@@ -30,8 +30,6 @@ const template = (
   </container>
 );
 
-console.log(template);
-
 const serviceDependencies = [
   "$ngRedux",
   "$scope",

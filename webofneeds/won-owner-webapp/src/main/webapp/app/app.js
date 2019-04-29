@@ -30,7 +30,7 @@ import uiRouterModule from "angular-ui-router";
  * delete at your own peril
  */
 import "angular-ui-router-shim";
-import { delay, inlineSVGSpritesheet } from "./utils.js";
+import { delay } from "./utils.js";
 
 //---------- Config -----------
 import { configRouting, runAccessControl } from "./configRouting.js";
@@ -169,15 +169,21 @@ app.run([
  */
 app.run(["$ngRedux", $ngRedux => $ngRedux.dispatch(actionCreators.tick())]);
 
-//let app = angular.module('won.owner',[...other modules...]);
-angular.bootstrap(document, ["won.owner"], {
-  // make sure dependency injection works after minification (or
-  // at least angular explains about sloppy imports with a
-  // reference to the right place)
-  // see https://docs.angularjs.org/guide/production
-  // and https://docs.angularjs.org/guide/di#dependency-annotation
-  strictDi: true,
-});
+/**
+ * create the parent element for angular. This could live in the build config, but since it is very angular specific, it should probably live here
+ */
+document.addEventListener("DOMContentLoaded", () => {
+  const uiView = document.createElement("section");
+  uiView.setAttribute("ui-view", "");
+  document.body.appendChild(uiView);
 
-//inlineSVGSpritesheet("./generated/icon-sprite.svg", "icon-sprite");
-inlineSVGSpritesheet("./generated/symbol/svg/sprite.symbol.svg", "icon-sprite");
+  //let app = angular.module('won.owner',[...other modules...]);
+  angular.bootstrap(document, ["won.owner"], {
+    // make sure dependency injection works after minification (or
+    // at least angular explains about sloppy imports with a
+    // reference to the right place)
+    // see https://docs.angularjs.org/guide/production
+    // and https://docs.angularjs.org/guide/di#dependency-annotation
+    strictDi: true,
+  });
+});
