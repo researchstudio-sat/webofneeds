@@ -3,7 +3,7 @@
  */
 import angular from "angular";
 import ngAnimate from "angular-animate";
-import { attach, getIn, get, delay, sortByDate } from "../../utils.js";
+import { attach, getIn, get, delay } from "../../utils.js";
 import { connect2Redux } from "../../won-utils.js";
 import { actionCreators } from "../../actions/actions.js";
 import postMessagesModule from "../post-messages.js";
@@ -31,6 +31,15 @@ class Controller {
       const viewAtomUri = generalSelectors.getViewAtomUriFromRoute(state);
       const viewConnUri = generalSelectors.getViewConnectionUriFromRoute(state);
 
+      const whatsAroundLocation = getIn(state, [
+        "owner",
+        "lastWhatsAroundLocation",
+      ]);
+      const whatsAroundMaxDistance = getIn(state, [
+        "owner",
+        "lastWhatsAroundMaxDistance",
+      ]);
+
       const whatsNewMetaAtoms = getIn(state, ["owner", "whatsAround"])
         .filter(metaAtom => atomUtils.isActive(metaAtom))
         .filter(metaAtom => !atomUtils.isSearchAtom(metaAtom))
@@ -40,9 +49,22 @@ class Controller {
           (metaAtom, metaAtomUri) =>
             !generalSelectors.isAtomOwned(state, metaAtomUri)
         )
-        .filter(metaAtom => atomUtils.hasLocation(metaAtom));
+        .filter(metaAtom => atomUtils.hasLocation(metaAtom))
+        .filter(metaAtom => {
+          const distanceFrom = atomUtils.getDistanceFrom(
+            metaAtom,
+            whatsAroundLocation
+          );
+          if (distanceFrom) {
+            return distanceFrom <= whatsAroundMaxDistance;
+          }
+          return false;
+        });
 
-      const sortedVisibleAtoms = sortByDate(whatsNewMetaAtoms, "creationDate");
+      const sortedVisibleAtoms = atomUtils.sortByDistanceFrom(
+        whatsNewMetaAtoms,
+        whatsAroundLocation
+      );
       const sortedVisibleAtomUriArray = sortedVisibleAtoms && [
         ...sortedVisibleAtoms.flatMap(visibleAtom => get(visibleAtom, "uri")),
       ];
