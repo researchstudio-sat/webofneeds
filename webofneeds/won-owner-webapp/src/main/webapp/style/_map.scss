@@ -43,11 +43,6 @@ main.ownermap {
         }
       }
 
-      &__loading {
-        font-size: $smallFontSize;
-        color: $won-line-gray;
-      }
-
       &__updated {
         display: grid;
         grid-template-columns: min-content min-content;
@@ -55,6 +50,11 @@ main.ownermap {
         align-items: center;
 
         font-size: $smallFontSize;
+
+        &__loading {
+          font-size: $smallFontSize;
+          color: $won-line-gray;
+        }
 
         &__time {
           white-space: nowrap;
@@ -102,11 +102,6 @@ main.ownermap {
         }
       }
 
-      &__loading {
-        font-size: $smallFontSize;
-        color: $won-line-gray;
-      }
-
       &__updated {
         display: grid;
         grid-template-columns: min-content min-content;
@@ -115,6 +110,11 @@ main.ownermap {
         justify-content: flex-end;
 
         font-size: $smallFontSize;
+
+        &__loading {
+          font-size: $smallFontSize;
+          color: $won-line-gray;
+        }
 
         &__time {
           white-space: nowrap;

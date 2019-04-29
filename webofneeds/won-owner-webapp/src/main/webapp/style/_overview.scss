@@ -13,40 +13,91 @@ main.owneroverview {
   margin: 0 auto;
 
   & .owneroverview__header {
-    display: grid;
-    grid-template-columns: 1fr min-content;
-    grid-gap: 0.5rem;
-    border-bottom: $thinGrayBorder;
-    padding: 0.5rem;
-    align-items: center;
-
-    &__title {
-      font-size: $mediumFontSize;
-    }
-
-    &__loading {
-      font-size: $smallFontSize;
-      color: $won-line-gray;
-    }
-
-    &__updated {
+    @media (min-width: $responsivenessBreakPoint) {
       display: grid;
-      grid-template-columns: min-content min-content;
+      grid-template-columns: 1fr min-content;
       grid-gap: 0.5rem;
+      border-bottom: $thinGrayBorder;
+      padding: 0.5rem;
       align-items: center;
 
-      font-size: $smallFontSize;
-
-      &__time {
-        white-space: nowrap;
-        color: $won-line-gray;
+      &__title {
+        font-size: $mediumFontSize;
       }
 
-      &__reload.won-button--filled.red {
-        font-size: 0.75rem;
-        padding: 0.25rem;
+      &__updated {
+        display: grid;
+        grid-template-columns: min-content min-content;
+        grid-gap: 0.5rem;
+        align-items: center;
+
+        font-size: $smallFontSize;
+
+        &__loading {
+          font-size: $smallFontSize;
+          color: $won-line-gray;
+        }
+
+        &__time {
+          white-space: nowrap;
+          color: $won-line-gray;
+        }
+
+        &__reload.won-button--filled.red {
+          font-size: 0.75rem;
+          padding: 0.25rem;
+        }
       }
     }
+    @media (max-width: $responsivenessBreakPoint) {
+      display: grid;
+      grid-template-columns: 1fr;
+      grid-template-rows: min-content min-content;
+      grid-gap: 0.5rem;
+      border-bottom: $thinGrayBorder;
+      padding: 0.5rem;
+      align-items: center;
+
+      &__title {
+        font-size: $normalFontSize;
+      }
+
+      &__updated {
+        display: grid;
+        grid-template-columns: min-content min-content;
+        grid-gap: 0.5rem;
+        align-items: center;
+        justify-content: flex-end;
+
+        font-size: $smallFontSize;
+
+        &__loading {
+          font-size: $smallFontSize;
+          color: $won-line-gray;
+        }
+
+        &__time {
+          white-space: nowrap;
+          color: $won-line-gray;
+        }
+
+        &__reload.won-button--filled.red {
+          font-size: 0.75rem;
+          padding: 0.25rem;
+        }
+      }
+    }
+  }
+
+  .ownermap__noresults {
+    display: flex;
+    flex-wrap: wrap;
+    padding: 0.5rem;
+    font-size: $normalFontSize;
+    color: $won-disabled-color;
+    text-align: center;
+    max-width: 25rem;
+    margin: 0 auto;
   }
 
   .owneroverview__content {

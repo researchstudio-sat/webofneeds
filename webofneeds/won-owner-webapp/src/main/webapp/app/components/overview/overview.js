@@ -63,6 +63,8 @@ class Controller {
             lastAtomUrisUpdateDate
           ),
         sortedVisibleAtomUriArray,
+        hasVisibleAtomUris:
+          sortedVisibleAtomUriArray && sortedVisibleAtomUriArray.length > 0,
         sortedVisibleAtomUriSize: sortedVisibleAtomUriArray
           ? sortedVisibleAtomUriArray.length
           : 0,

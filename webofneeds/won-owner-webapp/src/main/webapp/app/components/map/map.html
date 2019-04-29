@@ -34,14 +34,15 @@
                 <span class="ownermap__header__title__location__label">{{self.currentLocationName}}</span>
             </span>
         </div>
-        <div class="ownermap__header__loading" ng-if="self.isOwnerAtomUrisLoading">
-            Loading...
-        </div>
-        <div class="ownermap__header__updated" ng-if="!self.isOwnerAtomUrisLoading">
-            <div class="ownermap__header__updated__time">
+
+        <div class="ownermap__header__updated">
+            <div class="ownermap__header__updated__loading" ng-if="self.isOwnerAtomUrisLoading">
+                Loading...
+            </div>
+            <div class="ownermap__header__updated__time" ng-if="!self.isOwnerAtomUrisLoading">
                 Updated: {{ self.friendlyLastAtomUrisUpdateTimestamp }}
             </div>
-            <div class="ownermap__header__updated__reload won-button--filled red" ng-click="self.reload()">
+            <div class="ownermap__header__updated__reload won-button--filled red" ng-click="self.reload()" ng-disabled="self.isOwnerAtomUrisLoading">
                 Reload
             </div>
         </div>
