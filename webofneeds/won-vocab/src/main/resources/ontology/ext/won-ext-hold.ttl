@@ -14,24 +14,16 @@
 #    Annotation properties
 #################################################################
 
-###  https://w3id.org/won/core#allowedTargetSocket
-won:allowedTargetSocket rdf:type owl:AnnotationProperty .
+###  https://w3id.org/won/ext/hold#heldBy
+:heldBy rdf:type owl:AnnotationProperty ;
+        rdfs:range won:Atom ;
+        rdfs:domain won:Atom .
 
 
-###  https://w3id.org/won/core#autoOpen
-won:autoOpen rdf:type owl:AnnotationProperty .
-
-
-###  https://w3id.org/won/core#compatibleSocketType
-won:compatibleSocketType rdf:type owl:AnnotationProperty .
-
-
-###  https://w3id.org/won/core#derivesAtomProperty
-won:derivesAtomProperty rdf:type owl:AnnotationProperty .
-
-
-###  https://w3id.org/won/core#socketCapacity
-won:socketCapacity rdf:type owl:AnnotationProperty .
+###  https://w3id.org/won/ext/hold#holds
+:holds rdf:type owl:AnnotationProperty ;
+       rdfs:range won:Atom ;
+       rdfs:domain won:Atom .
 
 
 #################################################################
@@ -39,99 +31,44 @@ won:socketCapacity rdf:type owl:AnnotationProperty .
 #################################################################
 
 ###  https://w3id.org/won/ext/hold#heldBy
-:heldBy rdf:type owl:ObjectProperty ;
-        owl:inverseOf :holds ;
-        rdfs:domain won:Atom ;
-        rdfs:range won:Atom .
+:heldBy rdf:type owl:ObjectProperty .
 
 
 ###  https://w3id.org/won/ext/hold#holds
-:holds rdf:type owl:ObjectProperty ;
-       rdfs:domain won:Atom ,
-                   :Holder ;
-       rdfs:range won:Atom ,
-                  :Holdable .
-
-
-#################################################################
-#    Classes
-#################################################################
-
-###  https://w3id.org/won/ext/hold#Holdable
-:Holdable rdf:type owl:Class ;
-          owl:equivalentClass [ rdf:type owl:Restriction ;
-                                owl:onProperty won:socket ;
-                                owl:someValuesFrom :HoldableSocket
-                              ] ;
-          rdfs:comment "An Atom that does not represent an agent. May be connected to a Holder Atom via the heldBy property."@en .
-
-
-###  https://w3id.org/won/ext/hold#HoldableSocket
-:HoldableSocket rdf:type owl:Class ;
-                owl:equivalentClass [ rdf:type owl:Restriction ;
-                                      owl:onProperty won:socketConfiguration ;
-                                      owl:hasValue :HoldableSocketConfiguration
-                                    ] ;
-                rdfs:subClassOf won:Socket ;
-                rdfs:comment "An Atom uses this Socket to connect to the Persona Atom that holds it. Can be asserted explicitly, but is also inferrable for individuals that have socketConfiguration HoldableSocketConfiguration."@en .
-
-
-###  https://w3id.org/won/ext/hold#Holder
-:Holder rdf:type owl:Class ;
-        owl:equivalentClass [ rdf:type owl:Restriction ;
-                              owl:onProperty won:socket ;
-                              owl:someValuesFrom :HolderSocket
-                            ] ;
-        rdfs:comment "Represents an agent. Is linked to other Atoms the agent controls via the holds property."@en .
-
-
-###  https://w3id.org/won/ext/hold#HolderSocket
-:HolderSocket rdf:type owl:Class ;
-              owl:equivalentClass [ rdf:type owl:Restriction ;
-                                    owl:onProperty won:socketConfiguration ;
-                                    owl:hasValue :HolderSocketConfiguration
-                                  ] ;
-              rdfs:subClassOf won:Socket ;
-              rdfs:comment "A Persona Atom uses this Socket to connect to Atoms it holds. Can be asserted explicitly, but is also inferrable for individuals that have socketConfiguration HolderSocketConfiguration."@en .
+:holds rdf:type owl:ObjectProperty .
 
 
 #################################################################
 #    Individuals
 #################################################################
 
-###  http://example.com/won/ext/hold#MyAdditionalSocketConfig
-<http://example.com/won/ext/hold#MyAdditionalSocketConfig> rdf:type owl:NamedIndividual ;
-                                                           won:socketCapacity 5 .
-
-
 ###  http://example.com/won/ext/hold#MyConcreteHoldableSocket
-<http://example.com/won/ext/hold#MyConcreteHoldableSocket> rdf:type owl:NamedIndividual ,
-                                                                    :HoldableSocket ;
-                                                           won:socketConfiguration :HoldableSocketConfiguration .
+<http://example.com/won/ext/hold#MyConcreteHoldableSocket> rdf:type owl:NamedIndividual ;
+                                                           won:socketDefinition :HoldableSocketDefinition .
 
 
 ###  http://example.com/won/ext/hold#MyConcreteHolderSocket
-<http://example.com/won/ext/hold#MyConcreteHolderSocket> rdf:type owl:NamedIndividual ,
-                                                                  :HolderSocket ;
-                                                         won:socketConfiguration <http://example.com/won/ext/hold#MyAdditionalSocketConfig> ,
-                                                                                 :HolderSocketConfiguration .
+<http://example.com/won/ext/hold#MyConcreteHolderSocket> rdf:type owl:NamedIndividual ;
+                                                         won:socketDefinition :HolderSocketDefinition .
 
 
-###  https://w3id.org/won/ext/hold#HoldableSocketConfiguration
-:HoldableSocketConfiguration rdf:type owl:NamedIndividual ;
-                             rdfs:comment "An Atom uses a Socket with this configuration to connect to the Persona Atom that holds it."@en ;
-                             won:autoOpen "false"^^xsd:boolean ;
-                             won:compatibleSocketType :HolderSocket ;
-                             won:derivesAtomProperty :holds ;
-                             won:socketCapacity 1 .
+###  https://w3id.org/won/ext/hold#HoldableSocket
+:HoldableSocket rdf:type owl:NamedIndividual ,
+                         won:SocketDefinition ;
+                rdfs:comment "An Atom uses a Socket with this configuration to connect to the Persona Atom that holds it."@en ;
+                won:autoOpen "false"^^xsd:boolean ;
+                won:compatibleSocketDefinition :HolderSocketDefinition ;
+                won:derivesAtomProperty :holds ;
+                won:socketCapacity 1 .
 
 
-###  https://w3id.org/won/ext/hold#HolderSocketConfiguration
-:HolderSocketConfiguration rdf:type owl:NamedIndividual ;
-                           rdfs:comment "A Persona Atom uses a Socket with this configuration to connect to Atoms it holds."@en ;
-                           won:autoOpen "false"^^xsd:boolean ;
-                           won:compatibleSocketType :HoldableSocket ;
-                           won:derivesAtomProperty :heldBy .
+###  https://w3id.org/won/ext/hold#HolderSocket
+:HolderSocket rdf:type owl:NamedIndividual ,
+                       won:SocketDefinition ;
+              rdfs:comment "A Persona Atom uses a Socket with this configuration to connect to Atoms it holds."@en ;
+              won:autoOpen "false"^^xsd:boolean ;
+              won:compatibleSocketDefinition :HoldableSocketDefinition ;
+              won:derivesAtomProperty :heldBy .
 
 
 ###  https://w3id.org/won/ext/hold#heldBy

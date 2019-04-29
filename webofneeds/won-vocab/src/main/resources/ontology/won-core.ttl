@@ -61,9 +61,10 @@ xsd:duration rdf:type rdfs:Datatype .
            rdfs:isDefinedBy <https://w3id.org/won/core> .
 
 
-###  https://w3id.org/won/core#compatibleSocketType
-:compatibleSocketType rdf:type owl:ObjectProperty ;
-                      rdfs:domain :SocketConfiguration .
+###  https://w3id.org/won/core#compatibleSocketDefinition
+:compatibleSocketDefinition rdf:type owl:ObjectProperty ;
+                            rdfs:domain :SocketDefinition ;
+                            rdfs:range :SocketDefinition .
 
 
 ###  https://w3id.org/won/core#connectionState
@@ -93,7 +94,7 @@ xsd:duration rdf:type rdfs:Datatype .
 
 ###  https://w3id.org/won/core#derivesAtomProperty
 :derivesAtomProperty rdf:type owl:ObjectProperty ;
-                     rdfs:domain :SocketConfiguration ;
+                     rdfs:domain :SocketDefinition ;
                      rdfs:comment "Defines a property to be 'derived' when the connection is established. The property will be used to derive a triple '[sourceAtom] [property] [targetAtom]'."@en .
 
 
@@ -136,11 +137,6 @@ xsd:duration rdf:type rdfs:Datatype .
             rdfs:isDefinedBy <https://w3id.org/won/core> .
 
 
-###  https://w3id.org/won/core#overloadPolicy
-:overloadPolicy rdf:type owl:ObjectProperty ;
-                rdfs:domain :SocketConfiguration .
-
-
 ###  https://w3id.org/won/core#owner
 :owner rdf:type owl:ObjectProperty ,
                 owl:FunctionalProperty ;
@@ -153,11 +149,6 @@ xsd:duration rdf:type rdfs:Datatype .
 :ownerProtocolEndpoint rdf:type owl:ObjectProperty ;
                        rdfs:comment "Points to the ownerProtocol webservice endpoint of the atom. I.e., owner applications can communicate with the atom through this endpoint."@en ;
                        rdfs:isDefinedBy <https://w3id.org/won/core> .
-
-
-###  https://w3id.org/won/core#schedulingPolicy
-:schedulingPolicy rdf:type owl:ObjectProperty ;
-                  rdfs:domain :SocketConfiguration .
 
 
 ###  https://w3id.org/won/core#seeks
@@ -176,10 +167,11 @@ sought to fulfill the atom in contrast to the part that is available.""" ;
         rdfs:isDefinedBy <https://w3id.org/won/core> .
 
 
-###  https://w3id.org/won/core#socketConfiguration
-:socketConfiguration rdf:type owl:ObjectProperty ;
-                     rdfs:domain :Socket ;
-                     rdfs:range :SocketConfiguration .
+###  https://w3id.org/won/core#socketDefinition
+:socketDefinition rdf:type owl:ObjectProperty ;
+                  rdfs:domain :Socket ;
+                  rdfs:range :SocketDefinition ;
+                  rdfs:comment "Links the socket to its definition. A socket must have exactly one definition."@en .
 
 
 ###  https://w3id.org/won/core#supportsWonProtocolImpl
@@ -271,7 +263,7 @@ sought to fulfill the atom in contrast to the part that is available.""" ;
 
 ###  https://w3id.org/won/core#autoOpen
 :autoOpen rdf:type owl:DatatypeProperty ;
-          rdfs:domain :SocketConfiguration ;
+          rdfs:domain :SocketDefinition ;
           rdfs:range xsd:boolean ;
           rdfs:comment "Indicates that any incoming CONNECT/OPEN message will be answered with OPEN unless the facet configuration forbids it."@en .
 
@@ -332,7 +324,7 @@ sought to fulfill the atom in contrast to the part that is available.""" ;
 
 ###  https://w3id.org/won/core#socketCapacity
 :socketCapacity rdf:type owl:DatatypeProperty ;
-                rdfs:domain :SocketConfiguration ;
+                rdfs:domain :SocketDefinition ;
                 rdfs:range xsd:integer ;
                 rdfs:comment "Defines the maximum number of established connections supported by the socket."@en .
 
@@ -441,8 +433,9 @@ It specifies a content - what the atom is about, which may be something that is 
         rdfs:isDefinedBy <https://w3id.org/won/core> .
 
 
-###  https://w3id.org/won/core#SocketConfiguration
-:SocketConfiguration rdf:type owl:Class .
+###  https://w3id.org/won/core#SocketDefinition
+:SocketDefinition rdf:type owl:Class ;
+                  rdfs:comment "A Socket's definition."@en .
 
 
 ###  https://w3id.org/won/core#TimeSpecification
