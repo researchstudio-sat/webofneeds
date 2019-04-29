@@ -839,7 +839,7 @@ public class WonRdfUtils {
          */
         public static Optional<URI> getTypeOfSocket(Model content, URI socket) {
             Resource resource = content.getResource(socket.toString());
-            Resource socketType = resource.getPropertyResourceValue(RDF.type);
+            Resource socketType = resource.getPropertyResourceValue(WON.socketDefinition);
             if (socketType != null && socketType.isURIResource()) {
                 return Optional.of(URI.create(socketType.asResource().getURI()));
             }
@@ -887,7 +887,7 @@ public class WonRdfUtils {
             while (stmtIterator.hasNext()) {
                 RDFNode socket = stmtIterator.nextStatement().getObject();
                 if (socket.isResource() && socket.isURIResource()) {
-                    if (socket.asResource().hasProperty(RDF.type, socketTypeResource)) {
+                    if (socket.asResource().hasProperty(WON.socketDefinition, socketTypeResource)) {
                         ret.add(URI.create(socket.toString()));
                     }
                 }
@@ -952,7 +952,7 @@ public class WonRdfUtils {
             Resource baseRes = RdfUtils.getBaseResource(model);
             Resource socket = model.createResource(socketURI.toString());
             baseRes.addProperty(WON.socket, socket);
-            socket.addProperty(RDF.type, model.createResource(socketTypeURI.toString()));
+            socket.addProperty(WON.socketDefinition, model.createResource(socketTypeURI.toString()));
             if (isDefaultSocket) {
                 if (baseRes.hasProperty(WON.defaultSocket)) {
                     baseRes.removeAll(WON.defaultSocket);
@@ -1007,8 +1007,8 @@ public class WonRdfUtils {
             socketConfiguration
                             .setCompatibleSocketTypes(RdfUtils
                                             .getObjectStreamForPropertyPath(dataset, socketURI,
-                                                            PathParser.parse("<" + WON.socketDefinition.getURI()
-                                                                            + ">/<" + WON.compatibleSocketDefinition + ">",
+                                                            PathParser.parse("<" + WON.socketDefinition.getURI() + ">/<"
+                                                                            + WON.compatibleSocketDefinition + ">",
                                                                             DefaultPrefixUtils.getDefaultPrefixes()),
                                                             node -> node.isURI() ? URI.create(node.getURI()) : null)
                                             .collect(Collectors.toSet()));
@@ -1019,8 +1019,8 @@ public class WonRdfUtils {
             socketConfiguration
                             .setDerivationProperties(RdfUtils
                                             .getObjectStreamForPropertyPath(dataset, socketURI,
-                                                            PathParser.parse("<" + WON.socketDefinition.getURI()
-                                                                            + ">/<" + WON.derivesAtomProperty + ">",
+                                                            PathParser.parse("<" + WON.socketDefinition.getURI() + ">/<"
+                                                                            + WON.derivesAtomProperty + ">",
                                                                             DefaultPrefixUtils.getDefaultPrefixes()),
                                                             node -> node.isURI() ? URI.create(node.getURI()) : null)
                                             .collect(Collectors.toSet()));
@@ -1041,8 +1041,7 @@ public class WonRdfUtils {
             }
         }
 
-        public static void setSocketCapacity(SocketDefinitionImpl socketConfiguration, Dataset dataset,
-                        URI socketURI) {
+        public static void setSocketCapacity(SocketDefinitionImpl socketConfiguration, Dataset dataset, URI socketURI) {
             Set<Integer> socketCapacities = RdfUtils.getObjectStreamForPropertyPath(dataset, socketURI,
                             PathParser.parse("<" + WON.socketDefinition.getURI() + ">/<" + WON.socketCapacity + ">",
                                             DefaultPrefixUtils.getDefaultPrefixes()),
