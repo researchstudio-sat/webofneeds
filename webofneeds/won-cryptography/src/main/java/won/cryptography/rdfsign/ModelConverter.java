@@ -150,7 +150,7 @@ public class ModelConverter {
         } else if (rdfNode.isAnon()) {
             result = enclose(rdfNode.asResource().getId().getLabelString(), "_:", "");
         } else {
-            // TODO It might atom to be improved as some syntax cases might not be covered
+            // TODO It might need to be improved as some syntax cases might not be covered
             // so far
             // a collection??
             throw new UnsupportedOperationException("support missing for converting: " + rdfNode.toString());

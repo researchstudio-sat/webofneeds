@@ -296,7 +296,7 @@ export function isDisplayableUseCase(useCase) {
 }
 
 /**
- * return if the given useCase is displayable or not
+ * return whether the given useCase is displayable or not
  * @param useCase
  * @returns {*}
  */
@@ -306,7 +306,7 @@ export function isDisplayableItem(item) {
 
 /**
  * return if the given useCaseGroup is displayable or not
- * atoms to have at least one displayable UseCase
+ * needs to have at least one displayable UseCase
  * @param useCase
  * @returns {*}
  */

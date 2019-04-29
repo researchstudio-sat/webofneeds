@@ -111,7 +111,7 @@ Second if the counterpart atom doesn't evaluate the `:infoApartmentGrah` on its 
     1. Such messages would have to contain triples in their content graphs that our shapes are expecting.
         1. simplest solution is to add an imput field for raw RDF data in the owner app.
     1. Alternatively, the counterpart could send messages that tell us to ignore certain graphs that have been sent earlier, because they contained wrong data, or data that is no longer true (such as the current location). The semantics would be 'Graph XY (the one to ignore) is false'.
-        1. We have defined how messages can later be retracted in [our DeSemWeb2017 publication](http://ceur-ws.org/Vol-1934/contribution-07.pdf) - we just atom to implement that and give it a good GUI
+        1. We have defined how messages can later be retracted in [our DeSemWeb2017 publication](http://ceur-ws.org/Vol-1934/contribution-07.pdf) - we just need to implement that and give it a good GUI
     1. How could the bot could encourage such messages?
         1. Variant A: Keep it simple - show results - wait for triples
             1. validate the current data with the shapes

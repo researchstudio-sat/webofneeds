@@ -9,7 +9,6 @@ import labelledHrModule from "./labelled-hr.js";
 import connectionContextDropdownModule from "./connection-context-dropdown.js";
 import { connect2Redux } from "../won-utils.js";
 import { attach, delay, getIn, get } from "../utils.js";
-import * as atomUtils from "../atom-utils.js";
 import * as messageUtils from "../message-utils.js";
 import * as connectionUtils from "../connection-utils.js";
 import * as processUtils from "../process-utils.js";
@@ -138,7 +137,7 @@ function genComponentConf() {
                 on-submit="::self.sendRequest(value, selectedPersona)"
                 allow-details="::false"
                 allow-empty-submit="::true"
-                show-personas="self.isOwnedAtomWhatsX"
+                show-personas="!self.connection"
                 submit-button-label="::'Ask&#160;to&#160;Join'"
             >
             </chat-textfield>
@@ -171,7 +170,6 @@ function genComponentConf() {
         const connectionUri = getConnectionUriFromRoute(state);
         const ownedAtom = getOwnedAtomByConnectionUri(state, connectionUri);
         const connection = getIn(ownedAtom, ["connections", connectionUri]);
-        const isOwnedAtomWhatsX = atomUtils.isWhatsAroundAtom(ownedAtom);
         const targetAtomUri = get(connection, "targetAtomUri");
         const targetAtom = getIn(state, ["atoms", targetAtomUri]);
         const allChatMessages = get(connection, "messages");
@@ -210,7 +208,6 @@ function genComponentConf() {
           targetAtomUri,
           connectionUri,
           connection,
-          isOwnedAtomWhatsX,
           sortedMessageUris: sortedMessages && [
             ...sortedMessages.flatMap(msg => msg.get("uri")),
           ],
@@ -384,13 +381,8 @@ function genComponentConf() {
     }
 
     sendRequest(message, persona) {
-      if (!this.connection || this.isOwnedAtomWhatsX) {
+      if (!this.connection) {
         this.router__stateGoResetParams("connections");
-
-        if (this.isOwnedAtomWhatsX) {
-          //Close the connection if there was a present connection for a whatsaround atom
-          this.connections__close(this.connectionUri);
-        }
 
         if (this.targetAtomUri) {
           this.connections__connectAdHoc(this.targetAtomUri, message, persona);

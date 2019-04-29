@@ -39,7 +39,7 @@ Below is an example of part of an Atom resource description in TRIG format:
     won:hasBasicAtomType  won:Demand ;
     won:content        [ a  won:AtomContent ;
                                dc:title               "WANTED: external CD burner."^^xsd:string ;
-                               dc:description "Mine broke. Atom a new one ASAP."^^xsd:string
+                               dc:description "Mine broke. Need a new one ASAP."^^xsd:string
                           ] ;
     won:socket          won:OwnerSocket ;
     won:atomModality   [ a  won:AtomModality ] ;
@@ -71,7 +71,7 @@ We use Class <https://w3id.org/won/core#ECCPublicKey> to define the type of the 
 
 to define the public key itself. This information is sufficient to be able to reconstruct EC public key with any 
 common cryptographic library and apply it for signature validation or encryption. We use 
-[Bouncy Castle](https://www.bouncycastle.org/) library  for generating and storing the Atoms certificates. We use 
+[Bouncy Castle](https://www.bouncycastle.org/) library for generating and storing the Atom certificates. We use 
 384-Bit elliptic curve, curve id secp384r1. Initially, we considered using the curve with id brainpoolp384r1 from 
 [Brainpool Standard](https://www.ietf.org/rfc/rfc5639.txt), as it 
 is considered one of the safest curves. Later, during the implementation and applying the curve as part of TLS, we 

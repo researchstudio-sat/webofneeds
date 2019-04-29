@@ -28,7 +28,7 @@ The `won-owner-webapp` and `won-node-webapp` have plugin configurations that all
 
 Second, all webofneeds applications expect an environment variable `WON_CONFIG_DIR` pointing to a folder containing configuration files. Copy the contents of [/webofneeds/conf] (https://github.com/researchstudio-sat/webofneeds/tree/master/webofneeds/conf) to some location on the target host. In the files node.properties and owner.properties you will have to replace ´localhost´ with your server's dns name. For installing the system on a developer machine for testing purposes, just copy the contents of `/webofneeds/conf` to `/webofneeds/conf.local` - that folder is marked in the `.gitignore` file and will not be added to git.
 
-Third, you will atom to set up a tomcat user and give him `manager-script` permission. For details please check the Tomcat 7 documentation and [cargo Tomcat 7 documentation](http://cargo.codehaus.org/Tomcat+7.x)
+Third, you will need to set up a tomcat user and give him `manager-script` permission. For details please check the Tomcat 7 documentation and [cargo Tomcat 7 documentation](http://cargo.codehaus.org/Tomcat+7.x)
 
 Now you can deploy your webapps with just one command: `mvn clean install cargo:redeploy -P skip-dependencies,skip-tests,<serverprofile>`
 
@@ -40,7 +40,7 @@ Now you have to do this:
 2. Deploy the war files to the tomcat server (you may use `mvn cargo:redeploy -P <serverprofile>`)
 
 #### Speeding up server startup
-At startup, the jasper compiler seems to scan all jar files that are not explicitly excluded for tag library descriptors. We don't really atom this, as we don't use JSPs. Therefore, all our common libs should be excluded from scanning. A list of these files can be found in
+At startup, the jasper compiler seems to scan all jar files that are not explicitly excluded for tag library descriptors. We don't really need this, as we don't use JSPs. Therefore, all our common libs should be excluded from scanning. A list of these files can be found in
 ```
 /toolconfig/tomcat/tomcat-jasper-scan-exclude-jars.txt
 ```

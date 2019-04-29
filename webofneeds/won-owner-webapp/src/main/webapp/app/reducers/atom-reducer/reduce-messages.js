@@ -97,7 +97,7 @@ export function addMessage(
       const originatorUri = parsedMessage.getIn(["data", "originatorUri"]);
 
       if (originatorUri) {
-        //Message is originally from another atom, we might atom to add the atom as well
+        //Message is originally from another atom, we might need to add the atom as well
         if (!state.has(originatorUri)) {
           console.debug(
             "Originator Atom is not in the state yet, we need to add it"

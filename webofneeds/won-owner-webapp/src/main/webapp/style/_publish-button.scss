@@ -37,6 +37,14 @@
     }
   }
 
+  &.down .won-persona-list {
+    top: calc(100% + 0.25em);
+  }
+
+  &.up .won-persona-list {
+    bottom: calc(100% + 0.25em);
+  }
+
   .won-persona-list {
     $line-size: $postIconSize * 0.7;
     z-index: 2;
@@ -48,7 +56,6 @@
     position: absolute;
     min-width: 100%;
     right: 0;
-    bottom: calc(100% + 0.25em);
     display: grid;
     background: white;
     border: $won-line-gray 1px solid;

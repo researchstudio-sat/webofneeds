@@ -1075,11 +1075,11 @@ export function dispatchActionOnSuccessRemote(event) {
         The part where we iterate over all the references and send the dispatches to mark the
         message appropriately. usually we need to check whether the messageUri to be marked is
         the remoteMessageUri or the ownMessageUri, but since the autoClaim will only be executed
-        on ownMessages we do not atom this check here
+        on ownMessages we do not need this check here
        */
       /*TODO:
        Since we set a messageToBe (successfully) claimed before we even know if the transition was successful
-       we might atom to rethink this implementation in favor of a dirtyState somehow, and remove the dirty state on success
+       we might need to rethink this implementation in favor of a dirtyState somehow, and remove the dirty state on success
        of the message(if(toRefreshData)-part above)... but for now and because
        connectionsChateMessage does not do this either it will do...*/
       dispatch({

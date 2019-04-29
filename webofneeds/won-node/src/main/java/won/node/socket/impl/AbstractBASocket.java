@@ -206,7 +206,7 @@ public abstract class AbstractBASocket implements SocketLogic {
         executorService.execute(new Runnable() {
             @Override
             public void run() {
-                // here, we don't really atom to handle exceptions, as we don't want to flood
+                // here, we don't really need to handle exceptions, as we don't want to flood
                 // matching services with error messages
                 // try {
                 //// ownerProtocolOwnerService.hint(

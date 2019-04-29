@@ -579,28 +579,3 @@ function isSparqlVariable(str) {
   return str && str.search(/^\?\w+$/) > -1;
 }
 //TODO should return a context-def as well
-
-export function generateWhatsAroundQuery(latitude, longitude) {
-  return `PREFIX won: <https://w3id.org/won/core#>
-      PREFIX s: <http://schema.org/>
-      PREFIX geo: <http://www.bigdata.com/rdf/geospatial#>
-      PREFIX geoliteral: <http://www.bigdata.com/rdf/geospatial/literals/v1#>
-      SELECT DISTINCT ?result ((?radius-?location_geoDistance)/?radius as ?score) WHERE {
-        VALUES ?radius { 10 }        
-        ?result <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> won:Atom.
-        ?result won:atomState  won:Active .
-        ?result won:seeks?/(won:location|s:jobLocation|s:location|s:fromLocation|s:toLocation) ?location.
-        ?location s:geo ?location_geo.
-        SERVICE geo:search {
-          ?location_geo geo:search "inCircle".
-          ?location_geo geo:searchDatatype geoliteral:lat-lon.
-          ?location_geo geo:predicate won:geoSpatial.
-          ?location_geo geo:spatialCircleCenter "${latitude}#${longitude}".
-          ?location_geo geo:spatialCircleRadius ?radius.
-          ?location_geo geo:distanceValue ?location_geoDistance.
-        }
-        FILTER(?location_geoDistance < ?radius)
-        FILTER NOT EXISTS { ?result won:flag won:NoHintForCounterpart }
-        FILTER NOT EXISTS { ?result won:flag won:WhatsAround }
-      }`;
-}

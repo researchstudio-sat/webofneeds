@@ -16,7 +16,7 @@
         * Set `Indentation size` + `Tab size`: `4`
         * Rename the formatter settings profile to save it
 11. Set maven profiles: right-click the webofneeds project in the package explorer >> Maven >> Select Maven Profiles. check `skip-tests`
-12. If you develop on Windows you will atom to setup `node`s `windows-build-tools` (see [this guide](./installation-setting-up-frontend-development-environment.md#installing-windows-build-tools-on-windows))
+12. If you develop on Windows you will need to setup `node`s `windows-build-tools` (see [this guide](./installation-setting-up-frontend-development-environment.md#installing-windows-build-tools-on-windows))
 
 ### Preparation: generate cryptographic keys
 Follow the [instructions for generating your keys](https://github.com/researchstudio-sat/webofneeds/blob/master/documentation/installation-cryptographic-keys-and-certificates.md). The result will be a `t-keystore.jks` file somewhere in your filesystem.

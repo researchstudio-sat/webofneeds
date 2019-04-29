@@ -12842,7 +12842,7 @@
 
 <https://localhost:8443/won/resource/event/0svc5rwome1myj39cxxk#content-zfv9> {
     event:0svc5rwome1myj39cxxk
-            won:textMessage  "ok, I'll propose my latest message - but I'll atom to crawl the connection data first, please be patient." .
+            won:textMessage  "ok, I'll propose my latest message - but I'll need to crawl the connection data first, please be patient." .
 }
 
 <https://localhost:8443/won/resource/event/b24tt4akbmhrjddhoa41#envelope-ln0t> {
@@ -17369,7 +17369,7 @@
 
 <https://localhost:8443/won/resource/event/5q8smx3xq2u76h59kjoi#content-calr> {
     event:5q8smx3xq2u76h59kjoi
-            won:textMessage  "ok, I'll propose my latest message - but I'll atom to crawl the connection data first, please be patient." .
+            won:textMessage  "ok, I'll propose my latest message - but I'll need to crawl the connection data first, please be patient." .
 }
 
 <https://localhost:8443/won/resource/event/cvni71rbp23jg1gef1ad#envelope-dr5l> {

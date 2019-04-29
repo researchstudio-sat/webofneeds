@@ -8,7 +8,6 @@
 import won from "./won.js";
 import * as useCaseUtils from "../usecase-utils";
 import { is } from "../utils";
-import { generateWhatsAroundQuery } from "../sparql-builder-utils.js";
 
 import { Generator } from "sparqljs";
 
@@ -46,7 +45,7 @@ import { Generator } from "sparqljs";
    *    // the URIs where attachments can be found / will be published
    *    args.attachmentUris = ['http://example.org/.../1234.png', 'http://example.org/.../1234.pdf']
    *
-   *    // the triples will be put in the graph that's build here anyway, so there's no atom to pass graph-uri
+   *    // the triples will be put in the graph that's build here anyway, so there's no need to pass graph-uri
    *    args.arbitraryJsonLdGraph = [{ '@id': 'http://example.org/.../1234', 'dc:title': 'hi}, {...}, {...}]
    *
    *    args.recurInfinite =
@@ -123,23 +122,8 @@ import { Generator } from "sparqljs";
 
     const useCase = useCaseUtils.getUseCase(args.useCase);
 
-    /*TODO: instead of the detection if whatsX to generate the query we could just make useCases out of the whatsX instead
-      or define the query as a detail
-    */
-    const flags = args.content && args.content.flags;
-    const isWhatsAroundDraft =
-      flags &&
-      ((is("Array", flags) && flags.indexOf("won:WhatsAround") != -1) ||
-        flags === "won:WhatsAround");
-
     let queryString = undefined;
-    if (isWhatsAroundDraft) {
-      const location = args.seeks.location;
-
-      if (location && location.lat && location.lng) {
-        queryString = generateWhatsAroundQuery(location.lat, location.lng);
-      }
-    } else if (useCase && useCase.generateQuery) {
+    if (useCase && useCase.generateQuery) {
       const queryMask = {
         type: "query",
         queryType: "SELECT",

@@ -196,7 +196,7 @@ public class AnalyzeBehaviour extends BotBehaviour {
                                                                     proposalModel);
                                     Precondition precondition = new Precondition(preconditionUri, result.isConform());
                                     logger.trace("\t\t\tPrecondition: " + precondition);
-                                    // TODO: WE MIGHT ATOM TO CHECK WHETHER THE PRECONDITION IS ACTUALLY FULFILLED
+                                    // TODO: WE MIGHT NEED TO CHECK WHETHER THE PRECONDITION IS ACTUALLY FULFILLED
                                     // OR NOT BEFORE WE REMOVE THE TEMP STATUS
                                     if (AnalyzeBehaviour.this.isPreconditionMetPending(preconditionUri)) {
                                         logger.trace("\t\t\tRemove PreconditionMetPending Entry");

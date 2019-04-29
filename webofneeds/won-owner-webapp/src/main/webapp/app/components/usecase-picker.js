@@ -2,7 +2,6 @@
  * Created by quasarchimaere on 03.07.2018.
  */
 import angular from "angular";
-import Immutable from "immutable";
 import ngAnimate from "angular-animate";
 import labelledHrModule from "./labelled-hr.js";
 
@@ -46,13 +45,11 @@ function genComponentConf() {
         <!-- WHAT'S AROUND -->
         <div class="ucp__createx">
             <button class="won-button--filled red ucp__createx__button"
-                    ng-click="self.createWhatsAround()"
-                    ng-disabled="self.processingPublish">
+                    ng-click="self.router__stateGo('map')">
                 <svg class="won-button-icon" style="--local-primary:white;">
                     <use xlink:href="#ico36_location_current" href="#ico36_location_current"></use>
                 </svg>
-                <span ng-if="!self.processingPublish">What's in your Area?</span>
-                <span ng-if="self.processingPublish">Finding out what's going on&hellip;</span>
+                <span>What's in your Area?</span>
             </button>
             <button class="won-button--filled red ucp__createx__button"
                     ng-click="self.router__stateGo('overview')">
@@ -156,7 +153,6 @@ function genComponentConf() {
         return {
           loggedIn: accountUtils.isLoggedIn(get(state, "account")),
           showAll: getUseCaseGroupFromRoute(state) === "all",
-          processingPublish: state.getIn(["process", "processingPublish"]),
           connectionHasBeenLost: !selectIsConnected(state),
           useCaseGroups: useCaseUtils.getUseCaseGroups(),
           customUseCase: useCaseUtils.getCustomUseCase(),
@@ -172,30 +168,6 @@ function genComponentConf() {
     }
 
     // redirects start
-
-    createWhatsAround() {
-      if (this.processingPublish) {
-        console.debug("publish in process, do not take any action");
-        return;
-      }
-
-      if (this.loggedIn) {
-        this.atoms__whatsAround();
-      } else {
-        this.view__showTermsDialog(
-          Immutable.fromJS({
-            acceptCallback: () => {
-              this.view__hideModalDialog();
-              this.atoms__whatsAround();
-            },
-            cancelCallback: () => {
-              this.view__hideModalDialog();
-            },
-          })
-        );
-      }
-    }
-
     startFrom(selectedUseCase) {
       const selectedUseCaseIdentifier =
         selectedUseCase && selectedUseCase.identifier;

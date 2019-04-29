@@ -207,7 +207,7 @@ public class InitFactoryAction extends AbstractCreateAtomAction {
                                                                 waitForUnfinishedAtomsListener);
                                                 // now, we can check if we've already reached the target
                                                 if (creationUnfinishedCounter.getCount() <= 0) {
-                                                    // ok, turned out we didn't atom that listener
+                                                    // ok, turned out we didn't need that listener
                                                     bus.unsubscribe(waitForUnfinishedAtomsListener);
                                                     bus.publish(new InitFactoryFinishedEvent());
                                                 }

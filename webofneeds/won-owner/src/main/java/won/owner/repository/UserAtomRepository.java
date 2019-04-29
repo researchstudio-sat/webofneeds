@@ -24,7 +24,4 @@ import won.protocol.repository.WonRepository;
 public interface UserAtomRepository extends WonRepository<UserAtom> {
     @Query(value = "SELECT n from UserAtom n where n.uri = ?1")
     public UserAtom findByAtomUri(URI atomUri);
-
-    @Query(value = "SELECT n from UserAtom n order by n.creationDate DESC")
-    public List<UserAtom> findAllAtoms();
 }

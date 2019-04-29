@@ -128,7 +128,7 @@ public class BridgeForLinkedDataController implements InitializingBean {
             @Override
             public ClientHttpResponse extractData(final ClientHttpResponse originalResponse) throws IOException {
                 prepareBridgeResponseOutputStream(originalResponse, response);
-                // we don't really atom to return anything, so we don't
+                // we don't really need to return anything, so we don't
                 return null;
             }
         });

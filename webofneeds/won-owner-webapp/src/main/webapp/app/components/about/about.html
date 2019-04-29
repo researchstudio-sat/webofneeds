@@ -1,108 +1,185 @@
 <won-modal-dialog ng-if="self.showModalDialog"></won-modal-dialog>
 <header>
-    <won-topnav></won-topnav>
+  <won-topnav></won-topnav>
 </header>
 <won-toasts></won-toasts>
 <won-slide-in ng-if="self.showSlideIns"></won-slide-in>
 <main class="about" id="allSections">
-    <section class="about__welcome" ng-if="!self.visibleSection">
-        <div class="about__welcome__title">What is the Web of Needs?</div>
-        <won-flex-grid class="about__welcome__grid" items="::self.peopleGrid"></won-flex-grid>
-        <div class="about__welcome__description">
-            <span class="about__welcome__description__title">What is a &laquo;atom&raquo;?</span>
-            <span class="about__welcome__description__text">An atom helps you find people who can help you - or who share your interest.</span>
-            <span class="about__welcome__description__more clickable" ng-click="::self.toggleMoreInfo()">Read more</span>
+  <section class="about__welcome" ng-if="!self.visibleSection">
+    <div class="about__welcome__title">What is the Web of Needs?</div>
+    <won-flex-grid
+      class="about__welcome__grid"
+      items="::self.peopleGrid"
+    ></won-flex-grid>
+    <div class="about__welcome__description">
+      <span class="about__welcome__description__title"
+        >What is an &laquo;atom&raquo;?</span
+      >
+      <span class="about__welcome__description__text"
+        >An atom helps you find people who can help you - or who share your
+        interest.</span
+      >
+      <span
+        class="about__welcome__description__more clickable"
+        ng-click="::self.toggleMoreInfo()"
+        >Read more</span
+      >
 
-            <svg style="--local-primary:var(--won-primary-color);" class="about__welcome__description__arrow clickable" ng-click="::self.toggleMoreInfo()" ng-show="!self.moreInfo">
-                <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
-            </svg>
+      <svg
+        style="--local-primary:var(--won-primary-color);"
+        class="about__welcome__description__arrow clickable"
+        ng-click="::self.toggleMoreInfo()"
+        ng-show="!self.moreInfo"
+      >
+        <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
+      </svg>
 
-            <svg style="--local-primary:var(--won-primary-color);" class="about__welcome__description__arrow clickable" ng-click="::self.toggleMoreInfo()" ng-show="self.moreInfo">
-                <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
-            </svg>
+      <svg
+        style="--local-primary:var(--won-primary-color);"
+        class="about__welcome__description__arrow clickable"
+        ng-click="::self.toggleMoreInfo()"
+        ng-show="self.moreInfo"
+      >
+        <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
+      </svg>
 
-            <span class="about__welcome__description__text" ng-show="self.moreInfo">An atom is much like an automatic classified ad. You say what you are looking for, and other such ads will be
-                matched with yours. You could think of it as of a long-lived search query that can itself be found by others.
-                Once you found a useful match, you can connect to it and start to chat.</span>
+      <span class="about__welcome__description__text" ng-show="self.moreInfo"
+        >An atom is much like an automatic classified ad. You say what you are
+        looking for, and other such ads will be matched with yours. You could
+        think of it as of a long-lived search query that can itself be found by
+        others. Once you found a useful match, you can connect to it and start
+        to chat.</span
+      >
+    </div>
+  </section>
+  <section
+    class="about__howto"
+    ng-if="!self.visibleSection || self.visibleSection === 'aboutHowTo'"
+  >
+    <h1 class="about__howto__title">How it works</h1>
+    <h3 class="about__howto__subtitle">
+      in {{ self.howItWorksSteps.length }} Steps
+    </h3>
+    <div class="about__howto__steps">
+      <div
+        class="about__howto__steps__process"
+        ng-style="{'--howToColCount': self.howItWorksSteps.length}"
+      >
+        <!-- TODO: this var injection does not work -->
+        <svg
+          class="about__howto__steps__process__icon"
+          ng-class="{'about__howto__steps__process__icon--selected': $index == self.selectedHowItWorksStep}"
+          ng-repeat="item in self.howItWorksSteps"
+          ng-click="self.selectedHowItWorksStep = $index"
+        >
+          <use
+            xlink:href="{{ self.getSvgIconFromItem(item) }}"
+            href="{{ self.getSvgIconFromItem(item) }}"
+          />
+        </svg>
+        <div
+          class="about__howto__steps__process__stepcount"
+          ng-repeat="item in self.howItWorksSteps"
+          ng-class="{'about__howto__steps__process__stepcount--selected': $index == self.selectedHowItWorksStep}"
+          ng-click="self.selectedHowItWorksStep = $index"
+        >
+          {{ $index + 1 }}
         </div>
-    </section>
-    <section class="about__howto" ng-if="!self.visibleSection || self.visibleSection === 'aboutHowTo'">
-        <h1 class="about__howto__title">How it works</h1>
-        <h3 class="about__howto__subtitle">in {{self.howItWorksSteps.length}} Steps</h3>
-        <div class="about__howto__steps">
-            <div class="about__howto__steps__process" ng-style="{'--howToColCount': self.howItWorksSteps.length}"> <!-- TODO: this var injection does not work -->
-                <svg class="about__howto__steps__process__icon"
-                     ng-class="{'about__howto__steps__process__icon--selected': $index == self.selectedHowItWorksStep}"
-                     ng-repeat="item in self.howItWorksSteps"
-                     ng-click="self.selectedHowItWorksStep = $index">
-                    <use xlink:href="{{ self.getSvgIconFromItem(item) }}" href="{{ self.getSvgIconFromItem(item) }}"/>
-                </svg>
-                <div class="about__howto__steps__process__stepcount"
-                     ng-repeat="item in self.howItWorksSteps"
-                     ng-class="{'about__howto__steps__process__stepcount--selected': $index == self.selectedHowItWorksStep}"
-                     ng-click="self.selectedHowItWorksStep = $index">
-                    {{ $index+1 }}
-                </div>
-                <div class="about__howto__steps__process__stepline"></div>
-            </div>
-            <svg class="about__howto__steps__button about__howto__steps__button--prev"
-                 ng-class="{'about__howto__steps__button--invisible': self.selectedHowItWorksStep <= 0}"
-                 ng-click="self.selectedHowItWorksStep = self.selectedHowItWorksStep - 1">
-                <use xlink:href="#ico36_backarrow" href="#ico36_backarrow"/>
-            </svg>
-            <div class="about__howto__steps__detail">
-                <div class="about__howto__detail__title">
-                    {{ self.howItWorksSteps[self.selectedHowItWorksStep].title }}
-                </div>
-                <div class="about__howto__steps__detail__text">
-                    {{ self.howItWorksSteps[self.selectedHowItWorksStep].text }}
-                </div>
-            </div>
-            <svg class="about__howto__steps__button about__howto__steps__button--next"
-                 ng-class="{'about__howto__steps__button--invisible': self.selectedHowItWorksStep >= (self.howItWorksSteps.length-1)}"
-                 ng-click="self.selectedHowItWorksStep = self.selectedHowItWorksStep + 1">
-                <use xlink:href="#ico36_backarrow" href="#ico36_backarrow"/>
-            </svg>
+        <div class="about__howto__steps__process__stepline"></div>
+      </div>
+      <svg
+        class="about__howto__steps__button about__howto__steps__button--prev"
+        ng-class="{'about__howto__steps__button--invisible': self.selectedHowItWorksStep <= 0}"
+        ng-click="self.selectedHowItWorksStep = self.selectedHowItWorksStep - 1"
+      >
+        <use xlink:href="#ico36_backarrow" href="#ico36_backarrow" />
+      </svg>
+      <div class="about__howto__steps__detail">
+        <div class="about__howto__detail__title">
+          {{ self.howItWorksSteps[self.selectedHowItWorksStep].title }}
         </div>
-        <h2 class="about__howto__title">Ready to start?</h2>
-        <h3 class="about__howto__subtitle">Post your atom or offer and let {{ self.appTitle }} do the rest</h3>
-        <div class="about__howto__createx">
-            <button class="won-button--filled red about__howto__createx__button"
-                    ng-click="self.createWhatsAround()"
-                    ng-disabled="self.processingPublish">
-                <svg class="won-button-icon" style="--local-primary:white;">
-                    <use xlink:href="#ico36_location_current" href="#ico36_location_current"></use>
-                </svg>
-                <span ng-if="!self.processingPublish">What's in your Area?</span>
-                <span ng-if="self.processingPublish">Finding out what's going on&hellip;</span>
-            </button>
-            <button class="won-button--filled red about__howto__createx__button"
-                    ng-click="self.router__stateGo('overview')">
-                <span>What's new?</span>
-            </button>
-            <won-labelled-hr label="::'Or'" class="about__howto__createx__labelledhr"></won-labelled-hr>
-            <button class="won-button--filled red about__howto__createx__spanbutton"
-                    ng-click="self.showAvailableUseCases()"
-                    ng-disabled="self.processingPublish">
-                <span>Post something now!</span>
-            </button>
+        <div class="about__howto__steps__detail__text">
+          {{ self.howItWorksSteps[self.selectedHowItWorksStep].text }}
         </div>
-    </section>
-    <section class="about__privacyPolicy" ng-if="!self.visibleSection || self.visibleSection === 'aboutPrivacyPolicy'">
-        <div class="about__privacyPolicy__title">Privacy Policy</div>
-        <div class="about__privacyPolicy__text" ng-include="self.privacyPolicyTemplate"></div>
-    </section>
-    <section class="about__termsOfService" ng-if="!self.visibleSection || self.visibleSection === 'aboutTermsOfService'">
-        <div class="about__termsOfService__title">Terms Of Service</div>
-        <div class="about__termsOfService__text" ng-include="self.tosTemplate"></div>
-    </section>
-    <section class="about__imprint" ng-if="!self.visibleSection || self.visibleSection === 'aboutImprint'">
-        <div class="about__imprint__title">Imprint</div>
-        <div class="about__imprint__text" ng-include="self.imprintTemplate"></div>
-    </section>
-    <section class="about__faq" ng-if="!self.visibleSection || self.visibleSection === 'aboutFaq'">
-        <div class="about__faq__title">FAQs</div>
-        <won-accordion class="about__faq__questions" items="::self.questions"></won-accordion>
-    </section>
+      </div>
+      <svg
+        class="about__howto__steps__button about__howto__steps__button--next"
+        ng-class="{'about__howto__steps__button--invisible': self.selectedHowItWorksStep >= (self.howItWorksSteps.length-1)}"
+        ng-click="self.selectedHowItWorksStep = self.selectedHowItWorksStep + 1"
+      >
+        <use xlink:href="#ico36_backarrow" href="#ico36_backarrow" />
+      </svg>
+    </div>
+    <h2 class="about__howto__title">Ready to start?</h2>
+    <h3 class="about__howto__subtitle">
+      Post your atom or offer and let {{ self.appTitle }} do the rest
+    </h3>
+    <div class="about__howto__createx">
+      <button
+        class="won-button--filled red about__howto__createx__button"
+        ng-click="self.router__stateGo('map')">
+        <svg class="won-button-icon" style="--local-primary:white;">
+          <use
+            xlink:href="#ico36_location_current"
+            href="#ico36_location_current"
+          ></use>
+        </svg>
+        <span>What's in your Area?</span>
+      </button>
+      <button
+        class="won-button--filled red about__howto__createx__button"
+        ng-click="self.router__stateGo('overview')">
+        <span>What's new?</span>
+      </button>
+      <won-labelled-hr
+        label="::'Or'"
+        class="about__howto__createx__labelledhr"
+      ></won-labelled-hr>
+      <button
+        class="won-button--filled red about__howto__createx__spanbutton"
+        ng-click="self.showAvailableUseCases()"
+        ng-disabled="self.processingPublish"
+      >
+        <span>Post something now!</span>
+      </button>
+    </div>
+  </section>
+  <section
+    class="about__privacyPolicy"
+    ng-if="!self.visibleSection || self.visibleSection === 'aboutPrivacyPolicy'"
+  >
+    <div class="about__privacyPolicy__title">Privacy Policy</div>
+    <div
+      class="about__privacyPolicy__text"
+      ng-include="self.privacyPolicyTemplate"
+    ></div>
+  </section>
+  <section
+    class="about__termsOfService"
+    ng-if="!self.visibleSection || self.visibleSection === 'aboutTermsOfService'"
+  >
+    <div class="about__termsOfService__title">Terms Of Service</div>
+    <div
+      class="about__termsOfService__text"
+      ng-include="self.tosTemplate"
+    ></div>
+  </section>
+  <section
+    class="about__imprint"
+    ng-if="!self.visibleSection || self.visibleSection === 'aboutImprint'"
+  >
+    <div class="about__imprint__title">Imprint</div>
+    <div class="about__imprint__text" ng-include="self.imprintTemplate"></div>
+  </section>
+  <section
+    class="about__faq"
+    ng-if="!self.visibleSection || self.visibleSection === 'aboutFaq'"
+  >
+    <div class="about__faq__title">FAQs</div>
+    <won-accordion
+      class="about__faq__questions"
+      items="::self.questions"
+    ></won-accordion>
+  </section>
 </main>
 <won-footer></won-footer>

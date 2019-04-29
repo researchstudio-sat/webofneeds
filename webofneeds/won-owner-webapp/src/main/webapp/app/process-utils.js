@@ -18,12 +18,21 @@ export function isProcessingInitialLoad(process) {
 }
 
 /**
- * Return true if processingAtomUrisFromOwnerLoad is currently active
+ * Return true if fetchWhatsNew is currently active
  * @param process (full process from state)
  * @returns {*}
  */
-export function isProcessingAtomUrisFromOwnerLoad(process) {
-  return get(process, "processingAtomUrisFromOwnerLoad");
+export function isProcessingWhatsNew(process) {
+  return get(process, "processingWhatsNew");
+}
+
+/**
+ * Return true if fetchWhatsAround is currently active
+ * @param process (full process from state)
+ * @returns {*}
+ */
+export function isProcessingWhatsAround(process) {
+  return get(process, "processingWhatsAround");
 }
 
 /**

@@ -2,6 +2,7 @@ package won.protocol.util;
 
 import java.net.URI;
 import java.util.Collection;
+import java.util.LinkedList;
 
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
@@ -9,7 +10,7 @@ import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.DC;
-
+import org.apache.jena.vocabulary.RDF;
 import won.protocol.model.Coordinate;
 import won.protocol.model.AtomGraphType;
 import won.protocol.vocabulary.SCHEMA;
@@ -121,8 +122,45 @@ public class DefaultAtomModelWrapper extends AtomModelWrapper {
         return getAllContentPropertyStringValues(WON.tag, null);
     }
 
+    public Collection<URI> getAllFlags() {
+        Collection<RDFNode> rdfFlags = getContentPropertyObjects(WON.flag);
+        Collection<URI> uriFlags = new LinkedList<>();
+        for (RDFNode rdfFlag : rdfFlags) {
+            if (rdfFlag.isURIResource()) {
+                uriFlags.add(URI.create(rdfFlag.asResource().getURI()));
+            }
+        }
+        return uriFlags;
+    }
+
+    public Collection<URI> getContentTypes() {
+        Collection<RDFNode> rdfTypes = getContentPropertyObjects(RDF.type);
+        Collection<URI> uriTypes = new LinkedList<>();
+        for (RDFNode rdfType : rdfTypes) {
+            if (rdfType.isURIResource()) {
+                uriTypes.add(URI.create(rdfType.asResource().getURI()));
+            }
+        }
+        return uriTypes;
+    }
+
+    public Collection<URI> getSeeksTypes() {
+        Collection<RDFNode> rdfTypes = getSeeksPropertyObjects(RDF.type);
+        Collection<URI> uriTypes = new LinkedList<>();
+        for (RDFNode rdfType : rdfTypes) {
+            if (rdfType.isURIResource()) {
+                uriTypes.add(URI.create(rdfType.asResource().getURI()));
+            }
+        }
+        return uriTypes;
+    }
+
     public Collection<String> getAllTitles() {
         return getAllContentPropertyStringValues(DC.title, null);
+    }
+
+    public Coordinate getLocationCoordinate() {
+        return getLocationCoordinate(getAtomContentNode());
     }
 
     public Coordinate getLocationCoordinate(Resource contentNode) {

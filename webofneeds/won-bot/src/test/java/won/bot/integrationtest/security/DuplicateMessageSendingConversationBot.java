@@ -79,7 +79,7 @@ public class DuplicateMessageSendingConversationBot extends IntegrationtestBot {
         // subscribe it to:
         // * connect events - so it responds with open
         // * open events - so it responds with open (if the open received was the first
-        // open, and we still atom to accept the connection)
+        // open, and we still need to accept the connection)
         bus.subscribe(ConnectFromOtherAtomEvent.class,
                         new ActionOnEventListener(ctx, new OpenConnectionAction(ctx, "Hi!")));
         // add a listener that auto-responds to messages by a message

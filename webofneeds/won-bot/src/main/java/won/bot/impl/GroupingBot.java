@@ -151,7 +151,7 @@ public class GroupingBot extends EventBot {
         // subscribe it to:
         // * connect events - so it responds with open
         // * open events - so it responds with open (if the open received was the first
-        // open, and we still atom to accept the connection)
+        // open, and we still need to accept the connection)
         this.autoOpener = new ActionOnEventListener(ctx, new OpenConnectionAction(ctx, "Hi from the GroupingBot!"));
         bus.subscribe(ConnectFromOtherAtomEvent.class, this.autoOpener);
         // now, once all connections have been opened, make 1 bot send a message to the

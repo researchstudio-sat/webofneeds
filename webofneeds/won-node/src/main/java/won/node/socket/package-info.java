@@ -9,7 +9,7 @@
  * governing permissions and limitations under the License.
  */
 /**
- * Deprecated package, atoms to be refactored.
+ * Deprecated package, needs to be refactored.
  */
 @Deprecated
 package won.node.socket;

@@ -5,8 +5,8 @@ web of needs system.
 You are planning to play table-football with two colleagues this afternoon.
 Since four players are needed for playing table-football, you post your ‘atom’ for another mate on web of needs,
 you need to find another mate.
-If someone else has posted (or posts) a ‘atom’ that ‘matches’ your ‘atom
-of doing something together’, you will be notified by the web of atom.
+If someone else has posted (or posts) an ‘atom’ that ‘matches’ your ‘atom
+of doing something together’, you will be notified by the web of needs.
 Then, you can request the other person to start a chat to set up your
 table-football event. Have fun! ;)
 
@@ -27,7 +27,7 @@ If there is someone who gives away her book, you will be notified and can start 
 organise who to pick it up. Too easy? ;)
 
 #### Use Case 4: The bus no. 68 is often late
-The neighbourhood that you live in is too dark in nights and atoms more light.
+The neighbourhood that you live in is too dark in nights and needs more light.
 You express your ‘critique’ on this matter in the Web of Needs.
 If there are other ‘matched’ critiques, you will be connected to others and
 can start a chat with them. Do your best to find a solution! ;)

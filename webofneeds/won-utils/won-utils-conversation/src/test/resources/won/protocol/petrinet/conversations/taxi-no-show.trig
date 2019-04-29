@@ -801,7 +801,7 @@
 
 <https://localhost:8443/won/resource/event/ir8xthwyoc9ud8uh37ao#content-9slg> {
     event:ir8xthwyoc9ud8uh37ao
-            won:textMessage  "ok, I'll accept your latest proposal - but I'll atom to crawl the connection data first, please be patient." .
+            won:textMessage  "ok, I'll accept your latest proposal - but I'll need to crawl the connection data first, please be patient." .
 }
 
 <https://localhost:8443/won/resource/event/vdl7ep6vg07jlskzxkk0#envelope-0fi0> {
@@ -5509,7 +5509,7 @@
 
 <https://localhost:8443/won/resource/event/geyeld5i1nzzfofnxb0f#content-f80m> {
     event:geyeld5i1nzzfofnxb0f
-            won:textMessage  "ok, I'll accept your latest proposal - but I'll atom to crawl the connection data first, please be patient." .
+            won:textMessage  "ok, I'll accept your latest proposal - but I'll need to crawl the connection data first, please be patient." .
 }
 
 <https://localhost:8443/won/resource/event/fdinckttpie43x4v0at9#envelope-y3k3> {
@@ -8431,7 +8431,7 @@
 
 <https://localhost:8443/won/resource/event/b0xpko04z44orqqniaj0#content-ifm7> {
     event:b0xpko04z44orqqniaj0
-            won:textMessage  "ok, I'll accept your latest proposal - but I'll atom to crawl the connection data first, please be patient." .
+            won:textMessage  "ok, I'll accept your latest proposal - but I'll need to crawl the connection data first, please be patient." .
 }
 
 <https://localhost:8443/won/resource/event/jhagsulkburv6a75bpy5#envelope-spu9> {

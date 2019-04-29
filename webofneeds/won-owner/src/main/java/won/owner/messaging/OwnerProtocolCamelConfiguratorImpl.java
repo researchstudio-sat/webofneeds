@@ -81,7 +81,7 @@ public class OwnerProtocolCamelConfiguratorImpl implements OwnerProtocolCamelCon
     @Override
     public synchronized void addRemoteQueueListener(String endpoint, URI remoteEndpoint)
                     throws CamelConfigurationFailedException {
-        // sending and receiving endpoint atom to have the same scheme
+        // sending and receiving endpoint need to have the same scheme
         endpoint = remoteEndpoint.getScheme() + endpoint;
         if (camelContext.hasEndpoint(endpoint) != null) {
             logger.debug("route for listening to remote queue {} already configured", remoteEndpoint);

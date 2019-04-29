@@ -3,7 +3,7 @@
  */
 
 import won from "./won-es6.js";
-import { get, getIn } from "./utils.js";
+import { get, getIn, calculateDistance } from "./utils.js";
 import { labels } from "./won-label-utils.js";
 import * as connectionUtils from "./connection-utils.js";
 import * as useCaseUtils from "./usecase-utils.js";
@@ -67,6 +67,12 @@ export function getLocation(atom) {
   return undefined;
 }
 
+export function getDistanceFrom(atom, location) {
+  const atomLocation = getLocation(atom);
+
+  return calculateDistance(atomLocation, location);
+}
+
 /**
  * Returns the "Default" Image (currently the content branch is checked before seeks) of an atom
  * if the atom does not have any images we return undefined
@@ -111,18 +117,6 @@ export function isInactive(atom) {
 }
 
 /**
- * Determines if a given atom is a WhatsAround-Atom
- * @param atom
- * @returns {*|boolean}
- */
-export function isWhatsAroundAtom(atom) {
-  return (
-    getIn(atom, ["content", "flags"]) &&
-    getIn(atom, ["content", "flags"]).contains("won:WhatsAround")
-  );
-}
-
-/**
  * Determines if a given atom is a DirectResponse-Atom
  * @param atom
  * @returns {*|boolean}
@@ -131,6 +125,18 @@ export function isDirectResponseAtom(atom) {
   return (
     getIn(atom, ["content", "flags"]) &&
     getIn(atom, ["content", "flags"]).contains("won:DirectResponse")
+  );
+}
+
+/**
+ * Determines if a given atom is Invisible (contains the no hint for counterpart flag)
+ * @param atom
+ * @returns {*|boolean}
+ */
+export function isInvisibleAtom(atom) {
+  return (
+    getIn(atom, ["content", "flags"]) &&
+    getIn(atom, ["content", "flags"]).contains("won:NoHintForCounterpart")
   );
 }
 
@@ -206,7 +212,7 @@ export function isSearchAtom(atom) {
 /**
  * Generates an array that contains all atom flags, using a human readable label if available.
  */
-export function generateFullAtomFlags(atomImm) {
+export function generateFullFlagLabels(atomImm) {
   const flags = atomImm && atomImm.getIn(["content", "flags"]);
   const flagsArray =
     flags &&
@@ -221,7 +227,7 @@ export function generateFullAtomFlags(atomImm) {
 /**
  * Generates an array that contains all atom sockets, using a human readable label if available.
  */
-export function generateFullAtomSockets(atomImm) {
+export function generateFullSocketLabels(atomImm) {
   const sockets = atomImm && atomImm.getIn(["content", "sockets"]);
   const socketsArray =
     sockets &&
@@ -239,7 +245,7 @@ export function generateFullAtomSockets(atomImm) {
  * Retrieves the Label of the used useCase as an atomType, if no usecase is specified we check if atom is a searchAtom or DirectResponseAtom
  * @param {*} atomImm the atom as saved in the state
  */
-export function generateAtomTypeLabel(atomImm) {
+export function generateTypeLabel(atomImm) {
   const useCase = useCaseUtils.getUseCase(getMatchedUseCaseIdentifier(atomImm));
 
   if (useCase) {
@@ -258,7 +264,7 @@ export function generateAtomTypeLabel(atomImm) {
 /**
  * Generates an array that contains some atom sockets, using a human readable label if possible.
  */
-export function generateShortAtomSockets(atomImm) {
+export function generateShortSocketLabels(atomImm) {
   const sockets = atomImm && atomImm.get(["content", "sockets"]);
   const socketsArray =
     sockets &&
@@ -268,10 +274,9 @@ export function generateShortAtomSockets(atomImm) {
       // TODO: check if this can be used anywhere or whether it should be Group Chat Enabled
       .map(socket => {
         if (socket === won.WON.GroupSocketCompacted) {
-          return "Group Chat";
-        } else {
-          return "";
+          return labels.sockets[socket] ? labels.sockets[socket] : socket;
         }
+        return "";
       })
       .filter(socket => socket.length > 0);
   return socketsArray;
@@ -280,7 +285,7 @@ export function generateShortAtomSockets(atomImm) {
 /**
  * Generates an array that contains some atom flags, using a human readable label if possible.
  */
-export function generateShortAtomFlags(atomImm) {
+export function generateShortFlagLabels(atomImm) {
   const flags = atomImm && atomImm.getIn(["content", "flags"]);
   const flagsArray =
     flags &&
@@ -290,13 +295,12 @@ export function generateShortAtomFlags(atomImm) {
       // TODO: flags should have explanatory hovertext
       .map(flag => {
         if (flag === won.WON.NoHintForCounterpartCompacted) {
-          return "Invisible";
+          return labels.flags[flag] ? labels.flags[flag] : flag;
         }
         if (flag === won.WON.NoHintForMeCompacted) {
-          return "Silent";
-        } else {
-          return "";
+          return labels.flags[flag] ? labels.flags[flag] : flag;
         }
+        return "";
       })
       .filter(flag => flag.length > 0);
   return flagsArray;
@@ -336,6 +340,32 @@ export function getSeeksDefaultSocketWithKeyReset(atomImm) {
     return getSocketKeysReset(defaultSocket);
   }
   return undefined;
+}
+
+/**
+ * Sorts the elements by distance from given location (default order is ascending)
+ * @param elementsImm elements from state that need to be returned as a sorted array
+ * @param location given location to calculate the distance from
+ * @param order if "DESC" then the order will be descending, everything else resorts to the default sort of ascending order
+ * @returns {*} sorted Elements array
+ */
+export function sortByDistanceFrom(atomsImm, location, order = "ASC") {
+  let sortedAtoms = atomsImm && atomsImm.toArray();
+
+  if (sortedAtoms) {
+    sortedAtoms.sort(function(a, b) {
+      const bDist = getDistanceFrom(b, location);
+      const aDist = getDistanceFrom(a, location);
+
+      if (order === "DESC") {
+        return bDist - aDist;
+      } else {
+        return aDist - bDist;
+      }
+    });
+  }
+
+  return sortedAtoms;
 }
 
 function getSocketKeysReset(socketsImm) {

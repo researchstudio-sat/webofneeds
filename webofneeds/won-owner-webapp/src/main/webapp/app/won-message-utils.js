@@ -4,7 +4,7 @@
 
 import won from "./won-es6.js";
 import Immutable from "immutable";
-import { checkHttpStatus, urisToLookupMap, is, getIn } from "./utils.js";
+import { checkHttpStatus, urisToLookupMap, is } from "./utils.js";
 
 import { ownerBaseUrl } from "config";
 import urljoin from "url-join";
@@ -580,91 +580,114 @@ export function fetchOwnedData(dispatch) {
     .then(atomUris => fetchDataForOwnedAtoms(atomUris, dispatch));
 }
 
-export function fetchAllActiveAtomUrisFromOwner(dispatch, getState) {
-  return fetchAllAtomUrisFromNode(getState).then(atomUris => {
-    //return fetchAllAtomUrisFromOwner().then(atomUris => { //FIXME: use this instead once we store more uris on the owner itself
+export function fetchWhatsNew(
+  dispatch,
+  getState,
+  modifiedAfterDate = new Date(Date.now() - 30 /*Days before*/ * 86400000)
+) {
+  return fetchAllMetaAtoms(modifiedAfterDate).then(atoms => {
+    const atomsImm = Immutable.fromJS(atoms);
+    const atomUris = [...atomsImm.keys()];
+
     dispatch({
-      type: actionTypes.atoms.storeAtomUrisFromOwner,
-      payload: Immutable.fromJS({ uris: atomUris }),
+      type: actionTypes.atoms.storeWhatsNew,
+      payload: Immutable.fromJS({ metaAtoms: atoms }),
     });
     return atomUris;
   });
-} /*function fetchAllAtomUrisFromOwner(state = "ACTIVE") {
-  return fetch(urljoin(ownerBaseUrl, "/rest/atoms/all?state=" + state), {
-    method: "get",
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-    },
-    credentials: "include",
-  })
-    .then(checkHttpStatus)
-    .then(response => response.json());
-}*/ //FIXME: use this once we store more uris on the owner itself
-
-/**
- * Calls the restendpoint of the owner webapp, to retrieve all atomUris stored
- * on this instance
- * @param state ACTIVE or INACTIVE, default is ACTIVE
- * @returns {*}
- */ function fetchAllAtomUrisFromNode(getState) {
-  const nodeUri = getIn(getState(), ["config", "defaultNodeUri"]) + "/atom";
-  //const nodeUri = "https://node.matchat.org/won/resource/atom"; //for testing purposes
-
-  const DAYS_BEFORE = 30;
-  const modifiedAfterDate = new Date(
-    Date.now() - DAYS_BEFORE * 24 * 60 * 60 * 1000
-  );
-
-  return fetch(
-    "/owner/rest/linked-data/?uri=" +
-      encodeURIComponent(
-        nodeUri +
-          "?state=Active&modifiedafter=" +
-          modifiedAfterDate.toISOString()
-      ),
-    {
-      method: "get",
-      //credentials: "same-origin",
-      headers: {
-        Accept: "application/ld+json",
-        "Content-Type": "application/ld+json",
-        //Prefer: `return=representation; max-member-count="2000"`,
-        Prefer: undefined,
-      },
-    }
-  )
-    .then(response => {
-      if (response.status === 200) return response;
-      else
-        throw new Error(
-          `${response.status} - ${
-            response.statusText
-          } for fetchAllAtomUrisFromNode-request`
-        );
-    })
-    .then(dataset => dataset.json())
-    .then(dataset => {
-      const datasetImm = Immutable.fromJS(dataset);
-      const datasetGraph = datasetImm && datasetImm.get("@graph");
-      const firstDatasetGraph = datasetGraph && datasetGraph.first();
-      const rdfsMembers =
-        firstDatasetGraph && firstDatasetGraph.get("rdfs:member");
-
-      if (rdfsMembers && rdfsMembers.size > 0) {
-        return datasetImm
-          .get("@graph")
-          .first()
-          .get("rdfs:member")
-          .map(member => nodeUri + "/" + member.get("@id").split(":")[1])
-          .toJS();
-      } else {
-        return [];
-      }
-    });
 }
 
-window.fetchAllAtomUrisFromNode4dbg = fetchAllAtomUrisFromNode;
+function fetchAllMetaAtoms(modifiedAfterDate, state = "ACTIVE", limit = 200) {
+  return fetch(
+    urljoin(
+      ownerBaseUrl,
+      "/rest/atoms/all?state=" +
+        state +
+        (modifiedAfterDate
+          ? "&modifiedafter=" + modifiedAfterDate.toISOString()
+          : "") +
+        "&limit=" +
+        limit
+    ),
+    {
+      method: "get",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    }
+  )
+    .then(checkHttpStatus)
+    .then(response => response.json());
+}
+
+export function fetchWhatsAround(
+  dispatch,
+  getState,
+  modifiedAfterDate,
+  location,
+  maxDistance
+) {
+  return fetchAllMetaAtomsNear(modifiedAfterDate, location, maxDistance).then(
+    atoms => {
+      const atomsImm = Immutable.fromJS(atoms);
+      const atomUris = [...atomsImm.keys()];
+
+      dispatch({
+        type: actionTypes.atoms.storeWhatsAround,
+        payload: Immutable.fromJS({
+          metaAtoms: atoms,
+          location: location,
+          maxDistance: maxDistance,
+        }),
+      });
+      return atomUris;
+    }
+  );
+}
+
+function fetchAllMetaAtomsNear(
+  modifiedAfterDate,
+  location,
+  maxDistance = 5000,
+  limit = 200,
+  state = "ACTIVE"
+) {
+  if (location && location.lat && location.lng) {
+    return fetch(
+      urljoin(
+        ownerBaseUrl,
+        "/rest/atoms/all?state=" +
+          state +
+          "&limit=" +
+          limit +
+          "&latitude=" +
+          location.lat +
+          "&longitude=" +
+          location.lng +
+          "&maxDistance" +
+          maxDistance +
+          (modifiedAfterDate
+            ? "&modifiedafter=" + modifiedAfterDate.toISOString()
+            : "")
+      ),
+      {
+        method: "get",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(),
+        credentials: "include",
+      }
+    )
+      .then(checkHttpStatus)
+      .then(response => response.json());
+  } else {
+    return Promise.reject();
+  }
+}
 
 function fetchOwnedInactiveAtomUris() {
   return fetch(urljoin(ownerBaseUrl, "/rest/atoms?state=INACTIVE"), {

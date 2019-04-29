@@ -351,7 +351,7 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
         String whose = useWrongSender ? "your" : "my";
         String which = onlyProposes ? "proposal " : "";
         referToEarlierMessages(ctx, bus, con, "ok, I'll retract " + whose + " latest " + which
-                        + "message - but 'll atom to crawl the connection data first, please be patient.", state -> {
+                        + "message - but 'll need to crawl the connection data first, please be patient.", state -> {
                             URI uri = state.getNthLatestMessage(m -> onlyProposes
                                             ? (m.isProposesMessage() || m.isProposesToCancelMessage())
                                                             && m.getEffects().stream().anyMatch(e -> e.isProposes())
@@ -378,7 +378,7 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
     private void reject(EventListenerContext ctx, EventBus bus, Connection con, boolean useWrongSender) {
         String whose = useWrongSender ? "my" : "your";
         referToEarlierMessages(ctx, bus, con, "ok, I'll reject " + whose
-                        + " latest rejectable message - but I'll atom to crawl the connection data first, please be patient.",
+                        + " latest rejectable message - but I'll need to crawl the connection data first, please be patient.",
                         state -> {
                             URI uri = state.getLatestProposesOrClaimsMessageSentByAtom(
                                             useWrongSender ? con.getAtomURI() : con.getTargetAtomURI());
@@ -405,7 +405,7 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
 
     private void validate(EventListenerContext ctx, EventBus bus, Connection con) {
         Model messageModel = WonRdfUtils.MessageUtils.textMessage(
-                        "ok, I'll validate the connection - but I'll atom to crawl the connection data first, please be patient.");
+                        "ok, I'll validate the connection - but I'll need to crawl the connection data first, please be patient.");
         bus.publish(new ConnectionMessageCommandEvent(con, messageModel));
         // initiate crawl behaviour
         CrawlConnectionCommandEvent command = new CrawlConnectionCommandEvent(con.getAtomURI(), con.getConnectionURI());
@@ -439,7 +439,7 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
         String whose = allowOwnClauses ? allowCounterpartClauses ? "our" : "my"
                         : allowCounterpartClauses ? "your" : " - sorry, don't know which ones to choose, actually - ";
         referToEarlierMessages(ctx, bus, con, "ok, I'll make a proposal containing " + count + " of " + whose
-                        + " latest messages as clauses - but I'll atom to crawl the connection data first, please be patient.",
+                        + " latest messages as clauses - but I'll need to crawl the connection data first, please be patient.",
                         state -> {
                             return state.getNLatestMessageUris(m -> {
                                 URI ownedAtomUri = con.getAtomURI();
@@ -463,7 +463,7 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
 
     private void accept(EventListenerContext ctx, EventBus bus, Connection con) {
         referToEarlierMessages(ctx, bus, con,
-                        "ok, I'll accept your latest proposal - but I'll atom to crawl the connection data first, please be patient.",
+                        "ok, I'll accept your latest proposal - but I'll need to crawl the connection data first, please be patient.",
                         state -> {
                             URI uri = state.getLatestPendingProposalOrClaim(Optional.empty(),
                                             Optional.of(con.getTargetAtomURI()));
@@ -481,7 +481,7 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
 
     private void cancel(EventListenerContext ctx, EventBus bus, Connection con) {
         referToEarlierMessages(ctx, bus, con,
-                        "ok, I'll propose to cancel our latest agreement - but I'll atom to crawl the connection data first, please be patient.",
+                        "ok, I'll propose to cancel our latest agreement - but I'll need to crawl the connection data first, please be patient.",
                         state -> {
                             URI uri = state.getLatestAgreement();
                             return uri == null ? Collections.EMPTY_LIST : Arrays.asList(uri);

@@ -135,7 +135,7 @@ public class GetAgreementsTest {
     // This tries to cancel an agreement that accepts two proposals. However, there
     // is an error in the agreement since one of the accepted agreements is not a
     // proposal, but a message.
-    // The file name atoms to be changed..this should produce an empty file
+    // The file name needs to be changed..this should produce an empty file
     // I discovered that it creates problems to use event:6671551888677331000
     @Test
     public void twoProposalOneAgreementOneCancellationmsgError() throws IOException {

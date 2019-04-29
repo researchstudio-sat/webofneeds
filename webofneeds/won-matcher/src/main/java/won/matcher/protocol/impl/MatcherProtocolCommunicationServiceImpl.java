@@ -45,7 +45,7 @@ public class MatcherProtocolCommunicationServiceImpl implements MatcherProtocolC
                 matcherProtocolCamelConfigurator.addRouteForEndpoint(startingEndpoint, atomBrokerUri);
                 matcherProtocolQueueName = activeMQService.getProtocolQueueNameWithResource(nodeUri);
                 // register with remote node. If at some point the same trust strategy will
-                // be used when doing GET on won resource, we don't atom this separate register
+                // be used when doing GET on won resource, we don't need this separate register
                 // step for node
                 registrationClient.register(nodeUri.toString());
                 endpoint = matcherProtocolCamelConfigurator.configureCamelEndpointForAtomUri(nodeUri, atomBrokerUri,

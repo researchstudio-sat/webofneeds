@@ -5,7 +5,7 @@ package won.protocol.util;
  * the Authentication from the WonWebsocketHandler to the
  * PerUserKeystoreService. The type Object is used instead
  * <code>of org.springframework.security.core.Authentication</code> because this
- * class atoms to be in won-core, and won-core should not depend on
+ * class needs to be in won-core, and won-core should not depend on
  * spring-security.
  * 
  * @author fkleedorfer

@@ -18,7 +18,8 @@ const initialState = Immutable.fromJS({
   processingVerifyEmailAddress: false,
   processingResendVerificationEmail: false,
   processingSendAnonymousLinkEmail: false,
-  processingAtomUrisFromOwnerLoad: false,
+  processingWhatsNew: false,
+  processingWhatsAround: false,
   atoms: Immutable.Map(),
   connections: Immutable.Map(),
 });
@@ -125,11 +126,15 @@ export default function(processState = initialState, action = {}) {
       return processState;
     }
 
-    case actionTypes.atoms.loadAllActiveAtomUrisFromOwner:
-      return processState.set("processingAtomUrisFromOwnerLoad", true);
+    case actionTypes.atoms.fetchWhatsAround:
+      return processState.set("processingWhatsAround", true);
 
-    case actionTypes.atoms.storeAtomUrisFromOwner: {
-      const atomUris = action.payload.get("uris");
+    case actionTypes.atoms.fetchWhatsNew:
+      return processState.set("processingWhatsNew", true);
+
+    case actionTypes.atoms.storeWhatsNew: {
+      const metaAtoms = action.payload.get("metaAtoms");
+      const atomUris = metaAtoms && [...metaAtoms.keys()];
       atomUris &&
         atomUris.forEach(atomUri => {
           if (!processUtils.isAtomLoaded(processState, atomUri)) {
@@ -138,12 +143,25 @@ export default function(processState = initialState, action = {}) {
             });
           }
         });
-      return processState.set("processingAtomUrisFromOwnerLoad", false);
+      return processState.set("processingWhatsNew", false);
+    }
+
+    case actionTypes.atoms.storeWhatsAround: {
+      const metaAtoms = action.payload.get("metaAtoms");
+      const atomUris = metaAtoms && [...metaAtoms.keys()];
+      atomUris &&
+        atomUris.forEach(atomUri => {
+          if (!processUtils.isAtomLoaded(processState, atomUri)) {
+            processState = updateAtomProcess(processState, atomUri, {
+              toLoad: true,
+            });
+          }
+        });
+      return processState.set("processingWhatsAround", false);
     }
 
     case actionTypes.personas.create:
     case actionTypes.atoms.create:
-    case actionTypes.atoms.whatsAround:
       return processState.set("processingPublish", true);
 
     case actionTypes.failedToGetLocation:
@@ -594,7 +612,7 @@ export function addOriginatorAtomToLoad(
       const originatorUri = parsedMessage.getIn(["data", "originatorUri"]);
 
       if (originatorUri) {
-        //Message is originally from another atom, we might atom to add the atom as well
+        //Message is originally from another atom, we might need to add the atom as well
         if (!processUtils.isAtomLoaded(processState, originatorUri)) {
           console.debug(
             "Originator Atom is not in the state yet, we need to add it"

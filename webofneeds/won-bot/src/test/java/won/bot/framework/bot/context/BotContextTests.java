@@ -214,7 +214,7 @@ public class BotContextTests {
         botContext.saveToObjectMap("uriList", "list1", uriList);
         List<URI> uriListCopy = (List<URI>) botContext.loadFromObjectMap("uriList", "list1");
         Assert.assertEquals(uriList, uriListCopy);
-        // HashMap atoms to be serialized (here only non-complex keys are allowed in
+        // HashMap needs to be serialized (here only non-complex keys are allowed in
         // maps)
         botContext.dropCollection("uriMap");
         HashMap<String, URI> uriHashMap = new HashMap<>();

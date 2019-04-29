@@ -106,7 +106,7 @@ Drawbacks/Risks:
 * In case of change of reputation provider all transaction data has to be transferred (trustful cooperation between providers)
 * Incompatibility of which reputation providers are accepted by participants of a potential transaction
 
-=> Simple Decentralized Reputation Service Approach could be a starting point of implementing a first reputation concept but would also atom some rework if its later changed to more advanced concepts like a privacy-enhancement (see next). 
+=> Simple Decentralized Reputation Service Approach could be a starting point of implementing a first reputation concept but would also need some rework if its later changed to more advanced concepts like a privacy-enhancement (see next). 
 
 ### Privacy-enhanced Decentralized Reputation Service Approach
 

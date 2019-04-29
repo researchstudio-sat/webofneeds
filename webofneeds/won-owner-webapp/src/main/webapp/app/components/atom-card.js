@@ -179,7 +179,7 @@ function genComponentConf() {
           //General
           responseToAtom,
           atom,
-          atomTypeLabel: atom && atomUtils.generateAtomTypeLabel(atom),
+          atomTypeLabel: atom && atomUtils.generateTypeLabel(atom),
           personaUri,
           persona,
           personaName,
@@ -234,7 +234,7 @@ function genComponentConf() {
       }
     }
 
-    //FIXME: THIS and the corresponding css-class atom to be removed, this is solely to prevent loaded/but inactive atom to show up for now
+    //FIXME: THIS and the corresponding css-class need to be removed, this is solely to prevent loaded/but inactive atom to show up for now
     hideAtom() {
       return this.atomLoaded && atomUtils.isInactive(this.atom);
     }

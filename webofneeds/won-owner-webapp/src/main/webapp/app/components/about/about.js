@@ -1,5 +1,4 @@
 import angular from "angular";
-import Immutable from "immutable";
 import ngAnimate from "angular-animate";
 import compareToModule from "../../directives/compareTo.js";
 import accordionModule from "../accordion.js";
@@ -244,29 +243,6 @@ class AboutController {
       useCase: undefined,
       useCaseGroup: "all",
     });
-  }
-
-  createWhatsAround() {
-    if (this.processingPublish) {
-      console.debug("publish in process, do not take any action");
-      return;
-    }
-
-    if (this.loggedIn) {
-      this.atoms__whatsAround();
-    } else {
-      this.view__showTermsDialog(
-        Immutable.fromJS({
-          acceptCallback: () => {
-            this.view__hideModalDialog();
-            this.atoms__whatsAround();
-          },
-          cancelCallback: () => {
-            this.view__hideModalDialog();
-          },
-        })
-      );
-    }
   }
 
   toggleMoreInfo() {

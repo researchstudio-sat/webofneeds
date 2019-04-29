@@ -2,6 +2,8 @@ module PublishButton exposing (main)
 
 import Actions
 import Application
+import Browser.Dom as Dom exposing (Element)
+import Browser.Events
 import Color
 import Dict exposing (Dict)
 import Html exposing (Html)
@@ -12,12 +14,15 @@ import Json.Decode as Decode exposing (Decoder)
 import Json.Encode as Encode
 import Palette
 import Persona exposing (Persona)
+import Random
+import Task
+import Uuid exposing (Uuid)
 
 
 main =
     Application.element
         { init = init
-        , subscriptions = always Sub.none
+        , subscriptions = subscriptions
         , update = update
         , view = view
         , propDecoder = propDecoder
@@ -67,7 +72,35 @@ propDecoder =
 type alias Model =
     { state : State
     , selectedPersona : SelectedPersona
+    , buttonPosition : ButtonPosition
     }
+
+
+type ButtonPosition
+    = NotQueried
+    | HasId Uuid
+    | HasDimensions
+        { id : Uuid
+        , element : Element
+        }
+
+
+getUuid : ButtonPosition -> Maybe Uuid
+getUuid buttonPosition =
+    case buttonPosition of
+        NotQueried ->
+            Nothing
+
+        HasId id ->
+            Just id
+
+        HasDimensions { id } ->
+            Just id
+
+
+type PopupDirection
+    = Up
+    | Down
 
 
 type State
@@ -84,8 +117,9 @@ init : Props -> ( Model, Cmd Msg )
 init _ =
     ( { state = Closed
       , selectedPersona = Anonymous
+      , buttonPosition = NotQueried
       }
-    , Cmd.none
+    , getRandomId
     )
 
 
@@ -108,6 +142,30 @@ selectedPersona model props =
             )
 
 
+popupDirection : ButtonPosition -> PopupDirection
+popupDirection buttonPosition =
+    case buttonPosition of
+        NotQueried ->
+            Up
+
+        HasId _ ->
+            Up
+
+        HasDimensions { element } ->
+            let
+                distanceTop =
+                    element.element.y - element.viewport.y
+
+                distanceBottom =
+                    (element.viewport.y + element.viewport.height) - (element.element.y + element.element.height)
+            in
+            if distanceTop < distanceBottom then
+                Down
+
+            else
+                Up
+
+
 view :
     { model : Model
     , props : Props
@@ -126,6 +184,11 @@ view { model, props } =
             [ HA.disabled <| not props.buttonEnabled
             , HA.class "won-publish-button"
             , Events.onClick Publish
+            , HA.id
+                (getUuid model.buttonPosition
+                    |> Maybe.map Uuid.toString
+                    |> Maybe.withDefault ""
+                )
             ]
             [ Html.text props.label
             ]
@@ -134,6 +197,15 @@ view { model, props } =
         Html.div
             [ HA.class "won-button-row"
             , HA.class "won-publish-button"
+            , HA.classList
+                [ ( "up", popupDirection model.buttonPosition == Up )
+                , ( "down", popupDirection model.buttonPosition == Down )
+                ]
+            , HA.id
+                (getUuid model.buttonPosition
+                    |> Maybe.map Uuid.toString
+                    |> Maybe.withDefault ""
+                )
             ]
             ([ Palette.wonButton
                 [ HA.class "left"
@@ -149,12 +221,18 @@ view { model, props } =
                 , Events.onClick ToggleDropdown
                 ]
                 [ Icons.icon
-                    (case model.state of
-                        Open ->
+                    (case ( popupDirection model.buttonPosition, model.state ) of
+                        ( Up, Open ) ->
                             Icons.arrowDown
 
-                        Closed ->
+                        ( Up, Closed ) ->
                             Icons.arrowUp
+
+                        ( Down, Open ) ->
+                            Icons.arrowUp
+
+                        ( Down, Closed ) ->
+                            Icons.arrowDown
                     )
                     Color.white
                 ]
@@ -223,7 +301,11 @@ personaEntry persona =
 
 type Msg
     = SelectPersona SelectedPersona
+    | GotRandomId Uuid
+    | GotDimensions Element
+    | FailedToGetDimensions Dom.Error
     | ToggleDropdown
+    | GotAnimationFrame
     | Publish
 
 
@@ -274,6 +356,67 @@ update msg { model, props } =
             , publish model.selectedPersona
             )
 
+        GotRandomId uuid ->
+            case model.buttonPosition of
+                NotQueried ->
+                    ( { model
+                        | buttonPosition = HasId uuid
+                      }
+                    , Cmd.none
+                    )
+
+                _ ->
+                    ( model, Cmd.none )
+
+        GotDimensions element ->
+            case model.buttonPosition of
+                HasId uuid ->
+                    ( { model
+                        | buttonPosition =
+                            HasDimensions
+                                { id = uuid
+                                , element = element
+                                }
+                      }
+                    , Cmd.none
+                    )
+
+                HasDimensions { id } ->
+                    ( { model
+                        | buttonPosition =
+                            HasDimensions
+                                { id = id
+                                , element = element
+                                }
+                      }
+                    , Cmd.none
+                    )
+
+                NotQueried ->
+                    ( model, Cmd.none )
+
+        FailedToGetDimensions error ->
+            ( model
+            , Application.logError
+                (case error of
+                    Dom.NotFound id ->
+                        "Could not find element id " ++ id
+                )
+            )
+
+        GotAnimationFrame ->
+            ( model
+            , case model.buttonPosition of
+                HasId uuid ->
+                    getDimensions uuid
+
+                HasDimensions { id } ->
+                    getDimensions id
+
+                NotQueried ->
+                    Cmd.none
+            )
+
 
 publish : SelectedPersona -> Cmd msg
 publish personaChoice =
@@ -287,3 +430,39 @@ publish personaChoice =
                 Anonymous ->
                     Encode.null
         }
+
+
+getRandomId : Cmd Msg
+getRandomId =
+    Random.generate GotRandomId Uuid.uuidGenerator
+
+
+getDimensions : Uuid -> Cmd Msg
+getDimensions uuid =
+    Dom.getElement (Uuid.toString uuid)
+        |> Task.attempt
+            (\result ->
+                case result of
+                    Ok dimensions ->
+                        GotDimensions dimensions
+
+                    Err error ->
+                        FailedToGetDimensions error
+            )
+
+
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    let
+        sub =
+            Browser.Events.onAnimationFrame (always GotAnimationFrame)
+    in
+    case model.buttonPosition of
+        HasId _ ->
+            sub
+
+        HasDimensions _ ->
+            sub
+
+        NotQueried ->
+            Sub.none

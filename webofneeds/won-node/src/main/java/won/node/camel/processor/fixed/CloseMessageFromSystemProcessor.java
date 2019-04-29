@@ -84,7 +84,7 @@ public class CloseMessageFromSystemProcessor extends AbstractCamelProcessor {
 
         @Override
         public WonMessage process(WonMessage message) throws WonMessageProcessingException {
-            // there atom not be a remote connection. Don't create a message if this is the
+            // there need not be a remote connection. Don't create a message if this is the
             // case.
             if (connection.getTargetConnectionURI() == null)
                 return null;

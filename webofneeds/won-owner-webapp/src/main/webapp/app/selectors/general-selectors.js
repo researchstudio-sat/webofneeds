@@ -7,6 +7,7 @@ import { createSelector } from "reselect";
 import { decodeUriComponentProperly, getIn, get } from "../utils.js";
 import * as atomUtils from "../atom-utils.js";
 import * as accountUtils from "../account-utils.js";
+import * as viewUtils from "../view-utils.js";
 import Color from "color";
 
 export const selectLastUpdateTime = state => state.get("lastUpdateTime");
@@ -278,4 +279,9 @@ export function isAtomEditable(state, atomUri) {
   return (
     !!atom && isAtomOwned(state, atomUri) && atomUtils.hasMatchedUseCase(atom)
   );
+}
+
+export function isLocationAccessDenied(state) {
+  const viewState = get(state, "view");
+  return viewState && viewUtils.isLocationAccessDenied(viewState);
 }

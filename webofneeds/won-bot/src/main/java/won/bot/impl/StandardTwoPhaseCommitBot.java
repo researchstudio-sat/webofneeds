@@ -78,7 +78,7 @@ public class StandardTwoPhaseCommitBot extends EventBot {
         // subscribe it to:
         // * connect events - so it responds with open
         // * open events - so it responds with open (if the open received was the first
-        // open, and we still atom to accept the connection)
+        // open, and we need need to accept the connection)
         this.autoOpener = new ActionOnEventListener(ctx,
                         new AtomUriInNamedListFilter(ctx, botContextWrapper.getParticipantListName()),
                         new OpenConnectionAction(ctx, "Hi!"));

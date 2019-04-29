@@ -187,6 +187,7 @@ export function accessControl({
       return;
 
     case "overview":
+    case "map":
     case "signup":
     case "about":
     case "forgotPassword":

@@ -156,7 +156,7 @@ public class WorkerCrawlerActor extends UntypedActor {
             }
             // signal sender that this URI is processed and save meta data about crawling
             // the URI.
-            // This atoms to be done after all extracted URI messages have been sent to
+            // This needs to be done after all extracted URI messages have been sent to
             // guarantee consistency
             // in case of failure
             sendDoneUriMessage(uriMsg, wonNodeUri, etags);

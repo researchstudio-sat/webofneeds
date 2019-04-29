@@ -286,7 +286,7 @@ public abstract class EventBot extends TriggeredBot {
 
     /**
      * Class holding references to all important services that EventListeners inside
-     * bots atom to access.
+     * bots need to access.
      */
     public class MyEventListenerContext implements EventListenerContext {
         public TaskScheduler getTaskScheduler() {

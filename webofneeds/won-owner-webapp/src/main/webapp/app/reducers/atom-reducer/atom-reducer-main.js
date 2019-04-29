@@ -75,9 +75,14 @@ export default function(allAtomsInState = initialState, action = {}) {
         won.WON.InactiveCompacted
       );
     }
+    case actionTypes.atoms.storeWhatsNew:
+    case actionTypes.atoms.storeWhatsAround: {
+      const metaAtoms = action.payload.get("metaAtoms");
+      const atomUris = metaAtoms && [...metaAtoms.keys()];
+      return addAtomStubs(allAtomsInState, atomUris);
+    }
 
     case actionTypes.personas.storeTheirUrisInLoading:
-    case actionTypes.atoms.storeAtomUrisFromOwner:
     case actionTypes.atoms.storeTheirUrisInLoading: {
       return addAtomStubs(allAtomsInState, action.payload.get("uris"));
     }
@@ -262,7 +267,7 @@ export default function(allAtomsInState = initialState, action = {}) {
           connSenderSocket = won.WON.GroupSocketCompacted; //assume the connection is from group to x if the atom has the group but not the chat socket
         }
 
-        //atom to wait for success-response to set that
+        //need to wait for success-response to set that
         const optimisticConnection = Immutable.fromJS({
           uri: tmpConnectionUri,
           usingTemporaryUri: true,

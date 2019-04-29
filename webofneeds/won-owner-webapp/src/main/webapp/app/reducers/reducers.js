@@ -12,14 +12,19 @@ import accountReducer from "./account-reducer.js";
 import toastReducer from "./toast-reducer.js";
 import viewReducer from "./view-reducer.js";
 import processReducer from "./process-reducer.js";
+import { parseMetaAtom } from "./atom-reducer/parse-atom.js";
 /*
  * this reducer attaches a 'router' object to our state that keeps the routing state.
  */
 import { router } from "redux-ui-router";
 
 const initialOwnerState = Immutable.fromJS({
-  atomUris: Immutable.Set(),
-  lastAtomUrisUpdateTime: undefined,
+  whatsNew: Immutable.Map(),
+  whatsAround: Immutable.Map(),
+  lastWhatsNewUpdateTime: undefined,
+  lastWhatsAroundUpdateTime: undefined,
+  lastWhatsAroundLocation: undefined,
+  lastWhatsAroundMaxDistance: undefined,
 });
 
 const initialConfigState = Immutable.fromJS({ theme: { name: "current" } });
@@ -66,18 +71,49 @@ const reducers = {
       case actionTypes.account.reset:
         return initialOwnerState;
 
-      case actionTypes.atoms.storeAtomUrisFromOwner: {
-        const fetchedAtomUris = action.payload.get("uris");
-        let ownerAtomUris = owner.get("atomUris");
+      case actionTypes.atoms.storeWhatsNew: {
+        const metaAtoms = action.payload.get("metaAtoms");
+        let ownerMetaAtoms = owner.get("whatsNew");
 
-        fetchedAtomUris &&
-          fetchedAtomUris.forEach(
-            atomUri => (ownerAtomUris = ownerAtomUris.add(atomUri))
-          );
+        metaAtoms &&
+          metaAtoms.map(metaAtom => {
+            const metaAtomImm = parseMetaAtom(metaAtom);
+            if (metaAtomImm) {
+              ownerMetaAtoms = ownerMetaAtoms.set(
+                metaAtomImm.get("uri"),
+                metaAtomImm
+              );
+            }
+          });
 
         return owner
-          .set("atomUris", ownerAtomUris)
-          .set("lastAtomUrisUpdateTime", Date.now());
+          .set("whatsNew", ownerMetaAtoms)
+          .set("lastWhatsNewUpdateTime", Date.now());
+      }
+
+      case actionTypes.atoms.storeWhatsAround: {
+        const metaAtoms = action.payload.get("metaAtoms");
+        const location = action.payload.get("location");
+        const maxDistance = action.payload.get("maxDistance");
+
+        let ownerMetaAtoms = owner.get("whatsAround");
+
+        metaAtoms &&
+          metaAtoms.map(metaAtom => {
+            const metaAtomImm = parseMetaAtom(metaAtom);
+            if (metaAtomImm) {
+              ownerMetaAtoms = ownerMetaAtoms.set(
+                metaAtomImm.get("uri"),
+                metaAtomImm
+              );
+            }
+          });
+
+        return owner
+          .set("whatsAround", ownerMetaAtoms)
+          .set("lastWhatsAroundMaxDistance", maxDistance)
+          .set("lastWhatsAroundLocation", location)
+          .set("lastWhatsAroundUpdateTime", Date.now());
       }
 
       case actionTypes.atoms.removeDeleted:

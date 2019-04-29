@@ -98,7 +98,7 @@ public class AtomCreatorBot extends EventBot {
         bus.subscribe(AtomCreatedEvent.class, loadTestMonitor);
         bus.subscribe(HintFromMatcherEvent.class, loadTestMonitor);
         // wait for the targetCountReached event of the finishedCounter. We don't use
-        // another target counter, so we don't atom to do more filtering.
+        // another target counter, so we don't need to do more filtering.
         // this.workDoneSignaller = new ActionOnEventListener(
         // ctx, "workDoneSignaller",
         // new SignalWorkDoneAction(ctx));

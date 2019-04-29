@@ -34,18 +34,18 @@ A listener is registered by using `EventBus.subscribe(Class<T> eventClazz, Event
 
 **Example**: This Bot will publish a `WorkDoneEvent` when the first `ActEvent` is published on the bot's event bus. The bot is basically telling the framework to stop it as soon as the bot has started up. Not very useful, but very simple:
 ```
-//first, let't remember the bot's context and the bus - we'll atom them often
+//first, let't remember the bot's context and the bus - we'll need them often
 final EventListenerContext ctx = getEventListenerContext();
 EventBus bus = getEventBus();
 
 EventListener workDoneSignaller = 
 new ActionOnFirstNEventsListener(
-  ctx,                                 // each listener atoms the bot's context
-  1,                                   // this listener atoms to know how often it's supposed to be 
+  ctx,                                 // each listener needs the bot's context
+  1,                                   // this listener needs to know how often it's supposed to be 
                                        //   activated before stopping to listen
   "workDoneSignaller",                 // a name that is used in debug output. Useful if you have many listeners
     new PublishEventAction(            // the action that is executed when the listener is activated
-     ctx,                              // each action atoms the bot's context
+     ctx,                              // each action needs the bot's context
      new WorkDoneEvent(this))          // the event that will be published by the action
   )
 );
@@ -60,7 +60,7 @@ A bot is connected to the resources it uses through the [EventListenerContext](s
 * The [WonMessageSender](/webofneeds/won-core/src/main/java/won/protocol/message/sender/WonMessageSender.java) obtained via `EventListenerContext.getWonMessageSender()`. This object allows the bot to send WoN messages.
 
 ## The BotContext
-A bot manages the data it atoms to operate in the [BotContext](src/main/java/won/bot/framework/bot/context/BotContext.java). Most importantly, the botContext contains all atom URIs that the bot is responsible for. That particular information is required by the framework to decide which events should be routed to the bot, as it might be managing a number of bots. Other information in the bot context is just for the bot's internal purposes (i.e. your purposes).
+A bot manages the data it needs to operate in the [BotContext](src/main/java/won/bot/framework/bot/context/BotContext.java). Most importantly, the botContext contains all atom URIs that the bot is responsible for. That particular information is required by the framework to decide which events should be routed to the bot, as it might be managing a number of bots. Other information in the bot context is just for the bot's internal purposes (i.e. your purposes).
 
 ## The BotContextWrapper
 A bot always contains a specific [BotContextWrapper](src/main/java/won/bot/framework/bot/context/BotContextWrapper.java). This class or the respective subclasses enable you to access the BotContext described above, and facilitates HelperMethods for BotContext-DataRetrieval
