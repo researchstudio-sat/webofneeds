@@ -27,7 +27,7 @@
             </div>
         </div>
     </div>
-    <won-atom-map class="ownermap__map" locations="self.locations" add-current-location ng-if="!self.isOwnerAtomUrisToLoad">
+    <won-atom-map class="ownermap__map hide-in-responsive" locations="self.locations" add-current-location ng-if="!self.isOwnerAtomUrisToLoad">
     </won-atom-map>
     <div class="ownermap__content">
         <won-atom-card class="ownermap__content__atom" atom-uri="atomUri" ng-repeat="atomUri in self.sortedVisibleAtomUriArray track by atomUri"></won-atom-card>
