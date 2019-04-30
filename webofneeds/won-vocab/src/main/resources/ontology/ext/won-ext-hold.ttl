@@ -58,7 +58,7 @@
                 rdfs:comment "An Atom uses a Socket with this configuration to connect to the Persona Atom that holds it."@en ;
                 won:autoOpen "false"^^xsd:boolean ;
                 won:compatibleSocketDefinition :HolderSocket ;
-                won:derivesAtomProperty :holds ;
+                won:derivesAtomProperty :heldBy ;
                 won:socketCapacity 1 .
 
 
@@ -68,7 +68,7 @@
               rdfs:comment "A Persona Atom uses a Socket with this configuration to connect to Atoms it holds."@en ;
               won:autoOpen "false"^^xsd:boolean ;
               won:compatibleSocketDefinition :HoldableSocket ;
-              won:derivesAtomProperty :heldBy .
+              won:derivesAtomProperty :holds .
 
 
 ###  https://w3id.org/won/ext/hold#heldBy
