@@ -31,7 +31,7 @@ public class BotOwnerCallback implements OwnerCallback {
             public void run() {
                 try {
                     logger.debug("onCloseFromOtherAtom received for connection {}, message {} ", con.getConnectionURI(),
-                            wonMessage.getMessageURI());
+                                    wonMessage.getMessageURI());
                     getBotForAtomUri(con.getAtomURI()).onCloseFromOtherAtom(con, wonMessage);
                 } catch (Exception e) {
                     logger.warn("error while handling onCloseFromOtherAtom()", e);
@@ -64,7 +64,7 @@ public class BotOwnerCallback implements OwnerCallback {
                 if (wonMessage.getEnvelopeType() != WonMessageDirection.FROM_OWNER) {
                     try {
                         logger.debug("onConnectFromOtherAtom called for connection {}, message {}",
-                                con.getConnectionURI(), wonMessage.getMessageURI());
+                                        con.getConnectionURI(), wonMessage.getMessageURI());
                         getBotForAtomUri(con.getAtomURI()).onConnectFromOtherAtom(con, wonMessage);
                     } catch (Exception e) {
                         logger.warn("error while handling onConnectFromOtherAtom()", e);
@@ -100,7 +100,7 @@ public class BotOwnerCallback implements OwnerCallback {
                 if (wonMessage.getEnvelopeType() != WonMessageDirection.FROM_OWNER) {
                     try {
                         logger.debug("onMessageFromOtherAtom for Connection {}, message {}", con.getConnectionURI(),
-                                wonMessage.getMessageURI());
+                                        wonMessage.getMessageURI());
                         getBotForAtomUri(con.getAtomURI()).onMessageFromOtherAtom(con, wonMessage);
                     } catch (Exception e) {
                         logger.warn("error while handling onMessageFromOtherAtom()", e);
@@ -156,7 +156,7 @@ public class BotOwnerCallback implements OwnerCallback {
             throw new IllegalStateException("No bot registered for uri " + atomUri);
         if (!bot.getLifecyclePhase().isActive()) {
             throw new IllegalStateException("bot responsible for atom " + atomUri
-                    + " is not active (lifecycle phase is: " + bot.getLifecyclePhase() + ")");
+                            + " is not active (lifecycle phase is: " + bot.getLifecyclePhase() + ")");
         }
         return bot;
     }
