@@ -171,15 +171,23 @@ import { Generator } from "sparqljs";
       "won:seeks": seeksContentUri ? { "@id": seeksContentUri } : undefined,
       "won:socket": !(args.content && args.content.sockets)
         ? [
-            { "@id": "#chatSocket", "won:socketDefinition": "chat:ChatSocket" },
+            {
+              "@id": "#chatSocket",
+              "won:socketDefinition": { "@id": "chat:ChatSocket" },
+            },
             {
               "@id": "#holdableSocket",
-              "won:socketDefinition": "hold:HoldableSocket",
+              "won:socketDefinition": { "@id": "hold:HoldableSocket" },
             },
           ]
         : undefined,
       "won:defaultSocket": !(args.content && args.content.defaultSocket)
-        ? [{ "@id": "#chatSocket", "won:socketDefinition": "chat:ChatSocket" }]
+        ? [
+            {
+              "@id": "#chatSocket",
+              "won:socketDefinition": { "@id": "chat:ChatSocket" },
+            },
+          ]
         : undefined,
       "won:flag": won.debugmode ? [{ "@id": "won:UsedForTesting" }] : undefined, //TODO: refactor this and use a won:flags-Detail in the content instead
       "won:doNotMatchAfter": doNotMatchAfter

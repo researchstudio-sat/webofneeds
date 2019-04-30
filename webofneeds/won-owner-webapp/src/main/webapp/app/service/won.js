@@ -299,20 +299,20 @@ won.HOLD.HolderSocketCompacted = won.HOLD.prefix + ":HolderSocket";
 won.CHAT = {};
 won.CHAT.baseUri = "https://w3id.org/won/ext/chat#";
 won.CHAT.prefix = "chat";
-won.CHAT.ChatSocket = won.WON.baseUri + "ChatSocket";
-won.CHAT.ChatSocketCompacted = won.WON.prefix + ":ChatSocket";
+won.CHAT.ChatSocket = won.CHAT.baseUri + "ChatSocket";
+won.CHAT.ChatSocketCompacted = won.CHAT.prefix + ":ChatSocket";
 
 won.GROUP = {};
 won.GROUP.baseUri = "https://w3id.org/won/ext/group#";
 won.GROUP.prefix = "group";
-won.GROUP.GroupSocket = won.WON.baseUri + "GroupSocket";
-won.GROUP.GroupSocketCompacted = won.WON.prefix + ":GroupSocket";
+won.GROUP.GroupSocket = won.GROUP.baseUri + "GroupSocket";
+won.GROUP.GroupSocketCompacted = won.GROUP.prefix + ":GroupSocket";
 
 won.REVIEW = {};
 won.REVIEW.baseUri = "https://w3id.org/won/ext/review#";
 won.REVIEW.prefix = "review";
-won.REVIEW.ReviewSocket = won.WON.baseUri + "ReviewSocket";
-won.REVIEW.ReviewSocketCompacted = won.WON.prefix + ":ReviewSocket";
+won.REVIEW.ReviewSocket = won.REVIEW.baseUri + "ReviewSocket";
+won.REVIEW.ReviewSocketCompacted = won.REVIEW.prefix + ":ReviewSocket";
 
 won.EVENT = {};
 won.EVENT.WON_MESSAGE_RECEIVED = "WonMessageReceived";

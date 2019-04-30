@@ -341,7 +341,7 @@ export const sockets = {
     if (value) {
       let sockets = [];
       Immutable.fromJS(value).map((socket, key) => {
-        sockets.push({ "@id": key, "won:socketDefinition": socket });
+        sockets.push({ "@id": key, "won:socketDefinition": { "@id": socket } });
       });
 
       if (sockets.length > 0) {
@@ -362,7 +362,7 @@ export const sockets = {
         wonHasSockets.map(socket => {
           sockets = sockets.set(
             get(socket, "@id"),
-            get(socket, "won:socketDefinition")
+            getIn(socket, ["won:socketDefinition", "@id"])
           );
         });
         if (sockets.size > 0) {
@@ -371,7 +371,7 @@ export const sockets = {
       } else {
         return sockets.set(
           get(wonHasSockets, "@id"),
-          get(wonHasSockets, "won:socketDefinition")
+          getIn(wonHasSockets, ["won:socketDefinition", "@id"])
         );
       }
     }
@@ -401,7 +401,7 @@ export const defaultSocket = {
     if (value) {
       let sockets = [];
       Immutable.fromJS(value).map((socket, key) => {
-        sockets.push({ "@id": key, "won:socketDefinition": socket });
+        sockets.push({ "@id": key, "won:socketDefinition": { "@id": socket } });
       });
 
       if (sockets.length == 1) {
@@ -429,12 +429,12 @@ export const defaultSocket = {
           );
           return defaultSocket.set(
             defaultSocketId,
-            get(foundDefaultSocket, "won:socketDefinition")
+            getIn(foundDefaultSocket, ["won:socketDefinition", "@id"])
           );
         } else if (get(wonHasSockets, "@id") === defaultSocketId) {
           return defaultSocket.set(
             defaultSocketId,
-            get(wonHasSockets, "won:socketDefinition")
+            getIn(wonHasSockets, ["won:socketDefinition", "@id"])
           );
         }
       }

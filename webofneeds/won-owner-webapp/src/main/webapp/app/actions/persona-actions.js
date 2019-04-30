@@ -23,11 +23,11 @@ export function createPersona(persona, nodeUri) {
       "won:socket": [
         {
           "@id": "#holderSocket",
-          "@type": "hold:HolderSocket",
+          "won:socketDefinition": { "@id": "hold:HolderSocket" },
         },
         {
           "@id": "#reviewSocket",
-          "@type": "review:ReviewSocket",
+          "won:socketDefinition": { "@id": "review:ReviewSocket" },
         },
       ],
       "won:flag": [
