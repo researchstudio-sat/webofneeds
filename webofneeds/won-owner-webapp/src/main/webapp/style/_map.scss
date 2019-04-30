@@ -171,13 +171,10 @@ main.ownermap {
     overflow-y: hidden;
     width: 100%;
     transition: max-height 0.5s linear;
-    transition: overflow-y 0 linear 0.5s;
 
     &.ownermap__map--visible {
       transition: max-height 0.5s linear;
-      transition: overflow-y 0 linear 0.5s;
       max-height: 50vh;
-      overflow-y: auto;
     }
 
     .atom-map__mapmount {
@@ -189,29 +186,28 @@ main.ownermap {
   .ownermap__searchresults {
     height: 50vh;
     max-height: 0;
-    overflow: hidden;
+    overflow-y: hidden;
     background: $won-light-gray;
-    border: $thinGrayBorder;
-    border-top: 0;
     box-sizing: border-box;
     transition: max-height 0.5s linear;
-    transition: overflow-y 0 linear 0.5s;
-
-    &.ownermap__searchresults--visible {
-      transition: max-height 0.5s linear;
-      transition: overflow-y 0 linear 0.5s;
-      max-height: 50vh;
-      overflow-y: auto;
-    }
+    border: $thinGrayBorder;
+    border-top: 0;
 
     @media (max-width: $responsivenessBreakPoint) {
       border-left: 0;
       border-right: 0;
     }
 
+    &.ownermap__searchresults--visible {
+      transition: max-height 0.5s linear;
+      max-height: 50vh;
+      overflow-y: auto;
+    }
+
     &__result {
       display: grid;
       grid-template-columns: min-content 1fr;
+      grid-gap: 0.5rem;
       border-bottom: $thinGrayBorder;
       background: white;
 

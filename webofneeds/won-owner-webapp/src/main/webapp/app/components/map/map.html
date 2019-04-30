@@ -58,7 +58,15 @@
             </div>
         </div>
     </div>
-    <div class="ownermap__searchresults" ng-class="{'ownermap__searchresults--visible': self.showLocationInput}">
+    <div class="ownermap__searchresults" ng-class="{'ownermap__searchresults--visible': self.showLocationInput}" ng-if="!self.isOwnerAtomUrisToLoad && self.lastWhatsAroundLocation && !self.isLocationAccessDenied">
+        <div class="ownermap__searchresults__result" ng-if="!self.isLocationAccessDenied" ng-click="self.selectCurrentLocation()">
+            <svg class="ownermap__searchresults__result__icon">
+                <use xlink:href="#ico36_location_current" href="#ico36_location_current"></use>
+            </svg>
+            <div class="ownermap__searchresults__result__label">
+                Current Location
+            </div>
+        </div>
         <div class="ownermap__searchresults__result" ng-repeat="result in self.searchResults" ng-click="self.selectLocation(result)">
             <svg class="ownermap__searchresults__result__icon">
                 <use xlink:href="#ico16_indicator_location" href="#ico16_indicator_location"></use>

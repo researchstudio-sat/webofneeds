@@ -178,6 +178,56 @@ class Controller {
     this.atoms__fetchWhatsAround(undefined, location, 5000);
   }
 
+  selectCurrentLocation() {
+    if (!this.isLocationAccessDenied) {
+      if ("geolocation" in navigator) {
+        this.showLocationInput = false;
+        navigator.geolocation.getCurrentPosition(
+          currentLocation => {
+            const lat = currentLocation.coords.latitude;
+            const lng = currentLocation.coords.longitude;
+            this.view__updateCurrentLocation(
+              Immutable.fromJS({ location: { lat, lng } })
+            );
+
+            if (this.lastAtomUrisUpdateDate) {
+              this.atoms__fetchWhatsAround(
+                new Date(this.lastAtomUrisUpdateDate),
+                { lat, lng },
+                5000
+              );
+            } else {
+              this.atoms__fetchWhatsAround(undefined, { lat, lng }, 5000);
+            }
+          },
+          error => {
+            //error handler
+            console.error(
+              "Could not retrieve geolocation due to error: ",
+              error.code,
+              ", continuing map initialization without currentLocation. fullerror:",
+              error
+            );
+            console.error("LOCATION COULD NOT BE RETRIEVED");
+            if (error.code == 1) {
+              console.error("User Denied access");
+            }
+            this.view__locationAccessDenied();
+          },
+          {
+            //options
+            enableHighAccuracy: true,
+            maximumAge: 30 * 60 * 1000, //use if cache is not older than 30min
+          }
+        );
+      } else {
+        console.error("LOCATION COULD NOT BE RETRIEVED");
+        this.showLocationInput = false;
+        this.view__locationAccessDenied();
+      }
+    }
+  }
+
   updateWhatsAroundSuggestions() {
     const whatsAroundInputValue =
       !!this.whatsAroundInput().value && this.whatsAroundInput().value.trim();
