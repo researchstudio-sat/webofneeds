@@ -37,6 +37,14 @@ public class SocketService {
     public SocketService() {
     }
 
+    public Optional<Integer> getCapacity(URI socket) {
+        Optional<SocketDefinition> localConfig = getSocketConfig(socket);
+        if (!localConfig.isPresent() && localConfig.get().getCapacity().isPresent()) {
+            return localConfig.get().getCapacity();
+        }
+        return Optional.empty();
+    }
+
     public boolean isCompatible(URI localSocket, URI targetSocket) {
         Optional<SocketDefinition> localConfig = getSocketConfig(localSocket);
         Optional<SocketDefinition> targetConfig = getSocketConfig(targetSocket);

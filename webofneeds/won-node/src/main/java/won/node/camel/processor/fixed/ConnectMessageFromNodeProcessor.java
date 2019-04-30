@@ -89,6 +89,7 @@ public class ConnectMessageFromNodeProcessor extends AbstractCamelProcessor {
                 }
             }
         }
+        failForExceededCapacity(socket.getSocketURI());
         failForIncompatibleSockets(socket.getSocketURI(), targetSocketURI);
         if (con == null) {
             // create Connection in Database

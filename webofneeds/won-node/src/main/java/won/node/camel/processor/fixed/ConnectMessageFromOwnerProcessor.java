@@ -104,6 +104,7 @@ public class ConnectMessageFromOwnerProcessor extends AbstractCamelProcessor {
                 }
             }
         }
+        failForExceededCapacity(con.get().getSocketURI());
         failForIncompatibleSockets(con.get().getSocketURI(), con.get().getTargetSocketURI());
         // state transiation
         con.get().setState(con.get().getState().transit(ConnectionEventType.OWNER_OPEN));

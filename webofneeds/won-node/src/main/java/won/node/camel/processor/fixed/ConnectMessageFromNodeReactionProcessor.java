@@ -17,7 +17,6 @@ import won.protocol.message.WonMessageDirection;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.model.Connection;
 import won.protocol.model.Socket;
-import won.protocol.util.linkeddata.WonLinkedDataUtils;
 import won.protocol.vocabulary.WONMSG;
 
 @Component
@@ -36,9 +35,7 @@ public class ConnectMessageFromNodeReactionProcessor extends AbstractCamelProces
             Optional<Connection> con = connectionRepository.findOneByConnectionURIForUpdate(connectionURI.get());
             if (con.isPresent()) {
                 Socket socket = socketRepository.findOneBySocketURI(con.get().getSocketURI());
-                Optional<URI> targetSocket = WonLinkedDataUtils.getTypeOfSocket(con.get().getTargetSocketURI(),
-                                linkedDataSource);
-                if (targetSocket.isPresent() && socketService.isAutoOpen(socket.getSocketURI())) {
+                if (socketService.isAutoOpen(socket.getSocketURI())) {
                     sendAutoOpenForConnect(wonMessage);
                 }
             }

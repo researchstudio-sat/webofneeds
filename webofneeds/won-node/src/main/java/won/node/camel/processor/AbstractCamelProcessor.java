@@ -25,29 +25,30 @@ import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import won.cryptography.service.RandomNumberService;
-import won.node.socket.SocketService;
 import won.node.protocol.MatcherProtocolMatcherServiceClientSide;
 import won.node.service.DataAccessService;
+import won.node.socket.SocketService;
 import won.protocol.exception.IncompatibleSocketsException;
+import won.protocol.exception.SocketCapacityException;
 import won.protocol.jms.MessagingService;
 import won.protocol.message.WonMessage;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.model.Atom;
+import won.protocol.model.ConnectionState;
 import won.protocol.model.OwnerApplication;
+import won.protocol.repository.AtomMessageContainerRepository;
+import won.protocol.repository.AtomRepository;
 import won.protocol.repository.ConnectionContainerRepository;
 import won.protocol.repository.ConnectionMessageContainerRepository;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.DatasetHolderRepository;
-import won.protocol.repository.SocketRepository;
 import won.protocol.repository.MessageEventRepository;
-import won.protocol.repository.AtomMessageContainerRepository;
-import won.protocol.repository.AtomRepository;
 import won.protocol.repository.OwnerApplicationRepository;
+import won.protocol.repository.SocketRepository;
 import won.protocol.service.LinkedDataService;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.linkeddata.LinkedDataSource;
-import won.protocol.util.linkeddata.WonLinkedDataUtils;
 
 /**
  * User: syim Date: 02.03.2015
@@ -178,6 +179,16 @@ public abstract class AbstractCamelProcessor implements Processor {
             ownerApplicationIds.add(app.getOwnerApplicationId());
         }
         return ownerApplicationIds;
+    }
+
+    protected void failForExceededCapacity(URI socketURI) throws SocketCapacityException {
+        Optional<Integer> capacity = socketService.getCapacity(socketURI);
+        if (capacity.isPresent()) {
+            // lock the connection table by socketURI to avoid a race condition
+            connectionRepository.countBySocketUriForUpdate(socketURI);
+            if (connectionRepository.countBySocketURIAndState(socketURI, ConnectionState.CONNECTED) >= capacity.get()) {
+            }
+        }
     }
 
     protected void failForIncompatibleSockets(URI socketURI, URI targetSocketURI) throws IncompatibleSocketsException {

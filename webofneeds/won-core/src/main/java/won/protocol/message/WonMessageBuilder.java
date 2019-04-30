@@ -318,6 +318,14 @@ public class WonMessageBuilder {
                         welcomeMessage);
     }
 
+    public static WonMessageBuilder setMessagePropertiesForClose(URI messageURI, WonMessage connectToReactTo,
+                    String farewellMessage) {
+        return setMessagePropertiesForClose(messageURI, connectToReactTo.getRecipientURI(),
+                        connectToReactTo.getRecipientAtomURI(), connectToReactTo.getRecipientNodeURI(),
+                        connectToReactTo.getSenderURI(), connectToReactTo.getSenderAtomURI(),
+                        connectToReactTo.getSenderNodeURI(), farewellMessage);
+    }
+
     public static WonMessageBuilder setMessagePropertiesForClose(URI messageURI, URI localConnection, URI localAtom,
                     URI localWonNode, URI targetConnection, URI targetAtom, URI remoteWonNode, String farewellMessage) {
         return setMessagePropertiesForClose(messageURI, WonMessageDirection.FROM_OWNER, localConnection, localAtom,
