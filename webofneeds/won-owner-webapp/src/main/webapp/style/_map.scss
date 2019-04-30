@@ -142,7 +142,6 @@ main.ownermap {
     }
   }
 
-  .ownermap__deniedlocation,
   .ownermap__nolocation {
     display: grid;
     padding: 1rem;
@@ -202,6 +201,25 @@ main.ownermap {
       transition: max-height 0.5s linear;
       max-height: 50vh;
       overflow-y: auto;
+    }
+
+    &__deniedlocation {
+      display: grid;
+      padding: 1rem;
+      justify-items: center;
+      height: 49vh;
+      box-sizing: border-box;
+      align-content: center;
+
+      &__label {
+        margin-top: 1rem;
+        max-width: 25rem;
+        text-align: center;
+      }
+
+      &__icon {
+        --local-primary: #{$won-disabled-color};
+      }
     }
 
     &__result {
