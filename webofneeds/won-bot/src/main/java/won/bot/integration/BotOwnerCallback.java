@@ -12,6 +12,7 @@ import won.bot.framework.bot.Bot;
 import won.bot.framework.manager.BotManager;
 import won.owner.protocol.message.OwnerCallback;
 import won.protocol.message.WonMessage;
+import won.protocol.message.WonMessageDirection;
 import won.protocol.model.Connection;
 import won.protocol.model.Match;
 
@@ -30,7 +31,7 @@ public class BotOwnerCallback implements OwnerCallback {
             public void run() {
                 try {
                     logger.debug("onCloseFromOtherAtom received for connection {}, message {} ", con.getConnectionURI(),
-                                    wonMessage.getMessageURI());
+                            wonMessage.getMessageURI());
                     getBotForAtomUri(con.getAtomURI()).onCloseFromOtherAtom(con, wonMessage);
                 } catch (Exception e) {
                     logger.warn("error while handling onCloseFromOtherAtom()", e);
@@ -43,10 +44,14 @@ public class BotOwnerCallback implements OwnerCallback {
     public void onHintFromMatcher(final Match match, final WonMessage wonMessage) {
         taskScheduler.schedule(new Runnable() {
             public void run() {
-                try {
-                    getBotForAtomUri(match.getFromAtom()).onHintFromMatcher(match, wonMessage);
-                } catch (Exception e) {
-                    logger.warn("error while handling onHintFromMatcher()", e);
+                if (wonMessage.getEnvelopeType() != WonMessageDirection.FROM_OWNER) {
+                    try {
+                        getBotForAtomUri(match.getFromAtom()).onHintFromMatcher(match, wonMessage);
+                    } catch (Exception e) {
+                        logger.warn("error while handling onHintFromMatcher()", e);
+                    }
+                } else {
+                    logger.debug("Received echo for onHintFromMatcher");
                 }
             }
         }, new Date());
@@ -56,12 +61,16 @@ public class BotOwnerCallback implements OwnerCallback {
     public void onConnectFromOtherAtom(final Connection con, final WonMessage wonMessage) {
         taskScheduler.schedule(new Runnable() {
             public void run() {
-                try {
-                    logger.debug("onConnectFromOtherAtom called for connection {}, message {}", con.getConnectionURI(),
-                                    wonMessage.getMessageURI());
-                    getBotForAtomUri(con.getAtomURI()).onConnectFromOtherAtom(con, wonMessage);
-                } catch (Exception e) {
-                    logger.warn("error while handling onConnectFromOtherAtom()", e);
+                if (wonMessage.getEnvelopeType() != WonMessageDirection.FROM_OWNER) {
+                    try {
+                        logger.debug("onConnectFromOtherAtom called for connection {}, message {}",
+                                con.getConnectionURI(), wonMessage.getMessageURI());
+                        getBotForAtomUri(con.getAtomURI()).onConnectFromOtherAtom(con, wonMessage);
+                    } catch (Exception e) {
+                        logger.warn("error while handling onConnectFromOtherAtom()", e);
+                    }
+                } else {
+                    logger.debug("Received echo for onConnectFromOtherAtom");
                 }
             }
         }, new Date());
@@ -71,10 +80,14 @@ public class BotOwnerCallback implements OwnerCallback {
     public void onOpenFromOtherAtom(final Connection con, final WonMessage wonMessage) {
         taskScheduler.schedule(new Runnable() {
             public void run() {
-                try {
-                    getBotForAtomUri(con.getAtomURI()).onOpenFromOtherAtom(con, wonMessage);
-                } catch (Exception e) {
-                    logger.warn("error while handling onOpenFromOtherAtom()", e);
+                if (wonMessage.getEnvelopeType() != WonMessageDirection.FROM_OWNER) {
+                    try {
+                        getBotForAtomUri(con.getAtomURI()).onOpenFromOtherAtom(con, wonMessage);
+                    } catch (Exception e) {
+                        logger.warn("error while handling onOpenFromOtherAtom()", e);
+                    }
+                } else {
+                    logger.debug("Received echo for onOpenFromOtherAtom");
                 }
             }
         }, new Date());
@@ -84,12 +97,16 @@ public class BotOwnerCallback implements OwnerCallback {
     public void onMessageFromOtherAtom(final Connection con, final WonMessage wonMessage) {
         taskScheduler.schedule(new Runnable() {
             public void run() {
-                try {
-                    logger.debug("onMessageFromOtherAtom for Connection {}, message {}", con.getConnectionURI(),
-                                    wonMessage.getMessageURI());
-                    getBotForAtomUri(con.getAtomURI()).onMessageFromOtherAtom(con, wonMessage);
-                } catch (Exception e) {
-                    logger.warn("error while handling onMessageFromOtherAtom()", e);
+                if (wonMessage.getEnvelopeType() != WonMessageDirection.FROM_OWNER) {
+                    try {
+                        logger.debug("onMessageFromOtherAtom for Connection {}, message {}", con.getConnectionURI(),
+                                wonMessage.getMessageURI());
+                        getBotForAtomUri(con.getAtomURI()).onMessageFromOtherAtom(con, wonMessage);
+                    } catch (Exception e) {
+                        logger.warn("error while handling onMessageFromOtherAtom()", e);
+                    }
+                } else {
+                    logger.debug("Received echo for onMessageFromOtherAtom");
                 }
             }
         }, new Date());
@@ -139,7 +156,7 @@ public class BotOwnerCallback implements OwnerCallback {
             throw new IllegalStateException("No bot registered for uri " + atomUri);
         if (!bot.getLifecyclePhase().isActive()) {
             throw new IllegalStateException("bot responsible for atom " + atomUri
-                            + " is not active (lifecycle phase is: " + bot.getLifecyclePhase() + ")");
+                    + " is not active (lifecycle phase is: " + bot.getLifecyclePhase() + ")");
         }
         return bot;
     }
