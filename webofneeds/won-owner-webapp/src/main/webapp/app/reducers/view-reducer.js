@@ -24,6 +24,7 @@ const initialState = Immutable.fromJS({
   showSlideIns: true,
   atoms: new Immutable.Map(),
   locationAccessDenied: false,
+  currentLocation: undefined,
 });
 
 const initialAtomState = Immutable.fromJS({
@@ -66,6 +67,9 @@ export default function(viewState = initialState, action = {}) {
 
       return viewState.set("showMainMenu", false);
     }
+
+    case actionTypes.view.updateCurrentLocation:
+      return viewState.set("currentLocation", action.payload.get("location"));
 
     case actionTypes.view.toggleRdf:
       return viewState

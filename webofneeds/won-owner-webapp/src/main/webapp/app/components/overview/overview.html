@@ -16,10 +16,10 @@
             What's new? <span class="owneroverview__header__title__count" ng-if="!self.isOwnerAtomUrisLoading && self.hasVisibleAtomUris">({{ self.sortedVisibleAtomUriSize }})</span>
         </div>
         <div class="owneroverview__header__updated">
-            <div class="owneroverview__header__updated__time" ng-if="!self.isOwnerAtomUrisLoading">
+            <div class="owneroverview__header__updated__time hide-in-responsive" ng-if="!self.isOwnerAtomUrisLoading">
                 Updated: {{ self.friendlyLastAtomUrisUpdateTimestamp }}
             </div>
-            <div class="owneroverview__header__updated__loading" ng-if="self.isOwnerAtomUrisLoading">
+            <div class="owneroverview__header__updated__loading hide-in-responsive" ng-if="self.isOwnerAtomUrisLoading">
                 Loading...
             </div>
             <div class="owneroverview__header__updated__reload won-button--filled red" ng-click="self.reload()" ng-disabled="self.isOwnerAtomUrisLoading">
@@ -28,7 +28,7 @@
         </div>
     </div>
     <div class="owneroverview__content" ng-if="self.hasVisibleAtomUris">
-        <won-atom-card class="owneroverview__content__atom" atom-uri="atomUri" ng-repeat="atomUri in self.sortedVisibleAtomUriArray track by atomUri"></won-atom-card>
+        <won-atom-card class="owneroverview__content__atom" atom-uri="atomUri" current-location="self.currentLocation" ng-repeat="atomUri in self.sortedVisibleAtomUriArray track by atomUri"></won-atom-card>
     </div>
     <div class="owneroverview__noresults" ng-if="!self.hasVisibleAtomUris">
         <span class="owneroverview__noresults__label">Nothing new found.</span>

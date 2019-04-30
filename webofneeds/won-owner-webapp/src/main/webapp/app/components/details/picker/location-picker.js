@@ -3,13 +3,13 @@
  */
 
 import angular from "angular";
-import Immutable from "immutable"; // also exports itself as (window).L
 import L from "../../../leaflet-bundleable.js";
 import {
   attach,
   searchNominatim,
   reverseSearchNominatim,
   nominatim2draftLocation,
+  scrubSearchResults,
   delay,
   getIn,
 } from "../../../utils.js";
@@ -317,20 +317,6 @@ function genComponentConf() {
     },
     template: template,
   };
-}
-
-function scrubSearchResults(searchResults) {
-  return (
-    Immutable.fromJS(searchResults.map(nominatim2draftLocation))
-      /*
-         * filter "duplicate" results (e.g. "Wien"
-         *  -> 1x waterway, 1x boundary, 1x place)
-         */
-      .groupBy(r => r.get("name"))
-      .map(sameNamedResults => sameNamedResults.first())
-      .toList()
-      .toJS()
-  );
 }
 
 function onMapClick(e, ctrl) {

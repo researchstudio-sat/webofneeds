@@ -49,6 +49,10 @@ export function isLocationAccessDenied(viewState) {
   return get(viewState, "locationAccessDenied");
 }
 
+export function getCurrentLocation(viewState) {
+  return get(viewState, "currentLocation");
+}
+
 /**
  * Return the visible Tab of a certain atom, and if there was no tab stored in the state, return
  * the notFoundTab, which defaults to DETAIL

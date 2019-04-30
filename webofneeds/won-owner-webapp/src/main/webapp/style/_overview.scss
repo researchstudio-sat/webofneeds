@@ -13,78 +13,42 @@ main.owneroverview {
   margin: 0 auto;
 
   & .owneroverview__header {
-    @media (min-width: $responsivenessBreakPoint) {
-      display: grid;
-      grid-template-columns: 1fr min-content;
-      grid-gap: 0.5rem;
-      border-bottom: $thinGrayBorder;
-      padding: 0.5rem;
-      align-items: center;
-
-      &__title {
-        font-size: $mediumFontSize;
-      }
-
-      &__updated {
-        display: grid;
-        grid-template-columns: min-content min-content;
-        grid-gap: 0.5rem;
-        align-items: center;
-
-        font-size: $smallFontSize;
-
-        &__loading {
-          font-size: $smallFontSize;
-          color: $won-line-gray;
-        }
-
-        &__time {
-          white-space: nowrap;
-          color: $won-line-gray;
-        }
-
-        &__reload.won-button--filled.red {
-          font-size: 0.75rem;
-          padding: 0.25rem;
-        }
-      }
+    display: grid;
+    grid-template-columns: 1fr min-content;
+    grid-gap: 0.5rem;
+    border-bottom: $thinGrayBorder;
+    padding: 0.5rem;
+    @media (min-width: $maxContentWidth) {
+      padding-right: 0;
     }
-    @media (max-width: $responsivenessBreakPoint) {
+    align-items: center;
+
+    &__title {
+      font-size: $mediumFontSize;
+    }
+
+    &__updated {
       display: grid;
-      grid-template-columns: 1fr;
-      grid-template-rows: min-content min-content;
-      grid-gap: 0.5rem;
-      border-bottom: $thinGrayBorder;
-      padding: 0.5rem;
+      grid-template-columns: min-content min-content;
       align-items: center;
 
-      &__title {
-        font-size: $normalFontSize;
+      font-size: $smallFontSize;
+
+      &__loading {
+        font-size: $smallFontSize;
+        color: $won-line-gray;
+        margin-right: 0.5rem;
       }
 
-      &__updated {
-        display: grid;
-        grid-template-columns: min-content min-content;
-        grid-gap: 0.5rem;
-        align-items: center;
-        justify-content: flex-end;
+      &__time {
+        white-space: nowrap;
+        color: $won-line-gray;
+        margin-right: 0.5rem;
+      }
 
+      &__reload.won-button--filled.red {
         font-size: $smallFontSize;
-
-        &__loading {
-          font-size: $smallFontSize;
-          color: $won-line-gray;
-        }
-
-        &__time {
-          white-space: nowrap;
-          color: $won-line-gray;
-        }
-
-        &__reload.won-button--filled.red {
-          font-size: 0.75rem;
-          padding: 0.25rem;
-        }
+        padding: 0.33rem;
       }
     }
   }
@@ -97,7 +61,7 @@ main.owneroverview {
 
     &__label {
       font-size: $normalFontSize;
-      color: $won-disabled-color;
+      color: $won-primary-text-color;
       text-align: center;
       max-width: 25rem;
     }

@@ -1115,6 +1115,20 @@ export function callBuffer(fn, delay = 1000) {
   return buffer;
 }
 
+export function scrubSearchResults(searchResults) {
+  return (
+    Immutable.fromJS(searchResults.map(nominatim2draftLocation))
+      /*
+       * filter "duplicate" results (e.g. "Wien"
+       *  -> 1x waterway, 1x boundary, 1x place)
+       */
+      .groupBy(r => r.get("name"))
+      .map(sameNamedResults => sameNamedResults.first())
+      .toList()
+      .toJS()
+  );
+}
+
 /**
  * NOTE: don't pass recursive structures!
  * NOTE: don't pass immutablejs structures
