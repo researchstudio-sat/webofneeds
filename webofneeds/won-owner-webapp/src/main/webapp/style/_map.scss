@@ -2,6 +2,7 @@
 @import "sizing-utils";
 @import "fonts";
 @import "flex-layout";
+@import "textfield";
 
 main.ownermap {
   grid-column: 1 / -1;
@@ -13,118 +14,129 @@ main.ownermap {
   margin: 0 auto;
 
   & .ownermap__header {
+    display: grid;
+
     @media (min-width: $responsivenessBreakPoint) {
-      display: grid;
+      grid-template-areas: "omh__label omh__location omh__action";
+      grid-template-columns: min-content 1fr min-content;
+    }
+
+    @media (max-width: $responsivenessBreakPoint) {
+      grid-template-areas: "omh__label omh__action" "omh__location omh__location";
       grid-template-columns: 1fr min-content;
-      grid-gap: 0.5rem;
-      border-bottom: $thinGrayBorder;
-      padding: 0.5rem;
+    }
+
+    grid-gap: 0.5rem;
+    border-bottom: $thinGrayBorder;
+    padding: 0.5rem;
+    @media (min-width: $maxContentWidth) {
+      padding-right: 0;
+    }
+    align-items: center;
+
+    &__label {
+      grid-area: omh__label;
+      white-space: nowrap;
+      font-size: $mediumFontSize;
+    }
+
+    &__location,
+    &__input {
+      display: grid;
+      position: relative;
+      grid-template-columns: min-content 1fr 0;
       align-items: center;
 
-      &__title {
-        display: flex;
-        font-size: $mediumFontSize;
+      &__icon {
+        @include fixed-square($mediumFontSize);
+        margin-right: 0.5rem;
+      }
+    }
 
-        &__location {
-          display: flex;
-          align-items: center;
-          cursor: pointer;
-          color: $won-primary-color;
-          --local-primary: #{$won-primary-color};
+    &__location {
+      grid-area: omh__location;
+      cursor: pointer;
+      color: $won-primary-color;
+      --local-primary: #{$won-primary-color};
+      font-size: $mediumFontSize;
 
-          &:hover {
-            color: $won-primary-color-light;
-            --local-primary: #{$won-primary-color-light};
-          }
+      &:hover {
+        color: $won-primary-color-light;
+        --local-primary: #{$won-primary-color-light};
+      }
 
-          &__icon {
-            @include fixed-square($mediumFontSize);
-          }
+      &__label {
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+      }
+    }
+
+    &__input {
+      grid-area: omh__location;
+      color: $won-primary-text-color;
+      --local-primary: #{$won-primary-text-color};
+
+      $reset-button-size: 2.25rem;
+
+      &__icon {
+        cursor: pointer;
+        --local-primary: #{$won-primary-text-color};
+
+        &:hover {
+          --local-primary: #{$won-primary-color-light};
         }
       }
 
-      &__updated {
-        display: grid;
-        grid-template-columns: min-content min-content;
-        grid-gap: 0.5rem;
-        align-items: center;
+      &__inner {
+        @extend .won-txt;
+        border: $thinGrayBorder;
+        padding: 0.33rem 0.5rem + $reset-button-size 0.33rem 0.5rem;
 
-        font-size: $smallFontSize;
-
-        &__loading {
-          font-size: $smallFontSize;
-          color: $won-line-gray;
+        &::-ms-clear {
+          width: 0;
+          height: 0;
         }
+      }
 
-        &__time {
-          white-space: nowrap;
-          color: $won-line-gray;
-        }
+      &__reset {
+        @include fixed-square($reset-button-size);
+        position: absolute;
+        right: 0;
+        top: 0;
+        z-index: 1;
 
-        &__reload.won-button--filled.red {
-          font-size: 0.75rem;
-          padding: 0.25rem;
+        --local-primary: #{$won-primary-color};
+        &:hover {
+          --local-primary: #{$won-primary-color-light};
         }
       }
     }
 
-    @media (max-width: $responsivenessBreakPoint) {
+    &__updated {
+      grid-area: omh__action;
       display: grid;
-      grid-template-columns: 1fr;
-      grid-template-rows: min-content min-content;
-      grid-gap: 0.5rem;
-      border-bottom: $thinGrayBorder;
-      padding: 0.5rem;
+      grid-template-columns: min-content min-content;
       align-items: center;
 
-      &__title {
-        display: flex;
-        flex-direction: column;
-        font-size: $normalFontSize;
+      font-size: $smallFontSize;
 
-        &__location {
-          display: flex;
-          align-items: flex-start;
-          margin-top: 0.3rem;
-          cursor: pointer;
-          color: $won-primary-color;
-          --local-primary: #{$won-primary-color};
-
-          &:hover {
-            color: $won-primary-color-light;
-            --local-primary: #{$won-primary-color-light};
-          }
-
-          &__icon {
-            margin-top: 0.25rem;
-            @include fixed-square($normalFontSize);
-          }
-        }
+      &__loading {
+        font-size: $smallFontSize;
+        color: $won-line-gray;
+        margin-right: 0.5rem;
       }
 
-      &__updated {
-        display: grid;
-        grid-template-columns: min-content min-content;
-        grid-gap: 0.5rem;
-        align-items: center;
-        justify-content: flex-end;
+      &__time {
+        white-space: nowrap;
+        color: $won-line-gray;
+        margin-right: 0.5rem;
+      }
 
+      &__cancel.won-button--filled.red,
+      &__reload.won-button--filled.red {
         font-size: $smallFontSize;
-
-        &__loading {
-          font-size: $smallFontSize;
-          color: $won-line-gray;
-        }
-
-        &__time {
-          white-space: nowrap;
-          color: $won-line-gray;
-        }
-
-        &__reload.won-button--filled.red {
-          font-size: 0.75rem;
-          padding: 0.25rem;
-        }
+        padding: 0.66rem;
       }
     }
   }
@@ -159,6 +171,40 @@ main.ownermap {
     .atom-map__mapmount {
       width: 100%;
       height: 50vh;
+    }
+  }
+
+  .ownermap__searchresults {
+    height: 50vh;
+    max-height: 50vh;
+    overflow-y: auto;
+    background: $won-light-gray;
+    border: $thinGrayBorder;
+    border-top: 0;
+
+    &__result {
+      display: grid;
+      grid-template-columns: min-content 1fr;
+      border-bottom: $thinGrayBorder;
+      background: white;
+
+      padding: 0.5rem;
+      align-items: center;
+      --local-primary: #{$won-primary-text-color};
+      color: $won-primary-text-color;
+
+      &:hover {
+        cursor: pointer;
+        color: $won-primary-color;
+        --local-primary: #{$won-primary-color};
+      }
+
+      &__icon {
+        @include fixed-square($iconSize);
+      }
+
+      &__label {
+      }
     }
   }
 

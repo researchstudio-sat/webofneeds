@@ -9,6 +9,8 @@ import {
   get,
   delay,
   reverseSearchNominatim,
+  searchNominatim,
+  scrubSearchResults,
 } from "../../utils.js";
 import Immutable from "immutable";
 import { connect2Redux } from "../../won-utils.js";
@@ -22,12 +24,13 @@ import * as viewSelectors from "../../selectors/view-selectors.js";
 import * as processUtils from "../../process-utils.js";
 import * as wonLabelUtils from "../../won-label-utils.js";
 import * as atomUtils from "../../atom-utils.js";
+import wonInput from "../../directives/input.js";
 
 import "style/_map.scss";
 import "style/_atom-overlay.scss";
 import "style/_connection-overlay.scss";
 
-const serviceDependencies = ["$ngRedux", "$scope"];
+const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 class Controller {
   constructor() {
     attach(this, serviceDependencies, arguments);
@@ -162,10 +165,52 @@ class Controller {
       ).then(searchResult => {
         const displayName = searchResult.display_name;
         this.$scope.$apply(() => {
+          this.whatsAroundInput().value = displayName;
+          this.showResetButton = !!displayName && displayName.length > 0;
           this.lastWhatsAroundLocationName = displayName;
         });
       });
     }
+  }
+
+  selectLocation(location) {
+    this.showLocationInput = false;
+    this.atoms__fetchWhatsAround(undefined, location, 5000);
+  }
+
+  updateWhatsAroundSuggestions() {
+    const whatsAroundInputValue =
+      !!this.whatsAroundInput().value && this.whatsAroundInput().value.trim();
+
+    if (!!whatsAroundInputValue && whatsAroundInputValue.length > 0) {
+      searchNominatim(whatsAroundInputValue).then(searchResults => {
+        const parsedResults = scrubSearchResults(
+          searchResults,
+          whatsAroundInputValue
+        );
+        this.$scope.$apply(() => {
+          this.showResetButton = true;
+          this.searchResults = parsedResults;
+        });
+      });
+    } else {
+      this.resetWhatsAroundInput();
+    }
+  }
+
+  resetWhatsAroundInput() {
+    this.whatsAroundInput().value = "";
+    this.showResetButton = false;
+    this.searchResults = [];
+  }
+
+  whatsAroundInput() {
+    if (!this._whatsAroundInput) {
+      this._whatsAroundInput = this.$element[0].querySelector(
+        ".ownermap__header__input__inner"
+      );
+    }
+    return this._whatsAroundInput;
   }
 
   fetchCurrentLocationAndReload() {
@@ -244,5 +289,6 @@ export default angular
     atomMapModule,
     atomCardModule,
     postHeaderModule,
+    wonInput,
   ])
   .controller("MapController", Controller).name;
