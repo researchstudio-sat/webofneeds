@@ -295,7 +295,7 @@ function genComponentConf() {
           }
         );
       } else {
-        console.error("LOCATION COULD NOT BE RETRIEVED");
+        console.error("location could not be retrieved");
         this.view__locationAccessDenied();
         callback();
       }

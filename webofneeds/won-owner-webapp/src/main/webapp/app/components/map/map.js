@@ -208,7 +208,6 @@ class Controller {
               ", continuing map initialization without currentLocation. fullerror:",
               error
             );
-            console.error("LOCATION COULD NOT BE RETRIEVED");
             if (error.code == 1) {
               console.error("User Denied access");
             }
@@ -221,7 +220,7 @@ class Controller {
           }
         );
       } else {
-        console.error("LOCATION COULD NOT BE RETRIEVED");
+        console.error("location could not be retrieved");
         this.showLocationInput = false;
         this.view__locationAccessDenied();
       }
@@ -292,7 +291,6 @@ class Controller {
               ", continuing map initialization without currentLocation. fullerror:",
               error
             );
-            console.error("LOCATION COULD NOT BE RETRIEVED");
             if (error.code == 1) {
               console.error("User Denied access");
             }
@@ -305,7 +303,7 @@ class Controller {
           }
         );
       } else {
-        console.error("LOCATION COULD NOT BE RETRIEVED");
+        console.error("location could not be retrieved");
         this.view__locationAccessDenied();
       }
     }
