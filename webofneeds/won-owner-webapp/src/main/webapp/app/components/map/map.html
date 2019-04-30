@@ -44,10 +44,10 @@
             </svg>
         </div>
         <div class="ownermap__header__updated">
-            <div class="ownermap__header__updated__loading" ng-if="self.isOwnerAtomUrisLoading && !self.showLocationInput">
+            <div class="ownermap__header__updated__loading hide-in-responsive" ng-if="self.isOwnerAtomUrisLoading && !self.showLocationInput">
                 Loading...
             </div>
-            <div class="ownermap__header__updated__time" ng-if="!self.isOwnerAtomUrisLoading && !self.showLocationInput">
+            <div class="ownermap__header__updated__time hide-in-responsive" ng-if="!self.isOwnerAtomUrisLoading && !self.showLocationInput">
                 Updated: {{ self.friendlyLastAtomUrisUpdateTimestamp }}
             </div>
             <div class="ownermap__header__updated__reload won-button--filled red" ng-click="self.reload()" ng-disabled="self.isOwnerAtomUrisLoading"  ng-if="!self.showLocationInput">

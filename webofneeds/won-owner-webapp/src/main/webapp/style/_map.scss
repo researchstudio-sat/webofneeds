@@ -136,7 +136,7 @@ main.ownermap {
       &__cancel.won-button--filled.red,
       &__reload.won-button--filled.red {
         font-size: $smallFontSize;
-        padding: 0.66rem;
+        padding: 0.33rem;
       }
     }
   }
@@ -181,6 +181,11 @@ main.ownermap {
     background: $won-light-gray;
     border: $thinGrayBorder;
     border-top: 0;
+
+    @media (max-width: $responsivenessBreakPoint) {
+      border-left: 0;
+      border-right: 0;
+    }
 
     &__result {
       display: grid;

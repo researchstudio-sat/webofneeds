@@ -16,10 +16,10 @@
             What's new? <span class="owneroverview__header__title__count" ng-if="!self.isOwnerAtomUrisLoading && self.hasVisibleAtomUris">({{ self.sortedVisibleAtomUriSize }})</span>
         </div>
         <div class="owneroverview__header__updated">
-            <div class="owneroverview__header__updated__time" ng-if="!self.isOwnerAtomUrisLoading">
+            <div class="owneroverview__header__updated__time hide-in-responsive" ng-if="!self.isOwnerAtomUrisLoading">
                 Updated: {{ self.friendlyLastAtomUrisUpdateTimestamp }}
             </div>
-            <div class="owneroverview__header__updated__loading" ng-if="self.isOwnerAtomUrisLoading">
+            <div class="owneroverview__header__updated__loading hide-in-responsive" ng-if="self.isOwnerAtomUrisLoading">
                 Loading...
             </div>
             <div class="owneroverview__header__updated__reload won-button--filled red" ng-click="self.reload()" ng-disabled="self.isOwnerAtomUrisLoading">
