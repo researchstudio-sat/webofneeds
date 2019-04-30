@@ -44,7 +44,7 @@ function genComponentConf() {
             ng-if="self.atomImage"
             alt="{{self.atomImage.get('name')}}"
             ng-src="data:{{self.atomImage.get('type')}};base64,{{self.atomImage.get('data')}}"/>
-        <won-atom-map class="location" locations="[self.atomLocation]" ng-if="self.showMap" disable-controls default-layer-only add-current-location>
+        <won-atom-map class="location" locations="[self.atomLocation]" ng-if="self.showMap" disable-controls add-current-location>
         </won-atom-map>
     </div>
     <div class="card__icon__skeleton" ng-if="!self.atomLoaded"
