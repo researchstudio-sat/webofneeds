@@ -97,7 +97,9 @@ function genComponentConf() {
           .getBounds()
           .pad(0.5),
         this.currentLocation
-          ? { animate: false }
+          ? markedLocations.length === 0
+            ? { maxZoom: 10, animate: false }
+            : { animate: false }
           : { maxZoom: 14, animate: false }
       );
 
