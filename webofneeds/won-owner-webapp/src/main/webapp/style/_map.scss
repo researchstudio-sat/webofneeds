@@ -3,6 +3,7 @@
 @import "fonts";
 @import "flex-layout";
 @import "textfield";
+@import "animate";
 
 main.ownermap {
   grid-column: 1 / -1;
@@ -166,7 +167,18 @@ main.ownermap {
   .ownermap__map {
     display: block;
     height: 50vh;
+    max-height: 0;
+    overflow-y: hidden;
     width: 100%;
+    transition: max-height 0.5s linear;
+    transition: overflow-y 0 linear 0.5s;
+
+    &.ownermap__map--visible {
+      transition: max-height 0.5s linear;
+      transition: overflow-y 0 linear 0.5s;
+      max-height: 50vh;
+      overflow-y: auto;
+    }
 
     .atom-map__mapmount {
       width: 100%;
@@ -176,11 +188,21 @@ main.ownermap {
 
   .ownermap__searchresults {
     height: 50vh;
-    max-height: 50vh;
-    overflow-y: auto;
+    max-height: 0;
+    overflow: hidden;
     background: $won-light-gray;
     border: $thinGrayBorder;
     border-top: 0;
+    box-sizing: border-box;
+    transition: max-height 0.5s linear;
+    transition: overflow-y 0 linear 0.5s;
+
+    &.ownermap__searchresults--visible {
+      transition: max-height 0.5s linear;
+      transition: overflow-y 0 linear 0.5s;
+      max-height: 50vh;
+      overflow-y: auto;
+    }
 
     @media (max-width: $responsivenessBreakPoint) {
       border-left: 0;

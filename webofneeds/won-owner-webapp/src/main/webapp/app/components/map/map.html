@@ -58,7 +58,7 @@
             </div>
         </div>
     </div>
-    <div class="ownermap__searchresults" ng-if="self.showLocationInput">
+    <div class="ownermap__searchresults" ng-class="{'ownermap__searchresults--visible': self.showLocationInput}">
         <div class="ownermap__searchresults__result" ng-repeat="result in self.searchResults" ng-click="self.selectLocation(result)">
             <svg class="ownermap__searchresults__result__icon">
                 <use xlink:href="#ico16_indicator_location" href="#ico16_indicator_location"></use>
@@ -68,7 +68,7 @@
             </div>
         </div>
     </div>
-    <won-atom-map class="ownermap__map hide-in-responsive" locations="self.locations" current-location="self.lastWhatsAroundLocation" ng-if="!self.isOwnerAtomUrisToLoad && self.lastWhatsAroundLocation && !self.isLocationAccessDenied && !self.showLocationInput">
+    <won-atom-map class="ownermap__map hide-in-responsive" ng-class="{'ownermap__map--visible': !self.showLocationInput}" locations="self.locations" current-location="self.lastWhatsAroundLocation" ng-if="!self.isOwnerAtomUrisToLoad && self.lastWhatsAroundLocation && !self.isLocationAccessDenied">
     </won-atom-map>
     <div class="ownermap__content" ng-if="self.lastWhatsAroundLocation && !self.isLocationAccessDenied && self.hasVisibleAtomUris">
         <won-atom-card class="ownermap__content__atom" atom-uri="atomUri" current-location="self.lastWhatsAroundLocation" ng-repeat="atomUri in self.sortedVisibleAtomUriArray track by atomUri" ng-if="self.hasVisibleAtomUris"></won-atom-card>
