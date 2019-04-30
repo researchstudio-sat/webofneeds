@@ -38,7 +38,7 @@ public class ConnectMessageFromNodeReactionProcessor extends AbstractCamelProces
                 Socket socket = socketRepository.findOneBySocketURI(con.get().getSocketURI());
                 Optional<URI> targetSocket = WonLinkedDataUtils.getTypeOfSocket(con.get().getTargetSocketURI(),
                                 linkedDataSource);
-                if (targetSocket.isPresent() && socketService.isAutoOpen(socket.getTypeURI(), targetSocket.get())) {
+                if (targetSocket.isPresent() && socketService.isAutoOpen(socket.getSocketURI())) {
                     sendAutoOpenForConnect(wonMessage);
                 }
             }

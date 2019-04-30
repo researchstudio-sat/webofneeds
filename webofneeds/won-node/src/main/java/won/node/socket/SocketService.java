@@ -64,8 +64,7 @@ public class SocketService {
                 atomDataset.addNamedModel(atom.getAtomURI() + "#derivedData", derivationModel);
             }
             final Model modelToManipulate = derivationModel;
-            URI socketType = con.getTypeURI();
-            Optional<SocketDefinition> socketConfig = getSocketConfig(socketType);
+            Optional<SocketDefinition> socketConfig = getSocketConfig(con.getSocketURI());
             if (socketConfig.isPresent()) {
                 Resource atomRes = derivationModel.getResource(atom.getAtomURI().toString());
                 Resource targetAtomRes = derivationModel.getResource(con.getTargetAtomURI().toString());
@@ -74,11 +73,17 @@ public class SocketService {
                     socketConfig.get().getDerivationProperties().stream()
                                     .map(u -> modelToManipulate.createProperty(u.toString()))
                                     .forEach(p -> modelToManipulate.add(atomRes, p, targetAtomRes));
+                    socketConfig.get().getInverseDerivationProperties().stream()
+                                    .map(u -> modelToManipulate.createProperty(u.toString()))
+                                    .forEach(p -> modelToManipulate.add(targetAtomRes, p, atomRes));
                 } else {
                     logger.info("removing data for connection {}", con.getConnectionURI());
                     socketConfig.get().getDerivationProperties().stream()
                                     .map(u -> modelToManipulate.createProperty(u.toString()))
                                     .forEach(p -> modelToManipulate.remove(atomRes, p, targetAtomRes));
+                    socketConfig.get().getInverseDerivationProperties().stream()
+                                    .map(u -> modelToManipulate.createProperty(u.toString()))
+                                    .forEach(p -> modelToManipulate.remove(targetAtomRes, p, atomRes));
                 }
             }
             atom.incrementVersion();

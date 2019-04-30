@@ -22,10 +22,9 @@ public interface SocketDefinition {
     public Set<URI> getDerivationProperties();
 
     /**
-     * Indicates if a connection between this socket and the specified socket is
-     * allowed.
+     * Returns the set of inverse derivation properties to be used for this type.
      */
-    public Set<URI> compatibleTypes();
+    public Set<URI> getInverseDerivationProperties();
 
     /**
      * Indicates whether this socket configuration supports connecting to the other

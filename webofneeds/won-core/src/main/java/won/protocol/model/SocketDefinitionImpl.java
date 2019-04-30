@@ -10,6 +10,7 @@ public class SocketDefinitionImpl implements SocketDefinition {
     private final URI socketURI;
     private Optional<URI> socketDefinition = Optional.empty();
     private Set<URI> derivationProperties = new HashSet<>();
+    private Set<URI> inverseDerivationProperties = new HashSet<>();
     private Set<URI> compatibleSocketTypes = new HashSet<>();
     private Optional<Boolean> autoOpen = Optional.empty();
     private Optional<Integer> capacity = Optional.empty();
@@ -28,25 +29,33 @@ public class SocketDefinitionImpl implements SocketDefinition {
         return socketDefinition;
     }
 
+    public void setSocketDefinitionURI(URI socketDefinitionURI) {
+        this.socketDefinition = Optional.ofNullable(socketDefinitionURI);
+    }
+
+    public void setSocketDefinitionURI(Optional<URI> socketDefinitionURI) {
+        this.socketDefinition = socketDefinitionURI;
+    }
+
     @Override
     public Set<URI> getDerivationProperties() {
         return derivationProperties;
     }
 
     @Override
+    public Set<URI> getInverseDerivationProperties() {
+        return inverseDerivationProperties;
+    }
+
+    @Override
     public boolean isCompatibleWith(SocketDefinition other) {
-        boolean selfIsUnrestricted = true;
-        boolean otherIsUnrestricted = true;
         if (this.compatibleSocketTypes.isEmpty()) {
-            selfIsUnrestricted = false;
+            return true;
         }
-        if (other.compatibleTypes().isEmpty()) {
-            otherIsUnrestricted = false;
+        if (!other.getSocketDefinitionURI().isPresent()) {
+            return false;
         }
-        return (selfIsUnrestricted || other.getSocketDefinitionURI().isPresent()
-                        && this.compatibleSocketTypes.contains(other.getSocketDefinitionURI().get()))
-                        && (otherIsUnrestricted || this.getSocketDefinitionURI().isPresent()
-                                        && other.compatibleTypes().contains(this.getSocketDefinitionURI().get()));
+        return this.compatibleSocketTypes.contains(other.getSocketDefinitionURI().get());
     }
 
     @Override
@@ -64,8 +73,17 @@ public class SocketDefinitionImpl implements SocketDefinition {
         this.derivationProperties.addAll(derivationProperties);
     }
 
+    public void setInverseDerivationProperties(Collection<URI> properties) {
+        this.inverseDerivationProperties.clear();
+        this.inverseDerivationProperties.addAll(properties);
+    }
+
     public void addDerivationProperty(URI p) {
         this.derivationProperties.add(p);
+    }
+
+    public void addInverseDerivationProperty(URI p) {
+        this.inverseDerivationProperties.add(p);
     }
 
     public void setCompatibleSocketTypes(Collection<URI> allowedTargetSocketTypes) {
@@ -98,14 +116,7 @@ public class SocketDefinitionImpl implements SocketDefinition {
     }
 
     @Override
-    public Set<URI> compatibleTypes() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
     public Set<URI> getInconsistentProperties() {
-        // TODO Auto-generated method stub
-        return null;
+        return inconsistentProperties;
     }
 }

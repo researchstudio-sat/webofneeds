@@ -44,7 +44,7 @@ public class ConnectionModelMapper implements ModelMapper<Connection> {
         if (connection.getSocketURI() != null) {
             Resource socket = model.createResource(connection.getSocketURI().toString());
             connectionMember.addProperty(WON.socket, socket);
-            socket.addProperty(RDF.type, model.getResource(connection.getTypeURI().toString()));
+            socket.addProperty(WON.socketDefinition, model.getResource(connection.getTypeURI().toString()));
             if (connection.getTargetSocketURI() != null) {
                 connectionMember.addProperty(WON.targetSocket,
                                 model.getResource(connection.getTargetSocketURI().toString()));
@@ -75,8 +75,8 @@ public class ConnectionModelMapper implements ModelMapper<Connection> {
             connection.setTargetSocketURI(
                             URI.create(connectionRes.getProperty(WON.targetSocket).getResource().getURI()));
         }
-        connection.setTypeURI(
-                        URI.create(connectionRes.getProperty(WON.socket).getProperty(RDF.type).getResource().getURI()));
+        connection.setTypeURI(URI.create(connectionRes.getProperty(WON.socket).getProperty(WON.socketDefinition)
+                        .getResource().getURI()));
         Date lastUpdate = DateTimeUtils.parse(connectionRes.getProperty(DCTerms.modified).getString(), model);
         connection.setLastUpdate(lastUpdate);
         return connection;

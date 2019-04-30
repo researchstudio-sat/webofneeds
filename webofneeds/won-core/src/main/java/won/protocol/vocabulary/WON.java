@@ -84,6 +84,7 @@ public class WON {
     public static final Property compatibleSocketDefinition = m.createProperty(BASE_URI + "compatibleSocketDefinition");
     public static final Property socketDefinition = m.createProperty(BASE_URI, "socketDefinition");
     public static final Property derivesAtomProperty = m.createProperty(BASE_URI + "derivesAtomProperty");
+    public static final Property derivesInverseAtomProperty = m.createProperty(BASE_URI + "derivesInverseAtomProperty");
     public static final Property socketCapacity = m.createProperty(BASE_URI, "socketCapacity");
     public static final Property autoOpen = m.createProperty(BASE_URI, "autoOpen");
     // This property is used in the rdf-model part of connect (from owner) and hint

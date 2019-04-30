@@ -1004,35 +1004,51 @@ public class WonRdfUtils {
 
         public static void setCompatibleSocketDefinitions(SocketDefinitionImpl socketConfiguration, Dataset dataset,
                         URI socketURI) {
-            socketConfiguration
-                            .setCompatibleSocketTypes(RdfUtils
-                                            .getObjectStreamForPropertyPath(dataset, socketURI,
-                                                            PathParser.parse("<" + WON.socketDefinition.getURI() + ">/<"
-                                                                            + WON.compatibleSocketDefinition + ">",
-                                                                            DefaultPrefixUtils.getDefaultPrefixes()),
-                                                            node -> node.isURI() ? URI.create(node.getURI()) : null)
-                                            .collect(Collectors.toSet()));
+            socketConfiguration.setCompatibleSocketTypes(RdfUtils
+                            .getObjectStreamOfProperty(dataset, socketURI, URI.create(WON.socketDefinition.getURI()),
+                                            node -> node.isURIResource() ? URI.create(node.asResource().getURI())
+                                                            : null)
+                            .flatMap(def -> RdfUtils.getObjectStreamOfProperty(dataset, def,
+                                            URI.create(WON.compatibleSocketDefinition.getURI()),
+                                            node -> node.isURIResource() ? URI.create(node.asResource().getURI())
+                                                            : null))
+                            .collect(Collectors.toSet()));
         }
 
         public static void setDerivationProperties(SocketDefinitionImpl socketConfiguration, Dataset dataset,
                         URI socketURI) {
-            socketConfiguration
-                            .setDerivationProperties(RdfUtils
-                                            .getObjectStreamForPropertyPath(dataset, socketURI,
-                                                            PathParser.parse("<" + WON.socketDefinition.getURI() + ">/<"
-                                                                            + WON.derivesAtomProperty + ">",
-                                                                            DefaultPrefixUtils.getDefaultPrefixes()),
-                                                            node -> node.isURI() ? URI.create(node.getURI()) : null)
-                                            .collect(Collectors.toSet()));
+            socketConfiguration.setDerivationProperties(RdfUtils
+                            .getObjectStreamOfProperty(dataset, socketURI, URI.create(WON.socketDefinition.getURI()),
+                                            node -> node.isURIResource() ? URI.create(node.asResource().getURI())
+                                                            : null)
+                            .flatMap(def -> RdfUtils.getObjectStreamOfProperty(dataset, def,
+                                            URI.create(WON.derivesAtomProperty.getURI()),
+                                            node -> node.isURIResource() ? URI.create(node.asResource().getURI())
+                                                            : null))
+                            .collect(Collectors.toSet()));
+        }
+
+        public static void setInverseDerivationProperties(SocketDefinitionImpl socketConfiguration, Dataset dataset,
+                        URI socketURI) {
+            socketConfiguration.setInverseDerivationProperties(RdfUtils
+                            .getObjectStreamOfProperty(dataset, socketURI, URI.create(WON.socketDefinition.getURI()),
+                                            node -> node.isURIResource() ? URI.create(node.asResource().getURI())
+                                                            : null)
+                            .flatMap(def -> RdfUtils.getObjectStreamOfProperty(dataset, def,
+                                            URI.create(WON.derivesInverseAtomProperty.getURI()),
+                                            node -> node.isURIResource() ? URI.create(node.asResource().getURI())
+                                                            : null))
+                            .collect(Collectors.toSet()));
         }
 
         public static void setAutoOpen(SocketDefinitionImpl socketConfiguration, Dataset dataset, URI socketURI) {
-            Set<Boolean> autoOpens = RdfUtils.getObjectStreamForPropertyPath(dataset, socketURI,
-                            PathParser.parse("<" + WON.socketDefinition.getURI() + ">/<" + WON.autoOpen + ">",
-                                            DefaultPrefixUtils.getDefaultPrefixes()),
-                            node -> node.isLiteral() && node.getLiteral().getValue() instanceof Boolean
-                                            ? (Boolean) node.getLiteral().getValue()
-                                            : null)
+            Set<Boolean> autoOpens = RdfUtils
+                            .getObjectStreamOfProperty(dataset, socketURI, URI.create(WON.socketDefinition.getURI()),
+                                            node -> node.isURIResource() ? URI.create(node.asResource().getURI())
+                                                            : null)
+                            .flatMap(def -> RdfUtils.getObjectStreamOfProperty(dataset, def,
+                                            URI.create(WON.autoOpen.getURI()),
+                                            node -> node.isLiteral() ? (Boolean) node.asLiteral().getBoolean() : null))
                             .collect(Collectors.toSet());
             if (autoOpens.size() > 1) {
                 socketConfiguration.addInconsistentProperty(URI.create(WON.autoOpen.getURI()));
@@ -1042,12 +1058,13 @@ public class WonRdfUtils {
         }
 
         public static void setSocketCapacity(SocketDefinitionImpl socketConfiguration, Dataset dataset, URI socketURI) {
-            Set<Integer> socketCapacities = RdfUtils.getObjectStreamForPropertyPath(dataset, socketURI,
-                            PathParser.parse("<" + WON.socketDefinition.getURI() + ">/<" + WON.socketCapacity + ">",
-                                            DefaultPrefixUtils.getDefaultPrefixes()),
-                            node -> node.isLiteral() && node.getLiteral().getValue() instanceof Integer
-                                            ? (Integer) node.getLiteral().getValue()
-                                            : null)
+            Set<Integer> socketCapacities = RdfUtils
+                            .getObjectStreamOfProperty(dataset, socketURI, URI.create(WON.socketDefinition.getURI()),
+                                            node -> node.isURIResource() ? URI.create(node.asResource().getURI())
+                                                            : null)
+                            .flatMap(def -> RdfUtils.getObjectStreamOfProperty(dataset, def,
+                                            URI.create(WON.socketCapacity.getURI()),
+                                            node -> node.isLiteral() ? (Integer) node.asLiteral().getInt() : null))
                             .collect(Collectors.toSet());
             if (socketCapacities.size() > 1) {
                 socketConfiguration.addInconsistentProperty(URI.create(WON.socketCapacity.getURI()));

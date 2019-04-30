@@ -333,16 +333,20 @@ public class WonLinkedDataUtils {
         List<URI> configURIs = RdfUtils.getObjectsOfProperty(ontology, socket,
                         URI.create(WON.socketDefinition.getURI()),
                         node -> node.isURIResource() ? URI.create(node.asResource().getURI()) : null);
+        if (configURIs.size() > 1) {
+            throw new IllegalArgumentException("More than one socket configuration found");
+        }
         configURIs.stream().forEach(configURI -> {
             Dataset ds = linkedDataSource.getDataForResource(configURI);
             RdfUtils.addDatasetToDataset(ontology, ds);
         });
         SocketDefinitionImpl socketDef = new SocketDefinitionImpl(socket);
-        socketDef.setConfigurationURIs(configURIs);
+        socketDef.setSocketDefinitionURI(configURIs.stream().findFirst());
         WonRdfUtils.SocketUtils.setCompatibleSocketDefinitions(socketDef, ontology, socket);
         WonRdfUtils.SocketUtils.setAutoOpen(socketDef, ontology, socket);
         WonRdfUtils.SocketUtils.setSocketCapacity(socketDef, ontology, socket);
         WonRdfUtils.SocketUtils.setDerivationProperties(socketDef, ontology, socket);
+        WonRdfUtils.SocketUtils.setInverseDerivationProperties(socketDef, ontology, socket);
         return Optional.of(socketDef);
     }
 
