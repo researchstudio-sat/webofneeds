@@ -96,7 +96,9 @@ function genComponentConf() {
         L.featureGroup(this.markers)
           .getBounds()
           .pad(0.5),
-        this.currentLocation ? {} : { maxZoom: 14 }
+        this.currentLocation
+          ? { animate: false }
+          : { maxZoom: 14, animate: false }
       );
 
       this.mapAlreadyInitialized = true;
