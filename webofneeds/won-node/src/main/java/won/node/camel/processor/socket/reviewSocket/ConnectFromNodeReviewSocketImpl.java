@@ -21,12 +21,13 @@ import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.SCHEMA;
 import won.protocol.vocabulary.WON;
 import won.protocol.vocabulary.WONMSG;
+import won.protocol.vocabulary.WXREVIEW;
 
 /**
  * User: MS Date: 12.12.2018
  */
 @Component
-@SocketMessageProcessor(socketType = WON.ReviewSocketString, direction = WONMSG.FromExternalString, messageType = WONMSG.ConnectMessageString)
+@SocketMessageProcessor(socketType = WXREVIEW.ReviewSocketString, direction = WONMSG.FromExternalString, messageType = WONMSG.ConnectMessageString)
 public class ConnectFromNodeReviewSocketImpl extends AbstractCamelProcessor {
     @Override
     public void process(final Exchange exchange) {
@@ -56,12 +57,13 @@ public class ConnectFromNodeReviewSocketImpl extends AbstractCamelProcessor {
         Model derivationModel = atomDataset.getNamedModel(aboutAtom.getAtomURI() + "#derivedData");
         Resource aboutAtomResource = derivationModel.getResource(aboutAtomURI);
         Resource conRes = derivationModel.getResource(connectionUri.toString());
-        Statement reviewdConnectionsProperty = derivationModel.getProperty(aboutAtomResource, WON.reviewedConnection);
+        Statement reviewdConnectionsProperty = derivationModel.getProperty(aboutAtomResource,
+                        WXREVIEW.reviewedConnection);
         if (reviewdConnectionsProperty == null) {
-            derivationModel.add(aboutAtomResource, WON.reviewedConnection, conRes);
-            reviewdConnectionsProperty = derivationModel.getProperty(aboutAtomResource, WON.reviewedConnection);
+            derivationModel.add(aboutAtomResource, WXREVIEW.reviewedConnection, conRes);
+            reviewdConnectionsProperty = derivationModel.getProperty(aboutAtomResource, WXREVIEW.reviewedConnection);
         } else {
-            Property ratedConnections = derivationModel.getProperty(WON.reviewedConnection.toString());
+            Property ratedConnections = derivationModel.getProperty(WXREVIEW.reviewedConnection.toString());
             if (derivationModel.contains(aboutAtomResource, ratedConnections, conRes)) {
                 logger.debug("Connection already reviewed {}", connectionUri.toString());
                 throw new IllegalArgumentException("Connection already reviewed");

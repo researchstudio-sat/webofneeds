@@ -181,24 +181,6 @@ public class WON {
     public static final Property uri = m.createProperty(BASE_URI, "uri");
     public static final Property preview = m.createProperty(BASE_URI, "preview");
     public static final String privateDataGraph = BASE_URI + "privateDataGraph";
-    public static final String GroupSocketString = BASE_URI + "GroupSocket";
-    public static final String groupMemberString = BASE_URI + "groupMember";
-    public static final Property groupMember = m.createProperty(BASE_URI, "groupMember");
-    public static final String ownedByString = BASE_URI + "ownedBy";
-    public static final Property ownedBy = m.createProperty(BASE_URI + "ownedBy");
-    public static final String heldByString = BASE_URI + "heldBy";
-    public static final Property heldBy = m.createProperty(BASE_URI + "heldBy");
-    public static final String holdsString = BASE_URI + "holds";
-    public static final Property holds = m.createProperty(BASE_URI + "holds");
-    public static final String ownsString = BASE_URI + "owns";
-    public static final Property owns = m.createProperty(BASE_URI + "owns");
-    public static final String connectedWithString = BASE_URI + "connectedWith";
-    public static final Property connectedWith = m.createProperty(BASE_URI + "connectedWith");
-    public static final Property reviews = m.createProperty(BASE_URI + "reviews");
-    public static final String reviewsString = BASE_URI + "reviews";
-    public static final String ChatSocketString = BASE_URI + "ChatSocket";
-    public static final String ReviewSocketString = BASE_URI + "ReviewSocket";
-    public static final Property reviewedConnection = m.createProperty(BASE_URI + "reviewedConnection");
     // unread information
     public static final Property unreadSuggested = m.createProperty(BASE_URI + "unreadSuggested");
     public static final Property unreadRequestSent = m.createProperty(BASE_URI + "unreadRequestSent");

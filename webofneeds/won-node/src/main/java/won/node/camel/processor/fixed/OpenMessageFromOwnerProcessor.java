@@ -7,6 +7,7 @@ import java.util.Optional;
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.springframework.stereotype.Component;
+
 import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.camel.processor.annotation.FixedMessageProcessor;
 import won.node.camel.processor.general.OutboundMessageFactoryProcessor;
@@ -16,6 +17,7 @@ import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.message.processor.exception.WonMessageProcessingException;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionEventType;
+import won.protocol.model.ConnectionState;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
 import won.protocol.vocabulary.WONMSG;
@@ -73,7 +75,15 @@ public class OpenMessageFromOwnerProcessor extends AbstractCamelProcessor {
             }
         }
         failForIncompatibleSockets(con.getSocketURI(), con.getTargetSocketURI());
-        con.setState(con.getState().transit(ConnectionEventType.OWNER_OPEN));
+        ConnectionState state = con.getState();
+        if (state != ConnectionState.CONNECTED) {
+            state = state.transit(ConnectionEventType.OWNER_OPEN);
+            if (state == ConnectionState.CONNECTED) {
+                // previously unconnected connection would be established. Check capacity:
+                failForExceededCapacity(con.getSocketURI());
+            }
+        }
+        con.setState(state);
         connectionRepository.save(con);
         URI remoteMessageUri = wonNodeInformationService.generateEventURI(wonMessage.getRecipientNodeURI());
         // add the sockets to the message if necessary
