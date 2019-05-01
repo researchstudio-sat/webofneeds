@@ -1,4 +1,6 @@
 @prefix msg:   <https://w3id.org/won/message#> .
+@prefix group: <https://w3id.org/won/ext/group#> .
+@prefix chat: <https://w3id.org/won/ext/chat#> .
 @prefix conn:  <https://192.168.124.49:8443/won/resource/connection/> .
 @prefix atom:  <https://192.168.124.49:8443/won/resource/atom/> .
 @prefix woncrypt: <https://w3id.org/won/core#> .
@@ -57,11 +59,11 @@
                                                    ] ] .
     
     <https://192.168.124.49:8443/won/resource/atom/cbfgi37je6kr#chatSocket>
-            won:socketDefinition       won:ChatSocket .
+            won:socketDefinition       chat:ChatSocket .
     <https://192.168.124.49:8443/won/resource/atom/cbfgi37je6kr#groupSocket1>
-            won:socketDefinition       won:GroupSocket .
+            won:socketDefinition       group:GroupSocket .
     <https://192.168.124.49:8443/won/resource/atom/cbfgi37je6kr#groupSocket2>
-            won:socketDefinition       won:GroupSocket .
+            won:socketDefinition       group:GroupSocket .
 }
 
 <https://192.168.124.49:8443/won/resource/event/tb06f3a5l8vw#envelope-sig> {
