@@ -8,7 +8,7 @@ import won.protocol.vocabulary.WON;
 public class GroupSocketConfig extends HardcodedSocketConfig {
     public GroupSocketConfig() {
         super(SocketType.GroupSocket.getURI());
-        this.derivationProperties.add(WON.groupMember);
+        this.derivationProperties.add(URI.create(WON.groupMember.getURI()));
     }
 
     @Override

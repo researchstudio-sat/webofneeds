@@ -10,6 +10,7 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -60,6 +61,8 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.Iterators;
 
 import won.protocol.exception.IncorrectPropertyCountException;
+import won.protocol.util.RdfUtils.ModelVisitor;
+import won.protocol.vocabulary.WON;
 
 /**
  * Utilities for RDF manipulation with Jena.
@@ -1115,6 +1118,43 @@ public class RdfUtils {
         Iterator<Node> result = PathEval.eval(model.getGraph(), model.getResource(resourceURI.toString()).asNode(),
                         propertyPath, Context.emptyContext);
         return result;
+    }
+
+    public static <T> List<T> getObjectsOfProperty(final Dataset dataset, final URI resource, final URI property,
+                    Function<RDFNode, T> resultMapper) {
+        return RdfUtils.visitFlattenedToList(dataset, new ModelVisitor<Collection<T>>() {
+            @Override
+            public Collection<T> visit(Model model) {
+                Resource res = model.getResource(resource.toString());
+                if (res == null) {
+                    return Collections.EMPTY_LIST;
+                }
+                NodeIterator it = model.listObjectsOfProperty(res, model.createProperty(property.toString()));
+                List<T> ret = new ArrayList<T>();
+                while (it.hasNext()) {
+                    RDFNode node = it.next();
+                    ret.add(resultMapper.apply(node));
+                }
+                return ret;
+            }
+        });
+    }
+
+    public static <T> Optional<T> getFirstObjectOfProperty(final Dataset dataset, final URI resource,
+                    final URI property, Function<RDFNode, T> resultMapper) {
+        T result = RdfUtils.findFirst(dataset, new ModelVisitor<T>() {
+            @Override
+            public T visit(Model model) {
+                Resource socketRes = model.getResource(resource.toString());
+                if (socketRes == null) {
+                    return null;
+                }
+                Statement stmt = model.getProperty(socketRes, WON.overloadPolicy);
+                RDFNode obj = stmt.getObject();
+                return resultMapper.apply(obj);
+            }
+        });
+        return Optional.ofNullable(result);
     }
 
     /**

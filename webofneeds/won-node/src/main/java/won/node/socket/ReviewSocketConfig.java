@@ -8,7 +8,7 @@ import won.protocol.vocabulary.WON;
 public class ReviewSocketConfig extends HardcodedSocketConfig {
     public ReviewSocketConfig() {
         super(SocketType.ReviewSocket.getURI());
-        this.derivationProperties.add(WON.reviews);
+        this.derivationProperties.add(URI.create(WON.reviews.getURI()));
     }
 
     @Override

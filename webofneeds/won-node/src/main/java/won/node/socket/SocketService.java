@@ -3,6 +3,7 @@ package won.node.socket;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
@@ -13,9 +14,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import won.protocol.model.Connection;
 import won.protocol.model.Atom;
+import won.protocol.model.Connection;
+import won.protocol.model.SocketConfiguration;
 import won.protocol.repository.AtomRepository;
+import won.protocol.util.linkeddata.LinkedDataSource;
+import won.protocol.util.linkeddata.WonLinkedDataUtils;
 
 /**
  * Service that is informed of a state change of a connection and performs data
@@ -26,30 +30,55 @@ public class SocketService {
     Logger logger = LoggerFactory.getLogger(getClass());
     @Autowired
     AtomRepository atomRepository;
-    Map<URI, SocketConfig> hardcodedConfigs = new HashMap<>();
+    @Autowired
+    LinkedDataSource linkedDataSource;
+    Map<URI, SocketConfiguration> knownSockets = new HashMap<>();
 
     public SocketService() {
-        addConfig(new HoldableSocketConfig());
-        addConfig(new HolderSocketConfig());
-        addConfig(new GroupSocketConfig());
-        addConfig(new ChatSocketConfig());
-        addConfig(new ReviewSocketConfig());
+        addSocket(new GroupSocketConfig());
+        addSocket(new ChatSocketConfig());
+        addSocket(new ReviewSocketConfig());
     }
 
-    private void addConfig(SocketConfig config) {
-        this.hardcodedConfigs.put(config.getSocketType(), config);
+    private void addSocket(SocketConfiguration socket) {
+        this.knownSockets.put(socket.getSocketType(), socket);
+    }
+
+    private Optional<SocketConfiguration> getSocket(URI socketType) {
+        if (knownSockets.containsKey(socketType)) {
+            return Optional.of(knownSockets.get(socketType));
+        }
+        attemptToLoadSocketConfig(socketType);
+        if (knownSockets.containsKey(socketType)) {
+            return Optional.of(knownSockets.get(socketType));
+        }
+        return Optional.empty();
+    }
+
+    private void attemptToLoadSocketConfig(URI socketType) {
+        try {
+            Optional<SocketConfiguration> config = WonLinkedDataUtils.getSocketConfiguration(linkedDataSource,
+                            socketType);
+            if (config.isPresent()) {
+                this.knownSockets.put(socketType, config.get());
+            }
+        } catch (Exception e) {
+            logger.info("Failed to load configuation for socket type " + socketType, e);
+        }
     }
 
     public boolean isConnectionAllowedToType(URI localSocketType, URI targetSocketType) {
-        if (hardcodedConfigs.containsKey(localSocketType)) {
-            return hardcodedConfigs.get(localSocketType).isConnectionAllowedToType(targetSocketType);
+        Optional<SocketConfiguration> socketConfig = getSocket(localSocketType);
+        if (socketConfig.isPresent()) {
+            return socketConfig.get().isConnectionAllowedToType(targetSocketType);
         }
         return false;
     }
 
     public boolean isAutoOpen(URI localSocketType, URI targetSocketType) {
-        if (hardcodedConfigs.containsKey(localSocketType)) {
-            return hardcodedConfigs.get(localSocketType).isAutoOpen(targetSocketType);
+        Optional<SocketConfiguration> socketConfig = getSocket(localSocketType);
+        if (socketConfig.isPresent()) {
+            return socketConfig.get().isAutoOpen(targetSocketType);
         }
         return false;
     }
@@ -65,17 +94,19 @@ public class SocketService {
             }
             final Model modelToManipulate = derivationModel;
             URI socketType = con.getTypeURI();
-            if (hardcodedConfigs.containsKey(socketType)) {
+            Optional<SocketConfiguration> socketConfig = getSocket(socketType);
+            if (socketConfig.isPresent()) {
                 Resource atomRes = derivationModel.getResource(atom.getAtomURI().toString());
                 Resource targetAtomRes = derivationModel.getResource(con.getTargetAtomURI().toString());
-                SocketConfig config = hardcodedConfigs.get(socketType);
                 if (stateChange.isConnect()) {
                     logger.info("adding data for connection {}", con.getConnectionURI());
-                    config.getDerivationProperties().stream()
+                    socketConfig.get().getDerivationProperties().stream()
+                                    .map(u -> modelToManipulate.createProperty(u.toString()))
                                     .forEach(p -> modelToManipulate.add(atomRes, p, targetAtomRes));
                 } else {
                     logger.info("removing data for connection {}", con.getConnectionURI());
-                    config.getDerivationProperties().stream()
+                    socketConfig.get().getDerivationProperties().stream()
+                                    .map(u -> modelToManipulate.createProperty(u.toString()))
                                     .forEach(p -> modelToManipulate.remove(atomRes, p, targetAtomRes));
                 }
             }

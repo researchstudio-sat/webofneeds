@@ -81,6 +81,22 @@ public class WON {
     public static final Property socket = m.createProperty(BASE_URI, "socket");
     public static final Property defaultSocket = m.createProperty(BASE_URI, "defaultSocket");
     public static final Resource Socket = m.createResource(BASE_URI + "Socket");
+    public static final Property allowedTargetSocket = m.createProperty(BASE_URI + "allowedTargetSocket");
+    public static final Property derivesAtomProperty = m.createProperty(BASE_URI + "derivesAtomProperty");
+    public static final Resource OnOverloadDeny = m.createResource(BASE_URI + "OnOverloadDeny");
+    public static final Resource OnOverloadQueue = m.createResource(BASE_URI + "OnOverloadQueue");
+    public static final Resource OnOverloadReplaceNewest = m.createResource(BASE_URI + "OnOverloadReplaceNewest");
+    public static final Resource OnOverloadReplaceOldest = m.createResource(BASE_URI + "OnOverloadReplaceOldest");
+    public static final Resource OnOverloadReplaceRandom = m.createResource(BASE_URI + "OnOverloadReplaceRandom");
+    public static final Resource FIFOScheduling = m.createResource(BASE_URI + "FIFOScheduling");
+    public static final Resource LIFOScheduling = m.createResource(BASE_URI + "LIFOScheduling");
+    public static final Resource RandomScheduling = m.createResource(BASE_URI + "RandomScheduling");
+    public static final Resource SchedulingPolicy = m.createResource(BASE_URI + "SchedulingPolicy");
+    public static final Resource OverloadPolicy = m.createProperty(BASE_URI, "OverloadPolicy");
+    public static final Property overloadPolicy = m.createProperty(BASE_URI, "overloadPolicy");
+    public static final Property schedulingPolicy = m.createProperty(BASE_URI, "schedulingPolicy");
+    public static final Property socketCapacity = m.createProperty(BASE_URI, "socketCapacity");
+    public static final Property autoOpen = m.createProperty(BASE_URI, "autoOpen");
     // This property is used in the rdf-model part of connect (from owner) and hint
     // to specify a socket to which a connection is created
     public static final Property targetSocket = m.createProperty(BASE_URI + "targetSocket");

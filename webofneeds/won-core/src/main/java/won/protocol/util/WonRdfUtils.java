@@ -64,9 +64,11 @@ import won.protocol.exception.IncorrectPropertyCountException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageDirection;
 import won.protocol.message.WonSignatureData;
+import won.protocol.model.AtomGraphType;
 import won.protocol.model.ConnectionState;
 import won.protocol.model.Match;
-import won.protocol.model.AtomGraphType;
+import won.protocol.model.OverloadPolicy;
+import won.protocol.model.SchedulingPolicy;
 import won.protocol.service.WonNodeInfo;
 import won.protocol.service.WonNodeInfoBuilder;
 import won.protocol.vocabulary.SCHEMA;
@@ -997,6 +999,40 @@ public class WonRdfUtils {
                 baseResource.addProperty(WON.targetSocket, model.getResource(targetSocket.toString()));
             }
             return Optional.of(model);
+        }
+
+        public static List<URI> getAllowedTargetSocketTypes(Dataset dataset, URI socketType) {
+            return RdfUtils.getObjectsOfProperty(dataset, socketType, URI.create(WON.allowedTargetSocket.toString()),
+                            node -> node.isURIResource() ? URI.create(node.asResource().getURI()) : null);
+        }
+
+        public static List<URI> getDerivationProperties(Dataset dataset, URI socketType) {
+            return RdfUtils.getObjectsOfProperty(dataset, socketType, URI.create(WON.derivesAtomProperty.toString()),
+                            node -> node.isURIResource() ? URI.create(node.asResource().getURI()) : null);
+        }
+
+        public static Optional<OverloadPolicy> getOverloadPolicy(Dataset datset, URI socketType) {
+            return RdfUtils.getFirstObjectOfProperty(datset, socketType, URI.create(WON.overloadPolicy.toString()),
+                            node -> node.isURIResource()
+                                            ? OverloadPolicy.fromURI(URI.create(node.asResource().getURI()))
+                                            : null);
+        }
+
+        public static Optional<SchedulingPolicy> getSchedulingPolicy(Dataset datset, URI socketType) {
+            return RdfUtils.getFirstObjectOfProperty(datset, socketType, URI.create(WON.schedulingPolicy.toString()),
+                            node -> node.isURIResource()
+                                            ? SchedulingPolicy.fromURI(URI.create(node.asResource().getURI()))
+                                            : null);
+        }
+
+        public static Optional<Boolean> getAutoOpen(Dataset datset, URI socketType) {
+            return RdfUtils.getFirstObjectOfProperty(datset, socketType, URI.create(WON.autoOpen.toString()),
+                            node -> node.isLiteral() ? node.asLiteral().getBoolean() : null);
+        }
+
+        public static Optional<Integer> getSocketCapacity(Dataset datset, URI socketType) {
+            return RdfUtils.getFirstObjectOfProperty(datset, socketType, URI.create(WON.socketCapacity.toString()),
+                            node -> node.isLiteral() ? node.asLiteral().getInt() : null);
         }
     }
 

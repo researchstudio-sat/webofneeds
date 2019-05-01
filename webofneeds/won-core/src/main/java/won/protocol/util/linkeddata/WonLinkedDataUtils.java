@@ -30,9 +30,11 @@ import org.apache.jena.shared.PrefixMapping;
 import org.apache.jena.shared.impl.PrefixMappingImpl;
 import org.apache.jena.sparql.path.Path;
 import org.apache.jena.sparql.path.PathParser;
+import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import won.protocol.model.AtomState;
 import won.protocol.service.WonNodeInfo;
 import won.protocol.util.RdfUtils;
@@ -322,6 +324,25 @@ public class WonLinkedDataUtils {
     public static Collection<URI> getSocketsOfType(URI atomURI, URI socketTypeURI, LinkedDataSource linkedDataSource) {
         return WonRdfUtils.SocketUtils.getSocketsOfType(getDataForResource(atomURI, linkedDataSource), atomURI,
                         socketTypeURI);
+    }
+
+    public static Optional<SocketConfiguration> getSocketConfiguration(LinkedDataSource linkedDataSource,
+                    URI socketType) {
+        Dataset ontology = linkedDataSource.getDataForResource(socketType);
+        SocketConfigurationImpl socketConfig = new SocketConfigurationImpl();
+        socketConfig.setSocketType(socketType);
+        List<Resource> res = RdfUtils.getObjectsOfProperty(ontology, socketType, URI.create(RDF.type.toString()),
+                        node -> node.asResource());
+        if (!res.contains(WON.Socket))
+            return Optional.empty();
+        socketConfig.setAllowedTargetSocketTypes(
+                        WonRdfUtils.SocketUtils.getAllowedTargetSocketTypes(ontology, socketType));
+        socketConfig.setAutoOpen(WonRdfUtils.SocketUtils.getAutoOpen(ontology, socketType));
+        socketConfig.setCapacity(WonRdfUtils.SocketUtils.getSocketCapacity(ontology, socketType));
+        socketConfig.setDerivationProperties(WonRdfUtils.SocketUtils.getDerivationProperties(ontology, socketType));
+        socketConfig.setOverloadPolicy(WonRdfUtils.SocketUtils.getOverloadPolicy(ontology, socketType));
+        socketConfig.setSchedulingPolicy(WonRdfUtils.SocketUtils.getSchedulingPolicy(ontology, socketType));
+        return Optional.of(socketConfig);
     }
 
     public static Optional<URI> getTypeOfSocket(URI socketURI, LinkedDataSource linkedDataSource) {

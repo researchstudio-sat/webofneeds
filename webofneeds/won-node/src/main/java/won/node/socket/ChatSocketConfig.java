@@ -8,7 +8,7 @@ import won.protocol.vocabulary.WON;
 public class ChatSocketConfig extends HardcodedSocketConfig {
     public ChatSocketConfig() {
         super(SocketType.ChatSocket.getURI());
-        this.derivationProperties.add(WON.connectedWith);
+        this.derivationProperties.add(URI.create(WON.connectedWith.getURI()));
     }
 
     /**
