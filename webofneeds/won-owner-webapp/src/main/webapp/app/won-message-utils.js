@@ -915,8 +915,8 @@ export function fetchTheirAtomAndDispatch(atomUri, dispatch) {
   return won
     .getAtom(atomUri)
     .then(atom => {
-      if (atom["won:heldBy"] && atom["won:heldBy"]["@id"]) {
-        const personaUri = atom["won:heldBy"]["@id"];
+      if (atom["hold:heldBy"] && atom["hold:heldBy"]["@id"]) {
+        const personaUri = atom["hold:heldBy"]["@id"];
         dispatch({
           type: actionTypes.personas.storeTheirUrisInLoading,
           payload: Immutable.fromJS({ uris: [personaUri] }),
