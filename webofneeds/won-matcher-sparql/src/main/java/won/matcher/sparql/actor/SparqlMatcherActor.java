@@ -356,7 +356,8 @@ public class SparqlMatcherActor extends UntypedActor {
                 log.debug("transformed query: {}", hintForCounterpartQuery);
             }
             return Stream.concat(executeQuery(noHintForCounterpartQuery, atomToCheck, atom.getAtomUri()),
-                            executeQuery(hintForCounterpartQuery, atomToCheck, atom.getAtomUri())).collect(Collectors.toList());
+                            executeQuery(hintForCounterpartQuery, atomToCheck, atom.getAtomUri()))
+                            .collect(Collectors.toList());
         }).orElse(Collections.emptyList());
         return atoms;
     }
@@ -365,7 +366,7 @@ public class SparqlMatcherActor extends UntypedActor {
      * Executes the query, optionally only searching in the atomToCheck.
      * 
      * @param q
-     * @param atomToCheck 
+     * @param atomToCheck
      * @param atomURI - the URI of the atom we are matching for
      * @return
      */
@@ -376,10 +377,9 @@ public class SparqlMatcherActor extends UntypedActor {
         // we get exactly one result if that uri is found for the atom
         List<Binding> valuesBlockBindings = new ArrayList<>();
         List<Var> valuesBlockVariables = new ArrayList<>();
-        //bind the ?thisAtom variable to the atom we are matching for
+        // bind the ?thisAtom variable to the atom we are matching for
         valuesBlockBindings.add(BindingFactory.binding(thisAtom, new ResourceImpl(atomURI.toString()).asNode()));
         valuesBlockVariables.add(thisAtom);
-        
         if (atomToCheck.isPresent()) {
             valuesBlockBindings.add(BindingFactory.binding(resultName,
                             new ResourceImpl(atomToCheck.get().atomModelWrapper.getAtomUri()).asNode()));
