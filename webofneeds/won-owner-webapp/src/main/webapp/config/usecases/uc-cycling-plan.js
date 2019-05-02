@@ -61,6 +61,8 @@ export const cyclingPlan = {
       prefixes: {
         won: won.defaultContext["won"],
         rdf: won.defaultContext["rdf"],
+        buddy: won.defaultContext["buddy"],
+        hold: won.defaultContext["hold"],
         s: won.defaultContext["s"],
       },
       distinct: true,
@@ -71,6 +73,7 @@ export const cyclingPlan = {
         `${resultName} won:seeks ?seeks .`,
         `?seeks rdf:type s:PlanAction.`,
         `?seeks s:object ?planObject.`,
+        `?thisAtom hold:heldBy/buddy:buddy/^hold:holds ${resultName}`,
         `?planObject s:about <http://dbpedia.org/resource/Cycling>`,
         `BIND( ( 
           COALESCE(?location_geoScore, 0) 

@@ -58,6 +58,8 @@ export const lunchInterest = {
       prefixes: {
         won: won.defaultContext["won"],
         rdf: won.defaultContext["rdf"],
+        buddy: won.defaultContext["buddy"],
+        hold: won.defaultContext["hold"],
         s: won.defaultContext["s"],
       },
       distinct: true,
@@ -66,6 +68,7 @@ export const lunchInterest = {
       where: [
         `${resultName} rdf:type won:Atom.`,
         `${resultName} rdf:type s:PlanAction.`,
+        `?thisAtom hold:heldBy/buddy:buddy/^hold:holds ${resultName}`,
         `${resultName} s:object ?planObject.`,
         `?planObject s:about <http://dbpedia.org/resource/Lunch>`,
         // calculate average of scores; can be weighed if necessary

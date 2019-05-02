@@ -314,6 +314,12 @@ won.REVIEW.prefix = "review";
 won.REVIEW.ReviewSocket = won.REVIEW.baseUri + "ReviewSocket";
 won.REVIEW.ReviewSocketCompacted = won.REVIEW.prefix + ":ReviewSocket";
 
+won.BUDDY = {};
+won.BUDDY.baseUri = "https://w3id.org/won/ext/buddy#";
+won.BUDDY.prefix = "buddy";
+won.BUDDY.ReviewSocket = won.BUDDY.baseUri + "BuddySocket";
+won.BUDDY.ReviewSocketCompacted = won.BUDDY.prefix + ":BuddySocket";
+
 won.EVENT = {};
 won.EVENT.WON_MESSAGE_RECEIVED = "WonMessageReceived";
 won.EVENT.WON_SEARCH_RECEIVED = "SearchReceivedEvent";
@@ -683,6 +689,7 @@ won.minimalContext = {
   chat: won.CHAT.baseUri,
   group: won.GROUP.baseUri,
   review: won.REVIEW.baseUri,
+  buddy: won.BUDDY.baseUri,
   rdf: "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
   agr: "https://w3id.org/won/agreement#",
   pay: "https://w3id.org/won/payment#",

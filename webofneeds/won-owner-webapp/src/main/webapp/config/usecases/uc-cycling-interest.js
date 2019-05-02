@@ -59,6 +59,8 @@ export const cyclingInterest = {
     const query = sparqlQuery({
       prefixes: {
         won: won.defaultContext["won"],
+        buddy: won.defaultContext["buddy"],
+        hold: won.defaultContext["hold"],
         rdf: won.defaultContext["rdf"],
         s: won.defaultContext["s"],
       },
@@ -69,6 +71,8 @@ export const cyclingInterest = {
         `${resultName} rdf:type won:Atom.`,
         `${resultName} rdf:type s:PlanAction.`,
         `${resultName} s:object ?planObject.`,
+        `${resultName} hold:heldBy ?holder.`,
+        `?thisAtom hold:heldBy/buddy:buddy/^hold:holds ${resultName}`,
         `?planObject s:about <http://dbpedia.org/resource/Cycling>`,
         // calculate average of scores; can be weighed if necessary
         `BIND( ( 
