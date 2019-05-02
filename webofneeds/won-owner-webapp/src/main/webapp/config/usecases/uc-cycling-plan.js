@@ -73,8 +73,8 @@ export const cyclingPlan = {
         `${resultName} won:seeks ?seeks .`,
         `?seeks rdf:type s:PlanAction.`,
         `?seeks s:object ?planObject.`,
-        `?thisAtom hold:heldBy/buddy:buddy/^hold:holds ${resultName}`,
-        `?planObject s:about <http://dbpedia.org/resource/Cycling>`,
+        `?planObject s:about <http://dbpedia.org/resource/Cycling>.`,
+        `?thisAtom hold:heldBy/buddy:buddy/^hold:holds ${resultName}.`,
         `BIND( ( 
           COALESCE(?location_geoScore, 0) 
         ) / 5  as ?score)`,

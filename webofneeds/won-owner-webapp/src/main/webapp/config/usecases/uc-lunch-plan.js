@@ -73,8 +73,8 @@ export const lunchPlan = {
         `${resultName} won:seeks ?seeks .`,
         `?seeks rdf:type s:PlanAction.`,
         `?seeks s:object ?planObject.`,
-        `?thisAtom hold:heldBy/buddy:buddy/^hold:holds ${resultName}`,
-        `?planObject s:about <http://dbpedia.org/resource/Lunch>`,
+        `?planObject s:about <http://dbpedia.org/resource/Lunch>.`,
+        `?thisAtom hold:heldBy/buddy:buddy/^hold:holds ${resultName}.`,
         `BIND( ( 
           COALESCE(?location_geoScore, 0) 
         ) / 5  as ?score)`,
