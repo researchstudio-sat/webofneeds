@@ -87,8 +87,16 @@ public class OpenMessageFromNodeProcessor extends AbstractCamelProcessor {
         }
         if (!con.get().getTargetConnectionURI().equals(wonMessage.getSenderURI()))
             throw new IllegalStateException("the sender uri of the message must be equal to the remote connection uri");
-        failForIncompatibleSockets(con.get().getSocketURI(), con.get().getTypeURI(), con.get().getTargetSocketURI());
-        con.get().setState(con.get().getState().transit(ConnectionEventType.PARTNER_OPEN));
+        failForIncompatibleSockets(con.get().getSocketURI(), con.get().getTargetSocketURI());
+        ConnectionState state = con.get().getState();
+        if (state != ConnectionState.CONNECTED) {
+            state = state.transit(ConnectionEventType.PARTNER_OPEN);
+            if (state == ConnectionState.CONNECTED) {
+                // previously unconnected connection would be established. Check capacity:
+                failForExceededCapacity(con.get().getSocketURI());
+            }
+        }
+        con.get().setState(state);
         connectionRepository.save(con.get());
         // set the receiver to the local connection uri
         wonMessage.addMessageProperty(WONMSG.recipient, con.get().getConnectionURI());

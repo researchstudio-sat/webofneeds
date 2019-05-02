@@ -98,6 +98,12 @@ xsd:duration rdf:type rdfs:Datatype .
                      rdfs:comment "Defines a property to be 'derived' when the connection is established. The property will be used to derive a triple '[sourceAtom] [property] [targetAtom]'."@en .
 
 
+###  https://w3id.org/won/core#derivesInverseAtomProperty
+:derivesInverseAtomProperty rdf:type owl:ObjectProperty ;
+                            rdfs:domain :SocketDefinition ;
+                            rdfs:comment "Defines a property to be 'derived' when the connection is established. The property will be used to derive a triple '[targetAtom] [property] [sourceAtom]'."@en .
+
+
 ###  https://w3id.org/won/core#flag
 :flag rdf:type owl:ObjectProperty ;
       rdfs:domain :Atom ;

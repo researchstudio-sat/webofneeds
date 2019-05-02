@@ -10,6 +10,7 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -19,8 +20,11 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.Spliterator;
+import java.util.Spliterators;
 import java.util.function.Function;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
@@ -60,6 +64,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.Iterators;
 
 import won.protocol.exception.IncorrectPropertyCountException;
+import won.protocol.vocabulary.WON;
 
 /**
  * Utilities for RDF manipulation with Jena.
@@ -1115,6 +1120,121 @@ public class RdfUtils {
         Iterator<Node> result = PathEval.eval(model.getGraph(), model.getResource(resourceURI.toString()).asNode(),
                         propertyPath, Context.emptyContext);
         return result;
+    }
+
+    /**
+     * Evaluates the specified path in the specified model, starting with the
+     * specified resourceURI.
+     * 
+     * @param model
+     * @param resourceURI
+     * @param propertyPath
+     * @return
+     */
+    public static <T> Iterator<T> getObjectsForPropertyPath(final Model model, URI resourceURI, Path propertyPath,
+                    Function<Node, T> mapper) {
+        return getObjectStreamForPropertyPath(model, resourceURI, propertyPath, mapper).iterator();
+    }
+
+    public static <T> Stream<T> getObjectStreamForPropertyPath(final Model model, URI resourceURI, Path propertyPath,
+                    Function<Node, T> mapper) {
+        Iterator<Node> result = PathEval.eval(model.getGraph(), model.getResource(resourceURI.toString()).asNode(),
+                        propertyPath, Context.emptyContext);
+        return StreamSupport.stream(Spliterators.spliteratorUnknownSize(result, Spliterator.ORDERED), false)
+                        .map(mapper);
+    }
+
+    /**
+     * Evaluates the specified path in the specified dataset, starting with the
+     * specified resourceURI.
+     * 
+     * @param dataset
+     * @param resourceURI
+     * @param propertyPath
+     * @return
+     */
+    public static <T> Iterator<T> getObjectsForPropertyPath(final Dataset dataset, URI resourceURI, Path propertyPath,
+                    Function<Node, T> mapper) {
+        return getObjectStreamForPropertyPath(dataset, resourceURI, propertyPath, mapper).iterator();
+    }
+
+    /**
+     * Evaluates the specified path in the specified dataset, starting with the
+     * specified resourceURI.
+     * 
+     * @param dataset
+     * @param resourceURI
+     * @param propertyPath
+     * @return
+     */
+    public static <T> Stream<T> getObjectStreamForPropertyPath(final Dataset dataset, URI resourceURI,
+                    Path propertyPath, Function<Node, T> mapper) {
+        return StreamSupport
+                        .stream(Spliterators.spliteratorUnknownSize(new DefaultModelSelector().select(dataset),
+                                        Spliterator.ORDERED), false)
+                        .flatMap(model -> getObjectStreamForPropertyPath(model, resourceURI, propertyPath, mapper));
+    }
+
+    /**
+     * Evaluates the specified path in the specified dataset, starting with the
+     * specified resourceURI.
+     * 
+     * @param dataset
+     * @param resourceURI
+     * @param propertyPath
+     * @return
+     */
+    public static <T> Stream<T> getObjectStreamOfProperty(final Dataset dataset, URI resourceURI, URI property,
+                    Function<RDFNode, T> mapper) {
+        return StreamSupport
+                        .stream(Spliterators.spliteratorUnknownSize(new DefaultModelSelector().select(dataset),
+                                        Spliterator.ORDERED), false)
+                        .flatMap(model -> getObjectStreamOfProperty(model, resourceURI, property, mapper));
+    }
+
+    public static <T> Stream<T> getObjectStreamOfProperty(final Model model, URI resourceURI, URI property,
+                    Function<RDFNode, T> mapper) {
+        NodeIterator it = model.listObjectsOfProperty(model.createResource(resourceURI.toString()),
+                        model.createProperty(property.toString()));
+        return StreamSupport.stream(Spliterators.spliteratorUnknownSize(it, Spliterator.ORDERED), false).map(mapper);
+    }
+
+    public static <T> List<T> getObjectsOfProperty(final Dataset dataset, final URI resource, final URI property,
+                    Function<RDFNode, T> resultMapper) {
+        return RdfUtils.visitFlattenedToList(dataset, new ModelVisitor<Collection<T>>() {
+            @Override
+            public Collection<T> visit(Model model) {
+                Resource res = model.getResource(resource.toString());
+                if (res == null) {
+                    return Collections.emptyList();
+                }
+                NodeIterator it = model.listObjectsOfProperty(res, model.createProperty(property.toString()));
+                List<T> ret = new ArrayList<T>();
+                while (it.hasNext()) {
+                    RDFNode node = it.next();
+                    ret.add(resultMapper.apply(node));
+                }
+                return ret;
+            }
+        });
+    }
+
+    public static <T> Optional<T> getFirstObjectOfProperty(final Dataset dataset, final URI resource,
+                    final URI property, Function<RDFNode, T> resultMapper) {
+        T result = RdfUtils.findFirst(dataset, new ModelVisitor<T>() {
+            @Override
+            public T visit(Model model) {
+                Resource subj = model.getResource(resource.toString());
+                Property pred = model.getProperty(property.toString());
+                if (pred == null) {
+                    return null;
+                }
+                Statement stmt = model.getProperty(subj, pred);
+                RDFNode obj = stmt.getObject();
+                return resultMapper.apply(obj);
+            }
+        });
+        return Optional.ofNullable(result);
     }
 
     /**

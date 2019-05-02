@@ -14,7 +14,7 @@ export function isChatConnection(conn) {
   return (
     conn &&
     conn.get("socket") &&
-    conn.get("socket") === won.WON.ChatSocketCompacted
+    conn.get("socket") === won.CHAT.ChatSocketCompacted
   );
 }
 
@@ -27,7 +27,7 @@ export function isGroupChatConnection(conn) {
   return (
     conn &&
     conn.get("socket") &&
-    conn.get("socket") === won.WON.GroupSocketCompacted
+    conn.get("socket") === won.GROUP.GroupSocketCompacted
   );
 }
 
@@ -40,7 +40,7 @@ export function isRemoteChatConnection(conn) {
   return (
     conn &&
     conn.get("socket") &&
-    conn.get("socket") === won.WON.ChatSocketCompacted
+    conn.get("socket") === won.CHAT.ChatSocketCompacted
   );
 }
 
@@ -53,7 +53,7 @@ export function isRemoteGroupChatConnection(conn) {
   return (
     conn &&
     conn.get("targetSocket") &&
-    conn.get("targetSocket") === won.WON.GroupSocketCompacted
+    conn.get("targetSocket") === won.GROUP.GroupSocketCompacted
   );
 }
 

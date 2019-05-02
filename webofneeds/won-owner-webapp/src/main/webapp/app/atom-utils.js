@@ -155,23 +155,23 @@ export function isAtom(atom) {
 }
 
 export function hasChatSocket(atom) {
-  return hasSocket(atom, won.WON.ChatSocketCompacted);
+  return hasSocket(atom, won.CHAT.ChatSocketCompacted);
 }
 
 export function hasGroupSocket(atom) {
-  return hasSocket(atom, won.WON.GroupSocketCompacted);
+  return hasSocket(atom, won.GROUP.GroupSocketCompacted);
 }
 
 export function hasHoldableSocket(atom) {
-  return hasSocket(atom, won.WON.HoldableSocketCompacted);
+  return hasSocket(atom, won.HOLD.HoldableSocketCompacted);
 }
 
 export function hasHolderSocket(atom) {
-  return hasSocket(atom, won.WON.HolderSocketCompacted);
+  return hasSocket(atom, won.HOLD.HolderSocketCompacted);
 }
 
 export function hasReviewSocket(atom) {
-  return hasSocket(atom, won.WON.ReviewSocketCompacted);
+  return hasSocket(atom, won.REVIEW.ReviewSocketCompacted);
 }
 
 export function hasSocket(atom, socket) {
@@ -273,7 +273,7 @@ export function generateShortSocketLabels(atomImm) {
       // rename sockets
       // TODO: check if this can be used anywhere or whether it should be Group Chat Enabled
       .map(socket => {
-        if (socket === won.WON.GroupSocketCompacted) {
+        if (socket === won.GROUP.GroupSocketCompacted) {
           return labels.sockets[socket] ? labels.sockets[socket] : socket;
         }
         return "";
@@ -370,19 +370,19 @@ export function sortByDistanceFrom(atomsImm, location, order = "ASC") {
 
 function getSocketKeysReset(socketsImm) {
   return socketsImm.mapKeys((key, value) => {
-    if (value === "won:ChatSocket") {
+    if (value === "chat:ChatSocket") {
       return "#chatSocket";
     }
-    if (value === "won:GroupSocket") {
+    if (value === "group:GroupSocket") {
       return "#groupSocket";
     }
-    if (value === "won:HolderSocket") {
+    if (value === "hold:HolderSocket") {
       return "#holderSocket";
     }
-    if (value === "won:HoldableSocket") {
+    if (value === "hold:HoldableSocket") {
       return "#holdableSocket";
     }
-    if (value === "won:ReviewSocket") {
+    if (value === "review:ReviewSocket") {
       return "#reviewSocket";
     }
   });

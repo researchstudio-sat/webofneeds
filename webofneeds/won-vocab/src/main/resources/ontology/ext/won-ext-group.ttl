@@ -34,7 +34,7 @@
 
 ###  https://w3id.org/won/ext/group#GroupSocket
 :GroupSocket rdf:type owl:NamedIndividual ,
-                      won:SocketDefinition ;
+             won:SocketDefinition ;
              won:compatibleSocketDefinition chat:ChatSocket ;
              won:derivesAtomProperty :groupMember .
 

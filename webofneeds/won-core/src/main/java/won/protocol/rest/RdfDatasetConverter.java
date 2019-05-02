@@ -27,7 +27,7 @@ import won.protocol.util.RdfUtils;
 public class RdfDatasetConverter extends AbstractHttpMessageConverter<Dataset> {
     private static final Logger logger = LoggerFactory.getLogger(RdfDatasetConverter.class);
     private static final MediaType[] supportedMediaTypes = { RDFMediaType.APPLICATION_TRIG,
-                    RDFMediaType.APPLICATION_JSONLD, RDFMediaType.APPLICATION_NQUADS };
+                    RDFMediaType.APPLICATION_JSONLD, RDFMediaType.APPLICATION_NQUADS, MediaType.TEXT_PLAIN };
 
     public RdfDatasetConverter() {
         this(supportedMediaTypes);

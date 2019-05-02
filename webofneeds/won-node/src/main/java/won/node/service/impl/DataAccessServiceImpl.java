@@ -151,18 +151,6 @@ public class DataAccessServiceImpl implements won.node.service.DataAccessService
     }
 
     @Override
-    public Connection getConnection(List<Connection> connections, URI socketURI, ConnectionEventType eventType)
-                    throws ConnectionAlreadyExistsException {
-        Connection con = null;
-        for (Connection c : connections) {
-            // TODO: check remote atom type as well
-            if (socketURI.equals(c.getTypeURI()))
-                con = c;
-        }
-        return con;
-    }
-
-    @Override
     public Connection nextConnectionState(URI connectionURI, ConnectionEventType connectionEventType)
                     throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
         if (connectionURI == null)

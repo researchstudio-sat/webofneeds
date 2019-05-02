@@ -33,7 +33,10 @@ import org.apache.jena.sparql.path.PathParser;
 import org.apache.jena.vocabulary.RDFS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import won.protocol.model.AtomState;
+import won.protocol.model.SocketDefinition;
+import won.protocol.model.SocketDefinitionImpl;
 import won.protocol.service.WonNodeInfo;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
@@ -322,6 +325,29 @@ public class WonLinkedDataUtils {
     public static Collection<URI> getSocketsOfType(URI atomURI, URI socketTypeURI, LinkedDataSource linkedDataSource) {
         return WonRdfUtils.SocketUtils.getSocketsOfType(getDataForResource(atomURI, linkedDataSource), atomURI,
                         socketTypeURI);
+    }
+
+    public static Optional<SocketDefinition> getSocketDefinition(LinkedDataSource linkedDataSource, URI socket) {
+        Dataset ontology = linkedDataSource.getDataForResource(socket);
+        // load all data for configurations
+        List<URI> configURIs = RdfUtils.getObjectsOfProperty(ontology, socket,
+                        URI.create(WON.socketDefinition.getURI()),
+                        node -> node.isURIResource() ? URI.create(node.asResource().getURI()) : null);
+        if (configURIs.size() > 1) {
+            throw new IllegalArgumentException("More than one socket configuration found");
+        }
+        configURIs.stream().forEach(configURI -> {
+            Dataset ds = linkedDataSource.getDataForResource(configURI);
+            RdfUtils.addDatasetToDataset(ontology, ds);
+        });
+        SocketDefinitionImpl socketDef = new SocketDefinitionImpl(socket);
+        socketDef.setSocketDefinitionURI(configURIs.stream().findFirst());
+        WonRdfUtils.SocketUtils.setCompatibleSocketDefinitions(socketDef, ontology, socket);
+        WonRdfUtils.SocketUtils.setAutoOpen(socketDef, ontology, socket);
+        WonRdfUtils.SocketUtils.setSocketCapacity(socketDef, ontology, socket);
+        WonRdfUtils.SocketUtils.setDerivationProperties(socketDef, ontology, socket);
+        WonRdfUtils.SocketUtils.setInverseDerivationProperties(socketDef, ontology, socket);
+        return Optional.of(socketDef);
     }
 
     public static Optional<URI> getTypeOfSocket(URI socketURI, LinkedDataSource linkedDataSource) {

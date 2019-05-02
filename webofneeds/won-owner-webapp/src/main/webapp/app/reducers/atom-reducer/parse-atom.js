@@ -22,13 +22,13 @@ export function parseAtom(jsonldAtom) {
       identiconSvg: generateIdenticon(jsonldAtomImm),
       nodeUri: jsonldAtomImm.getIn(["won:wonNode", "@id"]),
       state: extractState(jsonldAtomImm),
-      heldBy: won.parseFrom(jsonldAtomImm, ["won:heldBy"], "xsd:ID"),
+      heldBy: won.parseFrom(jsonldAtomImm, ["hold:heldBy"], "xsd:ID"),
       holds:
-        won.parseListFrom(jsonldAtomImm, ["won:holds"], "xsd:ID") ||
+        won.parseListFrom(jsonldAtomImm, ["hold:holds"], "xsd:ID") ||
         Immutable.List(),
       rating: extractRating(jsonldAtomImm),
       groupMembers:
-        won.parseListFrom(jsonldAtomImm, ["won:groupMember"], "xsd:ID") ||
+        won.parseListFrom(jsonldAtomImm, ["group:groupMember"], "xsd:ID") ||
         Immutable.List(),
       content: generateContent(jsonldAtomImm, detailsToParse),
       seeks: generateContent(jsonldAtomImm.get("won:seeks"), detailsToParse),
@@ -268,8 +268,8 @@ function extractLastModifiedDate(atomJsonLd) {
 }
 
 function extractRating(atomJsonLd) {
-  const reviews = atomJsonLd.get("won:reviews");
-  const reviewedConnection = atomJsonLd.get("won:reviewedConnection");
+  const reviews = atomJsonLd.get("review:reviews");
+  const reviewedConnection = atomJsonLd.get("review:reviewedConnection");
 
   const rating = {
     aggregateRating:

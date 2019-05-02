@@ -15,10 +15,10 @@ import Immutable from "immutable";
 const emptyDraftImm = Immutable.fromJS({
   content: {
     sockets: {
-      "#chatSocket": "won:ChatSocket",
-      "#holdableSocket": "won:HoldableSocket",
+      "#chatSocket": "chat:ChatSocket",
+      "#holdableSocket": "hold:HoldableSocket",
     },
-    defaultSocket: { "#chatSocket": "won:ChatSocket" },
+    defaultSocket: { "#chatSocket": "chat:ChatSocket" },
   },
   seeks: {},
 });

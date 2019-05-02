@@ -393,7 +393,7 @@ public class AtomModelWrapper {
         Resource socket = getAtomModel().getResource(socketUri);
         Resource socketType = getAtomModel().createResource(socketTypeUri);
         getAtomContentNode().addProperty(WON.socket, socket);
-        socket.addProperty(RDF.type, socketType);
+        socket.addProperty(WON.socketDefinition, socketType);
     }
 
     public void setDefaultSocket(String socketUri) {
@@ -422,7 +422,7 @@ public class AtomModelWrapper {
         if (!getAtomContentNode().hasProperty(WON.socket, socket)) {
             return Optional.empty();
         }
-        Statement stmt = socket.getProperty(RDF.type);
+        Statement stmt = socket.getProperty(WON.socketDefinition);
         if (stmt == null)
             return Optional.empty();
         return Optional.of(stmt.getObject().toString());

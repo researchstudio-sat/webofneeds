@@ -22,10 +22,10 @@ export const lunchPlan = {
         title: "Let's go get lunch!",
         eventObject: "http://dbpedia.org/resource/Lunch",
         sockets: {
-          "#groupSocket": won.WON.GroupSocketCompacted,
-          "#holdableSocket": won.WON.HoldableSocketCompacted,
+          "#groupSocket": won.GROUP.GroupSocketCompacted,
+          "#holdableSocket": won.HOLD.HoldableSocketCompacted,
         },
-        defaultSocket: { "#groupSocket": won.WON.GroupSocketCompacted },
+        defaultSocket: { "#groupSocket": won.GROUP.GroupSocketCompacted },
       },
       seeks: {},
     }),

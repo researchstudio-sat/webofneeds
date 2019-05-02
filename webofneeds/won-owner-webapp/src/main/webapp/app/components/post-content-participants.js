@@ -91,7 +91,7 @@ function genComponentConf() {
           on-update="self.inviteParticipant(value)"
           detail="::{placeholder: 'Insert AtomUri to invite'}"
           excluded-uris="self.excludedFromInviteUris"
-          allowed-sockets="::[self.won.WON.ChatSocketCompacted, self.won.WON.GroupSocketCompacted]"
+          allowed-sockets="::[self.won.CHAT.ChatSocketCompacted, self.won.GROUP.GroupSocketCompacted]"
           excluded-text="::'Invitation does not work for atoms that are already part of the Group, or the group itself'"
           not-allowed-socket-text="::'Invitation does not work on atoms without Group or Chat Socket'"
           no-suggestions-text="::'No Participants available to invite'"

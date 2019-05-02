@@ -407,7 +407,7 @@ export function isHoldable(useCase) {
     useCase.draft.content &&
     useCase.draft.content.sockets &&
     values(useCase.draft.content.sockets).includes(
-      won.WON.HoldableSocketCompacted
+      won.HOLD.HoldableSocketCompacted
     )
   );
 }

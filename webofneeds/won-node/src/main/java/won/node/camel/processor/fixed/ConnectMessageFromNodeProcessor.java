@@ -89,7 +89,8 @@ public class ConnectMessageFromNodeProcessor extends AbstractCamelProcessor {
                 }
             }
         }
-        failForIncompatibleSockets(socket.getSocketURI(), socket.getTypeURI(), targetSocketURI);
+        failForExceededCapacity(socket.getSocketURI());
+        failForIncompatibleSockets(socket.getSocketURI(), targetSocketURI);
         if (con == null) {
             // create Connection in Database
             URI connectionUri = wonNodeInformationService.generateConnectionURI(wonNodeUriFromWonMessage);
