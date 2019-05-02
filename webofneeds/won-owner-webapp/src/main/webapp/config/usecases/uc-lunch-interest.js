@@ -70,7 +70,7 @@ export const lunchInterest = {
         `${resultName} rdf:type s:PlanAction.`,
         `${resultName} s:object ?planObject.`,
         `?planObject s:about <http://dbpedia.org/resource/Lunch>.`,
-        `?thisAtom hold:heldBy/buddy:buddy/^hold:holds ${resultName}.`,
+        `?thisAtom hold:heldBy/buddy:buddy/hold:holds ${resultName}.`,
         // calculate average of scores; can be weighed if necessary
         `BIND( ( 
           COALESCE(?location_geoScore, 0) 
