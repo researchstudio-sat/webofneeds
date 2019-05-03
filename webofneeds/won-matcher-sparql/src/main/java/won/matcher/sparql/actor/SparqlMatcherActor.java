@@ -45,8 +45,8 @@ import org.apache.jena.sparql.algebra.op.OpProject;
 import org.apache.jena.sparql.algebra.op.OpUnion;
 import org.apache.jena.sparql.core.BasicPattern;
 import org.apache.jena.sparql.core.Var;
-import org.apache.jena.sparql.engine.binding.Binding;
 import org.apache.jena.sparql.engine.binding.BindingFactory;
+import org.apache.jena.sparql.engine.binding.BindingHashMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -63,10 +63,10 @@ import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import akka.japi.Function;
 import scala.concurrent.duration.Duration;
-import won.matcher.service.common.event.BulkHintEvent;
-import won.matcher.service.common.event.BulkAtomEvent;
-import won.matcher.service.common.event.HintEvent;
 import won.matcher.service.common.event.AtomEvent;
+import won.matcher.service.common.event.BulkAtomEvent;
+import won.matcher.service.common.event.BulkHintEvent;
+import won.matcher.service.common.event.HintEvent;
 import won.matcher.sparql.config.SparqlMatcherConfig;
 import won.protocol.model.AtomState;
 import won.protocol.util.AtomModelWrapper;
@@ -375,17 +375,16 @@ public class SparqlMatcherActor extends UntypedActor {
         // if we were given an atomToCheck, restrict the query result to that uri so
         // that
         // we get exactly one result if that uri is found for the atom
-        List<Binding> valuesBlockBindings = new ArrayList<>();
         List<Var> valuesBlockVariables = new ArrayList<>();
         // bind the ?thisAtom variable to the atom we are matching for
-        valuesBlockBindings.add(BindingFactory.binding(thisAtom, new ResourceImpl(atomURI.toString()).asNode()));
+        BindingHashMap bindingMap = new BindingHashMap();
+        bindingMap.add(thisAtom, new ResourceImpl(atomURI.toString()).asNode());
         valuesBlockVariables.add(thisAtom);
         if (atomToCheck.isPresent()) {
-            valuesBlockBindings.add(BindingFactory.binding(resultName,
-                            new ResourceImpl(atomToCheck.get().atomModelWrapper.getAtomUri()).asNode()));
+            bindingMap.add(resultName, new ResourceImpl(atomToCheck.get().atomModelWrapper.getAtomUri()).asNode());
             valuesBlockVariables.add(resultName);
         }
-        compiledQuery.setValuesDataBlock(valuesBlockVariables, valuesBlockBindings);
+        compiledQuery.setValuesDataBlock(valuesBlockVariables, Collections.singletonList(bindingMap));
         // make sure we order by score, if present, and we limit the results
         if (compiledQuery.getProjectVars().contains(scoreName)) {
             compiledQuery.addOrderBy(scoreName, Query.ORDER_DESCENDING);
