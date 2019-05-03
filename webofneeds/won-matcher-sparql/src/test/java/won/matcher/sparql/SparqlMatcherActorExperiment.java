@@ -12,6 +12,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import won.matcher.service.common.event.AtomEvent;
+import won.matcher.service.common.event.AtomEvent.Priority;
 import won.matcher.service.common.spring.SpringExtension;
 import won.matcher.sparql.actor.SparqlMatcherActor;
 import won.matcher.sparql.spring.MatcherSparqlAppConfiguration;
@@ -54,6 +55,6 @@ public class SparqlMatcherActorExperiment {
             return null;
         }
         String atomUri = WonRdfUtils.AtomUtils.getAtomURI(dataset).toString();
-        return new AtomEvent(atomUri, "no_uri", AtomEvent.TYPE.ACTIVE, System.currentTimeMillis(), dataset);
+        return new AtomEvent(atomUri, "no_uri", AtomEvent.TYPE.ACTIVE, System.currentTimeMillis(), dataset, Priority.PUSHED);
     }
 }
