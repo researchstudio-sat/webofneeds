@@ -55,6 +55,7 @@ public class SparqlMatcherActorExperiment {
             return null;
         }
         String atomUri = WonRdfUtils.AtomUtils.getAtomURI(dataset).toString();
-        return new AtomEvent(atomUri, "no_uri", AtomEvent.TYPE.ACTIVE, System.currentTimeMillis(), dataset, Priority.PUSHED);
+        return new AtomEvent(atomUri, "no_uri", AtomEvent.TYPE.ACTIVE, System.currentTimeMillis(), dataset,
+                        Priority.PUSHED);
     }
 }
