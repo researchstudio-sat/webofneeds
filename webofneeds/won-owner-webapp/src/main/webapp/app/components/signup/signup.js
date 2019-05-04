@@ -3,13 +3,14 @@
  */
 import angular from "angular";
 import ngAnimate from "angular-animate";
-import { attach } from "../../utils.js";
+import { attach, get } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
 
 import signupTitleBarModule from "../signup-title-bar.js";
 import labelledHrModule from "../labelled-hr.js";
 
 import * as srefUtils from "../../sref-utils.js";
+import * as accountUtils from "../../account-utils.js";
 import * as viewSelectors from "../../selectors/view-selectors.js";
 
 import "style/_signup.scss";
@@ -28,11 +29,12 @@ class SignupController {
     Object.assign(this, srefUtils); // bind srefUtils to scope
 
     const select = state => {
+      const accountState = get(state, "account");
       return {
-        loggedIn: state.getIn(["account", "loggedIn"]),
-        registerError: state.getIn(["account", "registerError"]),
-        isAnonymous: state.getIn(["account", "isAnonymous"]),
-        privateId: state.getIn(["account", "privateId"]),
+        loggedIn: accountUtils.isLoggedIn(accountState),
+        registerError: accountUtils.getRegisterError(accountState),
+        isAnonymous: accountUtils.isAnonymous(accountState),
+        privateId: accountUtils.getPrivateId(accountState),
         showModalDialog: state.getIn(["view", "showModalDialog"]),
         showSlideIns:
           viewSelectors.hasSlideIns(state) && viewSelectors.showSlideIns(state),

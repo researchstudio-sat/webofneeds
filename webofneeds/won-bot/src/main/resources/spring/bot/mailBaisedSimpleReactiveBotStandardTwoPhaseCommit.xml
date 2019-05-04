@@ -19,17 +19,17 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans
         http://www.springframework.org/schema/beans/spring-beans-4.1.xsd">
 
-    <import resource="classpath:spring/component/needproducer/needproducer-mails.xml"/>
+    <import resource="classpath:spring/component/atomproducer/atomproducer-mails.xml"/>
     <import resource="classpath:spring/component/nodeurisource/nodeurisource-random.xml"/>
     <import resource="classpath:spring/component/botContext/botContext.xml"/>
 
     <bean id="mailBasedSimpleReactiveBot" class="won.bot.impl.StandardTwoPhaseCommitNoVoteBot">
         <property name="taskScheduler" ref="taskScheduler"/>
         <property name="botContextWrapper" ref="botContextWrapper"/>
-        <property name="needProducer" ref="needProducerFromMails"/>
+        <property name="atomProducer" ref="atomProducerFromMails"/>
         <property name="nodeURISource" ref="nodeUriSourceRandom"/>
-        <!-- expects a bean named "ownerProtocolNeedServiceClient" in the context -->
-        <property name="wonMessageSender" ref="ownerProtocolNeedServiceClientJMSBased"/>
+        <!-- expects a bean named "ownerProtocolAtomServiceClient" in the context -->
+        <property name="wonMessageSender" ref="ownerProtocolAtomServiceClientJMSBased"/>
         <property name="trigger">
             <bean class="org.springframework.scheduling.support.PeriodicTrigger">
                 <constructor-arg name="period" value="200"/>

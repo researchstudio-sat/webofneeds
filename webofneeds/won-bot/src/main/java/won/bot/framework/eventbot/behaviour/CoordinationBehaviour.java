@@ -19,7 +19,9 @@ public final class CoordinationBehaviour extends BotBehaviour {
     private CoordinationType typeA;
     private CoordinationType typeB;
 
-    public static enum CoordinationType{ACTIVATE, DEACTIVATE}
+    public static enum CoordinationType {
+        ACTIVATE, DEACTIVATE
+    }
 
     private CoordinationBehaviour(EventListenerContext context) {
         super(context);
@@ -29,7 +31,8 @@ public final class CoordinationBehaviour extends BotBehaviour {
         super(context, name);
     }
 
-    private CoordinationBehaviour(EventListenerContext context, BotBehaviour behaviourA, BotBehaviour behaviourB, CoordinationType typeA, CoordinationType typeB) {
+    private CoordinationBehaviour(EventListenerContext context, BotBehaviour behaviourA, BotBehaviour behaviourB,
+                    CoordinationType typeA, CoordinationType typeB) {
         super(context);
         this.behaviourA = behaviourA;
         this.behaviourB = behaviourB;
@@ -37,23 +40,34 @@ public final class CoordinationBehaviour extends BotBehaviour {
         this.typeB = typeB;
     }
 
-    public static CoordinationBehaviour connectActivateActivate(EventListenerContext context, BotBehaviour behaviourA, BotBehaviour behaviourB) {
-        return new CoordinationBehaviour(context, behaviourA, behaviourB, CoordinationType.ACTIVATE, CoordinationType.ACTIVATE);
+    public static CoordinationBehaviour connectActivateActivate(EventListenerContext context, BotBehaviour behaviourA,
+                    BotBehaviour behaviourB) {
+        return new CoordinationBehaviour(context, behaviourA, behaviourB, CoordinationType.ACTIVATE,
+                        CoordinationType.ACTIVATE);
     }
-    public static CoordinationBehaviour connectActivateDeactivate(EventListenerContext context, BotBehaviour behaviourA, BotBehaviour behaviourB) {
-        return new CoordinationBehaviour(context, behaviourA, behaviourB, CoordinationType.ACTIVATE, CoordinationType.DEACTIVATE);
+
+    public static CoordinationBehaviour connectActivateDeactivate(EventListenerContext context, BotBehaviour behaviourA,
+                    BotBehaviour behaviourB) {
+        return new CoordinationBehaviour(context, behaviourA, behaviourB, CoordinationType.ACTIVATE,
+                        CoordinationType.DEACTIVATE);
     }
-    public static CoordinationBehaviour connectDeactivateActivate(EventListenerContext context, BotBehaviour behaviourA, BotBehaviour behaviourB) {
-        return new CoordinationBehaviour(context, behaviourA, behaviourB, CoordinationType.DEACTIVATE, CoordinationType.ACTIVATE);
+
+    public static CoordinationBehaviour connectDeactivateActivate(EventListenerContext context, BotBehaviour behaviourA,
+                    BotBehaviour behaviourB) {
+        return new CoordinationBehaviour(context, behaviourA, behaviourB, CoordinationType.DEACTIVATE,
+                        CoordinationType.ACTIVATE);
     }
-    public static CoordinationBehaviour connectDeactivateDeactivate(EventListenerContext context, BotBehaviour behaviourA, BotBehaviour behaviourB) {
-        return new CoordinationBehaviour(context, behaviourA, behaviourB, CoordinationType.DEACTIVATE, CoordinationType.DEACTIVATE);
+
+    public static CoordinationBehaviour connectDeactivateDeactivate(EventListenerContext context,
+                    BotBehaviour behaviourA, BotBehaviour behaviourB) {
+        return new CoordinationBehaviour(context, behaviourA, behaviourB, CoordinationType.DEACTIVATE,
+                        CoordinationType.DEACTIVATE);
     }
 
     @Override
     protected void onActivate(Optional<Object> message) {
         EventBotAction actionToExecute = null;
-        if (typeB == CoordinationType.ACTIVATE){
+        if (typeB == CoordinationType.ACTIVATE) {
             actionToExecute = new BaseEventBotAction(context) {
                 @Override
                 protected void doRun(Event event, EventListener executingListener) throws Exception {
@@ -73,7 +87,7 @@ public final class CoordinationBehaviour extends BotBehaviour {
             };
         }
         Class<? extends Event> eventClazz = null;
-        if (typeA == CoordinationType.ACTIVATE){
+        if (typeA == CoordinationType.ACTIVATE) {
             eventClazz = BotBehaviourActivatedEvent.class;
         } else {
             eventClazz = BotBehaviourDeactivatedEvent.class;
@@ -84,6 +98,5 @@ public final class CoordinationBehaviour extends BotBehaviour {
                 return ((BotBehaviourEvent) event).getBehaviour() == behaviourA;
             }
         }, actionToExecute));
-
     }
 }

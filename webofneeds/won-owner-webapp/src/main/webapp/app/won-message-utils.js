@@ -11,7 +11,6 @@ import urljoin from "url-join";
 
 import { getRandomWonId } from "./won-utils.js";
 import * as useCaseUtils from "./usecase-utils.js";
-import { isConnUriClosed } from "./won-localstorage.js";
 import { actionTypes } from "./actions/actions.js";
 
 /**
@@ -34,8 +33,8 @@ export function isFetchMessageEffectsNeeded(wonMsg) {
 
 export function buildRateMessage(
   msgToRateFor,
-  ownedNeedUri,
-  theirNeedUri,
+  ownedAtomUri,
+  theirAtomUri,
   ownNodeUri,
   theirNodeUri,
   theirConnectionUri,
@@ -45,24 +44,24 @@ export function buildRateMessage(
     const buildMessage = function(envelopeData) {
       //TODO: use event URI pattern specified by WoN node
       const eventUri =
-        envelopeData[won.WONMSG.hasSenderNode] + "/event/" + getRandomWonId();
+        envelopeData[won.WONMSG.senderNode] + "/event/" + getRandomWonId();
       const message = new won.MessageBuilder(won.WONMSG.feedbackMessage) //TODO: Looks like a copy-paste-leftover from connect
         .eventURI(eventUri)
-        .hasOwnerDirection()
+        .ownerDirection()
         .forEnvelopeData(envelopeData)
-        .hasSentTimestamp(new Date().getTime().toString())
+        .sentTimestamp(new Date().getTime().toString())
         .addRating(rating, msgToRateFor.connection.uri)
         .build();
-      //const callback = createMessageCallbackForRemoteNeedMessage(eventUri, won.EVENT.OPEN_SENT);
+      //const callback = createMessageCallbackForTargetAtomMessage(eventUri, won.EVENT.OPEN_SENT);
       return { eventUri: eventUri, message: message };
     };
 
-    //fetch all data needed
+    //fetch all datan needed
     won
       .getEnvelopeDataforConnection(
         msgToRateFor.connection.uri,
-        ownedNeedUri,
-        theirNeedUri,
+        ownedAtomUri,
+        theirAtomUri,
         ownNodeUri,
         theirNodeUri,
         theirConnectionUri
@@ -77,8 +76,8 @@ export function buildRateMessage(
 
 export function buildCloseMessage(
   connectionUri,
-  ownedNeedUri,
-  theirNeedUri,
+  ownedAtomUri,
+  theirAtomUri,
   ownNodeUri,
   theirNodeUri,
   theirConnectionUri
@@ -86,23 +85,23 @@ export function buildCloseMessage(
   const buildMessage = function(envelopeData) {
     //TODO: use event URI pattern specified by WoN node
     const eventUri =
-      envelopeData[won.WONMSG.hasSenderNode] + "/event/" + getRandomWonId();
+      envelopeData[won.WONMSG.senderNode] + "/event/" + getRandomWonId();
     const message = new won.MessageBuilder(won.WONMSG.closeMessage)
       .eventURI(eventUri)
       .forEnvelopeData(envelopeData)
-      .hasOwnerDirection()
-      .hasSentTimestamp(new Date().getTime().toString())
+      .ownerDirection()
+      .sentTimestamp(new Date().getTime().toString())
       .build();
-    //const callback = createMessageCallbackForRemoteNeedMessage(eventUri, won.EVENT.CLOSE_SENT);
+    //const callback = createMessageCallbackForTargetAtomMessage(eventUri, won.EVENT.CLOSE_SENT);
     return { eventUri: eventUri, message: message };
   };
 
-  //fetch all data needed
+  //fetch all datan needed
   return won
     .getEnvelopeDataforConnection(
       connectionUri,
-      ownedNeedUri,
-      theirNeedUri,
+      ownedAtomUri,
+      theirAtomUri,
       ownNodeUri,
       theirNodeUri,
       theirConnectionUri
@@ -115,15 +114,15 @@ export function buildCloseMessage(
       throw err;
     });
 }
-export function buildCloseNeedMessage(needUri, wonNodeUri) {
+export function buildCloseAtomMessage(atomUri, wonNodeUri) {
   const buildMessage = function(envelopeData) {
     const eventUri =
-      envelopeData[won.WONMSG.hasSenderNode] + "/event/" + getRandomWonId();
-    const message = new won.MessageBuilder(won.WONMSG.closeNeedMessage)
+      envelopeData[won.WONMSG.senderNode] + "/event/" + getRandomWonId();
+    const message = new won.MessageBuilder(won.WONMSG.closeAtomMessage)
       .eventURI(eventUri)
-      .hasReceiverNode(wonNodeUri)
-      .hasOwnerDirection()
-      .hasSentTimestamp(new Date().getTime().toString())
+      .recipientNode(wonNodeUri)
+      .ownerDirection()
+      .sentTimestamp(new Date().getTime().toString())
       .forEnvelopeData(envelopeData)
       .build();
 
@@ -131,22 +130,22 @@ export function buildCloseNeedMessage(needUri, wonNodeUri) {
   };
 
   return won
-    .getEnvelopeDataForNeed(needUri, wonNodeUri)
+    .getEnvelopeDataForAtom(atomUri, wonNodeUri)
     .then(
       envelopeData => buildMessage(envelopeData),
-      () => won.reportError("cannot close need " + needUri)
+      () => won.reportError("cannot close atom " + atomUri)
     );
 }
 
-export function buildDeleteNeedMessage(needUri, wonNodeUri) {
+export function buildDeleteAtomMessage(atomUri, wonNodeUri) {
   const buildMessage = function(envelopeData) {
     const eventUri =
-      envelopeData[won.WONMSG.hasSenderNode] + "/event/" + getRandomWonId();
-    const message = new won.MessageBuilder(won.WONMSG.deleteNeedMessage)
+      envelopeData[won.WONMSG.senderNode] + "/event/" + getRandomWonId();
+    const message = new won.MessageBuilder(won.WONMSG.deleteAtomMessage)
       .eventURI(eventUri)
-      .hasReceiverNode(wonNodeUri)
-      .hasOwnerDirection()
-      .hasSentTimestamp(new Date().getTime().toString())
+      .recipientNode(wonNodeUri)
+      .ownerDirection()
+      .sentTimestamp(new Date().getTime().toString())
       .forEnvelopeData(envelopeData)
       .build();
 
@@ -154,22 +153,22 @@ export function buildDeleteNeedMessage(needUri, wonNodeUri) {
   };
 
   return won
-    .getEnvelopeDataForNeed(needUri, wonNodeUri)
+    .getEnvelopeDataForAtom(atomUri, wonNodeUri)
     .then(
       envelopeData => buildMessage(envelopeData),
-      () => won.reportError("cannot delete need " + needUri)
+      () => won.reportError("cannot delete atom " + atomUri)
     );
 }
 
-export function buildOpenNeedMessage(needUri, wonNodeUri) {
+export function buildOpenAtomMessage(atomUri, wonNodeUri) {
   const buildMessage = function(envelopeData) {
     const eventUri =
-      envelopeData[won.WONMSG.hasSenderNode] + "/event/" + getRandomWonId();
-    const message = new won.MessageBuilder(won.WONMSG.activateNeedMessage)
+      envelopeData[won.WONMSG.senderNode] + "/event/" + getRandomWonId();
+    const message = new won.MessageBuilder(won.WONMSG.activateAtomMessage)
       .eventURI(eventUri)
-      .hasReceiverNode(wonNodeUri)
-      .hasOwnerDirection()
-      .hasSentTimestamp(new Date().getTime().toString())
+      .recipientNode(wonNodeUri)
+      .ownerDirection()
+      .sentTimestamp(new Date().getTime().toString())
       .forEnvelopeData(envelopeData)
       .build();
 
@@ -177,58 +176,58 @@ export function buildOpenNeedMessage(needUri, wonNodeUri) {
   };
 
   return won
-    .getEnvelopeDataForNeed(needUri, wonNodeUri)
+    .getEnvelopeDataForAtom(atomUri, wonNodeUri)
     .then(
       envelopeData => buildMessage(envelopeData),
-      () => won.reportError("cannot close need " + needUri)
+      () => won.reportError("cannot close atom " + atomUri)
     );
 }
 
 /**
- * Builds json-ld for a connect-message in reaction to a need.
+ * Builds json-ld for a connect-message in reaction to an atom.
  * @param connectionUri
  * @param textMessage
  * @returns {{eventUri, message}|*}
  */
 export function buildConnectMessage({
-  ownedNeedUri,
-  theirNeedUri,
+  ownedAtomUri,
+  theirAtomUri,
   ownNodeUri,
   theirNodeUri,
   connectMessage,
   optionalOwnConnectionUri,
-  ownFacet,
-  theirFacet,
+  ownSocket,
+  theirSocket,
 }) {
   const envelopeData = won.getEnvelopeDataforNewConnection(
-    ownedNeedUri,
-    theirNeedUri,
+    ownedAtomUri,
+    theirAtomUri,
     ownNodeUri,
     theirNodeUri
   );
   if (optionalOwnConnectionUri) {
-    envelopeData[won.WONMSG.hasSender] = optionalOwnConnectionUri;
+    envelopeData[won.WONMSG.sender] = optionalOwnConnectionUri;
   }
-  if (ownFacet) {
-    envelopeData[won.WONMSG.hasSenderFacet] = ownFacet;
+  if (ownSocket) {
+    envelopeData[won.WONMSG.senderSocket] = ownSocket;
   }
-  if (theirFacet) {
-    envelopeData[won.WONMSG.hasReceiverFacet] = theirFacet;
+  if (theirSocket) {
+    envelopeData[won.WONMSG.recipientSocket] = theirSocket;
   }
   //TODO: use event URI pattern specified by WoN node
   const eventUri =
-    envelopeData[won.WONMSG.hasSenderNode] + "/event/" + getRandomWonId();
+    envelopeData[won.WONMSG.senderNode] + "/event/" + getRandomWonId();
   const messageBuilder = new won.MessageBuilder(won.WONMSG.connectMessage);
   messageBuilder.eventURI(eventUri);
   messageBuilder.forEnvelopeData(envelopeData);
-  //do not set facets: connect the default facets with each other
+  //do not set sockets: connect the default sockets with each other
   if (connectMessage && typeof connectMessage === "string") {
-    messageBuilder.hasTextMessage(connectMessage);
+    messageBuilder.textMessage(connectMessage);
   } else if (connectMessage) {
     messageBuilder.mergeIntoContentGraph(connectMessage);
   }
-  messageBuilder.hasOwnerDirection();
-  messageBuilder.hasSentTimestamp(new Date().getTime().toString());
+  messageBuilder.ownerDirection();
+  messageBuilder.sentTimestamp(new Date().getTime().toString());
   const message = messageBuilder.build();
 
   return { eventUri: eventUri, message: message };
@@ -239,8 +238,8 @@ export function buildChatMessage({
   additionalContent,
   referencedContentUris, //this is a map of corresponding uris to be e.g. proposes or retracted... (it already includes the correct uri -> remoteUri for received messages, and uri for sent messages)
   connectionUri,
-  ownedNeedUri,
-  theirNeedUri,
+  ownedAtomUri,
+  theirAtomUri,
   ownNodeUri,
   theirNodeUri,
   theirConnectionUri,
@@ -252,8 +251,8 @@ export function buildChatMessage({
 
   const envelopeDataP = won.getEnvelopeDataforConnection(
     connectionUri,
-    ownedNeedUri,
-    theirNeedUri,
+    ownedAtomUri,
+    theirAtomUri,
     ownNodeUri,
     theirNodeUri,
     theirConnectionUri
@@ -262,7 +261,7 @@ export function buildChatMessage({
   const messageP = Promise.all([envelopeDataP, jsonldGraphPayloadP]).then(
     ([envelopeData, graphPayload]) => {
       const eventUri =
-        envelopeData[won.WONMSG.hasSenderNode] + "/event/" + getRandomWonId();
+        envelopeData[won.WONMSG.senderNode] + "/event/" + getRandomWonId();
 
       /*
              * Build the json-ld message that's signed on the owner-server
@@ -272,8 +271,8 @@ export function buildChatMessage({
         won.WONMSG.connectionMessage
       )
         .forEnvelopeData(envelopeData)
-        .hasOwnerDirection()
-        .hasSentTimestamp(new Date().getTime().toString());
+        .ownerDirection()
+        .sentTimestamp(new Date().getTime().toString());
 
       if (isTTL && graphPayload) {
         wonMessageBuilder.mergeIntoContentGraph(graphPayload);
@@ -284,7 +283,7 @@ export function buildChatMessage({
         //add the chatMessage as normal text message
         if (chatMessage) {
           wonMessageBuilder.addContentGraphData(
-            won.WON.hasTextMessage,
+            won.WON.textMessage,
             chatMessage
           );
         }
@@ -340,33 +339,25 @@ export function buildChatMessage({
               switch (key) {
                 case "retracts":
                   contentNode[
-                    "http://purl.org/webofneeds/modification#retracts"
+                    "https://w3id.org/won/modification#retracts"
                   ] = uris;
                   break;
                 case "rejects":
-                  contentNode[
-                    "http://purl.org/webofneeds/agreement#rejects"
-                  ] = uris;
+                  contentNode["https://w3id.org/won/agreement#rejects"] = uris;
                   break;
                 case "proposes":
-                  contentNode[
-                    "http://purl.org/webofneeds/agreement#proposes"
-                  ] = uris;
+                  contentNode["https://w3id.org/won/agreement#proposes"] = uris;
                   break;
                 case "claims":
-                  contentNode[
-                    "http://purl.org/webofneeds/agreement#claims"
-                  ] = uris;
+                  contentNode["https://w3id.org/won/agreement#claims"] = uris;
                   break;
                 case "proposesToCancel":
                   contentNode[
-                    "http://purl.org/webofneeds/agreement#proposesToCancel"
+                    "https://w3id.org/won/agreement#proposesToCancel"
                   ] = uris;
                   break;
                 case "accepts":
-                  contentNode[
-                    "http://purl.org/webofneeds/agreement#accepts"
-                  ] = uris;
+                  contentNode["https://w3id.org/won/agreement#accepts"] = uris;
                   break;
                 default:
                   console.error(
@@ -404,8 +395,8 @@ export function buildChatMessage({
 
 export function buildOpenMessage(
   connectionUri,
-  ownedNeedUri,
-  theirNeedUri,
+  ownedAtomUri,
+  theirAtomUri,
   ownNodeUri,
   theirNodeUri,
   theirConnectionUri,
@@ -414,8 +405,8 @@ export function buildOpenMessage(
   const messageP = won
     .getEnvelopeDataforConnection(
       connectionUri,
-      ownedNeedUri,
-      theirNeedUri,
+      ownedAtomUri,
+      theirAtomUri,
       ownNodeUri,
       theirNodeUri,
       theirConnectionUri
@@ -423,13 +414,13 @@ export function buildOpenMessage(
     .then(envelopeData => {
       //TODO: use event URI pattern specified by WoN node
       const eventUri =
-        envelopeData[won.WONMSG.hasSenderNode] + "/event/" + getRandomWonId();
+        envelopeData[won.WONMSG.senderNode] + "/event/" + getRandomWonId();
       const message = new won.MessageBuilder(won.WONMSG.openMessage)
         .eventURI(eventUri)
         .forEnvelopeData(envelopeData)
-        .hasTextMessage(chatMessage)
-        .hasOwnerDirection()
-        .hasSentTimestamp(new Date().getTime().toString())
+        .textMessage(chatMessage)
+        .ownerDirection()
+        .sentTimestamp(new Date().getTime().toString())
         .build();
 
       return {
@@ -441,9 +432,54 @@ export function buildOpenMessage(
   return messageP;
 }
 
+export async function buildEditMessage(editedAtomData, oldAtom, wonNodeUri) {
+  const atomUriToEdit = oldAtom && oldAtom.get("uri");
+
+  //if type  create -> use atomBuilder as well
+  const prepareContentNodeData = async editedAtomData => ({
+    // Adds all fields from atomDataIsOrSeeks:
+    // title, description, tags, location,...
+    ...editedAtomData,
+
+    publishedContentUri: atomUriToEdit, //mandatory
+    arbitraryJsonLd: editedAtomData.ttl
+      ? await won.ttlToJsonLd(editedAtomData.ttl)
+      : [],
+  });
+
+  let contentRdf = won.buildAtomRdf({
+    content: editedAtomData.content
+      ? await prepareContentNodeData(editedAtomData.content)
+      : undefined,
+    seeks: editedAtomData.seeks
+      ? await prepareContentNodeData(editedAtomData.seeks)
+      : undefined,
+    useCase: editedAtomData.useCase ? editedAtomData.useCase : undefined, //only needed for atom building
+    // FIXME: find a better way to include atom details that are not part of is or seeks
+    socket: editedAtomData.socket,
+  });
+
+  const msgUri = wonNodeUri + "/event/" + getRandomWonId(); //mandatory
+  const msgJson = won.buildMessageRdf(contentRdf, {
+    recipientNode: wonNodeUri, //mandatory
+    senderNode: wonNodeUri, //mandatory
+    msgType: won.WONMSG.replaceMessage, //mandatory
+    publishedContentUri: atomUriToEdit, //mandatory
+    msgUri: msgUri,
+  });
+  //add the @base definition to the @context so we can use #fragments in the atom structure
+  msgJson["@context"]["@base"] = atomUriToEdit;
+
+  return {
+    message: msgJson,
+    eventUri: msgUri,
+    atomUri: atomUriToEdit,
+  };
+}
+
 /**
  *
- * @param needData
+ * @param atomData
  * @param wonNodeUri
  * @return {{
  *    message: (
@@ -456,113 +492,205 @@ export function buildOpenMessage(
  *      {@graph, @context}
  *    ),
  *    eventUri: string,
- *    needUri: string
+ *    atomUri: string
  * }}
  */
-export async function buildCreateMessage(needData, wonNodeUri) {
+export async function buildCreateMessage(atomData, wonNodeUri) {
   //Check for is and seeks
   /*
-    if(!needData.type || !needData.title)
-        throw new Error('Tried to create post without type or title. ', needData);
+    if(!atomData.type || !atomData.title)
+        throw new Error('Tried to create post without type or title. ', atomData);
     */
 
-  const publishedContentUri = wonNodeUri + "/need/" + getRandomWonId();
+  const publishedContentUri = wonNodeUri + "/atom/" + getRandomWonId();
 
-  const imgs = needData.images;
-  let attachmentUris = [];
-  if (imgs) {
-    imgs.forEach(function(img) {
-      img.uri = wonNodeUri + "/attachment/" + getRandomWonId();
-    });
-    attachmentUris = imgs.map(function(img) {
-      return img.uri;
-    });
-  }
-
-  //if type  create -> use needBuilder as well
-  const prepareContentNodeData = async needData => ({
-    // Adds all fields from needDataIsOrSeeks:
-    // title, description, tags, matchingContext, location,...
-    ...needData,
+  //if type  create -> use atomBuilder as well
+  const prepareContentNodeData = async atomData => ({
+    // Adds all fields from atomDataIsOrSeeks:
+    // title, description, tags, location,...
+    ...atomData,
 
     publishedContentUri: publishedContentUri, //mandatory
-    //TODO attach to either is or seeks?
-    attachmentUris: attachmentUris, //optional, should be same as in `attachments` below
-    arbitraryJsonLd: needData.ttl ? await won.ttlToJsonLd(needData.ttl) : [],
+    arbitraryJsonLd: atomData.ttl ? await won.ttlToJsonLd(atomData.ttl) : [],
   });
 
-  let contentRdf = won.buildNeedRdf({
-    content: needData.content
-      ? await prepareContentNodeData(needData.content)
+  let contentRdf = won.buildAtomRdf({
+    content: atomData.content
+      ? await prepareContentNodeData(atomData.content)
       : undefined,
-    seeks: needData.seeks
-      ? await prepareContentNodeData(needData.seeks)
+    seeks: atomData.seeks
+      ? await prepareContentNodeData(atomData.seeks)
       : undefined,
-    useCase: needData.useCase ? needData.useCase : undefined, //only needed for need building
-    // FIXME: find a better way to include need details that are not part of is or seeks
-    matchingContext: needData.matchingContext
-      ? needData.matchingContext
-      : undefined,
-    facet: needData.facet,
+    useCase: atomData.useCase ? atomData.useCase : undefined, //only needed for atom building
+    // FIXME: find a better way to include atom details that are not part of is or seeks
+    socket: atomData.socket,
   });
 
   const msgUri = wonNodeUri + "/event/" + getRandomWonId(); //mandatory
   const msgJson = won.buildMessageRdf(contentRdf, {
-    receiverNode: wonNodeUri, //mandatory
+    recipientNode: wonNodeUri, //mandatory
     senderNode: wonNodeUri, //mandatory
     msgType: won.WONMSG.createMessage, //mandatory
     publishedContentUri: publishedContentUri, //mandatory
     msgUri: msgUri,
-    attachments: imgs, //optional, should be same as in `attachmentUris` above
   });
-  //add the @base definition to the @context so we can use #fragments in the need structure
+  //add the @base definition to the @context so we can use #fragments in the atom structure
   msgJson["@context"]["@base"] = publishedContentUri;
   return {
     message: msgJson,
     eventUri: msgUri,
-    needUri: publishedContentUri,
+    atomUri: publishedContentUri,
   };
 }
 
-export function fetchDataForNonOwnedNeedOnly(needUri, dispatch) {
+export function fetchDataForNonOwnedAtomOnly(atomUri, dispatch) {
   dispatch({
-    type: actionTypes.needs.storeTheirUrisInLoading,
-    payload: Immutable.fromJS({ uris: [needUri] }),
+    type: actionTypes.atoms.storeTheirUrisInLoading,
+    payload: Immutable.fromJS({ uris: [atomUri] }),
   });
-  return fetchTheirNeedAndDispatch(needUri, dispatch);
+  return fetchTheirAtomAndDispatch(atomUri, dispatch);
 }
 
 export function fetchUnloadedData(dispatch) {
-  return fetchOwnedInactiveNeedUris().then(needUris => {
+  return fetchOwnedInactiveAtomUris().then(atomUris => {
     dispatch({
-      type: actionTypes.needs.storeOwnedInactiveUrisInLoading,
-      payload: Immutable.fromJS({ uris: needUris }),
+      type: actionTypes.atoms.storeOwnedInactiveUrisInLoading,
+      payload: Immutable.fromJS({ uris: atomUris }),
     });
-    return fetchDataForOwnedNeeds(needUris, dispatch);
+    return fetchDataForOwnedAtoms(atomUris, dispatch);
   });
 }
 
 export function fetchOwnedData(dispatch) {
-  return fetchOwnedInactiveNeedUris()
-    .then(inactiveNeedUris =>
+  return fetchOwnedInactiveAtomUris()
+    .then(inactiveAtomUris =>
       dispatch({
-        type: actionTypes.needs.storeOwnedInactiveUris,
-        payload: Immutable.fromJS({ uris: inactiveNeedUris }),
+        type: actionTypes.atoms.storeOwnedInactiveUris,
+        payload: Immutable.fromJS({ uris: inactiveAtomUris }),
       })
     )
-    .then(() => fetchOwnedActiveNeedUris())
-    .then(needUris => {
+    .then(() => fetchOwnedActiveAtomUris())
+    .then(atomUris => {
       dispatch({
-        type: actionTypes.needs.storeOwnedActiveUris,
-        payload: Immutable.fromJS({ uris: needUris }),
+        type: actionTypes.atoms.storeOwnedActiveUris,
+        payload: Immutable.fromJS({ uris: atomUris }),
       });
-      return needUris;
+      return atomUris;
     })
-    .then(needUris => fetchDataForOwnedNeeds(needUris, dispatch));
+    .then(atomUris => fetchDataForOwnedAtoms(atomUris, dispatch));
 }
 
-function fetchOwnedInactiveNeedUris() {
-  return fetch(urljoin(ownerBaseUrl, "/rest/needs?state=INACTIVE"), {
+export function fetchWhatsNew(
+  dispatch,
+  getState,
+  modifiedAfterDate = new Date(Date.now() - 30 /*Days before*/ * 86400000)
+) {
+  return fetchAllMetaAtoms(modifiedAfterDate).then(atoms => {
+    const atomsImm = Immutable.fromJS(atoms);
+    const atomUris = [...atomsImm.keys()];
+
+    dispatch({
+      type: actionTypes.atoms.storeWhatsNew,
+      payload: Immutable.fromJS({ metaAtoms: atoms }),
+    });
+    return atomUris;
+  });
+}
+
+function fetchAllMetaAtoms(modifiedAfterDate, state = "ACTIVE", limit = 200) {
+  return fetch(
+    urljoin(
+      ownerBaseUrl,
+      "/rest/atoms/all?state=" +
+        state +
+        (modifiedAfterDate
+          ? "&modifiedafter=" + modifiedAfterDate.toISOString()
+          : "") +
+        "&limit=" +
+        limit
+    ),
+    {
+      method: "get",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    }
+  )
+    .then(checkHttpStatus)
+    .then(response => response.json());
+}
+
+export function fetchWhatsAround(
+  dispatch,
+  getState,
+  modifiedAfterDate,
+  location,
+  maxDistance
+) {
+  return fetchAllMetaAtomsNear(modifiedAfterDate, location, maxDistance).then(
+    atoms => {
+      const atomsImm = Immutable.fromJS(atoms);
+      const atomUris = [...atomsImm.keys()];
+
+      dispatch({
+        type: actionTypes.atoms.storeWhatsAround,
+        payload: Immutable.fromJS({
+          metaAtoms: atoms,
+          location: location,
+          maxDistance: maxDistance,
+        }),
+      });
+      return atomUris;
+    }
+  );
+}
+
+function fetchAllMetaAtomsNear(
+  modifiedAfterDate,
+  location,
+  maxDistance = 5000,
+  limit = 200,
+  state = "ACTIVE"
+) {
+  if (location && location.lat && location.lng) {
+    return fetch(
+      urljoin(
+        ownerBaseUrl,
+        "/rest/atoms/all?state=" +
+          state +
+          "&limit=" +
+          limit +
+          "&latitude=" +
+          location.lat +
+          "&longitude=" +
+          location.lng +
+          "&maxDistance" +
+          maxDistance +
+          (modifiedAfterDate
+            ? "&modifiedafter=" + modifiedAfterDate.toISOString()
+            : "")
+      ),
+      {
+        method: "get",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(),
+        credentials: "include",
+      }
+    )
+      .then(checkHttpStatus)
+      .then(response => response.json());
+  } else {
+    return Promise.reject();
+  }
+}
+
+function fetchOwnedInactiveAtomUris() {
+  return fetch(urljoin(ownerBaseUrl, "/rest/atoms?state=INACTIVE"), {
     method: "get",
     headers: {
       Accept: "application/json",
@@ -574,8 +702,8 @@ function fetchOwnedInactiveNeedUris() {
     .then(response => response.json());
 }
 
-function fetchOwnedActiveNeedUris() {
-  return fetch(urljoin(ownerBaseUrl, "/rest/needs?state=ACTIVE"), {
+function fetchOwnedActiveAtomUris() {
+  return fetch(urljoin(ownerBaseUrl, "/rest/atoms?state=ACTIVE"), {
     method: "get",
     headers: {
       Accept: "application/json",
@@ -654,12 +782,12 @@ export function fetchMessageEffects(connectionUri, messageUri) {
     .then(response => response.json());
 }
 
-export function fetchMessage(needUri, eventUri) {
-  console.debug("fetchMessage: ", needUri, " eventUri: ", eventUri);
+export function fetchMessage(atomUri, eventUri) {
+  console.debug("fetchMessage: ", atomUri, " eventUri: ", eventUri);
   const url = urljoin(
     ownerBaseUrl,
     "/rest/linked-data/",
-    `?requester=${encodeURI(needUri)}`,
+    `?requester=${encodeURI(atomUri)}`,
     `&uri=${encodeURI(eventUri)}`
   );
   const httpOptions = {
@@ -675,84 +803,98 @@ export function fetchMessage(needUri, eventUri) {
     .then(response => response.json());
 }
 
-export async function fetchDataForOwnedNeeds(ownedNeedUris, dispatch) {
-  if (!is("Array", ownedNeedUris) || ownedNeedUris.length === 0) {
+export async function fetchDataForOwnedAtoms(ownedAtomUris, dispatch) {
+  if (!is("Array", ownedAtomUris) || ownedAtomUris.length === 0) {
     return;
   }
 
-  return urisToLookupMap(ownedNeedUris, uri =>
-    fetchOwnedNeedAndDispatch(uri, dispatch)
+  return urisToLookupMap(ownedAtomUris, uri =>
+    fetchOwnedAtomAndDispatch(uri, dispatch)
   )
     .then(() =>
-      urisToLookupMap(ownedNeedUris, needUri =>
-        fetchConnectionsOfNeedAndDispatch(needUri, dispatch)
+      urisToLookupMap(ownedAtomUris, atomUri =>
+        fetchConnectionsOfAtomAndDispatch(atomUri, dispatch)
       )
     )
-    .then(needConnectionMap => {
-      const theirNeedUris = Immutable.fromJS(needConnectionMap)
+    .then(atomConnectionMap => {
+      const theirAtomUris = Immutable.fromJS(atomConnectionMap)
         .filter(connections => connections.size > 0)
         .flatMap(entry => entry)
-        .map(conn => conn.get("hasRemoteNeed"))
+        .map(conn => conn.get("targetAtom"))
         .toSet();
 
-      const theirNeedUrisArray = theirNeedUris.toArray();
+      const theirAtomUrisArray = theirAtomUris.toArray();
 
       dispatch({
-        type: actionTypes.needs.storeTheirUrisInLoading,
-        payload: Immutable.fromJS({ uris: theirNeedUrisArray }),
+        type: actionTypes.atoms.storeTheirUrisInLoading,
+        payload: Immutable.fromJS({ uris: theirAtomUrisArray }),
       });
-      return theirNeedUrisArray;
+      return theirAtomUrisArray;
     })
-    .then(theirNeedUris =>
-      urisToLookupMap(theirNeedUris, uri =>
-        fetchTheirNeedAndDispatch(uri, dispatch)
+    .then(theirAtomUris =>
+      urisToLookupMap(theirAtomUris, uri =>
+        fetchTheirAtomAndDispatch(uri, dispatch)
       )
     );
 }
 
-function fetchConnectionsOfNeedAndDispatch(needUri, dispatch) {
+function fetchConnectionsOfAtomAndDispatch(atomUri, dispatch) {
   return won
-    .getConnectionUrisOfNeed(needUri, needUri, true)
-    .then(connectionUrisOfNeed => {
-      const activeConnectionUris = connectionUrisOfNeed.filter(
-        connUri => !isConnUriClosed(connUri)
-      );
+    .getConnectionUrisWithStateByAtomUri(atomUri, atomUri)
+    .then(connectionsWithStateAndSocket => {
+      dispatch({
+        type: actionTypes.connections.storeUrisToLoad,
+        payload: Immutable.fromJS({
+          atomUri: atomUri,
+          connections: connectionsWithStateAndSocket,
+        }),
+      });
+
+      const activeConnectionUris = connectionsWithStateAndSocket
+        .filter(conn => conn.connectionState !== won.WON.Closed)
+        .map(conn => conn.connectionUri);
+
       dispatch({
         type: actionTypes.connections.storeActiveUrisInLoading,
         payload: Immutable.fromJS({
-          needUri: needUri,
+          atomUri: atomUri,
           connUris: activeConnectionUris,
         }),
       });
 
       return urisToLookupMap(activeConnectionUris, connUri =>
-        fetchActiveConnectionAndDispatch(connUri, needUri, dispatch)
+        fetchActiveConnectionAndDispatch(connUri, atomUri, dispatch)
       );
     });
 }
 
-function fetchOwnedNeedAndDispatch(needUri, dispatch) {
+function fetchOwnedAtomAndDispatch(atomUri, dispatch) {
   return won
-    .getNeed(needUri)
-    .then(need => {
+    .getAtom(atomUri)
+    .then(atom => {
       dispatch({
-        type: actionTypes.needs.storeOwned,
-        payload: Immutable.fromJS({ needs: { [needUri]: need } }),
+        type: actionTypes.atoms.storeOwned,
+        payload: Immutable.fromJS({ atoms: { [atomUri]: atom } }),
       });
-      return need;
+      return atom;
     })
-    .catch(() => {
+    .catch(err => {
+      const errResponse = err && err.response;
+      const isDeleted = !!(errResponse && errResponse.status == 410);
+
       dispatch({
-        type: actionTypes.needs.storeUriFailed,
-        payload: Immutable.fromJS({ uri: needUri }),
+        type: isDeleted
+          ? actionTypes.atoms.removeDeleted
+          : actionTypes.atoms.storeUriFailed,
+        payload: Immutable.fromJS({ uri: atomUri }),
       });
       return;
     });
 }
 
-export function fetchActiveConnectionAndDispatch(connUri, needUri, dispatch) {
+export function fetchActiveConnectionAndDispatch(connUri, atomUri, dispatch) {
   return won
-    .getConnectionWithEventUris(connUri, { requesterWebId: needUri })
+    .getConnectionWithEventUris(connUri, { requesterWebId: atomUri })
     .then(connection => {
       dispatch({
         type: actionTypes.connections.storeActive,
@@ -769,49 +911,59 @@ export function fetchActiveConnectionAndDispatch(connUri, needUri, dispatch) {
     });
 }
 
-export function fetchTheirNeedAndDispatch(needUri, dispatch) {
+export function fetchTheirAtomAndDispatch(atomUri, dispatch) {
   return won
-    .getNeed(needUri)
-    .then(need => {
-      if (need["won:heldBy"] && need["won:heldBy"]["@id"]) {
-        const personaUri = need["won:heldBy"]["@id"];
+    .getAtom(atomUri)
+    .then(atom => {
+      if (atom["hold:heldBy"] && atom["hold:heldBy"]["@id"]) {
+        const personaUri = atom["hold:heldBy"]["@id"];
         dispatch({
           type: actionTypes.personas.storeTheirUrisInLoading,
           payload: Immutable.fromJS({ uris: [personaUri] }),
         });
         return won
-          .getNeed(personaUri)
-          .then(personaNeed => {
+          .getAtom(personaUri)
+          .then(personaAtom => {
             dispatch({
               type: actionTypes.personas.storeTheirs,
               payload: Immutable.fromJS({
-                needs: { [personaUri]: personaNeed },
+                atoms: { [personaUri]: personaAtom },
               }),
             });
-            return need;
+            return atom;
           })
-          .catch(() => {
+          .catch(err => {
+            const errResponse = err && err.response;
+            const isDeleted = !!(errResponse && errResponse.status == 410);
+
             dispatch({
-              type: actionTypes.personas.storeUriFailed,
+              type: isDeleted
+                ? actionTypes.personas.removeDeleted
+                : actionTypes.personas.storeUriFailed,
               payload: Immutable.fromJS({ uri: personaUri }),
             });
-            return need;
+            return atom;
           });
       } else {
-        return need;
+        return atom;
       }
     })
-    .then(need => {
+    .then(atom => {
       dispatch({
-        type: actionTypes.needs.storeTheirs,
-        payload: Immutable.fromJS({ needs: { [needUri]: need } }),
+        type: actionTypes.atoms.storeTheirs,
+        payload: Immutable.fromJS({ atoms: { [atomUri]: atom } }),
       });
-      return need;
+      return atom;
     })
-    .catch(() => {
+    .catch(err => {
+      const errResponse = err && err.response;
+      const isDeleted = !!(errResponse && errResponse.status == 410);
+
       dispatch({
-        type: actionTypes.needs.storeUriFailed,
-        payload: Immutable.fromJS({ uri: needUri }),
+        type: isDeleted
+          ? actionTypes.atoms.removeDeleted
+          : actionTypes.atoms.storeUriFailed,
+        payload: Immutable.fromJS({ uri: atomUri }),
       });
       return;
     });

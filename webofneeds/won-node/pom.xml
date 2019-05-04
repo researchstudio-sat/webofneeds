@@ -1,5 +1,7 @@
 <?xml version="1.0"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -19,15 +21,11 @@
     </properties>
 
     <dependencies>
-        <!--
-
-                 Warning! Only to be used in connection with the
-                 <dependencyManagement> section in the parent pom!
-
-        -->
+        <!-- Warning! Only to be used in connection with the <dependencyManagement> 
+            section in the parent pom! -->
         <dependency>
             <groupId>at.researchstudio.sat</groupId>
-            <artifactId>won-facets-tx</artifactId>
+            <artifactId>won-sockets-tx</artifactId>
             <version>${project.version}</version>
         </dependency>
 
@@ -47,6 +45,18 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-webmvc</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>at.researchstudio.sat</groupId>
+            <artifactId>won-cryptography</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>at.researchstudio.sat</groupId>
+            <artifactId>won-utils-tls</artifactId>
+            <version>${project.version}</version>
         </dependency>
 
         <!-- rdf -->
@@ -102,11 +112,6 @@
         </dependency>
 
         <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>jstl</artifactId>
-        </dependency>
-
-        <dependency>
             <groupId>cglib</groupId>
             <artifactId>cglib</artifactId>
             <scope>test</scope>
@@ -144,7 +149,6 @@
             <artifactId>javasimon-spring</artifactId>
         </dependency>
     </dependencies>
-
     <build>
         <resources>
             <resource>
@@ -156,42 +160,32 @@
                 <directory>src/test/resources</directory>
             </testResource>
         </testResources>
-        <!--plugins>
+        <plugins>
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>jaxws-maven-plugin</artifactId>
-                <version>1.9</version>
+                <groupId>net.revelc.code.formatter</groupId>
+                <artifactId>formatter-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>2.8</version>
                 <executions>
-                    <!- -execution>
-                        <id>generate-wsdl</id>
-                        <phase>process-classes</phase>
-                        <goals>
-                            <goal>wsgen</goal>
-                        </goals>
-                        <configuration>
-                            <sei>won.protocol.ws.NeedProtocolNeedWebServiceEndpoint</sei>
-                            <genWsdl>true</genWsdl>
-                            <verbose>true</verbose>
-                            <protocol>soap1.1</protocol>
-                        </configuration>
-                    </execution- ->
                     <execution>
-                        <id>generate-stubs</id>
-                        <phase>process-classes</phase>
+                        <id>copy-tomcat-dependencies</id>
+                        <!-- Some dependencies must be present in tomcat's 
+                            lib folder to avoid classloader issues -->
+                        <phase>prepare-package</phase>
                         <goals>
-                            <goal>wsimport</goal>
+                            <goal>copy-dependencies</goal>
                         </goals>
                         <configuration>
-                            <wsdlDirectory>target/jaxws/wsgen/wsdl</wsdlDirectory>
-                            <wsdlFiles>
-                                <wsdlFile>NeedProtocolNeedWebServiceEndpointService.wsdl</wsdlFile>
-                            </wsdlFiles>
-                            <! - - *** you need the next line to set the wsdlLocation in the generated stubs *** - ->
-                                <wsdlLocation>http://localhost:8080/won/needProtocol/?wsdl </wsdlLocation>
+                            <outputDirectory>${project.parent.basedir}/target/required-libs</outputDirectory>
+                            <includeGroupIds>at.researchstudio.sat</includeGroupIds>
+                            <includeArtifactIds>won-utils-tls</includeArtifactIds>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
-        </plugins-->
+        </plugins>
     </build>
 </project>

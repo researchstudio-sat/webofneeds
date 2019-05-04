@@ -8,7 +8,7 @@ import "ng-redux";
 import { labels } from "../won-label-utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { getPosts, getOwnedPosts } from "../selectors/general-selectors.js";
-import { getChatConnectionsByNeedUri } from "../selectors/connection-selectors.js";
+import { getChatConnectionsByAtomUri } from "../selectors/connection-selectors.js";
 
 import { attach, sortByDate, getIn } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
@@ -27,8 +27,8 @@ function genComponentConf() {
             ng-if="!self.postLoading"
             ng-click="self.latestConnectedUri && self.setOpen(self.latestConnectedUri)"
             ng-class="{
-              'indicators__item--reads': !self.hasUnreadConnected && self.latestConnectedUri,
-              'indicators__item--unreads': self.hasUnreadConnected && self.latestConnectedUri,
+              'indicators__item--reads': !self.unreadConnected && self.latestConnectedUri,
+              'indicators__item--unreads': self.unreadConnected && self.latestConnectedUri,
               'indicators__item--disabled': !self.latestConnectedUri,
             }">
                 <svg class="indicators__item__icon" title="Show latest message/request">
@@ -51,31 +51,31 @@ function genComponentConf() {
       const selectFromState = state => {
         const ownedPosts = getOwnedPosts(state);
         const allPosts = getPosts(state);
-        const ownedPost = ownedPosts && ownedPosts.get(this.needUri);
-        const chatConnectionsByNeedUri =
-          this.needUri && getChatConnectionsByNeedUri(state, this.needUri);
+        const ownedPost = ownedPosts && ownedPosts.get(this.atomUri);
+        const chatConnectionsByAtomUri =
+          this.atomUri && getChatConnectionsByAtomUri(state, this.atomUri);
 
         const connected =
-          chatConnectionsByNeedUri &&
-          chatConnectionsByNeedUri.filter(conn => {
-            const remoteNeedUri = conn.get("remoteNeedUri");
-            const remoteNeedActiveOrLoading =
-              remoteNeedUri &&
+          chatConnectionsByAtomUri &&
+          chatConnectionsByAtomUri.filter(conn => {
+            const targetAtomUri = conn.get("targetAtomUri");
+            const targetAtomActiveOrLoading =
+              targetAtomUri &&
               allPosts &&
-              allPosts.get(remoteNeedUri) &&
-              (getIn(state, ["process", "needs", remoteNeedUri, "loading"]) ||
-                allPosts.getIn([remoteNeedUri, "state"]) ===
+              allPosts.get(targetAtomUri) &&
+              (getIn(state, ["process", "atoms", targetAtomUri, "loading"]) ||
+                allPosts.getIn([targetAtomUri, "state"]) ===
                   won.WON.ActiveCompacted);
 
             return (
-              remoteNeedActiveOrLoading &&
+              targetAtomActiveOrLoading &&
               (isChatConnection(conn) || isGroupChatConnection(conn)) &&
               conn.get("state") !== won.WON.Suggested &&
               conn.get("state") !== won.WON.Closed
             );
           });
 
-        const hasUnreadConnected =
+        const unreadConnected =
           connected && !!connected.find(conn => conn.get("unread"));
 
         return {
@@ -83,13 +83,13 @@ function genComponentConf() {
           ownedPost,
           postLoading:
             !ownedPost ||
-            getIn(state, ["process", "needs", ownedPost.get("uri"), "loading"]),
-          hasUnreadConnected,
+            getIn(state, ["process", "atoms", ownedPost.get("uri"), "loading"]),
+          unreadConnected,
           latestConnectedUri: this.retrieveLatestUri(connected),
         };
       };
 
-      connect2Redux(selectFromState, actionCreators, ["self.needUri"], this);
+      connect2Redux(selectFromState, actionCreators, ["self.atomUri"], this);
 
       classOnComponentRoot("won-is-loading", () => this.postLoading, this);
     }
@@ -130,7 +130,7 @@ function genComponentConf() {
     controllerAs: "self",
     bindToController: true, //scope-bindings -> ctrl
     scope: {
-      needUri: "=",
+      atomUri: "=",
       onSelectedConnection: "&",
     },
     template: template,

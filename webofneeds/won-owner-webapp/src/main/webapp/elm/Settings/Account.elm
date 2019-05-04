@@ -1,7 +1,8 @@
-module Settings.Account exposing
+port module Settings.Account exposing
     ( Model
     , Msg
     , init
+    , subscriptions
     , update
     , view
     )
@@ -12,23 +13,34 @@ import Element.Font as Font
 import Element.Input as Input
 import Elements
 import Http
+import Json.Encode as Encode
 import Old.Skin as Skin exposing (Skin)
 
 
 type alias Model =
-    { exportState : ExportState
+    { accountState : AccountState
+    , accountInfo : AccountInfo
+    , passwordList : PasswordList
     }
 
 
-type alias HasFailed =
-    Bool
+type alias PasswordList =
+    { newPassword : String
+    , newPasswordRepeat : String
+    , oldPassword : String
+    }
 
 
-type ExportState
-    = EnteringPassword String
-    | StartingExport
-    | ExportStarted
-    | ExportFailed
+type alias AccountInfo =
+    { email : String
+    }
+
+
+type AccountState
+    = EnteringPassword PasswordList
+    | ChangeInProgress
+    | ChangeFailed
+    | ChangeCompleted
 
 
 
@@ -37,7 +49,12 @@ type ExportState
 
 init : () -> ( Model, Cmd Msg )
 init () =
-    ( { exportState = EnteringPassword "" }, Cmd.none )
+    ( { accountInfo = { email = "" }
+      , accountState = EnteringPassword { newPassword = "", newPasswordRepeat = "", oldPassword = "" }
+      , passwordList = { newPassword = "", newPasswordRepeat = "", oldPassword = "" }
+      }
+    , getAccountInfo ()
+    )
 
 
 
@@ -45,69 +62,140 @@ init () =
 
 
 type Msg
-    = ExportPasswordChanged String
-    | ExportButtonPressed
-    | ExportRequestReturned (Result Http.Error ())
+    = OldPasswordChanged String
+    | NewPasswordChanged String
+    | NewPasswordRepeatChanged String
+    | AccountInfoChanged AccountInfo
+    | ChangeButtonPressed
+    | ChangeRequestReturned (Result Http.Error ())
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        ExportPasswordChanged pwd ->
-            updateExportPassword pwd model
+        NewPasswordChanged newPwd ->
+            updateNewPassword newPwd model
 
-        ExportButtonPressed ->
-            startExport model
+        NewPasswordRepeatChanged newPwdR ->
+            updateNewPasswordRepeat newPwdR model
 
-        ExportRequestReturned result ->
+        OldPasswordChanged oldPwd ->
+            updateOldPassword oldPwd model
+
+        ChangeButtonPressed ->
+            changePassword model
+
+        ChangeRequestReturned result ->
             case result of
                 Ok () ->
                     ( { model
-                        | exportState = ExportStarted
+                        | accountState = ChangeCompleted
                       }
                     , Cmd.none
                     )
 
                 Err _ ->
                     ( { model
-                        | exportState = ExportFailed
+                        | accountState = ChangeFailed
                       }
                     , Cmd.none
                     )
 
-
-startExport : Model -> ( Model, Cmd Msg )
-startExport model =
-    case model.exportState of
-        EnteringPassword password ->
+        AccountInfoChanged newAccountInfo ->
             ( { model
-                | exportState = StartingExport
+                | accountInfo = newAccountInfo
               }
-            , exportRequest password
+            , Cmd.none
+            )
+
+
+changePassword : Model -> ( Model, Cmd Msg )
+changePassword model =
+    case model.accountState of
+        EnteringPassword { newPassword, newPasswordRepeat, oldPassword } ->
+            ( { model
+                | accountState = ChangeInProgress
+              }
+            , changeRequest ( { newPassword = newPassword, newPasswordRepeat = newPasswordRepeat, oldPassword = oldPassword }, model )
             )
 
         _ ->
             ( model, Cmd.none )
 
 
-exportRequest : String -> Cmd Msg
-exportRequest password =
+changeRequest : ( PasswordList, Model ) -> Cmd Msg
+changeRequest ( { newPassword, oldPassword }, model ) =
     Http.post
-        { url = "./rest/users/exportAccount"
+        { url = "./rest/users/changePassword"
         , body =
-            Http.multipartBody
-                [ Http.stringPart "password" password
-                ]
-        , expect = Http.expectWhatever ExportRequestReturned
+            Http.jsonBody <|
+                Encode.object
+                    [ ( "username", Encode.string model.accountInfo.email )
+                    , ( "oldPassword", Encode.string oldPassword )
+                    , ( "newPassword", Encode.string newPassword )
+                    ]
+        , expect = Http.expectWhatever ChangeRequestReturned
         }
 
 
-updateExportPassword : String -> Model -> ( Model, Cmd Msg )
-updateExportPassword password model =
-    ( case model.exportState of
+updateNewPassword : String -> Model -> ( Model, Cmd Msg )
+updateNewPassword newEnteredPassword model =
+    ( case model.accountState of
         EnteringPassword _ ->
+            let
+                newPasswordList =
+                    { newPassword = newEnteredPassword
+                    , newPasswordRepeat = model.passwordList.newPasswordRepeat
+                    , oldPassword = model.passwordList.oldPassword
+                    }
+            in
             { model
-                | exportState = EnteringPassword password
+                | accountState = EnteringPassword newPasswordList
+                , passwordList = newPasswordList
+            }
+
+        _ ->
+            model
+    , Cmd.none
+    )
+
+
+updateNewPasswordRepeat : String -> Model -> ( Model, Cmd Msg )
+updateNewPasswordRepeat newEnteredrepeatPassword model =
+    ( case model.accountState of
+        EnteringPassword _ ->
+            let
+                newPasswordList =
+                    { newPassword = model.passwordList.newPassword
+                    , newPasswordRepeat = newEnteredrepeatPassword
+                    , oldPassword = model.passwordList.oldPassword
+                    }
+            in
+            { model
+                | accountState = EnteringPassword newPasswordList
+                , passwordList = newPasswordList
+            }
+
+        _ ->
+            model
+    , Cmd.none
+    )
+
+
+updateOldPassword : String -> Model -> ( Model, Cmd Msg )
+updateOldPassword oldEnteredPassword model =
+    ( case model.accountState of
+        EnteringPassword _ ->
+            let
+                newPasswordList =
+                    { newPassword = model.passwordList.newPassword
+                    , newPasswordRepeat = model.passwordList.newPasswordRepeat
+                    , oldPassword = oldEnteredPassword
+                    }
+            in
+            { model
+                | accountState = EnteringPassword newPasswordList
+                , passwordList = newPasswordList
             }
 
         _ ->
@@ -120,81 +208,188 @@ updateExportPassword password model =
 ---- VIEW ----
 
 
-view : Skin -> Model -> Element Msg
-view skin model =
-    case model.exportState of
-        EnteringPassword password ->
+changeView : Skin -> Model -> Element Msg
+changeView skin model =
+    case model.accountState of
+        EnteringPassword { oldPassword, newPassword, newPasswordRepeat } ->
             column
                 [ width fill
                 , spacing 20
                 , Font.size 16
                 ]
-                [ el [ Font.size 24 ] <| text "Account data export"
-                , textColumn
+                [ textColumn
                     [ width fill
                     , spacing 10
                     ]
                     [ paragraph [ width fill ]
-                        [ text "All your account data will be sent to your email address"
-                        ]
-                    , paragraph [ width fill ]
-                        [ text "Your private keys will be encrypted."
+                        [ text "Change your password here."
                         ]
                     ]
                 , row
                     [ spacing 10
                     ]
-                    [ Input.newPassword [ width fill ]
-                        { onChange = ExportPasswordChanged
-                        , text = password
+                    [ Input.newPassword
+                        [ width fill
+                        , paddingEach
+                            { left = 0
+                            , top = 0
+                            , bottom = 0
+                            , right = 0
+                            }
+                        ]
+                        { onChange = OldPasswordChanged
+                        , text = oldPassword
                         , placeholder = Nothing
                         , label =
                             Input.labelLeft
                                 [ centerY
+                                , Font.size 14
                                 , paddingEach
                                     { left = 0
                                     , top = 0
                                     , bottom = 0
-                                    , right = 10
+                                    , right = 39
                                     }
                                 ]
-                                (text "Data encryption password:")
+                                (text "Current:")
                         , show = False
                         }
-                    , Elements.mainButton skin
-                        [ height fill ]
+                    ]
+                , row
+                    [ spacing 10
+                    ]
+                    [ Input.newPassword
+                        [ width fill
+                        , paddingEach
+                            { left = 0
+                            , top = 0
+                            , bottom = 0
+                            , right = 0
+                            }
+                        ]
+                        { onChange = NewPasswordChanged
+                        , text = newPassword
+                        , placeholder = Nothing
+                        , label =
+                            Input.labelLeft
+                                [ centerY
+                                , Font.size 14
+                                , paddingEach
+                                    { left = 0
+                                    , top = 0
+                                    , bottom = 0
+                                    , right = 60
+                                    }
+                                ]
+                                (text "New:")
+                        , show = False
+                        }
+                    ]
+                , if String.length newPassword > 0 && String.length newPassword < 6 then
+                    row [ spacing 10 ]
+                        [ el
+                            [ width fill
+                            , Font.color skin.primaryColor
+                            , Font.size 10
+                            ]
+                          <|
+                            text "Password too short, must be at least 6 Characters"
+                        ]
+
+                  else
+                    none
+                , row
+                    [ spacing 10
+                    ]
+                    [ Input.newPassword [ width fill ]
+                        { onChange = NewPasswordRepeatChanged
+                        , text = newPasswordRepeat
+                        , placeholder = Nothing
+                        , label =
+                            Input.labelLeft
+                                [ centerY
+                                , Font.size 14
+                                , paddingEach
+                                    { left = 0
+                                    , top = 0
+                                    , bottom = 0
+                                    , right = 9
+                                    }
+                                ]
+                                (text "Re-type new:")
+                        , show = False
+                        }
+                    ]
+                , if String.length newPasswordRepeat > 0 && newPassword /= newPasswordRepeat then
+                    row [ spacing 10 ]
+                        [ el
+                            [ width fill
+                            , Font.color skin.primaryColor
+                            , Font.size 10
+                            ]
+                          <|
+                            text "Password is not equal"
+                        ]
+
+                  else
+                    none
+                , row
+                    [ width fill
+                    , spacing 20
+                    ]
+                    [ Elements.mainButton
+                        skin
+                        [ width <| maximum 320 fill
+                        ]
                         { onPress =
-                            if String.isEmpty password then
+                            if String.isEmpty oldPassword then
+                                Nothing
+
+                            else if String.isEmpty newPassword then
+                                Nothing
+
+                            else if String.length newPassword < 6 then
+                                Nothing
+
+                            else if String.isEmpty newPasswordRepeat then
+                                Nothing
+
+                            else if newPassword /= newPasswordRepeat then
                                 Nothing
 
                             else
-                                Just ExportButtonPressed
-                        , label = text "Export"
+                                Just ChangeButtonPressed
+                        , label =
+                            el
+                                [ centerX
+                                ]
+                            <|
+                                text "Save Changes"
                         }
                     ]
                 ]
 
-        StartingExport ->
+        ChangeInProgress ->
             el
                 [ width fill
-                , Background.color skin.primaryColor
+                , Background.color skin.lineGray
                 , Font.color Skin.white
                 , padding 20
                 ]
             <|
-                text "Starting Export..."
+                text "Changing Password"
 
-        ExportStarted ->
+        ChangeCompleted ->
             el
                 [ width fill
-                , Background.color skin.primaryColor
+                , Background.color skin.lineGray
                 , Font.color Skin.white
                 , padding 20
                 ]
             <|
-                text "Export Started. You will get an e-mail soon"
+                text "Password changed"
 
-        ExportFailed ->
+        ChangeFailed ->
             el
                 [ width fill
                 , Background.color skin.primaryColor
@@ -202,4 +397,34 @@ view skin model =
                 , padding 20
                 ]
             <|
-                text "Export failed. Please try again later"
+                text "Change failed"
+
+
+view : Skin -> Model -> Element Msg
+view skin model =
+    column
+        [ width fill
+        , spacing 20
+        , Font.size 16
+        ]
+        [ el [ Font.size 24 ] <| text "Account Settings"
+        , paragraph [ width fill ]
+            [ text "Here you can change your account data."
+            ]
+        , changeView skin model
+        ]
+
+
+
+---- SUBSCRIPTIONS ----
+
+
+port getAccountInfo : () -> Cmd msg
+
+
+port accountInfoIn : (AccountInfo -> msg) -> Sub msg
+
+
+subscriptions : Sub Msg
+subscriptions =
+    accountInfoIn AccountInfoChanged

@@ -11,7 +11,7 @@ services:
     volumes:
       - $base_folder/won-server-certs:/usr/local/certs/out/
 
-  # portsgres need databases for owner and wonnode
+  # portsgres atom databases for owner and wonnode
   postgres:
     restart: always
     #build: ../../image/postgres
@@ -61,7 +61,7 @@ services:
     volumes:
       - $base_folder/mongodb/data/db:/data/db
 
-  # debug bot used to test need communication
+  # debug bot used to test atom communication
   debug_bot:
     restart: always
     #build: ../../image/bots
@@ -131,7 +131,7 @@ services:
       - bigdata
       - wonnode
 
-  # solr server as a need index
+  # solr server as an atom index
   solr:
     restart: always
     image: webofneeds/solr:live

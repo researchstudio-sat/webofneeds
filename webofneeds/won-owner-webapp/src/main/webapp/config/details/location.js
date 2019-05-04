@@ -26,7 +26,7 @@ export const location = {
   parseFromRDF: function(jsonLDImm) {
     const jsonldLocation =
       jsonLDImm &&
-      (jsonLDImm.get("s:location") || jsonLDImm.get("won:hasLocation"));
+      (jsonLDImm.get("s:location") || jsonLDImm.get("won:location"));
     return parseSPlace(jsonldLocation);
   },
   generateHumanReadable: function({ value, includeLabel }) {
@@ -239,7 +239,7 @@ function genSPlace({ geoData, baseUri }) {
     "@type": "s:Place",
     "s:name": geoData.name,
     "s:geo": genGeo({ lat: geoData.lat, lng: geoData.lng, baseUri }),
-    "won:hasBoundingBox": genBoundingBox({
+    "won:boundingBox": genBoundingBox({
       nwCorner: geoData.nwCorner,
       seCorner: geoData.seCorner,
       baseUri,
@@ -268,13 +268,13 @@ function genBoundingBox({ nwCorner, seCorner, baseUri }) {
     ? undefined
     : {
         "@id": baseUri ? baseUri + "/bounds" : undefined,
-        "won:hasNorthWestCorner": {
+        "won:northWestCorner": {
           "@id": baseUri ? baseUri + "/bounds/nw" : undefined,
           "@type": "s:GeoCoordinates",
           "s:latitude": nwCorner.lat.toFixed(6),
           "s:longitude": nwCorner.lng.toFixed(6),
         },
-        "won:hasSouthEastCorner": {
+        "won:southEastCorner": {
           "@id": baseUri ? baseUri + "/bounds/se" : undefined,
           "@type": "s:GeoCoordinates",
           "s:latitude": seCorner.lat.toFixed(6),
@@ -330,23 +330,23 @@ function parsePlaceLeniently(jsonldLocation) {
   };
 
   const nwCornerLat = parseFloatFromLocation([
-    "won:hasBoundingBox",
-    "won:hasNorthWestCorner",
+    "won:boundingBox",
+    "won:northWestCorner",
     "s:latitude",
   ]);
   const nwCornerLng = parseFloatFromLocation([
-    "won:hasBoundingBox",
-    "won:hasNorthWestCorner",
+    "won:boundingBox",
+    "won:northWestCorner",
     "s:longitude",
   ]);
   const seCornerLat = parseFloatFromLocation([
-    "won:hasBoundingBox",
-    "won:hasSouthEastCorner",
+    "won:boundingBox",
+    "won:southEastCorner",
     "s:latitude",
   ]);
   const seCornerLng = parseFloatFromLocation([
-    "won:hasBoundingBox",
-    "won:hasSouthEastCorner",
+    "won:boundingBox",
+    "won:southEastCorner",
     "s:longitude",
   ]);
 

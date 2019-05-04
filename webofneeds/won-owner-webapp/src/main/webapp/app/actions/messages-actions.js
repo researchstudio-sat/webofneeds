@@ -8,18 +8,20 @@ import { get, getIn } from "../utils.js";
 
 import Immutable from "immutable";
 import { getOwnMessageUri } from "../message-utils.js";
+import * as generalSelectors from "../selectors/general-selectors.js";
 
 import {
-  fetchDataForOwnedNeeds,
+  fetchDataForOwnedAtoms,
+  fetchDataForNonOwnedAtomOnly,
   fetchMessageEffects,
   fetchPetriNetUris,
   isFetchMessageEffectsNeeded,
   buildChatMessage,
-  fetchTheirNeedAndDispatch,
+  fetchTheirAtomAndDispatch,
   fetchActiveConnectionAndDispatch,
 } from "../won-message-utils.js";
 
-export function successfulCloseNeed(event) {
+export function successfulCloseAtom(event) {
   return (dispatch, getState) => {
     //TODO maybe refactor these response message handling
     if (
@@ -33,9 +35,9 @@ export function successfulCloseNeed(event) {
     }
   };
 }
-export function failedCloseNeed(event) {
+export function failedCloseAtom(event) {
   return dispatch => {
-    const needUri = event.getReceiverNeed();
+    const atomUri = event.getRecipientAtom();
     /*
         * TODO not sure if it's necessary to invalidate
         * the cache here as the previous action will just have
@@ -44,23 +46,23 @@ export function failedCloseNeed(event) {
         * with the server.
         */
     won
-      .invalidateCacheForNeed(needUri) // mark need and it's connection container dirty
-      .then(() => won.getConnectionUrisOfNeed(needUri))
-      .then(connectionUris =>
+      .invalidateCacheForAtom(atomUri) // mark atom and it's connection container dirty
+      .then(() => won.getConnectionUrisWithStateByAtomUri(atomUri))
+      .then(connectionsWithStateAndSocket =>
         Promise.all(
-          connectionUris.map(
-            cnctUri => won.invalidateCacheForNewMessage(cnctUri, needUri) // mark connections dirty
+          connectionsWithStateAndSocket.map(
+            conn => won.invalidateCacheForNewMessage(conn.connectionUri) // mark connections dirty
           )
         )
       )
       .then(() =>
-        // as the need and it's connections have been marked dirty
+        // as the atom and it's connections have been marked dirty
         // they will be reloaded on this action.
-        fetchDataForOwnedNeeds([needUri], dispatch)
+        fetchDataForOwnedAtoms([atomUri], dispatch)
       )
       .then(allThatData =>
         dispatch({
-          type: actionTypes.messages.closeNeed.failed,
+          type: actionTypes.messages.closeAtom.failed,
           payload: allThatData,
         })
       );
@@ -68,24 +70,24 @@ export function failedCloseNeed(event) {
 }
 
 /*
-         hasReceiverNeed: "https://192.168.124.53:8443/won/resource/need/1741189480636743700"
-         hasSenderNeed: "https://192.168.124.53:8443/won/resource/need/1741189480636743700"
+         recipientAtom: "https://192.168.124.53:8443/won/resource/atom/1741189480636743700"
+         senderAtom: "https://192.168.124.53:8443/won/resource/atom/1741189480636743700"
          has....Connection
          event.uri
 
 
-         won.WONMSG.hasReceiverNeed = won.WONMSG.baseUri + "hasReceiverNeed";
-         won.WONMSG.hasReceiverNeedCompacted = won.WONMSG.prefix + ":hasReceiverNeed";
-         won.WONMSG.hasReceiver = won.WONMSG.baseUri + "hasReceiver"; // connection if connection event
-         won.WONMSG.hasReceiverCompacted = won.WONMSG.prefix + ":hasReceiver";
-         won.WONMSG.hasReceiverNode = won.WONMSG.baseUri + "hasReceiverNode";
-         won.WONMSG.hasReceiverNodeCompacted = won.WONMSG.prefix + ":hasReceiverNode";
-         won.WONMSG.hasSenderNeed = won.WONMSG.baseUri + "hasSenderNeed";
-         won.WONMSG.hasSenderNeedCompacted = won.WONMSG.prefix + ":hasSenderNeed";
-         won.WONMSG.hasSender = won.WONMSG.baseUri + "hasSender";
-         won.WONMSG.hasSenderCompacted = won.WONMSG.prefix + ":hasSender";
-         won.WONMSG.hasSenderNode = won.WONMSG.baseUri + "hasSenderNode";
-         won.WONMSG.hasSenderNodeCompacted = won.WONMSG.prefix + ":hasSenderNode";
+         won.WONMSG.recipientAtom = won.WONMSG.baseUri + "recipientAtom";
+         won.WONMSG.recipientAtomCompacted = won.WONMSG.prefix + ":recipientAtom";
+         won.WONMSG.recipient = won.WONMSG.baseUri + "recipient"; // connection if connection event
+         won.WONMSG.recipientCompacted = won.WONMSG.prefix + ":recipient";
+         won.WONMSG.recipientNode = won.WONMSG.baseUri + "recipientNode";
+         won.WONMSG.recipientNodeCompacted = won.WONMSG.prefix + ":recipientNode";
+         won.WONMSG.senderAtom = won.WONMSG.baseUri + "senderAtom";
+         won.WONMSG.senderAtomCompacted = won.WONMSG.prefix + ":senderAtom";
+         won.WONMSG.sender = won.WONMSG.baseUri + "sender";
+         won.WONMSG.senderCompacted = won.WONMSG.prefix + ":sender";
+         won.WONMSG.senderNode = won.WONMSG.baseUri + "senderNode";
+         won.WONMSG.senderNodeCompacted = won.WONMSG.prefix + ":senderNode";
          */
 
 export function successfulCloseConnection(event) {
@@ -111,7 +113,7 @@ export function successfulCloseConnection(event) {
         payload: event,
       });
     } else {
-      //when a connection is closed by the node (e.g. when you close/deactivate a need all its corresponding connections will be closed)
+      //when a connection is closed by the node (e.g. when you close/deactivate an atom all its corresponding connections will be closed)
       dispatch({
         type: actionTypes.messages.close.success,
         payload: event,
@@ -123,61 +125,87 @@ export function successfulCloseConnection(event) {
 export function successfulCreate(event) {
   return dispatch => {
     //const state = getState();
-    //TODO: if negative, use alternative need URI and send again
-    //fetch need data and store in local RDF store
-    //get URI of newly created need from message
+    //TODO: if negative, use alternative atom URI and send again
+    //fetch atom data and store in local RDF store
+    //get URI of newly created atom from message
 
-    //load the data into the local rdf store and publish NeedCreatedEvent when done
-    const needURI = event.getReceiverNeed();
+    //load the data into the local rdf store and publish AtomCreatedEvent when done
+    const atomURI = event.getRecipientAtom();
 
-    won.getNeed(needURI).then(need => {
+    won.getAtom(atomURI).then(atom => {
       dispatch(
-        actionCreators.needs__createSuccessful({
-          publishEventUri: event.getIsResponseTo(),
-          needUri: event.getSenderNeed(),
-          need: need,
+        actionCreators.atoms__createSuccessful({
+          eventUri: event.getIsResponseTo(),
+          atomUri: event.getSenderAtom(),
+          atom: atom,
         })
       );
     });
   };
 }
 
+export function successfulEdit(event) {
+  return dispatch => {
+    console.debug("Received success replace message:", event);
+    //const state = getState();
+    //load the edited data into the local rdf store and publish AtomEditEvent when done
+    const atomURI = event.getRecipientAtom();
+
+    won
+      //.invalidateCacheForAtom(atomURI)
+      .clearStoreWithPromise()
+      .then(() => fetchDataForOwnedAtoms([atomURI], dispatch))
+      .then(() => {
+        dispatch(
+          actionCreators.atoms__editSuccessful({
+            eventUri: event.getIsResponseTo(),
+            atomUri: event.getSenderAtom(),
+            //atom: atom,
+          })
+        );
+      });
+  };
+}
+
 export function processOpenMessage(event) {
   return (dispatch, getState) => {
-    const receiverNeedUri = event.getReceiverNeed();
+    const recipientAtomUri = event.getRecipientAtom();
     const receiverConnectionUri = event.getReceiver();
 
-    const senderNeedUri = event.getSenderNeed();
+    const senderAtomUri = event.getSenderAtom();
     const senderConnectionUri = event.getSender();
 
-    const currentState = getState();
-    const senderNeed = getIn(currentState, ["needs", senderNeedUri]);
-    const receiverNeed = getIn(currentState, ["needs", receiverNeedUri]);
+    const state = getState();
+    const senderAtom = getIn(state, ["atoms", senderAtomUri]);
+    const recipientAtom = getIn(state, ["atoms", recipientAtomUri]);
 
-    const isOwnSenderNeed = get(senderNeed, "isOwned");
-    const isOwnReceiverNeed = get(receiverNeed, "isOwned");
+    const isOwnSenderAtom = generalSelectors.isAtomOwned(state, senderAtomUri);
+    const isOwnRecipientAtom = generalSelectors.isAtomOwned(
+      state,
+      recipientAtomUri
+    );
 
-    //check if the two connections are relevant to be stored within the state (if connUri is present, and if Need belongs to self)
-    const isSenderConnectionRelevant = senderConnectionUri && isOwnSenderNeed;
+    //check if the two connections are relevant to be stored within the state (if connUri is present, and if Atom belongs to self)
+    const isSenderConnectionRelevant = senderConnectionUri && isOwnSenderAtom;
     const isReceiverConnectionRelevant =
-      receiverConnectionUri && isOwnReceiverNeed;
+      receiverConnectionUri && isOwnRecipientAtom;
 
-    let senderNeedP;
-    if (isOwnSenderNeed) {
-      //We know that all own needs are already stored within the state, so we do not have to retrieve it
-      senderNeedP = Promise.resolve(won.invalidateCacheForNeed(senderNeedUri));
+    let senderAtomP;
+    if (isOwnSenderAtom) {
+      //We know that all own atoms are already stored within the state, so we do not have to retrieve it
+      senderAtomP = Promise.resolve(won.invalidateCacheForAtom(senderAtomUri));
     } else {
-      senderNeedP = fetchTheirNeedAndDispatch(senderNeedUri, dispatch);
+      senderAtomP = fetchTheirAtomAndDispatch(senderAtomUri, dispatch);
     }
 
-    let receiverNeedP;
-    if (isOwnReceiverNeed) {
-      //We know that all own needs are already stored within the state, so we do not have to retrieve it
-      receiverNeedP = Promise.resolve(
-        won.invalidateCacheForNeed(receiverNeedUri)
+    let recipientAtomP;
+    if (isOwnRecipientAtom) {
+      //We know that all own atoms are already stored within the state, so we do not have to retrieve it
+      recipientAtomP = Promise.resolve(
+        won.invalidateCacheForAtom(recipientAtomUri)
       );
     } else {
-      receiverNeedP = fetchTheirNeedAndDispatch(receiverNeedUri, dispatch);
+      recipientAtomP = fetchTheirAtomAndDispatch(recipientAtomUri, dispatch);
     }
 
     let senderConnectionP;
@@ -186,14 +214,14 @@ export function processOpenMessage(event) {
         "senderConnection not relevant, resolve promise with undefined -> ignore the connection"
       );
       senderConnectionP = Promise.resolve(false);
-    } else if (getIn(senderNeed, ["connections", senderConnectionUri])) {
+    } else if (getIn(senderAtom, ["connections", senderConnectionUri])) {
       senderConnectionP = won
-        .invalidateCacheForNewConnection(senderConnectionUri, senderNeedUri)
+        .invalidateCacheForNewConnection(senderConnectionUri, senderAtomUri)
         .then(() => true);
     } else {
       senderConnectionP = fetchActiveConnectionAndDispatch(
         senderConnectionUri,
-        senderNeedUri,
+        senderAtomUri,
         dispatch
       ).then(() => true);
     }
@@ -204,14 +232,17 @@ export function processOpenMessage(event) {
         "receiverConnection not relevant, resolve promise with undefined -> ignore the connection"
       );
       receiverConnectionP = Promise.resolve(true);
-    } else if (getIn(receiverNeed, ["connections", receiverConnectionUri])) {
+    } else if (getIn(recipientAtom, ["connections", receiverConnectionUri])) {
       receiverConnectionP = won
-        .invalidateCacheForNewConnection(receiverConnectionUri, receiverNeedUri)
+        .invalidateCacheForNewConnection(
+          receiverConnectionUri,
+          recipientAtomUri
+        )
         .then(() => true);
     } else {
       receiverConnectionP = fetchActiveConnectionAndDispatch(
         receiverConnectionUri,
-        receiverNeedUri,
+        recipientAtomUri,
         dispatch
       ).then(() => true);
     }
@@ -219,34 +250,34 @@ export function processOpenMessage(event) {
     Promise.all([
       senderConnectionP,
       receiverConnectionP,
-      senderNeedP,
-      receiverNeedP,
+      senderAtomP,
+      recipientAtomP,
     ]).then(
       ([
         senderConnectionRelevant,
         receiverConnectionRelevant,
-        senderNeed,
-        receiverNeed,
+        senderAtom,
+        recipientAtom,
       ]) => {
         if (receiverConnectionRelevant) {
-          console.debug("Change ReceiverConnectionState ", receiverNeed);
+          console.debug("Change ReceiverConnectionState ", recipientAtom);
           dispatch({
             type: actionTypes.messages.openMessageReceived,
             payload: {
               updatedConnectionUri: receiverConnectionUri,
-              ownedNeedUri: receiverNeedUri,
+              ownedAtomUri: recipientAtomUri,
               message: event,
             },
           });
         }
 
         if (senderConnectionRelevant) {
-          console.debug("Change SenderConnectionState ", senderNeed);
+          console.debug("Change SenderConnectionState ", senderAtom);
           dispatch({
             type: actionTypes.messages.openMessageSent,
             payload: {
               senderConnectionUri: senderConnectionUri,
-              senderNeedUri: senderNeedUri,
+              senderAtomUri: senderAtomUri,
               event: event,
             },
           });
@@ -265,26 +296,49 @@ export function processAgreementMessage(event) {
   };
 }
 
+export function processChangeNotificationMessage(event) {
+  return (dispatch, getState) => {
+    console.debug("processChangeNotificationMessage for: ", event);
+    const atomUriToLoad = event.getSenderAtom();
+
+    won
+      //.invalidateCacheForAtom(atomURI)
+      .clearStoreWithPromise()
+      .then(() => {
+        if (generalSelectors.isAtomOwned(getState(), atomUriToLoad)) {
+          fetchDataForOwnedAtoms([atomUriToLoad], dispatch);
+        } else {
+          fetchDataForNonOwnedAtomOnly(atomUriToLoad, dispatch);
+        }
+      });
+
+    dispatch({
+      type: actionTypes.messages.processChangeNotificationMessage,
+      payload: event,
+    });
+  };
+}
+
 export function processConnectionMessage(event) {
   return (dispatch, getState) => {
     if (isFetchMessageEffectsNeeded(event)) {
-      const _needUri = event.getSenderNeed();
-      const isSentEvent = getState().getIn(["needs", _needUri, "isOwned"]);
+      const _atomUri = event.getSenderAtom();
+      const isSentEvent = generalSelectors.isAtomOwned(getState(), _atomUri);
 
       let connectionUri;
-      let needUri;
+      let atomUri;
 
       if (isSentEvent) {
         connectionUri = event.getSender();
-        needUri = event.getSenderNeed();
+        atomUri = event.getSenderAtom();
       } else {
         connectionUri = event.getReceiver();
-        needUri = event.getReceiverNeed();
+        atomUri = event.getRecipientAtom();
       }
 
       const messages = getState().getIn([
-        "needs",
-        needUri,
+        "atoms",
+        atomUri,
         "connections",
         connectionUri,
         "messages",
@@ -352,7 +406,7 @@ export function processConnectionMessage(event) {
                       payload: {
                         messageUri: messageUri,
                         connectionUri: connectionUri,
-                        needUri: needUri,
+                        atomUri: atomUri,
                         accepted: true,
                       },
                     });
@@ -375,7 +429,7 @@ export function processConnectionMessage(event) {
                       payload: {
                         messageUri: messageUri,
                         connectionUri: connectionUri,
-                        needUri: needUri,
+                        atomUri: atomUri,
                         claimed: true,
                       },
                     });
@@ -399,7 +453,7 @@ export function processConnectionMessage(event) {
                       payload: {
                         messageUri: messageUri,
                         connectionUri: connectionUri,
-                        needUri: needUri,
+                        atomUri: atomUri,
                         proposed: true,
                       },
                     });
@@ -425,7 +479,7 @@ export function processConnectionMessage(event) {
                       payload: {
                         messageUri: messageUri,
                         connectionUri: connectionUri,
-                        needUri: needUri,
+                        atomUri: atomUri,
                         cancellationPending: true,
                       },
                     });
@@ -451,7 +505,7 @@ export function processConnectionMessage(event) {
                       payload: {
                         messageUri: messageUri,
                         connectionUri: connectionUri,
-                        needUri: needUri,
+                        atomUri: atomUri,
                         rejected: true,
                       },
                     });
@@ -477,7 +531,7 @@ export function processConnectionMessage(event) {
                       payload: {
                         messageUri: messageUri,
                         connectionUri: connectionUri,
-                        needUri: needUri,
+                        atomUri: atomUri,
                         retracted: true,
                       },
                     });
@@ -508,106 +562,112 @@ export function processConnectionMessage(event) {
 export function processConnectMessage(event) {
   return (dispatch, getState) => {
     const receiverConnectionUri = event.getReceiver();
-    const receiverNeedUri = event.getReceiverNeed();
+    const recipientAtomUri = event.getRecipientAtom();
 
-    const senderNeedUri = event.getSenderNeed();
+    const senderAtomUri = event.getSenderAtom();
     const senderConnectionUri = event.getSender();
 
-    const currentState = getState();
-    const senderNeed = currentState.getIn(["needs", senderNeedUri]);
-    const receiverNeed = currentState.getIn(["needs", receiverNeedUri]);
-    const isOwnSenderNeed = senderNeed && senderNeed.get("isOwned");
-    const isOwnReceiverNeed = receiverNeed && receiverNeed.get("isOwned");
+    const state = getState();
+    const senderAtom = getIn(state, ["atoms", senderAtomUri]);
+    const recipientAtom = getIn(state, ["atoms", recipientAtomUri]);
+    const isOwnSenderAtom = generalSelectors.isAtomOwned(state, senderAtomUri);
+    const isOwnRecipientAtom = generalSelectors.isAtomOwned(
+      state,
+      recipientAtomUri
+    );
 
-    let senderNeedP;
-    if (isOwnSenderNeed) {
-      //We know that all own needs are already stored within the state, so we do not have to retrieve it
-      senderNeedP = Promise.resolve(won.invalidateCacheForNeed(senderNeedUri));
+    let senderAtomP;
+    if (isOwnSenderAtom) {
+      //We know that all own atoms are already stored within the state, so we do not have to retrieve it
+      senderAtomP = Promise.resolve(won.invalidateCacheForAtom(senderAtomUri));
     } else {
-      senderNeedP = fetchTheirNeedAndDispatch(senderNeedUri, dispatch);
+      senderAtomP = fetchTheirAtomAndDispatch(senderAtomUri, dispatch);
     }
 
-    let receiverNeedP;
-    if (isOwnReceiverNeed) {
-      //We know that all own needs are already stored within the state, so we do not have to retrieve it
-      receiverNeedP = Promise.resolve(
-        won.invalidateCacheForNeed(receiverNeedUri)
+    let recipientAtomP;
+    if (isOwnRecipientAtom) {
+      //We know that all own atoms are already stored within the state, so we do not have to retrieve it
+      recipientAtomP = Promise.resolve(
+        won.invalidateCacheForAtom(recipientAtomUri)
       );
     } else {
-      receiverNeedP = fetchTheirNeedAndDispatch(receiverNeedUri, dispatch);
+      recipientAtomP = fetchTheirAtomAndDispatch(recipientAtomUri, dispatch);
     }
 
     let senderCP;
-    if (!senderConnectionUri || !isOwnSenderNeed) {
+    if (!senderConnectionUri || !isOwnSenderAtom) {
       console.debug(
-        "senderConnectionUri was null or senderNeed is not ownedNeed, resolve promise with undefined -> ignore the connection"
+        "senderConnectionUri was null or senderAtom is not ownedAtom, resolve promise with undefined -> ignore the connection"
       );
       senderCP = Promise.resolve(false);
     } else if (
-      senderNeed &&
-      senderNeed.getIn(["connections", senderConnectionUri])
+      senderAtom &&
+      senderAtom.getIn(["connections", senderConnectionUri])
     ) {
       // already in state. invalidate the version in the rdf-store.
       senderCP = Promise.resolve(
-        won.invalidateCacheForNewConnection(senderConnectionUri, senderNeedUri)
+        won.invalidateCacheForNewConnection(senderConnectionUri, senderAtomUri)
       ).then(() => true);
     } else {
       senderCP = fetchActiveConnectionAndDispatch(
         senderConnectionUri,
-        senderNeedUri,
+        senderAtomUri,
         dispatch
       ).then(() => true);
     }
 
     let receiverCP;
-    if (!receiverConnectionUri || !isOwnReceiverNeed) {
+    if (!receiverConnectionUri || !isOwnRecipientAtom) {
       console.debug(
-        "receiverConnectionUri was null or receiverNeed is not ownedNeed, resolve promise with undefined -> ignore the connection"
+        "receiverConnectionUri was null or recipientAtom is not ownedAtom, resolve promise with undefined -> ignore the connection"
       );
       receiverCP = Promise.resolve(false);
     } else if (
-      receiverNeed &&
-      receiverNeed.getIn(["connections", receiverConnectionUri])
+      recipientAtom &&
+      recipientAtom.getIn(["connections", receiverConnectionUri])
     ) {
       // already in state. invalidate the version in the rdf-store.
       receiverCP = won
-        .invalidateCacheForNewConnection(receiverConnectionUri, receiverNeedUri)
+        .invalidateCacheForNewConnection(
+          receiverConnectionUri,
+          recipientAtomUri
+        )
         .then(() => true);
     } else {
       receiverCP = fetchActiveConnectionAndDispatch(
         receiverConnectionUri,
-        receiverNeedUri,
+        recipientAtomUri,
         dispatch
       ).then(() => true);
     }
 
     //we have to retrieve the personas too
-    Promise.all([senderCP, receiverCP, senderNeedP, receiverNeedP]).then(
+    Promise.all([senderCP, receiverCP, senderAtomP, recipientAtomP]).then(
       ([
         senderConnectionRelevant,
         receiverConnectionRelevant,
-        senderNeed,
-        receiverNeed,
+        senderAtom,
+        recipientAtom,
       ]) => {
         if (receiverConnectionRelevant) {
-          console.debug("Change ReceiverConnectionState ", receiverNeed);
+          console.debug("Change ReceiverConnectionState ", recipientAtom);
           dispatch({
             type: actionTypes.messages.connectMessageReceived,
             payload: {
               updatedConnectionUri: receiverConnectionUri,
-              ownedNeedUri: receiverNeedUri,
+              ownedAtomUri: recipientAtomUri,
               message: event,
             },
           });
         }
 
         if (senderConnectionRelevant) {
-          console.debug("Change SenderConnectionState ", senderNeed);
+          console.debug("Change SenderConnectionState ", senderAtom);
           dispatch({
             type: actionTypes.messages.connectMessageSent,
             payload: {
               senderConnectionUri: senderConnectionUri,
-              senderNeedUri: senderNeedUri,
+              senderAtomUri: senderAtomUri,
               event: event,
             },
           });
@@ -620,8 +680,8 @@ export function processConnectMessage(event) {
 export function markAsRetracted(event) {
   return (dispatch, getState) => {
     const messages = getState().getIn([
-      "needs",
-      event.needUri,
+      "atoms",
+      event.atomUri,
       "connections",
       event.connectionUri,
       "messages",
@@ -631,7 +691,7 @@ export function markAsRetracted(event) {
     const payload = {
       messageUri: messageUri,
       connectionUri: event.connectionUri,
-      needUri: event.needUri,
+      atomUri: event.atomUri,
       retracted: event.retracted,
     };
 
@@ -645,8 +705,8 @@ export function markAsRetracted(event) {
 export function updateMessageStatus(event) {
   return (dispatch, getState) => {
     const messages = getState().getIn([
-      "needs",
-      event.needUri,
+      "atoms",
+      event.atomUri,
       "connections",
       event.connectionUri,
       "messages",
@@ -656,7 +716,7 @@ export function updateMessageStatus(event) {
     const payload = {
       messageUri: messageUri,
       connectionUri: event.connectionUri,
-      needUri: event.needUri,
+      atomUri: event.atomUri,
       messageStatus: event.messageStatus,
     };
 
@@ -670,8 +730,8 @@ export function updateMessageStatus(event) {
 export function markAsRejected(event) {
   return (dispatch, getState) => {
     const messages = getState().getIn([
-      "needs",
-      event.needUri,
+      "atoms",
+      event.atomUri,
       "connections",
       event.connectionUri,
       "messages",
@@ -681,7 +741,7 @@ export function markAsRejected(event) {
     const payload = {
       messageUri: messageUri,
       connectionUri: event.connectionUri,
-      needUri: event.needUri,
+      atomUri: event.atomUri,
       rejected: event.rejected,
     };
 
@@ -695,8 +755,8 @@ export function markAsRejected(event) {
 export function markAsProposed(event) {
   return (dispatch, getState) => {
     const messages = getState().getIn([
-      "needs",
-      event.needUri,
+      "atoms",
+      event.atomUri,
       "connections",
       event.connectionUri,
       "messages",
@@ -706,7 +766,7 @@ export function markAsProposed(event) {
     const payload = {
       messageUri: messageUri,
       connectionUri: event.connectionUri,
-      needUri: event.needUri,
+      atomUri: event.atomUri,
       proposed: event.proposed,
     };
 
@@ -720,8 +780,8 @@ export function markAsProposed(event) {
 export function markAsClaimed(event) {
   return (dispatch, getState) => {
     const messages = getState().getIn([
-      "needs",
-      event.needUri,
+      "atoms",
+      event.atomUri,
       "connections",
       event.connectionUri,
       "messages",
@@ -731,7 +791,7 @@ export function markAsClaimed(event) {
     const payload = {
       messageUri: messageUri,
       connectionUri: event.connectionUri,
-      needUri: event.needUri,
+      atomUri: event.atomUri,
       claimed: event.claimed,
     };
 
@@ -745,8 +805,8 @@ export function markAsClaimed(event) {
 export function markAsAccepted(event) {
   return (dispatch, getState) => {
     const messages = getState().getIn([
-      "needs",
-      event.needUri,
+      "atoms",
+      event.atomUri,
       "connections",
       event.connectionUri,
       "messages",
@@ -756,7 +816,7 @@ export function markAsAccepted(event) {
     const payload = {
       messageUri: messageUri,
       connectionUri: event.connectionUri,
-      needUri: event.needUri,
+      atomUri: event.atomUri,
       accepted: event.accepted,
     };
 
@@ -770,8 +830,8 @@ export function markAsAccepted(event) {
 export function markAsCancelled(event) {
   return (dispatch, getState) => {
     const messages = getState().getIn([
-      "needs",
-      event.needUri,
+      "atoms",
+      event.atomUri,
       "connections",
       event.connectionUri,
       "messages",
@@ -781,7 +841,7 @@ export function markAsCancelled(event) {
     const payload = {
       messageUri: messageUri,
       connectionUri: event.connectionUri,
-      needUri: event.needUri,
+      atomUri: event.atomUri,
       cancelled: event.cancelled,
     };
 
@@ -795,8 +855,8 @@ export function markAsCancelled(event) {
 export function markAsCancellationPending(event) {
   return (dispatch, getState) => {
     const messages = getState().getIn([
-      "needs",
-      event.needUri,
+      "atoms",
+      event.atomUri,
       "connections",
       event.connectionUri,
       "messages",
@@ -806,7 +866,7 @@ export function markAsCancellationPending(event) {
     const payload = {
       messageUri: messageUri,
       connectionUri: event.connectionUri,
-      needUri: event.needUri,
+      atomUri: event.atomUri,
       cancellationPending: event.cancellationPending,
     };
 
@@ -817,21 +877,21 @@ export function markAsCancellationPending(event) {
   };
 }
 
-export function needMessageReceived(event) {
+export function atomMessageReceived(event) {
   return (dispatch, getState) => {
-    //first check if we really have the 'own' need in the state - otherwise we'll ignore the hint
-    const need = getState().getIn(["needs", event.getReceiverNeed()]);
-    if (!need) {
+    //first check if we really have the 'own' atom in the state - otherwise we'll ignore the hint
+    const atom = getState().getIn(["atoms", event.getRecipientAtom()]);
+    if (!atom) {
       console.debug(
-        "ignoring needMessage for a need that is not ours:",
-        event.getReceiverNeed()
+        "ignoring atomMessage for an atom that is not ours:",
+        event.getRecipientAtom()
       );
     }
     dispatch({
-      type: actionTypes.messages.needMessageReceived,
+      type: actionTypes.messages.atomMessageReceived,
       payload: {
-        needUri: event.getReceiverNeed(),
-        humanReadable: need.get("humanReadable"),
+        atomUri: event.getRecipientAtom(),
+        humanReadable: atom.get("humanReadable"),
         message: event.getTextMessage(),
       },
     });
@@ -840,37 +900,37 @@ export function needMessageReceived(event) {
 
 export function processHintMessage(event) {
   return (dispatch, getState) => {
-    //first check if we really have the 'own' need in the state - otherwise we'll ignore the hint
-    const ownedNeedUri = event.getReceiverNeed();
-    const remoteNeedUri = event.getMatchCounterpart();
+    //first check if we really have the 'own' atom in the state - otherwise we'll ignore the hint
+    const ownedAtomUri = event.getRecipientAtom();
+    const targetAtomUri = event.getMatchCounterpart();
 
     const currentState = getState();
-    const ownedNeed = getIn(currentState, ["needs", ownedNeedUri]);
-    const remoteNeed = getIn(currentState, ["needs", remoteNeedUri]);
+    const ownedAtom = getIn(currentState, ["atoms", ownedAtomUri]);
+    const targetAtom = getIn(currentState, ["atoms", targetAtomUri]);
 
     const ownedConnectionUri = event.getReceiver();
 
-    if (!ownedNeed) {
+    if (!ownedAtom) {
       console.debug(
-        "ignoring hint for a need that is not yet in the state (could be a remoteNeed, or a non stored ownedNeed):",
-        ownedNeedUri
+        "ignoring hint for an atom that is not yet in the state (could be a targetAtom, or a non stored ownedAtom):",
+        ownedAtomUri
       );
-    } else if (get(remoteNeed, "state") === won.WON.InactiveCompacted) {
-      console.debug("ignoring hint for an inactive need:", remoteNeedUri);
+    } else if (get(targetAtom, "state") === won.WON.InactiveCompacted) {
+      console.debug("ignoring hint for an inactive atom:", targetAtomUri);
     } else {
       won
-        .invalidateCacheForNewConnection(ownedConnectionUri, ownedNeedUri)
+        .invalidateCacheForNewConnection(ownedConnectionUri, ownedAtomUri)
         .then(() => {
-          if (remoteNeed) {
-            return Promise.resolve(won.invalidateCacheForNeed(remoteNeedUri));
+          if (targetAtom) {
+            return Promise.resolve(won.invalidateCacheForAtom(targetAtomUri));
           } else {
-            return fetchTheirNeedAndDispatch(remoteNeedUri, dispatch);
+            return fetchTheirAtomAndDispatch(targetAtomUri, dispatch);
           }
         })
         .then(() =>
           fetchActiveConnectionAndDispatch(
             ownedConnectionUri,
-            ownedNeedUri,
+            ownedAtomUri,
             dispatch
           )
         );
@@ -1000,9 +1060,9 @@ export function dispatchActionOnSuccessRemote(event) {
 
     if (toAutoClaim) {
       const theirConnectionUri = event.getSender();
-      const ownedNeedUri = event.getReceiverNeed();
-      const ownNodeUri = event.getReceiverNode();
-      const theirNeedUri = event.getSenderNeed();
+      const ownedAtomUri = event.getRecipientAtom();
+      const ownNodeUri = event.getRecipientNode();
+      const theirAtomUri = event.getSenderAtom();
       const theirNodeUri = event.getSenderNode();
 
       let referencedContentUris = new Map().set("claims", [
@@ -1027,7 +1087,7 @@ export function dispatchActionOnSuccessRemote(event) {
         payload: {
           messageUri: event.getIsRemoteResponseTo(),
           connectionUri: connectionUri,
-          needUri: ownedNeedUri,
+          atomUri: ownedAtomUri,
           claimed: true,
         },
       });
@@ -1037,8 +1097,8 @@ export function dispatchActionOnSuccessRemote(event) {
         additionalContent: undefined,
         referencedContentUris: referencedContentUris,
         connectionUri,
-        ownedNeedUri,
-        theirNeedUri,
+        ownedAtomUri,
+        theirAtomUri,
         ownNodeUri,
         theirNodeUri,
         theirConnectionUri,

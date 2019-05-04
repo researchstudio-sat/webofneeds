@@ -9,14 +9,13 @@ import org.telegram.telegrambots.bots.AbsSender;
 import org.telegram.telegrambots.bots.commands.BotCommand;
 
 import won.bot.framework.eventbot.bus.EventBus;
-import won.bot.framework.eventbot.event.impl.telegram.TelegramCreateNeedEvent;
+import won.bot.framework.eventbot.event.impl.telegram.TelegramCreateAtomEvent;
 
 /**
  * Created by fsuda on 15.12.2016.
  */
 public class CritiqueBotCommand extends BotCommand {
     protected final Logger logger = LoggerFactory.getLogger(getClass());
-
     private EventBus bus;
 
     public CritiqueBotCommand(String commandIdentifier, String description, EventBus bus) {
@@ -27,6 +26,6 @@ public class CritiqueBotCommand extends BotCommand {
     @Override
     public void execute(AbsSender absSender, User user, Chat chat, String[] strings) {
         strings = ArrayUtils.add(strings, 0, "[CRITIQUE]");
-        bus.publish(new TelegramCreateNeedEvent(absSender, user, chat, strings));
+        bus.publish(new TelegramCreateAtomEvent(absSender, user, chat, strings));
     }
 }

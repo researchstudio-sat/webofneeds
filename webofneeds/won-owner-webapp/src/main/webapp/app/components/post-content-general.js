@@ -7,20 +7,12 @@ import { attach, get, getIn } from "../utils.js";
 import won from "../won-es6.js";
 import { relativeTime } from "../won-label-utils.js";
 import { connect2Redux } from "../won-utils.js";
-import {
-  generateFullNeedTypesLabel,
-  generateShortNeedTypesLabel,
-  generateFullNeedFlags,
-  generateFullNeedFacets,
-  generateShortNeedFlags,
-  generateShortNeedFacets,
-  generateNeedMatchingContext,
-} from "../need-utils.js";
+import * as atomUtils from "../atom-utils.js";
 import * as viewUtils from "../view-utils.js";
 import {
   selectLastUpdateTime,
   getConnectionUriFromRoute,
-  getOwnedNeedByConnectionUri,
+  getOwnedAtomByConnectionUri,
 } from "../selectors/general-selectors.js";
 import { actionCreators } from "../actions/actions.js";
 
@@ -30,78 +22,51 @@ import { getOwnedConnectionByUri } from "../selectors/connection-selectors.js";
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
   let template = `
-      <div class="pcg__columns">
-      <!-- LEFT COLUMN -->
-        <div class="pcg__columns__left">
-          <div class="pcg__columns__left__item" ng-if="self.friendlyTimestamp">
-            <div class="pcg__columns__left__item__label">
+      <div class="pcg__item" ng-if="self.friendlyCreationDate">
+          <div class="pcg__item__label">
               Created
-            </div>
-            <div class="pcg__columns__left__item__value">
-              {{ self.friendlyTimestamp }}
-            </div>
           </div>
-          <!-- TYPES - IF SHOW RDF IS TRUE -->
-          <div class="pcg__columns__left__item" ng-if="self.shouldShowRdf">
-            <div class="pcg__columns__left__item__label">
-              Types
-            </div>
-            <div class="pcg__columns__left__item__value">
-              {{ self.fullTypesLabel }}
-            </div>
+          <div class="pcg__item__value">
+              {{ self.friendlyCreationDate }}
           </div>
-        </div>
-
-      <!-- RIGHT COLUMN -->
-        <!-- TYPES - IF SHOW RDF IS FALSE -->
-        <div class="pcg__columns__right" ng-if="!self.shouldShowRdf && self.shortTypesLabel.length > 0">
-          <div class="pcg__columns__left__item">
-            <div class="pcg__columns__left__item__label">
+      </div>
+      <div class="pcg__item">
+          <div class="pcg__item__label">
               Type
-            </div>
-            <div class="pcg__columns__left__item__value">
-              {{ self.shortTypesLabel }} {{self.matchingContext}}
-            </div>
           </div>
-        </div>
-        <div class="pcg__columns__right" ng-if="!self.shouldShowRdf && self.shortTypesLabel.length === 0 && self.matchingContext.length > 0">
-          <div class="pcg__columns__left__item">
-            <div class="pcg__columns__left__item__label">
-              Context
-            </div>
-            <div class="pcg__columns__left__item__value">
-              {{self.matchingContext}}
-            </div>
+          <div class="pcg__item__value">
+              {{ self.typeLabel }}
           </div>
-        </div>
-        <!-- FLAGS -->
-        <div class="pcg__columns__right" ng-if="self.shouldShowRdf || (self.shortFlags && self.shortFlags.length > 0)">
-          <div class="pcg__columns__right__item">
-            <div class="pcg__columns__right__item__label">
+      </div>
+      <div class="pcg__item" ng-if="self.friendlyModifiedDate">
+          <div class="pcg__item__label">
+              Modified
+          </div>
+          <div class="pcg__item__value">
+              {{ self.friendlyModifiedDate }}
+          </div>
+      </div>
+      <div class="pcg__item" ng-if="(self.shouldShowRdf && (self.fullFlagLabels && self.fullFlagLabels.length > 0)) || (self.shortFlagLabels && self.shortFlagLabels.length > 0)">
+          <div class="pcg__item__label">
               Flags
-            </div>
-            <div class="pcg__columns__right__item__value" ng-if="self.shouldShowRdf">
-              <span class="pcg__columns__right__item__value__flag" ng-repeat="flag in self.fullFlags">{{flag}}</span>
-            </div>
-            <div class="pcg__columns__right__item__value" ng-if="!self.shouldShowRdf">
-              <span class="pcg__columns__right__item__value__flag" ng-repeat="flag in self.shortFlags">{{flag}}</span>
-            </div>
           </div>
-        </div>
-        <!-- FACETS -->
-        <div class="pcg__columns__right" ng-if="self.shouldShowRdf || (self.shortFacets && self.shortFacets.length > 0)">
-          <div class="pcg__columns__right__item">
-            <div class="pcg__columns__right__item__label">
-              Facets
-            </div>
-            <div class="pcg__columns__right__item__value" ng-if="self.shouldShowRdf">
-              <span class="pcg__columns__right__item__value__facet" ng-repeat="facet in self.fullFacets">{{facet}}</span>
-            </div>
-            <div class="pcg__columns__right__item__value" ng-if="!self.shouldShowRdf">
-              <span class="pcg__columns__right__item__value__facet" ng-repeat="facet in self.shortFacets">{{facet}}</span>
-            </div>
+          <div class="pcg__item__value" ng-if="self.shouldShowRdf">
+              <span class="pcg__item__value__flag" ng-repeat="flag in self.fullFlagLabels">{{flag}}</span>
           </div>
-        </div>
+          <div class="pcg__item__value" ng-if="!self.shouldShowRdf">
+              <span class="pcg__item__value__flag" ng-repeat="flag in self.shortFlagLabels">{{flag}}</span>
+          </div>
+      </div>
+      <div class="pcg__item" ng-if="(self.shouldShowRdf && (self.fullSocketLabels && self.fullSocketLabels.length > 0)) || (self.shortSocketLabels && self.shortSocketLabels.length > 0)">
+          <div class="pcg__item__label">
+              Sockets
+          </div>
+          <div class="pcg__item__value" ng-if="self.shouldShowRdf">
+              <span class="pcg__item__value__socket" ng-repeat="socket in self.fullSocketLabels">{{socket}}</span>
+          </div>
+          <div class="pcg__item__value" ng-if="!self.shouldShowRdf">
+              <span class="pcg__item__value__socket" ng-repeat="socket in self.shortSocketLabels">{{socket}}</span>
+          </div>
       </div>
     `;
 
@@ -114,32 +79,34 @@ function genComponentConf() {
         const connectionUri = getConnectionUriFromRoute(state);
         const connection = getOwnedConnectionByUri(state, connectionUri);
 
-        const ownNeed = getOwnedNeedByConnectionUri(state, connectionUri);
+        const ownAtom = getOwnedAtomByConnectionUri(state, connectionUri);
 
         const ratingConnectionUri =
-          get(connection, "remoteNeedUri") == this.postUri &&
-          get(ownNeed, "heldBy")
+          get(connection, "targetAtomUri") == this.postUri &&
+          get(ownAtom, "heldBy")
             ? connectionUri
             : null;
 
-        const post = this.postUri && getIn(state, ["needs", this.postUri]);
+        const post = this.postUri && getIn(state, ["atoms", this.postUri]);
         const viewState = get(state, "view");
+
+        const creationDate = get(post, "creationDate");
+        const modifiedDate = get(post, "modifiedDate");
 
         return {
           WON: won.WON,
-          fullTypesLabel: post && generateFullNeedTypesLabel(post),
-          shortTypesLabel: post && generateShortNeedTypesLabel(post),
-          matchingContext: post && generateNeedMatchingContext(post),
-          fullFlags: post && generateFullNeedFlags(post),
-          shortFlags: post && generateShortNeedFlags(post),
-          fullFacets: post && generateFullNeedFacets(post),
-          shortFacets: post && generateShortNeedFacets(post),
-          friendlyTimestamp:
-            post &&
-            relativeTime(
-              selectLastUpdateTime(state),
-              get(post, "creationDate")
-            ),
+          typeLabel: post && atomUtils.generateTypeLabel(post),
+          fullFlagLabels: post && atomUtils.generateFullFlagLabels(post),
+          shortFlagLabels: post && atomUtils.generateShortFlagLabels(post),
+          fullSocketLabels: post && atomUtils.generateFullSocketLabels(post),
+          shortSocketLabels: post && atomUtils.generateShortSocketLabels(post),
+          friendlyCreationDate:
+            creationDate &&
+            relativeTime(selectLastUpdateTime(state), creationDate),
+          friendlyModifiedDate:
+            modifiedDate &&
+            modifiedDate != creationDate &&
+            relativeTime(selectLastUpdateTime(state), modifiedDate),
           ratingConnectionUri: ratingConnectionUri,
           shouldShowRdf: viewUtils.showRdf(viewState),
         };

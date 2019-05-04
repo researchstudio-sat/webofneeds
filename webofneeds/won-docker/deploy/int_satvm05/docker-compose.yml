@@ -10,7 +10,7 @@ services:
     volumes:
       - $base_folder/won-server-certs1:/usr/local/certs/out/
 
-  # portsgres need databases for owner and wonnode 1
+  # portsgres atom databases for owner and wonnode 1
   postgres1:
     restart: always
     image: webofneeds/postgres:int
@@ -23,7 +23,7 @@ services:
     ports:
       - "5432:5432"
 
-  # wonnode 1 => https://satvm05.researchstudio.at:8888/won
+  # wonnode 1 => https://satvm05.researchstudio.at:8888/won 
   wonnode1:
     restart: always
     build: ../../image/wonnode
@@ -31,6 +31,8 @@ services:
     environment:
       - "uri.host=satvm05.researchstudio.at"
       - "http.port=8888"
+      - "uri.prefix=https://satvm05.researchstudio.at:8888/won"
+      - "client.authentication.behind.proxy=false"
       - "db.sql.jdbcDriverClass=org.postgresql.Driver"
       - "db.sql.jdbcUrl=jdbc:postgresql://satvm05.researchstudio.at:5432/won_node"
       - "db.ddl.strategy=validate"
@@ -65,6 +67,8 @@ services:
       - "uri.host=satvm05.researchstudio.at"
       - "http.port=8081"
       - "node.default.http.port=8888"
+      - "uri.prefix=https://satvm05.researchstudio.at:8888"
+      - "uri.prefix.node.default=https://satvm05.researchstudio.at:8888/won"      
       - "db.sql.jdbcDriverClass=org.postgresql.Driver"
       - "db.sql.jdbcUrl=jdbc:postgresql://satvm05.researchstudio.at:5432/won_owner"
       - "db.ddl.strategy=validate"
@@ -116,7 +120,7 @@ services:
     depends_on:
       - gencert2
 
-  # portsgres need databases for owner and wonnode 2
+  # portsgres atom databases for owner and wonnode 2
   postgres2:
     restart: always
     image: webofneeds/postgres:int
@@ -217,7 +221,7 @@ services:
     volumes:
       - $base_folder/mongodb/data/db:/data/db
 
-  # debug bot used to test need communication, connect to wonnodes 1 and 2
+  # debug bot used to test atom communication, connect to wonnodes 1 and 2
   debug_bot:
     restart: always
     build: ../../image/bots
@@ -355,7 +359,7 @@ services:
     volumes:
       - $base_folder/won-client-certs/matcher_sparql:/usr/src/matcher-sparql/client-certs/
 
-  # solr server as a need index
+  # solr server as an atom index
   solr:
     restart: always
     build: ../../image/solr

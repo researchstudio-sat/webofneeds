@@ -1,7 +1,7 @@
-@prefix msg:   <http://purl.org/webofneeds/message#> .
+@prefix msg:   <https://w3id.org/won/message#> .
 @prefix conn:  <https://satvm05.researchstudio.at/won/resource/connection/> .
-@prefix need:  <https://satvm05.researchstudio.at/won/resource/need/> .
-@prefix woncrypt: <http://purl.org/webofneeds/woncrypt#> .
+@prefix atom:  <https://satvm05.researchstudio.at/won/resource/atom/> .
+@prefix woncrypt: <https://w3id.org/won/core#> .
 @prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
 @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix cert:  <http://www.w3.org/ns/auth/cert#> .
@@ -11,38 +11,38 @@
 @prefix s:     <http://schema.org/> .
 @prefix sh:    <http://www.w3.org/ns/shacl#> .
 @prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-@prefix won:   <http://purl.org/webofneeds/model#> .
+@prefix won:   <https://w3id.org/won/core#> .
 @prefix ldp:   <http://www.w3.org/ns/ldp#> .
 @prefix event: <https://satvm05.researchstudio.at/won/resource/event/> .
 @prefix dc:    <http://purl.org/dc/elements/1.1/> .
 @prefix sioc:  <http://rdfs.org/sioc/ns#> .
 
-<https://satvm05.researchstudio.at/won/resource/need/vxesunm9q5in#sysinfo> {
-    need:vxesunm9q5in
-            a                      won:Need ;
+<https://satvm05.researchstudio.at/won/resource/atom/vxesunm9q5in#sysinfo> {
+    atom:vxesunm9q5in
+            a                      won:Atom ;
             <http://purl.org/dc/terms/created>
                     "2018-08-27T09:35:28.612Z"^^xsd:dateTime ;
             <http://purl.org/dc/terms/modified>
                     "2018-08-27T09:35:28.623Z"^^xsd:dateTime ;
-            won:hasConnections     <https://satvm05.researchstudio.at/won/resource/need/vxesunm9q5in/connections> ;
-            won:hasContentGraph    <https://satvm05.researchstudio.at/won/resource/event/dvhqs5ewq7ce#envelope-sig> , <https://satvm05.researchstudio.at/won/resource/event/dvhqs5ewq7ce#need> ;
-            won:hasEventContainer  <https://satvm05.researchstudio.at/won/resource/need/vxesunm9q5in#events> ;
-            won:hasWonNode         <https://satvm05.researchstudio.at/won/resource> ;
-            won:isInState          won:Active .
+            won:connections     <https://satvm05.researchstudio.at/won/resource/atom/vxesunm9q5in/connections> ;
+            won:contentGraph    <https://satvm05.researchstudio.at/won/resource/event/dvhqs5ewq7ce#envelope-sig> , <https://satvm05.researchstudio.at/won/resource/event/dvhqs5ewq7ce#atom> ;
+            won:messageContainer  <https://satvm05.researchstudio.at/won/resource/atom/vxesunm9q5in#events> ;
+            won:wonNode         <https://satvm05.researchstudio.at/won/resource> ;
+            won:atomState          won:Active .
     
-    <https://satvm05.researchstudio.at/won/resource/need/vxesunm9q5in#events>
-            a            won:EventContainer ;
+    <https://satvm05.researchstudio.at/won/resource/atom/vxesunm9q5in#events>
+            a            won:MessageContainer ;
             rdfs:member  event:dvhqs5ewq7ce , event:pq3s8g6pvibg5s56snza .
     
-    <https://satvm05.researchstudio.at/won/resource/need/vxesunm9q5in#sysinfo>
+    <https://satvm05.researchstudio.at/won/resource/atom/vxesunm9q5in#sysinfo>
             <http://www.w3.org/2004/03/trix/rdfg-1/subGraphOf>
-                    need:vxesunm9q5in .
+                    atom:vxesunm9q5in .
 }
 
-<https://satvm05.researchstudio.at/won/resource/event/dvhqs5ewq7ce#need> {
-    need:vxesunm9q5in
-            a             won:Need ;
-            won:hasFacet  won:ChatFacet ;
+<https://satvm05.researchstudio.at/won/resource/event/dvhqs5ewq7ce#atom> {
+    atom:vxesunm9q5in
+            a             won:Atom ;
+            won:socket  won:ChatSocket ;
             won:seeks     [ dc:title          "Taxi" ;
                             won:travelAction  [ a               s:TravelAction ;
                                                 s:fromLocation  [ a       s:Place ;
@@ -72,9 +72,9 @@
 <https://satvm05.researchstudio.at/won/resource/event/dvhqs5ewq7ce#envelope-sig> {
     <https://satvm05.researchstudio.at/won/resource/event/dvhqs5ewq7ce#envelope-sig>
             a                               sig:Signature ;
-            sig:hasSignatureValue           "MGUCMQCs1hRhDXXjvFl5lOC406rNkDtmGIhpziV203z7epp51ZGzWjshOW566YPpXKcEU5UCMHmq4ui29rQ/gKeHNeOsUEOv/SQbk+i0opI4MQf1kKqu4rk8ypukQOj2rs7wd+kOVg==" ;
-            sig:hasVerificationCertificate  need:vxesunm9q5in ;
-            msg:hasHash                     "YgFfgcSM+OQyOG4q52AazQyrdE2sy4rboUZZ5mTICCWYft1N67jgEGxsf6pGBT0ppooCSxgMYeOu6hESDJ9Y4USYzYA9NG8R/51+lZIl9+DXjn39Zj/648jQ+76t+XXrrpGiBikhszzAoya2BbrnE03VyffIAMEObuIZDLzxiTw=" ;
-            msg:hasPublicKeyFingerprint     "bYVjGX2hwZhWJEk5WKXpevw+wOFo76iYDF+9Dch0L8Y=" ;
-            msg:hasSignedGraph              <https://satvm05.researchstudio.at/won/resource/event/dvhqs5ewq7ce#envelope> .
+            sig:signatureValue           "MGUCMQCs1hRhDXXjvFl5lOC406rNkDtmGIhpziV203z7epp51ZGzWjshOW566YPpXKcEU5UCMHmq4ui29rQ/gKeHNeOsUEOv/SQbk+i0opI4MQf1kKqu4rk8ypukQOj2rs7wd+kOVg==" ;
+            sig:hasVerificationCertificate  atom:vxesunm9q5in ;
+            msg:hash                     "YgFfgcSM+OQyOG4q52AazQyrdE2sy4rboUZZ5mTICCWYft1N67jgEGxsf6pGBT0ppooCSxgMYeOu6hESDJ9Y4USYzYA9NG8R/51+lZIl9+DXjn39Zj/648jQ+76t+XXrrpGiBikhszzAoya2BbrnE03VyffIAMEObuIZDLzxiTw=" ;
+            msg:publicKeyFingerprint     "bYVjGX2hwZhWJEk5WKXpevw+wOFo76iYDF+9Dch0L8Y=" ;
+            msg:signedGraph              <https://satvm05.researchstudio.at/won/resource/event/dvhqs5ewq7ce#envelope> .
 }

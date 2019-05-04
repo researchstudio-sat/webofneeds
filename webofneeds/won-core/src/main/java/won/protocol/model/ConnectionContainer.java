@@ -1,19 +1,13 @@
 /*
- * Copyright 2012  Research Studios Austria Forschungsges.m.b.H.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
+ * Copyright 2012 Research Studios Austria Forschungsges.m.b.H. Licensed under
+ * the Apache License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at http://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable
+ * law or agreed to in writing, software distributed under the License is
+ * distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the specific language
+ * governing permissions and limitations under the License.
  */
-
 package won.protocol.model;
 
 import java.util.Date;
@@ -35,66 +29,62 @@ import won.protocol.model.parentaware.ParentAware;
 import won.protocol.model.parentaware.VersionedEntity;
 
 @Entity
-@Table(name="connection_container")
-public class ConnectionContainer implements ParentAware<Need>, VersionedEntity
-{
-  @Id
-  @Column( name = "id" )
-  protected Long id;
+@Table(name = "connection_container")
+public class ConnectionContainer implements ParentAware<Atom>, VersionedEntity {
+    @Id
+    @Column(name = "id")
+    protected Long id;
+    @Column(name = "version", columnDefinition = "integer DEFAULT 0", nullable = false)
+    private int version = 0;
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "last_update", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    private Date lastUpdate = new Date();
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "atom_id")
+    @MapsId
+    private Atom atom;
 
-  @Column(name="version", columnDefinition = "integer DEFAULT 0", nullable = false)
-  private int version = 0;
-
-  @Temporal(TemporalType.TIMESTAMP)
-  @Column(name="last_update", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-  private Date lastUpdate = new Date();
-
-  @OneToOne (fetch = FetchType.LAZY, optional = false)
-  @JoinColumn(name = "need_id")
-  @MapsId
-  private Need need;
-
-  @Override
-  @PrePersist
-  @PreUpdate
-  public void incrementVersion() {
-    this.version++;
-    this.lastUpdate = new Date();
-  }
-
-  @Override
-  public Date getLastUpdate() {
-    return lastUpdate;
-  }
-
-  public int getVersion() {
-    return version;
-  }
-
-  public Need getNeed() {
-    return need;
-  }
-
-  @Override
-  public Need getParent() {
-    return getNeed();
-  }
-
-  public void setNeed(final Need need) {
-    this.need = need;
-  }
-  
-  public Long getId() {
-      return this.id;
-  }
-
-  public ConnectionContainer(final Need need) {
-    this.need = need;
-    if (need != null) {
-      need.setConnectionContainer(this);
+    @Override
+    @PrePersist
+    @PreUpdate
+    public void incrementVersion() {
+        this.version++;
+        this.lastUpdate = new Date();
     }
-  }
 
-  public ConnectionContainer() {
-  }
+    @Override
+    public Date getLastUpdate() {
+        return lastUpdate;
+    }
+
+    public int getVersion() {
+        return version;
+    }
+
+    public Atom getAtom() {
+        return atom;
+    }
+
+    @Override
+    public Atom getParent() {
+        return getAtom();
+    }
+
+    public void setAtom(final Atom atom) {
+        this.atom = atom;
+    }
+
+    public Long getId() {
+        return this.id;
+    }
+
+    public ConnectionContainer(final Atom atom) {
+        this.atom = atom;
+        if (atom != null) {
+            atom.setConnectionContainer(this);
+        }
+    }
+
+    public ConnectionContainer() {
+    }
 }

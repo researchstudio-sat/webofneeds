@@ -1,0 +1,64 @@
+##################################################################
+#                   OWNER CREATES NEW ATOM
+##################################################################
+
+
+@prefix :       <http://www.example.com/resource/atom/100/> .
+@prefix owner:      <http://www.example.com/resource/owner/> .
+@prefix rdfs:       <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix geo:    <http://www.w3.org/2003/01/geo/wgs84_pos#> .
+@prefix xsd:    <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix cert    <http://www.w3.org/ns/auth/cert#> .
+@prefix tio:    <http://purl.org/tio/ns#> .
+@prefix won:    <https://w3id.org/won/core#> .
+@prefix crypt:      <https://w3id.org/won/cryptography#> .
+
+@prefix msg:    <https://w3id.org/won/msg#> .
+
+# owner-specified content (permanent):
+
+# let’s say connection 0 is the self-refering connection 
+# for create, update, etc. events
+
+:connection/0/event/[random#1]/owner#data {
+        :connection/0 rdfs:member :connection/0/event/[random#1]
+        :connection/0/event/[random#1] a won:Create
+}
+
+# signature of the event:
+:connection/0/event/[random#1]#data crypt:signature [
+    rdf:type crypt:WonSignature ;
+
+        # … sig data
+    ] .
+
+:core#data {
+
+    :
+        a won:Atom ;
+
+    # … add atom core stuff
+       .
+}
+
+# signature of the permanent part of data:
+:core#data crypt:signature [
+    rdf:type crypt:WonSignature ;
+
+        # … sig data
+    ] .
+
+
+# message meta data
+
+_:message a msg:wonMessage ;
+        msg:belongsToProtocol "OSNPC" ;
+
+
+# the following signature covers the whole message
+_:message crypt:signature [
+            rdf:type crypt:WonSignature ;
+
+            # … sig data
+         ] .

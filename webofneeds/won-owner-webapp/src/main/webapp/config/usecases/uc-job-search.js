@@ -58,7 +58,7 @@ export const jobSearch = {
    * ```
    * # index for industries using binds
    * prefix s: <http://schema.org/>
-   * prefix won:   <http://purl.org/webofneeds/model#>
+   * prefix won:   <https://w3id.org/won/core#>
    * select distinct * where {
    *   {
    *     select
@@ -66,7 +66,7 @@ export const jobSearch = {
    *       (sum(?var1) + sum(?var2) as ?targetOverlap)
    *       (count(${resultName}) as ?targetTotal)
    *     where {
-   *       ${resultName} a won:Need;
+   *       ${resultName} a won:Atom;
    *             s:industry ?industry .
    *       bind(if(str(?industry) = "design",1,0) as ?var1)
    *       bind(if(str(?industry) = "computer science",1,0) as ?var2)
@@ -160,7 +160,7 @@ export const jobSearch = {
       variables: [resultName, "?score"],
       subQueries: subQueries,
       where: [
-        `${resultName} rdf:type won:Need.`,
+        `${resultName} rdf:type won:Atom.`,
         `${resultName} rdf:type s:JobPosting.`,
 
         // calculate average of scores; can be weighed if necessary

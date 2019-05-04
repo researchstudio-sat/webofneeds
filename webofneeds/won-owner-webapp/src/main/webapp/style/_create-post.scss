@@ -138,6 +138,7 @@ won-create-search {
   .cp__footer {
     margin: $gridRowGap;
     grid-area: footer;
+    display: grid;
 
     won-labelled-hr .wlh__label__text {
       background-color: white;
@@ -146,6 +147,12 @@ won-create-search {
     .cp__footer__publish {
       width: 100%;
       margin-top: 1rem;
+    }
+
+    .cp__footer__edit {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-gap: 0.5rem;
     }
   }
 }

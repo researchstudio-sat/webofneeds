@@ -99,7 +99,7 @@ export const bandSearch = {
       variables: [resultName],
       subQueries: subQueries,
       where: [
-        `${resultName} rdf:type won:Need.`,
+        `${resultName} rdf:type won:Atom.`,
         `${resultName} rdf:type s:MusicGroup.`,
 
         // calculate average of scores; can be weighed if necessary

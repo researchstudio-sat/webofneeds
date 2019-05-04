@@ -13,12 +13,11 @@ import groupPostMessagesModule from "../group-post-messages.js";
 import visitorTitleBarModule from "../visitor-title-bar.js";
 import * as generalSelectors from "../../selectors/general-selectors.js";
 import * as viewSelectors from "../../selectors/view-selectors.js";
-import * as needUtils from "../../need-utils.js";
 import * as processUtils from "../../process-utils.js";
 import * as srefUtils from "../../sref-utils.js";
 
 import "style/_post-visitor.scss";
-import "style/_need-overlay.scss";
+import "style/_atom-overlay.scss";
 import "style/_connection-overlay.scss";
 
 const serviceDependencies = ["$ngRedux", "$scope"];
@@ -31,29 +30,29 @@ class Controller {
     Object.assign(this, srefUtils); // bind srefUtils to scope
 
     const selectFromState = state => {
-      const needUri = generalSelectors.getPostUriFromRoute(state);
-      const viewNeedUri = generalSelectors.getViewNeedUriFromRoute(state);
+      const atomUri = generalSelectors.getPostUriFromRoute(state);
+      const viewAtomUri = generalSelectors.getViewAtomUriFromRoute(state);
       const viewConnUri = generalSelectors.getViewConnectionUriFromRoute(state);
-      const need = getIn(state, ["needs", needUri]);
+      const atom = getIn(state, ["atoms", atomUri]);
 
       const process = get(state, "process");
 
       return {
-        needUri,
-        isOwnedNeed: needUtils.isOwned(need),
-        need,
+        atomUri,
+        isOwnedAtom: generalSelectors.isAtomOwned(state, atomUri),
+        atom,
         won: won.WON,
         showSlideIns:
           viewSelectors.hasSlideIns(state) && viewSelectors.showSlideIns(state),
         showModalDialog: viewSelectors.showModalDialog(state),
-        showNeedOverlay: !!viewNeedUri,
+        showAtomOverlay: !!viewAtomUri,
         showConnectionOverlay: !!viewConnUri,
-        viewNeedUri,
+        viewAtomUri,
         viewConnUri,
-        needLoading: !need || processUtils.isNeedLoading(process, needUri),
-        needToLoad: !need || processUtils.isNeedToLoad(process, needUri),
-        needFailedToLoad:
-          need && processUtils.hasNeedFailedToLoad(process, needUri),
+        atomLoading: !atom || processUtils.isAtomLoading(process, atomUri),
+        atomToLoad: !atom || processUtils.isAtomToLoad(process, atomUri),
+        atomFailedToLoad:
+          atom && processUtils.hasAtomFailedToLoad(process, atomUri),
       };
     };
 
@@ -61,23 +60,23 @@ class Controller {
 
     this.$scope.$watch(
       () =>
-        this.needUri && (!this.need || (this.needToLoad && !this.needLoading)),
-      () => delay(0).then(() => this.ensureNeedIsLoaded())
+        this.atomUri && (!this.atom || (this.atomToLoad && !this.atomLoading)),
+      () => delay(0).then(() => this.ensureAtomIsLoaded())
     );
   }
 
-  ensureNeedIsLoaded() {
+  ensureAtomIsLoaded() {
     if (
-      this.needUri &&
-      (!this.need || (this.needToLoad && !this.needLoading))
+      this.atomUri &&
+      (!this.atom || (this.atomToLoad && !this.atomLoading))
     ) {
-      this.needs__fetchUnloadedNeed(this.needUri);
+      this.atoms__fetchUnloadedAtom(this.atomUri);
     }
   }
 
   tryReload() {
-    if (this.needUri && this.needFailedToLoad) {
-      this.needs__fetchUnloadedNeed(this.needUri);
+    if (this.atomUri && this.atomFailedToLoad) {
+      this.atoms__fetchUnloadedAtom(this.atomUri);
     }
   }
 }

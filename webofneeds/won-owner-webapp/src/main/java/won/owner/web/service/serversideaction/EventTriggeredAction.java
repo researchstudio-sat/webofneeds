@@ -11,25 +11,24 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class EventTriggeredAction<E> {
-    
-    
     private Predicate<Optional<E>> triggerPredicate;
-    //a function accepting one event of type T, and produces zero or more EventTriggeredActions 
+    // a function accepting one event of type T, and produces zero or more
+    // EventTriggeredActions
     private Function<Optional<E>, Collection<EventTriggeredAction<E>>> action;
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private String name;
     private Date created = new Date();
-    
+
     /**
-     * Constructor to use if the action is to be executed when the event is an empty optional, 
-     * which is the case when first adding the action to the container. 
+     * Constructor to use if the action is to be executed when the event is an empty
+     * optional, which is the case when first adding the action to the container.
      */
     public EventTriggeredAction(String name, Function<Optional<E>, Collection<EventTriggeredAction<E>>> action) {
         this(name, e -> !e.isPresent(), action);
     }
-    
+
     public EventTriggeredAction(String name, Predicate<Optional<E>> triggerPredicate,
-            Function<Optional<E>, Collection<EventTriggeredAction<E>>> action) {
+                    Function<Optional<E>, Collection<EventTriggeredAction<E>>> action) {
         super();
         this.name = name;
         this.triggerPredicate = triggerPredicate;
@@ -39,18 +38,18 @@ public class EventTriggeredAction<E> {
     public Collection<EventTriggeredAction<E>> executeFor(Optional<E> event) {
         return this.action.apply(event);
     }
-    
+
     /**
      * Returns the duration since this action was created.
-     **/ 
+     **/
     public Duration getAge() {
         return Duration.ofMillis(System.currentTimeMillis() - created.getTime());
     }
-    
+
     public boolean isTriggeredBy(Optional<E> event) {
         return this.triggerPredicate.test(event);
     }
-    
+
     public String getName() {
         return name;
     }

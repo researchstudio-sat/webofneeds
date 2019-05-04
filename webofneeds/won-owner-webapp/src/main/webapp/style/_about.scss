@@ -266,15 +266,8 @@ main.about {
         }
       }
 
-      &__button,
-      &__button--pending {
+      &__button {
         white-space: normal;
-      }
-
-      &__button--pending {
-        grid-column: 1 / -1;
-        align-self: center;
-        justify-self: center;
       }
 
       &__spanbutton,

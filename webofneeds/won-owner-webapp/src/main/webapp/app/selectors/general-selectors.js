@@ -5,57 +5,75 @@
 import { createSelector } from "reselect";
 
 import { decodeUriComponentProperly, getIn, get } from "../utils.js";
-import { isPersona, isNeed, isActive, isInactive } from "../need-utils.js";
+import * as atomUtils from "../atom-utils.js";
+import * as accountUtils from "../account-utils.js";
+import * as viewUtils from "../view-utils.js";
 import Color from "color";
 
 export const selectLastUpdateTime = state => state.get("lastUpdateTime");
 export const getRouterParams = state =>
   getIn(state, ["router", "currentParams"]);
 
-export const getNeeds = state => state.get("needs");
-export const getOwnedNeeds = state =>
-  getNeeds(state).filter(need => need.get("isOwned"));
-export const getNonOwnedNeeds = state =>
-  getNeeds(state).filter(need => !need.get("isOwned"));
+export const getAtoms = state => state.get("atoms");
+export const getOwnedAtoms = state => {
+  const accountState = get(state, "account");
+  return getAtoms(state).filter(atom =>
+    accountUtils.isAtomOwned(accountState, get(atom, "uri"))
+  );
+};
+export const getNonOwnedAtoms = state => {
+  const accountState = get(state, "account");
+  return getAtoms(state).filter(
+    atom => !accountUtils.isAtomOwned(accountState, get(atom, "uri"))
+  );
+};
 
 export function getPosts(state) {
-  const needs = getNeeds(state);
-  return needs.filter(need => {
-    if (!need.getIn(["content", "type"])) return true;
+  const atoms = getAtoms(state);
+  return atoms.filter(atom => {
+    if (!atom.getIn(["content", "type"])) return true;
 
-    return isNeed(need) && !isPersona(need);
+    return atomUtils.isAtom(atom) && !atomUtils.isPersona(atom);
   });
 }
 
-export const getOwnedPosts = state =>
-  getPosts(state).filter(need => need.get("isOwned"));
+export const getOwnedPosts = state => {
+  const accountState = get(state, "account");
+  return getPosts(state).filter(atom =>
+    accountUtils.isAtomOwned(accountState, get(atom, "uri"))
+  );
+};
 
 export function getOwnedOpenPosts(state) {
-  const allOwnedNeeds = getOwnedPosts(state);
-  return allOwnedNeeds && allOwnedNeeds.filter(post => isActive(post));
+  const allOwnedAtoms = getOwnedPosts(state);
+  return (
+    allOwnedAtoms && allOwnedAtoms.filter(post => atomUtils.isActive(post))
+  );
 }
 
 export function getOpenPosts(state) {
   const allPosts = getPosts(state);
-  return allPosts && allPosts.filter(post => isActive(post));
+  return allPosts && allPosts.filter(post => atomUtils.isActive(post));
 }
 
-export function getActiveNeeds(state) {
-  const allNeeds = getNeeds(state);
-  return allNeeds && allNeeds.filter(need => isActive(need));
+export function getActiveAtoms(state) {
+  const allAtoms = getAtoms(state);
+  return allAtoms && allAtoms.filter(atom => atomUtils.isActive(atom));
 }
 
 //TODO: METHOD NAME TO ACTUALLY REPRESENT WHAT THE SELECTOR DOES
 export function getOwnedClosedPosts(state) {
-  const allOwnedNeeds = getOwnedPosts(state);
-  return allOwnedNeeds && allOwnedNeeds.filter(post => isInactive(post));
+  const allOwnedAtoms = getOwnedPosts(state);
+  return (
+    allOwnedAtoms && allOwnedAtoms.filter(post => atomUtils.isInactive(post))
+  );
 }
 
-export function getOwnedNeedsInCreation(state) {
-  const allOwnedNeeds = getOwnedNeeds(state);
-  // needs that have been created but are not confirmed by the server yet
+export function getOwnedAtomsInCreation(state) {
+  const allOwnedAtoms = getOwnedAtoms(state);
+  // atoms that have been created but are not confirmed by the server yet
   return (
-    allOwnedNeeds && allOwnedNeeds.filter(post => post.get("isBeingCreated"))
+    allOwnedAtoms && allOwnedAtoms.filter(post => post.get("isBeingCreated"))
   );
 }
 
@@ -64,13 +82,13 @@ export const selectIsConnected = state =>
   !state.getIn(["messages", "lostConnection"]);
 
 /**
- * Get the need for a given connectionUri
+ * Get the atom for a given connectionUri
  * @param state to retrieve data from
- * @param connectionUri to find corresponding need for
+ * @param connectionUri to find corresponding atom for
  */
-export function getOwnedNeedByConnectionUri(state, connectionUri) {
-  let needs = getOwnedNeeds(state); //we only check own needs as these are the only ones who have connections stored
-  return needs.find(need => need.getIn(["connections", connectionUri]));
+export function getOwnedAtomByConnectionUri(state, connectionUri) {
+  let atoms = getOwnedAtoms(state); //we only check own atoms as these are the only ones who have connections stored
+  return atoms.find(atom => atom.getIn(["connections", connectionUri]));
 }
 
 export const getCurrentParamsFromRoute = createSelector(
@@ -80,15 +98,15 @@ export const getCurrentParamsFromRoute = createSelector(
   }
 );
 
-export const getViewNeedUriFromRoute = createSelector(
+export const getViewAtomUriFromRoute = createSelector(
   state => state,
   state => {
-    const encodedNeedUri = getIn(state, [
+    const encodedAtomUri = getIn(state, [
       "router",
       "currentParams",
-      "viewNeedUri",
+      "viewAtomUri",
     ]);
-    return decodeUriComponentProperly(encodedNeedUri);
+    return decodeUriComponentProperly(encodedAtomUri);
   }
 );
 
@@ -148,15 +166,15 @@ export const getConnectionUriFromRoute = createSelector(
   }
 );
 
-export const getFromNeedUriFromRoute = createSelector(
+export const getFromAtomUriFromRoute = createSelector(
   state => state,
   state => {
-    const encodedNeedUri = getIn(state, [
+    const encodedAtomUri = getIn(state, [
       "router",
       "currentParams",
-      "fromNeedUri",
+      "fromAtomUri",
     ]);
-    return decodeUriComponentProperly(encodedNeedUri);
+    return decodeUriComponentProperly(encodedAtomUri);
   }
 );
 
@@ -193,8 +211,8 @@ export const getAboutSectionFromRoute = createSelector(
 );
 
 export function getOwnedPersonas(state) {
-  const needs = getOwnedNeeds(state);
-  const personas = needs.toList().filter(need => isPersona(need));
+  const atoms = getOwnedAtoms(state);
+  const personas = atoms.toList().filter(atom => atomUtils.isPersona(atom));
   return personas.map(persona => {
     return {
       displayName: getIn(persona, ["content", "personaName"]),
@@ -220,4 +238,54 @@ export function currentSkin() {
     lineGray: getColor("--won-line-gray"),
     subtitleGray: getColor("--won-subtitle-gray"),
   };
+}
+/**
+ * Returns true if the atom is owned by the user who is currently logged in
+ * @param state FULL redux state, no substates allowed
+ * @param atomUri
+ */
+export function isAtomOwned(state, atomUri) {
+  if (atomUri) {
+    const accountState = get(state, "account");
+    return accountUtils.isAtomOwned(accountState, atomUri);
+  }
+  return false;
+}
+
+/**
+ * This checks if the given atomUri is allowed to be used as a template,
+ * it is only allowed if the atom exists is NOT owned, and if it has a matchedUseCase
+ * @param atomUri
+ * @returns {*|boolean}
+ */
+export function isAtomUsableAsTemplate(state, atomUri) {
+  const atom = getIn(state, ["atoms", atomUri]);
+
+  return (
+    !!atom && !isAtomOwned(state, atomUri) && atomUtils.hasMatchedUseCase(atom)
+  );
+}
+
+/**
+ * This checks if the given atomUri is allowed to be edited,
+ * it is only allowed if the atom exists, and if it IS owned and has a matchedUseCase
+ * @param atom
+ * @returns {*|boolean}
+ */
+export function isAtomEditable(state, atomUri) {
+  const atom = getIn(state, ["atoms", atomUri]);
+
+  return (
+    !!atom && isAtomOwned(state, atomUri) && atomUtils.hasMatchedUseCase(atom)
+  );
+}
+
+export function isLocationAccessDenied(state) {
+  const viewState = get(state, "view");
+  return viewState && viewUtils.isLocationAccessDenied(viewState);
+}
+
+export function getCurrentLocation(state) {
+  const viewState = get(state, "view");
+  return viewState && viewUtils.getCurrentLocation(viewState);
 }

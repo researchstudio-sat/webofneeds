@@ -6,14 +6,13 @@ import ngAnimate from "angular-animate";
 import labelledHrModule from "./labelled-hr.js";
 
 import "ng-redux";
-import { attach } from "../utils.js";
+import Immutable from "immutable";
+import { attach, get } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { connect2Redux } from "../won-utils.js";
-import {
-  selectIsConnected,
-  getUseCaseGroupFromRoute,
-} from "../selectors/general-selectors.js";
+import * as generalSelectors from "../selectors/general-selectors.js";
 import * as useCaseUtils from "../usecase-utils.js";
+import * as accountUtils from "../account-utils.js";
 
 import "style/_usecase-picker.scss";
 
@@ -43,25 +42,15 @@ function genComponentConf() {
 
         <!-- WHAT'S AROUND -->
         <div class="ucp__createx">
-            <button class="ucp__createx__button--pending won-button--filled red"
-                    ng-if="self.processingPublish"
-                    ng-disabled="self.processingPublish">
-                <span>Finding out what's going on&hellip;</span>
-            </button>
-
             <button class="won-button--filled red ucp__createx__button"
-                    ng-if="!self.processingPublish"
-                    ng-click="self.createWhatsAround()"
-                    ng-disabled="self.processingPublish">
+                    ng-click="self.viewWhatsAround()">
                 <svg class="won-button-icon" style="--local-primary:white;">
                     <use xlink:href="#ico36_location_current" href="#ico36_location_current"></use>
                 </svg>
                 <span>What's in your Area?</span>
             </button>
             <button class="won-button--filled red ucp__createx__button"
-                    ng-if="!self.processingPublish"
-                    ng-click="self.createWhatsNew()"
-                    ng-disabled="self.processingPublish">
+                    ng-click="self.viewWhatsNew()">
                 <span>What's new?</span>
             </button>
 
@@ -71,24 +60,46 @@ function genComponentConf() {
         <div class="ucp__main">
 
         <!-- SEARCH FIELD -->
-        <input
-            type="text"
-            class="ucp__main__search"
-            placeholder="Search for use cases"
-            won-input="::self.updateSearch()" />
-
+        <div class="ucp__main__search">
+          <svg class="ucp__main__search__icon clickable"
+              style="--local-primary:var(--won-primary-color);"
+              ng-if="self.showResetButton"
+              ng-click="self.resetSearch()">
+              <use xlink:href="#ico36_close" href="#ico36_close"></use>
+          </svg>
+          <input
+              type="text"
+              class="ucp__main__search__input"
+              placeholder="Search for use cases"
+              won-input="::self.updateSearch()" />
+        </div>
         <!-- SEARCH RESULTS -->
         <div class="ucp__main__searchresult clickable"
           ng-repeat="useCase in self.searchResults"
+          ng-if="self.isSearching && self.searchResults"
           ng-click="self.startFrom(useCase)">
             <svg class="ucp__main__searchresult__icon"
                 ng-if="!!useCase.icon">
                 <use xlink:href="{{ useCase.icon }}" href="{{ useCase.icon }}"></use>
-              </svg>
-              <div class="ucp__main__searchresult__label"
+            </svg>
+            <div class="ucp__main__searchresult__label"
                 ng-if="!!useCase.label">
-                  {{ useCase.label }}
-              </div>
+                {{ useCase.label }}
+            </div>
+        </div>
+        <div class="ucp__main__noresults" ng-if="self.isSearching && !self.searchResults">
+          No Results found for '{{self.textfield().value}}'.
+        </div>
+        <div class="ucp__main__newcustom clickable" ng-if="self.isSearching && !self.searchResults && self.customUseCase"
+            ng-click="self.startFrom(self.customUseCase)">
+            <svg class="ucp__main__newcustom__icon"
+                ng-if="!!self.customUseCase.icon">
+                <use xlink:href="{{ self.customUseCase.icon }}" href="{{ self.customUseCase.icon }}"></use>
+            </svg>
+            <div class="ucp__main__newcustom__label"
+                ng-if="!!self.customUseCase.label">
+                {{ self.customUseCase.label }}
+            </div>
         </div>
 
 
@@ -132,15 +143,20 @@ function genComponentConf() {
 
       this.useCaseUtils = useCaseUtils;
       this.searchResults = undefined;
+      this.showResetButton = false;
 
       const selectFromState = state => {
         const showGroupsThreshold = 1; // only show groups with more than 1 use case(s) as groups
 
         return {
-          showAll: getUseCaseGroupFromRoute(state) === "all",
-          processingPublish: state.getIn(["process", "processingPublish"]),
-          connectionHasBeenLost: !selectIsConnected(state),
+          isLocationAccessDenied: generalSelectors.isLocationAccessDenied(
+            state
+          ),
+          loggedIn: accountUtils.isLoggedIn(get(state, "account")),
+          showAll: generalSelectors.getUseCaseGroupFromRoute(state) === "all",
+          connectionHasBeenLost: !generalSelectors.selectIsConnected(state),
           useCaseGroups: useCaseUtils.getUseCaseGroups(),
+          customUseCase: useCaseUtils.getCustomUseCase(),
           showGroupsThreshold,
           ungroupedUseCases: useCaseUtils.getUnGroupedUseCases(
             showGroupsThreshold
@@ -153,19 +169,6 @@ function genComponentConf() {
     }
 
     // redirects start
-
-    createWhatsAround() {
-      if (!this.processingPublish) {
-        this.needs__whatsAround();
-      }
-    }
-
-    createWhatsNew() {
-      if (!this.processingPublish) {
-        this.needs__whatsNew();
-      }
-    }
-
     startFrom(selectedUseCase) {
       const selectedUseCaseIdentifier =
         selectedUseCase && selectedUseCase.identifier;
@@ -200,28 +203,38 @@ function genComponentConf() {
 
     // redirects end
 
-    // search start
-
-    // TODO: deal with use cases that are in more than one group - they might show up repeatedly
-    // TODO: group search results by use case groups - only showing groups with results
     updateSearch() {
+      this.showResetButton = true;
       const query = this.textfield().value;
 
       if (query && query.trim().length > 1) {
         this.isSearching = true;
 
-        const results = useCaseUtils.filterUseCasesBySearchQuery(query);
+        const searchResults = useCaseUtils.filterUseCasesBySearchQuery(query);
 
-        if (!results) {
-          this.searchResults = undefined;
-          this.isSearching = false;
-        }
+        const sortByLabelAsc = (a, b) => {
+          const bValue = b && b.label && b.label.toLowerCase();
+          const aValue = a && a.label && a.label.toLowerCase();
 
-        this.searchResults = results;
+          if (aValue < bValue) return -1;
+          if (aValue > bValue) return 1;
+          return 0;
+        };
+
+        this.searchResults = searchResults
+          ? searchResults.sort(sortByLabelAsc)
+          : undefined;
       } else {
         this.searchResults = undefined;
         this.isSearching = false;
       }
+    }
+
+    resetSearch() {
+      this.isSearching = false;
+      this.searchResults = undefined;
+      this.textfield().value = "";
+      this.showResetButton = false;
     }
 
     // search end
@@ -232,10 +245,60 @@ function genComponentConf() {
     textfield() {
       if (!this._searchInput) {
         this._searchInput = this.$element[0].querySelector(
-          ".ucp__main__search"
+          ".ucp__main__search__input"
         );
       }
       return this._searchInput;
+    }
+
+    viewWhatsAround() {
+      this.viewWhatsX(() => {
+        this.router__stateGo("map");
+      });
+    }
+
+    viewWhatsNew() {
+      this.viewWhatsX(() => {
+        this.router__stateGo("overview");
+      });
+    }
+
+    viewWhatsX(callback) {
+      if (this.isLocationAccessDenied) {
+        callback();
+      } else if ("geolocation" in navigator) {
+        navigator.geolocation.getCurrentPosition(
+          currentLocation => {
+            const lat = currentLocation.coords.latitude;
+            const lng = currentLocation.coords.longitude;
+
+            this.view__updateCurrentLocation(
+              Immutable.fromJS({ location: { lat, lng } })
+            );
+            callback();
+          },
+          error => {
+            //error handler
+            console.error(
+              "Could not retrieve geolocation due to error: ",
+              error.code,
+              ", continuing map initialization without currentLocation. fullerror:",
+              error
+            );
+            this.view__locationAccessDenied();
+            callback();
+          },
+          {
+            //options
+            enableHighAccuracy: true,
+            maximumAge: 30 * 60 * 1000, //use if cache is not older than 30min
+          }
+        );
+      } else {
+        console.error("location could not be retrieved");
+        this.view__locationAccessDenied();
+        callback();
+      }
     }
   }
 
@@ -253,7 +316,7 @@ function genComponentConf() {
   };
 }
 
-export default //.controller('CreateNeedController', [...serviceDependencies, CreateNeedController])
+export default //.controller('CreateAtomController', [...serviceDependencies, CreateAtomController])
 angular
   .module("won.owner.components.usecasePicker", [ngAnimate, labelledHrModule])
   .directive("wonUsecasePicker", genComponentConf).name;

@@ -1,7 +1,7 @@
-@prefix msg:   <http://purl.org/webofneeds/message#> .
+@prefix msg:   <https://w3id.org/won/message#> .
 @prefix conn:  <https://localhost:8443/won/resource/connection/> .
-@prefix need:  <https://localhost:8443/won/resource/need/> .
-@prefix woncrypt: <http://purl.org/webofneeds/woncrypt#> .
+@prefix atom:  <https://localhost:8443/won/resource/atom/> .
+@prefix woncrypt: <https://w3id.org/won/core#> .
 @prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
 @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix cert:  <http://www.w3.org/ns/auth/cert#> .
@@ -11,7 +11,7 @@
 @prefix s:     <http://schema.org/> .
 @prefix sh:    <http://www.w3.org/ns/shacl#> .
 @prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-@prefix won:   <http://purl.org/webofneeds/model#> .
+@prefix won:   <https://w3id.org/won/core#> .
 @prefix ldp:   <http://www.w3.org/ns/ldp#> .
 @prefix event: <https://localhost:8443/won/resource/event/> .
 @prefix dc:    <http://purl.org/dc/elements/1.1/> .
@@ -24,22 +24,22 @@
 
 @prefix oln-test:   <http://sat.researchstudio.at/oln/test/> .
 
-<oln-test:taxiService1#need> {
+<oln-test:taxiService1#atom> {
     oln-test:taxiService1
-		a             won:Need ;
-		won:hasFlag   won:NoHintForCounterpart ;
+		a             won:Atom ;
+		won:flag   won:NoHintForCounterpart ;
 		dc:description   "next 10 minutes" ;
         dc:title "Taxi in Wien"@de ;
         dc:description "Biete Taxidienstleistungen im Raum Wien und Umgebung"@de ;
         dc:title "Taxi in Vienna"@en ;
         dc:description "Offering taxi services in Vienna and around"@en ;
-        won:hasTag "Taxi", "PersonenTransport"@de, "People transport"@en ;
+        won:tag "Taxi", "PersonenTransport"@de, "People transport"@en ;
         s:location  [ a                   s:Place ;
-                           won:hasBoundingBox  [ won:hasNorthWestCorner  [ a            s:GeoCoordinates ;
+                           won:boundingBox  [ won:northWestCorner  [ a            s:GeoCoordinates ;
                                                                            s:latitude   "48.199528" ;
                                                                            s:longitude  "16.355209"
                                                                          ] ;
-                                                 won:hasSouthEastCorner  [ a            s:GeoCoordinates ;
+                                                 won:southEastCorner  [ a            s:GeoCoordinates ;
                                                                            s:latitude   "48.218489" ;
                                                                            s:longitude  "16.384895"
                                                                          ]
@@ -79,7 +79,7 @@
 		];
 		won:seeks [
             won:seeks [
-                won:hasTag "Taxi";
+                won:tag "Taxi";
                 s:location [
                 s:geo [
                   a s:GeoCoordinates ;
@@ -101,7 +101,7 @@
             ]
 		];				  
 		won:goal [
-			won:hasShapesGraph ex2:p2g-shapes ;
+			won:shapesGraph ex2:p2g-shapes ;
 		] .
 }
 

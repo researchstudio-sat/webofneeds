@@ -25,7 +25,7 @@ services:
       - $base_folder/won-server-certsownergreen:/usr/local/certs/out/
       - $base_folder/openssl.conf:/usr/local/openssl.conf
 
-  # portsgres need databases for owner and wonnode blue
+  # portsgres atom databases for owner and wonnode blue
   postgresblue:
     restart: always
     image: webofneeds/postgres:master
@@ -113,7 +113,7 @@ services:
       - postgresblue
       - gencertownerblue
 
-  # portsgres need databases for owner and wonnode green
+  # portsgres atom databases for owner and wonnode green
   postgresgreen:
     restart: always
     image: webofneeds/postgres:master
@@ -215,7 +215,7 @@ services:
     volumes:
       - $base_folder/mongodb/data/db:/data/db
 
-  # debug bot used to test need communication, connect to wonnodes blue and green
+  # debug bot used to test atom communication, connect to wonnodes blue and green
   debug_bot:
     restart: always
     build: ../../image/bots
@@ -329,7 +329,7 @@ services:
       - wonnodeblue
       - wonnodegreen
 
-  # solr server as a need index
+  # solr server as an atom index
   solr:
     restart: always
     build: ../../image/solr

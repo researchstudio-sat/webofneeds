@@ -15,7 +15,7 @@ Not --> Private: paste private url
 Not --> Private: edit url \nadd private id
 Not --> LogoutPrivate: edit url \nchange private id \n(part 1: logs old out)
 LogoutPrivate --> Private:  edit url \nchange private id (part2: logs new in)
-Not --> Private: create need
+Not --> Private: create atom
 Not --> Account: sign up
 Not --> NotAllowed: session timeout
 
@@ -34,7 +34,7 @@ LogoutAccount --> Private: edit url \nadd private id\n(part 2: log in private id
 
 Account --> NotAllowed: edit url \nchange private id 
 
-Account --> Account: create need
+Account --> Account: create atom
 Account --> NotAllowed: sign up
 Account --> Not: session timeout
 
@@ -54,7 +54,7 @@ LogoutPrivate --> Private: edit url \nchange private id\n(part 2: log in private
 
 Private --> NotAllowed: edit url \nadd private id 
 
-Private --> Private: create need
+Private --> Private: create atom
 Private --> LogoutPrivate: sign up \n(step 1: log private id out)
 LogoutPrivate --> Account: sign up \n(step 2: log in account)
 

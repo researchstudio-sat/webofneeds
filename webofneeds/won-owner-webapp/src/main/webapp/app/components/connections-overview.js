@@ -1,5 +1,5 @@
 /**
- * A list over all owned posts/needs with their connections
+ * A list over all owned posts/atoms with their connections
  * below each other. Usually limited to a connections of a
  * specific state (e.g. "hint")
  * Created by ksinger on 12.04.2017.
@@ -22,67 +22,56 @@ import { actionCreators } from "../actions/actions.js";
 
 import "style/_connections-overview.scss";
 
-import {
-  getRouterParams,
-  getOwnedNeedByConnectionUri,
-  getOwnedNeedsInCreation,
-  getConnectionUriFromRoute,
-  getPostUriFromRoute,
-  getPosts,
-  getOwnedClosedPosts,
-  getOwnedOpenPosts,
-} from "../selectors/general-selectors.js";
-import { getChatConnectionsToCrawl } from "../selectors/connection-selectors.js";
-import {
-  isChatConnection,
-  isGroupChatConnection,
-} from "../connection-utils.js";
-import * as needUtils from "../need-utils.js";
+import * as generalSelectors from "../selectors/general-selectors.js";
+import * as connectionSelectors from "../selectors/connection-selectors.js";
+import * as connectionUtils from "../connection-utils.js";
+import * as atomUtils from "../atom-utils.js";
 import * as viewUtils from "../view-utils.js";
+import * as processUtils from "../process-utils.js";
 
 const serviceDependencies = ["$ngRedux", "$scope"];
 function genComponentConf() {
   let template = `
         <won-create-post-item ng-class="{'selected' : !!self.useCaseGroup || !!self.useCase}"></won-create-post-item>
-        <div ng-repeat="needUri in self.beingCreatedNeedUris track by needUri" class="co__item">
-            <div class="co__item__need" ng-class="{'selected' : needUri === self.needUriInRoute}">
-                <div class="co__item__need__indicator"></div>
-                <div class="co__item__need__header">
+        <div ng-repeat="atomUri in self.beingCreatedAtomUris track by atomUri" class="co__item">
+            <div class="co__item__atom" ng-class="{'selected' : atomUri === self.atomUriInRoute}">
+                <div class="co__item__atom__indicator"></div>
+                <div class="co__item__atom__header">
                     <won-post-header
-                        need-uri="::needUri"
-                        ng-click="self.toggleDetails(needUri)"
-                        ng-class="{ 'clickable' : !self.isNeedLoading(needUri) }">
+                        atom-uri="::atomUri"
+                        ng-click="self.toggleDetails(atomUri)"
+                        ng-class="{ 'clickable' : !self.isAtomLoading(atomUri) }">
                     </won-post-header>
                 </div>
             </div>
         </div>
-        <div ng-repeat="needUri in self.sortedOpenNeedUris track by needUri" class="co__item">
-            <div class="co__item__need" ng-class="{'won-unread': self.isUnread(needUri), 'selected' : needUri === self.needUriInRoute, 'open': self.isOpen(needUri)}">
-                <div class="co__item__need__indicator"></div>
-                <div class="co__item__need__header">
+        <div ng-repeat="atomUri in self.sortedOpenAtomUris track by atomUri" class="co__item">
+            <div class="co__item__atom" ng-class="{'won-unread': self.isUnread(atomUri), 'selected' : atomUri === self.atomUriInRoute, 'open': self.isOpen(atomUri)}">
+                <div class="co__item__atom__indicator"></div>
+                <div class="co__item__atom__header">
                     <won-post-header
-                        need-uri="::needUri"
-                        ng-click="self.toggleDetails(needUri)"
-                        ng-class="{ 'clickable' : !self.isNeedLoading(needUri) }">
+                        atom-uri="::atomUri"
+                        ng-click="self.toggleDetails(atomUri)"
+                        ng-class="{ 'clickable' : !self.isAtomLoading(atomUri) }">
                     </won-post-header>
                     <won-connection-indicators
                         on-selected-connection="::self.selectConnection(connectionUri)"
-                        need-uri="::needUri">
+                        atom-uri="::atomUri">
                     </won-connection-indicators>
                     <button
-                        class="co__item__need__header__button red"
-                        ng-click="needUri === self.needUriInRoute ? self.selectNeed(undefined) : self.selectNeed(needUri)"
+                        class="co__item__atom__header__button red"
+                        ng-click="atomUri === self.atomUriInRoute ? self.selectAtom(undefined) : self.selectAtom(atomUri)"
                         ng-class="{
-                          'won-button--filled' : needUri === self.needUriInRoute,
-                          'won-button--outlined thin': needUri !== self.needUriInRoute
+                          'won-button--filled' : atomUri === self.atomUriInRoute,
+                          'won-button--outlined thin': atomUri !== self.atomUriInRoute
                         }">
                         Details
                     </button>
-                    <div class="co__item__need__header__carret clickable" ng-click="!self.isNeedLoading(needUri) && self.toggleDetails(needUri)">
-                        <svg class="co__item__need__header__carret__icon"
+                    <div class="co__item__atom__header__carret clickable" ng-click="!self.isAtomLoading(atomUri) && self.toggleDetails(atomUri)">
+                        <svg class="co__item__atom__header__carret__icon"
                             ng-class="{
-                              'won-icon-expanded': self.isOpen(needUri),
-                              'won-icon-disabled': !self.hasOpenOrLoadingChatConnections(needUri, self.allNeeds, self.process) || self.isNeedLoading(needUri),
+                              'won-icon-expanded': self.isOpen(atomUri),
+                              'won-icon-disabled': !self.hasOpenOrLoadingChatConnections(atomUri, self.allAtoms, self.process) || self.isAtomLoading(atomUri),
                             }">
                             <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
                         </svg>
@@ -90,70 +79,70 @@ function genComponentConf() {
                 </div>
             </div>
             <div class="co__item__connections"
-                ng-if="self.isOpen(needUri) && self.hasOpenOrLoadingChatConnections(needUri, self.allNeeds, self.process)">
+                ng-if="self.isOpen(atomUri) && self.hasOpenOrLoadingChatConnections(atomUri, self.allAtoms, self.process)">
                 <div class="co__item__connections__item"
-                  ng-if="self.hasChatFacet(needUri)"
-                  ng-repeat="connUri in self.getOpenChatConnectionUrisArraySorted(needUri, self.allNeeds, self.process) track by connUri"
+                  ng-if="self.hasChatSocket(atomUri)"
+                  ng-repeat="connUri in self.getOpenChatConnectionUrisArraySorted(atomUri, self.allAtoms, self.process) track by connUri"
                   ng-class="{
-                    'won-unread': self.isConnectionUnread(needUri, connUri),
+                    'won-unread': self.isConnectionUnread(atomUri, connUri),
                     'selected': connUri === self.connUriInRoute
                   }">
                   <won-connection-selection-item
                       on-selected-connection="::self.selectConnection(connectionUri)"
                       connection-uri="::connUri"
-                      ng-class="{'won-unread': self.isConnectionUnread(needUri, connUri)}">
+                      ng-class="{'won-unread': self.isConnectionUnread(atomUri, connUri)}">
                   </won-connection-selection-item>
                 </div>
-                <div class="co__item__connections__item nonsticky" ng-if="self.hasChatFacet(needUri) && self.hasSuggestedConnections(needUri)"
+                <div class="co__item__connections__item nonsticky" ng-if="self.hasChatSocket(atomUri) && self.hasSuggestedConnections(atomUri)"
                   ng-class="{
-                    'won-unread': self.hasUnreadSuggestedConnections(needUri),
-                    'selected': self.isShowingSuggestions(needUri),
+                    'won-unread': self.hasUnreadSuggestedConnections(atomUri),
+                    'selected': self.isShowingSuggestions(atomUri),
                   }">
                   <won-suggestion-selection-item
-                      need-uri="::needUri"
-                      on-selected="self.showSuggestions(needUri)">
+                      atom-uri="::atomUri"
+                      on-selected="self.showSuggestions(atomUri)">
                   </won-suggestion-selection-item>
                 </div>
             </div>
         </div>
-        <div class="co__separator clickable" ng-class="{'co__separator--open' : self.showClosedNeeds}" ng-if="self.hasClosedNeeds()" ng-click="self.toggleClosedNeeds()">
-            <span class="co__separator__text">Archived Posts ({{self.getClosedNeedsText()}})</span>
+        <div class="co__separator clickable" ng-class="{'co__separator--open' : self.showClosedAtoms}" ng-if="self.hasClosedAtoms()" ng-click="self.toggleClosedAtoms()">
+            <span class="co__separator__text">Archived Posts ({{self.getClosedAtomsText()}})</span>
             <svg
                 style="--local-primary:var(--won-secondary-color);"
                 class="co__separator__arrow"
-                ng-if="self.showClosedNeeds">
+                ng-if="self.showClosedAtoms">
                 <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
             </svg>
             <svg style="--local-primary:var(--won-secondary-color);"
                 class="co__separator__arrow"
-                ng-if="!self.showClosedNeeds">
+                ng-if="!self.showClosedAtoms">
                 <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
             </svg>
         </div>
-        <div class="co__closedNeeds" ng-if="self.showClosedNeeds && self.closedNeedsSize > 0">
-            <div ng-repeat="needUri in self.sortedClosedNeedUris track by needUri" class="co__item">
-                <div class="co__item__need" ng-class="{'won-unread': self.isUnread(needUri), 'selected' : needUri === self.needUriInRoute, 'open': self.isOpen(needUri)}">
-                    <div class="co__item__need__indicator"></div>
-                    <div class="co__item__need__header">
+        <div class="co__closedAtoms" ng-if="self.showClosedAtoms && self.closedAtomsSize > 0">
+            <div ng-repeat="atomUri in self.sortedClosedAtomUris track by atomUri" class="co__item">
+                <div class="co__item__atom" ng-class="{'won-unread': self.isUnread(atomUri), 'selected' : atomUri === self.atomUriInRoute, 'open': self.isOpen(atomUri)}">
+                    <div class="co__item__atom__indicator"></div>
+                    <div class="co__item__atom__header">
                         <won-post-header
-                            need-uri="::needUri"
-                            ng-click="self.toggleDetails(needUri)"
-                            ng-class="{ 'clickable' : !self.isNeedLoading(needUri) }">
+                            atom-uri="::atomUri"
+                            ng-click="self.toggleDetails(atomUri)"
+                            ng-class="{ 'clickable' : !self.isAtomLoading(atomUri) }">
                         </won-post-header>
                         <button
-                            class="co__item__need__header__button red"
-                            ng-click="needUri === self.needUriInRoute ? self.selectNeed(undefined) : self.selectNeed(needUri)"
+                            class="co__item__atom__header__button red"
+                            ng-click="atomUri === self.atomUriInRoute ? self.selectAtom(undefined) : self.selectAtom(atomUri)"
                             ng-class="{
-                              'won-button--filled' : needUri === self.needUriInRoute,
-                              'won-button--outlined thin': needUri !== self.needUriInRoute
+                              'won-button--filled' : atomUri === self.atomUriInRoute,
+                              'won-button--outlined thin': atomUri !== self.atomUriInRoute
                             }">
                             Details
                         </button>
-                        <div class="co__item__need__header__carret clickable" ng-click="!self.isNeedLoading(needUri) && self.toggleDetails(needUri)">
-                          <svg class="co__item__need__header__carret__icon"
+                        <div class="co__item__atom__header__carret clickable" ng-click="!self.isAtomLoading(atomUri) && self.toggleDetails(atomUri)">
+                          <svg class="co__item__atom__header__carret__icon"
                               ng-class="{
-                                'won-icon-expanded': self.isOpen(needUri),
-                                'won-icon-disabled': self.isNeedLoading(needUri),
+                                'won-icon-expanded': self.isOpen(atomUri),
+                                'won-icon-disabled': self.isAtomLoading(atomUri),
                               }">
                               <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
                           </svg>
@@ -174,56 +163,63 @@ function genComponentConf() {
 
       const self = this;
       const selectFromState = state => {
-        const allNeeds = getPosts(state);
-        const openNeeds = getOwnedOpenPosts(state);
-        const closedNeeds = getOwnedClosedPosts(state);
+        const allAtoms = generalSelectors.getPosts(state);
+        const openAtoms = generalSelectors.getOwnedOpenPosts(state);
+        const closedAtoms = generalSelectors.getOwnedClosedPosts(state);
 
-        // needs that have been created but are not confirmed by the server yet
-        const beingCreatedNeeds = getOwnedNeedsInCreation(state);
+        // atoms that have been created but are not confirmed by the server yet
+        const beingCreatedAtoms = generalSelectors.getOwnedAtomsInCreation(
+          state
+        );
 
-        const connectionsToCrawl = getChatConnectionsToCrawl(state);
+        const connectionsToCrawl = connectionSelectors.getChatConnectionsToCrawl(
+          state
+        );
 
-        const routerParams = getRouterParams(state);
-        const useCase = get(routerParams, "useCase");
-        const useCaseGroup = get(routerParams, "useCaseGroup");
-        const connUriInRoute = getConnectionUriFromRoute(state);
-        const needUriInRoute = getPostUriFromRoute(state);
-        const needImpliedInRoute =
-          connUriInRoute && getOwnedNeedByConnectionUri(state, connUriInRoute);
-        const needUriImpliedInRoute =
-          needImpliedInRoute && needImpliedInRoute.get("uri");
+        const useCase = generalSelectors.getUseCaseFromRoute(state);
+        const useCaseGroup = generalSelectors.getUseCaseGroupFromRoute(state);
+        const connUriInRoute = generalSelectors.getConnectionUriFromRoute(
+          state
+        );
+        const atomUriInRoute = generalSelectors.getPostUriFromRoute(state);
+        const atomImpliedInRoute =
+          connUriInRoute &&
+          generalSelectors.getOwnedAtomByConnectionUri(state, connUriInRoute);
+        const atomUriImpliedInRoute =
+          atomImpliedInRoute && atomImpliedInRoute.get("uri");
 
-        const sortedOpenNeeds = sortByDate(openNeeds, "creationDate");
-        const sortedClosedNeeds = sortByDate(closedNeeds, "creationDate");
+        const sortedOpenAtoms = sortByDate(openAtoms, "creationDate");
+        const sortedClosedAtoms = sortByDate(closedAtoms, "creationDate");
 
-        const unloadedNeeds = closedNeeds.filter(need =>
-          getIn(state, ["process", "needs", need.get("uri"), "toLoad"])
+        const process = get(state, "process");
+        const unloadedAtoms = closedAtoms.filter(atom =>
+          processUtils.isAtomToLoad(process, atom.get("uri"))
         );
 
         const viewState = get(state, "view");
 
         return {
-          allNeeds,
-          process: state.get("process"),
+          allAtoms,
+          process,
           viewState,
-          showClosedNeeds: get(viewState, "showClosedNeeds"),
+          showClosedAtoms: viewUtils.showClosedAtoms(viewState),
           useCase,
           useCaseGroup,
-          needUriInRoute,
-          needUriImpliedInRoute,
+          atomUriInRoute,
+          atomUriImpliedInRoute,
           connUriInRoute,
-          beingCreatedNeedUris: beingCreatedNeeds && [
-            ...beingCreatedNeeds.keys(),
+          beingCreatedAtomUris: beingCreatedAtoms && [
+            ...beingCreatedAtoms.keys(),
           ],
-          sortedOpenNeedUris: sortedOpenNeeds && [
-            ...sortedOpenNeeds.flatMap(need => need.get("uri")),
+          sortedOpenAtomUris: sortedOpenAtoms && [
+            ...sortedOpenAtoms.flatMap(atom => atom.get("uri")),
           ],
-          sortedClosedNeedUris: sortedClosedNeeds && [
-            ...sortedClosedNeeds.flatMap(need => need.get("uri")),
+          sortedClosedAtomUris: sortedClosedAtoms && [
+            ...sortedClosedAtoms.flatMap(atom => atom.get("uri")),
           ],
           connectionsToCrawl: connectionsToCrawl || Immutable.Map(),
-          unloadedNeedsSize: unloadedNeeds ? unloadedNeeds.size : 0,
-          closedNeedsSize: closedNeeds ? closedNeeds.size : 0,
+          unloadedAtomsSize: unloadedAtoms ? unloadedAtoms.size : 0,
+          closedAtomsSize: closedAtoms ? closedAtoms.size : 0,
         };
       };
       connect2Redux(
@@ -233,7 +229,7 @@ function genComponentConf() {
         this
       );
 
-      this.$scope.$watch("self.needUriImpliedInRoute", (newValue, oldValue) => {
+      this.$scope.$watch("self.atomUriImpliedInRoute", (newValue, oldValue) => {
         if (newValue && !oldValue) {
           self.open[newValue] = true;
         }
@@ -270,195 +266,195 @@ function genComponentConf() {
       });
     }
 
-    toggleDetails(ownedNeedUri) {
+    toggleDetails(ownedAtomUri) {
       for (let key in this.open) {
-        if (key !== ownedNeedUri) {
+        if (key !== ownedAtomUri) {
           this.open[key] = false;
         }
       }
 
-      if (this.isOpen(ownedNeedUri)) {
-        this.open[ownedNeedUri] = false;
-        if (this.isOpenByConnection(ownedNeedUri)) {
-          this.needs__selectTab(
-            Immutable.fromJS({ needUri: ownedNeedUri, selectTab: "DETAIL" })
+      if (this.isOpen(ownedAtomUri)) {
+        this.open[ownedAtomUri] = false;
+        if (this.isOpenByConnection(ownedAtomUri)) {
+          this.atoms__selectTab(
+            Immutable.fromJS({ atomUri: ownedAtomUri, selectTab: "DETAIL" })
           );
           this.router__stateGoCurrent({
             postUri: undefined,
             useCase: undefined,
             useCaseGroup: undefined,
             connectionUri: undefined,
-            fromNeedUri: undefined,
+            fromAtomUri: undefined,
             mode: undefined,
           });
         }
       } else {
-        this.open[ownedNeedUri] = true;
+        this.open[ownedAtomUri] = true;
       }
     }
 
-    showSuggestions(ownedNeedUri) {
-      this.needs__selectTab(
-        Immutable.fromJS({ needUri: ownedNeedUri, selectTab: "SUGGESTIONS" })
+    showSuggestions(ownedAtomUri) {
+      this.atoms__selectTab(
+        Immutable.fromJS({ atomUri: ownedAtomUri, selectTab: "SUGGESTIONS" })
       );
       this.router__stateGoCurrent({
-        postUri: ownedNeedUri,
+        postUri: ownedAtomUri,
         useCase: undefined,
         useCaseGroup: undefined,
         connectionUri: undefined,
-        fromNeedUri: undefined,
+        fromAtomUri: undefined,
         mode: undefined,
       });
     }
 
-    hasChatFacet(needUri) {
-      const need = get(this.allNeeds, needUri);
-      return needUtils.hasChatFacet(need);
+    hasChatSocket(atomUri) {
+      const atom = get(this.allAtoms, atomUri);
+      return atomUtils.hasChatSocket(atom);
     }
 
-    hasSuggestedConnections(needUri) {
-      const need = get(this.allNeeds, needUri);
-      return needUtils.hasSuggestedConnections(need);
+    hasSuggestedConnections(atomUri) {
+      const atom = get(this.allAtoms, atomUri);
+      return atomUtils.hasSuggestedConnections(atom);
     }
 
-    hasUnreadSuggestedConnections(needUri) {
-      const need = get(this.allNeeds, needUri);
-      return needUtils.hasUnreadSuggestedConnections(need);
+    hasUnreadSuggestedConnections(atomUri) {
+      const atom = get(this.allAtoms, atomUri);
+      return atomUtils.hasUnreadSuggestedConnections(atom);
     }
 
-    isUnread(needUri) {
-      const need = get(this.allNeeds, needUri);
-      return get(need, "unread");
+    isUnread(atomUri) {
+      const atom = get(this.allAtoms, atomUri);
+      return get(atom, "unread");
     }
 
-    isConnectionUnread(needUri, connUri) {
-      const conn = getIn(this.allNeeds, [needUri, "connections", connUri]);
+    isConnectionUnread(atomUri, connUri) {
+      const conn = getIn(this.allAtoms, [atomUri, "connections", connUri]);
       return get(conn, "unread");
     }
 
-    hasClosedNeeds() {
-      return this.closedNeedsSize > 0;
+    hasClosedAtoms() {
+      return this.closedAtomsSize > 0;
     }
 
-    getClosedNeedsText() {
+    getClosedAtomsText() {
       let output = [];
-      if (this.closedNeedsSize > 0) {
-        output.push(`${this.closedNeedsSize}`);
+      if (this.closedAtomsSize > 0) {
+        output.push(`${this.closedAtomsSize}`);
       }
-      if (this.unloadedNeedsSize > 0) {
-        output.push(`${this.unloadedNeedsSize} unloaded`);
+      if (this.unloadedAtomsSize > 0) {
+        output.push(`${this.unloadedAtomsSize} unloaded`);
       }
 
       return output.join(" - ");
     }
 
-    toggleClosedNeeds() {
-      if (this.unloadedNeedsSize > 0) {
-        this.needs__fetchUnloadedNeeds();
+    toggleClosedAtoms() {
+      if (this.unloadedAtomsSize > 0) {
+        this.atoms__fetchUnloadedAtoms();
       }
-      this.view__toggleClosedNeeds();
+      this.view__toggleClosedAtoms();
     }
 
-    isOpen(ownedNeedUri) {
-      return this.isOpenByConnection(ownedNeedUri) || !!this.open[ownedNeedUri];
+    isOpen(ownedAtomUri) {
+      return this.isOpenByConnection(ownedAtomUri) || !!this.open[ownedAtomUri];
     }
 
-    isShowingSuggestions(ownedNeedUri) {
-      const visibleTab = viewUtils.getVisibleTabByNeedUri(
+    isShowingSuggestions(ownedAtomUri) {
+      const visibleTab = viewUtils.getVisibleTabByAtomUri(
         this.viewState,
-        ownedNeedUri
+        ownedAtomUri
       );
       return (
-        !!this.open[ownedNeedUri] &&
-        ownedNeedUri === this.needUriInRoute &&
+        !!this.open[ownedAtomUri] &&
+        ownedAtomUri === this.atomUriInRoute &&
         visibleTab === "SUGGESTIONS"
       );
     }
 
-    isNeedLoading(needUri) {
-      return this.process.getIn(["needs", needUri, "loading"]);
+    isAtomLoading(atomUri) {
+      return processUtils.isAtomLoading(this.process, atomUri);
     }
 
-    isOpenByConnection(ownedNeedUri) {
-      return this.needUriImpliedInRoute === ownedNeedUri;
+    isOpenByConnection(ownedAtomUri) {
+      return this.atomUriImpliedInRoute === ownedAtomUri;
     }
 
     selectConnection(connectionUri) {
       this.onSelectedConnection({ connectionUri }); //trigger callback with scope-object
     }
-    selectNeed(needUri) {
-      this.onSelectedNeed({ needUri }); //trigger callback with scope-object
+    selectAtom(atomUri) {
+      this.onSelectedAtom({ atomUri }); //trigger callback with scope-object
     }
-    selectSuggested(needUri) {
-      console.debug("stuff should happen now IMPL ME for: ", needUri);
+    selectSuggested(atomUri) {
+      console.debug("stuff should happen now IMPL ME for: ", atomUri);
     }
 
-    hasOpenOrLoadingChatConnections(needUri, allNeeds, process) {
-      const need = get(this.allNeeds, needUri);
+    hasOpenOrLoadingChatConnections(atomUri, allAtoms, process) {
+      const atom = get(this.allAtoms, atomUri);
 
-      if (!need) {
+      if (!atom) {
         return false;
       }
       return (
-        need.get("state") === won.WON.ActiveCompacted &&
-        !!need.get("connections").find(conn => {
-          if (!isChatConnection(conn) && !isGroupChatConnection(conn))
-            return false;
+        atom.get("state") === won.WON.ActiveCompacted &&
+        !!atom.get("connections").find(conn => {
           if (
-            process &&
-            process.getIn(["connections", conn.get("uri"), "loading"])
+            !connectionUtils.isChatConnection(conn) &&
+            !connectionUtils.isGroupChatConnection(conn)
           )
+            return false;
+          if (processUtils.isConnectionLoading(process, conn.get("uri")))
             return true; //if connection is currently loading we assume its a connection we want to show
 
-          const remoteNeedUri = conn.get("remoteNeedUri");
-          const remoteNeedPresent =
-            remoteNeedUri && allNeeds && !!allNeeds.get(remoteNeedUri);
+          const targetAtomUri = conn.get("targetAtomUri");
+          const targetAtomPresent =
+            targetAtomUri && allAtoms && !!allAtoms.get(targetAtomUri);
 
-          if (!remoteNeedPresent) return true; //if the remoteNeed is not present yet we assume its a connection we want
+          if (!targetAtomPresent) return true; //if the targetAtom is not present yet we assume its a connection we want
 
-          const remoteNeedActiveOrLoading =
-            process.getIn(["needs", remoteNeedUri, "loading"]) ||
-            process.getIn(["needs", remoteNeedUri, "failedToLoad"]) ||
-            allNeeds.getIn([remoteNeedUri, "state"]) ===
+          const targetAtomActiveOrLoading =
+            process.getIn(["atoms", targetAtomUri, "loading"]) ||
+            process.getIn(["atoms", targetAtomUri, "failedToLoad"]) ||
+            allAtoms.getIn([targetAtomUri, "state"]) ===
               won.WON.ActiveCompacted;
 
           return (
-            remoteNeedActiveOrLoading && conn.get("state") !== won.WON.Closed
+            targetAtomActiveOrLoading && conn.get("state") !== won.WON.Closed
           );
         })
       );
     }
 
-    getOpenChatConnectionUrisArraySorted(needUri, allNeeds, process) {
-      const need = get(this.allNeeds, needUri);
+    getOpenChatConnectionUrisArraySorted(atomUri, allAtoms, process) {
+      const atom = get(this.allAtoms, atomUri);
 
-      if (!need) {
+      if (!atom) {
         return undefined;
       }
       const sortedConnections = sortByDate(
-        need.get("connections").filter(conn => {
-          if (!isChatConnection(conn) && !isGroupChatConnection(conn))
-            return false;
+        atom.get("connections").filter(conn => {
           if (
-            process &&
-            process.getIn(["connections", conn.get("uri"), "loading"])
+            !connectionUtils.isChatConnection(conn) &&
+            !connectionUtils.isGroupChatConnection(conn)
           )
+            return false;
+          if (processUtils.isConnectionLoading(process, conn.get("uri")))
             return true; //if connection is currently loading we assume its a connection we want to show
 
-          const remoteNeedUri = conn.get("remoteNeedUri");
-          const remoteNeedPresent =
-            remoteNeedUri && allNeeds && !!allNeeds.get(remoteNeedUri);
+          const targetAtomUri = conn.get("targetAtomUri");
+          const targetAtomPresent =
+            targetAtomUri && allAtoms && !!allAtoms.get(targetAtomUri);
 
-          if (!remoteNeedPresent) return false;
+          if (!targetAtomPresent) return false;
 
-          const remoteNeedActiveOrLoading =
-            process.getIn(["needs", remoteNeedUri, "loading"]) ||
-            process.getIn(["needs", remoteNeedUri, "failedToLoad"]) ||
-            allNeeds.getIn([remoteNeedUri, "state"]) ===
+          const targetAtomActiveOrLoading =
+            process.getIn(["atoms", targetAtomUri, "loading"]) ||
+            process.getIn(["atoms", targetAtomUri, "failedToLoad"]) ||
+            allAtoms.getIn([targetAtomUri, "state"]) ===
               won.WON.ActiveCompacted;
 
           return (
-            remoteNeedActiveOrLoading &&
+            targetAtomActiveOrLoading &&
             conn.get("state") !== won.WON.Closed &&
             conn.get("state") !== won.WON.Suggested
           );
@@ -485,7 +481,7 @@ function genComponentConf() {
        *  on-selected-connection="myCallback(connectionUri)"
        */
       onSelectedConnection: "&",
-      onSelectedNeed: "&",
+      onSelectedAtom: "&",
     },
     template: template,
   };

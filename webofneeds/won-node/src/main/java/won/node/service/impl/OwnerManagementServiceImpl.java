@@ -11,23 +11,18 @@ import won.protocol.repository.OwnerApplicationRepository;
 import won.protocol.service.ApplicationManagementService;
 
 /**
- * User: sbyim
- * Date: 11.11.13
+ * User: sbyim Date: 11.11.13
  */
 public class OwnerManagementServiceImpl implements ApplicationManagementService {
     private final Logger logger = LoggerFactory.getLogger(getClass());
-
     @Autowired
     private OwnerApplicationRepository ownerApplicatonRepository;
-
     @Autowired
     private QueueManagementServiceImpl queueManagementService;
 
     @Override
     public String registerOwnerApplication(String ownerApplicationId) {
-
-        logger.debug("ownerApplicationId: "+ownerApplicationId.toString() );
-
+        logger.debug("ownerApplicationId: " + ownerApplicationId.toString());
         if (ownerApplicatonRepository.findByOwnerApplicationIdForUpdate(ownerApplicationId).isEmpty()) {
             logger.info("Registering owner application for the first time with id: {}", ownerApplicationId);
             OwnerApplication ownerApplication = new OwnerApplication();
@@ -41,7 +36,6 @@ public class OwnerManagementServiceImpl implements ApplicationManagementService 
             logger.info("Registering already known owner application with id: {}", ownerApplicationId);
             return ownerApplicationId;
         }
-
     }
 
     public void setQueueManagementService(QueueManagementServiceImpl queueManagementService) {

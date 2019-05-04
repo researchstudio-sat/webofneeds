@@ -14,8 +14,7 @@
   ~    limitations under the License.
   -->
 <!--
-CacheManager Configuration
-==========================
+CacheManager Configuration ==========================
 An ehcache.xml corresponds to a single CacheManager.
 
 See instructions below or the ehcache schema (ehcache.xsd) on how to configure.
@@ -65,17 +64,12 @@ a specific cache to overflow to off heap, you'll have to set overflowToOffHeap="
 
 Here is an example of CacheManager level resource tuning, which will use up to 400M of heap and 2G of offHeap:
 
-<ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="ehcache.xsd"
-         updateCheck="true" monitoring="autodetect"
-         dynamicConfig="true" maxBytesLocalHeap="400M" maxBytesLocalOffHeap="2G">
+<ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="ehcache.xsd" updateCheck="true" monitoring="autodetect" dynamicConfig="true" maxBytesLocalHeap="400M" maxBytesLocalOffHeap="2G">
 
 -->
-<ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="http://ehcache.org/ehcache.xsd"
-         updateCheck="false"
-         monitoring="autodetect"
-         dynamicConfig="true"><!--
+<ehcache 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://ehcache.org/ehcache.xsd" updateCheck="false" monitoring="autodetect" dynamicConfig="true">
+	<!--
     DiskStore configuration
     =======================
 
@@ -105,8 +99,8 @@ Here is an example of CacheManager level resource tuning, which will use up to 4
     Subdirectories can be specified below the property e.g. java.io.tmpdir/one
 
     -->
-    <diskStore path="java.io.tmpdir"/>
-    <!--
+	<diskStore path="java.io.tmpdir"/>
+	<!--
         TransactionManagerLookup configuration
         ======================================
         This class is used by ehcache to lookup the JTA TransactionManager use in the application
@@ -121,9 +115,8 @@ Here is an example of CacheManager level resource tuning, which will use up to 4
         You can provide you own lookup class that implements the
         net.sf.ehcache.transaction.manager.TransactionManagerLookup interface.
         -->
-    <transactionManagerLookup class="net.sf.ehcache.transaction.manager.DefaultTransactionManagerLookup"
-                              properties="jndiName=java:/TransactionManager" propertySeparator=";"/>
-    <!--
+	<transactionManagerLookup class="net.sf.ehcache.transaction.manager.DefaultTransactionManagerLookup" properties="jndiName=java:/TransactionManager" propertySeparator=";"/>
+	<!--
         CacheManagerEventListener
         =========================
         Specifies a CacheManagerEventListenerFactory which is notified when Caches are added
@@ -145,9 +138,8 @@ Here is an example of CacheManager level resource tuning, which will use up to 4
 
         If no class is specified, no listener is created. There is no default.
         -->
-    <cacheManagerEventListenerFactory class="" properties=""/>
-
-    <!--
+	<cacheManagerEventListenerFactory class="" properties=""/>
+	<!--
         Cache configuration
         ===================
 
@@ -280,9 +272,7 @@ Here is an example of CacheManager level resource tuning, which will use up to 4
 
         The following example configuration shows a cache configured for localTempSwap restartability.
 
-        <cache name="persistentCache" maxEntriesLocalHeap="1000">
-            <persistence strategy="localTempSwap"/>
-        </cache>
+        <cache name="persistentCache" maxEntriesLocalHeap="1000"><persistence strategy="localTempSwap"/></cache>
 
         Cache elements can also contain sub elements which take the same format of a factory class
         and properties. Defined sub-elements are:
@@ -325,8 +315,7 @@ Here is an example of CacheManager level resource tuning, which will use up to 4
 
         Example of setting up a logging listener for local cache events:
 
-        <cacheEventListenerFactory class="my.company.log.CacheLogger"
-            listenFor="local" />
+        <cacheEventListenerFactory class="my.company.log.CacheLogger" listenFor="local" />
 
 
         Search
@@ -336,9 +325,7 @@ Here is an example of CacheManager level resource tuning, which will use up to 4
         and value objects of elements put into the cache will be attributes against which
         queries can be expressed.
 
-        <cache>
-            <searchable/>
-        </cache>
+        <cache><searchable/></cache>
 
 
         An "attribute" of the cache elements can also be defined to be searchable. In the example below
@@ -348,39 +335,23 @@ Here is an example of CacheManager level resource tuning, which will use up to 4
         attribute expressions. Attribute values must also conform to the set of types documented in the
         net.sf.ehcache.search.attribute.AttributeExtractor interface
 
-        <cache>
-            <searchable>
-                <searchAttribute name="age" expression="value.getAge()"/>
-            </searchable>
-        </cache>
+        <cache><searchable><searchAttribute name="age" expression="value.getAge()"/></searchable></cache>
 
 
         Attributes may also be defined using a JavaBean style. With the following attribute declaration
         a public method getAge() will be expected to be found on either the key or value for cache elements
 
-        <cache>
-            <searchable>
-                <searchAttribute name="age"/>
-            </searchable>
-        </cache>
+        <cache><searchable><searchAttribute name="age"/></searchable></cache>
 
         In more complex situations you can create your own attribute extractor by implementing the
         AttributeExtractor interface. Providing your extractor class is shown in the following example:
 
-        <cache>
-            <searchable>
-                <searchAttribute name="age" class="com.example.MyAttributeExtractor"/>
-            </searchable>
-        </cache>
+        <cache><searchable><searchAttribute name="age" class="com.example.MyAttributeExtractor"/></searchable></cache>
 
         Use properties to pass state to your attribute extractor if needed. Your implementation must provide
         a public constructor that takes a single java.util.Properties instance
 
-        <cache>
-            <searchable>
-                <searchAttribute name="age" class="com.example.MyAttributeExtractor" properties="foo=1,bar=2"/>
-            </searchable>
-        </cache>
+        <cache><searchable><searchAttribute name="age" class="com.example.MyAttributeExtractor" properties="foo=1,bar=2"/></searchable></cache>
 
 
         Cache Exception Handling
@@ -392,8 +363,7 @@ Here is an example of CacheManager level resource tuning, which will use up to 4
 
         It is configured as per the following example:
 
-          <cacheExceptionHandlerFactory class="com.example.ExampleExceptionHandlerFactory"
-                                          properties="logLevel=FINE"/>
+          <cacheExceptionHandlerFactory class="com.example.ExampleExceptionHandlerFactory" properties="logLevel=FINE"/>
 
         Caches with ExceptionHandling configured are not of type Cache, but are of type Ehcache only,
         and are not available using CacheManager.getCache(), but using CacheManager.getEhcache().
@@ -408,8 +378,7 @@ Here is an example of CacheManager level resource tuning, which will use up to 4
 
         It is configured as per the following example:
 
-            <cacheLoaderFactory class="com.example.ExampleCacheLoaderFactory"
-                                          properties="type=int,startCounter=10"/>
+            <cacheLoaderFactory class="com.example.ExampleCacheLoaderFactory" properties="type=int,startCounter=10"/>
 
         Element value comparator
         ++++++++++++++++++++++++
@@ -451,12 +420,7 @@ Here is an example of CacheManager level resource tuning, which will use up to 4
         Transactions
         ++++++++++++
 
-        To enable an ehcache as transactions, set the transactionalMode
-
-        transactionalMode="xa" - high performance JTA/XA implementation
-        transactionalMode="xa_strict" - canonically correct JTA/XA implementation
-        transactionMode="local" - high performance local transactions involving caches only
-        transactionalMode="off" - the default, no transactions
+        To enable an ehcache as transactions, set the transactionalMode transactionalMode="xa" - high performance JTA/XA implementation transactionalMode="xa_strict" - canonically correct JTA/XA implementation transactionMode="local" - high performance local transactions involving caches only transactionalMode="off" - the default, no transactions
 
         If set, all cache operations will need to be done through transactions.
 
@@ -471,19 +435,11 @@ Here is an example of CacheManager level resource tuning, which will use up to 4
 
         The following is an example of how to configure CacheWriter for write-through:
 
-            <cacheWriter writeMode="write-through" notifyListenersOnException="true">
-                <cacheWriterFactory class="net.sf.ehcache.writer.TestCacheWriterFactory"
-                                    properties="type=int,startCounter=10"/>
-            </cacheWriter>
+            <cacheWriter writeMode="write-through" notifyListenersOnException="true"><cacheWriterFactory class="net.sf.ehcache.writer.TestCacheWriterFactory" properties="type=int,startCounter=10"/></cacheWriter>
 
         The following is an example of how to configure CacheWriter for write-behind:
 
-            <cacheWriter writeMode="write-behind" minWriteDelay="1" maxWriteDelay="5"
-                         rateLimitPerSecond="5" writeCoalescing="true" writeBatching="true" writeBatchSize="1"
-                         retryAttempts="2" retryAttemptDelaySeconds="1">
-                <cacheWriterFactory class="net.sf.ehcache.writer.TestCacheWriterFactory"
-                                    properties="type=int,startCounter=10"/>
-            </cacheWriter>
+            <cacheWriter writeMode="write-behind" minWriteDelay="1" maxWriteDelay="5" rateLimitPerSecond="5" writeCoalescing="true" writeBatching="true" writeBatchSize="1" retryAttempts="2" retryAttemptDelaySeconds="1"><cacheWriterFactory class="net.sf.ehcache.writer.TestCacheWriterFactory" properties="type=int,startCounter=10"/></cacheWriter>
 
         The cacheWriter element has the following attributes:
         * writeMode: the write mode, write-through or write-behind
@@ -525,9 +481,7 @@ Here is an example of CacheManager level resource tuning, which will use up to 4
 
         Extensions are added as per the following example:
 
-             <cacheExtensionFactory class="com.example.FileWatchingCacheRefresherExtensionFactory"
-                                 properties="refreshIntervalMillis=18000, loaderTimeout=3000,
-                                             flushPeriod=whatever, someOtherProperty=someValue ..."/>
+             <cacheExtensionFactory class="com.example.FileWatchingCacheRefresherExtensionFactory" properties="refreshIntervalMillis=18000, loaderTimeout=3000, flushPeriod=whatever, someOtherProperty=someValue ..."/>
 
         Cache Decorator Factory
         +++++++++++++++++++++++
@@ -539,9 +493,7 @@ Here is an example of CacheManager level resource tuning, which will use up to 4
 
         It is configured as per the following example:
 
-            <cacheDecoratorFactory
-          class="com.company.DecoratedCacheFactory"
-          properties="property1=true ..." />
+            <cacheDecoratorFactory class="com.company.DecoratedCacheFactory" properties="property1=true ..." />
 
         Distributed Caching with Terracotta
         +++++++++++++++++++++++++++++++++++
@@ -581,18 +533,18 @@ Here is an example of CacheManager level resource tuning, which will use up to 4
 
         <nonstop> has the following attributes:
 
-        *  enabled="true" - defaults to true.
+        * enabled="true" - defaults to true.
 
         *  timeoutMillis - An SLA setting, so that if a cache operation takes longer than the allowed ms, it will timeout.
 
         *  searchTimeoutMillis - If a cache search operation in the nonstop mode takes longer than the allowed ms, it will timeout.
 
-        *  immediateTimeout="true|false" - What to do on receipt of a ClusterOffline event indicating that communications
+        * immediateTimeout="true|false" - What to do on receipt of a ClusterOffline event indicating that communications
            with the Terracotta Server Array were interrupted.
 
         <nonstop> has one sub-element, <timeoutBehavior> which has the following attribute:
 
-        *  type="noop|exception|localReads|localReadsAndExceptionOnWrite" - What to do when a timeout has occurred. Exception is the default.
+        * type="noop|exception|localReads|localReadsAndExceptionOnWrite" - What to do when a timeout has occurred. Exception is the default.
 
         Simplest example to indicate clustering:
             <terracotta/>
@@ -605,7 +557,8 @@ Here is an example of CacheManager level resource tuning, which will use up to 4
 
         To indicate the cache should be clustered using synchronous-write locking level:
             <terracotta clustered="true" synchronousWrites="true"/>
-        --><!--
+        -->
+	<!--
     Default Cache configuration. These settings will be applied to caches
     created programmatically using CacheManager.add(String cacheName).
     This element is optional, and using CacheManager.add(String cacheName) when
@@ -613,11 +566,11 @@ Here is an example of CacheManager level resource tuning, which will use up to 4
 
     The defaultCache has an implicit name "default" which is a reserved cache name.
     -->
-    <defaultCache maxEntriesLocalHeap="0" eternal="false" timeToIdleSeconds="1200" timeToLiveSeconds="1200" />
-
-    <!--
+	<defaultCache maxEntriesLocalHeap="0" eternal="false" timeToIdleSeconds="1200" timeToLiveSeconds="1200" />
+	<!--
         Sample caches. Following are some example caches. Remove these before use.
-        --><!--
+        -->
+	<!--
     Sample cache named sampleCache1
     This cache contains a maximum in memory of 10000 elements, and will expire
     an element if it is idle for more than 5 minutes and lives for more than
@@ -627,81 +580,45 @@ Here is an example of CacheManager level resource tuning, which will use up to 4
     disk cache, which in this configuration will go to wherever java.io.tmp is
     defined on your system. On a standard Linux system this will be /tmp"
     -->
-    <cache name="linkedDataCache" overflowToDisk="false" diskPersistent="false" eternal="false"
-           maxBytesLocalHeap="5000000" timeToIdleSeconds="300" timeToLiveSeconds="1200" memoryStoreEvictionPolicy="LFU"
-           transactionalMode="off">
-        <!--persistence strategy="localTempSwap"/--> <!-- we disable persistent cache until we find out how to serialize a model in ehcache -->
-    </cache>
-
-
-
-    <!--
+	<cache name="linkedDataCache" overflowToDisk="false" diskPersistent="false" eternal="false" maxBytesLocalHeap="5000000" timeToIdleSeconds="300" timeToLiveSeconds="1200" memoryStoreEvictionPolicy="LFU" transactionalMode="off">
+		<!--persistence strategy="localTempSwap"/-->
+		<!-- we disable persistent cache until we find out how to serialize a model in ehcache -->
+	</cache>
+	<!--
         Sample cache named sampleCache2
         This cache has a maximum of 1000 elements in memory. There is no overflow to disk, so 1000
         is also the maximum cache size. Note that when a cache is eternal, timeToLive and
         timeToIdle are not used and do not need to be specified.
         -->
-    <!--cache name="sampleCache2" maxEntriesLocalHeap="1000" eternal="true" memoryStoreEvictionPolicy="FIFO"/-->
-    <!--
+	<!--cache name="sampleCache2" maxEntriesLocalHeap="1000" eternal="true" memoryStoreEvictionPolicy="FIFO"/-->
+	<!--
         Sample cache named sampleCache3. This cache overflows to disk. The disk store is
         persistent between cache and VM restarts. The disk expiry thread interval is set to 10
         minutes, overriding the default of 2 minutes.
         -->
-    <!--cache name="sampleCache3" maxEntriesLocalHeap="500" eternal="false" overflowToDisk="true" diskPersistent="true"
-           timeToIdleSeconds="300" timeToLiveSeconds="600" diskExpiryThreadIntervalSeconds="1"
-           memoryStoreEvictionPolicy="LFU">
-    </cache-->
-    <!--
+	<!--cache name="sampleCache3" maxEntriesLocalHeap="500" eternal="false" overflowToDisk="true" diskPersistent="true" timeToIdleSeconds="300" timeToLiveSeconds="600" diskExpiryThreadIntervalSeconds="1" memoryStoreEvictionPolicy="LFU"></cache-->
+	<!--
         Sample Terracotta clustered cache named sampleTerracottaCache.
         This cache uses Terracotta to cluster the contents of the cache.
         -->
-    <!--cache name="sampleTerracottaCache" maxBytesLocalHeap="10m" eternal="false" timeToIdleSeconds="3600"
-           timeToLiveSeconds="1800">
-        <terracotta/>
-    </cache-->
-    <!--
+	<!--cache name="sampleTerracottaCache" maxBytesLocalHeap="10m" eternal="false" timeToIdleSeconds="3600" timeToLiveSeconds="1800"><terracotta/></cache-->
+	<!--
           Sample xa enabled cache named xaCache
-        <cache name="xaCache"
-               maxEntriesLocalHeap="500"
-               eternal="false"
-               timeToIdleSeconds="300"
-               timeToLiveSeconds="600"
-               diskExpiryThreadIntervalSeconds="1"
-               transactionalMode="xa_strict">
-        </cache>
-        --><!--
+        <cache name="xaCache" maxEntriesLocalHeap="500" eternal="false" timeToIdleSeconds="300" timeToLiveSeconds="600" diskExpiryThreadIntervalSeconds="1" transactionalMode="xa_strict"></cache>
+        -->
+	<!--
       Sample copy on both read and write cache named copyCache
       using the default (explicitly configured here as an example) ReadWriteSerializationCopyStrategy
       class could be any implementation of net.sf.ehcache.store.compound.CopyStrategy
-    <cache name="copyCache"
-           maxEntriesLocalHeap="500"
-           eternal="false"
-           timeToIdleSeconds="300"
-           timeToLiveSeconds="600"
-           diskExpiryThreadIntervalSeconds="1"
-           copyOnRead="true"
-           copyOnWrite="true">
-        <copyStrategy class="net.sf.ehcache.store.compound.ReadWriteSerializationCopyStrategy" />
-    </cache>
-    --><!--
+    <cache name="copyCache" maxEntriesLocalHeap="500" eternal="false" timeToIdleSeconds="300" timeToLiveSeconds="600" diskExpiryThreadIntervalSeconds="1" copyOnRead="true" copyOnWrite="true"><copyStrategy class="net.sf.ehcache.store.compound.ReadWriteSerializationCopyStrategy" /></cache>
+    -->
+	<!--
       Sample, for Enterprise Ehcache only, demonstrating a tiered cache with in-memory, off-heap and disk stores. In this example the in-memory (on-heap) store is limited to 10,000 items ... which for example for 1k items would use 10MB of memory, the off-heap store is limited to 4GB and the disk store is unlimited in size.
-    <cache name="tieredCache"
-           maxEntriesLocalHeap="10000"
-           eternal="false"
-           timeToLiveSeconds="600"
-           overflowToOffHeap="true"
-           maxBytesLocalOffHeap="4g"
-           diskExpiryThreadIntervalSeconds="1">
-        <persistence strategy="localTempSwap"/>
-     </cache>
-    --><!--
+    <cache name="tieredCache" maxEntriesLocalHeap="10000" eternal="false" timeToLiveSeconds="600" overflowToOffHeap="true" maxBytesLocalOffHeap="4g" diskExpiryThreadIntervalSeconds="1"><persistence strategy="localTempSwap"/></cache>
+    -->
+	<!--
       Sample, for Enterprise Ehcache only, demonstrating a restartable cache with in-memory and off-heap stores.
-    <cache name="restartableCache"
-           maxEntriesLocalHeap="10000"
-           eternal="true"
-           overflowToOffHeap="true"
-           maxBytesLocalOffHeap="4g"
-         <persistence strategy="localRestartable"/>
-     </cache>
+    <cache name="restartableCache" maxEntriesLocalHeap="10000" eternal="true" overflowToOffHeap="true" maxBytesLocalOffHeap="4g"
+         <persistence strategy="localRestartable"/></cache>
      -->
 </ehcache>

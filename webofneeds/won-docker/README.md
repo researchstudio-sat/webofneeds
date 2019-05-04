@@ -7,7 +7,7 @@ the webofneeds applications as docker containers. There are images for the follo
 * owner: the owner application
 * postgres: postgres database for the wonnode and owner
 * matcher_service: a general matcher service
-* matcher_solr: a matcher that uses solr search index to match needs
+* matcher_solr: a matcher that uses solr search index to match atoms
 * bigdata: a RDF store that is used by the matcher-service to store rdf data
 * solr: a solr server with used by the matcher-solr
 * gencert: a tool that can generate certificates for wonnode and owner application
@@ -32,10 +32,10 @@ When the script executes it runs all the above listed docker images as container
 webofneeds docker hub repository if not available locally. If the script finishes without error all components
 should be started.
 
-You can access the owner application to log in and create needs using the following link:
+You can access the owner application to log in and create atoms using the following link:
 * **owner:** [https://${deploy_host}:8082/owner](https://${deploy_host}:8082/owner)
 
-You can access the wonnode and check the generated RDF needs using the following link:
+You can access the wonnode and check the generated RDF atoms using the following link:
 * **wonnode:** [https://${deploy_host}:8889/won](https://${deploy_host}:8889/won)
 
 The certificates used by the application are created on the first execution of the script, and reused in later

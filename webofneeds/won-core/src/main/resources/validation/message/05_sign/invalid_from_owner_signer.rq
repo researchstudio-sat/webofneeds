@@ -3,18 +3,18 @@ prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
 prefix geo:   <http://www.w3.org/2003/01/geo/wgs84_pos#>
 prefix conn:  <http://localhost:8080/won/resource/connection/>
 prefix event: <http://localhost:8080/won/resource/event/>
-prefix woncrypt: <http://purl.org/webofneeds/woncrypt#>
+prefix woncrypt: <https://w3id.org/won/core#>
 prefix xsd:   <http://www.w3.org/2001/XMLSchema#>
 prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 prefix local: <http://localhost:8080/won/resource/>
-prefix won:   <http://purl.org/webofneeds/model#>
-prefix msg:   <http://purl.org/webofneeds/message#>
+prefix won:   <https://w3id.org/won/core#>
+prefix msg:   <https://w3id.org/won/message#>
 prefix signature: <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#>
 prefix ldp:   <http://www.w3.org/ns/ldp#>
 
 
 # 'fromOwner' envelopes should be signed by:
-# - if it is the envelope without child envelopes - by sender need
+# - if it is the envelope without child envelopes - by sender atom
 # - if it is any other envelope - by sender Node, if specified,
 # and by receiver Node, if senderNode is unspecified
 #ASK
@@ -25,7 +25,7 @@ prefix ldp:   <http://www.w3.org/ns/ldp#>
 
     ?ownerLeafEnvNum
 
-    ?correctOwnerNotLeafReceiverNodeEnvNum
+    ?correctOwnerNotLeafRecipientNodeEnvNum
 
     ?correctOwnerNotLeafSenderNodeEnvNum
 
@@ -33,7 +33,7 @@ prefix ldp:   <http://www.w3.org/ns/ldp#>
 
 
     (if(?ownerLeafEnvNum != ?correctOwnerLeafEnvNum  ||
-    (?correctOwnerNotLeafReceiverNodeEnvNum != ?ownerNotLeafEnvNum
+    (?correctOwnerNotLeafRecipientNodeEnvNum != ?ownerNotLeafEnvNum
     && ?correctOwnerNotLeafSenderNodeEnvNum != ?ownerNotLeafEnvNum), "FAIL", "OK") AS ?check)
 
 
@@ -48,7 +48,7 @@ prefix ldp:   <http://www.w3.org/ns/ldp#>
     {
       GRAPH ?g1
       {
-          ?event msg:hasSenderNeed    ?envsigner
+          ?event msg:senderAtom    ?envsigner
       } .
       GRAPH ?g2
       {
@@ -68,7 +68,7 @@ prefix ldp:   <http://www.w3.org/ns/ldp#>
       GRAPH ?g5
       {
           ?envsig a signature:Signature .
-          ?envsig msg:hasSignedGraph ?env .
+          ?envsig msg:signedGraph ?env .
           ?envsig signature:hasVerificationCertificate ?envsigner .
       } .
     } ORDER BY ?event
@@ -100,7 +100,7 @@ prefix ldp:   <http://www.w3.org/ns/ldp#>
         {
           GRAPH ?g1
           {
-              ?event msg:hasSenderNode    ?envsigner
+              ?event msg:senderNode    ?envsigner
           } .
           GRAPH ?g2
           {
@@ -115,7 +115,7 @@ prefix ldp:   <http://www.w3.org/ns/ldp#>
           GRAPH ?g4
           {
               ?envsig a signature:Signature .
-              ?envsig msg:hasSignedGraph ?env .
+              ?envsig msg:signedGraph ?env .
               ?envsig signature:hasVerificationCertificate ?envsigner .
           } .
         } ORDER BY ?event
@@ -124,14 +124,14 @@ prefix ldp:   <http://www.w3.org/ns/ldp#>
 
      # count all non leaf fromOwner envelopes that have senderNode unspecified and have receiver node as signer
      {SELECT
-         (count(DISTINCT ?env) as ?correctOwnerNotLeafReceiverNodeEnvNum)
+         (count(DISTINCT ?env) as ?correctOwnerNotLeafRecipientNodeEnvNum)
          WHERE
          {
            GRAPH ?g1
            {
-               ?event msg:hasReceiverNode    ?envsigner .
+               ?event msg:recipientNode    ?envsigner .
                FILTER NOT EXISTS
-                   {   ?event msg:hasSenderNode    ?envsigner . }
+                   {   ?event msg:senderNode    ?envsigner . }
            } .
            GRAPH ?g2
            {
@@ -146,7 +146,7 @@ prefix ldp:   <http://www.w3.org/ns/ldp#>
            GRAPH ?g5
            {
                ?envsig a signature:Signature .
-               ?envsig msg:hasSignedGraph ?env .
+               ?envsig msg:signedGraph ?env .
                ?envsig signature:hasVerificationCertificate ?envsigner .
            } .
          } ORDER BY ?event

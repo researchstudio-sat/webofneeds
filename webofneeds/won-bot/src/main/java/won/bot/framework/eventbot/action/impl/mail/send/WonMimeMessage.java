@@ -8,7 +8,6 @@ import javax.mail.internet.MimeMessage;
  * Created by fsuda on 18.10.2016.
  */
 public class WonMimeMessage extends MimeMessage {
-
     public WonMimeMessage(Session session) {
         super(session);
     }
@@ -18,7 +17,6 @@ public class WonMimeMessage extends MimeMessage {
     }
 
     public void setMessageId(String messageId) throws MessagingException {
-
         if (messageId.startsWith("<") && messageId.endsWith(">")) {
             this.setHeader("Message-ID", messageId);
         } else {
@@ -32,7 +30,7 @@ public class WonMimeMessage extends MimeMessage {
 
     @Override
     public void updateMessageID() throws MessagingException {
-        if(getHeader("Message-Id") == null) {
+        if (getHeader("Message-Id") == null) {
             super.updateMessageID();
         }
     }

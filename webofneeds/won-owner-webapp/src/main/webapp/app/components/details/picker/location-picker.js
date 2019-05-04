@@ -3,13 +3,13 @@
  */
 
 import angular from "angular";
-import Immutable from "immutable"; // also exports itself as (window).L
 import L from "../../../leaflet-bundleable.js";
 import {
   attach,
   searchNominatim,
   reverseSearchNominatim,
   nominatim2draftLocation,
+  scrubSearchResults,
   delay,
   getIn,
 } from "../../../utils.js";
@@ -28,7 +28,6 @@ function genComponentConf() {
         <div class="lp__searchbox">
             <input
                 type="text"
-                id="lp__searchbox__inner"
                 class="lp__searchbox__inner"
                 placeholder="{{self.detail.placeholder}}"
                 ng-class="{'lp__searchbox__inner--withreset' : self.showResetButton}"/>
@@ -81,7 +80,7 @@ function genComponentConf() {
                 </a>
             </li>
         </ul>
-        <div class="lp__mapmount" id="lp__mapmount" in-view="$inview && self.mapInView($inviewInfo)"></div>
+        <div class="lp__mapmount" in-view="$inview && self.mapInView($inviewInfo)"></div>
             `;
 
   class Controller {
@@ -289,11 +288,11 @@ function genComponentConf() {
     }
 
     textfieldNg() {
-      return this.domCache.ng("#lp__searchbox__inner");
+      return this.domCache.ng(".lp__searchbox__inner");
     }
 
     textfield() {
-      return this.domCache.dom("#lp__searchbox__inner");
+      return this.domCache.dom(".lp__searchbox__inner");
     }
 
     mapMountNg() {
@@ -318,20 +317,6 @@ function genComponentConf() {
     },
     template: template,
   };
-}
-
-function scrubSearchResults(searchResults) {
-  return (
-    Immutable.fromJS(searchResults.map(nominatim2draftLocation))
-      /*
-         * filter "duplicate" results (e.g. "Wien"
-         *  -> 1x waterway, 1x boundary, 1x place)
-         */
-      .groupBy(r => r.get("name"))
-      .map(sameNamedResults => sameNamedResults.first())
-      .toList()
-      .toJS()
-  );
 }
 
 function onMapClick(e, ctrl) {

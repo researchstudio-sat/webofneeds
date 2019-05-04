@@ -1,0 +1,99 @@
+@import "won-config";
+@import "sizing-utils";
+
+.won-publish-button {
+  width: 100%;
+  height: 100%;
+
+  &.won-button-row {
+    display: flex;
+    position: relative;
+
+    align-items: stretch;
+
+    button.left {
+      border-bottom-right-radius: 0;
+      border-top-right-radius: 0;
+    }
+
+    button.right {
+      border-bottom-left-radius: 0;
+      border-top-left-radius: 0;
+    }
+
+    .submit-button {
+      flex-grow: 1;
+      white-space: normal;
+    }
+
+    .won-dropdown-button {
+      margin-left: 0.1em;
+      padding-left: 1ch;
+      padding-right: 1ch;
+      flex-shrink: 1;
+      won-svg-icon {
+        @include fixed-square($iconSize * 0.8);
+      }
+    }
+  }
+
+  &.down .won-persona-list {
+    top: calc(100% + 0.25em);
+  }
+
+  &.up .won-persona-list {
+    bottom: calc(100% + 0.25em);
+  }
+
+  .won-persona-list {
+    $line-size: $postIconSize * 0.7;
+    z-index: 2;
+    max-height: 25em;
+    overflow: auto;
+
+    font-size: 0.8rem;
+    box-sizing: border-box;
+    position: absolute;
+    min-width: 100%;
+    right: 0;
+    display: grid;
+    background: white;
+    border: $won-line-gray 1px solid;
+    border-radius: 0.19rem;
+
+    .won-persona-list-entry {
+      display: grid;
+      height: $line-size;
+      padding: 0.5rem;
+      grid-template-columns: min-content 1fr;
+      grid-column-gap: 1ch;
+      user-select: none;
+      cursor: pointer;
+
+      .won-persona-name {
+        align-self: center;
+        font-size: 1.2em;
+      }
+
+      &:hover {
+        background-color: $won-light-gray;
+      }
+
+      .won-persona-icon {
+        border-radius: 100%;
+        overflow: hidden;
+        @include fixed-square($line-size);
+        display: block;
+      }
+
+      &.empty {
+        grid-template-columns: 1fr max-content 1fr;
+        .won-persona-name {
+          grid-column: 2;
+          font-style: italic;
+          color: $won-line-gray;
+        }
+      }
+    }
+  }
+}

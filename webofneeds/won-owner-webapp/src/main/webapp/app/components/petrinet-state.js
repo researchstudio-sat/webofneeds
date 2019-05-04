@@ -8,7 +8,7 @@ import { actionCreators } from "../actions/actions.js";
 
 import { attach, generateSimpleTransitionLabel, getIn } from "../utils.js";
 import {
-  getOwnedNeedByConnectionUri,
+  getOwnedAtomByConnectionUri,
   getConnectionUriFromRoute,
 } from "../selectors/general-selectors.js";
 import { connect2Redux } from "../won-utils.js";
@@ -68,9 +68,9 @@ function genComponentConf() {
 
       const selectFromState = state => {
         const connectionUri = getConnectionUriFromRoute(state); //TODO: create selector that returns the correct connectionUri without looking up the open one
-        const need =
-          connectionUri && getOwnedNeedByConnectionUri(state, connectionUri);
-        const connection = need && need.getIn(["connections", connectionUri]);
+        const atom =
+          connectionUri && getOwnedAtomByConnectionUri(state, connectionUri);
+        const connection = atom && atom.getIn(["connections", connectionUri]);
 
         const petriNetData = connection && connection.get("petriNetData");
 

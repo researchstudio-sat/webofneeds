@@ -10,8 +10,9 @@ import {
   connect2Redux,
   createDocumentDefinitionFromPost,
 } from "../won-utils.js";
-import * as needUtils from "../need-utils.js";
+import * as atomUtils from "../atom-utils.js";
 import * as processUtils from "../process-utils.js";
+import * as generalSelectors from "../selectors/general-selectors.js";
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 
@@ -49,8 +50,14 @@ function genComponentConf() {
                     <button
                         class="won-button--outlined thin red"
                         ng-if="self.isUsableAsTemplate"
-                        ng-click="self.router__stateGoAbs('connections', {fromNeedUri: self.needUri, mode: 'DUPLICATE'})">
+                        ng-click="self.router__stateGoAbs('connections', {fromAtomUri: self.atomUri, mode: 'DUPLICATE'})">
                         Post this too!
+                    </button>
+                    <button
+                        class="won-button--outlined thin red"
+                        ng-if="self.isEditable"
+                        ng-click="self.router__stateGoAbs('connections', {fromAtomUri: self.atomUri, mode: 'EDIT'})">
+                        Edit
                     </button>
                     <a class="won-button--outlined thin red"
                         ng-if="self.adminEmail"
@@ -81,7 +88,7 @@ function genComponentConf() {
       attach(this, serviceDependencies, arguments);
 
       const selectFromState = state => {
-        const post = this.needUri && state.getIn(["needs", this.needUri]);
+        const post = this.atomUri && state.getIn(["atoms", this.atomUri]);
 
         let linkToPost;
         if (ownerBaseUrl && post) {
@@ -94,19 +101,23 @@ function genComponentConf() {
 
         return {
           adminEmail: getIn(state, ["config", "theme", "adminEmail"]),
-          isOwnPost: needUtils.isOwned(post),
-          isActive: needUtils.isActive(post),
-          isInactive: needUtils.isInactive(post),
-          isUsableAsTemplate: needUtils.isUsableAsTemplate(post),
+          isOwnPost: generalSelectors.isAtomOwned(state, this.atomUri),
+          isActive: atomUtils.isActive(post),
+          isInactive: atomUtils.isInactive(post),
+          isUsableAsTemplate: generalSelectors.isAtomUsableAsTemplate(
+            state,
+            this.atomUri
+          ),
+          isEditable: generalSelectors.isAtomEditable(state, this.atomUri),
           post,
           postLoading:
-            !post || processUtils.isNeedLoading(process, post.get("uri")),
+            !post || processUtils.isAtomLoading(process, post.get("uri")),
           postFailedToLoad:
-            post && processUtils.hasNeedFailedToLoad(process, post.get("uri")),
+            post && processUtils.hasAtomFailedToLoad(process, post.get("uri")),
           linkToPost,
         };
       };
-      connect2Redux(selectFromState, actionCreators, ["self.needUri"], this);
+      connect2Redux(selectFromState, actionCreators, ["self.atomUri"], this);
 
       const callback = event => {
         const clickedElement = event.target;
@@ -137,7 +148,7 @@ function genComponentConf() {
             {
               caption: "Delete",
               callback: () => {
-                /*this.needs__delete(this.post.get("uri"));
+                /*this.atoms__delete(this.post.get("uri"));
                 this.router__stateGoCurrent({
                   useCase: undefined,
                   postUri: undefined,
@@ -149,7 +160,7 @@ function genComponentConf() {
             {
               caption: "Archive",
               callback: () => {
-                this.needs__close(this.post.get("uri"));
+                this.atoms__close(this.post.get("uri"));
                 this.router__stateGoCurrent({
                   useCase: undefined,
                   postUri: undefined,
@@ -176,9 +187,9 @@ function genComponentConf() {
           text: "Deleting the Post is irreversible, do you want to proceed?",
           buttons: [
             {
-              caption: "YES",
+              caption: "Yes",
               callback: () => {
-                this.needs__delete(this.post.get("uri"));
+                this.atoms__delete(this.post.get("uri"));
                 this.router__stateGoCurrent({
                   useCase: undefined,
                   postUri: undefined,
@@ -187,7 +198,7 @@ function genComponentConf() {
               },
             },
             {
-              caption: "NO",
+              caption: "No",
               callback: () => {
                 this.view__hideModalDialog();
               },
@@ -199,7 +210,7 @@ function genComponentConf() {
     }
 
     generateReportPostMailParams() {
-      const subject = `[Report Post] - ${this.needUri}`;
+      const subject = `[Report Post] - ${this.atomUri}`;
       const body = `Link to Post: ${this.linkToPost}%0D%0AReason:%0D%0A`; //hint: %0D%0A adds a linebreak
 
       return `subject=${subject}&body=${body}`;
@@ -207,7 +218,7 @@ function genComponentConf() {
 
     reOpenPost() {
       if (this.isOwnPost) {
-        this.needs__reopen(this.post.get("uri"));
+        this.atoms__reopen(this.post.get("uri"));
       }
     }
 
@@ -229,7 +240,7 @@ function genComponentConf() {
     controllerAs: "self",
     bindToController: true, //scope-bindings -> ctrl
     scope: {
-      needUri: "=",
+      atomUri: "=",
     },
     template: template,
   };

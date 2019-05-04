@@ -11,13 +11,13 @@
 ```
 <https://localhost:8443/won/resource/event/557600936467257340#content> {
     event:557600936467257340
-            won:hasTextMessage  "two" ;
+            won:textMessage  "two" ;
             agr:proposes event:5669098069340991000 .
 }
 
 <https://localhost:8443/won/resource/event/ow321nn1va6clfidc4s0#content-1o90> {
     event:ow321nn1va6clfidc4s0
-            won:hasTextMessage  "Please go on." ;
+            won:textMessage  "Please go on." ;
             agr:accepts event:557600936467257340 .
 }
 
@@ -41,30 +41,30 @@ event:557600936467257340 agr:proposes event:5669098069340991000  .
 ```
 <https://localhost:8443/won/resource/event/5669098069340991000#content> {
     event:5669098069340991000
-            won:hasTextMessage  "one" .
+            won:textMessage  "one" .
 }
 
 <https://localhost:8443/won/resource/event/557600936467257340#content> {
     event:557600936467257340
-            won:hasTextMessage  "two" ;
+            won:textMessage  "two" ;
             agr:proposes event:5669098069340991000 .
 }
 
 <https://localhost:8443/won/resource/event/ow321nn1va6clfidc4s0#content-1o90> {
     event:ow321nn1va6clfidc4s0
-            won:hasTextMessage  "Please go on." ;
+            won:textMessage  "Please go on." ;
             agr:accepts event:557600936467257340 .
 }
 
 <https://localhost:8443/won/resource/event/1435888415723958200#content> {
     event:1435888415723958200
-            won:hasTextMessage  "validate" ;
+            won:textMessage  "validate" ;
             agr:proposesToCancel event:ow321nn1va6clfidc4s0 .
 }
 
 <https://localhost:8443/won/resource/event/mt1f8i41bogt7kc91fi6#content-lqq1> {
     event:mt1f8i41bogt7kc91fi6
-            won:hasTextMessage  "Ok, I'm going to validate the data in our connection. This may take a while." ;
+            won:textMessage  "Ok, I'm going to validate the data in our connection. This may take a while." ;
             agr:accepts event:1435888415723958200 .
 }
 ```
@@ -81,27 +81,27 @@ event:557600936467257340 agr:proposes event:5669098069340991000  .
 ```
 <https://localhost:8443/won/resource/event/5669098069340991000#content> {
     event:5669098069340991000
-            won:hasTextMessage  "one" .
+            won:textMessage  "one" .
 }
 
 <https://localhost:8443/won/resource/event/557600936467257340#content> {
     event:557600936467257340
-            won:hasTextMessage  "two" ;
+            won:textMessage  "two" ;
             agr:proposes event:5669098069340991000 .
 }
 <https://localhost:8443/won/resource/event/ow321nn1va6clfidc4s0#content-1o90> {
     event:ow321nn1va6clfidc4s0
-            won:hasTextMessage  "Please go on." ;
+            won:textMessage  "Please go on." ;
             agr:accepts event:557600936467257340 .
 }
 <https://localhost:8443/won/resource/event/1435888415723958200#content> {
     event:1435888415723958200
-            won:hasTextMessage  "validate" ;
+            won:textMessage  "validate" ;
             agr:proposesToCancel event:557600936467257340 .
 }
 <https://localhost:8443/won/resource/event/mt1f8i41bogt7kc91fi6#content-lqq1> {
     event:mt1f8i41bogt7kc91fi6
-            won:hasTextMessage  "Ok, I'm going to validate the data in our connection. This may take a while." ;
+            won:textMessage  "Ok, I'm going to validate the data in our connection. This may take a while." ;
             agr:accepts event:1435888415723958200 .
 }
 ```
@@ -136,7 +136,7 @@ event:557600936467257340
 ```
 <https://localhost:8443/won/resource/event/ow321nn1va6clfidc4s0#content-1o90> {
     event:ow321nn1va6clfidc4s0
-            won:hasTextMessage  "Please go on." ;
+            won:textMessage  "Please go on." ;
             agr:accepts event:557600936467257340 .
 }
 ```
@@ -153,12 +153,12 @@ event:557600936467257340
 ```
 <https://localhost:8443/won/resource/event/557600936467257340#content> {
     event:557600936467257340
-            won:hasTextMessage  "two" ;
+            won:textMessage  "two" ;
             agr:proposes event:5669098069340991000 .
 }
 <https://localhost:8443/won/resource/event/ow321nn1va6clfidc4s0#content-1o90> {
     event:ow321nn1va6clfidc4s0
-            won:hasTextMessage  "Please go on." ;
+            won:textMessage  "Please go on." ;
             agr:accepts event:557600936467257340 .
 }
 ```
@@ -175,22 +175,22 @@ event:557600936467257340
 ```
 <https://localhost:8443/won/resource/event/5669098069340991000#content> {
     event:5669098069340991000
-            won:hasTextMessage  "one" .
+            won:textMessage  "one" .
 }
 
 <https://localhost:8443/won/resource/event/557600936467257340#content> {
     event:557600936467257340
-            won:hasTextMessage  "two" ;
+            won:textMessage  "two" ;
             agr:proposes event:5669098069340991000 .
 }
 <https://localhost:8443/won/resource/event/1435888415723958200#content> {
     event:1435888415723958200
-            won:hasTextMessage  "validate" ;
+            won:textMessage  "validate" ;
             agr:proposesToCancel event:ow321nn1va6clfidc4s0 .
 }
 <https://localhost:8443/won/resource/event/mt1f8i41bogt7kc91fi6#content-lqq1> {
     event:mt1f8i41bogt7kc91fi6
-            won:hasTextMessage  "Ok, I'm going to validate the data in our connection. This may take a while." ;
+            won:textMessage  "Ok, I'm going to validate the data in our connection. This may take a while." ;
             agr:accepts event:1435888415723958200 .
 }
 ```

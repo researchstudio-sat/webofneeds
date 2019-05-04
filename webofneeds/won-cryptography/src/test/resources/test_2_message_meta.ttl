@@ -1,15 +1,15 @@
-@prefix :      <http://www.example.com/resource/need/100/v1#> .
+@prefix :      <http://www.example.com/resource/atom/100/v1#> .
 @prefix dc:    <http://purl.org/dc/elements/1.1/> .
 @prefix geo:   <http://www.w3.org/2003/01/geo/wgs84_pos#> .
 @prefix sp:    <http://spinrdf.org/sp#> .
 @prefix acco:  <http://purl.org/acco/ns#> .
 @prefix tio:   <http://purl.org/tio/ns#> .
 @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix wonmsg: <http://purl.org/webofneeds/message#> .
+@prefix wonmsg: <https://w3id.org/won/message#> .
 @prefix owl:   <http://www.w3.org/2002/07/owl#> .
 @prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
 @prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-@prefix won:   <http://purl.org/webofneeds/model#> .
+@prefix won:   <https://w3id.org/won/core#> .
 @prefix gr:    <http://purl.org/goodrelations/v1#> .
 @prefix signature: <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#> .
 @prefix ldp:   <http://www.w3.org/ns/ldp#> .
@@ -23,13 +23,13 @@
       [
         wonmsg:hasParameter
           [
-            wonmsg:parameterName wonmsg:needUri ;
-            wonmsg:parameterValue <http://www.example.com/resource/need/100>
+            wonmsg:parameterName wonmsg:atomUri ;
+            wonmsg:parameterValue <http://www.example.com/resource/atom/100>
           ] ;
         wonmsg:hasParameter
           [
-            wonmsg:parameterName wonmsg:needUri ;
-            wonmsg:parameterValue <http://www.example.com/resource/need/100>
+            wonmsg:parameterName wonmsg:atomUri ;
+            wonmsg:parameterValue <http://www.example.com/resource/atom/100>
           ]
       ]
   ] .

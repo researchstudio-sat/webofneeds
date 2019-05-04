@@ -1,0 +1,56 @@
+##################################################################
+#   CONNECT - MESSAGE FROM REMOTE WON NODE TO LOCAL WON NODE     #
+##################################################################
+
+@prefix :       <http://www.example.com/resource/atom/> .
+@prefix remote: <http://www.remote-example.com/resource/atom/> .
+@prefix webID:  <http://www.example.com/webids/> .
+
+@prefix won:    <https://w3id.org/won/core#> .
+@prefix crypt:  <https://w3id.org/won/cryptography#> .
+@prefix msg:    <https://w3id.org/won/message#> .
+
+@prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+
+
+############# MESSAGE HEADER ##############
+
+_:message msg:containsMessage
+    remote:[randomAtomID_2]/connection/[randomConnectionID_2_1]/event/[randomEventID_2_2]
+
+GRAPH remote:[randomAtomID_2]/connection/[randomConnectionID_2_1]/event/[randomEventID_2_2]#data {
+
+    remote:[randomAtomID_2]/connection/[randomConnectionID_2_1]/event/[randomEventID_2_2]
+        a msg:ConnectMessage ;
+        msg:sender remote:[randomAtomID_2] ;
+        msg:receiver :[randomAtomID_1] .
+
+        msg:refersTo
+            # a hint event within the same connection
+            remote:[randomAtomID_2]/connection/[randomConnectionID_2_1]/event/[randomEventID_2_1]
+
+        remote:[randomAtomID_2]/connection/[randomConnectionID_2_1]/event/[randomEventID_2_1]#data
+            crypt:hasSignature [
+                a crypt:WonSignature ;
+                crypt:signer webID:matcher_1 .
+                # signature data ...
+            ] .
+
+        :[randomAtomID_1]/core#data
+            crypt:hasSignature [
+                a crypt:WonSignature ;
+                crypt:signer webID:owner_1 .
+                # signature data ...
+            ] .
+
+}
+
+
+############# MESSAGE SIGNATURE ##############
+
+remote:[randomAtomID_2]/connection/[randomConnectionID_2_1]/event/[randomEventID_2_2]#data
+    crypt:hasSignature [
+        a crypt:WonSignature ;
+        crypt:signer webID:owner_2 .
+        # signature data ...
+    ]

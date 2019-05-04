@@ -32,18 +32,19 @@
     ```
 8. In the console navigate to the folder for the keystore created in previous steps (e.g. `C:/WoN/Keystore/`), adapt and run the following lines:
 
-    ```sh
-    openssl req -x509 -newkey rsa:2048 -keyout t-key.pem -out t-cert.pem  -passout pass:changeit -days 365 -subj "/CN=myhost.mydomain.com"
-
-    openssl pkcs12 -export -out sometmpfile_deletme -passout pass:changeit -inkey t-key.pem -passin pass:changeit -in t-cert.pem
-
-    <YOUR_JDK_DIR>/bin/keytool.exe -importkeystore -srckeystore sometmpfile_deletme -srcstoretype pkcs12 -destkeystore t-keystore.jks -deststoretype JKS -srcstorepass changeit  -deststorepass changeit
-
-    rm sometmpfile_deletme
-    ```
 **NOTE:** the openssl commands can be executed in windows using cygwin or the git bash
+
 **NOTE:** If you're getting the error message `Subject does not start with '/'.`, change last parameter to `-subj "//CN=myhost.mydomain.com"`
 
+```sh
+openssl req -x509 -newkey rsa:2048 -keyout t-key.pem -out t-cert.pem  -passout pass:changeit -days 365 -subj "//CN=myhost.mydomain.com"
+
+openssl pkcs12 -export -out sometmpfile_deletme -passout pass:changeit -inkey t-key.pem -passin pass:changeit -in t-cert.pem
+
+"$JAVA_HOME/bin/keytool.exe" -importkeystore -srckeystore sometmpfile_deletme -srcstoretype pkcs12 -destkeystore t-keystore.jks -deststoretype JKS -srcstorepass changeit  -deststorepass changeit
+
+rm sometmpfile_deletme
+```
 
 9. The other key stores, and the trust stores are created and filled in automatically when the application is run (in the locations defined in step 4 with the passwords defined in step 5).
 

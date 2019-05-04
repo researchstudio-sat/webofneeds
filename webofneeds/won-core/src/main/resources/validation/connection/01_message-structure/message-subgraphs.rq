@@ -1,9 +1,9 @@
 # each envelope must be subgraph of exactly one message
-PREFIX msg: <http://purl.org/webofneeds/message#>
+PREFIX msg: <https://w3id.org/won/message#>
 PREFIX rdfg: <http://www.w3.org/2004/03/trix/rdfg-1/>
 SELECT ?msg ?msgType ?g WHERE {
-	?msg msg:hasMessageType ?msgType .
-  	?msg2 msg:hasMessageType ?msgType .
+	?msg msg:messageType ?msgType .
+  	?msg2 msg:messageType ?msgType .
     ?g a msg:EnvelopeGraph ;
        rdfg:subGraphOf ?msg ;
        rdfg:subGraphOf ?msg2

@@ -11,8 +11,8 @@ The applications have to be told where to look for this file via a system proper
 
 The following logging levels are used:
 * **ERROR**: if the application fails to start up, or doesnt't work at all;
-* **WARN**: situations where methods can't execute as they are to be expected (methods called in states where they are not allowed, parametes pointing to not existing needs, etc.) but the application is still in a operative state; calls, data structures, etc., which go not conform with guidelines, good practices or hard constraints.
-* **INFO**: only in infrequent calls; one time initializations; need status changes (protocol calls);
+* **WARN**: situations where methods can't execute as they are to be expected (methods called in states where they are not allowed, parametes pointing to not existing atoms, etc.) but the application is still in a operative state; calls, data structures, etc., which go not conform with guidelines, good practices or hard constraints.
+* **INFO**: only in infrequent calls; one time initializations; atom status changes (protocol calls);
 * **DEBUG**: everything else.
 
 We do not use TRACE (see http://www.slf4j.org/faq.html#trace).

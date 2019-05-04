@@ -26,6 +26,8 @@ import { actionTypes, actionCreators } from "./actions/actions.js";
 //import './message-service.js'; //TODO still uses es5
 import SockJS from "sockjs-client";
 
+const ECHO_STRING = "e";
+
 export function runMessagingAgent(redux) {
   /**
    * The messageProcessingArray encapsulates all currently implemented message handlers with their respective redux dispatch
@@ -66,6 +68,15 @@ export function runMessagingAgent(redux) {
       return false;
     },
     function(message) {
+      if (message.isChangeNotificationMessage()) {
+        redux.dispatch(
+          actionCreators.messages__processChangeNotificationMessage(message)
+        );
+        return true;
+      }
+      return false;
+    },
+    function(message) {
       if (message.isFromExternal() && message.isCloseMessage()) {
         redux.dispatch(actionCreators.messages__close__success(message));
         return true;
@@ -79,6 +90,17 @@ export function runMessagingAgent(redux) {
         message.isResponseToCreateMessage()
       ) {
         redux.dispatch(actionCreators.messages__create__success(message));
+        return true;
+      }
+      return false;
+    },
+    function(message) {
+      if (
+        message.isFromSystem() &&
+        message.isSuccessResponse() &&
+        message.isResponseToReplaceMessage()
+      ) {
+        redux.dispatch(actionCreators.messages__edit__success(message));
         return true;
       }
       return false;
@@ -155,7 +177,7 @@ export function runMessagingAgent(redux) {
                      */
           redux.dispatch(
             actionCreators.router__stateGoAbs("connections", {
-              postUri: message.getSenderNeed(),
+              postUri: message.getSenderAtom(),
               connectionUri: message.getSender(),
             })
           );
@@ -185,10 +207,10 @@ export function runMessagingAgent(redux) {
     function(message) {
       if (message.isResponseToActivateMessage()) {
         if (message.isSuccessResponse()) {
-          redux.dispatch(actionCreators.messages__reopenNeed__success(message));
+          redux.dispatch(actionCreators.messages__reopenAtom__success(message));
           return true;
         } else {
-          redux.dispatch(actionCreators.messages__reopenNeed__failure(message));
+          redux.dispatch(actionCreators.messages__reopenAtom__failure(message));
           return true;
         }
       }
@@ -197,18 +219,18 @@ export function runMessagingAgent(redux) {
     function(message) {
       if (message.isResponseToDeactivateMessage()) {
         if (message.isSuccessResponse()) {
-          redux.dispatch(actionCreators.messages__closeNeed__success(message));
+          redux.dispatch(actionCreators.messages__closeAtom__success(message));
           return true;
         } else {
-          redux.dispatch(actionCreators.messages__closeNeed__failure(message));
+          redux.dispatch(actionCreators.messages__closeAtom__failure(message));
           return true;
         }
       }
       return false;
     },
     function(message) {
-      if (message.isFromSystem() && message.isNeedMessage()) {
-        redux.dispatch(actionCreators.messages__needMessageReceived(message));
+      if (message.isFromSystem() && message.isAtomMessage()) {
+        redux.dispatch(actionCreators.messages__atomMessageReceived(message));
         return true;
       }
       return false;
@@ -226,12 +248,12 @@ export function runMessagingAgent(redux) {
     function(message) {
       if (message.isFromSystem() && message.isDeactivateMessage()) {
         //dispatch an action that is suitable for displaying a toast
-        redux.dispatch(actionCreators.needs__closedBySystem(message));
+        redux.dispatch(actionCreators.atoms__closedBySystem(message));
         //adapt the state and GUI
         redux.dispatch({
-          type: actionTypes.needs.close,
+          type: actionTypes.atoms.close,
           payload: {
-            ownedNeedUri: message.getReceiverNeed(),
+            ownedAtomUri: message.getRecipientAtom(),
           },
         });
         return true;
@@ -248,12 +270,12 @@ export function runMessagingAgent(redux) {
       if (message.isResponseToDeleteMessage()) {
         if (message.isSuccessResponse()) {
           redux.dispatch(
-            actionCreators.needs__delete(message.getReceiverNeed())
+            actionCreators.atoms__delete(message.getRecipientAtom())
           );
           /*redux.dispatch({
-            type: actionTypes.needs.delete,
+            type: actionTypes.atoms.delete,
             payload: {
-              ownedNeedUri: message.getReceiverNeed(),
+              ownedAtomUri: message.getRecipientAtom(),
             },
           });*/
           return true;
@@ -369,6 +391,16 @@ export function runMessagingAgent(redux) {
 
   let missedHeartbeats = 0; // deadman-switch variable. should count up every 30s and gets reset onHeartbeat
   setInterval(checkHeartbeat, 30000); // heartbeats should arrive roughly every 30s
+
+  document.addEventListener("visibilitychange", function() {
+    if (document.visibilityState == "visible") {
+      onVisible();
+    }
+  });
+
+  function onVisible() {
+    ws.send(ECHO_STRING);
+  }
 
   function newSock() {
     const ws = new SockJS(urljoin(ownerBaseUrl, "/msg"), null, { debug: true });

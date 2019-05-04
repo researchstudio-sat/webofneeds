@@ -1,0 +1,518 @@
+@prefix : <https://w3id.org/won/core#> .
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+@prefix gr: <http://purl.org/goodrelations/v1#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix oslc: <http://open-services.net/ns/core#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sioc: <http://rdfs.org/sioc/types#> .
+@prefix schema_org: <http://schema.rdfs.org/all#> .
+@base <https://w3id.org/won/core> .
+
+<https://w3id.org/won/core> rdf:type owl:Ontology ;
+                                    owl:versionIRI <https://w3id.org/won/core/1.0> ;
+                                    dc:title "Web of Needs Ontology" ;
+                                    rdfs:comment "Ontology for the Web of Needs data model."@en ;
+                                    dc:date "2013-12-13"^^xsd:date ;
+                                    dc:creator "Florian Kleedorfer" ,
+                                               "Fabian Salcher" .
+
+#################################################################
+#    Object Properties
+#################################################################
+
+###  https://w3id.org/won/core#additionalData
+:additionalData rdf:type owl:ObjectProperty ;
+                   rdfs:range owl:Thing ;
+                   rdfs:comment "Contains additional information in form of an RDF graph about an event."^^xsd:string ;
+                   rdfs:isDefinedBy <https://w3id.org/won/core> .
+
+
+###  https://w3id.org/won/core#brokerUri
+:brokerUri rdf:type owl:ObjectProperty ;
+              rdfs:domain :WonOverActiveMq ;
+              rdfs:comment "Specifies the ActiveMQ broker URI to be used to contact the atom."@en ;
+              rdfs:isDefinedBy <https://w3id.org/won/core> .
+
+
+###  https://w3id.org/won/core#connectionState
+:connectionState rdf:type owl:ObjectProperty ,
+                             owl:FunctionalProperty ;
+                    rdfs:domain :Connection ;
+                    rdfs:range :ConnectionState ;
+                    rdfs:comment "Indicates the state in which the Connection object is."@en ;
+                    rdfs:isDefinedBy <https://w3id.org/won/core> .
+
+
+###  https://w3id.org/won/core#connections
+:connections rdf:type owl:ObjectProperty ;
+                rdfs:domain :Atom ;
+                rdfs:range :ConnectionContainer ;
+                rdfs:comment "Links the Atom object to its connections."@en ;
+                rdfs:isDefinedBy <https://w3id.org/won/core> .
+
+
+###  https://w3id.org/won/core#messageContainer
+:messageContainer rdf:type owl:ObjectProperty ,
+                            owl:FunctionalProperty ;
+                   rdfs:domain :Connection ;
+                   rdfs:range :MessageContainer ;
+                   rdfs:comment "Links the Connection object to a container containing connection events (messages)."@en ;
+                   rdfs:isDefinedBy <https://w3id.org/won/core> .
+
+
+###  https://w3id.org/won/core#socket
+:socket rdf:type owl:ObjectProperty ;
+          rdfs:domain :Atom ;
+          rdfs:range :Socket ;
+          rdfs:comment "Indicates that an atom or connection supports the specified socket (=behavior)."@en ;
+          rdfs:isDefinedBy <https://w3id.org/won/core> .
+
+		  
+###  https://w3id.org/won/core#defaultSocket
+:defaultSocket rdf:type owl:ObjectProperty ;
+          rdfs:domain :Atom ;
+          rdfs:range :Socket ;
+          rdfs:comment "Indicates the socket to connect to by default."@en ;
+          rdfs:isDefinedBy <https://w3id.org/won/core> .
+
+		  
+
+###  https://w3id.org/won/core#flag
+:flag rdf:type owl:ObjectProperty ;
+         rdfs:domain :Atom ;
+         rdfs:range :Flag ;
+         rdfs:comment "Links an Atom to its Flags"@en ;
+         rdfs:isDefinedBy <https://w3id.org/won/core> .
+
+
+###  https://w3id.org/won/core#matchingContext
+:flag rdf:type owl:ObjectProperty ;
+         rdfs:domain :Atom ;
+         rdfs:range xsd:String ;
+         rdfs:comment "Specifies a 'matching context' for the Atom. Matchers should only send hints to this Atom if the counterpart specifies the same matching context. If no matching context is specified, matching is not restricted, and matchers may send hints with counterparts that do specify matching contexts."@en ;
+         rdfs:isDefinedBy <https://w3id.org/won/core> .
+
+
+###  https://w3id.org/won/core#location
+:location rdf:type owl:ObjectProperty ;
+             rdfs:range :LocationSpecification ;
+             rdfs:comment "Links an AtomDescription entity to a description of its location."@en ;
+             rdfs:isDefinedBy <https://w3id.org/won/core> .
+
+
+###  https://w3id.org/won/core#matcherProtocolEndpoint
+:matcherProtocolEndpoint rdf:type owl:ObjectProperty ;
+                            rdfs:comment "Points to the matcherProtocol webservice endpoint of the atom. I.e., matchers can communicate with the atom through this endpoint."@en ;
+                            rdfs:isDefinedBy <https://w3id.org/won/core> .
+
+
+###  https://w3id.org/won/core#atomProtocolEndpoint
+:atomProtocolEndpoint rdf:type owl:ObjectProperty ;
+                         rdfs:subPropertyOf owl:topObjectProperty ;
+                         rdfs:comment "Points to the atomProtocol webservice endpoint of the atom. I.e., won nodes can communicate with the atom through this endpoint."@en ;
+                         rdfs:isDefinedBy <https://w3id.org/won/core> .
+
+
+###  https://w3id.org/won/core#originator
+:originator rdf:type owl:ObjectProperty ,
+                        owl:InverseFunctionalProperty ;
+               rdfs:comment "The entity (Atom, Connection, or Service - eg. matching service) that originated the event."@en ;
+               rdfs:isDefinedBy <https://w3id.org/won/core> .
+
+
+###  https://w3id.org/won/core#owner
+:owner rdf:type owl:ObjectProperty ,
+                   owl:FunctionalProperty ;
+          rdfs:domain :Atom ;
+          rdfs:comment "Specifies who controls the atom."@en ;
+          rdfs:isDefinedBy <https://w3id.org/won/core> .
+
+
+###  https://w3id.org/won/core#ownerProtocolEndpoint
+:ownerProtocolEndpoint rdf:type owl:ObjectProperty ;
+                          rdfs:comment "Points to the ownerProtocol webservice endpoint of the atom. I.e., owner applications can communicate with the atom through this endpoint."@en ;
+                          rdfs:isDefinedBy <https://w3id.org/won/core> .
+
+
+###  https://w3id.org/won/core#targetConnection
+:targetConnection rdf:type owl:ObjectProperty ,
+                              owl:FunctionalProperty ,
+                              owl:InverseFunctionalProperty ,
+                              owl:SymmetricProperty ;
+                     rdfs:domain :Connection ;
+                     rdfs:range :Connection ;
+                     rdfs:comment "Links a Connection object to its remote counterpart."@en ;
+                     rdfs:isDefinedBy <https://w3id.org/won/core> .
+
+
+###  https://w3id.org/won/core#targetSocket
+:targetSocket rdf:type owl:ObjectProperty ;
+                rdfs:comment "Indicates that a remote atom or remote connection supports the specified socket (=behavior) or specifies the remote socket to connect with."@en ;
+                rdfs:isDefinedBy <https://w3id.org/won/core> .
+
+
+###  https://w3id.org/won/core#targetAtom
+:targetAtom rdf:type owl:ObjectProperty ;
+               rdfs:domain :Connection ;
+               rdfs:range :Atom ;
+               rdfs:comment "links a Connection to its remote Atom. The remote Atom is the one holding the  targetConnection."@en ;
+               rdfs:isDefinedBy "https://w3id.org/won/core"@en .
+
+
+###  https://w3id.org/won/core#tag
+:tag rdf:type owl:ObjectProperty ;
+        rdfs:range xsd:string .
+
+
+###  https://w3id.org/won/core#timeSpecification
+:timeSpecification rdf:type owl:ObjectProperty ;
+                      rdfs:range :TimeSpecification ;
+                      rdfs:comment "Specifies when the Atom object is available."@en ;
+                      rdfs:isDefinedBy <https://w3id.org/won/core> .
+
+
+###  https://w3id.org/won/core#atomState
+:atomState rdf:type owl:ObjectProperty ,
+                    owl:FunctionalProperty ;
+           rdfs:domain :Atom ;
+           rdfs:range :AtomState ;
+           rdfs:comment "Defines the Atom object's state."@en ;
+           rdfs:isDefinedBy <https://w3id.org/won/core> .
+
+
+###  https://w3id.org/won/core#seeks
+:seeks rdf:type owl:ObjectProperty ;
+       rdfs:domain :Atom ;
+       rdfs:comment """This optional property is one of the two properties that defines the content of every atom (the other is the \"is\" property). It is used to describe that part of the content that is
+sought to fulfill the atom in contrast to the part that is available.""" ;
+       rdfs:isDefinedBy <https://w3id.org/won/core> .
+
+
+###  https://w3id.org/won/core#supportsWonProtocolImpl
+:supportsWonProtocolImpl rdf:type owl:ObjectProperty ;
+                         rdfs:domain :Atom ;
+                         rdfs:range :WonProtocol ;
+                         rdfs:comment "Connects an Atom object with a description of a WON protocol it supports."@en ;
+                         rdfs:isDefinedBy <https://w3id.org/won/core> .
+
+#################################################################
+#    Data properties
+#################################################################
+
+###  http://purl.org/dc/terms#created
+<http://purl.org/dc/terms#created> rdf:type owl:DatatypeProperty ;
+                                   rdfs:subPropertyOf owl:topDataProperty ;
+                                   rdfs:isDefinedBy <https://w3id.org/won/core> .
+
+
+###  http://purl.org/dc/terms/title
+<http://purl.org/dc/terms/title> rdf:type owl:DatatypeProperty .
+
+
+###  https://w3id.org/won/core#activeMQAtomProtocolQueueName
+:activeMQAtomProtocolQueueName rdf:type owl:DatatypeProperty ;
+                                  rdfs:comment "Name of the ActiveMQ queue used for the atom protocol."@en ;
+                                  rdfs:isDefinedBy <https://w3id.org/won/core> .
+
+
+###  https://w3id.org/won/core#activeMQOwnerProtocolQueueName
+:activeMQOwnerProtocolQueueName rdf:type owl:DatatypeProperty ;
+                                   rdfs:comment "Name of the ActiveMQ queue used for the owner protocol."@en ;
+                                   rdfs:isDefinedBy <https://w3id.org/won/core> .
+
+
+###  https://w3id.org/won/core#endTime
+:endTime rdf:type owl:DatatypeProperty ,
+                     owl:FunctionalProperty ;
+            rdfs:domain :TimeSpecification ;
+            rdfs:range xsd:dateTime ;
+            rdfs:comment "The end time as an xsd:dateTime."@en ;
+            rdfs:isDefinedBy <https://w3id.org/won/core> .
+
+
+###  https://w3id.org/won/core#recursIn
+:recursIn rdf:type owl:DatatypeProperty ,
+                      owl:FunctionalProperty ;
+             rdfs:domain :TimeSpecification ;
+             rdfs:range xsd:duration ;
+             rdfs:comment "If set, specifies the interval of recurrence measured from the startTime, in xsd:duration."@en ;
+             rdfs:isDefinedBy <https://w3id.org/won/core> .
+
+
+###  https://w3id.org/won/core#recursInfiniteTimes
+:recursInfiniteTimes rdf:type owl:DatatypeProperty ,
+                                 owl:FunctionalProperty ;
+                        rdfs:domain :TimeSpecification ;
+                        rdfs:range xsd:boolean ;
+                        rdfs:comment "Indicates that the TimeSpecification is repeated until the end of time."@en ;
+                        rdfs:isDefinedBy <https://w3id.org/won/core> .
+
+
+###  https://w3id.org/won/core#recursTimes
+:recursTimes rdf:type owl:DatatypeProperty ,
+                         owl:FunctionalProperty ;
+                rdfs:domain :TimeSpecification ;
+                rdfs:range xsd:integer ;
+                rdfs:comment "Specifies how often the interval recurs."@en ;
+                rdfs:isDefinedBy <https://w3id.org/won/core> .
+
+
+###  https://w3id.org/won/core#startTime
+:startTime rdf:type owl:DatatypeProperty ,
+                       owl:FunctionalProperty ;
+              rdfs:domain :TimeSpecification ;
+              rdfs:range xsd:dateTime ;
+              rdfs:comment "The start time as an xsd:dateTime."@en ;
+              rdfs:isDefinedBy <https://w3id.org/won/core> .
+
+###  https://w3id.org/won/core#doNotMatchBefore
+:doNotMatchBefore rdf:type owl:DatatypeProperty ,
+                     owl:FunctionalProperty ;
+            rdfs:domain :Atom ;
+            rdfs:range xsd:dateTime ;
+            rdfs:comment "Indicates that matchers should not use this atom for matching before the specified xsd:dateTime."@en ;
+            rdfs:isDefinedBy <https://w3id.org/won/core> .
+
+###  https://w3id.org/won/core#doNotMatchAfter
+:doNotMatchAfter rdf:type owl:DatatypeProperty ,
+                     owl:FunctionalProperty ;
+            rdfs:domain :Atom ;
+            rdfs:range xsd:dateTime ;
+            rdfs:comment "Indicates that matchers should not use this atom for matching after the specified xsd:dateTime."@en ;
+            rdfs:isDefinedBy <https://w3id.org/won/core> .
+
+###  https://w3id.org/won/core#tag
+:tag rdf:type owl:DatatypeProperty .
+
+
+###  https://w3id.org/won/core#timeStamp
+:timeStamp rdf:type owl:DatatypeProperty ,
+                       owl:FunctionalProperty ;
+              rdfs:range xsd:dateTime ;
+              rdfs:comment "The time and date when the event occurred."@en ;
+              rdfs:isDefinedBy <https://w3id.org/won/core> .
+
+
+###  http://www.w3.org/2003/01/geo/wgs84_pos#latitude
+<http://www.w3.org/2003/01/geo/wgs84_pos#latitude> rdf:type owl:DatatypeProperty ,
+                                                            owl:FunctionalProperty ;
+                                                   rdfs:domain <http://www.w3.org/2003/01/geo/wgs84_pos#Point> ;
+                                                   rdfs:range xsd:float ;
+                                                   rdfs:isDefinedBy <https://w3id.org/won/core> .
+
+
+###  http://www.w3.org/2003/01/geo/wgs84_pos#longitude
+<http://www.w3.org/2003/01/geo/wgs84_pos#longitude> rdf:type owl:DatatypeProperty ,
+                                                             owl:FunctionalProperty ;
+                                                    rdfs:domain <http://www.w3.org/2003/01/geo/wgs84_pos#Point> ;
+                                                    rdfs:range xsd:float .
+
+
+#################################################################
+#    Classes
+#################################################################
+
+###  https://w3id.org/won/core#Connection
+:Connection rdf:type owl:Class ;
+            rdfs:comment "Represents a Connection to between two Atoms. Whenever two Atoms are connected, each Atom creates a dedicated Connection object which encapsulate all information about the connection."@en ;
+            rdfs:isDefinedBy <https://w3id.org/won/core> .
+
+
+###  https://w3id.org/won/core#ConnectionContainer
+:ConnectionContainer rdf:type owl:Class ;
+                     rdfs:subClassOf <http://www.w3.org/ns/ldp#CompositeContainer> ;
+                     rdfs:comment "Container for Connections."@en ;
+                     rdfs:isDefinedBy <https://w3id.org/won/core> .
+
+
+###  https://w3id.org/won/core#ConnectionState
+:ConnectionState rdf:type owl:Class ;
+                 rdfs:comment "A Connection's state."@en ;
+                 rdfs:isDefinedBy <https://w3id.org/won/core> .
+
+
+###  https://w3id.org/won/core#MessageContainer
+:MessageContainer rdf:type owl:Class ;
+                rdfs:subClassOf <http://www.w3.org/ns/ldp#CompositeContainer> ;
+                rdfs:comment "Container for Events."@en ;
+                rdfs:isDefinedBy <https://w3id.org/won/core> .
+
+
+###  https://w3id.org/won/core#Socket
+:Socket rdf:type owl:Class ;
+       rdfs:comment "Sockets are behaviors an Atom can choose to support. Connections have a Socket; Atoms can be connected through multiple Connections if they have different Sockets."@en ;
+       rdfs:isDefinedBy <https://w3id.org/won/core> .
+
+
+###  https://w3id.org/won/core#Flag
+:Flag rdf:type owl:Class ;
+      rdfs:comment "Superclass of all Flags an atom can have."@en ;
+      rdfs:isDefinedBy <https://w3id.org/won/core> .
+
+
+###  https://w3id.org/won/core#LocationSpecification
+:LocationSpecification rdf:type owl:Class ;
+                       rdfs:comment "Specifies where an Atom is available."@en ;
+                       rdfs:isDefinedBy <https://w3id.org/won/core> .
+
+###  https://w3id.org/won/core#Atom
+:Atom rdf:type owl:Class ;
+      rdfs:comment """An atom is an online entity controlled by a person or organization. Its purpose is to be connected to other such atoms via Connections, so it can be said that it represents the need to interact with others.
+It specifies a content - what the atom is about, which may be something that is offered for sale, sought for rental etc."""@en ;
+      rdfs:isDefinedBy <https://w3id.org/won/core> ;
+      rdfs:label "Atom" .
+
+
+###  https://w3id.org/won/core#AtomState
+:AtomState rdf:type owl:Class ;
+           rdfs:comment "The Atom's state."@en ;
+           rdfs:isDefinedBy <https://w3id.org/won/core> .
+
+
+###  https://w3id.org/won/core#Region
+:Region rdf:type owl:Class ;
+        rdfs:subClassOf :LocationSpecification ;
+        rdfs:isDefinedBy <https://w3id.org/won/core> .
+
+
+###  https://w3id.org/won/core#TimeSpecification
+:TimeSpecification rdf:type owl:Class ;
+                   rdfs:comment "Specifies when an Atom is available. Matching services should try to find Atoms with TimeSpecifications that overlap with this atoms' TimeSpecifications."@en ;
+                   rdfs:isDefinedBy <https://w3id.org/won/core> .
+
+
+###  https://w3id.org/won/core#WonOverActiveMq
+:WonOverActiveMq rdf:type owl:Class ;
+                 rdfs:subClassOf :WonProtocol ;
+                 rdfs:comment "The Web of Needs protocol implementation that uses ActiveMQ."@en ;
+                 rdfs:isDefinedBy <https://w3id.org/won/core> .
+
+
+###  https://w3id.org/won/core#WonOverSoapWs
+:WonOverSoapWs rdf:type owl:Class ;
+               rdfs:subClassOf :WonProtocol ;
+               rdfs:comment "The Web of Needs Protocol implelementation that uses SOAP Webservices."@en ;
+               rdfs:isDefinedBy <https://w3id.org/won/core> .
+
+
+###  https://w3id.org/won/core#WonProtocol
+:WonProtocol rdf:type owl:Class ;
+             rdfs:comment """Superclass for Web of Needs protocol implementations."""@en ;
+             rdfs:isDefinedBy <https://w3id.org/won/core> .
+
+
+###  http://www.w3.org/2003/01/geo/wgs84_pos#Point
+<http://www.w3.org/2003/01/geo/wgs84_pos#Point> rdf:type owl:Class ;
+                                                rdfs:subClassOf :LocationSpecification .
+
+
+###  http://www.w3.org/ns/ldp#CompositeContainer
+<http://www.w3.org/ns/ldp#CompositeContainer> rdf:type owl:Class ;
+                                              rdfs:isDefinedBy <https://w3id.org/won/core> .
+
+
+#################################################################
+#    Individuals
+#################################################################
+
+###  https://w3id.org/won/core#Active
+:Active rdf:type owl:NamedIndividual ,
+                 :AtomState ;
+        rdfs:comment "The active state. "@en ;
+        rdfs:isDefinedBy <https://w3id.org/won/core> .
+
+
+###  https://w3id.org/won/core#Closed
+:Closed rdf:type owl:NamedIndividual ,
+                 :ConnectionState ;
+        rdfs:comment "The closed state. No Messages are forwarded in this state. Re-opening a connection is possbile."@en ;
+        rdfs:isDefinedBy <https://w3id.org/won/core> .
+
+
+###  https://w3id.org/won/core#Connected
+:Connected rdf:type owl:NamedIndividual ,
+                    :ConnectionState ;
+           rdfs:comment "The connected state. Messages are forwarded to/from the owner."@en ;
+           rdfs:isDefinedBy <https://w3id.org/won/core> .
+
+
+###  https://w3id.org/won/core#NoHintForMe
+:NoHintForMe rdf:type owl:NamedIndividual, :Flag;
+            rdfs:comment "An Atom specifying this flag indicates that matchers should not send Hint messages to that Atom. If the NoHintForCounterpart flag is also present, matchers should disregard this atom completely."@en ;
+            rdfs:isDefinedBy <https://w3id.org/won/core> .
+
+###  https://w3id.org/won/core#NoHintForCounterpart
+:NoHintForCounterpart rdf:type owl:NamedIndividual, :Flag;
+            rdfs:comment "An Atom specifying this flag indicates that matchers should not send Hint messages to the counterpart in case of a match. If the NoHintForMe flag is also present, matchers should disregard this atom completely."@en ;
+            rdfs:isDefinedBy <https://w3id.org/won/core> .
+
+###  https://w3id.org/won/core#WhatsAround
+:WhatsAround rdf:type owl:NamedIndividual, :Flag;
+            rdfs:comment "An Atom specifying this flag indicates that matchers should not match with anything but the location within this atom. The intention of this Flag is to simply find other atoms around a certain location."@en ;
+            rdfs:isDefinedBy <https://w3id.org/won/core> .
+
+###  https://w3id.org/won/core#WhatsNew
+:WhatsNew rdf:type owl:NamedIndividual, :Flag;
+            rdfs:comment "An Atom specifying this flag indicates that matchers should match with anything that is created recently. The intention of this Flag is to simply find other atoms created recently."@en ;
+            rdfs:isDefinedBy <https://w3id.org/won/core> .
+
+###  https://w3id.org/won/core#GroupSocket
+:GroupSocket rdf:type owl:NamedIndividual ,
+                     :Socket ;
+            rdfs:comment "The group socket. Messages are forwarded to all connections with this socket."@en ;
+            rdfs:isDefinedBy <https://w3id.org/won/core> .
+
+
+###  https://w3id.org/won/core#Inactive
+:Inactive rdf:type owl:NamedIndividual ,
+                   :AtomState ;
+          rdfs:comment "The incative state. Atoms do not communicate in this state. Intended to stop receiving messages for something not currently of interest."@en ;
+          rdfs:isDefinedBy <https://w3id.org/won/core> .
+
+###  https://w3id.org/won/core#ChatSocket
+:ChatSocket rdf:type owl:NamedIndividual ,
+                     :Socket ;
+            rdfs:comment "The Default socket. All messages and events are forwarded to the owner, no action is taken automatically."@en ;
+            rdfs:isDefinedBy <https://w3id.org/won/core> .
+
+
+###  https://w3id.org/won/core#RequestReceived
+:RequestReceived rdf:type owl:NamedIndividual ,
+                          :ConnectionState ;
+                 rdfs:comment "Half-open state. The connection has been opened by the remote counterpart but not yet been accepted by the local end."@en ;
+                 rdfs:isDefinedBy <https://w3id.org/won/core> .
+
+
+###  https://w3id.org/won/core#RequestSent
+:RequestSent rdf:type owl:NamedIndividual ,
+                      :ConnectionState ;
+             rdfs:comment "Half-open state. The Connection has been requested by the local end but not yet been accepted by the remote counterpart."@en ;
+             rdfs:isDefinedBy <https://w3id.org/won/core> .
+
+###  https://w3id.org/won/core#Suggested
+:Suggested rdf:type owl:NamedIndividual ,
+                    :ConnectionState ;
+           rdfs:comment "Suggested state. The Connection has been created through a Hint Event but not yet been opened by either of the sides."@en ;
+           rdfs:isDefinedBy <https://w3id.org/won/core> .
+
+
+###  https://w3id.org/won/core#UsedForTesting
+:UsedForTesting rdf:type owl:NamedIndividual ,
+                         :Flag .
+
+
+
+
+
+#################################################################
+#    Annotations
+#################################################################
+
+:UsedForTesting rdfs:comment "Flag indicating the atom has been created for testing purposes. It should only be matched with other atoms flagged with UsedForTesting. The flag is intended to separate real-world atoms from those generated for testing the system, so that users are neither spammed nor misled."@en ;
+                rdfs:isDefinedBy <https://w3id.org/won/core> .
+
+
+###  Generated by the OWL API (version 4.2.6.20160910-2108) https://github.com/owlcs/owlapi

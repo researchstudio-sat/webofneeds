@@ -1,10 +1,10 @@
 import angular from "angular";
-import Immutable from "immutable"; // also exports itself as (window).L
 import L from "../../../leaflet-bundleable.js";
 import {
   attach,
   searchNominatim,
   reverseSearchNominatim,
+  scrubSearchResults,
   nominatim2draftLocation,
   delay,
   getIn,
@@ -54,8 +54,7 @@ function genComponentConf() {
         <div class="rp__searchbox">
             <input
                 type="text"
-                id="rp__from-searchbox__inner"
-                class="rp__searchbox__inner"
+                class="rp__searchbox__inner departure-input"
                 placeholder="{{self.detail.placeholder.departure}}"
                 ng-class="{'rp__searchbox__inner--withreset' : self.fromShowResetButton}"/>
             <svg class="rp__searchbox__icon clickable" 
@@ -97,8 +96,7 @@ function genComponentConf() {
         <div class="rp__searchbox">
             <input
                 type="text"
-                id="rp__to-searchbox__inner"
-                class="rp__searchbox__inner"
+                class="rp__searchbox__inner destination-input"
                 placeholder="{{self.detail.placeholder.destination}}"
                 ng-class="{'rp__searchbox__inner--withreset' : self.toShowResetButton}"/>
             <svg class="rp__searchbox__icon clickable" 
@@ -125,8 +123,7 @@ function genComponentConf() {
             )}
         </ul>
 
-        <div class="rp__mapmount" 
-            id="rp__mapmount" 
+        <div class="rp__mapmount"
             in-view="$inview && self.mapInView($inviewInfo)">
         </div>
             `;
@@ -525,19 +522,19 @@ function genComponentConf() {
     }
 
     fromTextfieldNg() {
-      return this.domCache.ng("#rp__from-searchbox__inner");
+      return this.domCache.ng(".departure-input");
     }
 
     fromTextfield() {
-      return this.domCache.dom("#rp__from-searchbox__inner");
+      return this.domCache.dom(".departure-input");
     }
 
     toTextfieldNg() {
-      return this.domCache.ng("#rp__to-searchbox__inner");
+      return this.domCache.ng(".destination-input");
     }
 
     toTextfield() {
-      return this.domCache.dom("#rp__to-searchbox__inner");
+      return this.domCache.dom(".destination-input");
     }
 
     mapMountNg() {
@@ -562,20 +559,6 @@ function genComponentConf() {
     },
     template: template,
   };
-}
-
-function scrubSearchResults(searchResults) {
-  return (
-    Immutable.fromJS(searchResults.map(nominatim2draftLocation))
-      /*
-                   * filter "duplicate" results (e.g. "Wien"
-                   *  -> 1x waterway, 1x boundary, 1x place)
-                   */
-      .groupBy(r => r.get("name"))
-      .map(sameNamedResults => sameNamedResults.first())
-      .toList()
-      .toJS()
-  );
 }
 
 // TODO: decide on appropriate behaviour and implement it.

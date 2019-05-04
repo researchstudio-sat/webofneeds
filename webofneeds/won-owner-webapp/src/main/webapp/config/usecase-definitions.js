@@ -37,19 +37,19 @@ import { activitiesGroup } from "./usecases/group-activities";
  *    ...,
  *    generateQuery: (draft, resultName) => {
  *        new SparqlParser.parse(`
- *            PREFIX won: <http://purl.org/webofneeds/model#>
+ *            PREFIX won: <https://w3id.org/won/core#>
  *
  *            SELECT ${resultName} WHERE {
- *                ${resultName} a won:Need .
+ *                ${resultName} a won:Atom .
  *            }
  *        `)
  *    }
  * }
  *
- * A `generateQuery` is a function that takes the current need draft and the name of the result variable and returns a sparqljs json representation of the query. This can be created either programmatically or by using the Parser class from the sparqljs library.
+ * A `generateQuery` is a function that takes the current atom draft and the name of the result variable and returns a sparqljs json representation of the query. This can be created either programmatically or by using the Parser class from the sparqljs library.
  *
  * The query needs to be a SELECT query and select only the resultName variable.
- * This will be automatically enforced by the need builder.
+ * This will be automatically enforced by the atom builder.
  */
 
 const useCaseGroups = {

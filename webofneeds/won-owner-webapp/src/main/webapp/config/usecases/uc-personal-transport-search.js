@@ -57,7 +57,7 @@ export const personalTransportSearch = {
         },
         operations: [
           `
-            ${resultName} <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> won:Need.
+            ${resultName} <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> won:Atom.
             {
               { 
                 ${resultName} <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://dbpedia.org/resource/Ridesharing>.
@@ -99,7 +99,7 @@ export const personalTransportSearch = {
               UNION
               { 
                 ${resultName} <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> s:TaxiService. 
-                ${resultName} (won:hasLocation|s:location) ?location.
+                ${resultName} (won:location|s:location) ?location.
                 ?location s:geo ?location_geo.
                 ?location_geo 
                   s:latitude ?location_lat;
@@ -134,7 +134,7 @@ export const personalTransportSearch = {
           xsd: "http://www.w3.org/2001/XMLSchema#",
         },
         operations: [
-          `${resultName} a won:Need.
+          `${resultName} a won:Atom.
           {
             {
               ${resultName} a <http://dbpedia.org/resource/Ridesharing> ;
@@ -169,7 +169,7 @@ export const personalTransportSearch = {
           xsd: "http://www.w3.org/2001/XMLSchema#",
         },
         operations: [
-          `${resultName} a won:Need.
+          `${resultName} a won:Atom.
           {
             {
               ${resultName} a <http://dbpedia.org/resource/Ridesharing> ;
@@ -202,7 +202,7 @@ export const personalTransportSearch = {
           s: won.defaultContext["s"],
         },
         operations: [
-          `${resultName} a won:Need.`,
+          `${resultName} a won:Atom.`,
           `{{${resultName} a <http://dbpedia.org/resource/Ridesharing>} union {${resultName} a s:TaxiService}}`,
         ],
       };

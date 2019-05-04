@@ -32,13 +32,14 @@ public class PetriNetLoader {
         String pnmlString = new String(pnmlBytes);
         return readPNML(pnmlString);
     }
-    
+
     public PetriNet readPNML(String pnml) {
         PetriNetIO petriNetIO = getPetriNetIO();
         Optional<File> tempfile = Optional.empty();
         try {
             tempfile = Optional.of(File.createTempFile("petrinet-tmp-", ".xml"));
-            try (FileWriter fw = new FileWriter(tempfile.get())) {;
+            try (FileWriter fw = new FileWriter(tempfile.get())) {
+                ;
                 fw.write(pnml);
             }
             return petriNetIO.read(tempfile.get().getAbsolutePath());
@@ -50,5 +51,4 @@ public class PetriNetLoader {
             }
         }
     }
-    
 }

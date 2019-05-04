@@ -1,8 +1,8 @@
-PREFIX mod: <http://purl.org/webofneeds/modification#>
+PREFIX mod: <https://w3id.org/won/modification#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-PREFIX msg: <http://purl.org/webofneeds/message#>
-PREFIX won: <http://purl.org/webofneeds/model#>
-PREFIX agr: <http://purl.org/webofneeds/agreement#>
+PREFIX msg: <https://w3id.org/won/message#>
+PREFIX won: <https://w3id.org/won/core#>
+PREFIX agr: <https://w3id.org/won/agreement#>
 
 DELETE
  {
@@ -12,26 +12,26 @@ DELETE
 WHERE
  {
     GRAPH ?retractingMessageEnvelope {
-         ?retractingMsg msg:hasContent ?retractingMessageContent
+         ?retractingMsg msg:content ?retractingMessageContent
     }
     GRAPH ?retractingMessageContent {
         ?retractingMsg mod:retracts ?retractedMsg .
         ?rs ?rp ?ro .
     }
     GRAPH ?e2 {
-        ?retractingMsg msg:hasSender ?sender
+        ?retractingMsg msg:sender ?sender
     }
     GRAPH ?e3 {
-        ?retractedMsg msg:hasSender ?sender
+        ?retractedMsg msg:sender ?sender
     }
-    # Note: for this pattern, we need the union of all graphs that contain msg:hasPreviousMessage triples,
+    # Note: for this pattern, we need the union of all graphs that contain msg:previousMessage triples,
     # Jena provides the special graph name <urn:x-arq:UnionGraph> for querying the union of all the query's graphs
     # THIS QUERY WILL ONLY WORK WITH JENA
     GRAPH <urn:x-arq:UnionGraph> {
-        ?retractingMsg msg:hasPreviousMessage+ ?retractedMsg
+        ?retractingMsg msg:previousMessage+ ?retractedMsg
     }
     GRAPH ?retractedMessageEnvelope {
-        ?retractedMsg msg:hasContent ?retractedMessageContent
+        ?retractedMsg msg:content ?retractedMessageContent
     }
     GRAPH ?retractedMessageContent {
         ?s ?p ?o

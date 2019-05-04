@@ -41,7 +41,7 @@ if __name__ == '__main__':
 
     # load the tensor
     header_file = "headers.txt"
-    need_indices_file = "needIndices.txt"
+    atom_indices_file = "atomIndices.txt"
 
     slice_files = []
     for file in os.listdir(args.inputfolder):
@@ -49,11 +49,11 @@ if __name__ == '__main__':
             slice_files.append(file)
 
     header_input = args.inputfolder + "/" + header_file
-    need_indices_input = args.inputfolder + "/" + need_indices_file
+    atom_indices_input = args.inputfolder + "/" + atom_indices_file
     data_input = []
     for slice in slice_files:
         data_input.append(args.inputfolder + "/" + slice)
-    input_tensor = read_input_tensor(header_input, need_indices_input, data_input, True)
+    input_tensor = read_input_tensor(header_input, atom_indices_input, data_input, True)
 
     # execute rescal
     A,R = execute_extrescal(input_tensor, args.rank)

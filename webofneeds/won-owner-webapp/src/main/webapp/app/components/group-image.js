@@ -1,8 +1,8 @@
 /**
  * Component for rendering the icon of a groupChat (renders participants icons)
  * Can be included with either:
- *    connection-uri: then the participants of the remoteNeed are shown
- *    need-uri: then the participants of the need behind the need uri are shown
+ *    connection-uri: then the participants of the targetAtom are shown
+ *    atom-uri: then the participants of the atom behind the atom uri are shown
  * Created by quasarchimaere on 15.01.2019.
  */
 import angular from "angular";
@@ -14,8 +14,8 @@ import { labels } from "../won-label-utils.js";
 import { attach, get } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
 import {
-  getOwnedNeedByConnectionUri,
-  getNeeds,
+  getOwnedAtomByConnectionUri,
+  getAtoms,
 } from "../selectors/general-selectors.js";
 
 import "style/_group-image.scss";
@@ -54,19 +54,19 @@ function genComponentConf() {
         let groupMembers;
 
         if (this.connectionUri) {
-          const ownedNeed = getOwnedNeedByConnectionUri(
+          const ownedAtom = getOwnedAtomByConnectionUri(
             state,
             this.connectionUri
           );
           const connection =
-            ownedNeed && ownedNeed.getIn(["connections", this.connectionUri]);
-          const remoteNeed =
-            connection && get(getNeeds(state), connection.get("remoteNeedUri"));
-          groupMembers = remoteNeed && remoteNeed.get("groupMembers");
-        } else if (this.needUri) {
-          const need = get(getNeeds(state), this.needUri);
+            ownedAtom && ownedAtom.getIn(["connections", this.connectionUri]);
+          const targetAtom =
+            connection && get(getAtoms(state), connection.get("targetAtomUri"));
+          groupMembers = targetAtom && targetAtom.get("groupMembers");
+        } else if (this.atomUri) {
+          const atom = get(getAtoms(state), this.atomUri);
 
-          groupMembers = need && need.get("groupMembers");
+          groupMembers = atom && atom.get("groupMembers");
         }
 
         return {
@@ -78,7 +78,7 @@ function genComponentConf() {
       connect2Redux(
         selectFromState,
         actionCreators,
-        ["self.connectionUri", "self.needUri"],
+        ["self.connectionUri", "self.atomUri"],
         this
       );
     }
@@ -91,7 +91,7 @@ function genComponentConf() {
     bindToController: true, //scope-bindings -> ctrl
     scope: {
       connectionUri: "=",
-      needUri: "=",
+      atomUri: "=",
     },
     template: template,
   };

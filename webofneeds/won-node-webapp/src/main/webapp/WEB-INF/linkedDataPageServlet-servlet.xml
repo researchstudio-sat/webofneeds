@@ -64,8 +64,8 @@
         <property name="pageURIPrefix" value="${uri.path.page}" />
         <property name="connectionResourceURIPrefix" value="${uri.prefix.connection}" />
         <property name="connectionResourceURIPath" value="${uri.path.resource.connection}" />
-        <property name="needResourceURIPrefix" value="${uri.prefix.need}" />
-        <property name="needResourceURIPath" value="${uri.path.resource.need}" />
+        <property name="atomResourceURIPrefix" value="${uri.prefix.atom}" />
+        <property name="atomResourceURIPath" value="${uri.path.resource.atom}" />
         <property name="nodeResourceURIPrefix" value="${uri.prefix.node}"/>
         <property name="uriService" ref="uriService" />
         <property name="registrationServer" ref="registrationServer" />

@@ -39,6 +39,8 @@ import modalDialog from "./components/modal-dialog.js";
 import toasts from "./components/toasts.js";
 import slideIn from "./components/slide-in.js";
 import connectionsComponent from "./components/connections/connections.js";
+import overviewComponent from "./components/overview/overview.js";
+import mapComponent from "./components/map/map.js";
 import postComponent from "./components/post/post.js";
 import aboutComponent from "./components/about/about.js";
 import signupComponent from "./components/signup/signup.js";
@@ -78,6 +80,8 @@ let app = angular.module("won.owner", [
 
   //views
   connectionsComponent,
+  overviewComponent,
+  mapComponent,
   postComponent,
   aboutComponent,
   signupComponent,
@@ -134,6 +138,19 @@ app.run(["$ngRedux", $ngRedux => runMessagingAgent($ngRedux)]);
 app.run([
   "$ngRedux",
   $ngRedux => $ngRedux.dispatch(actionCreators.config__init()),
+]);
+
+app.run([
+  "$ngRedux",
+  $ngRedux => {
+    navigator.permissions
+      .query({ name: "geolocation" })
+      .then(permissionStatus => {
+        if (permissionStatus && permissionStatus.state === "denied") {
+          return $ngRedux.dispatch(actionCreators.view__locationAccessDenied());
+        }
+      });
+  },
 ]);
 
 app.run(runAccessControl);

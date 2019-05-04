@@ -1,161 +1,994 @@
-<html><head>
-<title>Datatype: PlainLiteral</title>
-<meta http-equiv='content-type' content='text/html;charset=utf8'>
-<link rel='stylesheet' href='../default.css' type='text/css' />
-</head>
-<body>
-<h1>Datatype: PlainLiteral</h1>
-<h2 class='summaryURI'>http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral</h2>
-<h2>Usage (72)</h2>
-<div class='codebox' id='usage_(72)'>
-<ul>
-<li>
-http://purl.org/webofneeds/model#<b>Active</b><span class='comment'> /*&nbsp;</span><a href="../annotationproperties/comment___1501100887.html" title="http://www.w3.org/2000/01/rdf-schema#comment">comment</a> <span class='literal'>"The active state. " <span style='color: black;'>(en)</span></span><span class='comment'>&nbsp;*/</span></li>
-<li>
-http://purl.org/webofneeds/model#<b>BasicNeedType</b><span class='comment'> /*&nbsp;</span><a href="../annotationproperties/comment___1501100887.html" title="http://www.w3.org/2000/01/rdf-schema#comment">comment</a> <span class='literal'>"Superclass for types of needs. Used primarily to indicate which types of needs are compatible with each other for sending hints." <span style='color: black;'>(en)</span></span><span class='comment'>&nbsp;*/</span></li>
-<li>
-http://purl.org/webofneeds/model#<b>Closed</b><span class='comment'> /*&nbsp;</span><a href="../annotationproperties/comment___1501100887.html" title="http://www.w3.org/2000/01/rdf-schema#comment">comment</a> <span class='literal'>"The closed state. No Messages are forwarded in this state. Re-opening a connection is possbile." <span style='color: black;'>(en)</span></span><span class='comment'>&nbsp;*/</span></li>
-<li>
-http://purl.org/webofneeds/model#<b>Connected</b><span class='comment'> /*&nbsp;</span><a href="../annotationproperties/comment___1501100887.html" title="http://www.w3.org/2000/01/rdf-schema#comment">comment</a> <span class='literal'>"The connected state. Messages are forwarded to/from the owner." <span style='color: black;'>(en)</span></span><span class='comment'>&nbsp;*/</span></li>
-<li>
-http://purl.org/webofneeds/model#<b>Connection</b><span class='comment'> /*&nbsp;</span><a href="../annotationproperties/comment___1501100887.html" title="http://www.w3.org/2000/01/rdf-schema#comment">comment</a> <span class='literal'>"Represents a Connection to between two Needs. Whenever two Needs are connected, each Need creates a dedicated Connection object which encapsulate all information about the connection." <span style='color: black;'>(en)</span></span><span class='comment'>&nbsp;*/</span></li>
-<li>
-http://purl.org/webofneeds/model#<b>ConnectionContainer</b><span class='comment'> /*&nbsp;</span><a href="../annotationproperties/comment___1501100887.html" title="http://www.w3.org/2000/01/rdf-schema#comment">comment</a> <span class='literal'>"Container for Connections." <span style='color: black;'>(en)</span></span><span class='comment'>&nbsp;*/</span></li>
-<li>
-http://purl.org/webofneeds/model#<b>ConnectionState</b><span class='comment'> /*&nbsp;</span><a href="../annotationproperties/comment___1501100887.html" title="http://www.w3.org/2000/01/rdf-schema#comment">comment</a> <span class='literal'>"A Connection's state." <span style='color: black;'>(en)</span></span><span class='comment'>&nbsp;*/</span></li>
-<li>
-http://purl.org/webofneeds/model#<b>Critique</b><span class='comment'> /*&nbsp;</span><a href="../annotationproperties/comment___1501100887.html" title="http://www.w3.org/2000/01/rdf-schema#comment">comment</a> <span class='literal'>"Indicates that the Need owner is dissatisfied with something, which should be described in more detail through NeedDescription and NeedModality. The owner may be interested in doing something about the problem, so matching services are advised to provide hints to similar Critique Needs." <span style='color: black;'>(en)</span></span><span class='comment'>&nbsp;*/</span></li>
-<li>
-http://purl.org/webofneeds/model#<b>Demand</b><span class='comment'> /*&nbsp;</span><a href="../annotationproperties/comment___1501100887.html" title="http://www.w3.org/2000/01/rdf-schema#comment">comment</a> <span class='literal'>"Indicates that the Need owner wants to obtain, borrow, rent, etc. something or consume a service. Hints to Supply objects are expected." <span style='color: black;'>(en)</span></span><span class='comment'>&nbsp;*/</span></li>
-<li>
-http://purl.org/webofneeds/model#<b>DoTogether</b><span class='comment'> /*&nbsp;</span><a href="../annotationproperties/comment___1501100887.html" title="http://www.w3.org/2000/01/rdf-schema#comment">comment</a> <span class='literal'>"Indicates that the Need owner is interested in social activty of some sort. Hints to other DoTogether Needs are expected." <span style='color: black;'>(en)</span></span><span class='comment'>&nbsp;*/</span></li>
-<li>
-http://purl.org/webofneeds/model#<b>EventContainer</b><span class='comment'> /*&nbsp;</span><a href="../annotationproperties/comment___1501100887.html" title="http://www.w3.org/2000/01/rdf-schema#comment">comment</a> <span class='literal'>"Container for Events." <span style='color: black;'>(en)</span></span><span class='comment'>&nbsp;*/</span></li>
-<li>
-http://purl.org/webofneeds/model#<b>Facet</b><span class='comment'> /*&nbsp;</span><a href="../annotationproperties/comment___1501100887.html" title="http://www.w3.org/2000/01/rdf-schema#comment">comment</a> <span class='literal'>"Facets are behaviours a Need can choose to support. Connections have a Facet; Needs can be connected through multiple Connections if they have different Facets." <span style='color: black;'>(en)</span></span><span class='comment'>&nbsp;*/</span></li>
-<li>
-http://purl.org/webofneeds/model#<b>GroupFacet</b><span class='comment'> /*&nbsp;</span><a href="../annotationproperties/comment___1501100887.html" title="http://www.w3.org/2000/01/rdf-schema#comment">comment</a> <span class='literal'>"The group facet. Messages are forwarded to all connections with this facet." <span style='color: black;'>(en)</span></span><span class='comment'>&nbsp;*/</span></li>
-<li>
-http://purl.org/webofneeds/model#<b>Inactive</b><span class='comment'> /*&nbsp;</span><a href="../annotationproperties/comment___1501100887.html" title="http://www.w3.org/2000/01/rdf-schema#comment">comment</a> <span class='literal'>"The incative state. Needs do not communicate in this state. Intended to stop receiving messages for something not currently of interest." <span style='color: black;'>(en)</span></span><span class='comment'>&nbsp;*/</span></li>
-<li>
-http://purl.org/webofneeds/model#<b>LocationSpecification</b><span class='comment'> /*&nbsp;</span><a href="../annotationproperties/comment___1501100887.html" title="http://www.w3.org/2000/01/rdf-schema#comment">comment</a> <span class='literal'>"Specifies where a Need is available." <span style='color: black;'>(en)</span></span><span class='comment'>&nbsp;*/</span></li>
-<li>
-http://purl.org/webofneeds/model#<b>Need</b><span class='comment'> /*&nbsp;</span><a href="../annotationproperties/comment___1501100887.html" title="http://www.w3.org/2000/01/rdf-schema#comment">comment</a> <span class='literal'>"A need is an online entity controlled by a person or organization. Its purpose is to be connected to other such needs via Connections, so it can be said that it represents the need to interact with others.
-It specifies a content - what the need is about, which may be something that is offered for sale, sought for rental etc." <span style='color: black;'>(en)</span></span><span class='comment'>&nbsp;*/</span></li>
-<li>
-http://purl.org/webofneeds/model#<b>Need</b><span class='comment'> /*&nbsp;</span><a href="../annotationproperties/label___653429740.html" title="http://www.w3.org/2000/01/rdf-schema#label">label</a> <span class='literal'>"Need" <span style='color: black;'>()</span></span><span class='comment'>&nbsp;*/</span></li>
-<li>
-http://purl.org/webofneeds/model#<b>NeedContent</b><span class='comment'> /*&nbsp;</span><a href="../annotationproperties/comment___1501100887.html" title="http://www.w3.org/2000/01/rdf-schema#comment">comment</a> <span class='literal'>"Whatever the Need is about." <span style='color: black;'>(en)</span></span><span class='comment'>&nbsp;*/</span></li>
-<li>
-http://purl.org/webofneeds/model#<b>NeedModality</b><span class='comment'> /*&nbsp;</span><a href="../annotationproperties/comment___1501100887.html" title="http://www.w3.org/2000/01/rdf-schema#comment">comment</a> <span class='literal'>"Defines the 'modality' of the need; in contrast to the NeedContent (the 'what' ) this should define where, when, and how" <span style='color: black;'>(en)</span></span><span class='comment'>&nbsp;*/</span></li>
-<li>
-http://purl.org/webofneeds/model#<b>NeedState</b><span class='comment'> /*&nbsp;</span><a href="../annotationproperties/comment___1501100887.html" title="http://www.w3.org/2000/01/rdf-schema#comment">comment</a> <span class='literal'>"The Need's state." <span style='color: black;'>(en)</span></span><span class='comment'>&nbsp;*/</span></li>
-<li>
-http://purl.org/webofneeds/model#<b>OwnerFacet</b><span class='comment'> /*&nbsp;</span><a href="../annotationproperties/comment___1501100887.html" title="http://www.w3.org/2000/01/rdf-schema#comment">comment</a> <span class='literal'>"The Default facet. All messages and events are forwarded to the owner, no action is taken automatically." <span style='color: black;'>(en)</span></span><span class='comment'>&nbsp;*/</span></li>
-<li>
-http://purl.org/webofneeds/model#<b>PriceSpecification</b><span class='comment'> /*&nbsp;</span><a href="../annotationproperties/comment___1501100887.html" title="http://www.w3.org/2000/01/rdf-schema#comment">comment</a> <span class='literal'>"Specifies the price." <span style='color: black;'>(en)</span></span><span class='comment'>&nbsp;*/</span></li>
-<li>
-http://purl.org/webofneeds/model#<b>RequestReceived</b><span class='comment'> /*&nbsp;</span><a href="../annotationproperties/comment___1501100887.html" title="http://www.w3.org/2000/01/rdf-schema#comment">comment</a> <span class='literal'>"Half-open state. The connection has been opened by the remote counterpart but not yet been accepted by the local end." <span style='color: black;'>(en)</span></span><span class='comment'>&nbsp;*/</span></li>
-<li>
-http://purl.org/webofneeds/model#<b>RequestSent</b><span class='comment'> /*&nbsp;</span><a href="../annotationproperties/comment___1501100887.html" title="http://www.w3.org/2000/01/rdf-schema#comment">comment</a> <span class='literal'>"Half-open state. The Connection has been requested by the local end but not yet been accepted by the remote counterpart." <span style='color: black;'>(en)</span></span><span class='comment'>&nbsp;*/</span></li>
-<li>
-http://purl.org/webofneeds/model#<b>Suggested</b><span class='comment'> /*&nbsp;</span><a href="../annotationproperties/comment___1501100887.html" title="http://www.w3.org/2000/01/rdf-schema#comment">comment</a> <span class='literal'>"Suggested state. The Connection has been created through a Hint Event but not yet been opened by either of the sides." <span style='color: black;'>(en)</span></span><span class='comment'>&nbsp;*/</span></li>
-<li>
-http://purl.org/webofneeds/model#<b>Supply</b><span class='comment'> /*&nbsp;</span><a href="../annotationproperties/comment___1501100887.html" title="http://www.w3.org/2000/01/rdf-schema#comment">comment</a> <span class='literal'>"Indicates that the Need owner wants to sell, lend or give away something. Hints to Demand Needs are expected." <span style='color: black;'>(en)</span></span><span class='comment'>&nbsp;*/</span></li>
-<li>
-http://purl.org/webofneeds/model#<b>TimeSpecification</b><span class='comment'> /*&nbsp;</span><a href="../annotationproperties/comment___1501100887.html" title="http://www.w3.org/2000/01/rdf-schema#comment">comment</a> <span class='literal'>"Specifies when a Need is available. Matching services should try to find Needs with TimeSpecifications that overlap with this needs' TimeSpecifications." <span style='color: black;'>(en)</span></span><span class='comment'>&nbsp;*/</span></li>
-<li>
-http://purl.org/webofneeds/model#<b>WonOverActiveMq</b><span class='comment'> /*&nbsp;</span><a href="../annotationproperties/comment___1501100887.html" title="http://www.w3.org/2000/01/rdf-schema#comment">comment</a> <span class='literal'>"The Web of Needs protocol implementation that uses ActiveMQ." <span style='color: black;'>(en)</span></span><span class='comment'>&nbsp;*/</span></li>
-<li>
-http://purl.org/webofneeds/model#<b>WonOverSoapWs</b><span class='comment'> /*&nbsp;</span><a href="../annotationproperties/comment___1501100887.html" title="http://www.w3.org/2000/01/rdf-schema#comment">comment</a> <span class='literal'>"The Web of Needs Protocol implelementation that uses SOAP Webservices." <span style='color: black;'>(en)</span></span><span class='comment'>&nbsp;*/</span></li>
-<li>
-http://purl.org/webofneeds/model#<b>WonProtocol</b><span class='comment'> /*&nbsp;</span><a href="../annotationproperties/comment___1501100887.html" title="http://www.w3.org/2000/01/rdf-schema#comment">comment</a> <span class='literal'>"Superclass for Web of Needs protocol implementations.
-" <span style='color: black;'>(en)</span></span><span class='comment'>&nbsp;*/</span></li>
-<li>
-http://purl.org/webofneeds/model#<b>allowsMatchWith</b><span class='comment'> /*&nbsp;</span><a href="../annotationproperties/comment___1501100887.html" title="http://www.w3.org/2000/01/rdf-schema#comment">comment</a> <span class='literal'>"Connects two basic need types to indicate that they are suitable for a match." <span style='color: black;'>(en)</span></span><span class='comment'>&nbsp;*/</span></li>
-<li>
-http://purl.org/webofneeds/model#<b>embedSpinAsk</b><span class='comment'> /*&nbsp;</span><a href="../annotationproperties/comment___1501100887.html" title="http://www.w3.org/2000/01/rdf-schema#comment">comment</a> <span class='literal'>"allows to attach a SPIN ASK clause to a content description, restricting possible matches" <span style='color: black;'>(en)</span></span><span class='comment'>&nbsp;*/</span></li>
-<li>
-http://purl.org/webofneeds/model#<b>hasActiveMQNeedProtocolQueueName</b><span class='comment'> /*&nbsp;</span><a href="../annotationproperties/comment___1501100887.html" title="http://www.w3.org/2000/01/rdf-schema#comment">comment</a> <span class='literal'>"Name of the ActiveMQ queue used for the need protocol." <span style='color: black;'>(en)</span></span><span class='comment'>&nbsp;*/</span></li>
-<li>
-http://purl.org/webofneeds/model#<b>hasActiveMQOwnerProtocolQueueName</b><span class='comment'> /*&nbsp;</span><a href="../annotationproperties/comment___1501100887.html" title="http://www.w3.org/2000/01/rdf-schema#comment">comment</a> <span class='literal'>"Name of the ActiveMQ queue used for the owner protocol." <span style='color: black;'>(en)</span></span><span class='comment'>&nbsp;*/</span></li>
-<li>
-http://purl.org/webofneeds/model#<b>hasBasicNeedType</b><span class='comment'> /*&nbsp;</span><a href="../annotationproperties/comment___1501100887.html" title="http://www.w3.org/2000/01/rdf-schema#comment">comment</a> <span class='literal'>"Specifies the basic need type of a need. This is primarily intended as a guidance for matching services." <span style='color: black;'>(en)</span></span><span class='comment'>&nbsp;*/</span></li>
-<li>
-http://purl.org/webofneeds/model#<b>hasBrokerUri</b><span class='comment'> /*&nbsp;</span><a href="../annotationproperties/comment___1501100887.html" title="http://www.w3.org/2000/01/rdf-schema#comment">comment</a> <span class='literal'>"Specifies the ActiveMQ broker URI to be used to contact the need." <span style='color: black;'>(en)</span></span><span class='comment'>&nbsp;*/</span></li>
-<li>
-http://purl.org/webofneeds/model#<b>hasConnectionState</b><span class='comment'> /*&nbsp;</span><a href="../annotationproperties/comment___1501100887.html" title="http://www.w3.org/2000/01/rdf-schema#comment">comment</a> <span class='literal'>"Indicates the state in which the Connection object is." <span style='color: black;'>(en)</span></span><span class='comment'>&nbsp;*/</span></li>
-<li>
-http://purl.org/webofneeds/model#<b>hasConnections</b><span class='comment'> /*&nbsp;</span><a href="../annotationproperties/comment___1501100887.html" title="http://www.w3.org/2000/01/rdf-schema#comment">comment</a> <span class='literal'>"Links the Need object to its connections." <span style='color: black;'>(en)</span></span><span class='comment'>&nbsp;*/</span></li>
-<li>
-http://purl.org/webofneeds/model#<b>hasContent</b><span class='comment'> /*&nbsp;</span><a href="../annotationproperties/comment___1501100887.html" title="http://www.w3.org/2000/01/rdf-schema#comment">comment</a> <span class='literal'>"Links the Need entity with the node representing its 'content'." <span style='color: black;'>(en)</span></span><span class='comment'>&nbsp;*/</span></li>
-<li>
-http://purl.org/webofneeds/model#<b>hasContentDescription</b><span class='comment'> /*&nbsp;</span><a href="../annotationproperties/comment___1501100887.html" title="http://www.w3.org/2000/01/rdf-schema#comment">comment</a> <span class='literal'>"Connects the need content node with a node that is intended to be connected to an arbitrary RDF graph used to describe the need content with any vocabulary or ontology." <span style='color: black;'>(en)</span></span><span class='comment'>&nbsp;*/</span></li>
-<li>
-http://purl.org/webofneeds/model#<b>hasCurrency</b><span class='comment'> /*&nbsp;</span><a href="../annotationproperties/comment___1501100887.html" title="http://www.w3.org/2000/01/rdf-schema#comment">comment</a> <span class='literal'>"The currency for all prices given using the ISO 4217 standard (3 characters)." <span style='color: black;'>(en)</span></span><span class='comment'>&nbsp;*/</span></li>
-<li>
-http://purl.org/webofneeds/model#<b>hasDepth</b><span class='comment'> /*&nbsp;</span><a href="../annotationproperties/comment___1501100887.html" title="http://www.w3.org/2000/01/rdf-schema#comment">comment</a> <span class='literal'>"Depth specified as a QuantitativeValue (specifies unit of measurement and value). " <span style='color: black;'>(en)</span></span><span class='comment'>&nbsp;*/</span></li>
-<li>
-http://purl.org/webofneeds/model#<b>hasEndTime</b><span class='comment'> /*&nbsp;</span><a href="../annotationproperties/comment___1501100887.html" title="http://www.w3.org/2000/01/rdf-schema#comment">comment</a> <span class='literal'>"The end time as an xsd:dateTimeStamp." <span style='color: black;'>(en)</span></span><span class='comment'>&nbsp;*/</span></li>
-<li>
-http://purl.org/webofneeds/model#<b>hasEventContainer</b><span class='comment'> /*&nbsp;</span><a href="../annotationproperties/comment___1501100887.html" title="http://www.w3.org/2000/01/rdf-schema#comment">comment</a> <span class='literal'>"Links the Connection object to a container containing connection events (messages)." <span style='color: black;'>(en)</span></span><span class='comment'>&nbsp;*/</span></li>
-<li>
-http://purl.org/webofneeds/model#<b>hasFacet</b><span class='comment'> /*&nbsp;</span><a href="../annotationproperties/comment___1501100887.html" title="http://www.w3.org/2000/01/rdf-schema#comment">comment</a> <span class='literal'>"Indicates that a need or connection supports the specified facet (=behaviour)." <span style='color: black;'>(en)</span></span><span class='comment'>&nbsp;*/</span></li>
-<li>
-http://purl.org/webofneeds/model#<b>hasHeight</b><span class='comment'> /*&nbsp;</span><a href="../annotationproperties/comment___1501100887.html" title="http://www.w3.org/2000/01/rdf-schema#comment">comment</a> <span class='literal'>"Height specified as a QuantitativeValue (specifies unit of measurement and value). " <span style='color: black;'>(en)</span></span><span class='comment'>&nbsp;*/</span></li>
-<li>
-http://purl.org/webofneeds/model#<b>hasISOCode</b><span class='comment'> /*&nbsp;</span><a href="../annotationproperties/comment___1501100887.html" title="http://www.w3.org/2000/01/rdf-schema#comment">comment</a> <span class='literal'>"Specifies the ISO region code as defined in ISO 3166-2." <span style='color: black;'>(en)</span></span><span class='comment'>&nbsp;*/</span></li>
-<li>
-http://purl.org/webofneeds/model#<b>hasLocationSpecification</b><span class='comment'> /*&nbsp;</span><a href="../annotationproperties/comment___1501100887.html" title="http://www.w3.org/2000/01/rdf-schema#comment">comment</a> <span class='literal'>"Links a NeedDescription entity to a description of its location." <span style='color: black;'>(en)</span></span><span class='comment'>&nbsp;*/</span></li>
-<li>
-http://purl.org/webofneeds/model#<b>hasLowerPriceLimit</b><span class='comment'> /*&nbsp;</span><a href="../annotationproperties/comment___1501100887.html" title="http://www.w3.org/2000/01/rdf-schema#comment">comment</a> <span class='literal'>"The lower price limit (only value, no currency)." <span style='color: black;'>(en)</span></span><span class='comment'>&nbsp;*/</span></li>
-<li>
-http://purl.org/webofneeds/model#<b>hasMatcherProtocolEndpoint</b><span class='comment'> /*&nbsp;</span><a href="../annotationproperties/comment___1501100887.html" title="http://www.w3.org/2000/01/rdf-schema#comment">comment</a> <span class='literal'>"Points to the matcherProtocol webservice endpoint of the need. I.e., matchers can communicate with the need through this endpoint." <span style='color: black;'>(en)</span></span><span class='comment'>&nbsp;*/</span></li>
-<li>
-http://purl.org/webofneeds/model#<b>hasNeedModality</b><span class='comment'> /*&nbsp;</span><a href="../annotationproperties/comment___1501100887.html" title="http://www.w3.org/2000/01/rdf-schema#comment">comment</a> <span class='literal'>"Defines the 'modality' of the need; in contrast to the content (the 'what' ) this should define where, when, and how" <span style='color: black;'>(en)</span></span><span class='comment'>&nbsp;*/</span></li>
-<li>
-http://purl.org/webofneeds/model#<b>hasNeedProtocolEndpoint</b><span class='comment'> /*&nbsp;</span><a href="../annotationproperties/comment___1501100887.html" title="http://www.w3.org/2000/01/rdf-schema#comment">comment</a> <span class='literal'>"Points to the needProtocol webservice endpoint of the need. I.e., won nodes can communicate with the need through this endpoint." <span style='color: black;'>(en)</span></span><span class='comment'>&nbsp;*/</span></li>
-<li>
-http://purl.org/webofneeds/model#<b>hasOriginator</b><span class='comment'> /*&nbsp;</span><a href="../annotationproperties/comment___1501100887.html" title="http://www.w3.org/2000/01/rdf-schema#comment">comment</a> <span class='literal'>"The entity (Need, Connection, or Service - eg. matching service) that originated the event." <span style='color: black;'>(en)</span></span><span class='comment'>&nbsp;*/</span></li>
-<li>
-http://purl.org/webofneeds/model#<b>hasOwner</b><span class='comment'> /*&nbsp;</span><a href="../annotationproperties/comment___1501100887.html" title="http://www.w3.org/2000/01/rdf-schema#comment">comment</a> <span class='literal'>"Specifies who controls the need." <span style='color: black;'>(en)</span></span><span class='comment'>&nbsp;*/</span></li>
-<li>
-http://purl.org/webofneeds/model#<b>hasOwnerProtocolEndpoint</b><span class='comment'> /*&nbsp;</span><a href="../annotationproperties/comment___1501100887.html" title="http://www.w3.org/2000/01/rdf-schema#comment">comment</a> <span class='literal'>"Points to the ownerProtocol webservice endpoint of the need. I.e., owner applications can communicate with the need through this endpoint." <span style='color: black;'>(en)</span></span><span class='comment'>&nbsp;*/</span></li>
-<li>
-http://purl.org/webofneeds/model#<b>hasPriceSpecification</b><span class='comment'> /*&nbsp;</span><a href="../annotationproperties/comment___1501100887.html" title="http://www.w3.org/2000/01/rdf-schema#comment">comment</a> <span class='literal'>"Specifies the price of a need." <span style='color: black;'>(en)</span></span><span class='comment'>&nbsp;*/</span></li>
-<li>
-http://purl.org/webofneeds/model#<b>hasQuantitativeProperty</b><span class='comment'> /*&nbsp;</span><a href="../annotationproperties/comment___1501100887.html" title="http://www.w3.org/2000/01/rdf-schema#comment">comment</a> <span class='literal'>"Superproperty for quantitative properties. Some are already defined in the ontology." <span style='color: black;'>(en)</span></span><span class='comment'>&nbsp;*/</span></li>
-<li>
-http://purl.org/webofneeds/model#<b>hasRecursIn</b><span class='comment'> /*&nbsp;</span><a href="../annotationproperties/comment___1501100887.html" title="http://www.w3.org/2000/01/rdf-schema#comment">comment</a> <span class='literal'>"If set, specifies the interval of recurrence measured from the startTime, in xsd:duration." <span style='color: black;'>(en)</span></span><span class='comment'>&nbsp;*/</span></li>
-<li>
-http://purl.org/webofneeds/model#<b>hasRecursInfiniteTimes</b><span class='comment'> /*&nbsp;</span><a href="../annotationproperties/comment___1501100887.html" title="http://www.w3.org/2000/01/rdf-schema#comment">comment</a> <span class='literal'>"Indicates that the TimeSpecification is repeated until the end of time." <span style='color: black;'>(en)</span></span><span class='comment'>&nbsp;*/</span></li>
-<li>
-http://purl.org/webofneeds/model#<b>hasRecursTimes</b><span class='comment'> /*&nbsp;</span><a href="../annotationproperties/comment___1501100887.html" title="http://www.w3.org/2000/01/rdf-schema#comment">comment</a> <span class='literal'>"Specifies how often the interval recurs." <span style='color: black;'>(en)</span></span><span class='comment'>&nbsp;*/</span></li>
-<li>
-http://purl.org/webofneeds/model#<b>hasRemoteConnection</b><span class='comment'> /*&nbsp;</span><a href="../annotationproperties/comment___1501100887.html" title="http://www.w3.org/2000/01/rdf-schema#comment">comment</a> <span class='literal'>"Links a Connection object to its remote counterpart." <span style='color: black;'>(en)</span></span><span class='comment'>&nbsp;*/</span></li>
-<li>
-http://purl.org/webofneeds/model#<b>hasRemoteFacet</b><span class='comment'> /*&nbsp;</span><a href="../annotationproperties/comment___1501100887.html" title="http://www.w3.org/2000/01/rdf-schema#comment">comment</a> <span class='literal'>"Indicates that a remote need or remote connection supports the specified facet (=behaviour) or specifies the remote facet to connect with." <span style='color: black;'>(en)</span></span><span class='comment'>&nbsp;*/</span></li>
-<li>
-http://purl.org/webofneeds/model#<b>hasStartTime</b><span class='comment'> /*&nbsp;</span><a href="../annotationproperties/comment___1501100887.html" title="http://www.w3.org/2000/01/rdf-schema#comment">comment</a> <span class='literal'>"The start time as an xsd:dateTimeStamp." <span style='color: black;'>(en)</span></span><span class='comment'>&nbsp;*/</span></li>
-<li>
-http://purl.org/webofneeds/model#<b>hasTag</b><span class='comment'> /*&nbsp;</span><a href="../annotationproperties/comment___1501100887.html" title="http://www.w3.org/2000/01/rdf-schema#comment">comment</a> <span class='literal'>"Specifies a tag for the need content." <span style='color: black;'>(en)</span></span><span class='comment'>&nbsp;*/</span></li>
-<li>
-http://purl.org/webofneeds/model#<b>hasTextDescription</b><span class='comment'> /*&nbsp;</span><a href="../annotationproperties/comment___1501100887.html" title="http://www.w3.org/2000/01/rdf-schema#comment">comment</a> <span class='literal'>"Textual description of the need. May contain #hashtags but no HTML, XHTML or other formatting." <span style='color: black;'>(en)</span></span><span class='comment'>&nbsp;*/</span></li>
-<li>
-http://purl.org/webofneeds/model#<b>hasTimeSpecification</b><span class='comment'> /*&nbsp;</span><a href="../annotationproperties/comment___1501100887.html" title="http://www.w3.org/2000/01/rdf-schema#comment">comment</a> <span class='literal'>"Specifies when the Need object is available." <span style='color: black;'>(en)</span></span><span class='comment'>&nbsp;*/</span></li>
-<li>
-http://purl.org/webofneeds/model#<b>hasTimeStamp</b><span class='comment'> /*&nbsp;</span><a href="../annotationproperties/comment___1501100887.html" title="http://www.w3.org/2000/01/rdf-schema#comment">comment</a> <span class='literal'>"The time and date when the event occurred." <span style='color: black;'>(en)</span></span><span class='comment'>&nbsp;*/</span></li>
-<li>
-http://purl.org/webofneeds/model#<b>hasUpperPriceLimit</b><span class='comment'> /*&nbsp;</span><a href="../annotationproperties/comment___1501100887.html" title="http://www.w3.org/2000/01/rdf-schema#comment">comment</a> <span class='literal'>"The upper price limit (only value, no currency)." <span style='color: black;'>(en)</span></span><span class='comment'>&nbsp;*/</span></li>
-<li>
-http://purl.org/webofneeds/model#<b>hasWeight</b><span class='comment'> /*&nbsp;</span><a href="../annotationproperties/comment___1501100887.html" title="http://www.w3.org/2000/01/rdf-schema#comment">comment</a> <span class='literal'>"Weight specified as a QuantitativeValue (specifies unit of measurement and value). " <span style='color: black;'>(en)</span></span><span class='comment'>&nbsp;*/</span></li>
-<li>
-http://purl.org/webofneeds/model#<b>hasWidth</b><span class='comment'> /*&nbsp;</span><a href="../annotationproperties/comment___1501100887.html" title="http://www.w3.org/2000/01/rdf-schema#comment">comment</a> <span class='literal'>"Width specified as a QuantitativeValue (specifies unit of measurement and value). " <span style='color: black;'>(en)</span></span><span class='comment'>&nbsp;*/</span></li>
-<li>
-http://purl.org/webofneeds/model#<b>isInState</b><span class='comment'> /*&nbsp;</span><a href="../annotationproperties/comment___1501100887.html" title="http://www.w3.org/2000/01/rdf-schema#comment">comment</a> <span class='literal'>"Defines the Need object's state." <span style='color: black;'>(en)</span></span><span class='comment'>&nbsp;*/</span></li>
-<li>
-http://purl.org/webofneeds/model#<b>supportsWonProtocolImpl</b><span class='comment'> /*&nbsp;</span><a href="../annotationproperties/comment___1501100887.html" title="http://www.w3.org/2000/01/rdf-schema#comment">comment</a> <span class='literal'>"Connects a Need object with a description of a WON protocol it supports." <span style='color: black;'>(en)</span></span><span class='comment'>&nbsp;*/</span></li>
-</ul>
-</div><!-- usage (72) -->
-<p class='footer'>
-</body></html>
+<html>
+  <head>
+    <title>Datatype: PlainLiteral</title>
+    <meta http-equiv="content-type" content="text/html;charset=utf8" />
+    <link rel="stylesheet" href="../default.css" type="text/css" />
+  </head>
+  <body>
+    <h1>Datatype: PlainLiteral</h1>
+    <h2 class="summaryURI">
+      http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral
+    </h2>
+    <h2>Usage (72)</h2>
+    <div class="codebox" id="usage_(72)">
+      <ul>
+        <li>
+          https://w3id.org/won/core#<b>Active</b
+          ><span class="comment"> /*&nbsp;</span
+          ><a
+            href="../annotationproperties/comment___1501100887.html"
+            title="http://www.w3.org/2000/01/rdf-schema#comment"
+            >comment</a
+          >
+          <span class="literal"
+            >"The active state. " <span style="color: black;">(en)</span></span
+          ><span class="comment">&nbsp;*/</span>
+        </li>
+        <li>
+          https://w3id.org/won/core#<b>BasicAtomType</b
+          ><span class="comment"> /*&nbsp;</span
+          ><a
+            href="../annotationproperties/comment___1501100887.html"
+            title="http://www.w3.org/2000/01/rdf-schema#comment"
+            >comment</a
+          >
+          <span class="literal"
+            >"Superclass for types of atoms. Used primarily to indicate which
+            types of atoms are compatible with each other for sending hints."
+            <span style="color: black;">(en)</span></span
+          ><span class="comment">&nbsp;*/</span>
+        </li>
+        <li>
+          https://w3id.org/won/core#<b>Closed</b
+          ><span class="comment"> /*&nbsp;</span
+          ><a
+            href="../annotationproperties/comment___1501100887.html"
+            title="http://www.w3.org/2000/01/rdf-schema#comment"
+            >comment</a
+          >
+          <span class="literal"
+            >"The closed state. No Messages are forwarded in this state.
+            Re-opening a connection is possbile."
+            <span style="color: black;">(en)</span></span
+          ><span class="comment">&nbsp;*/</span>
+        </li>
+        <li>
+          https://w3id.org/won/core#<b>Connected</b
+          ><span class="comment"> /*&nbsp;</span
+          ><a
+            href="../annotationproperties/comment___1501100887.html"
+            title="http://www.w3.org/2000/01/rdf-schema#comment"
+            >comment</a
+          >
+          <span class="literal"
+            >"The connected state. Messages are forwarded to/from the owner."
+            <span style="color: black;">(en)</span></span
+          ><span class="comment">&nbsp;*/</span>
+        </li>
+        <li>
+          https://w3id.org/won/core#<b>Connection</b
+          ><span class="comment"> /*&nbsp;</span
+          ><a
+            href="../annotationproperties/comment___1501100887.html"
+            title="http://www.w3.org/2000/01/rdf-schema#comment"
+            >comment</a
+          >
+          <span class="literal"
+            >"Represents a Connection to between two Atoms. Whenever two Atoms
+            are connected, each Atom creates a dedicated Connection object which
+            encapsulate all information about the connection."
+            <span style="color: black;">(en)</span></span
+          ><span class="comment">&nbsp;*/</span>
+        </li>
+        <li>
+          https://w3id.org/won/core#<b>ConnectionContainer</b
+          ><span class="comment"> /*&nbsp;</span
+          ><a
+            href="../annotationproperties/comment___1501100887.html"
+            title="http://www.w3.org/2000/01/rdf-schema#comment"
+            >comment</a
+          >
+          <span class="literal"
+            >"Container for Connections."
+            <span style="color: black;">(en)</span></span
+          ><span class="comment">&nbsp;*/</span>
+        </li>
+        <li>
+          https://w3id.org/won/core#<b>ConnectionState</b
+          ><span class="comment"> /*&nbsp;</span
+          ><a
+            href="../annotationproperties/comment___1501100887.html"
+            title="http://www.w3.org/2000/01/rdf-schema#comment"
+            >comment</a
+          >
+          <span class="literal"
+            >"A Connection's state."
+            <span style="color: black;">(en)</span></span
+          ><span class="comment">&nbsp;*/</span>
+        </li>
+        <li>
+          https://w3id.org/won/core#<b>Critique</b
+          ><span class="comment"> /*&nbsp;</span
+          ><a
+            href="../annotationproperties/comment___1501100887.html"
+            title="http://www.w3.org/2000/01/rdf-schema#comment"
+            >comment</a
+          >
+          <span class="literal"
+            >"Indicates that the Atom owner is dissatisfied with something,
+            which should be described in more detail through AtomDescription and
+            AtomModality. The owner may be interested in doing something about
+            the problem, so matching services are advised to provide hints to
+            similar Critique Atoms."
+            <span style="color: black;">(en)</span></span
+          ><span class="comment">&nbsp;*/</span>
+        </li>
+        <li>
+          https://w3id.org/won/core#<b>Demand</b
+          ><span class="comment"> /*&nbsp;</span
+          ><a
+            href="../annotationproperties/comment___1501100887.html"
+            title="http://www.w3.org/2000/01/rdf-schema#comment"
+            >comment</a
+          >
+          <span class="literal"
+            >"Indicates that the Atom owner wants to obtain, borrow, rent, etc.
+            something or consume a service. Hints to Supply objects are
+            expected." <span style="color: black;">(en)</span></span
+          ><span class="comment">&nbsp;*/</span>
+        </li>
+        <li>
+          https://w3id.org/won/core#<b>DoTogether</b
+          ><span class="comment"> /*&nbsp;</span
+          ><a
+            href="../annotationproperties/comment___1501100887.html"
+            title="http://www.w3.org/2000/01/rdf-schema#comment"
+            >comment</a
+          >
+          <span class="literal"
+            >"Indicates that the Atom owner is interested in social activty of
+            some sort. Hints to other DoTogether Atoms are expected."
+            <span style="color: black;">(en)</span></span
+          ><span class="comment">&nbsp;*/</span>
+        </li>
+        <li>
+          https://w3id.org/won/core#<b>MessageContainer</b
+          ><span class="comment"> /*&nbsp;</span
+          ><a
+            href="../annotationproperties/comment___1501100887.html"
+            title="http://www.w3.org/2000/01/rdf-schema#comment"
+            >comment</a
+          >
+          <span class="literal"
+            >"Container for Events."
+            <span style="color: black;">(en)</span></span
+          ><span class="comment">&nbsp;*/</span>
+        </li>
+        <li>
+          https://w3id.org/won/core#<b>Socket</b
+          ><span class="comment"> /*&nbsp;</span
+          ><a
+            href="../annotationproperties/comment___1501100887.html"
+            title="http://www.w3.org/2000/01/rdf-schema#comment"
+            >comment</a
+          >
+          <span class="literal"
+            >"Sockets are behaviours an Atom can choose to support. Connections
+            have a Socket; Atoms can be connected through multiple Connections
+            if they have different Sockets."
+            <span style="color: black;">(en)</span></span
+          ><span class="comment">&nbsp;*/</span>
+        </li>
+        <li>
+          https://w3id.org/won/core#<b>GroupSocket</b
+          ><span class="comment"> /*&nbsp;</span
+          ><a
+            href="../annotationproperties/comment___1501100887.html"
+            title="http://www.w3.org/2000/01/rdf-schema#comment"
+            >comment</a
+          >
+          <span class="literal"
+            >"The group socket. Messages are forwarded to all connections with
+            this socket." <span style="color: black;">(en)</span></span
+          ><span class="comment">&nbsp;*/</span>
+        </li>
+        <li>
+          https://w3id.org/won/core#<b>Inactive</b
+          ><span class="comment"> /*&nbsp;</span
+          ><a
+            href="../annotationproperties/comment___1501100887.html"
+            title="http://www.w3.org/2000/01/rdf-schema#comment"
+            >comment</a
+          >
+          <span class="literal"
+            >"The incative state. Atoms do not communicate in this state.
+            Intended to stop receiving messages for something not currently of
+            interest." <span style="color: black;">(en)</span></span
+          ><span class="comment">&nbsp;*/</span>
+        </li>
+        <li>
+          https://w3id.org/won/core#<b>LocationSpecification</b
+          ><span class="comment"> /*&nbsp;</span
+          ><a
+            href="../annotationproperties/comment___1501100887.html"
+            title="http://www.w3.org/2000/01/rdf-schema#comment"
+            >comment</a
+          >
+          <span class="literal"
+            >"Specifies where an Atom is available."
+            <span style="color: black;">(en)</span></span
+          ><span class="comment">&nbsp;*/</span>
+        </li>
+        <li>
+          https://w3id.org/won/core#<b>Atom</b
+          ><span class="comment"> /*&nbsp;</span
+          ><a
+            href="../annotationproperties/comment___1501100887.html"
+            title="http://www.w3.org/2000/01/rdf-schema#comment"
+            >comment</a
+          >
+          <span class="literal"
+            >"An atom is an online entity controlled by a person or
+            organization. Its purpose is to be connected to other such atoms via
+            Connections, so it can be said that it represents the need to
+            interact with others. It specifies a content - what the atom is
+            about, which may be something that is offered for sale, sought for
+            rental etc." <span style="color: black;">(en)</span></span
+          ><span class="comment">&nbsp;*/</span>
+        </li>
+        <li>
+          https://w3id.org/won/core#<b>Atom</b
+          ><span class="comment"> /*&nbsp;</span
+          ><a
+            href="../annotationproperties/label___653429740.html"
+            title="http://www.w3.org/2000/01/rdf-schema#label"
+            >label</a
+          >
+          <span class="literal"
+            >"Atom" <span style="color: black;">()</span></span
+          ><span class="comment">&nbsp;*/</span>
+        </li>
+        <li>
+          https://w3id.org/won/core#<b>AtomContent</b
+          ><span class="comment"> /*&nbsp;</span
+          ><a
+            href="../annotationproperties/comment___1501100887.html"
+            title="http://www.w3.org/2000/01/rdf-schema#comment"
+            >comment</a
+          >
+          <span class="literal"
+            >"Whatever the Atom is about."
+            <span style="color: black;">(en)</span></span
+          ><span class="comment">&nbsp;*/</span>
+        </li>
+        <li>
+          https://w3id.org/won/core#<b>AtomModality</b
+          ><span class="comment"> /*&nbsp;</span
+          ><a
+            href="../annotationproperties/comment___1501100887.html"
+            title="http://www.w3.org/2000/01/rdf-schema#comment"
+            >comment</a
+          >
+          <span class="literal"
+            >"Defines the 'modality' of the atom; in contrast to the AtomContent
+            (the 'what' ) this should define where, when, and how"
+            <span style="color: black;">(en)</span></span
+          ><span class="comment">&nbsp;*/</span>
+        </li>
+        <li>
+          https://w3id.org/won/core#<b>AtomState</b
+          ><span class="comment"> /*&nbsp;</span
+          ><a
+            href="../annotationproperties/comment___1501100887.html"
+            title="http://www.w3.org/2000/01/rdf-schema#comment"
+            >comment</a
+          >
+          <span class="literal"
+            >"The Atom's state." <span style="color: black;">(en)</span></span
+          ><span class="comment">&nbsp;*/</span>
+        </li>
+        <li>
+          https://w3id.org/won/core#<b>OwnerSocket</b
+          ><span class="comment"> /*&nbsp;</span
+          ><a
+            href="../annotationproperties/comment___1501100887.html"
+            title="http://www.w3.org/2000/01/rdf-schema#comment"
+            >comment</a
+          >
+          <span class="literal"
+            >"The Default socket. All messages and events are forwarded to the
+            owner, no action is taken automatically."
+            <span style="color: black;">(en)</span></span
+          ><span class="comment">&nbsp;*/</span>
+        </li>
+        <li>
+          https://w3id.org/won/core#<b>PriceSpecification</b
+          ><span class="comment"> /*&nbsp;</span
+          ><a
+            href="../annotationproperties/comment___1501100887.html"
+            title="http://www.w3.org/2000/01/rdf-schema#comment"
+            >comment</a
+          >
+          <span class="literal"
+            >"Specifies the price."
+            <span style="color: black;">(en)</span></span
+          ><span class="comment">&nbsp;*/</span>
+        </li>
+        <li>
+          https://w3id.org/won/core#<b>RequestReceived</b
+          ><span class="comment"> /*&nbsp;</span
+          ><a
+            href="../annotationproperties/comment___1501100887.html"
+            title="http://www.w3.org/2000/01/rdf-schema#comment"
+            >comment</a
+          >
+          <span class="literal"
+            >"Half-open state. The connection has been opened by the remote
+            counterpart but not yet been accepted by the local end."
+            <span style="color: black;">(en)</span></span
+          ><span class="comment">&nbsp;*/</span>
+        </li>
+        <li>
+          https://w3id.org/won/core#<b>RequestSent</b
+          ><span class="comment"> /*&nbsp;</span
+          ><a
+            href="../annotationproperties/comment___1501100887.html"
+            title="http://www.w3.org/2000/01/rdf-schema#comment"
+            >comment</a
+          >
+          <span class="literal"
+            >"Half-open state. The Connection has been requested by the local
+            end but not yet been accepted by the remote counterpart."
+            <span style="color: black;">(en)</span></span
+          ><span class="comment">&nbsp;*/</span>
+        </li>
+        <li>
+          https://w3id.org/won/core#<b>Suggested</b
+          ><span class="comment"> /*&nbsp;</span
+          ><a
+            href="../annotationproperties/comment___1501100887.html"
+            title="http://www.w3.org/2000/01/rdf-schema#comment"
+            >comment</a
+          >
+          <span class="literal"
+            >"Suggested state. The Connection has been created through a Hint
+            Event but not yet been opened by either of the sides."
+            <span style="color: black;">(en)</span></span
+          ><span class="comment">&nbsp;*/</span>
+        </li>
+        <li>
+          https://w3id.org/won/core#<b>Supply</b
+          ><span class="comment"> /*&nbsp;</span
+          ><a
+            href="../annotationproperties/comment___1501100887.html"
+            title="http://www.w3.org/2000/01/rdf-schema#comment"
+            >comment</a
+          >
+          <span class="literal"
+            >"Indicates that the Atom owner wants to sell, lend or give away
+            something. Hints to Demand Atoms are expected."
+            <span style="color: black;">(en)</span></span
+          ><span class="comment">&nbsp;*/</span>
+        </li>
+        <li>
+          https://w3id.org/won/core#<b>TimeSpecification</b
+          ><span class="comment"> /*&nbsp;</span
+          ><a
+            href="../annotationproperties/comment___1501100887.html"
+            title="http://www.w3.org/2000/01/rdf-schema#comment"
+            >comment</a
+          >
+          <span class="literal"
+            >"Specifies when an Atom is available. Matching services should try
+            to find Atoms with TimeSpecifications that overlap with this atoms'
+            TimeSpecifications." <span style="color: black;">(en)</span></span
+          ><span class="comment">&nbsp;*/</span>
+        </li>
+        <li>
+          https://w3id.org/won/core#<b>WonOverActiveMq</b
+          ><span class="comment"> /*&nbsp;</span
+          ><a
+            href="../annotationproperties/comment___1501100887.html"
+            title="http://www.w3.org/2000/01/rdf-schema#comment"
+            >comment</a
+          >
+          <span class="literal"
+            >"The Web of Needs protocol implementation that uses ActiveMQ."
+            <span style="color: black;">(en)</span></span
+          ><span class="comment">&nbsp;*/</span>
+        </li>
+        <li>
+          https://w3id.org/won/core#<b>WonOverSoapWs</b
+          ><span class="comment"> /*&nbsp;</span
+          ><a
+            href="../annotationproperties/comment___1501100887.html"
+            title="http://www.w3.org/2000/01/rdf-schema#comment"
+            >comment</a
+          >
+          <span class="literal"
+            >"The Web of Needs Protocol implelementation that uses SOAP
+            Webservices." <span style="color: black;">(en)</span></span
+          ><span class="comment">&nbsp;*/</span>
+        </li>
+        <li>
+          https://w3id.org/won/core#<b>WonProtocol</b
+          ><span class="comment"> /*&nbsp;</span
+          ><a
+            href="../annotationproperties/comment___1501100887.html"
+            title="http://www.w3.org/2000/01/rdf-schema#comment"
+            >comment</a
+          >
+          <span class="literal"
+            >"Superclass for Web of Needs protocol implementations. "
+            <span style="color: black;">(en)</span></span
+          ><span class="comment">&nbsp;*/</span>
+        </li>
+        <li>
+          https://w3id.org/won/core#<b>allowsMatchWith</b
+          ><span class="comment"> /*&nbsp;</span
+          ><a
+            href="../annotationproperties/comment___1501100887.html"
+            title="http://www.w3.org/2000/01/rdf-schema#comment"
+            >comment</a
+          >
+          <span class="literal"
+            >"Connects two basic atom types to indicate that they are suitable
+            for a match." <span style="color: black;">(en)</span></span
+          ><span class="comment">&nbsp;*/</span>
+        </li>
+        <li>
+          https://w3id.org/won/core#<b>embedSpinAsk</b
+          ><span class="comment"> /*&nbsp;</span
+          ><a
+            href="../annotationproperties/comment___1501100887.html"
+            title="http://www.w3.org/2000/01/rdf-schema#comment"
+            >comment</a
+          >
+          <span class="literal"
+            >"allows to attach a SPIN ASK clause to a content description,
+            restricting possible matches"
+            <span style="color: black;">(en)</span></span
+          ><span class="comment">&nbsp;*/</span>
+        </li>
+        <li>
+          https://w3id.org/won/core#<b>activeMQAtomProtocolQueueName</b
+          ><span class="comment"> /*&nbsp;</span
+          ><a
+            href="../annotationproperties/comment___1501100887.html"
+            title="http://www.w3.org/2000/01/rdf-schema#comment"
+            >comment</a
+          >
+          <span class="literal"
+            >"Name of the ActiveMQ queue used for the atom protocol."
+            <span style="color: black;">(en)</span></span
+          ><span class="comment">&nbsp;*/</span>
+        </li>
+        <li>
+          https://w3id.org/won/core#<b>activeMQOwnerProtocolQueueName</b
+          ><span class="comment"> /*&nbsp;</span
+          ><a
+            href="../annotationproperties/comment___1501100887.html"
+            title="http://www.w3.org/2000/01/rdf-schema#comment"
+            >comment</a
+          >
+          <span class="literal"
+            >"Name of the ActiveMQ queue used for the owner protocol."
+            <span style="color: black;">(en)</span></span
+          ><span class="comment">&nbsp;*/</span>
+        </li>
+        <li>
+          https://w3id.org/won/core#<b>hasBasicAtomType</b
+          ><span class="comment"> /*&nbsp;</span
+          ><a
+            href="../annotationproperties/comment___1501100887.html"
+            title="http://www.w3.org/2000/01/rdf-schema#comment"
+            >comment</a
+          >
+          <span class="literal"
+            >"Specifies the basic atom type of an atom. This is primarily
+            intended as a guidance for matching services."
+            <span style="color: black;">(en)</span></span
+          ><span class="comment">&nbsp;*/</span>
+        </li>
+        <li>
+          https://w3id.org/won/core#<b>brokerUri</b
+          ><span class="comment"> /*&nbsp;</span
+          ><a
+            href="../annotationproperties/comment___1501100887.html"
+            title="http://www.w3.org/2000/01/rdf-schema#comment"
+            >comment</a
+          >
+          <span class="literal"
+            >"Specifies the ActiveMQ broker URI to be used to contact the atom."
+            <span style="color: black;">(en)</span></span
+          ><span class="comment">&nbsp;*/</span>
+        </li>
+        <li>
+          https://w3id.org/won/core#<b>connectionState</b
+          ><span class="comment"> /*&nbsp;</span
+          ><a
+            href="../annotationproperties/comment___1501100887.html"
+            title="http://www.w3.org/2000/01/rdf-schema#comment"
+            >comment</a
+          >
+          <span class="literal"
+            >"Indicates the state in which the Connection object is."
+            <span style="color: black;">(en)</span></span
+          ><span class="comment">&nbsp;*/</span>
+        </li>
+        <li>
+          https://w3id.org/won/core#<b>connections</b
+          ><span class="comment"> /*&nbsp;</span
+          ><a
+            href="../annotationproperties/comment___1501100887.html"
+            title="http://www.w3.org/2000/01/rdf-schema#comment"
+            >comment</a
+          >
+          <span class="literal"
+            >"Links the Atom object to its connections."
+            <span style="color: black;">(en)</span></span
+          ><span class="comment">&nbsp;*/</span>
+        </li>
+        <li>
+          https://w3id.org/won/core#<b>hasContent</b
+          ><span class="comment"> /*&nbsp;</span
+          ><a
+            href="../annotationproperties/comment___1501100887.html"
+            title="http://www.w3.org/2000/01/rdf-schema#comment"
+            >comment</a
+          >
+          <span class="literal"
+            >"Links the Atom entity with the node representing its 'content'."
+            <span style="color: black;">(en)</span></span
+          ><span class="comment">&nbsp;*/</span>
+        </li>
+        <li>
+          https://w3id.org/won/core#<b>hasContentDescription</b
+          ><span class="comment"> /*&nbsp;</span
+          ><a
+            href="../annotationproperties/comment___1501100887.html"
+            title="http://www.w3.org/2000/01/rdf-schema#comment"
+            >comment</a
+          >
+          <span class="literal"
+            >"Connects the atom content node with a node that is intended to be
+            connected to an arbitrary RDF graph used to describe the atom
+            content with any vocabulary or ontology."
+            <span style="color: black;">(en)</span></span
+          ><span class="comment">&nbsp;*/</span>
+        </li>
+        <li>
+          https://w3id.org/won/core#<b>currency</b
+          ><span class="comment"> /*&nbsp;</span
+          ><a
+            href="../annotationproperties/comment___1501100887.html"
+            title="http://www.w3.org/2000/01/rdf-schema#comment"
+            >comment</a
+          >
+          <span class="literal"
+            >"The currency for all prices given using the ISO 4217 standard (3
+            characters)." <span style="color: black;">(en)</span></span
+          ><span class="comment">&nbsp;*/</span>
+        </li>
+        <li>
+          https://w3id.org/won/core#<b>depth</b
+          ><span class="comment"> /*&nbsp;</span
+          ><a
+            href="../annotationproperties/comment___1501100887.html"
+            title="http://www.w3.org/2000/01/rdf-schema#comment"
+            >comment</a
+          >
+          <span class="literal"
+            >"Depth specified as a QuantitativeValue (specifies unit of
+            measurement and value). "
+            <span style="color: black;">(en)</span></span
+          ><span class="comment">&nbsp;*/</span>
+        </li>
+        <li>
+          https://w3id.org/won/core#<b>endTime</b
+          ><span class="comment"> /*&nbsp;</span
+          ><a
+            href="../annotationproperties/comment___1501100887.html"
+            title="http://www.w3.org/2000/01/rdf-schema#comment"
+            >comment</a
+          >
+          <span class="literal"
+            >"The end time as an xsd:dateTimeStamp."
+            <span style="color: black;">(en)</span></span
+          ><span class="comment">&nbsp;*/</span>
+        </li>
+        <li>
+          https://w3id.org/won/core#<b>messageContainer</b
+          ><span class="comment"> /*&nbsp;</span
+          ><a
+            href="../annotationproperties/comment___1501100887.html"
+            title="http://www.w3.org/2000/01/rdf-schema#comment"
+            >comment</a
+          >
+          <span class="literal"
+            >"Links the Connection object to a container containing connection
+            events (messages)." <span style="color: black;">(en)</span></span
+          ><span class="comment">&nbsp;*/</span>
+        </li>
+        <li>
+          https://w3id.org/won/core#<b>socket</b
+          ><span class="comment"> /*&nbsp;</span
+          ><a
+            href="../annotationproperties/comment___1501100887.html"
+            title="http://www.w3.org/2000/01/rdf-schema#comment"
+            >comment</a
+          >
+          <span class="literal"
+            >"Indicates that an atom or connection supports the specified socket
+            (=behaviour)." <span style="color: black;">(en)</span></span
+          ><span class="comment">&nbsp;*/</span>
+        </li>
+        <li>
+          https://w3id.org/won/core#<b>height</b
+          ><span class="comment"> /*&nbsp;</span
+          ><a
+            href="../annotationproperties/comment___1501100887.html"
+            title="http://www.w3.org/2000/01/rdf-schema#comment"
+            >comment</a
+          >
+          <span class="literal"
+            >"Height specified as a QuantitativeValue (specifies unit of
+            measurement and value). "
+            <span style="color: black;">(en)</span></span
+          ><span class="comment">&nbsp;*/</span>
+        </li>
+        <li>
+          https://w3id.org/won/core#<b>iSOCode</b
+          ><span class="comment"> /*&nbsp;</span
+          ><a
+            href="../annotationproperties/comment___1501100887.html"
+            title="http://www.w3.org/2000/01/rdf-schema#comment"
+            >comment</a
+          >
+          <span class="literal"
+            >"Specifies the ISO region code as defined in ISO 3166-2."
+            <span style="color: black;">(en)</span></span
+          ><span class="comment">&nbsp;*/</span>
+        </li>
+        <li>
+          https://w3id.org/won/core#<b>locationSpecification</b
+          ><span class="comment"> /*&nbsp;</span
+          ><a
+            href="../annotationproperties/comment___1501100887.html"
+            title="http://www.w3.org/2000/01/rdf-schema#comment"
+            >comment</a
+          >
+          <span class="literal"
+            >"Links an AtomDescription entity to a description of its location."
+            <span style="color: black;">(en)</span></span
+          ><span class="comment">&nbsp;*/</span>
+        </li>
+        <li>
+          https://w3id.org/won/core#<b>lowerPriceLimit</b
+          ><span class="comment"> /*&nbsp;</span
+          ><a
+            href="../annotationproperties/comment___1501100887.html"
+            title="http://www.w3.org/2000/01/rdf-schema#comment"
+            >comment</a
+          >
+          <span class="literal"
+            >"The lower price limit (only value, no currency)."
+            <span style="color: black;">(en)</span></span
+          ><span class="comment">&nbsp;*/</span>
+        </li>
+        <li>
+          https://w3id.org/won/core#<b>matcherProtocolEndpoint</b
+          ><span class="comment"> /*&nbsp;</span
+          ><a
+            href="../annotationproperties/comment___1501100887.html"
+            title="http://www.w3.org/2000/01/rdf-schema#comment"
+            >comment</a
+          >
+          <span class="literal"
+            >"Points to the matcherProtocol webservice endpoint of the atom.
+            I.e., matchers can communicate with the atom through this endpoint."
+            <span style="color: black;">(en)</span></span
+          ><span class="comment">&nbsp;*/</span>
+        </li>
+        <li>
+          https://w3id.org/won/core#<b>atomModality</b
+          ><span class="comment"> /*&nbsp;</span
+          ><a
+            href="../annotationproperties/comment___1501100887.html"
+            title="http://www.w3.org/2000/01/rdf-schema#comment"
+            >comment</a
+          >
+          <span class="literal"
+            >"Defines the 'modality' of the atom; in contrast to the content
+            (the 'what' ) this should define where, when, and how"
+            <span style="color: black;">(en)</span></span
+          ><span class="comment">&nbsp;*/</span>
+        </li>
+        <li>
+          https://w3id.org/won/core#<b>atomProtocolEndpoint</b
+          ><span class="comment"> /*&nbsp;</span
+          ><a
+            href="../annotationproperties/comment___1501100887.html"
+            title="http://www.w3.org/2000/01/rdf-schema#comment"
+            >comment</a
+          >
+          <span class="literal"
+            >"Points to the atomProtocol webservice endpoint of the atom. I.e.,
+            won nodes can communicate with the atom through this endpoint."
+            <span style="color: black;">(en)</span></span
+          ><span class="comment">&nbsp;*/</span>
+        </li>
+        <li>
+          https://w3id.org/won/core#<b>originator</b
+          ><span class="comment"> /*&nbsp;</span
+          ><a
+            href="../annotationproperties/comment___1501100887.html"
+            title="http://www.w3.org/2000/01/rdf-schema#comment"
+            >comment</a
+          >
+          <span class="literal"
+            >"The entity (Atom, Connection, or Service - eg. matching service)
+            that originated the event."
+            <span style="color: black;">(en)</span></span
+          ><span class="comment">&nbsp;*/</span>
+        </li>
+        <li>
+          https://w3id.org/won/core#<b>owner</b
+          ><span class="comment"> /*&nbsp;</span
+          ><a
+            href="../annotationproperties/comment___1501100887.html"
+            title="http://www.w3.org/2000/01/rdf-schema#comment"
+            >comment</a
+          >
+          <span class="literal"
+            >"Specifies who controls the atom."
+            <span style="color: black;">(en)</span></span
+          ><span class="comment">&nbsp;*/</span>
+        </li>
+        <li>
+          https://w3id.org/won/core#<b>ownerProtocolEndpoint</b
+          ><span class="comment"> /*&nbsp;</span
+          ><a
+            href="../annotationproperties/comment___1501100887.html"
+            title="http://www.w3.org/2000/01/rdf-schema#comment"
+            >comment</a
+          >
+          <span class="literal"
+            >"Points to the ownerProtocol webservice endpoint of the atom. I.e.,
+            owner applications can communicate with the atom through this
+            endpoint." <span style="color: black;">(en)</span></span
+          ><span class="comment">&nbsp;*/</span>
+        </li>
+        <li>
+          https://w3id.org/won/core#<b>priceSpecification</b
+          ><span class="comment"> /*&nbsp;</span
+          ><a
+            href="../annotationproperties/comment___1501100887.html"
+            title="http://www.w3.org/2000/01/rdf-schema#comment"
+            >comment</a
+          >
+          <span class="literal"
+            >"Specifies the price of an atom."
+            <span style="color: black;">(en)</span></span
+          ><span class="comment">&nbsp;*/</span>
+        </li>
+        <li>
+          https://w3id.org/won/core#<b>quantitativeProperty</b
+          ><span class="comment"> /*&nbsp;</span
+          ><a
+            href="../annotationproperties/comment___1501100887.html"
+            title="http://www.w3.org/2000/01/rdf-schema#comment"
+            >comment</a
+          >
+          <span class="literal"
+            >"Superproperty for quantitative properties. Some are already
+            defined in the ontology."
+            <span style="color: black;">(en)</span></span
+          ><span class="comment">&nbsp;*/</span>
+        </li>
+        <li>
+          https://w3id.org/won/core#<b>recursIn</b
+          ><span class="comment"> /*&nbsp;</span
+          ><a
+            href="../annotationproperties/comment___1501100887.html"
+            title="http://www.w3.org/2000/01/rdf-schema#comment"
+            >comment</a
+          >
+          <span class="literal"
+            >"If set, specifies the interval of recurrence measured from the
+            startTime, in xsd:duration."
+            <span style="color: black;">(en)</span></span
+          ><span class="comment">&nbsp;*/</span>
+        </li>
+        <li>
+          https://w3id.org/won/core#<b>recursInfiniteTimes</b
+          ><span class="comment"> /*&nbsp;</span
+          ><a
+            href="../annotationproperties/comment___1501100887.html"
+            title="http://www.w3.org/2000/01/rdf-schema#comment"
+            >comment</a
+          >
+          <span class="literal"
+            >"Indicates that the TimeSpecification is repeated until the end of
+            time." <span style="color: black;">(en)</span></span
+          ><span class="comment">&nbsp;*/</span>
+        </li>
+        <li>
+          https://w3id.org/won/core#<b>recursTimes</b
+          ><span class="comment"> /*&nbsp;</span
+          ><a
+            href="../annotationproperties/comment___1501100887.html"
+            title="http://www.w3.org/2000/01/rdf-schema#comment"
+            >comment</a
+          >
+          <span class="literal"
+            >"Specifies how often the interval recurs."
+            <span style="color: black;">(en)</span></span
+          ><span class="comment">&nbsp;*/</span>
+        </li>
+        <li>
+          https://w3id.org/won/core#<b>targetConnection</b
+          ><span class="comment"> /*&nbsp;</span
+          ><a
+            href="../annotationproperties/comment___1501100887.html"
+            title="http://www.w3.org/2000/01/rdf-schema#comment"
+            >comment</a
+          >
+          <span class="literal"
+            >"Links a Connection object to its remote counterpart."
+            <span style="color: black;">(en)</span></span
+          ><span class="comment">&nbsp;*/</span>
+        </li>
+        <li>
+          https://w3id.org/won/core#<b>targetSocket</b
+          ><span class="comment"> /*&nbsp;</span
+          ><a
+            href="../annotationproperties/comment___1501100887.html"
+            title="http://www.w3.org/2000/01/rdf-schema#comment"
+            >comment</a
+          >
+          <span class="literal"
+            >"Indicates that a remote atom or remote connection supports the
+            specified socket (=behaviour) or specifies the remote socket to
+            connect with." <span style="color: black;">(en)</span></span
+          ><span class="comment">&nbsp;*/</span>
+        </li>
+        <li>
+          https://w3id.org/won/core#<b>startTime</b
+          ><span class="comment"> /*&nbsp;</span
+          ><a
+            href="../annotationproperties/comment___1501100887.html"
+            title="http://www.w3.org/2000/01/rdf-schema#comment"
+            >comment</a
+          >
+          <span class="literal"
+            >"The start time as an xsd:dateTimeStamp."
+            <span style="color: black;">(en)</span></span
+          ><span class="comment">&nbsp;*/</span>
+        </li>
+        <li>
+          https://w3id.org/won/core#<b>tag</b
+          ><span class="comment"> /*&nbsp;</span
+          ><a
+            href="../annotationproperties/comment___1501100887.html"
+            title="http://www.w3.org/2000/01/rdf-schema#comment"
+            >comment</a
+          >
+          <span class="literal"
+            >"Specifies a tag for the atom content."
+            <span style="color: black;">(en)</span></span
+          ><span class="comment">&nbsp;*/</span>
+        </li>
+        <li>
+          https://w3id.org/won/core#<b>hasTextDescription</b
+          ><span class="comment"> /*&nbsp;</span
+          ><a
+            href="../annotationproperties/comment___1501100887.html"
+            title="http://www.w3.org/2000/01/rdf-schema#comment"
+            >comment</a
+          >
+          <span class="literal"
+            >"Textual description of the atom. May contain #hashtags but no
+            HTML, XHTML or other formatting."
+            <span style="color: black;">(en)</span></span
+          ><span class="comment">&nbsp;*/</span>
+        </li>
+        <li>
+          https://w3id.org/won/core#<b>timeSpecification</b
+          ><span class="comment"> /*&nbsp;</span
+          ><a
+            href="../annotationproperties/comment___1501100887.html"
+            title="http://www.w3.org/2000/01/rdf-schema#comment"
+            >comment</a
+          >
+          <span class="literal"
+            >"Specifies when the Atom object is available."
+            <span style="color: black;">(en)</span></span
+          ><span class="comment">&nbsp;*/</span>
+        </li>
+        <li>
+          https://w3id.org/won/core#<b>timeStamp</b
+          ><span class="comment"> /*&nbsp;</span
+          ><a
+            href="../annotationproperties/comment___1501100887.html"
+            title="http://www.w3.org/2000/01/rdf-schema#comment"
+            >comment</a
+          >
+          <span class="literal"
+            >"The time and date when the event occurred."
+            <span style="color: black;">(en)</span></span
+          ><span class="comment">&nbsp;*/</span>
+        </li>
+        <li>
+          https://w3id.org/won/core#<b>upperPriceLimit</b
+          ><span class="comment"> /*&nbsp;</span
+          ><a
+            href="../annotationproperties/comment___1501100887.html"
+            title="http://www.w3.org/2000/01/rdf-schema#comment"
+            >comment</a
+          >
+          <span class="literal"
+            >"The upper price limit (only value, no currency)."
+            <span style="color: black;">(en)</span></span
+          ><span class="comment">&nbsp;*/</span>
+        </li>
+        <li>
+          https://w3id.org/won/core#<b>weight</b
+          ><span class="comment"> /*&nbsp;</span
+          ><a
+            href="../annotationproperties/comment___1501100887.html"
+            title="http://www.w3.org/2000/01/rdf-schema#comment"
+            >comment</a
+          >
+          <span class="literal"
+            >"Weight specified as a QuantitativeValue (specifies unit of
+            measurement and value). "
+            <span style="color: black;">(en)</span></span
+          ><span class="comment">&nbsp;*/</span>
+        </li>
+        <li>
+          https://w3id.org/won/core#<b>width</b
+          ><span class="comment"> /*&nbsp;</span
+          ><a
+            href="../annotationproperties/comment___1501100887.html"
+            title="http://www.w3.org/2000/01/rdf-schema#comment"
+            >comment</a
+          >
+          <span class="literal"
+            >"Width specified as a QuantitativeValue (specifies unit of
+            measurement and value). "
+            <span style="color: black;">(en)</span></span
+          ><span class="comment">&nbsp;*/</span>
+        </li>
+        <li>
+          https://w3id.org/won/core#<b>atomState</b
+          ><span class="comment"> /*&nbsp;</span
+          ><a
+            href="../annotationproperties/comment___1501100887.html"
+            title="http://www.w3.org/2000/01/rdf-schema#comment"
+            >comment</a
+          >
+          <span class="literal"
+            >"Defines the Atom object's state."
+            <span style="color: black;">(en)</span></span
+          ><span class="comment">&nbsp;*/</span>
+        </li>
+        <li>
+          https://w3id.org/won/core#<b>supportsWonProtocolImpl</b
+          ><span class="comment"> /*&nbsp;</span
+          ><a
+            href="../annotationproperties/comment___1501100887.html"
+            title="http://www.w3.org/2000/01/rdf-schema#comment"
+            >comment</a
+          >
+          <span class="literal"
+            >"Connects an Atom object with a description of a WON protocol it
+            supports." <span style="color: black;">(en)</span></span
+          ><span class="comment">&nbsp;*/</span>
+        </li>
+      </ul>
+    </div>
+    <!-- usage (72) -->
+    <p class="footer"></p>
+  </body>
+</html>

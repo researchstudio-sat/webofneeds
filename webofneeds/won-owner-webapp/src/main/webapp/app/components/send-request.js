@@ -1,15 +1,17 @@
 import angular from "angular";
+import Immutable from "immutable";
 import "ng-redux";
 import postContentModule from "./post-content.js";
 import postMenuModule from "./post-menu.js";
 import chatTextFieldModule from "./chat-textfield.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
-import { getPostUriFromRoute } from "../selectors/general-selectors.js";
+import * as generalSelectors from "../selectors/general-selectors.js";
 import { connect2Redux } from "../won-utils.js";
-import { attach, getIn } from "../utils.js";
-import * as needUtils from "../need-utils.js";
+import { attach, get, getIn } from "../utils.js";
+import * as atomUtils from "../atom-utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { getUseCaseLabel, getUseCaseIcon } from "../usecase-utils.js";
+import * as accountUtils from "../account-utils.js";
 
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 
@@ -30,11 +32,11 @@ function genComponentConf() {
             <div
                 class="post-info__footer__infolabel"
                 ng-if="self.isInactive">
-                Need is inactive, no requests allowed
+                Atom is inactive, no requests allowed
             </div>
             <!-- Reaction Use Cases -->
             <won-labelled-hr label="::'Or'" class="pm__footer__labelledhr"  ng-if="self.hasReactionUseCases"></won-labelled-hr>
-            <button class="won-button--filled red post-info__footer__button" style="margin: 0rem 0rem .3rem 0rem;
+            <button class="won-button--filled red post-info__footer__button" style="margin: 0rem 0rem .3rem 0rem;"
                     ng-if="self.hasReactionUseCases"
                     ng-repeat="ucIdentifier in self.reactionUseCasesArray"
                     ng-click="self.selectUseCase(ucIdentifier)">
@@ -62,40 +64,39 @@ function genComponentConf() {
       attach(this, serviceDependencies, arguments);
 
       const selectFromState = state => {
-        const postUriToConnectTo = getPostUriFromRoute(state);
-        const displayedPost = state.getIn(["needs", postUriToConnectTo]);
+        const postUriToConnectTo = generalSelectors.getPostUriFromRoute(state);
+        const displayedPost = state.getIn(["atoms", postUriToConnectTo]);
 
-        const post = state.getIn(["needs", postUriToConnectTo]);
+        const post = state.getIn(["atoms", postUriToConnectTo]);
+        const isOwned = generalSelectors.isAtomOwned(state, postUriToConnectTo);
+
         const reactionUseCases =
-          post &&
-          !needUtils.isOwned(post) &&
-          getIn(post, ["matchedUseCase", "reactionUseCases"]);
+          post && !isOwned && atomUtils.getReactionUseCases(post);
         const hasReactionUseCases =
           reactionUseCases && reactionUseCases.size > 0;
 
         const enabledUseCases =
-          post &&
-          needUtils.isOwned(post) &&
-          getIn(post, ["matchedUseCase", "enabledUseCases"]);
+          post && isOwned && atomUtils.getEnabledUseCases(post);
         const hasEnabledUseCases = enabledUseCases && enabledUseCases.size > 0;
 
         return {
+          loggedIn: accountUtils.isLoggedIn(get(state, "account")),
           displayedPost,
           postUriToConnectTo,
-          isInactive: needUtils.isInactive(displayedPost),
+          isInactive: atomUtils.isInactive(displayedPost),
           hasReactionUseCases,
           reactionUseCasesArray: reactionUseCases && reactionUseCases.toArray(),
           hasEnabledUseCases,
           enabledUseCasesArray: enabledUseCases && enabledUseCases.toArray(),
           showRequestField:
-            needUtils.isActive(displayedPost) &&
-            (needUtils.hasChatFacet(displayedPost) ||
-              needUtils.hasGroupFacet(displayedPost)),
+            atomUtils.isActive(displayedPost) &&
+            (atomUtils.hasChatSocket(displayedPost) ||
+              atomUtils.hasGroupSocket(displayedPost)),
           postLoading:
             !displayedPost ||
             getIn(state, [
               "process",
-              "needs",
+              "atoms",
               displayedPost.get("uri"),
               "loading",
             ]),
@@ -111,21 +112,45 @@ function genComponentConf() {
         useCase: ucIdentifier,
         useCaseGroup: undefined,
         postUri: undefined,
-        fromNeedUri: this.postUriToConnectTo,
-        viewNeedUri: undefined,
+        fromAtomUri: this.postUriToConnectTo,
+        viewAtomUri: undefined,
         viewConnUri: undefined,
         mode: "CONNECT",
       });
     }
 
     sendAdHocRequest(message, persona) {
-      this.router__stateGoResetParams("connections");
+      const tempPostUriToConnectTo = this.postUriToConnectTo;
 
-      if (this.postUriToConnectTo) {
-        this.connections__connectAdHoc(
-          this.postUriToConnectTo,
-          message,
-          persona
+      if (this.loggedIn) {
+        this.router__stateGoResetParams("connections");
+
+        if (tempPostUriToConnectTo) {
+          this.connections__connectAdHoc(
+            tempPostUriToConnectTo,
+            message,
+            persona
+          );
+        }
+      } else {
+        this.view__showTermsDialog(
+          Immutable.fromJS({
+            acceptCallback: () => {
+              this.view__hideModalDialog();
+              this.router__stateGoResetParams("connections");
+
+              if (tempPostUriToConnectTo) {
+                this.connections__connectAdHoc(
+                  tempPostUriToConnectTo,
+                  message,
+                  persona
+                );
+              }
+            },
+            cancelCallback: () => {
+              this.view__hideModalDialog();
+            },
+          })
         );
       }
     }

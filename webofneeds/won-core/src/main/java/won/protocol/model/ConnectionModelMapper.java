@@ -17,40 +17,37 @@ import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.WON;
 
 /**
- * User: gabriel
- * Date: 09.04.13
- * T  ime: 15:38
+ * User: gabriel Date: 09.04.13 T ime: 15:38
  */
 public class ConnectionModelMapper implements ModelMapper<Connection> {
-
     @Override
     public Model toModel(Connection connection) {
         Model model = ModelFactory.createDefaultModel();
         Resource connectionMember = model.createResource(connection.getConnectionURI().toString())
-                .addProperty(WON.HAS_CONNECTION_STATE, WON.toResource(connection.getState()))
-                .addProperty(WON.BELONGS_TO_NEED, model.createResource(connection.getNeedURI().toString()));
-        connectionMember.addProperty(RDF.type, WON.CONNECTION);
-        if (connection.getRemoteConnectionURI() != null) {
-            Resource remoteConnection = model.createResource(connection.getRemoteConnectionURI().toString());
-            connectionMember.addProperty(WON.HAS_REMOTE_CONNECTION, remoteConnection);
+                        .addProperty(WON.connectionState, WON.toResource(connection.getState()))
+                        .addProperty(WON.sourceAtom, model.createResource(connection.getAtomURI().toString()));
+        connectionMember.addProperty(RDF.type, WON.Connection);
+        if (connection.getTargetConnectionURI() != null) {
+            Resource targetConnection = model.createResource(connection.getTargetConnectionURI().toString());
+            connectionMember.addProperty(WON.targetConnection, targetConnection);
         }
-        if (connection.getRemoteNeedURI() != null) {
-            Resource remoteNeed = model.createResource(connection.getRemoteNeedURI().toString());
-            connectionMember.addProperty(WON.HAS_REMOTE_NEED, remoteNeed);
+        if (connection.getTargetAtomURI() != null) {
+            Resource targetAtom = model.createResource(connection.getTargetAtomURI().toString());
+            connectionMember.addProperty(WON.targetAtom, targetAtom);
         }
-
         Literal lastUpdate = DateTimeUtils.toLiteral(connection.getLastUpdate(), model);
         if (lastUpdate != null) {
             connectionMember.addProperty(DCTerms.modified, lastUpdate);
         }
-        
-        //we need the following check for old connections so we can still generate RDF for them.  
-        if (connection.getFacetURI() != null) {
-            Resource facet = model.createResource(connection.getFacetURI().toString());
-            connectionMember.addProperty(WON.HAS_FACET, facet);
-            facet.addProperty(RDF.type, model.getResource(connection.getTypeURI().toString()));
-            if (connection.getRemoteFacetURI() != null) {
-                connectionMember.addProperty(WON.HAS_REMOTE_FACET, model.getResource(connection.getRemoteFacetURI().toString()));
+        // we need the following check for old connections so we can still generate RDF
+        // for them.
+        if (connection.getSocketURI() != null) {
+            Resource socket = model.createResource(connection.getSocketURI().toString());
+            connectionMember.addProperty(WON.socket, socket);
+            socket.addProperty(WON.socketDefinition, model.getResource(connection.getTypeURI().toString()));
+            if (connection.getTargetSocketURI() != null) {
+                connectionMember.addProperty(WON.targetSocket,
+                                model.getResource(connection.getTargetSocketURI().toString()));
             }
         }
         return model;
@@ -58,31 +55,30 @@ public class ConnectionModelMapper implements ModelMapper<Connection> {
 
     @Override
     public Connection fromModel(Model model) {
-        URI connectionURI = RdfUtils.findFirstSubjectUri(model, RDF.type, WON.CONNECTION, false, true);
-        if (connectionURI == null) return null;
+        URI connectionURI = RdfUtils.findFirstSubjectUri(model, RDF.type, WON.Connection, false, true);
+        if (connectionURI == null)
+            return null;
         Resource connectionRes = model.getResource(connectionURI.toString());
         Connection connection = new Connection();
-
         connection.setConnectionURI(URI.create(connectionRes.getURI()));
-
-        URI connectionStateURI = URI.create(connectionRes.getProperty(WON.HAS_CONNECTION_STATE).getResource().getURI());
+        URI connectionStateURI = URI.create(connectionRes.getProperty(WON.connectionState).getResource().getURI());
         connection.setState(ConnectionState.parseString(connectionStateURI.getFragment()));
-        Statement remoteConnectionStmt = connectionRes.getProperty(WON.HAS_REMOTE_CONNECTION);
-        if (remoteConnectionStmt != null) {
-            connection.setRemoteConnectionURI(URI.create(connectionRes.getProperty(WON.HAS_REMOTE_CONNECTION).getResource()
-                    .getURI()));
+        Statement targetConnectionStmt = connectionRes.getProperty(WON.targetConnection);
+        if (targetConnectionStmt != null) {
+            connection.setTargetConnectionURI(
+                            URI.create(connectionRes.getProperty(WON.targetConnection).getResource().getURI()));
         }
-        connection.setNeedURI(URI.create(connectionRes.getProperty(WON.BELONGS_TO_NEED).getResource().getURI()));
-        connection.setRemoteNeedURI(URI.create(connectionRes.getProperty(WON.HAS_REMOTE_NEED).getResource().getURI()));
-        connection.setFacetURI(URI.create(connectionRes.getProperty(WON.HAS_FACET).getResource().getURI()));
-        if (connectionRes.hasProperty(WON.HAS_REMOTE_FACET)) {
-            connection.setRemoteFacetURI(URI.create(connectionRes.getProperty(WON.HAS_REMOTE_FACET).getResource().getURI()));
+        connection.setAtomURI(URI.create(connectionRes.getProperty(WON.sourceAtom).getResource().getURI()));
+        connection.setTargetAtomURI(URI.create(connectionRes.getProperty(WON.targetAtom).getResource().getURI()));
+        connection.setSocketURI(URI.create(connectionRes.getProperty(WON.socket).getResource().getURI()));
+        if (connectionRes.hasProperty(WON.targetSocket)) {
+            connection.setTargetSocketURI(
+                            URI.create(connectionRes.getProperty(WON.targetSocket).getResource().getURI()));
         }
-        connection.setTypeURI(URI.create(connectionRes.getProperty(WON.HAS_FACET).getProperty(RDF.type).getResource().getURI()));
+        connection.setTypeURI(URI.create(connectionRes.getProperty(WON.socket).getProperty(WON.socketDefinition)
+                        .getResource().getURI()));
         Date lastUpdate = DateTimeUtils.parse(connectionRes.getProperty(DCTerms.modified).getString(), model);
         connection.setLastUpdate(lastUpdate);
-
         return connection;
     }
 }
-

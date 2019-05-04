@@ -18,6 +18,6 @@ public class AdditionalParticipantCoordinatorBotContextWrapper extends Participa
     }
 
     public List<URI> getParticipantsDelayed() {
-        return getBotContext().getNamedNeedUriList(participantDelayedListName);
+        return getBotContext().getNamedAtomUriList(participantDelayedListName);
     }
 }

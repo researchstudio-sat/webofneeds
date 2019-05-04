@@ -14,83 +14,75 @@ import scala.concurrent.duration.FiniteDuration;
  */
 @Configuration
 @PropertySource("file:${WON_CONFIG_DIR}/matcher-rescal.properties")
-public class RescalMatcherConfig
-{
-  @Value("${matcher.rescal.uri.sparql.endpoint}")
-  private String sparqlEndpoint;
+public class RescalMatcherConfig {
+    @Value("${matcher.rescal.uri.sparql.endpoint}")
+    private String sparqlEndpoint;
+    @Value("${matcher.rescal.uri.public}")
+    private String publicMatcherUri;
+    @Value("${matcher.rescal.executionDir}")
+    private String executionDirectory;
+    @Value("${matcher.rescal.pythonScriptDir}")
+    private String pythonScriptDirectory;
+    @Value("${matcher.rescal.executionDurationMinutes}")
+    private long executionDuration;
+    @Value("${matcher.rescal.threshold}")
+    private double rescalThreshold;
+    @Value("${matcher.rescal.rank}")
+    private long rescalRank;
 
-  @Value("${matcher.rescal.uri.public}")
-  private String publicMatcherUri;
+    public String getSparqlEndpoint() {
+        return sparqlEndpoint;
+    }
 
-  @Value("${matcher.rescal.executionDir}")
-  private String executionDirectory;
+    public void setSparqlEndpoint(final String sparqlEndpoint) {
+        this.sparqlEndpoint = sparqlEndpoint;
+    }
 
-  @Value("${matcher.rescal.pythonScriptDir}")
-  private String pythonScriptDirectory;
+    public String getPublicMatcherUri() {
+        return publicMatcherUri;
+    }
 
-  @Value("${matcher.rescal.executionDurationMinutes}")
-  private long executionDuration;
+    public void setPublicMatcherUri(final String publicMatcherUri) {
+        this.publicMatcherUri = publicMatcherUri;
+    }
 
-  @Value("${matcher.rescal.threshold}")
-  private double rescalThreshold;
+    public String getExecutionDirectory() {
+        return executionDirectory;
+    }
 
-  @Value("${matcher.rescal.rank}")
-  private long rescalRank;
+    public void setExecutionDirectory(final String executionDirectory) {
+        this.executionDirectory = executionDirectory;
+    }
 
-  public String getSparqlEndpoint() {
-    return sparqlEndpoint;
-  }
+    public String getPythonScriptDirectory() {
+        return pythonScriptDirectory;
+    }
 
-  public void setSparqlEndpoint(final String sparqlEndpoint) {
-    this.sparqlEndpoint = sparqlEndpoint;
-  }
+    public void setPythonScriptDirectory(final String pythonScriptDirectory) {
+        this.pythonScriptDirectory = pythonScriptDirectory;
+    }
 
-  public String getPublicMatcherUri() {
-    return publicMatcherUri;
-  }
+    public FiniteDuration getExecutionDuration() {
+        return Duration.create(executionDuration, TimeUnit.MINUTES);
+    }
 
-  public void setPublicMatcherUri(final String publicMatcherUri) {
-    this.publicMatcherUri = publicMatcherUri;
-  }
+    public void setExecutionDuration(final long executionDuration) {
+        this.executionDuration = executionDuration;
+    }
 
+    public double getRescalThreshold() {
+        return rescalThreshold;
+    }
 
-  public String getExecutionDirectory() {
-    return executionDirectory;
-  }
+    public void setRescalThreshold(final double rescalThreshold) {
+        this.rescalThreshold = rescalThreshold;
+    }
 
-  public void setExecutionDirectory(final String executionDirectory) {
-    this.executionDirectory = executionDirectory;
-  }
+    public long getRescalRank() {
+        return rescalRank;
+    }
 
-  public String getPythonScriptDirectory() {
-    return pythonScriptDirectory;
-  }
-
-  public void setPythonScriptDirectory(final String pythonScriptDirectory) {
-    this.pythonScriptDirectory = pythonScriptDirectory;
-  }
-
-  public FiniteDuration getExecutionDuration() {
-    return Duration.create(executionDuration, TimeUnit.MINUTES);
-  }
-
-  public void setExecutionDuration(final long executionDuration) {
-    this.executionDuration = executionDuration;
-  }
-
-  public double getRescalThreshold() {
-    return rescalThreshold;
-  }
-
-  public void setRescalThreshold(final double rescalThreshold) {
-    this.rescalThreshold = rescalThreshold;
-  }
-
-  public long getRescalRank() {
-    return rescalRank;
-  }
-
-  public void setRescalRank(final long rescalRank) {
-    this.rescalRank = rescalRank;
-  }
+    public void setRescalRank(final long rescalRank) {
+        this.rescalRank = rescalRank;
+    }
 }

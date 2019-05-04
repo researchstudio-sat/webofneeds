@@ -8,7 +8,10 @@ import { accountLogin } from "./actions/account-actions.js";
 import { getCurrentParamsFromRoute } from "./selectors/general-selectors.js";
 import { privateId2Credentials } from "./won-utils.js";
 
-import { getIn, firstToLowerCase, hyphen2Camel } from "./utils.js";
+import { get, getIn, firstToLowerCase, hyphen2Camel } from "./utils.js";
+
+import * as accountUtils from "./account-utils.js";
+import * as processUtils from "./process-utils.js";
 
 /**
  * As we have configured our router to keep parameters unchanged,
@@ -21,14 +24,14 @@ import { getIn, firstToLowerCase, hyphen2Camel } from "./utils.js";
  */
 export const resetParams = Object.freeze({
   connectionUri: undefined,
-  viewNeedUri: undefined,
+  viewAtomUri: undefined,
   viewConnUri: undefined,
   postUri: undefined,
   useCase: undefined,
   useCaseGroup: undefined,
   token: undefined,
   privateId: undefined,
-  fromNeedUri: undefined,
+  fromAtomUri: undefined,
   mode: undefined,
 });
 
@@ -63,16 +66,18 @@ export const configRouting = [
 
     [
       { path: "/about?aboutSection", component: "about" },
+      { path: "/overview?viewAtomUri?viewConnUri", component: "overview" },
+      { path: "/map?viewAtomUri?viewConnUri", component: "map" },
       { path: "/signup", component: "signup" },
       { path: "/settings", component: "settings" },
       {
         path:
-          "/connections?privateId?postUri?connectionUri?useCase?useCaseGroup?token?viewNeedUri?viewConnUri?fromNeedUri?mode",
+          "/connections?privateId?postUri?connectionUri?useCase?useCaseGroup?token?viewAtomUri?viewConnUri?fromAtomUri?mode",
         component: "connections",
         as: "connections",
       },
       {
-        path: "/post/?postUri?viewNeedUri?viewConnUri",
+        path: "/post/?postUri?viewAtomUri?viewConnUri",
         component: "post",
         as: "post",
       },
@@ -143,7 +148,10 @@ export function accessControl({
     case "connections": {
       //If we know the user is not loggedIn and there is a postUri in the route, we link to the post-visitor view
       const postUriFromRoute = toParams["postUri"];
-      if (!getIn(state, ["account", "loggedIn"]) && !!postUriFromRoute) {
+      if (
+        !accountUtils.isLoggedIn(get(state, "account")) &&
+        !!postUriFromRoute
+      ) {
         dispatch(actionCreators.router__stateGoResetParams(defaultRoute));
       }
       return;
@@ -158,14 +166,25 @@ export function accessControl({
       return;
     }
 
+    case "settings":
+      if (!accountUtils.isLoggedIn(get(state, "account"))) {
+        if (event) {
+          event.preventDefault();
+        }
+        dispatch(actionCreators.router__stateGoResetParams(defaultRoute));
+      }
+      return;
+
+    case "overview":
+    case "map":
     case "signup":
     case "about":
       return; // can always access these pages.
 
     default:
       //FOR ALL OTHER ROUTES
-      if (!state.getIn(["process", "processingInitialLoad"])) {
-        if (state.getIn(["account", "loggedIn"])) {
+      if (!processUtils.isProcessingInitialLoad(get(state, "process"))) {
+        if (accountUtils.isLoggedIn(get(state, "account"))) {
           return; // logged in. continue route-change as intended.
         } else {
           //sure to be logged out
@@ -215,7 +234,7 @@ function reactToPrivateIdChanges(
   const state = getState();
 
   const { email } = toPrivateId ? privateId2Credentials(toPrivateId) : {};
-  if (state.getIn(["process", "processingLogin"])) {
+  if (processUtils.isProcessingLogin(get(state, "process"))) {
     console.debug(
       "There's already a login in process with the email " +
         email +
@@ -226,7 +245,7 @@ function reactToPrivateIdChanges(
     return Promise.resolve();
   }
 
-  if (state.getIn(["process", "processingLogout"])) {
+  if (processUtils.isProcessingLogout(get(state, "process"))) {
     // already logging out
     return Promise.resolve();
   }
@@ -234,7 +253,9 @@ function reactToPrivateIdChanges(
   //If there is a toPrivateId param and it is different than the old one we process a login for that privateId regardless
   if (toPrivateId && fromPrivateId !== toPrivateId) {
     // privateId has changed or was added
-    const credentials = { privateId: toPrivateId };
+    const credentials = {
+      privateId: toPrivateId,
+    };
     return accountLogin(credentials)(dispatch, getState);
   }
 }

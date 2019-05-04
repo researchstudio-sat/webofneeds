@@ -1,5 +1,5 @@
 import won from "../../app/won-es6.js";
-import { is, get } from "../../app/utils.js";
+import { is, get, getIn } from "../../app/utils.js";
 import { select } from "../details/abstract.js";
 import Immutable from "immutable";
 
@@ -144,12 +144,12 @@ export const tags = {
   messageEnabled: true,
   parseToRDF: function({ value }) {
     if (!value) {
-      return { "won:hasTag": undefined };
+      return { "won:tag": undefined };
     }
-    return { "won:hasTag": value };
+    return { "won:tag": value };
   },
   parseFromRDF: function(jsonLDImm) {
-    return won.parseListFrom(jsonLDImm, ["won:hasTag"], "xsd:string");
+    return won.parseListFrom(jsonLDImm, ["won:tag"], "xsd:string");
   },
   generateHumanReadable: function({ value, includeLabel }) {
     if (value && is("Array", value) && value.length > 0) {
@@ -180,9 +180,7 @@ export const suggestPost = {
     }
   },
   parseFromRDF: function(jsonLDImm) {
-    const suggestUriJsonLDImm =
-      jsonLDImm && jsonLDImm.get("won:suggestPostUri");
-    return suggestUriJsonLDImm && suggestUriJsonLDImm.get("@id");
+    return getIn(jsonLDImm, ["won:suggestPostUri", "@id"]);
   },
   generateHumanReadable: function({ value, includeLabel }) {
     if (value) {
@@ -212,9 +210,7 @@ export const responseToUri = {
     }
   },
   parseFromRDF: function(jsonLDImm) {
-    const responseToUriJsonLDImm =
-      jsonLDImm && jsonLDImm.get("won:responseToUri");
-    return responseToUriJsonLDImm && responseToUriJsonLDImm.get("@id");
+    return getIn(jsonLDImm, ["won:responseToUri", "@id"]);
   },
   generateHumanReadable: function({ value, includeLabel }) {
     if (value) {
@@ -233,27 +229,25 @@ export const flags = {
   component: undefined, //this is so we do not display the component as a detail-picker, but are still able to use the parseToRDF, parseFromRDF functions
   multiSelect: true,
   options: [
-    { value: "won:WhatsNew", label: "WhatsNew" },
-    { value: "won:WhatsAround", label: "WhatsAround" },
-    { value: "won:NoHintForMe", label: "NoHintForMe" },
-    { value: "won:NoHintForCounterpart", label: "NoHintForCounterpart" },
+    { value: "won:NoHintForMe", label: "Silent" },
+    { value: "won:NoHintForCounterpart", label: "Invisible" },
     { value: "won:DirectResponse", label: "DirectResponse" },
     { value: "won:UsedForTesting", label: "UsedForTesting" },
   ],
   parseToRDF: function({ value }) {
     if (!value) {
-      return { "won:hasFlag": undefined };
+      return { "won:flag": undefined };
     } else if (is("Array", value)) {
       const idFlags = value.map(item => {
         return { "@id": item };
       });
-      return { "won:hasFlag": idFlags };
+      return { "won:flag": idFlags };
     } else {
-      return { "won:hasFlag": [{ "@id": value }] };
+      return { "won:flag": [{ "@id": value }] };
     }
   },
   parseFromRDF: function(jsonLDImm) {
-    return won.parseListFrom(jsonLDImm, ["won:hasFlag"], "xsd:ID");
+    return won.parseListFrom(jsonLDImm, ["won:flag"], "xsd:ID");
   },
   generateHumanReadable: function({ value, includeLabel }) {
     //TODO: Implement this so that the label shows instead of the value
@@ -293,11 +287,12 @@ export const type = {
     const types = (rawTypes => {
       if (Immutable.List.isList(rawTypes)) {
         return Immutable.Set(rawTypes);
-      } else {
+      } else if (rawTypes) {
         return Immutable.Set([rawTypes]);
+      } else {
+        return undefined;
       }
     })(jsonLDImm.get("@type"));
-
     return types;
   },
   generateHumanReadable: function({ value, includeLabel }) {
@@ -311,47 +306,47 @@ export const type = {
   },
 };
 
-export const facets = {
+export const sockets = {
   ...select,
-  identifier: "facets",
-  label: "Facets",
+  identifier: "sockets",
+  label: "Sockets",
   icon: "#ico36_detail_title", //TODO: CORRECT ICON
   viewerComponent: undefined,
   component: undefined,
   multiSelect: true,
   options: [
     {
-      value: { "#chatFacet": "won:ChatFacet" },
-      label: "ChatFacet",
+      value: { "#chatSocket": "chat:ChatSocket" },
+      label: "ChatSocket",
     },
     {
-      value: { "#groupFacet": "won:GroupFacet" },
-      label: "GroupFacet",
+      value: { "#groupSocket": "group:GroupSocket" },
+      label: "GroupSocket",
     },
     {
-      value: { "#holderFacet": "won:HolderFacet" },
-      label: "HolderFacet",
+      value: { "#holderSocket": "hold:HolderSocket" },
+      label: "HolderSocket",
     },
     {
-      value: { "#holdableFacet": "won:HoldableFacet" },
-      label: "HoldableFacet",
+      value: { "#holdableSocket": "hold:HoldableSocket" },
+      label: "HoldableSocket",
     },
     {
-      value: { "#reviewFacet": "won:ReviewFacet" },
-      label: "ReviewFacet",
+      value: { "#reviewSocket": "review:ReviewSocket" },
+      label: "ReviewSocket",
     },
   ],
   parseToRDF: function({ value }) {
     //TODO: PARSE TO RDF ONLY WHEN VALUE IS CONTAINING ONLY POSSIBLE ONES
     if (value) {
-      let facets = [];
-      Immutable.fromJS(value).map((facet, key) => {
-        facets.push({ "@id": key, "@type": facet });
+      let sockets = [];
+      Immutable.fromJS(value).map((socket, key) => {
+        sockets.push({ "@id": key, "won:socketDefinition": { "@id": socket } });
       });
 
-      if (facets.length > 0) {
+      if (sockets.length > 0) {
         return {
-          "won:hasFacet": facets,
+          "won:socket": sockets,
         };
       }
     }
@@ -359,19 +354,25 @@ export const facets = {
     return undefined;
   },
   parseFromRDF: function(jsonLDImm) {
-    const wonHasFacets = get(jsonLDImm, "won:hasFacet");
-    let facets = Immutable.Map();
+    const wonHasSockets = get(jsonLDImm, "won:socket");
+    let sockets = Immutable.Map();
 
-    if (wonHasFacets) {
-      if (Immutable.List.isList(wonHasFacets)) {
-        wonHasFacets.map(facet => {
-          facets = facets.set(get(facet, "@id"), get(facet, "@type"));
+    if (wonHasSockets) {
+      if (Immutable.List.isList(wonHasSockets)) {
+        wonHasSockets.map(socket => {
+          sockets = sockets.set(
+            get(socket, "@id"),
+            getIn(socket, ["won:socketDefinition", "@id"])
+          );
         });
-        if (facets.size > 0) {
-          return facets;
+        if (sockets.size > 0) {
+          return sockets;
         }
       } else {
-        return facets.set(get(wonHasFacets, "@id"), get(wonHasFacets, "@type"));
+        return sockets.set(
+          get(wonHasSockets, "@id"),
+          getIn(wonHasSockets, ["won:socketDefinition", "@id"])
+        );
       }
     }
     return undefined;
@@ -387,10 +388,10 @@ export const facets = {
   },
 };
 
-export const defaultFacet = {
-  ...facets,
-  identifier: "defaultFacet",
-  label: "Default Facet",
+export const defaultSocket = {
+  ...sockets,
+  identifier: "defaultSocket",
+  label: "Default Socket",
   icon: "#ico36_detail_title", //TODO: CORRECT ICON
   viewerComponent: undefined,
   component: undefined,
@@ -398,14 +399,14 @@ export const defaultFacet = {
   parseToRDF: function({ value }) {
     //TODO: PARSE TO RDF ONLY WHEN VALUE IS ONE OF THE POSSIBLE ONES
     if (value) {
-      let facets = [];
-      Immutable.fromJS(value).map((facet, key) => {
-        facets.push({ "@id": key, "@type": facet });
+      let sockets = [];
+      Immutable.fromJS(value).map((socket, key) => {
+        sockets.push({ "@id": key, "won:socketDefinition": { "@id": socket } });
       });
 
-      if (facets.length == 1) {
+      if (sockets.length == 1) {
         return {
-          "won:hasDefaultFacet": facets,
+          "won:defaultSocket": sockets,
         };
       }
     }
@@ -413,10 +414,30 @@ export const defaultFacet = {
     return undefined;
   },
   parseFromRDF: function(jsonLDImm) {
-    const wonHasDefaultFacet = get(jsonLDImm, "won:hasDefaultFacet");
+    const wonHasDefaultSocket = get(jsonLDImm, "won:defaultSocket");
+    let defaultSocket = Immutable.Map();
 
-    if (wonHasDefaultFacet && !Immutable.List.isList(wonHasDefaultFacet)) {
-      return wonHasDefaultFacet;
+    if (wonHasDefaultSocket && !Immutable.List.isList(wonHasDefaultSocket)) {
+      const defaultSocketId = get(wonHasDefaultSocket, "@id");
+
+      const wonHasSockets = get(jsonLDImm, "won:socket");
+
+      if (wonHasSockets) {
+        if (Immutable.List.isList(wonHasSockets)) {
+          const foundDefaultSocket = wonHasSockets.find(
+            socket => get(socket, "@id") === defaultSocketId
+          );
+          return defaultSocket.set(
+            defaultSocketId,
+            getIn(foundDefaultSocket, ["won:socketDefinition", "@id"])
+          );
+        } else if (get(wonHasSockets, "@id") === defaultSocketId) {
+          return defaultSocket.set(
+            defaultSocketId,
+            getIn(wonHasSockets, ["won:socketDefinition", "@id"])
+          );
+        }
+      }
     }
     return undefined;
   },
@@ -428,31 +449,41 @@ export const defaultFacet = {
   },
 };
 
-export const sPlanAction = {
-  identifier: "sPlanAction",
-  label: "Plan",
+/*
+  Use this detail with the s:PlanAction type -> if you use this detail make sure you add the s:PlanAction type to the corresponding branch (content or seeks)
+*/
+export const eventObject = {
+  identifier: "eventObject",
+  label: "Event",
   icon: "#ico36_detail_title",
   placeholder: "What? (Short title shown in lists)",
   parseToRDF: function({ value }) {
-    const val = value ? value : undefined;
-    if (!val) {
+    if (!value) {
       return;
+    } else if (is("Array", value)) {
+      const eventObjects = value.map(item => {
+        return {
+          "@type": "s:Event",
+          "s:about": { "@id": item },
+        };
+      });
+      return { "s:object": eventObjects };
+    } else {
+      return {
+        "s:object": {
+          "@type": "s:Event",
+          "s:about": { "@id": value },
+        },
+      };
     }
-    return {
-      "@type": "s:PlanAction",
-      "s:object": {
-        "@type": "s:Event",
-        "s:about": value,
-      },
-    };
   },
   parseFromRDF: function(jsonLDImm) {
-    const types = jsonLDImm.getIn(["@type"]);
+    const types = get(jsonLDImm, "@type");
     if (
       (Immutable.List.isList(types) && types.includes("s:PlanAction")) ||
       types === "s:PlanAction"
     ) {
-      const planObjs = jsonLDImm.getIn(jsonLDImm, ["s:object"]);
+      const planObjs = get(jsonLDImm, "s:object");
       let plns = [];
 
       if (Immutable.List.isList(planObjs)) {

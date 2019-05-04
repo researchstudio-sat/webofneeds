@@ -2,11 +2,12 @@
  * Created by ksinger on 20.08.2015.
  */
 import angular from "angular";
-import { attach } from "../utils.js";
+import { attach, get } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { connect2Redux } from "../won-utils.js";
 
 import * as srefUtils from "../sref-utils.js";
+import * as accountUtils from "../account-utils.js";
 
 function genComponentConf() {
   let template = `
@@ -51,10 +52,12 @@ function genComponentConf() {
       this.password = "";
 
       const logout = state => {
+        const accountState = get(state, "account");
+
         return {
-          loggedIn: state.getIn(["account", "loggedIn"]),
-          email: state.getIn(["account", "email"]),
-          isAnonymous: state.getIn(["account", "isAnonymous"]),
+          loggedIn: accountUtils.isLoggedIn(accountState),
+          email: accountUtils.getEmail(accountState),
+          isAnonymous: accountUtils.isAnonymous(accountState),
         };
       };
 

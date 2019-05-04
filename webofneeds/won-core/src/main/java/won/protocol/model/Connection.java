@@ -1,19 +1,13 @@
 /*
- * Copyright 2012  Research Studios Austria Forschungsges.m.b.H.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright 2012 Research Studios Austria Forschungsges.m.b.H. Licensed under
+ * the Apache License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at http://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable
+ * law or agreed to in writing, software distributed under the License is
+ * distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the specific language
+ * governing permissions and limitations under the License.
  */
-
 package won.protocol.model;
 
 import java.net.URI;
@@ -42,254 +36,231 @@ import won.protocol.model.parentaware.ParentAware;
 import won.protocol.model.parentaware.VersionedEntity;
 
 /**
- * User: fkleedorfer
- * Date: 30.10.12
+ * User: fkleedorfer Date: 30.10.12
  */
 @Entity
 @Table(name = "connection", indexes = {
-        @Index(name = "IDX_CONNECTION_NEEDURI_REMOTENEEDURI", columnList = "needURI, remoteNeedURI"),
-    },
-    uniqueConstraints = {
-            @UniqueConstraint(name = "IDX_CONNECTION_UNIQUE_EVENT_CONTAINER_ID", columnNames = "event_container_id"),
-            @UniqueConstraint(name = "IDX_CONNECTION_UNIQUE_DATASETHOLDER_ID", columnNames = "datasetholder_id"),
-            @UniqueConstraint(name = "IDX_UNIQUE_CONNECTION", columnNames = { "needURI", "remoteNeedURI", "facetURI", "remoteFacetURI"})
-    })
+                @Index(name = "IDX_CONNECTION_ATOMURI_TARGETATOMURI", columnList = "atomURI, targetAtomURI"), }, uniqueConstraints = {
+                                @UniqueConstraint(name = "IDX_CONNECTION_UNIQUE_MESSAGE_CONTAINER_ID", columnNames = "message_container_id"),
+                                @UniqueConstraint(name = "IDX_CONNECTION_UNIQUE_DATASETHOLDER_ID", columnNames = "datasetholder_id"),
+                                @UniqueConstraint(name = "IDX_UNIQUE_CONNECTION", columnNames = { "atomURI",
+                                                "targetAtomURI", "socketURI", "targetSocketURI" }) })
 public class Connection implements ParentAware<ConnectionContainer>, VersionedEntity {
-  @Id
-  @GeneratedValue
-  @Column(name = "id")
-  private Long id;
+    @Id
+    @GeneratedValue
+    @Column(name = "id")
+    private Long id;
+    @Column(name = "version", columnDefinition = "integer DEFAULT 0", nullable = false)
+    private int version = 0;
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "last_update", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    private Date lastUpdate = new Date();
+    /* The public URI of this connection */
+    @Column(name = "connectionURI", unique = true)
+    @Convert(converter = URIConverter.class)
+    private URI connectionURI;
+    /* The uri of the connection's atom object */
+    @Column(name = "atomURI")
+    @Convert(converter = URIConverter.class)
+    private URI atomURI;
+    /* The uri of the socket's type */
+    @Column(name = "typeURI")
+    @Convert(converter = URIConverter.class)
+    private URI typeURI;
+    /*
+     * The uri of the socket. This must be a resource defined in the atom's content.
+     * The type of that resource is the typeURI
+     */
+    @Column(name = "socketURI")
+    @Convert(converter = URIConverter.class)
+    private URI socketURI;
+    /*
+     * The uri of the remote socket. This must be a resource defined in the remote
+     * atom's content or null, if we don't know it yet
+     */
+    @Column(name = "targetSocketURI")
+    @Convert(converter = URIConverter.class)
+    private URI targetSocketURI;
+    /* The URI of the remote connection */
+    /* Caution: on the owner side, the remote connection URI is never known. */
+    @Column(name = "targetConnectionURI")
+    @Convert(converter = URIConverter.class)
+    private URI targetConnectionURI;
+    /* The URI of the remote atom */
+    @Column(name = "targetAtomURI")
+    @Convert(converter = URIConverter.class)
+    private URI targetAtomURI;
+    /* The state of the connection */
+    @Column(name = "state")
+    @Enumerated(EnumType.STRING)
+    private ConnectionState state;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_atom_id")
+    private ConnectionContainer parent;
+    @OneToOne(fetch = FetchType.LAZY)
+    private DatasetHolder datasetHolder;
+    @JoinColumn(name = "message_container_id")
+    @OneToOne(fetch = FetchType.LAZY, optional = false, cascade = CascadeType.ALL, orphanRemoval = true)
+    private ConnectionMessageContainer messageContainer = null;
 
-  @Column(name = "version", columnDefinition = "integer DEFAULT 0", nullable = false)
-  private int version = 0;
+    @Override
+    public ConnectionContainer getParent() {
+        return this.parent;
+    }
 
-  @Temporal(TemporalType.TIMESTAMP)
-  @Column(name = "last_update", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-  private Date lastUpdate = new Date();
+    public ConnectionMessageContainer getMessageContainer() {
+        return messageContainer;
+    }
 
-  /* The public URI of this connection */
-  @Column(name = "connectionURI", unique = true)
-  @Convert(converter = URIConverter.class)
-  private URI connectionURI;
+    public void setMessageContainer(final ConnectionMessageContainer messageContainer) {
+        this.messageContainer = messageContainer;
+    }
 
-  /* The uri of the connection's need object */
-  @Column(name = "needURI")
-  @Convert(converter = URIConverter.class)
-  private URI needURI;
+    public void setParent(final ConnectionContainer parent) {
+        this.parent = parent;
+    }
 
-  /* The uri of the facet's type */
-  @Column(name = "typeURI")
-  @Convert(converter = URIConverter.class)
-  private URI typeURI;
-  
-  /* The uri of the facet. This must be a resource defined in the need's content. The type of that resource is the typeURI*/
-  @Column(name = "facetURI")
-  @Convert(converter = URIConverter.class)
-  private URI facetURI;
-  
-  /* The uri of the remote facet. This must be a resource defined in the remote need's content or null, if we don't know it yet */
-  @Column(name = "remoteFacetURI")
-  @Convert(converter = URIConverter.class)
-  private URI remoteFacetURI;
+    @Override
+    @PreUpdate
+    @PrePersist
+    public void incrementVersion() {
+        this.version++;
+        this.lastUpdate = new Date();
+    }
 
-  /* The URI of the remote connection */
-  /* Caution: on the owner side, the remote connection URI is never known. */
-  @Column(name = "remoteConnectionURI")
-  @Convert(converter = URIConverter.class)
-  private URI remoteConnectionURI;
-
-  /* The URI of the remote need */
-  @Column(name = "remoteNeedURI")
-  @Convert(converter = URIConverter.class)
-  private URI remoteNeedURI;
-
-  /* The state of the connection */
-  @Column(name = "state")
-  @Enumerated(EnumType.STRING)
-  private ConnectionState state;
-
-  @OneToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "parent_need_id")
-  private ConnectionContainer parent;
-
-  @OneToOne(fetch = FetchType.LAZY)
-  private DatasetHolder datasetHolder;
-
-  @JoinColumn(name = "event_container_id")
-  @OneToOne(fetch = FetchType.LAZY, optional = false, cascade = CascadeType.ALL,
-          orphanRemoval = true)
-  private ConnectionEventContainer eventContainer = null;
-
-  @Override
-  public ConnectionContainer getParent() {
-    return this.parent;
-  }
-
-
-  public ConnectionEventContainer getEventContainer() {
-    return eventContainer;
-  }
-
-  public void setEventContainer(final ConnectionEventContainer eventContainer) {
-    this.eventContainer = eventContainer;
-  }
-
-  public void setParent(final ConnectionContainer parent) {
-    this.parent = parent;
-  }
-
-  @Override
-  @PreUpdate
-  @PrePersist
-  public void incrementVersion() {
-    this.version++;
-    this.lastUpdate = new Date();
-  }
-
-  //TODO: we may want to introduce a creation date?
-
-  
-  
-
+    // TODO: we may want to introduce a creation date?
     public URI getTypeURI() {
         return typeURI;
     }
 
     @Override
     public String toString() {
-        return "Connection [id=" + id + ", connectionURI=" + connectionURI + ", needURI=" + needURI + ", typeURI="
-                + typeURI + ", facetURI=" + facetURI + ", remoteFacetURI=" + remoteFacetURI + ", remoteConnectionURI="
-                + remoteConnectionURI + ", remoteNeedURI=" + remoteNeedURI + ", state=" + state + "]";
+        return "Connection [id=" + id + ", connectionURI=" + connectionURI + ", atomURI=" + atomURI + ", typeURI="
+                        + typeURI + ", socketURI=" + socketURI + ", targetSocketURI=" + targetSocketURI
+                        + ", targetConnectionURI=" + targetConnectionURI + ", targetAtomURI=" + targetAtomURI
+                        + ", state=" + state + "]";
     }
 
     public void setTypeURI(URI typeURI) {
         this.typeURI = typeURI;
     }
-    
-    public URI getFacetURI() {
-        return facetURI;
+
+    public URI getSocketURI() {
+        return socketURI;
     }
 
-    public void setFacetURI(URI facetURI) {
-        this.facetURI = facetURI;
-    }    
-
-    public URI getRemoteFacetURI() {
-        return remoteFacetURI;
+    public void setSocketURI(URI socketURI) {
+        this.socketURI = socketURI;
     }
 
-    public void setRemoteFacetURI(URI remoteFacetURI) {
-        this.remoteFacetURI = remoteFacetURI;
+    public URI getTargetSocketURI() {
+        return targetSocketURI;
+    }
+
+    public void setTargetSocketURI(URI targetSocketURI) {
+        this.targetSocketURI = targetSocketURI;
     }
 
     public Long getId() {
         return id;
     }
 
-  public void setId(Long id) {
-      this.id = id;
-  }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-  public URI getConnectionURI()
-  {
-    return connectionURI;
-  }
+    public URI getConnectionURI() {
+        return connectionURI;
+    }
 
-  public void setConnectionURI(final URI connectionURI)
-  {
-    this.connectionURI = connectionURI;
-  }
+    public void setConnectionURI(final URI connectionURI) {
+        this.connectionURI = connectionURI;
+    }
 
-  public URI getNeedURI()
-  {
-    return needURI;
-  }
+    public URI getAtomURI() {
+        return atomURI;
+    }
 
-  public void setNeedURI(final URI needURI)
-  {
-    this.needURI = needURI;
-  }
+    public void setAtomURI(final URI atomURI) {
+        this.atomURI = atomURI;
+    }
 
-  public URI getRemoteConnectionURI()
-  {
-    return remoteConnectionURI;
-  }
+    public URI getTargetConnectionURI() {
+        return targetConnectionURI;
+    }
 
-  public void setRemoteConnectionURI(final URI remoteConnectionURI)
-  {
-    this.remoteConnectionURI = remoteConnectionURI;
-  }
+    public void setTargetConnectionURI(final URI targetConnectionURI) {
+        this.targetConnectionURI = targetConnectionURI;
+    }
 
-  public URI getRemoteNeedURI()
-  {
-    return remoteNeedURI;
-  }
+    public URI getTargetAtomURI() {
+        return targetAtomURI;
+    }
 
-  public void setRemoteNeedURI(final URI remoteNeedURI)
-  {
-    this.remoteNeedURI = remoteNeedURI;
-  }
+    public void setTargetAtomURI(final URI targetAtomURI) {
+        this.targetAtomURI = targetAtomURI;
+    }
 
-  public ConnectionState getState()
-  {
-    return state;
-  }
+    public ConnectionState getState() {
+        return state;
+    }
 
-  public void setState(final ConnectionState state)
-  {
-    this.state = state;
-  }
+    public void setState(final ConnectionState state) {
+        this.state = state;
+    }
 
-  protected void setVersion(final int version) {
-    this.version = version;
-  }
+    protected void setVersion(final int version) {
+        this.version = version;
+    }
 
-  public int getVersion() {
-    return version;
-  }
+    public int getVersion() {
+        return version;
+    }
 
-  public Date getLastUpdate() {
-    return lastUpdate;
-  }
+    public Date getLastUpdate() {
+        return lastUpdate;
+    }
 
-  protected void setLastUpdate(final Date lastUpdate) {
-    this.lastUpdate = lastUpdate;
-  }
+    protected void setLastUpdate(final Date lastUpdate) {
+        this.lastUpdate = lastUpdate;
+    }
 
-  public DatasetHolder getDatasetHolder() {
-    return datasetHolder;
-  }
+    public DatasetHolder getDatasetHolder() {
+        return datasetHolder;
+    }
 
-  public void setDatasetHolder(final DatasetHolder datasetHolder) {
-    this.datasetHolder = datasetHolder;
-  }
+    public void setDatasetHolder(final DatasetHolder datasetHolder) {
+        this.datasetHolder = datasetHolder;
+    }
 
-  @Override
-  public boolean equals(final Object o)
-  {
-    if (this == o) return true;
-    if (!(o instanceof Connection)) return false;
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof Connection))
+            return false;
+        final Connection that = (Connection) o;
+        if (connectionURI != null ? !connectionURI.equals(that.connectionURI) : that.connectionURI != null)
+            return false;
+        if (atomURI != null ? !atomURI.equals(that.atomURI) : that.atomURI != null)
+            return false;
+        if (targetConnectionURI != null ? !targetConnectionURI.equals(that.targetConnectionURI)
+                        : that.targetConnectionURI != null)
+            return false;
+        if (targetAtomURI != null ? !targetAtomURI.equals(that.targetAtomURI) : that.targetAtomURI != null)
+            return false;
+        if (state != that.state)
+            return false;
+        return true;
+    }
 
-    final Connection that = (Connection) o;
-
-    if (connectionURI != null ? !connectionURI.equals(that.connectionURI) : that.connectionURI != null) return false;
-    if (needURI != null ? !needURI.equals(that.needURI) : that.needURI != null) return false;
-    if (remoteConnectionURI != null ? !remoteConnectionURI.equals(that.remoteConnectionURI) : that.remoteConnectionURI != null)
-      return false;
-    if (remoteNeedURI != null ? !remoteNeedURI.equals(that.remoteNeedURI) : that.remoteNeedURI != null) return false;
-    if (state != that.state) return false;
-
-    return true;
-  }
-
-  @Override
-  public int hashCode()
-  {
-    int result = connectionURI != null ? connectionURI.hashCode() : 0;
-    result = 31 * result + (needURI != null ? needURI.hashCode() : 0);
-    result = 31 * result + (remoteConnectionURI != null ? remoteConnectionURI.hashCode() : 0);
-    result = 31 * result + (remoteNeedURI != null ? remoteNeedURI.hashCode() : 0);
-    result = 31 * result + (state != null ? state.hashCode() : 0);
-    return result;
-  }
+    @Override
+    public int hashCode() {
+        int result = connectionURI != null ? connectionURI.hashCode() : 0;
+        result = 31 * result + (atomURI != null ? atomURI.hashCode() : 0);
+        result = 31 * result + (targetConnectionURI != null ? targetConnectionURI.hashCode() : 0);
+        result = 31 * result + (targetAtomURI != null ? targetAtomURI.hashCode() : 0);
+        result = 31 * result + (state != null ? state.hashCode() : 0);
+        return result;
+    }
 }

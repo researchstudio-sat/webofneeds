@@ -56,6 +56,7 @@ function genComponentConf() {
           </svg>
         </div>
       </div>
+      <!-- Not in use: secret
       <div class="paypalpaymentp__label">
         {{ self.detail.secretLabel }}
       </div>
@@ -76,6 +77,8 @@ function genComponentConf() {
           </svg>
         </div>
       </div>
+      -->
+      <!-- Not in use: customer information
       <div class="paypalpaymentp__label" ng-if="self.isValidPayment()">
         {{ self.detail.customerLabel }}
       </div>
@@ -85,6 +88,7 @@ function genComponentConf() {
           on-update="self.updateCostumerUri(value)"
           detail="self.detail && self.detail.suggestPost"
       ></won-suggestpost-picker>
+      -->
     `;
 
   class Controller {
@@ -97,8 +101,8 @@ function genComponentConf() {
       // which means that no values get saved anyway
       this.addedNumber = this.initialValue && this.initialValue.amount;
       this.selectedCurrency = this.initialValue && this.initialValue.currency;
-      this.customerUri = this.initialValue && this.initialValue.customerUri;
-      this.secret = this.initialValue && this.initialValue.secret;
+      // this.customerUri = this.initialValue && this.initialValue.customerUri;
+      // this.secret = this.initialValue && this.initialValue.secret;
       this.receiver = this.initialValue && this.initialValue.receiver;
 
       if (!this.selectedCurrency) {
@@ -107,7 +111,7 @@ function genComponentConf() {
 
       this.showAmountResetButton = false;
       this.showReceiverResetButton = false;
-      this.showSecretResetButton = false;
+      // this.showSecretResetButton = false;
 
       delay(0).then(() => this.showInitialValues());
     }
@@ -115,21 +119,21 @@ function genComponentConf() {
     /**
      * Checks validity and uses callback method
      */
-    update(number, currency, customerUri, secret, receiver) {
+    update(number, currency, receiver) {
       const parsedNumber = Number.parseFloat(number);
       if (
         isValidNumber(number) &&
         currency &&
-        customerUri &&
-        secret &&
+        // customerUri &&
+        // secret &&
         receiver
       ) {
         this.onUpdate({
           value: {
             amount: parsedNumber,
             currency: currency,
-            customerUri: customerUri,
-            secret: secret,
+            // customerUri: customerUri,
+            // secret: secret,
             receiver: receiver,
           },
         });
@@ -142,7 +146,7 @@ function genComponentConf() {
       return (
         isValidNumber(this.addedNumber) &&
         this.currency &&
-        this.secret &&
+        // this.secret &&
         this.receiver
       );
     }
@@ -160,8 +164,8 @@ function genComponentConf() {
 
     showInitialValues() {
       this.addedNumber = this.initialValue && this.initialValue.amount;
-      this.customerUri = this.initialValue && this.initialValue.customerUri;
-      this.secret = this.initialValue && this.initialValue.secret;
+      // this.customerUri = this.initialValue && this.initialValue.customerUri;
+      // this.secret = this.initialValue && this.initialValue.secret;
       this.receiver = this.initialValue && this.initialValue.receiver;
       this.selectedCurrency =
         (this.initialValue && this.initialValue.currency) ||
@@ -170,10 +174,10 @@ function genComponentConf() {
         this.amount().value = this.initialValue.amount;
         this.showAmountResetButton = true;
       }
-      if (this.initialValue && this.initialValue.secret) {
-        this.secretInput().value = this.initialValue.secret;
-        this.showSecretResetButton = true;
-      }
+      // if (this.initialValue && this.initialValue.secret) {
+      //   this.secretInput().value = this.initialValue.secret;
+      //   this.showSecretResetButton = true;
+      // }
       if (this.initialValue && this.initialValue.receiver) {
         this.receiverInput().value = this.initialValue.receiver;
         this.showReceiverResetButton = true;
@@ -191,7 +195,7 @@ function genComponentConf() {
           this.addedNumber,
           this.selectedCurrency,
           this.customerUri,
-          this.secret,
+          // this.secret,
           this.receiver
         );
         this.showAmountResetButton = true;
@@ -200,32 +204,32 @@ function genComponentConf() {
       }
     }
 
-    updateCostumerUri(customerUri) {
-      this.customerUri = customerUri;
-      this.update(
-        this.addedNumber,
-        this.selectedCurrency,
-        this.customerUri,
-        this.secret,
-        this.receiver
-      );
-    }
+    // updateCostumerUri(customerUri) {
+    //   this.customerUri = customerUri;
+    //   this.update(
+    //     this.addedNumber,
+    //     this.selectedCurrency,
+    //     this.customerUri,
+    //     this.secret,
+    //     this.receiver
+    //   );
+    // }
 
-    updateSecret() {
-      this.secret = this.secretInput().value;
+    // updateSecret() {
+    //   this.secret = this.secretInput().value;
 
-      if (this.secret) {
-        //todo: check if secret is at least 4 chars long
-        this.showSecretResetButton = true;
-      }
-      this.update(
-        this.addedNumber,
-        this.selectedCurrency,
-        this.customerUri,
-        this.secret,
-        this.receiver
-      );
-    }
+    //   if (this.secret) {
+    //     //todo: check if secret is at least 4 chars long
+    //     this.showSecretResetButton = true;
+    //   }
+    //   this.update(
+    //     this.addedNumber,
+    //     this.selectedCurrency,
+    //     this.customerUri,
+    //     this.secret,
+    //     this.receiver
+    //   );
+    // }
 
     updateReceiver() {
       this.receiver = this.receiverInput().value;
@@ -237,8 +241,8 @@ function genComponentConf() {
       this.update(
         this.addedNumber,
         this.selectedCurrency,
-        this.customerUri,
-        this.secret,
+        // this.customerUri,
+        // this.secret,
         this.receiver
       );
     }
@@ -249,16 +253,16 @@ function genComponentConf() {
         this.update(
           this.addedNumber,
           this.selectedCurrency,
-          this.customerUri,
-          this.secret,
+          // this.customerUri,
+          // this.secret,
           this.receiver
         );
       } else {
         this.update(
           this.addedNumber,
           this.selectedCurrency,
-          this.customerUri,
-          this.secret,
+          // this.customerUri,
+          // this.secret,
           this.receiver
         );
       }
@@ -276,27 +280,27 @@ function genComponentConf() {
       this.update(
         this.addedNumber,
         this.selectedCurrency,
-        this.customerUri,
-        this.secret,
+        // this.customerUri,
+        // this.secret,
         this.receiver
       );
     }
 
-    resetSecret(resetInput) {
-      this.secret = undefined;
+    // resetSecret(resetInput) {
+    //   this.secret = undefined;
 
-      if (resetInput) {
-        this.secretInput().value = "";
-        this.showSecretResetButton = false;
-      }
-      this.update(
-        this.addedNumber,
-        this.selectedCurrency,
-        this.customerUri,
-        this.secret,
-        this.receiver
-      );
-    }
+    //   if (resetInput) {
+    //     this.secretInput().value = "";
+    //     this.showSecretResetButton = false;
+    //   }
+    //   this.update(
+    //     this.addedNumber,
+    //     this.selectedCurrency,
+    //     // this.customerUri,
+    //     // this.secret,
+    //     this.receiver
+    //   );
+    // }
 
     resetReceiver(resetInput) {
       this.receiver = undefined;
@@ -308,8 +312,8 @@ function genComponentConf() {
       this.update(
         this.addedNumber,
         this.selectedCurrency,
-        this.customerUri,
-        this.secret,
+        // this.customerUri,
+        // this.secret,
         this.receiver
       );
     }
@@ -341,14 +345,14 @@ function genComponentConf() {
       return this._receiver;
     }
 
-    secretInput() {
-      if (!this._secret) {
-        this._secret = this.$element[0].querySelector(
-          ".paypalpaymentp__textinput__secret"
-        );
-      }
-      return this._secret;
-    }
+    // secretInput() {
+    //   if (!this._secret) {
+    //     this._secret = this.$element[0].querySelector(
+    //       ".paypalpaymentp__textinput__secret"
+    //     );
+    //   }
+    //   return this._secret;
+    // }
   }
   Controller.$inject = serviceDependencies;
 

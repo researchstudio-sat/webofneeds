@@ -1,5 +1,5 @@
 /**
- * Component for rendering need-title, type and timestamp
+ * Component for rendering atom-title, type and timestamp
  * Created by ksinger on 10.04.2017.
  */
 import angular from "angular";
@@ -11,13 +11,13 @@ import { actionCreators } from "../actions/actions.js";
 import { labels, relativeTime } from "../won-label-utils.js";
 import { attach, getIn, get } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
-import * as needUtils from "../need-utils.js";
+import * as atomUtils from "../atom-utils.js";
 import { isChatToGroup } from "../connection-utils.js";
-import { getHumanReadableStringFromMessage } from "../reducers/need-reducer/parse-message.js";
+import { getHumanReadableStringFromMessage } from "../reducers/atom-reducer/parse-message.js";
 import {
   selectLastUpdateTime,
-  getOwnedNeedByConnectionUri,
-  getNeeds,
+  getOwnedAtomByConnectionUri,
+  getAtoms,
 } from "../selectors/general-selectors.js";
 import { getUnreadMessagesByConnectionUri } from "../selectors/message-selectors.js";
 import { getMessagesByConnectionUri } from "../selectors/message-selectors.js";
@@ -29,30 +29,30 @@ import "style/_connection-header.scss";
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
   let template = `
-      <div class="ch__icon" ng-if="!self.connectionOrNeedsLoading && !self.isConnectionToGroup">
+      <div class="ch__icon" ng-if="!self.connectionOrAtomsLoading && !self.isConnectionToGroup">
           <won-square-image
-            class="ch__icon__theirneed"
-            uri="::self.remoteNeed.get('uri')">
+            class="ch__icon__theiratom"
+            uri="::self.targetAtom.get('uri')">
           </won-square-image>
       </div>
       <won-group-image
         class="ch__groupicons"
-        ng-if="!self.connectionOrNeedsLoading && self.isConnectionToGroup"
+        ng-if="!self.connectionOrAtomsLoading && self.isConnectionToGroup"
         connection-uri="self.connectionUri">
       </won-group-image>
-      <div class="ch__right" ng-if="!self.connectionOrNeedsLoading">
-        <div class="ch__right__topline" ng-if="!self.remoteNeedFailedToLoad">
-          <div class="ch__right__topline__title" ng-if="!self.isDirectResponseFromRemote && self.remoteNeed.get('humanReadable')" title="{{ self.remoteNeed.get('humanReadable') }}">
-            {{ self.remoteNeed.get('humanReadable') }}
+      <div class="ch__right" ng-if="!self.connectionOrAtomsLoading">
+        <div class="ch__right__topline" ng-if="!self.targetAtomFailedToLoad">
+          <div class="ch__right__topline__title" ng-if="!self.isDirectResponseFromRemote && self.targetAtom.get('humanReadable')" title="{{ self.targetAtom.get('humanReadable') }}">
+            {{ self.targetAtom.get('humanReadable') }}
           </div>
-          <div class="ch__right__topline__notitle" ng-if="!self.isDirectResponseFromRemote && !self.remoteNeed.get('humanReadable')" title="no title">
+          <div class="ch__right__topline__notitle" ng-if="!self.isDirectResponseFromRemote && !self.targetAtom.get('humanReadable')" title="no title">
             no title
           </div>
           <div class="ch__right__topline__notitle" ng-if="self.isDirectResponseFromRemote" title="Direct Response">
             Direct Response
           </div>
         </div>
-        <div class="ch__right__subtitle" ng-if="!self.remoteNeedFailedToLoad">
+        <div class="ch__right__subtitle" ng-if="!self.targetAtomFailedToLoad">
           <span class="ch__right__subtitle__type">
             <span class="ch__right__subtitle__type__persona"
               ng-if="self.remotePersonaName && !self.isGroupChatEnabled">
@@ -87,23 +87,23 @@ function genComponentConf() {
             {{ self.friendlyTimestamp }}
           </div>
         </div>
-        <div class="ch__right__topline" ng-if="self.remoteNeedFailedToLoad">
+        <div class="ch__right__topline" ng-if="self.targetAtomFailedToLoad">
           <div class="ch__right__topline__notitle">
-            Remote Need Loading failed
+            Remote Atom Loading failed
           </div>
         </div>
-        <div class="ch__right__subtitle" ng-if="self.remoteNeedFailedToLoad">
+        <div class="ch__right__subtitle" ng-if="self.targetAtomFailedToLoad">
           <span class="ch__right__subtitle__type">
             <span class="ch__right__subtitle__type__state">
-              Need might have been deleted, you might want to close this connection.
+              Atom might have been deleted, you might want to close this connection.
             </span>
           </span>
         </div>
       </div>
-      <div class="ch__icon" ng-if="self.connectionOrNeedsLoading">
+      <div class="ch__icon" ng-if="self.connectionOrAtomsLoading">
           <div class="ch__icon__skeleton"></div>
       </div>
-      <div class="ch__right" ng-if="self.connectionOrNeedsLoading">
+      <div class="ch__right" ng-if="self.connectionOrAtomsLoading">
         <div class="ch__right__topline">
           <div class="ch__right__topline__title"></div>
           <div class="ch__right__topline__date"></div>
@@ -120,14 +120,14 @@ function genComponentConf() {
       this.labels = labels;
       this.WON = won.WON;
       const selectFromState = state => {
-        const ownedNeed = getOwnedNeedByConnectionUri(
+        const ownedAtom = getOwnedAtomByConnectionUri(
           state,
           this.connectionUri
         );
         const connection =
-          ownedNeed && ownedNeed.getIn(["connections", this.connectionUri]);
-        const remoteNeed =
-          connection && get(getNeeds(state), connection.get("remoteNeedUri"));
+          ownedAtom && ownedAtom.getIn(["connections", this.connectionUri]);
+        const targetAtom =
+          connection && get(getAtoms(state), connection.get("targetAtomUri"));
         const allMessages = getMessagesByConnectionUri(
           state,
           this.connectionUri
@@ -156,30 +156,30 @@ function genComponentConf() {
         const latestMessageUnread =
           latestMessage && latestMessage.get("unread");
 
-        const groupMembers = remoteNeed && remoteNeed.get("groupMembers");
+        const groupMembers = targetAtom && targetAtom.get("groupMembers");
 
-        const remotePersonaUri = get(remoteNeed, "heldBy");
+        const remotePersonaUri = get(targetAtom, "heldBy");
         const remotePersona =
-          remotePersonaUri && getIn(state, ["needs", remotePersonaUri]);
+          remotePersonaUri && getIn(state, ["atoms", remotePersonaUri]);
         const remotePersonaName = get(remotePersona, "humanReadable");
 
         return {
           connection,
           groupMembersArray: groupMembers && groupMembers.toArray(),
           groupMembersSize: groupMembers ? groupMembers.size : 0,
-          ownedNeed,
-          remoteNeed,
+          ownedAtom,
+          targetAtom,
           remotePersonaName,
           isConnectionToGroup: isChatToGroup(
-            state.get("needs"),
-            get(ownedNeed, "uri"),
+            state.get("atoms"),
+            get(ownedAtom, "uri"),
             this.connectionUri
           ),
-          isDirectResponseFromRemote: needUtils.isDirectResponseNeed(
-            remoteNeed
+          isDirectResponseFromRemote: atomUtils.isDirectResponseAtom(
+            targetAtom
           ),
-          isGroupChatEnabled: needUtils.hasGroupFacet(remoteNeed),
-          isChatEnabled: needUtils.hasChatFacet(remoteNeed),
+          isGroupChatEnabled: atomUtils.hasGroupSocket(targetAtom),
+          isChatEnabled: atomUtils.hasChatSocket(targetAtom),
           latestMessageHumanReadableString,
           latestMessageUnread,
           unreadMessageCount:
@@ -187,33 +187,33 @@ function genComponentConf() {
               ? unreadMessages.size
               : undefined,
           friendlyTimestamp:
-            remoteNeed &&
+            targetAtom &&
             relativeTime(
               selectLastUpdateTime(state),
-              this.timestamp || remoteNeed.get("lastUpdateDate")
+              this.timestamp || targetAtom.get("lastUpdateDate")
             ),
-          remoteNeedFailedToLoad:
-            remoteNeed &&
+          targetAtomFailedToLoad:
+            targetAtom &&
             getIn(state, [
               "process",
-              "needs",
-              remoteNeed.get("uri"),
+              "atoms",
+              targetAtom.get("uri"),
               "failedToLoad",
             ]),
-          connectionOrNeedsLoading:
+          connectionOrAtomsLoading:
             !connection ||
-            !remoteNeed ||
-            !ownedNeed ||
+            !targetAtom ||
+            !ownedAtom ||
             getIn(state, [
               "process",
-              "needs",
-              ownedNeed.get("uri"),
+              "atoms",
+              ownedAtom.get("uri"),
               "loading",
             ]) ||
             getIn(state, [
               "process",
-              "needs",
-              remoteNeed.get("uri"),
+              "atoms",
+              targetAtom.get("uri"),
               "loading",
             ]) ||
             getIn(state, [
@@ -234,7 +234,7 @@ function genComponentConf() {
 
       classOnComponentRoot(
         "won-is-loading",
-        () => this.connectionOrNeedsLoading,
+        () => this.connectionOrAtomsLoading,
         this
       );
     }

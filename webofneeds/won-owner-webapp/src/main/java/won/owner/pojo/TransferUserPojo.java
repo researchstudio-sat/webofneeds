@@ -8,7 +8,6 @@ import org.hibernate.validator.constraints.NotEmpty;
 public class TransferUserPojo extends UserPojo {
     @NotEmpty
     private String privatePassword;
-
     @NotEmpty
     private String privateUsername;
 

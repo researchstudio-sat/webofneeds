@@ -17,17 +17,13 @@ public abstract class SolrQueryFactory {
     abstract protected String makeQueryString();
 
     public String createQuery() {
-
         String queryString = makeQueryString();
         if (queryString == null) {
             return null;
         }
-
         if (boost != 1.0) {
             return "(" + queryString + ")^" + boost;
         }
-
         return queryString;
     }
-
 }

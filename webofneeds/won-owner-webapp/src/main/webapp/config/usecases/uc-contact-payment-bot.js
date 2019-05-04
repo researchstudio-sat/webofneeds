@@ -8,7 +8,7 @@ export const contactPaymentBot = {
   label: "Contact Payment Bot",
   icon: "#ico36_uc_custom",
   doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
-  // TODO: check if this can work like whatsX -> one click for need creation, because nothing can be changed
+  // TODO: check if this can work like whatsX -> one click for atom creation, because nothing can be changed
   draft: {
     ...mergeInEmptyDraft({
       content: {

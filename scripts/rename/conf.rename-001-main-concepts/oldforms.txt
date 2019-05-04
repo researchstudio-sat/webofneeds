@@ -1,0 +1,47 @@
+# This file contains one expression per line that is replaced by the 
+# corresponding line in newforms.txt.
+# Before processing, all lines starting with '#' are stripped.
+http://purl.org/webofneeds/model
+http\\://purl.org/webofneeds/model
+http://purl.org/webofneeds/woncrypt
+http\\://purl.org/webofneeds/woncrypt
+http://purl.org/webofneeds
+http\\://purl.org/webofneeds
+# now change a number of concept names
+hasQuery
+hasReceiver
+hasReceiverNeed
+hasReceiverNode
+hasReceiverFacet
+forwardToReceiver
+receiverNode
+receiverURI
+receiverNeed
+receiverNode
+receiverFacet
+isInState
+hasConnectionState
+remoteNeed
+remoteConnection
+remoteFacet
+belongsToNeed
+Needs
+Need
+Facets
+Facet
+eventContainer
+# here we fix a few mistakes we are making
+atomClientAuth
+Web of Atoms
+Web Of Atoms
+Atom a Lift
+Atom a lift
+webofatoms
+a atom
+A Atom
+atomed
+atoming
+you atom
+we atom
+they atom
+!an message-container

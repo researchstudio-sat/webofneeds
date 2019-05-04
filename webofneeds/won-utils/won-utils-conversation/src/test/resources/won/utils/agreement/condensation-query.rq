@@ -1,8 +1,8 @@
-PREFIX mod: <http://purl.org/webofneeds/modification#>
-PREFIX agr: <http://purl.org/webofneeds/agreement#>
+PREFIX mod: <https://w3id.org/won/modification#>
+PREFIX agr: <https://w3id.org/won/agreement#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-PREFIX msg: <http://purl.org/webofneeds/message#>
-PREFIX won: <http://purl.org/webofneeds/model#>
+PREFIX msg: <https://w3id.org/won/message#>
+PREFIX won: <https://w3id.org/won/core#>
 
 DELETE
  {
@@ -16,18 +16,18 @@ WHERE
             ?p != agr:proposes 
             && ?p != agr:accepts
             && ?p != agr:proposesToCancel
-            && ?p != msg:hasPreviousMessage
-            && ?p != msg:hasCorrespondingRemoteMessage
-            && ?p != msg:hasContent
-            && ?p != msg:hasMessageType
-            && ?p != msg:hasSender
-            && ?p != msg:hasSenderNeed
-            && ?p != msg:hasReceiver
-            && ?p != msg:hasReceiverNeed
+            && ?p != msg:previousMessage
+            && ?p != msg:correspondingRemoteMessage
+            && ?p != msg:content
+            && ?p != msg:messageType
+            && ?p != msg:sender
+            && ?p != msg:senderAtom
+            && ?p != msg:recipient
+            && ?p != msg:recipientAtom
         )
     } filter not exists {
         GRAPH ?g2 {
-            ?clause msg:hasContent ?g .
+            ?clause msg:content ?g .
         }
         GRAPH ?g {
           ?s ?p ?o .

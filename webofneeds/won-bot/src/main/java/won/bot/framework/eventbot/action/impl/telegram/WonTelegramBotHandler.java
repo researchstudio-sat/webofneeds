@@ -25,25 +25,23 @@ public class WonTelegramBotHandler extends TelegramLongPollingBot implements ICo
     private String token;
     private String botName;
     private EventBus bus;
-
     private CommandRegistry commandRegistry;
-
     private TelegramMessageGenerator telegramMessageGenerator;
 
-    public WonTelegramBotHandler(EventBus bus, TelegramMessageGenerator telegramMessageGenerator, String botName, String token) {
+    public WonTelegramBotHandler(EventBus bus, TelegramMessageGenerator telegramMessageGenerator, String botName,
+                    String token) {
         this.bus = bus;
         this.token = token;
         this.botName = botName;
         this.telegramMessageGenerator = telegramMessageGenerator;
-
         this.commandRegistry = new CommandRegistry(true, botName);
-
-        BotCommand offerBotCommand = new OfferBotCommand("offer", "create a offer need", bus);
-        BotCommand demandBotCommand = new DemandBotCommand("demand", "create a demand need", bus);
-        BotCommand critiqueBotCommand = new CritiqueBotCommand("critique", "create a critique need", bus);
-        BotCommand togetherBotCommand = new TogetherBotCommand("together", "create a together need", bus);
+        BotCommand offerBotCommand = new OfferBotCommand("offer", "create a offer atom", bus);
+        BotCommand demandBotCommand = new DemandBotCommand("demand", "create a demand atom", bus);
+        BotCommand critiqueBotCommand = new CritiqueBotCommand("critique", "create a critique atom", bus);
+        BotCommand togetherBotCommand = new TogetherBotCommand("together", "create a together atom", bus);
         BotCommand helpBotCommand = new HelpBotCommand("help", "list help", bus);
-        commandRegistry.registerAll(helpBotCommand, offerBotCommand, demandBotCommand, critiqueBotCommand, togetherBotCommand);
+        commandRegistry.registerAll(helpBotCommand, offerBotCommand, demandBotCommand, critiqueBotCommand,
+                        togetherBotCommand);
     }
 
     @Override

@@ -1,14 +1,16 @@
 import angular from "angular";
+import Immutable from "immutable";
 import ngAnimate from "angular-animate";
 import compareToModule from "../../directives/compareTo.js";
 import accordionModule from "../accordion.js";
 import flexGridModule from "../flexgrid.js";
-import { attach, getIn, toAbsoluteURL } from "../../utils.js";
+import { attach, get, getIn, toAbsoluteURL } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
 import { ownerBaseUrl } from "config";
 import * as srefUtils from "../../sref-utils.js";
-import { getAboutSectionFromRoute } from "../../selectors/general-selectors.js";
+import * as generalSelectors from "../../selectors/general-selectors.js";
 import * as viewSelectors from "../../selectors/view-selectors.js";
+import * as accountUtils from "../../account-utils.js";
 
 import "style/_about.scss";
 
@@ -21,9 +23,9 @@ const serviceDependencies = [
 const howItWorksSteps = [
   {
     svgSrc: "#ico36_description",
-    title: "Post your need anonymously",
+    title: "Post your atom anonymously",
     text:
-      "Needs can be very personal, so privacy is important. You don't have to reveal your identity here.",
+      "Atoms can be very personal, so privacy is important. You don't have to reveal your identity here.",
   },
   {
     svgSrc: "#ico36_match",
@@ -78,7 +80,7 @@ const questions = [
   {
     title: "What about my privacy?",
     detail:
-      "All the data you provide in a need description is" +
+      "All the data you provide in an atom description is" +
       " public and unencrypted. All the messages in a conversation are unencrypted but only visible to us (operating" +
       " the" +
       " servers) and to you and your conversation partner.",
@@ -87,7 +89,7 @@ const questions = [
     title: "Will the people I talk to see my identity?",
     detail:
       "If everything" +
-      " works as intended, no. Each need has its own cryptographic identity. They will know that the person who" +
+      " works as intended, no. Each atom has its own cryptographic identity. They will know that the person who" +
       " wrote the posting is the one sending them messages. As long as you do not provide any" +
       " information that identifies you, others will not easily find out who you really are. But please do not think" +
       " that you are fully anonymous here. Even if you are behind a proxy or an anonymization network, there might be" +
@@ -158,12 +160,12 @@ const questions = [
       " counterpart's WoN node and your counterpart's Owner Application. Each one of" +
       " these communication channels are secured with TLS, so the data is encrypted as it is transmitted. Once your" +
       " messages reach your Owner Application, they are signed using asymmetric cryptography so your counterpart can " +
-      "verify that the message was written by the same person who created the need in the first place. As messages are" +
+      "verify that the message was written by the same person who created the atom in the first place. As messages are" +
       " forwarded to the next processing node, signatures are added by " +
       "the receiving node. Messages sent later contain the signatures of earlier messages, so it becomes impossible " +
       "to change the content of messages or pretend they were never sent or received." +
-      " The Owner Application creates a new key pair for every need you" +
-      " create, so others should not be able to find out which needs are yours and which needs are from other" +
+      " The Owner Application creates a new key pair for every atom you" +
+      " create, so others should not be able to find out which atoms are yours and which atoms are from other" +
       " people. Note that this system has not had an independent security audit. If you are interested in" +
       " assessing the security of our approach, or if you have feedback for us, please contact us.",
   },
@@ -195,9 +197,11 @@ class AboutController {
     window.ab4dbg = this;
 
     const select = state => {
-      const visibleSection = getAboutSectionFromRoute(state);
+      const visibleSection = generalSelectors.getAboutSectionFromRoute(state);
       const themeName = getIn(state, ["config", "theme", "name"]);
       return {
+        isLocationAccessDenied: generalSelectors.isLocationAccessDenied(state),
+        loggedIn: accountUtils.isLoggedIn(get(state, "account")),
         themeName,
         visibleSection,
         appTitle: getIn(state, ["config", "theme", "title"]),
@@ -243,24 +247,62 @@ class AboutController {
     });
   }
 
-  createWhatsAround() {
-    if (!this.processingPublish) {
-      this.needs__whatsAround();
-    }
-  }
-
-  createWhatsNew() {
-    if (!this.processingPublish) {
-      this.needs__whatsNew();
-    }
-  }
-
   toggleMoreInfo() {
     this.moreInfo = !this.moreInfo;
   }
 
   getSvgIconFromItem(item) {
     return item.svgSrc ? item.svgSrc : "#ico36_uc_question";
+  }
+
+  viewWhatsAround() {
+    this.viewWhatsX(() => {
+      this.router__stateGo("map");
+    });
+  }
+
+  viewWhatsNew() {
+    this.viewWhatsX(() => {
+      this.router__stateGo("overview");
+    });
+  }
+
+  viewWhatsX(callback) {
+    if (this.isLocationAccessDenied) {
+      callback();
+    } else if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        currentLocation => {
+          const lat = currentLocation.coords.latitude;
+          const lng = currentLocation.coords.longitude;
+
+          this.view__updateCurrentLocation(
+            Immutable.fromJS({ location: { lat, lng } })
+          );
+          callback();
+        },
+        error => {
+          //error handler
+          console.error(
+            "Could not retrieve geolocation due to error: ",
+            error.code,
+            ", continuing map initialization without currentLocation. fullerror:",
+            error
+          );
+          this.view__locationAccessDenied();
+          callback();
+        },
+        {
+          //options
+          enableHighAccuracy: true,
+          maximumAge: 30 * 60 * 1000, //use if cache is not older than 30min
+        }
+      );
+    } else {
+      console.error("location could not be retrieved");
+      this.view__locationAccessDenied();
+      callback();
+    }
   }
 }
 

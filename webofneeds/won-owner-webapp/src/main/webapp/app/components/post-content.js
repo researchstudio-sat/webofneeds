@@ -8,20 +8,25 @@ import postIsOrSeeksInfoModule from "./post-is-or-seeks-info.js";
 import labelledHrModule from "./labelled-hr.js";
 import postContentGeneral from "./post-content-general.js";
 import postContentPersona from "./post-content-persona.js";
+import postContentParticipants from "./post-content-participants.js";
 import postHeaderModule from "./post-header.js";
 import trigModule from "./trig.js";
 import { attach, getIn, get } from "../utils.js";
 import won from "../won-es6.js";
 import { connect2Redux } from "../won-utils.js";
-import * as needUtils from "../need-utils.js";
+import * as atomUtils from "../atom-utils.js";
 import * as viewUtils from "../view-utils.js";
 import * as processUtils from "../process-utils.js";
 import * as connectionSelectors from "../selectors/connection-selectors.js";
-import { getConnectionUriFromRoute } from "../selectors/general-selectors.js";
+import {
+  getOwnedPersonas,
+  getConnectionUriFromRoute,
+  isAtomOwned,
+} from "../selectors/general-selectors.js";
 import { actionCreators } from "../actions/actions.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
 import ngAnimate from "angular-animate";
-import { Elm } from "../../elm/EditNeed.elm";
+import { Elm } from "../../elm/AddPersona.elm";
 
 import "style/_post-content.scss";
 import "style/_rdflink.scss";
@@ -51,90 +56,35 @@ function genComponentConf() {
               <use xlink:href="#ico16_indicator_error" href="#ico16_indicator_error"></use>
           </svg>
           <span class="post-failedtoload__label">
-              Failed To Load - Need might have been deleted
+              Failed To Load - Atom might have been deleted
           </span>
           <div class="post-failedtoload__actions">
             <button class="post-failedtoload__actions__button red won-button--outlined thin"
                 ng-click="self.tryReload()">
                 Try Reload
             </button>
-        </div>
+          </div>
         </div>
         <div class="post-content" ng-if="!self.postLoading && !self.postFailedToLoad">
+          <div class="post-content__updateindicator" ng-if="self.postProcessingUpdate">
+            <svg class="hspinner post-content__updateindicator__spinner">
+              <use xlink:href="#ico_loading_anim" href="#ico_loading_anim"></use>
+            </svg>
+            <span class="post-content__updateindicator__label">Processing changes...</span>
+          </div>
           <!-- GENERAL INFORMATION -->
           <won-post-content-general ng-if="self.isSelectedTab('DETAIL')" post-uri="self.postUri"></won-post-content-general>
           <!-- DETAIL INFORMATION -->
           <won-post-is-or-seeks-info branch="::'content'" ng-if="self.isSelectedTab('DETAIL') && self.hasContent" post-uri="self.postUri"></won-post-is-or-seeks-info>
           <won-labelled-hr label="::'Search'" class="cp__labelledhr" ng-show="self.isSelectedTab('DETAIL') && self.hasContent && self.hasSeeksBranch"></won-labelled-hr>
           <won-post-is-or-seeks-info branch="::'seeks'" ng-if="self.isSelectedTab('DETAIL') && self.hasSeeksBranch" post-uri="self.postUri"></won-post-is-or-seeks-info>
-          <won-elm module="self.editNeedModule" ng-if="self.isOwned && self.isSelectedTab('DETAIL') && !self.post.get('heldBy')" attributes="self.post.get('uri')"></won-elm>
 
           <!-- PERSONA INFORMATION -->
-          <won-post-content-persona ng-if="self.isSelectedTab('HELDBY')" holds-uri="self.postUri"></won-post-content-persona>
+          <won-post-content-persona ng-if="self.isSelectedTab('HELDBY') && self.post.get('heldBy')" holds-uri="self.postUri"></won-post-content-persona>
+          <won-elm module="self.addPersonaModule" ng-if="self.isSelectedTab('HELDBY') && self.isOwned && self.hasHoldableSocket && !self.post.get('heldBy')" props="{post: self.post.toJS(), personas: self.personas.toJS()}"></won-elm>
           
           <!-- PARTICIPANT INFORMATION -->
-          <div class="post-content__members" ng-if="self.isSelectedTab('PARTICIPANTS')">
-            <div
-                class="post-content__members__member"
-                ng-if="!self.isOwned && self.hasGroupMembers"
-                ng-repeat="memberUri in self.groupMembersArray track by memberUri">
-                <div class="post-content__members__member__indicator"></div>
-                <won-post-header
-                  class="clickable"
-                  ng-click="self.router__stateGoCurrent({viewNeedUri: memberUri, viewConnUri: undefined})"
-                  need-uri="::memberUri">
-                </won-post-header>
-                <div class="post-content__members__member__actions"></div>
-            </div>
-            <div class="post-content__members__member"
-                ng-if="self.isOwned && self.hasGroupChatConnections && conn.get('state') !== self.won.WON.Closed"
-                ng-repeat="conn in self.groupChatConnectionsArray"
-                in-view="conn.get('unread') && $inview && self.markAsRead(conn)"
-                ng-class="{'won-unread': conn.get('unread')}">
-                <div class="post-content__members__member__indicator"></div>
-                <won-post-header
-                  class="clickable"
-                  ng-click="self.router__stateGoCurrent({viewNeedUri: conn.get('remoteNeedUri'), viewConnUri: undefined})"
-                  need-uri="::conn.get('remoteNeedUri')">
-                </won-post-header>
-                <div class="post-content__members__member__actions">
-                    <div
-                      class="post-content__members__member__actions__button red won-button--outlined thin"
-                      ng-click="self.openRequest(conn)"
-                      ng-if="conn.get('state') === self.won.WON.RequestReceived">
-                        Accept
-                    </div>
-                    <div
-                      class="post-content__members__member__actions__button red won-button--outlined thin"
-                      ng-click="self.closeConnection(conn)"
-                      ng-if="conn.get('state') === self.won.WON.RequestReceived">
-                        Reject
-                    </div>
-                    <div
-                      class="post-content__members__member__actions__button red won-button--outlined thin"
-                      ng-click="self.sendRequest(conn)"
-                      ng-if="conn.get('state') === self.won.WON.Suggested">
-                        Request
-                    </div>
-                    <div
-                      class="post-content__members__member__actions__button red won-button--outlined thin"
-                      ng-disabled="true"
-                      ng-if="conn.get('state') === self.won.WON.RequestSent">
-                        Waiting for Accept...
-                    </div>
-                    <div
-                      class="post-content__members__member__actions__button red won-button--outlined thin"
-                      ng-click="self.closeConnection(conn)"
-                      ng-if="conn.get('state') === self.won.WON.Suggested || conn.get('state') === self.won.WON.Connected">
-                        Remove
-                    </div>
-                </div>
-            </div>
-            <div class="post-content__members__empty"
-                ng-if="(!self.isOwned && !self.hasGroupMembers) || (self.isOwned && !self.hasGroupChatConnections)">
-                No Groupmembers present.
-            </div>
-          </div>
+          <won-post-content-participants ng-if="self.isSelectedTab('PARTICIPANTS')" post-uri="self.postUri"></won-post-content-participants>
 
           <!-- REVIEW INFORMATION -->
           <div class="post-content__reviews" ng-if="self.isSelectedTab('REVIEWS')">
@@ -155,7 +105,7 @@ function genComponentConf() {
                 <won-post-header
                   class="clickable"
                   ng-click="self.viewSuggestion(conn)"
-                  need-uri="::conn.get('remoteNeedUri')">
+                  atom-uri="::conn.get('targetAtomUri')">
                 </won-post-header>
                 <div class="post-content__suggestions__suggestion__actions">
                     <div
@@ -172,25 +122,26 @@ function genComponentConf() {
             </div>
             <div class="post-content__suggestions__empty"
                 ng-if="!self.hasSuggestions">
-                No Suggestions for this Need.
+                No Suggestions for this Atom.
             </div>
           </div>
 
-          <!-- OTHER NEEDS -->
+          <!-- OTHER ATOMS -->
           <div class="post-content__members" ng-if="self.isSelectedTab('HOLDS')">
             <div
               class="post-content__members__member"
               ng-if="self.hasHeldPosts"
               ng-repeat="heldPostUri in self.heldPostsArray track by heldPostUri">
+              <div class="post-content__members__member__indicator"></div>
               <won-post-header
                 class="clickable"
-                ng-click="self.router__stateGoCurrent({viewNeedUri: heldPostUri, viewConnUri: undefined})"
-                need-uri="::heldPostUri">
+                ng-click="self.router__stateGoCurrent({viewAtomUri: heldPostUri, viewConnUri: undefined})"
+                atom-uri="::heldPostUri">
               </won-post-header>
             </div>
             <div class="post-content__members__empty"
                 ng-if="!self.hasHeldPosts">
-                This Persona does not have any Needs.
+                This Persona does not have any Atoms.
             </div>
           </div>
           <!-- RDF REPRESENTATION -->
@@ -226,13 +177,13 @@ function genComponentConf() {
       this.won = won;
       window.postcontent4dbg = this;
 
-      this.editNeedModule = Elm.EditNeed;
+      this.addPersonaModule = Elm.AddPersona;
 
       const selectFromState = state => {
         const openConnectionUri = getConnectionUriFromRoute(state);
-        const post = getIn(state, ["needs", this.postUri]);
-        const isPersona = needUtils.isPersona(post);
-        const isOwned = needUtils.isOwned(post);
+        const post = getIn(state, ["atoms", this.postUri]);
+        const isPersona = atomUtils.isPersona(post);
+        const isOwned = isAtomOwned(state, this.postUri);
         const content = get(post, "content");
 
         //TODO it will be possible to have more than one seeks
@@ -241,27 +192,12 @@ function genComponentConf() {
         const hasContent = this.hasVisibleDetails(content);
         const hasSeeksBranch = this.hasVisibleDetails(seeks);
 
-        const hasGroupFacet = needUtils.hasGroupFacet(post);
-
-        const groupMembers = hasGroupFacet && get(post, "groupMembers");
-        const groupChatConnections =
-          isOwned &&
-          hasGroupFacet &&
-          connectionSelectors.getGroupChatConnectionsByNeedUri(
-            state,
-            this.postUri
-          );
-
         const heldPosts = isPersona && get(post, "holds");
 
-        const suggestions = connectionSelectors.getSuggestedConnectionsByNeedUri(
+        const suggestions = connectionSelectors.getSuggestedConnectionsByAtomUri(
           state,
           this.postUri
         );
-
-        const isOwnedNeedWhatsX =
-          isOwned &&
-          (needUtils.isWhatsAroundNeed(post) || needUtils.isWhatsNewNeed(post));
 
         const viewState = get(state, "view");
         const process = get(state, "process");
@@ -270,30 +206,26 @@ function genComponentConf() {
           hasContent,
           hasSeeksBranch,
           post,
-          isOwnedNeedWhatsX,
           isPersona,
           isOwned,
           hasHeldPosts: isPersona && heldPosts && heldPosts.size > 0,
           heldPostsArray: isPersona && heldPosts && heldPosts.toArray(),
-          hasGroupFacet,
-          hasChatFacet: needUtils.hasChatFacet(post),
-          hasGroupMembers: groupMembers && groupMembers.size > 0,
-          hasGroupChatConnections:
-            groupChatConnections && groupChatConnections.size > 0,
-          groupChatConnectionsArray:
-            groupChatConnections && groupChatConnections.toArray(),
-          groupMembersArray: groupMembers && groupMembers.toArray(),
+          hasChatSocket: atomUtils.hasChatSocket(post),
+          hasHoldableSocket: atomUtils.hasHoldableSocket(post),
           hasSuggestions: isOwned && suggestions && suggestions.size > 0,
           suggestionsArray: isOwned && suggestions && suggestions.toArray(),
           postLoading:
-            !post || processUtils.isNeedLoading(process, this.postUri),
+            !post || processUtils.isAtomLoading(process, this.postUri),
           postFailedToLoad:
-            post && processUtils.hasNeedFailedToLoad(process, this.postUri),
+            post && processUtils.hasAtomFailedToLoad(process, this.postUri),
+          postProcessingUpdate:
+            post && processUtils.isAtomProcessingUpdate(process, this.postUri),
           createdTimestamp: post && post.get("creationDate"),
           shouldShowRdf: viewUtils.showRdf(viewState),
           fromConnection: !!openConnectionUri,
           openConnectionUri,
-          visibleTab: viewUtils.getVisibleTabByNeedUri(viewState, this.postUri),
+          visibleTab: viewUtils.getVisibleTabByAtomUri(viewState, this.postUri),
+          personas: getOwnedPersonas(state),
         };
       };
       connect2Redux(selectFromState, actionCreators, ["self.postUri"], this);
@@ -303,7 +235,7 @@ function genComponentConf() {
 
     tryReload() {
       if (this.postUri && this.postFailedToLoad) {
-        this.needs__fetchUnloadedNeed(this.postUri);
+        this.atoms__fetchUnloadedAtom(this.postUri);
       }
     }
 
@@ -321,28 +253,11 @@ function genComponentConf() {
       if (conn.get("unread")) {
         this.connections__markAsRead({
           connectionUri: connUri,
-          needUri: this.postUri,
+          atomUri: this.postUri,
         });
       }
 
       this.connections__close(connUri);
-    }
-
-    openRequest(conn, message = "") {
-      if (!conn || this.isOwnedNeedWhatsX) {
-        return;
-      }
-
-      const connUri = get(conn, "uri");
-
-      if (conn.get("unread")) {
-        this.connections__markAsRead({
-          connectionUri: connUri,
-          needUri: this.postUri,
-        });
-      }
-
-      this.connections__open(connUri, message);
     }
 
     sendRequest(conn, message = "") {
@@ -351,38 +266,21 @@ function genComponentConf() {
       }
 
       const connUri = get(conn, "uri");
-      const remoteNeedUri = get(conn, "remoteNeedUri");
+      const targetAtomUri = get(conn, "targetAtomUri");
 
       if (conn.get("unread")) {
         this.connections__markAsRead({
           connectionUri: connUri,
-          needUri: this.postUri,
+          atomUri: this.postUri,
         });
       }
 
-      if (this.isOwnedNeedWhatsX) {
-        this.connections__close(connUri);
-
-        if (remoteNeedUri) {
-          this.connections__connectAdHoc(remoteNeedUri, message);
-        }
-        //this.router__back();
-      } else {
-        this.connections__rate(connUri, won.WON.binaryRatingGood);
-        this.needs__connect(this.postUri, connUri, remoteNeedUri, message);
-      }
+      this.connections__rate(connUri, won.WON.binaryRatingGood);
+      this.atoms__connect(this.postUri, connUri, targetAtomUri, message);
     }
 
     addPersona(persona) {
       this.personas__connect(this.postUri, persona);
-    }
-
-    canAttachPersona() {
-      return this.post.get("isOwned") && !this.post.get("heldBy");
-    }
-
-    toggleShowGeneral() {
-      this.needs__toggleGeneralInfo(this.postUri);
     }
 
     isSelectedTab(tabName) {
@@ -393,7 +291,7 @@ function genComponentConf() {
       if (conn && conn.get("unread")) {
         const payload = {
           connectionUri: conn.get("uri"),
-          needUri: this.postUri,
+          atomUri: this.postUri,
         };
 
         const tmp_connections__markAsRead = this.connections__markAsRead;
@@ -414,13 +312,13 @@ function genComponentConf() {
       if (conn.get("unread")) {
         this.connections__markAsRead({
           connectionUri: connUri,
-          needUri: this.postUri,
+          atomUri: this.postUri,
         });
       }
 
       this.router__stateGoCurrent({
         viewConnUri: connUri,
-        viewNeedUri: undefined,
+        viewAtomUri: undefined,
       });
     }
 
@@ -433,8 +331,8 @@ function genComponentConf() {
         contentBranchImm.find(
           (detailValue, detailKey) =>
             detailKey != "type" &&
-            detailKey != "facets" &&
-            detailKey != "defaultFacet"
+            detailKey != "sockets" &&
+            detailKey != "defaultSocket"
         )
       );
     }
@@ -460,6 +358,7 @@ export default angular
     labelledHrModule,
     postContentGeneral,
     postContentPersona,
+    postContentParticipants,
     postHeaderModule,
     trigModule,
     inviewModule.name,

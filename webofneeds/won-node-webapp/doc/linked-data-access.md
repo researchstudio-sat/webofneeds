@@ -4,12 +4,12 @@ See also [genral description](../../won-core/doc/access-control.md) of Linked Da
 
 ### Public resources
 
-By default Node, Need, Connection and container resources are public in WoN - can be accessed by anyone.
+By default Node, Atom, Connection and container resources are public in WoN - can be accessed by anyone.
 
 ### Resources with restricted access
 
 By default Event resources can only be accessed by the party that has identity of one of the participants of this 
-event: receiver need, receiver node, sender need or sender node. WebID-TLS is used to verify the identity. The 
+event: receiver atom, receiver node, sender atom or sender node. WebID-TLS is used to verify the identity. The 
 node web application configuration in web.xml points to the 
 [configuration](../src/main/resources/spring/node-context.xml) that specifies the WebID filter and access control rules 
 to use. 
@@ -17,7 +17,7 @@ to use.
 ##### Debugging resources with restricted access
 For development process it can be useful to be able to access Event resources from the browser, but since these 
 resources have restricted access, one cannot see them without proving the rightful identity. For debugging purpose, 
-a developer can use separate client node keystore for generating needs and events, import the identity of the node 
+a developer can use separate client node keystore for generating atoms and events, import the identity of the node 
 from that keystore into his computer's certificate manager, and provide that certificate when browsing the 
 resources on that node - when browser asks for an identity. Here are the steps how it can be done when using Windows 
 and Chrome:

@@ -4,11 +4,8 @@ import { actionCreators } from "../../../actions/actions.js";
 import postHeaderModule from "../../post-header.js";
 import { attach, getIn, get } from "../../../utils.js";
 import { connect2Redux } from "../../../won-utils.js";
-import * as needUtils from "../../../need-utils.js";
-import {
-  getConnectionUriFromRoute,
-  getOwnedNeedByConnectionUri,
-} from "../../../selectors/general-selectors.js";
+import * as atomUtils from "../../../atom-utils.js";
+import * as generalSelectors from "../../../selectors/general-selectors.js";
 
 import "style/_suggestpost-viewer.scss";
 
@@ -25,8 +22,8 @@ function genComponentConf() {
           <div class="suggestpostv__content__post">
             <won-post-header
                 class="clickable"
-                need-uri="self.content"
-                ng-click="self.router__stateGoCurrent({viewNeedUri: self.content, viewConnUri: undefined})"
+                atom-uri="self.content"
+                ng-click="self.router__stateGoCurrent({viewAtomUri: self.content, viewConnUri: undefined})"
                 ng-disabled="!self.fetchedSuggestion">
             </won-post-header>
             <button class="suggestpostv__content__post__action won-button--outlined thin red"
@@ -62,16 +59,21 @@ function genComponentConf() {
       window.suggestpostv4dbg = this;
 
       const selectFromState = state => {
-        const openedConnectionUri = getConnectionUriFromRoute(state);
+        const openedConnectionUri = generalSelectors.getConnectionUriFromRoute(
+          state
+        );
         const openedOwnPost =
           openedConnectionUri &&
-          getOwnedNeedByConnectionUri(state, openedConnectionUri);
+          generalSelectors.getOwnedAtomByConnectionUri(
+            state,
+            openedConnectionUri
+          );
         const connection = getIn(openedOwnPost, [
           "connections",
           openedConnectionUri,
         ]);
 
-        const suggestedPost = getIn(state, ["needs", this.content]);
+        const suggestedPost = getIn(state, ["atoms", this.content]);
         const suggestedPostUri = get(suggestedPost, "uri");
 
         const connectionsOfOpenedOwnPost = get(openedOwnPost, "connections");
@@ -79,7 +81,7 @@ function genComponentConf() {
           suggestedPostUri &&
           connectionsOfOpenedOwnPost &&
           connectionsOfOpenedOwnPost.filter(
-            conn => conn.get("remoteNeedUri") === suggestedPostUri
+            conn => conn.get("targetAtomUri") === suggestedPostUri
           );
 
         const hasConnectionBetweenPosts =
@@ -87,47 +89,52 @@ function genComponentConf() {
 
         const isLoading = state.getIn([
           "process",
-          "needs",
+          "atoms",
           this.content,
           "loading",
         ]);
         const toLoad = state.getIn([
           "process",
-          "needs",
+          "atoms",
           this.content,
           "toLoad",
         ]);
         const failedToLoad = state.getIn([
           "process",
-          "needs",
+          "atoms",
           this.content,
           "failedToLoad",
         ]);
 
         const fetchedSuggestion = !isLoading && !toLoad && !failedToLoad;
+        const isSuggestedOwned = generalSelectors.isAtomOwned(
+          state,
+          suggestedPostUri
+        );
 
         return {
           suggestedPost,
           openedOwnPost,
-          hasChatFacet: needUtils.hasChatFacet(suggestedPost),
-          hasGroupFacet: needUtils.hasGroupFacet(suggestedPost),
+          hasChatSocket: atomUtils.hasChatSocket(suggestedPost),
+          hasGroupSocket: atomUtils.hasGroupSocket(suggestedPost),
+          isSuggestedOwned,
           showConnectAction:
             suggestedPost &&
             fetchedSuggestion &&
-            needUtils.isActive(suggestedPost) &&
-            !needUtils.hasGroupFacet(suggestedPost) &&
-            needUtils.hasChatFacet(suggestedPost) &&
+            atomUtils.isActive(suggestedPost) &&
+            !atomUtils.hasGroupSocket(suggestedPost) &&
+            atomUtils.hasChatSocket(suggestedPost) &&
             !hasConnectionBetweenPosts &&
-            !needUtils.isOwned(suggestedPost) &&
+            !isSuggestedOwned &&
             openedOwnPost,
           showJoinAction:
             suggestedPost &&
             fetchedSuggestion &&
-            needUtils.isActive(suggestedPost) &&
-            needUtils.hasGroupFacet(suggestedPost) &&
-            !needUtils.hasChatFacet(suggestedPost) &&
+            atomUtils.isActive(suggestedPost) &&
+            atomUtils.hasGroupSocket(suggestedPost) &&
+            !atomUtils.hasChatSocket(suggestedPost) &&
             !hasConnectionBetweenPosts &&
-            !needUtils.isOwned(suggestedPost) &&
+            !isSuggestedOwned &&
             openedOwnPost,
           isLoading,
           toLoad,
@@ -161,21 +168,21 @@ function genComponentConf() {
         return "Suggestion marked toLoad";
       } else if (this.failedToLoad) {
         return "Failed to load Suggestion";
-      } else if (needUtils.isInactive(this.suggestedPost)) {
+      } else if (atomUtils.isInactive(this.suggestedPost)) {
         return "This Suggestion is inactive";
       }
 
-      if (needUtils.isPersona(this.suggestedPost)) {
-        return needUtils.isOwned(this.suggestedPost)
+      if (atomUtils.isPersona(this.suggestedPost)) {
+        return this.isSuggestedOwned
           ? "This is one of your Personas"
           : "This is someone elses Persona";
       } else if (this.hasConnectionBetweenPosts) {
         return "Already established a Connection with this Suggestion";
-      } else if (needUtils.isOwned(this.suggestedPost)) {
-        return "This is one of your own Needs";
-      } else if (this.hasChatFacet && !this.hasGroupFacet) {
-        return "Click 'Connect' to connect with this Need";
-      } else if (!this.hasChatFacet && this.hasGroupFacet) {
+      } else if (this.isSuggestedOwned) {
+        return "This is one of your own Atoms";
+      } else if (this.hasChatSocket && !this.hasGroupSocket) {
+        return "Click 'Connect' to connect with this Atom";
+      } else if (!this.hasChatSocket && this.hasGroupSocket) {
         return "Click 'Join' to connect with this Group";
       }
 
@@ -189,7 +196,7 @@ function genComponentConf() {
         this.suggestedPost && this.suggestedPost.get("uri");
 
       if (openedOwnPostUri && suggestedPostUri) {
-        this.needs__connect(
+        this.atoms__connect(
           this.openedOwnPost.get("uri"),
           undefined,
           this.suggestedPost.get("uri"),
@@ -204,7 +211,7 @@ function genComponentConf() {
 
     reloadSuggestion() {
       if (this.content && this.failedToLoad) {
-        this.needs__fetchUnloadedNeed(this.content);
+        this.atoms__fetchUnloadedAtom(this.content);
       }
     }
   }

@@ -1,0 +1,37 @@
+<won-modal-dialog ng-if="self.showModalDialog"></won-modal-dialog>
+<div class="won-modal-atomview" ng-if="self.showAtomOverlay">
+    <won-post-info include-header="true" atom-uri="self.viewAtomUri"></won-post-info>
+</div>
+<div class="won-modal-connectionview" ng-if="self.showConnectionOverlay">
+    <won-post-messages connection-uri="self.viewConnUri"></won-post-messages>
+</div>
+<header>
+    <won-topnav></won-topnav>
+</header>
+<won-toasts></won-toasts>
+<won-slide-in ng-if="self.showSlideIns"></won-slide-in>
+<main class="owneroverview">
+    <div class="owneroverview__header">
+        <div class="owneroverview__header__title">
+            What's new? <span class="owneroverview__header__title__count" ng-if="!self.isOwnerAtomUrisLoading && self.hasVisibleAtomUris">({{ self.sortedVisibleAtomUriSize }})</span>
+        </div>
+        <div class="owneroverview__header__updated">
+            <div class="owneroverview__header__updated__time hide-in-responsive" ng-if="!self.isOwnerAtomUrisLoading">
+                Updated: {{ self.friendlyLastAtomUrisUpdateTimestamp }}
+            </div>
+            <div class="owneroverview__header__updated__loading hide-in-responsive" ng-if="self.isOwnerAtomUrisLoading">
+                Loading...
+            </div>
+            <div class="owneroverview__header__updated__reload won-button--filled red" ng-click="self.reload()" ng-disabled="self.isOwnerAtomUrisLoading">
+                Reload
+            </div>
+        </div>
+    </div>
+    <div class="owneroverview__content" ng-if="self.hasVisibleAtomUris">
+        <won-atom-card class="owneroverview__content__atom" atom-uri="atomUri" current-location="self.currentLocation" ng-repeat="atomUri in self.sortedVisibleAtomUriArray track by atomUri"></won-atom-card>
+    </div>
+    <div class="owneroverview__noresults" ng-if="!self.hasVisibleAtomUris">
+        <span class="owneroverview__noresults__label">Nothing new found.</span>
+    </div>
+</main>
+<won-footer></won-footer>

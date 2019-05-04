@@ -1,0 +1,48 @@
+@prefix :    <http://www.example.com/resource/atom/temp> .
+@prefix dc:  <http://purl.org/dc/elements/1.1/> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix geo:     <http://www.w3.org/2003/01/geo/wgs84_pos#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix won:     <https://w3id.org/won/core#> .
+@prefix gr:  <http://purl.org/goodrelations/v1#> .
+@prefix ldp:     <http://www.w3.org/ns/ldp#> .
+@prefix sp:  <http://spinrdf.org/sp#>.
+@prefix acco: <http://purl.org/acco/ns#>.
+@prefix tio:        <http://purl.org/tio/ns#> .
+@prefix sig:     <http://www.example.com/signature#> .
+
+# owner-specified content (permanent):
+  _:wonatom won:Atom ;
+              won:hasBasicAtomType
+                  won:Supply ;
+              won:content
+                  [ a   won:AtomContent ;
+                    won:contentDescription
+                    [ a tio:Taxi, gr:SomeItems ;
+                          gr:name "Fastest taxi in town"@en ;
+                          gr:description "Wherever you want to go, we'll take you there"@en ;
+                          # Link to the hotel and its features
+                          # tio:operatedBy foo:myCompany; #TODO: how do we want to link to other entities (maybe shared by a number of atoms, like the company here)
+                          # tio:operatedBy foo:myDriver;
+                          # Price of taxi is actually not that simple to define..
+                    ]
+                  ] ;
+        # owner-specified content (transient):
+            won:atomModality
+              [ a   won:AtomModality
+                 won:locationSpecification  [
+                 a geo:Point ;
+                 geo:latitude   "48.2187304" ;
+                 geo:longitude  "16.3602146"
+                 ]
+              ] .
+        }
+
+
+# signature of the whole data above:
+_:sig sig:signature [
+      rdf:type sig:WonSignature ;
+      sig:signer <http://example.com/webid#key-5> ;
+      sig:signatureValue
+"OGQzNGVkMzVmMmQ3ODIyOWM32MzQzNmExMgoYzI4ZDY3NjI4NTIyZTk=" . ] .

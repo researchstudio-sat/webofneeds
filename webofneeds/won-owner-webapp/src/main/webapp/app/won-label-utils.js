@@ -3,14 +3,12 @@ import { deepFreeze, isValidNumber } from "./utils.js";
 
 export const labels = deepFreeze({
   type: {
-    [won.WON.BasicNeedTypeDemandCompacted]: "Search", //'I want something',
-    [won.WON.BasicNeedTypeSupplyCompacted]: "Post", //'I offer something',
-    [won.WON.BasicNeedTypeDotogetherCompacted]: "Post + Search", //'I want to do something together',
+    [won.WON.BasicAtomTypeDemandCompacted]: "Search", //'I want something',
+    [won.WON.BasicAtomTypeSupplyCompacted]: "Post", //'I offer something',
+    [won.WON.BasicAtomTypeDotogetherCompacted]: "Post + Search", //'I want to do something together',
     //TODO: Find right declaration
-    [won.WON.BasicNeedTypeCombinedCompacted]: "Post + Search", //'I want to post and search',
-    [won.WON.BasicNeedTypeCritiqueCompacted]: "Post", //'I want to change something',
-    [won.WON.BasicNeedTypeWhatsAroundCompacted]: "What's Around",
-    [won.WON.BasicNeedTypeWhatsNewCompacted]: "What's New",
+    [won.WON.BasicAtomTypeCombinedCompacted]: "Post + Search", //'I want to post and search',
+    [won.WON.BasicAtomTypeCritiqueCompacted]: "Post", //'I want to change something',
   },
   connectionState: {
     [won.WON.Suggested]: "Conversation suggested.",
@@ -28,17 +26,16 @@ export const labels = deepFreeze({
     [won.WONMSG.hintFeedbackMessage]: "Hint Feedback Message",
   },
   flags: {
-    [won.WON.BasicNeedTypeWhatsAroundCompacted]: "What's Around",
-    [won.WON.BasicNeedTypeWhatsNewCompacted]: "What's New",
-    [won.WON.NoHintForCounterpartCompacted]: "No Hint For Others",
-    [won.WON.NoHintForMeCompacted]: "No Hint For Me",
+    [won.WON.NoHintForCounterpartCompacted]: "Invisible",
+    [won.WON.NoHintForMeCompacted]: "Silent",
     [won.WON.UsedForTestingCompacted]: "Used For Testing",
   },
-  facets: {
-    [won.WON.GroupFacetCompacted]: "Group Chat enabled",
-    [won.WON.ChatFacetCompacted]: "Chat enabled",
-    [won.WON.HoldableFacetCompacted]: "Holdable",
-    [won.WON.HolderFacetCompacted]: "Holder",
+  sockets: {
+    [won.GROUP.GroupSocketCompacted]: "Group Chat enabled",
+    [won.CHAT.ChatSocketCompacted]: "Chat enabled",
+    [won.HOLD.HoldableSocketCompacted]: "Holdable",
+    [won.HOLD.HolderSocketCompacted]: "Holder",
+    [won.REVIEW.ReviewSocketCompacted]: "Review enabled",
   },
 });
 

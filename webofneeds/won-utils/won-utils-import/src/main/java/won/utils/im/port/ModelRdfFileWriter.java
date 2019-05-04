@@ -10,24 +10,22 @@ import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 
 /**
- * User: ypanchenko
- * Date: 04.09.2014
+ * User: ypanchenko Date: 04.09.2014
  */
-public class ModelRdfFileWriter implements NeedDataWriter<Model>
-{
-  private OutputStream out;
+public class ModelRdfFileWriter implements AtomDataWriter<Model> {
+    private OutputStream out;
 
-  public ModelRdfFileWriter(final File outputFile) throws IOException {
-    out = new FileOutputStream(outputFile);
-  }
+    public ModelRdfFileWriter(final File outputFile) throws IOException {
+        out = new FileOutputStream(outputFile);
+    }
 
-  @Override
-  public void write(final Model model) {
-    RDFDataMgr.write(out, model, Lang.TURTLE);
-  }
+    @Override
+    public void write(final Model model) {
+        RDFDataMgr.write(out, model, Lang.TURTLE);
+    }
 
-  @Override
-  public void close() throws IOException {
-    out.close();
-  }
+    @Override
+    public void close() throws IOException {
+        out.close();
+    }
 }

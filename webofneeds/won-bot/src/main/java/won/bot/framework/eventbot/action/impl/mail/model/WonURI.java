@@ -3,9 +3,10 @@ package won.bot.framework.eventbot.action.impl.mail.model;
 import java.io.Serializable;
 import java.net.URI;
 
-/* Helper Class to encapsulate an uri and the type
+/*
+ * Helper Class to encapsulate an uri and the type
  */
-public class WonURI implements Serializable{
+public class WonURI implements Serializable {
     private URI uri;
     private UriType type;
 

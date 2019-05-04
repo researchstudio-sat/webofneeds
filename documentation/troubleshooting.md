@@ -7,9 +7,13 @@ Reason: we use tomcat APR. This means that in conf/server.xml, the following lin
 ```
 <Listener className="org.apache.catalina.core.AprLifecycleListener" SSLEngine="on" />
 ```
-and the apache tomcat native libarary needs to be installed. On Windows, this means you find the file `tcnative-1.dll` in tomcats `lib` folder,
+and the apache tomcat native library needs to be installed. On Windows, this means you find the file `tcnative-1.dll` in tomcats `lib` folder,
 
 for more information, see http://tomcat.apache.org/native-doc/
+
+## maven build fails with NoClassDefFoundException: java/sql/SQLException
+Turns out that you need to have a JDK installed. Download a recent JDK and tell eclipse to use that one by default: 
+`Window >> Preferences >> Java >> Installed JREs`. For me, Jdk11 did not work, but Jdk8u202 did.
 
 ## maven dies saying 'github rate limit reached'
 * for building on the *command line*, follow these [instructions](http://stackoverflow.com/questions/30995040/jspm-saying-github-rate-limit-reached-how-to-fix)

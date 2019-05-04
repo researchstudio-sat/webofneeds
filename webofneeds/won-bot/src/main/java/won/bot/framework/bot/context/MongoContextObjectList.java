@@ -8,29 +8,26 @@ import org.springframework.data.annotation.Id;
 /**
  * Created by hfriedrich on 21.11.2016.
  */
-public class MongoContextObjectList
-{
-  @Id
-  private String id;
+public class MongoContextObjectList {
+    @Id
+    private String id;
+    private List<Object> objectList;
 
-  private List<Object> objectList;
+    public MongoContextObjectList() {
+        id = null;
+        objectList = null;
+    }
 
-  public MongoContextObjectList() {
+    public MongoContextObjectList(String id) {
+        this.id = id;
+        objectList = new ArrayList<>();
+    }
 
-    id = null;
-    objectList = null;
-  }
+    public String getId() {
+        return id;
+    }
 
-  public MongoContextObjectList(String id) {
-    this.id = id;
-    objectList = new ArrayList<>();
-  }
-
-  public String getId() {
-    return id;
-  }
-
-  public List<Object> getList() {
-    return objectList;
-  }
+    public List<Object> getList() {
+        return objectList;
+    }
 }

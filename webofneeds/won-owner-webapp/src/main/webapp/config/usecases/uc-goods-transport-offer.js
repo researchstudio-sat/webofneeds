@@ -41,7 +41,7 @@ export const goodsTransportOffer = {
           xsd: "http://www.w3.org/2001/XMLSchema#",
         },
         operations: [
-          `${resultName} a won:Need.`,
+          `${resultName} a won:Atom.`,
           `${resultName} a <http://dbpedia.org/resource/Cargo>.`,
           `${resultName} won:seeks ?seeks.`,
           "?seeks won:travelAction/s:fromLocation ?fromLocation.",
@@ -78,7 +78,7 @@ export const goodsTransportOffer = {
           won: won.defaultContext["won"],
         },
         operations: [
-          `${resultName} a won:Need.`,
+          `${resultName} a won:Atom.`,
           `${resultName} a <http://dbpedia.org/resource/Cargo>.`,
         ],
       };

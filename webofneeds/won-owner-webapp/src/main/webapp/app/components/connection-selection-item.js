@@ -8,7 +8,7 @@ import { connect2Redux } from "../won-utils.js";
 import { actionCreators } from "../actions/actions.js";
 import {
   getConnectionUriFromRoute,
-  getOwnedNeedByConnectionUri,
+  getOwnedAtomByConnectionUri,
 } from "../selectors/general-selectors.js";
 
 import connectionHeaderModule from "./connection-header.js";
@@ -27,7 +27,7 @@ function genComponentConf() {
       <button
         class="csi__closebutton red won-button--outlined thin"
         ng-click="self.closeConnection()"
-        ng-if="self.remoteNeedFailedToLoad">
+        ng-if="self.targetAtomFailedToLoad">
           Close
       </button>
     `;
@@ -37,21 +37,21 @@ function genComponentConf() {
       attach(this, serviceDependencies, arguments);
 
       const selectFromState = state => {
-        const ownedNeed = getOwnedNeedByConnectionUri(
+        const ownedAtom = getOwnedAtomByConnectionUri(
           state,
           this.connectionUri
         );
-        const connection = getIn(ownedNeed, [
+        const connection = getIn(ownedAtom, [
           "connections",
           this.connectionUri,
         ]);
-        const remoteNeedUri = get(connection, "remoteNeedUri");
+        const targetAtomUri = get(connection, "targetAtomUri");
         return {
           openConnectionUri: getConnectionUriFromRoute(state),
           lastUpdateTimestamp: get(connection, "lastUpdateDate"),
-          remoteNeedFailedToLoad:
-            remoteNeedUri &&
-            getIn(state, ["process", "needs", remoteNeedUri, "failedToLoad"]),
+          targetAtomFailedToLoad:
+            targetAtomUri &&
+            getIn(state, ["process", "atoms", targetAtomUri, "failedToLoad"]),
         };
       };
 

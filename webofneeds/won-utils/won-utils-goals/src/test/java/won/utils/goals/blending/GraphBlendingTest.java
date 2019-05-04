@@ -22,16 +22,14 @@ import ch.qos.logback.classic.Logger;
 import won.utils.goals.GraphBlendingIterator;
 
 public class GraphBlendingTest {
-
     private static final String baseFolder = "/won/utils/goals/blending/";
-
 
     @BeforeClass
     public static void setLogLevel() {
-        Logger root = (Logger)LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
-        root.setLevel(Level.INFO);  
+        Logger root = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+        root.setLevel(Level.INFO);
     }
-    
+
     @Test
     public void blendSameTriples() throws IOException {
         Dataset ds = loadDataset(baseFolder + "same.trig");
@@ -56,13 +54,12 @@ public class GraphBlendingTest {
         test(ds);
     }
 
-// Recursive blending is not implemented yet
-//    @Test
-//    public void blendRecursive() throws IOException {
-//        Dataset ds = loadDataset(baseFolder + "recursive.trig");
-//        test(ds);
-//    }
-
+    // Recursive blending is not implemented yet
+    // @Test
+    // public void blendRecursive() throws IOException {
+    // Dataset ds = loadDataset(baseFolder + "recursive.trig");
+    // test(ds);
+    // }
     @Test
     public void blendDifferentLiterals() throws IOException {
         Dataset ds = loadDataset(baseFolder + "differentLiterals.trig");
@@ -71,7 +68,7 @@ public class GraphBlendingTest {
 
     @Test
     public void blendDifferentURIs() throws IOException {
-        Dataset ds = loadDataset(baseFolder +  "differentUris.trig");
+        Dataset ds = loadDataset(baseFolder + "differentUris.trig");
         test(ds);
     }
 
@@ -83,10 +80,9 @@ public class GraphBlendingTest {
 
     @Test
     public void blendEmpty() throws IOException {
-
         GraphBlendingIterator blendingIterator = new GraphBlendingIterator(ModelFactory.createDefaultModel(),
-                ModelFactory.createDefaultModel(),"http://example.org/test", "http://example.org/test/blended");
-
+                        ModelFactory.createDefaultModel(), "http://example.org/test",
+                        "http://example.org/test/blended");
         Assert.assertTrue(blendingIterator.hasNext());
         Assert.assertTrue(ModelFactory.createDefaultModel().isIsomorphicWith(blendingIterator.next()));
         Assert.assertFalse(blendingIterator.hasNext());
@@ -117,11 +113,9 @@ public class GraphBlendingTest {
     }
 
     public void test(Dataset ds) {
-
         // extract the two input models
         BlendingTestModelWrapper m1 = new BlendingTestModelWrapper(ds.getNamedModel("http://example.org/test/data1"));
         BlendingTestModelWrapper m2 = new BlendingTestModelWrapper(ds.getNamedModel("http://example.org/test/data2"));
-
         // extract all the expected blending result models
         List<BlendingTestModelWrapper> expectedModels = new LinkedList<>();
         Iterator<String> iter = ds.listNames();
@@ -131,32 +125,26 @@ public class GraphBlendingTest {
                 expectedModels.add(new BlendingTestModelWrapper(ds.getNamedModel(name)));
             }
         }
-
         // execute the blending
         GraphBlendingIterator blendingIterator = new GraphBlendingIterator(m1.getModel(), m2.getModel(),
-                "http://example.org/test", "http://example.org/test/blended");
+                        "http://example.org/test", "http://example.org/test/blended");
         Assert.assertTrue(blendingIterator.hasNext());
-
         // check that all blended graphs exist in the set of expected graphs
         int actualSize = 0;
         while (blendingIterator.hasNext()) {
             BlendingTestModelWrapper actual = new BlendingTestModelWrapper(blendingIterator.next());
-
             if (!expectedModels.contains(actual)) {
                 System.out.println("Model not found in expected models: ");
                 actual.getModel().write(System.out, "TTL");
             }
-
             Assert.assertTrue(expectedModels.contains(actual));
             actualSize++;
         }
-
         // check that the blended graph set has the same size as the expected graph set
         Assert.assertEquals(expectedModels.size(), actualSize);
     }
 
     private Dataset loadDataset(String path) throws IOException {
-
         InputStream is = null;
         Dataset dataset = null;
         try {
@@ -168,16 +156,14 @@ public class GraphBlendingTest {
                 is.close();
             }
         }
-
         return dataset;
     }
 
-
     /**
-     * Model wrapper class for easier comparison of expected and actual blending models.
+     * Model wrapper class for easier comparison of expected and actual blending
+     * models.
      */
     class BlendingTestModelWrapper {
-
         private Model model;
 
         public BlendingTestModelWrapper(Model m) {
@@ -189,11 +175,9 @@ public class GraphBlendingTest {
         }
 
         public boolean equals(Object obj) {
-
             if (!(obj instanceof BlendingTestModelWrapper)) {
                 return false;
             }
-
             BlendingTestModelWrapper other = (BlendingTestModelWrapper) obj;
             return model.isIsomorphicWith(other.getModel());
         }

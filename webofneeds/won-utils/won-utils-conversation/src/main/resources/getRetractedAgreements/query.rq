@@ -1,8 +1,8 @@
-PREFIX mod: <http://purl.org/webofneeds/modification#>
-PREFIX agr: <http://purl.org/webofneeds/agreement#>
+PREFIX mod: <https://w3id.org/won/modification#>
+PREFIX agr: <https://w3id.org/won/agreement#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-PREFIX msg: <http://purl.org/webofneeds/message#>
-PREFIX won: <http://purl.org/webofneeds/model#>
+PREFIX msg: <https://w3id.org/won/message#>
+PREFIX won: <https://w3id.org/won/core#>
 
 CONSTRUCT { ?acc agr:accepts ?prop . }
  WHERE {
@@ -14,11 +14,11 @@ CONSTRUCT { ?acc agr:accepts ?prop . }
           ?cancelProp2 agr:proposesToCancel ?acc .
           ?acc agr:accepts ?prop .
           ?prop agr:proposes ?clause .
-          ?clause msg:hasContent ?clauseContent .
+          ?clause msg:content ?clauseContent .
           
           #make sure the ordering is correct
-          ?cancelProp2 msg:hasPreviousMessage+/msg:hasCorrespondingRemoteMessage? ?acc .
-          ?acceptsMessageURIforProposesToCancel msg:hasPreviousMessage+/msg:hasCorrespondingRemoteMessage ?cancelProp2 .
+          ?cancelProp2 msg:previousMessage+/msg:correspondingRemoteMessage? ?acc .
+          ?acceptsMessageURIforProposesToCancel msg:previousMessage+/msg:correspondingRemoteMessage ?cancelProp2 .
     }
         
 } order by ?prop

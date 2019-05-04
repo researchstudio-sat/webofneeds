@@ -18,36 +18,26 @@ import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
 /**
- * User: sbyim
- * Date: 11.11.13
+ * User: sbyim Date: 11.11.13
  */
 @Entity
 @Table(name = "ownerApplication")
 public class OwnerApplication {
-
-
     @Id
     @GeneratedValue
-    @Column( name = "id" )
+    @Column(name = "id")
     private Long id;
-
-
-    @ManyToMany(mappedBy = "authorizedApplications", targetEntity = Need.class,fetch = FetchType.LAZY,
-      cascade = CascadeType.DETACH)
-     private List<Need> needs;
-
-
-    @ElementCollection(fetch = FetchType.EAGER) //required eager as the object is passed out of a hibernate session in
+    @ManyToMany(mappedBy = "authorizedApplications", targetEntity = Atom.class, fetch = FetchType.LAZY, cascade = CascadeType.DETACH)
+    private List<Atom> atoms;
+    @ElementCollection(fetch = FetchType.EAGER) // required eager as the object is passed out of a hibernate session in
     // OwnerProtocolOutgoingMessagesProcessor
     @Fetch(value = FetchMode.SUBSELECT)
-    @CollectionTable(name="QueueNames", joinColumns = @JoinColumn(name="owner_application_id"))
-    @Column(name="queueName")
+    @CollectionTable(name = "QueueNames", joinColumns = @JoinColumn(name = "owner_application_id"))
+    @Column(name = "queueName")
     private List<String> queueNames;
-
-    @Column(name="incomingEndpoint")
+    @Column(name = "incomingEndpoint")
     private String incomingEndpoint;
-
-    @Column( name = "ownerApplicationId", unique = true )
+    @Column(name = "ownerApplicationId", unique = true)
     private String ownerApplicationId;
 
     public Long getId() {
@@ -66,14 +56,13 @@ public class OwnerApplication {
         this.ownerApplicationId = ownerApplicationId;
     }
 
-//    public List<Need> getNeeds() {
-//        return needs;
-//    }
-//
-//    public void setNeeds(List<Need> needs) {
-//        this.needs = needs;
-//    }
-
+    // public List<Atom> getAtoms() {
+    // return atoms;
+    // }
+    //
+    // public void setAtoms(List<Atom> atoms) {
+    // this.atoms = atoms;
+    // }
     public List<String> getQueueNames() {
         return queueNames;
     }
@@ -81,8 +70,7 @@ public class OwnerApplication {
     public void setQueueNames(List<String> queueNames) {
         this.queueNames = queueNames;
     }
-    public void setIncomingEndpoint(String incomingEndpoint){
 
+    public void setIncomingEndpoint(String incomingEndpoint) {
     }
 }
-

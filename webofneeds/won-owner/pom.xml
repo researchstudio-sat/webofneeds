@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>webofneeds</artifactId>
         <groupId>at.researchstudio.sat</groupId>
@@ -9,16 +11,12 @@
 
     <artifactId>won-owner</artifactId>
     <name>Owner</name>
-	<dependencies>
-        <!--
-
-                 Warning! Only to be used in connection with the
-                 <dependencyManagement> section in the parent pom!
-
-        -->
+    <dependencies>
+        <!-- Warning! Only to be used in connection with the <dependencyManagement> 
+            section in the parent pom! -->
         <dependency>
             <groupId>at.researchstudio.sat</groupId>
-            <artifactId>won-facets-tx</artifactId>
+            <artifactId>won-sockets-tx</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -74,10 +72,10 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-webmvc</artifactId>
         </dependency>
-		<dependency>
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-core</artifactId>
-		</dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-core</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-messaging</artifactId>
@@ -86,9 +84,9 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-websocket</artifactId>
         </dependency>
-         <dependency>
+        <dependency>
             <groupId>at.researchstudio.sat</groupId>
-            <artifactId>won-utils-goals</artifactId>            
+            <artifactId>won-utils-goals</artifactId>
             <version>${project.version}</version>
         </dependency>
         <!-- TESTING -->
@@ -115,11 +113,11 @@
         </dependency>
 
         <dependency>
-        	<groupId>at.researchstudio.sat</groupId>
-        	<artifactId>won-utils-conversation</artifactId>
-        	<version>${project.version}</version>
+            <groupId>at.researchstudio.sat</groupId>
+            <artifactId>won-utils-conversation</artifactId>
+            <version>${project.version}</version>
         </dependency>
-	</dependencies>
+    </dependencies>
 
     <build>
         <resources>
@@ -132,6 +130,12 @@
                 <directory>src/test/resources</directory>
             </testResource>
         </testResources>
+        <plugins>
+            <plugin>
+                <groupId>net.revelc.code.formatter</groupId>
+                <artifactId>formatter-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
     </build>
 
 </project>

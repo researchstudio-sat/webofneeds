@@ -1,260 +1,192 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:context="http://www.springframework.org/schema/context"
-       xmlns:camel="http://camel.apache.org/schema/spring"
-       xsi:schemaLocation=
-               "http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
-
-
-                http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.1.xsd
-
-                http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
-
-    <!-- Camel configuration -->
-    <!--camel:camelContext id="wonNodeCamel" trace="false"  we comment this out for testing if using the 'trace'
+<beans 
+	xmlns="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:context="http://www.springframework.org/schema/context" 
+	xmlns:camel="http://camel.apache.org/schema/spring" xsi:schemaLocation=               "http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
+                http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.1.xsd                http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
+	<!-- Camel configuration -->
+	<!--camel:camelContext id="wonNodeCamel" trace="false"  we comment this out for testing if using the 'trace'
     attribute causes the resources for tracing to be allocated (CamelInternalProcessor$BacklogTracerAdvice with 100k
     elements in its queue) -->
-    <camel:camelContext id="wonNodeCamel">
-        <camel:packageScan>
-            <camel:package>won.node.camel.route.fixed</camel:package>
-        </camel:packageScan>
-        <camel:template id="producerTemplate" defaultEndpoint="direct:JMS"/>
-    </camel:camelContext>
-
-
-
-
-    <!--bean id="activemqConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory"
-           depends-on="embeddedBroker" -->
-        <!-- note: this URI does not need to be configurable via the
+	<camel:camelContext id="wonNodeCamel">
+		<camel:packageScan>
+			<camel:package>won.node.camel.route.fixed</camel:package>
+		</camel:packageScan>
+		<camel:template id="producerTemplate" defaultEndpoint="direct:JMS"/>
+	</camel:camelContext>
+	<!--bean id="activemqConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory" depends-on="embeddedBroker" -->
+	<!-- note: this URI does not need to be configurable via the
         config file, it will be the same on any system -->
-        <!--property name="brokerURL" value="${uri.protocol.activemq}?useLocalHost=false"/>
-    </bean-->
-
-    
-    <!--
-    <bean id="activemqConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory" depends-on="embeddedBroker" >
-        <property name="brokerURL" value="tcp://localhost:${activemq.broker.port}"/>
-    </bean>
+	<!--property name="brokerURL" value="${uri.protocol.activemq}?useLocalHost=false"/></bean-->
+	<!--
+    <bean id="activemqConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory" depends-on="embeddedBroker"><property name="brokerURL" value="tcp://localhost:${activemq.broker.port}"/></bean>
     -->
-
-    <!--TODO get from won security config... -->
-    <bean id="cachedConnectionFactory" class="org.springframework.jms.connection.CachingConnectionFactory"
-    depends-on="embeddedBroker">
-        <property name="targetConnectionFactory" ref="activemqConnectionFactory"></property>
-        <property name="sessionCacheSize" value="10"></property>
-    </bean>
-
-    <!--bean id="activemqConnectionFactory" class="org.apache.activemq.ActiveMQSslConnectionFactory"
-            >
-        <property name="brokerURL"
-                  value="${activemq.broker.scheme}://localhost:${activemq.broker.port}"/>
-        <property name="keyStore" value="${activemq.broker.keystore}"/>
-        <property name="keyStorePassword" value="${activemq.broker.keystore.password}"/>
-        <property name="trustStore" value="${activemq.broker.truststore}"/>
-        <property name="trustStorePassword" value="${activemq.broker.truststore.password}"/>
-    </bean-->
-    <!-- This is used for the connections from internal clients to embedded (internal) node broker. Since in this case
+	<!--TODO get from won security config... -->
+	<bean id="cachedConnectionFactory" class="org.springframework.jms.connection.CachingConnectionFactory" depends-on="embeddedBroker">
+		<property name="targetConnectionFactory" ref="activemqConnectionFactory"></property>
+		<property name="sessionCacheSize" value="10"></property>
+	</bean>
+	<!--bean id="activemqConnectionFactory" class="org.apache.activemq.ActiveMQSslConnectionFactory"><property name="brokerURL" value="${activemq.broker.scheme}://localhost:${activemq.broker.port}"/><property name="keyStore" value="${activemq.broker.keystore}"/><property name="keyStorePassword" value="${activemq.broker.keystore.password}"/><property name="trustStore" value="${activemq.broker.truststore}"/><property name="trustStorePassword" value="${activemq.broker.truststore.password}"/></bean-->
+	<!-- This is used for the connections from internal clients to embedded (internal) node broker. Since in this case
     establishing ssl connection is overkill, vm connection is used instead -->
-    <bean id="activemqConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
-        <property name="brokerURL" value="vm://wonBroker"/>
-        <property name="maxThreadPoolSize" value="10" />
-    </bean>
-
-    <!-- Configuring Broker -->
-    <!-- we used to have the o.a.a.x.PooledBrokerFactoryBean here, but it does not set the main spring
+	<bean id="activemqConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
+		<property name="brokerURL" value="vm://wonBroker"/>
+		<property name="maxThreadPoolSize" value="10" />
+	</bean>
+	<!-- Configuring Broker -->
+	<!-- we used to have the o.a.a.x.PooledBrokerFactoryBean here, but it does not set the main spring
          context as its parent context in its onPropertiesSet() method, so we can't use any of our beans
          inside the broker's spring context - but we need to use the same trustStoreService bean inside and
          outside the broker, so we changed to use the o.a.a.x.BrokerFactoryBean instead -->
-    <bean id="embeddedBroker" class="org.apache.activemq.xbean.BrokerFactoryBean">
-        <property name="config" value="classpath:spring/component/broker/activemq.xml"/>
-        <property name="start" value="true"/>
-    </bean>
-
-    <bean id="activeMQService" class="won.protocol.jms.ActiveMQServiceImpl">
-        <constructor-arg name="type" value="NeedProtocol"/>
-    </bean>
-    <bean id="brokerComponentFactory" class="won.protocol.jms.BrokerComponentFactory"/>
-
-    <!-- transaction manager for '.transacted' routes -->
-    <bean id="PROPAGATION_REQUIRED" class="won.node.camel.tx.SpringTransactionPolicyWithCustomIsolation">
-        <property name="transactionManager" ref="transactionManager"/>
-        <property name="propagationBehaviorName" value="PROPAGATION_REQUIRED"/>
-        <property name="isolationLevelName" value="ISOLATION_READ_COMMITTED" />
-    </bean>
-
-    <bean id="PROPAGATION_REQUIRES_NEW" class="won.node.camel.tx.SpringTransactionPolicyWithCustomIsolation">
-        <property name="transactionManager" ref="transactionManager"/>
-        <property name="propagationBehaviorName" value="PROPAGATION_REQUIRES_NEW"/>
-        <property name="isolationLevelName" value="ISOLATION_READ_COMMITTED" />
-    </bean>
-
-    <bean id="PROPAGATION_NEVER" class="won.node.camel.tx.SpringTransactionPolicyWithCustomIsolation">
-        <property name="transactionManager" ref="transactionManager"/>
-        <property name="propagationBehaviorName" value="PROPAGATION_NEVER"/>
-    </bean>
-    
-
-    <!--bean id="activemq" class="org.apache.activemq.camel.component.ActiveMQComponent"-->
-        <!-- note: this URI does not need to be configurable via the
+	<bean id="embeddedBroker" class="org.apache.activemq.xbean.BrokerFactoryBean">
+		<property name="config" value="classpath:spring/component/broker/activemq.xml"/>
+		<property name="start" value="true"/>
+	</bean>
+	<bean id="activeMQService" class="won.protocol.jms.ActiveMQServiceImpl">
+		<constructor-arg name="type" value="AtomProtocol"/>
+	</bean>
+	<bean id="brokerComponentFactory" class="won.protocol.jms.BrokerComponentFactory"/>
+	<!-- transaction manager for '.transacted' routes -->
+	<bean id="PROPAGATION_REQUIRED" class="won.node.camel.tx.SpringTransactionPolicyWithCustomIsolation">
+		<property name="transactionManager" ref="transactionManager"/>
+		<property name="propagationBehaviorName" value="PROPAGATION_REQUIRED"/>
+		<property name="isolationLevelName" value="ISOLATION_READ_COMMITTED" />
+	</bean>
+	<bean id="PROPAGATION_REQUIRES_NEW" class="won.node.camel.tx.SpringTransactionPolicyWithCustomIsolation">
+		<property name="transactionManager" ref="transactionManager"/>
+		<property name="propagationBehaviorName" value="PROPAGATION_REQUIRES_NEW"/>
+		<property name="isolationLevelName" value="ISOLATION_READ_COMMITTED" />
+	</bean>
+	<bean id="PROPAGATION_NEVER" class="won.node.camel.tx.SpringTransactionPolicyWithCustomIsolation">
+		<property name="transactionManager" ref="transactionManager"/>
+		<property name="propagationBehaviorName" value="PROPAGATION_NEVER"/>
+	</bean>
+	<!--bean id="activemq" class="org.apache.activemq.camel.component.ActiveMQComponent"-->
+	<!-- note: this URI does not need to be configurable via the
         config file, it will be the same on any system -->
-
-        <!--property name="brokerURL" value="tcp://localhost:${activemq.broker.port}"/>
-        <property name="connectionFactory" ref="cachedConnectionFactory"/>
-    </bean-->
-    <!--bean id="needProtocolCommunicationService" class="won.node.camel.NeedProtocolCommunicationServiceImpl"-->
-    <bean id="needProtocolCommunicationService" class="won.node.camel.NeedProtocolCommunicationServiceImpl">
-        <property name="registrationClient" ref="registrationClient" />
-    </bean>
-
-    <bean id="ownerProtocolOutgoingMessagesProcessor" class="won.node.camel.processor.general.OwnerProtocolOutgoingMessagesProcessor">
-        <property name="queueManagementService" ref="queueManagementService"/>
-    </bean>
-
-    <bean name="needProtocolCamelConfigurator" class="won.node.camel.NeedProtocolCamelConfiguratorImpl">
-        <property name="componentName" value="activemq"/>
-        <property name="messagingContext" ref="messagingContext"/>
-    </bean>
-
-    <bean id="messageReferencer" class="won.node.camel.processor.general.MessageReferencer" />
-
-    <bean id="needProtocolOutgoingMessagesProcessor"
-          class="won.node.camel.processor.general.NeedProtocolOutgoingMessagesProcessor" />
-
-    <bean id="successResponder"
-          class="won.node.camel.processor.general.SuccessResponder" />
-
-    <bean id="toNodeSender"
-          class="won.node.camel.processor.general.ToNodeSender" />
-    <bean id="toOwnerSender"
-          class="won.node.camel.processor.general.ToOwnerSender" />
-    <bean id="toOwnerEchoer"
-          class="won.node.camel.processor.general.ToOwnerEchoer" />          
-    <bean id="wonMessageCloner"
-          class="won.node.camel.processor.general.WonMessageCloner" />
-    <bean id="facetExtractor"
-          class="won.protocol.message.processor.camel.FacetTypeExtractingCamelProcessor" />
-
-
-    <!-- won-specific processors -->
-    <bean id="failResponder"
-          class="won.node.camel.processor.general.FailResponder" />
-    <bean name="resendResponseResponder"
-          class="won.node.camel.processor.general.ResponseResenderProcessor"/>
-  <!-- won-specific processors -->
-  <!-- start of the pipeline -->
-  <bean name="wonMessageIntoCamelProcessor" class="won.protocol.message.processor.camel.WonMessageIntoCamelProcessor" />
-
-    <bean name="receivedTimestampAdder"
-              class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
-        <constructor-arg>
-            <bean class="won.node.camel.processor.general.ReceivedTimestampAddingWonMessageProcessor" />
-        </constructor-arg>
-    </bean>
-
-  <bean name="directionFromOwnerAdder"
-        class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
-    <constructor-arg>
-      <bean class="won.node.camel.processor.general.DirectionAddingWonMessageProcessor">
-        <constructor-arg name="direction" value="FROM_OWNER" />
-      </bean>
-    </constructor-arg>
-  </bean>
-  <bean name="directionFromExternalAdder"
-        class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
-    <constructor-arg>
-      <bean class="won.node.camel.processor.general.DirectionAddingWonMessageProcessor">
-        <constructor-arg name="direction" value="FROM_EXTERNAL" />
-      </bean>
-    </constructor-arg>
-  </bean>
-
-  <bean name="directionFromSystemAdder"
-        class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
-    <constructor-arg>
-      <bean class="won.node.camel.processor.general.DirectionAddingWonMessageProcessor">
-        <constructor-arg name="direction" value="FROM_SYSTEM" />
-      </bean>
-    </constructor-arg>
-  </bean>
-    <!-- wrapping the messages for storage on node -->
-    <bean name="envelopeAdder"
-          class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
-        <constructor-arg>
-            <bean class="won.node.camel.processor.general.EnvelopeAddingWonMessageProcessor"/>
-        </constructor-arg>
-    </bean>
-  <!-- processor for checking if message event, create need, or create connection uri is well-formed -->
-  <bean name="uriNodePathChecker" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
-     <constructor-arg>
-       <bean class="won.protocol.message.processor.impl.UriConsistencyCheckingWonMessageProcessor" />
-     </constructor-arg>
-  </bean>
-  <!-- processor for checking if message event, create need, or create connection uri is already in use -->
-  <bean name="uriInUseChecker" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
-    <constructor-arg>
-      <bean class="won.node.camel.processor.general.UriAlreadyUsedCheckingWonMessageProcessor"/>
-    </constructor-arg>
-  </bean>
-  <!-- processor for checking well-formedness of messages -->
-  <bean name="wellformednessChecker" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
-    <constructor-arg>
-      <bean class="won.protocol.message.processor.impl.WellformednessCheckingWonMessageProcessor" />
-    </constructor-arg>
-  </bean>
-  <!-- processor for checking signatures -->
-  <bean name="signatureChecker" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
-    <constructor-arg>
-      <bean class="won.protocol.message.processor.impl.SignatureCheckingWonMessageProcessor" />
-    </constructor-arg>
-  </bean>
-    <!-- referencing prevoiusly unrerferenced messages -->
-    <bean id="referenceToUnreferencedMessageAdder"
-          class="won.node.camel.processor.general.ReferenceToUnreferencedMessageAddingProcessor" >
-    </bean>
-    <bean name="referenceAdder" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
-        <constructor-arg ref="referenceToUnreferencedMessageAdder" />
-    </bean>
-    <!-- signing messages -->
-    <bean id="signatureAddingProcessor" class="won.protocol.message.processor.impl.SignatureAddingWonMessageProcessor">
-        <property name="cryptographyService" ref="cryptographyService" />
-    </bean>
-    <bean name="signatureAdder" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
-        <constructor-arg ref="signatureAddingProcessor" />
-    </bean>
-  <!-- outbound message creating processor -->
-    <bean name="outboundMessageCreator" class="won.node.camel.processor.general.OutboundMessageCreatingProcessor" />
-
-  <!-- persisting messages -->
-  <bean name="persister" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
-    <constructor-arg>
-      <bean class="won.node.camel.processor.general.PersistingWonMessageProcessor" />
-    </constructor-arg>
-  </bean>
-  <!-- routing logic for wonMessages, computing which message-type specific processor -->
-  <bean name="fixedMessageProcessorSlip" class="won.node.camel.processor.general.MessageTypeSlipComputer">
-    <constructor-arg value="won.node.camel.processor.annotation.FixedMessageProcessor" />
-  </bean>
-  <!-- routing logic for wonMessages, computing which message-type specific processor -->
-  <bean name="fixedMessageReactionProcessorSlip" class="won.node.camel.processor.general.MessageTypeSlipComputer">
-    <constructor-arg value="won.node.camel.processor.annotation.FixedMessageReactionProcessor" />
-    <constructor-arg name="allowNoMatchingProcessor" value="true" />
-  </bean>
-  <bean name="parentLocker" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
-      <constructor-arg name="adaptee">
-          <bean class="won.node.camel.processor.general.LockMessageParentWonMessageProcessor" />
-      </constructor-arg>
-  </bean>
-  <!-- routing logic for wonMessages, computing which facet-specific processor to use -->
-  <bean name="facetTypeSlip" class="won.node.camel.processor.general.FacetTypeSlipComputer"/>
-  
-  <!-- extraction of connection state for data derivation -->
-  <bean name="connectionStateChangeBuilder" class="won.node.camel.processor.general.ConnectionStateChangeBuilderCamelProcessor" />
-  
-  <!--  data derivation processor -->
-  <bean name="dataDeriver" class="won.node.camel.processor.general.FacetDerivationProcessor" />
-  
-  <!--  delete message processor -->
-  <bean name="needDeleter" class="won.node.camel.processor.general.DeleteNeedMessageProcessor" />
+	<!--property name="brokerURL" value="tcp://localhost:${activemq.broker.port}"/><property name="connectionFactory" ref="cachedConnectionFactory"/></bean-->
+	<!--bean id="atomProtocolCommunicationService" class="won.node.camel.AtomProtocolCommunicationServiceImpl"-->
+	<bean id="atomProtocolCommunicationService" class="won.node.camel.AtomProtocolCommunicationServiceImpl">
+		<property name="registrationClient" ref="registrationClient" />
+	</bean>
+	<bean id="ownerProtocolOutgoingMessagesProcessor" class="won.node.camel.processor.general.OwnerProtocolOutgoingMessagesProcessor">
+		<property name="queueManagementService" ref="queueManagementService"/>
+	</bean>
+	<bean name="atomProtocolCamelConfigurator" class="won.node.camel.AtomProtocolCamelConfiguratorImpl">
+		<property name="componentName" value="activemq"/>
+		<property name="messagingContext" ref="messagingContext"/>
+	</bean>
+	<bean id="messageReferencer" class="won.node.camel.processor.general.MessageReferencer" />
+	<bean id="atomProtocolOutgoingMessagesProcessor" class="won.node.camel.processor.general.AtomProtocolOutgoingMessagesProcessor" />
+	<bean id="successResponder" class="won.node.camel.processor.general.SuccessResponder" />
+	<bean id="toNodeSender" class="won.node.camel.processor.general.ToNodeSender" />
+	<bean id="toOwnerSender" class="won.node.camel.processor.general.ToOwnerSender" />
+	<bean id="toOwnerEchoer" class="won.node.camel.processor.general.ToOwnerEchoer" />
+	<bean id="wonMessageCloner" class="won.node.camel.processor.general.WonMessageCloner" />
+	<bean id="socketExtractor" class="won.protocol.message.processor.camel.SocketTypeExtractingCamelProcessor" />
+	<!-- won-specific processors -->
+	<bean id="failResponder" class="won.node.camel.processor.general.FailResponder" />
+	<bean name="resendResponseResponder" class="won.node.camel.processor.general.ResponseResenderProcessor"/>
+	<!-- won-specific processors -->
+	<!-- start of the pipeline -->
+	<bean name="wonMessageIntoCamelProcessor" class="won.protocol.message.processor.camel.WonMessageIntoCamelProcessor" />
+	<bean name="receivedTimestampAdder" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
+		<constructor-arg>
+			<bean class="won.node.camel.processor.general.ReceivedTimestampAddingWonMessageProcessor" />
+		</constructor-arg>
+	</bean>
+	<bean name="directionFromOwnerAdder" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
+		<constructor-arg>
+			<bean class="won.node.camel.processor.general.DirectionAddingWonMessageProcessor">
+				<constructor-arg name="direction" value="FROM_OWNER" />
+			</bean>
+		</constructor-arg>
+	</bean>
+	<bean name="directionFromExternalAdder" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
+		<constructor-arg>
+			<bean class="won.node.camel.processor.general.DirectionAddingWonMessageProcessor">
+				<constructor-arg name="direction" value="FROM_EXTERNAL" />
+			</bean>
+		</constructor-arg>
+	</bean>
+	<bean name="directionFromSystemAdder" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
+		<constructor-arg>
+			<bean class="won.node.camel.processor.general.DirectionAddingWonMessageProcessor">
+				<constructor-arg name="direction" value="FROM_SYSTEM" />
+			</bean>
+		</constructor-arg>
+	</bean>
+	<!-- wrapping the messages for storage on node -->
+	<bean name="envelopeAdder" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
+		<constructor-arg>
+			<bean class="won.node.camel.processor.general.EnvelopeAddingWonMessageProcessor"/>
+		</constructor-arg>
+	</bean>
+	<!-- processor for checking if message event, create atom, or create connection uri is well-formed -->
+	<bean name="uriNodePathChecker" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
+		<constructor-arg>
+			<bean class="won.protocol.message.processor.impl.UriConsistencyCheckingWonMessageProcessor" />
+		</constructor-arg>
+	</bean>
+	<!-- processor for checking if message event, create atom, or create connection uri is already in use -->
+	<bean name="uriInUseChecker" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
+		<constructor-arg>
+			<bean class="won.node.camel.processor.general.UriAlreadyUsedCheckingWonMessageProcessor"/>
+		</constructor-arg>
+	</bean>
+	<!-- processor for checking well-formedness of messages -->
+	<bean name="wellformednessChecker" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
+		<constructor-arg>
+			<bean class="won.protocol.message.processor.impl.WellformednessCheckingWonMessageProcessor" />
+		</constructor-arg>
+	</bean>
+	<!-- processor for checking signatures -->
+	<bean name="signatureChecker" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
+		<constructor-arg>
+			<bean class="won.protocol.message.processor.impl.SignatureCheckingWonMessageProcessor" />
+		</constructor-arg>
+	</bean>
+	<!-- referencing prevoiusly unrerferenced messages -->
+	<bean id="referenceToUnreferencedMessageAdder" class="won.node.camel.processor.general.ReferenceToUnreferencedMessageAddingProcessor"></bean>
+	<bean name="referenceAdder" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
+		<constructor-arg ref="referenceToUnreferencedMessageAdder" />
+	</bean>
+	<!-- signing messages -->
+	<bean id="signatureAddingProcessor" class="won.protocol.message.processor.impl.SignatureAddingWonMessageProcessor">
+		<property name="cryptographyService" ref="cryptographyService" />
+	</bean>
+	<bean name="signatureAdder" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
+		<constructor-arg ref="signatureAddingProcessor" />
+	</bean>
+	<!-- outbound message creating processor -->
+	<bean name="outboundMessageCreator" class="won.node.camel.processor.general.OutboundMessageCreatingProcessor" />
+	<!-- persisting messages -->
+	<bean name="persister" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
+		<constructor-arg>
+			<bean class="won.node.camel.processor.general.PersistingWonMessageProcessor" />
+		</constructor-arg>
+	</bean>
+	<!-- routing logic for wonMessages, computing which message-type specific processor -->
+	<bean name="fixedMessageProcessorSlip" class="won.node.camel.processor.general.MessageTypeSlipComputer">
+		<constructor-arg value="won.node.camel.processor.annotation.FixedMessageProcessor" />
+	</bean>
+	<!-- routing logic for wonMessages, computing which message-type specific processor -->
+	<bean name="fixedMessageReactionProcessorSlip" class="won.node.camel.processor.general.MessageTypeSlipComputer">
+		<constructor-arg value="won.node.camel.processor.annotation.FixedMessageReactionProcessor" />
+		<constructor-arg name="allowNoMatchingProcessor" value="true" />
+	</bean>
+	<bean name="parentLocker" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
+		<constructor-arg name="adaptee">
+			<bean class="won.node.camel.processor.general.LockMessageParentWonMessageProcessor" />
+		</constructor-arg>
+	</bean>
+	<!-- routing logic for wonMessages, computing which socket-specific processor to use -->
+	<bean name="socketTypeSlip" class="won.node.camel.processor.general.SocketTypeSlipComputer"/>
+	<!-- extraction of connection state for data derivation -->
+	<bean name="connectionStateChangeBuilder" class="won.node.camel.processor.general.ConnectionStateChangeBuilderCamelProcessor" />
+	<!--  data derivation processor -->
+	<bean name="dataDeriver" class="won.node.camel.processor.general.SocketDerivationProcessor" />
+	<!--  delete message processor -->
+	<bean name="atomDeleter" class="won.node.camel.processor.general.DeleteAtomMessageProcessor" />
 </beans>

@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>at.researchstudio.sat</groupId>
@@ -13,12 +15,8 @@
     <name>Node Webapp</name>
 
     <dependencies>
-        <!--
-
-                 Warning! Only to be used in connection with the
-                 <dependencyManagement> section in the parent pom!
-
-        -->
+        <!-- Warning! Only to be used in connection with the <dependencyManagement> 
+            section in the parent pom! -->
         <dependency>
             <groupId>at.researchstudio.sat</groupId>
             <artifactId>won-node</artifactId>
@@ -69,8 +67,11 @@
             </testResource>
         </testResources>
 
-
         <plugins>
+            <plugin>
+                <groupId>net.revelc.code.formatter</groupId>
+                <artifactId>formatter-maven-plugin</artifactId>
+            </plugin>
             <plugin>
                 <groupId>org.codehaus.cargo</groupId>
                 <artifactId>cargo-maven2-plugin</artifactId>
@@ -100,15 +101,9 @@
                         </deployable>
                     </deployables>
                 </configuration>
-                <!--<executions>
-                    <execution>
-                        <id>deploy-node-tomcat</id>
-                        <phase>deploy</phase>
-                        <goals>
-                            <goal>deployer-redeploy</goal>
-                        </goals>
-                    </execution>
-                </executions>-->
+                <!--<executions> <execution> <id>deploy-node-tomcat</id> 
+                    <phase>deploy</phase> <goals> <goal>deployer-redeploy</goal> </goals> </execution> 
+                    </executions> -->
             </plugin>
 
             <plugin>
@@ -151,12 +146,19 @@
                                     <goal>echo</goal>
                                 </goals>
                                 <configuration>
-                                    <message>Note: building the won-node-webapp war file is skipped. This is done because the profile 'skip-node-webapp-war' is active ('-P skip-node-webapp-war' on the command line)</message>
+                                    <message>Note: building the
+                                        won-node-webapp war file is
+                                        skipped. This is done because
+                                        the profile
+                                        'skip-node-webapp-war' is active
+                                        ('-P skip-node-webapp-war' on
+                                        the command line)</message>
                                 </configuration>
                             </execution>
                         </executions>
                     </plugin>
-                    <!-- use the same config as above but set the phase to 'none' -->
+                    <!-- use the same config as above but set the phase to 
+                        'none' -->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-war-plugin</artifactId>
@@ -195,12 +197,21 @@
                                     <goal>echo</goal>
                                 </goals>
                                 <configuration>
-                                    <message>Note: building the won-node-webapp war file is skipped, but the webapp is built in 'exploded' mode. This is done because the profile 'skip-node-webapp-war-but-explode' is active ('-P skip-node-webapp-war-but-explode' on the command line)</message>
+                                    <message>Note: building the
+                                        won-node-webapp war file is
+                                        skipped, but the webapp is built
+                                        in 'exploded' mode. This is done
+                                        because the profile
+                                        'skip-node-webapp-war-but-explode'
+                                        is active ('-P
+                                        skip-node-webapp-war-but-explode'
+                                        on the command line)</message>
                                 </configuration>
                             </execution>
                         </executions>
                     </plugin>
-                    <!-- use the same config as above but set the phase to 'none' -->
+                    <!-- use the same config as above but set the phase to 
+                        'none' -->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-war-plugin</artifactId>
@@ -212,7 +223,9 @@
                             <execution>
                                 <id>default-exploded</id>
                                 <phase>package</phase>
-                                <goals><goal>exploded</goal></goals>
+                                <goals>
+                                    <goal>exploded</goal>
+                                </goals>
                             </execution>
                         </executions>
                     </plugin>

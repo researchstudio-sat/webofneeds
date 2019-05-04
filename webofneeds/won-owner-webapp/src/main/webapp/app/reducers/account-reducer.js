@@ -13,6 +13,7 @@ const initialState = Immutable.fromJS({
   isAnonymous: false,
   acceptedTermsOfService: false,
   acceptedDisclaimer: isDisclaimerAccepted(),
+  ownedAtomUris: Immutable.Set(),
 });
 
 export default function(userData = initialState, action = {}) {
@@ -33,6 +34,33 @@ export default function(userData = initialState, action = {}) {
         .set("acceptedTermsOfService", acceptedTermsOfService)
         .set("isAnonymous", isAnonymous)
         .set("privateId", privateId);
+    }
+    case actionTypes.atoms.storeOwnedInactiveUris:
+    case actionTypes.atoms.storeOwnedActiveUris: {
+      const ownedAtomUris = userData.get("ownedAtomUris");
+      return userData.set(
+        "ownedAtomUris",
+        ownedAtomUris.merge(action.payload.get("uris"))
+      );
+    }
+
+    case actionTypes.atoms.removeDeleted:
+    case actionTypes.personas.removeDeleted:
+    case actionTypes.atoms.delete: {
+      const atomUri = action.payload.get("uri");
+
+      const ownedAtomUris = userData.get("ownedAtomUris");
+      return userData.set("ownedAtomUris", ownedAtomUris.remove(atomUri));
+    }
+
+    case actionTypes.atoms.create: //for optimistic additions
+    case actionTypes.personas.create: //for optimistic additions
+    case actionTypes.atoms.createSuccessful: {
+      const ownedAtomUris = userData.get("ownedAtomUris");
+      return userData.set(
+        "ownedAtomUris",
+        ownedAtomUris.add(action.payload.atomUri)
+      );
     }
 
     case actionTypes.account.resendVerificationEmailFailed:

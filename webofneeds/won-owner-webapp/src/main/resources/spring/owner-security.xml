@@ -1,15 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-
-<beans:beans xmlns="http://www.springframework.org/schema/security"
-             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-             xmlns:beans="http://www.springframework.org/schema/beans" 
-             xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
-								 http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-4.2.xsd">
-
-
+<beans:beans 
+	xmlns="http://www.springframework.org/schema/security" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:beans="http://www.springframework.org/schema/beans" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.1.xsd								 http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-4.2.xsd">
 	<!-- special config for linked data brige: we want no caching headers added  -->
-	<http use-expressions="true" pattern="/rest/linked-data/**"
-		  entry-point-ref="ajaxLoginUrlAuthenticationEntryPoint" security-context-repository-ref="securityContextRepository" >
+	<http use-expressions="true" pattern="/rest/linked-data/**" entry-point-ref="ajaxLoginUrlAuthenticationEntryPoint" security-context-repository-ref="securityContextRepository">
 		<headers defaults-disabled="true">
 			<content-type-options />
 			<hsts />
@@ -22,12 +17,7 @@
 		<!-- we do not need CSRF protection for these resources as accessing them is not state-changing - however, it would be better to have it.. -->
 		<csrf disabled="true" />
 	</http>
-
-	<http use-expressions="true"
-		  pattern="(/generated/.+|/images/.+|/favicon.ico|/app/.+|bower_components/.+|/fonts/.+|/scripts/.+|/style/.+|/index.html|/appConfig/.+|/jspm_packages/.+|/jspm_config.js)"
-		  request-matcher="regex"
-		  entry-point-ref="ajaxLoginUrlAuthenticationEntryPoint"
-		   security-context-repository-ref="securityContextRepository">
+	<http use-expressions="true" pattern="(/generated/.+|/images/.+|/favicon.ico|/app/.+|bower_components/.+|/fonts/.+|/scripts/.+|/style/.+|/index.html|/appConfig/.+|/jspm_packages/.+|/jspm_config.js)" request-matcher="regex" entry-point-ref="ajaxLoginUrlAuthenticationEntryPoint" security-context-repository-ref="securityContextRepository">
 		<!--
 			This is static stuff, which may change, but usually doesn't.
 			If it changes, we want clients to notice the change via If-None-Match Etag validation.
@@ -40,53 +30,44 @@
 		<!-- we do not need CSRF protection for these resources as accessing them is not state-changing -->
 		<csrf disabled="true" />
 	</http>
-
-	<http use-expressions="true" entry-point-ref="ajaxLoginUrlAuthenticationEntryPoint"
-		  security-context-repository-ref="securityContextRepository">
-        <intercept-url pattern="/msg" access="isAnonymous() or isAuthenticated()"/>
-        <intercept-url pattern="/sitemap.xml" access="permitAll()"/>
-        <intercept-url pattern="/rest/users/" access="permitAll()"/>
-        <intercept-url pattern="/rest/users/transfer" access="isAuthenticated()"/>
-        <intercept-url pattern="/rest/users/ping/" access="permitAll()"/>
-        <intercept-url pattern="/rest/users/signout" access="permitAll()"/>
-        <intercept-url pattern="/rest/users/isSignedIn" access="permitAll()"/>
-        <intercept-url pattern="/rest/users/signin" access="permitAll()"/>
-        <intercept-url pattern="/rest/users/confirmRegistration" access="permitAll()"/>
-        <intercept-url pattern="/rest/users/resendVerificationEmail" access="permitAll()"/>
-        <intercept-url pattern="/rest/users/sendAnonymousLinkEmail" access="isAuthenticated()"/>
-        <intercept-url pattern="/rest/users/email" access="isAuthenticated()"/>
-        <intercept-url pattern="/rest/users/settings" access="isAuthenticated()"/>
-        <intercept-url pattern="/rest/users/acceptTermsOfService" access="isAuthenticated()"/>
-        <intercept-url pattern="/rest/needs/drafts/*" access="hasRole('ROLE_ACCOUNT')"/>
-        <intercept-url pattern="/rest/**" access="isAuthenticated()"/>
-        <intercept-url pattern="/**"  requires-channel="https"/>
-        <!--intercept-url pattern="/rest/**" access="isAuthenticated()" /-->
-        <!--
+	<http use-expressions="true" entry-point-ref="ajaxLoginUrlAuthenticationEntryPoint" security-context-repository-ref="securityContextRepository">
+		<intercept-url pattern="/msg" access="isAnonymous() or isAuthenticated()"/>
+		<intercept-url pattern="/sitemap.xml" access="permitAll()"/>
+		<intercept-url pattern="/rest/users/" access="permitAll()"/>
+		<intercept-url pattern="/rest/users/transfer" access="isAuthenticated()"/>
+		<intercept-url pattern="/rest/users/ping/" access="permitAll()"/>
+		<intercept-url pattern="/rest/users/signout" access="permitAll()"/>
+		<intercept-url pattern="/rest/users/isSignedIn" access="permitAll()"/>
+		<intercept-url pattern="/rest/users/signin" access="permitAll()"/>
+		<intercept-url pattern="/rest/users/changePassword" access="isAuthenticated()" />
+		<intercept-url pattern="/rest/users/resetPassword" access="isAuthenticated()" />
+		<intercept-url pattern="/rest/users/confirmRegistration" access="permitAll()"/>
+		<intercept-url pattern="/rest/users/resendVerificationEmail" access="permitAll()"/>
+		<intercept-url pattern="/rest/users/sendAnonymousLinkEmail" access="isAuthenticated()"/>
+		<intercept-url pattern="/rest/users/email" access="isAuthenticated()"/>
+		<intercept-url pattern="/rest/users/settings" access="isAuthenticated()"/>
+		<intercept-url pattern="/rest/users/acceptTermsOfService" access="isAuthenticated()"/>
+		<intercept-url pattern="/rest/atoms/drafts/*" access="hasRole('ROLE_ACCOUNT')"/>
+		<intercept-url pattern="/rest/atoms/all" access="permitAll()"/>
+		<intercept-url pattern="/rest/**" access="isAuthenticated()"/>
+		<intercept-url pattern="/**" requires-channel="https"/>
+		<!--intercept-url pattern="/rest/**" access="isAuthenticated()" /-->
+		<!--
             added for integrating spring-session, which we added to synchronize
             http sessions with websocket sessions.
             see: http://spring.io/blog/2014/09/16/preview-spring-security-websocket-support-sessions
         -->
-        <custom-filter ref="sessionRepositoryFilter" before="FIRST" />
-
+		<custom-filter ref="sessionRepositoryFilter" before="FIRST" />
 		<!--
 			this config resets all remember-me cookies on startup because the
 			'key' property is by default set to a newly generated SecureRandom value.
 			Alternatively, we can inject a value through external configuration.
 			A suitable name for that property would be ${owner.webapp.rememberme.key}.
 		-->
-        <!--
+		<!--
         remember-me beans are defined further below 
-		<remember-me
-				user-service-ref="wonUserDetailService"
-				use-secure-cookie="true"
-				services-alias="rememberMeServices"
-				remember-me-parameter="remember-me"
-				remember-me-cookie="remember-me"
-				token-validity-seconds="5184000"
-				data-source-ref="dataSource"
-				/>
+		<remember-me user-service-ref="wonUserDetailService" use-secure-cookie="true" services-alias="rememberMeServices" remember-me-parameter="remember-me" remember-me-cookie="remember-me" token-validity-seconds="5184000" data-source-ref="dataSource" />
             -->
-            
 		<!-- use spring security's default http headers -->
 		<!-- see http://docs.spring.io/spring-security/site/docs/3.2.9.RELEASE/reference/htmlsingle/#headers for
 		configuration in spring-security-3.2.9 -->
@@ -94,56 +75,40 @@
 		<!-- TODO: we actually do need CSRF protection here (see https://github.com/researchstudio-sat/webofneeds/issues/1141) -->
 		<csrf disabled="true" />
 	</http>
-
-    <!-- because we use a customization of the RememberMeServices, 
+	<!-- because we use a customization of the RememberMeServices, 
     we cannot use the <remember-me namespace config and have to define the required beans manually -->
-    
-    <beans:bean id="rememberMeFilter" class="org.springframework.security.web.authentication.rememberme.RememberMeAuthenticationFilter">
-        <beans:constructor-arg name="rememberMeServices" ref="rememberMeServices"/>
-        <beans:constructor-arg name="authenticationManager" ref="authenticationManager" />
-    </beans:bean>
-
-    <beans:bean id="rememberMeServices" class="won.owner.service.impl.KeystoreEnabledPersistentRememberMeServices">
-        <beans:constructor-arg name="userDetailsService" ref="wonUserDetailService"/>
-        <beans:constructor-arg name="key" value="${owner.webapp.rememberme.key}" />
-        <beans:constructor-arg name="tokenRepository" ref="tokenRepository"/>
-        <beans:property name="tokenValiditySeconds" value="5184000" />
-        <beans:property name="useSecureCookie" value="true" />
-    </beans:bean>
-    
-    
-    <beans:bean id="rememberMeAuthenticationProvider" class="org.springframework.security.authentication.RememberMeAuthenticationProvider">
-        <beans:constructor-arg name="key" value="${owner.webapp.rememberme.key}"/>
-    </beans:bean>
-    
-    
-    <beans:bean id="tokenRepository" class="org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl" >
-        <beans:property name="dataSource" ref="dataSource" />
-    </beans:bean>
-
+	<beans:bean id="rememberMeFilter" class="org.springframework.security.web.authentication.rememberme.RememberMeAuthenticationFilter">
+		<beans:constructor-arg name="rememberMeServices" ref="rememberMeServices"/>
+		<beans:constructor-arg name="authenticationManager" ref="authenticationManager" />
+	</beans:bean>
+	<beans:bean id="rememberMeServices" class="won.owner.service.impl.KeystoreEnabledPersistentRememberMeServices">
+		<beans:constructor-arg name="userDetailsService" ref="wonUserDetailService"/>
+		<beans:constructor-arg name="key" value="${owner.webapp.rememberme.key}" />
+		<beans:constructor-arg name="tokenRepository" ref="tokenRepository"/>
+		<beans:property name="tokenValiditySeconds" value="5184000" />
+		<beans:property name="useSecureCookie" value="true" />
+	</beans:bean>
+	<beans:bean id="rememberMeAuthenticationProvider" class="org.springframework.security.authentication.RememberMeAuthenticationProvider">
+		<beans:constructor-arg name="key" value="${owner.webapp.rememberme.key}"/>
+	</beans:bean>
+	<beans:bean id="tokenRepository" class="org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl">
+		<beans:property name="dataSource" ref="dataSource" />
+	</beans:bean>
 	<beans:bean id="encoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder"/>
-
 	<beans:bean name="authenticationProvider" class="won.owner.service.impl.KeystoreEnabledDaoAuthenticationProvider">
-        <beans:property name="userDetailsService" ref="wonUserDetailService"/>
+		<beans:property name="userDetailsService" ref="wonUserDetailService"/>
 		<beans:property name="passwordEncoder" ref="encoder"/>
 	</beans:bean>
-
 	<beans:bean name="ajaxLoginUrlAuthenticationEntryPoint" class="won.owner.security.AjaxLoginUrlAuthenticationEntryPoint">
 		<beans:constructor-arg value="/"/>
 	</beans:bean>
-
-    <beans:bean name="sessionRepository" class="org.springframework.session.MapSessionRepository" />
-
-    <beans:bean name="sessionRepositoryFilter" class="org.springframework.session.web.http.SessionRepositoryFilter">
-        <beans:constructor-arg ref="sessionRepository"/>
-    </beans:bean>
-
+	<beans:bean name="sessionRepository" class="org.springframework.session.MapSessionRepository" />
+	<beans:bean name="sessionRepositoryFilter" class="org.springframework.session.web.http.SessionRepositoryFilter">
+		<beans:constructor-arg ref="sessionRepository"/>
+	</beans:bean>
 	<authentication-manager alias="authenticationManager">
 		<authentication-provider ref="authenticationProvider"/>
 		<authentication-provider ref="rememberMeAuthenticationProvider"/>
 	</authentication-manager>
-
-	<beans:bean id="securityContextRepository"
-						class='org.springframework.security.web.context.HttpSessionSecurityContextRepository' />
-			
+	<beans:bean id="securityContextRepository" class='org.springframework.security.web.context.HttpSessionSecurityContextRepository' />
 </beans:beans>

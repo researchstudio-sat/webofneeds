@@ -1,0 +1,79 @@
+@prefix msg:   <https://w3id.org/won/message#> .
+@prefix group: <https://w3id.org/won/ext/group#> .
+@prefix chat: <https://w3id.org/won/ext/chat#> .
+@prefix conn:  <https://192.168.124.49:8443/won/resource/connection/> .
+@prefix atom:  <https://192.168.124.49:8443/won/resource/atom/> .
+@prefix woncrypt: <https://w3id.org/won/core#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix cert:  <http://www.w3.org/ns/auth/cert#> .
+@prefix local: <https://192.168.124.49:8443/won/resource/> .
+@prefix geo:   <http://www.w3.org/2003/01/geo/wgs84_pos#> .
+@prefix sig:   <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#> .
+@prefix s:     <http://schema.org/> .
+@prefix sh:    <http://www.w3.org/ns/shacl#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix won:   <https://w3id.org/won/core#> .
+@prefix ldp:   <http://www.w3.org/ns/ldp#> .
+@prefix event: <https://192.168.124.49:8443/won/resource/event/> .
+@prefix dc:    <http://purl.org/dc/elements/1.1/> .
+@prefix sioc:  <http://rdfs.org/sioc/ns#> .
+
+<https://192.168.124.49:8443/won/resource/atom/cbfgi37je6kr#sysinfo> {
+    <https://192.168.124.49:8443/won/resource/atom/cbfgi37je6kr#sysinfo>
+            <http://www.w3.org/2004/03/trix/rdfg-1/subGraphOf>
+                    atom:cbfgi37je6kr .
+    
+    atom:cbfgi37je6kr
+            a                      won:Atom ;
+            <http://purl.org/dc/terms/created>
+                    "2018-09-28T06:50:12.069Z"^^xsd:dateTime ;
+            <http://purl.org/dc/terms/modified>
+                    "2018-09-28T06:50:12.15Z"^^xsd:dateTime ;
+            won:connections     <https://192.168.124.49:8443/won/resource/atom/cbfgi37je6kr/connections> ;
+            won:contentGraph    <https://192.168.124.49:8443/won/resource/event/tb06f3a5l8vw#envelope-sig> , <https://192.168.124.49:8443/won/resource/event/tb06f3a5l8vw#atom> ;
+            won:messageContainer  <https://192.168.124.49:8443/won/resource/atom/cbfgi37je6kr#events> ;
+            won:wonNode         <https://192.168.124.49:8443/won/resource> ;
+            won:atomState          won:Active .
+    
+    <https://192.168.124.49:8443/won/resource/atom/cbfgi37je6kr#events>
+            a            won:MessageContainer ;
+            rdfs:member  event:tb06f3a5l8vw , event:zs766q6qd1y2gk4xpu89 .
+}
+
+<https://192.168.124.49:8443/won/resource/event/tb06f3a5l8vw#atom> {
+    atom:cbfgi37je6kr
+            a                    won:Atom ;
+            won:doNotMatchAfter  "2018-10-28T06:50:11.152Z"^^xsd:dateTime ;
+            won:socket         <https://192.168.124.49:8443/won/resource/atom/cbfgi37je6kr#chatSocket> ;
+            won:socket         <https://192.168.124.49:8443/won/resource/atom/cbfgi37je6kr#groupSocket1> ;
+            won:socket         <https://192.168.124.49:8443/won/resource/atom/cbfgi37je6kr#groupSocket2> ;
+            won:hasSearchString  "test" ;
+            dc:title    "test" ;
+            won:tag  "test" ;
+            cert:key             [ cert:PublicKey  [ a                       woncrypt:ECCPublicKey ;
+                                                     woncrypt:ecc_algorithm  "EC" ;
+                                                     woncrypt:ecc_curveId    "secp384r1" ;
+                                                     woncrypt:ecc_qx         "84332f6c7eab610d8829a917baaf502dc49bfc974e55620c6ecacab0b2403af6aab9d264cbe0fe801101f3924d6ff846" ;
+                                                     woncrypt:ecc_qy         "483c83006d524e13bb17cb0ec4687f7b7c188a76378c6df6a0be6a1204f9edd29c1d79399ade1e6cf97d7ecf77d7be5f"
+                                                   ] ] .
+    
+    <https://192.168.124.49:8443/won/resource/atom/cbfgi37je6kr#chatSocket>
+            won:socketDefinition       chat:ChatSocket .
+    <https://192.168.124.49:8443/won/resource/atom/cbfgi37je6kr#groupSocket1>
+            won:socketDefinition       group:GroupSocket .
+    <https://192.168.124.49:8443/won/resource/atom/cbfgi37je6kr#groupSocket2>
+            won:socketDefinition       group:GroupSocket .
+}
+
+<https://192.168.124.49:8443/won/resource/event/tb06f3a5l8vw#envelope-sig> {
+    <https://192.168.124.49:8443/won/resource/event/tb06f3a5l8vw#envelope-sig>
+            a                               sig:Signature ;
+            sig:signatureValue           "MGYCMQDRfmzpM43Z9aLGy0JHKjde1Gflxnt5uWk1OGRFDtNElb3UucgBdntseO8LWyf7duQCMQDI7lH8wGJvcblaUy8c0sKsfGjOT9AGf1tZsLIT8/NjDRwonrbjV0ctg711EjzMXFg=" ;
+            sig:hasVerificationCertificate  atom:cbfgi37je6kr ;
+            msg:hash                     "AIJAHAKhwONNb8RKvFDWitB4zS4eZybc9gw6Ik1nhZjiqhQ48zx42DdxTDmgcaX8ySl+5RPel/3pcfWbmubL3gDGApbFBbV+J/bhiGwKXTJx3qy4WKtgaRi6L3lbPtDB/v9x16ZTGev5qWffND67IMHEsGN/MoJBgUDB3FlIsnqQ" ;
+            msg:publicKeyFingerprint     "Jwr0/bFPnGzLCrE+74woWkF2ZT7yYrjxxoJC/cWREXw=" ;
+            msg:signedGraph              <https://192.168.124.49:8443/won/resource/event/tb06f3a5l8vw#envelope> .
+}
+
+    

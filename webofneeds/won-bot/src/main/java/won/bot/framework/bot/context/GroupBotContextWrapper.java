@@ -15,7 +15,7 @@ public class GroupBotContextWrapper extends BotContextWrapper {
     }
 
     @Override
-    public String getNeedCreateListName() {
+    public String getAtomCreateListName() {
         throw new UnsupportedOperationException("This List is not available for this BotContextWrapper");
     }
 
@@ -27,11 +27,11 @@ public class GroupBotContextWrapper extends BotContextWrapper {
         return groupMembersListName;
     }
 
-    public List<URI> getGroupNeedUris(){
-        return getBotContext().getNamedNeedUriList(getGroupListName());
+    public List<URI> getGroupAtomUris() {
+        return getBotContext().getNamedAtomUriList(getGroupListName());
     }
 
-    public List<URI> getGroupMemberNeedUris(){
-        return getBotContext().getNamedNeedUriList(getGroupMembersListName());
+    public List<URI> getGroupMemberAtomUris() {
+        return getBotContext().getNamedAtomUriList(getGroupMembersListName());
     }
 }

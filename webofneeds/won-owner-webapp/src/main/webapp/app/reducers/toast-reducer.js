@@ -92,14 +92,14 @@ export default function(allToasts = initialState, action = {}) {
 
     //WARN TOASTS: won.WON.warnToast
     //ERROR TOASTS: won.WON.errorToast
-    case actionTypes.messages.closeNeed.failed:
+    case actionTypes.messages.closeAtom.failed:
       return pushNewToast(
         allToasts,
         "Failed to close posting",
         won.WON.errorToast
       );
 
-    case actionTypes.messages.reopenNeed.failed:
+    case actionTypes.messages.reopenAtom.failed:
       return pushNewToast(
         allToasts,
         "Failed to reopen posting",
@@ -113,7 +113,7 @@ export default function(allToasts = initialState, action = {}) {
         won.WON.errorToast
       );
 
-    case actionTypes.messages.needMessageReceived: {
+    case actionTypes.messages.atomMessageReceived: {
       const humanReadable = action.payload.humanReadable;
       const message = action.payload.message;
       return pushNewToast(
@@ -123,7 +123,7 @@ export default function(allToasts = initialState, action = {}) {
       );
     }
 
-    case actionTypes.needs.closedBySystem: {
+    case actionTypes.atoms.closedBySystem: {
       const humanReadable = action.payload.humanReadable;
       const message = action.payload.message;
       return pushNewToast(

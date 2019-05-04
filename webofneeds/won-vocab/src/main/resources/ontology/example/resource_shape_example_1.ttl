@@ -1,48 +1,48 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix won: <http://purl.org/webofneeds/model#> .
+@prefix won: <https://w3id.org/won/core#> .
 @prefix oslc: <http://open-services.net/ns/core#> .
 @prefix dcterms: <http://purl.org/dc/terms/>
 @prefix travel: <http://example.org/travel#> .
 @prefix ex: <http://example.org/example_1#> .
 
-ex:Need1 
-	a won:Need ;
-	won:hasContent ex:Need1_Content1 ;
-	won:hasMatchingConstraint ex:Need1_Constraint1.
+ex:Atom1 
+	a won:Atom ;
+	won:content ex:Atom1_Content1 ;
+	won:hasMatchingConstraint ex:Atom1_Constraint1.
 	
-ex:Need1_Content1 won:hasTextDescription "Ich suche nach einer Mitfahrgelegenheit Wien - Salzburg für 2 Personen. Wär toll wenn sich jemand finden würde. (irgendwann zwischen Fr-So) Bitte, bitte wenn jemand diese Strecke fährt, bei mir melden :-) Dankeschön.. LG"^^xsd:string
+ex:Atom1_Content1 won:hasTextDescription "Ich suche nach einer Mitfahrgelegenheit Wien - Salzburg für 2 Personen. Wär toll wenn sich jemand finden würde. (irgendwann zwischen Fr-So) Bitte, bitte wenn jemand diese Strecke fährt, bei mir melden :-) Dankeschön.. LG"^^xsd:string
 
-ex:Need1_Constraint1 
+ex:Atom1_Constraint1 
 	a oslc:ResourceShape ;
 	oslc:describes travel:Journey
-	oslc:property ex:Need1_Constraint1_Prop1, ex:Need1_Constraint1_Prop2, ex:Need1_Constraint1_Prop3, ex:Need1_Constraint1_Prop4, ex:Need1_Constraint1_Prop5 . 
+	oslc:property ex:Atom1_Constraint1_Prop1, ex:Atom1_Constraint1_Prop2, ex:Atom1_Constraint1_Prop3, ex:Atom1_Constraint1_Prop4, ex:Atom1_Constraint1_Prop5 . 
 	
-ex:Need1_Constraint1_Prop1 
+ex:Atom1_Constraint1_Prop1 
 	a oscl:Property ;
 	oslc:propertyDefinition travel:type ;
 	oslc:occurs oslc:Exactly-one ;
 	oslc:allowedValue travel:Ride .
 
-ex:Need1_Constraint1_Prop2 
+ex:Atom1_Constraint1_Prop2 
 	a oscl:Property ;
 	oslc:propertyDefinition travel:fellowPassengers ;
 	oslc:occurs oslc:Exactly-one ;	
 	oslc:allowedValue "1"^^xsd:integer .
 	
-ex:Need1_Constraint1_Prop3
+ex:Atom1_Constraint1_Prop3
 	a oscl:Property ;
 	oslc:propertyDefinition travel:startingPoint ;
 	oslc:occurs oslc:Exactly-one ;	
 	oslc:allowedValue "Wien"^^rdfs:Literal .
 	
-ex:Need1_Constraint1_Prop4
+ex:Atom1_Constraint1_Prop4
 	a oscl:Property ;
 	oslc:propertyDefinition travel:destination ;
 	oslc:occurs oslc:Exactly-one ;	
 	oslc:allowedValue "Salzburg"^^rdfs:Literal .
 	
-ex:Need1_Constraint1_Prop5
+ex:Atom1_Constraint1_Prop5
 	a oscl:Property ;
 	oslc:propertyDefinition travel:date ;
 	oslc:occurs oslc:Exactly-one ;	

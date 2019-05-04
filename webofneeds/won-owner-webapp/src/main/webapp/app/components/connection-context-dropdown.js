@@ -6,14 +6,10 @@ import angular from "angular";
 import ngAnimate from "angular-animate";
 import { actionCreators } from "../actions/actions.js";
 import { attach, get, getIn, toAbsoluteURL } from "../utils.js";
-import {
-  getConnectionUriFromRoute,
-  getOwnedNeedByConnectionUri,
-} from "../selectors/general-selectors.js";
+import * as generalSelectors from "../selectors/general-selectors.js";
 import { connect2Redux } from "../won-utils.js";
 import { ownerBaseUrl } from "config";
 import * as connectionUtils from "../connection-utils.js";
-import * as needUtils from "../need-utils.js";
 import * as processUtils from "../process-utils.js";
 
 import "style/_context-dropdown.scss";
@@ -44,7 +40,7 @@ function genComponentConf() {
                     <button
                         class="won-button--outlined thin red"
                         ng-if="!self.isSuggested"
-                        ng-click="self.goToPost(self.connection.get('remoteNeedUri'))">
+                        ng-click="self.goToPost(self.connection.get('targetAtomUri'))">
                         Show Details
                     </button>
                     <button
@@ -61,9 +57,15 @@ function genComponentConf() {
                     </button>
                     <button
                         class="won-button--outlined thin red"
-                        ng-if="self.isRemoteNeedUsableAsTemplate"
-                        ng-click="self.router__stateGoAbs('connections', {fromNeedUri: self.remoteNeedUri, mode: 'DUPLICATE'})">
+                        ng-if="self.isTargetAtomUsableAsTemplate"
+                        ng-click="self.router__stateGoAbs('connections', {fromAtomUri: self.targetAtomUri, mode: 'DUPLICATE'})">
                         Post this too!
+                    </button>
+                    <button
+                        class="won-button--outlined thin red"
+                        ng-if="self.isTargetAtomEditable"
+                        ng-click="self.router__stateGoAbs('connections', {fromAtomUri: self.atomUri, mode: 'EDIT'})">
+                        Edit
                     </button>
                     <a class="won-button--outlined thin red"
                         ng-if="self.adminEmail"
@@ -84,18 +86,18 @@ function genComponentConf() {
       attach(this, serviceDependencies, arguments);
 
       const selectFromState = state => {
-        const connectionUri = getConnectionUriFromRoute(state);
+        const connectionUri = generalSelectors.getConnectionUriFromRoute(state);
 
         const post =
-          connectionUri && getOwnedNeedByConnectionUri(state, connectionUri);
+          connectionUri &&
+          generalSelectors.getOwnedAtomByConnectionUri(state, connectionUri);
         const connection = post && post.getIn(["connections", connectionUri]);
 
-        const remoteNeedUri = getIn(connection, ["remoteNeedUri"]);
-        const remoteNeed = getIn(state, ["needs", remoteNeedUri]);
+        const targetAtomUri = getIn(connection, ["targetAtomUri"]);
 
         let linkToPost;
-        if (ownerBaseUrl && remoteNeedUri) {
-          const path = "#!post/" + `?postUri=${encodeURI(remoteNeedUri)}`;
+        if (ownerBaseUrl && targetAtomUri) {
+          const path = "#!post/" + `?postUri=${encodeURI(targetAtomUri)}`;
 
           linkToPost = toAbsoluteURL(ownerBaseUrl).toString() + path;
         }
@@ -105,10 +107,10 @@ function genComponentConf() {
           connection,
           connectionUri,
           adminEmail: getIn(state, ["config", "theme", "adminEmail"]),
-          remoteNeedUri,
+          targetAtomUri,
           linkToPost,
           isConnectionToGroup: connectionUtils.isChatToGroup(
-            state.get("needs"),
+            state.get("atoms"),
             get(post, "uri"),
             connectionUri
           ),
@@ -117,8 +119,13 @@ function genComponentConf() {
           isSentRequest: connectionUtils.isRequestSent(connection),
           isReceivedRequest: connectionUtils.isRequestReceived(connection),
           isSuggested: connectionUtils.isSuggested(connection),
-          isRemoteNeedUsableAsTemplate: needUtils.isUsableAsTemplate(
-            remoteNeed
+          isTargetAtomUsableAsTemplate: generalSelectors.isAtomUsableAsTemplate(
+            state,
+            targetAtomUri
+          ),
+          isTargetAtomEditable: generalSelectors.isAtomEditable(
+            state,
+            targetAtomUri
           ),
           connectionLoading:
             !connection ||
@@ -147,7 +154,7 @@ function genComponentConf() {
     }
 
     generateReportPostMailParams() {
-      const subject = `[Report Post] - ${this.remoteNeedUri}`;
+      const subject = `[Report Post] - ${this.targetAtomUri}`;
       const body = `Link to Post: ${this.linkToPost}%0D%0AReason:%0D%0A`; //hint: %0D%0A adds a linebreak
 
       return `subject=${subject}&body=${body}`;
@@ -164,7 +171,7 @@ function genComponentConf() {
     goToPost(postUri) {
       this.router__stateGoCurrent({
         useCase: undefined,
-        viewNeedUri: postUri,
+        viewAtomUri: postUri,
         viewConnUri: undefined,
       });
     }

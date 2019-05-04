@@ -34,7 +34,7 @@
       }
     }
     > .topnav__inner__center {
-      // so the create-need-speechbubble-triangle centers correctly
+      // so the create-atom-speechbubble-triangle centers correctly
       // on the icon (when the caption isn't visible)
       @extend %center--absolute;
     }
@@ -100,5 +100,7 @@
   .topnav__signupbtn {
     @include won-button--filled(white, $won-primary-color);
     @extend .topnav__button;
+    padding-left: 1rem;
+    padding-right: 1rem;
   }
 }

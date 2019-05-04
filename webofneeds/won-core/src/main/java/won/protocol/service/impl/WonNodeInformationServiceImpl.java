@@ -14,18 +14,14 @@ import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
 
 /**
- * User: fsalcher
- * Date: 17.09.2014
+ * User: fsalcher Date: 17.09.2014
  */
 public class WonNodeInformationServiceImpl implements WonNodeInformationService {
-
     private static final int RANDOM_ID_STRING_LENGTH = 20;
     @Autowired
     private RandomNumberService randomNumberService;
-
     @Autowired
     private LinkedDataSource linkedDataSource;
-
     @Value(value = "${uri.node.default}")
     private URI defaultWonNodeUri;
 
@@ -34,20 +30,20 @@ public class WonNodeInformationServiceImpl implements WonNodeInformationService 
         assert wonNodeURI != null;
         Dataset nodeDataset = linkedDataSource.getDataForResource(wonNodeURI);
         WonNodeInfo info = WonRdfUtils.WonNodeUtils.getWonNodeInfo(wonNodeURI, nodeDataset);
-        if (info == null) throw new IllegalStateException("Could not obtain WonNodeInformation for URI " + wonNodeURI);
+        if (info == null)
+            throw new IllegalStateException("Could not obtain WonNodeInformation for URI " + wonNodeURI);
         return info;
     }
 
     @Override
-    public URI generateNeedURI() {
-        return generateNeedURI(getDefaultWonNodeURI());
+    public URI generateAtomURI() {
+        return generateAtomURI(getDefaultWonNodeURI());
     }
 
     @Override
     public URI generateEventURI(URI wonNodeURI) {
         WonNodeInfo wonNodeInformation = getWonNodeInformation(wonNodeURI);
-        return URI.create(wonNodeInformation.getEventURIPrefix() + "/" +
-                generateRandomID());
+        return URI.create(wonNodeInformation.getEventURIPrefix() + "/" + generateRandomID());
     }
 
     @Override
@@ -89,23 +85,21 @@ public class WonNodeInformationServiceImpl implements WonNodeInformationService 
     }
 
     @Override
-    public URI generateNeedURI(URI wonNodeURI) {
+    public URI generateAtomURI(URI wonNodeURI) {
         WonNodeInfo wonNodeInformation = getWonNodeInformation(wonNodeURI);
-        return URI.create(wonNodeInformation.getNeedURIPrefix() + "/" +
-                generateRandomID());
+        return URI.create(wonNodeInformation.getAtomURIPrefix() + "/" + generateRandomID());
     }
 
     @Override
-    public boolean isValidNeedURI(URI needURI) {
-        return isValidNeedURI(needURI, getDefaultWonNodeURI());
+    public boolean isValidAtomURI(URI atomURI) {
+        return isValidAtomURI(atomURI, getDefaultWonNodeURI());
     }
 
     @Override
-    public boolean isValidNeedURI(URI needURI, URI wonNodeURI) {
+    public boolean isValidAtomURI(URI atomURI, URI wonNodeURI) {
         WonNodeInfo wonNodeInformation = getWonNodeInformation(wonNodeURI);
-        return isValidURI(needURI, wonNodeInformation.getNeedURIPrefix());
+        return isValidURI(atomURI, wonNodeInformation.getAtomURIPrefix());
     }
-
 
     private boolean isValidURI(URI uri, String prefix) {
         return uri != null && uri.toString().startsWith(prefix);
@@ -113,11 +107,10 @@ public class WonNodeInformationServiceImpl implements WonNodeInformationService 
 
     @Override
     public URI getWonNodeUri(final URI resourceURI) {
-        URI wonNodeURI = WonLinkedDataUtils.getWonNodeURIForNeedOrConnectionURI(resourceURI, linkedDataSource);
-        if (wonNodeURI == null) throw new
-                IllegalStateException("Could not obtain WoN node URI for resource " + resourceURI);
+        URI wonNodeURI = WonLinkedDataUtils.getWonNodeURIForAtomOrConnectionURI(resourceURI, linkedDataSource);
+        if (wonNodeURI == null)
+            throw new IllegalStateException("Could not obtain WoN node URI for resource " + resourceURI);
         return wonNodeURI;
-
     }
 
     @Override
@@ -138,13 +131,13 @@ public class WonNodeInformationServiceImpl implements WonNodeInformationService 
     }
 
     /**
-     * Returns a random string that does not start with a number.
-     * We do this so that we generate URIs for which prefixing will always work with N3.js
+     * Returns a random string that does not start with a number. We do this so that
+     * we generate URIs for which prefixing will always work with N3.js
      * https://github.com/RubenVerborgh/N3.js/issues/121
      * 
      * @return
      */
     private String generateRandomID() {
-    	return randomNumberService.generateRandomString(RANDOM_ID_STRING_LENGTH);
+        return randomNumberService.generateRandomString(RANDOM_ID_STRING_LENGTH);
     }
 }

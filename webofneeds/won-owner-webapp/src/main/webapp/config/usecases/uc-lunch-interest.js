@@ -12,7 +12,7 @@ window.SparqlGenerator4dbg = Generator;
 export const lunchInterest = {
   identifier: "lunchInterest",
   label: "Add Lunch Interest",
-  icon: undefined,
+  icon: "#ico36_uc_meal-half",
   draft: {
     ...mergeInEmptyDraft({
       content: {
@@ -20,7 +20,8 @@ export const lunchInterest = {
         title: "I am interested in meeting up for lunch!",
       },
       seeks: {
-        sPlanAction: { "@id": "http://dbpedia.org/resource/Lunch" },
+        type: ["s:PlanAction"],
+        eventObject: "http://dbpedia.org/resource/Lunch",
       },
     }),
   },
@@ -32,9 +33,7 @@ export const lunchInterest = {
       mandatory: true,
     },
   },
-  seeksDetails: {
-    sPlanAction: { ...details.sPlanAction },
-  },
+  seeksDetails: {},
 
   generateQuery: (draft, resultName) => {
     const vicinityScoreSQ = vicinityScoreSubQuery({
@@ -65,7 +64,7 @@ export const lunchInterest = {
       variables: [resultName, "?score"],
       subQueries: subQueries,
       where: [
-        `${resultName} rdf:type won:Need.`,
+        `${resultName} rdf:type won:Atom.`,
         `${resultName} rdf:type s:PlanAction.`,
         `${resultName} s:object ?planObject.`,
         `?planObject s:about <http://dbpedia.org/resource/Lunch>`,

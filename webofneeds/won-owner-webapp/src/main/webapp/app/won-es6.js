@@ -9,7 +9,7 @@
  */
 
 import won from "./service/won.js";
-import "./service/need-builder.js";
+import "./service/atom-builder.js";
 import "./service/message-builder.js";
 import "./service/linkeddata-service-won.js";
 export default won;

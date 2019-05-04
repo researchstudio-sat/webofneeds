@@ -1,60 +1,60 @@
 <https://satvm05.researchstudio.at/won/resource/event/k5g40aj5p9akbum5olil#envelope-cla6-sig> {
     <https://satvm05.researchstudio.at/won/resource/event/k5g40aj5p9akbum5olil#envelope-cla6-sig>
             a       <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature> ;
-            <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#hasSignatureValue>
+            <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#signatureValue>
                     "MGQCMEjjppP7wlL0rPP15xneU7Y+gcV4wKMulwUCLdV2jRMpFK83IN9CXnp6NNpNUls0fAIwW+1XbNIQunuO9X1cNIi74shr3Ph5aDE62qm7kWbYG0qJuSym0QNI4gMhsQ04Hv/G" ;
             <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#hasVerificationCertificate>
-                    <https://satvm05.researchstudio.at/won/resource/need/bxh7r6yz5u5s7u4s8ru5> ;
-            <http://purl.org/webofneeds/message#hasHash>
+                    <https://satvm05.researchstudio.at/won/resource/atom/bxh7r6yz5u5s7u4s8ru5> ;
+            <https://w3id.org/won/message#hash>
                     "AJQqAWUCpPEwuY5TFnprrLxAX680BdFSYziKJ3QedizSw28iHChbRtRMxh9/ASLFHoVyM3x9l8JoYlD45FljBTvrpEvY9nrbqLtybmDSTefGk9ryJYYzoh02F1I2YD1odrzbQzZ0e02SxmbyXo+mC3X10qVQXbi8arcPe6/T6HTM" ;
-            <http://purl.org/webofneeds/message#hasPublicKeyFingerprint>
+            <https://w3id.org/won/message#publicKeyFingerprint>
                     "P855D3zfYF8O09qp/efHWixjquCHpGTNDHSkWG/51sI=" ;
-            <http://purl.org/webofneeds/message#hasSignedGraph>
+            <https://w3id.org/won/message#signedGraph>
                     <https://satvm05.researchstudio.at/won/resource/event/k5g40aj5p9akbum5olil#envelope-cla6> .
 }
 
 <https://satvm05.researchstudio.at/won/resource/event/k5g40aj5p9akbum5olil#envelope-cla6> {
     <https://satvm05.researchstudio.at/won/resource/event/k5g40aj5p9akbum5olil#envelope-cla6>
-            a       <http://purl.org/webofneeds/message#EnvelopeGraph> ;
-            <http://purl.org/webofneeds/message#containsSignature>
+            a       <https://w3id.org/won/message#EnvelopeGraph> ;
+            <https://w3id.org/won/message#containsSignature>
                     <https://satvm05.researchstudio.at/won/resource/event/k5g40aj5p9akbum5olil#content-eof7-sig> ;
             <http://www.w3.org/2004/03/trix/rdfg-1/subGraphOf>
                     <https://satvm05.researchstudio.at/won/resource/event/k5g40aj5p9akbum5olil> .
 
     <https://satvm05.researchstudio.at/won/resource/event/k5g40aj5p9akbum5olil#content-eof7-sig>
             a       <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature> ;
-            <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#hasSignatureValue>
+            <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#signatureValue>
                     "MGQCMF61cbLcCvBS7zOg/1YL6MN0fEfzW52eMx7H/DhA3ZEpc2UEfQ7afvRJl+6iMPQl3wIwcjxHJnQUs6fJQtIPOHQ9rFuwdT/lu2pbSpdWgfpArXXq/zGuZ4bEgqVc9em0u6fJ" ;
             <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#hasVerificationCertificate>
-                    <https://satvm05.researchstudio.at/won/resource/need/bxh7r6yz5u5s7u4s8ru5> ;
-            <http://purl.org/webofneeds/message#hasHash>
+                    <https://satvm05.researchstudio.at/won/resource/atom/bxh7r6yz5u5s7u4s8ru5> ;
+            <https://w3id.org/won/message#hash>
                     "YEosEbNXJZ5Otvyzlf6Jq8f0BUuXXUSEzhZo4MMo43dtgC2rIOX8qPjN10RFV5ueyOOU2WxjOGEt8J86WAW1HykwART0x+0jGoGVT5qZUmnds8gpAaZG94lxSKMWV7uqp5uw/HSbgFJYb/TiLsKquhs5ZtZopnZBz0KA3l1nzLY=" ;
-            <http://purl.org/webofneeds/message#hasPublicKeyFingerprint>
+            <https://w3id.org/won/message#publicKeyFingerprint>
                     "P855D3zfYF8O09qp/efHWixjquCHpGTNDHSkWG/51sI=" ;
-            <http://purl.org/webofneeds/message#hasSignedGraph>
+            <https://w3id.org/won/message#signedGraph>
                     <https://satvm05.researchstudio.at/won/resource/event/k5g40aj5p9akbum5olil#content-eof7> .
 
     <https://satvm05.researchstudio.at/won/resource/event/k5g40aj5p9akbum5olil>
-            a       <http://purl.org/webofneeds/message#FromOwner> ;
-            <http://purl.org/webofneeds/message#hasContent>
+            a       <https://w3id.org/won/message#FromOwner> ;
+            <https://w3id.org/won/message#content>
                     <https://satvm05.researchstudio.at/won/resource/event/k5g40aj5p9akbum5olil#content-eof7> ;
-            <http://purl.org/webofneeds/message#hasMessageType>
-                    <http://purl.org/webofneeds/message#ConnectionMessage> ;
-            <http://purl.org/webofneeds/message#hasReceiver>
+            <https://w3id.org/won/message#messageType>
+                    <https://w3id.org/won/message#ConnectionMessage> ;
+            <https://w3id.org/won/message#recipient>
                     <https://satvm05.researchstudio.at/won/resource/connection/hmbej2exnskvzt6glh73> ;
-            <http://purl.org/webofneeds/message#hasReceiverNeed>
-                    <https://satvm05.researchstudio.at/won/resource/need/gp2xiapmiw18> ;
-            <http://purl.org/webofneeds/message#hasReceiverNode>
+            <https://w3id.org/won/message#recipientAtom>
+                    <https://satvm05.researchstudio.at/won/resource/atom/gp2xiapmiw18> ;
+            <https://w3id.org/won/message#recipientNode>
                     <https://satvm05.researchstudio.at/won/resource> ;
-            <http://purl.org/webofneeds/message#hasSender>
+            <https://w3id.org/won/message#sender>
                     <https://satvm05.researchstudio.at/won/resource/connection/q5a4b3vszf2henxchmgn> ;
-            <http://purl.org/webofneeds/message#hasSenderNeed>
-                    <https://satvm05.researchstudio.at/won/resource/need/bxh7r6yz5u5s7u4s8ru5> ;
-            <http://purl.org/webofneeds/message#hasSenderNode>
+            <https://w3id.org/won/message#senderAtom>
+                    <https://satvm05.researchstudio.at/won/resource/atom/bxh7r6yz5u5s7u4s8ru5> ;
+            <https://w3id.org/won/message#senderNode>
                     <https://satvm05.researchstudio.at/won/resource> ;
-            <http://purl.org/webofneeds/message#hasSentTimestamp>
+            <https://w3id.org/won/message#sentTimestamp>
                     "1536133735069"^^<http://www.w3.org/2001/XMLSchema#long> ;
-            <http://purl.org/webofneeds/message#protocolVersion>
+            <https://w3id.org/won/message#protocolVersion>
                     "1.0" .
 }
 
@@ -62,13 +62,13 @@
     [ a       <http://www.w3.org/ns/shacl#ValidationResult> ] .
 
     <https://satvm05.researchstudio.at/won/resource/event/mkcpw9v9o9opay23s6mk#envelope-wiul>
-            a       <http://purl.org/webofneeds/message#EnvelopeGraph> .
+            a       <https://w3id.org/won/message#EnvelopeGraph> .
 
     <https://satvm05.researchstudio.at/won/resource/event/o5nkfp1m0m93nlny7g9x#envelope-vfvb-sig>
             a       <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature> .
 
     <https://satvm05.researchstudio.at/won/resource/event/ctx4gzusr61y02j4k4ke#envelope-sn2n>
-            a       <http://purl.org/webofneeds/message#EnvelopeGraph> .
+            a       <https://w3id.org/won/message#EnvelopeGraph> .
 
     <https://satvm05.researchstudio.at/won/resource/event/atm1i28u1kz0dscjzic9#envelope-mjsb-sig>
             a       <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature> .
@@ -89,25 +89,25 @@
             a       <http://www.w3.org/ns/shacl#NodeShape> .
 
     <https://satvm05.researchstudio.at/won/resource/event/g3eqevbr9ss7o45itk72#envelope-i0ze>
-            a       <http://purl.org/webofneeds/message#EnvelopeGraph> .
+            a       <https://w3id.org/won/message#EnvelopeGraph> .
 
     <https://satvm05.researchstudio.at/won/resource/event/t7gry3jr3l945jdn1qzp#envelope-zhke>
-            a       <http://purl.org/webofneeds/message#EnvelopeGraph> .
+            a       <https://w3id.org/won/message#EnvelopeGraph> .
 
     <https://satvm05.researchstudio.at/won/resource/event/f6z6xraiyc2c029hsxnw>
-            a       <http://purl.org/webofneeds/message#FromSystem> .
+            a       <https://w3id.org/won/message#FromSystem> .
 
     <https://satvm05.researchstudio.at/won/resource/event/dm8t3cyirhog869dtpmf#envelope-pmam-sig>
             a       <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature> .
 
     <https://satvm05.researchstudio.at/won/resource/event/k0h0jrhpck866v9otqqk#envelope-c73k>
-            a       <http://purl.org/webofneeds/message#EnvelopeGraph> .
+            a       <https://w3id.org/won/message#EnvelopeGraph> .
 
     <https://satvm05.researchstudio.at/won/resource/event/s3vywz4mxdajxlk0e3i9#envelope-5qvi-sig>
             a       <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature> .
 
     <https://satvm05.researchstudio.at/won/resource/event/u04c8ucuztvvlzxhzlxn#envelope-shmv>
-            a       <http://purl.org/webofneeds/message#EnvelopeGraph> .
+            a       <https://w3id.org/won/message#EnvelopeGraph> .
 
     <https://satvm05.researchstudio.at/won/resource/event/if12i5we1y87q74tqa4z#envelope-9hth-sig>
             a       <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature> .
@@ -116,40 +116,40 @@
             a       <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature> .
 
     <https://satvm05.researchstudio.at/won/resource/event/o5nkfp1m0m93nlny7g9x>
-            a       <http://purl.org/webofneeds/message#FromOwner> .
+            a       <https://w3id.org/won/message#FromOwner> .
 
     <https://satvm05.researchstudio.at/won/resource/event/mkcpw9v9o9opay23s6mk#content-q2be-sig>
             a       <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature> .
 
     <https://satvm05.researchstudio.at/won/resource/event/vogod7tgpeqvgw5sf75t>
-            a       <http://purl.org/webofneeds/message#FromExternal> .
+            a       <https://w3id.org/won/message#FromExternal> .
 
     <https://satvm05.researchstudio.at/won/resource/event/g343hihbu3e3vxz5bgim#envelope-zuny>
-            a       <http://purl.org/webofneeds/message#EnvelopeGraph> .
+            a       <https://w3id.org/won/message#EnvelopeGraph> .
 
     <https://satvm05.researchstudio.at/won/resource/event/dxppukwzurd6br43xb5g>
-            a       <http://purl.org/webofneeds/message#FromSystem> .
+            a       <https://w3id.org/won/message#FromSystem> .
 
     <https://satvm05.researchstudio.at/won/resource/event/o6rvtxeuw6wk4q0iqp03>
-            a       <http://purl.org/webofneeds/message#FromSystem> .
+            a       <https://w3id.org/won/message#FromSystem> .
 
     <https://satvm05.researchstudio.at/won/resource/event/faouzkv4swh8f9ds3red>
-            a       <http://purl.org/webofneeds/message#FromExternal> .
+            a       <https://w3id.org/won/message#FromExternal> .
 
     <https://satvm05.researchstudio.at/won/resource/event/atm1i28u1kz0dscjzic9#envelope-druq-sig>
             a       <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature> .
 
     <https://satvm05.researchstudio.at/won/resource/event/bexkso0yw3ntsi0om8p2#envelope-0mt3>
-            a       <http://purl.org/webofneeds/message#EnvelopeGraph> .
+            a       <https://w3id.org/won/message#EnvelopeGraph> .
 
     <https://satvm05.researchstudio.at/won/resource/event/t7gry3jr3l945jdn1qzp>
-            a       <http://purl.org/webofneeds/message#FromExternal> .
+            a       <https://w3id.org/won/message#FromExternal> .
 
     <https://satvm05.researchstudio.at/won/resource/event/v4nsb25jocdjhqty8vaj#envelope-wojr>
-            a       <http://purl.org/webofneeds/message#EnvelopeGraph> .
+            a       <https://w3id.org/won/message#EnvelopeGraph> .
 
     <https://satvm05.researchstudio.at/won/resource/event/mjly8u17ebtxnzgc9hco#envelope-swci>
-            a       <http://purl.org/webofneeds/message#EnvelopeGraph> .
+            a       <https://w3id.org/won/message#EnvelopeGraph> .
 
     <https://satvm05.researchstudio.at/won/resource/event/rcbdyecq6vk9ox4zu396#envelope-dua2-sig>
             a       <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature> .
@@ -158,46 +158,46 @@
             a       <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature> .
 
     <https://satvm05.researchstudio.at/won/resource/event/k0h0jrhpck866v9otqqk>
-            a       <http://purl.org/webofneeds/message#FromExternal> .
+            a       <https://w3id.org/won/message#FromExternal> .
 
     <https://satvm05.researchstudio.at/won/resource/event/u04c8ucuztvvlzxhzlxn>
-            a       <http://purl.org/webofneeds/message#FromSystem> .
+            a       <https://w3id.org/won/message#FromSystem> .
 
     <https://satvm05.researchstudio.at/won/resource/event/fvecm6ul3xk7o4bpl5r4>
-            a       <http://purl.org/webofneeds/message#FromExternal> .
+            a       <https://w3id.org/won/message#FromExternal> .
 
     <https://satvm05.researchstudio.at/won/resource/event/g343hihbu3e3vxz5bgim#envelope-zuny-sig>
             a       <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature> .
 
     <https://satvm05.researchstudio.at/won/resource/event/dv5c9f64l5591z6glrfx>
-            a       <http://purl.org/webofneeds/message#FromExternal> .
+            a       <https://w3id.org/won/message#FromExternal> .
 
     <https://satvm05.researchstudio.at/won/resource/event/f6z6xraiyc2c029hsxnw#envelope-qo4i>
-            a       <http://purl.org/webofneeds/message#EnvelopeGraph> .
+            a       <https://w3id.org/won/message#EnvelopeGraph> .
 
     <https://satvm05.researchstudio.at/won/resource/event/ctx4gzusr61y02j4k4ke#envelope-sn2n-sig>
             a       <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature> .
 
     <https://satvm05.researchstudio.at/won/resource/event/rcbdyecq6vk9ox4zu396>
-            a       <http://purl.org/webofneeds/message#FromSystem> .
+            a       <https://w3id.org/won/message#FromSystem> .
 
     <https://satvm05.researchstudio.at/won/resource/event/sn807y11f7e6espxsjwi#envelope-csau>
-            a       <http://purl.org/webofneeds/message#EnvelopeGraph> .
+            a       <https://w3id.org/won/message#EnvelopeGraph> .
 
     <https://satvm05.researchstudio.at/won/resource/event/dv5c9f64l5591z6glrfx#envelope-0nhw>
-            a       <http://purl.org/webofneeds/message#EnvelopeGraph> .
+            a       <https://w3id.org/won/message#EnvelopeGraph> .
 
     <https://satvm05.researchstudio.at/won/resource/event/vogod7tgpeqvgw5sf75t#envelope-rtos>
-            a       <http://purl.org/webofneeds/message#EnvelopeGraph> .
+            a       <https://w3id.org/won/message#EnvelopeGraph> .
 
     <https://satvm05.researchstudio.at/won/resource/event/ja3gsedvq9o5#envelope-vrxa>
-            a       <http://purl.org/webofneeds/message#EnvelopeGraph> .
+            a       <https://w3id.org/won/message#EnvelopeGraph> .
 
     <https://satvm05.researchstudio.at/won/resource/event/v4nsb25jocdjhqty8vaj#envelope-nf6b-sig>
             a       <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature> .
 
     <https://satvm05.researchstudio.at/won/resource/event/ldaabpv62dj1e70uwqt4>
-            a       <http://purl.org/webofneeds/message#FromSystem> .
+            a       <https://w3id.org/won/message#FromSystem> .
 
     <https://satvm05.researchstudio.at/won/resource/event/kuo65480nxqzd32koofh#content-lnkn-sig>
             a       <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature> .
@@ -212,16 +212,16 @@
             a       <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature> .
 
     <https://satvm05.researchstudio.at/won/resource/event/x8w8mesutrlss8rbrkuf#envelope-7o3b>
-            a       <http://purl.org/webofneeds/message#EnvelopeGraph> .
+            a       <https://w3id.org/won/message#EnvelopeGraph> .
 
     <https://satvm05.researchstudio.at/won/resource/event/gaf25w6bs9gaeb6oqm3z#envelope-zdge>
-            a       <http://purl.org/webofneeds/message#EnvelopeGraph> .
+            a       <https://w3id.org/won/message#EnvelopeGraph> .
 
     <https://satvm05.researchstudio.at/won/resource/event/gaf25w6bs9gaeb6oqm3z>
-            a       <http://purl.org/webofneeds/message#FromExternal> .
+            a       <https://w3id.org/won/message#FromExternal> .
 
     <https://satvm05.researchstudio.at/won/resource/event/atm1i28u1kz0dscjzic9#envelope-mjsb>
-            a       <http://purl.org/webofneeds/message#EnvelopeGraph> .
+            a       <https://w3id.org/won/message#EnvelopeGraph> .
 
     <https://satvm05.researchstudio.at/won/resource/event/vc4j6eocnj0e#content-sig>
             a       <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature> .
@@ -232,16 +232,16 @@
     [ a       <http://www.w3.org/ns/shacl#ValidationResult> ] .
 
     <https://satvm05.researchstudio.at/won/resource/event/crtzttv0wr96yidvwkka>
-            a       <http://purl.org/webofneeds/message#FromSystem> .
+            a       <https://w3id.org/won/message#FromSystem> .
 
     <https://satvm05.researchstudio.at/won/resource/event/vc4j6eocnj0e#data>
-            a       <http://purl.org/webofneeds/message#EnvelopeGraph> .
+            a       <https://w3id.org/won/message#EnvelopeGraph> .
 
     <https://satvm05.researchstudio.at/won/resource/event/tyipsec9pb20>
-            a       <http://purl.org/webofneeds/message#FromOwner> .
+            a       <https://w3id.org/won/message#FromOwner> .
 
     <https://satvm05.researchstudio.at/won/resource/event/m6djrxuzy62ouwfd8mm6>
-            a       <http://purl.org/webofneeds/message#FromSystem> .
+            a       <https://w3id.org/won/message#FromSystem> .
 
     <https://satvm05.researchstudio.at/won/resource/event/h28fvjfmjgehb56r0kx8#envelope-nacp-sig>
             a       <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature> .
@@ -256,13 +256,13 @@
             a       <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature> .
 
     <https://satvm05.researchstudio.at/won/resource/event/bb9incuswy5evphgki8p>
-            a       <http://purl.org/webofneeds/message#FromSystem> .
+            a       <https://w3id.org/won/message#FromSystem> .
 
     <https://satvm05.researchstudio.at/won/resource/event/vc4j6eocnj0e#envelope-ihnp-sig>
             a       <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature> .
 
     <https://satvm05.researchstudio.at/won/resource/event/fvecm6ul3xk7o4bpl5r4#envelope-2zhv>
-            a       <http://purl.org/webofneeds/message#EnvelopeGraph> .
+            a       <https://w3id.org/won/message#EnvelopeGraph> .
 
     <https://satvm05.researchstudio.at/won/resource/event/tyipsec9pb20#envelope-ynpy-sig>
             a       <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature> .
@@ -274,7 +274,7 @@
             a       <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature> .
 
     <https://satvm05.researchstudio.at/won/resource/connection/hmbej2exnskvzt6glh73/events>
-            a       <http://purl.org/webofneeds/model#EventContainer> .
+            a       <https://w3id.org/won/core#MessageContainer> .
 
     <https://satvm05.researchstudio.at/won/resource/event/ldaabpv62dj1e70uwqt4#envelope-5iyv-sig>
             a       <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature> .
@@ -283,31 +283,31 @@
             a       <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature> .
 
     <https://satvm05.researchstudio.at/won/resource/event/ox86im53qhxqygrqtdmc#envelope-xhhb>
-            a       <http://purl.org/webofneeds/message#EnvelopeGraph> .
+            a       <https://w3id.org/won/message#EnvelopeGraph> .
 
     <https://satvm05.researchstudio.at/won/resource/event/sn807y11f7e6espxsjwi#envelope-csau-sig>
             a       <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature> .
 
     <https://satvm05.researchstudio.at/won/resource/event/tyipsec9pb20#data>
-            a       <http://purl.org/webofneeds/message#EnvelopeGraph> .
+            a       <https://w3id.org/won/message#EnvelopeGraph> .
 
     <https://satvm05.researchstudio.at/won/resource/event/fvecm6ul3xk7o4bpl5r4#envelope-2zhv-sig>
             a       <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature> .
 
     <https://satvm05.researchstudio.at/won/resource/event/x0uh65ll8wal2018me54#envelope-36q3>
-            a       <http://purl.org/webofneeds/message#EnvelopeGraph> .
+            a       <https://w3id.org/won/message#EnvelopeGraph> .
 
     <https://satvm05.researchstudio.at/won/resource/event/g3eqevbr9ss7o45itk72>
-            a       <http://purl.org/webofneeds/message#FromExternal> .
+            a       <https://w3id.org/won/message#FromExternal> .
 
     <https://satvm05.researchstudio.at/won/resource/event/dxppukwzurd6br43xb5g#envelope-794d>
-            a       <http://purl.org/webofneeds/message#EnvelopeGraph> .
+            a       <https://w3id.org/won/message#EnvelopeGraph> .
 
     <https://satvm05.researchstudio.at/won/resource/event/vogod7tgpeqvgw5sf75t#envelope-tze1>
-            a       <http://purl.org/webofneeds/message#EnvelopeGraph> .
+            a       <https://w3id.org/won/message#EnvelopeGraph> .
 
     <https://satvm05.researchstudio.at/won/resource/event/atm1i28u1kz0dscjzic9>
-            a       <http://purl.org/webofneeds/message#FromExternal> .
+            a       <https://w3id.org/won/message#FromExternal> .
 
     <https://satvm05.researchstudio.at/won/resource/event/s3vywz4mxdajxlk0e3i9#envelope-gzy8-sig>
             a       <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature> .
@@ -316,28 +316,28 @@
             a       <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature> .
 
     <https://satvm05.researchstudio.at/won/resource/event/dnqazw7gaa1846w1ebm6#envelope-ln88>
-            a       <http://purl.org/webofneeds/message#EnvelopeGraph> .
+            a       <https://w3id.org/won/message#EnvelopeGraph> .
 
     <https://satvm05.researchstudio.at/won/resource/event/rhatoxb9nto2bmvuic1c#envelope-x96y>
-            a       <http://purl.org/webofneeds/message#EnvelopeGraph> .
+            a       <https://w3id.org/won/message#EnvelopeGraph> .
 
     <https://satvm05.researchstudio.at/won/resource/event/faouzkv4swh8f9ds3red#envelope-rhxi>
-            a       <http://purl.org/webofneeds/message#EnvelopeGraph> .
+            a       <https://w3id.org/won/message#EnvelopeGraph> .
 
     <https://satvm05.researchstudio.at/won/resource/event/s3vywz4mxdajxlk0e3i9#envelope-gzy8>
-            a       <http://purl.org/webofneeds/message#EnvelopeGraph> .
+            a       <https://w3id.org/won/message#EnvelopeGraph> .
 
     <https://satvm05.researchstudio.at/won/resource/connection/hmbej2exnskvzt6glh73>
-            a       <http://purl.org/webofneeds/model#Connection> .
+            a       <https://w3id.org/won/core#Connection> .
 
     <https://satvm05.researchstudio.at/won/resource/event/t7gry3jr3l945jdn1qzp#envelope-nzxz-sig>
             a       <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature> .
 
     <https://satvm05.researchstudio.at/won/resource/event/x8w8mesutrlss8rbrkuf>
-            a       <http://purl.org/webofneeds/message#FromExternal> .
+            a       <https://w3id.org/won/message#FromExternal> .
 
     <https://satvm05.researchstudio.at/won/resource/event/ja3gsedvq9o5#data>
-            a       <http://purl.org/webofneeds/message#EnvelopeGraph> .
+            a       <https://w3id.org/won/message#EnvelopeGraph> .
 
     <https://satvm05.researchstudio.at/won/resource/event/x0uh65ll8wal2018me54#envelope-36q3-sig>
             a       <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature> .
@@ -346,7 +346,7 @@
             a       <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature> .
 
     <https://satvm05.researchstudio.at/won/resource/event/gaf25w6bs9gaeb6oqm3z#envelope-fmo6>
-            a       <http://purl.org/webofneeds/message#EnvelopeGraph> .
+            a       <https://w3id.org/won/message#EnvelopeGraph> .
 
     <https://satvm05.researchstudio.at/won/resource/event/vogod7tgpeqvgw5sf75t#envelope-rtos-sig>
             a       <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature> .
@@ -355,7 +355,7 @@
             a       <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature> .
 
     <https://satvm05.researchstudio.at/won/resource/event/s3vywz4mxdajxlk0e3i9#envelope-5qvi>
-            a       <http://purl.org/webofneeds/message#EnvelopeGraph> .
+            a       <https://w3id.org/won/message#EnvelopeGraph> .
 
     <https://satvm05.researchstudio.at/won/resource/event/kuo65480nxqzd32koofh#envelope-y27a-sig>
             a       <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature> .
@@ -367,7 +367,7 @@
             a       <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature> .
 
     <https://satvm05.researchstudio.at/won/resource/event/rcbdyecq6vk9ox4zu396#envelope-dua2>
-            a       <http://purl.org/webofneeds/message#EnvelopeGraph> .
+            a       <https://w3id.org/won/message#EnvelopeGraph> .
 
     <https://satvm05.researchstudio.at/won/resource/event/tyipsec9pb20#content-sig>
             a       <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature> .
@@ -376,7 +376,7 @@
             a       <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature> .
 
     <https://satvm05.researchstudio.at/won/resource/event/crtzttv0wr96yidvwkka#envelope-uqm7>
-            a       <http://purl.org/webofneeds/message#EnvelopeGraph> .
+            a       <https://w3id.org/won/message#EnvelopeGraph> .
 
     <https://satvm05.researchstudio.at/won/resource/event/x8w8mesutrlss8rbrkuf#envelope-6js3-sig>
             a       <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature> .
@@ -384,13 +384,13 @@
     [ a       <http://www.w3.org/ns/shacl#ValidationReport> ] .
 
     <https://satvm05.researchstudio.at/won/resource/event/mjly8u17ebtxnzgc9hco>
-            a       <http://purl.org/webofneeds/message#FromExternal> .
+            a       <https://w3id.org/won/message#FromExternal> .
 
     <https://satvm05.researchstudio.at/won/resource/event/ldaabpv62dj1e70uwqt4#envelope-5iyv>
-            a       <http://purl.org/webofneeds/message#EnvelopeGraph> .
+            a       <https://w3id.org/won/message#EnvelopeGraph> .
 
     <https://satvm05.researchstudio.at/won/resource/event/x0uh65ll8wal2018me54#envelope-x8uz>
-            a       <http://purl.org/webofneeds/message#EnvelopeGraph> .
+            a       <https://w3id.org/won/message#EnvelopeGraph> .
 
     <https://satvm05.researchstudio.at/won/resource/event/mjly8u17ebtxnzgc9hco#envelope-swci-sig>
             a       <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature> .
@@ -398,29 +398,29 @@
     <https://satvm05.researchstudio.at/won/resource/event/mkcpw9v9o9opay23s6mk#envelope-c60p-sig>
             a       <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature> .
 
-    <https://satvm05.researchstudio.at/won/resource/need/bxh7r6yz5u5s7u4s8ru5>
-            a       <http://purl.org/webofneeds/model#Need> .
+    <https://satvm05.researchstudio.at/won/resource/atom/bxh7r6yz5u5s7u4s8ru5>
+            a       <https://w3id.org/won/core#Atom> .
 
     <https://satvm05.researchstudio.at/won/resource/event/k0h0jrhpck866v9otqqk#envelope-1ue5>
-            a       <http://purl.org/webofneeds/message#EnvelopeGraph> .
+            a       <https://w3id.org/won/message#EnvelopeGraph> .
 
     <https://satvm05.researchstudio.at/won/resource/event/ja3gsedvq9o5#content-sig>
             a       <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature> .
 
     <https://satvm05.researchstudio.at/won/resource/event/dv5c9f64l5591z6glrfx#envelope-q3zp>
-            a       <http://purl.org/webofneeds/message#EnvelopeGraph> .
+            a       <https://w3id.org/won/message#EnvelopeGraph> .
 
     <https://satvm05.researchstudio.at/won/resource/connection/q5a4b3vszf2henxchmgn>
-            a       <http://purl.org/webofneeds/model#Connection> .
+            a       <https://w3id.org/won/core#Connection> .
 
     <https://satvm05.researchstudio.at/won/resource/event/t7gry3jr3l945jdn1qzp#envelope-nzxz>
-            a       <http://purl.org/webofneeds/message#EnvelopeGraph> .
+            a       <https://w3id.org/won/message#EnvelopeGraph> .
 
     <https://satvm05.researchstudio.at/won/resource/event/faouzkv4swh8f9ds3red#envelope-ftck-sig>
             a       <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature> .
 
     <https://satvm05.researchstudio.at/won/resource/event/kuo65480nxqzd32koofh>
-            a       <http://purl.org/webofneeds/message#FromSystem> .
+            a       <https://w3id.org/won/message#FromSystem> .
 
     <https://satvm05.researchstudio.at/won/resource/event/x8w8mesutrlss8rbrkuf#envelope-7o3b-sig>
             a       <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature> .
@@ -429,84 +429,84 @@
             a       <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature> .
 
     <https://satvm05.researchstudio.at/won/resource/event/mjly8u17ebtxnzgc9hco#envelope-drtl>
-            a       <http://purl.org/webofneeds/message#EnvelopeGraph> .
+            a       <https://w3id.org/won/message#EnvelopeGraph> .
 
     <https://satvm05.researchstudio.at/won/resource/event/o5nkfp1m0m93nlny7g9x#envelope-nffl>
-            a       <http://purl.org/webofneeds/message#EnvelopeGraph> .
+            a       <https://w3id.org/won/message#EnvelopeGraph> .
 
     <https://satvm05.researchstudio.at/won/resource/event/sn807y11f7e6espxsjwi>
-            a       <http://purl.org/webofneeds/message#FromOwner> .
+            a       <https://w3id.org/won/message#FromOwner> .
 
     <https://satvm05.researchstudio.at/won/resource/event/vc4j6eocnj0e>
-            a       <http://purl.org/webofneeds/message#FromOwner> .
+            a       <https://w3id.org/won/message#FromOwner> .
 
     <https://satvm05.researchstudio.at/won/resource/event/o6rvtxeuw6wk4q0iqp03#envelope-euox-sig>
             a       <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature> .
 
     <https://satvm05.researchstudio.at/won/resource/event/o9s8cot2fvzemz7rxzbh#envelope-muab>
-            a       <http://purl.org/webofneeds/message#EnvelopeGraph> .
+            a       <https://w3id.org/won/message#EnvelopeGraph> .
 
     <https://satvm05.researchstudio.at/won/resource/event/x76qoafq9n5v#envelope-1cro-sig>
             a       <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature> .
 
     <https://satvm05.researchstudio.at/won/resource/event/mkcpw9v9o9opay23s6mk>
-            a       <http://purl.org/webofneeds/message#FromOwner> .
+            a       <https://w3id.org/won/message#FromOwner> .
 
     <https://satvm05.researchstudio.at/won/resource/event/vc4j6eocnj0e#envelope-ihnp>
-            a       <http://purl.org/webofneeds/message#EnvelopeGraph> .
+            a       <https://w3id.org/won/message#EnvelopeGraph> .
 
     <https://satvm05.researchstudio.at/won/resource/event/faouzkv4swh8f9ds3red#envelope-ftck>
-            a       <http://purl.org/webofneeds/message#EnvelopeGraph> .
+            a       <https://w3id.org/won/message#EnvelopeGraph> .
 
     <https://satvm05.researchstudio.at/won/resource/event/tyipsec9pb20#envelope-ynpy>
-            a       <http://purl.org/webofneeds/message#EnvelopeGraph> .
+            a       <https://w3id.org/won/message#EnvelopeGraph> .
 
     <https://satvm05.researchstudio.at/won/resource/event/o9s8cot2fvzemz7rxzbh#envelope-rr51>
-            a       <http://purl.org/webofneeds/message#EnvelopeGraph> .
+            a       <https://w3id.org/won/message#EnvelopeGraph> .
 
     <http://example.org/2/GeoCoordinateShape>
             a       <http://www.w3.org/ns/shacl#NodeShape> .
 
     <https://satvm05.researchstudio.at/won/resource/event/ctx4gzusr61y02j4k4ke>
-            a       <http://purl.org/webofneeds/message#FromSystem> .
+            a       <https://w3id.org/won/message#FromSystem> .
 
     <https://satvm05.researchstudio.at/won/resource/connection/q5a4b3vszf2henxchmgn/events>
-            a       <http://purl.org/webofneeds/model#EventContainer> .
+            a       <https://w3id.org/won/core#MessageContainer> .
 
     <https://satvm05.researchstudio.at/won/resource/event/o6rvtxeuw6wk4q0iqp03#envelope-euox>
-            a       <http://purl.org/webofneeds/message#EnvelopeGraph> .
+            a       <https://w3id.org/won/message#EnvelopeGraph> .
 
     <https://satvm05.researchstudio.at/won/resource/event/k0h0jrhpck866v9otqqk#envelope-c73k-sig>
             a       <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature> .
 
     <https://satvm05.researchstudio.at/won/resource/event/slu4qovaqi4w3ewii3im#envelope-lq52>
-            a       <http://purl.org/webofneeds/message#EnvelopeGraph> .
+            a       <https://w3id.org/won/message#EnvelopeGraph> .
 
     <https://satvm05.researchstudio.at/won/resource/event/g343hihbu3e3vxz5bgim>
-            a       <http://purl.org/webofneeds/message#FromExternal> .
+            a       <https://w3id.org/won/message#FromExternal> .
 
     <https://satvm05.researchstudio.at/won/resource/event/dm8t3cyirhog869dtpmf>
-            a       <http://purl.org/webofneeds/message#FromSystem> .
+            a       <https://w3id.org/won/message#FromSystem> .
 
     <https://satvm05.researchstudio.at/won/resource/event/o9s8cot2fvzemz7rxzbh>
-            a       <http://purl.org/webofneeds/message#FromExternal> .
+            a       <https://w3id.org/won/message#FromExternal> .
 
     <https://satvm05.researchstudio.at/won/resource/event/x0uh65ll8wal2018me54#content-26h2-sig>
             a       <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature> .
 
     <https://satvm05.researchstudio.at/won/resource/event/g3eqevbr9ss7o45itk72#envelope-abvu>
-            a       <http://purl.org/webofneeds/message#EnvelopeGraph> .
+            a       <https://w3id.org/won/message#EnvelopeGraph> .
 
     <https://satvm05.researchstudio.at/won/resource/event/sn807y11f7e6espxsjwi#envelope-mnyw>
-            a       <http://purl.org/webofneeds/message#EnvelopeGraph> .
+            a       <https://w3id.org/won/message#EnvelopeGraph> .
 
-    [ a       <http://purl.org/webofneeds/woncrypt#ECCPublicKey> ] .
+    [ a       <https://w3id.org/won/core#ECCPublicKey> ] .
 
     <http://example.org/2/PlaceShape>
             a       <http://www.w3.org/ns/shacl#NodeShape> .
 
     <https://satvm05.researchstudio.at/won/resource/event/m6djrxuzy62ouwfd8mm6#envelope-m0fh>
-            a       <http://purl.org/webofneeds/message#EnvelopeGraph> .
+            a       <https://w3id.org/won/message#EnvelopeGraph> .
 
     <https://satvm05.researchstudio.at/won/resource/event/v4nsb25jocdjhqty8vaj#content-0j2y-sig>
             a       <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature> .
@@ -518,7 +518,7 @@
             a       <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature> .
 
     <https://satvm05.researchstudio.at/won/resource/event/g343hihbu3e3vxz5bgim#envelope-d0hn>
-            a       <http://purl.org/webofneeds/message#EnvelopeGraph> .
+            a       <https://w3id.org/won/message#EnvelopeGraph> .
 
     <https://satvm05.researchstudio.at/won/resource/event/vc4j6eocnj0e#data-sig>
             a       <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature> .
@@ -527,19 +527,19 @@
             a       <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature> .
 
     <https://satvm05.researchstudio.at/won/resource/event/bb9incuswy5evphgki8p#envelope-d3a7>
-            a       <http://purl.org/webofneeds/message#EnvelopeGraph> .
+            a       <https://w3id.org/won/message#EnvelopeGraph> .
 
     <https://satvm05.researchstudio.at/won/resource/event/rhatoxb9nto2bmvuic1c#envelope-x96y-sig>
             a       <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature> .
 
     <https://satvm05.researchstudio.at/won/resource/event/x8w8mesutrlss8rbrkuf#envelope-6js3>
-            a       <http://purl.org/webofneeds/message#EnvelopeGraph> .
+            a       <https://w3id.org/won/message#EnvelopeGraph> .
 
     <https://satvm05.researchstudio.at/won/resource/event/faouzkv4swh8f9ds3red#envelope-rhxi-sig>
             a       <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature> .
 
     <https://satvm05.researchstudio.at/won/resource/event/mkcpw9v9o9opay23s6mk#envelope-c60p>
-            a       <http://purl.org/webofneeds/message#EnvelopeGraph> .
+            a       <https://w3id.org/won/message#EnvelopeGraph> .
 
     <https://satvm05.researchstudio.at/won/resource/event/k0h0jrhpck866v9otqqk#envelope-1ue5-sig>
             a       <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature> .
@@ -561,19 +561,19 @@
     ] .
 
     <https://satvm05.researchstudio.at/won/resource/event/dnqazw7gaa1846w1ebm6>
-            a       <http://purl.org/webofneeds/message#FromSystem> .
+            a       <https://w3id.org/won/message#FromSystem> .
 
     <https://satvm05.researchstudio.at/won/resource/event/v4nsb25jocdjhqty8vaj>
-            a       <http://purl.org/webofneeds/message#FromOwner> .
+            a       <https://w3id.org/won/message#FromOwner> .
 
     <https://satvm05.researchstudio.at/won/resource/event/slu4qovaqi4w3ewii3im#envelope-1bh5>
-            a       <http://purl.org/webofneeds/message#EnvelopeGraph> .
+            a       <https://w3id.org/won/message#EnvelopeGraph> .
 
     <https://satvm05.researchstudio.at/won/resource/event/if12i5we1y87q74tqa4z#envelope-9hth>
-            a       <http://purl.org/webofneeds/message#EnvelopeGraph> .
+            a       <https://w3id.org/won/message#EnvelopeGraph> .
 
     <https://satvm05.researchstudio.at/won/resource/event/fvecm6ul3xk7o4bpl5r4#envelope-qu6v>
-            a       <http://purl.org/webofneeds/message#EnvelopeGraph> .
+            a       <https://w3id.org/won/message#EnvelopeGraph> .
 
     <https://satvm05.researchstudio.at/won/resource/event/ja3gsedvq9o5#data-sig>
             a       <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature> .
@@ -584,34 +584,34 @@
     <https://satvm05.researchstudio.at/won/resource/event/f6z6xraiyc2c029hsxnw#envelope-qo4i-sig>
             a       <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature> .
 
-    [ a       <http://purl.org/webofneeds/woncrypt#ECCPublicKey> ] .
+    [ a       <https://w3id.org/won/core#ECCPublicKey> ] .
 
     <https://satvm05.researchstudio.at/won/resource/event/s3vywz4mxdajxlk0e3i9>
-            a       <http://purl.org/webofneeds/message#FromExternal> .
+            a       <https://w3id.org/won/message#FromExternal> .
 
     <https://satvm05.researchstudio.at/won/resource/event/x0uh65ll8wal2018me54>
-            a       <http://purl.org/webofneeds/message#FromOwner> .
+            a       <https://w3id.org/won/message#FromOwner> .
 
     <https://satvm05.researchstudio.at/won/resource/event/g343hihbu3e3vxz5bgim#envelope-d0hn-sig>
             a       <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature> .
 
     <https://satvm05.researchstudio.at/won/resource/event/atm1i28u1kz0dscjzic9#envelope-druq>
-            a       <http://purl.org/webofneeds/message#EnvelopeGraph> .
+            a       <https://w3id.org/won/message#EnvelopeGraph> .
 
     <https://satvm05.researchstudio.at/won/resource/event/ox86im53qhxqygrqtdmc>
-            a       <http://purl.org/webofneeds/message#FromSystem> .
+            a       <https://w3id.org/won/message#FromSystem> .
 
     <https://satvm05.researchstudio.at/won/resource/event/dm8t3cyirhog869dtpmf#envelope-pmam>
-            a       <http://purl.org/webofneeds/message#EnvelopeGraph> .
+            a       <https://w3id.org/won/message#EnvelopeGraph> .
 
     <https://satvm05.researchstudio.at/won/resource/event/slu4qovaqi4w3ewii3im>
-            a       <http://purl.org/webofneeds/message#FromExternal> .
+            a       <https://w3id.org/won/message#FromExternal> .
 
     <https://satvm05.researchstudio.at/won/resource/event/g3eqevbr9ss7o45itk72#envelope-abvu-sig>
             a       <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature> .
 
     <https://satvm05.researchstudio.at/won/resource/event/if12i5we1y87q74tqa4z>
-            a       <http://purl.org/webofneeds/message#FromSystem> .
+            a       <https://w3id.org/won/message#FromSystem> .
 
     <https://satvm05.researchstudio.at/won/resource/event/fvecm6ul3xk7o4bpl5r4#envelope-qu6v-sig>
             a       <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature> .
@@ -620,33 +620,33 @@
             a       <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature> .
 
     <https://satvm05.researchstudio.at/won/resource/event/kuo65480nxqzd32koofh#envelope-y27a>
-            a       <http://purl.org/webofneeds/message#EnvelopeGraph> .
+            a       <https://w3id.org/won/message#EnvelopeGraph> .
 
     <https://satvm05.researchstudio.at/won/resource/event/ja3gsedvq9o5>
-            a       <http://purl.org/webofneeds/message#FromOwner> .
+            a       <https://w3id.org/won/message#FromOwner> .
 
     <https://satvm05.researchstudio.at/won/resource/event/dv5c9f64l5591z6glrfx#envelope-0nhw-sig>
             a       <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature> .
 
     <https://satvm05.researchstudio.at/won/resource/event/o5nkfp1m0m93nlny7g9x#envelope-vfvb>
-            a       <http://purl.org/webofneeds/message#EnvelopeGraph> .
+            a       <https://w3id.org/won/message#EnvelopeGraph> .
 
     <https://satvm05.researchstudio.at/won/resource/event/bexkso0yw3ntsi0om8p2>
-            a       <http://purl.org/webofneeds/message#FromSystem> .
+            a       <https://w3id.org/won/message#FromSystem> .
 
     <https://satvm05.researchstudio.at/won/resource/event/mjly8u17ebtxnzgc9hco#envelope-drtl-sig>
             a       <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature> .
 
     <https://satvm05.researchstudio.at/won/resource/event/rhatoxb9nto2bmvuic1c>
-            a       <http://purl.org/webofneeds/message#FromSystem> .
+            a       <https://w3id.org/won/message#FromSystem> .
 
     <http://example.org/2/TaxiRideShape>
             a       <http://www.w3.org/ns/shacl#NodeShape> .
 
-    <https://satvm05.researchstudio.at/won/resource/need/gp2xiapmiw18>
-            a       <http://purl.org/webofneeds/model#Need> .
+    <https://satvm05.researchstudio.at/won/resource/atom/gp2xiapmiw18>
+            a       <https://w3id.org/won/core#Atom> .
 
     <https://satvm05.researchstudio.at/won/resource/event/v4nsb25jocdjhqty8vaj#envelope-nf6b>
-            a       <http://purl.org/webofneeds/message#EnvelopeGraph> .
+            a       <https://w3id.org/won/message#EnvelopeGraph> .
 }
 

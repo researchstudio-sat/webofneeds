@@ -18,12 +18,39 @@ export function isProcessingInitialLoad(process) {
 }
 
 /**
+ * Return true if fetchWhatsNew is currently active
+ * @param process (full process from state)
+ * @returns {*}
+ */
+export function isProcessingWhatsNew(process) {
+  return get(process, "processingWhatsNew");
+}
+
+/**
+ * Return true if fetchWhatsAround is currently active
+ * @param process (full process from state)
+ * @returns {*}
+ */
+export function isProcessingWhatsAround(process) {
+  return get(process, "processingWhatsAround");
+}
+
+/**
  * Return true if processingLogin is currently active
  * @param process (full process from state)
  * @returns {*}
  */
 export function isProcessingLogin(process) {
   return get(process, "processingLogin");
+}
+
+/**
+ * Return true if processingLoginForEmail is currently active
+ * @param process (full process from state)
+ * @returns {*}
+ */
+export function isProcessingLoginForEmail(process) {
+  return get(process, "processingLoginForEmail");
 }
 
 /**
@@ -81,45 +108,60 @@ export function isProcessingSendAnonymousLinkEmail(process) {
 }
 
 /**
- * Return true if given needUri is currently loading
+ * Return true if given atomUri is currently processing an update
  * @param process (full process from state)
- * @param needUri
+ * @param atomUri
  * @returns {*}
  */
-export function isNeedLoading(process, needUri) {
-  return needUri && getIn(process, ["needs", needUri, "loading"]);
+
+export function isAtomProcessingUpdate(process, atomUri) {
+  return atomUri && getIn(process, ["atoms", atomUri, "processUpdate"]);
 }
 
 /**
- * Return true if given needUri is set toLoad
+ * Return true if given atomUri is currently loading
  * @param process (full process from state)
- * @param needUri
+ * @param atomUri
  * @returns {*}
  */
-export function isNeedToLoad(process, needUri) {
-  return needUri && getIn(process, ["needs", needUri, "toLoad"]);
+export function isAtomLoading(process, atomUri) {
+  return atomUri && getIn(process, ["atoms", atomUri, "loading"]);
+}
+
+export function isAtomLoaded(process, atomUri) {
+  return atomUri && getIn(process, ["atoms", atomUri, "loaded"]);
 }
 
 /**
- * Return true if given needUri has failedToLoad
+ * Return true if given atomUri is set toLoad
  * @param process (full process from state)
- * @param needUri
+ * @param atomUri
  * @returns {*}
  */
-export function hasNeedFailedToLoad(process, needUri) {
-  return needUri && getIn(process, ["needs", needUri, "failedToLoad"]);
+export function isAtomToLoad(process, atomUri) {
+  return atomUri && getIn(process, ["atoms", atomUri, "toLoad"]);
 }
 
 /**
- * Return true if any needUri is currently loading
+ * Return true if given atomUri has failedToLoad
+ * @param process (full process from state)
+ * @param atomUri
+ * @returns {*}
+ */
+export function hasAtomFailedToLoad(process, atomUri) {
+  return atomUri && getIn(process, ["atoms", atomUri, "failedToLoad"]);
+}
+
+/**
+ * Return true if any atomUri is currently loading
  * @param process
  * @returns {boolean}
  */
-export function isAnyNeedLoading(process) {
-  const needProcess = get(process, "needs");
+export function isAnyAtomLoading(process) {
+  const atomProcess = get(process, "atoms");
 
-  return !!needProcess.find((needProcess, needUri) =>
-    isNeedLoading(process, needUri)
+  return !!atomProcess.find((atomProcess, atomUri) =>
+    isAtomLoading(process, atomUri)
   );
 }
 
@@ -144,6 +186,16 @@ export function isConnectionLoading(process, connUri, includeSubData = false) {
 }
 
 /**
+ * Return true if given atomUri has failedToLoad
+ * @param process (full process from state)
+ * @param atomUri
+ * @returns {*}
+ */
+export function hasConnectionFailedToLoad(process, connUri) {
+  return connUri && getIn(process, ["connections", connUri, "failedToLoad"]);
+}
+
+/**
  * Return true if any connUri is currently loading, if includeSubData is true, we also check the petriNetData and agreementData
  * @param process
  * @param includeSubData (default=false, determines if the loading state should be checked for agreementData and petriNetData as well
@@ -152,7 +204,7 @@ export function isConnectionLoading(process, connUri, includeSubData = false) {
 export function isAnyConnectionLoading(process, includeSubData) {
   const connectionProcess = get(process, "connections");
 
-  return !!connectionProcess.find((needProcess, connUri) =>
+  return !!connectionProcess.find((atomProcess, connUri) =>
     isConnectionLoading(process, connUri, includeSubData)
   );
 }

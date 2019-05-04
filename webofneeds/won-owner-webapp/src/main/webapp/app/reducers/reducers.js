@@ -7,15 +7,27 @@ import Immutable from "immutable";
 import { messagesReducer } from "./message-reducers.js";
 //import { isChatConnection } from "../connection-utils.js";
 import reduceReducers from "reduce-reducers";
-import needReducer from "./need-reducer/need-reducer-main.js";
+import atomReducer from "./atom-reducer/atom-reducer-main.js";
 import accountReducer from "./account-reducer.js";
 import toastReducer from "./toast-reducer.js";
 import viewReducer from "./view-reducer.js";
 import processReducer from "./process-reducer.js";
+import { parseMetaAtom } from "./atom-reducer/parse-atom.js";
 /*
  * this reducer attaches a 'router' object to our state that keeps the routing state.
  */
 import { router } from "redux-ui-router";
+
+const initialOwnerState = Immutable.fromJS({
+  whatsNew: Immutable.Map(),
+  whatsAround: Immutable.Map(),
+  lastWhatsNewUpdateTime: undefined,
+  lastWhatsAroundUpdateTime: undefined,
+  lastWhatsAroundLocation: undefined,
+  lastWhatsAroundMaxDistance: undefined,
+});
+
+const initialConfigState = Immutable.fromJS({ theme: { name: "current" } });
 
 const reducers = {
   router,
@@ -34,7 +46,7 @@ const reducers = {
     */
 
   account: accountReducer,
-  needs: needReducer,
+  atoms: atomReducer,
   messages: messagesReducer,
   toasts: toastReducer,
   view: viewReducer,
@@ -44,10 +56,7 @@ const reducers = {
   // lastUpdateTime: (state = Date.now(), action = {}) => Date.now(),
   lastUpdateTime: () => Date.now(),
 
-  config: (
-    config = Immutable.fromJS({ theme: { name: "current" } }),
-    action = {}
-  ) => {
+  config: (config = initialConfigState, action = {}) => {
     switch (action.type) {
       case actionTypes.config.init:
       case actionTypes.config.update:
@@ -55,6 +64,69 @@ const reducers = {
 
       default:
         return config;
+    }
+  },
+  owner: (owner = initialOwnerState, action = {}) => {
+    switch (action.type) {
+      case actionTypes.account.reset:
+        return initialOwnerState;
+
+      case actionTypes.atoms.storeWhatsNew: {
+        const metaAtoms = action.payload.get("metaAtoms");
+        let ownerMetaAtoms = owner.get("whatsNew");
+
+        metaAtoms &&
+          metaAtoms.map(metaAtom => {
+            const metaAtomImm = parseMetaAtom(metaAtom);
+            if (metaAtomImm) {
+              ownerMetaAtoms = ownerMetaAtoms.set(
+                metaAtomImm.get("uri"),
+                metaAtomImm
+              );
+            }
+          });
+
+        return owner
+          .set("whatsNew", ownerMetaAtoms)
+          .set("lastWhatsNewUpdateTime", Date.now());
+      }
+
+      case actionTypes.atoms.storeWhatsAround: {
+        const metaAtoms = action.payload.get("metaAtoms");
+        const location = action.payload.get("location");
+        const maxDistance = action.payload.get("maxDistance");
+
+        let ownerMetaAtoms = owner.get("whatsAround");
+
+        metaAtoms &&
+          metaAtoms.map(metaAtom => {
+            const metaAtomImm = parseMetaAtom(metaAtom);
+            if (metaAtomImm) {
+              ownerMetaAtoms = ownerMetaAtoms.set(
+                metaAtomImm.get("uri"),
+                metaAtomImm
+              );
+            }
+          });
+
+        return owner
+          .set("whatsAround", ownerMetaAtoms)
+          .set("lastWhatsAroundMaxDistance", maxDistance)
+          .set("lastWhatsAroundLocation", location)
+          .set("lastWhatsAroundUpdateTime", Date.now());
+      }
+
+      case actionTypes.atoms.removeDeleted:
+      case actionTypes.personas.removeDeleted:
+      case actionTypes.atoms.delete: {
+        const atomUri = action.payload.get("uri");
+        const atomUris = owner.get("atomUris");
+
+        return owner.set("atomUris", atomUris.remove(atomUri));
+      }
+
+      default:
+        return owner;
     }
   },
 };
@@ -98,14 +170,14 @@ export default reduceReducers(
       /**
        * Add all actions that load connections
        * and their events. The reducer here makes
-       * sure that no connections between two needs
+       * sure that no connections between two atoms
        * that both are owned by the user, remain
        * in the state.
        */
       case actionTypes.connections.storeActive:
       case actionTypes.account.loginFinished:
       case actionTypes.initialLoadFinished:
-        return deleteChatConnectionsBetweenOwnedNeeds(state);
+        return deleteChatConnectionsBetweenOwnedAtoms(state);
 
       default:
         return state;
@@ -116,31 +188,27 @@ export default reduceReducers(
 
 window.Immutable4dbg = Immutable;
 
-function deleteChatConnectionsBetweenOwnedNeeds(state) {
-  let needs = state.get("needs");
+function deleteChatConnectionsBetweenOwnedAtoms(state) {
+  let atoms = state.get("atoms");
 
-  if (needs) {
-    needs = needs.map(function(need) {
-      let connections = need.get("connections");
+  if (atoms) {
+    atoms = atoms.map(function(atom) {
+      let connections = atom.get("connections");
 
-      //TODO: FIXME, use special case handling for this, currently dont strip any connections between needs for debug reasons
+      //TODO: FIXME, use special case handling for this, currently dont strip any connections between atoms for debug reasons
       /*connections =
         connections &&
         connections.filter(function(conn) {
-          //Any connection that is not of type chatFacet will be exempt from deletion
+          //Any connection that is not of type chatSocket will be exempt from deletion
           if (isChatConnection(conn)) {
-            //Any other connection will be checked if it would be connected to the ownedNeed, if so we remove it.
-            return !state.getIn([
-              "needs",
-              conn.get("remoteNeedUri"),
-              "isOwned",
-            ]);
+            //Any other connection will be checked if it would be connected to the ownedAtom, if so we remove it.
+            return !generalSelectors.isAtomOwned(state, conn.get("targetAtomUri"));
           }
           return true;
         });*/
-      return need.set("connections", connections);
+      return atom.set("connections", connections);
     });
-    return state.set("needs", needs);
+    return state.set("atoms", atoms);
   }
 
   return state;

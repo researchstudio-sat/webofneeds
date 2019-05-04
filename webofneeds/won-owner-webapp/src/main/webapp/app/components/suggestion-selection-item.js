@@ -11,7 +11,7 @@ import {
   getPosts,
   getPostUriFromRoute,
 } from "../selectors/general-selectors.js";
-import { getChatConnectionsByNeedUri } from "../selectors/connection-selectors.js";
+import { getChatConnectionsByAtomUri } from "../selectors/connection-selectors.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
 import {
   isChatConnection,
@@ -52,22 +52,22 @@ function genComponentConf() {
 
       const selectFromState = state => {
         const allPosts = getPosts(state);
-        const chatConnectionsByNeedUri =
-          this.needUri && getChatConnectionsByNeedUri(state, this.needUri);
+        const chatConnectionsByAtomUri =
+          this.atomUri && getChatConnectionsByAtomUri(state, this.atomUri);
         const matches =
-          chatConnectionsByNeedUri &&
-          chatConnectionsByNeedUri.filter(conn => {
-            const remoteNeedUri = conn.get("remoteNeedUri");
-            const remoteNeedActiveOrLoading =
-              remoteNeedUri &&
+          chatConnectionsByAtomUri &&
+          chatConnectionsByAtomUri.filter(conn => {
+            const targetAtomUri = conn.get("targetAtomUri");
+            const targetAtomActiveOrLoading =
+              targetAtomUri &&
               allPosts &&
-              allPosts.get(remoteNeedUri) &&
-              (getIn(state, ["process", "needs", remoteNeedUri, "loading"]) ||
-                allPosts.getIn([remoteNeedUri, "state"]) ===
+              allPosts.get(targetAtomUri) &&
+              (getIn(state, ["process", "atoms", targetAtomUri, "loading"]) ||
+                allPosts.getIn([targetAtomUri, "state"]) ===
                   won.WON.ActiveCompacted);
 
             return (
-              remoteNeedActiveOrLoading &&
+              targetAtomActiveOrLoading &&
               (isChatConnection(conn) || isGroupChatConnection(conn)) &&
               conn.get("state") === won.WON.Suggested
             );
@@ -89,18 +89,18 @@ function genComponentConf() {
         };
       };
 
-      connect2Redux(selectFromState, actionCreators, ["self.needUri"], this);
+      connect2Redux(selectFromState, actionCreators, ["self.atomUri"], this);
 
       classOnComponentRoot("selected", () => this.isOpen(), this);
       classOnComponentRoot("won-unread", () => this.hasUnreadMatches, this);
     }
     isOpen() {
-      //FIXME: Currently just checks if need need-details are open
-      return this.openPostUri === this.needUri;
+      //FIXME: Currently just checks if atom atom-details are open
+      return this.openPostUri === this.atomUri;
     }
 
     setOpen() {
-      this.onSelected({ needUri: this.needUri }); //trigger callback with scope-object
+      this.onSelected({ atomUri: this.atomUri }); //trigger callback with scope-object
     }
   }
   Controller.$inject = serviceDependencies;
@@ -110,7 +110,7 @@ function genComponentConf() {
     controllerAs: "self",
     bindToController: true, //scope-bindings -> ctrl
     scope: {
-      needUri: "=",
+      atomUri: "=",
       onSelected: "&",
     },
     template: template,

@@ -31,25 +31,23 @@ public class Hint2TelegramAction extends BaseEventBotAction {
     @Override
     protected void doRun(Event event, EventListener executingListener) throws Exception {
         EventListenerContext ctx = getEventListenerContext();
-
         if (event instanceof HintFromMatcherEvent && ctx.getBotContextWrapper() instanceof TelegramBotContextWrapper) {
             TelegramBotContextWrapper botContextWrapper = (TelegramBotContextWrapper) ctx.getBotContextWrapper();
             Match match = ((HintFromMatcherEvent) event).getMatch();
             WonMessage wonMessage = ((HintFromMatcherEvent) event).getWonMessage();
-
-            URI yourNeedUri = match.getFromNeed();
-            URI remoteNeedUri = match.getToNeed();
-
-            Long chatId = botContextWrapper.getChatIdForURI(yourNeedUri);
-            if(chatId == null) {
-                logger.error("No chatId found for the specified needUri");
+            URI yourAtomUri = match.getFromAtom();
+            URI targetAtomUri = match.getToAtom();
+            Long chatId = botContextWrapper.getChatIdForURI(yourAtomUri);
+            if (chatId == null) {
+                logger.error("No chatId found for the specified atomUri");
                 return;
             }
-
-            try{
-                Message message = wonTelegramBotHandler.sendMessage(wonTelegramBotHandler.getTelegramMessageGenerator().getHintMessage(chatId, remoteNeedUri, yourNeedUri));
-                botContextWrapper.addMessageIdWonURIRelation(message.getMessageId(), new WonURI(wonMessage.getReceiverURI(), UriType.CONNECTION));
-            }catch (TelegramApiException te){
+            try {
+                Message message = wonTelegramBotHandler.sendMessage(wonTelegramBotHandler.getTelegramMessageGenerator()
+                                .getHintMessage(chatId, targetAtomUri, yourAtomUri));
+                botContextWrapper.addMessageIdWonURIRelation(message.getMessageId(),
+                                new WonURI(wonMessage.getRecipientURI(), UriType.CONNECTION));
+            } catch (TelegramApiException te) {
                 logger.error(te.getMessage());
             }
         }

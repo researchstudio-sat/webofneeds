@@ -1,0 +1,95 @@
+##################################################################
+#              ATOM REPRESENTATION AT THE WON NODE               #
+##################################################################
+
+@prefix :       <http://www.example.com/resource/atom/randomAtomID_1> .
+@prefix remote: <http://www.remote-example.com/resource/atom/randomAtomID_2> .
+@prefix webID:  <http://www.example.com/webids/> .
+
+@prefix won:    <https://w3id.org/won/core#> .
+@prefix crypt:  <https://w3id.org/won/cryptography#> .
+@prefix msg:    <https://w3id.org/won/message#> .
+
+@prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#>
+@prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix tio:    <http://purl.org/tio/ns#> .
+@prefix gr:     <http://purl.org/goodrelations/v1#> .
+
+
+############# ATOM META INFO ##############
+# document URL: :randomAtomID_1/meta
+
+#GRAPH
+<http://www.example.com/resource/atom/randomAtomID_1/meta#data> {
+
+    :
+        won:hasAtomEvents
+            <http://www.example.com/resource/atom/randomAtomID_1/atomEvents> ;
+        won:connections
+            <http://www.example.com/resource/atom/randomAtomID_1/connections> ;
+
+        won:atomState
+            won:Active ;
+        won:socket
+            won:ChatSocket .
+
+        <http://www.example.com/resource/atom/randomAtomID_1/atomEvents>
+            rdfs:member
+                <http://www.example.com/resource/atom/randomAtomID_1/event/0> .
+
+        <http://www.example.com/resource/atom/randomAtomID_1/connections>
+            rdfs:member
+                <http://www.example.com/resource/atom/randomAtomID_1/connection/randomConnectionID_1_1> .
+
+        <http://www.example.com/resource/atom/randomAtomID_1/connection/randomConnectionID_1_1>
+            :won:messageContainer [
+                rdfs:member
+                    <http://www.example.com/resource/atom/randomAtomID_1/connection/randomConnectionID_1_1/event/0>
+            ]
+
+}
+
+<http://www.example.com/resource/atom/randomAtomID_1/meta#data>
+    crypt:hasSignature [
+        a crypt:WonSignature ;
+        crypt:signer webID:WN1
+    ] .
+
+############# ATOM CORE CONTENT ##############
+# document URL: :randomAtomID_1/core
+
+# remains the same
+
+############# ATOM TRANSIENT CONTENT ##############
+# document URL: :randomAtomID_1/transient
+
+# remains the same
+
+############# ATOM MESSAGE 0 ##############
+# document URL: :randomAtomID_1/event/0
+
+# remains the same
+
+############# CONNECT MESSAGE ##############
+# document URL: :randomAtomID_1/connection/randomConnectionID_1_1/event/0
+
+<http://www.example.com/resource/atom/randomAtomID_1/connection/randomConnectionID_1_1/event/0#data> {
+
+  <http://www.example.com/resource/atom/randomAtomID_1/connection/randomConnectionID_1_1/event/0>
+    a msg:ConnectMessage ;
+
+    msg:sender <http://www.example.com/resource/atom/randomAtomID_1/connection/randomConnectionID_1_1> ;
+    msg:senderAtom <http://www.example.com/resource/atom/randomAtomID_1> ;
+    msg:senderNode <http://www.example.com>;
+    msg:receiver <http://www.remote-example.com/resource/atom/randomAtomID_2/sockets#owner> ;
+    msg:recipientAtom <http://www.remote-example.com/resource/atom/randomAtomID_2> ;
+    msg:recipientNode <http://www.remote-example.com> .
+
+}
+
+<http://www.example.com/resource/atom/randomAtomID_1/connection/randomConnectionID_1_1/event/0#data>
+    crypt:hasSignature [
+        a crypt:WonSignature ;
+        crypt:signer webID:owner_1
+        # signature data ...
+    ]

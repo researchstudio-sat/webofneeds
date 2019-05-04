@@ -17,8 +17,8 @@ In both cases they cause a **single**(!) action to be dispatched (~= passed as i
 If you want to **add new action-creators** do so by adding to the `actionHierarcy`-object in `actions.js`.
 From that two objects are generated at the moment:
 
-- `actionTypes`, which contains string-constants (e.g. actionTypes.needs.close === 'needs.close')
-- `actionCreators`, which houses the action creators. for the sake of injecting them with ng-redux, they are organised with `__` as seperator (e.g. `actionCreators.needs__close()`)
+- `actionTypes`, which contains string-constants (e.g. actionTypes.atoms.close === 'atoms.close')
+- `actionCreators`, which houses the action creators. for the sake of injecting them with ng-redux, they are organised with `__` as seperator (e.g. `actionCreators.atoms__close()`)
 
 Btw, the easiest way for actions without sideffects is to just placing an `myAction: INJ_DEFAULT`.
 This results in an action-creator that just dispatches all function-arguments as payload,
@@ -47,7 +47,7 @@ These are **side-effect-free**. Thus as much of the implementation as possible s
 
 They live in `app/components/`.
 
-Top-level components (views in the angular-sense) have their own folders (e.g. `app/components/create-need/` and are split in two files).
+Top-level components (views in the angular-sense) have their own folders (e.g. `app/components/create-atom/` and are split in two files).
 You'll need to add them to the routing (see below) to be able to switch the routing-state to these.
 
 Non-top-level components are implemented as directives.
@@ -97,9 +97,9 @@ $ngRedux.getState();
    reconnecting: true|false,
    waitingForAnswer: {...}
  },
- needs: {
-   [needUri]: {
-       connections: { //Immutable.Map() containing all corresponding Connections to this need
+ atoms: {
+   [atomUri]: {
+       connections: { //Immutable.Map() containing all corresponding Connections to this atom
            [connectionUri]: {
                creationDate: date, //creationDate of the connection
                lastUpdateDate: date, //date of lastUpdate of this connection (last date of the message that was added)
@@ -110,8 +110,8 @@ $ngRedux.getState();
                        unread: true|false, //whether or not this message is new (or already seen if you will)
                        forwardMessage: true|false, //default is false, flag to indicate if this is a message coming from another connection, and is referenced in the references->forwards of another message (this is a flag to indicate if the message is visible or not)
                        outgoingMessage: true|false, //flag to indicate if this was an outgoing or incoming message
-                       systemMessage: true|false, //flag to indicate if this message came from the system (e.g. hint messages) !wonMessage.isFromOwner() && !wonMessage.getSenderNeed() && wonMessage.getSenderNode(),
-                       senderUri: uri //to indicate which need or node sent the message itself, wonMessage.getSenderNeed() || wonMessage.getSenderNode(),
+                       systemMessage: true|false, //flag to indicate if this message came from the system (e.g. hint messages) !wonMessage.isFromOwner() && !wonMessage.getSenderAtom() && wonMessage.getSenderNode(),
+                       senderUri: uri //to indicate which atom or node sent the message itself, wonMessage.getSenderAtom() || wonMessage.getSenderNode(),
                        content: {
                            text: wonMessage.getTextMessage(),
                            matchScore: wonMessage.getMatchScore(),
@@ -130,7 +130,7 @@ $ngRedux.getState();
                        hasReferences: true|false //whether it contains any non-null/non-undefined references within the references block of the message
                        hasContent: true|false //whether it contains any non-null/non-undefined content within the content block of the message
                        injectInto: undefined or an array of connectionUris this message is injected into
-                       originatorUri: undefined or the uri of the post/need which initiated the forwardMessage (the one who injected the msg)
+                       originatorUri: undefined or the uri of the post/atom which initiated the forwardMessage (the one who injected the msg)
                        isParsable: true|false //true if hasReferences or hasContent is true
                        isMessageStatusUpToDate: true|false //true if the agreementData has been checked to define the status of the message
                        messageStatus: {
@@ -182,29 +182,28 @@ $ngRedux.getState();
                multiSelectType: String // default is undefined, indicates which action is supposed to happen for the multiselect messages
                unread: true|false, //whether or not this connection is new (or already seen if you will)
                isRated: true|false, //whether or not this connection has been rated yet
-               remoteNeedUri: string, //corresponding remote Need identifier
-               remoteConnectionUri: string, //corresponding remote Connection uri
+               targetAtomUri: string, //corresponding remote Atom identifier
+               targetConnectionUri: string, //corresponding remote Connection uri
                state: string, //state of the connection
                uri: string //unique identifier of this connection
            }
            ...
        },
-       creationDate: Date, //creationDate of this need
-       lastUpdateDate: date, //date of lastUpdate of this need (last date of the message or connection that was added)
-       nodeUri: string, //identifier of this need's server
-       isOwned: true|false, //whether this need is owned or not
-       isBeingCreated: true|false, //whether or not the creation of this need was successfully completed yet
-       state: "won:Active" | "won:Inactive", //state of the need
-       groupMembers: Immutable.List() // needUris of participants of this needs (won:hasGroupMember) -> usually only set for groupChatNeeds
-       holds: Immutable.List() // needUris of the persona that holds these additional needs
-       unread: true|false, //whether or not this need has new information that has not been read yet
-       uri: string, //unique identifier of this need
+       creationDate: Date, //creationDate of this atom
+       lastUpdateDate: date, //date of lastUpdate of this atom (last date of the message or connection that was added)
+       nodeUri: string, //identifier of this atom's server
+       isBeingCreated: true|false, //whether or not the creation of this atom was successfully completed yet
+       state: "won:Active" | "won:Inactive", //state of the atom
+       groupMembers: Immutable.List() // atomUris of participants of this atoms (won:groupMember) -> usually only set for groupChatAtoms
+       holds: Immutable.List() // atomUris of the persona that holds these additional atoms
+       unread: true|false, //whether or not this atom has new information that has not been read yet
+       uri: string, //unique identifier of this atom
        humanReadable: string, //a human Readable String that parses the content from is or seeks and searchString and makes a title out of it based on a certain logic
-       matchedUseCase: { //saves a matchedUseCase within the need so we dont have to parse it multiple times
+       matchedUseCase: { //saves a matchedUseCase within the atom so we dont have to parse it multiple times
            identifier: undefined, //matched identifier that is set within the matched usecase
            icon: undefined, //matched icon that is set within the matched usecase
-           iconBackground: //generated background color based on a hash of the need-uri, (similar to identiconSvg),
        },
+       background: //generated background color based on a hash of the atom-uri, (similar to identiconSvg),
        content : {...},
        seeks: {...}
    },
@@ -223,7 +222,7 @@ $ngRedux.getState();
  },
  view: {
      showRdf: true|false, //flag that is true if rawData mode is on (enables rdf view and rdf links) (default is false)
-     showClosedNeeds: true|false, //flag whether the drawer of the closedNeeds is open or closed (default is false)
+     showClosedAtoms: true|false, //flag whether the drawer of the closedAtoms is open or closed (default is false)
      showMainMenu: true|false, //flag whether the mainmenu dropdown is open or closed (default is false)
      showModalDialog: true|false, //flag whether the omnipresent modal dialog is displayed or not (default is false)
      modalDialog: {
@@ -239,7 +238,7 @@ $ngRedux.getState();
     }
  },
  process: {
-    processingPublish: true|false, //default false, flag that is true if a need(or persona) is currently being created
+    processingPublish: true|false, //default false, flag that is true if an atom(or persona) is currently being created
     processingLogout: true|false, //default false, flag that indicates if a logout is currently in process
     processingInitialLoad: true|false //flag that indicates if the initialLoad is currently in process
     processingLogin: true|false, //default false flag that indicates if a login is currently in process
@@ -247,18 +246,18 @@ $ngRedux.getState();
     processingAcceptTermsOfService: false, //indicates if the rest-call to accept the terms of service is currently pending
     processingVerifyEmailAddress: false, //indicates if the rest-call to verify the email address is currently pending
     processingResendVerificationEmail: false, //indicates if the rest-call to resend the verification mail is currently pending
-    needs: {
-        [needUri]: {
-            failedToLoad: true|false, //whether or not the need has failed to load (due to delete or other)
-            loading: true|false, //whether or not the need is currently in the process of being loaded
-            toLoad: true|false, //whether or not the need is flagged as toLoad (for future loading purposes)
+    atoms: {
+        [atomUri]: {
+            failedToLoad: true|false, //whether or not the atom has failed to load (due to delete or other)
+            loading: true|false, //whether or not the atom is currently in the process of being loaded
+            toLoad: true|false, //whether or not the atom is flagged as toLoad (for future loading purposes)
         }
     },
     connections: {
         [connUri]: {
            failedToLoad: true|false, //default is false, whether or not this connection was able to be loaded or not
            loadingMessages: true|false, //default is false, whether or not this connection is currently loading messages or processing agreements
-           loading: true|false, //default is false, whether or not this connection is currently loading itself (similar to the loading in the need)
+           loading: true|false, //default is false, whether or not this connection is currently loading itself (similar to the loading in the atom)
            messages: {
             [messageUri]: {
                 loading: true|false, //if the message is currently being loaded
@@ -283,27 +282,27 @@ $ngRedux.getState();
 */
 ```
 
-As you can see in this State all "visible" Data is stored within the needs and the corresponding connections and messages are stored within this tree.
-Example: If you want to retrieve all present connections for a given need you will access it by `$ngRedux.getState().getIn(["needs", [needUri], "connections"])`.
+As you can see in this State all "visible" Data is stored within the atoms and the corresponding connections and messages are stored within this tree.
+Example: If you want to retrieve all present connections for a given atom you will access it by `$ngRedux.getState().getIn(["atoms", [atomUri], "connections"])`.
 
-All The DataParsing happens within the `need-reducer.js` and should only be implemented here, in their respective Methods `parseNeed(jsonLdNeed, isOwned)`, `parseConnection(jsonLdConnection, unread)` and `parseMessage(jsonLdMessage, outgoingMessage, unread)`.
-It is very important to not parse needs/connections/messages in any other place or in any other way to make sure that the structure of the corresponding items is always the same, and so that the Views don't have to implement fail-safes when accessing elements, e.g. a Location is only present if the whole location data can be parsed/stored within the state, otherwise the location will stay empty.
-This is also true for every message connection and need, as soon as the data is in the state you can be certain that all the mandatory values are set correctly.
+All The DataParsing happens within the `atom-reducer.js` and should only be implemented here, in their respective Methods `parseAtom(jsonLdAtom)`, `parseConnection(jsonLdConnection, unread)` and `parseMessage(jsonLdMessage, outgoingMessage, unread)`.
+It is very important to not parse atoms/connections/messages in any other place or in any other way to make sure that the structure of the corresponding items is always the same, and so that the Views don't have to implement fail-safes when accessing elements, e.g. a Location is only present if the whole location data can be parsed/stored within the state, otherwise the location will stay empty.
+This is also true for every message connection and atom, as soon as the data is in the state you can be certain that all the mandatory values are set correctly.
 
 ### Data Structure
 
-The `is` and `seeks` parts in the state displayed above store all details of a given need. All available detail types are defined in `detail-definitions.js` and added to needs via use cases defined in `usecase-definitions.js`. All details in `detail-definitions.js` have a default `parseToRDF({value, identifier})` and `parseFromRDF(jsonLDImm)` functions that are used for all data parsing.
+The `is` and `seeks` parts in the state displayed above store all details of a given atom. All available detail types are defined in `detail-definitions.js` and added to atoms via use cases defined in `usecase-definitions.js`. All details in `detail-definitions.js` have a default `parseToRDF({value, identifier})` and `parseFromRDF(jsonLDImm)` functions that are used for all data parsing.
 There are also abstractDetails, which are not considered complete Details but provide a stub to a picker and a viewer component, e.g. abstractDetails.number, you have to write the parseToRDF, parseFromRDF functions, and set the identifier, label, and icon, as they do not have a default value.
 
 To adjust details for individual use cases, the data parsing functions should be overwritten in `usecase-definitions.js`. For parsing, **all details defined in any use case** will be considered. To avoid unexpected behaviour, `detail.identifier` must be unique across all use cases and must not be "search", as this literal is used to recognise full-text searches. Additonally, if two or more use cases use the same `parseToRDF({value, identifier})` function or use the same RDF predicates, information may not be correctly recognised. E.g., if one use case parses a "description" to be saved as `dc:description`, and another use case parses a "biography" to also be saved as `dc:description`, "description" and "biography" can't be told apart while parsing. As a result, which `parseFromRDF(sonLDImm)` is used for parsing the information depends on the order of use case definitions.
 
-Details are represented in the state as part of the need or a branch `seeks`, for example:
+Details are represented in the state as part of the atom or a branch `seeks`, for example:
 
 ```javascript
 /*
 seeks : {
-           title: string, //title of the need
-           description: string, //description of the need as a string (non mandatory, empty if not present)
+           title: string, //title of the atom
+           description: string, //description of the atom as a string (non mandatory, empty if not present)
            tags: Array of strings, //array of strings (non mandatory, empty if not present)
            location: { //non mandatory but if present it contains all elements below
                address: string, //address as human readable string
@@ -341,7 +340,7 @@ If it's **REST**-style, just use `fetch(...).then(...dispatch...)` in an action-
 If it's **linked-data-related**, use the utilities in `linkeddata-service-won.js`.
 They'll do standard HTTP(S) but will make sure to cache as much as possible via the local triplestore.
 
-If needs to **push to the web-socket**, add a hook for the respective _user(!)_-action in `message-reducers.js`.
+If it's **push to the web-socket**, add a hook for the respective _user(!)_-action in `message-reducers.js`.
 The `messaging-agent.js` will pick up any messages in `$ngRedux.getState().getIn(['messages', 'enqueued'])`
 and push them to it's websocket. This solution appears rather hacky to me (see 'high-level interactions' under 'Action Creators') and I'd be thrilled to hear any alternative solutions :)
 

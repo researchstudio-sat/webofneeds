@@ -23,15 +23,15 @@ public class ParticipantCoordinatorBotContextWrapper extends BotContextWrapper {
     }
 
     @Override
-    public String getNeedCreateListName() {
+    public String getAtomCreateListName() {
         throw new UnsupportedOperationException("This List is not available for this BotContextWrapper");
     }
 
-    public List<URI> getParticipants(){
-        return getBotContext().getNamedNeedUriList(participantListName);
+    public List<URI> getParticipants() {
+        return getBotContext().getNamedAtomUriList(participantListName);
     }
 
-    public List<URI> getCoordinators(){
-        return getBotContext().getNamedNeedUriList(coordinatorListName);
+    public List<URI> getCoordinators() {
+        return getBotContext().getNamedAtomUriList(coordinatorListName);
     }
 }

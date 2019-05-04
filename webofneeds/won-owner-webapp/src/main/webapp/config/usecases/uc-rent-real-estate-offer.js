@@ -80,10 +80,10 @@ export const rentRealEstateOffer = {
             xsd: "http://www.w3.org/2001/XMLSchema#",
           },
           operations: [
-            `${resultName} a won:Need.`,
+            `${resultName} a won:Atom.`,
             `${resultName} a won:RealEstateRentDemand.`,
             `${resultName} won:seeks ?seeks.`,
-            "?seeks (won:hasLocation|s:location) ?location.",
+            "?seeks (won:location|s:location) ?location.",
             "?location s:geo ?location_geo.",
             "?location_geo s:latitude ?location_lat;",
             "s:longitude ?location_lon;",
@@ -120,7 +120,7 @@ export const rentRealEstateOffer = {
             sh: won.defaultContext["sh"], //needed for the filterNumericProperty calls
           },
           operations: [
-            `${resultName} a won:Need.`,
+            `${resultName} a won:Atom.`,
             `${resultName} a won:RealEstateRentDemand.``${resultName} won:seeks ?seeks.`,
           ],
         },

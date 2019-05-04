@@ -21,8 +21,6 @@
 import { is, prefixOfUri, isArray, clone, createArray } from "../utils.js";
 import {
   clearReadUris,
-  clearClosedConnUris,
-  getClosedConnUris,
   clearDisclaimerAccepted,
   isDisclaimerAccepted,
   setDisclaimerAccepted,
@@ -39,25 +37,23 @@ let won = {};
  *
  */
 
-won.debugmode = false; //if you set this to true, the created needs will get flagged as debug needs in order to get matches and requests from the debugbot
+won.debugmode = false; //if you set this to true, the created atoms will get flagged as debug atoms in order to get matches and requests from the debugbot
 
 won.clearReadUris = clearReadUris;
-won.clearClosedConnUris = clearClosedConnUris;
-won.getClosedConnUris = getClosedConnUris;
 won.isDisclaimerAccepted = isDisclaimerAccepted;
 won.clearDisclaimerAccepted = clearDisclaimerAccepted;
 won.setDisclaimerAccepted = setDisclaimerAccepted;
 
 won.WON = {};
-won.WON.baseUri = "http://purl.org/webofneeds/model#";
+won.WON.baseUri = "https://w3id.org/won/core#";
 //won.WON.matcherURI = "http://localhost:8080/matcher/search/"
 won.WON.matcherURI = "https://localhost:8443/matcher/search/";
 //won.WON.matcherURI = "http://sat001.researchstudio.at:8080/matcher/search/";
 //won.WON.matcherURI = "https://sat001.researchstudio.at:8443/matcher/search/";
 
 won.WON.prefix = "won";
-won.WON.hasWonNode = won.WON.baseUri + "hasWonNode";
-won.WON.hasWonNodeCompacted = won.WON.prefix + ":hasWonNode";
+won.WON.wonNode = won.WON.baseUri + "wonNode";
+won.WON.wonNodeCompacted = won.WON.prefix + ":wonNode";
 won.WON.Active = won.WON.baseUri + "Active";
 won.WON.ActiveCompacted = won.WON.prefix + ":Active";
 won.WON.Closed = won.WON.baseUri + "Closed";
@@ -66,27 +62,30 @@ won.WON.ClosedCompacted = won.WON.prefix + ":Closed";
 won.WON.Inactive = won.WON.baseUri + "Inactive";
 won.WON.InactiveCompacted = won.WON.prefix + ":Inactive";
 
-won.WON.isInState = won.WON.baseUri + "isInState";
-won.WON.isInStateCompacted = won.WON.prefix + ":isInState";
-won.WON.hasFacet = won.WON.baseUri + "hasFacet";
-won.WON.hasFacetCompacted = won.WON.prefix + ":hasFacet";
-won.WON.hasFlag = won.WON.baseUri + "hasFlag";
-won.WON.hasFlagCompacted = won.WON.prefix + "hasFlag";
-won.WON.hasRemoteFacet = won.WON.baseUri + "hasRemoteFacet";
-won.WON.hasRemoteFacetCompacted = won.WON.prefix + ":hasRemoteFacet";
+won.WON.Deleted = won.WON.baseUri + "Deleted";
+won.WON.DeletedCompacted = won.WON.prefix + ":Deleted";
 
-won.WON.hasRemoteNeed = won.WON.baseUri + "hasRemoteNeed";
-won.WON.hasRemoteNeedCompacted = won.WON.prefix + ":hasRemoteNeed";
-won.WON.hasRemoteConnection = won.WON.baseUri + "hasRemoteConnection";
-won.WON.hasRemoteConnectionCompacted = won.WON.prefix + ":hasRemoteConnection";
+won.WON.atomState = won.WON.baseUri + "atomState";
+won.WON.atomStateCompacted = won.WON.prefix + ":atomState";
+won.WON.socket = won.WON.baseUri + "socket";
+won.WON.socketCompacted = won.WON.prefix + ":socket";
+won.WON.flag = won.WON.baseUri + "flag";
+won.WON.flagCompacted = won.WON.prefix + "flag";
+won.WON.targetSocket = won.WON.baseUri + "targetSocket";
+won.WON.targetSocketCompacted = won.WON.prefix + ":targetSocket";
+
+won.WON.targetAtom = won.WON.baseUri + "targetAtom";
+won.WON.targetAtomCompacted = won.WON.prefix + ":targetAtom";
+won.WON.targetConnection = won.WON.baseUri + "targetConnection";
+won.WON.targetConnectionCompacted = won.WON.prefix + ":targetConnection";
 won.WON.forResource = won.WON.baseUri + "forResource";
-won.WON.hasBinaryRating = won.WON.baseUri + "hasBinaryRating";
+won.WON.binaryRating = won.WON.baseUri + "binaryRating";
 won.WON.binaryRatingGood = won.WON.baseUri + "Good";
 won.WON.binaryRatingBad = won.WON.baseUri + "Bad";
-won.WON.hasFeedback = won.WON.baseUri + "hasFeedback";
+won.WON.feedback = won.WON.baseUri + "feedback";
 
-won.WON.hasConnectionState = won.WON.baseUri + "hasConnectionState";
-won.WON.hasConnectionState = won.WON.prefix + ":hasConnectionState";
+won.WON.connectionState = won.WON.baseUri + "connectionState";
+won.WON.connectionState = won.WON.prefix + ":connectionState";
 won.WON.Suggested = won.WON.baseUri + "Suggested";
 won.WON.SuggestedCompacted = won.WON.baseUri + ":Suggested";
 won.WON.RequestReceived = won.WON.baseUri + "RequestReceived";
@@ -117,8 +116,8 @@ won.WON.infoToast = won.WON.baseUri + "InfoToast";
 won.WON.warnToast = won.WON.baseUri + "WarnToast";
 won.WON.errorToast = won.WON.baseUri + "ErrorToast";
 
-won.WON.hasGraph = won.WON.baseUri + "hasGraph";
-won.WON.hasGraphCompacted = won.WON.prefix + ":hasGraph";
+won.WON.graph = won.WON.baseUri + "graph";
+won.WON.graphCompacted = won.WON.prefix + ":graph";
 
 won.WON.Connection = won.WON.baseUri + "Connection";
 won.WON.ConnectionCompacted = won.WON.prefix + ":Connection";
@@ -126,73 +125,59 @@ won.WON.ConnectionCompacted = won.WON.prefix + ":Connection";
 won.WON.Event = won.WON.baseUri + "Event";
 won.WON.EventCompacted = won.WON.prefix + ":Event";
 
-won.WON.Need = won.WON.baseUri + "Need";
-won.WON.NeedCompacted = won.WON.prefix + ":Need";
-won.WON.BasicNeedTypeDemand = won.WON.baseUri + "Demand";
-won.WON.BasicNeedTypeDemandCompacted = won.WON.prefix + ":Demand";
-won.WON.BasicNeedTypeSupply = won.WON.baseUri + "Supply";
-won.WON.BasicNeedTypeSupplyCompacted = won.WON.prefix + ":Supply";
-won.WON.BasicNeedTypeDotogether = won.WON.baseUri + "DoTogether";
-won.WON.BasicNeedTypeDotogetherCompacted = won.WON.prefix + ":DoTogether";
-won.WON.BasicNeedTypeCombined = won.WON.baseUri + "Combined";
-won.WON.BasicNeedTypeCombinedCompacted = won.WON.baseUri + ":Combined";
-won.WON.BasicNeedTypeCritique = won.WON.baseUri + "Critique";
-won.WON.BasicNeedTypeCritiqueCompacted = won.WON.prefix + ":Critique";
-won.WON.BasicNeedTypeWhatsAroundCompacted = won.WON.prefix + ":WhatsAround";
-won.WON.BasicNeedTypeWhatsNewCompacted = won.WON.prefix + ":WhatsNew";
+won.WON.Atom = won.WON.baseUri + "Atom";
+won.WON.AtomCompacted = won.WON.prefix + ":Atom";
+won.WON.BasicAtomTypeDemand = won.WON.baseUri + "Demand";
+won.WON.BasicAtomTypeDemandCompacted = won.WON.prefix + ":Demand";
+won.WON.BasicAtomTypeSupply = won.WON.baseUri + "Supply";
+won.WON.BasicAtomTypeSupplyCompacted = won.WON.prefix + ":Supply";
+won.WON.BasicAtomTypeDotogether = won.WON.baseUri + "DoTogether";
+won.WON.BasicAtomTypeDotogetherCompacted = won.WON.prefix + ":DoTogether";
+won.WON.BasicAtomTypeCombined = won.WON.baseUri + "Combined";
+won.WON.BasicAtomTypeCombinedCompacted = won.WON.baseUri + ":Combined";
+won.WON.BasicAtomTypeCritique = won.WON.baseUri + "Critique";
+won.WON.BasicAtomTypeCritiqueCompacted = won.WON.prefix + ":Critique";
 won.WON.NoHintForCounterpartCompacted =
   won.WON.prefix + ":NoHintForCounterpart";
 won.WON.UsedForTestingCompacted = won.WON.prefix + ":UsedForTesting";
 won.WON.NoHintForMeCompacted = won.WON.prefix + ":NoHintForMe";
-won.WON.HoldableFacet = won.WON.baseUri + "HoldableFacet";
-won.WON.HoldableFacetCompacted = won.WON.prefix + ":HoldableFacet";
-won.WON.HolderFacet = won.WON.baseUri + "HolderFacet";
-won.WON.HolderFacetCompacted = won.WON.prefix + ":HolderFacet";
-won.WON.ReviewFacet = won.WON.baseUri + "ReviewFacet";
-won.WON.ReviewFacetCompacted = won.WON.prefix + ":ReviewFacet";
-won.WON.ChatFacet = won.WON.baseUri + "ChatFacet";
-won.WON.ChatFacetCompacted = won.WON.prefix + ":ChatFacet";
-won.WON.GroupFacet = won.WON.baseUri + "GroupFacet";
-won.WON.GroupFacetCompacted = won.WON.prefix + ":GroupFacet";
-won.WON.ParticipantFacet = won.WON.baseUri + "ParticipantFacet";
-won.WON.ParticipantFacetCompacted = won.WON.prefix + ":ParticipantFacet";
-won.WON.CommentFacet = won.WON.baseUri + "CommentFacet";
-won.WON.CommentFacetCompacted = won.WON.prefix + ":CommentFacet";
-won.WON.CoordinatorFacet = won.WON.baseUri + "CoordinatorFacet";
-won.WON.CoordinatorFacetCompacted = won.WON.prefix + ":CoordinatorFacet";
-won.WON.belongsToNeed = won.WON.baseUri + "belongsToNeed";
-won.WON.belongsToNeedCompacted = won.WON.prefix + ":belongsToNeed";
-won.WON.hasBasicNeedType = won.WON.baseUri + "hasBasicNeedType";
-won.WON.hasBasicNeedTypeCompacted = won.WON.prefix + ":hasBasicNeedType";
-won.WON.hasConnections = won.WON.baseUri + "hasConnections";
-won.WON.hasConnectionsCompacted = won.WON.prefix + ":hasConnections";
-won.WON.hasConnectionState = won.WON.baseUri + "hasConnectionState";
-won.WON.hasConnectionStateCompacted = won.WON.prefix + ":hasConnectionState";
+won.WON.ParticipantSocket = won.WON.baseUri + "ParticipantSocket";
+won.WON.ParticipantSocketCompacted = won.WON.prefix + ":ParticipantSocket";
+won.WON.CommentSocket = won.WON.baseUri + "CommentSocket";
+won.WON.CommentSocketCompacted = won.WON.prefix + ":CommentSocket";
+won.WON.CoordinatorSocket = won.WON.baseUri + "CoordinatorSocket";
+won.WON.CoordinatorSocketCompacted = won.WON.prefix + ":CoordinatorSocket";
+won.WON.sourceAtom = won.WON.baseUri + "sourceAtom";
+won.WON.sourceAtomCompacted = won.WON.prefix + ":sourceAtom";
+won.WON.hasBasicAtomType = won.WON.baseUri + "hasBasicAtomType";
+won.WON.hasBasicAtomTypeCompacted = won.WON.prefix + ":hasBasicAtomType";
+won.WON.connections = won.WON.baseUri + "connections";
+won.WON.connectionsCompacted = won.WON.prefix + ":connections";
+won.WON.connectionState = won.WON.baseUri + "connectionState";
+won.WON.connectionStateCompacted = won.WON.prefix + ":connectionState";
 won.WON.hasContent = won.WON.baseUri + "hasContent";
-won.WON.hasContentCompacted = won.WON.prefix + ":hasContent";
+won.WON.hasContentCompacted = won.WON.prefix + ":content";
 won.WON.hasContentDescription = won.WON.baseUri + "hasContentDescription";
-won.WON.hasContentDescriptionCompacted =
-  won.WON.prefix + ":hasContentDescription";
-won.WON.hasEventContainer = won.WON.baseUri + "hasEventContainer";
-won.WON.hasEventContainerCompacted = won.WON.prefix + ":hasEventContainer";
-won.WON.hasOriginator = won.WON.baseUri + "hasOriginator";
-won.WON.hasOriginatorCompacted = won.WON.prefix + ":hasOriginator";
-won.WON.hasRecurInfiniteTimes = won.WON.baseUri + "hasRecurInfiniteTimes";
-won.WON.hasRecurInfiniteTimesCompacted =
-  won.WON.prefix + ":hasRecurInfiniteTimes";
-won.WON.hasRecursIn = won.WON.baseUri + "hasRecursIn";
-won.WON.hasRecursInCompacted = won.WON.prefix + ":hasRecurInfiniteTimes";
+won.WON.hasContentDescriptionCompacted = won.WON.prefix + ":contentDescription";
+won.WON.messageContainer = won.WON.baseUri + "messageContainer";
+won.WON.messageContainerCompacted = won.WON.prefix + ":messageContainer";
+won.WON.originator = won.WON.baseUri + "originator";
+won.WON.originatorCompacted = won.WON.prefix + ":originator";
+won.WON.recurInfiniteTimes = won.WON.baseUri + "recurInfiniteTimes";
+won.WON.recurInfiniteTimesCompacted = won.WON.prefix + ":recurInfiniteTimes";
+won.WON.recursIn = won.WON.baseUri + "recursIn";
+won.WON.recursInCompacted = won.WON.prefix + ":recurInfiniteTimes";
 won.WON.hasScore = won.WON.baseUri + "hasScore";
 won.WON.hasScoreCompacted = won.WON.prefix + ":hasScore";
-won.WON.hasTag = won.WON.baseUri + "hasTag";
-won.WON.hasTagCompacted = won.WON.prefix + ":hasTag";
+won.WON.tag = won.WON.baseUri + "tag";
+won.WON.tagCompacted = won.WON.prefix + ":tag";
 
-won.WON.hasMatchScore = won.WON.baseUri + "hasMatchScore";
-won.WON.hasMatchScoreCompacted = won.WON.prefix + ":hasMatchScore";
-won.WON.hasMatchCounterpart = won.WON.baseUri + "hasMatchCounterpart";
-won.WON.hasMatchCounterpart = won.WON.prefix + ":hasMatchCounterpart";
-won.WON.hasTextMessage = won.WON.baseUri + "hasTextMessage";
-won.WON.hasTextMessageCompacted = won.WON.prefix + ":hasTextMessage";
+won.WON.matchScore = won.WON.baseUri + "matchScore";
+won.WON.matchScoreCompacted = won.WON.prefix + ":matchScore";
+won.WON.matchCounterpart = won.WON.baseUri + "matchCounterpart";
+won.WON.matchCounterpart = won.WON.prefix + ":matchCounterpart";
+won.WON.textMessage = won.WON.baseUri + "textMessage";
+won.WON.textMessageCompacted = won.WON.prefix + ":textMessage";
 
 won.WON.searchResultURI = won.WON.baseUri + "uri";
 won.WON.searchResultPreview = won.WON.baseUri + "preview";
@@ -202,30 +187,30 @@ won.WON.searchResult = won.WON.baseUri + "Match";
 won.WON.usedForTesting = won.WON.prefix + "UserForTesting";
 
 won.WONMSG = {};
-won.WONMSG.baseUri = "http://purl.org/webofneeds/message#";
+won.WONMSG.baseUri = "https://w3id.org/won/message#";
 won.WONMSG.prefix = "msg";
 
 //sender/receiver etc.
-won.WONMSG.hasReceiverNeed = won.WONMSG.baseUri + "hasReceiverNeed";
-won.WONMSG.hasReceiverNeedCompacted = won.WONMSG.prefix + ":hasReceiverNeed";
-won.WONMSG.hasReceiver = won.WONMSG.baseUri + "hasReceiver";
-won.WONMSG.hasReceiverCompacted = won.WONMSG.prefix + ":hasReceiver";
-won.WONMSG.hasReceiverNode = won.WONMSG.baseUri + "hasReceiverNode";
-won.WONMSG.hasReceiverNodeCompacted = won.WONMSG.prefix + ":hasReceiverNode";
-won.WONMSG.hasReceiverFacet = won.WONMSG.baseUri + "hasReceiverFacet";
-won.WONMSG.hasReceiverFacetCompacted = won.WONMSG.prefix + ":hasReceiverFacet";
-won.WONMSG.hasSenderNeed = won.WONMSG.baseUri + "hasSenderNeed";
-won.WONMSG.hasSenderNeedCompacted = won.WONMSG.prefix + ":hasSenderNeed";
-won.WONMSG.hasSender = won.WONMSG.baseUri + "hasSender";
-won.WONMSG.hasSenderCompacted = won.WONMSG.prefix + ":hasSender";
-won.WONMSG.hasSenderNode = won.WONMSG.baseUri + "hasSenderNode";
-won.WONMSG.hasSenderNodeCompacted = won.WONMSG.prefix + ":hasSenderNode";
-won.WONMSG.hasSenderFacet = won.WONMSG.baseUri + "hasSenderFacet";
-won.WONMSG.hasSenderFacetCompacted = won.WONMSG.prefix + ":hasSenderFacet";
-won.WONMSG.hasMessageType = won.WONMSG.baseUri + ":hasMessageType";
-won.WONMSG.hasMessageTypeCompacted = won.WONMSG.prefix + ":hasMessageType";
-won.WONMSG.hasTimestamp = won.WONMSG.baseUri + "hasTimestamp";
-won.WONMSG.hasTimestampCompacted = won.WONMSG.prefix + ":hasTimestamp";
+won.WONMSG.recipientAtom = won.WONMSG.baseUri + "recipientAtom";
+won.WONMSG.recipientAtomCompacted = won.WONMSG.prefix + ":recipientAtom";
+won.WONMSG.recipient = won.WONMSG.baseUri + "recipient";
+won.WONMSG.recipientCompacted = won.WONMSG.prefix + ":recipient";
+won.WONMSG.recipientNode = won.WONMSG.baseUri + "recipientNode";
+won.WONMSG.recipientNodeCompacted = won.WONMSG.prefix + ":recipientNode";
+won.WONMSG.recipientSocket = won.WONMSG.baseUri + "recipientSocket";
+won.WONMSG.recipientSocketCompacted = won.WONMSG.prefix + ":recipientSocket";
+won.WONMSG.senderAtom = won.WONMSG.baseUri + "senderAtom";
+won.WONMSG.senderAtomCompacted = won.WONMSG.prefix + ":senderAtom";
+won.WONMSG.sender = won.WONMSG.baseUri + "sender";
+won.WONMSG.senderCompacted = won.WONMSG.prefix + ":sender";
+won.WONMSG.senderNode = won.WONMSG.baseUri + "senderNode";
+won.WONMSG.senderNodeCompacted = won.WONMSG.prefix + ":senderNode";
+won.WONMSG.senderSocket = won.WONMSG.baseUri + "senderSocket";
+won.WONMSG.senderSocketCompacted = won.WONMSG.prefix + ":senderSocket";
+won.WONMSG.messageType = won.WONMSG.baseUri + ":messageType";
+won.WONMSG.messageTypeCompacted = won.WONMSG.prefix + ":messageType";
+won.WONMSG.timestamp = won.WONMSG.baseUri + "timestamp";
+won.WONMSG.timestampCompacted = won.WONMSG.prefix + ":timestamp";
 won.WONMSG.refersTo = won.WONMSG.baseUri + "refersTo";
 won.WONMSG.refersToCompacted = won.WONMSG.prefix + ":refersTo";
 won.WONMSG.isResponseTo = won.WONMSG.baseUri + "isResponseTo";
@@ -237,7 +222,7 @@ won.WONMSG.EnvelopeGraph = won.WONMSG.baseUri + "EnvelopeGraph";
 won.WONMSG.EnvelopeGraphCompacted = won.WONMSG.prefix + ":EnvelopeGraph";
 
 won.WONMSG.hasContent = won.WONMSG.baseUri + "hasContent";
-won.WONMSG.hasContentCompacted = won.WONMSG.prefix + ":hasContent";
+won.WONMSG.hasContentCompacted = won.WONMSG.prefix + ":content";
 
 won.WONMSG.FromOwner = won.WONMSG.baseUri + "FromOwner";
 won.WONMSG.FromOwnerCompacted = won.WONMSG.prefix + ":FromOwner";
@@ -247,18 +232,20 @@ won.WONMSG.FromSystem = won.WONMSG.baseUri + "FromSystem";
 //message types
 won.WONMSG.createMessage = won.WONMSG.baseUri + "CreateMessage";
 won.WONMSG.createMessageCompacted = won.WONMSG.prefix + ":CreateMessage";
-won.WONMSG.activateNeedMessage = won.WONMSG.baseUri + "ActivateMessage";
-won.WONMSG.activateNeedMessageCompacted =
+won.WONMSG.replaceMessage = won.WONMSG.baseUri + "ReplaceMessage";
+won.WONMSG.replaceMessageCompacted = won.WONMSG.prefix + ":ReplaceMessage";
+won.WONMSG.activateAtomMessage = won.WONMSG.baseUri + "ActivateMessage";
+won.WONMSG.activateAtomMessageCompacted =
   won.WONMSG.prefix + ":ActivateMessage";
-won.WONMSG.deleteNeedMessage = won.WONMSG.baseUri + "DeleteMessage";
-won.WONMSG.deleteNeedMessageCompacted = won.WONMSG.prefix + ":DeleteMessage";
-won.WONMSG.deleteNeedSentMessage = won.WONMSG.baseUri + "DeleteSentMessage";
-won.WONMSG.deleteNeedSentMessageCompacted =
+won.WONMSG.deleteAtomMessage = won.WONMSG.baseUri + "DeleteMessage";
+won.WONMSG.deleteAtomMessageCompacted = won.WONMSG.prefix + ":DeleteMessage";
+won.WONMSG.deleteAtomSentMessage = won.WONMSG.baseUri + "DeleteSentMessage";
+won.WONMSG.deleteAtomSentMessageCompacted =
   won.WONMSG.prefix + ":DeleteSentMessage";
-won.WONMSG.closeNeedMessage = won.WONMSG.baseUri + "DeactivateMessage";
-won.WONMSG.closeNeedMessageCompacted = won.WONMSG.prefix + ":DeactivateMessage";
-won.WONMSG.closeNeedSentMessage = won.WONMSG.baseUri + "DeactivateSentMessage";
-won.WONMSG.closeNeedSentMessageCompacted =
+won.WONMSG.closeAtomMessage = won.WONMSG.baseUri + "DeactivateMessage";
+won.WONMSG.closeAtomMessageCompacted = won.WONMSG.prefix + ":DeactivateMessage";
+won.WONMSG.closeAtomSentMessage = won.WONMSG.baseUri + "DeactivateSentMessage";
+won.WONMSG.closeAtomSentMessageCompacted =
   won.WONMSG.prefix + ":DeactivateSentMessage";
 won.WONMSG.hintMessage = won.WONMSG.baseUri + "HintMessage";
 won.WONMSG.hintMessageCompacted = won.WONMSG.prefix + ":HintMessage";
@@ -270,8 +257,8 @@ won.WONMSG.connectMessageCompacted = won.WONMSG.prefix + ":ConnectMessage";
 won.WONMSG.connectSentMessage = won.WONMSG.baseUri + "ConnectSentMessage";
 won.WONMSG.connectSentMessageCompacted =
   won.WONMSG.prefix + ":ConnectSentMessage";
-won.WONMSG.needStateMessage = won.WONMSG.baseUri + "NeedStateMessage";
-won.WONMSG.needStateMessageCompacted = won.WONMSG.prefix + ":NeedStateMessage";
+won.WONMSG.atomStateMessage = won.WONMSG.baseUri + "AtomStateMessage";
+won.WONMSG.atomStateMessageCompacted = won.WONMSG.prefix + ":AtomStateMessage";
 won.WONMSG.closeMessage = won.WONMSG.baseUri + "CloseMessage";
 won.WONMSG.closeMessageCompacted = won.WONMSG.prefix + ":CloseMessage";
 won.WONMSG.openMessage = won.WONMSG.baseUri + "OpenMessage";
@@ -279,6 +266,10 @@ won.WONMSG.feedbackMessage = won.WONMSG.baseUri + "HintFeedbackMessage";
 won.WONMSG.openMessageCompacted = won.WONMSG.prefix + ":OpenMessage";
 won.WONMSG.openSentMessage = won.WONMSG.baseUri + "OpenSentMessage";
 won.WONMSG.openSentMessageCompacted = won.WONMSG.prefix + ":OpenSentMessage";
+won.WONMSG.changeNotificationMessage =
+  won.WONMSG.baseUri + "ChangeNotificationMessage";
+won.WONMSG.changeNotificationMessageCompacted =
+  won.WONMSG.prefix + ":ChangeNotificationMessage";
 won.WONMSG.connectionMessage = won.WONMSG.baseUri + "ConnectionMessage";
 won.WONMSG.connectionMessageCompacted =
   won.WONMSG.prefix + ":ConnectionMessage";
@@ -297,24 +288,50 @@ won.WONMSG.successResponseCompacted = won.WONMSG.prefix + ":SuccessResponse";
 won.WONMSG.failureResponse = won.WONMSG.baseUri + "FailureResponse";
 won.WONMSG.failureResponseCompacted = won.WONMSG.prefix + ":FailureResponse";
 
+won.HOLD = {};
+won.HOLD.baseUri = "https://w3id.org/won/ext/hold#";
+won.HOLD.prefix = "hold";
+won.HOLD.HoldableSocket = won.HOLD.baseUri + "HoldableSocket";
+won.HOLD.HoldableSocketCompacted = won.HOLD.prefix + ":HoldableSocket";
+won.HOLD.HolderSocket = won.HOLD.baseUri + "HolderSocket";
+won.HOLD.HolderSocketCompacted = won.HOLD.prefix + ":HolderSocket";
+
+won.CHAT = {};
+won.CHAT.baseUri = "https://w3id.org/won/ext/chat#";
+won.CHAT.prefix = "chat";
+won.CHAT.ChatSocket = won.CHAT.baseUri + "ChatSocket";
+won.CHAT.ChatSocketCompacted = won.CHAT.prefix + ":ChatSocket";
+
+won.GROUP = {};
+won.GROUP.baseUri = "https://w3id.org/won/ext/group#";
+won.GROUP.prefix = "group";
+won.GROUP.GroupSocket = won.GROUP.baseUri + "GroupSocket";
+won.GROUP.GroupSocketCompacted = won.GROUP.prefix + ":GroupSocket";
+
+won.REVIEW = {};
+won.REVIEW.baseUri = "https://w3id.org/won/ext/review#";
+won.REVIEW.prefix = "review";
+won.REVIEW.ReviewSocket = won.REVIEW.baseUri + "ReviewSocket";
+won.REVIEW.ReviewSocketCompacted = won.REVIEW.prefix + ":ReviewSocket";
+
 won.EVENT = {};
 won.EVENT.WON_MESSAGE_RECEIVED = "WonMessageReceived";
 won.EVENT.WON_SEARCH_RECEIVED = "SearchReceivedEvent";
-won.EVENT.NEED_CREATED = "NeedCreatedEvent";
+won.EVENT.ATOM_CREATED = "AtomCreatedEvent";
 won.EVENT.HINT_RECEIVED = "HintReceivedEvent";
 won.EVENT.CONNECT_SENT = "ConnectSentEvent";
 won.EVENT.CONNECT_RECEIVED = "ConnectReceivedEvent";
 won.EVENT.OPEN_SENT = "OpenSentEvent";
-won.EVENT.ACTIVATE_NEED_SENT = "ActivateNeedSentEvent";
-won.EVENT.ACTIVATE_NEED_RECEIVED = "ActivateNeedReceivedEvent";
-won.EVENT.CLOSE_NEED_SENT = "DeactivateSentEvent";
-won.EVENT.CLOSE_NEED_RECEIVED = "Deactivate_Received_Event";
+won.EVENT.ACTIVATE_ATOM_SENT = "ActivateAtomSentEvent";
+won.EVENT.ACTIVATE_ATOM_RECEIVED = "ActivateAtomReceivedEvent";
+won.EVENT.CLOSE_ATOM_SENT = "DeactivateSentEvent";
+won.EVENT.CLOSE_ATOM_RECEIVED = "Deactivate_Received_Event";
 won.EVENT.OPEN_RECEIVED = "OpenReceivedEvent";
 won.EVENT.CLOSE_SENT = "CloseSentEvent";
 won.EVENT.CLOSE_RECEIVED = "CloseReceivedEvent";
 won.EVENT.CONNECTION_MESSAGE_RECEIVED = "ConnectionMessageReceivedEvent";
 won.EVENT.CONNECTION_MESSAGE_SENT = "ConnectionMessageSentEvent";
-won.EVENT.NEED_STATE_MESSAGE_RECEIVED = "NeedStateMessageReceivedEvent";
+won.EVENT.ATOM_STATE_MESSAGE_RECEIVED = "AtomStateMessageReceivedEvent";
 won.EVENT.NO_CONNECTION = "NoConnectionErrorEvent";
 won.EVENT.NOT_TRANSMITTED = "NotTransmittedErrorEvent";
 won.EVENT.USER_SIGNED_IN = "UserSignedInEvent";
@@ -322,7 +339,7 @@ won.EVENT.USER_SIGNED_OUT = "UserSignedOutEvent";
 //TODO: this temp event, before we find out how to deal with session timeout
 won.EVENT.WEBSOCKET_CLOSED_UNEXPECTED = "WebSocketClosedUnexpected";
 
-won.EVENT.APPSTATE_CURRENT_NEED_CHANGED = "AppState.CurrentNeedChangedEvent";
+won.EVENT.APPSTATE_CURRENT_ATOM_CHANGED = "AppState.CurrentAtomChangedEvent";
 
 //keys for things that can be shown in the GUI as 'unread'
 won.UNREAD = {};
@@ -341,7 +358,7 @@ won.UNREAD.TYPES = [
 ];
 won.UNREAD.GROUP = {};
 won.UNREAD.GROUP.ALL = "all";
-won.UNREAD.GROUP.BYNEED = "byNeed";
+won.UNREAD.GROUP.BYATOM = "byAtom";
 
 //Code definitions as enum in RestStatusResponse.java
 won.RESPONSECODE = Object.freeze({
@@ -368,7 +385,7 @@ won.RESPONSECODE = Object.freeze({
   SETTINGS_CREATED: 5200,
   TOS_ACCEPT_SUCCESS: 6200,
   EXPORT_SUCCESS: 7200,
-  EXPORT_IS_ANONYMOUS: 7403,
+  EXPORT_NOT_VERIFIED: 7403,
 
   PRIVATEID_NOT_FOUND: 666, //this one is not defined in RestStatusResponse.java
 });
@@ -396,10 +413,10 @@ won.messageType2EventType = {
   [won.WONMSG.connectSentMessageCompacted]: won.EVENT.CONNECT_SENT,
   [won.WONMSG.openMessageCompacted]: won.EVENT.OPEN_RECEIVED,
   [won.WONMSG.closeMessageCompacted]: won.EVENT.CLOSE_RECEIVED,
-  [won.WONMSG.closeNeedMessageCompacted]: won.EVENT.CLOSE_NEED_RECEIVED,
+  [won.WONMSG.closeAtomMessageCompacted]: won.EVENT.CLOSE_ATOM_RECEIVED,
   [won.WONMSG.connectionMessageCompacted]:
     won.EVENT.CONNECTION_MESSAGE_RECEIVED,
-  [won.WONMSG.needStateMessageCompacted]: won.EVENT.NEED_STATE_MESSAGE_RECEIVED,
+  [won.WONMSG.atomStateMessageCompacted]: won.EVENT.ATOM_STATE_MESSAGE_RECEIVED,
   [won.WONMSG.errorMessageCompacted]: won.EVENT.NOT_TRANSMITTED,
 };
 
@@ -409,12 +426,12 @@ won.WONMSG.uriPlaceholder = Object.freeze({
 });
 
 won.WON.contentNodeBlankUri = Object.freeze({
-  seeks: "_:seeksNeedContent",
+  seeks: "_:seeksAtomContent",
 });
 
 /**
  * Compacts the passed string if possible.
- * e.g. "http://purl.org/webofneeds/model#Demand" -> "won:Demand"
+ * e.g. "https://w3id.org/won/core#Demand" -> "won:Demand"
  * @param {*} longValue
  * @param {*} context
  */
@@ -660,13 +677,17 @@ function context2ttlPrefixes(jsonldContext) {
 }
 
 won.minimalContext = {
-  msg: "http://purl.org/webofneeds/message#",
-  won: "http://purl.org/webofneeds/model#",
+  msg: "https://w3id.org/won/message#",
+  won: "https://w3id.org/won/core#",
+  hold: won.HOLD.baseUri,
+  chat: won.CHAT.baseUri,
+  group: won.GROUP.baseUri,
+  review: won.REVIEW.baseUri,
   rdf: "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
-  agr: "http://purl.org/webofneeds/agreement#",
-  pay: "http://purl.org/webofneeds/payment#",
+  agr: "https://w3id.org/won/agreement#",
+  pay: "https://w3id.org/won/payment#",
   gr: "http://purl.org/goodrelations/v1#",
-  wf: "http://purl.org/webofneeds/workflow#",
+  wf: "https://w3id.org/won/workflow#",
   rdfg: "http://www.w3.org/2004/03/trix/rdfg-1/",
 };
 won.minimalTurtlePrefixes = context2ttlPrefixes(won.minimalContext);
@@ -684,16 +705,15 @@ won.defaultContext = {
   sioc: "http://rdfs.org/sioc/ns#",
   dct: "http://purl.org/dc/terms/",
   cert: "http://www.w3.org/ns/auth/cert#",
-  woncrypt: "http://purl.org/webofneeds/woncrypt#",
   s: "http://schema.org/",
   sh: "http://www.w3.org/ns/shacl#",
   foaf: "http://xmlns.com/foaf/0.1/",
-  "msg:hasMessageType": {
-    "@id": "http://purl.org/webofneeds/message#hasMessageType",
+  "msg:messageType": {
+    "@id": "https://w3id.org/won/message#messageType",
     "@type": "@id",
   },
 };
-/** ttl-prefixes e.g. `@prefix msg: <http://purl.org/webofneeds/message#>.\n @prefix...` */
+/** ttl-prefixes e.g. `@prefix msg: <https://w3id.org/won/message#>.\n @prefix...` */
 won.defaultTurtlePrefixes = context2ttlPrefixes(won.defaultContext);
 
 won.JsonLdHelper = {
@@ -792,7 +812,7 @@ won.JsonLdHelper = {
 };
 
 /**
- *  Adds a msg:hasContent triple for each specified graphURI into the message graph
+ *  Adds a msg:content triple for each specified graphURI into the message graph
  * @param messageGraph
  * @param graphURIs
  */
@@ -825,7 +845,7 @@ won.addContentGraphReferencesToMessageGraph = function(
  * the specified messageType
  * and adds all specified graph URIs (which must be URIs of the
  * graphs to be added as content of the message) with triples
- * [message] wonmsg:hasContent [graphURI]
+ * [message] wonmsg:content [graphURI]
  * @param graphURIs
  * @returns {won.CreateMessageBuilder}
  */
@@ -837,7 +857,7 @@ won.addMessageGraph = function(builder, graphURIs, messageType) {
     "@graph": [
       {
         "@id": won.WONMSG.uriPlaceholder.event,
-        "msg:hasMessageType": { "@id": messageType },
+        "msg:messageType": { "@id": messageType },
       },
       {
         "@id": unsetMessageGraphUri,
@@ -873,7 +893,7 @@ won.newGraph = function(hashFragement) {
 
 /**
  *  Work in progress: for generating any number/structure of domain objects
- *  (need, connection container, connection ,event container, event (=wonMessage)
+ *  (atom, connection container, connection ,event container, event (=wonMessage)
  *  from json-ld
  *
  */
@@ -883,9 +903,9 @@ won.WonDomainObjects = function() {};
 won.WonDomainObjects.prototype = {
   constructor: won.WonDomainObjects,
   /**
-   * Returns the needURIs.
+   * Returns the atomURIs.
    */
-  getNeedUris: function() {},
+  getAtomUris: function() {},
   /**
    * Returns the connection URIs.
    */
@@ -1105,7 +1125,7 @@ WonMessage.prototype = {
 
   getRemoteMessageUri: function() {
     return this.getProperty(
-      "http://purl.org/webofneeds/message#hasCorrespondingRemoteMessage"
+      "https://w3id.org/won/message#correspondingRemoteMessage"
     );
   },
 
@@ -1206,7 +1226,7 @@ WonMessage.prototype = {
     const forwardedMessageUris = this.getForwardedMessageUris();
     if (forwardedMessageUris && forwardedMessageUris.length == 1) {
       //TODO: RECURSIVELY CREATE wonMessageObjects from all the forwarded Messages within this message
-      //const forwardedMessages = wonMessage.compactFramedMessage["msg:hasForwardedMessage"];
+      //const forwardedMessages = wonMessage.compactFramedMessage["msg:forwardedMessage"];
       const encapsulatingMessageUri = this.messageStructure.messageUri;
       const rawMessageWithoutEncapsulatingUri = this.rawMessage.filter(
         elem => !elem["@id"].startsWith(encapsulatingMessageUri)
@@ -1291,7 +1311,7 @@ WonMessage.prototype = {
   },
   getPropertyFromRemoteMessage: function(property) {
     const remoteMessage = this.__getFramedMessage()["@graph"][0][
-      "http://purl.org/webofneeds/message#hasCorrespondingRemoteMessage"
+      "https://w3id.org/won/message#correspondingRemoteMessage"
     ];
     if (remoteMessage) {
       let val = remoteMessage[property];
@@ -1327,45 +1347,41 @@ WonMessage.prototype = {
     if (this.isFromOwner()) {
       return this.compactFramedMessage;
     } else {
-      return this.compactFramedMessage["msg:hasCorrespondingRemoteMessage"];
+      return this.compactFramedMessage["msg:correspondingRemoteMessage"];
     }
   },
   getCompactFramedForwardedMessageContent: function() {
     const forwardedMessage =
       this.compactFramedMessage &&
-      this.compactFramedMessage["msg:hasForwardedMessage"];
+      this.compactFramedMessage["msg:forwardedMessage"];
     const forwardedMessageContent =
-      forwardedMessage && forwardedMessage["msg:hasCorrespondingRemoteMessage"];
+      forwardedMessage && forwardedMessage["msg:correspondingRemoteMessage"];
     return forwardedMessageContent;
   },
   getCompactRawMessage: function() {
     return this.compactRawMessage;
   },
   getMessageType: function() {
-    return this.getProperty(
-      "http://purl.org/webofneeds/message#hasMessageType"
-    );
+    return this.getProperty("https://w3id.org/won/message#messageType");
   },
   getInjectIntoConnectionUris: function() {
     return createArray(
-      this.getProperty(
-        "http://purl.org/webofneeds/message#hasInjectIntoConnection"
-      )
+      this.getProperty("https://w3id.org/won/message#injectIntoConnection")
     );
   },
   getForwardedMessageUris: function() {
     return createArray(
-      this.getProperty("http://purl.org/webofneeds/message#hasForwardedMessage")
+      this.getProperty("https://w3id.org/won/message#forwardedMessage")
     );
   },
   getReceivedTimestamp: function() {
     return this.getPropertyFromLocalMessage(
-      "http://purl.org/webofneeds/message#hasReceivedTimestamp"
+      "https://w3id.org/won/message#receivedTimestamp"
     );
   },
   getSentTimestamp: function() {
     return this.getPropertyFromLocalMessage(
-      "http://purl.org/webofneeds/message#hasSentTimestamp"
+      "https://w3id.org/won/message#sentTimestamp"
     );
   },
   /**
@@ -1380,111 +1396,101 @@ WonMessage.prototype = {
     return this.getSentTimestamp();
   },
   getTextMessage: function() {
-    return this.getProperty("http://purl.org/webofneeds/model#hasTextMessage");
+    return this.getProperty("https://w3id.org/won/core#textMessage");
   },
   getMatchScore: function() {
-    return this.getProperty("http://purl.org/webofneeds/model#hasMatchScore");
+    return this.getProperty("https://w3id.org/won/core#matchScore");
   },
   getMatchCounterpart: function() {
-    return this.getProperty(
-      "http://purl.org/webofneeds/model#hasMatchCounterpart"
-    );
+    return this.getProperty("https://w3id.org/won/core#matchCounterpart");
   },
   getIsResponseTo: function() {
-    return this.getProperty("http://purl.org/webofneeds/message#isResponseTo");
+    return this.getProperty("https://w3id.org/won/message#isResponseTo");
   },
   getIsRemoteResponseTo: function() {
-    return this.getProperty(
-      "http://purl.org/webofneeds/message#isRemoteResponseTo"
-    );
+    return this.getProperty("https://w3id.org/won/message#isRemoteResponseTo");
   },
   getIsResponseToMessageType: function() {
     return this.getProperty(
-      "http://purl.org/webofneeds/message#isResponseToMessageType"
+      "https://w3id.org/won/message#isResponseToMessageType"
     );
   },
 
   getSenderNode: function() {
-    return this.getProperty("http://purl.org/webofneeds/message#hasSenderNode");
+    return this.getProperty("https://w3id.org/won/message#senderNode");
   },
-  getSenderNeed: function() {
-    return this.getProperty("http://purl.org/webofneeds/message#hasSenderNeed");
+  getSenderAtom: function() {
+    return this.getProperty("https://w3id.org/won/message#senderAtom");
   },
   getSender: function() {
-    return this.getProperty("http://purl.org/webofneeds/message#hasSender");
+    return this.getProperty("https://w3id.org/won/message#sender");
   },
-  getReceiverNode: function() {
-    return this.getProperty(
-      "http://purl.org/webofneeds/message#hasReceiverNode"
-    );
+  getRecipientNode: function() {
+    return this.getProperty("https://w3id.org/won/message#recipientNode");
   },
-  getReceiverNeed: function() {
-    return this.getProperty(
-      "http://purl.org/webofneeds/message#hasReceiverNeed"
-    );
+  getRecipientAtom: function() {
+    return this.getProperty("https://w3id.org/won/message#recipientAtom");
   },
   getReceiver: function() {
-    return this.getProperty("http://purl.org/webofneeds/message#hasReceiver");
+    return this.getProperty("https://w3id.org/won/message#recipient");
   },
 
   getProposedMessageUris: function() {
     return createArray(
-      this.getProperty("http://purl.org/webofneeds/agreement#proposes")
+      this.getProperty("https://w3id.org/won/agreement#proposes")
     );
   },
 
   getClaimsMessageUris: function() {
     return createArray(
-      this.getProperty("http://purl.org/webofneeds/agreement#claims")
+      this.getProperty("https://w3id.org/won/agreement#claims")
     );
   },
 
   getAcceptsMessageUris: function() {
     return createArray(
-      this.getProperty("http://purl.org/webofneeds/agreement#accepts")
+      this.getProperty("https://w3id.org/won/agreement#accepts")
     );
   },
   getProposedToCancelMessageUris: function() {
     return createArray(
-      this.getProperty("http://purl.org/webofneeds/agreement#proposesToCancel")
+      this.getProperty("https://w3id.org/won/agreement#proposesToCancel")
     );
   },
   getRejectsMessageUris: function() {
     return createArray(
-      this.getProperty("http://purl.org/webofneeds/agreement#rejects")
+      this.getProperty("https://w3id.org/won/agreement#rejects")
     );
   },
   getRetractsMessageUris: function() {
     return createArray(
-      this.getProperty("http://purl.org/webofneeds/modification#retracts")
+      this.getProperty("https://w3id.org/won/modification#retracts")
     );
   },
 
   isProposeMessage: function() {
-    return !!this.getProperty("http://purl.org/webofneeds/agreement#proposes");
+    return !!this.getProperty("https://w3id.org/won/agreement#proposes");
   },
   isAcceptMessage: function() {
-    return !!this.getProperty("http://purl.org/webofneeds/agreement#accepts");
+    return !!this.getProperty("https://w3id.org/won/agreement#accepts");
   },
   isProposeToCancel: function() {
     return !!this.getProperty(
-      "http://purl.org/webofneeds/agreement#proposesToCancel"
+      "https://w3id.org/won/agreement#proposesToCancel"
     );
   },
   isProposal: function() {
-    return !!this.getProperty("http://purl.org/webofneeds/agreement#Proposal");
+    return !!this.getProperty("https://w3id.org/won/agreement#Proposal");
   },
   isAgreement: function() {
-    return !!this.getProperty("http://purl.org/webofneeds/agreement#Agreement");
+    return !!this.getProperty("https://w3id.org/won/agreement#Agreement");
   },
 
   isRejectMessage: function() {
-    return !!this.getProperty("http://purl.org/webofneeds/agreement#rejects");
+    return !!this.getProperty("https://w3id.org/won/agreement#rejects");
   },
   isRetractMessage: function() {
-    return !!this.getProperty(
-      "http://purl.org/webofneeds/modification#retracts"
-    );
+    return !!this.getProperty("https://w3id.org/won/modification#retracts");
   },
   isOutgoingMessage: function() {
     return (
@@ -1506,154 +1512,150 @@ WonMessage.prototype = {
   },
   isFromSystem: function() {
     let direction = this.getMessageDirection();
-    return direction === "http://purl.org/webofneeds/message#FromSystem";
+    return direction === "https://w3id.org/won/message#FromSystem";
   },
   isFromOwner: function() {
     let direction = this.getMessageDirection();
-    return direction === "http://purl.org/webofneeds/message#FromOwner";
+    return direction === "https://w3id.org/won/message#FromOwner";
   },
   isFromExternal: function() {
     let direction = this.getMessageDirection();
-    return direction === "http://purl.org/webofneeds/message#FromExternal";
+    return direction === "https://w3id.org/won/message#FromExternal";
   },
 
   isHintMessage: function() {
-    return (
-      this.getMessageType() === "http://purl.org/webofneeds/message#HintMessage"
-    );
+    return this.getMessageType() === "https://w3id.org/won/message#HintMessage";
   },
   isCreateMessage: function() {
     return (
-      this.getMessageType() ===
-      "http://purl.org/webofneeds/message#CreateMessage"
+      this.getMessageType() === "https://w3id.org/won/message#CreateMessage"
     );
   },
   isConnectMessage: function() {
     return (
-      this.getMessageType() ===
-      "http://purl.org/webofneeds/message#ConnectMessage"
+      this.getMessageType() === "https://w3id.org/won/message#ConnectMessage"
     );
   },
   isOpenMessage: function() {
-    return (
-      this.getMessageType() === "http://purl.org/webofneeds/message#OpenMessage"
-    );
+    return this.getMessageType() === "https://w3id.org/won/message#OpenMessage";
   },
   isConnectionMessage: function() {
     return (
-      this.getMessageType() ===
-      "http://purl.org/webofneeds/message#ConnectionMessage"
+      this.getMessageType() === "https://w3id.org/won/message#ConnectionMessage"
     );
   },
   isCloseMessage: function() {
     return (
-      this.getMessageType() ===
-      "http://purl.org/webofneeds/message#CloseMessage"
+      this.getMessageType() === "https://w3id.org/won/message#CloseMessage"
     );
   },
   isHintFeedbackMessage: function() {
     return (
       this.getMessageType() ===
-      "http://purl.org/webofneeds/message#HintFeedbackMessage"
+      "https://w3id.org/won/message#HintFeedbackMessage"
     );
   },
   isActivateMessage: function() {
     return (
-      this.getMessageType() ===
-      "http://purl.org/webofneeds/message#ActivateMessage"
+      this.getMessageType() === "https://w3id.org/won/message#ActivateMessage"
     );
   },
   isDeactivateMessage: function() {
     return (
-      this.getMessageType() ===
-      "http://purl.org/webofneeds/message#DeactivateMessage"
+      this.getMessageType() === "https://w3id.org/won/message#DeactivateMessage"
     );
   },
   isDeleteMessage: function() {
     return (
-      this.getMessageType() ===
-      "http://purl.org/webofneeds/message#DeleteMessage"
+      this.getMessageType() === "https://w3id.org/won/message#DeleteMessage"
     );
   },
-  isNeedMessage: function() {
-    return (
-      this.getMessageType() === "http://purl.org/webofneeds/message#NeedMessage"
-    );
+  isAtomMessage: function() {
+    return this.getMessageType() === "https://w3id.org/won/message#AtomMessage";
   },
   isResponse: function() {
     return this.isSuccessResponse() || this.isFailureResponse();
   },
   isSuccessResponse: function() {
     return (
-      this.getMessageType() ===
-      "http://purl.org/webofneeds/message#SuccessResponse"
+      this.getMessageType() === "https://w3id.org/won/message#SuccessResponse"
     );
   },
   isFailureResponse: function() {
     return (
-      this.getMessageType() ===
-      "http://purl.org/webofneeds/message#FailureResponse"
+      this.getMessageType() === "https://w3id.org/won/message#FailureResponse"
     );
   },
-
+  isResponseToReplaceMessage: function() {
+    return (
+      this.getIsResponseToMessageType() ===
+      "https://w3id.org/won/message#ReplaceMessage"
+    );
+  },
   isResponseToHintMessage: function() {
     return (
       this.getIsResponseToMessageType() ===
-      "http://purl.org/webofneeds/message#HintMessage"
+      "https://w3id.org/won/message#HintMessage"
     );
   },
   isResponseToCreateMessage: function() {
     return (
       this.getIsResponseToMessageType() ===
-      "http://purl.org/webofneeds/message#CreateMessage"
+      "https://w3id.org/won/message#CreateMessage"
     );
   },
   isResponseToConnectMessage: function() {
     return (
       this.getIsResponseToMessageType() ===
-      "http://purl.org/webofneeds/message#ConnectMessage"
+      "https://w3id.org/won/message#ConnectMessage"
     );
   },
   isResponseToOpenMessage: function() {
     return (
       this.getIsResponseToMessageType() ===
-      "http://purl.org/webofneeds/message#OpenMessage"
+      "https://w3id.org/won/message#OpenMessage"
     );
   },
   isResponseToConnectionMessage: function() {
     return (
       this.getIsResponseToMessageType() ===
-      "http://purl.org/webofneeds/message#ConnectionMessage"
+      "https://w3id.org/won/message#ConnectionMessage"
     );
   },
   isResponseToCloseMessage: function() {
     return (
       this.getIsResponseToMessageType() ===
-      "http://purl.org/webofneeds/message#CloseMessage"
+      "https://w3id.org/won/message#CloseMessage"
     );
   },
   isResponseToHintFeedbackMessage: function() {
     return (
       this.getIsResponseToMessageType() ===
-      "http://purl.org/webofneeds/message#HintFeedbackMessage"
+      "https://w3id.org/won/message#HintFeedbackMessage"
     );
   },
   isResponseToActivateMessage: function() {
     return (
       this.getIsResponseToMessageType() ===
-      "http://purl.org/webofneeds/message#ActivateMessage"
+      "https://w3id.org/won/message#ActivateMessage"
     );
   },
   isResponseToDeactivateMessage: function() {
     return (
       this.getIsResponseToMessageType() ===
-      "http://purl.org/webofneeds/message#DeactivateMessage"
+      "https://w3id.org/won/message#DeactivateMessage"
     );
   },
   isResponseToDeleteMessage: function() {
     return (
       this.getIsResponseToMessageType() ===
-      "http://purl.org/webofneeds/message#DeleteMessage"
+      "https://w3id.org/won/message#DeleteMessage"
+    );
+  },
+  isChangeNotificationMessage: function() {
+    return (
+      this.getMessageType() ===
+      "https://w3id.org/won/message#ChangeNotificationMessage"
     );
   },
 
@@ -1782,7 +1784,7 @@ WonMessage.prototype = {
             node.remoteEnvelope = remoteMessages[0];
             if (
               node.messageDirection ===
-              "http://purl.org/webofneeds/message#FromExternal"
+              "https://w3id.org/won/message#FromExternal"
             ) {
               //both messages can link to each other, but the FromExternal one
               //is the top level one. mark the other one as referenced
@@ -1840,9 +1842,7 @@ WonMessage.prototype = {
     return graphData.some(
       resource =>
         resource["@id"] === graphUri &&
-        resource["@type"].includes(
-          "http://purl.org/webofneeds/message#EnvelopeGraph"
-        )
+        resource["@type"].includes("https://w3id.org/won/message#EnvelopeGraph")
     );
   },
   __isSignatureGraph: graph => {
@@ -1862,8 +1862,7 @@ WonMessage.prototype = {
     let data = graphData
       .filter(resource => resource["@id"] == graphUri)
       .map(
-        resource =>
-          resource["http://purl.org/webofneeds/message#containsEnvelope"]
+        resource => resource["https://w3id.org/won/message#containsEnvelope"]
       )
       .filter(x => x);
     if (data.length > 0) {
@@ -1876,9 +1875,7 @@ WonMessage.prototype = {
     let graphData = graph["@graph"];
     const contentUrisArray = graphData
       .filter(resource => resource["@id"] === messageUri)
-      .map(
-        resource => resource["http://purl.org/webofneeds/message#hasContent"]
-      )
+      .map(resource => resource["https://w3id.org/won/message#content"])
       .filter(x => x);
     if (contentUrisArray.length > 0) {
       return contentUrisArray[0].map(x => x["@id"] || x["@value"]);
@@ -1892,14 +1889,12 @@ WonMessage.prototype = {
       .filter(
         resource =>
           resource["@type"].includes(
-            "http://purl.org/webofneeds/message#FromExternal"
+            "https://w3id.org/won/message#FromExternal"
           ) ||
           resource["@type"].includes(
-            "http://purl.org/webofneeds/message#FromOwner"
+            "https://w3id.org/won/message#FromOwner"
           ) ||
-          resource["@type"].includes(
-            "http://purl.org/webofneeds/message#FromSystem"
-          )
+          resource["@type"].includes("https://w3id.org/won/message#FromSystem")
       )
       .map(resource => ({
         messageUri: resource["@id"],
@@ -1919,15 +1914,13 @@ WonMessage.prototype = {
     let data = graphData
       .filter(
         resource =>
-          resource[
-            "http://purl.org/webofneeds/message#hasCorrespondingRemoteMessage"
-          ]
+          resource["https://w3id.org/won/message#correspondingRemoteMessage"]
       )
       .map(resource => ({
         messageUri: resource["@id"],
         correspondingRemoteMessageUri:
           resource[
-            "http://purl.org/webofneeds/message#hasCorrespondingRemoteMessage"
+            "https://w3id.org/won/message#correspondingRemoteMessage"
           ][0]["@id"],
       }))
       .filter(x => !!x); //if that property was not present, filter out undefineds
@@ -1943,15 +1936,12 @@ WonMessage.prototype = {
     let graphData = graph["@graph"];
     let data = graphData
       .filter(
-        resource =>
-          resource["http://purl.org/webofneeds/message#hasForwardedMessage"]
+        resource => resource["https://w3id.org/won/message#forwardedMessage"]
       )
       .map(resource => ({
         messageUri: resource["@id"],
         forwardedMessageUri:
-          resource["http://purl.org/webofneeds/message#hasForwardedMessage"][0][
-            "@id"
-          ],
+          resource["https://w3id.org/won/message#forwardedMessage"][0]["@id"],
       }))
       .filter(x => !!x); //if that property was not present, filter out undefineds
     if (Array.isArray(data)) {
@@ -1995,7 +1985,7 @@ won.MessageBuilder.prototype = {
 
   eventURI: function(eventUri) {
     this.getContext()[won.WONMSG.EnvelopeGraphCompacted] = {
-      "@id": "http://purl.org/webofneeds/message#EnvelopeGraph",
+      "@id": "https://w3id.org/won/message#EnvelopeGraph",
       "@type": "@id",
     };
     const regex = new RegExp(won.replaceRegExp(this.eventUriValue));
@@ -2017,71 +2007,71 @@ won.MessageBuilder.prototype = {
     }
     return this;
   },
-  hasSenderNeed: function(senderNeedURI) {
-    this.getMessageEventNode()[won.WONMSG.hasSenderNeedCompacted] = {
-      "@id": senderNeedURI,
+  senderAtom: function(senderAtomURI) {
+    this.getMessageEventNode()[won.WONMSG.senderAtomCompacted] = {
+      "@id": senderAtomURI,
     };
     return this;
   },
-  hasSenderNode: function(senderNodeURI) {
-    this.getMessageEventNode()[won.WONMSG.hasSenderNodeCompacted] = {
+  senderNode: function(senderNodeURI) {
+    this.getMessageEventNode()[won.WONMSG.senderNodeCompacted] = {
       "@id": senderNodeURI,
     };
     return this;
   },
-  hasSender: function(senderURI) {
-    this.getMessageEventNode()[won.WONMSG.hasSenderCompacted] = {
+  sender: function(senderURI) {
+    this.getMessageEventNode()[won.WONMSG.senderCompacted] = {
       "@id": senderURI,
     };
     return this;
   },
-  hasReceiver: function(receiverURI) {
-    this.getMessageEventNode()[won.WONMSG.hasReceiverCompacted] = {
-      "@id": receiverURI,
+  recipient: function(recipientURI) {
+    this.getMessageEventNode()[won.WONMSG.recipientCompacted] = {
+      "@id": recipientURI,
     };
     return this;
   },
-  hasReceiverNeed: function(receiverNeedURI) {
-    this.getMessageEventNode()[won.WONMSG.hasReceiverNeedCompacted] = {
-      "@id": receiverNeedURI,
+  recipientAtom: function(recipientAtomURI) {
+    this.getMessageEventNode()[won.WONMSG.recipientAtomCompacted] = {
+      "@id": recipientAtomURI,
     };
     return this;
   },
-  hasReceiverNode: function(receiverURI) {
-    this.getMessageEventNode()[won.WONMSG.hasReceiverNodeCompacted] = {
-      "@id": receiverURI,
+  recipientNode: function(recipientURI) {
+    this.getMessageEventNode()[won.WONMSG.recipientNodeCompacted] = {
+      "@id": recipientURI,
     };
     return this;
   },
-  hasOwnerDirection: function() {
+  ownerDirection: function() {
     this.getMessageEventNode()["@type"] = won.WONMSG.FromOwnerCompacted;
     return this;
   },
-  hasSentTimestamp: function(timestamp) {
-    this.getMessageEventNode()["msg:hasSentTimestamp"] = timestamp;
+  sentTimestamp: function(timestamp) {
+    this.getMessageEventNode()["msg:sentTimestamp"] = timestamp;
     return this;
   },
   /**
-   * Adds the specified facet as local facets. Only needed for connect and
+   * Adds the specified socket as local sockets. Only needed for connect and
    * openSuggested.
-   * @param receiverURI
+   * @param recipientURI
    * @returns {won.MessageBuilder}
    */
-  hasFacet: function(facetURI) {
-    this.getMessageEventNode()[won.WONMSG.hasSenderFacetCompacted] = {
-      "@id": facetURI,
+  socket: function(socketURI) {
+    this.getMessageEventNode()[won.WONMSG.senderSocketCompacted] = {
+      "@id": socketURI,
     };
     return this;
   },
   /**
-   * Adds the specified facet as local facets. Only needed for connect and
+   * Adds the specified socket as local sockets. Only needed for connect and
    * openSuggested.
-   * @param receiverURI
+   * @param recipientURI
    * @returns {won.MessageBuilder}
    */
-  hasRemoteFacet: function(facetURI) {
-    this.getMessageEventNode()[won.WONMSG.hasReceiverFacetCompacted] = {
-      "@id": facetURI,
+  targetSocket: function(socketURI) {
+    this.getMessageEventNode()[won.WONMSG.recipientSocketCompacted] = {
+      "@id": socketURI,
     };
     return this;
   },
@@ -2091,12 +2081,12 @@ won.MessageBuilder.prototype = {
    * @param text - text of the message
    * @returns {won.MessageBuilder}
    */
-  hasTextMessage: function(text) {
+  textMessage: function(text) {
     if (text == null || text === "") {
       // text is either null, undefined, or empty
       // do nothing
     } else {
-      this.getContentGraphNode()[won.WON.hasTextMessageCompacted] = text;
+      this.getContentGraphNode()[won.WON.textMessageCompacted] = text;
     }
     return this;
   },
@@ -2150,12 +2140,12 @@ won.MessageBuilder.prototype = {
   },
 
   addRating: function(rating, connectionUri) {
-    this.getContentGraphNode()[won.WON.hasFeedback] = {
+    this.getContentGraphNode()[won.WON.feedback] = {
       "@id": "_:b0",
-      "http://purl.org/webofneeds/model#forResource": {
+      "https://w3id.org/won/core#forResource": {
         "@id": connectionUri,
       },
-      "http://purl.org/webofneeds/model#hasBinaryRating": {
+      "https://w3id.org/won/core#binaryRating": {
         "@id": rating,
       },
     };

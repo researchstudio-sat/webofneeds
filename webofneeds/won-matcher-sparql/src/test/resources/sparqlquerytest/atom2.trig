@@ -1,0 +1,95 @@
+@prefix msg:   <https://w3id.org/won/message#> .
+@prefix conn:  <https://satvm05.researchstudio.at/won/resource/connection/> .
+@prefix atom:  <https://satvm05.researchstudio.at/won/resource/atom/> .
+@prefix woncrypt: <https://w3id.org/won/core#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix cert:  <http://www.w3.org/ns/auth/cert#> .
+@prefix local: <https://satvm05.researchstudio.at/won/resource/> .
+@prefix geo:   <http://www.w3.org/2003/01/geo/wgs84_pos#> .
+@prefix sig:   <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#> .
+@prefix s:     <http://schema.org/> .
+@prefix sh:    <http://www.w3.org/ns/shacl#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix won:   <https://w3id.org/won/core#> .
+@prefix ldp:   <http://www.w3.org/ns/ldp#> .
+@prefix event: <https://satvm05.researchstudio.at/won/resource/event/> .
+@prefix dc:    <http://purl.org/dc/elements/1.1/> .
+@prefix sioc:  <http://rdfs.org/sioc/ns#> .
+
+<https://satvm05.researchstudio.at/won/resource/event/a1x808uys85e#envelope-sig> {
+    <https://satvm05.researchstudio.at/won/resource/event/a1x808uys85e#envelope-sig>
+            a                               sig:Signature ;
+            sig:signatureValue           "MGUCMHpi7i7xCwSS/iudTE6t3cl6sL4TLL2ecwq0npATyfI+16aOkm9h4vuvM7XdmhVOKAIxANd5DbgONtZ40MFz4KYGbmmxtdR4i7Q9fPfNlzF2tNb0cHTILy+VDFhRvqu3AveFQQ==" ;
+            sig:hasVerificationCertificate  atom:hzn2ljvvgtyc ;
+            msg:hash                     "GAsA5C7ajRsOecrwigXB3FQD2aSWDkbdnTkuZIS2JODalJi4dquiOw2bYZvc5x+TEs+D6RGC0xV9ncB8EDX5zIdpVApypiq9bIU/6cB6Ihq8A/dXqBHK6lO5k1EPnkURu6G/lXho9FB0o2dtpKfjpzs7Ae0QRipqBudrYgh0Uk0=" ;
+            msg:publicKeyFingerprint     "hva7eVYwSRY91AzRmPcr3LiMBx2srhnbEQFnGhBBa+4=" ;
+            msg:signedGraph              <https://satvm05.researchstudio.at/won/resource/event/a1x808uys85e#envelope> .
+}
+
+<https://satvm05.researchstudio.at/won/resource/atom/hzn2ljvvgtyc#sysinfo> {
+    atom:hzn2ljvvgtyc
+            a                      won:Atom ;
+            <http://purl.org/dc/terms/created>
+                    "2018-09-21T11:39:26.361Z"^^xsd:dateTime ;
+            <http://purl.org/dc/terms/modified>
+                    "2018-09-21T11:39:26.368Z"^^xsd:dateTime ;
+            won:connections     <https://satvm05.researchstudio.at/won/resource/atom/hzn2ljvvgtyc/connections> ;
+            won:contentGraph    <https://satvm05.researchstudio.at/won/resource/event/a1x808uys85e#envelope-sig> , <https://satvm05.researchstudio.at/won/resource/event/a1x808uys85e#atom> ;
+            won:messageContainer  <https://satvm05.researchstudio.at/won/resource/atom/hzn2ljvvgtyc#events> ;
+            won:wonNode         <https://satvm05.researchstudio.at/won/resource> ;
+            won:atomState          won:Active .
+
+    <https://satvm05.researchstudio.at/won/resource/atom/hzn2ljvvgtyc#sysinfo>
+            <http://www.w3.org/2004/03/trix/rdfg-1/subGraphOf>
+                    atom:hzn2ljvvgtyc .
+
+    <https://satvm05.researchstudio.at/won/resource/atom/hzn2ljvvgtyc#events>
+            a            won:MessageContainer ;
+            rdfs:member  event:m9264orjk32cur48exwh , event:a1x808uys85e .
+}
+
+<https://satvm05.researchstudio.at/won/resource/event/a1x808uys85e#atom> {
+    <https://satvm05.researchstudio.at/won/resource/atom/hzn2ljvvgtyc/travelAction/chaef180rs>
+            a               s:TravelAction ;
+            s:fromLocation  <https://satvm05.researchstudio.at/won/resource/atom/hzn2ljvvgtyc/travelAction/chaef180rs/fromLocation> ;
+            s:toLocation    <https://satvm05.researchstudio.at/won/resource/atom/hzn2ljvvgtyc/travelAction/chaef180rs/toLocation> .
+
+    atom:hzn2ljvvgtyc
+            a                    won:Atom ;
+            won:doNotMatchAfter  "2018-09-21T12:09:24.405Z"^^xsd:dateTime ;
+            won:socket         won:ChatSocket ;
+            won:sparqlQuery         "PREFIX won: <https://w3id.org/won/core#>\nPREFIX s: <http://schema.org/>\nPREFIX geo: <http://www.bigdata.com/rdf/geospatial#>\nPREFIX geoliteral: <http://www.bigdata.com/rdf/geospatial/literals/v1#>\nSELECT DISTINCT ?result WHERE {\n  ?result <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> won:Atom.\n  ?result won:atomState won:Active.\n  {\n    { ?result <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://dbpedia.org/page/Ridesharing>. }\n    UNION\n    { ?result <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> s:TaxiService. }\n  }\n  {\n    ?result <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://dbpedia.org/page/Ridesharing>.\n    ?result (won:travelAction/s:fromLocation) ?fromLocation.\n    ?fromLocation s:geo ?fromLocation_geo.\n    SERVICE geo:search {\n      ?fromLocation_geo geo:search \"inCircle\".\n      ?fromLocation_geo geo:searchDatatype geoliteral:lat-lon.\n      ?fromLocation_geo geo:predicate won:geoSpatial.\n      ?fromLocation_geo geo:spatialCircleCenter \"48.22507335#16.3583975990458\".\n      ?fromLocation_geo geo:spatialCircleRadius \"100\".\n      ?fromLocation_geo geo:distanceValue ?fromLocation_geoDistance.\n    }\n    ?result (won:travelAction/s:toLocation) ?toLocation.\n    ?toLocation s:geo ?toLocation_geo.\n    SERVICE geo:search {\n      ?toLocation_geo geo:search \"inCircle\".\n      ?toLocation_geo geo:searchDatatype geoliteral:lat-lon.\n      ?toLocation_geo geo:predicate won:geoSpatial.\n      ?toLocation_geo geo:spatialCircleCenter \"48.29506435#14.3016253252504\".\n      ?toLocation_geo geo:spatialCircleRadius \"100\".\n      ?toLocation_geo geo:distanceValue ?toLocation_geoDistance.\n    }\n  }\n  UNION\n  {\n    ?result <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> s:TaxiService.\n    ?result (won:location|s:location) ?location.\n    ?location s:geo ?location_geo.\n    SERVICE geo:search {\n      ?location_geo geo:search \"inCircle\".\n      ?location_geo geo:searchDatatype geoliteral:lat-lon.\n      ?location_geo geo:predicate won:geoSpatial.\n      ?location_geo geo:spatialCircleCenter \"48.22507335#16.3583975990458\".\n      ?location_geo geo:spatialCircleRadius \"100\".\n      ?location_geo geo:distanceValue ?location_geoDistance.\n    }\n  }\n}\nORDER BY (?location_geoDistance)" ;
+            won:hasSearchString  "offer-lift" ;
+            dc:title    "Need a lift" ;
+            won:tag  "search-lift" ;
+            won:seeks            [ won:travelAction  <https://satvm05.researchstudio.at/won/resource/atom/hzn2ljvvgtyc/travelAction/chaef180rs> ] ;
+            cert:key             [ cert:PublicKey  [ a                       woncrypt:ECCPublicKey ;
+                                                     woncrypt:ecc_algorithm  "EC" ;
+                                                     woncrypt:ecc_curveId    "secp384r1" ;
+                                                     woncrypt:ecc_qx         "d15df73adf2d14756d6dbcece0a4d17ffc592f71bfee87cda68deb5a75fd9b0a1aac90bf7892839566be41b2c3771656" ;
+                                                     woncrypt:ecc_qy         "e9431636500eb34d04939a7f3e52415d2f643972ebdbf8026b9a9589cbcf6be714e376af0fe675d64f4ee045d6f12124"
+                                                   ] ] .
+
+    <https://satvm05.researchstudio.at/won/resource/atom/hzn2ljvvgtyc/travelAction/chaef180rs/fromLocation/geocoords>
+            a               s:GeoCoordinates ;
+            won:geoSpatial  "48.225073#16.358398"^^<http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon> ;
+            s:latitude      "48.225073" ;
+            s:longitude     "16.358398" .
+
+    <https://satvm05.researchstudio.at/won/resource/atom/hzn2ljvvgtyc/travelAction/chaef180rs/fromLocation>
+            a       s:Place ;
+            s:geo   <https://satvm05.researchstudio.at/won/resource/atom/hzn2ljvvgtyc/travelAction/chaef180rs/fromLocation/geocoords> ;
+            s:name  "Alsergrund, Wien, 1090, Österreich" .
+
+    <https://satvm05.researchstudio.at/won/resource/atom/hzn2ljvvgtyc/travelAction/chaef180rs/toLocation/geocoords>
+            a               s:GeoCoordinates ;
+            won:geoSpatial  "48.295064#14.301625"^^<http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon> ;
+            s:latitude      "48.295064" ;
+            s:longitude     "14.301625" .
+
+    <https://satvm05.researchstudio.at/won/resource/atom/hzn2ljvvgtyc/travelAction/chaef180rs/toLocation>
+            a       s:Place ;
+            s:geo   <https://satvm05.researchstudio.at/won/resource/atom/hzn2ljvvgtyc/travelAction/chaef180rs/toLocation/geocoords> ;
+            s:name  "Linz, Oberösterreich, Österreich" .
+}

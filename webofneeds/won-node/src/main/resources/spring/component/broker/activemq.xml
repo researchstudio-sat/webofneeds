@@ -47,7 +47,7 @@
             http://activemq.apache.org/producer-flow-control.html
         -->
         <!--destinations>
-            <queue physicalName="WON.CREATENEED"></queue>
+            <queue physicalName="WON.CREATEATOM"></queue>
         </destinations-->
         <destinationPolicy>
             <policyMap>
@@ -188,9 +188,7 @@
                         keyStorePassword="${activemq.broker.keystore.password}"
                         >
                     <trustManagers>
-                        <spring:bean class="won.cryptography.ssl.TrustManagerWrapperWithTrustService">
-                            <spring:constructor-arg ref="trustStoreService" />
-                        </spring:bean>
+                        <spring:bean class="won.utils.tls.AcceptAllCertsTrustManager" />
                     </trustManagers>
 
                 </sslContext>

@@ -1,0 +1,125 @@
+##################################################################
+#              ATOM REPRESENTATION AT THE WON NODE               #
+##################################################################
+
+@prefix :       <http://www.example.com/resource/atom/> .
+@prefix webID:  <http://www.example.com/webids/> .
+
+@prefix won:    <https://w3id.org/won/core#> .
+@prefix crypt:  <https://w3id.org/won/cryptography#> .
+@prefix msg:    <https://w3id.org/won/message#> .
+
+@prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#>
+@prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix tio:    <http://purl.org/tio/ns#> .
+@prefix gr:     <http://purl.org/goodrelations/v1#> .
+
+
+############# ATOM META INFO ##############
+# document URL: :[randomAtomID_1]/meta
+
+GRAPH :[randomAtomID_1]/meta#data {
+
+    :[randomAtomID_1]
+
+        won:hasAtomEvents
+            :[randomAtomID_1]/atomEvents ;
+        won:connections
+            :[randomAtomID_1]/connections ;
+
+        won:atomState
+            won:Active ;
+        won:socket
+            won:ChatSocket ;
+
+        :[randomAtomID_1]/atomEvents
+            rdfs:member
+                :[randomAtomID_1]/event/0 .
+
+}
+
+:[randomAtomID_1]/meta#data
+    crypt:hasSignature [
+        a crypt:WonSignature ;
+        crypt:signer webID:WN1
+    ]
+
+############# ATOM CORE CONTENT ##############
+# document URL: :[randomAtomID_1]/core
+
+GRAPH :[randomAtomID_1]/core#data {
+
+    :[randomAtomID_1]
+        a won:Atom ;
+        won:hasBasicAtomType
+            won:Supply ;
+        won:content
+            # see issue https://github.com/researchstudio-sat/webofneeds/issues/42
+            [
+                a tio:Taxi .
+            ] .
+}
+
+# extracted from the message
+:[randomAtomID_1]/core#data
+    crypt:hasSignature [
+        a crypt:WonSignature ;
+        crypt:signer webID:owner_1 .
+        # signature data ...
+    ]
+
+
+############# ATOM TRANSIENT CONTENT ##############
+# document URL: :[randomAtomID_1]/transient
+
+GRAPH :[randomAtomID_1]/transient#data {
+
+    :[randomAtomID_1]
+        won:content
+            [
+                gr:condition "Has been vacuumed three days ago!" .
+            ]
+}
+
+# extracted from the message
+:[randomAtomID_1]/transient#data
+    crypt:hasSignature [
+        a crypt:WonSignature ;
+        crypt:signer webID:owner_1 .
+        # signature data ...
+    ]
+
+
+############# ATOM MESSAGE 0 ##############
+# document URL: :[randomAtomID_1]/event/0
+
+GRAPH :[randomAtomID_1]/event/0#data {
+
+    :[randomAtomID_1]/event/0
+        a msg:CreateMessage ;
+
+        msg:content :[randomAtomID_1]/core ;
+        msg:content :[randomAtomID_1]/transient .
+
+
+        :[randomAtomID_1]/core#data
+            crypt:hasSignature [
+                a crypt:WonSignature ;
+                crypt:signer webID:owner_1 .
+                # signature data ...
+            ]
+
+        :[randomAtomID_1]/transient#data
+            crypt:hasSignature [
+                a crypt:WonSignature ;
+                crypt:signer webID:owner_1 .
+                # signature data ...
+            ]
+}
+
+
+:[randomAtomID_1]/event/0#data
+    crypt:hasSignature [
+        a crypt:WonSignature .
+        # signature data ...
+    ]

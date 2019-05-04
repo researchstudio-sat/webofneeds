@@ -1,6 +1,5 @@
 package won.bot.framework.bot.context;
 
-
 import java.net.URI;
 import java.util.List;
 
@@ -15,7 +14,7 @@ public class CommentBotContextWrapper extends BotContextWrapper {
         return null;
     }
 
-    public List<URI> getCommentList(){
-        return getBotContext().getNamedNeedUriList(commentListName);
+    public List<URI> getCommentList() {
+        return getBotContext().getNamedAtomUriList(commentListName);
     }
 }

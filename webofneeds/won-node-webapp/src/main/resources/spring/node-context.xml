@@ -1,15 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-
-<beans xmlns:sec="http://www.springframework.org/schema/security"
-             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-             xmlns:context="http://www.springframework.org/schema/context"
-             xmlns="http://www.springframework.org/schema/beans" xmlns:beans="http://www.springframework.org/schema/beans"
-             xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
-								 http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-4.2.xsd
-                                 http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.1.xsd">
-
-    <!--context:property-placeholder location="file:${WON_CONFIG_DIR}/node.properties" ignore-unresolvable="true"/-->
-    <!--
+<beans 
+	xmlns:sec="http://www.springframework.org/schema/security" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:context="http://www.springframework.org/schema/context" 
+	xmlns="http://www.springframework.org/schema/beans" 
+	xmlns:beans="http://www.springframework.org/schema/beans" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.1.xsd								 http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-4.2.xsd                                 http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.1.xsd">
+	<!--context:property-placeholder location="file:${WON_CONFIG_DIR}/node.properties" ignore-unresolvable="true"/-->
+	<!--
         Problem:
         1. The embedded activemq broker creates a child spring context
         2. Properties are not seen in child contexts because they are realized as bean factory post processors,
@@ -20,20 +17,23 @@
         2. we can define a concrete one in this context and in the child context because the
             template is visible in the child context
     -->
-    <bean id="abstractPropertySourcesPlaceholderConfigurer" abstract="true" class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
-        <property name="location" value="file:${WON_CONFIG_DIR}/node.properties" />
-        <property name="ignoreUnresolvablePlaceholders" value="true" />
-    </bean>
-    <!-- here's the concrete bean for the PPC. The same is done in the activemq.xml file -->
-    <bean id="propertyPlaceholderConfigurer" parent="abstractPropertySourcesPlaceholderConfigurer" />
-
-    <!-- was in node.xml --><!-- was in message-processors.xml within node.xml--><!-- was in activemq.xml within node-camel.xml within node.xml-->
-    <!-- was in node-camel.xml within node.xml --><!-- was in jdbc-storage.xml within node.xml -->
-    <!-- was in jpabased-rdf-storage.xml within node.xml --><!-- was in node-security.xml within node.xml-->
-    <!-- was in node-core.xml within node.xml--><!-- all the beans necessary for node's functioning -->
-    <import resource="classpath:/spring/node.xml"/>
-
-    <!--
+	<bean id="abstractPropertySourcesPlaceholderConfigurer" abstract="true" class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
+		<property name="location" value="file:${WON_CONFIG_DIR}/node.properties" />
+		<property name="ignoreUnresolvablePlaceholders" value="true" />
+	</bean>
+	<!-- here's the concrete bean for the PPC. The same is done in the activemq.xml file -->
+	<bean id="propertyPlaceholderConfigurer" parent="abstractPropertySourcesPlaceholderConfigurer" />
+	<!-- was in node.xml -->
+	<!-- was in message-processors.xml within node.xml-->
+	<!-- was in activemq.xml within node-camel.xml within node.xml-->
+	<!-- was in node-camel.xml within node.xml -->
+	<!-- was in jdbc-storage.xml within node.xml -->
+	<!-- was in jpabased-rdf-storage.xml within node.xml -->
+	<!-- was in node-security.xml within node.xml-->
+	<!-- was in node-core.xml within node.xml-->
+	<!-- all the beans necessary for node's functioning -->
+	<import resource="classpath:/spring/node.xml"/>
+	<!--
         Setup:
         There are two http sections for linked data below. One is for webaccesscontrol protected resources.
         They require a client certificate to be specified when the TLS request is made.
@@ -45,131 +45,104 @@
         If that is the case, the requested resource's access policy is checked. This is a static policy allowing both
         participants and their won nodes to read.
     -->
-
-    <!-- use all spring security's http headers except cache-control, which we handle separately to allow for fine
+	<!-- use all spring security's http headers except cache-control, which we handle separately to allow for fine
     grained cache control -->
-    <!-- see http://docs.spring.io/spring-security/site/docs/3.2.9.RELEASE/reference/htmlsingle/#headers for
+	<!-- see http://docs.spring.io/spring-security/site/docs/3.2.9.RELEASE/reference/htmlsingle/#headers for
     configuration in spring-security-3.2.9 -->
-
-    <!--
+	<!--
     we define two <http> sections: one for restricted access and one for public access. We could also do that with
     one more complex <http> section, but it seems that it would not really result in simplified configurations. For
     restricted access, we want to verify the WebID and we want no client-side caching. For public access, the WebID
     verification step is not needed, and we can be more open about caching.
      -->
-    <sec:http request-matcher="regex"
-              pattern="/(resource|data|page)/((event/.+)|(need/[a-zA-Z0-9]+/((deep.*)|(events/.+)|unread))|(connection/[a-zA-Z0-9]+/events.*))"
-              entry-point-ref="authorizationEntryPoint"
-              authentication-manager-ref="clientCertificateWebIdAuthenticationManager"
-              access-decision-manager-ref="webIdBasedAccessDecisionManager">
-        <sec:headers defaults-disabled="true">
-            <sec:content-type-options />
-            <sec:hsts />
-            <sec:frame-options />
-            <sec:xss-protection />
-        </sec:headers>
-        <!-- we want to extract client certs from a header field if we're behind a reverse proxy, so we need a custom
+	<sec:http request-matcher="regex" pattern="/(resource|data|page)/((event/.+)|(atom/[a-zA-Z0-9]+/((deep.*)|(events/.+)|unread))|(connection/[a-zA-Z0-9]+/events.*))" entry-point-ref="authorizationEntryPoint" authentication-manager-ref="clientCertificateWebIdAuthenticationManager" access-decision-manager-ref="webIdBasedAccessDecisionManager">
+		<sec:headers defaults-disabled="true">
+			<sec:content-type-options />
+			<sec:hsts />
+			<sec:frame-options />
+			<sec:xss-protection />
+		</sec:headers>
+		<!-- we want to extract client certs from a header field if we're behind a reverse proxy, so we need a custom
          extension of the X.509 filter -->
-        <sec:custom-filter ref="clientCertificateWebIdFilter" position="X509_FILTER" />
-        <sec:intercept-url pattern=".*" access="hasRole('ROLE_WEBID')" />
-        <!-- we do not need CSRF protection for these resources as accessing them is not state-changing -->
-        <sec:csrf disabled="true" />
-    </sec:http>
-
-    <!-- slightly different config for cases in which a client certificate is sufficient (but the webID will not be
+		<sec:custom-filter ref="clientCertificateWebIdFilter" position="X509_FILTER" />
+		<sec:intercept-url pattern=".*" access="hasRole('ROLE_WEBID')" />
+		<!-- we do not need CSRF protection for these resources as accessing them is not state-changing -->
+		<sec:csrf disabled="true" />
+	</sec:http>
+	<!-- slightly different config for cases in which a client certificate is sufficient (but the webID will not be
     checked
      -->
-    <sec:http request-matcher="regex"
-              pattern="/resource\?register=.+"
-              entry-point-ref="authorizationEntryPoint"
-              authentication-manager-ref="clientCertificateNoWebIdAuthenticationManager">
-        <sec:headers defaults-disabled="true">
-            <sec:cache-control/>
-            <sec:content-type-options />
-            <sec:hsts />
-            <sec:frame-options />
-            <sec:xss-protection />
-        </sec:headers>
-        <!-- we want to extract client certs from a header field if we're behind a reverse proxy, so we need a custom
+	<sec:http request-matcher="regex" pattern="/resource\?register=.+" entry-point-ref="authorizationEntryPoint" authentication-manager-ref="clientCertificateNoWebIdAuthenticationManager">
+		<sec:headers defaults-disabled="true">
+			<sec:cache-control/>
+			<sec:content-type-options />
+			<sec:hsts />
+			<sec:frame-options />
+			<sec:xss-protection />
+		</sec:headers>
+		<!-- we want to extract client certs from a header field if we're behind a reverse proxy, so we need a custom
          extension of the X.509 filter -->
-        <sec:custom-filter ref="clientCertificateNoWebIdFilter" position="X509_FILTER" />
-        <!-- we allow self-signed certificates that need not be webids -->
-        <sec:intercept-url pattern=".*" access="hasRole('ROLE_CLIENT_CERTIFICATE_PRESENTED')" />
-        <!-- we do not need CSRF protection for 'register': the client does not necessarily make
+		<sec:custom-filter ref="clientCertificateNoWebIdFilter" position="X509_FILTER" />
+		<!-- we allow self-signed certificates that need not be webids -->
+		<sec:intercept-url pattern=".*" access="hasRole('ROLE_CLIENT_CERTIFICATE_PRESENTED')" />
+		<!-- we do not need CSRF protection for 'register': the client does not necessarily make
             a call to the server prior to registering, so there may be no way to pass a X-CSRF-Token to the client.
             Also, we do not rely on sessions for registering -->
-        <sec:csrf disabled="true" />
-    </sec:http>
-
-    <!-- config for all other request including public access-->
-    <sec:http request-matcher="regex"
-              entry-point-ref="authorizationEntryPoint"
-              authentication-manager-ref="clientCertificateWebIdAuthenticationManager">
-        <sec:headers defaults-disabled="true">
-            <!-- no cache-control for public resources to allow for storing-->
-            <sec:content-type-options />
-            <sec:hsts />
-            <sec:frame-options />
-            <sec:xss-protection />
-        </sec:headers>
-        <sec:intercept-url pattern="/(resource|data|page)(/need)?(((\?.*)|/)?)" access="permitAll"/>
-        <sec:intercept-url pattern="/(resource|data|page)/connection(((\?.*)|/)?)" access="permitAll"/>
-        <sec:intercept-url pattern="/(resource|data|page)/((need/[a-zA-Z0-9]+(/connections)?)|(connection/[a-zA-Z0-9]+))(((\?.*)|/)?)" access="permitAll"/>
-        <sec:intercept-url pattern=".*" access="denyAll"/>
-        <!-- we do not need CSRF protection for publicly accessible resources, as accessing them is not state-changing -->
-        <sec:csrf disabled="true" />
-    </sec:http>
-
-
-    <bean id="webAuthenticationDetailsSource" class="org.springframework.security.web.authentication.WebAuthenticationDetailsSource" />
-
-    <!-- beans for access control based on self-signed client certificate (no webid) -->
-    <bean id="clientCertificateNoWebIdFilter"
-          class="won.node.springsecurity.ReverseProxyCompatibleX509AuthenticationFilter">
-        <constructor-arg name="behindProxy" value="${client.authentication.behind.proxy}" />
-        <property name="authenticationDetailsSource" ref="webAuthenticationDetailsSource" />
-        <property name="authenticationManager" ref="clientCertificateNoWebIdAuthenticationManager" />
-    </bean>
-    <bean id="authorizationEntryPoint" class="org.springframework.security.web.authentication.Http403ForbiddenEntryPoint" />
-    <bean id="clientCertificateNoWebIdUserDetailsService" class="won.node.springsecurity.ClientCertificateNoWebIdUserDetailsService" />
-    <bean id="clientCertificateNoWebIdPreAuthenticationProvider"
-          class="org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationProvider">
-        <property name="preAuthenticatedUserDetailsService" ref="clientCertificateNoWebIdUserDetailsService" />
-    </bean>
-    <sec:authentication-manager id="clientCertificateNoWebIdAuthenticationManager">
-        <sec:authentication-provider ref="clientCertificateNoWebIdPreAuthenticationProvider" />
-    </sec:authentication-manager>
-
-
-
-    <!-- beans for access control based on self-signed client certificate with webid -->
-    <bean id="clientCertificateWebIdFilter"
-          class="won.node.springsecurity.ReverseProxyCompatibleX509AuthenticationFilter">
-        <constructor-arg name="behindProxy" value="${client.authentication.behind.proxy}" />
-        <property name="authenticationDetailsSource" ref="webAuthenticationDetailsSource" />
-        <property name="authenticationManager" ref="clientCertificateWebIdAuthenticationManager" />
-    </bean>
-    <bean id="webIdVerificationAgent" class="won.cryptography.webid.WebIDVerificationAgent">
-        <property name="linkedDataSource" ref="linkedDataSource" />
-    </bean>
-    <bean id="acl" class="won.node.springsecurity.WonDefaultAccessControlRules"/>
-    <bean id="webIdUserDetailsService" class="won.node.springsecurity.WebIdUserDetailsService" />
-    <bean id="preAuthenticationProvider"
-          class="org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationProvider">
-        <property name="preAuthenticatedUserDetailsService" ref="webIdUserDetailsService" />
-    </bean>
-    <sec:authentication-manager id="clientCertificateWebIdAuthenticationManager">
-        <sec:authentication-provider ref="preAuthenticationProvider" />
-    </sec:authentication-manager>
-    <bean id="webIdBasedAccessDecisionManager" class="org.springframework.security.access.vote.AffirmativeBased">
-        <constructor-arg>
-            <list>
-                <bean class="won.node.springsecurity.DefaultWoNAccessDecisionVoter" />
-            </list>
-        </constructor-arg>
-    </bean>
-
-
-
-
+		<sec:csrf disabled="true" />
+	</sec:http>
+	<!-- config for all other request including public access-->
+	<sec:http request-matcher="regex" entry-point-ref="authorizationEntryPoint" authentication-manager-ref="clientCertificateWebIdAuthenticationManager">
+		<sec:headers defaults-disabled="true">
+			<!-- no cache-control for public resources to allow for storing-->
+			<sec:content-type-options />
+			<sec:hsts />
+			<sec:frame-options />
+			<sec:xss-protection />
+		</sec:headers>
+		<sec:intercept-url pattern="/(resource|data|page)(/atom)?(((\?.*)|/)?)" access="permitAll"/>
+		<sec:intercept-url pattern="/(resource|data|page)/connection(((\?.*)|/)?)" access="permitAll"/>
+		<sec:intercept-url pattern="/(resource|data|page)/((atom/[a-zA-Z0-9]+(/connections)?)|(connection/[a-zA-Z0-9]+))(((\?.*)|/)?)" access="permitAll"/>
+		<sec:intercept-url pattern=".*" access="denyAll"/>
+		<!-- we do not need CSRF protection for publicly accessible resources, as accessing them is not state-changing -->
+		<sec:csrf disabled="true" />
+	</sec:http>
+	<bean id="webAuthenticationDetailsSource" class="org.springframework.security.web.authentication.WebAuthenticationDetailsSource" />
+	<!-- beans for access control based on self-signed client certificate (no webid) -->
+	<bean id="clientCertificateNoWebIdFilter" class="won.node.springsecurity.ReverseProxyCompatibleX509AuthenticationFilter">
+		<constructor-arg name="behindProxy" value="${client.authentication.behind.proxy}" />
+		<property name="authenticationDetailsSource" ref="webAuthenticationDetailsSource" />
+		<property name="authenticationManager" ref="clientCertificateNoWebIdAuthenticationManager" />
+	</bean>
+	<bean id="authorizationEntryPoint" class="org.springframework.security.web.authentication.Http403ForbiddenEntryPoint" />
+	<bean id="clientCertificateNoWebIdUserDetailsService" class="won.node.springsecurity.ClientCertificateNoWebIdUserDetailsService" />
+	<bean id="clientCertificateNoWebIdPreAuthenticationProvider" class="org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationProvider">
+		<property name="preAuthenticatedUserDetailsService" ref="clientCertificateNoWebIdUserDetailsService" />
+	</bean>
+	<sec:authentication-manager id="clientCertificateNoWebIdAuthenticationManager">
+		<sec:authentication-provider ref="clientCertificateNoWebIdPreAuthenticationProvider" />
+	</sec:authentication-manager>
+	<!-- beans for access control based on self-signed client certificate with webid -->
+	<bean id="clientCertificateWebIdFilter" class="won.node.springsecurity.ReverseProxyCompatibleX509AuthenticationFilter">
+		<constructor-arg name="behindProxy" value="${client.authentication.behind.proxy}" />
+		<property name="authenticationDetailsSource" ref="webAuthenticationDetailsSource" />
+		<property name="authenticationManager" ref="clientCertificateWebIdAuthenticationManager" />
+	</bean>
+	<bean id="webIdVerificationAgent" class="won.cryptography.webid.WebIDVerificationAgent">
+		<property name="linkedDataSource" ref="linkedDataSource" />
+	</bean>
+	<bean id="acl" class="won.node.springsecurity.WonDefaultAccessControlRules"/>
+	<bean id="webIdUserDetailsService" class="won.node.springsecurity.WebIdUserDetailsService" />
+	<bean id="preAuthenticationProvider" class="org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationProvider">
+		<property name="preAuthenticatedUserDetailsService" ref="webIdUserDetailsService" />
+	</bean>
+	<sec:authentication-manager id="clientCertificateWebIdAuthenticationManager">
+		<sec:authentication-provider ref="preAuthenticationProvider" />
+	</sec:authentication-manager>
+	<bean id="webIdBasedAccessDecisionManager" class="org.springframework.security.access.vote.AffirmativeBased">
+		<constructor-arg>
+			<list>
+				<bean class="won.node.springsecurity.DefaultWoNAccessDecisionVoter" />
+			</list>
+		</constructor-arg>
+	</bean>
 </beans>

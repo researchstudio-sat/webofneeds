@@ -1,9 +1,9 @@
 # proposal4accept
-PREFIX mod: <http://purl.org/webofneeds/modification#>
-PREFIX agr: <http://purl.org/webofneeds/agreement#>
+PREFIX mod: <https://w3id.org/won/modification#>
+PREFIX agr: <https://w3id.org/won/agreement#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-PREFIX msg: <http://purl.org/webofneeds/message#>
-PREFIX won: <http://purl.org/webofneeds/model#>
+PREFIX msg: <https://w3id.org/won/message#>
+PREFIX won: <https://w3id.org/won/core#>
 
 CONSTRUCT { ?prop agr:proposes ?clause . }
  WHERE {
@@ -24,16 +24,16 @@ CONSTRUCT { ?prop agr:proposes ?clause . }
     }
 
    GRAPH ?g3 {
-        ?clause msg:hasContent ?clauseContent .
+        ?clause msg:content ?clauseContent .
     }
     
 
         
-    # Note: for this pattern, we need the union of all graphs that contain msg:hasPreviousMessage triples,
+    # Note: for this pattern, we need the union of all graphs that contain msg:previousMessage triples,
     # Jena provides the special graph name <urn:x-arq:UnionGraph> for querying the union of all the query's graphs
     # THIS QUERY WILL ONLY WORK WITH JENA
       GRAPH <urn:x-arq:UnionGraph> {
-        ?prop msg:hasPreviousMessage+/msg:hasCorrespondingRemoteMessage? ?clause .
-        ?targetedacceptsmessage msg:hasPreviousMessage+/msg:hasCorrespondingRemoteMessage ?prop .    
+        ?prop msg:previousMessage+/msg:correspondingRemoteMessage? ?clause .
+        ?targetedacceptsmessage msg:previousMessage+/msg:correspondingRemoteMessage ?prop .    
      }
 }

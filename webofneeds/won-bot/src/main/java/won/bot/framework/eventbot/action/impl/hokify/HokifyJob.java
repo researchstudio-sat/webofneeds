@@ -5,12 +5,9 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * 
  * @author MS on 17.09.2018
- *
  */
 public class HokifyJob {
-
     private static final String TITLE = "title";
     private static final String DATE = "date";
     private static final String REFERENCENUMBER = "referencenumber";
@@ -25,7 +22,6 @@ public class HokifyJob {
     private static final String FIELD = "field";
     private static final String STATS = "stats";
     private static final String PRIORIZE = "priorize";
-
     @JsonProperty(TITLE)
     private String title;
     // TODO Change to right date format
@@ -57,21 +53,20 @@ public class HokifyJob {
     private String priorize;
 
     public HokifyJob() {
-
     }
 
     @Override
     public String toString() {
         if (this.stats != null) {
             return "HokifyJob [title=" + title + ", date=" + date + ", referencenumber=" + referencenumber + ", image="
-                    + image + ", url=" + url + ", company=" + company + ", city=" + city + ", country=" + country
-                    + ", description=" + description + ", salary=" + salary + ", jobtype=" + jobtype + ", field="
-                    + field + ", stats=" + stats.toString() + ", priorize=" + priorize + "]";
+                            + image + ", url=" + url + ", company=" + company + ", city=" + city + ", country="
+                            + country + ", description=" + description + ", salary=" + salary + ", jobtype=" + jobtype
+                            + ", field=" + field + ", stats=" + stats.toString() + ", priorize=" + priorize + "]";
         } else {
             return "HokifyJob [title=" + title + ", date=" + date + ", referencenumber=" + referencenumber + ", image="
-                    + image + ", url=" + url + ", company=" + company + ", city=" + city + ", country=" + country
-                    + ", description=" + description + ", salary=" + salary + ", jobtype=" + jobtype + ", field="
-                    + field + ", stats=" + 0 + ", priorize=" + priorize + "]";
+                            + image + ", url=" + url + ", company=" + company + ", city=" + city + ", country="
+                            + country + ", description=" + description + ", salary=" + salary + ", jobtype=" + jobtype
+                            + ", field=" + field + ", stats=" + 0 + ", priorize=" + priorize + "]";
         }
     }
 
@@ -188,14 +183,12 @@ public class HokifyJob {
     }
 
     static class Stats {
-
         private static final String VIEWS = "views";
         private static final String DISCARDED = "discarded";
         private static final String SAVED = "saved";
         private static final String APPLIED = "applied";
         private static final String APPLIEDLAST30DAYS = "appliedLast30Days";
         private static final String SMSLINK = "smslink";
-
         @JsonProperty(VIEWS)
         private Views views;
         @JsonProperty(DISCARDED)
@@ -215,7 +208,7 @@ public class HokifyJob {
         @Override
         public String toString() {
             return "Stats [views=" + views.toString() + ", discarded=" + discarded + ", saved=" + saved + ", applied="
-                    + applied + ", appliedLast30Days=" + appliedLast30Days + ", smslink=" + smslink + "]";
+                            + applied + ", appliedLast30Days=" + appliedLast30Days + ", smslink=" + smslink + "]";
         }
 
         public Views getViews() {
@@ -270,7 +263,6 @@ public class HokifyJob {
             private static final String WEB = "web";
             private static final String APP = "app";
             private static final String EXTERNAL = "external";
-
             @JsonProperty(WEB)
             private int web;
             @JsonProperty(APP)

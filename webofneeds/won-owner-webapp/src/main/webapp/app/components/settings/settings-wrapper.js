@@ -6,6 +6,8 @@ import {
   getOwnedPersonas,
   currentSkin,
 } from "../../selectors/general-selectors.js";
+import { get } from "../../utils";
+import * as accountUtils from "../../account-utils.js";
 
 function genComponentConf($ngRedux) {
   return {
@@ -33,18 +35,46 @@ function genComponentConf($ngRedux) {
         }
       });
 
+      elmApp.ports.getVerified.subscribe(() => {
+        const isVerified = accountUtils.isEmailVerified(
+          get($ngRedux.getState(), "account")
+        );
+        elmApp.ports.isVerified.send(isVerified);
+      });
+
+      elmApp.ports.getAccountInfo.subscribe(() => {
+        const accountInfo = {
+          email: accountUtils.getEmail(get($ngRedux.getState(), "account")),
+          isVerified: accountUtils.isEmailVerified(
+            get($ngRedux.getState(), "account")
+          ),
+        };
+
+        elmApp.ports.accountInfoIn.send(accountInfo);
+      });
+
       const personas = getOwnedPersonas($ngRedux.getState());
       if (personas) {
         elmApp.ports.personaIn.send(personas.toJS());
       }
 
       const disconnect = $ngRedux.connect(state => {
-        return { personas: getOwnedPersonas(state) };
+        return {
+          personas: getOwnedPersonas(state),
+          isVerified: accountUtils.isEmailVerified(get(state, "account")),
+          accountInfo: {
+            email: accountUtils.getEmail(get(state, "account")),
+            isVerified: accountUtils.isEmailVerified(get(state, "account")),
+          },
+        };
       })(state => {
-        if (!state.personas) {
-          return;
+        if (state.personas) {
+          elmApp.ports.personaIn.send(state.personas.toJS());
         }
-        elmApp.ports.personaIn.send(state.personas.toJS());
+        elmApp.ports.isVerified.send(state.isVerified);
+        if (state.accountInfo.isVerified && state.accountInfo.email) {
+          elmApp.ports.accountInfoIn.send(state.accountInfo);
+        }
       });
 
       const disconnectSkin = $ngRedux.connect(state => {
@@ -57,6 +87,8 @@ function genComponentConf($ngRedux) {
 
       scope.$on("$destroy", () => {
         elmApp.ports.personaOut.unsubscribe();
+        elmApp.ports.getVerified.unsubscribe();
+        elmApp.ports.getAccountInfo.unsubscribe();
         disconnectSkin();
         disconnect();
       });

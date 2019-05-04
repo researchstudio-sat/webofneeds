@@ -8,7 +8,7 @@ a message from another node, an owner, a matcher, or from an internal
 process, it adds an envelope with a timestamp etc to state that it got the 
 message. Then it adds message references. These are references in the following form:
 ```
-<messageUri> msg:hasPreviousMessage <previousMessageUri>
+<messageUri> msg:previousMessage <previousMessageUri>
 ```
 Where `messageUri` is the URI of the message currently being processed and 
 ```previousMessageUri``` is the URI of the referenced message. 
@@ -19,7 +19,7 @@ In addition to this triple, a signature reference is added to the message:
 The message references serve the following purposes:
 1. No message except for the last one that is sent in a conversation is 
 unreferenced.
-2. All messages except for the one creating a need contain references
+2. All messages except for the one creating an atom contain references
 
 Thus, each `Create` message is the root of an unmodifiable, directed graph
 of messages.
@@ -34,7 +34,7 @@ the message that is being responded to is selected.
 `Open`, `Close`, `Connect`, the newest message stored in the WoN node 
 for the respective connection is selected. If there is no message stored 
 for the respective connection, the `Create`
-message that created the Need is selected. 
+message that created the Atom is selected. 
 *Note:* The messages that create 
 the connection are assigned to the connection, so they will be selected
 by Rule 3 for the subsequent messages.
@@ -57,16 +57,16 @@ confusion, both participants should be able to access each other's messages.
 
 This approach ensures the following invariants on the directed graph 
 obtained by all message references. 
-1. The `Create` message of a need must not contain a reference
+1. The `Create` message of an atom must not contain a reference
 1. Any message other than a `Create` message must contain at least one reference
-1. Source and target of a Message reference must be in the same eventContainer
+1. Source and target of a Message reference must be in the same messageContainer
   with the exception of references pointing to the `Create` message.
 1. There must be no directed circles in the graph
 1. From any message, other than a `Create` message, there must be 
-at least one path to the need's `Create` message
+at least one path to the atom's `Create` message
 1. A Response must always reference the message that it is a response to.
 
-*TODO explain NeedCreatedNotificationMessage*
+*TODO explain AtomCreatedNotificationMessage*
 
 ##  Invariants in SPARQL
 SPARQL queries to test message structure invariants
@@ -74,68 +74,68 @@ ASK queries must yield false
 SELECT/CONSTRUCT queries must yield empty results
 
 ```
-# The `Create` message of a need must not contain a reference
-prefix msg: <http://purl.org/webofneeds/message#>
+# The `Create` message of an atom must not contain a reference
+prefix msg: <https://w3id.org/won/message#>
 select ?msg where {
-  ?msg msg:hasMessageType msg:CreateMessage;
-	   msg:hasPreviousMessage ?msg.
+  ?msg msg:messageType msg:CreateMessage;
+	   msg:previousMessage ?msg.
 }
 ```
 ```
 # Any message other than a `Create` message must contain at least one reference
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-PREFIX msg: <http://purl.org/webofneeds/message#>
-PREFIX won: <http://purl.org/webofneeds/model#>
+PREFIX msg: <https://w3id.org/won/message#>
+PREFIX won: <https://w3id.org/won/core#>
 SELECT * WHERE {
-  ?msg msg:hasMessageType ?msgType .
-  FILTER NOT EXISTS {?msg msg:hasPreviousMessage ?msg2}  
-  FILTER (?msgType != msg:CreateMessage && ?msgType != msg:NeedCreatedNotificationMessage)
+  ?msg msg:messageType ?msgType .
+  FILTER NOT EXISTS {?msg msg:previousMessage ?msg2}  
+  FILTER (?msgType != msg:CreateMessage && ?msgType != msg:AtomCreatedNotificationMessage)
 }
 ```
 ```
 # Source and target of a Message reference must be in the same 
-# eventContainerwith the exception of references pointing to 
+# messageContainerwith the exception of references pointing to 
 # the `Create` message.
 prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-prefix msg: <http://purl.org/webofneeds/message#>
-prefix won: <http://purl.org/webofneeds/model#>
+prefix msg: <https://w3id.org/won/message#>
+prefix won: <https://w3id.org/won/core#>
 select * where {
   ?cnt rdfs:member ?msg .
   ?cnt2 rdfs:member ?msg2 .
-  ?msg msg:hasPreviousMessage ?msg2 .
-  ?msg2 msg:hasMessageType ?targetType .
+  ?msg msg:previousMessage ?msg2 .
+  ?msg2 msg:messageType ?targetType .
   filter (?cnt != ?cnt2 && ?targetType != msg:CreateMessage)
 }
 ```
 ```
 # There must be no directed circles in the graph
-PREFIX msg: <http://purl.org/webofneeds/message#>
+PREFIX msg: <https://w3id.org/won/message#>
 SELECT ?msg WHERE {
   {
-  	?msg msg:hasPreviousMessage ?msg .  
+  	?msg msg:previousMessage ?msg .  
   } UNION {
-  	?msg msg:hasPreviousMessage ?msg2 . 
-  	?msg2 msg:hasPreviousMessage* ?msg
+  	?msg msg:previousMessage ?msg2 . 
+  	?msg2 msg:previousMessage* ?msg
   } 
 }
 ```
 ```
 # From any message, other than a `Create` message, there must be 
-# at least one path to the need's `Create` message
-PREFIX msg: <http://purl.org/webofneeds/message#>
+# at least one path to the atom's `Create` message
+PREFIX msg: <https://w3id.org/won/message#>
 SELECT ?msg WHERE {
-  ?msg msg:hasMessageType ?msgType.
+  ?msg msg:messageType ?msgType.
   FILTER NOT EXISTS {
-    ?msg msg:hasPreviousMessage* ?createMsg.
-    ?createMsg msg:hasMessageType msg:CreateMessage.
+    ?msg msg:previousMessage* ?createMsg.
+    ?createMsg msg:messageType msg:CreateMessage.
   }
-  FILTER (?msgType != msg:NeedCreatedNotificationMessage)
+  FILTER (?msgType != msg:AtomCreatedNotificationMessage)
 }
 ```
 
 ```
 # A Response must always reference the message that it is a response to.
-PREFIX msg: <http://purl.org/webofneeds/message#>
+PREFIX msg: <https://w3id.org/won/message#>
 SELECT * WHERE {
   {
   	?resp a msg:FromSystem .
@@ -148,12 +148,12 @@ SELECT * WHERE {
 	?resp msg:isRemoteResponseTo ?msg .    
   }
   {
-  	?resp msg:hasMessageType msg:SuccessResponse.
+  	?resp msg:messageType msg:SuccessResponse.
   } UNION {
-    ?resp msg:hasMessageType msg:FailureResponse.
+    ?resp msg:messageType msg:FailureResponse.
   } 
   FILTER NOT EXISTS {
-  	?resp msg:hasPreviousMessage ?msg. 
+  	?resp msg:previousMessage ?msg. 
   }
 }
 ```
@@ -163,26 +163,26 @@ SELECT * WHERE {
 Find all messages in temporal ordering
 ```
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-PREFIX msg: <http://purl.org/webofneeds/message#>
-PREFIX won: <http://purl.org/webofneeds/model#>
+PREFIX msg: <https://w3id.org/won/message#>
+PREFIX won: <https://w3id.org/won/core#>
 SELECT distinct ?first ?msg ?distance ?text ?msgType ?time ?rem WHERE {
  {
    SELECT distinct ?first ?msg (count (?mid) as ?distance) WHERE {
-     ?msg msg:hasPreviousMessage* ?mid .
-     ?mid msg:hasPreviousMessage+ ?first .
-     FILTER NOT EXISTS {?first msg:hasPreviousMessage ?none}            
+     ?msg msg:previousMessage* ?mid .
+     ?mid msg:previousMessage+ ?first .
+     FILTER NOT EXISTS {?first msg:previousMessage ?none}            
    }
    GROUP BY ?msg ?first 
  }
  OPTIONAL {
-   ?msg won:hasTextMessage ?text.
-   ?msg msg:hasMessageType ?msgType.
+   ?msg won:textMessage ?text.
+   ?msg msg:messageType ?msgType.
  }
  OPTIONAL {
-    ?msg msg:hasCorrespondingRemoteMessage ?rem . 
-   ?rem won:hasTextMessage ?text.
-   ?rem msg:hasMessageType ?msgType.
+    ?msg msg:correspondingRemoteMessage ?rem . 
+   ?rem won:textMessage ?text.
+   ?rem msg:messageType ?msgType.
  }
- ?msg msg:hasReceivedTimestamp ?time.  
+ ?msg msg:receivedTimestamp ?time.  
 } ORDER BY ?first ?distance ?time
 ```

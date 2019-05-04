@@ -12,13 +12,12 @@ import won.matcher.service.common.spring.SpringExtension;
 /**
  * Created by hfriedrich on 15.09.2015.
  */
-public class AkkaRescalMain
-{
-  public static void main(String[] args) throws IOException {
-
-    AnnotationConfigApplicationContext ctx =
-      new AnnotationConfigApplicationContext(MatcherRescalAppConfiguration.class);
-    ActorSystem system = ctx.getBean(ActorSystem.class);
-    system.actorOf(SpringExtension.SpringExtProvider.get(system).props(RescalMatcherActor.class), "RescalMatcherActor");
-  }
+public class AkkaRescalMain {
+    public static void main(String[] args) throws IOException {
+        AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(
+                        MatcherRescalAppConfiguration.class);
+        ActorSystem system = ctx.getBean(ActorSystem.class);
+        system.actorOf(SpringExtension.SpringExtProvider.get(system).props(RescalMatcherActor.class),
+                        "RescalMatcherActor");
+    }
 }

@@ -128,7 +128,7 @@ function genComponentConf() {
           postUri: undefined,
           useCase: encodeURIComponent(selectedUseCaseIdentifier),
           useCaseGroup: undefined,
-          fromNeedUri: undefined,
+          fromAtomUri: undefined,
           mode: undefined,
         });
       } else {
@@ -145,7 +145,7 @@ function genComponentConf() {
         postUri: undefined,
         useCase: undefined,
         useCaseGroup: "all",
-        fromNeedUri: undefined,
+        fromAtomUri: undefined,
         mode: undefined,
       });
     }
@@ -157,7 +157,7 @@ function genComponentConf() {
         postUri: undefined,
         useCase: "search",
         useCaseGroup: undefined,
-        fromNeedUri: undefined,
+        fromAtomUri: undefined,
         mode: undefined,
       });
     }

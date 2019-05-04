@@ -1,22 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-<parent>
-    <artifactId>webofneeds</artifactId>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>webofneeds</artifactId>
+        <groupId>at.researchstudio.sat</groupId>
+        <version>0.4-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
     <groupId>at.researchstudio.sat</groupId>
+    <name>Utilities</name>
+    <artifactId>won-utils</artifactId>
     <version>0.4-SNAPSHOT</version>
-</parent>
-<modelVersion>4.0.0</modelVersion>
-<groupId>at.researchstudio.sat</groupId>
-<name>Utilities</name>
-<artifactId>won-utils</artifactId>
-<version>0.4-SNAPSHOT</version>
-<modules>
-    <module>won-utils-import</module>
-    <module>won-utils-mail</module>
-    <module>won-utils-crawl</module>   
-    <module>won-utils-goals</module> 
-    <module>won-utils-conversation</module>
-</modules>
-<packaging>pom</packaging>
-
+    <modules>
+        <module>won-utils-import</module>
+        <module>won-utils-mail</module>
+        <module>won-utils-crawl</module>
+        <module>won-utils-goals</module>
+        <module>won-utils-conversation</module>
+        <module>won-utils-tls</module>
+    </modules>
+    <packaging>pom</packaging>
 </project>

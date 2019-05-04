@@ -29,7 +29,7 @@ import * as useCaseUtils from "./usecase-utils.js";
 
 import won from "./won-es6.js";
 
-export function initLeaflet(mapMount) {
+export function initLeaflet(mapMount, overrideOptions) {
   if (!L) {
     throw new Error(
       "Tried to initialize a leaflet widget while leaflet wasn't loaded."
@@ -39,16 +39,20 @@ export function initLeaflet(mapMount) {
 
   const baseMaps = initLeafletBaseMaps();
 
-  const map = L.map(mapMount, {
-    center: [37.44, -42.89], //centered on north-west africa
-    zoom: 1, //world-map
-    layers: [baseMaps["Detailed default map"]], //initially visible layers
-  }); //.setView([51.505, -0.09], 13);
+  const map = L.map(
+    mapMount,
+    Object.assign(
+      {
+        center: [37.44, -42.89], //centered on north-west africa
+        zoom: 1, //world-map
+        layers: [baseMaps["Detailed default map"]], //initially visible layers
+      },
+      overrideOptions
+    )
+  ); //.setView([51.505, -0.09], 13);
 
   //map.fitWorld() // shows every continent twice :|
   map.fitBounds([[-80, -190], [80, 190]]); // fitWorld without repetition
-
-  L.control.layers(baseMaps).addTo(map);
 
   // Force it to adapt to actual size
   // for some reason this doesn't happen by default
@@ -65,23 +69,16 @@ export function initLeafletBaseMaps() {
       "Tried to initialize leaflet map-sources while leaflet wasn't loaded."
     );
   }
+
   //const secureOsmSource = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"; // secure osm.org
   const secureOsmSource = "https://www.matchat.org/tile/{z}/{x}/{y}.png"; // TODO: use own tile server instead of proxy
   const secureOsm = L.tileLayer(secureOsmSource, {
     attribution:
-      '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
-  });
-
-  const transportSource =
-    "http://{s}.tile2.opencyclemap.org/transport/{z}/{x}/{y}.png";
-  const transport = L.tileLayer(transportSource, {
-    attribution:
-      'Maps &copy; <a href="http://www.thunderforest.com">Thunderforest</a>, Data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>',
+      '&copy; <a href="http://osm.org/copyright" target="_blank">OpenStreetMap</a> contributors',
   });
 
   const baseMaps = {
     "Detailed default map": secureOsm,
-    "Transport (Insecurely loaded!)": transport,
   };
 
   return baseMaps;
@@ -102,7 +99,7 @@ export function leafletBounds(location) {
  *
  * example usage:
  * ```
- * reduxSelectDependsOnProperties(['self.needUri', 'self.timestamp'], selectFromState, this)
+ * reduxSelectDependsOnProperties(['self.atomUri', 'self.timestamp'], selectFromState, this)
  * ```
  *
  * @param properties a list of watch expressions
@@ -338,6 +335,56 @@ export function transferPrivateAccount(credentials) {
     }),
   }).then(checkHttpStatus);
 }
+
+/**
+ * Change the password of the user currently logged in.
+ * @param credentials { email, oldPassword, newPassword }
+ * @returns {*}
+ */
+export function changePassword(credentials) {
+  const { email, oldPassword, newPassword } = credentials;
+
+  return fetch("/owner/rest/users/changePassword", {
+    method: "post",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+    body: JSON.stringify({
+      username: email,
+      oldPassword: oldPassword,
+      newPassword: newPassword,
+    }),
+  }).then(checkHttpStatus);
+}
+
+window.changePassword4dbg = changePassword;
+
+/**
+ * Change the password of the user currently logged in.
+ * @param credentials { email, oldPassword, newPassword }
+ * @returns {*}
+ */
+export function resetPassword(credentials) {
+  const { email, recoveryKey, newPassword } = credentials;
+
+  return fetch("/owner/rest/users/resetPassword", {
+    method: "post",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+    body: JSON.stringify({
+      username: email,
+      recoveryKey: recoveryKey,
+      newPassword: newPassword,
+      verificationToken: "",
+    }),
+  }).then(checkHttpStatus);
+}
+window.resetPassword4dbg = resetPassword;
 
 /**
  * @param credentials either {email, password} or {privateId}

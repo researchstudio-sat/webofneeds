@@ -39,21 +39,17 @@
 import { tree2constants } from "../utils.js";
 import { hierarchy2Creators } from "./action-utils.js";
 
-import {
-  needCreate,
-  createWhatsNew,
-  createWhatsAround,
-} from "./create-need-action.js";
+import { atomCreate, atomEdit } from "./create-atom-action.js";
 
 import {
-  needsConnect,
-  fetchUnloadedNeeds,
-  fetchUnloadedNeed,
-  needsClose,
-  needsDelete,
-  needsOpen,
-  needsClosedBySystem,
-} from "./needs-actions.js";
+  atomsConnect,
+  fetchUnloadedAtoms,
+  fetchUnloadedAtom,
+  atomsClose,
+  atomsDelete,
+  atomsOpen,
+  atomsClosedBySystem,
+} from "./atoms-actions.js";
 
 import {
   stateBack,
@@ -79,13 +75,18 @@ import {
   accountResendVerificationEmail,
   accountSendAnonymousLinkEmail,
   reconnect,
+  accountChangePassword,
 } from "./account-actions.js";
 
 import * as cnct from "./connections-actions.js";
 import * as messages from "./messages-actions.js";
 import * as configActions from "./config-actions.js";
 
-import { pageLoadAction } from "./load-action.js";
+import {
+  pageLoadAction,
+  fetchWhatsNew,
+  fetchWhatsAround,
+} from "./load-action.js";
 import { stateGo, stateReload } from "redux-ui-router";
 import {
   createPersona,
@@ -107,7 +108,7 @@ const actionHierarchy = {
   connections: {
     open: cnct.connectionsOpen,
     connectAdHoc: cnct.connectionsConnectAdHoc,
-    connectReactionNeed: cnct.connectionsConnectReactionNeed,
+    connectReactionAtom: cnct.connectionsConnectReactionAtom,
     close: cnct.connectionsClose,
     closeRemote: cnct.connectionsCloseRemote,
     rate: cnct.connectionsRate,
@@ -118,6 +119,7 @@ const actionHierarchy = {
     showLatestMessages: cnct.showLatestMessages,
     showMoreMessages: cnct.showMoreMessages,
     fetchMessagesStart: INJ_DEFAULT,
+    fetchMessagesEnd: INJ_DEFAULT,
     messageUrisInLoading: INJ_DEFAULT,
     fetchMessagesFailed: INJ_DEFAULT,
     fetchMessagesSuccess: INJ_DEFAULT,
@@ -131,26 +133,32 @@ const actionHierarchy = {
     updatePetriNetData: INJ_DEFAULT,
 
     storeActiveUrisInLoading: INJ_DEFAULT,
+    storeUrisToLoad: INJ_DEFAULT,
     storeActive: INJ_DEFAULT,
 
     storeUriFailed: INJ_DEFAULT,
   },
-  needs: {
+  atoms: {
     received: INJ_DEFAULT,
     connectionsReceived: INJ_DEFAULT,
-    clean: INJ_DEFAULT,
-    create: needCreate,
-    whatsNew: createWhatsNew,
-    whatsAround: createWhatsAround,
+    create: atomCreate,
+    edit: atomEdit,
+    editSuccessful: INJ_DEFAULT,
+    editFailure: INJ_DEFAULT,
     createSuccessful: INJ_DEFAULT,
-    reopen: needsOpen,
-    close: needsClose,
-    delete: needsDelete,
-    closedBySystem: needsClosedBySystem,
+    reopen: atomsOpen,
+    close: atomsClose,
+    delete: atomsDelete,
+    closedBySystem: atomsClosedBySystem,
     failed: INJ_DEFAULT,
-    connect: needsConnect,
-    fetchUnloadedNeeds: fetchUnloadedNeeds,
-    fetchUnloadedNeed: fetchUnloadedNeed,
+    connect: atomsConnect,
+    fetchUnloadedAtoms: fetchUnloadedAtoms,
+    fetchUnloadedAtom: fetchUnloadedAtom,
+
+    fetchWhatsNew: fetchWhatsNew,
+    fetchWhatsAround: fetchWhatsAround,
+    storeWhatsNew: INJ_DEFAULT,
+    storeWhatsAround: INJ_DEFAULT,
 
     storeOwnedInactiveUris: INJ_DEFAULT,
     storeOwnedInactiveUrisInLoading: INJ_DEFAULT,
@@ -161,6 +169,7 @@ const actionHierarchy = {
     storeTheirs: INJ_DEFAULT,
 
     storeUriFailed: INJ_DEFAULT,
+    removeDeleted: INJ_DEFAULT,
     selectTab: INJ_DEFAULT,
   },
   personas: {
@@ -173,6 +182,7 @@ const actionHierarchy = {
     storeTheirUrisInLoading: INJ_DEFAULT,
 
     storeUriFailed: INJ_DEFAULT,
+    removeDeleted: INJ_DEFAULT,
   },
   router: {
     stateGo, // only overwrites parameters that are explicitly mentioned, unless called without queryParams object (which also resets "pervasive" parameters, that shouldn't be removed
@@ -193,7 +203,7 @@ const actionHierarchy = {
     /* websocket messages, e.g. post-creation, chatting */
     //TODO get rid of send and rename to receivedMessage
 
-    send: INJ_DEFAULT, //TODO this should be part of proper, user-story-level actions (e.g. need.publish or sendCnctMsg)
+    send: INJ_DEFAULT, //TODO this should be part of proper, user-story-level actions (e.g. atom.publish or sendCnctMsg)
 
     /*
          * posting things to the server should be optimistic and assume
@@ -203,6 +213,10 @@ const actionHierarchy = {
     create: {
       success: messages.successfulCreate,
       //TODO failure: messages.failedCreate
+    },
+    edit: {
+      success: messages.successfulEdit,
+      //TODO failure: messages.failedEdit
     },
     open: {
       successRemote: INJ_DEFAULT, //2nd successResponse
@@ -227,13 +241,13 @@ const actionHierarchy = {
       successOwn: INJ_DEFAULT, //1st successResponse
       failure: INJ_DEFAULT,
     },
-    closeNeed: {
-      success: messages.successfulCloseNeed,
-      failure: messages.failedCloseNeed,
+    closeAtom: {
+      success: messages.successfulCloseAtom,
+      failure: messages.failedCloseAtom,
     },
-    reopenNeed: {
-      success: messages.successfulReopenNeed,
-      failure: messages.failedReopenNeed,
+    reopenAtom: {
+      success: messages.successfulReopenAtom,
+      failure: messages.failedReopenAtom,
     },
     markAsRead: INJ_DEFAULT,
     messageStatus: {
@@ -253,8 +267,9 @@ const actionHierarchy = {
     },
     updateMessageStatus: messages.updateMessageStatus,
     processConnectionMessage: messages.processConnectionMessage,
+    processChangeNotificationMessage: messages.processChangeNotificationMessage,
     processAgreementMessage: messages.processAgreementMessage,
-    needMessageReceived: messages.needMessageReceived,
+    atomMessageReceived: messages.atomMessageReceived,
     processConnectMessage: messages.processConnectMessage,
     connectMessageReceived: INJ_DEFAULT,
     connectMessageSent: INJ_DEFAULT,
@@ -303,6 +318,10 @@ const actionHierarchy = {
     acceptDisclaimer: accountAcceptDisclaimer,
     acceptDisclaimerSuccess: INJ_DEFAULT,
 
+    changePassword: accountChangePassword,
+    changePasswordSuccess: INJ_DEFAULT,
+    changePasswordFailed: INJ_DEFAULT,
+
     acceptTermsOfService: accountAcceptTermsOfService,
     acceptTermsOfServiceStarted: INJ_DEFAULT,
     acceptTermsOfServiceSuccess: INJ_DEFAULT,
@@ -340,7 +359,7 @@ const actionHierarchy = {
   view: {
     toggleRdf: INJ_DEFAULT,
 
-    toggleClosedNeeds: INJ_DEFAULT,
+    toggleClosedAtoms: INJ_DEFAULT,
 
     showMainMenu: INJ_DEFAULT,
     hideMainMenu: INJ_DEFAULT,
@@ -351,11 +370,15 @@ const actionHierarchy = {
     selectAddMessageContent: INJ_DEFAULT,
     removeAddMessageContent: INJ_DEFAULT,
 
+    showTermsDialog: INJ_DEFAULT,
     showModalDialog: INJ_DEFAULT,
     hideModalDialog: INJ_DEFAULT,
 
     clearLoginError: INJ_DEFAULT,
     clearRegisterError: INJ_DEFAULT,
+
+    locationAccessDenied: INJ_DEFAULT,
+    updateCurrentLocation: INJ_DEFAULT,
 
     anonymousSlideIn: {
       show: INJ_DEFAULT,
@@ -380,7 +403,7 @@ const actionHierarchy = {
   tick: startTicking,
 };
 
-//as string constans, e.g. actionTypes.needs.close === "needs.close"
+//as string constans, e.g. actionTypes.atoms.close === "atoms.close"
 export const actionTypes = tree2constants(actionHierarchy);
 
 /**

@@ -1,19 +1,13 @@
 /*
- * Copyright 2012  Research Studios Austria Forschungsges.m.b.H.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
+ * Copyright 2012 Research Studios Austria Forschungsges.m.b.H. Licensed under
+ * the Apache License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at http://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable
+ * law or agreed to in writing, software distributed under the License is
+ * distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the specific language
+ * governing permissions and limitations under the License.
  */
-
 package won.node.camel.processor.general;
 
 import java.net.URI;
@@ -28,27 +22,25 @@ import won.protocol.message.WonMessageUtils;
 import won.protocol.message.processor.WonMessageProcessor;
 import won.protocol.message.processor.exception.WonMessageProcessingException;
 import won.protocol.model.Connection;
-import won.protocol.repository.ConnectionEventContainerRepository;
+import won.protocol.repository.ConnectionMessageContainerRepository;
 import won.protocol.repository.ConnectionRepository;
-import won.protocol.repository.NeedEventContainerRepository;
-import won.protocol.repository.NeedRepository;
+import won.protocol.repository.AtomMessageContainerRepository;
+import won.protocol.repository.AtomRepository;
 
 /**
  * Acquires a pessimistic read lock on the message's parent.
  */
-public class LockMessageParentWonMessageProcessor implements WonMessageProcessor{
-
+public class LockMessageParentWonMessageProcessor implements WonMessageProcessor {
     private final Logger logger = LoggerFactory.getLogger(getClass());
-
     @Autowired
     ConnectionRepository connectionRepository;
     @Autowired
-    NeedRepository needRepository;
+    AtomRepository atomRepository;
     @Autowired
-    ConnectionEventContainerRepository connectionEventContainerRepository;
+    ConnectionMessageContainerRepository connectionMessageContainerRepository;
     @Autowired
-    NeedEventContainerRepository needEventContainerRepository;
-            
+    AtomMessageContainerRepository atomMessageContainerRepository;
+
     @Override
     public WonMessage process(WonMessage message) throws WonMessageProcessingException {
         try {
@@ -67,15 +59,15 @@ public class LockMessageParentWonMessageProcessor implements WonMessageProcessor
     }
 
     private void lockParent(WonMessage message) {
-        //get the parent's URI (either a connection or a need
+        // get the parent's URI (either a connection or an atom
         URI parentURI = WonMessageUtils.getParentEntityUri(message);
-        //try a connection:
+        // try a connection:
         Optional<Connection> con = connectionRepository.findOneByConnectionURIForUpdate(parentURI);
         if (con.isPresent()) {
-            connectionEventContainerRepository.findOneByParentUriForUpdate(parentURI);
+            connectionMessageContainerRepository.findOneByParentUriForUpdate(parentURI);
         } else {
-            needRepository.findOneByNeedURIForUpdate(parentURI);
-            needEventContainerRepository.findOneByParentUriForUpdate(parentURI);
+            atomRepository.findOneByAtomURIForUpdate(parentURI);
+            atomMessageContainerRepository.findOneByParentUriForUpdate(parentURI);
         }
     }
 }

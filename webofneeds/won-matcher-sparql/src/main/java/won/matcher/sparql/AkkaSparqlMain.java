@@ -13,15 +13,13 @@ import won.matcher.sparql.spring.MatcherSparqlAppConfiguration;
 /**
  * Created by hfriedrich on 24.08.2015.
  */
-public class AkkaSparqlMain
-{
-
-  public static void main(String[] args) throws IOException {
-
-    AnnotationConfigApplicationContext ctx =
-      new AnnotationConfigApplicationContext(MatcherSparqlAppConfiguration.class);
-    ActorSystem system = ctx.getBean(ActorSystem.class);
-    ActorRef matcherPubSubActor = system.actorOf(
-      SpringExtension.SpringExtProvider.get(system).props(MatcherPubSubActor.class), "MatcherPubSubActor");
-  }
+public class AkkaSparqlMain {
+    public static void main(String[] args) throws IOException {
+        AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(
+                        MatcherSparqlAppConfiguration.class);
+        ActorSystem system = ctx.getBean(ActorSystem.class);
+        ActorRef matcherPubSubActor = system.actorOf(
+                        SpringExtension.SpringExtProvider.get(system).props(MatcherPubSubActor.class),
+                        "MatcherPubSubActor");
+    }
 }

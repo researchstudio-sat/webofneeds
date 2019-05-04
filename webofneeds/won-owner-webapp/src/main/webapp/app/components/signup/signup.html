@@ -49,14 +49,14 @@
             </div>
             <div>
                 <input id="acceptToS" ng-model="self.acceptToS" type="checkbox" required/>
-                <label for="acceptToS">I accept the <a href="{{ self.absHRef(self.$state, 'about', {'#': 'aboutTermsOfService'}) }}">Terms Of Service</a></label>
+                <label for="acceptToS">I accept the <a href="{{ self.absHRef(self.$state, 'about', {'aboutSection': 'aboutTermsOfService'}) }}">Terms Of Service</a></label>
             </div>
         </div>
-        <button id="signup" class="won-button--filled red" ng-if="self.isAnonymous" ng-disabled="registerForm.$invalid" ng-click="::self.account__transfer({email: self.email, password: self.password, privateId: self.privateId, rememberMe: self.rememberMe})">
+        <button class="won-button--filled red" ng-if="self.isAnonymous" ng-disabled="registerForm.$invalid" ng-click="::self.account__transfer({email: self.email, password: self.password, privateId: self.privateId, rememberMe: self.rememberMe})">
             <span>Keep Postings</span>
         </button>
         <won-labelled-hr label="or" ng-if="self.isAnonymous"></won-labelled-hr>
-        <button id="signup" class="won-button--filled red" ng-disabled="registerForm.$invalid" ng-click="::self.account__register({email: self.email, password: self.password, rememberMe: self.rememberMe})">
+        <button class="won-button--filled red" ng-disabled="registerForm.$invalid" ng-click="::self.account__register({email: self.email, password: self.password, rememberMe: self.rememberMe})">
             <span ng-if="!self.isAnonymous">That’s all we need. Let’s go!</span>
             <span ng-if="self.isAnonymous">Start from Scratch</span>
         </button>

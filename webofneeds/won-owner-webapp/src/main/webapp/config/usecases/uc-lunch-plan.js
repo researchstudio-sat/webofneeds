@@ -18,14 +18,14 @@ export const lunchPlan = {
   draft: {
     ...mergeInEmptyDraft({
       content: {
-        type: ["won:LunchPlan"],
+        type: ["s:PlanAction"],
         title: "Let's go get lunch!",
-        sPlanAction: { "@id": "http://dbpedia.org/resource/Lunch" },
-        facets: {
-          "#groupFacet": won.WON.GroupFacetCompacted,
-          "#holdableFacet": won.WON.HoldableFacetCompacted,
+        eventObject: "http://dbpedia.org/resource/Lunch",
+        sockets: {
+          "#groupSocket": won.GROUP.GroupSocketCompacted,
+          "#holdableSocket": won.HOLD.HoldableSocketCompacted,
         },
-        defaultFacet: { "#groupFacet": won.WON.GroupFacetCompacted },
+        defaultSocket: { "#groupSocket": won.GROUP.GroupSocketCompacted },
       },
       seeks: {},
     }),

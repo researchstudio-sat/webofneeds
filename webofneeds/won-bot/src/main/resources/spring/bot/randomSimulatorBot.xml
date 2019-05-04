@@ -17,17 +17,17 @@
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans         http://www.springframework.org/schema/beans/spring-beans-4.1.xsd">
 
-    <import resource="classpath:spring/component/needproducer/needproducer-mails-nonstop.xml"/>
+    <import resource="classpath:spring/component/atomproducer/atomproducer-mails-nonstop.xml"/>
     <import resource="classpath:spring/component/nodeurisource/nodeurisource-random.xml"/>
     <import resource="classpath:spring/component/botContext/botContext.xml"/>
 
     <bean id="randomSimulatorBot" class="won.bot.impl.RandomSimulatorBot">
         <property name="taskScheduler" ref="taskScheduler"/>
         <property name="botContextWrapper" ref="botContextWrapper"/>
-        <property name="needProducer" ref="needProducerFromMails"/>
+        <property name="atomProducer" ref="atomProducerFromMails"/>
         <property name="nodeURISource" ref="nodeUriSourceRandom"/>
-        <!-- expects a bean named "ownerProtocolNeedServiceClient" in the context -->
-        <property name="wonMessageSender" ref="ownerProtocolNeedServiceClientJMSBased"/>
+        <!-- expects a bean named "ownerProtocolAtomServiceClient" in the context -->
+        <property name="wonMessageSender" ref="ownerProtocolAtomServiceClientJMSBased"/>
         <property name="trigger">
             <bean class="org.springframework.scheduling.support.PeriodicTrigger">
                 <constructor-arg name="period" value="1000"/>

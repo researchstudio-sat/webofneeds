@@ -5,12 +5,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class PetriNetUris {
-
     // The URI chosen by one of the participants for this petri net
     private URI processURI;
-    
     private Set<URI> enabledTransitions = new HashSet<>();
-    
     private Set<URI> markedPlaces = new HashSet<>();
 
     public URI getProcessURI() {
@@ -36,6 +33,4 @@ public class PetriNetUris {
     public void setMarkedPlaces(Set<URI> markedPlaces) {
         this.markedPlaces = markedPlaces;
     }
-
-    
 }

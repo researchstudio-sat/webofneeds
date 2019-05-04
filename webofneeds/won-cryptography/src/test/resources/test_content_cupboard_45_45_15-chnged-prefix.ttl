@@ -1,22 +1,22 @@
-@prefix :    <http://www.example.com/resource/need/12> .
+@prefix :    <http://www.example.com/resource/atom/12> .
 @prefix dc:  <http://purl.org/dc/elements/1.1/> .
 @prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix geo:     <http://www.w3.org/2003/01/geo/wgs84_pos#> .
 @prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
 @prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-@prefix wofn:     <http://purl.org/webofneeds/model#> .
+@prefix wofn:     <https://w3id.org/won/core#> .
 @prefix gr:  <http://purl.org/goodrelations/v1#> .
 @prefix ldp:     <http://www.w3.org/ns/ldp#> .
 @prefix sp:  <http://spinrdf.org/sp#>.
 
-<http://www.example.com/resource/need/12>
-  a   wofn:Need ;
-  wofn:hasBasicNeedType
+<http://www.example.com/resource/atom/12>
+  a   wofn:Atom ;
+  wofn:hasBasicAtomType
       wofn:Supply ;
-  wofn:hasContent
-      [ a   wofn:NeedContent ;
+  wofn:content
+      [ a   wofn:AtomContent ;
         dc:title "small cupboard"^^xsd:string ;
-        wofn:hasContentDescription
+        wofn:contentDescription
         [ a   <http://dbpedia.org/resource/Cupboard> , gr:Individual ;
           gr:color "natural birch";
           gr:width
@@ -38,16 +38,16 @@
                 ]
         ]
       ] ;
-  wofn:hasNeedModality
-      [ a   wofn:NeedModality
+  wofn:atomModality
+      [ a   wofn:AtomModality
       ] ;
-  wofn:isInState wofn:Active ;
+  wofn:atomState wofn:Active ;
   wofn:matcherProtocolEndpoint
       <http://www.example.com/won/protocol/matcher> ;
-  wofn:needCreationDate
+  wofn:atomCreationDate
       "2013-09-25T10:49:54Z"^^xsd:dateTime ;
-  wofn:needProtocolEndpoint
-      <http://www.example.com/won/protocol/need> ;
+  wofn:atomProtocolEndpoint
+      <http://www.example.com/won/protocol/atom> ;
   wofn:ownerProtocolEndpoint
       <http://www.example.com/won/protocol/owner> .
 

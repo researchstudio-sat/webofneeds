@@ -15,20 +15,34 @@ const initialState = Immutable.fromJS({
 });
 export function messagesReducer(messages = initialState, action = {}) {
   switch (action.type) {
-    case actionTypes.needs.connect:
+    case actionTypes.account.reset:
+      return initialState;
+
+    case actionTypes.connections.open:
+    case actionTypes.connections.sendChatMessage:
+    case actionTypes.connections.rate:
+    case actionTypes.connections.close:
+    case actionTypes.messages.send:
+    case actionTypes.atoms.edit:
+    case actionTypes.atoms.connect:
     case actionTypes.personas.create:
-    case actionTypes.needs.create:
+    case actionTypes.atoms.create:
       return messages.setIn(
         ["enqueued", action.payload.eventUri],
         action.payload.message
       );
 
-    case actionTypes.needs.createSuccessful:
-      return messages.removeIn([
-        "waitingForAnswer",
-        action.payload.publishEventUri,
-      ]);
+    case actionTypes.atoms.editFailure: {
+      //TODO: IMPL
+      console.debug(
+        "message-reducer actionTypes.atoms.editFailure todo: impl / payload-> ",
+        action.payload
+      );
+      return messages;
+    }
 
+    case actionTypes.atoms.editSuccessful:
+    case actionTypes.atoms.createSuccessful:
     case actionTypes.messages.chatMessage.failure:
     case actionTypes.messages.chatMessage.success:
       return messages.removeIn(["waitingForAnswer", action.payload.eventUri]);
@@ -40,16 +54,6 @@ export function messagesReducer(messages = initialState, action = {}) {
         .removeIn(["enqueued", pendingEventUri])
         .setIn(["waitingForAnswer", pendingEventUri], msg);
     }
-
-    case actionTypes.connections.open:
-    case actionTypes.connections.sendChatMessage:
-    case actionTypes.connections.rate:
-    case actionTypes.connections.close:
-    case actionTypes.messages.send:
-      return messages.setIn(
-        ["enqueued", action.payload.eventUri],
-        action.payload.message
-      );
 
     case actionTypes.connections.sendChatMessageRefreshDataOnSuccess:
       return messages

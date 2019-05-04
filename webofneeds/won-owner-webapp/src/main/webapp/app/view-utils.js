@@ -25,6 +25,10 @@ export function showRdf(viewState) {
   return get(viewState, "showRdf");
 }
 
+export function showClosedAtoms(viewState) {
+  return get(viewState, "showClosedAtoms");
+}
+
 export function isAnonymousLinkSent(viewState) {
   return getIn(viewState, ["anonymousSlideIn", "linkSent"]);
 }
@@ -41,19 +45,27 @@ export function showAnonymousSlideInEmailInput(viewState) {
   return getIn(viewState, ["anonymousSlideIn", "showEmailInput"]);
 }
 
+export function isLocationAccessDenied(viewState) {
+  return get(viewState, "locationAccessDenied");
+}
+
+export function getCurrentLocation(viewState) {
+  return get(viewState, "currentLocation");
+}
+
 /**
- * Return the visible Tab of a certain need, and if there was no tab stored in the state, return
+ * Return the visible Tab of a certain atom, and if there was no tab stored in the state, return
  * the notFoundTab, which defaults to DETAIL
  * @param viewState
- * @param needUri
+ * @param atomUri
  * @param notFoundTab
  * @returns {*|string}
  */
-export function getVisibleTabByNeedUri(
+export function getVisibleTabByAtomUri(
   viewState,
-  needUri,
+  atomUri,
   notFoundTab = "DETAIL"
 ) {
-  const tab = getIn(viewState, ["needs", needUri, "visibleTab"]);
+  const tab = getIn(viewState, ["atoms", atomUri, "visibleTab"]);
   return tab || notFoundTab;
 }

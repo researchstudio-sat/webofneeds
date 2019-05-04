@@ -14,20 +14,19 @@ import Immutable from "immutable";
 
 const emptyDraftImm = Immutable.fromJS({
   content: {
-    facets: {
-      "#chatFacet": "won:ChatFacet",
-      "#holdableFacet": "won:HoldableFacet",
+    sockets: {
+      "#chatSocket": "chat:ChatSocket",
+      "#holdableSocket": "hold:HoldableSocket",
     },
-    defaultFacet: { "#chatFacet": "won:ChatFacet" },
+    defaultSocket: { "#chatSocket": "chat:ChatSocket" },
   },
   seeks: {},
-  matchingContext: undefined,
 });
 
 /**
  * This is used so we can inject preset values for certain UseCases, be aware that it does not merge the content completely.
  *
- * Facets and defaultFacet will be overwritten if set in the useCase itself FIXME: Figure out a better way to handle or communicate
+ * Sockets and defaultSocket will be overwritten if set in the useCase itself FIXME: Figure out a better way to handle or communicate
  * this
  * @param contentToMerge
  * @returns {any|*}
@@ -35,19 +34,19 @@ const emptyDraftImm = Immutable.fromJS({
 export function mergeInEmptyDraft(contentToMerge) {
   if (!contentToMerge) return emptyDraftImm.toJS();
   const contentToMergeImm = Immutable.fromJS(contentToMerge);
-  const mergeFacets = contentToMergeImm.getIn(["content", "facets"]);
-  const mergeDefaultFacet = contentToMergeImm.getIn([
+  const mergeSockets = contentToMergeImm.getIn(["content", "sockets"]);
+  const mergeDefaultSocket = contentToMergeImm.getIn([
     "content",
-    "defaultFacet",
+    "defaultSocket",
   ]);
 
   let mergedDraftImm = emptyDraftImm;
 
-  if (mergeFacets && mergeFacets.size > 0) {
-    mergedDraftImm = mergedDraftImm.removeIn(["content", "facets"]);
+  if (mergeSockets && mergeSockets.size > 0) {
+    mergedDraftImm = mergedDraftImm.removeIn(["content", "sockets"]);
   }
-  if (mergeDefaultFacet && mergeDefaultFacet.size > 0) {
-    mergedDraftImm = mergedDraftImm.removeIn(["content", "defaultFacet"]);
+  if (mergeDefaultSocket && mergeDefaultSocket.size > 0) {
+    mergedDraftImm = mergedDraftImm.removeIn(["content", "defaultSocket"]);
   }
 
   mergedDraftImm = mergedDraftImm.mergeDeep(contentToMergeImm);
@@ -79,9 +78,9 @@ export const details = {
   responseToUri: basicDetails.responseToUri,
   website: basicDetails.website,
   flags: basicDetails.flags,
-  sPlanAction: basicDetails.sPlanAction,
-  facets: basicDetails.facets,
-  defaultFacet: basicDetails.defaultFacet,
+  eventObject: basicDetails.eventObject,
+  sockets: basicDetails.sockets,
+  defaultSocket: basicDetails.defaultSocket,
   type: basicDetails.type,
 };
 

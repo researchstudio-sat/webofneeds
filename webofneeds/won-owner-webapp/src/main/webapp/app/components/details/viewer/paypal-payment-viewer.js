@@ -29,18 +29,21 @@ function genComponentConf() {
           <div class="paypalpaymentv__content__receiver">
             {{ self.content.get("receiver") }}
           </div>
+          <!-- Not in use: secret
           <div class="paypalpaymentv__content__label">
             {{ self.detail.secretLabel }}
           </div>
           <div class="paypalpaymentv__content__secret">
             {{ self.content.get("secret") }}
           </div>
+          -->
+          <!-- Not in use: Customer information
           <div class="paypalpaymentv__content__label span-column">
             {{ self.detail.customerLabel }}
           </div>
           <div class="paypalpaymentv__content__customer" ng-if="self.customerPost">
             <won-post-header
-                need-uri="self.customerPost.get('uri')"
+                atom-uri="self.customerPost.get('uri')"
                 timestamp="self.customerPost.get('creationDate')"
                 hide-image="::false">
             </won-post-header>
@@ -50,6 +53,7 @@ function genComponentConf() {
               ng-click="self.loadPost()">
               Click to Load Customer Post
           </button>
+          -->
         </div>
     `;
 
@@ -61,7 +65,7 @@ function genComponentConf() {
       const selectFromState = state => {
         const customerUri = this.content && this.content.get("customerUri");
 
-        const customerPost = customerUri && state.getIn(["needs", customerUri]);
+        const customerPost = customerUri && state.getIn(["atoms", customerUri]);
 
         return {
           customerUri,
@@ -94,11 +98,11 @@ function genComponentConf() {
       return undefined;
     }
 
-    loadPost() {
-      if (this.customerUri) {
-        this.needs__fetchSuggested(this.customerUri);
-      }
-    }
+    // loadPost() {
+    //   if (this.customerUri) {
+    //     this.atoms__fetchSuggested(this.customerUri);
+    //   }
+    // }
   }
   Controller.$inject = serviceDependencies;
 

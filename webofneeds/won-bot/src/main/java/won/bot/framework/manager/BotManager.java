@@ -9,20 +9,22 @@ import won.bot.framework.bot.Bot;
 /**
  *
  */
-public interface BotManager
-{
-  public Bot getBotForNeedURI(URI needUri);
-  public List<Bot> getBotsForNodeURI(URI nodeUri);
-  public void addBot(Bot bot);
+public interface BotManager {
+    public Bot getBotForAtomURI(URI atomUri);
 
-  /**
-   * Drops all registered bots and uses the specified ones.
-   * @param bots
-   */
-  public void setBots(Collection<Bot> bots);
+    public List<Bot> getBotsForNodeURI(URI nodeUri);
 
-  /**
-   * Indicates if all managed bots' work is done.
-   */
-  public boolean isWorkDone();
+    public void addBot(Bot bot);
+
+    /**
+     * Drops all registered bots and uses the specified ones.
+     * 
+     * @param bots
+     */
+    public void setBots(Collection<Bot> bots);
+
+    /**
+     * Indicates if all managed bots' work is done.
+     */
+    public boolean isWorkDone();
 }

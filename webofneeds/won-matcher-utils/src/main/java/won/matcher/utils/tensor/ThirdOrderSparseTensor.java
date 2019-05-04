@@ -1,19 +1,13 @@
 /*
- * Copyright 2012  Research Studios Austria Forschungsges.m.b.H.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
+ * Copyright 2012 Research Studios Austria Forschungsges.m.b.H. Licensed under
+ * the Apache License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at http://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable
+ * law or agreed to in writing, software distributed under the License is
+ * distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the specific language
+ * governing permissions and limitations under the License.
  */
-
 package won.matcher.utils.tensor;
 
 import java.io.File;
@@ -35,40 +29,34 @@ import org.la4j.vector.functor.VectorProcedure;
 /**
  * Sparse third order tensor based on la4j implementation of sparse matrices.
  * <p/>
- * User: hfriedrich
- * Date: 09.07.2014
+ * User: hfriedrich Date: 09.07.2014
  */
 public class ThirdOrderSparseTensor {
-
-    //private CCSMatrix[] slices;
-
+    // private CCSMatrix[] slices;
     private ArrayList<CCSMatrix> slices;
     private int[] dims;
 
     public ThirdOrderSparseTensor(int dimX1, int dimX2) {
-
         dims = null;
         slices = new ArrayList<>();
         resize(dimX1, dimX2);
     }
 
     public void resize(int dimX1, int dimX2) {
-
         for (int x3 = 0; x3 < slices.size(); x3++) {
             if (slices.get(x3) != null) {
                 slices.set(x3, slices.get(x3).copyOfShape(dimX1, dimX2).to(Matrices.CCS));
             }
         }
-        dims = new int[]{dimX1, dimX2, slices.size()};
+        dims = new int[] { dimX1, dimX2, slices.size() };
     }
 
     public void setEntry(double value, int x1, int x2, int x3) {
-
         if (slices.size() <= x3) {
             for (int i = slices.size(); i <= x3; i++) {
                 slices.add(i, CCSMatrix.zero(dims[0], dims[1]));
             }
-            dims = new int[]{dims[0], dims[1], slices.size()};
+            dims = new int[] { dims[0], dims[1], slices.size() };
         }
         slices.get(x3).set(x1, x2, value);
     }
@@ -86,8 +74,8 @@ public class ThirdOrderSparseTensor {
     }
 
     public void writeSliceToFile(String fileName, int slice) throws IOException {
-
-        // write the mtx file (remove the column-major specification cause python mm does not read it)
+        // write the mtx file (remove the column-major specification cause python mm
+        // does not read it)
         OutputStream os = new FileOutputStream(new File(fileName));
         NumberFormat format = DecimalFormat.getInstance(Locale.US);
         os.write(slices.get(slice).toMatrixMarket(format).replace("column-major", "").getBytes());

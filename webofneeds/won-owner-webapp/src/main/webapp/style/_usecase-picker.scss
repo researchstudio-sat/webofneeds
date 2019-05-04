@@ -76,19 +76,16 @@ won-usecase-picker {
       }
     }
 
-    &__button,
-    &__button--pending {
+    &__button {
       white-space: normal;
-    }
-
-    &__button--pending {
-      grid-column: 1 / -1;
-      align-self: center;
-      justify-self: center;
     }
 
     &__labelledhr {
       grid-column: 1 / -1;
+
+      & .wlh__label .wlh__label__text {
+        background: white;
+      }
     }
   }
 
@@ -99,19 +96,53 @@ won-usecase-picker {
     grid-auto-flow: row dense;
     grid-template-columns: 1fr 1fr 1fr;
     grid-gap: $gridRowGap;
-    overflow: auto;
 
+    &__noresults,
     &__labelledhr,
     &__search {
       grid-column: 1/-1;
     }
 
-    &__search {
-      @extend .won-txt;
-      min-height: $formInputHeight;
-      max-height: $formInputHeight;
+    &__noresults {
+      text-align: center;
+      padding: 1rem 0.5rem;
+      color: var(--won-disabled-color);
     }
 
+    &__search {
+      position: relative;
+      display: grid;
+
+      &__input {
+        @extend .won-txt;
+        min-height: $formInputHeight;
+        max-height: $formInputHeight;
+
+        $verticalPadding: calcVerticalPaddingToHeight(
+          $normalFontSize,
+          22/16,
+          $thinBorderWidth,
+          $formInputHeight
+        );
+        padding: $verticalPadding 0.438rem + $bigiconSize $verticalPadding
+          0.438rem;
+      }
+
+      &__icon {
+        @include fixed-square($bigiconSize);
+        position: absolute;
+        right: 0.5rem;
+        top: $formInputHeight / 2 - $bigiconSize / 2;
+        z-index: 1;
+      }
+
+      &__input::-ms-clear {
+        width: 0;
+        height: 0;
+      }
+    }
+
+    &__newcustom,
     &__searchresult,
     &__usecase-group {
       display: flex;
@@ -135,6 +166,10 @@ won-usecase-picker {
         color: $won-secondary-text-color;
         text-align: center;
       }
+    }
+
+    &__newcustom {
+      grid-column: 2;
     }
   }
 }

@@ -1,41 +1,102 @@
 @import "won-config";
 @import "animate";
 
-won-modal-dialog {
-  @include appearAnimation(0.5s);
-  display: flex;
-  width: 100%;
-  height: 100%;
-  z-index: 10000;
+@media (max-width: $responsivenessBreakPoint) {
+  won-modal-dialog {
+    @include appearAnimation(0.5s);
+    display: flex;
+    width: 100%;
+    height: 100%;
+    z-index: 10000;
 
-  align-items: center;
-  justify-content: center;
-  align-content: center;
-  position: fixed;
-  top: 0;
-  left: 0;
-  background: rgba(0, 0, 0, 0.5);
+    align-items: center;
+    justify-content: center;
+    align-content: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background: rgba(0, 0, 0, 0.5);
 
-  .md__dialog {
-    background: white;
-    display: grid;
-    grid-row-gap: 0.5rem;
-    padding: 0.5rem;
-
-    &__header {
-      &__caption {
-      }
-    }
-
-    &__content {
-      &__text {
-      }
-    }
-
-    &__footer {
+    .md__dialog {
+      max-height: 75vh;
+      box-sizing: border-box;
+      background: white;
       display: grid;
-      grid-auto-flow: column;
-      grid-column-gap: 0.5rem;
+      grid-row-gap: 0.5rem;
+      padding: 0.5rem;
+      grid-template-areas: "modal_header" "modal_content" "modal_footer";
+      grid-template-rows: min-content 1fr min-content;
+
+      &__header {
+        grid-area: modal_header;
+        &__caption {
+        }
+      }
+
+      &__content {
+        grid-area: modal_content;
+        overflow-y: auto;
+        &__text {
+        }
+      }
+
+      &__footer {
+        grid-area: modal_footer;
+        display: grid;
+        grid-auto-flow: column;
+        grid-column-gap: 0.5rem;
+      }
+    }
+  }
+}
+
+@media (min-width: $responsivenessBreakPoint) {
+  won-modal-dialog {
+    @include appearAnimation(0.5s);
+    display: flex;
+    width: 100%;
+    height: 100%;
+    z-index: 10000;
+
+    align-items: center;
+    justify-content: center;
+    align-content: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background: rgba(0, 0, 0, 0.5);
+
+    .md__dialog {
+      box-sizing: border-box;
+      max-width: $maxContentWidth/2;
+      min-width: $maxContentWidth/2;
+      max-height: 75vh;
+      background: white;
+      display: grid;
+      grid-row-gap: 0.5rem;
+      padding: 0.5rem;
+      grid-template-areas: "modal_header" "modal_content" "modal_footer";
+      grid-template-rows: min-content 1fr min-content;
+
+      &__header {
+        grid-area: modal_header;
+        &__caption {
+        }
+      }
+
+      &__content {
+        grid-area: modal_content;
+        overflow-y: auto;
+        &__text {
+        }
+      }
+
+      &__footer {
+        grid-area: modal_footer;
+        display: grid;
+        grid-auto-flow: column;
+        grid-column-gap: 0.5rem;
+      }
     }
   }
 }

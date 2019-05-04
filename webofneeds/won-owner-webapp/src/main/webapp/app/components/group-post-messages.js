@@ -9,7 +9,6 @@ import labelledHrModule from "./labelled-hr.js";
 import connectionContextDropdownModule from "./connection-context-dropdown.js";
 import { connect2Redux } from "../won-utils.js";
 import { attach, delay, getIn, get } from "../utils.js";
-import * as needUtils from "../need-utils.js";
 import * as messageUtils from "../message-utils.js";
 import * as connectionUtils from "../connection-utils.js";
 import * as processUtils from "../process-utils.js";
@@ -17,7 +16,7 @@ import { fetchMessage } from "../won-message-utils.js";
 import { actionCreators } from "../actions/actions.js";
 import {
   getConnectionUriFromRoute,
-  getOwnedNeedByConnectionUri,
+  getOwnedAtomByConnectionUri,
 } from "../selectors/general-selectors.js";
 import { hasMessagesToLoad } from "../selectors/connection-selectors.js";
 import { getUnreadMessagesByConnectionUri } from "../selectors/message-selectors.js";
@@ -49,7 +48,7 @@ function genComponentConf() {
             <won-connection-header
                 connection-uri="self.connectionUri">
             </won-connection-header>
-            <won-share-dropdown need-uri="self.remoteNeedUri"></won-share-dropdown>
+            <won-share-dropdown atom-uri="self.targetAtomUri"></won-share-dropdown>
             <won-connection-context-dropdown show-petri-net-data-field="" show-agreement-data-field=""></won-connection-context-dropdown>
         </div>
         <div
@@ -62,18 +61,18 @@ function genComponentConf() {
               </div>
             </div>
             <won-post-content-message
-              ng-if="self.remoteNeedUri"
-              post-uri="self.remoteNeedUri"
+              ng-if="self.targetAtomUri"
+              post-uri="self.targetAtomUri"
               connection-uri="self.connectionUri">
             </won-post-content-message>
             <div class="gpm__content__loadspinner"
-                ng-if="self.isProcessingLoadingMessages">
+                ng-if="self.isProcessingLoadingMessages || self.isConnectionLoading">
                 <svg class="hspinner">
                   <use xlink:href="#ico_loading_anim" href="#ico_loading_anim"></use>
                 </svg>
             </div>
             <button class="gpm__content__loadbutton won-button--outlined thin red"
-                ng-if="!self.isSuggested && !self.isProcessingLoadingMessages && self.hasConnectionMessagesToLoad"
+                ng-if="!self.isSuggested && !self.isProcessingLoadingMessages && !self.isConnectionLoading && self.hasConnectionMessagesToLoad"
                 ng-click="self.loadPreviousMessages()">
                 Load previous messages
             </button>
@@ -138,7 +137,7 @@ function genComponentConf() {
                 on-submit="::self.sendRequest(value, selectedPersona)"
                 allow-details="::false"
                 allow-empty-submit="::true"
-                show-personas="self.isOwnedNeedWhatsX"
+                show-personas="!self.connection"
                 submit-button-label="::'Ask&#160;to&#160;Join'"
             >
             </chat-textfield>
@@ -163,19 +162,16 @@ function genComponentConf() {
         "for prefixes that will be added automatically. E.g." +
         `\`<${
           won.WONMSG.uriPlaceholder.event
-        }> won:hasTextMessage "hello world!". \``;
+        }> won:textMessage "hello world!". \``;
 
       this.scrollContainer().addEventListener("scroll", e => this.onScroll(e));
 
       const selectFromState = state => {
         const connectionUri = getConnectionUriFromRoute(state);
-        const ownedNeed = getOwnedNeedByConnectionUri(state, connectionUri);
-        const connection = getIn(ownedNeed, ["connections", connectionUri]);
-        const isOwnedNeedWhatsX =
-          needUtils.isWhatsAroundNeed(ownedNeed) ||
-          needUtils.isWhatsNewNeed(ownedNeed);
-        const remoteNeedUri = get(connection, "remoteNeedUri");
-        const remoteNeed = getIn(state, ["needs", remoteNeedUri]);
+        const ownedAtom = getOwnedAtomByConnectionUri(state, connectionUri);
+        const connection = getIn(ownedAtom, ["connections", connectionUri]);
+        const targetAtomUri = get(connection, "targetAtomUri");
+        const targetAtom = getIn(state, ["atoms", targetAtomUri]);
         const allChatMessages = get(connection, "messages");
         const chatMessages =
           allChatMessages &&
@@ -207,12 +203,11 @@ function genComponentConf() {
         const process = get(state, "process");
 
         return {
-          ownedNeed,
-          remoteNeed,
-          remoteNeedUri,
+          ownedAtom,
+          targetAtom,
+          targetAtomUri,
           connectionUri,
           connection,
-          isOwnedNeedWhatsX,
           sortedMessageUris: sortedMessages && [
             ...sortedMessages.flatMap(msg => msg.get("uri")),
           ],
@@ -232,13 +227,17 @@ function genComponentConf() {
           shouldShowRdf: state.getIn(["view", "showRdf"]),
           // if the connect-message is here, everything else should be as well
           hasConnectionMessagesToLoad,
-          connectionOrNeedsLoading:
+          connectionOrAtomsLoading:
             !connection ||
-            !remoteNeed ||
-            !ownedNeed ||
-            processUtils.isNeedLoading(process, ownedNeed.get("uri")) ||
-            processUtils.isNeedLoading(process, remoteNeedUri) ||
+            !targetAtom ||
+            !ownedAtom ||
+            processUtils.isAtomLoading(process, ownedAtom.get("uri")) ||
+            processUtils.isAtomLoading(process, targetAtomUri) ||
             processUtils.isConnectionLoading(process, connectionUri),
+          isConnectionLoading: processUtils.isConnectionLoading(
+            process,
+            connectionUri
+          ),
         };
       };
 
@@ -261,7 +260,7 @@ function genComponentConf() {
 
       classOnComponentRoot(
         "won-is-loading",
-        () => this.connectionOrNeedsLoading,
+        () => this.connectionOrAtomsLoading,
         this
       );
     }
@@ -272,6 +271,7 @@ function genComponentConf() {
         const INITIAL_MESSAGECOUNT = 15;
         if (
           this.connection &&
+          !this.isConnectionLoading &&
           !this.isProcessingLoadingMessages &&
           this.connection.get("messages").size < INITIAL_MESSAGECOUNT &&
           this.hasConnectionMessagesToLoad
@@ -287,7 +287,11 @@ function genComponentConf() {
     loadPreviousMessages() {
       delay(0).then(() => {
         const MORE_MESSAGECOUNT = 5;
-        if (this.connection && !this.isProcessingLoadingMessages) {
+        if (
+          this.connection &&
+          !this.isProcessingLoadingMessages &&
+          !this.isConnectionLoading
+        ) {
           this.connections__showMoreMessages(
             this.connection.get("uri"),
             MORE_MESSAGECOUNT
@@ -354,12 +358,12 @@ function genComponentConf() {
     }
 
     addMessageToState(eventUri, key) {
-      const ownedNeedUri = this.ownedNeed.get("uri");
-      return fetchMessage(ownedNeedUri, eventUri).then(response => {
+      const ownedAtomUri = this.ownedAtom.get("uri");
+      return fetchMessage(ownedAtomUri, eventUri).then(response => {
         won.wonMessageFromJsonLd(response).then(msg => {
-          if (msg.isFromOwner() && msg.getReceiverNeed() === ownedNeedUri) {
-            /*if we find out that the receiverneed of the crawled event is actually our
-              need we will call the method again but this time with the correct eventUri
+          if (msg.isFromOwner() && msg.getRecipientAtom() === ownedAtomUri) {
+            /*if we find out that the recipientatom of the crawled event is actually our
+              atom we will call the method again but this time with the correct eventUri
             */
             this.addMessageToState(msg.getRemoteMessageUri(), key);
           } else {
@@ -377,25 +381,20 @@ function genComponentConf() {
     }
 
     sendRequest(message, persona) {
-      if (!this.connection || this.isOwnedNeedWhatsX) {
+      if (!this.connection) {
         this.router__stateGoResetParams("connections");
 
-        if (this.isOwnedNeedWhatsX) {
-          //Close the connection if there was a present connection for a whatsaround need
-          this.connections__close(this.connectionUri);
-        }
-
-        if (this.remoteNeedUri) {
-          this.connections__connectAdHoc(this.remoteNeedUri, message, persona);
+        if (this.targetAtomUri) {
+          this.connections__connectAdHoc(this.targetAtomUri, message, persona);
         }
 
         //this.router__stateGoCurrent({connectionUri: null, sendAdHocRequest: null});
       } else {
         this.connections__rate(this.connectionUri, won.WON.binaryRatingGood);
-        this.needs__connect(
-          this.ownedNeed.get("uri"),
+        this.atoms__connect(
+          this.ownedAtom.get("uri"),
           this.connectionUri,
-          this.remoteNeedUri,
+          this.targetAtomUri,
           message
         );
         this.router__stateGoCurrent({ connectionUri: this.connectionUri });

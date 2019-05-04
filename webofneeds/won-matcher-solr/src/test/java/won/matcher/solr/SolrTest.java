@@ -11,7 +11,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
-import won.matcher.service.common.event.NeedEvent;
+import won.matcher.service.common.event.AtomEvent;
 import won.matcher.service.common.spring.SpringExtension;
 import won.matcher.solr.actor.SolrMatcherActor;
 import won.matcher.solr.spring.MatcherSolrAppConfiguration;
@@ -22,25 +22,21 @@ import won.protocol.util.WonRdfUtils;
  */
 public class SolrTest {
     public static void main(String[] args) throws IOException, InterruptedException {
-
         // init basic Akka
-        AnnotationConfigApplicationContext ctx =
-                new AnnotationConfigApplicationContext(MatcherSolrAppConfiguration.class);
+        AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(
+                        MatcherSolrAppConfiguration.class);
         ActorSystem system = ctx.getBean(ActorSystem.class);
         ActorRef solrMatcherActor = system.actorOf(
-                SpringExtension.SpringExtProvider.get(system).props(SolrMatcherActor.class), "SolrMatcherActor");
-
-
-        NeedEvent ne1 = createNeedEvent("/needmodel/need1.trig");
-        NeedEvent ne2 = createNeedEvent("/needmodel/need2.trig");
-
+                        SpringExtension.SpringExtProvider.get(system).props(SolrMatcherActor.class),
+                        "SolrMatcherActor");
+        AtomEvent ne1 = createAtomEvent("/atommodel/atom1.trig");
+        AtomEvent ne2 = createAtomEvent("/atommodel/atom2.trig");
         solrMatcherActor.tell(ne1, null);
         Thread.sleep(5000);
         solrMatcherActor.tell(ne2, null);
     }
 
-    private static NeedEvent createNeedEvent(String path) throws IOException {
-
+    private static AtomEvent createAtomEvent(String path) throws IOException {
         InputStream is = null;
         Dataset dataset = null;
         try {
@@ -57,8 +53,7 @@ public class SolrTest {
             System.err.println(e);
             return null;
         }
-
-        String needUri = WonRdfUtils.NeedUtils.getNeedURI(dataset).toString();
-        return new NeedEvent(needUri, "no_uri", NeedEvent.TYPE.ACTIVE, System.currentTimeMillis(), dataset);
+        String atomUri = WonRdfUtils.AtomUtils.getAtomURI(dataset).toString();
+        return new AtomEvent(atomUri, "no_uri", AtomEvent.TYPE.ACTIVE, System.currentTimeMillis(), dataset);
     }
 }

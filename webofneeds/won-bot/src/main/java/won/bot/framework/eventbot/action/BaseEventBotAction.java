@@ -1,19 +1,13 @@
 /*
- * Copyright 2012  Research Studios Austria Forschungsges.m.b.H.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
+ * Copyright 2012 Research Studios Austria Forschungsges.m.b.H. Licensed under
+ * the Apache License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at http://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable
+ * law or agreed to in writing, software distributed under the License is
+ * distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the specific language
+ * governing permissions and limitations under the License.
  */
-
 package won.bot.framework.eventbot.action;
 
 import java.util.Objects;
@@ -32,49 +26,41 @@ import won.bot.framework.eventbot.listener.EventListener;
 /**
  *
  */
-public abstract class BaseEventBotAction implements won.bot.framework.eventbot.action.EventBotAction
-{
-  protected final Logger logger = LoggerFactory.getLogger(getClass());
-  private EventListenerContext eventListenerContext;
-  private static final String EXCEPTION_TAG = "failed";
-  private final String stopwatchName = getClass().getName();
+public abstract class BaseEventBotAction implements won.bot.framework.eventbot.action.EventBotAction {
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
+    private EventListenerContext eventListenerContext;
+    private static final String EXCEPTION_TAG = "failed";
+    private final String stopwatchName = getClass().getName();
 
-  protected BaseEventBotAction(final EventListenerContext eventListenerContext)
-  {
-    Objects.requireNonNull(eventListenerContext);
-    this.eventListenerContext = eventListenerContext;
-  }
+    protected BaseEventBotAction(final EventListenerContext eventListenerContext) {
+        Objects.requireNonNull(eventListenerContext);
+        this.eventListenerContext = eventListenerContext;
+    }
 
-  @Override
-  public Runnable getActionTask(final Event event, final EventListener eventListener) {
-    return new Runnable(){
-      public void run()
-      {
-        Stopwatch stopwatch = SimonManager.getStopwatch(stopwatchName);
-        Split split = stopwatch.start();
-        try {
-          doRun(event, eventListener);
-          split.stop();
-        } catch (Exception e) {
-          eventListenerContext.getEventBus().publish(new ErrorEvent(e));
-          split.stop(EXCEPTION_TAG);
-        } catch (Throwable t) {
-          logger.warn("could not run action {}", stopwatchName, t);
-          split.stop(EXCEPTION_TAG);
-          throw t;
-        }
-      }
-    };
-  }
+    @Override
+    public Runnable getActionTask(final Event event, final EventListener eventListener) {
+        return new Runnable() {
+            public void run() {
+                Stopwatch stopwatch = SimonManager.getStopwatch(stopwatchName);
+                Split split = stopwatch.start();
+                try {
+                    doRun(event, eventListener);
+                    split.stop();
+                } catch (Exception e) {
+                    eventListenerContext.getEventBus().publish(new ErrorEvent(e));
+                    split.stop(EXCEPTION_TAG);
+                } catch (Throwable t) {
+                    logger.warn("could not run action {}", stopwatchName, t);
+                    split.stop(EXCEPTION_TAG);
+                    throw t;
+                }
+            }
+        };
+    }
 
+    protected EventListenerContext getEventListenerContext() {
+        return eventListenerContext;
+    }
 
-
-  protected EventListenerContext getEventListenerContext()
-  {
-    return eventListenerContext;
-  }
-
-  protected abstract void doRun(Event event, EventListener executingListener) throws Exception;
-
-
+    protected abstract void doRun(Event event, EventListener executingListener) throws Exception;
 }

@@ -5,7 +5,7 @@ import Immutable from "immutable";
 import { connect2Redux } from "../../won-utils.js";
 import { attach, getIn } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
-import { getOwnedNeedByConnectionUri } from "../../selectors/general-selectors.js";
+import { getOwnedAtomByConnectionUri } from "../../selectors/general-selectors.js";
 import {
   isMessageProposable,
   isMessageClaimable,
@@ -93,18 +93,18 @@ function genComponentConf() {
       this.clicked = false;
 
       const selectFromState = state => {
-        const ownedNeed =
+        const ownedAtom =
           this.connectionUri &&
-          getOwnedNeedByConnectionUri(state, this.connectionUri);
+          getOwnedAtomByConnectionUri(state, this.connectionUri);
         const connection =
-          ownedNeed && ownedNeed.getIn(["connections", this.connectionUri]);
+          ownedAtom && ownedAtom.getIn(["connections", this.connectionUri]);
         const message =
           connection && this.messageUri
             ? getIn(connection, ["messages", this.messageUri])
             : Immutable.Map();
 
         return {
-          ownedNeed,
+          ownedAtom,
           message,
           multiSelectType: connection && connection.get("multiSelectType"),
           isProposed: isMessageProposed(message),

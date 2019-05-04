@@ -8,13 +8,10 @@ import uk.ac.imperial.pipe.animation.PetriNetAnimator;
 import uk.ac.imperial.pipe.models.petrinet.PetriNet;
 
 public class PetriNetState {
-
     // the petri net
     private PetriNet petriNet;
-
     // the animator (allowing us to change the pn's state)
     private PetriNetAnimator petriNetAnimator;
-
     // The URI chosen by one of the participants for this petri net
     private URI petriNetURI;
 
@@ -31,7 +28,7 @@ public class PetriNetState {
      */
     public Set<URI> getMarkedPlaces() {
         return petriNet.getPlaces().stream().filter(place -> place.getNumberOfTokensStored() > 0)
-                .map(place -> URI.create(place.getId())).collect(Collectors.toSet());
+                        .map(place -> URI.create(place.getId())).collect(Collectors.toSet());
     }
 
     /**
@@ -40,14 +37,12 @@ public class PetriNetState {
      */
     public Set<URI> getEnabledTransitions() {
         return petriNetAnimator.getEnabledTransitions().stream().map(t -> URI.create(t.getId()))
-                .collect(Collectors.toSet());
+                        .collect(Collectors.toSet());
     }
-    
+
     public void fireTransition(URI transitionURI) {
-        petriNetAnimator.getEnabledTransitions()
-             .stream()
-             .filter(t -> transitionURI.toString().equals(t.getId()))
-             .forEach(petriNetAnimator::fireTransition);
+        petriNetAnimator.getEnabledTransitions().stream().filter(t -> transitionURI.toString().equals(t.getId()))
+                        .forEach(petriNetAnimator::fireTransition);
     }
 
     public Set<URI> getPlaces() {
@@ -57,9 +52,8 @@ public class PetriNetState {
     public Set<URI> getTransitions() {
         return petriNet.getTransitions().stream().map(p -> URI.create(p.getId())).collect(Collectors.toSet());
     }
-    
+
     public URI getPetriNetURI() {
         return petriNetURI;
     }
-
 }

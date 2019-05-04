@@ -5,7 +5,7 @@ import { connect2Redux } from "../../won-utils.js";
 import * as useCaseUtils from "../../usecase-utils.js";
 import { attach, getIn, get } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
-import { getOwnedNeedByConnectionUri } from "../../selectors/general-selectors.js";
+import { getOwnedAtomByConnectionUri } from "../../selectors/general-selectors.js";
 import "angular-marked";
 
 import "style/_message-content.scss";
@@ -15,7 +15,7 @@ const serviceDependencies = ["$ngRedux", "$scope"];
 
 function genComponentConf() {
   let template = `
-      <div class="msg__text" ng-if="self.message && self.text" marked="self.text"></div>
+      <div class="msg__text markdown" ng-if="self.message && self.text" marked="self.text"></div>
       <div class="msg__content"
         ng-repeat="detail in self.allDetails"
         ng-if="self.message && detail.identifier && detail.viewerComponent && self.getDetailContent(detail.identifier)"
@@ -37,16 +37,16 @@ function genComponentConf() {
         "«This message couldn't be displayed as it didn't contain," +
         "any parsable content! " +
         'Click on the "Show raw RDF data"-button in ' +
-        'the main-menu on the right side of the navigationbar to see the "raw" message-data.»';
+        'the footer of the page to see the "raw" message-data.»';
 
       this.allDetails = useCaseUtils.getAllDetails();
 
       const selectFromState = state => {
-        const ownedNeed =
+        const ownedAtom =
           this.connectionUri &&
-          getOwnedNeedByConnectionUri(state, this.connectionUri);
+          getOwnedAtomByConnectionUri(state, this.connectionUri);
         const connection =
-          ownedNeed && ownedNeed.getIn(["connections", this.connectionUri]);
+          ownedAtom && ownedAtom.getIn(["connections", this.connectionUri]);
         const message =
           connection &&
           this.messageUri &&

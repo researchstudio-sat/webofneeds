@@ -1,0 +1,60 @@
+##################################################################
+#           OWNER APP SENDS CONNECT TO THE WON NODE
+##################################################################
+
+# URL of the document http://www.example.com/resource/atom/100/v1/connection/76634/event/88766/core
+
+@prefix :               <http://www.example.com/resource/atom/100/> .
+@prefix remote:         <http://www.remote-example.com/resource/atom/200/> .
+@prefix owner:          <http://www.example.com/resource/owner/> .
+@prefix remoteOwner:    <http://www.remote-example.com/resource/owner/> .
+@prefix rdfs:           <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix geo:            <http://www.w3.org/2003/01/geo/wgs84_pos#> .
+@prefix xsd:            <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdf:            <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix cert            <http://www.w3.org/ns/auth/cert#> .
+@prefix tio:            <http://purl.org/tio/ns#> .
+@prefix won:            <https://w3id.org/won/core#> .
+@prefix crypt:          <https://w3id.org/won/cryptography#> .
+
+##################################################################
+#                     EVENT GRAPH
+##################################################################
+
+
+GRAPH :v1/connection/76634/event/88766/core#data {
+
+    :v1/connection/76634 rdfs:member :v1/connection/76634/event/88766
+    :v1/connection/76634/event/88766
+        a won:Connect
+        won:hasAdditionalInformation "Interesting information" ;
+        won:refersToLocalAtom :v1/core ;
+        won:refersToTargetAtom remote:v4/core
+        .
+
+    :v1/core#data crypt:signature [
+          rdf:type crypt:WonSignature ;
+          crypt:signer owner:anon_randomNumber ;
+          crypt:created "2013-09-252T10:49:54.050+0000" ;
+          crypt:ecdsa_r "d84b41f7e60d0221008552305aee078db8b5a1c75556c4b452a2cc40"^^xsd:hexBinary ;
+          crypt:ecdsa_s "375b013732a76aa2ab961e9ced750f2a23a34e5b6d84b41f7e60d022"^^xsd:hexBinary .
+          ] .
+
+    remote:v4/core#data crypt:signature [
+          rdf:type crypt:WonSignature ;
+          crypt:signer remoteOwner:anon_randomNumber ;
+          crypt:created "2013-09-252T10:49:54.050+0000" ;
+          crypt:ecdsa_r "d84b41f7e60d0221008552305aee078db8b5a1c75556c4b452a2cc40"^^xsd:hexBinary ;
+          crypt:ecdsa_s "375b013732a76aa2ab961e9ced750f2a23a34e5b6d84b41f7e60d022"^^xsd:hexBinary .
+          ] .
+}
+
+# signature of the event:
+:v1/connection/76634/event/88766/core#data crypt:signature [
+      rdf:type crypt:WonSignature ;
+      crypt:signer owner:anon_randomNumber ;
+      crypt:created "2013-09-252T10:49:54.050+0000" ;
+      crypt:ecdsa_r "d84b41f7e60d0221008552305aee078db8b5a1c75556c4b452a2cc40"^^xsd:hexBinary ;
+      crypt:ecdsa_s "375b013732a76aa2ab961e9ced750f2a23a34e5b6d84b41f7e60d022"^^xsd:hexBinary .
+      ] .
+

@@ -1,0 +1,64 @@
+@prefix :    <http://www.example.com/resource/atom/temp> .
+@prefix dc:  <http://purl.org/dc/elements/1.1/> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix geo:     <http://www.w3.org/2003/01/geo/wgs84_pos#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix won:     <https://w3id.org/won/core#> .
+@prefix gr:  <http://purl.org/goodrelations/v1#> .
+@prefix ldp:     <http://www.w3.org/ns/ldp#> .
+@prefix sp:  <http://spinrdf.org/sp#>.
+@prefix acco: <http://purl.org/acco/ns#>.
+@prefix tio:        <http://purl.org/tio/ns#> .
+@prefix sig:     <http://www.example.com/signature#> .
+
+# owner-specified content (permanent):
+:#OWN1 {
+  _:wonatom won:Atom ;
+              won:hasBasicAtomType
+                  won:Supply ;
+              won:content
+                  [ a   won:AtomContent ;
+                    won:contentDescription
+                    [ a tio:Taxi, gr:SomeItems ;
+                          gr:name "Fastest taxi in town"@en ;
+                          gr:description "Wherever you want to go, we'll take you there"@en ;
+                          # Link to the hotel and its features
+                          # tio:operatedBy foo:myCompany; #TODO: how do we want to link to other entities (maybe shared by a number of atoms, like the company here)
+                          # tio:operatedBy foo:myDriver;
+                          # Price of taxi is actually not that simple to define..
+                    ]
+                  ] .
+}
+
+# signature of the permanent part of data:
+:#OWN1 sig:signature [
+      rdf:type sig:WonSignature ;
+      sig:creator <http://example.com/webid#key-5>;
+      sig:created
+              "2013-10-252T10:49:54.050+0000";
+"KlMzNGVkMzVmMmQ3ODIyOWM32MzQzNmExMgoYzI4ZDY3NjI4NTIyZTk=" . ] .
+
+
+# owner-specified content (transient):
+:#OWN2 {
+  _:wonatom won:atomModality
+      [ a   won:AtomModality
+         won:locationSpecification  [
+         a geo:Point ;
+         geo:latitude   "48.2187304" ;
+         geo:longitude  "16.3602146"
+         ]
+      ] .
+}
+# signature of the transient part of data:
+:#OWN2 sig:signature [
+      rdf:type sig:WonSignature ;
+      sig:creator <http://example.com/webid#key-5>;
+      sig:created
+              "2013-09-252T10:49:54.050+0000";
+"OGQzNGVkMzVmMmQ3ODIyOWM32MzQzNmExMgoYzI4ZDY3NjI4NTIyZTk=" . ] .
+
+# TODO does everything have to be repeated? E.g. :#OWNER-WEBID? #VERSIONING? probably yes, because of versioning...
+
+

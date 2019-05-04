@@ -1,0 +1,79 @@
+##################################################################
+#   ATOM CREATION - MESSAGE FROM OWNER APPLICATION TO WON NODE   #
+##################################################################
+
+@prefix :       <http://www.example.com/resource/atom/> .
+@prefix webID:  <http://www.example.com/webids/> .
+
+@prefix won:    <https://w3id.org/won/core#> .
+@prefix crypt:  <https://w3id.org/won/cryptography#> .
+@prefix msg:    <https://w3id.org/won/message#> .
+
+@prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix tio:    <http://purl.org/tio/ns#> .
+@prefix gr:     <http://purl.org/goodrelations/v1#> .
+
+
+############# CONTENT ##############
+
+GRAPH :[randomAtomID_1]/core#data {
+
+    :[randomAtomID_1]
+        a won:Atom ;
+        won:hasBasicAtomType
+            won:Supply ;
+        won:content
+            # see issue https://github.com/researchstudio-sat/webofneeds/issues/42
+            [
+                a tio:Taxi .
+            ] .
+}
+
+GRAPH :[randomAtomID_1]/transient#data {
+
+    :[randomAtomID_1]
+        won:content
+            [
+                gr:condition "Has been vacuumed three days ago!" .
+            ]
+}
+
+
+############# MESSAGE HEADER ##############
+
+_:message msg:containsMessage :[randomAtomID_1]/event/0
+
+GRAPH :[randomAtomID_1]/event/0#data {
+
+    :[randomAtomID_1]/event/0
+        a msg:CreateMessage ;
+
+        msg:content :[randomAtomID_1]/core ;
+        msg:content :[randomAtomID_1]/transient .
+
+    :[randomAtomID_1]/core#data
+        crypt:hasSignature [
+            a crypt:WonSignature ;
+            crypt:signer webID:owner_1 .
+            # signature data ...
+        ]
+
+    :[randomAtomID_1]/transient#data
+        crypt:hasSignature [
+            a crypt:WonSignature ;
+            crypt:signer webID:owner_1 .
+            # signature data ...
+        ]
+}
+
+
+############# MESSAGE SIGNATURE ##############
+
+:[randomAtomID_1]/event/0#data
+    crypt:hasSignature [
+        a crypt:WonSignature ;
+        crypt:signer webID:owner_1 .
+        # signature data ...
+    ]
+
+

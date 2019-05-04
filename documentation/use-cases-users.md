@@ -3,10 +3,10 @@ Here are some use cases from the perspective of a normal user who uses the origi
 web of needs system.
 #### Use Case 1: Finding a mate for playing table-football
 You are planning to play table-football with two colleagues this afternoon.
-Since four players are needed for playing table-football, you post your ‘need’ for another mate on web of needs,
+Since four players are needed for playing table-football, you post your ‘atom’ for another mate on web of needs,
 you need to find another mate.
-If someone else has posted (or posts) a ‘need’ that ‘matches’ your ‘need
-of doing something together’, you will be notified by the web of need.
+If someone else has posted (or posts) an ‘atom’ that ‘matches’ your ‘atom
+of doing something together’, you will be notified by the web of needs.
 Then, you can request the other person to start a chat to set up your
 table-football event. Have fun! ;)
 

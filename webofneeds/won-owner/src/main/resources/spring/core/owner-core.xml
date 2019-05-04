@@ -17,13 +17,13 @@
 
 	<bean id="uriService" class="won.owner.service.impl.URIService">
 		<property name="ownerProtocolOwnerServiceEndpointURI" value="${uri.owner.protocol.endpoint}" />
-		<property name="defaultOwnerProtocolNeedServiceEndpointURI"
-			value="${uri.need.protocol.endpoint.default}" />
+		<property name="defaultOwnerProtocolAtomServiceEndpointURI"
+			value="${uri.atom.protocol.endpoint.default}" />
 		<property name="ownerProtocolOwnerURI" value="${uri.prefix.owner}" />
 	</bean>
 
     <!-- Model Mapper for RDF -->
-	<bean id="needModelMapper" class="won.protocol.model.NeedModelMapper" />
+	<bean id="atomModelMapper" class="won.protocol.model.AtomModelMapper" />
 	<bean id="connectionModelMapper" class="won.protocol.model.ConnectionModelMapper" />
 
 	<bean id="executor"

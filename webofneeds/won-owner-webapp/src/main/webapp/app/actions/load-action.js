@@ -7,12 +7,12 @@ import { actionTypes, actionCreators } from "./actions.js";
 
 import { checkAccessToCurrentRoute } from "../configRouting.js";
 
-import { checkLoginStatus } from "../won-utils.js";
-
-import { fetchOwnedData } from "../won-message-utils.js";
+import * as wonUtils from "../won-utils.js";
+import * as wonMessageUtils from "../won-message-utils.js";
 
 export const pageLoadAction = () => (dispatch, getState) => {
-  checkLoginStatus()
+  wonUtils
+    .checkLoginStatus()
     /* handle data, dispatch actions */
     .then(data =>
       dispatch({
@@ -31,9 +31,31 @@ export const pageLoadAction = () => (dispatch, getState) => {
 function loadingWhileSignedIn(dispatch) {
   // reset websocket to make sure it's using the logged-in session
   dispatch(actionCreators.reconnect__start());
-  return fetchOwnedData(dispatch);
+  return wonMessageUtils.fetchOwnedData(dispatch);
 }
 
+export const fetchWhatsNew = modifiedAfterDate => (dispatch, getState) => {
+  dispatch({
+    type: actionTypes.atoms.fetchWhatsNew,
+  });
+  return wonMessageUtils.fetchWhatsNew(dispatch, getState, modifiedAfterDate);
+};
+
+export const fetchWhatsAround = (modifiedAfterDate, location, maxDistance) => (
+  dispatch,
+  getState
+) => {
+  dispatch({
+    type: actionTypes.atoms.fetchWhatsAround,
+  });
+  return wonMessageUtils.fetchWhatsAround(
+    dispatch,
+    getState,
+    modifiedAfterDate,
+    location,
+    maxDistance
+  );
+};
 /*
  Simply prints a logline and resolves the promise so we can go on in the chain
 */

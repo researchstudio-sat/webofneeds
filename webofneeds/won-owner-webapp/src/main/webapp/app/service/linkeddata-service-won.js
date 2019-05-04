@@ -65,7 +65,7 @@ import won from "./won.js";
    *         * requesterWebId: the WebID used to access the ressource (used
    *                 by the owner-server to pick the right key-pair)
    *         * deep: 'true' to automatically resolve containers (e.g.
-   *                 the event-container)
+   *                 the message-container)
    *         * paging parameters as found
    *           [here](https://github.com/researchstudio-sat/webofneeds/blob/master/webofneeds/won-node-webapp/doc/linked-data-paging.md)
    * @returns {string}
@@ -102,7 +102,7 @@ import won from "./won.js";
   won.clearStore = function() {
     //create an rdfstore-js based store as a cache for rdf data.
     privateData.store = rdfstore.create();
-    privateData.store.setPrefix("msg", "http://purl.org/webofneeds/message#");
+    privateData.store.setPrefix("msg", "https://w3id.org/won/message#");
     privateData.store.setPrefix(
       "rdf",
       "http://www.w3.org/1999/02/22-rdf-syntax-ns#"
@@ -112,7 +112,7 @@ import won from "./won.js";
       "http://www.w3.org/2000/01/rdf-schema#"
     );
     privateData.store.setPrefix("xsd", "http://www.w3.org/2001/XMLSchema#");
-    privateData.store.setPrefix("won", "http://purl.org/webofneeds/model#");
+    privateData.store.setPrefix("won", "https://w3id.org/won/core#");
 
     window.store4dbg = privateData.store;
 
@@ -120,6 +120,11 @@ import won from "./won.js";
     privateData.cacheStatus = {}; //uri -> {timestamp, cacheItemState}
     privateData.documentToGraph = {}; // document-uri -> Set<uris of contained graphs>
   };
+
+  won.clearStoreWithPromise = async function() {
+    won.clearStore();
+  };
+
   /**
    * OK: fully fetched
    * DIRTY: has changed
@@ -313,21 +318,21 @@ import won from "./won.js";
 
   /**
    * Invalidates the appropriate linked data cache items (i.e. the set of connections
-   * associated with a need) such that all information about a
+   * associated with an atom) such that all information about a
    * newly created connection is loaded. Should be called when receiving hint or connect.
    *
    * Note that this causes an asynchronous call - the cache items may only be invalidated
    * after some delay.
    *
    * @param connectionUri - the uri of the new connection
-   * @param needUri - the uri of the need that now has a new connection
+   * @param atomUri - the uri of the atom that now has a new connection
    * @return a promise so the caller can chain promises after this one
    */
-  won.invalidateCacheForNewConnection = function(connectionUri, needUri) {
+  won.invalidateCacheForNewConnection = function(connectionUri, atomUri) {
     if (connectionUri) {
       cacheItemMarkDirty(connectionUri);
     }
-    return getConnectionContainerOfNeed(needUri).then(function(
+    return getConnectionContainerOfAtom(atomUri).then(function(
       connectionContainerUri
     ) {
       if (connectionContainerUri != null) {
@@ -351,15 +356,15 @@ import won from "./won.js";
       cacheItemMarkDirty(connectionUri);
     }
     return won.getNode(connectionUri).then(connection => {
-      if (connection.hasEventContainer) {
-        cacheItemMarkDirty(connection.hasEventContainer);
+      if (connection.messageContainer) {
+        cacheItemMarkDirty(connection.messageContainer);
       }
     });
   };
-  won.invalidateCacheForNeed = function(needUri) {
-    if (needUri != null) {
-      cacheItemMarkDirty(needUri);
-      cacheItemMarkDirty(needUri + "/connections");
+  won.invalidateCacheForAtom = function(atomUri) {
+    if (atomUri != null) {
+      cacheItemMarkDirty(atomUri);
+      cacheItemMarkDirty(atomUri + "/connections");
     }
     return Promise.resolve(true); //return a promise for chaining
   };
@@ -409,7 +414,7 @@ import won from "./won.js";
   const rejectIfFailed = function(success, data, options) {
     const rejectionMessage = buildRejectionMessage(success, data, options);
     if (rejectionMessage) {
-      // observation: the error happens for #hasRemoteConnection property of suggested connection, but this
+      // observation: the error happens for #targetConnection property of suggested connection, but this
       // property is really not there (and should not be), so in that case it's not an error...
       return true;
     }
@@ -442,7 +447,7 @@ import won from "./won.js";
     if (errorMessage === null) {
       return "";
     } else {
-      // observation: the error happens for #hasRemoteConnection property of suggested connection, but this
+      // observation: the error happens for #targetConnection property of suggested connection, but this
       // property is really not there (and should not be), so in that case it's not an error...
       return options.message + " " + errorMessage;
     }
@@ -621,26 +626,26 @@ import won from "./won.js";
       const queryPromise = executeQueryOnRdfStore(
         tmpstore,
         `
-                prefix won: <http://purl.org/webofneeds/model#>
-                prefix msg: <http://purl.org/webofneeds/message#>
+                prefix won: <https://w3id.org/won/core#>
+                prefix msg: <https://w3id.org/won/message#>
                 prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
                 prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
                 select distinct ?s where {
-                    { ?s rdf:type won:Need } union
-                    { ?s won:hasConnections ?o } union
+                    { ?s rdf:type won:Atom } union
+                    { ?s won:connections ?o } union
 
                     { ?s rdf:type won:Connection } union
-                    { ?s won:hasEventContainer ?o } union
+                    { ?s won:messageContainer ?o } union
 
                     { ?s rdfs:member ?o } union
-                    { ?s rdf:type won:EventContainer } union
+                    { ?s rdf:type won:MessageContainer } union
 
                     { ?s rdf:type msg:FromOwner } union
                     { ?s rdf:type msg:FromSystem } union
                     { ?s rdf:type msg:FromExternal } union
-                    { ?s msg:hasMessageType ?o } union
-                    { ?s won:hasCorrespondingRemoteMessage ?o } union
-                    { ?s won:hasReceiver ?o }.
+                    { ?s msg:messageType ?o } union
+                    { ?s won:correspondingRemoteMessage ?o } union
+                    { ?s won:recipient ?o }.
                 }`
       );
 
@@ -684,13 +689,13 @@ import won from "./won.js";
             tmpstore,
             `
                           prefix event: <${baseUriForEvents}>
-                          prefix msg: <http://purl.org/webofneeds/message#>
+                          prefix msg: <https://w3id.org/won/message#>
 
                           select distinct ?graphOfMessage where {
-                              { <${messageUri}> msg:hasCorrespondingRemoteMessage ?graphOfMessage } union
-                              { ?graphOfMessage msg:hasCorrespondingRemoteMessage <${messageUri}> } union
-                              { <${messageUri}> msg:hasForwardedMessage ?graphOfMessage } union
-                              { <${messageUri}> msg:hasForwardedMessage/msg:hasCorrespondingRemoteMessage ?graphOfMessage }
+                              { <${messageUri}> msg:correspondingRemoteMessage ?graphOfMessage } union
+                              { ?graphOfMessage msg:correspondingRemoteMessage <${messageUri}> } union
+                              { <${messageUri}> msg:forwardedMessage ?graphOfMessage } union
+                              { <${messageUri}> msg:forwardedMessage/msg:correspondingRemoteMessage ?graphOfMessage }
                           }
                           `
           );
@@ -764,12 +769,16 @@ import won from "./won.js";
     })
       .then(response => {
         if (response.status === 200) return response;
-        else
-          throw new Error(
+        else {
+          let error = new Error(
             `${response.status} - ${
               response.statusText
             } for request ${uri}, ${JSON.stringify(params)}`
           );
+
+          error.response = response;
+          throw error;
+        }
       })
       .then(dataset => dataset.json())
       .then(
@@ -854,7 +863,7 @@ import won from "./won.js";
         //TODO hack; looking at uri
         console.error(
           "Adding a dataset loaded with `deep=true` " +
-            "that isn't an event-container. The cache will " +
+            "that isn't a message-container. The cache will " +
             "be faulty and deletion won't work properly. Uri: ",
           documentUri
         );
@@ -927,51 +936,51 @@ import won from "./won.js";
   }
 
   /**
-   * Loads the need-data without following up
+   * Loads the atom-data without following up
    * with a request for the connection-container
    * to get the connection-uris. Thus it's faster.
    */
-  won.getNeed = needUri =>
+  won.getAtom = atomUri =>
     won
-      .ensureLoaded(needUri)
+      .ensureLoaded(atomUri)
       .then(
         () =>
           new Promise(resolve =>
-            privateData.store.graph(needUri, (a, b) => resolve(b))
+            privateData.store.graph(atomUri, (a, b) => resolve(b))
           )
       )
-      .then(needGraph =>
-        triples2framedJson(needUri, needGraph.triples, {
+      .then(atomGraph =>
+        triples2framedJson(atomUri, atomGraph.triples, {
           /* frame */
-          "@id": needUri, // start the framing from this uri. Otherwise will generate all possible nesting-variants.
+          "@id": atomUri, // start the framing from this uri. Otherwise will generate all possible nesting-variants.
           "@context": won.defaultContext,
         })
       )
-      .then(needJsonLd => {
-        // usually the need-data will be in a single object in the '@graph' array.
+      .then(atomJsonLd => {
+        // usually the atom-data will be in a single object in the '@graph' array.
         // We can flatten this and still have valid json-ld
-        const flattenedNeedJsonLd = getIn(needJsonLd, ["@graph", 0])
-          ? getIn(needJsonLd, ["@graph", 0])
-          : needJsonLd;
-        flattenedNeedJsonLd["@context"] = needJsonLd["@context"]; // keep context
+        const flattenedAtomJsonLd = getIn(atomJsonLd, ["@graph", 0])
+          ? getIn(atomJsonLd, ["@graph", 0])
+          : atomJsonLd;
+        flattenedAtomJsonLd["@context"] = atomJsonLd["@context"]; // keep context
 
         if (
-          !flattenedNeedJsonLd ||
-          getIn(flattenedNeedJsonLd, ["@graph", "length"]) === 0
+          !flattenedAtomJsonLd ||
+          getIn(flattenedAtomJsonLd, ["@graph", "length"]) === 0
         ) {
           console.error(
             "Received empty graph ",
-            needJsonLd,
-            " for need ",
-            needUri
+            atomJsonLd,
+            " for atom ",
+            atomUri
           );
-          return { "@context": flattenedNeedJsonLd["@context"] };
+          return { "@context": flattenedAtomJsonLd["@context"] };
         }
 
-        return flattenedNeedJsonLd;
+        return flattenedAtomJsonLd;
       });
 
-  function triples2framedJson(needUri, triples, frame) {
+  function triples2framedJson(atomUri, triples, frame) {
     const jsonldjsQuads = {
       // everything in our rdfstore is in the default-graph atm
       "@default": triples.map(triple => ({
@@ -999,7 +1008,7 @@ import won from "./won.js";
         return framed;
       })
       .catch(err => {
-        console.error("Failed to frame need-data.", needUri, err);
+        console.error("Failed to frame atom-data.", atomUri, err);
         throw err;
       });
 
@@ -1073,46 +1082,46 @@ import won from "./won.js";
     return triples.map(tripleToString).join("\n");
   }
 
-  won.getEnvelopeDataForNeed = function(needUri, nodeUri) {
-    if (typeof needUri === "undefined" || needUri == null) {
-      throw { message: "getEnvelopeDataForNeed: needUri must not be null" };
+  won.getEnvelopeDataForAtom = function(atomUri, nodeUri) {
+    if (typeof atomUri === "undefined" || atomUri == null) {
+      throw { message: "getEnvelopeDataForAtom: atomUri must not be null" };
     }
 
     let ret = {};
-    ret[won.WONMSG.hasSenderNeed] = needUri;
-    ret[won.WONMSG.hasReceiverNeed] = needUri;
+    ret[won.WONMSG.senderAtom] = atomUri;
+    ret[won.WONMSG.recipientAtom] = atomUri;
 
     if (!(typeof nodeUri === "undefined" || nodeUri == null)) {
-      ret[won.WONMSG.hasSenderNode] = nodeUri;
-      ret[won.WONMSG.hasReceiverNode] = nodeUri;
+      ret[won.WONMSG.senderNode] = nodeUri;
+      ret[won.WONMSG.recipientNode] = nodeUri;
     }
 
     return Promise.resolve(ret);
   };
 
   won.getEnvelopeDataforNewConnection = function(
-    ownedNeedUri,
-    theirNeedUri,
+    ownedAtomUri,
+    theirAtomUri,
     ownNodeUri,
     theirNodeUri
   ) {
-    if (!ownedNeedUri) {
+    if (!ownedAtomUri) {
       throw {
         message:
-          "getEnvelopeDataforNewConnection: ownedNeedUri must not be null",
+          "getEnvelopeDataforNewConnection: ownedAtomUri must not be null",
       };
     }
-    if (!theirNeedUri) {
+    if (!theirAtomUri) {
       throw {
         message:
-          "getEnvelopeDataforNewConnection: theirNeedUri must not be null",
+          "getEnvelopeDataforNewConnection: theirAtomUri must not be null",
       };
     }
     return {
-      [won.WONMSG.hasSenderNeed]: ownedNeedUri,
-      [won.WONMSG.hasSenderNode]: ownNodeUri,
-      [won.WONMSG.hasReceiverNeed]: theirNeedUri,
-      [won.WONMSG.hasReceiverNode]: theirNodeUri,
+      [won.WONMSG.senderAtom]: ownedAtomUri,
+      [won.WONMSG.senderNode]: ownNodeUri,
+      [won.WONMSG.recipientAtom]: theirAtomUri,
+      [won.WONMSG.recipientNode]: theirNodeUri,
     };
   };
 
@@ -1124,8 +1133,8 @@ import won from "./won.js";
    */
   won.getEnvelopeDataforConnection = async function(
     connectionUri,
-    ownedNeedUri,
-    theirNeedUri,
+    ownedAtomUri,
+    theirAtomUri,
     ownNodeUri,
     theirNodeUri,
     theirConnectionUri
@@ -1137,15 +1146,15 @@ import won from "./won.js";
     }
 
     const ret = {
-      [won.WONMSG.hasSender]: connectionUri,
-      [won.WONMSG.hasSenderNeed]: ownedNeedUri,
-      [won.WONMSG.hasSenderNode]: ownNodeUri,
-      [won.WONMSG.hasReceiverNeed]: theirNeedUri,
-      [won.WONMSG.hasReceiverNode]: theirNodeUri,
+      [won.WONMSG.sender]: connectionUri,
+      [won.WONMSG.senderAtom]: ownedAtomUri,
+      [won.WONMSG.senderNode]: ownNodeUri,
+      [won.WONMSG.recipientAtom]: theirAtomUri,
+      [won.WONMSG.recipientNode]: theirNodeUri,
     };
     try {
       if (theirConnectionUri) {
-        ret[won.WONMSG.hasReceiver] = theirConnectionUri;
+        ret[won.WONMSG.recipient] = theirConnectionUri;
       }
     } catch (err) {
       console.error("getEnvelopeDataforConnection: ", err.message, err.stack);
@@ -1153,57 +1162,48 @@ import won from "./won.js";
     return Promise.resolve(ret);
   };
 
-  /*
-     * Loads all URIs of a need's connections.
-     */
-  won.getConnectionUrisOfNeed = (
-    needUri,
-    requesterWebId,
-    includeClosed = false
-  ) => {
-    if (includeClosed) {
-      return won
-        .executeCrawlableQuery(
-          won.queries["getAllConnectionUrisOfNeed"],
-          needUri,
-          requesterWebId
-        )
-        .then(result => result.map(x => x.connectionUri.value));
-    } else {
-      return won
-        .executeCrawlableQuery(
-          won.queries["getUnclosedConnectionUrisOfActiveNeed"],
-          needUri,
-          requesterWebId
-        )
-        .then(result => result.map(x => x.connectionUri.value));
-    }
+  won.getConnectionUrisWithStateByAtomUri = (atomUri, requesterWebId) => {
+    return won
+      .executeCrawlableQuery(
+        won.queries["getAllConnectionUrisOfAtom"],
+        atomUri,
+        requesterWebId
+      )
+      .then(result =>
+        result.map(x => {
+          return {
+            connectionUri: x.connectionUri.value,
+            connectionState: x.connectionState.value,
+            socketType: x.socketType.value,
+          };
+        })
+      );
   };
 
   /**
    *
-   * @param needUri
+   * @param atomUri
    * @returns {*} the Uri of the connection container (read: set) of
-   *              connections for the given need
+   *              connections for the given atom
    */
-  function getConnectionContainerOfNeed(needUri) {
-    if (typeof needUri === "undefined" || needUri == null) {
-      throw { message: "getConnectionsUri: needUri must not be null" };
+  function getConnectionContainerOfAtom(atomUri) {
+    if (typeof atomUri === "undefined" || atomUri == null) {
+      throw { message: "getConnectionsUri: atomUri must not be null" };
     }
-    return won.ensureLoaded(needUri).then(function() {
-      const lock = getReadUpdateLockPerUri(needUri);
+    return won.ensureLoaded(atomUri).then(function() {
+      const lock = getReadUpdateLockPerUri(atomUri);
       return lock.acquireReadLock().then(function() {
         try {
-          const subject = needUri;
-          const predicate = won.WON.hasConnections;
+          const subject = atomUri;
+          const predicate = won.WON.connections;
           const result = {};
-          privateData.store.node(needUri, function(success, graph) {
+          privateData.store.node(atomUri, function(success, graph) {
             const resultGraph = graph.match(subject, predicate, null);
             if (
               !rejectIfFailed(success, resultGraph, {
                 allowMultiple: false,
                 allowNone: false,
-                message: "Failed to load connections uri of need " + needUri,
+                message: "Failed to load connections uri of atom " + atomUri,
               })
             ) {
               result.result = resultGraph.triples[0].object.nominalValue;
@@ -1212,8 +1212,8 @@ import won from "./won.js";
           return result.result;
         } catch (e) {
           rethrow(
-            "could not get connection URIs of need + " +
-              needUri +
+            "could not get connection URIs of atom + " +
+              atomUri +
               ". Reason:" +
               e,
             e
@@ -1246,18 +1246,18 @@ import won from "./won.js";
         .then(connection =>
           Promise.all([
             Promise.resolve(connection),
-            won.getNode(connection.hasEventContainer, fetchParams),
+            won.getNode(connection.messageContainer, fetchParams),
           ])
         )
-        .then(([connection, eventContainer]) => {
+        .then(([connection, messageContainer]) => {
           /*
                  * if there's only a single rdfs:member in the event
                  * container, getNode will not return an array, so we
                  * need to make sure it's one from here on out.
                  */
-          connection.hasEvents = is("Array", eventContainer.member)
-            ? eventContainer.member
-            : [eventContainer.member];
+          connection.hasEvents = is("Array", messageContainer.member)
+            ? messageContainer.member
+            : [messageContainer.member];
           return connection;
         })
     );
@@ -1414,7 +1414,7 @@ import won from "./won.js";
   };
 
   /**
-   * Deletes all triples belonging to that particular document (e.g. need, event, etc)
+   * Deletes all triples belonging to that particular document (e.g. atom, event, etc)
    * from all graphs.
    */
   won.deleteDocumentFromStore = function(documentUri, removeCacheItem = true) {
@@ -1671,9 +1671,9 @@ import won from "./won.js";
    */
   won.queries = {
     /**
-     * Despite the name, returns the connections fo the specified need themselves. TODO rename
+     * Despite the name, returns the connections fo the specified atom themselves. TODO rename
      */
-    getAllConnectionUrisOfNeed: {
+    getAllConnectionUrisOfAtom: {
       propertyPaths: [
         {
           prefixes:
@@ -1683,55 +1683,20 @@ import won from "./won.js";
             won.WON.baseUri +
             "> " +
             "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> ",
-          propertyPath: "won:hasConnections",
+          propertyPath: "won:connections",
         },
       ],
       query:
-        "prefix won: <http://purl.org/webofneeds/model#> \n" +
+        "prefix won: <https://w3id.org/won/core#> \n" +
         "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> \n" +
-        "select ?connectionUri \n" +
+        "select ?connectionUri ?connectionState ?socketType \n" +
         " where { \n" +
-        " <::baseUri::> a won:Need; \n" +
-        "           won:hasConnections ?connections.\n" +
+        " <::baseUri::> a won:Atom; \n" +
+        "           won:connections ?connections.\n" +
         "  ?connections rdfs:member ?connectionUri. \n" +
-        "} \n",
-    },
-    getUnclosedConnectionUrisOfActiveNeed: {
-      propertyPaths: [
-        {
-          prefixes:
-            "prefix " +
-            won.WON.prefix +
-            ": <" +
-            won.WON.baseUri +
-            "> " +
-            "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> ",
-          propertyPath: "won:hasConnections",
-          fragment: " filter exists {<::baseUri::> won:isInState won:Active} ",
-        },
-        {
-          prefixes:
-            "prefix " +
-            won.WON.prefix +
-            ": <" +
-            won.WON.baseUri +
-            "> " +
-            "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> ",
-          propertyPath: "won:hasConnections/rdfs:member",
-          fragment: " filter exists {<::baseUri::> won:isInState won:Active} ",
-        },
-      ],
-      query:
-        "prefix won: <http://purl.org/webofneeds/model#> \n" +
-        "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> \n" +
-        "select ?connectionUri \n" +
-        " where { \n" +
-        " <::baseUri::> a won:Need; \n" +
-        "           won:hasConnections ?connections; \n" +
-        "           won:isInState ?needState.\n " +
-        "  ?connections rdfs:member ?connectionUri. \n" +
-        "  ?connectionUri won:hasConnectionState ?connectionState. \n" +
-        "  filter ( ?connectionState != won:Closed && ?needState = won:Active) \n" +
+        "  ?connectionUri won:connectionState ?connectionState. \n" +
+        "  ?connectionUri won:socket ?socketUri. \n" +
+        "  ?socketUri won:socketDefinition ?socketType. \n" +
         "} \n",
     },
   };

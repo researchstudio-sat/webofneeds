@@ -3,11 +3,11 @@
  */
 import { actionTypes } from "../actions/actions.js";
 import Immutable from "immutable";
-import { getIn } from "../utils.js";
+import { get, getIn } from "../utils.js";
 
 const initialState = Immutable.fromJS({
   showRdf: false,
-  showClosedNeeds: false,
+  showClosedAtoms: false,
   showMainMenu: false,
   showAddMessageContent: false,
   selectedAddMessageContent: undefined,
@@ -22,16 +22,21 @@ const initialState = Immutable.fromJS({
     linkCopied: false,
   },
   showSlideIns: true,
-  needs: new Immutable.Map(),
+  atoms: new Immutable.Map(),
+  locationAccessDenied: false,
+  currentLocation: undefined,
 });
 
-const initialNeedState = Immutable.fromJS({
+const initialAtomState = Immutable.fromJS({
   showGeneralInfo: false,
   visibleTab: "DETAIL",
 });
 
 export default function(viewState = initialState, action = {}) {
   switch (action.type) {
+    case actionTypes.view.locationAccessDenied:
+      return viewState.set("locationAccessDenied", true);
+
     case actionTypes.lostConnection:
       return viewState.set("showSlideIns", true);
 
@@ -63,15 +68,18 @@ export default function(viewState = initialState, action = {}) {
       return viewState.set("showMainMenu", false);
     }
 
+    case actionTypes.view.updateCurrentLocation:
+      return viewState.set("currentLocation", action.payload.get("location"));
+
     case actionTypes.view.toggleRdf:
       return viewState
         .set("showRdf", !viewState.get("showRdf"))
         .set("showMainMenu", false);
 
-    case actionTypes.view.toggleClosedNeeds:
+    case actionTypes.view.toggleClosedAtoms:
       return viewState.set(
-        "showClosedNeeds",
-        !viewState.get("showClosedNeeds")
+        "showClosedAtoms",
+        !viewState.get("showClosedAtoms")
       );
 
     case actionTypes.view.toggleAddMessageContent:
@@ -93,6 +101,30 @@ export default function(viewState = initialState, action = {}) {
 
     case actionTypes.view.removeAddMessageContent:
       return viewState.set("selectedAddMessageContent", undefined);
+
+    case actionTypes.view.showTermsDialog: {
+      const payload = Immutable.fromJS(action.payload);
+
+      const acceptCallback = get(payload, "acceptCallback");
+      const cancelCallback = get(payload, "cancelCallback");
+
+      const termsDialog = Immutable.fromJS({
+        showTerms: true,
+        buttons: [
+          {
+            caption: "Yes, I accept ToS",
+            callback: acceptCallback,
+          },
+          {
+            caption: "No, cancel",
+            callback: cancelCallback,
+          },
+        ],
+      });
+      return viewState
+        .set("showModalDialog", true)
+        .set("modalDialog", termsDialog);
+    }
 
     case actionTypes.view.showModalDialog: {
       const modalDialog = Immutable.fromJS(action.payload);
@@ -140,14 +172,14 @@ export default function(viewState = initialState, action = {}) {
         .setIn(["anonymousSlideIn", "linkCopied"], true)
         .setIn(["anonymousSlideIn", "linkSent"], false);
 
-    case actionTypes.needs.selectTab: {
-      const needUri = action.payload.get("needUri");
+    case actionTypes.atoms.selectTab: {
+      const atomUri = action.payload.get("atomUri");
       const selectTab = action.payload.get("selectTab");
 
       return viewState.updateIn(
-        ["needs", needUri],
-        initialNeedState,
-        needState => needState.update("visibleTab", () => selectTab)
+        ["atoms", atomUri],
+        initialAtomState,
+        atomState => atomState.update("visibleTab", () => selectTab)
       );
     }
 

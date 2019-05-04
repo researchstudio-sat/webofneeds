@@ -73,7 +73,7 @@ services:
     depends_on:
       - gencert
 
-  # postgres need databases for wonnode
+  # postgres atom databases for wonnode
   postgres_node:
     restart: always
     image: webofneeds/postgres:live
@@ -117,7 +117,7 @@ services:
       - postgres_node
       - nginx
 
-  # postgres need databases for owner
+  # postgres atom databases for owner
   postgres_owner:
     restart: always
     image: webofneeds/postgres:live
@@ -193,7 +193,7 @@ services:
       - bigdata
       - wonnode
 
-  # solr server as a need index
+  # solr server as an atom index
   solr:
     restart: always
     build: ../../image/solr
@@ -257,7 +257,7 @@ services:
     volumes:
       - $base_folder/mongodb/data/db:/data/db
 
-  # debug bot used to test need communication, connect to wonnodes (proxied: node.matchat.org)
+  # debug bot used to test atom communication, connect to wonnodes (proxied: node.matchat.org)
   debug_bot:
     restart: always
     build: ../../image/bots

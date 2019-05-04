@@ -114,7 +114,7 @@ export const piwikMiddleware = () => next => action => {
       "messages.processConnectMessage",
       "connections.close",
     ],
-    Needs: ["drafts.publish", "needs.close", "needs.reopen"],
+    Atoms: ["drafts.publish", "atoms.close", "atoms.reopen"],
   };
 
   // check if action.type is in the whitelist

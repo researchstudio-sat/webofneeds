@@ -3,6 +3,7 @@
  */
 import { get, getIn } from "../utils.js";
 import * as viewUtils from "../view-utils.js";
+import * as accountUtils from "../account-utils.js";
 import { getVerificationTokenFromRoute } from "./general-selectors.js";
 
 /**
@@ -39,7 +40,7 @@ export function showAnonymousSlideInEmailInput(state) {
 }
 
 export function showSlideInAnonymousSuccess(state) {
-  const isAnonymous = getIn(state, ["account", "isAnonymous"]);
+  const isAnonymous = accountUtils.isAnonymous(get(state, "account"));
 
   return (
     !showSlideInConnectionLost(state) &&
@@ -49,7 +50,7 @@ export function showSlideInAnonymousSuccess(state) {
 }
 
 export function showSlideInAnonymous(state) {
-  const isAnonymous = getIn(state, ["account", "isAnonymous"]);
+  const isAnonymous = accountUtils.isAnonymous(get(state, "account"));
 
   return (
     !showSlideInConnectionLost(state) &&
@@ -60,17 +61,19 @@ export function showSlideInAnonymous(state) {
 }
 
 export function showSlideInDisclaimer(state) {
-  const isDisclaimerAccepted = getIn(state, ["account", "acceptedDisclaimer"]);
+  const isDisclaimerAccepted = accountUtils.isDisclaimerAccepted(
+    get(state, "account")
+  );
 
   return !showSlideInConnectionLost(state) && !isDisclaimerAccepted;
 }
 
 export function showSlideInTermsOfService(state) {
-  const isLoggedIn = getIn(state, ["account", "loggedIn"]);
-  const isTermsOfServiceAccepted = getIn(state, [
-    "account",
-    "acceptedTermsOfService",
-  ]);
+  const accountState = get(state, "account");
+  const isLoggedIn = accountUtils.isLoggedIn(accountState);
+  const isTermsOfServiceAccepted = accountUtils.isTermsOfServiceAccepted(
+    accountState
+  );
 
   return (
     isLoggedIn && !showSlideInConnectionLost(state) && !isTermsOfServiceAccepted
@@ -79,9 +82,10 @@ export function showSlideInTermsOfService(state) {
 
 export function showSlideInEmailVerification(state) {
   const verificationToken = getVerificationTokenFromRoute(state);
-  const isLoggedIn = getIn(state, ["account", "loggedIn"]);
-  const isAnonymous = getIn(state, ["account", "isAnonymous"]);
-  const isEmailVerified = getIn(state, ["account", "emailVerified"]);
+  const accountState = get(state, "account");
+  const isLoggedIn = accountUtils.isLoggedIn(accountState);
+  const isAnonymous = accountUtils.isAnonymous(accountState);
+  const isEmailVerified = accountUtils.isEmailVerified(accountState);
 
   return (
     !showSlideInConnectionLost(state) &&

@@ -24,46 +24,42 @@ import akka.event.LoggingAdapter;
 import akka.japi.Function;
 import scala.concurrent.duration.Duration;
 import won.matcher.service.common.event.BulkHintEvent;
-import won.matcher.service.common.event.BulkNeedEvent;
-import won.matcher.service.common.event.NeedEvent;
+import won.matcher.service.common.event.BulkAtomEvent;
+import won.matcher.service.common.event.AtomEvent;
 import won.matcher.solr.config.SolrMatcherConfig;
 import won.matcher.solr.hints.HintBuilder;
-import won.matcher.solr.index.NeedIndexer;
+import won.matcher.solr.index.AtomIndexer;
 import won.matcher.solr.query.DefaultMatcherQueryExecuter;
 import won.matcher.solr.query.SolrMatcherQueryExecutor;
 import won.matcher.solr.query.TestMatcherQueryExecutor;
 import won.matcher.solr.query.factory.BooleanQueryFactory;
 import won.matcher.solr.query.factory.CreationDateQueryFactory;
-import won.matcher.solr.query.factory.DefaultNeedQueryFactory;
+import won.matcher.solr.query.factory.DefaultAtomQueryFactory;
 import won.matcher.solr.query.factory.HasFlagQueryFactory;
 import won.matcher.solr.query.factory.MatchingContextQueryFactory;
-import won.matcher.solr.query.factory.NeedStateQueryFactory;
+import won.matcher.solr.query.factory.AtomStateQueryFactory;
 import won.matcher.solr.query.factory.WhatsAroundQueryFactory;
 import won.matcher.solr.query.factory.WhatsNewQueryFactory;
-import won.protocol.util.NeedModelWrapper;
+import won.protocol.util.AtomModelWrapper;
 import won.protocol.vocabulary.WON;
 
 /**
- * Siren/Solr based abstract matcher with all implementations for querying as well as indexing needs.
+ * Siren/Solr based abstract matcher with all implementations for querying as
+ * well as indexing atoms.
  */
 @Component
 @Scope("prototype")
 public class SolrMatcherActor extends UntypedActor {
     private LoggingAdapter log = Logging.getLogger(getContext().system(), this);
-
     @Autowired
     private SolrMatcherConfig config;
-
     @Autowired
     private HintBuilder hintBuilder;
-
     @Autowired
-    private NeedIndexer needIndexer;
-
+    private AtomIndexer atomIndexer;
     @Autowired
     @Qualifier("defaultMatcherQueryExecuter")
     DefaultMatcherQueryExecuter defaultQueryExecuter;
-
     @Autowired
     TestMatcherQueryExecutor testQueryExecuter;
 
@@ -72,23 +68,23 @@ public class SolrMatcherActor extends UntypedActor {
         String eventTypeForLogging = "unknown";
         Optional<String> uriForLogging = Optional.empty();
         try {
-            if (o instanceof NeedEvent) {
-                eventTypeForLogging = "NeedEvent";
-                NeedEvent needEvent = (NeedEvent) o;
-                uriForLogging = Optional.ofNullable(needEvent.getUri());
-                if (needEvent.getEventType().equals(NeedEvent.TYPE.ACTIVE)) {
-                    processActiveNeedEvent(needEvent);
-                } else if (needEvent.getEventType().equals(NeedEvent.TYPE.INACTIVE)) {
-                    processInactiveNeedEvent(needEvent);
+            if (o instanceof AtomEvent) {
+                eventTypeForLogging = "AtomEvent";
+                AtomEvent atomEvent = (AtomEvent) o;
+                uriForLogging = Optional.ofNullable(atomEvent.getUri());
+                if (atomEvent.getEventType().equals(AtomEvent.TYPE.ACTIVE)) {
+                    processActiveAtomEvent(atomEvent);
+                } else if (atomEvent.getEventType().equals(AtomEvent.TYPE.INACTIVE)) {
+                    processInactiveAtomEvent(atomEvent);
                 } else {
                     unhandled(o);
                 }
-            } else if (o instanceof BulkNeedEvent) {
-                eventTypeForLogging = "BulkNeedEvent";
-                log.info("received bulk need event, processing {} need events ...",
-                        ((BulkNeedEvent) o).getNeedEvents().size());
-                for (NeedEvent event : ((BulkNeedEvent) o).getNeedEvents()) {
-                    processActiveNeedEvent(event);
+            } else if (o instanceof BulkAtomEvent) {
+                eventTypeForLogging = "BulkAtomEvent";
+                log.info("received bulk atom event, processing {} atom events ...",
+                                ((BulkAtomEvent) o).getAtomEvents().size());
+                for (AtomEvent event : ((BulkAtomEvent) o).getAtomEvents()) {
+                    processActiveAtomEvent(event);
                 }
             } else {
                 eventTypeForLogging = "unhandled";
@@ -96,186 +92,193 @@ public class SolrMatcherActor extends UntypedActor {
             }
         } catch (Exception e) {
             log.info(String.format("Caught exception when processing %s event %s. More info on loglevel 'debug'",
-                    eventTypeForLogging, uriForLogging.orElse("[no uri available]")));
+                            eventTypeForLogging, uriForLogging.orElse("[no uri available]")));
             log.debug("caught exception", e);
         }
     }
 
-    protected void processInactiveNeedEvent(NeedEvent needEvent) throws IOException, JsonLdError {
-        log.info("Add inactive need event content {} to solr index", needEvent);
-        needIndexer.index(needEvent.deserializeNeedDataset());
+    protected void processInactiveAtomEvent(AtomEvent atomEvent) throws IOException, JsonLdError {
+        log.info("Add inactive atom event content {} to solr index", atomEvent);
+        atomIndexer.index(atomEvent.deserializeAtomDataset());
     }
 
-    protected void processActiveNeedEvent(NeedEvent needEvent)
-            throws IOException, SolrServerException, JsonLdError {
-
-        log.info("Start processing active need event {}", needEvent);
-
-        // check if the need has doNotMatch flag, then do not use it for querying or indexing
-        Dataset dataset = needEvent.deserializeNeedDataset();
-        NeedModelWrapper needModelWrapper = new NeedModelWrapper(dataset);
-        if (needModelWrapper.hasFlag(WON.NO_HINT_FOR_ME) && needModelWrapper.hasFlag(WON.NO_HINT_FOR_COUNTERPART)) {
-            log.info("Discarding received need due to flags won:NoHintForMe and won:NoHintForCounterpart: {}", needEvent);
+    protected void processActiveAtomEvent(AtomEvent atomEvent) throws IOException, SolrServerException, JsonLdError {
+        log.info("Start processing active atom event {}", atomEvent);
+        // check if the atom has doNotMatch flag, then do not use it for querying or
+        // indexing
+        Dataset dataset = atomEvent.deserializeAtomDataset();
+        AtomModelWrapper atomModelWrapper = new AtomModelWrapper(dataset);
+        if (atomModelWrapper.flag(WON.NoHintForMe) && atomModelWrapper.flag(WON.NoHintForCounterpart)) {
+            log.info("Discarding received atom due to flags won:NoHintForMe and won:NoHintForCounterpart: {}",
+                            atomEvent);
             return;
         }
-        
-        // check if need has a sparql query attached
-        if (needModelWrapper.hasQuery()) {
-            log.debug("Need {} has a sparql query, omitting this need in Solr matcher", needModelWrapper.getNeedUri());
+        // check if atom has a sparql query attached
+        if (atomModelWrapper.sparqlQuery()) {
+            log.debug("Atom {} has a sparql query, omitting this atom in Solr matcher", atomModelWrapper.getAtomUri());
             return;
-        }        
-
-        // check if need is usedForTesting only
-        boolean usedForTesting = needModelWrapper.hasFlag(WON.USED_FOR_TESTING);
+        }
+        // check if atom is usedForTesting only
+        boolean usedForTesting = atomModelWrapper.flag(WON.UsedForTesting);
         SolrMatcherQueryExecutor queryExecutor = (usedForTesting ? testQueryExecuter : defaultQueryExecuter);
-
-        // create another query depending if the current need is "WhatsAround" or a default need
+        // create another query depending if the current atom is "WhatsAround" or a
+        // default atom
         String queryString = null;
-        if (needModelWrapper.hasFlag(WON.WHATS_AROUND)) {
-            // WhatsAround doesnt match on terms only other needs in close location are boosted
+        if (atomModelWrapper.flag(WON.WhatsAround)) {
+            // WhatsAround doesnt match on terms only other atoms in close location are
+            // boosted
             WhatsAroundQueryFactory qf = new WhatsAroundQueryFactory(dataset);
             queryString = qf.createQuery();
-        } else if(needModelWrapper.hasFlag(WON.WHATS_NEW)){
+        } else if (atomModelWrapper.flag(WON.WhatsNew)) {
             WhatsNewQueryFactory qf = new WhatsNewQueryFactory(dataset);
             queryString = qf.createQuery();
-        }else {
-            // default query matches content terms (of fields title, description and tags) with different weights
-            // and gives an additional multiplicative boost for geographically closer needs
-            DefaultNeedQueryFactory qf = new DefaultNeedQueryFactory(dataset);
+        } else {
+            // default query matches content terms (of fields title, description and tags)
+            // with different weights
+            // and gives an additional multiplicative boost for geographically closer atoms
+            DefaultAtomQueryFactory qf = new DefaultAtomQueryFactory(dataset);
             queryString = qf.createQuery();
         }
-
         // add filters to the query: default filters are
-        // - need status active
+        // - atom status active
         // - creation date overlap 1 month
         // - OR-filtering for matching contexts if any were specified
-
-        // now create three slightly different queries for different lists of needs:
-        // 1) needs without NoHintForCounterpart => hints for current need
-        // 2) needs without NoHintForSelf, excluding WhatsAround needs => hints for needs in index that are not WhatsAround
-        // 3) needs without NoHintForSelf that are only WhatsAround needs => hints for needs in index that are WhatsAround
+        // now create three slightly different queries for different lists of atoms:
+        // 1) atoms without NoHintForCounterpart => hints for current atom
+        // 2) atoms without NoHintForSelf, excluding WhatsAround atoms => hints for
+        // atoms in index that are not WhatsAround
+        // 3) atoms without NoHintForSelf that are only WhatsAround atoms => hints for
+        // atoms in index that are WhatsAround
         // to achieve this use a different filters for these queries
-
-        // case 1) needs without NoHintForCounterpart => hints for current need
+        // case 1) atoms without NoHintForCounterpart => hints for current atom
         List<String> filterQueries = new LinkedList<>();
-        filterQueries.add(new NeedStateQueryFactory(dataset).createQuery());
+        filterQueries.add(new AtomStateQueryFactory(dataset).createQuery());
         filterQueries.add(new CreationDateQueryFactory(dataset, 1, ChronoUnit.MONTHS).createQuery());
-        filterQueries.add(new BooleanQueryFactory(BooleanQueryFactory.BooleanOperator.NOT, new HasFlagQueryFactory(HasFlagQueryFactory.FLAGS.NO_HINT_FOR_COUNTERPART)).createQuery());
-        if (needModelWrapper.getMatchingContexts() != null && needModelWrapper.getMatchingContexts().size() > 0) {
-            filterQueries.add(new MatchingContextQueryFactory(needModelWrapper.getMatchingContexts()).createQuery());
+        filterQueries.add(new BooleanQueryFactory(BooleanQueryFactory.BooleanOperator.NOT,
+                        new HasFlagQueryFactory(HasFlagQueryFactory.FLAGS.NO_HINT_FOR_COUNTERPART)).createQuery());
+        if (atomModelWrapper.getMatchingContexts() != null && atomModelWrapper.getMatchingContexts().size() > 0) {
+            filterQueries.add(new MatchingContextQueryFactory(atomModelWrapper.getMatchingContexts()).createQuery());
         }
-        if (!needModelWrapper.hasFlag(WON.NO_HINT_FOR_ME)) {
-
+        if (!atomModelWrapper.flag(WON.NoHintForMe)) {
             // execute the query
-            log.info("query Solr endpoint {} for need {} and need list 1 (without NoHintForCounterpart)", config.getSolrEndpointUri(usedForTesting), needEvent.getUri());
-            SolrDocumentList docs = queryExecutor.executeNeedQuery(queryString, config.getMaxHints(),null, filterQueries.toArray(new String[filterQueries.size()]));
+            log.info("query Solr endpoint {} for atom {} and atom list 1 (without NoHintForCounterpart)",
+                            config.getSolrEndpointUri(usedForTesting), atomEvent.getUri());
+            SolrDocumentList docs = queryExecutor.executeAtomQuery(queryString, config.getMaxHints(), null,
+                            filterQueries.toArray(new String[filterQueries.size()]));
             if (docs != null) {
-
-                // perform knee detection depending on current need is WhatsAround/WhatsNew or not)
-                boolean kneeDetection = needModelWrapper.hasFlag(WON.WHATS_NEW) || needModelWrapper.hasFlag(WON.WHATS_AROUND) ? false : true;
-
-                // generate hints for current need (only generate hints for current need, suppress hints for matched needs,
-                BulkHintEvent events = hintBuilder.generateHintsFromSearchResult(docs, needEvent, needModelWrapper, false, true, kneeDetection);
-
-                log.info("Create {} hints for need {} and need list 1 (without NoHintForCounterpart)", events.getHintEvents().size(), needEvent);
-
-                // publish hints to current need
+                // perform knee detection depending on current atom is WhatsAround/WhatsNew or
+                // not)
+                boolean kneeDetection = atomModelWrapper.flag(WON.WhatsNew) || atomModelWrapper.flag(WON.WhatsAround)
+                                ? false
+                                : true;
+                // generate hints for current atom (only generate hints for current atom,
+                // suppress hints for matched atoms,
+                BulkHintEvent events = hintBuilder.generateHintsFromSearchResult(docs, atomEvent, atomModelWrapper,
+                                false, true, kneeDetection);
+                log.info("Create {} hints for atom {} and atom list 1 (without NoHintForCounterpart)",
+                                events.getHintEvents().size(), atomEvent);
+                // publish hints to current atom
                 if (events.getHintEvents().size() != 0) {
                     getSender().tell(events, getSelf());
                 }
             } else {
-                log.warning("No results found for need list 1 (without NoHintForCounterpart) query of need ", needEvent);
+                log.warning("No results found for atom list 1 (without NoHintForCounterpart) query of atom ",
+                                atomEvent);
             }
         }
-
-        // case 2) needs without NoHintForSelf, excluding WhatsAround needs => hints for needs in index that are not WhatsAround
+        // case 2) atoms without NoHintForSelf, excluding WhatsAround atoms => hints for
+        // atoms in index that are not WhatsAround
         filterQueries = new LinkedList<>();
-        filterQueries.add(new NeedStateQueryFactory(dataset).createQuery());
+        filterQueries.add(new AtomStateQueryFactory(dataset).createQuery());
         filterQueries.add(new CreationDateQueryFactory(dataset, 1, ChronoUnit.MONTHS).createQuery());
-        filterQueries.add(new BooleanQueryFactory(BooleanQueryFactory.BooleanOperator.NOT, new HasFlagQueryFactory(HasFlagQueryFactory.FLAGS.NO_HINT_FOR_ME)).createQuery());
-        filterQueries.add(new BooleanQueryFactory(BooleanQueryFactory.BooleanOperator.NOT, new HasFlagQueryFactory(HasFlagQueryFactory.FLAGS.WHATS_AROUND)).createQuery());
-        filterQueries.add(new BooleanQueryFactory(BooleanQueryFactory.BooleanOperator.NOT, new HasFlagQueryFactory(HasFlagQueryFactory.FLAGS.WHATS_NEW)).createQuery());
-        if (needModelWrapper.getMatchingContexts() != null && needModelWrapper.getMatchingContexts().size() > 0) {
-            filterQueries.add(new MatchingContextQueryFactory(needModelWrapper.getMatchingContexts()).createQuery());
+        filterQueries.add(new BooleanQueryFactory(BooleanQueryFactory.BooleanOperator.NOT,
+                        new HasFlagQueryFactory(HasFlagQueryFactory.FLAGS.NO_HINT_FOR_ME)).createQuery());
+        filterQueries.add(new BooleanQueryFactory(BooleanQueryFactory.BooleanOperator.NOT,
+                        new HasFlagQueryFactory(HasFlagQueryFactory.FLAGS.WHATS_AROUND)).createQuery());
+        filterQueries.add(new BooleanQueryFactory(BooleanQueryFactory.BooleanOperator.NOT,
+                        new HasFlagQueryFactory(HasFlagQueryFactory.FLAGS.WHATS_NEW)).createQuery());
+        if (atomModelWrapper.getMatchingContexts() != null && atomModelWrapper.getMatchingContexts().size() > 0) {
+            filterQueries.add(new MatchingContextQueryFactory(atomModelWrapper.getMatchingContexts()).createQuery());
         }
-        if (!needModelWrapper.hasFlag(WON.NO_HINT_FOR_COUNTERPART)) {
-
+        if (!atomModelWrapper.flag(WON.NoHintForCounterpart)) {
             // execute the query
-            log.info("query Solr endpoint {} for need {} and need list 2 (without NoHintForSelf, excluding WhatsAround needs)", config.getSolrEndpointUri(usedForTesting), needEvent.getUri());
-            SolrDocumentList docs = queryExecutor.executeNeedQuery(queryString, config.getMaxHintsForCounterparts(), null, filterQueries.toArray(new String[filterQueries.size()]));
+            log.info("query Solr endpoint {} for atom {} and atom list 2 (without NoHintForSelf, excluding WhatsAround atoms)",
+                            config.getSolrEndpointUri(usedForTesting), atomEvent.getUri());
+            SolrDocumentList docs = queryExecutor.executeAtomQuery(queryString, config.getMaxHintsForCounterparts(),
+                            null, filterQueries.toArray(new String[filterQueries.size()]));
             if (docs != null) {
-
-                // generate hints for matched needs (suppress hints for current need, only generate hints for matched needs, perform knee detection)
-                BulkHintEvent events = hintBuilder.generateHintsFromSearchResult(docs, needEvent, needModelWrapper, true, false, true);
-                log.info("Create {} hints for need {} and need list 2 (without NoHintForSelf, excluding WhatsAround needs)", events.getHintEvents().size(), needEvent);
-
-                // publish hints to current need
+                // generate hints for matched atoms (suppress hints for current atom, only
+                // generate hints for matched atoms, perform knee detection)
+                BulkHintEvent events = hintBuilder.generateHintsFromSearchResult(docs, atomEvent, atomModelWrapper,
+                                true, false, true);
+                log.info("Create {} hints for atom {} and atom list 2 (without NoHintForSelf, excluding WhatsAround atoms)",
+                                events.getHintEvents().size(), atomEvent);
+                // publish hints to current atom
                 if (events.getHintEvents().size() != 0) {
                     getSender().tell(events, getSelf());
                 }
             } else {
-                log.warning("No results found for need list 2 (without NoHintForSelf, excluding WhatsAround needs) query of need ", needEvent);
+                log.warning("No results found for atom list 2 (without NoHintForSelf, excluding WhatsAround atoms) query of atom ",
+                                atomEvent);
             }
         }
-
-        // case 3) needs without NoHintForSelf that are only WhatsAround needs => hints for needs in index that are WhatsAround
+        // case 3) atoms without NoHintForSelf that are only WhatsAround atoms => hints
+        // for atoms in index that are WhatsAround
         filterQueries = new LinkedList<>();
-        filterQueries.add(new NeedStateQueryFactory(dataset).createQuery());
+        filterQueries.add(new AtomStateQueryFactory(dataset).createQuery());
         filterQueries.add(new CreationDateQueryFactory(dataset, 1, ChronoUnit.MONTHS).createQuery());
-        filterQueries.add(new BooleanQueryFactory(BooleanQueryFactory.BooleanOperator.NOT, new HasFlagQueryFactory(HasFlagQueryFactory.FLAGS.NO_HINT_FOR_ME)).createQuery());
-        filterQueries.add(
-        		new BooleanQueryFactory(BooleanQueryFactory.BooleanOperator.OR, 
-        				new HasFlagQueryFactory(HasFlagQueryFactory.FLAGS.WHATS_AROUND),
-        				new HasFlagQueryFactory(HasFlagQueryFactory.FLAGS.WHATS_NEW)).createQuery());
-        if (needModelWrapper.getMatchingContexts() != null && needModelWrapper.getMatchingContexts().size() > 0) {
-            filterQueries.add(new MatchingContextQueryFactory(needModelWrapper.getMatchingContexts()).createQuery());
+        filterQueries.add(new BooleanQueryFactory(BooleanQueryFactory.BooleanOperator.NOT,
+                        new HasFlagQueryFactory(HasFlagQueryFactory.FLAGS.NO_HINT_FOR_ME)).createQuery());
+        filterQueries.add(new BooleanQueryFactory(BooleanQueryFactory.BooleanOperator.OR,
+                        new HasFlagQueryFactory(HasFlagQueryFactory.FLAGS.WHATS_AROUND),
+                        new HasFlagQueryFactory(HasFlagQueryFactory.FLAGS.WHATS_NEW)).createQuery());
+        if (atomModelWrapper.getMatchingContexts() != null && atomModelWrapper.getMatchingContexts().size() > 0) {
+            filterQueries.add(new MatchingContextQueryFactory(atomModelWrapper.getMatchingContexts()).createQuery());
         }
-        if (!needModelWrapper.hasFlag(WON.NO_HINT_FOR_COUNTERPART)) {
-
-            // hints for WhatsAround Needs should not have the keywords from title, description, tags etc.
-            // this can prevent to actually find WhatsAround needs.
-            // Instead create a WhatsAround query (query without keywords, just location) to find other WhatsAround needs
+        if (!atomModelWrapper.flag(WON.NoHintForCounterpart)) {
+            // hints for WhatsAround Atoms should not have the keywords from title,
+            // description, tags etc.
+            // this can prevent to actually find WhatsAround atoms.
+            // Instead create a WhatsAround query (query without keywords, just location) to
+            // find other WhatsAround atoms
             queryString = (new WhatsAroundQueryFactory(dataset)).createQuery();
-
             // execute the query
-            log.info("query Solr endpoint {} for need {} and need list 3 (without NoHintForSelf that are only WhatsAround needs)", config.getSolrEndpointUri(usedForTesting), needEvent.getUri());
-            SolrDocumentList docs = queryExecutor.executeNeedQuery(queryString, config.getMaxHintsForCounterparts(), null, filterQueries.toArray(new String[filterQueries.size()]));
+            log.info("query Solr endpoint {} for atom {} and atom list 3 (without NoHintForSelf that are only WhatsAround atoms)",
+                            config.getSolrEndpointUri(usedForTesting), atomEvent.getUri());
+            SolrDocumentList docs = queryExecutor.executeAtomQuery(queryString, config.getMaxHintsForCounterparts(),
+                            null, filterQueries.toArray(new String[filterQueries.size()]));
             if (docs != null) {
-
-                // generate hints for matched needs (suppress hints for current need, only generate hints for matched needs, do not perform knee detection)
-                BulkHintEvent events = hintBuilder.generateHintsFromSearchResult(docs, needEvent, needModelWrapper, true, false, false);
-                log.info("Create {} hints for need {} and need list 3 (without NoHintForSelf that are only WhatsAround needs)", events.getHintEvents().size(), needEvent);
-
-                // publish hints to current need
+                // generate hints for matched atoms (suppress hints for current atom, only
+                // generate hints for matched atoms, do not perform knee detection)
+                BulkHintEvent events = hintBuilder.generateHintsFromSearchResult(docs, atomEvent, atomModelWrapper,
+                                true, false, false);
+                log.info("Create {} hints for atom {} and atom list 3 (without NoHintForSelf that are only WhatsAround atoms)",
+                                events.getHintEvents().size(), atomEvent);
+                // publish hints to current atom
                 if (events.getHintEvents().size() != 0) {
                     getSender().tell(events, getSelf());
                 }
             } else {
-                log.warning("No results found for need list 3 (without NoHintForSelf that are only WhatsAround needs) query of need ", needEvent);
+                log.warning("No results found for atom list 3 (without NoHintForSelf that are only WhatsAround atoms) query of atom ",
+                                atomEvent);
             }
         }
-
-        // index need
-        log.info("Add need event content {} to solr index", needEvent);
-        needIndexer.index(dataset);
+        // index atom
+        log.info("Add atom event content {} to solr index", atomEvent);
+        atomIndexer.index(dataset);
     }
 
     @Override
     public SupervisorStrategy supervisorStrategy() {
-
-        SupervisorStrategy supervisorStrategy = new OneForOneStrategy(
-                0, Duration.Zero(), new Function<Throwable, SupervisorStrategy.Directive>() {
-
-            @Override
-            public SupervisorStrategy.Directive apply(Throwable t) throws Exception {
-
-                log.warning("Actor encountered error: {}", t);
-                // default behaviour
-                return SupervisorStrategy.escalate();
-            }
-        });
-
+        SupervisorStrategy supervisorStrategy = new OneForOneStrategy(0, Duration.Zero(),
+                        new Function<Throwable, SupervisorStrategy.Directive>() {
+                            @Override
+                            public SupervisorStrategy.Directive apply(Throwable t) throws Exception {
+                                log.warning("Actor encountered error: {}", t);
+                                // default behaviour
+                                return SupervisorStrategy.escalate();
+                            }
+                        });
         return supervisorStrategy;
     }
-
 }

@@ -116,6 +116,20 @@ input[type="email"] {
   font-size: 16px;
 }
 
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="date"],
+input[type="time"],
+input[type="url"],
+input[type="number"],
+select,
+textarea {
+  &:focus {
+    outline-color: $won-secondary-color;
+  }
+}
+
 .clickable {
   cursor: pointer;
   user-select: none;
@@ -152,3 +166,10 @@ svg {
 //TODO in topnav, make create-button black when the dialog is open
 //TODO the :hover isn't usable on touch displays (require alternate path to get to the help text) - dog-ears + peel-slide?
 //TODO enable keyboard selection. add aria-information
+
+.wonCurrentLocationMarkerIcon {
+  width: 15px;
+  height: 15px;
+  background-color: $won-primary-color;
+  border-radius: 100%;
+}

@@ -8,12 +8,8 @@ import java.util.Map;
  * Created by hfriedrich on 29.08.2017.
  */
 public class HasFlagQueryFactory extends SolrQueryFactory {
-
     public enum FLAGS {
-        WHATS_AROUND,
-        WHATS_NEW,
-        NO_HINT_FOR_COUNTERPART,
-        NO_HINT_FOR_ME
+        WHATS_AROUND, WHATS_NEW, NO_HINT_FOR_COUNTERPART, NO_HINT_FOR_ME
     }
 
     private static final Map<FLAGS, String> flagMap;
@@ -25,7 +21,6 @@ public class HasFlagQueryFactory extends SolrQueryFactory {
         myMap.put(FLAGS.NO_HINT_FOR_ME, "http\\://purl.org/webofneeds/model#NoHintForMe");
         flagMap = Collections.unmodifiableMap(myMap);
     }
-
     private FLAGS flag;
 
     public HasFlagQueryFactory(FLAGS flag) {
@@ -34,6 +29,7 @@ public class HasFlagQueryFactory extends SolrQueryFactory {
 
     @Override
     protected String makeQueryString() {
-        return new ExactMatchFieldQueryFactory("_graph.http___purl.org_webofneeds_model_hasFlag._id", flagMap.get(flag)).createQuery();
+        return new ExactMatchFieldQueryFactory("_graph.http___purl.org_webofneeds_model_flag._id", flagMap.get(flag))
+                        .createQuery();
     }
 }

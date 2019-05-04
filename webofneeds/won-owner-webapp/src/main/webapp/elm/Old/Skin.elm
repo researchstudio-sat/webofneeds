@@ -14,7 +14,7 @@ port module Old.Skin exposing
 import Browser
 import Element exposing (..)
 import Html exposing (Html)
-import Json.Decode as Decode exposing (Decoder, Error, Value)
+import Json.Decode as Decode exposing (Decoder)
 
 
 type alias Skin =
@@ -100,7 +100,10 @@ port skin : (SkinFlags -> msg) -> Sub msg
 
 
 type alias Rgb =
-    { r : Int, g : Int, b : Int }
+    { r : Int
+    , g : Int
+    , b : Int
+    }
 
 
 type alias Model model =
@@ -112,7 +115,6 @@ type alias Model model =
 type Msg msg
     = MsgReceived msg
     | SkinReceived Skin
-    | NoOp
 
 
 type alias SkinFlags =
@@ -176,9 +178,6 @@ skinnedElement { init, update, subscriptions, view } =
                           }
                         , Cmd.none
                         )
-
-                    NoOp ->
-                        ( model, Cmd.none )
         , view =
             \model ->
                 view model.skin model.model

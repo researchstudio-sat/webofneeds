@@ -6,8 +6,8 @@ SERVER=http://localhost:8080/owner
 
 JSON_CREATE_USER='{"username":"<NAME>", "password":"abc"}'
 JSON_SIGN_IN='{"username":"<NAME>", "password":"abc"}'
-JSON_NEED_DEMAND_A='{"title":"couch", "textDescription":"I need a couch", "basicNeedType":"DEMAND"}'
-JSON_NEED_SUPPLY_A='{"title":"couch", "textDescription":"I need a couch", "basicNeedType":"SUPPLY"}'
+JSON_ATOM_DEMAND_A='{"title":"couch", "textDescription":"I need a couch", "basicAtomType":"DEMAND"}'
+JSON_ATOM_SUPPLY_A='{"title":"couch", "textDescription":"I need a couch", "basicAtomType":"SUPPLY"}'
 
 function outputResponseIfNotOk {
 	output=$1
@@ -74,23 +74,23 @@ function signIn {
 	sendUserRequest "$operation" "$user" "$server" "/rest/users/signin/" "$json" POST false
 }
 
-function createNeed {
-	#post a need
-	operation="creating a need for user $user on server $server"
+function createAtom {
+	#post an atom
+	operation="creating an atom for user $user on server $server"
 	user=$1
 	server=$2
 	json=$3
-	output=`sendUserRequest "$operation" "$user" "$server" "/rest/needs/" "$json" POST true`
+	output=`sendUserRequest "$operation" "$user" "$server" "/rest/atoms/" "$json" POST true`
 	echo $output
 }
 
 function listMatches {
-	#post a need
-	operation="creating a need for user $user on server $server"
+	#post an atom
+	operation="creating an atom for user $user on server $server"
 	user=$1
 	server=$2
 	json=$3
-	sendUserRequest "$operation" "$user" "$server" "/rest/needs/" "$json" POST	
+	sendUserRequest "$operation" "$user" "$server" "/rest/atoms/" "$json" POST	
 }
 	
 function deleteCookies {	
@@ -109,8 +109,8 @@ createUser $USER1 $SERVER
 signIn $USER1 $SERVER
 createUser $USER2 $SERVER
 signIn $USER2 $SERVER
-createNeed $USER1 $SERVER $JSON_NEED_DEMAND_A
-createNeed $USER2 $SERVER $JSON_NEED_SUPPLY_A
+createAtom $USER1 $SERVER $JSON_ATOM_DEMAND_A
+createAtom $USER2 $SERVER $JSON_ATOM_SUPPLY_A
 cleanup
 
 
