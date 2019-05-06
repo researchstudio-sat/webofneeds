@@ -13,7 +13,7 @@ window.SparqlGenerator4dbg = Generator;
 export const lunchPlan = {
   identifier: "lunchPlan",
   label: "Plan Lunch!",
-  icon: undefined,
+  icon: "#ico36_uc_meal-half",
   doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
   draft: {
     ...mergeInEmptyDraft({

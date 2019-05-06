@@ -13,7 +13,7 @@ window.SparqlGenerator4dbg = Generator;
 export const cyclingPlan = {
   identifier: "cyclingPlan",
   label: "Plan a Ride!",
-  icon: undefined,
+  icon: "#ico36_uc_cycling_cropped",
   doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
   draft: {
     ...mergeInEmptyDraft({

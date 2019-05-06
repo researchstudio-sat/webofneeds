@@ -12,7 +12,7 @@ window.SparqlGenerator4dbg = Generator;
 export const cyclingInterest = {
   identifier: "cyclingInterest",
   label: "Add Cycling Interest",
-  icon: undefined,
+  icon: "#ico36_uc_cycling_cropped",
   draft: {
     ...mergeInEmptyDraft({
       content: {
