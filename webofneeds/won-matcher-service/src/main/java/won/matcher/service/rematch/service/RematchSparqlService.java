@@ -80,7 +80,6 @@ public class RematchSparqlService extends SparqlService {
         // in case of a new push from the WoN node, remove the reference
         // date for this atom - it will be added by the subsequent insert
         if (msg.getCause() == Cause.PUSHED) {
-            builder.append(" prefix won: <https://w3id.org/won/core#> \n");
             builder.append(" DELETE {  \n");
             builder.append("  graph won:rematchMetadata {  \n");
             builder.append("    ?atomUri won:referenceDate ?refDate ; \n");
@@ -90,23 +89,21 @@ public class RematchSparqlService extends SparqlService {
             builder.append("  graph won:rematchMetadata {  \n");
             builder.append("    ?atomUri won:referenceDate ?refDate . \n");
             builder.append("  } \n");
-            builder.append(" } \n");
+            builder.append(" }; \n");
         }
         // insert a new entry, using the current date as matchAttemptDate and
         // referenceDate
         // (the latter will be removed afterwards if it is not the earliest one)
-        builder.append(" prefix won: <https://w3id.org/won/core#> \n");
         builder.append(" INSERT DATA {  \n");
         builder.append("  graph won:rematchMetadata { \n");
         builder.append("      won:j won:matchAttemptDate ?matchAttemptDate; \n");
         builder.append("                  won:referenceDate ?referenceDate. \n");
         builder.append("           \n");
         builder.append("     } \n");
-        builder.append(" } \n");
+        builder.append(" }; \n");
         // this DELETE/INSERT WHERE update ensures that
         // * only the latest matchAttemptDate is kept
         // * only the earliest referenceDate is kept
-        builder.append(" prefix won: <https://w3id.org/won/core#> \n");
         builder.append(" DELETE {  \n");
         builder.append("  graph won:rematchMetadata {  \n");
         builder.append("    ?atomUri won:matchAttemptDate ?olderMAD ; \n");
@@ -128,7 +125,7 @@ public class RematchSparqlService extends SparqlService {
         builder.append("    } \n");
         builder.append("    filter (bound(?newerRD) && bound (?olderMAD)) \n");
         builder.append("  } \n");
-        builder.append(" } \n");
+        builder.append(" }; \n");
         builder.append("  \n");
         ParameterizedSparqlString pss = new ParameterizedSparqlString();
         pss.setCommandText(builder.toString());
