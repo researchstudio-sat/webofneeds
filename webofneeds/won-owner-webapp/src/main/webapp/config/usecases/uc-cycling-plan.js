@@ -30,6 +30,7 @@ export const cyclingPlan = {
       seeks: {},
     }),
   },
+  reactionUseCases: ["cyclingInterest"],
   details: {
     title: { ...details.title },
     description: { ...details.description },

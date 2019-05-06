@@ -30,6 +30,7 @@ export const lunchPlan = {
       seeks: {},
     }),
   },
+  reactionUseCases: ["lunchInterest"],
   details: {
     title: { ...details.title },
     description: { ...details.description },
