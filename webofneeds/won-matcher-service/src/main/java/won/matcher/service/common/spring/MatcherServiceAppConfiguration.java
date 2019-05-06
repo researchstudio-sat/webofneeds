@@ -29,7 +29,7 @@ import won.matcher.service.common.config.ClusterConfig;
                 "classpath:/spring/component/wonNodeInformationService.xml" })
 @PropertySource({ "file:${WON_CONFIG_DIR}/matcher-service.properties",
                 "file:${WON_CONFIG_DIR}/cluster-node.properties" })
-@ComponentScan({ "won.matcher.service.nodemanager", "won.matcher.service.common", "won.matcher.service.crawler" })
+@ComponentScan({ "won.matcher.service" })
 public class MatcherServiceAppConfiguration {
     @Autowired
     private ApplicationContext applicationContext;
