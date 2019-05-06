@@ -1,5 +1,5 @@
-import { lunchPlan } from "./uc-lunch-plan.js";
-import { cyclingPlan } from "./uc-cycling-plan.js";
+import { lunchPlan } from "./uc-lunch.js";
+import { cyclingPlan } from "./uc-cycling.js";
 
 export const hiddenGroup = {
   identifier: "hiddenGroup",

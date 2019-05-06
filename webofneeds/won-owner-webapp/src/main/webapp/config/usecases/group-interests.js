@@ -1,5 +1,5 @@
-import { cyclingInterest } from "./uc-cycling-interest.js";
-import { lunchInterest } from "./uc-lunch-interest.js";
+import { cyclingInterest } from "./uc-cycling.js";
+import { lunchInterest } from "./uc-lunch.js";
 
 export const interestsGroup = {
   identifier: "interestsgroup",
