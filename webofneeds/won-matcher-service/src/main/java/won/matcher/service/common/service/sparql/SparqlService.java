@@ -154,7 +154,8 @@ public class SparqlService {
             log.debug("Update SPARQL Endpoint: {}", sparqlEndpoint);
             log.debug("Execute query: {}", updateQuery);
             UpdateRequest query = UpdateFactory.create(updateQuery);
-            UpdateProcessRemote riStore = (UpdateProcessRemote) UpdateExecutionFactory.createRemote(query, sparqlEndpoint);
+            UpdateProcessRemote riStore = (UpdateProcessRemote) UpdateExecutionFactory.createRemote(query,
+                            sparqlEndpoint);
             riStore.execute();
         } catch (QueryParseException e) {
             log.warn("Error parsing update query: " + updateQuery, e);

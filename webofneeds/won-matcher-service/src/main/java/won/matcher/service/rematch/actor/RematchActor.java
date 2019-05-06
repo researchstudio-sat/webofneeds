@@ -79,7 +79,6 @@ public class RematchActor extends UntypedActor {
         pubSubMediator.tell(new DistributedPubSubMediator.Subscribe(BulkAtomEvent.class.getName(), getSelf()),
                         getSelf());
         log.debug("RematchActor startup complete");
-        
     }
 
     @Override
