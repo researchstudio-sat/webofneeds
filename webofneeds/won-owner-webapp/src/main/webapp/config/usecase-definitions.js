@@ -8,8 +8,10 @@ import { transportGroup } from "./usecases/group-transport";
 import { otherGroup } from "./usecases/group-other";
 import { personalMobilityGroup } from "./usecases/group-personal-mobility";
 import { interestsGroup } from "./usecases/group-interests";
-import { hiddenGroup } from "./usecases/group-hidden";
 // import { customUseCase } from "./usecases/uc-custom.js";
+
+import { lunchPlan } from "./usecases/uc-lunch.js";
+import { cyclingPlan } from "./usecases/uc-cycling.js";
 
 /**
  * USE CASE REQUIREMENTS
@@ -64,7 +66,12 @@ const useCaseGroups = {
   transport: transportGroup,
   personalMobility: personalMobilityGroup,
   other: otherGroup,
-  hiddenGroup: hiddenGroup,
+};
+
+// add useCases here that should not be visible in the grouped useCases (will be hidden and only accessible through reaction and enabledUseCases
+export const hiddenUseCases = {
+  lunchPlan: lunchPlan,
+  cyclingPlan: cyclingPlan,
 };
 
 // generate a list of usecases from all use case groups
@@ -72,6 +79,10 @@ let tempUseCases = {};
 for (let key in useCaseGroups) {
   const elements = useCaseGroups[key].subItems;
   addUseCasesToTemp(elements);
+}
+for (let identifier in hiddenUseCases) {
+  hiddenUseCases[identifier].hidden = true;
+  tempUseCases[identifier] = hiddenUseCases[identifier];
 }
 
 function addUseCasesToTemp(elements) {
