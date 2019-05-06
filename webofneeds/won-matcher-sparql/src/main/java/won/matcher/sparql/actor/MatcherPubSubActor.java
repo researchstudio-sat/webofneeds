@@ -60,6 +60,7 @@ public class MatcherPubSubActor extends UntypedActor {
         // subscribe to atom events
         pubSubMediator = DistributedPubSub.get(getContext().system()).mediator();
         pubSubMediator.tell(new DistributedPubSubMediator.Subscribe(AtomEvent.class.getName(), getSelf()), getSelf());
+        pubSubMediator.tell(new DistributedPubSubMediator.Subscribe(BulkAtomEvent.class.getName(), getSelf()), getSelf());
         // create the querying and indexing actors that do the actual work
         matcherActor = getContext().actorOf(SpringExtension.SpringExtProvider.get(getContext().system())
                         .fromConfigProps(SparqlMatcherActor.class), "SparqlMatcherPool");
