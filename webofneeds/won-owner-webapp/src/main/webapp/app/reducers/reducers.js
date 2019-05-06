@@ -120,9 +120,12 @@ const reducers = {
       case actionTypes.personas.removeDeleted:
       case actionTypes.atoms.delete: {
         const atomUri = action.payload.get("uri");
-        const atomUris = owner.get("atomUris");
+        const whatsAround = owner.get("whatsAround");
+        const whatsNew = owner.get("whatsNew");
 
-        return owner.set("atomUris", atomUris.remove(atomUri));
+        return owner
+          .set("whatsAround", whatsAround.remove(atomUri))
+          .set("whatsNew", whatsNew.remove(atomUri));
       }
 
       default:

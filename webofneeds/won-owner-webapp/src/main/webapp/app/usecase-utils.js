@@ -290,6 +290,7 @@ export function isDisplayableUseCase(useCase) {
   return (
     useCase &&
     useCase.identifier &&
+    !useCase.hidden &&
     (useCase.label || useCase.icon) &&
     !useCase.subItems
   );
