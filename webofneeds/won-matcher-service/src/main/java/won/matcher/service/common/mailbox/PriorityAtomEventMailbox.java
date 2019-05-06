@@ -6,6 +6,7 @@ import akka.actor.ActorSystem;
 import akka.dispatch.PriorityGenerator;
 import akka.dispatch.UnboundedStablePriorityMailbox;
 import won.matcher.service.common.event.AtomEvent;
+import won.matcher.service.common.event.Cause;
 
 public class PriorityAtomEventMailbox extends UnboundedStablePriorityMailbox {
     // needed for reflective instantiation
@@ -15,9 +16,9 @@ public class PriorityAtomEventMailbox extends UnboundedStablePriorityMailbox {
             @Override
             public int gen(Object event) {
                 if (event instanceof AtomEvent) {
-                    return ((AtomEvent) event).getPriority().getPriority();
+                    return ((AtomEvent) event).getCause().getPriority();
                 }
-                return AtomEvent.Priority.LOWEST_PRIORTY;
+                return Cause.LOWEST_PRIORTY;
             }
         });
     }

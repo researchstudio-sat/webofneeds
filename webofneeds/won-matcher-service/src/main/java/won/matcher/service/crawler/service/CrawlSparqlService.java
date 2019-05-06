@@ -20,9 +20,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-import won.matcher.service.common.event.BulkAtomEvent;
 import won.matcher.service.common.event.AtomEvent;
-import won.matcher.service.common.event.AtomEvent.Priority;
+import won.matcher.service.common.event.BulkAtomEvent;
+import won.matcher.service.common.event.Cause;
 import won.matcher.service.common.service.sparql.SparqlService;
 import won.matcher.service.crawler.config.CrawlConfig;
 import won.matcher.service.crawler.msg.CrawlUriMessage;
@@ -379,7 +379,7 @@ public class CrawlSparqlService extends SparqlService {
                     StringWriter sw = new StringWriter();
                     RDFDataMgr.write(sw, ds, RDFFormat.TRIG.getLang());
                     AtomEvent atomEvent = new AtomEvent(atomUri, wonNodeUri, AtomEvent.TYPE.ACTIVE, crawlDate,
-                                    sw.toString(), RDFFormat.TRIG.getLang(), Priority.CRAWLED);
+                                    sw.toString(), RDFFormat.TRIG.getLang(), Cause.CRAWLED);
                     bulkAtomEvent.addAtomEvent(atomEvent);
                 }
             }

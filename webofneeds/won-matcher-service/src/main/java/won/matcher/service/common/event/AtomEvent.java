@@ -10,7 +10,6 @@ import org.apache.jena.riot.LangBuilder;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
 
-import won.matcher.service.common.mailbox.PriorityAtomEventMailbox;
 import won.matcher.service.common.service.sparql.SparqlService;
 
 /**
@@ -26,38 +25,14 @@ public class AtomEvent implements Serializable {
     private String serializationLangContentType;
     private long crawlDate;
     private TYPE eventType;
-    private Priority priority;
-
-    /**
-     * Indicates the priority this event should be given by matchers. The priority
-     * should be given based on how the event was generated. Used in the
-     * {@link PriorityAtomEventMailbox}; lower priority values means more important.
-     */
-    public static enum Priority {
-        PUSHED(0), // we received a push about this Atom from a WoN node. React fast!
-        SCHEDULED_FOR_REMATCH(5), // we decided it's time to re-match for this Atom. Should be handled before
-                                  // events generated in crawling
-        CRAWLED(10), // we found this Atom during crawling. Handle when we have nothing else to do
-        ;
-        private int priority;
-
-        private Priority(int prio) {
-            this.priority = prio;
-        }
-
-        public int getPriority() {
-            return priority;
-        }
-
-        public static int LOWEST_PRIORTY = Integer.MAX_VALUE;
-    }
+    private Cause cause;
 
     public static enum TYPE {
         ACTIVE, INACTIVE
     }
 
     public AtomEvent(String uri, String wonNodeUri, TYPE eventType, long crawlDate, String resource, Lang format,
-                    Priority priority) {
+                    Cause priority) {
         this.uri = uri;
         this.wonNodeUri = wonNodeUri;
         this.eventType = eventType;
@@ -67,7 +42,7 @@ public class AtomEvent implements Serializable {
         serializationLangContentType = format.getContentType().getContentType();
     }
 
-    public AtomEvent(String uri, String wonNodeUri, TYPE eventType, long crawlDate, Dataset ds, Priority priority) {
+    public AtomEvent(String uri, String wonNodeUri, TYPE eventType, long crawlDate, Dataset ds, Cause priority) {
         this.uri = uri;
         this.wonNodeUri = wonNodeUri;
         this.eventType = eventType;
@@ -91,8 +66,8 @@ public class AtomEvent implements Serializable {
         return eventType;
     }
 
-    public Priority getPriority() {
-        return priority;
+    public Cause getCause() {
+        return cause;
     }
 
     public String getSerializedAtomResource() {
@@ -115,7 +90,7 @@ public class AtomEvent implements Serializable {
     @Override
     public AtomEvent clone() {
         AtomEvent e = new AtomEvent(uri, wonNodeUri, eventType, crawlDate, serializedAtomResource,
-                        getSerializationFormat(), priority);
+                        getSerializationFormat(), cause);
         return e;
     }
 

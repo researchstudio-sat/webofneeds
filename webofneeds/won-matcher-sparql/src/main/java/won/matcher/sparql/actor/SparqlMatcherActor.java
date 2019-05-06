@@ -45,6 +45,7 @@ import org.apache.jena.sparql.algebra.op.OpProject;
 import org.apache.jena.sparql.algebra.op.OpUnion;
 import org.apache.jena.sparql.core.BasicPattern;
 import org.apache.jena.sparql.core.Var;
+import org.apache.jena.sparql.engine.binding.Binding;
 import org.apache.jena.sparql.engine.binding.BindingFactory;
 import org.apache.jena.sparql.engine.binding.BindingHashMap;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,6 +67,8 @@ import scala.concurrent.duration.Duration;
 import won.matcher.service.common.event.AtomEvent;
 import won.matcher.service.common.event.BulkAtomEvent;
 import won.matcher.service.common.event.BulkHintEvent;
+
+import won.matcher.service.common.event.Cause;
 import won.matcher.service.common.event.HintEvent;
 import won.matcher.sparql.config.SparqlMatcherConfig;
 import won.protocol.model.AtomState;
@@ -206,7 +209,8 @@ public class SparqlMatcherActor extends UntypedActor {
                                                                                                                 // database.
                                                                                                                 // re-check!
                                         .filter(foundAtom -> postFilter(atom, foundAtom.atom))
-                                        .collect(Collectors.toList()));
+                                        .collect(Collectors.toList()),
+                        atomEvent.getCause());
         publishHintEvents(hintEvents, atom.getAtomUri(), false);
         // but use the whole list of matches for inverse matching
         final boolean noHintForCounterpart = atom.flag(WON.NoHintForCounterpart);
@@ -240,7 +244,7 @@ public class SparqlMatcherActor extends UntypedActor {
                                                 .filter(n -> n.atom.getAtomState() == AtomState.ACTIVE)
                                                 .filter(inverseMatch -> postFilter(matchedAtom.atom, inverseMatch.atom))
                                                 .collect(Collectors.toList()));
-                            }).map(entry -> produceHints(entry.getKey(), entry.getValue()))
+                            }).map(entry -> produceHints(entry.getKey(), entry.getValue(), atomEvent.getCause()))
                             .flatMap(hints -> hints.stream()).collect(Collectors.toList());
             // now that we've collected all inverse hints, publish them
             publishHintEvents(inverseHintEvents, atom.getAtomUri(), true);
@@ -248,7 +252,7 @@ public class SparqlMatcherActor extends UntypedActor {
         log.debug("finished sparql-based matching for atom {}", atom.getAtomUri());
     }
 
-    private Collection<HintEvent> produceHints(AtomModelWrapper atom, List<ScoredAtom> matches) {
+    private Collection<HintEvent> produceHints(AtomModelWrapper atom, List<ScoredAtom> matches, Cause cause) {
         // find max score
         Optional<Double> maxScore = matches.stream().map(n -> n.score).max((x, y) -> (int) Math.signum(x - y));
         if (!maxScore.isPresent()) {
@@ -267,7 +271,7 @@ public class SparqlMatcherActor extends UntypedActor {
                         .limit(config.getLimitResults()).map(hint -> {
                             double score = range == 0 ? 1.0 : (hint.score - minScore.get()) / range;
                             return new HintEvent(atom.getWonNodeUri(), atom.getAtomUri(), hint.atom.getWonNodeUri(),
-                                            hint.atom.getAtomUri(), config.getMatcherUri(), score);
+                                            hint.atom.getAtomUri(), config.getMatcherUri(), score, cause);
                         }).collect(Collectors.toList());
     }
 

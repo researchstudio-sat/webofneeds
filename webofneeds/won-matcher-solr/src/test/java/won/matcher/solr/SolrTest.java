@@ -12,7 +12,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import won.matcher.service.common.event.AtomEvent;
-import won.matcher.service.common.event.AtomEvent.Priority;
+import won.matcher.service.common.event.Cause;
 import won.matcher.service.common.spring.SpringExtension;
 import won.matcher.solr.actor.SolrMatcherActor;
 import won.matcher.solr.spring.MatcherSolrAppConfiguration;
@@ -56,6 +56,6 @@ public class SolrTest {
         }
         String atomUri = WonRdfUtils.AtomUtils.getAtomURI(dataset).toString();
         return new AtomEvent(atomUri, "no_uri", AtomEvent.TYPE.ACTIVE, System.currentTimeMillis(), dataset,
-                        Priority.PUSHED);
+                        Cause.PUSHED);
     }
 }

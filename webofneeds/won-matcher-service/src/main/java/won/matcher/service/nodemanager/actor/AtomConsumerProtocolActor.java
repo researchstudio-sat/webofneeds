@@ -20,7 +20,7 @@ import akka.event.LoggingAdapter;
 import akka.japi.Function;
 import scala.concurrent.duration.Duration;
 import won.matcher.service.common.event.AtomEvent;
-import won.matcher.service.common.event.AtomEvent.Priority;
+import won.matcher.service.common.event.Cause;
 import won.matcher.service.common.service.monitoring.MonitoringService;
 import won.matcher.service.crawler.msg.CrawlUriMessage;
 import won.matcher.service.crawler.msg.ResourceCrawlUriMessage;
@@ -83,25 +83,25 @@ public class AtomConsumerProtocolActor extends UntypedConsumerActor {
                     if (AtomModelWrapper.isAAtom(ds)) {
                         if (methodName.equals(MSG_HEADER_METHODNAME_ATOMCREATED)) {
                             event = new AtomEvent(atomUri, wonNodeUri, AtomEvent.TYPE.ACTIVE, crawlDate, ds,
-                                            Priority.PUSHED);
+                                            Cause.PUSHED);
                             pubSubMediator.tell(
                                             new DistributedPubSubMediator.Publish(event.getClass().getName(), event),
                                             getSelf());
                         } else if (methodName.equals(MSG_HEADER_METHODNAME_ATOMMODIFIED)) {
                             event = new AtomEvent(atomUri, wonNodeUri, AtomEvent.TYPE.ACTIVE, crawlDate, ds,
-                                            Priority.PUSHED);
+                                            Cause.PUSHED);
                             pubSubMediator.tell(
                                             new DistributedPubSubMediator.Publish(event.getClass().getName(), event),
                                             getSelf());
                         } else if (methodName.equals(MSG_HEADER_METHODNAME_ATOMACTIVATED)) {
                             event = new AtomEvent(atomUri, wonNodeUri, AtomEvent.TYPE.ACTIVE, crawlDate, ds,
-                                            Priority.PUSHED);
+                                            Cause.PUSHED);
                             pubSubMediator.tell(
                                             new DistributedPubSubMediator.Publish(event.getClass().getName(), event),
                                             getSelf());
                         } else if (methodName.equals(MSG_HEADER_METHODNAME_ATOMDEACTIVATED)) {
                             event = new AtomEvent(atomUri, wonNodeUri, AtomEvent.TYPE.INACTIVE, crawlDate, ds,
-                                            Priority.PUSHED);
+                                            Cause.PUSHED);
                             pubSubMediator.tell(
                                             new DistributedPubSubMediator.Publish(event.getClass().getName(), event),
                                             getSelf());
