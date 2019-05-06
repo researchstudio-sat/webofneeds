@@ -151,7 +151,6 @@ export const cyclingInterest = {
         `${resultName} rdf:type s:PlanAction.`,
         `${resultName} s:object ?planObject.`,
         `${resultName} hold:heldBy ?holder.`,
-        `?thisAtom hold:heldBy/buddy:buddy/^hold:holds ${resultName}`,
         `?planObject s:about <http://dbpedia.org/resource/Cycling>.`,
         `?thisAtom hold:heldBy/buddy:buddy/hold:holds ${resultName}.`,
         // calculate average of scores; can be weighed if necessary
