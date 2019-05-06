@@ -161,7 +161,7 @@ public class RematchSparqlService extends SparqlService {
         builder.append("    graph won:rematchMetadata { \n");
         builder.append("        ?atomUri won:referenceDate ?rDate ; \n");
         builder.append("                  won:matchAttemptDate ?mDate . \n");
-        builder.append("         filter (?mDate > ?rDate) \n");
+        builder.append("         filter (?mDate >= ?rDate) \n");
         builder.append("         bind (?mDate - ?rDate as ?lastDiff) \n");
         builder.append("         bind (?now - ?rDate as ?diff) \n");
         builder.append("     } \n");
