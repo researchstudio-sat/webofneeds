@@ -45,8 +45,8 @@ import org.apache.jena.sparql.algebra.op.OpProject;
 import org.apache.jena.sparql.algebra.op.OpUnion;
 import org.apache.jena.sparql.core.BasicPattern;
 import org.apache.jena.sparql.core.Var;
-import org.apache.jena.sparql.engine.binding.Binding;
 import org.apache.jena.sparql.engine.binding.BindingFactory;
+import org.apache.jena.sparql.engine.binding.BindingHashMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -63,10 +63,10 @@ import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import akka.japi.Function;
 import scala.concurrent.duration.Duration;
-import won.matcher.service.common.event.BulkHintEvent;
-import won.matcher.service.common.event.BulkAtomEvent;
-import won.matcher.service.common.event.HintEvent;
 import won.matcher.service.common.event.AtomEvent;
+import won.matcher.service.common.event.BulkAtomEvent;
+import won.matcher.service.common.event.BulkHintEvent;
+import won.matcher.service.common.event.HintEvent;
 import won.matcher.sparql.config.SparqlMatcherConfig;
 import won.protocol.model.AtomState;
 import won.protocol.util.AtomModelWrapper;
@@ -140,6 +140,7 @@ public class SparqlMatcherActor extends UntypedActor {
     }
 
     private static final Var resultName = Var.alloc("result");
+    private static final Var thisAtom = Var.alloc("thisAtom");
     private static final Var scoreName = Var.alloc("score");
 
     private static BasicPattern createDetailsQuery(Model model, Statement parentStatement) {
@@ -354,8 +355,9 @@ public class SparqlMatcherActor extends UntypedActor {
             if (log.isDebugEnabled()) {
                 log.debug("transformed query: {}", hintForCounterpartQuery);
             }
-            return Stream.concat(executeQuery(noHintForCounterpartQuery, atomToCheck),
-                            executeQuery(hintForCounterpartQuery, atomToCheck)).collect(Collectors.toList());
+            return Stream.concat(executeQuery(noHintForCounterpartQuery, atomToCheck, atom.getAtomUri()),
+                            executeQuery(hintForCounterpartQuery, atomToCheck, atom.getAtomUri()))
+                            .collect(Collectors.toList());
         }).orElse(Collections.emptyList());
         return atoms;
     }
@@ -365,18 +367,24 @@ public class SparqlMatcherActor extends UntypedActor {
      * 
      * @param q
      * @param atomToCheck
+     * @param atomURI - the URI of the atom we are matching for
      * @return
      */
-    private Stream<ScoredAtom> executeQuery(Op q, Optional<AtomModelWrapperAndDataset> atomToCheck) {
+    private Stream<ScoredAtom> executeQuery(Op q, Optional<AtomModelWrapperAndDataset> atomToCheck, String atomURI) {
         Query compiledQuery = OpAsQuery.asQuery(q);
         // if we were given an atomToCheck, restrict the query result to that uri so
         // that
         // we get exactly one result if that uri is found for the atom
+        List<Var> valuesBlockVariables = new ArrayList<>();
+        // bind the ?thisAtom variable to the atom we are matching for
+        BindingHashMap bindingMap = new BindingHashMap();
+        bindingMap.add(thisAtom, new ResourceImpl(atomURI.toString()).asNode());
+        valuesBlockVariables.add(thisAtom);
         if (atomToCheck.isPresent()) {
-            Binding binding = BindingFactory.binding(resultName,
-                            new ResourceImpl(atomToCheck.get().atomModelWrapper.getAtomUri()).asNode());
-            compiledQuery.setValuesDataBlock(Collections.singletonList(resultName), Collections.singletonList(binding));
+            bindingMap.add(resultName, new ResourceImpl(atomToCheck.get().atomModelWrapper.getAtomUri()).asNode());
+            valuesBlockVariables.add(resultName);
         }
+        compiledQuery.setValuesDataBlock(valuesBlockVariables, Collections.singletonList(bindingMap));
         // make sure we order by score, if present, and we limit the results
         if (compiledQuery.getProjectVars().contains(scoreName)) {
             compiledQuery.addOrderBy(scoreName, Query.ORDER_DESCENDING);

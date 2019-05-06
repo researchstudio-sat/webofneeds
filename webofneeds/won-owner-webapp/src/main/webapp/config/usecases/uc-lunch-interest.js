@@ -58,6 +58,8 @@ export const lunchInterest = {
       prefixes: {
         won: won.defaultContext["won"],
         rdf: won.defaultContext["rdf"],
+        buddy: won.defaultContext["buddy"],
+        hold: won.defaultContext["hold"],
         s: won.defaultContext["s"],
       },
       distinct: true,
@@ -67,7 +69,8 @@ export const lunchInterest = {
         `${resultName} rdf:type won:Atom.`,
         `${resultName} rdf:type s:PlanAction.`,
         `${resultName} s:object ?planObject.`,
-        `?planObject s:about <http://dbpedia.org/resource/Lunch>`,
+        `?planObject s:about <http://dbpedia.org/resource/Lunch>.`,
+        `?thisAtom hold:heldBy/buddy:buddy/hold:holds ${resultName}.`,
         // calculate average of scores; can be weighed if necessary
         `BIND( ( 
           COALESCE(?location_geoScore, 0) 

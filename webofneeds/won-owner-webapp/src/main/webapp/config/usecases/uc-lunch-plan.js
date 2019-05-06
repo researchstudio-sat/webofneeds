@@ -61,6 +61,8 @@ export const lunchPlan = {
       prefixes: {
         won: won.defaultContext["won"],
         rdf: won.defaultContext["rdf"],
+        buddy: won.defaultContext["buddy"],
+        hold: won.defaultContext["hold"],
         s: won.defaultContext["s"],
       },
       distinct: true,
@@ -71,7 +73,8 @@ export const lunchPlan = {
         `${resultName} won:seeks ?seeks .`,
         `?seeks rdf:type s:PlanAction.`,
         `?seeks s:object ?planObject.`,
-        `?planObject s:about <http://dbpedia.org/resource/Lunch>`,
+        `?planObject s:about <http://dbpedia.org/resource/Lunch>.`,
+        `?thisAtom hold:heldBy/buddy:buddy/hold:holds ${resultName}.`,
         `BIND( ( 
           COALESCE(?location_geoScore, 0) 
         ) / 5  as ?score)`,
