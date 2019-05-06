@@ -12,7 +12,7 @@ import scala.concurrent.duration.FiniteDuration;
 @Configuration
 @PropertySource("file:${WON_CONFIG_DIR}/matcher-service.properties")
 public class RematchConfig {
-    @Value("${rematcher.rematchInterval")
+    @Value("${rematcher.rematchInterval}")
     long rematchInterval;
 
     public RematchConfig() {
