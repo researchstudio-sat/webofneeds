@@ -1,0 +1,57 @@
+import { details, mergeInEmptyDraft } from "../detail-definitions.js";
+import won from "../../app/service/won.js";
+import { Generator } from "sparqljs";
+import { findLatestIntervallEndInJsonLdOrNowAndAddMillis } from "../../app/won-utils.js";
+
+window.SparqlGenerator4dbg = Generator;
+
+export const pokemonGoRaid = {
+  identifier: "pokemonGoRaid",
+  label: "Plan a Pokémon Raid",
+  icon: "#ico36_pokemon-raid", //TODO: Better Icon
+  doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
+  draft: {
+    ...mergeInEmptyDraft({
+      content: {
+        type: ["s:PlanAction"],
+        eventObject: "http://dbpedia.org/resource/Pokemon_Go",
+        sockets: {
+          "#groupSocket": won.GROUP.GroupSocketCompacted,
+          "#holdableSocket": won.HOLD.HoldableSocketCompacted,
+        },
+        defaultSocket: { "#groupSocket": won.GROUP.GroupSocketCompacted },
+      },
+      seeks: {},
+    }),
+  },
+  reactionUseCases: ["pokemonInterest"],
+  details: {
+    pokemonGym: { ...details.pokemonGym, mandatory: true },
+    pokemonRaid: { ...details.pokemonRaid, mandatory: true },
+  },
+  seeksDetails: {},
+};
+
+export const pokemonInterest = {
+  identifier: "pokemonInterest",
+  label: "Add Interest in Pokémon Go",
+  icon: "#ico36_pokeball", //TODO: Better Icon
+  draft: {
+    ...mergeInEmptyDraft({
+      content: {
+        type: ["won:Interest"],
+        title: "I am interested in Pokémon Go!",
+      },
+      seeks: {
+        type: ["s:PlanAction"],
+        eventObject: "http://dbpedia.org/resource/Pokemon_Go",
+      },
+    }),
+  },
+  enabledUseCases: ["pokemonGoRaid"],
+  reactionUseCases: ["pokemonGoRaid"],
+  details: {
+    title: { ...details.title },
+  },
+  seeksDetails: {},
+};

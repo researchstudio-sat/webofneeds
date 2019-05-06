@@ -12,6 +12,7 @@ import { interestsGroup } from "./usecases/group-interests";
 
 import { lunchPlan } from "./usecases/uc-lunch.js";
 import { cyclingPlan } from "./usecases/uc-cycling.js";
+import { pokemonGoRaid } from "./usecases/uc-pokemon.js";
 
 /**
  * USE CASE REQUIREMENTS
@@ -70,6 +71,7 @@ const useCaseGroups = {
 
 // add useCases here that should not be visible in the grouped useCases (will be hidden and only accessible through reaction and enabledUseCases
 export const hiddenUseCases = {
+  pokemonGoRaid: pokemonGoRaid,
   lunchPlan: lunchPlan,
   cyclingPlan: cyclingPlan,
 };
