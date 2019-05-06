@@ -32,7 +32,7 @@ public class AtomEvent implements Serializable {
     }
 
     public AtomEvent(String uri, String wonNodeUri, TYPE eventType, long crawlDate, String resource, Lang format,
-                    Cause priority) {
+                    Cause cause) {
         this.uri = uri;
         this.wonNodeUri = wonNodeUri;
         this.eventType = eventType;
@@ -40,9 +40,10 @@ public class AtomEvent implements Serializable {
         serializedAtomResource = resource;
         serializationLangName = format.getName();
         serializationLangContentType = format.getContentType().getContentType();
+        this.cause = cause;
     }
 
-    public AtomEvent(String uri, String wonNodeUri, TYPE eventType, long crawlDate, Dataset ds, Cause priority) {
+    public AtomEvent(String uri, String wonNodeUri, TYPE eventType, long crawlDate, Dataset ds, Cause cause) {
         this.uri = uri;
         this.wonNodeUri = wonNodeUri;
         this.eventType = eventType;
@@ -52,6 +53,7 @@ public class AtomEvent implements Serializable {
         serializedAtomResource = sw.toString();
         serializationLangName = RDFFormat.TRIG.getLang().getName();
         serializationLangContentType = RDFFormat.TRIG.getLang().getContentType().getContentType();
+        this.cause = cause;
     }
 
     public String getUri() {
