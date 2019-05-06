@@ -7,7 +7,8 @@ import { realEstateGroup } from "./usecases/group-real-estate";
 import { transportGroup } from "./usecases/group-transport";
 import { otherGroup } from "./usecases/group-other";
 import { personalMobilityGroup } from "./usecases/group-personal-mobility";
-import { activitiesGroup } from "./usecases/group-activities";
+import { interestsGroup } from "./usecases/group-interests";
+import { hiddenGroup } from "./usecases/group-hidden";
 // import { customUseCase } from "./usecases/uc-custom.js";
 
 /**
@@ -53,7 +54,7 @@ import { activitiesGroup } from "./usecases/group-activities";
  */
 
 const useCaseGroups = {
-  activities: activitiesGroup,
+  interestsGroup: interestsGroup,
   social: socialGroup,
   classifieds: classifiedsGroup,
   work: workGroup,
@@ -63,6 +64,7 @@ const useCaseGroups = {
   transport: transportGroup,
   personalMobility: personalMobilityGroup,
   other: otherGroup,
+  hiddenGroup: hiddenGroup,
 };
 
 // generate a list of usecases from all use case groups
