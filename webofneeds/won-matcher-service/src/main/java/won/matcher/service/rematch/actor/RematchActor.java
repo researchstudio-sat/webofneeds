@@ -105,8 +105,10 @@ public class RematchActor extends UntypedActor {
 
     private void rematch() {
         BulkAtomEvent rematchEvent = rematchSparqlService.findAtomsForRematching();
-        pubSubMediator.tell(new DistributedPubSubMediator.Publish(rematchEvent.getClass().getName(), rematchEvent),
+        if (!rematchEvent.getAtomEvents().isEmpty()) {
+            pubSubMediator.tell(new DistributedPubSubMediator.Publish(rematchEvent.getClass().getName(), rematchEvent),
                         getSelf());
+        }
         if (log.isDebugEnabled()) {
             log.debug("Found " + rematchEvent.getAtomEvents().size() + " atoms for rematching");
         }
@@ -130,8 +132,10 @@ public class RematchActor extends UntypedActor {
         BulkAtomEvent bulkAtomEvent = new BulkAtomEvent();
         msg.getHintEvents().stream().map(m -> processHint(m))
                         .forEach(ae -> ae.ifPresent(x -> bulkAtomEvent.addAtomEvent(x)));
-        pubSubMediator.tell(new DistributedPubSubMediator.Publish(bulkAtomEvent.getClass().getName(), bulkAtomEvent),
+        if (!bulkAtomEvent.getAtomEvents().isEmpty()) {
+            pubSubMediator.tell(new DistributedPubSubMediator.Publish(bulkAtomEvent.getClass().getName(), bulkAtomEvent),
                         getSelf());
+        }
         if (log.isDebugEnabled()) {
             log.debug("Handled BulkHintEvent of size " + msg.getHintEvents().size());
         }
