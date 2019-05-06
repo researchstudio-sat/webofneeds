@@ -96,7 +96,7 @@ public class RematchSparqlService extends SparqlService {
         // (the latter will be removed afterwards if it is not the earliest one)
         builder.append(" INSERT DATA {  \n");
         builder.append("  graph won:rematchMetadata { \n");
-        builder.append("      won:j won:matchAttemptDate ?matchAttemptDate; \n");
+        builder.append("      won:atomUri won:matchAttemptDate ?matchAttemptDate; \n");
         builder.append("                  won:referenceDate ?referenceDate. \n");
         builder.append("           \n");
         builder.append("     } \n");
