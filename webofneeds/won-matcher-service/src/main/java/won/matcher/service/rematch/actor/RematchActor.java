@@ -115,7 +115,7 @@ public class RematchActor extends UntypedActor {
     private void handleAtomEvent(AtomEvent msg) {
         rematchSparqlService.registerMatchingAttempt(msg);
         if (log.isDebugEnabled()) {
-            log.debug("Handled AtomEvent: " + msg.getUri());
+            log.debug("Handled AtomEvent: " + msg.getUri(), ", cause: " + msg.getCause());
         }
     }
 
@@ -141,7 +141,8 @@ public class RematchActor extends UntypedActor {
         processHint(msg).ifPresent(e -> pubSubMediator
                         .tell(new DistributedPubSubMediator.Publish(e.getClass().getName(), e), getSelf()));
         if (log.isDebugEnabled()) {
-            log.debug("Handled HintEvent: " + msg.getFromAtomUri() + " -> " + msg.getToAtomUri());
+            log.debug("Handled HintEvent: " + msg.getFromAtomUri() + " -> " + msg.getToAtomUri(),
+                            ", cause: " + msg.getCause());
         }
     }
 

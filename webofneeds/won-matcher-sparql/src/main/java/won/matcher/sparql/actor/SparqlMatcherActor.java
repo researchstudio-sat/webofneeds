@@ -189,7 +189,7 @@ public class SparqlMatcherActor extends UntypedActor {
      */
     protected void processActiveAtomEvent(AtomEvent atomEvent) throws IOException {
         AtomModelWrapper atom = new AtomModelWrapper(atomEvent.deserializeAtomDataset());
-        log.debug("starting sparql-based matching for atom {}", atom.getAtomUri());
+        log.debug("starting sparql-based matching for atom {}, cause: {}", atom.getAtomUri(), atomEvent.getCause());
         List<ScoredAtom> matches = queryAtom(atom);
         log.debug("found {} match candidates", matches.size());
         // produce hints after post-filtering the matches we found:
