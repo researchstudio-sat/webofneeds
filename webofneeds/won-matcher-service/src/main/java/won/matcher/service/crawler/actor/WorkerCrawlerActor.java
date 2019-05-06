@@ -21,6 +21,7 @@ import akka.cluster.pubsub.DistributedPubSubMediator;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import won.matcher.service.common.event.AtomEvent;
+import won.matcher.service.common.event.Cause;
 import won.matcher.service.common.service.sparql.SparqlService;
 import won.matcher.service.crawler.config.CrawlConfig;
 import won.matcher.service.crawler.exception.CrawlWrapperException;
@@ -168,7 +169,7 @@ public class WorkerCrawlerActor extends UntypedActor {
                 AtomEvent.TYPE type = state.equals(AtomState.ACTIVE) ? AtomEvent.TYPE.ACTIVE : AtomEvent.TYPE.INACTIVE;
                 log.debug("Created atom event for atom uri {}", uriMsg.getUri());
                 long crawlDate = System.currentTimeMillis();
-                AtomEvent atomEvent = new AtomEvent(uriMsg.getUri(), wonNodeUri, type, crawlDate, ds);
+                AtomEvent atomEvent = new AtomEvent(uriMsg.getUri(), wonNodeUri, type, crawlDate, ds, Cause.CRAWLED);
                 pubSubMediator.tell(new DistributedPubSubMediator.Publish(atomEvent.getClass().getName(), atomEvent),
                                 getSelf());
             }

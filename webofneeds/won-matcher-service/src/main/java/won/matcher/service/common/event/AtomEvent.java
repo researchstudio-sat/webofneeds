@@ -25,12 +25,14 @@ public class AtomEvent implements Serializable {
     private String serializationLangContentType;
     private long crawlDate;
     private TYPE eventType;
+    private Cause cause;
 
     public static enum TYPE {
         ACTIVE, INACTIVE
     }
 
-    public AtomEvent(String uri, String wonNodeUri, TYPE eventType, long crawlDate, String resource, Lang format) {
+    public AtomEvent(String uri, String wonNodeUri, TYPE eventType, long crawlDate, String resource, Lang format,
+                    Cause cause) {
         this.uri = uri;
         this.wonNodeUri = wonNodeUri;
         this.eventType = eventType;
@@ -38,9 +40,10 @@ public class AtomEvent implements Serializable {
         serializedAtomResource = resource;
         serializationLangName = format.getName();
         serializationLangContentType = format.getContentType().getContentType();
+        this.cause = cause;
     }
 
-    public AtomEvent(String uri, String wonNodeUri, TYPE eventType, long crawlDate, Dataset ds) {
+    public AtomEvent(String uri, String wonNodeUri, TYPE eventType, long crawlDate, Dataset ds, Cause cause) {
         this.uri = uri;
         this.wonNodeUri = wonNodeUri;
         this.eventType = eventType;
@@ -50,6 +53,7 @@ public class AtomEvent implements Serializable {
         serializedAtomResource = sw.toString();
         serializationLangName = RDFFormat.TRIG.getLang().getName();
         serializationLangContentType = RDFFormat.TRIG.getLang().getContentType().getContentType();
+        this.cause = cause;
     }
 
     public String getUri() {
@@ -62,6 +66,10 @@ public class AtomEvent implements Serializable {
 
     public TYPE getEventType() {
         return eventType;
+    }
+
+    public Cause getCause() {
+        return cause;
     }
 
     public String getSerializedAtomResource() {
@@ -84,7 +92,7 @@ public class AtomEvent implements Serializable {
     @Override
     public AtomEvent clone() {
         AtomEvent e = new AtomEvent(uri, wonNodeUri, eventType, crawlDate, serializedAtomResource,
-                        getSerializationFormat());
+                        getSerializationFormat(), cause);
         return e;
     }
 
