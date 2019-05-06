@@ -25,6 +25,8 @@ export const lunchInterest = {
       },
     }),
   },
+  enabledUseCases: ["lunchPlan"],
+  reactionUseCases: ["lunchPlan"],
   details: {
     title: { ...details.title },
     description: { ...details.description },
