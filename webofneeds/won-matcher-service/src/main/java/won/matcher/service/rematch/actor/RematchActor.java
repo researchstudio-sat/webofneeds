@@ -13,6 +13,8 @@ import akka.actor.ActorRef;
 import akka.actor.UntypedActor;
 import akka.cluster.pubsub.DistributedPubSub;
 import akka.cluster.pubsub.DistributedPubSubMediator;
+import akka.event.Logging;
+import akka.event.LoggingAdapter;
 import won.matcher.service.common.event.AtomEvent;
 import won.matcher.service.common.event.BulkAtomEvent;
 import won.matcher.service.common.event.BulkHintEvent;
@@ -48,6 +50,7 @@ import won.protocol.util.linkeddata.LinkedDataSource;
 @Component
 @Scope("prototype")
 public class RematchActor extends UntypedActor {
+    private LoggingAdapter log = Logging.getLogger(getContext().system(), this);
     private static final String REMATCH_TICK = "rematch_tick";
     private ActorRef pubSubMediator;
     @Autowired
@@ -75,6 +78,8 @@ public class RematchActor extends UntypedActor {
         pubSubMediator.tell(new DistributedPubSubMediator.Subscribe(AtomEvent.class.getName(), getSelf()), getSelf());
         pubSubMediator.tell(new DistributedPubSubMediator.Subscribe(BulkAtomEvent.class.getName(), getSelf()),
                         getSelf());
+        log.debug("RematchActor startup complete");
+        
     }
 
     @Override
@@ -103,14 +108,23 @@ public class RematchActor extends UntypedActor {
         BulkAtomEvent rematchEvent = rematchSparqlService.findAtomsForRematching();
         pubSubMediator.tell(new DistributedPubSubMediator.Publish(rematchEvent.getClass().getName(), rematchEvent),
                         getSelf());
+        if (log.isDebugEnabled()) {
+            log.debug("Found " + rematchEvent.getAtomEvents().size() + " atoms for rematching");
+        }
     }
 
     private void handleAtomEvent(AtomEvent msg) {
         rematchSparqlService.registerMatchingAttempt(msg);
+        if (log.isDebugEnabled()) {
+            log.debug("Handled AtomEvent: " + msg.getUri());
+        }
     }
 
     private void handleBulkAtomEvent(BulkAtomEvent msg) {
         rematchSparqlService.registerMatchingAttempts(msg);
+        if (log.isDebugEnabled()) {
+            log.debug("Handled BulkAtomEvent of size " + msg.getAtomEvents().size());
+        }
     }
 
     private void handleBulkHintEvent(BulkHintEvent msg) {
@@ -119,11 +133,17 @@ public class RematchActor extends UntypedActor {
                         .forEach(ae -> ae.ifPresent(x -> bulkAtomEvent.addAtomEvent(x)));
         pubSubMediator.tell(new DistributedPubSubMediator.Publish(bulkAtomEvent.getClass().getName(), bulkAtomEvent),
                         getSelf());
+        if (log.isDebugEnabled()) {
+            log.debug("Handled BulkHintEvent of size " + msg.getHintEvents().size());
+        }
     }
 
     private void handleHintEvent(HintEvent msg) {
         processHint(msg).ifPresent(e -> pubSubMediator
                         .tell(new DistributedPubSubMediator.Publish(e.getClass().getName(), e), getSelf()));
+        if (log.isDebugEnabled()) {
+            log.debug("Handled HintEvent: " + msg.getFromAtomUri() + " -> " + msg.getToAtomUri());
+        }
     }
 
     private Optional<AtomEvent> processHint(HintEvent msg) {
