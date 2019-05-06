@@ -180,14 +180,12 @@ public class SparqlMatcherActor extends UntypedActor {
     }
 
     /**
-     * Produces hints for the atom and possibly also 'inverse' hints. Inverse hints
-     * are hints sent to the atoms we find as matches for the original atom. The
-     * score is calculated as a function of scores provided by the embedded sparql
-     * queries: the range of those scores is projected on a range of 0-1. For
-     * inverse matches, the score is always 100%, because there is only one possible
-     * match - the original atom. Note: this could be improved by remembering
-     * reported match scores in the matcher and using historic scores for
-     * normalization, but that's a lot more work.
+     * Produces hints for the atom. The score is calculated as a function of scores
+     * provided by the embedded sparql queries: the range of those scores is
+     * projected on a range of 0-1. For inverse matches, the score is always 100%,
+     * because there is only one possible match - the original atom. Note: this
+     * could be improved by remembering reported match scores in the matcher and
+     * using historic scores for normalization, but that's a lot more work.
      */
     protected void processActiveAtomEvent(AtomEvent atomEvent) throws IOException {
         AtomModelWrapper atom = new AtomModelWrapper(atomEvent.deserializeAtomDataset());
@@ -211,44 +209,7 @@ public class SparqlMatcherActor extends UntypedActor {
                                         .filter(foundAtom -> postFilter(atom, foundAtom.atom))
                                         .collect(Collectors.toList()),
                         atomEvent.getCause());
-        publishHintEvents(hintEvents, atom.getAtomUri(), false);
-        // but use the whole list of matches for inverse matching
-        final boolean noHintForCounterpart = atom.flag(WON.NoHintForCounterpart);
-        if (!noHintForCounterpart) {
-            // we want do do inverse matching:
-            // 1. check if the inverse match is appropriate
-            // 2. do post-filtering
-            // 3. produce hints
-            // 4. collect all inverse hints and publish in one event
-            Dataset atomDataset = atom.copyDataset();
-            List<HintEvent> inverseHintEvents = matches.stream().filter(n -> n.atom.getAtomState() == AtomState.ACTIVE)
-                            .filter(matchedAtom -> !matchedAtom.atom.flag(WON.NoHintForMe)
-                                            && !atom.getAtomUri().equals(matchedAtom.atom.getAtomUri()))
-                            .map(matchedAtom -> {
-                                // query for the matched atom - but only in the dataset containing the original
-                                // atom. If we have a match, it means
-                                // that the matched atom should also get a hint, otherwise it should not.
-                                if (log.isDebugEnabled()) {
-                                    log.debug("checking if match {} of {} should get a hint by inverse matching it in atom's dataset: \n{}",
-                                                    new Object[] { matchedAtom.atom.getAtomUri(), atom.getAtomUri(),
-                                                                    RdfUtils.toString(atomDataset) });
-                                }
-                                List<ScoredAtom> matchesForMatchedAtom = queryAtom(matchedAtom.atom,
-                                                Optional.of(new AtomModelWrapperAndDataset(atom, atomDataset)));
-                                if (log.isDebugEnabled()) {
-                                    log.debug("match {} of {} is also getting a hint: {}",
-                                                    new Object[] { matchedAtom.atom.getAtomUri(), atom.getAtomUri(),
-                                                                    matchesForMatchedAtom.size() > 0 });
-                                }
-                                return new AbstractMap.SimpleEntry<>(matchedAtom.atom, matchesForMatchedAtom.stream()
-                                                .filter(n -> n.atom.getAtomState() == AtomState.ACTIVE)
-                                                .filter(inverseMatch -> postFilter(matchedAtom.atom, inverseMatch.atom))
-                                                .collect(Collectors.toList()));
-                            }).map(entry -> produceHints(entry.getKey(), entry.getValue(), atomEvent.getCause()))
-                            .flatMap(hints -> hints.stream()).collect(Collectors.toList());
-            // now that we've collected all inverse hints, publish them
-            publishHintEvents(inverseHintEvents, atom.getAtomUri(), true);
-        }
+        publishHintEvents(hintEvents, atom.getAtomUri());
         log.debug("finished sparql-based matching for atom {}", atom.getAtomUri());
     }
 
@@ -282,12 +243,12 @@ public class SparqlMatcherActor extends UntypedActor {
      * @param atomURI used for logging
      * @param inverse used for logging
      */
-    private void publishHintEvents(Collection<HintEvent> hintEvents, String atomURI, boolean inverse) {
+    private void publishHintEvents(Collection<HintEvent> hintEvents, String atomURI) {
         BulkHintEvent bulkHintEvent = new BulkHintEvent();
         bulkHintEvent.addHintEvents(hintEvents);
         pubSubMediator.tell(new DistributedPubSubMediator.Publish(bulkHintEvent.getClass().getName(), bulkHintEvent),
                         getSelf());
-        log.debug("sparql-based " + (inverse ? "inverse " : "") + "matching for atom {} (found {} matches)", atomURI,
+        log.debug("sparql-based matching for atom {} (found {} matches)", atomURI,
                         bulkHintEvent.getHintEvents().size());
     }
 
@@ -324,10 +285,6 @@ public class SparqlMatcherActor extends UntypedActor {
                         .map((union) -> new OpDistinct(new OpProject(union, Arrays.asList(new Var[] { resultName }))));
     }
 
-    private List<ScoredAtom> queryAtom(AtomModelWrapper atom) {
-        return queryAtom(atom, Optional.empty());
-    }
-
     /**
      * Query for matches to the atom, optionally the atomToCheck is used to search
      * in. If atomToCheck is passed, it is used as the result data iff the
@@ -338,7 +295,7 @@ public class SparqlMatcherActor extends UntypedActor {
      * @param atomToCheck
      * @return
      */
-    private List<ScoredAtom> queryAtom(AtomModelWrapper atom, Optional<AtomModelWrapperAndDataset> atomToCheck) {
+    private List<ScoredAtom> queryAtom(AtomModelWrapper atom) {
         Optional<Op> query;
         Optional<String> userQuery = atom.getQuery();
         if (userQuery.isPresent()) {
@@ -359,9 +316,8 @@ public class SparqlMatcherActor extends UntypedActor {
             if (log.isDebugEnabled()) {
                 log.debug("transformed query: {}", hintForCounterpartQuery);
             }
-            return Stream.concat(executeQuery(noHintForCounterpartQuery, atomToCheck, atom.getAtomUri()),
-                            executeQuery(hintForCounterpartQuery, atomToCheck, atom.getAtomUri()))
-                            .collect(Collectors.toList());
+            return Stream.concat(executeQuery(noHintForCounterpartQuery, atom.getAtomUri()),
+                            executeQuery(hintForCounterpartQuery, atom.getAtomUri())).collect(Collectors.toList());
         }).orElse(Collections.emptyList());
         return atoms;
     }
@@ -374,7 +330,7 @@ public class SparqlMatcherActor extends UntypedActor {
      * @param atomURI - the URI of the atom we are matching for
      * @return
      */
-    private Stream<ScoredAtom> executeQuery(Op q, Optional<AtomModelWrapperAndDataset> atomToCheck, String atomURI) {
+    private Stream<ScoredAtom> executeQuery(Op q, String atomURI) {
         Query compiledQuery = OpAsQuery.asQuery(q);
         // if we were given an atomToCheck, restrict the query result to that uri so
         // that
@@ -384,10 +340,6 @@ public class SparqlMatcherActor extends UntypedActor {
         BindingHashMap bindingMap = new BindingHashMap();
         bindingMap.add(thisAtom, new ResourceImpl(atomURI.toString()).asNode());
         valuesBlockVariables.add(thisAtom);
-        if (atomToCheck.isPresent()) {
-            bindingMap.add(resultName, new ResourceImpl(atomToCheck.get().atomModelWrapper.getAtomUri()).asNode());
-            valuesBlockVariables.add(resultName);
-        }
         compiledQuery.setValuesDataBlock(valuesBlockVariables, Collections.singletonList(bindingMap));
         // make sure we order by score, if present, and we limit the results
         if (compiledQuery.getProjectVars().contains(scoreName)) {
@@ -399,7 +351,7 @@ public class SparqlMatcherActor extends UntypedActor {
         compiledQuery.setOffset(0);
         compiledQuery.setDistinct(true);
         if (log.isDebugEnabled()) {
-            log.debug("executeQuery query: {}, atomToCheck: {}", new Object[] { compiledQuery, atomToCheck });
+            log.debug("executeQuery query: {}", new Object[] { compiledQuery });
         }
         List<ScoredAtomUri> foundUris = new LinkedList<>();
         // process query results iteratively
@@ -437,27 +389,13 @@ public class SparqlMatcherActor extends UntypedActor {
         // load data in parallel
         return foundUris.parallelStream().map(foundAtomUri -> {
             try {
-                // if we have an atomToCheck, return it if the URI we found actually is its URI,
-                // otherwise null
-                if ((atomToCheck.isPresent())) {
-                    AtomModelWrapper result = atomToCheck.get().atomModelWrapper.getAtomUri().equals(foundAtomUri.uri)
-                                    ? atomToCheck.get().atomModelWrapper
-                                    : null;
-                    if (result == null) {
-                        return null;
-                    }
-                    return new ScoredAtom(result, foundAtomUri.score);
-                } else {
-                    // no atomToCheck, which happens when we first look for matches in the graph
-                    // store:
-                    // download the linked data and return a new AtomModelWrapper
-                    Dataset ds = linkedDataSource.getDataForResource(URI.create(foundAtomUri.uri));
-                    // make sure we don't accidentally use empty or faulty results
-                    if (!AtomModelWrapper.isAAtom(ds)) {
-                        return null;
-                    }
-                    return new ScoredAtom(new AtomModelWrapper(ds), foundAtomUri.score);
+                // download the linked data and return a new AtomModelWrapper
+                Dataset ds = linkedDataSource.getDataForResource(URI.create(foundAtomUri.uri));
+                // make sure we don't accidentally use empty or faulty results
+                if (!AtomModelWrapper.isAAtom(ds)) {
+                    return null;
                 }
+                return new ScoredAtom(new AtomModelWrapper(ds), foundAtomUri.score);
             } catch (Exception e) {
                 log.info("caught exception trying to load atom URI {} : {} (more on loglevel 'debug')", foundAtomUri,
                                 e.getMessage());
