@@ -1,0 +1,161 @@
+@import "won-config";
+@import "textfield";
+@import "sizing-utils";
+
+pokemon-raidboss-picker {
+  display: grid;
+  grid-gap: 0.5rem;
+  grid-template-columns: min-content 1fr;
+  align-items: center;
+
+  @media (max-width: $responsivenessBreakPoint) {
+    .prbp__label,
+    .prbp__pokemon,
+    .prbp__expires,
+    .prbp__hatches {
+      grid-column: span 2;
+    }
+  }
+
+  .prbp__pokemon,
+  .prbp__hatches {
+    transition: opacity linear 0.5s;
+    opacity: 1;
+
+    &--disabled {
+      transition: opacity linear 0.5s;
+      opacity: 0.25;
+      user-select: none;
+      pointer-events: none;
+    }
+  }
+
+  .prbp__pokemonlist {
+    grid-column: span 2;
+    transition: opacity linear 0.5s, max-height linear 0.5s;
+    opacity: 1;
+    max-height: 15rem;
+    overflow-y: auto;
+    border: $thinGrayBorder;
+
+    &--disabled {
+      transition: opacity linear 0.5s, max-height linear 0.5s;
+      max-height: 0;
+      opacity: 0.25;
+      user-select: none;
+      pointer-events: none;
+      border-top: none;
+      border-bottom: none;
+    }
+    &__pokemon {
+      display: grid;
+      grid-template-areas: "pkm_image pkm_name" "pkm_image pkm_id";
+      grid-template-columns: min-content 1fr;
+      grid-column-gap: 0.5rem;
+      grid-row-gap: 0.25rem;
+      border-bottom: $thinGrayBorder;
+      padding: 0.25rem 0.5rem;
+      background: white;
+
+      &:last-of-type {
+        border-bottom: 0;
+      }
+
+      &__image {
+        grid-area: pkm_image;
+        @include fixed-square($postIconSize);
+      }
+
+      &__name {
+        grid-area: pkm_name;
+        font-size: $normalFontSize;
+      }
+
+      &__id {
+        grid-area: pkm_id;
+        font-size: $smallFontSize;
+        color: $won-subtitle-gray;
+      }
+
+      &:hover {
+        cursor: pointer;
+      }
+      &--selected {
+        background: $won-primary-color-light;
+      }
+    }
+  }
+
+  .prbp__label {
+    white-space: nowrap;
+    transition: opacity linear 0.5s;
+    opacity: 1;
+
+    &--disabled {
+      transition: opacity linear 0.5s;
+      opacity: 0.25;
+      user-select: none;
+      pointer-events: none;
+    }
+  }
+
+  .prbp__hatched {
+    width: $postIconSize;
+    height: $postIconSize;
+    margin: 0;
+  }
+
+  .prbp__level {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+    grid-gap: 0.25rem;
+    @media (max-width: $responsivenessBreakPoint) {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    grid-column: span 2;
+
+    .prbp__level__option {
+      display: none;
+
+      &:checked + label {
+        cursor: default;
+        border-color: $won-primary-color;
+        background-color: $won-primary-color-light;
+      }
+
+      & + label {
+        text-align: center;
+        font-size: $smallFontSize;
+        height: calc($postIconSize + #{$smallFontSize});
+        cursor: pointer;
+        padding: calc(#{$postIconSize} + 0.5rem) 0.25rem 0.25rem 0.25rem;
+        background-color: white;
+        background-repeat: no-repeat;
+        background-size: $postIconSize;
+        background-position: center 0.5rem;
+        border: $thinGrayBorder;
+        border-radius: 0.19rem;
+        user-select: none;
+      }
+
+      &[value="1"] + label,
+      &[value="2"] + label {
+        background-image: url(https://vignette.wikia.nocookie.net/pokemongo/images/5/5a/Egg_Raid_Normal.png/revision/latest?cb=20170620230659);
+      }
+
+      &[value="3"] + label,
+      &[value="4"] + label {
+        background-image: url(https://vignette.wikia.nocookie.net/pokemongo/images/e/e3/Egg_Raid_Rare.png/revision/latest?cb=20170620230126);
+      }
+
+      &[value="5"] + label {
+        background-image: url(https://vignette.wikia.nocookie.net/pokemongo/images/c/cd/Egg_Raid_Legendary.png/revision/latest?cb=20170620230139);
+
+        @media (max-width: $responsivenessBreakPoint) {
+          grid-column: span 2;
+        }
+      }
+    }
+  }
+}

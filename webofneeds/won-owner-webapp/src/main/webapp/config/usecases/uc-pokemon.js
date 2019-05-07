@@ -40,7 +40,6 @@ export const pokemonInterest = {
     ...mergeInEmptyDraft({
       content: {
         type: ["won:Interest"],
-        title: "I am interested in Pokémon Go!",
       },
       seeks: {
         type: ["s:PlanAction"],

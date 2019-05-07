@@ -57,11 +57,6 @@ export function parseAtom(jsonldAtom) {
       return undefined;
     }
 
-    parsedAtom.humanReadable = getHumanReadableStringFromAtom(
-      parsedAtom,
-      detailsToParse
-    );
-
     let parsedAtomImm = Immutable.fromJS(parsedAtom);
 
     if (!isPersona(parsedAtomImm)) {
@@ -85,6 +80,11 @@ export function parseAtom(jsonldAtom) {
           );
       }
     }
+
+    parsedAtomImm = parsedAtomImm.set(
+      "humanReadable",
+      getHumanReadableStringFromAtom(parsedAtomImm, detailsToParse)
+    );
 
     return parsedAtomImm;
   } else {
@@ -296,23 +296,32 @@ function extractRating(atomJsonLd) {
   }
 }
 
-function getHumanReadableStringFromAtom(atom, detailsToParse) {
-  if (atom && detailsToParse) {
-    const atomContent = atom.content;
-    const seeksBranch = atom.seeks;
+function getHumanReadableStringFromAtom(atomImm, detailsToParse) {
+  if (atomImm && detailsToParse) {
+    const atomContent = get(atomImm, "content");
+    const seeksBranch = get(atomImm, "seeks");
 
-    const title = atomContent && atomContent.title;
-    const seeksTitle = seeksBranch && seeksBranch.title;
+    const title = atomContent && atomContent.get("title");
+    const seeksTitle = seeksBranch && seeksBranch.get("title");
 
-    const immAtom = Immutable.fromJS(atom);
-
-    if (isPersona(atom)) {
-      return getIn(atom, ["content", "personaName"]);
-    } else if (isSearchAtom(immAtom)) {
-      const searchString = atom && atom.content && atom.content.searchString;
+    if (isPersona(atomImm)) {
+      return getIn(atomImm, ["content", "personaName"]);
+    } else if (isSearchAtom(atomImm)) {
+      const searchString = getIn(atomImm, ["content", "searchString"]);
 
       if (searchString) {
         return "Search: " + searchString;
+      }
+    }
+
+    if (getIn(atomImm, ["matchedUseCase", "identifier"]) === "pokemonGoRaid") {
+      const detailName = "pokemonRaid";
+      const detailValueImm = getIn(atomImm, ["content", detailName]);
+      if (detailValueImm && detailsToParse[detailName]) {
+        return detailsToParse[detailName].generateHumanReadable({
+          value: detailValueImm.toJS(),
+          includeLabel: false,
+        });
       }
     }
 
@@ -325,11 +334,11 @@ function getHumanReadableStringFromAtom(atom, detailsToParse) {
     }
 
     let humanReadableDetails = generateHumanReadableArray(
-      atomContent,
+      atomContent.toJS(),
       detailsToParse
     );
     let humanReadableSeeksDetails = generateHumanReadableArray(
-      seeksBranch,
+      seeksBranch.toJS(),
       detailsToParse
     );
 
@@ -353,7 +362,7 @@ function getHumanReadableStringFromAtom(atom, detailsToParse) {
 
 function generateHumanReadableArray(presentDetails, detailsToParse) {
   let humanReadableArray = [];
-  if (presentDetails) {
+  if (presentDetails && detailsToParse) {
     for (const key in presentDetails) {
       if (!(key === "sockets" || key === "type" || key === "defaultSocket")) {
         const detailToParse = detailsToParse[key];
