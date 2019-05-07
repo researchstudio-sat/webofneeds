@@ -18,6 +18,7 @@ import petrinettransitionViewerModule from "./petrinettransition-viewer.js";
 import reviewViewerModule from "./review-viewer.js";
 import suggestPostViewerModule from "./suggestpost-viewer.js";
 import paypalPaymentViewerModule from "./paypal-payment-viewer.js";
+import pokemonRaidbossViewerModule from "./pokemon-raidboss-viewer.js";
 
 /**
  * module names for angular's module system
@@ -43,4 +44,5 @@ export default [
   reviewViewerModule,
   suggestPostViewerModule,
   paypalPaymentViewerModule,
+  pokemonRaidbossViewerModule,
 ];

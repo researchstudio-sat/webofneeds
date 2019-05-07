@@ -36,7 +36,7 @@ export const pokemonRaid = {
   icon: "#ico36_pokeball", //TODO: Create and use better icon
   messageEnabled: false,
   component: "pokemon-raidboss-picker",
-  viewerComponent: "won-title-viewer",
+  viewerComponent: "pokemon-raidboss-viewer",
   filterDetail: {
     placeholder: "Filter by (name or id)",
   },
@@ -82,7 +82,8 @@ export const pokemonRaid = {
       !value ||
       !value.level ||
       !value.expires ||
-      (!value.id && value.hatched)
+      (!value.id && value.hatched) ||
+      (!value.hatched && !value.hatches)
     )
       return false;
 
