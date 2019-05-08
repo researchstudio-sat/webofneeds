@@ -11,6 +11,7 @@ pokemon-raidboss-viewer {
     border-radius: 0.19rem;
     grid-template-areas: "prbv_level prbv_pokemon" "prbv_level prbv_expires";
     grid-template-columns: min-content 1fr;
+    grid-template-rows: 4rem min-content;
     padding-left: 0;
 
     .prbv__content__label {
@@ -29,6 +30,7 @@ pokemon-raidboss-viewer {
       background-position: center 0.5rem;
       border-right: $thinGrayBorder;
       user-select: none;
+      word-break: keep-all;
 
       &--normal {
         background-image: url(https://vignette.wikia.nocookie.net/pokemongo/images/5/5a/Egg_Raid_Normal.png/revision/latest?cb=20170620230659);
@@ -63,13 +65,14 @@ pokemon-raidboss-viewer {
       grid-template-areas: "pkmv_image pkmv_name" "pkmv_image pkmv_id";
       grid-template-columns: min-content 1fr;
       grid-column-gap: 0.5rem;
-      grid-row-gap: 0.25rem;
       padding: 0.25rem;
       background: $won-light-gray;
       border-bottom: $thinGrayBorder;
+      grid-template-rows: 1.25rem min-content;
 
       &__image {
         grid-area: pkmv_image;
+        align-self: center;
         @include fixed-square(3.5rem);
 
         &--unhatched {

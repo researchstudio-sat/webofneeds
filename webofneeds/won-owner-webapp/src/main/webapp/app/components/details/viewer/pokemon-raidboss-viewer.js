@@ -33,27 +33,15 @@ function genComponentConf() {
           <div class="prbv__content__pokemon" ng-if="!self.hatched || !self.pokemon">
             <img class="prbv__content__pokemon__image prbv__content__pokemon__image--unhatched" src="{{self.detail.pokemonList[0].imageUrl}}"/>
             <div class="prbv__content__pokemon__id">?</div>
-            <div class="prbv__content__pokemon__name" ng-if="!self.shouldHaveHatched">Hatches {{ self.friendlyHatchesTime }}</div>
-            <div class="prbv__content__pokemon__name" ng-if="self.shouldHaveHatched">Should have hatched {{ self.friendlyHatchesTime }}</div>
+            <div class="prbv__content__pokemon__name" ng-if="!self.shouldHaveHatched">Hatches {{ self.friendlyHatchesTime }} ({{ self.hatchesLocaleString }})</div>
+            <div class="prbv__content__pokemon__name" ng-if="self.shouldHaveHatched">Should have hatched {{ self.friendlyHatchesTime }} ({{ self.hatchesLocaleString }})</div>
           </div>
           <div class="prbv__content__expires prbv__content__expires--expired" ng-if="self.hasExpired">
-            Has expired {{ self.friendlyExpiresTime }}
+            Has expired {{ self.friendlyExpiresTime }} ({{ self.expiresLocaleString }})
           </div>
           <div class="prbv__content__expires" ng-if="!self.hasExpired">
-            Expires {{ self.friendlyExpiresTime }}
+            Expires {{ self.friendlyExpiresTime }} ({{ self.expiresLocaleString }})
           </div>
-          <!--div class="prbv__content__label">
-            Hatches:
-          </div>
-          <div class="prbv__content__hatches">
-            {{ self.hatches }}
-          </div>
-          <div class="prbv__content__label">
-            Hatched:
-          </div>
-          <div class="prbv__content__hatched">
-            {{ self.hatched }}
-          </div-->
         </div>
     `;
 
@@ -70,7 +58,6 @@ function genComponentConf() {
         const hatched = get(this.content, "hatched");
 
         return {
-          id,
           pokemon:
             id &&
             this.detail &&
@@ -82,8 +69,6 @@ function genComponentConf() {
             this.detail &&
             this.detail.getLevelLabel &&
             this.detail.getLevelLabel(level),
-          hatches,
-          expires,
           hatched,
           shouldHaveHatched: hatches && selectLastUpdateTime(state) > hatches,
           hasExpired: expires && selectLastUpdateTime(state) > expires,
@@ -91,6 +76,8 @@ function genComponentConf() {
             hatches && relativeTime(selectLastUpdateTime(state), hatches),
           friendlyExpiresTime:
             expires && relativeTime(selectLastUpdateTime(state), expires),
+          hatchesLocaleString: hatches && hatches.toLocaleString(),
+          expiresLocaleString: expires && expires.toLocaleString(),
         };
       };
 
