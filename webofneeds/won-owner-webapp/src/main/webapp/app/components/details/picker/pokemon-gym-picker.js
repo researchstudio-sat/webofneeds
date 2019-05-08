@@ -1,32 +1,44 @@
 import angular from "angular";
 import { attach, delay } from "../../../utils.js";
 import { DomCache } from "../../../cstm-ng-utils.js";
-import wonInput from "../../../directives/input.js";
-import "angular-marked";
+import locationPickerModule from "./location-picker.js";
+import descriptionPickerModule from "./description-picker.js";
+import titlePickerModule from "./title-picker.js";
 
 import "style/_pokemongympicker.scss";
-import "style/_won-markdown.scss";
 
 const serviceDependencies = ["$scope", "$element"];
 function genComponentConf() {
   let template = `
-      <div class="pgp__input">
-      GYM PICKA!!! TODO: REMOVE THIS LINE!!!
-        <svg class="pgp__input__icon clickable"
-          style="--local-primary:var(--won-primary-color);"
-          ng-if="self.showResetButton"
-          ng-click="self.resetDescription()">
-          <use xlink:href="#ico36_close" href="#ico36_close"></use>
-        </svg>
-        <textarea
-          won-textarea-autogrow
-          class="pgp__input__inner"
-          won-input="::self.updateDescription()"
-          placeholder="{{self.detail.placeholder}}"></textarea>
-      </div>
-      <div class="pgp__preview__header">Preview</div>
-      <div ng-if="self.addedDescription" class="pgp__preview__content markdown" marked="self.addedDescription"></div>
-      <div ng-if="!self.addedDescription" class="pgp__preview__content--empty>Add Content to see instant preview</div>
+      <label class="pgp__label">Location:</label>
+      <won-location-picker
+          class="pgp__location"
+          initial-value="self.pokemonGym.location"
+          on-update="self.updateLocation(value)"
+          detail="self.detail && self.detail.locationDetail">
+      </won-location-picker>
+      <label class="pgp__label">Name:</label>
+      <won-title-picker
+          class="pgp__name"
+          initial-value="self.pokemonGym.name"
+          on-update="self.updateName(value)"
+          detail="self.detail && self.detail.nameDetail">
+      </won-title-picker>
+      <label for="pgp__ex" class="pgp__label">Gym Ex:</label>
+      <input
+          type="checkbox"
+          id="pgp__ex"
+          class="pgp__ex"
+          ng-model="self.pokemonGym.ex"
+          ng-change="self.updateEx(self.pokemonGym.ex)"
+          class="prbp__hatched" />
+      <label class="pgp__label">Additional Info:</label>
+      <won-description-picker
+          class="pgp__info"
+          initial-value="self.pokemonGym.info"
+          on-update="self.updateInfo(value)"
+          detail="self.detail && self.detail.infoDetail">
+      </won-description-picker>
     `;
 
   class Controller {
@@ -36,59 +48,55 @@ function genComponentConf() {
 
       window.pkmGymp4dbg = this;
 
-      this.addedDescription = this.initialValue;
-      this.showResetButton = false;
+      this.pokemonGym = this.initialValue || {};
 
-      delay(0).then(() => this.showInitialDescription());
+      delay(0).then(() => this.showInitialValues());
     }
 
     /**
      * Checks validity and uses callback method
      */
-    update(description) {
-      if (description && description.trim().length > 0) {
-        this.onUpdate({ value: description });
+    update(pokemonGym) {
+      if (this.detail.isValid(pokemonGym)) {
+        console.debug("gym: ", pokemonGym);
+        //TODO IMPL (include an isValid of some sorts)
+        this.onUpdate({
+          value: {
+            name: pokemonGym.name,
+            location: pokemonGym.location,
+            info: pokemonGym.info,
+            ex: pokemonGym.ex,
+          },
+        });
       } else {
         this.onUpdate({ value: undefined });
       }
     }
 
-    showInitialDescription() {
-      this.addedDescription = this.initialValue;
-
-      if (this.initialValue && this.initialValue.trim().length > 0) {
-        this.textfield().value = this.initialValue.trim();
-        this.showResetButton = true;
-      }
+    showInitialValues() {
+      this.pokemonGym = this.initialValue || {};
 
       this.$scope.$apply();
     }
 
-    updateDescription() {
-      const text = this.textfield().value;
-
-      if (text && text.trim().length > 0) {
-        this.addedDescription = text;
-        this.update(this.addedDescription);
-        this.showResetButton = true;
-      } else {
-        this.resetDescription();
-      }
+    updateLocation(location) {
+      this.pokemonGym.location = location;
+      this.update(this.pokemonGym);
     }
 
-    resetDescription() {
-      this.addedDescription = undefined;
-      this.textfield().value = "";
-      this.update(undefined);
-      this.showResetButton = false;
+    updateInfo(info) {
+      this.pokemonGym.info = info;
+      this.update(this.pokemonGym);
     }
 
-    textfieldNg() {
-      return this.domCache.ng(".pgp__input__inner");
+    updateName(name) {
+      this.pokemonGym.name = name;
+      this.update(this.pokemonGym);
     }
 
-    textfield() {
-      return this.domCache.dom(".pgp__input__inner");
+    updateEx(ex) {
+      this.pokemonGym.ex = ex;
+      this.update(this.pokemonGym);
     }
   }
   Controller.$inject = serviceDependencies;
@@ -108,5 +116,9 @@ function genComponentConf() {
 }
 
 export default angular
-  .module("won.owner.components.pokemonGymPicker", [wonInput, "hc.marked"])
+  .module("won.owner.components.pokemonGymPicker", [
+    titlePickerModule,
+    locationPickerModule,
+    descriptionPickerModule,
+  ])
   .directive("pokemonGymPicker", genComponentConf).name;

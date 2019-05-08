@@ -13,6 +13,18 @@ export const pokemonGym = {
   messageEnabled: false,
   component: "pokemon-gym-picker",
   viewerComponent: "won-description-viewer", //TODO: IMPL CORRECT VIEWER
+  locationDetail: {
+    placeholder: "Search for location",
+  },
+  infoDetail: {
+    placeholder: "Info about this gym (not mandatory, markdown enabled)",
+  },
+  nameDetail: {
+    placeholder: "Name (mandatory)",
+  },
+  isValid: function(value) {
+    return value && value.location && value.name;
+  },
   parseToRDF: function({ value }) {
     //TODO: IMPL CORRECT FUNCTION
     const val = value ? value : undefined;
