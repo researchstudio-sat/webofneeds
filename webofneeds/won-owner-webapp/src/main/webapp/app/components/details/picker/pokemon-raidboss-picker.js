@@ -55,17 +55,18 @@ function genComponentConf() {
       </won-title-picker>
       <div class="prbp__pokemonlist" ng-class="{'prbp__pokemonlist--disabled': !self.pokemonRaidBoss.hatched}">
         <div class="prbp__pokemonlist__pokemon"
-          ng-repeat="pokemon in self.detail.pokemonList | filter:self.filterPokemon(self.pokemonFilter, self.pokemonRaidBoss.id)"
+          ng-repeat="pokemon in self.detail.pokemonList | filter:self.filterPokemon(self.pokemonFilter, self.pokemonRaidBoss.id, self.pokemonRaidBoss.form)"
           ng-class="{
-            'prbp__pokemonlist__pokemon--selected': self.pokemonRaidBoss.id === pokemon.id
+            'prbp__pokemonlist__pokemon--selected': self.pokemonRaidBoss.id == pokemon.id && (!self.pokemonRaidBoss.form || self.pokemonRaidBoss.form == pokemon.form)
           }"
-          ng-click="self.updateId(pokemon.id)">
+          ng-click="self.updatePokemon(pokemon.id, pokemon.form)">
           <img class="prbp__pokemonlist__pokemon__image" src="{{pokemon.imageUrl}}"/>
           <div class="prbp__pokemonlist__pokemon__id">
             #{{pokemon.id}}
           </div>
           <div class="prbp__pokemonlist__pokemon__name">
             {{pokemon.name}}
+            <span class="prbp__pokemonlist__pokemon__name__form" ng-if="pokemon.form">({{ pokemon.form }})</span>
           </div>
         </div>
       </div>
@@ -80,10 +81,7 @@ function genComponentConf() {
 
       this.pokemonRaidBoss = this.initialValue || { level: 1 };
 
-      this.pokemonFilter =
-        this.initialValue &&
-        this.detail &&
-        this.detail.getPokemonNameById(this.initialValue.id);
+      this.pokemonFilter = undefined;
 
       delay(0).then(() => this.showInitialValues());
     }
@@ -96,6 +94,7 @@ function genComponentConf() {
         this.onUpdate({
           value: {
             id: pokemonRaidBoss.hatched ? pokemonRaidBoss.id : undefined,
+            form: pokemonRaidBoss.hatched ? pokemonRaidBoss.form : undefined,
             level: pokemonRaidBoss.level,
             hatched: pokemonRaidBoss.hatched,
             hatches: !pokemonRaidBoss.hatched
@@ -109,7 +108,7 @@ function genComponentConf() {
       }
     }
 
-    filterPokemon(pokemonFilter, selectedId) {
+    filterPokemon(pokemonFilter, selectedId, selectedForm) {
       return pokemon => {
         if (pokemonFilter) {
           const filterArray =
@@ -120,18 +119,31 @@ function genComponentConf() {
               .split(" ");
           if (filterArray && filterArray.length > 0) {
             for (const idx in filterArray) {
+              if (pokemon.id == filterArray[idx]) return true;
+              if ("#" + pokemon.id === filterArray[idx]) return true;
               if (
-                (selectedId && selectedId == pokemon.id) ||
-                pokemon.name.toLowerCase().includes(filterArray[idx]) ||
-                pokemon.id == filterArray[idx] ||
-                "#" + pokemon.id === filterArray[idx]
-              ) {
+                pokemon.form &&
+                pokemon.form.toLowerCase().includes(filterArray[idx])
+              )
                 return true;
-              }
+              if (pokemon.name.toLowerCase().includes(filterArray[idx]))
+                return true;
             }
-            return false;
           }
         }
+
+        if (selectedId) {
+          if (
+            (!selectedForm && selectedId == pokemon.id && !pokemon.form) ||
+            (selectedForm &&
+              selectedId == pokemon.id &&
+              selectedForm === pokemon.form)
+          ) {
+            return true;
+          }
+          return false;
+        }
+
         return true;
       };
     }
@@ -164,19 +176,30 @@ function genComponentConf() {
       this.pokemonFilter = filter && filter.trim();
     }
 
-    updateId(id) {
-      this.pokemonRaidBoss.id = this.pokemonRaidBoss.id != id ? id : undefined;
-      this.pokemonFilter =
-        this.detail && this.detail.getPokemonNameById(this.pokemonRaidBoss.id);
+    updatePokemon(id, form) {
+      if (this.pokemonRaidBoss.id == id && this.pokemonRaidBoss.form === form) {
+        this.pokemonRaidBoss.id = undefined;
+        this.pokemonRaidBoss.form = undefined;
+      } else {
+        this.pokemonRaidBoss.id = id;
+        this.pokemonRaidBoss.form = form;
+      }
+
+      console.debug(
+        "Selected Pokemon:",
+        this.pokemonRaidBoss,
+        "based on (",
+        id,
+        ",",
+        form,
+        ")"
+      );
+
       this.update(this.pokemonRaidBoss);
     }
 
     showInitialValues() {
       this.pokemonRaidBoss = this.initialValue || { level: 1 };
-      this.pokemonFilter =
-        this.pokemonRaidBoss &&
-        this.detail &&
-        this.detail.getPokemonNameById(this.pokemonRaidBoss.id);
       this.$scope.$apply();
     }
   }

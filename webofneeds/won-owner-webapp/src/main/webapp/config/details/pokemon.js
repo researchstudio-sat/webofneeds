@@ -11,18 +11,21 @@ export const pokemonGym = {
   label: "Gym",
   icon: "#ico36_dumbbell", //TODO: Create and use better icon
   messageEnabled: false,
-  component: "won-title-picker",
-  viewerComponent: "won-title-viewer",
+  component: "pokemon-gym-picker",
+  viewerComponent: "won-description-viewer", //TODO: IMPL CORRECT VIEWER
   parseToRDF: function({ value }) {
+    //TODO: IMPL CORRECT FUNCTION
     const val = value ? value : undefined;
     return {
       "won:gym": val,
     };
   },
   parseFromRDF: function(jsonLDImm) {
+    //TODO: IMPL CORRECT FUNCTION
     return won.parseFrom(jsonLDImm, ["won:gym"], "xsd:string");
   },
   generateHumanReadable: function({ value, includeLabel }) {
+    //TODO: IMPL CORRECT FUNCTION
     if (value) {
       return includeLabel ? this.label + ": " + value : value;
     }
@@ -41,7 +44,7 @@ export const pokemonRaid = {
     placeholder: "Filter by (name or id)",
   },
   pokemonList: [
-    //TODO: UPDATE LIST
+    //TODO: UPDATE LIST OR EXTRACT INTO SEPARATE FILE OR FIND WS that supplies these
     {
       id: 1,
       name: "Bulbasaur",
@@ -62,19 +65,35 @@ export const pokemonRaid = {
       name: "Charmander",
       imageUrl: "https://files.pokefans.net/images/pokemon-go/modelle/004.png",
     },
+    {
+      id: 386,
+      name: "Deoxys",
+      imageUrl: "https://files.pokefans.net/images/pokemon-go/modelle/386.png",
+    },
+    {
+      id: 386,
+      form: "init",
+      name: "Deoxys",
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/386-04.png",
+    },
   ],
-  findPokemonById: function(id) {
+  findPokemonById: function(id, form) {
     if (id) {
       for (const idx in this.pokemonList) {
-        if (this.pokemonList[idx].id == id) {
+        if (
+          this.pokemonList[idx].id == id &&
+          ((form && this.pokemonList[idx].form === form) ||
+            (!form && !this.pokemonList[idx].form))
+        ) {
           return this.pokemonList[idx];
         }
       }
     }
     return undefined;
   },
-  getPokemonNameById: function(id) {
-    const pokemon = this.findPokemonById(id);
+  getPokemonNameById: function(id, form) {
+    const pokemon = this.findPokemonById(id, form);
     return pokemon && pokemon.name;
   },
   isValid: function(value) {
@@ -117,6 +136,9 @@ export const pokemonRaid = {
           "won:raid": {
             "won:level": { "@value": value.level, "@type": "xsd:int" },
             "won:pokemonid": { "@value": value.id, "@type": "xsd:int" },
+            "won:pokemonform": value.form
+              ? { "@value": value.form, "@type": "xsd:string" }
+              : undefined,
             "s:validThrough": {
               "@value": toLocalISODateString(value.expires),
               "@type": "xsd:dateTime",
@@ -164,9 +186,14 @@ export const pokemonRaid = {
         !hatched &&
         won.parseFrom(jsonLDImm, ["won:raid", "s:validFrom"], "xsd:dateTime");
 
+      const form =
+        id &&
+        won.parseFrom(jsonLDImm, ["won:raid", "won:pokemonform"], "xsd:string");
+
       if (hatched) {
         return Immutable.fromJS({
           id,
+          form,
           hatched,
           level,
           expires,
@@ -187,7 +214,8 @@ export const pokemonRaid = {
       let labelPart = "";
       if (value.hatched) {
         labelPart =
-          this.getPokemonNameById(value.id) +
+          this.getPokemonNameById(value.id, value.form) +
+          (value.form ? " (" + value.form + ")" : "") +
           ", expires at: " +
           parseDatetimeStrictly(value.expires);
       } else {

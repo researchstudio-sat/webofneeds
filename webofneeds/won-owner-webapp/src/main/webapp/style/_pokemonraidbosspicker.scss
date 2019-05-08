@@ -69,6 +69,11 @@ pokemon-raidboss-picker {
       &__name {
         grid-area: pkm_name;
         font-size: $normalFontSize;
+
+        &__form {
+          margin-left: 0.25rem;
+          color: $won-subtitle-gray;
+        }
       }
 
       &__id {

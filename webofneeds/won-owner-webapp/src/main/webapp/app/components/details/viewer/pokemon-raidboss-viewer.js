@@ -28,7 +28,10 @@ function genComponentConf() {
           <div class="prbv__content__pokemon" ng-if="self.hatched && self.pokemon">
             <img class="prbv__content__pokemon__image" src="{{self.pokemon.imageUrl}}"/>
             <div class="prbv__content__pokemon__id">#{{self.pokemon.id}}</div>
-            <div class="prbv__content__pokemon__name">{{self.pokemon.name}}</div>
+            <div class="prbv__content__pokemon__name">
+              {{self.pokemon.name}}
+              <span class="prbv__content__pokemon__name__form" ng-if="self.form">({{ self.form }})</span>
+            </div>
           </div>
           <div class="prbv__content__pokemon" ng-if="!self.hatched || !self.pokemon">
             <img class="prbv__content__pokemon__image prbv__content__pokemon__image--unhatched" src="{{self.detail.pokemonList[0].imageUrl}}"/>
@@ -52,6 +55,7 @@ function genComponentConf() {
 
       const selectFromState = state => {
         const id = get(this.content, "id");
+        const form = get(this.content, "form");
         const level = get(this.content, "level");
         const hatches = get(this.content, "hatches");
         const expires = get(this.content, "expires");
@@ -62,7 +66,8 @@ function genComponentConf() {
             id &&
             this.detail &&
             this.detail.findPokemonById &&
-            this.detail.findPokemonById(id),
+            this.detail.findPokemonById(id, form),
+          form,
           level,
           levelLabel:
             level &&
