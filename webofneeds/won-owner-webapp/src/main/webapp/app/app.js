@@ -52,6 +52,12 @@ import aboutComponent from "./pages/about.jsx";
 import signupComponent from "./pages/signup.jsx";
 import settingsComponent from "./pages/settings.jsx";
 
+import serviceWorkerRuntime from "serviceworker-webpack-plugin/lib/runtime";
+
+if ("serviceWorker" in navigator) {
+  serviceWorkerRuntime.register();
+}
+
 //won import (used so you can access the debugmode variable without reloading the page)
 import won from "./service/won.js";
 window.won = won;

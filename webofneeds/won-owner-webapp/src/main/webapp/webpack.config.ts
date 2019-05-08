@@ -9,12 +9,17 @@ import * as WatchTimePlugin from "webpack-watch-time-plugin";
 import * as UnusedWebpackPlugin from "unused-webpack-plugin";
 import * as DartSass from "dart-sass";
 import * as HtmlWebpackPlugin from "html-webpack-plugin";
+import * as ServiceWorkerWebpackPlugin from "serviceworker-webpack-plugin";
 
 export default config;
 
 function config(env, argv): Configuration {
   const mode: "development" | "production" =
-    argv.mode || (argv.watch ? "development" : "production");
+    argv.mode || argv.host
+      ? "development"
+      : argv.watch
+        ? "development"
+        : "production";
 
   const nodeEnv = process.env.WON_DEPLOY_NODE_ENV || "default";
 
@@ -80,7 +85,15 @@ function config(env, argv): Configuration {
         {
           test: /\.s?css$/,
           use: [
-            MiniCssExtractPlugin.loader,
+            () => {
+              if (mode == "development") {
+                return {
+                  loader: "style-loader",
+                };
+              } else {
+                return MiniCssExtractPlugin.loader;
+              }
+            },
             {
               loader: "css-loader",
               options: {
@@ -112,7 +125,7 @@ function config(env, argv): Configuration {
               loader: "svg-sprite-loader",
               options: {
                 extract: true,
-                spriteFilename: "spritesheet.[hash].svg",
+                spriteFilename: "spritesheet.[contenthash].svg",
               },
             },
             {
@@ -159,6 +172,10 @@ function config(env, argv): Configuration {
       }),
       new MiniCssExtractPlugin({
         filename: "[name].[contenthash].css",
+      }),
+      new ServiceWorkerWebpackPlugin({
+        entry: path.join(__dirname, "sw.js"),
+        publicPath: "/",
       }),
       new SpriteLoaderPlugin({ plainSprite: true }),
       new CopyWebpackPlugin(
