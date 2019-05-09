@@ -1,7 +1,0 @@
-__pycache__/
-/bin/
-/lib/
-/local/
-/selenium/
-/share/
-.pytest_cache/
