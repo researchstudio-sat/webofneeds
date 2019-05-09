@@ -13,29 +13,18 @@ export const pokemonGymInfo = {
   messageEnabled: false,
   component: "pokemon-gym-picker",
   viewerComponent: "pokemon-gym-viewer",
-  infoDetail: {
-    placeholder: "Info about this gym (not mandatory, markdown enabled)",
-  },
   isValid: function(value) {
     return value && value.ex;
   },
   parseToRDF: function({ value }) {
     if (this.isValid(value)) {
-      return {
-        "won:gym": {
-          "won:gymex": { "@value": !!value.ex, "@type": "xsd:boolean" },
-        },
-      };
+      return { "won:gymex": { "@value": !!value.ex, "@type": "xsd:boolean" } };
     }
     return undefined;
   },
   parseFromRDF: function(jsonLDImm) {
     if (jsonLDImm) {
-      const ex = won.parseFrom(
-        jsonLDImm,
-        ["won:gym", "won:gymex"],
-        "xsd:boolean"
-      );
+      const ex = won.parseFrom(jsonLDImm, ["won:gymex"], "xsd:boolean");
 
       if (ex) {
         return Immutable.fromJS({ ex });
