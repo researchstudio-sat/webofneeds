@@ -14,16 +14,21 @@
 
 <https://w3id.org/won/core> rdf:type owl:Ontology ;
                              owl:versionIRI <https://w3id.org/won/core/1.0> ;
+                             dc:abstract "The Web of Needs is a decentralized linked data application infrastructure for mediating cooperation in the broadest sense. Based on append-only message logs, users (or other agents) publish objects ('Atoms') that can establish 'Connections'  with other Atoms. Matching services can make suggestions which atoms to connect to. An Atom specifies 'Sockets' indicating the kinds of Connections it is prepared to establish."@en ;
                              dc:creator "Fabian Salcher" ,
                                         "Florian Kleedorfer" ;
                              dc:date "2013-12-13"^^xsd:date ;
                              dc:title "Web of Needs Ontology" ;
-                             vann:PreferredNamespacePrefix "won" ;
+                             vann:preferredNamespacePrefix "won" ;
                              rdfs:comment "Ontology for the Web of Needs data model."@en .
 
 #################################################################
 #    Annotation properties
 #################################################################
+
+###  http://purl.org/dc/elements/1.1/abstract
+dc:abstract rdf:type owl:AnnotationProperty .
+
 
 ###  http://purl.org/dc/elements/1.1/creator
 dc:creator rdf:type owl:AnnotationProperty .
@@ -37,8 +42,8 @@ dc:date rdf:type owl:AnnotationProperty .
 dc:title rdf:type owl:AnnotationProperty .
 
 
-###  http://purl.org/vocab/vann/PreferredNamespacePrefix
-vann:PreferredNamespacePrefix rdf:type owl:AnnotationProperty .
+###  http://purl.org/vocab/vann/preferredNamespacePrefix
+vann:preferredNamespacePrefix rdf:type owl:AnnotationProperty .
 
 
 #################################################################
@@ -53,13 +58,12 @@ xsd:duration rdf:type rdfs:Datatype .
 #    Object Properties
 #################################################################
 
-###  https://w3id.org/won/core#additionalData
-:additionalData rdf:type owl:ObjectProperty ;
-                rdfs:domain owl:Thing ;
-                rdfs:range owl:Thing ;
-                rdfs:comment "Links to an RDF graph with additional information about the subject."^^xsd:string ;
-                rdfs:isDefinedBy <https://w3id.org/won/core> ;
-                rdfs:label "additionalData" .
+###  https://w3id.org/won/core#atomList
+:atomList rdf:type owl:ObjectProperty ;
+          rdfs:domain :Node ;
+          rdfs:range :AtomContainer ;
+          rdfs:comment "The Node's atoms, in a LDP-pageable container." ;
+          rdfs:label "atomList" .
 
 
 ###  https://w3id.org/won/core#atomState
@@ -406,6 +410,15 @@ It specifies a content - what the atom is about, which may be something that is 
       rdfs:label "Atom" .
 
 
+###  https://w3id.org/won/core#AtomContainer
+:AtomContainer rdf:type owl:Class ;
+               rdfs:subClassOf <http://www.w3.org/ns/ldp#CompositeContainer> ;
+               rdfs:comment """An LDP container with all the Atoms stored on the Node.
+
+The container supports LDP paging as described here: https://github.com/researchstudio-sat/webofneeds/blob/master/webofneeds/won-node-webapp/doc/linked-data-paging.md""" ;
+               rdfs:label "AtomContainer" .
+
+
 ###  https://w3id.org/won/core#AtomState
 :AtomState rdf:type owl:Class ;
            rdfs:comment "The Atom's state."@en ;
@@ -424,8 +437,7 @@ It specifies a content - what the atom is about, which may be something that is 
 :ConnectionContainer rdf:type owl:Class ;
                      rdfs:subClassOf <http://www.w3.org/ns/ldp#CompositeContainer> ;
                      owl:disjointWith :MessageContainer ;
-                     rdfs:comment "Container for Connections."@en ,
-                                  "Represents a Connection to between two Atoms. Whenever two Atoms are connected, each Atom creates a dedicated Connection object which encapsulate all information about the connection."@en ;
+                     rdfs:comment "Container for Connections. The container supports LDP paging as described here: https://github.com/researchstudio-sat/webofneeds/blob/master/webofneeds/won-node-webapp/doc/linked-data-paging.md"@en ;
                      rdfs:isDefinedBy <https://w3id.org/won/core> ;
                      rdfs:label "ConnectionContainer" .
 
@@ -447,7 +459,7 @@ It specifies a content - what the atom is about, which may be something that is 
 ###  https://w3id.org/won/core#MessageContainer
 :MessageContainer rdf:type owl:Class ;
                   rdfs:subClassOf <http://www.w3.org/ns/ldp#CompositeContainer> ;
-                  rdfs:comment "Container for Events."@en ;
+                  rdfs:comment "Container for Messages. The container supports LDP paging as described here: https://github.com/researchstudio-sat/webofneeds/blob/master/webofneeds/won-node-webapp/doc/linked-data-paging.md."@en ;
                   rdfs:isDefinedBy <https://w3id.org/won/core> ;
                   rdfs:label "MessageContainer" .
 
@@ -631,29 +643,6 @@ It specifies a content - what the atom is about, which may be something that is 
                         :WhatsAround
                         :WhatsNew
                       )
-] .
-
-
-[ rdf:type owl:AllDisjointProperties ;
-  owl:members ( :additionalData
-                :atomState
-                :compatibleSocketDefinition
-                :connectionState
-                :connections
-                :defaultSocket
-                :derivesAtomProperty
-                :derivesInverseAtomProperty
-                :flag
-                :messageContainer
-                :seeks
-                :socket
-                :socketDefinition
-                :supportsWonProtocolImpl
-                :targetAtom
-                :targetConnection
-                :targetSocket
-                :uriPrefixSpecification
-              )
 ] .
 
 
