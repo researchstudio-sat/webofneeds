@@ -27,7 +27,9 @@ export const pokemonGoRaid = {
   reactionUseCases: ["pokemonInterest"],
   details: {
     pokemonRaid: { ...details.pokemonRaid, mandatory: true },
-    pokemonGym: { ...details.pokemonGym, mandatory: true },
+    location: { ...details.location, mandatory: true },
+    pokemonGymInfo: { ...details.pokemonGymInfo },
+    description: { ...details.description },
   },
   seeksDetails: {},
 };

@@ -8,24 +8,13 @@ pokemon-gym-picker {
   grid-template-columns: min-content 1fr;
   align-items: center;
 
+  .pgp__label {
+    white-space: nowrap;
+  }
+
   .pgp__ex {
     width: $postIconSize;
     height: $postIconSize;
     margin: 0;
-  }
-
-  .pgp__location {
-    grid-column: span 2;
-  }
-  .pgp__info {
-    grid-column: span 2;
-  }
-
-  .pgp__label {
-    white-space: nowrap;
-    &--info,
-    &--location {
-      grid-column: span 2;
-    }
   }
 }

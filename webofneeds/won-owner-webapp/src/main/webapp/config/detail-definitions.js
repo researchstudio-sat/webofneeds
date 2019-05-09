@@ -83,7 +83,7 @@ export const details = {
   sockets: basicDetails.sockets,
   defaultSocket: basicDetails.defaultSocket,
   type: basicDetails.type,
-  pokemonGym: pokemonDetails.pokemonGym,
+  pokemonGymInfo: pokemonDetails.pokemonGymInfo,
   pokemonRaid: pokemonDetails.pokemonRaid,
 };
 

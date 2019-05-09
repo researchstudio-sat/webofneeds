@@ -4,48 +4,26 @@ import {
   isValidDate,
   //parseDatetimeStrictly,
   toLocalISODateString,
-  getIn,
 } from "../../app/utils.js";
-import {
-  genSPlace,
-  genDetailBaseUri,
-  parseSPlace,
-} from "../../app/won-utils.js";
 
-export const pokemonGym = {
-  identifier: "pokemonGym",
-  label: "Gym",
+export const pokemonGymInfo = {
+  identifier: "pokemonGymInfo",
+  label: "Additional Gym Info",
   icon: "#ico36_dumbbell", //TODO: Create and use better icon
   messageEnabled: false,
   component: "pokemon-gym-picker",
-  viewerComponent: "pokemon-gym-viewer", //TODO: IMPL CORRECT VIEWER
-  locationDetail: {
-    placeholder: "Search for location",
-  },
+  viewerComponent: "pokemon-gym-viewer",
   infoDetail: {
     placeholder: "Info about this gym (not mandatory, markdown enabled)",
   },
-  nameDetail: {
-    placeholder: "Name (mandatory)",
-  },
   isValid: function(value) {
-    return value && value.location && value.name;
+    return value && value.ex;
   },
-  parseToRDF: function({ value, identifier, contentUri }) {
-    //TODO: IMPL CORRECT FUNCTION
-
+  parseToRDF: function({ value }) {
     if (this.isValid(value)) {
       return {
         "won:gym": {
-          "s:name": { "@value": value.name, "@type": "xsd:string" },
-          "s:description": value.info
-            ? { "@value": value.info, "@type": "xsd:string" }
-            : undefined,
           "won:gymex": { "@value": !!value.ex, "@type": "xsd:boolean" },
-          "s:location": genSPlace({
-            geoData: value.location,
-            baseUri: genDetailBaseUri(contentUri, identifier),
-          }),
         },
       };
     }
@@ -53,43 +31,21 @@ export const pokemonGym = {
   },
   parseFromRDF: function(jsonLDImm) {
     if (jsonLDImm) {
-      const name = won.parseFrom(
+      const ex = won.parseFrom(
         jsonLDImm,
-        ["won:gym", "s:name"],
-        "xsd:string"
+        ["won:gym", "won:gymex"],
+        "xsd:boolean"
       );
 
-      const jsonLdLocation = getIn(jsonLDImm, ["won:gym", "s:location"]);
-      const location = jsonLdLocation && parseSPlace(jsonLdLocation);
-
-      if (name && location) {
-        const info = won.parseFrom(
-          jsonLDImm,
-          ["won:gym", "s:description"],
-          "xsd:string"
-        );
-
-        const ex = won.parseFrom(
-          jsonLDImm,
-          ["won:gym", "won:gymex"],
-          "xsd:boolean"
-        );
-
-        return Immutable.fromJS({
-          name,
-          info,
-          location,
-          ex,
-        });
+      if (ex) {
+        return Immutable.fromJS({ ex });
       }
     }
     return undefined;
   },
   generateHumanReadable: function({ value, includeLabel }) {
-    if (value && value.name) {
-      let labelPart = value.name + (value.ex ? " (Ex Gym)" : "");
-
-      return includeLabel ? this.label + ": " + labelPart : labelPart;
+    if (value && value.ex) {
+      return includeLabel ? this.label + ": " + "Ex Gym" : "Ex Gym";
     }
     return undefined;
   },
