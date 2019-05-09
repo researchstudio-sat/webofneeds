@@ -6,6 +6,7 @@
 @prefix xml: <http://www.w3.org/XML/1998/namespace> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vann: <http://purl.org/vocab/vann/> .
 @base <https://w3id.org/won/message> .
 
 <https://w3id.org/won/message> rdf:type owl:Ontology ;
@@ -15,8 +16,17 @@
                                            "Florian Kleedorfer" ,
                                            "Yana Panchenko" ;
                                 dc:date "2013-12-13"^^xsd:date ;
-                                dc:title "Web of Needs Ontology"@en ;
+                                dc:title "Web of Needs Message Ontology"@en ;
+                                vann:preferredNamespacePrefix "msg" ;
                                 rdfs:comment "Ontology for describing messages in the Web of Needs project."@en .
+
+#################################################################
+#    Annotation properties
+#################################################################
+
+###  http://purl.org/vocab/vann/preferredNamespacePrefix
+vann:preferredNamespacePrefix rdf:type owl:AnnotationProperty .
+
 
 #################################################################
 #    Object Properties
