@@ -52,7 +52,7 @@ do
 	if [[ ! -z ${only_ont} && ${only_ont} != ${ont} ]]
 	then
 		# the user specified only_ont and it's not the current one. skip.
-		echo "Only generating docs for ontology ${only_ont}. Skipping ${ont} (crossref)"
+		echo "Only generating docs for ontology ${only_ont}. Skipping ${ont} (ext)"
 		continue
 	fi
 	output_path="${output_base}/ext/won-ext-${ont}"
