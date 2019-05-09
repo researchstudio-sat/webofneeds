@@ -4,7 +4,13 @@ import {
   isValidDate,
   parseDatetimeStrictly,
   toLocalISODateString,
+  getIn,
 } from "../../app/utils.js";
+import {
+  genSPlace,
+  genDetailBaseUri,
+  parseSPlace,
+} from "../../app/won-utils.js";
 
 export const pokemonGym = {
   identifier: "pokemonGym",
@@ -25,16 +31,59 @@ export const pokemonGym = {
   isValid: function(value) {
     return value && value.location && value.name;
   },
-  parseToRDF: function({ value }) {
+  parseToRDF: function({ value, identifier, contentUri }) {
     //TODO: IMPL CORRECT FUNCTION
-    const val = value ? value : undefined;
-    return {
-      "won:gym": val,
-    };
+
+    if (this.isValid(value)) {
+      return {
+        "won:gym": {
+          "s:name": { "@value": value.name, "@type": "xsd:string" },
+          "s:description": value.info
+            ? { "@value": value.info, "@type": "xsd:string" }
+            : undefined,
+          "won:gymex": { "@value": !!value.ex, "@type": "xsd:boolean" },
+          "s:location": genSPlace({
+            geoData: value.location,
+            baseUri: genDetailBaseUri(contentUri, identifier),
+          }),
+        },
+      };
+    }
+    return undefined;
   },
   parseFromRDF: function(jsonLDImm) {
-    //TODO: IMPL CORRECT FUNCTION
-    return won.parseFrom(jsonLDImm, ["won:gym"], "xsd:string");
+    if (jsonLDImm) {
+      const name = won.parseFrom(
+        jsonLDImm,
+        ["won:gym", "s:name"],
+        "xsd:string"
+      );
+
+      const jsonLdLocation = getIn(jsonLDImm, ["won:gym", "s:location"]);
+      const location = jsonLdLocation && parseSPlace(jsonLdLocation);
+
+      if (name && location) {
+        const info = won.parseFrom(
+          jsonLDImm,
+          ["won:gym", "s:description"],
+          "xsd:string"
+        );
+
+        const ex = won.parseFrom(
+          jsonLDImm,
+          ["won:gym", "won:gymex"],
+          "xsd:boolean"
+        );
+
+        return Immutable.fromJS({
+          name,
+          info,
+          location,
+          ex,
+        });
+      }
+    }
+    return undefined;
   },
   generateHumanReadable: function({ value, includeLabel }) {
     //TODO: IMPL CORRECT FUNCTION
