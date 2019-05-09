@@ -50,14 +50,12 @@ public class ActiveMqWonNodeConnectionFactory {
         // read won node info
         String activeMq = WON.WonOverActiveMq.toString();
         String brokerUri = wonNodeInfo.getSupportedProtocolImplParamValue(activeMq, WON.brokerUri.toString());
-        String createdTopic = wonNodeInfo.getSupportedProtocolImplParamValue(activeMq,
-                        WON.activeMQMatcherProtocolOutAtomCreatedTopicName.toString());
+        String createdTopic = wonNodeInfo.getSupportedProtocolImplParamValue(activeMq, WON.atomCreatedTopic.toString());
         String activatedTopic = wonNodeInfo.getSupportedProtocolImplParamValue(activeMq,
-                        WON.activeMQMatcherProtocolOutAtomActivatedTopicName.toString());
+                        WON.atomActivatedTopic.toString());
         String deactivatedTopic = wonNodeInfo.getSupportedProtocolImplParamValue(activeMq,
-                        WON.activeMQMatcherProtocolOutAtomDeactivatedTopicName.toString());
-        String hintQueue = wonNodeInfo.getSupportedProtocolImplParamValue(activeMq,
-                        WON.activeMQMatcherProtocolQueueName.toString());
+                        WON.atomDeactivatedTopic.toString());
+        String hintQueue = wonNodeInfo.getSupportedProtocolImplParamValue(activeMq, WON.matcherQueue.toString());
         // create the activemq component for this won node
         String uuid = UUID.randomUUID().toString();
         String componentName = "activemq-" + uuid;

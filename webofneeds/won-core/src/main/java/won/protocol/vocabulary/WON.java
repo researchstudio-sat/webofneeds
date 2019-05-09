@@ -28,25 +28,13 @@ public class WON {
     public static final Resource Atom = m.createResource(BASE_URI + "Atom");
     public static final Property wonNode = m.createProperty(BASE_URI, "wonNode");
     public static final Property defaultGraphSigningMethod = m.createProperty(BASE_URI, "defaultGraphSigningMethod");
-    public static final Property atomProtocolEndpoint = m.createProperty(BASE_URI, "atomProtocolEndpoint");
-    public static final Property matcherProtocolEndpoint = m.createProperty(BASE_URI, "matcherProtocolEndpoint");
-    public static final Property ownerProtocolEndpoint = m.createProperty(BASE_URI, "ownerProtocolEndpoint");
-    public static final Property activeMQAtomProtocolQueueName = m.createProperty(BASE_URI,
-                    "activeMQAtomProtocolQueueName");
-    public static final Property activeMQOwnerProtocolQueueName = m.createProperty(BASE_URI,
-                    "activeMQOwnerProtocolQueueName");
-    public static final Property activeMQMatcherProtocolQueueName = m.createProperty(BASE_URI,
-                    "activeMQMatcherProtocolQueueName");
-    public static final Property activeMQMatcherProtocolOutAtomCreatedTopicName = m.createProperty(BASE_URI,
-                    "activeMQMatcherProtocolOutAtomCreatedTopicName");
-    public static final Property activeMQMatcherProtocolOutAtomActivatedTopicName = m.createProperty(BASE_URI,
-                    "activeMQMatcherProtocolOutAtomActivatedTopicName");
-    public static final Property activeMQMatcherProtocolOutAtomDeactivatedTopicName = m.createProperty(BASE_URI,
-                    "activeMQMatcherProtocolOutAtomDeactivatedTopicName");
-    public static final Property activeMQMatcherProtocolOutAtomDeletedTopicName = m.createProperty(BASE_URI,
-                    "activeMQMatcherProtocolOutAtomDeletedTopicName");
-    public static final Property activeMQMatcherProtocolOutMatcherRegisteredTopicName = m.createProperty(BASE_URI,
-                    "activeMQMatcherProtocolOutMatcherRegisteredTopicName");
+    public static final Property nodeQueue = m.createProperty(BASE_URI, "nodeQueue");
+    public static final Property ownerQueue = m.createProperty(BASE_URI, "ownerQueue");
+    public static final Property matcherQueue = m.createProperty(BASE_URI, "matcherQueue");
+    public static final Property atomCreatedTopic = m.createProperty(BASE_URI, "atomCreatedTopic");
+    public static final Property atomActivatedTopic = m.createProperty(BASE_URI, "atomActivatedTopic");
+    public static final Property atomDeactivatedTopic = m.createProperty(BASE_URI, "atomDeactivatedTopic");
+    public static final Property atomDeletedTopic = m.createProperty(BASE_URI, "atomDeletedTopic");
     public static final Property uriPrefixSpecification = m.createProperty(BASE_URI, "uriPrefixSpecification");
     public static final Property atomUriPrefix = m.createProperty(BASE_URI, "atomUriPrefix");
     public static final Property connectionUriPrefix = m.createProperty(BASE_URI, "connectionUriPrefix");
