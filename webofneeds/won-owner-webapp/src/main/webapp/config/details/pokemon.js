@@ -2,7 +2,7 @@ import Immutable from "immutable";
 import won from "../../app/won-es6.js";
 import {
   isValidDate,
-  parseDatetimeStrictly,
+  //parseDatetimeStrictly,
   toLocalISODateString,
   getIn,
 } from "../../app/utils.js";
@@ -86,9 +86,10 @@ export const pokemonGym = {
     return undefined;
   },
   generateHumanReadable: function({ value, includeLabel }) {
-    //TODO: IMPL CORRECT FUNCTION
-    if (value) {
-      return includeLabel ? this.label + ": " + value : value;
+    if (value && value.name) {
+      let labelPart = value.name + (value.ex ? " (Ex Gym)" : "");
+
+      return includeLabel ? this.label + ": " + labelPart : labelPart;
     }
     return undefined;
   },
@@ -276,16 +277,19 @@ export const pokemonRaid = {
       if (value.hatched) {
         labelPart =
           this.getPokemonNameById(value.id, value.form) +
-          (value.form ? " (" + value.form + ")" : "") +
+          (value.form
+            ? " (" + value.form + ")"
+            : "") /* +
           ", expires at: " +
-          parseDatetimeStrictly(value.expires);
+          parseDatetimeStrictly(value.expires)*/;
       } else {
-        labelPart =
-          this.getLevelLabel(value.level) +
+        labelPart = this.getLevelLabel(
+          value.level
+        ) /* +
           " , hatches at: " +
           parseDatetimeStrictly(value.hatches) +
           ", expires at: " +
-          parseDatetimeStrictly(value.expires);
+          parseDatetimeStrictly(value.expires)*/;
       }
 
       return includeLabel ? this.label + ": " + labelPart : labelPart;

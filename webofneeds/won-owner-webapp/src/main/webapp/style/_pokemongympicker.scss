@@ -4,60 +4,28 @@
 
 pokemon-gym-picker {
   display: grid;
-  grid-row-gap: 0.25rem;
+  grid-gap: 0.5rem;
+  grid-template-columns: min-content 1fr;
+  align-items: center;
 
-  .pgp__input {
-    display: grid;
-    position: relative;
-
-    .pgp__input__icon {
-      @include fixed-square($bigiconSize);
-      position: absolute;
-      right: 0.5rem;
-      top: $formInputHeight / 2 - $bigiconSize / 2;
-      z-index: 1;
-    }
-
-    .pgp__input__inner {
-      @extend .won-txt;
-      border: $thinGrayBorder;
-
-      // @include textfieldPadding(
-      //   $normalFontSize,
-      //   22/16,
-      //   $thinBorderWidth,
-      //   $formInputHeight
-      // );
-
-      //box-sizing: border-box;
-      min-height: $formInputHeight;
-      //min-width: 0; // so a size is specified and break-word works
-      //width: 100%;
-
-      word-wrap: break-word;
-
-      $verticalPadding: calcVerticalPaddingToHeight(
-        $normalFontSize,
-        22/16,
-        $thinBorderWidth,
-        $formInputHeight
-      );
-      padding: $verticalPadding 0.438rem + $bigiconSize $verticalPadding
-        0.438rem;
-    }
-
-    .pgp__input__inner::-ms-clear {
-      width: 0;
-      height: 0;
-    }
-  }
-  .pgp__preview__header {
-    color: $won-primary-color;
+  .pgp__ex {
+    width: $postIconSize;
+    height: $postIconSize;
+    margin: 0;
   }
 
-  .pgp__preview__content {
-    &--empty {
-      color: $won-line-gray;
+  .pgp__location {
+    grid-column: span 2;
+  }
+  .pgp__info {
+    grid-column: span 2;
+  }
+
+  .pgp__label {
+    white-space: nowrap;
+    &--info,
+    &--location {
+      grid-column: span 2;
     }
   }
 }

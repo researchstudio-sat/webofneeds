@@ -10,13 +10,6 @@ import "style/_pokemongympicker.scss";
 const serviceDependencies = ["$scope", "$element"];
 function genComponentConf() {
   let template = `
-      <label class="pgp__label">Location:</label>
-      <won-location-picker
-          class="pgp__location"
-          initial-value="self.pokemonGym.location"
-          on-update="self.updateLocation(value)"
-          detail="self.detail && self.detail.locationDetail">
-      </won-location-picker>
       <label class="pgp__label">Name:</label>
       <won-title-picker
           class="pgp__name"
@@ -24,6 +17,13 @@ function genComponentConf() {
           on-update="self.updateName(value)"
           detail="self.detail && self.detail.nameDetail">
       </won-title-picker>
+      <label class="pgp__label">Location:</label>
+      <won-location-picker
+          class="pgp__location pgp__label--location"
+          initial-value="self.pokemonGym.location"
+          on-update="self.updateLocation(value)"
+          detail="self.detail && self.detail.locationDetail">
+      </won-location-picker>
       <label for="pgp__ex" class="pgp__label">Gym Ex:</label>
       <input
           type="checkbox"
@@ -31,7 +31,7 @@ function genComponentConf() {
           class="pgp__ex"
           ng-model="self.pokemonGym.ex"
           ng-change="self.updateEx(self.pokemonGym.ex)"/>
-      <label class="pgp__label">Additional Info:</label>
+      <label class="pgp__label pgp__label--info">Additional Info:</label>
       <won-description-picker
           class="pgp__info"
           initial-value="self.pokemonGym.info"

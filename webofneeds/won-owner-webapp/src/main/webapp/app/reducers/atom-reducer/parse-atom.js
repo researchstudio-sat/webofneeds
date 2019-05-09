@@ -315,13 +315,28 @@ function getHumanReadableStringFromAtom(atomImm, detailsToParse) {
     }
 
     if (getIn(atomImm, ["matchedUseCase", "identifier"]) === "pokemonGoRaid") {
-      const detailName = "pokemonRaid";
-      const detailValueImm = getIn(atomImm, ["content", detailName]);
-      if (detailValueImm && detailsToParse[detailName]) {
-        return detailsToParse[detailName].generateHumanReadable({
-          value: detailValueImm.toJS(),
+      let raidReadable;
+      let gymReadable;
+
+      const raidDetail = "pokemonRaid";
+      const raidValueImm = getIn(atomImm, ["content", raidDetail]);
+      if (raidValueImm && detailsToParse[raidDetail]) {
+        raidReadable = detailsToParse[raidDetail].generateHumanReadable({
+          value: raidValueImm.toJS(),
           includeLabel: false,
         });
+      }
+
+      const gymDetail = "pokemonGym";
+      const gymValueImm = getIn(atomImm, ["content", gymDetail]);
+      if (gymValueImm && detailsToParse[gymDetail]) {
+        gymReadable = detailsToParse[gymDetail].generateHumanReadable({
+          value: gymValueImm.toJS(),
+          includeLabel: false,
+        });
+      }
+      if (raidReadable && gymReadable) {
+        return raidReadable + " @ " + gymReadable;
       }
     }
 
