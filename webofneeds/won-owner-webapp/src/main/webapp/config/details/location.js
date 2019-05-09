@@ -16,6 +16,10 @@ export const location = {
   component: "won-location-picker",
   viewerComponent: "won-location-viewer",
   messageEnabled: true,
+  overrideAddressDetail: {
+    placeholder:
+      "Alternative Address name (e.g. if doornumber should be included)",
+  },
   parseToRDF: function({ value, identifier, contentUri }) {
     return {
       "s:location": genSPlace({
