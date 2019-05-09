@@ -1,0 +1,60 @@
+@import "won-config";
+@import "sizing-utils";
+@import "animate";
+
+pokemon-gym-viewer {
+  @include won-detail-viewer("pgv");
+
+  .pgv__content {
+    display: grid;
+    grid-template-columns: min-content 1fr;
+    grid-gap: 0.5rem;
+
+    &__name {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+
+      &__label {
+        &__ex {
+          margin-left: 0.25rem;
+          color: $won-subtitle-gray;
+        }
+      }
+
+      &__carret {
+        @include fixed-square($normalFontSize);
+      }
+    }
+
+    &__label {
+      &--info {
+        cursor: pointer;
+        grid-column: span 2;
+      }
+      &__carret {
+        @include fixed-square($normalFontSize);
+      }
+    }
+
+    &__info {
+      grid-column: span 2;
+      @include slideWithOpacityAnimation(0.5s, linear, 100vh);
+    }
+
+    won-atom-map {
+      grid-column: span 2;
+      display: block;
+      @include slideWithOpacityAnimation(0.5s, linear, 20rem);
+
+      .atom-map__mapmount {
+        width: 100%;
+        height: 31rem;
+
+        @media (max-width: $responsivenessBreakPoint) {
+          height: 15rem;
+        }
+      }
+    }
+  }
+}

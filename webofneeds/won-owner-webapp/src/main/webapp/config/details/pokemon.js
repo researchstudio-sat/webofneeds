@@ -18,7 +18,7 @@ export const pokemonGym = {
   icon: "#ico36_dumbbell", //TODO: Create and use better icon
   messageEnabled: false,
   component: "pokemon-gym-picker",
-  viewerComponent: "won-description-viewer", //TODO: IMPL CORRECT VIEWER
+  viewerComponent: "pokemon-gym-viewer", //TODO: IMPL CORRECT VIEWER
   locationDetail: {
     placeholder: "Search for location",
   },
