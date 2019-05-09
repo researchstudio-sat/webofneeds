@@ -27,8 +27,7 @@ function genComponentConf() {
           id="prbp__hatched"
           class="prbp__hatched"
           ng-model="self.pokemonRaidBoss.hatched"
-          ng-change="self.updateHatched(self.pokemonRaidBoss.hatched)"
-          class="prbp__hatched" />
+          ng-change="self.updateHatched(self.pokemonRaidBoss.hatched)"/>
       <label class="prbp__label" ng-class="{'prbp__label--disabled': self.pokemonRaidBoss.hatched}">Hatches at</label>
       <won-datetime-picker
           ng-class="{'prbp__hatches--disabled': self.pokemonRaidBoss.hatched}"

@@ -30,8 +30,7 @@ function genComponentConf() {
           id="pgp__ex"
           class="pgp__ex"
           ng-model="self.pokemonGym.ex"
-          ng-change="self.updateEx(self.pokemonGym.ex)"
-          class="prbp__hatched" />
+          ng-change="self.updateEx(self.pokemonGym.ex)"/>
       <label class="pgp__label">Additional Info:</label>
       <won-description-picker
           class="pgp__info"
