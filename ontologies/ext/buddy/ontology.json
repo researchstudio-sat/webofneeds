@@ -1,0 +1,35 @@
+[ {
+  "@id" : "http://schema.org/knows",
+  "@type" : [ "http://www.w3.org/2002/07/owl#ObjectProperty" ]
+}, {
+  "@id" : "https://w3id.org/won/ext/buddy",
+  "@type" : [ "http://www.w3.org/2002/07/owl#Ontology" ],
+  "http://www.w3.org/2002/07/owl#imports" : [ {
+    "@id" : "https://w3id.org/won/core"
+  } ]
+}, {
+  "@id" : "https://w3id.org/won/ext/buddy#BuddySocket",
+  "@type" : [ "http://www.w3.org/2002/07/owl#NamedIndividual", "https://w3id.org/won/core#SocketDefinition" ],
+  "https://w3id.org/won/core#compatibleSocketDefinition" : [ {
+    "@id" : "https://w3id.org/won/ext/buddy#BuddySocket"
+  } ],
+  "https://w3id.org/won/core#derivesAtomProperty" : [ {
+    "@id" : "https://w3id.org/won/ext/buddy#buddy"
+  } ]
+}, {
+  "@id" : "https://w3id.org/won/ext/buddy#buddy",
+  "@type" : [ "http://www.w3.org/2002/07/owl#ObjectProperty", "http://www.w3.org/2002/07/owl#NamedIndividual" ],
+  "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
+    "@language" : "en",
+    "@value" : "Links a buddy Atom to one of its buddies. This should generally imply natural persons on both ends. We interpret buddies are people who like to do things together; such as engaging in sports or other social activities."
+  } ],
+  "http://www.w3.org/2000/01/rdf-schema#domain" : [ {
+    "@id" : "https://w3id.org/won/core#Atom"
+  } ],
+  "http://www.w3.org/2000/01/rdf-schema#range" : [ {
+    "@id" : "https://w3id.org/won/core#Atom"
+  } ],
+  "http://www.w3.org/2000/01/rdf-schema#subPropertyOf" : [ {
+    "@id" : "http://schema.org/knows"
+  } ]
+} ]
