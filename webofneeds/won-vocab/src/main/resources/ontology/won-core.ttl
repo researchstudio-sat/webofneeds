@@ -18,8 +18,7 @@
                              dc:creator "Fabian Salcher" ,
                                         "Florian Kleedorfer" ;
                              dc:date "2013-12-13"^^xsd:date ;
-                             dc:description "This `core` ontology supports representing the all the main concepts in Web of Needs, apart from the Messages, for which the `message` ontology must be used."@en ;
-                             dc:title "Web of Needs Ontology" ;
+                             dc:title "Web of Needs Core Ontology" ;
                              vann:preferredNamespacePrefix "won" ;
                              rdfs:comment "Ontology for the Web of Needs data model."@en .
 
