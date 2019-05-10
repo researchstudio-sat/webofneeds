@@ -10,7 +10,7 @@ import { connect2Redux } from "../won-utils.js";
 
 import * as srefUtils from "../sref-utils.js";
 
-import "style/_footer.scss";
+import "~/style/_footer.scss";
 
 function genTopnavConf() {
   let template = `

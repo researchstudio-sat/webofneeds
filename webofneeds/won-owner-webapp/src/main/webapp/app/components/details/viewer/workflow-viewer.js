@@ -2,7 +2,7 @@ import angular from "angular";
 import { attach, delay } from "../../../utils.js";
 import BpmnViewer from "bpmn-js";
 
-import "style/_workflow-viewer.scss";
+import "~/style/_workflow-viewer.scss";
 
 const serviceDependencies = ["$scope", "$element"];
 function genComponentConf() {

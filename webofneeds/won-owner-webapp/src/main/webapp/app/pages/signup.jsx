@@ -16,7 +16,7 @@ import * as accountUtils from "../account-utils.js";
 import * as viewSelectors from "../selectors/view-selectors.js";
 import { h } from "preact";
 
-import "style/_signup.scss";
+import "~/style/_signup.scss";
 
 const template = (
   <container>

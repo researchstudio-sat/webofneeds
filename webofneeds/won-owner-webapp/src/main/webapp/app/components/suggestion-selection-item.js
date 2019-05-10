@@ -18,7 +18,7 @@ import {
   isGroupChatConnection,
 } from "../connection-utils.js";
 
-import "style/_suggestion-selection-item-line.scss";
+import "~/style/_suggestion-selection-item-line.scss";
 
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {

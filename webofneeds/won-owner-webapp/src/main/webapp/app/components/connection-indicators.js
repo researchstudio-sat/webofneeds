@@ -18,7 +18,7 @@ import {
   isGroupChatConnection,
 } from "../connection-utils.js";
 
-import "style/_connection-indicators.scss";
+import "~/style/_connection-indicators.scss";
 
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {

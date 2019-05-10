@@ -24,7 +24,7 @@ import { getMessagesByConnectionUri } from "../selectors/message-selectors.js";
 import connectionStateModule from "./connection-state.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
 
-import "style/_connection-header.scss";
+import "~/style/_connection-header.scss";
 
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {

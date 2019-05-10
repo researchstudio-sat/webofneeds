@@ -17,7 +17,7 @@ import { doneTypingBufferNg, DomCache } from "../../../cstm-ng-utils.js";
 
 import { initLeaflet, leafletBounds } from "../../../won-utils.js";
 
-import "style/_locationpicker.scss";
+import "~/style/_locationpicker.scss";
 
 import "leaflet/dist/leaflet.css";
 

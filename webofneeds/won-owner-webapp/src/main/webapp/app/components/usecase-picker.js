@@ -17,7 +17,7 @@ import {
 import * as useCaseUtils from "../usecase-utils.js";
 import * as accountUtils from "../account-utils.js";
 
-import "style/_usecase-picker.scss";
+import "~/style/_usecase-picker.scss";
 
 const serviceDependencies = [
   "$ngRedux",

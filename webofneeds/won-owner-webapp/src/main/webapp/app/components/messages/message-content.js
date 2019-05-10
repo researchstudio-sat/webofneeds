@@ -8,8 +8,8 @@ import { actionCreators } from "../../actions/actions.js";
 import { getOwnedAtomByConnectionUri } from "../../selectors/general-selectors.js";
 import "angular-marked";
 
-import "style/_message-content.scss";
-import "style/_won-markdown.scss";
+import "~/style/_message-content.scss";
+import "~/style/_won-markdown.scss";
 
 const serviceDependencies = ["$ngRedux", "$scope"];
 

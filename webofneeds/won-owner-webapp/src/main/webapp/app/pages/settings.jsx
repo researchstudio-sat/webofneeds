@@ -13,7 +13,7 @@ import { h } from "preact";
 
 import * as srefUtils from "../sref-utils.js";
 
-import "style/_signup.scss";
+import "~/style/_signup.scss";
 
 const template = (
   <container>

@@ -2,7 +2,7 @@ import angular from "angular";
 import { attach, delay } from "../../../utils.js";
 import wonInput from "../../../directives/input.js";
 
-import "style/_reviewpicker.scss";
+import "~/style/_reviewpicker.scss";
 
 const serviceDependencies = ["$scope", "$element"];
 function genComponentConf() {

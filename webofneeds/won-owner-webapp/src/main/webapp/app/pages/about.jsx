@@ -8,14 +8,14 @@ import accordionModule from "../components/accordion.js";
 import flexGridModule from "../components/flexgrid.js";
 import { attach, get, getIn, toAbsoluteURL } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
-import { ownerBaseUrl } from "config/default.js";
+import { ownerBaseUrl } from "~/config/default.js";
 import * as srefUtils from "../sref-utils.js";
 import { getAboutSectionFromRoute } from "../selectors/general-selectors.js";
 import * as viewSelectors from "../selectors/view-selectors.js";
 import * as accountUtils from "../account-utils.js";
 import { h } from "preact";
 
-import "style/_about.scss";
+import "~/style/_about.scss";
 
 const template = (
   <container>

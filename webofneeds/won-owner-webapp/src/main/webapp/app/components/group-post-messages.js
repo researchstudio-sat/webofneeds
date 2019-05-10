@@ -24,8 +24,8 @@ import { getUnreadMessagesByConnectionUri } from "../selectors/message-selectors
 import autoresizingTextareaModule from "../directives/textarea-autogrow.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
 
-import "style/_group-post-messages.scss";
-import "style/_rdflink.scss";
+import "~/style/_group-post-messages.scss";
+import "~/style/_rdflink.scss";
 
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 

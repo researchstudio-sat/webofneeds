@@ -19,7 +19,7 @@
 import won from "./won-es6.js";
 import { watchImmutableRdxState, getIn } from "./utils.js";
 
-import { ownerBaseUrl } from "config/default.js";
+import { ownerBaseUrl } from "~/config/default.js";
 import urljoin from "url-join";
 
 import { actionTypes, actionCreators } from "./actions/actions.js";

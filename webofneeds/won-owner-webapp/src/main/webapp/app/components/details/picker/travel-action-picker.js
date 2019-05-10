@@ -13,7 +13,7 @@ import { DomCache } from "../../../cstm-ng-utils.js";
 
 import { initLeaflet } from "../../../won-utils.js";
 
-import "style/_travelactionpicker.scss";
+import "~/style/_travelactionpicker.scss";
 import "leaflet/dist/leaflet.css";
 
 const serviceDependencies = ["$scope", "$element"];

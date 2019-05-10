@@ -18,9 +18,9 @@ import * as processUtils from "../process-utils.js";
 import * as wonLabelUtils from "../won-label-utils.js";
 import { h } from "preact";
 
-import "style/_overview.scss";
-import "style/_atom-overlay.scss";
-import "style/_connection-overlay.scss";
+import "~/style/_overview.scss";
+import "~/style/_atom-overlay.scss";
+import "~/style/_connection-overlay.scss";
 
 const template = (
   <container>

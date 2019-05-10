@@ -5,7 +5,7 @@ import postHeaderModule from "../../post-header.js";
 import { attach } from "../../../utils.js";
 import { connect2Redux } from "../../../won-utils.js";
 
-import "style/_paypalpayment-viewer.scss";
+import "~/style/_paypalpayment-viewer.scss";
 
 const serviceDependencies = ["$scope", "$ngRedux", "$element"];
 function genComponentConf() {

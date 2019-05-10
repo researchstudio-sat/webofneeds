@@ -11,7 +11,7 @@ import labelledHrModule from "../../labelled-hr.js";
 import { getActiveAtoms } from "../../../selectors/general-selectors.js";
 import * as atomUtils from "../../../atom-utils.js";
 
-import "style/_suggestpostpicker.scss";
+import "~/style/_suggestpostpicker.scss";
 
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {

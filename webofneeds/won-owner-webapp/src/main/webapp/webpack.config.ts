@@ -36,7 +36,9 @@ function config(env, argv): Configuration {
       filename: "[name].[contenthash].js",
     },
     resolve: {
-      modules: [__dirname, "node_modules"],
+      alias: {
+        "~": path.resolve(__dirname),
+      },
     },
     module: {
       rules: [

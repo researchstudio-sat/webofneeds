@@ -14,7 +14,7 @@ import {
 import connectionHeaderModule from "./connection-header.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
 
-import "style/_connection-selection-item-line.scss";
+import "~/style/_connection-selection-item-line.scss";
 
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {

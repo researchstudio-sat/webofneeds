@@ -32,8 +32,8 @@ import {
 } from "../selectors/message-selectors.js";
 import autoresizingTextareaModule from "../directives/textarea-autogrow.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
-import "style/_post-messages.scss";
-import "style/_rdflink.scss";
+import "~/style/_post-messages.scss";
+import "~/style/_rdflink.scss";
 
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 

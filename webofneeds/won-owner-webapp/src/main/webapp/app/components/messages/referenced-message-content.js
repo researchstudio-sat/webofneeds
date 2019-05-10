@@ -10,7 +10,7 @@ import { labels } from "../../won-label-utils.js";
 import { fetchMessage } from "../../won-message-utils.js";
 import { classOnComponentRoot } from "../../cstm-ng-utils.js";
 
-import "style/_referenced-message-content.scss";
+import "~/style/_referenced-message-content.scss";
 
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 

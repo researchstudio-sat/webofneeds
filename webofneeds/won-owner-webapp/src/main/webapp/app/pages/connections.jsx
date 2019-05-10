@@ -20,10 +20,10 @@ import * as viewSelectors from "../selectors/view-selectors.js";
 import * as srefUtils from "../sref-utils.js";
 import { h } from "preact";
 
-import "style/_connections.scss";
-import "style/_responsiveness-utils.scss";
-import "style/_atom-overlay.scss";
-import "style/_connection-overlay.scss";
+import "~/style/_connections.scss";
+import "~/style/_responsiveness-utils.scss";
+import "~/style/_atom-overlay.scss";
+import "~/style/_connection-overlay.scss";
 
 const template = (
   <container>

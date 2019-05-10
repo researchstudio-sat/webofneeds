@@ -16,9 +16,9 @@ import * as generalSelectors from "../selectors/general-selectors.js";
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 
-import { ownerBaseUrl } from "config/default.js";
+import { ownerBaseUrl } from "~/config/default.js";
 
-import "style/_context-dropdown.scss";
+import "~/style/_context-dropdown.scss";
 
 const serviceDependencies = ["$scope", "$ngRedux", "$element"];
 function genComponentConf() {

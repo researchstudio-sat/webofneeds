@@ -4,7 +4,7 @@
 
 import angular from "angular";
 
-import "style/_signup-title-bar.scss";
+import "~/style/_signup-title-bar.scss";
 
 function genComponentConf() {
   let template = `

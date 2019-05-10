@@ -19,8 +19,8 @@ import * as accountUtils from "../account-utils.js";
 import { Elm } from "../../elm/PublishButton.elm";
 import elmModule from "./elm.js";
 
-import "style/_create-post.scss";
-import "style/_responsiveness-utils.scss";
+import "~/style/_create-post.scss";
+import "~/style/_responsiveness-utils.scss";
 
 const serviceDependencies = [
   "$ngRedux",

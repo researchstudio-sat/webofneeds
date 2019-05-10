@@ -19,9 +19,9 @@ import * as processUtils from "../process-utils.js";
 import * as srefUtils from "../sref-utils.js";
 import { h } from "preact";
 
-import "style/_post-visitor.scss";
-import "style/_atom-overlay.scss";
-import "style/_connection-overlay.scss";
+import "~/style/_post-visitor.scss";
+import "~/style/_atom-overlay.scss";
+import "~/style/_connection-overlay.scss";
 
 const template = (
   <container>

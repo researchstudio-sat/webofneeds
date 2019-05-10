@@ -4,8 +4,8 @@ import { DomCache } from "../../../cstm-ng-utils.js";
 import wonInput from "../../../directives/input.js";
 import "angular-marked";
 
-import "style/_descriptionpicker.scss";
-import "style/_won-markdown.scss";
+import "~/style/_descriptionpicker.scss";
+import "~/style/_won-markdown.scss";
 
 const serviceDependencies = ["$scope", "$element"];
 function genComponentConf() {
