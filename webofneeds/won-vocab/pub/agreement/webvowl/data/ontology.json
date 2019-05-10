@@ -1,0 +1,116 @@
+{
+  "_comment" : "Created with OWL2VOWL (version 0.3.5), http://vowl.visualdataweb.org",
+  "header" : {
+    "languages" : [ "en" ],
+    "baseIris" : [ "http://www.w3.org/1999/02/22-rdf-syntax-ns", "https://w3id.org/won/agreement", "http://www.w3.org/2000/01/rdf-schema" ],
+    "iri" : "https://w3id.org/won/agreement#"
+  },
+  "namespace" : [ ],
+  "class" : [ {
+    "id" : "0",
+    "type" : "owl:Class"
+  }, {
+    "id" : "2",
+    "type" : "owl:Thing"
+  }, {
+    "id" : "3",
+    "type" : "owl:Thing"
+  }, {
+    "id" : "5",
+    "type" : "owl:Class"
+  } ],
+  "classAttribute" : [ {
+    "iri" : "https://w3id.org/won/agreement#Agreement",
+    "baseIri" : "https://w3id.org/won/agreement",
+    "instances" : 0,
+    "label" : {
+      "IRI-based" : "Agreement"
+    },
+    "comment" : {
+      "en" : "The message that accepts a proposal concludes an agreement. It is the last message that is taken into account when calculating the content of the agreement, which makes it suitable for identifying the agreement. Therefore, it is given the type Agreement."
+    },
+    "id" : "0"
+  }, {
+    "iri" : "http://www.w3.org/2002/07/owl#Thing",
+    "baseIri" : "http://owl2vowl.de",
+    "id" : "2",
+    "label" : {
+      "undefined" : "Thing"
+    }
+  }, {
+    "iri" : "http://www.w3.org/2002/07/owl#Thing",
+    "baseIri" : "http://owl2vowl.de",
+    "id" : "3",
+    "label" : {
+      "undefined" : "Thing"
+    }
+  }, {
+    "iri" : "https://w3id.org/won/agreement#Proposal",
+    "baseIri" : "https://w3id.org/won/agreement",
+    "instances" : 0,
+    "label" : {
+      "IRI-based" : "Proposal"
+    },
+    "comment" : {
+      "en" : "The message that proposes other messages or proposes to cancel agreements is a Proposal."
+    },
+    "id" : "5"
+  } ],
+  "property" : [ {
+    "id" : "1",
+    "type" : "owl:objectProperty"
+  }, {
+    "id" : "4",
+    "type" : "owl:objectProperty"
+  }, {
+    "id" : "6",
+    "type" : "owl:objectProperty"
+  }, {
+    "id" : "7",
+    "type" : "owl:objectProperty"
+  } ],
+  "propertyAttribute" : [ {
+    "iri" : "https://w3id.org/won/agreement#accepts",
+    "baseIri" : "https://w3id.org/won/agreement",
+    "range" : "2",
+    "label" : {
+      "IRI-based" : "accepts"
+    },
+    "domain" : "0",
+    "comment" : {
+      "en" : "Used to link two message resources. The message in the subject accepts the message in the object. This only makes sense if the object references a proposal.\n\nDuring the projection from the edited conversation dataset to the agreement dataset, the validity of agreements is checked. Proposal messages that were not accepted are dropped, as are invalid or cancelled Agreements."
+    },
+    "attributes" : [ "object" ],
+    "id" : "1"
+  }, {
+    "iri" : "https://w3id.org/won/agreement#reject",
+    "baseIri" : "https://w3id.org/won/agreement",
+    "range" : "3",
+    "label" : {
+      "IRI-based" : "reject"
+    },
+    "domain" : "5",
+    "attributes" : [ "object" ],
+    "id" : "4"
+  }, {
+    "iri" : "https://w3id.org/won/agreement#proposesToCancel",
+    "baseIri" : "https://w3id.org/won/agreement",
+    "range" : "3",
+    "label" : {
+      "IRI-based" : "proposesToCancel"
+    },
+    "domain" : "5",
+    "attributes" : [ "object" ],
+    "id" : "6"
+  }, {
+    "iri" : "https://w3id.org/won/agreement#proposes",
+    "baseIri" : "https://w3id.org/won/agreement",
+    "range" : "3",
+    "label" : {
+      "IRI-based" : "proposes"
+    },
+    "domain" : "5",
+    "attributes" : [ "object" ],
+    "id" : "7"
+  } ]
+}

@@ -1,0 +1,46 @@
+[ {
+  "@id" : "https://w3id.org/won/agreement#",
+  "@type" : [ "http://www.w3.org/2002/07/owl#Ontology" ]
+}, {
+  "@id" : "https://w3id.org/won/agreement#Agreement",
+  "@type" : [ "http://www.w3.org/2002/07/owl#Class" ],
+  "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
+    "@language" : "en",
+    "@value" : "The message that accepts a proposal concludes an agreement. It is the last message that is taken into account when calculating the content of the agreement, which makes it suitable for identifying the agreement. Therefore, it is given the type Agreement."
+  } ]
+}, {
+  "@id" : "https://w3id.org/won/agreement#Proposal",
+  "@type" : [ "http://www.w3.org/2002/07/owl#Class" ],
+  "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
+    "@language" : "en",
+    "@value" : "The message that proposes other messages or proposes to cancel agreements is a Proposal."
+  } ]
+}, {
+  "@id" : "https://w3id.org/won/agreement#accepts",
+  "@type" : [ "http://www.w3.org/2002/07/owl#ObjectProperty" ],
+  "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
+    "@language" : "en",
+    "@value" : "Used to link two message resources. The message in the subject accepts the message in the object. This only makes sense if the object references a proposal.\n\nDuring the projection from the edited conversation dataset to the agreement dataset, the validity of agreements is checked. Proposal messages that were not accepted are dropped, as are invalid or cancelled Agreements."
+  } ],
+  "http://www.w3.org/2000/01/rdf-schema#domain" : [ {
+    "@id" : "https://w3id.org/won/agreement#Agreement"
+  } ]
+}, {
+  "@id" : "https://w3id.org/won/agreement#proposes",
+  "@type" : [ "http://www.w3.org/2002/07/owl#ObjectProperty" ],
+  "http://www.w3.org/2000/01/rdf-schema#domain" : [ {
+    "@id" : "https://w3id.org/won/agreement#Proposal"
+  } ]
+}, {
+  "@id" : "https://w3id.org/won/agreement#proposesToCancel",
+  "@type" : [ "http://www.w3.org/2002/07/owl#ObjectProperty" ],
+  "http://www.w3.org/2000/01/rdf-schema#domain" : [ {
+    "@id" : "https://w3id.org/won/agreement#Proposal"
+  } ]
+}, {
+  "@id" : "https://w3id.org/won/agreement#reject",
+  "@type" : [ "http://www.w3.org/2002/07/owl#ObjectProperty" ],
+  "http://www.w3.org/2000/01/rdf-schema#domain" : [ {
+    "@id" : "https://w3id.org/won/agreement#Proposal"
+  } ]
+} ]

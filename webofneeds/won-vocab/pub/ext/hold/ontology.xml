@@ -1,0 +1,170 @@
+<?xml version="1.0"?>
+<rdf:RDF xmlns="https://w3id.org/won/ext/hold#"
+     xml:base="https://w3id.org/won/ext/hold"
+     xmlns:dc="http://purl.org/dc/elements/1.1/"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:xml="http://www.w3.org/XML/1998/namespace"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:core="https://w3id.org/won/core#"
+     xmlns:hold="https://w3id.org/won/ext/hold#"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
+    <owl:Ontology rdf:about="https://w3id.org/won/ext/hold">
+        <owl:imports rdf:resource="https://w3id.org/won/core"/>
+    </owl:Ontology>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Annotation properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+
+    
+
+
+    <!-- https://w3id.org/won/ext/hold#heldBy -->
+
+
+    <owl:AnnotationProperty rdf:about="https://w3id.org/won/ext/hold#heldBy">
+        <rdfs:range rdf:resource="https://w3id.org/won/core#Atom"/>
+    </owl:AnnotationProperty>
+    
+
+
+    <!-- https://w3id.org/won/ext/hold#holds -->
+
+
+    <owl:AnnotationProperty rdf:about="https://w3id.org/won/ext/hold#holds">
+        <rdfs:range rdf:resource="https://w3id.org/won/core#Atom"/>
+    </owl:AnnotationProperty>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Object Properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+
+    
+
+
+    <!-- https://w3id.org/won/ext/hold#heldBy -->
+
+
+    <owl:ObjectProperty rdf:about="https://w3id.org/won/ext/hold#heldBy">
+        <rdfs:domain rdf:resource="https://w3id.org/won/core#Atom"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- https://w3id.org/won/ext/hold#holds -->
+
+
+    <owl:ObjectProperty rdf:about="https://w3id.org/won/ext/hold#holds">
+        <rdfs:domain rdf:resource="https://w3id.org/won/core#Atom"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Individuals
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+
+    
+
+
+    <!-- http://example.com/won/ext/hold#MyConcreteHoldableSocket -->
+
+
+    <owl:NamedIndividual rdf:about="http://example.com/won/ext/hold#MyConcreteHoldableSocket">
+        <core:socketDefinition rdf:resource="https://w3id.org/won/ext/hold#HoldableSocket"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://example.com/won/ext/hold#MyConcreteHolderSocket -->
+
+
+    <owl:NamedIndividual rdf:about="http://example.com/won/ext/hold#MyConcreteHolderSocket">
+        <core:socketDefinition rdf:resource="https://w3id.org/won/ext/hold#HolderSocket"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- https://w3id.org/won/ext/hold#HoldableSocket -->
+
+
+    <owl:NamedIndividual rdf:about="https://w3id.org/won/ext/hold#HoldableSocket">
+        <rdf:type rdf:resource="https://w3id.org/won/core#SocketDefinition"/>
+        <core:compatibleSocketDefinition rdf:resource="https://w3id.org/won/ext/hold#HolderSocket"/>
+        <core:derivesAtomProperty rdf:resource="https://w3id.org/won/ext/hold#heldBy"/>
+        <core:autoOpen rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</core:autoOpen>
+        <core:socketCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</core:socketCapacity>
+        <rdfs:comment xml:lang="en">An Atom uses a Socket with this configuration to connect to the Persona Atom that holds it.</rdfs:comment>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- https://w3id.org/won/ext/hold#HolderSocket -->
+
+
+    <owl:NamedIndividual rdf:about="https://w3id.org/won/ext/hold#HolderSocket">
+        <rdf:type rdf:resource="https://w3id.org/won/core#SocketDefinition"/>
+        <core:compatibleSocketDefinition rdf:resource="https://w3id.org/won/ext/hold#HoldableSocket"/>
+        <core:derivesAtomProperty rdf:resource="https://w3id.org/won/ext/hold#holds"/>
+        <core:autoOpen rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</core:autoOpen>
+        <rdfs:comment xml:lang="en">A Persona Atom uses a Socket with this configuration to connect to Atoms it holds.</rdfs:comment>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- https://w3id.org/won/ext/hold#heldBy -->
+
+
+    <owl:NamedIndividual rdf:about="https://w3id.org/won/ext/hold#heldBy"/>
+    
+
+
+    <!-- https://w3id.org/won/ext/hold#holds -->
+
+
+    <owl:NamedIndividual rdf:about="https://w3id.org/won/ext/hold#holds"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Annotations
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+
+    <rdf:Description rdf:about="https://w3id.org/won/ext/hold#heldBy">
+        <rdfs:comment xml:lang="en">Links an Atom to the Atom representing the agent (a person, organization, bot, ...) that controls both.</rdfs:comment>
+    </rdf:Description>
+    <rdf:Description rdf:about="https://w3id.org/won/ext/hold#holds">
+        <rdfs:comment xml:lang="en">Links the Atom representing an agent (a person, organization, bot, ...) to another Atom they control.</rdfs:comment>
+    </rdf:Description>
+</rdf:RDF>
+
+
+
+<!-- Generated by the OWL API (version 5.1.9) https://github.com/owlcs/owlapi/ -->
+
+

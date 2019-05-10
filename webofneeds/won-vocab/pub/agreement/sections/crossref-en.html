@@ -1,0 +1,161 @@
+<html><h2 id="crossreference" class="list">Cross reference for [Ontology Name] classes, properties and dataproperties <span class="backlink"> back to <a href="#toc">ToC</a></span></h2>
+This section provides details for each class and property defined by [Ontology Name].
+<div id="classes">
+   <h3 id="classes-headline" class="list">Classes</h3>
+   <ul class="hlist">
+      <li>
+         <a href="#Agreement" title="https://w3id.org/won/agreement#Agreement">
+            <span>agreement</span>
+         </a>
+      </li>
+      <li>
+         <a href="#Proposal" title="https://w3id.org/won/agreement#Proposal">
+            <span>proposal</span>
+         </a>
+      </li>
+   </ul>
+   <div class="entity" id="Agreement">
+      <h3>agreement<sup class="type-c" title="class">c</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#classes">Class ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/agreement#Agreement</p>
+      <div class="comment">
+         <span class="markdown">The message that accepts a proposal concludes an agreement. It is the last message that is taken into account when calculating the content of the agreement, which makes it suitable for identifying the agreement. Therefore, it is given the type Agreement.</span>
+      </div>
+      <dl class="description">
+         <dt>is in domain of</dt>
+         <dd>
+            <a href="#accepts" title="https://w3id.org/won/agreement#accepts">accepts</a>
+            <sup class="type-op" title="object property">op</sup>
+         </dd>
+      </dl>
+   </div>
+   <div class="entity" id="Proposal">
+      <h3>proposal<sup class="type-c" title="class">c</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#classes">Class ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/agreement#Proposal</p>
+      <div class="comment">
+         <span class="markdown">The message that proposes other messages or proposes to cancel agreements is a Proposal.</span>
+      </div>
+      <dl class="description">
+         <dt>is in domain of</dt>
+         <dd>
+            <a href="#proposes" title="https://w3id.org/won/agreement#proposes">proposes</a>
+            <sup class="type-op" title="object property">op</sup>, <a href="#proposesToCancel" title="https://w3id.org/won/agreement#proposesToCancel">proposes to cancel</a>
+            <sup class="type-op" title="object property">op</sup>, <a href="#reject" title="https://w3id.org/won/agreement#reject">reject</a>
+            <sup class="type-op" title="object property">op</sup>
+         </dd>
+      </dl>
+   </div>
+</div><div id="objectproperties">
+   <h3 id="properties" class="list">Object Properties</h3>
+   <ul class="hlist">
+      <li>
+         <a href="#accepts" title="https://w3id.org/won/agreement#accepts">
+            <span>accepts</span>
+         </a>
+      </li>
+      <li>
+         <a href="#proposes" title="https://w3id.org/won/agreement#proposes">
+            <span>proposes</span>
+         </a>
+      </li>
+      <li>
+         <a href="#proposesToCancel" title="https://w3id.org/won/agreement#proposesToCancel">
+            <span>proposes to cancel</span>
+         </a>
+      </li>
+      <li>
+         <a href="#reject" title="https://w3id.org/won/agreement#reject">
+            <span>reject</span>
+         </a>
+      </li>
+   </ul>
+   <div class="entity" id="accepts">
+      <h3>accepts<sup class="type-op" title="object property">op</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#objectproperties">Object Property ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/agreement#accepts</p>
+      <div class="comment">
+         <span class="markdown">Used to link two message resources. The message in the subject accepts the message in the object. This only makes sense if the object references a proposal.
+
+During the projection from the edited conversation dataset to the agreement dataset, the validity of agreements is checked. Proposal messages that were not accepted are dropped, as are invalid or cancelled Agreements.</span>
+      </div>
+      <div class="description">
+         <dl>
+            <dt>has domain</dt>
+            <dd>
+               <a href="#Agreement" title="https://w3id.org/won/agreement#Agreement">agreement</a>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
+         </dl>
+      </div>
+   </div>
+   <div class="entity" id="proposes">
+      <h3>proposes<sup class="type-op" title="object property">op</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#objectproperties">Object Property ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/agreement#proposes</p>
+      <div class="description">
+         <dl>
+            <dt>has domain</dt>
+            <dd>
+               <a href="#Proposal" title="https://w3id.org/won/agreement#Proposal">proposal</a>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
+         </dl>
+      </div>
+   </div>
+   <div class="entity" id="proposesToCancel">
+      <h3>proposes to cancel<sup class="type-op" title="object property">op</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#objectproperties">Object Property ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/agreement#proposesToCancel</p>
+      <div class="description">
+         <dl>
+            <dt>has domain</dt>
+            <dd>
+               <a href="#Proposal" title="https://w3id.org/won/agreement#Proposal">proposal</a>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
+         </dl>
+      </div>
+   </div>
+   <div class="entity" id="reject">
+      <h3>reject<sup class="type-op" title="object property">op</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#objectproperties">Object Property ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/agreement#reject</p>
+      <div class="description">
+         <dl>
+            <dt>has domain</dt>
+            <dd>
+               <a href="#Proposal" title="https://w3id.org/won/agreement#Proposal">proposal</a>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
+         </dl>
+      </div>
+   </div>
+</div><div id="legend">
+<h2>Legend <span class="backlink"> back to <a href="#toc">ToC</a></span></h2>
+<div   class="entity">
+<sup class="type-c" title="Classes">c</sup>: Classes <br/>
+<sup class="type-op" title="Object Properties">op</sup>: Object Properties <br/>
+<sup class="type-dp" title="Data Properties">dp</sup>: Data Properties <br/>
+<sup class="type-ni" title="Named Individuals">ni</sup>: Named Individuals
+</div>
+</div>
+</html>

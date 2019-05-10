@@ -1,0 +1,186 @@
+<html><h2 id="overv" class="list">Web of Needs Message Ontology: Overview <span class="backlink"> back to <a href="#toc">ToC</a></span></h2>
+<span class="markdown">
+This ontology has the following classes and properties.</span>
+<h4>Classes</h4>
+<ul class="hlist">
+   <li>
+      <a href="#ContentGraph" title="https://w3id.org/won/message#ContentGraph">
+         <span>content graph</span>
+      </a>
+   </li>
+   <li>
+      <a href="#EnvelopeGraph" title="https://w3id.org/won/message#EnvelopeGraph">EnvelopeGraph</a>
+   </li>
+   <li>
+      <a href="#FromExternal" title="https://w3id.org/won/message#FromExternal">FromExternal</a>
+   </li>
+   <li>
+      <a href="#FromOwner" title="https://w3id.org/won/message#FromOwner">FromOwner</a>
+   </li>
+   <li>
+      <a href="#FromSystem" title="https://w3id.org/won/message#FromSystem">FromSystem</a>
+   </li>
+   <li>
+      <a href="#Message" title="https://w3id.org/won/message#Message">Message</a>
+   </li>
+   <li>
+      <a href="#MessageType" title="https://w3id.org/won/message#MessageType">MessageType</a>
+   </li>
+   <li>
+      <a href="#ResponseType" title="https://w3id.org/won/message#ResponseType">ResponseType</a>
+   </li>
+</ul><h4>Object Properties</h4><ul class="hlist">
+   <li>
+      <a href="#containsEnvelope" title="https://w3id.org/won/message#containsEnvelope">
+         <span>contains envelope</span>
+      </a>
+   </li>
+   <li>
+      <a href="#containsSignature" title="https://w3id.org/won/message#containsSignature">
+         <span>contains signature</span>
+      </a>
+   </li>
+   <li>
+      <a href="#content" title="https://w3id.org/won/message#content">content</a>
+   </li>
+   <li>
+      <a href="#correspondingRemoteMessage"
+         title="https://w3id.org/won/message#correspondingRemoteMessage">correspondingRemoteMessage</a>
+   </li>
+   <li>
+      <a href="#messageType" title="https://w3id.org/won/message#messageType">messageType</a>
+   </li>
+   <li>
+      <a href="#previousMessage" title="https://w3id.org/won/message#previousMessage">
+         <span>previous message</span>
+      </a>
+   </li>
+   <li>
+      <a href="#recipient" title="https://w3id.org/won/message#recipient">
+         <span>recipient</span>
+      </a>
+   </li>
+   <li>
+      <a href="#recipientAtom" title="https://w3id.org/won/message#recipientAtom">
+         <span>recipient atom</span>
+      </a>
+   </li>
+   <li>
+      <a href="#recipientNode" title="https://w3id.org/won/message#recipientNode">
+         <span>recipient node</span>
+      </a>
+   </li>
+   <li>
+      <a href="#sender" title="https://w3id.org/won/message#sender">
+         <span>sender</span>
+      </a>
+   </li>
+   <li>
+      <a href="#senderAtom" title="https://w3id.org/won/message#senderAtom">
+         <span>sender atom</span>
+      </a>
+   </li>
+   <li>
+      <a href="#senderNode" title="https://w3id.org/won/message#senderNode">
+         <span>sender node</span>
+      </a>
+   </li>
+   <li>
+      <a href="#signedGraph" title="https://w3id.org/won/message#signedGraph">
+         <span>signed graph</span>
+      </a>
+   </li>
+</ul><h4>Data Properties</h4><ul class="hlist">
+   <li>
+      <a href="#hash" title="https://w3id.org/won/message#hash">hash</a>
+   </li>
+   <li>
+      <a href="#protocolVersion" title="https://w3id.org/won/message#protocolVersion">
+         <span>protocol version</span>
+      </a>
+   </li>
+   <li>
+      <a href="#publicKeyFingerprint"
+         title="https://w3id.org/won/message#publicKeyFingerprint">publicKeyFingerprint</a>
+   </li>
+   <li>
+      <a href="#receivedTimestamp" title="https://w3id.org/won/message#receivedTimestamp">
+         <span>received timestamp</span>
+      </a>
+   </li>
+   <li>
+      <a href="#sentTimestamp" title="https://w3id.org/won/message#sentTimestamp">sentTimestamp</a>
+   </li>
+   <li>
+      <a href="#timestamp" title="https://w3id.org/won/message#timestamp">
+         <span>timestamp</span>
+      </a>
+   </li>
+</ul><h4>Named Individuals</h4><ul class="hlist">
+   <li>
+      <a href="#ActivateMessage" title="https://w3id.org/won/message#ActivateMessage">
+         <span>activate message</span>
+      </a>
+   </li>
+   <li>
+      <a href="#AtomMessage" title="https://w3id.org/won/message#AtomMessage">
+         <span>atom message</span>
+      </a>
+   </li>
+   <li>
+      <a href="#ChangeNotificationMessage"
+         title="https://w3id.org/won/message#ChangeNotificationMessage">
+         <span>change notification message</span>
+      </a>
+   </li>
+   <li>
+      <a href="#CloseMessage" title="https://w3id.org/won/message#CloseMessage">
+         <span>close message</span>
+      </a>
+   </li>
+   <li>
+      <a href="#ConnectMessage" title="https://w3id.org/won/message#ConnectMessage">
+         <span>connect message</span>
+      </a>
+   </li>
+   <li>
+      <a href="#ConnectionMessage" title="https://w3id.org/won/message#ConnectionMessage">
+         <span>connection message</span>
+      </a>
+   </li>
+   <li>
+      <a href="#CreateMessage" title="https://w3id.org/won/message#CreateMessage">
+         <span>create message</span>
+      </a>
+   </li>
+   <li>
+      <a href="#DeactivateMessage" title="https://w3id.org/won/message#DeactivateMessage">
+         <span>deactivate message</span>
+      </a>
+   </li>
+   <li>
+      <a href="#FailureResponse" title="https://w3id.org/won/message#FailureResponse">
+         <span>failure response</span>
+      </a>
+   </li>
+   <li>
+      <a href="#HintMessage" title="https://w3id.org/won/message#HintMessage">
+         <span>hint message</span>
+      </a>
+   </li>
+   <li>
+      <a href="#OpenMessage" title="https://w3id.org/won/message#OpenMessage">
+         <span>open message</span>
+      </a>
+   </li>
+   <li>
+      <a href="#ReplaceMessage" title="https://w3id.org/won/message#ReplaceMessage">
+         <span>replace message</span>
+      </a>
+   </li>
+   <li>
+      <a href="#SuccessResponse" title="https://w3id.org/won/message#SuccessResponse">
+         <span>success response</span>
+      </a>
+   </li>
+</ul></html>
