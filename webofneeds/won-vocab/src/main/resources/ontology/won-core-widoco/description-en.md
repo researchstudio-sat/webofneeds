@@ -1,0 +1,1 @@
+This `core` ontology supports representing the all the main concepts in Web of Needs, apart from the Messages, for which the `message` ontology must be used.
