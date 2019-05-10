@@ -2,8 +2,8 @@
  * Created by quasarchimaere on 11.02.2019.
  */
 
-import * as useCaseDefinitions from "useCaseDefinitions";
-import { messageDetails } from "detailDefinitions";
+import * as useCaseDefinitions from "../config/usecase-definitions.js";
+import { messageDetails } from "../config/detail-definitions.js";
 import { getIn, get } from "./utils.js";
 import { values } from "min-dash";
 import won from "./won-es6.js";

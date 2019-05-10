@@ -14,12 +14,8 @@ import * as ServiceWorkerWebpackPlugin from "serviceworker-webpack-plugin";
 export default config;
 
 function config(env, argv): Configuration {
-  const mode: "development" | "production" =
-    argv.mode || argv.host
-      ? "development"
-      : argv.watch
-        ? "development"
-        : "production";
+  const mode: "production" | "development" =
+    process.env.NODE_ENV == "production" ? "production" : "development";
 
   const nodeEnv = process.env.WON_DEPLOY_NODE_ENV || "default";
 
@@ -42,34 +38,11 @@ function config(env, argv): Configuration {
     resolve: {
       modules: [__dirname, "node_modules"],
       alias: {
-        fetch: "whatwg-fetch",
-        "rdfstore-js$": path.resolve(
-          __dirname,
-          "scripts/rdfstore-js/rdf_store.js"
-        ),
-        "angular-ui-router-shim$": require.resolve(
-          "angular-ui-router/release/stateEvents.js"
-        ),
-        detailDefinitions$: path.resolve(
-          __dirname,
-          "config",
-          `detail-definitions.js`
-        ),
-        useCaseDefinitions$: path.resolve(
-          __dirname,
-          "config",
-          `usecase-definitions.js`
-        ),
         config$: path.resolve(__dirname, "config", `${nodeEnv}.js`),
-        jsonld$: require.resolve("jsonld/dist/jsonld.js"), // This is needed because `jsonld`s entrypoint is not compiled to compatible js (uses spread operators). With this resolve hook we instead use the compiled version.
       },
     },
     module: {
       rules: [
-        {
-          test: require.resolve("./scripts/rdfstore-js/rdf_store.js"),
-          use: "exports-loader?rdfstore",
-        },
         {
           test: /\.jsx?$/,
           exclude: [/node_modules/, /rdf_store\.js/],

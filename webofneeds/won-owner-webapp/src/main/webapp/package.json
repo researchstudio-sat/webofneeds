@@ -41,12 +41,10 @@
     "whatwg-fetch": "^0.10.1"
   },
   "scripts": {
-    "build": "webpack",
+    "build": "NODE_ENV=production webpack",
     "postinstall": "npm rebuild",
     "precommit": "lint-staged",
     "watch": "webpack --watch",
-    "webpack": "echo Deprecated: This command has been moved to `npm run build` && exit 1",
-    "webpack:watch": "echo Deprecated: This command has been moved to `npm run watch` && exit 1",
     "clean": "rimraf ./generated"
   },
   "devDependencies": {

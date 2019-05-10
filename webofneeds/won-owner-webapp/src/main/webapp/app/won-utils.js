@@ -20,7 +20,7 @@ import {
 import { ownerBaseUrl } from "config";
 import urljoin from "url-join";
 import qr from "qr-image";
-import jsonld from "jsonld";
+import jsonld from "jsonld/dist/jsonld.js";
 window.jsonld4dbg = jsonld;
 
 import Immutable from "immutable";

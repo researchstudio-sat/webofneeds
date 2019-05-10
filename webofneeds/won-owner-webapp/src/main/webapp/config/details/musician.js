@@ -2,7 +2,7 @@
  * Created by fsuda on 18.09.2018.
  */
 import Immutable from "immutable";
-import { details } from "detailDefinitions";
+import { details } from "../detail-definitions.js";
 
 import { is } from "../../app/utils.js";
 

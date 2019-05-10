@@ -25,7 +25,7 @@ import {
   isDisclaimerAccepted,
   setDisclaimerAccepted,
 } from "../won-localstorage.js";
-import jsonld from "jsonld";
+import jsonld from "jsonld/dist/jsonld.js";
 
 import N3 from "n3";
 window.N34dbg = N3;

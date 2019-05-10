@@ -32,8 +32,8 @@ import { parseJsonldLeaf, parseJsonldLeafsImm } from "../won-utils.js";
 import { ownerBaseUrl } from "config";
 import urljoin from "url-join";
 
-import rdfstore from "rdfstore-js";
-import jsonld from "jsonld";
+import rdfstore from "../../scripts/rdfstore-js/rdf_store.js";
+import jsonld from "jsonld/dist/jsonld.js";
 import won from "./won.js";
 
 (function() {

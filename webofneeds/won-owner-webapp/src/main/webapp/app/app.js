@@ -17,7 +17,10 @@ import "../style/won.scss";
 import angular from "angular";
 window.angular = angular; // for compatibility with pre-ES6/commonjs scripts
 
-import "fetch"; //polyfill for window.fetch (for backward-compatibility with older browsers)
+import "whatwg-fetch"; //polyfill for window.fetch (for backward-compatibility with older browsers)
+
+/* global process */
+console.log(process.env);
 
 import "redux";
 import ngReduxModule from "ng-redux";
@@ -29,7 +32,7 @@ import uiRouterModule from "angular-ui-router";
  * 
  * delete at your own peril
  */
-import "angular-ui-router-shim";
+import "angular-ui-router/release/stateEvents.js";
 import { delay } from "./utils.js";
 
 //---------- Config -----------
