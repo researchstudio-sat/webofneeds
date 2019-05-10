@@ -14,10 +14,11 @@
 
 <https://w3id.org/won/core> rdf:type owl:Ontology ;
                              owl:versionIRI <https://w3id.org/won/core/1.0> ;
-                             dc:abstract "The Web of Needs is a decentralized linked data application infrastructure for mediating cooperation in the broadest sense. Based on append-only message logs, users (or other agents) publish objects ('Atoms') that can establish 'Connections'  with other Atoms. Matching services can make suggestions which atoms to connect to. An Atom specifies 'Sockets' indicating the kinds of Connections it is prepared to establish."@en ;
+                             dc:abstract "The Web of Needs is a decentralized linked data application infrastructure for mediating cooperation in the broadest sense. Based on append-only message logs, users (or other agents) publish objects (*Atoms*) that can establish *Connections*  with other Atoms. Matching services can make suggestions which atoms to connect to. An Atom specifies 'Sockets' indicating the kinds of Connections it is prepared to establish."@en ;
                              dc:creator "Fabian Salcher" ,
                                         "Florian Kleedorfer" ;
                              dc:date "2013-12-13"^^xsd:date ;
+                             dc:description "This `core` ontology supports representing the all the main concepts in Web of Needs, apart from the Messages, for which the `message` ontology must be used."@en ;
                              dc:title "Web of Needs Ontology" ;
                              vann:preferredNamespacePrefix "won" ;
                              rdfs:comment "Ontology for the Web of Needs data model."@en .
@@ -36,6 +37,10 @@ dc:creator rdf:type owl:AnnotationProperty .
 
 ###  http://purl.org/dc/elements/1.1/date
 dc:date rdf:type owl:AnnotationProperty .
+
+
+###  http://purl.org/dc/elements/1.1/description
+dc:description rdf:type owl:AnnotationProperty .
 
 
 ###  http://purl.org/dc/elements/1.1/title
