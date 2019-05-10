@@ -1,0 +1,646 @@
+<https://w3id.org/won/core> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Ontology> .
+<https://w3id.org/won/core> <http://www.w3.org/2002/07/owl#versionIRI> <https://w3id.org/won/core/1.0> .
+<https://w3id.org/won/core> <http://purl.org/dc/elements/1.1/abstract> "The Web of Needs is a decentralized linked data application infrastructure for mediating cooperation in the broadest sense. Based on append-only message logs, users (or other agents) publish objects (*Atoms*) that can establish *Connections*  with other Atoms. Matching services can make suggestions which atoms to connect to. An Atom specifies 'Sockets' indicating the kinds of Connections it is prepared to establish."@en .
+<https://w3id.org/won/core> <http://purl.org/dc/elements/1.1/creator> "Fabian Salcher" .
+<https://w3id.org/won/core> <http://purl.org/dc/elements/1.1/creator> "Florian Kleedorfer" .
+<https://w3id.org/won/core> <http://purl.org/dc/elements/1.1/date> "2013-12-13"^^<http://www.w3.org/2001/XMLSchema#date> .
+<https://w3id.org/won/core> <http://purl.org/dc/elements/1.1/description> "This `core` ontology supports representing the all the main concepts in Web of Needs, apart from the Messages, for which the `message` ontology must be used."@en .
+<https://w3id.org/won/core> <http://purl.org/dc/elements/1.1/title> "Web of Needs Ontology" .
+<https://w3id.org/won/core> <http://purl.org/vocab/vann/preferredNamespacePrefix> "won" .
+<https://w3id.org/won/core> <http://www.w3.org/2000/01/rdf-schema#comment> "Ontology for the Web of Needs data model."@en .
+# 
+# 
+# #################################################################
+# #
+# #    Annotation properties
+# #
+# #################################################################
+# 
+# 
+# http://purl.org/dc/elements/1.1/abstract
+<http://purl.org/dc/elements/1.1/abstract> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
+# 
+# http://purl.org/dc/elements/1.1/creator
+<http://purl.org/dc/elements/1.1/creator> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
+# 
+# http://purl.org/dc/elements/1.1/date
+<http://purl.org/dc/elements/1.1/date> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
+# 
+# http://purl.org/dc/elements/1.1/description
+<http://purl.org/dc/elements/1.1/description> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
+# 
+# http://purl.org/dc/elements/1.1/title
+<http://purl.org/dc/elements/1.1/title> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
+# 
+# http://purl.org/vocab/vann/preferredNamespacePrefix
+<http://purl.org/vocab/vann/preferredNamespacePrefix> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
+# 
+# 
+# 
+# #################################################################
+# #
+# #    Datatypes
+# #
+# #################################################################
+# 
+# 
+# http://www.w3.org/2001/XMLSchema#duration
+<http://www.w3.org/2001/XMLSchema#duration> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2000/01/rdf-schema#Datatype> .
+# 
+# 
+# 
+# #################################################################
+# #
+# #    Object Properties
+# #
+# #################################################################
+# 
+# 
+# https://w3id.org/won/core#atomList
+<https://w3id.org/won/core#atomList> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+<https://w3id.org/won/core#atomList> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/core#Node> .
+<https://w3id.org/won/core#atomList> <http://www.w3.org/2000/01/rdf-schema#range> <https://w3id.org/won/core#AtomContainer> .
+<https://w3id.org/won/core#atomList> <http://www.w3.org/2000/01/rdf-schema#comment> "The Node's atoms, in a LDP-pageable container." .
+<https://w3id.org/won/core#atomList> <http://www.w3.org/2000/01/rdf-schema#label> "atomList" .
+# 
+# https://w3id.org/won/core#atomState
+<https://w3id.org/won/core#atomState> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+<https://w3id.org/won/core#atomState> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#FunctionalProperty> .
+<https://w3id.org/won/core#atomState> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/core#Atom> .
+<https://w3id.org/won/core#atomState> <http://www.w3.org/2000/01/rdf-schema#range> <https://w3id.org/won/core#AtomState> .
+<https://w3id.org/won/core#atomState> <http://www.w3.org/2000/01/rdf-schema#comment> "Defines the Atom object's state."@en .
+<https://w3id.org/won/core#atomState> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/core> .
+<https://w3id.org/won/core#atomState> <http://www.w3.org/2000/01/rdf-schema#label> "atomState" .
+# 
+# https://w3id.org/won/core#compatibleSocketDefinition
+<https://w3id.org/won/core#compatibleSocketDefinition> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+<https://w3id.org/won/core#compatibleSocketDefinition> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/core#SocketDefinition> .
+<https://w3id.org/won/core#compatibleSocketDefinition> <http://www.w3.org/2000/01/rdf-schema#range> <https://w3id.org/won/core#SocketDefinition> .
+<https://w3id.org/won/core#compatibleSocketDefinition> <http://www.w3.org/2000/01/rdf-schema#comment> "Identifies another SocketDefinition that is compatible with this one. Connections with other kinds of sockets will not be allowed unless they are explicitly annotated."@en .
+<https://w3id.org/won/core#compatibleSocketDefinition> <http://www.w3.org/2000/01/rdf-schema#label> "compatibleSocketDefinition" .
+# 
+# https://w3id.org/won/core#connectionState
+<https://w3id.org/won/core#connectionState> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+<https://w3id.org/won/core#connectionState> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#FunctionalProperty> .
+<https://w3id.org/won/core#connectionState> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/core#Connection> .
+<https://w3id.org/won/core#connectionState> <http://www.w3.org/2000/01/rdf-schema#range> <https://w3id.org/won/core#ConnectionState> .
+<https://w3id.org/won/core#connectionState> <http://www.w3.org/2000/01/rdf-schema#comment> "Indicates the state in which the Connection object is."@en .
+<https://w3id.org/won/core#connectionState> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/core> .
+<https://w3id.org/won/core#connectionState> <http://www.w3.org/2000/01/rdf-schema#label> "connectionState" .
+# 
+# https://w3id.org/won/core#connections
+<https://w3id.org/won/core#connections> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+<https://w3id.org/won/core#connections> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/core#Atom> .
+<https://w3id.org/won/core#connections> <http://www.w3.org/2000/01/rdf-schema#range> <https://w3id.org/won/core#ConnectionContainer> .
+<https://w3id.org/won/core#connections> <http://www.w3.org/2000/01/rdf-schema#comment> "Links the Atom object to its connections."@en .
+<https://w3id.org/won/core#connections> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/core> .
+<https://w3id.org/won/core#connections> <http://www.w3.org/2000/01/rdf-schema#label> "connections" .
+# 
+# https://w3id.org/won/core#defaultSocket
+<https://w3id.org/won/core#defaultSocket> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+<https://w3id.org/won/core#defaultSocket> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/core#Atom> .
+<https://w3id.org/won/core#defaultSocket> <http://www.w3.org/2000/01/rdf-schema#range> <https://w3id.org/won/core#Socket> .
+<https://w3id.org/won/core#defaultSocket> <http://www.w3.org/2000/01/rdf-schema#comment> "Indicates the socket to connect to by default."@en .
+<https://w3id.org/won/core#defaultSocket> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/core> .
+<https://w3id.org/won/core#defaultSocket> <http://www.w3.org/2000/01/rdf-schema#label> "defaultSocket" .
+# 
+# https://w3id.org/won/core#derivesAtomProperty
+<https://w3id.org/won/core#derivesAtomProperty> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+<https://w3id.org/won/core#derivesAtomProperty> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/core#SocketDefinition> .
+<https://w3id.org/won/core#derivesAtomProperty> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/1999/02/22-rdf-syntax-ns#Property> .
+<https://w3id.org/won/core#derivesAtomProperty> <http://www.w3.org/2000/01/rdf-schema#comment> "Defines a property to be 'derived' when the connection is established. The property will be used to derive a triple '[sourceAtom] [property] [targetAtom]'."@en .
+<https://w3id.org/won/core#derivesAtomProperty> <http://www.w3.org/2000/01/rdf-schema#label> "derivesAtomProperty" .
+# 
+# https://w3id.org/won/core#derivesInverseAtomProperty
+<https://w3id.org/won/core#derivesInverseAtomProperty> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+<https://w3id.org/won/core#derivesInverseAtomProperty> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/core#SocketDefinition> .
+<https://w3id.org/won/core#derivesInverseAtomProperty> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/1999/02/22-rdf-syntax-ns#Property> .
+<https://w3id.org/won/core#derivesInverseAtomProperty> <http://www.w3.org/2000/01/rdf-schema#comment> "Defines a property to be 'derived' when the connection is established. The property will be used to derive a triple '[targetAtom] [property] [sourceAtom]'."@en .
+<https://w3id.org/won/core#derivesInverseAtomProperty> <http://www.w3.org/2000/01/rdf-schema#label> "derivesInverseAtomProperty" .
+# 
+# https://w3id.org/won/core#flag
+<https://w3id.org/won/core#flag> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+<https://w3id.org/won/core#flag> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/core#Atom> .
+<https://w3id.org/won/core#flag> <http://www.w3.org/2000/01/rdf-schema#range> <https://w3id.org/won/core#Flag> .
+<https://w3id.org/won/core#flag> <http://www.w3.org/2000/01/rdf-schema#comment> "Links an Atom to its Flags"@en .
+<https://w3id.org/won/core#flag> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/core> .
+<https://w3id.org/won/core#flag> <http://www.w3.org/2000/01/rdf-schema#label> "flag" .
+# 
+# https://w3id.org/won/core#messageContainer
+<https://w3id.org/won/core#messageContainer> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+<https://w3id.org/won/core#messageContainer> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#FunctionalProperty> .
+<https://w3id.org/won/core#messageContainer> <http://www.w3.org/2000/01/rdf-schema#domain> _:genid1 .
+_:genid1 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+_:genid1 <http://www.w3.org/2002/07/owl#unionOf> _:genid3 .
+_:genid3 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
+_:genid3 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/core#Atom> .
+_:genid3 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:genid2 .
+_:genid2 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
+_:genid2 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/core#Connection> .
+_:genid2 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/1999/02/22-rdf-syntax-ns#nil> .
+<https://w3id.org/won/core#messageContainer> <http://www.w3.org/2000/01/rdf-schema#range> <https://w3id.org/won/core#MessageContainer> .
+<https://w3id.org/won/core#messageContainer> <http://www.w3.org/2000/01/rdf-schema#comment> "Links the Connection object to a container containing connection events (messages)."@en .
+<https://w3id.org/won/core#messageContainer> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/core> .
+<https://w3id.org/won/core#messageContainer> <http://www.w3.org/2000/01/rdf-schema#label> "messageContainer" .
+# 
+# https://w3id.org/won/core#seeks
+<https://w3id.org/won/core#seeks> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+<https://w3id.org/won/core#seeks> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/core#Atom> .
+<https://w3id.org/won/core#seeks> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2002/07/owl#Thing> .
+<https://w3id.org/won/core#seeks> <http://www.w3.org/2000/01/rdf-schema#comment> "This optional property is one of the two properties that defines the content of every atom (the other is the \"is\" property). It is used to describe that part of the content that is\nsought to fulfill the atom in contrast to the part that is available." .
+<https://w3id.org/won/core#seeks> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/core> .
+<https://w3id.org/won/core#seeks> <http://www.w3.org/2000/01/rdf-schema#label> "seeks" .
+# 
+# https://w3id.org/won/core#socket
+<https://w3id.org/won/core#socket> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+<https://w3id.org/won/core#socket> <http://www.w3.org/2000/01/rdf-schema#domain> _:genid4 .
+_:genid4 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+_:genid4 <http://www.w3.org/2002/07/owl#unionOf> _:genid6 .
+_:genid6 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
+_:genid6 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/core#Atom> .
+_:genid6 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:genid5 .
+_:genid5 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
+_:genid5 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/core#Connection> .
+_:genid5 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/1999/02/22-rdf-syntax-ns#nil> .
+<https://w3id.org/won/core#socket> <http://www.w3.org/2000/01/rdf-schema#range> <https://w3id.org/won/core#Socket> .
+<https://w3id.org/won/core#socket> <http://www.w3.org/2000/01/rdf-schema#comment> "Indicates that an atom or connection supports the specified socket (=behavior)."@en .
+<https://w3id.org/won/core#socket> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/core> .
+<https://w3id.org/won/core#socket> <http://www.w3.org/2000/01/rdf-schema#label> "socket" .
+# 
+# https://w3id.org/won/core#socketDefinition
+<https://w3id.org/won/core#socketDefinition> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+<https://w3id.org/won/core#socketDefinition> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/core#Socket> .
+<https://w3id.org/won/core#socketDefinition> <http://www.w3.org/2000/01/rdf-schema#range> <https://w3id.org/won/core#SocketDefinition> .
+<https://w3id.org/won/core#socketDefinition> <http://www.w3.org/2000/01/rdf-schema#comment> "Links the socket to its definition. A socket must have exactly one definition."@en .
+<https://w3id.org/won/core#socketDefinition> <http://www.w3.org/2000/01/rdf-schema#label> "socketDefinition" .
+# 
+# https://w3id.org/won/core#sourceAtom
+<https://w3id.org/won/core#sourceAtom> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+<https://w3id.org/won/core#sourceAtom> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/core#Connection> .
+<https://w3id.org/won/core#sourceAtom> <http://www.w3.org/2000/01/rdf-schema#range> <https://w3id.org/won/core#Atom> .
+<https://w3id.org/won/core#sourceAtom> <http://www.w3.org/2000/01/rdf-schema#comment> "Links a Connection to the Atom it belongs to (the source of this Connection)"@en .
+<https://w3id.org/won/core#sourceAtom> <http://www.w3.org/2000/01/rdf-schema#label> "sourceAtom" .
+# 
+# https://w3id.org/won/core#supportsWonProtocolImpl
+<https://w3id.org/won/core#supportsWonProtocolImpl> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+<https://w3id.org/won/core#supportsWonProtocolImpl> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/core#Node> .
+<https://w3id.org/won/core#supportsWonProtocolImpl> <http://www.w3.org/2000/01/rdf-schema#range> <https://w3id.org/won/core#WonProtocol> .
+<https://w3id.org/won/core#supportsWonProtocolImpl> <http://www.w3.org/2000/01/rdf-schema#comment> "Connects an WoN Node object with a description of a WON protocol it supports."@en .
+<https://w3id.org/won/core#supportsWonProtocolImpl> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/core> .
+<https://w3id.org/won/core#supportsWonProtocolImpl> <http://www.w3.org/2000/01/rdf-schema#label> "supportsWonProtocolImpl" .
+# 
+# https://w3id.org/won/core#targetAtom
+<https://w3id.org/won/core#targetAtom> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+<https://w3id.org/won/core#targetAtom> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/core#Connection> .
+<https://w3id.org/won/core#targetAtom> <http://www.w3.org/2000/01/rdf-schema#range> <https://w3id.org/won/core#Atom> .
+<https://w3id.org/won/core#targetAtom> <http://www.w3.org/2000/01/rdf-schema#comment> "links a Connection to its remote Atom. The remote Atom is the one holding the  targetConnection."@en .
+<https://w3id.org/won/core#targetAtom> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> "https://w3id.org/won/core"@en .
+<https://w3id.org/won/core#targetAtom> <http://www.w3.org/2000/01/rdf-schema#label> "targetAtom" .
+# 
+# https://w3id.org/won/core#targetConnection
+<https://w3id.org/won/core#targetConnection> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+<https://w3id.org/won/core#targetConnection> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#FunctionalProperty> .
+<https://w3id.org/won/core#targetConnection> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#InverseFunctionalProperty> .
+<https://w3id.org/won/core#targetConnection> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#SymmetricProperty> .
+<https://w3id.org/won/core#targetConnection> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/core#Connection> .
+<https://w3id.org/won/core#targetConnection> <http://www.w3.org/2000/01/rdf-schema#range> <https://w3id.org/won/core#Connection> .
+<https://w3id.org/won/core#targetConnection> <http://www.w3.org/2000/01/rdf-schema#comment> "Links a Connection object to its remote counterpart."@en .
+<https://w3id.org/won/core#targetConnection> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/core> .
+<https://w3id.org/won/core#targetConnection> <http://www.w3.org/2000/01/rdf-schema#label> "targetConnection" .
+# 
+# https://w3id.org/won/core#targetSocket
+<https://w3id.org/won/core#targetSocket> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+<https://w3id.org/won/core#targetSocket> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/core#Connection> .
+<https://w3id.org/won/core#targetSocket> <http://www.w3.org/2000/01/rdf-schema#range> <https://w3id.org/won/core#Socket> .
+<https://w3id.org/won/core#targetSocket> <http://www.w3.org/2000/01/rdf-schema#comment> "Indicates that a remote atom or remote connection supports the specified socket (=behavior) or specifies the remote socket to connect with."@en .
+<https://w3id.org/won/core#targetSocket> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/core> .
+<https://w3id.org/won/core#targetSocket> <http://www.w3.org/2000/01/rdf-schema#label> "targetSocket" .
+# 
+# https://w3id.org/won/core#uriPrefixSpecification
+<https://w3id.org/won/core#uriPrefixSpecification> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+<https://w3id.org/won/core#uriPrefixSpecification> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/core#Node> .
+<https://w3id.org/won/core#uriPrefixSpecification> <http://www.w3.org/2000/01/rdf-schema#range> <https://w3id.org/won/core#UriPrefixSpecification> .
+<https://w3id.org/won/core#uriPrefixSpecification> <http://www.w3.org/2000/01/rdf-schema#comment> "Specification of URI prefixes used by this WoN node."@en .
+<https://w3id.org/won/core#uriPrefixSpecification> <http://www.w3.org/2000/01/rdf-schema#label> "uriPrefixSpecification" .
+# 
+# 
+# 
+# #################################################################
+# #
+# #    Data properties
+# #
+# #################################################################
+# 
+# 
+# https://w3id.org/won/core#atomActivatedTopic
+<https://w3id.org/won/core#atomActivatedTopic> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
+<https://w3id.org/won/core#atomActivatedTopic> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/core#WonOverActiveMq> .
+<https://w3id.org/won/core#atomActivatedTopic> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/won/core#atomActivatedTopic> <http://www.w3.org/2000/01/rdf-schema#comment> "The activeMQ topic to subscribe to to be informed when an atom is activated."@en .
+<https://w3id.org/won/core#atomActivatedTopic> <http://www.w3.org/2000/01/rdf-schema#label> "atomActivatedTopic" .
+# 
+# https://w3id.org/won/core#atomCreatedTopic
+<https://w3id.org/won/core#atomCreatedTopic> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
+<https://w3id.org/won/core#atomCreatedTopic> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/core#WonOverActiveMq> .
+<https://w3id.org/won/core#atomCreatedTopic> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/won/core#atomCreatedTopic> <http://www.w3.org/2000/01/rdf-schema#comment> "The activeMQ topic to subscribe to to be informed when an atom is created."@en .
+<https://w3id.org/won/core#atomCreatedTopic> <http://www.w3.org/2000/01/rdf-schema#label> "atomCreatedTopic" .
+# 
+# https://w3id.org/won/core#atomDeactivatedTopic
+<https://w3id.org/won/core#atomDeactivatedTopic> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
+<https://w3id.org/won/core#atomDeactivatedTopic> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/core#WonOverActiveMq> .
+<https://w3id.org/won/core#atomDeactivatedTopic> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/won/core#atomDeactivatedTopic> <http://www.w3.org/2000/01/rdf-schema#comment> "The activeMQ topic to subscribe to to be informed when an atom is deactivated."@en .
+<https://w3id.org/won/core#atomDeactivatedTopic> <http://www.w3.org/2000/01/rdf-schema#label> "atomDeactivatedTopic" .
+# 
+# https://w3id.org/won/core#atomDeletedTopic
+<https://w3id.org/won/core#atomDeletedTopic> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
+<https://w3id.org/won/core#atomDeletedTopic> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/core#WonOverActiveMq> .
+<https://w3id.org/won/core#atomDeletedTopic> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/won/core#atomDeletedTopic> <http://www.w3.org/2000/01/rdf-schema#comment> "The activeMQ topic to subscribe to to be informed when an atom is deleted."@en .
+<https://w3id.org/won/core#atomDeletedTopic> <http://www.w3.org/2000/01/rdf-schema#label> "atomDeletedTopic" .
+# 
+# https://w3id.org/won/core#atomModifiedTopic
+<https://w3id.org/won/core#atomModifiedTopic> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
+<https://w3id.org/won/core#atomModifiedTopic> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/core#WonOverActiveMq> .
+<https://w3id.org/won/core#atomModifiedTopic> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/won/core#atomModifiedTopic> <http://www.w3.org/2000/01/rdf-schema#comment> "The activeMQ topic to subscribe to to be informed when an atom is modified."@en .
+<https://w3id.org/won/core#atomModifiedTopic> <http://www.w3.org/2000/01/rdf-schema#label> "atomModifiedTopic" .
+# 
+# https://w3id.org/won/core#atomUriPrefix
+<https://w3id.org/won/core#atomUriPrefix> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
+<https://w3id.org/won/core#atomUriPrefix> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/core#UriPrefixSpecification> .
+<https://w3id.org/won/core#atomUriPrefix> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/won/core#atomUriPrefix> <http://www.w3.org/2000/01/rdf-schema#comment> "Specifies the prefix an atom must have on the node this specification applies to. This specification allows clients to generate new valid new Atom URIs."@en .
+<https://w3id.org/won/core#atomUriPrefix> <http://www.w3.org/2000/01/rdf-schema#label> "atomUriPrefix" .
+# 
+# https://w3id.org/won/core#autoOpen
+<https://w3id.org/won/core#autoOpen> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
+<https://w3id.org/won/core#autoOpen> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/core#SocketDefinition> .
+<https://w3id.org/won/core#autoOpen> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#boolean> .
+<https://w3id.org/won/core#autoOpen> <http://www.w3.org/2000/01/rdf-schema#comment> "Indicates that any incoming CONNECT/OPEN message will be answered with OPEN unless the facet configuration forbids it."@en .
+<https://w3id.org/won/core#autoOpen> <http://www.w3.org/2000/01/rdf-schema#label> "autoOpen" .
+# 
+# https://w3id.org/won/core#brokerUri
+<https://w3id.org/won/core#brokerUri> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
+<https://w3id.org/won/core#brokerUri> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/core#WonOverActiveMq> .
+<https://w3id.org/won/core#brokerUri> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#anyURI> .
+<https://w3id.org/won/core#brokerUri> <http://www.w3.org/2000/01/rdf-schema#comment> "The URI of the activeMQ broker"@en .
+<https://w3id.org/won/core#brokerUri> <http://www.w3.org/2000/01/rdf-schema#label> "brokerUri" .
+# 
+# https://w3id.org/won/core#connectionUriPrefix
+<https://w3id.org/won/core#connectionUriPrefix> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
+<https://w3id.org/won/core#connectionUriPrefix> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/core#UriPrefixSpecification> .
+<https://w3id.org/won/core#connectionUriPrefix> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/won/core#connectionUriPrefix> <http://www.w3.org/2000/01/rdf-schema#comment> "Specifies the prefix a connection must have on the node this specification applies to."@en .
+<https://w3id.org/won/core#connectionUriPrefix> <http://www.w3.org/2000/01/rdf-schema#label> "connectionUriPrefix" .
+# 
+# https://w3id.org/won/core#doNotMatchAfter
+<https://w3id.org/won/core#doNotMatchAfter> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
+<https://w3id.org/won/core#doNotMatchAfter> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#FunctionalProperty> .
+<https://w3id.org/won/core#doNotMatchAfter> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/core#Atom> .
+<https://w3id.org/won/core#doNotMatchAfter> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#dateTime> .
+<https://w3id.org/won/core#doNotMatchAfter> <http://www.w3.org/2000/01/rdf-schema#comment> "Indicates that matchers should not use this atom for matching after the specified xsd:dateTime."@en .
+<https://w3id.org/won/core#doNotMatchAfter> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/core> .
+<https://w3id.org/won/core#doNotMatchAfter> <http://www.w3.org/2000/01/rdf-schema#label> "doNotMatchAfter" .
+# 
+# https://w3id.org/won/core#doNotMatchBefore
+<https://w3id.org/won/core#doNotMatchBefore> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
+<https://w3id.org/won/core#doNotMatchBefore> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#FunctionalProperty> .
+<https://w3id.org/won/core#doNotMatchBefore> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/core#Atom> .
+<https://w3id.org/won/core#doNotMatchBefore> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#dateTime> .
+<https://w3id.org/won/core#doNotMatchBefore> <http://www.w3.org/2000/01/rdf-schema#comment> "Indicates that matchers should not use this atom for matching before the specified xsd:dateTime."@en .
+<https://w3id.org/won/core#doNotMatchBefore> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/core> .
+<https://w3id.org/won/core#doNotMatchBefore> <http://www.w3.org/2000/01/rdf-schema#label> "doNotMatchBefore" .
+# 
+# https://w3id.org/won/core#eventUriPrefix
+<https://w3id.org/won/core#eventUriPrefix> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
+<https://w3id.org/won/core#eventUriPrefix> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/core#UriPrefixSpecification> .
+<https://w3id.org/won/core#eventUriPrefix> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/won/core#eventUriPrefix> <http://www.w3.org/2000/01/rdf-schema#comment> "Specifies the prefix an event must have on the node this specification applies to. This specification allows clients to generate new valid new event (message) URIs."@en .
+<https://w3id.org/won/core#eventUriPrefix> <http://www.w3.org/2000/01/rdf-schema#label> "eventUriPrefix" .
+# 
+# https://w3id.org/won/core#matcherQueue
+<https://w3id.org/won/core#matcherQueue> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
+<https://w3id.org/won/core#matcherQueue> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/core#WonOverActiveMq> .
+<https://w3id.org/won/core#matcherQueue> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/won/core#matcherQueue> <http://www.w3.org/2000/01/rdf-schema#comment> "The activeMQ queue to be used by matchers to send messages to the node."@en .
+<https://w3id.org/won/core#matcherQueue> <http://www.w3.org/2000/01/rdf-schema#label> "matcherQueue" .
+# 
+# https://w3id.org/won/core#matchingContext
+<https://w3id.org/won/core#matchingContext> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
+<https://w3id.org/won/core#matchingContext> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/core#Atom> .
+<https://w3id.org/won/core#matchingContext> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/won/core#matchingContext> <http://www.w3.org/2000/01/rdf-schema#comment> "Specifies a 'matching context' for the Atom. Matchers should only send hints to this Atom if the counterpart specifies the same matching context. If no matching context is specified, matching is not restricted, and matchers may send hints with counterparts that do specify matching contexts."@en .
+<https://w3id.org/won/core#matchingContext> <http://www.w3.org/2000/01/rdf-schema#label> "matchingContext" .
+# 
+# https://w3id.org/won/core#nodeQueue
+<https://w3id.org/won/core#nodeQueue> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
+<https://w3id.org/won/core#nodeQueue> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/core#WonOverActiveMq> .
+<https://w3id.org/won/core#nodeQueue> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/won/core#nodeQueue> <http://www.w3.org/2000/01/rdf-schema#comment> "The activeMQ queue to be used by other nodes to send messages to the node."@en .
+<https://w3id.org/won/core#nodeQueue> <http://www.w3.org/2000/01/rdf-schema#label> "nodeQueue" .
+# 
+# https://w3id.org/won/core#ownerQueue
+<https://w3id.org/won/core#ownerQueue> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
+<https://w3id.org/won/core#ownerQueue> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/core#WonOverActiveMq> .
+<https://w3id.org/won/core#ownerQueue> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/won/core#ownerQueue> <http://www.w3.org/2000/01/rdf-schema#comment> "The activeMQ queue to be used by owners to send messages to the node."@en .
+<https://w3id.org/won/core#ownerQueue> <http://www.w3.org/2000/01/rdf-schema#label> "ownerQueue" .
+# 
+# https://w3id.org/won/core#socketCapacity
+<https://w3id.org/won/core#socketCapacity> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
+<https://w3id.org/won/core#socketCapacity> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/core#SocketDefinition> .
+<https://w3id.org/won/core#socketCapacity> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#integer> .
+<https://w3id.org/won/core#socketCapacity> <http://www.w3.org/2000/01/rdf-schema#comment> "Defines the maximum number of established connections supported by the socket."@en .
+<https://w3id.org/won/core#socketCapacity> <http://www.w3.org/2000/01/rdf-schema#label> "socketCapacity" .
+# 
+# https://w3id.org/won/core#tag
+<https://w3id.org/won/core#tag> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
+<https://w3id.org/won/core#tag> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/core#Atom> .
+<https://w3id.org/won/core#tag> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/won/core#tag> <http://www.w3.org/2000/01/rdf-schema#comment> "Tags an Atom with a String value."@en .
+<https://w3id.org/won/core#tag> <http://www.w3.org/2000/01/rdf-schema#label> "tag" .
+# 
+# 
+# 
+# #################################################################
+# #
+# #    Classes
+# #
+# #################################################################
+# 
+# 
+# http://www.w3.org/1999/02/22-rdf-syntax-ns#Property
+<http://www.w3.org/1999/02/22-rdf-syntax-ns#Property> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+# 
+# http://www.w3.org/ns/ldp#CompositeContainer
+<http://www.w3.org/ns/ldp#CompositeContainer> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://www.w3.org/ns/ldp#CompositeContainer> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/core> .
+# 
+# https://w3id.org/won/core#Atom
+<https://w3id.org/won/core#Atom> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<https://w3id.org/won/core#Atom> <http://www.w3.org/2000/01/rdf-schema#comment> "An atom is an online entity controlled by a person or organization. Its purpose is to be connected to other such atoms via Connections, so it can be said that it represents the need to interact with others.\nIt specifies a content - what the atom is about, which may be something that is offered for sale, sought for rental etc."@en .
+<https://w3id.org/won/core#Atom> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/core> .
+<https://w3id.org/won/core#Atom> <http://www.w3.org/2000/01/rdf-schema#label> "Atom" .
+# 
+# https://w3id.org/won/core#AtomContainer
+<https://w3id.org/won/core#AtomContainer> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<https://w3id.org/won/core#AtomContainer> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://www.w3.org/ns/ldp#CompositeContainer> .
+<https://w3id.org/won/core#AtomContainer> <http://www.w3.org/2000/01/rdf-schema#comment> "An LDP container with all the Atoms stored on the Node.\n\nThe container supports LDP paging as described here: https://github.com/researchstudio-sat/webofneeds/blob/master/webofneeds/won-node-webapp/doc/linked-data-paging.md" .
+<https://w3id.org/won/core#AtomContainer> <http://www.w3.org/2000/01/rdf-schema#label> "AtomContainer" .
+# 
+# https://w3id.org/won/core#AtomState
+<https://w3id.org/won/core#AtomState> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<https://w3id.org/won/core#AtomState> <http://www.w3.org/2000/01/rdf-schema#comment> "The Atom's state."@en .
+<https://w3id.org/won/core#AtomState> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/core> .
+<https://w3id.org/won/core#AtomState> <http://www.w3.org/2000/01/rdf-schema#label> "AtomState" .
+# 
+# https://w3id.org/won/core#Connection
+<https://w3id.org/won/core#Connection> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<https://w3id.org/won/core#Connection> <http://www.w3.org/2000/01/rdf-schema#comment> "Represents a Connection to between two Atoms. Whenever two Atoms are connected, each Atom creates a dedicated Connection object which encapsulate all information about the connection."@en .
+<https://w3id.org/won/core#Connection> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/core> .
+<https://w3id.org/won/core#Connection> <http://www.w3.org/2000/01/rdf-schema#label> "Connection" .
+# 
+# https://w3id.org/won/core#ConnectionContainer
+<https://w3id.org/won/core#ConnectionContainer> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<https://w3id.org/won/core#ConnectionContainer> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://www.w3.org/ns/ldp#CompositeContainer> .
+<https://w3id.org/won/core#ConnectionContainer> <http://www.w3.org/2002/07/owl#disjointWith> <https://w3id.org/won/core#MessageContainer> .
+<https://w3id.org/won/core#ConnectionContainer> <http://www.w3.org/2000/01/rdf-schema#comment> "Container for Connections. The container supports LDP paging as described here: https://github.com/researchstudio-sat/webofneeds/blob/master/webofneeds/won-node-webapp/doc/linked-data-paging.md"@en .
+<https://w3id.org/won/core#ConnectionContainer> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/core> .
+<https://w3id.org/won/core#ConnectionContainer> <http://www.w3.org/2000/01/rdf-schema#label> "ConnectionContainer" .
+# 
+# https://w3id.org/won/core#ConnectionState
+<https://w3id.org/won/core#ConnectionState> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<https://w3id.org/won/core#ConnectionState> <http://www.w3.org/2000/01/rdf-schema#comment> "A Connection's state."@en .
+<https://w3id.org/won/core#ConnectionState> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/core> .
+<https://w3id.org/won/core#ConnectionState> <http://www.w3.org/2000/01/rdf-schema#label> "ConnectionState" .
+# 
+# https://w3id.org/won/core#Flag
+<https://w3id.org/won/core#Flag> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<https://w3id.org/won/core#Flag> <http://www.w3.org/2000/01/rdf-schema#comment> "Superclass of all Flags an atom can have."@en .
+<https://w3id.org/won/core#Flag> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/core> .
+<https://w3id.org/won/core#Flag> <http://www.w3.org/2000/01/rdf-schema#label> "Flag" .
+# 
+# https://w3id.org/won/core#MessageContainer
+<https://w3id.org/won/core#MessageContainer> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<https://w3id.org/won/core#MessageContainer> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://www.w3.org/ns/ldp#CompositeContainer> .
+<https://w3id.org/won/core#MessageContainer> <http://www.w3.org/2000/01/rdf-schema#comment> "Container for Messages. The container supports LDP paging as described here: https://github.com/researchstudio-sat/webofneeds/blob/master/webofneeds/won-node-webapp/doc/linked-data-paging.md."@en .
+<https://w3id.org/won/core#MessageContainer> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/core> .
+<https://w3id.org/won/core#MessageContainer> <http://www.w3.org/2000/01/rdf-schema#label> "MessageContainer" .
+# 
+# https://w3id.org/won/core#Node
+<https://w3id.org/won/core#Node> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<https://w3id.org/won/core#Node> <http://www.w3.org/2000/01/rdf-schema#comment> "A server storing Atoms and the data associated with them."@en .
+<https://w3id.org/won/core#Node> <http://www.w3.org/2000/01/rdf-schema#label> "Node" .
+# 
+# https://w3id.org/won/core#Socket
+<https://w3id.org/won/core#Socket> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<https://w3id.org/won/core#Socket> <http://www.w3.org/2000/01/rdf-schema#comment> "An Atom defines how Connections can be established using any number of Socket individuals. Each connection between two Atoms must specify the Socket it is attached to on each side."@en .
+<https://w3id.org/won/core#Socket> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/core> .
+<https://w3id.org/won/core#Socket> <http://www.w3.org/2000/01/rdf-schema#label> "Socket" .
+# 
+# https://w3id.org/won/core#SocketDefinition
+<https://w3id.org/won/core#SocketDefinition> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<https://w3id.org/won/core#SocketDefinition> <http://www.w3.org/2000/01/rdf-schema#comment> "A Socket's definition."@en .
+<https://w3id.org/won/core#SocketDefinition> <http://www.w3.org/2000/01/rdf-schema#label> "SocketDefinition" .
+# 
+# https://w3id.org/won/core#UriPrefixSpecification
+<https://w3id.org/won/core#UriPrefixSpecification> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<https://w3id.org/won/core#UriPrefixSpecification> <http://www.w3.org/2000/01/rdf-schema#comment> "Specification of URI prefixes for atoms, events, and connections for a WoN node."@en .
+<https://w3id.org/won/core#UriPrefixSpecification> <http://www.w3.org/2000/01/rdf-schema#label> "UriPrefixSpecification" .
+# 
+# https://w3id.org/won/core#WonOverActiveMq
+<https://w3id.org/won/core#WonOverActiveMq> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<https://w3id.org/won/core#WonOverActiveMq> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <https://w3id.org/won/core#WonProtocol> .
+<https://w3id.org/won/core#WonOverActiveMq> <http://www.w3.org/2000/01/rdf-schema#comment> "The Web of Needs protocol implementation that uses ActiveMQ."@en .
+<https://w3id.org/won/core#WonOverActiveMq> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/core> .
+<https://w3id.org/won/core#WonOverActiveMq> <http://www.w3.org/2000/01/rdf-schema#label> "WonOverActiveMq" .
+# 
+# https://w3id.org/won/core#WonProtocol
+<https://w3id.org/won/core#WonProtocol> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<https://w3id.org/won/core#WonProtocol> <http://www.w3.org/2000/01/rdf-schema#comment> "Superclass for Web of Needs protocol implementations."@en .
+<https://w3id.org/won/core#WonProtocol> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/core> .
+<https://w3id.org/won/core#WonProtocol> <http://www.w3.org/2000/01/rdf-schema#label> "WonProtocol" .
+# 
+# 
+# 
+# #################################################################
+# #
+# #    Individuals
+# #
+# #################################################################
+# 
+# 
+# https://w3id.org/won/core#Active
+<https://w3id.org/won/core#Active> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
+<https://w3id.org/won/core#Active> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/core#AtomState> .
+<https://w3id.org/won/core#Active> <http://www.w3.org/2000/01/rdf-schema#comment> "The active state. "@en .
+<https://w3id.org/won/core#Active> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/core> .
+<https://w3id.org/won/core#Active> <http://www.w3.org/2000/01/rdf-schema#label> "Active" .
+# 
+# https://w3id.org/won/core#Closed
+<https://w3id.org/won/core#Closed> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
+<https://w3id.org/won/core#Closed> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/core#ConnectionState> .
+<https://w3id.org/won/core#Closed> <http://www.w3.org/2000/01/rdf-schema#comment> "The closed state. No Messages are forwarded in this state. Re-opening a connection is possbile."@en .
+<https://w3id.org/won/core#Closed> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/core> .
+<https://w3id.org/won/core#Closed> <http://www.w3.org/2000/01/rdf-schema#label> "Closed" .
+# 
+# https://w3id.org/won/core#Connected
+<https://w3id.org/won/core#Connected> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
+<https://w3id.org/won/core#Connected> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/core#ConnectionState> .
+<https://w3id.org/won/core#Connected> <http://www.w3.org/2000/01/rdf-schema#comment> "The connected state. Messages are forwarded to/from the owner."@en .
+<https://w3id.org/won/core#Connected> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/core> .
+<https://w3id.org/won/core#Connected> <http://www.w3.org/2000/01/rdf-schema#label> "Connected" .
+# 
+# https://w3id.org/won/core#Inactive
+<https://w3id.org/won/core#Inactive> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
+<https://w3id.org/won/core#Inactive> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/core#AtomState> .
+<https://w3id.org/won/core#Inactive> <http://www.w3.org/2000/01/rdf-schema#comment> "The incative state. Atoms do not communicate in this state. Intended to stop receiving messages for something not currently of interest."@en .
+<https://w3id.org/won/core#Inactive> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/core> .
+<https://w3id.org/won/core#Inactive> <http://www.w3.org/2000/01/rdf-schema#label> "Inactive" .
+# 
+# https://w3id.org/won/core#NoHintForCounterpart
+<https://w3id.org/won/core#NoHintForCounterpart> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
+<https://w3id.org/won/core#NoHintForCounterpart> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/core#Flag> .
+<https://w3id.org/won/core#NoHintForCounterpart> <http://www.w3.org/2000/01/rdf-schema#comment> "An Atom specifying this flag indicates that matchers should not send Hint messages to the counterpart in case of a match. If the NoHintForMe flag is also present, matchers should disregard this atom completely."@en .
+<https://w3id.org/won/core#NoHintForCounterpart> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/core> .
+<https://w3id.org/won/core#NoHintForCounterpart> <http://www.w3.org/2000/01/rdf-schema#label> "NoHintForCounterpart" .
+# 
+# https://w3id.org/won/core#NoHintForMe
+<https://w3id.org/won/core#NoHintForMe> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
+<https://w3id.org/won/core#NoHintForMe> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/core#Flag> .
+<https://w3id.org/won/core#NoHintForMe> <http://www.w3.org/2000/01/rdf-schema#comment> "An Atom specifying this flag indicates that matchers should not send Hint messages to that Atom. If the NoHintForCounterpart flag is also present, matchers should disregard this atom completely."@en .
+<https://w3id.org/won/core#NoHintForMe> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/core> .
+<https://w3id.org/won/core#NoHintForMe> <http://www.w3.org/2000/01/rdf-schema#label> "NoHintForMe" .
+# 
+# https://w3id.org/won/core#RequestReceived
+<https://w3id.org/won/core#RequestReceived> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
+<https://w3id.org/won/core#RequestReceived> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/core#ConnectionState> .
+<https://w3id.org/won/core#RequestReceived> <http://www.w3.org/2000/01/rdf-schema#comment> "Half-open state. The connection has been opened by the remote counterpart but not yet been accepted by the local end."@en .
+<https://w3id.org/won/core#RequestReceived> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/core> .
+<https://w3id.org/won/core#RequestReceived> <http://www.w3.org/2000/01/rdf-schema#label> "RequestReceived" .
+# 
+# https://w3id.org/won/core#RequestSent
+<https://w3id.org/won/core#RequestSent> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
+<https://w3id.org/won/core#RequestSent> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/core#ConnectionState> .
+<https://w3id.org/won/core#RequestSent> <http://www.w3.org/2000/01/rdf-schema#comment> "Half-open state. The Connection has been requested by the local end but not yet been accepted by the remote counterpart."@en .
+<https://w3id.org/won/core#RequestSent> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/core> .
+<https://w3id.org/won/core#RequestSent> <http://www.w3.org/2000/01/rdf-schema#label> "RequestSent" .
+# 
+# https://w3id.org/won/core#Suggested
+<https://w3id.org/won/core#Suggested> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
+<https://w3id.org/won/core#Suggested> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/core#ConnectionState> .
+<https://w3id.org/won/core#Suggested> <http://www.w3.org/2000/01/rdf-schema#comment> "Suggested state. The Connection has been created through a Hint Event but not yet been opened by either of the sides."@en .
+<https://w3id.org/won/core#Suggested> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/core> .
+<https://w3id.org/won/core#Suggested> <http://www.w3.org/2000/01/rdf-schema#label> "Suggested" .
+# 
+# https://w3id.org/won/core#UsedForTesting
+<https://w3id.org/won/core#UsedForTesting> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
+<https://w3id.org/won/core#UsedForTesting> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/core#Flag> .
+<https://w3id.org/won/core#UsedForTesting> <http://www.w3.org/2000/01/rdf-schema#comment> "Flag indicating the atom has been created for testing purposes. It should only be matched with other atoms flagged with UsedForTesting. The flag is intended to separate real-world atoms from those generated for testing the system, so that users are neither spammed nor misled."@en .
+<https://w3id.org/won/core#UsedForTesting> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/core> .
+<https://w3id.org/won/core#UsedForTesting> <http://www.w3.org/2000/01/rdf-schema#label> "UsedForTesting" .
+# 
+# https://w3id.org/won/core#WhatsAround
+<https://w3id.org/won/core#WhatsAround> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
+<https://w3id.org/won/core#WhatsAround> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/core#Flag> .
+<https://w3id.org/won/core#WhatsAround> <http://www.w3.org/2000/01/rdf-schema#comment> "An Atom specifying this flag indicates that matchers should not match with anything but the location within this atom. The intention of this Flag is to simply find other atoms around a certain location."@en .
+<https://w3id.org/won/core#WhatsAround> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/core> .
+<https://w3id.org/won/core#WhatsAround> <http://www.w3.org/2000/01/rdf-schema#label> "WhatsAround" .
+# 
+# https://w3id.org/won/core#WhatsNew
+<https://w3id.org/won/core#WhatsNew> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
+<https://w3id.org/won/core#WhatsNew> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/core#Flag> .
+<https://w3id.org/won/core#WhatsNew> <http://www.w3.org/2000/01/rdf-schema#comment> "An Atom specifying this flag indicates that matchers should match with anything that is created recently. The intention of this Flag is to simply find other atoms created recently."@en .
+<https://w3id.org/won/core#WhatsNew> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/core> .
+<https://w3id.org/won/core#WhatsNew> <http://www.w3.org/2000/01/rdf-schema#label> "WhatsNew" .
+# 
+# 
+# 
+# #################################################################
+# #
+# #    General axioms
+# #
+# #################################################################
+# 
+# 
+_:genid7 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AllDisjointClasses> .
+_:genid7 <http://www.w3.org/2002/07/owl#members> _:genid18 .
+_:genid18 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
+_:genid18 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <http://www.w3.org/ns/ldp#CompositeContainer> .
+_:genid18 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:genid17 .
+_:genid17 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
+_:genid17 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/core#Atom> .
+_:genid17 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:genid16 .
+_:genid16 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
+_:genid16 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/core#AtomState> .
+_:genid16 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:genid15 .
+_:genid15 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
+_:genid15 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/core#Connection> .
+_:genid15 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:genid14 .
+_:genid14 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
+_:genid14 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/core#ConnectionState> .
+_:genid14 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:genid13 .
+_:genid13 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
+_:genid13 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/core#Flag> .
+_:genid13 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:genid12 .
+_:genid12 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
+_:genid12 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/core#Node> .
+_:genid12 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:genid11 .
+_:genid11 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
+_:genid11 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/core#Socket> .
+_:genid11 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:genid10 .
+_:genid10 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
+_:genid10 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/core#SocketDefinition> .
+_:genid10 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:genid9 .
+_:genid9 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
+_:genid9 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/core#UriPrefixSpecification> .
+_:genid9 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:genid8 .
+_:genid8 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
+_:genid8 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/core#WonProtocol> .
+_:genid8 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/1999/02/22-rdf-syntax-ns#nil> .
+# 
+_:genid19 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AllDifferent> .
+_:genid19 <http://www.w3.org/2002/07/owl#distinctMembers> <http://www.w3.org/1999/02/22-rdf-syntax-ns#nil> .
+# 
+_:genid20 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AllDifferent> .
+_:genid20 <http://www.w3.org/2002/07/owl#distinctMembers> _:genid32 .
+_:genid32 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
+_:genid32 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/core#Active> .
+_:genid32 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:genid31 .
+_:genid31 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
+_:genid31 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/core#Closed> .
+_:genid31 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:genid30 .
+_:genid30 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
+_:genid30 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/core#Connected> .
+_:genid30 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:genid29 .
+_:genid29 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
+_:genid29 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/core#Inactive> .
+_:genid29 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:genid28 .
+_:genid28 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
+_:genid28 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/core#NoHintForCounterpart> .
+_:genid28 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:genid27 .
+_:genid27 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
+_:genid27 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/core#NoHintForMe> .
+_:genid27 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:genid26 .
+_:genid26 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
+_:genid26 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/core#RequestReceived> .
+_:genid26 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:genid25 .
+_:genid25 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
+_:genid25 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/core#RequestSent> .
+_:genid25 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:genid24 .
+_:genid24 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
+_:genid24 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/core#Suggested> .
+_:genid24 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:genid23 .
+_:genid23 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
+_:genid23 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/core#UsedForTesting> .
+_:genid23 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:genid22 .
+_:genid22 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
+_:genid22 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/core#WhatsAround> .
+_:genid22 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:genid21 .
+_:genid21 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
+_:genid21 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/core#WhatsNew> .
+_:genid21 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/1999/02/22-rdf-syntax-ns#nil> .
+# 
+# Generated by the OWL API (version 5.1.9) https://github.com/owlcs/owlapi/
