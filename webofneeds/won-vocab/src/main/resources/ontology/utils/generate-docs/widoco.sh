@@ -24,12 +24,16 @@ then
 fi
 
 output_base=${script_path}/../../../../../../doc
+cd "${output_base}"
 ontology_root=${script_path}/../../
 echo "(re)generating ontology documentation in: ${output_base}"
 mkdir -p ${output_base}
 mkdir -p ${output_base}/ext
 onts=(won-core won-message won-agreement won-modification)
+rewrite_base="https://raw.githubusercontent.com/researchstudio-sat/webofneeds/master/webofneeds/won-vocab/src/main/resources/ontology/"
 ext_onts=(buddy chat group hold review schema)
+
+
 for ont in ${onts[@]} 
 do
 	if [[ ! -z ${only_ont} && ${only_ont} != ${ont} ]]
@@ -38,12 +42,12 @@ do
 		echo "Only generating docs for ontology ${only_ont}. Skipping ${ont} (main)"
 		continue
 	fi
-	output_path="${output_base}/${ont}"
+	output_path="${ont}"
 	mkdir -p "${output_path}"	
 	echo "generating documentation for ${ont} in ${output_path}" 
 	java -jar ${widoco_jar} -ontFile "${ontology_root}/${ont}.ttl" -outFolder "${output_path}" \
 		-oops -rewriteAll -htaccess -webVowl \
-		-licensius -rewriteBase "/won/" 
+		-licensius -rewriteBase "${rewrite_base}" 
 	java -jar ${widoco_jar} -ontFile "${ontology_root}/${ont}.ttl" -outFolder "${output_path}" -crossRef -rewriteAll
 done
 
@@ -55,11 +59,11 @@ do
 		echo "Only generating docs for ontology ${only_ont}. Skipping ${ont} (ext)"
 		continue
 	fi
-	output_path="${output_base}/ext/won-ext-${ont}"
+	output_path="ext/won-ext-${ont}"
 	mkdir -p "${output_path}"	
 	echo "generating documentation for ${ont} in ${output_path}" 
 	java -jar ${widoco_jar} -ontFile "${ontology_root}/ext/won-ext-${ont}.ttl" -outFolder "${output_path}" \
 		-oops -rewriteAll -htaccess -webVowl \
-		-licensius  -doNotDisplaySerializations -rewriteBase "/won/" 
+		-licensius  -doNotDisplaySerializations -rewriteBase "${rewrite_base}" 
 	java -jar ${widoco_jar} -ontFile "${ontology_root}/ext/won-ext-${ont}.ttl" -outFolder "${output_path}" -crossRef -rewriteAll
 done
