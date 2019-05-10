@@ -17,7 +17,7 @@ import {
   toAbsoluteURL,
 } from "./utils.js";
 
-import { ownerBaseUrl } from "config";
+import { ownerBaseUrl } from "config/default.js";
 import urljoin from "url-join";
 import qr from "qr-image";
 import jsonld from "jsonld/dist/jsonld.js";

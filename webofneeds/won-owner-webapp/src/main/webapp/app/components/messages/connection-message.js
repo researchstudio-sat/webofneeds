@@ -18,7 +18,7 @@ import { getOwnedAtomByConnectionUri } from "../../selectors/general-selectors.j
 import * as messageUtils from "../../message-utils.js";
 import { classOnComponentRoot } from "../../cstm-ng-utils.js";
 
-import { ownerBaseUrl } from "config";
+import { ownerBaseUrl } from "config/default.js";
 import urljoin from "url-join";
 
 import "style/_connection-message.scss";

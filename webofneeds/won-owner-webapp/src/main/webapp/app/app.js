@@ -19,9 +19,6 @@ window.angular = angular; // for compatibility with pre-ES6/commonjs scripts
 
 import "whatwg-fetch"; //polyfill for window.fetch (for backward-compatibility with older browsers)
 
-/* global process */
-console.log(process.env);
-
 import "redux";
 import ngReduxModule from "ng-redux";
 import ngReduxRouterModule from "redux-ui-router";

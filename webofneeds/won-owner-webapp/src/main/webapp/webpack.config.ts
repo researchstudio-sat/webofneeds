@@ -1,5 +1,5 @@
 import * as path from "path";
-import { Configuration } from "webpack";
+import { Configuration, EnvironmentPlugin } from "webpack";
 import * as MiniCssExtractPlugin from "mini-css-extract-plugin";
 import * as UglifyJsPlugin from "uglifyjs-webpack-plugin";
 import * as OptimizeCSSAssetsPlugin from "optimize-css-assets-webpack-plugin";
@@ -37,9 +37,6 @@ function config(env, argv): Configuration {
     },
     resolve: {
       modules: [__dirname, "node_modules"],
-      alias: {
-        config$: path.resolve(__dirname, "config", `${nodeEnv}.js`),
-      },
     },
     module: {
       rules: [
@@ -178,6 +175,10 @@ function config(env, argv): Configuration {
         ],
         // Root directory (optional)
         root: __dirname,
+      }),
+      new EnvironmentPlugin({
+        NODE_ENV: "development",
+        WON_DEPLOY_NODE_ENV: "default",
       }),
     ],
     devtool: "source-map",

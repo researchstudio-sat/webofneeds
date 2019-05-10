@@ -8,7 +8,7 @@ import dropdownModule from "./covering-dropdown.js";
 import { attach, delay, get, getIn, toAbsoluteURL } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { connect2Redux, parseRestErrorMessage } from "../won-utils.js";
-import { ownerBaseUrl } from "config";
+import { ownerBaseUrl } from "config/default.js";
 import { getVerificationTokenFromRoute } from "../selectors/general-selectors.js";
 import * as viewSelectors from "../selectors/view-selectors.js";
 import * as processSelectors from "../selectors/process-selectors.js";

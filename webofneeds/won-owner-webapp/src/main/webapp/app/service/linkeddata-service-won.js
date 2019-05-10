@@ -29,7 +29,7 @@ import {
 } from "../utils.js";
 import { parseJsonldLeaf, parseJsonldLeafsImm } from "../won-utils.js";
 
-import { ownerBaseUrl } from "config";
+import { ownerBaseUrl } from "config/default.js";
 import urljoin from "url-join";
 
 import rdfstore from "../../scripts/rdfstore-js/rdf_store.js";
