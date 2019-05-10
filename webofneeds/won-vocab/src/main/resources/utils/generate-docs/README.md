@@ -25,5 +25,5 @@ Sometimes it is handy not to build the whole set but just the ontology under dev
 
 For example, the following only builds the `won-message` ontology docs:
 ```
-./widoco.sh ${widoco_jar} won-message
+./widoco.sh ${widoco_jar} message
 ```
