@@ -2,6 +2,7 @@
 @prefix dc: <http://purl.org/dc/elements/1.1/> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix sig: <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#> .
 @prefix won: <https://w3id.org/won/core#> .
 @prefix xml: <http://www.w3.org/XML/1998/namespace> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
@@ -12,14 +13,14 @@
 <https://w3id.org/won/message> rdf:type owl:Ontology ;
                                 owl:versionIRI <https://w3id.org/won/message/1.0> ;
                                 owl:imports <https://w3id.org/won/core/1.0> ;
+                                dc:abstract "The Web of Needs Message Ontology is used to model the Messages used to publish or modify Atoms, to establish Connections, and to communicate between Atom owners."@en ;
                                 dc:creator "Fabian Salcher" ,
                                            "Florian Kleedorfer" ,
                                            "Yana Panchenko" ;
                                 dc:date "2013-12-13"^^xsd:date ;
                                 dc:title "Web of Needs Message Ontology"@en ;
                                 vann:preferredNamespacePrefix "msg" ;
-                                rdfs:comment "Ontology for describing messages in the Web of Needs project."@en ,
-                                             "The Web of Needs Message Ontology is used to model the Messages used to publish or modify Atoms, to establish Connections, and to communicate between Atom owners."@en .
+                                rdfs:comment "Ontology for describing messages in the Web of Needs project."@en .
 
 #################################################################
 #    Annotation properties
@@ -52,13 +53,15 @@ vann:preferredNamespacePrefix rdf:type owl:AnnotationProperty .
 ###  https://w3id.org/won/message#containsEnvelope
 :containsEnvelope rdf:type owl:ObjectProperty ;
                   rdfs:domain :EnvelopeGraph ;
-                  rdfs:range :EnvelopeGraph .
+                  rdfs:range :EnvelopeGraph ;
+                  rdfs:label "containsEnvelope" .
 
 
 ###  https://w3id.org/won/message#containsSignature
 :containsSignature rdf:type owl:ObjectProperty ;
                    rdfs:domain :EnvelopeGraph ;
-                   rdfs:range <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature> .
+                   rdfs:range sig:Signature ;
+                   rdfs:label "containsSignature" .
 
 
 ###  https://w3id.org/won/message#content
@@ -90,22 +93,21 @@ vann:preferredNamespacePrefix rdf:type owl:AnnotationProperty .
 ###  https://w3id.org/won/message#previousMessage
 :previousMessage rdf:type owl:ObjectProperty ;
                  rdfs:domain :Message ;
-                 rdfs:range :Message .
+                 rdfs:range :Message ;
+                 rdfs:label "previousMessage" .
 
 
 ###  https://w3id.org/won/message#recipient
 :recipient rdf:type owl:ObjectProperty ;
            rdfs:domain :Message ;
-           rdfs:range [ rdf:type owl:Restriction ;
-                        owl:onProperty :recipient ;
-                        owl:allValuesFrom [ rdf:type owl:Class ;
-                                            owl:unionOf ( won:Atom
-                                                          won:Connection
-                                                        )
-                                          ]
+           rdfs:range [ rdf:type owl:Class ;
+                        owl:unionOf ( won:Atom
+                                      won:Connection
+                                    )
                       ] ;
            rdfs:comment "Indicates the receiver of the message, either Socket or Connection."@en ;
-           rdfs:isDefinedBy <https://w3id.org/won/message> .
+           rdfs:isDefinedBy <https://w3id.org/won/message> ;
+           rdfs:label "recipient" .
 
 
 ###  https://w3id.org/won/message#recipientAtom
@@ -113,7 +115,8 @@ vann:preferredNamespacePrefix rdf:type owl:AnnotationProperty .
                rdfs:domain :Message ;
                rdfs:range won:Atom ;
                rdfs:comment "Indicates the Atom that 'contains' the receiver of the message."@en ;
-               rdfs:isDefinedBy <https://w3id.org/won/message> .
+               rdfs:isDefinedBy <https://w3id.org/won/message> ;
+               rdfs:label "recipientAtom" .
 
 
 ###  https://w3id.org/won/message#recipientNode
@@ -121,22 +124,21 @@ vann:preferredNamespacePrefix rdf:type owl:AnnotationProperty .
                rdfs:domain :Message ;
                rdfs:range won:Node ;
                rdfs:comment "Indicates the WoN Node the message recipient is hosted on."@en ;
-               rdfs:isDefinedBy <https://w3id.org/won/message> .
+               rdfs:isDefinedBy <https://w3id.org/won/message> ;
+               rdfs:label "recipientNode" .
 
 
 ###  https://w3id.org/won/message#sender
 :sender rdf:type owl:ObjectProperty ;
         rdfs:domain :Message ;
-        rdfs:range [ rdf:type owl:Restriction ;
-                     owl:onProperty :sender ;
-                     owl:allValuesFrom [ rdf:type owl:Class ;
-                                         owl:unionOf ( won:Atom
-                                                       won:Connection
-                                                     )
-                                       ]
+        rdfs:range [ rdf:type owl:Class ;
+                     owl:unionOf ( won:Atom
+                                   won:Connection
+                                 )
                    ] ;
         rdfs:comment "Indicates the sender of the message."@en ;
-        rdfs:isDefinedBy <https://w3id.org/won/message> .
+        rdfs:isDefinedBy <https://w3id.org/won/message> ;
+        rdfs:label "sender" .
 
 
 ###  https://w3id.org/won/message#senderAtom
@@ -144,7 +146,8 @@ vann:preferredNamespacePrefix rdf:type owl:AnnotationProperty .
             rdfs:domain :Message ;
             rdfs:range won:Atom ;
             rdfs:comment "Indicates the Atom that 'contains' the sender of the message."@en ;
-            rdfs:isDefinedBy <https://w3id.org/won/message> .
+            rdfs:isDefinedBy <https://w3id.org/won/message> ;
+            rdfs:label "senderAtom" .
 
 
 ###  https://w3id.org/won/message#senderNode
@@ -152,13 +155,15 @@ vann:preferredNamespacePrefix rdf:type owl:AnnotationProperty .
             rdfs:domain :Message ;
             rdfs:range won:Node ;
             rdfs:comment "Indicates the WoN Node the message sender is hosted on."@en ;
-            rdfs:isDefinedBy <https://w3id.org/won/message> .
+            rdfs:isDefinedBy <https://w3id.org/won/message> ;
+            rdfs:label "senderNode" .
 
 
 ###  https://w3id.org/won/message#signedGraph
 :signedGraph rdf:type owl:ObjectProperty ;
-             rdfs:domain <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature> ;
-             rdfs:range :MessageGraph .
+             rdfs:domain sig:Signature ;
+             rdfs:range :MessageGraph ;
+             rdfs:label "signedGraph" .
 
 
 #################################################################
@@ -167,6 +172,8 @@ vann:preferredNamespacePrefix rdf:type owl:AnnotationProperty .
 
 ###  https://w3id.org/won/message#hash
 :hash rdf:type owl:DatatypeProperty ;
+      rdfs:domain sig:Signature ;
+      rdfs:range xsd:string ;
       rdfs:comment "The message hash."@en ;
       rdfs:label "hash" .
 
@@ -174,11 +181,14 @@ vann:preferredNamespacePrefix rdf:type owl:AnnotationProperty .
 ###  https://w3id.org/won/message#protocolVersion
 :protocolVersion rdf:type owl:DatatypeProperty ;
                  rdfs:domain :Message ;
-                 rdfs:range xsd:string .
+                 rdfs:range xsd:string ;
+                 rdfs:label "protocolVersion" .
 
 
 ###  https://w3id.org/won/message#publicKeyFingerprint
 :publicKeyFingerprint rdf:type owl:DatatypeProperty ;
+                      rdfs:domain sig:Signature ;
+                      rdfs:range xsd:string ;
                       rdfs:comment "The fingerprint of the sender's public key (SHA-256 hash)." ;
                       rdfs:label "publicKeyFingerprint" .
 
@@ -186,21 +196,17 @@ vann:preferredNamespacePrefix rdf:type owl:AnnotationProperty .
 ###  https://w3id.org/won/message#receivedTimestamp
 :receivedTimestamp rdf:type owl:DatatypeProperty ;
                    rdfs:domain :Message ;
-                   rdfs:range xsd:long .
+                   rdfs:range xsd:long ;
+                   rdfs:comment "Holds the timestamp assigned when the WoN node received and saved the message."@en ;
+                   rdfs:label "receivedTimestamp" .
 
 
 ###  https://w3id.org/won/message#sentTimestamp
 :sentTimestamp rdf:type owl:DatatypeProperty ;
                rdfs:domain :Message ;
                rdfs:range xsd:long ;
-               rdfs:comment "Holds the timestamp assigned when the WoN node created the message."@en ;
+               rdfs:comment "Holds the timestamp assigned when the WoN node created and sent the message."@en ;
                rdfs:label "sentTimestamp" .
-
-
-###  https://w3id.org/won/message#timestamp
-:timestamp rdf:type owl:DatatypeProperty ;
-           rdfs:comment "Holds the timestamp assigned when the WoN node created the message."@en ;
-           rdfs:isDefinedBy <https://w3id.org/won/message> .
 
 
 #################################################################
@@ -208,7 +214,7 @@ vann:preferredNamespacePrefix rdf:type owl:AnnotationProperty .
 #################################################################
 
 ###  http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature
-<http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature> rdf:type owl:Class .
+sig:Signature rdf:type owl:Class .
 
 
 ###  https://w3id.org/won/core#Atom
@@ -225,7 +231,8 @@ won:Node rdf:type owl:Class .
 
 ###  https://w3id.org/won/message#ContentGraph
 :ContentGraph rdf:type owl:Class ;
-              rdfs:subClassOf :MessageGraph .
+              rdfs:subClassOf :MessageGraph ;
+              rdfs:label "ContentGraph" .
 
 
 ###  https://w3id.org/won/message#EnvelopeGraph
@@ -264,7 +271,9 @@ won:Node rdf:type owl:Class .
 
 
 ###  https://w3id.org/won/message#MessageGraph
-:MessageGraph rdf:type owl:Class .
+:MessageGraph rdf:type owl:Class ;
+              rdfs:comment "An RDF graph that belongs to a Message"@en ;
+              rdfs:label "MessageGraph" .
 
 
 ###  https://w3id.org/won/message#MessageType
@@ -290,7 +299,8 @@ won:Node rdf:type owl:Class .
 :ActivateMessage rdf:type owl:NamedIndividual ,
                           :MessageType ;
                  rdfs:comment "Type of message that activates an Atom."@en ;
-                 rdfs:isDefinedBy <https://w3id.org/won/message> .
+                 rdfs:isDefinedBy <https://w3id.org/won/message> ;
+                 rdfs:label "ActivateMessage" .
 
 
 ###  https://w3id.org/won/message#AtomMessage
@@ -298,84 +308,96 @@ won:Node rdf:type owl:Class .
                       :MessageType ;
              rdfs:comment """Message sent between an atom's owner and the WoN node hosting the atom. The message is informative only
                    and has no side effect The message is not routed to any other participant."""@en ;
-             rdfs:isDefinedBy <https://w3id.org/won/message> .
+             rdfs:isDefinedBy <https://w3id.org/won/message> ;
+             rdfs:label "AtomMessage" .
 
 
 ###  https://w3id.org/won/message#ChangeNotificationMessage
 :ChangeNotificationMessage rdf:type owl:NamedIndividual ,
                                     :MessageType ;
                            rdfs:comment "Type of message sent from a WoN Node to indicate that the remote Atom has changed."@en ;
-                           rdfs:isDefinedBy <https://w3id.org/won/message> .
+                           rdfs:isDefinedBy <https://w3id.org/won/message> ;
+                           rdfs:label "ChangeNotificationMessage" .
 
 
 ###  https://w3id.org/won/message#CloseMessage
 :CloseMessage rdf:type owl:NamedIndividual ,
                        :MessageType ;
               rdfs:comment "Type of message that closes a Connection."@en ;
-              rdfs:isDefinedBy <https://w3id.org/won/message> .
+              rdfs:isDefinedBy <https://w3id.org/won/message> ;
+              rdfs:label "CloseMessage" .
 
 
 ###  https://w3id.org/won/message#ConnectMessage
 :ConnectMessage rdf:type owl:NamedIndividual ,
                          :MessageType ;
                 rdfs:comment "Type of message that is sent from Atom A to Atom B in order to create a new Connection."@en ;
-                rdfs:isDefinedBy <https://w3id.org/won/message> .
+                rdfs:isDefinedBy <https://w3id.org/won/message> ;
+                rdfs:label "ConnectMessage" .
 
 
 ###  https://w3id.org/won/message#ConnectionMessage
 :ConnectionMessage rdf:type owl:NamedIndividual ,
                             :MessageType ;
                    rdfs:comment "Message sent via an established connection. This type is to be used in Socket-specific protocols."@en ;
-                   rdfs:isDefinedBy <https://w3id.org/won/message> .
+                   rdfs:isDefinedBy <https://w3id.org/won/message> ;
+                   rdfs:label "ConnectionMessage" .
 
 
 ###  https://w3id.org/won/message#CreateMessage
 :CreateMessage rdf:type owl:NamedIndividual ,
                         :MessageType ;
                rdfs:comment "Type of message sent to a WoN Node in order to create a new Atom."@en ;
-               rdfs:isDefinedBy <https://w3id.org/won/message> .
+               rdfs:isDefinedBy <https://w3id.org/won/message> ;
+               rdfs:label "CreateMessage" .
 
 
 ###  https://w3id.org/won/message#DeactivateMessage
 :DeactivateMessage rdf:type owl:NamedIndividual ,
                             :MessageType ;
                    rdfs:comment "Type of message that deactivates an Atom."@en ;
-                   rdfs:isDefinedBy <https://w3id.org/won/message> .
+                   rdfs:isDefinedBy <https://w3id.org/won/message> ;
+                   rdfs:label "DeactivateMessage" .
 
 
 ###  https://w3id.org/won/message#FailureResponse
 :FailureResponse rdf:type owl:NamedIndividual ,
                           :ResponseType ;
                  rdfs:comment "Indicates an error occurred while processing the message."@en ;
-                 rdfs:isDefinedBy <https://w3id.org/won/message> .
+                 rdfs:isDefinedBy <https://w3id.org/won/message> ;
+                 rdfs:label "FailureResponse" .
 
 
 ###  https://w3id.org/won/message#HintMessage
 :HintMessage rdf:type owl:NamedIndividual ,
                       :MessageType ;
              rdfs:comment "Type of message sent by a matching service to an Atom in order to inform its owner of other Atoms possibly interesting for establishing a connection."@en ;
-             rdfs:isDefinedBy <https://w3id.org/won/message> .
+             rdfs:isDefinedBy <https://w3id.org/won/message> ;
+             rdfs:label "HintMessage" .
 
 
 ###  https://w3id.org/won/message#OpenMessage
 :OpenMessage rdf:type owl:NamedIndividual ,
                       :MessageType ;
              rdfs:comment "Type of Message used to (re)open an existing Connection."@en ;
-             rdfs:isDefinedBy <https://w3id.org/won/message> .
+             rdfs:isDefinedBy <https://w3id.org/won/message> ;
+             rdfs:label "OpenMessage" .
 
 
 ###  https://w3id.org/won/message#ReplaceMessage
 :ReplaceMessage rdf:type owl:NamedIndividual ,
                          :MessageType ;
                 rdfs:comment "Type of message sent to a WoN Node in order replace an Atom's content."@en ;
-                rdfs:isDefinedBy <https://w3id.org/won/message> .
+                rdfs:isDefinedBy <https://w3id.org/won/message> ;
+                rdfs:label "ReplaceMessage" .
 
 
 ###  https://w3id.org/won/message#SuccessResponse
 :SuccessResponse rdf:type owl:NamedIndividual ,
                           :ResponseType ;
                  rdfs:comment "Indicates that the message was processed successfully."@en ;
-                 rdfs:isDefinedBy <https://w3id.org/won/message> .
+                 rdfs:isDefinedBy <https://w3id.org/won/message> ;
+                 rdfs:label "SuccessResponse" .
 
 
 #################################################################
