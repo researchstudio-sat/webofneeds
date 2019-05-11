@@ -326,17 +326,6 @@ function connectReactionAtom(
     const connectoToAtom = getIn(state, ["atoms", connectToAtomUri]);
     const nodeUri = getIn(state, ["config", "defaultNodeUri"]);
 
-    //add flags
-    atomDraft.content.flags
-      ? atomDraft.content.flags.push(
-          "won:NoHintForCounterpart",
-          "won:NoHintForMe"
-        )
-      : (atomDraft.content.flags = [
-          "won:NoHintForCounterpart",
-          "won:NoHintForMe",
-        ]);
-
     // create new atom
     const { message, eventUri, atomUri } = await buildCreateMessage(
       atomDraft,

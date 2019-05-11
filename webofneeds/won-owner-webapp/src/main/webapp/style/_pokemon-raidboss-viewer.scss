@@ -1,0 +1,99 @@
+@import "won-config";
+@import "sizing-utils";
+
+pokemon-raidboss-viewer {
+  @include won-detail-viewer("prbv");
+
+  .prbv__content.won-in-message,
+  .prbv__content:not(.won-in-message) {
+    display: grid;
+    border: $thinGrayBorder;
+    border-radius: 0.19rem;
+    grid-template-areas: "prbv_level prbv_pokemon" "prbv_level prbv_expires";
+    grid-template-columns: min-content 1fr;
+    grid-template-rows: 4rem min-content;
+    padding-left: 0;
+
+    .prbv__content__label {
+      white-space: nowrap;
+    }
+
+    .prbv__content__level {
+      grid-area: prbv_level;
+      text-align: center;
+      font-size: $smallFontSize;
+      height: calc($postIconSize + #{$smallFontSize});
+      padding: calc(#{$postIconSize} + 0.5rem) 0.25rem 0.25rem 0.25rem;
+      background-color: $won-light-gray;
+      background-repeat: no-repeat;
+      background-size: $postIconSize;
+      background-position: center 0.5rem;
+      border-right: $thinGrayBorder;
+      user-select: none;
+      word-break: keep-all;
+
+      &--normal {
+        background-image: url(https://vignette.wikia.nocookie.net/pokemongo/images/5/5a/Egg_Raid_Normal.png/revision/latest?cb=20170620230659);
+      }
+
+      &--rare {
+        background-image: url(https://vignette.wikia.nocookie.net/pokemongo/images/e/e3/Egg_Raid_Rare.png/revision/latest?cb=20170620230126);
+      }
+
+      &--legendary {
+        background-image: url(https://vignette.wikia.nocookie.net/pokemongo/images/c/cd/Egg_Raid_Legendary.png/revision/latest?cb=20170620230139);
+      }
+    }
+
+    .prbv__content__expires {
+      background-color: $won-lighter-gray;
+      padding: 0.25rem;
+      color: var(--won-subtitle-gray);
+      font-size: $smallFontSize;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      &--expired {
+        color: $won-unread-attention;
+      }
+    }
+
+    .prbv__content__pokemon {
+      grid-area: prbv_pokemon;
+      display: grid;
+      grid-template-areas: "pkmv_image pkmv_name" "pkmv_image pkmv_id";
+      grid-template-columns: minmax(3.5rem, min-content) 1fr;
+      grid-column-gap: 0.5rem;
+      padding: 0.25rem;
+      background: $won-light-gray;
+      border-bottom: $thinGrayBorder;
+      grid-template-rows: 1.25rem min-content;
+
+      &__image {
+        grid-area: pkmv_image;
+        align-self: center;
+        @include fixed-square(3.5rem);
+
+        &--unhatched {
+          filter: contrast(0%);
+        }
+      }
+
+      &__name {
+        grid-area: pkmv_name;
+        font-size: $normalFontSize;
+        &__form {
+          color: $won-subtitle-gray;
+          margin-left: 0.25rem;
+        }
+      }
+
+      &__id {
+        grid-area: pkmv_id;
+        font-size: $smallFontSize;
+        color: $won-subtitle-gray;
+      }
+    }
+  }
+}

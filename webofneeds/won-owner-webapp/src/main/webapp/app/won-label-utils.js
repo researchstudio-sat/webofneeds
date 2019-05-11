@@ -46,20 +46,25 @@ export const labels = deepFreeze({
  * Adapted from ["Javascript timestamp to relative time" at Stackoverflow](http://stackoverflow.com/questions/6108819/javascript-timestamp-to-relative-time-eg-2-seconds-ago-one-week-ago-etc-best)
  *
  * @param now
- * @param previous
+ * @param timeToCheck
  */
-export function relativeTime(now, previous) {
-  if (!now || !previous) {
+export function relativeTime(now, timeToCheck) {
+  if (!now || !timeToCheck) {
     return undefined;
   }
 
   const now_ = new Date(now);
-  const previous_ = new Date(previous);
-  const elapsed = now_ - previous_; // in ms
+  const timeToCheck_ = new Date(timeToCheck);
+  let elapsed = now_ - timeToCheck_; // in ms
 
   if (!isValidNumber(elapsed)) {
     // one of two dates was invalid
     return undefined;
+  }
+
+  const future = elapsed < 0;
+  if (future) {
+    elapsed = elapsed * -1;
   }
 
   const msPerMinute = 60 * 1000;
@@ -70,7 +75,9 @@ export function relativeTime(now, previous) {
 
   const labelGen = (msPerUnit, unitName) => {
     const rounded = Math.round(elapsed / msPerUnit);
-    return rounded + " " + unitName + (rounded !== 1 ? "s" : "") + " ago";
+    return future
+      ? "in " + rounded + " " + unitName + (rounded !== 1 ? "s" : "")
+      : rounded + " " + unitName + (rounded !== 1 ? "s" : "") + " ago";
   };
 
   if (elapsed < msPerMinute) {
