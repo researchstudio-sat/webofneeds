@@ -18,11 +18,28 @@
                                 dc:date "2013-12-13"^^xsd:date ;
                                 dc:title "Web of Needs Message Ontology"@en ;
                                 vann:preferredNamespacePrefix "msg" ;
-                                rdfs:comment "Ontology for describing messages in the Web of Needs project."@en .
+                                rdfs:comment "Ontology for describing messages in the Web of Needs project."@en ,
+                                             "The Web of Needs Message Ontology is used to model the Messages used to publish or modify Atoms, to establish Connections, and to communicate between Atom owners."@en .
 
 #################################################################
 #    Annotation properties
 #################################################################
+
+###  http://purl.org/dc/elements/1.1/abstract
+dc:abstract rdf:type owl:AnnotationProperty .
+
+
+###  http://purl.org/dc/elements/1.1/creator
+dc:creator rdf:type owl:AnnotationProperty .
+
+
+###  http://purl.org/dc/elements/1.1/date
+dc:date rdf:type owl:AnnotationProperty .
+
+
+###  http://purl.org/dc/elements/1.1/title
+dc:title rdf:type owl:AnnotationProperty .
+
 
 ###  http://purl.org/vocab/vann/preferredNamespacePrefix
 vann:preferredNamespacePrefix rdf:type owl:AnnotationProperty .
@@ -192,6 +209,14 @@ vann:preferredNamespacePrefix rdf:type owl:AnnotationProperty .
 
 ###  http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature
 <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature> rdf:type owl:Class .
+
+
+###  https://w3id.org/won/core#Atom
+won:Atom rdf:type owl:Class .
+
+
+###  https://w3id.org/won/core#Connection
+won:Connection rdf:type owl:Class .
 
 
 ###  https://w3id.org/won/core#Node

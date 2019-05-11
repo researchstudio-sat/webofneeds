@@ -4,48 +4,124 @@
 @prefix xml: <http://www.w3.org/XML/1998/namespace> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-@base <https://w3id.org/won/agreement#> .
+@base <https://w3id.org/won/agreement> .
 
-<https://w3id.org/won/agreement#> rdf:type owl:Ontology .
+<https://w3id.org/won/agreement> rdf:type owl:Ontology ;
+                                  owl:versionIRI <https://w3id.org/won/agreement/1.0> ;
+                                  owl:imports <https://w3id.org/won/message/1.0> ;
+                                  <http://purl.org/dc/elements/1.1/abstract> "Connections between Atoms on the Web of Needs allow for non-repudiable communication between two agents. The Agreement protocol provides means for the communication partners to establish and manage a set of agreed-upon RDF triples as a result of communication acts. Each partner can calculate the set of triples solely based on the communication history. The acts are *stating*, *proposing*, *accepting*, *claiming', *rejecting* and *proposing to cancel*. Stating is simply the act of sending a message containing some RDF triples; the other acts are executed by referencing earlier messages using the object properties in this ontology."@en ;
+                                  <http://purl.org/dc/elements/1.1/creator> "Florian Kleedorfer" ;
+                                  <http://purl.org/dc/elements/1.1/title> "Web of Needs Agreement Ontology"@en .
+
+#################################################################
+#    Annotation properties
+#################################################################
+
+###  http://purl.org/dc/elements/1.1/abstract
+<http://purl.org/dc/elements/1.1/abstract> rdf:type owl:AnnotationProperty .
+
 
 #################################################################
 #    Object Properties
 #################################################################
 
 ###  https://w3id.org/won/agreement#accepts
-<https://w3id.org/won/agreement#accepts> rdf:type owl:ObjectProperty ;
-                                               rdfs:domain <https://w3id.org/won/agreement#Agreement> ;
-                                               rdfs:comment """Used to link two message resources. The message in the subject accepts the message in the object. This only makes sense if the object references a proposal.
+:accepts rdf:type owl:ObjectProperty ;
+         rdfs:domain :Agreement ;
+         rdfs:range [ rdf:type owl:Class ;
+                      owl:unionOf ( :Claim
+                                    :Proposal
+                                  )
+                    ] ;
+         rdfs:comment "By referencing a Proposal via `msg:accepts` in the ContentGraph of subsequent Mesage, an Agreement is created."@en ;
+         rdfs:label "accepts" .
 
-During the projection from the edited conversation dataset to the agreement dataset, the validity of agreements is checked. Proposal messages that were not accepted are dropped, as are invalid or cancelled Agreements."""@en .
+
+###  https://w3id.org/won/agreement#claims
+:claims rdf:type owl:ObjectProperty ;
+        rdfs:domain :Claim ;
+        rdfs:range <https://w3id.org/won/message#Message> ;
+        rdfs:comment "By referencing an earlier Message via `msg:claims` in the ContentGraph of subsequent Mesage, a Claim is created. Claims can be affirmed by the counterpart using `msg:accepts` or rejected using `msg:rejects`."@en ;
+        rdfs:label "claims" .
 
 
 ###  https://w3id.org/won/agreement#proposes
-<https://w3id.org/won/agreement#proposes> rdf:type owl:ObjectProperty ;
-                                                rdfs:domain <https://w3id.org/won/agreement#Proposal> .
+:proposes rdf:type owl:ObjectProperty ;
+          rdfs:domain :Proposal ;
+          rdfs:range <https://w3id.org/won/message#Message> ;
+          rdfs:comment "By referencing a Message via `msg:accepts` in the ContentGraph of subsequent Mesage, a Proposal is created."@en ;
+          rdfs:label "proposes" .
 
 
 ###  https://w3id.org/won/agreement#proposesToCancel
-<https://w3id.org/won/agreement#proposesToCancel> rdf:type owl:ObjectProperty ;
-                                                        rdfs:domain <https://w3id.org/won/agreement#Proposal> .
+:proposesToCancel rdf:type owl:ObjectProperty ;
+                  rdfs:domain :Proposal ;
+                  rdfs:range :Agreement ;
+                  rdfs:comment "By referencing an Agreement via `msg:proposesToCancel` in the ContentGraph of subsequent Mesage, a Proposal to cancel an Agreement is created."@en ;
+                  rdfs:label "proposesToCancel" .
 
 
 ###  https://w3id.org/won/agreement#rejects
-<https://w3id.org/won/agreement#reject> rdf:type owl:ObjectProperty ;
-                                                        rdfs:domain <https://w3id.org/won/agreement#Proposal> .
+:rejects rdf:type owl:ObjectProperty ;
+         rdfs:domain <https://w3id.org/won/message#Message> ;
+         rdfs:range [ rdf:type owl:Class ;
+                      owl:unionOf ( :Claim
+                                    :Proposal
+                                  )
+                    ] ;
+         rdfs:comment "By referencing a Proposal via `msg:rejects` in the ContentGraph of subsequent Mesage, that Proposal is rejected and cannot become a valid Agreement any more."@en ;
+         rdfs:label "rejects" .
+
 
 #################################################################
 #    Classes
 #################################################################
 
 ###  https://w3id.org/won/agreement#Agreement
-<https://w3id.org/won/agreement#Agreement> rdf:type owl:Class ;
-                                                 rdfs:comment "The message that accepts a proposal concludes an agreement. It is the last message that is taken into account when calculating the content of the agreement, which makes it suitable for identifying the agreement. Therefore, it is given the type Agreement."@en .
+:Agreement rdf:type owl:Class ;
+           rdfs:subClassOf <https://w3id.org/won/message#Message> ;
+           rdfs:comment "The message references a Proposal via `msg:accepts` thereby concludes an Agreement. It is the last message that is taken into account when calculating the content of the Agreement, which makes it suitable for identifying the Agreement. Therefore, it is given the type Agreement."@en ;
+           rdfs:label "Agreement" .
+
+
+###  https://w3id.org/won/agreement#Claim
+:Claim rdf:type owl:Class ;
+       rdfs:subClassOf <https://w3id.org/won/message#Message> ;
+       rdfs:comment """A Message that claims other Messages using `msg:claims` is a Claim. It can become an Agreement via `msg:accepts` or it can be rejected via `msg:rejects`.
+
+The difference between a Claim and a Proposal is that the claim's content is interpreted as agreed-upon until rejected, while a Proposal's content is only interpreted as agreed-upon after it is accepted."""@en ;
+       rdfs:label "Claim" .
 
 
 ###  https://w3id.org/won/agreement#Proposal
-<https://w3id.org/won/agreement#Proposal> rdf:type owl:Class ;
-                                                rdfs:comment "The message that proposes other messages or proposes to cancel agreements is a Proposal."@en .
+:Proposal rdf:type owl:Class ;
+          rdfs:subClassOf <https://w3id.org/won/message#Message> ;
+          rdfs:comment """The Message that proposes other Messages or proposes to cancel Agreements is a Proposal.
+
+The difference between a Claim and a Proposal is that the claim's content is interpreted as agreed-upon until rejected, while a Proposal's content is only interpreted as agreed-upon after it is accepted."""@en ;
+          rdfs:label "Proposal" .
 
 
-###  Generated by the OWL API (version 4.2.6.20160910-2108) https://github.com/owlcs/owlapi
+#################################################################
+#    General axioms
+#################################################################
+
+[ rdf:type owl:AllDisjointClasses ;
+  owl:members ( :Agreement
+                :Claim
+                :Proposal
+              )
+] .
+
+
+[ rdf:type owl:AllDisjointProperties ;
+  owl:members ( :accepts
+                :claims
+                :proposes
+                :proposesToCancel
+                :rejects
+              )
+] .
+
+
+###  Generated by the OWL API (version 4.5.9.2019-02-01T07:24:44Z) https://github.com/owlcs/owlapi

@@ -14,7 +14,13 @@
 
 <https://w3id.org/won/core> rdf:type owl:Ontology ;
                              owl:versionIRI <https://w3id.org/won/core/1.0> ;
-                             dc:abstract "The Web of Needs is a decentralized linked data application infrastructure for mediating cooperation in the broadest sense. Based on append-only message logs, users (or other agents) publish objects (*Atoms*) that can establish *Connections*  with other Atoms. Matching services can make suggestions which atoms to connect to. An Atom specifies 'Sockets' indicating the kinds of Connections it is prepared to establish."@en ;
+                             dc:abstract """The Web of Needs is a decentralized linked data application infrastructure for mediating cooperation in the broadest sense. 
+
+Based on append-only message logs, users (or other agents) publish and manage objects (*Atoms*). The main goal of publishing Atoms is to express interest in cooperation, for example by specifying something that is needed or being offered. However, Atoms can contain arbitrary data and thus be used to build general linked data knowledge graphs.
+
+Atoms can establish *Connections*  with other Atoms, if both Atoms' owners agree to it.
+
+Matching services can make suggestions which atoms to connect to. An Atom specifies 'Sockets' indicating the kinds of Connections it is prepared to establish."""@en ;
                              dc:creator "Fabian Salcher" ,
                                         "Florian Kleedorfer" ;
                              dc:date "2013-12-13"^^xsd:date ;
