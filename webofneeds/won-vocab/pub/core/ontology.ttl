@@ -8,7 +8,13 @@
 
 <https://w3id.org/won/core> rdf:type owl:Ontology ;
                              owl:versionIRI <https://w3id.org/won/core/1.0> ;
-                             <http://purl.org/dc/elements/1.1/abstract> "The Web of Needs is a decentralized linked data application infrastructure for mediating cooperation in the broadest sense. Based on append-only message logs, users (or other agents) publish objects (*Atoms*) that can establish *Connections*  with other Atoms. Matching services can make suggestions which atoms to connect to. An Atom specifies 'Sockets' indicating the kinds of Connections it is prepared to establish."@en ;
+                             <http://purl.org/dc/elements/1.1/abstract> """The Web of Needs is a decentralized linked data application infrastructure for mediating cooperation in the broadest sense. 
+
+Based on append-only message logs, users (or other agents) publish and manage objects (*Atoms*). The main goal of publishing Atoms is to express interest in cooperation, for example by specifying something that is needed or being offered. However, Atoms can contain arbitrary data and thus be used to build general linked data knowledge graphs.
+
+Atoms can establish *Connections*  with other Atoms, if both Atoms' owners agree to it.
+
+Matching services can make suggestions which atoms to connect to. An Atom specifies 'Sockets' indicating the kinds of Connections it is prepared to establish."""@en ;
                              <http://purl.org/dc/elements/1.1/creator> "Fabian Salcher" ,
                                                                        "Florian Kleedorfer" ;
                              <http://purl.org/dc/elements/1.1/date> "2013-12-13"^^xsd:date ;
@@ -99,6 +105,14 @@ xsd:duration rdf:type rdfs:Datatype .
              rdfs:comment "Links the Atom object to its connections."@en ;
              rdfs:isDefinedBy <https://w3id.org/won/core> ;
              rdfs:label "connections" .
+
+
+###  https://w3id.org/won/core#contentGraph
+:contentGraph rdf:type owl:ObjectProperty ;
+              rdfs:domain :Atom ;
+              rdfs:range owl:Thing ;
+              rdfs:comment "Links an Atom to an RDF graph holding some of its RDF content."@en ;
+              rdfs:label "contentGraph" .
 
 
 ###  https://w3id.org/won/core#defaultSocket
@@ -233,6 +247,18 @@ sought to fulfill the atom in contrast to the part that is available.""" ;
                         rdfs:range :UriPrefixSpecification ;
                         rdfs:comment "Specification of URI prefixes used by this WoN node."@en ;
                         rdfs:label "uriPrefixSpecification" .
+
+
+###  https://w3id.org/won/core#wonNode
+:wonNode rdf:type owl:ObjectProperty ;
+         rdfs:domain [ rdf:type owl:Class ;
+                       owl:unionOf ( :Atom
+                                     :Connection
+                                   )
+                     ] ;
+         rdfs:range :Node ;
+         rdfs:comment "Links an Atom or Connection to their WoN node."@en ;
+         rdfs:label "wonNode" .
 
 
 #################################################################
@@ -641,6 +667,33 @@ The container supports LDP paging as described here: https://github.com/research
                         :WhatsAround
                         :WhatsNew
                       )
+] .
+
+
+[ rdf:type owl:AllDisjointProperties ;
+  owl:members ( owl:topObjectProperty
+                :atomList
+                :atomState
+                :compatibleSocketDefinition
+                :connectionState
+                :connections
+                :contentGraph
+                :defaultSocket
+                :derivesAtomProperty
+                :derivesInverseAtomProperty
+                :flag
+                :messageContainer
+                :seeks
+                :socket
+                :socketDefinition
+                :sourceAtom
+                :supportsWonProtocolImpl
+                :targetAtom
+                :targetConnection
+                :targetSocket
+                :uriPrefixSpecification
+                :wonNode
+              )
 ] .
 
 

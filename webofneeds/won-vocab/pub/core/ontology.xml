@@ -10,7 +10,13 @@
      xmlns:vann="http://purl.org/vocab/vann/">
     <owl:Ontology rdf:about="https://w3id.org/won/core">
         <owl:versionIRI rdf:resource="https://w3id.org/won/core/1.0"/>
-        <dc:abstract xml:lang="en">The Web of Needs is a decentralized linked data application infrastructure for mediating cooperation in the broadest sense. Based on append-only message logs, users (or other agents) publish objects (*Atoms*) that can establish *Connections*  with other Atoms. Matching services can make suggestions which atoms to connect to. An Atom specifies &apos;Sockets&apos; indicating the kinds of Connections it is prepared to establish.</dc:abstract>
+        <dc:abstract xml:lang="en">The Web of Needs is a decentralized linked data application infrastructure for mediating cooperation in the broadest sense. 
+
+Based on append-only message logs, users (or other agents) publish and manage objects (*Atoms*). The main goal of publishing Atoms is to express interest in cooperation, for example by specifying something that is needed or being offered. However, Atoms can contain arbitrary data and thus be used to build general linked data knowledge graphs.
+
+Atoms can establish *Connections*  with other Atoms, if both Atoms&apos; owners agree to it.
+
+Matching services can make suggestions which atoms to connect to. An Atom specifies &apos;Sockets&apos; indicating the kinds of Connections it is prepared to establish.</dc:abstract>
         <dc:creator>Fabian Salcher</dc:creator>
         <dc:creator>Florian Kleedorfer</dc:creator>
         <dc:date rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2013-12-13</dc:date>
@@ -167,6 +173,18 @@
         <rdfs:comment xml:lang="en">Links the Atom object to its connections.</rdfs:comment>
         <rdfs:isDefinedBy rdf:resource="https://w3id.org/won/core"/>
         <rdfs:label>connections</rdfs:label>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- https://w3id.org/won/core#contentGraph -->
+
+
+    <owl:ObjectProperty rdf:about="https://w3id.org/won/core#contentGraph">
+        <rdfs:domain rdf:resource="https://w3id.org/won/core#Atom"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+        <rdfs:comment xml:lang="en">Links an Atom to an RDF graph holding some of its RDF content.</rdfs:comment>
+        <rdfs:label>contentGraph</rdfs:label>
     </owl:ObjectProperty>
     
 
@@ -363,6 +381,25 @@ sought to fulfill the atom in contrast to the part that is available.</rdfs:comm
         <rdfs:range rdf:resource="https://w3id.org/won/core#UriPrefixSpecification"/>
         <rdfs:comment xml:lang="en">Specification of URI prefixes used by this WoN node.</rdfs:comment>
         <rdfs:label>uriPrefixSpecification</rdfs:label>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- https://w3id.org/won/core#wonNode -->
+
+
+    <owl:ObjectProperty rdf:about="https://w3id.org/won/core#wonNode">
+        <rdfs:domain>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="https://w3id.org/won/core#Atom"/>
+                    <rdf:Description rdf:about="https://w3id.org/won/core#Connection"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:domain>
+        <rdfs:range rdf:resource="https://w3id.org/won/core#Node"/>
+        <rdfs:comment xml:lang="en">Links an Atom or Connection to their WoN node.</rdfs:comment>
+        <rdfs:label>wonNode</rdfs:label>
     </owl:ObjectProperty>
     
 
@@ -986,6 +1023,33 @@ The container supports LDP paging as described here: https://github.com/research
             <rdf:Description rdf:about="https://w3id.org/won/core#WhatsAround"/>
             <rdf:Description rdf:about="https://w3id.org/won/core#WhatsNew"/>
         </owl:distinctMembers>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AllDisjointProperties"/>
+        <owl:members rdf:parseType="Collection">
+            <rdf:Description rdf:about="http://www.w3.org/2002/07/owl#topObjectProperty"/>
+            <rdf:Description rdf:about="https://w3id.org/won/core#atomList"/>
+            <rdf:Description rdf:about="https://w3id.org/won/core#atomState"/>
+            <rdf:Description rdf:about="https://w3id.org/won/core#compatibleSocketDefinition"/>
+            <rdf:Description rdf:about="https://w3id.org/won/core#connectionState"/>
+            <rdf:Description rdf:about="https://w3id.org/won/core#connections"/>
+            <rdf:Description rdf:about="https://w3id.org/won/core#contentGraph"/>
+            <rdf:Description rdf:about="https://w3id.org/won/core#defaultSocket"/>
+            <rdf:Description rdf:about="https://w3id.org/won/core#derivesAtomProperty"/>
+            <rdf:Description rdf:about="https://w3id.org/won/core#derivesInverseAtomProperty"/>
+            <rdf:Description rdf:about="https://w3id.org/won/core#flag"/>
+            <rdf:Description rdf:about="https://w3id.org/won/core#messageContainer"/>
+            <rdf:Description rdf:about="https://w3id.org/won/core#seeks"/>
+            <rdf:Description rdf:about="https://w3id.org/won/core#socket"/>
+            <rdf:Description rdf:about="https://w3id.org/won/core#socketDefinition"/>
+            <rdf:Description rdf:about="https://w3id.org/won/core#sourceAtom"/>
+            <rdf:Description rdf:about="https://w3id.org/won/core#supportsWonProtocolImpl"/>
+            <rdf:Description rdf:about="https://w3id.org/won/core#targetAtom"/>
+            <rdf:Description rdf:about="https://w3id.org/won/core#targetConnection"/>
+            <rdf:Description rdf:about="https://w3id.org/won/core#targetSocket"/>
+            <rdf:Description rdf:about="https://w3id.org/won/core#uriPrefixSpecification"/>
+            <rdf:Description rdf:about="https://w3id.org/won/core#wonNode"/>
+        </owl:members>
     </rdf:Description>
 </rdf:RDF>
 
