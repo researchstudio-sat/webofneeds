@@ -46,17 +46,17 @@ where
     bind (concat(?propNameUppercase,"Socket") as ?socketName)
     bind (concat("https://w3id.org/won/ext/schema#",?socketName) as ?socketDefName)
 	bind (IRI(?socketDefName) as ?socketDef)
-    bind (concat("An Atom `A` that specifies a Socket with this SocketDefinition derives a triple `A schema:",?propName, 
+    bind (concat("An Atom `A` that specifies a Socket with this SocketDefinition derives triple `A schema:",?propName, 
                  " B` when a Connection with an Atom B is established. ",
-                 "Automatically generated from the http://schema.org vocabulary.") as ?propComment)
+                 "Automatically generated from the [",?propName,"](",STR(?prop),") Property of the http://schema.org vocabulary.") as ?propComment)
     
     bind (concat(ucase(substr(?inversePropName,1,1)), substr(?inversePropName,2)) as ?inversePropNameUppercase)
     bind (concat(?inversePropNameUppercase, "Socket") as ?inverseSocketName)
     bind (concat("https://w3id.org/won/ext/schema#",?inverseSocketName) as ?inverseSocketDefName)
 	bind (IRI(?inverseSocketDefName) as ?inverseSocketDef)
-    bind (concat("An Atom `A` that specifies a Socket with this SocketDefinition derives a triple `B schema:",?propName,
+    bind (concat("An Atom `A` that specifies a Socket with this SocketDefinition derives triple `B schema:",?propName,
                  " A` when a Connection with an Atom B is established. ",
-                 "Automatically generated from the http://schema.org vocabulary.") as ?inversePropComment)
+                 "Automatically generated from the [",?propName,"](",STR(?prop),") Property of the http://schema.org vocabulary.") as ?inversePropComment)
   bind (if (?inverseExists, ?unbound, ?inverseSocketDef) as ?inverseSocketDefToAdd)    
   
   #Filter properties by their range. The range must include things that justify being created as individual Atoms.
@@ -75,5 +75,9 @@ where
   	?cls rdfs:subClassOf* schema:StructuredValue.
     filter(?cls != schema:ContactPoint)
     filter(?cls = ?range)
+  }
+  # Filter out properties that have been superseded
+  filter not exists {
+  	?prop schema:supersededBy ?other .  
   }
 }
