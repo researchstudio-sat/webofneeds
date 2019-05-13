@@ -390,11 +390,11 @@ _:genid8 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/19
 <https://w3id.org/won/core#tag> <http://www.w3.org/2000/01/rdf-schema#comment> "Tags an Atom with a String value."@en .
 <https://w3id.org/won/core#tag> <http://www.w3.org/2000/01/rdf-schema#label> "tag" .
 # 
-# https://w3id.org/won/core#won:textMessage
-<https://w3id.org/won/core#won:textMessage> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
-<https://w3id.org/won/core#won:textMessage> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#string> .
-<https://w3id.org/won/core#won:textMessage> <http://www.w3.org/2000/01/rdf-schema#label> "Specifies a text message."@en .
-<https://w3id.org/won/core#won:textMessage> <http://www.w3.org/2000/01/rdf-schema#label> "textMessage" .
+# https://w3id.org/won/core#textMessage
+<https://w3id.org/won/core#textMessage> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
+<https://w3id.org/won/core#textMessage> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/won/core#textMessage> <http://www.w3.org/2000/01/rdf-schema#comment> "Specifies a text message."@en .
+<https://w3id.org/won/core#textMessage> <http://www.w3.org/2000/01/rdf-schema#label> "textMessage" .
 # 
 # 
 # 
