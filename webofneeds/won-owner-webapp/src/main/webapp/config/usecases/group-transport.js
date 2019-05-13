@@ -7,7 +7,7 @@ import { goodsTransportOffer } from "./uc-goods-transport-offer.js";
 export const transportGroup = {
   identifier: "transportgroup",
   label: "Transport",
-  icon: undefined,
+  icon: "#ico36_uc_transport_offer",
   subItems: {
     personalTransportSearch: personalTransportSearch,
     taxiOffer: taxiOffer,
