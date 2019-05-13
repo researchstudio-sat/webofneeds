@@ -1,0 +1,87 @@
+<https://w3id.org/won/ext/group> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Ontology> .
+<https://w3id.org/won/ext/group> <http://www.w3.org/2002/07/owl#versionIRI> <https://w3id.org/won/ext/group/1.0> .
+<https://w3id.org/won/ext/group> <http://www.w3.org/2002/07/owl#imports> <https://w3id.org/won/core> .
+<https://w3id.org/won/ext/group> <http://www.w3.org/2002/07/owl#imports> <https://w3id.org/won/ext/chat> .
+<https://w3id.org/won/ext/group> <http://purl.org/dc/elements/1.1/abstract> "This ontology contains the definition of the *GroupSocket*, which, when used to establish a connection, puts all connectd Atoms in a group, expressed by the *groupMember* relationship between the Atoms and the Atom representing the group. Moreover, messages are broadcast to all group members."@en .
+<https://w3id.org/won/ext/group> <http://purl.org/dc/elements/1.1/creator> "Florian Kleedorfer" .
+<https://w3id.org/won/ext/group> <http://purl.org/dc/elements/1.1/date> "2019-04-15"^^<http://www.w3.org/2001/XMLSchema#date> .
+<https://w3id.org/won/ext/group> <http://purl.org/dc/elements/1.1/title> "Web of Needs Group Extension" .
+<https://w3id.org/won/ext/group> <http://purl.org/dc/terms/license> <https://creativecommons.org/licenses/by/4.0/> .
+<https://w3id.org/won/ext/group> <http://purl.org/vocab/vann/preferredNamespacePrefix> "grp" .
+# 
+# 
+# #################################################################
+# #
+# #    Annotation properties
+# #
+# #################################################################
+# 
+# 
+# http://purl.org/dc/elements/1.1/abstract
+<http://purl.org/dc/elements/1.1/abstract> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
+# 
+# http://purl.org/dc/elements/1.1/creator
+<http://purl.org/dc/elements/1.1/creator> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
+# 
+# http://purl.org/dc/elements/1.1/date
+<http://purl.org/dc/elements/1.1/date> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
+# 
+# http://purl.org/dc/elements/1.1/description
+<http://purl.org/dc/elements/1.1/description> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
+# 
+# http://purl.org/dc/elements/1.1/title
+<http://purl.org/dc/elements/1.1/title> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
+# 
+# http://purl.org/dc/terms/license
+<http://purl.org/dc/terms/license> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
+# 
+# http://purl.org/vocab/vann/preferredNamespacePrefix
+<http://purl.org/vocab/vann/preferredNamespacePrefix> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
+# 
+# 
+# 
+# #################################################################
+# #
+# #    Object Properties
+# #
+# #################################################################
+# 
+# 
+# https://w3id.org/won/ext/group#groupMember
+<https://w3id.org/won/ext/group#groupMember> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+<https://w3id.org/won/ext/group#groupMember> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/core#Atom> .
+<https://w3id.org/won/ext/group#groupMember> <http://www.w3.org/2000/01/rdf-schema#range> <https://w3id.org/won/core#Atom> .
+# 
+# 
+# 
+# #################################################################
+# #
+# #    Individuals
+# #
+# #################################################################
+# 
+# 
+# https://w3id.org/won/ext/group#GroupSocket
+<https://w3id.org/won/ext/group#GroupSocket> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
+<https://w3id.org/won/ext/group#GroupSocket> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/core#SocketDefinition> .
+<https://w3id.org/won/ext/group#GroupSocket> <https://w3id.org/won/core#compatibleSocketDefinition> <https://w3id.org/won/ext/chat#ChatSocket> .
+<https://w3id.org/won/ext/group#GroupSocket> <https://w3id.org/won/core#derivesAtomProperty> <https://w3id.org/won/ext/group#groupMember> .
+<https://w3id.org/won/ext/group#GroupSocket> <http://www.w3.org/2000/01/rdf-schema#comment> "Socket for connecting to the Atom as a group member."@en .
+<https://w3id.org/won/ext/group#GroupSocket> <http://www.w3.org/2000/01/rdf-schema#label> "GroupSocket" .
+# 
+# https://w3id.org/won/ext/group#groupMember
+<https://w3id.org/won/ext/group#groupMember> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
+# 
+# 
+# 
+# #################################################################
+# #
+# #    Annotations
+# #
+# #################################################################
+# 
+# 
+<https://w3id.org/won/ext/group#groupMember> <http://www.w3.org/2000/01/rdf-schema#comment> "Links a group Atom to one of its group members."@en .
+<https://w3id.org/won/ext/group#groupMember> <http://www.w3.org/2000/01/rdf-schema#label> "groupMember" .
+# 
+# Generated by the OWL API (version 5.1.9) https://github.com/owlcs/owlapi/

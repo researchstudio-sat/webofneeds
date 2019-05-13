@@ -1,0 +1,130 @@
+<https://w3id.org/won/ext/hold> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Ontology> .
+<https://w3id.org/won/ext/hold> <http://www.w3.org/2002/07/owl#versionIRI> <https://w3id.org/won/ext/hold/1.0> .
+<https://w3id.org/won/ext/hold> <http://www.w3.org/2002/07/owl#imports> <https://w3id.org/won/core> .
+<https://w3id.org/won/ext/hold> <http://purl.org/dc/elements/1.1/abstract> "This ontology contains the definition of the *HolderSocket* and the *HoldableSocket*, the *holds* and the *heldBy* properties. These express control relationships in WoN. The Atoms holding other atoms represent agents (users or programs) and can themselves not be held."@en .
+<https://w3id.org/won/ext/hold> <http://purl.org/dc/elements/1.1/creator> "Florian Kleedorfer" .
+<https://w3id.org/won/ext/hold> <http://purl.org/dc/elements/1.1/date> "2019-04-15"^^<http://www.w3.org/2001/XMLSchema#date> .
+<https://w3id.org/won/ext/hold> <http://purl.org/dc/elements/1.1/title> "Web of Needs Hold Extension" .
+<https://w3id.org/won/ext/hold> <http://purl.org/dc/terms/license> <https://creativecommons.org/licenses/by/4.0/> .
+<https://w3id.org/won/ext/hold> <http://purl.org/vocab/vann/preferredNamespacePrefix> "hold" .
+# 
+# 
+# #################################################################
+# #
+# #    Annotation properties
+# #
+# #################################################################
+# 
+# 
+# http://purl.org/dc/elements/1.1/abstract
+<http://purl.org/dc/elements/1.1/abstract> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
+# 
+# http://purl.org/dc/elements/1.1/creator
+<http://purl.org/dc/elements/1.1/creator> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
+# 
+# http://purl.org/dc/elements/1.1/date
+<http://purl.org/dc/elements/1.1/date> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
+# 
+# http://purl.org/dc/elements/1.1/description
+<http://purl.org/dc/elements/1.1/description> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
+# 
+# http://purl.org/dc/elements/1.1/title
+<http://purl.org/dc/elements/1.1/title> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
+# 
+# http://purl.org/dc/terms/license
+<http://purl.org/dc/terms/license> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
+# 
+# http://purl.org/vocab/vann/preferredNamespacePrefix
+<http://purl.org/vocab/vann/preferredNamespacePrefix> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
+# 
+# http://www.w3.org/2000/01/rdf-schema#labels
+<http://www.w3.org/2000/01/rdf-schema#labels> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
+# 
+# 
+# 
+# #################################################################
+# #
+# #    Object Properties
+# #
+# #################################################################
+# 
+# 
+# https://w3id.org/won/ext/hold#heldBy
+<https://w3id.org/won/ext/hold#heldBy> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+<https://w3id.org/won/ext/hold#heldBy> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/core#Atom> .
+<https://w3id.org/won/ext/hold#heldBy> <http://www.w3.org/2000/01/rdf-schema#range> <https://w3id.org/won/core#Atom> .
+<https://w3id.org/won/ext/hold#heldBy> <http://www.w3.org/2002/07/owl#propertyDisjointWith> <https://w3id.org/won/ext/hold#holds> .
+# 
+# https://w3id.org/won/ext/hold#holds
+<https://w3id.org/won/ext/hold#holds> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+<https://w3id.org/won/ext/hold#holds> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/core#Atom> .
+<https://w3id.org/won/ext/hold#holds> <http://www.w3.org/2000/01/rdf-schema#range> <https://w3id.org/won/core#Atom> .
+# 
+# 
+# 
+# #################################################################
+# #
+# #    Individuals
+# #
+# #################################################################
+# 
+# 
+# https://w3id.org/won/ext/hold#HoldableSocket
+<https://w3id.org/won/ext/hold#HoldableSocket> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
+<https://w3id.org/won/ext/hold#HoldableSocket> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/core#SocketDefinition> .
+<https://w3id.org/won/ext/hold#HoldableSocket> <https://w3id.org/won/core#compatibleSocketDefinition> <https://w3id.org/won/ext/hold#HolderSocket> .
+<https://w3id.org/won/ext/hold#HoldableSocket> <https://w3id.org/won/core#derivesAtomProperty> <https://w3id.org/won/ext/hold#heldBy> .
+<https://w3id.org/won/ext/hold#heldBy> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
+<https://w3id.org/won/ext/hold#HoldableSocket> <https://w3id.org/won/core#autoOpen> "false"^^<http://www.w3.org/2001/XMLSchema#boolean> .
+<https://w3id.org/won/ext/hold#HoldableSocket> <https://w3id.org/won/core#socketCapacity> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
+<https://w3id.org/won/ext/hold#HoldableSocket> <http://www.w3.org/2000/01/rdf-schema#comment> "An Atom uses a Socket with this configuration to connect to the Persona Atom that holds it."@en .
+<https://w3id.org/won/ext/hold#HoldableSocket> <http://www.w3.org/2000/01/rdf-schema#label> "HoldableSocket" .
+# 
+# https://w3id.org/won/ext/hold#HolderSocket
+<https://w3id.org/won/ext/hold#HolderSocket> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
+<https://w3id.org/won/ext/hold#HolderSocket> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/core#SocketDefinition> .
+<https://w3id.org/won/ext/hold#HolderSocket> <https://w3id.org/won/core#compatibleSocketDefinition> <https://w3id.org/won/ext/hold#HoldableSocket> .
+<https://w3id.org/won/ext/hold#HolderSocket> <https://w3id.org/won/core#derivesAtomProperty> <https://w3id.org/won/ext/hold#holds> .
+<https://w3id.org/won/ext/hold#holds> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
+<https://w3id.org/won/ext/hold#HolderSocket> <https://w3id.org/won/core#autoOpen> "false"^^<http://www.w3.org/2001/XMLSchema#boolean> .
+<https://w3id.org/won/ext/hold#HolderSocket> <http://www.w3.org/2000/01/rdf-schema#comment> "A Persona Atom uses a Socket with this configuration to connect to Atoms it holds."@en .
+<https://w3id.org/won/ext/hold#HolderSocket> <http://www.w3.org/2000/01/rdf-schema#label> "HolderSocket" .
+# 
+# https://w3id.org/won/ext/hold#heldBy
+# 
+# https://w3id.org/won/ext/hold#holds
+# 
+# 
+# 
+# #################################################################
+# #
+# #    Annotations
+# #
+# #################################################################
+# 
+# 
+<https://w3id.org/won/ext/hold#heldBy> <http://www.w3.org/2000/01/rdf-schema#comment> "Links an Atom to the Atom representing the agent (a person, organization, bot, ...) that controls both."@en .
+<https://w3id.org/won/ext/hold#heldBy> <http://www.w3.org/2000/01/rdf-schema#label> "heldBy" .
+# 
+<https://w3id.org/won/ext/hold#holds> <http://www.w3.org/2000/01/rdf-schema#comment> "Links the Atom representing an agent (a person, organization, bot, ...) to another Atom they control."@en .
+<https://w3id.org/won/ext/hold#holds> <http://www.w3.org/2000/01/rdf-schema#label> "holds" .
+# 
+# 
+# 
+# #################################################################
+# #
+# #    General axioms
+# #
+# #################################################################
+# 
+# 
+_:genid1 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AllDifferent> .
+_:genid1 <http://www.w3.org/2002/07/owl#distinctMembers> _:genid3 .
+_:genid3 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
+_:genid3 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/ext/hold#HoldableSocket> .
+_:genid3 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:genid2 .
+_:genid2 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
+_:genid2 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/ext/hold#HolderSocket> .
+_:genid2 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/1999/02/22-rdf-syntax-ns#nil> .
+# 
+# Generated by the OWL API (version 5.1.9) https://github.com/owlcs/owlapi/

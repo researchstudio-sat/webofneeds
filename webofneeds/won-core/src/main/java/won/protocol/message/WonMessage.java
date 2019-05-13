@@ -65,7 +65,6 @@ public class WonMessage implements Serializable {
     private URI recipientAtomURI;
     private URI recipientNodeURI;
     private URI recipientSocketURI;
-    private List<URI> refersTo = null;
     private List<URI> previousMessages = null;
     private List<URI> injectIntoConnections = null;
     private URI isResponseToMessageURI;
@@ -484,13 +483,6 @@ public class WonMessage implements Serializable {
             this.recipientSocketURI = getEnvelopePropertyURIValue(WONMSG.recipientSocket);
         }
         return this.recipientSocketURI;
-    }
-
-    public synchronized List<URI> getRefersTo() {
-        if (this.refersTo == null) {
-            this.refersTo = getEnvelopePropertyURIValues(WONMSG.refersTo);
-        }
-        return this.refersTo;
     }
 
     public synchronized List<URI> getInjectIntoConnectionURIs() {
