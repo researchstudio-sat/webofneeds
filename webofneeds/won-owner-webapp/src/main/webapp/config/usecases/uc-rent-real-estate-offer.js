@@ -59,6 +59,7 @@ export const rentRealEstateOffer = {
       mandatory: true,
     },
     images: { ...details.images },
+    files: { ...details.files },
   },
   seeksDetails: undefined,
   generateQuery: (draft, resultName) => {
