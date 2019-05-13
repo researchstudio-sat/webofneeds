@@ -1,3 +1,4 @@
+prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 #
 # CONSTRUCT query that generates a won:SocketDefinition individual for each property in schema.org
 # Checks for schema:inverseOf annotations. If such an annotation is found, the corresponding inverse SocketDefinition
@@ -13,13 +14,16 @@ prefix schema: <http://schema.org/>
 prefix wxs: <https://w3id.org/won/ext/schema#>
 construct {
   ?socketDef a won:SocketDefinition;
-               won:derivesAtomProperty ?prop ;
-           rdfs:comment "Socket automatically generated from the schema.org vocabulary."@en ;
-               won:compatibleSocketDefinition ?inverseSocketDef .
+        won:derivesAtomProperty ?prop ;
+		rdfs:label ?socketName ;
+        rdfs:comment ?propComment ;
+        won:compatibleSocketDefinition ?inverseSocketDef .
+		
     ?inverseSocketDefToAdd a won:SocketDefinition;
-         won:derivesInverseAtomProperty ?prop ;
-           rdfs:comment "Socket automatically generated from the schema.org vocabulary."@en ;
-               won:compatibleSocketDefinition ?socketDef .
+        won:derivesInverseAtomProperty ?prop ;
+		rdfs:label ?inverseSocketName ;
+		rdfs:comment ?inversePropComment ;
+        won:compatibleSocketDefinition ?socketDef .
     
 }
 where 
@@ -38,14 +42,38 @@ where
       bind (true as ?inverseExists)
     }
     bind (replace(str(?prop), "http://schema.org/", "") as ?propName)
-    bind (concat(ucase(substr(?propName,0,1)), substr(?propName,2)) as ?propNameUppercase)
-    bind (IRI(concat("https://w3id.org/won/ext/schema#",?propNameUppercase,"Socket")) as ?socketDef)
+    bind (concat(ucase(substr(?propName,1,1)), substr(?propName,2)) as ?propNameUppercase)
+    bind (concat(?propNameUppercase,"Socket") as ?socketName)
+    bind (concat("https://w3id.org/won/ext/schema#",?socketName) as ?socketDefName)
+	bind (IRI(?socketDefName) as ?socketDef)
+    bind (concat("An Atom `A` that specifies a Socket with this SocketDefinition derives a triple `A schema:",?propName, 
+                 " B` when a Connection with an Atom B is established. ",
+                 "Automatically generated from the http://schema.org vocabulary.") as ?propComment)
     
-    bind (concat(ucase(substr(?inversePropName,0,1)), substr(?inversePropName,2)) as ?inversePropNameUppercase)
-    bind (IRI(concat("https://w3id.org/won/ext/schema#",?inversePropNameUppercase,"Socket")) as ?inverseSocketDef)
+    bind (concat(ucase(substr(?inversePropName,1,1)), substr(?inversePropName,2)) as ?inversePropNameUppercase)
+    bind (concat(?inversePropNameUppercase, "Socket") as ?inverseSocketName)
+    bind (concat("https://w3id.org/won/ext/schema#",?inverseSocketName) as ?inverseSocketDefName)
+	bind (IRI(?inverseSocketDefName) as ?inverseSocketDef)
+    bind (concat("An Atom `A` that specifies a Socket with this SocketDefinition derives a triple `B schema:",?propName,
+                 " A` when a Connection with an Atom B is established. ",
+                 "Automatically generated from the http://schema.org vocabulary.") as ?inversePropComment)
   bind (if (?inverseExists, ?unbound, ?inverseSocketDef) as ?inverseSocketDefToAdd)    
-  filter exists {
-    ?prop schema:rangeIncludes ?range .
+  
+  #Filter properties by their range. The range must include things that justify being created as individual Atoms.
+  #  
+  ?prop schema:rangeIncludes ?range .
+  filter exists {  
+    # Require that the range includes a subclass of Thing
     ?range rdfs:subClassOf* schema:Thing   
+  }
+  filter not exists {
+    # Do not allow subclasses of schema:Quantity.
+  	?range rdfs:subClassOf* schema:Quantity  
+  }
+  filter not exists {
+    # Do not allow subclasses of schema:StructuredValue, except for schema:ContactPoint
+  	?cls rdfs:subClassOf* schema:StructuredValue.
+    filter(?cls != schema:ContactPoint)
+    filter(?cls = ?range)
   }
 }
