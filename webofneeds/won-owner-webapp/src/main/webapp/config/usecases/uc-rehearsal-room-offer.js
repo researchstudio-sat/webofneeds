@@ -60,6 +60,7 @@ export const rehearsalRoomOffer = {
     },
     fromDatetime: { ...details.fromDatetime },
     throughDatetime: { ...details.throughDatetime },
+    images: { ...details.images },
   },
 
   seeksDetails: undefined,

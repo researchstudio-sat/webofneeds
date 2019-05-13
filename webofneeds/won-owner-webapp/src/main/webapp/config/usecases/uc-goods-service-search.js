@@ -24,6 +24,7 @@ export const goodsServiceSearch = {
       },
       seeks: {
         type: ["s:Offer"],
+        images: { ...details.images },
       },
     }),
   },

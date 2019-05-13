@@ -22,6 +22,7 @@ export const serviceOffer = {
     price: { ...details.price, mandatory: true },
     tags: { ...details.tags },
     location: { ...details.location },
+    images: { ...details.images },
   },
   // TODO: what should this match on?
   // generateQuery: (draft, resultName) => {

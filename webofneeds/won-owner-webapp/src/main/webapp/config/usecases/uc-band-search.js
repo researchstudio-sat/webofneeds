@@ -37,6 +37,7 @@ export const bandSearch = {
     instruments: {
       ...instrumentsDetail,
     },
+    images: { ...details.images },
   },
   seeksDetails: {
     description: { ...details.description },

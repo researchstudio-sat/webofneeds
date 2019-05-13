@@ -32,6 +32,7 @@ export const rideShareOffer = {
     fromDatetime: { ...details.fromDatetime },
     throughDatetime: { ...details.throughDatetime },
     travelAction: { ...details.travelAction },
+    images: { ...details.images },
   },
   generateQuery: (draft, resultName) => {
     const fromLocation = getIn(draft, [

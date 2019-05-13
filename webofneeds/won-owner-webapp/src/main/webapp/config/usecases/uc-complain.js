@@ -28,6 +28,7 @@ export const complain = {
     description: { ...details.description },
     location: { ...details.location },
     tags: { ...details.tags },
+    images: { ...details.images },
   },
   seeksDetails: undefined,
 };
