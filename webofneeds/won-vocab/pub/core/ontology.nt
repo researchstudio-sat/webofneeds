@@ -3,8 +3,9 @@
 <https://w3id.org/won/core> <http://purl.org/dc/elements/1.1/abstract> "The Web of Needs is a decentralized linked data application infrastructure for mediating cooperation in the broadest sense. \n\nBased on append-only message logs, users (or other agents) publish and manage objects (*Atoms*). The main goal of publishing Atoms is to express interest in cooperation, for example by specifying something that is needed or being offered. However, Atoms can contain arbitrary data and thus be used to build general linked data knowledge graphs.\n\nAtoms can establish *Connections*  with other Atoms, if both Atoms' owners agree to it.\n\nMatching services can make suggestions which atoms to connect to. An Atom specifies 'Sockets' indicating the kinds of Connections it is prepared to establish."@en .
 <https://w3id.org/won/core> <http://purl.org/dc/elements/1.1/creator> "Fabian Salcher" .
 <https://w3id.org/won/core> <http://purl.org/dc/elements/1.1/creator> "Florian Kleedorfer" .
-<https://w3id.org/won/core> <http://purl.org/dc/elements/1.1/date> "2013-12-13"^^<http://www.w3.org/2001/XMLSchema#date> .
 <https://w3id.org/won/core> <http://purl.org/dc/elements/1.1/title> "Web of Needs Core Ontology" .
+<https://w3id.org/won/core> <http://purl.org/dc/terms/created> "2013-12-13"^^<http://www.w3.org/2001/XMLSchema#date> .
+<https://w3id.org/won/core> <http://purl.org/dc/terms/license> <https://creativecommons.org/licenses/by/4.0/> .
 <https://w3id.org/won/core> <http://purl.org/vocab/vann/preferredNamespacePrefix> "won" .
 <https://w3id.org/won/core> <http://www.w3.org/2000/01/rdf-schema#comment> "Ontology for the Web of Needs data model."@en .
 # 
@@ -30,6 +31,12 @@
 # 
 # http://purl.org/dc/elements/1.1/title
 <http://purl.org/dc/elements/1.1/title> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
+# 
+# http://purl.org/dc/terms/created
+<http://purl.org/dc/terms/created> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
+# 
+# http://purl.org/dc/terms/license
+<http://purl.org/dc/terms/license> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
 # 
 # http://purl.org/vocab/vann/preferredNamespacePrefix
 <http://purl.org/vocab/vann/preferredNamespacePrefix> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
@@ -382,6 +389,12 @@ _:genid8 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/19
 <https://w3id.org/won/core#tag> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#string> .
 <https://w3id.org/won/core#tag> <http://www.w3.org/2000/01/rdf-schema#comment> "Tags an Atom with a String value."@en .
 <https://w3id.org/won/core#tag> <http://www.w3.org/2000/01/rdf-schema#label> "tag" .
+# 
+# https://w3id.org/won/core#won:textMessage
+<https://w3id.org/won/core#won:textMessage> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
+<https://w3id.org/won/core#won:textMessage> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/won/core#won:textMessage> <http://www.w3.org/2000/01/rdf-schema#label> "Specifies a text message."@en .
+<https://w3id.org/won/core#won:textMessage> <http://www.w3.org/2000/01/rdf-schema#label> "textMessage" .
 # 
 # 
 # 

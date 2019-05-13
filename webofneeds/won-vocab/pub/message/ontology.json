@@ -77,7 +77,16 @@
   "@id" : "http://purl.org/dc/elements/1.1/date",
   "@type" : [ "http://www.w3.org/2002/07/owl#AnnotationProperty" ]
 }, {
+  "@id" : "http://purl.org/dc/elements/1.1/description",
+  "@type" : [ "http://www.w3.org/2002/07/owl#AnnotationProperty" ]
+}, {
   "@id" : "http://purl.org/dc/elements/1.1/title",
+  "@type" : [ "http://www.w3.org/2002/07/owl#AnnotationProperty" ]
+}, {
+  "@id" : "http://purl.org/dc/terms/created",
+  "@type" : [ "http://www.w3.org/2002/07/owl#AnnotationProperty" ]
+}, {
+  "@id" : "http://purl.org/dc/terms/license",
   "@type" : [ "http://www.w3.org/2002/07/owl#AnnotationProperty" ]
 }, {
   "@id" : "http://purl.org/vocab/vann/preferredNamespacePrefix",
@@ -96,7 +105,7 @@
   "@type" : [ "http://www.w3.org/2002/07/owl#Ontology" ],
   "http://purl.org/dc/elements/1.1/abstract" : [ {
     "@language" : "en",
-    "@value" : "The Web of Needs Message Ontology is used to model the Messages used to publish or modify Atoms, to establish Connections, and to communicate between Atom owners."
+    "@value" : "This ontology is used to model the Message objects central to the Web of Needs."
   } ],
   "http://purl.org/dc/elements/1.1/creator" : [ {
     "@value" : "Fabian Salcher"
@@ -105,13 +114,16 @@
   }, {
     "@value" : "Yana Panchenko"
   } ],
-  "http://purl.org/dc/elements/1.1/date" : [ {
-    "@type" : "http://www.w3.org/2001/XMLSchema#date",
-    "@value" : "2013-12-13"
-  } ],
   "http://purl.org/dc/elements/1.1/title" : [ {
     "@language" : "en",
     "@value" : "Web of Needs Message Ontology"
+  } ],
+  "http://purl.org/dc/terms/created" : [ {
+    "@type" : "http://www.w3.org/2001/XMLSchema#date",
+    "@value" : "2013-12-13"
+  } ],
+  "http://purl.org/dc/terms/license" : [ {
+    "@id" : "https://creativecommons.org/licenses/by/4.0/"
   } ],
   "http://purl.org/vocab/vann/preferredNamespacePrefix" : [ {
     "@value" : "msg"

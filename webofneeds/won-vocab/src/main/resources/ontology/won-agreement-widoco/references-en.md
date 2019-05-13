@@ -1,0 +1,1 @@
+1. Kleedorfer, Florian, Friedrich Heiko, and Huemer Christian. *[Agreements in a De-Centralized Linked Data Based Messaging System.](http://ceur-ws.org/Vol-1934/contribution-07.pdf)*, DeSemWeb Workshop (ISWC 2017), 08/2017, Vienna, (2017).

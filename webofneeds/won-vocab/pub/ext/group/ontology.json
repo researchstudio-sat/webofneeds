@@ -1,14 +1,65 @@
 [ {
+  "@id" : "http://purl.org/dc/elements/1.1/abstract",
+  "@type" : [ "http://www.w3.org/2002/07/owl#AnnotationProperty" ]
+}, {
+  "@id" : "http://purl.org/dc/elements/1.1/creator",
+  "@type" : [ "http://www.w3.org/2002/07/owl#AnnotationProperty" ]
+}, {
+  "@id" : "http://purl.org/dc/elements/1.1/date",
+  "@type" : [ "http://www.w3.org/2002/07/owl#AnnotationProperty" ]
+}, {
+  "@id" : "http://purl.org/dc/elements/1.1/description",
+  "@type" : [ "http://www.w3.org/2002/07/owl#AnnotationProperty" ]
+}, {
+  "@id" : "http://purl.org/dc/elements/1.1/title",
+  "@type" : [ "http://www.w3.org/2002/07/owl#AnnotationProperty" ]
+}, {
+  "@id" : "http://purl.org/dc/terms/license",
+  "@type" : [ "http://www.w3.org/2002/07/owl#AnnotationProperty" ]
+}, {
+  "@id" : "http://purl.org/vocab/vann/preferredNamespacePrefix",
+  "@type" : [ "http://www.w3.org/2002/07/owl#AnnotationProperty" ]
+}, {
   "@id" : "https://w3id.org/won/ext/group",
   "@type" : [ "http://www.w3.org/2002/07/owl#Ontology" ],
+  "http://purl.org/dc/elements/1.1/abstract" : [ {
+    "@language" : "en",
+    "@value" : "This ontology contains the definition of the *GroupSocket*, which, when used to establish a connection, puts all connectd Atoms in a group, expressed by the *groupMember* relationship between the Atoms and the Atom representing the group. Moreover, messages are broadcast to all group members."
+  } ],
+  "http://purl.org/dc/elements/1.1/creator" : [ {
+    "@value" : "Florian Kleedorfer"
+  } ],
+  "http://purl.org/dc/elements/1.1/date" : [ {
+    "@type" : "http://www.w3.org/2001/XMLSchema#date",
+    "@value" : "2019-04-15"
+  } ],
+  "http://purl.org/dc/elements/1.1/title" : [ {
+    "@value" : "Web of Needs Group Extension"
+  } ],
+  "http://purl.org/dc/terms/license" : [ {
+    "@id" : "https://creativecommons.org/licenses/by/4.0/"
+  } ],
+  "http://purl.org/vocab/vann/preferredNamespacePrefix" : [ {
+    "@value" : "grp"
+  } ],
   "http://www.w3.org/2002/07/owl#imports" : [ {
     "@id" : "https://w3id.org/won/core"
   }, {
     "@id" : "https://w3id.org/won/ext/chat"
+  } ],
+  "http://www.w3.org/2002/07/owl#versionIRI" : [ {
+    "@id" : "https://w3id.org/won/ext/group/1.0"
   } ]
 }, {
   "@id" : "https://w3id.org/won/ext/group#GroupSocket",
   "@type" : [ "http://www.w3.org/2002/07/owl#NamedIndividual", "https://w3id.org/won/core#SocketDefinition" ],
+  "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
+    "@language" : "en",
+    "@value" : "Socket for connecting to the Atom as a group member."
+  } ],
+  "http://www.w3.org/2000/01/rdf-schema#label" : [ {
+    "@value" : "GroupSocket"
+  } ],
   "https://w3id.org/won/core#compatibleSocketDefinition" : [ {
     "@id" : "https://w3id.org/won/ext/chat#ChatSocket"
   } ],
@@ -24,6 +75,9 @@
   } ],
   "http://www.w3.org/2000/01/rdf-schema#domain" : [ {
     "@id" : "https://w3id.org/won/core#Atom"
+  } ],
+  "http://www.w3.org/2000/01/rdf-schema#label" : [ {
+    "@value" : "groupMember"
   } ],
   "http://www.w3.org/2000/01/rdf-schema#range" : [ {
     "@id" : "https://w3id.org/won/core#Atom"

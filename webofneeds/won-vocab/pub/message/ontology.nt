@@ -1,12 +1,13 @@
 <https://w3id.org/won/message> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Ontology> .
 <https://w3id.org/won/message> <http://www.w3.org/2002/07/owl#versionIRI> <https://w3id.org/won/message/1.0> .
 <https://w3id.org/won/message> <http://www.w3.org/2002/07/owl#imports> <https://w3id.org/won/core/1.0> .
-<https://w3id.org/won/message> <http://purl.org/dc/elements/1.1/abstract> "The Web of Needs Message Ontology is used to model the Messages used to publish or modify Atoms, to establish Connections, and to communicate between Atom owners."@en .
+<https://w3id.org/won/message> <http://purl.org/dc/elements/1.1/abstract> "This ontology is used to model the Message objects central to the Web of Needs."@en .
 <https://w3id.org/won/message> <http://purl.org/dc/elements/1.1/creator> "Fabian Salcher" .
 <https://w3id.org/won/message> <http://purl.org/dc/elements/1.1/creator> "Florian Kleedorfer" .
 <https://w3id.org/won/message> <http://purl.org/dc/elements/1.1/creator> "Yana Panchenko" .
-<https://w3id.org/won/message> <http://purl.org/dc/elements/1.1/date> "2013-12-13"^^<http://www.w3.org/2001/XMLSchema#date> .
 <https://w3id.org/won/message> <http://purl.org/dc/elements/1.1/title> "Web of Needs Message Ontology"@en .
+<https://w3id.org/won/message> <http://purl.org/dc/terms/created> "2013-12-13"^^<http://www.w3.org/2001/XMLSchema#date> .
+<https://w3id.org/won/message> <http://purl.org/dc/terms/license> <https://creativecommons.org/licenses/by/4.0/> .
 <https://w3id.org/won/message> <http://purl.org/vocab/vann/preferredNamespacePrefix> "msg" .
 <https://w3id.org/won/message> <http://www.w3.org/2000/01/rdf-schema#comment> "Ontology for describing messages in the Web of Needs project."@en .
 # 
@@ -27,8 +28,17 @@
 # http://purl.org/dc/elements/1.1/date
 <http://purl.org/dc/elements/1.1/date> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
 # 
+# http://purl.org/dc/elements/1.1/description
+<http://purl.org/dc/elements/1.1/description> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
+# 
 # http://purl.org/dc/elements/1.1/title
 <http://purl.org/dc/elements/1.1/title> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
+# 
+# http://purl.org/dc/terms/created
+<http://purl.org/dc/terms/created> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
+# 
+# http://purl.org/dc/terms/license
+<http://purl.org/dc/terms/license> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
 # 
 # http://purl.org/vocab/vann/preferredNamespacePrefix
 <http://purl.org/vocab/vann/preferredNamespacePrefix> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .

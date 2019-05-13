@@ -7,6 +7,7 @@
 	 prov:wasAttributedTo :agent1;
 	 prov:wasAttributedTo :agent2;
 	 prov:wasAttributedTo <https://github.com/dgarijo/Widoco/>,<http://www.essepuntato.it/lode/>;
+	 prov:wasGeneratedAt "2013-12-13";
 .
 :agent0 a prov:Agent; foaf:name "Fabian Salcher".
 :agent1 a prov:Agent; foaf:name "Florian Kleedorfer".

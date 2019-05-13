@@ -7,16 +7,18 @@
      xmlns:xml="http://www.w3.org/XML/1998/namespace"
      xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
      xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
-     xmlns:vann="http://purl.org/vocab/vann/">
+     xmlns:vann="http://purl.org/vocab/vann/"
+     xmlns:terms="http://purl.org/dc/terms/">
     <owl:Ontology rdf:about="https://w3id.org/won/message">
         <owl:versionIRI rdf:resource="https://w3id.org/won/message/1.0"/>
         <owl:imports rdf:resource="https://w3id.org/won/core/1.0"/>
-        <dc:abstract xml:lang="en">The Web of Needs Message Ontology is used to model the Messages used to publish or modify Atoms, to establish Connections, and to communicate between Atom owners.</dc:abstract>
+        <dc:abstract xml:lang="en">This ontology is used to model the Message objects central to the Web of Needs.</dc:abstract>
         <dc:creator>Fabian Salcher</dc:creator>
         <dc:creator>Florian Kleedorfer</dc:creator>
         <dc:creator>Yana Panchenko</dc:creator>
-        <dc:date rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2013-12-13</dc:date>
         <dc:title xml:lang="en">Web of Needs Message Ontology</dc:title>
+        <terms:created rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2013-12-13</terms:created>
+        <terms:license rdf:resource="https://creativecommons.org/licenses/by/4.0/"/>
         <vann:preferredNamespacePrefix>msg</vann:preferredNamespacePrefix>
         <rdfs:comment xml:lang="en">Ontology for describing messages in the Web of Needs project.</rdfs:comment>
     </owl:Ontology>
@@ -56,10 +58,31 @@
     
 
 
+    <!-- http://purl.org/dc/elements/1.1/description -->
+
+
+    <owl:AnnotationProperty rdf:about="http://purl.org/dc/elements/1.1/description"/>
+    
+
+
     <!-- http://purl.org/dc/elements/1.1/title -->
 
 
     <owl:AnnotationProperty rdf:about="http://purl.org/dc/elements/1.1/title"/>
+    
+
+
+    <!-- http://purl.org/dc/terms/created -->
+
+
+    <owl:AnnotationProperty rdf:about="http://purl.org/dc/terms/created"/>
+    
+
+
+    <!-- http://purl.org/dc/terms/license -->
+
+
+    <owl:AnnotationProperty rdf:about="http://purl.org/dc/terms/license"/>
     
 
 

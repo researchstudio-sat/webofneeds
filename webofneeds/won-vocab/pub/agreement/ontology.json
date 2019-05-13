@@ -53,14 +53,29 @@
   "@id" : "http://purl.org/dc/elements/1.1/creator",
   "@type" : [ "http://www.w3.org/2002/07/owl#AnnotationProperty" ]
 }, {
+  "@id" : "http://purl.org/dc/elements/1.1/date",
+  "@type" : [ "http://www.w3.org/2002/07/owl#AnnotationProperty" ]
+}, {
+  "@id" : "http://purl.org/dc/elements/1.1/description",
+  "@type" : [ "http://www.w3.org/2002/07/owl#AnnotationProperty" ]
+}, {
   "@id" : "http://purl.org/dc/elements/1.1/title",
+  "@type" : [ "http://www.w3.org/2002/07/owl#AnnotationProperty" ]
+}, {
+  "@id" : "http://purl.org/dc/terms/created",
+  "@type" : [ "http://www.w3.org/2002/07/owl#AnnotationProperty" ]
+}, {
+  "@id" : "http://purl.org/dc/terms/license",
+  "@type" : [ "http://www.w3.org/2002/07/owl#AnnotationProperty" ]
+}, {
+  "@id" : "http://purl.org/vocab/vann/preferredNamespacePrefix",
   "@type" : [ "http://www.w3.org/2002/07/owl#AnnotationProperty" ]
 }, {
   "@id" : "https://w3id.org/won/agreement",
   "@type" : [ "http://www.w3.org/2002/07/owl#Ontology" ],
   "http://purl.org/dc/elements/1.1/abstract" : [ {
     "@language" : "en",
-    "@value" : "Connections between Atoms on the Web of Needs allow for non-repudiable communication between two agents. The Agreement protocol provides means for the communication partners to establish and manage a set of agreed-upon RDF triples as a result of communication acts. Each partner can calculate the set of triples solely based on the communication history. The acts are *stating*, *proposing*, *accepting*, *claiming', *rejecting* and *proposing to cancel*. Stating is simply the act of sending a message containing some RDF triples; the other acts are executed by referencing earlier messages using the object properties in this ontology."
+    "@value" : "Connections between Atoms on the Web of Needs allow for non-repudiable communication between two agents. The Agreement protocol provides means for the communication partners to establish and manage a set of agreed-upon RDF triples as a result of communication acts. Each partner can calculate the set of triples solely based on the communication history. The acts are *stating*, *proposing*, *accepting*, *claiming', *rejecting* and *proposing to cancel*. Stating is simply the act of sending a Message containing some RDF triples; the other acts are executed by referencing earlier messages using the object properties in this ontology."
   } ],
   "http://purl.org/dc/elements/1.1/creator" : [ {
     "@value" : "Florian Kleedorfer"
@@ -68,6 +83,16 @@
   "http://purl.org/dc/elements/1.1/title" : [ {
     "@language" : "en",
     "@value" : "Web of Needs Agreement Ontology"
+  } ],
+  "http://purl.org/dc/terms/created" : [ {
+    "@type" : "http://www.w3.org/2001/XMLSchema#date",
+    "@value" : "2017-07-28"
+  } ],
+  "http://purl.org/dc/terms/license" : [ {
+    "@id" : "https://creativecommons.org/licenses/by/4.0/"
+  } ],
+  "http://purl.org/vocab/vann/preferredNamespacePrefix" : [ {
+    "@value" : "agr"
   } ],
   "http://www.w3.org/2002/07/owl#imports" : [ {
     "@id" : "https://w3id.org/won/message/1.0"

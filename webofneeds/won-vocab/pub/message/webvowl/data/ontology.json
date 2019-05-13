@@ -12,18 +12,13 @@
       "en" : "Ontology for describing messages in the Web of Needs project."
     },
     "other" : {
-      "date" : [ {
-        "identifier" : "date",
+      "license" : [ {
+        "identifier" : "license",
         "language" : "undefined",
-        "value" : "2013-12-13",
-        "type" : "label"
+        "value" : "https://creativecommons.org/licenses/by/4.0/",
+        "type" : "iri"
       } ],
       "creator" : [ {
-        "identifier" : "creator",
-        "language" : "undefined",
-        "value" : "Yana Panchenko",
-        "type" : "label"
-      }, {
         "identifier" : "creator",
         "language" : "undefined",
         "value" : "Fabian Salcher",
@@ -31,7 +26,18 @@
       }, {
         "identifier" : "creator",
         "language" : "undefined",
+        "value" : "Yana Panchenko",
+        "type" : "label"
+      }, {
+        "identifier" : "creator",
+        "language" : "undefined",
         "value" : "Florian Kleedorfer",
+        "type" : "label"
+      } ],
+      "created" : [ {
+        "identifier" : "created",
+        "language" : "undefined",
+        "value" : "2013-12-13",
         "type" : "label"
       } ],
       "preferredNamespacePrefix" : [ {
@@ -43,7 +49,7 @@
       "abstract" : [ {
         "identifier" : "abstract",
         "language" : "en",
-        "value" : "The Web of Needs Message Ontology is used to model the Messages used to publish or modify Atoms, to establish Connections, and to communicate between Atom owners.",
+        "value" : "This ontology is used to model the Message objects central to the Web of Needs.",
         "type" : "label"
       } ],
       "title" : [ {

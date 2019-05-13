@@ -7,10 +7,88 @@
      xmlns:xml="http://www.w3.org/XML/1998/namespace"
      xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
      xmlns:core="https://w3id.org/won/core#"
-     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     xmlns:vann="http://purl.org/vocab/vann/"
+     xmlns:terms="http://purl.org/dc/terms/">
     <owl:Ontology rdf:about="https://w3id.org/won/ext/buddy">
+        <owl:versionIRI rdf:resource="https://w3id.org/won/ext/buddy/1.0"/>
         <owl:imports rdf:resource="https://w3id.org/won/core"/>
+        <dc:abstract xml:lang="en">This ontology contains the definition of the BuddySocket, which, when used to establish a connection, derives a *buddy* relationship between the Atoms.</dc:abstract>
+        <dc:creator>Florian Kleedorfer</dc:creator>
+        <dc:title>Web of Needs Buddy Extension</dc:title>
+        <terms:created rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2019-04-15</terms:created>
+        <terms:license rdf:resource="https://creativecommons.org/licenses/by/4.0/"/>
+        <vann:preferredNamespacePrefix>bd</vann:preferredNamespacePrefix>
+        <rdfs:comment xml:lang="en">WoN Buddy Extension for establishing buddy relationships.</rdfs:comment>
     </owl:Ontology>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Annotation properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+
+    
+
+
+    <!-- http://purl.org/dc/elements/1.1/abstract -->
+
+
+    <owl:AnnotationProperty rdf:about="http://purl.org/dc/elements/1.1/abstract"/>
+    
+
+
+    <!-- http://purl.org/dc/elements/1.1/creator -->
+
+
+    <owl:AnnotationProperty rdf:about="http://purl.org/dc/elements/1.1/creator"/>
+    
+
+
+    <!-- http://purl.org/dc/elements/1.1/date -->
+
+
+    <owl:AnnotationProperty rdf:about="http://purl.org/dc/elements/1.1/date"/>
+    
+
+
+    <!-- http://purl.org/dc/elements/1.1/description -->
+
+
+    <owl:AnnotationProperty rdf:about="http://purl.org/dc/elements/1.1/description"/>
+    
+
+
+    <!-- http://purl.org/dc/elements/1.1/title -->
+
+
+    <owl:AnnotationProperty rdf:about="http://purl.org/dc/elements/1.1/title"/>
+    
+
+
+    <!-- http://purl.org/dc/terms/created -->
+
+
+    <owl:AnnotationProperty rdf:about="http://purl.org/dc/terms/created"/>
+    
+
+
+    <!-- http://purl.org/dc/terms/license -->
+
+
+    <owl:AnnotationProperty rdf:about="http://purl.org/dc/terms/license"/>
+    
+
+
+    <!-- http://purl.org/vocab/vann/preferredNamespacePrefix -->
+
+
+    <owl:AnnotationProperty rdf:about="http://purl.org/vocab/vann/preferredNamespacePrefix"/>
     
 
 
@@ -63,6 +141,8 @@
         <rdf:type rdf:resource="https://w3id.org/won/core#SocketDefinition"/>
         <core:compatibleSocketDefinition rdf:resource="https://w3id.org/won/ext/buddy#BuddySocket"/>
         <core:derivesAtomProperty rdf:resource="https://w3id.org/won/ext/buddy#buddy"/>
+        <rdfs:comment xml:lang="en">Compatible with other BuddySockets, derives the buddy relationship.</rdfs:comment>
+        <rdfs:label>BuddySocket</rdfs:label>
     </owl:NamedIndividual>
     
 
@@ -85,6 +165,7 @@
 
     <rdf:Description rdf:about="https://w3id.org/won/ext/buddy#buddy">
         <rdfs:comment xml:lang="en">Links a buddy Atom to one of its buddies. This should generally imply natural persons on both ends. We interpret buddies are people who like to do things together; such as engaging in sports or other social activities.</rdfs:comment>
+        <rdfs:label>buddy</rdfs:label>
     </rdf:Description>
 </rdf:RDF>
 

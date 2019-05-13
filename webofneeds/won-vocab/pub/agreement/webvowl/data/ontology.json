@@ -9,16 +9,34 @@
     "iri" : "https://w3id.org/won/agreement",
     "author" : [ "Florian Kleedorfer" ],
     "other" : {
+      "license" : [ {
+        "identifier" : "license",
+        "language" : "undefined",
+        "value" : "https://creativecommons.org/licenses/by/4.0/",
+        "type" : "iri"
+      } ],
       "creator" : [ {
         "identifier" : "creator",
         "language" : "undefined",
         "value" : "Florian Kleedorfer",
         "type" : "label"
       } ],
+      "created" : [ {
+        "identifier" : "created",
+        "language" : "undefined",
+        "value" : "2017-07-28",
+        "type" : "label"
+      } ],
+      "preferredNamespacePrefix" : [ {
+        "identifier" : "preferredNamespacePrefix",
+        "language" : "undefined",
+        "value" : "agr",
+        "type" : "label"
+      } ],
       "abstract" : [ {
         "identifier" : "abstract",
         "language" : "en",
-        "value" : "Connections between Atoms on the Web of Needs allow for non-repudiable communication between two agents. The Agreement protocol provides means for the communication partners to establish and manage a set of agreed-upon RDF triples as a result of communication acts. Each partner can calculate the set of triples solely based on the communication history. The acts are *stating*, *proposing*, *accepting*, *claiming', *rejecting* and *proposing to cancel*. Stating is simply the act of sending a message containing some RDF triples; the other acts are executed by referencing earlier messages using the object properties in this ontology.",
+        "value" : "Connections between Atoms on the Web of Needs allow for non-repudiable communication between two agents. The Agreement protocol provides means for the communication partners to establish and manage a set of agreed-upon RDF triples as a result of communication acts. Each partner can calculate the set of triples solely based on the communication history. The acts are *stating*, *proposing*, *accepting*, *claiming', *rejecting* and *proposing to cancel*. Stating is simply the act of sending a Message containing some RDF triples; the other acts are executed by referencing earlier messages using the object properties in this ontology.",
         "type" : "label"
       } ],
       "title" : [ {
@@ -65,12 +83,12 @@
   }, {
     "instances" : 0,
     "union" : [ "3", "6" ],
-    "attributes" : [ "anonymous", "union" ],
+    "attributes" : [ "union", "anonymous" ],
     "id" : "2"
   }, {
     "instances" : 0,
     "union" : [ "3", "6" ],
-    "attributes" : [ "anonymous", "union" ],
+    "attributes" : [ "union", "anonymous" ],
     "id" : "7"
   }, {
     "iri" : "https://w3id.org/won/message#Message",
@@ -160,22 +178,22 @@
   }, {
     "range" : "6",
     "domain" : "3",
-    "attributes" : [ "anonymous", "object" ],
+    "attributes" : [ "object", "anonymous" ],
     "id" : "5"
   }, {
     "range" : "4",
     "domain" : "1",
-    "attributes" : [ "anonymous", "object" ],
+    "attributes" : [ "object", "anonymous" ],
     "id" : "8"
   }, {
     "range" : "4",
     "domain" : "3",
-    "attributes" : [ "anonymous", "object" ],
+    "attributes" : [ "object", "anonymous" ],
     "id" : "9"
   }, {
     "range" : "4",
     "domain" : "6",
-    "attributes" : [ "anonymous", "object" ],
+    "attributes" : [ "object", "anonymous" ],
     "id" : "10"
   }, {
     "iri" : "https://w3id.org/won/agreement#claims",
@@ -222,12 +240,12 @@
   }, {
     "range" : "3",
     "domain" : "1",
-    "attributes" : [ "anonymous", "object" ],
+    "attributes" : [ "object", "anonymous" ],
     "id" : "14"
   }, {
     "range" : "6",
     "domain" : "1",
-    "attributes" : [ "anonymous", "object" ],
+    "attributes" : [ "object", "anonymous" ],
     "id" : "15"
   }, {
     "iri" : "https://w3id.org/won/agreement#proposesToCancel",

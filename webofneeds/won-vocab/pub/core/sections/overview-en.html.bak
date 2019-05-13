@@ -170,6 +170,9 @@ This ontology has the following classes and properties.</span>
       <a href="#socketCapacity" title="https://w3id.org/won/core#socketCapacity">socketCapacity</a>
    </li>
    <li>
+      <a href="#won:textMessage" title="https://w3id.org/won/core#won:textMessage">Specifies a text message.</a>
+   </li>
+   <li>
       <a href="#tag" title="https://w3id.org/won/core#tag">tag</a>
    </li>
 </ul><h4>Named Individuals</h4><ul class="hlist">

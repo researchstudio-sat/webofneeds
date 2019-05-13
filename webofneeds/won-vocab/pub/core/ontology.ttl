@@ -17,8 +17,9 @@ Atoms can establish *Connections*  with other Atoms, if both Atoms' owners agree
 Matching services can make suggestions which atoms to connect to. An Atom specifies 'Sockets' indicating the kinds of Connections it is prepared to establish."""@en ;
                              <http://purl.org/dc/elements/1.1/creator> "Fabian Salcher" ,
                                                                        "Florian Kleedorfer" ;
-                             <http://purl.org/dc/elements/1.1/date> "2013-12-13"^^xsd:date ;
                              <http://purl.org/dc/elements/1.1/title> "Web of Needs Core Ontology" ;
+                             <http://purl.org/dc/terms/created> "2013-12-13"^^xsd:date ;
+                             <http://purl.org/dc/terms/license> <https://creativecommons.org/licenses/by/4.0/> ;
                              <http://purl.org/vocab/vann/preferredNamespacePrefix> "won" ;
                              rdfs:comment "Ontology for the Web of Needs data model."@en .
 
@@ -44,6 +45,14 @@ Matching services can make suggestions which atoms to connect to. An Atom specif
 
 ###  http://purl.org/dc/elements/1.1/title
 <http://purl.org/dc/elements/1.1/title> rdf:type owl:AnnotationProperty .
+
+
+###  http://purl.org/dc/terms/created
+<http://purl.org/dc/terms/created> rdf:type owl:AnnotationProperty .
+
+
+###  http://purl.org/dc/terms/license
+<http://purl.org/dc/terms/license> rdf:type owl:AnnotationProperty .
 
 
 ###  http://purl.org/vocab/vann/preferredNamespacePrefix
@@ -411,6 +420,13 @@ sought to fulfill the atom in contrast to the part that is available.""" ;
      rdfs:range xsd:string ;
      rdfs:comment "Tags an Atom with a String value."@en ;
      rdfs:label "tag" .
+
+
+###  https://w3id.org/won/core#won:textMessage
+:textMessage rdf:type owl:DatatypeProperty ;
+             rdfs:range xsd:string ;
+             rdfs:label "Specifies a text message."@en ,
+                        "textMessage" .
 
 
 #################################################################
