@@ -12,12 +12,13 @@
       "en" : "Ontology for describing messages in the Web of Needs project."
     },
     "other" : {
-      "creator" : [ {
-        "identifier" : "creator",
+      "license" : [ {
+        "identifier" : "license",
         "language" : "undefined",
-        "value" : "Yana Panchenko",
-        "type" : "label"
-      }, {
+        "value" : "https://creativecommons.org/licenses/by/4.0/",
+        "type" : "iri"
+      } ],
+      "creator" : [ {
         "identifier" : "creator",
         "language" : "undefined",
         "value" : "Fabian Salcher",
@@ -25,13 +26,30 @@
       }, {
         "identifier" : "creator",
         "language" : "undefined",
+        "value" : "Yana Panchenko",
+        "type" : "label"
+      }, {
+        "identifier" : "creator",
+        "language" : "undefined",
         "value" : "Florian Kleedorfer",
+        "type" : "label"
+      } ],
+      "created" : [ {
+        "identifier" : "created",
+        "language" : "undefined",
+        "value" : "2013-12-13",
         "type" : "label"
       } ],
       "preferredNamespacePrefix" : [ {
         "identifier" : "preferredNamespacePrefix",
         "language" : "undefined",
         "value" : "msg",
+        "type" : "label"
+      } ],
+      "abstract" : [ {
+        "identifier" : "abstract",
+        "language" : "en",
+        "value" : "This ontology is used to model the Message objects central to the Web of Needs.",
         "type" : "label"
       } ],
       "title" : [ {
@@ -53,38 +71,35 @@
     "id" : "8",
     "type" : "owl:Class"
   }, {
-    "id" : "25",
-    "type" : "rdfs:Literal"
-  }, {
     "id" : "19",
-    "type" : "owl:Thing"
+    "type" : "rdfs:Datatype"
   }, {
-    "id" : "20",
-    "type" : "rdfs:Literal"
+    "id" : "28",
+    "type" : "rdfs:Datatype"
   }, {
     "id" : "29",
-    "type" : "rdfs:Literal"
+    "type" : "rdfs:Datatype"
   }, {
     "id" : "32",
     "type" : "owl:Class"
   }, {
     "id" : "41",
-    "type" : "rdfs:Datatype"
+    "type" : "owl:unionOf"
   }, {
-    "id" : "42",
-    "type" : "rdfs:Datatype"
+    "id" : "31",
+    "type" : "owl:unionOf"
   }, {
     "id" : "4",
     "type" : "owl:Class"
   }, {
-    "id" : "22",
+    "id" : "26",
     "type" : "owl:Class"
   }, {
-    "id" : "43",
+    "id" : "22",
     "type" : "rdfs:Datatype"
   }, {
-    "id" : "31",
-    "type" : "owl:Thing"
+    "id" : "42",
+    "type" : "rdfs:Datatype"
   }, {
     "id" : "7",
     "type" : "owl:Class"
@@ -151,7 +166,8 @@
         "en" : "Type of message that closes a Connection."
       },
       "labels" : {
-        "IRI-based" : "CloseMessage"
+        "IRI-based" : "CloseMessage",
+        "undefined" : "CloseMessage"
       }
     }, {
       "iri" : "https://w3id.org/won/message#OpenMessage",
@@ -168,7 +184,8 @@
         "en" : "Type of Message used to (re)open an existing Connection."
       },
       "labels" : {
-        "IRI-based" : "OpenMessage"
+        "IRI-based" : "OpenMessage",
+        "undefined" : "OpenMessage"
       }
     }, {
       "iri" : "https://w3id.org/won/message#ActivateMessage",
@@ -185,7 +202,8 @@
         "en" : "Type of message that activates an Atom."
       },
       "labels" : {
-        "IRI-based" : "ActivateMessage"
+        "IRI-based" : "ActivateMessage",
+        "undefined" : "ActivateMessage"
       }
     }, {
       "iri" : "https://w3id.org/won/message#DeactivateMessage",
@@ -202,7 +220,8 @@
         "en" : "Type of message that deactivates an Atom."
       },
       "labels" : {
-        "IRI-based" : "DeactivateMessage"
+        "IRI-based" : "DeactivateMessage",
+        "undefined" : "DeactivateMessage"
       }
     }, {
       "iri" : "https://w3id.org/won/message#ChangeNotificationMessage",
@@ -219,7 +238,8 @@
         "en" : "Type of message sent from a WoN Node to indicate that the remote Atom has changed."
       },
       "labels" : {
-        "IRI-based" : "ChangeNotificationMessage"
+        "IRI-based" : "ChangeNotificationMessage",
+        "undefined" : "ChangeNotificationMessage"
       }
     }, {
       "iri" : "https://w3id.org/won/message#AtomMessage",
@@ -236,7 +256,8 @@
         "en" : "Message sent between an atom's owner and the WoN node hosting the atom. The message is informative only\n                   and has no side effect The message is not routed to any other participant."
       },
       "labels" : {
-        "IRI-based" : "AtomMessage"
+        "IRI-based" : "AtomMessage",
+        "undefined" : "AtomMessage"
       }
     }, {
       "iri" : "https://w3id.org/won/message#ReplaceMessage",
@@ -253,7 +274,8 @@
         "en" : "Type of message sent to a WoN Node in order replace an Atom's content."
       },
       "labels" : {
-        "IRI-based" : "ReplaceMessage"
+        "IRI-based" : "ReplaceMessage",
+        "undefined" : "ReplaceMessage"
       }
     }, {
       "iri" : "https://w3id.org/won/message#ConnectMessage",
@@ -270,7 +292,8 @@
         "en" : "Type of message that is sent from Atom A to Atom B in order to create a new Connection."
       },
       "labels" : {
-        "IRI-based" : "ConnectMessage"
+        "IRI-based" : "ConnectMessage",
+        "undefined" : "ConnectMessage"
       }
     }, {
       "iri" : "https://w3id.org/won/message#HintMessage",
@@ -287,7 +310,8 @@
         "en" : "Type of message sent by a matching service to an Atom in order to inform its owner of other Atoms possibly interesting for establishing a connection."
       },
       "labels" : {
-        "IRI-based" : "HintMessage"
+        "IRI-based" : "HintMessage",
+        "undefined" : "HintMessage"
       }
     }, {
       "iri" : "https://w3id.org/won/message#CreateMessage",
@@ -304,7 +328,8 @@
         "en" : "Type of message sent to a WoN Node in order to create a new Atom."
       },
       "labels" : {
-        "IRI-based" : "CreateMessage"
+        "IRI-based" : "CreateMessage",
+        "undefined" : "CreateMessage"
       }
     }, {
       "iri" : "https://w3id.org/won/message#ConnectionMessage",
@@ -321,7 +346,8 @@
         "en" : "Message sent via an established connection. This type is to be used in Socket-specific protocols."
       },
       "labels" : {
-        "IRI-based" : "ConnectionMessage"
+        "IRI-based" : "ConnectionMessage",
+        "undefined" : "ConnectionMessage"
       }
     } ],
     "subClasses" : [ "7" ],
@@ -343,32 +369,25 @@
     "id" : "8",
     "superClasses" : [ "4" ]
   }, {
-    "iri" : "http://www.w3.org/2000/01/rdf-schema#Literal",
-    "id" : "25",
-    "label" : {
-      "IRI-based" : "Literal",
-      "undefined" : "Literal"
-    }
-  }, {
-    "iri" : "http://www.w3.org/2002/07/owl#Thing",
-    "baseIri" : "http://owl2vowl.de",
+    "iri" : "http://www.w3.org/2001/XMLSchema#string",
+    "baseIri" : "http://www.w3.org/2001/XMLSchema",
     "id" : "19",
     "label" : {
-      "undefined" : "Thing"
+      "IRI-based" : "string"
     }
   }, {
-    "iri" : "http://www.w3.org/2000/01/rdf-schema#Literal",
-    "id" : "20",
+    "iri" : "http://www.w3.org/2001/XMLSchema#long",
+    "baseIri" : "http://www.w3.org/2001/XMLSchema",
+    "id" : "28",
     "label" : {
-      "IRI-based" : "Literal",
-      "undefined" : "Literal"
+      "IRI-based" : "long"
     }
   }, {
-    "iri" : "http://www.w3.org/2000/01/rdf-schema#Literal",
+    "iri" : "http://www.w3.org/2001/XMLSchema#long",
+    "baseIri" : "http://www.w3.org/2001/XMLSchema",
     "id" : "29",
     "label" : {
-      "IRI-based" : "Literal",
-      "undefined" : "Literal"
+      "IRI-based" : "long"
     }
   }, {
     "iri" : "https://w3id.org/won/core#Connection",
@@ -380,19 +399,15 @@
     "attributes" : [ "external" ],
     "id" : "32"
   }, {
-    "iri" : "http://www.w3.org/2001/XMLSchema#string",
-    "baseIri" : "http://www.w3.org/2001/XMLSchema",
-    "id" : "41",
-    "label" : {
-      "IRI-based" : "string"
-    }
+    "instances" : 0,
+    "union" : [ "32", "34" ],
+    "attributes" : [ "anonymous", "union" ],
+    "id" : "41"
   }, {
-    "iri" : "http://www.w3.org/2001/XMLSchema#long",
-    "baseIri" : "http://www.w3.org/2001/XMLSchema",
-    "id" : "42",
-    "label" : {
-      "IRI-based" : "long"
-    }
+    "instances" : 0,
+    "union" : [ "32", "34" ],
+    "attributes" : [ "anonymous", "union" ],
+    "id" : "31"
   }, {
     "iri" : "https://w3id.org/won/message#Message",
     "baseIri" : "https://w3id.org/won/message",
@@ -401,7 +416,7 @@
       "IRI-based" : "Message",
       "undefined" : "Message"
     },
-    "subClasses" : [ "8", "3", "22" ],
+    "subClasses" : [ "8", "3", "26" ],
     "comment" : {
       "undefined" : "Superclass for messages. They fall into three categories: FromOwner, FromSystem and FromExternal."
     },
@@ -417,21 +432,21 @@
     "comment" : {
       "undefined" : "A Message generated by an Atom's owner."
     },
-    "id" : "22",
+    "id" : "26",
     "superClasses" : [ "4" ]
   }, {
-    "iri" : "http://www.w3.org/2001/XMLSchema#long",
+    "iri" : "http://www.w3.org/2001/XMLSchema#string",
     "baseIri" : "http://www.w3.org/2001/XMLSchema",
-    "id" : "43",
+    "id" : "22",
     "label" : {
-      "IRI-based" : "long"
+      "IRI-based" : "string"
     }
   }, {
-    "iri" : "http://www.w3.org/2002/07/owl#Thing",
-    "baseIri" : "http://owl2vowl.de",
-    "id" : "31",
+    "iri" : "http://www.w3.org/2001/XMLSchema#string",
+    "baseIri" : "http://www.w3.org/2001/XMLSchema",
+    "id" : "42",
     "label" : {
-      "undefined" : "Thing"
+      "IRI-based" : "string"
     }
   }, {
     "iri" : "https://w3id.org/won/message#ResponseType",
@@ -464,7 +479,8 @@
         "en" : "Indicates an error occurred while processing the message."
       },
       "labels" : {
-        "IRI-based" : "FailureResponse"
+        "IRI-based" : "FailureResponse",
+        "undefined" : "FailureResponse"
       }
     }, {
       "iri" : "https://w3id.org/won/message#SuccessResponse",
@@ -481,7 +497,8 @@
         "en" : "Indicates that the message was processed successfully."
       },
       "labels" : {
-        "IRI-based" : "SuccessResponse"
+        "IRI-based" : "SuccessResponse",
+        "undefined" : "SuccessResponse"
       }
     } ],
     "comment" : {
@@ -512,9 +529,13 @@
     "baseIri" : "https://w3id.org/won/message",
     "instances" : 0,
     "label" : {
-      "IRI-based" : "MessageGraph"
+      "IRI-based" : "MessageGraph",
+      "undefined" : "MessageGraph"
     },
     "subClasses" : [ "16", "1" ],
+    "comment" : {
+      "en" : "An RDF graph that belongs to a Message"
+    },
     "id" : "13"
   }, {
     "iri" : "http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature",
@@ -530,7 +551,8 @@
     "baseIri" : "https://w3id.org/won/message",
     "instances" : 0,
     "label" : {
-      "IRI-based" : "ContentGraph"
+      "IRI-based" : "ContentGraph",
+      "undefined" : "ContentGraph"
     },
     "id" : "16",
     "superClasses" : [ "13" ]
@@ -584,22 +606,22 @@
     "id" : "18",
     "type" : "owl:datatypeProperty"
   }, {
-    "id" : "21",
+    "id" : "20",
     "type" : "rdfs:SubClassOf"
+  }, {
+    "id" : "21",
+    "type" : "owl:datatypeProperty"
   }, {
     "id" : "23",
     "type" : "rdfs:SubClassOf"
   }, {
     "id" : "24",
-    "type" : "owl:datatypeProperty"
+    "type" : "rdfs:SubClassOf"
   }, {
-    "id" : "26",
+    "id" : "25",
     "type" : "rdfs:SubClassOf"
   }, {
     "id" : "27",
-    "type" : "rdfs:SubClassOf"
-  }, {
-    "id" : "28",
     "type" : "rdfs:SubClassOf"
   }, {
     "id" : "30",
@@ -626,28 +648,25 @@
     "id" : "40",
     "type" : "owl:objectProperty"
   }, {
-    "id" : "44",
+    "id" : "43",
     "type" : "owl:datatypeProperty"
+  }, {
+    "id" : "44",
+    "type" : "owl:disjointWith"
   }, {
     "id" : "45",
     "type" : "owl:disjointWith"
   }, {
     "id" : "46",
-    "type" : "owl:disjointWith"
+    "type" : "owl:datatypeProperty"
   }, {
     "id" : "47",
     "type" : "owl:datatypeProperty"
   }, {
     "id" : "48",
-    "type" : "owl:datatypeProperty"
-  }, {
-    "id" : "49",
-    "type" : "owl:datatypeProperty"
-  }, {
-    "id" : "50",
     "type" : "owl:objectProperty"
   }, {
-    "id" : "51",
+    "id" : "49",
     "type" : "owl:objectProperty"
   } ],
   "propertyAttribute" : [ {
@@ -655,7 +674,8 @@
     "baseIri" : "https://w3id.org/won/message",
     "range" : "2",
     "label" : {
-      "IRI-based" : "containsSignature"
+      "IRI-based" : "containsSignature",
+      "undefined" : "containsSignature"
     },
     "domain" : "1",
     "attributes" : [ "object" ],
@@ -665,7 +685,8 @@
     "baseIri" : "https://w3id.org/won/message",
     "range" : "4",
     "label" : {
-      "IRI-based" : "previousMessage"
+      "IRI-based" : "previousMessage",
+      "undefined" : "previousMessage"
     },
     "domain" : "4",
     "attributes" : [ "object" ],
@@ -683,7 +704,8 @@
       } ]
     },
     "label" : {
-      "IRI-based" : "recipientNode"
+      "IRI-based" : "recipientNode",
+      "undefined" : "recipientNode"
     },
     "domain" : "4",
     "comment" : {
@@ -718,7 +740,8 @@
     "baseIri" : "https://w3id.org/won/message",
     "range" : "13",
     "label" : {
-      "IRI-based" : "signedGraph"
+      "IRI-based" : "signedGraph",
+      "undefined" : "signedGraph"
     },
     "domain" : "2",
     "attributes" : [ "object" ],
@@ -736,7 +759,8 @@
       } ]
     },
     "label" : {
-      "IRI-based" : "senderNode"
+      "IRI-based" : "senderNode",
+      "undefined" : "senderNode"
     },
     "domain" : "4",
     "comment" : {
@@ -768,62 +792,62 @@
     "id" : "15"
   }, {
     "range" : "13",
-    "domain" : "16",
+    "domain" : "1",
     "attributes" : [ "anonymous", "object" ],
     "id" : "17"
   }, {
     "iri" : "https://w3id.org/won/message#publicKeyFingerprint",
     "baseIri" : "https://w3id.org/won/message",
-    "range" : "20",
+    "range" : "19",
     "label" : {
       "IRI-based" : "publicKeyFingerprint",
       "undefined" : "publicKeyFingerprint"
     },
-    "domain" : "19",
+    "domain" : "2",
     "comment" : {
       "undefined" : "The fingerprint of the sender's public key (SHA-256 hash)."
     },
     "attributes" : [ "datatype" ],
     "id" : "18"
   }, {
-    "range" : "4",
-    "domain" : "22",
-    "attributes" : [ "anonymous", "object" ],
-    "id" : "21"
-  }, {
     "range" : "13",
-    "domain" : "1",
+    "domain" : "16",
     "attributes" : [ "anonymous", "object" ],
-    "id" : "23"
+    "id" : "20"
   }, {
     "iri" : "https://w3id.org/won/message#hash",
     "baseIri" : "https://w3id.org/won/message",
-    "range" : "25",
+    "range" : "22",
     "label" : {
       "IRI-based" : "hash",
       "undefined" : "hash"
     },
-    "domain" : "19",
+    "domain" : "2",
     "comment" : {
       "en" : "The message hash."
     },
     "attributes" : [ "datatype" ],
-    "id" : "24"
+    "id" : "21"
+  }, {
+    "range" : "4",
+    "domain" : "8",
+    "attributes" : [ "anonymous", "object" ],
+    "id" : "23"
   }, {
     "range" : "6",
     "domain" : "7",
     "attributes" : [ "anonymous", "object" ],
-    "id" : "26"
+    "id" : "24"
+  }, {
+    "range" : "4",
+    "domain" : "26",
+    "attributes" : [ "anonymous", "object" ],
+    "id" : "25"
   }, {
     "range" : "4",
     "domain" : "3",
     "attributes" : [ "anonymous", "object" ],
     "id" : "27"
-  }, {
-    "range" : "4",
-    "domain" : "8",
-    "attributes" : [ "anonymous", "object" ],
-    "id" : "28"
   }, {
     "iri" : "https://w3id.org/won/message#sender",
     "baseIri" : "https://w3id.org/won/message",
@@ -837,7 +861,8 @@
       } ]
     },
     "label" : {
-      "IRI-based" : "sender"
+      "IRI-based" : "sender",
+      "undefined" : "sender"
     },
     "domain" : "4",
     "comment" : {
@@ -858,7 +883,8 @@
       } ]
     },
     "label" : {
-      "IRI-based" : "senderAtom"
+      "IRI-based" : "senderAtom",
+      "undefined" : "senderAtom"
     },
     "domain" : "4",
     "comment" : {
@@ -879,7 +905,8 @@
       } ]
     },
     "label" : {
-      "IRI-based" : "recipientAtom"
+      "IRI-based" : "recipientAtom",
+      "undefined" : "recipientAtom"
     },
     "domain" : "4",
     "comment" : {
@@ -912,7 +939,8 @@
     "baseIri" : "https://w3id.org/won/message",
     "range" : "1",
     "label" : {
-      "IRI-based" : "containsEnvelope"
+      "IRI-based" : "containsEnvelope",
+      "undefined" : "containsEnvelope"
     },
     "domain" : "1",
     "attributes" : [ "object" ],
@@ -920,68 +948,52 @@
   }, {
     "iri" : "https://w3id.org/won/message#sentTimestamp",
     "baseIri" : "https://w3id.org/won/message",
-    "range" : "43",
+    "range" : "28",
     "label" : {
       "IRI-based" : "sentTimestamp",
       "undefined" : "sentTimestamp"
     },
     "domain" : "4",
     "comment" : {
-      "en" : "Holds the timestamp assigned when the WoN node created the message."
+      "en" : "Holds the timestamp assigned when the WoN node created and sent the message."
     },
     "attributes" : [ "datatype" ],
-    "id" : "44"
+    "id" : "43"
   }, {
     "range" : "4",
     "domain" : "1",
     "attributes" : [ "anonymous", "object" ],
-    "id" : "45"
+    "id" : "44"
   }, {
     "range" : "6",
     "domain" : "1",
     "attributes" : [ "anonymous", "object" ],
-    "id" : "46"
-  }, {
-    "iri" : "https://w3id.org/won/message#timestamp",
-    "baseIri" : "https://w3id.org/won/message",
-    "range" : "29",
-    "annotations" : {
-      "isDefinedBy" : [ {
-        "identifier" : "isDefinedBy",
-        "language" : "undefined",
-        "value" : "https://w3id.org/won/message",
-        "type" : "iri"
-      } ]
-    },
-    "label" : {
-      "IRI-based" : "timestamp"
-    },
-    "domain" : "19",
-    "comment" : {
-      "en" : "Holds the timestamp assigned when the WoN node created the message."
-    },
-    "attributes" : [ "datatype" ],
-    "id" : "47"
+    "id" : "45"
   }, {
     "iri" : "https://w3id.org/won/message#protocolVersion",
     "baseIri" : "https://w3id.org/won/message",
-    "range" : "41",
+    "range" : "42",
     "label" : {
-      "IRI-based" : "protocolVersion"
+      "IRI-based" : "protocolVersion",
+      "undefined" : "protocolVersion"
     },
     "domain" : "4",
     "attributes" : [ "datatype" ],
-    "id" : "48"
+    "id" : "46"
   }, {
     "iri" : "https://w3id.org/won/message#receivedTimestamp",
     "baseIri" : "https://w3id.org/won/message",
-    "range" : "42",
+    "range" : "29",
     "label" : {
-      "IRI-based" : "receivedTimestamp"
+      "IRI-based" : "receivedTimestamp",
+      "undefined" : "receivedTimestamp"
     },
     "domain" : "4",
+    "comment" : {
+      "en" : "Holds the timestamp assigned when the WoN node received and saved the message."
+    },
     "attributes" : [ "datatype" ],
-    "id" : "49"
+    "id" : "47"
   }, {
     "iri" : "https://w3id.org/won/message#correspondingRemoteMessage",
     "baseIri" : "https://w3id.org/won/message",
@@ -995,11 +1007,11 @@
       "en" : "Points to another message. Messages always exist in two copies: one on the sender's WoN node and one on the receiver's WoN node. The receiver's WoN node copies the message, mints a new URI for it and points to the original message using 'msg:correspondingRemoteMessage'."
     },
     "attributes" : [ "object" ],
-    "id" : "50"
+    "id" : "48"
   }, {
     "iri" : "https://w3id.org/won/message#recipient",
     "baseIri" : "https://w3id.org/won/message",
-    "range" : "31",
+    "range" : "41",
     "annotations" : {
       "isDefinedBy" : [ {
         "identifier" : "isDefinedBy",
@@ -1009,13 +1021,14 @@
       } ]
     },
     "label" : {
-      "IRI-based" : "recipient"
+      "IRI-based" : "recipient",
+      "undefined" : "recipient"
     },
     "domain" : "4",
     "comment" : {
       "en" : "Indicates the receiver of the message, either Socket or Connection."
     },
     "attributes" : [ "object" ],
-    "id" : "51"
+    "id" : "49"
   } ]
 }

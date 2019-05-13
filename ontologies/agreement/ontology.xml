@@ -1,12 +1,92 @@
 <?xml version="1.0"?>
 <rdf:RDF xmlns="https://w3id.org/won/agreement#"
      xml:base="https://w3id.org/won/agreement"
+     xmlns:dc="http://purl.org/dc/elements/1.1/"
      xmlns:owl="http://www.w3.org/2002/07/owl#"
      xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
      xmlns:xml="http://www.w3.org/XML/1998/namespace"
      xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
-     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
-    <owl:Ontology rdf:about="https://w3id.org/won/agreement#"/>
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     xmlns:vann="http://purl.org/vocab/vann/"
+     xmlns:terms="http://purl.org/dc/terms/">
+    <owl:Ontology rdf:about="https://w3id.org/won/agreement">
+        <owl:versionIRI rdf:resource="https://w3id.org/won/agreement/1.0"/>
+        <owl:imports rdf:resource="https://w3id.org/won/message/1.0"/>
+        <dc:abstract xml:lang="en">Connections between Atoms on the Web of Needs allow for non-repudiable communication between two agents. The Agreement protocol provides means for the communication partners to establish and manage a set of agreed-upon RDF triples as a result of communication acts. Each partner can calculate the set of triples solely based on the communication history. The acts are *stating*, *proposing*, *accepting*, *claiming&apos;, *rejecting* and *proposing to cancel*. Stating is simply the act of sending a Message containing some RDF triples; the other acts are executed by referencing earlier messages using the object properties in this ontology.</dc:abstract>
+        <dc:creator>Florian Kleedorfer</dc:creator>
+        <dc:title xml:lang="en">Web of Needs Agreement Ontology</dc:title>
+        <terms:created rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2017-07-28</terms:created>
+        <terms:license rdf:resource="https://creativecommons.org/licenses/by/4.0/"/>
+        <vann:preferredNamespacePrefix>agr</vann:preferredNamespacePrefix>
+    </owl:Ontology>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Annotation properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+
+    
+
+
+    <!-- http://purl.org/dc/elements/1.1/abstract -->
+
+
+    <owl:AnnotationProperty rdf:about="http://purl.org/dc/elements/1.1/abstract"/>
+    
+
+
+    <!-- http://purl.org/dc/elements/1.1/creator -->
+
+
+    <owl:AnnotationProperty rdf:about="http://purl.org/dc/elements/1.1/creator"/>
+    
+
+
+    <!-- http://purl.org/dc/elements/1.1/date -->
+
+
+    <owl:AnnotationProperty rdf:about="http://purl.org/dc/elements/1.1/date"/>
+    
+
+
+    <!-- http://purl.org/dc/elements/1.1/description -->
+
+
+    <owl:AnnotationProperty rdf:about="http://purl.org/dc/elements/1.1/description"/>
+    
+
+
+    <!-- http://purl.org/dc/elements/1.1/title -->
+
+
+    <owl:AnnotationProperty rdf:about="http://purl.org/dc/elements/1.1/title"/>
+    
+
+
+    <!-- http://purl.org/dc/terms/created -->
+
+
+    <owl:AnnotationProperty rdf:about="http://purl.org/dc/terms/created"/>
+    
+
+
+    <!-- http://purl.org/dc/terms/license -->
+
+
+    <owl:AnnotationProperty rdf:about="http://purl.org/dc/terms/license"/>
+    
+
+
+    <!-- http://purl.org/vocab/vann/preferredNamespacePrefix -->
+
+
+    <owl:AnnotationProperty rdf:about="http://purl.org/vocab/vann/preferredNamespacePrefix"/>
     
 
 
@@ -27,9 +107,28 @@
 
     <owl:ObjectProperty rdf:about="https://w3id.org/won/agreement#accepts">
         <rdfs:domain rdf:resource="https://w3id.org/won/agreement#Agreement"/>
-        <rdfs:comment xml:lang="en">Used to link two message resources. The message in the subject accepts the message in the object. This only makes sense if the object references a proposal.
+        <rdfs:range>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="https://w3id.org/won/agreement#Claim"/>
+                    <rdf:Description rdf:about="https://w3id.org/won/agreement#Proposal"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:range>
+        <rdfs:comment xml:lang="en">By referencing a Proposal via `msg:accepts` in the ContentGraph of subsequent Mesage, an Agreement is created.</rdfs:comment>
+        <rdfs:label>accepts</rdfs:label>
+    </owl:ObjectProperty>
+    
 
-During the projection from the edited conversation dataset to the agreement dataset, the validity of agreements is checked. Proposal messages that were not accepted are dropped, as are invalid or cancelled Agreements.</rdfs:comment>
+
+    <!-- https://w3id.org/won/agreement#claims -->
+
+
+    <owl:ObjectProperty rdf:about="https://w3id.org/won/agreement#claims">
+        <rdfs:domain rdf:resource="https://w3id.org/won/agreement#Claim"/>
+        <rdfs:range rdf:resource="https://w3id.org/won/message#Message"/>
+        <rdfs:comment xml:lang="en">By referencing an earlier Message via `msg:claims` in the ContentGraph of subsequent Mesage, a Claim is created. Claims can be affirmed by the counterpart using `msg:accepts` or rejected using `msg:rejects`.</rdfs:comment>
+        <rdfs:label>claims</rdfs:label>
     </owl:ObjectProperty>
     
 
@@ -39,6 +138,9 @@ During the projection from the edited conversation dataset to the agreement data
 
     <owl:ObjectProperty rdf:about="https://w3id.org/won/agreement#proposes">
         <rdfs:domain rdf:resource="https://w3id.org/won/agreement#Proposal"/>
+        <rdfs:range rdf:resource="https://w3id.org/won/message#Message"/>
+        <rdfs:comment xml:lang="en">By referencing a Message via `msg:accepts` in the ContentGraph of subsequent Mesage, a Proposal is created.</rdfs:comment>
+        <rdfs:label>proposes</rdfs:label>
     </owl:ObjectProperty>
     
 
@@ -48,15 +150,28 @@ During the projection from the edited conversation dataset to the agreement data
 
     <owl:ObjectProperty rdf:about="https://w3id.org/won/agreement#proposesToCancel">
         <rdfs:domain rdf:resource="https://w3id.org/won/agreement#Proposal"/>
+        <rdfs:range rdf:resource="https://w3id.org/won/agreement#Agreement"/>
+        <rdfs:comment xml:lang="en">By referencing an Agreement via `msg:proposesToCancel` in the ContentGraph of subsequent Mesage, a Proposal to cancel an Agreement is created.</rdfs:comment>
+        <rdfs:label>proposesToCancel</rdfs:label>
     </owl:ObjectProperty>
     
 
 
-    <!-- https://w3id.org/won/agreement#reject -->
+    <!-- https://w3id.org/won/agreement#rejects -->
 
 
-    <owl:ObjectProperty rdf:about="https://w3id.org/won/agreement#reject">
-        <rdfs:domain rdf:resource="https://w3id.org/won/agreement#Proposal"/>
+    <owl:ObjectProperty rdf:about="https://w3id.org/won/agreement#rejects">
+        <rdfs:domain rdf:resource="https://w3id.org/won/message#Message"/>
+        <rdfs:range>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="https://w3id.org/won/agreement#Claim"/>
+                    <rdf:Description rdf:about="https://w3id.org/won/agreement#Proposal"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:range>
+        <rdfs:comment xml:lang="en">By referencing a Proposal via `msg:rejects` in the ContentGraph of subsequent Mesage, that Proposal is rejected and cannot become a valid Agreement any more.</rdfs:comment>
+        <rdfs:label>rejects</rdfs:label>
     </owl:ObjectProperty>
     
 
@@ -77,7 +192,22 @@ During the projection from the edited conversation dataset to the agreement data
 
 
     <owl:Class rdf:about="https://w3id.org/won/agreement#Agreement">
-        <rdfs:comment xml:lang="en">The message that accepts a proposal concludes an agreement. It is the last message that is taken into account when calculating the content of the agreement, which makes it suitable for identifying the agreement. Therefore, it is given the type Agreement.</rdfs:comment>
+        <rdfs:subClassOf rdf:resource="https://w3id.org/won/message#Message"/>
+        <rdfs:comment xml:lang="en">The message references a Proposal via `msg:accepts` thereby concludes an Agreement. It is the last message that is taken into account when calculating the content of the Agreement, which makes it suitable for identifying the Agreement. Therefore, it is given the type Agreement.</rdfs:comment>
+        <rdfs:label>Agreement</rdfs:label>
+    </owl:Class>
+    
+
+
+    <!-- https://w3id.org/won/agreement#Claim -->
+
+
+    <owl:Class rdf:about="https://w3id.org/won/agreement#Claim">
+        <rdfs:subClassOf rdf:resource="https://w3id.org/won/message#Message"/>
+        <rdfs:comment xml:lang="en">A Message that claims other Messages using `msg:claims` is a Claim. It can become an Agreement via `msg:accepts` or it can be rejected via `msg:rejects`.
+
+The difference between a Claim and a Proposal is that the claim&apos;s content is interpreted as agreed-upon until rejected, while a Proposal&apos;s content is only interpreted as agreed-upon after it is accepted.</rdfs:comment>
+        <rdfs:label>Claim</rdfs:label>
     </owl:Class>
     
 
@@ -86,8 +216,49 @@ During the projection from the edited conversation dataset to the agreement data
 
 
     <owl:Class rdf:about="https://w3id.org/won/agreement#Proposal">
-        <rdfs:comment xml:lang="en">The message that proposes other messages or proposes to cancel agreements is a Proposal.</rdfs:comment>
+        <rdfs:subClassOf rdf:resource="https://w3id.org/won/message#Message"/>
+        <rdfs:comment xml:lang="en">The Message that proposes other Messages or proposes to cancel Agreements is a Proposal.
+
+The difference between a Claim and a Proposal is that the claim&apos;s content is interpreted as agreed-upon until rejected, while a Proposal&apos;s content is only interpreted as agreed-upon after it is accepted.</rdfs:comment>
+        <rdfs:label>Proposal</rdfs:label>
     </owl:Class>
+    
+
+
+    <!-- https://w3id.org/won/message#Message -->
+
+
+    <owl:Class rdf:about="https://w3id.org/won/message#Message"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // General axioms
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+
+    <rdf:Description>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AllDisjointClasses"/>
+        <owl:members rdf:parseType="Collection">
+            <rdf:Description rdf:about="https://w3id.org/won/agreement#Agreement"/>
+            <rdf:Description rdf:about="https://w3id.org/won/agreement#Claim"/>
+            <rdf:Description rdf:about="https://w3id.org/won/agreement#Proposal"/>
+        </owl:members>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AllDisjointProperties"/>
+        <owl:members rdf:parseType="Collection">
+            <rdf:Description rdf:about="https://w3id.org/won/agreement#accepts"/>
+            <rdf:Description rdf:about="https://w3id.org/won/agreement#claims"/>
+            <rdf:Description rdf:about="https://w3id.org/won/agreement#proposes"/>
+            <rdf:Description rdf:about="https://w3id.org/won/agreement#proposesToCancel"/>
+            <rdf:Description rdf:about="https://w3id.org/won/agreement#rejects"/>
+        </owl:members>
+    </rdf:Description>
 </rdf:RDF>
 
 

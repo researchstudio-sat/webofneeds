@@ -1,72 +1,164 @@
 {
   "_comment" : "Created with OWL2VOWL (version 0.3.5), http://vowl.visualdataweb.org",
   "header" : {
-    "languages" : [ "en" ],
-    "baseIris" : [ "http://www.w3.org/1999/02/22-rdf-syntax-ns", "https://w3id.org/won/agreement", "http://www.w3.org/2000/01/rdf-schema" ],
-    "iri" : "https://w3id.org/won/agreement#"
+    "languages" : [ "en", "undefined" ],
+    "baseIris" : [ "http://www.w3.org/1999/02/22-rdf-syntax-ns", "https://w3id.org/won/agreement", "http://www.w3.org/2000/01/rdf-schema", "https://w3id.org/won/message", "http://www.w3.org/2001/XMLSchema" ],
+    "title" : {
+      "en" : "Web of Needs Agreement Ontology"
+    },
+    "iri" : "https://w3id.org/won/agreement",
+    "author" : [ "Florian Kleedorfer" ],
+    "other" : {
+      "license" : [ {
+        "identifier" : "license",
+        "language" : "undefined",
+        "value" : "https://creativecommons.org/licenses/by/4.0/",
+        "type" : "iri"
+      } ],
+      "creator" : [ {
+        "identifier" : "creator",
+        "language" : "undefined",
+        "value" : "Florian Kleedorfer",
+        "type" : "label"
+      } ],
+      "created" : [ {
+        "identifier" : "created",
+        "language" : "undefined",
+        "value" : "2017-07-28",
+        "type" : "label"
+      } ],
+      "preferredNamespacePrefix" : [ {
+        "identifier" : "preferredNamespacePrefix",
+        "language" : "undefined",
+        "value" : "agr",
+        "type" : "label"
+      } ],
+      "abstract" : [ {
+        "identifier" : "abstract",
+        "language" : "en",
+        "value" : "Connections between Atoms on the Web of Needs allow for non-repudiable communication between two agents. The Agreement protocol provides means for the communication partners to establish and manage a set of agreed-upon RDF triples as a result of communication acts. Each partner can calculate the set of triples solely based on the communication history. The acts are *stating*, *proposing*, *accepting*, *claiming', *rejecting* and *proposing to cancel*. Stating is simply the act of sending a Message containing some RDF triples; the other acts are executed by referencing earlier messages using the object properties in this ontology.",
+        "type" : "label"
+      } ],
+      "title" : [ {
+        "identifier" : "title",
+        "language" : "en",
+        "value" : "Web of Needs Agreement Ontology",
+        "type" : "label"
+      } ]
+    }
   },
   "namespace" : [ ],
   "class" : [ {
-    "id" : "0",
+    "id" : "3",
     "type" : "owl:Class"
   }, {
     "id" : "2",
-    "type" : "owl:Thing"
+    "type" : "owl:unionOf"
   }, {
-    "id" : "3",
-    "type" : "owl:Thing"
+    "id" : "7",
+    "type" : "owl:unionOf"
   }, {
-    "id" : "5",
+    "id" : "4",
+    "type" : "owl:Class"
+  }, {
+    "id" : "1",
+    "type" : "owl:Class"
+  }, {
+    "id" : "6",
     "type" : "owl:Class"
   } ],
   "classAttribute" : [ {
+    "iri" : "https://w3id.org/won/agreement#Claim",
+    "baseIri" : "https://w3id.org/won/agreement",
+    "instances" : 0,
+    "label" : {
+      "IRI-based" : "Claim",
+      "undefined" : "Claim"
+    },
+    "comment" : {
+      "en" : "A Message that claims other Messages using `msg:claims` is a Claim. It can become an Agreement via `msg:accepts` or it can be rejected via `msg:rejects`.\n\nThe difference between a Claim and a Proposal is that the claim's content is interpreted as agreed-upon until rejected, while a Proposal's content is only interpreted as agreed-upon after it is accepted."
+    },
+    "id" : "3",
+    "superClasses" : [ "4" ]
+  }, {
+    "instances" : 0,
+    "union" : [ "3", "6" ],
+    "attributes" : [ "union", "anonymous" ],
+    "id" : "2"
+  }, {
+    "instances" : 0,
+    "union" : [ "3", "6" ],
+    "attributes" : [ "union", "anonymous" ],
+    "id" : "7"
+  }, {
+    "iri" : "https://w3id.org/won/message#Message",
+    "baseIri" : "https://w3id.org/won/message",
+    "instances" : 0,
+    "label" : {
+      "IRI-based" : "Message"
+    },
+    "subClasses" : [ "1", "3", "6" ],
+    "attributes" : [ "external" ],
+    "id" : "4"
+  }, {
     "iri" : "https://w3id.org/won/agreement#Agreement",
     "baseIri" : "https://w3id.org/won/agreement",
     "instances" : 0,
     "label" : {
-      "IRI-based" : "Agreement"
+      "IRI-based" : "Agreement",
+      "undefined" : "Agreement"
     },
     "comment" : {
-      "en" : "The message that accepts a proposal concludes an agreement. It is the last message that is taken into account when calculating the content of the agreement, which makes it suitable for identifying the agreement. Therefore, it is given the type Agreement."
+      "en" : "The message references a Proposal via `msg:accepts` thereby concludes an Agreement. It is the last message that is taken into account when calculating the content of the Agreement, which makes it suitable for identifying the Agreement. Therefore, it is given the type Agreement."
     },
-    "id" : "0"
-  }, {
-    "iri" : "http://www.w3.org/2002/07/owl#Thing",
-    "baseIri" : "http://owl2vowl.de",
-    "id" : "2",
-    "label" : {
-      "undefined" : "Thing"
-    }
-  }, {
-    "iri" : "http://www.w3.org/2002/07/owl#Thing",
-    "baseIri" : "http://owl2vowl.de",
-    "id" : "3",
-    "label" : {
-      "undefined" : "Thing"
-    }
+    "id" : "1",
+    "superClasses" : [ "4" ]
   }, {
     "iri" : "https://w3id.org/won/agreement#Proposal",
     "baseIri" : "https://w3id.org/won/agreement",
     "instances" : 0,
     "label" : {
-      "IRI-based" : "Proposal"
+      "IRI-based" : "Proposal",
+      "undefined" : "Proposal"
     },
     "comment" : {
-      "en" : "The message that proposes other messages or proposes to cancel agreements is a Proposal."
+      "en" : "The Message that proposes other Messages or proposes to cancel Agreements is a Proposal.\n\nThe difference between a Claim and a Proposal is that the claim's content is interpreted as agreed-upon until rejected, while a Proposal's content is only interpreted as agreed-upon after it is accepted."
     },
-    "id" : "5"
+    "id" : "6",
+    "superClasses" : [ "4" ]
   } ],
   "property" : [ {
-    "id" : "1",
+    "id" : "0",
     "type" : "owl:objectProperty"
   }, {
-    "id" : "4",
+    "id" : "5",
+    "type" : "owl:disjointWith"
+  }, {
+    "id" : "8",
+    "type" : "rdfs:SubClassOf"
+  }, {
+    "id" : "9",
+    "type" : "rdfs:SubClassOf"
+  }, {
+    "id" : "10",
+    "type" : "rdfs:SubClassOf"
+  }, {
+    "id" : "11",
     "type" : "owl:objectProperty"
   }, {
-    "id" : "6",
+    "id" : "12",
     "type" : "owl:objectProperty"
   }, {
-    "id" : "7",
+    "id" : "13",
+    "type" : "owl:objectProperty"
+  }, {
+    "id" : "14",
+    "type" : "owl:disjointWith"
+  }, {
+    "id" : "15",
+    "type" : "owl:disjointWith"
+  }, {
+    "id" : "16",
     "type" : "owl:objectProperty"
   } ],
   "propertyAttribute" : [ {
@@ -74,43 +166,100 @@
     "baseIri" : "https://w3id.org/won/agreement",
     "range" : "2",
     "label" : {
-      "IRI-based" : "accepts"
+      "IRI-based" : "accepts",
+      "undefined" : "accepts"
     },
-    "domain" : "0",
+    "domain" : "1",
     "comment" : {
-      "en" : "Used to link two message resources. The message in the subject accepts the message in the object. This only makes sense if the object references a proposal.\n\nDuring the projection from the edited conversation dataset to the agreement dataset, the validity of agreements is checked. Proposal messages that were not accepted are dropped, as are invalid or cancelled Agreements."
+      "en" : "By referencing a Proposal via `msg:accepts` in the ContentGraph of subsequent Mesage, an Agreement is created."
     },
     "attributes" : [ "object" ],
-    "id" : "1"
+    "id" : "0"
   }, {
-    "iri" : "https://w3id.org/won/agreement#reject",
-    "baseIri" : "https://w3id.org/won/agreement",
-    "range" : "3",
-    "label" : {
-      "IRI-based" : "reject"
-    },
-    "domain" : "5",
-    "attributes" : [ "object" ],
-    "id" : "4"
+    "range" : "6",
+    "domain" : "3",
+    "attributes" : [ "object", "anonymous" ],
+    "id" : "5"
   }, {
-    "iri" : "https://w3id.org/won/agreement#proposesToCancel",
+    "range" : "4",
+    "domain" : "1",
+    "attributes" : [ "object", "anonymous" ],
+    "id" : "8"
+  }, {
+    "range" : "4",
+    "domain" : "3",
+    "attributes" : [ "object", "anonymous" ],
+    "id" : "9"
+  }, {
+    "range" : "4",
+    "domain" : "6",
+    "attributes" : [ "object", "anonymous" ],
+    "id" : "10"
+  }, {
+    "iri" : "https://w3id.org/won/agreement#claims",
     "baseIri" : "https://w3id.org/won/agreement",
-    "range" : "3",
+    "range" : "4",
     "label" : {
-      "IRI-based" : "proposesToCancel"
+      "IRI-based" : "claims",
+      "undefined" : "claims"
     },
-    "domain" : "5",
+    "domain" : "3",
+    "comment" : {
+      "en" : "By referencing an earlier Message via `msg:claims` in the ContentGraph of subsequent Mesage, a Claim is created. Claims can be affirmed by the counterpart using `msg:accepts` or rejected using `msg:rejects`."
+    },
     "attributes" : [ "object" ],
-    "id" : "6"
+    "id" : "11"
   }, {
     "iri" : "https://w3id.org/won/agreement#proposes",
     "baseIri" : "https://w3id.org/won/agreement",
-    "range" : "3",
+    "range" : "4",
     "label" : {
-      "IRI-based" : "proposes"
+      "IRI-based" : "proposes",
+      "undefined" : "proposes"
     },
-    "domain" : "5",
+    "domain" : "6",
+    "comment" : {
+      "en" : "By referencing a Message via `msg:accepts` in the ContentGraph of subsequent Mesage, a Proposal is created."
+    },
     "attributes" : [ "object" ],
-    "id" : "7"
+    "id" : "12"
+  }, {
+    "iri" : "https://w3id.org/won/agreement#rejects",
+    "baseIri" : "https://w3id.org/won/agreement",
+    "range" : "7",
+    "label" : {
+      "IRI-based" : "rejects",
+      "undefined" : "rejects"
+    },
+    "domain" : "4",
+    "comment" : {
+      "en" : "By referencing a Proposal via `msg:rejects` in the ContentGraph of subsequent Mesage, that Proposal is rejected and cannot become a valid Agreement any more."
+    },
+    "attributes" : [ "object" ],
+    "id" : "13"
+  }, {
+    "range" : "3",
+    "domain" : "1",
+    "attributes" : [ "object", "anonymous" ],
+    "id" : "14"
+  }, {
+    "range" : "6",
+    "domain" : "1",
+    "attributes" : [ "object", "anonymous" ],
+    "id" : "15"
+  }, {
+    "iri" : "https://w3id.org/won/agreement#proposesToCancel",
+    "baseIri" : "https://w3id.org/won/agreement",
+    "range" : "1",
+    "label" : {
+      "IRI-based" : "proposesToCancel",
+      "undefined" : "proposesToCancel"
+    },
+    "domain" : "6",
+    "comment" : {
+      "en" : "By referencing an Agreement via `msg:proposesToCancel` in the ContentGraph of subsequent Mesage, a Proposal to cancel an Agreement is created."
+    },
+    "attributes" : [ "object" ],
+    "id" : "16"
   } ]
 }

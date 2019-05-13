@@ -9,13 +9,41 @@
     } ]
   } ]
 }, {
-  "@id" : "_:genid19",
+  "@id" : "_:genid10",
+  "@type" : [ "http://www.w3.org/2002/07/owl#AllDisjointClasses" ],
+  "http://www.w3.org/2002/07/owl#members" : [ {
+    "@list" : [ {
+      "@id" : "http://www.w3.org/ns/ldp#CompositeContainer"
+    }, {
+      "@id" : "https://w3id.org/won/core#Atom"
+    }, {
+      "@id" : "https://w3id.org/won/core#AtomState"
+    }, {
+      "@id" : "https://w3id.org/won/core#Connection"
+    }, {
+      "@id" : "https://w3id.org/won/core#ConnectionState"
+    }, {
+      "@id" : "https://w3id.org/won/core#Flag"
+    }, {
+      "@id" : "https://w3id.org/won/core#Node"
+    }, {
+      "@id" : "https://w3id.org/won/core#Socket"
+    }, {
+      "@id" : "https://w3id.org/won/core#SocketDefinition"
+    }, {
+      "@id" : "https://w3id.org/won/core#UriPrefixSpecification"
+    }, {
+      "@id" : "https://w3id.org/won/core#WonProtocol"
+    } ]
+  } ]
+}, {
+  "@id" : "_:genid22",
   "@type" : [ "http://www.w3.org/2002/07/owl#AllDifferent" ],
   "http://www.w3.org/2002/07/owl#distinctMembers" : [ {
     "@list" : [ ]
   } ]
 }, {
-  "@id" : "_:genid20",
+  "@id" : "_:genid23",
   "@type" : [ "http://www.w3.org/2002/07/owl#AllDifferent" ],
   "http://www.w3.org/2002/07/owl#distinctMembers" : [ {
     "@list" : [ {
@@ -45,6 +73,56 @@
     } ]
   } ]
 }, {
+  "@id" : "_:genid36",
+  "@type" : [ "http://www.w3.org/2002/07/owl#AllDisjointProperties" ],
+  "http://www.w3.org/2002/07/owl#members" : [ {
+    "@list" : [ {
+      "@id" : "http://www.w3.org/2002/07/owl#topObjectProperty"
+    }, {
+      "@id" : "https://w3id.org/won/core#atomList"
+    }, {
+      "@id" : "https://w3id.org/won/core#atomState"
+    }, {
+      "@id" : "https://w3id.org/won/core#compatibleSocketDefinition"
+    }, {
+      "@id" : "https://w3id.org/won/core#connectionState"
+    }, {
+      "@id" : "https://w3id.org/won/core#connections"
+    }, {
+      "@id" : "https://w3id.org/won/core#contentGraph"
+    }, {
+      "@id" : "https://w3id.org/won/core#defaultSocket"
+    }, {
+      "@id" : "https://w3id.org/won/core#derivesAtomProperty"
+    }, {
+      "@id" : "https://w3id.org/won/core#derivesInverseAtomProperty"
+    }, {
+      "@id" : "https://w3id.org/won/core#flag"
+    }, {
+      "@id" : "https://w3id.org/won/core#messageContainer"
+    }, {
+      "@id" : "https://w3id.org/won/core#seeks"
+    }, {
+      "@id" : "https://w3id.org/won/core#socket"
+    }, {
+      "@id" : "https://w3id.org/won/core#socketDefinition"
+    }, {
+      "@id" : "https://w3id.org/won/core#sourceAtom"
+    }, {
+      "@id" : "https://w3id.org/won/core#supportsWonProtocolImpl"
+    }, {
+      "@id" : "https://w3id.org/won/core#targetAtom"
+    }, {
+      "@id" : "https://w3id.org/won/core#targetConnection"
+    }, {
+      "@id" : "https://w3id.org/won/core#targetSocket"
+    }, {
+      "@id" : "https://w3id.org/won/core#uriPrefixSpecification"
+    }, {
+      "@id" : "https://w3id.org/won/core#wonNode"
+    } ]
+  } ]
+}, {
   "@id" : "_:genid4",
   "@type" : [ "http://www.w3.org/2002/07/owl#Class" ],
   "http://www.w3.org/2002/07/owl#unionOf" : [ {
@@ -56,30 +134,12 @@
   } ]
 }, {
   "@id" : "_:genid7",
-  "@type" : [ "http://www.w3.org/2002/07/owl#AllDisjointClasses" ],
-  "http://www.w3.org/2002/07/owl#members" : [ {
+  "@type" : [ "http://www.w3.org/2002/07/owl#Class" ],
+  "http://www.w3.org/2002/07/owl#unionOf" : [ {
     "@list" : [ {
-      "@id" : "http://www.w3.org/ns/ldp#CompositeContainer"
-    }, {
       "@id" : "https://w3id.org/won/core#Atom"
     }, {
-      "@id" : "https://w3id.org/won/core#AtomState"
-    }, {
       "@id" : "https://w3id.org/won/core#Connection"
-    }, {
-      "@id" : "https://w3id.org/won/core#ConnectionState"
-    }, {
-      "@id" : "https://w3id.org/won/core#Flag"
-    }, {
-      "@id" : "https://w3id.org/won/core#Node"
-    }, {
-      "@id" : "https://w3id.org/won/core#Socket"
-    }, {
-      "@id" : "https://w3id.org/won/core#SocketDefinition"
-    }, {
-      "@id" : "https://w3id.org/won/core#UriPrefixSpecification"
-    }, {
-      "@id" : "https://w3id.org/won/core#WonProtocol"
     } ]
   } ]
 }, {
@@ -96,6 +156,12 @@
   "@type" : [ "http://www.w3.org/2002/07/owl#AnnotationProperty" ]
 }, {
   "@id" : "http://purl.org/dc/elements/1.1/title",
+  "@type" : [ "http://www.w3.org/2002/07/owl#AnnotationProperty" ]
+}, {
+  "@id" : "http://purl.org/dc/terms/created",
+  "@type" : [ "http://www.w3.org/2002/07/owl#AnnotationProperty" ]
+}, {
+  "@id" : "http://purl.org/dc/terms/license",
   "@type" : [ "http://www.w3.org/2002/07/owl#AnnotationProperty" ]
 }, {
   "@id" : "http://purl.org/vocab/vann/preferredNamespacePrefix",
@@ -117,19 +183,22 @@
   "@type" : [ "http://www.w3.org/2002/07/owl#Ontology" ],
   "http://purl.org/dc/elements/1.1/abstract" : [ {
     "@language" : "en",
-    "@value" : "The Web of Needs is a decentralized linked data application infrastructure for mediating cooperation in the broadest sense. Based on append-only message logs, users (or other agents) publish objects (*Atoms*) that can establish *Connections*  with other Atoms. Matching services can make suggestions which atoms to connect to. An Atom specifies 'Sockets' indicating the kinds of Connections it is prepared to establish."
+    "@value" : "The Web of Needs is a decentralized linked data application infrastructure for mediating cooperation in the broadest sense. \n\nBased on append-only message logs, users (or other agents) publish and manage objects (*Atoms*). The main goal of publishing Atoms is to express interest in cooperation, for example by specifying something that is needed or being offered. However, Atoms can contain arbitrary data and thus be used to build general linked data knowledge graphs.\n\nAtoms can establish *Connections*  with other Atoms, if both Atoms' owners agree to it.\n\nMatching services can make suggestions which atoms to connect to. An Atom specifies 'Sockets' indicating the kinds of Connections it is prepared to establish."
   } ],
   "http://purl.org/dc/elements/1.1/creator" : [ {
     "@value" : "Fabian Salcher"
   }, {
     "@value" : "Florian Kleedorfer"
   } ],
-  "http://purl.org/dc/elements/1.1/date" : [ {
+  "http://purl.org/dc/elements/1.1/title" : [ {
+    "@value" : "Web of Needs Core Ontology"
+  } ],
+  "http://purl.org/dc/terms/created" : [ {
     "@type" : "http://www.w3.org/2001/XMLSchema#date",
     "@value" : "2013-12-13"
   } ],
-  "http://purl.org/dc/elements/1.1/title" : [ {
-    "@value" : "Web of Needs Core Ontology"
+  "http://purl.org/dc/terms/license" : [ {
+    "@id" : "https://creativecommons.org/licenses/by/4.0/"
   } ],
   "http://purl.org/vocab/vann/preferredNamespacePrefix" : [ {
     "@value" : "won"
@@ -714,6 +783,22 @@
     "@id" : "https://w3id.org/won/core#ConnectionContainer"
   } ]
 }, {
+  "@id" : "https://w3id.org/won/core#contentGraph",
+  "@type" : [ "http://www.w3.org/2002/07/owl#ObjectProperty" ],
+  "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
+    "@language" : "en",
+    "@value" : "Links an Atom to an RDF graph holding some of its RDF content."
+  } ],
+  "http://www.w3.org/2000/01/rdf-schema#domain" : [ {
+    "@id" : "https://w3id.org/won/core#Atom"
+  } ],
+  "http://www.w3.org/2000/01/rdf-schema#label" : [ {
+    "@value" : "contentGraph"
+  } ],
+  "http://www.w3.org/2000/01/rdf-schema#range" : [ {
+    "@id" : "http://www.w3.org/2002/07/owl#Thing"
+  } ]
+}, {
   "@id" : "https://w3id.org/won/core#defaultSocket",
   "@type" : [ "http://www.w3.org/2002/07/owl#ObjectProperty" ],
   "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
@@ -1113,5 +1198,33 @@
   } ],
   "http://www.w3.org/2000/01/rdf-schema#range" : [ {
     "@id" : "https://w3id.org/won/core#UriPrefixSpecification"
+  } ]
+}, {
+  "@id" : "https://w3id.org/won/core#won:textMessage",
+  "@type" : [ "http://www.w3.org/2002/07/owl#DatatypeProperty" ],
+  "http://www.w3.org/2000/01/rdf-schema#label" : [ {
+    "@language" : "en",
+    "@value" : "Specifies a text message."
+  }, {
+    "@value" : "textMessage"
+  } ],
+  "http://www.w3.org/2000/01/rdf-schema#range" : [ {
+    "@id" : "http://www.w3.org/2001/XMLSchema#string"
+  } ]
+}, {
+  "@id" : "https://w3id.org/won/core#wonNode",
+  "@type" : [ "http://www.w3.org/2002/07/owl#ObjectProperty" ],
+  "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
+    "@language" : "en",
+    "@value" : "Links an Atom or Connection to their WoN node."
+  } ],
+  "http://www.w3.org/2000/01/rdf-schema#domain" : [ {
+    "@id" : "_:genid7"
+  } ],
+  "http://www.w3.org/2000/01/rdf-schema#label" : [ {
+    "@value" : "wonNode"
+  } ],
+  "http://www.w3.org/2000/01/rdf-schema#range" : [ {
+    "@id" : "https://w3id.org/won/core#Node"
   } ]
 } ]

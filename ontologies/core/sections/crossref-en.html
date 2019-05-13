@@ -73,6 +73,7 @@ It specifies a content - what the atom is about, which may be something that is 
          <dd>
             <a href="#atomState" title="https://w3id.org/won/core#atomState">atomState</a>
             <sup class="type-op" title="object property">op</sup>, <a href="#connections" title="https://w3id.org/won/core#connections">connections</a>
+            <sup class="type-op" title="object property">op</sup>, <a href="#contentGraph" title="https://w3id.org/won/core#contentGraph">contentGraph</a>
             <sup class="type-op" title="object property">op</sup>, <a href="#defaultSocket" title="https://w3id.org/won/core#defaultSocket">defaultSocket</a>
             <sup class="type-op" title="object property">op</sup>, <a href="#doNotMatchAfter" title="https://w3id.org/won/core#doNotMatchAfter">doNotMatchAfter</a>
             <sup class="type-dp" title="data property">dp</sup>, <a href="#doNotMatchBefore" title="https://w3id.org/won/core#doNotMatchBefore">doNotMatchBefore</a>
@@ -438,6 +439,11 @@ The container supports LDP paging as described here: https://github.com/research
             <sup class="type-op" title="object property">op</sup>, <a href="#uriPrefixSpecification" title="https://w3id.org/won/core#uriPrefixSpecification">uriPrefixSpecification</a>
             <sup class="type-op" title="object property">op</sup>
          </dd>
+         <dt>is in range of</dt>
+         <dd>
+            <a href="#wonNode" title="https://w3id.org/won/core#wonNode">wonNode</a>
+            <sup class="type-op" title="object property">op</sup>
+         </dd>
          <dt>is disjoint with</dt>
          <dd>
             <a href="#http://www.w3.org/ns/ldp#CompositeContainer" title="http://www.w3.org/ns/ldp#CompositeContainer">composite container</a>
@@ -684,6 +690,9 @@ The container supports LDP paging as described here: https://github.com/research
          <a href="#connectionState" title="https://w3id.org/won/core#connectionState">connectionState</a>
       </li>
       <li>
+         <a href="#contentGraph" title="https://w3id.org/won/core#contentGraph">contentGraph</a>
+      </li>
+      <li>
          <a href="#defaultSocket" title="https://w3id.org/won/core#defaultSocket">defaultSocket</a>
       </li>
       <li>
@@ -726,6 +735,9 @@ The container supports LDP paging as described here: https://github.com/research
       </li>
       <li>
          <a href="#uriPrefixSpecification" title="https://w3id.org/won/core#uriPrefixSpecification">uriPrefixSpecification</a>
+      </li>
+      <li>
+         <a href="#wonNode" title="https://w3id.org/won/core#wonNode">wonNode</a>
       </li>
    </ul>
    <div class="entity" id="atomList">
@@ -870,6 +882,31 @@ The container supports LDP paging as described here: https://github.com/research
             <dt>has range</dt>
             <dd>
                <a href="#ConnectionState" title="https://w3id.org/won/core#ConnectionState">ConnectionState</a>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
+         </dl>
+      </div>
+   </div>
+   <div class="entity" id="contentGraph">
+      <h3>contentGraph<sup class="type-op" title="object property">op</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#objectproperties">Object Property ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/core#contentGraph</p>
+      <div class="comment">
+         <span class="markdown">Links an Atom to an RDF graph holding some of its RDF content.</span>
+      </div>
+      <div class="description">
+         <dl>
+            <dt>has domain</dt>
+            <dd>
+               <a href="#Atom" title="https://w3id.org/won/core#Atom">Atom</a>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
+            <dt>has range</dt>
+            <dd>
+               <span class="dotted" title="http://www.w3.org/2002/07/owl#Thing">thing</span>
                <sup class="type-c" title="class">c</sup>
             </dd>
          </dl>
@@ -1290,6 +1327,34 @@ sought to fulfill the atom in contrast to the part that is available.</span>
          </dl>
       </div>
    </div>
+   <div class="entity" id="wonNode">
+      <h3>wonNode<sup class="type-op" title="object property">op</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#objectproperties">Object Property ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/core#wonNode</p>
+      <div class="comment">
+         <span class="markdown">Links an Atom or Connection to their WoN node.</span>
+      </div>
+      <div class="description">
+         <dl>
+            <dt>has domain</dt>
+            <dd>
+               <a href="#Atom" title="https://w3id.org/won/core#Atom">Atom</a>
+               <sup class="type-c" title="class">c</sup> 
+               <span class="logic">or</span> 
+               <a href="#Connection" title="https://w3id.org/won/core#Connection">Connection</a>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
+            <dt>has range</dt>
+            <dd>
+               <a href="#Node" title="https://w3id.org/won/core#Node">Node</a>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
+         </dl>
+      </div>
+   </div>
 </div><div id="dataproperties">
    <h3 id="dataproperties-headline" class="list">Data Properties</h3>
    <ul class="hlist">
@@ -1343,6 +1408,9 @@ sought to fulfill the atom in contrast to the part that is available.</span>
       </li>
       <li>
          <a href="#socketCapacity" title="https://w3id.org/won/core#socketCapacity">socketCapacity</a>
+      </li>
+      <li>
+         <a href="#won:textMessage" title="https://w3id.org/won/core#won:textMessage">Specifies a text message.</a>
       </li>
       <li>
          <a href="#tag" title="https://w3id.org/won/core#tag">tag</a>
@@ -1768,6 +1836,22 @@ sought to fulfill the atom in contrast to the part that is available.</span>
             <dt>has range</dt>
             <dd>
                <span class="dotted" title="http://www.w3.org/2001/XMLSchema#integer">integer</span>
+            </dd>
+         </dl>
+      </div>
+   </div>
+   <div class="entity" id="won:textMessage">
+      <h3>Specifies a text message.<sup class="type-dp" title="data property">dp</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#dataproperties">Data Property ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/core#won:textMessage</p>
+      <div class="description">
+         <dl>
+            <dt>has range</dt>
+            <dd>
+               <span class="dotted" title="http://www.w3.org/2001/XMLSchema#string">string</span>
             </dd>
          </dl>
       </div>

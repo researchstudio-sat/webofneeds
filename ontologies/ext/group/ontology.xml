@@ -7,11 +7,81 @@
      xmlns:xml="http://www.w3.org/XML/1998/namespace"
      xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
      xmlns:core="https://w3id.org/won/core#"
-     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     xmlns:vann="http://purl.org/vocab/vann/"
+     xmlns:terms="http://purl.org/dc/terms/">
     <owl:Ontology rdf:about="https://w3id.org/won/ext/group">
+        <owl:versionIRI rdf:resource="https://w3id.org/won/ext/group/1.0"/>
         <owl:imports rdf:resource="https://w3id.org/won/core"/>
         <owl:imports rdf:resource="https://w3id.org/won/ext/chat"/>
+        <dc:abstract xml:lang="en">This ontology contains the definition of the *GroupSocket*, which, when used to establish a connection, puts all connectd Atoms in a group, expressed by the *groupMember* relationship between the Atoms and the Atom representing the group. Moreover, messages are broadcast to all group members.</dc:abstract>
+        <dc:creator>Florian Kleedorfer</dc:creator>
+        <dc:date rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2019-04-15</dc:date>
+        <dc:title>Web of Needs Group Extension</dc:title>
+        <terms:license rdf:resource="https://creativecommons.org/licenses/by/4.0/"/>
+        <vann:preferredNamespacePrefix>grp</vann:preferredNamespacePrefix>
     </owl:Ontology>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Annotation properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+
+    
+
+
+    <!-- http://purl.org/dc/elements/1.1/abstract -->
+
+
+    <owl:AnnotationProperty rdf:about="http://purl.org/dc/elements/1.1/abstract"/>
+    
+
+
+    <!-- http://purl.org/dc/elements/1.1/creator -->
+
+
+    <owl:AnnotationProperty rdf:about="http://purl.org/dc/elements/1.1/creator"/>
+    
+
+
+    <!-- http://purl.org/dc/elements/1.1/date -->
+
+
+    <owl:AnnotationProperty rdf:about="http://purl.org/dc/elements/1.1/date"/>
+    
+
+
+    <!-- http://purl.org/dc/elements/1.1/description -->
+
+
+    <owl:AnnotationProperty rdf:about="http://purl.org/dc/elements/1.1/description"/>
+    
+
+
+    <!-- http://purl.org/dc/elements/1.1/title -->
+
+
+    <owl:AnnotationProperty rdf:about="http://purl.org/dc/elements/1.1/title"/>
+    
+
+
+    <!-- http://purl.org/dc/terms/license -->
+
+
+    <owl:AnnotationProperty rdf:about="http://purl.org/dc/terms/license"/>
+    
+
+
+    <!-- http://purl.org/vocab/vann/preferredNamespacePrefix -->
+
+
+    <owl:AnnotationProperty rdf:about="http://purl.org/vocab/vann/preferredNamespacePrefix"/>
     
 
 
@@ -56,6 +126,8 @@
         <rdf:type rdf:resource="https://w3id.org/won/core#SocketDefinition"/>
         <core:compatibleSocketDefinition rdf:resource="https://w3id.org/won/ext/chat#ChatSocket"/>
         <core:derivesAtomProperty rdf:resource="https://w3id.org/won/ext/group#groupMember"/>
+        <rdfs:comment xml:lang="en">Socket for connecting to the Atom as a group member.</rdfs:comment>
+        <rdfs:label>GroupSocket</rdfs:label>
     </owl:NamedIndividual>
     
 
@@ -78,6 +150,7 @@
 
     <rdf:Description rdf:about="https://w3id.org/won/ext/group#groupMember">
         <rdfs:comment xml:lang="en">Links a group Atom to one of its group members.</rdfs:comment>
+        <rdfs:label>groupMember</rdfs:label>
     </rdf:Description>
 </rdf:RDF>
 

@@ -1,4 +1,45 @@
-<https://w3id.org/won/agreement#> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Ontology> .
+<https://w3id.org/won/agreement> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Ontology> .
+<https://w3id.org/won/agreement> <http://www.w3.org/2002/07/owl#versionIRI> <https://w3id.org/won/agreement/1.0> .
+<https://w3id.org/won/agreement> <http://www.w3.org/2002/07/owl#imports> <https://w3id.org/won/message/1.0> .
+<https://w3id.org/won/agreement> <http://purl.org/dc/elements/1.1/abstract> "Connections between Atoms on the Web of Needs allow for non-repudiable communication between two agents. The Agreement protocol provides means for the communication partners to establish and manage a set of agreed-upon RDF triples as a result of communication acts. Each partner can calculate the set of triples solely based on the communication history. The acts are *stating*, *proposing*, *accepting*, *claiming', *rejecting* and *proposing to cancel*. Stating is simply the act of sending a Message containing some RDF triples; the other acts are executed by referencing earlier messages using the object properties in this ontology."@en .
+<https://w3id.org/won/agreement> <http://purl.org/dc/elements/1.1/creator> "Florian Kleedorfer" .
+<https://w3id.org/won/agreement> <http://purl.org/dc/elements/1.1/title> "Web of Needs Agreement Ontology"@en .
+<https://w3id.org/won/agreement> <http://purl.org/dc/terms/created> "2017-07-28"^^<http://www.w3.org/2001/XMLSchema#date> .
+<https://w3id.org/won/agreement> <http://purl.org/dc/terms/license> <https://creativecommons.org/licenses/by/4.0/> .
+<https://w3id.org/won/agreement> <http://purl.org/vocab/vann/preferredNamespacePrefix> "agr" .
+# 
+# 
+# #################################################################
+# #
+# #    Annotation properties
+# #
+# #################################################################
+# 
+# 
+# http://purl.org/dc/elements/1.1/abstract
+<http://purl.org/dc/elements/1.1/abstract> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
+# 
+# http://purl.org/dc/elements/1.1/creator
+<http://purl.org/dc/elements/1.1/creator> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
+# 
+# http://purl.org/dc/elements/1.1/date
+<http://purl.org/dc/elements/1.1/date> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
+# 
+# http://purl.org/dc/elements/1.1/description
+<http://purl.org/dc/elements/1.1/description> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
+# 
+# http://purl.org/dc/elements/1.1/title
+<http://purl.org/dc/elements/1.1/title> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
+# 
+# http://purl.org/dc/terms/created
+<http://purl.org/dc/terms/created> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
+# 
+# http://purl.org/dc/terms/license
+<http://purl.org/dc/terms/license> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
+# 
+# http://purl.org/vocab/vann/preferredNamespacePrefix
+<http://purl.org/vocab/vann/preferredNamespacePrefix> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
+# 
 # 
 # 
 # #################################################################
@@ -11,19 +52,54 @@
 # https://w3id.org/won/agreement#accepts
 <https://w3id.org/won/agreement#accepts> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
 <https://w3id.org/won/agreement#accepts> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/agreement#Agreement> .
-<https://w3id.org/won/agreement#accepts> <http://www.w3.org/2000/01/rdf-schema#comment> "Used to link two message resources. The message in the subject accepts the message in the object. This only makes sense if the object references a proposal.\n\nDuring the projection from the edited conversation dataset to the agreement dataset, the validity of agreements is checked. Proposal messages that were not accepted are dropped, as are invalid or cancelled Agreements."@en .
+<https://w3id.org/won/agreement#accepts> <http://www.w3.org/2000/01/rdf-schema#range> _:genid1 .
+_:genid1 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+_:genid1 <http://www.w3.org/2002/07/owl#unionOf> _:genid3 .
+_:genid3 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
+_:genid3 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/agreement#Claim> .
+_:genid3 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:genid2 .
+_:genid2 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
+_:genid2 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/agreement#Proposal> .
+_:genid2 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/1999/02/22-rdf-syntax-ns#nil> .
+<https://w3id.org/won/agreement#accepts> <http://www.w3.org/2000/01/rdf-schema#comment> "By referencing a Proposal via `msg:accepts` in the ContentGraph of subsequent Mesage, an Agreement is created."@en .
+<https://w3id.org/won/agreement#accepts> <http://www.w3.org/2000/01/rdf-schema#label> "accepts" .
+# 
+# https://w3id.org/won/agreement#claims
+<https://w3id.org/won/agreement#claims> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+<https://w3id.org/won/agreement#claims> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/agreement#Claim> .
+<https://w3id.org/won/agreement#claims> <http://www.w3.org/2000/01/rdf-schema#range> <https://w3id.org/won/message#Message> .
+<https://w3id.org/won/message#Message> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<https://w3id.org/won/agreement#claims> <http://www.w3.org/2000/01/rdf-schema#comment> "By referencing an earlier Message via `msg:claims` in the ContentGraph of subsequent Mesage, a Claim is created. Claims can be affirmed by the counterpart using `msg:accepts` or rejected using `msg:rejects`."@en .
+<https://w3id.org/won/agreement#claims> <http://www.w3.org/2000/01/rdf-schema#label> "claims" .
 # 
 # https://w3id.org/won/agreement#proposes
 <https://w3id.org/won/agreement#proposes> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
 <https://w3id.org/won/agreement#proposes> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/agreement#Proposal> .
+<https://w3id.org/won/agreement#proposes> <http://www.w3.org/2000/01/rdf-schema#range> <https://w3id.org/won/message#Message> .
+<https://w3id.org/won/agreement#proposes> <http://www.w3.org/2000/01/rdf-schema#comment> "By referencing a Message via `msg:accepts` in the ContentGraph of subsequent Mesage, a Proposal is created."@en .
+<https://w3id.org/won/agreement#proposes> <http://www.w3.org/2000/01/rdf-schema#label> "proposes" .
 # 
 # https://w3id.org/won/agreement#proposesToCancel
 <https://w3id.org/won/agreement#proposesToCancel> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
 <https://w3id.org/won/agreement#proposesToCancel> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/agreement#Proposal> .
+<https://w3id.org/won/agreement#proposesToCancel> <http://www.w3.org/2000/01/rdf-schema#range> <https://w3id.org/won/agreement#Agreement> .
+<https://w3id.org/won/agreement#proposesToCancel> <http://www.w3.org/2000/01/rdf-schema#comment> "By referencing an Agreement via `msg:proposesToCancel` in the ContentGraph of subsequent Mesage, a Proposal to cancel an Agreement is created."@en .
+<https://w3id.org/won/agreement#proposesToCancel> <http://www.w3.org/2000/01/rdf-schema#label> "proposesToCancel" .
 # 
-# https://w3id.org/won/agreement#reject
-<https://w3id.org/won/agreement#reject> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
-<https://w3id.org/won/agreement#reject> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/agreement#Proposal> .
+# https://w3id.org/won/agreement#rejects
+<https://w3id.org/won/agreement#rejects> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+<https://w3id.org/won/agreement#rejects> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/message#Message> .
+<https://w3id.org/won/agreement#rejects> <http://www.w3.org/2000/01/rdf-schema#range> _:genid4 .
+_:genid4 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+_:genid4 <http://www.w3.org/2002/07/owl#unionOf> _:genid6 .
+_:genid6 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
+_:genid6 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/agreement#Claim> .
+_:genid6 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:genid5 .
+_:genid5 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
+_:genid5 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/agreement#Proposal> .
+_:genid5 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/1999/02/22-rdf-syntax-ns#nil> .
+<https://w3id.org/won/agreement#rejects> <http://www.w3.org/2000/01/rdf-schema#comment> "By referencing a Proposal via `msg:rejects` in the ContentGraph of subsequent Mesage, that Proposal is rejected and cannot become a valid Agreement any more."@en .
+<https://w3id.org/won/agreement#rejects> <http://www.w3.org/2000/01/rdf-schema#label> "rejects" .
 # 
 # 
 # 
@@ -36,10 +112,61 @@
 # 
 # https://w3id.org/won/agreement#Agreement
 <https://w3id.org/won/agreement#Agreement> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
-<https://w3id.org/won/agreement#Agreement> <http://www.w3.org/2000/01/rdf-schema#comment> "The message that accepts a proposal concludes an agreement. It is the last message that is taken into account when calculating the content of the agreement, which makes it suitable for identifying the agreement. Therefore, it is given the type Agreement."@en .
+<https://w3id.org/won/agreement#Agreement> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <https://w3id.org/won/message#Message> .
+<https://w3id.org/won/agreement#Agreement> <http://www.w3.org/2000/01/rdf-schema#comment> "The message references a Proposal via `msg:accepts` thereby concludes an Agreement. It is the last message that is taken into account when calculating the content of the Agreement, which makes it suitable for identifying the Agreement. Therefore, it is given the type Agreement."@en .
+<https://w3id.org/won/agreement#Agreement> <http://www.w3.org/2000/01/rdf-schema#label> "Agreement" .
+# 
+# https://w3id.org/won/agreement#Claim
+<https://w3id.org/won/agreement#Claim> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<https://w3id.org/won/agreement#Claim> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <https://w3id.org/won/message#Message> .
+<https://w3id.org/won/agreement#Claim> <http://www.w3.org/2000/01/rdf-schema#comment> "A Message that claims other Messages using `msg:claims` is a Claim. It can become an Agreement via `msg:accepts` or it can be rejected via `msg:rejects`.\n\nThe difference between a Claim and a Proposal is that the claim's content is interpreted as agreed-upon until rejected, while a Proposal's content is only interpreted as agreed-upon after it is accepted."@en .
+<https://w3id.org/won/agreement#Claim> <http://www.w3.org/2000/01/rdf-schema#label> "Claim" .
 # 
 # https://w3id.org/won/agreement#Proposal
 <https://w3id.org/won/agreement#Proposal> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
-<https://w3id.org/won/agreement#Proposal> <http://www.w3.org/2000/01/rdf-schema#comment> "The message that proposes other messages or proposes to cancel agreements is a Proposal."@en .
+<https://w3id.org/won/agreement#Proposal> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <https://w3id.org/won/message#Message> .
+<https://w3id.org/won/agreement#Proposal> <http://www.w3.org/2000/01/rdf-schema#comment> "The Message that proposes other Messages or proposes to cancel Agreements is a Proposal.\n\nThe difference between a Claim and a Proposal is that the claim's content is interpreted as agreed-upon until rejected, while a Proposal's content is only interpreted as agreed-upon after it is accepted."@en .
+<https://w3id.org/won/agreement#Proposal> <http://www.w3.org/2000/01/rdf-schema#label> "Proposal" .
+# 
+# https://w3id.org/won/message#Message
+# 
+# 
+# 
+# #################################################################
+# #
+# #    General axioms
+# #
+# #################################################################
+# 
+# 
+_:genid7 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AllDisjointClasses> .
+_:genid7 <http://www.w3.org/2002/07/owl#members> _:genid10 .
+_:genid10 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
+_:genid10 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/agreement#Agreement> .
+_:genid10 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:genid9 .
+_:genid9 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
+_:genid9 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/agreement#Claim> .
+_:genid9 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:genid8 .
+_:genid8 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
+_:genid8 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/agreement#Proposal> .
+_:genid8 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/1999/02/22-rdf-syntax-ns#nil> .
+# 
+_:genid11 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AllDisjointProperties> .
+_:genid11 <http://www.w3.org/2002/07/owl#members> _:genid16 .
+_:genid16 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
+_:genid16 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/agreement#accepts> .
+_:genid16 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:genid15 .
+_:genid15 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
+_:genid15 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/agreement#claims> .
+_:genid15 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:genid14 .
+_:genid14 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
+_:genid14 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/agreement#proposes> .
+_:genid14 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:genid13 .
+_:genid13 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
+_:genid13 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/agreement#proposesToCancel> .
+_:genid13 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:genid12 .
+_:genid12 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
+_:genid12 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/agreement#rejects> .
+_:genid12 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/1999/02/22-rdf-syntax-ns#nil> .
 # 
 # Generated by the OWL API (version 5.1.9) https://github.com/owlcs/owlapi/

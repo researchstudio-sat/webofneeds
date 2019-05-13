@@ -1,54 +1,112 @@
-<html><h2 id="crossreference" class="list">Cross reference for [Ontology Name] classes, properties and dataproperties <span class="backlink"> back to <a href="#toc">ToC</a></span></h2>
-This section provides details for each class and property defined by [Ontology Name].
+<html><h2 id="crossreference" class="list">Cross reference for Web of Needs Agreement Ontology classes, properties and dataproperties <span class="backlink"> back to <a href="#toc">ToC</a></span></h2>
+This section provides details for each class and property defined by Web of Needs Agreement Ontology.
 <div id="classes">
    <h3 id="classes-headline" class="list">Classes</h3>
    <ul class="hlist">
       <li>
-         <a href="#Agreement" title="https://w3id.org/won/agreement#Agreement">
-            <span>agreement</span>
-         </a>
+         <a href="#Agreement" title="https://w3id.org/won/agreement#Agreement">Agreement</a>
       </li>
       <li>
-         <a href="#Proposal" title="https://w3id.org/won/agreement#Proposal">
-            <span>proposal</span>
-         </a>
+         <a href="#Claim" title="https://w3id.org/won/agreement#Claim">Claim</a>
+      </li>
+      <li>
+         <a href="#Proposal" title="https://w3id.org/won/agreement#Proposal">Proposal</a>
       </li>
    </ul>
    <div class="entity" id="Agreement">
-      <h3>agreement<sup class="type-c" title="class">c</sup>
+      <h3>Agreement<sup class="type-c" title="class">c</sup>
          <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#classes">Class ToC</a>
          </span>
       </h3>
       <p>
          <strong>IRI:</strong> https://w3id.org/won/agreement#Agreement</p>
       <div class="comment">
-         <span class="markdown">The message that accepts a proposal concludes an agreement. It is the last message that is taken into account when calculating the content of the agreement, which makes it suitable for identifying the agreement. Therefore, it is given the type Agreement.</span>
+         <span class="markdown">The message references a Proposal via `msg:accepts` thereby concludes an Agreement. It is the last message that is taken into account when calculating the content of the Agreement, which makes it suitable for identifying the Agreement. Therefore, it is given the type Agreement.</span>
       </div>
       <dl class="description">
+         <dt>has super-classes</dt>
+         <dd>
+            <span class="dotted" title="https://w3id.org/won/message#Message">message</span>
+            <sup class="type-c" title="class">c</sup>
+         </dd>
          <dt>is in domain of</dt>
          <dd>
             <a href="#accepts" title="https://w3id.org/won/agreement#accepts">accepts</a>
             <sup class="type-op" title="object property">op</sup>
          </dd>
+         <dt>is in range of</dt>
+         <dd>
+            <a href="#proposesToCancel" title="https://w3id.org/won/agreement#proposesToCancel">proposesToCancel</a>
+            <sup class="type-op" title="object property">op</sup>
+         </dd>
+         <dt>is disjoint with</dt>
+         <dd>
+            <a href="#Claim" title="https://w3id.org/won/agreement#Claim">Claim</a>
+            <sup class="type-c" title="class">c</sup>, <a href="#Proposal" title="https://w3id.org/won/agreement#Proposal">Proposal</a>
+            <sup class="type-c" title="class">c</sup>
+         </dd>
+      </dl>
+   </div>
+   <div class="entity" id="Claim">
+      <h3>Claim<sup class="type-c" title="class">c</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#classes">Class ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/agreement#Claim</p>
+      <div class="comment">
+         <span class="markdown">A Message that claims other Messages using `msg:claims` is a Claim. It can become an Agreement via `msg:accepts` or it can be rejected via `msg:rejects`.
+
+The difference between a Claim and a Proposal is that the claim's content is interpreted as agreed-upon until rejected, while a Proposal's content is only interpreted as agreed-upon after it is accepted.</span>
+      </div>
+      <dl class="description">
+         <dt>has super-classes</dt>
+         <dd>
+            <span class="dotted" title="https://w3id.org/won/message#Message">message</span>
+            <sup class="type-c" title="class">c</sup>
+         </dd>
+         <dt>is in domain of</dt>
+         <dd>
+            <a href="#claims" title="https://w3id.org/won/agreement#claims">claims</a>
+            <sup class="type-op" title="object property">op</sup>
+         </dd>
+         <dt>is disjoint with</dt>
+         <dd>
+            <a href="#Agreement" title="https://w3id.org/won/agreement#Agreement">Agreement</a>
+            <sup class="type-c" title="class">c</sup>, <a href="#Proposal" title="https://w3id.org/won/agreement#Proposal">Proposal</a>
+            <sup class="type-c" title="class">c</sup>
+         </dd>
       </dl>
    </div>
    <div class="entity" id="Proposal">
-      <h3>proposal<sup class="type-c" title="class">c</sup>
+      <h3>Proposal<sup class="type-c" title="class">c</sup>
          <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#classes">Class ToC</a>
          </span>
       </h3>
       <p>
          <strong>IRI:</strong> https://w3id.org/won/agreement#Proposal</p>
       <div class="comment">
-         <span class="markdown">The message that proposes other messages or proposes to cancel agreements is a Proposal.</span>
+         <span class="markdown">The Message that proposes other Messages or proposes to cancel Agreements is a Proposal.
+
+The difference between a Claim and a Proposal is that the claim's content is interpreted as agreed-upon until rejected, while a Proposal's content is only interpreted as agreed-upon after it is accepted.</span>
       </div>
       <dl class="description">
+         <dt>has super-classes</dt>
+         <dd>
+            <span class="dotted" title="https://w3id.org/won/message#Message">message</span>
+            <sup class="type-c" title="class">c</sup>
+         </dd>
          <dt>is in domain of</dt>
          <dd>
             <a href="#proposes" title="https://w3id.org/won/agreement#proposes">proposes</a>
-            <sup class="type-op" title="object property">op</sup>, <a href="#proposesToCancel" title="https://w3id.org/won/agreement#proposesToCancel">proposes to cancel</a>
-            <sup class="type-op" title="object property">op</sup>, <a href="#reject" title="https://w3id.org/won/agreement#reject">reject</a>
+            <sup class="type-op" title="object property">op</sup>, <a href="#proposesToCancel" title="https://w3id.org/won/agreement#proposesToCancel">proposesToCancel</a>
             <sup class="type-op" title="object property">op</sup>
+         </dd>
+         <dt>is disjoint with</dt>
+         <dd>
+            <a href="#Agreement" title="https://w3id.org/won/agreement#Agreement">Agreement</a>
+            <sup class="type-c" title="class">c</sup>, <a href="#Claim" title="https://w3id.org/won/agreement#Claim">Claim</a>
+            <sup class="type-c" title="class">c</sup>
          </dd>
       </dl>
    </div>
@@ -56,24 +114,19 @@ This section provides details for each class and property defined by [Ontology N
    <h3 id="properties" class="list">Object Properties</h3>
    <ul class="hlist">
       <li>
-         <a href="#accepts" title="https://w3id.org/won/agreement#accepts">
-            <span>accepts</span>
-         </a>
+         <a href="#accepts" title="https://w3id.org/won/agreement#accepts">accepts</a>
       </li>
       <li>
-         <a href="#proposes" title="https://w3id.org/won/agreement#proposes">
-            <span>proposes</span>
-         </a>
+         <a href="#claims" title="https://w3id.org/won/agreement#claims">claims</a>
       </li>
       <li>
-         <a href="#proposesToCancel" title="https://w3id.org/won/agreement#proposesToCancel">
-            <span>proposes to cancel</span>
-         </a>
+         <a href="#proposes" title="https://w3id.org/won/agreement#proposes">proposes</a>
       </li>
       <li>
-         <a href="#reject" title="https://w3id.org/won/agreement#reject">
-            <span>reject</span>
-         </a>
+         <a href="#proposesToCancel" title="https://w3id.org/won/agreement#proposesToCancel">proposesToCancel</a>
+      </li>
+      <li>
+         <a href="#rejects" title="https://w3id.org/won/agreement#rejects">rejects</a>
       </li>
    </ul>
    <div class="entity" id="accepts">
@@ -84,15 +137,46 @@ This section provides details for each class and property defined by [Ontology N
       <p>
          <strong>IRI:</strong> https://w3id.org/won/agreement#accepts</p>
       <div class="comment">
-         <span class="markdown">Used to link two message resources. The message in the subject accepts the message in the object. This only makes sense if the object references a proposal.
-
-During the projection from the edited conversation dataset to the agreement dataset, the validity of agreements is checked. Proposal messages that were not accepted are dropped, as are invalid or cancelled Agreements.</span>
+         <span class="markdown">By referencing a Proposal via `msg:accepts` in the ContentGraph of subsequent Mesage, an Agreement is created.</span>
       </div>
       <div class="description">
          <dl>
             <dt>has domain</dt>
             <dd>
-               <a href="#Agreement" title="https://w3id.org/won/agreement#Agreement">agreement</a>
+               <a href="#Agreement" title="https://w3id.org/won/agreement#Agreement">Agreement</a>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
+            <dt>has range</dt>
+            <dd>
+               <a href="#Claim" title="https://w3id.org/won/agreement#Claim">Claim</a>
+               <sup class="type-c" title="class">c</sup> 
+               <span class="logic">or</span> 
+               <a href="#Proposal" title="https://w3id.org/won/agreement#Proposal">Proposal</a>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
+         </dl>
+      </div>
+   </div>
+   <div class="entity" id="claims">
+      <h3>claims<sup class="type-op" title="object property">op</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#objectproperties">Object Property ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/agreement#claims</p>
+      <div class="comment">
+         <span class="markdown">By referencing an earlier Message via `msg:claims` in the ContentGraph of subsequent Mesage, a Claim is created. Claims can be affirmed by the counterpart using `msg:accepts` or rejected using `msg:rejects`.</span>
+      </div>
+      <div class="description">
+         <dl>
+            <dt>has domain</dt>
+            <dd>
+               <a href="#Claim" title="https://w3id.org/won/agreement#Claim">Claim</a>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
+            <dt>has range</dt>
+            <dd>
+               <span class="dotted" title="https://w3id.org/won/message#Message">message</span>
                <sup class="type-c" title="class">c</sup>
             </dd>
          </dl>
@@ -105,45 +189,72 @@ During the projection from the edited conversation dataset to the agreement data
       </h3>
       <p>
          <strong>IRI:</strong> https://w3id.org/won/agreement#proposes</p>
+      <div class="comment">
+         <span class="markdown">By referencing a Message via `msg:accepts` in the ContentGraph of subsequent Mesage, a Proposal is created.</span>
+      </div>
       <div class="description">
          <dl>
             <dt>has domain</dt>
             <dd>
-               <a href="#Proposal" title="https://w3id.org/won/agreement#Proposal">proposal</a>
+               <a href="#Proposal" title="https://w3id.org/won/agreement#Proposal">Proposal</a>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
+            <dt>has range</dt>
+            <dd>
+               <span class="dotted" title="https://w3id.org/won/message#Message">message</span>
                <sup class="type-c" title="class">c</sup>
             </dd>
          </dl>
       </div>
    </div>
    <div class="entity" id="proposesToCancel">
-      <h3>proposes to cancel<sup class="type-op" title="object property">op</sup>
+      <h3>proposesToCancel<sup class="type-op" title="object property">op</sup>
          <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#objectproperties">Object Property ToC</a>
          </span>
       </h3>
       <p>
          <strong>IRI:</strong> https://w3id.org/won/agreement#proposesToCancel</p>
+      <div class="comment">
+         <span class="markdown">By referencing an Agreement via `msg:proposesToCancel` in the ContentGraph of subsequent Mesage, a Proposal to cancel an Agreement is created.</span>
+      </div>
       <div class="description">
          <dl>
             <dt>has domain</dt>
             <dd>
-               <a href="#Proposal" title="https://w3id.org/won/agreement#Proposal">proposal</a>
+               <a href="#Proposal" title="https://w3id.org/won/agreement#Proposal">Proposal</a>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
+            <dt>has range</dt>
+            <dd>
+               <a href="#Agreement" title="https://w3id.org/won/agreement#Agreement">Agreement</a>
                <sup class="type-c" title="class">c</sup>
             </dd>
          </dl>
       </div>
    </div>
-   <div class="entity" id="reject">
-      <h3>reject<sup class="type-op" title="object property">op</sup>
+   <div class="entity" id="rejects">
+      <h3>rejects<sup class="type-op" title="object property">op</sup>
          <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#objectproperties">Object Property ToC</a>
          </span>
       </h3>
       <p>
-         <strong>IRI:</strong> https://w3id.org/won/agreement#reject</p>
+         <strong>IRI:</strong> https://w3id.org/won/agreement#rejects</p>
+      <div class="comment">
+         <span class="markdown">By referencing a Proposal via `msg:rejects` in the ContentGraph of subsequent Mesage, that Proposal is rejected and cannot become a valid Agreement any more.</span>
+      </div>
       <div class="description">
          <dl>
             <dt>has domain</dt>
             <dd>
-               <a href="#Proposal" title="https://w3id.org/won/agreement#Proposal">proposal</a>
+               <span class="dotted" title="https://w3id.org/won/message#Message">message</span>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
+            <dt>has range</dt>
+            <dd>
+               <a href="#Claim" title="https://w3id.org/won/agreement#Claim">Claim</a>
+               <sup class="type-c" title="class">c</sup> 
+               <span class="logic">or</span> 
+               <a href="#Proposal" title="https://w3id.org/won/agreement#Proposal">Proposal</a>
                <sup class="type-c" title="class">c</sup>
             </dd>
          </dl>
