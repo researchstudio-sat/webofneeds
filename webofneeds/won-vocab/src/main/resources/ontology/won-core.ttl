@@ -1,15 +1,11 @@
 @prefix : <https://w3id.org/won/core#> .
 @prefix dc: <http://purl.org/dc/elements/1.1/> .
-@prefix gr: <http://purl.org/goodrelations/v1#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-@prefix xml: <http://www.w3.org/XML/1998/namespace> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
-@prefix oslc: <http://open-services.net/ns/core#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix sioc: <http://rdfs.org/sioc/types#> .
 @prefix vann: <http://purl.org/vocab/vann/> .
-@prefix schema_org: <http://schema.rdfs.org/all#> .
 @base <https://w3id.org/won/core> .
 
 <https://w3id.org/won/core> rdf:type owl:Ontology ;
@@ -23,10 +19,12 @@ Atoms can establish *Connections*  with other Atoms, if both Atoms' owners agree
 Matching services can make suggestions which atoms to connect to. An Atom specifies 'Sockets' indicating the kinds of Connections it is prepared to establish."""@en ;
                              dc:creator "Fabian Salcher" ,
                                         "Florian Kleedorfer" ;
-                             dc:date "2013-12-13"^^xsd:date ;
+                             dcterms:created "2013-12-13"^^xsd:date ;
                              dc:title "Web of Needs Core Ontology" ;
+							 dcterms:license <https://creativecommons.org/licenses/by/4.0/> ;
                              vann:preferredNamespacePrefix "won" ;
                              rdfs:comment "Ontology for the Web of Needs data model."@en .
+							 
 
 #################################################################
 #    Annotation properties
@@ -46,6 +44,9 @@ dc:date rdf:type owl:AnnotationProperty .
 
 ###  http://purl.org/dc/elements/1.1/description
 dc:description rdf:type owl:AnnotationProperty .
+
+
+dcterms:license rdf:type owl:AnnotationProperty .
 
 
 ###  http://purl.org/dc/elements/1.1/title

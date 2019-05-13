@@ -8,17 +8,19 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix vann: <http://purl.org/vocab/vann/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
 @base <https://w3id.org/won/message> .
 
 <https://w3id.org/won/message> rdf:type owl:Ontology ;
                                 owl:versionIRI <https://w3id.org/won/message/1.0> ;
                                 owl:imports <https://w3id.org/won/core/1.0> ;
-                                dc:abstract "The Web of Needs Message Ontology is used to model the Messages used to publish or modify Atoms, to establish Connections, and to communicate between Atom owners."@en ;
+                                dc:abstract "This ontology is used to model the Message objects central to the Web of Needs."@en ;
                                 dc:creator "Fabian Salcher" ,
                                            "Florian Kleedorfer" ,
                                            "Yana Panchenko" ;
-                                dc:date "2013-12-13"^^xsd:date ;
+                                dcterms:created "2013-12-13"^^xsd:date ;
                                 dc:title "Web of Needs Message Ontology"@en ;
+                                dcterms:license <https://creativecommons.org/licenses/by/4.0/> ;
                                 vann:preferredNamespacePrefix "msg" ;
                                 rdfs:comment "Ontology for describing messages in the Web of Needs project."@en .
 
@@ -38,8 +40,16 @@ dc:creator rdf:type owl:AnnotationProperty .
 dc:date rdf:type owl:AnnotationProperty .
 
 
+###  http://purl.org/dc/elements/1.1/description
+dc:description rdf:type owl:AnnotationProperty .
+
+
 ###  http://purl.org/dc/elements/1.1/title
 dc:title rdf:type owl:AnnotationProperty .
+
+
+###  http://purl.org/dc/terms/license
+dcterms:license rdf:type owl:AnnotationProperty .
 
 
 ###  http://purl.org/vocab/vann/preferredNamespacePrefix
