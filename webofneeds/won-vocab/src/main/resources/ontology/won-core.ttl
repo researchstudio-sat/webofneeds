@@ -6,6 +6,7 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix vann: <http://purl.org/vocab/vann/> .
+@prefix vaem: <http://www.linkedmodel.org/schema/vaem>
 @base <https://w3id.org/won/core> .
 
 <https://w3id.org/won/core> rdf:type owl:Ontology ;
@@ -420,10 +421,11 @@ sought to fulfill the atom in contrast to the part that is available.""" ;
      rdfs:label "tag" .
 
 
-###  https://w3id.org/won/core#won:textMessage
-:won:textMessage rdf:type owl:DatatypeProperty ;
+###  https://w3id.org/won/core#textMessage
+:textMessage rdf:type owl:DatatypeProperty ;
                  rdfs:range xsd:string ;
                  rdfs:comment "Specifies a text message."@en ;
+				 vaem:rationale "At first glance, this property seems better placed in the `message` ontology, however the message validation forbids properties from that ontology in the message content. As it is really important, we place it in `core`."@en;
 				 rdfs:label "textMessage" .
 
 
