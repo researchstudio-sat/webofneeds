@@ -24,7 +24,6 @@ export const goodsServiceSearch = {
       },
       seeks: {
         type: ["s:Offer"],
-        images: { ...details.images },
       },
     }),
   },
@@ -39,6 +38,7 @@ export const goodsServiceSearch = {
     priceRange: { ...details.pricerange },
     description: { ...details.description },
     location: { ...details.location },
+    images: { ...details.images },
   },
   generateQuery: (draft, resultName) => {
     let subQueries = [];
