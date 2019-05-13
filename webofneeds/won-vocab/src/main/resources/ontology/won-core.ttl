@@ -423,8 +423,8 @@ sought to fulfill the atom in contrast to the part that is available.""" ;
 ###  https://w3id.org/won/core#won:textMessage
 :won:textMessage rdf:type owl:DatatypeProperty ;
                  rdfs:range xsd:string ;
-                 rdfs:label "Specifies a text message."@en ,
-                            "textMessage" .
+                 rdfs:comment "Specifies a text message."@en ;
+				 rdfs:label "textMessage" .
 
 
 #################################################################
