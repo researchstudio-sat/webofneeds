@@ -34,6 +34,7 @@ export const rehearsalRoomOffer = {
       },
     }),
   },
+  reactionUseCases: ["rehearsalRoomSearch"],
   details: {
     title: { ...details.title },
     description: { ...details.description },

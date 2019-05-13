@@ -30,6 +30,7 @@ export const musicianSearch = {
       },
     }),
   },
+  reactionUseCases: ["bandSearch"],
   details: {
     title: { ...details.title },
     description: { ...details.description },

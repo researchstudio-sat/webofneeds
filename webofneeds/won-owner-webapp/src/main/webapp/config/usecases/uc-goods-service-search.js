@@ -27,6 +27,7 @@ export const goodsServiceSearch = {
       },
     }),
   },
+  reactionUseCases: ["serviceOffer", "goodsOffer"],
   seeksDetails: {
     title: { ...details.title },
     tags: {

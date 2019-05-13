@@ -20,6 +20,7 @@ export const postdocOffer = {
       },
     }),
   },
+  reactionUseCases: ["postdocSearch"],
   details: {
     title: { ...details.title },
     description: { ...details.description },

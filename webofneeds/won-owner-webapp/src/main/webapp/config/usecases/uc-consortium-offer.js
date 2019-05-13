@@ -20,6 +20,7 @@ export const consortiumOffer = {
       },
     }),
   },
+  reactionUseCases: ["consortiumSearch"],
   details: {
     title: { ...details.title },
     description: { ...details.description },

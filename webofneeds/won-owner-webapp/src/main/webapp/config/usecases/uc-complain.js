@@ -22,6 +22,7 @@ export const complain = {
       },
     }),
   },
+  reactionUseCases: ["handleComplaint"],
   details: {
     title: { ...details.title },
     description: { ...details.description },
