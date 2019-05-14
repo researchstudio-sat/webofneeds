@@ -6,7 +6,7 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix vann: <http://purl.org/vocab/vann/> .
-@prefix vaem: <http://www.linkedmodel.org/schema/vaem>
+@prefix vaem: <http://www.linkedmodel.org/schema/vaem> .
 @base <https://w3id.org/won/core> .
 
 <https://w3id.org/won/core> rdf:type owl:Ontology ;
