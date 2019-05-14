@@ -11,6 +11,7 @@ import shareDropdownModule from "./share-dropdown.js";
 import { attach, get, getIn } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
 import * as processUtils from "../process-utils.js";
+import * as viewUtils from "../view-utils.js";
 import * as generalSelectors from "../selectors/general-selectors.js";
 import { actionCreators } from "../actions/actions.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
@@ -108,6 +109,11 @@ function genComponentConf() {
           getIn(post, ["matchedUseCase", "reactionUseCases"]);
         const hasReactionUseCases =
           reactionUseCases && reactionUseCases.size > 0;
+        const viewState = get(state, "view");
+        const visibleTab = viewUtils.getVisibleTabByAtomUri(
+          viewState,
+          this.postUri
+        );
 
         const enabledUseCases =
           post && isOwned && getIn(post, ["matchedUseCase", "enabledUseCases"]);
@@ -126,6 +132,7 @@ function genComponentConf() {
           showFooter:
             !postLoading &&
             !postFailedToLoad &&
+            visibleTab === "DETAIL" &&
             (hasReactionUseCases || hasEnabledUseCases),
         };
       };

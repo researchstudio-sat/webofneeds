@@ -13,6 +13,7 @@ import * as atomUtils from "../atom-utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { getUseCaseLabel, getUseCaseIcon } from "../usecase-utils.js";
 import * as accountUtils from "../account-utils.js";
+import * as viewUtils from "../view-utils.js";
 
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 
@@ -20,7 +21,7 @@ function genComponentConf() {
   let template = `
         <won-post-menu post-uri="self.atomUri"></won-post-menu>
         <won-post-content post-uri="self.atomUri"></won-post-content>
-        <div class="post-info__footer" ng-if="!self.atomLoading">
+        <div class="post-info__footer" ng-if="self.showFooter">
             <!-- AdHoc Request Field -->
             <chat-textfield
                 ng-if="self.showAdHocRequestField"
@@ -78,12 +79,19 @@ function genComponentConf() {
         const showReactionUseCases =
           isConnectible && !isOwned && hasReactionUseCases;
 
+        const showAdHocRequestField =
+          isConnectible && !showEnabledUseCases && !showReactionUseCases;
+
+        const viewState = get(state, "view");
+        const visibleTab = viewUtils.getVisibleTabByAtomUri(viewState, atomUri);
+
+        const atomLoading =
+          !atom || processSelectors.isAtomLoading(state, atomUri);
         return {
           loggedIn: accountUtils.isLoggedIn(get(state, "account")),
           atomUri,
           isInactive: atomUtils.isInactive(atom),
-          showAdHocRequestField:
-            isConnectible && !showEnabledUseCases && !showReactionUseCases,
+          showAdHocRequestField,
           showEnabledUseCases,
           showReactionUseCases,
           reactionUseCasesArray:
@@ -91,7 +99,13 @@ function genComponentConf() {
             atomUtils.getReactionUseCases(atom).toArray(),
           enabledUseCasesArray:
             showEnabledUseCases && atomUtils.getEnabledUseCases(atom).toArray(),
-          atomLoading: !atom || processSelectors.isAtomLoading(state, atomUri),
+          atomLoading,
+          showFooter:
+            !atomLoading &&
+            visibleTab === "DETAIL" &&
+            (showEnabledUseCases ||
+              showReactionUseCases ||
+              showAdHocRequestField),
         };
       };
       connect2Redux(selectFromState, actionCreators, [], this);
