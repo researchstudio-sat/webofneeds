@@ -31,7 +31,7 @@ import * as processUtils from "../process-utils.js";
 const serviceDependencies = ["$ngRedux", "$scope"];
 function genComponentConf() {
   let template = `
-        <won-create-post-item ng-class="{'selected' : !!self.useCaseGroup || !!self.useCase}"></won-create-post-item>
+        <won-create-post-item ng-class="{'selected' : self.createItemSelected}"></won-create-post-item>
         <div ng-repeat="atomUri in self.beingCreatedAtomUris track by atomUri" class="co__item">
             <div class="co__item__atom">
                 <div class="co__item__atom__indicator"></div>
@@ -165,8 +165,6 @@ function genComponentConf() {
           state
         );
 
-        const useCase = generalSelectors.getUseCaseFromRoute(state);
-        const useCaseGroup = generalSelectors.getUseCaseGroupFromRoute(state);
         const connUriInRoute = generalSelectors.getConnectionUriFromRoute(
           state
         );
@@ -190,10 +188,10 @@ function genComponentConf() {
         return {
           allAtoms,
           process,
-          viewState,
           showClosedAtoms: viewUtils.showClosedAtoms(viewState),
-          useCase,
-          useCaseGroup,
+          createItemSelected:
+            !!generalSelectors.getUseCaseGroupFromRoute(state) ||
+            !!generalSelectors.getUseCaseFromRoute(state),
           atomUriImpliedInRoute,
           connUriInRoute,
           beingCreatedAtomUris: beingCreatedAtoms && [
