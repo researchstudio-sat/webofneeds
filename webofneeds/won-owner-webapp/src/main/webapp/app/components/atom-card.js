@@ -225,7 +225,6 @@ function genComponentConf() {
 
       classOnComponentRoot("won-is-loading", () => this.atomLoading, this);
       classOnComponentRoot("won-is-toload", () => this.atomToLoad, this);
-      classOnComponentRoot("won-is-invisible", () => this.hideAtom(), this);
     }
 
     ensureAtomIsLoaded() {
@@ -237,11 +236,6 @@ function genComponentConf() {
       ) {
         this.atoms__fetchUnloadedAtom(this.atomUri);
       }
-    }
-
-    //FIXME: THIS and the corresponding css-class need to be removed, this is solely to prevent loaded/but inactive atom to show up for now
-    hideAtom() {
-      return this.atomLoaded && atomUtils.isInactive(this.atom);
     }
 
     hasTitle() {

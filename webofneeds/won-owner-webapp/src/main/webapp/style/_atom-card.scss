@@ -9,10 +9,6 @@ won-atom-card {
   padding: 0.5rem;
   color: black;
 
-  &.won-is-invisible {
-    display: none;
-  }
-
   &.won-is-toload,
   &.won-is-loading {
     @include animateOpacityHeartBeat();
