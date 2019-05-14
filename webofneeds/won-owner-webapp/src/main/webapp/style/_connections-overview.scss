@@ -148,21 +148,6 @@ won-connections-overview {
           }
         }
       }
-
-      @media (min-width: $responsivenessBreakPoint) {
-        &.selected {
-          @include speech-bubble-right(
-            white,
-            $won-line-gray,
-            $speechBubbleTailSize,
-            $thinBorderWidth,
-            50%
-          );
-          &.open {
-            position: sticky;
-          }
-        }
-      }
     }
     &__connections {
       &__item {

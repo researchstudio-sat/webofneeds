@@ -33,7 +33,7 @@ function genComponentConf() {
   let template = `
         <won-create-post-item ng-class="{'selected' : !!self.useCaseGroup || !!self.useCase}"></won-create-post-item>
         <div ng-repeat="atomUri in self.beingCreatedAtomUris track by atomUri" class="co__item">
-            <div class="co__item__atom" ng-class="{'selected' : atomUri === self.atomUriInRoute}">
+            <div class="co__item__atom">
                 <div class="co__item__atom__indicator"></div>
                 <div class="co__item__atom__header">
                     <won-post-header
@@ -45,7 +45,7 @@ function genComponentConf() {
             </div>
         </div>
         <div ng-repeat="atomUri in self.sortedOpenAtomUris track by atomUri" class="co__item">
-            <div class="co__item__atom" ng-class="{'won-unread': self.isUnread(atomUri), 'selected' : atomUri === self.atomUriInRoute, 'open': self.isOpen(atomUri)}">
+            <div class="co__item__atom" ng-class="{'won-unread': self.isUnread(atomUri), 'open': self.isOpen(atomUri)}">
                 <div class="co__item__atom__indicator"></div>
                 <div class="co__item__atom__header">
                     <won-post-header
@@ -58,12 +58,8 @@ function genComponentConf() {
                         atom-uri="::atomUri">
                     </won-connection-indicators>
                     <button
-                        class="co__item__atom__header__button red"
-                        ng-click="self.showAtomDetails(atomUri)"
-                        ng-class="{
-                          'won-button--filled' : atomUri === self.atomUriInRoute,
-                          'won-button--outlined thin': atomUri !== self.atomUriInRoute
-                        }">
+                        class="co__item__atom__header__button red won-button--outlined thin"
+                        ng-click="self.showAtomDetails(atomUri)">
                         Details
                     </button>
                     <div class="co__item__atom__header__carret clickable" ng-click="!self.isAtomLoading(atomUri) && self.toggleDetails(atomUri)">
@@ -95,7 +91,6 @@ function genComponentConf() {
                 <div class="co__item__connections__item nonsticky" ng-if="self.hasChatSocket(atomUri) && self.hasSuggestedConnections(atomUri)"
                   ng-class="{
                     'won-unread': self.hasUnreadSuggestedConnections(atomUri),
-                    'selected': self.isShowingSuggestions(atomUri),
                   }">
                   <won-suggestion-selection-item
                       atom-uri="::atomUri"
@@ -120,7 +115,7 @@ function genComponentConf() {
         </div>
         <div class="co__closedAtoms" ng-if="self.showClosedAtoms && self.closedAtomsSize > 0">
             <div ng-repeat="atomUri in self.sortedClosedAtomUris track by atomUri" class="co__item">
-                <div class="co__item__atom" ng-class="{'won-unread': self.isUnread(atomUri), 'selected' : atomUri === self.atomUriInRoute, 'open': self.isOpen(atomUri)}">
+                <div class="co__item__atom" ng-class="{'won-unread': self.isUnread(atomUri), 'open': self.isOpen(atomUri)}">
                     <div class="co__item__atom__indicator"></div>
                     <div class="co__item__atom__header">
                         <won-post-header
@@ -129,12 +124,8 @@ function genComponentConf() {
                             ng-class="{ 'clickable' : !self.isAtomLoading(atomUri) }">
                         </won-post-header>
                         <button
-                            class="co__item__atom__header__button red"
-                            ng-click="self.showAtomDetails(atomUri)"
-                            ng-class="{
-                              'won-button--filled' : atomUri === self.atomUriInRoute,
-                              'won-button--outlined thin': atomUri !== self.atomUriInRoute
-                            }">
+                            class="co__item__atom__header__button red won-button--outlined thin"
+                            ng-click="self.showAtomDetails(atomUri)">
                             Details
                         </button>
                         <div class="co__item__atom__header__carret clickable" ng-click="!self.isAtomLoading(atomUri) && self.toggleDetails(atomUri)">
@@ -179,7 +170,7 @@ function genComponentConf() {
         const connUriInRoute = generalSelectors.getConnectionUriFromRoute(
           state
         );
-        const atomUriInRoute = generalSelectors.getPostUriFromRoute(state);
+
         const atomImpliedInRoute =
           connUriInRoute &&
           generalSelectors.getOwnedAtomByConnectionUri(state, connUriInRoute);
@@ -203,7 +194,6 @@ function genComponentConf() {
           showClosedAtoms: viewUtils.showClosedAtoms(viewState),
           useCase,
           useCaseGroup,
-          atomUriInRoute,
           atomUriImpliedInRoute,
           connUriInRoute,
           beingCreatedAtomUris: beingCreatedAtoms && [
@@ -357,18 +347,6 @@ function genComponentConf() {
       return this.isOpenByConnection(ownedAtomUri) || !!this.open[ownedAtomUri];
     }
 
-    isShowingSuggestions(ownedAtomUri) {
-      const visibleTab = viewUtils.getVisibleTabByAtomUri(
-        this.viewState,
-        ownedAtomUri
-      );
-      return (
-        !!this.open[ownedAtomUri] &&
-        ownedAtomUri === this.atomUriInRoute &&
-        visibleTab === "SUGGESTIONS"
-      );
-    }
-
     isAtomLoading(atomUri) {
       return processUtils.isAtomLoading(this.process, atomUri);
     }
@@ -379,10 +357,6 @@ function genComponentConf() {
 
     selectConnection(connectionUri) {
       this.onSelectedConnection({ connectionUri }); //trigger callback with scope-object
-    }
-
-    selectSuggested(atomUri) {
-      console.debug("stuff should happen now IMPL ME for: ", atomUri);
     }
 
     hasOpenOrLoadingChatConnections(atomUri, allAtoms, process) {
