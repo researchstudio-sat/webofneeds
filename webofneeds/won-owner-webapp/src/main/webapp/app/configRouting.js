@@ -89,6 +89,10 @@ export const configRouting = [
         as: "map",
       },
       {
+        path: "/inventory?viewAtomUri?viewConnUri",
+        component: "inventory",
+      },
+      {
         path:
           "/connections?privateId?connectionUri?useCase?useCaseGroup?token?viewAtomUri?viewConnUri?fromAtomUri?mode",
         component: connectionsComponent,
@@ -200,6 +204,7 @@ export function accessControl({
       }
       return;
 
+    case "inventory":
     case "overview":
     case "map":
     case "signup":

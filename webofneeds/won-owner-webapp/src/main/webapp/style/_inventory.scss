@@ -1,0 +1,66 @@
+@import "won-config";
+@import "sizing-utils";
+@import "fonts";
+@import "flex-layout";
+
+main.ownerinventory {
+  grid-column: 1 / -1;
+  padding: 0;
+  box-sizing: border-box;
+  align-items: stretch;
+  max-width: $maxContentWidth;
+  width: 100%;
+  margin: 0 auto;
+
+  & .ownerinventory__header {
+    display: grid;
+    grid-template-columns: 1fr min-content;
+    grid-gap: 0.5rem;
+    border-bottom: $thinGrayBorder;
+    padding: 0.5rem;
+    @media (min-width: $maxContentWidth) {
+      padding-right: 0;
+    }
+    align-items: center;
+
+    &__title {
+      font-size: $mediumFontSize;
+    }
+  }
+
+  .ownerinventory__noresults {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    padding: 0.5rem;
+
+    &__label {
+      font-size: $normalFontSize;
+      color: $won-primary-text-color;
+      text-align: center;
+      max-width: 25rem;
+    }
+  }
+
+  .ownerinventory__content {
+    display: flex;
+    flex-wrap: wrap;
+    padding: 0.5rem;
+
+    won-atom-card.ownerinventory__content__atom {
+      border: $thinGrayBorder;
+      background: $won-light-gray;
+
+      margin-right: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    @media (max-width: $responsivenessBreakPoint) {
+      display: block;
+
+      won-atom-card.ownerinventory__content__atom {
+        margin-right: 0;
+      }
+    }
+  }
+}
