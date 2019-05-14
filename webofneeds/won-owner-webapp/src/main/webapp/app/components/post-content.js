@@ -277,6 +277,11 @@ function genComponentConf() {
 
       this.connections__rate(connUri, won.WONCON.binaryRatingGood);
       this.atoms__connect(this.postUri, connUri, targetAtomUri, message);
+      this.router__stateGo("connections", {
+        connectionUri: connUri,
+        viewAtomUri: undefined,
+        viewConnUri: undefined,
+      });
     }
 
     addPersona(persona) {
