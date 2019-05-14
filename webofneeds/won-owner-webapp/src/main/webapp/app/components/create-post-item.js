@@ -125,7 +125,6 @@ function genComponentConf() {
       if (selectedUseCaseIdentifier) {
         this.router__stateGoCurrent({
           connectionUri: undefined,
-          postUri: undefined,
           useCase: encodeURIComponent(selectedUseCaseIdentifier),
           useCaseGroup: undefined,
           fromAtomUri: undefined,
@@ -142,7 +141,6 @@ function genComponentConf() {
     showAvailableUseCases() {
       this.router__stateGoCurrent({
         connectionUri: undefined,
-        postUri: undefined,
         useCase: undefined,
         useCaseGroup: "all",
         fromAtomUri: undefined,
@@ -154,7 +152,6 @@ function genComponentConf() {
       // TODO: this link is still broken
       this.router__stateGoCurrent({
         connectionUri: undefined,
-        postUri: undefined,
         useCase: "search",
         useCaseGroup: undefined,
         fromAtomUri: undefined,

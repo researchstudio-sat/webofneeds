@@ -90,7 +90,7 @@ export const configRouting = [
       },
       {
         path:
-          "/connections?privateId?postUri?connectionUri?useCase?useCaseGroup?token?viewAtomUri?viewConnUri?fromAtomUri?mode",
+          "/connections?privateId?connectionUri?useCase?useCaseGroup?token?viewAtomUri?viewConnUri?fromAtomUri?mode",
         component: connectionsComponent,
         as: "connections",
       },

@@ -212,22 +212,10 @@ class ConnectionsController {
     this.$scope.$on("$destroy", disconnect);
   }
 
-  selectAtom(atomUri) {
-    this.router__stateGoCurrent({
-      connectionUri: undefined,
-      postUri: atomUri,
-      useCase: undefined,
-      useCaseGroup: undefined,
-      fromAtomUri: undefined,
-      mode: undefined,
-    });
-  }
-
   selectConnection(connectionUri) {
     this.markAsRead(connectionUri);
     this.router__stateGoCurrent({
       connectionUri: connectionUri,
-      postUri: undefined,
       useCase: undefined,
       useCaseGroup: undefined,
       fromAtomUri: undefined,

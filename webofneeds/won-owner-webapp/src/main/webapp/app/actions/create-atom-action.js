@@ -114,7 +114,6 @@ export function atomCreate(draft, persona, nodeUri) {
 
         dispatch(
           actionCreators.router__stateGoAbs("connections", {
-            postUri: undefined,
             connectionUri: undefined,
           })
         );

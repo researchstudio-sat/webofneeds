@@ -103,7 +103,7 @@ function genComponentConf() {
       this.router__stateGo("connections", {
         useCase: ucIdentifier,
         useCaseGroup: undefined,
-        postUri: undefined,
+        connectionUri: undefined,
         fromAtomUri: this.atomUri,
         viewAtomUri: undefined,
         viewConnUri: undefined,

@@ -441,7 +441,6 @@ class AboutController {
   showAvailableUseCases() {
     this.router__stateGoAbs("connections", {
       connectionUri: undefined,
-      postUri: undefined,
       useCase: undefined,
       useCaseGroup: "all",
     });

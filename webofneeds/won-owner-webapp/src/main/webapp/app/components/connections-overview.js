@@ -59,7 +59,7 @@ function genComponentConf() {
                     </won-connection-indicators>
                     <button
                         class="co__item__atom__header__button red"
-                        ng-click="atomUri === self.atomUriInRoute ? self.selectAtom(undefined) : self.selectAtom(atomUri)"
+                        ng-click="self.showAtomDetails(atomUri)"
                         ng-class="{
                           'won-button--filled' : atomUri === self.atomUriInRoute,
                           'won-button--outlined thin': atomUri !== self.atomUriInRoute
@@ -99,7 +99,7 @@ function genComponentConf() {
                   }">
                   <won-suggestion-selection-item
                       atom-uri="::atomUri"
-                      on-selected="self.showSuggestions(atomUri)">
+                      on-selected="self.showAtomSuggestions(atomUri)">
                   </won-suggestion-selection-item>
                 </div>
             </div>
@@ -130,7 +130,7 @@ function genComponentConf() {
                         </won-post-header>
                         <button
                             class="co__item__atom__header__button red"
-                            ng-click="atomUri === self.atomUriInRoute ? self.selectAtom(undefined) : self.selectAtom(atomUri)"
+                            ng-click="self.showAtomDetails(atomUri)"
                             ng-class="{
                               'won-button--filled' : atomUri === self.atomUriInRoute,
                               'won-button--outlined thin': atomUri !== self.atomUriInRoute
@@ -278,7 +278,6 @@ function genComponentConf() {
             Immutable.fromJS({ atomUri: ownedAtomUri, selectTab: "DETAIL" })
           );
           this.router__stateGoCurrent({
-            postUri: undefined,
             useCase: undefined,
             useCaseGroup: undefined,
             connectionUri: undefined,
@@ -291,18 +290,19 @@ function genComponentConf() {
       }
     }
 
-    showSuggestions(ownedAtomUri) {
+    showAtomSuggestions(atomUri) {
+      this.showAtomTab(atomUri, "SUGGESTIONS");
+    }
+
+    showAtomDetails(atomUri) {
+      this.showAtomTab(atomUri, "DETAIL");
+    }
+
+    showAtomTab(atomUri, tab = "DETAIL") {
       this.atoms__selectTab(
-        Immutable.fromJS({ atomUri: ownedAtomUri, selectTab: "SUGGESTIONS" })
+        Immutable.fromJS({ atomUri: atomUri, selectTab: tab })
       );
-      this.router__stateGoCurrent({
-        postUri: ownedAtomUri,
-        useCase: undefined,
-        useCaseGroup: undefined,
-        connectionUri: undefined,
-        fromAtomUri: undefined,
-        mode: undefined,
-      });
+      this.router__stateGo("post", { postUri: atomUri });
     }
 
     hasChatSocket(atomUri) {
@@ -380,9 +380,7 @@ function genComponentConf() {
     selectConnection(connectionUri) {
       this.onSelectedConnection({ connectionUri }); //trigger callback with scope-object
     }
-    selectAtom(atomUri) {
-      this.onSelectedAtom({ atomUri }); //trigger callback with scope-object
-    }
+
     selectSuggested(atomUri) {
       console.debug("stuff should happen now IMPL ME for: ", atomUri);
     }
@@ -475,7 +473,6 @@ function genComponentConf() {
        *  on-selected-connection="myCallback(connectionUri)"
        */
       onSelectedConnection: "&",
-      onSelectedAtom: "&",
     },
     template: template,
   };
