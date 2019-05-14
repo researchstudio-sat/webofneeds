@@ -56,17 +56,6 @@ won-connections-overview {
           box-sizing: border-box;
           transition: width 0.25s linear;
         }
-
-        & > .co__item__atom__header > .co__item__atom__header__button {
-          width: 3.5rem;
-          padding-left: 0;
-          padding-right: 0;
-          white-space: nowrap;
-          margin-right: 0.5rem;
-          box-sizing: border-box;
-          transition: width 0.25s linear, border-left-width 0s linear 0.05s,
-            border-right-width 0s linear 0.05s;
-        }
       }
 
       &:not(.open) {
@@ -81,19 +70,6 @@ won-connections-overview {
           box-sizing: border-box;
           transition: width 0.25s linear;
         }
-
-        & > .co__item__atom__header > .co__item__atom__header__button {
-          width: 0;
-          padding-left: 0;
-          padding-right: 0;
-          border-left-width: 0;
-          border-right-width: 0;
-          white-space: nowrap;
-          overflow: hidden;
-          box-sizing: border-box;
-          transition: width 0.25s linear, border-left-width 0s linear 0.25s,
-            border-right-width 0s linear 0.25s;
-        }
       }
 
       &__header {
@@ -102,7 +78,6 @@ won-connections-overview {
         grid-template-columns: 1fr auto auto auto;
         min-width: 0;
 
-        & > .co__item__atom__header__button,
         & > won-connection-indicators,
         & > won-post-header {
           max-height: 2.5rem;
@@ -110,11 +85,6 @@ won-connections-overview {
 
         & > won-post-header {
           padding-right: 0.5rem;
-        }
-
-        & > .co__item__atom__header__button {
-          font-size: $smallFontSize;
-          max-height: 2.5rem;
         }
 
         &__carret {

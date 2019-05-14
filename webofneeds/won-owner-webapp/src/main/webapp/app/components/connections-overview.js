@@ -38,7 +38,7 @@ function genComponentConf() {
                 <div class="co__item__atom__header">
                     <won-post-header
                         atom-uri="::atomUri"
-                        ng-click="self.toggleDetails(atomUri)"
+                        ng-click="!self.isAtomLoading(atomUri) && self.showAtomDetails(atomUri)"
                         ng-class="{ 'clickable' : !self.isAtomLoading(atomUri) }">
                     </won-post-header>
                 </div>
@@ -50,18 +50,13 @@ function genComponentConf() {
                 <div class="co__item__atom__header">
                     <won-post-header
                         atom-uri="::atomUri"
-                        ng-click="self.toggleDetails(atomUri)"
+                        ng-click="!self.isAtomLoading(atomUri) && self.showAtomDetails(atomUri)"
                         ng-class="{ 'clickable' : !self.isAtomLoading(atomUri) }">
                     </won-post-header>
                     <won-connection-indicators
                         on-selected-connection="::self.selectConnection(connectionUri)"
                         atom-uri="::atomUri">
                     </won-connection-indicators>
-                    <button
-                        class="co__item__atom__header__button red won-button--outlined thin"
-                        ng-click="self.showAtomDetails(atomUri)">
-                        Details
-                    </button>
                     <div class="co__item__atom__header__carret clickable" ng-click="!self.isAtomLoading(atomUri) && self.toggleDetails(atomUri)">
                         <svg class="co__item__atom__header__carret__icon"
                             ng-class="{
@@ -120,14 +115,9 @@ function genComponentConf() {
                     <div class="co__item__atom__header">
                         <won-post-header
                             atom-uri="::atomUri"
-                            ng-click="self.toggleDetails(atomUri)"
+                            ng-click="!self.isAtomLoading(atomUri) && self.showAtomDetails(atomUri)"
                             ng-class="{ 'clickable' : !self.isAtomLoading(atomUri) }">
                         </won-post-header>
-                        <button
-                            class="co__item__atom__header__button red won-button--outlined thin"
-                            ng-click="self.showAtomDetails(atomUri)">
-                            Details
-                        </button>
                         <div class="co__item__atom__header__carret clickable" ng-click="!self.isAtomLoading(atomUri) && self.toggleDetails(atomUri)">
                           <svg class="co__item__atom__header__carret__icon"
                               ng-class="{
