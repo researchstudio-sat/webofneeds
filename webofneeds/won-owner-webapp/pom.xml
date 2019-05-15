@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project 
-	xmlns="http://maven.apache.org/POM/4.0.0" 
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<parent>
 		<artifactId>webofneeds</artifactId>
 		<groupId>at.researchstudio.sat</groupId>
@@ -20,7 +20,7 @@
 	</repositories>
 	<dependencies>
 		<!-- Warning! Only to be used in connection with the <dependencyManagement> 
-            section in the parent pom! -->
+			section in the parent pom! -->
 		<dependency>
 			<groupId>at.researchstudio.sat</groupId>
 			<artifactId>won-owner</artifactId>
@@ -204,8 +204,8 @@
 				</configuration>
 				<executions>
 					<execution>
-						<!-- optional: you don't really need execution ids, 
-                            but it looks nice in your build log. -->
+						<!-- optional: you don't really need execution ids, but it looks nice 
+							in your build log. -->
 						<id>install-node-and-npm</id>
 						<goals>
 							<goal>install-node-and-npm</goal>
@@ -220,8 +220,7 @@
 					<execution>
 						<id>npm-install</id>
 						<goals>
-							<!-- everything else is executed by the postinstall 
-                                hook in package.json -->
+							<!-- everything else is executed by the postinstall hook in package.json -->
 							<goal>npm</goal>
 						</goals>
 					</execution>
@@ -245,9 +244,9 @@
 						</configuration>
 					</execution>
 					<execution>
-						<!-- Configuration that starts the watch task. This 
-                            causes a build when resources change. Not run during any phase, must be started 
-                            explicitly using 'mvn frontend:npm@watch' -->
+						<!-- Configuration that starts the watch task. This causes a build 
+							when resources change. Not run during any phase, must be started explicitly 
+							using 'mvn frontend:npm@watch' -->
 						<id>watch</id>
 						<goals>
 							<goal>npm</goal>
@@ -277,13 +276,17 @@
 									<goal>echo</goal>
 								</goals>
 								<configuration>
-									<message>Note: building the                                        won-owner-webapp war file is                                        skipped. This is done because                                        the profile                                        'skip-owner-webapp-war' is                                        active ('-P                                        skip-owner-webapp-war' on the                                        command line)</message>
+									<message>
+										Note:
+										Building the won-owner-webapp war file is skipped.
+										This is done because the profile 'skip-owner-webapp-war' is active
+										('-Pskip-owner-webapp-war' on the command line)
+									</message>
 								</configuration>
 							</execution>
 						</executions>
 					</plugin>
-					<!-- use the same config as above but set the phase to 
-                        'none' -->
+					<!-- use the same config as above but set the phase to 'none' -->
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-war-plugin</artifactId>
@@ -322,13 +325,16 @@
 									<goal>echo</goal>
 								</goals>
 								<configuration>
-									<message>Note: building the                                        won-owner-webapp war file is                                        skipped, but the webapp is built                                        in 'exploded' mode. This is done                                        because the profile                                        'skip-owner-webapp-war-but-explode'                                        is active ('-P                                        skip-owner-webapp-war-but-explode'                                        on the command line)</message>
+									<message>Note: building the won-owner-webapp war file is
+										skipped, but the webapp is built in 'exploded' mode. This is
+										done because the profile 'skip-owner-webapp-war-but-explode'
+										is active ('-P skip-owner-webapp-war-but-explode' on the
+										command line)</message>
 								</configuration>
 							</execution>
 						</executions>
 					</plugin>
-					<!-- use the same config as above but set the phase to 
-                        'none' -->
+					<!-- use the same config as above but set the phase to 'none' -->
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-war-plugin</artifactId>
@@ -367,13 +373,21 @@
 									<goal>echo</goal>
 								</goals>
 								<configuration>
-									<message>Note: the install and build                                        process for the javascript                                        frontend is skipped completely.                                        This is done because the profile                                        'skip-frontend' is active ('-P                                        skip-frontend' on the command                                        line)</message>
+									<message>
+										Note:
+										The install and build process for the javascript
+										frontend is
+										skipped completely.
+										This is done because the profile
+										'skip-frontend' is active
+										('-Pskip-frontend' on the command
+										line)
+									</message>
 								</configuration>
 							</execution>
 						</executions>
 					</plugin>
-					<!-- use the same config as above but set the phase to 
-                        'none' -->
+					<!-- use the same config as above but set the phase to 'none' -->
 					<plugin>
 						<groupId>com.github.eirslett</groupId>
 						<artifactId>frontend-maven-plugin</artifactId>
@@ -414,13 +428,16 @@
 									<goal>echo</goal>
 								</goals>
 								<configuration>
-									<message>Note: the install process                                        for the javascript frontend is                                        skipped but 'gulp build' and                                        'gulp clean' are still executed.                                        This is done because the profile                                        'skip-frontend-all-but-gulp' is                                        active ('-P                                        skip-frontend-all-but-gulp' on                                        the command line)</message>
+									<message>Note: the install process for the javascript frontend
+										is skipped but 'gulp build' and 'gulp clean' are still
+										executed. This is done because the profile
+										'skip-frontend-all-but-gulp' is active ('-P
+										skip-frontend-all-but-gulp' on the command line)</message>
 								</configuration>
 							</execution>
 						</executions>
 					</plugin>
-					<!-- use the same config as above but set the phase to 
-                        'none' -->
+					<!-- use the same config as above but set the phase to 'none' -->
 					<plugin>
 						<groupId>com.github.eirslett</groupId>
 						<artifactId>frontend-maven-plugin</artifactId>
@@ -458,7 +475,9 @@
 									<goal>echo</goal>
 								</goals>
 								<configuration>
-									<message>Note: the profile                                        'suppress-npm-clean' is active                                        because the local installation                                        of nodejs was not found in                                        'src/main/webapp/node'. 'npm run                                        clean' will not be executed.</message>
+									<message>Note: the profile 'suppress-npm-clean' is active
+										because the local installation of nodejs was not found in
+										'src/main/webapp/node'. 'npm run clean' will not be executed.</message>
 								</configuration>
 							</execution>
 						</executions>
