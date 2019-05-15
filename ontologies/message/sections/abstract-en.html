@@ -1,4 +1,8 @@
 <html>
 <h2>Abstract</h2><span class="markdown">
-This ontology is used to model the Message objects central to the Web of Needs.</span>
+This ontology is used to model the Message objects central to the Web of Needs. Messages are entities that encapsulate addressing information, signing information, and optionally, content in an RDF dataset. A message is identified by a URI in the URI space on the WoN node it was created on. 
+
+A message consists of graphs that can conceptually contain other graphs; thus the message dataset conceptually is a tree of graphs, which can either be envelope graphs, holding addressing information and signatures, or content graphs, holding arbitrary content.
+
+If a message is sent to another Atom, a new Message URI is minted on that Atom's WoN node and the message copied into the new Message's dataset.</span>
 </html>
