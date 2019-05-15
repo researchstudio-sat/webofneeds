@@ -63,10 +63,15 @@ function generate_for_ontology() {
 	mkdir -p "${output_path}"
 	echo "generating documentation for ${ont} in ${output_path}" 
 	java -jar ${widoco_jar} -ontFile "${ont_file}" -outFolder "${output_path}" ${config_file_opt} \
-		-licensius -oops -rewriteAll -webVowl
+	    -licensius -oops -rewriteAll -webVowl
 	java -jar ${widoco_jar} -ontFile "${ont_file}" -outFolder "${output_path}" ${config_file_opt} \
 		-crossRef -rewriteAll
 	cp "${output_path}/index-en.html" "${output_path}/index.html"
+	# rename ontology.json to ontology.jsonld because we host our ontologies on github
+	# and their content-type system is extension based. (.jsonld -> application/ld+json)
+	mv "${output_path}/ontology.json" "${output_path}/ontology.jsonld"
+	# replace extension .json with .jsonld in the redirects file, if created
+	sed -i -e 's/\.json/.jsonld/g' "${output_path}/.htaccess"
 	for section_html_file in ${output_path}/sections/*.html
 	do
 		section_html_filename=${section_html_file##*/}
