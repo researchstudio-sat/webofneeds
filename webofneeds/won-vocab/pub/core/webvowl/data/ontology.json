@@ -268,24 +268,6 @@
         "undefined" : "Connected"
       }
     }, {
-      "iri" : "https://w3id.org/won/core#RequestSent",
-      "baseIri" : "https://w3id.org/won/core",
-      "annotations" : {
-        "isDefinedBy" : [ {
-          "identifier" : "isDefinedBy",
-          "language" : "undefined",
-          "value" : "https://w3id.org/won/core",
-          "type" : "iri"
-        } ]
-      },
-      "comment" : {
-        "en" : "Half-open state. The Connection has been requested by the local end but not yet been accepted by the remote counterpart."
-      },
-      "labels" : {
-        "IRI-based" : "RequestSent",
-        "undefined" : "RequestSent"
-      }
-    }, {
       "iri" : "https://w3id.org/won/core#Closed",
       "baseIri" : "https://w3id.org/won/core",
       "annotations" : {
@@ -302,6 +284,24 @@
       "labels" : {
         "IRI-based" : "Closed",
         "undefined" : "Closed"
+      }
+    }, {
+      "iri" : "https://w3id.org/won/core#RequestSent",
+      "baseIri" : "https://w3id.org/won/core",
+      "annotations" : {
+        "isDefinedBy" : [ {
+          "identifier" : "isDefinedBy",
+          "language" : "undefined",
+          "value" : "https://w3id.org/won/core",
+          "type" : "iri"
+        } ]
+      },
+      "comment" : {
+        "en" : "Half-open state. The Connection has been requested by the local end but not yet been accepted by the remote counterpart."
+      },
+      "labels" : {
+        "IRI-based" : "RequestSent",
+        "undefined" : "RequestSent"
       }
     } ],
     "comment" : {
@@ -1794,6 +1794,14 @@
     "iri" : "https://w3id.org/won/core#textMessage",
     "baseIri" : "https://w3id.org/won/core",
     "range" : "107",
+    "annotations" : {
+      "rationale" : [ {
+        "identifier" : "rationale",
+        "language" : "en",
+        "value" : "At first glance, this property seems better placed in the `message` ontology, however the message validation forbids properties from that ontology in the message content. As it is really important, we place it in `core`.",
+        "type" : "label"
+      } ]
+    },
     "label" : {
       "IRI-based" : "textMessage",
       "undefined" : "textMessage"

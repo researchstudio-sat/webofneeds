@@ -83,12 +83,12 @@
   }, {
     "instances" : 0,
     "union" : [ "3", "6" ],
-    "attributes" : [ "union", "anonymous" ],
+    "attributes" : [ "anonymous", "union" ],
     "id" : "2"
   }, {
     "instances" : 0,
     "union" : [ "3", "6" ],
-    "attributes" : [ "union", "anonymous" ],
+    "attributes" : [ "anonymous", "union" ],
     "id" : "7"
   }, {
     "iri" : "https://w3id.org/won/message#Message",

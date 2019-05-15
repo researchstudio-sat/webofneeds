@@ -59,6 +59,10 @@ Matching services can make suggestions which atoms to connect to. An Atom specif
 <http://purl.org/vocab/vann/preferredNamespacePrefix> rdf:type owl:AnnotationProperty .
 
 
+###  http://www.linkedmodel.org/schema/vaem#rationale
+<http://www.linkedmodel.org/schema/vaem#rationale> rdf:type owl:AnnotationProperty .
+
+
 #################################################################
 #    Datatypes
 #################################################################
@@ -425,6 +429,7 @@ sought to fulfill the atom in contrast to the part that is available.""" ;
 ###  https://w3id.org/won/core#textMessage
 :textMessage rdf:type owl:DatatypeProperty ;
              rdfs:range xsd:string ;
+             <http://www.linkedmodel.org/schema/vaem#rationale> "At first glance, this property seems better placed in the `message` ontology, however the message validation forbids properties from that ontology in the message content. As it is really important, we place it in `core`."@en ;
              rdfs:comment "Specifies a text message."@en ;
              rdfs:label "textMessage" .
 

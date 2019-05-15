@@ -1,7 +1,7 @@
 <https://w3id.org/won/message> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Ontology> .
 <https://w3id.org/won/message> <http://www.w3.org/2002/07/owl#versionIRI> <https://w3id.org/won/message/1.0> .
 <https://w3id.org/won/message> <http://www.w3.org/2002/07/owl#imports> <https://w3id.org/won/core/1.0> .
-<https://w3id.org/won/message> <http://purl.org/dc/elements/1.1/abstract> "This ontology is used to model the Message objects central to the Web of Needs."@en .
+<https://w3id.org/won/message> <http://purl.org/dc/elements/1.1/abstract> "This ontology is used to model the Message objects central to the Web of Needs. Messages are entities that encapsulate addressing information, signing information, and optionally, content in an RDF dataset. A message is identified by a URI in the URI space on the WoN node it was created on. \n\nA message consists of graphs that can conceptually contain other graphs; thus the message dataset conceptually is a tree of graphs, which can either be envelope graphs, holding addressing information and signatures, or content graphs, holding arbitrary content.\n\nIf a message is sent to another Atom, a new Message URI is minted on that Atom's WoN node and the message copied into the new Message's dataset."@en .
 <https://w3id.org/won/message> <http://purl.org/dc/elements/1.1/creator> "Fabian Salcher" .
 <https://w3id.org/won/message> <http://purl.org/dc/elements/1.1/creator> "Florian Kleedorfer" .
 <https://w3id.org/won/message> <http://purl.org/dc/elements/1.1/creator> "Yana Panchenko" .
@@ -9,7 +9,6 @@
 <https://w3id.org/won/message> <http://purl.org/dc/terms/created> "2013-12-13"^^<http://www.w3.org/2001/XMLSchema#date> .
 <https://w3id.org/won/message> <http://purl.org/dc/terms/license> <https://creativecommons.org/licenses/by/4.0/> .
 <https://w3id.org/won/message> <http://purl.org/vocab/vann/preferredNamespacePrefix> "msg" .
-<https://w3id.org/won/message> <http://www.w3.org/2000/01/rdf-schema#comment> "Ontology for describing messages in the Web of Needs project."@en .
 # 
 # 
 # #################################################################
@@ -78,6 +77,16 @@
 <https://w3id.org/won/message#correspondingRemoteMessage> <http://www.w3.org/2000/01/rdf-schema#range> <https://w3id.org/won/message#Message> .
 <https://w3id.org/won/message#correspondingRemoteMessage> <http://www.w3.org/2000/01/rdf-schema#comment> "Points to another message. Messages always exist in two copies: one on the sender's WoN node and one on the receiver's WoN node. The receiver's WoN node copies the message, mints a new URI for it and points to the original message using 'msg:correspondingRemoteMessage'."@en .
 <https://w3id.org/won/message#correspondingRemoteMessage> <http://www.w3.org/2000/01/rdf-schema#label> "correspondingRemoteMessage" .
+# 
+# https://w3id.org/won/message#hintTargetAtom
+<https://w3id.org/won/message#hintTargetAtom> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+<https://w3id.org/won/message#hintTargetAtom> <http://www.w3.org/2000/01/rdf-schema#comment> "The target Atom of the AtomHintMessage. By sending this message, the sender wants to express that the Atom's owner may want to establish a connection with the targetAtom (but first must choose a suitable pair of sockets), or that the targetAtom may just be interesting for the owner for other reasons."@en .
+<https://w3id.org/won/message#hintTargetAtom> <http://www.w3.org/2000/01/rdf-schema#label> "hintTargetAtom" .
+# 
+# https://w3id.org/won/message#hintTargetSocket
+<https://w3id.org/won/message#hintTargetSocket> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+<https://w3id.org/won/message#hintTargetSocket> <http://www.w3.org/2000/01/rdf-schema#comment> "The target Socket of a SocketHintMessage. By sending this message it is suggested to establish a connection between the recipientSocket and the targetSocket."@en .
+<https://w3id.org/won/message#hintTargetSocket> <http://www.w3.org/2000/01/rdf-schema#label> "hintTargetSocket" .
 # 
 # https://w3id.org/won/message#messageType
 <https://w3id.org/won/message#messageType> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
@@ -178,6 +187,13 @@ _:genid5 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/19
 <https://w3id.org/won/message#hash> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#string> .
 <https://w3id.org/won/message#hash> <http://www.w3.org/2000/01/rdf-schema#comment> "The message hash."@en .
 <https://w3id.org/won/message#hash> <http://www.w3.org/2000/01/rdf-schema#label> "hash" .
+# 
+# https://w3id.org/won/message#hintScore
+<https://w3id.org/won/message#hintScore> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
+<https://w3id.org/won/message#hintScore> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/message#Message> .
+<https://w3id.org/won/message#hintScore> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#float> .
+<https://w3id.org/won/message#hintScore> <http://www.w3.org/2000/01/rdf-schema#comment> "Score of the Hint, indicating how well-suited the sender of the Hint thinks it is for the recipient. Must be in the range of 0.0 (worst) and 1.0 (best)."@en .
+<https://w3id.org/won/message#hintScore> <http://www.w3.org/2000/01/rdf-schema#label> "hintScore" .
 # 
 # https://w3id.org/won/message#protocolVersion
 <https://w3id.org/won/message#protocolVersion> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
@@ -296,6 +312,13 @@ _:genid5 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/19
 <https://w3id.org/won/message#ActivateMessage> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/message> .
 <https://w3id.org/won/message#ActivateMessage> <http://www.w3.org/2000/01/rdf-schema#label> "ActivateMessage" .
 # 
+# https://w3id.org/won/message#AtomHintMessage
+<https://w3id.org/won/message#AtomHintMessage> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
+<https://w3id.org/won/message#AtomHintMessage> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/message#MessageType> .
+<https://w3id.org/won/message#AtomHintMessage> <http://www.w3.org/2000/01/rdf-schema#comment> "Type of message sent by a matching service to an Atom in order to inform its owner of other Atoms possibly interesting for establishing a connection, or just generally of interest."@en .
+<https://w3id.org/won/message#AtomHintMessage> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/message> .
+<https://w3id.org/won/message#AtomHintMessage> <http://www.w3.org/2000/01/rdf-schema#label> "AtomHintMessage" .
+# 
 # https://w3id.org/won/message#AtomMessage
 <https://w3id.org/won/message#AtomMessage> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
 <https://w3id.org/won/message#AtomMessage> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/message#MessageType> .
@@ -352,13 +375,6 @@ _:genid5 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/19
 <https://w3id.org/won/message#FailureResponse> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/message> .
 <https://w3id.org/won/message#FailureResponse> <http://www.w3.org/2000/01/rdf-schema#label> "FailureResponse" .
 # 
-# https://w3id.org/won/message#HintMessage
-<https://w3id.org/won/message#HintMessage> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
-<https://w3id.org/won/message#HintMessage> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/message#MessageType> .
-<https://w3id.org/won/message#HintMessage> <http://www.w3.org/2000/01/rdf-schema#comment> "Type of message sent by a matching service to an Atom in order to inform its owner of other Atoms possibly interesting for establishing a connection."@en .
-<https://w3id.org/won/message#HintMessage> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/message> .
-<https://w3id.org/won/message#HintMessage> <http://www.w3.org/2000/01/rdf-schema#label> "HintMessage" .
-# 
 # https://w3id.org/won/message#OpenMessage
 <https://w3id.org/won/message#OpenMessage> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
 <https://w3id.org/won/message#OpenMessage> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/message#MessageType> .
@@ -372,6 +388,12 @@ _:genid5 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/19
 <https://w3id.org/won/message#ReplaceMessage> <http://www.w3.org/2000/01/rdf-schema#comment> "Type of message sent to a WoN Node in order replace an Atom's content."@en .
 <https://w3id.org/won/message#ReplaceMessage> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/message> .
 <https://w3id.org/won/message#ReplaceMessage> <http://www.w3.org/2000/01/rdf-schema#label> "ReplaceMessage" .
+# 
+# https://w3id.org/won/message#SocketHintMessage
+<https://w3id.org/won/message#SocketHintMessage> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
+<https://w3id.org/won/message#SocketHintMessage> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/message#MessageType> .
+<https://w3id.org/won/message#SocketHintMessage> <http://www.w3.org/2000/01/rdf-schema#comment> "Type of message sent by a matching service to the Socket of an Atom in order to inform its owner of the Socket of another Atom possibly interesting for establishing a connection."@en .
+<https://w3id.org/won/message#SocketHintMessage> <http://www.w3.org/2000/01/rdf-schema#label> "SocketHintMessage" .
 # 
 # https://w3id.org/won/message#SuccessResponse
 <https://w3id.org/won/message#SuccessResponse> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
@@ -405,9 +427,12 @@ _:genid8 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/wo
 _:genid8 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/1999/02/22-rdf-syntax-ns#nil> .
 # 
 _:genid12 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AllDifferent> .
-_:genid12 <http://www.w3.org/2002/07/owl#distinctMembers> _:genid25 .
+_:genid12 <http://www.w3.org/2002/07/owl#distinctMembers> _:genid26 .
+_:genid26 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
+_:genid26 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/message#ActivateMessage> .
+_:genid26 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:genid25 .
 _:genid25 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
-_:genid25 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/message#ActivateMessage> .
+_:genid25 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/message#AtomHintMessage> .
 _:genid25 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:genid24 .
 _:genid24 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
 _:genid24 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/message#AtomMessage> .
@@ -434,16 +459,58 @@ _:genid17 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1
 _:genid17 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/message#FailureResponse> .
 _:genid17 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:genid16 .
 _:genid16 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
-_:genid16 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/message#HintMessage> .
+_:genid16 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/message#OpenMessage> .
 _:genid16 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:genid15 .
 _:genid15 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
-_:genid15 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/message#OpenMessage> .
+_:genid15 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/message#ReplaceMessage> .
 _:genid15 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:genid14 .
 _:genid14 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
-_:genid14 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/message#ReplaceMessage> .
+_:genid14 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/message#SocketHintMessage> .
 _:genid14 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:genid13 .
 _:genid13 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
 _:genid13 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/message#SuccessResponse> .
 _:genid13 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/1999/02/22-rdf-syntax-ns#nil> .
+# 
+_:genid27 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AllDifferent> .
+_:genid27 <http://www.w3.org/2002/07/owl#distinctMembers> _:genid40 .
+_:genid40 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
+_:genid40 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/message#ActivateMessage> .
+_:genid40 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:genid39 .
+_:genid39 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
+_:genid39 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/message#AtomHintMessage> .
+_:genid39 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:genid38 .
+_:genid38 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
+_:genid38 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/message#AtomMessage> .
+_:genid38 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:genid37 .
+_:genid37 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
+_:genid37 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/message#ChangeNotificationMessage> .
+_:genid37 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:genid36 .
+_:genid36 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
+_:genid36 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/message#CloseMessage> .
+_:genid36 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:genid35 .
+_:genid35 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
+_:genid35 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/message#ConnectMessage> .
+_:genid35 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:genid34 .
+_:genid34 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
+_:genid34 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/message#ConnectionMessage> .
+_:genid34 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:genid33 .
+_:genid33 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
+_:genid33 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/message#CreateMessage> .
+_:genid33 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:genid32 .
+_:genid32 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
+_:genid32 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/message#DeactivateMessage> .
+_:genid32 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:genid31 .
+_:genid31 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
+_:genid31 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/message#FailureResponse> .
+_:genid31 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:genid30 .
+_:genid30 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
+_:genid30 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/message#OpenMessage> .
+_:genid30 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:genid29 .
+_:genid29 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
+_:genid29 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/message#ReplaceMessage> .
+_:genid29 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:genid28 .
+_:genid28 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
+_:genid28 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/message#SuccessResponse> .
+_:genid28 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/1999/02/22-rdf-syntax-ns#nil> .
 # 
 # Generated by the OWL API (version 5.1.9) https://github.com/owlcs/owlapi/

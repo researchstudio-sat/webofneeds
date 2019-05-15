@@ -41,6 +41,9 @@
 # http://purl.org/vocab/vann/preferredNamespacePrefix
 <http://purl.org/vocab/vann/preferredNamespacePrefix> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
 # 
+# http://www.linkedmodel.org/schema/vaem#rationale
+<http://www.linkedmodel.org/schema/vaem#rationale> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
+# 
 # 
 # 
 # #################################################################
@@ -393,6 +396,7 @@ _:genid8 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/19
 # https://w3id.org/won/core#textMessage
 <https://w3id.org/won/core#textMessage> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
 <https://w3id.org/won/core#textMessage> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/won/core#textMessage> <http://www.linkedmodel.org/schema/vaem#rationale> "At first glance, this property seems better placed in the `message` ontology, however the message validation forbids properties from that ontology in the message content. As it is really important, we place it in `core`."@en .
 <https://w3id.org/won/core#textMessage> <http://www.w3.org/2000/01/rdf-schema#comment> "Specifies a text message."@en .
 <https://w3id.org/won/core#textMessage> <http://www.w3.org/2000/01/rdf-schema#label> "textMessage" .
 # 
