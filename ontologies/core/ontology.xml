@@ -7,6 +7,7 @@
      xmlns:xml="http://www.w3.org/XML/1998/namespace"
      xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
      xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     xmlns:vaem="http://www.linkedmodel.org/schema/vaem#"
      xmlns:vann="http://purl.org/vocab/vann/"
      xmlns:terms="http://purl.org/dc/terms/">
     <owl:Ontology rdf:about="https://w3id.org/won/core">
@@ -94,6 +95,13 @@ Matching services can make suggestions which atoms to connect to. An Atom specif
 
 
     <owl:AnnotationProperty rdf:about="http://purl.org/vocab/vann/preferredNamespacePrefix"/>
+    
+
+
+    <!-- http://www.linkedmodel.org/schema/vaem#rationale -->
+
+
+    <owl:AnnotationProperty rdf:about="http://www.linkedmodel.org/schema/vaem#rationale"/>
     
 
 
@@ -657,6 +665,7 @@ sought to fulfill the atom in contrast to the part that is available.</rdfs:comm
 
     <owl:DatatypeProperty rdf:about="https://w3id.org/won/core#textMessage">
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <vaem:rationale xml:lang="en">At first glance, this property seems better placed in the `message` ontology, however the message validation forbids properties from that ontology in the message content. As it is really important, we place it in `core`.</vaem:rationale>
         <rdfs:comment xml:lang="en">Specifies a text message.</rdfs:comment>
         <rdfs:label>textMessage</rdfs:label>
     </owl:DatatypeProperty>
