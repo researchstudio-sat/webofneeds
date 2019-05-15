@@ -18,34 +18,52 @@ main.owneroverview {
     grid-gap: 0.5rem;
     border-bottom: $thinGrayBorder;
     padding: 0.5rem;
+    @media (min-width: $maxContentWidth) {
+      padding-right: 0;
+    }
     align-items: center;
 
     &__title {
       font-size: $mediumFontSize;
     }
 
-    &__loading {
-      font-size: $smallFontSize;
-      color: $won-line-gray;
-    }
-
     &__updated {
       display: grid;
       grid-template-columns: min-content min-content;
-      grid-gap: 0.5rem;
       align-items: center;
 
       font-size: $smallFontSize;
 
+      &__loading {
+        font-size: $smallFontSize;
+        color: $won-line-gray;
+        margin-right: 0.5rem;
+      }
+
       &__time {
         white-space: nowrap;
         color: $won-line-gray;
+        margin-right: 0.5rem;
       }
 
       &__reload.won-button--filled.red {
-        font-size: 0.75rem;
-        padding: 0.25rem;
+        font-size: $smallFontSize;
+        padding: 0.33rem;
       }
+    }
+  }
+
+  .owneroverview__noresults {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    padding: 0.5rem;
+
+    &__label {
+      font-size: $normalFontSize;
+      color: $won-primary-text-color;
+      text-align: center;
+      max-width: 25rem;
     }
   }
 

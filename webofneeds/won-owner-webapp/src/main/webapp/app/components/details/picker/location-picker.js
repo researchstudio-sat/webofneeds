@@ -3,19 +3,20 @@
  */
 
 import angular from "angular";
-import Immutable from "immutable"; // also exports itself as (window).L
 import L from "../../../leaflet-bundleable.js";
 import {
   attach,
   searchNominatim,
   reverseSearchNominatim,
   nominatim2draftLocation,
+  scrubSearchResults,
   delay,
   getIn,
 } from "../../../utils.js";
 import { doneTypingBufferNg, DomCache } from "../../../cstm-ng-utils.js";
 
 import { initLeaflet, leafletBounds } from "../../../won-utils.js";
+import titlePickerModule from "./title-picker.js";
 
 import "~/style/_locationpicker.scss";
 
@@ -80,7 +81,16 @@ function genComponentConf() {
                 </a>
             </li>
         </ul>
+        <!-- MAP VIEW -->
         <div class="lp__mapmount" in-view="$inview && self.mapInView($inviewInfo)"></div>
+        <!-- ADDRESS OVERRIDE -->
+        <won-title-picker
+          ng-if="self.pickedLocation"
+          class="lp__addressoverride"
+          initial-value="self.alternativeName"
+          on-update="self.updateAddressName(value)"
+          detail="self.detail && self.detail.overrideAddressDetail">
+        </won-title-picker>
             `;
 
   class Controller {
@@ -93,6 +103,7 @@ function genComponentConf() {
 
       this.locationIsSaved = !!this.initialValue;
       this.pickedLocation = this.initialValue;
+      this.alternativeName = undefined;
       this.previousLocation = undefined;
       this.showResetButton = false;
 
@@ -114,6 +125,17 @@ function genComponentConf() {
         this.onUpdate({ value: location });
       } else {
         this.onUpdate({ value: undefined });
+      }
+    }
+
+    updateAddressName(name) {
+      if (this.pickedLocation) {
+        if (name) {
+          this.pickedLocation.name = name;
+        } else {
+          this.pickedLocation.name = this.textfield().value;
+        }
+        this.onUpdate({ value: this.pickedLocation });
       }
     }
 
@@ -156,6 +178,7 @@ function genComponentConf() {
 
       this.locationIsSaved = false;
       this.pickedLocation = undefined;
+      this.alternativeName = undefined;
       this.placeMarkers([]);
       this.showResetButton = false;
 
@@ -167,6 +190,7 @@ function genComponentConf() {
       this.update(location);
       this.locationIsSaved = true;
       this.pickedLocation = location;
+      this.alternativeName = undefined;
 
       this.resetSearchResults(); // picked one, can hide the rest if they were there
       this.textfield().value = location.name;
@@ -220,6 +244,7 @@ function genComponentConf() {
         this.map.invalidateSize();
 
         this.textfield().value = this.pickedLocation.name;
+        this.alternativeName = undefined;
         this.showResetButton = true;
         this.placeMarkers([this.pickedLocation]);
         this.markers[0].openPopup();
@@ -319,20 +344,6 @@ function genComponentConf() {
   };
 }
 
-function scrubSearchResults(searchResults) {
-  return (
-    Immutable.fromJS(searchResults.map(nominatim2draftLocation))
-      /*
-         * filter "duplicate" results (e.g. "Wien"
-         *  -> 1x waterway, 1x boundary, 1x place)
-         */
-      .groupBy(r => r.get("name"))
-      .map(sameNamedResults => sameNamedResults.first())
-      .toList()
-      .toJS()
-  );
-}
-
 function onMapClick(e, ctrl) {
   //`this` is the mapcontainer here as leaflet
   // apparently binds itself to the function.
@@ -356,7 +367,7 @@ function onMapClick(e, ctrl) {
 }
 
 export default angular
-  .module("won.owner.components.locationPicker", [])
+  .module("won.owner.components.locationPicker", [titlePickerModule])
   .directive("wonLocationPicker", genComponentConf).name;
 
 window.searchNominatim4dbg = searchNominatim;

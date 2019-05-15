@@ -10,7 +10,7 @@ import { attach, get, getIn, toAbsoluteURL } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { ownerBaseUrl } from "~/config/default.js";
 import * as srefUtils from "../sref-utils.js";
-import { getAboutSectionFromRoute } from "../selectors/general-selectors.js";
+import generalSelectors from "../selectors/general-selectors.js";
 import * as viewSelectors from "../selectors/view-selectors.js";
 import * as accountUtils from "../account-utils.js";
 import { h } from "preact";
@@ -90,10 +90,10 @@ const template = (
             className="about__howto__steps__process"
             ng-style="{'--howToColCount': self.howItWorksSteps.length}"
           >
-            {/* TODO: this var injection does not work */}
+            {/* TODO: this var injection does not work*/}
             <svg
               className="about__howto__steps__process__icon"
-              ng-class="{'about__howto__steps__process__icon--selected': $index == self.selectedHowItWorksStep}"
+              ng-className="{'about__howto__steps__process__icon--selected': $index == self.selectedHowItWorksStep}"
               ng-repeat="item in self.howItWorksSteps"
               ng-click="self.selectedHowItWorksStep = $index"
             >
@@ -105,7 +105,7 @@ const template = (
             <div
               className="about__howto__steps__process__stepcount"
               ng-repeat="item in self.howItWorksSteps"
-              ng-class="{'about__howto__steps__process__stepcount--selected': $index == self.selectedHowItWorksStep}"
+              ng-className="{'about__howto__steps__process__stepcount--selected': $index == self.selectedHowItWorksStep}"
               ng-click="self.selectedHowItWorksStep = $index"
             >
               {"{{ $index + 1 }}"}
@@ -114,7 +114,7 @@ const template = (
           </div>
           <svg
             className="about__howto__steps__button about__howto__steps__button--prev"
-            ng-class="{'about__howto__steps__button--invisible': self.selectedHowItWorksStep <= 0}"
+            ng-className="{'about__howto__steps__button--invisible': self.selectedHowItWorksStep <= 0}"
             ng-click="self.selectedHowItWorksStep = self.selectedHowItWorksStep - 1"
           >
             <use xlinkHref="#ico36_backarrow" href="#ico36_backarrow" />
@@ -129,7 +129,7 @@ const template = (
           </div>
           <svg
             className="about__howto__steps__button about__howto__steps__button--next"
-            ng-class="{'about__howto__steps__button--invisible': self.selectedHowItWorksStep >= (self.howItWorksSteps.length-1)}"
+            ng-className="{'about__howto__steps__button--invisible': self.selectedHowItWorksStep >= (self.howItWorksSteps.length-1)}"
             ng-click="self.selectedHowItWorksStep = self.selectedHowItWorksStep + 1"
           >
             <use xlinkHref="#ico36_backarrow" href="#ico36_backarrow" />
@@ -142,8 +142,7 @@ const template = (
         <div className="about__howto__createx">
           <button
             className="won-button--filled red about__howto__createx__button"
-            ng-click="self.createWhatsAround()"
-            ng-disabled="self.processingPublish"
+            ng-click="self.viewWhatsAround()"
           >
             <svg className="won-button-icon" style="--local-primary:white;">
               <use
@@ -151,16 +150,11 @@ const template = (
                 href="#ico36_location_current"
               />
             </svg>
-            <span ng-if="!self.processingPublish">
-              {"What's in your Area?"}
-            </span>
-            <span ng-if="self.processingPublish">
-              {"Finding out what's going on&hellip"};
-            </span>
+            <span>{"What's in your Area?"}</span>
           </button>
           <button
             className="won-button--filled red about__howto__createx__button"
-            ng-click="self.router__stateGo('overview')"
+            ng-click="self.viewWhatsNew()"
           >
             <span>{"What's new?"}</span>
           </button>
@@ -405,9 +399,10 @@ class AboutController {
     window.ab4dbg = this;
 
     const select = state => {
-      const visibleSection = getAboutSectionFromRoute(state);
+      const visibleSection = generalSelectors.getAboutSectionFromRoute(state);
       const themeName = getIn(state, ["config", "theme", "name"]);
       return {
+        isLocationAccessDenied: generalSelectors.isLocationAccessDenied(state),
         loggedIn: accountUtils.isLoggedIn(get(state, "account")),
         themeName,
         visibleSection,
@@ -454,35 +449,62 @@ class AboutController {
     });
   }
 
-  createWhatsAround() {
-    if (this.processingPublish) {
-      console.debug("publish in process, do not take any action");
-      return;
-    }
-
-    if (this.loggedIn) {
-      this.atoms__whatsAround();
-    } else {
-      this.view__showTermsDialog(
-        Immutable.fromJS({
-          acceptCallback: () => {
-            this.view__hideModalDialog();
-            this.atoms__whatsAround();
-          },
-          cancelCallback: () => {
-            this.view__hideModalDialog();
-          },
-        })
-      );
-    }
-  }
-
   toggleMoreInfo() {
     this.moreInfo = !this.moreInfo;
   }
 
   getSvgIconFromItem(item) {
     return item.svgSrc ? item.svgSrc : "#ico36_uc_question";
+  }
+
+  viewWhatsAround() {
+    this.viewWhatsX(() => {
+      this.router__stateGo("map");
+    });
+  }
+
+  viewWhatsNew() {
+    this.viewWhatsX(() => {
+      this.router__stateGo("overview");
+    });
+  }
+
+  viewWhatsX(callback) {
+    if (this.isLocationAccessDenied) {
+      callback();
+    } else if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        currentLocation => {
+          const lat = currentLocation.coords.latitude;
+          const lng = currentLocation.coords.longitude;
+
+          this.view__updateCurrentLocation(
+            Immutable.fromJS({ location: { lat, lng } })
+          );
+          callback();
+        },
+        error => {
+          //error handler
+          console.error(
+            "Could not retrieve geolocation due to error: ",
+            error.code,
+            ", continuing map initialization without currentLocation. fullerror:",
+            error
+          );
+          this.view__locationAccessDenied();
+          callback();
+        },
+        {
+          //options
+          enableHighAccuracy: true,
+          maximumAge: 30 * 60 * 1000, //use if cache is not older than 30min
+        }
+      );
+    } else {
+      console.error("location could not be retrieved");
+      this.view__locationAccessDenied();
+      callback();
+    }
   }
 }
 

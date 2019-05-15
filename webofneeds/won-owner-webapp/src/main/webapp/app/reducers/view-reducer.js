@@ -23,6 +23,8 @@ const initialState = Immutable.fromJS({
   },
   showSlideIns: true,
   atoms: new Immutable.Map(),
+  locationAccessDenied: false,
+  currentLocation: undefined,
 });
 
 const initialAtomState = Immutable.fromJS({
@@ -32,6 +34,9 @@ const initialAtomState = Immutable.fromJS({
 
 export default function(viewState = initialState, action = {}) {
   switch (action.type) {
+    case actionTypes.view.locationAccessDenied:
+      return viewState.set("locationAccessDenied", true);
+
     case actionTypes.lostConnection:
       return viewState.set("showSlideIns", true);
 
@@ -62,6 +67,9 @@ export default function(viewState = initialState, action = {}) {
 
       return viewState.set("showMainMenu", false);
     }
+
+    case actionTypes.view.updateCurrentLocation:
+      return viewState.set("currentLocation", action.payload.get("location"));
 
     case actionTypes.view.toggleRdf:
       return viewState

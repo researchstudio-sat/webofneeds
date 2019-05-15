@@ -20,15 +20,17 @@ public class HintEvent implements Serializable {
     private String serializedExplanationModel;
     private String serializationLangName;
     private String serializationLangContentType;
+    private Cause cause;
 
     public HintEvent(String fromWonNodeUri, String fromAtomUri, String toWonNodeUri, String toAtomUri,
-                    String matcherUri, double score) {
+                    String matcherUri, double score, Cause cause) {
         this.fromWonNodeUri = fromWonNodeUri;
         this.fromAtomUri = fromAtomUri;
         this.toWonNodeUri = toWonNodeUri;
         this.toAtomUri = toAtomUri;
         this.matcherUri = matcherUri;
         this.score = score;
+        this.cause = cause;
     }
 
     public String getFromAtomUri() {
@@ -53,6 +55,10 @@ public class HintEvent implements Serializable {
 
     public double getScore() {
         return score;
+    }
+
+    public Cause getCause() {
+        return cause;
     }
 
     public Model deserializeExplanationModel() {
@@ -81,7 +87,7 @@ public class HintEvent implements Serializable {
 
     @Override
     public HintEvent clone() {
-        HintEvent e = new HintEvent(fromWonNodeUri, fromAtomUri, toWonNodeUri, toAtomUri, matcherUri, score);
+        HintEvent e = new HintEvent(fromWonNodeUri, fromAtomUri, toWonNodeUri, toAtomUri, matcherUri, score, cause);
         e.setGeneratedEventUri(this.getGeneratedEventUri());
         e.setSerializationLangContentType(this.serializationLangContentType);
         e.setSerializationLangName(this.serializationLangName);
@@ -92,6 +98,6 @@ public class HintEvent implements Serializable {
     @Override
     public String toString() {
         return "HintEvent: (" + getFromWonNodeUri() + ", " + getFromAtomUri() + ", " + getToWonNodeUri() + ", "
-                        + getToAtomUri() + ", " + getMatcherUri() + ", " + getScore() + ")";
+                        + getToAtomUri() + ", " + getMatcherUri() + ", " + getScore() + ", " + getCause() + ")";
     }
 }

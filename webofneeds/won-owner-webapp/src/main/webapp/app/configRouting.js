@@ -16,6 +16,7 @@ import * as processUtils from "./process-utils.js";
 import settingsComponent from "./pages/settings.jsx";
 import postComponent from "./pages/post.jsx";
 import overviewComponent from "./pages/overview.jsx";
+import mapComponent from "./pages/map.jsx";
 import aboutComponent from "./pages/about.jsx";
 import connectionsComponent from "./pages/connections.jsx";
 import signupComponent from "./pages/signup.jsx";
@@ -83,6 +84,11 @@ export const configRouting = [
         path: "/about?aboutSection",
         component: aboutComponent,
         as: "about",
+      },
+      {
+        path: "/map?viewAtomUri?viewConnUri",
+        component: mapComponent,
+        as: "map",
       },
       {
         path:
@@ -196,6 +202,7 @@ export function accessControl({
       return;
 
     case "overview":
+    case "map":
     case "signup":
     case "about":
       return; // can always access these pages.

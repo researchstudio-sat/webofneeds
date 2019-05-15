@@ -290,6 +290,7 @@ export function isDisplayableUseCase(useCase) {
   return (
     useCase &&
     useCase.identifier &&
+    !useCase.hidden &&
     (useCase.label || useCase.icon) &&
     !useCase.subItems
   );
@@ -407,7 +408,7 @@ export function isHoldable(useCase) {
     useCase.draft.content &&
     useCase.draft.content.sockets &&
     values(useCase.draft.content.sockets).includes(
-      won.WON.HoldableSocketCompacted
+      won.HOLD.HoldableSocketCompacted
     )
   );
 }

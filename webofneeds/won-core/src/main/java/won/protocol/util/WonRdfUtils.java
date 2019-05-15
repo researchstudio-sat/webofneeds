@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.graph.NodeFactory;
@@ -57,6 +58,7 @@ import org.apache.jena.sparql.path.PathParser;
 import org.apache.jena.tdb.TDB;
 import org.apache.jena.vocabulary.RDF;
 import org.hibernate.cfg.NotYetImplementedException;
+import org.hibernate.hql.internal.ast.tree.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,9 +66,10 @@ import won.protocol.exception.IncorrectPropertyCountException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageDirection;
 import won.protocol.message.WonSignatureData;
+import won.protocol.model.AtomGraphType;
 import won.protocol.model.ConnectionState;
 import won.protocol.model.Match;
-import won.protocol.model.AtomGraphType;
+import won.protocol.model.SocketDefinitionImpl;
 import won.protocol.service.WonNodeInfo;
 import won.protocol.service.WonNodeInfoBuilder;
 import won.protocol.vocabulary.SCHEMA;
@@ -836,7 +839,7 @@ public class WonRdfUtils {
          */
         public static Optional<URI> getTypeOfSocket(Model content, URI socket) {
             Resource resource = content.getResource(socket.toString());
-            Resource socketType = resource.getPropertyResourceValue(RDF.type);
+            Resource socketType = resource.getPropertyResourceValue(WON.socketDefinition);
             if (socketType != null && socketType.isURIResource()) {
                 return Optional.of(URI.create(socketType.asResource().getURI()));
             }
@@ -884,7 +887,7 @@ public class WonRdfUtils {
             while (stmtIterator.hasNext()) {
                 RDFNode socket = stmtIterator.nextStatement().getObject();
                 if (socket.isResource() && socket.isURIResource()) {
-                    if (socket.asResource().hasProperty(RDF.type, socketTypeResource)) {
+                    if (socket.asResource().hasProperty(WON.socketDefinition, socketTypeResource)) {
                         ret.add(URI.create(socket.toString()));
                     }
                 }
@@ -949,7 +952,7 @@ public class WonRdfUtils {
             Resource baseRes = RdfUtils.getBaseResource(model);
             Resource socket = model.createResource(socketURI.toString());
             baseRes.addProperty(WON.socket, socket);
-            socket.addProperty(RDF.type, model.createResource(socketTypeURI.toString()));
+            socket.addProperty(WON.socketDefinition, model.createResource(socketTypeURI.toString()));
             if (isDefaultSocket) {
                 if (baseRes.hasProperty(WON.defaultSocket)) {
                     baseRes.removeAll(WON.defaultSocket);
@@ -997,6 +1000,77 @@ public class WonRdfUtils {
                 baseResource.addProperty(WON.targetSocket, model.getResource(targetSocket.toString()));
             }
             return Optional.of(model);
+        }
+
+        public static void setCompatibleSocketDefinitions(SocketDefinitionImpl socketConfiguration, Dataset dataset,
+                        URI socketURI) {
+            socketConfiguration.setCompatibleSocketTypes(RdfUtils
+                            .getObjectStreamOfProperty(dataset, socketURI, URI.create(WON.socketDefinition.getURI()),
+                                            node -> node.isURIResource() ? URI.create(node.asResource().getURI())
+                                                            : null)
+                            .flatMap(def -> RdfUtils.getObjectStreamOfProperty(dataset, def,
+                                            URI.create(WON.compatibleSocketDefinition.getURI()),
+                                            node -> node.isURIResource() ? URI.create(node.asResource().getURI())
+                                                            : null))
+                            .collect(Collectors.toSet()));
+        }
+
+        public static void setDerivationProperties(SocketDefinitionImpl socketConfiguration, Dataset dataset,
+                        URI socketURI) {
+            socketConfiguration.setDerivationProperties(RdfUtils
+                            .getObjectStreamOfProperty(dataset, socketURI, URI.create(WON.socketDefinition.getURI()),
+                                            node -> node.isURIResource() ? URI.create(node.asResource().getURI())
+                                                            : null)
+                            .flatMap(def -> RdfUtils.getObjectStreamOfProperty(dataset, def,
+                                            URI.create(WON.derivesAtomProperty.getURI()),
+                                            node -> node.isURIResource() ? URI.create(node.asResource().getURI())
+                                                            : null))
+                            .collect(Collectors.toSet()));
+        }
+
+        public static void setInverseDerivationProperties(SocketDefinitionImpl socketConfiguration, Dataset dataset,
+                        URI socketURI) {
+            socketConfiguration.setInverseDerivationProperties(RdfUtils
+                            .getObjectStreamOfProperty(dataset, socketURI, URI.create(WON.socketDefinition.getURI()),
+                                            node -> node.isURIResource() ? URI.create(node.asResource().getURI())
+                                                            : null)
+                            .flatMap(def -> RdfUtils.getObjectStreamOfProperty(dataset, def,
+                                            URI.create(WON.derivesInverseAtomProperty.getURI()),
+                                            node -> node.isURIResource() ? URI.create(node.asResource().getURI())
+                                                            : null))
+                            .collect(Collectors.toSet()));
+        }
+
+        public static void setAutoOpen(SocketDefinitionImpl socketConfiguration, Dataset dataset, URI socketURI) {
+            Set<Boolean> autoOpens = RdfUtils
+                            .getObjectStreamOfProperty(dataset, socketURI, URI.create(WON.socketDefinition.getURI()),
+                                            node -> node.isURIResource() ? URI.create(node.asResource().getURI())
+                                                            : null)
+                            .flatMap(def -> RdfUtils.getObjectStreamOfProperty(dataset, def,
+                                            URI.create(WON.autoOpen.getURI()),
+                                            node -> node.isLiteral() ? (Boolean) node.asLiteral().getBoolean() : null))
+                            .collect(Collectors.toSet());
+            if (autoOpens.size() > 1) {
+                socketConfiguration.addInconsistentProperty(URI.create(WON.autoOpen.getURI()));
+            } else if (autoOpens.size() == 1) {
+                socketConfiguration.setAutoOpen(autoOpens.iterator().next());
+            }
+        }
+
+        public static void setSocketCapacity(SocketDefinitionImpl socketConfiguration, Dataset dataset, URI socketURI) {
+            Set<Integer> socketCapacities = RdfUtils
+                            .getObjectStreamOfProperty(dataset, socketURI, URI.create(WON.socketDefinition.getURI()),
+                                            node -> node.isURIResource() ? URI.create(node.asResource().getURI())
+                                                            : null)
+                            .flatMap(def -> RdfUtils.getObjectStreamOfProperty(dataset, def,
+                                            URI.create(WON.socketCapacity.getURI()),
+                                            node -> node.isLiteral() ? (Integer) node.asLiteral().getInt() : null))
+                            .collect(Collectors.toSet());
+            if (socketCapacities.size() > 1) {
+                socketConfiguration.addInconsistentProperty(URI.create(WON.socketCapacity.getURI()));
+            } else if (socketCapacities.size() == 1) {
+                socketConfiguration.setCapacity(socketCapacities.iterator().next());
+            }
         }
     }
 

@@ -22,10 +22,10 @@ export const otherGroup = {
         ...mergeInEmptyDraft({
           content: {
             sockets: {
-              "#groupSocket": won.WON.GroupSocketCompacted,
-              "#holdableSocket": won.WON.HoldableSocketCompacted,
+              "#groupSocket": won.GROUP.GroupSocketCompacted,
+              "#holdableSocket": won.HOLD.HoldableSocketCompacted,
             },
-            defaultSocket: { "#groupSocket": won.WON.GroupSocketCompacted },
+            defaultSocket: { "#groupSocket": won.GROUP.GroupSocketCompacted },
           },
         }),
       },

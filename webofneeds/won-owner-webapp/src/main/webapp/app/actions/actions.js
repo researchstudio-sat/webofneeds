@@ -39,11 +39,7 @@
 import { tree2constants } from "../utils.js";
 import { hierarchy2Creators } from "./action-utils.js";
 
-import {
-  atomCreate,
-  atomEdit,
-  createWhatsAround,
-} from "./create-atom-action.js";
+import { atomCreate, atomEdit } from "./create-atom-action.js";
 
 import {
   atomsConnect,
@@ -88,7 +84,8 @@ import * as configActions from "./config-actions.js";
 
 import {
   pageLoadAction,
-  loadAllActiveAtomUrisFromOwner,
+  fetchWhatsNew,
+  fetchWhatsAround,
 } from "./load-action.js";
 import { stateGo, stateReload } from "redux-ui-router";
 import {
@@ -148,7 +145,6 @@ const actionHierarchy = {
     edit: atomEdit,
     editSuccessful: INJ_DEFAULT,
     editFailure: INJ_DEFAULT,
-    whatsAround: createWhatsAround,
     createSuccessful: INJ_DEFAULT,
     reopen: atomsOpen,
     close: atomsClose,
@@ -159,8 +155,10 @@ const actionHierarchy = {
     fetchUnloadedAtoms: fetchUnloadedAtoms,
     fetchUnloadedAtom: fetchUnloadedAtom,
 
-    loadAllActiveAtomUrisFromOwner: loadAllActiveAtomUrisFromOwner,
-    storeAtomUrisFromOwner: INJ_DEFAULT,
+    fetchWhatsNew: fetchWhatsNew,
+    fetchWhatsAround: fetchWhatsAround,
+    storeWhatsNew: INJ_DEFAULT,
+    storeWhatsAround: INJ_DEFAULT,
 
     storeOwnedInactiveUris: INJ_DEFAULT,
     storeOwnedInactiveUrisInLoading: INJ_DEFAULT,
@@ -378,6 +376,9 @@ const actionHierarchy = {
 
     clearLoginError: INJ_DEFAULT,
     clearRegisterError: INJ_DEFAULT,
+
+    locationAccessDenied: INJ_DEFAULT,
+    updateCurrentLocation: INJ_DEFAULT,
 
     anonymousSlideIn: {
       show: INJ_DEFAULT,

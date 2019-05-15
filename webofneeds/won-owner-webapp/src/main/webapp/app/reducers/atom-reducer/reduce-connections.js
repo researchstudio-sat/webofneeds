@@ -39,7 +39,7 @@ function addConnectionFull(state, connection) {
 
       parsedConnection = parsedConnection.setIn(["data", "socket"], realSocket);
 
-      if (realSocket === won.WON.HolderSocketCompacted) {
+      if (realSocket === won.HOLD.HolderSocketCompacted) {
         const holdsUri = targetAtomUri;
         console.debug(
           "Handling a holderSocket-connection within atom: ",
@@ -56,7 +56,7 @@ function addConnectionFull(state, connection) {
             );
           }
         }
-      } else if (realSocket === won.WON.HoldableSocketCompacted) {
+      } else if (realSocket === won.HOLD.HoldableSocketCompacted) {
         //holdableSocket Connection from atom to persona -> need to add heldBy targetAtomUri to the atom
         const heldByUri = targetAtomUri;
         console.debug(
@@ -195,7 +195,7 @@ export function changeConnectionState(state, connectionUri, newState) {
   const connection = getIn(atom, ["connections", connectionUri]);
   if (
     newState === won.WON.Closed &&
-    connection.get("socket") == won.WON.HolderSocketCompacted
+    connection.get("socket") === won.HOLD.HolderSocketCompacted
   ) {
     state = state.updateIn([atomUri, "holds"], holds =>
       holds.delete(connection.get("targetAtomUri"))
@@ -204,7 +204,7 @@ export function changeConnectionState(state, connectionUri, newState) {
 
   if (
     newState === won.WON.Closed &&
-    connection.get("socket") == won.WON.HoldableSocketCompacted
+    connection.get("socket") === won.HOLD.HoldableSocketCompacted
   ) {
     state = state.deleteIn([atomUri, "heldBy"]);
   }
@@ -382,16 +382,16 @@ export function addConnectionToLoad(state, atomUri, conn) {
     !!storedAtom.getIn(["connections", conn.get("connectionUri")]);
 
   const socketTypeToCompacted = socketType => {
-    if (socketType === won.WON.ChatSocket) {
-      return won.WON.ChatSocketCompacted;
-    } else if (socketType === won.WON.GroupSocket) {
-      return won.WON.GroupSocketCompacted;
-    } else if (socketType === won.WON.ReviewSocket) {
-      return won.WON.ReviewSocketCompacted;
-    } else if (socketType === won.WON.HolderSocket) {
-      return won.WON.HolderSocketCompacted;
-    } else if (socketType === won.WON.HoldableSocket) {
-      return won.WON.HoldableSocketCompacted;
+    if (socketType === won.CHAT.ChatSocket) {
+      return won.CHAT.ChatSocketCompacted;
+    } else if (socketType === won.GROUP.GroupSocket) {
+      return won.GROUP.GroupSocketCompacted;
+    } else if (socketType === won.REVIEW.ReviewSocket) {
+      return won.REVIEW.ReviewSocketCompacted;
+    } else if (socketType === won.HOLD.HolderSocket) {
+      return won.HOLD.HolderSocketCompacted;
+    } else if (socketType === won.HOLD.HoldableSocket) {
+      return won.HOLD.HoldableSocketCompacted;
     } else {
       console.warn(
         "Unknown socketType: ",

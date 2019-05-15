@@ -1,12 +1,13 @@
 import Immutable from "immutable";
 import won from "../../won-es6.js";
 import * as useCaseUtils from "../../usecase-utils.js";
+import { isSearchAtom, isPersona } from "../../atom-utils.js";
 import {
-  isWhatsAroundAtom,
-  isSearchAtom,
-  isPersona,
-} from "../../atom-utils.js";
-import { generateHexColor, generateRgbColorArray, getIn } from "../../utils.js";
+  generateHexColor,
+  generateRgbColorArray,
+  getIn,
+  get,
+} from "../../utils.js";
 import shajs from "sha.js";
 import Identicon from "identicon.js";
 
@@ -21,13 +22,13 @@ export function parseAtom(jsonldAtom) {
       identiconSvg: generateIdenticon(jsonldAtomImm),
       nodeUri: jsonldAtomImm.getIn(["won:wonNode", "@id"]),
       state: extractState(jsonldAtomImm),
-      heldBy: won.parseFrom(jsonldAtomImm, ["won:heldBy"], "xsd:ID"),
+      heldBy: won.parseFrom(jsonldAtomImm, ["hold:heldBy"], "xsd:ID"),
       holds:
-        won.parseListFrom(jsonldAtomImm, ["won:holds"], "xsd:ID") ||
+        won.parseListFrom(jsonldAtomImm, ["hold:holds"], "xsd:ID") ||
         Immutable.List(),
       rating: extractRating(jsonldAtomImm),
       groupMembers:
-        won.parseListFrom(jsonldAtomImm, ["won:groupMember"], "xsd:ID") ||
+        won.parseListFrom(jsonldAtomImm, ["group:groupMember"], "xsd:ID") ||
         Immutable.List(),
       content: generateContent(jsonldAtomImm, detailsToParse),
       seeks: generateContent(jsonldAtomImm.get("won:seeks"), detailsToParse),
@@ -56,11 +57,6 @@ export function parseAtom(jsonldAtom) {
       return undefined;
     }
 
-    parsedAtom.humanReadable = getHumanReadableStringFromAtom(
-      parsedAtom,
-      detailsToParse
-    );
-
     let parsedAtomImm = Immutable.fromJS(parsedAtom);
 
     if (!isPersona(parsedAtomImm)) {
@@ -85,6 +81,11 @@ export function parseAtom(jsonldAtom) {
       }
     }
 
+    parsedAtomImm = parsedAtomImm.set(
+      "humanReadable",
+      getHumanReadableStringFromAtom(parsedAtomImm, detailsToParse)
+    );
+
     return parsedAtomImm;
   } else {
     console.error(
@@ -94,6 +95,90 @@ export function parseAtom(jsonldAtom) {
     return undefined;
   }
 }
+
+/**
+ * Tries to extract all the metaData of a given metaAtom into a state that is similar to the ones we use for the parseAtom
+ * in general, metaAtoms are retrieved when accessing whatsNew and whatsAround (for now) and are json structures based on the
+ * AtomPojo of the owner app.
+ * @param metaAtom
+ * @returns {*}
+ */
+export function parseMetaAtom(metaAtom) {
+  const metaAtomImm = Immutable.fromJS(metaAtom);
+
+  const extractTypes = types =>
+    types &&
+    Immutable.Set(
+      types.map(type =>
+        type
+          .replace("https://w3id.org/won/core#", "won:")
+          .replace("http://schema.org/", "s:")
+      )
+    );
+  const extractFlags = flags =>
+    flags &&
+    flags.map(flag =>
+      flag
+        .replace("https://w3id.org/won/core#", "won:")
+        .replace("http://schema.org/", "s:")
+    );
+  const extractLocation = location =>
+    location && {
+      address: "",
+      lat: get(location, "latitude"),
+      lng: get(location, "longitude"),
+    };
+  const extractStateFromMeta = state => {
+    switch (state) {
+      case "ACTIVE":
+        return won.WON.ActiveCompacted;
+      case "INACTIVE":
+        return won.WON.InactiveCompacted;
+      case "DELETED":
+        return won.WON.DeletedCompacted;
+      default:
+        return undefined;
+    }
+  };
+
+  if (metaAtomImm) {
+    let parsedMetaAtom = {
+      uri: get(metaAtomImm, "uri"),
+      state: extractStateFromMeta(get(metaAtomImm, "state")),
+      content: {
+        type: extractTypes(get(metaAtomImm, "types")),
+        flags: extractFlags(get(metaAtomImm, "flags")),
+        location: extractLocation(get(metaAtomImm, "location")),
+      },
+      seeks: {
+        type: extractTypes(get(metaAtomImm, "seeksTypes")),
+      },
+      modifiedDate:
+        get(metaAtomImm, "modifiedDate") &&
+        new Date(get(metaAtomImm, "modifiedDate")),
+      creationDate:
+        get(metaAtomImm, "creationDate") &&
+        new Date(get(metaAtomImm, "creationDate")),
+    };
+
+    if (
+      parsedMetaAtom.state &&
+      parsedMetaAtom.modifiedDate &&
+      parsedMetaAtom.creationDate
+    ) {
+      return Immutable.fromJS(parsedMetaAtom);
+    } else {
+      console.error(
+        "Cant parse metaAtom, data is an invalid atom-object: ",
+        metaAtomImm && metaAtomImm.toJS()
+      );
+      return undefined;
+    }
+  }
+  return undefined;
+}
+
+window.parseMetaAtom4dbg = parseMetaAtom;
 
 /**
  * Tries to extract all the detailsToParse from the given contentJsonLd
@@ -183,8 +268,8 @@ function extractLastModifiedDate(atomJsonLd) {
 }
 
 function extractRating(atomJsonLd) {
-  const reviews = atomJsonLd.get("won:reviews");
-  const reviewedConnection = atomJsonLd.get("won:reviewedConnection");
+  const reviews = atomJsonLd.get("review:reviews");
+  const reviewedConnection = atomJsonLd.get("review:reviewedConnection");
 
   const rating = {
     aggregateRating:
@@ -211,40 +296,64 @@ function extractRating(atomJsonLd) {
   }
 }
 
-function getHumanReadableStringFromAtom(atom, detailsToParse) {
-  if (atom && detailsToParse) {
-    const atomContent = atom.content;
-    const seeksBranch = atom.seeks;
+function getHumanReadableStringFromAtom(atomImm, detailsToParse) {
+  if (atomImm && detailsToParse) {
+    const atomContent = get(atomImm, "content");
+    const seeksBranch = get(atomImm, "seeks");
 
-    const title = atomContent && atomContent.title;
-    const seeksTitle = seeksBranch && seeksBranch.title;
+    const title = atomContent && atomContent.get("title");
+    const seeksTitle = seeksBranch && seeksBranch.get("title");
 
-    const immAtom = Immutable.fromJS(atom);
-
-    if (isPersona(atom)) {
-      return getIn(atom, ["content", "personaName"]);
-    } else if (isWhatsAroundAtom(immAtom)) {
-      let location =
-        (atomContent && atomContent["location"]) ||
-        (seeksBranch && seeksBranch["location"]);
-
-      const locationJS =
-        location && Immutable.Iterable.isIterable(location)
-          ? location.toJS()
-          : location;
-
-      return (
-        "What's Around " +
-        detailsToParse["location"].generateHumanReadable({
-          value: locationJS,
-          includeLabel: false,
-        })
-      );
-    } else if (isSearchAtom(immAtom)) {
-      const searchString = atom && atom.content && atom.content.searchString;
+    if (isPersona(atomImm)) {
+      return getIn(atomImm, ["content", "personaName"]);
+    } else if (isSearchAtom(atomImm)) {
+      const searchString = getIn(atomImm, ["content", "searchString"]);
 
       if (searchString) {
         return "Search: " + searchString;
+      }
+    }
+
+    if (getIn(atomImm, ["matchedUseCase", "identifier"]) === "pokemonGoRaid") {
+      let raidReadable;
+      let locationReadable;
+      let gymReadable;
+
+      const raidDetail = "pokemonRaid";
+      const raidValueImm = getIn(atomImm, ["content", raidDetail]);
+      if (raidValueImm && detailsToParse[raidDetail]) {
+        raidReadable = detailsToParse[raidDetail].generateHumanReadable({
+          value: raidValueImm.toJS(),
+          includeLabel: false,
+        });
+      }
+
+      const locationDetail = "location";
+      const locationValueImm = getIn(atomImm, ["content", locationDetail]);
+      if (locationValueImm && detailsToParse[locationDetail]) {
+        locationReadable = detailsToParse[locationDetail].generateHumanReadable(
+          {
+            value: locationValueImm.toJS(),
+            includeLabel: false,
+          }
+        );
+      }
+
+      const gymDetail = "pokemonGymInfo";
+      const gymValueImm = getIn(atomImm, ["content", gymDetail]);
+      if (gymValueImm && detailsToParse[gymDetail]) {
+        gymReadable = detailsToParse[gymDetail].generateHumanReadable({
+          value: gymValueImm.toJS(),
+          includeLabel: false,
+        });
+      }
+      if (raidReadable && locationReadable) {
+        return (
+          raidReadable +
+          " @ " +
+          locationReadable +
+          (gymReadable ? " (" + gymReadable + ")" : "")
+        );
       }
     }
 
@@ -257,11 +366,11 @@ function getHumanReadableStringFromAtom(atom, detailsToParse) {
     }
 
     let humanReadableDetails = generateHumanReadableArray(
-      atomContent,
+      atomContent.toJS(),
       detailsToParse
     );
     let humanReadableSeeksDetails = generateHumanReadableArray(
-      seeksBranch,
+      seeksBranch.toJS(),
       detailsToParse
     );
 
@@ -285,7 +394,7 @@ function getHumanReadableStringFromAtom(atom, detailsToParse) {
 
 function generateHumanReadableArray(presentDetails, detailsToParse) {
   let humanReadableArray = [];
-  if (presentDetails) {
+  if (presentDetails && detailsToParse) {
     for (const key in presentDetails) {
       if (!(key === "sockets" || key === "type" || key === "defaultSocket")) {
         const detailToParse = detailsToParse[key];

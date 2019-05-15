@@ -1,0 +1,287 @@
+@import "won-config";
+@import "sizing-utils";
+@import "fonts";
+@import "flex-layout";
+@import "textfield";
+@import "animate";
+
+main.ownermap {
+  grid-column: 1 / -1;
+  padding: 0;
+  box-sizing: border-box;
+  align-items: stretch;
+  max-width: $maxContentWidth;
+  width: 100%;
+  margin: 0 auto;
+
+  & .ownermap__header {
+    display: grid;
+
+    @media (min-width: $responsivenessBreakPoint) {
+      grid-template-areas: "omh__label omh__location omh__action";
+      grid-template-columns: min-content 1fr min-content;
+    }
+
+    @media (max-width: $responsivenessBreakPoint) {
+      grid-template-areas: "omh__label omh__action" "omh__location omh__location";
+      grid-template-columns: 1fr min-content;
+    }
+
+    grid-gap: 0.5rem;
+    border-bottom: $thinGrayBorder;
+    padding: 0.5rem;
+    @media (min-width: $maxContentWidth) {
+      padding-right: 0;
+    }
+    align-items: center;
+
+    &__label {
+      grid-area: omh__label;
+      white-space: nowrap;
+      font-size: $mediumFontSize;
+    }
+
+    &__location,
+    &__input {
+      display: grid;
+      position: relative;
+      grid-template-columns: min-content 1fr 0;
+      align-items: center;
+
+      &__icon {
+        @include fixed-square($mediumFontSize);
+        margin-right: 0.5rem;
+      }
+    }
+
+    &__location {
+      grid-area: omh__location;
+      cursor: pointer;
+      color: $won-primary-color;
+      --local-primary: #{$won-primary-color};
+      font-size: $mediumFontSize;
+
+      &:hover {
+        color: $won-primary-color-light;
+        --local-primary: #{$won-primary-color-light};
+      }
+
+      &__label {
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+      }
+    }
+
+    &__input {
+      grid-area: omh__location;
+      color: $won-primary-text-color;
+      --local-primary: #{$won-primary-text-color};
+
+      $reset-button-size: 2.25rem;
+
+      &__icon {
+        cursor: pointer;
+        --local-primary: #{$won-primary-text-color};
+
+        &:hover {
+          --local-primary: #{$won-primary-color-light};
+        }
+      }
+
+      &__inner {
+        @extend .won-txt;
+        border: $thinGrayBorder;
+        padding: 0.33rem 0.5rem + $reset-button-size 0.33rem 0.5rem;
+
+        &::-ms-clear {
+          width: 0;
+          height: 0;
+        }
+      }
+
+      &__reset {
+        @include fixed-square($reset-button-size);
+        position: absolute;
+        right: 0;
+        top: 0;
+        z-index: 1;
+
+        --local-primary: #{$won-primary-color};
+        &:hover {
+          --local-primary: #{$won-primary-color-light};
+        }
+      }
+    }
+
+    &__updated {
+      grid-area: omh__action;
+      display: grid;
+      grid-template-columns: min-content min-content;
+      align-items: center;
+
+      font-size: $smallFontSize;
+
+      &__loading {
+        font-size: $smallFontSize;
+        color: $won-line-gray;
+        margin-right: 0.5rem;
+      }
+
+      &__time {
+        white-space: nowrap;
+        color: $won-line-gray;
+        margin-right: 0.5rem;
+      }
+
+      &__cancel.won-button--filled.red,
+      &__reload.won-button--filled.red {
+        font-size: $smallFontSize;
+        padding: 0.33rem;
+      }
+    }
+  }
+
+  .ownermap__nolocation {
+    display: grid;
+    padding: 1rem;
+    justify-items: center;
+
+    &__label {
+      margin-top: 1rem;
+      max-width: 25rem;
+      text-align: center;
+    }
+
+    &__icon {
+      --local-primary: #{$won-disabled-color};
+    }
+
+    &__button {
+      margin-top: 1rem;
+      padding: 0.5rem;
+    }
+  }
+
+  .ownermap__map {
+    display: block;
+    height: 50vh;
+    max-height: 0;
+    overflow-y: hidden;
+    width: 100%;
+    transition: max-height 0.5s linear;
+
+    &.ownermap__map--visible {
+      transition: max-height 0.5s linear;
+      max-height: 50vh;
+    }
+
+    .atom-map__mapmount {
+      width: 100%;
+      height: 50vh;
+    }
+  }
+
+  .ownermap__searchresults {
+    height: 50vh;
+    max-height: 0;
+    overflow-y: hidden;
+    background: $won-light-gray;
+    box-sizing: border-box;
+    transition: max-height 0.5s linear;
+    border: $thinGrayBorder;
+    border-top: 0;
+
+    @media (max-width: $responsivenessBreakPoint) {
+      border-left: 0;
+      border-right: 0;
+    }
+
+    &.ownermap__searchresults--visible {
+      transition: max-height 0.5s linear;
+      max-height: 50vh;
+      overflow-y: auto;
+    }
+
+    &__deniedlocation {
+      display: grid;
+      padding: 1rem;
+      justify-items: center;
+      height: 49vh;
+      box-sizing: border-box;
+      align-content: center;
+
+      &__label {
+        margin-top: 1rem;
+        max-width: 25rem;
+        text-align: center;
+      }
+
+      &__icon {
+        --local-primary: #{$won-disabled-color};
+      }
+    }
+
+    &__result {
+      display: grid;
+      grid-template-columns: min-content 1fr;
+      grid-gap: 0.5rem;
+      border-bottom: $thinGrayBorder;
+      background: white;
+
+      padding: 0.5rem;
+      align-items: center;
+      --local-primary: #{$won-primary-text-color};
+      color: $won-primary-text-color;
+
+      &:hover {
+        cursor: pointer;
+        color: $won-primary-color;
+        --local-primary: #{$won-primary-color};
+      }
+
+      &__icon {
+        @include fixed-square($iconSize);
+      }
+
+      &__label {
+      }
+    }
+  }
+
+  .ownermap__noresults {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    padding: 0.5rem;
+
+    &__label {
+      font-size: $normalFontSize;
+      color: $won-primary-text-color;
+      text-align: center;
+      max-width: 25rem;
+    }
+  }
+
+  .ownermap__content {
+    display: flex;
+    flex-wrap: wrap;
+    padding: 0.5rem;
+
+    won-atom-card.ownermap__content__atom {
+      border: $thinGrayBorder;
+      background: $won-light-gray;
+
+      margin-right: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    @media (max-width: $responsivenessBreakPoint) {
+      display: block;
+
+      won-atom-card.ownermap__content__atom {
+        margin-right: 0;
+      }
+    }
+  }
+}

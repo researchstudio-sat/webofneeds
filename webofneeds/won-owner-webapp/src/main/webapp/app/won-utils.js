@@ -29,11 +29,7 @@ import * as useCaseUtils from "./usecase-utils.js";
 
 import won from "./won-es6.js";
 
-export function initLeaflet(
-  mapMount,
-  overrideOptions,
-  defaultLayerOnly = false
-) {
+export function initLeaflet(mapMount, overrideOptions) {
   if (!L) {
     throw new Error(
       "Tried to initialize a leaflet widget while leaflet wasn't loaded."
@@ -58,10 +54,6 @@ export function initLeaflet(
   //map.fitWorld() // shows every continent twice :|
   map.fitBounds([[-80, -190], [80, 190]]); // fitWorld without repetition
 
-  if (!defaultLayerOnly) {
-    L.control.layers(baseMaps).addTo(map);
-  }
-
   // Force it to adapt to actual size
   // for some reason this doesn't happen by default
   // when the map is within a tag.
@@ -77,23 +69,16 @@ export function initLeafletBaseMaps() {
       "Tried to initialize leaflet map-sources while leaflet wasn't loaded."
     );
   }
+
   //const secureOsmSource = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"; // secure osm.org
   const secureOsmSource = "https://www.matchat.org/tile/{z}/{x}/{y}.png"; // TODO: use own tile server instead of proxy
   const secureOsm = L.tileLayer(secureOsmSource, {
     attribution:
-      '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
-  });
-
-  const transportSource =
-    "http://{s}.tile2.opencyclemap.org/transport/{z}/{x}/{y}.png";
-  const transport = L.tileLayer(transportSource, {
-    attribution:
-      'Maps &copy; <a href="http://www.thunderforest.com">Thunderforest</a>, Data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>',
+      '&copy; <a href="http://osm.org/copyright" target="_blank">OpenStreetMap</a> contributors',
   });
 
   const baseMaps = {
     "Detailed default map": secureOsm,
-    "Transport (Insecurely loaded!)": transport,
   };
 
   return baseMaps;
@@ -733,34 +718,44 @@ export function parseJsonldLeaf(val, type) {
     case "xsd:string":
       return unwrappedVal + ""; // everything can be parsed to a string in js
 
+    case "xsd:boolean": {
+      const value = unwrappedVal + "";
+      if (value === "true") {
+        return true;
+      } else if (value === "false") {
+        return false;
+      } else {
+        throwErr(`Annotated \`${type_}\` is not valid.`);
+      }
+      break;
+    }
+
     case "s:Number":
     case "s:Float":
     case "s:Integer":
     case "xsd:int":
-    case "xsd:float":
-      {
-        const parsedVal = Number(unwrappedVal);
-        if (!isValidNumber(parsedVal)) {
-          throwErr(
-            `Annotated value of type \`${type_}\` isn't parsable to a \`Number\`.`
-          );
-        } else {
-          return parsedVal;
-        }
+    case "xsd:float": {
+      const parsedVal = Number(unwrappedVal);
+      if (!isValidNumber(parsedVal)) {
+        throwErr(
+          `Annotated value of type \`${type_}\` isn't parsable to a \`Number\`.`
+        );
+      } else {
+        return parsedVal;
       }
       break;
+    }
 
     case "s:DateTime":
-    case "xsd:dateTime":
-      {
-        const parsedDateTime = parseDatetimeStrictly(unwrappedVal);
-        if (isValidDate(parsedDateTime)) {
-          return parsedDateTime;
-        } else {
-          throwErr(`Annotated \`${type_}\` isn't parsable to a \`Date\`.`);
-        }
+    case "xsd:dateTime": {
+      const parsedDateTime = parseDatetimeStrictly(unwrappedVal);
+      if (isValidDate(parsedDateTime)) {
+        return parsedDateTime;
+      } else {
+        throwErr(`Annotated \`${type_}\` isn't parsable to a \`Date\`.`);
       }
       break;
+    }
 
     case "xsd:id":
     case "xsd:ID": {
@@ -835,4 +830,157 @@ export function parseRestErrorMessage(error) {
   }
 
   return error;
+}
+
+/**
+ * Parses json-ld of an `s:Place` in a best-effort kinda style.
+ * Any data missing in the RDF will be missing in the result object.
+ * @param {*} jsonldLocation
+ */
+export function parsePlaceLeniently(jsonldLocation) {
+  if (!jsonldLocation) return undefined; // NO LOCATION PRESENT
+
+  const jsonldLocationImm = Immutable.fromJS(jsonldLocation);
+
+  const parseFloatFromLocation = path =>
+    won.parseFrom(jsonldLocationImm, path, "xsd:float");
+
+  const place = {
+    address: won.parseFrom(jsonldLocationImm, ["s:name"], "xsd:string"),
+    lat: parseFloatFromLocation(["s:geo", "s:latitude"]),
+    lng: parseFloatFromLocation(["s:geo", "s:longitude"]),
+    // nwCorner if present (see below)
+    // seCorner if present (see below)
+  };
+
+  const nwCornerLat = parseFloatFromLocation([
+    "won:boundingBox",
+    "won:northWestCorner",
+    "s:latitude",
+  ]);
+  const nwCornerLng = parseFloatFromLocation([
+    "won:boundingBox",
+    "won:northWestCorner",
+    "s:longitude",
+  ]);
+  const seCornerLat = parseFloatFromLocation([
+    "won:boundingBox",
+    "won:southEastCorner",
+    "s:latitude",
+  ]);
+  const seCornerLng = parseFloatFromLocation([
+    "won:boundingBox",
+    "won:southEastCorner",
+    "s:longitude",
+  ]);
+
+  if (nwCornerLat || nwCornerLng) {
+    place.nwCorner = {
+      lat: nwCornerLat,
+      lng: nwCornerLng,
+    };
+  }
+  if (seCornerLat || seCornerLng) {
+    place.seCorner = {
+      lat: seCornerLat,
+      lng: seCornerLng,
+    };
+  }
+  return place;
+}
+
+/**
+ * Generates rdf from given geoData (e.g. location from a location picker)
+ * @param geoData
+ * @param baseUri
+ * @returns {*}
+ */
+export function genSPlace({ geoData, baseUri }) {
+  if (!geoData) {
+    return undefined;
+  }
+  if (!geoData.lat || !geoData.lng || !geoData.name) {
+    return undefined;
+  }
+
+  return {
+    "@id": baseUri,
+    "@type": "s:Place",
+    "s:name": geoData.name,
+    "s:geo": genGeo({ lat: geoData.lat, lng: geoData.lng, baseUri }),
+    "won:boundingBox": genBoundingBox({
+      nwCorner: geoData.nwCorner,
+      seCorner: geoData.seCorner,
+      baseUri,
+    }),
+  };
+}
+
+function genGeo({ lat, lng, baseUri }) {
+  if (isNaN(lat) || isNaN(lng)) {
+    return undefined;
+  }
+  return {
+    "@id": baseUri ? baseUri + "/geo" : undefined,
+    "@type": "s:GeoCoordinates",
+    "s:latitude": lat.toFixed(6),
+    "s:longitude": lng.toFixed(6),
+    "won:geoSpatial": {
+      "@type": "http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon",
+      "@value": `${lat.toFixed(6)}#${lng.toFixed(6)}`,
+    },
+  };
+}
+
+function genBoundingBox({ nwCorner, seCorner, baseUri }) {
+  return !nwCorner || !seCorner
+    ? undefined
+    : {
+        "@id": baseUri ? baseUri + "/bounds" : undefined,
+        "won:northWestCorner": {
+          "@id": baseUri ? baseUri + "/bounds/nw" : undefined,
+          "@type": "s:GeoCoordinates",
+          "s:latitude": nwCorner.lat.toFixed(6),
+          "s:longitude": nwCorner.lng.toFixed(6),
+        },
+        "won:southEastCorner": {
+          "@id": baseUri ? baseUri + "/bounds/se" : undefined,
+          "@type": "s:GeoCoordinates",
+          "s:latitude": seCorner.lat.toFixed(6),
+          "s:longitude": seCorner.lng.toFixed(6),
+        },
+      };
+}
+
+export function genDetailBaseUri(baseUri, detailIdentifier) {
+  if (!baseUri || !detailIdentifier) {
+    return undefined;
+  }
+  const randomId = generateIdString(10);
+  return baseUri + "/" + detailIdentifier + "/" + randomId;
+}
+
+export function parseSPlace(jsonldLocation) {
+  if (!jsonldLocation) return undefined; // NO LOCATION PRESENT
+
+  const location = parsePlaceLeniently(jsonldLocation);
+
+  if (
+    location &&
+    location.address &&
+    location.lat &&
+    location.lng &&
+    location.nwCorner.lat &&
+    location.nwCorner.lng &&
+    location.seCorner.lat &&
+    location.seCorner.lng
+  ) {
+    return Immutable.fromJS(location);
+  } else {
+    console.error(
+      "Cant parse location, data is an invalid location-object: ",
+      jsonldLocation
+    );
+    return undefined;
+  }
 }

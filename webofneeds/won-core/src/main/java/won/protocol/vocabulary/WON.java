@@ -28,25 +28,13 @@ public class WON {
     public static final Resource Atom = m.createResource(BASE_URI + "Atom");
     public static final Property wonNode = m.createProperty(BASE_URI, "wonNode");
     public static final Property defaultGraphSigningMethod = m.createProperty(BASE_URI, "defaultGraphSigningMethod");
-    public static final Property atomProtocolEndpoint = m.createProperty(BASE_URI, "atomProtocolEndpoint");
-    public static final Property matcherProtocolEndpoint = m.createProperty(BASE_URI, "matcherProtocolEndpoint");
-    public static final Property ownerProtocolEndpoint = m.createProperty(BASE_URI, "ownerProtocolEndpoint");
-    public static final Property activeMQAtomProtocolQueueName = m.createProperty(BASE_URI,
-                    "activeMQAtomProtocolQueueName");
-    public static final Property activeMQOwnerProtocolQueueName = m.createProperty(BASE_URI,
-                    "activeMQOwnerProtocolQueueName");
-    public static final Property activeMQMatcherProtocolQueueName = m.createProperty(BASE_URI,
-                    "activeMQMatcherProtocolQueueName");
-    public static final Property activeMQMatcherProtocolOutAtomCreatedTopicName = m.createProperty(BASE_URI,
-                    "activeMQMatcherProtocolOutAtomCreatedTopicName");
-    public static final Property activeMQMatcherProtocolOutAtomActivatedTopicName = m.createProperty(BASE_URI,
-                    "activeMQMatcherProtocolOutAtomActivatedTopicName");
-    public static final Property activeMQMatcherProtocolOutAtomDeactivatedTopicName = m.createProperty(BASE_URI,
-                    "activeMQMatcherProtocolOutAtomDeactivatedTopicName");
-    public static final Property activeMQMatcherProtocolOutAtomDeletedTopicName = m.createProperty(BASE_URI,
-                    "activeMQMatcherProtocolOutAtomDeletedTopicName");
-    public static final Property activeMQMatcherProtocolOutMatcherRegisteredTopicName = m.createProperty(BASE_URI,
-                    "activeMQMatcherProtocolOutMatcherRegisteredTopicName");
+    public static final Property nodeQueue = m.createProperty(BASE_URI, "nodeQueue");
+    public static final Property ownerQueue = m.createProperty(BASE_URI, "ownerQueue");
+    public static final Property matcherQueue = m.createProperty(BASE_URI, "matcherQueue");
+    public static final Property atomCreatedTopic = m.createProperty(BASE_URI, "atomCreatedTopic");
+    public static final Property atomActivatedTopic = m.createProperty(BASE_URI, "atomActivatedTopic");
+    public static final Property atomDeactivatedTopic = m.createProperty(BASE_URI, "atomDeactivatedTopic");
+    public static final Property atomDeletedTopic = m.createProperty(BASE_URI, "atomDeletedTopic");
     public static final Property uriPrefixSpecification = m.createProperty(BASE_URI, "uriPrefixSpecification");
     public static final Property atomUriPrefix = m.createProperty(BASE_URI, "atomUriPrefix");
     public static final Property connectionUriPrefix = m.createProperty(BASE_URI, "connectionUriPrefix");
@@ -81,6 +69,12 @@ public class WON {
     public static final Property socket = m.createProperty(BASE_URI, "socket");
     public static final Property defaultSocket = m.createProperty(BASE_URI, "defaultSocket");
     public static final Resource Socket = m.createResource(BASE_URI + "Socket");
+    public static final Property compatibleSocketDefinition = m.createProperty(BASE_URI + "compatibleSocketDefinition");
+    public static final Property socketDefinition = m.createProperty(BASE_URI, "socketDefinition");
+    public static final Property derivesAtomProperty = m.createProperty(BASE_URI + "derivesAtomProperty");
+    public static final Property derivesInverseAtomProperty = m.createProperty(BASE_URI + "derivesInverseAtomProperty");
+    public static final Property socketCapacity = m.createProperty(BASE_URI, "socketCapacity");
+    public static final Property autoOpen = m.createProperty(BASE_URI, "autoOpen");
     // This property is used in the rdf-model part of connect (from owner) and hint
     // to specify a socket to which a connection is created
     public static final Property targetSocket = m.createProperty(BASE_URI + "targetSocket");
@@ -175,24 +169,6 @@ public class WON {
     public static final Property uri = m.createProperty(BASE_URI, "uri");
     public static final Property preview = m.createProperty(BASE_URI, "preview");
     public static final String privateDataGraph = BASE_URI + "privateDataGraph";
-    public static final String GroupSocketString = BASE_URI + "GroupSocket";
-    public static final String groupMemberString = BASE_URI + "groupMember";
-    public static final Property groupMember = m.createProperty(BASE_URI, "groupMember");
-    public static final String ownedByString = BASE_URI + "ownedBy";
-    public static final Property ownedBy = m.createProperty(BASE_URI + "ownedBy");
-    public static final String heldByString = BASE_URI + "heldBy";
-    public static final Property heldBy = m.createProperty(BASE_URI + "heldBy");
-    public static final String holdsString = BASE_URI + "holds";
-    public static final Property holds = m.createProperty(BASE_URI + "holds");
-    public static final String ownsString = BASE_URI + "owns";
-    public static final Property owns = m.createProperty(BASE_URI + "owns");
-    public static final String connectedWithString = BASE_URI + "connectedWith";
-    public static final Property connectedWith = m.createProperty(BASE_URI + "connectedWith");
-    public static final Property reviews = m.createProperty(BASE_URI + "reviews");
-    public static final String reviewsString = BASE_URI + "reviews";
-    public static final String ChatSocketString = BASE_URI + "ChatSocket";
-    public static final String ReviewSocketString = BASE_URI + "ReviewSocket";
-    public static final Property reviewedConnection = m.createProperty(BASE_URI + "reviewedConnection");
     // unread information
     public static final Property unreadSuggested = m.createProperty(BASE_URI + "unreadSuggested");
     public static final Property unreadRequestSent = m.createProperty(BASE_URI + "unreadRequestSent");

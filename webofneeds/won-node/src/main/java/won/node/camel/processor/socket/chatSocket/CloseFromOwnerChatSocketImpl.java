@@ -7,13 +7,14 @@ import won.node.camel.processor.annotation.DefaultSocketMessageProcessor;
 import won.node.camel.processor.annotation.SocketMessageProcessor;
 import won.protocol.vocabulary.WON;
 import won.protocol.vocabulary.WONMSG;
+import won.protocol.vocabulary.WXCHAT;
 
 /**
  * User: syim Date: 05.03.2015
  */
 @Component
 @DefaultSocketMessageProcessor(direction = WONMSG.FromOwnerString, messageType = WONMSG.CloseMessageString)
-@SocketMessageProcessor(socketType = WON.ChatSocketString, direction = WONMSG.FromOwnerString, messageType = WONMSG.CloseMessageString)
+@SocketMessageProcessor(socketType = WXCHAT.ChatSocketString, direction = WONMSG.FromOwnerString, messageType = WONMSG.CloseMessageString)
 public class CloseFromOwnerChatSocketImpl extends AbstractCamelProcessor {
     @Override
     public void process(final Exchange exchange) {

@@ -326,17 +326,6 @@ function connectReactionAtom(
     const connectoToAtom = getIn(state, ["atoms", connectToAtomUri]);
     const nodeUri = getIn(state, ["config", "defaultNodeUri"]);
 
-    //add flags
-    atomDraft.content.flags
-      ? atomDraft.content.flags.push(
-          "won:NoHintForCounterpart",
-          "won:NoHintForMe"
-        )
-      : (atomDraft.content.flags = [
-          "won:NoHintForCounterpart",
-          "won:NoHintForMe",
-        ]);
-
     // create new atom
     const { message, eventUri, atomUri } = await buildCreateMessage(
       atomDraft,
@@ -359,14 +348,14 @@ function connectReactionAtom(
               persona,
               "content",
               "sockets",
-            ]).keyOf("won:HolderSocket"),
+            ]).keyOf("hold:HolderSocket"),
           },
           {
             pending: true,
             socket: `${atomUri}#holdableSocket`,
             // FIXME: does not work as new atom is not in state yet
             //socket: getIn(state, ["atoms", atomUri, "content", "sockets"]).keyOf(
-            //  "won:HoldableSocket"
+            //  "hold:HoldableSocket"
             //),
           },
         ]),
@@ -473,14 +462,14 @@ function connectAdHoc(theirAtomUri, textMessage, persona, dispatch, getState) {
               persona,
               "content",
               "sockets",
-            ]).keyOf("won:HolderSocket"),
+            ]).keyOf("hold:HolderSocket"),
           },
           {
             pending: true,
             socket: `${atomUri}#holdableSocket`,
             // FIXME: does not work as new atom is not in state yet
             //socket: getIn(state, ["atoms", atomUri, "content", "sockets"]).keyOf(
-            //  "won:HoldableSocket"
+            //  "hold:HoldableSocket"
             //),
           },
         ]),

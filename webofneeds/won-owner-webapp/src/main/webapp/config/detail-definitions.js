@@ -7,6 +7,7 @@ import * as basicDetails from "./details/basic.js";
 import * as workflowDetails from "./details/workflow.js";
 import * as reviewDetails from "./details/review.js";
 import * as paymentDetails from "./details/payment.js";
+import * as pokemonDetails from "./details/pokemon.js";
 
 import * as abstractDetails_ from "./details/abstract.js";
 export const abstractDetails = abstractDetails_; // reexport
@@ -15,10 +16,10 @@ import Immutable from "immutable";
 const emptyDraftImm = Immutable.fromJS({
   content: {
     sockets: {
-      "#chatSocket": "won:ChatSocket",
-      "#holdableSocket": "won:HoldableSocket",
+      "#chatSocket": "chat:ChatSocket",
+      "#holdableSocket": "hold:HoldableSocket",
     },
-    defaultSocket: { "#chatSocket": "won:ChatSocket" },
+    defaultSocket: { "#chatSocket": "chat:ChatSocket" },
   },
   seeks: {},
 });
@@ -82,6 +83,8 @@ export const details = {
   sockets: basicDetails.sockets,
   defaultSocket: basicDetails.defaultSocket,
   type: basicDetails.type,
+  pokemonGymInfo: pokemonDetails.pokemonGymInfo,
+  pokemonRaid: pokemonDetails.pokemonRaid,
 };
 
 export const messageDetails = {

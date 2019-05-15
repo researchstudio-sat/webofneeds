@@ -3,7 +3,7 @@
  */
 
 import won from "./won-es6.js";
-import { get, getIn } from "./utils.js";
+import { get, getIn, calculateDistance } from "./utils.js";
 import { labels } from "./won-label-utils.js";
 import * as connectionUtils from "./connection-utils.js";
 import * as useCaseUtils from "./usecase-utils.js";
@@ -67,6 +67,12 @@ export function getLocation(atom) {
   return undefined;
 }
 
+export function getDistanceFrom(atom, location) {
+  const atomLocation = getLocation(atom);
+
+  return calculateDistance(atomLocation, location);
+}
+
 /**
  * Returns the "Default" Image (currently the content branch is checked before seeks) of an atom
  * if the atom does not have any images we return undefined
@@ -111,18 +117,6 @@ export function isInactive(atom) {
 }
 
 /**
- * Determines if a given atom is a WhatsAround-Atom
- * @param atom
- * @returns {*|boolean}
- */
-export function isWhatsAroundAtom(atom) {
-  return (
-    getIn(atom, ["content", "flags"]) &&
-    getIn(atom, ["content", "flags"]).contains("won:WhatsAround")
-  );
-}
-
-/**
  * Determines if a given atom is a DirectResponse-Atom
  * @param atom
  * @returns {*|boolean}
@@ -131,6 +125,18 @@ export function isDirectResponseAtom(atom) {
   return (
     getIn(atom, ["content", "flags"]) &&
     getIn(atom, ["content", "flags"]).contains("won:DirectResponse")
+  );
+}
+
+/**
+ * Determines if a given atom is Invisible (contains the no hint for counterpart flag)
+ * @param atom
+ * @returns {*|boolean}
+ */
+export function isInvisibleAtom(atom) {
+  return (
+    getIn(atom, ["content", "flags"]) &&
+    getIn(atom, ["content", "flags"]).contains("won:NoHintForCounterpart")
   );
 }
 
@@ -149,23 +155,23 @@ export function isAtom(atom) {
 }
 
 export function hasChatSocket(atom) {
-  return hasSocket(atom, won.WON.ChatSocketCompacted);
+  return hasSocket(atom, won.CHAT.ChatSocketCompacted);
 }
 
 export function hasGroupSocket(atom) {
-  return hasSocket(atom, won.WON.GroupSocketCompacted);
+  return hasSocket(atom, won.GROUP.GroupSocketCompacted);
 }
 
 export function hasHoldableSocket(atom) {
-  return hasSocket(atom, won.WON.HoldableSocketCompacted);
+  return hasSocket(atom, won.HOLD.HoldableSocketCompacted);
 }
 
 export function hasHolderSocket(atom) {
-  return hasSocket(atom, won.WON.HolderSocketCompacted);
+  return hasSocket(atom, won.HOLD.HolderSocketCompacted);
 }
 
 export function hasReviewSocket(atom) {
-  return hasSocket(atom, won.WON.ReviewSocketCompacted);
+  return hasSocket(atom, won.REVIEW.ReviewSocketCompacted);
 }
 
 export function hasSocket(atom, socket) {
@@ -267,7 +273,7 @@ export function generateShortSocketLabels(atomImm) {
       // rename sockets
       // TODO: check if this can be used anywhere or whether it should be Group Chat Enabled
       .map(socket => {
-        if (socket === won.WON.GroupSocketCompacted) {
+        if (socket === won.GROUP.GroupSocketCompacted) {
           return labels.sockets[socket] ? labels.sockets[socket] : socket;
         }
         return "";
@@ -336,21 +342,47 @@ export function getSeeksDefaultSocketWithKeyReset(atomImm) {
   return undefined;
 }
 
+/**
+ * Sorts the elements by distance from given location (default order is ascending)
+ * @param elementsImm elements from state that need to be returned as a sorted array
+ * @param location given location to calculate the distance from
+ * @param order if "DESC" then the order will be descending, everything else resorts to the default sort of ascending order
+ * @returns {*} sorted Elements array
+ */
+export function sortByDistanceFrom(atomsImm, location, order = "ASC") {
+  let sortedAtoms = atomsImm && atomsImm.toArray();
+
+  if (sortedAtoms) {
+    sortedAtoms.sort(function(a, b) {
+      const bDist = getDistanceFrom(b, location);
+      const aDist = getDistanceFrom(a, location);
+
+      if (order === "DESC") {
+        return bDist - aDist;
+      } else {
+        return aDist - bDist;
+      }
+    });
+  }
+
+  return sortedAtoms;
+}
+
 function getSocketKeysReset(socketsImm) {
   return socketsImm.mapKeys((key, value) => {
-    if (value === "won:ChatSocket") {
+    if (value === "chat:ChatSocket") {
       return "#chatSocket";
     }
-    if (value === "won:GroupSocket") {
+    if (value === "group:GroupSocket") {
       return "#groupSocket";
     }
-    if (value === "won:HolderSocket") {
+    if (value === "hold:HolderSocket") {
       return "#holderSocket";
     }
-    if (value === "won:HoldableSocket") {
+    if (value === "hold:HoldableSocket") {
       return "#holdableSocket";
     }
-    if (value === "won:ReviewSocket") {
+    if (value === "review:ReviewSocket") {
       return "#reviewSocket";
     }
   });

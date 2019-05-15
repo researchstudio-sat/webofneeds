@@ -199,8 +199,6 @@ function genComponentConf() {
           this.postUri
         );
 
-        const isOwnedAtomWhatsX = isOwned && atomUtils.isWhatsAroundAtom(post);
-
         const viewState = get(state, "view");
         const process = get(state, "process");
 
@@ -208,7 +206,6 @@ function genComponentConf() {
           hasContent,
           hasSeeksBranch,
           post,
-          isOwnedAtomWhatsX,
           isPersona,
           isOwned,
           hasHeldPosts: isPersona && heldPosts && heldPosts.size > 0,
@@ -278,17 +275,8 @@ function genComponentConf() {
         });
       }
 
-      if (this.isOwnedAtomWhatsX) {
-        this.connections__close(connUri);
-
-        if (targetAtomUri) {
-          this.connections__connectAdHoc(targetAtomUri, message);
-        }
-        //this.router__back();
-      } else {
-        this.connections__rate(connUri, won.WON.binaryRatingGood);
-        this.atoms__connect(this.postUri, connUri, targetAtomUri, message);
-      }
+      this.connections__rate(connUri, won.WON.binaryRatingGood);
+      this.atoms__connect(this.postUri, connUri, targetAtomUri, message);
     }
 
     addPersona(persona) {

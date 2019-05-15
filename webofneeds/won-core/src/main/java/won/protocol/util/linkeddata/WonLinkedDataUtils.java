@@ -11,6 +11,8 @@
 package won.protocol.util.linkeddata;
 
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -28,9 +30,14 @@ import org.apache.jena.shared.PrefixMapping;
 import org.apache.jena.shared.impl.PrefixMappingImpl;
 import org.apache.jena.sparql.path.Path;
 import org.apache.jena.sparql.path.PathParser;
+import org.apache.jena.vocabulary.RDFS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import won.protocol.model.AtomState;
+import won.protocol.model.SocketDefinition;
+import won.protocol.model.SocketDefinitionImpl;
+import won.protocol.service.WonNodeInfo;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WON;
@@ -86,6 +93,47 @@ public class WonLinkedDataUtils {
 
     public static Dataset getConversationAndAtomsDataset(String connectionURI, LinkedDataSource linkedDataSource) {
         return getConversationAndAtomsDataset(URI.create(connectionURI), linkedDataSource);
+    }
+
+    public static List<URI> getNodeAtomUris(URI nodeURI, LinkedDataSource linkedDataSource) {
+        return getNodeAtomUris(nodeURI, null, null, null, linkedDataSource);
+    }
+
+    public static List<URI> getNodeAtomUris(URI nodeURI, ZonedDateTime modifiedAfter, ZonedDateTime createdAfter,
+                    AtomState atomState, LinkedDataSource linkedDataSource) {
+        Dataset nodeDataset = getDataForResource(nodeURI, linkedDataSource);
+        WonNodeInfo wonNodeInfo = WonRdfUtils.WonNodeUtils.getWonNodeInfo(nodeURI, nodeDataset);
+        URI atomListUri = URI.create(wonNodeInfo.getAtomListURI());
+        String newQuery = atomListUri.getQuery();
+        if (atomState != null) {
+            String queryPart = "state=" + modifiedAfter;
+            newQuery = (newQuery == null) ? queryPart : ("&" + queryPart);
+        }
+        if (modifiedAfter != null) {
+            String queryPart = "modifiedafter=" + modifiedAfter;
+            newQuery = (newQuery == null) ? queryPart : ("&" + queryPart);
+        }
+        if (createdAfter != null) {
+            // TODO: rename this parameter once we handle that parameter in the node (use
+            // modifiedafter for now)
+            String queryPart = "modifiedafter=" + createdAfter;
+            newQuery = (newQuery == null) ? queryPart : ("&" + queryPart);
+        }
+        try {
+            atomListUri = new URI(atomListUri.getScheme(), atomListUri.getAuthority(), atomListUri.getPath(), newQuery,
+                            atomListUri.getFragment());
+        } catch (URISyntaxException e) {
+            logger.warn("Could not append parameters to nodeURI, proceeding request without parameters");
+        }
+        Dataset atomListDataset = getDataForResource(atomListUri, linkedDataSource);
+        return RdfUtils.visitFlattenedToList(atomListDataset, model -> {
+            StmtIterator it = model.listStatements((Resource) null, RDFS.member, (RDFNode) null);
+            List<URI> ret = new ArrayList<>();
+            while (it.hasNext()) {
+                ret.add(URI.create(it.next().getObject().toString()));
+            }
+            return ret;
+        });
     }
 
     public static Dataset getFullAtomDataset(URI atomURI, LinkedDataSource linkedDataSource) {
@@ -277,6 +325,29 @@ public class WonLinkedDataUtils {
     public static Collection<URI> getSocketsOfType(URI atomURI, URI socketTypeURI, LinkedDataSource linkedDataSource) {
         return WonRdfUtils.SocketUtils.getSocketsOfType(getDataForResource(atomURI, linkedDataSource), atomURI,
                         socketTypeURI);
+    }
+
+    public static Optional<SocketDefinition> getSocketDefinition(LinkedDataSource linkedDataSource, URI socket) {
+        Dataset ontology = linkedDataSource.getDataForResource(socket);
+        // load all data for configurations
+        List<URI> configURIs = RdfUtils.getObjectsOfProperty(ontology, socket,
+                        URI.create(WON.socketDefinition.getURI()),
+                        node -> node.isURIResource() ? URI.create(node.asResource().getURI()) : null);
+        if (configURIs.size() > 1) {
+            throw new IllegalArgumentException("More than one socket configuration found");
+        }
+        configURIs.stream().forEach(configURI -> {
+            Dataset ds = linkedDataSource.getDataForResource(configURI);
+            RdfUtils.addDatasetToDataset(ontology, ds);
+        });
+        SocketDefinitionImpl socketDef = new SocketDefinitionImpl(socket);
+        socketDef.setSocketDefinitionURI(configURIs.stream().findFirst());
+        WonRdfUtils.SocketUtils.setCompatibleSocketDefinitions(socketDef, ontology, socket);
+        WonRdfUtils.SocketUtils.setAutoOpen(socketDef, ontology, socket);
+        WonRdfUtils.SocketUtils.setSocketCapacity(socketDef, ontology, socket);
+        WonRdfUtils.SocketUtils.setDerivationProperties(socketDef, ontology, socket);
+        WonRdfUtils.SocketUtils.setInverseDerivationProperties(socketDef, ontology, socket);
+        return Optional.of(socketDef);
     }
 
     public static Optional<URI> getTypeOfSocket(URI socketURI, LinkedDataSource linkedDataSource) {

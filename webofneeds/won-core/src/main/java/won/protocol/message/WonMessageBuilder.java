@@ -48,9 +48,6 @@ public class WonMessageBuilder {
     private Set<URI> injectIntoConnections = new HashSet<>();
     private WonMessageType wonMessageType;
     private WonMessageDirection wonMessageDirection;
-    // a message may refer to a number of other messages (e.g. previously sent
-    // messages)
-    private Set<URI> refersToURIs = new HashSet<>();
     // if the message is a response message, it MUST have exactly one
     // isResponseToMessageURI set.
     private URI isResponseToMessageURI;
@@ -162,10 +159,6 @@ public class WonMessageBuilder {
         if (!injectIntoConnections.isEmpty()) {
             injectIntoConnections.forEach(receiver -> messageEventResource.addProperty(WONMSG.injectIntoConnection,
                             envelopeGraph.getResource(receiver.toString())));
-        }
-        // add refersTo
-        for (URI refersToURI : refersToURIs) {
-            messageEventResource.addProperty(WONMSG.refersTo, envelopeGraph.createResource(refersToURI.toString()));
         }
         if (isResponseToMessageURI != null) {
             if (wonMessageType != WonMessageType.SUCCESS_RESPONSE
@@ -316,6 +309,14 @@ public class WonMessageBuilder {
                         connectToReactTo.getSenderURI(), connectToReactTo.getSenderAtomURI(),
                         connectToReactTo.getSenderNodeURI(), Optional.of(connectToReactTo.getSenderSocketURI()),
                         welcomeMessage);
+    }
+
+    public static WonMessageBuilder setMessagePropertiesForClose(URI messageURI, WonMessage connectToReactTo,
+                    String farewellMessage) {
+        return setMessagePropertiesForClose(messageURI, connectToReactTo.getRecipientURI(),
+                        connectToReactTo.getRecipientAtomURI(), connectToReactTo.getRecipientNodeURI(),
+                        connectToReactTo.getSenderURI(), connectToReactTo.getSenderAtomURI(),
+                        connectToReactTo.getSenderNodeURI(), farewellMessage);
     }
 
     public static WonMessageBuilder setMessagePropertiesForClose(URI messageURI, URI localConnection, URI localAtom,
@@ -743,11 +744,6 @@ public class WonMessageBuilder {
         RdfUtils.replaceBaseURI(contentGraph, this.messageURI.toString());
         addContent(contentGraph);
         return contentGraph;
-    }
-
-    public WonMessageBuilder addRefersToURI(URI refersTo) {
-        refersToURIs.add(refersTo);
-        return this;
     }
 
     public WonMessageBuilder setIsResponseToMessageURI(URI isResponseToMessageURI) {

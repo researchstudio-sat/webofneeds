@@ -45,9 +45,6 @@ public interface DataAccessService {
      */
     public Socket getSocket(URI atomURI, Optional<URI> socketUri) throws IllegalArgumentException, NoSuchAtomException;
 
-    Connection getConnection(List<Connection> connections, URI socketURI, ConnectionEventType eventType)
-                    throws ConnectionAlreadyExistsException;
-
     public Connection createConnection(final URI connectionURI, final URI atomURI, final URI otherAtomURI,
                     final URI otherConnectionURI, final URI socketURI, final URI socketTypeURI,
                     final URI targetSocketURI, final ConnectionState connectionState,

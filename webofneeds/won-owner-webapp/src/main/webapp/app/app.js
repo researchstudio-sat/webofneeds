@@ -47,6 +47,7 @@ import toasts from "./components/toasts.js";
 import slideIn from "./components/slide-in.js";
 import connectionsComponent from "./pages/connections.jsx";
 import overviewComponent from "./pages/overview.jsx";
+import mapComponent from "./pages/map.jsx";
 import postComponent from "./pages/post.jsx";
 import aboutComponent from "./pages/about.jsx";
 import signupComponent from "./pages/signup.jsx";
@@ -93,6 +94,7 @@ let app = angular.module("won.owner", [
   //views
   connectionsComponent.module,
   overviewComponent.module,
+  mapComponent.module,
   postComponent.module,
   aboutComponent.module,
   signupComponent.module,
@@ -149,6 +151,19 @@ app.run(["$ngRedux", $ngRedux => runMessagingAgent($ngRedux)]);
 app.run([
   "$ngRedux",
   $ngRedux => $ngRedux.dispatch(actionCreators.config__init()),
+]);
+
+app.run([
+  "$ngRedux",
+  $ngRedux => {
+    navigator.permissions
+      .query({ name: "geolocation" })
+      .then(permissionStatus => {
+        if (permissionStatus && permissionStatus.state === "denied") {
+          return $ngRedux.dispatch(actionCreators.view__locationAccessDenied());
+        }
+      });
+  },
 ]);
 
 app.run(runAccessControl);

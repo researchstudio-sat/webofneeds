@@ -19,13 +19,13 @@ import org.apache.jena.vocabulary.RDF;
 import won.bot.framework.bot.context.HokifyJobBotContextWrapper;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.EventBotActionUtils;
+import won.bot.framework.eventbot.action.impl.atomlifecycle.AbstractCreateAtomAction;
 import won.bot.framework.eventbot.action.impl.hokify.HokifyJob;
 import won.bot.framework.eventbot.action.impl.hokify.util.HokifyBotsApi;
-import won.bot.framework.eventbot.action.impl.atomlifecycle.AbstractCreateAtomAction;
 import won.bot.framework.eventbot.bus.EventBus;
 import won.bot.framework.eventbot.event.Event;
-import won.bot.framework.eventbot.event.impl.hokify.CreateAtomFromJobEvent;
 import won.bot.framework.eventbot.event.impl.atomlifecycle.AtomCreatedEvent;
+import won.bot.framework.eventbot.event.impl.hokify.CreateAtomFromJobEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.FailureResponseEvent;
 import won.bot.framework.eventbot.listener.EventListener;
 import won.protocol.message.WonMessage;
@@ -35,6 +35,7 @@ import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.SCHEMA;
 import won.protocol.vocabulary.WON;
+import won.protocol.vocabulary.WXCHAT;
 
 /**
  * Created by MS on 18.09.2018.
@@ -204,7 +205,7 @@ public class CreateAtomFromJobAction extends AbstractCreateAtomAction {
         }
         seeksPart.addProperty(RDF.type, SCHEMA.PERSON);
         seeksPart.addProperty(WON.seeks, SCHEMA.JOBPOSTING);
-        atomModelWrapper.addSocket("#ChatSocket", WON.ChatSocketString);
+        atomModelWrapper.addSocket("#ChatSocket", WXCHAT.ChatSocketString);
         atomModelWrapper.setDefaultSocket("#ChatSocket");
         atomModelWrapper.addFlag(WON.NoHintForMe);
         atom.addProperty(WON.seeks, seeksPart);

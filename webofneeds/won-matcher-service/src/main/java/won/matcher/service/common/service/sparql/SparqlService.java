@@ -14,6 +14,7 @@ import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
+import org.apache.jena.query.QueryParseException;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
@@ -149,10 +150,15 @@ public class SparqlService {
      * @param updateQuery
      */
     public void executeUpdateQuery(String updateQuery) {
-        log.debug("Update SPARQL Endpoint: {}", sparqlEndpoint);
-        log.debug("Execute query: {}", updateQuery);
-        UpdateRequest query = UpdateFactory.create(updateQuery);
-        UpdateProcessRemote riStore = (UpdateProcessRemote) UpdateExecutionFactory.createRemote(query, sparqlEndpoint);
-        riStore.execute();
+        try {
+            log.debug("Update SPARQL Endpoint: {}", sparqlEndpoint);
+            log.debug("Execute query: {}", updateQuery);
+            UpdateRequest query = UpdateFactory.create(updateQuery);
+            UpdateProcessRemote riStore = (UpdateProcessRemote) UpdateExecutionFactory.createRemote(query,
+                            sparqlEndpoint);
+            riStore.execute();
+        } catch (QueryParseException e) {
+            log.warn("Error parsing update query: " + updateQuery, e);
+        }
     }
 }

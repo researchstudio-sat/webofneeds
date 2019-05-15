@@ -2,6 +2,7 @@
  * Created by ksinger on 01.09.2015.
  */
 import GeoPoint from "geopoint";
+import Immutable from "immutable";
 
 export function hyphen2Camel(hyphened) {
   return hyphened
@@ -1114,6 +1115,20 @@ export function callBuffer(fn, delay = 1000) {
   return buffer;
 }
 
+export function scrubSearchResults(searchResults) {
+  return (
+    Immutable.fromJS(searchResults.map(nominatim2draftLocation))
+      /*
+       * filter "duplicate" results (e.g. "Wien"
+       *  -> 1x waterway, 1x boundary, 1x place)
+       */
+      .groupBy(r => r.get("name"))
+      .map(sameNamedResults => sameNamedResults.first())
+      .toList()
+      .toJS()
+  );
+}
+
 /**
  * NOTE: don't pass recursive structures!
  * NOTE: don't pass immutablejs structures
@@ -1301,3 +1316,42 @@ export function generateSimpleTransitionLabel(str) {
 }
 
 window.toLocalISODateString4dbg = toLocalISODateString;
+
+/**
+ * Calculates distance between two locations in meters
+ * If any of the locations or lat, lng of the location are undefined/null, return undefined
+ * @param locationA json {lat, lng]
+ * @param locationB json {lat, lng]
+ * @returns {number} distance between these two coordinates in meters
+ */
+export function calculateDistance(locationA, locationB) {
+  const locationAImm = locationA && Immutable.fromJS(locationA);
+  const locationBImm = locationB && Immutable.fromJS(locationB);
+
+  if (
+    !locationAImm ||
+    !locationAImm.get("lat") ||
+    !locationAImm.get("lng") ||
+    !locationBImm ||
+    !locationBImm.get("lat") ||
+    !locationBImm.get("lng")
+  ) {
+    return;
+  }
+
+  const earthRadius = 6371000; // earth radius in meters
+  const dLat =
+    ((locationBImm.get("lat") - locationAImm.get("lat")) * Math.PI) / 180;
+  const dLon =
+    ((locationBImm.get("lng") - locationAImm.get("lng")) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos((locationAImm.get("lat") * Math.PI) / 180) *
+      Math.cos((locationBImm.get("lat") * Math.PI) / 180) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  const d = earthRadius * c;
+
+  return Math.round(d);
+}

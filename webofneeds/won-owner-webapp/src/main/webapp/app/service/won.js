@@ -62,6 +62,9 @@ won.WON.ClosedCompacted = won.WON.prefix + ":Closed";
 won.WON.Inactive = won.WON.baseUri + "Inactive";
 won.WON.InactiveCompacted = won.WON.prefix + ":Inactive";
 
+won.WON.Deleted = won.WON.baseUri + "Deleted";
+won.WON.DeletedCompacted = won.WON.prefix + ":Deleted";
+
 won.WON.atomState = won.WON.baseUri + "atomState";
 won.WON.atomStateCompacted = won.WON.prefix + ":atomState";
 won.WON.socket = won.WON.baseUri + "socket";
@@ -134,21 +137,10 @@ won.WON.BasicAtomTypeCombined = won.WON.baseUri + "Combined";
 won.WON.BasicAtomTypeCombinedCompacted = won.WON.baseUri + ":Combined";
 won.WON.BasicAtomTypeCritique = won.WON.baseUri + "Critique";
 won.WON.BasicAtomTypeCritiqueCompacted = won.WON.prefix + ":Critique";
-won.WON.BasicAtomTypeWhatsAroundCompacted = won.WON.prefix + ":WhatsAround";
 won.WON.NoHintForCounterpartCompacted =
   won.WON.prefix + ":NoHintForCounterpart";
 won.WON.UsedForTestingCompacted = won.WON.prefix + ":UsedForTesting";
 won.WON.NoHintForMeCompacted = won.WON.prefix + ":NoHintForMe";
-won.WON.HoldableSocket = won.WON.baseUri + "HoldableSocket";
-won.WON.HoldableSocketCompacted = won.WON.prefix + ":HoldableSocket";
-won.WON.HolderSocket = won.WON.baseUri + "HolderSocket";
-won.WON.HolderSocketCompacted = won.WON.prefix + ":HolderSocket";
-won.WON.ReviewSocket = won.WON.baseUri + "ReviewSocket";
-won.WON.ReviewSocketCompacted = won.WON.prefix + ":ReviewSocket";
-won.WON.ChatSocket = won.WON.baseUri + "ChatSocket";
-won.WON.ChatSocketCompacted = won.WON.prefix + ":ChatSocket";
-won.WON.GroupSocket = won.WON.baseUri + "GroupSocket";
-won.WON.GroupSocketCompacted = won.WON.prefix + ":GroupSocket";
 won.WON.ParticipantSocket = won.WON.baseUri + "ParticipantSocket";
 won.WON.ParticipantSocketCompacted = won.WON.prefix + ":ParticipantSocket";
 won.WON.CommentSocket = won.WON.baseUri + "CommentSocket";
@@ -219,8 +211,6 @@ won.WONMSG.messageType = won.WONMSG.baseUri + ":messageType";
 won.WONMSG.messageTypeCompacted = won.WONMSG.prefix + ":messageType";
 won.WONMSG.timestamp = won.WONMSG.baseUri + "timestamp";
 won.WONMSG.timestampCompacted = won.WONMSG.prefix + ":timestamp";
-won.WONMSG.refersTo = won.WONMSG.baseUri + "refersTo";
-won.WONMSG.refersToCompacted = won.WONMSG.prefix + ":refersTo";
 won.WONMSG.isResponseTo = won.WONMSG.baseUri + "isResponseTo";
 won.WONMSG.isResponseToCompacted = won.WONMSG.prefix + ":isResponseTo";
 won.WONMSG.isRemoteResponseTo = won.WONMSG.baseUri + "isRemoteResponseTo";
@@ -295,6 +285,38 @@ won.WONMSG.successResponse = won.WONMSG.baseUri + "SuccessResponse";
 won.WONMSG.successResponseCompacted = won.WONMSG.prefix + ":SuccessResponse";
 won.WONMSG.failureResponse = won.WONMSG.baseUri + "FailureResponse";
 won.WONMSG.failureResponseCompacted = won.WONMSG.prefix + ":FailureResponse";
+
+won.HOLD = {};
+won.HOLD.baseUri = "https://w3id.org/won/ext/hold#";
+won.HOLD.prefix = "hold";
+won.HOLD.HoldableSocket = won.HOLD.baseUri + "HoldableSocket";
+won.HOLD.HoldableSocketCompacted = won.HOLD.prefix + ":HoldableSocket";
+won.HOLD.HolderSocket = won.HOLD.baseUri + "HolderSocket";
+won.HOLD.HolderSocketCompacted = won.HOLD.prefix + ":HolderSocket";
+
+won.CHAT = {};
+won.CHAT.baseUri = "https://w3id.org/won/ext/chat#";
+won.CHAT.prefix = "chat";
+won.CHAT.ChatSocket = won.CHAT.baseUri + "ChatSocket";
+won.CHAT.ChatSocketCompacted = won.CHAT.prefix + ":ChatSocket";
+
+won.GROUP = {};
+won.GROUP.baseUri = "https://w3id.org/won/ext/group#";
+won.GROUP.prefix = "group";
+won.GROUP.GroupSocket = won.GROUP.baseUri + "GroupSocket";
+won.GROUP.GroupSocketCompacted = won.GROUP.prefix + ":GroupSocket";
+
+won.REVIEW = {};
+won.REVIEW.baseUri = "https://w3id.org/won/ext/review#";
+won.REVIEW.prefix = "review";
+won.REVIEW.ReviewSocket = won.REVIEW.baseUri + "ReviewSocket";
+won.REVIEW.ReviewSocketCompacted = won.REVIEW.prefix + ":ReviewSocket";
+
+won.BUDDY = {};
+won.BUDDY.baseUri = "https://w3id.org/won/ext/buddy#";
+won.BUDDY.prefix = "buddy";
+won.BUDDY.ReviewSocket = won.BUDDY.baseUri + "BuddySocket";
+won.BUDDY.ReviewSocketCompacted = won.BUDDY.prefix + ":BuddySocket";
 
 won.EVENT = {};
 won.EVENT.WON_MESSAGE_RECEIVED = "WonMessageReceived";
@@ -661,6 +683,11 @@ function context2ttlPrefixes(jsonldContext) {
 won.minimalContext = {
   msg: "https://w3id.org/won/message#",
   won: "https://w3id.org/won/core#",
+  hold: won.HOLD.baseUri,
+  chat: won.CHAT.baseUri,
+  group: won.GROUP.baseUri,
+  review: won.REVIEW.baseUri,
+  buddy: won.BUDDY.baseUri,
   rdf: "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
   agr: "https://w3id.org/won/agreement#",
   pay: "https://w3id.org/won/payment#",

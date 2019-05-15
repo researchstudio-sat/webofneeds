@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
 import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.camel.processor.annotation.SocketMessageProcessor;
 import won.protocol.message.WonMessage;
@@ -15,19 +16,18 @@ import won.protocol.message.WonMessageBuilder;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionState;
-import won.protocol.model.SocketType;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
-import won.protocol.vocabulary.WON;
 import won.protocol.vocabulary.WONMSG;
+import won.protocol.vocabulary.WXGROUP;
 
 /**
  * Created with IntelliJ IDEA. User: gabriel Date: 16.09.13 Time: 18:42 To
  * change this template use File | Settings | File Templates.
  */
 @Component
-@SocketMessageProcessor(socketType = WON.GroupSocketString, direction = WONMSG.FromExternalString, messageType = WONMSG.ConnectionMessageString)
+@SocketMessageProcessor(socketType = WXGROUP.GroupSocketString, direction = WONMSG.FromExternalString, messageType = WONMSG.ConnectionMessageString)
 public class SendMessageFromNodeGroupSocketImpl extends AbstractCamelProcessor {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     @Autowired
@@ -105,9 +105,5 @@ public class SendMessageFromNodeGroupSocketImpl extends AbstractCamelProcessor {
                 logger.warn("caught Exception:", e);
             }
         }
-    }
-
-    public SocketType getSocketType() {
-        return SocketType.GroupSocket;
     }
 }

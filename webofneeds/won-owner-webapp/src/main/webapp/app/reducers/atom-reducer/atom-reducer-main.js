@@ -75,9 +75,14 @@ export default function(allAtomsInState = initialState, action = {}) {
         won.WON.InactiveCompacted
       );
     }
+    case actionTypes.atoms.storeWhatsNew:
+    case actionTypes.atoms.storeWhatsAround: {
+      const metaAtoms = action.payload.get("metaAtoms");
+      const atomUris = metaAtoms && [...metaAtoms.keys()];
+      return addAtomStubs(allAtomsInState, atomUris);
+    }
 
     case actionTypes.personas.storeTheirUrisInLoading:
-    case actionTypes.atoms.storeAtomUrisFromOwner:
     case actionTypes.atoms.storeTheirUrisInLoading: {
       return addAtomStubs(allAtomsInState, action.payload.get("uris"));
     }
@@ -253,13 +258,13 @@ export default function(allAtomsInState = initialState, action = {}) {
       } else {
         const tmpConnectionUri = "connectionFrom:" + eventUri;
         //TODO: FIGURE OUT A WAY TO INCLUDE THE CORRECT SOCKET FOR ALL POSSIBLE CASES (e.g senderSocket -> get Socket from atom -> store said socket)
-        let connSenderSocket = won.WON.ChatSocketCompacted; //Default add optimistic Connection as ChatConnection
+        let connSenderSocket = won.CHAT.ChatSocketCompacted; //Default add optimistic Connection as ChatConnection
         const ownedAtom = get(allAtomsInState, ownedAtomUri);
         if (
           !atomUtils.hasChatSocket(ownedAtom) &&
           atomUtils.hasGroupSocket(ownedAtom)
         ) {
-          connSenderSocket = won.WON.GroupSocketCompacted; //assume the connection is from group to x if the atom has the group but not the chat socket
+          connSenderSocket = won.GROUP.GroupSocketCompacted; //assume the connection is from group to x if the atom has the group but not the chat socket
         }
 
         //need to wait for success-response to set that

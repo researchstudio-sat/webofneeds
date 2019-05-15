@@ -9,7 +9,6 @@ import { actionCreators } from "../../../actions/actions.js";
 import postHeaderModule from "../../post-header.js";
 import labelledHrModule from "../../labelled-hr.js";
 import { getActiveAtoms } from "../../../selectors/general-selectors.js";
-import * as atomUtils from "../../../atom-utils.js";
 
 import "~/style/_suggestpostpicker.scss";
 
@@ -55,9 +54,6 @@ function genComponentConf() {
       </div>
       <div class="suggestpostp__error" ng-if="self.uriToFetchFailedToLoad && self.fetchAtomUriFieldHasText()">
           Failed to Load Suggestion, might not be a valid uri.
-      </div>
-      <div class="suggestpostp__error" ng-if="self.uriToFetchIsWhatsAround && self.fetchAtomUriFieldHasText()">
-          Suggestion invalid, you are trying to share a What's Around Atom.
       </div>
       <div class="suggestpostp__error" ng-if="self.uriToFetchIsExcluded && self.fetchAtomUriFieldHasText()">
           {{ self.excludedText }}
@@ -105,9 +101,6 @@ function genComponentConf() {
         ]);
         const uriToFetchLoading = !!get(uriToFetchProcess, "loading");
         const uriToFetchFailedToLoad = !!get(uriToFetchProcess, "failedToLoad");
-        const uriToFetchIsWhatsAround = atomUtils.isWhatsAroundAtom(
-          get(allForbiddenAtoms, this.uriToFetch)
-        );
         const uriToFetchIsNotAllowed =
           !!get(allForbiddenAtoms, this.uriToFetch) &&
           !this.hasAtLeastOneAllowedSocket(
@@ -121,7 +114,6 @@ function genComponentConf() {
           suggestedAtomUri,
           uriToFetchLoading,
           uriToFetchFailedToLoad,
-          uriToFetchIsWhatsAround,
           uriToFetchIsExcluded,
           uriToFetchIsNotAllowed,
           allSuggestableAtoms,
@@ -141,7 +133,6 @@ function genComponentConf() {
             this.uriToFetch &&
             !uriToFetchLoading &&
             (uriToFetchFailedToLoad ||
-              uriToFetchIsWhatsAround ||
               uriToFetchIsExcluded ||
               uriToFetchIsNotAllowed),
         };
@@ -199,9 +190,7 @@ function genComponentConf() {
 
     isSuggestable(atom) {
       return (
-        !atomUtils.isWhatsAroundAtom(atom) &&
-        !this.isExcludedAtom(atom) &&
-        this.hasAtLeastOneAllowedSocket(atom)
+        !this.isExcludedAtom(atom) && this.hasAtLeastOneAllowedSocket(atom)
       );
     }
 

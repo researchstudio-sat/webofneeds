@@ -315,20 +315,17 @@ public class LinkedDataServiceImpl implements LinkedDataService {
         res.addProperty(WON.supportsWonProtocolImpl, blankNodeActiveMq);
         blankNodeActiveMq.addProperty(RDF.type, WON.WonOverActiveMq)
                         .addProperty(WON.brokerUri, model.createResource(this.activeMqEndpoint))
-                        .addProperty(WON.activeMQOwnerProtocolQueueName, this.activeMqOwnerProtcolQueueName,
+                        .addProperty(WON.ownerQueue, this.activeMqOwnerProtcolQueueName, XSDDatatype.XSDstring)
+                        .addProperty(WON.nodeQueue, this.activeMqAtomProtcolQueueName, XSDDatatype.XSDstring)
+                        .addProperty(WON.matcherQueue, this.activeMqMatcherPrtotocolQueueName, XSDDatatype.XSDstring)
+                        .addProperty(WON.atomActivatedTopic, this.activeMqMatcherProtocolTopicNameAtomActivated,
                                         XSDDatatype.XSDstring)
-                        .addProperty(WON.activeMQAtomProtocolQueueName, this.activeMqAtomProtcolQueueName,
+                        .addProperty(WON.atomDeactivatedTopic, this.activeMqMatcherProtocolTopicNameAtomDeactivated,
                                         XSDDatatype.XSDstring)
-                        .addProperty(WON.activeMQMatcherProtocolQueueName, this.activeMqMatcherPrtotocolQueueName,
+                        .addProperty(WON.atomDeletedTopic, this.activeMqMatcherProtocolTopicNameAtomDeleted,
                                         XSDDatatype.XSDstring)
-                        .addProperty(WON.activeMQMatcherProtocolOutAtomActivatedTopicName,
-                                        this.activeMqMatcherProtocolTopicNameAtomActivated, XSDDatatype.XSDstring)
-                        .addProperty(WON.activeMQMatcherProtocolOutAtomDeactivatedTopicName,
-                                        this.activeMqMatcherProtocolTopicNameAtomDeactivated, XSDDatatype.XSDstring)
-                        .addProperty(WON.activeMQMatcherProtocolOutAtomDeletedTopicName,
-                                        this.activeMqMatcherProtocolTopicNameAtomDeleted, XSDDatatype.XSDstring)
-                        .addProperty(WON.activeMQMatcherProtocolOutAtomCreatedTopicName,
-                                        this.activeMqMatcherProtocolTopicNameAtomCreated, XSDDatatype.XSDstring);
+                        .addProperty(WON.atomCreatedTopic, this.activeMqMatcherProtocolTopicNameAtomCreated,
+                                        XSDDatatype.XSDstring);
         Resource blankNodeUriSpec = model.createResource();
         res.addProperty(WON.uriPrefixSpecification, blankNodeUriSpec);
         blankNodeUriSpec.addProperty(WON.atomUriPrefix, model.createLiteral(this.atomResourceURIPrefix));

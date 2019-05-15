@@ -19,7 +19,8 @@ import org.slf4j.LoggerFactory;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import won.protocol.util.WonRdfUtils;
-import won.protocol.vocabulary.WON;
+import won.protocol.vocabulary.WXCHAT;
+import won.protocol.vocabulary.WXGROUP;
 
 public class WonRdfUtilsTest {
     private InputStream getResourceAsStream(String name) {
@@ -63,7 +64,7 @@ public class WonRdfUtilsTest {
         Dataset atomDataset = loadTestDatasetFromClasspathResource("wonrdfutils/atom1.trig");
         URI atomURI = WonRdfUtils.AtomUtils.getAtomURI(atomDataset);
         Collection<URI> sockets = WonRdfUtils.SocketUtils.getSocketsOfType(atomDataset, atomURI,
-                        URI.create(WON.ChatSocketString));
+                        URI.create(WXCHAT.ChatSocketString));
         Assert.assertEquals(1, sockets.size());
         Assert.assertEquals(URI.create("https://192.168.124.49:8443/won/resource/atom/cbfgi37je6kr#chatSocket"),
                         sockets.stream().findFirst().get());
@@ -74,7 +75,7 @@ public class WonRdfUtilsTest {
         Dataset atomDataset = loadTestDatasetFromClasspathResource("wonrdfutils/atom1.trig");
         URI atomURI = WonRdfUtils.AtomUtils.getAtomURI(atomDataset);
         Collection<URI> sockets = WonRdfUtils.SocketUtils.getSocketsOfType(atomDataset, atomURI,
-                        URI.create(WON.GroupSocketString));
+                        URI.create(WXGROUP.GroupSocketString));
         Assert.assertEquals(2, sockets.size());
         Assert.assertTrue(sockets.contains(
                         URI.create("https://192.168.124.49:8443/won/resource/atom/cbfgi37je6kr#groupSocket1")));

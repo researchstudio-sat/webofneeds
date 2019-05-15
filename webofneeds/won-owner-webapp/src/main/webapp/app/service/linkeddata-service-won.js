@@ -1696,7 +1696,7 @@ import won from "./won.js";
         "  ?connections rdfs:member ?connectionUri. \n" +
         "  ?connectionUri won:connectionState ?connectionState. \n" +
         "  ?connectionUri won:socket ?socketUri. \n" +
-        "  ?socketUri a ?socketType. \n" +
+        "  ?socketUri won:socketDefinition ?socketType. \n" +
         "} \n",
     },
   };

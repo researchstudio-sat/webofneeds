@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import won.matcher.service.common.event.BulkHintEvent;
+import won.matcher.service.common.event.Cause;
 import won.matcher.service.common.event.HintEvent;
 import won.matcher.service.common.event.AtomEvent;
 import won.matcher.solr.config.SolrMatcherConfig;
@@ -175,12 +176,12 @@ public class HintBuilder {
             log.debug("generate hint for match {} with normalized score {}", matchedAtomUri, score);
             if (!doSuppressHintForAtom) {
                 bulkHintEvent.addHintEvent(new HintEvent(atom.getWonNodeUri(), atom.getUri(), wonNodeUri,
-                                matchedAtomUri, config.getSolrServerPublicUri(), score));
+                                matchedAtomUri, config.getSolrServerPublicUri(), score, atom.getCause()));
             }
             // also send the same hints to the other side (remote atom and wonnode)?
             if (!doSuppressHintForMatchedAtoms) {
                 bulkHintEvent.addHintEvent(new HintEvent(wonNodeUri, matchedAtomUri, atom.getWonNodeUri(),
-                                atom.getUri(), config.getSolrServerPublicUri(), score));
+                                atom.getUri(), config.getSolrServerPublicUri(), score, atom.getCause()));
             }
         }
         return bulkHintEvent;

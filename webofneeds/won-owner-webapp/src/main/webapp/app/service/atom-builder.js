@@ -8,7 +8,6 @@
 import won from "./won.js";
 import * as useCaseUtils from "../usecase-utils";
 import { is } from "../utils";
-import { generateWhatsAroundQuery } from "../sparql-builder-utils.js";
 
 import { Generator } from "sparqljs";
 
@@ -123,23 +122,8 @@ import { Generator } from "sparqljs";
 
     const useCase = useCaseUtils.getUseCase(args.useCase);
 
-    /*TODO: instead of the detection if whatsX to generate the query we could just make useCases out of the whatsX instead
-      or define the query as a detail
-    */
-    const flags = args.content && args.content.flags;
-    const isWhatsAroundDraft =
-      flags &&
-      ((is("Array", flags) && flags.indexOf("won:WhatsAround") != -1) ||
-        flags === "won:WhatsAround");
-
     let queryString = undefined;
-    if (isWhatsAroundDraft) {
-      const location = args.seeks.location;
-
-      if (location && location.lat && location.lng) {
-        queryString = generateWhatsAroundQuery(location.lat, location.lng);
-      }
-    } else if (useCase && useCase.generateQuery) {
+    if (useCase && useCase.generateQuery) {
       const queryMask = {
         type: "query",
         queryType: "SELECT",
@@ -187,12 +171,23 @@ import { Generator } from "sparqljs";
       "won:seeks": seeksContentUri ? { "@id": seeksContentUri } : undefined,
       "won:socket": !(args.content && args.content.sockets)
         ? [
-            { "@id": "#chatSocket", "@type": "won:ChatSocket" },
-            { "@id": "#holdableSocket", "@type": "won:HoldableSocket" },
+            {
+              "@id": "#chatSocket",
+              "won:socketDefinition": { "@id": "chat:ChatSocket" },
+            },
+            {
+              "@id": "#holdableSocket",
+              "won:socketDefinition": { "@id": "hold:HoldableSocket" },
+            },
           ]
         : undefined,
       "won:defaultSocket": !(args.content && args.content.defaultSocket)
-        ? [{ "@id": "#chatSocket", "@type": "won:ChatSocket" }]
+        ? [
+            {
+              "@id": "#chatSocket",
+              "won:socketDefinition": { "@id": "chat:ChatSocket" },
+            },
+          ]
         : undefined,
       "won:flag": won.debugmode ? [{ "@id": "won:UsedForTesting" }] : undefined, //TODO: refactor this and use a won:flags-Detail in the content instead
       "won:doNotMatchAfter": doNotMatchAfter

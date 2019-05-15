@@ -121,7 +121,6 @@ public class WONMSG {
     public static final Property senderNode = m.createProperty(BASE_URI, "senderNode");
     public static final Property messageType = m.createProperty(BASE_URI, "messageType");
     public static final Property content = m.createProperty(BASE_URI, "content");
-    public static final Property refersTo = m.createProperty(BASE_URI, "refersTo");
     public static final Property isResponseTo = m.createProperty(BASE_URI, "isResponseTo");
     public static final Property isRemoteResponseTo = m.createProperty(BASE_URI, "isRemoteResponseTo");
     public static final Property isResponseToMessageType = m.createProperty(BASE_URI, "isResponseToMessageType");;
@@ -129,12 +128,8 @@ public class WONMSG {
     public static final Property forwardedMessage = m.createProperty(BASE_URI, "forwardedMessage");
     public static final Property injectIntoConnection = m.createProperty(BASE_URI, "injectIntoConnection");
     public static final Property previousMessage = m.createProperty(BASE_URI + "previousMessage");
-    public static final Property newAtomState = m.createProperty(BASE_URI, "newAtomState");
     public static final Property sentTimestamp = m.createProperty(BASE_URI, "sentTimestamp");
     public static final Property receivedTimestamp = m.createProperty(BASE_URI, "receivedTimestamp");
-    // public static final String MESSAGE_HAS_CONTENT_PROPERTY = "hasContent";
-    // public static final String MESSAGE_REFERS_TO_PROPERTY = "refersTo";
-    // public static final String MESSAGE_NEW_ATOM_STATE_PROPERTY = "newAtomState";
     // added to support referencing signatures from the envelope
     public static final Property containsSignature = m.createProperty(BASE_URI, "containsSignature");
     // TODO maybe the three properties below could better belong to a separate

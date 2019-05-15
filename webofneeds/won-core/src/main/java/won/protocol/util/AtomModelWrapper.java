@@ -393,7 +393,7 @@ public class AtomModelWrapper {
         Resource socket = getAtomModel().getResource(socketUri);
         Resource socketType = getAtomModel().createResource(socketTypeUri);
         getAtomContentNode().addProperty(WON.socket, socket);
-        socket.addProperty(RDF.type, socketType);
+        socket.addProperty(WON.socketDefinition, socketType);
     }
 
     public void setDefaultSocket(String socketUri) {
@@ -422,7 +422,7 @@ public class AtomModelWrapper {
         if (!getAtomContentNode().hasProperty(WON.socket, socket)) {
             return Optional.empty();
         }
-        Statement stmt = socket.getProperty(RDF.type);
+        Statement stmt = socket.getProperty(WON.socketDefinition);
         if (stmt == null)
             return Optional.empty();
         return Optional.of(stmt.getObject().toString());
@@ -509,6 +509,12 @@ public class AtomModelWrapper {
     public ZonedDateTime getCreationDate() {
         String dateString = RdfUtils.findOnePropertyFromResource(getSysInfoModel(), getAtomNode(AtomGraphType.SYSINFO),
                         DCTerms.created).asLiteral().getString();
+        return ZonedDateTime.parse(dateString, DateTimeFormatter.ISO_DATE_TIME);
+    }
+
+    public ZonedDateTime getModifiedDate() {
+        String dateString = RdfUtils.findOnePropertyFromResource(getSysInfoModel(), getAtomNode(AtomGraphType.SYSINFO),
+                        DCTerms.modified).asLiteral().getString();
         return ZonedDateTime.parse(dateString, DateTimeFormatter.ISO_DATE_TIME);
     }
 
@@ -727,6 +733,15 @@ public class AtomModelWrapper {
         return values;
     }
 
+    public Collection<RDFNode> getContentPropertyObjects(Resource contentNode, Property p) {
+        Collection<RDFNode> values = new LinkedList<>();
+        NodeIterator nodeIterator = getAtomModel().listObjectsOfProperty(contentNode, p);
+        while (nodeIterator.hasNext()) {
+            values.add(nodeIterator.next());
+        }
+        return values;
+    }
+
     public Collection<String> getAllContentPropertyStringValues(Property p, String language) {
         Collection<String> values = new LinkedList<>();
         Collection<Resource> nodes = getSeeksNodes();
@@ -757,6 +772,16 @@ public class AtomModelWrapper {
         Collection<Resource> nodes = getSeeksNodes();
         for (Resource node : nodes) {
             Collection valuesOfContentNode = getContentPropertyStringValues(node, p, language);
+            values.addAll(valuesOfContentNode);
+        }
+        return values;
+    }
+
+    public Collection<RDFNode> getSeeksPropertyObjects(Property p) {
+        Collection<RDFNode> values = new LinkedList<>();
+        Collection<Resource> nodes = getSeeksNodes();
+        for (Resource node : nodes) {
+            Collection valuesOfContentNode = getContentPropertyObjects(node, p);
             values.addAll(valuesOfContentNode);
         }
         return values;
@@ -877,6 +902,14 @@ public class AtomModelWrapper {
                             0);
         }
         return object;
+    }
+
+    public Collection<RDFNode> getContentPropertyObjects(Property p) {
+        Collection<RDFNode> values = new LinkedList<>();
+        Resource node = getAtomContentNode();
+        Collection valuesOfContentNode = getContentPropertyObjects(node, p);
+        values.addAll(valuesOfContentNode);
+        return values;
     }
 
     private Node getContentPropertyObject(String propertyPath) {
