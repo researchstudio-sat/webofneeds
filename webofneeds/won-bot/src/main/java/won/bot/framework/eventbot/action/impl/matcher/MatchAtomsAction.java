@@ -53,8 +53,9 @@ public class MatchAtomsAction extends BaseEventBotAction {
         WonNodeInformationService wonNodeInformationService = getEventListenerContext().getWonNodeInformationService();
         URI localWonNode = WonRdfUtils.AtomUtils.getWonNodeURIFromAtom(
                         getEventListenerContext().getLinkedDataSource().getDataForResource(atomURI), atomURI);
-        return WonMessageBuilder.setMessagePropertiesForHint(wonNodeInformationService.generateEventURI(localWonNode),
-                        atomURI, Optional.empty(), localWonNode, otherAtomURI, Optional.empty(), originator, score)
+        return WonMessageBuilder
+                        .setMessagePropertiesForHintToAtom(wonNodeInformationService.generateEventURI(localWonNode),
+                                        atomURI, localWonNode, otherAtomURI, originator, score)
                         .build();
     }
 }

@@ -33,7 +33,7 @@ prefix ldp:   <http://www.w3.org/ns/ldp#>
     ?correctExtRestEnvNum
 
 
-    (if(bound(?type) && ?type = msg:HintMessage || (
+    (if(bound(?type) && (?type = msg:AtomHintMessage || ?type = msg:SocketHintMessage ) || (
     ?correctExtLeafEnvNum = ?extLeafEnvNum &&
     ?correctExtLeafClosestEnvNum = ?extLeafClosestEnvNum  &&
     ?correctExtRestEnvNum = ?extRestEnvNum), "OK", "FAIL") AS ?check)

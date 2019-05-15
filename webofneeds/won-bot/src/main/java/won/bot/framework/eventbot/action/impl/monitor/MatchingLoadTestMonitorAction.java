@@ -24,7 +24,8 @@ import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.impl.atomlifecycle.AtomCreatedEvent;
-import won.bot.framework.eventbot.event.impl.wonmessage.HintFromMatcherEvent;
+import won.bot.framework.eventbot.event.impl.wonmessage.AtomHintFromMatcherEvent;
+import won.bot.framework.eventbot.event.impl.wonmessage.SocketHintFromMatcherEvent;
 import won.bot.framework.eventbot.listener.EventListener;
 
 /**
@@ -50,12 +51,20 @@ public class MatchingLoadTestMonitorAction extends BaseEventBotAction {
             long startTime = System.currentTimeMillis();
             String atomUri = ((AtomCreatedEvent) event).getAtomURI().toString();
             atomEventStartTime.put(atomUri, startTime);
-        } else if (event instanceof HintFromMatcherEvent) {
-            logger.info("RECEIVED EVENT {} for uri {}", event,
-                            ((HintFromMatcherEvent) event).getMatch().getFromAtom().toString());
+        } else if (event instanceof AtomHintFromMatcherEvent) {
+            String atomUri = ((AtomHintFromMatcherEvent) event).getRecipientAtom().toString();
+            logger.info("RECEIVED EVENT {} for uri {}", event, atomUri);
             long hintReceivedTime = System.currentTimeMillis();
-            String atomUri = ((HintFromMatcherEvent) event).getMatch().getFromAtom().toString();
-            atomSplits.get(((HintFromMatcherEvent) event).getMatch().getFromAtom().toString()).stop();
+            atomSplits.get(atomUri).stop();
+            if (hintEventReceivedTime.get(atomUri) == null) {
+                hintEventReceivedTime.put(atomUri, new LinkedList<Long>());
+            }
+            hintEventReceivedTime.get(atomUri).add(hintReceivedTime);
+        } else if (event instanceof SocketHintFromMatcherEvent) {
+            String atomUri = ((SocketHintFromMatcherEvent) event).getRecipientSocket().toString();
+            logger.info("RECEIVED EVENT {} for uri {}", event, atomUri);
+            long hintReceivedTime = System.currentTimeMillis();
+            atomSplits.get(atomUri).stop();
             if (hintEventReceivedTime.get(atomUri) == null) {
                 hintEventReceivedTime.put(atomUri, new LinkedList<Long>());
             }

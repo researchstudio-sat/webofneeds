@@ -140,6 +140,12 @@ public class UriAlreadyUsedCheckingWonMessageProcessor implements WonMessageProc
                                         message.getIsResponseToMessageURI())
                         && processedMessage.getContentGraphURIs().containsAll(message.getContentGraphURIs())
                         && equalsOrBothNull(processedMessage.getMessageType(), message.getMessageType())
+<<<<<<< HEAD
+=======
+                        && equalsOrBothNull(processedMessage.getHintTargetAtomURI(), message.getHintTargetAtomURI())
+                        && equalsOrBothNull(processedMessage.getHintTargetSocketURI(), message.getHintTargetSocketURI())
+                        && equalsOrBothNull(processedMessage.getHintScore(), message.getHintScore())
+>>>>>>> Refactor Hint-related Message types.
                         && equalsOrBothNull(processedMessage.getEnvelopeType(), message.getEnvelopeType())) {
             return true;
         }

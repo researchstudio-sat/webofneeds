@@ -22,7 +22,8 @@ ASK
        ?subj msg:messageType ?type
        FILTER (?type != msg:CreateMessage  &&  ?type != msg:ConnectMessage
             && ?type != msg:ReplaceMessage 
-            && ?type != msg:CloseMessage && ?type != msg:ConnectionMessage && ?type != msg:HintMessage
+            && ?type != msg:CloseMessage && ?type != msg:ConnectionMessage 
+            && ?type != msg:AtomHintMessage && ?type != msg:SocketHintMessage
             && ?type != msg:DeleteMessage
             && ?type != msg:FailureResponse && ?type != msg:SuccessResponse
             && ?type != msg:ActivateMessage && ?type != msg:DeactivateMessage

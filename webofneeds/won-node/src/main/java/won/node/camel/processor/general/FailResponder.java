@@ -62,7 +62,7 @@ public class FailResponder extends AbstractCamelProcessor {
                 errormessage = String.format("An error occurred while processing message %s",
                                 originalMessage.getMessageURI());
             }
-            if (originalMessage.getMessageType() == WonMessageType.HINT_MESSAGE) {
+            if (originalMessage.getMessageType().isHintMessage()) {
                 // we don't want to send a FailureResponse for a hint message as matchers
                 // are not fully compatible messaging agents (atoms), so sending this message
                 // will fail.

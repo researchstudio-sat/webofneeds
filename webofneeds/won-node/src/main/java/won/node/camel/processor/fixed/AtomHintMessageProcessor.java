@@ -12,7 +12,10 @@ import org.springframework.stereotype.Component;
 import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.camel.processor.annotation.FixedMessageProcessor;
 import won.protocol.message.WonMessage;
+import won.protocol.message.WonMessageType;
 import won.protocol.message.processor.camel.WonCamelConstants;
+import won.protocol.message.processor.exception.MissingMessagePropertyException;
+import won.protocol.model.Atom;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionEventType;
 import won.protocol.model.ConnectionState;
@@ -27,12 +30,10 @@ import won.protocol.vocabulary.WONMSG;
  * User: syim Date: 02.03.2015
  */
 @Component
-@FixedMessageProcessor(direction = WONMSG.FromExternalString, messageType = WONMSG.HintMessageString)
-public class HintMessageProcessor extends AbstractCamelProcessor {
-    @Autowired
-    private ConnectionRepository connectionRepository;
+@FixedMessageProcessor(direction = WONMSG.FromExternalString, messageType = WONMSG.AtomHintMessageString)
+public class AtomHintMessageProcessor extends AbstractCamelProcessor {
     @Value("${ignore.hints.suggested.connection.count.max}")
-    private Long maxSuggestedConnectionCount = 100L;
+    private Long maxAtomHintsCount = 100L;
 
     public void process(Exchange exchange) throws Exception {
         Message message = exchange.getIn();
@@ -43,45 +44,41 @@ public class HintMessageProcessor extends AbstractCamelProcessor {
             exchange.getIn().setHeader(WonCamelConstants.IGNORE_HINT, Boolean.TRUE);
             return;
         }
-        URI wonNodeFromWonMessage = wonMessage.getRecipientNodeURI();
-        URI otherAtomURIFromWonMessage = URI.create(RdfUtils.findOnePropertyFromResource(wonMessage.getMessageContent(),
-                        wonMessage.getMessageURI(), WON.matchCounterpart).asResource().getURI());
-        double wmScore = RdfUtils.findOnePropertyFromResource(wonMessage.getMessageContent(),
-                        wonMessage.getMessageURI(), WON.matchScore).asLiteral().getDouble();
+        URI otherAtomURIFromWonMessage = wonMessage.getHintTargetAtomURI();
+        if (otherAtomURIFromWonMessage == null) {
+            throw new MissingMessagePropertyException(URI.create(WONMSG.hintTargetAtom.toString()));
+        }
+        URI recipientAtomURI = wonMessage.getRecipientAtomURI();
+        if (recipientAtomURI == null) {
+            throw new MissingMessagePropertyException(URI.create(WONMSG.recipientAtom.toString()));
+        }
+        if (wonMessage.getHintTargetSocketURI() != null) {
+            throw new IllegalArgumentException("An AtomHintMessage must not have a msg:hintTargetSocket property");
+        }
+        Double wmScore = wonMessage.getHintScore();
         URI wmOriginator = wonMessage.getSenderNodeURI();
-        if (wmScore < 0 || wmScore > 1)
+        if (wmScore == null) {
+            throw new MissingMessagePropertyException(URI.create(WONMSG.hintScore.toString()));
+        }
+        if (wmScore < 0 || wmScore > 1) {
             throw new IllegalArgumentException("score is not in [0,1]");
-        if (wmOriginator == null)
+        }
+        if (wmOriginator == null) {
             throw new IllegalArgumentException("originator is not set");
-        // socket: either specified or default
-        URI socketURI = WonRdfUtils.SocketUtils.getSocket(wonMessage);
-        // remote socket: either specified or null
-        Optional<URI> targetSocketURI = Optional.ofNullable(WonRdfUtils.SocketUtils.getTargetSocket(wonMessage));
-        Socket socket = dataService.getSocket(atomURIFromWonMessage,
-                        socketURI == null ? Optional.empty() : Optional.of(socketURI));
-        // create Connection in Database
-        Optional<Connection> con = Optional.empty();
-        if (targetSocketURI.isPresent()) {
-            con = connectionRepository.findOneByAtomURIAndTargetAtomURIAndSocketURIAndTargetSocketURIForUpdate(
-                            atomURIFromWonMessage, otherAtomURIFromWonMessage, socket.getSocketURI(),
-                            targetSocketURI.get());
-        } else {
-            con = connectionRepository.findOneByAtomURIAndTargetAtomURIAndSocketURIAndNullTargetSocketForUpdate(
-                            atomURIFromWonMessage, otherAtomURIFromWonMessage, socket.getSocketURI());
         }
-        if (!con.isPresent()) {
-            URI connectionUri = wonNodeInformationService.generateConnectionURI(wonNodeFromWonMessage);
-            con = Optional.of(dataService.createConnection(connectionUri, atomURIFromWonMessage,
-                            otherAtomURIFromWonMessage, null, socket.getSocketURI(), socket.getTypeURI(),
-                            targetSocketURI.orElse(null), ConnectionState.SUGGESTED, ConnectionEventType.MATCHER_HINT));
+        // add to atom's messages
+        Atom atom = atomRepository.findOneByAtomURI(recipientAtomURI);
+        if (atom == null) {
+            throw new IllegalArgumentException("atom not found - cannot send atom message to: " + recipientAtomURI);
         }
-        // build message to send to owner, put in header
-        // set the receiver to the newly generated connection uri
-        wonMessage.addMessageProperty(WONMSG.recipient, con.get().getConnectionURI());
+        atom.getMessageContainer().getEvents()
+                        .add(messageEventRepository.findOneByMessageURIforUpdate(wonMessage.getMessageURI()));
+        atom = atomRepository.save(atom);
     }
 
     private boolean isTooManyHints(URI atomURIFromWonMessage) {
-        long hintCount = connectionRepository.countByAtomURIAndState(atomURIFromWonMessage, ConnectionState.SUGGESTED);
-        return (hintCount > maxSuggestedConnectionCount);
+        long hintCount = messageEventRepository.countByParentURIAndMessageType(atomURIFromWonMessage,
+                        WonMessageType.ATOM_HINT_MESSAGE);
+        return (hintCount > maxAtomHintsCount);
     }
 }

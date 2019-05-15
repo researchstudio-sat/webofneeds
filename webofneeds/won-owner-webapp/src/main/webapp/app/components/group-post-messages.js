@@ -177,7 +177,8 @@ function genComponentConf() {
           allChatMessages &&
           allChatMessages
             .filter(msg => !msg.getIn(["references", "forwards"])) //FILTER OUT ALL FORWARD MESSAGE ENVELOPES JUST IN CASE
-            .filter(msg => !messageUtils.isHintMessage(msg)); //FILTER OUT ALL HINT MESSAGES
+            .filter(msg => !messageUtils.isAtomHintMessage(msg)) //FILTER OUT ALL HINT MESSAGES
+            .filter(msg => !messageUtils.isSocketHintMessage(msg));
         const hasConnectionMessagesToLoad = hasMessagesToLoad(
           state,
           connectionUri

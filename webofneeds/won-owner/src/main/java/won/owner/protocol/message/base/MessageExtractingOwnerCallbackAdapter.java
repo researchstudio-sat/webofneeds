@@ -16,8 +16,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import won.owner.protocol.message.OwnerCallback;
 import won.protocol.message.WonMessage;
 import won.protocol.model.Connection;
-import won.protocol.model.Match;
-import won.protocol.util.WonRdfUtils;
 
 /**
  * Simple implementation of the WonMessageHandlerAdapter that extracts the
@@ -37,11 +35,6 @@ public class MessageExtractingOwnerCallbackAdapter extends OwnerCallbackAdapter 
     @Override
     protected Connection makeConnection(WonMessage wonMessage) {
         return toConnection(wonMessage);
-    }
-
-    @Override
-    protected Match makeMatch(WonMessage wonMessage) {
-        return WonRdfUtils.MessageUtils.toMatch(wonMessage);
     }
 
     /**

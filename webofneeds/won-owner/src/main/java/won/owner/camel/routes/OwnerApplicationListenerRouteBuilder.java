@@ -14,6 +14,7 @@ import java.net.URI;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.LoggingLevel;
+import org.apache.camel.builder.PredicateBuilder;
 import org.apache.camel.builder.RouteBuilder;
 
 import won.protocol.message.processor.camel.WonCamelConstants;
@@ -49,8 +50,11 @@ public class OwnerApplicationListenerRouteBuilder extends RouteBuilder {
         // +"?concurrentConsumers=2")
         from(endpoint).routeId("Node2OwnerRoute" + brokerUri).to("bean:wonMessageIntoCamelProcessor")
                         .to("bean:wellformednessChecker").to("bean:uriNodePathChecker").choice()
-                        .when(header(WonCamelConstants.MESSAGE_TYPE_HEADER)
-                                        .isEqualTo(URI.create(WONMSG.HintMessageString)))
+                        .when(PredicateBuilder.or(
+                                        header(WonCamelConstants.MESSAGE_TYPE_HEADER)
+                                                        .isEqualTo(URI.create(WONMSG.AtomHintMessageString)),
+                                        header(WonCamelConstants.MESSAGE_TYPE_HEADER)
+                                                        .isEqualTo(URI.create(WONMSG.SocketHintMessageString))))
                         // don't check the signature if we're processing a hint message (until the
                         // matcher signs its messages)
                         .log(LoggingLevel.DEBUG, "not checking signature because we're  processing a hint message)")

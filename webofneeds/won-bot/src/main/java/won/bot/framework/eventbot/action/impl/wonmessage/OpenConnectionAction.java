@@ -17,11 +17,13 @@ import org.apache.jena.query.Dataset;
 
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
+import won.bot.framework.eventbot.action.BotActionUtils;
 import won.bot.framework.eventbot.event.ConnectionSpecificEvent;
 import won.bot.framework.eventbot.event.Event;
+import won.bot.framework.eventbot.event.impl.wonmessage.AtomHintFromMatcherEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.ConnectFromOtherAtomEvent;
-import won.bot.framework.eventbot.event.impl.wonmessage.HintFromMatcherEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.OpenFromOtherAtomEvent;
+import won.bot.framework.eventbot.event.impl.wonmessage.SocketHintFromMatcherEvent;
 import won.bot.framework.eventbot.listener.EventListener;
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
@@ -63,15 +65,37 @@ public class OpenConnectionAction extends BaseEventBotAction {
                 // else do not respond - we assume the connection is now established.
             }
             return;
-        } else if (event instanceof HintFromMatcherEvent) {
+        } else if (event instanceof AtomHintFromMatcherEvent) {
             // TODO: the hint with a match object is not really suitable here. Would be
             // better to
             // use connection object instead
-            HintFromMatcherEvent hintEvent = (HintFromMatcherEvent) event;
+            AtomHintFromMatcherEvent hintEvent = (AtomHintFromMatcherEvent) event;
             logger.debug("opening connection based on hint {}", event);
             getEventListenerContext().getWonMessageSender()
-                            .sendWonMessage(createConnectWonMessage(hintEvent.getMatch().getFromAtom(),
-                                            hintEvent.getMatch().getToAtom(), Optional.empty(), Optional.empty()));
+                            .sendWonMessage(createConnectWonMessage(hintEvent.getRecipientAtom(),
+                                            hintEvent.getHintTargetAtom(), Optional.empty(), Optional.empty()));
+        } else if (event instanceof SocketHintFromMatcherEvent) {
+            // TODO: the hint with a match object is not really suitable here. Would be
+            // better to
+            // use connection object instead
+            SocketHintFromMatcherEvent hintEvent = (SocketHintFromMatcherEvent) event;
+            Optional<URI> recipientAtom = BotActionUtils.getRecipientAtomURIFromHintEvent(hintEvent,
+                            getEventListenerContext().getLinkedDataSource());
+            Optional<URI> hintTargetAtom = BotActionUtils.getTargetAtomURIFromHintEvent(hintEvent,
+                            getEventListenerContext().getLinkedDataSource());
+            if (!recipientAtom.isPresent()) {
+                logger.info("could not get recipient atom for hint event {}, cannot connect", event);
+                return;
+            }
+            if (!hintTargetAtom.isPresent()) {
+                logger.info("could not get target atom for hint event {}, cannot connect", event);
+                return;
+            }
+            logger.debug("opening connection based on hint {}", event);
+            getEventListenerContext().getWonMessageSender()
+                            .sendWonMessage(createConnectWonMessage(recipientAtom.get(), hintTargetAtom.get(),
+                                            Optional.of(hintEvent.getRecipientSocket()),
+                                            Optional.of(hintEvent.getHintTargetSocket())));
         }
     }
 

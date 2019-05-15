@@ -10,23 +10,36 @@
  */
 package won.bot.framework.eventbot.event.impl.wonmessage;
 
+import java.net.URI;
+
 import won.bot.framework.eventbot.event.BaseEvent;
 import won.bot.framework.eventbot.event.MessageEvent;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageType;
-import won.protocol.model.Match;
 
-public class HintFromMatcherEvent extends BaseEvent implements MessageEvent {
-    private final Match match;
+public class AtomHintFromMatcherEvent extends BaseEvent implements MessageEvent {
     final WonMessage wonMessage;
+    double hintScore = 0;
+    URI hintTargetAtom = null;
+    URI recipientAtom = null;
 
-    public HintFromMatcherEvent(final Match match, final WonMessage wonMessage) {
-        this.match = match;
+    public AtomHintFromMatcherEvent(final WonMessage wonMessage) {
         this.wonMessage = wonMessage;
+        this.hintScore = wonMessage.getHintScore();
+        this.hintTargetAtom = wonMessage.getHintTargetAtomURI();
+        this.recipientAtom = wonMessage.getRecipientAtomURI();
     }
 
-    public Match getMatch() {
-        return match;
+    public double getHintScore() {
+        return hintScore;
+    }
+
+    public URI getHintTargetAtom() {
+        return hintTargetAtom;
+    }
+
+    public URI getRecipientAtom() {
+        return recipientAtom;
     }
 
     public WonMessage getWonMessage() {

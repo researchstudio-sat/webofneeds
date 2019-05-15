@@ -25,22 +25,23 @@ import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.bus.EventBus;
 import won.bot.framework.eventbot.bus.impl.AsyncEventBusImpl;
 import won.bot.framework.eventbot.event.Event;
+import won.bot.framework.eventbot.event.impl.atomlifecycle.AtomCreatedEvent;
 import won.bot.framework.eventbot.event.impl.lifecycle.ActEvent;
 import won.bot.framework.eventbot.event.impl.lifecycle.ErrorEvent;
 import won.bot.framework.eventbot.event.impl.lifecycle.InitializeEvent;
 import won.bot.framework.eventbot.event.impl.lifecycle.ShutdownEvent;
-import won.bot.framework.eventbot.event.impl.matcher.MatcherRegisteredEvent;
 import won.bot.framework.eventbot.event.impl.matcher.AtomActivatedEventForMatcher;
 import won.bot.framework.eventbot.event.impl.matcher.AtomCreatedEventForMatcher;
 import won.bot.framework.eventbot.event.impl.matcher.AtomDeactivatedEventForMatcher;
 import won.bot.framework.eventbot.event.impl.matcher.AtomModifiedEventForMatcher;
-import won.bot.framework.eventbot.event.impl.atomlifecycle.AtomCreatedEvent;
+import won.bot.framework.eventbot.event.impl.matcher.MatcherRegisteredEvent;
+import won.bot.framework.eventbot.event.impl.wonmessage.AtomHintFromMatcherEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.CloseFromOtherAtomEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.ConnectFromOtherAtomEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.FailureResponseEvent;
-import won.bot.framework.eventbot.event.impl.wonmessage.HintFromMatcherEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.MessageFromOtherAtomEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.OpenFromOtherAtomEvent;
+import won.bot.framework.eventbot.event.impl.wonmessage.SocketHintFromMatcherEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.SuccessResponseEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.WonMessageSentEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.WonMessageSentOnConnectionEvent;
@@ -54,7 +55,6 @@ import won.protocol.message.sender.WonMessageSender;
 import won.protocol.message.sender.exception.WonMessageSenderException;
 import won.protocol.model.Connection;
 import won.protocol.model.SocketType;
-import won.protocol.model.Match;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.linkeddata.LinkedDataSource;
 
@@ -115,11 +115,21 @@ public abstract class EventBot extends TriggeredBot {
     }
 
     @Override
-    public final void onHintFromMatcher(final Match match, final WonMessage wonMessage) {
+    public final void onAtomHintFromMatcher(final WonMessage wonMessage) {
         if (getLifecyclePhase().isActive()) {
-            eventBus.publish(new HintFromMatcherEvent(match, wonMessage));
+            eventBus.publish(new AtomHintFromMatcherEvent(wonMessage));
         } else {
-            logger.info("not publishing event for call to onHintFromMatcher() as the bot is not in state {} but {}",
+            logger.info("not publishing event for call to onAtomHintFromMatcher() as the bot is not in state {} but {}",
+                            BotLifecyclePhase.ACTIVE, getLifecyclePhase());
+        }
+    }
+
+    @Override
+    public final void onSocketHintFromMatcher(final WonMessage wonMessage) {
+        if (getLifecyclePhase().isActive()) {
+            eventBus.publish(new SocketHintFromMatcherEvent(wonMessage));
+        } else {
+            logger.info("not publishing event for call to onSocketHintFromMatcher() as the bot is not in state {} but {}",
                             BotLifecyclePhase.ACTIVE, getLifecyclePhase());
         }
     }

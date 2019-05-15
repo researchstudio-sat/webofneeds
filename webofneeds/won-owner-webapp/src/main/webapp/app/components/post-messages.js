@@ -321,7 +321,8 @@ function genComponentConf() {
           connection
             .get("messages")
             .filter(msg => !msg.get("forwardMessage"))
-            .filter(msg => !messageUtils.isHintMessage(msg));
+            .filter(msg => !messageUtils.isAtomHintMessage(msg))
+            .filter(msg => !messageUtils.isSocketHintMessage(msg));
         const hasConnectionMessagesToLoad = hasMessagesToLoad(
           state,
           selectedConnectionUri

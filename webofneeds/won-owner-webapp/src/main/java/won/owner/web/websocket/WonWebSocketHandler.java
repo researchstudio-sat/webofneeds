@@ -16,6 +16,7 @@ import java.security.Principal;
 import java.text.MessageFormat;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Optional;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -53,6 +54,8 @@ import won.protocol.model.AtomState;
 import won.protocol.util.AuthenticationThreadLocal;
 import won.protocol.util.LoggingUtils;
 import won.protocol.util.WonRdfUtils;
+import won.protocol.util.linkeddata.LinkedDataSource;
+import won.protocol.util.linkeddata.WonLinkedDataUtils;
 
 /**
  * User: syim Date: 06.08.14
@@ -77,6 +80,8 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
     private EagerlyCachePopulatingMessageProcessor eagerlyCachePopulatingProcessor;
     @Autowired
     private ServerSideActionService serverSideActionService;
+    @Autowired
+    private LinkedDataSource linkedDataSource;
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -333,11 +338,24 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
                                         wonMessage.getRecipientURI().toString(), textMsg);
                     }
                     return;
-                case HINT_MESSAGE:
+                case ATOM_HINT_MESSAGE:
                     if (userAtom.isMatches()) {
-                        String targetAtomUri = WonRdfUtils.MessageUtils.toMatch(wonMessage).getToAtom().toString();
+                        String targetAtomUri = wonMessage.getHintTargetAtomURI().toString();
                         emailSender.sendHintNotificationMessage(user.getEmail(), atomUri.toString(), targetAtomUri,
                                         wonMessage.getRecipientURI().toString());
+                    }
+                    return;
+                case SOCKET_HINT_MESSAGE:
+                    if (userAtom.isMatches()) {
+                        Optional<URI> targetAtomUri = WonLinkedDataUtils
+                                        .getAtomOfSocket(wonMessage.getHintTargetSocketURI(), linkedDataSource);
+                        if (targetAtomUri.isPresent()) {
+                            emailSender.sendHintNotificationMessage(user.getEmail(), atomUri.toString(),
+                                            targetAtomUri.get().toString(), wonMessage.getRecipientURI().toString());
+                        } else {
+                            logger.info("received socket hint to {} but could not identify corresponding atom - no mail sent.",
+                                            wonMessage.getHintTargetSocketURI());
+                        }
                     }
                     return;
                 case CLOSE:

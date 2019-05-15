@@ -77,16 +77,22 @@ public class HintAssociatedAtomAction extends BaseEventBotAction {
         WonNodeInformationService wonNodeInformationService = getEventListenerContext().getWonNodeInformationService();
         URI localWonNode = WonRdfUtils.AtomUtils.getWonNodeURIFromAtom(linkedDataSource.getDataForResource(atomURI),
                         atomURI);
-        return WonMessageBuilder
-                        .setMessagePropertiesForHint(wonNodeInformationService.generateEventURI(localWonNode), atomURI,
-                                        localSocketType.map(socketType -> WonLinkedDataUtils
-                                                        .getSocketsOfType(atomURI, socketType, linkedDataSource)
-                                                        .stream().findFirst().orElse(null)),
-                                        localWonNode, otherAtomURI,
-                                        targetSocketType.map(socketType -> WonLinkedDataUtils
-                                                        .getSocketsOfType(otherAtomURI, socketType, linkedDataSource)
-                                                        .stream().findFirst().orElse(null)),
-                                        originator, score)
-                        .build();
+        Optional<URI> sourceSocket = localSocketType.map(socketType -> WonLinkedDataUtils
+                        .getSocketsOfType(atomURI, socketType, linkedDataSource).stream().findFirst().orElse(null));
+        Optional<URI> targetSocket = targetSocketType.map(
+                        socketType -> WonLinkedDataUtils.getSocketsOfType(otherAtomURI, socketType, linkedDataSource)
+                                        .stream().findFirst().orElse(null));
+        if (sourceSocket.isPresent() && targetSocket.isPresent()) {
+            return WonMessageBuilder
+                            .setMessagePropertiesForHintToSocket(
+                                            wonNodeInformationService.generateEventURI(localWonNode), atomURI,
+                                            sourceSocket.get(), localWonNode, targetSocket.get(), originator, score)
+                            .build();
+        } else {
+            return WonMessageBuilder
+                            .setMessagePropertiesForHintToAtom(wonNodeInformationService.generateEventURI(localWonNode),
+                                            atomURI, localWonNode, otherAtomURI, originator, score)
+                            .build();
+        }
     }
 }

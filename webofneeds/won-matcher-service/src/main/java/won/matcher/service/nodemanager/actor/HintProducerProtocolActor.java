@@ -3,7 +3,6 @@ package won.matcher.service.nodemanager.actor;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 import org.apache.jena.riot.Lang;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -90,8 +89,9 @@ public class HintProducerProtocolActor extends UntypedProducerActor {
     private WonMessage createHintWonMessage(HintEvent hint) throws WonMessageBuilderException {
         URI wonNode = URI.create(hint.getFromWonNodeUri());
         return WonMessageBuilder
-                        .setMessagePropertiesForHint(hint.getGeneratedEventUri(), URI.create(hint.getFromAtomUri()),
-                                        Optional.empty(), wonNode, URI.create(hint.getToAtomUri()), Optional.empty(),
+                        .setMessagePropertiesForHintToAtom(hint.getGeneratedEventUri(),
+                                        URI.create(hint.getFromAtomUri()),
+                                        wonNode, URI.create(hint.getToAtomUri()),
                                         URI.create(hint.getMatcherUri()), hint.getScore())
                         .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL).build();
     }

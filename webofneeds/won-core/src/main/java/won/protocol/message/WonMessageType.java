@@ -14,8 +14,8 @@ public enum WonMessageType {
     CREATE_ATOM(WONMSG.CreateMessage), REPLACE(WONMSG.ReplaceMessage), CONNECT(WONMSG.ConnectMessage),
     DEACTIVATE(WONMSG.DeactivateMessage), ACTIVATE(WONMSG.ActivateMessage), CLOSE(WONMSG.CloseMessage),
     DELETE(WONMSG.DeleteMessage), OPEN(WONMSG.OpenMessage), CONNECTION_MESSAGE(WONMSG.ConnectionMessage),
-    ATOM_MESSAGE(WONMSG.AtomMessage), HINT_MESSAGE(WONMSG.HintMessage),
-    HINT_FEEDBACK_MESSAGE(WONMSG.HintFeedbackMessage),
+    ATOM_MESSAGE(WONMSG.AtomMessage), ATOM_HINT_MESSAGE(WONMSG.AtomHintMessage),
+    SOCKET_HINT_MESSAGE(WONMSG.SocketHintMessage), HINT_FEEDBACK_MESSAGE(WONMSG.HintFeedbackMessage),
     // notification messages
     HINT_NOTIFICATION(WONMSG.HintNotificationMessage), ATOM_CREATED_NOTIFICATION(WONMSG.AtomCreatedNotificationMessage),
     // response messages
@@ -54,7 +54,11 @@ public enum WonMessageType {
     }
 
     public boolean causesNewConnection() {
-        return this == CONNECT || this == HINT_MESSAGE;
+        return this == CONNECT || this == SOCKET_HINT_MESSAGE;
+    }
+
+    public boolean isHintMessage() {
+        return this == ATOM_HINT_MESSAGE || this == SOCKET_HINT_MESSAGE;
     }
 
     public static WonMessageType getWonMessageType(Resource resource) {
@@ -78,8 +82,10 @@ public enum WonMessageType {
             return CONNECTION_MESSAGE;
         if (WONMSG.AtomMessage.equals(resource))
             return ATOM_MESSAGE;
-        if (WONMSG.HintMessage.equals(resource))
-            return HINT_MESSAGE;
+        if (WONMSG.AtomHintMessage.equals(resource))
+            return ATOM_HINT_MESSAGE;
+        if (WONMSG.SocketHintMessage.equals(resource))
+            return SOCKET_HINT_MESSAGE;
         if (WONMSG.HintFeedbackMessage.equals(resource))
             return HINT_FEEDBACK_MESSAGE;
         // response classes

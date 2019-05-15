@@ -33,7 +33,7 @@ export function parseMessage(
   const retractsMessages = wonMessage.getRetractsMessageUris();
   const claimsMessages = wonMessage.getClaimsMessageUris();
 
-  const matchScoreFloat = parseFloat(wonMessage.getMatchScore());
+  const matchScoreFloat = parseFloat(wonMessage.getHintScore());
 
   const detailsToParse = useCaseUtils.getAllDetails();
 
@@ -107,7 +107,8 @@ export function parseMessage(
       //Receive Status Flags
       unread:
         !wonMessage.isFromOwner() &&
-        !wonMessage.isHintMessage() &&
+        !wonMessage.isAtomHintMessage() &&
+        !wonMessage.isSocketHintMessage() &&
         !isUriRead(wonMessage.getMessageUri()),
       //Send Status Flags
       isReceivedByOwn: alreadyProcessed || !wonMessage.isFromOwner(), //if the message is not from the owner we know it has been received anyway

@@ -317,8 +317,11 @@ public class WonMessageRoutes extends RouteBuilder {
         from("activemq:queue:MatcherProtocol.in?concurrentConsumers=5").transacted("PROPAGATION_NEVER")
                         .routeId("activemq:queue:MatcherProtocol.in").to("bean:wonMessageIntoCamelProcessor").choice()
                         // we only handle hint messages
-                        .when(header(WonCamelConstants.MESSAGE_TYPE_HEADER)
-                                        .isEqualTo(URI.create(WONMSG.HintMessage.getURI().toString())))
+                        .when(PredicateBuilder.or(
+                                        header(WonCamelConstants.MESSAGE_TYPE_HEADER).isEqualTo(
+                                                        URI.create(WONMSG.AtomHintMessage.getURI().toString())),
+                                        header(WonCamelConstants.MESSAGE_TYPE_HEADER).isEqualTo(
+                                                        URI.create(WONMSG.SocketHintMessage.getURI().toString()))))
                         // TODO as soon as Matcher can sign his messages, perform here
                         // .to("bean:wellformednessChecker") and .to("bean:signatureChecker")
                         .to("bean:uriNodePathChecker").to("bean:uriInUseChecker").to("bean:envelopeAdder")

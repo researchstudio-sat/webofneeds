@@ -29,7 +29,7 @@ import won.bot.framework.eventbot.event.impl.matcher.AtomCreatedEventForMatcher;
 import won.bot.framework.eventbot.event.impl.matcher.AtomDeactivatedEventForMatcher;
 import won.bot.framework.eventbot.event.impl.atomlifecycle.AtomCreatedEvent;
 import won.bot.framework.eventbot.event.impl.atomlifecycle.AtomDeactivatedEvent;
-import won.bot.framework.eventbot.event.impl.wonmessage.HintFromMatcherEvent;
+import won.bot.framework.eventbot.event.impl.wonmessage.AtomHintFromMatcherEvent;
 import won.bot.framework.eventbot.listener.BaseEventListener;
 import won.bot.framework.eventbot.listener.EventListener;
 import won.bot.framework.eventbot.listener.impl.ActionOnEventListener;
@@ -87,7 +87,7 @@ public class MatcherProtocolTestBot extends EventBot {
         // count until 1 atom is created, then create a comment socket
         bus.subscribe(AtomCreatedEvent.class, this.matcher);
         this.allAtomsDeactivator = new ActionOnEventListener(ctx, new DeactivateAllAtomsAction(ctx), 1);
-        bus.subscribe(HintFromMatcherEvent.class, this.allAtomsDeactivator);
+        bus.subscribe(AtomHintFromMatcherEvent.class, this.allAtomsDeactivator);
         this.workDoneSignaller = new ActionOnceAfterNEventsListener(ctx, 4, new SignalWorkDoneAction(ctx));
         bus.subscribe(AtomDeactivatedEvent.class, this.workDoneSignaller);
         bus.subscribe(AtomDeactivatedEventForMatcher.class, this.workDoneSignaller);

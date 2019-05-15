@@ -898,11 +898,15 @@ export function atomMessageReceived(event) {
   };
 }
 
-export function processHintMessage(event) {
+export function processSocketHintMessage(event) {
+  console.log("TODO: implement processSocketHintMessage for event " + event);
+}
+
+export function processAtomHintMessage(event) {
   return (dispatch, getState) => {
     //first check if we really have the 'own' atom in the state - otherwise we'll ignore the hint
     const ownedAtomUri = event.getRecipientAtom();
-    const targetAtomUri = event.getMatchCounterpart();
+    const targetAtomUri = event.getHintTargetAtom();
 
     const currentState = getState();
     const ownedAtom = getIn(currentState, ["atoms", ownedAtomUri]);

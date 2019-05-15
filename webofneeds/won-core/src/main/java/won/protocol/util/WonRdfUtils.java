@@ -58,7 +58,6 @@ import org.apache.jena.sparql.path.PathParser;
 import org.apache.jena.tdb.TDB;
 import org.apache.jena.vocabulary.RDF;
 import org.hibernate.cfg.NotYetImplementedException;
-import org.hibernate.hql.internal.ast.tree.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,7 +67,6 @@ import won.protocol.message.WonMessageDirection;
 import won.protocol.message.WonSignatureData;
 import won.protocol.model.AtomGraphType;
 import won.protocol.model.ConnectionState;
-import won.protocol.model.Match;
 import won.protocol.model.SocketDefinitionImpl;
 import won.protocol.service.WonNodeInfo;
 import won.protocol.service.WonNodeInfoBuilder;
@@ -705,31 +703,6 @@ public class WonRdfUtils {
             return RdfUtils.findFirstPropertyFromResource(dataset, resource, WON.textMessage);
         }
 
-        /**
-         * Converts the specified hint message into a Match object.
-         * 
-         * @param wonMessage
-         * @return a match object or null if the message is not a hint message.
-         */
-        public static Match toMatch(final WonMessage wonMessage) {
-            if (!WONMSG.HintMessage.equals(wonMessage.getMessageType().getResource())) {
-                return null;
-            }
-            Match match = new Match();
-            match.setFromAtom(wonMessage.getRecipientAtomURI());
-            Dataset messageContent = wonMessage.getMessageContent();
-            RDFNode score = findOnePropertyFromResource(messageContent, wonMessage.getMessageURI(), WON.matchScore);
-            if (!score.isLiteral())
-                return null;
-            match.setScore(score.asLiteral().getDouble());
-            RDFNode counterpart = findOnePropertyFromResource(messageContent, wonMessage.getMessageURI(),
-                            WON.matchCounterpart);
-            if (!counterpart.isResource())
-                return null;
-            match.setToAtom(URI.create(counterpart.asResource().getURI()));
-            return match;
-        }
-
         public static WonMessage copyByDatasetSerialization(final WonMessage toWrap) {
             WonMessage copied = new WonMessage(RdfUtils.readDatasetFromString(
                             RdfUtils.writeDatasetToString(toWrap.getCompleteDataset(), Lang.TRIG), Lang.TRIG));
@@ -1071,6 +1044,11 @@ public class WonRdfUtils {
             } else if (socketCapacities.size() == 1) {
                 socketConfiguration.setCapacity(socketCapacities.iterator().next());
             }
+        }
+
+        public static Optional<URI> getAtomOfSocket(Dataset dataset, URI socketURI) {
+            return RdfUtils.getFirstStatementMapped(dataset, null, URI.create(WON.socket.getURI()), socketURI,
+                            s -> s.getSubject().isURIResource() ? URI.create(s.getSubject().getURI()) : null);
         }
     }
 

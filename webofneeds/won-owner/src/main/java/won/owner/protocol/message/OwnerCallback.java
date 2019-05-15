@@ -14,7 +14,6 @@ import java.net.URI;
 
 import won.protocol.message.WonMessage;
 import won.protocol.model.Connection;
-import won.protocol.model.Match;
 
 /**
  * Interface for owner implementations providing methods for receiving specific
@@ -27,7 +26,9 @@ public interface OwnerCallback {
 
     public void onCloseFromOtherAtom(Connection con, final WonMessage wonMessage);
 
-    public void onHintFromMatcher(Match match, final WonMessage wonMessage);
+    public void onAtomHintFromMatcher(final WonMessage wonMessage);
+
+    public void onSocketHintFromMatcher(final WonMessage wonMessage);
 
     public void onMessageFromOtherAtom(Connection con, final WonMessage wonMessage);
 

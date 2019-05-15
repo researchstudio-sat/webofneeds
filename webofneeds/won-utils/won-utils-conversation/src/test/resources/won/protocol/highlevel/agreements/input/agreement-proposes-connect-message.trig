@@ -1901,7 +1901,7 @@
     event:75z0ck8d0ijloyvzyo05
             a                     msg:FromExternal ;
             msg:content        <https://localhost:8443/won/resource/event/75z0ck8d0ijloyvzyo05#content-y1fe> ;
-            msg:messageType    msg:HintMessage ;
+            msg:messageType    msg:AtomHintMessage ;
             msg:recipientAtom   atom:7820503869697675000 ;
             msg:recipientNode   <https://localhost:8443/won/resource> ;
             msg:senderNode     <http://localhost:8080/matcher> ;

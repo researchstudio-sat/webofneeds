@@ -245,8 +245,11 @@ won.WONMSG.closeAtomMessageCompacted = won.WONMSG.prefix + ":DeactivateMessage";
 won.WONMSG.closeAtomSentMessage = won.WONMSG.baseUri + "DeactivateSentMessage";
 won.WONMSG.closeAtomSentMessageCompacted =
   won.WONMSG.prefix + ":DeactivateSentMessage";
-won.WONMSG.hintMessage = won.WONMSG.baseUri + "HintMessage";
-won.WONMSG.hintMessageCompacted = won.WONMSG.prefix + ":HintMessage";
+won.WONMSG.atomHintMessage = won.WONMSG.baseUri + "AtomHintMessage";
+won.WONMSG.atomHintMessageCompacted = won.WONMSG.prefix + ":AtomHintMessage";
+won.WONMSG.socketHintMessage = won.WONMSG.baseUri + "SocketHintMessage";
+won.WONMSG.socketHintMessageCompacted =
+  won.WONMSG.prefix + ":SocketHintMessage";
 won.WONMSG.hintFeedbackMessage = won.WONMSG.baseUri + "HintFeedbackMessage";
 won.WONMSG.hintFeedbackMessageCompacted =
   won.WONMSG.prefix + ":HintFeedbackMessage";
@@ -404,7 +407,7 @@ won.PRIVATEID_NOT_FOUND_ERROR = Object.freeze({
  * type of latest message for a connection in a given state.
  */
 won.cnctState2MessageType = Object.freeze({
-  [won.WON.Suggested]: won.WONMSG.hintMessage,
+  [won.WON.Suggested]: won.WONMSG.socketHintMessage,
   [won.WON.RequestReceived]: won.WONMSG.connectMessage,
   [won.WON.RequestSent]: won.WONMSG.connectSentMessage,
   [won.WON.Connected]: won.WONMSG.connectionMessage,
@@ -412,7 +415,8 @@ won.cnctState2MessageType = Object.freeze({
 });
 
 won.messageType2EventType = {
-  [won.WONMSG.hintMessageCompacted]: won.EVENT.HINT_RECEIVED,
+  [won.WONMSG.atomHintMessageCompacted]: won.EVENT.HINT_RECEIVED,
+  [won.WONMSG.socketHintMessageCompacted]: won.EVENT.HINT_RECEIVED,
   [won.WONMSG.connectMessageCompacted]: won.EVENT.CONNECT_RECEIVED,
   [won.WONMSG.connectSentMessageCompacted]: won.EVENT.CONNECT_SENT,
   [won.WONMSG.openMessageCompacted]: won.EVENT.OPEN_RECEIVED,
@@ -1403,11 +1407,14 @@ WonMessage.prototype = {
   getTextMessage: function() {
     return this.getProperty("https://w3id.org/won/core#textMessage");
   },
-  getMatchScore: function() {
-    return this.getProperty("https://w3id.org/won/core#matchScore");
+  getHintScore: function() {
+    return this.getProperty("https://w3id.org/won/core#hintScore");
   },
-  getMatchCounterpart: function() {
-    return this.getProperty("https://w3id.org/won/core#matchCounterpart");
+  getHintTargetAtom: function() {
+    return this.getProperty("https://w3id.org/won/core#hintTargetAtom");
+  },
+  getHintTargetSocket: function() {
+    return this.getProperty("https://w3id.org/won/core#hintTargetSocket");
   },
   getIsResponseTo: function() {
     return this.getProperty("https://w3id.org/won/message#isResponseTo");
@@ -1528,8 +1535,10 @@ WonMessage.prototype = {
     return direction === "https://w3id.org/won/message#FromExternal";
   },
 
-  isHintMessage: function() {
-    return this.getMessageType() === "https://w3id.org/won/message#HintMessage";
+  isAtomHintMessage: function() {
+    return (
+      this.getMessageType() === "https://w3id.org/won/message#AtomHintMessage"
+    );
   },
   isCreateMessage: function() {
     return (
@@ -1597,10 +1606,10 @@ WonMessage.prototype = {
       "https://w3id.org/won/message#ReplaceMessage"
     );
   },
-  isResponseToHintMessage: function() {
+  isResponseToAtomHintMessage: function() {
     return (
       this.getIsResponseToMessageType() ===
-      "https://w3id.org/won/message#HintMessage"
+      "https://w3id.org/won/message#AtomHintMessage"
     );
   },
   isResponseToCreateMessage: function() {

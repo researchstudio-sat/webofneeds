@@ -28,7 +28,7 @@ prefix rdfg:   <http://www.w3.org/2004/03/trix/rdfg-1/>
     (if((?ttlContents*2+?ttlEnvelopes*2)!=?ttlGraphs, "a content is not referenced from an envelope", "OK") AS
     ?contentNotReferencedCheck)
 
-    (if((bound(?type) && ?type = msg:HintMessage) || ! (?numOfMultiRefContent>0 || ((?ttlContents + ?ttlEnvelopes + 1)!=?ttlGraphs)), "OK", "FAIL") AS ?check)
+    (if((bound(?type) && (?type = msg:AtomHintMessage || ?type = msg:SocketHintMessage )) || ! (?numOfMultiRefContent>0 || ((?ttlContents + ?ttlEnvelopes + 1)!=?ttlGraphs)), "OK", "FAIL") AS ?check)
 
   WHERE
   {

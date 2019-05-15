@@ -32,7 +32,7 @@ public class UriConsistencyCheckingWonMessageProcessor implements WonMessageProc
         URI recipientNode = message.getRecipientNodeURI();
         WonNodeInfo senderNodeInfo = null;
         WonNodeInfo recipientNodeInfo = null;
-        if (senderNode != null && !WonMessageType.HINT_MESSAGE.equals(message.getMessageType())) {
+        if (senderNode != null && !message.getMessageType().isHintMessage()) {
             // do not check the sender node for a hint
             // TODO: change this behaviour as soon as a matcher uses a WoN node
             senderNodeInfo = wonNodeInformationService.getWonNodeInformation(senderNode);

@@ -372,6 +372,10 @@ public class WonLinkedDataUtils {
         return WonRdfUtils.SocketUtils.getTypeOfSocket(getDataForResource(socketURI, linkedDataSource), socketURI);
     }
 
+    public static Optional<URI> getAtomOfSocket(URI socketURI, LinkedDataSource linkedDataSource) {
+        return WonRdfUtils.SocketUtils.getAtomOfSocket(getDataForResource(socketURI, linkedDataSource), socketURI);
+    }
+
     /**
      * Crawls all connections of the specified atom without messages.
      */
