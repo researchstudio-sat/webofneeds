@@ -1,0 +1,13 @@
+diff --git a/node_modules/parcel-bundler/src/assets/ElmAsset.js b/node_modules/parcel-bundler/src/assets/ElmAsset.js
+index 5f81ebc..ae86f0a 100644
+--- a/node_modules/parcel-bundler/src/assets/ElmAsset.js
++++ b/node_modules/parcel-bundler/src/assets/ElmAsset.js
+@@ -39,7 +39,7 @@ class ElmAsset extends Asset {
+       await this.getConfig(['elm.json'], {load: false});
+     }
+ 
+-    options.debug = !this.options.production;
++    options.debug = false;
+     if (this.options.minify) {
+       options.optimize = true;
+     }

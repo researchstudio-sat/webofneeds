@@ -10,6 +10,11 @@ module.exports = {
     browser: true,
     es6: true,
   },
+  settings: {
+    react: {
+      version: "16.0",
+    },
+  },
   parserOptions: {
     sourceType: "module",
     ecmaVersion: 2017,

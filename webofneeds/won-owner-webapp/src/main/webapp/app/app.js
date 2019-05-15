@@ -8,9 +8,9 @@
 
 //---- app.js-Dependencies ----
 import "babel-polyfill";
+import svgs from "../images/won-icons/*.svg";
 
-/* global require */
-require.context("../images/won-icons", false, /\.svg$/);
+console.log(svgs);
 
 import "../style/won.scss";
 
@@ -52,12 +52,6 @@ import aboutComponent from "./pages/about.jsx";
 import signupComponent from "./pages/signup.jsx";
 import settingsComponent from "./pages/settings.jsx";
 
-import serviceWorkerRuntime from "serviceworker-webpack-plugin/lib/runtime";
-
-if ("serviceWorker" in navigator) {
-  serviceWorkerRuntime.register();
-}
-
 //won import (used so you can access the debugmode variable without reloading the page)
 import won from "./service/won.js";
 window.won = won;
@@ -69,6 +63,12 @@ window.won = won;
 import { runMessagingAgent } from "./messaging-agent.js";
 
 import detailModules from "./components/details/details.js";
+
+//import serviceWorkerRuntime from "serviceworker-webpack-plugin/lib/runtime";
+
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("../sw.js");
+}
 
 let app = angular.module("won.owner", [
   /* to enable legacy $stateChange* events in ui-router (see
