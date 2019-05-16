@@ -54,6 +54,7 @@ import org.apache.jena.sparql.algebra.op.OpProject;
 import org.apache.jena.sparql.algebra.op.OpUnion;
 import org.apache.jena.sparql.core.BasicPattern;
 import org.apache.jena.sparql.core.Var;
+import org.apache.jena.sparql.function.library.leviathan.sec;
 import org.apache.jena.sparql.path.Path;
 import org.apache.jena.sparql.path.PathParser;
 import org.apache.jena.tdb.TDB;
@@ -777,21 +778,29 @@ public class WonRdfUtils {
          */
         public static boolean isSocketsCompatible(Dataset dataset, URI firstAtomSocket, URI secondAtomSocket) {
             Set<URI> firstCompatibleDefs = getCompatibleSocketDefinitions(dataset, firstAtomSocket);
-            URI secondDef = getSocketDefinition(dataset, secondAtomSocket);
-            if (!firstCompatibleDefs.isEmpty() && !firstCompatibleDefs.contains(secondDef)) {
+            Optional<URI> secondDef = getSocketDefinition(dataset, secondAtomSocket);
+            if (!secondDef.isPresent()) {
+                throw new IllegalArgumentException("No socket definition found for " + secondAtomSocket);
+            }
+            if (!firstCompatibleDefs.isEmpty() && !firstCompatibleDefs.contains(secondDef.get())) {
                 return false;
             }
             Set<URI> secondCompatibleDefs = getCompatibleSocketDefinitions(dataset, secondAtomSocket);
-            URI firstDef = getSocketDefinition(dataset, firstAtomSocket);
-            if (!secondCompatibleDefs.isEmpty() && !secondCompatibleDefs.contains(firstDef)) {
+            Optional<URI> firstDef = getSocketDefinition(dataset, firstAtomSocket);
+            if (!firstDef.isPresent()) {
+                throw new IllegalArgumentException("No socket definition found for " + firstAtomSocket);
+            }
+            if (!secondCompatibleDefs.isEmpty() && !secondCompatibleDefs.contains(firstDef.get())) {
                 return false;
             }
             return true;
         }
 
-        private static URI getSocketDefinition(Dataset dataset, URI firstAtomSocket) {
-            // TODO continue here
-            return null;
+        public static Optional<URI> getSocketDefinition(Dataset dataset, URI socket) {
+            return RdfUtils
+            .getObjectStreamOfProperty(dataset, socket, URI.create(WON.socketDefinition.getURI()),
+                            node -> node.isURIResource() ? URI.create(node.asResource().getURI())
+                                            : null).findFirst();
         }
 
         /**
