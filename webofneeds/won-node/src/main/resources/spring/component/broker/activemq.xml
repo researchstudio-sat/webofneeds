@@ -177,13 +177,13 @@
 
         </transportConnectors>
         <sslContext>
-            <!--sslContext
+            <sslContext
                     keyStore="${activemq.broker.keystore}"
                     keyStorePassword="${activemq.broker.keystore.password}"
                     trustStore="${activemq.broker.truststore}"
-                    trustStorePassword="${activemq.broker.truststore.password}"-->
+                    trustStorePassword="${activemq.broker.truststore.password}"/>
                 <!-- broker's private key is the same as server's private key, and his trust is defined by the custom trust manager-->
-                <sslContext
+                <!-- >sslContext
                         keyStore="${activemq.broker.keystore}"
                         keyStorePassword="${activemq.broker.keystore.password}"
                         >
@@ -191,7 +191,7 @@
                         <spring:bean class="won.utils.tls.AcceptAllCertsTrustManager" />
                     </trustManagers>
 
-                </sslContext>
+                </sslContext-->
 
         </sslContext>
 
