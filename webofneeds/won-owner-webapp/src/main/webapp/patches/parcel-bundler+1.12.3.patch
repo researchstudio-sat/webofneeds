@@ -1,21 +1,8 @@
 diff --git a/node_modules/parcel-bundler/src/assets/ElmAsset.js b/node_modules/parcel-bundler/src/assets/ElmAsset.js
-index 5f81ebc..bf3076e 100644
+index 5f81ebc..ae86f0a 100644
 --- a/node_modules/parcel-bundler/src/assets/ElmAsset.js
 +++ b/node_modules/parcel-bundler/src/assets/ElmAsset.js
-@@ -5,6 +5,12 @@ const {minify} = require('terser');
- const path = require('path');
- const spawn = require('cross-spawn');
- 
-+async function succeed() {
-+  return;
-+}
-+
-+let promiseChain = succeed();
-+
- class ElmAsset extends Asset {
-   constructor(name, options) {
-     super(name, options);
-@@ -39,7 +45,7 @@ class ElmAsset extends Asset {
+@@ -39,7 +39,7 @@ class ElmAsset extends Asset {
        await this.getConfig(['elm.json'], {load: false});
      }
  
@@ -24,31 +11,3 @@ index 5f81ebc..bf3076e 100644
      if (this.options.minify) {
        options.optimize = true;
      }
-@@ -48,7 +54,12 @@ class ElmAsset extends Asset {
-   }
- 
-   async collectDependencies() {
--    let dependencies = await this.elm.findAllDependencies(this.name);
-+    let waitForDependencies = (async () => {
-+      await promiseChain;
-+      return await this.elm.findAllDependencies(this.name);
-+    })();
-+    promiseChain = waitForDependencies;
-+    let dependencies = await waitForDependencies;
-     for (let dependency of dependencies) {
-       this.addDependency(dependency, {includedInParent: true});
-     }
-@@ -71,7 +82,12 @@ class ElmAsset extends Asset {
-   }
- 
-   async generate() {
--    let compiled = await this.elm.compileToString(this.name, this.elmOpts);
-+    let waitForCompile = (async () => {
-+      await promiseChain;
-+      return await this.elm.compileToString(this.name, this.elmOpts);
-+    })();
-+    promiseChain = waitForCompile;
-+    let compiled = await waitForCompile;
-     this.contents = compiled.toString();
-     if (this.options.hmr) {
-       let {inject} = await localRequire('elm-hot', this.name);
