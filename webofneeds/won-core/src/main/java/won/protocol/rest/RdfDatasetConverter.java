@@ -26,13 +26,13 @@ import won.protocol.util.RdfUtils;
  */
 public class RdfDatasetConverter extends AbstractHttpMessageConverter<Dataset> {
     private static final Logger logger = LoggerFactory.getLogger(RdfDatasetConverter.class);
-    private static final MediaType[] supportedMediaTypes = { 
+    private static final MediaType[] supportedMediaTypes = {
                     RDFMediaType.APPLICATION_TRIG,
                     RDFMediaType.APPLICATION_NQUADS,
-                    RDFMediaType.APPLICATION_X_TURTLE, 
-                    RDFMediaType.TEXT_RDF_N3, 
+                    RDFMediaType.APPLICATION_X_TURTLE,
+                    RDFMediaType.TEXT_RDF_N3,
                     RDFMediaType.TEXT_TURTLE,
-                    RDFMediaType.APPLICATION_JSONLD};
+                    RDFMediaType.APPLICATION_JSONLD };
 
     public RdfDatasetConverter() {
         this(supportedMediaTypes);
