@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.graph.NodeFactory;
@@ -70,6 +71,7 @@ import won.protocol.model.ConnectionState;
 import won.protocol.model.SocketDefinitionImpl;
 import won.protocol.service.WonNodeInfo;
 import won.protocol.service.WonNodeInfoBuilder;
+import won.protocol.util.RdfUtils.Pair;
 import won.protocol.vocabulary.SCHEMA;
 import won.protocol.vocabulary.SFSIG;
 import won.protocol.vocabulary.WON;
@@ -744,6 +746,55 @@ public class WonRdfUtils {
         }
 
         /**
+         * Calculates all compatible socket pairs in the two specified atoms.
+         * 
+         * @param dataset
+         * @param leftAtom
+         * @param rightAtom
+         * @return
+         */
+        public static Set<Pair<URI>> getCompatibleSocketsForAtoms(Dataset dataset, URI firstAtom, URI secondAtom) {
+            Set<URI> firstAtomSockets = getSocketsOfAtom(dataset, firstAtom);
+            Set<URI> secondAtomSockets = getSocketsOfAtom(dataset, secondAtom);
+            Set<Pair<URI>> ret = new HashSet<>();
+            firstAtomSockets.forEach(firstAtomSocket -> {
+                secondAtomSockets.forEach(secondAtomSocket -> {
+                    if (isSocketsCompatible(dataset, firstAtomSocket, secondAtomSocket)) {
+                        ret.add(new Pair(firstAtomSocket, secondAtomSocket));
+                    }
+                });
+            });
+            return ret;
+        }
+
+        /**
+         * Checks if the specified sockets are compatible.
+         * 
+         * @param dataset
+         * @param firstAtomSocket
+         * @param secondAtomSocket
+         * @return
+         */
+        public static boolean isSocketsCompatible(Dataset dataset, URI firstAtomSocket, URI secondAtomSocket) {
+            Set<URI> firstCompatibleDefs = getCompatibleSocketDefinitions(dataset, firstAtomSocket);
+            URI secondDef = getSocketDefinition(dataset, secondAtomSocket);
+            if (!firstCompatibleDefs.isEmpty() && !firstCompatibleDefs.contains(secondDef)) {
+                return false;
+            }
+            Set<URI> secondCompatibleDefs = getCompatibleSocketDefinitions(dataset, secondAtomSocket);
+            URI firstDef = getSocketDefinition(dataset, firstAtomSocket);
+            if (!secondCompatibleDefs.isEmpty() && !secondCompatibleDefs.contains(firstDef)) {
+                return false;
+            }
+            return true;
+        }
+
+        private static URI getSocketDefinition(Dataset dataset, URI firstAtomSocket) {
+            // TODO continue here
+            return null;
+        }
+
+        /**
          * Returns a property of the message (i.e. the object of the first triple (
          * [message-uri] [property] X ) found in one of the content graphs of the
          * specified message.
@@ -880,6 +931,16 @@ public class WonRdfUtils {
             return getDefaultSocket(model, model.getResource(subject.toString()), returnAnyIfNoDefaultFound);
         }
 
+        public static Set<URI> getSocketsOfAtom(Dataset atomDataset, URI atomURI) {
+            return getSocketsOfAtomAsStream(atomDataset, atomURI).collect(Collectors.toSet());
+        }
+
+        public static Stream<URI> getSocketsOfAtomAsStream(Dataset atomDataset, URI atomURI) {
+            return RdfUtils.getObjectStreamOfProperty(atomDataset, atomURI, URI.create(WON.socket.getURI()),
+                            node -> node.isURIResource() ? URI.create(node.asResource().getURI())
+                                            : null);
+        }
+
         /**
          * Returns the default socket found in the model. If there is no default socket,
          * the result is empty. unless returnAnyIfNoDefaultFound is true, in which case
@@ -977,7 +1038,11 @@ public class WonRdfUtils {
 
         public static void setCompatibleSocketDefinitions(SocketDefinitionImpl socketConfiguration, Dataset dataset,
                         URI socketURI) {
-            socketConfiguration.setCompatibleSocketTypes(RdfUtils
+            socketConfiguration.setCompatibleSocketTypes(getCompatibleSocketDefinitions(dataset, socketURI));
+        }
+
+        public static Set<URI> getCompatibleSocketDefinitions(Dataset dataset, URI socketURI) {
+            return RdfUtils
                             .getObjectStreamOfProperty(dataset, socketURI, URI.create(WON.socketDefinition.getURI()),
                                             node -> node.isURIResource() ? URI.create(node.asResource().getURI())
                                                             : null)
@@ -985,7 +1050,7 @@ public class WonRdfUtils {
                                             URI.create(WON.compatibleSocketDefinition.getURI()),
                                             node -> node.isURIResource() ? URI.create(node.asResource().getURI())
                                                             : null))
-                            .collect(Collectors.toSet()));
+                            .collect(Collectors.toSet());
         }
 
         public static void setDerivationProperties(SocketDefinitionImpl socketConfiguration, Dataset dataset,

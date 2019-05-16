@@ -23,14 +23,14 @@ import won.protocol.model.SocketType;
 public class AtomCreatedEventForDebugHint extends BaseAtomSpecificEvent {
     private final URI wonNodeUri;
     private final Dataset atomDataset;
-    private final SocketType socketType;
+    private final HintType hintType;
 
     public AtomCreatedEventForDebugHint(final URI atomURI, final URI wonNodeUri, final Dataset atomDataset,
-                    final SocketType socketType) {
+                    final HintType hintType) {
         super(atomURI);
         this.wonNodeUri = wonNodeUri;
         this.atomDataset = atomDataset;
-        this.socketType = socketType;
+        this.hintType = hintType;
     }
 
     public URI getWonNodeUri() {
@@ -39,5 +39,9 @@ public class AtomCreatedEventForDebugHint extends BaseAtomSpecificEvent {
 
     public Dataset getAtomDataset() {
         return atomDataset;
+    }
+
+    public HintType getHintType() {
+        return hintType;
     }
 }

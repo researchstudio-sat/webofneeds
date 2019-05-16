@@ -42,6 +42,7 @@ import won.bot.framework.eventbot.event.impl.crawlconnection.CrawlConnectionComm
 import won.bot.framework.eventbot.event.impl.crawlconnection.CrawlConnectionCommandSuccessEvent;
 import won.bot.framework.eventbot.event.impl.debugbot.ConnectDebugCommandEvent;
 import won.bot.framework.eventbot.event.impl.debugbot.HintDebugCommandEvent;
+import won.bot.framework.eventbot.event.impl.debugbot.HintType;
 import won.bot.framework.eventbot.event.impl.debugbot.MessageToElizaEvent;
 import won.bot.framework.eventbot.event.impl.debugbot.ReplaceDebugAtomContentCommandEvent;
 import won.bot.framework.eventbot.event.impl.debugbot.SendNDebugCommandEvent;
@@ -64,7 +65,7 @@ import won.protocol.validation.WonConnectionValidator;
  */
 public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAction {
     Pattern PATTERN_USAGE = Pattern.compile("^usage|\\?|help|debug$", Pattern.CASE_INSENSITIVE);
-    Pattern PATTERN_HINT = Pattern.compile("^hint$", Pattern.CASE_INSENSITIVE);
+    Pattern PATTERN_HINT = Pattern.compile("^hint(\\s+(socket))?$", Pattern.CASE_INSENSITIVE);
     Pattern PATTERN_CLOSE = Pattern.compile("^close$", Pattern.CASE_INSENSITIVE);
     Pattern PATTERN_MODIFY = Pattern.compile("^modify$", Pattern.CASE_INSENSITIVE);
     Pattern PATTERN_CONNECT = Pattern.compile("^connect$", Pattern.CASE_INSENSITIVE);
@@ -171,10 +172,14 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
                 } else if (PATTERN_USAGE.matcher(message).matches()) {
                     bus.publish(new UsageDebugCommandEvent(con));
                 } else if (PATTERN_HINT.matcher(message).matches()) {
+                    Matcher m = PATTERN_HINT.matcher(message);
+                    m.matches();
+                    boolean socketHint = m.group(3) != null;
+                    String hintType = socketHint ? "SocketHintMessage" : "AtomHintMessage";
                     Model messageModel = WonRdfUtils.MessageUtils
-                                    .textMessage("Ok, I'll create a new atom and make it send a hint to you.");
+                                    .textMessage("Ok, I'll create a new atom and send a " + hintType + " to you.");
                     bus.publish(new ConnectionMessageCommandEvent(con, messageModel));
-                    bus.publish(new HintDebugCommandEvent(con));
+                    bus.publish(new HintDebugCommandEvent(con, socketHint ? HintType.SOCKET_HINT : HintType.ATOM_HINT));
                 } else if (PATTERN_CONNECT.matcher(message).matches()) {
                     Model messageModel = WonRdfUtils.MessageUtils
                                     .textMessage("Ok, I'll create a new atom and make it send a connect to you.");
