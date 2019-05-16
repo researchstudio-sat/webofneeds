@@ -798,9 +798,10 @@ public class WonRdfUtils {
 
         public static Optional<URI> getSocketDefinition(Dataset dataset, URI socket) {
             return RdfUtils
-            .getObjectStreamOfProperty(dataset, socket, URI.create(WON.socketDefinition.getURI()),
-                            node -> node.isURIResource() ? URI.create(node.asResource().getURI())
-                                            : null).findFirst();
+                            .getObjectStreamOfProperty(dataset, socket, URI.create(WON.socketDefinition.getURI()),
+                                            node -> node.isURIResource() ? URI.create(node.asResource().getURI())
+                                                            : null)
+                            .findFirst();
         }
 
         /**
