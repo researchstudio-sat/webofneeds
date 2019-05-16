@@ -1,6 +1,8 @@
 package won.protocol.model;
 
 import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
 
 import won.protocol.vocabulary.WON;
 
@@ -9,14 +11,26 @@ import won.protocol.vocabulary.WON;
  * change this template use File | Settings | File Templates.
  */
 public enum SocketType {
-    ChatSocket("ChatSocket"), HolderSocket("HolderSocket"), HoldableSocket("HoldableSocket"),
-    GroupSocket("GroupSocket"), ReviewSocket("ReviewSocket"), CoordinatorSocket("CoordinatorSocket"),
+    ChatSocket("wx-chat", "ChatSocket"), HolderSocket("wx-hold", "HolderSocket"),
+    HoldableSocket("wx-hold", "HoldableSocket"),
+    GroupSocket("wx-group", "GroupSocket"), ReviewSocket("wx-review", "ReviewSocket"),
+    CoordinatorSocket("CoordinatorSocket"),
     ParticipantSocket("ParticipantSocket"), CommentSocket("CommentSocket"),
     CommentModeratedSocket("CommentModeratedSocket"), CommentUnrestrictedSocket("CommentUnrestrictedSocket"),
     ControlSocket("ControlSocket"), BAPCCoordinatorSocket("BAPCCoordinatorSocket"),
     BAPCParticipantSocket("BAPCParticipantSocket"), BACCCoordinatorSocket("BACCCoordinatorSocket"),
     BACCParticipantSocket("BACCParticipantSocket"), BAAtomicPCCoordinatorSocket("BAAtomicPCCoordinatorSocket"),
     BAAtomicCCCoordinatorSocket("BAAtomicCCCoordinatorSocket");
+    private static final Map<String, String> namespaces = new HashMap();
+    static {
+        namespaces.put("wx-chat", "https://w3id.org/won/ext/chat#");
+        namespaces.put("wx-hold", "https://w3id.org/won/ext/hold#");
+        namespaces.put("wx-group", "https://w3id.org/won/ext/group#");
+        namespaces.put("wx-review", "https://w3id.org/won/ext/review#");
+        namespaces.put("wx-buddy", "https://w3id.org/won/ext/buddy#");
+        namespaces.put("won", "https://w3id.org/won/core#");
+    }
+
     public static String[] getNames() {
         String[] ret = new String[SocketType.values().length];
         int i = 0;
@@ -66,12 +80,22 @@ public enum SocketType {
     }
 
     private String name;
+    private String nsPrefix;;
 
-    private SocketType(String name) {
+    private SocketType(String prefix) {
         this.name = name;
+        this.nsPrefix = WON.DEFAULT_PREFIX;
+    }
+
+    private SocketType(String prefix, String name) {
+        this(name);
+        this.nsPrefix = prefix;
     }
 
     public URI getURI() {
-        return URI.create(WON.BASE_URI + name);
+        String ns = namespaces.get(nsPrefix);
+        if (ns == null)
+            throw new IllegalStateException("No namespace configured for prefix '" + nsPrefix + "'");
+        return URI.create(ns + name);
     }
 }
