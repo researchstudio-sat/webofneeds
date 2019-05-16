@@ -178,32 +178,27 @@
         </transportConnectors>
         <sslContext>
         	<!-- This is tricky.
+        	
         	The activeMQ broker runs in a child context of the won-node-webapp. All clients (matchers, owners, 
         	nodes) first register with the webapp via a TLS request. Their key is then trusted, i.e. put in the truststore.
         	Then they connect to activeMQ, also via TLS. As tomcat and activemq thus seem to be the same entity 
         	externally, they have to use the same private key and the same truststore. 
         	
-        	We tried to use the AcceptAllCertsTrustManager here, but it seems this approach does not work. 
+        	We tried to use the AcceptAllCertsTrustManager here, but it seems this approach does not work  
+        	We tried to let the activeMQ broker use the same truststore file but that did not work, either (probably the 
+        	TrustManager's getAcceptedIssuers method is supposed to return the trusted certificates - not sure.
         	
-        	We now try to let the activeMQ broker use the same truststore file. 
+        	Ths current approach is to use a TrustManager that uses the TrustStoreService also accessed by the node webapp. 
+        	This seems to work now. 
         	-->
             <sslContext
-                    keyStore="${activemq.broker.keystore}"
-                    keyStorePassword="${activemq.broker.keystore.password}"
-                    >
-                    <trustManagers>
-                        <spring:ref bean="nodeTrustManagerTLS"/>
-                    </trustManagers>
-                    
+	             keyStore="${activemq.broker.keystore}"
+	             keyStorePassword="${activemq.broker.keystore.password}"
+	             >
+	             <trustManagers>
+	                 <spring:ref bean="nodeTrustManagerTLS"/>
+	             </trustManagers>
             </sslContext>
-                
-                <!-- >sslContext
-                        keyStore="${activemq.broker.keystore}"
-                        keyStorePassword="${activemq.broker.keystore.password}"
-                        >
-                    
-                </sslContext-->
-
         </sslContext>
 
         <plugins>
