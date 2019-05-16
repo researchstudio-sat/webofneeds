@@ -43,11 +43,11 @@
     "whatwg-fetch": "^0.10.1"
   },
   "scripts": {
-    "build": "WON_OWNER_BASE_URL=/owner parcel build index.html --public-url=/owner -d generated",
+    "build": "cross-env WON_OWNER_BASE_URL=/owner parcel build index.html --public-url=/owner -d generated",
     "serve": "parcel index.html",
     "postinstall": "npm rebuild && patch-package",
     "precommit": "lint-staged",
-    "watch": "WON_OWNER_BASE_URL=/owner parcel watch index.html --public-url=/owner -d generated",
+    "watch": "cross-env WON_OWNER_BASE_URL=/owner parcel watch index.html --public-url=/owner -d generated",
     "clean": "rimraf ./generated ./.cache"
   },
   "devDependencies": {
@@ -59,6 +59,7 @@
     "babel-plugin-transform-react-jsx": "^6.24.1",
     "babel-polyfill": "^6.26.0",
     "babel-preset-env": "^1.6.1",
+    "cross-env": "^5.2.0",
     "elm": "^0.19.0-bugfix6",
     "elm-hot": "^1.0.1",
     "eslint": "^5.16.0",
