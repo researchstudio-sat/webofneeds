@@ -11,6 +11,7 @@ import org.apache.jena.riot.RDFFormat;
 import org.apache.jena.riot.RDFLanguages;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.MediaType;
@@ -22,7 +23,13 @@ import org.springframework.util.StopWatch;
 import won.protocol.util.RdfUtils;
 
 /**
- * User: fsalcher Date: 15.09.2014
+ * Converts between Jena RDF datasets and HTTP responses (server side and client
+ * side).
+ * <p>
+ * In the context of WoN, this is configured in LinkedDataRestClientHttps for
+ * the client and in linkedDataPageServlet-servlet.xml (won-node-webapp) and
+ * dispatcherServlet.xml (won-owner-webapp).
+ * </p>
  */
 public class RdfDatasetConverter extends AbstractHttpMessageConverter<Dataset> {
     private static final Logger logger = LoggerFactory.getLogger(RdfDatasetConverter.class);
