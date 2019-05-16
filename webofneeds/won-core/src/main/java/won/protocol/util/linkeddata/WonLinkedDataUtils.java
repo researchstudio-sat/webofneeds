@@ -24,6 +24,7 @@ import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.SimpleSelector;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.shared.PrefixMapping;
@@ -334,14 +335,31 @@ public class WonLinkedDataUtils {
                         URI.create(WON.socketDefinition.getURI()),
                         node -> node.isURIResource() ? URI.create(node.asResource().getURI()) : null);
         if (configURIs.size() > 1) {
-            throw new IllegalArgumentException("More than one socket configuration found");
+            throw new IllegalArgumentException("More than one socket definition found for socket " + socket);
+        }
+        if (configURIs.size() == 0) {
+            throw new IllegalArgumentException("No socket definition found for socket " + socket);
         }
         configURIs.stream().forEach(configURI -> {
             Dataset ds = linkedDataSource.getDataForResource(configURI);
             RdfUtils.addDatasetToDataset(ontology, ds);
         });
+        URI socketDefinitionURI = configURIs.stream().findFirst().get();
         SocketDefinitionImpl socketDef = new SocketDefinitionImpl(socket);
-        socketDef.setSocketDefinitionURI(configURIs.stream().findFirst());
+        // if a socket definition is referenced via won:socketDefinition, it has to be
+        // the subject of a triple
+        boolean isSocketDefFound = RdfUtils.findFirst(ontology, model -> {
+            if (model.listStatements(new SimpleSelector(model.createResource(socketDefinitionURI.toString()), null,
+                            (RDFNode) null)).hasNext()) {
+                return socket;
+            }
+            return null;
+        }) != null;
+        if (!isSocketDefFound) {
+            throw new IllegalArgumentException("Could not find data for socket definition " + socketDefinitionURI
+                            + " of socket " + socket);
+        }
+        socketDef.setSocketDefinitionURI(socketDefinitionURI);
         WonRdfUtils.SocketUtils.setCompatibleSocketDefinitions(socketDef, ontology, socket);
         WonRdfUtils.SocketUtils.setAutoOpen(socketDef, ontology, socket);
         WonRdfUtils.SocketUtils.setSocketCapacity(socketDef, ontology, socket);
