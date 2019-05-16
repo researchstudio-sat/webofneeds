@@ -65,14 +65,11 @@ const template = (
         />
         <won-usecase-picker />
         <div className="overview__right__welcome__howto">
-          <div className="overview__right__welcome__howto__label">
-            {"{{ self.appTitle }} connects people's atoms to their solutions"}
-          </div>
           <a
             className="overview__right__welcome__howto__button won-button--filled red"
             href="{{ ::self.absHRef(self.$state, 'about', {'aboutSection': 'aboutHowTo'}) }}"
           >
-            <span>{"How {{ self.appTitle }} works?"}</span>
+            <span>Learn how it works</span>
           </a>
         </div>
       </div>
@@ -141,13 +138,11 @@ class ConnectionsController {
 
       const theme = getIn(state, ["config", "theme"]);
       const themeName = get(theme, "name");
-      const appTitle = get(theme, "title");
       const welcomeTemplate = get(theme, "welcomeTemplate");
 
       const showCreateFromPost = !!(fromAtomUri && mode);
 
       return {
-        appTitle,
         welcomeTemplatePath: "./skin/" + themeName + "/" + welcomeTemplate,
 
         open,
