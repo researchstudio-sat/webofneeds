@@ -52,7 +52,7 @@
     "id" : "0",
     "type" : "owl:Class"
   }, {
-    "id" : "11",
+    "id" : "6",
     "type" : "owl:Class"
   }, {
     "id" : "13",
@@ -91,7 +91,7 @@
     "id" : "16",
     "type" : "owl:Class"
   }, {
-    "id" : "10",
+    "id" : "9",
     "type" : "rdfs:Datatype"
   }, {
     "id" : "19",
@@ -142,7 +142,7 @@
     "id" : "79",
     "type" : "owl:Class"
   }, {
-    "id" : "7",
+    "id" : "8",
     "type" : "owl:Class"
   }, {
     "id" : "4",
@@ -157,7 +157,7 @@
     "id" : "23",
     "type" : "owl:Class"
   }, {
-    "id" : "8",
+    "id" : "11",
     "type" : "rdfs:Datatype"
   }, {
     "id" : "38",
@@ -301,7 +301,7 @@
       "en" : "A Connection's state."
     },
     "attributes" : [ "external" ],
-    "id" : "11"
+    "id" : "6"
   }, {
     "iri" : "https://w3id.org/won/core#UriPrefixSpecification",
     "baseIri" : "https://w3id.org/won/core",
@@ -453,7 +453,7 @@
   }, {
     "iri" : "http://www.w3.org/2001/XMLSchema#dateTime",
     "baseIri" : "http://www.w3.org/2001/XMLSchema",
-    "id" : "10",
+    "id" : "9",
     "label" : {
       "IRI-based" : "dateTime"
     }
@@ -544,12 +544,12 @@
     }
   }, {
     "instances" : 0,
-    "union" : [ "2", "7" ],
+    "union" : [ "2", "8" ],
     "attributes" : [ "anonymous", "union" ],
     "id" : "111"
   }, {
     "instances" : 0,
-    "union" : [ "2", "7" ],
+    "union" : [ "2", "8" ],
     "attributes" : [ "anonymous", "union" ],
     "id" : "66"
   }, {
@@ -561,7 +561,7 @@
     }
   }, {
     "instances" : 0,
-    "union" : [ "2", "7" ],
+    "union" : [ "2", "8" ],
     "attributes" : [ "anonymous", "union" ],
     "id" : "115"
   }, {
@@ -627,7 +627,7 @@
       "en" : "An atom is an online entity controlled by a person or organization. Its purpose is to be connected to other such atoms via Connections, so it can be said that it represents the need to interact with others.\nIt specifies a content - what the atom is about, which may be something that is offered for sale, sought for rental etc."
     },
     "attributes" : [ "external" ],
-    "id" : "7"
+    "id" : "8"
   }, {
     "iri" : "https://w3id.org/won/core#WonOverActiveMq",
     "baseIri" : "https://w3id.org/won/core",
@@ -830,7 +830,7 @@
   }, {
     "iri" : "http://www.w3.org/2001/XMLSchema#string",
     "baseIri" : "http://www.w3.org/2001/XMLSchema",
-    "id" : "8",
+    "id" : "11",
     "label" : {
       "IRI-based" : "string"
     }
@@ -863,10 +863,10 @@
     "id" : "3",
     "type" : "owl:datatypeProperty"
   }, {
-    "id" : "6",
+    "id" : "7",
     "type" : "owl:datatypeProperty"
   }, {
-    "id" : "9",
+    "id" : "10",
     "type" : "owl:datatypeProperty"
   }, {
     "id" : "12",
@@ -1186,23 +1186,9 @@
     "attributes" : [ "external", "datatype" ],
     "id" : "3"
   }, {
-    "iri" : "https://w3id.org/won/core#tag",
-    "baseIri" : "https://w3id.org/won/core",
-    "range" : "8",
-    "label" : {
-      "IRI-based" : "tag",
-      "undefined" : "tag"
-    },
-    "domain" : "7",
-    "comment" : {
-      "en" : "Tags an Atom with a String value."
-    },
-    "attributes" : [ "external", "datatype" ],
-    "id" : "6"
-  }, {
     "iri" : "https://w3id.org/won/core#doNotMatchBefore",
     "baseIri" : "https://w3id.org/won/core",
-    "range" : "10",
+    "range" : "9",
     "annotations" : {
       "isDefinedBy" : [ {
         "identifier" : "isDefinedBy",
@@ -1215,12 +1201,26 @@
       "IRI-based" : "doNotMatchBefore",
       "undefined" : "doNotMatchBefore"
     },
-    "domain" : "7",
+    "domain" : "8",
     "comment" : {
       "en" : "Indicates that matchers should not use this atom for matching before the specified xsd:dateTime."
     },
     "attributes" : [ "external", "functional", "datatype" ],
-    "id" : "9"
+    "id" : "7"
+  }, {
+    "iri" : "https://w3id.org/won/core#tag",
+    "baseIri" : "https://w3id.org/won/core",
+    "range" : "11",
+    "label" : {
+      "IRI-based" : "tag",
+      "undefined" : "tag"
+    },
+    "domain" : "8",
+    "comment" : {
+      "en" : "Tags an Atom with a String value."
+    },
+    "attributes" : [ "external", "datatype" ],
+    "id" : "10"
   }, {
     "iri" : "https://w3id.org/won/core#eventUriPrefix",
     "baseIri" : "https://w3id.org/won/core",
@@ -1265,7 +1265,7 @@
       "IRI-based" : "doNotMatchAfter",
       "undefined" : "doNotMatchAfter"
     },
-    "domain" : "7",
+    "domain" : "8",
     "comment" : {
       "en" : "Indicates that matchers should not use this atom for matching after the specified xsd:dateTime."
     },
@@ -1324,7 +1324,7 @@
     "attributes" : [ "anonymous", "object" ],
     "id" : "30"
   }, {
-    "range" : "11",
+    "range" : "6",
     "domain" : "2",
     "attributes" : [ "anonymous", "object" ],
     "id" : "31"
@@ -1339,7 +1339,7 @@
     "attributes" : [ "anonymous", "object" ],
     "id" : "33"
   }, {
-    "range" : "11",
+    "range" : "6",
     "domain" : "27",
     "attributes" : [ "anonymous", "object" ],
     "id" : "34"
@@ -1370,7 +1370,7 @@
   }, {
     "iri" : "https://w3id.org/won/core#targetAtom",
     "baseIri" : "https://w3id.org/won/core",
-    "range" : "7",
+    "range" : "8",
     "annotations" : {
       "isDefinedBy" : [ {
         "identifier" : "isDefinedBy",
@@ -1392,12 +1392,12 @@
   }, {
     "iri" : "https://w3id.org/won/ext/review#reviews",
     "baseIri" : "https://w3id.org/won/ext/review",
-    "range" : "7",
+    "range" : "8",
     "label" : {
       "IRI-based" : "reviews",
       "undefined" : "reviews"
     },
-    "domain" : "7",
+    "domain" : "8",
     "comment" : {
       "en" : "Links an Atom to a reviewed Atom"
     },
@@ -1411,7 +1411,7 @@
       "IRI-based" : "matchingContext",
       "undefined" : "matchingContext"
     },
-    "domain" : "7",
+    "domain" : "8",
     "comment" : {
       "en" : "Specifies a 'matching context' for the Atom. Matchers should only send hints to this Atom if the counterpart specifies the same matching context. If no matching context is specified, matching is not restricted, and matchers may send hints with counterparts that do specify matching contexts."
     },
@@ -1419,12 +1419,12 @@
     "id" : "41"
   }, {
     "range" : "29",
-    "domain" : "7",
+    "domain" : "8",
     "attributes" : [ "anonymous", "object" ],
     "id" : "43"
   }, {
     "range" : "13",
-    "domain" : "7",
+    "domain" : "8",
     "attributes" : [ "anonymous", "object" ],
     "id" : "44"
   }, {
@@ -1434,22 +1434,22 @@
     "id" : "45"
   }, {
     "range" : "21",
-    "domain" : "7",
+    "domain" : "8",
     "attributes" : [ "anonymous", "object" ],
     "id" : "46"
   }, {
     "range" : "23",
-    "domain" : "7",
+    "domain" : "8",
     "attributes" : [ "anonymous", "object" ],
     "id" : "47"
   }, {
     "range" : "16",
-    "domain" : "7",
+    "domain" : "8",
     "attributes" : [ "anonymous", "object" ],
     "id" : "48"
   }, {
     "range" : "0",
-    "domain" : "7",
+    "domain" : "8",
     "attributes" : [ "anonymous", "object" ],
     "id" : "49"
   }, {
@@ -1468,17 +1468,17 @@
     "id" : "50"
   }, {
     "range" : "27",
-    "domain" : "7",
+    "domain" : "8",
     "attributes" : [ "anonymous", "object" ],
     "id" : "51"
   }, {
-    "range" : "11",
-    "domain" : "7",
+    "range" : "6",
+    "domain" : "8",
     "attributes" : [ "anonymous", "object" ],
     "id" : "52"
   }, {
     "range" : "2",
-    "domain" : "7",
+    "domain" : "8",
     "attributes" : [ "anonymous", "object" ],
     "id" : "53"
   }, {
@@ -1563,7 +1563,7 @@
   }, {
     "iri" : "https://w3id.org/won/core#connectionState",
     "baseIri" : "https://w3id.org/won/core",
-    "range" : "11",
+    "range" : "6",
     "annotations" : {
       "isDefinedBy" : [ {
         "identifier" : "isDefinedBy",
@@ -1648,7 +1648,7 @@
       "IRI-based" : "connections",
       "undefined" : "connections"
     },
-    "domain" : "7",
+    "domain" : "8",
     "comment" : {
       "en" : "Links the Atom object to its connections."
     },
@@ -1656,22 +1656,22 @@
     "id" : "78"
   }, {
     "range" : "29",
-    "domain" : "11",
+    "domain" : "6",
     "attributes" : [ "anonymous", "object" ],
     "id" : "80"
   }, {
     "range" : "0",
-    "domain" : "11",
+    "domain" : "6",
     "attributes" : [ "anonymous", "object" ],
     "id" : "81"
   }, {
     "range" : "21",
-    "domain" : "11",
+    "domain" : "6",
     "attributes" : [ "anonymous", "object" ],
     "id" : "82"
   }, {
     "range" : "13",
-    "domain" : "11",
+    "domain" : "6",
     "attributes" : [ "anonymous", "object" ],
     "id" : "83"
   }, {
@@ -1690,7 +1690,7 @@
     "id" : "84"
   }, {
     "range" : "16",
-    "domain" : "11",
+    "domain" : "6",
     "attributes" : [ "anonymous", "object" ],
     "id" : "86"
   }, {
@@ -1705,7 +1705,7 @@
     "id" : "89"
   }, {
     "range" : "23",
-    "domain" : "11",
+    "domain" : "6",
     "attributes" : [ "anonymous", "object" ],
     "id" : "90"
   }, {
@@ -1743,7 +1743,7 @@
       "IRI-based" : "atomState",
       "undefined" : "atomState"
     },
-    "domain" : "7",
+    "domain" : "8",
     "comment" : {
       "en" : "Defines the Atom object's state."
     },
@@ -1771,7 +1771,7 @@
       "IRI-based" : "contentGraph",
       "undefined" : "contentGraph"
     },
-    "domain" : "7",
+    "domain" : "8",
     "comment" : {
       "en" : "Links an Atom to an RDF graph holding some of its RDF content."
     },
@@ -1934,7 +1934,7 @@
     "attributes" : [ "anonymous", "object" ],
     "id" : "118"
   }, {
-    "range" : "11",
+    "range" : "6",
     "domain" : "62",
     "attributes" : [ "anonymous", "object" ],
     "id" : "119"
@@ -1969,6 +1969,20 @@
     "attributes" : [ "anonymous", "object" ],
     "id" : "125"
   }, {
+    "iri" : "https://w3id.org/won/core#sourceAtom",
+    "baseIri" : "https://w3id.org/won/core",
+    "range" : "8",
+    "label" : {
+      "IRI-based" : "sourceAtom",
+      "undefined" : "sourceAtom"
+    },
+    "domain" : "2",
+    "comment" : {
+      "en" : "Links a Connection to the Atom it belongs to (the source of this Connection)"
+    },
+    "attributes" : [ "external", "object" ],
+    "id" : "126"
+  }, {
     "iri" : "https://w3id.org/won/core#seeks",
     "baseIri" : "https://w3id.org/won/core",
     "range" : "99",
@@ -1984,23 +1998,9 @@
       "IRI-based" : "seeks",
       "undefined" : "seeks"
     },
-    "domain" : "7",
+    "domain" : "8",
     "comment" : {
       "undefined" : "This optional property is one of the two properties that defines the content of every atom (the other is the \"is\" property). It is used to describe that part of the content that is\nsought to fulfill the atom in contrast to the part that is available."
-    },
-    "attributes" : [ "external", "object" ],
-    "id" : "126"
-  }, {
-    "iri" : "https://w3id.org/won/core#sourceAtom",
-    "baseIri" : "https://w3id.org/won/core",
-    "range" : "7",
-    "label" : {
-      "IRI-based" : "sourceAtom",
-      "undefined" : "sourceAtom"
-    },
-    "domain" : "2",
-    "comment" : {
-      "en" : "Links a Connection to the Atom it belongs to (the source of this Connection)"
     },
     "attributes" : [ "external", "object" ],
     "id" : "127"
@@ -2026,11 +2026,11 @@
       "IRI-based" : "reviewedConnection",
       "undefined" : "reviewedConnection"
     },
-    "domain" : "7",
+    "domain" : "8",
     "attributes" : [ "object" ],
     "id" : "129"
   }, {
-    "range" : "7",
+    "range" : "8",
     "domain" : "62",
     "attributes" : [ "anonymous", "object" ],
     "id" : "130"
@@ -2064,7 +2064,7 @@
       "IRI-based" : "defaultSocket",
       "undefined" : "defaultSocket"
     },
-    "domain" : "7",
+    "domain" : "8",
     "comment" : {
       "en" : "Indicates the socket to connect to by default."
     },
@@ -2139,7 +2139,7 @@
       "IRI-based" : "flag",
       "undefined" : "flag"
     },
-    "domain" : "7",
+    "domain" : "8",
     "comment" : {
       "en" : "Links an Atom to its Flags"
     },

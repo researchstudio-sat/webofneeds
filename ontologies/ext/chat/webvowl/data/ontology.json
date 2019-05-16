@@ -261,24 +261,6 @@
         "undefined" : "Connected"
       }
     }, {
-      "iri" : "https://w3id.org/won/core#RequestSent",
-      "baseIri" : "https://w3id.org/won/core",
-      "annotations" : {
-        "isDefinedBy" : [ {
-          "identifier" : "isDefinedBy",
-          "language" : "undefined",
-          "value" : "https://w3id.org/won/core",
-          "type" : "iri"
-        } ]
-      },
-      "comment" : {
-        "en" : "Half-open state. The Connection has been requested by the local end but not yet been accepted by the remote counterpart."
-      },
-      "labels" : {
-        "IRI-based" : "RequestSent",
-        "undefined" : "RequestSent"
-      }
-    }, {
       "iri" : "https://w3id.org/won/core#Closed",
       "baseIri" : "https://w3id.org/won/core",
       "annotations" : {
@@ -295,6 +277,24 @@
       "labels" : {
         "IRI-based" : "Closed",
         "undefined" : "Closed"
+      }
+    }, {
+      "iri" : "https://w3id.org/won/core#RequestSent",
+      "baseIri" : "https://w3id.org/won/core",
+      "annotations" : {
+        "isDefinedBy" : [ {
+          "identifier" : "isDefinedBy",
+          "language" : "undefined",
+          "value" : "https://w3id.org/won/core",
+          "type" : "iri"
+        } ]
+      },
+      "comment" : {
+        "en" : "Half-open state. The Connection has been requested by the local end but not yet been accepted by the remote counterpart."
+      },
+      "labels" : {
+        "IRI-based" : "RequestSent",
+        "undefined" : "RequestSent"
       }
     } ],
     "comment" : {
@@ -1949,6 +1949,20 @@
     "attributes" : [ "anonymous", "object" ],
     "id" : "124"
   }, {
+    "iri" : "https://w3id.org/won/core#sourceAtom",
+    "baseIri" : "https://w3id.org/won/core",
+    "range" : "8",
+    "label" : {
+      "IRI-based" : "sourceAtom",
+      "undefined" : "sourceAtom"
+    },
+    "domain" : "2",
+    "comment" : {
+      "en" : "Links a Connection to the Atom it belongs to (the source of this Connection)"
+    },
+    "attributes" : [ "external", "object" ],
+    "id" : "125"
+  }, {
     "iri" : "https://w3id.org/won/core#seeks",
     "baseIri" : "https://w3id.org/won/core",
     "range" : "98",
@@ -1967,20 +1981,6 @@
     "domain" : "8",
     "comment" : {
       "undefined" : "This optional property is one of the two properties that defines the content of every atom (the other is the \"is\" property). It is used to describe that part of the content that is\nsought to fulfill the atom in contrast to the part that is available."
-    },
-    "attributes" : [ "external", "object" ],
-    "id" : "125"
-  }, {
-    "iri" : "https://w3id.org/won/core#sourceAtom",
-    "baseIri" : "https://w3id.org/won/core",
-    "range" : "8",
-    "label" : {
-      "IRI-based" : "sourceAtom",
-      "undefined" : "sourceAtom"
-    },
-    "domain" : "2",
-    "comment" : {
-      "en" : "Links a Connection to the Atom it belongs to (the source of this Connection)"
     },
     "attributes" : [ "external", "object" ],
     "id" : "126"
@@ -2004,20 +2004,6 @@
     "attributes" : [ "anonymous", "object" ],
     "id" : "128"
   }, {
-    "iri" : "https://w3id.org/won/core#atomList",
-    "baseIri" : "https://w3id.org/won/core",
-    "range" : "60",
-    "label" : {
-      "IRI-based" : "atomList",
-      "undefined" : "atomList"
-    },
-    "domain" : "21",
-    "comment" : {
-      "undefined" : "The Node's atoms, in a LDP-pageable container."
-    },
-    "attributes" : [ "external", "object" ],
-    "id" : "129"
-  }, {
     "iri" : "https://w3id.org/won/core#defaultSocket",
     "baseIri" : "https://w3id.org/won/core",
     "range" : "0",
@@ -2036,6 +2022,20 @@
     "domain" : "8",
     "comment" : {
       "en" : "Indicates the socket to connect to by default."
+    },
+    "attributes" : [ "external", "object" ],
+    "id" : "129"
+  }, {
+    "iri" : "https://w3id.org/won/core#atomList",
+    "baseIri" : "https://w3id.org/won/core",
+    "range" : "60",
+    "label" : {
+      "IRI-based" : "atomList",
+      "undefined" : "atomList"
+    },
+    "domain" : "21",
+    "comment" : {
+      "undefined" : "The Node's atoms, in a LDP-pageable container."
     },
     "attributes" : [ "external", "object" ],
     "id" : "130"

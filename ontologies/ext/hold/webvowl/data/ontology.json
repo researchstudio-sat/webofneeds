@@ -261,24 +261,6 @@
         "undefined" : "Connected"
       }
     }, {
-      "iri" : "https://w3id.org/won/core#Closed",
-      "baseIri" : "https://w3id.org/won/core",
-      "annotations" : {
-        "isDefinedBy" : [ {
-          "identifier" : "isDefinedBy",
-          "language" : "undefined",
-          "value" : "https://w3id.org/won/core",
-          "type" : "iri"
-        } ]
-      },
-      "comment" : {
-        "en" : "The closed state. No Messages are forwarded in this state. Re-opening a connection is possbile."
-      },
-      "labels" : {
-        "IRI-based" : "Closed",
-        "undefined" : "Closed"
-      }
-    }, {
       "iri" : "https://w3id.org/won/core#RequestSent",
       "baseIri" : "https://w3id.org/won/core",
       "annotations" : {
@@ -295,6 +277,24 @@
       "labels" : {
         "IRI-based" : "RequestSent",
         "undefined" : "RequestSent"
+      }
+    }, {
+      "iri" : "https://w3id.org/won/core#Closed",
+      "baseIri" : "https://w3id.org/won/core",
+      "annotations" : {
+        "isDefinedBy" : [ {
+          "identifier" : "isDefinedBy",
+          "language" : "undefined",
+          "value" : "https://w3id.org/won/core",
+          "type" : "iri"
+        } ]
+      },
+      "comment" : {
+        "en" : "The closed state. No Messages are forwarded in this state. Re-opening a connection is possbile."
+      },
+      "labels" : {
+        "IRI-based" : "Closed",
+        "undefined" : "Closed"
       }
     } ],
     "comment" : {
@@ -1979,6 +1979,20 @@
     "attributes" : [ "external", "datatype" ],
     "id" : "125"
   }, {
+    "iri" : "https://w3id.org/won/core#sourceAtom",
+    "baseIri" : "https://w3id.org/won/core",
+    "range" : "7",
+    "label" : {
+      "IRI-based" : "sourceAtom",
+      "undefined" : "sourceAtom"
+    },
+    "domain" : "2",
+    "comment" : {
+      "en" : "Links a Connection to the Atom it belongs to (the source of this Connection)"
+    },
+    "attributes" : [ "external", "object" ],
+    "id" : "126"
+  }, {
     "iri" : "https://w3id.org/won/core#seeks",
     "baseIri" : "https://w3id.org/won/core",
     "range" : "98",
@@ -1997,20 +2011,6 @@
     "domain" : "7",
     "comment" : {
       "undefined" : "This optional property is one of the two properties that defines the content of every atom (the other is the \"is\" property). It is used to describe that part of the content that is\nsought to fulfill the atom in contrast to the part that is available."
-    },
-    "attributes" : [ "external", "object" ],
-    "id" : "126"
-  }, {
-    "iri" : "https://w3id.org/won/core#sourceAtom",
-    "baseIri" : "https://w3id.org/won/core",
-    "range" : "7",
-    "label" : {
-      "IRI-based" : "sourceAtom",
-      "undefined" : "sourceAtom"
-    },
-    "domain" : "2",
-    "comment" : {
-      "en" : "Links a Connection to the Atom it belongs to (the source of this Connection)"
     },
     "attributes" : [ "external", "object" ],
     "id" : "127"
