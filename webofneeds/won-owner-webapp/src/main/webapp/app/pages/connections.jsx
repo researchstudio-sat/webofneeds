@@ -61,7 +61,6 @@ const template = (
       <div className="overview__right__welcome">
         <div
           className="overview__right__welcome__text"
-          ng-if="self.welcomeTemplate != undefined"
           ng-include="self.welcomeTemplatePath"
         />
         <won-usecase-picker />

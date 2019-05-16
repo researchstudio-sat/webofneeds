@@ -5,9 +5,8 @@
  */
 import angular from "angular";
 import ngAnimate from "angular-animate";
-import { attach, getIn, get, delay } from "../utils.js";
+import { attach, getIn, get, delay, sortByDate } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
-import won from "../won-es6.js";
 import { actionCreators } from "../actions/actions.js";
 import postMessagesModule from "../components/post-messages.js";
 import atomCardModule from "../components/atom-card.js";
@@ -16,6 +15,7 @@ import * as generalSelectors from "../selectors/general-selectors.js";
 import * as viewSelectors from "../selectors/view-selectors.js";
 import * as processUtils from "../process-utils.js";
 import * as wonLabelUtils from "../won-label-utils.js";
+import * as atomUtils from "../atom-utils.js";
 import { h } from "preact";
 
 import "~/style/_overview.scss";
@@ -45,38 +45,48 @@ const template = (
           {"What's new? "}
           <span
             className="owneroverview__header__title__count"
-            ng-if="!self.isOwnerAtomUrisLoading"
+            ng-if="!self.isOwnerAtomUrisLoading && self.hasVisibleAtomUris"
           >
-            {"{{ self.atomUrisSize }}"}
+            {"({{ self.sortedVisibleAtomUriSize }})"}
           </span>
         </div>
-        <div
-          className="owneroverview__header__loading"
-          ng-if="self.isOwnerAtomUrisLoading"
-        >
-          Loading...
-        </div>
-        <div
-          className="owneroverview__header__updated"
-          ng-if="!self.isOwnerAtomUrisLoading"
-        >
-          <div className="owneroverview__header__updated__time">
-            {"Updated: {{ self.friendlyLastAtomUrisUpdateTimestamp }}"}
+        <div className="owneroverview__header__updated">
+          <div
+            className="owneroverview__header__updated__time hide-in-responsive"
+            ng-if="!self.isOwnerAtomUrisLoading"
+          >
+            Updated: {"{{ self.friendlyLastAtomUrisUpdateTimestamp }}"}
+          </div>
+          <div
+            className="owneroverview__header__updated__loading hide-in-responsive"
+            ng-if="self.isOwnerAtomUrisLoading"
+          >
+            Loading...
           </div>
           <div
             className="owneroverview__header__updated__reload won-button--filled red"
             ng-click="self.reload()"
+            ng-disabled="self.isOwnerAtomUrisLoading"
           >
             Reload
           </div>
         </div>
       </div>
-      <div className="owneroverview__content">
+      <div className="owneroverview__content" ng-if="self.hasVisibleAtomUris">
         <won-atom-card
-          class="owneroverview__content__atom"
+          className="owneroverview__content__atom"
           atom-uri="atomUri"
-          ng-repeat="atomUri in self.atomUrisArray track by atomUri"
+          current-location="self.currentLocation"
+          ng-repeat="atomUri in self.sortedVisibleAtomUriArray track by atomUri"
         />
+      </div>
+      <div
+        className="owneroverview__noresults"
+        ng-if="!self.hasVisibleAtomUris"
+      >
+        <span className="owneroverview__noresults__label">
+          Nothing new found.
+        </span>
       </div>
     </main>
     <won-footer />
@@ -89,26 +99,37 @@ class Controller {
     attach(this, serviceDependencies, arguments);
     this.selection = 0;
     window.overview4dbg = this;
-    this.WON = won.WON;
 
     const selectFromState = state => {
       const viewAtomUri = generalSelectors.getViewAtomUriFromRoute(state);
       const viewConnUri = generalSelectors.getViewConnectionUriFromRoute(state);
 
-      const atomUris = getIn(state, ["owner", "atomUris"]);
+      const whatsNewMetaAtoms = getIn(state, ["owner", "whatsNew"])
+        .filter(metaAtom => atomUtils.isActive(metaAtom))
+        .filter(metaAtom => !atomUtils.isSearchAtom(metaAtom))
+        .filter(metaAtom => !atomUtils.isDirectResponseAtom(metaAtom))
+        .filter(metaAtom => !atomUtils.isInvisibleAtom(metaAtom))
+        .filter(
+          (metaAtom, metaAtomUri) =>
+            !generalSelectors.isAtomOwned(state, metaAtomUri)
+        );
+
+      const sortedVisibleAtoms = sortByDate(whatsNewMetaAtoms, "creationDate");
+      const sortedVisibleAtomUriArray = sortedVisibleAtoms && [
+        ...sortedVisibleAtoms.flatMap(visibleAtom => get(visibleAtom, "uri")),
+      ];
       const lastAtomUrisUpdateDate = getIn(state, [
         "owner",
-        "lastAtomUrisUpdateTime",
+        "lastWhatsNewUpdateTime",
       ]);
 
       const process = get(state, "process");
-      const isOwnerAtomUrisLoading = processUtils.isProcessingAtomUrisFromOwnerLoad(
-        process
-      );
+      const isOwnerAtomUrisLoading = processUtils.isProcessingWhatsNew(process);
       const isOwnerAtomUrisToLoad =
         !lastAtomUrisUpdateDate && !isOwnerAtomUrisLoading;
 
       return {
+        currentLocation: generalSelectors.getCurrentLocation(state),
         lastAtomUrisUpdateDate,
         friendlyLastAtomUrisUpdateTimestamp:
           lastAtomUrisUpdateDate &&
@@ -116,8 +137,12 @@ class Controller {
             generalSelectors.selectLastUpdateTime(state),
             lastAtomUrisUpdateDate
           ),
-        atomUrisArray: atomUris && atomUris.toArray().splice(0, 200), //FIXME: CURRENTLY LIMIT TO 200 entries
-        atomUrisSize: atomUris ? atomUris.size : 0,
+        sortedVisibleAtomUriArray,
+        hasVisibleAtomUris:
+          sortedVisibleAtomUriArray && sortedVisibleAtomUriArray.length > 0,
+        sortedVisibleAtomUriSize: sortedVisibleAtomUriArray
+          ? sortedVisibleAtomUriArray.length
+          : 0,
         isOwnerAtomUrisLoading,
         isOwnerAtomUrisToLoad,
         showSlideIns:
@@ -140,13 +165,16 @@ class Controller {
 
   ensureAtomUrisLoaded() {
     if (this.isOwnerAtomUrisToLoad) {
-      this.atoms__loadAllActiveAtomUrisFromOwner();
+      this.atoms__fetchWhatsNew();
     }
   }
 
   reload() {
     if (!this.isOwnerAtomUrisLoading) {
-      this.atoms__loadAllActiveAtomUrisFromOwner();
+      const modifiedAfterDate =
+        new Date(this.lastAtomUrisUpdateDate) ||
+        new Date(Date.now() - 30 /*Days before*/ * 86400000);
+      this.atoms__fetchWhatsNew(modifiedAfterDate);
     }
   }
 }
