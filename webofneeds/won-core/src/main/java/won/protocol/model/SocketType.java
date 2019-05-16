@@ -82,7 +82,7 @@ public enum SocketType {
     private String name;
     private String nsPrefix;;
 
-    private SocketType(String prefix) {
+    private SocketType(String name) {
         this.name = name;
         this.nsPrefix = WON.DEFAULT_PREFIX;
     }
