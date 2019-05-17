@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.camel.processor.annotation.FixedMessageProcessor;
+import won.protocol.exception.IncompatibleSocketsException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.message.processor.exception.MissingMessagePropertyException;
@@ -21,6 +22,7 @@ import won.protocol.model.Socket;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
+import won.protocol.util.linkeddata.WonLinkedDataUtils;
 import won.protocol.vocabulary.WON;
 import won.protocol.vocabulary.WONMSG;
 
@@ -28,7 +30,6 @@ import won.protocol.vocabulary.WONMSG;
  * User: syim Date: 02.03.2015
  */
 @Component
-@FixedMessageProcessor(direction = WONMSG.FromExternalString, messageType = WONMSG.SocketHintMessageString)
 public class SocketHintMessageProcessor extends AbstractCamelProcessor {
     @Autowired
     private ConnectionRepository connectionRepository;
@@ -39,12 +40,12 @@ public class SocketHintMessageProcessor extends AbstractCamelProcessor {
         Message message = exchange.getIn();
         WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.MESSAGE_HEADER);
         logger.debug("STORING message with id {}", wonMessage.getMessageURI());
-        URI atomURIFromWonMessage = wonMessage.getRecipientAtomURI();
-        if (isTooManyHints(atomURIFromWonMessage)) {
+        URI recipientAtomURI = wonMessage.getRecipientAtomURI();
+        if (isTooManyHints(recipientAtomURI)) {
             exchange.getIn().setHeader(WonCamelConstants.IGNORE_HINT, Boolean.TRUE);
             return;
         }
-        URI wonNodeFromWonMessage = wonMessage.getRecipientNodeURI();
+        URI recipientWoNNodeURI = wonMessage.getRecipientNodeURI();
         URI targetSocketURI = wonMessage.getHintTargetSocketURI();
         Double score = wonMessage.getHintScore();
         if (targetSocketURI == null) {
@@ -64,14 +65,21 @@ public class SocketHintMessageProcessor extends AbstractCamelProcessor {
         if (recipientSocketURI == null) {
             throw new MissingMessagePropertyException(URI.create(WONMSG.recipientSocket.toString()));
         }
-        Socket socket = dataService.getSocket(atomURIFromWonMessage, Optional.ofNullable(recipientSocketURI));
+        if (!WonLinkedDataUtils.isCompatibleSockets(linkedDataSource, recipientSocketURI, targetSocketURI)) {
+            throw new IncompatibleSocketsException(recipientSocketURI, targetSocketURI);
+        }
+        Socket socket = dataService.getSocket(recipientAtomURI, Optional.ofNullable(recipientSocketURI));
         // create Connection in Database
+        Optional<URI> targetAtomURI = WonLinkedDataUtils.getAtomOfSocket(targetSocketURI, linkedDataSource);
+        if (!targetAtomURI.isPresent()) {
+            throw new IllegalArgumentException("Cannot determine atom of socket " + targetSocketURI);
+        }
         Optional<Connection> con = connectionRepository
-                        .findOneByAtomURIAndTargetAtomURIAndSocketURIAndTargetSocketURIForUpdate(atomURIFromWonMessage,
-                                        targetSocketURI, socket.getSocketURI(), targetSocketURI);
+                        .findOneByAtomURIAndTargetAtomURIAndSocketURIAndTargetSocketURIForUpdate(recipientAtomURI,
+                                        targetAtomURI.get(), socket.getSocketURI(), targetSocketURI);
         if (!con.isPresent()) {
-            URI connectionUri = wonNodeInformationService.generateConnectionURI(wonNodeFromWonMessage);
-            con = Optional.of(dataService.createConnection(connectionUri, atomURIFromWonMessage, targetSocketURI, null,
+            URI connectionUri = wonNodeInformationService.generateConnectionURI(recipientWoNNodeURI);
+            con = Optional.of(dataService.createConnection(connectionUri, recipientAtomURI, targetAtomURI.get(), null,
                             socket.getSocketURI(), socket.getTypeURI(), targetSocketURI, ConnectionState.SUGGESTED,
                             ConnectionEventType.MATCHER_HINT));
         }

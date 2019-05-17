@@ -30,7 +30,6 @@ import won.protocol.vocabulary.WONMSG;
  * User: syim Date: 02.03.2015
  */
 @Component
-@FixedMessageProcessor(direction = WONMSG.FromExternalString, messageType = WONMSG.AtomHintMessageString)
 public class AtomHintMessageProcessor extends AbstractCamelProcessor {
     @Value("${ignore.hints.suggested.connection.count.max}")
     private Long maxAtomHintsCount = 100L;
@@ -66,14 +65,6 @@ public class AtomHintMessageProcessor extends AbstractCamelProcessor {
         if (wmOriginator == null) {
             throw new IllegalArgumentException("originator is not set");
         }
-        // add to atom's messages
-        Atom atom = atomRepository.findOneByAtomURI(recipientAtomURI);
-        if (atom == null) {
-            throw new IllegalArgumentException("atom not found - cannot send atom message to: " + recipientAtomURI);
-        }
-        atom.getMessageContainer().getEvents()
-                        .add(messageEventRepository.findOneByMessageURIforUpdate(wonMessage.getMessageURI()));
-        atom = atomRepository.save(atom);
     }
 
     private boolean isTooManyHints(URI atomURIFromWonMessage) {
