@@ -11,10 +11,16 @@
 package won.bot.framework.eventbot.action.impl.wonmessage;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 import org.apache.jena.query.Dataset;
+
+import com.esotericsoftware.kryo.serializers.TaggedFieldSerializer.Tag;
 
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
@@ -26,12 +32,14 @@ import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.WonRdfUtils;
+import won.protocol.util.RdfUtils.Pair;
+import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
 
 /**
- * BaseEventBotAction connecting two atoms on the specified sockets or on their
- * default sockets. Requires an AtomSpecificEvent to run and expeects the
- * atomURI from the event to be associated with another atom URI via the
+ * BaseEventBotAction connecting two atoms on the specified sockets or on two
+ * other, compatible sockets. Requires an AtomSpecificEvent to run and expeects
+ * the atomURI from the event to be associated with another atom URI via the
  * botContext.saveToObjectMap method.
  */
 public class ConnectWithAssociatedAtomAction extends BaseEventBotAction {
@@ -63,29 +71,57 @@ public class ConnectWithAssociatedAtomAction extends BaseEventBotAction {
         final URI myAtomUri = ((AtomSpecificEvent) event).getAtomURI();
         final URI targetAtomUri = getEventListenerContext().getBotContextWrapper().getUriAssociation(myAtomUri);
         try {
-            getEventListenerContext().getWonMessageSender().sendWonMessage(createWonMessage(myAtomUri, targetAtomUri));
+            Optional<WonMessage> msg = createWonMessage(myAtomUri, targetAtomUri);
+            if (msg.isPresent()) {
+                getEventListenerContext().getWonMessageSender().sendWonMessage(msg.get());
+            } else {
+                logger.info("could not connect " + myAtomUri + " and " + targetAtomUri + ": no suitable sockets found");
+            }
         } catch (Exception e) {
             logger.warn("could not connect " + myAtomUri + " and " + targetAtomUri, e);
         }
     }
 
-    private WonMessage createWonMessage(URI fromUri, URI toUri) throws WonMessageBuilderException {
+    private Optional<WonMessage> createWonMessage(URI fromUri, URI toUri) throws WonMessageBuilderException {
         WonNodeInformationService wonNodeInformationService = getEventListenerContext().getWonNodeInformationService();
         Dataset localAtomRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(fromUri);
         Dataset targetAtomRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(toUri);
         URI localWonNode = WonRdfUtils.AtomUtils.getWonNodeURIFromAtom(localAtomRDF, fromUri);
         URI remoteWonNode = WonRdfUtils.AtomUtils.getWonNodeURIFromAtom(targetAtomRDF, toUri);
-        return WonMessageBuilder.setMessagePropertiesForConnect(
-                        wonNodeInformationService.generateEventURI(localWonNode),
-                        localSocketType.map(socketType -> WonLinkedDataUtils
-                                        .getSocketsOfType(fromUri, socketType,
-                                                        getEventListenerContext().getLinkedDataSource())
-                                        .stream().findFirst().orElse(null)),
-                        fromUri, localWonNode,
-                        targetSocketType.map(socketType -> WonLinkedDataUtils
-                                        .getSocketsOfType(toUri, socketType,
-                                                        getEventListenerContext().getLinkedDataSource())
-                                        .stream().findFirst().orElse(null)),
-                        toUri, remoteWonNode, welcomeMessage).build();
+        LinkedDataSource linkedDataSource = getEventListenerContext().getLinkedDataSource();
+        if (localSocketType.isPresent() && targetSocketType.isPresent()) {
+            Optional<URI> localSocket = localSocketType.map(socketType -> WonLinkedDataUtils
+                            .getSocketsOfType(fromUri, socketType,
+                                            linkedDataSource)
+                            .stream().findFirst().orElse(null));
+            Optional<URI> targetSocket = targetSocketType.map(socketType -> WonLinkedDataUtils
+                            .getSocketsOfType(toUri, socketType,
+                                            linkedDataSource)
+                            .stream().findFirst().orElse(null));
+            if (localSocket.isPresent() && targetSocket.isPresent()) {
+                return Optional.of(WonMessageBuilder.setMessagePropertiesForConnect(
+                                wonNodeInformationService.generateEventURI(localWonNode),
+                                localSocket,
+                                fromUri, localWonNode,
+                                targetSocket,
+                                toUri, remoteWonNode, welcomeMessage).build());
+            }
+        }
+        // no sockets specified or specified sockets not supported. try a random
+        // compatibly pair
+        Set<Pair<URI>> compatibleSockets = WonLinkedDataUtils.getCompatibleSocketsForAtoms(linkedDataSource,
+                        fromUri, toUri);
+        if (!compatibleSockets.isEmpty()) {
+            List<Pair<URI>> shuffledSocketPairs = new ArrayList<>(compatibleSockets);
+            Collections.shuffle(shuffledSocketPairs);
+            Pair<URI> sockets = shuffledSocketPairs.get(0);
+            return Optional.of(WonMessageBuilder.setMessagePropertiesForConnect(
+                            wonNodeInformationService.generateEventURI(localWonNode),
+                            Optional.of(sockets.getFirst()),
+                            fromUri, localWonNode,
+                            Optional.of(sockets.getSecond()),
+                            toUri, remoteWonNode, welcomeMessage).build());
+        }
+        return Optional.empty();
     }
 }

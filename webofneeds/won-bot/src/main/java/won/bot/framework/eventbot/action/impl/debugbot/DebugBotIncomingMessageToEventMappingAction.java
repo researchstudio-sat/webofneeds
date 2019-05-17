@@ -65,7 +65,7 @@ import won.protocol.validation.WonConnectionValidator;
  */
 public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAction {
     Pattern PATTERN_USAGE = Pattern.compile("^usage|\\?|help|debug$", Pattern.CASE_INSENSITIVE);
-    Pattern PATTERN_HINT = Pattern.compile("^hint(\\s+(socket))?$", Pattern.CASE_INSENSITIVE);
+    Pattern PATTERN_HINT = Pattern.compile("^hint(\\s+((random|incompatible)\\s+)?socket)?$", Pattern.CASE_INSENSITIVE);
     Pattern PATTERN_CLOSE = Pattern.compile("^close$", Pattern.CASE_INSENSITIVE);
     Pattern PATTERN_MODIFY = Pattern.compile("^modify$", Pattern.CASE_INSENSITIVE);
     Pattern PATTERN_CONNECT = Pattern.compile("^connect$", Pattern.CASE_INSENSITIVE);
@@ -122,7 +122,7 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
     }
 
     public static final String[] USAGE_MESSAGES = { "# Usage:\n"
-                    + "* `hint`:            create a new atom and send hint to it\n"
+                    + "* `hint ((random|incompatible) socket) `:            create a new atom and send me an atom or socket hint (between random or incompatible sockets)\n"
                     + "* `connect`:         create a new atom and send connection request to it\n"
                     + "* `close`:           close the current connection\n"
                     + "* `modify`:          modify the atom's description\n"
@@ -174,12 +174,20 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
                 } else if (PATTERN_HINT.matcher(message).matches()) {
                     Matcher m = PATTERN_HINT.matcher(message);
                     m.matches();
-                    boolean socketHint = m.group(3) != null;
-                    String hintType = socketHint ? "SocketHintMessage" : "AtomHintMessage";
+                    boolean socketHint = m.group(1) != null;
+                    boolean incompatible = "incompatible".equals(m.group(3));
+                    boolean random = "random".equals(m.group(3));
+                    String hintType = socketHint
+                                    ? incompatible ? "incompatible SocketHintMessage"
+                                                    : random ? "random SocketHintMessage" : "SocketHintMessage"
+                                    : "AtomHintMessage";
                     Model messageModel = WonRdfUtils.MessageUtils
                                     .textMessage("Ok, I'll create a new atom and send a " + hintType + " to you.");
                     bus.publish(new ConnectionMessageCommandEvent(con, messageModel));
-                    bus.publish(new HintDebugCommandEvent(con, socketHint ? HintType.SOCKET_HINT : HintType.ATOM_HINT));
+                    bus.publish(new HintDebugCommandEvent(con,
+                                    socketHint ? incompatible ? HintType.INCOMPATIBLE_SOCKET_HINT
+                                                    : random ? HintType.RANDOM_SOCKET_HINT : HintType.SOCKET_HINT
+                                                    : HintType.ATOM_HINT));
                 } else if (PATTERN_CONNECT.matcher(message).matches()) {
                     Model messageModel = WonRdfUtils.MessageUtils
                                     .textMessage("Ok, I'll create a new atom and make it send a connect to you.");
