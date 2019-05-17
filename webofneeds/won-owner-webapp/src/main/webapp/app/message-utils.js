@@ -288,6 +288,10 @@ export function isAtomHintMessage(msg) {
   return get(msg, "messageType") === won.WONMSG.atomHintMessage;
 }
 
+export function isSocketHintMessage(msg) {
+  return get(msg, "messageType") === won.WONMSG.socketHintMessage;
+}
+
 export function isConnectionMessage(msg) {
   return get(msg, "messageType") === won.WONMSG.connectionMessage;
 }

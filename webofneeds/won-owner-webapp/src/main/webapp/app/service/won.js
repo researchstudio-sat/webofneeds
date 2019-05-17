@@ -1540,6 +1540,11 @@ WonMessage.prototype = {
       this.getMessageType() === "https://w3id.org/won/message#AtomHintMessage"
     );
   },
+  isSocketHintMessage: function() {
+    return (
+      this.getMessageType() === "https://w3id.org/won/message#SocketHintMessage"
+    );
+  },
   isCreateMessage: function() {
     return (
       this.getMessageType() === "https://w3id.org/won/message#CreateMessage"
