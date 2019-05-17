@@ -747,7 +747,8 @@ public class WonRdfUtils {
         }
 
         /**
-         * Calculates all compatible socket pairs in the two specified atoms.
+         * Calculates all compatible socket pairs in the two specified atoms defined in
+         * the dataset.
          * 
          * @param dataset
          * @param leftAtom
@@ -761,6 +762,20 @@ public class WonRdfUtils {
             firstAtomSockets.forEach(firstAtomSocket -> {
                 secondAtomSockets.forEach(secondAtomSocket -> {
                     if (isSocketsCompatible(dataset, firstAtomSocket, secondAtomSocket)) {
+                        ret.add(new Pair(firstAtomSocket, secondAtomSocket));
+                    }
+                });
+            });
+            return ret;
+        }
+
+        public static Set<Pair<URI>> getIncompatibleSocketsForAtoms(Dataset dataset, URI firstAtom, URI secondAtom) {
+            Set<URI> firstAtomSockets = getSocketsOfAtom(dataset, firstAtom);
+            Set<URI> secondAtomSockets = getSocketsOfAtom(dataset, secondAtom);
+            Set<Pair<URI>> ret = new HashSet<>();
+            firstAtomSockets.forEach(firstAtomSocket -> {
+                secondAtomSockets.forEach(secondAtomSocket -> {
+                    if (!isSocketsCompatible(dataset, firstAtomSocket, secondAtomSocket)) {
                         ret.add(new Pair(firstAtomSocket, secondAtomSocket));
                     }
                 });
