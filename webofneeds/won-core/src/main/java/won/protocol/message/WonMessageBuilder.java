@@ -508,8 +508,11 @@ public class WonMessageBuilder {
                     URI otherAtomURI, URI matcherURI, double score) {
         WonMessageBuilder builder = new WonMessageBuilder(messageURI)
                         .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL)
-                        .setWonMessageType(WonMessageType.ATOM_HINT_MESSAGE).setSenderNodeURI(matcherURI)
-                        .setRecipientAtomURI(atomURI).setRecipientNodeURI(wonNodeURI).setHintTargetAtomURI(otherAtomURI)
+                        .setWonMessageType(WonMessageType.ATOM_HINT_MESSAGE)
+                        .setSenderNodeURI(matcherURI)
+                        .setRecipientAtomURI(atomURI)
+                        .setRecipientNodeURI(wonNodeURI)
+                        .setHintTargetAtomURI(otherAtomURI)
                         .setHintScore(score);
         return builder.setSentTimestampToNow();
     }
@@ -518,9 +521,13 @@ public class WonMessageBuilder {
                     URI wonNodeURI, URI otherAtomSocketURI, URI matcherURI, double score) {
         WonMessageBuilder builder = new WonMessageBuilder(messageURI)
                         .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL)
-                        .setWonMessageType(WonMessageType.SOCKET_HINT_MESSAGE).setSenderNodeURI(matcherURI)
-                        .setRecipientAtomURI(atomURI).setRecipientNodeURI(wonNodeURI)
-                        .setHintTargetSocketURI(otherAtomSocketURI).setHintScore(score);
+                        .setWonMessageType(WonMessageType.SOCKET_HINT_MESSAGE)
+                        .setSenderNodeURI(matcherURI)
+                        .setRecipientAtomURI(atomURI)
+                        .setRecipientSocketURI(atomSocketURI)
+                        .setRecipientNodeURI(wonNodeURI)
+                        .setHintTargetSocketURI(otherAtomSocketURI)
+                        .setHintScore(score);
         return builder.setSentTimestampToNow();
     }
 
