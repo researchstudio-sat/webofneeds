@@ -51,11 +51,10 @@ public class OwnerApplicationListenerRouteBuilder extends RouteBuilder {
         // name. Also, we're unsure if the concurrentConsumers part is even interpreted
         // anywhere // from(endpoints.get(i)
         // +"?concurrentConsumers=2")
-        
-        synchronized(this) {
-            //we sometimes see the owner fail during startup because it's trying to add
-            //the same route multiple times here. That's why we added the synchronized block
-            //and this check if the route exists.
+        synchronized (this) {
+            // we sometimes see the owner fail during startup because it's trying to add
+            // the same route multiple times here. That's why we added the synchronized
+            // block and this check if the route exists.
             if (getContext().hasEndpoint(endpoint) != null) {
                 logger.debug("route for listening to remote queue {} already configured", endpoint);
                 return;

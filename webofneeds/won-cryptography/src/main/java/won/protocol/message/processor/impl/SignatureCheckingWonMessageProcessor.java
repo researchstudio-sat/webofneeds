@@ -67,11 +67,51 @@ public class SignatureCheckingWonMessageProcessor implements WonMessageProcessor
         }
         // throw exception if the verification fails:
         if (!result.isVerificationPassed()) {
+            String errormessage = "Message verification failed. Message:"
+                            + messageDataToString(message)
+                            + ", Problem:"
+                            + result.getMessage();
+            if (logger.isDebugEnabled()) {
+                logger.debug(errormessage + ". Offending message:\n" + RdfUtils.toString(message.getCompleteDataset()));
+            }
             // TODO SignatureProcessingException?
             throw new WonMessageProcessingException(new SignatureException(
-                            "Could not verify message " + message.getMessageURI() + ": " + result.getMessage()));
+                            errormessage + ". To log the offending message, set Loglevel to DEBUG for logger '"
+                                            + this.getClass().getName() + "'"));
         }
         return message;
+    }
+
+    private String messageDataToString(WonMessage message) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("[");
+        sb.append("messageURI: ").append(message.getMessageURI());
+        sb.append("messageType: ").append(message.getMessageType());
+        boolean senderPrinted = appendIfPresent(message.getSenderURI(), "sender", sb)
+                        || appendIfPresent(message.getSenderSocketURI(), "senderSocket", sb)
+                        || appendIfPresent(message.getSenderAtomURI(), "senderAtom", sb)
+                        || appendIfPresent(message.getSenderNodeURI(), "senderNode", sb);
+        if (!senderPrinted) {
+            sb.append("sender: (no sender info found)");
+        }
+        sb.append(", ");
+        boolean recipientPrinted = appendIfPresent(message.getRecipientURI(), "recipient", sb)
+                        || appendIfPresent(message.getRecipientSocketURI(), "recipientSocket", sb)
+                        || appendIfPresent(message.getRecipientAtomURI(), "recipientAtom", sb)
+                        || appendIfPresent(message.getRecipientNodeURI(), "senderNode", sb);
+        if (!recipientPrinted) {
+            sb.append("recipient: (no recipient info found)");
+        }
+        sb.append("]");
+        return sb.toString();
+    }
+
+    private boolean appendIfPresent(URI uri, String label, StringBuilder sb) {
+        if (uri != null) {
+            sb.append(label).append(": ").append(uri);
+            return true;
+        }
+        return false;
     }
 
     // TODO If public key extracted from the message itself, there is a security
