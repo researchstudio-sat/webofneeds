@@ -3,6 +3,7 @@ package won.matcher.service.nodemanager.actor;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import org.apache.jena.riot.Lang;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,9 @@ import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import akka.japi.Function;
 import scala.concurrent.duration.Duration;
+import won.matcher.service.common.event.AtomHintEvent;
 import won.matcher.service.common.event.HintEvent;
+import won.matcher.service.common.event.SocketHintEvent;
 import won.matcher.service.common.service.monitoring.MonitoringService;
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
@@ -62,21 +65,29 @@ public class HintProducerProtocolActor extends UntypedProducerActor {
     public Object onTransformOutgoingMessage(Object message) {
         HintEvent hint = (HintEvent) message;
         Map<String, Object> headers = new HashMap<>();
-        headers.put("atomURI", hint.getFromAtomUri());
-        headers.put("otherAtomURI", hint.getToAtomUri());
-        headers.put("score", String.valueOf(hint.getScore()));
-        headers.put("originator", hint.getMatcherUri());
-        // headers.put("content",
-        // RdfUtils.toString(hint.deserializeExplanationModel()));
-        // headers.put("remoteBrokerEndpoint", localBrokerUri);
         headers.put("methodName", "hint");
-        WonMessage wonMessage = createHintWonMessage(hint);
-        Object body = WonMessageEncoder.encode(wonMessage, Lang.TRIG);
-        CamelMessage camelMsg = new CamelMessage(body, headers);
-        // monitoring code
-        monitoringService.stopClock(MonitoringService.ATOM_HINT_STOPWATCH, hint.getFromAtomUri());
-        log.debug("Send hint camel message {}", hint.getFromAtomUri());
-        return camelMsg;
+        Optional<WonMessage> wonMessage = createHintWonMessage(hint);
+        if (wonMessage.isPresent()) {
+            Object body = WonMessageEncoder.encode(wonMessage.get(), Lang.TRIG);
+            CamelMessage camelMsg = new CamelMessage(body, headers);
+            // monitoring code
+            stopStopwatch(hint);
+            return camelMsg;
+        }
+        return null;
+    }
+
+    private void stopStopwatch(HintEvent hint) {
+        Optional<String> stopwatchTag = Optional.empty();
+        if (hint instanceof AtomHintEvent) {
+            stopwatchTag = Optional.of(((AtomHintEvent) hint).getTargetAtomUri());
+        } else if (hint instanceof SocketHintEvent) {
+            stopwatchTag = Optional.of(((SocketHintEvent) hint).getTargetSocketURI());
+        }
+        if (stopwatchTag.isPresent()) {
+            monitoringService.stopClock(MonitoringService.ATOM_HINT_STOPWATCH, stopwatchTag.get());
+            log.debug("Send hint camel message {}", stopwatchTag.get());
+        }
     }
 
     /**
@@ -86,14 +97,29 @@ public class HintProducerProtocolActor extends UntypedProducerActor {
      * @return
      * @throws WonMessageBuilderException
      */
-    private WonMessage createHintWonMessage(HintEvent hint) throws WonMessageBuilderException {
-        URI wonNode = URI.create(hint.getFromWonNodeUri());
-        return WonMessageBuilder
-                        .setMessagePropertiesForHintToAtom(hint.getGeneratedEventUri(),
-                                        URI.create(hint.getFromAtomUri()),
-                                        wonNode, URI.create(hint.getToAtomUri()),
-                                        URI.create(hint.getMatcherUri()), hint.getScore())
-                        .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL).build();
+    private Optional<WonMessage> createHintWonMessage(HintEvent hint) throws WonMessageBuilderException {
+        if (hint instanceof AtomHintEvent) {
+            AtomHintEvent ahe = (AtomHintEvent) hint;
+            return Optional.of(WonMessageBuilder
+                            .setMessagePropertiesForHintToAtom(ahe.getGeneratedEventUri(),
+                                            URI.create(ahe.getRecipientAtomUri()),
+                                            URI.create(ahe.getRecipientWonNodeUri()),
+                                            URI.create(ahe.getTargetAtomUri()),
+                                            URI.create(ahe.getMatcherUri()),
+                                            hint.getScore())
+                            .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL).build());
+        } else if (hint instanceof SocketHintEvent) {
+            SocketHintEvent she = (SocketHintEvent) hint;
+            return Optional.of(WonMessageBuilder
+                            .setMessagePropertiesForHintToAtom(she.getGeneratedEventUri(),
+                                            URI.create(she.getRecipientSocketURI()),
+                                            URI.create(she.getRecipientWonNodeUri()),
+                                            URI.create(she.getTargetSocketURI()),
+                                            URI.create(she.getMatcherUri()),
+                                            hint.getScore())
+                            .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL).build());
+        }
+        return Optional.empty();
     }
 
     @Override

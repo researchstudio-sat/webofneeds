@@ -232,16 +232,16 @@ public class WonNodeControllerActor extends UntypedActor {
      * @param hint
      */
     private void sendHint(HintEvent hint) {
-        if (!crawlWonNodes.containsKey(hint.getFromWonNodeUri())) {
+        if (!crawlWonNodes.containsKey(hint.getRecipientWonNodeUri())) {
             log.warning("cannot send hint to won node {}! Is registered with the won node controller?",
-                            hint.getFromWonNodeUri());
+                            hint.getRecipientWonNodeUri());
             return;
         }
         // send hint to first won node
-        URI eventUri = wonNodeInformationService.generateEventURI(URI.create(hint.getFromWonNodeUri()));
+        URI eventUri = wonNodeInformationService.generateEventURI(URI.create(hint.getRecipientWonNodeUri()));
         hint.setGeneratedEventUri(eventUri);
-        WonNodeConnection fromWonNodeConnection = crawlWonNodes.get(hint.getFromWonNodeUri());
-        log.info("Send hint {} to won node {}", hint, hint.getFromWonNodeUri());
+        WonNodeConnection fromWonNodeConnection = crawlWonNodes.get(hint.getRecipientWonNodeUri());
+        log.info("Send hint {} to won node {}", hint, hint.getRecipientWonNodeUri());
         fromWonNodeConnection.getHintProducer().tell(hint, getSelf());
     }
 
