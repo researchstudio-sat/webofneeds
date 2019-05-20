@@ -161,7 +161,7 @@ public class RematchActor extends UntypedActor {
         Optional<URI> targetAtom = null;
         String targetWonNode = msg.getTargetWonNodeUri();
         if (msg instanceof SocketHintEvent) {
-            targetAtom = WonLinkedDataUtils.getAtomOfSocket(URI.create(((SocketHintEvent) msg).getTargetSocketURI()),
+            targetAtom = WonLinkedDataUtils.getAtomOfSocket(URI.create(((SocketHintEvent) msg).getTargetSocketUri()),
                             linkedDataSource);
         } else if (msg instanceof AtomHintEvent) {
             targetAtom = Optional.of(URI.create(((AtomHintEvent) msg).getTargetAtomUri()));

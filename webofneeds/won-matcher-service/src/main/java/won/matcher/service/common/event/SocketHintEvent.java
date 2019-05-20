@@ -18,11 +18,11 @@ public class SocketHintEvent extends HintEvent {
         this.targetSocketUri = targetSocketUri;
     }
 
-    public String getRecipientSocketURI() {
+    public String getRecipientSocketUri() {
         return recipientSocketUri;
     }
 
-    public String getTargetSocketURI() {
+    public String getTargetSocketUri() {
         return targetSocketUri;
     }
 

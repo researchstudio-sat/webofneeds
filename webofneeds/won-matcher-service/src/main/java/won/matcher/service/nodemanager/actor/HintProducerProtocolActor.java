@@ -29,6 +29,7 @@ import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
 import won.protocol.message.WonMessageDirection;
 import won.protocol.message.WonMessageEncoder;
+import won.protocol.service.WonNodeInformationService;
 
 /**
  * Akka camel actor used to send out hints to won nodes Created by hfriedrich on
@@ -39,6 +40,8 @@ import won.protocol.message.WonMessageEncoder;
 public class HintProducerProtocolActor extends UntypedProducerActor {
     @Autowired
     private MonitoringService monitoringService;
+    @Autowired
+    private WonNodeInformationService wonNodeInformationService;
     private String endpoint;
     private String localBrokerUri;
     private ActorRef pubSubMediator;
@@ -66,6 +69,8 @@ public class HintProducerProtocolActor extends UntypedProducerActor {
         HintEvent hint = (HintEvent) message;
         Map<String, Object> headers = new HashMap<>();
         headers.put("methodName", "hint");
+        URI eventUri = wonNodeInformationService.generateEventURI(URI.create(hint.getRecipientWonNodeUri()));
+        hint.setGeneratedEventUri(eventUri);
         Optional<WonMessage> wonMessage = createHintWonMessage(hint);
         if (wonMessage.isPresent()) {
             Object body = WonMessageEncoder.encode(wonMessage.get(), Lang.TRIG);
@@ -82,7 +87,7 @@ public class HintProducerProtocolActor extends UntypedProducerActor {
         if (hint instanceof AtomHintEvent) {
             stopwatchTag = Optional.of(((AtomHintEvent) hint).getTargetAtomUri());
         } else if (hint instanceof SocketHintEvent) {
-            stopwatchTag = Optional.of(((SocketHintEvent) hint).getTargetSocketURI());
+            stopwatchTag = Optional.of(((SocketHintEvent) hint).getTargetSocketUri());
         }
         if (stopwatchTag.isPresent()) {
             monitoringService.stopClock(MonitoringService.ATOM_HINT_STOPWATCH, stopwatchTag.get());
@@ -112,9 +117,9 @@ public class HintProducerProtocolActor extends UntypedProducerActor {
             SocketHintEvent she = (SocketHintEvent) hint;
             return Optional.of(WonMessageBuilder
                             .setMessagePropertiesForHintToAtom(she.getGeneratedEventUri(),
-                                            URI.create(she.getRecipientSocketURI()),
+                                            URI.create(she.getRecipientSocketUri()),
                                             URI.create(she.getRecipientWonNodeUri()),
-                                            URI.create(she.getTargetSocketURI()),
+                                            URI.create(she.getTargetSocketUri()),
                                             URI.create(she.getMatcherUri()),
                                             hint.getScore())
                             .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL).build());
