@@ -28,7 +28,7 @@ ssh won@satvm01 chmod 777 $base_folder/solr/wontest/data
 
 # copy the matchat skin to the custom skin folder that get used by this instance
 ssh won@satvm01 mkdir -p $base_folder/custom_owner_skin
-scp -r $WORKSPACE/webofneeds/won-owner-webapp/src/main/webapp/skin/matchat/* won@satvm01:$base_folder/custom_owner_skin/
+scp -r $WORKSPACE/webofneeds/won-owner-webapp/src/main/webapp/static/skin/matchat/* won@satvm01:$base_folder/custom_owner_skin/
 
 echo build the docker containers
 docker --tlsverify -H satvm01.researchstudio.at:2376 pull webofneeds/bigdata
