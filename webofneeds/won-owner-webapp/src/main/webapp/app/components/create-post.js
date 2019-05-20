@@ -33,19 +33,16 @@ function genComponentConf() {
         <div class="cp__header">
             <a class="cp__header__back clickable"
                 ng-click="self.router__back()">
-                <svg style="--local-primary:var(--won-primary-color);"
-                    class="cp__header__back__icon show-in-responsive">
+                <svg class="cp__header__back__icon show-in-responsive">
                     <use xlink:href="#ico36_backarrow" href="#ico36_backarrow"></use>
                 </svg>
-                <svg style="--local-primary:var(--won-primary-color);"
-                    class="cp__header__back__icon hide-in-responsive">
+                <svg class="cp__header__back__icon hide-in-responsive">
                     <use xlink:href="#ico36_close" href="#ico36_close"></use>
                 </svg>
             </a>
             <svg class="cp__header__icon"
                 title="{{self.useCase['label']}}"
-                ng-if="self.useCase['icon']"
-                style="--local-primary:var(--won-primary-color);">
+                ng-if="self.useCase['icon']">
                     <use xlink:href="{{self.useCase['icon']}}" href="{{self.useCase['icon']}}"></use>
             </svg>
             <span class="cp__header__title" ng-if="!self.isCreateFromAtom && !self.isEditFromAtom">{{self.useCase.label}}</span>

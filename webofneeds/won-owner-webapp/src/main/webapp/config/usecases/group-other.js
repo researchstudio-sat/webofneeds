@@ -10,7 +10,7 @@ import { details, mergeInEmptyDraft } from "../detail-definitions.js";
 export const otherGroup = {
   identifier: "othergroup",
   label: "More...",
-  icon: undefined,
+  icon: "#ico36_plus",
   subItems: {
     complain: complain,
     handleComplaint: handleComplaint,

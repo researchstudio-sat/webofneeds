@@ -37,6 +37,7 @@ export const rentRealEstateSearch = {
       },
     }),
   },
+  reactionUseCases: ["rentRealEstateOffer"],
   details: undefined,
   seeksDetails: {
     location: { ...details.location },

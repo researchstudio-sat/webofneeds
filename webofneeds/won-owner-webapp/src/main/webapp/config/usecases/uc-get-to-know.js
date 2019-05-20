@@ -27,6 +27,7 @@ export const getToKnow = {
     person: { ...details.person },
     skills: { ...skillsDetail },
     interests: { ...interestsDetail },
+    images: { ...details.images },
   },
   seeksDetails: {
     description: { ...details.description },

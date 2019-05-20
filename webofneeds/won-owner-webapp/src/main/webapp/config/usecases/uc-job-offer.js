@@ -31,6 +31,7 @@ export const jobOffer = {
       },
     }),
   },
+  reactionUseCases: ["jobSearch"],
   details: {
     title: { ...details.title },
     description: { ...details.description },

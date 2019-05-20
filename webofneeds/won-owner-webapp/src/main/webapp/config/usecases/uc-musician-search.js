@@ -30,10 +30,12 @@ export const musicianSearch = {
       },
     }),
   },
+  reactionUseCases: ["bandSearch"],
   details: {
     title: { ...details.title },
     description: { ...details.description },
     genres: { ...genresDetail },
+    images: { ...details.images },
     location: {
       ...details.location,
       mandatory: true,

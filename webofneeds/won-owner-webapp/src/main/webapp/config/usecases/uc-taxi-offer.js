@@ -23,6 +23,7 @@ export const taxiOffer = {
     title: { ...details.title },
     description: { ...details.description },
     location: { ...details.location },
+    images: { ...details.images },
   },
   generateQuery: (draft, resultName) => {
     const location = getIn(draft, ["content", "location"]);

@@ -37,6 +37,7 @@ export const rentRealEstateOffer = {
       },
     }),
   },
+  reactionUseCases: ["rentRealEstateSearch"],
   details: {
     title: { ...details.title },
     description: { ...details.description },
@@ -57,6 +58,8 @@ export const rentRealEstateOffer = {
       ...realEstateRentDetail,
       mandatory: true,
     },
+    images: { ...details.images },
+    files: { ...details.files },
   },
   seeksDetails: undefined,
   generateQuery: (draft, resultName) => {

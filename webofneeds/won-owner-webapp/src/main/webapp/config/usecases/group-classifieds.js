@@ -11,7 +11,7 @@ TODO: create use case icons
 export const classifiedsGroup = {
   identifier: "classifiedsgroup",
   label: "Buy & Sell",
-  icon: undefined,
+  icon: "#ico36_detail_price",
   subItems: {
     goodsOffer: goodsOffer,
     goodsServiceSearch: goodsServiceSearch,

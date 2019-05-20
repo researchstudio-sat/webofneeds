@@ -15,12 +15,14 @@ export const serviceOffer = {
       },
     }),
   },
+  reactionUseCases: ["goodsServiceSearch"],
   details: {
     title: { ...details.title, mandatory: true },
     description: { ...details.description },
     price: { ...details.price, mandatory: true },
     tags: { ...details.tags },
     location: { ...details.location },
+    images: { ...details.images },
   },
   // TODO: what should this match on?
   // generateQuery: (draft, resultName) => {

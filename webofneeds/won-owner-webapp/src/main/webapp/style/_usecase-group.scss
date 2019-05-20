@@ -46,12 +46,14 @@ won-usecase-group {
 
     &__icon {
       grid-area: header_icon;
+      --local-primary: #{$won-subtitle-gray};
       @include fixed-square($postIconSize);
     }
 
     &__back {
       grid-area: header_back;
       &__icon {
+        --local-primary: #{$won-primary-color};
         @include fixed-square($backIconSize);
       }
     }
@@ -69,22 +71,25 @@ won-usecase-group {
     overflow: auto;
 
     &__usecase {
-      display: flex;
+      display: grid;
+      grid-template-columns: min-content 1fr;
+      grid-template-areas: "ucgi__icon ucgi__label";
+
       align-items: center;
-      flex-direction: column;
-      justify-content: center;
       padding: 0.5rem;
       border-radius: 0.19rem;
       background: $won-secondary-color-light;
 
       &__icon {
+        grid-area: ucgi__icon;
         @include fixed-square($iconSize);
         --local-primary: #{$won-secondary-text-color};
+        margin-right: 0.5rem;
       }
 
       &__label {
+        grid-area: ucgi__label;
         color: $won-secondary-text-color;
-        text-align: center;
       }
 
       &:hover {
