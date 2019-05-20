@@ -52,14 +52,14 @@ public class ConnectMessageFromOwnerProcessor extends AbstractCamelProcessor {
             if (!con.isPresent())
                 throw new NoSuchConnectionException(connectionURI.get());
             // however, if the sockets don't match, we report an error:
-            if (userDefinedSocketURI.isPresent() && !userDefinedSocketURI.equals(con.get().getSocketURI())) {
+            if (userDefinedSocketURI.isPresent() && !userDefinedSocketURI.get().equals(con.get().getSocketURI())) {
                 throw new IllegalStateException(
                                 "Cannot process CONNECT message FROM_OWNER. Specified socket uri conflicts with existing connection data");
             }
             // remote socket uri: may be set on the connection, in which case we may have a
             // conflict
-            if (con.get().getTargetSocketURI() != null && userDefinedTargetSocketURI != null
-                            && !con.get().getTargetSocketURI().equals(userDefinedTargetSocketURI)) {
+            if (con.get().getTargetSocketURI() != null && userDefinedTargetSocketURI.isPresent()
+                            && !con.get().getTargetSocketURI().equals(userDefinedTargetSocketURI.get())) {
                 throw new IllegalStateException(
                                 "Cannot process CONNECT message FROM_OWNER. Specified remote socket uri conflicts with existing connection data");
             }

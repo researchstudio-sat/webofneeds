@@ -69,13 +69,15 @@ public class FailResponder extends AbstractCamelProcessor {
                 logger.debug("suppressing failure response for HINT message", exception);
                 return;
             }
-            logger.info("Caught error while processing WON message {} (type:{}) : {} - sending FailureResponse (more info on log level DEBUG)",
+            logger.info("Caught error while processing WON message {} (type:{}) : {} - sending FailureResponse (full message and stacktrace (if any) on log level DEBUG)",
                             new Object[] { originalMessage.getMessageURI(), originalMessage.getMessageType(),
                                             errormessage });
-            if (exception != null) {
-                logger.debug("stacktrace of caught exception:", exception);
+            if (logger.isDebugEnabled()) {
+                if (exception != null) {
+                    logger.debug("stacktrace of caught exception:", exception);
+                }
+                logger.debug("original message: {}", RdfUtils.toString(originalMessage.getCompleteDataset()));
             }
-            logger.debug("original message: {}", RdfUtils.toString(originalMessage.getCompleteDataset()));
             if (WonMessageType.FAILURE_RESPONSE == originalMessage.getMessageType()
                             && WonMessageType.FAILURE_RESPONSE == originalMessage.getIsResponseToMessageType()) {
                 // do not throw failures back and forth. If the original message is already a
