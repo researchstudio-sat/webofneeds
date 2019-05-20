@@ -3,7 +3,7 @@ FROM openjdk:8u121-jdk
 
 # install certbot
 ADD ./jessie-backports.list /etc/apt/sources.list.d/jessie-backports.list
-RUN apt-get update && apt-get install -y certbot -t jessie-backports dos2unix cron
+RUN apt-get update && apt-get install -y certbot -t jessie-backports dos2unix
 
 # main directory where the certificates are generated. This directory should be mounted to the host since other
 # directories inside (e.g. "live") use symlinks which should not be broken by mounting
@@ -35,6 +35,8 @@ RUN chmod +x /usr/local/bin/certificate-request-and-renew.sh
 RUN dos2unix /usr/local/bin/certificate-request-and-renew.sh
 
 # execute cron to keep container running
-RUN touch /var/log/cron.log
-CMD cron && tail -f /var/log/cron.log
+#RUN touch /var/log/cron.log
+#CMD cron && tail -f /var/log/cron.log
 
+# try to renew letsencrypt certificates
+RUN /usr/local/bin/certificate-request-and-renew.sh
