@@ -1,27 +1,28 @@
 diff --git a/node_modules/parcel-plugin-svg-sprite/src/asset.js b/node_modules/parcel-plugin-svg-sprite/src/asset.js
-index ad32b24..41e7044 100644
+index ad32b24..cae29b2 100644
 --- a/node_modules/parcel-plugin-svg-sprite/src/asset.js
 +++ b/node_modules/parcel-plugin-svg-sprite/src/asset.js
-@@ -1,5 +1,5 @@
+@@ -1,5 +1,6 @@
 -const { Asset } = require('parcel-bundler');
 -const { createHash } = require('./utils');
 +const { Asset } = require("parcel-bundler");
 +const { createHash } = require("./utils");
++const { basename } = require("path");
  
  class SvgAsset extends Asset {
    /**
-@@ -12,8 +12,9 @@ class SvgAsset extends Asset {
+@@ -12,8 +13,9 @@ class SvgAsset extends Asset {
    async generate() {
      // this is used to keep original behavior with files imported by css for font
      // here `parentBundle` is null so we can't know if svg is imported by a css file
 -    const isFromAssets = this.name.includes('/assets/');
 +    const isFromAssets = this.name.includes("/assets/");
      const hash = await this.generateHash();
-+    const id = this.name.match(/([^\/.]+)\.[^\/.]+$/)[1];
++    const id = basename(this.name, ".svg");
  
      if (isFromAssets) {
        return {};
-@@ -21,7 +22,7 @@ class SvgAsset extends Asset {
+@@ -21,7 +23,7 @@ class SvgAsset extends Asset {
  
      return [
        {
@@ -30,7 +31,7 @@ index ad32b24..41e7044 100644
          value: {
            hash,
            path: this.name,
-@@ -29,8 +30,8 @@ class SvgAsset extends Asset {
+@@ -29,8 +31,8 @@ class SvgAsset extends Asset {
          },
        },
        {
@@ -42,18 +43,19 @@ index ad32b24..41e7044 100644
      ];
    }
 diff --git a/node_modules/parcel-plugin-svg-sprite/src/utils/sprite.js b/node_modules/parcel-plugin-svg-sprite/src/utils/sprite.js
-index 4560fe7..25842a3 100644
+index 4560fe7..c33a0d8 100644
 --- a/node_modules/parcel-plugin-svg-sprite/src/utils/sprite.js
 +++ b/node_modules/parcel-plugin-svg-sprite/src/utils/sprite.js
-@@ -1,5 +1,5 @@
+@@ -1,5 +1,6 @@
 -const SVGSpriter = require('svg-sprite');
 -const findLast = require('lodash/findLast');
 +const SVGSpriter = require("svg-sprite");
 +const findLast = require("lodash/findLast");
++const { basename } = require("path");
  
  /**
   * @desc Create id generator function to inject id from svgList in svg sprite
-@@ -18,8 +18,12 @@ function createIdGenerator(svgList) {
+@@ -18,8 +19,12 @@ function createIdGenerator(svgList) {
     */
    function generator(defaultId, file) {
      const svgItem = findLast(svgList, item => item.path === file.path);
@@ -63,12 +65,12 @@ index 4560fe7..25842a3 100644
 +      throw new Error(
 +        `File ${file.path} not found in svg list during id generation`
 +      );
-+    const id = svgItem.path.match(/([^\/.]+)\.[^\/.]+$/)[1];
++    const id = basename(svgItem.path, ".svg");
 +    return id;
    }
  
    return generator;
-@@ -80,7 +84,7 @@ function compileSprite(spriter) {
+@@ -80,7 +85,7 @@ function compileSprite(spriter) {
        if (error) return reject(error);
  
        const { contents } = result.symbol.sprite;
