@@ -38,8 +38,8 @@ import * as accountUtils from "../account-utils.js";
 import { Elm } from "../../elm/PublishButton.elm";
 import elmModule from "./elm.js";
 
-import "style/_chattextfield.scss";
-import "style/_textfield.scss";
+import "~/style/_chattextfield.scss";
+import "~/style/_textfield.scss";
 
 function genComponentConf() {
   let template = `
@@ -228,7 +228,7 @@ function genComponentConf() {
               personas: self.personas,
               label: self.submitButtonLabel
             }"
-            on-action="self.submit(payload)" >
+            on-publish="self.submit(personaId)" >
           </won-elm>
       <!-- PERSONA SELECTION END -->
 

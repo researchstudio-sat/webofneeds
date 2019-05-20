@@ -8,11 +8,11 @@ import { actionCreators } from "../actions/actions.js";
 import { attach, get, getIn, toAbsoluteURL } from "../utils.js";
 import * as generalSelectors from "../selectors/general-selectors.js";
 import { connect2Redux } from "../won-utils.js";
-import { ownerBaseUrl } from "config";
+import { ownerBaseUrl } from "~/config/default.js";
 import * as connectionUtils from "../connection-utils.js";
 import * as processUtils from "../process-utils.js";
 
-import "style/_context-dropdown.scss";
+import "~/style/_context-dropdown.scss";
 
 const serviceDependencies = ["$scope", "$ngRedux", "$element"];
 function genComponentConf() {

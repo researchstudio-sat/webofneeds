@@ -10,7 +10,7 @@ import postContextDropDownModule from "../components/post-context-dropdown.js";
 import shareDropdownModule from "../components/share-dropdown.js";
 import * as atomUtils from "../atom-utils.js";
 
-import "style/_visitor-title-bar.scss";
+import "~/style/_visitor-title-bar.scss";
 
 const serviceDependencies = ["$ngRedux", "$scope"];
 function genComponentConf() {

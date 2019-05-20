@@ -16,7 +16,7 @@ import {
 } from "../selectors/general-selectors.js";
 import { actionCreators } from "../actions/actions.js";
 
-import "style/_post-content-general.scss";
+import "~/style/_post-content-general.scss";
 import { getOwnedConnectionByUri } from "../selectors/connection-selectors.js";
 
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];

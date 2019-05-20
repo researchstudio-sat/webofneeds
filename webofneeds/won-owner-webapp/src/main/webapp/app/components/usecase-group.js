@@ -8,7 +8,7 @@ import { connect2Redux } from "../won-utils.js";
 import * as useCaseUtils from "../usecase-utils.js";
 import { getUseCaseGroupFromRoute } from "../selectors/general-selectors.js";
 
-import "style/_usecase-group.scss";
+import "~/style/_usecase-group.scss";
 
 const serviceDependencies = [
   "$ngRedux",

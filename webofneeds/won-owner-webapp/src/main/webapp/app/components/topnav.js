@@ -14,8 +14,8 @@ import * as viewSelectors from "../selectors/view-selectors.js";
 import * as srefUtils from "../sref-utils.js";
 import * as accountUtils from "../account-utils.js";
 
-import "style/_responsiveness-utils.scss";
-import "style/_topnav.scss";
+import "~/style/_responsiveness-utils.scss";
+import "~/style/_topnav.scss";
 
 function genTopnavConf() {
   let template = `

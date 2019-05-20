@@ -28,8 +28,8 @@ import { classOnComponentRoot } from "../cstm-ng-utils.js";
 import ngAnimate from "angular-animate";
 import { Elm } from "../../elm/AddPersona.elm";
 
-import "style/_post-content.scss";
-import "style/_rdflink.scss";
+import "~/style/_post-content.scss";
+import "~/style/_rdflink.scss";
 import elmModule from "./elm.js";
 
 const CONNECTION_READ_TIMEOUT = 1500;

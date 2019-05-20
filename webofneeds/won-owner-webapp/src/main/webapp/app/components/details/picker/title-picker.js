@@ -3,7 +3,7 @@ import { attach, delay } from "../../../utils.js";
 import { DomCache } from "../../../cstm-ng-utils.js";
 import wonInput from "../../../directives/input.js";
 
-import "style/_titlepicker.scss";
+import "~/style/_titlepicker.scss";
 
 const serviceDependencies = ["$scope", "$element"];
 function genComponentConf() {

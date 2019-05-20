@@ -6,7 +6,7 @@ import won from "./won-es6.js";
 import Immutable from "immutable";
 import { checkHttpStatus, urisToLookupMap, is } from "./utils.js";
 
-import { ownerBaseUrl } from "config";
+import { ownerBaseUrl } from "~/config/default.js";
 import urljoin from "url-join";
 
 import { getRandomWonId } from "./won-utils.js";

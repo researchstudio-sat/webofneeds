@@ -10,7 +10,7 @@ import {
   getUseCaseGroupFromRoute,
 } from "../selectors/general-selectors.js";
 
-import "style/_create-post-item.scss";
+import "~/style/_create-post-item.scss";
 
 const serviceDependencies = ["$scope", "$ngRedux"];
 function genComponentConf() {

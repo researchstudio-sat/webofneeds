@@ -4,8 +4,8 @@ import { actionCreators } from "../../../actions/actions.js";
 import { attach, get } from "../../../utils.js";
 import { connect2Redux } from "../../../won-utils.js";
 
-import "style/_pokemon-gym-viewer.scss";
-import "style/_won-markdown.scss";
+import "/style/_pokemon-gym-viewer.scss";
+import "/style/_won-markdown.scss";
 
 const serviceDependencies = ["$scope", "$ngRedux", "$element"];
 function genComponentConf() {

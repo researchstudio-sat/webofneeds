@@ -1,7 +1,7 @@
 import angular from "angular";
 import { attach } from "../../../utils.js";
 
-import "style/_select-viewer.scss";
+import "~/style/_select-viewer.scss";
 
 const serviceDependencies = ["$scope", "$element"];
 function genComponentConf() {

@@ -6,7 +6,7 @@ import enterModule from "../directives/enter.js";
 import { dispatchEvent, attach, readAsDataURL } from "../utils.js";
 import globToRegexp from "glob-to-regexp";
 
-import "style/_file-dropzone.scss";
+import "~/style/_file-dropzone.scss";
 
 function genComponentConf() {
   let template = `

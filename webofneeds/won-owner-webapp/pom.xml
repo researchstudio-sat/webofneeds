@@ -167,6 +167,7 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-war-plugin</artifactId>
 				<configuration>
+					<warSourceDirectory>src/main/webapp/generated</warSourceDirectory>
 					<warSourceExcludes>bower_components/**,jspm_packages/**,node_modules/**,node/**,scripts/**</warSourceExcludes>
 				</configuration>
 				<executions>
@@ -296,6 +297,9 @@
 								<phase>none</phase>
 							</execution>
 						</executions>
+						<configuration>
+							<warSourceDirectory>src/main/webapp/generated</warSourceDirectory>
+						</configuration>
 					</plugin>
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
@@ -346,6 +350,7 @@
 							<execution>
 								<id>default-exploded</id>
 								<configuration>
+									<warSourceDirectory>src/main/webapp/generated</warSourceDirectory>
 									<warSourceExcludes>bower_components/**,jspm_packages/**,node_modules/**,node/**,scripts/**</warSourceExcludes>
 								</configuration>
 								<phase>package</phase>

@@ -23,7 +23,7 @@ import {
   isMessageUnread,
 } from "../../message-utils.js";
 
-import "style/_connection-message-actions.scss";
+import "~/style/_connection-message-actions.scss";
 
 const serviceDependencies = ["$ngRedux", "$scope"];
 

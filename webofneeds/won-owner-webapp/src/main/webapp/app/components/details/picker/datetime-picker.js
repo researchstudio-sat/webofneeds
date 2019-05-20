@@ -8,7 +8,7 @@ import {
 } from "../../../utils.js";
 import { DomCache } from "../../../cstm-ng-utils.js";
 
-import "style/_datetimepicker.scss";
+import "~/style/_datetimepicker.scss";
 
 const serviceDependencies = ["$scope", "$element"];
 function genComponentConf() {

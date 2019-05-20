@@ -3,7 +3,7 @@ import { attach, delay } from "../../../utils.js";
 import { DomCache } from "../../../cstm-ng-utils.js";
 import dropzoneModule from "../../file-dropzone.js";
 
-import "style/_petrinetpicker.scss";
+import "~/style/_petrinetpicker.scss";
 
 const serviceDependencies = ["$scope", "$element"];
 function genComponentConf() {

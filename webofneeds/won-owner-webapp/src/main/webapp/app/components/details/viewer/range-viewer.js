@@ -1,7 +1,7 @@
 import angular from "angular";
 import { attach } from "../../../utils.js";
 
-import "style/_range-viewer.scss";
+import "~/style/_range-viewer.scss";
 
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {

@@ -17,7 +17,7 @@ import * as generalSelectors from "../selectors/general-selectors.js";
 import { actionCreators } from "../actions/actions.js";
 import ngAnimate from "angular-animate";
 
-import "style/_post-content-participants.scss";
+import "~/style/_post-content-participants.scss";
 
 const CONNECTION_READ_TIMEOUT = 1500;
 

@@ -19,8 +19,8 @@ import * as accountUtils from "../account-utils.js";
 import { Elm } from "../../elm/PublishButton.elm";
 import elmModule from "./elm.js";
 
-import "style/_create-post.scss";
-import "style/_responsiveness-utils.scss";
+import "~/style/_create-post.scss";
+import "~/style/_responsiveness-utils.scss";
 
 const serviceDependencies = [
   "$ngRedux",
@@ -107,7 +107,7 @@ function genComponentConf() {
                 showPersonas: self.isHoldable && self.loggedIn,
                 personas: self.personas
               }"
-              on-action="self.publish(payload)"
+              on-publish="self.publish(personaId)"
               ng-if="self.showCreateInput && !self.isEditFromAtom">
             </won-elm>
             <div class="cp__footer__edit" ng-if="self.loggedIn && self.showCreateInput && self.isEditFromAtom && self.isFromAtomEditable">

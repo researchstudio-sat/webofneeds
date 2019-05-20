@@ -4,7 +4,7 @@ import { DomCache } from "../../../cstm-ng-utils.js";
 import dropzoneModule from "../../file-dropzone.js";
 import BpmnViewer from "bpmn-js";
 
-import "style/_workflowpicker.scss";
+import "~/style/_workflowpicker.scss";
 
 const serviceDependencies = ["$scope", "$element"];
 function genComponentConf() {

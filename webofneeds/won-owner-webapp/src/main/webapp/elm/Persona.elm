@@ -7,7 +7,6 @@ module Persona exposing
     , review
     )
 
-import Actions
 import Html exposing (Attribute, Html)
 import Html.Attributes as Attributes
 import Icons
@@ -16,6 +15,7 @@ import Json.Decode.Extra as Decode
 import Json.Decode.Pipeline as DP
 import Json.Encode as Encode
 import Time exposing (Posix)
+import Widget exposing (Action)
 
 
 type alias Persona =
@@ -95,23 +95,20 @@ connect :
     { persona : Persona
     , atomUrl : String
     }
-    -> Cmd msg
+    -> Action
 connect { persona, atomUrl } =
-    Actions.startAction
-        { action = "personas__connect"
-        , payload =
-            Encode.list Encode.string
-                [ atomUrl
-                , persona.uri
-                ]
-        }
+    Widget.customAction
+        "personas__connect"
+        [ Encode.string atomUrl
+        , Encode.string persona.uri
+        ]
 
 
 review :
     { connection : String
     , review : Review
     }
-    -> Cmd msg
+    -> Action
 review data =
     let
         encodedReview =
@@ -120,11 +117,8 @@ review data =
                 , ( "message", Encode.string data.review.message )
                 ]
     in
-    Actions.startAction
-        { action = "personas__review"
-        , payload =
-            Encode.list identity
-                [ Encode.string data.connection
-                , encodedReview
-                ]
-        }
+    Widget.customAction
+        "personas__review"
+        [ Encode.string data.connection
+        , encodedReview
+        ]
