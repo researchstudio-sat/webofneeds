@@ -52,24 +52,24 @@ export const bandSearch = {
     const genresSQ = tagOverlapScoreSubQuery({
       resultName: resultName,
       bindScoreAs: "?genres_jaccardIndex",
-      pathToTags: "won:genres",
+      pathToTags: "won:genre",
       prefixesInPath: {
         s: won.defaultContext["s"],
         won: won.defaultContext["won"],
       },
-      tagLikes: getIn(draft, ["seeks", "genres"]),
+      tagLikes: getIn(draft, ["seeks", "genre"]),
     });
 
     // instruments
     const instrumentsSQ = tagOverlapScoreSubQuery({
       resultName: resultName,
       bindScoreAs: "?instruments_jaccardIndex",
-      pathToTags: "won:seeks/won:instruments",
+      pathToTags: "won:seeks/won:instrument",
       prefixesInPath: {
         s: won.defaultContext["s"],
         won: won.defaultContext["won"],
       },
-      tagLikes: getIn(draft, ["content", "instruments"]),
+      tagLikes: getIn(draft, ["content", "instrument"]),
     });
 
     const vicinityScoreSQ = vicinityScoreSubQuery({

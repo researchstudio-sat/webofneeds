@@ -15,12 +15,12 @@ export const instrumentsDetail = {
   messageEnabled: false,
   parseToRDF: function({ value }) {
     if (!value) {
-      return { "won:instruments": undefined };
+      return { "won:instrument": undefined };
     }
-    return { "won:instruments": value };
+    return { "won:instrument": value };
   },
   parseFromRDF: function(jsonLDImm) {
-    const instruments = jsonLDImm && jsonLDImm.get("won:instruments");
+    const instruments = jsonLDImm && jsonLDImm.get("won:instrument");
     if (!instruments) {
       return undefined;
     } else if (is("String", instruments)) {
@@ -49,12 +49,12 @@ export const genresDetail = {
   messageEnabled: false,
   parseToRDF: function({ value }) {
     if (!value) {
-      return { "won:genres": undefined };
+      return { "won:genre": undefined };
     }
-    return { "won:genres": value };
+    return { "won:genre": value };
   },
   parseFromRDF: function(jsonLDImm) {
-    const genres = jsonLDImm && jsonLDImm.get("won:genres");
+    const genres = jsonLDImm && jsonLDImm.get("won:genre");
     if (!genres) {
       return undefined;
     } else if (is("String", genres)) {

@@ -88,11 +88,11 @@ export const searchString = {
   parseToRDF: function({ value }) {
     const val = value ? value : undefined;
     return {
-      "won:hasSearchString": val,
+      "won:searchString": val,
     };
   },
   parseFromRDF: function(jsonLDImm) {
-    return won.parseFrom(jsonLDImm, ["won:hasSearchString"], "xsd:string");
+    return won.parseFrom(jsonLDImm, ["won:searchString"], "xsd:string");
   },
   generateHumanReadable: function({ value, includeLabel }) {
     if (value) {

@@ -13,7 +13,7 @@ export const files = {
   messageEnabled: true,
   parseToRDF: function({ value, identifier, contentUri }) {
     if (!value) {
-      return { "won:hasFile": undefined };
+      return { "won:file": undefined };
     }
     let payload = [];
     value.forEach(file => {
@@ -33,12 +33,12 @@ export const files = {
       }
     });
     if (payload.length > 0) {
-      return { "won:hasFile": payload };
+      return { "won:file": payload };
     }
-    return { "won:hasFile": undefined };
+    return { "won:file": undefined };
   },
   parseFromRDF: function(jsonLDImm) {
-    const files = jsonLDImm && jsonLDImm.get("won:hasFile");
+    const files = jsonLDImm && jsonLDImm.get("won:file");
     let parsedFiles = [];
 
     if (Immutable.List.isList(files)) {
@@ -94,7 +94,7 @@ export const images = {
   messageEnabled: true,
   parseToRDF: function({ value, identifier, contentUri }) {
     if (!value) {
-      return { "won:hasImage": undefined };
+      return { "won:image": undefined };
     }
     let payload = [];
     value.forEach(image => {
@@ -120,12 +120,12 @@ export const images = {
       }
     });
     if (payload.length > 0) {
-      return { "won:hasImage": payload };
+      return { "won:image": payload };
     }
-    return { "won:hasImage": undefined };
+    return { "won:image": undefined };
   },
   parseFromRDF: function(jsonLDImm) {
-    const images = jsonLDImm && jsonLDImm.get("won:hasImage");
+    const images = jsonLDImm && jsonLDImm.get("won:image");
     let imgs = [];
 
     if (Immutable.List.isList(images)) {

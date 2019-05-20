@@ -44,7 +44,7 @@ export const goodsServiceSearch = {
     let subQueries = [];
     let subScores = [];
 
-    const tags = getIn(draft, ["seeks", "tags"]);
+    const tags = getIn(draft, ["seeks", "tag"]);
     let keywords = [];
 
     // prep tags for searching
@@ -89,7 +89,7 @@ export const goodsServiceSearch = {
         let tagsSQ = textSearchSubQuery({
           resultName: resultName,
           bindScoreAs: "?tags_" + keyword + "_index",
-          pathToText: "won:tags",
+          pathToText: "won:tag",
           prefixesInPath: {},
           keyword: keyword,
         });

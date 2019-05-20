@@ -272,7 +272,7 @@ public class SparqlMatcherActor extends UntypedActor {
                 queries.add(seeksQuery);
         }
         Statement search = model.getProperty(model.createResource(atomURI),
-                        model.createProperty("https://w3id.org/won/core#hasSearchString"));
+                        model.createProperty("https://w3id.org/won/core#searchString"));
         if (search != null) {
             String searchString = search.getString();
             queries.add(SparqlMatcherUtils.createSearchQuery(searchString, resultName, 2, true, true));

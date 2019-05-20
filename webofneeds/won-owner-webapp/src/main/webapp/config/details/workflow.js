@@ -29,12 +29,12 @@ export const bpmnWorkflow = {
         "s:data": value.data,
       };
 
-      return { "won:hasBpmnWorkflow": workflow };
+      return { "won:bpmnWorkflow": workflow };
     }
-    return { "won:hasBpmnWorkflow": undefined };
+    return { "won:bpmnWorkflow": undefined };
   },
   parseFromRDF: function(jsonLDImm) {
-    const wflw = jsonLDImm && jsonLDImm.get("won:hasBpmnWorkflow");
+    const wflw = jsonLDImm && jsonLDImm.get("won:bpmnWorkflow");
 
     let workflow = {
       name: get(wflw, "s:name"),
@@ -79,12 +79,12 @@ export const petriNetWorkflow = {
         "wf:inlinePetriNetDefinition": value.data,
       };
 
-      return { "won:hasPetriNet": workflow };
+      return { "won:petriNet": workflow };
     }
-    return { "won:hasPetriNet": undefined };
+    return { "won:petriNet": undefined };
   },
   parseFromRDF: function(jsonLDImm) {
-    const wflw = jsonLDImm && jsonLDImm.get("won:hasPetriNet");
+    const wflw = jsonLDImm && jsonLDImm.get("won:petriNet");
 
     let workflow = {
       processURI: get(wflw, "@id"),
