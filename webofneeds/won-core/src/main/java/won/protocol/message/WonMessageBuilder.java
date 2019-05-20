@@ -517,16 +517,17 @@ public class WonMessageBuilder {
         return builder.setSentTimestampToNow();
     }
 
-    public static WonMessageBuilder setMessagePropertiesForHintToSocket(URI messageURI, URI atomURI, URI atomSocketURI,
-                    URI wonNodeURI, URI otherAtomSocketURI, URI matcherURI, double score) {
+    public static WonMessageBuilder setMessagePropertiesForHintToSocket(URI messageURI, URI recipientAtomURI,
+                    URI recipientSocketURI,
+                    URI wonNodeURI, URI targetSocketURI, URI matcherURI, double score) {
         WonMessageBuilder builder = new WonMessageBuilder(messageURI)
                         .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL)
                         .setWonMessageType(WonMessageType.SOCKET_HINT_MESSAGE)
                         .setSenderNodeURI(matcherURI)
-                        .setRecipientAtomURI(atomURI)
-                        .setRecipientSocketURI(atomSocketURI)
+                        .setRecipientAtomURI(recipientAtomURI)
+                        .setRecipientSocketURI(recipientSocketURI)
                         .setRecipientNodeURI(wonNodeURI)
-                        .setHintTargetSocketURI(otherAtomSocketURI)
+                        .setHintTargetSocketURI(targetSocketURI)
                         .setHintScore(score);
         return builder.setSentTimestampToNow();
     }

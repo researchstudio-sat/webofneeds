@@ -29,7 +29,10 @@ import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
 import won.protocol.message.WonMessageDirection;
 import won.protocol.message.WonMessageEncoder;
+import won.protocol.service.LinkedDataService;
 import won.protocol.service.WonNodeInformationService;
+import won.protocol.util.linkeddata.LinkedDataSource;
+import won.protocol.util.linkeddata.WonLinkedDataUtils;
 
 /**
  * Akka camel actor used to send out hints to won nodes Created by hfriedrich on
@@ -42,6 +45,8 @@ public class HintProducerProtocolActor extends UntypedProducerActor {
     private MonitoringService monitoringService;
     @Autowired
     private WonNodeInformationService wonNodeInformationService;
+    @Autowired
+    private LinkedDataSource linkedDataSource;
     private String endpoint;
     private String localBrokerUri;
     private ActorRef pubSubMediator;
@@ -115,14 +120,19 @@ public class HintProducerProtocolActor extends UntypedProducerActor {
                             .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL).build());
         } else if (hint instanceof SocketHintEvent) {
             SocketHintEvent she = (SocketHintEvent) hint;
-            return Optional.of(WonMessageBuilder
-                            .setMessagePropertiesForHintToAtom(she.getGeneratedEventUri(),
-                                            URI.create(she.getRecipientSocketUri()),
-                                            URI.create(she.getRecipientWonNodeUri()),
-                                            URI.create(she.getTargetSocketUri()),
-                                            URI.create(she.getMatcherUri()),
-                                            hint.getScore())
-                            .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL).build());
+            Optional<URI> recipientAtomURI = WonLinkedDataUtils.getAtomOfSocket(URI.create(she.getRecipientSocketUri()),
+                            linkedDataSource);
+            if (recipientAtomURI.isPresent()) {
+                return Optional.of(WonMessageBuilder
+                                .setMessagePropertiesForHintToSocket(she.getGeneratedEventUri(),
+                                                recipientAtomURI.get(),
+                                                URI.create(she.getRecipientSocketUri()),
+                                                URI.create(she.getRecipientWonNodeUri()),
+                                                URI.create(she.getTargetSocketUri()),
+                                                URI.create(she.getMatcherUri()),
+                                                hint.getScore())
+                                .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL).build());
+            }
         }
         return Optional.empty();
     }
