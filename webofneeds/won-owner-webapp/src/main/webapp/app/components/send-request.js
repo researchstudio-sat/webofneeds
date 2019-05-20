@@ -6,6 +6,7 @@ import postMenuModule from "./post-menu.js";
 import chatTextFieldModule from "./chat-textfield.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
 import * as generalSelectors from "../selectors/general-selectors.js";
+import * as processSelectors from "../selectors/process-selectors.js";
 import { connect2Redux } from "../won-utils.js";
 import { attach, get, getIn } from "../utils.js";
 import * as atomUtils from "../atom-utils.js";
@@ -17,11 +18,12 @@ const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 
 function genComponentConf() {
   let template = `
-        <won-post-menu post-uri="self.postUriToConnectTo"></won-post-menu>
-        <won-post-content post-uri="self.postUriToConnectTo"></won-post-content>
-        <div class="post-info__footer" ng-if="!self.postLoading">
+        <won-post-menu post-uri="self.atomUri"></won-post-menu>
+        <won-post-content post-uri="self.atomUri"></won-post-content>
+        <div class="post-info__footer" ng-if="!self.atomLoading">
+            <!-- AdHoc Request Field -->
             <chat-textfield
-                ng-if="self.showRequestField"
+                ng-if="self.showAdHocRequestField"
                 placeholder="::'Message (optional)'"
                 on-submit="::self.sendAdHocRequest(value, selectedPersona)"
                 allow-empty-submit="::true"
@@ -29,15 +31,9 @@ function genComponentConf() {
                 submit-button-label="::'Ask&#160;to&#160;Chat'">
 
             </chat-textfield>
-            <div
-                class="post-info__footer__infolabel"
-                ng-if="self.isInactive">
-                Atom is inactive, no requests allowed
-            </div>
             <!-- Reaction Use Cases -->
-            <won-labelled-hr label="::'Or'" class="pm__footer__labelledhr"  ng-if="self.hasReactionUseCases"></won-labelled-hr>
-            <button class="won-button--filled red post-info__footer__button" style="margin: 0rem 0rem .3rem 0rem;"
-                    ng-if="self.hasReactionUseCases"
+            <button class="won-button--filled red post-info__footer__button"
+                    ng-if="self.showReactionUseCases"
                     ng-repeat="ucIdentifier in self.reactionUseCasesArray"
                     ng-click="self.selectUseCase(ucIdentifier)">
                     <svg class="won-button-icon" style="--local-primary:white;" ng-if="self.getUseCaseIcon(ucIdentifier)">
@@ -46,9 +42,8 @@ function genComponentConf() {
                     <span>{{ self.getUseCaseLabel(ucIdentifier) }}</span>
             </button>
             <!-- Enabled Use Cases -->
-            <won-labelled-hr label="::'Or'" class="pm__footer__labelledhr"  ng-if="self.hasEnabledUseCases"></won-labelled-hr>
-            <button class="won-button--filled red post-info__footer__button" style="margin: 0rem 0rem .3rem 0rem;"
-                    ng-if="self.hasEnabledUseCases"
+            <button class="won-button--filled red post-info__footer__button"
+                    ng-if="self.showEnabledUseCases"
                     ng-repeat="ucIdentifier in self.enabledUseCasesArray"
                     ng-click="self.selectUseCase(ucIdentifier)">
                     <svg class="won-button-icon" style="--local-primary:white;" ng-if="self.getUseCaseIcon(ucIdentifier)">
@@ -56,6 +51,11 @@ function genComponentConf() {
                     </svg>
                     <span>{{ self.getUseCaseLabel(ucIdentifier) }}</span>
             </button>
+            <div
+                class="post-info__footer__infolabel"
+                ng-if="self.isInactive">
+                Atom is inactive, no requests allowed
+            </div>
         </div>
     `;
 
@@ -64,47 +64,39 @@ function genComponentConf() {
       attach(this, serviceDependencies, arguments);
 
       const selectFromState = state => {
-        const postUriToConnectTo = generalSelectors.getPostUriFromRoute(state);
-        const displayedPost = state.getIn(["atoms", postUriToConnectTo]);
+        const atomUri = generalSelectors.getPostUriFromRoute(state);
+        const atom = getIn(state, ["atoms", atomUri]);
 
-        const post = state.getIn(["atoms", postUriToConnectTo]);
-        const isOwned = generalSelectors.isAtomOwned(state, postUriToConnectTo);
+        const isOwned = generalSelectors.isAtomOwned(state, atomUri);
 
-        const reactionUseCases =
-          post && !isOwned && atomUtils.getReactionUseCases(post);
-        const hasReactionUseCases =
-          reactionUseCases && reactionUseCases.size > 0;
+        const isConnectible = atomUtils.isConnectible(atom);
+        const hasReactionUseCases = atomUtils.hasReactionUseCases(atom);
+        const hasEnabledUseCases = atomUtils.hasEnabledUseCases(atom);
 
-        const enabledUseCases =
-          post && isOwned && atomUtils.getEnabledUseCases(post);
-        const hasEnabledUseCases = enabledUseCases && enabledUseCases.size > 0;
+        const showEnabledUseCases =
+          isConnectible && isOwned && hasEnabledUseCases;
+        const showReactionUseCases =
+          isConnectible && !isOwned && hasReactionUseCases;
 
         return {
           loggedIn: accountUtils.isLoggedIn(get(state, "account")),
-          displayedPost,
-          postUriToConnectTo,
-          isInactive: atomUtils.isInactive(displayedPost),
-          hasReactionUseCases,
-          reactionUseCasesArray: reactionUseCases && reactionUseCases.toArray(),
-          hasEnabledUseCases,
-          enabledUseCasesArray: enabledUseCases && enabledUseCases.toArray(),
-          showRequestField:
-            atomUtils.isActive(displayedPost) &&
-            (atomUtils.hasChatSocket(displayedPost) ||
-              atomUtils.hasGroupSocket(displayedPost)),
-          postLoading:
-            !displayedPost ||
-            getIn(state, [
-              "process",
-              "atoms",
-              displayedPost.get("uri"),
-              "loading",
-            ]),
+          atomUri,
+          isInactive: atomUtils.isInactive(atom),
+          showAdHocRequestField:
+            isConnectible && !showEnabledUseCases && !showReactionUseCases,
+          showEnabledUseCases,
+          showReactionUseCases,
+          reactionUseCasesArray:
+            showReactionUseCases &&
+            atomUtils.getReactionUseCases(atom).toArray(),
+          enabledUseCasesArray:
+            showEnabledUseCases && atomUtils.getEnabledUseCases(atom).toArray(),
+          atomLoading: !atom || processSelectors.isAtomLoading(state, atomUri),
         };
       };
       connect2Redux(selectFromState, actionCreators, [], this);
 
-      classOnComponentRoot("won-is-loading", () => this.postLoading, this);
+      classOnComponentRoot("won-is-loading", () => this.atomLoading, this);
     }
 
     selectUseCase(ucIdentifier) {
@@ -112,7 +104,7 @@ function genComponentConf() {
         useCase: ucIdentifier,
         useCaseGroup: undefined,
         postUri: undefined,
-        fromAtomUri: this.postUriToConnectTo,
+        fromAtomUri: this.atomUri,
         viewAtomUri: undefined,
         viewConnUri: undefined,
         mode: "CONNECT",
@@ -120,17 +112,13 @@ function genComponentConf() {
     }
 
     sendAdHocRequest(message, persona) {
-      const tempPostUriToConnectTo = this.postUriToConnectTo;
+      const _atomUri = this.atomUri;
 
       if (this.loggedIn) {
         this.router__stateGoResetParams("connections");
 
-        if (tempPostUriToConnectTo) {
-          this.connections__connectAdHoc(
-            tempPostUriToConnectTo,
-            message,
-            persona
-          );
+        if (_atomUri) {
+          this.connections__connectAdHoc(_atomUri, message, persona);
         }
       } else {
         this.view__showTermsDialog(
@@ -139,12 +127,8 @@ function genComponentConf() {
               this.view__hideModalDialog();
               this.router__stateGoResetParams("connections");
 
-              if (tempPostUriToConnectTo) {
-                this.connections__connectAdHoc(
-                  tempPostUriToConnectTo,
-                  message,
-                  persona
-                );
+              if (_atomUri) {
+                this.connections__connectAdHoc(_atomUri, message, persona);
               }
             },
             cancelCallback: () => {

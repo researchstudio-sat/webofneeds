@@ -14,7 +14,7 @@ import { labels } from "../../won-label-utils.js";
 import { classOnComponentRoot } from "../../cstm-ng-utils.js";
 import squareImageModule from "../square-image.js";
 
-import "style/_combined-message-content.scss";
+import "~/style/_combined-message-content.scss";
 
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 

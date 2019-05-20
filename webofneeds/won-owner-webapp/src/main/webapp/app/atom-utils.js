@@ -37,8 +37,18 @@ export function getReactionUseCases(atom) {
   return getIn(atom, ["matchedUseCase", "reactionUseCases"]);
 }
 
+export function hasReactionUseCases(atom) {
+  const reactionUseCases = getReactionUseCases(atom);
+  return !!reactionUseCases && reactionUseCases.size > 0;
+}
+
 export function getEnabledUseCases(atom) {
   return getIn(atom, ["matchedUseCase", "enabledUseCases"]);
+}
+
+export function hasEnabledUseCases(atom) {
+  const enabledUseCases = getEnabledUseCases(atom);
+  return !!enabledUseCases && enabledUseCases.size > 0;
 }
 
 export function hasMatchedUseCase(atom) {
@@ -114,6 +124,14 @@ export function getDefaultImage(atom) {
  */
 export function isInactive(atom) {
   return get(atom, "state") && get(atom, "state") === won.WON.InactiveCompacted;
+}
+
+/**
+ * If an atom is active and has the chat or the group socket we can connect to it.
+ * @param atom
+ */
+export function isConnectible(atom) {
+  return isActive(atom) && (hasChatSocket(atom) || hasGroupSocket(atom));
 }
 
 /**

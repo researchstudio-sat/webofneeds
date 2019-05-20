@@ -2,7 +2,7 @@
  * Created by ksinger on 30.06.2017.
  */
 
-import { piwik } from "config";
+import { piwik } from "~/config/default.js";
 
 // ------- INIT  --------------------
 

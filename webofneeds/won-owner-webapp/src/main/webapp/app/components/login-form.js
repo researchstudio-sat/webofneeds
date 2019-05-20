@@ -7,7 +7,7 @@ import { actionCreators } from "../actions/actions.js";
 import { connect2Redux, parseRestErrorMessage } from "../won-utils.js";
 import won from "../won-es6.js";
 import "angular-marked";
-import "style/_won-markdown.scss";
+import "~/style/_won-markdown.scss";
 
 import * as srefUtils from "../sref-utils.js";
 import * as accountUtils from "../account-utils.js";

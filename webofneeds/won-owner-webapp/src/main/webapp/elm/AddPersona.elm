@@ -1,6 +1,5 @@
 module AddPersona exposing (main)
 
-import Application exposing (Style)
 import Html exposing (..)
 import Html.Attributes as Attributes
 import Html.Events as Events
@@ -9,7 +8,17 @@ import Json.Decode.Extra as Decode
 import Maybe.Extra as Maybe
 import Palette
 import Persona exposing (Persona)
-import Time
+import Widget
+
+
+main =
+    Widget.widget
+        { init = init
+        , update = update
+        , view = view
+        , subscriptions = \_ -> Sub.none
+        , propDecoder = propDecoder
+        }
 
 
 
@@ -103,6 +112,7 @@ update msg { model, props } =
                                 { persona = persona
                                 , atomUrl = props.postUri
                                 }
+                                |> Widget.performAction
                             )
 
                         Nothing ->
@@ -122,8 +132,7 @@ update msg { model, props } =
 
 
 view :
-    { style : Style
-    , model : Model
+    { model : Model
     , props : Props
     }
     -> Html Msg
@@ -212,17 +221,3 @@ personaView model persona =
             ]
         ]
         persona
-
-
-
----- MAIN ----
-
-
-main =
-    Application.element
-        { init = init
-        , update = update
-        , view = view
-        , subscriptions = \_ -> Sub.none
-        , propDecoder = propDecoder
-        }

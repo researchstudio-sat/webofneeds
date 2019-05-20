@@ -17,7 +17,7 @@ import { classOnComponentRoot } from "../cstm-ng-utils.js";
 
 import { getUseCaseLabel, getUseCaseIcon } from "../usecase-utils.js";
 
-import "style/_post-info.scss";
+import "~/style/_post-info.scss";
 
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {

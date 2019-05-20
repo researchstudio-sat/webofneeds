@@ -27,6 +27,7 @@ export const goodsServiceSearch = {
       },
     }),
   },
+  reactionUseCases: ["serviceOffer", "goodsOffer"],
   seeksDetails: {
     title: { ...details.title },
     tags: {
@@ -37,6 +38,7 @@ export const goodsServiceSearch = {
     priceRange: { ...details.pricerange },
     description: { ...details.description },
     location: { ...details.location },
+    images: { ...details.images },
   },
   generateQuery: (draft, resultName) => {
     let subQueries = [];

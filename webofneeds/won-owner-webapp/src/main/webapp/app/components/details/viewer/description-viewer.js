@@ -2,8 +2,8 @@ import angular from "angular";
 import { attach } from "../../../utils.js";
 import "angular-marked";
 
-import "style/_description-viewer.scss";
-import "style/_won-markdown.scss";
+import "~/style/_description-viewer.scss";
+import "~/style/_won-markdown.scss";
 
 const serviceDependencies = ["$scope", "$element"];
 function genComponentConf() {

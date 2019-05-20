@@ -19,8 +19,8 @@ import * as accountUtils from "../account-utils.js";
 import { Elm } from "../../elm/PublishButton.elm";
 import elmModule from "./elm.js";
 
-import "style/_create-post.scss";
-import "style/_responsiveness-utils.scss";
+import "~/style/_create-post.scss";
+import "~/style/_responsiveness-utils.scss";
 
 const serviceDependencies = [
   "$ngRedux",
@@ -33,19 +33,16 @@ function genComponentConf() {
         <div class="cp__header">
             <a class="cp__header__back clickable"
                 ng-click="self.router__back()">
-                <svg style="--local-primary:var(--won-primary-color);"
-                    class="cp__header__back__icon show-in-responsive">
+                <svg class="cp__header__back__icon show-in-responsive">
                     <use xlink:href="#ico36_backarrow" href="#ico36_backarrow"></use>
                 </svg>
-                <svg style="--local-primary:var(--won-primary-color);"
-                    class="cp__header__back__icon hide-in-responsive">
+                <svg class="cp__header__back__icon hide-in-responsive">
                     <use xlink:href="#ico36_close" href="#ico36_close"></use>
                 </svg>
             </a>
             <svg class="cp__header__icon"
                 title="{{self.useCase['label']}}"
-                ng-if="self.useCase['icon']"
-                style="--local-primary:var(--won-primary-color);">
+                ng-if="self.useCase['icon']">
                     <use xlink:href="{{self.useCase['icon']}}" href="{{self.useCase['icon']}}"></use>
             </svg>
             <span class="cp__header__title" ng-if="!self.isCreateFromAtom && !self.isEditFromAtom">{{self.useCase.label}}</span>
@@ -110,7 +107,7 @@ function genComponentConf() {
                 showPersonas: self.isHoldable && self.loggedIn,
                 personas: self.personas
               }"
-              on-action="self.publish(payload)"
+              on-publish="self.publish(personaId)"
               ng-if="self.showCreateInput && !self.isEditFromAtom">
             </won-elm>
             <div class="cp__footer__edit" ng-if="self.loggedIn && self.showCreateInput && self.isEditFromAtom && self.isFromAtomEditable">

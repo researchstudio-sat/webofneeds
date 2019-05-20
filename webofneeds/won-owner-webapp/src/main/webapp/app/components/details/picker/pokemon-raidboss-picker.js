@@ -4,7 +4,7 @@ import { DomCache } from "../../../cstm-ng-utils.js";
 import datetimePickerModule from "./datetime-picker.js";
 import titlePickerModule from "./title-picker.js";
 
-import "style/_pokemonraidbosspicker.scss";
+import "/style/_pokemonraidbosspicker.scss";
 
 const serviceDependencies = ["$scope", "$element"];
 function genComponentConf() {

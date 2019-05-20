@@ -7,10 +7,17 @@
 /* jshint esnext: true */
 
 //---- app.js-Dependencies ----
+import "babel-polyfill";
+import svgs from "../images/won-icons/*.svg";
+
+console.log(svgs);
+
+import "../style/won.scss";
+
 import angular from "angular";
 window.angular = angular; // for compatibility with pre-ES6/commonjs scripts
 
-import "fetch"; //polyfill for window.fetch (for backward-compatibility with older browsers)
+import "whatwg-fetch"; //polyfill for window.fetch (for backward-compatibility with older browsers)
 
 import "redux";
 import ngReduxModule from "ng-redux";
@@ -22,8 +29,8 @@ import uiRouterModule from "angular-ui-router";
  * 
  * delete at your own peril
  */
-import "angular-ui-router-shim";
-import { delay, inlineSVGSpritesheet } from "./utils.js";
+import "angular-ui-router/release/stateEvents.js";
+import { delay } from "./utils.js";
 
 //---------- Config -----------
 import { configRouting, runAccessControl } from "./configRouting.js";
@@ -38,13 +45,13 @@ import footer from "./components/footer.js";
 import modalDialog from "./components/modal-dialog.js";
 import toasts from "./components/toasts.js";
 import slideIn from "./components/slide-in.js";
-import connectionsComponent from "./components/connections/connections.js";
-import overviewComponent from "./components/overview/overview.js";
-import mapComponent from "./components/map/map.js";
-import postComponent from "./components/post/post.js";
-import aboutComponent from "./components/about/about.js";
-import signupComponent from "./components/signup/signup.js";
-import settingsComponent from "./components/settings/settings.js";
+import connectionsComponent from "./pages/connections.jsx";
+import overviewComponent from "./pages/overview.jsx";
+import mapComponent from "./pages/map.jsx";
+import postComponent from "./pages/post.jsx";
+import aboutComponent from "./pages/about.jsx";
+import signupComponent from "./pages/signup.jsx";
+import settingsComponent from "./pages/settings.jsx";
 
 //won import (used so you can access the debugmode variable without reloading the page)
 import won from "./service/won.js";
@@ -57,6 +64,12 @@ window.won = won;
 import { runMessagingAgent } from "./messaging-agent.js";
 
 import detailModules from "./components/details/details.js";
+
+//import serviceWorkerRuntime from "serviceworker-webpack-plugin/lib/runtime";
+
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("../sw.js");
+}
 
 let app = angular.module("won.owner", [
   /* to enable legacy $stateChange* events in ui-router (see
@@ -79,13 +92,13 @@ let app = angular.module("won.owner", [
   ...detailModules,
 
   //views
-  connectionsComponent,
-  overviewComponent,
-  mapComponent,
-  postComponent,
-  aboutComponent,
-  signupComponent,
-  settingsComponent,
+  connectionsComponent.module,
+  overviewComponent.module,
+  mapComponent.module,
+  postComponent.module,
+  aboutComponent.module,
+  signupComponent.module,
+  settingsComponent.module,
 ]);
 
 /* create store, register middlewares, set up redux-devtool-support, etc */
@@ -177,15 +190,21 @@ app.run([
  */
 app.run(["$ngRedux", $ngRedux => $ngRedux.dispatch(actionCreators.tick())]);
 
-//let app = angular.module('won.owner',[...other modules...]);
-angular.bootstrap(document, ["won.owner"], {
-  // make sure dependency injection works after minification (or
-  // at least angular explains about sloppy imports with a
-  // reference to the right place)
-  // see https://docs.angularjs.org/guide/production
-  // and https://docs.angularjs.org/guide/di#dependency-annotation
-  strictDi: true,
-});
+/**
+ * create the parent element for angular. This could live in the build config, but since it is very angular specific, it should probably live here
+ */
+document.addEventListener("DOMContentLoaded", () => {
+  const uiView = document.createElement("section");
+  uiView.setAttribute("ui-view", "");
+  document.body.appendChild(uiView);
 
-//inlineSVGSpritesheet("./generated/icon-sprite.svg", "icon-sprite");
-inlineSVGSpritesheet("./generated/symbol/svg/sprite.symbol.svg", "icon-sprite");
+  //let app = angular.module('won.owner',[...other modules...]);
+  angular.bootstrap(document, ["won.owner"], {
+    // make sure dependency injection works after minification (or
+    // at least angular explains about sloppy imports with a
+    // reference to the right place)
+    // see https://docs.angularjs.org/guide/production
+    // and https://docs.angularjs.org/guide/di#dependency-annotation
+    strictDi: true,
+  });
+});

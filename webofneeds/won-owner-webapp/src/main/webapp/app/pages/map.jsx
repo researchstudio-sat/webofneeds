@@ -1,6 +1,4 @@
-/**
- * Created by quasarchimaere on 04.04.2019.
- */
+/** @jsx h */
 import angular from "angular";
 import ngAnimate from "angular-animate";
 import {
@@ -11,24 +9,230 @@ import {
   reverseSearchNominatim,
   searchNominatim,
   scrubSearchResults,
-} from "../../utils.js";
+} from "../utils.js";
 import Immutable from "immutable";
-import { connect2Redux } from "../../won-utils.js";
-import { actionCreators } from "../../actions/actions.js";
-import postMessagesModule from "../post-messages.js";
-import atomCardModule from "../atom-card.js";
-import atomMapModule from "../atom-map.js";
-import postHeaderModule from "../post-header.js";
-import * as generalSelectors from "../../selectors/general-selectors.js";
-import * as viewSelectors from "../../selectors/view-selectors.js";
-import * as processUtils from "../../process-utils.js";
-import * as wonLabelUtils from "../../won-label-utils.js";
-import * as atomUtils from "../../atom-utils.js";
-import wonInput from "../../directives/input.js";
+import { connect2Redux } from "../won-utils.js";
+import { actionCreators } from "../actions/actions.js";
+import postMessagesModule from "../components/post-messages.js";
+import atomCardModule from "../components/atom-card.js";
+import atomMapModule from "../components/atom-map.js";
+import postHeaderModule from "../components/post-header.js";
+import * as generalSelectors from "../selectors/general-selectors.js";
+import * as viewSelectors from "../selectors/view-selectors.js";
+import * as processUtils from "../process-utils.js";
+import * as wonLabelUtils from "../won-label-utils.js";
+import * as atomUtils from "../atom-utils.js";
+import wonInput from "../directives/input.js";
+import { h } from "preact";
 
-import "style/_map.scss";
-import "style/_atom-overlay.scss";
-import "style/_connection-overlay.scss";
+import "~/style/_map.scss";
+import "~/style/_atom-overlay.scss";
+import "~/style/_connection-overlay.scss";
+
+const template = (
+  <container>
+    <won-modal-dialog ng-if="self.showModalDialog" />
+    <div className="won-modal-atomview" ng-if="self.showAtomOverlay">
+      <won-post-info include-header="true" atom-uri="self.viewAtomUri" />
+    </div>
+    <div
+      className="won-modal-connectionview"
+      ng-if="self.showConnectionOverlay"
+    >
+      <won-post-messages connection-uri="self.viewConnUri" />
+    </div>
+    <header>
+      <won-topnav />
+    </header>
+    <won-toasts />
+    <won-slide-in ng-if="self.showSlideIns" />
+    <main className="ownermap">
+      <div
+        className="ownermap__header"
+        ng-if="self.isLocationAccessDenied || self.lastWhatsAroundLocation"
+      >
+        <span className="ownermap__header__label">{"What's around:"}</span>
+        <div
+          className="ownermap__header__location"
+          ng-click="self.showLocationInput = true"
+          ng-show="!self.showLocationInput"
+        >
+          <svg className="ownermap__header__location__icon">
+            <use
+              xlinkHref="#ico36_detail_location"
+              href="#ico36_detail_location"
+            />
+          </svg>
+          <span className="ownermap__header__location__label">
+            {"{{self.lastWhatsAroundLocationName}}"}
+          </span>
+        </div>
+        <div
+          className="ownermap__header__input"
+          ng-show="self.showLocationInput || (self.isLocationAccessDenied && !self.lastWhatsAroundLocation)"
+        >
+          <svg
+            className="ownermap__header__input__icon"
+            ng-click="self.showLocationInput = false"
+          >
+            <use
+              xlinkHref="#ico36_detail_location"
+              href="#ico36_detail_location"
+            />
+          </svg>
+          <input
+            type="text"
+            className="ownermap__header__input__inner"
+            placeholder="Search around location"
+            won-input="::self.updateWhatsAroundSuggestions()"
+          />
+          <svg
+            className="ownermap__header__input__reset clickable"
+            ng-if="self.showResetButton"
+            ng-click="self.resetWhatsAroundInput()"
+          >
+            <use xlinkHref="#ico36_close" href="#ico36_close" />
+          </svg>
+        </div>
+        <div className="ownermap__header__updated">
+          <div
+            className="ownermap__header__updated__loading hide-in-responsive"
+            ng-if="self.isOwnerAtomUrisLoading && !self.showLocationInput"
+          >
+            Loading...
+          </div>
+          <div
+            className="ownermap__header__updated__time hide-in-responsive"
+            ng-if="!self.isOwnerAtomUrisLoading && !self.showLocationInput"
+          >
+            Updated: {"{{ self.friendlyLastAtomUrisUpdateTimestamp }}"}
+          </div>
+          <div
+            className="ownermap__header__updated__reload won-button--filled red"
+            ng-click="self.reload()"
+            ng-disabled="self.isOwnerAtomUrisLoading"
+            ng-if="!self.showLocationInput"
+          >
+            Reload
+          </div>
+          <div
+            className="ownermap__header__updated__cancel won-button--filled red"
+            ng-click="self.showLocationInput = false"
+            ng-disabled="self.isOwnerAtomUrisLoading"
+            ng-if="self.showLocationInput"
+          >
+            Cancel
+          </div>
+        </div>
+      </div>
+      <div
+        className="ownermap__searchresults"
+        ng-className="{'ownermap__searchresults--visible': self.showLocationInput || (self.isLocationAccessDenied && !self.lastWhatsAroundLocation)}"
+        ng-if="!self.isOwnerAtomUrisToLoad || self.isLocationAccessDenied"
+      >
+        <div
+          className="ownermap__searchresults__result"
+          ng-if="!self.isLocationAccessDenied"
+          ng-click="self.selectCurrentLocation()"
+        >
+          <svg className="ownermap__searchresults__result__icon">
+            <use
+              xlinkHref="#ico36_location_current"
+              href="#ico36_location_current"
+            />
+          </svg>
+          <div className="ownermap__searchresults__result__label">
+            Current Location
+          </div>
+        </div>
+        <div
+          className="ownermap__searchresults__result"
+          ng-repeat="result in self.searchResults"
+          ng-click="self.selectLocation(result)"
+        >
+          <svg className="ownermap__searchresults__result__icon">
+            <use
+              xlinkHref="#ico16_indicator_location"
+              href="#ico16_indicator_location"
+            />
+          </svg>
+          <div className="ownermap__searchresults__result__label">
+            {"{{ result.name }}"}
+          </div>
+        </div>
+        <div
+          className="ownermap__searchresults__deniedlocation"
+          ng-if="self.isLocationAccessDenied && !self.lastWhatsAroundLocation && !self.hasVisibleAtomUris && !(self.searchResults && self.searchResults.length > 0)"
+        >
+          <svg className="ownermap__searchresults__deniedlocation__icon">
+            <use
+              xlinkHref="#ico16_indicator_error"
+              href="#ico16_indicator_error"
+            />
+          </svg>
+          <div className="ownermap__searchresults__deniedlocation__label">
+            {`You prohibit us from retrieving your location, so we won't be able
+            to show what's around you. If you want to change that, grant access
+            to the location in your browser and reload the page, or type any
+            location in the input-field above.`}
+          </div>
+        </div>
+      </div>
+      <div
+        className="ownermap__nolocation"
+        ng-if="!self.currentLocation && !self.isLocationAccessDenied && !self.lastWhatsAroundLocation"
+      >
+        <svg className="ownermap__nolocation__icon">
+          <use
+            xlinkHref="#ico36_detail_location"
+            href="#ico36_detail_location"
+          />
+        </svg>
+        <div className="ownermap__nolocation__label">
+          You did not grant location access yet.{" "}
+          <span className="show-in-responsive">Tap</span>
+          <span className="hide-in-responsive">Click</span> the button below and
+          accept the location access to see what is going on around you.
+        </div>
+        <div
+          className="ownermap__nolocation__button won-button--filled red"
+          ng-click="self.fetchCurrentLocationAndReload()"
+        >
+          {"See What's Around"}
+        </div>
+      </div>
+      <won-atom-map
+        className="ownermap__map hide-in-responsive"
+        ng-className="{'ownermap__map--visible': !(self.showLocationInput || (self.isLocationAccessDenied && !self.lastWhatsAroundLocation))}"
+        locations="self.locations"
+        current-location="self.lastWhatsAroundLocation"
+        ng-if="!self.isOwnerAtomUrisToLoad && self.lastWhatsAroundLocation"
+      />
+      <div
+        className="ownermap__content"
+        ng-if="self.lastWhatsAroundLocation && self.hasVisibleAtomUris"
+      >
+        <won-atom-card
+          className="ownermap__content__atom"
+          atom-uri="atomUri"
+          current-location="self.lastWhatsAroundLocation"
+          ng-repeat="atomUri in self.sortedVisibleAtomUriArray track by atomUri"
+          ng-if="self.hasVisibleAtomUris"
+        />
+      </div>
+      <div
+        className="ownermap__noresults"
+        ng-if="self.lastWhatsAroundLocation && !self.hasVisibleAtomUris"
+      >
+        <span className="ownermap__noresults__label">
+          Nothing around this location, you can try another location by clicking
+          on the location in the header.
+        </span>
+      </div>
+    </main>
+    <won-footer />
+  </container>
+);
 
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 class Controller {
@@ -330,13 +534,17 @@ class Controller {
 
 Controller.$inject = serviceDependencies;
 
-export default angular
-  .module("won.owner.components.map", [
-    ngAnimate,
-    postMessagesModule,
-    atomMapModule,
-    atomCardModule,
-    postHeaderModule,
-    wonInput,
-  ])
-  .controller("MapController", Controller).name;
+export default {
+  module: angular
+    .module("won.owner.components.map", [
+      ngAnimate,
+      postMessagesModule,
+      atomMapModule,
+      atomCardModule,
+      postHeaderModule,
+      wonInput,
+    ])
+    .controller("MapController", Controller).name,
+  controller: "MapController",
+  template: template,
+};

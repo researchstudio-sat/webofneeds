@@ -22,11 +22,13 @@ export const complain = {
       },
     }),
   },
+  reactionUseCases: ["handleComplaint"],
   details: {
     title: { ...details.title },
     description: { ...details.description },
     location: { ...details.location },
     tags: { ...details.tags },
+    images: { ...details.images },
   },
   seeksDetails: undefined,
 };

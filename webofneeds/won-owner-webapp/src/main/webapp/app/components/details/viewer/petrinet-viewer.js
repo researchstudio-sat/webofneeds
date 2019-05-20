@@ -2,7 +2,7 @@ import angular from "angular";
 import { attach } from "../../../utils.js";
 import petrinetStateModule from "../../petrinet-state.js";
 
-import "style/_petrinet-viewer.scss";
+import "~/style/_petrinet-viewer.scss";
 
 const serviceDependencies = ["$scope", "$element"];
 function genComponentConf() {

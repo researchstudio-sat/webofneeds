@@ -7,7 +7,7 @@ import { connect2Redux } from "../../../won-utils.js";
 import * as atomUtils from "../../../atom-utils.js";
 import * as generalSelectors from "../../../selectors/general-selectors.js";
 
-import "style/_suggestpost-viewer.scss";
+import "~/style/_suggestpost-viewer.scss";
 
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {

@@ -8,7 +8,7 @@ import { handleComplaint } from "./uc-handle-complaint";
 export const socialGroup = {
   identifier: "socialgroup",
   label: "Social",
-  icon: undefined,
+  icon: "#ico36_uc_find_people",
   subItems: {
     getBreakfast: getBreakfast,
     afterparty: afterparty,

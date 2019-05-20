@@ -2,7 +2,7 @@ import angular from "angular";
 import { attach, delay } from "../../../utils.js";
 import { DomCache } from "../../../cstm-ng-utils.js";
 
-import "style/_dropdownpicker.scss";
+import "~/style/_dropdownpicker.scss";
 
 const serviceDependencies = ["$scope", "$element"];
 function genComponentConf() {

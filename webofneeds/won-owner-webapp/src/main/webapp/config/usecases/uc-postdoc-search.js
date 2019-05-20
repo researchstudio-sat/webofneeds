@@ -23,6 +23,7 @@ export const postdocSearch = {
       },
     }),
   },
+  reactionUseCases: ["postdocOffer"],
   details: {
     title: { ...details.title },
     description: { ...details.description },

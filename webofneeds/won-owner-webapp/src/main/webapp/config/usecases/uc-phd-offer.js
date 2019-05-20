@@ -20,6 +20,7 @@ export const phdOffer = {
       },
     }),
   },
+  reactionUseCases: ["phdSearch"],
   details: {
     title: { ...details.title },
     description: { ...details.description },

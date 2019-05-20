@@ -22,7 +22,7 @@ pokemon-raidboss-viewer {
       grid-area: prbv_level;
       text-align: center;
       font-size: $smallFontSize;
-      height: calc($postIconSize + #{$smallFontSize});
+      height: $postIconSize + $smallFontSize;
       padding: calc(#{$postIconSize} + 0.5rem) 0.25rem 0.25rem 0.25rem;
       background-color: $won-light-gray;
       background-repeat: no-repeat;

@@ -10,7 +10,7 @@ import * as useCaseUtils from "../usecase-utils.js";
 import { connect2Redux } from "../won-utils.js";
 import { actionCreators } from "../actions/actions.js";
 
-import "style/_post-is-or-seeks-info.scss";
+import "~/style/_post-is-or-seeks-info.scss";
 import { title } from "../../config/details/basic.js";
 
 //TODO can't inject $scope with the angular2-router, preventing redux-cleanup

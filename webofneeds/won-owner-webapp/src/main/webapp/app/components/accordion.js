@@ -1,8 +1,8 @@
 import angular from "angular";
 import "angular-marked";
 
-import "style/_accordion.scss";
-import "style/_won-markdown.scss";
+import "~/style/_accordion.scss";
+import "~/style/_won-markdown.scss";
 
 function genComponentConf() {
   let template = `

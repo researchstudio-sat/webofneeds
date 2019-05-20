@@ -132,9 +132,9 @@ pokemon-raidboss-picker {
       & + label {
         text-align: center;
         font-size: $smallFontSize;
-        height: calc($postIconSize + #{$smallFontSize});
+        height: $postIconSize + $smallFontSize;
         cursor: pointer;
-        padding: calc(#{$postIconSize} + 0.5rem) 0.25rem 0.25rem 0.25rem;
+        padding: ($postIconSize + 0.5rem) 0.25rem 0.25rem 0.25rem;
         background-color: white;
         background-repeat: no-repeat;
         background-size: $postIconSize;

@@ -20,7 +20,7 @@ import { attach, delay, sortByDate, get, getIn } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
 import { actionCreators } from "../actions/actions.js";
 
-import "style/_connections-overview.scss";
+import "~/style/_connections-overview.scss";
 
 import * as generalSelectors from "../selectors/general-selectors.js";
 import * as connectionSelectors from "../selectors/connection-selectors.js";

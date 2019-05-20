@@ -18,7 +18,7 @@ import {
   getAtoms,
 } from "../selectors/general-selectors.js";
 
-import "style/_group-image.scss";
+import "~/style/_group-image.scss";
 
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {

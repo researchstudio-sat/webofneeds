@@ -34,6 +34,7 @@ export const rehearsalRoomSearch = {
       },
     }),
   },
+  reactionUseCases: ["rehearsalRoomOffer"],
   details: undefined,
   seeksDetails: {
     location: { ...details.location },
