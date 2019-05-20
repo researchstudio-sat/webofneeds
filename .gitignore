@@ -54,6 +54,7 @@ bin/setenv.*
 /webofneeds/won-owner-webapp/src/main/webapp/yarn-error.log
 /webofneeds/won-owner-webapp/src/main/webapp/.tern-project
 /webofneeds/won-owner-webapp/app/config.js
+won-owner-webapp/src/main/webapp/.cache
 webofneeds/won-docker/image/bots/bots.jar
 webofneeds/won-docker/image/bots/conf/
 webofneeds/won-docker/image/matcher-rescal/conf/
