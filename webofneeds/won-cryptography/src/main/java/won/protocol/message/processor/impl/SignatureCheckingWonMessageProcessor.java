@@ -85,8 +85,8 @@ public class SignatureCheckingWonMessageProcessor implements WonMessageProcessor
     private String messageDataToString(WonMessage message) {
         StringBuilder sb = new StringBuilder();
         sb.append("[");
-        sb.append("messageURI: ").append(message.getMessageURI());
-        sb.append("messageType: ").append(message.getMessageType());
+        sb.append("messageURI: ").append(message.getMessageURI()).append(", ");
+        sb.append("messageType: ").append(message.getMessageType()).append(", ");
         boolean senderPrinted = appendIfPresent(message.getSenderURI(), "sender", sb)
                         || appendIfPresent(message.getSenderSocketURI(), "senderSocket", sb)
                         || appendIfPresent(message.getSenderAtomURI(), "senderAtom", sb)
