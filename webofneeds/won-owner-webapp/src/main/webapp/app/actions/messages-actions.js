@@ -4,7 +4,7 @@
 
 import won from "../won-es6.js";
 import { actionTypes, actionCreators } from "./actions.js";
-import { get, getIn } from "../utils.js";
+import { getIn } from "../utils.js";
 
 import Immutable from "immutable";
 import { getOwnMessageUri } from "../message-utils.js";
@@ -20,6 +20,7 @@ import {
   fetchTheirAtomAndDispatch,
   fetchActiveConnectionAndDispatch,
 } from "../won-message-utils.js";
+import * as atomUtils from "../atom-utils.js";
 
 export function successfulCloseAtom(event) {
   return (dispatch, getState) => {
@@ -956,7 +957,7 @@ export function processAtomHintMessage(event) {
         "ignoring hint for an atom that is not yet in the state (could be a targetAtom, or a non stored ownedAtom):",
         ownedAtomUri
       );
-    } else if (get(targetAtom, "state") === won.WON.InactiveCompacted) {
+    } else if (atomUtils.isInactive(targetAtom)) {
       console.debug("ignoring hint for an inactive atom:", targetAtomUri);
     } else {
       won
