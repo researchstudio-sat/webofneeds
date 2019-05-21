@@ -45,6 +45,7 @@ import won.protocol.exception.IncorrectPropertyCountException;
 import won.protocol.model.AtomGraphType;
 import won.protocol.model.AtomState;
 import won.protocol.vocabulary.WON;
+import won.protocol.vocabulary.WONMATCH;
 
 /**
  * This class wraps the atom models (atom and sysinfo graphs in an atom
@@ -299,16 +300,16 @@ public class AtomModelWrapper {
     }
 
     public void addFlag(Resource flag) {
-        getAtomContentNode().addProperty(WON.flag, flag);
+        getAtomContentNode().addProperty(WONMATCH.flag, flag);
     }
 
     public boolean flag(Resource flag) {
         Resource atomRes = getAtomContentNode();
-        return atomRes != null && atomRes.hasProperty(WON.flag, flag);
+        return atomRes != null && atomRes.hasProperty(WONMATCH.flag, flag);
     }
 
     public Calendar getDoNotMatchBefore() {
-        Statement prop = getAtomContentNode().getProperty(WON.doNotMatchBefore);
+        Statement prop = getAtomContentNode().getProperty(WONMATCH.doNotMatchBefore);
         if (prop == null) {
             return null;
         }
@@ -326,7 +327,7 @@ public class AtomModelWrapper {
     }
 
     public Calendar getDoNotMatchAfter() {
-        Statement prop = getAtomContentNode().getProperty(WON.doNotMatchAfter);
+        Statement prop = getAtomContentNode().getProperty(WONMATCH.doNotMatchAfter);
         if (prop == null) {
             return null;
         }
@@ -344,31 +345,31 @@ public class AtomModelWrapper {
     }
 
     public void addMatchingContext(String context) {
-        getAtomContentNode().addProperty(WON.matchingContext, context);
+        getAtomContentNode().addProperty(WONMATCH.matchingContext, context);
     }
 
     public boolean matchingContext(String context) {
-        return getAtomContentNode().hasProperty(WON.matchingContext, context);
+        return getAtomContentNode().hasProperty(WONMATCH.matchingContext, context);
     }
 
     public void addQuery(String query) {
-        getAtomContentNode().addProperty(WON.sparqlQuery, query);
+        getAtomContentNode().addProperty(WONMATCH.sparqlQuery, query);
     }
 
     public Optional<String> getQuery() {
-        Statement stmt = getAtomContentNode().getProperty(WON.sparqlQuery);
+        Statement stmt = getAtomContentNode().getProperty(WONMATCH.sparqlQuery);
         if (stmt == null)
             return Optional.empty();
         return Optional.of(stmt.getString());
     }
 
     public boolean sparqlQuery() {
-        return getAtomContentNode().hasProperty(WON.sparqlQuery);
+        return getAtomContentNode().hasProperty(WONMATCH.sparqlQuery);
     }
 
     public Collection<String> getMatchingContexts() {
         Collection<String> matchingContexts = new LinkedList<>();
-        NodeIterator iter = getAtomModel().listObjectsOfProperty(getAtomContentNode(), WON.matchingContext);
+        NodeIterator iter = getAtomModel().listObjectsOfProperty(getAtomContentNode(), WONMATCH.matchingContext);
         while (iter.hasNext()) {
             matchingContexts.add(iter.next().asLiteral().getString());
         }
@@ -579,7 +580,7 @@ public class AtomModelWrapper {
 
     private void addSeeksPropertyToAtomNode(RDFNode contentNode) {
         Resource atomNode = getAtomContentNode();
-        atomNode.addProperty(WON.seeks, contentNode);
+        atomNode.addProperty(WONMATCH.seeks, contentNode);
     }
 
     public Collection<Resource> getGoalNodes() {

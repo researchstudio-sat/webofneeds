@@ -19,7 +19,8 @@ import org.apache.jena.vocabulary.DC;
 import org.apache.jena.vocabulary.RDF;
 
 import won.protocol.vocabulary.SCHEMA;
-import won.protocol.vocabulary.WON;
+import won.protocol.vocabulary.WONCON;
+import won.protocol.vocabulary.WONMATCH;
 
 public class TransportOfferAtomGenerator {
     static Model model = ModelFactory.createDefaultModel();
@@ -51,7 +52,7 @@ public class TransportOfferAtomGenerator {
             seeksPart = addDescription(seeksPart, 1.0);
             seeksPart = addTags(seeksPart, 0.8, 1, 3);
             atom.addProperty(RDF.type, won_Atom);
-            atom.addProperty(WON.seeks, seeksPart);
+            atom.addProperty(WONMATCH.seeks, seeksPart);
             try {
                 FileOutputStream out = new FileOutputStream("sample_atoms/transport_offer_atom_" + rnd + ".trig");
                 model.write(out, "TURTLE");
@@ -114,13 +115,13 @@ public class TransportOfferAtomGenerator {
         geoResource.addProperty(SCHEMA.LONGITUDE, lng);
         // add bigdata specific value: "<subj> won:geoSpatial
         // "48.225073#16.358398"^^<http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon>"
-        geoResource.addProperty(WON.geoSpatial, lat + "#" + lng, bigdata_geoSpatialDatatype);
-        locationResource.addProperty(WON.boundingBox, boundingBoxResource);
-        boundingBoxResource.addProperty(WON.northWestCorner, nwCornerResource);
+        geoResource.addProperty(WONCON.geoSpatial, lat + "#" + lng, bigdata_geoSpatialDatatype);
+        locationResource.addProperty(WONCON.boundingBox, boundingBoxResource);
+        boundingBoxResource.addProperty(WONCON.northWestCorner, nwCornerResource);
         nwCornerResource.addProperty(RDF.type, schema_GeoCoordinates);
         nwCornerResource.addProperty(SCHEMA.LATITUDE, nwlat);
         nwCornerResource.addProperty(SCHEMA.LONGITUDE, nwlng);
-        boundingBoxResource.addProperty(WON.southEastCorner, seCornerResource);
+        boundingBoxResource.addProperty(WONCON.southEastCorner, seCornerResource);
         seCornerResource.addProperty(RDF.type, schema_GeoCoordinates);
         seCornerResource.addProperty(SCHEMA.LATITUDE, selat);
         seCornerResource.addProperty(SCHEMA.LONGITUDE, selng);
@@ -134,7 +135,7 @@ public class TransportOfferAtomGenerator {
         int numberOfTags = (int) (Math.random() * Math.abs(max - min + 1) + min);
         Collections.shuffle(Arrays.asList(tags));
         for (int j = 0; j < numberOfTags; j++) {
-            resource.addProperty(WON.tag, tags[j]);
+            resource.addProperty(WONCON.tag, tags[j]);
         }
         return resource;
     }

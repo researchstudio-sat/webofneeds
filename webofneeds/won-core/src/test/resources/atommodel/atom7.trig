@@ -11,6 +11,7 @@
 @prefix s:     <http://schema.org/> .
 @prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix won:   <https://w3id.org/won/core#> .
+@prefix match:   <https://w3id.org/won/matching#> .
 @prefix ldp:   <http://www.w3.org/ns/ldp#> .
 @prefix event: <https://node.matchat.org/won/resource/event/> .
 @prefix sioc:  <http://rdfs.org/sioc/ns#> .
@@ -20,13 +21,13 @@
 <https://node.matchat.org/won/resource/event/6899375303355711000#atom> {
     atom:3030440624813201400
             a                     won:Atom ;
-            won:matchingContext  "TU_Wien" ;
-            won:matchingContext  "Vienna" ;
-            won:matchingContext  "Ball" ;
+            match:matchingContext  "TU_Wien" ;
+            match:matchingContext  "Vienna" ;
+            match:matchingContext  "Ball" ;
             dc:title                "Ballkleid" ;
             won:socket          won:ChatSocket ;
-            won:flag           won:UsedForTesting ;
-            won:flag           won:NoHintForMe;
+            match:flag           match:UsedForTesting ;
+            match:flag           match:NoHintForMe;
             cert:key              [ cert:PublicKey  [ a                       woncrypt:ECCPublicKey ;
                                                       woncrypt:ecc_algorithm  "EC" ;
                                                       woncrypt:ecc_curveId    "secp384r1" ;

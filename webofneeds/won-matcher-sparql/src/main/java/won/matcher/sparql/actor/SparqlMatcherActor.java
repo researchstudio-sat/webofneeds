@@ -71,7 +71,7 @@ import won.matcher.sparql.config.SparqlMatcherConfig;
 import won.protocol.model.AtomState;
 import won.protocol.util.AtomModelWrapper;
 import won.protocol.util.linkeddata.LinkedDataSource;
-import won.protocol.vocabulary.WON;
+import won.protocol.vocabulary.WONMATCH;
 
 /**
  * Siren/Solr based abstract matcher with all implementations for querying as
@@ -417,10 +417,10 @@ public class SparqlMatcherActor extends UntypedActor {
             if (atom.getAtomUri().equals(foundAtom.getAtomUri())) {
                 return false;
             }
-            if (atom.flag(WON.NoHintForMe)) {
+            if (atom.flag(WONMATCH.NoHintForMe)) {
                 return false;
             }
-            if (foundAtom.flag(WON.NoHintForCounterpart)) {
+            if (foundAtom.flag(WONMATCH.NoHintForCounterpart)) {
                 return false;
             }
             Set<String> atomContexts = getMatchingContexts(atom);

@@ -77,6 +77,7 @@ import won.protocol.vocabulary.SCHEMA;
 import won.protocol.vocabulary.SFSIG;
 import won.protocol.vocabulary.WON;
 import won.protocol.vocabulary.WONAGR;
+import won.protocol.vocabulary.WONCON;
 import won.protocol.vocabulary.WONMOD;
 import won.protocol.vocabulary.WONMSG;
 
@@ -253,7 +254,7 @@ public class WonRdfUtils {
          */
         public static Model addMessage(Model model, String message) {
             Resource baseRes = RdfUtils.findOrCreateBaseResource(model);
-            baseRes.addProperty(WON.textMessage, message, XSDDatatype.XSDstring);
+            baseRes.addProperty(WONCON.text, message, XSDDatatype.XSDstring);
             return model;
         }
 
@@ -266,7 +267,7 @@ public class WonRdfUtils {
         public static Model textMessage(String message) {
             Model messageModel = createModelWithBaseResource();
             Resource baseRes = messageModel.createResource(messageModel.getNsPrefixURI(""));
-            baseRes.addProperty(WON.textMessage, message, XSDDatatype.XSDstring);
+            baseRes.addProperty(WONCON.text, message, XSDDatatype.XSDstring);
             return messageModel;
         }
 
@@ -407,9 +408,9 @@ public class WonRdfUtils {
             Model messageModel = createModelWithBaseResource();
             Resource baseRes = RdfUtils.getBaseResource(messageModel);
             Resource feedbackNode = messageModel.createResource();
-            baseRes.addProperty(WON.feedback, feedbackNode);
-            feedbackNode.addProperty(WON.binaryRating, isFeedbackPositive ? WON.Good : WON.Bad);
-            feedbackNode.addProperty(WON.forResource, messageModel.createResource(forResource.toString()));
+            baseRes.addProperty(WONCON.feedback, feedbackNode);
+            feedbackNode.addProperty(WONCON.binaryRating, isFeedbackPositive ? WONCON.Good : WONCON.Bad);
+            feedbackNode.addProperty(WONCON.feedbackTarget, messageModel.createResource(forResource.toString()));
             return messageModel;
         }
 
@@ -422,7 +423,7 @@ public class WonRdfUtils {
          */
         @Deprecated
         public static String getTextMessage(Model model) {
-            Statement stmt = model.getProperty(RdfUtils.getBaseResource(model), WON.textMessage);
+            Statement stmt = model.getProperty(RdfUtils.getBaseResource(model), WONCON.text);
             if (stmt != null) {
                 return stmt.getObject().asLiteral().getLexicalForm();
             }
@@ -438,7 +439,7 @@ public class WonRdfUtils {
          */
         public static Set<String> getTextMessages(Model model, URI messageUri) {
             Set<String> ret = new HashSet<>();
-            StmtIterator stmtIt = model.listStatements(model.getResource(messageUri.toString()), WON.textMessage,
+            StmtIterator stmtIt = model.listStatements(model.getResource(messageUri.toString()), WONCON.text,
                             (RDFNode) null);
             while (stmtIt.hasNext()) {
                 RDFNode node = stmtIt.next().getObject();
@@ -563,7 +564,7 @@ public class WonRdfUtils {
          */
         public static Model addProcessing(Model model, String message) {
             Resource baseRes = RdfUtils.findOrCreateBaseResource(model);
-            baseRes.addProperty(WON.isProcessing, message, XSDDatatype.XSDstring);
+            baseRes.addProperty(WONCON.isProcessing, message, XSDDatatype.XSDstring);
             return model;
         }
 
@@ -697,13 +698,13 @@ public class WonRdfUtils {
         private static RDFNode getTextMessageForResource(Dataset dataset, URI uri) {
             if (uri == null)
                 return null;
-            return RdfUtils.findFirstPropertyFromResource(dataset, uri, WON.textMessage);
+            return RdfUtils.findFirstPropertyFromResource(dataset, uri, WONCON.text);
         }
 
         private static RDFNode getTextMessageForResource(Dataset dataset, Resource resource) {
             if (resource == null)
                 return null;
-            return RdfUtils.findFirstPropertyFromResource(dataset, resource, WON.textMessage);
+            return RdfUtils.findFirstPropertyFromResource(dataset, resource, WONCON.text);
         }
 
         public static WonMessage copyByDatasetSerialization(final WonMessage toWrap) {

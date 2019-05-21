@@ -42,6 +42,7 @@ import won.matcher.solr.query.factory.WhatsAroundQueryFactory;
 import won.matcher.solr.query.factory.WhatsNewQueryFactory;
 import won.protocol.util.AtomModelWrapper;
 import won.protocol.vocabulary.WON;
+import won.protocol.vocabulary.WONMATCH;
 
 /**
  * Siren/Solr based abstract matcher with all implementations for querying as
@@ -108,7 +109,7 @@ public class SolrMatcherActor extends UntypedActor {
         // indexing
         Dataset dataset = atomEvent.deserializeAtomDataset();
         AtomModelWrapper atomModelWrapper = new AtomModelWrapper(dataset);
-        if (atomModelWrapper.flag(WON.NoHintForMe) && atomModelWrapper.flag(WON.NoHintForCounterpart)) {
+        if (atomModelWrapper.flag(WONMATCH.NoHintForMe) && atomModelWrapper.flag(WONMATCH.NoHintForCounterpart)) {
             log.info("Discarding received atom due to flags won:NoHintForMe and won:NoHintForCounterpart: {}",
                             atomEvent);
             return;
@@ -119,17 +120,17 @@ public class SolrMatcherActor extends UntypedActor {
             return;
         }
         // check if atom is usedForTesting only
-        boolean usedForTesting = atomModelWrapper.flag(WON.UsedForTesting);
+        boolean usedForTesting = atomModelWrapper.flag(WONMATCH.UsedForTesting);
         SolrMatcherQueryExecutor queryExecutor = (usedForTesting ? testQueryExecuter : defaultQueryExecuter);
         // create another query depending if the current atom is "WhatsAround" or a
         // default atom
         String queryString = null;
-        if (atomModelWrapper.flag(WON.WhatsAround)) {
+        if (atomModelWrapper.flag(WONMATCH.WhatsAround)) {
             // WhatsAround doesnt match on terms only other atoms in close location are
             // boosted
             WhatsAroundQueryFactory qf = new WhatsAroundQueryFactory(dataset);
             queryString = qf.createQuery();
-        } else if (atomModelWrapper.flag(WON.WhatsNew)) {
+        } else if (atomModelWrapper.flag(WONMATCH.WhatsNew)) {
             WhatsNewQueryFactory qf = new WhatsNewQueryFactory(dataset);
             queryString = qf.createQuery();
         } else {
@@ -159,7 +160,7 @@ public class SolrMatcherActor extends UntypedActor {
         if (atomModelWrapper.getMatchingContexts() != null && atomModelWrapper.getMatchingContexts().size() > 0) {
             filterQueries.add(new MatchingContextQueryFactory(atomModelWrapper.getMatchingContexts()).createQuery());
         }
-        if (!atomModelWrapper.flag(WON.NoHintForMe)) {
+        if (!atomModelWrapper.flag(WONMATCH.NoHintForMe)) {
             // execute the query
             log.info("query Solr endpoint {} for atom {} and atom list 1 (without NoHintForCounterpart)",
                             config.getSolrEndpointUri(usedForTesting), atomEvent.getUri());
@@ -168,9 +169,10 @@ public class SolrMatcherActor extends UntypedActor {
             if (docs != null) {
                 // perform knee detection depending on current atom is WhatsAround/WhatsNew or
                 // not)
-                boolean kneeDetection = atomModelWrapper.flag(WON.WhatsNew) || atomModelWrapper.flag(WON.WhatsAround)
-                                ? false
-                                : true;
+                boolean kneeDetection = atomModelWrapper.flag(WONMATCH.WhatsNew)
+                                || atomModelWrapper.flag(WONMATCH.WhatsAround)
+                                                ? false
+                                                : true;
                 // generate hints for current atom (only generate hints for current atom,
                 // suppress hints for matched atoms,
                 BulkHintEvent events = hintBuilder.generateHintsFromSearchResult(docs, atomEvent, atomModelWrapper,
@@ -200,7 +202,7 @@ public class SolrMatcherActor extends UntypedActor {
         if (atomModelWrapper.getMatchingContexts() != null && atomModelWrapper.getMatchingContexts().size() > 0) {
             filterQueries.add(new MatchingContextQueryFactory(atomModelWrapper.getMatchingContexts()).createQuery());
         }
-        if (!atomModelWrapper.flag(WON.NoHintForCounterpart)) {
+        if (!atomModelWrapper.flag(WONMATCH.NoHintForCounterpart)) {
             // execute the query
             log.info("query Solr endpoint {} for atom {} and atom list 2 (without NoHintForSelf, excluding WhatsAround atoms)",
                             config.getSolrEndpointUri(usedForTesting), atomEvent.getUri());
@@ -235,7 +237,7 @@ public class SolrMatcherActor extends UntypedActor {
         if (atomModelWrapper.getMatchingContexts() != null && atomModelWrapper.getMatchingContexts().size() > 0) {
             filterQueries.add(new MatchingContextQueryFactory(atomModelWrapper.getMatchingContexts()).createQuery());
         }
-        if (!atomModelWrapper.flag(WON.NoHintForCounterpart)) {
+        if (!atomModelWrapper.flag(WONMATCH.NoHintForCounterpart)) {
             // hints for WhatsAround Atoms should not have the keywords from title,
             // description, tags etc.
             // this can prevent to actually find WhatsAround atoms.

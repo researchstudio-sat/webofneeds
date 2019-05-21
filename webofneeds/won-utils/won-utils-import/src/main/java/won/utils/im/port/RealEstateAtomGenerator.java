@@ -26,6 +26,8 @@ import org.apache.jena.vocabulary.RDF;
 
 import won.protocol.vocabulary.SCHEMA;
 import won.protocol.vocabulary.WON;
+import won.protocol.vocabulary.WONCON;
+import won.protocol.vocabulary.WONMATCH;
 
 public class RealEstateAtomGenerator {
     static Model model = ModelFactory.createDefaultModel();
@@ -63,8 +65,8 @@ public class RealEstateAtomGenerator {
             atom = addFloorSize(atom, 0.8, 28, 250, atom);
             atom = addNumberOfRooms(atom, 0.8, 1, 9, atom);
             atom = addPriceSpecification(atom, 1.0, 250, 2200, atom);
-            atom.addProperty(WON.tag, "RentOutRealEstate");
-            seeksPart.addProperty(WON.tag, "SearchRealEstateToRent");
+            atom.addProperty(WONCON.tag, "RentOutRealEstate");
+            seeksPart.addProperty(WONCON.tag, "SearchRealEstateToRent");
             atom.addProperty(RDF.type, WON.Atom);
             /*
              * no sockets - they are added by the bot Resource won_ChatSocket =
@@ -78,7 +80,7 @@ public class RealEstateAtomGenerator {
              * chatSocket.getModel().getResource(SocketType.ChatSocket.getURI().toString()))
              * ; atom.addProperty(won_socket, chatSocket);
              */
-            atom.addProperty(WON.seeks, seeksPart);
+            atom.addProperty(WONMATCH.seeks, seeksPart);
             try {
                 FileOutputStream out = new FileOutputStream(
                                 new File(parentFolder, "real_estate_atom_" + rnd + ".trig"));
@@ -96,7 +98,7 @@ public class RealEstateAtomGenerator {
 
     private static Resource addQuery(Resource resource) throws Exception {
         String query = RealEstateAtomGenerator.getResourceAsString("realestate-offer-query-template.rq");
-        return resource.addLiteral(WON.sparqlQuery, query);
+        return resource.addLiteral(WONMATCH.sparqlQuery, query);
     }
 
     private static Resource addTitle(Resource resource, double probability, int counter) {
@@ -150,13 +152,13 @@ public class RealEstateAtomGenerator {
         geoResource.addProperty(SCHEMA.LONGITUDE, lng);
         // add bigdata specific value: "<subj> won:geoSpatial
         // "48.225073#16.358398"^^<http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon>"
-        geoResource.addProperty(WON.geoSpatial, lat + "#" + lng, bigdata_geoSpatialDatatype);
-        locationResource.addProperty(WON.boundingBox, boundingBoxResource);
-        boundingBoxResource.addProperty(WON.northWestCorner, nwCornerResource);
+        geoResource.addProperty(WONCON.geoSpatial, lat + "#" + lng, bigdata_geoSpatialDatatype);
+        locationResource.addProperty(WONCON.boundingBox, boundingBoxResource);
+        boundingBoxResource.addProperty(WONCON.northWestCorner, nwCornerResource);
         nwCornerResource.addProperty(RDF.type, schema_GeoCoordinates);
         nwCornerResource.addProperty(SCHEMA.LATITUDE, nwlat);
         nwCornerResource.addProperty(SCHEMA.LONGITUDE, nwlng);
-        boundingBoxResource.addProperty(WON.southEastCorner, seCornerResource);
+        boundingBoxResource.addProperty(WONCON.southEastCorner, seCornerResource);
         seCornerResource.addProperty(RDF.type, schema_GeoCoordinates);
         seCornerResource.addProperty(SCHEMA.LATITUDE, selat);
         seCornerResource.addProperty(SCHEMA.LONGITUDE, selng);
@@ -167,9 +169,9 @@ public class RealEstateAtomGenerator {
     }
 
     private static Resource replaceInQuery(Resource resource, String toReplace, String replacement) {
-        String query = resource.getRequiredProperty(WON.sparqlQuery).getString();
-        resource.removeAll(WON.sparqlQuery);
-        return resource.addProperty(WON.sparqlQuery, query.replaceAll(toReplace, replacement));
+        String query = resource.getRequiredProperty(WONMATCH.sparqlQuery).getString();
+        resource.removeAll(WONMATCH.sparqlQuery);
+        return resource.addProperty(WONMATCH.sparqlQuery, query.replaceAll(toReplace, replacement));
     }
 
     private static Resource addAmenities(Resource resource, double probability, int min, int max) {

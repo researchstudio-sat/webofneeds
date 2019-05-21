@@ -34,7 +34,8 @@ import won.protocol.util.DefaultAtomModelWrapper;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.SCHEMA;
-import won.protocol.vocabulary.WON;
+import won.protocol.vocabulary.WONCON;
+import won.protocol.vocabulary.WONMATCH;
 import won.protocol.vocabulary.WXCHAT;
 
 /**
@@ -175,13 +176,13 @@ public class CreateAtomFromJobAction extends AbstractCreateAtomAction {
             geoResource.addProperty(SCHEMA.LONGITUDE, lng);
             RDFDatatype bigdata_geoSpatialDatatype = new BaseDatatype(
                             "http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon");
-            geoResource.addProperty(WON.geoSpatial, lat + "#" + lng, bigdata_geoSpatialDatatype);
-            jobLocation.addProperty(WON.boundingBox, boundingBoxResource);
-            boundingBoxResource.addProperty(WON.northWestCorner, nwCornerResource);
+            geoResource.addProperty(WONCON.geoSpatial, lat + "#" + lng, bigdata_geoSpatialDatatype);
+            jobLocation.addProperty(WONCON.boundingBox, boundingBoxResource);
+            boundingBoxResource.addProperty(WONCON.northWestCorner, nwCornerResource);
             nwCornerResource.addProperty(RDF.type, SCHEMA.GEOCOORDINATES);
             nwCornerResource.addProperty(SCHEMA.LATITUDE, nwlat);
             nwCornerResource.addProperty(SCHEMA.LONGITUDE, nwlng);
-            boundingBoxResource.addProperty(WON.southEastCorner, seCornerResource);
+            boundingBoxResource.addProperty(WONCON.southEastCorner, seCornerResource);
             seCornerResource.addProperty(RDF.type, SCHEMA.GEOCOORDINATES);
             seCornerResource.addProperty(SCHEMA.LATITUDE, selat);
             seCornerResource.addProperty(SCHEMA.LONGITUDE, selng);
@@ -201,14 +202,14 @@ public class CreateAtomFromJobAction extends AbstractCreateAtomAction {
         }
         String[] tags = { "job", "hokify", "offer-job" };
         for (String tag : tags) {
-            atom.addProperty(WON.tag, tag);
+            atom.addProperty(WONCON.tag, tag);
         }
         seeksPart.addProperty(RDF.type, SCHEMA.PERSON);
-        seeksPart.addProperty(WON.seeks, SCHEMA.JOBPOSTING);
+        seeksPart.addProperty(WONMATCH.seeks, SCHEMA.JOBPOSTING);
         atomModelWrapper.addSocket("#ChatSocket", WXCHAT.ChatSocketString);
         atomModelWrapper.setDefaultSocket("#ChatSocket");
-        atomModelWrapper.addFlag(WON.NoHintForMe);
-        atom.addProperty(WON.seeks, seeksPart);
+        atomModelWrapper.addFlag(WONMATCH.NoHintForMe);
+        atom.addProperty(WONMATCH.seeks, seeksPart);
         return atomModelWrapper.copyDataset();
     }
 

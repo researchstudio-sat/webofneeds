@@ -23,7 +23,8 @@ import won.matcher.solr.config.SolrMatcherConfig;
 import won.matcher.solr.query.factory.MatchingContextQueryFactory;
 import won.matcher.solr.utils.Katomle;
 import won.protocol.util.AtomModelWrapper;
-import won.protocol.vocabulary.WON;
+import won.protocol.vocabulary.WONCON;
+import won.protocol.vocabulary.WONMATCH;
 
 /**
  * Created by hfriedrich on 02.08.2016.
@@ -104,8 +105,8 @@ public class HintBuilder {
         BulkHintEvent bulkHintEvent = new BulkHintEvent();
         log.info("Received {} matches as query result for atom {}, keeping the top {} ",
                         new Object[] { (docs != null) ? docs.size() : 0, atom, newDocs.size() });
-        boolean noHintForMe = atomModelWrapper.flag(WON.NoHintForMe);
-        boolean noHintForCounterpart = atomModelWrapper.flag(WON.NoHintForCounterpart);
+        boolean noHintForMe = atomModelWrapper.flag(WONMATCH.NoHintForMe);
+        boolean noHintForCounterpart = atomModelWrapper.flag(WONMATCH.NoHintForCounterpart);
         log.debug("atom to be matched has NoHintForMe: {}, NoHintForCounterpart: {} ", noHintForMe,
                         noHintForCounterpart);
         for (SolrDocument doc : newDocs) {
@@ -120,8 +121,8 @@ public class HintBuilder {
                 continue;
             }
             List<String> flags = getValueList(doc, HAS_FLAG_SOLR_FIELD);
-            boolean matchedAtomNoHintForMe = flags.contains(WON.NoHintForMe.toString());
-            boolean matchedAtomNoHintForCounterpart = flags.contains(WON.NoHintForCounterpart.toString());
+            boolean matchedAtomNoHintForMe = flags.contains(WONMATCH.NoHintForMe.toString());
+            boolean matchedAtomNoHintForCounterpart = flags.contains(WONMATCH.NoHintForCounterpart.toString());
             // check the matching contexts of the two atoms that are supposed to be matched
             // send only hints to atoms if their matching contexts overlap (if one atom has
             // empty matching context it always receives hints)

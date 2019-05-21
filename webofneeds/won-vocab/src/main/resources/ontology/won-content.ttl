@@ -6,6 +6,8 @@
 @prefix xml: <http://www.w3.org/XML/1998/namespace> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix bd: <http://www.bigdata.com/rdf/geospatial/literals/v1#> .
+@prefix schema: <http://schema.org/> .
 @base <https://w3id.org/won/content> .
 
 <https://w3id.org/won/content> rdf:type owl:Ontology ;
@@ -43,8 +45,51 @@
 
 
 #################################################################
+#    Datatypes
+#################################################################
+
+bd:lat-lon  a rdfs:Datatype .
+
+#################################################################
 #    Object Properties
 #################################################################
+
+###  https://w3id.org/won/content#binaryRating
+:binaryRating rdf:type owl:ObjectProperty ;
+              rdfs:domain :Feedback ;
+              rdfs:range :BinaryRating ;
+              rdfs:comment "Specifies a binary rating for a Feedback"@en ;
+              rdfs:label "binaryRating" .
+
+
+###  https://w3id.org/won/content#boundingBox
+:boundingBox rdf:type owl:ObjectProperty ;
+             rdfs:domain schema:Place ;
+             rdfs:range :BoundingBox ;
+             rdfs:comment "Specifies a bounding box for a schema:Place"@en ;
+             rdfs:label "boundingBox" .
+
+
+###  https://w3id.org/won/content#feedback
+:feedback rdf:type owl:ObjectProperty ;
+          rdfs:domain msg:Message ;
+          rdfs:range :Feedback ;
+          rdfs:comment "Adds feedback to a message."@en ;
+          rdfs:label "feedback" .
+
+
+###  https://w3id.org/won/content#feedbackTarget
+:feedbackTarget rdf:type owl:ObjectProperty ;
+                rdfs:domain :Feedback ;
+                rdfs:range [ rdf:type owl:Class ;
+                             owl:unionOf ( won:Atom
+                                           won:Connection
+                                         )
+                           ] ;
+                rdfs:comment "Links a Feedback to its target."@en ;
+                rdfs:label "feedbackFor" .
+
+
 
 ###  https://w3id.org/won/content#inResponseTo
 :inResponseTo rdf:type owl:ObjectProperty ;
@@ -54,9 +99,25 @@
               rdfs:label "inResponseTo" .
 
 
+###  https://w3id.org/won/content#northWestCorner
+:northWestCorner rdf:type owl:ObjectProperty ;
+                 rdfs:domain :BoundingBox ;
+                 rdfs:range schema:GeoCoordinates ;
+                 rdfs:comment "The northwest corner of the bounding box"@en ;
+                 rdfs:label "northWestCorner" .
+
+
+###  https://w3id.org/won/content#southEastCorner
+:southEastCorner rdf:type owl:ObjectProperty ;
+                 rdfs:domain :BoundingBox ;
+                 rdfs:range schema:GeoCoordinates ;
+                 rdfs:comment "The southeast corner of the bounding box"@en ;
+                 rdfs:label "southEastCorner" .
+
+
 ###  https://w3id.org/won/content#suggestedAtom
 :suggestedAtom rdf:type owl:ObjectProperty ;
-               rdfs:domain msg:Message;
+               rdfs:domain msg:Message ;
                rdfs:range won:Atom ;
                rdfs:comment "Suggests to the recipient of the message to connect to the Atom linked to with this property."@en ;
                rdfs:label "suggestedAtom" .
@@ -65,8 +126,8 @@
 ###  https://w3id.org/won/content#travelAction
 :travelAction rdf:type owl:ObjectProperty ;
               rdfs:domain won:Atom ;
+              rdfs:range schema:TravelAction ;
               rdfs:comment "Links the Atom to a schema:TravelAction, indicating that this action is what is being offered/suggested."@en ;
-			  rdfs:range <http://schema.org/TravelAction>;
               rdfs:label "travelAction" .
 
 
@@ -98,6 +159,12 @@
       rdfs:label "file" .
 
 
+###  https://w3id.org/won/content#geoSpatial
+:geoSpatial rdf:type owl:DatatypeProperty ;
+            rdfs:range bd:lat-lon ;
+			rdfs:comment "The geolocation of the object in one value in the format `{latitude}#{longitude}^^http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon` - used for geospatial search in bigdata/blazegraph"@en ;
+            rdfs:label "geoSpatial" .
+
 ###  https://w3id.org/won/content#image
 :image rdf:type owl:DatatypeProperty ;
        rdfs:domain [ rdf:type owl:Class ;
@@ -110,6 +177,14 @@
        rdfs:label "image" .
 
 
+###  https://w3id.org/won/content#isProcessing
+:isProcessing rdf:type owl:DatatypeProperty ;
+              rdfs:domain msg:Message ;
+              rdfs:range xsd:boolean ;
+              rdfs:comment "Set on a Message sent to or by a bot to prevent it from re-evaluating its goals in reaction to the message."@en ;
+              rdfs:label "isProcessing" .
+
+
 ###  https://w3id.org/won/content#petriNet
 :petriNet rdf:type owl:DatatypeProperty ;
           rdfs:domain [ rdf:type owl:Class ;
@@ -120,6 +195,7 @@
           rdfs:range xsd:base64Binary ;
           rdfs:comment "The base64 serialization of  the XML file exported from PIPE (https://github.com/sarahtattersall/PIPE)"@en ;
           rdfs:label "petriNet" .
+
 
 ###  https://w3id.org/won/content#tag
 :tag rdf:type owl:DatatypeProperty ;
@@ -141,12 +217,45 @@
 #    Classes
 #################################################################
 
+###  http://schema.org/GeoCoordinates
+schema:GeoCoordinates rdf:type owl:Class .
+
+
+###  http://schema.org/Place
+schema:Place rdf:type owl:Class .
+
+
+###  http://schema.org/TravelAction
+schema:TravelAction rdf:type owl:Class .
+
+
+###  http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon
+<http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon> rdf:type owl:Class .
+
+
+###  https://w3id.org/won/content#BinaryRating
+:BinaryRating rdf:type owl:Class ;
+              rdfs:comment "Binary rating values."@en ;
+              rdfs:label "BinaryRating" .
+
+
+###  https://w3id.org/won/content#BoundingBox
+:BoundingBox rdf:type owl:Class ;
+             rdfs:comment "The bounding box around a location, used for calculating the map viewport when displaying it."@en ;
+             rdfs:label "BoundingBox" .
+
 
 ###  https://w3id.org/won/content#DirectResponse
 :DirectResponse rdf:type owl:Class ;
                 rdfs:subClassOf won:Atom ;
                 rdfs:comment "An Atom of this class indicates that it was created for directly responding to another Atom."@en ;
                 rdfs:label "DirectResponse" .
+
+
+###  https://w3id.org/won/content#Feedback
+:Feedback rdf:type owl:Class ;
+          rdfs:comment "Feedback for an Atom or Connection"@en ;
+          rdfs:label "Feedback" .
 
 
 ###  https://w3id.org/won/content#ServiceBot
@@ -156,6 +265,31 @@
             rdfs:label "ServiceBot" .
 
 
+###  https://w3id.org/won/message#Message
+msg:Message rdf:type owl:Class .
+
+
+#################################################################
+#    Individuals
+#################################################################
+
+###  https://w3id.org/won/content#Bad
+:Bad rdf:type owl:NamedIndividual ,
+              :BinaryRating ;
+     rdfs:comment "A bad rating" ;
+     rdfs:label "Bad" .
+
+
+###  https://w3id.org/won/content#Good
+:Good rdf:type owl:NamedIndividual ,
+               :BinaryRating ;
+      rdfs:comment "A good rating" ;
+      rdfs:label "Good" .
+
+
+#################################################################
+#    Annotations
+#################################################################
 
 
 
