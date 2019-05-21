@@ -16,7 +16,7 @@
                                 <http://purl.org/dc/elements/1.1/created> "2019-05-14"^^xsd:date ;
                                 <http://purl.org/dc/elements/1.1/title> "Web of Needs Content Ontology"@en ;
                                 <http://purl.org/dc/terms/license> "https://creativecommons.org/licenses/by/4.0/"^^xsd:string ;
-                                <http://purl.org/vocab/vann/preferredNamespacePrefix> "wcnt"^^xsd:string .
+                                <http://purl.org/vocab/vann/preferredNamespacePrefix> "con"^^xsd:string .
 
 #################################################################
 #    Annotation properties

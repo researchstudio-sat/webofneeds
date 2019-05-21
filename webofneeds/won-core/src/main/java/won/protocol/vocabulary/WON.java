@@ -48,16 +48,7 @@ public class WON {
     public static final Property atomState = m.createProperty(BASE_URI, "atomState");
     public static final Property contentGraph = m.createProperty(BASE_URI, "contentGraph");
     public static final Property derivedGraph = m.createProperty(BASE_URI, "derivedGraph");
-    public static final Property textMessage = m.createProperty(BASE_URI + "textMessage");
     public static final Property isProcessing = m.createProperty(BASE_URI + "isProcessing");
-    public static final Resource Message = m.createResource(BASE_URI + "Message");
-    public static final Property feedback = m.createProperty(BASE_URI, "feedback");
-    public static final Property feedbackEvent = m.createProperty(BASE_URI, "feedbackEvent");
-    // used to express which URI the feedback relates to
-    public static final Property forResource = m.createProperty(BASE_URI, "forResource");
-    public static final Property binaryRating = m.createProperty(BASE_URI, "binaryRating");
-    public static final Resource Good = m.createResource(BASE_URI + "Good");
-    public static final Resource Bad = m.createResource(BASE_URI + "Bad");
     public static final Property tag = m.createProperty(BASE_URI, "tag");
     public static final Property attachedMedia = m.createProperty(BASE_URI, "attachedMedia");
     public static final Property height = m.createProperty(BASE_URI, "height");
@@ -65,7 +56,7 @@ public class WON {
     public static final Property width = m.createProperty(BASE_URI, "width");
     public static final Property weight = m.createProperty(BASE_URI, "weight");
     public static final Property quantitativeProperty = m.createProperty(BASE_URI, "quantitativeProperty");
-    public static final Property travelAction = m.createProperty("https://w3id.org/won/core#travelAction");
+    
     public static final Property socket = m.createProperty(BASE_URI, "socket");
     public static final Property defaultSocket = m.createProperty(BASE_URI, "defaultSocket");
     public static final Resource Socket = m.createResource(BASE_URI + "Socket");
