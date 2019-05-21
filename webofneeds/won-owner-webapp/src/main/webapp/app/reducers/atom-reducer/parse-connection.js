@@ -8,8 +8,6 @@ export function parseConnection(jsonldConnection) {
 
   let parsedConnection = {
     belongsToUri: jsonldConnectionImm.get("sourceAtom"),
-    socketUri: jsonldConnectionImm.get("socket"), //TODO: REMOVE THIS AFTER REFACTORING
-    targetSocketUri: jsonldConnectionImm.get("targetSocket"), //TODO: REMOVE THIS AFTER REFACTORING
     data: {
       uri: jsonldConnectionImm.get("uri"),
       state: jsonldConnectionImm.get("connectionState"),
@@ -17,7 +15,7 @@ export function parseConnection(jsonldConnection) {
       socketUri: jsonldConnectionImm.get("socket"),
       targetSocketUri: jsonldConnectionImm.get("targetSocket"),
       socket: undefined, //will be determined by the reduce-connections //TODO: REMOVE THIS AFTER REFACTORING
-      targetSocket: undefined, //will be determined by the reduce-connections
+      targetSocket: undefined, //will be determined by the reduce-connections //TODO: REMOVE THIS AFTER REFACTORING
       agreementData: {
         agreementUris: Immutable.Set(),
         pendingProposalUris: Immutable.Set(),
