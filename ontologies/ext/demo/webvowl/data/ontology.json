@@ -1,0 +1,409 @@
+{
+  "_comment" : "Created with OWL2VOWL (version 0.3.5), http://vowl.visualdataweb.org",
+  "header" : {
+    "languages" : [ "en", "undefined" ],
+    "baseIris" : [ "http://www.w3.org/1999/02/22-rdf-syntax-ns", "http://www.w3.org/2000/01/rdf-schema", "http://www.w3.org/2001/XMLSchema", "https://w3id.org/won/ext/demo" ],
+    "title" : {
+      "undefined" : "Web of Needs Demo Extension"
+    },
+    "iri" : "https://w3id.org/won/ext/demo",
+    "author" : [ "Florian Kleedorfer" ],
+    "other" : {
+      "license" : [ {
+        "identifier" : "license",
+        "language" : "undefined",
+        "value" : "https://creativecommons.org/licenses/by/4.0/",
+        "type" : "iri"
+      } ],
+      "creator" : [ {
+        "identifier" : "creator",
+        "language" : "undefined",
+        "value" : "Florian Kleedorfer",
+        "type" : "label"
+      } ],
+      "created" : [ {
+        "identifier" : "created",
+        "language" : "undefined",
+        "value" : "2019-05-20",
+        "type" : "label"
+      } ],
+      "preferredNamespacePrefix" : [ {
+        "identifier" : "preferredNamespacePrefix",
+        "language" : "undefined",
+        "value" : "demo",
+        "type" : "label"
+      } ],
+      "abstract" : [ {
+        "identifier" : "abstract",
+        "language" : "en",
+        "value" : "Extension that provides a vocabulary for the Web of Needs Demo on https://matchat.org/. This ontology provides a sandbox environment for experimenting with different approaches for modeling a domain quickly. More mature models will be moved to independent extensions, which are expected to be more stable.",
+        "type" : "label"
+      } ],
+      "title" : [ {
+        "identifier" : "title",
+        "language" : "undefined",
+        "value" : "Web of Needs Demo Extension",
+        "type" : "label"
+      } ]
+    }
+  },
+  "namespace" : [ ],
+  "class" : [ {
+    "id" : "0",
+    "type" : "owl:Class"
+  }, {
+    "id" : "1",
+    "type" : "owl:Class"
+  }, {
+    "id" : "2",
+    "type" : "owl:Class"
+  }, {
+    "id" : "3",
+    "type" : "owl:Class"
+  }, {
+    "id" : "4",
+    "type" : "owl:Class"
+  }, {
+    "id" : "5",
+    "type" : "owl:Class"
+  }, {
+    "id" : "9",
+    "type" : "owl:Class"
+  }, {
+    "id" : "10",
+    "type" : "owl:Class"
+  }, {
+    "id" : "11",
+    "type" : "rdfs:Datatype"
+  }, {
+    "id" : "12",
+    "type" : "owl:Class"
+  }, {
+    "id" : "8",
+    "type" : "rdfs:Datatype"
+  }, {
+    "id" : "14",
+    "type" : "owl:Class"
+  }, {
+    "id" : "15",
+    "type" : "owl:Class"
+  }, {
+    "id" : "16",
+    "type" : "owl:Class"
+  }, {
+    "id" : "17",
+    "type" : "owl:Class"
+  }, {
+    "id" : "18",
+    "type" : "owl:Class"
+  }, {
+    "id" : "19",
+    "type" : "owl:Class"
+  }, {
+    "id" : "20",
+    "type" : "owl:Class"
+  }, {
+    "id" : "7",
+    "type" : "owl:Class"
+  }, {
+    "id" : "21",
+    "type" : "owl:Class"
+  }, {
+    "id" : "22",
+    "type" : "owl:Class"
+  }, {
+    "id" : "23",
+    "type" : "owl:Class"
+  } ],
+  "classAttribute" : [ {
+    "iri" : "https://w3id.org/won/ext/demo#ConsortiumOffer",
+    "baseIri" : "https://w3id.org/won/ext/demo",
+    "instances" : 0,
+    "label" : {
+      "IRI-based" : "ConsortiumOffer",
+      "undefined" : "ConsortiumOffer"
+    },
+    "comment" : {
+      "en" : "Offer to join a consortium."
+    },
+    "id" : "0"
+  }, {
+    "iri" : "https://w3id.org/won/ext/demo#PersonalTransportSearch",
+    "baseIri" : "https://w3id.org/won/ext/demo",
+    "instances" : 0,
+    "label" : {
+      "IRI-based" : "PersonalTransportSearch",
+      "undefined" : "PersonalTransportSearch"
+    },
+    "comment" : {
+      "en" : "Search for a people transport, for example, a taxi ride."
+    },
+    "id" : "1"
+  }, {
+    "iri" : "https://w3id.org/won/ext/demo#RehearsalRoomRentOffer",
+    "baseIri" : "https://w3id.org/won/ext/demo",
+    "instances" : 0,
+    "label" : {
+      "IRI-based" : "RehearsalRoomRentOffer",
+      "undefined" : "RehearsalRoomRentOffer"
+    },
+    "comment" : {
+      "en" : "Offer to rent out a rehearsal room for music bands."
+    },
+    "id" : "2"
+  }, {
+    "iri" : "https://w3id.org/won/ext/demo#PaymentServiceRequest",
+    "baseIri" : "https://w3id.org/won/ext/demo",
+    "instances" : 0,
+    "label" : {
+      "IRI-based" : "PaymentServiceRequest",
+      "undefined" : "PaymentServiceRequest"
+    },
+    "comment" : {
+      "en" : "Demand for a payment service."
+    },
+    "id" : "3"
+  }, {
+    "iri" : "https://w3id.org/won/ext/demo#AfterParty",
+    "baseIri" : "https://w3id.org/won/ext/demo",
+    "instances" : 0,
+    "label" : {
+      "IRI-based" : "AfterParty",
+      "undefined" : "AfterParty"
+    },
+    "comment" : {
+      "en" : "Class for describing parties after some event."
+    },
+    "id" : "4"
+  }, {
+    "iri" : "https://w3id.org/won/ext/demo#PostDocSearch",
+    "baseIri" : "https://w3id.org/won/ext/demo",
+    "instances" : 0,
+    "label" : {
+      "IRI-based" : "PostDocSearch",
+      "undefined" : "PostDocSearch"
+    },
+    "comment" : {
+      "en" : "Search for a PostDoc position"
+    },
+    "id" : "5"
+  }, {
+    "iri" : "https://w3id.org/won/ext/demo#Breakfast",
+    "baseIri" : "https://w3id.org/won/ext/demo",
+    "instances" : 0,
+    "label" : {
+      "IRI-based" : "Breakfast",
+      "undefined" : "Breakfast"
+    },
+    "comment" : {
+      "en" : "Class for descrbing breakfasts, for example for early morning meetings."
+    },
+    "id" : "9"
+  }, {
+    "iri" : "https://w3id.org/won/ext/demo#Meetup",
+    "baseIri" : "https://w3id.org/won/ext/demo",
+    "instances" : 0,
+    "label" : {
+      "IRI-based" : "Meetup",
+      "undefined" : "Meetup"
+    },
+    "comment" : {
+      "en" : "Class for meetups."
+    },
+    "id" : "10"
+  }, {
+    "iri" : "http://www.w3.org/2001/XMLSchema#string",
+    "baseIri" : "http://www.w3.org/2001/XMLSchema",
+    "id" : "11",
+    "label" : {
+      "IRI-based" : "string"
+    }
+  }, {
+    "iri" : "https://w3id.org/won/ext/demo#Complaint",
+    "baseIri" : "https://w3id.org/won/ext/demo",
+    "instances" : 0,
+    "label" : {
+      "IRI-based" : "Complaint",
+      "undefined" : "Complaint"
+    },
+    "comment" : {
+      "en" : "Class of complaints about something. Similar complaints may be matched with each other, or with a group concerned with the topic of the complaint."
+    },
+    "id" : "12"
+  }, {
+    "iri" : "http://www.w3.org/2001/XMLSchema#string",
+    "baseIri" : "http://www.w3.org/2001/XMLSchema",
+    "id" : "8",
+    "label" : {
+      "IRI-based" : "string"
+    }
+  }, {
+    "iri" : "https://w3id.org/won/ext/demo#Interest",
+    "baseIri" : "https://w3id.org/won/ext/demo",
+    "instances" : 0,
+    "label" : {
+      "IRI-based" : "Interest",
+      "undefined" : "Interest"
+    },
+    "comment" : {
+      "en" : "Announce an interest in something, such as a hobby."
+    },
+    "id" : "14"
+  }, {
+    "iri" : "https://w3id.org/won/ext/demo#PostDocPosition",
+    "baseIri" : "https://w3id.org/won/ext/demo",
+    "instances" : 0,
+    "label" : {
+      "IRI-based" : "PostDocPosition",
+      "undefined" : "PostDocPosition"
+    },
+    "comment" : {
+      "en" : "Offering of a PostDoc position."
+    },
+    "id" : "15"
+  }, {
+    "iri" : "https://w3id.org/won/ext/demo#SightSeeing",
+    "baseIri" : "https://w3id.org/won/ext/demo",
+    "instances" : 0,
+    "label" : {
+      "IRI-based" : "SightSeeing",
+      "undefined" : "SightSeeing"
+    },
+    "comment" : {
+      "en" : "Sightseeing tour/trip."
+    },
+    "id" : "16"
+  }, {
+    "iri" : "https://w3id.org/won/ext/demo#HandleComplaint",
+    "baseIri" : "https://w3id.org/won/ext/demo",
+    "instances" : 0,
+    "label" : {
+      "IRI-based" : "HandleComplaint",
+      "undefined" : "HandleComplaint"
+    },
+    "comment" : {
+      "en" : "Intention to handle complaints. May be matched with complaints or related groups."
+    },
+    "id" : "17"
+  }, {
+    "iri" : "https://w3id.org/won/ext/demo#PhdPositionSearch",
+    "baseIri" : "https://w3id.org/won/ext/demo",
+    "instances" : 0,
+    "label" : {
+      "IRI-based" : "PhdPositionSearch",
+      "undefined" : "PhdPositionSearch"
+    },
+    "comment" : {
+      "en" : "Search for a PhD position."
+    },
+    "id" : "18"
+  }, {
+    "iri" : "https://w3id.org/won/ext/demo#RealEstateRentOffer",
+    "baseIri" : "https://w3id.org/won/ext/demo",
+    "instances" : 0,
+    "label" : {
+      "IRI-based" : "RealEstateRentOffer",
+      "undefined" : "RealEstateRentOffer"
+    },
+    "comment" : {
+      "en" : "Offer to rent out real estate."
+    },
+    "id" : "19"
+  }, {
+    "iri" : "https://w3id.org/won/ext/demo#RehearsalRoomRentDemand",
+    "baseIri" : "https://w3id.org/won/ext/demo",
+    "instances" : 0,
+    "label" : {
+      "IRI-based" : "RehearsalRoomRentDemand",
+      "undefined" : "RehearsalRoomRentDemand"
+    },
+    "comment" : {
+      "en" : "Demand to rent a rehearsal room for music bands."
+    },
+    "id" : "20"
+  }, {
+    "iri" : "https://w3id.org/won/ext/demo#Musician",
+    "baseIri" : "https://w3id.org/won/ext/demo",
+    "instances" : 0,
+    "label" : {
+      "IRI-based" : "Musician",
+      "undefined" : "Musician"
+    },
+    "comment" : {
+      "en" : "Class for musicians, to be matched with searches for musicians."
+    },
+    "id" : "7"
+  }, {
+    "iri" : "https://w3id.org/won/ext/demo#RealEstateRentDemand",
+    "baseIri" : "https://w3id.org/won/ext/demo",
+    "instances" : 0,
+    "label" : {
+      "IRI-based" : "RealEstateRentDemand",
+      "undefined" : "RealEstateRentDemand"
+    },
+    "comment" : {
+      "en" : "Demand for renting real estate."
+    },
+    "id" : "21"
+  }, {
+    "iri" : "https://w3id.org/won/ext/demo#PhdPosition",
+    "baseIri" : "https://w3id.org/won/ext/demo",
+    "instances" : 0,
+    "label" : {
+      "IRI-based" : "PhdPosition",
+      "undefined" : "PhdPosition"
+    },
+    "comment" : {
+      "en" : "Offering of a PhD position."
+    },
+    "id" : "22"
+  }, {
+    "iri" : "https://w3id.org/won/ext/demo#ConsortiumSearch",
+    "baseIri" : "https://w3id.org/won/ext/demo",
+    "instances" : 0,
+    "label" : {
+      "IRI-based" : "ConsortiumSearch",
+      "undefined" : "ConsortiumSearch"
+    },
+    "comment" : {
+      "en" : "Interest in joining a consortium."
+    },
+    "id" : "23"
+  } ],
+  "property" : [ {
+    "id" : "6",
+    "type" : "owl:datatypeProperty"
+  }, {
+    "id" : "13",
+    "type" : "owl:datatypeProperty"
+  } ],
+  "propertyAttribute" : [ {
+    "iri" : "https://w3id.org/won/ext/demo#instrument",
+    "baseIri" : "https://w3id.org/won/ext/demo",
+    "range" : "8",
+    "label" : {
+      "IRI-based" : "instrument",
+      "undefined" : "instrument"
+    },
+    "domain" : "7",
+    "comment" : {
+      "en" : "instrument comment"
+    },
+    "attributes" : [ "datatype" ],
+    "id" : "6"
+  }, {
+    "iri" : "https://w3id.org/won/ext/demo#genre",
+    "baseIri" : "https://w3id.org/won/ext/demo",
+    "range" : "11",
+    "label" : {
+      "IRI-based" : "genre",
+      "undefined" : "genre"
+    },
+    "domain" : "7",
+    "comment" : {
+      "en" : "genre comment"
+    },
+    "attributes" : [ "datatype" ],
+    "id" : "13"
+  } ]
+}

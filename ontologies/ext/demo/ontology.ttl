@@ -1,0 +1,198 @@
+@prefix : <https://w3id.org/won/ext/demo#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@base <https://w3id.org/won/ext/demo> .
+
+<https://w3id.org/won/ext/demo> rdf:type owl:Ontology ;
+                                 owl:versionIRI <https://w3id.org/won/ext/demo/1.0> ;
+                                 <http://purl.org/dc/elements/1.1/abstract> "Extension that provides a vocabulary for the Web of Needs Demo on https://matchat.org/. This ontology provides a sandbox environment for experimenting with different approaches for modeling a domain quickly. More mature models will be moved to independent extensions, which are expected to be more stable."@en ;
+                                 <http://purl.org/dc/elements/1.1/creator> "Florian Kleedorfer" ;
+                                 <http://purl.org/dc/elements/1.1/title> "Web of Needs Demo Extension" ;
+                                 <http://purl.org/dc/terms/created> "2019-05-20"^^xsd:date ;
+                                 <http://purl.org/dc/terms/license> <https://creativecommons.org/licenses/by/4.0/> ;
+                                 <http://purl.org/vocab/vann/preferredNamespacePrefix> "demo" .
+
+#################################################################
+#    Annotation properties
+#################################################################
+
+###  http://purl.org/dc/elements/1.1/abstract
+<http://purl.org/dc/elements/1.1/abstract> rdf:type owl:AnnotationProperty .
+
+
+###  http://purl.org/dc/elements/1.1/creator
+<http://purl.org/dc/elements/1.1/creator> rdf:type owl:AnnotationProperty .
+
+
+###  http://purl.org/dc/elements/1.1/date
+<http://purl.org/dc/elements/1.1/date> rdf:type owl:AnnotationProperty .
+
+
+###  http://purl.org/dc/elements/1.1/description
+<http://purl.org/dc/elements/1.1/description> rdf:type owl:AnnotationProperty .
+
+
+###  http://purl.org/dc/elements/1.1/title
+<http://purl.org/dc/elements/1.1/title> rdf:type owl:AnnotationProperty .
+
+
+###  http://purl.org/dc/terms/created
+<http://purl.org/dc/terms/created> rdf:type owl:AnnotationProperty .
+
+
+###  http://purl.org/dc/terms/license
+<http://purl.org/dc/terms/license> rdf:type owl:AnnotationProperty .
+
+
+###  http://purl.org/vocab/vann/preferredNamespacePrefix
+<http://purl.org/vocab/vann/preferredNamespacePrefix> rdf:type owl:AnnotationProperty .
+
+
+#################################################################
+#    Data properties
+#################################################################
+
+###  https://w3id.org/won/ext/demo#genre
+:genre rdf:type owl:DatatypeProperty ;
+       rdfs:domain :Musician ;
+       rdfs:range xsd:string ;
+       rdfs:comment "genre comment"@en ;
+       rdfs:label "genre" .
+
+
+###  https://w3id.org/won/ext/demo#instrument
+:instrument rdf:type owl:DatatypeProperty ;
+            rdfs:domain :Musician ;
+            rdfs:range xsd:string ;
+            rdfs:comment "instrument comment"@en ;
+            rdfs:label "instrument" .
+
+
+#################################################################
+#    Classes
+#################################################################
+
+###  https://w3id.org/won/ext/demo#AfterParty
+:AfterParty rdf:type owl:Class ;
+            rdfs:comment "Class for describing parties after some event."@en ;
+            rdfs:label "AfterParty" .
+
+
+###  https://w3id.org/won/ext/demo#Breakfast
+:Breakfast rdf:type owl:Class ;
+           rdfs:comment "Class for descrbing breakfasts, for example for early morning meetings."@en ;
+           rdfs:label "Breakfast" .
+
+
+###  https://w3id.org/won/ext/demo#Complaint
+:Complaint rdf:type owl:Class ;
+           rdfs:comment "Class of complaints about something. Similar complaints may be matched with each other, or with a group concerned with the topic of the complaint."@en ;
+           rdfs:label "Complaint" .
+
+
+###  https://w3id.org/won/ext/demo#ConsortiumOffer
+:ConsortiumOffer rdf:type owl:Class ;
+                 rdfs:comment "Offer to join a consortium."@en ;
+                 rdfs:label "ConsortiumOffer" .
+
+
+###  https://w3id.org/won/ext/demo#ConsortiumSearch
+:ConsortiumSearch rdf:type owl:Class ;
+                  rdfs:comment "Interest in joining a consortium."@en ;
+                  rdfs:label "ConsortiumSearch" .
+
+
+###  https://w3id.org/won/ext/demo#HandleComplaint
+:HandleComplaint rdf:type owl:Class ;
+                 rdfs:comment "Intention to handle complaints. May be matched with complaints or related groups."@en ;
+                 rdfs:label "HandleComplaint" .
+
+
+###  https://w3id.org/won/ext/demo#Interest
+:Interest rdf:type owl:Class ;
+          rdfs:comment "Announce an interest in something, such as a hobby."@en ;
+          rdfs:label "Interest" .
+
+
+###  https://w3id.org/won/ext/demo#Meetup
+:Meetup rdf:type owl:Class ;
+        rdfs:comment "Class for meetups."@en ;
+        rdfs:label "Meetup" .
+
+
+###  https://w3id.org/won/ext/demo#Musician
+:Musician rdf:type owl:Class ;
+          rdfs:comment "Class for musicians, to be matched with searches for musicians."@en ;
+          rdfs:label "Musician" .
+
+
+###  https://w3id.org/won/ext/demo#PaymentServiceRequest
+:PaymentServiceRequest rdf:type owl:Class ;
+                       rdfs:comment "Demand for a payment service."@en ;
+                       rdfs:label "PaymentServiceRequest" .
+
+
+###  https://w3id.org/won/ext/demo#PersonalTransportSearch
+:PersonalTransportSearch rdf:type owl:Class ;
+                         rdfs:comment "Search for a people transport, for example, a taxi ride."@en ;
+                         rdfs:label "PersonalTransportSearch" .
+
+
+###  https://w3id.org/won/ext/demo#PhdPosition
+:PhdPosition rdf:type owl:Class ;
+             rdfs:comment "Offering of a PhD position."@en ;
+             rdfs:label "PhdPosition" .
+
+
+###  https://w3id.org/won/ext/demo#PhdPositionSearch
+:PhdPositionSearch rdf:type owl:Class ;
+                   rdfs:comment "Search for a PhD position."@en ;
+                   rdfs:label "PhdPositionSearch" .
+
+
+###  https://w3id.org/won/ext/demo#PostDocPosition
+:PostDocPosition rdf:type owl:Class ;
+                 rdfs:comment "Offering of a PostDoc position."@en ;
+                 rdfs:label "PostDocPosition" .
+
+
+###  https://w3id.org/won/ext/demo#PostDocSearch
+:PostDocSearch rdf:type owl:Class ;
+               rdfs:comment "Search for a PostDoc position"@en ;
+               rdfs:label "PostDocSearch" .
+
+
+###  https://w3id.org/won/ext/demo#RealEstateRentDemand
+:RealEstateRentDemand rdf:type owl:Class ;
+                      rdfs:comment "Demand for renting real estate."@en ;
+                      rdfs:label "RealEstateRentDemand" .
+
+
+###  https://w3id.org/won/ext/demo#RealEstateRentOffer
+:RealEstateRentOffer rdf:type owl:Class ;
+                     rdfs:comment "Offer to rent out real estate."@en ;
+                     rdfs:label "RealEstateRentOffer" .
+
+
+###  https://w3id.org/won/ext/demo#RehearsalRoomRentDemand
+:RehearsalRoomRentDemand rdf:type owl:Class ;
+                         rdfs:comment "Demand to rent a rehearsal room for music bands."@en ;
+                         rdfs:label "RehearsalRoomRentDemand" .
+
+
+###  https://w3id.org/won/ext/demo#RehearsalRoomRentOffer
+:RehearsalRoomRentOffer rdf:type owl:Class ;
+                        rdfs:comment "Offer to rent out a rehearsal room for music bands."@en ;
+                        rdfs:label "RehearsalRoomRentOffer" .
+
+
+###  https://w3id.org/won/ext/demo#SightSeeing
+:SightSeeing rdf:type owl:Class ;
+             rdfs:comment "Sightseeing tour/trip."@en ;
+             rdfs:label "SightSeeing" .
+
+
+###  Generated by the OWL API (version 5.1.9) https://github.com/owlcs/owlapi/

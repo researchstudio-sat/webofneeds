@@ -1,0 +1,177 @@
+<https://w3id.org/won/content> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Ontology> .
+<https://w3id.org/won/content> <http://www.w3.org/2002/07/owl#versionIRI> <https://w3id.org/won/content/1.0> .
+<https://w3id.org/won/content> <http://www.w3.org/2002/07/owl#imports> <https://w3id.org/won/core/1.0> .
+<https://w3id.org/won/content> <http://www.w3.org/2002/07/owl#imports> <https://w3id.org/won/message/1.0> .
+<https://w3id.org/won/content> <http://purl.org/dc/elements/1.1/abstract> "This ontology defines properties commonly used in the content of Messages and Atoms, in parallel to the [WoN Matching Ontology](https://w3id.org/won/matching). That does not mean that these are the only properties that can be used in messages. The content of a message (i.e., the triples in any of its ContentGraphs) is unrestricted, except for the rule that no part of the [WoN Message vocabulary](https://w3id.org/won/message) may be used in the content."@en .
+<https://w3id.org/won/content> <http://purl.org/dc/elements/1.1/created> "2019-05-14"^^<http://www.w3.org/2001/XMLSchema#date> .
+<https://w3id.org/won/content> <http://purl.org/dc/elements/1.1/title> "Web of Needs Content Ontology"@en .
+<https://w3id.org/won/content> <http://purl.org/dc/terms/license> "https://creativecommons.org/licenses/by/4.0/" .
+<https://w3id.org/won/content> <http://purl.org/vocab/vann/preferredNamespacePrefix> "wcnt" .
+# 
+# 
+# #################################################################
+# #
+# #    Annotation properties
+# #
+# #################################################################
+# 
+# 
+# http://purl.org/dc/elements/1.1/abstract
+<http://purl.org/dc/elements/1.1/abstract> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
+# 
+# http://purl.org/dc/elements/1.1/created
+<http://purl.org/dc/elements/1.1/created> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
+# 
+# http://purl.org/dc/elements/1.1/title
+<http://purl.org/dc/elements/1.1/title> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
+# 
+# http://purl.org/dc/terms/license
+<http://purl.org/dc/terms/license> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
+# 
+# http://purl.org/vocab/vann/preferredNamespacePrefix
+<http://purl.org/vocab/vann/preferredNamespacePrefix> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
+# 
+# 
+# 
+# #################################################################
+# #
+# #    Object Properties
+# #
+# #################################################################
+# 
+# 
+# https://w3id.org/won/content#inResponseTo
+<https://w3id.org/won/content#inResponseTo> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+<https://w3id.org/won/content#inResponseTo> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/content#DirectResponse> .
+<https://w3id.org/won/content#inResponseTo> <http://www.w3.org/2000/01/rdf-schema#range> <https://w3id.org/won/core#Atom> .
+<https://w3id.org/won/core#Atom> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<https://w3id.org/won/content#inResponseTo> <http://www.w3.org/2000/01/rdf-schema#comment> "An Atom that was created in order to directly respond to another links to that Atom with this property."@en .
+<https://w3id.org/won/content#inResponseTo> <http://www.w3.org/2000/01/rdf-schema#label> "inResponseTo" .
+# 
+# https://w3id.org/won/content#suggestedAtom
+<https://w3id.org/won/content#suggestedAtom> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+<https://w3id.org/won/content#suggestedAtom> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/message#Message> .
+<https://w3id.org/won/message#Message> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<https://w3id.org/won/content#suggestedAtom> <http://www.w3.org/2000/01/rdf-schema#range> <https://w3id.org/won/core#Atom> .
+<https://w3id.org/won/content#suggestedAtom> <http://www.w3.org/2000/01/rdf-schema#comment> "Suggests to the recipient of the message to connect to the Atom linked to with this property."@en .
+<https://w3id.org/won/content#suggestedAtom> <http://www.w3.org/2000/01/rdf-schema#label> "suggestedAtom" .
+# 
+# https://w3id.org/won/content#travelAction
+<https://w3id.org/won/content#travelAction> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+<https://w3id.org/won/content#travelAction> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/core#Atom> .
+<https://w3id.org/won/content#travelAction> <http://www.w3.org/2000/01/rdf-schema#range> <http://schema.org/TravelAction> .
+<http://schema.org/TravelAction> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<https://w3id.org/won/content#travelAction> <http://www.w3.org/2000/01/rdf-schema#comment> "Links the Atom to a schema:TravelAction, indicating that this action is what is being offered/suggested."@en .
+<https://w3id.org/won/content#travelAction> <http://www.w3.org/2000/01/rdf-schema#label> "travelAction" .
+# 
+# 
+# 
+# #################################################################
+# #
+# #    Data properties
+# #
+# #################################################################
+# 
+# 
+# https://w3id.org/won/content#bpmnWorkflow
+<https://w3id.org/won/content#bpmnWorkflow> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
+<https://w3id.org/won/content#bpmnWorkflow> <http://www.w3.org/2000/01/rdf-schema#domain> _:genid1 .
+_:genid1 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+_:genid1 <http://www.w3.org/2002/07/owl#unionOf> _:genid3 .
+_:genid3 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
+_:genid3 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/core#Atom> .
+_:genid3 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:genid2 .
+_:genid2 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
+_:genid2 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/message#Message> .
+_:genid2 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/1999/02/22-rdf-syntax-ns#nil> .
+<https://w3id.org/won/content#bpmnWorkflow> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#base64Binary> .
+<https://w3id.org/won/content#bpmnWorkflow> <http://www.w3.org/2000/01/rdf-schema#comment> "A BPMN conformant XML file in base 64 encoding."@en .
+<https://w3id.org/won/content#bpmnWorkflow> <http://www.w3.org/2000/01/rdf-schema#label> "bpmnWorkflow" .
+# 
+# https://w3id.org/won/content#file
+<https://w3id.org/won/content#file> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
+<https://w3id.org/won/content#file> <http://www.w3.org/2000/01/rdf-schema#domain> _:genid4 .
+_:genid4 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+_:genid4 <http://www.w3.org/2002/07/owl#unionOf> _:genid6 .
+_:genid6 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
+_:genid6 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/core#Atom> .
+_:genid6 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:genid5 .
+_:genid5 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
+_:genid5 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/message#Message> .
+_:genid5 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/1999/02/22-rdf-syntax-ns#nil> .
+<https://w3id.org/won/content#file> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#base64Binary> .
+<https://w3id.org/won/content#file> <http://www.w3.org/2000/01/rdf-schema#comment> "A file in base64 encoding."@en .
+<https://w3id.org/won/content#file> <http://www.w3.org/2000/01/rdf-schema#label> "file" .
+# 
+# https://w3id.org/won/content#image
+<https://w3id.org/won/content#image> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
+<https://w3id.org/won/content#image> <http://www.w3.org/2000/01/rdf-schema#domain> _:genid7 .
+_:genid7 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+_:genid7 <http://www.w3.org/2002/07/owl#unionOf> _:genid9 .
+_:genid9 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
+_:genid9 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/core#Atom> .
+_:genid9 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:genid8 .
+_:genid8 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
+_:genid8 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/message#Message> .
+_:genid8 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/1999/02/22-rdf-syntax-ns#nil> .
+<https://w3id.org/won/content#image> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#base64Binary> .
+<https://w3id.org/won/content#image> <http://www.w3.org/2000/01/rdf-schema#comment> "Image data in base64 encoding."@en .
+<https://w3id.org/won/content#image> <http://www.w3.org/2000/01/rdf-schema#label> "image" .
+# 
+# https://w3id.org/won/content#petriNet
+<https://w3id.org/won/content#petriNet> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
+<https://w3id.org/won/content#petriNet> <http://www.w3.org/2000/01/rdf-schema#domain> _:genid10 .
+_:genid10 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+_:genid10 <http://www.w3.org/2002/07/owl#unionOf> _:genid12 .
+_:genid12 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
+_:genid12 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/core#Atom> .
+_:genid12 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:genid11 .
+_:genid11 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
+_:genid11 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/message#Message> .
+_:genid11 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/1999/02/22-rdf-syntax-ns#nil> .
+<https://w3id.org/won/content#petriNet> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#base64Binary> .
+<https://w3id.org/won/content#petriNet> <http://www.w3.org/2000/01/rdf-schema#comment> "The base64 serialization of  the XML file exported from PIPE (https://github.com/sarahtattersall/PIPE)"@en .
+<https://w3id.org/won/content#petriNet> <http://www.w3.org/2000/01/rdf-schema#label> "petriNet" .
+# 
+# https://w3id.org/won/content#tag
+<https://w3id.org/won/content#tag> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
+<https://w3id.org/won/content#tag> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/core#Atom> .
+<https://w3id.org/won/content#tag> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/won/content#tag> <http://www.w3.org/2000/01/rdf-schema#comment> "Tags an Atom with a String value."@en .
+<https://w3id.org/won/content#tag> <http://www.w3.org/2000/01/rdf-schema#label> "tag" .
+# 
+# https://w3id.org/won/content#text
+<https://w3id.org/won/content#text> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
+<https://w3id.org/won/content#text> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/message#Message> .
+<https://w3id.org/won/content#text> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/won/content#text> <http://www.w3.org/2000/01/rdf-schema#comment> "The textual content of a Message."@en .
+<https://w3id.org/won/content#text> <http://www.w3.org/2000/01/rdf-schema#label> "text" .
+# 
+# 
+# 
+# #################################################################
+# #
+# #    Classes
+# #
+# #################################################################
+# 
+# 
+# http://schema.org/TravelAction
+# 
+# https://w3id.org/won/content#DirectResponse
+<https://w3id.org/won/content#DirectResponse> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<https://w3id.org/won/content#DirectResponse> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <https://w3id.org/won/core#Atom> .
+<https://w3id.org/won/content#DirectResponse> <http://www.w3.org/2000/01/rdf-schema#comment> "An Atom of this class indicates that it was created for directly responding to another Atom."@en .
+<https://w3id.org/won/content#DirectResponse> <http://www.w3.org/2000/01/rdf-schema#label> "DirectResponse" .
+# 
+# https://w3id.org/won/content#ServiceBot
+<https://w3id.org/won/content#ServiceBot> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<https://w3id.org/won/content#ServiceBot> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <https://w3id.org/won/core#Atom> .
+<https://w3id.org/won/content#ServiceBot> <http://www.w3.org/2000/01/rdf-schema#comment> "An Atom of this class indicates that it is controlled by a bot offering a service."@en .
+<https://w3id.org/won/content#ServiceBot> <http://www.w3.org/2000/01/rdf-schema#label> "ServiceBot" .
+# 
+# https://w3id.org/won/core#Atom
+# 
+# https://w3id.org/won/message#Message
+# 
+# Generated by the OWL API (version 5.1.9) https://github.com/owlcs/owlapi/

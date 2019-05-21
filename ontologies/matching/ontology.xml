@@ -1,0 +1,279 @@
+<?xml version="1.0"?>
+<rdf:RDF xmlns="https://w3id.org/won/matching#"
+     xml:base="https://w3id.org/won/matching"
+     xmlns:dc="http://purl.org/dc/elements/1.1/"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:xml="http://www.w3.org/XML/1998/namespace"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     xmlns:vann="http://purl.org/vocab/vann/"
+     xmlns:terms="http://purl.org/dc/terms/">
+    <owl:Ontology rdf:about="https://w3id.org/won/matching">
+        <owl:versionIRI rdf:resource="https://w3id.org/won/matching/1.0"/>
+        <owl:imports rdf:resource="https://w3id.org/won/core/1.0"/>
+        <owl:imports rdf:resource="https://w3id.org/won/message/1.0"/>
+        <dc:abstract xml:lang="en">Provides a vocabulary for communication between Atoms and Matchers in Web of Needs. By using this vocabulary, Atoms indicate which kinds of hints they want to receive from Matchers.</dc:abstract>
+        <dc:created rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2019-05-14</dc:created>
+        <dc:title xml:lang="en">Web of Needs Matching Ontology</dc:title>
+        <terms:license>https://creativecommons.org/licenses/by/4.0/</terms:license>
+        <vann:preferredNamespacePrefix xml:lang="en">match</vann:preferredNamespacePrefix>
+    </owl:Ontology>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Annotation properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+
+    
+
+
+    <!-- http://purl.org/dc/elements/1.1/abstract -->
+
+
+    <owl:AnnotationProperty rdf:about="http://purl.org/dc/elements/1.1/abstract"/>
+    
+
+
+    <!-- http://purl.org/dc/elements/1.1/created -->
+
+
+    <owl:AnnotationProperty rdf:about="http://purl.org/dc/elements/1.1/created"/>
+    
+
+
+    <!-- http://purl.org/dc/elements/1.1/title -->
+
+
+    <owl:AnnotationProperty rdf:about="http://purl.org/dc/elements/1.1/title"/>
+    
+
+
+    <!-- http://purl.org/dc/terms/license -->
+
+
+    <owl:AnnotationProperty rdf:about="http://purl.org/dc/terms/license"/>
+    
+
+
+    <!-- http://purl.org/vocab/vann/preferredNamespacePrefix -->
+
+
+    <owl:AnnotationProperty rdf:about="http://purl.org/vocab/vann/preferredNamespacePrefix"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Object Properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+
+    
+
+
+    <!-- https://w3id.org/won/matching#flag -->
+
+
+    <owl:ObjectProperty rdf:about="https://w3id.org/won/matching#flag">
+        <rdfs:domain rdf:resource="https://w3id.org/won/core#Atom"/>
+        <rdfs:range rdf:resource="https://w3id.org/won/matching#Flag"/>
+        <rdfs:comment xml:lang="en">Links an Atom to its Flags</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="https://w3id.org/won/core"/>
+        <rdfs:label>flag</rdfs:label>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- https://w3id.org/won/matching#seeks -->
+
+
+    <owl:ObjectProperty rdf:about="https://w3id.org/won/matching#seeks">
+        <rdfs:domain rdf:resource="https://w3id.org/won/core#Atom"/>
+        <rdfs:range rdf:resource="https://w3id.org/won/matching#CounterpartSpecification"/>
+        <rdfs:comment>This optional property is one of the two properties that defines the content of every atom (the other is the &quot;is&quot; property). It is used to describe that part of the content that is
+sought to fulfill the atom in contrast to the part that is available.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="https://w3id.org/won/core"/>
+        <rdfs:label>seeks</rdfs:label>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Data properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+
+    
+
+
+    <!-- https://w3id.org/won/matching#doNotMatchAfter -->
+
+
+    <owl:DatatypeProperty rdf:about="https://w3id.org/won/matching#doNotMatchAfter">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+        <rdfs:domain rdf:resource="https://w3id.org/won/core#Atom"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#dateTime"/>
+        <rdfs:comment xml:lang="en">Indicates that matchers should not use this atom for matching after the specified xsd:dateTime.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="https://w3id.org/won/core"/>
+        <rdfs:label>doNotMatchAfter</rdfs:label>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- https://w3id.org/won/matching#doNotMatchBefore -->
+
+
+    <owl:DatatypeProperty rdf:about="https://w3id.org/won/matching#doNotMatchBefore">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+        <rdfs:domain rdf:resource="https://w3id.org/won/core#Atom"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#dateTime"/>
+        <rdfs:comment xml:lang="en">Indicates that matchers should not use this atom for matching before the specified xsd:dateTime.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="https://w3id.org/won/core"/>
+        <rdfs:label>doNotMatchBefore</rdfs:label>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- https://w3id.org/won/matching#matchingContext -->
+
+
+    <owl:DatatypeProperty rdf:about="https://w3id.org/won/matching#matchingContext">
+        <rdfs:domain rdf:resource="https://w3id.org/won/core#Atom"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <rdfs:comment xml:lang="en">Specifies a &apos;matching context&apos; for the Atom. Matchers should only send hints to this Atom if the counterpart specifies the same matching context. If no matching context is specified, matching is not restricted, and matchers may send hints with counterparts that do specify matching contexts.</rdfs:comment>
+        <rdfs:label>matchingContext</rdfs:label>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- https://w3id.org/won/matching#searchString -->
+
+
+    <owl:DatatypeProperty rdf:about="https://w3id.org/won/matching#searchString">
+        <rdfs:domain rdf:resource="https://w3id.org/won/core#Atom"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <rdfs:comment xml:lang="en">Specifies a search string that matchers should use when searching for matches for this Atom.</rdfs:comment>
+        <rdfs:label>searchString</rdfs:label>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- https://w3id.org/won/matching#sparqlQuery -->
+
+
+    <owl:DatatypeProperty rdf:about="https://w3id.org/won/matching#sparqlQuery">
+        <rdfs:domain rdf:resource="https://w3id.org/won/core#Atom"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <rdfs:comment xml:lang="en">Atoms can add SPARQL 1.1 queries using this property. Matchers can use these queries to find suitable counterparts in a collection of Atoms.</rdfs:comment>
+        <rdfs:label>sparqlQuery</rdfs:label>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Classes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+
+    
+
+
+    <!-- https://w3id.org/won/core#Atom -->
+
+
+    <owl:Class rdf:about="https://w3id.org/won/core#Atom"/>
+    
+
+
+    <!-- https://w3id.org/won/matching#CounterpartSpecification -->
+
+
+    <owl:Class rdf:about="https://w3id.org/won/matching#CounterpartSpecification">
+        <rdfs:subClassOf rdf:resource="https://w3id.org/won/core#Atom"/>
+        <rdfs:comment>Specification or description of the Atoms to be matched with this Atom.</rdfs:comment>
+        <rdfs:label>CounterpartSpecification</rdfs:label>
+    </owl:Class>
+    
+
+
+    <!-- https://w3id.org/won/matching#Flag -->
+
+
+    <owl:Class rdf:about="https://w3id.org/won/matching#Flag">
+        <rdfs:comment xml:lang="en">Superclass of all Flags an atom can have.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="https://w3id.org/won/core"/>
+        <rdfs:label>Flag</rdfs:label>
+    </owl:Class>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Individuals
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+
+    
+
+
+    <!-- https://w3id.org/won/matching#NoHintForCounterpart -->
+
+
+    <owl:NamedIndividual rdf:about="https://w3id.org/won/matching#NoHintForCounterpart">
+        <rdf:type rdf:resource="https://w3id.org/won/matching#Flag"/>
+        <rdfs:comment xml:lang="en">An Atom specifying this flag indicates that matchers should not send Hint messages to the counterpart in case of a match. If the NoHintForMe flag is also present, matchers should disregard this atom completely.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="https://w3id.org/won/core"/>
+        <rdfs:label>NoHintForCounterpart</rdfs:label>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- https://w3id.org/won/matching#NoHintForMe -->
+
+
+    <owl:NamedIndividual rdf:about="https://w3id.org/won/matching#NoHintForMe">
+        <rdf:type rdf:resource="https://w3id.org/won/matching#Flag"/>
+        <rdfs:comment xml:lang="en">An Atom specifying this flag indicates that matchers should not send Hint messages to that Atom. If the NoHintForCounterpart flag is also present, matchers should disregard this atom completely.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="https://w3id.org/won/core"/>
+        <rdfs:label>NoHintForMe</rdfs:label>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- https://w3id.org/won/matching#UsedForTesting -->
+
+
+    <owl:NamedIndividual rdf:about="https://w3id.org/won/matching#UsedForTesting">
+        <rdf:type rdf:resource="https://w3id.org/won/matching#Flag"/>
+        <rdfs:comment xml:lang="en">Flag indicating the atom has been created for testing purposes. It should only be matched with other atoms flagged with UsedForTesting. The flag is intended to separate real-world atoms from those generated for testing the system, so that users are neither spammed nor misled.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="https://w3id.org/won/core"/>
+        <rdfs:label>UsedForTesting</rdfs:label>
+    </owl:NamedIndividual>
+</rdf:RDF>
+
+
+
+<!-- Generated by the OWL API (version 5.1.9) https://github.com/owlcs/owlapi/ -->
+
+

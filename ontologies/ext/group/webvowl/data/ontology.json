@@ -796,24 +796,6 @@
         "undefined" : "NoHintForCounterpart"
       }
     }, {
-      "iri" : "https://w3id.org/won/core#UsedForTesting",
-      "baseIri" : "https://w3id.org/won/core",
-      "annotations" : {
-        "isDefinedBy" : [ {
-          "identifier" : "isDefinedBy",
-          "language" : "undefined",
-          "value" : "https://w3id.org/won/core",
-          "type" : "iri"
-        } ]
-      },
-      "comment" : {
-        "en" : "Flag indicating the atom has been created for testing purposes. It should only be matched with other atoms flagged with UsedForTesting. The flag is intended to separate real-world atoms from those generated for testing the system, so that users are neither spammed nor misled."
-      },
-      "labels" : {
-        "IRI-based" : "UsedForTesting",
-        "undefined" : "UsedForTesting"
-      }
-    }, {
       "iri" : "https://w3id.org/won/core#NoHintForMe",
       "baseIri" : "https://w3id.org/won/core",
       "annotations" : {
@@ -830,6 +812,24 @@
       "labels" : {
         "IRI-based" : "NoHintForMe",
         "undefined" : "NoHintForMe"
+      }
+    }, {
+      "iri" : "https://w3id.org/won/core#UsedForTesting",
+      "baseIri" : "https://w3id.org/won/core",
+      "annotations" : {
+        "isDefinedBy" : [ {
+          "identifier" : "isDefinedBy",
+          "language" : "undefined",
+          "value" : "https://w3id.org/won/core",
+          "type" : "iri"
+        } ]
+      },
+      "comment" : {
+        "en" : "Flag indicating the atom has been created for testing purposes. It should only be matched with other atoms flagged with UsedForTesting. The flag is intended to separate real-world atoms from those generated for testing the system, so that users are neither spammed nor misled."
+      },
+      "labels" : {
+        "IRI-based" : "UsedForTesting",
+        "undefined" : "UsedForTesting"
       }
     } ],
     "comment" : {
@@ -1176,7 +1176,7 @@
   "propertyAttribute" : [ {
     "range" : "0",
     "domain" : "2",
-    "attributes" : [ "anonymous", "object" ],
+    "attributes" : [ "object", "anonymous" ],
     "id" : "1"
   }, {
     "iri" : "https://w3id.org/won/core#ownerQueue",
@@ -1281,12 +1281,12 @@
   }, {
     "range" : "21",
     "domain" : "2",
-    "attributes" : [ "anonymous", "object" ],
+    "attributes" : [ "object", "anonymous" ],
     "id" : "20"
   }, {
     "range" : "23",
     "domain" : "2",
-    "attributes" : [ "anonymous", "object" ],
+    "attributes" : [ "object", "anonymous" ],
     "id" : "22"
   }, {
     "iri" : "http://www.w3.org/2002/07/owl#topObjectProperty",
@@ -1301,7 +1301,7 @@
   }, {
     "range" : "13",
     "domain" : "27",
-    "attributes" : [ "anonymous", "object" ],
+    "attributes" : [ "object", "anonymous" ],
     "id" : "26"
   }, {
     "iri" : "https://w3id.org/won/core#supportsWonProtocolImpl",
@@ -1328,37 +1328,37 @@
   }, {
     "range" : "16",
     "domain" : "27",
-    "attributes" : [ "anonymous", "object" ],
+    "attributes" : [ "object", "anonymous" ],
     "id" : "30"
   }, {
     "range" : "6",
     "domain" : "2",
-    "attributes" : [ "anonymous", "object" ],
+    "attributes" : [ "object", "anonymous" ],
     "id" : "31"
   }, {
     "range" : "29",
     "domain" : "27",
-    "attributes" : [ "anonymous", "object" ],
+    "attributes" : [ "object", "anonymous" ],
     "id" : "32"
   }, {
     "range" : "23",
     "domain" : "27",
-    "attributes" : [ "anonymous", "object" ],
+    "attributes" : [ "object", "anonymous" ],
     "id" : "33"
   }, {
     "range" : "6",
     "domain" : "27",
-    "attributes" : [ "anonymous", "object" ],
+    "attributes" : [ "object", "anonymous" ],
     "id" : "34"
   }, {
     "range" : "0",
     "domain" : "27",
-    "attributes" : [ "anonymous", "object" ],
+    "attributes" : [ "object", "anonymous" ],
     "id" : "35"
   }, {
     "range" : "21",
     "domain" : "27",
-    "attributes" : [ "anonymous", "object" ],
+    "attributes" : [ "object", "anonymous" ],
     "id" : "36"
   }, {
     "iri" : "https://w3id.org/won/core#socketCapacity",
@@ -1413,37 +1413,37 @@
   }, {
     "range" : "29",
     "domain" : "8",
-    "attributes" : [ "anonymous", "object" ],
+    "attributes" : [ "object", "anonymous" ],
     "id" : "42"
   }, {
     "range" : "13",
     "domain" : "8",
-    "attributes" : [ "anonymous", "object" ],
+    "attributes" : [ "object", "anonymous" ],
     "id" : "43"
   }, {
     "range" : "2",
     "domain" : "27",
-    "attributes" : [ "anonymous", "object" ],
+    "attributes" : [ "object", "anonymous" ],
     "id" : "44"
   }, {
     "range" : "21",
     "domain" : "8",
-    "attributes" : [ "anonymous", "object" ],
+    "attributes" : [ "object", "anonymous" ],
     "id" : "45"
   }, {
     "range" : "23",
     "domain" : "8",
-    "attributes" : [ "anonymous", "object" ],
+    "attributes" : [ "object", "anonymous" ],
     "id" : "46"
   }, {
     "range" : "16",
     "domain" : "8",
-    "attributes" : [ "anonymous", "object" ],
+    "attributes" : [ "object", "anonymous" ],
     "id" : "47"
   }, {
     "range" : "0",
     "domain" : "8",
-    "attributes" : [ "anonymous", "object" ],
+    "attributes" : [ "object", "anonymous" ],
     "id" : "48"
   }, {
     "iri" : "https://w3id.org/won/core#socketDefinition",
@@ -1462,32 +1462,32 @@
   }, {
     "range" : "27",
     "domain" : "8",
-    "attributes" : [ "anonymous", "object" ],
+    "attributes" : [ "object", "anonymous" ],
     "id" : "50"
   }, {
     "range" : "6",
     "domain" : "8",
-    "attributes" : [ "anonymous", "object" ],
+    "attributes" : [ "object", "anonymous" ],
     "id" : "51"
   }, {
     "range" : "2",
     "domain" : "8",
-    "attributes" : [ "anonymous", "object" ],
+    "attributes" : [ "object", "anonymous" ],
     "id" : "52"
   }, {
     "range" : "13",
     "domain" : "0",
-    "attributes" : [ "anonymous", "object" ],
+    "attributes" : [ "object", "anonymous" ],
     "id" : "53"
   }, {
     "range" : "13",
     "domain" : "16",
-    "attributes" : [ "anonymous", "object" ],
+    "attributes" : [ "object", "anonymous" ],
     "id" : "54"
   }, {
     "range" : "29",
     "domain" : "0",
-    "attributes" : [ "anonymous", "object" ],
+    "attributes" : [ "object", "anonymous" ],
     "id" : "55"
   }, {
     "iri" : "https://w3id.org/won/core#connectionUriPrefix",
@@ -1578,52 +1578,52 @@
   }, {
     "range" : "13",
     "domain" : "21",
-    "attributes" : [ "anonymous", "object" ],
+    "attributes" : [ "object", "anonymous" ],
     "id" : "67"
   }, {
     "range" : "16",
     "domain" : "21",
-    "attributes" : [ "anonymous", "object" ],
+    "attributes" : [ "object", "anonymous" ],
     "id" : "68"
   }, {
     "range" : "16",
     "domain" : "0",
-    "attributes" : [ "anonymous", "object" ],
+    "attributes" : [ "object", "anonymous" ],
     "id" : "69"
   }, {
     "range" : "29",
     "domain" : "21",
-    "attributes" : [ "anonymous", "object" ],
+    "attributes" : [ "object", "anonymous" ],
     "id" : "70"
   }, {
     "range" : "13",
     "domain" : "23",
-    "attributes" : [ "anonymous", "object" ],
+    "attributes" : [ "object", "anonymous" ],
     "id" : "71"
   }, {
     "range" : "16",
     "domain" : "23",
-    "attributes" : [ "anonymous", "object" ],
+    "attributes" : [ "object", "anonymous" ],
     "id" : "72"
   }, {
     "range" : "0",
     "domain" : "21",
-    "attributes" : [ "anonymous", "object" ],
+    "attributes" : [ "object", "anonymous" ],
     "id" : "73"
   }, {
     "range" : "29",
     "domain" : "23",
-    "attributes" : [ "anonymous", "object" ],
+    "attributes" : [ "object", "anonymous" ],
     "id" : "74"
   }, {
     "range" : "0",
     "domain" : "23",
-    "attributes" : [ "anonymous", "object" ],
+    "attributes" : [ "object", "anonymous" ],
     "id" : "75"
   }, {
     "range" : "21",
     "domain" : "23",
-    "attributes" : [ "anonymous", "object" ],
+    "attributes" : [ "object", "anonymous" ],
     "id" : "76"
   }, {
     "iri" : "https://w3id.org/won/core#connections",
@@ -1650,22 +1650,22 @@
   }, {
     "range" : "29",
     "domain" : "6",
-    "attributes" : [ "anonymous", "object" ],
+    "attributes" : [ "object", "anonymous" ],
     "id" : "79"
   }, {
     "range" : "0",
     "domain" : "6",
-    "attributes" : [ "anonymous", "object" ],
+    "attributes" : [ "object", "anonymous" ],
     "id" : "80"
   }, {
     "range" : "21",
     "domain" : "6",
-    "attributes" : [ "anonymous", "object" ],
+    "attributes" : [ "object", "anonymous" ],
     "id" : "81"
   }, {
     "range" : "13",
     "domain" : "6",
-    "attributes" : [ "anonymous", "object" ],
+    "attributes" : [ "object", "anonymous" ],
     "id" : "82"
   }, {
     "iri" : "https://w3id.org/won/core#nodeQueue",
@@ -1684,27 +1684,27 @@
   }, {
     "range" : "16",
     "domain" : "6",
-    "attributes" : [ "anonymous", "object" ],
+    "attributes" : [ "object", "anonymous" ],
     "id" : "85"
   }, {
     "range" : "13",
     "domain" : "2",
-    "attributes" : [ "anonymous", "object" ],
+    "attributes" : [ "object", "anonymous" ],
     "id" : "87"
   }, {
     "range" : "16",
     "domain" : "2",
-    "attributes" : [ "anonymous", "object" ],
+    "attributes" : [ "object", "anonymous" ],
     "id" : "88"
   }, {
     "range" : "23",
     "domain" : "6",
-    "attributes" : [ "anonymous", "object" ],
+    "attributes" : [ "object", "anonymous" ],
     "id" : "89"
   }, {
     "range" : "29",
     "domain" : "2",
-    "attributes" : [ "anonymous", "object" ],
+    "attributes" : [ "object", "anonymous" ],
     "id" : "90"
   }, {
     "iri" : "https://w3id.org/won/core#atomDeletedTopic",
@@ -1804,7 +1804,7 @@
     "comment" : {
       "en" : "Links a Connection object to its remote counterpart."
     },
-    "attributes" : [ "external", "functional", "symmetric", "inverse functional", "object" ],
+    "attributes" : [ "external", "functional", "object", "symmetric", "inverse functional" ],
     "id" : "103"
   }, {
     "iri" : "https://w3id.org/won/core#atomActivatedTopic",
@@ -1887,17 +1887,17 @@
   }, {
     "range" : "29",
     "domain" : "13",
-    "attributes" : [ "anonymous", "object" ],
+    "attributes" : [ "object", "anonymous" ],
     "id" : "112"
   }, {
     "range" : "29",
     "domain" : "16",
-    "attributes" : [ "anonymous", "object" ],
+    "attributes" : [ "object", "anonymous" ],
     "id" : "113"
   }, {
     "range" : "86",
     "domain" : "78",
-    "attributes" : [ "anonymous", "object" ],
+    "attributes" : [ "object", "anonymous" ],
     "id" : "115"
   }, {
     "iri" : "https://w3id.org/won/core#targetSocket",
@@ -1924,43 +1924,57 @@
   }, {
     "range" : "2",
     "domain" : "61",
-    "attributes" : [ "anonymous", "object" ],
+    "attributes" : [ "object", "anonymous" ],
     "id" : "117"
   }, {
     "range" : "6",
     "domain" : "61",
-    "attributes" : [ "anonymous", "object" ],
+    "attributes" : [ "object", "anonymous" ],
     "id" : "118"
   }, {
     "range" : "23",
     "domain" : "61",
-    "attributes" : [ "anonymous", "object" ],
+    "attributes" : [ "object", "anonymous" ],
     "id" : "119"
   }, {
     "range" : "21",
     "domain" : "61",
-    "attributes" : [ "anonymous", "object" ],
+    "attributes" : [ "object", "anonymous" ],
     "id" : "120"
   }, {
     "range" : "0",
     "domain" : "61",
-    "attributes" : [ "anonymous", "object" ],
+    "attributes" : [ "object", "anonymous" ],
     "id" : "121"
   }, {
     "range" : "16",
     "domain" : "61",
-    "attributes" : [ "anonymous", "object" ],
+    "attributes" : [ "object", "anonymous" ],
     "id" : "122"
   }, {
     "range" : "13",
     "domain" : "61",
-    "attributes" : [ "anonymous", "object" ],
+    "attributes" : [ "object", "anonymous" ],
     "id" : "123"
   }, {
     "range" : "29",
     "domain" : "61",
-    "attributes" : [ "anonymous", "object" ],
+    "attributes" : [ "object", "anonymous" ],
     "id" : "124"
+  }, {
+    "iri" : "https://w3id.org/won/core#sourceAtom",
+    "baseIri" : "https://w3id.org/won/core",
+    "range" : "8",
+    "label" : {
+      "IRI-based" : "sourceAtom",
+      "undefined" : "sourceAtom"
+    },
+    "domain" : "2",
+    "comment" : {
+      "en" : "Links a Connection to the Atom it belongs to (the source of this Connection)"
+    },
+    "attributes" : [ "external", "object" ],
+    "id" : "125"
   }, {
     "iri" : "https://w3id.org/won/core#seeks",
     "baseIri" : "https://w3id.org/won/core",
@@ -1982,20 +1996,6 @@
       "undefined" : "This optional property is one of the two properties that defines the content of every atom (the other is the \"is\" property). It is used to describe that part of the content that is\nsought to fulfill the atom in contrast to the part that is available."
     },
     "attributes" : [ "external", "object" ],
-    "id" : "125"
-  }, {
-    "iri" : "https://w3id.org/won/core#sourceAtom",
-    "baseIri" : "https://w3id.org/won/core",
-    "range" : "8",
-    "label" : {
-      "IRI-based" : "sourceAtom",
-      "undefined" : "sourceAtom"
-    },
-    "domain" : "2",
-    "comment" : {
-      "en" : "Links a Connection to the Atom it belongs to (the source of this Connection)"
-    },
-    "attributes" : [ "external", "object" ],
     "id" : "126"
   }, {
     "iri" : "https://w3id.org/won/core#atomUriPrefix",
@@ -2014,8 +2014,22 @@
   }, {
     "range" : "8",
     "domain" : "61",
-    "attributes" : [ "anonymous", "object" ],
+    "attributes" : [ "object", "anonymous" ],
     "id" : "128"
+  }, {
+    "iri" : "https://w3id.org/won/core#atomList",
+    "baseIri" : "https://w3id.org/won/core",
+    "range" : "60",
+    "label" : {
+      "IRI-based" : "atomList",
+      "undefined" : "atomList"
+    },
+    "domain" : "21",
+    "comment" : {
+      "undefined" : "The Node's atoms, in a LDP-pageable container."
+    },
+    "attributes" : [ "external", "object" ],
+    "id" : "129"
   }, {
     "iri" : "https://w3id.org/won/core#defaultSocket",
     "baseIri" : "https://w3id.org/won/core",
@@ -2037,25 +2051,11 @@
       "en" : "Indicates the socket to connect to by default."
     },
     "attributes" : [ "external", "object" ],
-    "id" : "129"
-  }, {
-    "iri" : "https://w3id.org/won/core#atomList",
-    "baseIri" : "https://w3id.org/won/core",
-    "range" : "60",
-    "label" : {
-      "IRI-based" : "atomList",
-      "undefined" : "atomList"
-    },
-    "domain" : "21",
-    "comment" : {
-      "undefined" : "The Node's atoms, in a LDP-pageable container."
-    },
-    "attributes" : [ "external", "object" ],
     "id" : "130"
   }, {
     "range" : "27",
     "domain" : "61",
-    "attributes" : [ "anonymous", "object" ],
+    "attributes" : [ "object", "anonymous" ],
     "id" : "131"
   }, {
     "iri" : "https://w3id.org/won/core#matcherQueue",
@@ -2102,22 +2102,22 @@
   }, {
     "range" : "61",
     "domain" : "86",
-    "attributes" : [ "anonymous", "object" ],
+    "attributes" : [ "object", "anonymous" ],
     "id" : "135"
   }, {
     "range" : "61",
     "domain" : "60",
-    "attributes" : [ "anonymous", "object" ],
+    "attributes" : [ "object", "anonymous" ],
     "id" : "136"
   }, {
     "range" : "61",
     "domain" : "78",
-    "attributes" : [ "anonymous", "object" ],
+    "attributes" : [ "object", "anonymous" ],
     "id" : "137"
   }, {
     "range" : "29",
     "domain" : "4",
-    "attributes" : [ "anonymous", "object" ],
+    "attributes" : [ "object", "anonymous" ],
     "id" : "138"
   }, {
     "iri" : "https://w3id.org/won/core#flag",

@@ -1,0 +1,41 @@
+<html><h2 id="overv" class="list">Web of Needs Content Ontology: Overview <span class="backlink"> back to <a href="#toc">ToC</a></span></h2>
+<span class="markdown">
+This ontology has the following classes and properties.</span>
+<h4>Classes</h4>
+<ul class="hlist">
+   <li>
+      <a href="#DirectResponse" title="https://w3id.org/won/content#DirectResponse">DirectResponse</a>
+   </li>
+   <li>
+      <a href="#ServiceBot" title="https://w3id.org/won/content#ServiceBot">ServiceBot</a>
+   </li>
+</ul><h4>Object Properties</h4><ul class="hlist">
+   <li>
+      <a href="#inResponseTo" title="https://w3id.org/won/content#inResponseTo">inResponseTo</a>
+   </li>
+   <li>
+      <a href="#suggestedAtom" title="https://w3id.org/won/content#suggestedAtom">suggestedAtom</a>
+   </li>
+   <li>
+      <a href="#travelAction" title="https://w3id.org/won/content#travelAction">travelAction</a>
+   </li>
+</ul><h4>Data Properties</h4><ul class="hlist">
+   <li>
+      <a href="#bpmnWorkflow" title="https://w3id.org/won/content#bpmnWorkflow">bpmnWorkflow</a>
+   </li>
+   <li>
+      <a href="#file" title="https://w3id.org/won/content#file">file</a>
+   </li>
+   <li>
+      <a href="#image" title="https://w3id.org/won/content#image">image</a>
+   </li>
+   <li>
+      <a href="#petriNet" title="https://w3id.org/won/content#petriNet">petriNet</a>
+   </li>
+   <li>
+      <a href="#tag" title="https://w3id.org/won/content#tag">tag</a>
+   </li>
+   <li>
+      <a href="#text" title="https://w3id.org/won/content#text">text</a>
+   </li>
+</ul></html>

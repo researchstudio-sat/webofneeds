@@ -1,0 +1,169 @@
+@prefix : <https://w3id.org/won/content#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@base <https://w3id.org/won/content> .
+
+<https://w3id.org/won/content> rdf:type owl:Ontology ;
+                                owl:versionIRI <https://w3id.org/won/content/1.0> ;
+                                owl:imports <https://w3id.org/won/core/1.0> ,
+                                            <https://w3id.org/won/message/1.0> ;
+                                <http://purl.org/dc/elements/1.1/abstract> "This ontology defines properties commonly used in the content of Messages and Atoms, in parallel to the [WoN Matching Ontology](https://w3id.org/won/matching). That does not mean that these are the only properties that can be used in messages. The content of a message (i.e., the triples in any of its ContentGraphs) is unrestricted, except for the rule that no part of the [WoN Message vocabulary](https://w3id.org/won/message) may be used in the content."@en ;
+                                <http://purl.org/dc/elements/1.1/created> "2019-05-14"^^xsd:date ;
+                                <http://purl.org/dc/elements/1.1/title> "Web of Needs Content Ontology"@en ;
+                                <http://purl.org/dc/terms/license> "https://creativecommons.org/licenses/by/4.0/" ;
+                                <http://purl.org/vocab/vann/preferredNamespacePrefix> "wcnt" .
+
+#################################################################
+#    Annotation properties
+#################################################################
+
+###  http://purl.org/dc/elements/1.1/abstract
+<http://purl.org/dc/elements/1.1/abstract> rdf:type owl:AnnotationProperty .
+
+
+###  http://purl.org/dc/elements/1.1/created
+<http://purl.org/dc/elements/1.1/created> rdf:type owl:AnnotationProperty .
+
+
+###  http://purl.org/dc/elements/1.1/title
+<http://purl.org/dc/elements/1.1/title> rdf:type owl:AnnotationProperty .
+
+
+###  http://purl.org/dc/terms/license
+<http://purl.org/dc/terms/license> rdf:type owl:AnnotationProperty .
+
+
+###  http://purl.org/vocab/vann/preferredNamespacePrefix
+<http://purl.org/vocab/vann/preferredNamespacePrefix> rdf:type owl:AnnotationProperty .
+
+
+#################################################################
+#    Object Properties
+#################################################################
+
+###  https://w3id.org/won/content#inResponseTo
+:inResponseTo rdf:type owl:ObjectProperty ;
+              rdfs:domain :DirectResponse ;
+              rdfs:range <https://w3id.org/won/core#Atom> ;
+              rdfs:comment "An Atom that was created in order to directly respond to another links to that Atom with this property."@en ;
+              rdfs:label "inResponseTo" .
+
+
+###  https://w3id.org/won/content#suggestedAtom
+:suggestedAtom rdf:type owl:ObjectProperty ;
+               rdfs:domain <https://w3id.org/won/message#Message> ;
+               rdfs:range <https://w3id.org/won/core#Atom> ;
+               rdfs:comment "Suggests to the recipient of the message to connect to the Atom linked to with this property."@en ;
+               rdfs:label "suggestedAtom" .
+
+
+###  https://w3id.org/won/content#travelAction
+:travelAction rdf:type owl:ObjectProperty ;
+              rdfs:domain <https://w3id.org/won/core#Atom> ;
+              rdfs:range <http://schema.org/TravelAction> ;
+              rdfs:comment "Links the Atom to a schema:TravelAction, indicating that this action is what is being offered/suggested."@en ;
+              rdfs:label "travelAction" .
+
+
+#################################################################
+#    Data properties
+#################################################################
+
+###  https://w3id.org/won/content#bpmnWorkflow
+:bpmnWorkflow rdf:type owl:DatatypeProperty ;
+              rdfs:domain [ rdf:type owl:Class ;
+                            owl:unionOf ( <https://w3id.org/won/core#Atom>
+                                          <https://w3id.org/won/message#Message>
+                                        )
+                          ] ;
+              rdfs:range xsd:base64Binary ;
+              rdfs:comment "A BPMN conformant XML file in base 64 encoding."@en ;
+              rdfs:label "bpmnWorkflow" .
+
+
+###  https://w3id.org/won/content#file
+:file rdf:type owl:DatatypeProperty ;
+      rdfs:domain [ rdf:type owl:Class ;
+                    owl:unionOf ( <https://w3id.org/won/core#Atom>
+                                  <https://w3id.org/won/message#Message>
+                                )
+                  ] ;
+      rdfs:range xsd:base64Binary ;
+      rdfs:comment "A file in base64 encoding."@en ;
+      rdfs:label "file" .
+
+
+###  https://w3id.org/won/content#image
+:image rdf:type owl:DatatypeProperty ;
+       rdfs:domain [ rdf:type owl:Class ;
+                     owl:unionOf ( <https://w3id.org/won/core#Atom>
+                                   <https://w3id.org/won/message#Message>
+                                 )
+                   ] ;
+       rdfs:range xsd:base64Binary ;
+       rdfs:comment "Image data in base64 encoding."@en ;
+       rdfs:label "image" .
+
+
+###  https://w3id.org/won/content#petriNet
+:petriNet rdf:type owl:DatatypeProperty ;
+          rdfs:domain [ rdf:type owl:Class ;
+                        owl:unionOf ( <https://w3id.org/won/core#Atom>
+                                      <https://w3id.org/won/message#Message>
+                                    )
+                      ] ;
+          rdfs:range xsd:base64Binary ;
+          rdfs:comment "The base64 serialization of  the XML file exported from PIPE (https://github.com/sarahtattersall/PIPE)"@en ;
+          rdfs:label "petriNet" .
+
+
+###  https://w3id.org/won/content#tag
+:tag rdf:type owl:DatatypeProperty ;
+     rdfs:domain <https://w3id.org/won/core#Atom> ;
+     rdfs:range xsd:string ;
+     rdfs:comment "Tags an Atom with a String value."@en ;
+     rdfs:label "tag" .
+
+
+###  https://w3id.org/won/content#text
+:text rdf:type owl:DatatypeProperty ;
+      rdfs:domain <https://w3id.org/won/message#Message> ;
+      rdfs:range xsd:string ;
+      rdfs:comment "The textual content of a Message."@en ;
+      rdfs:label "text" .
+
+
+#################################################################
+#    Classes
+#################################################################
+
+###  http://schema.org/TravelAction
+<http://schema.org/TravelAction> rdf:type owl:Class .
+
+
+###  https://w3id.org/won/content#DirectResponse
+:DirectResponse rdf:type owl:Class ;
+                rdfs:subClassOf <https://w3id.org/won/core#Atom> ;
+                rdfs:comment "An Atom of this class indicates that it was created for directly responding to another Atom."@en ;
+                rdfs:label "DirectResponse" .
+
+
+###  https://w3id.org/won/content#ServiceBot
+:ServiceBot rdf:type owl:Class ;
+            rdfs:subClassOf <https://w3id.org/won/core#Atom> ;
+            rdfs:comment "An Atom of this class indicates that it is controlled by a bot offering a service."@en ;
+            rdfs:label "ServiceBot" .
+
+
+###  https://w3id.org/won/core#Atom
+<https://w3id.org/won/core#Atom> rdf:type owl:Class .
+
+
+###  https://w3id.org/won/message#Message
+<https://w3id.org/won/message#Message> rdf:type owl:Class .
+
+
+###  Generated by the OWL API (version 5.1.9) https://github.com/owlcs/owlapi/

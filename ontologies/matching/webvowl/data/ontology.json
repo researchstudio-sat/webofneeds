@@ -1,0 +1,364 @@
+{
+  "_comment" : "Created with OWL2VOWL (version 0.3.5), http://vowl.visualdataweb.org",
+  "header" : {
+    "languages" : [ "en", "undefined" ],
+    "baseIris" : [ "http://www.w3.org/1999/02/22-rdf-syntax-ns", "https://w3id.org/won/matching", "http://www.w3.org/2000/01/rdf-schema", "http://www.w3.org/2001/XMLSchema", "https://w3id.org/won/core" ],
+    "title" : {
+      "en" : "Web of Needs Matching Ontology"
+    },
+    "iri" : "https://w3id.org/won/matching",
+    "other" : {
+      "license" : [ {
+        "identifier" : "license",
+        "language" : "undefined",
+        "value" : "https://creativecommons.org/licenses/by/4.0/",
+        "type" : "label"
+      } ],
+      "created" : [ {
+        "identifier" : "created",
+        "language" : "undefined",
+        "value" : "2019-05-14",
+        "type" : "label"
+      } ],
+      "preferredNamespacePrefix" : [ {
+        "identifier" : "preferredNamespacePrefix",
+        "language" : "en",
+        "value" : "match",
+        "type" : "label"
+      } ],
+      "abstract" : [ {
+        "identifier" : "abstract",
+        "language" : "en",
+        "value" : "Provides a vocabulary for communication between Atoms and Matchers in Web of Needs. By using this vocabulary, Atoms indicate which kinds of hints they want to receive from Matchers.",
+        "type" : "label"
+      } ],
+      "title" : [ {
+        "identifier" : "title",
+        "language" : "en",
+        "value" : "Web of Needs Matching Ontology",
+        "type" : "label"
+      } ]
+    }
+  },
+  "namespace" : [ ],
+  "class" : [ {
+    "id" : "0",
+    "type" : "owl:Class"
+  }, {
+    "id" : "8",
+    "type" : "rdfs:Datatype"
+  }, {
+    "id" : "9",
+    "type" : "rdfs:Datatype"
+  }, {
+    "id" : "7",
+    "type" : "rdfs:Datatype"
+  }, {
+    "id" : "3",
+    "type" : "owl:Class"
+  }, {
+    "id" : "1",
+    "type" : "owl:Class"
+  }, {
+    "id" : "5",
+    "type" : "rdfs:Datatype"
+  }, {
+    "id" : "13",
+    "type" : "rdfs:Datatype"
+  } ],
+  "classAttribute" : [ {
+    "iri" : "https://w3id.org/won/matching#CounterpartSpecification",
+    "baseIri" : "https://w3id.org/won/matching",
+    "instances" : 0,
+    "label" : {
+      "IRI-based" : "CounterpartSpecification",
+      "undefined" : "CounterpartSpecification"
+    },
+    "comment" : {
+      "undefined" : "Specification or description of the Atoms to be matched with this Atom."
+    },
+    "id" : "0",
+    "superClasses" : [ "1" ]
+  }, {
+    "iri" : "http://www.w3.org/2001/XMLSchema#string",
+    "baseIri" : "http://www.w3.org/2001/XMLSchema",
+    "id" : "8",
+    "label" : {
+      "IRI-based" : "string"
+    }
+  }, {
+    "iri" : "http://www.w3.org/2001/XMLSchema#string",
+    "baseIri" : "http://www.w3.org/2001/XMLSchema",
+    "id" : "9",
+    "label" : {
+      "IRI-based" : "string"
+    }
+  }, {
+    "iri" : "http://www.w3.org/2001/XMLSchema#string",
+    "baseIri" : "http://www.w3.org/2001/XMLSchema",
+    "id" : "7",
+    "label" : {
+      "IRI-based" : "string"
+    }
+  }, {
+    "iri" : "https://w3id.org/won/matching#Flag",
+    "baseIri" : "https://w3id.org/won/matching",
+    "instances" : 0,
+    "annotations" : {
+      "isDefinedBy" : [ {
+        "identifier" : "isDefinedBy",
+        "language" : "undefined",
+        "value" : "https://w3id.org/won/core",
+        "type" : "iri"
+      } ]
+    },
+    "label" : {
+      "IRI-based" : "Flag",
+      "undefined" : "Flag"
+    },
+    "individuals" : [ {
+      "iri" : "https://w3id.org/won/matching#NoHintForMe",
+      "baseIri" : "https://w3id.org/won/matching",
+      "annotations" : {
+        "isDefinedBy" : [ {
+          "identifier" : "isDefinedBy",
+          "language" : "undefined",
+          "value" : "https://w3id.org/won/core",
+          "type" : "iri"
+        } ]
+      },
+      "comment" : {
+        "en" : "An Atom specifying this flag indicates that matchers should not send Hint messages to that Atom. If the NoHintForCounterpart flag is also present, matchers should disregard this atom completely."
+      },
+      "labels" : {
+        "IRI-based" : "NoHintForMe",
+        "undefined" : "NoHintForMe"
+      }
+    }, {
+      "iri" : "https://w3id.org/won/matching#UsedForTesting",
+      "baseIri" : "https://w3id.org/won/matching",
+      "annotations" : {
+        "isDefinedBy" : [ {
+          "identifier" : "isDefinedBy",
+          "language" : "undefined",
+          "value" : "https://w3id.org/won/core",
+          "type" : "iri"
+        } ]
+      },
+      "comment" : {
+        "en" : "Flag indicating the atom has been created for testing purposes. It should only be matched with other atoms flagged with UsedForTesting. The flag is intended to separate real-world atoms from those generated for testing the system, so that users are neither spammed nor misled."
+      },
+      "labels" : {
+        "IRI-based" : "UsedForTesting",
+        "undefined" : "UsedForTesting"
+      }
+    }, {
+      "iri" : "https://w3id.org/won/matching#NoHintForCounterpart",
+      "baseIri" : "https://w3id.org/won/matching",
+      "annotations" : {
+        "isDefinedBy" : [ {
+          "identifier" : "isDefinedBy",
+          "language" : "undefined",
+          "value" : "https://w3id.org/won/core",
+          "type" : "iri"
+        } ]
+      },
+      "comment" : {
+        "en" : "An Atom specifying this flag indicates that matchers should not send Hint messages to the counterpart in case of a match. If the NoHintForMe flag is also present, matchers should disregard this atom completely."
+      },
+      "labels" : {
+        "IRI-based" : "NoHintForCounterpart",
+        "undefined" : "NoHintForCounterpart"
+      }
+    } ],
+    "comment" : {
+      "en" : "Superclass of all Flags an atom can have."
+    },
+    "id" : "3"
+  }, {
+    "iri" : "https://w3id.org/won/core#Atom",
+    "baseIri" : "https://w3id.org/won/core",
+    "instances" : 0,
+    "label" : {
+      "IRI-based" : "Atom"
+    },
+    "subClasses" : [ "0" ],
+    "attributes" : [ "external" ],
+    "id" : "1"
+  }, {
+    "iri" : "http://www.w3.org/2001/XMLSchema#dateTime",
+    "baseIri" : "http://www.w3.org/2001/XMLSchema",
+    "id" : "5",
+    "label" : {
+      "IRI-based" : "dateTime"
+    }
+  }, {
+    "iri" : "http://www.w3.org/2001/XMLSchema#dateTime",
+    "baseIri" : "http://www.w3.org/2001/XMLSchema",
+    "id" : "13",
+    "label" : {
+      "IRI-based" : "dateTime"
+    }
+  } ],
+  "property" : [ {
+    "id" : "2",
+    "type" : "owl:objectProperty"
+  }, {
+    "id" : "4",
+    "type" : "owl:datatypeProperty"
+  }, {
+    "id" : "6",
+    "type" : "owl:datatypeProperty"
+  }, {
+    "id" : "10",
+    "type" : "rdfs:SubClassOf"
+  }, {
+    "id" : "11",
+    "type" : "owl:objectProperty"
+  }, {
+    "id" : "12",
+    "type" : "owl:datatypeProperty"
+  }, {
+    "id" : "14",
+    "type" : "owl:datatypeProperty"
+  }, {
+    "id" : "15",
+    "type" : "owl:datatypeProperty"
+  } ],
+  "propertyAttribute" : [ {
+    "iri" : "https://w3id.org/won/matching#flag",
+    "baseIri" : "https://w3id.org/won/matching",
+    "range" : "3",
+    "annotations" : {
+      "isDefinedBy" : [ {
+        "identifier" : "isDefinedBy",
+        "language" : "undefined",
+        "value" : "https://w3id.org/won/core",
+        "type" : "iri"
+      } ]
+    },
+    "label" : {
+      "IRI-based" : "flag",
+      "undefined" : "flag"
+    },
+    "domain" : "1",
+    "comment" : {
+      "en" : "Links an Atom to its Flags"
+    },
+    "attributes" : [ "object" ],
+    "id" : "2"
+  }, {
+    "iri" : "https://w3id.org/won/matching#doNotMatchAfter",
+    "baseIri" : "https://w3id.org/won/matching",
+    "range" : "5",
+    "annotations" : {
+      "isDefinedBy" : [ {
+        "identifier" : "isDefinedBy",
+        "language" : "undefined",
+        "value" : "https://w3id.org/won/core",
+        "type" : "iri"
+      } ]
+    },
+    "label" : {
+      "IRI-based" : "doNotMatchAfter",
+      "undefined" : "doNotMatchAfter"
+    },
+    "domain" : "1",
+    "comment" : {
+      "en" : "Indicates that matchers should not use this atom for matching after the specified xsd:dateTime."
+    },
+    "attributes" : [ "datatype", "functional" ],
+    "id" : "4"
+  }, {
+    "iri" : "https://w3id.org/won/matching#sparqlQuery",
+    "baseIri" : "https://w3id.org/won/matching",
+    "range" : "7",
+    "label" : {
+      "IRI-based" : "sparqlQuery",
+      "undefined" : "sparqlQuery"
+    },
+    "domain" : "1",
+    "comment" : {
+      "en" : "Atoms can add SPARQL 1.1 queries using this property. Matchers can use these queries to find suitable counterparts in a collection of Atoms."
+    },
+    "attributes" : [ "datatype" ],
+    "id" : "6"
+  }, {
+    "range" : "1",
+    "domain" : "0",
+    "attributes" : [ "object", "anonymous" ],
+    "id" : "10"
+  }, {
+    "iri" : "https://w3id.org/won/matching#seeks",
+    "baseIri" : "https://w3id.org/won/matching",
+    "range" : "0",
+    "annotations" : {
+      "isDefinedBy" : [ {
+        "identifier" : "isDefinedBy",
+        "language" : "undefined",
+        "value" : "https://w3id.org/won/core",
+        "type" : "iri"
+      } ]
+    },
+    "label" : {
+      "IRI-based" : "seeks",
+      "undefined" : "seeks"
+    },
+    "domain" : "1",
+    "comment" : {
+      "undefined" : "This optional property is one of the two properties that defines the content of every atom (the other is the \"is\" property). It is used to describe that part of the content that is\nsought to fulfill the atom in contrast to the part that is available."
+    },
+    "attributes" : [ "object" ],
+    "id" : "11"
+  }, {
+    "iri" : "https://w3id.org/won/matching#searchString",
+    "baseIri" : "https://w3id.org/won/matching",
+    "range" : "9",
+    "label" : {
+      "IRI-based" : "searchString",
+      "undefined" : "searchString"
+    },
+    "domain" : "1",
+    "comment" : {
+      "en" : "Specifies a search string that matchers should use when searching for matches for this Atom."
+    },
+    "attributes" : [ "datatype" ],
+    "id" : "12"
+  }, {
+    "iri" : "https://w3id.org/won/matching#matchingContext",
+    "baseIri" : "https://w3id.org/won/matching",
+    "range" : "8",
+    "label" : {
+      "IRI-based" : "matchingContext",
+      "undefined" : "matchingContext"
+    },
+    "domain" : "1",
+    "comment" : {
+      "en" : "Specifies a 'matching context' for the Atom. Matchers should only send hints to this Atom if the counterpart specifies the same matching context. If no matching context is specified, matching is not restricted, and matchers may send hints with counterparts that do specify matching contexts."
+    },
+    "attributes" : [ "datatype" ],
+    "id" : "14"
+  }, {
+    "iri" : "https://w3id.org/won/matching#doNotMatchBefore",
+    "baseIri" : "https://w3id.org/won/matching",
+    "range" : "13",
+    "annotations" : {
+      "isDefinedBy" : [ {
+        "identifier" : "isDefinedBy",
+        "language" : "undefined",
+        "value" : "https://w3id.org/won/core",
+        "type" : "iri"
+      } ]
+    },
+    "label" : {
+      "IRI-based" : "doNotMatchBefore",
+      "undefined" : "doNotMatchBefore"
+    },
+    "domain" : "1",
+    "comment" : {
+      "en" : "Indicates that matchers should not use this atom for matching before the specified xsd:dateTime."
+    },
+    "attributes" : [ "datatype", "functional" ],
+    "id" : "15"
+  } ]
+}

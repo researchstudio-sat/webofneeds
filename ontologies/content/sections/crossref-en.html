@@ -1,0 +1,329 @@
+<html><h2 id="crossreference" class="list">Cross reference for Web of Needs Content Ontology classes, properties and dataproperties <span class="backlink"> back to <a href="#toc">ToC</a></span></h2>
+This section provides details for each class and property defined by Web of Needs Content Ontology.
+<div id="classes">
+   <h3 id="classes-headline" class="list">Classes</h3>
+   <ul class="hlist">
+      <li>
+         <a href="#DirectResponse" title="https://w3id.org/won/content#DirectResponse">DirectResponse</a>
+      </li>
+      <li>
+         <a href="#ServiceBot" title="https://w3id.org/won/content#ServiceBot">ServiceBot</a>
+      </li>
+   </ul>
+   <div class="entity" id="DirectResponse">
+      <h3>DirectResponse<sup class="type-c" title="class">c</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#classes">Class ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/content#DirectResponse</p>
+      <div class="comment">
+         <span class="markdown">An Atom of this class indicates that it was created for directly responding to another Atom.</span>
+      </div>
+      <dl class="description">
+         <dt>has super-classes</dt>
+         <dd>
+            <span class="dotted" title="https://w3id.org/won/core#Atom">atom</span>
+            <sup class="type-c" title="class">c</sup>
+         </dd>
+         <dt>is in domain of</dt>
+         <dd>
+            <a href="#inResponseTo" title="https://w3id.org/won/content#inResponseTo">inResponseTo</a>
+            <sup class="type-op" title="object property">op</sup>
+         </dd>
+      </dl>
+   </div>
+   <div class="entity" id="ServiceBot">
+      <h3>ServiceBot<sup class="type-c" title="class">c</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#classes">Class ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/content#ServiceBot</p>
+      <div class="comment">
+         <span class="markdown">An Atom of this class indicates that it is controlled by a bot offering a service.</span>
+      </div>
+      <dl class="description">
+         <dt>has super-classes</dt>
+         <dd>
+            <span class="dotted" title="https://w3id.org/won/core#Atom">atom</span>
+            <sup class="type-c" title="class">c</sup>
+         </dd>
+      </dl>
+   </div>
+</div><div id="objectproperties">
+   <h3 id="properties" class="list">Object Properties</h3>
+   <ul class="hlist">
+      <li>
+         <a href="#inResponseTo" title="https://w3id.org/won/content#inResponseTo">inResponseTo</a>
+      </li>
+      <li>
+         <a href="#suggestedAtom" title="https://w3id.org/won/content#suggestedAtom">suggestedAtom</a>
+      </li>
+      <li>
+         <a href="#travelAction" title="https://w3id.org/won/content#travelAction">travelAction</a>
+      </li>
+   </ul>
+   <div class="entity" id="inResponseTo">
+      <h3>inResponseTo<sup class="type-op" title="object property">op</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#objectproperties">Object Property ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/content#inResponseTo</p>
+      <div class="comment">
+         <span class="markdown">An Atom that was created in order to directly respond to another links to that Atom with this property.</span>
+      </div>
+      <div class="description">
+         <dl>
+            <dt>has domain</dt>
+            <dd>
+               <a href="#DirectResponse" title="https://w3id.org/won/content#DirectResponse">DirectResponse</a>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
+            <dt>has range</dt>
+            <dd>
+               <span class="dotted" title="https://w3id.org/won/core#Atom">atom</span>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
+         </dl>
+      </div>
+   </div>
+   <div class="entity" id="suggestedAtom">
+      <h3>suggestedAtom<sup class="type-op" title="object property">op</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#objectproperties">Object Property ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/content#suggestedAtom</p>
+      <div class="comment">
+         <span class="markdown">Suggests to the recipient of the message to connect to the Atom linked to with this property.</span>
+      </div>
+      <div class="description">
+         <dl>
+            <dt>has domain</dt>
+            <dd>
+               <span class="dotted" title="https://w3id.org/won/message#Message">message</span>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
+            <dt>has range</dt>
+            <dd>
+               <span class="dotted" title="https://w3id.org/won/core#Atom">atom</span>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
+         </dl>
+      </div>
+   </div>
+   <div class="entity" id="travelAction">
+      <h3>travelAction<sup class="type-op" title="object property">op</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#objectproperties">Object Property ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/content#travelAction</p>
+      <div class="comment">
+         <span class="markdown">Links the Atom to a schema:TravelAction, indicating that this action is what is being offered/suggested.</span>
+      </div>
+      <div class="description">
+         <dl>
+            <dt>has domain</dt>
+            <dd>
+               <span class="dotted" title="https://w3id.org/won/core#Atom">atom</span>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
+            <dt>has range</dt>
+            <dd>
+               <span class="dotted" title="http://schema.org/TravelAction">travel action</span>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
+         </dl>
+      </div>
+   </div>
+</div><div id="dataproperties">
+   <h3 id="dataproperties-headline" class="list">Data Properties</h3>
+   <ul class="hlist">
+      <li>
+         <a href="#bpmnWorkflow" title="https://w3id.org/won/content#bpmnWorkflow">bpmnWorkflow</a>
+      </li>
+      <li>
+         <a href="#file" title="https://w3id.org/won/content#file">file</a>
+      </li>
+      <li>
+         <a href="#image" title="https://w3id.org/won/content#image">image</a>
+      </li>
+      <li>
+         <a href="#petriNet" title="https://w3id.org/won/content#petriNet">petriNet</a>
+      </li>
+      <li>
+         <a href="#tag" title="https://w3id.org/won/content#tag">tag</a>
+      </li>
+      <li>
+         <a href="#text" title="https://w3id.org/won/content#text">text</a>
+      </li>
+   </ul>
+   <div class="entity" id="bpmnWorkflow">
+      <h3>bpmnWorkflow<sup class="type-dp" title="data property">dp</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#dataproperties">Data Property ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/content#bpmnWorkflow</p>
+      <div class="comment">
+         <span class="markdown">A BPMN conformant XML file in base 64 encoding.</span>
+      </div>
+      <div class="description">
+         <dl>
+            <dt>has domain</dt>
+            <dd>
+               <span class="dotted" title="https://w3id.org/won/core#Atom">atom</span>
+               <sup class="type-c" title="class">c</sup> 
+               <span class="logic">or</span> 
+               <span class="dotted" title="https://w3id.org/won/message#Message">message</span>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
+            <dt>has range</dt>
+            <dd>
+               <span class="dotted" title="http://www.w3.org/2001/XMLSchema#base64Binary">base64 binary</span>
+            </dd>
+         </dl>
+      </div>
+   </div>
+   <div class="entity" id="file">
+      <h3>file<sup class="type-dp" title="data property">dp</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#dataproperties">Data Property ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/content#file</p>
+      <div class="comment">
+         <span class="markdown">A file in base64 encoding.</span>
+      </div>
+      <div class="description">
+         <dl>
+            <dt>has domain</dt>
+            <dd>
+               <span class="dotted" title="https://w3id.org/won/core#Atom">atom</span>
+               <sup class="type-c" title="class">c</sup> 
+               <span class="logic">or</span> 
+               <span class="dotted" title="https://w3id.org/won/message#Message">message</span>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
+            <dt>has range</dt>
+            <dd>
+               <span class="dotted" title="http://www.w3.org/2001/XMLSchema#base64Binary">base64 binary</span>
+            </dd>
+         </dl>
+      </div>
+   </div>
+   <div class="entity" id="image">
+      <h3>image<sup class="type-dp" title="data property">dp</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#dataproperties">Data Property ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/content#image</p>
+      <div class="comment">
+         <span class="markdown">Image data in base64 encoding.</span>
+      </div>
+      <div class="description">
+         <dl>
+            <dt>has domain</dt>
+            <dd>
+               <span class="dotted" title="https://w3id.org/won/core#Atom">atom</span>
+               <sup class="type-c" title="class">c</sup> 
+               <span class="logic">or</span> 
+               <span class="dotted" title="https://w3id.org/won/message#Message">message</span>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
+            <dt>has range</dt>
+            <dd>
+               <span class="dotted" title="http://www.w3.org/2001/XMLSchema#base64Binary">base64 binary</span>
+            </dd>
+         </dl>
+      </div>
+   </div>
+   <div class="entity" id="petriNet">
+      <h3>petriNet<sup class="type-dp" title="data property">dp</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#dataproperties">Data Property ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/content#petriNet</p>
+      <div class="comment">
+         <span class="markdown">The base64 serialization of  the XML file exported from PIPE (https://github.com/sarahtattersall/PIPE)</span>
+      </div>
+      <div class="description">
+         <dl>
+            <dt>has domain</dt>
+            <dd>
+               <span class="dotted" title="https://w3id.org/won/core#Atom">atom</span>
+               <sup class="type-c" title="class">c</sup> 
+               <span class="logic">or</span> 
+               <span class="dotted" title="https://w3id.org/won/message#Message">message</span>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
+            <dt>has range</dt>
+            <dd>
+               <span class="dotted" title="http://www.w3.org/2001/XMLSchema#base64Binary">base64 binary</span>
+            </dd>
+         </dl>
+      </div>
+   </div>
+   <div class="entity" id="tag">
+      <h3>tag<sup class="type-dp" title="data property">dp</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#dataproperties">Data Property ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/content#tag</p>
+      <div class="comment">
+         <span class="markdown">Tags an Atom with a String value.</span>
+      </div>
+      <div class="description">
+         <dl>
+            <dt>has domain</dt>
+            <dd>
+               <span class="dotted" title="https://w3id.org/won/core#Atom">atom</span>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
+            <dt>has range</dt>
+            <dd>
+               <span class="dotted" title="http://www.w3.org/2001/XMLSchema#string">string</span>
+            </dd>
+         </dl>
+      </div>
+   </div>
+   <div class="entity" id="text">
+      <h3>text<sup class="type-dp" title="data property">dp</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#dataproperties">Data Property ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/content#text</p>
+      <div class="comment">
+         <span class="markdown">The textual content of a Message.</span>
+      </div>
+      <div class="description">
+         <dl>
+            <dt>has domain</dt>
+            <dd>
+               <span class="dotted" title="https://w3id.org/won/message#Message">message</span>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
+            <dt>has range</dt>
+            <dd>
+               <span class="dotted" title="http://www.w3.org/2001/XMLSchema#string">string</span>
+            </dd>
+         </dl>
+      </div>
+   </div>
+</div><div id="legend">
+<h2>Legend <span class="backlink"> back to <a href="#toc">ToC</a></span></h2>
+<div   class="entity">
+<sup class="type-c" title="Classes">c</sup>: Classes <br/>
+<sup class="type-op" title="Object Properties">op</sup>: Object Properties <br/>
+<sup class="type-dp" title="Data Properties">dp</sup>: Data Properties <br/>
+<sup class="type-ni" title="Named Individuals">ni</sup>: Named Individuals
+</div>
+</div>
+</html>

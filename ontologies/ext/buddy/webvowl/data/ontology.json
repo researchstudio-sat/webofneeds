@@ -2039,6 +2039,20 @@
     "attributes" : [ "anonymous", "object" ],
     "id" : "130"
   }, {
+    "iri" : "https://w3id.org/won/core#atomList",
+    "baseIri" : "https://w3id.org/won/core",
+    "range" : "60",
+    "label" : {
+      "IRI-based" : "atomList",
+      "undefined" : "atomList"
+    },
+    "domain" : "21",
+    "comment" : {
+      "undefined" : "The Node's atoms, in a LDP-pageable container."
+    },
+    "attributes" : [ "object", "external" ],
+    "id" : "131"
+  }, {
     "iri" : "https://w3id.org/won/core#defaultSocket",
     "baseIri" : "https://w3id.org/won/core",
     "range" : "0",
@@ -2057,20 +2071,6 @@
     "domain" : "7",
     "comment" : {
       "en" : "Indicates the socket to connect to by default."
-    },
-    "attributes" : [ "object", "external" ],
-    "id" : "131"
-  }, {
-    "iri" : "https://w3id.org/won/core#atomList",
-    "baseIri" : "https://w3id.org/won/core",
-    "range" : "60",
-    "label" : {
-      "IRI-based" : "atomList",
-      "undefined" : "atomList"
-    },
-    "domain" : "21",
-    "comment" : {
-      "undefined" : "The Node's atoms, in a LDP-pageable container."
     },
     "attributes" : [ "object", "external" ],
     "id" : "132"

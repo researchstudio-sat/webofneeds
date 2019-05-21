@@ -1,0 +1,393 @@
+<html><h2 id="crossreference" class="list">Cross reference for Web of Needs Matching Ontology classes, properties and dataproperties <span class="backlink"> back to <a href="#toc">ToC</a></span></h2>
+This section provides details for each class and property defined by Web of Needs Matching Ontology.
+<div id="classes">
+   <h3 id="classes-headline" class="list">Classes</h3>
+   <ul class="hlist">
+      <li>
+         <a href="#CounterpartSpecification"
+            title="https://w3id.org/won/matching#CounterpartSpecification">CounterpartSpecification</a>
+      </li>
+      <li>
+         <a href="#Flag" title="https://w3id.org/won/matching#Flag">Flag</a>
+      </li>
+   </ul>
+   <div class="entity" id="CounterpartSpecification">
+      <h3>CounterpartSpecification<sup class="type-c" title="class">c</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#classes">Class ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/matching#CounterpartSpecification</p>
+      <div class="comment">
+         <span class="markdown">Specification or description of the Atoms to be matched with this Atom.</span>
+      </div>
+      <dl class="description">
+         <dt>has super-classes</dt>
+         <dd>
+            <span class="dotted" title="https://w3id.org/won/core#Atom">atom</span>
+            <sup class="type-c" title="class">c</sup>
+         </dd>
+         <dt>is in range of</dt>
+         <dd>
+            <a href="#seeks" title="https://w3id.org/won/matching#seeks">seeks</a>
+            <sup class="type-op" title="object property">op</sup>
+         </dd>
+      </dl>
+   </div>
+   <div class="entity" id="Flag">
+      <h3>Flag<sup class="type-c" title="class">c</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#classes">Class ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/matching#Flag</p>
+      <div class="comment">
+         <span class="markdown">Superclass of all Flags an atom can have.</span>
+      </div>
+      <dl class="definedBy">
+         <dt>Is defined by</dt>
+         <dd>
+            <a href="https://w3id.org/won/core">https://w3id.org/won/core</a>
+         </dd>
+      </dl>
+      <dl class="description">
+         <dt>is in range of</dt>
+         <dd>
+            <a href="#flag" title="https://w3id.org/won/matching#flag">flag</a>
+            <sup class="type-op" title="object property">op</sup>
+         </dd>
+         <dt>has members</dt>
+         <dd>
+            <a href="#NoHintForCounterpart"
+               title="https://w3id.org/won/matching#NoHintForCounterpart">NoHintForCounterpart</a>
+            <sup class="type-ni" title="named individual">ni</sup>, <a href="#NoHintForMe" title="https://w3id.org/won/matching#NoHintForMe">NoHintForMe</a>
+            <sup class="type-ni" title="named individual">ni</sup>, <a href="#UsedForTesting" title="https://w3id.org/won/matching#UsedForTesting">UsedForTesting</a>
+            <sup class="type-ni" title="named individual">ni</sup>
+         </dd>
+      </dl>
+   </div>
+</div><div id="objectproperties">
+   <h3 id="properties" class="list">Object Properties</h3>
+   <ul class="hlist">
+      <li>
+         <a href="#flag" title="https://w3id.org/won/matching#flag">flag</a>
+      </li>
+      <li>
+         <a href="#seeks" title="https://w3id.org/won/matching#seeks">seeks</a>
+      </li>
+   </ul>
+   <div class="entity" id="flag">
+      <h3>flag<sup class="type-op" title="object property">op</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#objectproperties">Object Property ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/matching#flag</p>
+      <div class="comment">
+         <span class="markdown">Links an Atom to its Flags</span>
+      </div>
+      <dl class="definedBy">
+         <dt>Is defined by</dt>
+         <dd>
+            <a href="https://w3id.org/won/core">https://w3id.org/won/core</a>
+         </dd>
+      </dl>
+      <div class="description">
+         <dl>
+            <dt>has domain</dt>
+            <dd>
+               <span class="dotted" title="https://w3id.org/won/core#Atom">atom</span>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
+            <dt>has range</dt>
+            <dd>
+               <a href="#Flag" title="https://w3id.org/won/matching#Flag">Flag</a>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
+         </dl>
+      </div>
+   </div>
+   <div class="entity" id="seeks">
+      <h3>seeks<sup class="type-op" title="object property">op</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#objectproperties">Object Property ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/matching#seeks</p>
+      <div class="comment">
+         <span class="markdown">This optional property is one of the two properties that defines the content of every atom (the other is the "is" property). It is used to describe that part of the content that is
+sought to fulfill the atom in contrast to the part that is available.</span>
+      </div>
+      <dl class="definedBy">
+         <dt>Is defined by</dt>
+         <dd>
+            <a href="https://w3id.org/won/core">https://w3id.org/won/core</a>
+         </dd>
+      </dl>
+      <div class="description">
+         <dl>
+            <dt>has domain</dt>
+            <dd>
+               <span class="dotted" title="https://w3id.org/won/core#Atom">atom</span>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
+            <dt>has range</dt>
+            <dd>
+               <a href="#CounterpartSpecification"
+                  title="https://w3id.org/won/matching#CounterpartSpecification">CounterpartSpecification</a>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
+         </dl>
+      </div>
+   </div>
+</div><div id="dataproperties">
+   <h3 id="dataproperties-headline" class="list">Data Properties</h3>
+   <ul class="hlist">
+      <li>
+         <a href="#doNotMatchAfter" title="https://w3id.org/won/matching#doNotMatchAfter">doNotMatchAfter</a>
+      </li>
+      <li>
+         <a href="#doNotMatchBefore" title="https://w3id.org/won/matching#doNotMatchBefore">doNotMatchBefore</a>
+      </li>
+      <li>
+         <a href="#matchingContext" title="https://w3id.org/won/matching#matchingContext">matchingContext</a>
+      </li>
+      <li>
+         <a href="#searchString" title="https://w3id.org/won/matching#searchString">searchString</a>
+      </li>
+      <li>
+         <a href="#sparqlQuery" title="https://w3id.org/won/matching#sparqlQuery">sparqlQuery</a>
+      </li>
+   </ul>
+   <div class="entity" id="doNotMatchAfter">
+      <h3>doNotMatchAfter<sup class="type-dp" title="data property">dp</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#dataproperties">Data Property ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/matching#doNotMatchAfter</p>
+      <div class="comment">
+         <span class="markdown">Indicates that matchers should not use this atom for matching after the specified xsd:dateTime.</span>
+      </div>
+      <dl class="definedBy">
+         <dt>Is defined by</dt>
+         <dd>
+            <a href="https://w3id.org/won/core">https://w3id.org/won/core</a>
+         </dd>
+      </dl>
+      <div class="description">
+         <p>
+            <strong>has characteristics:</strong> functional</p>
+         <dl>
+            <dt>has domain</dt>
+            <dd>
+               <span class="dotted" title="https://w3id.org/won/core#Atom">atom</span>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
+            <dt>has range</dt>
+            <dd>
+               <span class="dotted" title="http://www.w3.org/2001/XMLSchema#dateTime">date time</span>
+            </dd>
+         </dl>
+      </div>
+   </div>
+   <div class="entity" id="doNotMatchBefore">
+      <h3>doNotMatchBefore<sup class="type-dp" title="data property">dp</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#dataproperties">Data Property ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/matching#doNotMatchBefore</p>
+      <div class="comment">
+         <span class="markdown">Indicates that matchers should not use this atom for matching before the specified xsd:dateTime.</span>
+      </div>
+      <dl class="definedBy">
+         <dt>Is defined by</dt>
+         <dd>
+            <a href="https://w3id.org/won/core">https://w3id.org/won/core</a>
+         </dd>
+      </dl>
+      <div class="description">
+         <p>
+            <strong>has characteristics:</strong> functional</p>
+         <dl>
+            <dt>has domain</dt>
+            <dd>
+               <span class="dotted" title="https://w3id.org/won/core#Atom">atom</span>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
+            <dt>has range</dt>
+            <dd>
+               <span class="dotted" title="http://www.w3.org/2001/XMLSchema#dateTime">date time</span>
+            </dd>
+         </dl>
+      </div>
+   </div>
+   <div class="entity" id="matchingContext">
+      <h3>matchingContext<sup class="type-dp" title="data property">dp</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#dataproperties">Data Property ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/matching#matchingContext</p>
+      <div class="comment">
+         <span class="markdown">Specifies a 'matching context' for the Atom. Matchers should only send hints to this Atom if the counterpart specifies the same matching context. If no matching context is specified, matching is not restricted, and matchers may send hints with counterparts that do specify matching contexts.</span>
+      </div>
+      <div class="description">
+         <dl>
+            <dt>has domain</dt>
+            <dd>
+               <span class="dotted" title="https://w3id.org/won/core#Atom">atom</span>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
+            <dt>has range</dt>
+            <dd>
+               <span class="dotted" title="http://www.w3.org/2001/XMLSchema#string">string</span>
+            </dd>
+         </dl>
+      </div>
+   </div>
+   <div class="entity" id="searchString">
+      <h3>searchString<sup class="type-dp" title="data property">dp</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#dataproperties">Data Property ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/matching#searchString</p>
+      <div class="comment">
+         <span class="markdown">Specifies a search string that matchers should use when searching for matches for this Atom.</span>
+      </div>
+      <div class="description">
+         <dl>
+            <dt>has domain</dt>
+            <dd>
+               <span class="dotted" title="https://w3id.org/won/core#Atom">atom</span>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
+            <dt>has range</dt>
+            <dd>
+               <span class="dotted" title="http://www.w3.org/2001/XMLSchema#string">string</span>
+            </dd>
+         </dl>
+      </div>
+   </div>
+   <div class="entity" id="sparqlQuery">
+      <h3>sparqlQuery<sup class="type-dp" title="data property">dp</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#dataproperties">Data Property ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/matching#sparqlQuery</p>
+      <div class="comment">
+         <span class="markdown">Atoms can add SPARQL 1.1 queries using this property. Matchers can use these queries to find suitable counterparts in a collection of Atoms.</span>
+      </div>
+      <div class="description">
+         <dl>
+            <dt>has domain</dt>
+            <dd>
+               <span class="dotted" title="https://w3id.org/won/core#Atom">atom</span>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
+            <dt>has range</dt>
+            <dd>
+               <span class="dotted" title="http://www.w3.org/2001/XMLSchema#string">string</span>
+            </dd>
+         </dl>
+      </div>
+   </div>
+</div><div id="namedindividuals">
+   <h3 id="namedindividuals" class="list">Named Individuals</h3>
+   <ul class="hlist">
+      <li>
+         <a href="#NoHintForCounterpart"
+            title="https://w3id.org/won/matching#NoHintForCounterpart">NoHintForCounterpart</a>
+      </li>
+      <li>
+         <a href="#NoHintForMe" title="https://w3id.org/won/matching#NoHintForMe">NoHintForMe</a>
+      </li>
+      <li>
+         <a href="#UsedForTesting" title="https://w3id.org/won/matching#UsedForTesting">UsedForTesting</a>
+      </li>
+   </ul>
+   <div class="entity" id="NoHintForCounterpart">
+      <h3>NoHintForCounterpart<sup class="type-ni" title="named individual">ni</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#namedindividuals">Named Individual ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/matching#NoHintForCounterpart</p>
+      <div class="comment">
+         <span class="markdown">An Atom specifying this flag indicates that matchers should not send Hint messages to the counterpart in case of a match. If the NoHintForMe flag is also present, matchers should disregard this atom completely.</span>
+      </div>
+      <dl class="definedBy">
+         <dt>Is defined by</dt>
+         <dd>
+            <a href="https://w3id.org/won/core">https://w3id.org/won/core</a>
+         </dd>
+      </dl>
+      <dl class="description">
+         <dt>belongs to</dt>
+         <dd>
+            <a href="#Flag" title="https://w3id.org/won/matching#Flag">Flag</a>
+            <sup class="type-c" title="class">c</sup>
+         </dd>
+      </dl>
+   </div>
+   <div class="entity" id="NoHintForMe">
+      <h3>NoHintForMe<sup class="type-ni" title="named individual">ni</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#namedindividuals">Named Individual ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/matching#NoHintForMe</p>
+      <div class="comment">
+         <span class="markdown">An Atom specifying this flag indicates that matchers should not send Hint messages to that Atom. If the NoHintForCounterpart flag is also present, matchers should disregard this atom completely.</span>
+      </div>
+      <dl class="definedBy">
+         <dt>Is defined by</dt>
+         <dd>
+            <a href="https://w3id.org/won/core">https://w3id.org/won/core</a>
+         </dd>
+      </dl>
+      <dl class="description">
+         <dt>belongs to</dt>
+         <dd>
+            <a href="#Flag" title="https://w3id.org/won/matching#Flag">Flag</a>
+            <sup class="type-c" title="class">c</sup>
+         </dd>
+      </dl>
+   </div>
+   <div class="entity" id="UsedForTesting">
+      <h3>UsedForTesting<sup class="type-ni" title="named individual">ni</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#namedindividuals">Named Individual ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/matching#UsedForTesting</p>
+      <div class="comment">
+         <span class="markdown">Flag indicating the atom has been created for testing purposes. It should only be matched with other atoms flagged with UsedForTesting. The flag is intended to separate real-world atoms from those generated for testing the system, so that users are neither spammed nor misled.</span>
+      </div>
+      <dl class="definedBy">
+         <dt>Is defined by</dt>
+         <dd>
+            <a href="https://w3id.org/won/core">https://w3id.org/won/core</a>
+         </dd>
+      </dl>
+      <dl class="description">
+         <dt>belongs to</dt>
+         <dd>
+            <a href="#Flag" title="https://w3id.org/won/matching#Flag">Flag</a>
+            <sup class="type-c" title="class">c</sup>
+         </dd>
+      </dl>
+   </div>
+</div><div id="legend">
+<h2>Legend <span class="backlink"> back to <a href="#toc">ToC</a></span></h2>
+<div   class="entity">
+<sup class="type-c" title="Classes">c</sup>: Classes <br/>
+<sup class="type-op" title="Object Properties">op</sup>: Object Properties <br/>
+<sup class="type-dp" title="Data Properties">dp</sup>: Data Properties <br/>
+<sup class="type-ni" title="Named Individuals">ni</sup>: Named Individuals
+</div>
+</div>
+</html>

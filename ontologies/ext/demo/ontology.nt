@@ -1,0 +1,174 @@
+<https://w3id.org/won/ext/demo> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Ontology> .
+<https://w3id.org/won/ext/demo> <http://www.w3.org/2002/07/owl#versionIRI> <https://w3id.org/won/ext/demo/1.0> .
+<https://w3id.org/won/ext/demo> <http://purl.org/dc/elements/1.1/abstract> "Extension that provides a vocabulary for the Web of Needs Demo on https://matchat.org/. This ontology provides a sandbox environment for experimenting with different approaches for modeling a domain quickly. More mature models will be moved to independent extensions, which are expected to be more stable."@en .
+<https://w3id.org/won/ext/demo> <http://purl.org/dc/elements/1.1/creator> "Florian Kleedorfer" .
+<https://w3id.org/won/ext/demo> <http://purl.org/dc/elements/1.1/title> "Web of Needs Demo Extension" .
+<https://w3id.org/won/ext/demo> <http://purl.org/dc/terms/created> "2019-05-20"^^<http://www.w3.org/2001/XMLSchema#date> .
+<https://w3id.org/won/ext/demo> <http://purl.org/dc/terms/license> <https://creativecommons.org/licenses/by/4.0/> .
+<https://w3id.org/won/ext/demo> <http://purl.org/vocab/vann/preferredNamespacePrefix> "demo" .
+# 
+# 
+# #################################################################
+# #
+# #    Annotation properties
+# #
+# #################################################################
+# 
+# 
+# http://purl.org/dc/elements/1.1/abstract
+<http://purl.org/dc/elements/1.1/abstract> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
+# 
+# http://purl.org/dc/elements/1.1/creator
+<http://purl.org/dc/elements/1.1/creator> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
+# 
+# http://purl.org/dc/elements/1.1/date
+<http://purl.org/dc/elements/1.1/date> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
+# 
+# http://purl.org/dc/elements/1.1/description
+<http://purl.org/dc/elements/1.1/description> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
+# 
+# http://purl.org/dc/elements/1.1/title
+<http://purl.org/dc/elements/1.1/title> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
+# 
+# http://purl.org/dc/terms/created
+<http://purl.org/dc/terms/created> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
+# 
+# http://purl.org/dc/terms/license
+<http://purl.org/dc/terms/license> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
+# 
+# http://purl.org/vocab/vann/preferredNamespacePrefix
+<http://purl.org/vocab/vann/preferredNamespacePrefix> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
+# 
+# 
+# 
+# #################################################################
+# #
+# #    Data properties
+# #
+# #################################################################
+# 
+# 
+# https://w3id.org/won/ext/demo#genre
+<https://w3id.org/won/ext/demo#genre> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
+<https://w3id.org/won/ext/demo#genre> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/ext/demo#Musician> .
+<https://w3id.org/won/ext/demo#genre> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/won/ext/demo#genre> <http://www.w3.org/2000/01/rdf-schema#comment> "genre comment"@en .
+<https://w3id.org/won/ext/demo#genre> <http://www.w3.org/2000/01/rdf-schema#label> "genre" .
+# 
+# https://w3id.org/won/ext/demo#instrument
+<https://w3id.org/won/ext/demo#instrument> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
+<https://w3id.org/won/ext/demo#instrument> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/ext/demo#Musician> .
+<https://w3id.org/won/ext/demo#instrument> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/won/ext/demo#instrument> <http://www.w3.org/2000/01/rdf-schema#comment> "instrument comment"@en .
+<https://w3id.org/won/ext/demo#instrument> <http://www.w3.org/2000/01/rdf-schema#label> "instrument" .
+# 
+# 
+# 
+# #################################################################
+# #
+# #    Classes
+# #
+# #################################################################
+# 
+# 
+# https://w3id.org/won/ext/demo#AfterParty
+<https://w3id.org/won/ext/demo#AfterParty> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<https://w3id.org/won/ext/demo#AfterParty> <http://www.w3.org/2000/01/rdf-schema#comment> "Class for describing parties after some event."@en .
+<https://w3id.org/won/ext/demo#AfterParty> <http://www.w3.org/2000/01/rdf-schema#label> "AfterParty" .
+# 
+# https://w3id.org/won/ext/demo#Breakfast
+<https://w3id.org/won/ext/demo#Breakfast> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<https://w3id.org/won/ext/demo#Breakfast> <http://www.w3.org/2000/01/rdf-schema#comment> "Class for descrbing breakfasts, for example for early morning meetings."@en .
+<https://w3id.org/won/ext/demo#Breakfast> <http://www.w3.org/2000/01/rdf-schema#label> "Breakfast" .
+# 
+# https://w3id.org/won/ext/demo#Complaint
+<https://w3id.org/won/ext/demo#Complaint> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<https://w3id.org/won/ext/demo#Complaint> <http://www.w3.org/2000/01/rdf-schema#comment> "Class of complaints about something. Similar complaints may be matched with each other, or with a group concerned with the topic of the complaint."@en .
+<https://w3id.org/won/ext/demo#Complaint> <http://www.w3.org/2000/01/rdf-schema#label> "Complaint" .
+# 
+# https://w3id.org/won/ext/demo#ConsortiumOffer
+<https://w3id.org/won/ext/demo#ConsortiumOffer> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<https://w3id.org/won/ext/demo#ConsortiumOffer> <http://www.w3.org/2000/01/rdf-schema#comment> "Offer to join a consortium."@en .
+<https://w3id.org/won/ext/demo#ConsortiumOffer> <http://www.w3.org/2000/01/rdf-schema#label> "ConsortiumOffer" .
+# 
+# https://w3id.org/won/ext/demo#ConsortiumSearch
+<https://w3id.org/won/ext/demo#ConsortiumSearch> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<https://w3id.org/won/ext/demo#ConsortiumSearch> <http://www.w3.org/2000/01/rdf-schema#comment> "Interest in joining a consortium."@en .
+<https://w3id.org/won/ext/demo#ConsortiumSearch> <http://www.w3.org/2000/01/rdf-schema#label> "ConsortiumSearch" .
+# 
+# https://w3id.org/won/ext/demo#HandleComplaint
+<https://w3id.org/won/ext/demo#HandleComplaint> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<https://w3id.org/won/ext/demo#HandleComplaint> <http://www.w3.org/2000/01/rdf-schema#comment> "Intention to handle complaints. May be matched with complaints or related groups."@en .
+<https://w3id.org/won/ext/demo#HandleComplaint> <http://www.w3.org/2000/01/rdf-schema#label> "HandleComplaint" .
+# 
+# https://w3id.org/won/ext/demo#Interest
+<https://w3id.org/won/ext/demo#Interest> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<https://w3id.org/won/ext/demo#Interest> <http://www.w3.org/2000/01/rdf-schema#comment> "Announce an interest in something, such as a hobby."@en .
+<https://w3id.org/won/ext/demo#Interest> <http://www.w3.org/2000/01/rdf-schema#label> "Interest" .
+# 
+# https://w3id.org/won/ext/demo#Meetup
+<https://w3id.org/won/ext/demo#Meetup> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<https://w3id.org/won/ext/demo#Meetup> <http://www.w3.org/2000/01/rdf-schema#comment> "Class for meetups."@en .
+<https://w3id.org/won/ext/demo#Meetup> <http://www.w3.org/2000/01/rdf-schema#label> "Meetup" .
+# 
+# https://w3id.org/won/ext/demo#Musician
+<https://w3id.org/won/ext/demo#Musician> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<https://w3id.org/won/ext/demo#Musician> <http://www.w3.org/2000/01/rdf-schema#comment> "Class for musicians, to be matched with searches for musicians."@en .
+<https://w3id.org/won/ext/demo#Musician> <http://www.w3.org/2000/01/rdf-schema#label> "Musician" .
+# 
+# https://w3id.org/won/ext/demo#PaymentServiceRequest
+<https://w3id.org/won/ext/demo#PaymentServiceRequest> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<https://w3id.org/won/ext/demo#PaymentServiceRequest> <http://www.w3.org/2000/01/rdf-schema#comment> "Demand for a payment service."@en .
+<https://w3id.org/won/ext/demo#PaymentServiceRequest> <http://www.w3.org/2000/01/rdf-schema#label> "PaymentServiceRequest" .
+# 
+# https://w3id.org/won/ext/demo#PersonalTransportSearch
+<https://w3id.org/won/ext/demo#PersonalTransportSearch> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<https://w3id.org/won/ext/demo#PersonalTransportSearch> <http://www.w3.org/2000/01/rdf-schema#comment> "Search for a people transport, for example, a taxi ride."@en .
+<https://w3id.org/won/ext/demo#PersonalTransportSearch> <http://www.w3.org/2000/01/rdf-schema#label> "PersonalTransportSearch" .
+# 
+# https://w3id.org/won/ext/demo#PhdPosition
+<https://w3id.org/won/ext/demo#PhdPosition> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<https://w3id.org/won/ext/demo#PhdPosition> <http://www.w3.org/2000/01/rdf-schema#comment> "Offering of a PhD position."@en .
+<https://w3id.org/won/ext/demo#PhdPosition> <http://www.w3.org/2000/01/rdf-schema#label> "PhdPosition" .
+# 
+# https://w3id.org/won/ext/demo#PhdPositionSearch
+<https://w3id.org/won/ext/demo#PhdPositionSearch> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<https://w3id.org/won/ext/demo#PhdPositionSearch> <http://www.w3.org/2000/01/rdf-schema#comment> "Search for a PhD position."@en .
+<https://w3id.org/won/ext/demo#PhdPositionSearch> <http://www.w3.org/2000/01/rdf-schema#label> "PhdPositionSearch" .
+# 
+# https://w3id.org/won/ext/demo#PostDocPosition
+<https://w3id.org/won/ext/demo#PostDocPosition> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<https://w3id.org/won/ext/demo#PostDocPosition> <http://www.w3.org/2000/01/rdf-schema#comment> "Offering of a PostDoc position."@en .
+<https://w3id.org/won/ext/demo#PostDocPosition> <http://www.w3.org/2000/01/rdf-schema#label> "PostDocPosition" .
+# 
+# https://w3id.org/won/ext/demo#PostDocSearch
+<https://w3id.org/won/ext/demo#PostDocSearch> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<https://w3id.org/won/ext/demo#PostDocSearch> <http://www.w3.org/2000/01/rdf-schema#comment> "Search for a PostDoc position"@en .
+<https://w3id.org/won/ext/demo#PostDocSearch> <http://www.w3.org/2000/01/rdf-schema#label> "PostDocSearch" .
+# 
+# https://w3id.org/won/ext/demo#RealEstateRentDemand
+<https://w3id.org/won/ext/demo#RealEstateRentDemand> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<https://w3id.org/won/ext/demo#RealEstateRentDemand> <http://www.w3.org/2000/01/rdf-schema#comment> "Demand for renting real estate."@en .
+<https://w3id.org/won/ext/demo#RealEstateRentDemand> <http://www.w3.org/2000/01/rdf-schema#label> "RealEstateRentDemand" .
+# 
+# https://w3id.org/won/ext/demo#RealEstateRentOffer
+<https://w3id.org/won/ext/demo#RealEstateRentOffer> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<https://w3id.org/won/ext/demo#RealEstateRentOffer> <http://www.w3.org/2000/01/rdf-schema#comment> "Offer to rent out real estate."@en .
+<https://w3id.org/won/ext/demo#RealEstateRentOffer> <http://www.w3.org/2000/01/rdf-schema#label> "RealEstateRentOffer" .
+# 
+# https://w3id.org/won/ext/demo#RehearsalRoomRentDemand
+<https://w3id.org/won/ext/demo#RehearsalRoomRentDemand> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<https://w3id.org/won/ext/demo#RehearsalRoomRentDemand> <http://www.w3.org/2000/01/rdf-schema#comment> "Demand to rent a rehearsal room for music bands."@en .
+<https://w3id.org/won/ext/demo#RehearsalRoomRentDemand> <http://www.w3.org/2000/01/rdf-schema#label> "RehearsalRoomRentDemand" .
+# 
+# https://w3id.org/won/ext/demo#RehearsalRoomRentOffer
+<https://w3id.org/won/ext/demo#RehearsalRoomRentOffer> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<https://w3id.org/won/ext/demo#RehearsalRoomRentOffer> <http://www.w3.org/2000/01/rdf-schema#comment> "Offer to rent out a rehearsal room for music bands."@en .
+<https://w3id.org/won/ext/demo#RehearsalRoomRentOffer> <http://www.w3.org/2000/01/rdf-schema#label> "RehearsalRoomRentOffer" .
+# 
+# https://w3id.org/won/ext/demo#SightSeeing
+<https://w3id.org/won/ext/demo#SightSeeing> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<https://w3id.org/won/ext/demo#SightSeeing> <http://www.w3.org/2000/01/rdf-schema#comment> "Sightseeing tour/trip."@en .
+<https://w3id.org/won/ext/demo#SightSeeing> <http://www.w3.org/2000/01/rdf-schema#label> "SightSeeing" .
+# 
+# Generated by the OWL API (version 5.1.9) https://github.com/owlcs/owlapi/

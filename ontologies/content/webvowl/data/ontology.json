@@ -1,0 +1,378 @@
+{
+  "_comment" : "Created with OWL2VOWL (version 0.3.5), http://vowl.visualdataweb.org",
+  "header" : {
+    "languages" : [ "en", "undefined" ],
+    "baseIris" : [ "http://www.w3.org/1999/02/22-rdf-syntax-ns", "https://w3id.org/won/content", "http://schema.org", "http://www.w3.org/2000/01/rdf-schema", "https://w3id.org/won/message", "http://www.w3.org/2001/XMLSchema", "https://w3id.org/won/core" ],
+    "title" : {
+      "en" : "Web of Needs Content Ontology"
+    },
+    "iri" : "https://w3id.org/won/content",
+    "other" : {
+      "license" : [ {
+        "identifier" : "license",
+        "language" : "undefined",
+        "value" : "https://creativecommons.org/licenses/by/4.0/",
+        "type" : "label"
+      } ],
+      "created" : [ {
+        "identifier" : "created",
+        "language" : "undefined",
+        "value" : "2019-05-14",
+        "type" : "label"
+      } ],
+      "preferredNamespacePrefix" : [ {
+        "identifier" : "preferredNamespacePrefix",
+        "language" : "undefined",
+        "value" : "wcnt",
+        "type" : "label"
+      } ],
+      "abstract" : [ {
+        "identifier" : "abstract",
+        "language" : "en",
+        "value" : "This ontology defines properties commonly used in the content of Messages and Atoms, in parallel to the [WoN Matching Ontology](https://w3id.org/won/matching). That does not mean that these are the only properties that can be used in messages. The content of a message (i.e., the triples in any of its ContentGraphs) is unrestricted, except for the rule that no part of the [WoN Message vocabulary](https://w3id.org/won/message) may be used in the content.",
+        "type" : "label"
+      } ],
+      "title" : [ {
+        "identifier" : "title",
+        "language" : "en",
+        "value" : "Web of Needs Content Ontology",
+        "type" : "label"
+      } ]
+    }
+  },
+  "namespace" : [ ],
+  "class" : [ {
+    "id" : "6",
+    "type" : "owl:unionOf"
+  }, {
+    "id" : "11",
+    "type" : "rdfs:Datatype"
+  }, {
+    "id" : "1",
+    "type" : "owl:unionOf"
+  }, {
+    "id" : "2",
+    "type" : "rdfs:Datatype"
+  }, {
+    "id" : "4",
+    "type" : "owl:unionOf"
+  }, {
+    "id" : "5",
+    "type" : "rdfs:Datatype"
+  }, {
+    "id" : "8",
+    "type" : "owl:Class"
+  }, {
+    "id" : "10",
+    "type" : "rdfs:Datatype"
+  }, {
+    "id" : "15",
+    "type" : "rdfs:Datatype"
+  }, {
+    "id" : "7",
+    "type" : "owl:Class"
+  }, {
+    "id" : "13",
+    "type" : "owl:unionOf"
+  }, {
+    "id" : "14",
+    "type" : "rdfs:Datatype"
+  }, {
+    "id" : "20",
+    "type" : "owl:Class"
+  }, {
+    "id" : "16",
+    "type" : "owl:Class"
+  }, {
+    "id" : "17",
+    "type" : "owl:Class"
+  } ],
+  "classAttribute" : [ {
+    "instances" : 0,
+    "union" : [ "7", "8" ],
+    "attributes" : [ "anonymous", "union" ],
+    "id" : "6"
+  }, {
+    "iri" : "http://www.w3.org/2001/XMLSchema#base64Binary",
+    "baseIri" : "http://www.w3.org/2001/XMLSchema",
+    "id" : "11",
+    "label" : {
+      "IRI-based" : "base64Binary"
+    }
+  }, {
+    "instances" : 0,
+    "union" : [ "7", "8" ],
+    "attributes" : [ "anonymous", "union" ],
+    "id" : "1"
+  }, {
+    "iri" : "http://www.w3.org/2001/XMLSchema#base64Binary",
+    "baseIri" : "http://www.w3.org/2001/XMLSchema",
+    "id" : "2",
+    "label" : {
+      "IRI-based" : "base64Binary"
+    }
+  }, {
+    "instances" : 0,
+    "union" : [ "7", "8" ],
+    "attributes" : [ "anonymous", "union" ],
+    "id" : "4"
+  }, {
+    "iri" : "http://www.w3.org/2001/XMLSchema#base64Binary",
+    "baseIri" : "http://www.w3.org/2001/XMLSchema",
+    "id" : "5",
+    "label" : {
+      "IRI-based" : "base64Binary"
+    }
+  }, {
+    "iri" : "https://w3id.org/won/message#Message",
+    "baseIri" : "https://w3id.org/won/message",
+    "instances" : 0,
+    "label" : {
+      "IRI-based" : "Message"
+    },
+    "attributes" : [ "external" ],
+    "id" : "8"
+  }, {
+    "iri" : "http://www.w3.org/2001/XMLSchema#string",
+    "baseIri" : "http://www.w3.org/2001/XMLSchema",
+    "id" : "10",
+    "label" : {
+      "IRI-based" : "string"
+    }
+  }, {
+    "iri" : "http://www.w3.org/2001/XMLSchema#string",
+    "baseIri" : "http://www.w3.org/2001/XMLSchema",
+    "id" : "15",
+    "label" : {
+      "IRI-based" : "string"
+    }
+  }, {
+    "iri" : "https://w3id.org/won/core#Atom",
+    "baseIri" : "https://w3id.org/won/core",
+    "instances" : 0,
+    "label" : {
+      "IRI-based" : "Atom"
+    },
+    "subClasses" : [ "16", "17" ],
+    "attributes" : [ "external" ],
+    "id" : "7"
+  }, {
+    "instances" : 0,
+    "union" : [ "7", "8" ],
+    "attributes" : [ "anonymous", "union" ],
+    "id" : "13"
+  }, {
+    "iri" : "http://www.w3.org/2001/XMLSchema#base64Binary",
+    "baseIri" : "http://www.w3.org/2001/XMLSchema",
+    "id" : "14",
+    "label" : {
+      "IRI-based" : "base64Binary"
+    }
+  }, {
+    "iri" : "http://schema.org/TravelAction",
+    "baseIri" : "http://schema.org",
+    "instances" : 0,
+    "label" : {
+      "IRI-based" : "TravelAction"
+    },
+    "attributes" : [ "external" ],
+    "id" : "20"
+  }, {
+    "iri" : "https://w3id.org/won/content#DirectResponse",
+    "baseIri" : "https://w3id.org/won/content",
+    "instances" : 0,
+    "label" : {
+      "IRI-based" : "DirectResponse",
+      "undefined" : "DirectResponse"
+    },
+    "comment" : {
+      "en" : "An Atom of this class indicates that it was created for directly responding to another Atom."
+    },
+    "id" : "16",
+    "superClasses" : [ "7" ]
+  }, {
+    "iri" : "https://w3id.org/won/content#ServiceBot",
+    "baseIri" : "https://w3id.org/won/content",
+    "instances" : 0,
+    "label" : {
+      "IRI-based" : "ServiceBot",
+      "undefined" : "ServiceBot"
+    },
+    "comment" : {
+      "en" : "An Atom of this class indicates that it is controlled by a bot offering a service."
+    },
+    "id" : "17",
+    "superClasses" : [ "7" ]
+  } ],
+  "property" : [ {
+    "id" : "0",
+    "type" : "owl:datatypeProperty"
+  }, {
+    "id" : "3",
+    "type" : "owl:datatypeProperty"
+  }, {
+    "id" : "9",
+    "type" : "owl:datatypeProperty"
+  }, {
+    "id" : "12",
+    "type" : "owl:datatypeProperty"
+  }, {
+    "id" : "18",
+    "type" : "owl:objectProperty"
+  }, {
+    "id" : "19",
+    "type" : "owl:objectProperty"
+  }, {
+    "id" : "21",
+    "type" : "owl:datatypeProperty"
+  }, {
+    "id" : "22",
+    "type" : "owl:datatypeProperty"
+  }, {
+    "id" : "23",
+    "type" : "rdfs:SubClassOf"
+  }, {
+    "id" : "24",
+    "type" : "owl:objectProperty"
+  }, {
+    "id" : "25",
+    "type" : "rdfs:SubClassOf"
+  } ],
+  "propertyAttribute" : [ {
+    "iri" : "https://w3id.org/won/content#image",
+    "baseIri" : "https://w3id.org/won/content",
+    "range" : "2",
+    "label" : {
+      "IRI-based" : "image",
+      "undefined" : "image"
+    },
+    "domain" : "1",
+    "comment" : {
+      "en" : "Image data in base64 encoding."
+    },
+    "attributes" : [ "datatype" ],
+    "id" : "0"
+  }, {
+    "iri" : "https://w3id.org/won/content#petriNet",
+    "baseIri" : "https://w3id.org/won/content",
+    "range" : "5",
+    "label" : {
+      "IRI-based" : "petriNet",
+      "undefined" : "petriNet"
+    },
+    "domain" : "4",
+    "comment" : {
+      "en" : "The base64 serialization of  the XML file exported from PIPE (https://github.com/sarahtattersall/PIPE)"
+    },
+    "attributes" : [ "datatype" ],
+    "id" : "3"
+  }, {
+    "iri" : "https://w3id.org/won/content#tag",
+    "baseIri" : "https://w3id.org/won/content",
+    "range" : "10",
+    "label" : {
+      "IRI-based" : "tag",
+      "undefined" : "tag"
+    },
+    "domain" : "7",
+    "comment" : {
+      "en" : "Tags an Atom with a String value."
+    },
+    "attributes" : [ "datatype" ],
+    "id" : "9"
+  }, {
+    "iri" : "https://w3id.org/won/content#bpmnWorkflow",
+    "baseIri" : "https://w3id.org/won/content",
+    "range" : "14",
+    "label" : {
+      "IRI-based" : "bpmnWorkflow",
+      "undefined" : "bpmnWorkflow"
+    },
+    "domain" : "13",
+    "comment" : {
+      "en" : "A BPMN conformant XML file in base 64 encoding."
+    },
+    "attributes" : [ "datatype" ],
+    "id" : "12"
+  }, {
+    "iri" : "https://w3id.org/won/content#inResponseTo",
+    "baseIri" : "https://w3id.org/won/content",
+    "range" : "7",
+    "label" : {
+      "IRI-based" : "inResponseTo",
+      "undefined" : "inResponseTo"
+    },
+    "domain" : "16",
+    "comment" : {
+      "en" : "An Atom that was created in order to directly respond to another links to that Atom with this property."
+    },
+    "attributes" : [ "object" ],
+    "id" : "18"
+  }, {
+    "iri" : "https://w3id.org/won/content#suggestedAtom",
+    "baseIri" : "https://w3id.org/won/content",
+    "range" : "7",
+    "label" : {
+      "IRI-based" : "suggestedAtom",
+      "undefined" : "suggestedAtom"
+    },
+    "domain" : "8",
+    "comment" : {
+      "en" : "Suggests to the recipient of the message to connect to the Atom linked to with this property."
+    },
+    "attributes" : [ "object" ],
+    "id" : "19"
+  }, {
+    "iri" : "https://w3id.org/won/content#text",
+    "baseIri" : "https://w3id.org/won/content",
+    "range" : "15",
+    "label" : {
+      "IRI-based" : "text",
+      "undefined" : "text"
+    },
+    "domain" : "8",
+    "comment" : {
+      "en" : "The textual content of a Message."
+    },
+    "attributes" : [ "datatype" ],
+    "id" : "21"
+  }, {
+    "iri" : "https://w3id.org/won/content#file",
+    "baseIri" : "https://w3id.org/won/content",
+    "range" : "11",
+    "label" : {
+      "IRI-based" : "file",
+      "undefined" : "file"
+    },
+    "domain" : "6",
+    "comment" : {
+      "en" : "A file in base64 encoding."
+    },
+    "attributes" : [ "datatype" ],
+    "id" : "22"
+  }, {
+    "range" : "7",
+    "domain" : "16",
+    "attributes" : [ "object", "anonymous" ],
+    "id" : "23"
+  }, {
+    "iri" : "https://w3id.org/won/content#travelAction",
+    "baseIri" : "https://w3id.org/won/content",
+    "range" : "20",
+    "label" : {
+      "IRI-based" : "travelAction",
+      "undefined" : "travelAction"
+    },
+    "domain" : "7",
+    "comment" : {
+      "en" : "Links the Atom to a schema:TravelAction, indicating that this action is what is being offered/suggested."
+    },
+    "attributes" : [ "object" ],
+    "id" : "24"
+  }, {
+    "range" : "7",
+    "domain" : "17",
+    "attributes" : [ "object", "anonymous" ],
+    "id" : "25"
+  } ]
+}

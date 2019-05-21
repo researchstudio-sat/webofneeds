@@ -1,0 +1,47 @@
+<html><h2 id="overv" class="list">Web of Needs Matching Ontology: Overview <span class="backlink"> back to <a href="#toc">ToC</a></span></h2>
+<span class="markdown">
+This ontology has the following classes and properties.</span>
+<h4>Classes</h4>
+<ul class="hlist">
+   <li>
+      <a href="#CounterpartSpecification"
+         title="https://w3id.org/won/matching#CounterpartSpecification">CounterpartSpecification</a>
+   </li>
+   <li>
+      <a href="#Flag" title="https://w3id.org/won/matching#Flag">Flag</a>
+   </li>
+</ul><h4>Object Properties</h4><ul class="hlist">
+   <li>
+      <a href="#flag" title="https://w3id.org/won/matching#flag">flag</a>
+   </li>
+   <li>
+      <a href="#seeks" title="https://w3id.org/won/matching#seeks">seeks</a>
+   </li>
+</ul><h4>Data Properties</h4><ul class="hlist">
+   <li>
+      <a href="#doNotMatchAfter" title="https://w3id.org/won/matching#doNotMatchAfter">doNotMatchAfter</a>
+   </li>
+   <li>
+      <a href="#doNotMatchBefore" title="https://w3id.org/won/matching#doNotMatchBefore">doNotMatchBefore</a>
+   </li>
+   <li>
+      <a href="#matchingContext" title="https://w3id.org/won/matching#matchingContext">matchingContext</a>
+   </li>
+   <li>
+      <a href="#searchString" title="https://w3id.org/won/matching#searchString">searchString</a>
+   </li>
+   <li>
+      <a href="#sparqlQuery" title="https://w3id.org/won/matching#sparqlQuery">sparqlQuery</a>
+   </li>
+</ul><h4>Named Individuals</h4><ul class="hlist">
+   <li>
+      <a href="#NoHintForCounterpart"
+         title="https://w3id.org/won/matching#NoHintForCounterpart">NoHintForCounterpart</a>
+   </li>
+   <li>
+      <a href="#NoHintForMe" title="https://w3id.org/won/matching#NoHintForMe">NoHintForMe</a>
+   </li>
+   <li>
+      <a href="#UsedForTesting" title="https://w3id.org/won/matching#UsedForTesting">UsedForTesting</a>
+   </li>
+</ul></html>

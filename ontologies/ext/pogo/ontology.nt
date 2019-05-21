@@ -1,0 +1,105 @@
+<https://w3id.org/won/ext/pogo> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Ontology> .
+<https://w3id.org/won/ext/pogo> <http://www.w3.org/2002/07/owl#versionIRI> <https://w3id.org/won/ext/pogo/1.0> .
+<https://w3id.org/won/ext/pogo> <http://www.w3.org/2002/07/owl#imports> <https://w3id.org/won/core> .
+<https://w3id.org/won/ext/pogo> <http://purl.org/dc/elements/1.1/abstract> "Ontology for coordinating Pokémon GO raids."@en .
+<https://w3id.org/won/ext/pogo> <http://purl.org/dc/elements/1.1/creator> "Fabian Suda" .
+<https://w3id.org/won/ext/pogo> <http://purl.org/dc/elements/1.1/creator> "Florian Kleedorfer" .
+<https://w3id.org/won/ext/pogo> <http://purl.org/dc/elements/1.1/title> "Web of Needs Pokémon GO Raid Extension" .
+<https://w3id.org/won/ext/pogo> <http://purl.org/dc/terms/created> "2019-05-21" .
+<https://w3id.org/won/ext/pogo> <http://purl.org/dc/terms/license> <https://creativecommons.org/licenses/by/4.0/> .
+<https://w3id.org/won/ext/pogo> <http://purl.org/vocab/vann/preferredNamespacePrefix> "pgo" .
+# 
+# 
+# #################################################################
+# #
+# #    Annotation properties
+# #
+# #################################################################
+# 
+# 
+# http://purl.org/dc/elements/1.1/abstract
+<http://purl.org/dc/elements/1.1/abstract> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
+# 
+# http://purl.org/dc/elements/1.1/creator
+<http://purl.org/dc/elements/1.1/creator> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
+# 
+# http://purl.org/dc/elements/1.1/date
+<http://purl.org/dc/elements/1.1/date> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
+# 
+# http://purl.org/dc/elements/1.1/description
+<http://purl.org/dc/elements/1.1/description> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
+# 
+# http://purl.org/dc/elements/1.1/title
+<http://purl.org/dc/elements/1.1/title> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
+# 
+# http://purl.org/dc/terms/license
+<http://purl.org/dc/terms/license> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
+# 
+# http://purl.org/vocab/vann/preferredNamespacePrefix
+<http://purl.org/vocab/vann/preferredNamespacePrefix> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
+# 
+# 
+# 
+# #################################################################
+# #
+# #    Object Properties
+# #
+# #################################################################
+# 
+# 
+# https://w3id.org/won/ext/pogo#raid
+<https://w3id.org/won/ext/pogo#raid> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+<https://w3id.org/won/ext/pogo#raid> <http://www.w3.org/2000/01/rdf-schema#range> <https://w3id.org/won/ext/pogo#Raid> .
+# 
+# 
+# 
+# #################################################################
+# #
+# #    Data properties
+# #
+# #################################################################
+# 
+# 
+# https://w3id.org/won/ext/pogo#gymEx
+<https://w3id.org/won/ext/pogo#gymEx> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
+<https://w3id.org/won/ext/pogo#gymEx> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/ext/pogo#Raid> .
+<https://w3id.org/won/ext/pogo#gymEx> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#boolean> .
+<https://w3id.org/won/ext/pogo#gymEx> <http://www.w3.org/2000/01/rdf-schema#comment> "Indicates if this raid's gym is an 'Ex' gym that may allow Raid participants to win raid tickets"@en .
+<https://w3id.org/won/ext/pogo#gymEx> <http://www.w3.org/2000/01/rdf-schema#label> "gymEx" .
+# 
+# https://w3id.org/won/ext/pogo#level
+<https://w3id.org/won/ext/pogo#level> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
+<https://w3id.org/won/ext/pogo#level> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/ext/pogo#Raid> .
+<https://w3id.org/won/ext/pogo#level> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#int> .
+<https://w3id.org/won/ext/pogo#level> <http://www.w3.org/2000/01/rdf-schema#comment> "Level of the Raid."@en .
+<https://w3id.org/won/ext/pogo#level> <http://www.w3.org/2000/01/rdf-schema#label> "level" .
+# 
+# https://w3id.org/won/ext/pogo#pokemonForm
+<https://w3id.org/won/ext/pogo#pokemonForm> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
+<https://w3id.org/won/ext/pogo#pokemonForm> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/ext/pogo#Raid> .
+<https://w3id.org/won/ext/pogo#pokemonForm> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/won/ext/pogo#pokemonForm> <http://www.w3.org/2000/01/rdf-schema#comment> "The form of the Pokémon in the Raid."@en .
+<https://w3id.org/won/ext/pogo#pokemonForm> <http://www.w3.org/2000/01/rdf-schema#label> "pokemonForm" .
+# 
+# https://w3id.org/won/ext/pogo#pokemonId
+<https://w3id.org/won/ext/pogo#pokemonId> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
+<https://w3id.org/won/ext/pogo#pokemonId> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/ext/pogo#Raid> .
+<https://w3id.org/won/ext/pogo#pokemonId> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/won/ext/pogo#pokemonId> <http://www.w3.org/2000/01/rdf-schema#comment> "The ID of the Pokémon in the Raid."@en .
+<https://w3id.org/won/ext/pogo#pokemonId> <http://www.w3.org/2000/01/rdf-schema#label> "pokemonId" .
+# 
+# 
+# 
+# #################################################################
+# #
+# #    Classes
+# #
+# #################################################################
+# 
+# 
+# https://w3id.org/won/ext/pogo#Raid
+<https://w3id.org/won/ext/pogo#Raid> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<https://w3id.org/won/ext/pogo#Raid> <http://www.w3.org/2000/01/rdf-schema#comment> "A Pokémon GO raid"@en .
+<https://w3id.org/won/ext/pogo#Raid> <http://www.w3.org/2000/01/rdf-schema#label> "Raid" .
+# 
+# Generated by the OWL API (version 5.1.9) https://github.com/owlcs/owlapi/

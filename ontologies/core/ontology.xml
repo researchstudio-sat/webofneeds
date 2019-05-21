@@ -250,19 +250,6 @@ Matching services can make suggestions which atoms to connect to. An Atom specif
     
 
 
-    <!-- https://w3id.org/won/core#flag -->
-
-
-    <owl:ObjectProperty rdf:about="https://w3id.org/won/core#flag">
-        <rdfs:domain rdf:resource="https://w3id.org/won/core#Atom"/>
-        <rdfs:range rdf:resource="https://w3id.org/won/core#Flag"/>
-        <rdfs:comment xml:lang="en">Links an Atom to its Flags</rdfs:comment>
-        <rdfs:isDefinedBy rdf:resource="https://w3id.org/won/core"/>
-        <rdfs:label>flag</rdfs:label>
-    </owl:ObjectProperty>
-    
-
-
     <!-- https://w3id.org/won/core#messageContainer -->
 
 
@@ -280,20 +267,6 @@ Matching services can make suggestions which atoms to connect to. An Atom specif
         <rdfs:comment xml:lang="en">Links the Connection object to a container containing connection events (messages).</rdfs:comment>
         <rdfs:isDefinedBy rdf:resource="https://w3id.org/won/core"/>
         <rdfs:label>messageContainer</rdfs:label>
-    </owl:ObjectProperty>
-    
-
-
-    <!-- https://w3id.org/won/core#seeks -->
-
-
-    <owl:ObjectProperty rdf:about="https://w3id.org/won/core#seeks">
-        <rdfs:domain rdf:resource="https://w3id.org/won/core#Atom"/>
-        <rdfs:range rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
-        <rdfs:comment>This optional property is one of the two properties that defines the content of every atom (the other is the &quot;is&quot; property). It is used to describe that part of the content that is
-sought to fulfill the atom in contrast to the part that is available.</rdfs:comment>
-        <rdfs:isDefinedBy rdf:resource="https://w3id.org/won/core"/>
-        <rdfs:label>seeks</rdfs:label>
     </owl:ObjectProperty>
     
 
@@ -548,34 +521,6 @@ sought to fulfill the atom in contrast to the part that is available.</rdfs:comm
     
 
 
-    <!-- https://w3id.org/won/core#doNotMatchAfter -->
-
-
-    <owl:DatatypeProperty rdf:about="https://w3id.org/won/core#doNotMatchAfter">
-        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
-        <rdfs:domain rdf:resource="https://w3id.org/won/core#Atom"/>
-        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#dateTime"/>
-        <rdfs:comment xml:lang="en">Indicates that matchers should not use this atom for matching after the specified xsd:dateTime.</rdfs:comment>
-        <rdfs:isDefinedBy rdf:resource="https://w3id.org/won/core"/>
-        <rdfs:label>doNotMatchAfter</rdfs:label>
-    </owl:DatatypeProperty>
-    
-
-
-    <!-- https://w3id.org/won/core#doNotMatchBefore -->
-
-
-    <owl:DatatypeProperty rdf:about="https://w3id.org/won/core#doNotMatchBefore">
-        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
-        <rdfs:domain rdf:resource="https://w3id.org/won/core#Atom"/>
-        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#dateTime"/>
-        <rdfs:comment xml:lang="en">Indicates that matchers should not use this atom for matching before the specified xsd:dateTime.</rdfs:comment>
-        <rdfs:isDefinedBy rdf:resource="https://w3id.org/won/core"/>
-        <rdfs:label>doNotMatchBefore</rdfs:label>
-    </owl:DatatypeProperty>
-    
-
-
     <!-- https://w3id.org/won/core#eventUriPrefix -->
 
 
@@ -596,18 +541,6 @@ sought to fulfill the atom in contrast to the part that is available.</rdfs:comm
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
         <rdfs:comment xml:lang="en">The activeMQ queue to be used by matchers to send messages to the node.</rdfs:comment>
         <rdfs:label>matcherQueue</rdfs:label>
-    </owl:DatatypeProperty>
-    
-
-
-    <!-- https://w3id.org/won/core#matchingContext -->
-
-
-    <owl:DatatypeProperty rdf:about="https://w3id.org/won/core#matchingContext">
-        <rdfs:domain rdf:resource="https://w3id.org/won/core#Atom"/>
-        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
-        <rdfs:comment xml:lang="en">Specifies a &apos;matching context&apos; for the Atom. Matchers should only send hints to this Atom if the counterpart specifies the same matching context. If no matching context is specified, matching is not restricted, and matchers may send hints with counterparts that do specify matching contexts.</rdfs:comment>
-        <rdfs:label>matchingContext</rdfs:label>
     </owl:DatatypeProperty>
     
 
@@ -644,30 +577,6 @@ sought to fulfill the atom in contrast to the part that is available.</rdfs:comm
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
         <rdfs:comment xml:lang="en">Defines the maximum number of established connections supported by the socket.</rdfs:comment>
         <rdfs:label>socketCapacity</rdfs:label>
-    </owl:DatatypeProperty>
-    
-
-
-    <!-- https://w3id.org/won/core#tag -->
-
-
-    <owl:DatatypeProperty rdf:about="https://w3id.org/won/core#tag">
-        <rdfs:domain rdf:resource="https://w3id.org/won/core#Atom"/>
-        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
-        <rdfs:comment xml:lang="en">Tags an Atom with a String value.</rdfs:comment>
-        <rdfs:label>tag</rdfs:label>
-    </owl:DatatypeProperty>
-    
-
-
-    <!-- https://w3id.org/won/core#textMessage -->
-
-
-    <owl:DatatypeProperty rdf:about="https://w3id.org/won/core#textMessage">
-        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
-        <vaem:rationale xml:lang="en">At first glance, this property seems better placed in the `message` ontology, however the message validation forbids properties from that ontology in the message content. As it is really important, we place it in `core`.</vaem:rationale>
-        <rdfs:comment xml:lang="en">Specifies a text message.</rdfs:comment>
-        <rdfs:label>textMessage</rdfs:label>
     </owl:DatatypeProperty>
     
 
@@ -767,17 +676,6 @@ The container supports LDP paging as described here: https://github.com/research
         <rdfs:comment xml:lang="en">A Connection&apos;s state.</rdfs:comment>
         <rdfs:isDefinedBy rdf:resource="https://w3id.org/won/core"/>
         <rdfs:label>ConnectionState</rdfs:label>
-    </owl:Class>
-    
-
-
-    <!-- https://w3id.org/won/core#Flag -->
-
-
-    <owl:Class rdf:about="https://w3id.org/won/core#Flag">
-        <rdfs:comment xml:lang="en">Superclass of all Flags an atom can have.</rdfs:comment>
-        <rdfs:isDefinedBy rdf:resource="https://w3id.org/won/core"/>
-        <rdfs:label>Flag</rdfs:label>
     </owl:Class>
     
 
@@ -918,30 +816,6 @@ The container supports LDP paging as described here: https://github.com/research
     
 
 
-    <!-- https://w3id.org/won/core#NoHintForCounterpart -->
-
-
-    <owl:NamedIndividual rdf:about="https://w3id.org/won/core#NoHintForCounterpart">
-        <rdf:type rdf:resource="https://w3id.org/won/core#Flag"/>
-        <rdfs:comment xml:lang="en">An Atom specifying this flag indicates that matchers should not send Hint messages to the counterpart in case of a match. If the NoHintForMe flag is also present, matchers should disregard this atom completely.</rdfs:comment>
-        <rdfs:isDefinedBy rdf:resource="https://w3id.org/won/core"/>
-        <rdfs:label>NoHintForCounterpart</rdfs:label>
-    </owl:NamedIndividual>
-    
-
-
-    <!-- https://w3id.org/won/core#NoHintForMe -->
-
-
-    <owl:NamedIndividual rdf:about="https://w3id.org/won/core#NoHintForMe">
-        <rdf:type rdf:resource="https://w3id.org/won/core#Flag"/>
-        <rdfs:comment xml:lang="en">An Atom specifying this flag indicates that matchers should not send Hint messages to that Atom. If the NoHintForCounterpart flag is also present, matchers should disregard this atom completely.</rdfs:comment>
-        <rdfs:isDefinedBy rdf:resource="https://w3id.org/won/core"/>
-        <rdfs:label>NoHintForMe</rdfs:label>
-    </owl:NamedIndividual>
-    
-
-
     <!-- https://w3id.org/won/core#RequestReceived -->
 
 
@@ -978,42 +852,6 @@ The container supports LDP paging as described here: https://github.com/research
     
 
 
-    <!-- https://w3id.org/won/core#UsedForTesting -->
-
-
-    <owl:NamedIndividual rdf:about="https://w3id.org/won/core#UsedForTesting">
-        <rdf:type rdf:resource="https://w3id.org/won/core#Flag"/>
-        <rdfs:comment xml:lang="en">Flag indicating the atom has been created for testing purposes. It should only be matched with other atoms flagged with UsedForTesting. The flag is intended to separate real-world atoms from those generated for testing the system, so that users are neither spammed nor misled.</rdfs:comment>
-        <rdfs:isDefinedBy rdf:resource="https://w3id.org/won/core"/>
-        <rdfs:label>UsedForTesting</rdfs:label>
-    </owl:NamedIndividual>
-    
-
-
-    <!-- https://w3id.org/won/core#WhatsAround -->
-
-
-    <owl:NamedIndividual rdf:about="https://w3id.org/won/core#WhatsAround">
-        <rdf:type rdf:resource="https://w3id.org/won/core#Flag"/>
-        <rdfs:comment xml:lang="en">An Atom specifying this flag indicates that matchers should not match with anything but the location within this atom. The intention of this Flag is to simply find other atoms around a certain location.</rdfs:comment>
-        <rdfs:isDefinedBy rdf:resource="https://w3id.org/won/core"/>
-        <rdfs:label>WhatsAround</rdfs:label>
-    </owl:NamedIndividual>
-    
-
-
-    <!-- https://w3id.org/won/core#WhatsNew -->
-
-
-    <owl:NamedIndividual rdf:about="https://w3id.org/won/core#WhatsNew">
-        <rdf:type rdf:resource="https://w3id.org/won/core#Flag"/>
-        <rdfs:comment xml:lang="en">An Atom specifying this flag indicates that matchers should match with anything that is created recently. The intention of this Flag is to simply find other atoms created recently.</rdfs:comment>
-        <rdfs:isDefinedBy rdf:resource="https://w3id.org/won/core"/>
-        <rdfs:label>WhatsNew</rdfs:label>
-    </owl:NamedIndividual>
-    
-
-
     <!-- 
     ///////////////////////////////////////////////////////////////////////////////////////
     //
@@ -1024,68 +862,8 @@ The container supports LDP paging as described here: https://github.com/research
 
 
     <rdf:Description>
-        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AllDisjointClasses"/>
-        <owl:members rdf:parseType="Collection">
-            <rdf:Description rdf:about="http://www.w3.org/ns/ldp#CompositeContainer"/>
-            <rdf:Description rdf:about="https://w3id.org/won/core#Atom"/>
-            <rdf:Description rdf:about="https://w3id.org/won/core#AtomState"/>
-            <rdf:Description rdf:about="https://w3id.org/won/core#Connection"/>
-            <rdf:Description rdf:about="https://w3id.org/won/core#ConnectionState"/>
-            <rdf:Description rdf:about="https://w3id.org/won/core#Flag"/>
-            <rdf:Description rdf:about="https://w3id.org/won/core#Node"/>
-            <rdf:Description rdf:about="https://w3id.org/won/core#Socket"/>
-            <rdf:Description rdf:about="https://w3id.org/won/core#SocketDefinition"/>
-            <rdf:Description rdf:about="https://w3id.org/won/core#UriPrefixSpecification"/>
-            <rdf:Description rdf:about="https://w3id.org/won/core#WonProtocol"/>
-        </owl:members>
-    </rdf:Description>
-    <rdf:Description>
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AllDifferent"/>
         <owl:distinctMembers rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
-    </rdf:Description>
-    <rdf:Description>
-        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AllDifferent"/>
-        <owl:distinctMembers rdf:parseType="Collection">
-            <rdf:Description rdf:about="https://w3id.org/won/core#Active"/>
-            <rdf:Description rdf:about="https://w3id.org/won/core#Closed"/>
-            <rdf:Description rdf:about="https://w3id.org/won/core#Connected"/>
-            <rdf:Description rdf:about="https://w3id.org/won/core#Inactive"/>
-            <rdf:Description rdf:about="https://w3id.org/won/core#NoHintForCounterpart"/>
-            <rdf:Description rdf:about="https://w3id.org/won/core#NoHintForMe"/>
-            <rdf:Description rdf:about="https://w3id.org/won/core#RequestReceived"/>
-            <rdf:Description rdf:about="https://w3id.org/won/core#RequestSent"/>
-            <rdf:Description rdf:about="https://w3id.org/won/core#Suggested"/>
-            <rdf:Description rdf:about="https://w3id.org/won/core#UsedForTesting"/>
-            <rdf:Description rdf:about="https://w3id.org/won/core#WhatsAround"/>
-            <rdf:Description rdf:about="https://w3id.org/won/core#WhatsNew"/>
-        </owl:distinctMembers>
-    </rdf:Description>
-    <rdf:Description>
-        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AllDisjointProperties"/>
-        <owl:members rdf:parseType="Collection">
-            <rdf:Description rdf:about="http://www.w3.org/2002/07/owl#topObjectProperty"/>
-            <rdf:Description rdf:about="https://w3id.org/won/core#atomList"/>
-            <rdf:Description rdf:about="https://w3id.org/won/core#atomState"/>
-            <rdf:Description rdf:about="https://w3id.org/won/core#compatibleSocketDefinition"/>
-            <rdf:Description rdf:about="https://w3id.org/won/core#connectionState"/>
-            <rdf:Description rdf:about="https://w3id.org/won/core#connections"/>
-            <rdf:Description rdf:about="https://w3id.org/won/core#contentGraph"/>
-            <rdf:Description rdf:about="https://w3id.org/won/core#defaultSocket"/>
-            <rdf:Description rdf:about="https://w3id.org/won/core#derivesAtomProperty"/>
-            <rdf:Description rdf:about="https://w3id.org/won/core#derivesInverseAtomProperty"/>
-            <rdf:Description rdf:about="https://w3id.org/won/core#flag"/>
-            <rdf:Description rdf:about="https://w3id.org/won/core#messageContainer"/>
-            <rdf:Description rdf:about="https://w3id.org/won/core#seeks"/>
-            <rdf:Description rdf:about="https://w3id.org/won/core#socket"/>
-            <rdf:Description rdf:about="https://w3id.org/won/core#socketDefinition"/>
-            <rdf:Description rdf:about="https://w3id.org/won/core#sourceAtom"/>
-            <rdf:Description rdf:about="https://w3id.org/won/core#supportsWonProtocolImpl"/>
-            <rdf:Description rdf:about="https://w3id.org/won/core#targetAtom"/>
-            <rdf:Description rdf:about="https://w3id.org/won/core#targetConnection"/>
-            <rdf:Description rdf:about="https://w3id.org/won/core#targetSocket"/>
-            <rdf:Description rdf:about="https://w3id.org/won/core#uriPrefixSpecification"/>
-            <rdf:Description rdf:about="https://w3id.org/won/core#wonNode"/>
-        </owl:members>
     </rdf:Description>
 </rdf:RDF>
 
