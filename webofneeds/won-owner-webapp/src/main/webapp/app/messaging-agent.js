@@ -38,10 +38,15 @@ export function runMessagingAgent(redux) {
     function(message) {
       /* Other clients or matcher initiated stuff: */
       if (message.isFromExternal() && message.isAtomHintMessage()) {
-        redux.dispatch(
+        console.warn(
+          "Omit further handling of received AtomHintMessage: ",
+          message,
+          "TODO: IMPL"
+        );
+        /*redux.dispatch(
           actionCreators.messages__processAtomHintMessage(message)
         );
-        return true;
+        return true;*/
       }
       return false;
     },
