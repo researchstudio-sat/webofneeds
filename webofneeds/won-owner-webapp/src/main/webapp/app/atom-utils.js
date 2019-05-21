@@ -14,7 +14,16 @@ import * as useCaseUtils from "./usecase-utils.js";
  * @returns {*|boolean}
  */
 export function isActive(atom) {
-  return get(atom, "state") && get(atom, "state") === won.WON.ActiveCompacted;
+  return get(atom, "state") === won.WON.ActiveCompacted;
+}
+
+/**
+ * Determines if a given atom is a Inactive
+ * @param atom
+ * @returns {*|boolean}
+ */
+export function isInactive(atom) {
+  return get(atom, "state") === won.WON.InactiveCompacted;
 }
 
 export function getIdenticonSvg(atom) {
@@ -115,15 +124,6 @@ export function getDefaultImage(atom) {
     }
   }
   return undefined;
-}
-
-/**
- * Determines if a given atom is a Inactive
- * @param atom
- * @returns {*|boolean}
- */
-export function isInactive(atom) {
-  return get(atom, "state") && get(atom, "state") === won.WON.InactiveCompacted;
 }
 
 /**
