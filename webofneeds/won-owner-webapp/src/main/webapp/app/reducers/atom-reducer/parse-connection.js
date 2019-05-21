@@ -14,8 +14,6 @@ export function parseConnection(jsonldConnection) {
       messages: Immutable.Map(),
       socketUri: jsonldConnectionImm.get("socket"),
       targetSocketUri: jsonldConnectionImm.get("targetSocket"),
-      socket: undefined, //will be determined by the reduce-connections //TODO: REMOVE THIS AFTER REFACTORING
-      targetSocket: undefined, //will be determined by the reduce-connections //TODO: REMOVE THIS AFTER REFACTORING
       agreementData: {
         agreementUris: Immutable.Set(),
         pendingProposalUris: Immutable.Set(),
