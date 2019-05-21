@@ -11,7 +11,6 @@ import angular from "angular";
 import "ng-redux";
 import ngAnimate from "angular-animate";
 import { dispatchEvent, attach, delay, get } from "../utils.js";
-import won from "../won-es6.js";
 import {
   getOwnedAtomByConnectionUri,
   getOwnedPersonas,
@@ -32,7 +31,8 @@ import autoresizingTextareaModule from "../directives/textarea-autogrow.js";
 import { actionCreators } from "../actions/actions.js";
 import labelledHrModule from "./labelled-hr.js";
 import { getHumanReadableStringFromMessage } from "../reducers/atom-reducer/parse-message.js";
-import { isChatToGroup } from "../connection-utils.js";
+import * as connectionSelectors from "../selectors/connection-selectors.js";
+import * as connectionUtils from "../connection-utils.js";
 import * as accountUtils from "../account-utils.js";
 
 import { Elm } from "../../elm/PublishButton.elm";
@@ -49,30 +49,30 @@ function genComponentConf() {
           <div class="cts__details__grid"
               ng-if="!self.selectedDetail && !self.multiSelectType">
             <won-labelled-hr label="::'Actions'" class="cts__details__grid__hr"
-              ng-if="!self.multiSelectType && self.isConnected && !self.isGroupChatConnection"></won-labelled-hr>
+              ng-if="!self.multiSelectType && self.isConnected && !self.isChatToGroupConnection"></won-labelled-hr>
             <button
-                ng-if="!self.showAgreementData && !self.isGroupChatConnection"
+                ng-if="!self.showAgreementData && !self.isChatToGroupConnection"
                 class="cts__details__grid__action won-button--filled red"
                 ng-click="self.activateMultiSelect('proposes')"
                 ng-disabled="!self.hasProposableMessages">
                 Make Proposal
             </button>
             <button
-                ng-if="!self.showAgreementData && !self.isGroupChatConnection"
+                ng-if="!self.showAgreementData && !self.isChatToGroupConnection"
                 class="cts__details__grid__action won-button--filled red"
                 ng-click="self.activateMultiSelect('claims')"
                 ng-disabled="!self.hasClaimableMessages">
                 Make Claim
             </button>
             <button
-                ng-if="self.showAgreementData && !self.isGroupChatConnection"
+                ng-if="self.showAgreementData && !self.isChatToGroupConnection"
                 class="cts__details__grid__action won-button--filled red"
                 ng-click="self.activateMultiSelect('accepts')"
                 ng-disabled="!self.hasAcceptableMessages">
                 Accept Proposal(s)
             </button>
             <button
-                ng-if="self.showAgreementData && !self.isGroupChatConnection"
+                ng-if="self.showAgreementData && !self.isChatToGroupConnection"
                 class="cts__details__grid__action won-button--filled red"
                 ng-click="self.activateMultiSelect('rejects')"
                 ng-disabled="!self.hasRejectableMessages">
@@ -80,13 +80,13 @@ function genComponentConf() {
             </button>
             <button
                 class="cts__details__grid__action won-button--filled red"
-                ng-if="!self.isGroupChatConnection"
+                ng-if="!self.isChatToGroupConnection"
                 ng-click="self.activateMultiSelect('proposesToCancel')"
                 ng-disabled="!self.hasCancelableMessages">
                 Cancel Agreement(s)
             </button>
             <button class="cts__details__grid__action won-button--filled red"
-                ng-if="!self.isGroupChatConnection"
+                ng-if="!self.isChatToGroupConnection"
                 ng-click="self.activateMultiSelect('retracts')"
                 ng-disabled="!self.hasRetractableMessages">
                 Retract Message(s)
@@ -305,13 +305,6 @@ function genComponentConf() {
           getOwnedAtomByConnectionUri(state, this.connectionUri);
         const connection =
           post && post.getIn(["connections", this.connectionUri]);
-        const connectionState = connection && connection.get("state");
-
-        const isGroupChatConnection = isChatToGroup(
-          state.get("atoms"),
-          get(post, "uri"),
-          this.connectionUri
-        );
 
         const messages = getMessagesByConnectionUri(state, this.connectionUri);
 
@@ -356,8 +349,11 @@ function genComponentConf() {
           post,
           multiSelectType: connection && connection.get("multiSelectType"),
           showAgreementData: connection && connection.get("showAgreementData"),
-          isGroupChatConnection: isGroupChatConnection,
-          isConnected: connectionState && connectionState === won.WON.Connected,
+          isChatToGroupConnection: connectionSelectors.isChatToGroupConnection(
+            get(state, "atoms"),
+            connection
+          ),
+          isConnected: connectionUtils.isConnected(connection),
           selectedMessages: selectedMessages,
           hasClaimableMessages,
           hasProposableMessages,

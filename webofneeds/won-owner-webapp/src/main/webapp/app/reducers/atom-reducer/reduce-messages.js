@@ -3,7 +3,8 @@ import { markUriAsRead } from "../../won-localstorage.js";
 import { markConnectionAsRead } from "./reduce-connections.js";
 import { addAtomStub } from "./reduce-atoms.js";
 import { getOwnMessageUri } from "../../message-utils.js";
-import { isChatToGroup } from "../../connection-utils.js";
+import * as connectionSelectors from "../../selectors/connection-selectors.js";
+import { getIn } from "../../utils.js";
 
 /*
  "alreadyProcessed" flag, which indicates that we do not care about the
@@ -53,7 +54,10 @@ export function addMessage(
           parsedMessage.getIn(["data", "unread"]) &&
           !(
             hasContainedForwardedWonMessages &&
-            isChatToGroup(state, atomUri, connectionUri)
+            connectionSelectors.isChatToGroupConnection(
+              state,
+              getIn(state, [atomUri, "connections", connectionUri])
+            )
           )
         ) {
           //If there is a new message for the connection we will set the connection to newConnection
@@ -73,7 +77,10 @@ export function addMessage(
         }
       } else if (
         atomUri &&
-        isChatToGroup &&
+        connectionSelectors.isChatToGroupConnection(
+          state,
+          getIn(state, [atomUri, "connections", connectionUri])
+        ) &&
         !hasContainedForwardedWonMessages
       ) {
         if (parsedMessage.getIn(["data", "unread"])) {
@@ -140,7 +147,10 @@ export function addMessage(
         if (
           !(
             hasContainedForwardedWonMessages &&
-            isChatToGroup(state, atomUri, connectionUri)
+            connectionSelectors.isChatToGroupConnection(
+              state,
+              getIn(state, [atomUri, "connections", connectionUri])
+            )
           )
         ) {
           messages = messages.set(

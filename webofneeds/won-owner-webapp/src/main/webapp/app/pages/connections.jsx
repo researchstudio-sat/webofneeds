@@ -15,7 +15,8 @@ import usecaseGroupModule from "../components/usecase-group.js";
 import { attach, getIn, get } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import * as generalSelectors from "../selectors/general-selectors.js";
-import { isChatToGroup } from "../connection-utils.js";
+import * as connectionSelectors from "../selectors/connection-selectors.js";
+import * as connectionUtils from "../connection-utils.js";
 import * as viewSelectors from "../selectors/view-selectors.js";
 import * as srefUtils from "../sref-utils.js";
 import { h } from "preact";
@@ -124,13 +125,7 @@ class ConnectionsController {
         "connections",
         selectedConnectionUri,
       ]);
-      const isSelectedConnectionGroupChat = isChatToGroup(
-        state.get("atoms"),
-        get(atom, "uri"),
-        selectedConnectionUri
-      );
-
-      const selectedConnectionState = getIn(selectedConnection, ["state"]);
+      const isSelectedConnectionGroupChat = connectionSelectors.isChatToGroupConnection(get(state, "atoms"), selectedConnection);
 
       const ownedAtoms = generalSelectors.getOwnedAtoms(state);
 
@@ -152,14 +147,13 @@ class ConnectionsController {
           !useCase &&
           !useCaseGroup &&
           !selectedPost &&
-          (!selectedConnection || selectedConnectionState === won.WON.Closed),
+          (!selectedConnection || connectionUtils.isClosed(selectedConnection)),
         showContentSide:
           showCreateFromPost ||
           useCase ||
           useCaseGroup ||
           selectedPost ||
-          (selectedConnection && selectedConnectionState !== won.WON.Closed),
-
+          (selectedConnection && !connectionUtils.isClosed(selectedConnection)),
         showUseCasePicker:
           !useCase &&
           !!useCaseGroup &&
@@ -187,18 +181,18 @@ class ConnectionsController {
           !selectedPost &&
           !useCaseGroup &&
           !isSelectedConnectionGroupChat &&
-          (selectedConnectionState === won.WON.Connected ||
-            selectedConnectionState === won.WON.RequestReceived ||
-            selectedConnectionState === won.WON.RequestSent ||
-            selectedConnectionState === won.WON.Suggested),
+          (connectionUtils.isConnected(selectedConnection) ||
+            connectionUtils.isRequestReceived(selectedConnection) ||
+            connectionUtils.isRequestSent(selectedConnection) ||
+            connectionUtils.isSuggested(selectedConnection)),
         showGroupPostMessages:
           !selectedPost &&
           !useCaseGroup &&
           isSelectedConnectionGroupChat &&
-          (selectedConnectionState === won.WON.Connected ||
-            selectedConnectionState === won.WON.RequestReceived ||
-            selectedConnectionState === won.WON.RequestSent ||
-            selectedConnectionState === won.WON.Suggested),
+          (connectionUtils.isConnected(selectedConnection) ||
+            connectionUtils.isRequestReceived(selectedConnection) ||
+            connectionUtils.isRequestSent(selectedConnection) ||
+            connectionUtils.isSuggested(selectedConnection)),
         showPostInfo: selectedPost && !useCaseGroup,
         showSlideIns:
           viewSelectors.hasSlideIns(state) && viewSelectors.showSlideIns(state),
