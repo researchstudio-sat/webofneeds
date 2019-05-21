@@ -158,7 +158,7 @@ export function isChatToGroupConnection(allAtoms, connection) {
 
   return (
     socket === won.CHAT.ChatSocketCompacted &&
-    targetSocket === won.CHAT.GroupSocketCompacted
+    targetSocket === won.GROUP.GroupSocketCompacted
   );
 }
 
@@ -172,7 +172,7 @@ export function isGroupToChatConnection(allAtoms, connection) {
   const { socket, targetSocket } = getSockets(allAtoms, connection);
 
   return (
-    socket === won.CHAT.GroupSocketCompacted &&
+    socket === won.GROUP.GroupSocketCompacted &&
     targetSocket === won.CHAT.ChatSocketCompacted
   );
 }
@@ -187,8 +187,8 @@ export function isGroupToGroupConnection(allAtoms, connection) {
   const { socket, targetSocket } = getSockets(allAtoms, connection);
 
   return (
-    socket === won.CHAT.GroupSocketCompacted &&
-    targetSocket === won.CHAT.GroupSocketCompacted
+    socket === won.GROUP.GroupSocketCompacted &&
+    targetSocket === won.GROUP.GroupSocketCompacted
   );
 }
 

@@ -5,7 +5,6 @@
  * Created by ksinger on 12.04.2017.
  */
 
-import won from "../won-es6.js";
 import angular from "angular";
 import Immutable from "immutable";
 import ngAnimate from "angular-animate";
@@ -157,7 +156,6 @@ function genComponentConf() {
     constructor() {
       attach(this, serviceDependencies, arguments);
       this.open = open;
-      this.WON = won.WON;
       //this.labels = labels;
       window.co4dbg = this;
 
@@ -415,8 +413,7 @@ function genComponentConf() {
           const targetAtomActiveOrLoading =
             process.getIn(["atoms", targetAtomUri, "loading"]) ||
             process.getIn(["atoms", targetAtomUri, "failedToLoad"]) ||
-            allAtoms.getIn([targetAtomUri, "state"]) ===
-              won.WON.ActiveCompacted;
+            atomUtils.isActive(get(allAtoms, targetAtomUri));
 
           return targetAtomActiveOrLoading && !connectionUtils.isClosed(conn);
         })
@@ -448,8 +445,7 @@ function genComponentConf() {
           const targetAtomActiveOrLoading =
             process.getIn(["atoms", targetAtomUri, "loading"]) ||
             process.getIn(["atoms", targetAtomUri, "failedToLoad"]) ||
-            allAtoms.getIn([targetAtomUri, "state"]) ===
-              won.WON.ActiveCompacted;
+            atomUtils.isActive(get(allAtoms, targetAtomUri));
 
           return (
             targetAtomActiveOrLoading &&
