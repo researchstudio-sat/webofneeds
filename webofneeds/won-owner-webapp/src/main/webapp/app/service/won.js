@@ -1032,7 +1032,7 @@ window.jsonLdToTrig4dbg = won.jsonLdToTrig;
  */
 won.n3Write = async function(quads, writerArgs) {
   //const { namedNode, literal, defaultGraph, quad } = N3.DataFactory;
-  const writer = N3.Writer(writerArgs);
+  const writer = new N3.Writer(writerArgs);
   return new Promise((resolve, reject) => {
     //quads.forEach(t => writer.addQuad(t))
     writer.addQuads(quads);
@@ -1052,7 +1052,7 @@ won.n3Write = async function(quads, writerArgs) {
  *   (https://github.com/RubenVerborgh/N3.js#parsing) for more details.
  */
 won.n3Parse = async function(rdf, parserArgs) {
-  const parser = parserArgs ? N3.Parser(parserArgs) : N3.Parser();
+  const parser = parserArgs ? new N3.Parser(parserArgs) : new N3.Parser();
   return new Promise((resolve, reject) => {
     let quads = [];
     parser.parse(rdf, (error, quad, prefixes) => {
@@ -1188,6 +1188,12 @@ WonMessage.prototype = {
         this.contentGraphTrig = await won.jsonLdToTrig(jsonldData);
         return this.contentGraphTrig;
       } catch (e) {
+        console.error(
+          "Failed to generate trig for message ",
+          this.getMessageUri(),
+          "\n\n",
+          e
+        );
         const msg =
           "Failed to generate trig for message " +
           this.getMessageUri() +
@@ -1195,7 +1201,6 @@ WonMessage.prototype = {
           e.message +
           "\n\n" +
           e.stack;
-        console.error(msg);
         this.contentGraphTrigError = msg;
       }
     }
@@ -1219,6 +1224,12 @@ WonMessage.prototype = {
 
         return this.compactFramedMessage;
       } catch (e) {
+        console.error(
+          "Failed to generate jsonld for message ",
+          this.getMessageUri(),
+          "\n\n",
+          e
+        );
         const msg =
           "Failed to generate jsonld for message " +
           this.getMessageUri() +
@@ -1226,7 +1237,6 @@ WonMessage.prototype = {
           e.message +
           "\n\n" +
           e.stack;
-        console.error(msg);
         this.compactFramedMessageError = msg;
       }
     }
