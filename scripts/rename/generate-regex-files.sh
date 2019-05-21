@@ -39,8 +39,8 @@ IFS=${myifs}
 if [[ ${#oldforms[@]} != ${#newforms[@]} ]]
 then
 	echo "ERROR: ${oldforms_file} and ${newforms_file} must have the same number of lines!" >&2
-	echo "${oldforms_file}: " $(wc -l ${oldforms_file} | awk '{print $1;}') " lines" >&2
-	echo "${newforms_file}: " $(wc -l ${newforms_file} | awk '{print $1;}') " lines" >&2
+	echo "${oldforms_file}: " $(wc -l ${oldforms_file} | awk '{print $1;}') " lines (generated ${#oldforms[@]} forms)" >&2
+	echo "${newforms_file}: " $(wc -l ${newforms_file} | awk '{print $1;}') " lines (generated ${#newforms[@]} forms)" >&2
 	exit 1
 fi
 

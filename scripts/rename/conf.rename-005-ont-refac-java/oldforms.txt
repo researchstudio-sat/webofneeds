@@ -1,0 +1,35 @@
+#WON.java -> WONMATCH.java
+!\<WON.seeks\>
+!\<WON.flag\>
+!\<WON.doNotMatchBefore\>
+!\<WON.doNotMatchAfter\>
+!\<WON.UsedForTesting\>
+!\<WON.WhatsAround\>
+!\<WON.WhatsNew\>
+!\<WON.NoHintForCounterpart\>
+!\<WON.NoHintForMe\>
+!\<WON.matchingContext\>
+!\<WON.sparqlQuery\>
+#WON.java -> WONCON.java
+!\<WON.travelAction\>
+!\<WON.responseToUri\>
+!\<WON.suggestPostUri\>
+!\<WON.bpmnWorkflow\>
+!\<WON.file\>
+!\<WON.image\>
+!\<WON.petriNet\>
+!\<WON.tag\>
+!\<WON.textMessage\>
+!\<WON.DirectResponse\>
+!\<WON.ServiceBot\>
+!\<WON.feedback\>
+!\<WON.feedbackEvent\>
+!\<WON.forResource\>
+!\<WON.binaryRating\>
+!\<WON.Good\>
+!\<WON.Bad\>
+!\<WON.isProcessing\>
+!\<WON.boundingBox\>
+!\<WON.northWestCorner\>
+!\<WON.southEastCorner\>
+!\<WON.geoSpatial\>
