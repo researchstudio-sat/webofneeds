@@ -103,6 +103,10 @@ public interface MessageEventRepository extends WonRepository<MessageEventPlaceh
     List<MessageEventPlaceholder> findByParentURIAndMessageTypeForUpdate(@Param("parent") URI parentURI,
                     @Param("messageType") WonMessageType messageType);
 
+    @Query("select count(*) from MessageEventPlaceholder msg where msg.parentURI = :parent and msg.messageType = :messageType")
+    long countByParentURIAndMessageType(@Param("parent") URI parentURI,
+                    @Param("messageType") WonMessageType messageType);
+
     @Query("select msg from MessageEventPlaceholder msg where msg.parentURI = :parent and msg.messageType = :messageType")
     List<MessageEventPlaceholder> findByParentURIAndMessageType(@Param("parent") URI parentURI,
                     @Param("messageType") WonMessageType messageType);

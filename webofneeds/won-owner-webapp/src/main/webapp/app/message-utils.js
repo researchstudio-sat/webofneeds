@@ -284,8 +284,12 @@ export function isMessageAgreement(msg) {
   return isMessageAccepted(msg) && !isMessageCancellationPending(msg);
 }
 
-export function isHintMessage(msg) {
-  return get(msg, "messageType") === won.WONMSG.hintMessage;
+export function isAtomHintMessage(msg) {
+  return get(msg, "messageType") === won.WONMSG.atomHintMessage;
+}
+
+export function isSocketHintMessage(msg) {
+  return get(msg, "messageType") === won.WONMSG.socketHintMessage;
 }
 
 export function isConnectionMessage(msg) {

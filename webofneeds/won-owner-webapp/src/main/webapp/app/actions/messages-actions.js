@@ -898,11 +898,52 @@ export function atomMessageReceived(event) {
   };
 }
 
-export function processHintMessage(event) {
+export function processSocketHintMessage(event) {
+  return (dispatch, getState) => {
+    const recipientAtomUri = event.getRecipientAtom();
+    //const targetSocketUri = event.getHintTargetSocket(); //we currently dont need to know the targetSocketUri of the message (is known by fetching the connection)
+
+    const currentState = getState();
+    const recipientConnUri = event.getReceiver();
+    const recipientAtom = getIn(currentState, ["atoms", recipientAtomUri]);
+
+    if (!recipientAtom) {
+      console.debug(
+        "ignoring hint for an atom that is not yet in the state (could be a targetAtom, or a non stored ownedAtom):",
+        recipientAtomUri
+      );
+    } else if (!recipientConnUri) {
+      console.debug("ignoring hint without a receiver(Connection)Uri:", event);
+    } else {
+      won
+        .invalidateCacheForNewConnection(recipientConnUri, recipientAtomUri)
+        .then(() => {
+          return fetchActiveConnectionAndDispatch(
+            recipientConnUri,
+            recipientAtomUri,
+            dispatch
+          );
+        })
+        .then(connection => {
+          const targetAtomUri = connection && connection.targetAtom;
+          const targetAtom = getIn(currentState, ["atoms", targetAtomUri]);
+
+          if (targetAtom) {
+            return Promise.resolve(won.invalidateCacheForAtom(targetAtomUri));
+          } else {
+            return fetchTheirAtomAndDispatch(targetAtomUri, dispatch);
+          }
+        });
+    }
+  };
+}
+
+export function processAtomHintMessage(event) {
+  //TODO: Needs refactoring as atomHints are completely different and without a connection since the split into two different hintTypes
   return (dispatch, getState) => {
     //first check if we really have the 'own' atom in the state - otherwise we'll ignore the hint
     const ownedAtomUri = event.getRecipientAtom();
-    const targetAtomUri = event.getMatchCounterpart();
+    const targetAtomUri = event.getHintTargetAtom();
 
     const currentState = getState();
     const ownedAtom = getIn(currentState, ["atoms", ownedAtomUri]);

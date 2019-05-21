@@ -315,20 +315,41 @@ public class WonMessageRoutes extends RouteBuilder {
          * Matcher protocol, incoming
          */
         from("activemq:queue:MatcherProtocol.in?concurrentConsumers=5").transacted("PROPAGATION_NEVER")
-                        .routeId("activemq:queue:MatcherProtocol.in").to("bean:wonMessageIntoCamelProcessor").choice()
+                        .routeId("activemq:queue:MatcherProtocol.in")
+                        .to("bean:wonMessageIntoCamelProcessor")
+                        .choice()
                         // we only handle hint messages
-                        .when(header(WonCamelConstants.MESSAGE_TYPE_HEADER)
-                                        .isEqualTo(URI.create(WONMSG.HintMessage.getURI().toString())))
+                        .when(PredicateBuilder.or(
+                                        header(WonCamelConstants.MESSAGE_TYPE_HEADER).isEqualTo(
+                                                        URI.create(WONMSG.AtomHintMessageString)),
+                                        header(WonCamelConstants.MESSAGE_TYPE_HEADER).isEqualTo(
+                                                        URI.create(WONMSG.SocketHintMessageString))))
                         // TODO as soon as Matcher can sign his messages, perform here
                         // .to("bean:wellformednessChecker") and .to("bean:signatureChecker")
-                        .to("bean:uriNodePathChecker").to("bean:uriInUseChecker").to("bean:envelopeAdder")
-                        .to("bean:directionFromExternalAdder").to("bean:receivedTimestampAdder")
-                        .to("direct:processHintAndStore").to("bean:toOwnerSender") // --> seda:OwnerProtocolOut
-                        .otherwise().log(LoggingLevel.INFO, "could not route message");
-        from("direct:processHintAndStore").transacted("PROPAGATION_REQUIRES_NEW").routeId("direct:processHintAndStore")
+                        .to("bean:uriNodePathChecker")
+                        .to("bean:uriInUseChecker")
+                        .to("bean:envelopeAdder")
+                        .to("bean:directionFromExternalAdder")
+                        .to("bean:receivedTimestampAdder")
+                        .to("direct:processHintAndStore")
+                        .to("bean:toOwnerSender") // --> seda:OwnerProtocolOut
+                        .otherwise()
+                        .log(LoggingLevel.INFO, "could not route message");
+        from("direct:processHintAndStore")
+                        .transacted("PROPAGATION_REQUIRES_NEW")
+                        .routeId("direct:processHintAndStore")
                         .to("bean:parentLocker")
+                        .choice()
+                        .when(header(WonCamelConstants.MESSAGE_TYPE_HEADER)
+                                        .isEqualTo(URI.create(WONMSG.AtomHintMessageString)))
+                        .to("bean:atomHintMessageProcessor?method=process")
+                        .when(header(WonCamelConstants.MESSAGE_TYPE_HEADER).isEqualTo(
+                                        URI.create(WONMSG.SocketHintMessageString)))
+                        .to("bean:socketHintMessageProcessor?method=process")
                         // call the default implementation, which may alter the message.
-                        .to("bean:hintMessageProcessor?method=process").choice()
+                        .endChoice()
+                        .end()
+                        .choice()
                         .when(isNotEqualTo(header(WonCamelConstants.IGNORE_HINT),
                                         ExpressionBuilder.constantExpression(Boolean.TRUE)))
                         .to("direct:reference-sign-persist").otherwise()

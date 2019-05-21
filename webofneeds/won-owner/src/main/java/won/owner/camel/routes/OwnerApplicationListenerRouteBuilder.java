@@ -14,7 +14,10 @@ import java.net.URI;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.LoggingLevel;
+import org.apache.camel.builder.PredicateBuilder;
 import org.apache.camel.builder.RouteBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.vocabulary.WONMSG;
@@ -27,6 +30,7 @@ import won.protocol.vocabulary.WONMSG;
  * generate routes dynamically in runtime that listen to those queues.
  */
 public class OwnerApplicationListenerRouteBuilder extends RouteBuilder {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private String endpoint;
     private URI brokerUri;
 
@@ -47,28 +51,40 @@ public class OwnerApplicationListenerRouteBuilder extends RouteBuilder {
         // name. Also, we're unsure if the concurrentConsumers part is even interpreted
         // anywhere // from(endpoints.get(i)
         // +"?concurrentConsumers=2")
-        from(endpoint).routeId("Node2OwnerRoute" + brokerUri).to("bean:wonMessageIntoCamelProcessor")
-                        .to("bean:wellformednessChecker").to("bean:uriNodePathChecker").choice()
-                        .when(header(WonCamelConstants.MESSAGE_TYPE_HEADER)
-                                        .isEqualTo(URI.create(WONMSG.HintMessageString)))
-                        // don't check the signature if we're processing a hint message (until the
-                        // matcher signs its messages)
-                        .log(LoggingLevel.DEBUG, "not checking signature because we're  processing a hint message)")
-                        .to("bean:linkedDataCacheInvalidator").to("bean:linkedDataCacheUpdater")
-                        // this expects a bean with name 'mainOwnerMessageProcessor' in the application
-                        // context
-                        // this bean is *not* provided by the won-owner module. This allows the
-                        // definition of a
-                        // different processing chain depending on the use case.
-                        .to("bean:mainOwnerMessageProcessor").otherwise()
-                        .log(LoggingLevel.DEBUG, "checking signature because we're not processing a hint message)")
-                        .to("bean:signatureChecker").to("bean:linkedDataCacheInvalidator")
-                        .to("bean:linkedDataCacheUpdater")
-                        // this expects a bean with name 'mainOwnerMessageProcessor' in the application
-                        // context
-                        // this bean is *not* provided by the won-owner module. This allows the
-                        // definition of a
-                        // different processing chain depending on the use case.
-                        .to("bean:mainOwnerMessageProcessor").end();
+        synchronized (this) {
+            // we sometimes see the owner fail during startup because it's trying to add
+            // the same route multiple times here. That's why we added the synchronized
+            // block and this check if the route exists.
+            if (getContext().hasEndpoint(endpoint) != null) {
+                logger.debug("route for listening to remote queue {} already configured", endpoint);
+                return;
+            }
+            from(endpoint).routeId("Node2OwnerRoute" + brokerUri).to("bean:wonMessageIntoCamelProcessor")
+                            .to("bean:wellformednessChecker").to("bean:uriNodePathChecker").choice()
+                            .when(PredicateBuilder.or(
+                                            header(WonCamelConstants.MESSAGE_TYPE_HEADER)
+                                                            .isEqualTo(URI.create(WONMSG.AtomHintMessageString)),
+                                            header(WonCamelConstants.MESSAGE_TYPE_HEADER)
+                                                            .isEqualTo(URI.create(WONMSG.SocketHintMessageString))))
+                            // don't check the signature if we're processing a hint message (until the
+                            // matcher signs its messages)
+                            .log(LoggingLevel.DEBUG, "not checking signature because we're  processing a hint message)")
+                            .to("bean:linkedDataCacheInvalidator").to("bean:linkedDataCacheUpdater")
+                            // this expects a bean with name 'mainOwnerMessageProcessor' in the application
+                            // context
+                            // this bean is *not* provided by the won-owner module. This allows the
+                            // definition of a
+                            // different processing chain depending on the use case.
+                            .to("bean:mainOwnerMessageProcessor").otherwise()
+                            .log(LoggingLevel.DEBUG, "checking signature because we're not processing a hint message)")
+                            .to("bean:signatureChecker").to("bean:linkedDataCacheInvalidator")
+                            .to("bean:linkedDataCacheUpdater")
+                            // this expects a bean with name 'mainOwnerMessageProcessor' in the application
+                            // context
+                            // this bean is *not* provided by the won-owner module. This allows the
+                            // definition of a
+                            // different processing chain depending on the use case.
+                            .to("bean:mainOwnerMessageProcessor").end();
+        }
     }
 }

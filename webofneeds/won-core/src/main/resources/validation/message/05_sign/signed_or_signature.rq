@@ -23,7 +23,7 @@ prefix rdfg:   <http://www.w3.org/2004/03/trix/rdfg-1/>
   ?numCorrectSignatures
 
 
-    (if((bound(?type) && ?type = msg:HintMessage) || (?numCorrectSignatures = 1 && ?numGraphs >= 2), "OK", "FAIL") AS ?check)
+    (if((bound(?type) && (?type = msg:AtomHintMessage || ?type = msg:SocketHintMessage )) || (?numCorrectSignatures = 1 && ?numGraphs >= 2), "OK", "FAIL") AS ?check)
 
   WHERE
   {

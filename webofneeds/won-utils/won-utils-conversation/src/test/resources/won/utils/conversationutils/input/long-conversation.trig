@@ -7600,7 +7600,7 @@
     event:e1er6lkkd3m15q3sel7e
             a                     msg:FromExternal ;
             msg:content        <https://localhost:8443/won/resource/event/e1er6lkkd3m15q3sel7e#content-nf27> ;
-            msg:messageType    msg:HintMessage ;
+            msg:messageType    msg:AtomHintMessage ;
             msg:recipientAtom   atom:4517796920802783000 ;
             msg:recipientNode   <https://localhost:8443/won/resource> ;
             msg:senderNode     <http://localhost:8080/matcher> ;

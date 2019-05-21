@@ -91,8 +91,6 @@ public class WON {
     public static final Property originator = m.createProperty(BASE_URI, "originator");
     public static final Property additionalData = m.createProperty(BASE_URI, "additionalData");
     public static final Resource AdditionalDataContainer = m.createResource(BASE_URI + "AdditionalDataContainer");
-    public static final Property matchScore = m.createProperty(BASE_URI, "matchScore");
-    public static final Property matchCounterpart = m.createProperty(BASE_URI, "matchCounterpart");
     public static final Property seeks = m.createProperty(BASE_URI, "seeks");
     public static final Property goal = m.createProperty(BASE_URI, "goal");
     public static final Property shapesGraph = m.createProperty(BASE_URI, "shapesGraph");

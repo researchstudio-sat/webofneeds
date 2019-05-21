@@ -16,10 +16,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import won.matcher.service.common.event.BulkHintEvent;
-import won.matcher.service.common.event.Cause;
-import won.matcher.service.common.event.HintEvent;
 import won.matcher.service.common.event.AtomEvent;
+import won.matcher.service.common.event.AtomHintEvent;
+import won.matcher.service.common.event.BulkHintEvent;
 import won.matcher.solr.config.SolrMatcherConfig;
 import won.matcher.solr.query.factory.MatchingContextQueryFactory;
 import won.matcher.solr.utils.Katomle;
@@ -175,13 +174,15 @@ public class HintBuilder {
             score = Math.max(0, Math.min(1, score));
             log.debug("generate hint for match {} with normalized score {}", matchedAtomUri, score);
             if (!doSuppressHintForAtom) {
-                bulkHintEvent.addHintEvent(new HintEvent(atom.getWonNodeUri(), atom.getUri(), wonNodeUri,
-                                matchedAtomUri, config.getSolrServerPublicUri(), score, atom.getCause()));
+                bulkHintEvent.addHintEvent(
+                                new AtomHintEvent(atom.getUri(), atom.getWonNodeUri(), matchedAtomUri, wonNodeUri,
+                                                config.getSolrServerPublicUri(), score, atom.getCause()));
             }
             // also send the same hints to the other side (remote atom and wonnode)?
             if (!doSuppressHintForMatchedAtoms) {
-                bulkHintEvent.addHintEvent(new HintEvent(wonNodeUri, matchedAtomUri, atom.getWonNodeUri(),
-                                atom.getUri(), config.getSolrServerPublicUri(), score, atom.getCause()));
+                bulkHintEvent.addHintEvent(
+                                new AtomHintEvent(matchedAtomUri, wonNodeUri, atom.getUri(), atom.getWonNodeUri(),
+                                                config.getSolrServerPublicUri(), score, atom.getCause()));
             }
         }
         return bulkHintEvent;

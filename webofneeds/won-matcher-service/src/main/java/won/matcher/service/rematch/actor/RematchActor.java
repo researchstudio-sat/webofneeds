@@ -16,13 +16,16 @@ import akka.cluster.pubsub.DistributedPubSubMediator;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import won.matcher.service.common.event.AtomEvent;
+import won.matcher.service.common.event.AtomHintEvent;
 import won.matcher.service.common.event.BulkAtomEvent;
 import won.matcher.service.common.event.BulkHintEvent;
 import won.matcher.service.common.event.Cause;
 import won.matcher.service.common.event.HintEvent;
+import won.matcher.service.common.event.SocketHintEvent;
 import won.matcher.service.rematch.config.RematchConfig;
 import won.matcher.service.rematch.service.RematchSparqlService;
 import won.protocol.util.linkeddata.LinkedDataSource;
+import won.protocol.util.linkeddata.WonLinkedDataUtils;
 
 /**
  * Actor that is responsible for re-matching and inverse matching. Re-matching
@@ -146,8 +149,7 @@ public class RematchActor extends UntypedActor {
         processHint(msg).ifPresent(e -> pubSubMediator
                         .tell(new DistributedPubSubMediator.Publish(e.getClass().getName(), e), getSelf()));
         if (log.isDebugEnabled()) {
-            log.debug("Handled HintEvent: " + msg.getFromAtomUri() + " -> " + msg.getToAtomUri(),
-                            ", cause: " + msg.getCause());
+            log.debug("Handled HintEvent: " + msg);
         }
     }
 
@@ -156,8 +158,19 @@ public class RematchActor extends UntypedActor {
             // don't do inverse matching for results of inverse matching
             return Optional.empty();
         }
-        Dataset ds = linkedDataSource.getDataForResource(URI.create(msg.getToAtomUri()));
-        return Optional.of(new AtomEvent(msg.getToAtomUri(), msg.getToWonNodeUri(), AtomEvent.TYPE.ACTIVE,
+        Optional<URI> targetAtom = null;
+        String targetWonNode = msg.getTargetWonNodeUri();
+        if (msg instanceof SocketHintEvent) {
+            targetAtom = WonLinkedDataUtils.getAtomOfSocket(URI.create(((SocketHintEvent) msg).getTargetSocketUri()),
+                            linkedDataSource);
+        } else if (msg instanceof AtomHintEvent) {
+            targetAtom = Optional.of(URI.create(((AtomHintEvent) msg).getTargetAtomUri()));
+        }
+        if (!targetAtom.isPresent()) {
+            return Optional.empty();
+        }
+        Dataset ds = linkedDataSource.getDataForResource(targetAtom.get());
+        return Optional.of(new AtomEvent(targetAtom.get().toString(), targetWonNode, AtomEvent.TYPE.ACTIVE,
                         System.currentTimeMillis(), ds, Cause.MATCHED));
     }
 }

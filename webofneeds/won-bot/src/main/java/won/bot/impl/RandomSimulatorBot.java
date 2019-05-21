@@ -33,7 +33,7 @@ import won.bot.framework.eventbot.event.impl.lifecycle.ActEvent;
 import won.bot.framework.eventbot.event.impl.atomlifecycle.AtomCreatedEvent;
 import won.bot.framework.eventbot.event.impl.atomlifecycle.AtomProducerExhaustedEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.ConnectFromOtherAtomEvent;
-import won.bot.framework.eventbot.event.impl.wonmessage.HintFromMatcherEvent;
+import won.bot.framework.eventbot.event.impl.wonmessage.AtomHintFromMatcherEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.MessageFromOtherAtomEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.OpenFromOtherAtomEvent;
 import won.bot.framework.eventbot.listener.BaseEventListener;
@@ -110,7 +110,7 @@ public class RandomSimulatorBot extends EventBot {
                         MIN_NEXT_CREATION_TIMEOUT_MILLIS, MAX_NEXT_CREATION_TIMEOUT_MILLIS, this.hashCode(),
                         new CreateAtomWithSocketsAction(ctx, getBotContextWrapper().getAtomCreateListName()))));
         // when a hint is received, connect fraction of the cases after a random timeout
-        bus.subscribe(HintFromMatcherEvent.class, new ActionOnEventListener(ctx, "hint-reactor",
+        bus.subscribe(AtomHintFromMatcherEvent.class, new ActionOnEventListener(ctx, "hint-reactor",
                         new RandomDelayedAction(ctx, MIN_RECATION_TIMEOUT_MILLIS, MAX_REACTION_TIMEOUT_MILLIS,
                                         (long) this.hashCode(),
                                         new MultipleActions(ctx, new SendFeedbackForHintAction(ctx),

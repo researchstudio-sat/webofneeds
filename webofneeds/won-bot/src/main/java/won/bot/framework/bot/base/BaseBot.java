@@ -23,7 +23,6 @@ import won.bot.framework.bot.BotLifecyclePhase;
 import won.bot.framework.bot.context.BotContextWrapper;
 import won.protocol.message.WonMessage;
 import won.protocol.model.Connection;
-import won.protocol.model.Match;
 
 /**
  * Basic Bot implementation intended to be extended. Does nothing.
@@ -121,7 +120,10 @@ public abstract class BaseBot implements Bot {
     public abstract void onCloseFromOtherAtom(Connection con, final WonMessage wonMessage);
 
     @Override
-    public abstract void onHintFromMatcher(Match match, final WonMessage wonMessage);
+    public abstract void onAtomHintFromMatcher(WonMessage wonMessage);
+
+    @Override
+    public abstract void onSocketHintFromMatcher(WonMessage wonMessage);
 
     @Override
     public abstract void onMessageFromOtherAtom(Connection con, final WonMessage wonMessage);

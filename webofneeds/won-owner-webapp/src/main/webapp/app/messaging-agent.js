@@ -37,8 +37,25 @@ export function runMessagingAgent(redux) {
   const messageProcessingArray = [
     function(message) {
       /* Other clients or matcher initiated stuff: */
-      if (message.isFromExternal() && message.isHintMessage()) {
-        redux.dispatch(actionCreators.messages__processHintMessage(message));
+      if (message.isFromExternal() && message.isAtomHintMessage()) {
+        console.warn(
+          "Omit further handling of received AtomHintMessage: ",
+          message,
+          "TODO: IMPL"
+        );
+        /*redux.dispatch(
+          actionCreators.messages__processAtomHintMessage(message)
+        );
+        return true;*/
+      }
+      return false;
+    },
+    function(message) {
+      /* Other clients or matcher initiated stuff: */
+      if (message.isFromExternal() && message.isSocketHintMessage()) {
+        redux.dispatch(
+          actionCreators.messages__processSocketHintMessage(message)
+        );
         return true;
       }
       return false;

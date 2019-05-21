@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.graph.NodeFactory;
@@ -53,12 +54,12 @@ import org.apache.jena.sparql.algebra.op.OpProject;
 import org.apache.jena.sparql.algebra.op.OpUnion;
 import org.apache.jena.sparql.core.BasicPattern;
 import org.apache.jena.sparql.core.Var;
+import org.apache.jena.sparql.function.library.leviathan.sec;
 import org.apache.jena.sparql.path.Path;
 import org.apache.jena.sparql.path.PathParser;
 import org.apache.jena.tdb.TDB;
 import org.apache.jena.vocabulary.RDF;
 import org.hibernate.cfg.NotYetImplementedException;
-import org.hibernate.hql.internal.ast.tree.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,10 +69,10 @@ import won.protocol.message.WonMessageDirection;
 import won.protocol.message.WonSignatureData;
 import won.protocol.model.AtomGraphType;
 import won.protocol.model.ConnectionState;
-import won.protocol.model.Match;
 import won.protocol.model.SocketDefinitionImpl;
 import won.protocol.service.WonNodeInfo;
 import won.protocol.service.WonNodeInfoBuilder;
+import won.protocol.util.RdfUtils.Pair;
 import won.protocol.vocabulary.SCHEMA;
 import won.protocol.vocabulary.SFSIG;
 import won.protocol.vocabulary.WON;
@@ -705,31 +706,6 @@ public class WonRdfUtils {
             return RdfUtils.findFirstPropertyFromResource(dataset, resource, WON.textMessage);
         }
 
-        /**
-         * Converts the specified hint message into a Match object.
-         * 
-         * @param wonMessage
-         * @return a match object or null if the message is not a hint message.
-         */
-        public static Match toMatch(final WonMessage wonMessage) {
-            if (!WONMSG.HintMessage.equals(wonMessage.getMessageType().getResource())) {
-                return null;
-            }
-            Match match = new Match();
-            match.setFromAtom(wonMessage.getRecipientAtomURI());
-            Dataset messageContent = wonMessage.getMessageContent();
-            RDFNode score = findOnePropertyFromResource(messageContent, wonMessage.getMessageURI(), WON.matchScore);
-            if (!score.isLiteral())
-                return null;
-            match.setScore(score.asLiteral().getDouble());
-            RDFNode counterpart = findOnePropertyFromResource(messageContent, wonMessage.getMessageURI(),
-                            WON.matchCounterpart);
-            if (!counterpart.isResource())
-                return null;
-            match.setToAtom(URI.create(counterpart.asResource().getURI()));
-            return match;
-        }
-
         public static WonMessage copyByDatasetSerialization(final WonMessage toWrap) {
             WonMessage copied = new WonMessage(RdfUtils.readDatasetFromString(
                             RdfUtils.writeDatasetToString(toWrap.getCompleteDataset(), Lang.TRIG), Lang.TRIG));
@@ -768,6 +744,79 @@ public class WonRdfUtils {
             } else {
                 return message.getRecipientSocketURI();
             }
+        }
+
+        /**
+         * Calculates all compatible socket pairs in the two specified atoms defined in
+         * the dataset.
+         * 
+         * @param dataset
+         * @param leftAtom
+         * @param rightAtom
+         * @return
+         */
+        public static Set<Pair<URI>> getCompatibleSocketsForAtoms(Dataset dataset, URI firstAtom, URI secondAtom) {
+            Set<URI> firstAtomSockets = getSocketsOfAtom(dataset, firstAtom);
+            Set<URI> secondAtomSockets = getSocketsOfAtom(dataset, secondAtom);
+            Set<Pair<URI>> ret = new HashSet<>();
+            firstAtomSockets.forEach(firstAtomSocket -> {
+                secondAtomSockets.forEach(secondAtomSocket -> {
+                    if (isSocketsCompatible(dataset, firstAtomSocket, secondAtomSocket)) {
+                        ret.add(new Pair(firstAtomSocket, secondAtomSocket));
+                    }
+                });
+            });
+            return ret;
+        }
+
+        public static Set<Pair<URI>> getIncompatibleSocketsForAtoms(Dataset dataset, URI firstAtom, URI secondAtom) {
+            Set<URI> firstAtomSockets = getSocketsOfAtom(dataset, firstAtom);
+            Set<URI> secondAtomSockets = getSocketsOfAtom(dataset, secondAtom);
+            Set<Pair<URI>> ret = new HashSet<>();
+            firstAtomSockets.forEach(firstAtomSocket -> {
+                secondAtomSockets.forEach(secondAtomSocket -> {
+                    if (!isSocketsCompatible(dataset, firstAtomSocket, secondAtomSocket)) {
+                        ret.add(new Pair(firstAtomSocket, secondAtomSocket));
+                    }
+                });
+            });
+            return ret;
+        }
+
+        /**
+         * Checks if the specified sockets are compatible.
+         * 
+         * @param dataset
+         * @param firstAtomSocket
+         * @param secondAtomSocket
+         * @return
+         */
+        public static boolean isSocketsCompatible(Dataset dataset, URI firstAtomSocket, URI secondAtomSocket) {
+            Set<URI> firstCompatibleDefs = getCompatibleSocketDefinitions(dataset, firstAtomSocket);
+            Optional<URI> secondDef = getSocketDefinition(dataset, secondAtomSocket);
+            if (!secondDef.isPresent()) {
+                throw new IllegalArgumentException("No socket definition found for " + secondAtomSocket);
+            }
+            if (!firstCompatibleDefs.isEmpty() && !firstCompatibleDefs.contains(secondDef.get())) {
+                return false;
+            }
+            Set<URI> secondCompatibleDefs = getCompatibleSocketDefinitions(dataset, secondAtomSocket);
+            Optional<URI> firstDef = getSocketDefinition(dataset, firstAtomSocket);
+            if (!firstDef.isPresent()) {
+                throw new IllegalArgumentException("No socket definition found for " + firstAtomSocket);
+            }
+            if (!secondCompatibleDefs.isEmpty() && !secondCompatibleDefs.contains(firstDef.get())) {
+                return false;
+            }
+            return true;
+        }
+
+        public static Optional<URI> getSocketDefinition(Dataset dataset, URI socket) {
+            return RdfUtils
+                            .getObjectStreamOfProperty(dataset, socket, URI.create(WON.socketDefinition.getURI()),
+                                            node -> node.isURIResource() ? URI.create(node.asResource().getURI())
+                                                            : null)
+                            .findFirst();
         }
 
         /**
@@ -907,6 +956,16 @@ public class WonRdfUtils {
             return getDefaultSocket(model, model.getResource(subject.toString()), returnAnyIfNoDefaultFound);
         }
 
+        public static Set<URI> getSocketsOfAtom(Dataset atomDataset, URI atomURI) {
+            return getSocketsOfAtomAsStream(atomDataset, atomURI).collect(Collectors.toSet());
+        }
+
+        public static Stream<URI> getSocketsOfAtomAsStream(Dataset atomDataset, URI atomURI) {
+            return RdfUtils.getObjectStreamOfProperty(atomDataset, atomURI, URI.create(WON.socket.getURI()),
+                            node -> node.isURIResource() ? URI.create(node.asResource().getURI())
+                                            : null);
+        }
+
         /**
          * Returns the default socket found in the model. If there is no default socket,
          * the result is empty. unless returnAnyIfNoDefaultFound is true, in which case
@@ -1004,7 +1063,11 @@ public class WonRdfUtils {
 
         public static void setCompatibleSocketDefinitions(SocketDefinitionImpl socketConfiguration, Dataset dataset,
                         URI socketURI) {
-            socketConfiguration.setCompatibleSocketTypes(RdfUtils
+            socketConfiguration.setCompatibleSocketTypes(getCompatibleSocketDefinitions(dataset, socketURI));
+        }
+
+        public static Set<URI> getCompatibleSocketDefinitions(Dataset dataset, URI socketURI) {
+            return RdfUtils
                             .getObjectStreamOfProperty(dataset, socketURI, URI.create(WON.socketDefinition.getURI()),
                                             node -> node.isURIResource() ? URI.create(node.asResource().getURI())
                                                             : null)
@@ -1012,7 +1075,7 @@ public class WonRdfUtils {
                                             URI.create(WON.compatibleSocketDefinition.getURI()),
                                             node -> node.isURIResource() ? URI.create(node.asResource().getURI())
                                                             : null))
-                            .collect(Collectors.toSet()));
+                            .collect(Collectors.toSet());
         }
 
         public static void setDerivationProperties(SocketDefinitionImpl socketConfiguration, Dataset dataset,
@@ -1071,6 +1134,11 @@ public class WonRdfUtils {
             } else if (socketCapacities.size() == 1) {
                 socketConfiguration.setCapacity(socketCapacities.iterator().next());
             }
+        }
+
+        public static Optional<URI> getAtomOfSocket(Dataset dataset, URI socketURI) {
+            return RdfUtils.getFirstStatementMapped(dataset, null, URI.create(WON.socket.getURI()), socketURI,
+                            s -> s.getSubject().isURIResource() ? URI.create(s.getSubject().getURI()) : null);
         }
     }
 

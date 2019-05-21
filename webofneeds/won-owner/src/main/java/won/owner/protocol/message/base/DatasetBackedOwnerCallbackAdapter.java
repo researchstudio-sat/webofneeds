@@ -30,7 +30,6 @@ import won.protocol.message.WonMessage;
 import won.protocol.message.processor.exception.WonMessageProcessingException;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionState;
-import won.protocol.model.Match;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.util.linkeddata.LinkedDataSource;
@@ -104,10 +103,5 @@ public class DatasetBackedOwnerCallbackAdapter extends OwnerCallbackAdapter {
 
     private URI getURIFromSolution(final QuerySolution soln, String var) {
         return URI.create(soln.getResource(var).getURI().toString());
-    }
-
-    @Override
-    protected Match makeMatch(final WonMessage wonMessage) {
-        return WonRdfUtils.MessageUtils.toMatch(wonMessage);
     }
 }

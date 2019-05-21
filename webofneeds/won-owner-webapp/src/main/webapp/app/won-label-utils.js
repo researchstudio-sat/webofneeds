@@ -22,7 +22,8 @@ export const labels = deepFreeze({
     [won.WONMSG.openMessage]: "Accepted Contact Request",
     [won.WONMSG.closeMessage]: "Close Message",
     [won.WONMSG.connectionMessage]: "Chat Message",
-    [won.WONMSG.hintMessage]: "Hint Message",
+    [won.WONMSG.atomHintMessage]: "Atom Hint Message",
+    [won.WONMSG.socketHintMessage]: "Socket Hint Message",
     [won.WONMSG.hintFeedbackMessage]: "Hint Feedback Message",
   },
   flags: {

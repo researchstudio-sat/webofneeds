@@ -3569,7 +3569,7 @@
     event:u3op66771mcm3ibsrr31
             a                     msg:FromExternal ;
             msg:content        <https://localhost:8443/won/resource/event/u3op66771mcm3ibsrr31#content-4i2l> ;
-            msg:messageType    msg:HintMessage ;
+            msg:messageType    msg:AtomHintMessage ;
             msg:recipientAtom   atom:2615528351738345500 ;
             msg:recipientNode   <https://localhost:8443/won/resource> ;
             msg:senderNode     <http://localhost:8080/matcher> ;

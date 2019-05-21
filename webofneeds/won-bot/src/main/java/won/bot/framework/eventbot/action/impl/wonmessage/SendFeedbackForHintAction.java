@@ -18,7 +18,7 @@ import org.apache.jena.query.Dataset;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.event.Event;
-import won.bot.framework.eventbot.event.impl.wonmessage.HintFromMatcherEvent;
+import won.bot.framework.eventbot.event.impl.wonmessage.AtomHintFromMatcherEvent;
 import won.bot.framework.eventbot.listener.EventListener;
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
@@ -39,11 +39,11 @@ public class SendFeedbackForHintAction extends BaseEventBotAction {
 
     @Override
     public void doRun(final Event event, EventListener executingListener) throws Exception {
-        if (event instanceof HintFromMatcherEvent) {
+        if (event instanceof AtomHintFromMatcherEvent) {
             // TODO: the hint with a match object is not really suitable here. Would be
             // better to
             // use connection object instead
-            HintFromMatcherEvent hintEvent = (HintFromMatcherEvent) event;
+            AtomHintFromMatcherEvent hintEvent = (AtomHintFromMatcherEvent) event;
             hintEvent.getWonMessage().getRecipientURI();
             boolean feedbackValue = random.nextBoolean();
             WonMessage message = createFeedbackMessage(hintEvent.getWonMessage().getRecipientURI(), feedbackValue);

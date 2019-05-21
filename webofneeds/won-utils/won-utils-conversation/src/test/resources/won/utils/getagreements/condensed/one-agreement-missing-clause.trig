@@ -492,7 +492,7 @@
 <https://localhost:8443/won/resource/event/75z0ck8d0ijloyvzyo05#envelope-trus> {
     event:75z0ck8d0ijloyvzyo05
             msg:content       <https://localhost:8443/won/resource/event/75z0ck8d0ijloyvzyo05#content-y1fe> ;
-            msg:messageType   msg:HintMessage ;
+            msg:messageType   msg:AtomHintMessage ;
             msg:recipientAtom  atom:7820503869697675000 .
 }
 

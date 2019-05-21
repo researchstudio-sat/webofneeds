@@ -397,6 +397,12 @@ public class AtomModelWrapper {
     }
 
     public void setDefaultSocket(String socketUri) {
+        if (socketUri.startsWith("#")) {
+            socketUri = getAtomUri() + socketUri;
+        } else if (!socketUri.startsWith(getAtomUri())) {
+            throw new IllegalArgumentException(
+                            "The socketURI must start with '[atomURI]#' or '#' but was: " + socketUri);
+        }
         Resource socket = getAtomModel().getResource(socketUri);
         getAtomContentNode().addProperty(WON.defaultSocket, socket);
     }

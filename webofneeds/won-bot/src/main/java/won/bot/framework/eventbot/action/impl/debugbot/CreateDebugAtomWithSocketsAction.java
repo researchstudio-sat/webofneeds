@@ -26,6 +26,7 @@ import won.bot.framework.eventbot.event.AtomCreationFailedEvent;
 import won.bot.framework.eventbot.event.AtomSpecificEvent;
 import won.bot.framework.eventbot.event.impl.debugbot.ConnectDebugCommandEvent;
 import won.bot.framework.eventbot.event.impl.debugbot.HintDebugCommandEvent;
+import won.bot.framework.eventbot.event.impl.debugbot.HintType;
 import won.bot.framework.eventbot.event.impl.debugbot.AtomCreatedEventForDebugConnect;
 import won.bot.framework.eventbot.event.impl.debugbot.AtomCreatedEventForDebugHint;
 import won.bot.framework.eventbot.event.impl.matcher.AtomCreatedEventForMatcher;
@@ -125,8 +126,18 @@ public class CreateDebugAtomWithSocketsAction extends AbstractCreateAtomAction {
                 logger.debug("atom creation successful, new atom URI is {}", atomURI);
                 // save the mapping between the original and the reaction in to the context.
                 getEventListenerContext().getBotContextWrapper().addUriAssociation(reactingToAtomUri, atomURI);
-                if ((origEvent instanceof HintDebugCommandEvent) || isInitialForHint) {
-                    bus.publish(new AtomCreatedEventForDebugHint(atomURI, wonNodeUri, debugAtomDataset, null));
+                if (origEvent instanceof HintDebugCommandEvent || isInitialForHint) {
+                    HintType hintType = HintType.ATOM_HINT;
+                    if (origEvent instanceof HintDebugCommandEvent) {
+                        hintType = ((HintDebugCommandEvent) origEvent).getHintType();
+                        bus.publish(new AtomCreatedEventForDebugHint(origEvent, atomURI, wonNodeUri,
+                                        debugAtomDataset,
+                                        hintType));
+                    } else {
+                        bus.publish(new AtomCreatedEventForDebugHint(origEvent, atomURI, wonNodeUri,
+                                        debugAtomDataset,
+                                        hintType));
+                    }
                 } else if ((origEvent instanceof ConnectDebugCommandEvent) || isInitialForConnect) {
                     bus.publish(new AtomCreatedEventForDebugConnect(atomURI, wonNodeUri, debugAtomDataset, null));
                 } else {

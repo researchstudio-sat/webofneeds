@@ -47,6 +47,8 @@ public class WonMessageBuilderTest {
     private static final URI TYPE_URI_2 = URI.create("http://example.com/type/2");
     private static final URI CONNECTION_URI_1 = URI.create("http://example.com/won/res/con/1");
     private static final URI CONNECTION_URI_2 = URI.create("http://example.com/won/res/con/2");
+    private static final URI ATOM_URI_1 = URI.create("http://example.com/atom/1");
+    private static final URI ATOM_URI_2 = URI.create("http://example.com/atom/2");
 
     @BeforeClass
     public static void setLogLevel() {
@@ -69,7 +71,7 @@ public class WonMessageBuilderTest {
     @Test
     public void test_wrap_retains_envelope_graph_properties() {
         WonMessage msg2 = wrapMessage(createMessageWithContent().build()).build();
-        Assert.assertEquals(WonMessageType.HINT_MESSAGE, msg2.getMessageType());
+        Assert.assertEquals(WonMessageType.ATOM_HINT_MESSAGE, msg2.getMessageType());
     }
 
     @Test
@@ -243,7 +245,8 @@ public class WonMessageBuilderTest {
     }
 
     private WonMessageBuilder createMessageWithoutContent() {
-        return new WonMessageBuilder(MSG_URI_1).setWonMessageType(WonMessageType.HINT_MESSAGE)
+        return new WonMessageBuilder(MSG_URI_1).setWonMessageType(WonMessageType.ATOM_HINT_MESSAGE)
+                        .setHintTargetAtomURI(ATOM_URI_1).setHintScore(0.2)
                         .setWonMessageDirection(WonMessageDirection.FROM_OWNER);
     }
 
@@ -261,20 +264,20 @@ public class WonMessageBuilderTest {
 
     private WonMessageBuilder createMessageWithContent() {
         return new WonMessageBuilder(MSG_URI_1).addContent(createContent())
-                        .setWonMessageType(WonMessageType.HINT_MESSAGE)
-                        .setWonMessageDirection(WonMessageDirection.FROM_OWNER);
+                        .setWonMessageType(WonMessageType.ATOM_HINT_MESSAGE).setHintTargetAtomURI(ATOM_URI_1)
+                        .setHintScore(0.5).setWonMessageDirection(WonMessageDirection.FROM_OWNER);
     }
 
     private WonMessageBuilder createMessageWithTwoContentGraphs() {
         return new WonMessageBuilder(MSG_URI_1).addContent(createContent()).addContent(createDifferentContent())
-                        .setWonMessageType(WonMessageType.HINT_MESSAGE)
-                        .setWonMessageDirection(WonMessageDirection.FROM_OWNER);
+                        .setWonMessageType(WonMessageType.ATOM_HINT_MESSAGE).setHintTargetAtomURI(ATOM_URI_1)
+                        .setHintScore(0.2).setWonMessageDirection(WonMessageDirection.FROM_OWNER);
     }
 
     private WonMessageBuilder createMessageWithContentDataset() {
         return new WonMessageBuilder(MSG_URI_1).addContent(createContentDataset())
-                        .setWonMessageType(WonMessageType.HINT_MESSAGE)
-                        .setWonMessageDirection(WonMessageDirection.FROM_OWNER);
+                        .setWonMessageType(WonMessageType.ATOM_HINT_MESSAGE).setHintTargetAtomURI(ATOM_URI_1)
+                        .setHintScore(0.2).setWonMessageDirection(WonMessageDirection.FROM_OWNER);
     }
 
     private Model createContent() {

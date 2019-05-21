@@ -2,7 +2,6 @@ package won.matcher.sparql.actor;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -45,8 +44,6 @@ import org.apache.jena.sparql.algebra.op.OpProject;
 import org.apache.jena.sparql.algebra.op.OpUnion;
 import org.apache.jena.sparql.core.BasicPattern;
 import org.apache.jena.sparql.core.Var;
-import org.apache.jena.sparql.engine.binding.Binding;
-import org.apache.jena.sparql.engine.binding.BindingFactory;
 import org.apache.jena.sparql.engine.binding.BindingHashMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -65,15 +62,14 @@ import akka.event.LoggingAdapter;
 import akka.japi.Function;
 import scala.concurrent.duration.Duration;
 import won.matcher.service.common.event.AtomEvent;
+import won.matcher.service.common.event.AtomHintEvent;
 import won.matcher.service.common.event.BulkAtomEvent;
 import won.matcher.service.common.event.BulkHintEvent;
-
 import won.matcher.service.common.event.Cause;
 import won.matcher.service.common.event.HintEvent;
 import won.matcher.sparql.config.SparqlMatcherConfig;
 import won.protocol.model.AtomState;
 import won.protocol.util.AtomModelWrapper;
-import won.protocol.util.RdfUtils;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.vocabulary.WON;
 
@@ -231,8 +227,8 @@ public class SparqlMatcherActor extends UntypedActor {
                                                                                                        // descending
                         .limit(config.getLimitResults()).map(hint -> {
                             double score = range == 0 ? 1.0 : (hint.score - minScore.get()) / range;
-                            return new HintEvent(atom.getWonNodeUri(), atom.getAtomUri(), hint.atom.getWonNodeUri(),
-                                            hint.atom.getAtomUri(), config.getMatcherUri(), score, cause);
+                            return new AtomHintEvent(atom.getAtomUri(), atom.getWonNodeUri(), hint.atom.getAtomUri(),
+                                            hint.atom.getWonNodeUri(), config.getMatcherUri(), score, cause);
                         }).collect(Collectors.toList());
     }
 

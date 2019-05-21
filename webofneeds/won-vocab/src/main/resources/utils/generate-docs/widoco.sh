@@ -1,7 +1,12 @@
 #!/usr/bin/bash
 usage(){
 cat << EOF
-usage: $0 <widoco-jar> [only-ont]
+usage: 
+	$0 clean
+	
+	Deletes the output directory.
+	
+	$0 <widoco-jar> [only-ont]
 
 	Generates (or re-generates) all the ontology documentation.
 	Parameters: 
@@ -11,23 +16,37 @@ usage: $0 <widoco-jar> [only-ont]
 EOF
 }
 script_path="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+project_dir=${script_path}/../../../../../
+project_dir="$( cd ${project_dir} >/dev/null 2>&1 && pwd )"
+output_base=${project_dir}/target
+if [[ $1 == "clean" ]]
+then
+	if [[ -d ${output_base} ]]
+	then
+		rm -rf ${output_base} && echo "deleted output directory ${output_base}."
+	else 
+		echo "${output_base} does not exist, nothing here for me to clean up."
+	fi
+	exit 0
+fi
 
 if [[ -z ${1+x} || ! -r $1 ]]
 then
 	usage
 	exit 1
 fi
+
 widoco_jar=$1
 if [[ ! -z ${2+x} ]]
 then
 	only_ont=$2
 fi
 
-output_base=${script_path}/../../../../../pub/
-output_base="$( cd ${output_base} >/dev/null 2>&1 && pwd )"
-ontology_root=${script_path}/../../ontology/
-ontology_root="$( cd "${ontology_root}" >/dev/null 2>&1 && pwd )"
-echo "(re)generating documentation for ontologies found in ${ontology_root} into ${output_base}"
+ontology_root=${project_dir}/src/main/resources/ontology/
+echo "(re)generating documentation for ontologies"
+echo "   ontologies folder:  ${ontology_root}"
+echo "   output folder    :  ${output_base}"
+
 onts=(core message agreement modification)
 rewrite_base="https://researchstudio-sat.github.io/webofneeds/ontologies"
 ext_onts=(buddy chat group hold review schema)
@@ -61,12 +80,21 @@ function generate_for_ontology() {
 		config_file_opt="-confFile ${config_file}"
 	fi
 	mkdir -p "${output_path}"
-	echo "generating documentation for ${ont} in ${output_path}" 
+	echo "generating documentation for '${ont}' ontology in subfolder '${output_path}'" 
 	java -jar ${widoco_jar} -ontFile "${ont_file}" -outFolder "${output_path}" ${config_file_opt} \
-		-licensius -oops -rewriteAll -webVowl
+	    -licensius -oops -rewriteAll -webVowl
 	java -jar ${widoco_jar} -ontFile "${ont_file}" -outFolder "${output_path}" ${config_file_opt} \
 		-crossRef -rewriteAll
 	cp "${output_path}/index-en.html" "${output_path}/index.html"
+	# rename ontology.json to ontology.jsonld because we host our ontologies on github
+	# and their content-type system is extension based. (.jsonld -> application/ld+json)
+	mv "${output_path}/ontology.json" "${output_path}/ontology.jsonld"
+	# replace extension .json with .jsonld in the redirects file, if created
+	sed -i -e 's/\.json/.jsonld/g' "${output_path}/.htaccess"
+	for f in "${output_path}/index*.html"
+	do
+		sed -i -e 's/ontology\.json/ontology.jsonld/g' ${f}
+	done
 	for section_html_file in ${output_path}/sections/*.html
 	do
 		section_html_filename=${section_html_file##*/}

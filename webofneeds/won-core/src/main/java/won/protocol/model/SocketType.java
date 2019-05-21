@@ -14,6 +14,7 @@ public enum SocketType {
     ChatSocket("wx-chat", "ChatSocket"), HolderSocket("wx-hold", "HolderSocket"),
     HoldableSocket("wx-hold", "HoldableSocket"),
     GroupSocket("wx-group", "GroupSocket"), ReviewSocket("wx-review", "ReviewSocket"),
+    BuddySocket("wx-buddy", "BuddySocket"),
     CoordinatorSocket("CoordinatorSocket"),
     ParticipantSocket("ParticipantSocket"), CommentSocket("CommentSocket"),
     CommentModeratedSocket("CommentModeratedSocket"), CommentUnrestrictedSocket("CommentUnrestrictedSocket"),
