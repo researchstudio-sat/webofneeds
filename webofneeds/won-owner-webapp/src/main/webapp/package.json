@@ -48,7 +48,7 @@
     "win:serve": "cross-env PARCEL_WORKERS=1 npm run serve",
     "postinstall": "npm rebuild && patch-package",
     "precommit": "lint-staged",
-    "watch": "cross-env WON_OWNER_BASE_URL=/owner parcel watch index.html --public-url=/owner -d generated",
+    "watch": "cross-env WON_OWNER_BASE_URL=/owner parcel watch index.html --public-url=/owner -d generated --no-hmr",
     "win:watch": "cross-env PARCEL_WORKERS=1 npm run watch",
     "clean": "rimraf ./generated ./.cache"
   },
