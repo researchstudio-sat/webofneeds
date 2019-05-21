@@ -16,7 +16,7 @@
                                  dc:title "Web of Needs Demo Extension" ;
                                  dcterms:created "2019-05-20"^^xsd:date ;
                                  dcterms:license <https://creativecommons.org/licenses/by/4.0/> ;
-                                 vann:preferredNamespacePrefix "demo" .
+                                 vann:preferredNamespacePrefix "wx-demo" .
 
 #################################################################
 #    Annotation properties

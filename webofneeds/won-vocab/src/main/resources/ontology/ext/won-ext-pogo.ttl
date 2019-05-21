@@ -19,7 +19,7 @@
                                  dc:title "Web of Needs Pokémon GO Raid Extension" ;
                                  dcterms:created "2019-05-21" ;
                                  dcterms:license <https://creativecommons.org/licenses/by/4.0/> ;
-                                 vann:preferredNamespacePrefix "pgo" .
+                                 vann:preferredNamespacePrefix "wx-pogo" .
 
 #################################################################
 #    Annotation properties

@@ -1,4 +1,4 @@
-@prefix : <https://w3id.org/won/ext/wx-template#> .
+@prefix : <https://w3id.org/won/ext/template#> .
 @prefix dc: <http://purl.org/dc/elements/1.1/> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
@@ -7,10 +7,10 @@
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix vann: <http://purl.org/vocab/vann/> .
 @prefix dcterms: <http://purl.org/dc/terms/> .
-@base <https://w3id.org/won/ext/wx-template> .
+@base <https://w3id.org/won/ext/template> .
 
-<https://w3id.org/won/ext/wx-template> rdf:type owl:Ontology ;
-                                 owl:versionIRI <https://w3id.org/won/ext/wx-template/1.0> ;
+<https://w3id.org/won/ext/template> rdf:type owl:Ontology ;
+                                 owl:versionIRI <https://w3id.org/won/ext/template/1.0> ;
                                  owl:imports <https://w3id.org/won/core> ;
                                  dc:abstract "Template for ontology extensions. To be copied and changed."@en ;
                                  dc:creator "Your Name Here" ;
