@@ -243,7 +243,7 @@ export function hasUnreadSuggestedConnections(atom) {
 export function isSearchAtom(atom) {
   return (
     getIn(atom, ["content", "type"]) &&
-    getIn(atom, ["content", "type"]).has("won:PureSearch")
+    getIn(atom, ["content", "type"]).has("demo:PureSearch")
   );
 }
 
