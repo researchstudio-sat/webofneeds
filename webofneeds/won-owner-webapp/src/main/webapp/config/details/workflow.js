@@ -107,7 +107,7 @@ export const petriNetWorkflow = {
   },
 };
 /*<https://192.168.124.49:8443/won/resource/event/xlifb1yz7opl/petrinetWorkflow/fzkwlb9xdp> wf:firesTransition <https://w3id.org/won/process/taxi#DriverArrivedAtPickupLocation> .
- <this:eventuri> won:textMessage "Dear passenger, I'm waiting at the pickup location. You have 5 minutes." .*/
+ <this:eventuri> con:text "Dear passenger, I'm waiting at the pickup location. You have 5 minutes." .*/
 
 export const petriNetTransition = {
   identifier: "petriNetTransition",

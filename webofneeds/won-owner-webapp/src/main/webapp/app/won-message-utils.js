@@ -283,10 +283,7 @@ export function buildChatMessage({
       ) {
         //add the chatMessage as normal text message
         if (chatMessage) {
-          wonMessageBuilder.addContentGraphData(
-            won.WON.textMessage,
-            chatMessage
-          );
+          wonMessageBuilder.addContentGraphData(won.WONCON.text, chatMessage);
         }
 
         if (additionalContent) {

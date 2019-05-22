@@ -88,11 +88,11 @@ export const searchString = {
   parseToRDF: function({ value }) {
     const val = value ? value : undefined;
     return {
-      "won:searchString": val,
+      "match:searchString": val,
     };
   },
   parseFromRDF: function(jsonLDImm) {
-    return won.parseFrom(jsonLDImm, ["won:searchString"], "xsd:string");
+    return won.parseFrom(jsonLDImm, ["match:searchString"], "xsd:string");
   },
   generateHumanReadable: function({ value, includeLabel }) {
     if (value) {
@@ -144,12 +144,12 @@ export const tags = {
   messageEnabled: true,
   parseToRDF: function({ value }) {
     if (!value) {
-      return { "won:tag": undefined };
+      return { "con:tag": undefined };
     }
-    return { "won:tag": value };
+    return { "con:tag": value };
   },
   parseFromRDF: function(jsonLDImm) {
-    return won.parseListFrom(jsonLDImm, ["won:tag"], "xsd:string");
+    return won.parseListFrom(jsonLDImm, ["con:tag"], "xsd:string");
   },
   generateHumanReadable: function({ value, includeLabel }) {
     if (value && is("Array", value) && value.length > 0) {
@@ -173,14 +173,14 @@ export const suggestPost = {
 
     if (val) {
       return {
-        "won:suggestPostUri": { "@id": val },
+        "con:suggestedAtom": { "@id": val },
       };
     } else {
-      return { "won:suggestPostUri": undefined };
+      return { "con:suggestedAtom": undefined };
     }
   },
   parseFromRDF: function(jsonLDImm) {
-    return getIn(jsonLDImm, ["won:suggestPostUri", "@id"]);
+    return getIn(jsonLDImm, ["con:suggestedAtom", "@id"]);
   },
   generateHumanReadable: function({ value, includeLabel }) {
     if (value) {
@@ -203,14 +203,14 @@ export const responseToUri = {
 
     if (val) {
       return {
-        "won:responseToUri": { "@id": val },
+        "con:inResponseTo": { "@id": val },
       };
     } else {
-      return { "won:responseToUri": undefined };
+      return { "con:inResponseTo": undefined };
     }
   },
   parseFromRDF: function(jsonLDImm) {
-    return getIn(jsonLDImm, ["won:responseToUri", "@id"]);
+    return getIn(jsonLDImm, ["con:inResponseTo", "@id"]);
   },
   generateHumanReadable: function({ value, includeLabel }) {
     if (value) {
@@ -229,25 +229,25 @@ export const flags = {
   component: undefined, //this is so we do not display the component as a detail-picker, but are still able to use the parseToRDF, parseFromRDF functions
   multiSelect: true,
   options: [
-    { value: "won:NoHintForMe", label: "Silent" },
-    { value: "won:NoHintForCounterpart", label: "Invisible" },
-    { value: "won:DirectResponse", label: "DirectResponse" },
-    { value: "won:UsedForTesting", label: "UsedForTesting" },
+    { value: "match:NoHintForMe", label: "Silent" },
+    { value: "match:NoHintForCounterpart", label: "Invisible" },
+    { value: "con:DirectResponse", label: "DirectResponse" },
+    { value: "match:UsedForTesting", label: "UsedForTesting" },
   ],
   parseToRDF: function({ value }) {
     if (!value) {
-      return { "won:flag": undefined };
+      return { "match:flag": undefined };
     } else if (is("Array", value)) {
       const idFlags = value.map(item => {
         return { "@id": item };
       });
-      return { "won:flag": idFlags };
+      return { "match:flag": idFlags };
     } else {
-      return { "won:flag": [{ "@id": value }] };
+      return { "match:flag": [{ "@id": value }] };
     }
   },
   parseFromRDF: function(jsonLDImm) {
-    return won.parseListFrom(jsonLDImm, ["won:flag"], "xsd:ID");
+    return won.parseListFrom(jsonLDImm, ["match:flag"], "xsd:ID");
   },
   generateHumanReadable: function({ value, includeLabel }) {
     //TODO: Implement this so that the label shows instead of the value

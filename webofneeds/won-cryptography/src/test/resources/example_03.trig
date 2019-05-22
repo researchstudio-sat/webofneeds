@@ -1,3 +1,5 @@
+@prefix con:   <https://w3id.org/won/content#> .
+@prefix match:   <https://w3id.org/won/matching#> .
 # Root level triples, unnamed graph and named graph
 # Purpose: Testing multiple graphs and named graphs
 

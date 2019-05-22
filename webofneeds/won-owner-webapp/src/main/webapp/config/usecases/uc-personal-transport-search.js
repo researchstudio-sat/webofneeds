@@ -16,7 +16,7 @@ export const personalTransportSearch = {
     ...mergeInEmptyDraft({
       content: {
         title: "Need a lift",
-        type: ["won:PersonalTransportSearch"],
+        type: ["demo:PersonalTransportSearch"],
       },
     }),
   },
@@ -62,7 +62,7 @@ export const personalTransportSearch = {
               { 
                 ${resultName} <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://dbpedia.org/resource/Ridesharing>.
                 OPTIONAL { 
-                  ${resultName} (won:travelAction/s:fromLocation) ?fromLocation.
+                  ${resultName} (con:travelAction/s:fromLocation) ?fromLocation.
                   ?fromLocation s:geo ?fromLocation_geo.
                   ?fromLocation_geo 
                     s:latitude ?fromLocation_lat;
@@ -77,7 +77,7 @@ export const personalTransportSearch = {
                   BIND((?fromLatDiff * ?fromLatDiff) + (?fromLonDiff * ?fromLonDiff) AS ?fromLocation_geoDistanceScore)
                 }
                 OPTIONAL {
-                  ${resultName} (won:travelAction/s:toLocation) ?toLocation.
+                  ${resultName} (con:travelAction/s:toLocation) ?toLocation.
                   ?toLocation s:geo ?toLocation_geo.
                   ?toLocation_geo 
                     s:latitude ?toLocation_lat;
@@ -138,7 +138,7 @@ export const personalTransportSearch = {
           {
             {
               ${resultName} a <http://dbpedia.org/resource/Ridesharing> ;
-                            (won:travelAction/s:fromLocation) ?location.
+                            (con:travelAction/s:fromLocation) ?location.
             } 
             union 
             {
@@ -173,7 +173,7 @@ export const personalTransportSearch = {
           {
             {
               ${resultName} a <http://dbpedia.org/resource/Ridesharing> ;
-                            (won:travelAction/s:toLocation) ?location.
+                            (con:travelAction/s:toLocation) ?location.
             } 
             union 
             {

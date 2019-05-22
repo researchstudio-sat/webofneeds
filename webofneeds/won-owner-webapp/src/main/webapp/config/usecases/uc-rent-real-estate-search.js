@@ -28,11 +28,11 @@ export const rentRealEstateSearch = {
   draft: {
     ...mergeInEmptyDraft({
       seeks: {
-        type: ["won:RealEstateRentOffer"],
+        type: ["demo:RealEstateRentOffer"],
         tags: ["RentOutRealEstate"],
       },
       content: {
-        type: ["won:RealEstateRentDemand"],
+        type: ["demo:RealEstateRentDemand"],
         tags: ["SearchRealEstateToRent"],
       },
     }),
@@ -65,7 +65,7 @@ export const rentRealEstateSearch = {
           },
           operations: [
             `${resultName} a won:Atom.`,
-            `${resultName} a won:RealEstateRentOffer.`,
+            `${resultName} a demo:RealEstateRentOffer.`,
             `${resultName} (won:location|s:location) ?location.`,
             "?location s:geo ?location_geo.",
             "?location_geo s:latitude ?location_lat;",
@@ -115,7 +115,7 @@ export const rentRealEstateSearch = {
           },
           operations: [
             `${resultName} a won:Atom.`,
-            `${resultName} a won:RealEstateRentOffer.`,
+            `${resultName} a demo:RealEstateRentOffer.`,
           ],
         },
         rentRange &&

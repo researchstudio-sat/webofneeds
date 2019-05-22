@@ -47,7 +47,6 @@ import org.apache.jena.sparql.expr.nodevalue.NodeValueString;
 import org.apache.jena.vocabulary.RDF;
 
 import won.protocol.vocabulary.WON;
-import won.protocol.vocabulary.WONCON;
 import won.protocol.vocabulary.WONMATCH;
 
 public class SparqlMatcherUtils {

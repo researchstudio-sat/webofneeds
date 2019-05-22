@@ -15,7 +15,6 @@ import org.junit.Test;
 import won.protocol.message.Utils;
 import won.protocol.model.AtomGraphType;
 import won.protocol.model.AtomState;
-import won.protocol.vocabulary.WON;
 import won.protocol.vocabulary.WONCON;
 import won.protocol.vocabulary.WONMATCH;
 

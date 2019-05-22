@@ -39,10 +39,10 @@ export const taxiOffer = {
         },
         operations: [
           `${resultName} a won:Atom.`,
-          `${resultName} a won:PersonalTransportSearch.`,
-          `${resultName} won:seeks ?seeks.`,
-          "?seeks won:travelAction/s:fromLocation ?fromLocation.",
-          "?seeks won:travelAction/s:toLocation ?toLocation.",
+          `${resultName} a demo:PersonalTransportSearch.`,
+          `${resultName} match:seeks ?seeks.`,
+          "?seeks con:travelAction/s:fromLocation ?fromLocation.",
+          "?seeks con:travelAction/s:toLocation ?toLocation.",
           "?fromLocation s:geo ?fromLocation_geo.",
           "?fromLocation_geo s:latitude ?fromLocation_lat;",
           "s:longitude ?fromLocation_lon;",
@@ -76,7 +76,7 @@ export const taxiOffer = {
         },
         operations: [
           `${resultName} a won:Atom.`,
-          `${resultName} a won:PersonalTransportSearch.`,
+          `${resultName} a demo:PersonalTransportSearch.`,
         ],
       };
     }

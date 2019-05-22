@@ -1,3 +1,5 @@
+@prefix con:   <https://w3id.org/won/content#> .
+@prefix match:   <https://w3id.org/won/matching#> .
 @prefix msg:   <https://w3id.org/won/message#> .
 @prefix conn:  <https://localhost:8443/won/resource/connection/> .
 @prefix atom:  <https://localhost:8443/won/resource/atom/> .
@@ -27,19 +29,19 @@
 <oln-test:taxiService1#atom> {
     oln-test:taxiService1
 		a             won:Atom ;
-		won:flag   won:NoHintForCounterpart ;
+		match:flag   match:NoHintForCounterpart ;
 		dc:description   "next 10 minutes" ;
         dc:title "Taxi in Wien"@de ;
         dc:description "Biete Taxidienstleistungen im Raum Wien und Umgebung"@de ;
         dc:title "Taxi in Vienna"@en ;
         dc:description "Offering taxi services in Vienna and around"@en ;
-        won:tag "Taxi", "PersonenTransport"@de, "People transport"@en ;
+        con:tag "Taxi", "PersonenTransport"@de, "People transport"@en ;
         s:location  [ a                   s:Place ;
-                           won:boundingBox  [ won:northWestCorner  [ a            s:GeoCoordinates ;
+                           con:boundingBox  [ con:northWestCorner  [ a            s:GeoCoordinates ;
                                                                            s:latitude   "48.199528" ;
                                                                            s:longitude  "16.355209"
                                                                          ] ;
-                                                 won:southEastCorner  [ a            s:GeoCoordinates ;
+                                                 con:southEastCorner  [ a            s:GeoCoordinates ;
                                                                            s:latitude   "48.218489" ;
                                                                            s:longitude  "16.384895"
                                                                          ]
@@ -51,8 +53,8 @@
                            s:name              "Wien, Österreich"@de;
                            s:name              "Vienna, Austria"@en
                          ] ;
-		won:seeks [
-            won:seeks [
+		match:seeks [
+            match:seeks [
                 dc:title "Taxi";
                 s:location [
                     s:geo [
@@ -64,8 +66,8 @@
                 ];
 			]
 		];
-		won:seeks [
-            won:seeks [
+		match:seeks [
+            match:seeks [
               dc:description "Taxi";
               s:location [
                 s:geo [
@@ -77,9 +79,9 @@
               ];
             ]
 		];
-		won:seeks [
-            won:seeks [
-                won:tag "Taxi";
+		match:seeks [
+            match:seeks [
+                con:tag "Taxi";
                 s:location [
                 s:geo [
                   a s:GeoCoordinates ;
@@ -90,13 +92,13 @@
                 ];
 		    ]
 		];
-		won:seeks [
-            won:seeks [
+		match:seeks [
+            match:seeks [
               dc:title "Taxi Wien"
             ]
 		];
-		won:seeks [
-            won:seeks [
+		match:seeks [
+            match:seeks [
               dc:description "Taxi Wien"
             ]
 		];				  

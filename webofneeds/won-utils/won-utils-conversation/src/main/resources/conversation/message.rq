@@ -1,3 +1,4 @@
+PREFIX con: <https://w3id.org/won/content#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX msg: <https://w3id.org/won/message#>
 PREFIX won: <https://w3id.org/won/core#>
@@ -17,7 +18,7 @@ WHERE
      }
      filter( (! bound(?senderConnection) )|| ?senderConnection = ?sender)  
      OPTIONAL {
-      ?msg (msg:correspondingRemoteMessage|msg:forwardedMessage)*/won:textMessage ?text.
+      ?msg (msg:correspondingRemoteMessage|msg:forwardedMessage)*/con:text ?text.
      }
      OPTIONAL {
       ?msg agr:proposes ?proposes.

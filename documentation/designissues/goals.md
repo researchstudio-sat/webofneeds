@@ -2,7 +2,7 @@
 
 Atoms can declare goals that they want to achieve in collaboration with a counterpart atom. For example, one atom offers a taxi ride and the other atom is looking for a ride. This situation may be described as two complementary goals by the two atoms which can result in a collaboration to fulfill actually a common goal of both - perform the ride together as driver and client. 
 
-As described before atoms are matched based on the data in their `won:is` and `won:seeks` branches. A third type of top level branch is `won:goal`. A goal consists of data graph as input suggestion for the goal and a SHACL graph that defines how the data should look like after the goal is reached. Atoms try to fulfill their goals in a conversation with a counterpart atom after the matching happened and a connection is opened. Atoms would look on the counterpart for fitting complementary goals where the data graph would fulfill the SHACL shapes graph of its own goal(s) and where they can fulfill the SHACL shapes graph on the counterpart with their own data graph in reverse. To fullfill two goals on both both sides one atom would propose a data graph that satisfies both SHACL shape graph constraints. This data graph would usually be a combination of data graphs of goals of both sides. The other side could then accept the proposed data graph if it satisfies one of its goals and thereby form an agreement with its counterpart atom.  
+As described before atoms are matched based on the data in their `won:is` and `match:seeks` branches. A third type of top level branch is `won:goal`. A goal consists of data graph as input suggestion for the goal and a SHACL graph that defines how the data should look like after the goal is reached. Atoms try to fulfill their goals in a conversation with a counterpart atom after the matching happened and a connection is opened. Atoms would look on the counterpart for fitting complementary goals where the data graph would fulfill the SHACL shapes graph of its own goal(s) and where they can fulfill the SHACL shapes graph on the counterpart with their own data graph in reverse. To fullfill two goals on both both sides one atom would propose a data graph that satisfies both SHACL shape graph constraints. This data graph would usually be a combination of data graphs of goals of both sides. The other side could then accept the proposed data graph if it satisfies one of its goals and thereby form an agreement with its counterpart atom.  
 
 This structure of goals can be used to agree on actions like service/API calls executed by bots that manage atoms. For instance, a bot could create an atom that describes the input data for a certain API call (e.g. organize a ride and a call taxi) in its goals SHACL shape graph (e.g. specifying that there must be at least be a pickup location and optionally a time provided). 
 
@@ -88,7 +88,7 @@ GRAPH :service-pickup-shapes-graph {
 If this taxi service atom is matched with a potential client atom with compatible goals they could start a collaboration.
 The taxi service cannot fulfill its goal just for itself by proposing its `:service-pickup-data-graph` to a client since its shape graph `:service-pickup-shapes-graph` requires a pick up location property of type `taxi:hasPickUpLocation` as well as a client set by the property `taxi:hasClient`. These triples have to be provided by a client to satisfy the taxi services shapes graphs. 
 
-A client atom that could have been matched to the above service could look like the following. The atom is again described in a `:atomGraph` graph but with a `won:seeks` top level branch to match the service atom. The atom has one goal with a data graph `:client-pickup-data-graph` and a shape graph `client-pickup-data-graph`. 
+A client atom that could have been matched to the above service could look like the following. The atom is again described in a `:atomGraph` graph but with a `match:seeks` top level branch to match the service atom. The atom has one goal with a data graph `:client-pickup-data-graph` and a shape graph `client-pickup-data-graph`. 
 
 The data graph specifies a node of type `taxi:Ride` with client, pickup time and location properties. The pickup time is set to the next day and is meant to overwrite the default pickup time in the data graph of the taxi service. For the pickup location an address string is specified. The client is set to the own atom uri `atom:taxiDemandAtom`.
 
@@ -99,7 +99,7 @@ The shape graph specifies the conditions for the client to accept an agreement w
 GRAPH :atomGraph {
   atom:taxiDemandAtom
   a won:Atom;
-  won:seeks [
+  match:seeks [
     dc:title "Looking for a taxi in Vienna" ;
     won:location [
       a  s:Place ;

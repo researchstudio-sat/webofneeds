@@ -162,7 +162,7 @@ export function isConnectible(atom) {
 export function isDirectResponseAtom(atom) {
   return (
     getIn(atom, ["content", "flags"]) &&
-    getIn(atom, ["content", "flags"]).contains("won:DirectResponse")
+    getIn(atom, ["content", "flags"]).contains("con:DirectResponse")
   );
 }
 
@@ -174,7 +174,7 @@ export function isDirectResponseAtom(atom) {
 export function isInvisibleAtom(atom) {
   return (
     getIn(atom, ["content", "flags"]) &&
-    getIn(atom, ["content", "flags"]).contains("won:NoHintForCounterpart")
+    getIn(atom, ["content", "flags"]).contains("match:NoHintForCounterpart")
   );
 }
 
@@ -332,10 +332,10 @@ export function generateShortFlagLabels(atomImm) {
       // rename flags
       // TODO: flags should have explanatory hovertext
       .map(flag => {
-        if (flag === won.WON.NoHintForCounterpartCompacted) {
+        if (flag === won.WONMATCH.NoHintForCounterpartCompacted) {
           return labels.flags[flag] ? labels.flags[flag] : flag;
         }
-        if (flag === won.WON.NoHintForMeCompacted) {
+        if (flag === won.WONMATCH.NoHintForMeCompacted) {
           return labels.flags[flag] ? labels.flags[flag] : flag;
         }
         return "";

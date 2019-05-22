@@ -25,12 +25,12 @@ export const rehearsalRoomSearch = {
   draft: {
     ...mergeInEmptyDraft({
       content: {
-        type: ["won:RehearsalRoomRentDemand"],
+        type: ["demo:RehearsalRoomRentDemand"],
         title: "Looking for Rehearsal Room!",
         searchString: "Rehearsal Room",
       },
       seeks: {
-        type: ["won:RehearsalRoomRentOffer"],
+        type: ["demo:RehearsalRoomRentOffer"],
       },
     }),
   },
@@ -68,7 +68,7 @@ export const rehearsalRoomSearch = {
           },
           operations: [
             `${resultName} a won:Atom.`,
-            `${resultName} a won:RehearsalRoomRentOffer.`,
+            `${resultName} a demo:RehearsalRoomRentOffer.`,
             `${resultName} (won:location|s:location) ?location.`,
             "?location s:geo ?location_geo.",
             "?location_geo s:latitude ?location_lat;",
@@ -111,7 +111,7 @@ export const rehearsalRoomSearch = {
           },
           operations: [
             `${resultName} a won:Atom.`,
-            `${resultName} a won:RehearsalRoomRentOffer.`,
+            `${resultName} a demo:RehearsalRoomRentOffer.`,
           ],
         },
         rentRange &&

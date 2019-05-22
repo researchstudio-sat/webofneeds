@@ -83,7 +83,7 @@ export const jobSearch = {
     const skillsSQ = tagOverlapScoreSubQuery({
       resultName: resultName,
       bindScoreAs: "?skills_jaccardIndex",
-      pathToTags: "won:seeks/s:knowsAbout",
+      pathToTags: "match:seeks/s:knowsAbout",
       prefixesInPath: {
         s: won.defaultContext["s"],
         won: won.defaultContext["won"],

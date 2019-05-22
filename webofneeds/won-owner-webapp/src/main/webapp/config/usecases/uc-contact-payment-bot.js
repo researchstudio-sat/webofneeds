@@ -13,14 +13,14 @@ export const contactPaymentBot = {
     ...mergeInEmptyDraft({
       content: {
         title: "Payment Service Contact Request",
-        type: ["won:ServiceContactRequest", "won:PaymentServiceRequest"],
+        type: ["won:ServiceContactRequest", "demo:PaymentServiceRequest"],
       },
       // TODO: hardcoded title & description for user
       seeks: {
         // should only look for type
         // future extension possibility: add payment type dropdown
         // alternatively: extend for other bots (might require more extensive RDF stuff)
-        type: ["won:ServiceBot"],
+        type: ["con:ServiceBot"],
       },
     }),
   },
@@ -35,7 +35,7 @@ export const contactPaymentBot = {
       },
       distinct: true,
       variables: [resultName, "?score"],
-      where: [`${resultName} rdf:type won:ServiceBot`, `BIND(1 as ?score)`],
+      where: [`${resultName} rdf:type con:ServiceBot`, `BIND(1 as ?score)`],
     });
 
     return query;

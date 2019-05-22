@@ -586,7 +586,10 @@ public class AtomModelWrapper {
     public Collection<Resource> getGoalNodes() {
         Collection<Resource> contentNodes = new LinkedList<>();
         String queryClause = "{ ?atomNode a won:Atom. ?atomNode won:goal ?contentNode. }";
-        String queryString = "prefix won: <https://w3id.org/won/core#> \n" + "SELECT DISTINCT ?contentNode WHERE { \n"
+        String queryString = "prefix won: <https://w3id.org/won/core#> \n"
+                        + "prefix match: <https://w3id.org/won/matching#> \n"
+                        + "prefix con: <https://w3id.org/won/content#> \n"
+                        + "SELECT DISTINCT ?contentNode WHERE { \n"
                         + queryClause + "\n }";
         Query query = QueryFactory.create(queryString);
         try (QueryExecution qexec = QueryExecutionFactory.create(query, getAtomModel())) {
@@ -609,8 +612,11 @@ public class AtomModelWrapper {
      */
     public Collection<Resource> getSeeksNodes() {
         Collection<Resource> contentNodes = new LinkedList<>();
-        String queryClause = "{ ?atomNode a won:Atom. ?atomNode won:seeks ?contentNode. FILTER NOT EXISTS { ?atomNode won:seeks/won:seeks ?contentNode. } }";
-        String queryString = "prefix won: <https://w3id.org/won/core#> \n" + "SELECT DISTINCT ?contentNode WHERE { \n"
+        String queryClause = "{ ?atomNode a won:Atom. ?atomNode match:seeks ?contentNode. FILTER NOT EXISTS { ?atomNode match:seeks/match:seeks ?contentNode. } }";
+        String queryString = "prefix won: <https://w3id.org/won/core#> \n"
+                        + "prefix match: <https://w3id.org/won/matching#> \n"
+                        + "prefix con: <https://w3id.org/won/content#> \n"
+                        + "SELECT DISTINCT ?contentNode WHERE { \n"
                         + queryClause + "\n }";
         Query query = QueryFactory.create(queryString);
         try (QueryExecution qexec = QueryExecutionFactory.create(query, getAtomModel())) {
@@ -634,10 +640,13 @@ public class AtomModelWrapper {
     public Collection<Resource> getAllContentNodes() {
         Collection<Resource> contentNodes = new LinkedList<>();
         String queryClause = null;
-        String seeksClause = "{ ?atomNode a won:Atom. ?atomNode won:seeks ?contentNode. FILTER NOT EXISTS { ?atomNode won:seeks/won:seeks ?contentNode. } }";
-        String seeksSeeksClause = "{ ?atomNode a won:Atom. ?atomNode won:seeks/won:seeks ?contentNode. }";
+        String seeksClause = "{ ?atomNode a won:Atom. ?atomNode match:seeks ?contentNode. FILTER NOT EXISTS { ?atomNode match:seeks/match:seeks ?contentNode. } }";
+        String seeksSeeksClause = "{ ?atomNode a won:Atom. ?atomNode match:seeks/match:seeks ?contentNode. }";
         queryClause = seeksClause + "UNION \n" + seeksSeeksClause;
-        String queryString = "prefix won: <https://w3id.org/won/core#> \n" + "SELECT DISTINCT ?contentNode WHERE { \n"
+        String queryString = "prefix won: <https://w3id.org/won/core#> \n"
+                        + "prefix match: <https://w3id.org/won/matching#> \n"
+                        + "prefix con: <https://w3id.org/won/content#> \n"
+                        + "SELECT DISTINCT ?contentNode WHERE { \n"
                         + queryClause + "\n }";
         Query query = QueryFactory.create(queryString);
         try (QueryExecution qexec = QueryExecutionFactory.create(query, getAtomModel())) {
@@ -662,9 +671,12 @@ public class AtomModelWrapper {
     public Collection<Resource> getSeeksSeeksNodes() {
         Collection<Resource> contentNodes = new LinkedList<>();
         String queryClause = null;
-        String seeksSeeksClause = "{ ?atomNode a won:Atom. ?atomNode won:seeks/won:seeks ?contentNode. }";
+        String seeksSeeksClause = "{ ?atomNode a won:Atom. ?atomNode match:seeks/match:seeks ?contentNode. }";
         queryClause = seeksSeeksClause;
-        String queryString = "prefix won: <https://w3id.org/won/core#> \n" + "SELECT DISTINCT ?contentNode WHERE { \n"
+        String queryString = "prefix won: <https://w3id.org/won/core#> \n"
+                        + "prefix match: <https://w3id.org/won/matching#> \n"
+                        + "prefix con: <https://w3id.org/won/content#> \n"
+                        + "SELECT DISTINCT ?contentNode WHERE { \n"
                         + queryClause + "\n }";
         Query query = QueryFactory.create(queryString);
         try (QueryExecution qexec = QueryExecutionFactory.create(query, getAtomModel())) {

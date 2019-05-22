@@ -70,8 +70,8 @@ export const lunchPlan = {
       variables: [resultName, "?score"],
       subQueries: subQueries,
       where: [
-        `${resultName} rdf:type won:Interest.`,
-        `${resultName} won:seeks ?seeks .`,
+        `${resultName} rdf:type demo:Interest.`,
+        `${resultName} match:seeks ?seeks .`,
         `?seeks rdf:type s:PlanAction.`,
         `?seeks s:object ?planObject.`,
         `?planObject s:about <http://dbpedia.org/resource/Lunch>.`,
@@ -95,7 +95,7 @@ export const lunchInterest = {
   draft: {
     ...mergeInEmptyDraft({
       content: {
-        type: ["won:Interest"],
+        type: ["demo:Interest"],
         title: "I am interested in meeting up for lunch!",
       },
       seeks: {

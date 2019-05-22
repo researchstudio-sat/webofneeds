@@ -167,7 +167,7 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
             try {
                 if (message == null) {
                     Model messageModel = WonRdfUtils.MessageUtils.textMessage(
-                                    "Whatever you sent me there, it was not a normal text message. I'm expecting a <message> won:textMessage \"Some text\" triple in that message.");
+                                    "Whatever you sent me there, it was not a normal text message. I'm expecting a <message> con:text \"Some text\" triple in that message.");
                     bus.publish(new ConnectionMessageCommandEvent(con, messageModel));
                 } else if (PATTERN_USAGE.matcher(message).matches()) {
                     bus.publish(new UsageDebugCommandEvent(con));

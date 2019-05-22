@@ -11,13 +11,13 @@
 ```
 <https://localhost:8443/won/resource/event/557600936467257340#content> {
     event:557600936467257340
-            won:textMessage  "two" ;
+            con:text  "two" ;
             agr:proposes event:5669098069340991000 .
 }
 
 <https://localhost:8443/won/resource/event/ow321nn1va6clfidc4s0#content-1o90> {
     event:ow321nn1va6clfidc4s0
-            won:textMessage  "Please go on." ;
+            con:text  "Please go on." ;
             agr:accepts event:557600936467257340 .
 }
 

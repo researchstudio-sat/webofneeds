@@ -1,3 +1,5 @@
+@prefix con:   <https://w3id.org/won/content#> .
+@prefix match:   <https://w3id.org/won/matching#> .
 # example 1: all information necessary to make a valid goal instance (proposal) is available in the goals of the two atoms
 
 @prefix msg:   <https://w3id.org/won/message#> .
@@ -57,7 +59,7 @@
             won:socket  won:ChatSocket ;
             dc:description  "This is an atom automatically created by the DebugBot." ;
             dc:title        "Debugging with initial connect: taxi in Vienna" ;
-            won:seeks     _:b0 ;
+            match:seeks     _:b0 ;
             cert:key      [ cert:PublicKey  [ a                       woncrypt:ECCPublicKey ;
                                               woncrypt:ecc_algorithm  "EC" ;
                                               woncrypt:ecc_curveId    "secp384r1" ;

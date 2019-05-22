@@ -110,7 +110,7 @@ public class SolrMatcherActor extends UntypedActor {
         Dataset dataset = atomEvent.deserializeAtomDataset();
         AtomModelWrapper atomModelWrapper = new AtomModelWrapper(dataset);
         if (atomModelWrapper.flag(WONMATCH.NoHintForMe) && atomModelWrapper.flag(WONMATCH.NoHintForCounterpart)) {
-            log.info("Discarding received atom due to flags won:NoHintForMe and won:NoHintForCounterpart: {}",
+            log.info("Discarding received atom due to flags match:NoHintForMe and match:NoHintForCounterpart: {}",
                             atomEvent);
             return;
         }

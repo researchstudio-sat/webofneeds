@@ -61,10 +61,10 @@ export const rideShareOffer = {
         },
         operations: [
           `${resultName} a won:Atom.`,
-          `${resultName} won:seeks ?seeks.`,
+          `${resultName} match:seeks ?seeks.`,
           isValidDate(fromTime) && `?seeks s:validFrom ?starttime.`,
-          `?seeks won:travelAction/s:fromLocation ?fromLocation.`,
-          `?seeks won:travelAction/s:toLocation ?toLocation.`,
+          `?seeks con:travelAction/s:fromLocation ?fromLocation.`,
+          `?seeks con:travelAction/s:toLocation ?toLocation.`,
           "?fromLocation s:geo ?fromLocation_geo.",
           "?fromLocation_geo s:latitude ?fromLocation_lat;",
           "s:longitude ?fromLocation_lon;",
@@ -108,9 +108,9 @@ export const rideShareOffer = {
         },
         operations: [
           `${resultName} a won:Atom.`,
-          `${resultName} won:seeks ?seeks.`,
+          `${resultName} match:seeks ?seeks.`,
           isValidDate(fromTime) && `?seeks s:validFrom ?starttime.`,
-          `?seeks won:travelAction/s:fromLocation ?fromLocation.`,
+          `?seeks con:travelAction/s:fromLocation ?fromLocation.`,
           "?fromLocation s:geo ?fromLocation_geo.",
           "?fromLocation_geo s:latitude ?fromLocation_lat;",
           "s:longitude ?fromLocation_lon;",
@@ -143,9 +143,9 @@ export const rideShareOffer = {
         },
         operations: [
           `${resultName} a won:Atom.`,
-          `${resultName} won:seeks ?seeks.`,
+          `${resultName} match:seeks ?seeks.`,
           isValidDate(fromTime) && `?seeks s:validFrom ?starttime.`,
-          `?seeks won:travelAction/s:toLocation ?toLocation.`,
+          `?seeks con:travelAction/s:toLocation ?toLocation.`,
           "?toLocation s:geo ?toLocation_geo.",
           "?toLocation_geo s:latitude ?toLocation_lat;",
           "s:longitude ?toLocation_lon;",
@@ -176,7 +176,7 @@ export const rideShareOffer = {
         },
         operations: [
           `${resultName} a won:Atom.`,
-          `${resultName} won:seeks ?seeks.`,
+          `${resultName} match:seeks ?seeks.`,
           isValidDate(fromTime) && `?seeks s:validFrom ?starttime.`,
         ],
       };

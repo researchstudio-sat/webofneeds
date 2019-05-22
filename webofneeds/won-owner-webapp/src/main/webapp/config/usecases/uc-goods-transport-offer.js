@@ -43,9 +43,9 @@ export const goodsTransportOffer = {
         operations: [
           `${resultName} a won:Atom.`,
           `${resultName} a <http://dbpedia.org/resource/Cargo>.`,
-          `${resultName} won:seeks ?seeks.`,
-          "?seeks won:travelAction/s:fromLocation ?fromLocation.",
-          "?seeks won:travelAction/s:toLocation ?toLocation.",
+          `${resultName} match:seeks ?seeks.`,
+          "?seeks con:travelAction/s:fromLocation ?fromLocation.",
+          "?seeks con:travelAction/s:toLocation ?toLocation.",
           "?fromLocation s:geo ?fromLocation_geo.",
           "?fromLocation_geo s:latitude ?fromLocation_lat;",
           "s:longitude ?fromLocation_lon;",

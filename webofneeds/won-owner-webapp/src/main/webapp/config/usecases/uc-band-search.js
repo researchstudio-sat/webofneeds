@@ -23,7 +23,7 @@ export const bandSearch = {
     ...mergeInEmptyDraft({
       content: {
         title: "I'm looking for a band!",
-        type: ["won:Musician"],
+        type: ["demo:Musician"],
       },
       seeks: {
         type: ["s:MusicGroup"],
@@ -52,7 +52,7 @@ export const bandSearch = {
     const genresSQ = tagOverlapScoreSubQuery({
       resultName: resultName,
       bindScoreAs: "?genres_jaccardIndex",
-      pathToTags: "won:genre",
+      pathToTags: "demo:genre",
       prefixesInPath: {
         s: won.defaultContext["s"],
         won: won.defaultContext["won"],
@@ -64,7 +64,7 @@ export const bandSearch = {
     const instrumentsSQ = tagOverlapScoreSubQuery({
       resultName: resultName,
       bindScoreAs: "?instruments_jaccardIndex",
-      pathToTags: "won:seeks/won:instrument",
+      pathToTags: "match:seeks/demo:instrument",
       prefixesInPath: {
         s: won.defaultContext["s"],
         won: won.defaultContext["won"],

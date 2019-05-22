@@ -1,3 +1,5 @@
+@prefix con:   <https://w3id.org/won/content#> .
+@prefix match:   <https://w3id.org/won/matching#> .
 @prefix msg:   <https://w3id.org/won/message#> .
 @prefix group: <https://w3id.org/won/ext/group#> .
 @prefix chat: <https://w3id.org/won/ext/chat#> .
@@ -44,13 +46,13 @@
 <https://192.168.124.49:8443/won/resource/event/tb06f3a5l8vw#atom> {
     atom:cbfgi37je6kr
             a                    won:Atom ;
-            won:doNotMatchAfter  "2018-10-28T06:50:11.152Z"^^xsd:dateTime ;
+            match:doNotMatchAfter  "2018-10-28T06:50:11.152Z"^^xsd:dateTime ;
             won:socket         <https://192.168.124.49:8443/won/resource/atom/cbfgi37je6kr#chatSocket> ;
             won:socket         <https://192.168.124.49:8443/won/resource/atom/cbfgi37je6kr#groupSocket1> ;
             won:socket         <https://192.168.124.49:8443/won/resource/atom/cbfgi37je6kr#groupSocket2> ;
             won:hasSearchString  "test" ;
             dc:title    "test" ;
-            won:tag  "test" ;
+            con:tag  "test" ;
             cert:key             [ cert:PublicKey  [ a                       woncrypt:ECCPublicKey ;
                                                      woncrypt:ecc_algorithm  "EC" ;
                                                      woncrypt:ecc_curveId    "secp384r1" ;

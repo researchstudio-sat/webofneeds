@@ -27,12 +27,12 @@ export const rentRealEstateOffer = {
   draft: {
     ...mergeInEmptyDraft({
       content: {
-        type: ["won:RealEstateRentOffer"],
+        type: ["demo:RealEstateRentOffer"],
         title: "For Rent",
         tags: ["RentOutRealEstate"],
       },
       seeks: {
-        type: ["won:RealEstateRentDemand"],
+        type: ["demo:RealEstateRentDemand"],
         tags: ["SearchRealEstateToRent"],
       },
     }),
@@ -84,8 +84,8 @@ export const rentRealEstateOffer = {
           },
           operations: [
             `${resultName} a won:Atom.`,
-            `${resultName} a won:RealEstateRentDemand.`,
-            `${resultName} won:seeks ?seeks.`,
+            `${resultName} a demo:RealEstateRentDemand.`,
+            `${resultName} match:seeks ?seeks.`,
             "?seeks (won:location|s:location) ?location.",
             "?location s:geo ?location_geo.",
             "?location_geo s:latitude ?location_lat;",
@@ -124,7 +124,7 @@ export const rentRealEstateOffer = {
           },
           operations: [
             `${resultName} a won:Atom.`,
-            `${resultName} a won:RealEstateRentDemand.``${resultName} won:seeks ?seeks.`,
+            `${resultName} a demo:RealEstateRentDemand.``${resultName} match:seeks ?seeks.`,
           ],
         },
         rent && filterPrice("?seeks", rent.amount, rent.currency, "rent"),

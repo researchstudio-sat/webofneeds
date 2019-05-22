@@ -26,7 +26,7 @@ export const musicianSearch = {
         type: ["s:MusicGroup"],
       },
       seeks: {
-        type: ["won:Musician"],
+        type: ["demo:Musician"],
       },
     }),
   },
@@ -52,7 +52,7 @@ export const musicianSearch = {
     const genresSQ = tagOverlapScoreSubQuery({
       resultName: resultName,
       bindScoreAs: "?genre_jaccardIndex",
-      pathToTags: "won:seeks/won:genre",
+      pathToTags: "match:seeks/demo:genre",
       prefixesInPath: {
         s: won.defaultContext["s"],
         won: won.defaultContext["won"],
@@ -64,7 +64,7 @@ export const musicianSearch = {
     const instrumentsSQ = tagOverlapScoreSubQuery({
       resultName: resultName,
       bindScoreAs: "?instruments_jaccardIndex",
-      pathToTags: "won:instrument",
+      pathToTags: "demo:instrument",
       prefixesInPath: {
         s: won.defaultContext["s"],
         won: won.defaultContext["won"],
@@ -75,7 +75,7 @@ export const musicianSearch = {
     const vicinityScoreSQ = vicinityScoreSubQuery({
       resultName: resultName,
       bindScoreAs: "?location_geoScore",
-      pathToGeoCoords: "won:seeks/s:location/s:geo",
+      pathToGeoCoords: "match:seeks/s:location/s:geo",
       prefixesInPath: {
         s: won.defaultContext["s"],
         won: won.defaultContext["won"],
@@ -101,7 +101,7 @@ export const musicianSearch = {
       subQueries: subQueries,
       where: [
         `${resultName} rdf:type won:Atom.`,
-        `${resultName} rdf:type won:Musician.`,
+        `${resultName} rdf:type demo:Musician.`,
 
         // calculate average of scores; can be weighed if necessary
         `BIND( ( 

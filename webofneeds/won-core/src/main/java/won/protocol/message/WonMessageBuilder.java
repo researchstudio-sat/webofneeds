@@ -857,8 +857,8 @@ public class WonMessageBuilder {
     }
 
     /**
-     * Adds a won:textMessage triple to one of the unsigned content graphs in this
-     * builder. Creates a new unsigned content graph if none is found.
+     * Adds a con:text triple to one of the unsigned content graphs in this builder.
+     * Creates a new unsigned content graph if none is found.
      * 
      * @param textMessage may be null in which case the builder is not modified
      * @return

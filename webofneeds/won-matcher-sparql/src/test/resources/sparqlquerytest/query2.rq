@@ -8,22 +8,22 @@ WHERE
                     WHERE
                       { ?result  a                     <https://w3id.org/won/core#Atom> ;
                                  <https://w3id.org/won/core#atomState>  <https://w3id.org/won/core#Active> ;
-                                 <https://w3id.org/won/core#seeks>  ?seeks .
-                        ?seeks <https://w3id.org/won/core#travelAction>/<http://schema.org/fromLocation> ?fromLocation .
+                                 <https://w3id.org/won/matching#seeks>  ?seeks .
+                        ?seeks <https://w3id.org/won/content#travelAction>/<http://schema.org/fromLocation> ?fromLocation .
                         ?fromLocation
                                   <http://schema.org/geo>  ?fromLocation_geo
                         SERVICE <http://www.bigdata.com/rdf/geospatial#search>
                           { ?fromLocation_geo
                                       <http://www.bigdata.com/rdf/geospatial#search>  "inCircle" ;
                                       <http://www.bigdata.com/rdf/geospatial#searchDatatype>  <http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon> ;
-                                      <http://www.bigdata.com/rdf/geospatial#predicate>  <https://w3id.org/won/core#geoSpatial> ;
+                                      <http://www.bigdata.com/rdf/geospatial#predicate>  <https://w3id.org/won/content#geoSpatial> ;
                                       <http://www.bigdata.com/rdf/geospatial#spatialCircleCenter>  "48.220210#16.371216" ;
                                       <http://www.bigdata.com/rdf/geospatial#spatialCircleRadius>  "10" ;
                                       <http://www.bigdata.com/rdf/geospatial#distanceValue>  ?fromLocation_geoDistance}
                       }
                     ORDER BY ?fromLocation_geoDistance
                   }
-                  FILTER NOT EXISTS { ?result  <https://w3id.org/won/core#flag>  <https://w3id.org/won/core#NoHintForCounterpart> }
+                  FILTER NOT EXISTS { ?result  <https://w3id.org/won/matching#flag>  <https://w3id.org/won/matching#NoHintForCounterpart> }
                 
             }
           OFFSET  0

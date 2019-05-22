@@ -150,7 +150,7 @@ public class RealEstateAtomGenerator {
         geoResource.addProperty(RDF.type, schema_GeoCoordinates);
         geoResource.addProperty(SCHEMA.LATITUDE, lat);
         geoResource.addProperty(SCHEMA.LONGITUDE, lng);
-        // add bigdata specific value: "<subj> won:geoSpatial
+        // add bigdata specific value: "<subj> con:geoSpatial
         // "48.225073#16.358398"^^<http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon>"
         geoResource.addProperty(WONCON.geoSpatial, lat + "#" + lng, bigdata_geoSpatialDatatype);
         locationResource.addProperty(WONCON.boundingBox, boundingBoxResource);

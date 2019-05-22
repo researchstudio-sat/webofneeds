@@ -99,7 +99,7 @@ function genComponentConf() {
       this.draftObject = {
         content: {
           type: ["won:PureSearch"],
-          flags: ["won:NoHintForCounterpart"],
+          flags: ["match:NoHintForCounterpart"],
         },
         seeks: {},
         useCase: "search",

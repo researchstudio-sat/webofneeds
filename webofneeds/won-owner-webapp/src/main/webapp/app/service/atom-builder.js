@@ -168,7 +168,7 @@ import { Generator } from "sparqljs";
           ? args.seeks.publishedContentUri
           : undefined,
       "@type": ["won:Atom"],
-      "won:seeks": seeksContentUri ? { "@id": seeksContentUri } : undefined,
+      "match:seeks": seeksContentUri ? { "@id": seeksContentUri } : undefined,
       "won:socket": !(args.content && args.content.sockets)
         ? [
             {
@@ -189,11 +189,13 @@ import { Generator } from "sparqljs";
             },
           ]
         : undefined,
-      "won:flag": won.debugmode ? [{ "@id": "won:UsedForTesting" }] : undefined, //TODO: refactor this and use a won:flags-Detail in the content instead
-      "won:doNotMatchAfter": doNotMatchAfter
+      "match:flag": won.debugmode
+        ? [{ "@id": "match:UsedForTesting" }]
+        : undefined, //TODO: refactor this and use a won:flags-Detail in the content instead
+      "match:doNotMatchAfter": doNotMatchAfter
         ? { "@value": doNotMatchAfter, "@type": "xsd:dateTime" }
         : undefined,
-      "won:sparqlQuery": queryString,
+      "match:sparqlQuery": queryString,
     };
 
     if (args.content) {

@@ -27,9 +27,9 @@ export const labels = deepFreeze({
     [won.WONMSG.hintFeedbackMessage]: "Hint Feedback Message",
   },
   flags: {
-    [won.WON.NoHintForCounterpartCompacted]: "Invisible",
-    [won.WON.NoHintForMeCompacted]: "Silent",
-    [won.WON.UsedForTestingCompacted]: "Used For Testing",
+    [won.WONMATCH.NoHintForCounterpartCompacted]: "Invisible",
+    [won.WONMATCH.NoHintForMeCompacted]: "Silent",
+    [won.WONMATCH.UsedForTestingCompacted]: "Used For Testing",
   },
   sockets: {
     [won.GROUP.GroupSocketCompacted]: "Group Chat enabled",

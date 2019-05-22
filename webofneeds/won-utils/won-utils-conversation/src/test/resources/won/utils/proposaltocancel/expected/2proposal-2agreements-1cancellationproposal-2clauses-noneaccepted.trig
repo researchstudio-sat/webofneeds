@@ -20,13 +20,13 @@
 
 <https://localhost:8443/won/resource/event/cgqt5h004iql2003me2n> {
     <https://localhost:8443/won/resource/event/152dum7y56zn95qyernf>
-            <https://w3id.org/won/core#textMessage>
+            <https://w3id.org/won/content#text>
                     "I'm not sure I understand you fully." .
         <https://localhost:8443/won/resource/event/152dum7y56zn95qyernf>
                 <https://w3id.org/won/agreement#accepts>
                     <https://localhost:8443/won/resource/event/1107469913331435500> .
         <https://localhost:8443/won/resource/event/4846251213444807000>
-             <https://w3id.org/won/core#textMessage>
+             <https://w3id.org/won/content#text>
                        "one" .
                 <https://localhost:8443/won/resource/event/4846251213444807000>
                        <https://w3id.org/won/agreement#accepts>

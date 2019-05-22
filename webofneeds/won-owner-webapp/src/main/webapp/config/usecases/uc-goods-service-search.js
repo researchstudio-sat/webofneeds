@@ -89,7 +89,7 @@ export const goodsServiceSearch = {
         let tagsSQ = textSearchSubQuery({
           resultName: resultName,
           bindScoreAs: "?tags_" + keyword + "_index",
-          pathToText: "won:tag",
+          pathToText: "con:tag",
           prefixesInPath: {},
           keyword: keyword,
         });

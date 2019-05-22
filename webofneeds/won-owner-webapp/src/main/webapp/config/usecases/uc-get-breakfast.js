@@ -13,7 +13,7 @@ export const getBreakfast = {
   draft: {
     ...mergeInEmptyDraft({
       content: {
-        type: ["won:Breakfast"],
+        type: ["demo:Breakfast"],
         title: "I'm up for breakfast! Any plans?",
         tags: ["breakfast"],
         searchString: "breakfast",

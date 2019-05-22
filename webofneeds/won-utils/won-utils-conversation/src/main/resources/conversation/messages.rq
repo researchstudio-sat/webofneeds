@@ -1,3 +1,4 @@
+PREFIX con: <https://w3id.org/won/content#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX msg: <https://w3id.org/won/message#>
 PREFIX won: <https://w3id.org/won/core#>
@@ -11,7 +12,7 @@ SELECT distinct (?msg as ?uri) ?timestamp ?msgType ?text ?senderAtom ?retracts ?
    ?msg msg:messageType ?msgType.
    ?msg msg:receivedTimestamp ?timestamp.
    OPTIONAL {
-    ?msg won:textMessage ?text.
+    ?msg con:text ?text.
    }
    OPTIONAL {
     ?msg agr:proposes ?proposes.

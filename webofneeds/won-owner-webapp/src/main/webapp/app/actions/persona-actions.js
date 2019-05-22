@@ -30,9 +30,9 @@ export function createPersona(persona, nodeUri) {
           "won:socketDefinition": { "@id": "review:ReviewSocket" },
         },
       ],
-      "won:flag": [
-        { "@id": "won:NoHintForCounterpart" },
-        { "@id": "won:NoHintForMe" },
+      "match:flag": [
+        { "@id": "match:NoHintForCounterpart" },
+        { "@id": "match:NoHintForMe" },
       ],
       "s:name": persona.displayName,
       "s:description": persona.aboutMe || undefined,

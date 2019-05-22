@@ -592,8 +592,8 @@
         <won:weight rdf:resource="&wonex;CouchWeight"/>
         <won:width rdf:resource="&wonex;CouchWidth"/>
         <won:contentDescription rdf:resource="&wonex;MyCouch"/>
-        <won:tag rdf:resource="http://www.dmoz.org/Shopping/Home_and_Garden/Furniture/"/>
-        <won:tag rdf:resource="http://www.dmoz.org/Shopping/Home_and_Garden/Furniture/Recycled_Materials/"/>
+        <con:tag rdf:resource="http://www.dmoz.org/Shopping/Home_and_Garden/Furniture/"/>
+        <con:tag rdf:resource="http://www.dmoz.org/Shopping/Home_and_Garden/Furniture/Recycled_Materials/"/>
     </owl:NamedIndividual>
     
 

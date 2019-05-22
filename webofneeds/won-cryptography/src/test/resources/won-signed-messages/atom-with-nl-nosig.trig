@@ -1,3 +1,5 @@
+@prefix con:   <https://w3id.org/won/content#> .
+@prefix match:   <https://w3id.org/won/matching#> .
 @prefix dc:    <http://purl.org/dc/elements/1.1/> .
 @prefix atom:  <http://localhost:8080/won/resource/atom/> .
 @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
@@ -30,7 +32,7 @@
                                                                                                  geo:longitude   "0.000000"
                                                                                                ]
                                                                ] ;
-                                    won:tag                 """a
+                                    con:tag                 """a
                                     a
                                     a""" ;
                                     dc:description     "hi  i havae a briken wahing machine   come take it away.\r\n \r\n \r\ns d"

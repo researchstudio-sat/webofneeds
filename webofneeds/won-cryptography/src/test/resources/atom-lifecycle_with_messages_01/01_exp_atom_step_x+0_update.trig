@@ -1,3 +1,5 @@
+@prefix con:   <https://w3id.org/won/content#> .
+@prefix match:   <https://w3id.org/won/matching#> .
 ##################################################################
 #          OWNER SENDS UPDATE EVENT TO THE WON NODE
 ##################################################################
