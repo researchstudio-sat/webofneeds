@@ -48,3 +48,4 @@ websocket-test.js
 sockjs-0.3.min.js
 sockjs-0.3.js
 /generated/
+/.cache/
