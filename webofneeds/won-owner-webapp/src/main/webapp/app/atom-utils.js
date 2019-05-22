@@ -72,20 +72,40 @@ export function hasImages(atom) {
 
 export function hasLocation(atom) {
   return (
+    !!getIn(atom, ["content", "jobLocation"]) ||
     !!getIn(atom, ["content", "location"]) ||
+    !!getIn(atom, ["seeks", "jobLocation"]) ||
     !!getIn(atom, ["seeks", "location"])
   );
 }
 
+/**
+ * Returns the first location found in the content of the atom
+ * jobLocation has priority over "default" location
+ * If no location is present undefined will be returned
+ * @param atom
+ * @returns {*}
+ */
 export function getLocation(atom) {
   if (hasLocation(atom)) {
     return (
-      getIn(atom, ["content", "location"]) || getIn(atom, ["seeks", "location"])
+      getIn(atom, ["content", "jobLocation"]) ||
+      getIn(atom, ["content", "location"]) ||
+      getIn(atom, ["seeks", "jobLocation"]) ||
+      getIn(atom, ["seeks", "location"])
     );
   }
   return undefined;
 }
 
+/**
+ * Get distance between the first found atomLocation and the location (parameter)
+ * Distance in meters, undefined if atom has no location or location parameter is undefined
+ * Priority of atomLocation is defined within getLocation
+ * @param atom
+ * @param location
+ * @returns {*}
+ */
 export function getDistanceFrom(atom, location) {
   const atomLocation = getLocation(atom);
 

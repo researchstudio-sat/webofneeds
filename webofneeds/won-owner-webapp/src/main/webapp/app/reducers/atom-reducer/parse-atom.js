@@ -149,6 +149,7 @@ export function parseMetaAtom(metaAtom) {
         type: extractTypes(get(metaAtomImm, "types")),
         flags: extractFlags(get(metaAtomImm, "flags")),
         location: extractLocation(get(metaAtomImm, "location")),
+        jobLocation: extractLocation(get(metaAtomImm, "jobLocation")),
       },
       seeks: {
         type: extractTypes(get(metaAtomImm, "seeksTypes")),

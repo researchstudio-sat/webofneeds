@@ -23,13 +23,13 @@ won-atom-card {
     }
 
     .card__main__subtitle__type {
-      height: calc(#{$smallFontSize} - 0.1rem);
+      height: $smallFontSize - 0.1rem;
       width: 5rem;
       background-color: $won-skeleton-color;
     }
 
     .card__main__topline__title {
-      height: calc(#{$smallFontSize} - 0.05rem);
+      height: $smallFontSize - 0.05rem;
       width: 7rem;
       background-color: $won-skeleton-color;
     }
@@ -71,14 +71,15 @@ won-atom-card {
       display: flex;
       align-items: center;
       justify-content: center;
-      @include fixed-square(5rem);
+      $cardIdenticonSize: 5rem;
+      @include fixed-square(#{$cardIdenticonSize});
 
       &.usecaseimage {
         box-sizing: border-box;
         padding: 0.25rem;
 
         > svg {
-          @include fixed-square(calc(#{5rem}-0.5rem));
+          @include fixed-square(#{$cardIdenticonSize - 0.5rem});
           --local-primary: #{$won-secondary-text-color};
         }
       }
@@ -205,10 +206,15 @@ won-atom-card {
       align-items: center;
       @include fixed-square($postIconSize);
 
-      &__usecaseimage > svg {
-        @include fixed-square(calc(#{$postIconSize}-0.5rem));
-        --local-primary: #{$won-secondary-text-color};
+      &__usecaseimage {
+        display: grid;
+
+        > svg {
+          @include fixed-square(#{$postIconSize - 0.5rem});
+          --local-primary: #{$won-secondary-text-color};
+        }
       }
+
       &__identicon {
         @include fixed-square($postIconSize);
       }
