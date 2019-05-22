@@ -4,7 +4,7 @@
 
 import won from "../won-es6.js";
 import { actionTypes, actionCreators } from "./actions.js";
-import { get, getIn } from "../utils.js";
+import { getIn } from "../utils.js";
 
 import Immutable from "immutable";
 import { getOwnMessageUri } from "../message-utils.js";
@@ -20,6 +20,7 @@ import {
   fetchTheirAtomAndDispatch,
   fetchActiveConnectionAndDispatch,
 } from "../won-message-utils.js";
+import * as atomUtils from "../atom-utils.js";
 
 export function successfulCloseAtom(event) {
   return (dispatch, getState) => {
@@ -170,10 +171,10 @@ export function successfulEdit(event) {
 export function processOpenMessage(event) {
   return (dispatch, getState) => {
     const recipientAtomUri = event.getRecipientAtom();
-    const receiverConnectionUri = event.getReceiver();
+    const receiverConnectionUri = event.getRecipientConnection();
 
     const senderAtomUri = event.getSenderAtom();
-    const senderConnectionUri = event.getSender();
+    const senderConnectionUri = event.getSenderConnection();
 
     const state = getState();
     const senderAtom = getIn(state, ["atoms", senderAtomUri]);
@@ -329,10 +330,10 @@ export function processConnectionMessage(event) {
       let atomUri;
 
       if (isSentEvent) {
-        connectionUri = event.getSender();
+        connectionUri = event.getSenderConnection();
         atomUri = event.getSenderAtom();
       } else {
-        connectionUri = event.getReceiver();
+        connectionUri = event.getRecipientConnection();
         atomUri = event.getRecipientAtom();
       }
 
@@ -561,11 +562,11 @@ export function processConnectionMessage(event) {
 
 export function processConnectMessage(event) {
   return (dispatch, getState) => {
-    const receiverConnectionUri = event.getReceiver();
+    const receiverConnectionUri = event.getRecipientConnection();
     const recipientAtomUri = event.getRecipientAtom();
 
     const senderAtomUri = event.getSenderAtom();
-    const senderConnectionUri = event.getSender();
+    const senderConnectionUri = event.getSenderConnection();
 
     const state = getState();
     const senderAtom = getIn(state, ["atoms", senderAtomUri]);
@@ -904,7 +905,7 @@ export function processSocketHintMessage(event) {
     //const targetSocketUri = event.getHintTargetSocket(); //we currently dont need to know the targetSocketUri of the message (is known by fetching the connection)
 
     const currentState = getState();
-    const recipientConnUri = event.getReceiver();
+    const recipientConnUri = event.getRecipientConnection();
     const recipientAtom = getIn(currentState, ["atoms", recipientAtomUri]);
 
     if (!recipientAtom) {
@@ -949,14 +950,14 @@ export function processAtomHintMessage(event) {
     const ownedAtom = getIn(currentState, ["atoms", ownedAtomUri]);
     const targetAtom = getIn(currentState, ["atoms", targetAtomUri]);
 
-    const ownedConnectionUri = event.getReceiver();
+    const ownedConnectionUri = event.getRecipientConnection();
 
     if (!ownedAtom) {
       console.debug(
         "ignoring hint for an atom that is not yet in the state (could be a targetAtom, or a non stored ownedAtom):",
         ownedAtomUri
       );
-    } else if (get(targetAtom, "state") === won.WON.InactiveCompacted) {
+    } else if (atomUtils.isInactive(targetAtom)) {
       console.debug("ignoring hint for an inactive atom:", targetAtomUri);
     } else {
       won
@@ -1038,7 +1039,7 @@ export function dispatchActionOnFailureOwn(event) {
 export function dispatchActionOnSuccessRemote(event) {
   return (dispatch, getState) => {
     const messageUri = event.getIsRemoteResponseTo();
-    const connectionUri = event.getReceiver();
+    const connectionUri = event.getRecipientConnection();
 
     const toDispatchList = getState().getIn([
       "messages",
@@ -1100,7 +1101,7 @@ export function dispatchActionOnSuccessRemote(event) {
     }
 
     if (toAutoClaim) {
-      const theirConnectionUri = event.getSender();
+      const theirConnectionUri = event.getSenderConnection();
       const ownedAtomUri = event.getRecipientAtom();
       const ownNodeUri = event.getRecipientNode();
       const theirAtomUri = event.getSenderAtom();

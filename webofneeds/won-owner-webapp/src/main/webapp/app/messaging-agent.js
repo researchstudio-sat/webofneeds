@@ -195,7 +195,7 @@ export function runMessagingAgent(redux) {
           redux.dispatch(
             actionCreators.router__stateGoAbs("connections", {
               postUri: message.getSenderAtom(),
-              connectionUri: message.getSender(),
+              connectionUri: message.getSenderConnection(),
             })
           );
           return true;
@@ -211,7 +211,7 @@ export function runMessagingAgent(redux) {
           return true;
         } else if (message.isFailureResponse()) {
           //Resend the failed close message
-          const connectionUri = message.getSender();
+          const connectionUri = message.getSenderConnection();
           if (connectionUri) {
             console.warn("RESEND CLOSE MESSAGE FOR: ", connectionUri);
             redux.dispatch(actionCreators.connections__closeRemote(message));

@@ -1444,7 +1444,7 @@ WonMessage.prototype = {
   getSenderAtom: function() {
     return this.getProperty("https://w3id.org/won/message#senderAtom");
   },
-  getSender: function() {
+  getSenderConnection: function() {
     return this.getProperty("https://w3id.org/won/message#sender");
   },
   getRecipientNode: function() {
@@ -1453,7 +1453,7 @@ WonMessage.prototype = {
   getRecipientAtom: function() {
     return this.getProperty("https://w3id.org/won/message#recipientAtom");
   },
-  getReceiver: function() {
+  getRecipientConnection: function() {
     return this.getProperty("https://w3id.org/won/message#recipient");
   },
 
@@ -1517,7 +1517,8 @@ WonMessage.prototype = {
   isOutgoingMessage: function() {
     return (
       this.isFromOwner() ||
-      (this.isFromSystem() && this.getSender() !== this.getReceiver())
+      (this.isFromSystem() &&
+        this.getSenderConnection() !== this.getRecipientConnection())
     );
   },
   hasContainedForwardedWonMessages: function() {

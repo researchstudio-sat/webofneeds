@@ -10,6 +10,7 @@ import * as generalSelectors from "../selectors/general-selectors.js";
 import { connect2Redux } from "../won-utils.js";
 import { ownerBaseUrl } from "~/config/default.js";
 import * as connectionUtils from "../connection-utils.js";
+import * as connectionSelectors from "../selectors/connection-selectors.js";
 import * as processUtils from "../process-utils.js";
 
 import "~/style/_context-dropdown.scss";
@@ -109,10 +110,9 @@ function genComponentConf() {
           adminEmail: getIn(state, ["config", "theme", "adminEmail"]),
           targetAtomUri,
           linkToPost,
-          isConnectionToGroup: connectionUtils.isChatToGroup(
-            state.get("atoms"),
-            get(post, "uri"),
-            connectionUri
+          isConnectionToGroup: connectionSelectors.isChatToGroupConnection(
+            get(state, "atoms"),
+            connection
           ),
           showAgreementData: connection && connection.get("showAgreementData"),
           isConnected: connectionUtils.isConnected(connection),

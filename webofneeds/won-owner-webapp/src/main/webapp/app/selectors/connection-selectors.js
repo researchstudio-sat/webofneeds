@@ -48,8 +48,7 @@ export function getChatConnectionsByAtomUri(state, atomUri) {
   const connections = atom && atom.get("connections");
 
   return (
-    connections &&
-    connections.filter(conn => connectionUtils.isChatConnection(conn))
+    connections && connections.filter(conn => isChatToXConnection(atoms, conn))
   );
 }
 
@@ -59,7 +58,7 @@ export function getGroupChatConnectionsByAtomUri(state, atomUri) {
   const connections = atom && atom.get("connections");
 
   return connections
-    ? connections.filter(conn => connectionUtils.isGroupChatConnection(conn))
+    ? connections.filter(conn => isGroupToXConnection(atoms, conn))
     : Immutable.Map();
 }
 
@@ -73,8 +72,8 @@ export function getSuggestedConnectionsByAtomUri(state, atomUri) {
         .filter(conn => connectionUtils.isSuggested(conn))
         .filter(
           conn =>
-            connectionUtils.isChatConnection(conn) ||
-            connectionUtils.isGroupChatConnection(conn)
+            isChatToXConnection(atoms, conn) ||
+            isGroupToXConnection(atoms, conn)
         )
     : Immutable.Map();
 }
@@ -92,8 +91,7 @@ export function getChatConnectionsToCrawl(state) {
     allConnections
       .filter(
         conn =>
-          connectionUtils.isChatConnection(conn) ||
-          connectionUtils.isGroupChatConnection(conn)
+          isChatToXConnection(atoms, conn) || isGroupToXConnection(atoms, conn)
       )
       .filter(conn => {
         const connUri = get(conn, "uri");
@@ -108,7 +106,7 @@ export function getChatConnectionsToCrawl(state) {
 
   const connectionsInStateConnected =
     chatConnections &&
-    chatConnections.filter(conn => conn.get("state") === won.WON.Connected);
+    chatConnections.filter(conn => connectionUtils.isConnected(conn));
 
   const connectionsWithoutConnectMessage =
     connectionsInStateConnected &&
@@ -132,4 +130,127 @@ export function hasMessagesToLoad(state, connUri) {
   ]);
 
   return messageProcess && !!messageProcess.find(msg => msg.get("toLoad"));
+}
+
+/**
+ * Returns true if both sockets are ChatSockets
+ * @param allAtoms all atoms of the state
+ * @param connection to check sockettypes of
+ * @returns {boolean}
+ */
+export function isChatToChatConnection(allAtoms, connection) {
+  const { socket, targetSocket } = getSockets(allAtoms, connection);
+
+  return (
+    socket === won.CHAT.ChatSocketCompacted &&
+    targetSocket === won.CHAT.ChatSocketCompacted
+  );
+}
+
+/**
+ * Returns true if socket is a ChatSocket and targetSocket is a GroupSocket
+ * @param allAtoms all atoms of the state
+ * @param connection to check sockettypes of
+ * @returns {boolean}
+ */
+export function isChatToGroupConnection(allAtoms, connection) {
+  const { socket, targetSocket } = getSockets(allAtoms, connection);
+
+  return (
+    socket === won.CHAT.ChatSocketCompacted &&
+    targetSocket === won.GROUP.GroupSocketCompacted
+  );
+}
+
+/**
+ * Returns true if socket is a GroupSocket and targetSocket is a ChatSocket
+ * @param allAtoms all atoms of the state
+ * @param connection to check sockettypes of
+ * @returns {boolean}
+ */
+export function isGroupToChatConnection(allAtoms, connection) {
+  const { socket, targetSocket } = getSockets(allAtoms, connection);
+
+  return (
+    socket === won.GROUP.GroupSocketCompacted &&
+    targetSocket === won.CHAT.ChatSocketCompacted
+  );
+}
+
+/**
+ * Returns true if both sockets are GroupSockets
+ * @param allAtoms all atoms of the state
+ * @param connection to check sockettypes of
+ * @returns {boolean}
+ */
+export function isGroupToGroupConnection(allAtoms, connection) {
+  const { socket, targetSocket } = getSockets(allAtoms, connection);
+
+  return (
+    socket === won.GROUP.GroupSocketCompacted &&
+    targetSocket === won.GROUP.GroupSocketCompacted
+  );
+}
+
+/**
+ * Returns true if socket is GroupSocket and targetSocket is either GroupSocket or ChatSocket
+ * @param allAtoms
+ * @param connection
+ * @returns {boolean}
+ */
+export function isGroupToXConnection(allAtoms, connection) {
+  return (
+    isGroupToChatConnection(allAtoms, connection) ||
+    isGroupToGroupConnection(allAtoms, connection)
+  );
+}
+
+/**
+ * Returns true if socket is ChatSocket and targetSocket is either GroupSocket or ChatSocket
+ * @param allAtoms
+ * @param connection
+ * @returns {boolean}
+ */
+export function isChatToXConnection(allAtoms, connection) {
+  return (
+    isChatToChatConnection(allAtoms, connection) ||
+    isChatToGroupConnection(allAtoms, connection)
+  );
+}
+
+/**
+ * Retrieves the used sockets of the given connection
+ * @param allAtoms
+ * @param connection
+ * @returns {{socket, targetSocket}}
+ */
+function getSockets(allAtoms, connection) {
+  let socket = undefined;
+  let targetSocket = undefined;
+
+  if (connection && allAtoms) {
+    const socketUri = get(connection, "socketUri");
+    const targetSocketUri = get(connection, "targetSocketUri");
+
+    if (socketUri && targetSocketUri) {
+      const atom =
+        allAtoms &&
+        allAtoms.find(atom =>
+          getIn(atom, ["connections", get(connection, "uri")])
+        );
+      socket = getIn(atom, ["content", "sockets", socketUri]);
+      targetSocket = getIn(allAtoms, [
+        get(connection, "targetAtomUri"),
+        "content",
+        "sockets",
+        targetSocketUri,
+      ]);
+
+      // Uncomment lines below for verbose debug output
+      // if (socket && targetSocket) {
+      //  console.debug(get(connection, "uri"), ":", socket, "-->", targetSocket);
+      //}
+    }
+  }
+  return { socket, targetSocket };
 }

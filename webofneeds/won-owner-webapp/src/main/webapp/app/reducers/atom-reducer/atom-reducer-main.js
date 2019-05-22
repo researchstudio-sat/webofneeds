@@ -404,9 +404,9 @@ export default function(allAtomsInState = initialState, action = {}) {
       // use the remote success message to obtain the remote connection
       // uri (which we may not have known)
       const wonMessage = action.payload;
-      const connectionUri = wonMessage.getReceiver();
+      const connectionUri = wonMessage.getRecipientConnection();
       const atomUri = wonMessage.getRecipientAtom();
-      const targetConnectionUri = wonMessage.getSender();
+      const targetConnectionUri = wonMessage.getSenderConnection();
 
       if (allAtomsInState.getIn([atomUri, "connections", connectionUri])) {
         const eventUri = wonMessage.getIsRemoteResponseTo();
@@ -442,7 +442,7 @@ export default function(allAtomsInState = initialState, action = {}) {
       // changeConnectionState
       const wonMessage = action.payload;
       const eventUri = wonMessage.getIsResponseTo();
-      const connUri = wonMessage.getReceiver();
+      const connUri = wonMessage.getRecipientConnection();
 
       const tmpConnUri = "connectionFrom:" + wonMessage.getIsResponseTo();
       const tmpAtom = getAtomByConnectionUri(allAtomsInState, tmpConnUri);
@@ -532,7 +532,7 @@ export default function(allAtomsInState = initialState, action = {}) {
     case actionTypes.messages.close.success:
       return changeConnectionState(
         allAtomsInState,
-        action.payload.getReceiver(),
+        action.payload.getRecipientConnection(),
         won.WON.Closed
       );
     case actionTypes.messages.viewState.markExpandReference:
@@ -719,7 +719,7 @@ export default function(allAtomsInState = initialState, action = {}) {
       const wonMessage = getIn(action, ["payload"]);
       const eventUri = wonMessage.getIsResponseTo();
       const atomUri = wonMessage.getRecipientAtom();
-      const connectionUri = wonMessage.getReceiver();
+      const connectionUri = wonMessage.getRecipientConnection();
       // we want to use the response date to update the original message
       // date
       // in order to use server timestamps everywhere
@@ -758,7 +758,7 @@ export default function(allAtomsInState = initialState, action = {}) {
         ? wonMessage.getIsRemoteResponseTo()
         : wonMessage.getIsResponseTo();
       const atomUri = wonMessage.getRecipientAtom();
-      const connectionUri = wonMessage.getReceiver();
+      const connectionUri = wonMessage.getRecipientConnection();
 
       allAtomsInState = allAtomsInState.setIn(
         [
@@ -778,7 +778,7 @@ export default function(allAtomsInState = initialState, action = {}) {
       const wonMessage = getIn(action, ["payload"]);
       const eventUri = wonMessage.getIsRemoteResponseTo();
       const atomUri = wonMessage.getRecipientAtom();
-      const connectionUri = wonMessage.getReceiver();
+      const connectionUri = wonMessage.getRecipientConnection();
       const path = [
         atomUri,
         "connections",

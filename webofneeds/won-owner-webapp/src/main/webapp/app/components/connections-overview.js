@@ -5,7 +5,6 @@
  * Created by ksinger on 12.04.2017.
  */
 
-import won from "../won-es6.js";
 import angular from "angular";
 import Immutable from "immutable";
 import ngAnimate from "angular-animate";
@@ -157,7 +156,6 @@ function genComponentConf() {
     constructor() {
       attach(this, serviceDependencies, arguments);
       this.open = open;
-      this.WON = won.WON;
       //this.labels = labels;
       window.co4dbg = this;
 
@@ -390,17 +388,17 @@ function genComponentConf() {
     }
 
     hasOpenOrLoadingChatConnections(atomUri, allAtoms, process) {
-      const atom = get(this.allAtoms, atomUri);
+      const atom = get(allAtoms, atomUri);
 
       if (!atom) {
         return false;
       }
       return (
-        atom.get("state") === won.WON.ActiveCompacted &&
+        atomUtils.isActive(atom) &&
         !!atom.get("connections").find(conn => {
           if (
-            !connectionUtils.isChatConnection(conn) &&
-            !connectionUtils.isGroupChatConnection(conn)
+            !connectionSelectors.isChatToXConnection(allAtoms, conn) &&
+            !connectionSelectors.isGroupToXConnection(allAtoms, conn)
           )
             return false;
           if (processUtils.isConnectionLoading(process, conn.get("uri")))
@@ -415,18 +413,15 @@ function genComponentConf() {
           const targetAtomActiveOrLoading =
             process.getIn(["atoms", targetAtomUri, "loading"]) ||
             process.getIn(["atoms", targetAtomUri, "failedToLoad"]) ||
-            allAtoms.getIn([targetAtomUri, "state"]) ===
-              won.WON.ActiveCompacted;
+            atomUtils.isActive(get(allAtoms, targetAtomUri));
 
-          return (
-            targetAtomActiveOrLoading && conn.get("state") !== won.WON.Closed
-          );
+          return targetAtomActiveOrLoading && !connectionUtils.isClosed(conn);
         })
       );
     }
 
     getOpenChatConnectionUrisArraySorted(atomUri, allAtoms, process) {
-      const atom = get(this.allAtoms, atomUri);
+      const atom = get(allAtoms, atomUri);
 
       if (!atom) {
         return undefined;
@@ -434,8 +429,8 @@ function genComponentConf() {
       const sortedConnections = sortByDate(
         atom.get("connections").filter(conn => {
           if (
-            !connectionUtils.isChatConnection(conn) &&
-            !connectionUtils.isGroupChatConnection(conn)
+            !connectionSelectors.isChatToXConnection(allAtoms, conn) &&
+            !connectionSelectors.isGroupToXConnection(allAtoms, conn)
           )
             return false;
           if (processUtils.isConnectionLoading(process, conn.get("uri")))
@@ -450,13 +445,12 @@ function genComponentConf() {
           const targetAtomActiveOrLoading =
             process.getIn(["atoms", targetAtomUri, "loading"]) ||
             process.getIn(["atoms", targetAtomUri, "failedToLoad"]) ||
-            allAtoms.getIn([targetAtomUri, "state"]) ===
-              won.WON.ActiveCompacted;
+            atomUtils.isActive(get(allAtoms, targetAtomUri));
 
           return (
             targetAtomActiveOrLoading &&
-            conn.get("state") !== won.WON.Closed &&
-            conn.get("state") !== won.WON.Suggested
+            !connectionUtils.isClosed(conn) &&
+            !connectionUtils.isSuggested(conn)
           );
         }),
         "creationDate"
