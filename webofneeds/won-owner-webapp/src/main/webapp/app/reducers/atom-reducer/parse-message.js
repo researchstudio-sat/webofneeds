@@ -118,9 +118,9 @@ export function parseMessage(
   };
 
   if (wonMessage.isFromOwner()) {
-    parsedMessage.belongsToUri = wonMessage.getSender();
+    parsedMessage.belongsToUri = wonMessage.getSenderConnection();
   } else if (wonMessage.isFromSystem()) {
-    parsedMessage.belongsToUri = wonMessage.getSender();
+    parsedMessage.belongsToUri = wonMessage.getSenderConnection();
   } else {
     parsedMessage.belongsToUri = wonMessage.getRecipientConnection();
   }

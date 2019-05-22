@@ -174,7 +174,7 @@ export function processOpenMessage(event) {
     const receiverConnectionUri = event.getRecipientConnection();
 
     const senderAtomUri = event.getSenderAtom();
-    const senderConnectionUri = event.getSender();
+    const senderConnectionUri = event.getSenderConnection();
 
     const state = getState();
     const senderAtom = getIn(state, ["atoms", senderAtomUri]);
@@ -330,7 +330,7 @@ export function processConnectionMessage(event) {
       let atomUri;
 
       if (isSentEvent) {
-        connectionUri = event.getSender();
+        connectionUri = event.getSenderConnection();
         atomUri = event.getSenderAtom();
       } else {
         connectionUri = event.getRecipientConnection();
@@ -566,7 +566,7 @@ export function processConnectMessage(event) {
     const recipientAtomUri = event.getRecipientAtom();
 
     const senderAtomUri = event.getSenderAtom();
-    const senderConnectionUri = event.getSender();
+    const senderConnectionUri = event.getSenderConnection();
 
     const state = getState();
     const senderAtom = getIn(state, ["atoms", senderAtomUri]);
@@ -1101,7 +1101,7 @@ export function dispatchActionOnSuccessRemote(event) {
     }
 
     if (toAutoClaim) {
-      const theirConnectionUri = event.getSender();
+      const theirConnectionUri = event.getSenderConnection();
       const ownedAtomUri = event.getRecipientAtom();
       const ownNodeUri = event.getRecipientNode();
       const theirAtomUri = event.getSenderAtom();

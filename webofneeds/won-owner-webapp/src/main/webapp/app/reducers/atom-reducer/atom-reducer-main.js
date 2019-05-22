@@ -406,7 +406,7 @@ export default function(allAtomsInState = initialState, action = {}) {
       const wonMessage = action.payload;
       const connectionUri = wonMessage.getRecipientConnection();
       const atomUri = wonMessage.getRecipientAtom();
-      const targetConnectionUri = wonMessage.getSender();
+      const targetConnectionUri = wonMessage.getSenderConnection();
 
       if (allAtomsInState.getIn([atomUri, "connections", connectionUri])) {
         const eventUri = wonMessage.getIsRemoteResponseTo();
