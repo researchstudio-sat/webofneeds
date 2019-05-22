@@ -92,9 +92,13 @@
     }
   }
 
-  .topnav__page-title {
+  .topnav__app-title {
     font-weight: 700;
     margin-right: 0.5rem;
+  }
+  .topnav__page-title {
+    margin-right: 0.5rem;
+    color: $won-subtitle-gray;
   }
 
   .topnav__signupbtn {
