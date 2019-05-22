@@ -122,7 +122,7 @@ export function parseMessage(
   } else if (wonMessage.isFromSystem()) {
     parsedMessage.belongsToUri = wonMessage.getSender();
   } else {
-    parsedMessage.belongsToUri = wonMessage.getReceiver();
+    parsedMessage.belongsToUri = wonMessage.getRecipientConnection();
   }
 
   if (

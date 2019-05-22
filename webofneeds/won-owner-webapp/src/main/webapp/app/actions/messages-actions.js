@@ -171,7 +171,7 @@ export function successfulEdit(event) {
 export function processOpenMessage(event) {
   return (dispatch, getState) => {
     const recipientAtomUri = event.getRecipientAtom();
-    const receiverConnectionUri = event.getReceiver();
+    const receiverConnectionUri = event.getRecipientConnection();
 
     const senderAtomUri = event.getSenderAtom();
     const senderConnectionUri = event.getSender();
@@ -333,7 +333,7 @@ export function processConnectionMessage(event) {
         connectionUri = event.getSender();
         atomUri = event.getSenderAtom();
       } else {
-        connectionUri = event.getReceiver();
+        connectionUri = event.getRecipientConnection();
         atomUri = event.getRecipientAtom();
       }
 
@@ -562,7 +562,7 @@ export function processConnectionMessage(event) {
 
 export function processConnectMessage(event) {
   return (dispatch, getState) => {
-    const receiverConnectionUri = event.getReceiver();
+    const receiverConnectionUri = event.getRecipientConnection();
     const recipientAtomUri = event.getRecipientAtom();
 
     const senderAtomUri = event.getSenderAtom();
@@ -905,7 +905,7 @@ export function processSocketHintMessage(event) {
     //const targetSocketUri = event.getHintTargetSocket(); //we currently dont need to know the targetSocketUri of the message (is known by fetching the connection)
 
     const currentState = getState();
-    const recipientConnUri = event.getReceiver();
+    const recipientConnUri = event.getRecipientConnection();
     const recipientAtom = getIn(currentState, ["atoms", recipientAtomUri]);
 
     if (!recipientAtom) {
@@ -950,7 +950,7 @@ export function processAtomHintMessage(event) {
     const ownedAtom = getIn(currentState, ["atoms", ownedAtomUri]);
     const targetAtom = getIn(currentState, ["atoms", targetAtomUri]);
 
-    const ownedConnectionUri = event.getReceiver();
+    const ownedConnectionUri = event.getRecipientConnection();
 
     if (!ownedAtom) {
       console.debug(
@@ -1039,7 +1039,7 @@ export function dispatchActionOnFailureOwn(event) {
 export function dispatchActionOnSuccessRemote(event) {
   return (dispatch, getState) => {
     const messageUri = event.getIsRemoteResponseTo();
-    const connectionUri = event.getReceiver();
+    const connectionUri = event.getRecipientConnection();
 
     const toDispatchList = getState().getIn([
       "messages",
