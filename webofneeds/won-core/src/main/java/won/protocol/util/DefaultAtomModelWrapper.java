@@ -167,7 +167,7 @@ public class DefaultAtomModelWrapper extends AtomModelWrapper {
     }
 
     public Coordinate getLocationCoordinate(Resource contentNode) {
-        return getLocationCoordinate(contentNode, SCHEMA.LOCATION, WON.location);
+        return getLocationCoordinate(contentNode, SCHEMA.LOCATION);
     }
 
     public Coordinate getJobLocationCoordinate() {
@@ -176,10 +176,6 @@ public class DefaultAtomModelWrapper extends AtomModelWrapper {
 
     public Coordinate getJobLocationCoordinate(Resource contentNode) {
         return getLocationCoordinate(contentNode, SCHEMA.JOBLOCATION);
-    }
-
-    private Coordinate getLocationCoordinate(Resource contentNode, Property locationProperty) {
-        return getLocationCoordinate(contentNode, locationProperty, null);
     }
 
     /**
@@ -192,8 +188,7 @@ public class DefaultAtomModelWrapper extends AtomModelWrapper {
      * is not present in the contentNode
      * @return Coordinate if found otherwise null
      */
-    private Coordinate getLocationCoordinate(Resource contentNode, Property locationProperty,
-                    Property fallbackProperty) {
+    private Coordinate getLocationCoordinate(Resource contentNode, Property locationProperty) {
         Model atomModel = getAtomModel();
         Property geoProperty = atomModel.createProperty("http://schema.org/", "geo");
         Property longitudeProperty = atomModel.createProperty("http://schema.org/", "longitude");
