@@ -24,4 +24,13 @@ public class WONMATCH {
     public static final Resource NoHintForMe = m.createResource(BASE_URI + "NoHintForMe");
     public static final Property matchingContext = m.createProperty(BASE_URI + "matchingContext");
     public static final Property sparqlQuery = m.createProperty(BASE_URI + "sparqlQuery");
+
+    /**
+     * Returns the base URI for this schema.
+     *
+     * @return the URI for this schema
+     */
+    public static String getURI() {
+        return BASE_URI;
+    }
 }

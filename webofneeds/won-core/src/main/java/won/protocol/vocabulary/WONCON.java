@@ -31,4 +31,13 @@ public class WONCON {
     public static final Property northWestCorner = m.createProperty(BASE_URI, "northWestCorner");
     public static final Property southEastCorner = m.createProperty(BASE_URI, "southEastCorner");
     public static final Property geoSpatial = m.createProperty(BASE_URI + "geoSpatial");
+
+    /**
+     * Returns the base URI for this schema.
+     *
+     * @return the URI for this schema
+     */
+    public static String getURI() {
+        return BASE_URI;
+    }
 }
