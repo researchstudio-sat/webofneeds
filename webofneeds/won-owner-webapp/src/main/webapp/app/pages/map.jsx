@@ -42,7 +42,7 @@ const template = (
       <won-post-messages connection-uri="self.viewConnUri" />
     </div>
     <header>
-      <won-topnav />
+      <won-topnav page-title="::'What\'s around'" />
     </header>
     <won-toasts />
     <won-slide-in ng-if="self.showSlideIns" />
@@ -127,7 +127,7 @@ const template = (
       </div>
       <div
         className="ownermap__searchresults"
-        ng-className="{'ownermap__searchresults--visible': self.showLocationInput || (self.isLocationAccessDenied && !self.lastWhatsAroundLocation)}"
+        ng-class="{'ownermap__searchresults--visible': self.showLocationInput || (self.isLocationAccessDenied && !self.lastWhatsAroundLocation)}"
         ng-if="!self.isOwnerAtomUrisToLoad || self.isLocationAccessDenied"
       >
         <div
@@ -203,7 +203,7 @@ const template = (
       </div>
       <won-atom-map
         className="ownermap__map hide-in-responsive"
-        ng-className="{'ownermap__map--visible': !(self.showLocationInput || (self.isLocationAccessDenied && !self.lastWhatsAroundLocation))}"
+        ng-class="{'ownermap__map--visible': !(self.showLocationInput || (self.isLocationAccessDenied && !self.lastWhatsAroundLocation))}"
         locations="self.locations"
         current-location="self.lastWhatsAroundLocation"
         ng-if="!self.isOwnerAtomUrisToLoad && self.lastWhatsAroundLocation"

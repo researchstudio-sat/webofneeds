@@ -17,6 +17,8 @@ import * as accountUtils from "../account-utils.js";
 import "~/style/_responsiveness-utils.scss";
 import "~/style/_topnav.scss";
 
+const serviceDependencies = ["$ngRedux", "$scope", "$state", "$element"];
+
 function genTopnavConf() {
   let template = `
         <nav class="topnav">
@@ -26,9 +28,12 @@ function genTopnavConf() {
                         class="topnav__button">
                             <img src="skin/{{self.themeName}}/images/logo.svg"
                                 class="topnav__button__icon">
-                            <span class="topnav__page-title topnav__button__caption hide-in-responsive">
+                            <span class="topnav__app-title topnav__button__caption hide-in-responsive">
                                 {{ self.appTitle }}
                             </span>
+                            <!--span class="topnav__page-title" ng-if="self.pageTitle">
+                                {{ self.pageTitle }}
+                            </span-->
                     </a>
                     <div class="topnav__inner__left__slideintoggle"
                         ng-if="self.showSlideInIndicator"
@@ -65,12 +70,6 @@ function genTopnavConf() {
         </nav>
     `;
 
-  const serviceDependencies = [
-    "$ngRedux",
-    "$scope",
-    "$state" /*injections as strings here*/,
-  ];
-
   class Controller {
     constructor(/* arguments <- serviceDependencies */) {
       attach(this, serviceDependencies, arguments);
@@ -95,14 +94,16 @@ function genTopnavConf() {
         };
       };
 
-      connect2Redux(selectFromState, actionCreators, [], this);
+      connect2Redux(selectFromState, actionCreators, ["self.pageTitle"], this);
     }
   }
   Controller.$inject = serviceDependencies;
 
   return {
     restrict: "E",
-    scope: {}, //isolate scope to allow usage within other controllers/components
+    scope: {
+      pageTitle: "=",
+    }, //isolate scope to allow usage within other controllers/components
     controller: Controller,
     controllerAs: "self",
     bindToController: true, //scope-bindings -> ctrl

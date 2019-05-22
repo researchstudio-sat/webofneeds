@@ -21,7 +21,7 @@ const template = (
   <container>
     <won-modal-dialog ng-if="self.showModalDialog" />
     <header>
-      <won-topnav />
+      <won-topnav page-title="::'About'" />
     </header>
     <won-toasts />
     <won-slide-in ng-if="self.showSlideIns" />
@@ -93,7 +93,7 @@ const template = (
             {/* TODO: this var injection does not work*/}
             <svg
               className="about__howto__steps__process__icon"
-              ng-className="{'about__howto__steps__process__icon--selected': $index == self.selectedHowItWorksStep}"
+              ng-class="{'about__howto__steps__process__icon--selected': $index == self.selectedHowItWorksStep}"
               ng-repeat="item in self.howItWorksSteps"
               ng-click="self.selectedHowItWorksStep = $index"
             >
@@ -105,7 +105,7 @@ const template = (
             <div
               className="about__howto__steps__process__stepcount"
               ng-repeat="item in self.howItWorksSteps"
-              ng-className="{'about__howto__steps__process__stepcount--selected': $index == self.selectedHowItWorksStep}"
+              ng-class="{'about__howto__steps__process__stepcount--selected': $index == self.selectedHowItWorksStep}"
               ng-click="self.selectedHowItWorksStep = $index"
             >
               {"{{ $index + 1 }}"}
@@ -114,7 +114,7 @@ const template = (
           </div>
           <svg
             className="about__howto__steps__button about__howto__steps__button--prev"
-            ng-className="{'about__howto__steps__button--invisible': self.selectedHowItWorksStep <= 0}"
+            ng-class="{'about__howto__steps__button--invisible': self.selectedHowItWorksStep <= 0}"
             ng-click="self.selectedHowItWorksStep = self.selectedHowItWorksStep - 1"
           >
             <use xlinkHref="#ico36_backarrow" href="#ico36_backarrow" />
@@ -129,7 +129,7 @@ const template = (
           </div>
           <svg
             className="about__howto__steps__button about__howto__steps__button--next"
-            ng-className="{'about__howto__steps__button--invisible': self.selectedHowItWorksStep >= (self.howItWorksSteps.length-1)}"
+            ng-class="{'about__howto__steps__button--invisible': self.selectedHowItWorksStep >= (self.howItWorksSteps.length-1)}"
             ng-click="self.selectedHowItWorksStep = self.selectedHowItWorksStep + 1"
           >
             <use xlinkHref="#ico36_backarrow" href="#ico36_backarrow" />

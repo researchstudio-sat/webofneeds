@@ -36,7 +36,7 @@ const template = (
       <won-post-messages connection-uri="self.viewConnUri" />
     </div>
     <header>
-      <won-topnav />
+      <won-topnav page-title="self.atomTitle" />
     </header>
     <won-toasts />
     <won-slide-in ng-if="self.showSlideIns" />
@@ -104,6 +104,7 @@ class Controller {
         atomUri,
         isOwnedAtom: generalSelectors.isAtomOwned(state, atomUri),
         atom,
+        atomTitle: get(atom, "humanReadable"),
         won: won.WON,
         showSlideIns:
           viewSelectors.hasSlideIns(state) && viewSelectors.showSlideIns(state),
