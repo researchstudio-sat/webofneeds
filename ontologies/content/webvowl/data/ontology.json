@@ -2,7 +2,7 @@
   "_comment" : "Created with OWL2VOWL (version 0.3.5), http://vowl.visualdataweb.org",
   "header" : {
     "languages" : [ "en", "undefined" ],
-    "baseIris" : [ "http://www.w3.org/1999/02/22-rdf-syntax-ns", "https://w3id.org/won/content", "http://schema.org", "http://www.w3.org/2000/01/rdf-schema", "https://w3id.org/won/message", "http://www.w3.org/2001/XMLSchema", "https://w3id.org/won/core" ],
+    "baseIris" : [ "http://www.w3.org/1999/02/22-rdf-syntax-ns", "https://w3id.org/won/content", "http://schema.org", "http://www.w3.org/2000/01/rdf-schema", "https://w3id.org/won/message", "http://www.bigdata.com/rdf/geospatial/literals/v1", "http://www.w3.org/2001/XMLSchema", "https://w3id.org/won/core" ],
     "title" : {
       "en" : "Web of Needs Content Ontology"
     },
@@ -23,7 +23,7 @@
       "preferredNamespacePrefix" : [ {
         "identifier" : "preferredNamespacePrefix",
         "language" : "undefined",
-        "value" : "wcnt",
+        "value" : "con",
         "type" : "label"
       } ],
       "abstract" : [ {
@@ -43,9 +43,36 @@
   "namespace" : [ ],
   "class" : [ {
     "id" : "6",
+    "type" : "owl:Class"
+  }, {
+    "id" : "15",
+    "type" : "owl:Class"
+  }, {
+    "id" : "21",
+    "type" : "owl:Thing"
+  }, {
+    "id" : "5",
+    "type" : "rdfs:Datatype"
+  }, {
+    "id" : "29",
+    "type" : "rdfs:Datatype"
+  }, {
+    "id" : "32",
+    "type" : "rdfs:Datatype"
+  }, {
+    "id" : "33",
+    "type" : "owl:Class"
+  }, {
+    "id" : "35",
+    "type" : "rdfs:Datatype"
+  }, {
+    "id" : "23",
     "type" : "owl:unionOf"
   }, {
-    "id" : "11",
+    "id" : "24",
+    "type" : "rdfs:Datatype"
+  }, {
+    "id" : "37",
     "type" : "rdfs:Datatype"
   }, {
     "id" : "1",
@@ -54,72 +81,156 @@
     "id" : "2",
     "type" : "rdfs:Datatype"
   }, {
-    "id" : "4",
-    "type" : "owl:unionOf"
-  }, {
-    "id" : "5",
-    "type" : "rdfs:Datatype"
-  }, {
     "id" : "8",
     "type" : "owl:Class"
   }, {
-    "id" : "10",
+    "id" : "40",
     "type" : "rdfs:Datatype"
   }, {
-    "id" : "15",
-    "type" : "rdfs:Datatype"
-  }, {
-    "id" : "7",
-    "type" : "owl:Class"
-  }, {
-    "id" : "13",
+    "id" : "4",
     "type" : "owl:unionOf"
   }, {
+    "id" : "9",
+    "type" : "owl:Class"
+  }, {
+    "id" : "12",
+    "type" : "owl:Class"
+  }, {
     "id" : "14",
-    "type" : "rdfs:Datatype"
-  }, {
-    "id" : "20",
     "type" : "owl:Class"
   }, {
-    "id" : "16",
+    "id" : "28",
+    "type" : "owl:unionOf"
+  }, {
+    "id" : "39",
+    "type" : "owl:unionOf"
+  }, {
+    "id" : "19",
     "type" : "owl:Class"
   }, {
-    "id" : "17",
+    "id" : "31",
+    "type" : "owl:Class"
+  }, {
+    "id" : "11",
+    "type" : "owl:Class"
+  }, {
+    "id" : "26",
     "type" : "owl:Class"
   } ],
   "classAttribute" : [ {
+    "iri" : "https://w3id.org/won/content#BinaryRating",
+    "baseIri" : "https://w3id.org/won/content",
     "instances" : 0,
-    "union" : [ "7", "8" ],
-    "attributes" : [ "anonymous", "union" ],
+    "label" : {
+      "IRI-based" : "BinaryRating",
+      "undefined" : "BinaryRating"
+    },
+    "individuals" : [ {
+      "iri" : "https://w3id.org/won/content#Bad",
+      "baseIri" : "https://w3id.org/won/content",
+      "comment" : {
+        "undefined" : "A bad rating"
+      },
+      "labels" : {
+        "IRI-based" : "Bad",
+        "undefined" : "Bad"
+      }
+    }, {
+      "iri" : "https://w3id.org/won/content#Good",
+      "baseIri" : "https://w3id.org/won/content",
+      "comment" : {
+        "undefined" : "A good rating"
+      },
+      "labels" : {
+        "IRI-based" : "Good",
+        "undefined" : "Good"
+      }
+    } ],
+    "comment" : {
+      "en" : "Binary rating values."
+    },
     "id" : "6"
+  }, {
+    "iri" : "http://schema.org/GeoCoordinates",
+    "baseIri" : "http://schema.org",
+    "instances" : 0,
+    "label" : {
+      "IRI-based" : "GeoCoordinates"
+    },
+    "attributes" : [ "external" ],
+    "id" : "15"
+  }, {
+    "iri" : "http://www.w3.org/2002/07/owl#Thing",
+    "baseIri" : "http://owl2vowl.de",
+    "id" : "21",
+    "label" : {
+      "undefined" : "Thing"
+    }
   }, {
     "iri" : "http://www.w3.org/2001/XMLSchema#base64Binary",
     "baseIri" : "http://www.w3.org/2001/XMLSchema",
-    "id" : "11",
+    "id" : "5",
+    "label" : {
+      "IRI-based" : "base64Binary"
+    }
+  }, {
+    "iri" : "http://www.w3.org/2001/XMLSchema#string",
+    "baseIri" : "http://www.w3.org/2001/XMLSchema",
+    "id" : "29",
+    "label" : {
+      "IRI-based" : "string"
+    }
+  }, {
+    "iri" : "http://www.w3.org/2001/XMLSchema#string",
+    "baseIri" : "http://www.w3.org/2001/XMLSchema",
+    "id" : "32",
+    "label" : {
+      "IRI-based" : "string"
+    }
+  }, {
+    "iri" : "https://w3id.org/won/core#Connection",
+    "baseIri" : "https://w3id.org/won/core",
+    "instances" : 0,
+    "label" : {
+      "IRI-based" : "Connection"
+    },
+    "attributes" : [ "external" ],
+    "id" : "33"
+  }, {
+    "iri" : "http://www.w3.org/2001/XMLSchema#base64Binary",
+    "baseIri" : "http://www.w3.org/2001/XMLSchema",
+    "id" : "35",
     "label" : {
       "IRI-based" : "base64Binary"
     }
   }, {
     "instances" : 0,
-    "union" : [ "7", "8" ],
+    "union" : [ "12", "8" ],
+    "attributes" : [ "anonymous", "union" ],
+    "id" : "23"
+  }, {
+    "iri" : "http://www.w3.org/2001/XMLSchema#base64Binary",
+    "baseIri" : "http://www.w3.org/2001/XMLSchema",
+    "id" : "24",
+    "label" : {
+      "IRI-based" : "base64Binary"
+    }
+  }, {
+    "iri" : "http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon",
+    "baseIri" : "http://www.bigdata.com/rdf/geospatial/literals/v1",
+    "id" : "37",
+    "label" : {
+      "IRI-based" : "lat-lon"
+    }
+  }, {
+    "instances" : 0,
+    "union" : [ "12", "8" ],
     "attributes" : [ "anonymous", "union" ],
     "id" : "1"
   }, {
     "iri" : "http://www.w3.org/2001/XMLSchema#base64Binary",
     "baseIri" : "http://www.w3.org/2001/XMLSchema",
     "id" : "2",
-    "label" : {
-      "IRI-based" : "base64Binary"
-    }
-  }, {
-    "instances" : 0,
-    "union" : [ "7", "8" ],
-    "attributes" : [ "anonymous", "union" ],
-    "id" : "4"
-  }, {
-    "iri" : "http://www.w3.org/2001/XMLSchema#base64Binary",
-    "baseIri" : "http://www.w3.org/2001/XMLSchema",
-    "id" : "5",
     "label" : {
       "IRI-based" : "base64Binary"
     }
@@ -133,19 +244,29 @@
     "attributes" : [ "external" ],
     "id" : "8"
   }, {
-    "iri" : "http://www.w3.org/2001/XMLSchema#string",
+    "iri" : "http://www.w3.org/2001/XMLSchema#boolean",
     "baseIri" : "http://www.w3.org/2001/XMLSchema",
-    "id" : "10",
+    "id" : "40",
     "label" : {
-      "IRI-based" : "string"
+      "IRI-based" : "boolean"
     }
   }, {
-    "iri" : "http://www.w3.org/2001/XMLSchema#string",
-    "baseIri" : "http://www.w3.org/2001/XMLSchema",
-    "id" : "15",
+    "instances" : 0,
+    "union" : [ "12", "8" ],
+    "attributes" : [ "anonymous", "union" ],
+    "id" : "4"
+  }, {
+    "iri" : "https://w3id.org/won/content#Feedback",
+    "baseIri" : "https://w3id.org/won/content",
+    "instances" : 0,
     "label" : {
-      "IRI-based" : "string"
-    }
+      "IRI-based" : "Feedback",
+      "undefined" : "Feedback"
+    },
+    "comment" : {
+      "en" : "Feedback for an Atom or Connection"
+    },
+    "id" : "9"
   }, {
     "iri" : "https://w3id.org/won/core#Atom",
     "baseIri" : "https://w3id.org/won/core",
@@ -153,21 +274,40 @@
     "label" : {
       "IRI-based" : "Atom"
     },
-    "subClasses" : [ "16", "17" ],
+    "subClasses" : [ "11", "26" ],
     "attributes" : [ "external" ],
-    "id" : "7"
+    "id" : "12"
+  }, {
+    "iri" : "https://w3id.org/won/content#BoundingBox",
+    "baseIri" : "https://w3id.org/won/content",
+    "instances" : 0,
+    "label" : {
+      "IRI-based" : "BoundingBox",
+      "undefined" : "BoundingBox"
+    },
+    "comment" : {
+      "en" : "The bounding box around a location, used for calculating the map viewport when displaying it."
+    },
+    "id" : "14"
   }, {
     "instances" : 0,
-    "union" : [ "7", "8" ],
+    "union" : [ "33", "12" ],
     "attributes" : [ "anonymous", "union" ],
-    "id" : "13"
+    "id" : "28"
   }, {
-    "iri" : "http://www.w3.org/2001/XMLSchema#base64Binary",
-    "baseIri" : "http://www.w3.org/2001/XMLSchema",
-    "id" : "14",
+    "instances" : 0,
+    "union" : [ "12", "8" ],
+    "attributes" : [ "anonymous", "union" ],
+    "id" : "39"
+  }, {
+    "iri" : "http://schema.org/Place",
+    "baseIri" : "http://schema.org",
+    "instances" : 0,
     "label" : {
-      "IRI-based" : "base64Binary"
-    }
+      "IRI-based" : "Place"
+    },
+    "attributes" : [ "external" ],
+    "id" : "19"
   }, {
     "iri" : "http://schema.org/TravelAction",
     "baseIri" : "http://schema.org",
@@ -176,7 +316,7 @@
       "IRI-based" : "TravelAction"
     },
     "attributes" : [ "external" ],
-    "id" : "20"
+    "id" : "31"
   }, {
     "iri" : "https://w3id.org/won/content#DirectResponse",
     "baseIri" : "https://w3id.org/won/content",
@@ -188,8 +328,8 @@
     "comment" : {
       "en" : "An Atom of this class indicates that it was created for directly responding to another Atom."
     },
-    "id" : "16",
-    "superClasses" : [ "7" ]
+    "id" : "11",
+    "superClasses" : [ "12" ]
   }, {
     "iri" : "https://w3id.org/won/content#ServiceBot",
     "baseIri" : "https://w3id.org/won/content",
@@ -201,8 +341,8 @@
     "comment" : {
       "en" : "An Atom of this class indicates that it is controlled by a bot offering a service."
     },
-    "id" : "17",
-    "superClasses" : [ "7" ]
+    "id" : "26",
+    "superClasses" : [ "12" ]
   } ],
   "property" : [ {
     "id" : "0",
@@ -211,32 +351,59 @@
     "id" : "3",
     "type" : "owl:datatypeProperty"
   }, {
-    "id" : "9",
-    "type" : "owl:datatypeProperty"
+    "id" : "7",
+    "type" : "owl:objectProperty"
   }, {
-    "id" : "12",
-    "type" : "owl:datatypeProperty"
+    "id" : "10",
+    "type" : "owl:objectProperty"
+  }, {
+    "id" : "13",
+    "type" : "owl:objectProperty"
+  }, {
+    "id" : "16",
+    "type" : "owl:objectProperty"
+  }, {
+    "id" : "17",
+    "type" : "owl:objectProperty"
   }, {
     "id" : "18",
     "type" : "owl:objectProperty"
   }, {
-    "id" : "19",
-    "type" : "owl:objectProperty"
-  }, {
-    "id" : "21",
-    "type" : "owl:datatypeProperty"
+    "id" : "20",
+    "type" : "rdfs:SubClassOf"
   }, {
     "id" : "22",
     "type" : "owl:datatypeProperty"
   }, {
-    "id" : "23",
-    "type" : "rdfs:SubClassOf"
-  }, {
-    "id" : "24",
-    "type" : "owl:objectProperty"
-  }, {
     "id" : "25",
     "type" : "rdfs:SubClassOf"
+  }, {
+    "id" : "27",
+    "type" : "owl:objectProperty"
+  }, {
+    "id" : "30",
+    "type" : "owl:objectProperty"
+  }, {
+    "id" : "34",
+    "type" : "owl:objectProperty"
+  }, {
+    "id" : "36",
+    "type" : "owl:datatypeProperty"
+  }, {
+    "id" : "38",
+    "type" : "owl:datatypeProperty"
+  }, {
+    "id" : "41",
+    "type" : "owl:datatypeProperty"
+  }, {
+    "id" : "42",
+    "type" : "owl:datatypeProperty"
+  }, {
+    "id" : "43",
+    "type" : "owl:datatypeProperty"
+  }, {
+    "id" : "44",
+    "type" : "owl:objectProperty"
   } ],
   "propertyAttribute" : [ {
     "iri" : "https://w3id.org/won/content#image",
@@ -267,51 +434,51 @@
     "attributes" : [ "datatype" ],
     "id" : "3"
   }, {
-    "iri" : "https://w3id.org/won/content#tag",
+    "iri" : "https://w3id.org/won/content#feedback",
     "baseIri" : "https://w3id.org/won/content",
-    "range" : "10",
+    "range" : "9",
     "label" : {
-      "IRI-based" : "tag",
-      "undefined" : "tag"
+      "IRI-based" : "feedback",
+      "undefined" : "feedback"
     },
-    "domain" : "7",
+    "domain" : "8",
     "comment" : {
-      "en" : "Tags an Atom with a String value."
+      "en" : "Adds feedback to a message."
     },
-    "attributes" : [ "datatype" ],
-    "id" : "9"
-  }, {
-    "iri" : "https://w3id.org/won/content#bpmnWorkflow",
-    "baseIri" : "https://w3id.org/won/content",
-    "range" : "14",
-    "label" : {
-      "IRI-based" : "bpmnWorkflow",
-      "undefined" : "bpmnWorkflow"
-    },
-    "domain" : "13",
-    "comment" : {
-      "en" : "A BPMN conformant XML file in base 64 encoding."
-    },
-    "attributes" : [ "datatype" ],
-    "id" : "12"
+    "attributes" : [ "object" ],
+    "id" : "7"
   }, {
     "iri" : "https://w3id.org/won/content#inResponseTo",
     "baseIri" : "https://w3id.org/won/content",
-    "range" : "7",
+    "range" : "12",
     "label" : {
       "IRI-based" : "inResponseTo",
       "undefined" : "inResponseTo"
     },
-    "domain" : "16",
+    "domain" : "11",
     "comment" : {
       "en" : "An Atom that was created in order to directly respond to another links to that Atom with this property."
     },
     "attributes" : [ "object" ],
-    "id" : "18"
+    "id" : "10"
+  }, {
+    "iri" : "https://w3id.org/won/content#northWestCorner",
+    "baseIri" : "https://w3id.org/won/content",
+    "range" : "15",
+    "label" : {
+      "IRI-based" : "northWestCorner",
+      "undefined" : "northWestCorner"
+    },
+    "domain" : "14",
+    "comment" : {
+      "en" : "The northwest corner of the bounding box"
+    },
+    "attributes" : [ "object" ],
+    "id" : "13"
   }, {
     "iri" : "https://w3id.org/won/content#suggestedAtom",
     "baseIri" : "https://w3id.org/won/content",
-    "range" : "7",
+    "range" : "12",
     "label" : {
       "IRI-based" : "suggestedAtom",
       "undefined" : "suggestedAtom"
@@ -321,11 +488,133 @@
       "en" : "Suggests to the recipient of the message to connect to the Atom linked to with this property."
     },
     "attributes" : [ "object" ],
-    "id" : "19"
+    "id" : "16"
+  }, {
+    "iri" : "https://w3id.org/won/content#southEastCorner",
+    "baseIri" : "https://w3id.org/won/content",
+    "range" : "15",
+    "label" : {
+      "IRI-based" : "southEastCorner",
+      "undefined" : "southEastCorner"
+    },
+    "domain" : "14",
+    "comment" : {
+      "en" : "The southeast corner of the bounding box"
+    },
+    "attributes" : [ "object" ],
+    "id" : "17"
+  }, {
+    "iri" : "https://w3id.org/won/content#boundingBox",
+    "baseIri" : "https://w3id.org/won/content",
+    "range" : "14",
+    "label" : {
+      "IRI-based" : "boundingBox",
+      "undefined" : "boundingBox"
+    },
+    "domain" : "19",
+    "comment" : {
+      "en" : "Specifies a bounding box for a schema:Place"
+    },
+    "attributes" : [ "object" ],
+    "id" : "18"
+  }, {
+    "range" : "12",
+    "domain" : "11",
+    "attributes" : [ "anonymous", "object" ],
+    "id" : "20"
+  }, {
+    "iri" : "https://w3id.org/won/content#file",
+    "baseIri" : "https://w3id.org/won/content",
+    "range" : "24",
+    "label" : {
+      "IRI-based" : "file",
+      "undefined" : "file"
+    },
+    "domain" : "23",
+    "comment" : {
+      "en" : "A file in base64 encoding."
+    },
+    "attributes" : [ "datatype" ],
+    "id" : "22"
+  }, {
+    "range" : "12",
+    "domain" : "26",
+    "attributes" : [ "anonymous", "object" ],
+    "id" : "25"
+  }, {
+    "iri" : "https://w3id.org/won/content#feedbackTarget",
+    "baseIri" : "https://w3id.org/won/content",
+    "range" : "28",
+    "label" : {
+      "IRI-based" : "feedbackTarget",
+      "undefined" : "feedbackFor"
+    },
+    "domain" : "9",
+    "comment" : {
+      "en" : "Links a Feedback to its target."
+    },
+    "attributes" : [ "object" ],
+    "id" : "27"
+  }, {
+    "iri" : "https://w3id.org/won/content#travelAction",
+    "baseIri" : "https://w3id.org/won/content",
+    "range" : "31",
+    "label" : {
+      "IRI-based" : "travelAction",
+      "undefined" : "travelAction"
+    },
+    "domain" : "12",
+    "comment" : {
+      "en" : "Links the Atom to a schema:TravelAction, indicating that this action is what is being offered/suggested."
+    },
+    "attributes" : [ "object" ],
+    "id" : "30"
+  }, {
+    "iri" : "https://w3id.org/won/content#binaryRating",
+    "baseIri" : "https://w3id.org/won/content",
+    "range" : "6",
+    "label" : {
+      "IRI-based" : "binaryRating",
+      "undefined" : "binaryRating"
+    },
+    "domain" : "9",
+    "comment" : {
+      "en" : "Specifies a binary rating for a Feedback"
+    },
+    "attributes" : [ "object" ],
+    "id" : "34"
+  }, {
+    "iri" : "https://w3id.org/won/content#tag",
+    "baseIri" : "https://w3id.org/won/content",
+    "range" : "32",
+    "label" : {
+      "IRI-based" : "tag",
+      "undefined" : "tag"
+    },
+    "domain" : "12",
+    "comment" : {
+      "en" : "Tags an Atom with a String value."
+    },
+    "attributes" : [ "datatype" ],
+    "id" : "36"
+  }, {
+    "iri" : "https://w3id.org/won/content#bpmnWorkflow",
+    "baseIri" : "https://w3id.org/won/content",
+    "range" : "35",
+    "label" : {
+      "IRI-based" : "bpmnWorkflow",
+      "undefined" : "bpmnWorkflow"
+    },
+    "domain" : "39",
+    "comment" : {
+      "en" : "A BPMN conformant XML file in base 64 encoding."
+    },
+    "attributes" : [ "datatype" ],
+    "id" : "38"
   }, {
     "iri" : "https://w3id.org/won/content#text",
     "baseIri" : "https://w3id.org/won/content",
-    "range" : "15",
+    "range" : "29",
     "label" : {
       "IRI-based" : "text",
       "undefined" : "text"
@@ -335,44 +624,48 @@
       "en" : "The textual content of a Message."
     },
     "attributes" : [ "datatype" ],
-    "id" : "21"
+    "id" : "41"
   }, {
-    "iri" : "https://w3id.org/won/content#file",
+    "iri" : "https://w3id.org/won/content#geoSpatial",
     "baseIri" : "https://w3id.org/won/content",
-    "range" : "11",
+    "range" : "37",
     "label" : {
-      "IRI-based" : "file",
-      "undefined" : "file"
+      "IRI-based" : "geoSpatial",
+      "undefined" : "geoSpatial"
     },
-    "domain" : "6",
+    "domain" : "21",
     "comment" : {
-      "en" : "A file in base64 encoding."
+      "en" : "The geolocation of the object in one value in the format `{latitude}#{longitude}^^http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon` - used for geospatial search in bigdata/blazegraph"
     },
     "attributes" : [ "datatype" ],
-    "id" : "22"
+    "id" : "42"
   }, {
-    "range" : "7",
-    "domain" : "16",
-    "attributes" : [ "object", "anonymous" ],
-    "id" : "23"
-  }, {
-    "iri" : "https://w3id.org/won/content#travelAction",
+    "iri" : "https://w3id.org/won/content#isProcessing",
     "baseIri" : "https://w3id.org/won/content",
-    "range" : "20",
+    "range" : "40",
     "label" : {
-      "IRI-based" : "travelAction",
-      "undefined" : "travelAction"
+      "IRI-based" : "isProcessing",
+      "undefined" : "isProcessing"
     },
-    "domain" : "7",
+    "domain" : "8",
     "comment" : {
-      "en" : "Links the Atom to a schema:TravelAction, indicating that this action is what is being offered/suggested."
+      "en" : "Set on a Message sent to or by a bot to prevent it from re-evaluating its goals in reaction to the message."
+    },
+    "attributes" : [ "datatype" ],
+    "id" : "43"
+  }, {
+    "iri" : "https://w3id.org/won/content#feedbackEvent",
+    "baseIri" : "https://w3id.org/won/content",
+    "range" : "8",
+    "label" : {
+      "IRI-based" : "feedbackEvent",
+      "en" : "feedbackEvent"
+    },
+    "domain" : "33",
+    "comment" : {
+      "en" : "Links a message containing Feedback to a Connection."
     },
     "attributes" : [ "object" ],
-    "id" : "24"
-  }, {
-    "range" : "7",
-    "domain" : "17",
-    "attributes" : [ "object", "anonymous" ],
-    "id" : "25"
+    "id" : "44"
   } ]
 }

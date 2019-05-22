@@ -15,6 +15,8 @@
     "@list" : [ {
       "@id" : "https://w3id.org/won/message#ActivateMessage"
     }, {
+      "@id" : "https://w3id.org/won/message#AtomHintMessage"
+    }, {
       "@id" : "https://w3id.org/won/message#AtomMessage"
     }, {
       "@id" : "https://w3id.org/won/message#ChangeNotificationMessage"
@@ -31,7 +33,39 @@
     }, {
       "@id" : "https://w3id.org/won/message#FailureResponse"
     }, {
-      "@id" : "https://w3id.org/won/message#HintMessage"
+      "@id" : "https://w3id.org/won/message#OpenMessage"
+    }, {
+      "@id" : "https://w3id.org/won/message#ReplaceMessage"
+    }, {
+      "@id" : "https://w3id.org/won/message#SocketHintMessage"
+    }, {
+      "@id" : "https://w3id.org/won/message#SuccessResponse"
+    } ]
+  } ]
+}, {
+  "@id" : "_:genid27",
+  "@type" : [ "http://www.w3.org/2002/07/owl#AllDifferent" ],
+  "http://www.w3.org/2002/07/owl#distinctMembers" : [ {
+    "@list" : [ {
+      "@id" : "https://w3id.org/won/message#ActivateMessage"
+    }, {
+      "@id" : "https://w3id.org/won/message#AtomHintMessage"
+    }, {
+      "@id" : "https://w3id.org/won/message#AtomMessage"
+    }, {
+      "@id" : "https://w3id.org/won/message#ChangeNotificationMessage"
+    }, {
+      "@id" : "https://w3id.org/won/message#CloseMessage"
+    }, {
+      "@id" : "https://w3id.org/won/message#ConnectMessage"
+    }, {
+      "@id" : "https://w3id.org/won/message#ConnectionMessage"
+    }, {
+      "@id" : "https://w3id.org/won/message#CreateMessage"
+    }, {
+      "@id" : "https://w3id.org/won/message#DeactivateMessage"
+    }, {
+      "@id" : "https://w3id.org/won/message#FailureResponse"
     }, {
       "@id" : "https://w3id.org/won/message#OpenMessage"
     }, {
@@ -105,7 +139,7 @@
   "@type" : [ "http://www.w3.org/2002/07/owl#Ontology" ],
   "http://purl.org/dc/elements/1.1/abstract" : [ {
     "@language" : "en",
-    "@value" : "This ontology is used to model the Message objects central to the Web of Needs."
+    "@value" : "This ontology is used to model the Message objects central to the Web of Needs. Messages are entities that encapsulate addressing information, signing information, and optionally, content in an RDF dataset. A message is identified by a URI in the URI space on the WoN node it was created on. \n\nA message consists of graphs that can conceptually contain other graphs; thus the message dataset conceptually is a tree of graphs, which can either be envelope graphs, holding addressing information and signatures, or content graphs, holding arbitrary content.\n\nIf a message is sent to another Atom, a new Message URI is minted on that Atom's WoN node and the message copied into the new Message's dataset."
   } ],
   "http://purl.org/dc/elements/1.1/creator" : [ {
     "@value" : "Fabian Salcher"
@@ -146,6 +180,19 @@
   } ],
   "http://www.w3.org/2000/01/rdf-schema#label" : [ {
     "@value" : "ActivateMessage"
+  } ]
+}, {
+  "@id" : "https://w3id.org/won/message#AtomHintMessage",
+  "@type" : [ "http://www.w3.org/2002/07/owl#NamedIndividual", "https://w3id.org/won/message#MessageType" ],
+  "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
+    "@language" : "en",
+    "@value" : "Type of message sent by a matching service to an Atom in order to inform its owner of other Atoms possibly interesting for establishing a connection, or just generally of interest."
+  } ],
+  "http://www.w3.org/2000/01/rdf-schema#isDefinedBy" : [ {
+    "@id" : "https://w3id.org/won/message"
+  } ],
+  "http://www.w3.org/2000/01/rdf-schema#label" : [ {
+    "@value" : "AtomHintMessage"
   } ]
 }, {
   "@id" : "https://w3id.org/won/message#AtomMessage",
@@ -313,19 +360,6 @@
     "@id" : "https://w3id.org/won/message#Message"
   } ]
 }, {
-  "@id" : "https://w3id.org/won/message#HintMessage",
-  "@type" : [ "http://www.w3.org/2002/07/owl#NamedIndividual", "https://w3id.org/won/message#MessageType" ],
-  "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
-    "@language" : "en",
-    "@value" : "Type of message sent by a matching service to an Atom in order to inform its owner of other Atoms possibly interesting for establishing a connection."
-  } ],
-  "http://www.w3.org/2000/01/rdf-schema#isDefinedBy" : [ {
-    "@id" : "https://w3id.org/won/message"
-  } ],
-  "http://www.w3.org/2000/01/rdf-schema#label" : [ {
-    "@value" : "HintMessage"
-  } ]
-}, {
   "@id" : "https://w3id.org/won/message#Message",
   "@type" : [ "http://www.w3.org/2002/07/owl#Class" ],
   "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
@@ -398,6 +432,16 @@
   } ],
   "http://www.w3.org/2000/01/rdf-schema#subClassOf" : [ {
     "@id" : "https://w3id.org/won/message#MessageType"
+  } ]
+}, {
+  "@id" : "https://w3id.org/won/message#SocketHintMessage",
+  "@type" : [ "http://www.w3.org/2002/07/owl#NamedIndividual", "https://w3id.org/won/message#MessageType" ],
+  "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
+    "@language" : "en",
+    "@value" : "Type of message sent by a matching service to the Socket of an Atom in order to inform its owner of the Socket of another Atom possibly interesting for establishing a connection."
+  } ],
+  "http://www.w3.org/2000/01/rdf-schema#label" : [ {
+    "@value" : "SocketHintMessage"
   } ]
 }, {
   "@id" : "https://w3id.org/won/message#SuccessResponse",
@@ -486,6 +530,42 @@
   } ],
   "http://www.w3.org/2000/01/rdf-schema#range" : [ {
     "@id" : "http://www.w3.org/2001/XMLSchema#string"
+  } ]
+}, {
+  "@id" : "https://w3id.org/won/message#hintScore",
+  "@type" : [ "http://www.w3.org/2002/07/owl#DatatypeProperty" ],
+  "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
+    "@language" : "en",
+    "@value" : "Score of the Hint, indicating how well-suited the sender of the Hint thinks it is for the recipient. Must be in the range of 0.0 (worst) and 1.0 (best)."
+  } ],
+  "http://www.w3.org/2000/01/rdf-schema#domain" : [ {
+    "@id" : "https://w3id.org/won/message#Message"
+  } ],
+  "http://www.w3.org/2000/01/rdf-schema#label" : [ {
+    "@value" : "hintScore"
+  } ],
+  "http://www.w3.org/2000/01/rdf-schema#range" : [ {
+    "@id" : "http://www.w3.org/2001/XMLSchema#float"
+  } ]
+}, {
+  "@id" : "https://w3id.org/won/message#hintTargetAtom",
+  "@type" : [ "http://www.w3.org/2002/07/owl#ObjectProperty" ],
+  "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
+    "@language" : "en",
+    "@value" : "The target Atom of the AtomHintMessage. By sending this message, the sender wants to express that the Atom's owner may want to establish a connection with the targetAtom (but first must choose a suitable pair of sockets), or that the targetAtom may just be interesting for the owner for other reasons."
+  } ],
+  "http://www.w3.org/2000/01/rdf-schema#label" : [ {
+    "@value" : "hintTargetAtom"
+  } ]
+}, {
+  "@id" : "https://w3id.org/won/message#hintTargetSocket",
+  "@type" : [ "http://www.w3.org/2002/07/owl#ObjectProperty" ],
+  "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
+    "@language" : "en",
+    "@value" : "The target Socket of a SocketHintMessage. By sending this message it is suggested to establish a connection between the recipientSocket and the targetSocket."
+  } ],
+  "http://www.w3.org/2000/01/rdf-schema#label" : [ {
+    "@value" : "hintTargetSocket"
   } ]
 }, {
   "@id" : "https://w3id.org/won/message#messageType",

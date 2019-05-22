@@ -19,7 +19,7 @@
         <dc:date rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2019-05-03</dc:date>
         <dc:title>Web of Needs Schema Extension</dc:title>
         <terms:license rdf:resource="https://creativecommons.org/licenses/by/4.0/"/>
-        <vann:preferredNamespacePrefix>wxs</vann:preferredNamespacePrefix>
+        <vann:preferredNamespacePrefix>wx-schema</vann:preferredNamespacePrefix>
         <prov:wasDerivedFrom rdf:resource="http://schema.org"/>
     </owl:Ontology>
     

@@ -6,7 +6,7 @@
 <https://w3id.org/won/ext/buddy> <http://purl.org/dc/elements/1.1/title> "Web of Needs Buddy Extension" .
 <https://w3id.org/won/ext/buddy> <http://purl.org/dc/terms/created> "2019-04-15"^^<http://www.w3.org/2001/XMLSchema#date> .
 <https://w3id.org/won/ext/buddy> <http://purl.org/dc/terms/license> <https://creativecommons.org/licenses/by/4.0/> .
-<https://w3id.org/won/ext/buddy> <http://purl.org/vocab/vann/preferredNamespacePrefix> "bd" .
+<https://w3id.org/won/ext/buddy> <http://purl.org/vocab/vann/preferredNamespacePrefix> "wx-buddy" .
 <https://w3id.org/won/ext/buddy> <http://www.w3.org/2000/01/rdf-schema#comment> "WoN Buddy Extension for establishing buddy relationships."@en .
 # 
 # 

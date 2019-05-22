@@ -9,7 +9,11 @@
 <https://w3id.org/won/message> rdf:type owl:Ontology ;
                                 owl:versionIRI <https://w3id.org/won/message/1.0> ;
                                 owl:imports <https://w3id.org/won/core/1.0> ;
-                                <http://purl.org/dc/elements/1.1/abstract> "This ontology is used to model the Message objects central to the Web of Needs."@en ;
+                                <http://purl.org/dc/elements/1.1/abstract> """This ontology is used to model the Message objects central to the Web of Needs. Messages are entities that encapsulate addressing information, signing information, and optionally, content in an RDF dataset. A message is identified by a URI in the URI space on the WoN node it was created on. 
+
+A message consists of graphs that can conceptually contain other graphs; thus the message dataset conceptually is a tree of graphs, which can either be envelope graphs, holding addressing information and signatures, or content graphs, holding arbitrary content.
+
+If a message is sent to another Atom, a new Message URI is minted on that Atom's WoN node and the message copied into the new Message's dataset."""@en ;
                                 <http://purl.org/dc/elements/1.1/creator> "Fabian Salcher" ,
                                                                           "Florian Kleedorfer" ,
                                                                           "Yana Panchenko" ;
@@ -87,6 +91,18 @@
                             rdfs:range :Message ;
                             rdfs:comment "Points to another message. Messages always exist in two copies: one on the sender's WoN node and one on the receiver's WoN node. The receiver's WoN node copies the message, mints a new URI for it and points to the original message using 'msg:correspondingRemoteMessage'."@en ;
                             rdfs:label "correspondingRemoteMessage" .
+
+
+###  https://w3id.org/won/message#hintTargetAtom
+:hintTargetAtom rdf:type owl:ObjectProperty ;
+                rdfs:comment "The target Atom of the AtomHintMessage. By sending this message, the sender wants to express that the Atom's owner may want to establish a connection with the targetAtom (but first must choose a suitable pair of sockets), or that the targetAtom may just be interesting for the owner for other reasons."@en ;
+                rdfs:label "hintTargetAtom" .
+
+
+###  https://w3id.org/won/message#hintTargetSocket
+:hintTargetSocket rdf:type owl:ObjectProperty ;
+                  rdfs:comment "The target Socket of a SocketHintMessage. By sending this message it is suggested to establish a connection between the recipientSocket and the targetSocket."@en ;
+                  rdfs:label "hintTargetSocket" .
 
 
 ###  https://w3id.org/won/message#messageType
@@ -184,6 +200,14 @@
       rdfs:range xsd:string ;
       rdfs:comment "The message hash."@en ;
       rdfs:label "hash" .
+
+
+###  https://w3id.org/won/message#hintScore
+:hintScore rdf:type owl:DatatypeProperty ;
+           rdfs:domain :Message ;
+           rdfs:range xsd:float ;
+           rdfs:comment "Score of the Hint, indicating how well-suited the sender of the Hint thinks it is for the recipient. Must be in the range of 0.0 (worst) and 1.0 (best)."@en ;
+           rdfs:label "hintScore" .
 
 
 ###  https://w3id.org/won/message#protocolVersion
@@ -311,6 +335,14 @@
                  rdfs:label "ActivateMessage" .
 
 
+###  https://w3id.org/won/message#AtomHintMessage
+:AtomHintMessage rdf:type owl:NamedIndividual ,
+                          :MessageType ;
+                 rdfs:comment "Type of message sent by a matching service to an Atom in order to inform its owner of other Atoms possibly interesting for establishing a connection, or just generally of interest."@en ;
+                 rdfs:isDefinedBy <https://w3id.org/won/message> ;
+                 rdfs:label "AtomHintMessage" .
+
+
 ###  https://w3id.org/won/message#AtomMessage
 :AtomMessage rdf:type owl:NamedIndividual ,
                       :MessageType ;
@@ -376,14 +408,6 @@
                  rdfs:label "FailureResponse" .
 
 
-###  https://w3id.org/won/message#HintMessage
-:HintMessage rdf:type owl:NamedIndividual ,
-                      :MessageType ;
-             rdfs:comment "Type of message sent by a matching service to an Atom in order to inform its owner of other Atoms possibly interesting for establishing a connection."@en ;
-             rdfs:isDefinedBy <https://w3id.org/won/message> ;
-             rdfs:label "HintMessage" .
-
-
 ###  https://w3id.org/won/message#OpenMessage
 :OpenMessage rdf:type owl:NamedIndividual ,
                       :MessageType ;
@@ -398,6 +422,13 @@
                 rdfs:comment "Type of message sent to a WoN Node in order replace an Atom's content."@en ;
                 rdfs:isDefinedBy <https://w3id.org/won/message> ;
                 rdfs:label "ReplaceMessage" .
+
+
+###  https://w3id.org/won/message#SocketHintMessage
+:SocketHintMessage rdf:type owl:NamedIndividual ,
+                            :MessageType ;
+                   rdfs:comment "Type of message sent by a matching service to the Socket of an Atom in order to inform its owner of the Socket of another Atom possibly interesting for establishing a connection."@en ;
+                   rdfs:label "SocketHintMessage" .
 
 
 ###  https://w3id.org/won/message#SuccessResponse
@@ -423,6 +454,7 @@
 
 [ rdf:type owl:AllDifferent ;
   owl:distinctMembers ( :ActivateMessage
+                        :AtomHintMessage
                         :AtomMessage
                         :ChangeNotificationMessage
                         :CloseMessage
@@ -431,7 +463,25 @@
                         :CreateMessage
                         :DeactivateMessage
                         :FailureResponse
-                        :HintMessage
+                        :OpenMessage
+                        :ReplaceMessage
+                        :SocketHintMessage
+                        :SuccessResponse
+                      )
+] .
+
+
+[ rdf:type owl:AllDifferent ;
+  owl:distinctMembers ( :ActivateMessage
+                        :AtomHintMessage
+                        :AtomMessage
+                        :ChangeNotificationMessage
+                        :CloseMessage
+                        :ConnectMessage
+                        :ConnectionMessage
+                        :CreateMessage
+                        :DeactivateMessage
+                        :FailureResponse
                         :OpenMessage
                         :ReplaceMessage
                         :SuccessResponse

@@ -17,7 +17,7 @@
         <dc:created rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2019-05-14</dc:created>
         <dc:title xml:lang="en">Web of Needs Content Ontology</dc:title>
         <terms:license>https://creativecommons.org/licenses/by/4.0/</terms:license>
-        <vann:preferredNamespacePrefix>wcnt</vann:preferredNamespacePrefix>
+        <vann:preferredNamespacePrefix>con</vann:preferredNamespacePrefix>
     </owl:Ontology>
     
 
@@ -72,12 +72,98 @@
     <!-- 
     ///////////////////////////////////////////////////////////////////////////////////////
     //
+    // Datatypes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+
+    
+
+
+    <!-- http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon -->
+
+
+    <rdfs:Datatype rdf:about="http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
     // Object Properties
     //
     ///////////////////////////////////////////////////////////////////////////////////////
      -->
 
 
+    
+
+
+    <!-- https://w3id.org/won/content#binaryRating -->
+
+
+    <owl:ObjectProperty rdf:about="https://w3id.org/won/content#binaryRating">
+        <rdfs:domain rdf:resource="https://w3id.org/won/content#Feedback"/>
+        <rdfs:range rdf:resource="https://w3id.org/won/content#BinaryRating"/>
+        <rdfs:comment xml:lang="en">Specifies a binary rating for a Feedback</rdfs:comment>
+        <rdfs:label>binaryRating</rdfs:label>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- https://w3id.org/won/content#boundingBox -->
+
+
+    <owl:ObjectProperty rdf:about="https://w3id.org/won/content#boundingBox">
+        <rdfs:domain rdf:resource="http://schema.org/Place"/>
+        <rdfs:range rdf:resource="https://w3id.org/won/content#BoundingBox"/>
+        <rdfs:comment xml:lang="en">Specifies a bounding box for a schema:Place</rdfs:comment>
+        <rdfs:label>boundingBox</rdfs:label>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- https://w3id.org/won/content#feedback -->
+
+
+    <owl:ObjectProperty rdf:about="https://w3id.org/won/content#feedback">
+        <rdfs:domain rdf:resource="https://w3id.org/won/message#Message"/>
+        <rdfs:range rdf:resource="https://w3id.org/won/content#Feedback"/>
+        <rdfs:comment xml:lang="en">Adds feedback to a message.</rdfs:comment>
+        <rdfs:label>feedback</rdfs:label>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- https://w3id.org/won/content#feedbackEvent -->
+
+
+    <owl:ObjectProperty rdf:about="https://w3id.org/won/content#feedbackEvent">
+        <rdfs:domain rdf:resource="https://w3id.org/won/core#Connection"/>
+        <rdfs:range rdf:resource="https://w3id.org/won/message#Message"/>
+        <rdfs:comment xml:lang="en">Links a message containing Feedback to a Connection.</rdfs:comment>
+        <rdfs:label xml:lang="en">feedbackEvent</rdfs:label>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- https://w3id.org/won/content#feedbackTarget -->
+
+
+    <owl:ObjectProperty rdf:about="https://w3id.org/won/content#feedbackTarget">
+        <rdfs:domain rdf:resource="https://w3id.org/won/content#Feedback"/>
+        <rdfs:range>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="https://w3id.org/won/core#Atom"/>
+                    <rdf:Description rdf:about="https://w3id.org/won/core#Connection"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:range>
+        <rdfs:comment xml:lang="en">Links a Feedback to its target.</rdfs:comment>
+        <rdfs:label>feedbackFor</rdfs:label>
+    </owl:ObjectProperty>
     
 
 
@@ -89,6 +175,30 @@
         <rdfs:range rdf:resource="https://w3id.org/won/core#Atom"/>
         <rdfs:comment xml:lang="en">An Atom that was created in order to directly respond to another links to that Atom with this property.</rdfs:comment>
         <rdfs:label>inResponseTo</rdfs:label>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- https://w3id.org/won/content#northWestCorner -->
+
+
+    <owl:ObjectProperty rdf:about="https://w3id.org/won/content#northWestCorner">
+        <rdfs:domain rdf:resource="https://w3id.org/won/content#BoundingBox"/>
+        <rdfs:range rdf:resource="http://schema.org/GeoCoordinates"/>
+        <rdfs:comment xml:lang="en">The northwest corner of the bounding box</rdfs:comment>
+        <rdfs:label>northWestCorner</rdfs:label>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- https://w3id.org/won/content#southEastCorner -->
+
+
+    <owl:ObjectProperty rdf:about="https://w3id.org/won/content#southEastCorner">
+        <rdfs:domain rdf:resource="https://w3id.org/won/content#BoundingBox"/>
+        <rdfs:range rdf:resource="http://schema.org/GeoCoordinates"/>
+        <rdfs:comment xml:lang="en">The southeast corner of the bounding box</rdfs:comment>
+        <rdfs:label>southEastCorner</rdfs:label>
     </owl:ObjectProperty>
     
 
@@ -167,6 +277,17 @@
     
 
 
+    <!-- https://w3id.org/won/content#geoSpatial -->
+
+
+    <owl:DatatypeProperty rdf:about="https://w3id.org/won/content#geoSpatial">
+        <rdfs:range rdf:resource="http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon"/>
+        <rdfs:comment xml:lang="en">The geolocation of the object in one value in the format `{latitude}#{longitude}^^http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon` - used for geospatial search in bigdata/blazegraph</rdfs:comment>
+        <rdfs:label>geoSpatial</rdfs:label>
+    </owl:DatatypeProperty>
+    
+
+
     <!-- https://w3id.org/won/content#image -->
 
 
@@ -182,6 +303,18 @@
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#base64Binary"/>
         <rdfs:comment xml:lang="en">Image data in base64 encoding.</rdfs:comment>
         <rdfs:label>image</rdfs:label>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- https://w3id.org/won/content#isProcessing -->
+
+
+    <owl:DatatypeProperty rdf:about="https://w3id.org/won/content#isProcessing">
+        <rdfs:domain rdf:resource="https://w3id.org/won/message#Message"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+        <rdfs:comment xml:lang="en">Set on a Message sent to or by a bot to prevent it from re-evaluating its goals in reaction to the message.</rdfs:comment>
+        <rdfs:label>isProcessing</rdfs:label>
     </owl:DatatypeProperty>
     
 
@@ -241,10 +374,51 @@
     
 
 
+    <!-- http://schema.org/GeoCoordinates -->
+
+
+    <owl:Class rdf:about="http://schema.org/GeoCoordinates"/>
+    
+
+
+    <!-- http://schema.org/Place -->
+
+
+    <owl:Class rdf:about="http://schema.org/Place"/>
+    
+
+
     <!-- http://schema.org/TravelAction -->
 
 
     <owl:Class rdf:about="http://schema.org/TravelAction"/>
+    
+
+
+    <!-- http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon -->
+
+
+    <owl:Class rdf:about="http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon"/>
+    
+
+
+    <!-- https://w3id.org/won/content#BinaryRating -->
+
+
+    <owl:Class rdf:about="https://w3id.org/won/content#BinaryRating">
+        <rdfs:comment xml:lang="en">Binary rating values.</rdfs:comment>
+        <rdfs:label>BinaryRating</rdfs:label>
+    </owl:Class>
+    
+
+
+    <!-- https://w3id.org/won/content#BoundingBox -->
+
+
+    <owl:Class rdf:about="https://w3id.org/won/content#BoundingBox">
+        <rdfs:comment xml:lang="en">The bounding box around a location, used for calculating the map viewport when displaying it.</rdfs:comment>
+        <rdfs:label>BoundingBox</rdfs:label>
+    </owl:Class>
     
 
 
@@ -255,6 +429,16 @@
         <rdfs:subClassOf rdf:resource="https://w3id.org/won/core#Atom"/>
         <rdfs:comment xml:lang="en">An Atom of this class indicates that it was created for directly responding to another Atom.</rdfs:comment>
         <rdfs:label>DirectResponse</rdfs:label>
+    </owl:Class>
+    
+
+
+    <!-- https://w3id.org/won/content#Feedback -->
+
+
+    <owl:Class rdf:about="https://w3id.org/won/content#Feedback">
+        <rdfs:comment xml:lang="en">Feedback for an Atom or Connection</rdfs:comment>
+        <rdfs:label>Feedback</rdfs:label>
     </owl:Class>
     
 
@@ -277,10 +461,51 @@
     
 
 
+    <!-- https://w3id.org/won/core#Connection -->
+
+
+    <owl:Class rdf:about="https://w3id.org/won/core#Connection"/>
+    
+
+
     <!-- https://w3id.org/won/message#Message -->
 
 
     <owl:Class rdf:about="https://w3id.org/won/message#Message"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Individuals
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+
+    
+
+
+    <!-- https://w3id.org/won/content#Bad -->
+
+
+    <owl:NamedIndividual rdf:about="https://w3id.org/won/content#Bad">
+        <rdf:type rdf:resource="https://w3id.org/won/content#BinaryRating"/>
+        <rdfs:comment>A bad rating</rdfs:comment>
+        <rdfs:label>Bad</rdfs:label>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- https://w3id.org/won/content#Good -->
+
+
+    <owl:NamedIndividual rdf:about="https://w3id.org/won/content#Good">
+        <rdf:type rdf:resource="https://w3id.org/won/content#BinaryRating"/>
+        <rdfs:comment>A good rating</rdfs:comment>
+        <rdfs:label>Good</rdfs:label>
+    </owl:NamedIndividual>
 </rdf:RDF>
 
 

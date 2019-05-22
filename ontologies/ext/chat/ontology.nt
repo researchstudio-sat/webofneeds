@@ -6,7 +6,7 @@
 <https://w3id.org/won/ext/chat> <http://purl.org/dc/elements/1.1/title> "Web of Needs Chat Extension" .
 <https://w3id.org/won/ext/chat> <http://purl.org/dc/terms/created> "2019-04-15"^^<http://www.w3.org/2001/XMLSchema#date> .
 <https://w3id.org/won/ext/chat> <http://purl.org/dc/terms/license> <https://creativecommons.org/licenses/by/4.0/> .
-<https://w3id.org/won/ext/chat> <http://purl.org/vocab/vann/preferredNamespacePrefix> "chat" .
+<https://w3id.org/won/ext/chat> <http://purl.org/vocab/vann/preferredNamespacePrefix> "wx-chat" .
 # 
 # 
 # #################################################################

@@ -43,7 +43,7 @@
     "@id" : "https://creativecommons.org/licenses/by/4.0/"
   } ],
   "http://purl.org/vocab/vann/preferredNamespacePrefix" : [ {
-    "@value" : "demo"
+    "@value" : "wx-demo"
   } ],
   "http://www.w3.org/2002/07/owl#versionIRI" : [ {
     "@id" : "https://w3id.org/won/ext/demo/1.0"
@@ -197,6 +197,16 @@
   } ],
   "http://www.w3.org/2000/01/rdf-schema#label" : [ {
     "@value" : "PostDocSearch"
+  } ]
+}, {
+  "@id" : "https://w3id.org/won/ext/demo#PureSearch",
+  "@type" : [ "http://www.w3.org/2002/07/owl#Class" ],
+  "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
+    "@language" : "en",
+    "@value" : "Class for Atoms that are just searches (defining a search String via match:searchString)."
+  } ],
+  "http://www.w3.org/2000/01/rdf-schema#label" : [ {
+    "@value" : "PureSearch"
   } ]
 }, {
   "@id" : "https://w3id.org/won/ext/demo#RealEstateRentDemand",

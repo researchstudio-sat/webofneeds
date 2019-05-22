@@ -4,12 +4,69 @@ This section provides details for each class and property defined by Web of Need
    <h3 id="classes-headline" class="list">Classes</h3>
    <ul class="hlist">
       <li>
+         <a href="#BinaryRating" title="https://w3id.org/won/content#BinaryRating">BinaryRating</a>
+      </li>
+      <li>
+         <a href="#BoundingBox" title="https://w3id.org/won/content#BoundingBox">BoundingBox</a>
+      </li>
+      <li>
          <a href="#DirectResponse" title="https://w3id.org/won/content#DirectResponse">DirectResponse</a>
+      </li>
+      <li>
+         <a href="#Feedback" title="https://w3id.org/won/content#Feedback">Feedback</a>
       </li>
       <li>
          <a href="#ServiceBot" title="https://w3id.org/won/content#ServiceBot">ServiceBot</a>
       </li>
    </ul>
+   <div class="entity" id="BinaryRating">
+      <h3>BinaryRating<sup class="type-c" title="class">c</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#classes">Class ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/content#BinaryRating</p>
+      <div class="comment">
+         <span class="markdown">Binary rating values.</span>
+      </div>
+      <dl class="description">
+         <dt>is in range of</dt>
+         <dd>
+            <a href="#binaryRating" title="https://w3id.org/won/content#binaryRating">binaryRating</a>
+            <sup class="type-op" title="object property">op</sup>
+         </dd>
+         <dt>has members</dt>
+         <dd>
+            <a href="#Bad" title="https://w3id.org/won/content#Bad">Bad</a>
+            <sup class="type-ni" title="named individual">ni</sup>, <a href="#Good" title="https://w3id.org/won/content#Good">Good</a>
+            <sup class="type-ni" title="named individual">ni</sup>
+         </dd>
+      </dl>
+   </div>
+   <div class="entity" id="BoundingBox">
+      <h3>BoundingBox<sup class="type-c" title="class">c</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#classes">Class ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/content#BoundingBox</p>
+      <div class="comment">
+         <span class="markdown">The bounding box around a location, used for calculating the map viewport when displaying it.</span>
+      </div>
+      <dl class="description">
+         <dt>is in domain of</dt>
+         <dd>
+            <a href="#northWestCorner" title="https://w3id.org/won/content#northWestCorner">northWestCorner</a>
+            <sup class="type-op" title="object property">op</sup>, <a href="#southEastCorner" title="https://w3id.org/won/content#southEastCorner">southEastCorner</a>
+            <sup class="type-op" title="object property">op</sup>
+         </dd>
+         <dt>is in range of</dt>
+         <dd>
+            <a href="#boundingBox" title="https://w3id.org/won/content#boundingBox">boundingBox</a>
+            <sup class="type-op" title="object property">op</sup>
+         </dd>
+      </dl>
+   </div>
    <div class="entity" id="DirectResponse">
       <h3>DirectResponse<sup class="type-c" title="class">c</sup>
          <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#classes">Class ToC</a>
@@ -29,6 +86,30 @@ This section provides details for each class and property defined by Web of Need
          <dt>is in domain of</dt>
          <dd>
             <a href="#inResponseTo" title="https://w3id.org/won/content#inResponseTo">inResponseTo</a>
+            <sup class="type-op" title="object property">op</sup>
+         </dd>
+      </dl>
+   </div>
+   <div class="entity" id="Feedback">
+      <h3>Feedback<sup class="type-c" title="class">c</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#classes">Class ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/content#Feedback</p>
+      <div class="comment">
+         <span class="markdown">Feedback for an Atom or Connection</span>
+      </div>
+      <dl class="description">
+         <dt>is in domain of</dt>
+         <dd>
+            <a href="#binaryRating" title="https://w3id.org/won/content#binaryRating">binaryRating</a>
+            <sup class="type-op" title="object property">op</sup>, <a href="#feedbackTarget" title="https://w3id.org/won/content#feedbackTarget">feedbackFor</a>
+            <sup class="type-op" title="object property">op</sup>
+         </dd>
+         <dt>is in range of</dt>
+         <dd>
+            <a href="#feedback" title="https://w3id.org/won/content#feedback">feedback</a>
             <sup class="type-op" title="object property">op</sup>
          </dd>
       </dl>
@@ -55,7 +136,28 @@ This section provides details for each class and property defined by Web of Need
    <h3 id="properties" class="list">Object Properties</h3>
    <ul class="hlist">
       <li>
+         <a href="#binaryRating" title="https://w3id.org/won/content#binaryRating">binaryRating</a>
+      </li>
+      <li>
+         <a href="#boundingBox" title="https://w3id.org/won/content#boundingBox">boundingBox</a>
+      </li>
+      <li>
+         <a href="#feedback" title="https://w3id.org/won/content#feedback">feedback</a>
+      </li>
+      <li>
+         <a href="#feedbackEvent" title="https://w3id.org/won/content#feedbackEvent">feedbackEvent</a>
+      </li>
+      <li>
+         <a href="#feedbackTarget" title="https://w3id.org/won/content#feedbackTarget">feedbackFor</a>
+      </li>
+      <li>
          <a href="#inResponseTo" title="https://w3id.org/won/content#inResponseTo">inResponseTo</a>
+      </li>
+      <li>
+         <a href="#northWestCorner" title="https://w3id.org/won/content#northWestCorner">northWestCorner</a>
+      </li>
+      <li>
+         <a href="#southEastCorner" title="https://w3id.org/won/content#southEastCorner">southEastCorner</a>
       </li>
       <li>
          <a href="#suggestedAtom" title="https://w3id.org/won/content#suggestedAtom">suggestedAtom</a>
@@ -64,6 +166,134 @@ This section provides details for each class and property defined by Web of Need
          <a href="#travelAction" title="https://w3id.org/won/content#travelAction">travelAction</a>
       </li>
    </ul>
+   <div class="entity" id="binaryRating">
+      <h3>binaryRating<sup class="type-op" title="object property">op</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#objectproperties">Object Property ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/content#binaryRating</p>
+      <div class="comment">
+         <span class="markdown">Specifies a binary rating for a Feedback</span>
+      </div>
+      <div class="description">
+         <dl>
+            <dt>has domain</dt>
+            <dd>
+               <a href="#Feedback" title="https://w3id.org/won/content#Feedback">Feedback</a>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
+            <dt>has range</dt>
+            <dd>
+               <a href="#BinaryRating" title="https://w3id.org/won/content#BinaryRating">BinaryRating</a>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
+         </dl>
+      </div>
+   </div>
+   <div class="entity" id="boundingBox">
+      <h3>boundingBox<sup class="type-op" title="object property">op</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#objectproperties">Object Property ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/content#boundingBox</p>
+      <div class="comment">
+         <span class="markdown">Specifies a bounding box for a schema:Place</span>
+      </div>
+      <div class="description">
+         <dl>
+            <dt>has domain</dt>
+            <dd>
+               <span class="dotted" title="http://schema.org/Place">place</span>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
+            <dt>has range</dt>
+            <dd>
+               <a href="#BoundingBox" title="https://w3id.org/won/content#BoundingBox">BoundingBox</a>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
+         </dl>
+      </div>
+   </div>
+   <div class="entity" id="feedback">
+      <h3>feedback<sup class="type-op" title="object property">op</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#objectproperties">Object Property ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/content#feedback</p>
+      <div class="comment">
+         <span class="markdown">Adds feedback to a message.</span>
+      </div>
+      <div class="description">
+         <dl>
+            <dt>has domain</dt>
+            <dd>
+               <span class="dotted" title="https://w3id.org/won/message#Message">message</span>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
+            <dt>has range</dt>
+            <dd>
+               <a href="#Feedback" title="https://w3id.org/won/content#Feedback">Feedback</a>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
+         </dl>
+      </div>
+   </div>
+   <div class="entity" id="feedbackEvent">
+      <h3>feedbackEvent<sup class="type-op" title="object property">op</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#objectproperties">Object Property ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/content#feedbackEvent</p>
+      <div class="comment">
+         <span class="markdown">Links a message containing Feedback to a Connection.</span>
+      </div>
+      <div class="description">
+         <dl>
+            <dt>has domain</dt>
+            <dd>
+               <span class="dotted" title="https://w3id.org/won/core#Connection">connection</span>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
+            <dt>has range</dt>
+            <dd>
+               <span class="dotted" title="https://w3id.org/won/message#Message">message</span>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
+         </dl>
+      </div>
+   </div>
+   <div class="entity" id="feedbackTarget">
+      <h3>feedbackFor<sup class="type-op" title="object property">op</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#objectproperties">Object Property ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/content#feedbackTarget</p>
+      <div class="comment">
+         <span class="markdown">Links a Feedback to its target.</span>
+      </div>
+      <div class="description">
+         <dl>
+            <dt>has domain</dt>
+            <dd>
+               <a href="#Feedback" title="https://w3id.org/won/content#Feedback">Feedback</a>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
+            <dt>has range</dt>
+            <dd>
+               <span class="dotted" title="https://w3id.org/won/core#Atom">atom</span>
+               <sup class="type-c" title="class">c</sup> 
+               <span class="logic">or</span> 
+               <span class="dotted" title="https://w3id.org/won/core#Connection">connection</span>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
+         </dl>
+      </div>
+   </div>
    <div class="entity" id="inResponseTo">
       <h3>inResponseTo<sup class="type-op" title="object property">op</sup>
          <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#objectproperties">Object Property ToC</a>
@@ -84,6 +314,56 @@ This section provides details for each class and property defined by Web of Need
             <dt>has range</dt>
             <dd>
                <span class="dotted" title="https://w3id.org/won/core#Atom">atom</span>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
+         </dl>
+      </div>
+   </div>
+   <div class="entity" id="northWestCorner">
+      <h3>northWestCorner<sup class="type-op" title="object property">op</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#objectproperties">Object Property ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/content#northWestCorner</p>
+      <div class="comment">
+         <span class="markdown">The northwest corner of the bounding box</span>
+      </div>
+      <div class="description">
+         <dl>
+            <dt>has domain</dt>
+            <dd>
+               <a href="#BoundingBox" title="https://w3id.org/won/content#BoundingBox">BoundingBox</a>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
+            <dt>has range</dt>
+            <dd>
+               <span class="dotted" title="http://schema.org/GeoCoordinates">geo coordinates</span>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
+         </dl>
+      </div>
+   </div>
+   <div class="entity" id="southEastCorner">
+      <h3>southEastCorner<sup class="type-op" title="object property">op</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#objectproperties">Object Property ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/content#southEastCorner</p>
+      <div class="comment">
+         <span class="markdown">The southeast corner of the bounding box</span>
+      </div>
+      <div class="description">
+         <dl>
+            <dt>has domain</dt>
+            <dd>
+               <a href="#BoundingBox" title="https://w3id.org/won/content#BoundingBox">BoundingBox</a>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
+            <dt>has range</dt>
+            <dd>
+               <span class="dotted" title="http://schema.org/GeoCoordinates">geo coordinates</span>
                <sup class="type-c" title="class">c</sup>
             </dd>
          </dl>
@@ -149,7 +429,13 @@ This section provides details for each class and property defined by Web of Need
          <a href="#file" title="https://w3id.org/won/content#file">file</a>
       </li>
       <li>
+         <a href="#geoSpatial" title="https://w3id.org/won/content#geoSpatial">geoSpatial</a>
+      </li>
+      <li>
          <a href="#image" title="https://w3id.org/won/content#image">image</a>
+      </li>
+      <li>
+         <a href="#isProcessing" title="https://w3id.org/won/content#isProcessing">isProcessing</a>
       </li>
       <li>
          <a href="#petriNet" title="https://w3id.org/won/content#petriNet">petriNet</a>
@@ -215,6 +501,27 @@ This section provides details for each class and property defined by Web of Need
          </dl>
       </div>
    </div>
+   <div class="entity" id="geoSpatial">
+      <h3>geoSpatial<sup class="type-dp" title="data property">dp</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#dataproperties">Data Property ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/content#geoSpatial</p>
+      <div class="comment">
+         <span class="markdown">The geolocation of the object in one value in the format `{latitude}#{longitude}^^http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon` - used for geospatial search in bigdata/blazegraph</span>
+      </div>
+      <div class="description">
+         <dl>
+            <dt>has range</dt>
+            <dd>
+               <span class="dotted"
+                     title="http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon">lat lon</span>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
+         </dl>
+      </div>
+   </div>
    <div class="entity" id="image">
       <h3>image<sup class="type-dp" title="data property">dp</sup>
          <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#dataproperties">Data Property ToC</a>
@@ -238,6 +545,30 @@ This section provides details for each class and property defined by Web of Need
             <dt>has range</dt>
             <dd>
                <span class="dotted" title="http://www.w3.org/2001/XMLSchema#base64Binary">base64 binary</span>
+            </dd>
+         </dl>
+      </div>
+   </div>
+   <div class="entity" id="isProcessing">
+      <h3>isProcessing<sup class="type-dp" title="data property">dp</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#dataproperties">Data Property ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/content#isProcessing</p>
+      <div class="comment">
+         <span class="markdown">Set on a Message sent to or by a bot to prevent it from re-evaluating its goals in reaction to the message.</span>
+      </div>
+      <div class="description">
+         <dl>
+            <dt>has domain</dt>
+            <dd>
+               <span class="dotted" title="https://w3id.org/won/message#Message">message</span>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
+            <dt>has range</dt>
+            <dd>
+               <span class="dotted" title="http://www.w3.org/2001/XMLSchema#boolean">boolean</span>
             </dd>
          </dl>
       </div>
@@ -316,6 +647,52 @@ This section provides details for each class and property defined by Web of Need
             </dd>
          </dl>
       </div>
+   </div>
+</div><div id="namedindividuals">
+   <h3 id="namedindividuals" class="list">Named Individuals</h3>
+   <ul class="hlist">
+      <li>
+         <a href="#Bad" title="https://w3id.org/won/content#Bad">Bad</a>
+      </li>
+      <li>
+         <a href="#Good" title="https://w3id.org/won/content#Good">Good</a>
+      </li>
+   </ul>
+   <div class="entity" id="Bad">
+      <h3>Bad<sup class="type-ni" title="named individual">ni</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#namedindividuals">Named Individual ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/content#Bad</p>
+      <div class="comment">
+         <span class="markdown">A bad rating</span>
+      </div>
+      <dl class="description">
+         <dt>belongs to</dt>
+         <dd>
+            <a href="#BinaryRating" title="https://w3id.org/won/content#BinaryRating">BinaryRating</a>
+            <sup class="type-c" title="class">c</sup>
+         </dd>
+      </dl>
+   </div>
+   <div class="entity" id="Good">
+      <h3>Good<sup class="type-ni" title="named individual">ni</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#namedindividuals">Named Individual ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/content#Good</p>
+      <div class="comment">
+         <span class="markdown">A good rating</span>
+      </div>
+      <dl class="description">
+         <dt>belongs to</dt>
+         <dd>
+            <a href="#BinaryRating" title="https://w3id.org/won/content#BinaryRating">BinaryRating</a>
+            <sup class="type-c" title="class">c</sup>
+         </dd>
+      </dl>
    </div>
 </div><div id="legend">
 <h2>Legend <span class="backlink"> back to <a href="#toc">ToC</a></span></h2>

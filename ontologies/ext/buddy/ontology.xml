@@ -19,7 +19,7 @@
         <dc:title>Web of Needs Buddy Extension</dc:title>
         <terms:created rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2019-04-15</terms:created>
         <terms:license rdf:resource="https://creativecommons.org/licenses/by/4.0/"/>
-        <vann:preferredNamespacePrefix>bd</vann:preferredNamespacePrefix>
+        <vann:preferredNamespacePrefix>wx-buddy</vann:preferredNamespacePrefix>
         <rdfs:comment xml:lang="en">WoN Buddy Extension for establishing buddy relationships.</rdfs:comment>
     </owl:Ontology>
     

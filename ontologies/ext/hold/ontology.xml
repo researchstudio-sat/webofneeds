@@ -19,7 +19,7 @@
         <dc:date rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2019-04-15</dc:date>
         <dc:title>Web of Needs Hold Extension</dc:title>
         <terms:license rdf:resource="https://creativecommons.org/licenses/by/4.0/"/>
-        <vann:preferredNamespacePrefix>hold</vann:preferredNamespacePrefix>
+        <vann:preferredNamespacePrefix>wx-hold</vann:preferredNamespacePrefix>
     </owl:Ontology>
     
 

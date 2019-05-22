@@ -4,14 +4,44 @@ This ontology has the following classes and properties.</span>
 <h4>Classes</h4>
 <ul class="hlist">
    <li>
+      <a href="#BinaryRating" title="https://w3id.org/won/content#BinaryRating">BinaryRating</a>
+   </li>
+   <li>
+      <a href="#BoundingBox" title="https://w3id.org/won/content#BoundingBox">BoundingBox</a>
+   </li>
+   <li>
       <a href="#DirectResponse" title="https://w3id.org/won/content#DirectResponse">DirectResponse</a>
+   </li>
+   <li>
+      <a href="#Feedback" title="https://w3id.org/won/content#Feedback">Feedback</a>
    </li>
    <li>
       <a href="#ServiceBot" title="https://w3id.org/won/content#ServiceBot">ServiceBot</a>
    </li>
 </ul><h4>Object Properties</h4><ul class="hlist">
    <li>
+      <a href="#binaryRating" title="https://w3id.org/won/content#binaryRating">binaryRating</a>
+   </li>
+   <li>
+      <a href="#boundingBox" title="https://w3id.org/won/content#boundingBox">boundingBox</a>
+   </li>
+   <li>
+      <a href="#feedback" title="https://w3id.org/won/content#feedback">feedback</a>
+   </li>
+   <li>
+      <a href="#feedbackEvent" title="https://w3id.org/won/content#feedbackEvent">feedbackEvent</a>
+   </li>
+   <li>
+      <a href="#feedbackTarget" title="https://w3id.org/won/content#feedbackTarget">feedbackFor</a>
+   </li>
+   <li>
       <a href="#inResponseTo" title="https://w3id.org/won/content#inResponseTo">inResponseTo</a>
+   </li>
+   <li>
+      <a href="#northWestCorner" title="https://w3id.org/won/content#northWestCorner">northWestCorner</a>
+   </li>
+   <li>
+      <a href="#southEastCorner" title="https://w3id.org/won/content#southEastCorner">southEastCorner</a>
    </li>
    <li>
       <a href="#suggestedAtom" title="https://w3id.org/won/content#suggestedAtom">suggestedAtom</a>
@@ -27,7 +57,13 @@ This ontology has the following classes and properties.</span>
       <a href="#file" title="https://w3id.org/won/content#file">file</a>
    </li>
    <li>
+      <a href="#geoSpatial" title="https://w3id.org/won/content#geoSpatial">geoSpatial</a>
+   </li>
+   <li>
       <a href="#image" title="https://w3id.org/won/content#image">image</a>
+   </li>
+   <li>
+      <a href="#isProcessing" title="https://w3id.org/won/content#isProcessing">isProcessing</a>
    </li>
    <li>
       <a href="#petriNet" title="https://w3id.org/won/content#petriNet">petriNet</a>
@@ -37,5 +73,12 @@ This ontology has the following classes and properties.</span>
    </li>
    <li>
       <a href="#text" title="https://w3id.org/won/content#text">text</a>
+   </li>
+</ul><h4>Named Individuals</h4><ul class="hlist">
+   <li>
+      <a href="#Bad" title="https://w3id.org/won/content#Bad">Bad</a>
+   </li>
+   <li>
+      <a href="#Good" title="https://w3id.org/won/content#Good">Good</a>
    </li>
 </ul></html>

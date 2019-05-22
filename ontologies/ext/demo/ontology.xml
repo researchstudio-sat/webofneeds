@@ -16,7 +16,7 @@
         <dc:title>Web of Needs Demo Extension</dc:title>
         <terms:created rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2019-05-20</terms:created>
         <terms:license rdf:resource="https://creativecommons.org/licenses/by/4.0/"/>
-        <vann:preferredNamespacePrefix>demo</vann:preferredNamespacePrefix>
+        <vann:preferredNamespacePrefix>wx-demo</vann:preferredNamespacePrefix>
     </owl:Ontology>
     
 
@@ -283,6 +283,16 @@
     <owl:Class rdf:about="https://w3id.org/won/ext/demo#PostDocSearch">
         <rdfs:comment xml:lang="en">Search for a PostDoc position</rdfs:comment>
         <rdfs:label>PostDocSearch</rdfs:label>
+    </owl:Class>
+    
+
+
+    <!-- https://w3id.org/won/ext/demo#PureSearch -->
+
+
+    <owl:Class rdf:about="https://w3id.org/won/ext/demo#PureSearch">
+        <rdfs:comment xml:lang="en">Class for Atoms that are just searches (defining a search String via match:searchString).</rdfs:comment>
+        <rdfs:label>PureSearch</rdfs:label>
     </owl:Class>
     
 

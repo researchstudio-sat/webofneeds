@@ -14,7 +14,7 @@
                                  <http://purl.org/dc/elements/1.1/title> "Web of Needs Chat Extension" ;
                                  <http://purl.org/dc/terms/created> "2019-04-15"^^xsd:date ;
                                  <http://purl.org/dc/terms/license> <https://creativecommons.org/licenses/by/4.0/> ;
-                                 <http://purl.org/vocab/vann/preferredNamespacePrefix> "chat" .
+                                 <http://purl.org/vocab/vann/preferredNamespacePrefix> "wx-chat" .
 
 #################################################################
 #    Annotation properties

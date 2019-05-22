@@ -6,7 +6,7 @@
 <https://w3id.org/won/content> <http://purl.org/dc/elements/1.1/created> "2019-05-14"^^<http://www.w3.org/2001/XMLSchema#date> .
 <https://w3id.org/won/content> <http://purl.org/dc/elements/1.1/title> "Web of Needs Content Ontology"@en .
 <https://w3id.org/won/content> <http://purl.org/dc/terms/license> "https://creativecommons.org/licenses/by/4.0/" .
-<https://w3id.org/won/content> <http://purl.org/vocab/vann/preferredNamespacePrefix> "wcnt" .
+<https://w3id.org/won/content> <http://purl.org/vocab/vann/preferredNamespacePrefix> "con" .
 # 
 # 
 # #################################################################
@@ -35,23 +35,92 @@
 # 
 # #################################################################
 # #
+# #    Datatypes
+# #
+# #################################################################
+# 
+# 
+# http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon
+<http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2000/01/rdf-schema#Datatype> .
+# 
+# 
+# 
+# #################################################################
+# #
 # #    Object Properties
 # #
 # #################################################################
 # 
 # 
+# https://w3id.org/won/content#binaryRating
+<https://w3id.org/won/content#binaryRating> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+<https://w3id.org/won/content#binaryRating> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/content#Feedback> .
+<https://w3id.org/won/content#binaryRating> <http://www.w3.org/2000/01/rdf-schema#range> <https://w3id.org/won/content#BinaryRating> .
+<https://w3id.org/won/content#binaryRating> <http://www.w3.org/2000/01/rdf-schema#comment> "Specifies a binary rating for a Feedback"@en .
+<https://w3id.org/won/content#binaryRating> <http://www.w3.org/2000/01/rdf-schema#label> "binaryRating" .
+# 
+# https://w3id.org/won/content#boundingBox
+<https://w3id.org/won/content#boundingBox> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+<https://w3id.org/won/content#boundingBox> <http://www.w3.org/2000/01/rdf-schema#domain> <http://schema.org/Place> .
+<https://w3id.org/won/content#boundingBox> <http://www.w3.org/2000/01/rdf-schema#range> <https://w3id.org/won/content#BoundingBox> .
+<https://w3id.org/won/content#boundingBox> <http://www.w3.org/2000/01/rdf-schema#comment> "Specifies a bounding box for a schema:Place"@en .
+<https://w3id.org/won/content#boundingBox> <http://www.w3.org/2000/01/rdf-schema#label> "boundingBox" .
+# 
+# https://w3id.org/won/content#feedback
+<https://w3id.org/won/content#feedback> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+<https://w3id.org/won/content#feedback> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/message#Message> .
+<https://w3id.org/won/content#feedback> <http://www.w3.org/2000/01/rdf-schema#range> <https://w3id.org/won/content#Feedback> .
+<https://w3id.org/won/content#feedback> <http://www.w3.org/2000/01/rdf-schema#comment> "Adds feedback to a message."@en .
+<https://w3id.org/won/content#feedback> <http://www.w3.org/2000/01/rdf-schema#label> "feedback" .
+# 
+# https://w3id.org/won/content#feedbackEvent
+<https://w3id.org/won/content#feedbackEvent> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+<https://w3id.org/won/content#feedbackEvent> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/core#Connection> .
+<https://w3id.org/won/core#Connection> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<https://w3id.org/won/content#feedbackEvent> <http://www.w3.org/2000/01/rdf-schema#range> <https://w3id.org/won/message#Message> .
+<https://w3id.org/won/content#feedbackEvent> <http://www.w3.org/2000/01/rdf-schema#comment> "Links a message containing Feedback to a Connection."@en .
+<https://w3id.org/won/content#feedbackEvent> <http://www.w3.org/2000/01/rdf-schema#label> "feedbackEvent"@en .
+# 
+# https://w3id.org/won/content#feedbackTarget
+<https://w3id.org/won/content#feedbackTarget> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+<https://w3id.org/won/content#feedbackTarget> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/content#Feedback> .
+<https://w3id.org/won/content#feedbackTarget> <http://www.w3.org/2000/01/rdf-schema#range> _:genid1 .
+_:genid1 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+_:genid1 <http://www.w3.org/2002/07/owl#unionOf> _:genid3 .
+_:genid3 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
+_:genid3 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/core#Atom> .
+<https://w3id.org/won/core#Atom> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+_:genid3 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:genid2 .
+_:genid2 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
+_:genid2 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/core#Connection> .
+_:genid2 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/1999/02/22-rdf-syntax-ns#nil> .
+<https://w3id.org/won/content#feedbackTarget> <http://www.w3.org/2000/01/rdf-schema#comment> "Links a Feedback to its target."@en .
+<https://w3id.org/won/content#feedbackTarget> <http://www.w3.org/2000/01/rdf-schema#label> "feedbackFor" .
+# 
 # https://w3id.org/won/content#inResponseTo
 <https://w3id.org/won/content#inResponseTo> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
 <https://w3id.org/won/content#inResponseTo> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/content#DirectResponse> .
 <https://w3id.org/won/content#inResponseTo> <http://www.w3.org/2000/01/rdf-schema#range> <https://w3id.org/won/core#Atom> .
-<https://w3id.org/won/core#Atom> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
 <https://w3id.org/won/content#inResponseTo> <http://www.w3.org/2000/01/rdf-schema#comment> "An Atom that was created in order to directly respond to another links to that Atom with this property."@en .
 <https://w3id.org/won/content#inResponseTo> <http://www.w3.org/2000/01/rdf-schema#label> "inResponseTo" .
+# 
+# https://w3id.org/won/content#northWestCorner
+<https://w3id.org/won/content#northWestCorner> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+<https://w3id.org/won/content#northWestCorner> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/content#BoundingBox> .
+<https://w3id.org/won/content#northWestCorner> <http://www.w3.org/2000/01/rdf-schema#range> <http://schema.org/GeoCoordinates> .
+<https://w3id.org/won/content#northWestCorner> <http://www.w3.org/2000/01/rdf-schema#comment> "The northwest corner of the bounding box"@en .
+<https://w3id.org/won/content#northWestCorner> <http://www.w3.org/2000/01/rdf-schema#label> "northWestCorner" .
+# 
+# https://w3id.org/won/content#southEastCorner
+<https://w3id.org/won/content#southEastCorner> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+<https://w3id.org/won/content#southEastCorner> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/content#BoundingBox> .
+<https://w3id.org/won/content#southEastCorner> <http://www.w3.org/2000/01/rdf-schema#range> <http://schema.org/GeoCoordinates> .
+<https://w3id.org/won/content#southEastCorner> <http://www.w3.org/2000/01/rdf-schema#comment> "The southeast corner of the bounding box"@en .
+<https://w3id.org/won/content#southEastCorner> <http://www.w3.org/2000/01/rdf-schema#label> "southEastCorner" .
 # 
 # https://w3id.org/won/content#suggestedAtom
 <https://w3id.org/won/content#suggestedAtom> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
 <https://w3id.org/won/content#suggestedAtom> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/message#Message> .
-<https://w3id.org/won/message#Message> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
 <https://w3id.org/won/content#suggestedAtom> <http://www.w3.org/2000/01/rdf-schema#range> <https://w3id.org/won/core#Atom> .
 <https://w3id.org/won/content#suggestedAtom> <http://www.w3.org/2000/01/rdf-schema#comment> "Suggests to the recipient of the message to connect to the Atom linked to with this property."@en .
 <https://w3id.org/won/content#suggestedAtom> <http://www.w3.org/2000/01/rdf-schema#label> "suggestedAtom" .
@@ -60,7 +129,6 @@
 <https://w3id.org/won/content#travelAction> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
 <https://w3id.org/won/content#travelAction> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/core#Atom> .
 <https://w3id.org/won/content#travelAction> <http://www.w3.org/2000/01/rdf-schema#range> <http://schema.org/TravelAction> .
-<http://schema.org/TravelAction> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
 <https://w3id.org/won/content#travelAction> <http://www.w3.org/2000/01/rdf-schema#comment> "Links the Atom to a schema:TravelAction, indicating that this action is what is being offered/suggested."@en .
 <https://w3id.org/won/content#travelAction> <http://www.w3.org/2000/01/rdf-schema#label> "travelAction" .
 # 
@@ -75,22 +143,7 @@
 # 
 # https://w3id.org/won/content#bpmnWorkflow
 <https://w3id.org/won/content#bpmnWorkflow> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
-<https://w3id.org/won/content#bpmnWorkflow> <http://www.w3.org/2000/01/rdf-schema#domain> _:genid1 .
-_:genid1 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
-_:genid1 <http://www.w3.org/2002/07/owl#unionOf> _:genid3 .
-_:genid3 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
-_:genid3 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/core#Atom> .
-_:genid3 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:genid2 .
-_:genid2 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
-_:genid2 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/message#Message> .
-_:genid2 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/1999/02/22-rdf-syntax-ns#nil> .
-<https://w3id.org/won/content#bpmnWorkflow> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#base64Binary> .
-<https://w3id.org/won/content#bpmnWorkflow> <http://www.w3.org/2000/01/rdf-schema#comment> "A BPMN conformant XML file in base 64 encoding."@en .
-<https://w3id.org/won/content#bpmnWorkflow> <http://www.w3.org/2000/01/rdf-schema#label> "bpmnWorkflow" .
-# 
-# https://w3id.org/won/content#file
-<https://w3id.org/won/content#file> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
-<https://w3id.org/won/content#file> <http://www.w3.org/2000/01/rdf-schema#domain> _:genid4 .
+<https://w3id.org/won/content#bpmnWorkflow> <http://www.w3.org/2000/01/rdf-schema#domain> _:genid4 .
 _:genid4 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
 _:genid4 <http://www.w3.org/2002/07/owl#unionOf> _:genid6 .
 _:genid6 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
@@ -99,13 +152,13 @@ _:genid6 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:genid5 .
 _:genid5 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
 _:genid5 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/message#Message> .
 _:genid5 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/1999/02/22-rdf-syntax-ns#nil> .
-<https://w3id.org/won/content#file> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#base64Binary> .
-<https://w3id.org/won/content#file> <http://www.w3.org/2000/01/rdf-schema#comment> "A file in base64 encoding."@en .
-<https://w3id.org/won/content#file> <http://www.w3.org/2000/01/rdf-schema#label> "file" .
+<https://w3id.org/won/content#bpmnWorkflow> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#base64Binary> .
+<https://w3id.org/won/content#bpmnWorkflow> <http://www.w3.org/2000/01/rdf-schema#comment> "A BPMN conformant XML file in base 64 encoding."@en .
+<https://w3id.org/won/content#bpmnWorkflow> <http://www.w3.org/2000/01/rdf-schema#label> "bpmnWorkflow" .
 # 
-# https://w3id.org/won/content#image
-<https://w3id.org/won/content#image> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
-<https://w3id.org/won/content#image> <http://www.w3.org/2000/01/rdf-schema#domain> _:genid7 .
+# https://w3id.org/won/content#file
+<https://w3id.org/won/content#file> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
+<https://w3id.org/won/content#file> <http://www.w3.org/2000/01/rdf-schema#domain> _:genid7 .
 _:genid7 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
 _:genid7 <http://www.w3.org/2002/07/owl#unionOf> _:genid9 .
 _:genid9 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
@@ -114,13 +167,19 @@ _:genid9 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:genid8 .
 _:genid8 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
 _:genid8 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/message#Message> .
 _:genid8 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/1999/02/22-rdf-syntax-ns#nil> .
-<https://w3id.org/won/content#image> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#base64Binary> .
-<https://w3id.org/won/content#image> <http://www.w3.org/2000/01/rdf-schema#comment> "Image data in base64 encoding."@en .
-<https://w3id.org/won/content#image> <http://www.w3.org/2000/01/rdf-schema#label> "image" .
+<https://w3id.org/won/content#file> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#base64Binary> .
+<https://w3id.org/won/content#file> <http://www.w3.org/2000/01/rdf-schema#comment> "A file in base64 encoding."@en .
+<https://w3id.org/won/content#file> <http://www.w3.org/2000/01/rdf-schema#label> "file" .
 # 
-# https://w3id.org/won/content#petriNet
-<https://w3id.org/won/content#petriNet> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
-<https://w3id.org/won/content#petriNet> <http://www.w3.org/2000/01/rdf-schema#domain> _:genid10 .
+# https://w3id.org/won/content#geoSpatial
+<https://w3id.org/won/content#geoSpatial> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
+<https://w3id.org/won/content#geoSpatial> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon> .
+<https://w3id.org/won/content#geoSpatial> <http://www.w3.org/2000/01/rdf-schema#comment> "The geolocation of the object in one value in the format `{latitude}#{longitude}^^http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon` - used for geospatial search in bigdata/blazegraph"@en .
+<https://w3id.org/won/content#geoSpatial> <http://www.w3.org/2000/01/rdf-schema#label> "geoSpatial" .
+# 
+# https://w3id.org/won/content#image
+<https://w3id.org/won/content#image> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
+<https://w3id.org/won/content#image> <http://www.w3.org/2000/01/rdf-schema#domain> _:genid10 .
 _:genid10 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
 _:genid10 <http://www.w3.org/2002/07/owl#unionOf> _:genid12 .
 _:genid12 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
@@ -129,6 +188,28 @@ _:genid12 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:genid11 .
 _:genid11 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
 _:genid11 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/message#Message> .
 _:genid11 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/1999/02/22-rdf-syntax-ns#nil> .
+<https://w3id.org/won/content#image> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#base64Binary> .
+<https://w3id.org/won/content#image> <http://www.w3.org/2000/01/rdf-schema#comment> "Image data in base64 encoding."@en .
+<https://w3id.org/won/content#image> <http://www.w3.org/2000/01/rdf-schema#label> "image" .
+# 
+# https://w3id.org/won/content#isProcessing
+<https://w3id.org/won/content#isProcessing> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
+<https://w3id.org/won/content#isProcessing> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/message#Message> .
+<https://w3id.org/won/content#isProcessing> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#boolean> .
+<https://w3id.org/won/content#isProcessing> <http://www.w3.org/2000/01/rdf-schema#comment> "Set on a Message sent to or by a bot to prevent it from re-evaluating its goals in reaction to the message."@en .
+<https://w3id.org/won/content#isProcessing> <http://www.w3.org/2000/01/rdf-schema#label> "isProcessing" .
+# 
+# https://w3id.org/won/content#petriNet
+<https://w3id.org/won/content#petriNet> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
+<https://w3id.org/won/content#petriNet> <http://www.w3.org/2000/01/rdf-schema#domain> _:genid13 .
+_:genid13 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+_:genid13 <http://www.w3.org/2002/07/owl#unionOf> _:genid15 .
+_:genid15 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
+_:genid15 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/core#Atom> .
+_:genid15 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:genid14 .
+_:genid14 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
+_:genid14 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/message#Message> .
+_:genid14 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/1999/02/22-rdf-syntax-ns#nil> .
 <https://w3id.org/won/content#petriNet> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#base64Binary> .
 <https://w3id.org/won/content#petriNet> <http://www.w3.org/2000/01/rdf-schema#comment> "The base64 serialization of  the XML file exported from PIPE (https://github.com/sarahtattersall/PIPE)"@en .
 <https://w3id.org/won/content#petriNet> <http://www.w3.org/2000/01/rdf-schema#label> "petriNet" .
@@ -156,13 +237,38 @@ _:genid11 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/1
 # #################################################################
 # 
 # 
+# http://schema.org/GeoCoordinates
+<http://schema.org/GeoCoordinates> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+# 
+# http://schema.org/Place
+<http://schema.org/Place> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+# 
 # http://schema.org/TravelAction
+<http://schema.org/TravelAction> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+# 
+# http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon
+<http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+# 
+# https://w3id.org/won/content#BinaryRating
+<https://w3id.org/won/content#BinaryRating> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<https://w3id.org/won/content#BinaryRating> <http://www.w3.org/2000/01/rdf-schema#comment> "Binary rating values."@en .
+<https://w3id.org/won/content#BinaryRating> <http://www.w3.org/2000/01/rdf-schema#label> "BinaryRating" .
+# 
+# https://w3id.org/won/content#BoundingBox
+<https://w3id.org/won/content#BoundingBox> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<https://w3id.org/won/content#BoundingBox> <http://www.w3.org/2000/01/rdf-schema#comment> "The bounding box around a location, used for calculating the map viewport when displaying it."@en .
+<https://w3id.org/won/content#BoundingBox> <http://www.w3.org/2000/01/rdf-schema#label> "BoundingBox" .
 # 
 # https://w3id.org/won/content#DirectResponse
 <https://w3id.org/won/content#DirectResponse> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
 <https://w3id.org/won/content#DirectResponse> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <https://w3id.org/won/core#Atom> .
 <https://w3id.org/won/content#DirectResponse> <http://www.w3.org/2000/01/rdf-schema#comment> "An Atom of this class indicates that it was created for directly responding to another Atom."@en .
 <https://w3id.org/won/content#DirectResponse> <http://www.w3.org/2000/01/rdf-schema#label> "DirectResponse" .
+# 
+# https://w3id.org/won/content#Feedback
+<https://w3id.org/won/content#Feedback> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<https://w3id.org/won/content#Feedback> <http://www.w3.org/2000/01/rdf-schema#comment> "Feedback for an Atom or Connection"@en .
+<https://w3id.org/won/content#Feedback> <http://www.w3.org/2000/01/rdf-schema#label> "Feedback" .
 # 
 # https://w3id.org/won/content#ServiceBot
 <https://w3id.org/won/content#ServiceBot> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
@@ -172,6 +278,30 @@ _:genid11 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/1
 # 
 # https://w3id.org/won/core#Atom
 # 
+# https://w3id.org/won/core#Connection
+# 
 # https://w3id.org/won/message#Message
+<https://w3id.org/won/message#Message> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+# 
+# 
+# 
+# #################################################################
+# #
+# #    Individuals
+# #
+# #################################################################
+# 
+# 
+# https://w3id.org/won/content#Bad
+<https://w3id.org/won/content#Bad> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
+<https://w3id.org/won/content#Bad> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/content#BinaryRating> .
+<https://w3id.org/won/content#Bad> <http://www.w3.org/2000/01/rdf-schema#comment> "A bad rating" .
+<https://w3id.org/won/content#Bad> <http://www.w3.org/2000/01/rdf-schema#label> "Bad" .
+# 
+# https://w3id.org/won/content#Good
+<https://w3id.org/won/content#Good> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
+<https://w3id.org/won/content#Good> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/content#BinaryRating> .
+<https://w3id.org/won/content#Good> <http://www.w3.org/2000/01/rdf-schema#comment> "A good rating" .
+<https://w3id.org/won/content#Good> <http://www.w3.org/2000/01/rdf-schema#label> "Good" .
 # 
 # Generated by the OWL API (version 5.1.9) https://github.com/owlcs/owlapi/

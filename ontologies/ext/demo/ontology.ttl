@@ -13,7 +13,7 @@
                                  <http://purl.org/dc/elements/1.1/title> "Web of Needs Demo Extension" ;
                                  <http://purl.org/dc/terms/created> "2019-05-20"^^xsd:date ;
                                  <http://purl.org/dc/terms/license> <https://creativecommons.org/licenses/by/4.0/> ;
-                                 <http://purl.org/vocab/vann/preferredNamespacePrefix> "demo" .
+                                 <http://purl.org/vocab/vann/preferredNamespacePrefix> "wx-demo" .
 
 #################################################################
 #    Annotation properties
@@ -163,6 +163,12 @@
 :PostDocSearch rdf:type owl:Class ;
                rdfs:comment "Search for a PostDoc position"@en ;
                rdfs:label "PostDocSearch" .
+
+
+###  https://w3id.org/won/ext/demo#PureSearch
+:PureSearch rdf:type owl:Class ;
+            rdfs:comment "Class for Atoms that are just searches (defining a search String via match:searchString)."@en ;
+            rdfs:label "PureSearch" .
 
 
 ###  https://w3id.org/won/ext/demo#RealEstateRentDemand

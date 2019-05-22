@@ -18,7 +18,7 @@
         <dc:title>Web of Needs Chat Extension</dc:title>
         <terms:created rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2019-04-15</terms:created>
         <terms:license rdf:resource="https://creativecommons.org/licenses/by/4.0/"/>
-        <vann:preferredNamespacePrefix>chat</vann:preferredNamespacePrefix>
+        <vann:preferredNamespacePrefix>wx-chat</vann:preferredNamespacePrefix>
     </owl:Ontology>
     
 

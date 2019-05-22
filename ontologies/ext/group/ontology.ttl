@@ -15,7 +15,7 @@
                                   <http://purl.org/dc/elements/1.1/date> "2019-04-15"^^xsd:date ;
                                   <http://purl.org/dc/elements/1.1/title> "Web of Needs Group Extension" ;
                                   <http://purl.org/dc/terms/license> <https://creativecommons.org/licenses/by/4.0/> ;
-                                  <http://purl.org/vocab/vann/preferredNamespacePrefix> "grp" .
+                                  <http://purl.org/vocab/vann/preferredNamespacePrefix> "wx-group" .
 
 #################################################################
 #    Annotation properties

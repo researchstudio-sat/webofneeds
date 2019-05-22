@@ -49,7 +49,7 @@
   },
   "namespace" : [ ],
   "class" : [ {
-    "id" : "1",
+    "id" : "0",
     "type" : "owl:Class"
   } ],
   "classAttribute" : [ {
@@ -60,25 +60,25 @@
       "IRI-based" : "Message"
     },
     "attributes" : [ "external" ],
-    "id" : "1"
+    "id" : "0"
   } ],
   "property" : [ {
-    "id" : "0",
+    "id" : "1",
     "type" : "owl:objectProperty"
   } ],
   "propertyAttribute" : [ {
     "iri" : "https://w3id.org/won/modification#retracts",
     "baseIri" : "https://w3id.org/won/modification",
-    "range" : "1",
+    "range" : "0",
     "label" : {
       "IRI-based" : "retracts",
       "undefined" : "retracts"
     },
-    "domain" : "1",
+    "domain" : "0",
     "comment" : {
       "en" : "Used for message editing. The subject and object must both be a Message. The meaning of the statement is that the subject Message causes retraction of the object Message.\n\nRetracting a Message has the effect that in the projection from the acknowledged conversation dataset to the modified conversation dataset, all content graphs of that message are omitted."
     },
     "attributes" : [ "object" ],
-    "id" : "0"
+    "id" : "1"
   } ]
 }

@@ -5,7 +5,7 @@
 <https://w3id.org/won/ext/demo> <http://purl.org/dc/elements/1.1/title> "Web of Needs Demo Extension" .
 <https://w3id.org/won/ext/demo> <http://purl.org/dc/terms/created> "2019-05-20"^^<http://www.w3.org/2001/XMLSchema#date> .
 <https://w3id.org/won/ext/demo> <http://purl.org/dc/terms/license> <https://creativecommons.org/licenses/by/4.0/> .
-<https://w3id.org/won/ext/demo> <http://purl.org/vocab/vann/preferredNamespacePrefix> "demo" .
+<https://w3id.org/won/ext/demo> <http://purl.org/vocab/vann/preferredNamespacePrefix> "wx-demo" .
 # 
 # 
 # #################################################################
@@ -145,6 +145,11 @@
 <https://w3id.org/won/ext/demo#PostDocSearch> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
 <https://w3id.org/won/ext/demo#PostDocSearch> <http://www.w3.org/2000/01/rdf-schema#comment> "Search for a PostDoc position"@en .
 <https://w3id.org/won/ext/demo#PostDocSearch> <http://www.w3.org/2000/01/rdf-schema#label> "PostDocSearch" .
+# 
+# https://w3id.org/won/ext/demo#PureSearch
+<https://w3id.org/won/ext/demo#PureSearch> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<https://w3id.org/won/ext/demo#PureSearch> <http://www.w3.org/2000/01/rdf-schema#comment> "Class for Atoms that are just searches (defining a search String via match:searchString)."@en .
+<https://w3id.org/won/ext/demo#PureSearch> <http://www.w3.org/2000/01/rdf-schema#label> "PureSearch" .
 # 
 # https://w3id.org/won/ext/demo#RealEstateRentDemand
 <https://w3id.org/won/ext/demo#RealEstateRentDemand> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .

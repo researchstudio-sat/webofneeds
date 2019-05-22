@@ -7,7 +7,7 @@
 <https://w3id.org/won/ext/pogo> <http://purl.org/dc/elements/1.1/title> "Web of Needs Pokémon GO Raid Extension" .
 <https://w3id.org/won/ext/pogo> <http://purl.org/dc/terms/created> "2019-05-21" .
 <https://w3id.org/won/ext/pogo> <http://purl.org/dc/terms/license> <https://creativecommons.org/licenses/by/4.0/> .
-<https://w3id.org/won/ext/pogo> <http://purl.org/vocab/vann/preferredNamespacePrefix> "pgo" .
+<https://w3id.org/won/ext/pogo> <http://purl.org/vocab/vann/preferredNamespacePrefix> "wx-pogo" .
 # 
 # 
 # #################################################################

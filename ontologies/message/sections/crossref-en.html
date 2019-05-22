@@ -170,7 +170,8 @@ This section provides details for each class and property defined by Web of Need
             <a href="#content" title="https://w3id.org/won/message#content">content</a>
             <sup class="type-op" title="object property">op</sup>, <a href="#correspondingRemoteMessage"
                title="https://w3id.org/won/message#correspondingRemoteMessage">correspondingRemoteMessage</a>
-            <sup class="type-op" title="object property">op</sup>, <a href="#messageType" title="https://w3id.org/won/message#messageType">messageType</a>
+            <sup class="type-op" title="object property">op</sup>, <a href="#hintScore" title="https://w3id.org/won/message#hintScore">hintScore</a>
+            <sup class="type-dp" title="data property">dp</sup>, <a href="#messageType" title="https://w3id.org/won/message#messageType">messageType</a>
             <sup class="type-op" title="object property">op</sup>, <a href="#previousMessage" title="https://w3id.org/won/message#previousMessage">previousMessage</a>
             <sup class="type-op" title="object property">op</sup>, <a href="#protocolVersion" title="https://w3id.org/won/message#protocolVersion">protocolVersion</a>
             <sup class="type-dp" title="data property">dp</sup>, <a href="#receivedTimestamp" title="https://w3id.org/won/message#receivedTimestamp">receivedTimestamp</a>
@@ -253,6 +254,7 @@ This section provides details for each class and property defined by Web of Need
          <dt>has members</dt>
          <dd>
             <a href="#ActivateMessage" title="https://w3id.org/won/message#ActivateMessage">ActivateMessage</a>
+            <sup class="type-ni" title="named individual">ni</sup>, <a href="#AtomHintMessage" title="https://w3id.org/won/message#AtomHintMessage">AtomHintMessage</a>
             <sup class="type-ni" title="named individual">ni</sup>, <a href="#AtomMessage" title="https://w3id.org/won/message#AtomMessage">AtomMessage</a>
             <sup class="type-ni" title="named individual">ni</sup>, <a href="#ChangeNotificationMessage"
                title="https://w3id.org/won/message#ChangeNotificationMessage">ChangeNotificationMessage</a>
@@ -261,9 +263,9 @@ This section provides details for each class and property defined by Web of Need
             <sup class="type-ni" title="named individual">ni</sup>, <a href="#ConnectionMessage" title="https://w3id.org/won/message#ConnectionMessage">ConnectionMessage</a>
             <sup class="type-ni" title="named individual">ni</sup>, <a href="#CreateMessage" title="https://w3id.org/won/message#CreateMessage">CreateMessage</a>
             <sup class="type-ni" title="named individual">ni</sup>, <a href="#DeactivateMessage" title="https://w3id.org/won/message#DeactivateMessage">DeactivateMessage</a>
-            <sup class="type-ni" title="named individual">ni</sup>, <a href="#HintMessage" title="https://w3id.org/won/message#HintMessage">HintMessage</a>
             <sup class="type-ni" title="named individual">ni</sup>, <a href="#OpenMessage" title="https://w3id.org/won/message#OpenMessage">OpenMessage</a>
             <sup class="type-ni" title="named individual">ni</sup>, <a href="#ReplaceMessage" title="https://w3id.org/won/message#ReplaceMessage">ReplaceMessage</a>
+            <sup class="type-ni" title="named individual">ni</sup>, <a href="#SocketHintMessage" title="https://w3id.org/won/message#SocketHintMessage">SocketHintMessage</a>
             <sup class="type-ni" title="named individual">ni</sup>
          </dd>
          <dt>is disjoint with</dt>
@@ -327,6 +329,12 @@ This section provides details for each class and property defined by Web of Need
       <li>
          <a href="#correspondingRemoteMessage"
             title="https://w3id.org/won/message#correspondingRemoteMessage">correspondingRemoteMessage</a>
+      </li>
+      <li>
+         <a href="#hintTargetAtom" title="https://w3id.org/won/message#hintTargetAtom">hintTargetAtom</a>
+      </li>
+      <li>
+         <a href="#hintTargetSocket" title="https://w3id.org/won/message#hintTargetSocket">hintTargetSocket</a>
       </li>
       <li>
          <a href="#messageType" title="https://w3id.org/won/message#messageType">messageType</a>
@@ -455,6 +463,28 @@ This section provides details for each class and property defined by Web of Need
                <sup class="type-c" title="class">c</sup>
             </dd>
          </dl>
+      </div>
+   </div>
+   <div class="entity" id="hintTargetAtom">
+      <h3>hintTargetAtom<sup class="type-op" title="object property">op</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#objectproperties">Object Property ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/message#hintTargetAtom</p>
+      <div class="comment">
+         <span class="markdown">The target Atom of the AtomHintMessage. By sending this message, the sender wants to express that the Atom's owner may want to establish a connection with the targetAtom (but first must choose a suitable pair of sockets), or that the targetAtom may just be interesting for the owner for other reasons.</span>
+      </div>
+   </div>
+   <div class="entity" id="hintTargetSocket">
+      <h3>hintTargetSocket<sup class="type-op" title="object property">op</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#objectproperties">Object Property ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/message#hintTargetSocket</p>
+      <div class="comment">
+         <span class="markdown">The target Socket of a SocketHintMessage. By sending this message it is suggested to establish a connection between the recipientSocket and the targetSocket.</span>
       </div>
    </div>
    <div class="entity" id="messageType">
@@ -732,6 +762,9 @@ This section provides details for each class and property defined by Web of Need
          <a href="#hash" title="https://w3id.org/won/message#hash">hash</a>
       </li>
       <li>
+         <a href="#hintScore" title="https://w3id.org/won/message#hintScore">hintScore</a>
+      </li>
+      <li>
          <a href="#protocolVersion" title="https://w3id.org/won/message#protocolVersion">protocolVersion</a>
       </li>
       <li>
@@ -766,6 +799,30 @@ This section provides details for each class and property defined by Web of Need
             <dt>has range</dt>
             <dd>
                <span class="dotted" title="http://www.w3.org/2001/XMLSchema#string">string</span>
+            </dd>
+         </dl>
+      </div>
+   </div>
+   <div class="entity" id="hintScore">
+      <h3>hintScore<sup class="type-dp" title="data property">dp</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#dataproperties">Data Property ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/message#hintScore</p>
+      <div class="comment">
+         <span class="markdown">Score of the Hint, indicating how well-suited the sender of the Hint thinks it is for the recipient. Must be in the range of 0.0 (worst) and 1.0 (best).</span>
+      </div>
+      <div class="description">
+         <dl>
+            <dt>has domain</dt>
+            <dd>
+               <a href="#Message" title="https://w3id.org/won/message#Message">Message</a>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
+            <dt>has range</dt>
+            <dd>
+               <span class="dotted" title="http://www.w3.org/2001/XMLSchema#float">float</span>
             </dd>
          </dl>
       </div>
@@ -871,6 +928,9 @@ This section provides details for each class and property defined by Web of Need
          <a href="#ActivateMessage" title="https://w3id.org/won/message#ActivateMessage">ActivateMessage</a>
       </li>
       <li>
+         <a href="#AtomHintMessage" title="https://w3id.org/won/message#AtomHintMessage">AtomHintMessage</a>
+      </li>
+      <li>
          <a href="#AtomMessage" title="https://w3id.org/won/message#AtomMessage">AtomMessage</a>
       </li>
       <li>
@@ -896,13 +956,13 @@ This section provides details for each class and property defined by Web of Need
          <a href="#FailureResponse" title="https://w3id.org/won/message#FailureResponse">FailureResponse</a>
       </li>
       <li>
-         <a href="#HintMessage" title="https://w3id.org/won/message#HintMessage">HintMessage</a>
-      </li>
-      <li>
          <a href="#OpenMessage" title="https://w3id.org/won/message#OpenMessage">OpenMessage</a>
       </li>
       <li>
          <a href="#ReplaceMessage" title="https://w3id.org/won/message#ReplaceMessage">ReplaceMessage</a>
+      </li>
+      <li>
+         <a href="#SocketHintMessage" title="https://w3id.org/won/message#SocketHintMessage">SocketHintMessage</a>
       </li>
       <li>
          <a href="#SuccessResponse" title="https://w3id.org/won/message#SuccessResponse">SuccessResponse</a>
@@ -917,6 +977,30 @@ This section provides details for each class and property defined by Web of Need
          <strong>IRI:</strong> https://w3id.org/won/message#ActivateMessage</p>
       <div class="comment">
          <span class="markdown">Type of message that activates an Atom.</span>
+      </div>
+      <dl class="definedBy">
+         <dt>Is defined by</dt>
+         <dd>
+            <a href="https://w3id.org/won/message">https://w3id.org/won/message</a>
+         </dd>
+      </dl>
+      <dl class="description">
+         <dt>belongs to</dt>
+         <dd>
+            <a href="#MessageType" title="https://w3id.org/won/message#MessageType">MessageType</a>
+            <sup class="type-c" title="class">c</sup>
+         </dd>
+      </dl>
+   </div>
+   <div class="entity" id="AtomHintMessage">
+      <h3>AtomHintMessage<sup class="type-ni" title="named individual">ni</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#namedindividuals">Named Individual ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/message#AtomHintMessage</p>
+      <div class="comment">
+         <span class="markdown">Type of message sent by a matching service to an Atom in order to inform its owner of other Atoms possibly interesting for establishing a connection, or just generally of interest.</span>
       </div>
       <dl class="definedBy">
          <dt>Is defined by</dt>
@@ -1125,30 +1209,6 @@ This section provides details for each class and property defined by Web of Need
          </dd>
       </dl>
    </div>
-   <div class="entity" id="HintMessage">
-      <h3>HintMessage<sup class="type-ni" title="named individual">ni</sup>
-         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#namedindividuals">Named Individual ToC</a>
-         </span>
-      </h3>
-      <p>
-         <strong>IRI:</strong> https://w3id.org/won/message#HintMessage</p>
-      <div class="comment">
-         <span class="markdown">Type of message sent by a matching service to an Atom in order to inform its owner of other Atoms possibly interesting for establishing a connection.</span>
-      </div>
-      <dl class="definedBy">
-         <dt>Is defined by</dt>
-         <dd>
-            <a href="https://w3id.org/won/message">https://w3id.org/won/message</a>
-         </dd>
-      </dl>
-      <dl class="description">
-         <dt>belongs to</dt>
-         <dd>
-            <a href="#MessageType" title="https://w3id.org/won/message#MessageType">MessageType</a>
-            <sup class="type-c" title="class">c</sup>
-         </dd>
-      </dl>
-   </div>
    <div class="entity" id="OpenMessage">
       <h3>OpenMessage<sup class="type-ni" title="named individual">ni</sup>
          <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#namedindividuals">Named Individual ToC</a>
@@ -1189,6 +1249,24 @@ This section provides details for each class and property defined by Web of Need
             <a href="https://w3id.org/won/message">https://w3id.org/won/message</a>
          </dd>
       </dl>
+      <dl class="description">
+         <dt>belongs to</dt>
+         <dd>
+            <a href="#MessageType" title="https://w3id.org/won/message#MessageType">MessageType</a>
+            <sup class="type-c" title="class">c</sup>
+         </dd>
+      </dl>
+   </div>
+   <div class="entity" id="SocketHintMessage">
+      <h3>SocketHintMessage<sup class="type-ni" title="named individual">ni</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#namedindividuals">Named Individual ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/message#SocketHintMessage</p>
+      <div class="comment">
+         <span class="markdown">Type of message sent by a matching service to the Socket of an Atom in order to inform its owner of the Socket of another Atom possibly interesting for establishing a connection.</span>
+      </div>
       <dl class="description">
          <dt>belongs to</dt>
          <dd>

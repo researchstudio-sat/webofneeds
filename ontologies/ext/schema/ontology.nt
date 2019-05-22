@@ -6,7 +6,7 @@
 <https://w3id.org/won/ext/schema> <http://purl.org/dc/elements/1.1/date> "2019-05-03"^^<http://www.w3.org/2001/XMLSchema#date> .
 <https://w3id.org/won/ext/schema> <http://purl.org/dc/elements/1.1/title> "Web of Needs Schema Extension" .
 <https://w3id.org/won/ext/schema> <http://purl.org/dc/terms/license> <https://creativecommons.org/licenses/by/4.0/> .
-<https://w3id.org/won/ext/schema> <http://purl.org/vocab/vann/preferredNamespacePrefix> "wxs" .
+<https://w3id.org/won/ext/schema> <http://purl.org/vocab/vann/preferredNamespacePrefix> "wx-schema" .
 <https://w3id.org/won/ext/schema> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://schema.org> .
 # 
 # 

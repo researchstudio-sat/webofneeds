@@ -14,7 +14,7 @@
                                    <http://purl.org/dc/elements/1.1/date> "2019-05-03"^^xsd:date ;
                                    <http://purl.org/dc/elements/1.1/title> "Web of Needs Schema Extension" ;
                                    <http://purl.org/dc/terms/license> <https://creativecommons.org/licenses/by/4.0/> ;
-                                   <http://purl.org/vocab/vann/preferredNamespacePrefix> "wxs" ;
+                                   <http://purl.org/vocab/vann/preferredNamespacePrefix> "wx-schema" ;
                                    <http://www.w3.org/ns/prov#wasDerivedFrom> <http://schema.org> .
 
 #################################################################

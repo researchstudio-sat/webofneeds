@@ -15,7 +15,7 @@
                                  <http://purl.org/dc/elements/1.1/title> "Web of Needs Pokémon GO Raid Extension" ;
                                  <http://purl.org/dc/terms/created> "2019-05-21" ;
                                  <http://purl.org/dc/terms/license> <https://creativecommons.org/licenses/by/4.0/> ;
-                                 <http://purl.org/vocab/vann/preferredNamespacePrefix> "pgo" .
+                                 <http://purl.org/vocab/vann/preferredNamespacePrefix> "wx-pogo" .
 
 #################################################################
 #    Annotation properties
