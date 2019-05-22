@@ -164,13 +164,40 @@ public class DefaultAtomModelWrapper extends AtomModelWrapper {
     }
 
     public Coordinate getLocationCoordinate(Resource contentNode) {
+        return getLocationCoordinate(contentNode, SCHEMA.LOCATION, WON.location);
+    }
+
+    public Coordinate getJobLocationCoordinate() {
+        return getJobLocationCoordinate(getAtomContentNode());
+    }
+
+    public Coordinate getJobLocationCoordinate(Resource contentNode) {
+        return getLocationCoordinate(contentNode, SCHEMA.JOBLOCATION);
+    }
+
+    private Coordinate getLocationCoordinate(Resource contentNode, Property locationProperty) {
+        return getLocationCoordinate(contentNode, locationProperty, null);
+    }
+
+    /**
+     * Tries to retrieve the coordinates of the location stored in the contentNode
+     * within the given locationProperty
+     * 
+     * @param contentNode contentNode in which the locationProperty is searched for
+     * @param locationProperty e.g SCHEMA.LOCATION or SCHEMA.JOBLOCATION
+     * @param fallbackProperty nullable, will be checked if locationProperty itself
+     * is not present in the contentNode
+     * @return Coordinate if found otherwise null
+     */
+    private Coordinate getLocationCoordinate(Resource contentNode, Property locationProperty,
+                    Property fallbackProperty) {
         Model atomModel = getAtomModel();
         Property geoProperty = atomModel.createProperty("http://schema.org/", "geo");
         Property longitudeProperty = atomModel.createProperty("http://schema.org/", "longitude");
         Property latitudeProperty = atomModel.createProperty("http://schema.org/", "latitude");
-        RDFNode locationNode = RdfUtils.findOnePropertyFromResource(atomModel, contentNode, SCHEMA.LOCATION);
-        if (locationNode == null) {
-            locationNode = RdfUtils.findOnePropertyFromResource(atomModel, contentNode, WON.location);
+        RDFNode locationNode = RdfUtils.findOnePropertyFromResource(atomModel, contentNode, locationProperty);
+        if (fallbackProperty != null && locationNode == null) {
+            locationNode = RdfUtils.findOnePropertyFromResource(atomModel, contentNode, fallbackProperty);
         }
         RDFNode geoNode = (locationNode != null && locationNode.isResource())
                         ? RdfUtils.findOnePropertyFromResource(atomModel, locationNode.asResource(), geoProperty)

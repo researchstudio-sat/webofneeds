@@ -166,7 +166,8 @@ public class RestAtomController {
                                 && ((modifiedAfter == null) || modifiedAfter.isBefore(atom.getModifiedZonedDateTime()))
                                 && ((createdAfter == null) || createdAfter.isBefore(atom.getCreationZonedDateTime()))
                                 && ((nearLocation == null)
-                                                || (isNearLocation(nearLocation, atom.getLocation(), maxDistance)))) {
+                                                || isNearLocation(nearLocation, atom.getLocation(), maxDistance)
+                                                || isNearLocation(nearLocation, atom.getJobLocation(), maxDistance))) {
                     atomMap.put(atom.getUri(), atom);
                     if (limit > 0 && atomMap.size() >= limit)
                         break; // break fetching if the limit has been reached
