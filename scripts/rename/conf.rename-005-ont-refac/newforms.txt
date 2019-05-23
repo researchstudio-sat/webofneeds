@@ -12,6 +12,7 @@
 !con:feedback
 !con:feedbackTarget
 !con:file
+!con:file
 !con:geoSpatial
 !con:image
 !con:inResponseTo
@@ -36,6 +37,7 @@
 !https://w3id.org/won/content#feedback
 !https://w3id.org/won/content#feedbackTarget
 !https://w3id.org/won/content#file
+!https://w3id.org/won/content#file
 !https://w3id.org/won/content#geoSpatial
 !https://w3id.org/won/content#image
 !https://w3id.org/won/content#inResponseTo
@@ -59,6 +61,7 @@
 !WONCON.bpmnWorkflow
 !WONCON.feedback
 !WONCON.feedbackTarget
+!WONCON.file
 !WONCON.file
 !WONCON.geoSpatial
 !WONCON.image

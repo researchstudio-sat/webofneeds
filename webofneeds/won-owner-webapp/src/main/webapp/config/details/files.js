@@ -13,7 +13,7 @@ export const files = {
   messageEnabled: true,
   parseToRDF: function({ value, identifier, contentUri }) {
     if (!value) {
-      return { "won:file": undefined };
+      return { "con:file": undefined };
     }
     let payload = [];
     value.forEach(file => {
@@ -33,12 +33,12 @@ export const files = {
       }
     });
     if (payload.length > 0) {
-      return { "won:file": payload };
+      return { "con:file": payload };
     }
-    return { "won:file": undefined };
+    return { "con:file": undefined };
   },
   parseFromRDF: function(jsonLDImm) {
-    const files = jsonLDImm && jsonLDImm.get("won:file");
+    const files = jsonLDImm && jsonLDImm.get("con:file");
     let parsedFiles = [];
 
     if (Immutable.List.isList(files)) {

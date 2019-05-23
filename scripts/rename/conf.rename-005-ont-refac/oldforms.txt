@@ -12,6 +12,7 @@
 !\<won:feedback\>
 !\<won:forResource\>
 !\<won:hasFile\>
+!\<won:file\>
 !\<won:geoSpatial\>
 !\<won:hasImage\>
 !\<won:responseToUri\>
@@ -36,6 +37,7 @@
 !\<https://w3id.org/won/core#feedback\>
 !\<https://w3id.org/won/core#forResource\>
 !\<https://w3id.org/won/core#hasFile\>
+!\<https://w3id.org/won/core#file\>
 !\<https://w3id.org/won/core#geoSpatial\>
 !\<https://w3id.org/won/core#hasImage\>
 !\<https://w3id.org/won/core#responseToUri\>
@@ -60,6 +62,7 @@
 !\<WON.feedback\>
 !\<WON.forResource\>
 !\<WON.hasFile\>
+!\<WON.file\>
 !\<WON.geoSpatial\>
 !\<WON.hasImage\>
 !\<WON.responseToUri\>
