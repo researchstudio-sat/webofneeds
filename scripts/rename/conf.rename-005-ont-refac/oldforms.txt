@@ -10,6 +10,7 @@
 !\<won:boundingBox\>
 !\<won:hasBpmnWorkflow\>
 !\<won:feedback\>
+!\<won:feedbackEvent\>
 !\<won:forResource\>
 !\<won:hasFile\>
 !\<won:file\>
@@ -35,6 +36,7 @@
 !\<https://w3id.org/won/core#boundingBox\>
 !\<https://w3id.org/won/core#hasBpmnWorkflow\>
 !\<https://w3id.org/won/core#feedback\>
+!\<https://w3id.org/won/core#feedbackEvent\>
 !\<https://w3id.org/won/core#forResource\>
 !\<https://w3id.org/won/core#hasFile\>
 !\<https://w3id.org/won/core#file\>
@@ -60,6 +62,7 @@
 !\<WON.boundingBox\>
 !\<WON.hasBpmnWorkflow\>
 !\<WON.feedback\>
+!\<WON.feedbackEvent\>
 !\<WON.forResource\>
 !\<WON.hasFile\>
 !\<WON.file\>
@@ -84,6 +87,7 @@
 !\<WON.boundingBoxCompacted\>
 !\<WON.hasBpmnWorkflowCompacted\>
 !\<WON.feedbackCompacted\>
+!\<WON.feedbackEventCompacted\>
 !\<WON.forResourceCompacted\>
 !\<WON.hasFileCompacted\>
 !\<WON.geoSpatialCompacted\>

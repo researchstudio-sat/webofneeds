@@ -4,12 +4,12 @@ usage(){
 cat << EOF
 usage: $0 [FORCE]
 
-	Finds all .trig files recursively from the working directory and 
-	prepends prefix declarations for con: and match: 
+	Finds all .java files recursively from the working directory and 
+	prepends imports for WONMATCH and WONCON.
 
 	Parameters:
 		FORCE - really change files
-				without this parameter, files are not changed but written to /tmp/tmpfile.trig
+				without this parameter, files are not changed but written to ${tmpfile}
 EOF
 }
 
@@ -27,6 +27,7 @@ else
 fi
 
 script_name=${BASH_SOURCE[0]##*/}
+
 function error_handler() {
   echo "Error occurred in ${script_name} at line: ${1}."
   echo "Line exited with status: ${2}"
@@ -46,35 +47,39 @@ then
 else 
 	echo -e "\e[32mDry run. Not changing files. Use the FORCE parameter to make changes\e[0m"
 fi
-echo "Recursively searching all trig files, this might take a while..."
-for file in `find . -type f | grep -E ".trig$" | grep -v -E -f "${script_path}/renameignore"`
+echo "Recursively searching all java files, this might take a while..."
+tmpfolder=/tmp/addjavaheader
+mkdir -p ${tmpfolder}
+for file in `find . -type f | grep -E ".java$" | grep -v -E -f "${script_path}/renameignore"`
 do
 	if [[ ! -f ${file} ]]
 	then
 		continue
 	fi
 	echo -ne "processing $file: "
-	prepend_file=/tmp/prepend.trig
+	tmpfile="${tmpfolder}/tmp_${file##*/}"
+	prepend_file=/tmp/prepend.java
 	rm -f ${prepend_file}
 	touch ${prepend_file}
-	grep -q 'con:' $file && ! grep -q 'won/content#' $file && \
-		echo "@prefix con: <https://w3id.org/won/content#> ." >> ${prepend_file} 
-	grep -q 'match:' $file && ! grep -q 'won/matching#' $file && \
-		echo "@prefix match: <https://w3id.org/won/matching#> ." >> ${prepend_file}
+	grep -q 'WONCON\.' $file && ! grep -q 'import won.protocol.vocabulary.WONCON' $file && \
+		echo "import won.protocol.vocabulary.WONCON;" >> ${prepend_file} 
+	grep -q 'WONMATCH\.' $file && ! grep -q 'import won.protocol.vocabulary.WONMATCH' $file && \
+		echo "import won.protocol.vocabulary.WONMATCH;" >> ${prepend_file}
 	if [[ ! -s ${prepend_file} ]]
 	then
 		## prepend file is empty, nothing to do
 		echo  -e "\e[96mprefix not used or already defined, not touching file.\e[0m"
 		continue
 	fi
-	echo -en "\e[33madding prefixes...\e[0m"
-	cat ${prepend_file} > /tmp/tmpfile.trig
-	cat ${file} >> /tmp/tmpfile.trig
+	echo -en "\e[33madding import statement(s)...\e[0m"
+	insertLines=`cat ${prepend_file}`
+	cat ${file} | sed -e "/^package.*$/a ${insertLines}" > ${tmpfile}
 	if (${FORCE})
 	then
-		mv /tmp/tmpfile.trig $file
+		mv ${tmpfile} $file
 		echo -e "\e[32m done.\e[0m"
 	else 
-		echo -e "\e[32m dry run, leaving file untouched.\e[0m Output is in /tmp/tmpfile.trig"
+		echo -e "\e[32m dry run, leaving file untouched.\e[0m Output is in ${tmpfile}"
 	fi
+	rm -f ${prepend_file}
 done 

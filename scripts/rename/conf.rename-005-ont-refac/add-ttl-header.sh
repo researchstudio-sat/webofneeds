@@ -26,6 +26,7 @@ else
 	FORCE=false
 fi
 
+script_name=${BASH_SOURCE[0]##*/}
 
 function error_handler() {
   echo "Error occurred in ${script_name} at line: ${1}."
@@ -51,15 +52,19 @@ tmpfolder=/tmp/addttlheader
 mkdir -p ${tmpfolder}
 for file in `find . -type f | grep -E ".ttl$" | grep -v -E -f "${script_path}/renameignore"`
 do
+	if [[ ! -f ${file} ]]
+	then
+		continue
+	fi
 	echo -ne "processing $file: "
 	tmpfile="${tmpfolder}/tmp_${file##*/}"
 	prepend_file=/tmp/prepend.ttl
 	rm -f ${prepend_file}
 	touch ${prepend_file}
 	grep -q 'con:' $file && ! grep -q 'won/content#' $file && \
-		echo "@PREFIX con: <https://w3id.org/won/content#> ." >> ${prepend_file} 
+		echo "@prefix con: <https://w3id.org/won/content#> ." >> ${prepend_file} 
 	grep -q 'match:' $file && ! grep -q 'won/matching#' $file && \
-		echo "@PREFIX match: <https://w3id.org/won/matching#> ." >> ${prepend_file}
+		echo "@prefix match: <https://w3id.org/won/matching#> ." >> ${prepend_file}
 	if [[ ! -s ${prepend_file} ]]
 	then
 		## prepend file is empty, nothing to do

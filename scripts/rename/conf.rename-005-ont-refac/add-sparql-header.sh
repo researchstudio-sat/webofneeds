@@ -26,6 +26,7 @@ else
 	FORCE=false
 fi
 
+script_name=${BASH_SOURCE[0]##*/}
 
 function error_handler() {
   echo "Error occurred in ${script_name} at line: ${1}."
@@ -49,6 +50,10 @@ fi
 echo "Recursively searching all rq files, this might take a while..."
 for file in `find . -type f | grep -E ".rq$" | grep -v -E -f "${script_path}/renameignore"`
 do
+	if [[ ! -f ${file} ]]
+	then
+		continue
+	fi
 	echo -ne "processing $file: "
 	prepend_file=/tmp/prepend.rq
 	rm -f ${prepend_file}

@@ -10,6 +10,7 @@
 !con:boundingBox
 !con:bpmnWorkflow
 !con:feedback
+!con:feedbackEvent
 !con:feedbackTarget
 !con:file
 !con:file
@@ -35,6 +36,7 @@
 !https://w3id.org/won/content#boundingBox
 !https://w3id.org/won/content#bpmnWorkflow
 !https://w3id.org/won/content#feedback
+!https://w3id.org/won/content#feedbackEvent
 !https://w3id.org/won/content#feedbackTarget
 !https://w3id.org/won/content#file
 !https://w3id.org/won/content#file
@@ -60,6 +62,7 @@
 !WONCON.boundingBox
 !WONCON.bpmnWorkflow
 !WONCON.feedback
+!WONCON.feedbackEvent
 !WONCON.feedbackTarget
 !WONCON.file
 !WONCON.file
@@ -84,6 +87,7 @@
 !WONCON.boundingBoxCompacted
 !WONCON.bpmnWorkflowCompacted
 !WONCON.feedbackCompacted
+!WONCON.feedbackEventCompacted
 !WONCON.feedbackTargetCompacted
 !WONCON.fileCompacted
 !WONCON.geoSpatialCompacted
