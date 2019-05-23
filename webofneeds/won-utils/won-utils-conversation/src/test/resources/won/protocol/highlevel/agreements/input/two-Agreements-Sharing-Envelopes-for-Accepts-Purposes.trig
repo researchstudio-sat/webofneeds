@@ -1668,7 +1668,7 @@
             won:connectionState   won:Connected ;
             won:messageContainer    <https://localhost:8443/won/resource/connection/xq6jofxo2w8o05io6dre/events> ;
             won:socket             won:ChatSocket ;
-            won:feedbackEvent     event:4672813835273634000 ;
+            con:feedbackEvent     event:4672813835273634000 ;
             won:targetConnection  conn:4t9deo4t6bqx83jxk5ex ;
             won:targetAtom        atom:nte803gz4pbiw6equ3qa ;
             won:wonNode           <https://localhost:8443/won/resource> .
