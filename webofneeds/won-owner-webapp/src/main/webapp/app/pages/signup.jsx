@@ -10,7 +10,6 @@ import { actionCreators } from "../actions/actions.js";
 
 import labelledHrModule from "../components/labelled-hr.js";
 
-import * as srefUtils from "../sref-utils.js";
 import * as accountUtils from "../account-utils.js";
 import * as viewSelectors from "../selectors/view-selectors.js";
 import { h } from "preact";
@@ -122,7 +121,7 @@ const template = (
             />
             <label htmlFor="acceptToS">
               I accept the{" "}
-              <a href="{{ self.absHRef(self.$state, 'about', {'aboutSection': 'aboutTermsOfService'}) }}">
+              <a className="clickable" ng-click="self.router__stateGo('about', {'aboutSection': 'aboutTermsOfService'})">
                 Terms Of Service
               </a>
             </label>
@@ -162,7 +161,6 @@ class SignupController {
     attach(this, serviceDependencies, arguments);
     this.rememberMe = false;
     this.acceptToS = false;
-    Object.assign(this, srefUtils); // bind srefUtils to scope
 
     const select = state => {
       const accountState = get(state, "account");
