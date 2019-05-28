@@ -2,109 +2,94 @@
 @import "button";
 @import "positioning-utils";
 
-.topnav {
-  //TODO split into single-purpose-classes
-  @include max-content-width($maxContentWidth, $minContentPadding, "topnav");
+won-topnav {
+  border-bottom: $thinBorderWidth solid $won-line-gray;
+  background: white;
 
-  > .topnav__inner {
-    //@include tri-aligned('topnav__inner', 1rem);
-    @include flex-row-spaced;
+  nav.topnav--new {
+    display: grid;
+    grid-auto-flow: column;
+    grid-template-areas: "nav_logo nav_title nav_slideintoggle nav_signup nav_accountmenu";
+    grid-template-columns: min-content 1fr min-content min-content min-content;
+    margin: 0 auto;
+    padding: 0 0.5rem;
+    box-sizing: border-box;
+    height: 100%;
+    align-items: center;
+    max-width: $maxContentWidth;
 
-    position: relative; //to allow absolute on *__center
+    .topnav__button {
+      //used within the dropdown directive
+      white-space: nowrap;
 
-    > .topnav__inner__left {
-      display: flex;
-      align-items: center;
-
-      margin-right: 1rem;
       .topnav__button__icon {
-        margin-right: 0.5rem;
+        @include fixed-square($bigiconSize);
+      }
+    }
+
+    .topnav__logo {
+      grid-area: nav_logo;
+      @include fixed-square($bigiconSize);
+      margin-right: 0.5rem;
+    }
+
+    .topnav__title {
+      grid-area: nav_title;
+      color: $won-primary-color;
+      margin-right: 0.5rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+
+      .topnav__app-title {
+        white-space: nowrap;
+        font-weight: 700;
       }
 
-      .topnav__inner__left__slideintoggle {
-        cursor: pointer;
-        &__icon {
-          @include fixed-square(1.5rem);
-          --local-primary: #{$won-secondary-color};
-        }
-        &__carret {
-          @include fixed-square(1.5rem);
-          --local-primary: #{$won-secondary-color};
-        }
+      .topnav__divider {
+        font-weight: 700;
+        margin: 0 0.25rem;
+        color: $won-primary-color;
       }
-    }
-    > .topnav__inner__center {
-      // so the create-atom-speechbubble-triangle centers correctly
-      // on the icon (when the caption isn't visible)
-      @extend %center--absolute;
-    }
-    > .topnav__inner__right {
-      margin-left: 1rem;
-      .topnav__button {
-        margin-left: 0.5rem;
-        cursor: pointer;
+
+      .topnav__page-title {
+        color: $won-primary-color;
+        font-weight: 700;
         white-space: nowrap;
       }
     }
-  }
 
-  a:not(.topnav__signupbtn),
-  a:visited:not(.topnav__signupbtn) {
-    color: $won-primary-color;
-  }
+    .topnav__slideintoggle {
+      grid-area: nav_slideintoggle;
+      display: grid;
+      grid-auto-flow: column;
+      cursor: pointer;
+      margin-right: 0.5rem;
 
-  & .topnav__carret {
-    // with svg-included margins
-    @include carretSized;
-  }
-
-  .topnav__button,
-  .topnav__button__caption {
-    white-space: nowrap;
-  }
-
-  & .topnav__button {
-    @include flex-row;
-
-    padding-top: 0.5rem;
-    padding-bottom: 0.5rem;
-
-    .topnav__button__icon {
-      @include fixed-square($bigiconSize);
-
-      &.logo {
-        transform: rotate(180deg);
+      &__icon {
+        @include fixed-square(1.5rem);
+        --local-primary: #{$won-secondary-color};
+      }
+      &__carret {
+        @include fixed-square(1.5rem);
+        --local-primary: #{$won-secondary-color};
       }
     }
 
-    &.open {
-      color: black;
+    .topnav__signupbtn {
+      grid-area: nav_signup;
+      padding-left: 1rem;
+      padding-right: 1rem;
+      margin-right: 0.5rem;
     }
-  }
 
-  & .topnav__list {
-    @include flex-row;
-    list-style: none;
-    align-items: stretch;
+    won-account-menu {
+      grid-area: nav_accountmenu;
 
-    > li {
-      @include flex-column;
+      .topnav__carret {
+        // with svg-included margins
+        @include carretSized;
+      }
     }
-  }
-
-  .topnav__app-title {
-    font-weight: 700;
-    margin-right: 0.5rem;
-  }
-  .topnav__page-title {
-    margin-right: 0.5rem;
-    color: $won-subtitle-gray;
-  }
-
-  .topnav__signupbtn {
-    @include won-button--filled(white, $won-primary-color);
-    @extend .topnav__button;
-    padding-left: 1rem;
-    padding-right: 1rem;
   }
 }

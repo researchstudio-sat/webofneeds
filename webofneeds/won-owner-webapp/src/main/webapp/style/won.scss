@@ -40,15 +40,13 @@ body {
         1fr;
     }
 
-    > header {
+    > won-topnav {
       grid-area: header;
       position: sticky;
-      top: 0;
-      border-bottom: $thinBorderWidth solid $won-line-gray;
-      z-index: 1000;
       box-sizing: border-box;
       height: var(--headerHeight);
-      background: white;
+      top: 0;
+      z-index: 1000;
     }
 
     > won-toasts,
