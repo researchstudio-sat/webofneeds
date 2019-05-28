@@ -41,9 +41,7 @@ const template = (
     >
       <won-post-messages connection-uri="self.viewConnUri" />
     </div>
-    <header>
-      <won-topnav page-title="::'What\'s around'" />
-    </header>
+    <won-topnav page-title="::'What\'s around'" />
     <won-toasts />
     <won-slide-in ng-if="self.showSlideIns" />
     <main className="ownermap">

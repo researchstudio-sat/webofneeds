@@ -8,7 +8,6 @@ import ngAnimate from "angular-animate";
 import { attach, get } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 
-import signupTitleBarModule from "../components/signup-title-bar.js";
 import labelledHrModule from "../components/labelled-hr.js";
 
 import * as srefUtils from "../sref-utils.js";
@@ -21,13 +20,10 @@ import "~/style/_signup.scss";
 const template = (
   <container>
     <won-modal-dialog ng-if="self.showModalDialog" />
-    <header>
-      <won-topnav page-title="::'Sign Up'" />
-    </header>
+    <won-topnav page-title="::'Sign Up'" />
     <won-toasts />
     <won-slide-in ng-if="self.showSlideIns" />
     <main className="signup" id="signupSection">
-      <won-signup-title-bar />
       <div className="signup__content">
         <div className="signup__content__form" ng-form name="registerForm">
           <input
@@ -210,7 +206,6 @@ class SignupController {
 export default {
   module: angular
     .module("won.owner.components.signup", [
-      signupTitleBarModule,
       labelledHrModule,
       ngAnimate,
     ])
