@@ -9,7 +9,7 @@ won-topnav {
   nav.topnav--new {
     display: grid;
     grid-auto-flow: column;
-    grid-template-areas: "nav_logo nav_title nav_slideintoggle nav_signup nav_accountmenu";
+    grid-template-areas: "nav_logo nav_title nav_slideintoggle nav_loading nav_signup nav_accountmenu";
     grid-template-columns: min-content 1fr min-content min-content min-content;
     margin: 0 auto;
     padding: 0 0.5rem;
@@ -74,6 +74,11 @@ won-topnav {
         @include fixed-square(1.5rem);
         --local-primary: #{$won-secondary-color};
       }
+    }
+
+    .topnav__loading {
+      grid-area: nav_loading;
+      margin-right: 0.5rem;
     }
 
     .topnav__signupbtn {

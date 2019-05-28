@@ -43,8 +43,8 @@ function genTopnavConf() {
                     <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
                 </svg>
             </div>
-            <div class="topnav__list__loading" ng-if="self.showLoadingIndicator">
-                <svg class="topnav__list__loading__spinner hspinner">
+            <div class="topnav__loading" ng-if="self.showLoadingIndicator">
+                <svg class="topnav__loading__spinner hspinner">
                     <use xlink:href="#ico_loading_anim" href="#ico_loading_anim"></use>
                 </svg>
             </div>
