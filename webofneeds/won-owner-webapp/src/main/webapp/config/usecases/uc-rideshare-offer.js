@@ -58,6 +58,8 @@ export const rideShareOffer = {
           s: won.defaultContext["s"],
           geo: "http://www.bigdata.com/rdf/geospatial#",
           xsd: "http://www.w3.org/2001/XMLSchema#",
+          match: won.defaultContext["match"],
+          con: won.defaultContext["con"],
         },
         operations: [
           `${resultName} a won:Atom.`,
@@ -105,6 +107,8 @@ export const rideShareOffer = {
           s: won.defaultContext["s"],
           geo: "http://www.bigdata.com/rdf/geospatial#",
           xsd: "http://www.w3.org/2001/XMLSchema#",
+          match: won.defaultContext["match"],
+          con: won.defaultContext["con"],
         },
         operations: [
           `${resultName} a won:Atom.`,
@@ -140,6 +144,8 @@ export const rideShareOffer = {
           s: won.defaultContext["s"],
           geo: "http://www.bigdata.com/rdf/geospatial#",
           xsd: "http://www.w3.org/2001/XMLSchema#",
+          match: won.defaultContext["match"],
+          con: won.defaultContext["con"],
         },
         operations: [
           `${resultName} a won:Atom.`,
@@ -173,6 +179,7 @@ export const rideShareOffer = {
         prefixes: {
           won: won.defaultContext["won"],
           s: won.defaultContext["s"],
+          match: won.defaultContext["match"],
         },
         operations: [
           `${resultName} a won:Atom.`,

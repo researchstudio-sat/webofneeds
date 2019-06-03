@@ -36,6 +36,9 @@ export const taxiOffer = {
           won: won.defaultContext["won"],
           s: won.defaultContext["s"],
           xsd: won.defaultContext["xsd"],
+          demo: won.defaultContext["demo"],
+          match: won.defaultContext["match"],
+          con: won.defaultContext["con"],
         },
         operations: [
           `${resultName} a won:Atom.`,
@@ -73,6 +76,7 @@ export const taxiOffer = {
         // to select seeks-branch
         prefixes: {
           won: won.defaultContext["won"],
+          demo: won.defaultContext["demo"],
         },
         operations: [
           `${resultName} a won:Atom.`,

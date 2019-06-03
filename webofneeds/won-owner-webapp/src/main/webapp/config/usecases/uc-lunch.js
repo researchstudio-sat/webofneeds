@@ -47,6 +47,7 @@ export const lunchPlan = {
       prefixesInPath: {
         s: won.defaultContext["s"],
         won: won.defaultContext["won"],
+        con: won.defaultContext["con"],
       },
       geoCoordinates: getIn(draft, ["content", "location"]),
     });
@@ -65,6 +66,8 @@ export const lunchPlan = {
         buddy: won.defaultContext["buddy"],
         hold: won.defaultContext["hold"],
         s: won.defaultContext["s"],
+        match: won.defaultContext["match"],
+        demo: won.defaultContext["demo"],
       },
       distinct: true,
       variables: [resultName, "?score"],
@@ -124,6 +127,7 @@ export const lunchInterest = {
       prefixesInPath: {
         s: won.defaultContext["s"],
         won: won.defaultContext["won"],
+        con: won.defaultContext["con"],
       },
       geoCoordinates: getIn(draft, ["content", "location"]),
     });

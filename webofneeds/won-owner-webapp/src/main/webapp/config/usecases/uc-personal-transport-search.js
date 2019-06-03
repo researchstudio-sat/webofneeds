@@ -54,6 +54,7 @@ export const personalTransportSearch = {
           s: won.defaultContext["s"],
           geo: "http://www.bigdata.com/rdf/geospatial#",
           xsd: "http://www.w3.org/2001/XMLSchema#",
+          con: won.defaultContext["con"],
         },
         operations: [
           `
@@ -132,6 +133,7 @@ export const personalTransportSearch = {
           s: won.defaultContext["s"],
           geo: "http://www.bigdata.com/rdf/geospatial#",
           xsd: "http://www.w3.org/2001/XMLSchema#",
+          con: won.defaultContext["con"],
         },
         operations: [
           `${resultName} a won:Atom.
@@ -167,6 +169,7 @@ export const personalTransportSearch = {
           s: won.defaultContext["s"],
           geo: "http://www.bigdata.com/rdf/geospatial#",
           xsd: "http://www.w3.org/2001/XMLSchema#",
+          con: won.defaultContext["con"],
         },
         operations: [
           `${resultName} a won:Atom.

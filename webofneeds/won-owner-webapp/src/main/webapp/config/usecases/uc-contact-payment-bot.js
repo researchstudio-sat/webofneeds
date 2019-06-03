@@ -32,6 +32,7 @@ export const contactPaymentBot = {
       prefixes: {
         won: won.defaultContext["won"],
         rdf: won.defaultContext["rdf"],
+        con: won.defaultContext["con"],
       },
       distinct: true,
       variables: [resultName, "?score"],

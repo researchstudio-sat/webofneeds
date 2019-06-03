@@ -39,6 +39,8 @@ export const goodsTransportOffer = {
           s: won.defaultContext["s"],
           geo: "http://www.bigdata.com/rdf/geospatial#",
           xsd: "http://www.w3.org/2001/XMLSchema#",
+          con: won.defaultContext["con"],
+          match: won.defaultContext["match"],
         },
         operations: [
           `${resultName} a won:Atom.`,

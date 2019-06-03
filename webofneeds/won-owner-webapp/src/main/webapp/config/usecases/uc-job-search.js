@@ -87,6 +87,7 @@ export const jobSearch = {
       prefixesInPath: {
         s: won.defaultContext["s"],
         won: won.defaultContext["won"],
+        match: won.defaultContext["match"],
       },
       tagLikes: getIn(draft, ["content", "skills"]),
     });
@@ -134,6 +135,7 @@ export const jobSearch = {
       prefixesInPath: {
         s: won.defaultContext["s"],
         won: won.defaultContext["won"],
+        con: won.defaultContext["con"],
       },
       geoCoordinates: getIn(draft, ["seeks", "jobLocation"]),
     });

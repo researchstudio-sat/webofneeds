@@ -65,6 +65,7 @@ export const rehearsalRoomSearch = {
             s: won.defaultContext["s"],
             geo: "http://www.bigdata.com/rdf/geospatial#",
             xsd: won.defaultContext["xsd"],
+            demo: won.defaultContext["demo"],
           },
           operations: [
             `${resultName} a won:Atom.`,
@@ -108,6 +109,7 @@ export const rehearsalRoomSearch = {
           prefixes: {
             won: won.defaultContext["won"],
             rdf: won.defaultContext["rdf"],
+            demo: won.defaultContext["demo"],
           },
           operations: [
             `${resultName} a won:Atom.`,

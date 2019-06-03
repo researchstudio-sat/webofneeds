@@ -62,6 +62,7 @@ export const rentRealEstateSearch = {
             s: won.defaultContext["s"],
             won: won.defaultContext["won"],
             xsd: won.defaultContext["xsd"],
+            demo: won.defaultContext["demo"],
           },
           operations: [
             `${resultName} a won:Atom.`,
@@ -112,6 +113,7 @@ export const rentRealEstateSearch = {
           prefixes: {
             won: won.defaultContext["won"],
             s: won.defaultContext["s"],
+            demo: won.defaultContext["demo"],
           },
           operations: [
             `${resultName} a won:Atom.`,

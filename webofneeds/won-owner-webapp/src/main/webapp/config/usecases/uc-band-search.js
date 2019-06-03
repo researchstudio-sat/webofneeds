@@ -79,6 +79,7 @@ export const bandSearch = {
       prefixesInPath: {
         s: won.defaultContext["s"],
         won: won.defaultContext["won"],
+        con: won.defaultContext["con"],
       },
 
       geoCoordinates: getIn(draft, ["seeks", "location"]),

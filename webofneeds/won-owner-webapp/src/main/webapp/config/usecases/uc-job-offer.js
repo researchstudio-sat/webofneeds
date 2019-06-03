@@ -91,6 +91,7 @@ export const jobOffer = {
       prefixesInPath: {
         s: won.defaultContext["s"],
         won: won.defaultContext["won"],
+        match: won.defaultContext["match"],
       },
       tagLikes: getIn(draft, ["content", "organizationNames"]),
     });
@@ -103,6 +104,7 @@ export const jobOffer = {
       prefixesInPath: {
         s: won.defaultContext["s"],
         won: won.defaultContext["won"],
+        match: won.defaultContext["match"],
       },
       tagLikes: getIn(draft, ["content", "employmentTypes"]),
     });
@@ -115,6 +117,7 @@ export const jobOffer = {
       prefixesInPath: {
         s: won.defaultContext["s"],
         won: won.defaultContext["won"],
+        match: won.defaultContext["match"],
       },
       tagLikes: getIn(draft, ["content", "industry"]),
     });
@@ -126,6 +129,8 @@ export const jobOffer = {
       prefixesInPath: {
         s: won.defaultContext["s"],
         won: won.defaultContext["won"],
+        match: won.defaultContext["match"],
+        con: won.defaultContext["con"],
       },
       geoCoordinates: getIn(draft, ["content", "jobLocation"]),
     });

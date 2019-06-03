@@ -81,6 +81,8 @@ export const rentRealEstateOffer = {
             s: won.defaultContext["s"],
             geo: "http://www.bigdata.com/rdf/geospatial#",
             xsd: "http://www.w3.org/2001/XMLSchema#",
+            demo: won.defaultContext["demo"],
+            match: won.defaultContext["match"],
           },
           operations: [
             `${resultName} a won:Atom.`,
@@ -115,12 +117,14 @@ export const rentRealEstateOffer = {
 
       filter = concatenateFilters(filters);
     } else {
+      //Location is set to mandatory, hence this clause will never get called
       const filters = [
         {
           // to select is-branch
           prefixes: {
             won: won.defaultContext["won"],
             sh: won.defaultContext["sh"], //needed for the filterNumericProperty calls
+            demo: won.defaultContext["demo"],
           },
           operations: [
             `${resultName} a won:Atom.`,

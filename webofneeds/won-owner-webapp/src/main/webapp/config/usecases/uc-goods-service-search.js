@@ -118,6 +118,7 @@ export const goodsServiceSearch = {
       pathToGeoCoords: "s:location/s:geo",
       prefixesInPath: {
         s: won.defaultContext["s"],
+        con: won.defaultContext["con"],
       },
       geoCoordinates: getIn(draft, ["seeks", "location"]),
     });
@@ -138,6 +139,8 @@ export const goodsServiceSearch = {
       {
         prefixes: {
           won: won.defaultContext["won"],
+          s: won.defaultContext["s"],
+          rdf: won.defaultContext["rdf"],
         },
         operations: [
           `${resultName} rdf:type won:Atom.`,

@@ -79,6 +79,8 @@ export const musicianSearch = {
       prefixesInPath: {
         s: won.defaultContext["s"],
         won: won.defaultContext["won"],
+        match: won.defaultContext["match"],
+        con: won.defaultContext["con"],
       },
       geoCoordinates: getIn(draft, ["content", "location"]),
     });
@@ -95,6 +97,7 @@ export const musicianSearch = {
         won: won.defaultContext["won"],
         rdf: won.defaultContext["rdf"],
         s: won.defaultContext["s"],
+        demo: won.defaultContext["demo"],
       },
       distinct: true,
       variables: [resultName],
