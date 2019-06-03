@@ -45,7 +45,6 @@ const template = (
     >
       <won-connections-overview
         on-selected-connection="::self.selectConnection(connectionUri)"
-        open="self.open"
       />
     </aside>
     {/* RIGHT SIDE */}
@@ -90,7 +89,6 @@ class ConnectionsController {
   constructor() {
     attach(this, serviceDependencies, arguments);
     this.WON = won.WON;
-    this.open = {};
 
     const selectFromState = state => {
       const viewConnUri = generalSelectors.getViewConnectionUriFromRoute(state);
@@ -132,8 +130,6 @@ class ConnectionsController {
 
       return {
         welcomeTemplatePath: "./skin/" + themeName + "/" + welcomeTemplate,
-
-        open,
         showModalDialog: getIn(state, ["view", "showModalDialog"]),
         showWelcomeSide:
           !showCreateFromPost &&

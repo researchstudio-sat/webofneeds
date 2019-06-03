@@ -5,7 +5,9 @@
 import { createSelector } from "reselect";
 
 import { decodeUriComponentProperly, getIn, get } from "../utils.js";
+import * as connectionSelectors from "./connection-selectors.js";
 import * as atomUtils from "../atom-utils.js";
+import * as connectionUtils from "../connection-utils.js";
 import * as accountUtils from "../account-utils.js";
 import * as viewUtils from "../view-utils.js";
 import Color from "color";
@@ -19,12 +21,6 @@ export const getOwnedAtoms = state => {
   const accountState = get(state, "account");
   return getAtoms(state).filter(atom =>
     accountUtils.isAtomOwned(accountState, get(atom, "uri"))
-  );
-};
-export const getNonOwnedAtoms = state => {
-  const accountState = get(state, "account");
-  return getAtoms(state).filter(
-    atom => !accountUtils.isAtomOwned(accountState, get(atom, "uri"))
   );
 };
 
@@ -44,29 +40,36 @@ export const getOwnedPosts = state => {
   );
 };
 
-export function getOwnedOpenPosts(state) {
-  const allOwnedAtoms = getOwnedPosts(state);
-  return (
-    allOwnedAtoms && allOwnedAtoms.filter(post => atomUtils.isActive(post))
-  );
-}
+/**
+ * Gets all Atoms that...
+ *  - are Active
+ *  - have the ChatSocket
+ *  - have at least one non-closed ChatSocket connection
+ * @param state
+ */
+export function getChatAtoms(state) {
+  const allOwnedAtoms = getOwnedAtoms(state);
 
-export function getOpenPosts(state) {
-  const allPosts = getPosts(state);
-  return allPosts && allPosts.filter(post => atomUtils.isActive(post));
+  if (allOwnedAtoms) {
+    return allOwnedAtoms
+      .filter(atom => atomUtils.isActive(atom))
+      .filter(atom => atomUtils.hasChatSocket(atom))
+      .filter(
+        atom =>
+          !!get(atom, "connections") &&
+          !!get(atom, "connections")
+            .filter(conn => !connectionUtils.isClosed(conn))
+            .find(conn =>
+              connectionSelectors.isChatToXConnection(get(state, "atoms"), conn)
+            )
+      );
+  }
+  return undefined;
 }
 
 export function getActiveAtoms(state) {
   const allAtoms = getAtoms(state);
   return allAtoms && allAtoms.filter(atom => atomUtils.isActive(atom));
-}
-
-//TODO: METHOD NAME TO ACTUALLY REPRESENT WHAT THE SELECTOR DOES
-export function getOwnedClosedPosts(state) {
-  const allOwnedAtoms = getOwnedPosts(state);
-  return (
-    allOwnedAtoms && allOwnedAtoms.filter(post => atomUtils.isInactive(post))
-  );
 }
 
 export function getOwnedAtomsInCreation(state) {

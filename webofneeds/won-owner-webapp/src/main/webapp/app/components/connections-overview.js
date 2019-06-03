@@ -44,7 +44,7 @@ function genComponentConf() {
             </div>
         </div>
         <div ng-repeat="atomUri in self.sortedOpenAtomUris track by atomUri" class="co__item">
-            <div class="co__item__atom" ng-class="{'won-unread': self.isUnread(atomUri), 'open': self.isOpen(atomUri)}">
+            <div class="co__item__atom" ng-class="{'won-unread': self.isUnread(atomUri)}">
                 <div class="co__item__atom__indicator"></div>
                 <div class="co__item__atom__header">
                     <won-post-header
@@ -56,25 +56,13 @@ function genComponentConf() {
                         on-selected-connection="::self.selectConnection(connectionUri)"
                         atom-uri="::atomUri">
                     </won-connection-indicators>
-                    <div class="co__item__atom__header__carret clickable" ng-click="!self.isAtomLoading(atomUri) && self.toggleDetails(atomUri)">
-                        <svg class="co__item__atom__header__carret__icon"
-                            ng-class="{
-                              'won-icon-expanded': self.isOpen(atomUri),
-                              'won-icon-disabled': !self.hasOpenOrLoadingChatConnections(atomUri, self.allAtoms, self.process) || self.isAtomLoading(atomUri),
-                            }">
-                            <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
-                        </svg>
-                    </div>
                 </div>
             </div>
-            <div class="co__item__connections"
-                ng-if="self.isOpen(atomUri) && self.hasOpenOrLoadingChatConnections(atomUri, self.allAtoms, self.process)">
+            <div class="co__item__connections">
                 <div class="co__item__connections__item"
-                  ng-if="self.hasChatSocket(atomUri)"
                   ng-repeat="connUri in self.getOpenChatConnectionUrisArraySorted(atomUri, self.allAtoms, self.process) track by connUri"
                   ng-class="{
-                    'won-unread': self.isConnectionUnread(atomUri, connUri),
-                    'selected': connUri === self.connUriInRoute
+                    'won-unread': self.isConnectionUnread(atomUri, connUri)
                   }">
                   <won-connection-selection-item
                       on-selected-connection="::self.selectConnection(connectionUri)"
@@ -82,7 +70,7 @@ function genComponentConf() {
                       ng-class="{'won-unread': self.isConnectionUnread(atomUri, connUri)}">
                   </won-connection-selection-item>
                 </div>
-                <div class="co__item__connections__item nonsticky" ng-if="self.hasChatSocket(atomUri) && self.hasSuggestedConnections(atomUri)"
+                <div class="co__item__connections__item" ng-if="self.hasSuggestedConnections(atomUri)"
                   ng-class="{
                     'won-unread': self.hasUnreadSuggestedConnections(atomUri),
                   }">
@@ -98,14 +86,12 @@ function genComponentConf() {
   class Controller {
     constructor() {
       attach(this, serviceDependencies, arguments);
-      this.open = open;
       //this.labels = labels;
       window.co4dbg = this;
 
-      const self = this;
       const selectFromState = state => {
         const allAtoms = generalSelectors.getPosts(state);
-        const openAtoms = generalSelectors.getOwnedOpenPosts(state);
+        const openAtoms = generalSelectors.getChatAtoms(state);
 
         // atoms that have been created but are not confirmed by the server yet
         const beingCreatedAtoms = generalSelectors.getOwnedAtomsInCreation(
@@ -120,12 +106,6 @@ function genComponentConf() {
           state
         );
 
-        const atomImpliedInRoute =
-          connUriInRoute &&
-          generalSelectors.getOwnedAtomByConnectionUri(state, connUriInRoute);
-        const atomUriImpliedInRoute =
-          atomImpliedInRoute && atomImpliedInRoute.get("uri");
-
         const sortedOpenAtoms = sortByDate(openAtoms, "creationDate");
         const process = get(state, "process");
 
@@ -135,7 +115,6 @@ function genComponentConf() {
           createItemSelected:
             !!generalSelectors.getUseCaseGroupFromRoute(state) ||
             !!generalSelectors.getUseCaseFromRoute(state),
-          atomUriImpliedInRoute,
           connUriInRoute,
           beingCreatedAtomUris: beingCreatedAtoms && [
             ...beingCreatedAtoms.keys(),
@@ -152,12 +131,6 @@ function genComponentConf() {
         ["self.connectionUri"],
         this
       );
-
-      this.$scope.$watch("self.atomUriImpliedInRoute", (newValue, oldValue) => {
-        if (newValue && !oldValue) {
-          self.open[newValue] = true;
-        }
-      });
 
       this.$scope.$watch("self.connectionsToCrawl", cnctToCrawl =>
         this.ensureUnreadMessagesAreLoaded(cnctToCrawl)
@@ -190,32 +163,6 @@ function genComponentConf() {
       });
     }
 
-    toggleDetails(ownedAtomUri) {
-      for (let key in this.open) {
-        if (key !== ownedAtomUri) {
-          this.open[key] = false;
-        }
-      }
-
-      if (this.isOpen(ownedAtomUri)) {
-        this.open[ownedAtomUri] = false;
-        if (this.isOpenByConnection(ownedAtomUri)) {
-          this.atoms__selectTab(
-            Immutable.fromJS({ atomUri: ownedAtomUri, selectTab: "DETAIL" })
-          );
-          this.router__stateGoCurrent({
-            useCase: undefined,
-            useCaseGroup: undefined,
-            connectionUri: undefined,
-            fromAtomUri: undefined,
-            mode: undefined,
-          });
-        }
-      } else {
-        this.open[ownedAtomUri] = true;
-      }
-    }
-
     showAtomSuggestions(atomUri) {
       this.showAtomTab(atomUri, "SUGGESTIONS");
     }
@@ -229,11 +176,6 @@ function genComponentConf() {
         Immutable.fromJS({ atomUri: atomUri, selectTab: tab })
       );
       this.router__stateGo("post", { postUri: atomUri });
-    }
-
-    hasChatSocket(atomUri) {
-      const atom = get(this.allAtoms, atomUri);
-      return atomUtils.hasChatSocket(atom);
     }
 
     hasSuggestedConnections(atomUri) {
@@ -256,53 +198,12 @@ function genComponentConf() {
       return get(conn, "unread");
     }
 
-    isOpen(ownedAtomUri) {
-      return this.isOpenByConnection(ownedAtomUri) || !!this.open[ownedAtomUri];
-    }
-
     isAtomLoading(atomUri) {
       return processUtils.isAtomLoading(this.process, atomUri);
     }
 
-    isOpenByConnection(ownedAtomUri) {
-      return this.atomUriImpliedInRoute === ownedAtomUri;
-    }
-
     selectConnection(connectionUri) {
       this.onSelectedConnection({ connectionUri }); //trigger callback with scope-object
-    }
-
-    hasOpenOrLoadingChatConnections(atomUri, allAtoms, process) {
-      const atom = get(allAtoms, atomUri);
-
-      if (!atom) {
-        return false;
-      }
-      return (
-        atomUtils.isActive(atom) &&
-        !!atom.get("connections").find(conn => {
-          if (
-            !connectionSelectors.isChatToXConnection(allAtoms, conn) &&
-            !connectionSelectors.isGroupToXConnection(allAtoms, conn)
-          )
-            return false;
-          if (processUtils.isConnectionLoading(process, conn.get("uri")))
-            return true; //if connection is currently loading we assume its a connection we want to show
-
-          const targetAtomUri = conn.get("targetAtomUri");
-          const targetAtomPresent =
-            targetAtomUri && allAtoms && !!allAtoms.get(targetAtomUri);
-
-          if (!targetAtomPresent) return true; //if the targetAtom is not present yet we assume its a connection we want
-
-          const targetAtomActiveOrLoading =
-            process.getIn(["atoms", targetAtomUri, "loading"]) ||
-            process.getIn(["atoms", targetAtomUri, "failedToLoad"]) ||
-            atomUtils.isActive(get(allAtoms, targetAtomUri));
-
-          return targetAtomActiveOrLoading && !connectionUtils.isClosed(conn);
-        })
-      );
     }
 
     getOpenChatConnectionUrisArraySorted(atomUri, allAtoms, process) {
@@ -354,7 +255,6 @@ function genComponentConf() {
     controllerAs: "self",
     bindToController: true, //scope-bindings -> ctrl
     scope: {
-      open: "=",
       /*
        * Usage:
        *  on-selected-connection="myCallback(connectionUri)"

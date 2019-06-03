@@ -19,7 +19,6 @@ won-connections-overview {
       border-bottom: $thinGrayBorder;
       box-sizing: border-box;
       overflow: hidden;
-      --transition-duration: 0.25s;
 
       @media (max-width: $responsivenessBreakPoint) {
         &:not(.won-unread) > .co__item__atom__indicator {
@@ -41,41 +40,10 @@ won-connections-overview {
         border-left: $thinGrayBorder;
       }
 
-      &.open {
-        position: sticky;
-        top: var(--headerHeight);
-        z-index: 500;
-        background-color: $won-light-gray;
-        height: var(--won-overview-atom-height);
-        max-height: var(--won-overview-atom-height);
-
-        & > .co__item__atom__header > won-connection-indicators {
-          //TODO: STYLE AND TRANSITION FOR OPENEDATOM INDICATORS
-          overflow: hidden;
-          width: 0;
-          box-sizing: border-box;
-          transition: width 0.25s linear;
-        }
-      }
-
-      &:not(.open) {
-        height: var(--won-overview-atom-height);
-        max-height: var(--won-overview-atom-height);
-
-        & > .co__item__atom__header > won-connection-indicators {
-          //TODO: STYLE AND TRANSITION FOR NOT OPENEDATOM INDICATORS
-          width: 2rem;
-          margin-right: 0.5rem;
-          overflow: hidden;
-          box-sizing: border-box;
-          transition: width 0.25s linear;
-        }
-      }
-
       &__header {
         padding: 0.5rem;
         display: grid;
-        grid-template-columns: 1fr auto auto auto;
+        grid-template-columns: 1fr auto;
         min-width: 0;
 
         & > won-connection-indicators,
@@ -86,47 +54,11 @@ won-connections-overview {
         & > won-post-header {
           padding-right: 0.5rem;
         }
-
-        &__carret {
-          // results in a clickable area as large as indicators
-          // TODO: make the value less rigid
-          // parents grid-gap takes care of margin-left
-          $padding: 0.625rem;
-          padding-top: $padding;
-          padding-bottom: $padding;
-          padding-right: $padding;
-
-          &__icon {
-            @include carretSized;
-
-            &.won-icon-disabled {
-              --local-primary: #{$won-skeleton-color};
-            }
-
-            &:not(.won-icon-disabled) {
-              --local-primary: #{$won-secondary-color};
-            }
-
-            &:not(.won-icon-expanded) {
-              transition: 0.25s linear;
-            }
-
-            &.won-icon-expanded {
-              transform: rotate(-180deg);
-              transition: transform 0.25s linear;
-            }
-          }
-        }
       }
     }
     &__connections {
       &__item {
         padding-left: 0.5rem;
-        &.selected:not(.nonsticky) {
-          position: sticky;
-          top: calc(var(--headerHeight) + var(--won-overview-atom-height));
-          z-index: 500;
-        }
         // intrent connections so it's clear they belong *to* the post
         &:not(.won-unread) {
           background-color: $won-line-gray;
@@ -143,7 +75,6 @@ won-connections-overview {
           }
         }
       }
-      @include slideAnimationFixedHorizontal(0.5s, ease-in-out, 100vh);
     }
   }
 
