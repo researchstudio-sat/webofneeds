@@ -273,9 +273,7 @@ function genComponentConf() {
         "Use it, so your TTL can be found when parsing the messages. " +
         "See `won.defaultTurtlePrefixes` " +
         "for prefixes that will be added automatically. E.g." +
-        `\`<${
-          won.WONMSG.uriPlaceholder.event
-        }> won:textMessage "hello world!". \``;
+        `\`<${won.WONMSG.uriPlaceholder.event}> con:text "hello world!". \``;
 
       this.scrollContainer().addEventListener("scroll", e => this.onScroll(e));
 
@@ -847,7 +845,7 @@ function genComponentConf() {
       } else {
         this.connections__rate(
           this.selectedConnectionUri,
-          won.WON.binaryRatingGood
+          won.WONCON.binaryRatingGood
         );
         this.atoms__connect(
           this.ownedAtom.get("uri"),
@@ -869,7 +867,7 @@ function genComponentConf() {
       rateBad &&
         this.connections__rate(
           this.connection.get("uri"),
-          won.WON.binaryRatingBad
+          won.WONCON.binaryRatingBad
         );
       this.connections__close(this.connection.get("uri"));
 

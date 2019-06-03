@@ -1,3 +1,5 @@
+@prefix con:   <https://w3id.org/won/content#> .
+@prefix match:   <https://w3id.org/won/matching#> .
 @prefix msg:   <https://w3id.org/won/message#> .
 @prefix conn:  <https://satvm05.researchstudio.at/won/resource/connection/> .
 @prefix atom:  <https://satvm05.researchstudio.at/won/resource/atom/> .
@@ -57,13 +59,13 @@
 
     atom:hzn2ljvvgtyc
             a                    won:Atom ;
-            won:doNotMatchAfter  "2018-09-21T12:09:24.405Z"^^xsd:dateTime ;
+            match:doNotMatchAfter  "2018-09-21T12:09:24.405Z"^^xsd:dateTime ;
             won:socket         won:ChatSocket ;
-            won:sparqlQuery         "PREFIX won: <https://w3id.org/won/core#>\nPREFIX s: <http://schema.org/>\nPREFIX geo: <http://www.bigdata.com/rdf/geospatial#>\nPREFIX geoliteral: <http://www.bigdata.com/rdf/geospatial/literals/v1#>\nSELECT DISTINCT ?result WHERE {\n  ?result <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> won:Atom.\n  ?result won:atomState won:Active.\n  {\n    { ?result <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://dbpedia.org/page/Ridesharing>. }\n    UNION\n    { ?result <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> s:TaxiService. }\n  }\n  {\n    ?result <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://dbpedia.org/page/Ridesharing>.\n    ?result (won:travelAction/s:fromLocation) ?fromLocation.\n    ?fromLocation s:geo ?fromLocation_geo.\n    SERVICE geo:search {\n      ?fromLocation_geo geo:search \"inCircle\".\n      ?fromLocation_geo geo:searchDatatype geoliteral:lat-lon.\n      ?fromLocation_geo geo:predicate won:geoSpatial.\n      ?fromLocation_geo geo:spatialCircleCenter \"48.22507335#16.3583975990458\".\n      ?fromLocation_geo geo:spatialCircleRadius \"100\".\n      ?fromLocation_geo geo:distanceValue ?fromLocation_geoDistance.\n    }\n    ?result (won:travelAction/s:toLocation) ?toLocation.\n    ?toLocation s:geo ?toLocation_geo.\n    SERVICE geo:search {\n      ?toLocation_geo geo:search \"inCircle\".\n      ?toLocation_geo geo:searchDatatype geoliteral:lat-lon.\n      ?toLocation_geo geo:predicate won:geoSpatial.\n      ?toLocation_geo geo:spatialCircleCenter \"48.29506435#14.3016253252504\".\n      ?toLocation_geo geo:spatialCircleRadius \"100\".\n      ?toLocation_geo geo:distanceValue ?toLocation_geoDistance.\n    }\n  }\n  UNION\n  {\n    ?result <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> s:TaxiService.\n    ?result (won:location|s:location) ?location.\n    ?location s:geo ?location_geo.\n    SERVICE geo:search {\n      ?location_geo geo:search \"inCircle\".\n      ?location_geo geo:searchDatatype geoliteral:lat-lon.\n      ?location_geo geo:predicate won:geoSpatial.\n      ?location_geo geo:spatialCircleCenter \"48.22507335#16.3583975990458\".\n      ?location_geo geo:spatialCircleRadius \"100\".\n      ?location_geo geo:distanceValue ?location_geoDistance.\n    }\n  }\n}\nORDER BY (?location_geoDistance)" ;
+            match:sparqlQuery         "PREFIX won: <https://w3id.org/won/core#>\nPREFIX s: <http://schema.org/>\nPREFIX geo: <http://www.bigdata.com/rdf/geospatial#>\nPREFIX geoliteral: <http://www.bigdata.com/rdf/geospatial/literals/v1#>\nSELECT DISTINCT ?result WHERE {\n  ?result <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> won:Atom.\n  ?result won:atomState won:Active.\n  {\n    { ?result <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://dbpedia.org/page/Ridesharing>. }\n    UNION\n    { ?result <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> s:TaxiService. }\n  }\n  {\n    ?result <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://dbpedia.org/page/Ridesharing>.\n    ?result (con:travelAction/s:fromLocation) ?fromLocation.\n    ?fromLocation s:geo ?fromLocation_geo.\n    SERVICE geo:search {\n      ?fromLocation_geo geo:search \"inCircle\".\n      ?fromLocation_geo geo:searchDatatype geoliteral:lat-lon.\n      ?fromLocation_geo geo:predicate con:geoSpatial.\n      ?fromLocation_geo geo:spatialCircleCenter \"48.22507335#16.3583975990458\".\n      ?fromLocation_geo geo:spatialCircleRadius \"100\".\n      ?fromLocation_geo geo:distanceValue ?fromLocation_geoDistance.\n    }\n    ?result (con:travelAction/s:toLocation) ?toLocation.\n    ?toLocation s:geo ?toLocation_geo.\n    SERVICE geo:search {\n      ?toLocation_geo geo:search \"inCircle\".\n      ?toLocation_geo geo:searchDatatype geoliteral:lat-lon.\n      ?toLocation_geo geo:predicate con:geoSpatial.\n      ?toLocation_geo geo:spatialCircleCenter \"48.29506435#14.3016253252504\".\n      ?toLocation_geo geo:spatialCircleRadius \"100\".\n      ?toLocation_geo geo:distanceValue ?toLocation_geoDistance.\n    }\n  }\n  UNION\n  {\n    ?result <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> s:TaxiService.\n    ?result (won:location|s:location) ?location.\n    ?location s:geo ?location_geo.\n    SERVICE geo:search {\n      ?location_geo geo:search \"inCircle\".\n      ?location_geo geo:searchDatatype geoliteral:lat-lon.\n      ?location_geo geo:predicate con:geoSpatial.\n      ?location_geo geo:spatialCircleCenter \"48.22507335#16.3583975990458\".\n      ?location_geo geo:spatialCircleRadius \"100\".\n      ?location_geo geo:distanceValue ?location_geoDistance.\n    }\n  }\n}\nORDER BY (?location_geoDistance)" ;
             won:hasSearchString  "offer-lift" ;
             dc:title    "Need a lift" ;
-            won:tag  "search-lift" ;
-            won:seeks            [ won:travelAction  <https://satvm05.researchstudio.at/won/resource/atom/hzn2ljvvgtyc/travelAction/chaef180rs> ] ;
+            con:tag  "search-lift" ;
+            match:seeks            [ con:travelAction  <https://satvm05.researchstudio.at/won/resource/atom/hzn2ljvvgtyc/travelAction/chaef180rs> ] ;
             cert:key             [ cert:PublicKey  [ a                       woncrypt:ECCPublicKey ;
                                                      woncrypt:ecc_algorithm  "EC" ;
                                                      woncrypt:ecc_curveId    "secp384r1" ;
@@ -73,7 +75,7 @@
 
     <https://satvm05.researchstudio.at/won/resource/atom/hzn2ljvvgtyc/travelAction/chaef180rs/fromLocation/geocoords>
             a               s:GeoCoordinates ;
-            won:geoSpatial  "48.225073#16.358398"^^<http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon> ;
+            con:geoSpatial  "48.225073#16.358398"^^<http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon> ;
             s:latitude      "48.225073" ;
             s:longitude     "16.358398" .
 
@@ -84,7 +86,7 @@
 
     <https://satvm05.researchstudio.at/won/resource/atom/hzn2ljvvgtyc/travelAction/chaef180rs/toLocation/geocoords>
             a               s:GeoCoordinates ;
-            won:geoSpatial  "48.295064#14.301625"^^<http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon> ;
+            con:geoSpatial  "48.295064#14.301625"^^<http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon> ;
             s:latitude      "48.295064" ;
             s:longitude     "14.301625" .
 

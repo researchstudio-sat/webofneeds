@@ -47,6 +47,7 @@ import org.apache.jena.sparql.expr.nodevalue.NodeValueString;
 import org.apache.jena.vocabulary.RDF;
 
 import won.protocol.vocabulary.WON;
+import won.protocol.vocabulary.WONMATCH;
 
 public class SparqlMatcherUtils {
     /**
@@ -195,7 +196,8 @@ public class SparqlMatcherUtils {
         InsertionTargetFindingVisitor targetFinder = new InsertionTargetFindingVisitor();
         Walker.walk(q, targetFinder);
         OpInserter inserter = targetFinder.getInserter();
-        inserter.setNotExistsTriple(new Triple(resultName, WON.flag.asNode(), WON.NoHintForCounterpart.asNode()));
+        inserter.setNotExistsTriple(
+                        new Triple(resultName, WONMATCH.flag.asNode(), WONMATCH.NoHintForCounterpart.asNode()));
         return Transformer.transform(inserter, q);
     }
 
@@ -203,7 +205,8 @@ public class SparqlMatcherUtils {
         InsertionTargetFindingVisitor targetFinder = new InsertionTargetFindingVisitor();
         Walker.walk(q, targetFinder);
         OpInserter inserter = targetFinder.getInserter();
-        inserter.setJoinWithTriple(new Triple(resultName, WON.flag.asNode(), WON.NoHintForCounterpart.asNode()));
+        inserter.setJoinWithTriple(
+                        new Triple(resultName, WONMATCH.flag.asNode(), WONMATCH.NoHintForCounterpart.asNode()));
         return Transformer.transform(inserter, q);
     }
 

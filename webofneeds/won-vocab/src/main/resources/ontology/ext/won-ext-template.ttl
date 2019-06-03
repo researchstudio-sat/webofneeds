@@ -1,0 +1,52 @@
+@prefix : <https://w3id.org/won/ext/template#> .
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix won: <https://w3id.org/won/core#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vann: <http://purl.org/vocab/vann/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@base <https://w3id.org/won/ext/template> .
+
+<https://w3id.org/won/ext/template> rdf:type owl:Ontology ;
+                                 owl:versionIRI <https://w3id.org/won/ext/template/1.0> ;
+                                 owl:imports <https://w3id.org/won/core> ;
+                                 dc:abstract "Template for ontology extensions. To be copied and changed."@en ;
+                                 dc:creator "Your Name Here" ;
+                                 dcterms:created "1970-24-12"^^xsd:date ;
+                                 dc:title "Web of Needs Extension Template" ;
+                                 dcterms:license <https://creativecommons.org/licenses/by/4.0/> ;
+                                 vann:preferredNamespacePrefix "wx-template" .
+
+#################################################################
+#    Annotation properties
+#################################################################
+
+###  http://purl.org/dc/elements/1.1/abstract
+dc:abstract rdf:type owl:AnnotationProperty .
+
+
+###  http://purl.org/dc/elements/1.1/creator
+dc:creator rdf:type owl:AnnotationProperty .
+
+
+###  http://purl.org/dc/elements/1.1/date
+dc:date rdf:type owl:AnnotationProperty .
+
+
+###  http://purl.org/dc/elements/1.1/description
+dc:description rdf:type owl:AnnotationProperty .
+
+
+###  http://purl.org/dc/elements/1.1/title
+dc:title rdf:type owl:AnnotationProperty .
+
+
+###  http://purl.org/dc/terms/license
+dcterms:license rdf:type owl:AnnotationProperty .
+
+
+###  http://purl.org/vocab/vann/preferredNamespacePrefix
+vann:preferredNamespacePrefix rdf:type owl:AnnotationProperty .
+

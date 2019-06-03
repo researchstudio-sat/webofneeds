@@ -1,3 +1,5 @@
+PREFIX con: <https://w3id.org/won/content#>
+PREFIX match: <https://w3id.org/won/matching#>
 PREFIX won: <https://w3id.org/won/core#>
 PREFIX s: <http://schema.org/>
 PREFIX geo: <http://www.bigdata.com/rdf/geospatial#>
@@ -9,7 +11,7 @@ prefix sh:    <http://www.w3.org/ns/shacl#>
 SELECT DISTINCT ?result WHERE {
   ?result a won:Atom ;
   won:atomState won:Active ;
-  won:seeks ?seeks .
+  match:seeks ?seeks .
     
   optional {
     ?seeks s:priceSpecification ?seeks_pricespec.
@@ -63,7 +65,7 @@ SELECT DISTINCT ?result WHERE {
   SERVICE geo:search {
     ?location_geo geo:search "inCircle".
     ?location_geo geo:searchDatatype geoliteral:lat-lon.
-    ?location_geo geo:predicate won:geoSpatial.
+    ?location_geo geo:predicate con:geoSpatial.
     ?location_geo geo:spatialCircleCenter ?varLatLng.
     ?location_geo geo:spatialCircleRadius ?varRadius.
     ?location_geo geo:distanceValue ?location_geoDistance.

@@ -47,6 +47,7 @@ export const lunchPlan = {
       prefixesInPath: {
         s: won.defaultContext["s"],
         won: won.defaultContext["won"],
+        con: won.defaultContext["con"],
       },
       geoCoordinates: getIn(draft, ["content", "location"]),
     });
@@ -65,13 +66,15 @@ export const lunchPlan = {
         buddy: won.defaultContext["buddy"],
         hold: won.defaultContext["hold"],
         s: won.defaultContext["s"],
+        match: won.defaultContext["match"],
+        demo: won.defaultContext["demo"],
       },
       distinct: true,
       variables: [resultName, "?score"],
       subQueries: subQueries,
       where: [
-        `${resultName} rdf:type won:Interest.`,
-        `${resultName} won:seeks ?seeks .`,
+        `${resultName} rdf:type demo:Interest.`,
+        `${resultName} match:seeks ?seeks .`,
         `?seeks rdf:type s:PlanAction.`,
         `?seeks s:object ?planObject.`,
         `?planObject s:about <http://dbpedia.org/resource/Lunch>.`,
@@ -95,7 +98,7 @@ export const lunchInterest = {
   draft: {
     ...mergeInEmptyDraft({
       content: {
-        type: ["won:Interest"],
+        type: ["demo:Interest"],
         title: "I am interested in meeting up for lunch!",
       },
       seeks: {
@@ -124,6 +127,7 @@ export const lunchInterest = {
       prefixesInPath: {
         s: won.defaultContext["s"],
         won: won.defaultContext["won"],
+        con: won.defaultContext["con"],
       },
       geoCoordinates: getIn(draft, ["content", "location"]),
     });

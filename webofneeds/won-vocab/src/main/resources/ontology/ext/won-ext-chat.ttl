@@ -17,7 +17,7 @@
                                  dcterms:created "2019-04-15"^^xsd:date ;
                                  dc:title "Web of Needs Chat Extension" ;
                                  dcterms:license <https://creativecommons.org/licenses/by/4.0/> ;
-                                 vann:preferredNamespacePrefix "chat" .
+                                 vann:preferredNamespacePrefix "wx-chat" .
 
 #################################################################
 #    Annotation properties

@@ -20,7 +20,7 @@
                                   dc:title "Web of Needs Buddy Extension" ;
                                   dcterms:created "2019-04-15"^^xsd:date ;
                                   dcterms:license <https://creativecommons.org/licenses/by/4.0/> ;
-                                  vann:preferredNamespacePrefix "bd" ;
+                                  vann:preferredNamespacePrefix "wx-buddy" ;
                                   rdfs:comment "WoN Buddy Extension for establishing buddy relationships."@en .
 
 #################################################################

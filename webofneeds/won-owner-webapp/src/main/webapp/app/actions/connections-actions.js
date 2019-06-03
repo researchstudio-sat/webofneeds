@@ -432,9 +432,9 @@ function connectAdHoc(theirAtomUri, textMessage, persona, dispatch, getState) {
       content: {
         responseToUri: theirAtomUri,
         flags: [
-          "won:DirectResponse",
-          "won:NoHintForCounterpart",
-          "won:NoHintForMe",
+          "con:DirectResponse",
+          "match:NoHintForCounterpart",
+          "match:NoHintForMe",
         ],
       },
     };

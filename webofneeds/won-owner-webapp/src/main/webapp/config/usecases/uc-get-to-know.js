@@ -13,7 +13,7 @@ export const getToKnow = {
   draft: {
     ...mergeInEmptyDraft({
       content: {
-        type: ["won:Meetup"],
+        type: ["demo:Meetup"],
         title: "I'm up for meeting new people!",
         tags: ["meetup"],
         searchString: "meetup",

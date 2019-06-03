@@ -21,6 +21,6 @@
 
 <https://localhost:8443/won/resource/event/557600936467257340> {
     <https://localhost:8443/won/resource/event/5669098069340991000>
-            <https://w3id.org/won/core#textMessage>
+            <https://w3id.org/won/content#text>
                     "one" .
 }

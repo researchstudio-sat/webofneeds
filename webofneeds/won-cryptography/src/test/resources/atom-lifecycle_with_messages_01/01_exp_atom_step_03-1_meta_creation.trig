@@ -1,3 +1,5 @@
+@prefix con:   <https://w3id.org/won/content#> .
+@prefix match:   <https://w3id.org/won/matching#> .
 ##################################################################
 #                 WON NODE PUBLISHES THE ATOM
 # The WoN node publishes the graphs from step 01 and 02 and publishes

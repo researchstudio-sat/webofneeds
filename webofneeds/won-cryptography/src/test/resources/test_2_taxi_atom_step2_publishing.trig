@@ -1,3 +1,5 @@
+@prefix con:   <https://w3id.org/won/content#> .
+@prefix match:   <https://w3id.org/won/matching#> .
 #TODO should here be <http://www.example.com/resource/atom/100> or <http://www.example.com/resource/atom/100/v1>?:
 @prefix :    <http://www.example.com/resource/atom/100> .
 @prefix dc:  <http://purl.org/dc/elements/1.1/> .

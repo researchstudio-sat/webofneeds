@@ -47,10 +47,10 @@ echo "(re)generating documentation for ontologies"
 echo "   ontologies folder:  ${ontology_root}"
 echo "   output folder    :  ${output_base}"
 
-onts=(core message agreement modification)
-rewrite_base="https://researchstudio-sat.github.io/webofneeds/ontologies"
-ext_onts=(buddy chat group hold review schema)
+onts=(core message agreement modification content matching)
+ext_onts=(buddy chat group hold review schema demo pogo)
 
+rewrite_base="https://researchstudio-sat.github.io/webofneeds/ontologies"
 
 function generate_for_ontology() {
 	ont=$1

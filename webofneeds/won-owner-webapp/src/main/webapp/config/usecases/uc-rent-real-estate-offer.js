@@ -27,12 +27,12 @@ export const rentRealEstateOffer = {
   draft: {
     ...mergeInEmptyDraft({
       content: {
-        type: ["won:RealEstateRentOffer"],
+        type: ["demo:RealEstateRentOffer"],
         title: "For Rent",
         tags: ["RentOutRealEstate"],
       },
       seeks: {
-        type: ["won:RealEstateRentDemand"],
+        type: ["demo:RealEstateRentDemand"],
         tags: ["SearchRealEstateToRent"],
       },
     }),
@@ -81,11 +81,13 @@ export const rentRealEstateOffer = {
             s: won.defaultContext["s"],
             geo: "http://www.bigdata.com/rdf/geospatial#",
             xsd: "http://www.w3.org/2001/XMLSchema#",
+            demo: won.defaultContext["demo"],
+            match: won.defaultContext["match"],
           },
           operations: [
             `${resultName} a won:Atom.`,
-            `${resultName} a won:RealEstateRentDemand.`,
-            `${resultName} won:seeks ?seeks.`,
+            `${resultName} a demo:RealEstateRentDemand.`,
+            `${resultName} match:seeks ?seeks.`,
             "?seeks (won:location|s:location) ?location.",
             "?location s:geo ?location_geo.",
             "?location_geo s:latitude ?location_lat;",
@@ -115,16 +117,18 @@ export const rentRealEstateOffer = {
 
       filter = concatenateFilters(filters);
     } else {
+      //Location is set to mandatory, hence this clause will never get called
       const filters = [
         {
           // to select is-branch
           prefixes: {
             won: won.defaultContext["won"],
             sh: won.defaultContext["sh"], //needed for the filterNumericProperty calls
+            demo: won.defaultContext["demo"],
           },
           operations: [
             `${resultName} a won:Atom.`,
-            `${resultName} a won:RealEstateRentDemand.``${resultName} won:seeks ?seeks.`,
+            `${resultName} a demo:RealEstateRentDemand.``${resultName} match:seeks ?seeks.`,
           ],
         },
         rent && filterPrice("?seeks", rent.amount, rent.currency, "rent"),

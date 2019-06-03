@@ -1,3 +1,5 @@
+@prefix con:   <https://w3id.org/won/content#> .
+@prefix match:   <https://w3id.org/won/matching#> .
 @prefix msg:   <https://w3id.org/won/message#> .
 @prefix conn:  <https://satvm05.researchstudio.at/won/resource/connection/> .
 @prefix atom:  <https://satvm05.researchstudio.at/won/resource/atom/> .
@@ -22,7 +24,7 @@
             a             won:Atom ;
             won:goal      [ won:shapesGraph  <https://satvm05.researchstudio.at/won/resource/event/qkrivynfftr9gtl3u8im#content-fsw0> ] ;
             won:socket  won:ChatSocket ;
-            won:flag   won:NoHintForCounterpart , won:NoHintForMe ;
+            match:flag   match:NoHintForCounterpart , match:NoHintForMe ;
             dc:description  "This is a automatically created atom by the TaxiBot" ;
             dc:title        "Taxi in Wien<->Taxi" ;
             cert:key      [ cert:PublicKey  [ a                       woncrypt:ECCPublicKey ;

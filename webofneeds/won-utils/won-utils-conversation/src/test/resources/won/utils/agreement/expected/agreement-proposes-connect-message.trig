@@ -24,7 +24,7 @@
                     <https://w3id.org/won/core#ChatSocket> ;
             <https://w3id.org/won/core#targetSocket>
                     <https://w3id.org/won/core#ChatSocket> ;
-            <https://w3id.org/won/core#textMessage>
+            <https://w3id.org/won/content#text>
                     "hi" .
 }
 

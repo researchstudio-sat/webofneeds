@@ -71,7 +71,7 @@ import won.matcher.sparql.config.SparqlMatcherConfig;
 import won.protocol.model.AtomState;
 import won.protocol.util.AtomModelWrapper;
 import won.protocol.util.linkeddata.LinkedDataSource;
-import won.protocol.vocabulary.WON;
+import won.protocol.vocabulary.WONMATCH;
 
 /**
  * Siren/Solr based abstract matcher with all implementations for querying as
@@ -265,14 +265,14 @@ public class SparqlMatcherActor extends UntypedActor {
         String atomURI = atom.getAtomUri();
         ArrayList<Op> queries = new ArrayList<>(3);
         Statement seeks = model.getProperty(model.createResource(atomURI),
-                        model.createProperty("https://w3id.org/won/core#seeks"));
+                        model.createProperty("https://w3id.org/won/matching#seeks"));
         if (seeks != null) {
             Op seeksQuery = createAtomQuery(model, seeks);
             if (seeksQuery != null)
                 queries.add(seeksQuery);
         }
         Statement search = model.getProperty(model.createResource(atomURI),
-                        model.createProperty("https://w3id.org/won/core#hasSearchString"));
+                        model.createProperty("https://w3id.org/won/matching#searchString"));
         if (search != null) {
             String searchString = search.getString();
             queries.add(SparqlMatcherUtils.createSearchQuery(searchString, resultName, 2, true, true));
@@ -406,7 +406,7 @@ public class SparqlMatcherActor extends UntypedActor {
     private static Set<String> getMatchingContexts(AtomModelWrapper atom) {
         Model model = atom.getAtomModel();
         Resource atomURI = model.createResource(atom.getAtomUri());
-        Property matchingContextProperty = model.createProperty("https://w3id.org/won/core#matchingContext");
+        Property matchingContextProperty = model.createProperty("https://w3id.org/won/matching#matchingContext");
         Stream<RDFNode> stream = StreamSupport.stream(Spliterators.spliteratorUnknownSize(
                         model.listObjectsOfProperty(atomURI, matchingContextProperty), Spliterator.CONCURRENT), false);
         return stream.map(node -> node.asLiteral().getString()).collect(Collectors.toSet());
@@ -417,10 +417,10 @@ public class SparqlMatcherActor extends UntypedActor {
             if (atom.getAtomUri().equals(foundAtom.getAtomUri())) {
                 return false;
             }
-            if (atom.flag(WON.NoHintForMe)) {
+            if (atom.flag(WONMATCH.NoHintForMe)) {
                 return false;
             }
-            if (foundAtom.flag(WON.NoHintForCounterpart)) {
+            if (foundAtom.flag(WONMATCH.NoHintForCounterpart)) {
                 return false;
             }
             Set<String> atomContexts = getMatchingContexts(atom);

@@ -41,7 +41,7 @@ export const pokemonInterest = {
   draft: {
     ...mergeInEmptyDraft({
       content: {
-        type: ["won:Interest"],
+        type: ["demo:Interest"],
       },
       seeks: {
         type: ["s:PlanAction"],

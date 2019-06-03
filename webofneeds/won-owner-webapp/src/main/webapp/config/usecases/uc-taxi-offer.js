@@ -36,13 +36,16 @@ export const taxiOffer = {
           won: won.defaultContext["won"],
           s: won.defaultContext["s"],
           xsd: won.defaultContext["xsd"],
+          demo: won.defaultContext["demo"],
+          match: won.defaultContext["match"],
+          con: won.defaultContext["con"],
         },
         operations: [
           `${resultName} a won:Atom.`,
-          `${resultName} a won:PersonalTransportSearch.`,
-          `${resultName} won:seeks ?seeks.`,
-          "?seeks won:travelAction/s:fromLocation ?fromLocation.",
-          "?seeks won:travelAction/s:toLocation ?toLocation.",
+          `${resultName} a demo:PersonalTransportSearch.`,
+          `${resultName} match:seeks ?seeks.`,
+          "?seeks con:travelAction/s:fromLocation ?fromLocation.",
+          "?seeks con:travelAction/s:toLocation ?toLocation.",
           "?fromLocation s:geo ?fromLocation_geo.",
           "?fromLocation_geo s:latitude ?fromLocation_lat;",
           "s:longitude ?fromLocation_lon;",
@@ -73,10 +76,11 @@ export const taxiOffer = {
         // to select seeks-branch
         prefixes: {
           won: won.defaultContext["won"],
+          demo: won.defaultContext["demo"],
         },
         operations: [
           `${resultName} a won:Atom.`,
-          `${resultName} a won:PersonalTransportSearch.`,
+          `${resultName} a demo:PersonalTransportSearch.`,
         ],
       };
     }

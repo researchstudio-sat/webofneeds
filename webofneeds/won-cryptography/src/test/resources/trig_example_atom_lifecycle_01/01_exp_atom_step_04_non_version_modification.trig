@@ -1,3 +1,5 @@
+@prefix con:   <https://w3id.org/won/content#> .
+@prefix match:   <https://w3id.org/won/matching#> .
 ##################################################################
 #                 WON NODE SETS STATE TO ACTIVE
 # Only the won:atomState and the signature of the :v1/meta graph

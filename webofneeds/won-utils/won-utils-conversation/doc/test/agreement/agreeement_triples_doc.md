@@ -7,16 +7,16 @@
 ```
 <https://localhost:8443/won/resource/event/5669098069340991000#content> {
     event:5669098069340991000
-            won:textMessage  "one" .
+            con:text  "one" .
 }
 <https://localhost:8443/won/resource/event/557600936467257340#content> {
     event:557600936467257340
-            won:textMessage  "two" ;
+            con:text  "two" ;
             agr:proposes event:5669098069340991000 .
 }
 <https://localhost:8443/won/resource/event/ow321nn1va6clfidc4s0#content-1o90> {
     event:ow321nn1va6clfidc4s0
-            won:textMessage  "Please go on." ;
+            con:text  "Please go on." ;
             agr:accepts event:557600936467257340 .
 }
 ```
@@ -27,30 +27,30 @@
 ```
 <https://localhost:8443/won/resource/event/5669098069340991000#content> {
     event:5669098069340991000
-            won:textMessage  "one" .
+            con:text  "one" .
 }
 
 <https://localhost:8443/won/resource/event/557600936467257340#content> {
     event:557600936467257340
-            won:textMessage  "two" ;
+            con:text  "two" ;
             agr:proposes event:5669098069340991000 .
 }
 
 <https://localhost:8443/won/resource/event/ow321nn1va6clfidc4s0#content-1o90> {
     event:ow321nn1va6clfidc4s0
-            won:textMessage  "Please go on." ;
+            con:text  "Please go on." ;
             agr:accepts event:557600936467257340 .
 }
 
 <https://localhost:8443/won/resource/event/1435888415723958200#content> {
     event:1435888415723958200
-            won:textMessage  "validate" ;
+            con:text  "validate" ;
             agr:proposesToCancel event:ow321nn1va6clfidc4s0 .
 }
 
 <https://localhost:8443/won/resource/event/mt1f8i41bogt7kc91fi6#content-lqq1> {
     event:mt1f8i41bogt7kc91fi6
-            won:textMessage  "Ok, I'm going to validate the data in our connection. This may take a while." ;
+            con:text  "Ok, I'm going to validate the data in our connection. This may take a while." ;
             agr:accepts event:1435888415723958200 .
 }
 ```
@@ -62,27 +62,27 @@
 ```
 <https://localhost:8443/won/resource/event/5669098069340991000#content> {
     event:5669098069340991000
-            won:textMessage  "one" .
+            con:text  "one" .
 }
 
 <https://localhost:8443/won/resource/event/557600936467257340#content> {
     event:557600936467257340
-            won:textMessage  "two" ;
+            con:text  "two" ;
             agr:proposes event:5669098069340991000 .
 }
 <https://localhost:8443/won/resource/event/ow321nn1va6clfidc4s0#content-1o90> {
     event:ow321nn1va6clfidc4s0
-            won:textMessage  "Please go on." ;
+            con:text  "Please go on." ;
             agr:accepts event:557600936467257340 .
 }
 <https://localhost:8443/won/resource/event/1435888415723958200#content> {
     event:1435888415723958200
-            won:textMessage  "validate" ;
+            con:text  "validate" ;
             agr:proposesToCancel event:557600936467257340 .
 }
 <https://localhost:8443/won/resource/event/mt1f8i41bogt7kc91fi6#content-lqq1> {
     event:mt1f8i41bogt7kc91fi6
-            won:textMessage  "Ok, I'm going to validate the data in our connection. This may take a while." ;
+            con:text  "Ok, I'm going to validate the data in our connection. This may take a while." ;
             agr:accepts event:1435888415723958200 .
 }
 ```
@@ -93,22 +93,22 @@
 ```
 <https://localhost:8443/won/resource/event/5669098069340991000#content> {
     event:5669098069340991000
-            won:textMessage  "one" .
+            con:text  "one" .
 }
 
 <https://localhost:8443/won/resource/event/00d5wzbbf8hzzt2eewcc#content-tbn3> {
     event:00d5wzbbf8hzzt2eewcc
-            won:textMessage  "I'm not sure I understand you fully." .
+            con:text  "I'm not sure I understand you fully." .
 }
 <https://localhost:8443/won/resource/event/557600936467257340#content> {
     event:557600936467257340
-            won:textMessage  "two" ;
+            con:text  "two" ;
             agr:proposes event:5669098069340991000 ;
             agr:proposes event:00d5wzbbf8hzzt2eewcc .
 }
 <https://localhost:8443/won/resource/event/ow321nn1va6clfidc4s0#content-1o90> {
     event:ow321nn1va6clfidc4s0
-            won:textMessage  "Please go on." ;
+            con:text  "Please go on." ;
             agr:accepts event:557600936467257340 .
 }
 ```
@@ -119,7 +119,7 @@
 ```
 <https://localhost:8443/won/resource/event/ow321nn1va6clfidc4s0#content-1o90> {
     event:ow321nn1va6clfidc4s0
-            won:textMessage  "Please go on." ;
+            con:text  "Please go on." ;
             agr:accepts event:557600936467257340 .
 }
 ```
@@ -130,12 +130,12 @@
 ```
 <https://localhost:8443/won/resource/event/557600936467257340#content> {
     event:557600936467257340
-            won:textMessage  "two" ;
+            con:text  "two" ;
             agr:proposes event:5669098069340991000 .
 }
 <https://localhost:8443/won/resource/event/ow321nn1va6clfidc4s0#content-1o90> {
     event:ow321nn1va6clfidc4s0
-            won:textMessage  "Please go on." ;
+            con:text  "Please go on." ;
             agr:accepts event:557600936467257340 .
 }
 ```
@@ -150,22 +150,22 @@
 ```
 <https://localhost:8443/won/resource/event/5669098069340991000#content> {
     event:5669098069340991000
-            won:textMessage  "one" .
+            con:text  "one" .
 }
 
 <https://localhost:8443/won/resource/event/557600936467257340#content> {
     event:557600936467257340
-            won:textMessage  "two" ;
+            con:text  "two" ;
             agr:proposes event:5669098069340991000 .
 }
 <https://localhost:8443/won/resource/event/1435888415723958200#content> {
     event:1435888415723958200
-            won:textMessage  "validate" ;
+            con:text  "validate" ;
             agr:proposesToCancel event:ow321nn1va6clfidc4s0 .
 }
 <https://localhost:8443/won/resource/event/mt1f8i41bogt7kc91fi6#content-lqq1> {
     event:mt1f8i41bogt7kc91fi6
-            won:textMessage  "Ok, I'm going to validate the data in our connection. This may take a while." ;
+            con:text  "Ok, I'm going to validate the data in our connection. This may take a while." ;
             agr:accepts event:1435888415723958200 .
 }
 ```
@@ -178,32 +178,32 @@
     event:6671551888677331000
             won:socket        won:OwnerSocket ;
             won:targetSocket  won:OwnerSocket ;
-            won:textMessage  "hi" .
+            con:text  "hi" .
 }
 <https://localhost:8443/won/resource/event/5669098069340991000#content> {
     event:5669098069340991000
-            won:textMessage  "one" .
+            con:text  "one" .
 }
 <https://localhost:8443/won/resource/event/usi9yhill1lo2xi70sjx#content-klsc> {
     event:usi9yhill1lo2xi70sjx
-            won:textMessage  "Greetings! \nI am the DebugBot. I can simulate multiple other users so you can test things. I understand a few commands. \nTo see which ones, type \n\n'usage'\n\n (without the quotes)." ;
+            con:text  "Greetings! \nI am the DebugBot. I can simulate multiple other users so you can test things. I understand a few commands. \nTo see which ones, type \n\n'usage'\n\n (without the quotes)." ;
 agr:proposes event:6671551888677331000 .
 }
 
 <https://localhost:8443/won/resource/event/5669098069340991000#content> {
     event:5669098069340991000
-            won:textMessage  "one" .
+            con:text  "one" .
 }
 
 <https://localhost:8443/won/resource/event/00d5wzbbf8hzzt2eewcc#content-tbn3> {
     event:00d5wzbbf8hzzt2eewcc
-            won:textMessage  "I'm not sure I understand you fully." ;
+            con:text  "I'm not sure I understand you fully." ;
             agr:proposes event:5669098069340991000 .
 }
 
 <https://localhost:8443/won/resource/event/557600936467257340#content> {
     event:557600936467257340
-            won:textMessage  "two" ;
+            con:text  "two" ;
             agr:accepts event:usi9yhill1lo2xi70sjx ;
             agr:accepts event:00d5wzbbf8hzzt2eewcc .
 }
@@ -215,35 +215,35 @@ agr:proposes event:6671551888677331000 .
 ```
 <https://localhost:8443/won/resource/event/usi9yhill1lo2xi70sjx#content-klsc> {
     event:usi9yhill1lo2xi70sjx
-            won:textMessage  "Greetings! \nI am the DebugBot. I can simulate multiple other users so you can test things. I understand a few commands. \nTo see which ones, type \n\n'usage'\n\n (without the quotes)." .
+            con:text  "Greetings! \nI am the DebugBot. I can simulate multiple other users so you can test things. I understand a few commands. \nTo see which ones, type \n\n'usage'\n\n (without the quotes)." .
 }
 
 <https://localhost:8443/won/resource/event/5669098069340991000#content> {
     event:5669098069340991000
-            won:textMessage  "one" .
+            con:text  "one" .
 }
 
 <https://localhost:8443/won/resource/event/00d5wzbbf8hzzt2eewcc#content-tbn3> {
     event:00d5wzbbf8hzzt2eewcc
-            won:textMessage  "I'm not sure I understand you fully." ;
+            con:text  "I'm not sure I understand you fully." ;
             agr:proposes event:5669098069340991000 ;
             agr:proposes event:usi9yhill1lo2xi70sjx .
 }
 
 <https://localhost:8443/won/resource/event/557600936467257340#content> {
     event:557600936467257340
-            won:textMessage  "two" ;
+            con:text  "two" ;
             agr:accepts event:00d5wzbbf8hzzt2eewcc .
 }
 <https://localhost:8443/won/resource/event/1435888415723958200#content> {
     event:1435888415723958200
-            won:textMessage  "validate" ;
+            con:text  "validate" ;
             agr:proposesToCancel event:usi9yhill1lo2xi70sjx .
 }
 
 <https://localhost:8443/won/resource/event/mt1f8i41bogt7kc91fi6#content-lqq1> {
     event:mt1f8i41bogt7kc91fi6
-            won:textMessage  "Ok, I'm going to validate the data in our connection. This may take a while." ;
+            con:text  "Ok, I'm going to validate the data in our connection. This may take a while." ;
             agr:accepts event:1435888415723958200 .
 }
 ```
@@ -256,39 +256,39 @@ agr:proposes event:6671551888677331000 .
     event:6671551888677331000
             won:socket        won:OwnerSocket ;
             won:targetSocket  won:OwnerSocket ;
-            won:textMessage  "hi" .
+            con:text  "hi" .
 }
 <https://localhost:8443/won/resource/event/usi9yhill1lo2xi70sjx#content-klsc> {
     event:usi9yhill1lo2xi70sjx
-            won:textMessage  "Greetings! \nI am the DebugBot. I can simulate multiple other users so you can test things. I understand a few commands. \nTo see which ones, type \n\n'usage'\n\n (without the quotes)." ;
+            con:text  "Greetings! \nI am the DebugBot. I can simulate multiple other users so you can test things. I understand a few commands. \nTo see which ones, type \n\n'usage'\n\n (without the quotes)." ;
 agr:proposes event:6671551888677331000 .
 }
 
 <https://localhost:8443/won/resource/event/5669098069340991000#content> {
     event:5669098069340991000
-            won:textMessage  "one" .
+            con:text  "one" .
 }
 
 <https://localhost:8443/won/resource/event/00d5wzbbf8hzzt2eewcc#content-tbn3> {
     event:00d5wzbbf8hzzt2eewcc
-            won:textMessage  "I'm not sure I understand you fully." ;
+            con:text  "I'm not sure I understand you fully." ;
             agr:proposes event:5669098069340991000 .
 }
 
 <https://localhost:8443/won/resource/event/557600936467257340#content> {
     event:557600936467257340
-            won:textMessage  "two" ;
+            con:text  "two" ;
             agr:accepts event:usi9yhill1lo2xi70sjx ;
             agr:accepts event:00d5wzbbf8hzzt2eewcc .
 }
 <https://localhost:8443/won/resource/event/1435888415723958200#content> {
     event:1435888415723958200
-            won:textMessage  "validate" ;
+            con:text  "validate" ;
             agr:proposesToCancel event:557600936467257340.
 }
 <https://localhost:8443/won/resource/event/mt1f8i41bogt7kc91fi6#content-lqq1> {
     event:mt1f8i41bogt7kc91fi6
-            won:textMessage  "Ok, I'm going to validate the data in our connection. This may take a while." ;
+            con:text  "Ok, I'm going to validate the data in our connection. This may take a while." ;
             agr:accepts event:1435888415723958200 .
 }
 ```
@@ -300,28 +300,28 @@ agr:proposes event:6671551888677331000 .
     event:6671551888677331000
             won:socket        won:OwnerSocket ;
             won:targetSocket  won:OwnerSocket ;
-            won:textMessage  "hi" .
+            con:text  "hi" .
 }
 <https://localhost:8443/won/resource/event/usi9yhill1lo2xi70sjx#content-klsc> {
     event:usi9yhill1lo2xi70sjx
-            won:textMessage  "Greetings! \nI am the DebugBot. I can simulate multiple other users so you can test things. I understand a few commands. \nTo see which ones, type \n\n'usage'\n\n (without the quotes)." ;
+            con:text  "Greetings! \nI am the DebugBot. I can simulate multiple other users so you can test things. I understand a few commands. \nTo see which ones, type \n\n'usage'\n\n (without the quotes)." ;
 agr:proposes event:6671551888677331000 .
 }
 
 <https://localhost:8443/won/resource/event/5669098069340991000#content> {
     event:5669098069340991000
-            won:textMessage  "one" .
+            con:text  "one" .
 }
 
 <https://localhost:8443/won/resource/event/00d5wzbbf8hzzt2eewcc#content-tbn3> {
     event:00d5wzbbf8hzzt2eewcc
-            won:textMessage  "I'm not sure I understand you fully." ;
+            con:text  "I'm not sure I understand you fully." ;
             agr:proposes event:5669098069340991000 .
 }
 
 <https://localhost:8443/won/resource/event/557600936467257340#content> {
     event:557600936467257340
-            won:textMessage  "two" ;
+            con:text  "two" ;
             agr:accepts event:usi9yhill1lo2xi70sjx ;
             agr:accepts event:5669098069340991000 .
 }
@@ -336,7 +336,7 @@ agr:proposes event:6671551888677331000 .
                     <https://w3id.org/won/core#OwnerSocket> ;
             <https://w3id.org/won/core#targetSocket>
                     <https://w3id.org/won/core#OwnerSocket> ;
-            <https://w3id.org/won/core#textMessage>
+            <https://w3id.org/won/content#text>
                     "hi" .
 }
 ```
@@ -351,39 +351,39 @@ agr:proposes event:6671551888677331000 .
     event:6671551888677331000
             won:socket        won:OwnerSocket ;
             won:targetSocket  won:OwnerSocket ;
-            won:textMessage  "hi" .
+            con:text  "hi" .
 }
 <https://localhost:8443/won/resource/event/usi9yhill1lo2xi70sjx#content-klsc> {
     event:usi9yhill1lo2xi70sjx
-            won:textMessage  "Greetings! \nI am the DebugBot. I can simulate multiple other users so you can test things. I understand a few commands. \nTo see which ones, type \n\n'usage'\n\n (without the quotes)." ;
+            con:text  "Greetings! \nI am the DebugBot. I can simulate multiple other users so you can test things. I understand a few commands. \nTo see which ones, type \n\n'usage'\n\n (without the quotes)." ;
 agr:proposes event:6671551888677331000 .
 }
 
 <https://localhost:8443/won/resource/event/5669098069340991000#content> {
     event:5669098069340991000
-            won:textMessage  "one" .
+            con:text  "one" .
 }
 
 <https://localhost:8443/won/resource/event/00d5wzbbf8hzzt2eewcc#content-tbn3> {
     event:00d5wzbbf8hzzt2eewcc
-            won:textMessage  "I'm not sure I understand you fully." ;
+            con:text  "I'm not sure I understand you fully." ;
             agr:proposes event:5669098069340991000 .
 }
 
 <https://localhost:8443/won/resource/event/557600936467257340#content> {
     event:557600936467257340
-            won:textMessage  "two" ;
+            con:text  "two" ;
             agr:accepts event:usi9yhill1lo2xi70sjx ;
             agr:accepts event:5669098069340991000 .
 }
 <https://localhost:8443/won/resource/event/1435888415723958200#content> {
     event:1435888415723958200
-            won:textMessage  "validate" ;
+            con:text  "validate" ;
             agr:proposesToCancel event:557600936467257340.
 }
 <https://localhost:8443/won/resource/event/mt1f8i41bogt7kc91fi6#content-lqq1> {
     event:mt1f8i41bogt7kc91fi6
-            won:textMessage  "Ok, I'm going to validate the data in our connection. This may take a while." ;
+            con:text  "Ok, I'm going to validate the data in our connection. This may take a while." ;
             agr:accepts event:1435888415723958200 .
 }
 ```
@@ -396,38 +396,38 @@ agr:proposes event:6671551888677331000 .
     event:6671551888677331000
             won:socket        won:OwnerSocket ;
             won:targetSocket  won:OwnerSocket ;
-            won:textMessage  "hi" .
+            con:text  "hi" .
 }
 
 <https://localhost:8443/won/resource/event/usi9yhill1lo2xi70sjx#content-klsc> {
     event:usi9yhill1lo2xi70sjx
-            won:textMessage  "Greetings! \nI am the DebugBot. I can simulate multiple other users so you can test things. I understand a few commands. \nTo see which ones, type \n\n'usage'\n\n (without the quotes)." ;
+            con:text  "Greetings! \nI am the DebugBot. I can simulate multiple other users so you can test things. I understand a few commands. \nTo see which ones, type \n\n'usage'\n\n (without the quotes)." ;
             agr:proposes  event:6671551888677331000 .
 }
 <https://localhost:8443/won/resource/event/5669098069340991000#content> {
     event:5669098069340991000
-            won:textMessage  "one" ;
+            con:text  "one" ;
             agr:accepts event:usi9yhill1lo2xi70sjx .
 }
 <https://localhost:8443/won/resource/event/00d5wzbbf8hzzt2eewcc#content-tbn3> {
     event:00d5wzbbf8hzzt2eewcc
-            won:textMessage  "I'm not sure I understand you fully." ;
+            con:text  "I'm not sure I understand you fully." ;
             agr:proposesToCancel event:5669098069340991000 .
             
 }
 <https://localhost:8443/won/resource/event/557600936467257340#content> {
     event:557600936467257340
-            won:textMessage  "two" ;
+            con:text  "two" ;
             agr:accepts event:00d5wzbbf8hzzt2eewcc .
 }
 <https://localhost:8443/won/resource/event/ow321nn1va6clfidc4s0#content-1o90> {
     event:ow321nn1va6clfidc4s0
-            won:textMessage  "Please go on." ;
+            con:text  "Please go on." ;
             agr:proposesToCancel event:5669098069340991000 .
 }
 <https://localhost:8443/won/resource/event/1435888415723958200#content> {
     event:1435888415723958200
-            won:textMessage  "validate" ;
+            con:text  "validate" ;
             agr:accepts event:ow321nn1va6clfidc4s0 .
 }
 ```
@@ -442,44 +442,44 @@ agr:proposes event:6671551888677331000 .
     event:6671551888677331000
             won:socket        won:OwnerSocket ;
             won:targetSocket  won:OwnerSocket ;
-            won:textMessage  "hi" .
+            con:text  "hi" .
 }
 
 <https://localhost:8443/won/resource/event/5669098069340991000#content> {
     event:5669098069340991000
-            won:textMessage  "one" .
+            con:text  "one" .
 }
 
 <https://localhost:8443/won/resource/event/usi9yhill1lo2xi70sjx#content-klsc> {
     event:usi9yhill1lo2xi70sjx
-            won:textMessage  "Greetings! \nI am the DebugBot. I can simulate multiple other users so you can test things. I understand a few commands. \nTo see which ones, type \n\n'usage'\n\n (without the quotes)." ;
+            con:text  "Greetings! \nI am the DebugBot. I can simulate multiple other users so you can test things. I understand a few commands. \nTo see which ones, type \n\n'usage'\n\n (without the quotes)." ;
             agr:proposes event:6671551888677331000 .
 }
 <https://localhost:8443/won/resource/event/557600936467257340#content> {
     event:557600936467257340
-            won:textMessage  "two" ;
+            con:text  "two" ;
             agr:accepts event:usi9yhill1lo2xi70sjx .
 }
 <https://localhost:8443/won/resource/event/00d5wzbbf8hzzt2eewcc#content-tbn3> {
     event:00d5wzbbf8hzzt2eewcc
-            won:textMessage  "I'm not sure I understand you fully." ;
+            con:text  "I'm not sure I understand you fully." ;
             agr:proposes event:5669098069340991000 .
 }
 # this is an error. I am accepting a proposal from myself…
 <https://localhost:8443/won/resource/event/ow321nn1va6clfidc4s0#content-1o90> {
     event:ow321nn1va6clfidc4s0
-            won:textMessage  "Please go on." ;
+            con:text  "Please go on." ;
             agr:accepts event:00d5wzbbf8hzzt2eewcc .
 }
 
 <https://localhost:8443/won/resource/event/1435888415723958200#content> {
     event:1435888415723958200
-            won:textMessage  "validate" ;
+            con:text  "validate" ;
             agr:proposesToCancel event:557600936467257340 .
 }
 <https://localhost:8443/won/resource/event/mt1f8i41bogt7kc91fi6#content-lqq1> {
     event:mt1f8i41bogt7kc91fi6
-            won:textMessage  "Ok, I'm going to validate the data in our connection. This may take a while." ;
+            con:text  "Ok, I'm going to validate the data in our connection. This may take a while." ;
             agr:accepts event:1435888415723958200 .
 }
 ```
@@ -490,29 +490,29 @@ agr:proposes event:6671551888677331000 .
 ```
 <https://localhost:8443/won/resource/event/5669098069340991000#content> {
     event:5669098069340991000
-            won:textMessage  "one" .
+            con:text  "one" .
 }
 
 <https://localhost:8443/won/resource/event/usi9yhill1lo2xi70sjx#content-klsc> {
     event:usi9yhill1lo2xi70sjx
-            won:textMessage  "Greetings! \nI am the DebugBot. I can simulate multiple other users so you can test things. I understand a few commands. \nTo see which ones, type \n\n'usage'\n\n (without the quotes)." .
+            con:text  "Greetings! \nI am the DebugBot. I can simulate multiple other users so you can test things. I understand a few commands. \nTo see which ones, type \n\n'usage'\n\n (without the quotes)." .
 }
 
 <https://localhost:8443/won/resource/event/00d5wzbbf8hzzt2eewcc#content-tbn3> {
     event:00d5wzbbf8hzzt2eewcc
-            won:textMessage  "I'm not sure I understand you fully." ;
+            con:text  "I'm not sure I understand you fully." ;
             agr:proposes event:usi9yhill1lo2xi70sjx .
 }
 
 <https://localhost:8443/won/resource/event/557600936467257340#content> {
     event:557600936467257340
-            won:textMessage  "two" ;
+            con:text  "two" ;
             agr:accepts event:00d5wzbbf8hzzt2eewcc .
 }
 
 <https://localhost:8443/won/resource/event/ow321nn1va6clfidc4s0#content-1o90> {
     event:ow321nn1va6clfidc4s0
-            won:textMessage  "Please go on." ;
+            con:text  "Please go on." ;
             agr:accepts event:5669098069340991000 .
 }
 ```
@@ -523,23 +523,23 @@ agr:proposes event:6671551888677331000 .
 ```
 <https://localhost:8443/won/resource/event/5669098069340991000#content> {
     event:5669098069340991000
-            won:textMessage  "one" .
+            con:text  "one" .
 }
 
 <https://localhost:8443/won/resource/event/557600936467257340#content> {
     event:557600936467257340
-            won:textMessage  "two" ;
+            con:text  "two" ;
             agr:proposes event:5669098069340991000 .
 }
 
 <https://localhost:8443/won/resource/event/ow321nn1va6clfidc4s0#content-1o90> {
     event:ow321nn1va6clfidc4s0
-            won:textMessage  "Please go on." ;
+            con:text  "Please go on." ;
             agr:accepts event:557600936467257340 .
 }
 <https://localhost:8443/won/resource/event/mt1f8i41bogt7kc91fi6#content-lqq1> {
     event:mt1f8i41bogt7kc91fi6
-            won:textMessage  "Ok, I'm going to validate the data in our connection. This may take a while." ;
+            con:text  "Ok, I'm going to validate the data in our connection. This may take a while." ;
             agr:accepts event:557600936467257340 .
 }
 ```
@@ -550,12 +550,12 @@ agr:proposes event:6671551888677331000 .
 ```
 <https://localhost:8443/won/resource/event/557600936467257340#content> {
     event:557600936467257340
-            won:textMessage  "two" ;
+            con:text  "two" ;
             agr:proposes event:5669098069340991000 .
 }
 <https://localhost:8443/won/resource/event/1435888415723958200#content> {
     event:1435888415723958200
-            won:textMessage  "validate" ;
+            con:text  "validate" ;
             agr:accepts event:557600936467257340 .
 }
 ```
@@ -566,16 +566,16 @@ agr:proposes event:6671551888677331000 .
 ```
 <https://localhost:8443/won/resource/event/5669098069340991000#content> {
     event:5669098069340991000
-            won:textMessage  "one" .
+            con:text  "one" .
 }
 <https://localhost:8443/won/resource/event/557600936467257340#content> {
     event:557600936467257340
-            won:textMessage  "two" ;
+            con:text  "two" ;
             agr:accepts   event: ow321nn1va6clfidc4s0 .
  .}
 <https://localhost:8443/won/resource/event/ow321nn1va6clfidc4s0#content-1o90> {
     event:ow321nn1va6clfidc4s0
-            won:textMessage  "Please go on." ;
+            con:text  "Please go on." ;
            agr:proposes  event:5669098069340991000 .
  .}
 ```
@@ -586,12 +586,12 @@ agr:proposes event:6671551888677331000 .
 ```
 <https://localhost:8443/won/resource/event/5669098069340991000#content> {
     event:5669098069340991000
-            won:textMessage  "one" .
+            con:text  "one" .
 }
 
 <https://localhost:8443/won/resource/event/557600936467257340#content> {
     event:557600936467257340
-            won:textMessage  "two" ;
+            con:text  "two" ;
             agr:proposes event:5669098069340991000 ;
             agr:accepts event:557600936467257340 .
 }..
@@ -605,7 +605,7 @@ agr:proposes event:6671551888677331000 .
     event:6671551888677331000
             won:socket        won:OwnerSocket ;
             won:targetSocket  won:OwnerSocket ;
-            won:textMessage  "hi" .
+            con:text  "hi" .
 }
 
 <https://localhost:8443/won/resource/event/t1h3u3s5q6is5sewv843#envelope-i81z> {
@@ -686,20 +686,20 @@ Fixed tests.
 ```
 <https://localhost:8443/won/resource/event/4672813835273634000#content> {
     event:4672813835273634000
-            won:feedback  [ won:forResource      conn:xq6jofxo2w8o05io6dre ;
-                               won:binaryRating  won:Good
+            con:feedback  [ con:feedbackTarget      conn:xq6jofxo2w8o05io6dre ;
+                               con:binaryRating  con:Good
                              ] .
 }
 
 <https://localhost:8443/won/resource/event/5669098069340991000#content> {
     event:5669098069340991000
-            won:textMessage  "one" ;
+            con:text  "one" ;
             agr:proposes  event:4672813835273634000 .
 }
 
 <https://localhost:8443/won/resource/event/00d5wzbbf8hzzt2eewcc#content-tbn3> {
     event:00d5wzbbf8hzzt2eewcc
-            won:textMessage  "I'm not sure I understand you fully." ;
+            con:text  "I'm not sure I understand you fully." ;
             agr:accepts event:5669098069340991000 .
 }
 
@@ -709,11 +709,11 @@ diff - only in expected:
 diff - only in actual:
 <https://localhost:8443/won/resource/event/00d5wzbbf8hzzt2eewcc> {
     <https://localhost:8443/won/resource/event/4672813835273634000>
-            <https://w3id.org/won/core#feedback>
-                    [ <https://w3id.org/won/core#forResource>
+            <https://w3id.org/won/content#feedback>
+                    [ <https://w3id.org/won/content#feedbackTarget>
                               <https://localhost:8443/won/resource/connection/xq6jofxo2w8o05io6dre> ;
-                      <https://w3id.org/won/core#binaryRating>
-                              <https://w3id.org/won/core#Good>
+                      <https://w3id.org/won/content#binaryRating>
+                              <https://w3id.org/won/content#Good>
                     ] .
 }
 ```
@@ -726,18 +726,18 @@ diff - only in actual:
     event:6671551888677331000
             won:socket        won:OwnerSocket ;
             won:targetSocket  won:OwnerSocket ;
-            won:textMessage  "hi" .
+            con:text  "hi" .
 }
 
 <https://localhost:8443/won/resource/event/5669098069340991000#content> {
     event:5669098069340991000
-            won:textMessage  "one" ;
+            con:text  "one" ;
             agr:proposes event:6671551888677331000 .
 }
 
 <https://localhost:8443/won/resource/event/00d5wzbbf8hzzt2eewcc#content-tbn3> {
     event:00d5wzbbf8hzzt2eewcc
-            won:textMessage  "I'm not sure I understand you fully." ;
+            con:text  "I'm not sure I understand you fully." ;
             agr:accepts event:5669098069340991000 .
 }
 
@@ -749,7 +749,7 @@ Test output:
                     <https://w3id.org/won/core#OwnerSocket> ;
             <https://w3id.org/won/core#targetSocket>
                     <https://w3id.org/won/core#OwnerSocket> ;
-            <https://w3id.org/won/core#textMessage>
+            <https://w3id.org/won/content#text>
                     "hi" .
 }
 ```
@@ -763,8 +763,8 @@ Test output:
 ```
 <https://localhost:8443/won/resource/event/4672813835273634000#content> {
     event:4672813835273634000
-            won:feedback  [ won:forResource      conn:xq6jofxo2w8o05io6dre ;
-                               won:binaryRating  won:Good
+            con:feedback  [ con:feedbackTarget      conn:xq6jofxo2w8o05io6dre ;
+                               con:binaryRating  con:Good
                              ] .
 }
 
@@ -772,14 +772,14 @@ Test output:
     event:6671551888677331000
             won:socket        won:OwnerSocket ;
             won:targetSocket  won:OwnerSocket ;
-            won:textMessage  "hi" ;
+            con:text  "hi" ;
             agr:proposes event:4672813835273634000 .
 }
 
 
 <https://localhost:8443/won/resource/event/usi9yhill1lo2xi70sjx#content-klsc> {
     event:usi9yhill1lo2xi70sjx
-            won:textMessage  "Greetings! \nI am the DebugBot. I can simulate multiple other users so you can test things. I understand a few commands. \nTo see which ones, type \n\n'usage'\n\n (without the quotes)." ;
+            con:text  "Greetings! \nI am the DebugBot. I can simulate multiple other users so you can test things. I understand a few commands. \nTo see which ones, type \n\n'usage'\n\n (without the quotes)." ;
             agr:accepts event:6671551888677331000 .
 }
 
@@ -787,11 +787,11 @@ test (output):
 
 <https://localhost:8443/won/resource/event/usi9yhill1lo2xi70sjx> {
     <https://localhost:8443/won/resource/event/4672813835273634000>
-            <https://w3id.org/won/core#feedback>
-                    [ <https://w3id.org/won/core#forResource>
+            <https://w3id.org/won/content#feedback>
+                    [ <https://w3id.org/won/content#feedbackTarget>
                               <https://localhost:8443/won/resource/connection/xq6jofxo2w8o05io6dre> ;
-                      <https://w3id.org/won/core#binaryRating>
-                              <https://w3id.org/won/core#Good>
+                      <https://w3id.org/won/content#binaryRating>
+                              <https://w3id.org/won/content#Good>
                     ] .
 }
 ```
@@ -804,30 +804,30 @@ test (output):
     event:6671551888677331000
             won:socket        won:OwnerSocket ;
             won:targetSocket  won:OwnerSocket ;
-            won:textMessage  "hi" .
+            con:text  "hi" .
 }
 
 <https://localhost:8443/won/resource/event/usi9yhill1lo2xi70sjx#content-klsc> {
     event:usi9yhill1lo2xi70sjx
-            won:textMessage  "Greetings! \nI am the DebugBot. I can simulate multiple other users so you can test things. I understand a few commands. \nTo see which ones, type \n\n'usage'\n\n (without the quotes)." .
+            con:text  "Greetings! \nI am the DebugBot. I can simulate multiple other users so you can test things. I understand a few commands. \nTo see which ones, type \n\n'usage'\n\n (without the quotes)." .
 }
 
 <https://localhost:8443/won/resource/event/5669098069340991000#content> {
     event:5669098069340991000
-            won:textMessage  "one" ;
+            con:text  "one" ;
             agr:proposes event:6671551888677331000 .
 }
 
 <https://localhost:8443/won/resource/event/00d5wzbbf8hzzt2eewcc#content-tbn3> {
     event:00d5wzbbf8hzzt2eewcc
-            won:textMessage  "I'm not sure I understand you fully." ;
+            con:text  "I'm not sure I understand you fully." ;
             agr:accepts event:5669098069340991000 ;
             agr:proposes event:usi9yhill1lo2xi70sjx .
 }
 
 <https://localhost:8443/won/resource/event/557600936467257340#content> {
     event:557600936467257340
-            won:textMessage  "two" ;
+            con:text  "two" ;
             agr:accepts event:00d5wzbbf8hzzt2eewcc .
 }
 ```
@@ -840,38 +840,38 @@ test (output):
     event:6671551888677331000
             won:socket        won:OwnerSocket ;
             won:targetSocket  won:OwnerSocket ;
-            won:textMessage  "hi" .
+            con:text  "hi" .
 }
 
 <https://localhost:8443/won/resource/event/usi9yhill1lo2xi70sjx#content-klsc> {
     event:usi9yhill1lo2xi70sjx
-            won:textMessage  "Greetings! \nI am the DebugBot. I can simulate multiple other users so you can test things. I understand a few commands. \nTo see which ones, type \n\n'usage'\n\n (without the quotes)." .
+            con:text  "Greetings! \nI am the DebugBot. I can simulate multiple other users so you can test things. I understand a few commands. \nTo see which ones, type \n\n'usage'\n\n (without the quotes)." .
 }
 
 
 <https://localhost:8443/won/resource/event/5669098069340991000#content> {
     event:5669098069340991000
-            won:textMessage  "one" ;
+            con:text  "one" ;
             agr:proposes event:6671551888677331000 .
 }
 
 <https://localhost:8443/won/resource/event/00d5wzbbf8hzzt2eewcc#content-tbn3> {
     event:00d5wzbbf8hzzt2eewcc
-            won:textMessage  "I'm not sure I understand you fully." ;
+            con:text  "I'm not sure I understand you fully." ;
             agr:accepts event:5669098069340991000 ;
             agr:proposes event:usi9yhill1lo2xi70sjx .
 }
 
 <https://localhost:8443/won/resource/event/557600936467257340#content> {
     event:557600936467257340
-            won:textMessage  "two" ;
+            con:text  "two" ;
             agr:accepts event:00d5wzbbf8hzzt2eewcc ;
             agr:proposesToCancel event:00d5wzbbf8hzzt2eewcc .
 }
 
 <https://localhost:8443/won/resource/event/ow321nn1va6clfidc4s0#content-1o90> {
     event:ow321nn1va6clfidc4s0
-            won:textMessage  "Please go on." ;
+            con:text  "Please go on." ;
             agr:accepts event:557600936467257340 .
 }
 ```
@@ -884,24 +884,24 @@ test (output):
     event:6671551888677331000
             won:socket        won:OwnerSocket ;
             won:targetSocket  won:OwnerSocket ;
-            won:textMessage  "hi" .
+            con:text  "hi" .
 }
 
 <https://localhost:8443/won/resource/event/usi9yhill1lo2xi70sjx#content-klsc> {
     event:usi9yhill1lo2xi70sjx
-            won:textMessage  "Greetings! \nI am the DebugBot. I can simulate multiple other users so you can test things. I understand a few commands. \nTo see which ones, type \n\n'usage'\n\n (without the quotes)." ;
+            con:text  "Greetings! \nI am the DebugBot. I can simulate multiple other users so you can test things. I understand a few commands. \nTo see which ones, type \n\n'usage'\n\n (without the quotes)." ;
             agr:proposes event:6671551888677331000 .
 }
 
 <https://localhost:8443/won/resource/event/5669098069340991000#content> {
     event:5669098069340991000
-            won:textMessage  "one" ;
+            con:text  "one" ;
             agr:proposes event:usi9yhill1lo2xi70sjx .
 }
 
 <https://localhost:8443/won/resource/event/00d5wzbbf8hzzt2eewcc#content-tbn3> {
     event:00d5wzbbf8hzzt2eewcc
-            won:textMessage  "I'm not sure I understand you fully." ;
+            con:text  "I'm not sure I understand you fully." ;
             agr:accept event:5669098069340991000 .
 }
 ```
@@ -915,24 +915,24 @@ test (output):
     event:6671551888677331000
             won:socket        won:OwnerSocket ;
             won:targetSocket  won:OwnerSocket ;
-            won:textMessage  "hi" .
+            con:text  "hi" .
 }
 
 <https://localhost:8443/won/resource/event/usi9yhill1lo2xi70sjx#content-klsc> {
     event:usi9yhill1lo2xi70sjx
-            won:textMessage  "Greetings! \nI am the DebugBot. I can simulate multiple other users so you can test things. I understand a few commands. \nTo see which ones, type \n\n'usage'\n\n (without the quotes)." ;
+            con:text  "Greetings! \nI am the DebugBot. I can simulate multiple other users so you can test things. I understand a few commands. \nTo see which ones, type \n\n'usage'\n\n (without the quotes)." ;
             agr:proposes event:6671551888677331000 .
 }
 
 <https://localhost:8443/won/resource/event/00d5wzbbf8hzzt2eewcc#content-tbn3> {
     event:00d5wzbbf8hzzt2eewcc
-            won:textMessage  "I'm not sure I understand you fully." ;
+            con:text  "I'm not sure I understand you fully." ;
             agr:proposes event:usi9yhill1lo2xi70sjx .
 }
 
 <https://localhost:8443/won/resource/event/557600936467257340#content> {
     event:557600936467257340
-            won:textMessage  "two" ;
+            con:text  "two" ;
             agr:accepts event:00d5wzbbf8hzzt2eewcc .
 }
 ```
@@ -945,38 +945,38 @@ test (output):
     event:6671551888677331000
             won:socket        won:OwnerSocket ;
             won:targetSocket  won:OwnerSocket ;
-            won:textMessage  "hi" .
+            con:text  "hi" .
 }
 
 <https://localhost:8443/won/resource/event/usi9yhill1lo2xi70sjx#content-klsc> {
     event:usi9yhill1lo2xi70sjx
-            won:textMessage  "Greetings! \nI am the DebugBot. I can simulate multiple other users so you can test things. I understand a few commands. \nTo see which ones, type \n\n'usage'\n\n (without the quotes)." .
+            con:text  "Greetings! \nI am the DebugBot. I can simulate multiple other users so you can test things. I understand a few commands. \nTo see which ones, type \n\n'usage'\n\n (without the quotes)." .
 }
 
 
 <https://localhost:8443/won/resource/event/5669098069340991000#content> {
     event:5669098069340991000
-            won:textMessage  "one" ;
+            con:text  "one" ;
             agr:proposes event:6671551888677331000 .
 }
 
 <https://localhost:8443/won/resource/event/00d5wzbbf8hzzt2eewcc#content-tbn3> {
     event:00d5wzbbf8hzzt2eewcc
-            won:textMessage  "I'm not sure I understand you fully." ;
+            con:text  "I'm not sure I understand you fully." ;
             agr:accepts event:5669098069340991000 ;
             agr:proposes event:usi9yhill1lo2xi70sjx .
 }
 
 <https://localhost:8443/won/resource/event/557600936467257340#content> {
     event:557600936467257340
-            won:textMessage  "two" ;
+            con:text  "two" ;
             agr:accepts event:00d5wzbbf8hzzt2eewcc ;
             agr:proposesToCancel event:557600936467257340 .
 }
 
 <https://localhost:8443/won/resource/event/ow321nn1va6clfidc4s0#content-1o90> {
     event:ow321nn1va6clfidc4s0
-            won:textMessage  "Please go on." ;
+            con:text  "Please go on." ;
             agr:accepts event:557600936467257340 .
 }
 
@@ -988,7 +988,7 @@ compare with:
 ```
 <https://localhost:8443/won/resource/event/557600936467257340#content> {
     event:557600936467257340
-            won:textMessage  "two" ;
+            con:text  "two" ;
             agr:accepts event:00d5wzbbf8hzzt2eewcc ;
             agr:proposesToCancel event:00d5wzbbf8hzzt2eewcc .
 }
@@ -997,7 +997,7 @@ Is replaced with:
 
 <https://localhost:8443/won/resource/event/557600936467257340#content> {
     event:557600936467257340
-            won:textMessage  "two" ;
+            con:text  "two" ;
             agr:accepts event:00d5wzbbf8hzzt2eewcc ;
             agr:proposesToCancel event:557600936467257340 .
 }
@@ -1008,31 +1008,31 @@ Is replaced with:
     event:6671551888677331000
             won:socket        won:OwnerSocket ;
             won:targetSocket  won:OwnerSocket ;
-            won:textMessage  "hi" .
+            con:text  "hi" .
 }
 
 <https://localhost:8443/won/resource/event/usi9yhill1lo2xi70sjx#content-klsc> {
     event:usi9yhill1lo2xi70sjx
-            won:textMessage  "Greetings! \nI am the DebugBot. I can simulate multiple other users so you can test things. I understand a few commands. \nTo see which ones, type \n\n'usage'\n\n (without the quotes)." .
+            con:text  "Greetings! \nI am the DebugBot. I can simulate multiple other users so you can test things. I understand a few commands. \nTo see which ones, type \n\n'usage'\n\n (without the quotes)." .
 }
 
 
 <https://localhost:8443/won/resource/event/5669098069340991000#content> {
     event:5669098069340991000
-            won:textMessage  "one" ;
+            con:text  "one" ;
             agr:proposes event:6671551888677331000 .
 }
 
 <https://localhost:8443/won/resource/event/00d5wzbbf8hzzt2eewcc#content-tbn3> {
     event:00d5wzbbf8hzzt2eewcc
-            won:textMessage  "I'm not sure I understand you fully." ;
+            con:text  "I'm not sure I understand you fully." ;
             agr:accepts event:5669098069340991000 ;
             agr:proposes event:usi9yhill1lo2xi70sjx .
 }
 
 <https://localhost:8443/won/resource/event/557600936467257340#content> {
     event:557600936467257340
-            won:textMessage  "two" ;
+            con:text  "two" ;
             agr:accepts event:00d5wzbbf8hzzt2eewcc ;
             agr:proposesToCancel event:00d5wzbbf8hzzt2eewcc .
 }
@@ -1041,7 +1041,7 @@ Is replaced with:
 
 <https://localhost:8443/won/resource/event/ow321nn1va6clfidc4s0#content-1o90> {
     event:ow321nn1va6clfidc4s0
-            won:textMessage  "Please go on." ;
+            con:text  "Please go on." ;
             agr:accepts event:557600936467257340 .
 }
 ```

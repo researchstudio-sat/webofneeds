@@ -46,12 +46,9 @@ won.setDisclaimerAccepted = setDisclaimerAccepted;
 
 won.WON = {};
 won.WON.baseUri = "https://w3id.org/won/core#";
-//won.WON.matcherURI = "http://localhost:8080/matcher/search/"
 won.WON.matcherURI = "https://localhost:8443/matcher/search/";
-//won.WON.matcherURI = "http://sat001.researchstudio.at:8080/matcher/search/";
-//won.WON.matcherURI = "https://sat001.researchstudio.at:8443/matcher/search/";
-
 won.WON.prefix = "won";
+
 won.WON.wonNode = won.WON.baseUri + "wonNode";
 won.WON.wonNodeCompacted = won.WON.prefix + ":wonNode";
 won.WON.Active = won.WON.baseUri + "Active";
@@ -69,8 +66,6 @@ won.WON.atomState = won.WON.baseUri + "atomState";
 won.WON.atomStateCompacted = won.WON.prefix + ":atomState";
 won.WON.socket = won.WON.baseUri + "socket";
 won.WON.socketCompacted = won.WON.prefix + ":socket";
-won.WON.flag = won.WON.baseUri + "flag";
-won.WON.flagCompacted = won.WON.prefix + "flag";
 won.WON.targetSocket = won.WON.baseUri + "targetSocket";
 won.WON.targetSocketCompacted = won.WON.prefix + ":targetSocket";
 
@@ -78,11 +73,6 @@ won.WON.targetAtom = won.WON.baseUri + "targetAtom";
 won.WON.targetAtomCompacted = won.WON.prefix + ":targetAtom";
 won.WON.targetConnection = won.WON.baseUri + "targetConnection";
 won.WON.targetConnectionCompacted = won.WON.prefix + ":targetConnection";
-won.WON.forResource = won.WON.baseUri + "forResource";
-won.WON.binaryRating = won.WON.baseUri + "binaryRating";
-won.WON.binaryRatingGood = won.WON.baseUri + "Good";
-won.WON.binaryRatingBad = won.WON.baseUri + "Bad";
-won.WON.feedback = won.WON.baseUri + "feedback";
 
 won.WON.connectionState = won.WON.baseUri + "connectionState";
 won.WON.connectionState = won.WON.prefix + ":connectionState";
@@ -95,22 +85,6 @@ won.WON.RequestSentCompacted = won.WON.baseUri + ":RequestSent";
 
 won.WON.Connected = won.WON.baseUri + "Connected";
 
-//EVENT TYPES
-won.WON.OwnerClose = won.WON.baseUri + "OwnerClose";
-won.WON.OwnerCloseCompacted = won.WON.prefix + ":OwnerClose";
-won.WON.OwnerOpen = won.WON.baseUri + "OwnerOpen";
-won.WON.OwnerOpenCompacted = won.WON.prefix + ":OwnerOpen";
-won.WON.PartnerClose = won.WON.baseUri + "PartnerClose";
-won.WON.PartnerCloseCompacted = won.WON.prefix + ":PartnerClose";
-won.WON.PartnerOpen = won.WON.baseUri + "PartnerOpen";
-won.WON.PartnerOpenCompacted = won.WON.prefix + ":PartnerOpen";
-won.WON.PartnerMessage = won.WON.baseUri + "PartnerMessage";
-won.WON.PartnerMessageCompacted = won.WON.prefix + ":PartnerMessage";
-won.WON.OwnerMessage = won.WON.baseUri + "OwnerMessage";
-won.WON.OwnerMessageCompacted = won.WON.prefix + ":OwnerMessage";
-won.WON.Hint = won.WON.baseUri + "Hint";
-won.WON.HintCompacted = won.WON.prefix + ":Hint";
-
 //TOAST TYPES
 won.WON.infoToast = won.WON.baseUri + "InfoToast";
 won.WON.warnToast = won.WON.baseUri + "WarnToast";
@@ -122,62 +96,23 @@ won.WON.graphCompacted = won.WON.prefix + ":graph";
 won.WON.Connection = won.WON.baseUri + "Connection";
 won.WON.ConnectionCompacted = won.WON.prefix + ":Connection";
 
-won.WON.Event = won.WON.baseUri + "Event";
-won.WON.EventCompacted = won.WON.prefix + ":Event";
-
 won.WON.Atom = won.WON.baseUri + "Atom";
 won.WON.AtomCompacted = won.WON.prefix + ":Atom";
-won.WON.BasicAtomTypeDemand = won.WON.baseUri + "Demand";
-won.WON.BasicAtomTypeDemandCompacted = won.WON.prefix + ":Demand";
-won.WON.BasicAtomTypeSupply = won.WON.baseUri + "Supply";
-won.WON.BasicAtomTypeSupplyCompacted = won.WON.prefix + ":Supply";
-won.WON.BasicAtomTypeDotogether = won.WON.baseUri + "DoTogether";
-won.WON.BasicAtomTypeDotogetherCompacted = won.WON.prefix + ":DoTogether";
-won.WON.BasicAtomTypeCombined = won.WON.baseUri + "Combined";
-won.WON.BasicAtomTypeCombinedCompacted = won.WON.baseUri + ":Combined";
-won.WON.BasicAtomTypeCritique = won.WON.baseUri + "Critique";
-won.WON.BasicAtomTypeCritiqueCompacted = won.WON.prefix + ":Critique";
-won.WON.NoHintForCounterpartCompacted =
-  won.WON.prefix + ":NoHintForCounterpart";
-won.WON.UsedForTestingCompacted = won.WON.prefix + ":UsedForTesting";
-won.WON.NoHintForMeCompacted = won.WON.prefix + ":NoHintForMe";
-won.WON.ParticipantSocket = won.WON.baseUri + "ParticipantSocket";
-won.WON.ParticipantSocketCompacted = won.WON.prefix + ":ParticipantSocket";
-won.WON.CommentSocket = won.WON.baseUri + "CommentSocket";
-won.WON.CommentSocketCompacted = won.WON.prefix + ":CommentSocket";
-won.WON.CoordinatorSocket = won.WON.baseUri + "CoordinatorSocket";
-won.WON.CoordinatorSocketCompacted = won.WON.prefix + ":CoordinatorSocket";
 won.WON.sourceAtom = won.WON.baseUri + "sourceAtom";
 won.WON.sourceAtomCompacted = won.WON.prefix + ":sourceAtom";
-won.WON.hasBasicAtomType = won.WON.baseUri + "hasBasicAtomType";
-won.WON.hasBasicAtomTypeCompacted = won.WON.prefix + ":hasBasicAtomType";
 won.WON.connections = won.WON.baseUri + "connections";
 won.WON.connectionsCompacted = won.WON.prefix + ":connections";
 won.WON.connectionState = won.WON.baseUri + "connectionState";
 won.WON.connectionStateCompacted = won.WON.prefix + ":connectionState";
 won.WON.hasContent = won.WON.baseUri + "hasContent";
 won.WON.hasContentCompacted = won.WON.prefix + ":content";
-won.WON.hasContentDescription = won.WON.baseUri + "hasContentDescription";
-won.WON.hasContentDescriptionCompacted = won.WON.prefix + ":contentDescription";
 won.WON.messageContainer = won.WON.baseUri + "messageContainer";
 won.WON.messageContainerCompacted = won.WON.prefix + ":messageContainer";
-won.WON.originator = won.WON.baseUri + "originator";
-won.WON.originatorCompacted = won.WON.prefix + ":originator";
-won.WON.recurInfiniteTimes = won.WON.baseUri + "recurInfiniteTimes";
-won.WON.recurInfiniteTimesCompacted = won.WON.prefix + ":recurInfiniteTimes";
-won.WON.recursIn = won.WON.baseUri + "recursIn";
-won.WON.recursInCompacted = won.WON.prefix + ":recurInfiniteTimes";
-won.WON.hasScore = won.WON.baseUri + "hasScore";
-won.WON.hasScoreCompacted = won.WON.prefix + ":hasScore";
-won.WON.tag = won.WON.baseUri + "tag";
-won.WON.tagCompacted = won.WON.prefix + ":tag";
 
 won.WON.matchScore = won.WON.baseUri + "matchScore";
 won.WON.matchScoreCompacted = won.WON.prefix + ":matchScore";
 won.WON.matchCounterpart = won.WON.baseUri + "matchCounterpart";
 won.WON.matchCounterpart = won.WON.prefix + ":matchCounterpart";
-won.WON.textMessage = won.WON.baseUri + "textMessage";
-won.WON.textMessageCompacted = won.WON.prefix + ":textMessage";
 
 won.WON.searchResultURI = won.WON.baseUri + "uri";
 won.WON.searchResultPreview = won.WON.baseUri + "preview";
@@ -186,11 +121,32 @@ won.WON.searchResult = won.WON.baseUri + "Match";
 
 won.WON.usedForTesting = won.WON.prefix + "UserForTesting";
 
+won.WONCON = {};
+won.WONCON.baseUri = "https://w3id.org/won/content#";
+won.WONCON.prefix = "con";
+won.WONCON.text = won.WONCON.baseUri + "text";
+won.WONCON.textCompacted = won.WONCON.prefix + ":text";
+won.WONCON.tag = won.WONCON.baseUri + "tag";
+won.WONCON.tagCompacted = won.WONCON.prefix + ":tag";
+won.WONCON.binaryRatingGood = won.WONCON.baseUri + "Good";
+won.WONCON.binaryRatingBad = won.WONCON.baseUri + "Bad";
+won.WONCON.feedback = won.WONCON.baseUri + "feedback";
+won.WONCON.binaryRating = won.WONCON.baseUri + "binaryRating";
+won.WONCON.feedbackTarget = won.WON.baseUri + "feedbackTarget";
+
+won.WONMATCH = {};
+won.WONMATCH.baseUri = "https://w3id.org/won/matching#";
+won.WONMATCH.prefix = "match";
+won.WONMATCH.NoHintForCounterpartCompacted =
+  won.WON.prefix + ":NoHintForCounterpart";
+won.WONMATCH.UsedForTestingCompacted = won.WONMATCH.prefix + ":UsedForTesting";
+won.WONMATCH.NoHintForMeCompacted = won.WONMATCH.prefix + ":NoHintForMe";
+won.WONMATCH.flag = won.WON.baseUri + "flag";
+won.WONMATCH.flagCompacted = won.WONMATCH.prefix + ":flag";
+
 won.WONMSG = {};
 won.WONMSG.baseUri = "https://w3id.org/won/message#";
 won.WONMSG.prefix = "msg";
-
-//sender/receiver etc.
 won.WONMSG.recipientAtom = won.WONMSG.baseUri + "recipientAtom";
 won.WONMSG.recipientAtomCompacted = won.WONMSG.prefix + ":recipientAtom";
 won.WONMSG.recipient = won.WONMSG.baseUri + "recipient";
@@ -687,6 +643,9 @@ function context2ttlPrefixes(jsonldContext) {
 won.minimalContext = {
   msg: "https://w3id.org/won/message#",
   won: "https://w3id.org/won/core#",
+  con: won.WONCON.baseUri,
+  match: won.WONMATCH.baseUri,
+  demo: "https://w3id.org/won/ext/demo#",
   hold: won.HOLD.baseUri,
   chat: won.CHAT.baseUri,
   group: won.GROUP.baseUri,
@@ -1415,7 +1374,7 @@ WonMessage.prototype = {
     return this.getSentTimestamp();
   },
   getTextMessage: function() {
-    return this.getProperty("https://w3id.org/won/core#textMessage");
+    return this.getProperty("https://w3id.org/won/content#text");
   },
   getHintScore: function() {
     return this.getProperty("https://w3id.org/won/core#hintScore");
@@ -2116,7 +2075,7 @@ won.MessageBuilder.prototype = {
       // text is either null, undefined, or empty
       // do nothing
     } else {
-      this.getContentGraphNode()[won.WON.textMessageCompacted] = text;
+      this.getContentGraphNode()[won.WONCON.textCompacted] = text;
     }
     return this;
   },
@@ -2170,12 +2129,12 @@ won.MessageBuilder.prototype = {
   },
 
   addRating: function(rating, connectionUri) {
-    this.getContentGraphNode()[won.WON.feedback] = {
+    this.getContentGraphNode()[won.WONCON.feedback] = {
       "@id": "_:b0",
-      "https://w3id.org/won/core#forResource": {
+      "https://w3id.org/won/content#feedbackTarget": {
         "@id": connectionUri,
       },
-      "https://w3id.org/won/core#binaryRating": {
+      "https://w3id.org/won/content#binaryRating": {
         "@id": rating,
       },
     };

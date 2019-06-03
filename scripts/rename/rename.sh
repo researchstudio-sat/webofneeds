@@ -15,9 +15,6 @@ source ${script_path}/common.sh $*
 
 ${script_path}/generate-regex-files.sh "$confdir" || exit 1
 
-sed_script_file=${confdir}/generated/sed-changefile-regexes.txt
-grep_script_file=${confdir}/generated/grep-checkfile-regex.txt
-
 # Parameters: 
 # $1: the file to process
 # Performs the replacements within the file if it is a file and renames it if it is a file or directory

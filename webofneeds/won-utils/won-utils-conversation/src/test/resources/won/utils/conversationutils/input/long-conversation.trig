@@ -1,3 +1,5 @@
+@prefix con:   <https://w3id.org/won/content#> .
+@prefix match:   <https://w3id.org/won/matching#> .
 @prefix msg:   <https://w3id.org/won/message#> .
 @prefix conn:  <https://localhost:8443/won/resource/connection/> .
 @prefix woncrypt: <https://w3id.org/won/core#> .
@@ -39,7 +41,7 @@
 
 <https://localhost:8443/won/resource/event/f34kg2a64biitiyljzfw#content-ne7g> {
     event:f34kg2a64biitiyljzfw
-            won:textMessage  "six" .
+            con:text  "six" .
 }
 
 <https://localhost:8443/won/resource/event/9fk2qrwimvgonhm1sljr#envelope-z6ry> {
@@ -83,7 +85,7 @@
 
 <https://localhost:8443/won/resource/event/ffj5c1mid09rmivhtxe6#content-1rut> {
     event:ffj5c1mid09rmivhtxe6
-            won:textMessage  "eight" .
+            con:text  "eight" .
 }
 
 <https://localhost:8443/won/resource/event/hi64fybu855zd84gm23o#envelope-llt1> {
@@ -236,14 +238,14 @@
     atom:2ovsiwhi5f7ok5t29gzm
             a             won:Atom ;
             won:socket  won:ChatSocket ;
-            won:flag   won:UsedForTesting , won:NoHintForCounterpart , won:NoHintForMe ;
+            match:flag   match:UsedForTesting , match:NoHintForCounterpart , match:NoHintForMe ;
             dc:description  "This is an atom automatically created by the DebugBot." ;
             dc:title        "Debugging with initial hint: Test" ;
             dc:description  "This is an atom automatically created by the DebugBot." ;
             dc:title        "Debugging with initial hint: Test" ;
             dc:description  "This is an atom automatically created by the DebugBot." ;
             dc:title        "Debugging with initial hint: Test" ;
-            won:seeks     _:b0 , _:b1 , _:b2 .
+            match:seeks     _:b0 , _:b1 , _:b2 .
     
     _:b0    dc:description  "This is an atom automatically created by the DebugBot." ;
             dc:title        "Debugging with initial hint: Test" .
@@ -325,7 +327,7 @@
 
 <https://localhost:8443/won/resource/event/hi64fybu855zd84gm23o#content-uesg> {
     event:hi64fybu855zd84gm23o
-            won:textMessage  "five" .
+            con:text  "five" .
 }
 
 <https://localhost:8443/won/resource/event/npg50wfexy2tikfbxpqu#envelope-6pi0> {
@@ -535,7 +537,7 @@
 
 <https://localhost:8443/won/resource/event/b97h74szn2jt99ihir1z#content-94fb> {
     event:b97h74szn2jt99ihir1z
-            won:textMessage  "five" .
+            con:text  "five" .
 }
 
 <https://localhost:8443/won/resource/event/3232577983921531000#data> {
@@ -651,7 +653,7 @@
 
 <https://localhost:8443/won/resource/event/swgo2s2b6o1exjlrla5n#content-5bph> {
     event:swgo2s2b6o1exjlrla5n
-            won:textMessage  "nine" .
+            con:text  "nine" .
 }
 
 <https://localhost:8443/won/resource/event/ozbuze2xsy5qbn0us43e#envelope-7zgc> {
@@ -987,7 +989,7 @@
 
 <https://localhost:8443/won/resource/event/r2c1w0wygs3rg64l0fqf#content-6e7w> {
     event:r2c1w0wygs3rg64l0fqf
-            won:textMessage  "four" .
+            con:text  "four" .
 }
 
 <https://localhost:8443/won/resource/event/24gkpya4bkp2j2rbefuc#envelope-mic8> {
@@ -1033,7 +1035,7 @@
 
 <https://localhost:8443/won/resource/event/3168560491118476300#content> {
     event:3168560491118476300
-            won:textMessage  "good morning!" .
+            con:text  "good morning!" .
 }
 
 <https://localhost:8443/won/resource/event/2dldj24d8lqgu87mv3qf#envelope-3q1o-sig> {
@@ -1078,7 +1080,7 @@
 
 <https://localhost:8443/won/resource/event/5kwectcuph2gf9p0aky5#content-5b6e> {
     event:5kwectcuph2gf9p0aky5
-            won:textMessage  "seven" .
+            con:text  "seven" .
 }
 
 <https://localhost:8443/won/resource/event/k0wk3njap0d16izp2i6z#envelope-iaq5> {
@@ -1520,7 +1522,7 @@
 
 <https://localhost:8443/won/resource/event/tjmyyjl6wobookjbhjz6#content-6h91> {
     event:tjmyyjl6wobookjbhjz6
-            won:textMessage  "three" .
+            con:text  "three" .
 }
 
 <https://localhost:8443/won/resource/event/1bcv89pxuhd2gp5l5nsu#envelope-0jll> {
@@ -1713,7 +1715,7 @@
 
 <https://localhost:8443/won/resource/event/s9tczu5xer541e42pepw#content-3gy7> {
     event:s9tczu5xer541e42pepw
-            won:textMessage  "three" .
+            con:text  "three" .
 }
 
 <https://localhost:8443/won/resource/event/9u662o69kcmgo34xvj03#envelope-6pbi> {
@@ -1773,7 +1775,7 @@
 
 <https://localhost:8443/won/resource/event/qna3ez6ybsh2tewkoby2#content-gd6b> {
     event:qna3ez6ybsh2tewkoby2
-            won:textMessage  "seven" .
+            con:text  "seven" .
 }
 
 <https://localhost:8443/won/resource/event/oovwqttnrlfy7xbkcojf#envelope-z7ao-sig> {
@@ -1963,7 +1965,7 @@
 
 <https://localhost:8443/won/resource/event/i7j7pnshk7ezp52o5ech#content-znb9> {
     event:i7j7pnshk7ezp52o5ech
-            won:textMessage  "two" .
+            con:text  "two" .
 }
 
 <https://localhost:8443/won/resource/event/qpngxhutn69c94slm9gn#envelope-wywy> {
@@ -2063,7 +2065,7 @@
 
 <https://localhost:8443/won/resource/event/dwlb3d1edh1zmv2fylzz#content-wpxs> {
     event:dwlb3d1edh1zmv2fylzz
-            won:textMessage  "one" .
+            con:text  "one" .
 }
 
 <https://localhost:8443/won/resource/event/r2c1w0wygs3rg64l0fqf#envelope-vfj0-sig> {
@@ -2078,7 +2080,7 @@
 
 <https://localhost:8443/won/resource/event/3232577983921531000#content> {
     event:3232577983921531000
-            won:textMessage  "send 9" .
+            con:text  "send 9" .
 }
 
 <https://localhost:8443/won/resource/event/vqqk16qvhf54i4nfw4kz#envelope-r8kx> {
@@ -2757,7 +2759,7 @@
 
 <https://localhost:8443/won/resource/event/o3addfh8ddd1gpc1mul8#content-rvjo> {
     event:o3addfh8ddd1gpc1mul8
-            won:textMessage  "one" .
+            con:text  "one" .
 }
 
 <https://localhost:8443/won/resource/event/oovwqttnrlfy7xbkcojf#envelope-pkef> {
@@ -2912,7 +2914,7 @@
 
 <https://localhost:8443/won/resource/event/gi7vgtoh8cpfxmc3qfzm#content-pnx0> {
     event:gi7vgtoh8cpfxmc3qfzm
-            won:textMessage  "five" .
+            con:text  "five" .
 }
 
 <https://localhost:8443/won/resource/event/wxt76dcvdg43076e3wwx#envelope-1uyb> {
@@ -3021,7 +3023,7 @@
 
 <https://localhost:8443/won/resource/event/xskpod54j5p7xuqwrsmn#content-nqko> {
     event:xskpod54j5p7xuqwrsmn
-            won:textMessage  "six" .
+            con:text  "six" .
 }
 
 <https://localhost:8443/won/resource/event/puwt147docct7c7sor3u#envelope-v2tp-sig> {
@@ -3232,7 +3234,7 @@
     event:3294287262210695000
             won:socket        won:ChatSocket ;
             won:targetSocket  won:ChatSocket ;
-            won:textMessage  "hello" .
+            con:text  "hello" .
 }
 
 <https://localhost:8443/won/resource/event/d45wfv3f52m2c2n8rnbb#envelope-x2ud> {
@@ -3949,7 +3951,7 @@
 
 <https://localhost:8443/won/resource/event/1qbpr1ugz3jxc3pu3hpv#content-hmvj> {
     event:1qbpr1ugz3jxc3pu3hpv
-            won:textMessage  "six" .
+            con:text  "six" .
 }
 
 <https://localhost:8443/won/resource/event/noobh2hep5dek2lnwgm5#envelope-am6e> {
@@ -4040,7 +4042,7 @@
 
 <https://localhost:8443/won/resource/event/8737279072951765000#content> {
     event:8737279072951765000
-            won:textMessage  "send 9" .
+            con:text  "send 9" .
 }
 
 <https://localhost:8443/won/resource/event/uxk3porfm86sh9kcftsd#envelope-uc5o-sig> {
@@ -4212,7 +4214,7 @@
 
 <https://localhost:8443/won/resource/event/3apbcn1c2o9hgrnxo4rw#content-avj2> {
     event:3apbcn1c2o9hgrnxo4rw
-            won:textMessage  "four" .
+            con:text  "four" .
 }
 
 <https://localhost:8443/won/resource/event/tqjuk5oivtq1u5b1bkuo#envelope-sjfv> {
@@ -4681,7 +4683,7 @@
 
 <https://localhost:8443/won/resource/event/4227so3ro4v41g6j1qfy#content-vtit> {
     event:4227so3ro4v41g6j1qfy
-            won:textMessage  "four" .
+            con:text  "four" .
 }
 
 <https://localhost:8443/won/resource/event/71xk18tfdq442ja0kg8r#envelope-kmfd-sig> {
@@ -4850,7 +4852,7 @@
 
 <https://localhost:8443/won/resource/event/oovwqttnrlfy7xbkcojf#content-m6pn> {
     event:oovwqttnrlfy7xbkcojf
-            won:textMessage  "two" .
+            con:text  "two" .
 }
 
 <https://localhost:8443/won/resource/event/hayfn1qsb13b4m9gbeo4#envelope-derv> {
@@ -5498,7 +5500,7 @@
 
 <https://localhost:8443/won/resource/event/4152337386173656000#content> {
     event:4152337386173656000
-            won:textMessage  "propose" .
+            con:text  "propose" .
 }
 
 <https://localhost:8443/won/resource/event/q5joyttqlnc7ht8mmg1g#envelope-e4b3> {
@@ -5631,7 +5633,7 @@
     atom:4517796920802783000
             a             won:Atom ;
             won:socket  won:ChatSocket ;
-            won:flag   won:UsedForTesting ;
+            match:flag   match:UsedForTesting ;
             dc:title  "Test" ;
             dc:title  "Test" ;
             dc:title  "Test" ;
@@ -6174,7 +6176,7 @@
 
 <https://localhost:8443/won/resource/event/sldopxdatr6axjuasy6x#content-i4yj> {
     event:sldopxdatr6axjuasy6x
-            won:textMessage  "three" .
+            con:text  "three" .
 }
 
 <https://localhost:8443/won/resource/event/6806941562298968000#envelope-s99w-sig> {
@@ -6927,7 +6929,7 @@
 
 <https://localhost:8443/won/resource/event/rgcqnpnatryycn5cd9cs#content-lbe8> {
     event:rgcqnpnatryycn5cd9cs
-            won:textMessage  "eight" .
+            con:text  "eight" .
 }
 
 <https://localhost:8443/won/resource/event/wxt76dcvdg43076e3wwx#envelope-1uyb-sig> {
@@ -6996,7 +6998,7 @@
 
 <https://localhost:8443/won/resource/event/v02oubvsnnv7rx4gjb36#content-vxjm> {
     event:v02oubvsnnv7rx4gjb36
-            won:textMessage  "one" .
+            con:text  "one" .
 }
 
 <https://localhost:8443/won/resource/event/4ll0l8pyev4hw4x9luks#envelope-r207> {
@@ -7032,7 +7034,7 @@
 
 <https://localhost:8443/won/resource/event/uxk3porfm86sh9kcftsd#content-d8tl> {
     event:uxk3porfm86sh9kcftsd
-            won:textMessage  "nine" .
+            con:text  "nine" .
 }
 
 <https://localhost:8443/won/resource/event/kdwxbfuz9d938gqqt6ij#envelope-lct1-sig> {
@@ -7318,7 +7320,7 @@
 
 <https://localhost:8443/won/resource/event/pm76xd4xoorgns734t4r#content-hfsf> {
     event:pm76xd4xoorgns734t4r
-            won:textMessage  "two" .
+            con:text  "two" .
 }
 
 <https://localhost:8443/won/resource/event/31vnmooeugvwj50005yn#envelope-r3b7> {
@@ -8478,7 +8480,7 @@
 
 <https://localhost:8443/won/resource/event/2827350912810749000#content> {
     event:2827350912810749000
-            won:textMessage  "send 9" .
+            con:text  "send 9" .
 }
 
 <https://localhost:8443/won/resource/event/2827350912810749000#envelope-fpf5> {
@@ -8757,12 +8759,12 @@
 
 <https://localhost:8443/won/resource/event/xxik65ofaf2j3tym3tqu#content-41tj> {
     event:xxik65ofaf2j3tym3tqu
-            won:textMessage  "seven" .
+            con:text  "seven" .
 }
 
 <https://localhost:8443/won/resource/event/6rrkhhh7qvwb3pg9mhgu#content-9a37> {
     event:6rrkhhh7qvwb3pg9mhgu
-            won:textMessage  "Greetings! \nI am the DebugBot. I can simulate multiple other users so you can test things. I understand a few commands. \nTo see which ones, type \n\n'usage'\n\n (without the quotes)." .
+            con:text  "Greetings! \nI am the DebugBot. I can simulate multiple other users so you can test things. I understand a few commands. \nTo see which ones, type \n\n'usage'\n\n (without the quotes)." .
 }
 
 <https://localhost:8443/won/resource/event/l791zdmcb5zef4ryyby6#envelope-f5bu> {
@@ -8912,7 +8914,7 @@
 
 <https://localhost:8443/won/resource/event/tzdrs2m2km0jvafk5kwi#content-kqn5> {
     event:tzdrs2m2km0jvafk5kwi
-            won:textMessage  "nine" .
+            con:text  "nine" .
 }
 
 <https://localhost:8443/won/resource/event/0svc5rwome1myj39cxxk#envelope-ucaz> {
@@ -9100,7 +9102,7 @@
 
 <https://localhost:8443/won/resource/event/hw6lsjfsh3evrbqrirgo#content-pa32> {
     event:hw6lsjfsh3evrbqrirgo
-            won:textMessage  "eight" .
+            con:text  "eight" .
 }
 
 <https://localhost:8443/won/resource/event/1qbpr1ugz3jxc3pu3hpv#envelope-qz5j-sig> {
@@ -10005,7 +10007,7 @@
 
 <https://localhost:8443/won/resource/event/0svc5rwome1myj39cxxk#content-zfv9> {
     event:0svc5rwome1myj39cxxk
-            won:textMessage  "ok, I'll propose my latest message - but I'll need to crawl the connection data first, please be patient." .
+            con:text  "ok, I'll propose my latest message - but I'll need to crawl the connection data first, please be patient." .
 }
 
 <https://localhost:8443/won/resource/event/9u662o69kcmgo34xvj03#envelope-8us4> {
@@ -10705,7 +10707,7 @@
 
 <https://localhost:8443/won/resource/event/ansbz6vu5hqede3l19k0#content-nhjd> {
     event:ansbz6vu5hqede3l19k0
-            won:textMessage  "I'm not sure I understand you fully." .
+            con:text  "I'm not sure I understand you fully." .
 }
 
 <https://localhost:8443/won/resource/event/lc7idl45o5u0p9avvcm9#envelope-dway-sig> {

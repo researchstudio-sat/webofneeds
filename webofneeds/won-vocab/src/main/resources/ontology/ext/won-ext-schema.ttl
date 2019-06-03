@@ -19,7 +19,7 @@
                                    dc:date "2019-05-03"^^xsd:date ;
                                    dc:title "Web of Needs Schema Extension" ;
                                    dcterms:license <https://creativecommons.org/licenses/by/4.0/> ;
-                                   vann:preferredNamespacePrefix "wxs" ;
+                                   vann:preferredNamespacePrefix "wx-schema" ;
                                    prov:wasDerivedFrom <http://schema.org> .
 
 #################################################################

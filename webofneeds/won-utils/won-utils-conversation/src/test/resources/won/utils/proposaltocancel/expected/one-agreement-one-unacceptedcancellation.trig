@@ -20,7 +20,7 @@
 
 <https://localhost:8443/won/resource/event/1435888415723958200> {
     <https://localhost:8443/won/resource/event/ow321nn1va6clfidc4s0>
-            <https://w3id.org/won/core#textMessage>
+            <https://w3id.org/won/content#text>
                     "Please go on." .
         <https://localhost:8443/won/resource/event/ow321nn1va6clfidc4s0>
                 <https://w3id.org/won/agreement#accepts>

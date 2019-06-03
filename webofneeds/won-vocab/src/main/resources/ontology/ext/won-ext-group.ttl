@@ -19,7 +19,7 @@
                                   dc:date "2019-04-15"^^xsd:date ;
                                   dc:title "Web of Needs Group Extension" ;
                                   dcterms:license <https://creativecommons.org/licenses/by/4.0/> ;
-                                  vann:preferredNamespacePrefix "grp" .
+                                  vann:preferredNamespacePrefix "wx-group" .
 
 #################################################################
 #    Annotation properties

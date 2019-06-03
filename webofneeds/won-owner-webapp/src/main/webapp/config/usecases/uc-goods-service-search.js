@@ -44,7 +44,7 @@ export const goodsServiceSearch = {
     let subQueries = [];
     let subScores = [];
 
-    const tags = getIn(draft, ["seeks", "tags"]);
+    const tags = getIn(draft, ["seeks", "tag"]);
     let keywords = [];
 
     // prep tags for searching
@@ -89,7 +89,7 @@ export const goodsServiceSearch = {
         let tagsSQ = textSearchSubQuery({
           resultName: resultName,
           bindScoreAs: "?tags_" + keyword + "_index",
-          pathToText: "won:tags",
+          pathToText: "con:tag",
           prefixesInPath: {},
           keyword: keyword,
         });
@@ -118,6 +118,7 @@ export const goodsServiceSearch = {
       pathToGeoCoords: "s:location/s:geo",
       prefixesInPath: {
         s: won.defaultContext["s"],
+        con: won.defaultContext["con"],
       },
       geoCoordinates: getIn(draft, ["seeks", "location"]),
     });
@@ -138,6 +139,8 @@ export const goodsServiceSearch = {
       {
         prefixes: {
           won: won.defaultContext["won"],
+          s: won.defaultContext["s"],
+          rdf: won.defaultContext["rdf"],
         },
         operations: [
           `${resultName} rdf:type won:Atom.`,

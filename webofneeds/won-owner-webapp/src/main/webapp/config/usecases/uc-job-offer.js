@@ -87,10 +87,11 @@ export const jobOffer = {
     const organizationNameSQ = tagOverlapScoreSubQuery({
       resultName: resultName,
       bindScoreAs: "?organizationName_jaccardIndex",
-      pathToTags: "won:seeks/s:hiringOrganization/s:name",
+      pathToTags: "match:seeks/s:hiringOrganization/s:name",
       prefixesInPath: {
         s: won.defaultContext["s"],
         won: won.defaultContext["won"],
+        match: won.defaultContext["match"],
       },
       tagLikes: getIn(draft, ["content", "organizationNames"]),
     });
@@ -99,10 +100,11 @@ export const jobOffer = {
     const employmentTypesSQ = tagOverlapScoreSubQuery({
       resultName: resultName,
       bindScoreAs: "?employmentTypes_jaccardIndex",
-      pathToTags: "won:seeks/s:employmentType",
+      pathToTags: "match:seeks/s:employmentType",
       prefixesInPath: {
         s: won.defaultContext["s"],
         won: won.defaultContext["won"],
+        match: won.defaultContext["match"],
       },
       tagLikes: getIn(draft, ["content", "employmentTypes"]),
     });
@@ -111,10 +113,11 @@ export const jobOffer = {
     const industryScoreSQ = tagOverlapScoreSubQuery({
       resultName: resultName,
       bindScoreAs: "?industry_jaccardIndex",
-      pathToTags: "won:seeks/s:industry",
+      pathToTags: "match:seeks/s:industry",
       prefixesInPath: {
         s: won.defaultContext["s"],
         won: won.defaultContext["won"],
+        match: won.defaultContext["match"],
       },
       tagLikes: getIn(draft, ["content", "industry"]),
     });
@@ -122,10 +125,12 @@ export const jobOffer = {
     const vicinityScoreSQ = vicinityScoreSubQuery({
       resultName: resultName,
       bindScoreAs: "?jobLocation_geoScore",
-      pathToGeoCoords: "won:seeks/s:jobLocation/s:geo",
+      pathToGeoCoords: "match:seeks/s:jobLocation/s:geo",
       prefixesInPath: {
         s: won.defaultContext["s"],
         won: won.defaultContext["won"],
+        match: won.defaultContext["match"],
+        con: won.defaultContext["con"],
       },
       geoCoordinates: getIn(draft, ["content", "jobLocation"]),
     });

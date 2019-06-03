@@ -1,3 +1,5 @@
+@prefix con:   <https://w3id.org/won/content#> .
+@prefix match:   <https://w3id.org/won/matching#> .
 @prefix msg:   <https://w3id.org/won/message#> .
 @prefix conn:  <https://satsrv04.researchstudio.at:8889/won/resource/connection/> .
 @prefix woncrypt: <https://w3id.org/won/core#> .

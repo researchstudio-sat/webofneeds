@@ -1,12 +1,13 @@
 @prefix : <https://w3id.org/won/core#> .
 @prefix dc: <http://purl.org/dc/elements/1.1/> .
-@prefix dcterms: <http://purl.org/dc/terms/> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix vann: <http://purl.org/vocab/vann/> .
 @prefix vaem: <http://www.linkedmodel.org/schema/vaem#> .
+@prefix vann: <http://purl.org/vocab/vann/> .
+@prefix terms: <http://purl.org/dc/terms/> .
 @base <https://w3id.org/won/core> .
 
 <https://w3id.org/won/core> rdf:type owl:Ontology ;
@@ -20,12 +21,11 @@ Atoms can establish *Connections*  with other Atoms, if both Atoms' owners agree
 Matching services can make suggestions which atoms to connect to. An Atom specifies 'Sockets' indicating the kinds of Connections it is prepared to establish."""@en ;
                              dc:creator "Fabian Salcher" ,
                                         "Florian Kleedorfer" ;
-                             dcterms:created "2013-12-13"^^xsd:date ;
                              dc:title "Web of Needs Core Ontology" ;
-							 dcterms:license <https://creativecommons.org/licenses/by/4.0/> ;
+                             terms:created "2013-12-13"^^xsd:date ;
+                             terms:license <https://creativecommons.org/licenses/by/4.0/> ;
                              vann:preferredNamespacePrefix "won" ;
                              rdfs:comment "Ontology for the Web of Needs data model."@en .
-							 
 
 #################################################################
 #    Annotation properties
@@ -47,15 +47,24 @@ dc:date rdf:type owl:AnnotationProperty .
 dc:description rdf:type owl:AnnotationProperty .
 
 
-dcterms:license rdf:type owl:AnnotationProperty .
-
-
 ###  http://purl.org/dc/elements/1.1/title
 dc:title rdf:type owl:AnnotationProperty .
 
 
+###  http://purl.org/dc/terms/created
+terms:created rdf:type owl:AnnotationProperty .
+
+
+###  http://purl.org/dc/terms/license
+terms:license rdf:type owl:AnnotationProperty .
+
+
 ###  http://purl.org/vocab/vann/preferredNamespacePrefix
 vann:preferredNamespacePrefix rdf:type owl:AnnotationProperty .
+
+
+###  http://www.linkedmodel.org/schema/vaem#rationale
+vaem:rationale rdf:type owl:AnnotationProperty .
 
 
 #################################################################
@@ -148,15 +157,6 @@ xsd:duration rdf:type rdfs:Datatype .
                             rdfs:label "derivesInverseAtomProperty" .
 
 
-###  https://w3id.org/won/core#flag
-:flag rdf:type owl:ObjectProperty ;
-      rdfs:domain :Atom ;
-      rdfs:range :Flag ;
-      rdfs:comment "Links an Atom to its Flags"@en ;
-      rdfs:isDefinedBy <https://w3id.org/won/core> ;
-      rdfs:label "flag" .
-
-
 ###  https://w3id.org/won/core#messageContainer
 :messageContainer rdf:type owl:ObjectProperty ,
                            owl:FunctionalProperty ;
@@ -169,16 +169,6 @@ xsd:duration rdf:type rdfs:Datatype .
                   rdfs:comment "Links the Connection object to a container containing connection events (messages)."@en ;
                   rdfs:isDefinedBy <https://w3id.org/won/core> ;
                   rdfs:label "messageContainer" .
-
-
-###  https://w3id.org/won/core#seeks
-:seeks rdf:type owl:ObjectProperty ;
-       rdfs:domain :Atom ;
-       rdfs:range owl:Thing ;
-       rdfs:comment """This optional property is one of the two properties that defines the content of every atom (the other is the \"is\" property). It is used to describe that part of the content that is
-sought to fulfill the atom in contrast to the part that is available.""" ;
-       rdfs:isDefinedBy <https://w3id.org/won/core> ;
-       rdfs:label "seeks" .
 
 
 ###  https://w3id.org/won/core#socket
@@ -345,26 +335,6 @@ sought to fulfill the atom in contrast to the part that is available.""" ;
                      rdfs:label "connectionUriPrefix" .
 
 
-###  https://w3id.org/won/core#doNotMatchAfter
-:doNotMatchAfter rdf:type owl:DatatypeProperty ,
-                          owl:FunctionalProperty ;
-                 rdfs:domain :Atom ;
-                 rdfs:range xsd:dateTime ;
-                 rdfs:comment "Indicates that matchers should not use this atom for matching after the specified xsd:dateTime."@en ;
-                 rdfs:isDefinedBy <https://w3id.org/won/core> ;
-                 rdfs:label "doNotMatchAfter" .
-
-
-###  https://w3id.org/won/core#doNotMatchBefore
-:doNotMatchBefore rdf:type owl:DatatypeProperty ,
-                           owl:FunctionalProperty ;
-                  rdfs:domain :Atom ;
-                  rdfs:range xsd:dateTime ;
-                  rdfs:comment "Indicates that matchers should not use this atom for matching before the specified xsd:dateTime."@en ;
-                  rdfs:isDefinedBy <https://w3id.org/won/core> ;
-                  rdfs:label "doNotMatchBefore" .
-
-
 ###  https://w3id.org/won/core#eventUriPrefix
 :eventUriPrefix rdf:type owl:DatatypeProperty ;
                 rdfs:domain :UriPrefixSpecification ;
@@ -379,14 +349,6 @@ sought to fulfill the atom in contrast to the part that is available.""" ;
               rdfs:range xsd:string ;
               rdfs:comment "The activeMQ queue to be used by matchers to send messages to the node."@en ;
               rdfs:label "matcherQueue" .
-
-
-###  https://w3id.org/won/core#matchingContext
-:matchingContext rdf:type owl:DatatypeProperty ;
-                 rdfs:domain :Atom ;
-                 rdfs:range xsd:string ;
-                 rdfs:comment "Specifies a 'matching context' for the Atom. Matchers should only send hints to this Atom if the counterpart specifies the same matching context. If no matching context is specified, matching is not restricted, and matchers may send hints with counterparts that do specify matching contexts."@en ;
-                 rdfs:label "matchingContext" .
 
 
 ###  https://w3id.org/won/core#nodeQueue
@@ -411,22 +373,6 @@ sought to fulfill the atom in contrast to the part that is available.""" ;
                 rdfs:range xsd:integer ;
                 rdfs:comment "Defines the maximum number of established connections supported by the socket."@en ;
                 rdfs:label "socketCapacity" .
-
-
-###  https://w3id.org/won/core#tag
-:tag rdf:type owl:DatatypeProperty ;
-     rdfs:domain :Atom ;
-     rdfs:range xsd:string ;
-     rdfs:comment "Tags an Atom with a String value."@en ;
-     rdfs:label "tag" .
-
-
-###  https://w3id.org/won/core#textMessage
-:textMessage rdf:type owl:DatatypeProperty ;
-                 rdfs:range xsd:string ;
-                 rdfs:comment "Specifies a text message."@en ;
-				 vaem:rationale "At first glance, this property seems better placed in the `message` ontology, however the message validation forbids properties from that ontology in the message content. As it is really important, we place it in `core`."@en;
-				 rdfs:label "textMessage" .
 
 
 #################################################################
@@ -487,13 +433,6 @@ The container supports LDP paging as described here: https://github.com/research
                  rdfs:comment "A Connection's state."@en ;
                  rdfs:isDefinedBy <https://w3id.org/won/core> ;
                  rdfs:label "ConnectionState" .
-
-
-###  https://w3id.org/won/core#Flag
-:Flag rdf:type owl:Class ;
-      rdfs:comment "Superclass of all Flags an atom can have."@en ;
-      rdfs:isDefinedBy <https://w3id.org/won/core> ;
-      rdfs:label "Flag" .
 
 
 ###  https://w3id.org/won/core#MessageContainer
@@ -580,22 +519,6 @@ The container supports LDP paging as described here: https://github.com/research
           rdfs:label "Inactive" .
 
 
-###  https://w3id.org/won/core#NoHintForCounterpart
-:NoHintForCounterpart rdf:type owl:NamedIndividual ,
-                               :Flag ;
-                      rdfs:comment "An Atom specifying this flag indicates that matchers should not send Hint messages to the counterpart in case of a match. If the NoHintForMe flag is also present, matchers should disregard this atom completely."@en ;
-                      rdfs:isDefinedBy <https://w3id.org/won/core> ;
-                      rdfs:label "NoHintForCounterpart" .
-
-
-###  https://w3id.org/won/core#NoHintForMe
-:NoHintForMe rdf:type owl:NamedIndividual ,
-                      :Flag ;
-             rdfs:comment "An Atom specifying this flag indicates that matchers should not send Hint messages to that Atom. If the NoHintForCounterpart flag is also present, matchers should disregard this atom completely."@en ;
-             rdfs:isDefinedBy <https://w3id.org/won/core> ;
-             rdfs:label "NoHintForMe" .
-
-
 ###  https://w3id.org/won/core#RequestReceived
 :RequestReceived rdf:type owl:NamedIndividual ,
                           :ConnectionState ;
@@ -620,96 +543,12 @@ The container supports LDP paging as described here: https://github.com/research
            rdfs:label "Suggested" .
 
 
-###  https://w3id.org/won/core#UsedForTesting
-:UsedForTesting rdf:type owl:NamedIndividual ,
-                         :Flag ;
-                rdfs:comment "Flag indicating the atom has been created for testing purposes. It should only be matched with other atoms flagged with UsedForTesting. The flag is intended to separate real-world atoms from those generated for testing the system, so that users are neither spammed nor misled."@en ;
-                rdfs:isDefinedBy <https://w3id.org/won/core> ;
-                rdfs:label "UsedForTesting" .
-
-
-###  https://w3id.org/won/core#WhatsAround
-:WhatsAround rdf:type owl:NamedIndividual ,
-                      :Flag ;
-             rdfs:comment "An Atom specifying this flag indicates that matchers should not match with anything but the location within this atom. The intention of this Flag is to simply find other atoms around a certain location."@en ;
-             rdfs:isDefinedBy <https://w3id.org/won/core> ;
-             rdfs:label "WhatsAround" .
-
-
-###  https://w3id.org/won/core#WhatsNew
-:WhatsNew rdf:type owl:NamedIndividual ,
-                   :Flag ;
-          rdfs:comment "An Atom specifying this flag indicates that matchers should match with anything that is created recently. The intention of this Flag is to simply find other atoms created recently."@en ;
-          rdfs:isDefinedBy <https://w3id.org/won/core> ;
-          rdfs:label "WhatsNew" .
-
-
 #################################################################
 #    General axioms
 #################################################################
 
-[ rdf:type owl:AllDisjointClasses ;
-  owl:members ( <http://www.w3.org/ns/ldp#CompositeContainer>
-                :Atom
-                :AtomState
-                :Connection
-                :ConnectionState
-                :Flag
-                :Node
-                :Socket
-                :SocketDefinition
-                :UriPrefixSpecification
-                :WonProtocol
-              )
-] .
-
-
 [ rdf:type owl:AllDifferent ;
   owl:distinctMembers rdf:nil
-] .
-
-
-[ rdf:type owl:AllDifferent ;
-  owl:distinctMembers ( :Active
-                        :Closed
-                        :Connected
-                        :Inactive
-                        :NoHintForCounterpart
-                        :NoHintForMe
-                        :RequestReceived
-                        :RequestSent
-                        :Suggested
-                        :UsedForTesting
-                        :WhatsAround
-                        :WhatsNew
-                      )
-] .
-
-
-[ rdf:type owl:AllDisjointProperties ;
-  owl:members ( owl:topObjectProperty
-                :atomList
-                :atomState
-                :compatibleSocketDefinition
-                :connectionState
-                :connections
-                :contentGraph
-                :defaultSocket
-                :derivesAtomProperty
-                :derivesInverseAtomProperty
-                :flag
-                :messageContainer
-                :seeks
-                :socket
-                :socketDefinition
-                :sourceAtom
-                :supportsWonProtocolImpl
-                :targetAtom
-                :targetConnection
-                :targetSocket
-                :uriPrefixSpecification
-                :wonNode
-              )
 ] .
 
 

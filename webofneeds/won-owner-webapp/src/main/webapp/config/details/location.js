@@ -83,12 +83,12 @@ export const travelAction = {
   messageEnabled: true,
   parseToRDF: function({ value, identifier, contentUri }) {
     if (!value) {
-      return { "won:travelAction": undefined };
+      return { "con:travelAction": undefined };
     }
 
     const baseUri = genDetailBaseUri(contentUri, identifier);
     return {
-      "won:travelAction": {
+      "con:travelAction": {
         "@id": baseUri,
         "@type": "s:TravelAction",
         "s:fromLocation": genSPlace({
@@ -114,7 +114,7 @@ export const travelAction = {
     };
   },
   parseFromRDF: function(jsonLDImm) {
-    const jsonLdTravelAction = jsonLDImm && jsonLDImm.get("won:travelAction");
+    const jsonLdTravelAction = jsonLDImm && jsonLDImm.get("con:travelAction");
     if (!jsonLdTravelAction) return undefined;
 
     const jsonLdTravelActionImm = Immutable.fromJS(jsonLdTravelAction);

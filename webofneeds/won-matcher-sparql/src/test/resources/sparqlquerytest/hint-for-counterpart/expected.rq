@@ -5,6 +5,6 @@ WHERE
                <https://w3id.org/won/core#atomState>  <https://w3id.org/won/core#Active> ;
                <http://purl.org/dc/terms/created>  ?created
     }
-    FILTER NOT EXISTS { ?result  <https://w3id.org/won/core#flag>  <https://w3id.org/won/core#NoHintForCounterpart> }
+    FILTER NOT EXISTS { ?result  <https://w3id.org/won/matching#flag>  <https://w3id.org/won/matching#NoHintForCounterpart> }
   }
 

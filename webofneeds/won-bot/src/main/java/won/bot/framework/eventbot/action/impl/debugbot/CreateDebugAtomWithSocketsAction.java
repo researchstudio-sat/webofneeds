@@ -17,20 +17,20 @@ import org.apache.jena.query.Dataset;
 
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.EventBotActionUtils;
+import won.bot.framework.eventbot.action.impl.atomlifecycle.AbstractCreateAtomAction;
 import won.bot.framework.eventbot.action.impl.counter.Counter;
 import won.bot.framework.eventbot.action.impl.counter.CounterImpl;
-import won.bot.framework.eventbot.action.impl.atomlifecycle.AbstractCreateAtomAction;
 import won.bot.framework.eventbot.bus.EventBus;
-import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.AtomCreationFailedEvent;
 import won.bot.framework.eventbot.event.AtomSpecificEvent;
+import won.bot.framework.eventbot.event.Event;
+import won.bot.framework.eventbot.event.impl.atomlifecycle.AtomCreatedEvent;
+import won.bot.framework.eventbot.event.impl.debugbot.AtomCreatedEventForDebugConnect;
+import won.bot.framework.eventbot.event.impl.debugbot.AtomCreatedEventForDebugHint;
 import won.bot.framework.eventbot.event.impl.debugbot.ConnectDebugCommandEvent;
 import won.bot.framework.eventbot.event.impl.debugbot.HintDebugCommandEvent;
 import won.bot.framework.eventbot.event.impl.debugbot.HintType;
-import won.bot.framework.eventbot.event.impl.debugbot.AtomCreatedEventForDebugConnect;
-import won.bot.framework.eventbot.event.impl.debugbot.AtomCreatedEventForDebugHint;
 import won.bot.framework.eventbot.event.impl.matcher.AtomCreatedEventForMatcher;
-import won.bot.framework.eventbot.event.impl.atomlifecycle.AtomCreatedEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.FailureResponseEvent;
 import won.bot.framework.eventbot.listener.EventListener;
 import won.protocol.message.WonMessage;
@@ -38,7 +38,7 @@ import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.DefaultAtomModelWrapper;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
-import won.protocol.vocabulary.WON;
+import won.protocol.vocabulary.WONMATCH;
 
 /**
  * Creates an atom with the specified sockets. If no socket is specified, the
@@ -82,7 +82,7 @@ public class CreateDebugAtomWithSocketsAction extends AbstractCreateAtomAction {
         if (atomDataset != null) {
             DefaultAtomModelWrapper atomModelWrapper = new DefaultAtomModelWrapper(atomDataset);
             titleString = atomModelWrapper.getSomeTitleFromIsOrAll("en", "de");
-            createAtom = atomModelWrapper.flag(WON.UsedForTesting) && !atomModelWrapper.flag(WON.NoHintForMe);
+            createAtom = atomModelWrapper.flag(WONMATCH.UsedForTesting) && !atomModelWrapper.flag(WONMATCH.NoHintForMe);
         }
         if (!createAtom)
             return; // if create atom is false do not continue the debug atom creation

@@ -17,7 +17,7 @@
 ```
 < <https://localhost:8443/won/resource/event/eczqg8lp7xbukpzikd41#content-xg7t> {
 <     event:eczqg8lp7xbukpzikd41
-<             won:textMessage  "    'deactivate':  deactivate remote atom of the current connection" .
+<             con:text  "    'deactivate':  deactivate remote atom of the current connection" .
 < }
 < 
 ```
@@ -353,7 +353,7 @@ event:ofx1afjv35cwpppp0wyg
 10171a10172,10175
 > <https://localhost:8443/won/resource/event/eczqg8lp7xbukpzikd41#content-xg7t> {
 >     event:eczqg8lp7xbukpzikd41
->             won:textMessage  "    'deactivate':  deactivate remote atom of the current connection" .
+>             con:text  "    'deactivate':  deactivate remote atom of the current connection" .
 > }
 ```
 
@@ -368,7 +368,7 @@ event:ofx1afjv35cwpppp0wyg
 8786,8789d8785
 < <https://localhost:8443/won/resource/event/152dum7y56zn95qyernf#content-19tl> {
 <     event:152dum7y56zn95qyernf
-<             won:textMessage  "I'm not sure I understand you fully." .
+<             con:text  "I'm not sure I understand you fully." .
 < }
 ```
 
@@ -399,7 +399,7 @@ event:ofx1afjv35cwpppp0wyg
 < 
 < <https://localhost:8443/won/resource/event/eczqg8lp7xbukpzikd41#content-xg7t> {
 <     event:eczqg8lp7xbukpzikd41
-<             won:textMessage  "    'deactivate':  deactivate remote atom of the current connection" .
+<             con:text  "    'deactivate':  deactivate remote atom of the current connection" .
 ```
 
 ***diff** with all-messages-acknowledged.trig sample*:
@@ -682,7 +682,7 @@ event:ofx1afjv35cwpppp0wyg
 < 
 < <https://localhost:8443/won/resource/event/eczqg8lp7xbukpzikd41#content-xg7t> {
 <     event:eczqg8lp7xbukpzikd41
-<             won:textMessage  "    'deactivate':  deactivate remote atom of the current connection" .
+<             con:text  "    'deactivate':  deactivate remote atom of the current connection" .
 ```
 
 ***diff** with all-messages-acknowledged.trig sample*:
@@ -761,7 +761,7 @@ event:ofx1afjv35cwpppp0wyg
 < 
 < <https://localhost:8443/won/resource/event/eczqg8lp7xbukpzikd41#content-xg7t> {
 <     event:eczqg8lp7xbukpzikd41
-<             won:textMessage  "    'deactivate':  deactivate remote atom of the current connection" .
+<             con:text  "    'deactivate':  deactivate remote atom of the current connection" .
 
 -----------
 
@@ -776,7 +776,7 @@ event:ofx1afjv35cwpppp0wyg
 10039,10043d10038
 < <https://localhost:8443/won/resource/event/eczqg8lp7xbukpzikd41#content-xg7t> {
 <     event:eczqg8lp7xbukpzikd41
-<             won:textMessage  "    'deactivate':  deactivate remote atom of the current connection" .
+<             con:text  "    'deactivate':  deactivate remote atom of the current connection" .
 < }
 ```
 
@@ -968,7 +968,7 @@ event:ofx1afjv35cwpppp0wyg
 10094,10098d10093
 < <https://localhost:8443/won/resource/event/eczqg8lp7xbukpzikd41#content-xg7t> {
 <     event:eczqg8lp7xbukpzikd41
-<             won:textMessage  "    'deactivate':  deactivate remote atom of the current connection" .
+<             con:text  "    'deactivate':  deactivate remote atom of the current connection" .
 < }
 < 
 ```
