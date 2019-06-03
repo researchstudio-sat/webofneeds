@@ -6,7 +6,6 @@ import won from "../won-es6.js";
 import sendRequestModule from "../components/send-request.js";
 import postMessagesModule from "../components/post-messages.js";
 import groupPostMessagesModule from "../components/group-post-messages.js";
-import postInfoModule from "../components/post-info.js";
 import connectionsOverviewModule from "../components/connections-overview.js";
 import createPostModule from "../components/create-post.js";
 import createSearchModule from "../components/create-search.js";
@@ -46,7 +45,6 @@ const template = (
     >
       <won-connections-overview
         on-selected-connection="::self.selectConnection(connectionUri)"
-        on-selected-atom="::self.selectAtom(atomUri)"
         open="self.open"
       />
     </aside>
@@ -63,8 +61,10 @@ const template = (
         />
         <won-usecase-picker />
         <div className="overview__right__welcome__howto">
-          <a className="overview__right__welcome__howto__button won-button--filled red"
-            ng-click="self.router__stateGo('about', {'aboutSection': 'aboutHowTo'})" >
+          <a
+            className="overview__right__welcome__howto__button won-button--filled red"
+            ng-click="self.router__stateGo('about', {'aboutSection': 'aboutHowTo'})"
+          >
             <span>Learn how it works</span>
           </a>
         </div>
@@ -77,7 +77,6 @@ const template = (
       <won-create-search ng-if="self.showCreateSearch" />
       <won-post-messages ng-if="self.showPostMessages" />
       <won-group-post-messages ng-if="self.showGroupPostMessages" />
-      <won-post-info include-header="::true" ng-if="self.showPostInfo" />
     </main>
     <won-footer ng-class="{'hide-in-responsive': self.hideFooterInResponsive }">
       {/* Connection view does not show the footer in responsive mode as there should not be two scrollable areas imho */}
@@ -96,9 +95,6 @@ class ConnectionsController {
     const selectFromState = state => {
       const viewConnUri = generalSelectors.getViewConnectionUriFromRoute(state);
       const viewAtomUri = generalSelectors.getViewAtomUriFromRoute(state);
-      const selectedPostUri = generalSelectors.getPostUriFromRoute(state);
-      const selectedPost =
-        selectedPostUri && getIn(state, ["atoms", selectedPostUri]);
 
       const useCase = generalSelectors.getUseCaseFromRoute(state);
       const useCaseGroup = generalSelectors.getUseCaseGroupFromRoute(state);
@@ -119,7 +115,10 @@ class ConnectionsController {
         "connections",
         selectedConnectionUri,
       ]);
-      const isSelectedConnectionGroupChat = connectionSelectors.isChatToGroupConnection(get(state, "atoms"), selectedConnection);
+      const isSelectedConnectionGroupChat = connectionSelectors.isChatToGroupConnection(
+        get(state, "atoms"),
+        selectedConnection
+      );
 
       const ownedAtoms = generalSelectors.getOwnedAtoms(state);
 
@@ -140,39 +139,28 @@ class ConnectionsController {
           !showCreateFromPost &&
           !useCase &&
           !useCaseGroup &&
-          !selectedPost &&
           (!selectedConnection || connectionUtils.isClosed(selectedConnection)),
         showContentSide:
           showCreateFromPost ||
           useCase ||
           useCaseGroup ||
-          selectedPost ||
           (selectedConnection && !connectionUtils.isClosed(selectedConnection)),
         showUseCasePicker:
           !useCase &&
           !!useCaseGroup &&
           useCaseGroup === "all" &&
-          !selectedPost &&
           !selectedConnection,
         showUseCaseGroups:
           !useCase &&
           !!useCaseGroup &&
           useCaseGroup !== "all" &&
-          !selectedPost &&
           !selectedConnection,
         showCreatePost:
           showCreateFromPost ||
-          (!!useCase &&
-            useCase !== "search" &&
-            !selectedPost &&
-            !selectedConnection),
+          (!!useCase && useCase !== "search" && !selectedConnection),
         showCreateSearch:
-          !!useCase &&
-          useCase === "search" &&
-          !selectedPost &&
-          !selectedConnection,
+          !!useCase && useCase === "search" && !selectedConnection,
         showPostMessages:
-          !selectedPost &&
           !useCaseGroup &&
           !isSelectedConnectionGroupChat &&
           (connectionUtils.isConnected(selectedConnection) ||
@@ -180,14 +168,12 @@ class ConnectionsController {
             connectionUtils.isRequestSent(selectedConnection) ||
             connectionUtils.isSuggested(selectedConnection)),
         showGroupPostMessages:
-          !selectedPost &&
           !useCaseGroup &&
           isSelectedConnectionGroupChat &&
           (connectionUtils.isConnected(selectedConnection) ||
             connectionUtils.isRequestReceived(selectedConnection) ||
             connectionUtils.isRequestSent(selectedConnection) ||
             connectionUtils.isSuggested(selectedConnection)),
-        showPostInfo: selectedPost && !useCaseGroup,
         showSlideIns:
           viewSelectors.hasSlideIns(state) && viewSelectors.showSlideIns(state),
         showAtomOverlay: !!viewAtomUri,
@@ -198,7 +184,6 @@ class ConnectionsController {
           showCreateFromPost ||
           !hasOwnedAtoms ||
           selectedConnection ||
-          selectedPost ||
           !!useCaseGroup ||
           !!useCase,
         hideWelcomeSideInResponsive: hasOwnedAtoms,
@@ -254,7 +239,6 @@ export default {
       sendRequestModule,
       postMessagesModule,
       groupPostMessagesModule,
-      postInfoModule,
       usecasePickerModule,
       usecaseGroupModule,
       createPostModule,

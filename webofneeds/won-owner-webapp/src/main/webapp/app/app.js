@@ -52,7 +52,7 @@ import postComponent from "./pages/post.jsx";
 import aboutComponent from "./pages/about.jsx";
 import signupComponent from "./pages/signup.jsx";
 import settingsComponent from "./pages/settings.jsx";
-import inventoryComponent from "./components/inventory/inventory.js";
+import inventoryComponent from "./pages/inventory.jsx";
 
 //won import (used so you can access the debugmode variable without reloading the page)
 import won from "./service/won.js";
@@ -100,7 +100,7 @@ let app = angular.module("won.owner", [
   aboutComponent.module,
   signupComponent.module,
   settingsComponent.module,
-  inventoryComponent,
+  inventoryComponent.module,
 ]);
 
 /* create store, register middlewares, set up redux-devtool-support, etc */

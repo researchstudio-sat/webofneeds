@@ -161,10 +161,6 @@ function genComponentConf() {
               caption: "Archive",
               callback: () => {
                 this.atoms__close(this.post.get("uri"));
-                this.router__stateGoCurrent({
-                  useCase: undefined,
-                  postUri: undefined,
-                });
                 this.view__hideModalDialog();
               },
             },
@@ -190,10 +186,7 @@ function genComponentConf() {
               caption: "Yes",
               callback: () => {
                 this.atoms__delete(this.post.get("uri"));
-                this.router__stateGoCurrent({
-                  useCase: undefined,
-                  postUri: undefined,
-                });
+                this.router__stateGo("inventory");
                 this.view__hideModalDialog();
               },
             },

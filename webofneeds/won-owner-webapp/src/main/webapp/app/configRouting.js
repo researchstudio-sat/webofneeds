@@ -20,6 +20,7 @@ import mapComponent from "./pages/map.jsx";
 import aboutComponent from "./pages/about.jsx";
 import connectionsComponent from "./pages/connections.jsx";
 import signupComponent from "./pages/signup.jsx";
+import inventoryComponent from "./pages/inventory.jsx";
 
 import jsxRenderer from "@depack/render";
 
@@ -90,7 +91,8 @@ export const configRouting = [
       },
       {
         path: "/inventory?viewAtomUri?viewConnUri",
-        component: "inventory",
+        component: inventoryComponent,
+        as: "inventory",
       },
       {
         path:
