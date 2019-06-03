@@ -20,7 +20,7 @@ const serviceDependencies = ["$ngRedux", "$scope", "$state", "$element"];
 
 function genTopnavConf() {
   let template = `
-        <nav class="topnav--new">
+        <nav class="topnav">
             <img src="skin/{{self.themeName}}/images/logo.svg" class="topnav__logo clickable" ng-click="self.router__stateGoDefault()">
             <div class="topnav__title">
               <span class="topnav__app-title hide-in-responsive" ng-click="self.router__stateGoDefault()">

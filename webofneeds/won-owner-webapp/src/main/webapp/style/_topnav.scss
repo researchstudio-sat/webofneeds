@@ -6,7 +6,7 @@ won-topnav {
   border-bottom: $thinBorderWidth solid $won-line-gray;
   background: white;
 
-  nav.topnav--new {
+  nav.topnav {
     display: grid;
     grid-auto-flow: column;
     grid-template-areas: "nav_logo nav_title nav_slideintoggle nav_loading nav_signup nav_accountmenu";
