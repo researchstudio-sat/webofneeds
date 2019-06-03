@@ -37,7 +37,7 @@ const template = (
     <main className="ownerinventory">
       <div className="ownerinventory__header">
         <div className="ownerinventory__header__title">
-          Open
+          Active
           <span
             className="ownerinventory__header__title__count"
             ng-if="self.hasOwnedActiveAtomUris"
@@ -65,13 +65,10 @@ const template = (
           Nothing to display
         </span>
       </div>
-      <div className="ownerinventory__header">
+      <div className="ownerinventory__header" ng-if="self.hasOwnedInactiveAtomUris">
         <div className="ownerinventory__header__title">
-          Closed
-          <span
-            className="ownerinventory__header__title__count"
-            ng-if="self.hasOwnedInactiveAtomUris"
-          >
+          Archived
+          <span className="ownerinventory__header__title__count">
             {"({{self.sortedOwnedInactiveAtomUriSize}})"}
           </span>
         </div>
@@ -87,20 +84,12 @@ const template = (
           ng-repeat="atomUri in self.sortedOwnedInactiveAtomUriArray track by atomUri"
         />
       </div>
-      <div
-        className="ownerinventory__noresults"
-        ng-if="!self.hasOwnedInactiveAtomUris"
-      >
-        <span className="ownerinventory__noresults__label">
-          Nothing to display
-        </span>
-      </div>
     </main>
     <won-footer />
   </container>
 );
 
-const serviceDependencies = ["$ngRedux", "$scope"];
+const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 class Controller {
   constructor() {
     attach(this, serviceDependencies, arguments);
