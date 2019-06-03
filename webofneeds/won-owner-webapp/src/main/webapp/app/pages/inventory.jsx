@@ -17,6 +17,7 @@ import { h } from "preact";
 import "~/style/_inventory.scss";
 import "~/style/_atom-overlay.scss";
 import "~/style/_connection-overlay.scss";
+import * as viewUtils from "../view-utils";
 
 const template = (
   <container>
@@ -134,6 +135,8 @@ class Controller {
         ...sortedOwnedInactiveAtoms.flatMap(atom => get(atom, "uri")),
       ];
 
+      const viewState = get(state, "view");
+
       return {
         currentLocation: generalSelectors.getCurrentLocation(state),
         sortedOwnedActiveAtomUriArray,
@@ -157,10 +160,19 @@ class Controller {
         showConnectionOverlay: !!viewConnUri,
         viewAtomUri,
         viewConnUri,
+        showClosedAtoms: viewUtils.showClosedAtoms(viewState),
       };
     };
 
     connect2Redux(selectFromState, actionCreators, [], this);
+  }
+
+  toggleClosedAtoms() {
+    //TODO: USE ONCE THIS IS COLLAPSIBLE
+    /*if (this.unloadedAtomsSize > 0) {
+      this.atoms__fetchUnloadedAtoms();
+    }
+    this.view__toggleClosedAtoms();*/
   }
 }
 

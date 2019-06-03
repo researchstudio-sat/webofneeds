@@ -146,33 +146,7 @@ won-connections-overview {
       @include slideAnimationFixedHorizontal(0.5s, ease-in-out, 100vh);
     }
   }
-  .co__separator {
-    margin-top: 1.5rem;
-    padding: 0 0.5rem;
-    display: flex;
-    justify-content: space-between;
-    flex-direction: row;
-    align-items: center;
-    color: $won-line-gray;
-    &--open {
-      transition: border-bottom-width linear 0.1s;
-      border-bottom: $thinGrayBorder;
-      color: $won-primary-color;
-      &:hover {
-        color: $won-line-gray;
-      }
-    }
-    &:hover {
-      color: $won-primary-color;
-    }
-    &__arrow {
-      @include carretSized;
-      padding: 0.625em;
-    }
-  }
-  .co__closedAtoms {
-    @include slideWithOpacityAnimation(0.5s, ease-in-out, 100vh);
-  }
+
   .co__loading {
     display: flex;
     flex-direction: column;

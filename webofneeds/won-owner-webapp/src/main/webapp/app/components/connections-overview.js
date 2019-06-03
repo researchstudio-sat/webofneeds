@@ -25,7 +25,6 @@ import * as generalSelectors from "../selectors/general-selectors.js";
 import * as connectionSelectors from "../selectors/connection-selectors.js";
 import * as connectionUtils from "../connection-utils.js";
 import * as atomUtils from "../atom-utils.js";
-import * as viewUtils from "../view-utils.js";
 import * as processUtils from "../process-utils.js";
 
 const serviceDependencies = ["$ngRedux", "$scope"];
@@ -94,43 +93,6 @@ function genComponentConf() {
                 </div>
             </div>
         </div>
-        <div class="co__separator clickable" ng-class="{'co__separator--open' : self.showClosedAtoms}" ng-if="self.hasClosedAtoms()" ng-click="self.toggleClosedAtoms()">
-            <span class="co__separator__text">Archived Posts ({{self.getClosedAtomsText()}})</span>
-            <svg
-                style="--local-primary:var(--won-secondary-color);"
-                class="co__separator__arrow"
-                ng-if="self.showClosedAtoms">
-                <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
-            </svg>
-            <svg style="--local-primary:var(--won-secondary-color);"
-                class="co__separator__arrow"
-                ng-if="!self.showClosedAtoms">
-                <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
-            </svg>
-        </div>
-        <div class="co__closedAtoms" ng-if="self.showClosedAtoms && self.closedAtomsSize > 0">
-            <div ng-repeat="atomUri in self.sortedClosedAtomUris track by atomUri" class="co__item">
-                <div class="co__item__atom" ng-class="{'won-unread': self.isUnread(atomUri), 'open': self.isOpen(atomUri)}">
-                    <div class="co__item__atom__indicator"></div>
-                    <div class="co__item__atom__header">
-                        <won-post-header
-                            atom-uri="::atomUri"
-                            ng-click="!self.isAtomLoading(atomUri) && self.showAtomDetails(atomUri)"
-                            ng-class="{ 'clickable' : !self.isAtomLoading(atomUri) }">
-                        </won-post-header>
-                        <div class="co__item__atom__header__carret clickable" ng-click="!self.isAtomLoading(atomUri) && self.toggleDetails(atomUri)">
-                          <svg class="co__item__atom__header__carret__icon"
-                              ng-class="{
-                                'won-icon-expanded': self.isOpen(atomUri),
-                                'won-icon-disabled': self.isAtomLoading(atomUri),
-                              }">
-                              <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
-                          </svg>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
     `;
 
   class Controller {
@@ -144,7 +106,6 @@ function genComponentConf() {
       const selectFromState = state => {
         const allAtoms = generalSelectors.getPosts(state);
         const openAtoms = generalSelectors.getOwnedOpenPosts(state);
-        const closedAtoms = generalSelectors.getOwnedClosedPosts(state);
 
         // atoms that have been created but are not confirmed by the server yet
         const beingCreatedAtoms = generalSelectors.getOwnedAtomsInCreation(
@@ -166,19 +127,11 @@ function genComponentConf() {
           atomImpliedInRoute && atomImpliedInRoute.get("uri");
 
         const sortedOpenAtoms = sortByDate(openAtoms, "creationDate");
-        const sortedClosedAtoms = sortByDate(closedAtoms, "creationDate");
-
         const process = get(state, "process");
-        const unloadedAtoms = closedAtoms.filter(atom =>
-          processUtils.isAtomToLoad(process, atom.get("uri"))
-        );
-
-        const viewState = get(state, "view");
 
         return {
           allAtoms,
           process,
-          showClosedAtoms: viewUtils.showClosedAtoms(viewState),
           createItemSelected:
             !!generalSelectors.getUseCaseGroupFromRoute(state) ||
             !!generalSelectors.getUseCaseFromRoute(state),
@@ -190,12 +143,7 @@ function genComponentConf() {
           sortedOpenAtomUris: sortedOpenAtoms && [
             ...sortedOpenAtoms.flatMap(atom => atom.get("uri")),
           ],
-          sortedClosedAtomUris: sortedClosedAtoms && [
-            ...sortedClosedAtoms.flatMap(atom => atom.get("uri")),
-          ],
           connectionsToCrawl: connectionsToCrawl || Immutable.Map(),
-          unloadedAtomsSize: unloadedAtoms ? unloadedAtoms.size : 0,
-          closedAtomsSize: closedAtoms ? closedAtoms.size : 0,
         };
       };
       connect2Redux(
@@ -306,29 +254,6 @@ function genComponentConf() {
     isConnectionUnread(atomUri, connUri) {
       const conn = getIn(this.allAtoms, [atomUri, "connections", connUri]);
       return get(conn, "unread");
-    }
-
-    hasClosedAtoms() {
-      return this.closedAtomsSize > 0;
-    }
-
-    getClosedAtomsText() {
-      let output = [];
-      if (this.closedAtomsSize > 0) {
-        output.push(`${this.closedAtomsSize}`);
-      }
-      if (this.unloadedAtomsSize > 0) {
-        output.push(`${this.unloadedAtomsSize} unloaded`);
-      }
-
-      return output.join(" - ");
-    }
-
-    toggleClosedAtoms() {
-      if (this.unloadedAtomsSize > 0) {
-        this.atoms__fetchUnloadedAtoms();
-      }
-      this.view__toggleClosedAtoms();
     }
 
     isOpen(ownedAtomUri) {
