@@ -35,9 +35,7 @@ const template = (
     >
       <won-post-messages connection-uri="self.viewConnUri" />
     </div>
-    <header>
-      <won-topnav page-title="self.atomTitle" />
-    </header>
+    <won-topnav page-title="self.atomTitle" />
     <won-toasts />
     <won-slide-in ng-if="self.showSlideIns" />
     <main

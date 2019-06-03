@@ -169,7 +169,7 @@ function genSlideInConf() {
               <h3>Therefore:</h3>
               <p>
                 <ul>
-                  <li><b><a href="{{ self.absHRef(self.$state, 'signup') }}">Consider signing up!</a></b> It will allow us to contact you if there is relevant activity.</li>
+                  <li><b><a class="clickable" ng-click="self.router__stateGo('signup')" ">Consider signing up!</a></b> It will allow us to contact you if there is relevant activity.</li>
                   <li>Alternatively, we can <b>send you the login link</b> by email.</li>
                 </ul>
               </p>

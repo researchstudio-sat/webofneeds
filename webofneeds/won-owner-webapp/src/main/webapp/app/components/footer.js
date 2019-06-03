@@ -8,8 +8,6 @@ import { attach, getIn } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { connect2Redux } from "../won-utils.js";
 
-import * as srefUtils from "../sref-utils.js";
-
 import "~/style/_footer.scss";
 
 function genTopnavConf() {
@@ -22,23 +20,23 @@ function genTopnavConf() {
         </div>
         <div class="footer__tagLine">Web of Needs</div>-->
         <div class="footer__linksdesktop hide-in-responsive">
-            <a class="footer__linksdesktop__link" href="{{ self.absHRef(self.$state, 'about', {'aboutSection': undefined}) }}">About</a>
+            <a class="footer__linksdesktop__link" ng-click="self.router__stateGo('about', {'aboutSection': undefined})">About</a>
             <span class="footer__linksdesktop__divider">|</span>
-            <a class="footer__linksdesktop__link" href="{{ self.absHRef(self.$state, 'about', {'aboutSection': 'aboutPrivacyPolicy'}) }}">Privacy</a>
+            <a class="footer__linksdesktop__link" ng-click="self.router__stateGo('about', {'aboutSection': 'aboutPrivacyPolicy'})">Privacy</a>
             <span class="footer__linksdesktop__divider">|</span>
-            <a class="footer__linksdesktop__link" href="{{ self.absHRef(self.$state, 'about', {'aboutSection': 'aboutFaq'}) }}">FAQ</a>
+            <a class="footer__linksdesktop__link" ng-click="self.router__stateGo('about', {'aboutSection': 'aboutFaq'})">FAQ</a>
             <span class="footer__linksdesktop__divider">|</span>
-            <a class="footer__linksdesktop__link" href="{{ self.absHRef(self.$state, 'about', {'aboutSection': 'aboutTermsOfService'}) }}">Terms Of Service</a>
+            <a class="footer__linksdesktop__link" ng-click="self.router__stateGo('about', {'aboutSection': 'aboutTermsOfService'})">Terms Of Service</a>
             <span class="footer__linksdesktop__divider">|</span>
             <span class="footer__linksdesktop__link" ng-click="self.toggleDebugMode()">{{ self.getDebugModeLabel() }}</span>
             <span class="footer__linksdesktop__divider">|</span>
             <span class="footer__linksdesktop__link" ng-click="self.view__toggleRdf()">{{self.shouldShowRdf? "Hide raw RDF data" : "Show raw RDF data"}}</span>
         </div>
         <div class="footer__linksmobile show-in-responsive">
-            <a class="footer__linksmobile__link" href="{{ self.absHRef(self.$state, 'about', {'aboutSection': undefined}) }}">About</a>
-            <a class="footer__linksmobile__link" href="{{ self.absHRef(self.$state, 'about', {'aboutSection': 'aboutPrivacyPolicy'}) }}">Privacy</a>
-            <a class="footer__linksmobile__link" href="{{ self.absHRef(self.$state, 'about', {'aboutSection': 'aboutFaq'}) }}">FAQ</a>
-            <a class="footer__linksmobile__link" href="{{ self.absHRef(self.$state, 'about', {'aboutSection': 'aboutTermsOfService'}) }}">Terms Of Service</a>
+            <a class="footer__linksmobile__link" ng-click="self.router__stateGo('about', {'aboutSection': undefined})">About</a>
+            <a class="footer__linksmobile__link" ng-click="self.router__stateGo('about', {'aboutSection': 'aboutPrivacyPolicy'})">Privacy</a>
+            <a class="footer__linksmobile__link" ng-click="self.router__stateGo('about', {'aboutSection': 'aboutFaq'})">FAQ</a>
+            <a class="footer__linksmobile__link" ng-click="self.router__stateGo('about', {'aboutSection': 'aboutTermsOfService'})">Terms Of Service</a>
             <span class="footer__linksmobile__link" ng-click="self.toggleDebugMode()">{{ self.getDebugModeLabel() }}</span>
             <span class="footer__linksmobile__link" ng-click="self.view__toggleRdf()">{{self.shouldShowRdf? "Hide raw RDF data" : "Show raw RDF data"}}</span>
         </div>
@@ -54,7 +52,6 @@ function genTopnavConf() {
   class Controller {
     constructor(/* arguments <- serviceDependencies */) {
       attach(this, serviceDependencies, arguments);
-      Object.assign(this, srefUtils); // bind srefUtils to scope
 
       window.footer4dbg = this;
 

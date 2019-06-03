@@ -9,7 +9,6 @@ import won from "../won-es6.js";
 import "angular-marked";
 import "~/style/_won-markdown.scss";
 
-import * as srefUtils from "../sref-utils.js";
 import * as accountUtils from "../account-utils.js";
 
 function genLoginConf() {
@@ -53,7 +52,7 @@ function genLoginConf() {
         </form>
         <div class="wl__register">
             No account yet?
-            <a href="{{ self.absHRef(self.$state, 'signup') }}" ng-click="self.view__hideMainMenu()">
+            <a class="clickable" ng-click="self.view__hideMainMenu() && self.router__stateGo('signup')">
                 Sign up
             </a>
         </div>`;
@@ -68,7 +67,6 @@ function genLoginConf() {
   class Controller {
     constructor(/* arguments <- serviceDependencies */) {
       attach(this, serviceDependencies, arguments);
-      Object.assign(this, srefUtils); // bind srefUtils to scope
       this.parseRestErrorMessage = parseRestErrorMessage;
       window.lic4dbg = this;
 

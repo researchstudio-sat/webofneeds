@@ -20,9 +20,7 @@ import "~/style/_about.scss";
 const template = (
   <container>
     <won-modal-dialog ng-if="self.showModalDialog" />
-    <header>
-      <won-topnav page-title="::'About'" />
-    </header>
+    <won-topnav page-title="::'About'" />
     <won-toasts />
     <won-slide-in ng-if="self.showSlideIns" />
     <main className="about" id="allSections">

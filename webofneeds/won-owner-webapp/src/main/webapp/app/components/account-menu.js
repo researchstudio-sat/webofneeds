@@ -10,8 +10,6 @@ import dropdownModule from "./covering-dropdown.js";
 import loginFormModule from "./login-form.js";
 import loggedInMenuModule from "./logged-in-menu.js";
 
-import * as srefUtils from "../sref-utils.js";
-
 import * as accountUtils from "../account-utils.js";
 
 import "~/style/_login.scss";
@@ -66,7 +64,6 @@ function genLogoutConf() {
   class Controller {
     constructor(/* arguments <- serviceDependencies */) {
       attach(this, serviceDependencies, arguments);
-      Object.assign(this, srefUtils);
 
       window.lopu4dbg = this;
 

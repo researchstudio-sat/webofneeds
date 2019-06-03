@@ -8,10 +8,8 @@ import ngAnimate from "angular-animate";
 import { attach, get } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 
-import signupTitleBarModule from "../components/signup-title-bar.js";
 import labelledHrModule from "../components/labelled-hr.js";
 
-import * as srefUtils from "../sref-utils.js";
 import * as accountUtils from "../account-utils.js";
 import * as viewSelectors from "../selectors/view-selectors.js";
 import { h } from "preact";
@@ -21,13 +19,10 @@ import "~/style/_signup.scss";
 const template = (
   <container>
     <won-modal-dialog ng-if="self.showModalDialog" />
-    <header>
-      <won-topnav page-title="::'Sign Up'" />
-    </header>
+    <won-topnav page-title="::'Sign Up'" />
     <won-toasts />
     <won-slide-in ng-if="self.showSlideIns" />
     <main className="signup" id="signupSection">
-      <won-signup-title-bar />
       <div className="signup__content">
         <div className="signup__content__form" ng-form name="registerForm">
           <input
@@ -126,7 +121,7 @@ const template = (
             />
             <label htmlFor="acceptToS">
               I accept the{" "}
-              <a href="{{ self.absHRef(self.$state, 'about', {'aboutSection': 'aboutTermsOfService'}) }}">
+              <a className="clickable" ng-click="self.router__stateGo('about', {'aboutSection': 'aboutTermsOfService'})">
                 Terms Of Service
               </a>
             </label>
@@ -166,7 +161,6 @@ class SignupController {
     attach(this, serviceDependencies, arguments);
     this.rememberMe = false;
     this.acceptToS = false;
-    Object.assign(this, srefUtils); // bind srefUtils to scope
 
     const select = state => {
       const accountState = get(state, "account");
@@ -210,7 +204,6 @@ class SignupController {
 export default {
   module: angular
     .module("won.owner.components.signup", [
-      signupTitleBarModule,
       labelledHrModule,
       ngAnimate,
     ])

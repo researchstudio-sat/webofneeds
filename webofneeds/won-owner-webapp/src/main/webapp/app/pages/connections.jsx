@@ -18,7 +18,6 @@ import * as generalSelectors from "../selectors/general-selectors.js";
 import * as connectionSelectors from "../selectors/connection-selectors.js";
 import * as connectionUtils from "../connection-utils.js";
 import * as viewSelectors from "../selectors/view-selectors.js";
-import * as srefUtils from "../sref-utils.js";
 import { h } from "preact";
 
 import "~/style/_connections.scss";
@@ -38,9 +37,7 @@ const template = (
     >
       <won-post-messages connection-uri="self.viewConnUri" />
     </div>
-    <header>
-      <won-topnav page-title="::'Chats'" />
-    </header>
+    <won-topnav page-title="::'Chats'" />
     <won-toasts />
     <won-slide-in ng-if="self.showSlideIns" />
     <aside
@@ -66,10 +63,8 @@ const template = (
         />
         <won-usecase-picker />
         <div className="overview__right__welcome__howto">
-          <a
-            className="overview__right__welcome__howto__button won-button--filled red"
-            href="{{ ::self.absHRef(self.$state, 'about', {'aboutSection': 'aboutHowTo'}) }}"
-          >
+          <a className="overview__right__welcome__howto__button won-button--filled red"
+            ng-click="self.router__stateGo('about', {'aboutSection': 'aboutHowTo'})" >
             <span>Learn how it works</span>
           </a>
         </div>
@@ -95,7 +90,6 @@ const serviceDependencies = ["$element", "$ngRedux", "$scope", "$state"];
 class ConnectionsController {
   constructor() {
     attach(this, serviceDependencies, arguments);
-    Object.assign(this, srefUtils);
     this.WON = won.WON;
     this.open = {};
 

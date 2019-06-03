@@ -66,9 +66,7 @@ export const configRouting = [
 
       const origParams = $location.search();
       if (origParams) {
-        const onlyConstParams = addConstParams({}, origParams);
-        //updatedRoute.search(onlyConstParams); // strip all but "constant" parameters
-        $location.search(onlyConstParams);
+        $location.search(addConstParams({}, origParams));
       }
 
       //return updatedRoute;
@@ -107,7 +105,8 @@ export const configRouting = [
         as: "post",
       },
       {
-        path: "/settings{settingsParams:.*}",
+        //path: "/settings{settingsParams:.*}",
+        path: "/settings",
         component: settingsComponent,
         as: "settings",
       },
