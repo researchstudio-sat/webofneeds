@@ -29,18 +29,6 @@ import * as processUtils from "../process-utils.js";
 const serviceDependencies = ["$ngRedux", "$scope"];
 function genComponentConf() {
   let template = `
-        <div ng-repeat="atomUri in self.beingCreatedAtomUris track by atomUri" class="co__item">
-            <div class="co__item__atom">
-                <div class="co__item__atom__indicator"></div>
-                <div class="co__item__atom__header">
-                    <won-post-header
-                        atom-uri="::atomUri"
-                        ng-click="!self.isAtomLoading(atomUri) && self.showAtomDetails(atomUri)"
-                        ng-class="{ 'clickable' : !self.isAtomLoading(atomUri) }">
-                    </won-post-header>
-                </div>
-            </div>
-        </div>
         <div ng-repeat="atomUri in self.sortedOpenAtomUris track by atomUri" class="co__item">
             <div class="co__item__atom" ng-class="{'won-unread': self.isUnread(atomUri)}">
                 <div class="co__item__atom__indicator"></div>
@@ -84,17 +72,11 @@ function genComponentConf() {
   class Controller {
     constructor() {
       attach(this, serviceDependencies, arguments);
-      //this.labels = labels;
       window.co4dbg = this;
 
       const selectFromState = state => {
         const allAtoms = generalSelectors.getPosts(state);
         const openAtoms = generalSelectors.getChatAtoms(state);
-
-        // atoms that have been created but are not confirmed by the server yet
-        const beingCreatedAtoms = generalSelectors.getOwnedAtomsInCreation(
-          state
-        );
 
         const connectionsToCrawl = connectionSelectors.getChatConnectionsToCrawl(
           state
@@ -111,9 +93,6 @@ function genComponentConf() {
           allAtoms,
           process,
           connUriInRoute,
-          beingCreatedAtomUris: beingCreatedAtoms && [
-            ...beingCreatedAtoms.keys(),
-          ],
           sortedOpenAtomUris: sortedOpenAtoms && [
             ...sortedOpenAtoms.flatMap(atom => atom.get("uri")),
           ],
