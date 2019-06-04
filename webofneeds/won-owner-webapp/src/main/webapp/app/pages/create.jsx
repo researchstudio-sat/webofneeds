@@ -52,7 +52,7 @@ class CreateController {
 
       const showCreateFromPost = !!(fromAtomUri && mode);
 
-      const showUseCaseGroups = !useCase && !!useCaseGroup && useCaseGroup !== "all";
+      const showUseCaseGroups = !useCase && !!useCaseGroup;
       const showCreatePost = showCreateFromPost || (!!useCase && useCase !== "search");
       const showCreateSearch = !!useCase && useCase === "search";
       return {
