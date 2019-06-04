@@ -41,6 +41,7 @@ import { actionCreators } from "./actions/actions.js";
 
 //-------- Components ---------
 import topnav from "./components/topnav.js";
+import menu from "./components/menu.js";
 import footer from "./components/footer.js";
 import modalDialog from "./components/modal-dialog.js";
 import toasts from "./components/toasts.js";
@@ -54,6 +55,7 @@ import aboutComponent from "./pages/about.jsx";
 import signupComponent from "./pages/signup.jsx";
 import settingsComponent from "./pages/settings.jsx";
 import inventoryComponent from "./pages/inventory.jsx";
+import createComponent from "./pages/create.jsx";
 
 //won import (used so you can access the debugmode variable without reloading the page)
 import won from "./service/won.js";
@@ -85,6 +87,7 @@ let app = angular.module("won.owner", [
 
   //components
   topnav,
+  menu,
   footer,
   modalDialog,
   toasts,
@@ -103,6 +106,7 @@ let app = angular.module("won.owner", [
   signupComponent.module,
   settingsComponent.module,
   inventoryComponent.module,
+  createComponent.module,
 ]);
 
 /* create store, register middlewares, set up redux-devtool-support, etc */

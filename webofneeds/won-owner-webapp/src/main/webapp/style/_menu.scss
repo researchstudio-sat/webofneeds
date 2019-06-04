@@ -1,0 +1,39 @@
+@import "won-config";
+
+won-menu {
+  background: $won-light-gray;
+  border-bottom: $thinGrayBorder;
+
+  > .menu {
+    display: grid;
+    grid-auto-flow: column;
+    grid-gap: 0.5rem;
+    justify-content: center;
+    margin: 0 auto;
+    padding: 0 0.5rem;
+    box-sizing: border-box;
+    max-width: $maxContentWidth;
+
+    > .menu__tab {
+      cursor: pointer;
+      padding: 0.5rem;
+      color: $won-primary-text-color;
+      box-sizing: border-box;
+      border-bottom: $won-light-gray 0.25rem solid;
+
+      &.menu__tab--selected {
+        cursor: default;
+        pointer-events: none;
+        border-bottom-color: $won-primary-color;
+        color: $won-primary-color;
+      }
+
+      &:not(.menu__tab--selected) {
+        &:hover {
+          border-bottom-color: $won-primary-color-light;
+          color: $won-primary-color-light;
+        }
+      }
+    }
+  }
+}

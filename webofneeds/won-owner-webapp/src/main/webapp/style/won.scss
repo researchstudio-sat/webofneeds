@@ -4,7 +4,14 @@
 @import "reset";
 
 body {
-  --headerHeight: 3.3rem;
+  @media (max-width: $responsivenessBreakPoint) {
+    --headerHeight: 3.3rem;
+    --menuHeight: 2.7rem;
+  }
+  @media (min-width: $responsivenessBreakPoint) {
+    --headerHeight: 3.3rem;
+    --menuHeight: 2.7rem;
+  }
 
   //this font will be inherited down the cascade
   @include default-font;
@@ -18,20 +25,22 @@ body {
       grid-template-areas:
         "header"
         "info"
+        "menu"
         "list"
         "content"
         "footer";
-      grid-template-rows: min-content min-content min-content 1fr min-content;
+      grid-template-rows: min-content min-content min-content min-content 1fr min-content;
     }
 
     @media (min-width: $responsivenessBreakPoint) {
       grid-template-areas:
         "header header header header"
         "info info info info"
+        "menu menu menu menu"
         ". list content ."
         ". . . ."
         "footer footer footer footer";
-      grid-template-rows: min-content min-content max-content 1fr min-content;
+      grid-template-rows: min-content min-content min-content max-content 1fr min-content;
       grid-template-columns:
         1fr minmax(min-content, $maxContentWidth/2) minmax(
           min-content,
@@ -52,6 +61,12 @@ body {
     > won-toasts,
     > won-slide-in {
       grid-area: info;
+    }
+
+    > won-menu {
+      grid-area: menu;
+      box-sizing: border-box;
+      height: var(--menuHeight);
     }
 
     > aside.overview__left {
@@ -75,10 +90,9 @@ body {
         background: white;
       }
 
-      > won-group-administration,
       > won-group-post-messages,
       > won-post-messages {
-        height: calc(100vh - var(--headerHeight));
+        height: calc(100vh - var(--headerHeight) - var(--menuHeight));
       }
     }
 
