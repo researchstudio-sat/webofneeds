@@ -27,14 +27,10 @@ function genComponentConf() {
         <!-- HEADER: -->
         <div class="cp__header">
             <a class="cp__header__back clickable"
-                ng-click="self.router__stateGoCurrent({useCase: undefined})">
+                ng-click="self.router__back()">
                 <svg style="--local-primary:var(--won-primary-color);"
-                    class="cp__header__back__icon show-in-responsive">
+                    class="cp__header__back__icon">
                     <use xlink:href="#ico36_backarrow" href="#ico36_backarrow"></use>
-                </svg>
-                <svg style="--local-primary:var(--won-primary-color);"
-                    class="cp__header__back__icon hide-in-responsive">
-                    <use xlink:href="#ico36_close" href="#ico36_close"></use>
                 </svg>
             </a>
             <svg class="cp__header__icon"

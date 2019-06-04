@@ -27,12 +27,9 @@ function genComponentConf() {
         <!-- HEADER -->
         <div class="ucp__header" ng-if="self.showAll">
             <a class="ucp__header__back clickable"
-                ng-click="self.router__stateGoCurrent({useCase: undefined, useCaseGroup: undefined})">
-                <svg class="ucp__header__back__icon show-in-responsive">
+                ng-click="self.router__back()">
+                <svg class="ucp__header__back__icon">
                     <use xlink:href="#ico36_backarrow" href="#ico36_backarrow"></use>
-                </svg>
-                <svg class="ucp__header__back__icon hide-in-responsive">
-                    <use xlink:href="#ico36_close" href="#ico36_close"></use>
                 </svg>
             </a>
             <span class="ucp__header__title">Pick one!</span>
