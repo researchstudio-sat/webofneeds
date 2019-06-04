@@ -43,22 +43,19 @@ const template = (
     </aside>
     {/* RIGHT SIDE */}
     <main
-      className="overview__right"
-      ng-if="self.showWelcomeSide"
-      ng-class="{'hide-in-responsive' : self.hideWelcomeSideInResponsive}"
+      className="overview__rightwelcome"
+      ng-if="self.showNoSelectionSide"
+      ng-class="{'hide-in-responsive' : self.hideNoSelectionInResponsive}"
     >
-      <div className="overview__right__welcome">
-        <div
-          className="overview__right__welcome__text"
-          ng-include="self.welcomeTemplatePath"
-        />
-        <div className="overview__right__welcome__howto">
-          <a
-            className="overview__right__welcome__howto__button won-button--filled red"
-            ng-click="self.router__stateGo('about', {'aboutSection': 'aboutHowTo'})"
-          >
-            <span>Learn how it works</span>
-          </a>
+      <div className="overview__rightwelcome__noselection">
+        <svg
+          className="overview__rightwelcome__noselection__icon"
+          title="Messages"
+        >
+          <use xlinkHref="#ico36_message" href="#ico36_message" />
+        </svg>
+        <div className="overview__rightwelcome__noselection__text">
+          No Chat selected
         </div>
       </div>
     </main>
@@ -106,14 +103,9 @@ class ConnectionsController {
 
       const hasOwnedAtoms = ownedAtoms && ownedAtoms.size > 0;
 
-      const theme = getIn(state, ["config", "theme"]);
-      const themeName = get(theme, "name");
-      const welcomeTemplate = get(theme, "welcomeTemplate");
-
       return {
-        welcomeTemplatePath: "./skin/" + themeName + "/" + welcomeTemplate,
         showModalDialog: getIn(state, ["view", "showModalDialog"]),
-        showWelcomeSide:
+        showNoSelectionSide:
           !selectedConnection || connectionUtils.isClosed(selectedConnection),
         showContentSide:
           selectedConnection && !connectionUtils.isClosed(selectedConnection),
@@ -136,7 +128,7 @@ class ConnectionsController {
         viewAtomUri,
         viewConnUri,
         hideListSideInResponsive: !hasOwnedAtoms || selectedConnection,
-        hideWelcomeSideInResponsive: hasOwnedAtoms,
+        hideNoSelectionInResponsive: hasOwnedAtoms,
         hideFooterInResponsive: selectedConnection,
       };
     };

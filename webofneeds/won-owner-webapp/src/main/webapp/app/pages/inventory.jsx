@@ -18,6 +18,8 @@ import "~/style/_inventory.scss";
 import "~/style/_atom-overlay.scss";
 import "~/style/_connection-overlay.scss";
 import * as viewUtils from "../view-utils";
+import {getIn} from "../utils";
+import * as accountUtils from "../account-utils";
 
 const template = (
   <container>
@@ -32,10 +34,24 @@ const template = (
       <won-post-messages connection-uri="self.viewConnUri" />
     </div>
     <won-topnav page-title="::'Inventory'" />
-    <won-menu />
+    <won-menu ng-if="self.isLoggedIn" />
     <won-toasts />
     <won-slide-in ng-if="self.showSlideIns" />
-    <main className="ownerinventory">
+    <main className="ownerwelcome" ng-if="!self.isLoggedIn">
+      <div
+        className="ownerwelcome__text"
+        ng-include="self.welcomeTemplatePath"
+      />
+      <div className="ownerwelcome__howto">
+        <a
+          className="ownerwelcome__howto__button won-button--filled red"
+          ng-click="self.router__stateGo('about', {'aboutSection': 'aboutHowTo'})"
+        >
+          <span>Learn how it works</span>
+        </a>
+      </div>
+    </main>
+    <main className="ownerinventory" ng-if="self.isLoggedIn">
       <div className="ownerinventory__header">
         <div className="ownerinventory__header__title">
           Active
@@ -142,7 +158,15 @@ class Controller {
 
       const viewState = get(state, "view");
 
+      const theme = getIn(state, ["config", "theme"]);
+      const themeName = get(theme, "name");
+      const welcomeTemplate = get(theme, "welcomeTemplate");
+
+      const accountState = get(state, "account");
+
       return {
+        isLoggedIn: accountUtils.isLoggedIn(accountState),
+        welcomeTemplatePath: "./skin/" + themeName + "/" + welcomeTemplate,
         currentLocation: generalSelectors.getCurrentLocation(state),
         sortedOwnedActiveAtomUriArray,
         sortedOwnedInactiveAtomUriArray,

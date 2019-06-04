@@ -3,6 +3,39 @@
 @import "fonts";
 @import "flex-layout";
 
+main.ownerwelcome {
+  grid-column: 1 / -1;
+  padding: 0;
+  box-sizing: border-box;
+  align-items: stretch;
+  max-width: $maxContentWidth;
+  width: 100%;
+  margin: 0 auto;
+
+  .ownerwelcome__text {
+    padding-bottom: 1rem;
+    h1 {
+      padding-bottom: 1.5rem;
+      text-align: center;
+    }
+    p {
+      padding-bottom: 1.5rem;
+      text-align: center;
+    }
+    h3 {
+      text-align: center;
+    }
+  }
+
+  .ownerwelcome__howto {
+    padding-top: 3rem;
+
+    &__button {
+      width: 100%;
+    }
+  }
+}
+
 main.ownerinventory {
   grid-column: 1 / -1;
   padding: 0;

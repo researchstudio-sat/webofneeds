@@ -74,6 +74,17 @@ body {
       z-index: 2;
     }
 
+    > main.overview__rightwelcome {
+      grid-area: content;
+
+      > .overview__rightwelcome__noselection {
+        box-sizing: border-box;
+        position: sticky;
+        top: var(--headerHeight);
+        height: calc(100vh - var(--headerHeight) - var(--menuHeight));
+      }
+    }
+
     > main.overview__right {
       grid-area: content;
 

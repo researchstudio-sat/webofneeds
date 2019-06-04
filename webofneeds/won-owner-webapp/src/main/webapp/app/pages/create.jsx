@@ -17,12 +17,13 @@ import { h } from "preact";
 
 import "~/style/_create.scss";
 import "~/style/_responsiveness-utils.scss";
+import * as accountUtils from "../account-utils";
 
 const template = (
   <container>
     <won-modal-dialog ng-if="self.showModalDialog" />
     <won-topnav page-title="::'Create'" />
-    <won-menu />
+    <won-menu ng-if="self.isLoggedIn" />
     <won-toasts />
     <won-slide-in ng-if="self.showSlideIns" />
     {/* RIGHT SIDE */}
@@ -55,7 +56,11 @@ class CreateController {
       const showUseCaseGroups = !useCase && !!useCaseGroup;
       const showCreatePost = showCreateFromPost || (!!useCase && useCase !== "search");
       const showCreateSearch = !!useCase && useCase === "search";
+
+      const accountState = get(state, "account");
+
       return {
+        isLoggedIn: accountUtils.isLoggedIn(accountState),
         showModalDialog: getIn(state, ["view", "showModalDialog"]),
         showUseCasePicker: !(showUseCaseGroups || showCreatePost || showCreateSearch),
         showUseCaseGroups,
