@@ -74,10 +74,10 @@ body {
       z-index: 2;
     }
 
-    > main.overview__rightwelcome {
+    > main.overview__rightempty {
       grid-area: content;
 
-      > .overview__rightwelcome__noselection {
+      > .overview__rightempty__noselection {
         box-sizing: border-box;
         position: sticky;
         top: var(--headerHeight);

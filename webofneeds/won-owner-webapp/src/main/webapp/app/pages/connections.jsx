@@ -43,18 +43,18 @@ const template = (
     </aside>
     {/* RIGHT SIDE */}
     <main
-      className="overview__rightwelcome"
+      className="overview__rightempty"
       ng-if="self.showNoSelectionSide"
       ng-class="{'hide-in-responsive' : self.hideNoSelectionInResponsive}"
     >
-      <div className="overview__rightwelcome__noselection">
+      <div className="overview__rightempty__noselection">
         <svg
-          className="overview__rightwelcome__noselection__icon"
+          className="overview__rightempty__noselection__icon"
           title="Messages"
         >
           <use xlinkHref="#ico36_message" href="#ico36_message" />
         </svg>
-        <div className="overview__rightwelcome__noselection__text">
+        <div className="overview__rightempty__noselection__text">
           No Chat selected
         </div>
       </div>
