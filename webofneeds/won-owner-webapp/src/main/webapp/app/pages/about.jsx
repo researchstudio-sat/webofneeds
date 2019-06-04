@@ -162,7 +162,7 @@ const template = (
           />
           <button
             className="won-button--filled red about__howto__createx__spanbutton"
-            ng-click="self.showAvailableUseCases()"
+            ng-click="self.router__stateGo('create')"
             ng-disabled="self.processingPublish"
           >
             <span>Post something now!</span>
@@ -436,14 +436,6 @@ class AboutController {
     this.howItWorksSteps = howItWorksSteps;
     this.selectedHowItWorksStep = 0;
     this.moreInfo = false;
-  }
-
-  showAvailableUseCases() {
-    this.router__stateGoAbs("connections", {
-      connectionUri: undefined,
-      useCase: undefined,
-      useCaseGroup: "all",
-    });
   }
 
   toggleMoreInfo() {

@@ -55,6 +55,57 @@ main.ownerinventory {
       margin-bottom: 1rem;
     }
 
+    .ownerinventory__content__createatom {
+      border: $thinGrayBorder;
+      background: $won-light-gray;
+      padding: 0.5rem;
+      margin-right: 1rem;
+      margin-bottom: 1rem;
+      cursor: pointer;
+      display: grid;
+      grid-gap: 0.5rem;
+      grid-auto-flow: row;
+      justify-content: center;
+      align-content: center;
+      grid-template-rows: min-content min-content;
+      box-sizing: border-box;
+
+      @media (max-width: $responsivenessBreakPoint) {
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+      }
+
+      @media (min-width: $responsivenessBreakPoint) {
+        width: 15rem;
+        max-width: 15rem;
+        box-sizing: content-box;
+      }
+
+      &:hover {
+        border-color: $won-primary-color;
+
+        .ownerinventory__content__createatom__label {
+          color: $won-primary-color;
+        }
+
+        .ownerinventory__content__createatom__icon {
+          --local-primary: #{$won-primary-color};
+        }
+      }
+
+      .ownerinventory__content__createatom__label {
+        font-size: $mediumFontSize;
+        text-align: center;
+        color: $won-line-gray;
+      }
+
+      .ownerinventory__content__createatom__icon {
+        @include fixed-square($hugeiconSize);
+        --local-primary: #{$won-line-gray};
+      }
+    }
+
     @media (max-width: $responsivenessBreakPoint) {
       display: block;
 

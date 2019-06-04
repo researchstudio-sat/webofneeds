@@ -253,20 +253,6 @@ export function getUseCase(useCaseString) {
   return undefined;
 }
 
-/**
- * This fucntion returns all UseCases that are defined with "showInList = true", this is so we can define useCases
- * that show up within our connection-overview "quick item"-buttons, e.g. if we want to define a usecase that is
- * always available from this list
- * @returns {{}}
- */
-export function getListUseCases() {
-  const useCasesImm = Immutable.fromJS(useCaseDefinitions.getAllUseCases());
-  const listUseCases =
-    useCasesImm && useCasesImm.filter(useCase => get(useCase, "showInList"));
-
-  return listUseCases && listUseCases.toJS();
-}
-
 export function getUseCaseGroupByIdentifier(groupIdentifier) {
   if (groupIdentifier) {
     const useCaseGroups = useCaseDefinitions.getAllUseCaseGroups();

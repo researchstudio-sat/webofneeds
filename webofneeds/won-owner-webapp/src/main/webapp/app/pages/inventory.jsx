@@ -57,6 +57,18 @@ const template = (
           current-location="self.currentLocation"
           ng-repeat="atomUri in self.sortedOwnedActiveAtomUriArray track by atomUri"
         />
+        <div
+          className="ownerinventory__content__createatom"
+          ng-click="self.router__stateGo('create')"
+        >
+          <svg
+            className="ownerinventory__content__createatom__icon"
+            title="Create a new post"
+          >
+            <use xlinkHref="#ico36_plus" href="#ico36_plus" />
+          </svg>
+          <span className="ownerinventory__content__createatom__label">New</span>
+        </div>
       </div>
       <div
         className="ownerinventory__noresults"
@@ -66,7 +78,10 @@ const template = (
           Nothing to display
         </span>
       </div>
-      <div className="ownerinventory__header" ng-if="self.hasOwnedInactiveAtomUris">
+      <div
+        className="ownerinventory__header"
+        ng-if="self.hasOwnedInactiveAtomUris"
+      >
         <div className="ownerinventory__header__title">
           Archived
           <span className="ownerinventory__header__title__count">

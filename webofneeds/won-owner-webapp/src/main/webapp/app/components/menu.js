@@ -47,6 +47,15 @@ function genTopnavConf() {
 
       connect2Redux(selectFromState, actionCreators, [], this);
     }
+    //This method is for debug purposes only, we currently dont offer the createSearch within the ui call menu4dbg.createSearchPost() to access the createSearch View
+    createSearchPost() {
+      this.router__stateGo("create", {
+        useCase: "search",
+        useCaseGroup: undefined,
+        fromAtomUri: undefined,
+        mode: undefined,
+      });
+    }
   }
   Controller.$inject = serviceDependencies;
 

@@ -13,7 +13,6 @@ import postHeaderModule from "./post-header.js";
 import connectionIndicatorsModule from "./connection-indicators.js";
 import connectionSelectionItemModule from "./connection-selection-item.js";
 import suggestionSelectionItemModule from "./suggestion-selection-item.js";
-import createPostItemModule from "./create-post-item.js";
 
 import { attach, delay, sortByDate, get, getIn } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
@@ -30,7 +29,6 @@ import * as processUtils from "../process-utils.js";
 const serviceDependencies = ["$ngRedux", "$scope"];
 function genComponentConf() {
   let template = `
-        <won-create-post-item ng-class="{'selected' : self.createItemSelected}"></won-create-post-item>
         <div ng-repeat="atomUri in self.beingCreatedAtomUris track by atomUri" class="co__item">
             <div class="co__item__atom">
                 <div class="co__item__atom__indicator"></div>
@@ -112,9 +110,6 @@ function genComponentConf() {
         return {
           allAtoms,
           process,
-          createItemSelected:
-            !!generalSelectors.getUseCaseGroupFromRoute(state) ||
-            !!generalSelectors.getUseCaseFromRoute(state),
           connUriInRoute,
           beingCreatedAtomUris: beingCreatedAtoms && [
             ...beingCreatedAtoms.keys(),
@@ -273,6 +268,5 @@ export default angular
     postHeaderModule,
     connectionIndicatorsModule,
     ngAnimate,
-    createPostItemModule,
   ])
   .directive("wonConnectionsOverview", genComponentConf).name;
