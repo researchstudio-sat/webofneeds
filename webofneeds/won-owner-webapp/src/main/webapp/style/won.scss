@@ -74,6 +74,17 @@ body {
       z-index: 2;
     }
 
+    > main.overview__nochats {
+      grid-area: content;
+      grid-column: 1 / -1;
+      > .overview__nochats__empty {
+        box-sizing: border-box;
+        position: sticky;
+        top: var(--headerHeight);
+        height: calc(100vh - var(--headerHeight) - var(--menuHeight));
+      }
+    }
+
     > main.overview__rightempty {
       grid-area: content;
 

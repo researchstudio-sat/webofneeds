@@ -38,6 +38,7 @@ const template = (
     <aside
       className="overview__left"
       ng-class="{'hide-in-responsive': self.hideListSideInResponsive}"
+      ng-if="self.showListSide"
     >
       <won-connections-overview on-selected-connection="::self.selectConnection(connectionUri)" />
     </aside>
@@ -57,11 +58,27 @@ const template = (
         <div className="overview__rightempty__noselection__text">
           No Chat selected
         </div>
+        <div className="overview__rightempty__noselection__subtext">
+          Click on a Chat on the left to open
+        </div>
       </div>
     </main>
     <main className="overview__right" ng-if="self.showContentSide">
       <won-post-messages ng-if="self.showPostMessages" />
       <won-group-post-messages ng-if="self.showGroupPostMessages" />
+    </main>
+    <main className="overview__nochats" ng-if="!self.showListSide">
+      <div className="overview__nochats__empty">
+        <svg
+          className="overview__nochats__empty__icon"
+          title="Messages"
+        >
+          <use xlinkHref="#ico36_message" href="#ico36_message" />
+        </svg>
+        <div className="overview__nochats__empty__text">
+          No Open Chats available
+        </div>
+      </div>
     </main>
     <won-footer ng-class="{'hide-in-responsive': self.hideFooterInResponsive }">
       {/* Connection view does not show the footer in responsive mode as there should not be two scrollable areas imho */}
@@ -99,16 +116,17 @@ class ConnectionsController {
         selectedConnection
       );
 
-      const ownedAtoms = generalSelectors.getOwnedAtoms(state);
+      const chatAtoms = generalSelectors.getChatAtoms(state);
 
-      const hasOwnedAtoms = ownedAtoms && ownedAtoms.size > 0;
+      const hasChatAtoms = chatAtoms && chatAtoms.size > 0;
 
       return {
         showModalDialog: getIn(state, ["view", "showModalDialog"]),
+        showListSide: hasChatAtoms,
         showNoSelectionSide:
-          !selectedConnection || connectionUtils.isClosed(selectedConnection),
+          hasChatAtoms && !selectedConnection || connectionUtils.isClosed(selectedConnection),
         showContentSide:
-          selectedConnection && !connectionUtils.isClosed(selectedConnection),
+          hasChatAtoms && selectedConnection && !connectionUtils.isClosed(selectedConnection),
         showPostMessages:
           !isSelectedConnectionGroupChat &&
           (connectionUtils.isConnected(selectedConnection) ||
@@ -127,8 +145,9 @@ class ConnectionsController {
         showConnectionOverlay: !!viewConnUri,
         viewAtomUri,
         viewConnUri,
-        hideListSideInResponsive: !hasOwnedAtoms || selectedConnection,
-        hideNoSelectionInResponsive: hasOwnedAtoms,
+        hasChatAtoms,
+        hideListSideInResponsive: !hasChatAtoms || selectedConnection,
+        hideNoSelectionInResponsive: hasChatAtoms,
         hideFooterInResponsive: selectedConnection,
       };
     };

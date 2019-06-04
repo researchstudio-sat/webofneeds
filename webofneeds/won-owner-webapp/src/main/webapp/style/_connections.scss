@@ -10,8 +10,8 @@ aside.overview__left {
   }
 }
 
-main.overview__rightempty {
-  .overview__rightempty__noselection {
+main.overview__nochats {
+  .overview__nochats__empty {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -27,6 +27,38 @@ main.overview__rightempty {
       margin-top: 1rem;
       color: $won-line-gray;
       font-size: $mediumFontSize;
+    }
+    &__subtext {
+      margin-top: 0.5rem;
+      color: $won-line-gray;
+      font-size: $normalFontSize;
+    }
+  }
+}
+
+main.overview__rightempty {
+  .overview__rightempty__noselection {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: $won-lighter-gray;
+    border-right: $thinGrayBorder;
+
+    &__icon {
+      @include fixed-square($hugeiconSize);
+      --local-primary: #{$won-line-gray};
+    }
+
+    &__text {
+      margin-top: 1rem;
+      color: $won-line-gray;
+      font-size: $mediumFontSize;
+    }
+    &__subtext {
+      margin-top: 0.5rem;
+      color: $won-line-gray;
+      font-size: $normalFontSize;
     }
   }
 }
