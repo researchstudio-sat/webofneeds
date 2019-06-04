@@ -75,42 +75,38 @@ export function atomCreate(draft, persona, nodeUri) {
       delete prevParams.privateId;
     }
 
-    return ensureLoggedIn(dispatch, getState)
-      .then(() => {
-        return dispatch(actionCreators.router__stateGoDefault());
-      })
-      .then(async () => {
-        const { message, eventUri, atomUri } = await buildCreateMessage(
-          draft,
-          nodeUri
-        );
-        if (persona) {
-          const response = await fetch("rest/action/connect", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
+    return ensureLoggedIn(dispatch, getState).then(async () => {
+      const { message, eventUri, atomUri } = await buildCreateMessage(
+        draft,
+        nodeUri
+      );
+      if (persona) {
+        const response = await fetch("rest/action/connect", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify([
+            {
+              pending: false,
+              socket: `${persona}#holderSocket`,
             },
-            body: JSON.stringify([
-              {
-                pending: false,
-                socket: `${persona}#holderSocket`,
-              },
-              {
-                pending: true,
-                socket: `${atomUri}#holdableSocket`,
-              },
-            ]),
-            credentials: "include",
-          });
-          if (!response.ok) {
-            const errorMsg = await response.text();
-            throw new Error(`Could not connect identity: ${errorMsg}`);
-          }
-        }
-        dispatch({
-          type: actionTypes.atoms.create,
-          payload: { eventUri, message, atomUri, atom: draft },
+            {
+              pending: true,
+              socket: `${atomUri}#holdableSocket`,
+            },
+          ]),
+          credentials: "include",
         });
+        if (!response.ok) {
+          const errorMsg = await response.text();
+          throw new Error(`Could not connect identity: ${errorMsg}`);
+        }
+      }
+      dispatch({
+        type: actionTypes.atoms.create,
+        payload: { eventUri, message, atomUri, atom: draft },
       });
+    });
   };
 }
