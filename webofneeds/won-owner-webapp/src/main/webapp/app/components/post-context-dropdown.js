@@ -50,13 +50,13 @@ function genComponentConf() {
                     <button
                         class="won-button--outlined thin red"
                         ng-if="self.isUsableAsTemplate"
-                        ng-click="self.router__stateGoAbs('connections', {fromAtomUri: self.atomUri, mode: 'DUPLICATE'})">
+                        ng-click="self.router__stateGoAbs('create', {fromAtomUri: self.atomUri, mode: 'DUPLICATE'})">
                         Post this too!
                     </button>
                     <button
                         class="won-button--outlined thin red"
                         ng-if="self.isEditable"
-                        ng-click="self.router__stateGoAbs('connections', {fromAtomUri: self.atomUri, mode: 'EDIT'})">
+                        ng-click="self.router__stateGoAbs('create', {fromAtomUri: self.atomUri, mode: 'EDIT'})">
                         Edit
                     </button>
                     <a class="won-button--outlined thin red"

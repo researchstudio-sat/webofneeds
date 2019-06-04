@@ -114,7 +114,7 @@ function genComponentConf() {
     }
 
     selectUseCase(ucIdentifier) {
-      this.router__stateGo("connections", {
+      this.router__stateGo("create", {
         useCase: ucIdentifier,
         useCaseGroup: undefined,
         connectionUri: undefined,
