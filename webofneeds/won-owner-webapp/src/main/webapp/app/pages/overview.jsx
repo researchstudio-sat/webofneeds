@@ -35,7 +35,6 @@ const template = (
       <won-post-messages connection-uri="self.viewConnUri" />
     </div>
     <won-topnav page-title="::'What\'s New'" />
-    <won-menu />
     <won-toasts />
     <won-slide-in ng-if="self.showSlideIns" />
     <main className="owneroverview">

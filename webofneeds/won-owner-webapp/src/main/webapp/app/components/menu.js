@@ -14,9 +14,6 @@ function genTopnavConf() {
       <a class="menu__tab" ng-click="self.router__stateGo('inventory')" ng-class="{'menu__tab--selected': self.showInventory}">Inventory</a>
       <a class="menu__tab" ng-click="self.router__stateGo('connections')" ng-class="{'menu__tab--selected': self.showChats}">Chats</a>
       <a class="menu__tab" ng-click="self.router__stateGo('create')" ng-class="{'menu__tab--selected': self.showCreate}">Create</a>
-      <a class="menu__tab menu__tab--selected" ng-if="self.showWhatsNew">What's New</a>
-      <a class="menu__tab menu__tab--selected" ng-if="self.showWhatsAround">What's Around</a>
-      <a class="menu__tab menu__tab--selected" ng-if="self.showSignUp">Sign Up</a>
     </div>
   `;
 
@@ -38,9 +35,6 @@ function genTopnavConf() {
         return {
           showInventory: currentRoute === "inventory",
           showChats: currentRoute === "connections",
-          showWhatsNew: currentRoute === "overview",
-          showWhatsAround: currentRoute === "map",
-          showSignUp: currentRoute === "signup",
           showCreate: currentRoute === "create",
         };
       };
