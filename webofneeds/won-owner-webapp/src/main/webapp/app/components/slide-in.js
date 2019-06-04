@@ -243,7 +243,7 @@ function genSlideInConf() {
         const accountState = get(state, "account");
 
         const privateId = accountUtils.getPrivateId(accountState);
-        const path = "#!/connections" + `?privateId=${privateId}`;
+        const path = "#!/inventory" + `?privateId=${privateId}`;
 
         const anonymousLink = toAbsoluteURL(ownerBaseUrl).toString() + path;
         const isLoggedIn = accountUtils.isLoggedIn(accountState);

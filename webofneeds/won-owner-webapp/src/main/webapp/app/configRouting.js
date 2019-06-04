@@ -52,7 +52,7 @@ export const resetParamsImm = Immutable.fromJS(resetParams);
 /**
  * Default Route
  */
-export const defaultRoute = "connections";
+export const defaultRoute = "inventory";
 
 /**
  * Adapted from https://github.com/neilff/redux-ui-router/blob/master/example/index.js
@@ -96,13 +96,12 @@ export const configRouting = [
         as: "create",
       },
       {
-        path: "/inventory?viewAtomUri?viewConnUri",
+        path: "/inventory?viewAtomUri?viewConnUri?token?privateId",
         component: inventoryComponent,
         as: "inventory",
       },
       {
-        path:
-          "/connections?privateId?connectionUri?token?viewAtomUri?viewConnUri",
+        path: "/connections?connectionUri?viewAtomUri?viewConnUri",
         component: connectionsComponent,
         as: "connections",
       },

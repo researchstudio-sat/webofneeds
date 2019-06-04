@@ -30,9 +30,9 @@ public class WonOwnerMailSender {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private static final String OWNER_TARGET_ATOM_LINK = "/#!post/?postUri=";
     private static final String OWNER_CONNECTION_LINK = "/#!connections?connectionUri=%s";
-    private static final String OWNER_LOCAL_ATOM_LINK = "/#!connections?postUri=";
-    private static final String OWNER_VERIFICATION_LINK = "/#!/connections?token=";
-    private static final String OWNER_ANONYMOUS_LINK = "/#!/connections?privateId=";
+    private static final String OWNER_LOCAL_ATOM_LINK = "/#!post/?postUri=";
+    private static final String OWNER_VERIFICATION_LINK = "/#!/inventory?token=";
+    private static final String OWNER_ANONYMOUS_LINK = "/#!/inventory?privateId=";
     private static final String EXPORT_FILE_NAME = "export.zip";
     private static final String SUBJECT_CONVERSATION_MESSAGE = "New message";
     private static final String SUBJECT_CONNECT = "New conversation request";
