@@ -123,8 +123,7 @@ function genComponentConf() {
         selectedUseCase && selectedUseCase.identifier;
 
       if (selectedUseCaseIdentifier) {
-        this.router__stateGoCurrent({
-          connectionUri: undefined,
+        this.router__stateGo("create", {
           useCase: encodeURIComponent(selectedUseCaseIdentifier),
           useCaseGroup: undefined,
           fromAtomUri: undefined,
@@ -139,8 +138,7 @@ function genComponentConf() {
     }
 
     showAvailableUseCases() {
-      this.router__stateGoCurrent({
-        connectionUri: undefined,
+      this.router__stateGo("create", {
         useCase: undefined,
         useCaseGroup: "all",
         fromAtomUri: undefined,
@@ -150,8 +148,7 @@ function genComponentConf() {
 
     showPureSearch() {
       // TODO: this link is still broken
-      this.router__stateGoCurrent({
-        connectionUri: undefined,
+      this.router__stateGo("create", {
         useCase: "search",
         useCaseGroup: undefined,
         fromAtomUri: undefined,

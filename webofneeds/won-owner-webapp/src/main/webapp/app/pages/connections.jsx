@@ -3,14 +3,9 @@
 import angular from "angular";
 import ngAnimate from "angular-animate";
 import won from "../won-es6.js";
-import sendRequestModule from "../components/send-request.js";
 import postMessagesModule from "../components/post-messages.js";
 import groupPostMessagesModule from "../components/group-post-messages.js";
 import connectionsOverviewModule from "../components/connections-overview.js";
-import createPostModule from "../components/create-post.js";
-import createSearchModule from "../components/create-search.js";
-import usecasePickerModule from "../components/usecase-picker.js";
-import usecaseGroupModule from "../components/usecase-group.js";
 import { attach, getIn, get } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import * as generalSelectors from "../selectors/general-selectors.js";
@@ -44,9 +39,7 @@ const template = (
       className="overview__left"
       ng-class="{'hide-in-responsive': self.hideListSideInResponsive}"
     >
-      <won-connections-overview
-        on-selected-connection="::self.selectConnection(connectionUri)"
-      />
+      <won-connections-overview on-selected-connection="::self.selectConnection(connectionUri)" />
     </aside>
     {/* RIGHT SIDE */}
     <main
@@ -59,7 +52,6 @@ const template = (
           className="overview__right__welcome__text"
           ng-include="self.welcomeTemplatePath"
         />
-        <won-usecase-picker />
         <div className="overview__right__welcome__howto">
           <a
             className="overview__right__welcome__howto__button won-button--filled red"
@@ -71,10 +63,6 @@ const template = (
       </div>
     </main>
     <main className="overview__right" ng-if="self.showContentSide">
-      <won-usecase-picker ng-if="self.showUseCasePicker" />
-      <won-usecase-group ng-if="self.showUseCaseGroups" />
-      <won-create-post ng-if="self.showCreatePost" />
-      <won-create-search ng-if="self.showCreateSearch" />
       <won-post-messages ng-if="self.showPostMessages" />
       <won-group-post-messages ng-if="self.showGroupPostMessages" />
     </main>
@@ -95,14 +83,9 @@ class ConnectionsController {
       const viewConnUri = generalSelectors.getViewConnectionUriFromRoute(state);
       const viewAtomUri = generalSelectors.getViewAtomUriFromRoute(state);
 
-      const useCase = generalSelectors.getUseCaseFromRoute(state);
-      const useCaseGroup = generalSelectors.getUseCaseGroupFromRoute(state);
-
       const selectedConnectionUri = generalSelectors.getConnectionUriFromRoute(
         state
       );
-      const fromAtomUri = generalSelectors.getFromAtomUriFromRoute(state);
-      const mode = generalSelectors.getModeFromRoute(state);
 
       const atom =
         selectedConnectionUri &&
@@ -127,45 +110,20 @@ class ConnectionsController {
       const themeName = get(theme, "name");
       const welcomeTemplate = get(theme, "welcomeTemplate");
 
-      const showCreateFromPost = !!(fromAtomUri && mode);
-
       return {
         welcomeTemplatePath: "./skin/" + themeName + "/" + welcomeTemplate,
         showModalDialog: getIn(state, ["view", "showModalDialog"]),
         showWelcomeSide:
-          !showCreateFromPost &&
-          !useCase &&
-          !useCaseGroup &&
-          (!selectedConnection || connectionUtils.isClosed(selectedConnection)),
+          !selectedConnection || connectionUtils.isClosed(selectedConnection),
         showContentSide:
-          showCreateFromPost ||
-          useCase ||
-          useCaseGroup ||
-          (selectedConnection && !connectionUtils.isClosed(selectedConnection)),
-        showUseCasePicker:
-          !useCase &&
-          !!useCaseGroup &&
-          useCaseGroup === "all" &&
-          !selectedConnection,
-        showUseCaseGroups:
-          !useCase &&
-          !!useCaseGroup &&
-          useCaseGroup !== "all" &&
-          !selectedConnection,
-        showCreatePost:
-          showCreateFromPost ||
-          (!!useCase && useCase !== "search" && !selectedConnection),
-        showCreateSearch:
-          !!useCase && useCase === "search" && !selectedConnection,
+          selectedConnection && !connectionUtils.isClosed(selectedConnection),
         showPostMessages:
-          !useCaseGroup &&
           !isSelectedConnectionGroupChat &&
           (connectionUtils.isConnected(selectedConnection) ||
             connectionUtils.isRequestReceived(selectedConnection) ||
             connectionUtils.isRequestSent(selectedConnection) ||
             connectionUtils.isSuggested(selectedConnection)),
         showGroupPostMessages:
-          !useCaseGroup &&
           isSelectedConnectionGroupChat &&
           (connectionUtils.isConnected(selectedConnection) ||
             connectionUtils.isRequestReceived(selectedConnection) ||
@@ -177,12 +135,7 @@ class ConnectionsController {
         showConnectionOverlay: !!viewConnUri,
         viewAtomUri,
         viewConnUri,
-        hideListSideInResponsive:
-          showCreateFromPost ||
-          !hasOwnedAtoms ||
-          selectedConnection ||
-          !!useCaseGroup ||
-          !!useCase,
+        hideListSideInResponsive: !hasOwnedAtoms || selectedConnection,
         hideWelcomeSideInResponsive: hasOwnedAtoms,
         hideFooterInResponsive: selectedConnection,
       };
@@ -196,13 +149,7 @@ class ConnectionsController {
 
   selectConnection(connectionUri) {
     this.markAsRead(connectionUri);
-    this.router__stateGoCurrent({
-      connectionUri: connectionUri,
-      useCase: undefined,
-      useCaseGroup: undefined,
-      fromAtomUri: undefined,
-      mode: undefined,
-    });
+    this.router__stateGoCurrent({ connectionUri: connectionUri });
   }
 
   markAsRead(connectionUri) {
@@ -233,13 +180,8 @@ export default {
   module: angular
     .module("won.owner.components.connections", [
       ngAnimate,
-      sendRequestModule,
       postMessagesModule,
       groupPostMessagesModule,
-      usecasePickerModule,
-      usecaseGroupModule,
-      createPostModule,
-      createSearchModule,
       connectionsOverviewModule,
     ])
     .controller("ConnectionsController", [

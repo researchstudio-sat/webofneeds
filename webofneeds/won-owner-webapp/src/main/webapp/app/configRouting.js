@@ -102,7 +102,7 @@ export const configRouting = [
       },
       {
         path:
-          "/connections?privateId?connectionUri?useCase?useCaseGroup?token?viewAtomUri?viewConnUri?fromAtomUri?mode",
+          "/connections?privateId?connectionUri?token?viewAtomUri?viewConnUri",
         component: connectionsComponent,
         as: "connections",
       },
