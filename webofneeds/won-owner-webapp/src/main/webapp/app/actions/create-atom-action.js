@@ -111,12 +111,6 @@ export function atomCreate(draft, persona, nodeUri) {
           type: actionTypes.atoms.create,
           payload: { eventUri, message, atomUri, atom: draft },
         });
-
-        dispatch(
-          actionCreators.router__stateGoAbs("connections", {
-            connectionUri: undefined,
-          })
-        );
       });
   };
 }

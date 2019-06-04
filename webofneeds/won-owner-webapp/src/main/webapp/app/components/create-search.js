@@ -175,12 +175,14 @@ function genComponentConf() {
 
         if (this.loggedIn) {
           this.atoms__create(tempDraft, undefined, tempDefaultNodeUri);
+          this.router__stateGo("inventory");
         } else {
           this.view__showTermsDialog(
             Immutable.fromJS({
               acceptCallback: () => {
                 this.view__hideModalDialog();
                 this.atoms__create(tempDraft, undefined, tempDefaultNodeUri);
+                this.router__stateGo("inventory");
               },
               cancelCallback: () => {
                 this.view__hideModalDialog();
