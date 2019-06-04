@@ -44,6 +44,7 @@ main.overview__rightempty {
     justify-content: center;
     background: $won-lighter-gray;
     border-right: $thinGrayBorder;
+    border-bottom: $thinGrayBorder;
 
     &__icon {
       @include fixed-square($hugeiconSize);

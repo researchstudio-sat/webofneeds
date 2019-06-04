@@ -44,6 +44,8 @@ won-usecase-picker {
 
     &__back {
       grid-area: header_back;
+      display: grid;
+
       &__icon {
         --local-primary: #{$won-primary-color};
         @include fixed-square($backIconSize);

@@ -30,8 +30,7 @@ const serviceDependencies = ["$ngRedux", "$scope"];
 function genComponentConf() {
   let template = `
         <div ng-repeat="atomUri in self.sortedOpenAtomUris track by atomUri" class="co__item">
-            <div class="co__item__atom" ng-class="{'won-unread': self.isUnread(atomUri)}">
-                <div class="co__item__atom__indicator"></div>
+            <div class="co__item__atom">
                 <div class="co__item__atom__header">
                     <won-post-header
                         atom-uri="::atomUri"
@@ -160,11 +159,6 @@ function genComponentConf() {
     hasUnreadSuggestedConnections(atomUri) {
       const atom = get(this.allAtoms, atomUri);
       return atomUtils.hasUnreadSuggestedConnections(atom);
-    }
-
-    isUnread(atomUri) {
-      const atom = get(this.allAtoms, atomUri);
-      return get(atom, "unread");
     }
 
     isConnectionUnread(atomUri, connUri) {

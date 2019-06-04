@@ -20,7 +20,7 @@ function genComponentConf() {
   const template = `
       <!-- HEADER -->
       <div class="ucg__header">
-          <a class="cp__header__back clickable"
+          <a class="ucg__header__back clickable"
               ng-click="self.router__back()">
               <svg class="ucg__header__back__icon">
                   <use xlink:href="#ico36_backarrow" href="#ico36_backarrow"></use>
