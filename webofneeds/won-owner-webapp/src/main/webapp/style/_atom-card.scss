@@ -186,8 +186,11 @@ won-atom-card {
     grid-template-areas: "card__main__topline" "card__main__subtitle";
     grid-template-columns: 1fr;
     grid-template-rows: min-content min-content min-content;
-    width: 15rem;
-    max-width: 15rem;
+
+    @media (min-width: $responsivenessBreakPoint) {
+      width: 15rem;
+      max-width: 15rem;
+    }
 
     &--showIcon {
       grid-template-areas: "card__main__icon card__main__topline" "card__main__icon card__main__subtitle";
