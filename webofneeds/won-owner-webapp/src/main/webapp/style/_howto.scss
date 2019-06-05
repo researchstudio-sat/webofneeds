@@ -5,27 +5,27 @@
 won-how-to {
   display: block;
 
-  .about__howto__title {
+  .howto__title {
     text-align: center;
     color: $won-primary-color;
     padding-bottom: 0.25rem;
     font-weight: normal;
   }
-  h1.about__howto__title {
+  h1.howto__title {
     font-size: $bigFontSize;
   }
-  h2.about__howto__title {
+  h2.howto__title {
     font-size: $mediumFontSize;
   }
 
-  h3.about__howto__subtitle {
+  h3.howto__subtitle {
     text-align: center;
     font-size: $normalFontSize;
     font-weight: bold;
     max-width: 16rem;
     margin: 0 auto;
   }
-  .about__howto__steps {
+  .howto__steps {
     display: grid;
     grid-column-gap: 1rem;
     grid-row-gap: 2rem;
@@ -162,7 +162,7 @@ won-how-to {
       }
     }
   }
-  .about__howto__createx {
+  .howto__createx {
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-column-gap: 0.5rem;

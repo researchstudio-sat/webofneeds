@@ -12,18 +12,18 @@ import * as generalSelectors from "../selectors/general-selectors";
 
 function genTopnavConf() {
   let template = `
-        <h1 class="about__howto__title">How it works</h1>
-        <h3 class="about__howto__subtitle">
+        <h1 class="howto__title">How it works</h1>
+        <h3 class="howto__subtitle">
           in {{ self.howItWorksSteps.length }} Steps
         </h3>
-        <div class="about__howto__steps">
+        <div class="howto__steps">
           <div
-            class="about__howto__steps__process"
+            class="howto__steps__process"
             ng-style="{'--howToColCount': self.howItWorksSteps.length}"
           >
             <svg
-              class="about__howto__steps__process__icon"
-              ng-class="{'about__howto__steps__process__icon--selected': $index == self.selectedHowItWorksStep}"
+              class="howto__steps__process__icon"
+              ng-class="{'howto__steps__process__icon--selected': $index == self.selectedHowItWorksStep}"
               ng-repeat="item in self.howItWorksSteps"
               ng-click="self.selectedHowItWorksStep = $index"
             >
@@ -33,45 +33,45 @@ function genTopnavConf() {
               ></use>
             </svg>
             <div
-              class="about__howto__steps__process__stepcount"
+              class="howto__steps__process__stepcount"
               ng-repeat="item in self.howItWorksSteps"
-              ng-class="{'about__howto__steps__process__stepcount--selected': $index == self.selectedHowItWorksStep}"
+              ng-class="{'howto__steps__process__stepcount--selected': $index == self.selectedHowItWorksStep}"
               ng-click="self.selectedHowItWorksStep = $index"
             >
               {{ $index + 1 }}
             </div>
-            <div class="about__howto__steps__process__stepline" ></div>
+            <div class="howto__steps__process__stepline" ></div>
           </div>
           <svg
-            class="about__howto__steps__button about__howto__steps__button--prev"
-            ng-class="{'about__howto__steps__button--invisible': self.selectedHowItWorksStep <= 0}"
+            class="howto__steps__button howto__steps__button--prev"
+            ng-class="{'howto__steps__button--invisible': self.selectedHowItWorksStep <= 0}"
             ng-click="self.selectedHowItWorksStep = self.selectedHowItWorksStep - 1"
           >
             <use xlink:href="#ico36_backarrow" href="#ico36_backarrow" ></use>
           </svg>
-          <div class="about__howto__steps__detail">
-            <div class="about__howto__detail__title">
+          <div class="howto__steps__detail">
+            <div class="howto__detail__title">
               {{ self.howItWorksSteps[self.selectedHowItWorksStep].title }}
             </div>
-            <div class="about__howto__steps__detail__text">
+            <div class="howto__steps__detail__text">
               {{ self.howItWorksSteps[self.selectedHowItWorksStep].text }}
             </div>
           </div>
           <svg
-            class="about__howto__steps__button about__howto__steps__button--next"
-            ng-class="{'about__howto__steps__button--invisible': self.selectedHowItWorksStep >= (self.howItWorksSteps.length-1)}"
+            class="howto__steps__button howto__steps__button--next"
+            ng-class="{'howto__steps__button--invisible': self.selectedHowItWorksStep >= (self.howItWorksSteps.length-1)}"
             ng-click="self.selectedHowItWorksStep = self.selectedHowItWorksStep + 1"
           >
             <use xlink:href="#ico36_backarrow" href="#ico36_backarrow" ></use>
           </svg>
         </div>
-        <h2 class="about__howto__title">Ready to start?</h2>
-        <h3 class="about__howto__subtitle">
+        <h2 class="howto__title">Ready to start?</h2>
+        <h3 class="howto__subtitle">
           Post your atom or offer and let {{ self.appTitle }} do the rest
         </h3>
-        <div class="about__howto__createx">
+        <div class="howto__createx">
           <button
-            class="won-button--filled red about__howto__createx__button"
+            class="won-button--filled red howto__createx__button"
             ng-click="self.viewWhatsAround()"
           >
             <svg class="won-button-icon" style="--local-primary:white;">
@@ -83,17 +83,17 @@ function genTopnavConf() {
             <span>What's in your Area?</span>
           </button>
           <button
-            class="won-button--filled red about__howto__createx__button"
+            class="won-button--filled red howto__createx__button"
             ng-click="self.viewWhatsNew()"
           >
             <span>What's new?</span>
           </button>
           <won-labelled-hr
             label="::'Or'"
-            class="about__howto__createx__labelledhr"
+            class="howto__createx__labelledhr"
           ></won-labelled-hr>
           <button
-            class="won-button--filled red about__howto__createx__spanbutton"
+            class="won-button--filled red howto__createx__spanbutton"
             ng-click="self.router__stateGo('create')"
           >
             <span>Post something now!</span>
