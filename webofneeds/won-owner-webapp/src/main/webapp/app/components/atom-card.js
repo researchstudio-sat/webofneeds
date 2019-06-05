@@ -6,6 +6,7 @@ import angular from "angular";
 import inviewModule from "angular-inview";
 import "ng-redux";
 import atomMapModule from "./atom-map.js";
+import suggestionSelectionItemModule from "./suggestion-selection-item.js";
 import { actionCreators } from "../actions/actions.js";
 import { relativeTime } from "../won-label-utils.js";
 import { attach, getIn, get } from "../utils.js";
@@ -16,6 +17,7 @@ import * as atomUtils from "../atom-utils.js";
 import * as processUtils from "../process-utils.js";
 
 import "~/style/_atom-card.scss";
+import Immutable from "immutable";
 
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
@@ -29,7 +31,7 @@ function genComponentConf() {
           'inactive': self.isInactive,
           'card__icon--map': self.showMap,
         }"
-        ng-click="self.router__stateGo('post', {postUri: self.atom.get('uri')})">
+        ng-click="::self.showAtomDetails(self.atomUri)">
         <div class="identicon usecaseimage"
             ng-if="self.showDefaultIcon && self.useCaseIcon">
             <svg>
@@ -52,7 +54,7 @@ function genComponentConf() {
     </div>
     <!-- Main Information -->
     <div class="card__main clickable"
-        ng-if="self.atomLoaded" ng-click="self.router__stateGo('post', {postUri: self.atom.get('uri')})"
+        ng-if="self.atomLoaded" ng-click="::self.showAtomDetails(self.atomUri)"
         ng-class="{
           'card__main--showIcon': !self.showDefaultIcon,
         }">
@@ -119,7 +121,7 @@ function genComponentConf() {
         </div>
     </div>
     <!-- Attached Persona Info -->
-    <div class="card__persona clickable" ng-if="self.atomLoaded && self.persona && self.atomHasHoldableSocket" ng-click="self.router__stateGoCurrent({viewAtomUri: self.personaUri})">
+    <div class="card__persona clickable" ng-if="self.showPersona && self.atomLoaded && self.persona && self.atomHasHoldableSocket" ng-click="self.router__stateGoCurrent({viewAtomUri: self.personaUri})">
           <img class="card__persona__icon"
               ng-if="::self.personaIdenticonSvg"
               alt="Auto-generated title image for persona that holds the atom"
@@ -133,9 +135,15 @@ function genComponentConf() {
           <div class="card__persona__websitelabel" ng-if="self.personaWebsite">Website:</div>
           <a class="card__persona__websitelink" target="_blank" href="{{self.personaWebsite}}" ng-if="self.personaWebsite">{{ self.personaWebsite }}</a>
     </div>
-    <div class="card__nopersona" ng-if="(self.atomLoaded && !self.persona && self.atomHasHoldableSocket) || !self.atomLoaded">
+    <div class="card__nopersona" ng-if="self.showPersona && ((self.atomLoaded && !self.persona && self.atomHasHoldableSocket) || !self.atomLoaded)">
         <span class="card__nopersona__label" ng-if="self.atomLoaded">No Persona attached</span>
     </div>
+    <won-suggestion-selection-item
+        ng-if="self.showSuggestions && self.atomHasSuggestions"
+        class="card__indicators"
+        atom-uri="::self.atomUri"
+        on-selected="::self.showAtomSuggestions(self.atomUri)">
+    </won-suggestion-selection-item>
     `;
 
   class Controller {
@@ -186,6 +194,7 @@ function genComponentConf() {
           personaVerified,
           atomHasHolderSocket: atomUtils.hasHolderSocket(atom),
           atomHasHoldableSocket: atomUtils.hasHoldableSocket(atom),
+          atomHasSuggestions: atomUtils.hasSuggestedConnections(atom),
           atomLoaded:
             processUtils.isAtomLoaded(process, this.atomUri) &&
             !get(atom, "isBeingCreated"),
@@ -222,7 +231,7 @@ function genComponentConf() {
       connect2Redux(
         selectFromState,
         actionCreators,
-        ["self.atomUri", "self.currentLocation"],
+        ["self.atomUri", "self.currentLocation", "self.showSuggestions"],
         this
       );
 
@@ -261,6 +270,21 @@ function genComponentConf() {
         return this.atom.get("humanReadable");
       }
     }
+
+    showAtomSuggestions(atomUri) {
+      this.showAtomTab(atomUri, "SUGGESTIONS");
+    }
+
+    showAtomDetails(atomUri) {
+      this.showAtomTab(atomUri, "DETAIL");
+    }
+
+    showAtomTab(atomUri, tab = "DETAIL") {
+      this.atoms__selectTab(
+        Immutable.fromJS({ atomUri: atomUri, selectTab: tab })
+      );
+      this.router__stateGo("post", { postUri: atomUri });
+    }
   }
   Controller.$inject = serviceDependencies;
   return {
@@ -271,11 +295,17 @@ function genComponentConf() {
     scope: {
       atomUri: "=",
       currentLocation: "=",
+      showSuggestions: "=",
+      showPersona: "=",
     },
     template: template,
   };
 }
 
 export default angular
-  .module("won.owner.components.atomCard", [inviewModule.name, atomMapModule])
+  .module("won.owner.components.atomCard", [
+    inviewModule.name,
+    atomMapModule,
+    suggestionSelectionItemModule,
+  ])
   .directive("wonAtomCard", genComponentConf).name;

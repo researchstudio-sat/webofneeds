@@ -3,19 +3,12 @@
  */
 
 import angular from "angular";
-import won from "../won-es6.js";
 import { attach, getIn } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
 import { actionCreators } from "../actions/actions.js";
-import {
-  getPosts,
-  getPostUriFromRoute,
-} from "../selectors/general-selectors.js";
-import * as connectionSelectors from "../selectors/connection-selectors.js";
-import { classOnComponentRoot } from "../cstm-ng-utils.js";
-import * as connectionUtils from "../connection-utils.js";
 
 import "~/style/_suggestion-selection-item-line.scss";
+import * as atomUtils from "../atom-utils";
 
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
@@ -23,8 +16,8 @@ function genComponentConf() {
       <svg class="ssi__icon"
           ng-click="self.setOpen()"
           ng-class="{
-            'ssi__icon--reads': !self.hasUnreadMatches,
-            'ssi__icon--unreads': self.hasUnreadMatches
+            'ssi__icon--reads': !self.hasUnreadSuggestions,
+            'ssi__icon--unreads': self.hasUnreadSuggestions
           }">
           <use xlink:href="#ico36_match" href="#ico36_match"></use>
       </svg>
@@ -36,8 +29,8 @@ function genComponentConf() {
         </div>
         <div class="ssi__right__subtitle">
           <div class="ssi__right__subtitle__label">
-            <span>{{ self.matchesCount }} Suggestions</span>
-            <span ng-if="self.hasUnreadMatches">, {{ self.unreadMatchesCount }} new</span
+            <span>{{ self.suggestionsCount }} Suggestions</span>
+            <span ng-if="self.hasUnreadSuggestions">, {{ self.unreadSuggestionsCount }} new</span
           </div>
         </div>
       </div>
@@ -48,54 +41,27 @@ function genComponentConf() {
       attach(this, serviceDependencies, arguments);
 
       const selectFromState = state => {
-        const allPosts = getPosts(state);
-        const chatConnectionsByAtomUri =
-          this.atomUri &&
-          connectionSelectors.getChatConnectionsByAtomUri(state, this.atomUri);
-        const matches =
-          chatConnectionsByAtomUri &&
-          chatConnectionsByAtomUri.filter(conn => {
-            const targetAtomUri = conn.get("targetAtomUri");
-            const targetAtomActiveOrLoading =
-              targetAtomUri &&
-              allPosts &&
-              allPosts.get(targetAtomUri) &&
-              (getIn(state, ["process", "atoms", targetAtomUri, "loading"]) ||
-                allPosts.getIn([targetAtomUri, "state"]) ===
-                  won.WON.ActiveCompacted);
+        const atom = getIn(state, ["atoms", this.atomUri]);
+        const suggestedConnections = atomUtils.getSuggestedConnections(atom);
 
-            return (
-              targetAtomActiveOrLoading &&
-              connectionUtils.isSuggested(conn) &&
-              (connectionSelectors.isChatToXConnection(allPosts, conn) ||
-                connectionSelectors.isGroupToXConnection(allPosts, conn))
-            );
-          });
-
-        const unreadMatches =
-          matches && matches.filter(conn => conn.get("unread"));
-        const unreadMatchesCount = unreadMatches ? unreadMatches.size : 0;
-
-        const matchesCount = matches ? matches.size : 0;
-
-        const openPostUri = getPostUriFromRoute(state);
+        const suggestionsCount = suggestedConnections
+          ? suggestedConnections.size
+          : 0;
+        const unreadSuggestions =
+          suggestedConnections &&
+          suggestedConnections.filter(conn => conn.get("unread"));
+        const unreadSuggestionsCount = unreadSuggestions
+          ? unreadSuggestions.size
+          : 0;
 
         return {
-          matchesCount,
-          unreadMatchesCount,
-          hasUnreadMatches: unreadMatchesCount > 0,
-          openPostUri,
+          suggestionsCount,
+          unreadSuggestionsCount,
+          hasUnreadSuggestions: unreadSuggestionsCount > 0,
         };
       };
 
       connect2Redux(selectFromState, actionCreators, ["self.atomUri"], this);
-
-      classOnComponentRoot("selected", () => this.isOpen(), this);
-      classOnComponentRoot("won-unread", () => this.hasUnreadMatches, this);
-    }
-    isOpen() {
-      //FIXME: Currently just checks if atom atom-details are open
-      return this.openPostUri === this.atomUri;
     }
 
     setOpen() {

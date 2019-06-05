@@ -65,6 +65,8 @@ const template = (
           atom-uri="atomUri"
           current-location="self.currentLocation"
           ng-repeat="atomUri in self.sortedOwnedActiveAtomUriArray track by atomUri"
+          show-suggestions="::true"
+          show-persona="::true"
         />
         <div
           className="ownerinventory__content__createatom"
@@ -107,6 +109,8 @@ const template = (
           atom-uri="atomUri"
           current-location="self.currentLocation"
           ng-repeat="atomUri in self.sortedOwnedInactiveAtomUriArray track by atomUri"
+          show-suggestions="::false"
+          show-persona="::true"
         />
       </div>
     </main>

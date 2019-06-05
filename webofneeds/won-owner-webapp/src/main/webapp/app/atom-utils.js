@@ -226,6 +226,13 @@ export function hasSuggestedConnections(atom) {
   );
 }
 
+export function getSuggestedConnections(atom) {
+  return (
+    get(atom, "connections") &&
+    get(atom, "connections").filter(conn => connectionUtils.isSuggested(conn))
+  );
+}
+
 export function hasUnreadSuggestedConnections(atom) {
   return (
     get(atom, "connections") &&

@@ -216,6 +216,8 @@ const template = (
           current-location="self.lastWhatsAroundLocation"
           ng-repeat="atomUri in self.sortedVisibleAtomUriArray track by atomUri"
           ng-if="self.hasVisibleAtomUris"
+          show-suggestions="::false"
+          show-persona="::true"
         />
       </div>
       <div
