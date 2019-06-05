@@ -44,7 +44,7 @@ export const getOwnedPosts = state => {
  * Gets all Atoms that...
  *  - are Active
  *  - have the ChatSocket
- *  - have at least one non-closed ChatSocket connection
+ *  - have at least one non-closed non-suggested ChatSocket connection
  * @param state
  */
 export function getChatAtoms(state) {
@@ -58,7 +58,13 @@ export function getChatAtoms(state) {
         atom =>
           !!get(atom, "connections") &&
           !!get(atom, "connections")
-            .filter(conn => !connectionUtils.isClosed(conn))
+            .filter(
+              conn =>
+                !(
+                  connectionUtils.isClosed(conn) ||
+                  connectionUtils.isSuggested(conn)
+                )
+            )
             .find(conn =>
               connectionSelectors.isChatToXConnection(get(state, "atoms"), conn)
             )
