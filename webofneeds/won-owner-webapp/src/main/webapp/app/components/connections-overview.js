@@ -12,7 +12,6 @@ import squareImageModule from "./square-image.js";
 import postHeaderModule from "./post-header.js";
 import connectionIndicatorsModule from "./connection-indicators.js";
 import connectionSelectionItemModule from "./connection-selection-item.js";
-import suggestionSelectionItemModule from "./suggestion-selection-item.js";
 
 import { attach, delay, sortByDate, get, getIn } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
@@ -54,15 +53,6 @@ function genComponentConf() {
                       connection-uri="::connUri"
                       ng-class="{'won-unread': self.isConnectionUnread(atomUri, connUri)}">
                   </won-connection-selection-item>
-                </div>
-                <div class="co__item__connections__item" ng-if="self.hasSuggestedConnections(atomUri)"
-                  ng-class="{
-                    'won-unread': self.hasUnreadSuggestedConnections(atomUri),
-                  }">
-                  <won-suggestion-selection-item
-                      atom-uri="::atomUri"
-                      on-selected="self.showAtomSuggestions(atomUri)">
-                  </won-suggestion-selection-item>
                 </div>
             </div>
         </div>
@@ -136,10 +126,6 @@ function genComponentConf() {
       });
     }
 
-    showAtomSuggestions(atomUri) {
-      this.showAtomTab(atomUri, "SUGGESTIONS");
-    }
-
     showAtomDetails(atomUri) {
       this.showAtomTab(atomUri, "DETAIL");
     }
@@ -149,16 +135,6 @@ function genComponentConf() {
         Immutable.fromJS({ atomUri: atomUri, selectTab: tab })
       );
       this.router__stateGo("post", { postUri: atomUri });
-    }
-
-    hasSuggestedConnections(atomUri) {
-      const atom = get(this.allAtoms, atomUri);
-      return atomUtils.hasSuggestedConnections(atom);
-    }
-
-    hasUnreadSuggestedConnections(atomUri) {
-      const atom = get(this.allAtoms, atomUri);
-      return atomUtils.hasUnreadSuggestedConnections(atom);
     }
 
     isConnectionUnread(atomUri, connUri) {
@@ -237,7 +213,6 @@ export default angular
   .module("won.owner.components.connectionsOverview", [
     squareImageModule,
     connectionSelectionItemModule,
-    suggestionSelectionItemModule,
     postHeaderModule,
     connectionIndicatorsModule,
     ngAnimate,

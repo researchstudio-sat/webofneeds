@@ -42,7 +42,6 @@ won-connections-overview {
       margin-left: 1rem;
       &__item {
         padding-left: 0.5rem;
-        // intrent connections so it's clear they belong *to* the post
         &:not(.won-unread) {
           background-color: $won-line-gray;
           border-left: $thinGrayBorder;
