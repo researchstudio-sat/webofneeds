@@ -21,7 +21,6 @@ import Old.Persona as Persona exposing (Persona, PersonaData, SaveState(..))
 import Old.Skin as Skin exposing (Skin)
 import Regex
 import String.Extra as String
-import Time
 import Url
 import Validate exposing (Validator)
 

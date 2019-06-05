@@ -47,6 +47,7 @@ export const cyclingPlan = {
       prefixesInPath: {
         s: won.defaultContext["s"],
         won: won.defaultContext["won"],
+        con: won.defaultContext["con"],
       },
       geoCoordinates: getIn(draft, ["content", "location"]),
     });
@@ -70,8 +71,8 @@ export const cyclingPlan = {
       variables: [resultName, "?score"],
       subQueries: subQueries,
       where: [
-        `${resultName} rdf:type won:Interest.`,
-        `${resultName} won:seeks ?seeks .`,
+        `${resultName} rdf:type demo:Interest.`,
+        `${resultName} match:seeks ?seeks .`,
         `?seeks rdf:type s:PlanAction.`,
         `?seeks s:object ?planObject.`,
         `?planObject s:about <http://dbpedia.org/resource/Cycling>.`,
@@ -95,7 +96,7 @@ export const cyclingInterest = {
   draft: {
     ...mergeInEmptyDraft({
       content: {
-        type: ["won:Interest"],
+        type: ["demo:Interest"],
         title: "I am interested in cycling!",
       },
       seeks: {
@@ -124,6 +125,7 @@ export const cyclingInterest = {
       prefixesInPath: {
         s: won.defaultContext["s"],
         won: won.defaultContext["won"],
+        con: won.defaultContext["con"],
       },
       geoCoordinates: getIn(draft, ["content", "location"]),
     });

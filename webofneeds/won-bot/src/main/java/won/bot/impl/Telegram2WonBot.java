@@ -25,7 +25,7 @@ import won.bot.framework.eventbot.event.impl.telegram.SendHelpEvent;
 import won.bot.framework.eventbot.event.impl.telegram.TelegramCreateAtomEvent;
 import won.bot.framework.eventbot.event.impl.telegram.TelegramMessageReceivedEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.ConnectFromOtherAtomEvent;
-import won.bot.framework.eventbot.event.impl.wonmessage.HintFromMatcherEvent;
+import won.bot.framework.eventbot.event.impl.wonmessage.AtomHintFromMatcherEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.MessageFromOtherAtomEvent;
 import won.bot.framework.eventbot.listener.impl.ActionOnEventListener;
 
@@ -71,7 +71,7 @@ public class Telegram2WonBot extends EventBot {
             bus.subscribe(TelegramCreateAtomEvent.class, new ActionOnEventListener(ctx, "TelegramCreateAction",
                             new TelegramCreateAction(ctx, wonTelegramBotHandler, telegramContentExtractor)));
             // WON initiated Events
-            bus.subscribe(HintFromMatcherEvent.class, new ActionOnEventListener(ctx, "HintReceived",
+            bus.subscribe(AtomHintFromMatcherEvent.class, new ActionOnEventListener(ctx, "HintReceived",
                             new Hint2TelegramAction(ctx, wonTelegramBotHandler)));
             bus.subscribe(ConnectFromOtherAtomEvent.class, new ActionOnEventListener(ctx, "ConnectReceived",
                             new Connect2TelegramAction(ctx, wonTelegramBotHandler)));

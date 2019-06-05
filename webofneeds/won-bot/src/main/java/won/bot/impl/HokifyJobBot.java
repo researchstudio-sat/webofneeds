@@ -89,8 +89,11 @@ public class HokifyJobBot extends EventBot {
                             }));
             // WON initiated Events
             /*
-             * bus.subscribe(HintFromMatcherEvent.class, new ActionOnEventListener(ctx,
-             * "HintReceived", new Hint2HokifyAction(ctx)));
+             * When uncommenting this one day, remember to EventBotAction hint2HokifyAction
+             * = new Hint2HokifyAction(ctx); bus.subscribe(AtomHintFromMatcherEvent.class,
+             * new ActionOnEventListener(ctx, "AtomHintReceived", hint2HokifyAction));
+             * bus.subscribe(SocketHintFromMatcherEvent.class, new
+             * ActionOnEventListener(ctx, "AtomHintReceived", hint2HokifyAction));
              */
             bus.subscribe(ConnectFromOtherAtomEvent.class,
                             new ActionOnEventListener(ctx, "ConnectReceived", new Connect2HokifyAction(ctx)));

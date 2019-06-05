@@ -1,3 +1,5 @@
+@prefix con:   <https://w3id.org/won/content#> .
+@prefix match:   <https://w3id.org/won/matching#> .
 @prefix msg:   <https://w3id.org/won/message#> .
 @prefix conn:  <https://satvm05.researchstudio.at/won/resource/connection/> .
 @prefix atom:  <https://satvm05.researchstudio.at/won/resource/atom/> .
@@ -60,12 +62,12 @@
 
     atom:qhj15b6jojuk
             a                    won:Atom ;
-            won:doNotMatchAfter  "2018-09-19T14:57:31.676Z"^^xsd:dateTime ;
+            match:doNotMatchAfter  "2018-09-19T14:57:31.676Z"^^xsd:dateTime ;
             won:socket         won:ChatSocket ;
-            a           won:RealEstateRentDemand ;
-            won:tag  "SearchRealEstateToRent" ;
-            won:seeks            [ a                     won:RealEstateRentOffer ;
-                                   won:tag            "RentOutRealEstate" ;
+            a           demo:RealEstateRentDemand ;
+            con:tag  "SearchRealEstateToRent" ;
+            match:seeks            [ a                     demo:RealEstateRentOffer ;
+                                   con:tag            "RentOutRealEstate" ;
                                    s:priceSpecification  <https://satvm05.researchstudio.at/won/resource/atom/qhj15b6jojuk/rentRange/wjcmtrhwuh>
                                  ] ;
             cert:key             [ cert:PublicKey  [ a                       woncrypt:ECCPublicKey ;

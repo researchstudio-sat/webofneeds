@@ -1,3 +1,4 @@
+PREFIX con: <https://w3id.org/won/content#>
 PREFIX won: <https://w3id.org/won/core#>
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX s: <http://schema.org/>
@@ -24,7 +25,7 @@ SELECT DISTINCT ?result ?score WHERE {
       SERVICE geo:search {
         ?geo geo:search "inCircle";
           geo:searchDatatype geoliteral:lat-lon;
-          geo:predicate won:geoSpatial;
+          geo:predicate con:geoSpatial;
           geo:spatialCircleCenter "48.22350935259615#16.38684868812561";
           geo:spatialCircleRadius "10";
           geo:distanceValue ?geoDistance.

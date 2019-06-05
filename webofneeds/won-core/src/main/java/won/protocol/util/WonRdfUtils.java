@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.graph.NodeFactory;
@@ -53,12 +54,12 @@ import org.apache.jena.sparql.algebra.op.OpProject;
 import org.apache.jena.sparql.algebra.op.OpUnion;
 import org.apache.jena.sparql.core.BasicPattern;
 import org.apache.jena.sparql.core.Var;
+import org.apache.jena.sparql.function.library.leviathan.sec;
 import org.apache.jena.sparql.path.Path;
 import org.apache.jena.sparql.path.PathParser;
 import org.apache.jena.tdb.TDB;
 import org.apache.jena.vocabulary.RDF;
 import org.hibernate.cfg.NotYetImplementedException;
-import org.hibernate.hql.internal.ast.tree.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,14 +69,15 @@ import won.protocol.message.WonMessageDirection;
 import won.protocol.message.WonSignatureData;
 import won.protocol.model.AtomGraphType;
 import won.protocol.model.ConnectionState;
-import won.protocol.model.Match;
 import won.protocol.model.SocketDefinitionImpl;
 import won.protocol.service.WonNodeInfo;
 import won.protocol.service.WonNodeInfoBuilder;
+import won.protocol.util.RdfUtils.Pair;
 import won.protocol.vocabulary.SCHEMA;
 import won.protocol.vocabulary.SFSIG;
 import won.protocol.vocabulary.WON;
 import won.protocol.vocabulary.WONAGR;
+import won.protocol.vocabulary.WONCON;
 import won.protocol.vocabulary.WONMOD;
 import won.protocol.vocabulary.WONMSG;
 
@@ -245,14 +247,14 @@ public class WonRdfUtils {
 
     public static class MessageUtils {
         /**
-         * Adds the specified text as a won:textMessage to the model's base resource.
+         * Adds the specified text as a con:text to the model's base resource.
          * 
          * @param message
          * @return
          */
         public static Model addMessage(Model model, String message) {
             Resource baseRes = RdfUtils.findOrCreateBaseResource(model);
-            baseRes.addProperty(WON.textMessage, message, XSDDatatype.XSDstring);
+            baseRes.addProperty(WONCON.text, message, XSDDatatype.XSDstring);
             return model;
         }
 
@@ -265,7 +267,7 @@ public class WonRdfUtils {
         public static Model textMessage(String message) {
             Model messageModel = createModelWithBaseResource();
             Resource baseRes = messageModel.createResource(messageModel.getNsPrefixURI(""));
-            baseRes.addProperty(WON.textMessage, message, XSDDatatype.XSDstring);
+            baseRes.addProperty(WONCON.text, message, XSDDatatype.XSDstring);
             return messageModel;
         }
 
@@ -406,22 +408,22 @@ public class WonRdfUtils {
             Model messageModel = createModelWithBaseResource();
             Resource baseRes = RdfUtils.getBaseResource(messageModel);
             Resource feedbackNode = messageModel.createResource();
-            baseRes.addProperty(WON.feedback, feedbackNode);
-            feedbackNode.addProperty(WON.binaryRating, isFeedbackPositive ? WON.Good : WON.Bad);
-            feedbackNode.addProperty(WON.forResource, messageModel.createResource(forResource.toString()));
+            baseRes.addProperty(WONCON.feedback, feedbackNode);
+            feedbackNode.addProperty(WONCON.binaryRating, isFeedbackPositive ? WONCON.Good : WONCON.Bad);
+            feedbackNode.addProperty(WONCON.feedbackTarget, messageModel.createResource(forResource.toString()));
             return messageModel;
         }
 
         /**
-         * Returns the first won:textMessage object, or null if none is found. Won't
-         * work on WonMessage models, removal depends on refactoring of BA socket code
+         * Returns the first con:text object, or null if none is found. Won't work on
+         * WonMessage models, removal depends on refactoring of BA socket code
          * 
          * @param model
          * @return
          */
         @Deprecated
         public static String getTextMessage(Model model) {
-            Statement stmt = model.getProperty(RdfUtils.getBaseResource(model), WON.textMessage);
+            Statement stmt = model.getProperty(RdfUtils.getBaseResource(model), WONCON.text);
             if (stmt != null) {
                 return stmt.getObject().asLiteral().getLexicalForm();
             }
@@ -429,15 +431,15 @@ public class WonRdfUtils {
         }
 
         /**
-         * Returns all won:textMessage objects, or an empty set if none is found. The
-         * specified model has to be a message's content graph.
+         * Returns all con:text objects, or an empty set if none is found. The specified
+         * model has to be a message's content graph.
          * 
          * @param model
          * @return
          */
         public static Set<String> getTextMessages(Model model, URI messageUri) {
             Set<String> ret = new HashSet<>();
-            StmtIterator stmtIt = model.listStatements(model.getResource(messageUri.toString()), WON.textMessage,
+            StmtIterator stmtIt = model.listStatements(model.getResource(messageUri.toString()), WONCON.text,
                             (RDFNode) null);
             while (stmtIt.hasNext()) {
                 RDFNode node = stmtIt.next().getObject();
@@ -449,7 +451,7 @@ public class WonRdfUtils {
         }
 
         /**
-         * Returns the first won:textMessage object, or null if none is found. tries the
+         * Returns the first con:text object, or null if none is found. tries the
          * message, its corresponding remote message, and any forwarded message, if any
          * of those are contained in the dataset
          *
@@ -461,35 +463,38 @@ public class WonRdfUtils {
             // find the text message in the message, the remote message, or any forwarded
             // message
             String queryString = "prefix msg: <https://w3id.org/won/message#>\n"
-                            + "prefix won: <https://w3id.org/won/core#>\n" + "\n" + "SELECT distinct ?txt WHERE {\n"
-                            + "  {\n" + "    graph ?gA { ?msg won:textMessage ?txt }\n" + "  } union {\n"
+                            + "prefix won: <https://w3id.org/won/core#>\n"
+                            + "prefix con: <https://w3id.org/won/content#>\n"
+                            + "prefix match: <https://w3id.org/won/matching#>\n"
+                            + "\n" + "SELECT distinct ?txt WHERE {\n"
+                            + "  {\n" + "    graph ?gA { ?msg con:text ?txt }\n" + "  } union {\n"
                             + "    graph ?gB { ?msg msg:correspondingRemoteMessage ?msg2 }\n"
-                            + "    graph ?gA { ?msg2 won:textMessage ?txt }\n" + "  } union {\n"
+                            + "    graph ?gA { ?msg2 con:text ?txt }\n" + "  } union {\n"
                             + "    graph ?gC { ?msg msg:forwardedMessage ?msg2 }\n"
                             + "    graph ?gB { ?msg2 msg:correspondingRemoteMessage ?msg3 }\n"
-                            + "    graph ?gA { ?msg3 won:textMessage ?txt }\n" + "  } union {\n"
+                            + "    graph ?gA { ?msg3 con:text ?txt }\n" + "  } union {\n"
                             + "    graph ?gD { ?msg msg:correspondingRemoteMessage ?msg2 }\n"
                             + "    graph ?gC { ?msg2 msg:forwardedMessage ?msg3 }\n"
                             + "    graph ?gB { ?msg3 msg:correspondingRemoteMessage ?msg4 }\n"
-                            + "    graph ?gA { ?msg4 won:textMessage ?txt }\n" + "  } union {\n"
+                            + "    graph ?gA { ?msg4 con:text ?txt }\n" + "  } union {\n"
                             + "    graph ?gE { ?msg msg:forwardedMessage ?msg2 }\n"
                             + "    graph ?gD { ?msg2 msg:correspondingRemoteMessage ?msg3 }\n"
                             + "    graph ?gC { ?msg3 msg:forwardedMessage ?msg4 }\n"
                             + "    graph ?gB { ?msg4 msg:correspondingRemoteMessage ?msg5 }\n"
-                            + "    graph ?gA { ?msg5 won:textMessage ?txt }\n" + "  } union {\n"
+                            + "    graph ?gA { ?msg5 con:text ?txt }\n" + "  } union {\n"
                             + "    graph ?gF { ?msg msg:correspondingRemoteMessage ?msg2 }\n"
                             + "    graph ?gE { ?msg2 msg:forwardedMessage ?msg3 }\n"
                             + "    graph ?gD { ?msg3 msg:correspondingRemoteMessage ?msg4 }\n"
                             + "    graph ?gC { ?msg4 msg:forwardedMessage ?msg5 }\n"
                             + "    graph ?gB { ?msg5 msg:correspondingRemoteMessage ?msg6 }\n"
-                            + "    graph ?gA { ?msg6 won:textMessage ?txt }\n" + "  } union {\n"
+                            + "    graph ?gA { ?msg6 con:text ?txt }\n" + "  } union {\n"
                             + "    graph ?gG { ?msg msg:forwardedMessage ?msg2 }\n"
                             + "    graph ?gF { ?msg2 msg:correspondingRemoteMessage ?msg3 }\n"
                             + "    graph ?gE { ?msg3 msg:forwardedMessage ?msg4 }\n"
                             + "    graph ?gD { ?msg4 msg:correspondingRemoteMessage ?msg5 }\n"
                             + "    graph ?gC { ?msg5 msg:forwardedMessage ?msg6 }\n"
                             + "    graph ?gB { ?msg6 msg:correspondingRemoteMessage ?msg7 }\n"
-                            + "    graph ?gA { ?msg7 won:textMessage ?txt }\n" + "  }\n" + "\n" + "}";
+                            + "    graph ?gA { ?msg7 con:text ?txt }\n" + "  }\n" + "\n" + "}";
             Query query = QueryFactory.create(queryString);
             QuerySolutionMap initialBinding = new QuerySolutionMap();
             Model tmpModel = ModelFactory.createDefaultModel();
@@ -555,14 +560,14 @@ public class WonRdfUtils {
         }
 
         /**
-         * Adds the specified text as a won:textMessage to the model's base resource.
+         * Adds the specified text as a con:text to the model's base resource.
          * 
          * @param message
          * @return
          */
         public static Model addProcessing(Model model, String message) {
             Resource baseRes = RdfUtils.findOrCreateBaseResource(model);
-            baseRes.addProperty(WON.isProcessing, message, XSDDatatype.XSDstring);
+            baseRes.addProperty(WONCON.isProcessing, message, XSDDatatype.XSDstring);
             return model;
         }
 
@@ -696,38 +701,13 @@ public class WonRdfUtils {
         private static RDFNode getTextMessageForResource(Dataset dataset, URI uri) {
             if (uri == null)
                 return null;
-            return RdfUtils.findFirstPropertyFromResource(dataset, uri, WON.textMessage);
+            return RdfUtils.findFirstPropertyFromResource(dataset, uri, WONCON.text);
         }
 
         private static RDFNode getTextMessageForResource(Dataset dataset, Resource resource) {
             if (resource == null)
                 return null;
-            return RdfUtils.findFirstPropertyFromResource(dataset, resource, WON.textMessage);
-        }
-
-        /**
-         * Converts the specified hint message into a Match object.
-         * 
-         * @param wonMessage
-         * @return a match object or null if the message is not a hint message.
-         */
-        public static Match toMatch(final WonMessage wonMessage) {
-            if (!WONMSG.HintMessage.equals(wonMessage.getMessageType().getResource())) {
-                return null;
-            }
-            Match match = new Match();
-            match.setFromAtom(wonMessage.getRecipientAtomURI());
-            Dataset messageContent = wonMessage.getMessageContent();
-            RDFNode score = findOnePropertyFromResource(messageContent, wonMessage.getMessageURI(), WON.matchScore);
-            if (!score.isLiteral())
-                return null;
-            match.setScore(score.asLiteral().getDouble());
-            RDFNode counterpart = findOnePropertyFromResource(messageContent, wonMessage.getMessageURI(),
-                            WON.matchCounterpart);
-            if (!counterpart.isResource())
-                return null;
-            match.setToAtom(URI.create(counterpart.asResource().getURI()));
-            return match;
+            return RdfUtils.findFirstPropertyFromResource(dataset, resource, WONCON.text);
         }
 
         public static WonMessage copyByDatasetSerialization(final WonMessage toWrap) {
@@ -768,6 +748,79 @@ public class WonRdfUtils {
             } else {
                 return message.getRecipientSocketURI();
             }
+        }
+
+        /**
+         * Calculates all compatible socket pairs in the two specified atoms defined in
+         * the dataset.
+         * 
+         * @param dataset
+         * @param leftAtom
+         * @param rightAtom
+         * @return
+         */
+        public static Set<Pair<URI>> getCompatibleSocketsForAtoms(Dataset dataset, URI firstAtom, URI secondAtom) {
+            Set<URI> firstAtomSockets = getSocketsOfAtom(dataset, firstAtom);
+            Set<URI> secondAtomSockets = getSocketsOfAtom(dataset, secondAtom);
+            Set<Pair<URI>> ret = new HashSet<>();
+            firstAtomSockets.forEach(firstAtomSocket -> {
+                secondAtomSockets.forEach(secondAtomSocket -> {
+                    if (isSocketsCompatible(dataset, firstAtomSocket, secondAtomSocket)) {
+                        ret.add(new Pair(firstAtomSocket, secondAtomSocket));
+                    }
+                });
+            });
+            return ret;
+        }
+
+        public static Set<Pair<URI>> getIncompatibleSocketsForAtoms(Dataset dataset, URI firstAtom, URI secondAtom) {
+            Set<URI> firstAtomSockets = getSocketsOfAtom(dataset, firstAtom);
+            Set<URI> secondAtomSockets = getSocketsOfAtom(dataset, secondAtom);
+            Set<Pair<URI>> ret = new HashSet<>();
+            firstAtomSockets.forEach(firstAtomSocket -> {
+                secondAtomSockets.forEach(secondAtomSocket -> {
+                    if (!isSocketsCompatible(dataset, firstAtomSocket, secondAtomSocket)) {
+                        ret.add(new Pair(firstAtomSocket, secondAtomSocket));
+                    }
+                });
+            });
+            return ret;
+        }
+
+        /**
+         * Checks if the specified sockets are compatible.
+         * 
+         * @param dataset
+         * @param firstAtomSocket
+         * @param secondAtomSocket
+         * @return
+         */
+        public static boolean isSocketsCompatible(Dataset dataset, URI firstAtomSocket, URI secondAtomSocket) {
+            Set<URI> firstCompatibleDefs = getCompatibleSocketDefinitions(dataset, firstAtomSocket);
+            Optional<URI> secondDef = getSocketDefinition(dataset, secondAtomSocket);
+            if (!secondDef.isPresent()) {
+                throw new IllegalArgumentException("No socket definition found for " + secondAtomSocket);
+            }
+            if (!firstCompatibleDefs.isEmpty() && !firstCompatibleDefs.contains(secondDef.get())) {
+                return false;
+            }
+            Set<URI> secondCompatibleDefs = getCompatibleSocketDefinitions(dataset, secondAtomSocket);
+            Optional<URI> firstDef = getSocketDefinition(dataset, firstAtomSocket);
+            if (!firstDef.isPresent()) {
+                throw new IllegalArgumentException("No socket definition found for " + firstAtomSocket);
+            }
+            if (!secondCompatibleDefs.isEmpty() && !secondCompatibleDefs.contains(firstDef.get())) {
+                return false;
+            }
+            return true;
+        }
+
+        public static Optional<URI> getSocketDefinition(Dataset dataset, URI socket) {
+            return RdfUtils
+                            .getObjectStreamOfProperty(dataset, socket, URI.create(WON.socketDefinition.getURI()),
+                                            node -> node.isURIResource() ? URI.create(node.asResource().getURI())
+                                                            : null)
+                            .findFirst();
         }
 
         /**
@@ -907,6 +960,16 @@ public class WonRdfUtils {
             return getDefaultSocket(model, model.getResource(subject.toString()), returnAnyIfNoDefaultFound);
         }
 
+        public static Set<URI> getSocketsOfAtom(Dataset atomDataset, URI atomURI) {
+            return getSocketsOfAtomAsStream(atomDataset, atomURI).collect(Collectors.toSet());
+        }
+
+        public static Stream<URI> getSocketsOfAtomAsStream(Dataset atomDataset, URI atomURI) {
+            return RdfUtils.getObjectStreamOfProperty(atomDataset, atomURI, URI.create(WON.socket.getURI()),
+                            node -> node.isURIResource() ? URI.create(node.asResource().getURI())
+                                            : null);
+        }
+
         /**
          * Returns the default socket found in the model. If there is no default socket,
          * the result is empty. unless returnAnyIfNoDefaultFound is true, in which case
@@ -1004,7 +1067,11 @@ public class WonRdfUtils {
 
         public static void setCompatibleSocketDefinitions(SocketDefinitionImpl socketConfiguration, Dataset dataset,
                         URI socketURI) {
-            socketConfiguration.setCompatibleSocketTypes(RdfUtils
+            socketConfiguration.setCompatibleSocketTypes(getCompatibleSocketDefinitions(dataset, socketURI));
+        }
+
+        public static Set<URI> getCompatibleSocketDefinitions(Dataset dataset, URI socketURI) {
+            return RdfUtils
                             .getObjectStreamOfProperty(dataset, socketURI, URI.create(WON.socketDefinition.getURI()),
                                             node -> node.isURIResource() ? URI.create(node.asResource().getURI())
                                                             : null)
@@ -1012,7 +1079,7 @@ public class WonRdfUtils {
                                             URI.create(WON.compatibleSocketDefinition.getURI()),
                                             node -> node.isURIResource() ? URI.create(node.asResource().getURI())
                                                             : null))
-                            .collect(Collectors.toSet()));
+                            .collect(Collectors.toSet());
         }
 
         public static void setDerivationProperties(SocketDefinitionImpl socketConfiguration, Dataset dataset,
@@ -1071,6 +1138,11 @@ public class WonRdfUtils {
             } else if (socketCapacities.size() == 1) {
                 socketConfiguration.setCapacity(socketCapacities.iterator().next());
             }
+        }
+
+        public static Optional<URI> getAtomOfSocket(Dataset dataset, URI socketURI) {
+            return RdfUtils.getFirstStatementMapped(dataset, null, URI.create(WON.socket.getURI()), socketURI,
+                            s -> s.getSubject().isURIResource() ? URI.create(s.getSubject().getURI()) : null);
         }
     }
 

@@ -20,6 +20,6 @@
 
 <https://localhost:8443/won/resource/event/00d5wzbbf8hzzt2eewcc> {
     <https://localhost:8443/won/resource/event/usi9yhill1lo2xi70sjx>
-            <https://w3id.org/won/core#textMessage>
+            <https://w3id.org/won/content#text>
                     "Greetings! \nI am the DebugBot. I can simulate multiple other users so you can test things. I understand a few commands. \nTo see which ones, type \n\n'usage'\n\n (without the quotes)." .
 }

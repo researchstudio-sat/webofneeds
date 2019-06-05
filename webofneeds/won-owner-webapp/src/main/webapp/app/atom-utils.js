@@ -14,7 +14,16 @@ import * as useCaseUtils from "./usecase-utils.js";
  * @returns {*|boolean}
  */
 export function isActive(atom) {
-  return get(atom, "state") && get(atom, "state") === won.WON.ActiveCompacted;
+  return get(atom, "state") === won.WON.ActiveCompacted;
+}
+
+/**
+ * Determines if a given atom is a Inactive
+ * @param atom
+ * @returns {*|boolean}
+ */
+export function isInactive(atom) {
+  return get(atom, "state") === won.WON.InactiveCompacted;
 }
 
 export function getIdenticonSvg(atom) {
@@ -37,8 +46,18 @@ export function getReactionUseCases(atom) {
   return getIn(atom, ["matchedUseCase", "reactionUseCases"]);
 }
 
+export function hasReactionUseCases(atom) {
+  const reactionUseCases = getReactionUseCases(atom);
+  return !!reactionUseCases && reactionUseCases.size > 0;
+}
+
 export function getEnabledUseCases(atom) {
   return getIn(atom, ["matchedUseCase", "enabledUseCases"]);
+}
+
+export function hasEnabledUseCases(atom) {
+  const enabledUseCases = getEnabledUseCases(atom);
+  return !!enabledUseCases && enabledUseCases.size > 0;
 }
 
 export function hasMatchedUseCase(atom) {
@@ -53,20 +72,40 @@ export function hasImages(atom) {
 
 export function hasLocation(atom) {
   return (
+    !!getIn(atom, ["content", "jobLocation"]) ||
     !!getIn(atom, ["content", "location"]) ||
+    !!getIn(atom, ["seeks", "jobLocation"]) ||
     !!getIn(atom, ["seeks", "location"])
   );
 }
 
+/**
+ * Returns the first location found in the content of the atom
+ * jobLocation has priority over "default" location
+ * If no location is present undefined will be returned
+ * @param atom
+ * @returns {*}
+ */
 export function getLocation(atom) {
   if (hasLocation(atom)) {
     return (
-      getIn(atom, ["content", "location"]) || getIn(atom, ["seeks", "location"])
+      getIn(atom, ["content", "jobLocation"]) ||
+      getIn(atom, ["content", "location"]) ||
+      getIn(atom, ["seeks", "jobLocation"]) ||
+      getIn(atom, ["seeks", "location"])
     );
   }
   return undefined;
 }
 
+/**
+ * Get distance between the first found atomLocation and the location (parameter)
+ * Distance in meters, undefined if atom has no location or location parameter is undefined
+ * Priority of atomLocation is defined within getLocation
+ * @param atom
+ * @param location
+ * @returns {*}
+ */
 export function getDistanceFrom(atom, location) {
   const atomLocation = getLocation(atom);
 
@@ -108,12 +147,11 @@ export function getDefaultImage(atom) {
 }
 
 /**
- * Determines if a given atom is a Inactive
+ * If an atom is active and has the chat or the group socket we can connect to it.
  * @param atom
- * @returns {*|boolean}
  */
-export function isInactive(atom) {
-  return get(atom, "state") && get(atom, "state") === won.WON.InactiveCompacted;
+export function isConnectible(atom) {
+  return isActive(atom) && (hasChatSocket(atom) || hasGroupSocket(atom));
 }
 
 /**
@@ -124,7 +162,7 @@ export function isInactive(atom) {
 export function isDirectResponseAtom(atom) {
   return (
     getIn(atom, ["content", "flags"]) &&
-    getIn(atom, ["content", "flags"]).contains("won:DirectResponse")
+    getIn(atom, ["content", "flags"]).contains("con:DirectResponse")
   );
 }
 
@@ -136,7 +174,7 @@ export function isDirectResponseAtom(atom) {
 export function isInvisibleAtom(atom) {
   return (
     getIn(atom, ["content", "flags"]) &&
-    getIn(atom, ["content", "flags"]).contains("won:NoHintForCounterpart")
+    getIn(atom, ["content", "flags"]).contains("match:NoHintForCounterpart")
   );
 }
 
@@ -205,7 +243,7 @@ export function hasUnreadSuggestedConnections(atom) {
 export function isSearchAtom(atom) {
   return (
     getIn(atom, ["content", "type"]) &&
-    getIn(atom, ["content", "type"]).has("won:PureSearch")
+    getIn(atom, ["content", "type"]).has("demo:PureSearch")
   );
 }
 
@@ -294,10 +332,10 @@ export function generateShortFlagLabels(atomImm) {
       // rename flags
       // TODO: flags should have explanatory hovertext
       .map(flag => {
-        if (flag === won.WON.NoHintForCounterpartCompacted) {
+        if (flag === won.WONMATCH.NoHintForCounterpartCompacted) {
           return labels.flags[flag] ? labels.flags[flag] : flag;
         }
-        if (flag === won.WON.NoHintForMeCompacted) {
+        if (flag === won.WONMATCH.NoHintForMeCompacted) {
           return labels.flags[flag] ? labels.flags[flag] : flag;
         }
         return "";

@@ -8,10 +8,20 @@ import { accountLogin } from "./actions/account-actions.js";
 import { getCurrentParamsFromRoute } from "./selectors/general-selectors.js";
 import { privateId2Credentials } from "./won-utils.js";
 
-import { get, getIn, firstToLowerCase, hyphen2Camel } from "./utils.js";
+import { get, getIn } from "./utils.js";
 
 import * as accountUtils from "./account-utils.js";
 import * as processUtils from "./process-utils.js";
+
+import settingsComponent from "./pages/settings.jsx";
+import postComponent from "./pages/post.jsx";
+import overviewComponent from "./pages/overview.jsx";
+import mapComponent from "./pages/map.jsx";
+import aboutComponent from "./pages/about.jsx";
+import connectionsComponent from "./pages/connections.jsx";
+import signupComponent from "./pages/signup.jsx";
+
+import jsxRenderer from "@depack/render";
 
 /**
  * As we have configured our router to keep parameters unchanged,
@@ -56,42 +66,57 @@ export const configRouting = [
 
       const origParams = $location.search();
       if (origParams) {
-        const onlyConstParams = addConstParams({}, origParams);
-        //updatedRoute.search(onlyConstParams); // strip all but "constant" parameters
-        $location.search(onlyConstParams);
+        $location.search(addConstParams({}, origParams));
       }
 
       //return updatedRoute;
     });
 
     [
-      { path: "/about?aboutSection", component: "about" },
-      { path: "/overview?viewAtomUri?viewConnUri", component: "overview" },
-      { path: "/map?viewAtomUri?viewConnUri", component: "map" },
-      { path: "/signup", component: "signup" },
-      { path: "/settings", component: "settings" },
+      {
+        path: "/signup",
+        component: signupComponent,
+        as: "signup",
+      },
+      {
+        path: "/about?aboutSection",
+        component: aboutComponent,
+        as: "about",
+      },
+      {
+        path: "/map?viewAtomUri?viewConnUri",
+        component: mapComponent,
+        as: "map",
+      },
       {
         path:
           "/connections?privateId?postUri?connectionUri?useCase?useCaseGroup?token?viewAtomUri?viewConnUri?fromAtomUri?mode",
-        component: "connections",
+        component: connectionsComponent,
         as: "connections",
       },
       {
+        path: "/overview?viewAtomUri?viewConnUri",
+        component: overviewComponent,
+        as: "overview",
+      },
+      {
         path: "/post/?postUri?viewAtomUri?viewConnUri",
-        component: "post",
+        component: postComponent,
         as: "post",
       },
+      {
+        //path: "/settings{settingsParams:.*}",
+        path: "/settings",
+        component: settingsComponent,
+        as: "settings",
+      },
     ].forEach(({ path, component, as }) => {
-      const cmlComponent = hyphen2Camel(component);
-
-      if (!path) path = `/${component}`;
-      if (!as) as = firstToLowerCase(cmlComponent);
-
       $stateProvider.state(as, {
         url: path,
-        templateUrl: `./app/components/${component}/${component}.html`,
-        // template: `<${component}></${component>` TODO use directives instead of view+ctrl
-        controller: `${cmlComponent}Controller`,
+        template: component.template.children
+          .map(vnode => jsxRenderer(vnode))
+          .join(""),
+        controller: component.controller,
         controllerAs: "self",
         scope: {},
       });

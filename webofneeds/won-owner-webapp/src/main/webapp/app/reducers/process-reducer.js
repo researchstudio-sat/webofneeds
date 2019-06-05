@@ -362,7 +362,7 @@ export default function(processState = initialState, action = {}) {
 
     case actionTypes.connections.sendChatMessageClaimOnSuccess:
     case actionTypes.connections.sendChatMessageRefreshDataOnSuccess: {
-      const connUri = action.payload.optimisticEvent.getSender();
+      const connUri = action.payload.optimisticEvent.getSenderConnection();
 
       return updateConnectionProcess(processState, connUri, {
         petriNetData: { dirty: true },

@@ -1,3 +1,4 @@
+PREFIX con: <https://w3id.org/won/content#>
 PREFIX mod: <https://w3id.org/won/modification#>
 PREFIX agr: <https://w3id.org/won/agreement#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
@@ -23,12 +24,12 @@ SELECT distinct ?first ?msg ?distance ?text ?msgType ?time ?rem WHERE {
    GROUP BY ?msg ?first 
  }
  OPTIONAL {
-   ?msg won:textMessage ?text.
+   ?msg con:text ?text.
    ?msg msg:messageType ?msgType.
  }
  OPTIONAL {
     ?msg msg:correspondingRemoteMessage ?rem . 
-   ?rem won:textMessage ?text.
+   ?rem con:text ?text.
    ?rem msg:messageType ?msgType.
  }
  ?msg msg:receivedTimestamp ?time.  

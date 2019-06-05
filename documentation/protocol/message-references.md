@@ -175,12 +175,12 @@ SELECT distinct ?first ?msg ?distance ?text ?msgType ?time ?rem WHERE {
    GROUP BY ?msg ?first 
  }
  OPTIONAL {
-   ?msg won:textMessage ?text.
+   ?msg con:text ?text.
    ?msg msg:messageType ?msgType.
  }
  OPTIONAL {
     ?msg msg:correspondingRemoteMessage ?rem . 
-   ?rem won:textMessage ?text.
+   ?rem con:text ?text.
    ?rem msg:messageType ?msgType.
  }
  ?msg msg:receivedTimestamp ?time.  

@@ -11,15 +11,21 @@
 package won.bot.framework.eventbot.action;
 
 import java.net.URI;
+import java.util.Optional;
 
 import org.apache.jena.query.Dataset;
 
 import won.bot.framework.eventbot.EventListenerContext;
+import won.bot.framework.eventbot.event.Event;
+import won.bot.framework.eventbot.event.impl.wonmessage.AtomHintFromMatcherEvent;
+import won.bot.framework.eventbot.event.impl.wonmessage.SocketHintFromMatcherEvent;
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.WonRdfUtils;
+import won.protocol.util.linkeddata.LinkedDataSource;
+import won.protocol.util.linkeddata.WonLinkedDataUtils;
 
 /**
  * Created by fkleedorfer on 10.06.2016.
@@ -41,5 +47,41 @@ public class BotActionUtils {
                                         targetAtom,
                                         WonRdfUtils.AtomUtils.getWonNodeURIFromAtom(targetAtomRDF, targetAtom), message)
                         .build();
+    }
+
+    /**
+     * Retrieves the recipient atom URI for either AtomHintFromMatcherEvent or
+     * SocketHintFromMatcherEvent.
+     * 
+     * @param event
+     * @return
+     */
+    public static Optional<URI> getTargetAtomURIFromHintEvent(Event event, LinkedDataSource linkedDataSource) {
+        if (event instanceof AtomHintFromMatcherEvent) {
+            return Optional.of(((AtomHintFromMatcherEvent) event).getHintTargetAtom());
+        }
+        if (event instanceof SocketHintFromMatcherEvent) {
+            URI socketURI = ((SocketHintFromMatcherEvent) event).getHintTargetSocket();
+            return WonLinkedDataUtils.getAtomOfSocket(socketURI, linkedDataSource);
+        }
+        return Optional.empty();
+    }
+
+    /**
+     * Retrieves the recipient atom URI for either AtomHintFromMatcherEvent or
+     * SocketHintFromMatcherEvent.
+     * 
+     * @param event
+     * @return
+     */
+    public static Optional<URI> getRecipientAtomURIFromHintEvent(Event event, LinkedDataSource linkedDataSource) {
+        if (event instanceof AtomHintFromMatcherEvent) {
+            return Optional.of(((AtomHintFromMatcherEvent) event).getRecipientAtom());
+        }
+        if (event instanceof SocketHintFromMatcherEvent) {
+            URI socketURI = ((SocketHintFromMatcherEvent) event).getRecipientSocket();
+            return WonLinkedDataUtils.getAtomOfSocket(socketURI, linkedDataSource);
+        }
+        return Optional.empty();
     }
 }

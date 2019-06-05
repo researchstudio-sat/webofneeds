@@ -45,6 +45,7 @@ won-create-search {
     }
 
     &__icon {
+      --local-primary: #{$won-subtitle-gray};
       grid-area: header_icon;
       @include fixed-square($postIconSize);
     }
@@ -52,6 +53,7 @@ won-create-search {
     &__back {
       grid-area: header_back;
       &__icon {
+        --local-primary: #{$won-primary-color};
         @include fixed-square($backIconSize);
       }
     }

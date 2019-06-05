@@ -8,14 +8,14 @@ WHERE
                     WHERE
                       { ?result  a                     <https://w3id.org/won/core#Atom> ;
                                  <https://w3id.org/won/core#atomState>  <https://w3id.org/won/core#Active> ;
-                                 <https://w3id.org/won/core#seeks>  ?seeks .
-                        ?seeks <https://w3id.org/won/core#travelAction>/<http://schema.org/fromLocation> ?fromLocation .
+                                 <https://w3id.org/won/matching#seeks>  ?seeks .
+                        ?seeks <https://w3id.org/won/content#travelAction>/<http://schema.org/fromLocation> ?fromLocation .
                         ?fromLocation
                                   <http://schema.org/geo>  ?fromLocation_geo
                       }
                     ORDER BY ?fromLocation_geoDistance
                   }
-                  FILTER NOT EXISTS { ?result  <https://w3id.org/won/core#flag>  <https://w3id.org/won/core#NoHintForCounterpart> }
+                  FILTER NOT EXISTS { ?result  <https://w3id.org/won/matching#flag>  <https://w3id.org/won/matching#NoHintForCounterpart> }
                 
             }
           OFFSET  0

@@ -36,7 +36,8 @@ public class WONMSG {
     public static final String DeleteMessageString = BASE_URI + "DeleteMessage";
     public static final String ConnectionMessageString = BASE_URI + "ConnectionMessage";
     public static final String AtomMessageString = BASE_URI + "AtomMessage";
-    public static final String HintMessageString = BASE_URI + "HintMessage";
+    public static final String SocketHintMessageString = BASE_URI + "SocketHintMessage";
+    public static final String AtomHintMessageString = BASE_URI + "AtomHintMessage";
     public static final String HintFeedbackMessageString = BASE_URI + "HintFeedbackMessage";
     public static final String FailureResponseString = BASE_URI + "FailureResponse";
     public static final String SuccessResponseString = BASE_URI + "SuccessResponse";
@@ -52,7 +53,8 @@ public class WONMSG {
     public static final Resource DeleteMessage = m.createResource(DeleteMessageString);
     public static final Resource ConnectionMessage = m.createResource(ConnectionMessageString);
     public static final Resource AtomMessage = m.createResource(AtomMessageString);
-    public static final Resource HintMessage = m.createResource(HintMessageString);
+    public static final Resource SocketHintMessage = m.createResource(SocketHintMessageString);
+    public static final Resource AtomHintMessage = m.createResource(AtomHintMessageString);
     public static final Resource HintFeedbackMessage = m.createResource(HintFeedbackMessageString);
     public static final Resource SuccessResponse = m.createResource(SuccessResponseString);
     public static final Resource FailureResponse = m.createResource(FailureResponseString);
@@ -142,6 +144,9 @@ public class WONMSG {
     public static final Property recipientSocket = m.createProperty(BASE_URI, "recipientSocket");
     public static final Property senderSocket = m.createProperty(BASE_URI, "senderSocket");
     public static final Property contentType = m.createProperty(BASE_URI, "contentType");
+    public static final Property hintScore = m.createProperty(BASE_URI, "hintScore");
+    public static final Property hintTargetAtom = m.createProperty(BASE_URI, "hintTargetAtom");
+    public static final Property hintTargetSocket = m.createProperty(BASE_URI, "hintTargetSocket");
     public static final String GRAPH_URI_FRAGMENT = "data";
 
     /**

@@ -219,7 +219,7 @@ export function vicinityScoreSubQuery({
       `SERVICE geo:search {
             ?geo geo:search "inCircle" .
             ?geo geo:searchDatatype geoliteral:lat-lon .
-            ?geo geo:predicate won:geoSpatial .
+            ?geo geo:predicate con:geoSpatial .
             ?geo geo:spatialCircleCenter "${lat}#${lng}" .
             ?geo geo:spatialCircleRadius "${radius}" .
             ?geo geo:distanceValue ?geoDistance .

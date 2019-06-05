@@ -140,6 +140,9 @@ public class UriAlreadyUsedCheckingWonMessageProcessor implements WonMessageProc
                                         message.getIsResponseToMessageURI())
                         && processedMessage.getContentGraphURIs().containsAll(message.getContentGraphURIs())
                         && equalsOrBothNull(processedMessage.getMessageType(), message.getMessageType())
+                        && equalsOrBothNull(processedMessage.getHintTargetAtomURI(), message.getHintTargetAtomURI())
+                        && equalsOrBothNull(processedMessage.getHintTargetSocketURI(), message.getHintTargetSocketURI())
+                        && equalsOrBothNull(processedMessage.getHintScore(), message.getHintScore())
                         && equalsOrBothNull(processedMessage.getEnvelopeType(), message.getEnvelopeType())) {
             return true;
         }

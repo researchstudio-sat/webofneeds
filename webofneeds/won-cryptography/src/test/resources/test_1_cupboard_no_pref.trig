@@ -1,3 +1,5 @@
+@prefix con:   <https://w3id.org/won/content#> .
+@prefix match:   <https://w3id.org/won/matching#> .
 <http://www.example.com/resource/atom/12#ALL> {
 	<http://www.example.com/resource/atom/12> <https://w3id.org/won/core#atomState> <https://w3id.org/won/core#Active> .
 	<http://www.example.com/resource/atom/12> <https://w3id.org/won/core#atomCreationDate> "2013-09-252T10:49:54.054+0000" .

@@ -4,7 +4,7 @@ import "ng-redux";
 import won from "../won-es6.js";
 import { attach, clone, delay, dispatchEvent } from "../utils.js";
 
-import "style/_create-isseeks.scss";
+import "~/style/_create-isseeks.scss";
 
 //TODO: can't inject $scope with the angular2-router, preventing redux-cleanup
 const serviceDependencies = [

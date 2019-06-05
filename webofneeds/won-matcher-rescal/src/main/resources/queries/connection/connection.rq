@@ -1,3 +1,5 @@
+PREFIX con: <https://w3id.org/won/content#>
+PREFIX match: <https://w3id.org/won/matching#>
 prefix won: <https://w3id.org/won/core#>
 prefix rdfs: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 
@@ -8,11 +10,11 @@ SELECT DISTINCT ?slice ?atom ?value WHERE { # value is the remote atom
     ?connectionUri won:crawlDate ?date.
     ?connectionUri won:sourceAtom ?atom.
     ?connectionUri won:targetAtom ?value.
-    ?rating won:binaryRating won:Good.
-    ?rating won:forResource ?connectionUri.
-    OPTIONAL {?atom won:flag ?flag1}.
-    OPTIONAL {?value won:flag ?flag2}.
-    FILTER (!bound(?flag1) || (?flag1 != won:DoNotMatch && ?flag1 != won:UsedForTesting))
-    FILTER (!bound(?flag2) || (?flag2 != won:DoNotMatch && ?flag2 != won:UsedForTesting))
+    ?rating con:binaryRating con:Good.
+    ?rating con:feedbackTarget ?connectionUri.
+    OPTIONAL {?atom match:flag ?flag1}.
+    OPTIONAL {?value match:flag ?flag2}.
+    FILTER (!bound(?flag1) || (?flag1 != won:DoNotMatch && ?flag1 != match:UsedForTesting))
+    FILTER (!bound(?flag2) || (?flag2 != won:DoNotMatch && ?flag2 != match:UsedForTesting))
     FILTER (?date >= ?from && ?date < ?to) # bind variables ?from and ?to here
 }

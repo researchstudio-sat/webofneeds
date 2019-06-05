@@ -52,6 +52,7 @@ won-suggestpost-picker {
       min-height: $formInputHeight;
       min-height: $formInputHeight;
       word-wrap: break-word;
+      box-sizing: border-box;
 
       $verticalPadding: calcVerticalPaddingToHeight(
         $normalFontSize,

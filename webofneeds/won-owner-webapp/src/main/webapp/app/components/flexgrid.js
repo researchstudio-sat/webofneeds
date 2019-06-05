@@ -1,7 +1,7 @@
 import angular from "angular";
 import labelledHrModule from "./labelled-hr.js";
 
-import "style/_flexgrid.scss";
+import "~/style/_flexgrid.scss";
 
 function genComponentConf() {
   let template = `

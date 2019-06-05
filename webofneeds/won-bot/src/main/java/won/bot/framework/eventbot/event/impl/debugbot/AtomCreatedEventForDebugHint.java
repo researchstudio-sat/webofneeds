@@ -15,7 +15,7 @@ import java.net.URI;
 import org.apache.jena.query.Dataset;
 
 import won.bot.framework.eventbot.event.BaseAtomSpecificEvent;
-import won.protocol.model.SocketType;
+import won.bot.framework.eventbot.event.Event;
 
 /**
  *
@@ -23,14 +23,17 @@ import won.protocol.model.SocketType;
 public class AtomCreatedEventForDebugHint extends BaseAtomSpecificEvent {
     private final URI wonNodeUri;
     private final Dataset atomDataset;
-    private final SocketType socketType;
+    private final HintType hintType;
+    private final Event cause;
 
-    public AtomCreatedEventForDebugHint(final URI atomURI, final URI wonNodeUri, final Dataset atomDataset,
-                    final SocketType socketType) {
+    public AtomCreatedEventForDebugHint(Event cause, final URI atomURI, final URI wonNodeUri,
+                    final Dataset atomDataset,
+                    final HintType hintType) {
         super(atomURI);
+        this.cause = cause;
         this.wonNodeUri = wonNodeUri;
         this.atomDataset = atomDataset;
-        this.socketType = socketType;
+        this.hintType = hintType;
     }
 
     public URI getWonNodeUri() {
@@ -39,5 +42,13 @@ public class AtomCreatedEventForDebugHint extends BaseAtomSpecificEvent {
 
     public Dataset getAtomDataset() {
         return atomDataset;
+    }
+
+    public HintType getHintType() {
+        return hintType;
+    }
+
+    public Event getCause() {
+        return cause;
     }
 }

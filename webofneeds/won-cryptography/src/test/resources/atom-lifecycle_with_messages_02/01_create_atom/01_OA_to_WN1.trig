@@ -1,3 +1,5 @@
+@prefix con:   <https://w3id.org/won/content#> .
+@prefix match:   <https://w3id.org/won/matching#> .
 ##################################################################
 #   ATOM CREATION - MESSAGE FROM OWNER APPLICATION TO WON NODE   #
 ##################################################################

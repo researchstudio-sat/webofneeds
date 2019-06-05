@@ -18,6 +18,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
@@ -32,6 +33,7 @@ import org.apache.jena.shared.impl.PrefixMappingImpl;
 import org.apache.jena.sparql.path.Path;
 import org.apache.jena.sparql.path.PathParser;
 import org.apache.jena.vocabulary.RDFS;
+import org.bouncycastle.asn1.sec.SECNamedCurves;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,6 +42,7 @@ import won.protocol.model.SocketDefinition;
 import won.protocol.model.SocketDefinitionImpl;
 import won.protocol.service.WonNodeInfo;
 import won.protocol.util.RdfUtils;
+import won.protocol.util.RdfUtils.Pair;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WON;
 import won.protocol.vocabulary.WONMSG;
@@ -328,10 +331,58 @@ public class WonLinkedDataUtils {
                         socketTypeURI);
     }
 
-    public static Optional<SocketDefinition> getSocketDefinition(LinkedDataSource linkedDataSource, URI socket) {
-        Dataset ontology = linkedDataSource.getDataForResource(socket);
+    /**
+     * Executes {@link WonRdfUtils.SocketUtils.getCompatibleSocketsForAtoms} after
+     * crawling the required data.
+     * 
+     * @param linkedDataSource
+     * @param firstAtom
+     * @param secondAtom
+     * @return set of pairs, the first member belonging to the firstAtom, the second
+     * to the secondAtom
+     */
+    public static Set<Pair<URI>> getCompatibleSocketsForAtoms(LinkedDataSource linkedDataSource, URI firstAtom,
+                    URI secondAtom) {
+        Dataset dataset = loadDataForAtomWithSocketDefinitions(linkedDataSource, firstAtom);
+        RdfUtils.addDatasetToDataset(dataset, loadDataForAtomWithSocketDefinitions(linkedDataSource, secondAtom));
+        return WonRdfUtils.SocketUtils.getCompatibleSocketsForAtoms(dataset, firstAtom, secondAtom);
+    }
+
+    public static Set<Pair<URI>> getIncompatibleSocketsForAtoms(LinkedDataSource linkedDataSource, URI firstAtom,
+                    URI secondAtom) {
+        Dataset dataset = loadDataForAtomWithSocketDefinitions(linkedDataSource, firstAtom);
+        RdfUtils.addDatasetToDataset(dataset, loadDataForAtomWithSocketDefinitions(linkedDataSource, secondAtom));
+        return WonRdfUtils.SocketUtils.getIncompatibleSocketsForAtoms(dataset, firstAtom, secondAtom);
+    }
+
+    public static boolean isCompatibleSockets(LinkedDataSource linkedDataSource, URI firstSocket,
+                    URI secondSocket) {
+        Optional<URI> firstAtom = getAtomOfSocket(firstSocket, linkedDataSource);
+        Optional<URI> secondAtom = getAtomOfSocket(secondSocket, linkedDataSource);
+        if (!firstAtom.isPresent()) {
+            throw new IllegalStateException("Could not determine atom of socket " + firstSocket);
+        }
+        if (!secondAtom.isPresent()) {
+            throw new IllegalStateException("Could not determine atom of socket " + secondSocket);
+        }
+        Dataset dataset = loadDataForAtomWithSocketDefinitions(linkedDataSource, firstAtom.get());
+        RdfUtils.addDatasetToDataset(dataset, loadDataForAtomWithSocketDefinitions(linkedDataSource, secondAtom.get()));
+        return WonRdfUtils.SocketUtils.isSocketsCompatible(dataset, firstSocket, secondSocket);
+    }
+
+    public static Dataset loadDataForAtomWithSocketDefinitions(LinkedDataSource linkedDataSource, URI atomURI) {
+        Dataset dataset = linkedDataSource.getDataForResource(atomURI);
+        Set<URI> sockets = WonRdfUtils.SocketUtils.getSocketsOfAtom(dataset, atomURI);
+        sockets.forEach(socket -> {
+            RdfUtils.addDatasetToDataset(dataset, loadDataForSocket(linkedDataSource, socket));
+        });
+        return dataset;
+    }
+
+    public static Dataset loadDataForSocket(LinkedDataSource linkedDataSource, URI socket) {
+        Dataset dataset = linkedDataSource.getDataForResource(socket);
         // load all data for configurations
-        List<URI> configURIs = RdfUtils.getObjectsOfProperty(ontology, socket,
+        List<URI> configURIs = RdfUtils.getObjectsOfProperty(dataset, socket,
                         URI.create(WON.socketDefinition.getURI()),
                         node -> node.isURIResource() ? URI.create(node.asResource().getURI()) : null);
         if (configURIs.size() > 1) {
@@ -342,13 +393,32 @@ public class WonLinkedDataUtils {
         }
         configURIs.stream().forEach(configURI -> {
             Dataset ds = linkedDataSource.getDataForResource(configURI);
-            RdfUtils.addDatasetToDataset(ontology, ds);
+            RdfUtils.addDatasetToDataset(dataset, ds);
+        });
+        return dataset;
+    }
+
+    public static Optional<SocketDefinition> getSocketDefinition(LinkedDataSource linkedDataSource, URI socket) {
+        Dataset dataset = linkedDataSource.getDataForResource(socket);
+        // load all data for configurations
+        List<URI> configURIs = RdfUtils.getObjectsOfProperty(dataset, socket,
+                        URI.create(WON.socketDefinition.getURI()),
+                        node -> node.isURIResource() ? URI.create(node.asResource().getURI()) : null);
+        if (configURIs.size() > 1) {
+            throw new IllegalArgumentException("More than one socket definition found for socket " + socket);
+        }
+        if (configURIs.size() == 0) {
+            throw new IllegalArgumentException("No socket definition found for socket " + socket);
+        }
+        configURIs.stream().forEach(configURI -> {
+            Dataset ds = linkedDataSource.getDataForResource(configURI);
+            RdfUtils.addDatasetToDataset(dataset, ds);
         });
         URI socketDefinitionURI = configURIs.stream().findFirst().get();
         SocketDefinitionImpl socketDef = new SocketDefinitionImpl(socket);
         // if a socket definition is referenced via won:socketDefinition, it has to be
         // the subject of a triple
-        boolean isSocketDefFound = RdfUtils.findFirst(ontology, model -> {
+        boolean isSocketDefFound = RdfUtils.findFirst(dataset, model -> {
             if (model.listStatements(new SimpleSelector(model.createResource(socketDefinitionURI.toString()), null,
                             (RDFNode) null)).hasNext()) {
                 return socket;
@@ -360,16 +430,20 @@ public class WonLinkedDataUtils {
                             + " of socket " + socket);
         }
         socketDef.setSocketDefinitionURI(socketDefinitionURI);
-        WonRdfUtils.SocketUtils.setCompatibleSocketDefinitions(socketDef, ontology, socket);
-        WonRdfUtils.SocketUtils.setAutoOpen(socketDef, ontology, socket);
-        WonRdfUtils.SocketUtils.setSocketCapacity(socketDef, ontology, socket);
-        WonRdfUtils.SocketUtils.setDerivationProperties(socketDef, ontology, socket);
-        WonRdfUtils.SocketUtils.setInverseDerivationProperties(socketDef, ontology, socket);
+        WonRdfUtils.SocketUtils.setCompatibleSocketDefinitions(socketDef, dataset, socket);
+        WonRdfUtils.SocketUtils.setAutoOpen(socketDef, dataset, socket);
+        WonRdfUtils.SocketUtils.setSocketCapacity(socketDef, dataset, socket);
+        WonRdfUtils.SocketUtils.setDerivationProperties(socketDef, dataset, socket);
+        WonRdfUtils.SocketUtils.setInverseDerivationProperties(socketDef, dataset, socket);
         return Optional.of(socketDef);
     }
 
     public static Optional<URI> getTypeOfSocket(URI socketURI, LinkedDataSource linkedDataSource) {
         return WonRdfUtils.SocketUtils.getTypeOfSocket(getDataForResource(socketURI, linkedDataSource), socketURI);
+    }
+
+    public static Optional<URI> getAtomOfSocket(URI socketURI, LinkedDataSource linkedDataSource) {
+        return WonRdfUtils.SocketUtils.getAtomOfSocket(getDataForResource(socketURI, linkedDataSource), socketURI);
     }
 
     /**

@@ -11,14 +11,11 @@ import {
   getPosts,
   getPostUriFromRoute,
 } from "../selectors/general-selectors.js";
-import { getChatConnectionsByAtomUri } from "../selectors/connection-selectors.js";
+import * as connectionSelectors from "../selectors/connection-selectors.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
-import {
-  isChatConnection,
-  isGroupChatConnection,
-} from "../connection-utils.js";
+import * as connectionUtils from "../connection-utils.js";
 
-import "style/_suggestion-selection-item-line.scss";
+import "~/style/_suggestion-selection-item-line.scss";
 
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
@@ -53,7 +50,8 @@ function genComponentConf() {
       const selectFromState = state => {
         const allPosts = getPosts(state);
         const chatConnectionsByAtomUri =
-          this.atomUri && getChatConnectionsByAtomUri(state, this.atomUri);
+          this.atomUri &&
+          connectionSelectors.getChatConnectionsByAtomUri(state, this.atomUri);
         const matches =
           chatConnectionsByAtomUri &&
           chatConnectionsByAtomUri.filter(conn => {
@@ -68,8 +66,9 @@ function genComponentConf() {
 
             return (
               targetAtomActiveOrLoading &&
-              (isChatConnection(conn) || isGroupChatConnection(conn)) &&
-              conn.get("state") === won.WON.Suggested
+              connectionUtils.isSuggested(conn) &&
+              (connectionSelectors.isChatToXConnection(allPosts, conn) ||
+                connectionSelectors.isGroupToXConnection(allPosts, conn))
             );
           });
 

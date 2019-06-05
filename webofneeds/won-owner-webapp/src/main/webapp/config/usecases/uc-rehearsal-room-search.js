@@ -25,15 +25,16 @@ export const rehearsalRoomSearch = {
   draft: {
     ...mergeInEmptyDraft({
       content: {
-        type: ["won:RehearsalRoomRentDemand"],
+        type: ["demo:RehearsalRoomRentDemand"],
         title: "Looking for Rehearsal Room!",
         searchString: "Rehearsal Room",
       },
       seeks: {
-        type: ["won:RehearsalRoomRentOffer"],
+        type: ["demo:RehearsalRoomRentOffer"],
       },
     }),
   },
+  reactionUseCases: ["rehearsalRoomOffer"],
   details: undefined,
   seeksDetails: {
     location: { ...details.location },
@@ -64,10 +65,11 @@ export const rehearsalRoomSearch = {
             s: won.defaultContext["s"],
             geo: "http://www.bigdata.com/rdf/geospatial#",
             xsd: won.defaultContext["xsd"],
+            demo: won.defaultContext["demo"],
           },
           operations: [
             `${resultName} a won:Atom.`,
-            `${resultName} a won:RehearsalRoomRentOffer.`,
+            `${resultName} a demo:RehearsalRoomRentOffer.`,
             `${resultName} (won:location|s:location) ?location.`,
             "?location s:geo ?location_geo.",
             "?location_geo s:latitude ?location_lat;",
@@ -107,10 +109,11 @@ export const rehearsalRoomSearch = {
           prefixes: {
             won: won.defaultContext["won"],
             rdf: won.defaultContext["rdf"],
+            demo: won.defaultContext["demo"],
           },
           operations: [
             `${resultName} a won:Atom.`,
-            `${resultName} a won:RehearsalRoomRentOffer.`,
+            `${resultName} a demo:RehearsalRoomRentOffer.`,
           ],
         },
         rentRange &&

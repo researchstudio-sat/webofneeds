@@ -29,6 +29,11 @@
     <bean id="predefinedAliasStrategy" class="won.cryptography.ssl.PredefinedAliasPrivateKeyStrategy">
         <constructor-arg value="${uri.prefix.resource}" />
     </bean>
+    <!--  we're going to use this bean in the activemq.xml config to allow access to all clients who registered in the webapp -->
+    <bean id="nodeTrustManagerTLS" class="won.cryptography.ssl.TrustManagerWrapperWithTrustService">
+    	<constructor-arg ref="trustStoreService" />
+    </bean>
+    
    <bean id="registrationClient" class="won.cryptography.service.RegistrationRestClientHttps" depends-on="cryptographyService">
         <constructor-arg ref="keyStoreService" />
         <constructor-arg name="privateKeyStrategy" ref="predefinedAliasStrategy" />

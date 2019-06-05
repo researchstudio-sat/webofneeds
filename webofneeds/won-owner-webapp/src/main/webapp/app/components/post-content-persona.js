@@ -17,7 +17,7 @@ import { details } from "../../config/detail-definitions.js";
 import { Elm } from "../../elm/RatingView.elm";
 import elmModule from "./elm.js";
 
-import "style/_post-content-persona.scss";
+import "~/style/_post-content-persona.scss";
 import { getOwnedConnectionByUri } from "../selectors/connection-selectors.js";
 
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];

@@ -15,7 +15,8 @@ import org.junit.Test;
 import won.protocol.message.Utils;
 import won.protocol.model.AtomGraphType;
 import won.protocol.model.AtomState;
-import won.protocol.vocabulary.WON;
+import won.protocol.vocabulary.WONCON;
+import won.protocol.vocabulary.WONMATCH;
 
 /**
  * Created by hfriedrich on 16.03.2017.
@@ -55,10 +56,10 @@ public class AtomModelWrapperTest {
         Assert.assertEquals("https://node.matchat.org/won/resource/atom/3030440624813201400/connections",
                         atomModelWrapper.getConnectionContainerUri());
         // query the atom model values
-        Assert.assertTrue(atomModelWrapper.flag(WON.UsedForTesting));
+        Assert.assertTrue(atomModelWrapper.flag(WONMATCH.UsedForTesting));
         Assert.assertEquals(1, atomModelWrapper.getSocketUris().size());
         Assert.assertEquals("https://w3id.org/won/core#ChatSocket", atomModelWrapper.getSocketUris().iterator().next());
-        Assert.assertTrue(atomModelWrapper.flag(WON.NoHintForMe));
+        Assert.assertTrue(atomModelWrapper.flag(WONMATCH.NoHintForMe));
         // query the content nodes
         Assert.assertEquals(2, atomModelWrapper.getAllContentNodes().size());
         Assert.assertNotNull(atomModelWrapper.getAtomContentNode());
@@ -66,9 +67,9 @@ public class AtomModelWrapperTest {
         Assert.assertEquals("Offering tennis lessons", atomModelWrapper.getContentPropertyStringValue(DC.title));
         Assert.assertTrue(atomModelWrapper.getSeeksPropertyStringValues(DC.title).contains("tennis students"));
         Assert.assertEquals(2, atomModelWrapper.getAllContentPropertyStringValues(DC.title, null).size());
-        Assert.assertEquals(3, atomModelWrapper.getContentPropertyStringValues(WON.tag, null).size());
-        Assert.assertEquals(2, atomModelWrapper.getSeeksPropertyStringValues(WON.tag, null).size());
-        Assert.assertEquals(5, atomModelWrapper.getAllContentPropertyStringValues(WON.tag, null).size());
+        Assert.assertEquals(3, atomModelWrapper.getContentPropertyStringValues(WONCON.tag, null).size());
+        Assert.assertEquals(2, atomModelWrapper.getSeeksPropertyStringValues(WONCON.tag, null).size());
+        Assert.assertEquals(5, atomModelWrapper.getAllContentPropertyStringValues(WONCON.tag, null).size());
         Assert.assertEquals("16.358398",
                         atomModelWrapper.getContentPropertyStringValue("s:location/s:geo/s:longitude"));
         // query the goals
@@ -120,9 +121,9 @@ public class AtomModelWrapperTest {
         Assert.assertNotNull(atomModelWrapper.copyAtomModel(AtomGraphType.ATOM));
         Assert.assertEquals(ATOM_URI, atomModelWrapper.getAtomUri());
         atomModelWrapper.setContentPropertyStringValue(DC.description, "description");
-        atomModelWrapper.addPropertyStringValue(WON.tag, "tag");
+        atomModelWrapper.addPropertyStringValue(WONCON.tag, "tag");
         Assert.assertEquals(1, atomModelWrapper.getContentPropertyStringValues(DC.description, null).size());
-        Assert.assertEquals(1, atomModelWrapper.getContentPropertyStringValues(WON.tag, null).size());
+        Assert.assertEquals(1, atomModelWrapper.getContentPropertyStringValues(WONCON.tag, null).size());
         // add different content nodes now and check that they are there
         atomModelWrapper.createSeeksNode("https://seeks_uri1");
         atomModelWrapper.createSeeksNode("https://seeks_uri2");
@@ -135,13 +136,13 @@ public class AtomModelWrapperTest {
         atomModelWrapper.setContentPropertyStringValue(DC.description, "description");
         atomModelWrapper.setSeeksPropertyStringValue(DC.description, "description1");
         atomModelWrapper.addSeeksPropertyStringValue(DC.description, "description2");
-        atomModelWrapper.addPropertyStringValue(WON.tag, "tag1");
-        atomModelWrapper.addSeeksPropertyStringValue(WON.tag, "tag2");
+        atomModelWrapper.addPropertyStringValue(WONCON.tag, "tag1");
+        atomModelWrapper.addSeeksPropertyStringValue(WONCON.tag, "tag2");
         Assert.assertEquals(4, atomModelWrapper.getSeeksPropertyStringValues(DC.description, null).size());
         Assert.assertEquals(5, atomModelWrapper.getAllContentPropertyStringValues(DC.description, null).size());
-        Assert.assertEquals(4, atomModelWrapper.getAllContentPropertyStringValues(WON.tag, null).size());
-        Assert.assertEquals(2, atomModelWrapper.getContentPropertyStringValues(WON.tag, null).size());
-        Assert.assertEquals(2, atomModelWrapper.getSeeksPropertyStringValues(WON.tag, null).size());
+        Assert.assertEquals(4, atomModelWrapper.getAllContentPropertyStringValues(WONCON.tag, null).size());
+        Assert.assertEquals(2, atomModelWrapper.getContentPropertyStringValues(WONCON.tag, null).size());
+        Assert.assertEquals(2, atomModelWrapper.getSeeksPropertyStringValues(WONCON.tag, null).size());
     }
 
     @Test

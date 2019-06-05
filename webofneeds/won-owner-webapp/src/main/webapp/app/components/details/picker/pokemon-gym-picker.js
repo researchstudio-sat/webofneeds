@@ -2,7 +2,7 @@ import angular from "angular";
 import { attach, delay } from "../../../utils.js";
 import { DomCache } from "../../../cstm-ng-utils.js";
 
-import "style/_pokemongympicker.scss";
+import "/style/_pokemongympicker.scss";
 
 const serviceDependencies = ["$scope", "$element"];
 function genComponentConf() {

@@ -201,7 +201,7 @@ public abstract class AbstractCamelProcessor implements Processor {
         if (socketURI.isPresent() && atomURI.isPresent()
                         && !socketURI.get().toString().startsWith(atomURI.get().toString())) {
             throw new IllegalArgumentException(
-                            "User-defined socket " + socketURI + " is not a socket of atom " + atomURI);
+                            "User-defined socket " + socketURI.get() + " is not a socket of atom " + atomURI.get());
         }
     }
 }

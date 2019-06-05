@@ -26,14 +26,16 @@ export const musicianSearch = {
         type: ["s:MusicGroup"],
       },
       seeks: {
-        type: ["won:Musician"],
+        type: ["demo:Musician"],
       },
     }),
   },
+  reactionUseCases: ["bandSearch"],
   details: {
     title: { ...details.title },
     description: { ...details.description },
     genres: { ...genresDetail },
+    images: { ...details.images },
     location: {
       ...details.location,
       mandatory: true,
@@ -49,34 +51,36 @@ export const musicianSearch = {
     // genres
     const genresSQ = tagOverlapScoreSubQuery({
       resultName: resultName,
-      bindScoreAs: "?genres_jaccardIndex",
-      pathToTags: "won:seeks/won:genres",
+      bindScoreAs: "?genre_jaccardIndex",
+      pathToTags: "match:seeks/demo:genre",
       prefixesInPath: {
         s: won.defaultContext["s"],
         won: won.defaultContext["won"],
       },
-      tagLikes: getIn(draft, ["content", "genres"]),
+      tagLikes: getIn(draft, ["content", "genre"]),
     });
 
     // instruments
     const instrumentsSQ = tagOverlapScoreSubQuery({
       resultName: resultName,
       bindScoreAs: "?instruments_jaccardIndex",
-      pathToTags: "won:instruments",
+      pathToTags: "demo:instrument",
       prefixesInPath: {
         s: won.defaultContext["s"],
         won: won.defaultContext["won"],
       },
-      tagLikes: getIn(draft, ["seeks", "instruments"]),
+      tagLikes: getIn(draft, ["seeks", "instrument"]),
     });
 
     const vicinityScoreSQ = vicinityScoreSubQuery({
       resultName: resultName,
       bindScoreAs: "?location_geoScore",
-      pathToGeoCoords: "won:seeks/s:location/s:geo",
+      pathToGeoCoords: "match:seeks/s:location/s:geo",
       prefixesInPath: {
         s: won.defaultContext["s"],
         won: won.defaultContext["won"],
+        match: won.defaultContext["match"],
+        con: won.defaultContext["con"],
       },
       geoCoordinates: getIn(draft, ["content", "location"]),
     });
@@ -93,13 +97,14 @@ export const musicianSearch = {
         won: won.defaultContext["won"],
         rdf: won.defaultContext["rdf"],
         s: won.defaultContext["s"],
+        demo: won.defaultContext["demo"],
       },
       distinct: true,
       variables: [resultName],
       subQueries: subQueries,
       where: [
         `${resultName} rdf:type won:Atom.`,
-        `${resultName} rdf:type won:Musician.`,
+        `${resultName} rdf:type demo:Musician.`,
 
         // calculate average of scores; can be weighed if necessary
         `BIND( ( 

@@ -31,7 +31,7 @@ export function parseAtom(jsonldAtom) {
         won.parseListFrom(jsonldAtomImm, ["group:groupMember"], "xsd:ID") ||
         Immutable.List(),
       content: generateContent(jsonldAtomImm, detailsToParse),
-      seeks: generateContent(jsonldAtomImm.get("won:seeks"), detailsToParse),
+      seeks: generateContent(jsonldAtomImm.get("match:seeks"), detailsToParse),
       creationDate: extractCreationDate(jsonldAtomImm),
       lastUpdateDate: extractCreationDate(jsonldAtomImm), //Used for sorting/updates (e.g. if connection comes in etc...)
       modifiedDate: extractLastModifiedDate(jsonldAtomImm), //Used as a flag if the atom itself has changed (e.g. atom edit)
@@ -149,6 +149,7 @@ export function parseMetaAtom(metaAtom) {
         type: extractTypes(get(metaAtomImm, "types")),
         flags: extractFlags(get(metaAtomImm, "flags")),
         location: extractLocation(get(metaAtomImm, "location")),
+        jobLocation: extractLocation(get(metaAtomImm, "jobLocation")),
       },
       seeks: {
         type: extractTypes(get(metaAtomImm, "seeksTypes")),

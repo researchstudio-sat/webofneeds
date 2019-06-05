@@ -28,15 +28,16 @@ export const rentRealEstateSearch = {
   draft: {
     ...mergeInEmptyDraft({
       seeks: {
-        type: ["won:RealEstateRentOffer"],
+        type: ["demo:RealEstateRentOffer"],
         tags: ["RentOutRealEstate"],
       },
       content: {
-        type: ["won:RealEstateRentDemand"],
+        type: ["demo:RealEstateRentDemand"],
         tags: ["SearchRealEstateToRent"],
       },
     }),
   },
+  reactionUseCases: ["rentRealEstateOffer"],
   details: undefined,
   seeksDetails: {
     location: { ...details.location },
@@ -61,10 +62,11 @@ export const rentRealEstateSearch = {
             s: won.defaultContext["s"],
             won: won.defaultContext["won"],
             xsd: won.defaultContext["xsd"],
+            demo: won.defaultContext["demo"],
           },
           operations: [
             `${resultName} a won:Atom.`,
-            `${resultName} a won:RealEstateRentOffer.`,
+            `${resultName} a demo:RealEstateRentOffer.`,
             `${resultName} (won:location|s:location) ?location.`,
             "?location s:geo ?location_geo.",
             "?location_geo s:latitude ?location_lat;",
@@ -111,10 +113,11 @@ export const rentRealEstateSearch = {
           prefixes: {
             won: won.defaultContext["won"],
             s: won.defaultContext["s"],
+            demo: won.defaultContext["demo"],
           },
           operations: [
             `${resultName} a won:Atom.`,
-            `${resultName} a won:RealEstateRentOffer.`,
+            `${resultName} a demo:RealEstateRentOffer.`,
           ],
         },
         rentRange &&

@@ -15,7 +15,7 @@ import { classOnComponentRoot } from "../cstm-ng-utils.js";
 import * as atomUtils from "../atom-utils.js";
 import * as processUtils from "../process-utils.js";
 
-import "style/_post-header.scss";
+import "~/style/_post-header.scss";
 
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {

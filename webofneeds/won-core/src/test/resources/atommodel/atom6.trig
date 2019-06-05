@@ -1,3 +1,5 @@
+@prefix con:   <https://w3id.org/won/content#> .
+@prefix match:   <https://w3id.org/won/matching#> .
 @prefix msg:   <https://w3id.org/won/message#> .
 @prefix conn:  <https://node.matchat.org/won/resource/connection/> .
 @prefix woncrypt: <https://w3id.org/won/core#> .
@@ -18,13 +20,13 @@
 <https://node.matchat.org/won/resource/event/6899375303355711001#atom> {
     atom:3030440624813201401
         a                       won:Atom ;
-        won:flag             won:UsedForTesting ;
+        match:flag             match:UsedForTesting ;
         won:hasMatchingBehavior won:Mutual ;
         won:is2                  _:is_and_seeks ;
         dc:title                "is" ;
         won:connectsTo _:closesTheLoop ;
         won:seeks2               _:is_and_seeks ;
-        won:seeks               _:seeks.
+        match:seeks               _:seeks.
     _:seeks
         a                       won:AtomContent ;
         dc:title                "seeks" ;

@@ -16,7 +16,7 @@ import * as connectionUtils from "../connection-utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
 
-import "style/_post-menu.scss";
+import "~/style/_post-menu.scss";
 
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {

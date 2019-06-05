@@ -1,11 +1,9 @@
 import angular from "angular";
-import { currentSkin } from "../selectors/general-selectors";
 import { actionCreators } from "../actions/actions";
 
 import "./svg-icon.js";
 
 import "../../style/_elm.scss";
-import { getIn } from "../utils";
 
 function genComponentConf($ngRedux) {
   return {
@@ -20,21 +18,8 @@ function genComponentConf($ngRedux) {
       element[0].appendChild(childElement);
       const elmApp = scope.module.init({
         node: childElement,
-        flags: {
-          props: scope.props,
-          style: currentSkin(),
-        },
+        flags: scope.props,
       });
-
-      const disconnectState = $ngRedux.connect(state => ({
-        skin: getIn(state, ["config", "theme"]),
-      }))(() =>
-        window.requestAnimationFrame(() => {
-          elmApp.ports.inPort.send({
-            newStyle: currentSkin(),
-          });
-        })
-      );
 
       scope.$watch("props", props => {
         elmApp.ports.inPort.send({
@@ -43,11 +28,36 @@ function genComponentConf($ngRedux) {
       });
 
       if (elmApp.ports.outPort) {
-        elmApp.ports.outPort.subscribe(({ action, payload }) => {
-          if (actionCreators[action]) {
-            $ngRedux.dispatch(actionCreators[action](...payload));
-          } else {
-            scope.onAction({ action, payload });
+        elmApp.ports.outPort.subscribe(message => {
+          switch (message.type) {
+            case "action":
+              if (actionCreators[message.name]) {
+                $ngRedux.dispatch(
+                  actionCreators[message.name](...message.arguments)
+                );
+              } else {
+                console.error(`Could not find action "${message.name}"`);
+              }
+              break;
+            case "event": {
+              const eventAttrName = message.name
+                .replace(/([A-Z])/g, "-$1")
+                .toLowerCase();
+              if (element[0].hasAttribute(eventAttrName)) {
+                scope.$parent.$eval(
+                  element[0].getAttribute(eventAttrName),
+                  message.payload
+                );
+              } else {
+                console.error(
+                  `Could not find attribute ${eventAttrName}`,
+                  element[0]
+                );
+              }
+              break;
+            }
+            default:
+              console.error(`Could not read message "${message}"`);
           }
         });
       }
@@ -60,7 +70,6 @@ function genComponentConf($ngRedux) {
         elmApp.ports.inPort.send({
           unmount: true,
         });
-        disconnectState();
         if (elmApp.ports.outPort) {
           elmApp.ports.outPort.unsubscribe();
         }

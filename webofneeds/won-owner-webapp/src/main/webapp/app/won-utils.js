@@ -17,10 +17,10 @@ import {
   toAbsoluteURL,
 } from "./utils.js";
 
-import { ownerBaseUrl } from "config";
+import { ownerBaseUrl } from "~/config/default.js";
 import urljoin from "url-join";
 import qr from "qr-image";
-import jsonld from "jsonld";
+import jsonld from "jsonld/dist/jsonld.js";
 window.jsonld4dbg = jsonld;
 
 import Immutable from "immutable";
@@ -854,23 +854,23 @@ export function parsePlaceLeniently(jsonldLocation) {
   };
 
   const nwCornerLat = parseFloatFromLocation([
-    "won:boundingBox",
-    "won:northWestCorner",
+    "con:boundingBox",
+    "con:northWestCorner",
     "s:latitude",
   ]);
   const nwCornerLng = parseFloatFromLocation([
-    "won:boundingBox",
-    "won:northWestCorner",
+    "con:boundingBox",
+    "con:northWestCorner",
     "s:longitude",
   ]);
   const seCornerLat = parseFloatFromLocation([
-    "won:boundingBox",
-    "won:southEastCorner",
+    "con:boundingBox",
+    "con:southEastCorner",
     "s:latitude",
   ]);
   const seCornerLng = parseFloatFromLocation([
-    "won:boundingBox",
-    "won:southEastCorner",
+    "con:boundingBox",
+    "con:southEastCorner",
     "s:longitude",
   ]);
 
@@ -908,7 +908,7 @@ export function genSPlace({ geoData, baseUri }) {
     "@type": "s:Place",
     "s:name": geoData.name,
     "s:geo": genGeo({ lat: geoData.lat, lng: geoData.lng, baseUri }),
-    "won:boundingBox": genBoundingBox({
+    "con:boundingBox": genBoundingBox({
       nwCorner: geoData.nwCorner,
       seCorner: geoData.seCorner,
       baseUri,
@@ -925,7 +925,7 @@ function genGeo({ lat, lng, baseUri }) {
     "@type": "s:GeoCoordinates",
     "s:latitude": lat.toFixed(6),
     "s:longitude": lng.toFixed(6),
-    "won:geoSpatial": {
+    "con:geoSpatial": {
       "@type": "http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon",
       "@value": `${lat.toFixed(6)}#${lng.toFixed(6)}`,
     },
@@ -937,13 +937,13 @@ function genBoundingBox({ nwCorner, seCorner, baseUri }) {
     ? undefined
     : {
         "@id": baseUri ? baseUri + "/bounds" : undefined,
-        "won:northWestCorner": {
+        "con:northWestCorner": {
           "@id": baseUri ? baseUri + "/bounds/nw" : undefined,
           "@type": "s:GeoCoordinates",
           "s:latitude": nwCorner.lat.toFixed(6),
           "s:longitude": nwCorner.lng.toFixed(6),
         },
-        "won:southEastCorner": {
+        "con:southEastCorner": {
           "@id": baseUri ? baseUri + "/bounds/se" : undefined,
           "@type": "s:GeoCoordinates",
           "s:latitude": seCorner.lat.toFixed(6),

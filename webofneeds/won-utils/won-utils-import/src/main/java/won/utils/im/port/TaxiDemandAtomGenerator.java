@@ -13,7 +13,8 @@ import org.apache.jena.vocabulary.DC;
 import org.apache.jena.vocabulary.RDF;
 
 import won.protocol.vocabulary.SCHEMA;
-import won.protocol.vocabulary.WON;
+import won.protocol.vocabulary.WONCON;
+import won.protocol.vocabulary.WONMATCH;
 
 public class TaxiDemandAtomGenerator {
     static Model model = ModelFactory.createDefaultModel();
@@ -39,12 +40,12 @@ public class TaxiDemandAtomGenerator {
             // method signatures: branch, probability that detail is added, min, max
             atom = addTitle(atom, 1.0, i);
             atom = addDescription(atom, 1.0);
-            atom.addProperty(WON.tag, "search-lift");
+            atom.addProperty(WONCON.tag, "search-lift");
             seeksPart = addDate(seeksPart, 0.9);
             // seeksPart = addTime(seeksPart, 0.9);
             seeksPart = addTravelAction(seeksPart, 0.9);
             atom.addProperty(RDF.type, won_Atom);
-            atom.addProperty(WON.seeks, seeksPart);
+            atom.addProperty(WONMATCH.seeks, seeksPart);
             try {
                 FileOutputStream out = new FileOutputStream("sample_atoms/taxi_demand_atom_" + rnd + ".trig");
                 model.write(out, "TURTLE");
@@ -102,7 +103,7 @@ public class TaxiDemandAtomGenerator {
         Resource fromGeoResource = model.createResource();
         Resource fromSchema_Place = model.createResource("http://schema.org/Place");
         Resource fromSchema_GeoCoordinates = model.createResource("http://schema.org/GeoCoordinates");
-        resource.addProperty(WON.travelAction, fromLocationResource);
+        resource.addProperty(WONCON.travelAction, fromLocationResource);
         fromLocationResource.addProperty(RDF.type, fromSchema_Place);
         fromLocationResource.addProperty(SCHEMA.NAME, locations[0].get("name"));
         fromLocationResource.addProperty(SCHEMA.GEO, fromGeoResource);
@@ -116,7 +117,7 @@ public class TaxiDemandAtomGenerator {
         Resource toGeoResource = model.createResource();
         Resource toSchema_Place = model.createResource("http://schema.org/Place");
         Resource toSchema_GeoCoordinates = model.createResource("http://schema.org/GeoCoordinates");
-        resource.addProperty(WON.travelAction, toLocationResource);
+        resource.addProperty(WONCON.travelAction, toLocationResource);
         toLocationResource.addProperty(RDF.type, toSchema_Place);
         toLocationResource.addProperty(SCHEMA.NAME, locations[1].get("name"));
         toLocationResource.addProperty(SCHEMA.GEO, toGeoResource);

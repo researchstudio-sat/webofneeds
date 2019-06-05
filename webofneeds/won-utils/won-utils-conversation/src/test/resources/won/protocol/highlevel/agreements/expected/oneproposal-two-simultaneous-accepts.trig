@@ -1,3 +1,5 @@
+@prefix con:   <https://w3id.org/won/content#> .
+@prefix match:   <https://w3id.org/won/matching#> .
 @prefix msg:   <https://w3id.org/won/message#> .
 @prefix conn:  <https://localhost:8443/won/resource/connection/> .
 @prefix woncrypt: <https://w3id.org/won/core#> .
@@ -19,10 +21,10 @@
 @prefix agr: <https://w3id.org/won/agreement#> .
 
 <https://localhost:8443/won/resource/event/557600936467257340> {
-    <https://localhost:8443/won/resource/event/5669098069340991000>	won:textMessage	"one" .
+    <https://localhost:8443/won/resource/event/5669098069340991000>	con:text	"one" .
 }
 # Both accept messages are simultaneous, so only the lexicographically smaller one 
 # creates an agreement.
 # <https://localhost:8443/won/resource/event/mt1f8i41bogt7kc91fi6> {
-#    <https://localhost:8443/won/resource/event/5669098069340991000> won:textMessage  "one" .
+#    <https://localhost:8443/won/resource/event/5669098069340991000> con:text  "one" .
 # }

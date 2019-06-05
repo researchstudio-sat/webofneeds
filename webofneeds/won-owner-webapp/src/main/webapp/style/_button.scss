@@ -16,6 +16,10 @@
     background: lightgrey;
     cursor: default;
   }
+
+  .won-button-icon {
+    --local-primary: #{$color};
+  }
 }
 
 @mixin outline-button-color($color) {
@@ -39,6 +43,10 @@
     color: white;
     background: $won-disabled-color;
     cursor: default;
+  }
+
+  .won-button-icon {
+    --local-primary: #{$color};
   }
 }
 

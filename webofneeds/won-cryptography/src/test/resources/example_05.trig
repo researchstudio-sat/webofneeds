@@ -1,3 +1,5 @@
+@prefix con:   <https://w3id.org/won/content#> .
+@prefix match:   <https://w3id.org/won/matching#> .
 # Multiple and encapsuled graphs
 # Purpose: Testing graph encapsulation and merging of graphs with same name/hierarchy
 # Loading with TriG+ parser should result in the following graph:

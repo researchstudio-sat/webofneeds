@@ -45,7 +45,7 @@
 
 <https://satvm05.researchstudio.at/won/resource/event/n3j4mhrrypppoymsa5xp#content-vybl> {
     <https://satvm05.researchstudio.at/won/resource/event/n3j4mhrrypppoymsa5xp>
-            <https://w3id.org/won/core#textMessage>
+            <https://w3id.org/won/content#text>
                     "some failure" .
 }
 

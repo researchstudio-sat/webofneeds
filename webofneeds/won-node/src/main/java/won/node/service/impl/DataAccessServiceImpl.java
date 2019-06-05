@@ -16,28 +16,28 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import won.protocol.exception.ConnectionAlreadyExistsException;
-import won.protocol.exception.IllegalMessageForConnectionStateException;
 import won.protocol.exception.IllegalMessageForAtomStateException;
-import won.protocol.exception.NoSuchConnectionException;
+import won.protocol.exception.IllegalMessageForConnectionStateException;
 import won.protocol.exception.NoSuchAtomException;
+import won.protocol.exception.NoSuchConnectionException;
+import won.protocol.model.Atom;
+import won.protocol.model.AtomState;
 import won.protocol.model.Connection;
-import won.protocol.model.ConnectionMessageContainer;
 import won.protocol.model.ConnectionEventType;
+import won.protocol.model.ConnectionMessageContainer;
 import won.protocol.model.ConnectionState;
 import won.protocol.model.DatasetHolder;
 import won.protocol.model.Socket;
-import won.protocol.model.Atom;
-import won.protocol.model.AtomState;
+import won.protocol.repository.AtomMessageContainerRepository;
+import won.protocol.repository.AtomRepository;
 import won.protocol.repository.ConnectionContainerRepository;
 import won.protocol.repository.ConnectionMessageContainerRepository;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.DatasetHolderRepository;
 import won.protocol.repository.SocketRepository;
-import won.protocol.repository.AtomMessageContainerRepository;
-import won.protocol.repository.AtomRepository;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.DataAccessUtils;
-import won.protocol.vocabulary.WON;
+import won.protocol.vocabulary.WONCON;
 
 /**
  * T User: gabriel Date: 06/11/13
@@ -207,7 +207,7 @@ public class DataAccessServiceImpl implements won.node.service.DataAccessService
                             connection.getConnectionURI());
             return false;
         }
-        mainRes.addProperty(WON.feedbackEvent, feedback);
+        mainRes.addProperty(WONCON.feedbackEvent, feedback);
         ModelExtract extract = new ModelExtract(new StatementTripleBoundary(TripleBoundary.stopNowhere));
         model.add(extract.extract(feedback, feedback.getModel()));
         dataset.setDefaultModel(model);

@@ -272,7 +272,7 @@
     
 
 
-    <!-- https://w3id.org/won/core#tag -->
+    <!-- https://w3id.org/won/content#tag -->
 
     <owl:ObjectProperty rdf:about="&won;tag">
         <rdfs:domain rdf:resource="&won;AtomContent"/>

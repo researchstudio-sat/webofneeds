@@ -18,12 +18,11 @@ import org.apache.jena.vocabulary.RDFS;
 import org.apache.jena.vocabulary.XSD;
 
 import won.protocol.vocabulary.CERT;
-import won.protocol.vocabulary.GEO;
-import won.protocol.vocabulary.LDP;
 import won.protocol.vocabulary.SCHEMA;
 import won.protocol.vocabulary.SFSIG;
-import won.protocol.vocabulary.SIOC;
 import won.protocol.vocabulary.WON;
+import won.protocol.vocabulary.WONCON;
+import won.protocol.vocabulary.WONMATCH;
 import won.protocol.vocabulary.WONMSG;
 
 /**
@@ -47,13 +46,12 @@ public class DefaultPrefixUtils {
     public static void setDefaultPrefixes(PrefixMapping prefixMapping) {
         prefixMapping.setNsPrefix(WON.DEFAULT_PREFIX, WON.getURI());
         prefixMapping.setNsPrefix(WONMSG.DEFAULT_PREFIX, WONMSG.getURI());
+        prefixMapping.setNsPrefix(WONCON.DEFAULT_PREFIX, WONCON.getURI());
+        prefixMapping.setNsPrefix(WONMATCH.DEFAULT_PREFIX, WONMATCH.getURI());
         prefixMapping.setNsPrefix(SFSIG.DEFAULT_PREFIX, SFSIG.getURI());
         prefixMapping.setNsPrefix(CERT.DEFAULT_PREFIX, CERT.getURI());
-        prefixMapping.setNsPrefix(SIOC.DEFAULT_PREFIX, SIOC.getURI());
         prefixMapping.setNsPrefix("rdf", RDF.getURI());
-        prefixMapping.setNsPrefix(LDP.DEFAULT_PREFIX, LDP.getURI());
         prefixMapping.setNsPrefix("rdfs", RDFS.getURI());
-        prefixMapping.setNsPrefix(GEO.DEFAULT_PREFIX, GEO.getURI());
         prefixMapping.setNsPrefix("xsd", XSD.getURI());
         prefixMapping.setNsPrefix("dc", DC.getURI());
         prefixMapping.setNsPrefix(SCHEMA.DEFAULT_PREFIX, SCHEMA.getURI());

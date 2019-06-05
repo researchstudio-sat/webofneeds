@@ -177,22 +177,32 @@
 
         </transportConnectors>
         <sslContext>
-            <!--sslContext
-                    keyStore="${activemq.broker.keystore}"
-                    keyStorePassword="${activemq.broker.keystore.password}"
-                    trustStore="${activemq.broker.truststore}"
-                    trustStorePassword="${activemq.broker.truststore.password}"-->
-                <!-- broker's private key is the same as server's private key, and his trust is defined by the custom trust manager-->
-                <sslContext
-                        keyStore="${activemq.broker.keystore}"
-                        keyStorePassword="${activemq.broker.keystore.password}"
-                        >
-                    <trustManagers>
+        	<!-- This is actually not tricky.
+        	
+        	The activeMQ broker runs in a child context of the won-node-webapp. Both the webapp and the 
+        	activeMQ broker requires TLS clients to provide a client certificate, but actually do not 
+        	check it upon connection request. The webapp and activemq thus must impersonate the same entity 
+        	externally. However, if behind nginx (as in the case of a live deployment), they read in their private
+        	key in different formats (activemq: jks, nginx: pem) - that has been a source of trouble in the
+        	past, as sometimes these files get out of sync and don't contain the same key. 
+        	
+        	Before making changes to this config, see https://github.com/researchstudio-sat/webofneeds/issues/891
+        	        	
+        	If establishing a TLS connection fails, it is because the client cannot verify the
+        	server's certificate. It has nothing to do with the server's trust store. It is ok to use
+        	the AcceptAllCertsTrustManager here.  
+        	
+        	Specifically, it is not necessary (and probably causes a slow-down when many keys are trusted, to use a TrustManager 
+        	(nodeTrustManagerTLS) that uses the TrustStoreService also accessed by the node webapp.
+        	-->
+            <sslContext
+	             keyStore="${activemq.broker.keystore}"
+	             keyStorePassword="${activemq.broker.keystore.password}"
+	             >
+	             <trustManagers>
                         <spring:bean class="won.utils.tls.AcceptAllCertsTrustManager" />
-                    </trustManagers>
-
-                </sslContext>
-
+                 </trustManagers>
+            </sslContext>
         </sslContext>
 
         <plugins>

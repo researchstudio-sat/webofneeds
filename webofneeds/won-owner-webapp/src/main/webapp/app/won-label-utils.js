@@ -22,13 +22,14 @@ export const labels = deepFreeze({
     [won.WONMSG.openMessage]: "Accepted Contact Request",
     [won.WONMSG.closeMessage]: "Close Message",
     [won.WONMSG.connectionMessage]: "Chat Message",
-    [won.WONMSG.hintMessage]: "Hint Message",
+    [won.WONMSG.atomHintMessage]: "Atom Hint Message",
+    [won.WONMSG.socketHintMessage]: "Socket Hint Message",
     [won.WONMSG.hintFeedbackMessage]: "Hint Feedback Message",
   },
   flags: {
-    [won.WON.NoHintForCounterpartCompacted]: "Invisible",
-    [won.WON.NoHintForMeCompacted]: "Silent",
-    [won.WON.UsedForTestingCompacted]: "Used For Testing",
+    [won.WONMATCH.NoHintForCounterpartCompacted]: "Invisible",
+    [won.WONMATCH.NoHintForMeCompacted]: "Silent",
+    [won.WONMATCH.UsedForTestingCompacted]: "Used For Testing",
   },
   sockets: {
     [won.GROUP.GroupSocketCompacted]: "Group Chat enabled",

@@ -7,7 +7,9 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.apache.jena.query.Dataset;
@@ -65,6 +67,9 @@ public class WonMessage implements Serializable {
     private URI recipientAtomURI;
     private URI recipientNodeURI;
     private URI recipientSocketURI;
+    private URI hintTargetAtomURI;
+    private URI hintTargetSocketURI;
+    private Double hintScore;
     private List<URI> previousMessages = null;
     private List<URI> injectIntoConnections = null;
     private URI isResponseToMessageURI;
@@ -485,6 +490,28 @@ public class WonMessage implements Serializable {
         return this.recipientSocketURI;
     }
 
+    public synchronized URI getHintTargetSocketURI() {
+        if (this.hintTargetSocketURI == null) {
+            this.hintTargetSocketURI = getEnvelopePropertyURIValue(WONMSG.hintTargetSocket);
+        }
+        return this.hintTargetSocketURI;
+    }
+
+    public synchronized URI getHintTargetAtomURI() {
+        if (this.hintTargetAtomURI == null) {
+            this.hintTargetAtomURI = getEnvelopePropertyURIValue(WONMSG.hintTargetAtom);
+        }
+        return this.hintTargetAtomURI;
+    }
+
+    public synchronized Double getHintScore() {
+        if (this.hintScore == null) {
+            this.hintScore = getEnvelopePropertyValue(WONMSG.hintScore,
+                            x -> x.isLiteral() ? x.asLiteral().getDouble() : null);
+        }
+        return this.hintScore;
+    }
+
     public synchronized List<URI> getInjectIntoConnectionURIs() {
         if (this.injectIntoConnections == null) {
             this.injectIntoConnections = getEnvelopePropertyURIValues(WONMSG.injectIntoConnection);
@@ -564,6 +591,32 @@ public class WonMessage implements Serializable {
                             property, (RDFNode) null);
             if (it.hasNext()) {
                 return URI.create(it.nextStatement().getObject().asResource().toString());
+            }
+            // move to the next envelope
+            currentEnvelopeUri = RdfUtils.findFirstObjectUri(currentEnvelope, WONMSG.containsEnvelope, null, true,
+                            true);
+            currentEnvelope = null;
+            if (currentEnvelopeUri != null) {
+                currentEnvelope = this.completeDataset.getNamedModel(currentEnvelopeUri.toString());
+            }
+        }
+        return null;
+    }
+
+    public synchronized <T> T getEnvelopePropertyValue(Property property, Function<RDFNode, T> mapper) {
+        Model currentEnvelope = getOuterEnvelopeGraph();
+        URI currentEnvelopeUri = getOuterEnvelopeGraphURI();
+        // TODO would make sense to order envelope graphs in order from container to
+        // containee in the first place,
+        // if proper done, we should avoid ending up in infinite loop if someone sends
+        // us malformed envelopes that
+        // contain-in-other circular...
+        while (currentEnvelope != null) {
+            URI currentMessageURI = findMessageUri(currentEnvelope, currentEnvelopeUri.toString());
+            StmtIterator it = currentEnvelope.listStatements(currentEnvelope.getResource(currentMessageURI.toString()),
+                            property, (RDFNode) null);
+            if (it.hasNext()) {
+                return mapper.apply(it.nextStatement().getObject());
             }
             // move to the next envelope
             currentEnvelopeUri = RdfUtils.findFirstObjectUri(currentEnvelope, WONMSG.containsEnvelope, null, true,

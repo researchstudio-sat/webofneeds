@@ -39,7 +39,7 @@ public class SuccessResponder extends AbstractCamelProcessor {
         // with other means which ownerapplications to send the response to.
         if (originalMessage.getSenderAtomURI() == null)
             return;
-        if (originalMessage.getMessageType() == WonMessageType.HINT_MESSAGE) {
+        if (originalMessage.getMessageType().isHintMessage()) {
             // we don't want to send a SuccessResponse for a hint message as matchers
             // are not fully compatible messaging agents (atoms), so sending this message
             // will fail.

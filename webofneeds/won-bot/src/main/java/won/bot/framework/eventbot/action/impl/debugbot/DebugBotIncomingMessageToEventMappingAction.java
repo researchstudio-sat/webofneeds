@@ -42,6 +42,7 @@ import won.bot.framework.eventbot.event.impl.crawlconnection.CrawlConnectionComm
 import won.bot.framework.eventbot.event.impl.crawlconnection.CrawlConnectionCommandSuccessEvent;
 import won.bot.framework.eventbot.event.impl.debugbot.ConnectDebugCommandEvent;
 import won.bot.framework.eventbot.event.impl.debugbot.HintDebugCommandEvent;
+import won.bot.framework.eventbot.event.impl.debugbot.HintType;
 import won.bot.framework.eventbot.event.impl.debugbot.MessageToElizaEvent;
 import won.bot.framework.eventbot.event.impl.debugbot.ReplaceDebugAtomContentCommandEvent;
 import won.bot.framework.eventbot.event.impl.debugbot.SendNDebugCommandEvent;
@@ -64,7 +65,7 @@ import won.protocol.validation.WonConnectionValidator;
  */
 public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAction {
     Pattern PATTERN_USAGE = Pattern.compile("^usage|\\?|help|debug$", Pattern.CASE_INSENSITIVE);
-    Pattern PATTERN_HINT = Pattern.compile("^hint$", Pattern.CASE_INSENSITIVE);
+    Pattern PATTERN_HINT = Pattern.compile("^hint(\\s+((random|incompatible)\\s+)?socket)?$", Pattern.CASE_INSENSITIVE);
     Pattern PATTERN_CLOSE = Pattern.compile("^close$", Pattern.CASE_INSENSITIVE);
     Pattern PATTERN_MODIFY = Pattern.compile("^modify$", Pattern.CASE_INSENSITIVE);
     Pattern PATTERN_CONNECT = Pattern.compile("^connect$", Pattern.CASE_INSENSITIVE);
@@ -121,7 +122,7 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
     }
 
     public static final String[] USAGE_MESSAGES = { "# Usage:\n"
-                    + "* `hint`:            create a new atom and send hint to it\n"
+                    + "* `hint ((random|incompatible) socket) `:            create a new atom and send me an atom or socket hint (between random or incompatible sockets)\n"
                     + "* `connect`:         create a new atom and send connection request to it\n"
                     + "* `close`:           close the current connection\n"
                     + "* `modify`:          modify the atom's description\n"
@@ -166,15 +167,27 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
             try {
                 if (message == null) {
                     Model messageModel = WonRdfUtils.MessageUtils.textMessage(
-                                    "Whatever you sent me there, it was not a normal text message. I'm expecting a <message> won:textMessage \"Some text\" triple in that message.");
+                                    "Whatever you sent me there, it was not a normal text message. I'm expecting a <message> con:text \"Some text\" triple in that message.");
                     bus.publish(new ConnectionMessageCommandEvent(con, messageModel));
                 } else if (PATTERN_USAGE.matcher(message).matches()) {
                     bus.publish(new UsageDebugCommandEvent(con));
                 } else if (PATTERN_HINT.matcher(message).matches()) {
+                    Matcher m = PATTERN_HINT.matcher(message);
+                    m.matches();
+                    boolean socketHint = m.group(1) != null;
+                    boolean incompatible = "incompatible".equals(m.group(3));
+                    boolean random = "random".equals(m.group(3));
+                    String hintType = socketHint
+                                    ? incompatible ? "incompatible SocketHintMessage"
+                                                    : random ? "random SocketHintMessage" : "SocketHintMessage"
+                                    : "AtomHintMessage";
                     Model messageModel = WonRdfUtils.MessageUtils
-                                    .textMessage("Ok, I'll create a new atom and make it send a hint to you.");
+                                    .textMessage("Ok, I'll create a new atom and send a " + hintType + " to you.");
                     bus.publish(new ConnectionMessageCommandEvent(con, messageModel));
-                    bus.publish(new HintDebugCommandEvent(con));
+                    bus.publish(new HintDebugCommandEvent(con,
+                                    socketHint ? incompatible ? HintType.INCOMPATIBLE_SOCKET_HINT
+                                                    : random ? HintType.RANDOM_SOCKET_HINT : HintType.SOCKET_HINT
+                                                    : HintType.ATOM_HINT));
                 } else if (PATTERN_CONNECT.matcher(message).matches()) {
                     Model messageModel = WonRdfUtils.MessageUtils
                                     .textMessage("Ok, I'll create a new atom and make it send a connect to you.");

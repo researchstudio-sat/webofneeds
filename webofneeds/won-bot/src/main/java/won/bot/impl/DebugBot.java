@@ -13,6 +13,7 @@ package won.bot.impl;
 import java.net.URI;
 
 import org.apache.wml.WMLAccessElement;
+import org.joda.time.chrono.BuddhistChronology;
 
 import won.bot.framework.bot.base.EventBot;
 import won.bot.framework.eventbot.EventListenerContext;
@@ -141,7 +142,8 @@ public class DebugBot extends EventBot {
         // create the echo atom for debug initial connect - if we're not reacting to the
         // creation of our own echo atom.
         CreateDebugAtomWithSocketsAction atomForInitialConnectAction = new CreateDebugAtomWithSocketsAction(ctx, true,
-                        true);
+                        true, SocketType.ChatSocket.getURI(), SocketType.HoldableSocket.getURI(),
+                        SocketType.BuddySocket.getURI());
         atomForInitialConnectAction.setIsInitialForConnect(true);
         ActionOnEventListener initialConnector = new ActionOnEventListener(ctx,
                         new NotFilter(new AtomUriInNamedListFilter(ctx,
@@ -150,7 +152,9 @@ public class DebugBot extends EventBot {
         bus.subscribe(AtomCreatedEventForMatcher.class, initialConnector);
         // create the echo atom for debug initial hint - if we're not reacting to the
         // creation of our own echo atom.
-        CreateDebugAtomWithSocketsAction initialHinter = new CreateDebugAtomWithSocketsAction(ctx, true, true);
+        CreateDebugAtomWithSocketsAction initialHinter = new CreateDebugAtomWithSocketsAction(ctx, true, true,
+                        SocketType.ChatSocket.getURI(), SocketType.HoldableSocket.getURI(),
+                        SocketType.BuddySocket.getURI());
         initialHinter.setIsInitialForHint(true);
         ActionOnEventListener atomForInitialHintListener = new ActionOnEventListener(ctx, new NotFilter(
                         new AtomUriInNamedListFilter(ctx, ctx.getBotContextWrapper().getAtomCreateListName())),
@@ -167,7 +171,9 @@ public class DebugBot extends EventBot {
         // as soon as the echo atom triggered by debug hint command created, hint to
         // original
         this.atomHinter = new ActionOnEventListener(ctx, "atomHinter", new RandomDelayedAction(ctx,
-                        CONNECT_DELAY_MILLIS, CONNECT_DELAY_MILLIS, 1, new HintAssociatedAtomAction(ctx, matcherUri)));
+                        CONNECT_DELAY_MILLIS, CONNECT_DELAY_MILLIS, 1, new HintAssociatedAtomAction(ctx,
+                                        SocketType.ChatSocket.getURI(), SocketType.ChatSocket.getURI(),
+                                        matcherUri)));
         bus.subscribe(AtomCreatedEventForDebugHint.class, this.atomHinter);
         // if the original atom wants to connect - always open
         this.autoOpener = new ActionOnEventListener(ctx,

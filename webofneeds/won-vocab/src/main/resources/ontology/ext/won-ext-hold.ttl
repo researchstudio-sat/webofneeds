@@ -18,7 +18,7 @@
                                  dc:date "2019-04-15"^^xsd:date ;
                                  dc:title "Web of Needs Hold Extension" ;
                                  dcterms:license <https://creativecommons.org/licenses/by/4.0/> ;
-                                 vann:preferredNamespacePrefix "hold" .
+                                 vann:preferredNamespacePrefix "wx-hold" .
 
 #################################################################
 #    Annotation properties

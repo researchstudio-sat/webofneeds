@@ -76,8 +76,8 @@ public class MatcherCLI implements CommandLineRunner {
         URI wonNode = WonLinkedDataUtils.getWonNodeURIForAtomOrConnection(atomURI,
                         linkedDataSource.getDataForResource(atomURI));
         return WonMessageBuilder
-                        .setMessagePropertiesForHint(wonNodeInformationService.generateEventURI(wonNode), atomURI,
-                                        Optional.empty(), wonNode, otherAtomURI, Optional.empty(), originator, score)
+                        .setMessagePropertiesForHintToAtom(wonNodeInformationService.generateEventURI(wonNode), atomURI,
+                                        wonNode, otherAtomURI, originator, score)
                         .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL).build();
     }
 }

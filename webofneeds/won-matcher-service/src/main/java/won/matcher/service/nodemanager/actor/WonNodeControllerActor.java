@@ -1,11 +1,15 @@
 package won.matcher.service.nodemanager.actor;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.commons.collections.IteratorUtils;
 import org.apache.jena.query.Dataset;
@@ -26,8 +30,10 @@ import akka.japi.Function;
 import scala.concurrent.duration.Duration;
 import won.cryptography.service.RegistrationClient;
 import won.cryptography.ssl.MessagingContext;
+import won.matcher.service.common.event.AtomHintEvent;
 import won.matcher.service.common.event.BulkHintEvent;
 import won.matcher.service.common.event.HintEvent;
+import won.matcher.service.common.event.SocketHintEvent;
 import won.matcher.service.common.event.WonNodeEvent;
 import won.matcher.service.common.spring.SpringExtension;
 import won.matcher.service.crawler.actor.MasterCrawlerActor;
@@ -37,8 +43,9 @@ import won.matcher.service.nodemanager.pojo.WonNodeConnection;
 import won.matcher.service.nodemanager.service.HintDBService;
 import won.matcher.service.nodemanager.service.WonNodeSparqlService;
 import won.protocol.service.WonNodeInfo;
-import won.protocol.service.WonNodeInformationService;
+import won.protocol.util.RdfUtils.Pair;
 import won.protocol.util.linkeddata.LinkedDataSource;
+import won.protocol.util.linkeddata.WonLinkedDataUtils;
 
 /**
  * Actor that knows all won nodes the matching service is communicating with. It
@@ -64,8 +71,6 @@ public class WonNodeControllerActor extends UntypedActor {
     private WonNodeSparqlService sparqlService;
     @Autowired
     private WonNodeControllerConfig config;
-    @Autowired
-    private WonNodeInformationService wonNodeInformationService;
     @Autowired
     private RegistrationClient registrationClient;
     @Autowired
@@ -206,7 +211,8 @@ public class WonNodeControllerActor extends UntypedActor {
         } else if (message instanceof BulkHintEvent) {
             BulkHintEvent bulkHintEvent = (BulkHintEvent) message;
             for (HintEvent hint : bulkHintEvent.getHintEvents()) {
-                processHint(hint);
+                expandToSocketHintsIfAppropriate(hint)
+                                .forEach(h -> processHint(h));
             }
             return;
         }
@@ -232,17 +238,48 @@ public class WonNodeControllerActor extends UntypedActor {
      * @param hint
      */
     private void sendHint(HintEvent hint) {
-        if (!crawlWonNodes.containsKey(hint.getFromWonNodeUri())) {
+        if (!crawlWonNodes.containsKey(hint.getRecipientWonNodeUri())) {
             log.warning("cannot send hint to won node {}! Is registered with the won node controller?",
-                            hint.getFromWonNodeUri());
+                            hint.getRecipientWonNodeUri());
             return;
         }
         // send hint to first won node
-        URI eventUri = wonNodeInformationService.generateEventURI(URI.create(hint.getFromWonNodeUri()));
-        hint.setGeneratedEventUri(eventUri);
-        WonNodeConnection fromWonNodeConnection = crawlWonNodes.get(hint.getFromWonNodeUri());
-        log.info("Send hint {} to won node {}", hint, hint.getFromWonNodeUri());
+        WonNodeConnection fromWonNodeConnection = crawlWonNodes.get(hint.getRecipientWonNodeUri());
+        log.info("Send hint {} to won node {}", hint, hint.getRecipientWonNodeUri());
         fromWonNodeConnection.getHintProducer().tell(hint, getSelf());
+    }
+
+    /**
+     * If the HintEvent is an AtomHintEvent, this method checks the respective atoms
+     * for compatible sockets and generates one SocketHintEvent for each
+     * combination. If no such combinations are found, or if the hint is not an
+     * AtomHintEvent, the original hint is returned as the only element in the
+     * collection.
+     * 
+     * @param message
+     * @return
+     */
+    private Collection<HintEvent> expandToSocketHintsIfAppropriate(HintEvent message) {
+        if (message instanceof AtomHintEvent) {
+            AtomHintEvent ahe = (AtomHintEvent) message;
+            Set<Pair<URI>> compatibleSocketPairs = WonLinkedDataUtils.getCompatibleSocketsForAtoms(linkedDataSource,
+                            URI.create(ahe.getRecipientAtomUri()),
+                            URI.create(ahe.getTargetAtomUri()));
+            if (!compatibleSocketPairs.isEmpty()) {
+                return compatibleSocketPairs
+                                .stream()
+                                .map(p -> new SocketHintEvent(
+                                                p.getFirst().toString(),
+                                                ahe.getRecipientWonNodeUri(),
+                                                p.getSecond().toString(),
+                                                ahe.getTargetWonNodeUri(),
+                                                ahe.getMatcherUri(),
+                                                ahe.getScore(),
+                                                ahe.getCause()))
+                                .collect(Collectors.toList());
+            }
+        }
+        return Collections.singletonList(message);
     }
 
     /**

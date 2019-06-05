@@ -105,7 +105,7 @@ public class PersistingWonMessageProcessor implements WonMessageProcessor {
             AtomMessageContainer nec = new AtomMessageContainer(null, parent);
             atomMessageContainerRepository.saveAndFlush(nec);
             return nec;
-        } else if (WonMessageType.CONNECT.equals(type) || WonMessageType.HINT_MESSAGE.equals(type)) {
+        } else if (WonMessageType.CONNECT.equals(type) || WonMessageType.SOCKET_HINT_MESSAGE.equals(type)) {
             // create a connection event container witn null parent (because it will only be
             // persisted at a later point in
             // time)

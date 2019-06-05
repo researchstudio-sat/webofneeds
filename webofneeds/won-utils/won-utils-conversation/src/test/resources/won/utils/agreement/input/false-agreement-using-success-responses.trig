@@ -1,3 +1,5 @@
+@prefix con:   <https://w3id.org/won/content#> .
+@prefix match:   <https://w3id.org/won/matching#> .
 @prefix msg:   <https://w3id.org/won/message#> .
 @prefix conn:  <https://localhost:8443/won/resource/connection/> .
 @prefix woncrypt: <https://w3id.org/won/core#> .
@@ -670,7 +672,7 @@
     atom:7820503869697675000
             a             won:Atom ;
             won:socket  won:ChatSocket ;
-            won:flag   won:UsedForTesting ;
+            match:flag   match:UsedForTesting ;
             dc:title "More Coffee" ;
             dc:title "More Coffee" ;
             dc:title "More Coffee" ;
@@ -706,7 +708,7 @@
 
 <https://localhost:8443/won/resource/event/1435888415723958200#content> {
     event:1435888415723958200
-            won:textMessage  "validate" .
+            con:text  "validate" .
 }
 
 <https://localhost:8443/won/resource/event/ej27d16ryg5cg6hos72l#envelope-xm9b-sig> {
@@ -724,7 +726,7 @@
             a             won:Atom ;
             won:socket  won:ChatSocket ;
             dc:description  "This is an atom automatically created by the DebugBot." ;             dc:title        "Debugging with initial hint: More Coffee" ;             dc:description  "This is an atom automatically created by the DebugBot." ;             dc:title        "Debugging with initial hint: More Coffee" ;             dc:description  "This is an atom automatically created by the DebugBot." ;             dc:title        "Debugging with initial hint: More Coffee" ;
-            won:seeks     _:b0 , _:b1 , _:b2 ;
+            match:seeks     _:b0 , _:b1 , _:b2 ;
             cert:key      [ cert:PublicKey  [ a                       woncrypt:ECCPublicKey ;
                                               woncrypt:ecc_algorithm  "EC" ;
                                               woncrypt:ecc_curveId    "secp384r1" ;
@@ -812,7 +814,7 @@
     event:6671551888677331000
             won:socket        won:ChatSocket ;
             won:targetSocket  won:ChatSocket ;
-            won:textMessage  "hi" .
+            con:text  "hi" .
 }
 
 <https://localhost:8443/won/resource/event/2kt4vylzjcvoz4rtn5tn#envelope-ikk0> {
@@ -1329,7 +1331,7 @@
 
 <https://localhost:8443/won/resource/event/ow321nn1va6clfidc4s0#content-1o90> {
     event:ow321nn1va6clfidc4s0
-            won:textMessage  "Please go on." .
+            con:text  "Please go on." .
 }
 
 <https://localhost:8443/won/resource/event/fbsnd9ilwhqg8f4l2tjg#envelope-jfhm> {
@@ -1358,7 +1360,7 @@
 
 <https://localhost:8443/won/resource/event/5669098069340991000#content> {
     event:5669098069340991000
-            won:textMessage  "one" .
+            con:text  "one" .
 }
 
 <https://localhost:8443/won/resource/event/6671551888677331000#envelope-pj9k> {
@@ -1455,7 +1457,7 @@
 
 <https://localhost:8443/won/resource/event/557600936467257340#content> {
     event:557600936467257340
-            won:textMessage  "two" .
+            con:text  "two" .
 }
 
 <https://localhost:8443/won/resource/event/mt1f8i41bogt7kc91fi6#envelope-ua55> {
@@ -1664,14 +1666,14 @@
             won:connectionState   won:Connected ;
             won:messageContainer    <https://localhost:8443/won/resource/connection/xq6jofxo2w8o05io6dre/events> ;
             won:socket             won:ChatSocket ;
-            won:feedbackEvent     event:4672813835273634000 ;
+            con:feedbackEvent     event:4672813835273634000 ;
             won:targetConnection  conn:4t9deo4t6bqx83jxk5ex ;
             won:targetAtom        atom:nte803gz4pbiw6equ3qa ;
             won:wonNode           <https://localhost:8443/won/resource> .
     
     event:4672813835273634000
-            won:feedback  [ won:forResource      conn:xq6jofxo2w8o05io6dre ;
-                               won:binaryRating  won:Good
+            con:feedback  [ con:feedbackTarget      conn:xq6jofxo2w8o05io6dre ;
+                               con:binaryRating  con:Good
                              ] .
     
     <https://localhost:8443/won/resource/connection/xq6jofxo2w8o05io6dre/events>
@@ -1894,7 +1896,7 @@
     event:75z0ck8d0ijloyvzyo05
             a                     msg:FromExternal ;
             msg:content        <https://localhost:8443/won/resource/event/75z0ck8d0ijloyvzyo05#content-y1fe> ;
-            msg:messageType    msg:HintMessage ;
+            msg:messageType    msg:AtomHintMessage ;
             msg:recipientAtom   atom:7820503869697675000 ;
             msg:recipientNode   <https://localhost:8443/won/resource> ;
             msg:senderNode     <http://localhost:8080/matcher> ;
@@ -2345,7 +2347,7 @@
 
 <https://localhost:8443/won/resource/event/usi9yhill1lo2xi70sjx#content-klsc> {
     event:usi9yhill1lo2xi70sjx
-            won:textMessage  "Greetings! \nI am the DebugBot. I can simulate multiple other users so you can test things. I understand a few commands. \nTo see which ones, type \n\n'usage'\n\n (without the quotes)." .
+            con:text  "Greetings! \nI am the DebugBot. I can simulate multiple other users so you can test things. I understand a few commands. \nTo see which ones, type \n\n'usage'\n\n (without the quotes)." .
 }
 
 <https://localhost:8443/won/resource/event/2kt4vylzjcvoz4rtn5tn#envelope-1xbk> {
@@ -2476,8 +2478,8 @@
 
 <https://localhost:8443/won/resource/event/4672813835273634000#content> {
     event:4672813835273634000
-            won:feedback  [ won:forResource      conn:xq6jofxo2w8o05io6dre ;
-                               won:binaryRating  won:Good
+            con:feedback  [ con:feedbackTarget      conn:xq6jofxo2w8o05io6dre ;
+                               con:binaryRating  con:Good
                              ] .
 }
 
@@ -2551,12 +2553,12 @@
 
 <https://localhost:8443/won/resource/event/00d5wzbbf8hzzt2eewcc#content-tbn3> {
     event:00d5wzbbf8hzzt2eewcc
-            won:textMessage  "I'm not sure I understand you fully." .
+            con:text  "I'm not sure I understand you fully." .
 }
 
 <https://localhost:8443/won/resource/event/mt1f8i41bogt7kc91fi6#content-lqq1> {
     event:mt1f8i41bogt7kc91fi6
-            won:textMessage  "Ok, I'm going to validate the data in our connection. This may take a while." .
+            con:text  "Ok, I'm going to validate the data in our connection. This may take a while." .
 }
 
 <https://localhost:8443/won/resource/event/3jaz102f0678yab8vwx2#envelope-7byg> {

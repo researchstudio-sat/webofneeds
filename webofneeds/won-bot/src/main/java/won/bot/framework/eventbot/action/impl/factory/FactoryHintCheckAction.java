@@ -11,16 +11,18 @@
 package won.bot.framework.eventbot.action.impl.factory;
 
 import java.net.URI;
+import java.util.Optional;
 
 import won.bot.framework.bot.context.FactoryBotContextWrapper;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
+import won.bot.framework.eventbot.action.BotActionUtils;
 import won.bot.framework.eventbot.bus.EventBus;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.impl.factory.FactoryHintEvent;
-import won.bot.framework.eventbot.event.impl.wonmessage.HintFromMatcherEvent;
+import won.bot.framework.eventbot.event.impl.wonmessage.AtomHintFromMatcherEvent;
+import won.bot.framework.eventbot.event.impl.wonmessage.SocketHintFromMatcherEvent;
 import won.bot.framework.eventbot.listener.EventListener;
-import won.protocol.model.Match;
 
 /**
  * Checks if the received hint is for a factoryURI
@@ -32,20 +34,22 @@ public class FactoryHintCheckAction extends BaseEventBotAction {
 
     @Override
     protected void doRun(Event event, EventListener executingListener) throws Exception {
-        if (!(event instanceof HintFromMatcherEvent)
+        if (!(event instanceof AtomHintFromMatcherEvent) || event instanceof SocketHintFromMatcherEvent
                         || !(getEventListenerContext().getBotContextWrapper() instanceof FactoryBotContextWrapper)) {
             logger.error("FactoryHintCheckAction can only handle HintFromMatcherEvent with FactoryBotContextWrapper");
             return;
         }
         FactoryBotContextWrapper botContextWrapper = (FactoryBotContextWrapper) getEventListenerContext()
                         .getBotContextWrapper();
-        Match match = ((HintFromMatcherEvent) event).getMatch();
-        URI ownUri = match.getFromAtom();
-        URI requesterUri = match.getToAtom();
-        if (botContextWrapper.isFactoryAtom(ownUri)) {
-            logger.debug("FactoryHint for factoryURI: " + ownUri + " from the requesterUri: " + requesterUri);
+        Optional<URI> ownUri = BotActionUtils.getRecipientAtomURIFromHintEvent(event,
+                        getEventListenerContext().getLinkedDataSource());
+        Optional<URI> requesterUri = BotActionUtils.getTargetAtomURIFromHintEvent(event,
+                        getEventListenerContext().getLinkedDataSource());
+        if (ownUri.isPresent() && requesterUri.isPresent() && botContextWrapper.isFactoryAtom(ownUri.get())) {
+            logger.debug("FactoryHint for factoryURI: " + ownUri.get() + " from the requesterUri: "
+                            + requesterUri.get());
             EventBus bus = getEventListenerContext().getEventBus();
-            bus.publish(new FactoryHintEvent(requesterUri, ownUri));
+            bus.publish(new FactoryHintEvent(requesterUri.get(), ownUri.get()));
         } else {
             logger.warn("NON FactoryHint for URI: " + ownUri + " from the requesterUri: " + requesterUri
                             + " ignore the hint");

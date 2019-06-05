@@ -13,14 +13,6 @@ EOF
 script_path="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 source ${script_path}/common.sh $* 
 
-oldforms_file=${confdir}/oldforms.txt
-newforms_file=${confdir}/newforms.txt
-oldforms_file_expanded=${confdir}/generated/oldforms-expanded.txt
-newforms_file_expanded=${confdir}/generated/newforms-expanded.txt
-sed_script_file=${confdir}/generated/sed-changefile-regexes.txt
-sed_script_file_db_migration=${confdir}/generated/sed-db-migration-regexes.txt
-grep_script_file=${confdir}/generated/grep-checkfile-regex.txt
-
 mkdir -p ${confdir}/generated
 
 function join_by { local IFS="$1"; shift; echo "$*"; }
@@ -39,8 +31,8 @@ IFS=${myifs}
 if [[ ${#oldforms[@]} != ${#newforms[@]} ]]
 then
 	echo "ERROR: ${oldforms_file} and ${newforms_file} must have the same number of lines!" >&2
-	echo "${oldforms_file}: " $(wc -l ${oldforms_file} | awk '{print $1;}') " lines" >&2
-	echo "${newforms_file}: " $(wc -l ${newforms_file} | awk '{print $1;}') " lines" >&2
+	echo "${oldforms_file}: " $(wc -l ${oldforms_file} | awk '{print $1;}') " lines (generated ${#oldforms[@]} forms)" >&2
+	echo "${newforms_file}: " $(wc -l ${newforms_file} | awk '{print $1;}') " lines (generated ${#newforms[@]} forms)" >&2
 	exit 1
 fi
 

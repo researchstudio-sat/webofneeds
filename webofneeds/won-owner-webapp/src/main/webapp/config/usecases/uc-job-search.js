@@ -36,6 +36,7 @@ export const jobSearch = {
       },
     }),
   },
+  reactionUseCases: ["jobOffer"],
   details: {
     title: { ...details.title },
     description: { ...details.description },
@@ -82,10 +83,11 @@ export const jobSearch = {
     const skillsSQ = tagOverlapScoreSubQuery({
       resultName: resultName,
       bindScoreAs: "?skills_jaccardIndex",
-      pathToTags: "won:seeks/s:knowsAbout",
+      pathToTags: "match:seeks/s:knowsAbout",
       prefixesInPath: {
         s: won.defaultContext["s"],
         won: won.defaultContext["won"],
+        match: won.defaultContext["match"],
       },
       tagLikes: getIn(draft, ["content", "skills"]),
     });
@@ -133,6 +135,7 @@ export const jobSearch = {
       prefixesInPath: {
         s: won.defaultContext["s"],
         won: won.defaultContext["won"],
+        con: won.defaultContext["con"],
       },
       geoCoordinates: getIn(draft, ["seeks", "jobLocation"]),
     });

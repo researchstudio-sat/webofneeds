@@ -14,17 +14,17 @@ import java.net.URI;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
-import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.springframework.stereotype.Component;
+
 import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.camel.processor.annotation.FixedMessageProcessor;
 import won.protocol.message.WonMessage;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.model.Connection;
 import won.protocol.util.RdfUtils;
-import won.protocol.vocabulary.WON;
+import won.protocol.vocabulary.WONCON;
 import won.protocol.vocabulary.WONMSG;
 
 /**
@@ -54,7 +54,7 @@ public class HintFeedbackMessageFromOwnerProcessor extends AbstractCamelProcesso
         final URI messageURI = message.getMessageURI();
         RdfUtils.visit(message.getMessageContent(), model -> {
             Resource baseResource = model.getResource(messageURI.toString());
-            if (baseResource.hasProperty(WON.feedback)) {
+            if (baseResource.hasProperty(WONCON.feedback)) {
                 // add the base resource as a feedback event to the connection
                 processFeedback(con, baseResource);
             }

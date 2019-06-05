@@ -4,7 +4,7 @@ import { parseConnection } from "./parse-connection.js";
 import { markUriAsRead } from "../../won-localstorage.js";
 
 import { markAtomAsRead } from "./reduce-atoms.js";
-import { getIn } from "../../utils.js";
+import { getIn, get } from "../../utils.js";
 
 export function storeConnectionsData(state, connectionsToStore) {
   if (connectionsToStore && connectionsToStore.size > 0) {
@@ -18,24 +18,24 @@ export function storeConnectionsData(state, connectionsToStore) {
 /**
  * Adds the connection to the atoms connections.
  *
- * @param state
+ * @param atomState
  * @param connection
  * @param newConnection
  * @return {*}
  */
-function addConnectionFull(state, connection) {
+function addConnectionFull(atomState, connection) {
   let parsedConnection = parseConnection(connection);
 
   if (parsedConnection) {
-    const atomUri = parsedConnection.get("belongsToUri");
-    const atom = state.get(atomUri);
+    const atomUri = get(parsedConnection, "belongsToUri");
+    const atom = get(atomState, atomUri);
 
     if (atom) {
-      const targetAtomUri = parsedConnection.getIn(["data", "targetAtomUri"]);
-      const connectionUri = parsedConnection.getIn(["data", "uri"]);
+      const targetAtomUri = getIn(parsedConnection, ["data", "targetAtomUri"]);
+      const connectionUri = getIn(parsedConnection, ["data", "uri"]);
 
-      const socketUri = parsedConnection.get("socketUri");
-      const realSocket = atom.getIn(["content", "sockets", socketUri]);
+      const socketUri = getIn(parsedConnection, ["data", "socketUri"]);
+      const realSocket = getIn(atom, ["content", "sockets", socketUri]);
 
       parsedConnection = parsedConnection.setIn(["data", "socket"], realSocket);
 
@@ -49,9 +49,9 @@ function addConnectionFull(state, connection) {
         );
 
         if (holdsUri) {
-          const currentHolds = state.getIn([atomUri, "holds"]);
+          const currentHolds = getIn(atomState, [atomUri, "holds"]);
           if (currentHolds && !currentHolds.includes(holdsUri)) {
-            state = state.updateIn([atomUri, "holds"], holdsList =>
+            atomState = atomState.updateIn([atomUri, "holds"], holdsList =>
               holdsList.push(holdsUri)
             );
           }
@@ -67,15 +67,18 @@ function addConnectionFull(state, connection) {
         );
 
         if (heldByUri) {
-          state = state.setIn([atomUri, "heldBy"], heldByUri);
+          atomState = atomState.setIn([atomUri, "heldBy"], heldByUri);
         }
       }
 
-      const targetAtom = state.get(targetAtomUri);
+      const targetAtom = get(atomState, targetAtomUri);
 
       if (targetAtom) {
-        const targetSocketUri = parsedConnection.get("targetSocketUri");
-        const realTargetSocket = targetAtom.getIn([
+        const targetSocketUri = getIn(parsedConnection, [
+          "data",
+          "targetSocketUri",
+        ]);
+        const realTargetSocket = getIn(targetAtom, [
           "content",
           "sockets",
           targetSocketUri,
@@ -89,16 +92,16 @@ function addConnectionFull(state, connection) {
         }
       }
 
-      if (parsedConnection.getIn(["data", "unread"])) {
+      if (getIn(parsedConnection, ["data", "unread"])) {
         //If there is a new message for the connection we will set the connection to newConnection
-        state = state.setIn(
+        atomState = atomState.setIn(
           [atomUri, "lastUpdateDate"],
           parsedConnection.getIn(["data", "lastUpdateDate"])
         );
-        state = state.setIn([atomUri, "unread"], true);
+        atomState = atomState.setIn([atomUri, "unread"], true);
       }
 
-      return state.mergeDeepIn(
+      return atomState.mergeDeepIn(
         [atomUri, "connections", connectionUri],
         parsedConnection.get("data")
       );
@@ -111,7 +114,7 @@ function addConnectionFull(state, connection) {
       );
     }
   }
-  return state;
+  return atomState;
 }
 
 export function markConnectionAsRead(state, connectionUri, atomUri) {

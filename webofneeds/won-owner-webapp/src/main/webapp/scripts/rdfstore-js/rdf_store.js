@@ -1,20 +1,13 @@
 (function() {
 
-
-
-  if(typeof(console)=='undefined') {
-     console = {};
-     console.log = function(e){};
-  }
-
   // renamed s/process/rdfProcess/ so it doesn't overwrite
   // the system variable `process` (e.g. process.plattform)
   // NOTE: this is why not to use global variables. exactly this.
   window.rdfProcess = {};
-  rdfProcess.nextTick = function(f) {
+  window.rdfProcess.nextTick = function(f) {
     setTimeout(f,0);
   };
-var Utils = {};
+let Utils = {};
 
 
 
@@ -41,15 +34,16 @@ Utils.clone = function(o) {
 };
 
 Utils.shuffle = function(o){ //v1.0
-    for(var j, x, i = o.length; i; j = parseInt(Math.random() * i), x = o[--i], o[i] = o[j], o[j] = x){};
+    // eslint-disable-next-line no-empty
+    for(let j, x, i = o.length; i; j = parseInt(Math.random() * i), x = o[--i], o[i] = o[j], o[j] = x){}
     return o;
 };
 
 Utils.include = function(a,v) {
-    var cmp = arguments[2];
+    let cmp = arguments[2];
 
-    for(var i=(a.length-1); i>=0; i--) {
-        var res = false;
+    for(let i=(a.length-1); i>=0; i--) {
+        let res = false;
         if(cmp == null) {
             res = (a[i] === v);
         } else {
@@ -65,8 +59,8 @@ Utils.include = function(a,v) {
 };
 
 Utils.remove = function(a,v) {
-    var acum = [];
-    for(var i=0; i<a.length; i++) {
+    let acum = [];
+    for(let i=0; i<a.length; i++) {
         if(a[i] !== v) {
             acum.push(a[i]);
         }
@@ -113,10 +107,10 @@ Utils.meanwhile = function(c,floop,fend,env) {
 };
 
 Utils.seq = function() {
-    var fs = arguments;
+    let fs = arguments;
     return function(callback) {
         Utils.repeat(0, fs.length, function(k,env){
-            var floop = arguments.callee;
+            let floop = arguments.callee;
             fs[env._i](function(){
                 k(floop, env);
             });
@@ -128,14 +122,14 @@ Utils.seq = function() {
 
 
 Utils.partition = function(c, n) {
-    var rem = c.length % n;
-    var currentGroup = [];
-    for(var i=0; i<rem; i++) {
+    let rem = c.length % n;
+    let currentGroup = [];
+    for(let i=0; i<rem; i++) {
         currentGroup.push(null);
     }
     
-    var groups = [];
-    for(var i=0; i<c.length; i++) {
+    let groups = [];
+    for(let i=0; i<c.length; i++) {
         currentGroup.push(c[i]);
         if(currentGroup.length % n == 0) {
             groups.push(currentGroup);
@@ -146,8 +140,8 @@ Utils.partition = function(c, n) {
 };
 
 Utils.keys = function(obj) {
-    var variables = [];
-    for(var variable in obj) {
+    let variables = [];
+    for(let variable in obj) {
         variables.push(variable);
     }
 
@@ -168,13 +162,13 @@ Utils.iso8601 = function(date) {
 
 
 Utils.parseISO8601 = function (str) {
-    var regexp = "^([0-9]{4})(-([0-9]{2})(-([0-9]{2})" +
-        "(T([0-9]{2}):([0-9]{2})(:([0-9]{2})(\.([0-9]+))?)?" +
+    let regexp = "^([0-9]{4})(-([0-9]{2})(-([0-9]{2})" +
+        "(T([0-9]{2}):([0-9]{2})(:([0-9]{2})(\\.([0-9]+))?)?" +
         "(Z|(([-+])([0-9]{2}):([0-9]{2})))?)?)?)?";
-    var d = str.match(new RegExp(regexp));
+    let d = str.match(new RegExp(regexp));
 
-    var offset = 0;
-    var date = new Date(d[1], 0, 1);
+    let offset = 0;
+    let date = new Date(d[1], 0, 1);
 
     if (d[3]) { date.setMonth(d[3] - 1); }
     if (d[5]) { date.setDate(d[5]);  }
@@ -188,16 +182,16 @@ Utils.parseISO8601 = function (str) {
     }
 
     offset -= date.getTimezoneOffset();
-    var time = (Number(date) + (offset * 60 * 1000));
-    var toReturn = new Date();
+    let time = (Number(date) + (offset * 60 * 1000));
+    let toReturn = new Date();
     toReturn.setTime(Number(time));
     return toReturn;
 };
 
 Utils.parseISO8601Components = function (str) {
-    var regexp = "([0-9]{4})(-([0-9]{2}))(-([0-9]{2}))(T([0-9]{2}):([0-9]{2})(:([0-9]{2}))?(\.([0-9]+))?)?(Z|([-+])([0-9]{2})(:([0-9]{2}))?)?";
-    var d = str.match(new RegExp(regexp));
-    var year, month, date, hours, minutes, seconds, millisecs, timezone;
+    let regexp = "([0-9]{4})(-([0-9]{2}))(-([0-9]{2}))(T([0-9]{2}):([0-9]{2})(:([0-9]{2}))?(\\.([0-9]+))?)?(Z|([-+])([0-9]{2})(:([0-9]{2}))?)?";
+    let d = str.match(new RegExp(regexp));
+    let year, month, date, hours, minutes, seconds, millisecs, timezone;
     year = Number(d[1]);
     month = d[3] - 1;
     date  = Number(d[5]);
@@ -231,13 +225,13 @@ Utils.parseISO8601Components = function (str) {
 };
 
 Utils.compareDateComponents = function(stra,strb) {
-    var a = Utils.parseISO8601Components(stra);
-    var b = Utils.parseISO8601Components(strb);
+    let a = Utils.parseISO8601Components(stra);
+    let b = Utils.parseISO8601Components(strb);
 
     if((a.timezone == null && b.timezone == null) ||
        (a.timezone != null && b.timezone != null)) {        
-        var da = Utils.parseISO8601(stra);
-        var db = Utils.parseISO8601(strb);
+        const da = Utils.parseISO8601(stra);
+        const db = Utils.parseISO8601(strb);
         
         if(da.getTime() == db.getTime()) {
             return 0;
@@ -247,12 +241,12 @@ Utils.compareDateComponents = function(stra,strb) {
             return 1;
         }
     } else if (a.timezone != null && b.timezone == null){
-        da = Utils.parseISO8601(stra);
-        db = Utils.parseISO8601(strb);
-        var ta = da.getTime();
-        var tb = db.getTime();
+        const da = Utils.parseISO8601(stra);
+        const db = Utils.parseISO8601(strb);
+        const ta = da.getTime();
+        const tb = db.getTime();
 
-        var offset = 14*60*60;
+        const offset = 14*60*60;
 
         if(ta < tb && ta < (tb + offset)) {
             return -1;
@@ -262,12 +256,12 @@ Utils.compareDateComponents = function(stra,strb) {
         return null;
         }
     } else {
-        da = Utils.parseISO8601(stra);
-        db = Utils.parseISO8601(strb);
-        ta = da.getTime();
-        tb = db.getTime();
+        const da = Utils.parseISO8601(stra);
+        const db = Utils.parseISO8601(strb);
+        const ta = da.getTime();
+        const tb = db.getTime();
 
-        var offset = 14*60*60;
+        const offset = 14*60*60;
         if(ta < tb && (ta + offset)  < tb) {
             return -1;
         } else if(ta > tb && (ta + offset) > tb) {
@@ -280,21 +274,21 @@ Utils.compareDateComponents = function(stra,strb) {
 
 // RDF utils
 Utils.lexicalFormLiteral = function(term, env) {
-    var value = term.value;
-    var lang = term.lang;
-    var type = term.type;
+    let value = term.value;
+    let lang = term.lang;
+    let type = term.type;
 
-    var indexedValue = null;
+    let indexedValue = null;
     if(value != null && type != null && typeof(type) != 'string') {
-        var typeValue = type.value;
+        let typeValue = type.value;
 
         if(typeValue == null) {
-            var typePrefix = type.prefix;
-            var typeSuffix = type.suffix;
+            let typePrefix = type.prefix;
+            let typeSuffix = type.suffix;
 
-            var resolvedPrefix = env.namespaces[typePrefix];
+            let resolvedPrefix = env.namespaces[typePrefix];
             term.type = resolvedPrefix+typeSuffix;
-	    typeValue = resolvedPrefix+typeSuffix;
+            typeValue = resolvedPrefix+typeSuffix;
         }
 	// normalization
 	if(typeValue.indexOf('hexBinary') != -1) {
@@ -308,19 +302,19 @@ Utils.lexicalFormLiteral = function(term, env) {
         } else if(type == null) {
             indexedValue = '"' + value + '"' + "@" + lang;        
         } else {
-	    // normalization
-	    if(type.indexOf('hexBinary') != -1) {
-		indexedValue = '"' + term.value.toLowerCase() + '"^^<'+type+'>';
-	    } else {
-		indexedValue = '"' + term.value + '"^^<'+type+'>';
-	    }
+          // normalization
+          if(type.indexOf('hexBinary') != -1) {
+            indexedValue = '"' + term.value.toLowerCase() + '"^^<'+type+'>';
+          } else {
+            indexedValue = '"' + term.value + '"^^<'+type+'>';
+          }
         }
     }
     return indexedValue;
 };
 
 Utils.lexicalFormBaseUri = function(term, env) {
-    var uri = null;
+    let uri = null;
     env = env || {};
     //console.log("*** normalizing URI token:");
     //console.log(term);
@@ -328,9 +322,9 @@ Utils.lexicalFormBaseUri = function(term, env) {
         //console.log(" - URI has prefix and suffix");
         //console.log(" - prefix:"+term.prefix);
         //console.log(" - suffixx:"+term.suffix);
-        var prefix = term.prefix;
-        var suffix = term.suffix;
-        var resolvedPrefix = env.namespaces[prefix];
+        let prefix = term.prefix;
+        let suffix = term.suffix;
+        let resolvedPrefix = env.namespaces[prefix];
         if(resolvedPrefix != null) {            
             uri = resolvedPrefix+suffix;
         } else {
@@ -364,7 +358,7 @@ Utils.lexicalFormTerm = function(term, ns) {
     } else if(term.token === 'literal') {
         return {'literal': Utils.lexicalFormLiteral(term, ns)};
     } else if(term.token === 'blank') {
-        var label = '_:'+term.value;
+        let label = '_:'+term.value;
         return {'blank': label};
     } else {
 	throw new Error("Error, cannot get lexical form of unknown token: "+term.token);
@@ -372,9 +366,9 @@ Utils.lexicalFormTerm = function(term, ns) {
 };
 
 Utils.normalizeUnicodeLiterals = function (string) {
-    var escapedUnicode = string.match(/\\u[0-9abcdefABCDEF]{4,4}/g) || [];
-    var dups = {};
-    for (var i = 0; i < escapedUnicode.length; i++) {
+    let escapedUnicode = string.match(/\\u[0-9abcdefABCDEF]{4,4}/g) || [];
+    let dups = {};
+    for (let i = 0; i < escapedUnicode.length; i++) {
         if (dups[escapedUnicode[i]] == null) {
             dups[escapedUnicode[i]] = true;
             string = string.replace(new RegExp("\\" + escapedUnicode[i], "g"), eval("'" + escapedUnicode[i] + "'"));
@@ -393,7 +387,7 @@ Utils.hashTerm = function(term) {
       } else if(term.token === 'blank') {
           return "b"+term.value;
       } else if(term.token === 'literal') {
-          var l = "l"+term.value;
+          let l = "l"+term.value;
           l = l + (term.type || "");
           l = l + (term.lang || "");        
    
@@ -401,8 +395,8 @@ Utils.hashTerm = function(term) {
       }
     } catch(e) {
         if(typeof(term) === 'object') {
-            var key = "";
-            for(p in term) {
+            let key = "";
+            for(const p in term) {
                 key = key + p + term[p];
             }
 
@@ -416,10 +410,10 @@ Utils.hashTerm = function(term) {
 // end of ./src/js-trees/src/utils.js 
 
 // exports
-var InMemoryBTree = {};
+let InMemoryBTree = {};
 
-var left = -1;
-var right = 1;
+let left = -1;
+let right = 1;
 
 
 /**
@@ -475,7 +469,7 @@ InMemoryBTree.Tree.prototype._allocateNode = function () {
  *
  * Persists the node to secondary memory.
  */
-InMemoryBTree.Tree.prototype._diskWrite= function(node) {
+InMemoryBTree.Tree.prototype._diskWrite= function() {
     // dummy implementation;
     // no-op
 };
@@ -494,7 +488,7 @@ InMemoryBTree.Tree.prototype._diskRead = function(pointer) {
 };
 
 
-InMemoryBTree.Tree.prototype._diskDelete= function(node) {
+InMemoryBTree.Tree.prototype._diskDelete= function() {
     // dummy implmentation
     // no-op
 };
@@ -524,11 +518,11 @@ InMemoryBTree.Tree.prototype.clear = function() {
  * If no node is found, null is returned.
  */
 InMemoryBTree.Tree.prototype.search = function(key, checkExists) {
-    var searching = true;
-    var node = this.root;
+    let searching = true;
+    let node = this.root;
 
     while(searching) {
-        var idx = 0;
+        let idx = 0;
         while(idx < node.numberActives && this.comparator(key, node.keys[idx].key) === 1) {
             idx++;
         }
@@ -563,11 +557,11 @@ InMemoryBTree.Tree.prototype.walk = function(f) {
 
 InMemoryBTree.Tree.prototype._walk = function(f,node) {
     if(node.isLeaf) {
-        for(var i=0; i<node.numberActives; i++) {
+        for(let i=0; i<node.numberActives; i++) {
             f(node.keys[i]);
         }
     } else {
-        for(var i=0; i<node.numberActives; i++) {
+        for(let i=0; i<node.numberActives; i++) {
             this._walk(f,this._diskRead(node.children[i]));
             f(node.keys[i]);
         }
@@ -589,7 +583,7 @@ InMemoryBTree.Tree.prototype._walkNodes = function(f,node) {
         f(node);
     } else {
         f(node);
-        for(var i=0; i<node.numberActives; i++) {
+        for(let i=0; i<node.numberActives; i++) {
             this._walkNodes(f,this._diskRead(node.children[i]));
         }
         this._walkNodes(f,this._diskRead(node.children[node.numberActives]));
@@ -602,22 +596,23 @@ InMemoryBTree.Tree.prototype._walkNodes = function(f,node) {
  * Split the child node and adjusts the parent.
  */
 InMemoryBTree.Tree.prototype._splitChild = function(parent, index, child) {
-    var newChild = this._allocateNode();
+    let newChild = this._allocateNode();
     newChild.isLeaf = child.isLeaf;
     newChild.level = child.level;
     newChild.numberActives = this.order - 1;
 
     // Copy the higher order keys to the new child
-    var newParentChild = child.keys[this.order-1];
+    let newParentChild = child.keys[this.order-1];
     child.keys[this.order-1] = null;
 
-    for(var i=0; i< this.order-1; i++) {
-	newChild.keys[i]=child.keys[i+this.order];
-	child.keys[i+this.order] = null;
-	if(!child.isLeaf) {
-	    newChild.children[i] = child.children[i+this.order];
-            child.children[i+this.order] = null;
-	}
+    let i = 0;
+    for(; i< this.order-1; i++) {
+      newChild.keys[i]=child.keys[i+this.order];
+      child.keys[i+this.order] = null;
+      if(!child.isLeaf) {
+        newChild.children[i] = child.children[i+this.order];
+        child.children[i+this.order] = null;
+      }
     }
 
     // Copy the last child pointer
@@ -655,7 +650,7 @@ InMemoryBTree.Tree.prototype._splitChild = function(parent, index, child) {
  */
 InMemoryBTree.Tree.prototype.insert = function(key,data) {
     if(this.root.numberActives === (2 * this.order - 1)) {
-        var newRoot = this._allocateNode();
+        let newRoot = this._allocateNode();
         newRoot.isLeaf = false;
         newRoot.level = this.root.level + 1;
         newRoot.numberActives = 0;
@@ -678,14 +673,14 @@ InMemoryBTree.Tree.prototype.insert = function(key,data) {
  * in the BTree hierarchy.
  */
 InMemoryBTree.Tree.prototype._insertNonFull = function(node,key,data) {
-    var idx = node.numberActives - 1;
+    let idx = node.numberActives - 1;
 
     while(!node.isLeaf) {
         while(idx>=0 && this.comparator(key,node.keys[idx].key) === -1) {
             idx--;
         }
         idx++;
-        var child = this._diskRead(node.children[idx]);
+        let child = this._diskRead(node.children[idx]);
 
         if(child.numberActives === 2*this.order -1) {
             this._splitChild(node,idx,child);
@@ -717,19 +712,19 @@ InMemoryBTree.Tree.prototype._insertNonFull = function(node,key,data) {
  * @returns true if the key is deleted false otherwise
  */
 InMemoryBTree.Tree.prototype['delete'] = function(key) {
-    var node = this.root;
-    var parent = null;
-    var searching = true;
-    var idx = null;
-    var lsibling = null;
-    var rsibling = null;
-    var shouldContinue = true;
+    let node = this.root;
+    let parent = null;
+    let searching = true;
+    let idx = null;
+    let lsibling = null;
+    let rsibling = null;
+    let shouldContinue = true;
 
     while(shouldContinue === true) {
         shouldContinue = false;
 
         while(searching === true) {
-            i = 0;
+            let i = 0;
 
             if(node.numberActives === 0) {
                 return false;
@@ -808,10 +803,10 @@ InMemoryBTree.Tree.prototype['delete'] = function(key) {
 
         //Case 2: The node containing the key is found and is an internal node
         if(node.isLeaf === false) {
-            var tmpNode = null;
-            var tmpNode2 = null;
+            let tmpNode = null;
+            let tmpNode2 = null;
             if((tmpNode=this._diskRead(node.children[idx])).numberActives > (this.order-1)) {
-                var subNodeIdx = this._getMaxKeyPos(tmpNode);
+                const subNodeIdx = this._getMaxKeyPos(tmpNode);
                 key = subNodeIdx.node.keys[subNodeIdx.index];
 
                 node.keys[idx] = key;
@@ -823,7 +818,7 @@ InMemoryBTree.Tree.prototype['delete'] = function(key) {
                 shouldContinue = true;
                 searching = true;
             } else if ((tmpNode = this._diskRead(node.children[idx+1])).numberActives >(this.order-1)) {
-                var subNodeIdx = this._getMinKeyPos(tmpNode);
+                const subNodeIdx = this._getMinKeyPos(tmpNode);
                 key = subNodeIdx.node.keys[subNodeIdx.index];
 
                 node.keys[idx] = key;
@@ -837,13 +832,14 @@ InMemoryBTree.Tree.prototype['delete'] = function(key) {
             } else if((tmpNode = this._diskRead(node.children[idx])).numberActives === (this.order-1) &&
                       (tmpNode2 = this._diskRead(node.children[idx+1])).numberActives === (this.order-1)) {
 
-                var combNode = this._mergeNodes(tmpNode, node.keys[idx], tmpNode2);
+                let combNode = this._mergeNodes(tmpNode, node.keys[idx], tmpNode2);
                 node.children[idx] = combNode;
 
                 idx++;
-                for(var i=idx; i<node.numberActives; i++) {
-          	    node.children[i] = node.children[i+1];
-          	    node.keys[i-1] = node.keys[i];
+                let i = idx;
+                for(; i<node.numberActives; i++) {
+                  node.children[i] = node.children[i+1];
+                  node.keys[i-1] = node.keys[i];
                 }
                 // freeing unused references
                 node.children[i] = null;
@@ -896,8 +892,8 @@ InMemoryBTree.Tree.prototype._moveKey = function (parent, i, position) {
     }
 
     //var lchild = parent.children[i-1];
-    var lchild = this._diskRead(parent.children[i]);
-    var rchild = this._diskRead(parent.children[i + 1]);
+    let lchild = this._diskRead(parent.children[i]);
+    let rchild = this._diskRead(parent.children[i + 1]);
 
 
     if (position == left) {
@@ -908,7 +904,7 @@ InMemoryBTree.Tree.prototype._moveKey = function (parent, i, position) {
 
         parent.keys[i] = rchild.keys[0];
 
-        for (var _i = 1; _i < rchild.numberActives; _i++) {
+        for (let _i = 1; _i < rchild.numberActives; _i++) {
             rchild.keys[_i - 1] = rchild.keys[_i];
             rchild.children[_i - 1] = rchild.children[_i];
         }
@@ -916,7 +912,7 @@ InMemoryBTree.Tree.prototype._moveKey = function (parent, i, position) {
         rchild.numberActives--;
     } else {
         rchild.children[rchild.numberActives + 1] = rchild.children[rchild.numberActives];
-        for (var _i = rchild.numberActives; _i > 0; _i--) {
+        for (let _i = rchild.numberActives; _i > 0; _i--) {
             rchild.children[_i] = rchild.children[_i - 1];
             rchild.keys[_i] = rchild.keys[_i - 1];
         }
@@ -947,9 +943,9 @@ InMemoryBTree.Tree.prototype._moveKey = function (parent, i, position) {
  * @param parent the node whose children will be merged
  * @param i Index of the key in the parent pointing to the nodes to merge
  */
-InMemoryBTree.Tree.prototype._mergeSiblings = function (parent, index, pos) {
-    var i, j;
-    var n1, n2;
+InMemoryBTree.Tree.prototype._mergeSiblings = function (parent, index) {
+    let i, j;
+    let n1, n2;
 
     if (index === (parent.numberActives)) {
         index--;
@@ -961,7 +957,7 @@ InMemoryBTree.Tree.prototype._mergeSiblings = function (parent, index, pos) {
     }
 
     //Merge the current node with the left node
-    var newNode = this._allocateNode();
+    let newNode = this._allocateNode();
     newNode.isLeaf = n1.isLeaf;
     newNode.level = n1.level;
 
@@ -1023,19 +1019,17 @@ InMemoryBTree.Tree.prototype._mergeSiblings = function (parent, index, pos) {
  * @return true if the key can be deleted, false otherwise
  */
 InMemoryBTree.Tree.prototype._deleteKeyFromNode = function (node, index) {
-    var keysMax = (2 * this.order) - 1;
+    let keysMax = (2 * this.order) - 1;
     if (node.numberActives < keysMax) {
         keysMax = node.numberActives;
     }
-    ;
+    
 
-    var i;
+    let i;
 
     if (node.isLeaf === false) {
         return false;
     }
-
-    var key = node.keys[index];
 
     for (i = index; i < keysMax - 1; i++) {
         node.keys[i] = node.keys[i + 1];
@@ -1052,8 +1046,8 @@ InMemoryBTree.Tree.prototype._deleteKeyFromNode = function (node, index) {
 };
 
 InMemoryBTree.Tree.prototype._mergeNodes = function (n1, key, n2) {
-    var newNode;
-    var i;
+    let newNode;
+    let i;
 
     newNode = this._allocateNode();
     newNode.isLeaf = true;
@@ -1089,14 +1083,14 @@ InMemoryBTree.Tree.prototype._mergeNodes = function (n1, key, n2) {
  * valid.
  */
 InMemoryBTree.Tree.prototype.audit = function (showOutput) {
-    var errors = [];
-    var alreadySeen = [];
-    var that = this;
+    let errors = [];
+    let alreadySeen = [];
+    const that = this;
 
-    var foundInArray = function (data) {
-        for (var i = 0; i < alreadySeen.length; i++) {
+    const foundInArray = function (data) {
+        for (let i = 0; i < alreadySeen.length; i++) {
             if (that.comparator(alreadySeen[i], data) === 0) {
-                var error = " !!! duplicated key " + data;
+                let error = " !!! duplicated key " + data;
                 if (showOutput === true) {
                     console.log(error);
                 }
@@ -1105,8 +1099,7 @@ InMemoryBTree.Tree.prototype.audit = function (showOutput) {
         }
     };
 
-    var length = null;
-    var that = this;
+    let length = null;
     this.walkNodes(function (n) {
         if (showOutput === true) {
             console.log("--- Node at " + n.level + " level");
@@ -1114,7 +1107,7 @@ InMemoryBTree.Tree.prototype.audit = function (showOutput) {
             console.log(" - num actives? " + n.numberActives);
             console.log(" - keys: ");
         }
-        for (var i = n.numberActives; i < n.keys.length; i++) {
+        for (let i = n.numberActives; i < n.keys.length; i++) {
             if (n.keys[i] != null) {
                 if (showOutput === true) {
                     console.log(" * warning : redundant key data");
@@ -1123,7 +1116,7 @@ InMemoryBTree.Tree.prototype.audit = function (showOutput) {
             }
         }
 
-        for (var i = n.numberActives + 1; i < n.children.length; i++) {
+        for (let i = n.numberActives + 1; i < n.children.length; i++) {
             if (n.children[i] != null) {
                 if (showOutput === true) {
                     console.log(" * warning : redundant children data");
@@ -1134,21 +1127,21 @@ InMemoryBTree.Tree.prototype.audit = function (showOutput) {
 
 
         if (n.isLeaf === false) {
-            for (var i = 0; i < n.numberActives; i++) {
-                var maxLeft = that._diskRead(n.children[i]).keys[that._diskRead(n.children[i]).numberActives - 1 ].key;
-                var minRight = that._diskRead(n.children[i + 1]).keys[0].key;
+            for (let i = 0; i < n.numberActives; i++) {
+                let maxLeft = that._diskRead(n.children[i]).keys[that._diskRead(n.children[i]).numberActives - 1 ].key;
+                let minRight = that._diskRead(n.children[i + 1]).keys[0].key;
                 if (showOutput === true) {
                     console.log("   " + n.keys[i].key + "(" + maxLeft + "," + minRight + ")");
                 }
                 if (that.comparator(n.keys[i].key, maxLeft) === -1) {
-                    var error = " !!! value max left " + maxLeft + " > key " + n.keys[i].key;
+                  const error = " !!! value max left " + maxLeft + " > key " + n.keys[i].key;
                     if (showOutput === true) {
                         console.log(error);
                     }
                     errors.push(error);
                 }
                 if (that.comparator(n.keys[i].key, minRight) === 1) {
-                    var error = " !!! value min right " + minRight + " < key " + n.keys[i].key;
+                    const error = " !!! value min right " + minRight + " < key " + n.keys[i].key;
                     if (showOutput === true) {
                         console.log(error);
                     }
@@ -1163,14 +1156,14 @@ InMemoryBTree.Tree.prototype.audit = function (showOutput) {
                 length = n.level;
             } else {
                 if (length != n.level) {
-                    var error = " !!! Leaf node with wrong level value";
+                    const error = " !!! Leaf node with wrong level value";
                     if (showOutput === true) {
                         console.log(error);
                     }
                     errors.push(error);
                 }
             }
-            for (var i = 0; i < n.numberActives; i++) {
+            for (let i = 0; i < n.numberActives; i++) {
                 if (showOutput === true) {
                     console.log(" " + n.keys[i].key);
                 }
@@ -1182,15 +1175,17 @@ InMemoryBTree.Tree.prototype.audit = function (showOutput) {
 
         if (n != that.root) {
             if (n.numberActives > ((2 * that.order) - 1)) {
+                let error;
                 if (showOutput === true) {
-                    var error = " !!!! MAX num keys restriction violated ";
+                    error = " !!!! MAX num keys restriction violated ";
                 }
                 console.log(error);
                 errors.push(error);
             }
             if (n.numberActives < (that.order - 1)) {
-                if (showOutput === true) {
-                    var error = " !!!! MIN num keys restriction violated ";
+              let error;  
+              if (showOutput === true) {
+                    error = " !!!! MIN num keys restriction violated ";
                 }
                 console.log(error);
                 errors.push(error);
@@ -1209,7 +1204,7 @@ InMemoryBTree.Tree.prototype.audit = function (showOutput) {
  *  @return An object containing the key and position of the key
  */
 InMemoryBTree.Tree.prototype._getMaxKeyPos = function (node) {
-    var node_pos = {};
+    let node_pos = {};
 
     while (true) {
         if (node === null) {
@@ -1237,7 +1232,7 @@ InMemoryBTree.Tree.prototype._getMaxKeyPos = function (node) {
  *  @return An object containing the key and position of the key
  */
 InMemoryBTree.Tree.prototype._getMinKeyPos = function (node) {
-    var node_pos = {};
+    let node_pos = {};
 
     while (true) {
         if (node === null) {
@@ -1279,7 +1274,7 @@ InMemoryBTree.Node = function() {
 // end of ./src/js-trees/src/in_memory_b_tree.js 
 
 // exports
-var QuadIndexCommon = {};
+let QuadIndexCommon = {};
 
 /**
  * NodeKey
@@ -1298,8 +1293,8 @@ QuadIndexCommon.NodeKey = function(components, order) {
 };
 
 QuadIndexCommon.NodeKey.prototype.comparator = function(keyPattern) {
-    for(var i=0; i<this.order.length; i++) {
-        var component = this.order[i];
+    for(let i=0; i<this.order.length; i++) {
+        let component = this.order[i];
         if(keyPattern[component] == null) {
             return 0;
         } else {
@@ -1328,15 +1323,15 @@ QuadIndexCommon.Pattern = function (components) {
 
     this.keyComponents = {};
 
-    var order = [];
-    var indif = [];
+    let order = [];
+    let indif = [];
     var components = ['subject', 'predicate', 'object', 'graph'];
 
     // components must have been already normalized and
     // inserted in the lexicon.
     // OIDs retrieved from the lexicon *are* numbers so
     // they can be told apart from variables (strings)
-    for (var i = 0; i < components.length; i++) {
+    for (let i = 0; i < components.length; i++) {
         if (typeof(this[components[i]]) === 'string') {
             indif.push(components[i]);
             this.keyComponents[components[i]] = null;
@@ -1355,10 +1350,10 @@ QuadIndexCommon.Pattern = function (components) {
 // end of ./src/js-rdf-persistence/src/quad_index_common.js 
 
 // exports
-var QuadIndex = {};
+let QuadIndex = {};
 
 // imports
-var BaseTree = InMemoryBTree;
+let BaseTree = InMemoryBTree;
 
 QuadIndex.Tree = function(params,callback) {
     if(arguments != 0) {
@@ -1369,10 +1364,10 @@ QuadIndex.Tree = function(params,callback) {
         BaseTree.Tree.call(this, params.order, params['name'], params['persistent'], params['cacheMaxSize']);
 
         this.comparator = function (a, b) {
-            for (var i = 0; i < this.componentOrder.length; i++) {
-                var component = this.componentOrder[i];
-                var vala = a[component];
-                var valb = b[component];
+            for (let i = 0; i < this.componentOrder.length; i++) {
+                let component = this.componentOrder[i];
+                let vala = a[component];
+                let valb = b[component];
                 if (vala < valb) {
                     return -1;
                 } else if (vala > valb) {
@@ -1383,8 +1378,8 @@ QuadIndex.Tree = function(params,callback) {
         };
 
         this.rangeComparator = function (a, b) {
-            for (var i = 0; i < this.componentOrder.length; i++) {
-                var component = this.componentOrder[i];
+            for (let i = 0; i < this.componentOrder.length; i++) {
+                let component = this.componentOrder[i];
                 if (b[component] == null || a[component] == null) {
                     return 0;
                 } else {
@@ -1416,7 +1411,7 @@ QuadIndex.Tree.prototype.insert = function(quad, callback) {
 };
 
 QuadIndex.Tree.prototype.search = function(quad, callback) {
-    var result = BaseTree.Tree.prototype.search.call(this, quad, true); // true -> check exists : not present in all the b-tree implementations, check first.
+    let result = BaseTree.Tree.prototype.search.call(this, quad, true); // true -> check exists : not present in all the b-tree implementations, check first.
     if(callback)
         callback(result);
 
@@ -1424,7 +1419,7 @@ QuadIndex.Tree.prototype.search = function(quad, callback) {
 };
 
 QuadIndex.Tree.prototype.range = function (pattern, callback) {
-    var result = null;
+    let result = null;
     if (typeof(this.root) === 'string') {
         result = this._rangeTraverse(this, this._diskRead(this.root), pattern);
     } else {
@@ -1438,9 +1433,9 @@ QuadIndex.Tree.prototype.range = function (pattern, callback) {
 };
 
 QuadIndex.Tree.prototype._rangeTraverse = function(tree,node, pattern) {
-    var patternKey  = pattern.key;
-    var acum = [];
-    var pendingNodes = [node];
+    let patternKey  = pattern.key;
+    let acum = [];
+    let pendingNodes = [node];
     var node, idxMin, idxMax;
     while(pendingNodes.length > 0) {
         node = pendingNodes.shift();
@@ -1458,8 +1453,8 @@ QuadIndex.Tree.prototype._rangeTraverse = function(tree,node, pattern) {
             }
 
         } else {
-            var pointer = node.children[idxMin];
-            var childNode = tree._diskRead(pointer);
+            let pointer = node.children[idxMin];
+            let childNode = tree._diskRead(pointer);
             pendingNodes.push(childNode);
 
             var idxMax = idxMin;
@@ -1482,7 +1477,7 @@ QuadIndex.Tree.prototype._rangeTraverse = function(tree,node, pattern) {
 // end of ./src/js-rdf-persistence/src/quad_index.js 
 
 // exports
-var QuadBackend = {};
+let QuadBackend = {};
 
 
 // imports
@@ -1512,8 +1507,8 @@ QuadBackend.QuadBackend = function (configuration, callback) {
             OS:['object', 'subject', 'predicate', 'graph']
         };
 
-        for (var i = 0; i < this.indices.length; i++) {
-            var indexKey = this.indices[i];
+        for (let i = 0; i < this.indices.length; i++) {
+            let indexKey = this.indices[i];
             this.indexMap[indexKey] = new QuadIndex.Tree({order:this.treeOrder,
                 componentOrder:this.componentOrders[indexKey],
                 persistent:configuration['persistent'],
@@ -1527,20 +1522,20 @@ QuadBackend.QuadBackend = function (configuration, callback) {
 };
 
 QuadBackend.QuadBackend.prototype.clear = function() {
-        for(var i=0; i<this.indices.length; i++) {
-            var indexKey = this.indices[i];
+        for(let i=0; i<this.indices.length; i++) {
+            let indexKey = this.indices[i];
             this.indexMap[indexKey].clear();
         }
 };
 
 QuadBackend.QuadBackend.prototype._indexForPattern = function (pattern) {
-    var indexKey = pattern.indexKey;
-    var matchingIndices = this.indices;
+    let indexKey = pattern.indexKey;
+    let matchingIndices = this.indices;
 
-    for (var i = 0; i < matchingIndices.length; i++) {
-        var index = matchingIndices[i];
-        var indexComponents = this.componentOrders[index];
-        for (var j = 0; j < indexComponents.length; j++) {
+    for (let i = 0; i < matchingIndices.length; i++) {
+        let index = matchingIndices[i];
+        let indexComponents = this.componentOrders[index];
+        for (let j = 0; j < indexComponents.length; j++) {
             if (Utils.include(indexKey, indexComponents[j]) === false) {
                 break;
             }
@@ -1555,9 +1550,9 @@ QuadBackend.QuadBackend.prototype._indexForPattern = function (pattern) {
 
 
 QuadBackend.QuadBackend.prototype.index = function (quad, callback) {
-    for (var i = 0; i < this.indices.length; i++) {
-        var indexKey = this.indices[i];
-        var index = this.indexMap[indexKey];
+    for (let i = 0; i < this.indices.length; i++) {
+        let indexKey = this.indices[i];
+        let index = this.indexMap[indexKey];
 
         index.insert(quad);
     }
@@ -1569,9 +1564,9 @@ QuadBackend.QuadBackend.prototype.index = function (quad, callback) {
 };
 
 QuadBackend.QuadBackend.prototype.range = function (pattern, callback) {
-    var indexKey = this._indexForPattern(pattern);
-    var index = this.indexMap[indexKey];
-    var quads = index.range(pattern);
+    let indexKey = this._indexForPattern(pattern);
+    let index = this.indexMap[indexKey];
+    let quads = index.range(pattern);
     if (callback)
         callback(quads);
 
@@ -1579,9 +1574,9 @@ QuadBackend.QuadBackend.prototype.range = function (pattern, callback) {
 };
 
 QuadBackend.QuadBackend.prototype.search = function (quad, callback) {
-    var indexKey = this.indices[0];
-    var index = this.indexMap[indexKey];
-    var result = index.search(quad);
+    let indexKey = this.indices[0];
+    let index = this.indexMap[indexKey];
+    let result = index.search(quad);
 
     if (callback)
         callback(result != null);
@@ -1591,8 +1586,8 @@ QuadBackend.QuadBackend.prototype.search = function (quad, callback) {
 
 
 QuadBackend.QuadBackend.prototype['delete'] = function (quad, callback) {
-    var indexKey, index;
-    for (var i = 0; i < this.indices.length; i++) {
+    let indexKey, index;
+    for (let i = 0; i < this.indices.length; i++) {
         indexKey = this.indices[i];
         index = this.indexMap[indexKey];
 
@@ -1609,7 +1604,7 @@ QuadBackend.QuadBackend.prototype['delete'] = function (quad, callback) {
 // end of ./src/js-rdf-persistence/src/quad_backend.js 
 
 // exports
-var Lexicon = {};
+let Lexicon = {};
 
 // imports
 
@@ -1649,9 +1644,9 @@ Lexicon.Lexicon.prototype.registerGraph = function(oid){
 };
 
 Lexicon.Lexicon.prototype.registeredGraphs = function(shouldReturnUris) {
-    var acum = [];
+    let acum = [];
 
-    for(var g in this.knownGraphs) {
+    for(let g in this.knownGraphs) {
         if(shouldReturnUris === true) {
             acum.push(this.OIDToUri['u'+g]);
         } else {
@@ -1666,7 +1661,7 @@ Lexicon.Lexicon.prototype.registerUri = function(uri) {
         return(this.defaultGraphOid);
     } else if(this.uriToOID[uri] == null){
         var oid = this.oidCounter;
-        var oidStr = 'u'+oid;
+        let oidStr = 'u'+oid;
         this.oidCounter++;
 
         this.uriToOID[uri] =[oid, 0];
@@ -1674,9 +1669,9 @@ Lexicon.Lexicon.prototype.registerUri = function(uri) {
 
         return(oid);
     } else {
-        var oidCounter = this.uriToOID[uri];
+        let oidCounter = this.uriToOID[uri];
         var oid = oidCounter[0];
-        var counter = oidCounter[1] + 1;
+        let counter = oidCounter[1] + 1;
         this.uriToOID[uri] = [oid, counter];
         return(oid);
     }
@@ -1686,7 +1681,7 @@ Lexicon.Lexicon.prototype.resolveUri = function(uri) {
     if(uri === this.defaultGraphUri) {
         return(this.defaultGraphOid);
     } else {
-        var oidCounter = this.uriToOID[uri];
+        let oidCounter = this.uriToOID[uri];
         if(oidCounter != null) {
             return(oidCounter[0]);
         } else {
@@ -1699,7 +1694,7 @@ Lexicon.Lexicon.prototype.resolveUriCost = function(uri) {
     if(uri === this.defaultGraphUri) {
         return(this.defaultGraphOid);
     } else {
-        var oidCounter = this.uriToOID[uri];
+        let oidCounter = this.uriToOID[uri];
         if(oidCounter != null) {
             return(oidCounter[1]);
         } else {
@@ -1709,9 +1704,9 @@ Lexicon.Lexicon.prototype.resolveUriCost = function(uri) {
 };
 
 Lexicon.Lexicon.prototype.registerBlank = function(label) {
-    var oid = this.oidCounter;
+    let oid = this.oidCounter;
     this.oidCounter++;
-    var oidStr = ""+oid;
+    let oidStr = ""+oid;
     this.OIDToBlank[oidStr] = true;
     return(oid);
 };
@@ -1723,7 +1718,7 @@ Lexicon.Lexicon.prototype.resolveBlank = function(label) {
 //    var id = label.split(":")[1];
 //    callback(id);
 
-    var oid = this.oidCounter;
+    let oid = this.oidCounter;
     this.oidCounter++;
     return(oid);
 };
@@ -1735,7 +1730,7 @@ Lexicon.Lexicon.prototype.resolveBlankCost = function(label) {
 Lexicon.Lexicon.prototype.registerLiteral = function(literal) {
     if(this.literalToOID[literal] == null){
         var oid = this.oidCounter;
-        var oidStr =  'l'+ oid;
+        let oidStr =  'l'+ oid;
         this.oidCounter++;
 
         this.literalToOID[literal] = [oid, 0];
@@ -1743,16 +1738,16 @@ Lexicon.Lexicon.prototype.registerLiteral = function(literal) {
 
         return(oid);
     } else {
-        var oidCounter = this.literalToOID[literal];
+        let oidCounter = this.literalToOID[literal];
         var oid = oidCounter[0];
-        var counter = oidCounter[1] + 1;
+        let counter = oidCounter[1] + 1;
         this.literalToOID[literal] = [oid, counter];
         return(oid);
     }
 };
 
 Lexicon.Lexicon.prototype.resolveLiteral = function (literal) {
-    var oidCounter = this.literalToOID[literal];
+    let oidCounter = this.literalToOID[literal];
     if (oidCounter != null) {
         return(oidCounter[0]);
     } else {
@@ -1761,7 +1756,7 @@ Lexicon.Lexicon.prototype.resolveLiteral = function (literal) {
 };
 
 Lexicon.Lexicon.prototype.resolveLiteralCost = function (literal) {
-    var oidCounter = this.literalToOID[literal];
+    let oidCounter = this.literalToOID[literal];
     if (oidCounter != null) {
         return(oidCounter[1]);
     } else {
@@ -1774,14 +1769,14 @@ Lexicon.Lexicon.prototype.parseLiteral = function(literalString) {
     var parts = literalString.lastIndexOf("@");
     if(parts!=-1 && literalString[parts-1]==='"' && literalString.substring(parts, literalString.length).match(/^@[a-zA-Z\-]+$/g)!=null) {
         var value = literalString.substring(1,parts-1);
-        var lang = literalString.substring(parts+1, literalString.length);
+        let lang = literalString.substring(parts+1, literalString.length);
         return {token: "literal", value:value, lang:lang};
     }
 
     var parts = literalString.lastIndexOf("^^");
     if(parts!=-1 && literalString[parts-1]==='"' && literalString[parts+2] === '<' && literalString[literalString.length-1] === '>') {
         var value = literalString.substring(1,parts-1);
-        var type = literalString.substring(parts+3, literalString.length-1);
+        let type = literalString.substring(parts+3, literalString.length-1);
 
         return {token: "literal", value:value, type:type};
     }
@@ -1803,15 +1798,15 @@ Lexicon.Lexicon.prototype.retrieve = function(oid) {
                        suffix: null,
                        defaultGraph: true });
         } else {
-          var maybeUri = this.OIDToUri['u'+oid];
+          let maybeUri = this.OIDToUri['u'+oid];
           if(maybeUri != null) {
               return(this.parseUri(maybeUri));
           } else {
-              var maybeLiteral = this.OIDToLiteral['l'+oid];
+              let maybeLiteral = this.OIDToLiteral['l'+oid];
               if(maybeLiteral != null) {
                   return(this.parseLiteral(maybeLiteral));
               } else {
-                  var maybeBlank = this.OIDToBlank[""+oid];
+                  let maybeBlank = this.OIDToBlank[""+oid];
                   if(maybeBlank != null) {
                       return({token:"blank", value:"_:"+oid});
                   } else {
@@ -1869,7 +1864,7 @@ Lexicon.Lexicon.prototype.unregisterTerm = function (kind, oid) {
     if (kind === 'uri') {
         if (oid != this.defaultGraphOid) {
             var oidStr = 'u' + oid;
-            var uri = this.OIDToUri[oidStr];     // = uri;
+            let uri = this.OIDToUri[oidStr];     // = uri;
             var oidCounter = this.uriToOID[uri]; // =[oid, 0];
 
             var counter = oidCounter[1];
@@ -1890,7 +1885,7 @@ Lexicon.Lexicon.prototype.unregisterTerm = function (kind, oid) {
     } else if (kind === 'literal') {
         this.oidCounter++;
         var oidStr = 'l' + oid;
-        var literal = this.OIDToLiteral[oidStr];  // = literal;
+        let literal = this.OIDToLiteral[oidStr];  // = literal;
         var oidCounter = this.literalToOID[literal]; // = [oid, 0];
 
         var counter = oidCounter[1];
@@ -1914,10 +1909,10 @@ Lexicon.Lexicon.prototype.unregisterTerm = function (kind, oid) {
 // end of ./src/js-rdf-persistence/src/lexicon.js 
 
 // exports
-var NetworkTransport = {};
+let NetworkTransport = {};
 
 NetworkTransport.load = function (uri, accept, callback, redirect) {
-    var transport = jQuery;
+    let transport = jQuery;
 
     transport.ajax({
         url:uri,
@@ -1925,10 +1920,10 @@ NetworkTransport.load = function (uri, accept, callback, redirect) {
 
         success:function (data, status, xhr) {
             if (("" + xhr.status)[0] == '2') {
-                var headers = xhr.getAllResponseHeaders().split("\n");
-                var acum = {};
-                for (var i = 0; i < headers.length; i++) {
-                    var header = headers[i].split(":");
+                let headers = xhr.getAllResponseHeaders().split("\n");
+                let acum = {};
+                for (let i = 0; i < headers.length; i++) {
+                    let header = headers[i].split(":");
                     acum[header[0]] = header[1];
                 }
 
@@ -1942,7 +1937,7 @@ NetworkTransport.load = function (uri, accept, callback, redirect) {
                 if (redirection == 0) {
                     callback(false, 500);
                 } else {
-                    var location = (xhr.getAllResponseHeaders()["Location"] || xhr.getAllResponseHeaders()["location"]);
+                    let location = (xhr.getAllResponseHeaders()["Location"] || xhr.getAllResponseHeaders()["location"]);
                     if (location != null) {
                         NetworkTransport.load(location, accept, callback, (redirection - 1));
                     } else {
@@ -1968,16 +1963,16 @@ NetworkTransport.load = function (uri, accept, callback, redirect) {
  * Copyright (c) 2011 Digital Bazaar, Inc. All rights reserved.
  */
 
-var jsonldParser = null;
+let jsonldParser = null;
 
 (function()
 {
 
 // used by Exception
-var _setMembers = function(self, obj)
+let _setMembers = function(self, obj)
 {
    self.stack = '';
-   for(var key in obj)
+   for(let key in obj)
    {
       self[key] = obj[key];
    }
@@ -2001,8 +1996,8 @@ if(typeof(window) !== 'undefined')
          {
             throw new TypeError('Object.keys called on non-object');
          }
-         var rval = [];
-         for(var p in o)
+         let rval = [];
+         for(let p in o)
          {
             if(Object.prototype.hasOwnProperty.call(o, p))
             {
@@ -2022,18 +2017,18 @@ if(typeof(window) !== 'undefined')
        if (this == null)
          throw new TypeError();
     
-       var t = Object(this);
-       var len = t.length >>> 0;
+       let t = Object(this);
+       let len = t.length >>> 0;
        if (typeof fun != "function")
          throw new TypeError();
     
-       var res = [];
-       var thisp = arguments[1];
-       for (var i = 0; i < len; i++)
+       let res = [];
+       let thisp = arguments[1];
+       for (let i = 0; i < len; i++)
        {
          if (i in t)
          {
-           var val = t[i]; // in case fun mutates this
+           let val = t[i]; // in case fun mutates this
            if (fun.call(thisp, val, i, t))
              res.push(val);
          }
@@ -2059,7 +2054,7 @@ else if(typeof(module) !== 'undefined' && module.exports)
 
 jsonldParser = jsonld;
 
-var defaultContext = { "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+let defaultContext = { "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
                        "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
                        "owl": "http://www.w3.org/2002/07/owl#",
                        "xsd": "http://www.w3.org/2001/XMLSchema#",
@@ -2082,12 +2077,12 @@ var defaultContext = { "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
 /*
  * Globals and helper functions.
  */
-var ns =
+let ns =
 {
    xsd: 'http://www.w3.org/2001/XMLSchema#'
 };
 
-var xsd =
+let xsd =
 {
    'boolean': ns.xsd + 'boolean',
    'double': ns.xsd + 'double',
@@ -2102,7 +2097,7 @@ var xsd =
  * @param p the property.
  * @param o the object.
  */
-var _setProperty = function(s, p, o)
+let _setProperty = function(s, p, o)
 {
    if(p in s)
    {
@@ -2131,15 +2126,15 @@ var _setProperty = function(s, p, o)
  */
 var _clone = function(value)
 {
-   var rval;
+   let rval;
    
    if(value.constructor === Object)
    {
       rval = {};
-      var keys = Object.keys(value).sort();
+      let keys = Object.keys(value).sort();
       for(var i in keys)
       {
-         var key = keys[i];
+         let key = keys[i];
          rval[key] = _clone(value[key]);
       }
    }
@@ -2166,12 +2161,12 @@ var _clone = function(value)
  * 
  * @return the keywords.
  */
-var _getKeywords = function(ctx)
+let _getKeywords = function(ctx)
 {
    // TODO: reduce calls to this function by caching keywords in processor
    // state
    
-   var rval =
+   let rval =
    {
       '@id': '@id',
       '@language': '@language',
@@ -2182,7 +2177,7 @@ var _getKeywords = function(ctx)
    if(ctx)
    {
       // gather keyword aliases from context
-      var keywords = {};
+      let keywords = {};
       for(var key in ctx)
       {
          if(ctx[key].constructor === String && ctx[key] in rval)
@@ -2209,9 +2204,9 @@ var _getKeywords = function(ctx)
  * 
  * @return the iri or NULL.
  */
-var _getTermIri = function(ctx, term)
+let _getTermIri = function(ctx, term)
 {
-   var rval = null;
+   let rval = null;
    if(term in ctx)
    {
       if(ctx[term].constructor === String)
@@ -2237,9 +2232,9 @@ var _getTermIri = function(ctx, term)
  *
  * @return the compacted IRI as a term or prefix or the original IRI.
  */
-var _compactIri = function(ctx, iri, usedCtx)
+let _compactIri = function(ctx, iri, usedCtx)
 {
-   var rval = null;
+   let rval = null;
    
    // check the context for a term that could shorten the IRI
    // (give preference to terms over prefixes)
@@ -2276,10 +2271,10 @@ var _compactIri = function(ctx, iri, usedCtx)
          if(key.length > 0 && key[0] !== '@')
          {
             // see if IRI begins with the next IRI from the context
-            var ctxIri = _getTermIri(ctx, key);
+            let ctxIri = _getTermIri(ctx, key);
             if(ctxIri !== null)
             {
-               var idx = iri.indexOf(ctxIri);
+               let idx = iri.indexOf(ctxIri);
                
                // compact to a prefix
                if(idx === 0 && iri.length > ctxIri.length)
@@ -2316,25 +2311,25 @@ var _compactIri = function(ctx, iri, usedCtx)
  *
  * @return the expanded term as an absolute IRI.
  */
-var _expandTerm = function(ctx, term, usedCtx)
+let _expandTerm = function(ctx, term, usedCtx)
 {
-   var rval = term;
+   let rval = term;
    
    // get JSON-LD keywords
-   var keywords = _getKeywords(ctx);
+   let keywords = _getKeywords(ctx);
    
    // 1. If the property has a colon, it is a prefix or an absolute IRI:
-   var idx = term.indexOf(':');
+   let idx = term.indexOf(':');
    if(idx !== -1)
    {
       // get the potential prefix
-      var prefix = term.substr(0, idx);
+      let prefix = term.substr(0, idx);
 
       // expand term if prefix is in context, otherwise leave it be
       if(prefix in ctx)
       {
          // prefix found, expand property to absolute IRI
-         var iri = _getTermIri(ctx, prefix);
+         let iri = _getTermIri(ctx, prefix);
          rval = iri + term.substr(idx + 1);
          if(usedCtx !== null)
          {
@@ -2354,7 +2349,7 @@ var _expandTerm = function(ctx, term, usedCtx)
    // 3. The property is a keyword.
    else
    {
-      for(var key in keywords)
+      for(let key in keywords)
       {
          if(term === keywords[key])
          {
@@ -2374,14 +2369,14 @@ var _expandTerm = function(ctx, term, usedCtx)
  * 
  * @return the sorted context.
  */
-var _sortContextKeys = function(ctx)
+let _sortContextKeys = function(ctx)
 {
    // sort keys
-   var rval = {};
-   var keys = Object.keys(ctx).sort();
-   for(var k in keys)
+   let rval = {};
+   let keys = Object.keys(ctx).sort();
+   for(let k in keys)
    {
-      var key = keys[k];
+      let key = keys[k];
       rval[key] = ctx[key];
    }
    return rval;
@@ -2395,7 +2390,7 @@ var _sortContextKeys = function(ctx)
  * 
  * @return true if the value is a reference to a subject, false if not.
  */
-var _isReference = function(value)
+let _isReference = function(value)
 {
    // Note: A value is a reference to a subject if all of these hold true:
    // 1. It is an Object.
@@ -2414,9 +2409,9 @@ var _isReference = function(value)
  * 
  * @return true if the value is a subject with properties, false if not.
  */
-var _isSubject = function(value)
+let _isSubject = function(value)
 {
-   var rval = false;
+   let rval = false;
    
    // Note: A value is a subject if all of these hold true:
    // 1. It is an Object.
@@ -2424,7 +2419,7 @@ var _isSubject = function(value)
    // 3. It has more than 1 key OR any existing key is not '@id'.
    if(value !== null && value.constructor === Object && !('@value' in value))
    {
-      var keyCount = Object.keys(value).length;
+      let keyCount = Object.keys(value).length;
       rval = (keyCount > 1 || !('@id' in value));
    }
    
@@ -2470,7 +2465,7 @@ jsonld.expand = function(input)
  */
 jsonld.compact = function(ctx, input)
 {
-   var rval = null;
+   let rval = null;
    
    // TODO: should context simplification be optional? (ie: remove context
    // entries that are not used in the output)
@@ -2480,7 +2475,7 @@ jsonld.compact = function(ctx, input)
       // fully expand input
       input = jsonld.expand(input);
       
-      var tmp;
+      let tmp;
       if(input.constructor === Array)
       {
          rval = [];
@@ -2497,13 +2492,13 @@ jsonld.compact = function(ctx, input)
          ctx = jsonld.mergeContexts({}, ctx);
       }
       
-      for(var i in tmp)
+      for(let i in tmp)
       {
          // setup output context
-         var ctxOut = {};
+         let ctxOut = {};
          
          // compact
-         var out = new Processor().compact(_clone(ctx), null, tmp[i], ctxOut);
+         let out = new Processor().compact(_clone(ctx), null, tmp[i], ctxOut);
          
          // add context if used
          if(Object.keys(ctxOut).length > 0)
@@ -2512,7 +2507,7 @@ jsonld.compact = function(ctx, input)
             ctxOut = _sortContextKeys(ctxOut);
             
             // sort keys
-            var keys = Object.keys(out);
+            let keys = Object.keys(out);
             keys.sort();
             
             // put @context first
@@ -2520,10 +2515,10 @@ jsonld.compact = function(ctx, input)
             out['@context'] = ctxOut;
             
             // order keys in output
-            var ordered = {};
-            for(var k in keys)
+            let ordered = {};
+            for(let k in keys)
             {
-               var key = keys[k];
+               let key = keys[k];
                ordered[key] = out[key];
             }
             out = ordered;
@@ -2560,12 +2555,12 @@ jsonld.mergeContexts = function(ctx1, ctx2)
    }
    
    // copy context to merged output
-   var merged = _clone(ctx1);
+   let merged = _clone(ctx1);
    
    if(ctx2.constructor === Array)
    {
       // merge array of contexts in order
-      for(var i in ctx2)
+      for(let i in ctx2)
       {
          merged = jsonld.mergeContexts(merged, ctx2[i]);
       }
@@ -2579,7 +2574,7 @@ jsonld.mergeContexts = function(ctx1, ctx2)
          // ignore special keys starting with '@'
          if(key.indexOf('@') !== 0)
          {
-            for(var mkey in merged)
+            for(let mkey in merged)
             {
                if(merged[mkey] === ctx2[key])
                {
@@ -2659,10 +2654,10 @@ jsonld.frame = function(input, frame, options)
  */
 jsonld.toTriples = function(input, graph, callback)
 {
-   var rval = null;
+   let rval = null;
    
    // normalize input
-   var normalized = jsonld.normalize(input);
+   let normalized = jsonld.normalize(input);
    
    // setup default callback
    callback = callback || null;
@@ -2679,29 +2674,29 @@ jsonld.toTriples = function(input, graph, callback)
    }
    
    // generate triples
-   var quit = false;
-   for(var i1 in normalized)
+   let quit = false;
+   for(let i1 in normalized)
    {
-      var e = normalized[i1];
-      var s = e['@id'];
+      let e = normalized[i1];
+      let s = e['@id'];
        if(s[0] == "_") {
            s = {'token':'blank', 'value':s.split(":")[1]};
        } else {
            s = {'token':'uri', 'value':s};
        }
 
-      for(var p in e)
+      for(let p in e)
       {
          if(p !== '@id')
          {
-	     var obj = e[p];
+	     let obj = e[p];
              if(obj.constructor !== Array)
              {
 		 obj = [obj];
              }
-            for(var i2 in obj)
+            for(let i2 in obj)
             {
-                var obji2 = obj[i2];
+                let obji2 = obj[i2];
 		if(p === '@type' || p === 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type') {
 		    p = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type';
                     obji2 = {'token':'uri', 'value':obji2};		    
@@ -2756,7 +2751,7 @@ jsonld.toTriples = function(input, graph, callback)
 jsonld.resolve = function(input, resolver, callback)
 {
    // find all @context URLs
-   var urls = {};
+   let urls = {};
    var findUrls = function(input, replace)
    {
       if(input.constructor === Array)
@@ -2768,14 +2763,14 @@ jsonld.resolve = function(input, resolver, callback)
       }
       else if(input.constructor === Object)
       {
-         for(var key in input)
+         for(let key in input)
          {
             if(key === '@context')
             {
                // @context is an array that might contain URLs
                if(input[key].constructor === Array)
                {
-                  var list = input[key];
+                  let list = input[key];
                   for(var i in list)
                   {
                      if(list[i].constructor === String)
@@ -2813,8 +2808,8 @@ jsonld.resolve = function(input, resolver, callback)
    findUrls(input, false);
    
    // state for resolving URLs
-   var count = Object.keys(urls).length;
-   var errors = null;
+   let count = Object.keys(urls).length;
+   let errors = null;
    
    if(count === 0)
    {
@@ -2889,10 +2884,10 @@ var Processor = function()
  */
 Processor.prototype.compact = function(ctx, property, value, usedCtx)
 {
-   var rval;
+   let rval;
    
    // get JSON-LD keywords
-   var keywords = _getKeywords(ctx);
+   let keywords = _getKeywords(ctx);
    
    if(value === null)
    {
@@ -2904,7 +2899,7 @@ Processor.prototype.compact = function(ctx, property, value, usedCtx)
    {
       // recursively add compacted values to array
       rval = [];
-      for(var i in value)
+      for(let i in value)
       {
          rval.push(this.compact(ctx, property, value[i], usedCtx));
       }
@@ -2929,7 +2924,7 @@ Processor.prototype.compact = function(ctx, property, value, usedCtx)
          {
             // set object to compacted property, only overwrite existing
             // properties if the property actually compacted
-            var p = _compactIri(ctx, key, usedCtx);
+            let p = _compactIri(ctx, key, usedCtx);
             if(p !== key || !(p in rval))
             {
                // FIXME: clean old values from the usedCtx here ... or just
@@ -2942,10 +2937,10 @@ Processor.prototype.compact = function(ctx, property, value, usedCtx)
    else
    {
       // get coerce type
-      var coerce = this.getCoerceType(ctx, property, usedCtx);
+      let coerce = this.getCoerceType(ctx, property, usedCtx);
       
       // get type from value, to ensure coercion is valid
-      var type = null;
+      let type = null;
       if(value.constructor === Object)
       {
          // type coercion can only occur if language is not specified
@@ -3082,7 +3077,7 @@ Processor.prototype.compact = function(ctx, property, value, usedCtx)
  */
 Processor.prototype.expand = function(ctx, property, value)
 {
-   var rval;
+   let rval;
    
    // TODO: add data format error detection?
    
@@ -3101,7 +3096,7 @@ Processor.prototype.expand = function(ctx, property, value)
    {
       // recursively add expanded values to array
       rval = [];
-      for(var i in value)
+      for(let i in value)
       {
          rval.push(this.expand(ctx, property, value[i]));
       }
@@ -3116,7 +3111,7 @@ Processor.prototype.expand = function(ctx, property, value)
       
       // recursively handle sub-properties that aren't a sub-context
       rval = {};
-      for(var key in value)
+      for(let key in value)
       {
          // preserve frame keywords
          if(key === '@embed' || key === '@explicit' ||
@@ -3136,10 +3131,10 @@ Processor.prototype.expand = function(ctx, property, value)
    else
    {
       // do type coercion
-      var coerce = this.getCoerceType(ctx, property, null);
+      let coerce = this.getCoerceType(ctx, property, null);
 
       // get JSON-LD keywords
-      var keywords = _getKeywords(ctx);
+      let keywords = _getKeywords(ctx);
 
       // automatic coercion for basic JSON types
       if(coerce === null &&
@@ -3206,7 +3201,7 @@ Processor.prototype.expand = function(ctx, property, value)
  */
 Processor.prototype.normalize = function(input)
 {
-   var rval = [];
+   let rval = [];
 
    // TODO: validate context
    
@@ -3220,24 +3215,24 @@ Processor.prototype.normalize = function(input)
       };
       
       // expand input
-      var expanded = this.expand(defaultContext, null, input);
+      let expanded = this.expand(defaultContext, null, input);
       
       // assign names to unnamed bnodes
       this.nameBlankNodes(expanded);
       
       // flatten
-      var subjects = {};
+      let subjects = {};
       _flatten(null, null, expanded, subjects);
 
       // append subjects with sorted properties to array
-      for(var key in subjects)
+      for(let key in subjects)
       {
-         var s = subjects[key];
-         var sorted = {};
-         var keys = Object.keys(s).sort();
-         for(var i in keys)
+         let s = subjects[key];
+         let sorted = {};
+         let keys = Object.keys(s).sort();
+         for(let i in keys)
          {
-            var k = keys[i];
+            let k = keys[i];
             sorted[k] = s[k];
          }
          rval.push(sorted);
@@ -3267,10 +3262,10 @@ Processor.prototype.normalize = function(input)
  */
 Processor.prototype.getCoerceType = function(ctx, property, usedCtx)
 {
-   var rval = null;
+   let rval = null;
 
    // get expanded property
-   var p = _expandTerm(ctx, property, null);
+   let p = _expandTerm(ctx, property, null);
    
    // built-in type coercion JSON-LD-isms
    if(p === '@id' || p === '@type')
@@ -3284,7 +3279,7 @@ Processor.prototype.getCoerceType = function(ctx, property, usedCtx)
       if(p in ctx && ctx[p].constructor === Object && '@type' in ctx[p])
       {
          // property found, return expanded type
-         var type = ctx[p]['@type'];
+         let type = ctx[p]['@type'];
          rval = _expandTerm(ctx, type, usedCtx);
          if(usedCtx !== null)
          {
@@ -3296,19 +3291,19 @@ Processor.prototype.getCoerceType = function(ctx, property, usedCtx)
    return rval;
 };
 
-var _isBlankNodeIri = function(v)
+let _isBlankNodeIri = function(v)
 {
    return v.indexOf('_:') === 0;
 };
 
-var _isNamedBlankNode = function(v)
+let _isNamedBlankNode = function(v)
 {
    // look for "_:" at the beginning of the subject
    return (
       v.constructor === Object && '@id' in v && _isBlankNodeIri(v['@id']));
 };
 
-var _isBlankNode = function(v)
+let _isBlankNode = function(v)
 {
    // look for a subject with no ID or a blank node ID
    return (_isSubject(v) && (!('@id' in v) || _isNamedBlankNode(v)));
@@ -3324,11 +3319,11 @@ var _isBlankNode = function(v)
  */
 var _compare = function(v1, v2)
 {
-   var rval = 0;
+   let rval = 0;
    
    if(v1.constructor === Array && v2.constructor === Array)
    {
-      for(var i = 0; i < v1.length && rval === 0; ++i)
+      for(let i = 0; i < v1.length && rval === 0; ++i)
       {
          rval = _compare(v1[i], v2[i]);
       }
@@ -3352,9 +3347,9 @@ var _compare = function(v1, v2)
  * 
  * @return -1 if o1 < o2, 0 if o1 == o2, 1 if o1 > o2.
  */
-var _compareObjectKeys = function(o1, o2, key)
+let _compareObjectKeys = function(o1, o2, key)
 {
-   var rval = 0;
+   let rval = 0;
    if(key in o1)
    {
       if(key in o2)
@@ -3381,9 +3376,9 @@ var _compareObjectKeys = function(o1, o2, key)
  * 
  * @return -1 if o1 < o2, 0 if o1 == o2, 1 if o1 > o2.
  */
-var _compareObjects = function(o1, o2)
+let _compareObjects = function(o1, o2)
 {
-   var rval = 0;
+   let rval = 0;
    
    if(o1.constructor === String)
    {
@@ -3432,9 +3427,9 @@ var _compareObjects = function(o1, o2)
  * 
  * @return -1 if a < b, 0 if a == b, 1 if a > b.
  */
-var _compareBlankNodeObjects = function(a, b)
+let _compareBlankNodeObjects = function(a, b)
 {
-   var rval = 0;
+   let rval = 0;
    
    /*
    3. For each property, compare sorted object values.
@@ -3451,14 +3446,14 @@ var _compareBlankNodeObjects = function(a, b)
    3.2.9. The bnode with the alphabetically-first @id is first.
    */
    
-   for(var p in a)
+   for(let p in a)
    {
       // skip IDs (IRIs)
       if(p !== '@id')
       {
          // step #3.1
-         var lenA = (a[p].constructor === Array) ? a[p].length : 1;
-         var lenB = (b[p].constructor === Array) ? b[p].length : 1;
+         let lenA = (a[p].constructor === Array) ? a[p].length : 1;
+         let lenB = (b[p].constructor === Array) ? b[p].length : 1;
          rval = _compare(lenA, lenB);
 
          // step #3.2.1
@@ -3484,7 +3479,7 @@ var _compareBlankNodeObjects = function(a, b)
          {
             objsA.sort(_compareObjects);
             objsB.sort(_compareObjects);
-            for(var i = 0; i < objsA.length && rval === 0; ++i)
+            for(let i = 0; i < objsA.length && rval === 0; ++i)
             {
                rval = _compareObjects(objsA[i], objsB[i]);
             }
@@ -3508,9 +3503,9 @@ var _compareBlankNodeObjects = function(a, b)
  * 
  * @return the blank node name generator.
  */
-var _createNameGenerator = function(prefix)
+let _createNameGenerator = function(prefix)
 {
-   var count = -1;
+   let count = -1;
    var ng = {
       next: function()
       {
@@ -3545,7 +3540,7 @@ var _collectSubjects = function(input, subjects, bnodes)
    }
    else if(input.constructor === Array)
    {
-      for(var i in input)
+      for(let i in input)
       {
          _collectSubjects(input[i], subjects, bnodes);
       }
@@ -3572,7 +3567,7 @@ var _collectSubjects = function(input, subjects, bnodes)
       }
       
       // recurse through subject properties
-      for(var key in input)
+      for(let key in input)
       {
          _collectSubjects(input[key], subjects, bnodes);
       }
@@ -3591,7 +3586,7 @@ var _collectSubjects = function(input, subjects, bnodes)
  */
 var _flatten = function(parent, parentProperty, value, subjects)
 {
-   var flattened = null;
+   let flattened = null;
    
    if(value === null)
    {
@@ -3600,7 +3595,7 @@ var _flatten = function(parent, parentProperty, value, subjects)
    else if(value.constructor === Array)
    {
       // list of objects or a disjoint graph
-      for(var i in value)
+      for(let i in value)
       {
          _flatten(parent, parentProperty, value[i], subjects);
       }
@@ -3624,7 +3619,7 @@ var _flatten = function(parent, parentProperty, value, subjects)
          }
          
          // top-level graph literal
-         for(var idx in value['@id'])
+         for(let idx in value['@id'])
          {
             _flatten(parent, parentProperty, value['@id'][idx], subjects);
          }
@@ -3633,7 +3628,7 @@ var _flatten = function(parent, parentProperty, value, subjects)
       else
       {
          // create or fetch existing subject
-         var subject;
+         let subject;
          if(value['@id'] in subjects)
          {
             // FIXME: '@id' might be a graph literal (as {})
@@ -3648,9 +3643,9 @@ var _flatten = function(parent, parentProperty, value, subjects)
          flattened = {'@id': subject['@id']};
 
          // flatten embeds
-         for(var key in value)
+         for(let key in value)
          {
-            var v = value[key];
+            let v = value[key];
             
             // drop null values, skip @id (it is already set above)
             if(v !== null && key !== '@id')
@@ -3689,7 +3684,7 @@ var _flatten = function(parent, parentProperty, value, subjects)
       if(parent.constructor === Array)
       {
          // do not add duplicate IRIs for the same property
-         var duplicate = false;
+         let duplicate = false;
          if(flattened.constructor === Object && '@id' in flattened)
          {
             duplicate = (parent.filter(function(e)
@@ -3719,17 +3714,17 @@ var _flatten = function(parent, parentProperty, value, subjects)
 Processor.prototype.nameBlankNodes = function(input)
 {
    // create temporary blank node name generator
-   var ng = this.ng.tmp = _createNameGenerator('tmp');
+   let ng = this.ng.tmp = _createNameGenerator('tmp');
    
    // collect subjects and unnamed bnodes
-   var subjects = {};
-   var bnodes = [];
+   let subjects = {};
+   let bnodes = [];
    _collectSubjects(input, subjects, bnodes);
    
    // uniquely name all unnamed bnodes
-   for(var i in bnodes)
+   for(let i in bnodes)
    {
-      var bnode = bnodes[i];
+      let bnode = bnodes[i];
       if(!('@id' in bnode))
       {
          // generate names until one is unique
@@ -3749,13 +3744,13 @@ Processor.prototype.nameBlankNodes = function(input)
  */
 Processor.prototype.renameBlankNode = function(b, id)
 {
-   var old = b['@id'];
+   let old = b['@id'];
    
    // update bnode IRI
    b['@id'] = id;
    
    // update subjects map
-   var subjects = this.subjects;
+   let subjects = this.subjects;
    subjects[id] = subjects[old];
    delete subjects[old];
    
@@ -3766,7 +3761,7 @@ Processor.prototype.renameBlankNode = function(b, id)
    delete this.edges.props[old];
    
    // update references to this bnode
-   var refs = this.edges.refs[id].all;
+   let refs = this.edges.refs[id].all;
    for(var i in refs)
    {
       var iri = refs[i].s;
@@ -3774,19 +3769,19 @@ Processor.prototype.renameBlankNode = function(b, id)
       {
          iri = id;
       }
-      var ref = subjects[iri];
+      let ref = subjects[iri];
       var props = this.edges.props[iri].all;
-      for(var i2 in props)
+      for(let i2 in props)
       {
          if(props[i2].s === old)
          {
             props[i2].s = id;
             
             // normalize property to array for single code-path
-            var p = props[i2].p;
-            var tmp = (ref[p].constructor === Object) ? [ref[p]] :
+            let p = props[i2].p;
+            let tmp = (ref[p].constructor === Object) ? [ref[p]] :
                (ref[p].constructor === Array) ? ref[p] : [];
-            for(var n in tmp)
+            for(let n in tmp)
             {
                if(tmp[n].constructor === Object &&
                   '@id' in tmp[n] && tmp[n]['@id'] === old)
@@ -3804,7 +3799,7 @@ Processor.prototype.renameBlankNode = function(b, id)
    {
       var iri = props[i].s;
       refs = this.edges.refs[iri].all;
-      for(var r in refs)
+      for(let r in refs)
       {
          if(refs[r].s === old)
          {
@@ -3827,13 +3822,13 @@ Processor.prototype.canonicalizeBlankNodes = function(input)
    this.serializations = {};
    
    // collect subjects and bnodes from flat input graph
-   var edges = this.edges =
+   let edges = this.edges =
    {
       refs: {},
       props: {}
    };
-   var subjects = this.subjects = {};
-   var bnodes = [];
+   let subjects = this.subjects = {};
+   let bnodes = [];
    for(var i in input)
    {
       var iri = input[i]['@id'];
@@ -3858,8 +3853,8 @@ Processor.prototype.canonicalizeBlankNodes = function(input)
    this.collectEdges();
    
    // create canonical blank node name generator
-   var c14n = this.ng.c14n = _createNameGenerator('c14n');
-   var ngTmp = this.ng.tmp;
+   let c14n = this.ng.c14n = _createNameGenerator('c14n');
+   let ngTmp = this.ng.tmp;
    
    // rename all bnodes that happen to be in the c14n namespace
    // and initialize serializations
@@ -3870,7 +3865,7 @@ Processor.prototype.canonicalizeBlankNodes = function(input)
       if(c14n.inNamespace(iri))
       {
          // generate names until one is unique
-         while(ngTmp.next() in subjects){};
+         while(ngTmp.next() in subjects){}
          this.renameBlankNode(bnode, ngTmp.current());
          iri = bnode['@id'];
       }
@@ -3882,8 +3877,8 @@ Processor.prototype.canonicalizeBlankNodes = function(input)
    }
    
    // keep sorting and naming blank nodes until they are all named
-   var resort = true;
-   var self = this;
+   let resort = true;
+   let self = this;
    while(bnodes.length > 0)
    {
       if(resort)
@@ -3898,10 +3893,10 @@ Processor.prototype.canonicalizeBlankNodes = function(input)
       // name all bnodes according to the first bnode's relation mappings
       var bnode = bnodes.shift();
       var iri = bnode['@id'];
-      var dirs = ['props', 'refs'];
-      for(var d in dirs)
+      let dirs = ['props', 'refs'];
+      for(let d in dirs)
       {
-         var dir = dirs[d];
+         let dir = dirs[d];
          
          // if no serialization has been computed, name only the first node
          if(this.serializations[iri][dir] === null)
@@ -3915,17 +3910,17 @@ Processor.prototype.canonicalizeBlankNodes = function(input)
          }
          
          // sort keys by value to name them in order
-         var keys = Object.keys(mapping);
+         let keys = Object.keys(mapping);
          keys.sort(function(a, b)
          {
             return _compare(mapping[a], mapping[b]);
          });
          
          // name bnodes in mapping
-         var renamed = [];
+         let renamed = [];
          for(var i in keys)
          {
-            var iriK = keys[i];
+            let iriK = keys[i];
             if(!c14n.inNamespace(iri) && iriK in subjects)
             {
                this.renameBlankNode(subjects[iriK], c14n.next());
@@ -3934,16 +3929,16 @@ Processor.prototype.canonicalizeBlankNodes = function(input)
          }
          
          // only keep non-canonically named bnodes
-         var tmp = bnodes;
+         let tmp = bnodes;
          bnodes = [];
          for(var i in tmp)
          {
-            var b = tmp[i];
-            var iriB = b['@id'];
+            let b = tmp[i];
+            let iriB = b['@id'];
             if(!c14n.inNamespace(iriB))
             {
                // mark serializations related to the named bnodes as dirty
-               for(var i2 in renamed)
+               for(let i2 in renamed)
                {
                   if(this.markSerializationDirty(iriB, renamed[i2], dir))
                   {
@@ -3958,12 +3953,12 @@ Processor.prototype.canonicalizeBlankNodes = function(input)
    }
    
    // sort property lists that now have canonically-named bnodes
-   for(var key in edges.props)
+   for(let key in edges.props)
    {
       if(edges.props[key].bnodes.length > 0)
       {
          var bnode = subjects[key];
-         for(var p in bnode)
+         for(let p in bnode)
          {
             if(p.indexOf('@') !== 0 && bnode[p].constructor === Array)
             {
@@ -3997,7 +3992,7 @@ MappingBuilder = function()
  */
 MappingBuilder.prototype.copy = function()
 {
-   var rval = new MappingBuilder();
+   let rval = new MappingBuilder();
    rval.count = this.count;
    rval.processed = _clone(this.processed);
    rval.mapping = _clone(this.mapping);
@@ -4040,12 +4035,12 @@ MappingBuilder.prototype.mapNode = function(iri)
  * 
  * @return the serialized properties.
  */
-var _serializeProperties = function(b)
+let _serializeProperties = function(b)
 {
-   var rval = '';
+   let rval = '';
    
-   var first = true;
-   for(var p in b)
+   let first = true;
+   for(let p in b)
    {
       if(p !== '@id')
       {
@@ -4062,10 +4057,10 @@ var _serializeProperties = function(b)
          rval += '<' + p + '>';
          
          // object(s)
-         var objs = (b[p].constructor === Array) ? b[p] : [b[p]];
-         for(var oi in objs)
+         let objs = (b[p].constructor === Array) ? b[p] : [b[p]];
+         for(let oi in objs)
          {
-            var o = objs[oi];
+            let o = objs[oi];
             if(o.constructor === Object)
             {
                // ID (IRI)
@@ -4120,10 +4115,10 @@ MappingBuilder.prototype.serialize = function(subjects, edges)
    if(this.keyStack.length > 0)
    {
       // continue from top of key stack
-      var next = this.keyStack.pop();
+      let next = this.keyStack.pop();
       for(; next.idx < next.keys.length; ++next.idx)
       {
-         var k = next.keys[next.idx];
+         let k = next.keys[next.idx];
          if(!(k in this.adj))
          {
             this.keyStack.push(next);
@@ -4141,21 +4136,21 @@ MappingBuilder.prototype.serialize = function(subjects, edges)
             this.done[k] = true;
             
             // serialize top-level key and its details
-            var s = k;
-            var adj = this.adj[k];
-            var iri = adj.i;
+            let s = k;
+            let adj = this.adj[k];
+            let iri = adj.i;
             if(iri in subjects)
             {
-               var b = subjects[iri];
+               let b = subjects[iri];
                
                // serialize properties
                s += '[' + _serializeProperties(b) + ']';
                
                // serialize references
-               var first = true;
+               let first = true;
                s += '[';
-               var refs = edges.refs[iri].all;
-               for(var r in refs)
+               let refs = edges.refs[iri].all;
+               for(let r in refs)
                {
                   if(first)
                   {
@@ -4193,9 +4188,9 @@ MappingBuilder.prototype.serialize = function(subjects, edges)
  */
 Processor.prototype.markSerializationDirty = function(iri, changed, dir)
 {
-   var rval = false;
+   let rval = false;
    
-   var s = this.serializations[iri];
+   let s = this.serializations[iri];
    if(s[dir] !== null && changed in s[dir].m)
    {
       s[dir] = null;
@@ -4210,7 +4205,7 @@ Processor.prototype.markSerializationDirty = function(iri, changed, dir)
  * 
  * @param a the array.
  */
-var _rotate = function(a)
+let _rotate = function(a)
 {
    a.unshift.apply(a, a.splice(1, a.length));
 };
@@ -4225,9 +4220,9 @@ var _rotate = function(a)
  * 
  * @return -1 if s1 < s2, 0 if s1 == s2 (or indeterminate), 1 if s1 > v2.
  */
-var _compareSerializations = function(s1, s2)
+let _compareSerializations = function(s1, s2)
 {
-   var rval = 0;
+   let rval = 0;
    
    if(s1.length == s2.length)
    {
@@ -4269,12 +4264,12 @@ Processor.prototype.serializeCombos = function(
       mapped[mb.mapNode(notMapped[0].s)] = notMapped[0].s;
       
       // recurse into remaining possible combinations
-      var original = mb.copy();
+      let original = mb.copy();
       notMapped = notMapped.slice(1);
-      var rotations = Math.max(1, notMapped.length);
-      for(var r = 0; r < rotations; ++r)
+      let rotations = Math.max(1, notMapped.length);
+      for(let r = 0; r < rotations; ++r)
       {
-         var m = (r === 0) ? mb : original.copy();
+         let m = (r === 0) ? mb : original.copy();
          this.serializeCombos(s, iri, siri, m, dir, mapped, notMapped);
          
          // rotate not-mapped for next combination
@@ -4284,7 +4279,7 @@ Processor.prototype.serializeCombos = function(
    // no more adjacent bnodes to map, update serialization
    else
    {
-      var keys = Object.keys(mapped).sort();
+      let keys = Object.keys(mapped).sort();
       mb.adj[siri] = { i: iri, k: keys, m: mapped };
       mb.serialize(this.subjects, this.edges);
       
@@ -4292,9 +4287,9 @@ Processor.prototype.serializeCombos = function(
       if(s[dir] === null || _compareSerializations(mb.s, s[dir].s) <= 0)
       {
          // recurse into adjacent values
-         for(var i in keys)
+         for(let i in keys)
          {
-            var k = keys[i];
+            let k = keys[i];
             this.serializeBlankNode(s, mapped[k], mb, dir);
          }
          
@@ -4325,15 +4320,15 @@ Processor.prototype.serializeBlankNode = function(s, iri, mb, dir)
    {
       // iri now processed
       mb.processed[iri] = true;
-      var siri = mb.mapNode(iri);
+      let siri = mb.mapNode(iri);
       
       // copy original mapping builder
-      var original = mb.copy();
+      let original = mb.copy();
       
       // split adjacent bnodes on mapped and not-mapped
-      var adj = this.edges[dir][iri].bnodes;
-      var mapped = {};
-      var notMapped = [];
+      let adj = this.edges[dir][iri].bnodes;
+      let mapped = {};
+      let notMapped = [];
       for(var i in adj)
       {
          if(adj[i].s in mb.mapping)
@@ -4405,10 +4400,10 @@ Processor.prototype.serializeBlankNode = function(s, iri, mb, dir)
       }*/
       
       // loop over possible combinations
-      var combos = Math.max(1, notMapped.length);
+      let combos = Math.max(1, notMapped.length);
       for(var i = 0; i < combos; ++i)
       {
-         var m = (i === 0) ? mb : original.copy();
+         let m = (i === 0) ? mb : original.copy();
          this.serializeCombos(s, iri, siri, m, dir, mapped, notMapped);         
       }
    }
@@ -4424,11 +4419,11 @@ Processor.prototype.serializeBlankNode = function(s, iri, mb, dir)
  */
 Processor.prototype.deepCompareBlankNodes = function(a, b)
 {
-   var rval = 0;
+   let rval = 0;
    
    // compare IRIs
-   var iriA = a['@id'];
-   var iriB = b['@id'];
+   let iriA = a['@id'];
+   let iriB = b['@id'];
    if(iriA === iriB)
    {
       rval = 0;
@@ -4442,13 +4437,13 @@ Processor.prototype.deepCompareBlankNodes = function(a, b)
       if(rval === 0)
       {
          // compare property edges and then reference edges
-         var dirs = ['props', 'refs'];
-         for(var i = 0; rval === 0 && i < dirs.length; ++i)
+         let dirs = ['props', 'refs'];
+         for(let i = 0; rval === 0 && i < dirs.length; ++i)
          {
             // recompute 'a' and 'b' serializations as necessary
-            var dir = dirs[i];
-            var sA = this.serializations[iriA];
-            var sB = this.serializations[iriB];
+            let dir = dirs[i];
+            let sA = this.serializations[iriA];
+            let sB = this.serializations[iriB];
             if(sA[dir] === null)
             {
                var mb = new MappingBuilder();
@@ -4491,7 +4486,7 @@ Processor.prototype.deepCompareBlankNodes = function(a, b)
  */
 Processor.prototype.shallowCompareBlankNodes = function(a, b)
 {
-   var rval = 0;
+   let rval = 0;
    
    /* ShallowSort Algorithm (when comparing two bnodes):
       1. Compare the number of properties.
@@ -4506,8 +4501,8 @@ Processor.prototype.shallowCompareBlankNodes = function(a, b)
       5.2. The bnode with the alphabetically-first reference iri is first.
       5.3. The bnode with the alphabetically-first reference property is first.
     */
-   var pA = Object.keys(a);
-   var pB = Object.keys(b);
+   let pA = Object.keys(a);
+   let pB = Object.keys(b);
    
    // step #1
    rval = _compare(pA.length, pB.length);
@@ -4535,7 +4530,7 @@ Processor.prototype.shallowCompareBlankNodes = function(a, b)
    // step #5
    if(rval === 0)
    {
-      for(var i = 0; i < edgesA.length && rval === 0; ++i)
+      for(let i = 0; i < edgesA.length && rval === 0; ++i)
       {
          rval = this.compareEdges(edgesA[i], edgesB[i]);
       }
@@ -4558,11 +4553,11 @@ Processor.prototype.shallowCompareBlankNodes = function(a, b)
  */
 Processor.prototype.compareEdges = function(a, b)
 {
-   var rval = 0;
+   let rval = 0;
    
-   var bnodeA = _isBlankNodeIri(a.s);
-   var bnodeB = _isBlankNodeIri(b.s);
-   var c14n = this.ng.c14n;
+   let bnodeA = _isBlankNodeIri(a.s);
+   let bnodeB = _isBlankNodeIri(b.s);
+   let c14n = this.ng.c14n;
    
    // if not both bnodes, one that is a bnode is greater
    if(bnodeA != bnodeB)
@@ -4583,8 +4578,8 @@ Processor.prototype.compareEdges = function(a, b)
       // do bnode IRI comparison if canonical naming has begun
       if(rval === 0 && c14n !== null)
       {
-         var c14nA = c14n.inNamespace(a.s);
-         var c14nB = c14n.inNamespace(b.s);
+         let c14nA = c14n.inNamespace(a.s);
+         let c14nB = c14n.inNamespace(b.s);
          if(c14nA != c14nB)
          {
             rval = c14nA ? 1 : -1;
@@ -4608,27 +4603,27 @@ Processor.prototype.compareEdges = function(a, b)
  */
 Processor.prototype.collectEdges = function()
 {
-   var refs = this.edges.refs;
-   var props = this.edges.props;
+   let refs = this.edges.refs;
+   let props = this.edges.props;
    
    // collect all references and properties
    for(var iri in this.subjects)
    {
-      var subject = this.subjects[iri];
-      for(var key in subject)
+      let subject = this.subjects[iri];
+      for(let key in subject)
       {
          if(key !== '@id')
          {
             // normalize to array for single codepath
-            var object = subject[key];
-            var tmp = (object.constructor !== Array) ? [object] : object;
-            for(var i in tmp)
+            let object = subject[key];
+            let tmp = (object.constructor !== Array) ? [object] : object;
+            for(let i in tmp)
             {
-               var o = tmp[i];
+               let o = tmp[i];
                if(o.constructor === Object && '@id' in o &&
                   o['@id'] in this.subjects)
                {
-                  var objIri = o['@id'];
+                  let objIri = o['@id'];
                   
                   // map object to this subject
                   refs[objIri].all.push({ s: iri, p: key });
@@ -4642,7 +4637,7 @@ Processor.prototype.collectEdges = function()
    }
    
    // create sorted categories
-   var self = this;
+   let self = this;
    for(var iri in refs)
    {
       refs[iri].all.sort(function(a, b) { return self.compareEdges(a, b); });
@@ -4668,23 +4663,23 @@ Processor.prototype.collectEdges = function()
  * 
  * @return true if the input has one of the given types.
  */
-var _isType = function(input, frame)
+let _isType = function(input, frame)
 {
-   var rval = false;
+   let rval = false;
    
    // check if type(s) are specified in frame and input
-   var type = '@type';
+   let type = '@type';
    if('@type' in frame &&
       input.constructor === Object && type in input)
    {
-      var tmp = (input[type].constructor === Array) ?
+      let tmp = (input[type].constructor === Array) ?
          input[type] : [input[type]];
-      var types = (frame[type].constructor === Array) ?
+      let types = (frame[type].constructor === Array) ?
          frame[type] : [frame[type]];
-      for(var t = 0; t < types.length && !rval; ++t)
+      for(let t = 0; t < types.length && !rval; ++t)
       {
          type = types[t];
-         for(var i in tmp)
+         for(let i in tmp)
          {
             if(tmp[i] === type)
             {
@@ -4706,16 +4701,16 @@ var _isType = function(input, frame)
  * 
  * @return true if the input matches the frame.
  */
-var _isDuckType = function(input, frame)
+let _isDuckType = function(input, frame)
 {
-   var rval = false;
+   let rval = false;
    
    // frame must not have a specific type
-   var type = '@type';
+   let type = '@type';
    if(!(type in frame))
    {
       // get frame properties that must exist on input
-      var props = Object.keys(frame).filter(function(e)
+      let props = Object.keys(frame).filter(function(e)
       {
          // filter non-keywords
          return e.indexOf('@') !== 0;
@@ -4729,7 +4724,7 @@ var _isDuckType = function(input, frame)
       else if(input.constructor === Object && '@id' in input)
       {
          rval = true;
-         for(var i in props)
+         for(let i in props)
          {
             if(!(props[i] in input))
             {
@@ -4757,19 +4752,19 @@ var _isDuckType = function(input, frame)
  * 
  * @return the framed input.
  */
-var _subframe = function(
+let _subframe = function(
    subjects, value, frame, embeds, autoembed, parent, parentKey, options)
 {
    // get existing embed entry
-   var iri = value['@id'];
-   var embed = (iri in embeds) ? embeds[iri] : null;
+   let iri = value['@id'];
+   let embed = (iri in embeds) ? embeds[iri] : null;
    
    // determine if value should be embedded or referenced,
    // embed is ON if:
    // 1. The frame OR default option specifies @embed as ON, AND
    // 2. There is no existing embed OR it is an autoembed, AND
    //    autoembed mode is off.
-   var embedOn = (
+   let embedOn = (
       (('@embed' in frame && frame['@embed']) ||
       (!('@embed' in frame) && options.defaults.embedOn)) &&
       (embed === null || (embed.autoembed && !autoembed)));
@@ -4793,7 +4788,7 @@ var _subframe = function(
          if(embed.parent[embed.key].constructor === Array)
          {
             // find and replace embed in array
-            var objs = embed.parent[embed.key];
+            let objs = embed.parent[embed.key];
             for(var i in objs)
             {
                if(objs[i].constructor === Object && '@id' in objs[i] &&
@@ -4812,8 +4807,8 @@ var _subframe = function(
          // recursively remove any dependent dangling embeds
          var removeDependents = function(iri)
          {
-            var iris = Object.keys(embeds);
-            for(var i in iris)
+            let iris = Object.keys(embeds);
+            for(let i in iris)
             {
                i = iris[i];
                if(i in embeds && embeds[i].parent !== null &&
@@ -4833,7 +4828,7 @@ var _subframe = function(
       embed.key = parentKey;
       
       // check explicit flag
-      var explicitOn = (
+      let explicitOn = (
          frame['@explicit'] === true || options.defaults.explicitOn);
       if(explicitOn)
       {
@@ -4849,7 +4844,7 @@ var _subframe = function(
       }
       
       // iterate over keys in value
-      var keys = Object.keys(value);
+      let keys = Object.keys(value);
       for(i in keys)
       {
          // skip keywords
@@ -4870,9 +4865,9 @@ var _subframe = function(
             }
             
             // build input and do recursion
-            var v = value[key];
-            var input = (v.constructor === Array) ? v : [v];
-            for(var n in input)
+            let v = value[key];
+            let input = (v.constructor === Array) ? v : [v];
+            for(let n in input)
             {
                // replace reference to subject w/embedded subject
                if(input[n].constructor === Object &&
@@ -4910,7 +4905,7 @@ var _subframe = function(
                }
                
                // determine if omit default is on
-               var omitOn = (
+               let omitOn = (
                   f['@omitDefault'] === true || options.defaults.omitDefaultOn);
                if(!omitOn)
                {
@@ -4950,11 +4945,11 @@ var _subframe = function(
 var _frame = function(
    subjects, input, frame, embeds, autoembed, parent, parentKey, options)
 {
-   var rval = null;
+   let rval = null;
    
    // prepare output, set limit, get array of frames
-   var limit = -1;
-   var frames;
+   let limit = -1;
+   let frames;
    if(frame.constructor === Array)
    {
       rval = [];
@@ -4971,8 +4966,8 @@ var _frame = function(
    }
    
    // iterate over frames adding input matches to list
-   var values = [];
-   for(var i = 0; i < frames.length && limit !== 0; ++i)
+   let values = [];
+   for(let i = 0; i < frames.length && limit !== 0; ++i)
    {
       // get next frame
       frame = frames[i];
@@ -4987,10 +4982,10 @@ var _frame = function(
       
       // create array of values for each frame
       values[i] = [];
-      for(var n = 0; n < input.length && limit !== 0; ++n)
+      for(let n = 0; n < input.length && limit !== 0; ++n)
       {
          // add input to list if it matches frame specific type or duck-type
-         var next = input[n];
+         let next = input[n];
          if(_isType(next, frame) || _isDuckType(next, frame))
          {
             values[i].push(next);
@@ -5000,12 +4995,12 @@ var _frame = function(
    }
    
    // for each matching value, add it to the output
-   for(var i1 in values)
+   for(let i1 in values)
    {
-      for(var i2 in values[i1])
+      for(let i2 in values[i1])
       {
          frame = frames[i1];
-         var value = values[i1][i2];
+         let value = values[i1][i2];
          
          // if value is a subject, do subframing
          if(_isSubject(value))
@@ -5023,7 +5018,7 @@ var _frame = function(
          else
          {
             // determine if value is a reference to an embed
-            var isRef = (_isReference(value) && value['@id'] in embeds);
+            let isRef = (_isReference(value) && value['@id'] in embeds);
             
             // push any value that isn't a parentless reference
             if(!(parent === null && isRef))
@@ -5048,13 +5043,13 @@ var _frame = function(
  */
 Processor.prototype.frame = function(input, frame, options)
 {
-   var rval;
+   let rval;
    
    // normalize input
    input = jsonld.normalize(input);
    
    // save frame context
-   var ctx = null;
+   let ctx = null;
    if('@context' in frame)
    {
       ctx = _clone(frame['@context']);
@@ -5071,7 +5066,7 @@ Processor.prototype.frame = function(input, frame, options)
       }
       
       // expand all elements in the array
-      var tmp = [];
+      let tmp = [];
       for(var i in frame)
       {
          tmp.push(jsonld.expand(frame[i]));
@@ -5092,7 +5087,7 @@ Processor.prototype.frame = function(input, frame, options)
    };
    
    // build map of all subjects
-   var subjects = {};
+   let subjects = {};
    for(var i in input)
    {
       subjects[input[i]['@id']] = input[i];
@@ -5114,7 +5109,7 @@ Processor.prototype.frame = function(input, frame, options)
 
 
 // exports
-var JSONLDParser = {};
+let JSONLDParser = {};
 
 JSONLDParser.parser = {};
 JSONLDParser.parser.parse = function(data, graph) {
@@ -5130,7 +5125,7 @@ JSONLDParser.parser.parse = function(data, graph) {
 
 // **N3Lexer** tokenizes N3 documents.
 // ## Regular expressions
-var patterns = {
+let patterns = {
   _iri: /^<((?:[^\x00-\x20<>\\"\{\}\|\^\`]|\\[uU])*)>/,
   _string: /^"[^"\\]*(?:\\.[^"\\]*)*"(?=[^"\\])|^'[^'\\]*(?:\\.[^'\\]*)*'(?=[^'\\])/,
   _tripleQuotedString: /^""("[^"\\]*(?:(?:\\.|"(?!""))[^"\\]*)*")""|^''('[^'\\]*(?:(?:\\.|'(?!''))[^'\\]*)*')''/,
@@ -5153,22 +5148,22 @@ var patterns = {
 
 // Regular expression and replacement string to escape N3 strings.
 // Note how we catch invalid unicode sequences separately (they will trigger an error).
-var escapeSequence = /\\u([a-fA-F0-9]{4})|\\U([a-fA-F0-9]{8})|\\[uU]|\\(.)/g;
-var escapeReplacements = { '\\': '\\', "'": "'", '"': '"',
+let escapeSequence = /\\u([a-fA-F0-9]{4})|\\U([a-fA-F0-9]{8})|\\[uU]|\\(.)/g;
+let escapeReplacements = { '\\': '\\', "'": "'", '"': '"',
                            'n': '\n', 'r': '\r', 't': '\t', 'f': '\f', 'b': '\b',
                            '_': '_', '~': '~', '.': '.', '-': '-', '!': '!', '$': '$', '&': '&',
                            '(': '(', ')': ')', '*': '*', '+': '+', ',': ',', ';': ';', '=': '=',
                            '/': '/', '?': '?', '#': '#', '@': '@', '%': '%' };
-var illegalUrlChars = /[\x00-\x20<>\\"\{\}\|\^\`]/;
-var fromCharCode = String.fromCharCode;
+let illegalUrlChars = /[\x00-\x20<>\\"\{\}\|\^\`]/;
+let fromCharCode = String.fromCharCode;
 
 // Different punctuation types.
-var punctuationTypes = { '.': 'dot', ';': 'semicolon', ',': 'comma',
+let punctuationTypes = { '.': 'dot', ';': 'semicolon', ',': 'comma',
                          '[': 'bracketopen', ']': 'bracketclose',
                          '(': 'liststart', ')': 'listend' };
 
 // `setImmediate` shim
-var immediately = typeof setImmediate === 'function' ? setImmediate :
+let immediately = typeof setImmediate === 'function' ? setImmediate :
                   function setImmediate(func) { setTimeout(func, 0); };
 
 // ## Constructor
@@ -5177,7 +5172,7 @@ function N3Lexer() {
     return new N3Lexer();
 
   // Local copies of the patterns perform slightly better.
-  for (var name in patterns)
+  for (let name in patterns)
     this[name] = patterns[name];
 }
 
@@ -5187,7 +5182,7 @@ N3Lexer.prototype = {
   // ### `_tokenizeToEnd` tokenizes as for as possible, emitting tokens through the callback.
   _tokenizeToEnd: function (callback, inputFinished) {
     // Continue parsing as far as possible; the loop will return eventually.
-    var input = this._input;
+    let input = this._input;
     while (true) {
       // Count and skip whitespace lines.
       var whiteSpaceMatch;
@@ -5198,7 +5193,7 @@ N3Lexer.prototype = {
         input = input.substr(whiteSpaceMatch[0].length, input.length);
 
       // Create uniform token skeleton, so the JavaScript engine uses one runtime type for all tokens.
-      var token = { line: this._line, type: '', value: '', prefix: '' };
+      let token = { line: this._line, type: '', value: '', prefix: '' };
 
       // Stop for now if we're at the end.
       if (this._endOfFile.test(input)) {
@@ -5406,7 +5401,7 @@ N3Lexer.prototype = {
   _unescape: function (item) {
     try {
       return item.replace(escapeSequence, function (sequence, unicode4, unicode8, escapedChar) {
-        var charCode;
+        let charCode;
         if (unicode4) {
           charCode = parseInt(unicode4, 16);
           if (isNaN(charCode)) throw new Error(); // can never happen (regex), but helps performance
@@ -5419,7 +5414,7 @@ N3Lexer.prototype = {
           return fromCharCode(0xD800 + ((charCode -= 0x10000) >> 10), 0xDC00 + (charCode & 0x3FF));
         }
         else {
-          var replacement = escapeReplacements[escapedChar];
+          let replacement = escapeReplacements[escapedChar];
           if (!replacement)
             throw new Error();
           return replacement;
@@ -5434,7 +5429,7 @@ N3Lexer.prototype = {
   // ### `tokenize` starts the transformation of an N3 document into an array of tokens.
   // The input can be a string or a stream.
   tokenize: function (input, callback) {
-    var self = this;
+    let self = this;
     this._line = 1;
 
     // If the input is a string, continuously emit tokens through the callback until the end.
@@ -5487,16 +5482,16 @@ N3Lexer.prototype = {
 
 // **N3Parser** parses N3 documents.
 
-var RDF_PREFIX = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
+let RDF_PREFIX = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
     RDF_NIL    = RDF_PREFIX + 'nil',
     RDF_FIRST  = RDF_PREFIX + 'first',
     RDF_REST   = RDF_PREFIX + 'rest';
 
-var absoluteURI = /:/,
+let absoluteURI = /:/,
     documentPart = /[^\/]*$/,
     rootURI = /^(?:[^:]+:\/*)?[^\/]*/;
 
-var _undefined, noop = function () {};
+let _undefined, noop = function () {};
 
 // ## Constructor
 function N3Parser(config) {
@@ -5566,7 +5561,7 @@ N3Parser.prototype = {
                         (this._blankNodes[token.value] = '_:b' + this._blankNodeCount++);
       }
       else {
-        var prefix = this._prefixes[token.prefix];
+        let prefix = this._prefixes[token.prefix];
         if (prefix === _undefined)
           return this._error('Undefined prefix "' + token.prefix + ':"', token);
         this._subject = prefix + token.value;
@@ -5605,7 +5600,7 @@ N3Parser.prototype = {
         return this._error('Disallowed blank node as predicate', token);
       }
       else {
-        var prefix = this._prefixes[token.prefix];
+        let prefix = this._prefixes[token.prefix];
         if (prefix === _undefined)
           return this._error('Undefined prefix "' + token.prefix + ':"', token);
         this._predicate = prefix + token.value;
@@ -5646,7 +5641,7 @@ N3Parser.prototype = {
                        (this._blankNodes[token.value] = '_:b' + this._blankNodeCount++);
       }
       else {
-        var prefix = this._prefixes[token.prefix];
+        let prefix = this._prefixes[token.prefix];
         if (prefix === _undefined)
           return this._error('Undefined prefix "' + token.prefix + ':"', token);
         this._object = prefix + token.value;
@@ -5693,7 +5688,7 @@ N3Parser.prototype = {
                              context: 'n3/contexts#default' });
 
     // Restore parent triple that contains the blank node.
-    var triple = this._tripleStack.pop();
+    let triple = this._tripleStack.pop();
     this._subject = triple.subject;
     // Was the blank node the object?
     if (triple.object !== null) {
@@ -5715,7 +5710,7 @@ N3Parser.prototype = {
         value = token.value;
       }
       else {
-        var prefix = this._prefixes[token.prefix];
+        let prefix = this._prefixes[token.prefix];
         if (prefix === _undefined)
           return this._error('Undefined prefix "' + token.prefix + ':"', token);
         value = prefix + token.value;
@@ -5732,7 +5727,7 @@ N3Parser.prototype = {
 
   // ### `_readListItem` reads items from a list.
   _readListItem: function (token) {
-    var item = null,                  // The actual list item.
+    let item = null,                  // The actual list item.
         itemHead = null,              // The head of the rdf:first predicate.
         prevItemHead = this._subject, // The head of the previous rdf:first predicate.
         stack = this._tripleStack,    // The stack of triples part of recursion (lists, blanks, etc.).
@@ -5749,7 +5744,7 @@ N3Parser.prototype = {
                        (this._blankNodes[token.value] = '_:b' + this._blankNodeCount++);
       }
       else {
-        var prefix = this._prefixes[token.prefix];
+        let prefix = this._prefixes[token.prefix];
         if (prefix === _undefined)
           return this._error('Undefined prefix "' + token.prefix + ':"', token);
         item = prefix + token.value;
@@ -5841,7 +5836,7 @@ N3Parser.prototype = {
 
   // ### `_readPunctuation` reads punctuation between triples or triple parts.
   _readPunctuation: function (token, empty) {
-    var next;
+    let next;
     switch (token.type) {
     // A dot just ends the statement, without sharing anything with the next.
     case 'dot':
@@ -5879,7 +5874,7 @@ N3Parser.prototype = {
   _readPrefixURI: function (token) {
     if (token.type !== 'IRI')
       return this._error('Expected IRI to follow prefix "' + this._prefix + ':"', token);
-    var prefixURI;
+    let prefixURI;
     if (this._baseURI === null || absoluteURI.test(token.value))
       prefixURI = token.value;
     else
@@ -5917,7 +5912,7 @@ N3Parser.prototype = {
 
   // ### `_getTripleEndReader` gets the next reader function at the end of a triple.
   _getTripleEndReader: function () {
-    var stack = this._tripleStack;
+    let stack = this._tripleStack;
     if (stack.length === 0)
       return this._readPunctuation;
 
@@ -5973,7 +5968,7 @@ N3Parser.prototype = {
     this._prefixCallback = prefixCallback || noop;
 
     // Execute the read callback when a token arrives.
-    var self = this;
+    let self = this;
     this._lexer.tokenize(input, function (error, token) {
       if (self._readCallback !== _undefined) {
         if (error !== null)
@@ -6000,7 +5995,7 @@ N3Parser.prototype = {
 
 
 // Add a wrapper around the N3.js parser
-var RVN3Parser = {};
+let RVN3Parser = {};
 RVN3Parser.parser = {
   async: true,
 
@@ -6016,7 +6011,7 @@ RVN3Parser.parser = {
       options.documentIRI = options.baseURI;
 
     // Parse triples into array
-    var triples = [];
+    let triples = [];
     new N3Parser(options).parse(data, function (error, triple) {
       if (error)
         callback(false, error);
@@ -6043,7 +6038,7 @@ function convertEntity(entity) {
   switch (entity[0]) {
   case '"': {
       if(entity.indexOf("^^") > 0) {
-          var parts = entity.split("^^");
+          let parts = entity.split("^^");
           return {literal: parts[0] + "^^<" + parts[1] + ">" };
       } else {
           return { literal: entity };
@@ -6051,14 +6046,14 @@ function convertEntity(entity) {
     }
     case '_': return { blank: entity.replace('b', '') };
     default:  return { token: 'uri', value: entity, prefix: null, suffix: null };
-  };
+  }
 }
 
 
 // end of ./src/js-communication/src/rvn3_parser.js 
 
 // exports
-var RDFLoader = {};
+let RDFLoader = {};
 
 // imports
 
@@ -6088,7 +6083,7 @@ RDFLoader.RDFLoader = function (params) {
     }
 
     this.acceptHeaderValue = "";
-    for (var i = 0; i < this.precedences.length; i++) {
+    for (let i = 0; i < this.precedences.length; i++) {
         if (i != 0) {
             this.acceptHeaderValue = this.acceptHeaderValue + "," + this.precedences[i];
         } else {
@@ -6104,8 +6099,8 @@ RDFLoader.RDFLoader.prototype.registerParser = function(mediaType, parser) {
 
 RDFLoader.RDFLoader.prototype.unregisterParser = function(mediaType) {
     delete this.parsers[mediaType];
-    var mediaTypes = [];
-    for(var i=0; i<this.precedences.length; i++) {
+    let mediaTypes = [];
+    for(let i=0; i<this.precedences.length; i++) {
         if(this.precedences[i] != mediaType) {
             mediaTypes.push(this.precedences[i]);
         }
@@ -6119,16 +6114,16 @@ RDFLoader.RDFLoader.prototype.setAcceptHeaderPrecedence = function(mediaTypes) {
 };
 
 RDFLoader.RDFLoader.prototype.load = function(uri, graph, callback) {
-    var that = this;
+    let that = this;
     NetworkTransport.load(uri, this.acceptHeaderValue, function(success, results){
         if(success == true) {
-            var mime = results["headers"]["Content-Type"] || results["headers"]["content-type"];
-            var data = results['data'];
+            let mime = results["headers"]["Content-Type"] || results["headers"]["content-type"];
+            let data = results['data'];
             if(mime != null) {
                 mime = mime.split(";")[0];
-                for(var m in that.parsers) {
+                for(let m in that.parsers) {
                     if(m.indexOf("/")!=-1) {
-                        var mimeParts = m.split("/");
+                        let mimeParts = m.split("/");
                         if(mimeParts[1] === '*') {
                             if(mime.indexOf(mimeParts[0])!=-1) {
                                 return that.tryToParse(that.parsers[m], graph, data, {documentURI: uri}, callback);
@@ -6186,7 +6181,7 @@ RDFLoader.RDFLoader.prototype.tryToParse = function(parser, graph, input, option
         if(parser.async) {
             parser.parse(input, graph, options, callback);
         } else {
-            var parsed = parser.parse(input, graph, options);
+            let parsed = parser.parse(input, graph, options);
 
             if(parsed != null) {
                 callback(true, parsed);
@@ -6209,7 +6204,7 @@ RDFLoader.RDFLoader.prototype.tryToParse = function(parser, graph, input, option
 // end of ./src/js-communication/src/rdf_loader.js 
 
 // exports
-var AbstractQueryTree = {};
+let AbstractQueryTree = {};
 
 // imports
 
@@ -6259,7 +6254,7 @@ AbstractQueryTree.AbstractQueryTree.prototype.parseSelect = function(syntaxTree)
         console.log("error parsing query");
         return null;
     } else {
-        var env = { freshCounter: 0 };
+        let env = { freshCounter: 0 };
         syntaxTree.pattern = this.build(syntaxTree.pattern, env);
         return syntaxTree;
     }
@@ -6278,7 +6273,7 @@ AbstractQueryTree.AbstractQueryTree.prototype.build = function(node, env) {
     if(node.token === 'groupgraphpattern') {
         return this._buildGroupGraphPattern(node, env);
     } else if (node.token === 'basicgraphpattern') {
-        var bgp = { kind: 'BGP',
+        let bgp = { kind: 'BGP',
                     value: node.triplesContext };
 	//console.log("pre1");
 	bgp = AbstractQueryTree.translatePathExpressionsInBGP(bgp, env);
@@ -6286,13 +6281,13 @@ AbstractQueryTree.AbstractQueryTree.prototype.build = function(node, env) {
 	//console.log(sys.inspect(bgp,true,20));	
 	return bgp;
     } else if (node.token === 'graphunionpattern') {
-        var a = this.build(node.value[0],env);
-        var b = this.build(node.value[1],env);
+        let a = this.build(node.value[0],env);
+        let b = this.build(node.value[1],env);
 
         return { kind: 'UNION',
                  value: [a,b] };
     } else if(node.token === 'graphgraphpattern') {
-        var c = this.build(node.value, env);
+        let c = this.build(node.value, env);
         return { kind: 'GRAPH',
                  value: c,
                  graph: node.graph };
@@ -6302,15 +6297,15 @@ AbstractQueryTree.AbstractQueryTree.prototype.build = function(node, env) {
 };
 
 AbstractQueryTree.translatePathExpressionsInBGP = function(bgp, env) {
-    var pathExpression;
-    var before = [], rest, bottomJoin;
-    for(var i=0; i<bgp.value.length; i++) {
+    let pathExpression;
+    let before = [], rest, bottomJoin;
+    for(let i=0; i<bgp.value.length; i++) {
 	if(bgp.value[i].predicate && bgp.value[i].predicate.token === 'path') {
 	    //console.log("FOUND A PATH");
 	    pathExpression = bgp.value[i];
 	    rest = bgp.value.slice(i+1);
-	    var bgpTransformed = AbstractQueryTree.translatePathExpression(pathExpression, env);
-	    var optionalPattern = null;
+	    let bgpTransformed = AbstractQueryTree.translatePathExpression(pathExpression, env);
+	    let optionalPattern = null;
 	    //console.log("BACK FROM TRANSFORMED");
 	    if(bgpTransformed.kind === 'BGP') {
 		before = before.concat(bgpTransformed.value);
@@ -6355,10 +6350,10 @@ AbstractQueryTree.translatePathExpressionsInBGP = function(bgp, env) {
 
 		if(rest.length >0) {
 		    //console.log("(2a)")
-		    var rvalueJoin = AbstractQueryTree.translatePathExpressionsInBGP({kind: 'BGP', value: rest}, env);
+		    let rvalueJoin = AbstractQueryTree.translatePathExpressionsInBGP({kind: 'BGP', value: rest}, env);
 		    //console.log("got rvalue");
 		    if(optionalPattern != null) {
-			var optionals = before.concat([optionalPattern]).concat(rest);
+			let optionals = before.concat([optionalPattern]).concat(rest);
 			return { kind: 'UNION',
 				 value: [{ kind: 'JOIN',
 					   lvalue: bottomJoin,
@@ -6413,12 +6408,12 @@ AbstractQueryTree.translatePathExpression  = function(pathExpression, env) {
 	    return {kind: 'BGP', value: [pathExpression]};
 	}
     } else if(pathExpression.predicate.kind === 'sequence') {
-	var currentSubject = pathExpression.subject;
-	var lastObject = pathExpression.object;
-	var currentGraph = pathExpression.graph;
-	var nextObject, chain;
-	var restTriples = [];
-	for(var i=0; i< pathExpression.predicate.value.length; i++) {
+	let currentSubject = pathExpression.subject;
+	let lastObject = pathExpression.object;
+	let currentGraph = pathExpression.graph;
+	let nextObject, chain;
+	let restTriples = [];
+	for(let i=0; i< pathExpression.predicate.value.length; i++) {
 	    if(i!=pathExpression.predicate.value.length-1) {
 		nextObject = {
 		    token: "var",
@@ -6444,9 +6439,9 @@ AbstractQueryTree.translatePathExpression  = function(pathExpression, env) {
 	    restTriples.push(chain);
 
 	    if(i!=pathExpression.predicate.value.length-1)
-		currentSubject = Utils.clone(nextObject);;
+		currentSubject = Utils.clone(nextObject);
 	}
-	var bgp = {kind: 'BGP', value: restTriples};
+	let bgp = {kind: 'BGP', value: restTriples};
 	//console.log("BEFORE (1):");
 	//console.log(bgp);
 	//console.log("--------------");
@@ -6455,11 +6450,11 @@ AbstractQueryTree.translatePathExpression  = function(pathExpression, env) {
 };
 
 AbstractQueryTree.AbstractQueryTree.prototype._buildGroupGraphPattern = function(node, env) {
-    var f = (node.filters || []);
-    var g = {kind: "EMPTY_PATTERN"};
+    let f = (node.filters || []);
+    let g = {kind: "EMPTY_PATTERN"};
 
-    for(var i=0; i<node.patterns.length; i++) {
-        var pattern = node.patterns[i];
+    for(let i=0; i<node.patterns.length; i++) {
+        let pattern = node.patterns[i];
         if(pattern.token === 'optionalgraphpattern') {
             var parsedPattern = this.build(pattern.value,env);
             if(parsedPattern.kind === 'FILTER') {
@@ -6569,7 +6564,7 @@ AbstractQueryTree.AbstractQueryTree.prototype.bind = function(aqt, bindings) {
         aqt.graph = bindings[aqt.graph.value];
     }
     if(aqt.filter != null) {
-        var acum = [];
+        let acum = [];
         for(var i=0; i< aqt.filter.length; i++) {
             aqt.filter[i].value = this._bindFilter(aqt.filter[i].value, bindings);
             acum.push(aqt.filter[i]);
@@ -6610,11 +6605,11 @@ AbstractQueryTree.AbstractQueryTree.prototype.bind = function(aqt, bindings) {
 };
 
 AbstractQueryTree.AbstractQueryTree.prototype._bindTripleContext = function(triples, bindings) {
-    for(var i=0; i<triples.length; i++) {
+    for(let i=0; i<triples.length; i++) {
         delete triples[i]['graph'];
         delete triples[i]['variables'];
-        for(var p in triples[i]) {
-            var comp = triples[i][p];
+        for(let p in triples[i]) {
+            let comp = triples[i][p];
             if(comp.token === 'var' && bindings[comp.value] != null) {
                 triples[i][p] = bindings[comp.value];
             }
@@ -6627,7 +6622,7 @@ AbstractQueryTree.AbstractQueryTree.prototype._bindTripleContext = function(trip
 
 AbstractQueryTree.AbstractQueryTree.prototype._bindFilter = function(filterExpr, bindings) {
     if(filterExpr.expressionType != null) {
-        var expressionType = filterExpr.expressionType;
+        let expressionType = filterExpr.expressionType;
         if(expressionType == 'relationalexpression') {
             filterExpr.op1 = this._bindFilter(filterExpr.op1, bindings);
             filterExpr.op2 = this._bindFilter(filterExpr.op2, bindings);
@@ -6659,7 +6654,7 @@ AbstractQueryTree.AbstractQueryTree.prototype._bindFilter = function(filterExpr,
             if(filterExpr.primaryexpression == 'var') {
                 // lookup the var in the bindings
                 if(bindings[filterExpr.value.value] != null) {
-                    var val = bindings[filterExpr.value.value];
+                    let val = bindings[filterExpr.value.value];
                     if(val.token === 'uri') {
                         filterExpr.primaryexpression = 'iri';
                     } else {
@@ -6683,8 +6678,8 @@ AbstractQueryTree.AbstractQueryTree.prototype.replace = function(aqt, from, to, 
         aqt.graph = Utils.clone(to);
     }
     if(aqt.filter != null) {
-        var acum = [];
-        for(var i=0; i< aqt.filter.length; i++) {
+        let acum = [];
+        for(let i=0; i< aqt.filter.length; i++) {
             aqt.filter[i].value = this._replaceFilter(aqt.filter[i].value, from, to, ns);
             acum.push(aqt.filter[i]);
         }
@@ -6722,9 +6717,9 @@ AbstractQueryTree.AbstractQueryTree.prototype.replace = function(aqt, from, to, 
 };
 
 AbstractQueryTree.AbstractQueryTree.prototype._replaceTripleContext = function(triples, from, to, ns) {
-    for(var i=0; i<triples.length; i++) {
-        for(var p in triples[i]) {
-            var comp = triples[i][p];
+    for(let i=0; i<triples.length; i++) {
+        for(let p in triples[i]) {
+            let comp = triples[i][p];
 	    if(comp.token === 'var' && from.token === 'var' && comp.value === from.value) {
 		triples[i][p] = to;
 	    } else if(comp.token === 'blank' && from.token === 'blank' && comp.value === from.value) {
@@ -6745,7 +6740,7 @@ AbstractQueryTree.AbstractQueryTree.prototype._replaceTripleContext = function(t
 
 AbstractQueryTree.AbstractQueryTree.prototype._replaceFilter = function(filterExpr, from, to, ns) {
     if(filterExpr.expressionType != null) {
-        var expressionType = filterExpr.expressionType;
+        let expressionType = filterExpr.expressionType;
         if(expressionType == 'relationalexpression') {
             filterExpr.op1 = this._replaceFilter(filterExpr.op1, from, to, ns);
             filterExpr.op2 = this._replaceFilter(filterExpr.op2, from, to, ns);
@@ -6774,7 +6769,7 @@ AbstractQueryTree.AbstractQueryTree.prototype._replaceFilter = function(filterEx
                 filterExpr.args[i] = this._replaceFilter(filterExpr.args[i], from, to, ns);
             }
         } else if(expressionType == 'atomic') {        
-	    var val = null;
+	    let val = null;
             if(filterExpr.primaryexpression == from.token && filterExpr.value == from.value) {
                     val = to.value;                
             } else if(filterExpr.primaryexpression == 'iri' && from.token == 'uri' && filterExpr.value == from.value) {
@@ -6822,7 +6817,7 @@ AbstractQueryTree.AbstractQueryTree.prototype.treeWithUnion = function(aqt) {
     } else if(aqt.kind === 'GRAPH') {
 	return false;
     } else if(aqt.kind === 'LEFT_JOIN' || aqt.kind === 'JOIN') {
-        var leftUnion  = this.treeWithUnion(aqt.lvalue);
+        let leftUnion  = this.treeWithUnion(aqt.lvalue);
 	if(leftUnion)
 	    return true;
 	else
@@ -6872,7 +6867,7 @@ SparqlParser.parser = (function(){
       + '"';
   }
   
-  var result = {
+  let result = {
     /*
      * Parses the input with a generated parser. If the parsing is successfull,
      * returns a value explicitly or implicitly specified by the grammar from
@@ -6880,7 +6875,7 @@ SparqlParser.parser = (function(){
      * unsuccessful, throws |PEG.parser.SyntaxError| describing the error.
      */
     parse: function(input, startRule) {
-      var parseFunctions = {
+      let parseFunctions = {
         "SPARQL": parse_SPARQL,
         "Query": parse_Query,
         "Prologue": parse_Prologue,
@@ -7034,16 +7029,16 @@ SparqlParser.parser = (function(){
         startRule = "SPARQL";
       }
       
-      var pos = 0;
-      var reportFailures = 0;
-      var rightmostFailuresPos = 0;
-      var rightmostFailuresExpected = [];
+      let pos = 0;
+      let reportFailures = 0;
+      let rightmostFailuresPos = 0;
+      let rightmostFailuresExpected = [];
       
       function padLeft(input, padding, length) {
-        var result = input;
+        let result = input;
         
-        var padLength = length - input.length;
-        for (var i = 0; i < padLength; i++) {
+        let padLength = length - input.length;
+        for (let i = 0; i < padLength; i++) {
           result = padding + result;
         }
         
@@ -7051,9 +7046,9 @@ SparqlParser.parser = (function(){
       }
       
       function escape(ch) {
-        var charCode = ch.charCodeAt(0);
-        var escapeChar;
-        var length;
+        let charCode = ch.charCodeAt(0);
+        let escapeChar;
+        let length;
         
         if (charCode <= 0xFF) {
           escapeChar = 'x';
@@ -7080,7 +7075,7 @@ SparqlParser.parser = (function(){
       }
       
       function parse_SPARQL() {
-        var result0;
+        let result0;
         
         result0 = parse_Query();
         if (result0 === null) {
@@ -7090,8 +7085,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_Query() {
-        var result0, result1;
-        var pos0, pos1;
+        let result0, result1;
+        let pos0, pos1;
         
         reportFailures++;
         pos0 = pos;
@@ -7137,8 +7132,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_Prologue() {
-        var result0, result1, result2, result3;
-        var pos0, pos1;
+        let result0, result1, result2, result3;
+        let pos0, pos1;
         
         reportFailures++;
         pos0 = pos;
@@ -7191,8 +7186,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_BaseDecl() {
-        var result0, result1, result2, result3;
-        var pos0, pos1;
+        let result0, result1, result2, result3;
+        let pos0, pos1;
         
         reportFailures++;
         pos0 = pos;
@@ -7255,7 +7250,7 @@ SparqlParser.parser = (function(){
           result0 = (function(offset, i) {
               registerDefaultPrefix(i);
         
-              var base = {};
+              let base = {};
               base.token = 'base';
               base.value = i;
         
@@ -7273,8 +7268,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_PrefixDecl() {
-        var result0, result1, result2, result3, result4, result5;
-        var pos0, pos1;
+        let result0, result1, result2, result3, result4, result5;
+        let pos0, pos1;
         
         reportFailures++;
         pos0 = pos;
@@ -7355,7 +7350,7 @@ SparqlParser.parser = (function(){
         
               registerPrefix(p,l);
         
-              var prefix = {};
+              let prefix = {};
               prefix.token = 'prefix';
               prefix.prefix = p;
               prefix.local = l;
@@ -7374,8 +7369,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_SelectQuery() {
-        var result0, result1, result2, result3, result4, result5, result6, result7, result8;
-        var pos0, pos1;
+        let result0, result1, result2, result3, result4, result5, result6, result7, result8;
+        let pos0, pos1;
         
         reportFailures++;
         pos0 = pos;
@@ -7463,9 +7458,9 @@ SparqlParser.parser = (function(){
         if (result0 !== null) {
           result0 = (function(offset, s, gs, w, sm) {
         
-              var dataset = {'named':[], 'implicit':[]};
-              for(var i=0; i<gs.length; i++) {
-                  var g = gs[i];
+              let dataset = {'named':[], 'implicit':[]};
+              for(let i=0; i<gs.length; i++) {
+                  let g = gs[i];
                   if(g.kind === 'default') {
                       dataset['implicit'].push(g.graph);
                   } else {
@@ -7481,7 +7476,7 @@ SparqlParser.parser = (function(){
                                            value:'https://github.com/antoniogarrote/rdfstore-js#default_graph'});
               }
         
-              var query = {};
+              let query = {};
               query.kind = 'select';
               query.token = 'executableunit'
               query.dataset = dataset;
@@ -7516,8 +7511,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_SubSelect() {
-        var result0, result1, result2;
-        var pos0;
+        let result0, result1, result2;
+        let pos0;
         
         reportFailures++;
         pos0 = pos;
@@ -7548,8 +7543,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_SelectClause() {
-        var result0, result1, result2, result3, result4, result5, result6, result7, result8, result9, result10, result11, result12, result13, result14, result15, result16, result17;
-        var pos0, pos1, pos2;
+        let result0, result1, result2, result3, result4, result5, result6, result7, result8, result9, result10, result11, result12, result13, result14, result15, result16, result17;
+        let pos0, pos1, pos2;
         
         reportFailures++;
         pos0 = pos;
@@ -8046,13 +8041,13 @@ SparqlParser.parser = (function(){
         }
         if (result0 !== null) {
           result0 = (function(offset, mod, proj) {
-             var vars = [];
+             let vars = [];
               if(proj.length === 3 && proj[1]==="*") {
                   return {vars: [{token: 'variable', kind:'*'}], modifier:arrayToString(mod)};
               }
         
-              for(var i=0; i< proj.length; i++) {
-                  var aVar = proj[i];
+              for(let i=0; i< proj.length; i++) {
+                  let aVar = proj[i];
         
                   if(aVar.length === 3) {
                       vars.push({token: 'variable', kind:'var', value:aVar[1]});
@@ -8075,8 +8070,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_ConstructQuery() {
-        var result0, result1, result2, result3, result4, result5, result6, result7, result8, result9;
-        var pos0, pos1;
+        let result0, result1, result2, result3, result4, result5, result6, result7, result8, result9;
+        let pos0, pos1;
         
         reportFailures++;
         pos0 = pos;
@@ -8193,9 +8188,9 @@ SparqlParser.parser = (function(){
         }
         if (result0 !== null) {
           result0 = (function(offset, t, gs, w, sm) {
-              var dataset = {'named':[], 'implicit':[]};
-              for(var i=0; i<gs.length; i++) {
-                  var g = gs[i];
+              let dataset = {'named':[], 'implicit':[]};
+              for(let i=0; i<gs.length; i++) {
+                  let g = gs[i];
                   if(g.kind === 'default') {
                       dataset['implicit'].push(g.graph);
                   } else {
@@ -8211,7 +8206,7 @@ SparqlParser.parser = (function(){
                                            value:'https://github.com/antoniogarrote/rdfstore-js#default_graph'});
               }
         
-              var query = {};
+              let query = {};
               query.kind = 'construct';
               query.token = 'executableunit'
               query.dataset = dataset;
@@ -8242,8 +8237,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_DescribeQuery() {
-        var result0, result1, result2, result3, result4;
-        var pos0;
+        let result0, result1, result2, result3, result4;
+        let pos0;
         
         reportFailures++;
         pos0 = pos;
@@ -8320,8 +8315,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_AskQuery() {
-        var result0, result1, result2, result3, result4, result5;
-        var pos0, pos1;
+        let result0, result1, result2, result3, result4, result5;
+        let pos0, pos1;
         
         reportFailures++;
         pos0 = pos;
@@ -8404,9 +8399,9 @@ SparqlParser.parser = (function(){
         }
         if (result0 !== null) {
           result0 = (function(offset, gs, w) {
-              var dataset = {'named':[], 'implicit':[]};
-              for(var i=0; i<gs.length; i++) {
-                  var g = gs[i];
+              let dataset = {'named':[], 'implicit':[]};
+              for(let i=0; i<gs.length; i++) {
+                  let g = gs[i];
                   if(g.kind === 'implicit') {
                       dataset['implicit'].push(g.graph);
                   } else {
@@ -8422,7 +8417,7 @@ SparqlParser.parser = (function(){
                                             value:'https://github.com/antoniogarrote/rdfstore-js#default_graph'});
               }
         
-              var query = {};
+              let query = {};
               query.kind = 'ask';
               query.token = 'executableunit'
               query.dataset = dataset;
@@ -8442,8 +8437,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_DatasetClause() {
-        var result0, result1, result2, result3, result4;
-        var pos0, pos1;
+        let result0, result1, result2, result3, result4;
+        let pos0, pos1;
         
         reportFailures++;
         pos0 = pos;
@@ -8521,8 +8516,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_DefaultGraphClause() {
-        var result0, result1;
-        var pos0, pos1;
+        let result0, result1;
+        let pos0, pos1;
         
         reportFailures++;
         pos0 = pos;
@@ -8561,8 +8556,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_NamedGraphClause() {
-        var result0, result1, result2;
-        var pos0, pos1;
+        let result0, result1, result2;
+        let pos0, pos1;
         
         reportFailures++;
         pos0 = pos;
@@ -8626,8 +8621,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_WhereClause() {
-        var result0, result1, result2, result3, result4;
-        var pos0, pos1;
+        let result0, result1, result2, result3, result4;
+        let pos0, pos1;
         
         reportFailures++;
         pos0 = pos;
@@ -8703,8 +8698,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_SolutionModifier() {
-        var result0, result1, result2, result3;
-        var pos0, pos1;
+        let result0, result1, result2, result3;
+        let pos0, pos1;
         
         reportFailures++;
         pos0 = pos;
@@ -8740,7 +8735,7 @@ SparqlParser.parser = (function(){
         }
         if (result0 !== null) {
           result0 = (function(offset, gc, oc, lo) {
-              var acum = {};
+              let acum = {};
               if(lo != null) {
                   if(lo.limit != null) {
                       acum.limit = lo.limit;
@@ -8770,8 +8765,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_GroupClause() {
-        var result0, result1, result2, result3, result4, result5;
-        var pos0, pos1;
+        let result0, result1, result2, result3, result4, result5;
+        let pos0, pos1;
         
         reportFailures++;
         pos0 = pos;
@@ -8880,8 +8875,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_GroupCondition() {
-        var result0, result1, result2, result3, result4, result5, result6, result7, result8, result9;
-        var pos0, pos1, pos2;
+        let result0, result1, result2, result3, result4, result5, result6, result7, result8, result9;
+        let pos0, pos1, pos2;
         
         reportFailures++;
         pos0 = pos;
@@ -9171,8 +9166,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_HavingClause() {
-        var result0, result1, result2;
-        var pos0;
+        let result0, result1, result2;
+        let pos0;
         
         reportFailures++;
         pos0 = pos;
@@ -9214,8 +9209,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_OrderClause() {
-        var result0, result1, result2, result3, result4, result5, result6;
-        var pos0, pos1;
+        let result0, result1, result2, result3, result4, result5, result6;
+        let pos0, pos1;
         
         reportFailures++;
         pos0 = pos;
@@ -9335,8 +9330,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_OrderCondition() {
-        var result0, result1, result2, result3, result4;
-        var pos0, pos1;
+        let result0, result1, result2, result3, result4;
+        let pos0, pos1;
         
         reportFailures++;
         pos0 = pos;
@@ -9472,8 +9467,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_LimitOffsetClauses() {
-        var result0, result1;
-        var pos0, pos1;
+        let result0, result1;
+        let pos0, pos1;
         
         reportFailures++;
         pos0 = pos;
@@ -9511,9 +9506,9 @@ SparqlParser.parser = (function(){
         }
         if (result0 !== null) {
           result0 = (function(offset, cls) {
-              var acum = {};
-              for(var i=0; i<cls.length; i++) {
-                  var cl = cls[i];
+              let acum = {};
+              for(let i=0; i<cls.length; i++) {
+                  let cl = cls[i];
                   if(cl.limit != null) {
                       acum['limit'] = cl.limit;
                   } else if(cl.offset != null){
@@ -9535,8 +9530,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_LimitClause() {
-        var result0, result1, result2, result3, result4;
-        var pos0, pos1;
+        let result0, result1, result2, result3, result4;
+        let pos0, pos1;
         
         reportFailures++;
         pos0 = pos;
@@ -9611,8 +9606,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_OffsetClause() {
-        var result0, result1, result2, result3, result4;
-        var pos0, pos1;
+        let result0, result1, result2, result3, result4;
+        let pos0, pos1;
         
         reportFailures++;
         pos0 = pos;
@@ -9687,8 +9682,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_BindingsClause() {
-        var result0, result1, result2, result3, result4, result5, result6;
-        var pos0, pos1;
+        let result0, result1, result2, result3, result4, result5, result6;
+        let pos0, pos1;
         
         reportFailures++;
         pos0 = pos;
@@ -9860,7 +9855,7 @@ SparqlParser.parser = (function(){
       }
       
       function parse_BindingValue() {
-        var result0;
+        let result0;
         
         reportFailures++;
         result0 = parse_IRIref();
@@ -9892,8 +9887,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_Update() {
-        var result0, result1, result2, result3, result4, result5, result6;
-        var pos0, pos1, pos2;
+        let result0, result1, result2, result3, result4, result5, result6;
+        let pos0, pos1, pos2;
         
         reportFailures++;
         pos0 = pos;
@@ -9976,12 +9971,12 @@ SparqlParser.parser = (function(){
         if (result0 !== null) {
           result0 = (function(offset, p, u, us) {
         
-              var query = {};
+              let query = {};
               query.token = 'query';
               query.kind = 'update'
               query.prologue = p;
         
-             var units = [u];
+             let units = [u];
         
              if(us.length != null && us[3] != null && us[3].units != null) {
                  units = units.concat(us[3].units);
@@ -10002,7 +9997,7 @@ SparqlParser.parser = (function(){
       }
       
       function parse_Update1() {
-        var result0;
+        let result0;
         
         reportFailures++;
         result0 = parse_Load();
@@ -10035,8 +10030,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_Load() {
-        var result0, result1, result2, result3, result4, result5, result6;
-        var pos0, pos1, pos2;
+        let result0, result1, result2, result3, result4, result5, result6;
+        let pos0, pos1, pos2;
         
         reportFailures++;
         pos0 = pos;
@@ -10147,7 +10142,7 @@ SparqlParser.parser = (function(){
         }
         if (result0 !== null) {
           result0 = (function(offset, sg, dg) {
-              var query = {};
+              let query = {};
               query.kind = 'load';
               query.token = 'executableunit'
               query.sourceGraph = sg;
@@ -10167,8 +10162,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_Clear() {
-        var result0, result1, result2, result3, result4;
-        var pos0, pos1;
+        let result0, result1, result2, result3, result4;
+        let pos0, pos1;
         
         reportFailures++;
         pos0 = pos;
@@ -10255,7 +10250,7 @@ SparqlParser.parser = (function(){
         }
         if (result0 !== null) {
           result0 = (function(offset, ref) {
-              var query = {};
+              let query = {};
               query.kind = 'clear';
               query.token = 'executableunit'
               query.destinyGraph = ref;
@@ -10274,8 +10269,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_Drop() {
-        var result0, result1, result2, result3, result4;
-        var pos0, pos1;
+        let result0, result1, result2, result3, result4;
+        let pos0, pos1;
         
         reportFailures++;
         pos0 = pos;
@@ -10362,7 +10357,7 @@ SparqlParser.parser = (function(){
         }
         if (result0 !== null) {
           result0 = (function(offset, ref) {
-              var query = {};
+              let query = {};
               query.kind = 'drop';
               query.token = 'executableunit'
               query.destinyGraph = ref;
@@ -10381,8 +10376,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_Create() {
-        var result0, result1, result2, result3, result4;
-        var pos0, pos1;
+        let result0, result1, result2, result3, result4;
+        let pos0, pos1;
         
         reportFailures++;
         pos0 = pos;
@@ -10469,7 +10464,7 @@ SparqlParser.parser = (function(){
         }
         if (result0 !== null) {
           result0 = (function(offset, ref) {
-              var query = {};
+              let query = {};
               query.kind = 'create';
               query.token = 'executableunit'
               query.destinyGraph = ref;
@@ -10488,8 +10483,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_InsertData() {
-        var result0, result1, result2, result3, result4;
-        var pos0, pos1;
+        let result0, result1, result2, result3, result4;
+        let pos0, pos1;
         
         reportFailures++;
         pos0 = pos;
@@ -10575,7 +10570,7 @@ SparqlParser.parser = (function(){
         }
         if (result0 !== null) {
           result0 = (function(offset, qs) {
-              var query = {};
+              let query = {};
               query.kind = 'insertdata';
               query.token = 'executableunit'
               query.quads = qs;
@@ -10594,8 +10589,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_DeleteData() {
-        var result0, result1, result2, result3;
-        var pos0, pos1;
+        let result0, result1, result2, result3;
+        let pos0, pos1;
         
         reportFailures++;
         pos0 = pos;
@@ -10670,7 +10665,7 @@ SparqlParser.parser = (function(){
         }
         if (result0 !== null) {
           result0 = (function(offset, qs) {
-              var query = {};
+              let query = {};
               query.kind = 'deletedata';
               query.token = 'executableunit'
               query.quads = qs;
@@ -10689,8 +10684,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_DeleteWhere() {
-        var result0, result1, result2, result3, result4;
-        var pos0, pos1;
+        let result0, result1, result2, result3, result4;
+        let pos0, pos1;
         
         reportFailures++;
         pos0 = pos;
@@ -10776,25 +10771,25 @@ SparqlParser.parser = (function(){
         }
         if (result0 !== null) {
           result0 = (function(offset, p) {
-              var query = {};
+              let query = {};
               query.kind = 'modify';
               query.pattern = p;
               query['with'] = null;
               query['using'] = null;
         
-              var quads = [];
+              let quads = [];
         
         
-              var patternsCollection = p.patterns[0];
+              let patternsCollection = p.patterns[0];
               if(patternsCollection.triplesContext == null && patternsCollection.patterns!=null) {
                   patternsCollection = patternsCollection.patterns[0].triplesContext;
               } else {
                   patternsCollection = patternsCollection.triplesContext;
               }
         
-              for(var i=0; i<patternsCollection.length; i++) {
-                  var quad = {};
-                  var contextQuad = patternsCollection[i];
+              for(let i=0; i<patternsCollection.length; i++) {
+                  let quad = {};
+                  let contextQuad = patternsCollection[i];
         
                   quad['subject'] = contextQuad['subject'];
                   quad['predicate'] = contextQuad['predicate'];
@@ -10820,8 +10815,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_Modify() {
-        var result0, result1, result2, result3, result4, result5, result6, result7, result8, result9, result10;
-        var pos0, pos1, pos2;
+        let result0, result1, result2, result3, result4, result5, result6, result7, result8, result9, result10;
+        let pos0, pos1, pos2;
         
         reportFailures++;
         pos0 = pos;
@@ -11010,7 +11005,7 @@ SparqlParser.parser = (function(){
         }
         if (result0 !== null) {
           result0 = (function(offset, wg, dic, uc, p) {
-              var query = {};
+              let query = {};
               query.kind = 'modify';
         
               if(wg != "") {
@@ -11051,8 +11046,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_DeleteClause() {
-        var result0, result1;
-        var pos0, pos1;
+        let result0, result1;
+        let pos0, pos1;
         
         reportFailures++;
         pos0 = pos;
@@ -11105,8 +11100,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_InsertClause() {
-        var result0, result1;
-        var pos0, pos1;
+        let result0, result1;
+        let pos0, pos1;
         
         reportFailures++;
         pos0 = pos;
@@ -11159,8 +11154,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_UsingClause() {
-        var result0, result1, result2, result3, result4, result5;
-        var pos0, pos1, pos2;
+        let result0, result1, result2, result3, result4, result5;
+        let pos0, pos1, pos2;
         
         reportFailures++;
         pos0 = pos;
@@ -11285,8 +11280,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_GraphRef() {
-        var result0, result1, result2;
-        var pos0, pos1;
+        let result0, result1, result2;
+        let pos0, pos1;
         
         reportFailures++;
         pos0 = pos;
@@ -11350,8 +11345,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_GraphRefAll() {
-        var result0;
-        var pos0;
+        let result0;
+        let pos0;
         
         reportFailures++;
         pos0 = pos;
@@ -11465,8 +11460,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_QuadPattern() {
-        var result0, result1, result2, result3, result4, result5, result6, result7;
-        var pos0, pos1;
+        let result0, result1, result2, result3, result4, result5, result6, result7;
+        let pos0, pos1;
         
         reportFailures++;
         pos0 = pos;
@@ -11566,8 +11561,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_QuadData() {
-        var result0, result1, result2, result3, result4, result5, result6, result7;
-        var pos0, pos1;
+        let result0, result1, result2, result3, result4, result5, result6, result7;
+        let pos0, pos1;
         
         reportFailures++;
         pos0 = pos;
@@ -11667,8 +11662,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_Quads() {
-        var result0, result1, result2, result3, result4;
-        var pos0, pos1, pos2;
+        let result0, result1, result2, result3, result4;
+        let pos0, pos1, pos2;
         
         reportFailures++;
         pos0 = pos;
@@ -11752,7 +11747,7 @@ SparqlParser.parser = (function(){
         }
         if (result0 !== null) {
           result0 = (function(offset, ts, qs) {
-              var quads = []
+              let quads = []
               if(ts.triplesContext != null && ts.triplesContext != null) {
                 for(var i=0; i<ts.triplesContext.length; i++) {
                     var triple = ts.triplesContext[i]
@@ -11788,8 +11783,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_QuadsNotTriples() {
-        var result0, result1, result2, result3, result4, result5, result6, result7, result8, result9, result10, result11;
-        var pos0, pos1;
+        let result0, result1, result2, result3, result4, result5, result6, result7, result8, result9, result10, result11;
+        let pos0, pos1;
         
         reportFailures++;
         pos0 = pos;
@@ -11929,10 +11924,10 @@ SparqlParser.parser = (function(){
         }
         if (result0 !== null) {
           result0 = (function(offset, g, ts) {
-              var quads = []
+              let quads = []
               if(ts.triplesContext) {
-                for(var i=0; i<ts.triplesContext.length; i++) {
-                    var triple = ts.triplesContext[i]
+                for(let i=0; i<ts.triplesContext.length; i++) {
+                    let triple = ts.triplesContext[i]
                     triple.graph = g;
                     quads.push(triple)
                 }
@@ -11953,8 +11948,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_TriplesTemplate() {
-        var result0, result1, result2, result3, result4;
-        var pos0, pos1, pos2;
+        let result0, result1, result2, result3, result4;
+        let pos0, pos1, pos2;
         
         reportFailures++;
         pos0 = pos;
@@ -12019,8 +12014,8 @@ SparqlParser.parser = (function(){
         }
         if (result0 !== null) {
           result0 = (function(offset, b, bs) {
-             var triples = b.triplesContext;
-             var toTest = null;
+             let triples = b.triplesContext;
+             let toTest = null;
               if(typeof(bs) === 'object') {
                     if(bs.length != null) {
                           if(bs[3].triplesContext!=null) {
@@ -12044,8 +12039,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_GroupGraphPattern() {
-        var result0, result1, result2, result3, result4;
-        var pos0, pos1;
+        let result0, result1, result2, result3, result4;
+        let pos0, pos1;
         
         reportFailures++;
         pos0 = pos;
@@ -12192,8 +12187,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_GroupGraphPatternSub() {
-        var result0, result1, result2, result3, result4, result5, result6, result7;
-        var pos0, pos1, pos2;
+        let result0, result1, result2, result3, result4, result5, result6, result7;
+        let pos0, pos1, pos2;
         
         reportFailures++;
         pos0 = pos;
@@ -12332,7 +12327,7 @@ SparqlParser.parser = (function(){
         }
         if (result0 !== null) {
           result0 = (function(offset, tb, tbs) {
-              var subpatterns = [];
+              let subpatterns = [];
               if(tb != null && tb != []) {
                   subpatterns.push(tb);
               }
@@ -12345,10 +12340,10 @@ SparqlParser.parser = (function(){
                   }
               }
         
-              var compactedSubpatterns = [];
+              let compactedSubpatterns = [];
         
-              var currentBasicGraphPatterns = [];
-              var currentFilters = [];
+              let currentBasicGraphPatterns = [];
+              let currentFilters = [];
         
               for(var i=0; i<subpatterns.length; i++) {
                   if(subpatterns[i].token!='triplespattern' && subpatterns[i].token != 'filter') {
@@ -12405,8 +12400,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_TriplesBlock() {
-        var result0, result1, result2, result3;
-        var pos0, pos1, pos2;
+        let result0, result1, result2, result3;
+        let pos0, pos1, pos2;
         
         reportFailures++;
         pos0 = pos;
@@ -12460,8 +12455,8 @@ SparqlParser.parser = (function(){
         }
         if (result0 !== null) {
           result0 = (function(offset, b, bs) {
-             var triples = b.triplesContext;
-             var toTest = null;
+             let triples = b.triplesContext;
+             let toTest = null;
               if(typeof(bs) === 'object') {
                     if(bs.length != null) {
                           if(bs[2].triplesContext!=null) {
@@ -12485,7 +12480,7 @@ SparqlParser.parser = (function(){
       }
       
       function parse_GraphPatternNotTriples() {
-        var result0;
+        let result0;
         
         reportFailures++;
         result0 = parse_GroupOrUnionGraphPattern();
@@ -12512,8 +12507,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_OptionalGraphPattern() {
-        var result0, result1, result2, result3;
-        var pos0, pos1;
+        let result0, result1, result2, result3;
+        let pos0, pos1;
         
         reportFailures++;
         pos0 = pos;
@@ -12589,8 +12584,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_GraphGraphPattern() {
-        var result0, result1, result2, result3, result4, result5;
-        var pos0, pos1;
+        let result0, result1, result2, result3, result4, result5;
+        let pos0, pos1;
         
         reportFailures++;
         pos0 = pos;
@@ -12668,11 +12663,11 @@ SparqlParser.parser = (function(){
         }
         if (result0 !== null) {
           result0 = (function(offset, g, gg) {
-              for(var i=0; i<gg.patterns.length; i++) {
-                var quads = []
-                var ts = gg.patterns[i];
-                for(var j=0; j<ts.triplesContext.length; j++) {
-                    var triple = ts.triplesContext[j]
+              for(let i=0; i<gg.patterns.length; i++) {
+                let quads = []
+                let ts = gg.patterns[i];
+                for(let j=0; j<ts.triplesContext.length; j++) {
+                    let triple = ts.triplesContext[j]
                     triple.graph = g;
                 }
               }
@@ -12692,8 +12687,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_ServiceGraphPattern() {
-        var result0, result1, result2;
-        var pos0, pos1;
+        let result0, result1, result2;
+        let pos0, pos1;
         
         reportFailures++;
         pos0 = pos;
@@ -12743,8 +12738,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_MinusGraphPattern() {
-        var result0, result1;
-        var pos0, pos1;
+        let result0, result1;
+        let pos0, pos1;
         
         reportFailures++;
         pos0 = pos;
@@ -12788,8 +12783,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_GroupOrUnionGraphPattern() {
-        var result0, result1, result2, result3, result4, result5;
-        var pos0, pos1, pos2;
+        let result0, result1, result2, result3, result4, result5;
+        let pos0, pos1, pos2;
         
         reportFailures++;
         pos0 = pos;
@@ -12926,15 +12921,15 @@ SparqlParser.parser = (function(){
                   return a;
               } else {
         
-                  var lastToken = {token: 'graphunionpattern',
+                  let lastToken = {token: 'graphunionpattern',
                                    value: [a]};
         
-                  for(var i=0; i<b.length; i++) {
+                  for(let i=0; i<b.length; i++) {
                       if(i==b.length-1) {
                           lastToken.value.push(b[i][3]);
                       } else {
                           lastToken.value.push(b[i][3]);
-                          var newToken = {token: 'graphunionpattern',
+                          let newToken = {token: 'graphunionpattern',
                                           value: [lastToken]}
         
                           lastToken = newToken;
@@ -12957,8 +12952,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_Filter() {
-        var result0, result1, result2, result3;
-        var pos0, pos1;
+        let result0, result1, result2, result3;
+        let pos0, pos1;
         
         reportFailures++;
         pos0 = pos;
@@ -13034,7 +13029,7 @@ SparqlParser.parser = (function(){
       }
       
       function parse_Constraint() {
-        var result0;
+        let result0;
         
         reportFailures++;
         result0 = parse_BrackettedExpression();
@@ -13052,8 +13047,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_FunctionCall() {
-        var result0, result1;
-        var pos0, pos1;
+        let result0, result1;
+        let pos0, pos1;
         
         reportFailures++;
         pos0 = pos;
@@ -13073,7 +13068,7 @@ SparqlParser.parser = (function(){
         }
         if (result0 !== null) {
           result0 = (function(offset, i, args) {
-              var fcall = {};
+              let fcall = {};
               fcall.token = "expression";
               fcall.expressionType = 'irireforfunction'
               fcall.iriref = i;
@@ -13093,15 +13088,15 @@ SparqlParser.parser = (function(){
       }
       
       function parse_ArgList() {
-        var result0, result1, result2, result3, result4, result5;
-        var pos0, pos1, pos2;
+        let result0, result1, result2, result3, result4, result5;
+        let pos0, pos1, pos2;
         
         reportFailures++;
         pos0 = pos;
         result0 = parse_NIL();
         if (result0 !== null) {
           result0 = (function(offset) {
-              var args = {};
+              let args = {};
               args.token = 'args';
               args.value = [];
               return args;
@@ -13229,12 +13224,12 @@ SparqlParser.parser = (function(){
           }
           if (result0 !== null) {
             result0 = (function(offset, d, e, es) {
-                var cleanEx = [];
+                let cleanEx = [];
           
-                for(var i=0; i<es.length; i++) {
+                for(let i=0; i<es.length; i++) {
                     cleanEx.push(es[i][1]);
                 }
-                var args = {};
+                let args = {};
                 args.token = 'args';
                 args.value = [e].concat(cleanEx);
           
@@ -13259,15 +13254,15 @@ SparqlParser.parser = (function(){
       }
       
       function parse_ExpressionList() {
-        var result0, result1, result2, result3, result4, result5, result6;
-        var pos0, pos1, pos2;
+        let result0, result1, result2, result3, result4, result5, result6;
+        let pos0, pos1, pos2;
         
         reportFailures++;
         pos0 = pos;
         result0 = parse_NIL();
         if (result0 !== null) {
           result0 = (function(offset) {
-              var args = {};
+              let args = {};
               args.token = 'args';
               args.value = [];
               return args;
@@ -13413,12 +13408,12 @@ SparqlParser.parser = (function(){
           }
           if (result0 !== null) {
             result0 = (function(offset, e, es) {
-                var cleanEx = [];
+                let cleanEx = [];
           
-                for(var i=0; i<es.length; i++) {
+                for(let i=0; i<es.length; i++) {
                     cleanEx.push(es[i][3]);
                 }
-                var args = {};
+                let args = {};
                 args.token = 'args';
                 args.value = [e].concat(cleanEx);
           
@@ -13437,8 +13432,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_ConstructTemplate() {
-        var result0, result1, result2, result3, result4;
-        var pos0, pos1;
+        let result0, result1, result2, result3, result4;
+        let pos0, pos1;
         
         reportFailures++;
         pos0 = pos;
@@ -13517,8 +13512,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_ConstructTriples() {
-        var result0, result1, result2, result3, result4;
-        var pos0, pos1, pos2;
+        let result0, result1, result2, result3, result4;
+        let pos0, pos1, pos2;
         
         reportFailures++;
         pos0 = pos;
@@ -13583,8 +13578,8 @@ SparqlParser.parser = (function(){
         }
         if (result0 !== null) {
           result0 = (function(offset, b, bs) {
-             var triples = b.triplesContext;
-             var toTest = null;
+             let triples = b.triplesContext;
+             let toTest = null;
               if(typeof(bs) === 'object') {
                     if(bs.length != null) {
                           if(bs[3].triplesContext!=null) {
@@ -13608,8 +13603,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_TriplesSameSubject() {
-        var result0, result1, result2, result3;
-        var pos0, pos1;
+        let result0, result1, result2, result3;
+        let pos0, pos1;
         
         reportFailures++;
         pos0 = pos;
@@ -13651,12 +13646,12 @@ SparqlParser.parser = (function(){
         }
         if (result0 !== null) {
           result0 = (function(offset, s, pairs) {
-              var triplesContext = pairs.triplesContext;
-              var subject = s;
+              let triplesContext = pairs.triplesContext;
+              let subject = s;
               if(pairs.pairs) {
-                for(var i=0; i< pairs.pairs.length; i++) {
-                    var pair = pairs.pairs[i];
-                    var triple = null;
+                for(let i=0; i< pairs.pairs.length; i++) {
+                    let pair = pairs.pairs[i];
+                    let triple = null;
         	    if(pair[1].length != null)
         	      pair[1] = pair[1][0]
                     if(subject.token && subject.token==='triplesnodecollection') {
@@ -13670,7 +13665,7 @@ SparqlParser.parser = (function(){
                 }
               }
         
-              var token = {};
+              let token = {};
               token.token = "triplessamesubject";
               token.triplesContext = triplesContext;
               token.chainSubject = subject;
@@ -13721,18 +13716,18 @@ SparqlParser.parser = (function(){
           }
           if (result0 !== null) {
             result0 = (function(offset, tn, pairs) {
-                var triplesContext = tn.triplesContext;
-                var subject = tn.chainSubject;
+                let triplesContext = tn.triplesContext;
+                let subject = tn.chainSubject;
           
                 if(pairs.pairs) {
-                  for(var i=0; i< pairs.pairs.length; i++) {
-                      var pair = pairs.pairs[i];
+                  for(let i=0; i< pairs.pairs.length; i++) {
+                      let pair = pairs.pairs[i];
                       if(pair[1].length != null)
           	      pair[1] = pair[1][0]
           
                       if(tn.token === "triplesnodecollection") {
-                          for(var j=0; j<subject.length; j++) {
-                              var subj = subject[j];
+                          for(let j=0; j<subject.length; j++) {
+                              let subj = subject[j];
                               if(subj.triplesContext != null) {
                                   var triple = {subject: subj.chainSubject, predicate: pair[0], object: pair[1]}
                                   triplesContext.concat(subj.triplesContext);
@@ -13748,7 +13743,7 @@ SparqlParser.parser = (function(){
                   }
                 }
           
-                var token = {};
+                let token = {};
                 token.token = "triplessamesubject";
                 token.triplesContext = triplesContext;
                 token.chainSubject = subject;
@@ -13768,8 +13763,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_PropertyListNotEmpty() {
-        var result0, result1, result2, result3, result4, result5, result6, result7, result8, result9;
-        var pos0, pos1, pos2, pos3;
+        let result0, result1, result2, result3, result4, result5, result6, result7, result8, result9;
+        let pos0, pos1, pos2, pos3;
         
         reportFailures++;
         pos0 = pos;
@@ -13947,11 +13942,11 @@ SparqlParser.parser = (function(){
         }
         if (result0 !== null) {
           result0 = (function(offset, v, ol, rest) {
-              var token = {}
+              let token = {}
               token.token = 'propertylist';
-              var triplesContext = [];
-              var pairs = [];
-              var test = [];
+              let triplesContext = [];
+              let pairs = [];
+              let test = [];
         
               for( var i=0; i<ol.length; i++) {
         
@@ -13971,11 +13966,11 @@ SparqlParser.parser = (function(){
         
         
               for(var i=0; i<rest.length; i++) {
-                  var tok = rest[i][3];
-                  var newVerb  = tok[0];
-                  var newObjsList = tok[2] || [];
+                  let tok = rest[i][3];
+                  let newVerb  = tok[0];
+                  let newObjsList = tok[2] || [];
         
-                  for(var j=0; j<newObjsList.length; j++) {
+                  for(let j=0; j<newObjsList.length; j++) {
                    if(newObjsList[j].triplesContext != null) {
                       triplesContext = triplesContext.concat(newObjsList[j].triplesContext);
                      pairs.push([newVerb, newObjsList[j].chainSubject]);
@@ -14003,7 +13998,7 @@ SparqlParser.parser = (function(){
       }
       
       function parse_PropertyList() {
-        var result0;
+        let result0;
         
         reportFailures++;
         result0 = parse_PropertyListNotEmpty();
@@ -14016,8 +14011,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_ObjectList() {
-        var result0, result1, result2, result3, result4, result5;
-        var pos0, pos1, pos2;
+        let result0, result1, result2, result3, result4, result5;
+        let pos0, pos1, pos2;
         
         reportFailures++;
         pos0 = pos;
@@ -14118,12 +14113,12 @@ SparqlParser.parser = (function(){
         if (result0 !== null) {
           result0 = (function(offset, obj, objs) {
         
-                var toReturn = [];
+                let toReturn = [];
         
                 toReturn.push(obj);
         
-                for(var i=0; i<objs.length; i++) {
-                    for(var j=0; j<objs[i].length; j++) {
+                for(let i=0; i<objs.length; i++) {
+                    for(let j=0; j<objs[i].length; j++) {
                         if(typeof(objs[i][j])=="object" && objs[i][j].token != null) {
                             toReturn.push(objs[i][j]);
                         }
@@ -14144,8 +14139,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_Verb() {
-        var result0;
-        var pos0;
+        let result0;
+        let pos0;
         
         reportFailures++;
         result0 = parse_VarOrIRIref();
@@ -14177,8 +14172,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_TriplesSameSubjectPath() {
-        var result0, result1, result2, result3;
-        var pos0, pos1;
+        let result0, result1, result2, result3;
+        let pos0, pos1;
         
         reportFailures++;
         pos0 = pos;
@@ -14220,12 +14215,12 @@ SparqlParser.parser = (function(){
         }
         if (result0 !== null) {
           result0 = (function(offset, s, pairs) {
-              var triplesContext = pairs.triplesContext;
-              var subject = s;
+              let triplesContext = pairs.triplesContext;
+              let subject = s;
               if(pairs.pairs) {
-                for(var i=0; i< pairs.pairs.length; i++) {
-                    var pair = pairs.pairs[i];
-                    var triple = null;
+                for(let i=0; i< pairs.pairs.length; i++) {
+                    let pair = pairs.pairs[i];
+                    let triple = null;
         	    if(pair[1].length != null)
         	      pair[1] = pair[1][0]
                     if(subject.token && subject.token==='triplesnodecollection') {
@@ -14239,7 +14234,7 @@ SparqlParser.parser = (function(){
                 }
               }
         
-              var token = {};
+              let token = {};
               token.token = "triplessamesubject";
               token.triplesContext = triplesContext;
               token.chainSubject = subject;
@@ -14290,18 +14285,18 @@ SparqlParser.parser = (function(){
           }
           if (result0 !== null) {
             result0 = (function(offset, tn, pairs) {
-                var triplesContext = tn.triplesContext;
-                var subject = tn.chainSubject;
+                let triplesContext = tn.triplesContext;
+                let subject = tn.chainSubject;
           
                 if(pairs.pairs) {
-                  for(var i=0; i< pairs.pairs.length; i++) {
-                      var pair = pairs.pairs[i];
+                  for(let i=0; i< pairs.pairs.length; i++) {
+                      let pair = pairs.pairs[i];
                       if(pair[1].length != null)
           	      pair[1] = pair[1][0]
           
                       if(tn.token === "triplesnodecollection") {
-                          for(var j=0; j<subject.length; j++) {
-                              var subj = subject[j];
+                          for(let j=0; j<subject.length; j++) {
+                              let subj = subject[j];
                               if(subj.triplesContext != null) {
                                   var triple = {subject: subj.chainSubject, predicate: pair[0], object: pair[1]}
                                   triplesContext.concat(subj.triplesContext);
@@ -14317,7 +14312,7 @@ SparqlParser.parser = (function(){
                   }
                 }
           
-                var token = {};
+                let token = {};
                 token.token = "triplessamesubject";
                 token.triplesContext = triplesContext;
                 token.chainSubject = subject;
@@ -14338,8 +14333,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_PropertyListNotEmptyPath() {
-        var result0, result1, result2, result3, result4, result5, result6, result7, result8;
-        var pos0, pos1, pos2, pos3;
+        let result0, result1, result2, result3, result4, result5, result6, result7, result8;
+        let pos0, pos1, pos2, pos3;
         
         reportFailures++;
         pos0 = pos;
@@ -14506,9 +14501,9 @@ SparqlParser.parser = (function(){
           result0 = (function(offset, v, ol, rest) {
               token = {}
               token.token = 'propertylist';
-              var triplesContext = [];
-              var pairs = [];
-              var test = [];
+              let triplesContext = [];
+              let pairs = [];
+              let test = [];
         
               for( var i=0; i<ol.length; i++) {
         
@@ -14528,11 +14523,11 @@ SparqlParser.parser = (function(){
         
         
               for(var i=0; i<rest.length; i++) {
-                  var tok = rest[i][3];
-                  var newVerb  = tok[0];
-                  var newObjsList = tok[1] || [];
+                  let tok = rest[i][3];
+                  let newVerb  = tok[0];
+                  let newObjsList = tok[1] || [];
         
-                  for(var j=0; j<newObjsList.length; j++) {
+                  for(let j=0; j<newObjsList.length; j++) {
                    if(newObjsList[j].triplesContext != null) {
                       triplesContext = triplesContext.concat(newObjsList[j].triplesContext);
                      pairs.push([newVerb, newObjsList[j].chainSubject]);
@@ -14559,7 +14554,7 @@ SparqlParser.parser = (function(){
       }
       
       function parse_PropertyListPath() {
-        var result0;
+        let result0;
         
         reportFailures++;
         result0 = parse_PropertyListNotEmpty();
@@ -14572,15 +14567,15 @@ SparqlParser.parser = (function(){
       }
       
       function parse_VerbPath() {
-        var result0;
-        var pos0;
+        let result0;
+        let pos0;
         
         reportFailures++;
         pos0 = pos;
         result0 = parse_PathAlternative();
         if (result0 !== null) {
           result0 = (function(offset, p) {
-              var path = {};
+              let path = {};
               path.token = 'path';
               path.kind = 'element';
               path.value = p;
@@ -14599,8 +14594,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_PathAlternative() {
-        var result0, result1, result2, result3;
-        var pos0, pos1, pos2;
+        let result0, result1, result2, result3;
+        let pos0, pos1, pos2;
         
         reportFailures++;
         pos0 = pos;
@@ -14670,11 +14665,11 @@ SparqlParser.parser = (function(){
         	if(rest == null || rest.length === 0) {
         	    return first;
         	} else {
-        	    var acum = [];
-        	    for(var i=0; i<rest.length; i++)
+        	    let acum = [];
+        	    for(let i=0; i<rest.length; i++)
         		acum.push(rest[1]);
         
-        	    var path = {};
+        	    let path = {};
         	    path.token = 'path';
         	    path.kind = 'alternative';
         	    path.value = acum;
@@ -14694,8 +14689,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_PathSequence() {
-        var result0, result1, result2, result3;
-        var pos0, pos1, pos2;
+        let result0, result1, result2, result3;
+        let pos0, pos1, pos2;
         
         reportFailures++;
         pos0 = pos;
@@ -14765,12 +14760,12 @@ SparqlParser.parser = (function(){
         	if(rest == null || rest.length === 0) {
         	    return first;
         	} else {
-        	    var acum = [first];
+        	    let acum = [first];
         
-        	    for(var i=0; i<rest.length; i++) 
+        	    for(let i=0; i<rest.length; i++) 
         		acum.push(rest[i][1]);
         
-        	    var path = {};
+        	    let path = {};
         	    path.token = 'path';
         	    path.kind = 'sequence';
         	
@@ -14791,8 +14786,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_PathElt() {
-        var result0, result1;
-        var pos0, pos1;
+        let result0, result1;
+        let pos0, pos1;
         
         reportFailures++;
         pos0 = pos;
@@ -14839,8 +14834,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_PathEltOrInverse() {
-        var result0, result1;
-        var pos0, pos1;
+        let result0, result1;
+        let pos0, pos1;
         
         reportFailures++;
         result0 = parse_PathElt();
@@ -14870,7 +14865,7 @@ SparqlParser.parser = (function(){
           }
           if (result0 !== null) {
             result0 = (function(offset, elt) {
-          	var path = {};
+          	let path = {};
           	path.token = 'path';
           	path.kind = 'inversePath';
           	path.value = elt;
@@ -14890,8 +14885,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_PathMod() {
-        var result0, result1, result2, result3, result4;
-        var pos0, pos1, pos2, pos3;
+        let result0, result1, result2, result3, result4;
+        let pos0, pos1, pos2, pos3;
         
         reportFailures++;
         if (input.charCodeAt(pos) === 42) {
@@ -15072,8 +15067,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_PathPrimary() {
-        var result0, result1, result2;
-        var pos0, pos1;
+        let result0, result1, result2;
+        let pos0, pos1;
         
         reportFailures++;
         result0 = parse_IRIref();
@@ -15176,8 +15171,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_PathNegatedPropertySet() {
-        var result0, result1, result2, result3, result4;
-        var pos0, pos1, pos2;
+        let result0, result1, result2, result3, result4;
+        let pos0, pos1, pos2;
         
         result0 = parse_PathOneInPropertySet();
         if (result0 === null) {
@@ -15283,8 +15278,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_PathOneInPropertySet() {
-        var result0, result1;
-        var pos0;
+        let result0, result1;
+        let pos0;
         
         reportFailures++;
         result0 = parse_IRIref();
@@ -15342,18 +15337,18 @@ SparqlParser.parser = (function(){
       }
       
       function parse_TriplesNode() {
-        var result0;
-        var pos0;
+        let result0;
+        let pos0;
         
         reportFailures++;
         pos0 = pos;
         result0 = parse_Collection();
         if (result0 !== null) {
           result0 = (function(offset, c) {
-              var triplesContext = [];
-              var chainSubject = [];
+              let triplesContext = [];
+              let chainSubject = [];
         
-              var triple = null;
+              let triple = null;
         
               // catch NIL
               /*
@@ -15369,18 +15364,18 @@ SparqlParser.parser = (function(){
               */
         
               // other cases
-              for(var i=0; i<c.length; i++) {
+              for(let i=0; i<c.length; i++) {
                   GlobalBlankNodeCounter++;
                   //_:b0  rdf:first  1 ;
                   //rdf:rest   _:b1 .
-                  var nextObject = null;
+                  let nextObject = null;
                   if(c[i].chainSubject == null && c[i].triplesContext == null) {
                       nextObject = c[i];
                   } else {
                       nextObject = c[i].chainSubject;
                       triplesContext = triplesContext.concat(nextSubject.triplesContext);
                   }
-                  var currentSubject = null;
+                  let currentSubject = null;
                   triple = {subject: {token:'blank', value:("_:"+GlobalBlankNodeCounter)},
                             predicate:{token:'uri', prefix:null, suffix:null, value:'http://www.w3.org/1999/02/22-rdf-syntax-ns#first'},
                             object:nextObject };
@@ -15421,8 +15416,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_BlankNodePropertyList() {
-        var result0, result1, result2, result3, result4, result5, result6, result7;
-        var pos0, pos1;
+        let result0, result1, result2, result3, result4, result5, result6, result7;
+        let pos0, pos1;
         
         reportFailures++;
         pos0 = pos;
@@ -15510,12 +15505,12 @@ SparqlParser.parser = (function(){
           result0 = (function(offset, pl) {
         
               GlobalBlankNodeCounter++;
-              var subject = {token:'blank', value:'_:'+GlobalBlankNodeCounter};
-              var newTriples =  [];
+              let subject = {token:'blank', value:'_:'+GlobalBlankNodeCounter};
+              let newTriples =  [];
         
-              for(var i=0; i< pl.pairs.length; i++) {
-                  var pair = pl.pairs[i];
-                  var triple = {}
+              for(let i=0; i< pl.pairs.length; i++) {
+                  let pair = pl.pairs[i];
+                  let triple = {}
                   triple.subject = subject;
                   triple.predicate = pair[0];
                   if(pair[1].length != null)
@@ -15541,8 +15536,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_Collection() {
-        var result0, result1, result2, result3, result4, result5, result6, result7;
-        var pos0, pos1;
+        let result0, result1, result2, result3, result4, result5, result6, result7;
+        let pos0, pos1;
         
         reportFailures++;
         pos0 = pos;
@@ -15651,8 +15646,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_GraphNode() {
-        var result0, result1, result2, result3;
-        var pos0, pos1;
+        let result0, result1, result2, result3;
+        let pos0, pos1;
         
         reportFailures++;
         pos0 = pos;
@@ -15734,7 +15729,7 @@ SparqlParser.parser = (function(){
       }
       
       function parse_VarOrTerm() {
-        var result0;
+        let result0;
         
         reportFailures++;
         result0 = parse_Var();
@@ -15749,7 +15744,7 @@ SparqlParser.parser = (function(){
       }
       
       function parse_VarOrIRIref() {
-        var result0;
+        let result0;
         
         reportFailures++;
         result0 = parse_Var();
@@ -15764,8 +15759,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_Var() {
-        var result0;
-        var pos0;
+        let result0;
+        let pos0;
         
         reportFailures++;
         pos0 = pos;
@@ -15775,7 +15770,7 @@ SparqlParser.parser = (function(){
         }
         if (result0 !== null) {
           result0 = (function(offset, v) {
-              var term = {};
+              let term = {};
               term.token = 'var';
               term.value = v;
               return term;
@@ -15792,7 +15787,7 @@ SparqlParser.parser = (function(){
       }
       
       function parse_GraphTerm() {
-        var result0;
+        let result0;
         
         reportFailures++;
         result0 = parse_IRIref();
@@ -15819,8 +15814,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_ConditionalOrExpression() {
-        var result0, result1, result2, result3, result4, result5;
-        var pos0, pos1, pos2;
+        let result0, result1, result2, result3, result4, result5;
+        let pos0, pos1, pos2;
         
         reportFailures++;
         pos0 = pos;
@@ -15935,12 +15930,12 @@ SparqlParser.parser = (function(){
                   return v;
               }
         
-              var exp = {};
+              let exp = {};
               exp.token = "expression";
               exp.expressionType = "conditionalor";
-              var ops = [v];
+              let ops = [v];
         
-              for(var i=0; i<vs.length; i++) {
+              for(let i=0; i<vs.length; i++) {
                   ops.push(vs[i][3]);
               }
         
@@ -15960,8 +15955,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_ConditionalAndExpression() {
-        var result0, result1, result2, result3, result4, result5;
-        var pos0, pos1, pos2;
+        let result0, result1, result2, result3, result4, result5;
+        let pos0, pos1, pos2;
         
         reportFailures++;
         pos0 = pos;
@@ -16075,12 +16070,12 @@ SparqlParser.parser = (function(){
               if(vs.length === 0) {
                   return v;
               }
-              var exp = {};
+              let exp = {};
               exp.token = "expression";
               exp.expressionType = "conditionaland";
-              var ops = [v];
+              let ops = [v];
         
-              for(var i=0; i<vs.length; i++) {
+              for(let i=0; i<vs.length; i++) {
                   ops.push(vs[i][3]);
               }
         
@@ -16100,8 +16095,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_RelationalExpression() {
-        var result0, result1, result2, result3, result4, result5, result6, result7, result8, result9, result10;
-        var pos0, pos1, pos2;
+        let result0, result1, result2, result3, result4, result5, result6, result7, result8, result9, result10;
+        let pos0, pos1, pos2;
         
         reportFailures++;
         pos0 = pos;
@@ -17184,9 +17179,9 @@ SparqlParser.parser = (function(){
                   var operator = "!=";
                   exp.expressionType = "conditionaland"         
                 }
-                var lop = op1;
-                var rops = []
-                for(var opi=0; opi<op2[0].length; opi++) {
+                let lop = op1;
+                let rops = []
+                for(let opi=0; opi<op2[0].length; opi++) {
                   if(op2[0][opi].token ==="args") {
                     rops = op2[0][opi].value;
                     break;
@@ -17195,8 +17190,8 @@ SparqlParser.parser = (function(){
         
                 exp.token = "expression";
                 exp.operands = [];
-                for(var i=0; i<rops.length; i++) {
-                  var nextOperand = {};
+                for(let i=0; i<rops.length; i++) {
+                  let nextOperand = {};
                   nextOperand.token = "expression";
                   nextOperand.expressionType = "relationalexpression";
                   nextOperand.operator = operator;
@@ -17229,8 +17224,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_AdditiveExpression() {
-        var result0, result1, result2, result3, result4, result5, result6;
-        var pos0, pos1, pos2, pos3;
+        let result0, result1, result2, result3, result4, result5, result6;
+        let pos0, pos1, pos2, pos3;
         
         reportFailures++;
         pos0 = pos;
@@ -17655,23 +17650,23 @@ SparqlParser.parser = (function(){
                   return op1;
               }
         
-              var ex = {};
+              let ex = {};
               ex.token = 'expression';
               ex.expressionType = 'additiveexpression';
               ex.summand = op1;
               ex.summands = [];
         
-              for(var i=0; i<ops.length; i++) {
-                  var summand = ops[i];
-                  var sum = {};
+              for(let i=0; i<ops.length; i++) {
+                  let summand = ops[i];
+                  let sum = {};
                   if(summand.length == 4 && typeof(summand[1]) === "string") {
                       sum.operator = summand[1];
                       sum.expression = summand[3];
                   } else {
-                      var subexp = {}
-                      var firstFactor = sum[0];
+                      let subexp = {}
+                      let firstFactor = sum[0];
                       var operator = sum[1][1];
-                      var secondFactor = sum[1][3];
+                      let secondFactor = sum[1][3];
                       var operator = null;
                       if(firstFactor.value < 0) {
                           sum.operator = '-';
@@ -17703,8 +17698,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_MultiplicativeExpression() {
-        var result0, result1, result2, result3, result4, result5;
-        var pos0, pos1, pos2;
+        let result0, result1, result2, result3, result4, result5;
+        let pos0, pos1, pos2;
         
         reportFailures++;
         pos0 = pos;
@@ -17911,14 +17906,14 @@ SparqlParser.parser = (function(){
                   return exp;
               }
         
-              var ex = {};
+              let ex = {};
               ex.token = 'expression';
               ex.expressionType = 'multiplicativeexpression';
               ex.factor = exp;
               ex.factors = [];
-              for(var i=0; i<exps.length; i++) {
-                  var factor = exps[i];
-                  var fact = {};
+              for(let i=0; i<exps.length; i++) {
+                  let factor = exps[i];
+                  let fact = {};
                   fact.operator = factor[1];
                   fact.expression = factor[3];
                   ex.factors.push(fact);
@@ -17938,8 +17933,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_UnaryExpression() {
-        var result0, result1, result2;
-        var pos0, pos1;
+        let result0, result1, result2;
+        let pos0, pos1;
         
         reportFailures++;
         pos0 = pos;
@@ -17978,7 +17973,7 @@ SparqlParser.parser = (function(){
         }
         if (result0 !== null) {
           result0 = (function(offset, e) {
-              var ex = {};
+              let ex = {};
               ex.token = 'expression';
               ex.expressionType = 'unaryexpression';
               ex.unaryexpression = "!";
@@ -18027,7 +18022,7 @@ SparqlParser.parser = (function(){
           }
           if (result0 !== null) {
             result0 = (function(offset, v) {
-                var ex = {};
+                let ex = {};
                 ex.token = 'expression';
                 ex.expressionType = 'unaryexpression';
                 ex.unaryexpression = "+";
@@ -18076,7 +18071,7 @@ SparqlParser.parser = (function(){
             }
             if (result0 !== null) {
               result0 = (function(offset, v) {
-                  var ex = {};
+                  let ex = {};
                   ex.token = 'expression';
                   ex.expressionType = 'unaryexpression';
                   ex.unaryexpression = "-";
@@ -18101,8 +18096,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_PrimaryExpression() {
-        var result0;
-        var pos0;
+        let result0;
+        let pos0;
         
         reportFailures++;
         result0 = parse_BrackettedExpression();
@@ -18115,7 +18110,7 @@ SparqlParser.parser = (function(){
               result0 = parse_RDFLiteral();
               if (result0 !== null) {
                 result0 = (function(offset, v) {
-                    var ex = {};
+                    let ex = {};
                     ex.token = 'expression';
                     ex.expressionType = 'atomic';
                     ex.primaryexpression = 'rdfliteral';
@@ -18132,7 +18127,7 @@ SparqlParser.parser = (function(){
                 result0 = parse_NumericLiteral();
                 if (result0 !== null) {
                   result0 = (function(offset, v) {
-                      var ex = {};
+                      let ex = {};
                       ex.token = 'expression';
                       ex.expressionType = 'atomic';
                       ex.primaryexpression = 'numericliteral';
@@ -18149,7 +18144,7 @@ SparqlParser.parser = (function(){
                   result0 = parse_BooleanLiteral();
                   if (result0 !== null) {
                     result0 = (function(offset, v) {
-                        var ex = {};
+                        let ex = {};
                         ex.token = 'expression';
                         ex.expressionType = 'atomic';
                         ex.primaryexpression = 'booleanliteral';
@@ -18168,7 +18163,7 @@ SparqlParser.parser = (function(){
                       result0 = parse_Var();
                       if (result0 !== null) {
                         result0 = (function(offset, v) {
-                            var ex = {};
+                            let ex = {};
                             ex.token = 'expression';
                             ex.expressionType = 'atomic';
                             ex.primaryexpression = 'var';
@@ -18195,8 +18190,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_BrackettedExpression() {
-        var result0, result1, result2, result3, result4;
-        var pos0, pos1;
+        let result0, result1, result2, result3, result4;
+        let pos0, pos1;
         
         reportFailures++;
         pos0 = pos;
@@ -18274,8 +18269,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_BuiltInCall() {
-        var result0, result1, result2, result3, result4, result5, result6, result7, result8, result9, result10, result11, result12, result13, result14;
-        var pos0, pos1, pos2;
+        let result0, result1, result2, result3, result4, result5, result6, result7, result8, result9, result10, result11, result12, result13, result14;
+        let pos0, pos1, pos2;
         
         reportFailures++;
         pos0 = pos;
@@ -18375,7 +18370,7 @@ SparqlParser.parser = (function(){
         }
         if (result0 !== null) {
           result0 = (function(offset, e) {
-              var ex = {};
+              let ex = {};
               ex.token = 'expression'
               ex.expressionType = 'builtincall'
               ex.builtincall = 'str'
@@ -18485,7 +18480,7 @@ SparqlParser.parser = (function(){
           }
           if (result0 !== null) {
             result0 = (function(offset, e) {
-                var ex = {};
+                let ex = {};
                 ex.token = 'expression'
                 ex.expressionType = 'builtincall'
                 ex.builtincall = 'lang'
@@ -18637,7 +18632,7 @@ SparqlParser.parser = (function(){
             }
             if (result0 !== null) {
               result0 = (function(offset, e1, e2) {
-                  var ex = {};
+                  let ex = {};
                   ex.token = 'expression'
                   ex.expressionType = 'builtincall'
                   ex.builtincall = 'langmatches'
@@ -18747,7 +18742,7 @@ SparqlParser.parser = (function(){
               }
               if (result0 !== null) {
                 result0 = (function(offset, e) {
-                    var ex = {};
+                    let ex = {};
                     ex.token = 'expression'
                     ex.expressionType = 'builtincall'
                     ex.builtincall = 'datatype'
@@ -18857,7 +18852,7 @@ SparqlParser.parser = (function(){
                 }
                 if (result0 !== null) {
                   result0 = (function(offset, v) {
-                      var ex = {};
+                      let ex = {};
                       ex.token = 'expression'
                       ex.expressionType = 'builtincall'
                       ex.builtincall = 'bound'
@@ -18967,7 +18962,7 @@ SparqlParser.parser = (function(){
                   }
                   if (result0 !== null) {
                     result0 = (function(offset, e) {
-                        var ex = {};
+                        let ex = {};
                         ex.token = 'expression';
                         ex.expressionType = 'builtincall';
                         ex.builtincall = 'iri'
@@ -19077,7 +19072,7 @@ SparqlParser.parser = (function(){
                     }
                     if (result0 !== null) {
                       result0 = (function(offset, e) {
-                          var ex = {};
+                          let ex = {};
                           ex.token = 'expression';
                           ex.expressionType = 'builtincall';
                           ex.builtincall = 'uri'
@@ -19197,7 +19192,7 @@ SparqlParser.parser = (function(){
                       }
                       if (result0 !== null) {
                         result0 = (function(offset, arg) {
-                            var ex = {};
+                            let ex = {};
                             ex.token = 'expression';
                             ex.expressionType = 'builtincall';
                             ex.builtincall = 'bnode';
@@ -19261,7 +19256,7 @@ SparqlParser.parser = (function(){
                         }
                         if (result0 !== null) {
                           result0 = (function(offset, args) {
-                              var ex = {};
+                              let ex = {};
                               ex.token = 'expression';
                               ex.expressionType = 'builtincall';
                               ex.builtincall = 'coalesce';
@@ -19455,7 +19450,7 @@ SparqlParser.parser = (function(){
                           }
                           if (result0 !== null) {
                             result0 = (function(offset, test, trueCond, falseCond) {
-                              var ex = {};
+                              let ex = {};
                               ex.token = 'expression';
                               ex.expressionType = 'builtincall';
                               ex.builtincall = 'if';
@@ -19565,7 +19560,7 @@ SparqlParser.parser = (function(){
                             }
                             if (result0 !== null) {
                               result0 = (function(offset, arg) {
-                                var ex = {};
+                                let ex = {};
                                 ex.token = 'expression';
                                 ex.expressionType = 'builtincall';
                                 ex.builtincall = 'isliteral';
@@ -19675,7 +19670,7 @@ SparqlParser.parser = (function(){
                               }
                               if (result0 !== null) {
                                 result0 = (function(offset, arg) {
-                                  var ex = {};
+                                  let ex = {};
                                   ex.token = 'expression';
                                   ex.expressionType = 'builtincall';
                                   ex.builtincall = 'isblank';
@@ -19827,7 +19822,7 @@ SparqlParser.parser = (function(){
                                 }
                                 if (result0 !== null) {
                                   result0 = (function(offset, e1, e2) {
-                                    var ex = {};
+                                    let ex = {};
                                     ex.token = 'expression';
                                     ex.expressionType = 'builtincall';
                                     ex.builtincall = 'sameterm';
@@ -19958,7 +19953,7 @@ SparqlParser.parser = (function(){
                                   }
                                   if (result0 !== null) {
                                     result0 = (function(offset, arg) {
-                                      var ex = {};
+                                      let ex = {};
                                       ex.token = 'expression';
                                       ex.expressionType = 'builtincall';
                                       ex.builtincall = 'isuri';
@@ -20174,12 +20169,12 @@ SparqlParser.parser = (function(){
                                     }
                                     if (result0 !== null) {
                                       result0 = (function(offset, fnname, alter, finalarg) {
-                                      var ex = {};
+                                      let ex = {};
                                       ex.token = 'expression';
                                       ex.expressionType = 'custom';
                                       ex.name = fnname.join('');
-                                      var acum = [];
-                                      for(var i=0; i<alter.length; i++)
+                                      let acum = [];
+                                      for(let i=0; i<alter.length; i++)
                                         acum.push(alter[i][1]);
                                       acum.push(finalarg);
                                       ex.args = acum;
@@ -20221,8 +20216,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_RegexExpression() {
-        var result0, result1, result2, result3, result4, result5, result6, result7, result8, result9, result10, result11, result12;
-        var pos0, pos1, pos2;
+        let result0, result1, result2, result3, result4, result5, result6, result7, result8, result9, result10, result11, result12;
+        let pos0, pos1, pos2;
         
         reportFailures++;
         pos0 = pos;
@@ -20414,7 +20409,7 @@ SparqlParser.parser = (function(){
         }
         if (result0 !== null) {
           result0 = (function(offset, e1, e2, eo) {
-              var regex = {};
+              let regex = {};
               regex.token = 'expression';
               regex.expressionType = 'regex';
               regex.text = e1;
@@ -20435,8 +20430,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_ExistsFunc() {
-        var result0, result1, result2;
-        var pos0, pos1;
+        let result0, result1, result2;
+        let pos0, pos1;
         
         reportFailures++;
         pos0 = pos;
@@ -20486,7 +20481,7 @@ SparqlParser.parser = (function(){
         }
         if (result0 !== null) {
           result0 = (function(offset, ggp) {
-            var ex = {};
+            let ex = {};
             ex.token = 'expression';
             ex.expressionType = 'builtincall';
             ex.builtincall = 'exists';
@@ -20506,8 +20501,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_NotExistsFunc() {
-        var result0, result1, result2, result3, result4;
-        var pos0, pos1;
+        let result0, result1, result2, result3, result4;
+        let pos0, pos1;
         
         reportFailures++;
         pos0 = pos;
@@ -20593,7 +20588,7 @@ SparqlParser.parser = (function(){
         }
         if (result0 !== null) {
           result0 = (function(offset, ggp) {
-            var ex = {};
+            let ex = {};
             ex.token = 'expression';
             ex.expressionType = 'builtincall';
             ex.builtincall = 'notexists';
@@ -20613,8 +20608,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_Aggregate() {
-        var result0, result1, result2, result3, result4, result5, result6, result7, result8, result9, result10;
-        var pos0, pos1;
+        let result0, result1, result2, result3, result4, result5, result6, result7, result8, result9, result10;
+        let pos0, pos1;
         
         reportFailures++;
         pos0 = pos;
@@ -20773,7 +20768,7 @@ SparqlParser.parser = (function(){
         }
         if (result0 !== null) {
           result0 = (function(offset, d, e) {
-              var exp = {};
+              let exp = {};
               exp.token = 'expression';
               exp.expressionType = 'aggregate';
               exp.aggregateType = 'count';
@@ -20933,7 +20928,7 @@ SparqlParser.parser = (function(){
           }
           if (result0 !== null) {
             result0 = (function(offset, d, e) {
-                var exp = {};
+                let exp = {};
                 exp.token = 'expression';
                 exp.expressionType = 'aggregate';
                 exp.aggregateType = 'sum';
@@ -21093,7 +21088,7 @@ SparqlParser.parser = (function(){
             }
             if (result0 !== null) {
               result0 = (function(offset, d, e) {
-                  var exp = {};
+                  let exp = {};
                   exp.token = 'expression';
                   exp.expressionType = 'aggregate';
                   exp.aggregateType = 'min';
@@ -21253,7 +21248,7 @@ SparqlParser.parser = (function(){
               }
               if (result0 !== null) {
                 result0 = (function(offset, d, e) {
-                    var exp = {};
+                    let exp = {};
                     exp.token = 'expression'
                     exp.expressionType = 'aggregate'
                     exp.aggregateType = 'max'
@@ -21413,7 +21408,7 @@ SparqlParser.parser = (function(){
                 }
                 if (result0 !== null) {
                   result0 = (function(offset, d, e) {
-                      var exp = {};
+                      let exp = {};
                       exp.token = 'expression'
                       exp.expressionType = 'aggregate'
                       exp.aggregateType = 'avg'
@@ -21439,8 +21434,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_IRIrefOrFunction() {
-        var result0, result1;
-        var pos0, pos1;
+        let result0, result1;
+        let pos0, pos1;
         
         reportFailures++;
         pos0 = pos;
@@ -21461,7 +21456,7 @@ SparqlParser.parser = (function(){
         }
         if (result0 !== null) {
           result0 = (function(offset, i, args) {
-              var fcall = {};
+              let fcall = {};
               fcall.token = "expression";
               fcall.expressionType = 'irireforfunction';
               fcall.iriref = i;
@@ -21481,8 +21476,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_RDFLiteral() {
-        var result0, result1, result2;
-        var pos0, pos1, pos2;
+        let result0, result1, result2;
+        let pos0, pos1, pos2;
         
         reportFailures++;
         pos0 = pos;
@@ -21550,7 +21545,7 @@ SparqlParser.parser = (function(){
       }
       
       function parse_NumericLiteral() {
-        var result0;
+        let result0;
         
         reportFailures++;
         result0 = parse_NumericLiteralUnsigned();
@@ -21568,7 +21563,7 @@ SparqlParser.parser = (function(){
       }
       
       function parse_NumericLiteralUnsigned() {
-        var result0;
+        let result0;
         
         reportFailures++;
         result0 = parse_DOUBLE();
@@ -21586,7 +21581,7 @@ SparqlParser.parser = (function(){
       }
       
       function parse_NumericLiteralPositive() {
-        var result0;
+        let result0;
         
         reportFailures++;
         result0 = parse_DOUBLE_POSITIVE();
@@ -21604,7 +21599,7 @@ SparqlParser.parser = (function(){
       }
       
       function parse_NumericLiteralNegative() {
-        var result0;
+        let result0;
         
         reportFailures++;
         result0 = parse_DOUBLE_NEGATIVE();
@@ -21622,8 +21617,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_BooleanLiteral() {
-        var result0;
-        var pos0;
+        let result0;
+        let pos0;
         
         reportFailures++;
         pos0 = pos;
@@ -21649,7 +21644,7 @@ SparqlParser.parser = (function(){
         }
         if (result0 !== null) {
           result0 = (function(offset) {
-              var lit = {};
+              let lit = {};
               lit.token = "literal";
               lit.lang = null;
               lit.type = "http://www.w3.org/2001/XMLSchema#boolean";
@@ -21684,7 +21679,7 @@ SparqlParser.parser = (function(){
           }
           if (result0 !== null) {
             result0 = (function(offset) {
-                var lit = {};
+                let lit = {};
                 lit.token = "literal";
                 lit.lang = null;
                 lit.type = "http://www.w3.org/2001/XMLSchema#boolean";
@@ -21704,8 +21699,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_String() {
-        var result0;
-        var pos0;
+        let result0;
+        let pos0;
         
         reportFailures++;
         pos0 = pos;
@@ -21754,8 +21749,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_IRIref() {
-        var result0;
-        var pos0;
+        let result0;
+        let pos0;
         
         reportFailures++;
         pos0 = pos;
@@ -21784,8 +21779,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_PrefixedName() {
-        var result0;
-        var pos0;
+        let result0;
+        let pos0;
         
         reportFailures++;
         pos0 = pos;
@@ -21814,8 +21809,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_BlankNode() {
-        var result0;
-        var pos0;
+        let result0;
+        let pos0;
         
         reportFailures++;
         pos0 = pos;
@@ -21844,8 +21839,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_IRI_REF() {
-        var result0, result1, result2;
-        var pos0, pos1;
+        let result0, result1, result2;
+        let pos0, pos1;
         
         reportFailures++;
         pos0 = pos;
@@ -21920,8 +21915,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_PNAME_NS() {
-        var result0, result1;
-        var pos0, pos1;
+        let result0, result1;
+        let pos0, pos1;
         
         reportFailures++;
         pos0 = pos;
@@ -21962,8 +21957,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_PNAME_LN() {
-        var result0, result1;
-        var pos0, pos1;
+        let result0, result1;
+        let pos0, pos1;
         
         reportFailures++;
         pos0 = pos;
@@ -21995,8 +21990,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_BLANK_NODE_LABEL() {
-        var result0, result1;
-        var pos0, pos1;
+        let result0, result1;
+        let pos0, pos1;
         
         reportFailures++;
         pos0 = pos;
@@ -22036,8 +22031,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_VAR1() {
-        var result0, result1;
-        var pos0, pos1;
+        let result0, result1;
+        let pos0, pos1;
         
         reportFailures++;
         pos0 = pos;
@@ -22077,8 +22072,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_VAR2() {
-        var result0, result1;
-        var pos0, pos1;
+        let result0, result1;
+        let pos0, pos1;
         
         reportFailures++;
         pos0 = pos;
@@ -22118,8 +22113,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_LANGTAG() {
-        var result0, result1, result2, result3, result4, result5;
-        var pos0, pos1, pos2;
+        let result0, result1, result2, result3, result4, result5;
+        let pos0, pos1, pos2;
         
         reportFailures++;
         pos0 = pos;
@@ -22294,8 +22289,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_INTEGER() {
-        var result0, result1;
-        var pos0;
+        let result0, result1;
+        let pos0;
         
         reportFailures++;
         pos0 = pos;
@@ -22327,7 +22322,7 @@ SparqlParser.parser = (function(){
         }
         if (result0 !== null) {
           result0 = (function(offset, d) {
-              var lit = {};
+              let lit = {};
               lit.token = "literal";
               lit.lang = null;
               lit.type = "http://www.w3.org/2001/XMLSchema#integer";
@@ -22346,8 +22341,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_DECIMAL() {
-        var result0, result1, result2, result3;
-        var pos0, pos1;
+        let result0, result1, result2, result3;
+        let pos0, pos1;
         
         reportFailures++;
         pos0 = pos;
@@ -22428,7 +22423,7 @@ SparqlParser.parser = (function(){
         if (result0 !== null) {
           result0 = (function(offset, a, b, c) {
         
-              var lit = {};
+              let lit = {};
               lit.token = "literal";
               lit.lang = null;
               lit.type = "http://www.w3.org/2001/XMLSchema#decimal";
@@ -22490,7 +22485,7 @@ SparqlParser.parser = (function(){
           }
           if (result0 !== null) {
             result0 = (function(offset, a, b) {
-                var lit = {};
+                let lit = {};
                 lit.token = "literal";
                 lit.lang = null;
                 lit.type = "http://www.w3.org/2001/XMLSchema#decimal";
@@ -22510,8 +22505,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_DOUBLE() {
-        var result0, result1, result2, result3;
-        var pos0, pos1;
+        let result0, result1, result2, result3;
+        let pos0, pos1;
         
         reportFailures++;
         pos0 = pos;
@@ -22597,7 +22592,7 @@ SparqlParser.parser = (function(){
         }
         if (result0 !== null) {
           result0 = (function(offset, a, b, c, e) {
-              var lit = {};
+              let lit = {};
               lit.token = "literal";
               lit.lang = null;
               lit.type = "http://www.w3.org/2001/XMLSchema#double";
@@ -22665,7 +22660,7 @@ SparqlParser.parser = (function(){
           }
           if (result0 !== null) {
             result0 = (function(offset, a, b, c) {
-                var lit = {};
+                let lit = {};
                 lit.token = "literal";
                 lit.lang = null;
                 lit.type = "http://www.w3.org/2001/XMLSchema#double";
@@ -22719,7 +22714,7 @@ SparqlParser.parser = (function(){
             }
             if (result0 !== null) {
               result0 = (function(offset, a, b) {
-                  var lit = {};
+                  let lit = {};
                   lit.token = "literal";
                   lit.lang = null;
                   lit.type = "http://www.w3.org/2001/XMLSchema#double";
@@ -22740,8 +22735,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_INTEGER_POSITIVE() {
-        var result0, result1;
-        var pos0, pos1;
+        let result0, result1;
+        let pos0, pos1;
         
         reportFailures++;
         pos0 = pos;
@@ -22781,8 +22776,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_DECIMAL_POSITIVE() {
-        var result0, result1;
-        var pos0, pos1;
+        let result0, result1;
+        let pos0, pos1;
         
         reportFailures++;
         pos0 = pos;
@@ -22822,8 +22817,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_DOUBLE_POSITIVE() {
-        var result0, result1;
-        var pos0, pos1;
+        let result0, result1;
+        let pos0, pos1;
         
         reportFailures++;
         pos0 = pos;
@@ -22863,8 +22858,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_INTEGER_NEGATIVE() {
-        var result0, result1;
-        var pos0, pos1;
+        let result0, result1;
+        let pos0, pos1;
         
         reportFailures++;
         pos0 = pos;
@@ -22904,8 +22899,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_DECIMAL_NEGATIVE() {
-        var result0, result1;
-        var pos0, pos1;
+        let result0, result1;
+        let pos0, pos1;
         
         reportFailures++;
         pos0 = pos;
@@ -22945,8 +22940,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_DOUBLE_NEGATIVE() {
-        var result0, result1;
-        var pos0, pos1;
+        let result0, result1;
+        let pos0, pos1;
         
         reportFailures++;
         pos0 = pos;
@@ -22986,8 +22981,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_EXPONENT() {
-        var result0, result1, result2, result3;
-        var pos0, pos1;
+        let result0, result1, result2, result3;
+        let pos0, pos1;
         
         reportFailures++;
         pos0 = pos;
@@ -23067,8 +23062,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_STRING_LITERAL1() {
-        var result0, result1, result2;
-        var pos0, pos1;
+        let result0, result1, result2;
+        let pos0, pos1;
         
         reportFailures++;
         pos0 = pos;
@@ -23149,8 +23144,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_STRING_LITERAL2() {
-        var result0, result1, result2;
-        var pos0, pos1;
+        let result0, result1, result2;
+        let pos0, pos1;
         
         reportFailures++;
         pos0 = pos;
@@ -23231,8 +23226,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_STRING_LITERAL_LONG1() {
-        var result0, result1, result2, result3;
-        var pos0, pos1, pos2;
+        let result0, result1, result2, result3;
+        let pos0, pos1, pos2;
         
         reportFailures++;
         pos0 = pos;
@@ -23379,8 +23374,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_STRING_LITERAL_LONG2() {
-        var result0, result1, result2, result3;
-        var pos0, pos1, pos2;
+        let result0, result1, result2, result3;
+        let pos0, pos1, pos2;
         
         reportFailures++;
         pos0 = pos;
@@ -23527,8 +23522,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_ECHAR() {
-        var result0, result1;
-        var pos0;
+        let result0, result1;
+        let pos0;
         
         reportFailures++;
         pos0 = pos;
@@ -23569,8 +23564,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_NIL() {
-        var result0, result1, result2;
-        var pos0, pos1;
+        let result0, result1, result2;
+        let pos0, pos1;
         
         reportFailures++;
         pos0 = pos;
@@ -23634,7 +23629,7 @@ SparqlParser.parser = (function(){
       }
       
       function parse_WS() {
-        var result0;
+        let result0;
         
         reportFailures++;
         if (/^[ ]/.test(input.charAt(pos))) {
@@ -23690,8 +23685,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_COMMENT() {
-        var result0, result1, result2;
-        var pos0;
+        let result0, result1, result2;
+        let pos0;
         
         reportFailures++;
         pos0 = pos;
@@ -23745,8 +23740,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_ANON() {
-        var result0, result1, result2;
-        var pos0;
+        let result0, result1, result2;
+        let pos0;
         
         reportFailures++;
         pos0 = pos;
@@ -23798,7 +23793,7 @@ SparqlParser.parser = (function(){
       }
       
       function parse_PN_CHARS_BASE() {
-        var result0;
+        let result0;
         
         reportFailures++;
         if (/^[A-Z]/.test(input.charAt(pos))) {
@@ -23961,7 +23956,7 @@ SparqlParser.parser = (function(){
       }
       
       function parse_PN_CHARS_U() {
-        var result0;
+        let result0;
         
         reportFailures++;
         result0 = parse_PN_CHARS_BASE();
@@ -23984,8 +23979,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_VARNAME() {
-        var result0, result1, result2;
-        var pos0, pos1;
+        let result0, result1, result2;
+        let pos0, pos1;
         
         reportFailures++;
         pos0 = pos;
@@ -24121,7 +24116,7 @@ SparqlParser.parser = (function(){
       }
       
       function parse_PN_CHARS() {
-        var result0;
+        let result0;
         
         reportFailures++;
         result0 = parse_PN_CHARS_U();
@@ -24188,8 +24183,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_PN_PREFIX() {
-        var result0, result1, result2;
-        var pos0, pos1;
+        let result0, result1, result2;
+        let pos0, pos1;
         
         reportFailures++;
         pos0 = pos;
@@ -24252,8 +24247,8 @@ SparqlParser.parser = (function(){
       }
       
       function parse_PN_LOCAL() {
-        var result0, result1, result2;
-        var pos0, pos1;
+        let result0, result1, result2;
+        let pos0, pos1;
         
         reportFailures++;
         pos0 = pos;
@@ -24306,9 +24301,9 @@ SparqlParser.parser = (function(){
       function cleanupExpected(expected) {
         expected.sort();
         
-        var lastExpected = null;
-        var cleanExpected = [];
-        for (var i = 0; i < expected.length; i++) {
+        let lastExpected = null;
+        let cleanExpected = [];
+        for (let i = 0; i < expected.length; i++) {
           if (expected[i] !== lastExpected) {
             cleanExpected.push(expected[i]);
             lastExpected = expected[i];
@@ -24325,12 +24320,12 @@ SparqlParser.parser = (function(){
          * enough to prevent it.
          */
         
-        var line = 1;
-        var column = 1;
-        var seenCR = false;
+        let line = 1;
+        let column = 1;
+        let seenCR = false;
         
-        for (var i = 0; i < Math.max(pos, rightmostFailuresPos); i++) {
-          var ch = input.charAt(i);
+        for (let i = 0; i < Math.max(pos, rightmostFailuresPos); i++) {
+          let ch = input.charAt(i);
           if (ch === "\n") {
             if (!seenCR) { line++; }
             column = 1;
@@ -24350,8 +24345,8 @@ SparqlParser.parser = (function(){
       
       
           var flattenString = function(arrs) {
-              var acum ="";
-              for(var i=0; i< arrs.length; i++) {
+              let acum ="";
+              for(let i=0; i< arrs.length; i++) {
                 if(typeof(arrs[i])==='string') {
                   acum = acum + arrs[i];
                 } else {
@@ -24365,7 +24360,7 @@ SparqlParser.parser = (function(){
       
           var GlobalBlankNodeCounter = 0;
       
-          var prefixes = {};
+          let prefixes = {};
       
           var registerPrefix = function(prefix, uri) {
               prefixes[prefix] = uri;
@@ -24376,8 +24371,8 @@ SparqlParser.parser = (function(){
           }
       
           var arrayToString = function(array) {
-              var tmp = "";
-              for(var i=0; i<array.length; i++) {
+              let tmp = "";
+              for(let i=0; i<array.length; i++) {
                   tmp = tmp + array[i];            
               }
       
@@ -24385,7 +24380,7 @@ SparqlParser.parser = (function(){
           }
       
       
-      var result = parseFunctions[startRule]();
+      let result = parseFunctions[startRule]();
       
       /*
        * The parser is now in one of the following three states:
@@ -24412,9 +24407,9 @@ SparqlParser.parser = (function(){
        * handle these states.
        */
       if (result === null || pos !== input.length) {
-        var offset = Math.max(pos, rightmostFailuresPos);
-        var found = offset < input.length ? input.charAt(offset) : null;
-        var errorPosition = computeErrorPosition();
+        let offset = Math.max(pos, rightmostFailuresPos);
+        let found = offset < input.length ? input.charAt(offset) : null;
+        let errorPosition = computeErrorPosition();
         
         throw new this.SyntaxError(
           cleanupExpected(rightmostFailuresExpected),
@@ -24436,7 +24431,7 @@ SparqlParser.parser = (function(){
   
   result.SyntaxError = function(expected, found, offset, line, column) {
     function buildMessage(expected, found) {
-      var expectedHumanized, foundHumanized;
+      let expectedHumanized, foundHumanized;
       
       switch (expected.length) {
         case 0:
@@ -24474,7 +24469,7 @@ SparqlParser.parser = (function(){
 // end of ./src/js-sparql-parser/src/sparql_parser.js 
 
 // exports
-var RDFJSInterface = {};
+let RDFJSInterface = {};
 
 // imports
 
@@ -24510,8 +24505,8 @@ RDFJSInterface.UrisMap = function() {
 };
 
 RDFJSInterface.UrisMap.prototype.values = function() {
-    var collected = {};
-    for(var p in this) {
+    let collected = {};
+    for(let p in this) {
         if(!Utils.include(this.interfaceProperties,p) && 
            typeof(this[p])!=='function' &&
            p!=='defaultNs' &&
@@ -24554,7 +24549,7 @@ RDFJSInterface.UrisMap.prototype.setDefault = function(iri) {
 };
 
 RDFJSInterface.UrisMap.prototype.addAll = function(prefixMap, override) {
-    for(var prefix in prefixMap) {
+    for(let prefix in prefixMap) {
         if(!Utils.include(this.interfaceProperties, prefix)) {
             if(this[prefix] != null) {
                 if(override === true) {
@@ -24570,9 +24565,9 @@ RDFJSInterface.UrisMap.prototype.addAll = function(prefixMap, override) {
 };
 
 RDFJSInterface.UrisMap.prototype.resolve = function(curie) {
-    var parts = curie.split(":");
-    var ns = parts[0];
-    var suffix = parts[1];
+    let parts = curie.split(":");
+    let ns = parts[0];
+    let suffix = parts[1];
     if(ns === '') {
         if(this.defaultNs == null) {
             return null;
@@ -24587,11 +24582,11 @@ RDFJSInterface.UrisMap.prototype.resolve = function(curie) {
 };
 
 RDFJSInterface.UrisMap.prototype.shrink = function(iri) {
-    for(var ns in this) {
-        var prefix = this[ns];
+    for(let ns in this) {
+        let prefix = this[ns];
         if(iri.indexOf(prefix) === 0) {
             if(prefix !== '' && ns != 'defaultNs') {
-                var suffix = iri.split(prefix)[1];
+                let suffix = iri.split(prefix)[1];
                 return ns + ":" + suffix;
             }
         }
@@ -24642,7 +24637,7 @@ RDFJSInterface.Profile.prototype.setTerm = function(term, iri) {
 // RDF environemnt
 RDFJSInterface.RDFEnvironment = function () {
     this.blankNodeCounter = 0;
-    var that = this;
+    let that = this;
     this.filters = {
         s:function (s) {
             return function (t) {
@@ -24685,27 +24680,27 @@ RDFJSInterface.RDFEnvironment = function () {
             };
         },
         type:function (o) {
-            var type = that.resolve("rdf:type");
+            let type = that.resolve("rdf:type");
             return function (t) {
                 return t.predicate.equals(type) && t.object.equals(o);
             };
         }
     };
 
-    for (var p in RDFJSInterface.defaultContext) {
+    for (let p in RDFJSInterface.defaultContext) {
         this.prefixes.set(p, RDFJSInterface.defaultContext[p]);
     }
 };
 Utils['extends'](RDFJSInterface.Profile,RDFJSInterface.RDFEnvironment);
 
 RDFJSInterface.RDFEnvironment.prototype.createBlankNode = function() {
-     var bnode =  new RDFJSInterface.BlankNode(this.blankNodeCounter);
+     let bnode =  new RDFJSInterface.BlankNode(this.blankNodeCounter);
     this.blankNodeCounter++;
     return bnode;
 };
 
 RDFJSInterface.RDFEnvironment.prototype.createNamedNode = function(value) {
-    var resolvedValue = this.resolve(value);
+    let resolvedValue = this.resolve(value);
     if(resolvedValue != null) {
         return new RDFJSInterface.NamedNode(resolvedValue);
     } else {
@@ -24726,9 +24721,9 @@ RDFJSInterface.RDFEnvironment.prototype.createTriple = function(subject, predica
 };
 
 RDFJSInterface.RDFEnvironment.prototype.createGraph = function(triples) {
-    var graph = new RDFJSInterface.Graph();
+    let graph = new RDFJSInterface.Graph();
     if(triples != null) {
-        for(var i=0; i<triples.length; i++) {
+        for(let i=0; i<triples.length; i++) {
             graph.add(triples[i]);
         }
     }
@@ -24750,7 +24745,7 @@ RDFJSInterface.RDFEnvironment.prototype.createProfile = function(empty) {
     if(empty === true) {
         return new RDFJSInterface.RDFEnvironment.Profile();
     } else {
-        var profile = new RDFJSInterface.RDFEnvironment.Profile();
+        let profile = new RDFJSInterface.RDFEnvironment.Profile();
         profile.importProfile(this);
 
         return profile;
@@ -24761,10 +24756,10 @@ RDFJSInterface.RDFEnvironment.prototype.createTermMap = function(empty) {
     if(empty === true) {
         return new RDFJSInterface.UrisMap();
     } else {
-      var cloned = this.terms.values();
-      var termMap = new RDFJSInterface.UrisMap();
+      let cloned = this.terms.values();
+      let termMap = new RDFJSInterface.UrisMap();
    
-      for(var p in cloned) {
+      for(let p in cloned) {
           termMap[p] = cloned[p];
       }
    
@@ -24776,10 +24771,10 @@ RDFJSInterface.RDFEnvironment.prototype.createPrefixMap = function(empty) {
     if(empty === true) {
         return new RDFJSInterface.UrisMap();
     } else {
-      var cloned = this.prefixes.values();
-      var prefixMap = new RDFJSInterface.UrisMap();
+      let cloned = this.prefixes.values();
+      let prefixMap = new RDFJSInterface.UrisMap();
    
-      for(var p in cloned) {
+      for(let p in cloned) {
           prefixMap[p] = cloned[p];
       }
    
@@ -24799,8 +24794,8 @@ RDFJSInterface.RDFNode.prototype.equals = function(otherNode) {
         return this.valueOf() == otherNode;
 
     } else {
-        for(var i in this.attributes) {
-            var attribute = this.attributes[i];
+        for(let i in this.attributes) {
+            let attribute = this.attributes[i];
             if(this[attribute] != otherNode[attribute]) {
                 return false;
             }
@@ -24868,7 +24863,7 @@ RDFJSInterface.Literal.prototype.toString = function(){
         } else {
             var tmp = '"'+this.nominalValue+'"';
         }
-    };
+    }
     if(this.language != null) {
         tmp = tmp + "@" + this.language;
     } else if(this.datatype != null || this.type) {
@@ -24940,11 +24935,11 @@ RDFJSInterface.Graph = function() {
 };
 
 RDFJSInterface.Graph.prototype.add = function(triple) {
-    for(var i=0; i<this.actions.length; i++) {
+    for(let i=0; i<this.actions.length; i++) {
         triple = this.actions[i](triple);
     }
     
-    var id = triple.subject.toString()+triple.predicate.toString()+triple.object.toString();
+    let id = triple.subject.toString()+triple.predicate.toString()+triple.object.toString();
     if(!this.duplicates[id]) {
         this.duplicates[id] = true;
         this.triples.push(triple);
@@ -24957,7 +24952,7 @@ RDFJSInterface.Graph.prototype.add = function(triple) {
 RDFJSInterface.Graph.prototype.addAction = function (tripleAction, run) {
     this.actions.push(tripleAction);
     if (run == true) {
-        for (var i = 0; i < this.triples.length; i++) {
+        for (let i = 0; i < this.triples.length; i++) {
             this.triples[i] = tripleAction(this.triples[i]);
         }
     }
@@ -24966,8 +24961,8 @@ RDFJSInterface.Graph.prototype.addAction = function (tripleAction, run) {
 };
 
 RDFJSInterface.Graph.prototype.addAll = function (graph) {
-    var newTriples = graph.toArray();
-    for (var i = 0; i < newTriples.length; i++) {
+    let newTriples = graph.toArray();
+    for (let i = 0; i < newTriples.length; i++) {
         this.add(newTriples[i]);
     }
 
@@ -24976,10 +24971,10 @@ RDFJSInterface.Graph.prototype.addAll = function (graph) {
 };
 
 RDFJSInterface.Graph.prototype.remove = function(triple) {
-    var toRemove = null;
-    for(var i=0; i<this.triples.length; i++) {
+    let toRemove = null;
+    for(let i=0; i<this.triples.length; i++) {
         if(this.triples[i].equals(triple)) {
-            var id = triple.subject.toString()+triple.predicate.toString()+triple.object.toString();
+            let id = triple.subject.toString()+triple.predicate.toString()+triple.object.toString();
             delete this.duplicates[id];
             toRemove = i;
             break;
@@ -24999,7 +24994,7 @@ RDFJSInterface.Graph.prototype.toArray = function() {
 };
 
 RDFJSInterface.Graph.prototype.some = function(p) {
-    for(var i=0; i<this.triples.length; i++) {
+    for(let i=0; i<this.triples.length; i++) {
         if(p(this.triples[i],this) === true) {
             return true;
         }
@@ -25009,7 +25004,7 @@ RDFJSInterface.Graph.prototype.some = function(p) {
 };
 
 RDFJSInterface.Graph.prototype.every = function(p) {
-    for(var i=0; i<this.triples.length; i++) {
+    for(let i=0; i<this.triples.length; i++) {
         if(p(this.triples[i],this) === false) {
             return false;
         }
@@ -25019,9 +25014,9 @@ RDFJSInterface.Graph.prototype.every = function(p) {
 };
 
 RDFJSInterface.Graph.prototype.filter = function(f) {
-    var tmp = new RDFJSInterface.Graph();
+    let tmp = new RDFJSInterface.Graph();
 
-    for(var i=0; i<this.triples.length; i++) {
+    for(let i=0; i<this.triples.length; i++) {
         if(f(this.triples[i],this) === true) {
             tmp.add(this.triples[i]);
         }
@@ -25031,25 +25026,25 @@ RDFJSInterface.Graph.prototype.filter = function(f) {
 };
 
 RDFJSInterface.Graph.prototype.forEach = function(f) {
-    for(var i=0; i<this.triples.length; i++) {
+    for(let i=0; i<this.triples.length; i++) {
         f(this.triples[i],this);
     }
 };
 
 RDFJSInterface.Graph.prototype.merge = function(g) {
-    var newGraph = new RDFJSInterface.Graph();
-    for(var i=0; i<this.triples.length; i++)
+    let newGraph = new RDFJSInterface.Graph();
+    for(let i=0; i<this.triples.length; i++)
         newGraph.add(this.triples[i]);
     
     return newGraph;
 };
 
 RDFJSInterface.Graph.prototype.match = function(subject, predicate, object, limit) {
-    var graph = new RDFJSInterface.Graph();
+    let graph = new RDFJSInterface.Graph();
 
-    var matched = 0;
-    for(var i=0; i<this.triples.length; i++) {
-        var triple = this.triples[i];
+    let matched = 0;
+    for(let i=0; i<this.triples.length; i++) {
+        let triple = this.triples[i];
         if(subject == null || (triple.subject.equals(subject))) {
             if(predicate == null || (triple.predicate.equals(predicate))) {
                 if(object == null || (triple.object.equals(object))) {
@@ -25068,9 +25063,9 @@ RDFJSInterface.Graph.prototype.match = function(subject, predicate, object, limi
 };
 
 RDFJSInterface.Graph.prototype.removeMatches = function(subject, predicate, object) {
-    var toRemove = [];
+    let toRemove = [];
     for(var i=0; i<this.triples.length; i++) {
-        var triple = this.triples[i];
+        let triple = this.triples[i];
         if(subject == null || (triple.subject.equals(subject))) {
             if(predicate == null || (triple.predicate.equals(predicate))) {
                 if(object == null || (triple.object.equals(object))) {
@@ -25088,7 +25083,7 @@ RDFJSInterface.Graph.prototype.removeMatches = function(subject, predicate, obje
 };
 
 RDFJSInterface.Graph.prototype.toNT = function() {
-    var n3 = "";
+    let n3 = "";
 
     this.forEach(function(triple) {
         n3 = n3 + triple.toString();
@@ -25107,7 +25102,7 @@ RDFJSInterface.buildRDFResource = function(value, bindings, engine, env) {
     } else if(value.token === 'uri') {
         return RDFJSInterface.buildNamedNode(value, bindings, engine, env);
     } else if(value.token === 'var') {
-        var result = bindings[value.value];
+        let result = bindings[value.value];
         if(result != null) {
             return RDFJSInterface.buildRDFResource(result, bindings, engine, env);
         } else {
@@ -25137,7 +25132,7 @@ RDFJSInterface.buildNamedNode = function(value, bindings, engine, env) {
         return new RDFJSInterface.NamedNode(value);
     } else {
         if(value.prefix != null) {
-            var prefix = engine.resolveNsInEnvironment(value.prefix, env);
+            let prefix = engine.resolveNsInEnvironment(value.prefix, env);
             value.value = prefix+value.suffix;
             return new RDFJSInterface.NamedNode(value);
         } else {
@@ -25157,17 +25152,17 @@ var QueryFilters = {};
 // imports
 
 QueryFilters.checkFilters = function(pattern, bindings, nullifyErrors, dataset, queryEnv, queryEngine) {
-    var filters = pattern.filter;
-    var nullified = [];
+    let filters = pattern.filter;
+    let nullified = [];
     if(filters==null || pattern.length != null) {
         return bindings;
     }
 
-    for(var i=0; i<filters.length; i++) {
-        var filter = filters[i];
-        var filteredBindings = QueryFilters.run(filter.value, bindings, nullifyErrors, dataset, queryEnv, queryEngine);
-        var acum = [];
-        for(var j=0; j<filteredBindings.length; j++) {
+    for(let i=0; i<filters.length; i++) {
+        let filter = filters[i];
+        let filteredBindings = QueryFilters.run(filter.value, bindings, nullifyErrors, dataset, queryEnv, queryEngine);
+        let acum = [];
+        for(let j=0; j<filteredBindings.length; j++) {
             if(filteredBindings[j]["__nullify__"]!=null) {
                 nullified.push(filteredBindings[j]);
             } else {
@@ -25183,13 +25178,13 @@ QueryFilters.checkFilters = function(pattern, bindings, nullifyErrors, dataset, 
 
 QueryFilters.boundVars = function(filterExpr) {
     if(filterExpr.expressionType != null) {
-        var expressionType = filterExpr.expressionType;
+        let expressionType = filterExpr.expressionType;
         if(expressionType == 'relationalexpression') {
-            var op1 = filterExpr.op1;
-            var op2 = filterExpr.op2;
+            let op1 = filterExpr.op1;
+            let op2 = filterExpr.op2;
             return QueryFilters.boundVars(op1)+QueryFilters.boundVars(op2);
         } else if(expressionType == 'conditionalor' || expressionType == 'conditionaland') {
-            var vars = [];
+            let vars = [];
             for(var i=0; i< filterExpr.operands; i++) {
                 vars = vars.concat(QueryFilters.boundVars(filterExpr.operands[i]));
             }
@@ -25238,10 +25233,10 @@ QueryFilters.boundVars = function(filterExpr) {
 };
 
 QueryFilters.run = function(filterExpr, bindings, nullifyFilters, dataset, env, queryEngine) {    
-    var denormBindings = queryEngine.copyDenormalizedBindings(bindings, env.outCache);
-    var filteredBindings = [];
-    for(var i=0; i<bindings.length; i++) {
-        var thisDenormBindings = denormBindings[i];
+    let denormBindings = queryEngine.copyDenormalizedBindings(bindings, env.outCache);
+    let filteredBindings = [];
+    for(let i=0; i<bindings.length; i++) {
+        let thisDenormBindings = denormBindings[i];
         var ebv = QueryFilters.runFilter(filterExpr, thisDenormBindings, queryEngine, dataset, env);
         // ebv can be directly a RDFTerm (e.g. atomic expression in filter)
         // this additional call to ebv will return -> true/false/error
@@ -25271,11 +25266,11 @@ QueryFilters.run = function(filterExpr, bindings, nullifyFilters, dataset, env, 
 };
 
 QueryFilters.collect = function(filterExpr, bindings, dataset, env, queryEngine, callback) {
-    var denormBindings = queryEngine.copyDenormalizedBindings(bindings, env.outCache);
-    var filteredBindings = [];
-    for(var i=0; i<denormBindings.length; i++) {
-        var thisDenormBindings = denormBindings[i];
-        var ebv = QueryFilters.runFilter(filterExpr, thisDenormBindings, queryEngine, dataset, env);
+    let denormBindings = queryEngine.copyDenormalizedBindings(bindings, env.outCache);
+    let filteredBindings = [];
+    for(let i=0; i<denormBindings.length; i++) {
+        let thisDenormBindings = denormBindings[i];
+        let ebv = QueryFilters.runFilter(filterExpr, thisDenormBindings, queryEngine, dataset, env);
         filteredBindings.push({binding:bindings[i], value:ebv});
     }
     return(filteredBindings);
@@ -25295,7 +25290,7 @@ QueryFilters.runAggregator = function(aggregator, bindingsGroup, queryEngine, da
             return bindingsGroup[0][aggregator.expression.value.value];
         } else if(aggregator.expression.expressionType === 'aggregate') {
             if(aggregator.expression.aggregateType === 'max') {
-                var max = null;
+                let max = null;
                 for(var i=0; i< bindingsGroup.length; i++) {
                     var bindings = bindingsGroup[i];
                     var ebv = QueryFilters.runFilter(aggregator.expression.expression, bindings, queryEngine, dataset, env);                    
@@ -25316,7 +25311,7 @@ QueryFilters.runAggregator = function(aggregator, bindingsGroup, queryEngine, da
                     return max;
                 }
             } else if(aggregator.expression.aggregateType === 'min') {
-                var min = null;
+                let min = null;
                 for(var i=0; i< bindingsGroup.length; i++) {
                     var bindings = bindingsGroup[i];
                     var ebv = QueryFilters.runFilter(aggregator.expression.expression, bindings, queryEngine, dataset, env);                    
@@ -25397,7 +25392,7 @@ QueryFilters.runAggregator = function(aggregator, bindingsGroup, queryEngine, da
                     }
                 }
 
-                var result = QueryFilters.runDivFunction(aggregated, {token: 'literal', type:"http://www.w3.org/2001/XMLSchema#integer", value:''+count});
+                let result = QueryFilters.runDivFunction(aggregated, {token: 'literal', type:"http://www.w3.org/2001/XMLSchema#integer", value:''+count});
                 result.value = ''+result.value;
                 return result;
             } else if(aggregator.expression.aggregateType === 'sum') {
@@ -25437,10 +25432,10 @@ QueryFilters.runFilter = function(filterExpr, bindings, queryEngine, dataset, en
     //console.log("RUNNING FILTER");
     //console.log(filterExpr);
     if(filterExpr.expressionType != null) {
-        var expressionType = filterExpr.expressionType;
+        let expressionType = filterExpr.expressionType;
         if(expressionType == 'relationalexpression') {
-            var op1 = QueryFilters.runFilter(filterExpr.op1, bindings,queryEngine, dataset, env);
-            var op2 = QueryFilters.runFilter(filterExpr.op2, bindings,queryEngine, dataset, env);
+            let op1 = QueryFilters.runFilter(filterExpr.op1, bindings,queryEngine, dataset, env);
+            let op2 = QueryFilters.runFilter(filterExpr.op2, bindings,queryEngine, dataset, env);
             return QueryFilters.runRelationalFilter(filterExpr, op1, op2, bindings, queryEngine, dataset, env);
         } else if(expressionType == 'conditionalor') {
             return QueryFilters.runOrFunction(filterExpr, bindings, queryEngine, dataset, env);
@@ -25463,7 +25458,7 @@ QueryFilters.runFilter = function(filterExpr, bindings, queryEngine, dataset, en
         } else if(expressionType == 'atomic') {        
             if(filterExpr.primaryexpression == 'var') {
                 // lookup the var in the bindings
-                var val = bindings[filterExpr.value.value];
+                let val = bindings[filterExpr.value.value];
                 return val;
             } else {
                 // numeric, literal, etc...
@@ -25701,7 +25696,7 @@ QueryFilters.ebv = function (term) {
                 term.type == "http://www.w3.org/2001/XMLSchema#unsignedShort" ||
                 term.type == "http://www.w3.org/2001/XMLSchema#unsignedByte" ||
                 term.type == "http://www.w3.org/2001/XMLSchema#positiveInteger") {
-                var tmp = parseFloat(term.value);
+                let tmp = parseFloat(term.value);
                 if (isNaN(tmp)) {
                     return false;
                 } else {
@@ -25733,17 +25728,17 @@ QueryFilters.ebv = function (term) {
 QueryFilters.effectiveBooleanValue = QueryFilters.ebv;
 
 QueryFilters.ebvTrue = function() {
-    var val = {token: 'literal', type:"http://www.w3.org/2001/XMLSchema#boolean", value:true};
+    let val = {token: 'literal', type:"http://www.w3.org/2001/XMLSchema#boolean", value:true};
     return val;
 };
 
 QueryFilters.ebvFalse = function() {
-    var val = {token: 'literal', type:"http://www.w3.org/2001/XMLSchema#boolean", value:false};
+    let val = {token: 'literal', type:"http://www.w3.org/2001/XMLSchema#boolean", value:false};
     return val;
 };
 
 QueryFilters.ebvError = function() {
-    var val = {token: 'literal', type:"https://github.com/antoniogarrote/js-tools/types#error", value:null};
+    let val = {token: 'literal', type:"https://github.com/antoniogarrote/js-tools/types#error", value:null};
     return val;
 };
 
@@ -25771,11 +25766,11 @@ QueryFilters.ebvBoolean = function (bool) {
 
 
 QueryFilters.runRelationalFilter = function(filterExpr, op1, op2, bindings, queryEngine, dataset, env) {
-    var operator = filterExpr.operator;
+    let operator = filterExpr.operator;
     if(operator === '=') {
         return QueryFilters.runEqualityFunction(op1, op2, bindings, queryEngine, dataset, env);
     } else if(operator === '!=') {
-        var res = QueryFilters.runEqualityFunction(op1, op2, bindings, queryEngine, dataset, env);
+        let res = QueryFilters.runEqualityFunction(op1, op2, bindings, queryEngine, dataset, env);
         if(QueryFilters.isEbvError(res)) {
             return res;
         } else {
@@ -25916,7 +25911,7 @@ QueryFilters.effectiveTypeValue = function(val){
         } else if (val.type == "http://www.w3.org/2001/XMLSchema#date" || 
                    val.type == "http://www.w3.org/2001/XMLSchema#dateTime" ) {
             try {
-                var d = Utils.parseISO8601(val.value);            
+                let d = Utils.parseISO8601(val.value);            
                 return(d);
             } catch(e) {
                 return null;
@@ -25947,10 +25942,10 @@ QueryFilters.effectiveTypeValue = function(val){
 */
 QueryFilters.runOrFunction = function(filterExpr, bindings, queryEngine, dataset, env) {
 
-    var acum = null;
+    let acum = null;
 
-    for(var i=0; i< filterExpr.operands.length; i++) {
-        var ebv = QueryFilters.runFilter(filterExpr.operands[i], bindings, queryEngine, dataset, env);
+    for(let i=0; i< filterExpr.operands.length; i++) {
+        let ebv = QueryFilters.runFilter(filterExpr.operands[i], bindings, queryEngine, dataset, env);
         if(QueryFilters.isEbvError(ebv) == false) {
             ebv = QueryFilters.ebv(ebv);
         }
@@ -25982,11 +25977,11 @@ QueryFilters.runOrFunction = function(filterExpr, bindings, queryEngine, dataset
 */
 QueryFilters.runAndFunction = function(filterExpr, bindings, queryEngine, dataset, env) {
 
-    var acum = null;
+    let acum = null;
 
-    for(var i=0; i< filterExpr.operands.length; i++) {
+    for(let i=0; i< filterExpr.operands.length; i++) {
 
-        var ebv = QueryFilters.runFilter(filterExpr.operands[i], bindings, queryEngine, dataset, env);
+        let ebv = QueryFilters.runFilter(filterExpr.operands[i], bindings, queryEngine, dataset, env);
 
         if(QueryFilters.isEbvError(ebv) == false) {
             ebv = QueryFilters.ebv(ebv);
@@ -26020,8 +26015,8 @@ QueryFilters.runEqualityFunction = function(op1, op2, bindings, queryEngine, dat
         return QueryFilters.ebvError();
     }
     if(QueryFilters.isNumeric(op1) && QueryFilters.isNumeric(op2)) {
-        var eop1 = QueryFilters.effectiveTypeValue(op1);
-        var eop2 = QueryFilters.effectiveTypeValue(op2);
+        let eop1 = QueryFilters.effectiveTypeValue(op1);
+        let eop2 = QueryFilters.effectiveTypeValue(op2);
         if(isNaN(eop1) || isNaN(eop2)) {
             return QueryFilters.ebvBoolean(QueryFilters.RDFTermEquality(op1, op2, queryEngine, env));
         } else {
@@ -26040,7 +26035,7 @@ QueryFilters.runEqualityFunction = function(op1, op2, bindings, queryEngine, dat
             return QueryFilters.ebvFalse();
         }
 
-        var comp = Utils.compareDateComponents(op1.value, op2.value);
+        let comp = Utils.compareDateComponents(op1.value, op2.value);
         if(comp != null) {
             if(comp == 0) {
                 return QueryFilters.ebvTrue();
@@ -26079,7 +26074,7 @@ QueryFilters.runGtFunction = function(op1, op2, bindings) {
             return QueryFilters.ebvFalse();
         }
 
-        var comp = Utils.compareDateComponents(op1.value, op2.value);
+        let comp = Utils.compareDateComponents(op1.value, op2.value);
         if(comp != null) {
             if(comp == 1) {
                 return QueryFilters.ebvTrue();
@@ -26148,7 +26143,7 @@ QueryFilters.runLtFunction = function(op1, op2, bindings) {
             return QueryFilters.ebvFalse();
         }
 
-        var comp = Utils.compareDateComponents(op1.value, op2.value);
+        let comp = Utils.compareDateComponents(op1.value, op2.value);
         if(comp != null) {
             if(comp == -1) {
                 return QueryFilters.ebvTrue();
@@ -26186,7 +26181,7 @@ QueryFilters.runGtEqFunction = function(op1, op2, bindings) {
             return QueryFilters.ebvFalse();
         }
 
-        var comp = Utils.compareDateComponents(op1.value, op2.value);
+        let comp = Utils.compareDateComponents(op1.value, op2.value);
         if(comp != null) {
             if(comp != -1) {
                 return QueryFilters.ebvTrue();
@@ -26225,7 +26220,7 @@ QueryFilters.runLtEqFunction = function(op1, op2, bindings) {
             return QueryFilters.ebvFalse();
         }
 
-        var comp = Utils.compareDateComponents(op1.value, op2.value);
+        let comp = Utils.compareDateComponents(op1.value, op2.value);
         if(comp != null) {
             if(comp != 1) {
                 return QueryFilters.ebvTrue();
@@ -26241,15 +26236,15 @@ QueryFilters.runLtEqFunction = function(op1, op2, bindings) {
 };
 
 QueryFilters.runAddition = function(summand, summands, bindings, queryEngine, dataset, env) {
-    var summandOp = QueryFilters.runFilter(summand,bindings,queryEngine, dataset, env);
+    let summandOp = QueryFilters.runFilter(summand,bindings,queryEngine, dataset, env);
     if(QueryFilters.isEbvError(summandOp)) {
         return QueryFilters.ebvError();
     }
 
-    var acum = summandOp;
+    let acum = summandOp;
     if(QueryFilters.isNumeric(summandOp)) {
-        for(var i=0; i<summands.length; i++) {
-            var nextSummandOp = QueryFilters.runFilter(summands[i].expression, bindings,queryEngine, dataset, env);
+        for(let i=0; i<summands.length; i++) {
+            let nextSummandOp = QueryFilters.runFilter(summands[i].expression, bindings,queryEngine, dataset, env);
             if(QueryFilters.isNumeric(nextSummandOp)) {
                 if(summands[i].operator === '+') {
                     acum = QueryFilters.runSumFunction(acum, nextSummandOp);
@@ -26270,7 +26265,7 @@ QueryFilters.runSumFunction = function(suma, sumb) {
     if(QueryFilters.isEbvError(suma) || QueryFilters.isEbvError(sumb)) {
         return QueryFilters.ebvError();
     }
-    var val = QueryFilters.effectiveTypeValue(suma) + QueryFilters.effectiveTypeValue(sumb);
+    let val = QueryFilters.effectiveTypeValue(suma) + QueryFilters.effectiveTypeValue(sumb);
     
     if(QueryFilters.isDouble(suma) || QueryFilters.isDouble(sumb)) {
         return {token: 'literal', type:"http://www.w3.org/2001/XMLSchema#double", value:val};        
@@ -26287,7 +26282,7 @@ QueryFilters.runSubFunction = function(suma, sumb) {
     if(QueryFilters.isEbvError(suma) || QueryFilters.isEbvError(sumb)) {
         return QueryFilters.ebvError();
     }
-    var val = QueryFilters.effectiveTypeValue(suma) - QueryFilters.effectiveTypeValue(sumb);
+    let val = QueryFilters.effectiveTypeValue(suma) - QueryFilters.effectiveTypeValue(sumb);
 
     if(QueryFilters.isDouble(suma) || QueryFilters.isDouble(sumb)) {
         return {token: 'literal', type:"http://www.w3.org/2001/XMLSchema#double", value:val};        
@@ -26301,15 +26296,15 @@ QueryFilters.runSubFunction = function(suma, sumb) {
 };
 
 QueryFilters.runMultiplication = function(factor, factors, bindings, queryEngine, dataset, env) {
-    var factorOp = QueryFilters.runFilter(factor,bindings,queryEngine, dataset, env);
+    let factorOp = QueryFilters.runFilter(factor,bindings,queryEngine, dataset, env);
     if(QueryFilters.isEbvError(factorOp)) {
         return factorOp;
     }
 
-    var acum = factorOp;
+    let acum = factorOp;
     if(QueryFilters.isNumeric(factorOp)) {
-        for(var i=0; i<factors.length; i++) {
-            var nextFactorOp = QueryFilters.runFilter(factors[i].expression, bindings,queryEngine, dataset, env);
+        for(let i=0; i<factors.length; i++) {
+            let nextFactorOp = QueryFilters.runFilter(factors[i].expression, bindings,queryEngine, dataset, env);
             if(QueryFilters.isEbvError(nextFactorOp)) {
                 return factorOp;
             }
@@ -26333,7 +26328,7 @@ QueryFilters.runMulFunction = function(faca, facb) {
     if(QueryFilters.isEbvError(faca) || QueryFilters.isEbvError(facb)) {
         return QueryFilters.ebvError();
     }
-    var val = QueryFilters.effectiveTypeValue(faca) * QueryFilters.effectiveTypeValue(facb);
+    let val = QueryFilters.effectiveTypeValue(faca) * QueryFilters.effectiveTypeValue(facb);
 
     if(QueryFilters.isDouble(faca) || QueryFilters.isDouble(facb)) {
         return {token: 'literal', type:"http://www.w3.org/2001/XMLSchema#double", value:val};        
@@ -26350,7 +26345,7 @@ QueryFilters.runDivFunction = function(faca, facb) {
     if(QueryFilters.isEbvError(faca) || QueryFilters.isEbvError(facb)) {
         return QueryFilters.ebvError();
     }
-    var val = QueryFilters.effectiveTypeValue(faca) / QueryFilters.effectiveTypeValue(facb);
+    let val = QueryFilters.effectiveTypeValue(faca) / QueryFilters.effectiveTypeValue(facb);
 
     if(QueryFilters.isDouble(faca) || QueryFilters.isDouble(facb)) {
         return {token: 'literal', type:"http://www.w3.org/2001/XMLSchema#double", value:val};        
@@ -26367,11 +26362,11 @@ QueryFilters.runBuiltInCall = function(builtincall, args, bindings, queryEngine,
     if(builtincall === 'notexists' || builtincall === 'exists') {
         // Run the query in the filter applying bindings
 
-        var cloned = JSON.parse(JSON.stringify(args[0])); // @todo CHANGE THIS!!
-        var ast = queryEngine.abstractQueryTree.parseSelect({pattern:cloned}, bindings);
+        let cloned = JSON.parse(JSON.stringify(args[0])); // @todo CHANGE THIS!!
+        let ast = queryEngine.abstractQueryTree.parseSelect({pattern:cloned}, bindings);
         ast = queryEngine.abstractQueryTree.bind(ast.pattern, bindings);
 
-        var result = queryEngine.executeSelectUnit([ {kind:'*'} ], 
+        let result = queryEngine.executeSelectUnit([ {kind:'*'} ], 
                                                    dataset,
                                                    ast,
                                                    env);
@@ -26384,12 +26379,12 @@ QueryFilters.runBuiltInCall = function(builtincall, args, bindings, queryEngine,
 
     }  else {
 
-        var ops = [];
-        for(var i=0; i<args.length; i++) {
+        let ops = [];
+        for(let i=0; i<args.length; i++) {
             if(args[i].token === 'var') {
                 ops.push(args[i]);
             } else {
-                var op = QueryFilters.runFilter(args[i], bindings, queryEngine, dataset, env);
+                let op = QueryFilters.runFilter(args[i], bindings, queryEngine, dataset, env);
                 if(QueryFilters.isEbvError(op)) {
                     return op;
                 }
@@ -26419,7 +26414,7 @@ QueryFilters.runBuiltInCall = function(builtincall, args, bindings, queryEngine,
             }
         } else if(builtincall === 'datatype') {
             if(ops[0].token === 'literal'){
-                var lit = ops[0];
+                let lit = ops[0];
                 if(lit.type != null) {
                     if(typeof(lit.type) === 'string') {
                         return {token: 'uri', value:lit.type, prefix:null, suffix:null};
@@ -26453,16 +26448,16 @@ QueryFilters.runBuiltInCall = function(builtincall, args, bindings, queryEngine,
                 return QueryFilters.ebvFalse();
             }        
         } else if(builtincall === 'sameterm') {
-            var op1 = ops[0];
-            var op2 = ops[1];
-            var res = QueryFilters.RDFTermEquality(op1, op2, queryEngine, env);
+            let op1 = ops[0];
+            let op2 = ops[1];
+            let res = QueryFilters.RDFTermEquality(op1, op2, queryEngine, env);
             if(QueryFilters.isEbvError(res)) {
                 res = false;
             }
             return QueryFilters.ebvBoolean(res);
         } else if(builtincall === 'langmatches') {
-            var lang = ops[0];
-            var langRange = ops[1];
+            let lang = ops[0];
+            let langRange = ops[1];
 
             if(lang.token === 'literal' && langRange.token === 'literal'){
                 if(langRange.value === '*' && lang.value != '') {
@@ -26474,8 +26469,8 @@ QueryFilters.runBuiltInCall = function(builtincall, args, bindings, queryEngine,
                 return QueryFilters.ebvError();
             }        
         } else if(builtincall === 'bound') {
-            var boundVar = ops[0].value;
-            var acum = [];
+            let boundVar = ops[0].value;
+            let acum = [];
             if(boundVar == null) {
                 return QueryFilters.ebvError();
             } else  if(bindings[boundVar] != null) {
@@ -26492,13 +26487,13 @@ QueryFilters.runBuiltInCall = function(builtincall, args, bindings, queryEngine,
 };
 
 QueryFilters.runUnaryExpression = function(unaryexpression, expression, bindings, queryEngine, dataset, env) {
-    var op = QueryFilters.runFilter(expression, bindings,queryEngine, dataset, env);
+    let op = QueryFilters.runFilter(expression, bindings,queryEngine, dataset, env);
     if(QueryFilters.isEbvError(op)) {
         return op;
     }
 
     if(unaryexpression === '!') {
-        var res = QueryFilters.ebv(op);
+        let res = QueryFilters.ebv(op);
         //console.log("** Unary ! ");
         //console.log(op)
         if(QueryFilters.isEbvError(res)) {
@@ -26524,8 +26519,8 @@ QueryFilters.runUnaryExpression = function(unaryexpression, expression, bindings
         }
     } else if(unaryexpression === '-') {
         if(QueryFilters.isNumeric(op)) {
-            var clone = {};
-            for(var p in op) {
+            let clone = {};
+            for(let p in op) {
                 clone[p] = op[p];
             }
             clone.value = -clone.value;
@@ -26578,7 +26573,7 @@ QueryFilters.runRegex = function(text, pattern, flags, bindings, queryEngine, da
         return QueryFilters.ebvError();
     }
 
-    var regex;
+    let regex;
     if(flags == null) {
         regex = new RegExp(pattern);                    
     } else {
@@ -26605,12 +26600,12 @@ QueryFilters.runIriRefOrFunction = function(iriref, args, bindings,queryEngine, 
     if(args == null) {
         return iriref;
     } else {
-        var ops = [];
-        for(var i=0; i<args.length; i++) {
+        let ops = [];
+        for(let i=0; i<args.length; i++) {
             ops.push(QueryFilters.runFilter(args[i], bindings, queryEngine, dataset, env))
         }
 
-        var fun = Utils.lexicalFormBaseUri(iriref, env);
+        let fun = Utils.lexicalFormBaseUri(iriref, env);
 
         if(fun == "http://www.w3.org/2001/XMLSchema#integer" ||
            fun == "http://www.w3.org/2001/XMLSchema#decimal" ||
@@ -26868,18 +26863,18 @@ QueryFilters.runIriRefOrFunction = function(iriref, args, bindings,queryEngine, 
 // end of ./src/js-query-engine/src/query_filters.js 
 
 // exports
-var QueryPlanDPSize = {};
+let QueryPlanDPSize = {};
 
 QueryPlanDPSize.variablesInBGP = function(bgp) {
     // may be cached in the pattern
-    var variables = bgp.variables;
+    let variables = bgp.variables;
     if(variables) {
         return variables;
     }
 
-    var components =  bgp.value || bgp;
+    let components =  bgp.value || bgp;
     variables  = [];
-    for(var comp in components) {
+    for(let comp in components) {
         if(components[comp] && components[comp].token === "var") {
             variables.push(components[comp].value);
         } else if(components[comp] && components[comp].token === "blank") {
@@ -26892,8 +26887,8 @@ QueryPlanDPSize.variablesInBGP = function(bgp) {
 };
 
 QueryPlanDPSize.connected = function(leftPlan, rightPlan) {
-    var varsLeft ="/"+leftPlan.vars.join("/")+"/";
-    for(var i=0; i<rightPlan.vars.length; i++) {
+    let varsLeft ="/"+leftPlan.vars.join("/")+"/";
+    for(let i=0; i<rightPlan.vars.length; i++) {
         if(varsLeft.indexOf("/"+rightPlan.vars[i]+"/") != -1) {
             return true;
         }
@@ -26903,12 +26898,12 @@ QueryPlanDPSize.connected = function(leftPlan, rightPlan) {
 };
 
 QueryPlanDPSize.variablesIntersectionBGP = function(bgpa, bgpb) {
-    var varsa = QueryPlanDPSize.variablesInBGP(bgpa).sort();
-    var varsb = QueryPlanDPSize.variablesInBGP(bgpb).sort();
-    var ia = 0;
-    var ib = 0;
+    let varsa = QueryPlanDPSize.variablesInBGP(bgpa).sort();
+    let varsb = QueryPlanDPSize.variablesInBGP(bgpb).sort();
+    let ia = 0;
+    let ib = 0;
 
-    var intersection = [];
+    let intersection = [];
 
     while(ia<varsa.length && ib<varsb.length) {
         if(varsa[ia] === varsb[ib]) {
@@ -26929,17 +26924,17 @@ QueryPlanDPSize.variablesIntersectionBGP = function(bgpa, bgpb) {
  * All BGPs sharing variables are grouped together.
  */
 QueryPlanDPSize.executeAndBGPsGroups = function(bgps) {
-    var groups = {};
-    var groupVars = {};
+    let groups = {};
+    let groupVars = {};
     var groupId = 0;
 
-    for(var i=0; i<bgps.length; i++) {
-        var bgp = bgps[i];
-	var newGroups = {};
-	var newGroupVars = {};
+    for(let i=0; i<bgps.length; i++) {
+        let bgp = bgps[i];
+	let newGroups = {};
+	let newGroupVars = {};
 
-        var vars = [];
-        for(var comp in bgp) {
+        let vars = [];
+        for(let comp in bgp) {
             if(comp != '_cost') {
                 if(bgp[comp].token === 'var') {
                     vars.push(bgp[comp].value);
@@ -26950,16 +26945,16 @@ QueryPlanDPSize.executeAndBGPsGroups = function(bgps) {
         }
 
 	
-        var foundGroup = false;
-	var currentGroupId = null;
-	var toDelete = [];
-	var toJoin = {};
+        let foundGroup = false;
+	let currentGroupId = null;
+	let toDelete = [];
+	let toJoin = {};
 
-        for(var nextGroupId in groupVars) {
-            var groupVar = groupVars[nextGroupId];
+        for(let nextGroupId in groupVars) {
+            let groupVar = groupVars[nextGroupId];
 	    foundGroup = false;
-            for(var j=0; j<vars.length; j++) {
-                var thisVar = "/"+vars[j]+"/";
+            for(let j=0; j<vars.length; j++) {
+                let thisVar = "/"+vars[j]+"/";
                 if(groupVar.indexOf(thisVar) != -1) {
 		    foundGroup = true;
 		    break;
@@ -26979,10 +26974,10 @@ QueryPlanDPSize.executeAndBGPsGroups = function(bgps) {
             newGroupVars[groupId] = "/"+(vars.join("/"))+"/";
             groupId++;
         } else {
-	    var acumGroups = [];
-	    var acumId = "";
-	    var acumVars = "";
-	    for(var gid in toJoin) {
+	    let acumGroups = [];
+	    let acumId = "";
+	    let acumVars = "";
+	    for(let gid in toJoin) {
 		acumId = acumId+gid;
 		acumGroups = acumGroups.concat(groups[gid]);
 		acumVars = groupVars[gid];
@@ -26999,7 +26994,7 @@ QueryPlanDPSize.executeAndBGPsGroups = function(bgps) {
 	groupVars = newGroupVars;
     }
 
-    var acum = [];
+    let acum = [];
     for(var groupId in groups) {
         acum.push(groups[groupId]);
     }
@@ -27008,8 +27003,8 @@ QueryPlanDPSize.executeAndBGPsGroups = function(bgps) {
 };
 
 QueryPlanDPSize.intersectionSize = function(leftPlan, rightPlan) {
-    var idsRight = rightPlan.i.split("_");
-    for(var i=0; i<idsRight.length; i++) {
+    let idsRight = rightPlan.i.split("_");
+    for(let i=0; i<idsRight.length; i++) {
         if(idsRight[i]=="")
             continue;
         if(leftPlan.i.indexOf('_'+idsRight[i]+'_') != -1) {
@@ -27020,9 +27015,9 @@ QueryPlanDPSize.intersectionSize = function(leftPlan, rightPlan) {
 };
 
 QueryPlanDPSize.createJoinTree = function(leftPlan, rightPlan) {
-    var varsLeft ="/"+leftPlan.vars.join("/")+"/";
-    var acumVars = leftPlan.vars.concat([]);
-    var join = [];
+    let varsLeft ="/"+leftPlan.vars.join("/")+"/";
+    let acumVars = leftPlan.vars.concat([]);
+    let join = [];
 
     for(var i=0; i<rightPlan.vars.length; i++) {
         if(varsLeft.indexOf("/"+rightPlan.vars[i]+"/") != -1) {
@@ -27036,9 +27031,9 @@ QueryPlanDPSize.createJoinTree = function(leftPlan, rightPlan) {
         }
     }
 
-    var rightIds = rightPlan.i.split("_");
-    var leftIds = leftPlan.i.split("_");
-    var distinct = {};
+    let rightIds = rightPlan.i.split("_");
+    let leftIds = leftPlan.i.split("_");
+    let distinct = {};
     for(var i=0; i<rightIds.length; i++) {
         if(rightIds[i] != "") {
             distinct[rightIds[i]] = true;
@@ -27049,8 +27044,8 @@ QueryPlanDPSize.createJoinTree = function(leftPlan, rightPlan) {
             distinct[leftIds[i]] = true;
         }
     }
-    var ids = [];
-    for(var id in distinct) {
+    let ids = [];
+    for(let id in distinct) {
         ids.push(id);
     }
 
@@ -27071,10 +27066,10 @@ QueryPlanDPSize.executeBushyTree = function(treeNode, dataset, queryEngine, env)
     } else if(treeNode.right == null) {
         return QueryPlanDPSize.executeEmptyJoinBGP(treeNode.left, dataset, queryEngine, env);
     } else {
-        var resultsLeft = QueryPlanDPSize.executeBushyTree(treeNode.left, dataset, queryEngine, env);
+        let resultsLeft = QueryPlanDPSize.executeBushyTree(treeNode.left, dataset, queryEngine, env);
 
         if(resultsLeft!=null) {
-            var resultsRight = QueryPlanDPSize.executeBushyTree(treeNode.right, dataset, queryEngine, env);
+            let resultsRight = QueryPlanDPSize.executeBushyTree(treeNode.right, dataset, queryEngine, env);
             if(resultsRight!=null) {
                 return QueryPlanDPSize.joinBindings2(treeNode.join, resultsLeft, resultsRight);
             } else {
@@ -27086,31 +27081,31 @@ QueryPlanDPSize.executeBushyTree = function(treeNode, dataset, queryEngine, env)
 
 
 QueryPlanDPSize.executeAndBGPsDPSize = function(allBgps, dataset, queryEngine, env) {
-    var groups = QueryPlanDPSize.executeAndBGPsGroups(allBgps);
-    var groupResults = [];
+    let groups = QueryPlanDPSize.executeAndBGPsGroups(allBgps);
+    let groupResults = [];
     for(var g=0; g<groups.length; g++) {
 
         // Build bushy tree for this group
-        var bgps = groups[g];
-        var costFactor = 1;
+        let bgps = groups[g];
+        let costFactor = 1;
 
-	var bgpas = queryEngine.computeCosts(bgps,env);
+	let bgpas = queryEngine.computeCosts(bgps,env);
 
-        var bestPlans = {};
-        var plans = {};
-        var sizes = {};
+        let bestPlans = {};
+        let plans = {};
+        let sizes = {};
 
-        var maxSize = 1;
-        var maxPlan = null;
+        let maxSize = 1;
+        let maxPlan = null;
 
-        var cache = {};
+        let cache = {};
         
         sizes['1'] = [];
 
         // Building plans of size 1
         for(var i=0; i<bgps.length; i++) {
-            var vars = [];
-            for(var comp in bgps[i]) {
+            let vars = [];
+            for(let comp in bgps[i]) {
                 if(comp != '_cost') {
                     if(bgps[i][comp].token === 'var') {
                         vars.push(bgps[i][comp].value);
@@ -27121,7 +27116,7 @@ QueryPlanDPSize.executeAndBGPsDPSize = function(allBgps, dataset, queryEngine, e
             }
 
             plans["_"+i+"_"] = {left: bgps[i], right:null, cost:bgps[i]._cost, i:('_'+i+'_'), vars:vars};
-            var plan = {left: bgps[i], right:null, cost:bgps[i]._cost, i:('_'+i+'_'), vars:vars};
+            let plan = {left: bgps[i], right:null, cost:bgps[i]._cost, i:('_'+i+'_'), vars:vars};
             bestPlans["_"+i+"_"] = plan;
             delete bgps[i]['_cost'];
             cache["_"+i+"_"] = true;
@@ -27132,18 +27127,18 @@ QueryPlanDPSize.executeAndBGPsDPSize = function(allBgps, dataset, queryEngine, e
         }
 
         // dynamic programming -> build plans of increasing size
-        for(var s=2; s<=bgps.length; s++) { // size
-            for(var sl=1; sl<s; sl++) { // size left plan
-                var sr = s - sl; // size right plan
-                var leftPlans = sizes[''+sl] || [];
-                var rightPlans = sizes[''+sr] || [];
+        for(let s=2; s<=bgps.length; s++) { // size
+            for(let sl=1; sl<s; sl++) { // size left plan
+                let sr = s - sl; // size right plan
+                let leftPlans = sizes[''+sl] || [];
+                let rightPlans = sizes[''+sr] || [];
 
                 for(var i=0; i<leftPlans.length; i++) {
-                    for(var j=0; j<rightPlans.length; j++) {
+                    for(let j=0; j<rightPlans.length; j++) {
                         if(leftPlans[i]===rightPlans[j])
                             continue;
-                        var leftPlan = plans[leftPlans[i]];
-                        var rightPlan = plans[rightPlans[j]];
+                        let leftPlan = plans[leftPlans[i]];
+                        let rightPlan = plans[rightPlans[j]];
 
                         // condition (1)
                         if(QueryPlanDPSize.intersectionSize(leftPlan, rightPlan) == 0) {
@@ -27151,14 +27146,14 @@ QueryPlanDPSize.executeAndBGPsDPSize = function(allBgps, dataset, queryEngine, e
 
                             if(QueryPlanDPSize.connected(leftPlan,rightPlan)) {
                                 maxSize = s;
-                                var p1 = bestPlans[leftPlan.i];  //QueryPlanDPSize.bestPlan(leftPlan, bestPlans);
-                                var p2 = bestPlans[rightPlan.i]; //QueryPlanDPSize.bestPlan(rightPlan, bestPlans);
+                                let p1 = bestPlans[leftPlan.i];  //QueryPlanDPSize.bestPlan(leftPlan, bestPlans);
+                                let p2 = bestPlans[rightPlan.i]; //QueryPlanDPSize.bestPlan(rightPlan, bestPlans);
 
-                                var currPlan = QueryPlanDPSize.createJoinTree(p1,p2);
+                                let currPlan = QueryPlanDPSize.createJoinTree(p1,p2);
                                 if(!cache[currPlan.i]) {
                                     cache[currPlan.i] = true;
 
-                                    var costUnion = currPlan.cost+1;
+                                    let costUnion = currPlan.cost+1;
                                     if(bestPlans[currPlan.i] != null) {
                                         costUnion = bestPlans[currPlan.i].cost;
                                     }
@@ -27191,15 +27186,15 @@ QueryPlanDPSize.executeAndBGPsDPSize = function(allBgps, dataset, queryEngine, e
     var acum = null;
 
     for(var g=0; g<groupResults.length; g++) {
-        var tree = groupResults[g];
+        let tree = groupResults[g];
 
-        var result = QueryPlanDPSize.executeBushyTree(tree, dataset, queryEngine, env);
+        let result = QueryPlanDPSize.executeBushyTree(tree, dataset, queryEngine, env);
         if(acum == null) {
             acum = result;
         } else {
             acum = QueryPlanDPSize.crossProductBindings(acum, result);
         }
-    };
+    }
 
     return acum;
 };
@@ -27212,7 +27207,7 @@ QueryPlanDPSize.executeEmptyJoinBGP = function(bgp, dataset, queryEngine, queryE
 QueryPlanDPSize.executeBGPDatasets = function(bgp, dataset, queryEngine, queryEnv) {
     // avoid duplicate queries in the same graph
     // merge of graphs is not guaranted here.
-    var duplicates = {};
+    let duplicates = {};
 
     if(bgp.graph == null) {
         //union through all default graph(s)
@@ -27230,7 +27225,7 @@ QueryPlanDPSize.executeBGPDatasets = function(bgp, dataset, queryEngine, queryEn
         return acumBindings;
     } else if(bgp.graph.token === 'var') {
         // union through all named datasets
-        var graphVar = bgp.graph.value;        
+        let graphVar = bgp.graph.value;        
         var acum = [];
 
         for(var i=0; i<dataset.named.length; i++) {
@@ -27242,7 +27237,7 @@ QueryPlanDPSize.executeBGPDatasets = function(bgp, dataset, queryEngine, queryEn
                 if(results != null) {
                     results = QueryPlanDPSize.buildBindingsFromRange(results, bgp);
                     // add the graph bound variable to the result 
-                    for(var j=0; j< results.length; j++) {
+                    for(let j=0; j< results.length; j++) {
                         results[j][graphVar] = dataset.named[i].oid;
                     }
                     acum.push(results);
@@ -27269,10 +27264,10 @@ QueryPlanDPSize.executeBGPDatasets = function(bgp, dataset, queryEngine, queryEn
 };
 
 QueryPlanDPSize.buildBindingsFromRange = function(results, bgp) {
-    var variables = QueryPlanDPSize.variablesInBGP(bgp);
+    let variables = QueryPlanDPSize.variablesInBGP(bgp);
     var bindings = {};
 
-    var components =  bgp.value||bgp;
+    let components =  bgp.value||bgp;
     var bindings = {};
     for(comp in components) {
         if(components[comp] && components[comp].token === "var") {
@@ -27282,15 +27277,15 @@ QueryPlanDPSize.buildBindingsFromRange = function(results, bgp) {
         }
     }
 
-    var resultsBindings =[];
+    let resultsBindings =[];
 
     if(results!=null) {
-      for(var i=0; i<results.length; i++) {
-          var binding = {};
-          var result  = results[i];
-	  var duplicated = false;
+      for(let i=0; i<results.length; i++) {
+          let binding = {};
+          let result  = results[i];
+	  let duplicated = false;
           for(var comp in bindings) {
-              var value = result[comp];
+              let value = result[comp];
 	      if(binding[bindings[comp]] == null || binding[bindings[comp]] === value) {
 		  binding[bindings[comp]] = value;
 	      } else {
@@ -27309,7 +27304,7 @@ QueryPlanDPSize.buildBindingsFromRange = function(results, bgp) {
 
 // @used
 QueryPlanDPSize.areCompatibleBindings = function(bindingsa, bindingsb) {
-    for(var variable in bindingsa) {
+    for(let variable in bindingsa) {
         if(bindingsb[variable]!=null && (bindingsb[variable] != bindingsa[variable])) {
             return false;
         }
@@ -27334,7 +27329,7 @@ QueryPlanDPSize.areCompatibleBindings = function(bindingsa, bindingsb) {
 
 
 QueryPlanDPSize.mergeBindings = function(bindingsa, bindingsb) {
-    var merged = {};
+    let merged = {};
     for(var variable in bindingsa) {
         merged[variable] = bindingsa[variable];
     }
@@ -27347,9 +27342,9 @@ QueryPlanDPSize.mergeBindings = function(bindingsa, bindingsb) {
 };
 
 QueryPlanDPSize.joinBindings2 = function(bindingVars, bindingsa, bindingsb) {
-    var acum = {};
-    var bindings, variable, variableValue, values, tmp;
-    var joined = [];
+    let acum = {};
+    let bindings, variable, variableValue, values, tmp;
+    let joined = [];
 
     for(var i=0; i<bindingsa.length; i++) {
         bindings = bindingsa[i];
@@ -27378,7 +27373,7 @@ QueryPlanDPSize.joinBindings2 = function(bindingVars, bindingsa, bindingsb) {
 
             if(tmp[variableValue] != null) {
                 if(j == bindingVars.length-1) {
-                    for(var k=0; k<tmp[variableValue].length; k++) {
+                    for(let k=0; k<tmp[variableValue].length; k++) {
                         joined.push(QueryPlanDPSize.mergeBindings(tmp[variableValue][k],bindings));
                     }
                 } else {
@@ -27392,12 +27387,12 @@ QueryPlanDPSize.joinBindings2 = function(bindingVars, bindingsa, bindingsb) {
 };
 
 QueryPlanDPSize.joinBindings = function(bindingsa, bindingsb) {
-    var result = [];
+    let result = [];
 
-    for(var i=0; i< bindingsa.length; i++) {
-        var bindinga = bindingsa[i];
-        for(var j=0; j<bindingsb.length; j++) {
-            var bindingb = bindingsb[j];
+    for(let i=0; i< bindingsa.length; i++) {
+        let bindinga = bindingsa[i];
+        for(let j=0; j<bindingsb.length; j++) {
+            let bindingb = bindingsb[j];
             if(QueryPlanDPSize.areCompatibleBindings(bindinga, bindingb)){
                 result.push(QueryPlanDPSize.mergeBindings(bindinga, bindingb));
             }
@@ -27407,7 +27402,7 @@ QueryPlanDPSize.joinBindings = function(bindingsa, bindingsb) {
 };
 
 QueryPlanDPSize.augmentMissingBindings = function(bindinga, bindingb) {
-    for(var pb in bindingb) {
+    for(let pb in bindingb) {
         if(bindinga[pb] == null) {
             bindinga[pb] = null;
         }
@@ -27443,16 +27438,16 @@ QueryPlanDPSize.augmentMissingBindings = function(bindinga, bindingb) {
 */
 
 QueryPlanDPSize.leftOuterJoinBindings = function(bindingsa, bindingsb) {
-    var result = [];
+    let result = [];
     // strict was being passes ad an argument
     //var compatibleFunction = QueryPlanDPSize.areCompatibleBindings;
     //if(strict === true)
     // 	compatibleFunction = QueryPlanDPSize.areCompatibleBindingsStrict;
 
-    for(var i=0; i< bindingsa.length; i++) {
-        var bindinga = bindingsa[i];
-        var matched = false;
-        for(var j=0; j<bindingsb.length; j++) {
+    for(let i=0; i< bindingsa.length; i++) {
+        let bindinga = bindingsa[i];
+        let matched = false;
+        for(let j=0; j<bindingsb.length; j++) {
             var bindingb = bindingsb[j];
             if(QueryPlanDPSize.areCompatibleBindings(bindinga, bindingb)){
                 matched = true;
@@ -27472,12 +27467,12 @@ QueryPlanDPSize.leftOuterJoinBindings = function(bindingsa, bindingsb) {
 };
 
 QueryPlanDPSize.crossProductBindings = function(bindingsa, bindingsb) {
-    var result = [];
+    let result = [];
 
-    for(var i=0; i< bindingsa.length; i++) {
-        var bindinga = bindingsa[i];
-        for(var j=0; j<bindingsb.length; j++) {
-            var bindingb = bindingsb[j];
+    for(let i=0; i< bindingsa.length; i++) {
+        let bindinga = bindingsa[i];
+        for(let j=0; j<bindingsb.length; j++) {
+            let bindingb = bindingsb[j];
             result.push(QueryPlanDPSize.mergeBindings(bindinga, bindingb));
         }
     }
@@ -27490,9 +27485,9 @@ QueryPlanDPSize.unionBindings = function(bindingsa, bindingsb) {
 };
 
 QueryPlanDPSize.unionManyBindings = function(bindingLists) {
-    var acum = [];
-    for(var i=0; i<bindingLists.length; i++) {
-        var bindings = bindingLists[i];
+    let acum = [];
+    for(let i=0; i<bindingLists.length; i++) {
+        let bindings = bindingLists[i];
         acum = QueryPlanDPSize.unionBindings(acum, bindings);
     }
 
@@ -27503,10 +27498,10 @@ QueryPlanDPSize.unionManyBindings = function(bindingLists) {
 // end of ./src/js-query-engine/src/query_plan_sync_dpsize.js 
 
 // exports
-var QueryEngine = {};
+let QueryEngine = {};
 
 //imports
-var QueryPlan = QueryPlanDPSize;
+let QueryPlan = QueryPlanDPSize;
 QueryEngine.QueryEngine = function(params) {
     if(arguments.length != 0) {
         this.backend = params.backend;
@@ -27528,19 +27523,19 @@ QueryEngine.QueryEngine.prototype.setCustomFunctions = function(customFns) {
 
 // Utils
 QueryEngine.QueryEngine.prototype.registerNsInEnvironment = function(prologue, env) {
-    var prefixes = [];
+    let prefixes = [];
     if(prologue != null && prologue.prefixes != null) {
 	prefixes =prologue.prefixes;
     }
-    var toSave = {};
+    let toSave = {};
 
     // adding default prefixes;
-    for(var p in this.defaultPrefixes) {
+    for(let p in this.defaultPrefixes) {
         toSave[p] = this.defaultPrefixes[p];
     }
 
-    for(var i=0; i<prefixes.length; i++) {
-        var prefix = prefixes[i];
+    for(let i=0; i<prefixes.length; i++) {
+        let prefix = prefixes[i];
         if(prefix.token === "prefix") {
             toSave[prefix.prefix] = prefix.local;
         }
@@ -27556,17 +27551,17 @@ QueryEngine.QueryEngine.prototype.registerNsInEnvironment = function(prologue, e
 
 QueryEngine.QueryEngine.prototype.applyModifier = function(modifier, projectedBindings) {
     if(modifier == "DISTINCT") {
-        var map = {};
-        var result = [];
-        for(var i=0; i<projectedBindings.length; i++) {
-            var bindings = projectedBindings[i];
-            var key = "";
+        let map = {};
+        let result = [];
+        for(let i=0; i<projectedBindings.length; i++) {
+            let bindings = projectedBindings[i];
+            let key = "";
          
             // if no projection variables hash is passed, all the bound
             // variable in the current bindings will be used.
-            for(var p in (bindings)) {
+            for(let p in (bindings)) {
                 // hashing the object
-                var obj = bindings[p];
+                let obj = bindings[p];
                 if(obj == null) {
                     key = key+p+'null';
                 } else if(obj.token == 'literal') {
@@ -27618,22 +27613,22 @@ QueryEngine.QueryEngine.prototype.applyLimitOffset = function(offset, limit, bin
 
 
 QueryEngine.QueryEngine.prototype.applySingleOrderBy = function(orderFilters, modifiedBindings, dataset, outEnv) {
-    var acum = [];
-    for(var i=0; i<orderFilters.length; i++) {
-        var orderFilter = orderFilters[i];
-        var results = QueryFilters.collect(orderFilter.expression, [modifiedBindings], dataset, outEnv, this);
+    let acum = [];
+    for(let i=0; i<orderFilters.length; i++) {
+        let orderFilter = orderFilters[i];
+        let results = QueryFilters.collect(orderFilter.expression, [modifiedBindings], dataset, outEnv, this);
         acum.push(results[0].value);
     }
     return {binding:modifiedBindings, value:acum};
 };
 
 QueryEngine.QueryEngine.prototype.applyOrderBy = function(order, modifiedBindings, dataset, outEnv) {
-    var that = this;
-    var acum = [];
+    let that = this;
+    let acum = [];
     if(order != null && order.length > 0) {
         for(var i=0; i<modifiedBindings.length; i++) {
-            var bindings = modifiedBindings[i];
-            var results = that.applySingleOrderBy(order, bindings, dataset, outEnv);
+            let bindings = modifiedBindings[i];
+            let results = that.applySingleOrderBy(order, bindings, dataset, outEnv);
             acum.push(results);
         }
 
@@ -27641,7 +27636,7 @@ QueryEngine.QueryEngine.prototype.applyOrderBy = function(order, modifiedBinding
             return that.compareFilteredBindings(a, b, order, outEnv);
         });
 
-        var toReturn = [];
+        let toReturn = [];
         for(var i=0; i<acum.length; i++) {
             toReturn.push(acum[i].binding);
         }
@@ -27653,13 +27648,13 @@ QueryEngine.QueryEngine.prototype.applyOrderBy = function(order, modifiedBinding
 };
 
 QueryEngine.QueryEngine.prototype.compareFilteredBindings = function(a, b, order, env) {
-    var found = false;
-    var i = 0;
+    let found = false;
+    let i = 0;
     while(!found) {
         if(i==a.value.length) {
             return 0;
         }
-        var direction = order[i].direction;
+        let direction = order[i].direction;
         var filterResult;
 
         // unbound first
@@ -27737,8 +27732,8 @@ QueryEngine.QueryEngine.prototype.compareFilteredBindings = function(a, b, order
 };
 
 QueryEngine.QueryEngine.prototype.removeDefaultGraphBindings = function(bindingsList, dataset) {
-    var onlyDefaultDatasets = [];
-    var namedDatasetsMap = {};
+    let onlyDefaultDatasets = [];
+    let namedDatasetsMap = {};
     for(var i=0; i<dataset.named.length; i++) {
         namedDatasetsMap[dataset.named[i].oid] = true;
     }
@@ -27747,12 +27742,12 @@ QueryEngine.QueryEngine.prototype.removeDefaultGraphBindings = function(bindings
             onlyDefaultDatasets.push(dataset.implicit[i].oid);
         }
     }
-    var acum = [];
+    let acum = [];
     for(i=0; i<bindingsList.length; i++) {
-        var bindings = bindingsList[i];
-        var foundDefaultGraph = false;
-        for(var p in bindings) {
-            for(var j=0; j<namedDatasetsMap.length; j++) {
+        let bindings = bindingsList[i];
+        let foundDefaultGraph = false;
+        for(let p in bindings) {
+            for(let j=0; j<namedDatasetsMap.length; j++) {
                 if(bindings[p] === namedDatasetsMap[j]) {
                     foundDefaultGraph = true;
                     break;
@@ -27772,10 +27767,10 @@ QueryEngine.QueryEngine.prototype.removeDefaultGraphBindings = function(bindings
 
 
 QueryEngine.QueryEngine.prototype.aggregateBindings = function(projection, bindingsGroup, dataset, env) {
-    var denormBindings = this.copyDenormalizedBindings(bindingsGroup, env.outCache);
-    var aggregatedBindings = {};
-    for(var i=0; i<projection.length; i++) {
-        var aggregatedValue = QueryFilters.runAggregator(projection[i], denormBindings, this, dataset, env);
+    let denormBindings = this.copyDenormalizedBindings(bindingsGroup, env.outCache);
+    let aggregatedBindings = {};
+    for(let i=0; i<projection.length; i++) {
+        let aggregatedValue = QueryFilters.runAggregator(projection[i], denormBindings, this, dataset, env);
         if(projection[i].alias) {
             aggregatedBindings[projection[i].alias.value] = aggregatedValue; 
         } else {
@@ -27790,18 +27785,18 @@ QueryEngine.QueryEngine.prototype.projectBindings = function(projection, results
     if(projection[0].kind === '*') {
         return results;
     } else {
-        var projectedResults = [];
+        let projectedResults = [];
 
-        for(var i=0; i<results.length; i++) {
-            var currentResult = results[i];
-            var currentProjected = {};
-            var shouldAdd = true;
+        for(let i=0; i<results.length; i++) {
+            let currentResult = results[i];
+            let currentProjected = {};
+            let shouldAdd = true;
 
-            for(var j=0; j< projection.length; j++) {
+            for(let j=0; j< projection.length; j++) {
                 if(projection[j].token == 'variable' && projection[j].kind != 'aliased') {
                     currentProjected[projection[j].value.value] = currentResult[projection[j].value.value];
                 } else if(projection[j].token == 'variable' && projection[j].kind == 'aliased') {
-                    var ebv = QueryFilters.runFilter(projection[j].expression, currentResult, this, dataset, {blanks:{}, outCache:{}});
+                    let ebv = QueryFilters.runFilter(projection[j].expression, currentResult, this, dataset, {blanks:{}, outCache:{}});
                     if(QueryFilters.isEbvError(ebv)) {
                         shouldAdd = false;
                         break;
@@ -27822,13 +27817,13 @@ QueryEngine.QueryEngine.prototype.projectBindings = function(projection, results
 };
 
 QueryEngine.QueryEngine.prototype.resolveNsInEnvironment = function(prefix, env) {
-    var namespaces = env.namespaces;
+    let namespaces = env.namespaces;
     return namespaces[prefix];
 };
 
 QueryEngine.QueryEngine.prototype.termCost = function(term, env) {
     if(term.token === 'uri') {
-        var uri = Utils.lexicalFormBaseUri(term, env);
+        let uri = Utils.lexicalFormBaseUri(term, env);
         if(uri == null) {
             return(0);
         } else {
@@ -27836,10 +27831,10 @@ QueryEngine.QueryEngine.prototype.termCost = function(term, env) {
         }
 
     } else if(term.token === 'literal') {
-        var lexicalFormLiteral = Utils.lexicalFormLiteral(term, env);
+        let lexicalFormLiteral = Utils.lexicalFormLiteral(term, env);
         return(this.lexicon.resolveLiteralCost(lexicalFormLiteral));
     } else if(term.token === 'blank') {
-        var label = term.value;
+        let label = term.value;
         return this.lexicon.resolveBlankCost(label);
     } else if(term.token === 'var') {
         return (this.lexicon.oidCounter/3)
@@ -27851,7 +27846,7 @@ QueryEngine.QueryEngine.prototype.termCost = function(term, env) {
 
 QueryEngine.QueryEngine.prototype.normalizeTerm = function(term, env, shouldIndex) {
     if(term.token === 'uri') {
-        var uri = Utils.lexicalFormBaseUri(term, env);
+        let uri = Utils.lexicalFormBaseUri(term, env);
         if(uri == null) {
             return(null);
         } else {
@@ -27863,7 +27858,7 @@ QueryEngine.QueryEngine.prototype.normalizeTerm = function(term, env, shouldInde
         }
 
     } else if(term.token === 'literal') {
-        var lexicalFormLiteral = Utils.lexicalFormLiteral(term, env);
+        let lexicalFormLiteral = Utils.lexicalFormLiteral(term, env);
         if(shouldIndex) {
            var oid = this.lexicon.registerLiteral(lexicalFormLiteral);
             return(oid);
@@ -27872,7 +27867,7 @@ QueryEngine.QueryEngine.prototype.normalizeTerm = function(term, env, shouldInde
             return(oid);
         }
     } else if(term.token === 'blank') {
-        var label = term.value;
+        let label = term.value;
         var oid = env.blanks[label];
         if( oid != null) {
             return(oid);
@@ -27895,13 +27890,13 @@ QueryEngine.QueryEngine.prototype.normalizeTerm = function(term, env, shouldInde
 };
 
 QueryEngine.QueryEngine.prototype.normalizeDatasets = function(datasets, outerEnv, callback) {
-    var that = this;
-    for(var i=0; i<datasets.length; i++) {
-        var dataset = datasets[i];
+    let that = this;
+    for(let i=0; i<datasets.length; i++) {
+        let dataset = datasets[i];
         if(dataset.value === that.lexicon.defaultGraphUri) {
             dataset.oid = that.lexicon.defaultGraphOid;
         } else {
-            var oid = that.normalizeTerm(dataset, outerEnv, false);      
+            let oid = that.normalizeTerm(dataset, outerEnv, false);      
             if(oid != null) {
                 dataset.oid = oid;
             } else {
@@ -27914,11 +27909,11 @@ QueryEngine.QueryEngine.prototype.normalizeDatasets = function(datasets, outerEn
 };
 
 QueryEngine.QueryEngine.prototype.normalizeQuad = function(quad, queryEnv, shouldIndex) {
-    var subject    = null;
-    var predicate  = null;
-    var object     = null;
-    var graph      = null;
-    var oid;
+    let subject    = null;
+    let predicate  = null;
+    let object     = null;
+    let graph      = null;
+    let oid;
 
     if(quad.graph == null) {
         graph = 0; // default graph
@@ -27961,10 +27956,10 @@ QueryEngine.QueryEngine.prototype.normalizeQuad = function(quad, queryEnv, shoul
 };
 
 QueryEngine.QueryEngine.prototype.quadCost = function(quad, queryEnv, shouldIndex) {
-    var subject    = null;
-    var predicate  = null;
-    var object     = null;
-    var graph      = null;
+    let subject    = null;
+    let predicate  = null;
+    let object     = null;
+    let graph      = null;
 
     if(quad.graph == null) {
         graph = (this.lexicon.oidCounter/4)
@@ -27980,10 +27975,10 @@ QueryEngine.QueryEngine.prototype.quadCost = function(quad, queryEnv, shouldInde
 };
 
 QueryEngine.QueryEngine.prototype.denormalizeBindingsList = function(bindingsList, env) {
-    var results = [];
+    let results = [];
 
-    for(var i=0; i<bindingsList.length; i++) {
-        var result = this.denormalizeBindings(bindingsList[i], env);
+    for(let i=0; i<bindingsList.length; i++) {
+        let result = this.denormalizeBindings(bindingsList[i], env);
         results.push(result);
     }
     return(results);
@@ -27996,13 +27991,13 @@ QueryEngine.QueryEngine.prototype.denormalizeBindingsList = function(bindingsLis
  * This is required just to save lookups when final results are generated.
  */
 QueryEngine.QueryEngine.prototype.copyDenormalizedBindings = function(bindingsList, out, callback) {
-    var denormList = [];
-    for(var i=0; i<bindingsList.length; i++) {
-        var denorm = {};
-        var bindings = bindingsList[i];
-        var variables = Utils.keys(bindings);
-        for(var j=0; j<variables.length; j++) {
-            var oid = bindings[variables[j]];
+    let denormList = [];
+    for(let i=0; i<bindingsList.length; i++) {
+        let denorm = {};
+        let bindings = bindingsList[i];
+        let variables = Utils.keys(bindings);
+        for(let j=0; j<variables.length; j++) {
+            let oid = bindings[variables[j]];
             if(oid == null) {
                 // this can be null, e.g. union different variables (check SPARQL recommendation examples UNION)
                 denorm[variables[j]] = null;
@@ -28011,11 +28006,11 @@ QueryEngine.QueryEngine.prototype.copyDenormalizedBindings = function(bindingsLi
                 // binding is the result of the aggregation of other bindings in a GROUP clause
                 denorm[variables[j]] = oid;
             } else {
-                var inOut = out[oid];
+                let inOut = out[oid];
                 if(inOut!= null) {
                     denorm[variables[j]] = inOut;
                 } else {                    
-                    var val = this.lexicon.retrieve(oid);
+                    let val = this.lexicon.retrieve(oid);
                     out[oid] = val;
                     denorm[variables[j]] = val;
                 }
@@ -28027,10 +28022,10 @@ QueryEngine.QueryEngine.prototype.copyDenormalizedBindings = function(bindingsLi
 };
 
 QueryEngine.QueryEngine.prototype.denormalizeBindings = function(bindings, env, callback) {
-    var variables = Utils.keys(bindings);
-    var envOut = env.outCache;
-    for(var i=0; i<variables.length; i++) {
-        var oid = bindings[variables[i]];
+    let variables = Utils.keys(bindings);
+    let envOut = env.outCache;
+    for(let i=0; i<variables.length; i++) {
+        let oid = bindings[variables[i]];
         if(oid == null) {
             // this can be null, e.g. union different variables (check SPARQL recommendation examples UNION)
             bindings[variables[i]] = null;
@@ -28038,7 +28033,7 @@ QueryEngine.QueryEngine.prototype.denormalizeBindings = function(bindings, env, 
             if(envOut[oid] != null) {
                 bindings[variables[i]] = envOut[oid];
             } else {
-                var val = this.lexicon.retrieve(oid);
+                let val = this.lexicon.retrieve(oid);
                 bindings[variables[i]] = val;
 		if(val.token === 'blank') {
 		    env.blanks[val.value] = oid;
@@ -28055,13 +28050,13 @@ QueryEngine.QueryEngine.prototype.execute = function(queryString, callback, defa
     //try{
         queryString = Utils.normalizeUnicodeLiterals(queryString);
 
-        var syntaxTree = this.abstractQueryTree.parseQueryString(queryString);
+        let syntaxTree = this.abstractQueryTree.parseQueryString(queryString);
         if(syntaxTree == null) {
             callback(false,"Error parsing query string");
         } else {
             if(syntaxTree.token === 'query' && syntaxTree.kind == 'update')  {
                 this.callbacksBackend.startGraphModification();
-                var that = this;
+                let that = this;
                 this.executeUpdate(syntaxTree, function(success, result){
 		    if(that.lexicon.updateAfterWrite)
 			that.lexicon.updateAfterWrite();
@@ -28091,16 +28086,16 @@ QueryEngine.QueryEngine.prototype.execute = function(queryString, callback, defa
 // Retrieval queries
 
 QueryEngine.QueryEngine.prototype.executeQuery = function(syntaxTree, callback, defaultDataset, namedDataset) {
-    var prologue = syntaxTree.prologue;
-    var units = syntaxTree.units;
-    var that = this;
+    let prologue = syntaxTree.prologue;
+    let units = syntaxTree.units;
+    let that = this;
 
     // environment for the operation -> base ns, declared ns, etc.
-    var queryEnv = {blanks:{}, outCache:{}};
+    let queryEnv = {blanks:{}, outCache:{}};
     this.registerNsInEnvironment(prologue, queryEnv);
 
     // retrieval queries can only have 1 executable unit
-    var aqt = that.abstractQueryTree.parseExecutableUnit(units[0]);
+    let aqt = that.abstractQueryTree.parseExecutableUnit(units[0]);
 
     // can be anything else but a select???
     if(aqt.kind === 'select') {
@@ -28145,40 +28140,40 @@ QueryEngine.QueryEngine.prototype.executeQuery = function(syntaxTree, callback, 
                 if(success) {              
                     var result = that.denormalizeBindingsList(result, queryEnv);
                     if(result != null) { 
-                        var graph = new RDFJSInterface.Graph();
+                        let graph = new RDFJSInterface.Graph();
                             
                         // CONSTRUCT WHERE {} case
                         if(aqt.template == null) {
                             aqt.template = {triplesContext: aqt.pattern};
                         }
-                        var blankIdCounter = 1;
-			var toClear = [];
-                        for(var i=0; i<result.length; i++) {
-                            var bindings = result[i];
+                        let blankIdCounter = 1;
+			let toClear = [];
+                        for(let i=0; i<result.length; i++) {
+                            let bindings = result[i];
 			    for(var j=0; j<toClear.length; j++)
 				delete toClear[j].valuetmp;
 
                             for(var j=0; j<aqt.template.triplesContext.length; j++) {
                                 // fresh IDs for blank nodes in the construct template
-                                var components = ['subject', 'predicate', 'object'];
-                                var tripleTemplate = aqt.template.triplesContext[j];                                    
+                                let components = ['subject', 'predicate', 'object'];
+                                let tripleTemplate = aqt.template.triplesContext[j];                                    
                                 for(var p=0; p<components.length; p++) {
-                                    var component = components[p];
+                                    let component = components[p];
                                     if(tripleTemplate[component].token === 'blank') {
 					if(tripleTemplate[component].valuetmp && tripleTemplate[component].valuetmp != null) {
 					} else {
-					    var blankId = "_:b"+blankIdCounter;
+					    let blankId = "_:b"+blankIdCounter;
 					    blankIdCounter++;
 					    tripleTemplate[component].valuetmp = blankId;
 					    toClear.push(tripleTemplate[component]);
 					}
 				    }
                                 }
-                                var s = RDFJSInterface.buildRDFResource(tripleTemplate.subject,bindings,that,queryEnv);
+                                let s = RDFJSInterface.buildRDFResource(tripleTemplate.subject,bindings,that,queryEnv);
                                 var p = RDFJSInterface.buildRDFResource(tripleTemplate.predicate,bindings,that,queryEnv);
-                                var o = RDFJSInterface.buildRDFResource(tripleTemplate.object,bindings,that,queryEnv);
+                                let o = RDFJSInterface.buildRDFResource(tripleTemplate.object,bindings,that,queryEnv);
                                 if(s!=null && p!=null && o!=null) {
-                                    var triple = new RDFJSInterface.Triple(s,p,o);
+                                    let triple = new RDFJSInterface.Triple(s,p,o);
                                     graph.add(triple);
                                     //} else {
                                     //    return callback(false, "Error creating output graph")
@@ -28204,13 +28199,13 @@ QueryEngine.QueryEngine.prototype.executeQuery = function(syntaxTree, callback, 
 
 QueryEngine.QueryEngine.prototype.executeSelect = function(unit, env, defaultDataset, namedDataset, callback) {
     if(unit.kind === "select" || unit.kind === "ask" || unit.kind === "construct" || unit.kind === "modify") {
-        var projection = unit.projection;
-        var dataset    = unit.dataset;
-        var modifier   = unit.modifier;
-        var limit      = unit.limit;
-        var offset     = unit.offset;
-        var order      = unit.order;
-        var that = this;
+        let projection = unit.projection;
+        let dataset    = unit.dataset;
+        let modifier   = unit.modifier;
+        let limit      = unit.limit;
+        let offset     = unit.offset;
+        let order      = unit.order;
+        let that = this;
 
         if(defaultDataset != null || namedDataset != null) {
             dataset.implicit = defaultDataset || [];
@@ -28223,11 +28218,11 @@ QueryEngine.QueryEngine.prototype.executeSelect = function(unit, env, defaultDat
         }
 
         if (that.normalizeDatasets(dataset.implicit.concat(dataset.named), env) != null) {
-            var result = that.executeSelectUnit(projection, dataset, unit.pattern, env);
+            let result = that.executeSelectUnit(projection, dataset, unit.pattern, env);
             if(result != null) {
                 // detect single group
                 if(unit.group!=null && unit.group === "") {
-                    var foundUniqueGroup = false;
+                    let foundUniqueGroup = false;
                     for(var i=0; i<unit.projection.length; i++) {
                         if(unit.projection[i].expression!=null && unit.projection[i].expression.expressionType === 'aggregate') {
                             foundUniqueGroup = true;
@@ -28240,13 +28235,13 @@ QueryEngine.QueryEngine.prototype.executeSelect = function(unit, env, defaultDat
                 }
                 if(unit.group && unit.group != "") {
                     if(that.checkGroupSemantics(unit.group,projection)) {
-                        var groupedBindings = that.groupSolution(result, unit.group, dataset, env);
+                        let groupedBindings = that.groupSolution(result, unit.group, dataset, env);
                              
-                        var aggregatedBindings = [];
-                        var foundError = false;
+                        let aggregatedBindings = [];
+                        let foundError = false;
                             
                         for(var i=0; i<groupedBindings.length; i++) {
-                            var resultingBindings = that.aggregateBindings(projection, groupedBindings[i], dataset, env);
+                            let resultingBindings = that.aggregateBindings(projection, groupedBindings[i], dataset, env);
                             aggregatedBindings.push(resultingBindings);
                         }
                         callback(true, {'bindings': aggregatedBindings, 'denorm':true});
@@ -28254,11 +28249,11 @@ QueryEngine.QueryEngine.prototype.executeSelect = function(unit, env, defaultDat
                         callback(false, "Incompatible Group and Projection variables");
                     }
                 } else {
-                    var orderedBindings = that.applyOrderBy(order, result, dataset, env);
-                    var projectedBindings = that.projectBindings(projection, orderedBindings, dataset);
-                    var modifiedBindings = that.applyModifier(modifier, projectedBindings);
-                    var limitedBindings  = that.applyLimitOffset(offset, limit, modifiedBindings);
-                    var filteredBindings = that.removeDefaultGraphBindings(limitedBindings, dataset);
+                    let orderedBindings = that.applyOrderBy(order, result, dataset, env);
+                    let projectedBindings = that.projectBindings(projection, orderedBindings, dataset);
+                    let modifiedBindings = that.applyModifier(modifier, projectedBindings);
+                    let limitedBindings  = that.applyLimitOffset(offset, limit, modifiedBindings);
+                    let filteredBindings = that.removeDefaultGraphBindings(limitedBindings, dataset);
                     
                     callback(true, filteredBindings);
                 }
@@ -28276,17 +28271,17 @@ QueryEngine.QueryEngine.prototype.executeSelect = function(unit, env, defaultDat
 
 
 QueryEngine.QueryEngine.prototype.groupSolution = function(bindings, group, dataset, queryEnv){
-    var order = [];
-    var filteredBindings = [];
-    var initialized = false;
-    var that = this;
+    let order = [];
+    let filteredBindings = [];
+    let initialized = false;
+    let that = this;
     if(group === 'singleGroup') {
         return [bindings];
     } else {
         for(var i=0; i<bindings.length; i++) {
-            var outFloop = arguments.callee;
-            var currentBindings = bindings[i];
-            var mustAddBindings = true;
+            let outFloop = arguments.callee;
+            let currentBindings = bindings[i];
+            let mustAddBindings = true;
 
             /**
              * In this loop, we iterate through all the group clauses and tranform the current bindings
@@ -28295,9 +28290,9 @@ QueryEngine.QueryEngine.prototype.groupSolution = function(bindings, group, data
              * grouped variables that will be used later to build the final groups
              */
             for(var j=0; j<group.length; j++) {
-                var floop = arguments.callee;
-                var currentOrderClause = group[j];
-                var orderVariable = null;
+                let floop = arguments.callee;
+                let currentOrderClause = group[j];
+                let orderVariable = null;
 
                 if(currentOrderClause.token === 'var') {
                     orderVariable = currentOrderClause.value;
@@ -28355,14 +28350,14 @@ QueryEngine.QueryEngine.prototype.groupSolution = function(bindings, group, data
          * After processing all the bindings, we build the group using the
          * information stored about the order of the group variables.
          */
-        var dups = {};
-        var groupMap = {};
-        var groupCounter = 0;
+        let dups = {};
+        let groupMap = {};
+        let groupCounter = 0;
         for(var i=0; i<filteredBindings.length; i++) {
-            var currentTransformedBinding = filteredBindings[i];
-            var key = "";
+            let currentTransformedBinding = filteredBindings[i];
+            let key = "";
             for(var j=0; j<order.length; j++) {
-                var maybeObject = currentTransformedBinding[order[j]];
+                let maybeObject = currentTransformedBinding[order[j]];
                 if(typeof(maybeObject) === 'object') {
                     key = key + maybeObject.value;
                 } else {
@@ -28382,14 +28377,14 @@ QueryEngine.QueryEngine.prototype.groupSolution = function(bindings, group, data
         }
 
         // The final result is an array of arrays with all the groups
-        var groups = [];
+        let groups = [];
             
-        for(var k in dups) {
+        for(let k in dups) {
             groups.push(dups[k]);
         }
 
         return groups;
-    };
+    }
 };
 
 
@@ -28407,7 +28402,7 @@ QueryEngine.QueryEngine.prototype.executeSelectUnit = function(projection, datas
         return this.executeLEFT_JOIN(projection, dataset, pattern, env);            
     } else if(pattern.kind === "FILTER") {
         // Some components may have the filter inside the unit
-        var results = this.executeSelectUnit(projection, dataset, pattern.value, env);
+        let results = this.executeSelectUnit(projection, dataset, pattern.value, env);
         if(results != null) {
             results = QueryFilters.checkFilters(pattern, results, false, dataset, env, this);
             return results;
@@ -28431,8 +28426,8 @@ QueryEngine.QueryEngine.prototype.executeZeroOrMorePath = function(pattern, data
     //console.log(pattern.x);
     //console.log("Y");
     //console.log(pattern.y);
-    var projection = [];
-    var starProjection = false;
+    let projection = [];
+    let starProjection = false;
     if(pattern.x.token === 'var') {
 	projection.push({token: 'variable',
 			 kind: 'var',
@@ -28458,11 +28453,11 @@ QueryEngine.QueryEngine.prototype.executeZeroOrMorePath = function(pattern, data
 	//console.log("BINDINGS "+bindings.length);
 	//console.log(bindings);
 	var acum = {};
-	var results = [];
+	let results = [];
 	var vx, intermediate, nextBinding, vxDenorm;
-	var origVXName = pattern.x.value;
+	let origVXName = pattern.x.value;
 	var last = pattern.x;
-	var nextPath = pattern.path;
+	let nextPath = pattern.path;
 	//console.log("VAR - VAR PATTERN");
 	//console.log(nextPath.value);
 	for(var i=0; i<bindings.length; i++) {
@@ -28478,7 +28473,7 @@ QueryEngine.QueryEngine.prototype.executeZeroOrMorePath = function(pattern, data
 		pattern.path = this.abstractQueryTree.replace(nextPath, last, vxDenorm, env);
 		nextPath = Utils.clone(pattern.path);
 		intermediate = this.executeZeroOrMorePath(pattern, dataset, env);
-		for(var j=0; j<intermediate.length; j++) {
+		for(let j=0; j<intermediate.length; j++) {
 		    nextBinding = intermediate[j];
 		    nextBinding[origVXName] = vx;
 		    results.push(nextBinding)
@@ -28490,13 +28485,13 @@ QueryEngine.QueryEngine.prototype.executeZeroOrMorePath = function(pattern, data
 	//console.log("RETURNING VAR - VAR");
 	return results;
     } else if(pattern.x.token !== 'var' && pattern.y.token === 'var') {
-	var finished;
+	let finished;
 	var acum = {};
-	var initial = true;
-	var pending = [];
+	let initial = true;
+	let pending = [];
 	var bindings,nextBinding;
-	var collected = [];
-	var origVx = pattern.x;
+	let collected = [];
+	let origVx = pattern.x;
 	var last;
 
 	while(initial == true || pending.length !== 0) {
@@ -28509,10 +28504,10 @@ QueryEngine.QueryEngine.prototype.executeZeroOrMorePath = function(pattern, data
 		last = pattern.x;
 		initial = false;
 	    } else {
-		var nextOid = pending.pop();
+		let nextOid = pending.pop();
 		//console.log("POPPING:"+nextOid);
 		var value = this.lexicon.retrieve(nextOid);
-		var path = pattern.path; //Utils.clone(pattern.path);
+		let path = pattern.path; //Utils.clone(pattern.path);
 		//console.log(path.value[0]);
 		//console.log("REPLACING");
 		//console.log(last);
@@ -28550,17 +28545,17 @@ QueryEngine.QueryEngine.prototype.executeZeroOrMorePath = function(pattern, data
 };
 
 QueryEngine.QueryEngine.prototype.executeUNION = function(projection, dataset, patterns, env) {
-    var setQuery1 = patterns[0];
-    var setQuery2 = patterns[1];
-    var set1 = null;
-    var set2 = null;
+    let setQuery1 = patterns[0];
+    let setQuery2 = patterns[1];
+    let set1 = null;
+    let set2 = null;
 
     if(patterns.length != 2) {
         throw new Error("SPARQL algebra UNION with more than two components");
     }
 
-    var that = this;
-    var sets = [];
+    let that = this;
+    let sets = [];
 
     set1 = that.executeSelectUnit(projection, dataset, setQuery1, env);
     if(set1==null) {
@@ -28572,14 +28567,14 @@ QueryEngine.QueryEngine.prototype.executeUNION = function(projection, dataset, p
         return null;
     }
 
-    var result = QueryPlan.unionBindings(set1, set2);
+    let result = QueryPlan.unionBindings(set1, set2);
     result = QueryFilters.checkFilters(patterns, result, false, dataset, env, that);
     return result;
 };
 
 QueryEngine.QueryEngine.prototype.executeAndBGP = function(projection, dataset, patterns, env) {
-    var that = this;
-    var result = QueryPlan.executeAndBGPsDPSize(patterns.value, dataset, this, env);
+    let that = this;
+    let result = QueryPlan.executeAndBGPsDPSize(patterns.value, dataset, this, env);
     if(result!=null) {
         return QueryFilters.checkFilters(patterns, result, false, dataset, env, that);
     } else {
@@ -28588,15 +28583,15 @@ QueryEngine.QueryEngine.prototype.executeAndBGP = function(projection, dataset, 
 };
 
 QueryEngine.QueryEngine.prototype.executeLEFT_JOIN = function(projection, dataset, patterns, env) {
-    var setQuery1 = patterns.lvalue;
-    var setQuery2 = patterns.rvalue;
+    let setQuery1 = patterns.lvalue;
+    let setQuery2 = patterns.rvalue;
 
-    var set1 = null;
-    var set2 = null;
+    let set1 = null;
+    let set2 = null;
 
-    var that = this;
-    var sets = [];
-    var acum, duplicates;
+    let that = this;
+    let sets = [];
+    let acum, duplicates;
 
     //console.log("SET QUERY 1");
     //console.log(setQuery1.value);
@@ -28616,18 +28611,18 @@ QueryEngine.QueryEngine.prototype.executeLEFT_JOIN = function(projection, datase
     //console.log("\nLEFT JOIN SETS:")
     //console.log(set1)
     //console.log(set2)
-    var result = QueryPlan.leftOuterJoinBindings(set1, set2);
+    let result = QueryPlan.leftOuterJoinBindings(set1, set2);
     //console.log("---")
     //console.log(result);
 
-    var bindings = QueryFilters.checkFilters(patterns, result, true, dataset, env, that);
+    let bindings = QueryFilters.checkFilters(patterns, result, true, dataset, env, that);
     //console.log("---")
     //console.log(bindings)
     //console.log("\r\n")
     
     if(set1.length>1 && set2.length>1) {
-            var vars = [];
-            var vars1 = {};
+            let vars = [];
+            let vars1 = {};
             for(var p in set1[0]) {
                 vars1[p] = true;
             }
@@ -28638,7 +28633,7 @@ QueryEngine.QueryEngine.prototype.executeLEFT_JOIN = function(projection, datase
             }
             acum = [];
             duplicates = {};
-            for(var i=0; i<bindings.length; i++) {
+            for(let i=0; i<bindings.length; i++) {
                 if(bindings[i]["__nullify__"] === true) {
                     for(var j=0; j<vars.length; j++) {
                         bindings[i]["bindings"][vars[j]] = null;
@@ -28682,13 +28677,13 @@ QueryEngine.QueryEngine.prototype.executeLEFT_JOIN = function(projection, datase
 };
 
 QueryEngine.QueryEngine.prototype.executeJOIN = function(projection, dataset, patterns, env) {
-    var setQuery1 = patterns.lvalue;
-    var setQuery2 = patterns.rvalue;
-    var set1 = null;
-    var set2 = null;
+    let setQuery1 = patterns.lvalue;
+    let setQuery2 = patterns.rvalue;
+    let set1 = null;
+    let set2 = null;
 
-    var that = this;
-    var sets = [];
+    let that = this;
+    let sets = [];
 
     set1 = that.executeSelectUnit(projection, dataset, setQuery1, env);
     if(set1 == null) {
@@ -28701,12 +28696,12 @@ QueryEngine.QueryEngine.prototype.executeJOIN = function(projection, dataset, pa
     }
     
     
-    var result = null;
+    let result = null;
     if(set1.length ===0 || set2.length===0) {
 	result = [];
     } else {
-	var commonVarsTmp = {};
-	var commonVars = [];
+	let commonVarsTmp = {};
+	let commonVars = [];
 
 	for(var p in set1[0])
 	    commonVarsTmp[p] = false;
@@ -28730,16 +28725,16 @@ QueryEngine.QueryEngine.prototype.executeJOIN = function(projection, dataset, pa
 
 
 QueryEngine.QueryEngine.prototype.rangeQuery = function(quad, queryEnv) {
-    var that = this;
+    let that = this;
     //console.log("BEFORE:");
     //console.log("QUAD:");
     //console.log(quad);
-    var key = that.normalizeQuad(quad, queryEnv, false);
+    let key = that.normalizeQuad(quad, queryEnv, false);
     if(key != null) {
         //console.log("RANGE QUERY:")
         //console.log(key);
         //console.log(new QuadIndexCommon.Pattern(key));
-        var quads = that.backend.range(new QuadIndexCommon.Pattern(key));
+        let quads = that.backend.range(new QuadIndexCommon.Pattern(key));
         //console.log("retrieved");
         //console.log(quads)
         if(quads == null || quads.length == 0) {
@@ -28756,20 +28751,20 @@ QueryEngine.QueryEngine.prototype.rangeQuery = function(quad, queryEnv) {
 // Update queries
 
 QueryEngine.QueryEngine.prototype.executeUpdate = function(syntaxTree, callback) {
-    var prologue = syntaxTree.prologue;
-    var units = syntaxTree.units;
+    let prologue = syntaxTree.prologue;
+    let units = syntaxTree.units;
     var that = this;
 
     // environment for the operation -> base ns, declared ns, etc.
-    var queryEnv = {blanks:{}, outCache:{}};
+    let queryEnv = {blanks:{}, outCache:{}};
     this.registerNsInEnvironment(prologue, queryEnv);
-    for(var i=0; i<units.length; i++) {
+    for(let i=0; i<units.length; i++) {
 
-        var aqt = that.abstractQueryTree.parseExecutableUnit(units[i]);
+        let aqt = that.abstractQueryTree.parseExecutableUnit(units[i]);
         if(aqt.kind === 'insertdata') {
             for(var j=0; j<aqt.quads.length; j++) {
                 var quad = aqt.quads[j];
-                var result = that._executeQuadInsert(quad, queryEnv);
+                let result = that._executeQuadInsert(quad, queryEnv);
                 if(result !== true) {
                     return callback(false, error);
                 }
@@ -28786,7 +28781,7 @@ QueryEngine.QueryEngine.prototype.executeUpdate = function(syntaxTree, callback)
         } else if(aqt.kind === 'create') {
             callback(true);
         } else if(aqt.kind === 'load') {
-            var graph = {'uri': Utils.lexicalFormBaseUri(aqt.sourceGraph, queryEnv)};
+            let graph = {'uri': Utils.lexicalFormBaseUri(aqt.sourceGraph, queryEnv)};
             if(aqt.destinyGraph != null) {
                 graph = {'uri': Utils.lexicalFormBaseUri(aqt.destinyGraph, queryEnv)};
             }
@@ -28812,20 +28807,20 @@ QueryEngine.QueryEngine.prototype.executeUpdate = function(syntaxTree, callback)
 };
 
 QueryEngine.QueryEngine.prototype.batchLoad = function(quads, callback) {
-    var subject    = null;
-    var predicate  = null;
-    var object     = null;
-    var graph      = null;
-    var oldLimit = Utils.stackCounterLimit;
-    var counter = 0;
-    var success = true;
-    var blanks = {};
-    var maybeBlankOid, oid, quad, key, originalQuad;
+    let subject    = null;
+    let predicate  = null;
+    let object     = null;
+    let graph      = null;
+    let oldLimit = Utils.stackCounterLimit;
+    let counter = 0;
+    let success = true;
+    let blanks = {};
+    let maybeBlankOid, oid, quad, key, originalQuad;
 
     if(this.eventsOnBatchLoad)
         this.callbacksBackend.startGraphModification();
 
-    for(var i=0; i<quads.length; i++) {
+    for(let i=0; i<quads.length; i++) {
         quad = quads[i];
 	
         // subject
@@ -28962,7 +28957,7 @@ QueryEngine.QueryEngine.prototype.batchLoad = function(quads, callback) {
         quad = {subject: subject, predicate:predicate, object:object, graph: graph};
         key = new QuadIndexCommon.NodeKey(quad);
 
-        var result = this.backend.search(key);
+        let result = this.backend.search(key);
         if(!result) {
             result = this.backend.index(key);
             if(result == true){
@@ -28980,7 +28975,7 @@ QueryEngine.QueryEngine.prototype.batchLoad = function(quads, callback) {
     if(this.lexicon.updateAfterWrite != null)
 	this.lexicon.updateAfterWrite();
 
-    var exitFn = function(){
+    let exitFn = function(){
         if(success) {
             if(callback)
                 callback(true, counter);
@@ -29007,7 +29002,7 @@ QueryEngine.QueryEngine.prototype.batchLoad = function(quads, callback) {
 
 // @modified dp
 QueryEngine.QueryEngine.prototype.computeCosts = function (quads, env) {
-    for (var i = 0; i < quads.length; i++) {
+    for (let i = 0; i < quads.length; i++) {
         quads[i]['_cost'] = this.quadCost(quads[i], env);
     }
 
@@ -29017,11 +29012,11 @@ QueryEngine.QueryEngine.prototype.computeCosts = function (quads, env) {
 // Low level operations for update queries
 
 QueryEngine.QueryEngine.prototype._executeModifyQuery = function(aqt, queryEnv, callback) {
-    var that = this;
-    var querySuccess = true;
-    var error = null;
-    var bindings = null;
-    var components = ['subject', 'predicate', 'object', 'graph'];
+    let that = this;
+    let querySuccess = true;
+    let error = null;
+    let bindings = null;
+    let components = ['subject', 'predicate', 'object', 'graph'];
 
     aqt.insert = aqt.insert == null ? [] : aqt.insert;
     aqt['delete'] = aqt['delete'] == null ? [] : aqt['delete'];
@@ -29030,8 +29025,8 @@ QueryEngine.QueryEngine.prototype._executeModifyQuery = function(aqt, queryEnv, 
         function(k) {
             // select query
 
-            var defaultGraph = [];
-            var namedGraph = [];
+            let defaultGraph = [];
+            let namedGraph = [];
 
             if(aqt['with'] != null) {
                 defaultGraph.push(aqt['with']);
@@ -29039,8 +29034,8 @@ QueryEngine.QueryEngine.prototype._executeModifyQuery = function(aqt, queryEnv, 
 
             if(aqt['using'] != null) {
                 namedGraph = [];
-                for(var i=0; i<aqt['using'].length; i++) {
-                    var usingGraph = aqt['using'][i];
+                for(let i=0; i<aqt['using'].length; i++) {
+                    let usingGraph = aqt['using'][i];
                     if(usingGraph.kind === 'named') {
                         namedGraph.push(usingGraph.uri);
                     } else {
@@ -29069,18 +29064,18 @@ QueryEngine.QueryEngine.prototype._executeModifyQuery = function(aqt, queryEnv, 
         },function(k) {
             // delete query
 
-            var defaultGraph = aqt['with'];
+            let defaultGraph = aqt['with'];
             if(querySuccess) {
-                var quads = [];
-                for(var i=0; i<aqt['delete'].length; i++) {
-                    var src = aqt['delete'][i];
+                let quads = [];
+                for(let i=0; i<aqt['delete'].length; i++) {
+                    let src = aqt['delete'][i];
 
                     for(var j=0; j<bindings.length; j++) {
                         var quad = {};
-                        var binding = bindings[j];
+                        let binding = bindings[j];
 
-                        for(var c=0; c<components.length; c++) {
-                            var component = components[c];
+                        for(let c=0; c<components.length; c++) {
+                            let component = components[c];
                             if(component == 'graph' && src[component] == null) {
                                 quad['graph'] = defaultGraph;
                             } else if(src[component].token === 'var') {
@@ -29105,19 +29100,19 @@ QueryEngine.QueryEngine.prototype._executeModifyQuery = function(aqt, queryEnv, 
             }
         },function(k) {
             // insert query
-            var defaultGraph = aqt['with'];
+            let defaultGraph = aqt['with'];
 
             if(querySuccess) {
-                var quads = [];
+                let quads = [];
                 for(var i=0; i<aqt.insert.length; i++) {
-                    var src = aqt.insert[i];
+                    let src = aqt.insert[i];
 
-                    for(var j=0; j<bindings.length; j++) {
+                    for(let j=0; j<bindings.length; j++) {
                         var quad = {};
-                        var binding = bindings[j];
+                        let binding = bindings[j];
 
-                        for(var c=0; c<components.length; c++) {
-                            var component = components[c];
+                        for(let c=0; c<components.length; c++) {
+                            let component = components[c];
                             if(component == 'graph' && src[component] == null) {
                                 quad['graph'] = defaultGraph;
                             } else if(src[component].token === 'var') {
@@ -29147,10 +29142,10 @@ QueryEngine.QueryEngine.prototype._executeModifyQuery = function(aqt, queryEnv, 
 };
 
 QueryEngine.QueryEngine.prototype._executeQuadInsert = function(quad, queryEnv) {
-    var that = this;
-    var normalized = this.normalizeQuad(quad, queryEnv, true);
+    let that = this;
+    let normalized = this.normalizeQuad(quad, queryEnv, true);
     if(normalized != null) {
-        var key = new QuadIndexCommon.NodeKey(normalized);
+        let key = new QuadIndexCommon.NodeKey(normalized);
         var result = that.backend.search(key);
         if(result){
             return(result);
@@ -29171,12 +29166,12 @@ QueryEngine.QueryEngine.prototype._executeQuadInsert = function(quad, queryEnv) 
 };
 
 QueryEngine.QueryEngine.prototype._executeQuadDelete = function(quad, queryEnv) {
-    var that = this;
-    var normalized = this.normalizeQuad(quad, queryEnv, false);
+    let that = this;
+    let normalized = this.normalizeQuad(quad, queryEnv, false);
     if(normalized != null) {
-        var key = new QuadIndexCommon.NodeKey(normalized);
+        let key = new QuadIndexCommon.NodeKey(normalized);
         that.backend['delete'](key);
-        var result = that.lexicon.unregister(quad, key);
+        let result = that.lexicon.unregister(quad, key);
         if(result == true){
             that.callbacksBackend.nextGraphModification(Callbacks['deleted'], [quad, normalized]);
             return true;
@@ -29195,12 +29190,12 @@ QueryEngine.QueryEngine.prototype._executeClearGraph = function(destinyGraph, qu
         this.execute("DELETE { ?s ?p ?o } WHERE { ?s ?p ?o }", callback);
     } else if(destinyGraph === 'named') {
         var that = this;
-        var graphs = this.lexicon.registeredGraphs(true);
+        let graphs = this.lexicon.registeredGraphs(true);
         if(graphs!=null) {
-            var foundErrorDeleting = false;
+            let foundErrorDeleting = false;
             Utils.repeat(0, graphs.length,function(k,env) {
-                var graph = graphs[env._i];
-                var floop = arguments.callee;
+                let graph = graphs[env._i];
+                let floop = arguments.callee;
                 if(!foundErrorDeleting) {
                     that.execute("DELETE { GRAPH <"+graph+"> { ?s ?p ?o } } WHERE { GRAPH <"+graph+"> { ?s ?p ?o } }", function(success, results){
                         foundErrorDeleting = !success;
@@ -29227,7 +29222,7 @@ QueryEngine.QueryEngine.prototype._executeClearGraph = function(destinyGraph, qu
     } else {
         // destinyGraph is an URI
         if(destinyGraph.token == 'uri') {
-            var graphUri = Utils.lexicalFormBaseUri(destinyGraph,queryEnv);
+            let graphUri = Utils.lexicalFormBaseUri(destinyGraph,queryEnv);
             if(graphUri != null) {
                 this.execute("DELETE { GRAPH <"+graphUri+"> { ?s ?p ?o } } WHERE { GRAPH <"+graphUri+"> { ?s ?p ?o } }", callback);
             } else {
@@ -29244,10 +29239,10 @@ QueryEngine.QueryEngine.prototype.checkGroupSemantics = function(groupVars, proj
         return true;        
     }
 
-    var projection = {};
+    let projection = {};
 
     for(var i=0; i<groupVars.length; i++) {
-        var groupVar = groupVars[i];
+        let groupVar = groupVars[i];
         if(groupVar.token === 'var') {
             projection[groupVar.value] = true;
         } else if(groupVar.token === 'aliased_expression') {
@@ -29256,7 +29251,7 @@ QueryEngine.QueryEngine.prototype.checkGroupSemantics = function(groupVars, proj
     }
 
     for(i=0; i<projectionVars.length; i++) {
-        var projectionVar = projectionVars[i];
+        let projectionVar = projectionVars[i];
         if(projectionVar.kind === 'var') {
             if(projection[projectionVar.value.value] == null) {
                 return false;
@@ -29323,19 +29318,19 @@ Callbacks.CallbacksBackend = function() {
     this.queriesCallbacksMap = {};
     this.queriesInverseMap = {};
 
-    for(var i=0; i<this.indices.length; i++) {
-        var indexKey = this.indices[i];
+    for(let i=0; i<this.indices.length; i++) {
+        let indexKey = this.indices[i];
         this.indexMap[indexKey] = {};
         this.queriesIndexMap[indexKey] = {};
-    };
+    }
 };
 
 Callbacks.CallbacksBackend.prototype.startGraphModification = function() {
     this.pendingQueries = [].concat(this.queriesList);
     this.matchedQueries = [];
 
-    var added = Callbacks['added'];
-    var deleted = Callbacks['deleted'];
+    let added = Callbacks['added'];
+    let deleted = Callbacks['deleted'];
     if(this.updateInProgress == null) {
         this.updateInProgress = {added: [], deleted: []};
     }
@@ -29346,9 +29341,9 @@ Callbacks.CallbacksBackend.prototype.nextGraphModification = function(event, qua
 };
 
 Callbacks.CallbacksBackend.prototype.endGraphModification = function(callback) {
-    var that = this;
+    let that = this;
     if(this.updateInProgress != null) {
-        var tmp = that.updateInProgress;
+        let tmp = that.updateInProgress;
         that.updateInProgress = null;
         this.sendNotification(Callbacks['deleted'], tmp[Callbacks['deleted']],function(){
             that.sendNotification(Callbacks['added'], tmp[Callbacks['added']], function(){
@@ -29369,12 +29364,12 @@ Callbacks.CallbacksBackend.prototype.cancelGraphModification = function() {
 };
 
 Callbacks.CallbacksBackend.prototype.sendNotification = function(event, quadsPairs, doneCallback) {
-    var notificationsMap = {};
-    for(var i=0; i<quadsPairs.length; i++) {
-        var quadPair = quadsPairs[i];
-        for(var indexKey in this.indexMap) {
-            var index = this.indexMap[indexKey];
-            var order = this.componentOrders[indexKey];
+    let notificationsMap = {};
+    for(let i=0; i<quadsPairs.length; i++) {
+        let quadPair = quadsPairs[i];
+        for(let indexKey in this.indexMap) {
+            let index = this.indexMap[indexKey];
+            let order = this.componentOrders[indexKey];
             this._searchCallbacksInIndex(index, order, event, quadPair, notificationsMap);
             if(this.pendingQueries.length != 0) {
                 index = this.queriesIndexMap[indexKey];
@@ -29390,23 +29385,23 @@ Callbacks.CallbacksBackend.prototype.sendNotification = function(event, quadsPai
 };
 
 Callbacks.CallbacksBackend.prototype.sendEmptyNotification = function(event, value, doneCallback) {
-    var callbacks = this.emptyNotificationsMap[event] || [];
-    for(var i=0; i<callbacks.length; i++) {
+    let callbacks = this.emptyNotificationsMap[event] || [];
+    for(let i=0; i<callbacks.length; i++) {
         callbacks[i](event, value);
     }
     doneCallback();
 };
 
 Callbacks.CallbacksBackend.prototype.dispatchNotifications = function(notificationsMap) {
-    for(var callbackId in notificationsMap) {
-        var callback = this.callbacksMap[callbackId];
-        var deleted = notificationsMap[callbackId][Callbacks['deleted']];
+    for(let callbackId in notificationsMap) {
+        let callback = this.callbacksMap[callbackId];
+        let deleted = notificationsMap[callbackId][Callbacks['deleted']];
         if(deleted!=null) {
             try {
                 callback(Callbacks['deleted'],deleted);
             }catch(e){}
         }
-        for(var event in notificationsMap[callbackId]) {
+        for(let event in notificationsMap[callbackId]) {
             if(event!=Callbacks['deleted']) {
                 try{
                     callback(event, notificationsMap[callbackId][event]);
@@ -29418,15 +29413,15 @@ Callbacks.CallbacksBackend.prototype.dispatchNotifications = function(notificati
 };
 
 Callbacks.CallbacksBackend.prototype._searchCallbacksInIndex = function(index, order, event, quadPair, notificationsMap) {
-    var quadPairNomalized = quadPair[1];
+    let quadPairNomalized = quadPair[1];
     var quadPair = quadPair[0];
 
-    for(var i=0; i<(order.length+1); i++) {
-        var matched = index['_'] || [];
+    for(let i=0; i<(order.length+1); i++) {
+        let matched = index['_'] || [];
         
-        var filteredIds = [];
-        for(var j=0; j<matched.length; j++) {
-            var callbackId = matched[j];
+        let filteredIds = [];
+        for(let j=0; j<matched.length; j++) {
+            let callbackId = matched[j];
             if(this.callbacksMap[callbackId] != null) {
                 notificationsMap[callbackId] = notificationsMap[callbackId] || {};
                 notificationsMap[callbackId][event] = notificationsMap[callbackId][event] || [];
@@ -29435,7 +29430,7 @@ Callbacks.CallbacksBackend.prototype._searchCallbacksInIndex = function(index, o
             }
         }
         index['_'] = filteredIds;
-        var component = order[i];
+        let component = order[i];
         if(index[''+quadPairNomalized[component]] != null) {
             index = index[''+quadPairNomalized[component]];
         } else {
@@ -29445,13 +29440,13 @@ Callbacks.CallbacksBackend.prototype._searchCallbacksInIndex = function(index, o
 };
 
 Callbacks.CallbacksBackend.prototype.subscribeEmpty = function(event, callback) {
-    var callbacks = this.emptyNotificationsMap[event] || [];
+    let callbacks = this.emptyNotificationsMap[event] || [];
     callbacks.push(callback);
     this.emptyNotificationsMap[event] = callbacks;
 };
 
 Callbacks.CallbacksBackend.prototype.unsubscribeEmpty = function(event, callback) {
-    var callbacks = this.emptyNotificationsMap[event];
+    let callbacks = this.emptyNotificationsMap[event];
     if(callbacks != null) {
         callbacks = Utils.remove(callbacks, callback);
     }
@@ -29459,18 +29454,18 @@ Callbacks.CallbacksBackend.prototype.unsubscribeEmpty = function(event, callback
 };
 
 Callbacks.CallbacksBackend.prototype.subscribe = function(s,p,o,g,callback, doneCallback) {
-    var quad = this._tokenizeComponents(s,p,o,g);
-    var queryEnv = {blanks:{}, outCache:{}};
+    let quad = this._tokenizeComponents(s,p,o,g);
+    let queryEnv = {blanks:{}, outCache:{}};
     this.engine.registerNsInEnvironment(null, queryEnv);
-    var that = this;
-    var normalized = this.engine.normalizeQuad(quad, queryEnv, true);
-    var pattern =  new QuadIndexCommon.Pattern(normalized);        
-    var indexKey = that._indexForPattern(pattern);
-    var indexOrder = that.componentOrders[indexKey];
-    var index = that.indexMap[indexKey];
-    for(var i=0; i<indexOrder.length; i++) {
-        var component = indexOrder[i];
-        var quadValue = normalized[component];
+    let that = this;
+    let normalized = this.engine.normalizeQuad(quad, queryEnv, true);
+    let pattern =  new QuadIndexCommon.Pattern(normalized);        
+    let indexKey = that._indexForPattern(pattern);
+    let indexOrder = that.componentOrders[indexKey];
+    let index = that.indexMap[indexKey];
+    for(let i=0; i<indexOrder.length; i++) {
+        let component = indexOrder[i];
+        let quadValue = normalized[component];
         if(quadValue === '_') {
             if(index['_'] == null) {
                 index['_'] = [];
@@ -29498,7 +29493,7 @@ Callbacks.CallbacksBackend.prototype.subscribe = function(s,p,o,g,callback, done
 };
 
 Callbacks.CallbacksBackend.prototype.unsubscribe = function(callback) {
-    var id = this.callbacksInverseMap[callback];
+    let id = this.callbacksInverseMap[callback];
     if(id != null) {
         delete this.callbacksInverseMap[callback];
         delete this.callbacksMap[id];
@@ -29506,7 +29501,7 @@ Callbacks.CallbacksBackend.prototype.unsubscribe = function(callback) {
 };
 
 Callbacks.CallbacksBackend.prototype._tokenizeComponents = function(s, p, o, g) {
-    var pattern = {};
+    let pattern = {};
 
     if(s == null) {
         pattern['subject'] = Callbacks.ANYTHING;
@@ -29540,13 +29535,13 @@ Callbacks.CallbacksBackend.prototype._tokenizeComponents = function(s, p, o, g) 
 };
 
 Callbacks.CallbacksBackend.prototype._indexForPattern = function(pattern) {
-    var indexKey = pattern.indexKey;
-    var matchingIndices = this.indices;
+    let indexKey = pattern.indexKey;
+    let matchingIndices = this.indices;
 
-    for(var i=0; i<matchingIndices.length; i++) {
-        var index = matchingIndices[i];
-        var indexComponents = this.componentOrders[index];
-        for(var j=0; j<indexComponents.length; j++) {
+    for(let i=0; i<matchingIndices.length; i++) {
+        let index = matchingIndices[i];
+        let indexComponents = this.componentOrders[index];
+        for(let j=0; j<indexComponents.length; j++) {
             if(Utils.include(indexKey, indexComponents[j])===false) {
                 break;
             }
@@ -29560,7 +29555,7 @@ Callbacks.CallbacksBackend.prototype._indexForPattern = function(pattern) {
 };
 
 Callbacks.CallbacksBackend.prototype.observeNode = function() {
-    var uri,graphUri,callback,doneCallback;
+    let uri,graphUri,callback,doneCallback;
 
     if(arguments.length === 4) {
         uri = arguments[0];
@@ -29573,16 +29568,16 @@ Callbacks.CallbacksBackend.prototype.observeNode = function() {
         callback = arguments[1];
         doneCallback = arguments[2];
     }
-    var query = "CONSTRUCT { <" + uri + "> ?p ?o } WHERE { GRAPH <" + graphUri + "> { <" + uri + "> ?p ?o } }";
-    var that = this;
-    var queryEnv = {blanks:{}, outCache:{}};
+    let query = "CONSTRUCT { <" + uri + "> ?p ?o } WHERE { GRAPH <" + graphUri + "> { <" + uri + "> ?p ?o } }";
+    let that = this;
+    let queryEnv = {blanks:{}, outCache:{}};
     this.engine.registerNsInEnvironment(null, queryEnv);
-    var bindings = [];
+    let bindings = [];
     this.engine.execute(query,  function(success, graph){
         if(success) {
-            var node = graph;
-            var mustFlush = false;
-            var observer = function(event, triples){
+            let node = graph;
+            let mustFlush = false;
+            let observer = function(event, triples){
                 if(event === 'eventsFlushed' && mustFlush ) {
                     mustFlush = false;
                     try {
@@ -29590,11 +29585,11 @@ Callbacks.CallbacksBackend.prototype.observeNode = function() {
                     }catch(e){}
                 } else if(event !== 'eventsFlushed') {
                     mustFlush = true;
-                    for(var i = 0; i<triples.length; i++) {
-                        var triple = triples[i];
-                        var s = RDFJSInterface.buildRDFResource(triple.subject,bindings,that.engine,queryEnv);
-                        var p = RDFJSInterface.buildRDFResource(triple.predicate,bindings,that.engine,queryEnv);
-                        var o = RDFJSInterface.buildRDFResource(triple.object,bindings,that.engine,queryEnv);
+                    for(let i = 0; i<triples.length; i++) {
+                        let triple = triples[i];
+                        let s = RDFJSInterface.buildRDFResource(triple.subject,bindings,that.engine,queryEnv);
+                        let p = RDFJSInterface.buildRDFResource(triple.predicate,bindings,that.engine,queryEnv);
+                        let o = RDFJSInterface.buildRDFResource(triple.object,bindings,that.engine,queryEnv);
                         if(s!=null && p!=null && o!=null) {
                             triple = new RDFJSInterface.Triple(s,p,o);
                             if(event === Callbacks['added']) {
@@ -29624,7 +29619,7 @@ Callbacks.CallbacksBackend.prototype.observeNode = function() {
 };
 
 Callbacks.CallbacksBackend.prototype.stopObservingNode = function(callback) {
-    var observer = this.observersMap[callback];
+    let observer = this.observersMap[callback];
     if(observer) {
         this.unsubscribe(observer);
         this.unsubscribeEmpty(Callbacks['eventsFlushed'],observer);
@@ -29637,36 +29632,36 @@ Callbacks.CallbacksBackend.prototype.stopObservingNode = function(callback) {
 // Queries
 
 Callbacks.CallbacksBackend.prototype.observeQuery = function(query, callback, endCallback) {
-    var queryParsed = this.aqt.parseQueryString(query);
-    var parsedTree = this.aqt.parseSelect(queryParsed.units[0]);
-    var patterns = this.aqt.collectBasicTriples(parsedTree);
-    var that = this;
-    var queryEnv = {blanks:{}, outCache:{}};
+    let queryParsed = this.aqt.parseQueryString(query);
+    let parsedTree = this.aqt.parseSelect(queryParsed.units[0]);
+    let patterns = this.aqt.collectBasicTriples(parsedTree);
+    let that = this;
+    let queryEnv = {blanks:{}, outCache:{}};
     this.engine.registerNsInEnvironment(null, queryEnv);
-    var floop, pattern, quad, indexKey, indexOrder, index;
+    let floop, pattern, quad, indexKey, indexOrder, index;
 
-    var counter = this.queryCounter;
+    let counter = this.queryCounter;
     this.queryCounter++;
     this.queriesMap[counter] = query;
     this.queriesInverseMap[query] = counter;
     this.queriesList.push(counter);
     this.queriesCallbacksMap[counter] = callback;
 
-    for(var i=0; i<patterns.length; i++) {
+    for(let i=0; i<patterns.length; i++) {
         quad = patterns[i];
         if(quad.graph == null) {
             quad.graph = that.engine.lexicon.defaultGraphUriTerm;
         }
 
-        var normalized = that.engine.normalizeQuad(quad, queryEnv, true);
+        let normalized = that.engine.normalizeQuad(quad, queryEnv, true);
         pattern =  new QuadIndexCommon.Pattern(normalized);        
         indexKey = that._indexForPattern(pattern);
         indexOrder = that.componentOrders[indexKey];
         index = that.queriesIndexMap[indexKey];
 
-        for(var j=0; j<indexOrder.length; j++) {
-            var component = indexOrder[j];
-            var quadValue = normalized[component];
+        for(let j=0; j<indexOrder.length; j++) {
+            let component = indexOrder[j];
+            let quadValue = normalized[component];
             if(typeof(quadValue) === 'string') {
                 if(index['_'] == null) {
                     index['_'] = [];
@@ -29699,7 +29694,7 @@ Callbacks.CallbacksBackend.prototype.observeQuery = function(query, callback, en
 };
 
 Callbacks.CallbacksBackend.prototype.stopObservingQuery = function(query) {
-    var id = this.queriesInverseMap[query];
+    let id = this.queriesInverseMap[query];
     if(id != null) {
         delete this.queriesInverseMap[query];
         delete this.queriesMap[id];
@@ -29708,15 +29703,15 @@ Callbacks.CallbacksBackend.prototype.stopObservingQuery = function(query) {
 };
 
 Callbacks.CallbacksBackend.prototype._searchQueriesInIndex = function(index, order, quadPair) {
-    var quadPairNomalized = quadPair[1];
+    let quadPairNomalized = quadPair[1];
     var quadPair = quadPair[0];
 
-    for(var i=0; i<(order.length+1); i++) {
-        var matched = index['_'] || [];
+    for(let i=0; i<(order.length+1); i++) {
+        let matched = index['_'] || [];
         
-        var filteredIds = [];
-        for(var j=0; j<matched.length; j++) {
-            var queryId = matched[j];
+        let filteredIds = [];
+        for(let j=0; j<matched.length; j++) {
+            let queryId = matched[j];
             if(Utils.include(this.pendingQueries,queryId)) {
                 Utils.remove(this.pendingQueries,queryId);
                 this.matchedQueries.push(queryId);
@@ -29728,7 +29723,7 @@ Callbacks.CallbacksBackend.prototype._searchQueriesInIndex = function(index, ord
         }
         index['_'] = filteredIds;
 
-        var component = order[i];
+        let component = order[i];
         if(index[''+quadPairNomalized[component]] != null) {
             index = index[''+quadPairNomalized[component]];
         } else {
@@ -29738,9 +29733,9 @@ Callbacks.CallbacksBackend.prototype._searchQueriesInIndex = function(index, ord
 };
 
 Callbacks.CallbacksBackend.prototype.dispatchQueries = function(callback) {
-    var that = this;
-    var floop, query, queryId, queryCallback;
-    var toDispatchMap = {};
+    let that = this;
+    let floop, query, queryId, queryCallback;
+    let toDispatchMap = {};
 
     Utils.repeat(0, this.matchedQueries.length,
         function(k, env){
@@ -29783,13 +29778,13 @@ var RDFStoreClient = {};
 try {
     if(typeof(Worker)=='undefined') {
         Worker = null;
-    };
+    }
 } catch(e) {
     Worker = null;
 }
 
 // Checks if this is a webworker
-if(!!Worker) {
+if(Worker) {
 
     RDFStoreClient.RDFStoreClient = function(path_to_store_script, args, cb) {
         console.log("trying to load "+path_to_store_script);
@@ -29800,7 +29795,7 @@ if(!!Worker) {
         }
         this.callbacksCounter = 1;
         var that = this;
-        var creationCallback = function(success, result) {
+        let creationCallback = function(success, result) {
             if(success === true) {
                 cb(true, that);
             } else {
@@ -29822,17 +29817,17 @@ if(!!Worker) {
     };
 
     RDFStoreClient.RDFStoreClient.prototype.receive = function(packet) {
-        var event = packet.data || packet;
+        let event = packet.data || packet;
         //console.log("RECEIVED SOMETHING");
         if(event.fn === 'workerRequest:NetworkTransport:load') {
-            var that = this;
-            var workerCallback = event['callback'];
-            var args = event['arguments'].concat(function(success, results){
+            let that = this;
+            let workerCallback = event['callback'];
+            let args = event['arguments'].concat(function(success, results){
                 that.connection.postMessage({'fn':'workerRequestResponse', 'results':[success, results], 'callback':workerCallback});
             });
             NetworkTransport.load.apply(NetworkTransport,args);
         } else {
-            var callbackData = this.callbacks[event.callback];
+            let callbackData = this.callbacks[event.callback];
             //console.log(packet);
             //console.log(callbackData);
             if(callbackData) {
@@ -29853,7 +29848,7 @@ if(!!Worker) {
     };
 
     RDFStoreClient.RDFStoreClient.prototype.registerCallback = function(fn, callback) {
-        var id = ''+this.callbacksCounter;
+        let id = ''+this.callbacksCounter;
         this.callbacks[id] = {'fn':fn, 'cb':callback};
         this.callbacksCounter++;
 
@@ -29872,7 +29867,7 @@ if(!!Worker) {
                                         arguments[3]);
         } else {
 
-            var queryString,callback;
+            let queryString,callback;
 
             if(arguments.length === 1) {
                 queryString = arguments[0];
@@ -29883,7 +29878,7 @@ if(!!Worker) {
                 callback = arguments [1];
             }
 
-            var id = this.registerCallback('execute',callback);
+            let id = this.registerCallback('execute',callback);
 
             this.connection.postMessage({'fn':'execute', 'args':[queryString], 'callback':id});
         }
@@ -29891,9 +29886,9 @@ if(!!Worker) {
     };
 
     RDFStoreClient.RDFStoreClient.prototype.insert = function() {
-        var graph;
-        var triples;
-        var callback;
+        let graph;
+        let triples;
+        let callback;
         if(arguments.length === 1) {
             triples = arguments[0];
             this.connection.postMessage({'fn':'insert', 'args':[triples]})
@@ -29914,8 +29909,8 @@ if(!!Worker) {
     };
 
     RDFStoreClient.RDFStoreClient.prototype.graph = function() {
-        var graphUri = null;
-        var callback = null;
+        let graphUri = null;
+        let callback = null;
         if(arguments.length === 1) {
             callback = arguments[0] || function(){};
         } else if(arguments.length === 2) {
@@ -29925,12 +29920,12 @@ if(!!Worker) {
             throw new Error("An optional graph URI and a callback function must be provided");
         }
 
-        var that = this;
-        var wrapperCallback = function(success, toWrap) {
+        let that = this;
+        let wrapperCallback = function(success, toWrap) {
             //console.log("CALLBACK!\n\n");
             if(success) {
-                var triple;
-                for(var i=0; i<toWrap.triples.length; i++) {
+                let triple;
+                for(let i=0; i<toWrap.triples.length; i++) {
                     triple = toWrap.triples[i];
                     toWrap.triples[i] = new RDFJSInterface.Triple(that.adaptJSInterface(triple.subject),
                                                                   that.adaptJSInterface(triple.predicate),
@@ -29941,7 +29936,7 @@ if(!!Worker) {
                 callback(success,toWrap);
             }
         };
-        var id = this.registerCallback('insert', wrapperCallback);
+        let id = this.registerCallback('insert', wrapperCallback);
         if(graphUri == null) {
             this.connection.postMessage({'fn':'graph', 'args':[], 'callback':id})
         } else {
@@ -29950,9 +29945,9 @@ if(!!Worker) {
     };
 
     RDFStoreClient.RDFStoreClient.prototype.node = function() {
-        var graphUri = null;
-        var callback = null;
-        var nodeUri  = null;
+        let graphUri = null;
+        let callback = null;
+        let nodeUri  = null;
         if(arguments.length === 2) {
             nodeUri = arguments[0];
             callback = arguments[1] || function(){};
@@ -29964,12 +29959,12 @@ if(!!Worker) {
             throw new Error("An optional graph URI and a callback function must be provided");
         }
 
-        var that = this;
-        var wrapperCallback = function(success, toWrap) {
+        let that = this;
+        let wrapperCallback = function(success, toWrap) {
             //console.log("CALLBACK!\n\n");
             if(success) {
-                var triple;
-                for(var i=0; i<toWrap.triples.length; i++) {
+                let triple;
+                for(let i=0; i<toWrap.triples.length; i++) {
                     triple = toWrap.triples[i];
                     toWrap.triples[i] = new RDFJSInterface.Triple(that.adaptJSInterface(triple.subject),
                                                                   that.adaptJSInterface(triple.predicate),
@@ -29980,7 +29975,7 @@ if(!!Worker) {
                 callback(success,toWrap);
             }
         };
-        var id = this.registerCallback('insert', wrapperCallback);
+        let id = this.registerCallback('insert', wrapperCallback);
         if(graphUri == null) {
             this.connection.postMessage({'fn':'node', 'args':[nodeUri], 'callback':id})
         } else {
@@ -30001,9 +29996,9 @@ if(!!Worker) {
 
 
     RDFStoreClient.RDFStoreClient.prototype['delete'] = function() {
-        var graph;
-        var triples;
-        var callback;
+        let graph;
+        let triples;
+        let callback;
         if(arguments.length === 1) {
             triples = arguments[0];
             this.connection.postMessage({'fn':'delete', 'args':[triples]})
@@ -30025,8 +30020,8 @@ if(!!Worker) {
 
 
     RDFStoreClient.RDFStoreClient.prototype.clear = function() {
-        var graph;
-        var callback;
+        let graph;
+        let callback;
      
         if(arguments.length === 1) {
             callback= arguments[0] || function(){};
@@ -30069,10 +30064,10 @@ if(!!Worker) {
     };
 
     RDFStoreClient.RDFStoreClient.prototype.load = function(){
-        var mediaType;
-        var data;
-        var graph;
-        var callback;
+        let mediaType;
+        let data;
+        let graph;
+        let callback;
      
         if(arguments.length === 3) {
             mediaType = arguments[0];
@@ -30094,13 +30089,13 @@ if(!!Worker) {
     };
 
     RDFStoreClient.RDFStoreClient.prototype.startObservingQuery = function() {
-        var query = arguments[0];
-        var callback = arguments[1];
-        var endCallback = arguments[2];
+        let query = arguments[0];
+        let callback = arguments[1];
+        let endCallback = arguments[2];
         if(endCallback!=null) {
             var id1 = this.registerCallback('startObservingQuery', callback);
             this.observingCallbacks[query] = id1;
-            var id2 = this.registerCallback('startObservingQueryEndCb', endCallback);
+            let id2 = this.registerCallback('startObservingQueryEndCb', endCallback);
             this.connection.postMessage({'fn':'startObservingQuery', 'args':[query], 'callback':[id1,id2]})
         } else {
             var id1 = this.registerCallback('startObservingQuery', callback);
@@ -30110,14 +30105,14 @@ if(!!Worker) {
     };
      
     RDFStoreClient.RDFStoreClient.prototype.stopObservingQuery = function(query) {
-        var id = this.observingCallbacks[query];
+        let id = this.observingCallbacks[query];
         delete this.observingCallbacks[query];
         delete this.callbacks[id];
         this.connection.postMessage({'fn':'stopObservingQuery', 'args':[query], 'callback':[]})
     };
 
     RDFStoreClient.RDFStoreClient.prototype.startObservingNode = function() {
-        var uri, graphUri, callback;
+        let uri, graphUri, callback;
 
         if(arguments.length === 2) {
             uri = arguments[0];
@@ -30126,8 +30121,8 @@ if(!!Worker) {
             var that = this;
             var wrapperCallback = function(toWrap) {
                 //console.log("CALLBACK!\n\n");
-                var triple;
-                for(var i=0; i<toWrap.triples.length; i++) {
+                let triple;
+                for(let i=0; i<toWrap.triples.length; i++) {
                     triple = toWrap.triples[i];
                     toWrap.triples[i] = new RDFJSInterface.Triple(that.adaptJSInterface(triple.subject),
                                                                   that.adaptJSInterface(triple.predicate),
@@ -30148,8 +30143,8 @@ if(!!Worker) {
             var that = this;
             var wrapperCallback = function(toWrap) {
                 //console.log("CALLBACK!\n\n");
-                var triple;
-                for(var i=0; i<toWrap.triples.length; i++) {
+                let triple;
+                for(let i=0; i<toWrap.triples.length; i++) {
                     triple = toWrap.triples[i];
                     toWrap.triples[i] = new RDFJSInterface.Triple(that.adaptJSInterface(triple.subject),
                                                                   that.adaptJSInterface(triple.predicate),
@@ -30166,7 +30161,7 @@ if(!!Worker) {
     };
      
     RDFStoreClient.RDFStoreClient.prototype.stopObservingNode = function(callback) {
-        var id = this.observingCallbacks[callback];
+        let id = this.observingCallbacks[callback];
         delete this.observingCallbacks[callback];
         delete this.callbacks[id];
         //console.log("STOP OBSERVING "+id);
@@ -30174,11 +30169,11 @@ if(!!Worker) {
     };
 
     RDFStoreClient.RDFStoreClient.prototype.subscribe = function(s, p, o, g, callback) {
-        var that = this;
-        var wrapperCallback = function(event,triples) {
+        let that = this;
+        let wrapperCallback = function(event,triples) {
             //console.log("CALLBACK!\n\n");
-            var triple;
-            for(var i=0; i<triples.length; i++) {
+            let triple;
+            for(let i=0; i<triples.length; i++) {
                 triple = triples[i];
                 triples[i] = new RDFJSInterface.Triple(that.adaptJSInterface(triple.subject),
                                                        that.adaptJSInterface(triple.predicate),
@@ -30186,14 +30181,14 @@ if(!!Worker) {
             }                
             callback(event,triples);
         };
-        var id = this.registerCallback('subscribe', wrapperCallback);
+        let id = this.registerCallback('subscribe', wrapperCallback);
         this.observingCallbacks[callback] = id;
 
         this.connection.postMessage({'fn':'subscribe', 'args':[s,p,o,g], 'callback':id});
     };
      
     RDFStoreClient.RDFStoreClient.prototype.unsubscribe = function(callback) {
-        var id = this.observingCallbacks[callback];
+        let id = this.observingCallbacks[callback];
         delete this.observingCallbacks[callback];
         delete this.callbacks[id];
         //console.log("STOP OBSERVING "+id);
@@ -30201,13 +30196,13 @@ if(!!Worker) {
     };
          
     RDFStoreClient.RDFStoreClient.prototype.registeredGraphs = function(callback) {
-        var that = this;
-        var wrapperCallback = function(success, graphs) {
+        let that = this;
+        let wrapperCallback = function(success, graphs) {
             //console.log("CALLBACK!\n\n");
             if(success) {
-                var triple;
-                for(var i=0; i<graphs.length; i++) {
-                    var graph = graphs[i];
+                let triple;
+                for(let i=0; i<graphs.length; i++) {
+                    let graph = graphs[i];
                     graphs[i] = that.adaptJSInterface(graph);
                 }                
                 callback(success, graphs);
@@ -30216,7 +30211,7 @@ if(!!Worker) {
             }
         };
 
-        var id = this.registerCallback('registeredGraphs', wrapperCallback);
+        let id = this.registerCallback('registeredGraphs', wrapperCallback);
         this.connection.postMessage({'fn':'registeredGraphs', 'args':[], 'callback':id})
     };
 
@@ -30239,7 +30234,7 @@ if(!!Worker) {
 // end of ./src/js-connection/src/rdfstore_client.js 
 
 // exports
-var Store = {};
+let Store = {};
 
 /**
  * @namespace
@@ -30248,7 +30243,7 @@ var Store = {};
  */
 
 // imports
-var MongodbQueryEngine = { MongodbQueryEngine: function(){ throw 'MongoDB backend not supported in the browser version' } };
+let MongodbQueryEngine = { MongodbQueryEngine: function(){ throw 'MongoDB backend not supported in the browser version' } };
 var RDFStoreClient = RDFStoreClient;
 /**
  * Version of the store
@@ -30279,7 +30274,7 @@ Store.VERSION = "0.8.1";
  * @param {Function} callback Callback function that will be invoked with an error flag and the connection/store object.
  */
 Store.connect = function() {
-    var path, args, callback;
+    let path, args, callback;
     if(arguments.length == 1) {
         path = __dirname;
         args = {};
@@ -30299,7 +30294,7 @@ Store.connect = function() {
         callback = arguments[2];
     }
     try {
-        if(!!Worker) {
+        if(Worker) {
             new RDFStoreClient.RDFStoreClient(path, args, function(success,connection) {
                 callback(success, connection);
             });
@@ -30341,7 +30336,7 @@ Store.create = function(){
         return new Store.Store(arguments[0], arguments[1]);
     } else {
         return new Store.Store();
-    };
+    }
 };
 
 /**
@@ -30366,8 +30361,8 @@ Store.create = function(){
  * </ul>
  */
 Store.Store = function(arg1, arg2) {
-    var callback = null;
-    var params   = null;
+    let callback = null;
+    let params   = null;
 
     if(arguments.length == 0) {
         params ={};
@@ -30387,7 +30382,7 @@ Store.Store = function(arg1, arg2) {
 
     this.functionMap = {};
 
-    var that = this;
+    let that = this;
     this.customFns = {};
     if(params['engine']==='mongodb') {
         this.isMongodb = true;
@@ -30506,7 +30501,7 @@ Store.Store.prototype.execute = function() {
                                     arguments[3]);
     } else {
 
-        var queryString;
+        let queryString;
         var callback;
      
         if(arguments.length === 1) {
@@ -30533,7 +30528,7 @@ Store.Store.prototype.execute = function() {
  * @param {Function} [callback]
  */
 Store.Store.prototype.executeWithEnvironment = function() {
-    var queryString, defaultGraphs, namedGraphs;
+    let queryString, defaultGraphs, namedGraphs;
 
     if(arguments.length === 3) {
         queryString   = arguments[0];
@@ -30547,8 +30542,8 @@ Store.Store.prototype.executeWithEnvironment = function() {
         defaultGraphs = arguments[1];
         namedGraphs   = arguments[2];
     }
-    var defaultGraphsNorm = [];
-    var namedGraphsNorm = [];
+    let defaultGraphsNorm = [];
+    let namedGraphsNorm = [];
     for(var i=0; i<defaultGraphs.length; i++) {
         defaultGraphsNorm.push({'token':'uri','value':defaultGraphs[i]})
     }
@@ -30574,8 +30569,8 @@ Store.Store.prototype.executeWithEnvironment = function() {
  * @param {Functon} callback
  */
 Store.Store.prototype.graph = function() {
-    var graphUri = null;
-    var callback = null;
+    let graphUri = null;
+    let callback = null;
     if(arguments.length === 1) {
         callback = arguments[0] || function(){};
         graphUri = this.engine.lexicon.defaultGraphUri;
@@ -30614,9 +30609,9 @@ Store.Store.prototype.graph = function() {
  * @param {Functon} callback
  */
 Store.Store.prototype.node = function() {
-    var graphUri = null;
-    var callback = null;
-    var nodeUri  = null;
+    let graphUri = null;
+    let callback = null;
+    let nodeUri  = null;
     if(arguments.length === 2) {
         nodeUri = arguments[0];
         callback = arguments[1] || function(){};
@@ -30665,7 +30660,7 @@ Store.Store.prototype.node = function() {
  * @param {Function} [callback] Function that will be invoked, once the event listener had been correctly set up.
  */
 Store.Store.prototype.startObservingNode = function() {
-    var uri, graphUri, callback;
+    let uri, graphUri, callback;
 
     if(arguments.length === 2) {
         uri = arguments[0];
@@ -30712,9 +30707,9 @@ Store.Store.prototype.stopObservingNode = function(callback) {
  * @param {Function} [callback] optional function that will be invoked when the stored had set up the event listener function.
  */
 Store.Store.prototype.startObservingQuery = function() {
-    var query = arguments[0];
-    var callback = arguments[1];
-    var endCallback = arguments[2];
+    let query = arguments[0];
+    let callback = arguments[1];
+    let endCallback = arguments[2];
     if(endCallback!=null) {
         this.engine.callbacksBackend.observeQuery(query, callback, endCallback);
     } else {
@@ -30757,17 +30752,17 @@ Store.Store.prototype.stopObservingQuery = function(query) {
  * @param {Function} event listener function that will be notified when a change occurs
  */
 Store.Store.prototype.subscribe = function(s, p, o, g, callback) {
-    var that = this;
-    var adapterCb = function(event,triples){
-        var acum = [];
-        var queryEnv = {blanks:{}, outCache:{}};
-        var bindings = [];
+    let that = this;
+    let adapterCb = function(event,triples){
+        let acum = [];
+        let queryEnv = {blanks:{}, outCache:{}};
+        let bindings = [];
 
-        for(var i=0; i<triples.length; i++) {
-            var triple = triples[i];
-            var s = RDFJSInterface.buildRDFResource(triple.subject,bindings,that.engine,queryEnv);
-            var p = RDFJSInterface.buildRDFResource(triple.predicate,bindings,that.engine,queryEnv);
-            var o = RDFJSInterface.buildRDFResource(triple.object,bindings,that.engine,queryEnv);
+        for(let i=0; i<triples.length; i++) {
+            let triple = triples[i];
+            let s = RDFJSInterface.buildRDFResource(triple.subject,bindings,that.engine,queryEnv);
+            let p = RDFJSInterface.buildRDFResource(triple.predicate,bindings,that.engine,queryEnv);
+            let o = RDFJSInterface.buildRDFResource(triple.object,bindings,that.engine,queryEnv);
             if(s!=null && p!=null && o!=null) {
                 triple = new RDFJSInterface.Triple(s,p,o);
                 acum.push(triple);
@@ -30790,7 +30785,7 @@ Store.Store.prototype.subscribe = function(s, p, o, g, callback) {
  * @param {Function} callback The event listener to be removed
  */
 Store.Store.prototype.unsubscribe = function(callback) {
-    var adapterCb = this.functionMap[callback];
+    let adapterCb = this.functionMap[callback];
     this.engine.callbacksBackend.unsubscribe(adapterCb);
     delete this.functionMap[callback];
 };
@@ -30838,9 +30833,9 @@ Store.Store.prototype.setDefaultPrefix = function(uri) {
  * @param {String} [callback] A callback function that will be invoked with a success notification and the number of triples inserted
  */ 
 Store.Store.prototype.insert = function() {
-    var graph;
-    var triples;
-    var callback;
+    let graph;
+    let triples;
+    let callback;
     if(arguments.length === 1) {
         triples = arguments[0];
         callback= function(){};
@@ -30855,8 +30850,8 @@ Store.Store.prototype.insert = function() {
         throw new Error("The triples to insert, an optional graph and callback must be provided");
     }
 
-    var query = "";
-    var that = this;
+    let query = "";
+    let that = this;
     triples.forEach(function(triple) {
         query = query + that._nodeToQuery(triple.subject) + that._nodeToQuery(triple.predicate) + that._nodeToQuery(triple.object) + ".";
     });
@@ -30872,7 +30867,7 @@ Store.Store.prototype.insert = function() {
 
 Store.Store.prototype._nodeToQuery = function(term) {
     if(term.interfaceName === 'NamedNode') {
-        var resolvedUri = this.rdf.resolve(term.valueOf());
+        let resolvedUri = this.rdf.resolve(term.valueOf());
         if(resolvedUri != null) {
             return "<" + resolvedUri + ">";
         } else {
@@ -30902,9 +30897,9 @@ Store.Store.prototype._nodeToQuery = function(term) {
  */ 
 Store.Store.prototype['delete'] = function() {
 
-    var graph;
-    var triples;
-    var callback;
+    let graph;
+    let triples;
+    let callback;
     if(arguments.length === 1) {
         triples = arguments[0];
         callback= function(){};
@@ -30919,8 +30914,8 @@ Store.Store.prototype['delete'] = function() {
         throw new Error("The triples to delete, an optional graph and callback must be provided");
     }
 
-    var query = "";
-    var that = this;
+    let query = "";
+    let that = this;
     triples.forEach(function(triple) {
         query = query + that._nodeToQuery(triple.subject) + that._nodeToQuery(triple.predicate) + that._nodeToQuery(triple.object) + ".";
     });
@@ -30948,7 +30943,7 @@ Store.Store.prototype['delete'] = function() {
  * @param {Function} [callback] a function that will be invoked with a success notification
  */
 Store.Store.prototype.clear = function() {
-    var graph;
+    let graph;
     var callback;
 
     if(arguments.length === 0) {
@@ -30964,7 +30959,7 @@ Store.Store.prototype.clear = function() {
         throw new Error("The optional graph and a callback must be provided");
     }
 
-    var query = "CLEAR GRAPH " + this._nodeToQuery(graph);
+    let query = "CLEAR GRAPH " + this._nodeToQuery(graph);
     this.engine.execute(query, callback);
 };
 
@@ -31001,8 +30996,8 @@ Store.Store.prototype.registerDefaultNamespace = function(ns, prefix) {
  * specification in the default Profile.
  */
 Store.Store.prototype.registerDefaultProfileNamespaces = function() {
-    var defaultNsMap = this.rdf.prefixes.values();
-    for (var p in defaultNsMap) {
+    let defaultNsMap = this.rdf.prefixes.values();
+    for (let p in defaultNsMap) {
         this.registerDefaultNamespace(p,defaultNsMap[p]);
     }
 };
@@ -31033,11 +31028,11 @@ Store.Store.prototype.registerDefaultProfileNamespaces = function() {
  * @param {Function} callback that will be invoked with a success notification and the number of triples loaded.
  */
 Store.Store.prototype.load = function(){
-    var mediaType;
-    var data;
-    var graph;
-    var callback;
-    var options = {};
+    let mediaType;
+    let data;
+    let graph;
+    let callback;
+    let options = {};
 
     if(arguments.length === 3) {
         graph = this.rdf.createNamedNode(this.engine.lexicon.defaultGraphUri);
@@ -31062,17 +31057,17 @@ Store.Store.prototype.load = function(){
 
     if(mediaType === 'remote') {
         data = this.rdf.createNamedNode(data);
-        var query = "LOAD <"+data.valueOf()+"> INTO GRAPH <"+graph.valueOf()+">";
+        let query = "LOAD <"+data.valueOf()+"> INTO GRAPH <"+graph.valueOf()+">";
         this.engine.execute(query, callback);
     } else {
 
-        var that = this;
+        let that = this;
 
-        var parser = this.engine.rdfLoader.parsers[mediaType];
+        let parser = this.engine.rdfLoader.parsers[mediaType];
 
         if (!parser) return callback(false, 0);
 
-        var cb = function(success, quads) {
+        let cb = function(success, quads) {
             if(success) {
                 that.engine.batchLoad(quads,callback);
             } else {
@@ -31080,7 +31075,7 @@ Store.Store.prototype.load = function(){
             }
         };
 
-        var args = [parser, {'token':'uri', 'value':graph.valueOf()}, data, options, cb];
+        let args = [parser, {'token':'uri', 'value':graph.valueOf()}, data, options, cb];
 
         if(data && typeof(data)==='string' && data.indexOf('file://')=== 0) {
           this.engine.rdfLoader.loadFromFile.apply(null, args);
@@ -31128,21 +31123,21 @@ Store.Store.prototype.registerParser = function(mediaType, parser) {
 Store.Store.prototype.registeredGraphs = function(callback) {
     if(this.isMongodb) {
         this.engine.registeredGraphs(true, function(graphs){
-            var acum = [];
-            for(var i=0; i<graphs.length; i++) {
-                var graph = graphs[i];
-                var uri = new RDFJSInterface.NamedNode(graph);
+            let acum = [];
+            for(let i=0; i<graphs.length; i++) {
+                let graph = graphs[i];
+                let uri = new RDFJSInterface.NamedNode(graph);
                 acum.push(uri);
             }
             
             return callback(true, acum);    
         });
     } else {
-        var graphs = this.engine.lexicon.registeredGraphs(true);
-        var acum = [];
-        for(var i=0; i<graphs.length; i++) {
-            var graph = graphs[i];
-            var uri = new RDFJSInterface.NamedNode(graph);
+        let graphs = this.engine.lexicon.registeredGraphs(true);
+        let acum = [];
+        for(let i=0; i<graphs.length; i++) {
+            let graph = graphs[i];
+            let uri = new RDFJSInterface.NamedNode(graph);
             acum.push(uri);
         }
      
@@ -31209,7 +31204,7 @@ Store.Store.prototype.close = function(cb) {
     RDFStoreWorker.workerCallbacksCounter = 0;
     RDFStoreWorker.workerCallbacks = {};
     RDFStoreWorker.registerCallback = function(cb) {
-        var nextId = ""+RDFStoreWorker.workerCallbacksCounter;
+        let nextId = ""+RDFStoreWorker.workerCallbacksCounter;
         RDFStoreWorker.workerCallbacksCounter++;
         RDFStoreWorker.workerCallbacks[nextId] = cb;
         return nextId;
@@ -31221,7 +31216,7 @@ Store.Store.prototype.close = function(cb) {
         if(typeof(NetworkTransport) != 'undefined'  && NetworkTransport != null) {
             NetworkTransport = {
                 load: function(uri, graph, callback) {
-                    var cbId = RDFStoreWorker.registerCallback(function(results){
+                    let cbId = RDFStoreWorker.registerCallback(function(results){
                         callback.apply(callback,results);
                     });
                     postMessage({'fn':'workerRequest:NetworkTransport:load','callback':cbId, 'arguments':[uri,graph]});
@@ -31233,7 +31228,7 @@ Store.Store.prototype.close = function(cb) {
             }
         }
 
-        var args = [argsObject];
+        let args = [argsObject];
         //console.log("in handling create");
         args.push(function(result){
             //console.log("created!!!");
@@ -31248,11 +31243,11 @@ Store.Store.prototype.close = function(cb) {
     };
 
     RDFStoreWorker.receive = function(packet) {
-        var msg = packet.data || packet;
+        let msg = packet.data || packet;
         //console.log("RECEIVED...");
         if(msg.fn === 'workerRequestResponse') {
-            var cbId = msg.callback;
-            var callback = RDFStoreWorker.workerCallbacks[cbId];
+            let cbId = msg.callback;
+            let callback = RDFStoreWorker.workerCallbacks[cbId];
             if(callback != null) {
                 delete RDFStoreWorker.workerCallbacks[cbId];
                 callback(msg.results);
@@ -31293,9 +31288,9 @@ Store.Store.prototype.close = function(cb) {
                         postMessage({'callback':msg.callback, 'result':result, 'success':success});
                     }
                 });
-                var triple;
-                var toWrap = msg.args[0];
-                for(var i=0; i<toWrap.triples.length; i++) {
+                let triple;
+                let toWrap = msg.args[0];
+                for(let i=0; i<toWrap.triples.length; i++) {
                     triple = toWrap.triples[i];
                     toWrap.triples[i] = new RDFJSInterface.Triple(RDFStoreWorker.adaptJSInterface(triple.subject),
                                                                   RDFStoreWorker.adaptJSInterface(triple.predicate),
@@ -31419,4 +31414,6 @@ Store.Store.prototype.close = function(cb) {
 try {
   window.rdfstore = Store;
 } catch(e) { }
+
+module.exports = Store
 })();

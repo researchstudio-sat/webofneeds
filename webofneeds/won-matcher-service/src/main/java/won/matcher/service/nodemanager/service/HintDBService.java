@@ -33,6 +33,6 @@ public class HintDBService {
     }
 
     private String getHintIdentificationString(HintEvent hint) {
-        return hint.getFromAtomUri() + hint.getFromWonNodeUri() + hint.getToAtomUri() + hint.getToWonNodeUri();
+        return hint.getIdentifyingString();
     }
 }

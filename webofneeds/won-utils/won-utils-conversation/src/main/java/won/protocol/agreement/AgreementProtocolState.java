@@ -932,7 +932,8 @@ public class AgreementProtocolState {
                 case HINT_FEEDBACK_MESSAGE:
                 case DEACTIVATE:
                 case ACTIVATE:
-                case HINT_MESSAGE:
+                case ATOM_HINT_MESSAGE:
+                case SOCKET_HINT_MESSAGE:
                     if (!message.isAcknowledgedLocally()) {
                         notAcknowledged(copy, message);
                     }

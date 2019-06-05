@@ -4,7 +4,7 @@ import wonInput from "../../../directives/input.js";
 
 import suggestpostPickerModule from "./suggestpost-picker.js";
 
-import "style/_paypalpaymentpicker.scss";
+import "~/style/_paypalpaymentpicker.scss";
 
 const serviceDependencies = ["$scope", "$element"];
 function genComponentConf() {

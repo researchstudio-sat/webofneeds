@@ -28,6 +28,7 @@ public class AtomPojo {
     private Collection<URI> types;
     private Collection<URI> seeksTypes;
     private Coordinate location;
+    private Coordinate jobLocation;
     @JsonIgnore
     private ZonedDateTime creationZonedDateTime;
     private String creationDate;
@@ -52,6 +53,7 @@ public class AtomPojo {
         creationZonedDateTime = atom.getCreationDate();
         creationDate = creationZonedDateTime.toString();
         location = atom.getLocationCoordinate();
+        jobLocation = atom.getJobLocationCoordinate();
         flags = atom.getAllFlags();
         types = atom.getContentTypes();
         seeksTypes = atom.getSeeksTypes();
@@ -93,6 +95,14 @@ public class AtomPojo {
 
     public void setLocation(Coordinate location) {
         this.location = location;
+    }
+
+    public Coordinate getJobLocation() {
+        return jobLocation;
+    }
+
+    public void setJobLocation(Coordinate jobLocation) {
+        this.jobLocation = jobLocation;
     }
 
     public ZonedDateTime getCreationZonedDateTime() {

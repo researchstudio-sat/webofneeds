@@ -294,7 +294,7 @@ export function connectionsOpen(connectionUri, textMessage) {
 
     dispatch(
       actionCreators.router__stateGoCurrent({
-        connectionUri: optimisticEvent.getSender(),
+        connectionUri: optimisticEvent.getSenderConnection(),
       })
     );
   };
@@ -432,9 +432,9 @@ function connectAdHoc(theirAtomUri, textMessage, persona, dispatch, getState) {
       content: {
         responseToUri: theirAtomUri,
         flags: [
-          "won:DirectResponse",
-          "won:NoHintForCounterpart",
-          "won:NoHintForMe",
+          "con:DirectResponse",
+          "match:NoHintForCounterpart",
+          "match:NoHintForMe",
         ],
       },
     };
@@ -578,7 +578,7 @@ export function connectionsClose(connectionUri) {
 export function connectionsCloseRemote(message) {
   //Closes the 'targetConnection' again, if closeConnections(...) only closes the 'own' connection
   return dispatch => {
-    const connectionUri = message.getSender();
+    const connectionUri = message.getSenderConnection();
     const targetAtomUri = message.getSenderAtom();
     const remoteNode = message.getSenderNode();
     const ownedAtomUri = message.getRecipientAtom();

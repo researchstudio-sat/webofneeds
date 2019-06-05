@@ -1237,6 +1237,24 @@ public class RdfUtils {
         return Optional.ofNullable(result);
     }
 
+    public static <T> Optional<T> getFirstStatementMapped(final Dataset dataset, final URI subject, final URI predicate,
+                    final URI object, Function<Statement, T> resultMapper) {
+        T result = RdfUtils.findFirst(dataset, new ModelVisitor<T>() {
+            @Override
+            public T visit(Model model) {
+                Resource subj = subject == null ? null : model.getResource(subject.toString());
+                Property pred = predicate == null ? null : model.getProperty(predicate.toString());
+                RDFNode obj = object == null ? null : model.getResource(object.toString());
+                StmtIterator it = model.listStatements(subj, pred, obj);
+                if (it.hasNext()) {
+                    return resultMapper.apply(it.next());
+                }
+                return null;
+            }
+        });
+        return Optional.ofNullable(result);
+    }
+
     /**
      * Evaluates the specified path in each model of the specified dataset, starting
      * with the specified resourceURI.

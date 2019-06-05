@@ -13,7 +13,7 @@ export const sightseeing = {
   draft: {
     ...mergeInEmptyDraft({
       content: {
-        type: ["won:SightSeeing"],
+        type: ["demo:SightSeeing"],
         tags: ["sightseeing"],
         searchString: "sightseeing",
       },

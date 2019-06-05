@@ -1,3 +1,5 @@
+@prefix con:   <https://w3id.org/won/content#> .
+@prefix match:   <https://w3id.org/won/matching#> .
 @prefix msg:   <https://w3id.org/won/message#> .
 @prefix conn:  <https://satvm05.researchstudio.at/won/resource/connection/> .
 @prefix atom:  <https://satvm05.researchstudio.at/won/resource/atom/> .
@@ -33,14 +35,14 @@
     atom:1196850096998977500
             a             won:Atom ;
             won:socket  won:ChatSocket ;
-            won:seeks     [ dc:title         "Taxi" ;
+            match:seeks     [ dc:title         "Taxi" ;
                             s:location  [ a                   s:Place ;
-                                               won:boundingBox  [
-                                                                    won:northWestCorner  [ a            s:GeoCoordinates ;
+                                               con:boundingBox  [
+                                                                    con:northWestCorner  [ a            s:GeoCoordinates ;
                                                                                                s:latitude   "48.218727" ;
                                                                                                s:longitude  "16.360141"
                                                                                              ] ;
-                                                                    won:southEastCorner  [ a            s:GeoCoordinates ;
+                                                                    con:southEastCorner  [ a            s:GeoCoordinates ;
                                                                                                s:latitude   "48.218828" ;
                                                                                                s:longitude  "16.360241"
                                                                                              ]

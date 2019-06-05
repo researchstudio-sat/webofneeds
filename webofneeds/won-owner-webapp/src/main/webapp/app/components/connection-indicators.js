@@ -8,17 +8,15 @@ import "ng-redux";
 import { labels } from "../won-label-utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { getPosts, getOwnedPosts } from "../selectors/general-selectors.js";
-import { getChatConnectionsByAtomUri } from "../selectors/connection-selectors.js";
+import * as connectionSelectors from "../selectors/connection-selectors.js";
+import * as connectionUtils from "../connection-utils.js";
+import * as atomUtils from "../atom-utils.js";
 
-import { attach, sortByDate, getIn } from "../utils.js";
+import { attach, sortByDate, getIn, get } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
-import {
-  isChatConnection,
-  isGroupChatConnection,
-} from "../connection-utils.js";
 
-import "style/_connection-indicators.scss";
+import "~/style/_connection-indicators.scss";
 
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
@@ -53,7 +51,8 @@ function genComponentConf() {
         const allPosts = getPosts(state);
         const ownedPost = ownedPosts && ownedPosts.get(this.atomUri);
         const chatConnectionsByAtomUri =
-          this.atomUri && getChatConnectionsByAtomUri(state, this.atomUri);
+          this.atomUri &&
+          connectionSelectors.getChatConnectionsByAtomUri(state, this.atomUri);
 
         const connected =
           chatConnectionsByAtomUri &&
@@ -64,14 +63,16 @@ function genComponentConf() {
               allPosts &&
               allPosts.get(targetAtomUri) &&
               (getIn(state, ["process", "atoms", targetAtomUri, "loading"]) ||
-                allPosts.getIn([targetAtomUri, "state"]) ===
-                  won.WON.ActiveCompacted);
+                atomUtils.isActive(get(allPosts, targetAtomUri)));
 
             return (
               targetAtomActiveOrLoading &&
-              (isChatConnection(conn) || isGroupChatConnection(conn)) &&
-              conn.get("state") !== won.WON.Suggested &&
-              conn.get("state") !== won.WON.Closed
+              (connectionSelectors.isChatToXConnection(allPosts, conn) ||
+                connectionSelectors.isGroupToXConnection(allPosts, conn)) &&
+              !(
+                connectionUtils.isSuggested(conn) ||
+                connectionUtils.isClosed(conn)
+              )
             );
           });
 

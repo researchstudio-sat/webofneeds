@@ -2,7 +2,7 @@ import angular from "angular";
 import { attach } from "../../../utils.js";
 import atomMapModule from "../../atom-map.js";
 
-import "style/_travel-action-viewer.scss";
+import "~/style/_travel-action-viewer.scss";
 
 const serviceDependencies = ["$scope", "$element"];
 function genComponentConf() {

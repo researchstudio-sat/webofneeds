@@ -40,3 +40,11 @@ then
 	echo "Error: $confdir does not seem to be a valid conf directory for $0" >&2
 	exit 3	
 fi
+
+oldforms_file=${confdir}/oldforms.txt
+newforms_file=${confdir}/newforms.txt
+oldforms_file_expanded=${confdir}/generated/oldforms-expanded.txt
+newforms_file_expanded=${confdir}/generated/newforms-expanded.txt
+sed_script_file=${confdir}/generated/sed-changefile-regexes.txt
+sed_script_file_db_migration=${confdir}/generated/sed-db-migration-regexes.txt
+grep_script_file=${confdir}/generated/grep-checkfile-regex.txt

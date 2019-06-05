@@ -23,19 +23,21 @@ export const bandSearch = {
     ...mergeInEmptyDraft({
       content: {
         title: "I'm looking for a band!",
-        type: ["won:Musician"],
+        type: ["demo:Musician"],
       },
       seeks: {
         type: ["s:MusicGroup"],
       },
     }),
   },
+  reactionUseCases: ["musicianSearch"],
   details: {
     title: { ...details.title },
     description: { ...details.description },
     instruments: {
       ...instrumentsDetail,
     },
+    images: { ...details.images },
   },
   seeksDetails: {
     description: { ...details.description },
@@ -50,24 +52,24 @@ export const bandSearch = {
     const genresSQ = tagOverlapScoreSubQuery({
       resultName: resultName,
       bindScoreAs: "?genres_jaccardIndex",
-      pathToTags: "won:genres",
+      pathToTags: "demo:genre",
       prefixesInPath: {
         s: won.defaultContext["s"],
         won: won.defaultContext["won"],
       },
-      tagLikes: getIn(draft, ["seeks", "genres"]),
+      tagLikes: getIn(draft, ["seeks", "genre"]),
     });
 
     // instruments
     const instrumentsSQ = tagOverlapScoreSubQuery({
       resultName: resultName,
       bindScoreAs: "?instruments_jaccardIndex",
-      pathToTags: "won:seeks/won:instruments",
+      pathToTags: "match:seeks/demo:instrument",
       prefixesInPath: {
         s: won.defaultContext["s"],
         won: won.defaultContext["won"],
       },
-      tagLikes: getIn(draft, ["content", "instruments"]),
+      tagLikes: getIn(draft, ["content", "instrument"]),
     });
 
     const vicinityScoreSQ = vicinityScoreSubQuery({
@@ -77,6 +79,7 @@ export const bandSearch = {
       prefixesInPath: {
         s: won.defaultContext["s"],
         won: won.defaultContext["won"],
+        con: won.defaultContext["con"],
       },
 
       geoCoordinates: getIn(draft, ["seeks", "location"]),

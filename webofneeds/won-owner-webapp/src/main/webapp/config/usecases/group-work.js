@@ -8,7 +8,7 @@ import { postdocSearch } from "./uc-postdoc-search.js";
 export const workGroup = {
   identifier: "workgroup",
   label: "Jobs",
-  icon: undefined,
+  icon: "#ico36_uc_consortium-search", //TODO proper icon
   subItems: {
     jobSearch: jobSearch,
     jobOffer: jobOffer,
