@@ -110,7 +110,7 @@ const template = (
           current-location="self.currentLocation"
           ng-repeat="atomUri in self.sortedOwnedInactiveAtomUriArray track by atomUri"
           show-suggestions="::false"
-          show-persona="::true"
+          show-persona="::false"
         />
       </div>
     </main>
