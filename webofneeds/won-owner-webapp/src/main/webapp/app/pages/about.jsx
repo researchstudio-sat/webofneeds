@@ -4,6 +4,7 @@ import angular from "angular";
 import Immutable from "immutable";
 import ngAnimate from "angular-animate";
 import compareToModule from "../directives/compareTo.js";
+import howToModule from "../components/howto.js";
 import accordionModule from "../components/accordion.js";
 import flexGridModule from "../components/flexgrid.js";
 import { attach, get, getIn, toAbsoluteURL } from "../utils.js";
@@ -75,100 +76,10 @@ const template = (
           </span>
         </div>
       </section>
-      <section
+      <won-how-to
         className="about__howto"
         ng-if="!self.visibleSection || self.visibleSection === 'aboutHowTo'"
-      >
-        <h1 className="about__howto__title">How it works</h1>
-        <h3 className="about__howto__subtitle">
-          {"in {{ self.howItWorksSteps.length }} Steps"}
-        </h3>
-        <div className="about__howto__steps">
-          <div
-            className="about__howto__steps__process"
-            ng-style="{'--howToColCount': self.howItWorksSteps.length}"
-          >
-            {/* TODO: this var injection does not work*/}
-            <svg
-              className="about__howto__steps__process__icon"
-              ng-class="{'about__howto__steps__process__icon--selected': $index == self.selectedHowItWorksStep}"
-              ng-repeat="item in self.howItWorksSteps"
-              ng-click="self.selectedHowItWorksStep = $index"
-            >
-              <use
-                xlinkHref="{{ self.getSvgIconFromItem(item) }}"
-                href="{{ self.getSvgIconFromItem(item) }}"
-              />
-            </svg>
-            <div
-              className="about__howto__steps__process__stepcount"
-              ng-repeat="item in self.howItWorksSteps"
-              ng-class="{'about__howto__steps__process__stepcount--selected': $index == self.selectedHowItWorksStep}"
-              ng-click="self.selectedHowItWorksStep = $index"
-            >
-              {"{{ $index + 1 }}"}
-            </div>
-            <div className="about__howto__steps__process__stepline" />
-          </div>
-          <svg
-            className="about__howto__steps__button about__howto__steps__button--prev"
-            ng-class="{'about__howto__steps__button--invisible': self.selectedHowItWorksStep <= 0}"
-            ng-click="self.selectedHowItWorksStep = self.selectedHowItWorksStep - 1"
-          >
-            <use xlinkHref="#ico36_backarrow" href="#ico36_backarrow" />
-          </svg>
-          <div className="about__howto__steps__detail">
-            <div className="about__howto__detail__title">
-              {"{{ self.howItWorksSteps[self.selectedHowItWorksStep].title }}"}
-            </div>
-            <div className="about__howto__steps__detail__text">
-              {"{{ self.howItWorksSteps[self.selectedHowItWorksStep].text }}"}
-            </div>
-          </div>
-          <svg
-            className="about__howto__steps__button about__howto__steps__button--next"
-            ng-class="{'about__howto__steps__button--invisible': self.selectedHowItWorksStep >= (self.howItWorksSteps.length-1)}"
-            ng-click="self.selectedHowItWorksStep = self.selectedHowItWorksStep + 1"
-          >
-            <use xlinkHref="#ico36_backarrow" href="#ico36_backarrow" />
-          </svg>
-        </div>
-        <h2 className="about__howto__title">Ready to start?</h2>
-        <h3 className="about__howto__subtitle">
-          {"Post your atom or offer and let {{ self.appTitle }} do the rest"}
-        </h3>
-        <div className="about__howto__createx">
-          <button
-            className="won-button--filled red about__howto__createx__button"
-            ng-click="self.viewWhatsAround()"
-          >
-            <svg className="won-button-icon" style="--local-primary:white;">
-              <use
-                xlinkHref="#ico36_location_current"
-                href="#ico36_location_current"
-              />
-            </svg>
-            <span>{"What's in your Area?"}</span>
-          </button>
-          <button
-            className="won-button--filled red about__howto__createx__button"
-            ng-click="self.viewWhatsNew()"
-          >
-            <span>{"What's new?"}</span>
-          </button>
-          <won-labelled-hr
-            label="::'Or'"
-            className="about__howto__createx__labelledhr"
-          />
-          <button
-            className="won-button--filled red about__howto__createx__spanbutton"
-            ng-click="self.router__stateGo('create')"
-            ng-disabled="self.processingPublish"
-          >
-            <span>Post something now!</span>
-          </button>
-        </div>
-      </section>
+      />
       <section
         className="about__privacyPolicy"
         ng-if="!self.visibleSection || self.visibleSection === 'aboutPrivacyPolicy'"
@@ -218,36 +129,6 @@ const serviceDependencies = [
   "$ngRedux",
   "$state",
   "$scope" /*'$routeParams' /*injections as strings here*/,
-];
-
-const howItWorksSteps = [
-  {
-    svgSrc: "#ico36_description",
-    title: "Post your atom anonymously",
-    text:
-      "Atoms can be very personal, so privacy is important. You don't have to reveal your identity here.",
-  },
-  {
-    svgSrc: "#ico36_match",
-    title: "Get matches",
-    text:
-      "Based on the" +
-      " information you provide, we will try to connect you with others",
-  },
-  {
-    svgSrc: "#ico36_incoming",
-    title: "Request contact – or be contacted",
-    text:
-      "If you're interested," +
-      " make a contact request - or get one if your counterpart is faster than you",
-  },
-  {
-    svgSrc: "#ico36_message",
-    title: "Interact and exchange",
-    text:
-      "You found someone" +
-      " who has what you need, wants to meet or change something in your common environment? Go chat with them! ",
-  },
 ];
 
 const peopleGrid = ({ themeName }) => [
@@ -400,11 +281,9 @@ class AboutController {
       const visibleSection = generalSelectors.getAboutSectionFromRoute(state);
       const themeName = getIn(state, ["config", "theme", "name"]);
       return {
-        isLocationAccessDenied: generalSelectors.isLocationAccessDenied(state),
         loggedIn: accountUtils.isLoggedIn(get(state, "account")),
         themeName,
         visibleSection,
-        appTitle: getIn(state, ["config", "theme", "title"]),
         tosTemplate:
           "./skin/" +
           themeName +
@@ -421,7 +300,6 @@ class AboutController {
           "/" +
           getIn(state, ["config", "theme", "privacyPolicyTemplate"]),
         peopleGrid: peopleGrid({ themeName }),
-        processingPublish: state.getIn(["process", "processingPublish"]),
         showModalDialog: state.getIn(["view", "showModalDialog"]),
         showSlideIns:
           viewSelectors.hasSlideIns(state) && viewSelectors.showSlideIns(state),
@@ -433,67 +311,11 @@ class AboutController {
 
     this.questions = questions;
     this.peopleGrid = [];
-    this.howItWorksSteps = howItWorksSteps;
-    this.selectedHowItWorksStep = 0;
     this.moreInfo = false;
   }
 
   toggleMoreInfo() {
     this.moreInfo = !this.moreInfo;
-  }
-
-  getSvgIconFromItem(item) {
-    return item.svgSrc ? item.svgSrc : "#ico36_uc_question";
-  }
-
-  viewWhatsAround() {
-    this.viewWhatsX(() => {
-      this.router__stateGo("map");
-    });
-  }
-
-  viewWhatsNew() {
-    this.viewWhatsX(() => {
-      this.router__stateGo("overview");
-    });
-  }
-
-  viewWhatsX(callback) {
-    if (this.isLocationAccessDenied) {
-      callback();
-    } else if ("geolocation" in navigator) {
-      navigator.geolocation.getCurrentPosition(
-        currentLocation => {
-          const lat = currentLocation.coords.latitude;
-          const lng = currentLocation.coords.longitude;
-
-          this.view__updateCurrentLocation(
-            Immutable.fromJS({ location: { lat, lng } })
-          );
-          callback();
-        },
-        error => {
-          //error handler
-          console.error(
-            "Could not retrieve geolocation due to error: ",
-            error.code,
-            ", continuing map initialization without currentLocation. fullerror:",
-            error
-          );
-          this.view__locationAccessDenied();
-          callback();
-        },
-        {
-          //options
-          enableHighAccuracy: true,
-          maximumAge: 30 * 60 * 1000, //use if cache is not older than 30min
-        }
-      );
-    } else {
-      console.error("location could not be retrieved");
-      this.view__locationAccessDenied();
-      callback();
-    }
   }
 }
 
@@ -503,6 +325,7 @@ export default {
       accordionModule,
       flexGridModule,
       compareToModule,
+      howToModule,
       ngAnimate,
     ])
     .controller("AboutController", [...serviceDependencies, AboutController])

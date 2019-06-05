@@ -5,16 +5,24 @@
 
 main.ownerwelcome {
   grid-column: 1 / -1;
-  padding: 0;
   box-sizing: border-box;
   align-items: stretch;
-  max-width: $maxContentWidth;
+  max-width: 45rem;
   width: 100%;
   margin: 0 auto;
 
+  padding: 4rem $minContentPadding 7rem $minContentPadding;
+  @media (max-width: $responsivenessBreakPoint) {
+    padding: 2rem 0.5rem 4rem;
+  }
+
   .ownerwelcome__text {
     padding-bottom: 1rem;
+
     h1 {
+      color: var(--won-primary-color);
+      font-weight: normal;
+      font-size: $bigFontSize;
       padding-bottom: 1.5rem;
       text-align: center;
     }
@@ -24,14 +32,6 @@ main.ownerwelcome {
     }
     h3 {
       text-align: center;
-    }
-  }
-
-  .ownerwelcome__howto {
-    padding-top: 3rem;
-
-    &__button {
-      width: 100%;
     }
   }
 }

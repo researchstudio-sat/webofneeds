@@ -147,7 +147,7 @@ export function accountLogin(credentials, redirectToFeed = false) {
       .then(() => {
         if (redirectToFeed) {
           return dispatch(
-            actionCreators.router__stateGoResetParams("connections")
+            actionCreators.router__stateGoResetParams("inventory")
           );
         }
         return Promise.resolve();

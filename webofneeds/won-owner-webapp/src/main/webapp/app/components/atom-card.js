@@ -110,7 +110,7 @@ function genComponentConf() {
             </span>
         </div>
     </div>
-    <div class="card__main" ng-if="self.atomLoading || self.atomToLoad">
+    <div class="card__main" ng-if="self.atomLoading || self.atomToLoad || self.atomInCreation">
         <div class="card__main__topline">
             <div class="card__main__topline__title"></div>
         </div>
@@ -186,8 +186,11 @@ function genComponentConf() {
           personaVerified,
           atomHasHolderSocket: atomUtils.hasHolderSocket(atom),
           atomHasHoldableSocket: atomUtils.hasHoldableSocket(atom),
-          atomLoaded: processUtils.isAtomLoaded(process, this.atomUri),
+          atomLoaded:
+            processUtils.isAtomLoaded(process, this.atomUri) &&
+            !get(atom, "isBeingCreated"),
           atomLoading: processUtils.isAtomLoading(process, this.atomUri),
+          atomInCreation: get(atom, "isBeingCreated"),
           atomToLoad: processUtils.isAtomToLoad(process, this.atomUri),
           atomFailedToLoad: processUtils.hasAtomFailedToLoad(
             process,
@@ -223,7 +226,11 @@ function genComponentConf() {
         this
       );
 
-      classOnComponentRoot("won-is-loading", () => this.atomLoading, this);
+      classOnComponentRoot(
+        "won-is-loading",
+        () => this.atomLoading || this.atomInCreation,
+        this
+      );
       classOnComponentRoot("won-is-toload", () => this.atomToLoad, this);
     }
 
@@ -232,6 +239,7 @@ function genComponentConf() {
         this.atomUri &&
         !this.atomLoaded &&
         !this.atomLoading &&
+        !this.atomInCreation &&
         this.atomToLoad
       ) {
         this.atoms__fetchUnloadedAtom(this.atomUri);

@@ -7,7 +7,7 @@ import { connect2Redux } from "../won-utils.js";
 import { actionCreators } from "../actions/actions.js";
 import postMessagesModule from "../components/post-messages.js";
 import atomCardModule from "../components/atom-card.js";
-import postHeaderModule from "../components/post-header.js";
+import howToModule from "../components/howto.js";
 import * as generalSelectors from "../selectors/general-selectors.js";
 import * as viewSelectors from "../selectors/view-selectors.js";
 import * as atomUtils from "../atom-utils.js";
@@ -18,7 +18,7 @@ import "~/style/_inventory.scss";
 import "~/style/_atom-overlay.scss";
 import "~/style/_connection-overlay.scss";
 import * as viewUtils from "../view-utils";
-import {getIn} from "../utils";
+import { getIn } from "../utils";
 import * as accountUtils from "../account-utils";
 
 const template = (
@@ -33,7 +33,7 @@ const template = (
     >
       <won-post-messages connection-uri="self.viewConnUri" />
     </div>
-    <won-topnav page-title="::'Inventory'" />
+    <won-topnav />
     <won-menu ng-if="self.isLoggedIn" />
     <won-toasts />
     <won-slide-in ng-if="self.showSlideIns" />
@@ -42,14 +42,7 @@ const template = (
         className="ownerwelcome__text"
         ng-include="self.welcomeTemplatePath"
       />
-      <div className="ownerwelcome__howto">
-        <a
-          className="ownerwelcome__howto__button won-button--filled red"
-          ng-click="self.router__stateGo('about', {'aboutSection': 'aboutHowTo'})"
-        >
-          <span>Learn how it works</span>
-        </a>
-      </div>
+      <won-how-to />
     </main>
     <main className="ownerinventory" ng-if="self.isLoggedIn">
       <div className="ownerinventory__header">
@@ -213,7 +206,7 @@ export default {
       ngAnimate,
       postMessagesModule,
       atomCardModule,
-      postHeaderModule,
+      howToModule,
     ])
     .controller("InventoryController", [...serviceDependencies, Controller])
     .name,
