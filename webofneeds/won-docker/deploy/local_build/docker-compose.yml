@@ -1,12 +1,11 @@
-version: '2'
+version: "3"
 services:
-
   # create self-signed server certificate for $deploy_host
   gencert:
     build: ../../image/gencert
     #image: webofneeds/gencert:live
     environment:
-      - "CN=$deploy_host"
+      - "CN=wonnode"
       - "PASS=pass:changeit"
     volumes:
       - $base_folder/won-server-certs:/usr/local/certs/out/
@@ -29,10 +28,10 @@ services:
     build: ../../image/wonnode
     #image: webofneeds/wonnode:live
     environment:
-      - "uri.host=$deploy_host"
-      - "http.port=8889"
+      - "uri.host=wonnode"
+      - "http.port=8443"
       - "db.sql.jdbcDriverClass=org.postgresql.Driver"
-      - "db.sql.jdbcUrl=jdbc:postgresql://$deploy_host:5433/won_node"
+      - "db.sql.jdbcUrl=jdbc:postgresql://postgres:5432/won_node"
       - "db.sql.user=won"
       - "db.sql.password=won"
       - "db.ddl.strategy=validate"
@@ -67,13 +66,13 @@ services:
     build: ../../image/bots
     #image: webofneeds/bots:live
     environment:
-      - "node.default.host=$deploy_host"
-      - "node.default.http.port=8889"
-      - "won.node.uris=https://$deploy_host:8889/won/resource"
+      - "node.default.host=wonnode"
+      - "node.default.http.port=8443"
+      - "won.node.uris=https://wonnode:8443/won/resource"
       - "botContext.impl=mongoBotContext"
       - "botContext.mongodb.user=won"
       - "botContext.mongodb.pass=won"
-      - "botContext.mongodb.host=$deploy_host"
+      - "botContext.mongodb.host=mongodb"
       - "botContext.mongodb.port=27017"
       - "botContext.mongodb.database=won"
     depends_on:
@@ -86,21 +85,22 @@ services:
     build: ../../image/owner
     #image: webofneeds/owner:live
     environment:
-      - "node.default.host=$deploy_host"
-      - "uri.host=$deploy_host"
-      - "http.port=8082"
-      - "node.default.http.port=8889"
+      - "node.default.host=wonnode"
+      - "uri.host=owner"
+      - "http.port=8443"
+      - "node.default.http.port=8443"
       - "db.sql.jdbcDriverClass=org.postgresql.Driver"
-      - "db.sql.jdbcUrl=jdbc:postgresql://$deploy_host:5433/won_owner"
+      - "db.sql.jdbcUrl=jdbc:postgresql://postgres:5432/won_owner"
       - "db.sql.user=won"
       - "db.sql.password=won"
       - "db.ddl.strategy=validate"
       - "CERTIFICATE_PASSWORD=changeit"
+      - "LOGBACK_CONFIG=logback_debug.xml"
     ports:
       - "8082:8443"
     volumes:
-     - $base_folder/won-server-certs:/usr/local/tomcat/conf/ssl/
-     - $base_folder/won-client-certs/owner:/usr/local/tomcat/won/client-certs/
+      - $base_folder/won-server-certs:/usr/local/tomcat/conf/ssl/
+      - $base_folder/won-client-certs/owner:/usr/local/tomcat/won/client-certs/
     depends_on:
       - wonnode
       - postgres
@@ -120,10 +120,10 @@ services:
     build: ../../image/matcher-service
     #image: webofneeds/matcher_service:live
     environment:
-      - "node.host=$deploy_host"
-      - "cluster.seedNodes=$deploy_host:2561,$deploy_host:2562"
-      - "uri.sparql.endpoint=http://$deploy_host:10000/blazegraph/namespace/kb/sparql"
-      - "wonNodeController.wonNode.crawl=https://$deploy_host:8889/won/resource"
+      - "node.host=wonnode"
+      - "cluster.seedNodes=localhost:2561"
+      - "uri.sparql.endpoint=http://bigdata:9999/blazegraph/namespace/kb/sparql"
+      - "wonNodeController.wonNode.crawl=https://wonnode:8443/won/resource"
       - "cluster.local.port=2561"
     ports:
       - "2561:2561"
@@ -147,51 +147,32 @@ services:
     build: ../../image/matcher-solr
     #image: webofneeds/matcher_solr:live
     environment:
-      - "node.host=$deploy_host"
-      - "cluster.seedNodes=$deploy_host:2561,$deploy_host:2562"
+      - "node.host=wonnode"
+      - "cluster.seedNodes=matcher_service:2561"
       - "cluster.local.port=2562"
-      - "matcher.solr.uri.solr.server=http://$deploy_host:8984/solr/"
-      - "matcher.solr.uri.solr.server.public=http://$deploy_host:8984/solr/"
+      - "matcher.solr.uri.solr.server=http://solr:8983/solr/"
+      - "matcher.solr.uri.solr.server.public=http://solr:8983/solr/"
     ports:
       - "2562:2562"
     depends_on:
       - solr
-
-  # rescal matcher and connect to matcher service
-  matcher_rescal:
-    restart: always
-    build: ../../image/matcher-rescal
-    #image: webofneeds/matcher_rescal:live
-    environment:
-      - "node.host=$deploy_host"
-      - "cluster.seedNodes=$deploy_host:2561,$deploy_host:2563"
-      - "cluster.local.port=2563"
-      - "matcher.rescal.uri.public=http://$deploy_host/rescal/"
-      - "matcher.rescal.uri.sparql.endpoint=http://$deploy_host:10000/blazegraph/namespace/kb/sparql"
-      - "matcher.rescal.executionDurationMinutes=1"
-      - "matcher.rescal.threshold=0.15"
-      - "matcher.rescal.rank=10"
-    ports:
-      - "2563:2563"
-    depends_on:
-      - bigdata
       - matcher_service
 
-
+  # sparql matcher and connect to matcher service
   matcher_sparql:
     restart: always
     build: ../../image/matcher-sparql
     image: webofneeds/matcher_sparql:int
     environment:
-    - "node.host=$deploy_host"
-    - "cluster.seedNodes=$deploy_host:2561,$deploy_host:2563"
-    - "cluster.local.port=2564"
-    - "matcher.sparql.uri.sparql.endpoint=http://$deploy_host:10000/blazegraph/namespace/kb/sparql"
-    - "matcher.sparql.uri.public=http://$deploy_host/sparql/"
-    - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
+      - "node.host=wonnode"
+      - "cluster.seedNodes=matcher_service:2561"
+      - "cluster.local.port=2564"
+      - "matcher.sparql.uri.sparql.endpoint=http://bigdata:9999/blazegraph/namespace/kb/sparql"
+      - "matcher.sparql.uri.public=http://matcher_sparql/sparql/"
+      - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
     ports:
-    - "2564:2564"
+      - "2564:2564"
     depends_on:
-    - matcher_service
+      - matcher_service
     volumes:
-    - $base_folder/won-client-certs/matcher_sparql:/usr/src/matcher-sparql/client-certs/
+      - $base_folder/won-client-certs/matcher_sparql:/usr/src/matcher-sparql/client-certs/
