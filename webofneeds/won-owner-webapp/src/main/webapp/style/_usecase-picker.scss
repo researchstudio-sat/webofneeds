@@ -85,7 +85,12 @@ won-usecase-picker {
     display: grid;
     grid-auto-rows: min-content;
     grid-auto-flow: row dense;
-    grid-template-columns: 1fr 1fr 1fr;
+    @media (min-width: $responsivenessBreakPoint) {
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+    @media (max-width: $responsivenessBreakPoint) {
+      grid-template-columns: 1fr 1fr;
+    }
     grid-gap: $gridRowGap;
 
     &__noresults,
