@@ -76,6 +76,8 @@ won-how-to {
         box-sizing: border-box;
         font-weight: bold;
         cursor: pointer;
+        position: relative;
+        z-index: 2;
 
         &--selected {
           background: $won-primary-color;
@@ -119,7 +121,7 @@ won-how-to {
           );
           content: "";
           background-color: $won-primary-color;
-          z-index: -1;
+          z-index: 1;
         }
       }
     }

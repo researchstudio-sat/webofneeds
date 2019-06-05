@@ -10,17 +10,22 @@ main.ownerwelcome {
   max-width: 45rem;
   width: 100%;
   margin: 0 auto;
+  background: white;
+  border: $thinGrayBorder;
+  border-top: 0;
 
-  padding: 4rem $minContentPadding 7rem $minContentPadding;
+  padding: 3rem $minContentPadding 3rem $minContentPadding;
   @media (max-width: $responsivenessBreakPoint) {
-    padding: 2rem 0.5rem 4rem;
+    padding: 2rem 0.5rem 2rem;
+    border-left: 0;
+    border-right: 0;
   }
 
   .ownerwelcome__text {
     padding-bottom: 1rem;
 
     h1 {
-      color: var(--won-primary-color);
+      color: $won-primary-color;
       font-weight: normal;
       font-size: $bigFontSize;
       padding-bottom: 1.5rem;
