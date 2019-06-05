@@ -7,28 +7,28 @@ import { attach, getIn } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
 import { actionCreators } from "../actions/actions.js";
 
-import "~/style/_suggestion-selection-item-line.scss";
+import "~/style/_atom-suggestions-indicator.scss";
 import * as atomUtils from "../atom-utils";
 
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
   let template = `
-      <svg class="ssi__icon"
+      <svg class="asi__icon"
           ng-click="self.setOpen()"
           ng-class="{
-            'ssi__icon--reads': !self.hasUnreadSuggestions,
-            'ssi__icon--unreads': self.hasUnreadSuggestions
+            'asi__icon--reads': !self.hasUnreadSuggestions,
+            'asi__icon--unreads': self.hasUnreadSuggestions
           }">
           <use xlink:href="#ico36_match" href="#ico36_match"></use>
       </svg>
-      <div class="ssi__right" ng-click="self.setOpen()">
-        <div class="ssi__right__topline">
-          <div class="ssi__right__topline__title">
+      <div class="asi__right" ng-click="self.setOpen()">
+        <div class="asi__right__topline">
+          <div class="asi__right__topline__title">
             Suggestions
           </div>
         </div>
-        <div class="ssi__right__subtitle">
-          <div class="ssi__right__subtitle__label">
+        <div class="asi__right__subtitle">
+          <div class="asi__right__subtitle__label">
             <span>{{ self.suggestionsCount }} Suggestions</span>
             <span ng-if="self.hasUnreadSuggestions">, {{ self.unreadSuggestionsCount }} new</span
           </div>
@@ -82,5 +82,5 @@ function genComponentConf() {
   };
 }
 export default angular
-  .module("won.owner.components.SuggestionSelectionItem", [])
-  .directive("wonSuggestionSelectionItem", genComponentConf).name;
+  .module("won.owner.components.AtomSuggestionsIndicator", [])
+  .directive("wonAtomSuggestionsIndicator", genComponentConf).name;

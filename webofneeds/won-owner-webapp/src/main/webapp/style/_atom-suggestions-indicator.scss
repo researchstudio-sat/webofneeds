@@ -5,7 +5,7 @@
 @import "square-image";
 @import "speech-bubble";
 
-won-suggestion-selection-item {
+won-atom-suggestions-indicator {
   display: grid;
   grid-template-columns: min-content 1fr;
   align-items: center;
@@ -15,7 +15,7 @@ won-suggestion-selection-item {
   cursor: pointer;
   border-top: $thinGrayBorder;
 
-  .ssi__icon {
+  .asi__icon {
     box-sizing: border-box;
     padding: 0.25rem;
     @include fixed-square($postIconSize);
@@ -26,7 +26,7 @@ won-suggestion-selection-item {
       --local-primary: #{$won-primary-color-light};
     }
   }
-  .ssi__right {
+  .asi__right {
     display: grid;
     grid-template-areas: "topline" "subtitle";
     padding-left: 0.5rem;

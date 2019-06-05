@@ -6,7 +6,7 @@ import angular from "angular";
 import inviewModule from "angular-inview";
 import "ng-redux";
 import atomMapModule from "./atom-map.js";
-import suggestionSelectionItemModule from "./suggestion-selection-item.js";
+import atomSuggestionsIndicatorModule from "./atom-suggestions-indicator.js";
 import { actionCreators } from "../actions/actions.js";
 import { relativeTime } from "../won-label-utils.js";
 import { attach, getIn, get } from "../utils.js";
@@ -138,12 +138,12 @@ function genComponentConf() {
     <div class="card__nopersona" ng-if="self.showPersona && ((self.atomLoaded && !self.persona && self.atomHasHoldableSocket) || !self.atomLoaded)">
         <span class="card__nopersona__label" ng-if="self.atomLoaded">No Persona attached</span>
     </div>
-    <won-suggestion-selection-item
+    <won-atom-suggestions-indicator
         ng-if="self.showSuggestions && self.atomHasSuggestions"
         class="card__indicators"
         atom-uri="::self.atomUri"
         on-selected="::self.showAtomSuggestions(self.atomUri)">
-    </won-suggestion-selection-item>
+    </won-atom-suggestions-indicator>
     `;
 
   class Controller {
@@ -306,6 +306,6 @@ export default angular
   .module("won.owner.components.atomCard", [
     inviewModule.name,
     atomMapModule,
-    suggestionSelectionItemModule,
+    atomSuggestionsIndicatorModule,
   ])
   .directive("wonAtomCard", genComponentConf).name;
