@@ -138,10 +138,10 @@ won.WONMATCH = {};
 won.WONMATCH.baseUri = "https://w3id.org/won/matching#";
 won.WONMATCH.prefix = "match";
 won.WONMATCH.NoHintForCounterpartCompacted =
-  won.WON.prefix + ":NoHintForCounterpart";
+  won.WONMATCH.prefix + ":NoHintForCounterpart";
 won.WONMATCH.UsedForTestingCompacted = won.WONMATCH.prefix + ":UsedForTesting";
 won.WONMATCH.NoHintForMeCompacted = won.WONMATCH.prefix + ":NoHintForMe";
-won.WONMATCH.flag = won.WON.baseUri + "flag";
+won.WONMATCH.flag = won.WONMATCH.baseUri + "flag";
 won.WONMATCH.flagCompacted = won.WONMATCH.prefix + ":flag";
 
 won.WONMSG = {};
@@ -274,8 +274,8 @@ won.REVIEW.ReviewSocketCompacted = won.REVIEW.prefix + ":ReviewSocket";
 won.BUDDY = {};
 won.BUDDY.baseUri = "https://w3id.org/won/ext/buddy#";
 won.BUDDY.prefix = "buddy";
-won.BUDDY.ReviewSocket = won.BUDDY.baseUri + "BuddySocket";
-won.BUDDY.ReviewSocketCompacted = won.BUDDY.prefix + ":BuddySocket";
+won.BUDDY.BuddySocket = won.BUDDY.baseUri + "BuddySocket";
+won.BUDDY.BuddySocketCompacted = won.BUDDY.prefix + ":BuddySocket";
 
 won.EVENT = {};
 won.EVENT.WON_MESSAGE_RECEIVED = "WonMessageReceived";

@@ -430,5 +430,8 @@ function getSocketKeysReset(socketsImm) {
     if (value === "review:ReviewSocket") {
       return "#reviewSocket";
     }
+    if (value === "buddy:BuddySocket") {
+      return "#buddySocket";
+    }
   });
 }

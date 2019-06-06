@@ -29,6 +29,10 @@ export function createPersona(persona, nodeUri) {
           "@id": "#reviewSocket",
           "won:socketDefinition": { "@id": "review:ReviewSocket" },
         },
+        {
+          "@id": "#buddySocket",
+          "won:socketDefinition": { "@id": "buddy:BuddySocket" },
+        },
       ],
       "match:flag": [
         { "@id": "match:NoHintForCounterpart" },
@@ -74,7 +78,7 @@ async function connectReview(
   const getSocket = persona => {
     const reviewSocket = persona
       .getIn(["content", "sockets"])
-      .filter(socketType => socketType == "review:ReviewSocket")
+      .filter(socketType => socketType === "review:ReviewSocket")
       .keySeq()
       .first();
 

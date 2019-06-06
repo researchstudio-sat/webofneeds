@@ -37,6 +37,7 @@ export const labels = deepFreeze({
     [won.HOLD.HoldableSocketCompacted]: "Holdable",
     [won.HOLD.HolderSocketCompacted]: "Holder",
     [won.REVIEW.ReviewSocketCompacted]: "Review enabled",
+    [won.BUDDY.BuddySocketCompacted]: "Buddy",
   },
 });
 
