@@ -11,9 +11,27 @@ import "~/style/_menu.scss";
 function genTopnavConf() {
   let template = `
     <div class="menu">
-      <a class="menu__tab" ng-click="self.router__stateGo('inventory')" ng-class="{'menu__tab--selected': self.showInventory}">Inventory</a>
-      <a class="menu__tab" ng-click="self.router__stateGo('connections')" ng-class="{'menu__tab--selected': self.showChats}">Chats</a>
-      <a class="menu__tab" ng-click="self.router__stateGo('create')" ng-class="{'menu__tab--selected': self.showCreate}">Create</a>
+      <a class="menu__tab" ng-click="self.router__stateGo('inventory')"
+        ng-class="{
+          'menu__tab--selected': self.showInventory,
+          'menu__tab--unread': false,
+        }"
+      >
+        <span class="menu__tab__unread"></span>
+        <span class="menu__tab__label">Inventory</span>
+      </a>
+      <a class="menu__tab" ng-click="self.router__stateGo('connections')"
+        ng-class="{
+          'menu__tab--selected': self.showChats,
+          'menu__tab--unread': false,
+        }"
+      >
+        <span class="menu__tab__unread"></span>
+        <span class="menu__tab__label">Chats</span>
+      </a>
+      <a class="menu__tab" ng-click="self.router__stateGo('create')" ng-class="{'menu__tab--selected': self.showCreate}">
+        <span class="menu__tab__label">Create</span>
+      </a>
     </div>
   `;
 
