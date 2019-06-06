@@ -26,7 +26,13 @@ won-menu {
         cursor: default;
         pointer-events: none;
         border-bottom-color: $won-primary-color;
-        color: $won-primary-color;
+
+        &:not(.menu__tab--inactive) {
+          color: $won-primary-color;
+        }
+      }
+      &.menu__tab--inactive {
+        color: $won-line-gray;
       }
 
       &.menu__tab--unread {

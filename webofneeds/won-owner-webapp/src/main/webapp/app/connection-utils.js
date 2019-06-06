@@ -25,6 +25,10 @@ export function isClosed(connection) {
   return get(connection, "state") === won.WON.Closed;
 }
 
+export function isUnread(connection) {
+  return !!get(connection, "unread");
+}
+
 /**
  * Creates a label of the participants and suggestions/requests/invites of a given set of groupChatConnections
  * @param groupChatConnections

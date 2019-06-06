@@ -50,27 +50,70 @@ export const getOwnedPosts = state => {
 export function getChatAtoms(state) {
   const allOwnedAtoms = getOwnedAtoms(state);
 
-  if (allOwnedAtoms) {
-    return allOwnedAtoms
+  return (
+    allOwnedAtoms &&
+    allOwnedAtoms
       .filter(atom => atomUtils.isActive(atom))
       .filter(atom => atomUtils.hasChatSocket(atom))
       .filter(
         atom =>
           !!get(atom, "connections") &&
-          !!get(atom, "connections")
-            .filter(
-              conn =>
-                !(
-                  connectionUtils.isClosed(conn) ||
-                  connectionUtils.isSuggested(conn)
-                )
-            )
-            .find(conn =>
+          !!get(atom, "connections").find(
+            conn =>
+              !(
+                connectionUtils.isClosed(conn) ||
+                connectionUtils.isSuggested(conn)
+              ) &&
               connectionSelectors.isChatToXConnection(get(state, "atoms"), conn)
-            )
-      );
-  }
-  return undefined;
+          )
+      )
+  );
+}
+
+export function hasChatAtoms(state) {
+  const chatAtoms = getChatAtoms(state);
+  return chatAtoms && chatAtoms.size > 0;
+}
+
+/**
+ * Determines if there are any connections that are unread and suggested
+ * (used for the inventory unread indicator)
+ * @param state
+ * @returns {boolean}
+ */
+export function hasUnreadSuggestedConnections(state) {
+  const allOwnedAtoms = getOwnedAtoms(state);
+
+  return (
+    allOwnedAtoms &&
+    !!allOwnedAtoms
+      .filter(atom => atomUtils.isActive(atom))
+      .find(atom => atomUtils.hasUnreadSuggestedConnections(atom))
+  );
+}
+
+export function hasUnreadChatConnections(state) {
+  const chatAtoms = getChatAtoms(state);
+
+  return (
+    chatAtoms &&
+    !!chatAtoms.find(
+      atom =>
+        !!get(atom, "connections") &&
+        !!get(atom, "connections").find(
+          conn =>
+            !(
+              connectionUtils.isClosed(conn) ||
+              connectionUtils.isSuggested(conn)
+            ) &&
+            connectionSelectors.isChatToXConnection(
+              get(state, "atoms"),
+              conn
+            ) &&
+            connectionUtils.isUnread(conn)
+        )
+    )
+  );
 }
 
 export function getActiveAtoms(state) {
