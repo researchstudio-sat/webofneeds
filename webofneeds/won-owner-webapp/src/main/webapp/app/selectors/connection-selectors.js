@@ -64,17 +64,10 @@ export function getGroupChatConnectionsByAtomUri(state, atomUri) {
 
 export function getSuggestedConnectionsByAtomUri(state, atomUri) {
   const atoms = getAtoms(state);
-  const atom = atoms && atoms.get(atomUri);
-  const connections = atom && atom.get("connections");
+  const connections = getIn(atoms, [atomUri, "connections"]);
 
   return connections
-    ? connections
-        .filter(conn => connectionUtils.isSuggested(conn))
-        .filter(
-          conn =>
-            isChatToXConnection(atoms, conn) ||
-            isGroupToXConnection(atoms, conn)
-        )
+    ? connections.filter(conn => connectionUtils.isSuggested(conn))
     : Immutable.Map();
 }
 
