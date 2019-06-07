@@ -10,11 +10,10 @@
 7.  Clone project with git (e.g. to `C:\DATA\DEV\workspace`). It’s easier not to do this in eclipse, but with the git bash or gui)
 8. Import project in eclipse: File >> Import >> Existing Maven Project >> point to `pom.xml`
 9. Deactivate "autobuild": Window >> Preferences >> General >> Workspace >> uncheck "Build automatically"
-10. Change "spaces for tabs" settings: 
-    * General: Window >> Preferences >> General >> Editors >> Text Editors >> Check `Insert spaces for tabs`
-    * JavaScript: Window >> Preferences >> Javascript >> Code Style >> Formatter >> Edit >> Indentation >> Tab policy >> choose `spaces only`
-        * Set `Indentation size` + `Tab size`: `4`
-        * Rename the formatter settings profile to save it
+10. Use the provided code style: Window >> Preferences >> Java >> Code Style >> Formatter
+	1. Click `Import`
+	2. Select the file `webofneeds/won-buildtools/src/main/resources/eclipse/formatter.xml`
+	3. Click `Apply and Close`
 11. Set maven profiles: right-click the webofneeds project in the package explorer >> Maven >> Select Maven Profiles. check `skip-tests`
 12. If you develop on Windows you will need to setup `node`s `windows-build-tools` (see [this guide](./installation-setting-up-frontend-development-environment.md#installing-windows-build-tools-on-windows))
 
