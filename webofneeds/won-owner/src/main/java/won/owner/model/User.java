@@ -5,12 +5,7 @@
 package won.owner.model;
 
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -31,6 +26,7 @@ import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 
+import nl.martijndwars.webpush.Subscription;
 import org.springframework.data.domain.Persistable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -97,6 +93,9 @@ public class User implements UserDetails, Persistable<Long> {
     // during high usage. Fix it.
     @ElementCollection(fetch = FetchType.EAGER)
     private Set<URI> draftURIs;
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "user_id")
+    private Set<PushSubscription> pushSubscriptions = new HashSet<>();
     @Transient
     private Collection<SimpleGrantedAuthority> authorities;
 
@@ -292,6 +291,14 @@ public class User implements UserDetails, Persistable<Long> {
 
     public void setPrivateId(String privateId) {
         this.privateId = privateId;
+    }
+
+    public void addPushSubscription(PushSubscription subscription) {
+        pushSubscriptions.add(subscription);
+    }
+
+    public Iterable<PushSubscription> getPushSubscriptions() {
+        return pushSubscriptions;
     }
 
     private boolean isWithinGracePeriod() {

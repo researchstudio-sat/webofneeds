@@ -15,6 +15,10 @@
         <!-- Warning! Only to be used in connection with the <dependencyManagement> 
             section in the parent pom! -->
         <dependency>
+            <groupId>nl.martijndwars</groupId>
+            <artifactId>web-push</artifactId>
+        </dependency>
+        <dependency>
             <groupId>at.researchstudio.sat</groupId>
             <artifactId>won-sockets-tx</artifactId>
             <version>${project.version}</version>

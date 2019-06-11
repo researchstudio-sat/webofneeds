@@ -37,7 +37,8 @@ public enum RestStatusResponse {
     SETTINGS_CREATED(5200, "Settings created", HttpStatus.CREATED),
     TOS_ACCEPT_SUCCESS(6200, "Successfully accepted Terms Of Service", HttpStatus.OK),
     EXPORT_SUCCESS(7200, "Successfully started exporting user", HttpStatus.OK),
-    EXPORT_NOT_VERIFIED(7403, "You need a verified account to export your data", HttpStatus.BAD_REQUEST);
+    EXPORT_NOT_VERIFIED(7403, "You need a verified account to export your data", HttpStatus.BAD_REQUEST),
+    SUBSCRIBE_SUCCESS(8200, "Successfully subscribed to push notifications", HttpStatus.OK);
     private final int code;
     private final String message;
     private final HttpStatus httpStatus;

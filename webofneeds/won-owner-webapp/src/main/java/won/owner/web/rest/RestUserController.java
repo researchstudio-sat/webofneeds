@@ -15,6 +15,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import nl.martijndwars.webpush.Subscription;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,11 +46,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.request.WebRequest;
 
-import won.owner.model.EmailVerificationToken;
-import won.owner.model.KeyStoreIOException;
-import won.owner.model.TokenPurpose;
-import won.owner.model.User;
-import won.owner.model.UserAtom;
+import won.owner.model.*;
 import won.owner.pojo.AnonymousLinkPojo;
 import won.owner.pojo.ChangePasswordPojo;
 import won.owner.pojo.ResetPasswordPojo;
@@ -462,6 +459,19 @@ public class RestUserController {
             User authUser = ((KeystoreEnabledUserDetails) authentication.getPrincipal()).getUser();
             return generateUserResponse(userService.getByUsername(authUser.getUsername()));
         }
+    }
+
+    @RequestMapping(value = "/subscribeNotifications", method = RequestMethod.POST)
+    @Transactional(propagation = Propagation.REQUIRED)
+    public ResponseEntity subscribeNotifications(@RequestBody Subscription subscription) {
+        SecurityContext context = SecurityContextHolder.getContext();
+        String userName = context.getAuthentication().getName();
+        User user = userService.getByUsername(userName);
+        if (user == null) {
+            return generateStatusResponse(RestStatusResponse.USER_NOT_SIGNED_IN);
+        }
+        userService.addPushSubscription(user, new PushSubscription(subscription));
+        return generateStatusResponse(RestStatusResponse.SUBSCRIBE_SUCCESS);
     }
 
     @RequestMapping(value = "/signout", method = RequestMethod.POST)
