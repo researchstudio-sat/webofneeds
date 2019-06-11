@@ -509,6 +509,17 @@ export default function(processState = initialState, action = {}) {
               }
             });
           }
+
+          const buddyUris = parsedAtom.get("buddies");
+          if (buddyUris.size > 0) {
+            buddyUris.map(buddyUri => {
+              if (!processUtils.isAtomLoaded(processState, buddyUri)) {
+                processState = updateAtomProcess(processState, buddyUri, {
+                  toLoad: true,
+                });
+              }
+            });
+          }
         });
       return processState;
     }
