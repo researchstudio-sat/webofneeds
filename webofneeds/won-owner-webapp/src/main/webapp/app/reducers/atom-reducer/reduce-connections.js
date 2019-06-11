@@ -5,6 +5,7 @@ import { markUriAsRead } from "../../won-localstorage.js";
 
 import { markAtomAsRead } from "./reduce-atoms.js";
 import { getIn, get } from "../../utils.js";
+import * as connectionUtils from "../../connection-utils";
 
 export function storeConnectionsData(state, connectionsToStore) {
   if (connectionsToStore && connectionsToStore.size > 0) {
@@ -39,7 +40,10 @@ function addConnectionFull(atomState, connection) {
 
       parsedConnection = parsedConnection.setIn(["data", "socket"], realSocket);
 
-      if (realSocket === won.HOLD.HolderSocketCompacted) {
+      if (
+        realSocket === won.HOLD.HolderSocketCompacted &&
+        connectionUtils.isConnected(parsedConnection)
+      ) {
         const holdsUri = targetAtomUri;
 
         if (holdsUri) {
@@ -50,7 +54,10 @@ function addConnectionFull(atomState, connection) {
             );
           }
         }
-      } else if (realSocket === won.HOLD.HoldableSocketCompacted) {
+      } else if (
+        realSocket === won.HOLD.HoldableSocketCompacted &&
+        connectionUtils.isConnected(parsedConnection)
+      ) {
         //holdableSocket Connection from atom to persona -> need to add heldBy targetAtomUri to the atom
         const heldByUri = targetAtomUri;
 
@@ -80,6 +87,7 @@ function addConnectionFull(atomState, connection) {
         }
 
         if (
+          connectionUtils.isConnected(parsedConnection) &&
           realSocket === won.BUDDY.BuddySocketCompacted &&
           realTargetSocket === won.BUDDY.BuddySocketCompacted
         ) {
