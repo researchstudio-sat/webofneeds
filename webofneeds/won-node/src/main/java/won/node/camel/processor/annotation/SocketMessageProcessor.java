@@ -16,7 +16,7 @@ import java.lang.annotation.Target;
 public @interface SocketMessageProcessor {
     String socketType();
 
-    String direction();
+    String direction() default "ANY";
 
-    String messageType();
+    String messageType() default "ANY";
 }

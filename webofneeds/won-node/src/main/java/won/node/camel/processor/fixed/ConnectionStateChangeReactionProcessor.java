@@ -1,37 +1,31 @@
-package won.node.camel.processor.general;
+package won.node.camel.processor.fixed;
 
 import java.net.URI;
 import java.util.Optional;
 
 import org.apache.camel.Exchange;
-import org.apache.camel.Processor;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-import won.node.protocol.MatcherProtocolMatcherServiceClientSide;
-import won.node.protocol.impl.MatcherProtocolMatcherClientImpl;
+import won.node.camel.processor.AbstractCamelProcessor;
+import won.node.camel.processor.annotation.FixedMessageReactionProcessor;
+import won.node.camel.processor.general.ConnectionStateChangeBuilder;
 import won.node.socket.ConnectionStateChange;
-import won.node.socket.SocketService;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageDirection;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.model.Atom;
 import won.protocol.model.Connection;
-import won.protocol.repository.AtomRepository;
-import won.protocol.repository.ConnectionRepository;
 
 /**
- * Compares the connection state found in the header of the 'in' message with
- * the state the connection is in now and triggers the data derivation.
+ * Configured to react to any message, checking whether the message caused a
+ * connection state change, then Compares the connection state found in the
+ * header of the 'in' message with the state the connection is in now and
+ * triggers the data derivation.
  */
-public class SocketDerivationProcessor implements Processor {
-    @Autowired
-    ConnectionRepository connectionRepository;
-    @Autowired
-    AtomRepository atomRepository;
-    @Autowired
-    SocketService derivationService;
-
-    public SocketDerivationProcessor() {
+@Component
+@FixedMessageReactionProcessor()
+public class ConnectionStateChangeReactionProcessor extends AbstractCamelProcessor {
+    public ConnectionStateChangeReactionProcessor() {
     }
 
     @Override
@@ -40,8 +34,7 @@ public class SocketDerivationProcessor implements Processor {
         ConnectionStateChangeBuilder stateChangeBuilder = (ConnectionStateChangeBuilder) exchange.getIn()
                         .getHeader(WonCamelConstants.CONNECTION_STATE_CHANGE_BUILDER_HEADER);
         if (stateChangeBuilder == null) {
-            throw new IllegalStateException("expecting to find a ConnectionStateBuilder in 'in' header '"
-                            + WonCamelConstants.CONNECTION_STATE_CHANGE_BUILDER_HEADER + "'");
+            return;
         }
         // first, try to find the connection uri in the header:
         URI conUri = (URI) exchange.getIn().getHeader(WonCamelConstants.CONNECTION_URI_HEADER);
@@ -54,7 +47,9 @@ public class SocketDerivationProcessor implements Processor {
         if (conUri != null) {
             // found a connection. Put its URI in the header and load it
             con = Optional.of(connectionRepository.findOneByConnectionURI(conUri));
-            stateChangeBuilder.newState(con.get().getState());
+            if (!stateChangeBuilder.canBuild()) {
+                stateChangeBuilder.newState(con.get().getState());
+            }
         } else {
             // found no connection. don't modify the builder
         }
@@ -67,7 +62,10 @@ public class SocketDerivationProcessor implements Processor {
                 con = Optional.of(connectionRepository.findOneByConnectionURI(conUri));
             }
             Atom atom = atomRepository.findOneByAtomURI(con.get().getAtomURI());
-            derivationService.deriveDataForStateChange(connectionStateChange, atom, con.get());
+            if (connectionStateChange.isConnect() || connectionStateChange.isDisconnect()) {
+                // trigger rematch
+                matcherProtocolMatcherClient.atomModified(atom.getAtomURI(), null);
+            }
         }
     }
 }
