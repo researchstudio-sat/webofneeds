@@ -90,6 +90,17 @@ function genComponentConf() {
               <span class="post-menu__item__count">({{self.heldPostsSize}})</span>
             </div>
             <div class="post-menu__item"
+              ng-if="self.hasBuddySocket"
+              ng-click="self.selectTab('BUDDIES')"
+              ng-class="{
+                'post-menu__item--unread': self.hasBuddyRequests,
+                'post-menu__item--selected': self.isSelectedTab('BUDDIES'),
+                'post-menu__item--inactive': !self.hasBuddies
+              }">
+              <span class="post-menu__item__label">Buddies</span>
+              <span class="post-menu__item__count">({{self.buddyCount}})</span>
+            </div>
+            <div class="post-menu__item"
               ng-if="self.hasReviewSocket"
               ng-click="self.selectTab('REVIEWS')"
               ng-class="{
@@ -124,6 +135,7 @@ function genComponentConf() {
         const hasHolderSocket = atomUtils.hasHolderSocket(post);
         const hasGroupSocket = atomUtils.hasGroupSocket(post);
         const hasReviewSocket = atomUtils.hasReviewSocket(post);
+        const hasBuddySocket = atomUtils.hasBuddySocket(post);
         const reviewCount =
           hasReviewSocket && getIn(post, ["rating", "reviewCount"]);
 
@@ -169,6 +181,19 @@ function genComponentConf() {
             this.postUri
           );
 
+        const buddyConnections =
+          isOwned &&
+          connectionSelectors.getBuddyConnectionsByAtomUri(
+            state,
+            this.postUri,
+            true,
+            true
+          );
+
+        const buddies = isOwned
+          ? buddyConnections.filter(conn => connectionUtils.isConnected(conn))
+          : get(post, "buddies");
+
         const viewState = get(state, "view");
         const process = get(state, "process");
 
@@ -190,6 +215,18 @@ function genComponentConf() {
           hasHolderSocket,
           hasGroupSocket,
           hasReviewSocket,
+          hasBuddySocket,
+          hasBuddyRequests:
+            !!buddyConnections &&
+            !!buddyConnections.find(conn =>
+              connectionUtils.isRequestReceived(conn)
+            ),
+          hasBuddies: buddyConnections
+            ? buddyConnections.size > 0
+            : buddies
+              ? buddies.size > 0
+              : false,
+          buddyCount: buddies ? buddies.size : 0,
           hasReviews: reviewCount > 0,
           reviewCount,
           hasChatSocket: atomUtils.hasChatSocket(post),
