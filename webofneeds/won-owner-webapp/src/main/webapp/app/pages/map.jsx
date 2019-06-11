@@ -33,7 +33,7 @@ const template = (
   <container>
     <won-modal-dialog ng-if="self.showModalDialog" />
     <div className="won-modal-atomview" ng-if="self.showAtomOverlay">
-      <won-post-info include-header="true" atom-uri="self.viewAtomUri" />
+      <won-post-info atom-uri="self.viewAtomUri" />
     </div>
     <div
       className="won-modal-connectionview"
@@ -216,6 +216,8 @@ const template = (
           current-location="self.lastWhatsAroundLocation"
           ng-repeat="atomUri in self.sortedVisibleAtomUriArray track by atomUri"
           ng-if="self.hasVisibleAtomUris"
+          show-suggestions="::false"
+          show-persona="::true"
         />
       </div>
       <div

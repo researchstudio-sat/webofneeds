@@ -194,7 +194,6 @@ export function runMessagingAgent(redux) {
                      */
           redux.dispatch(
             actionCreators.router__stateGoAbs("connections", {
-              postUri: message.getSenderAtom(),
               connectionUri: message.getSenderConnection(),
             })
           );

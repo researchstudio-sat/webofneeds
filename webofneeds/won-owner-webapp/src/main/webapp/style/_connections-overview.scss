@@ -6,103 +6,28 @@ won-connections-overview {
   display: block;
   margin: 0;
 
-  --won-overview-atom-height: 3.5rem;
-
   .co__item {
-    background-color: $won-light-gray;
+    margin-top: 2.5rem;
+
+    &:first-of-type {
+      margin-top: 0;
+    }
 
     &__atom {
       display: grid;
       grid-auto-flow: column;
-      grid-template-columns: min-content 1fr;
+      grid-template-columns: 1fr;
       align-items: center;
       border-bottom: $thinGrayBorder;
       box-sizing: border-box;
       overflow: hidden;
-      --transition-duration: 0.25s;
-
-      @media (max-width: $responsivenessBreakPoint) {
-        &:not(.won-unread) > .co__item__atom__indicator {
-          border-left: none;
-        }
-      }
-
-      & > .co__item__atom__indicator {
-        box-sizing: border-box;
-        width: 0.25rem;
-        height: 100%;
-      }
-
-      &.won-unread > .co__item__atom__indicator {
-        border-left: 0.25rem solid $won-unread-attention;
-      }
-
-      &:not(.won-unread) > .co__item__atom__indicator {
-        border-left: $thinGrayBorder;
-      }
-
-      &.open {
-        position: sticky;
-        top: var(--headerHeight);
-        z-index: 500;
-        background-color: $won-light-gray;
-        height: var(--won-overview-atom-height);
-        max-height: var(--won-overview-atom-height);
-
-        & > .co__item__atom__header > won-connection-indicators {
-          //TODO: STYLE AND TRANSITION FOR OPENEDATOM INDICATORS
-          overflow: hidden;
-          width: 0;
-          box-sizing: border-box;
-          transition: width 0.25s linear;
-        }
-
-        & > .co__item__atom__header > .co__item__atom__header__button {
-          width: 3.5rem;
-          padding-left: 0;
-          padding-right: 0;
-          white-space: nowrap;
-          margin-right: 0.5rem;
-          box-sizing: border-box;
-          transition: width 0.25s linear, border-left-width 0s linear 0.05s,
-            border-right-width 0s linear 0.05s;
-        }
-      }
-
-      &:not(.open) {
-        height: var(--won-overview-atom-height);
-        max-height: var(--won-overview-atom-height);
-
-        & > .co__item__atom__header > won-connection-indicators {
-          //TODO: STYLE AND TRANSITION FOR NOT OPENEDATOM INDICATORS
-          width: 2rem;
-          margin-right: 0.5rem;
-          overflow: hidden;
-          box-sizing: border-box;
-          transition: width 0.25s linear;
-        }
-
-        & > .co__item__atom__header > .co__item__atom__header__button {
-          width: 0;
-          padding-left: 0;
-          padding-right: 0;
-          border-left-width: 0;
-          border-right-width: 0;
-          white-space: nowrap;
-          overflow: hidden;
-          box-sizing: border-box;
-          transition: width 0.25s linear, border-left-width 0s linear 0.25s,
-            border-right-width 0s linear 0.25s;
-        }
-      }
 
       &__header {
         padding: 0.5rem;
         display: grid;
-        grid-template-columns: 1fr auto auto auto;
+        grid-template-columns: 1fr auto;
         min-width: 0;
 
-        & > .co__item__atom__header__button,
         & > won-connection-indicators,
         & > won-post-header {
           max-height: 2.5rem;
@@ -111,68 +36,12 @@ won-connections-overview {
         & > won-post-header {
           padding-right: 0.5rem;
         }
-
-        & > .co__item__atom__header__button {
-          font-size: $smallFontSize;
-          max-height: 2.5rem;
-        }
-
-        &__carret {
-          // results in a clickable area as large as indicators
-          // TODO: make the value less rigid
-          // parents grid-gap takes care of margin-left
-          $padding: 0.625rem;
-          padding-top: $padding;
-          padding-bottom: $padding;
-          padding-right: $padding;
-
-          &__icon {
-            @include carretSized;
-
-            &.won-icon-disabled {
-              --local-primary: #{$won-skeleton-color};
-            }
-
-            &:not(.won-icon-disabled) {
-              --local-primary: #{$won-secondary-color};
-            }
-
-            &:not(.won-icon-expanded) {
-              transition: 0.25s linear;
-            }
-
-            &.won-icon-expanded {
-              transform: rotate(-180deg);
-              transition: transform 0.25s linear;
-            }
-          }
-        }
-      }
-
-      @media (min-width: $responsivenessBreakPoint) {
-        &.selected {
-          @include speech-bubble-right(
-            white,
-            $won-line-gray,
-            $speechBubbleTailSize,
-            $thinBorderWidth,
-            50%
-          );
-          &.open {
-            position: sticky;
-          }
-        }
       }
     }
     &__connections {
+      margin-left: 1rem;
       &__item {
         padding-left: 0.5rem;
-        &.selected:not(.nonsticky) {
-          position: sticky;
-          top: calc(var(--headerHeight) + var(--won-overview-atom-height));
-          z-index: 500;
-        }
-        // intrent connections so it's clear they belong *to* the post
         &:not(.won-unread) {
           background-color: $won-line-gray;
           border-left: $thinGrayBorder;
@@ -188,45 +57,6 @@ won-connections-overview {
           }
         }
       }
-      @include slideAnimationFixedHorizontal(0.5s, ease-in-out, 100vh);
-    }
-  }
-  .co__separator {
-    margin-top: 1.5rem;
-    padding: 0 0.5rem;
-    display: flex;
-    justify-content: space-between;
-    flex-direction: row;
-    align-items: center;
-    color: $won-line-gray;
-    &--open {
-      transition: border-bottom-width linear 0.1s;
-      border-bottom: $thinGrayBorder;
-      color: $won-primary-color;
-      &:hover {
-        color: $won-line-gray;
-      }
-    }
-    &:hover {
-      color: $won-primary-color;
-    }
-    &__arrow {
-      @include carretSized;
-      padding: 0.625em;
-    }
-  }
-  .co__closedAtoms {
-    @include slideWithOpacityAnimation(0.5s, ease-in-out, 100vh);
-  }
-  .co__loading {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    &__label {
-      color: $won-subtitle-gray;
-    }
-    &__spinner {
     }
   }
 }

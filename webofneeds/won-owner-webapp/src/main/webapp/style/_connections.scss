@@ -10,35 +10,56 @@ aside.overview__left {
   }
 }
 
-main.overview__right {
-  .overview__right__welcome {
-    padding: 0.5rem;
+main.overview__nochats {
+  .overview__nochats__empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: $won-lighter-gray;
 
-    > won-usecase-picker {
-      padding: 0;
+    &__icon {
+      @include fixed-square($hugeiconSize);
+      --local-primary: #{$won-line-gray};
     }
 
     &__text {
-      padding-bottom: 1rem;
-      h1 {
-        padding-bottom: 1.5rem;
-        text-align: center;
-      }
-      p {
-        padding-bottom: 1.5rem;
-        text-align: center;
-      }
-      h3 {
-        text-align: center;
-      }
+      margin-top: 1rem;
+      color: $won-line-gray;
+      font-size: $mediumFontSize;
+    }
+    &__subtext {
+      margin-top: 0.5rem;
+      color: $won-line-gray;
+      font-size: $normalFontSize;
+    }
+  }
+}
+
+main.overview__rightempty {
+  .overview__rightempty__noselection {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: $won-lighter-gray;
+    border-right: $thinGrayBorder;
+    border-bottom: $thinGrayBorder;
+
+    &__icon {
+      @include fixed-square($hugeiconSize);
+      --local-primary: #{$won-line-gray};
     }
 
-    &__howto {
-      padding-top: 3rem;
-
-      &__button {
-        width: 100%;
-      }
+    &__text {
+      margin-top: 1rem;
+      color: $won-line-gray;
+      font-size: $mediumFontSize;
+    }
+    &__subtext {
+      margin-top: 0.5rem;
+      color: $won-line-gray;
+      font-size: $normalFontSize;
     }
   }
 }

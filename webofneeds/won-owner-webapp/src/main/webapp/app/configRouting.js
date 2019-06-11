@@ -17,9 +17,11 @@ import settingsComponent from "./pages/settings.jsx";
 import postComponent from "./pages/post.jsx";
 import overviewComponent from "./pages/overview.jsx";
 import mapComponent from "./pages/map.jsx";
+import createComponent from "./pages/create.jsx";
 import aboutComponent from "./pages/about.jsx";
 import connectionsComponent from "./pages/connections.jsx";
 import signupComponent from "./pages/signup.jsx";
+import inventoryComponent from "./pages/inventory.jsx";
 
 import jsxRenderer from "@depack/render";
 
@@ -50,7 +52,7 @@ export const resetParamsImm = Immutable.fromJS(resetParams);
 /**
  * Default Route
  */
-export const defaultRoute = "connections";
+export const defaultRoute = "inventory";
 
 /**
  * Adapted from https://github.com/neilff/redux-ui-router/blob/master/example/index.js
@@ -89,8 +91,17 @@ export const configRouting = [
         as: "map",
       },
       {
-        path:
-          "/connections?privateId?postUri?connectionUri?useCase?useCaseGroup?token?viewAtomUri?viewConnUri?fromAtomUri?mode",
+        path: "/create?useCase?useCaseGroup?fromAtomUri?mode",
+        component: createComponent,
+        as: "create",
+      },
+      {
+        path: "/inventory?viewAtomUri?viewConnUri?token?privateId",
+        component: inventoryComponent,
+        as: "inventory",
+      },
+      {
+        path: "/connections?connectionUri?viewAtomUri?viewConnUri",
         component: connectionsComponent,
         as: "connections",
       },
@@ -169,19 +180,6 @@ export function accessControl({
     "\" that won't work" +
     "without logging in. Blocking route-change.";
   switch (toState.name) {
-    case defaultRoute:
-    case "connections": {
-      //If we know the user is not loggedIn and there is a postUri in the route, we link to the post-visitor view
-      const postUriFromRoute = toParams["postUri"];
-      if (
-        !accountUtils.isLoggedIn(get(state, "account")) &&
-        !!postUriFromRoute
-      ) {
-        dispatch(actionCreators.router__stateGoResetParams(defaultRoute));
-      }
-      return;
-    }
-
     case "post": {
       const postUriFromRoute = toParams["postUri"];
 
@@ -200,6 +198,10 @@ export function accessControl({
       }
       return;
 
+    case defaultRoute:
+    case "connections":
+    case "create":
+    case "inventory":
     case "overview":
     case "map":
     case "signup":

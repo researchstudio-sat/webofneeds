@@ -31,12 +31,6 @@ won-usecase-group {
     min-width: 0;
     align-items: center;
 
-    // so it doesn't interset with the speech-bubble tail coming in from the left on the desktop version
-    padding-left: 0.5rem;
-    @media (max-width: $responsivenessBreakPoint) {
-      padding-left: 0;
-    }
-
     &__title {
       grid-area: header_title;
       color: $won-subtitle-gray;
@@ -52,6 +46,8 @@ won-usecase-group {
 
     &__back {
       grid-area: header_back;
+      display: grid;
+
       &__icon {
         --local-primary: #{$won-primary-color};
         @include fixed-square($backIconSize);
@@ -66,7 +62,12 @@ won-usecase-group {
     display: grid;
     grid-auto-rows: min-content;
     grid-auto-flow: row dense;
-    grid-template-columns: 1fr 1fr 1fr;
+    @media (min-width: $responsivenessBreakPoint) {
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+    @media (max-width: $responsivenessBreakPoint) {
+      grid-template-columns: 1fr 1fr;
+    }
     grid-gap: $gridRowGap;
     overflow: auto;
 

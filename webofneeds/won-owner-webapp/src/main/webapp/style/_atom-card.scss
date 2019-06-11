@@ -4,14 +4,10 @@
 
 won-atom-card {
   display: grid;
-  grid-template-areas: "card__icon" "card__main" "card__persona";
-  grid-template-rows: max-content 1fr min-content;
+  grid-template-areas: "card__icon" "card__main" "card__persona" "card__indicators";
+  grid-template-rows: max-content 1fr min-content min-content;
   padding: 0.5rem;
   color: black;
-
-  &.won-is-invisible {
-    display: none;
-  }
 
   &.won-is-toload,
   &.won-is-loading {
@@ -132,6 +128,11 @@ won-atom-card {
     }
   }
 
+  .card__indicators {
+    grid-area: card__indicators;
+    margin-top: 0.5rem;
+  }
+
   .card__persona {
     grid-area: card__persona;
     margin-top: 0.5rem;
@@ -190,8 +191,11 @@ won-atom-card {
     grid-template-areas: "card__main__topline" "card__main__subtitle";
     grid-template-columns: 1fr;
     grid-template-rows: min-content min-content min-content;
-    width: 15rem;
-    max-width: 15rem;
+
+    @media (min-width: $responsivenessBreakPoint) {
+      width: 15rem;
+      max-width: 15rem;
+    }
 
     &--showIcon {
       grid-template-areas: "card__main__icon card__main__topline" "card__main__icon card__main__subtitle";

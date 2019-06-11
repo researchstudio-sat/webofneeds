@@ -33,11 +33,8 @@ function genComponentConf() {
         <div class="cp__header">
             <a class="cp__header__back clickable"
                 ng-click="self.router__back()">
-                <svg class="cp__header__back__icon show-in-responsive">
+                <svg class="cp__header__back__icon">
                     <use xlink:href="#ico36_backarrow" href="#ico36_backarrow"></use>
-                </svg>
-                <svg class="cp__header__back__icon hide-in-responsive">
-                    <use xlink:href="#ico36_close" href="#ico36_close"></use>
                 </svg>
             </a>
             <svg class="cp__header__icon"
@@ -375,7 +372,7 @@ function genComponentConf() {
             tempDraft,
             persona
           );
-          this.router__stateGoCurrent({
+          this.router__stateGo("connections", {
             useCase: undefined,
             connectionUri: undefined,
           });
@@ -389,7 +386,7 @@ function genComponentConf() {
                   tempDraft,
                   persona
                 );
-                this.router__stateGoCurrent({
+                this.router__stateGo("connections", {
                   useCase: undefined,
                   connectionUri: undefined,
                 });
@@ -417,12 +414,14 @@ function genComponentConf() {
 
         if (this.loggedIn) {
           this.atoms__create(tempDraft, persona, tempDefaultNodeUri);
+          this.router__stateGo("inventory");
         } else {
           this.view__showTermsDialog(
             Immutable.fromJS({
               acceptCallback: () => {
                 this.view__hideModalDialog();
                 this.atoms__create(tempDraft, persona, tempDefaultNodeUri);
+                this.router__stateGo("inventory");
               },
               cancelCallback: () => {
                 this.view__hideModalDialog();

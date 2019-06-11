@@ -408,8 +408,6 @@ function connectReactionAtom(
         actionCreators.router__stateGo("connections", {
           useCase: undefined,
           useCaseGroup: undefined,
-          postUri: atomUri,
-          atomUri: undefined,
           fromAtomUri: undefined,
           viewAtomUri: undefined,
           viewConnUri: undefined,
@@ -511,8 +509,6 @@ function connectAdHoc(theirAtomUri, textMessage, persona, dispatch, getState) {
           actionToDispatch: {
             effect: "stateGoCurrent",
             connectionUri: "responseEvent::receiverUri",
-            postUri: theirAtom,
-            atomUri: atomUri,
           },
         },
       });

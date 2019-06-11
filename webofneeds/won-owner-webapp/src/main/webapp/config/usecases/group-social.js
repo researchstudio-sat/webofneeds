@@ -12,9 +12,9 @@ export const socialGroup = {
   subItems: {
     getBreakfast: getBreakfast,
     afterparty: afterparty,
-    sightseeing: sightseeing,
-    getToKnow: getToKnow,
     complain: complain,
+    getToKnow: getToKnow,
+    sightseeing: sightseeing,
     handleComplaint: handleComplaint,
   },
 };

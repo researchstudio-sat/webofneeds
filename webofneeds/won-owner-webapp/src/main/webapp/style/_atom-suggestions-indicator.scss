@@ -5,63 +5,17 @@
 @import "square-image";
 @import "speech-bubble";
 
-won-suggestion-selection-item {
-  $triangleCutoutSize: $speechBubbleTailSize;
-  $padding: 0.5rem;
+won-atom-suggestions-indicator {
   display: grid;
   grid-template-columns: min-content 1fr;
   align-items: center;
 
   position: relative; // to allow positioning the contextmenu in relation to this component-root
-  padding-left: $padding + $triangleCutoutSize;
-  padding-right: $padding;
-  padding-top: $padding;
-  padding-bottom: $padding;
+  padding-top: 0.5rem;
   cursor: pointer;
+  border-top: $thinGrayBorder;
 
-  background-color: $won-light-gray;
-
-  &:not(.won-unread) {
-    @include speech-bubble-left-inward(
-      $won-line-gray,
-      $won-line-gray,
-      $triangleCutoutSize,
-      $thinBorderWidth,
-      50%,
-      "before" /* needed so there can be another tail*/
-    );
-    border-left: $thinGrayBorder;
-  }
-  &.won-unread {
-    @include speech-bubble-left-inward(
-      $won-unread-attention,
-      $won-unread-attention,
-      $triangleCutoutSize,
-      $thinBorderWidth,
-      50%,
-      "before" /* needed so there can be another tail*/
-    );
-    border-left: $thinBorderWidth solid $won-unread-attention;
-  }
-
-  $invisibleBorder: $thinBorderWidth solid $won-light-gray;
-  border-left: $thinGrayBorder;
-  border-bottom: $thinGrayBorder;
-
-  &:hover,
-  &.selected {
-    background-color: white;
-  }
-  &.selected {
-    @include speech-bubble-right(
-      white,
-      $won-line-gray,
-      $speechBubbleTailSize,
-      $thinBorderWidth,
-      50%
-    );
-  }
-  .ssi__icon {
+  .asi__icon {
     box-sizing: border-box;
     padding: 0.25rem;
     @include fixed-square($postIconSize);
@@ -72,7 +26,7 @@ won-suggestion-selection-item {
       --local-primary: #{$won-primary-color-light};
     }
   }
-  .ssi__right {
+  .asi__right {
     display: grid;
     grid-template-areas: "topline" "subtitle";
     padding-left: 0.5rem;

@@ -26,12 +26,12 @@ function genTopnavConf() {
               <span class="topnav__app-title hide-in-responsive" ng-click="self.router__stateGoDefault()">
                   {{ self.appTitle }}
               </span>
-              <!--span class="topnav__divider hide-in-responsive" ng-if="self.pageTitle">
+              <span class="topnav__divider hide-in-responsive" ng-if="self.pageTitle">
                   &mdash;
               </span>
               <span class="topnav__page-title" ng-if="self.pageTitle">
                   {{ self.pageTitle }}
-              </span-->
+              </span>
             </div>
             <div class="topnav__slideintoggle"
                 ng-if="self.showSlideInIndicator"

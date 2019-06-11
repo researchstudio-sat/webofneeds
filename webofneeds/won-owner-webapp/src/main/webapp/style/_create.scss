@@ -1,0 +1,16 @@
+@import "won-config";
+@import "sizing-utils";
+@import "fonts";
+@import "flex-layout";
+
+main.ownercreate {
+  grid-column: 1 / -1;
+  border: $thinGrayBorder;
+  border-top: 0;
+  box-sizing: border-box;
+  align-items: stretch;
+  max-width: $maxContentWidth;
+  width: 100%;
+  margin: 0 auto;
+  background: white;
+}

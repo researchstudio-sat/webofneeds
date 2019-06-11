@@ -41,10 +41,12 @@ import { actionCreators } from "./actions/actions.js";
 
 //-------- Components ---------
 import topnav from "./components/topnav.js";
+import menu from "./components/menu.js";
 import footer from "./components/footer.js";
 import modalDialog from "./components/modal-dialog.js";
 import toasts from "./components/toasts.js";
 import slideIn from "./components/slide-in.js";
+import postInfo from "./components/post-info.js";
 import connectionsComponent from "./pages/connections.jsx";
 import overviewComponent from "./pages/overview.jsx";
 import mapComponent from "./pages/map.jsx";
@@ -52,6 +54,8 @@ import postComponent from "./pages/post.jsx";
 import aboutComponent from "./pages/about.jsx";
 import signupComponent from "./pages/signup.jsx";
 import settingsComponent from "./pages/settings.jsx";
+import inventoryComponent from "./pages/inventory.jsx";
+import createComponent from "./pages/create.jsx";
 
 //won import (used so you can access the debugmode variable without reloading the page)
 import won from "./service/won.js";
@@ -83,10 +87,12 @@ let app = angular.module("won.owner", [
 
   //components
   topnav,
+  menu,
   footer,
   modalDialog,
   toasts,
   slideIn,
+  postInfo,
 
   //details
   ...detailModules,
@@ -99,6 +105,8 @@ let app = angular.module("won.owner", [
   aboutComponent.module,
   signupComponent.module,
   settingsComponent.module,
+  inventoryComponent.module,
+  createComponent.module,
 ]);
 
 /* create store, register middlewares, set up redux-devtool-support, etc */
