@@ -16,6 +16,7 @@ import {
   fetchDataForNonOwnedAtomOnly,
 } from "../won-message-utils.js";
 import * as connectionUtils from "../connection-utils.js";
+import * as atomUtils from "../atom-utils.js";
 import { get } from "../utils.js";
 
 export function fetchUnloadedAtoms() {
@@ -35,12 +36,30 @@ export function atomsConnect(
   ownedAtomUri,
   ownConnectionUri,
   theirAtomUri,
-  connectMessage
+  connectMessage,
+  ownSocketType,
+  theirSocketType
 ) {
   return async (dispatch, getState) => {
     const state = getState();
     const ownedAtom = state.getIn(["atoms", ownedAtomUri]);
     const theirAtom = state.getIn(["atoms", theirAtomUri]);
+
+    const ownSocketUri = atomUtils.getSocketUri(ownedAtom, ownSocketType);
+    const theirSocketUri = atomUtils.getSocketUri(theirAtom, theirSocketType);
+
+    if (ownSocketType && !ownSocketUri) {
+      throw new Error(
+        `Atom ${ownedAtom.get("uri")} does not have a ${ownSocketType}`
+      );
+    }
+
+    if (theirSocketType && !theirSocketUri) {
+      throw new Error(
+        `Atom ${theirAtom.get("uri")} does not have a ${theirSocketType}`
+      );
+    }
+
     const cnctMsg = await buildConnectMessage({
       ownedAtomUri: ownedAtomUri,
       theirAtomUri: theirAtomUri,
@@ -48,6 +67,8 @@ export function atomsConnect(
       theirNodeUri: theirAtom.get("nodeUri"),
       connectMessage: connectMessage,
       optionalOwnConnectionUri: ownConnectionUri,
+      ownSocket: ownSocketUri,
+      theirSocket: theirSocketUri,
     });
     const optimisticEvent = await won.wonMessageFromJsonLd(cnctMsg.message);
     dispatch({
