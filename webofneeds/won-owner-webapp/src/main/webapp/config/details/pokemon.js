@@ -50,41 +50,41 @@ export const pokemonRaid = {
   filterDetail: {
     placeholder: "Filter by (name or id)",
   },
-  pokemonList: [
-    //TODO: UPDATE LIST OR EXTRACT INTO SEPARATE FILE OR FIND WS that supplies these
-    {
-      id: 1,
-      name: "Bulbasaur",
-      imageUrl: "https://files.pokefans.net/images/pokemon-go/modelle/001.png",
-    },
-    {
-      id: 2,
-      name: "Ivysaur",
-      imageUrl: "https://files.pokefans.net/images/pokemon-go/modelle/002.png",
-    },
-    {
-      id: 3,
-      name: "Venusaur",
-      imageUrl: "https://files.pokefans.net/images/pokemon-go/modelle/003.png",
-    },
-    {
-      id: 4,
-      name: "Charmander",
-      imageUrl: "https://files.pokefans.net/images/pokemon-go/modelle/004.png",
-    },
-    {
-      id: 386,
-      name: "Deoxys",
-      imageUrl: "https://files.pokefans.net/images/pokemon-go/modelle/386.png",
-    },
-    {
-      id: 386,
-      form: "init",
-      name: "Deoxys",
-      imageUrl:
-        "https://files.pokefans.net/images/pokemon-go/modelle/386-04.png",
-    },
-  ],
+  // pokemonList: [
+  //   //TODO: UPDATE LIST OR EXTRACT INTO SEPARATE FILE OR FIND WS that supplies these
+  //   {
+  //     id: 1,
+  //     name: "Bulbasaur",
+  //     imageUrl: "https://files.pokefans.net/images/pokemon-go/modelle/001.png",
+  //   },
+  //   {
+  //     id: 2,
+  //     name: "Ivysaur",
+  //     imageUrl: "https://files.pokefans.net/images/pokemon-go/modelle/002.png",
+  //   },
+  //   {
+  //     id: 3,
+  //     name: "Venusaur",
+  //     imageUrl: "https://files.pokefans.net/images/pokemon-go/modelle/003.png",
+  //   },
+  //   {
+  //     id: 4,
+  //     name: "Charmander",
+  //     imageUrl: "https://files.pokefans.net/images/pokemon-go/modelle/004.png",
+  //   },
+  //   {
+  //     id: 386,
+  //     name: "Deoxys",
+  //     imageUrl: "https://files.pokefans.net/images/pokemon-go/modelle/386.png",
+  //   },
+  //   {
+  //     id: 386,
+  //     form: "init",
+  //     name: "Deoxys",
+  //     imageUrl:
+  //       "https://files.pokefans.net/images/pokemon-go/modelle/386-04.png",
+  //   },
+  // ],
   findPokemonById: function(id, form) {
     if (id) {
       for (const idx in this.pokemonList) {

@@ -21,6 +21,7 @@ function genComponentConf() {
           <input id="prbp__level__5" type="radio" name="prbp__level" class="prbp__level__option" value="5" ng-checked="self.isLevelChecked(5)"/>
           <label for="prbp__level__5" ng-click="self.updateLevel(5)">{{ self.detail.getLevelLabel(5) }}</label>
       </div>
+
       <label for="prbp__hatched">Hatched</label>
       <input
           type="checkbox"
@@ -28,6 +29,7 @@ function genComponentConf() {
           class="prbp__hatched"
           ng-model="self.pokemonRaidBoss.hatched"
           ng-change="self.updateHatched(self.pokemonRaidBoss.hatched)"/>
+
       <label class="prbp__label" ng-class="{'prbp__label--disabled': self.pokemonRaidBoss.hatched}">Hatches at</label>
       <won-datetime-picker
           ng-class="{'prbp__hatches--disabled': self.pokemonRaidBoss.hatched}"
@@ -36,6 +38,7 @@ function genComponentConf() {
           on-update="self.updateHatches(value)"
           detail="self.detail && self.detail.hatches">
       </won-datetime-picker>
+
       <label class="prbp__label">Expires at</label>
       <won-datetime-picker
           class="prbp__expires"
@@ -43,8 +46,10 @@ function genComponentConf() {
           on-update="self.updateExpires(value)"
           detail="self.detail && self.detail.expires">
       </won-datetime-picker>
+
       <label class="prbp__label"
           ng-class="{'prbp__label--disabled': !self.pokemonRaidBoss.hatched}">Pokemon</label>
+      <!-- POKEMON NAME -->
       <won-title-picker
           ng-class="{'prbp__pokemon--disabled': !self.pokemonRaidBoss.hatched}"
           class="prbp__pokemon"
@@ -52,6 +57,7 @@ function genComponentConf() {
           on-update="self.updatePokemonFilter(value)"
           detail="self.detail && self.detail.filterDetail">
       </won-title-picker>
+      <!-- POKEMON LIST -->
       <div class="prbp__pokemonlist" ng-class="{'prbp__pokemonlist--disabled': !self.pokemonRaidBoss.hatched}">
         <div class="prbp__pokemonlist__pokemon"
           ng-repeat="pokemon in self.detail.pokemonList | filter:self.filterPokemon(self.pokemonFilter, self.pokemonRaidBoss.id, self.pokemonRaidBoss.form)"
@@ -81,6 +87,8 @@ function genComponentConf() {
       this.pokemonRaidBoss = this.initialValue || { level: 1 };
 
       this.pokemonFilter = undefined;
+
+      this.pokemonList = getCurrentPokemon();
 
       delay(0).then(() => this.showInitialValues());
     }
@@ -216,6 +224,37 @@ function genComponentConf() {
     },
     template: template,
   };
+}
+
+function getCurrentPokemon() {
+  // TODO: change this URL for any live system
+  // TODO: add hardcoded fallback list
+  const url = "http://localhost:1234/current";
+  let pokeList = "not available";
+
+  // TODO: error catching - check if response.status is 200
+  pokeList = fetch(url).then(async response =>
+    formatPokemonJson(await response.json())
+  );
+  // edit list to fit "our" format
+  // return result
+  return pokeList;
+}
+
+function formatPokemonJson(jsonList) {
+  if (!jsonList || jsonList.length == 0) {
+    // TODO: return some sort of error
+  }
+  let formattedList = { array: [] };
+  for (let entry of jsonList) {
+    formattedList["array"].push({
+      id: entry.PokemonId,
+      name: entry.Pokemons[0].Name,
+      imageUrl: entry.Pokemons[0].PokemonPictureFileNameLink,
+    });
+  }
+  console.log(formattedList["array"]);
+  return formattedList["array"];
 }
 
 export default angular
