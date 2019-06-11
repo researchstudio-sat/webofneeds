@@ -93,7 +93,7 @@ public class User implements UserDetails, Persistable<Long> {
     // during high usage. Fix it.
     @ElementCollection(fetch = FetchType.EAGER)
     private Set<URI> draftURIs;
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "user_id")
     private Set<PushSubscription> pushSubscriptions = new HashSet<>();
     @Transient

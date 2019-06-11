@@ -365,7 +365,7 @@ public class UserService {
     }
 
     public void addPushSubscription(User user, PushSubscription subscription) {
-        pushSubscriptionRepository.save(subscription);
         user.addPushSubscription(subscription);
+        save(user);
     }
 }

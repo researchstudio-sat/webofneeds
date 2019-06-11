@@ -461,7 +461,7 @@ public class RestUserController {
         }
     }
 
-    @RequestMapping(value = "/subscribeNotifications", method = RequestMethod.POST)
+    @RequestMapping(value = "/subscribeNotifications", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @Transactional(propagation = Propagation.REQUIRED)
     public ResponseEntity subscribeNotifications(@RequestBody Subscription subscription) {
         SecurityContext context = SecurityContextHolder.getContext();
