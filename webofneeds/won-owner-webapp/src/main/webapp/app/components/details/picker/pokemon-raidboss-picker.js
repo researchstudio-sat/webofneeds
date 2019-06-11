@@ -60,12 +60,12 @@ function genComponentConf() {
       <!-- POKEMON LIST -->
       <div class="prbp__pokemonlist" ng-class="{'prbp__pokemonlist--disabled': !self.pokemonRaidBoss.hatched}">
         <div class="prbp__pokemonlist__pokemon"
-          ng-repeat="pokemon in self.detail.pokemonList | filter:self.filterPokemon(self.pokemonFilter, self.pokemonRaidBoss.id, self.pokemonRaidBoss.form)"
+          ng-repeat="pokemon in self.pokemonList | filter:self.filterPokemon(self.pokemonFilter, self.pokemonRaidBoss.id, self.pokemonRaidBoss.form)"
           ng-class="{
             'prbp__pokemonlist__pokemon--selected': self.pokemonRaidBoss.id == pokemon.id && (!self.pokemonRaidBoss.form || self.pokemonRaidBoss.form == pokemon.form)
           }"
           ng-click="self.updatePokemon(pokemon.id, pokemon.form)">
-          <img class="prbp__pokemonlist__pokemon__image" src="{{pokemon.imageUrl}}"/>
+          <img class="prbp__pokemonlist__pokemon__image" src={{pokemon.imageUrl}}/>
           <div class="prbp__pokemonlist__pokemon__id">
             #{{pokemon.id}}
           </div>
@@ -85,10 +85,7 @@ function genComponentConf() {
       window.pkmRaidBossp4dbg = this;
 
       this.pokemonRaidBoss = this.initialValue || { level: 1 };
-
       this.pokemonFilter = undefined;
-
-      this.pokemonList = getCurrentPokemon();
 
       delay(0).then(() => this.showInitialValues());
     }
@@ -207,7 +204,11 @@ function genComponentConf() {
 
     showInitialValues() {
       this.pokemonRaidBoss = this.initialValue || { level: 1 };
-      this.$scope.$apply();
+      // populate pokemonlist
+      getCurrentPokemon().then(pokemonList => {
+        this.pokemonList = pokemonList;
+        this.$scope.$apply();
+      });
     }
   }
   Controller.$inject = serviceDependencies;
@@ -230,30 +231,34 @@ function getCurrentPokemon() {
   // TODO: change this URL for any live system
   // TODO: add hardcoded fallback list
   const url = "http://localhost:1234/current";
-  let pokeList = "not available";
+  //let pokeList = "not available";
 
   // TODO: error catching - check if response.status is 200
-  pokeList = fetch(url).then(async response =>
-    formatPokemonJson(await response.json())
-  );
+
   // edit list to fit "our" format
   // return result
-  return pokeList;
+  return fetch(url)
+    .then(response => response.json())
+    .then(r => formatPokemonJson(r));
 }
 
 function formatPokemonJson(jsonList) {
   if (!jsonList || jsonList.length == 0) {
-    // TODO: return some sort of error
+    // return fallbackPokemonList;
   }
   let formattedList = { array: [] };
   for (let entry of jsonList) {
-    formattedList["array"].push({
-      id: entry.PokemonId,
-      name: entry.Pokemons[0].Name,
-      imageUrl: entry.Pokemons[0].PokemonPictureFileNameLink,
-    });
+    let pokemon = {};
+    pokemon.id = entry.PokemonId;
+    pokemon.name = entry.Pokemons[0].Name;
+    pokemon.imageUrl = entry.Pokemons[0].PokemonPictureFileNameLink;
+    pokemon.isShiny = entry.Pokemons[0].isShiny;
+    if (entry.Pokemons[0].HasForm) {
+      pokemon.form = entry.Pokemons[0].Form;
+    }
+
+    formattedList["array"].push(pokemon);
   }
-  console.log(formattedList["array"]);
   return formattedList["array"];
 }
 
