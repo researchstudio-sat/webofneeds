@@ -4,6 +4,8 @@ import java.net.URI;
 import java.util.Optional;
 
 import org.apache.camel.Exchange;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import won.node.camel.processor.AbstractCamelProcessor;
@@ -25,6 +27,7 @@ import won.protocol.model.Connection;
 @Component
 @FixedMessageReactionProcessor()
 public class ConnectionStateChangeReactionProcessor extends AbstractCamelProcessor {
+    Logger logger = LoggerFactory.getLogger(getClass());
     public ConnectionStateChangeReactionProcessor() {
     }
 
@@ -34,6 +37,7 @@ public class ConnectionStateChangeReactionProcessor extends AbstractCamelProcess
         ConnectionStateChangeBuilder stateChangeBuilder = (ConnectionStateChangeBuilder) exchange.getIn()
                         .getHeader(WonCamelConstants.CONNECTION_STATE_CHANGE_BUILDER_HEADER);
         if (stateChangeBuilder == null) {
+            logger.info("no stateChangeBuilder found in exchange header, cannot check for state change");
             return;
         }
         // first, try to find the connection uri in the header:
@@ -65,7 +69,12 @@ public class ConnectionStateChangeReactionProcessor extends AbstractCamelProcess
             if (connectionStateChange.isConnect() || connectionStateChange.isDisconnect()) {
                 // trigger rematch
                 matcherProtocolMatcherClient.atomModified(atom.getAtomURI(), null);
+                logger.info("matchers notified of connection state change");
+            } else {
+                logger.debug("no relevant connection state change, not notifying matchers");
             }
+        } else {
+            logger.info("Could collect ConnectionStateChange information, not checking for state change");
         }
     }
 }
