@@ -5,10 +5,9 @@
 import won from "../won-es6.js";
 import Immutable from "immutable";
 
-import {
-  getConnectionUriFromRoute,
-  getOwnedAtomByConnectionUri,
-} from "../selectors/general-selectors.js";
+import * as generalSelectors from "../selectors/general-selectors.js";
+import * as atomUtils from "../atom-utils.js";
+import * as ownerApi from "../owner-api.js";
 import { getOwnedConnectionByUri } from "../selectors/connection-selectors.js";
 
 import { get, getIn, urisToLookupSuccessAndFailedMap } from "../utils.js";
@@ -317,13 +316,15 @@ export function connectionsConnectReactionAtom(
 function connectReactionAtom(
   connectToAtomUri,
   atomDraft,
-  persona,
+  personaUri,
   dispatch,
   getState
 ) {
   ensureLoggedIn(dispatch, getState).then(async () => {
+    //TODO: Determine the ownership of the connectToAtom and if it is owned by you then autoOpen the connection
     const state = getState();
     const connectoToAtom = getIn(state, ["atoms", connectToAtomUri]);
+
     const nodeUri = getIn(state, ["config", "defaultNodeUri"]);
 
     // create new atom
@@ -333,34 +334,25 @@ function connectReactionAtom(
     );
 
     // add persona
-    if (persona) {
-      const response = await fetch("rest/action/connect", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+    if (personaUri) {
+      const persona = getIn(state, ["atoms", personaUri]);
+      const response = await ownerApi.serverSideConnect(
+        {
+          pending: false,
+          socket: atomUtils.getSocketUri(
+            persona,
+            won.HOLD.HolderSocketCompacted
+          ),
         },
-        body: JSON.stringify([
-          {
-            pending: false,
-            //socket: `${persona}#holderSocket`,
-            socket: getIn(state, [
-              "atoms",
-              persona,
-              "content",
-              "sockets",
-            ]).keyOf("hold:HolderSocket"),
-          },
-          {
-            pending: true,
-            socket: `${atomUri}#holdableSocket`,
-            // FIXME: does not work as new atom is not in state yet
-            //socket: getIn(state, ["atoms", atomUri, "content", "sockets"]).keyOf(
-            //  "hold:HoldableSocket"
-            //),
-          },
-        ]),
-        credentials: "include",
-      });
+        {
+          pending: true,
+          socket: `${atomUri}#holdableSocket`,
+          // FIXME: does not work as new atom is not in state yet
+          //socket: getIn(state, ["atoms", atomUri, "content", "sockets"]).keyOf(
+          //  "hold:HoldableSocket"
+          //),
+        }
+      );
       if (!response.ok) {
         const errorMsg = await response.text();
         throw new Error(`Could not connect identity: ${errorMsg}`);
@@ -447,33 +439,23 @@ function connectAdHoc(theirAtomUri, textMessage, persona, dispatch, getState) {
 
     // add persona
     if (persona) {
-      const response = await fetch("rest/action/connect", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await ownerApi.serverSideConnect(
+        {
+          pending: false,
+          //socket: `${persona}#holderSocket`,
+          socket: getIn(state, ["atoms", persona, "content", "sockets"]).keyOf(
+            "hold:HolderSocket"
+          ),
         },
-        body: JSON.stringify([
-          {
-            pending: false,
-            //socket: `${persona}#holderSocket`,
-            socket: getIn(state, [
-              "atoms",
-              persona,
-              "content",
-              "sockets",
-            ]).keyOf("hold:HolderSocket"),
-          },
-          {
-            pending: true,
-            socket: `${atomUri}#holdableSocket`,
-            // FIXME: does not work as new atom is not in state yet
-            //socket: getIn(state, ["atoms", atomUri, "content", "sockets"]).keyOf(
-            //  "hold:HoldableSocket"
-            //),
-          },
-        ]),
-        credentials: "include",
-      });
+        {
+          pending: true,
+          socket: `${atomUri}#holdableSocket`,
+          // FIXME: does not work as new atom is not in state yet
+          //socket: getIn(state, ["atoms", atomUri, "content", "sockets"]).keyOf(
+          //  "hold:HoldableSocket"
+          //),
+        }
+      );
       if (!response.ok) {
         const errorMsg = await response.text();
         throw new Error(`Could not connect identity: ${errorMsg}`);
@@ -667,9 +649,10 @@ export function showLatestMessages(connectionUriParam, numberOfEvents) {
   return (dispatch, getState) => {
     const state = getState();
     const connectionUri =
-      connectionUriParam || getConnectionUriFromRoute(state);
+      connectionUriParam || generalSelectors.getConnectionUriFromRoute(state);
     const atom =
-      connectionUri && getOwnedAtomByConnectionUri(state, connectionUri);
+      connectionUri &&
+      generalSelectors.getOwnedAtomByConnectionUri(state, connectionUri);
     const atomUri = atom && atom.get("uri");
     const connection =
       connectionUri && getOwnedConnectionByUri(state, connectionUri);
@@ -731,7 +714,8 @@ export function loadLatestMessagesOfConnection({
   dispatch,
 }) {
   const atom =
-    connectionUri && getOwnedAtomByConnectionUri(state, connectionUri);
+    connectionUri &&
+    generalSelectors.getOwnedAtomByConnectionUri(state, connectionUri);
   const atomUri = atom && atom.get("uri");
   const connection =
     connectionUri && getOwnedConnectionByUri(state, connectionUri);
@@ -801,9 +785,10 @@ export function showMoreMessages(connectionUriParam, numberOfEvents) {
   return (dispatch, getState) => {
     const state = getState();
     const connectionUri =
-      connectionUriParam || getConnectionUriFromRoute(state);
+      connectionUriParam || generalSelectors.getConnectionUriFromRoute(state);
     const atom =
-      connectionUri && getOwnedAtomByConnectionUri(state, connectionUri);
+      connectionUri &&
+      generalSelectors.getOwnedAtomByConnectionUri(state, connectionUri);
     const atomUri = atom && atom.get("uri");
     const connection = atom && atom.getIn(["connections", connectionUri]);
     const connectionMessages = connection && connection.get("messages");
