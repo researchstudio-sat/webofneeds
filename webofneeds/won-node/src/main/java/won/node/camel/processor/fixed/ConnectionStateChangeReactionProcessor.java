@@ -28,6 +28,7 @@ import won.protocol.model.Connection;
 @FixedMessageReactionProcessor()
 public class ConnectionStateChangeReactionProcessor extends AbstractCamelProcessor {
     Logger logger = LoggerFactory.getLogger(getClass());
+
     public ConnectionStateChangeReactionProcessor() {
     }
 
