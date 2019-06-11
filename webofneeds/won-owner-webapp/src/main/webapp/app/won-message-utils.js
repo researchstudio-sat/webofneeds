@@ -197,8 +197,8 @@ export function buildConnectMessage({
   theirNodeUri,
   connectMessage,
   optionalOwnConnectionUri,
-  ownSocket,
-  theirSocket,
+  socketUri,
+  targetSocketUri,
 }) {
   const envelopeData = won.getEnvelopeDataforNewConnection(
     ownedAtomUri,
@@ -209,11 +209,11 @@ export function buildConnectMessage({
   if (optionalOwnConnectionUri) {
     envelopeData[won.WONMSG.sender] = optionalOwnConnectionUri;
   }
-  if (ownSocket) {
-    envelopeData[won.WONMSG.senderSocket] = ownSocket;
+  if (socketUri) {
+    envelopeData[won.WONMSG.senderSocket] = socketUri;
   }
-  if (theirSocket) {
-    envelopeData[won.WONMSG.recipientSocket] = theirSocket;
+  if (targetSocketUri) {
+    envelopeData[won.WONMSG.recipientSocket] = targetSocketUri;
   }
   //TODO: use event URI pattern specified by WoN node
   const eventUri =

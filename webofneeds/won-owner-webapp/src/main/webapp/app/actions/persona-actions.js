@@ -76,22 +76,22 @@ async function connectReview(
   connectMessage,
   connectionUri = undefined
 ) {
-  const ownSocketUri = atomUtils.getSocketUri(
+  const socketUri = atomUtils.getSocketUri(
     ownPersona,
     won.REVIEW.ReviewSocketCompacted
   );
-  const theirSocketUri = atomUtils.getSocketUri(
+  const targetSocketUri = atomUtils.getSocketUri(
     foreignPersona,
     won.REVIEW.ReviewSocketCompacted
   );
 
-  if (!ownSocketUri) {
+  if (!socketUri) {
     throw new Error(
       `Persona ${ownPersona.get("uri")} does not have a review socket`
     );
   }
 
-  if (!theirSocketUri) {
+  if (!targetSocketUri) {
     throw new Error(
       `Persona ${foreignPersona.get("uri")} does not have a review socket`
     );
@@ -104,8 +104,8 @@ async function connectReview(
     theirNodeUri: foreignPersona.get("nodeUri"),
     connectMessage: connectMessage,
     optionalOwnConnectionUri: connectionUri,
-    ownSocket: ownSocketUri,
-    theirSocket: theirSocketUri,
+    socketUri: socketUri,
+    targetSocketUri: targetSocketUri,
   });
   const optimisticEvent = await won.wonMessageFromJsonLd(cnctMsg.message);
   dispatch({
@@ -115,6 +115,8 @@ async function connectReview(
       message: cnctMsg.message,
       ownConnectionUri: connectionUri,
       optimisticEvent: optimisticEvent,
+      socketUri: socketUri,
+      targetSocketUri: targetSocketUri,
     },
   });
 }

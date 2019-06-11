@@ -37,26 +37,26 @@ export function atomsConnect(
   ownConnectionUri,
   theirAtomUri,
   connectMessage,
-  ownSocketType,
-  theirSocketType
+  socketType,
+  targetSocketType
 ) {
   return async (dispatch, getState) => {
     const state = getState();
     const ownedAtom = state.getIn(["atoms", ownedAtomUri]);
     const theirAtom = state.getIn(["atoms", theirAtomUri]);
 
-    const ownSocketUri = atomUtils.getSocketUri(ownedAtom, ownSocketType);
-    const theirSocketUri = atomUtils.getSocketUri(theirAtom, theirSocketType);
+    const socketUri = atomUtils.getSocketUri(ownedAtom, socketType);
+    const targetSocketUri = atomUtils.getSocketUri(theirAtom, targetSocketType);
 
-    if (ownSocketType && !ownSocketUri) {
+    if (socketType && !socketUri) {
       throw new Error(
-        `Atom ${ownedAtom.get("uri")} does not have a ${ownSocketType}`
+        `Atom ${ownedAtom.get("uri")} does not have a ${socketType}`
       );
     }
 
-    if (theirSocketType && !theirSocketUri) {
+    if (targetSocketType && !targetSocketUri) {
       throw new Error(
-        `Atom ${theirAtom.get("uri")} does not have a ${theirSocketType}`
+        `Atom ${theirAtom.get("uri")} does not have a ${targetSocketType}`
       );
     }
 
@@ -67,8 +67,8 @@ export function atomsConnect(
       theirNodeUri: theirAtom.get("nodeUri"),
       connectMessage: connectMessage,
       optionalOwnConnectionUri: ownConnectionUri,
-      ownSocket: ownSocketUri,
-      theirSocket: theirSocketUri,
+      socketUri: socketUri,
+      targetSocketUri: targetSocketUri,
     });
     const optimisticEvent = await won.wonMessageFromJsonLd(cnctMsg.message);
     dispatch({
@@ -78,6 +78,8 @@ export function atomsConnect(
         message: cnctMsg.message,
         ownConnectionUri: ownConnectionUri,
         optimisticEvent: optimisticEvent,
+        socketUri: socketUri,
+        targetSocketUri: targetSocketUri,
       },
     });
   };
