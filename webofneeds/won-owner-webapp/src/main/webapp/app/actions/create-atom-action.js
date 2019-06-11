@@ -84,14 +84,10 @@ export function atomCreate(draft, persona, nodeUri) {
       if (persona) {
         return ownerApi
           .serverSideConnect(
-            {
-              pending: false,
-              socket: `${persona}#holderSocket`,
-            },
-            {
-              pending: true,
-              socket: `${atomUri}#holdableSocket`,
-            }
+            `${persona}#holderSocket`,
+            `${atomUri}#holdableSocket`,
+            false,
+            true
           )
           .then(async response => {
             if (!response.ok) {

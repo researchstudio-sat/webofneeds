@@ -125,15 +125,10 @@ async function connectReview(
 export function connectPersona(atomUri, personaUri) {
   return dispatch => {
     return ownerApi
+      .serverSideConnect()
       .serverSideConnect(
-        {
-          pending: false,
-          socket: `${personaUri}#holderSocket`,
-        },
-        {
-          pending: false,
-          socket: `${atomUri}#holdableSocket`,
-        }
+        `${personaUri}#holderSocket`,
+        `${atomUri}#holdableSocket`
       )
       .then(async response => {
         if (!response.ok) {

@@ -338,21 +338,10 @@ function connectReactionAtom(
       const persona = getIn(state, ["atoms", personaUri]);
       ownerApi
         .serverSideConnect(
-          {
-            pending: false,
-            socket: atomUtils.getSocketUri(
-              persona,
-              won.HOLD.HolderSocketCompacted
-            ),
-          },
-          {
-            pending: true,
-            socket: `${atomUri}#holdableSocket`,
-            // FIXME: does not work as new atom is not in state yet
-            //socket: getIn(state, ["atoms", atomUri, "content", "sockets"]).keyOf(
-            //  "hold:HoldableSocket"
-            //),
-          }
+          atomUtils.getSocketUri(persona, won.HOLD.HolderSocketCompacted),
+          `${atomUri}#holdableSocket`,
+          false,
+          true
         )
         .then(async response => {
           if (!response.ok) {
@@ -418,7 +407,13 @@ export function connectionsConnectAdHoc(theirAtomUri, textMessage, persona) {
   return (dispatch, getState) =>
     connectAdHoc(theirAtomUri, textMessage, persona, dispatch, getState); // moved to separate function to make transpilation work properly
 }
-function connectAdHoc(theirAtomUri, textMessage, persona, dispatch, getState) {
+function connectAdHoc(
+  theirAtomUri,
+  textMessage,
+  personaUri,
+  dispatch,
+  getState
+) {
   ensureLoggedIn(dispatch, getState).then(async () => {
     const state = getState();
     const theirAtom = getIn(state, ["atoms", theirAtomUri]);
@@ -441,23 +436,13 @@ function connectAdHoc(theirAtomUri, textMessage, persona, dispatch, getState) {
     );
 
     // add persona
-    if (persona) {
+    if (personaUri) {
+      const persona = getIn(state, ["atoms", personaUri]);
       const response = await ownerApi.serverSideConnect(
-        {
-          pending: false,
-          //socket: `${persona}#holderSocket`,
-          socket: getIn(state, ["atoms", persona, "content", "sockets"]).keyOf(
-            "hold:HolderSocket"
-          ),
-        },
-        {
-          pending: true,
-          socket: `${atomUri}#holdableSocket`,
-          // FIXME: does not work as new atom is not in state yet
-          //socket: getIn(state, ["atoms", atomUri, "content", "sockets"]).keyOf(
-          //  "hold:HoldableSocket"
-          //),
-        }
+        atomUtils.getSocketUri(persona, won.HOLD.HolderSocketCompacted),
+        `${atomUri}#holdableSocket`,
+        false,
+        true
       );
       if (!response.ok) {
         const errorMsg = await response.text();
