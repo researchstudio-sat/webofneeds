@@ -54,7 +54,7 @@ export const pokemonRaid = {
     //TODO: move to separate file and include all pokemon
     {
       id: 1,
-      name: "Bulbasaur",
+      name: "TESTY",
       imageUrl: "https://files.pokefans.net/images/pokemon-go/modelle/001.png",
     },
     {
@@ -87,13 +87,13 @@ export const pokemonRaid = {
   ],
   findPokemonById: function(id, form) {
     if (id) {
-      for (const idx in this.pokemonList) {
+      for (const idx in this.fallbackPokemonList) {
         if (
-          this.pokemonList[idx].id == id &&
-          ((form && this.pokemonList[idx].form === form) ||
-            (!form && !this.pokemonList[idx].form))
+          this.fallbackPokemonList[idx].id == id &&
+          ((form && this.fallbackPokemonList[idx].form === form) ||
+            (!form && !this.fallbackPokemonList[idx].form))
         ) {
-          return this.pokemonList[idx];
+          return this.fallbackPokemonList[idx];
         }
       }
     }

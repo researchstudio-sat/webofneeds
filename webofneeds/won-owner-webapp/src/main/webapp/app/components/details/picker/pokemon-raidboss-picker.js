@@ -202,10 +202,49 @@ function genComponentConf() {
       this.update(this.pokemonRaidBoss);
     }
 
+    getCurrentPokemon() {
+      // TODO: change this URL for any live system
+      const url = "http://localhost:1234/all";
+
+      return fetch(url)
+        .then(response => {
+          if (response.ok) {
+            return response.json();
+          }
+          throw new Error("HTTP Error: ", response.status);
+        })
+        .then(jsonResponse => this.formatPokemonJson(jsonResponse))
+        .catch(error => {
+          console.log("Pokemon Data could not be fetched: ", error.message);
+          return this.detail.fallbackPokemonList;
+        });
+    }
+
+    formatPokemonJson(jsonList) {
+      if (!jsonList || jsonList.length == 0) {
+        console.log("jsonList is: " + jsonList);
+        return this.detail.fallbackPokemonList;
+      }
+      let formattedList = { array: [] };
+      for (let entry of jsonList) {
+        let pokemon = {};
+        pokemon.id = entry.PokemonId;
+        pokemon.name = entry.Pokemons[0].Name;
+        pokemon.imageUrl = entry.Pokemons[0].PokemonPictureFileNameLink;
+        pokemon.isShiny = entry.Pokemons[0].isShiny;
+        if (entry.Pokemons[0].HasForm) {
+          pokemon.form = entry.Pokemons[0].Form;
+        }
+
+        formattedList["array"].push(pokemon);
+      }
+      return formattedList["array"];
+    }
+
     showInitialValues() {
       this.pokemonRaidBoss = this.initialValue || { level: 1 };
       // populate pokemonlist
-      getCurrentPokemon().then(pokemonList => {
+      this.getCurrentPokemon().then(pokemonList => {
         this.pokemonList = pokemonList;
         this.$scope.$apply();
       });
@@ -225,41 +264,6 @@ function genComponentConf() {
     },
     template: template,
   };
-}
-
-function getCurrentPokemon() {
-  // TODO: change this URL for any live system
-  // TODO: add hardcoded fallback list
-  const url = "http://localhost:1234/current";
-  //let pokeList = "not available";
-
-  // TODO: error catching - check if response.status is 200
-
-  // edit list to fit "our" format
-  // return result
-  return fetch(url)
-    .then(response => response.json())
-    .then(r => formatPokemonJson(r));
-}
-
-function formatPokemonJson(jsonList) {
-  if (!jsonList || jsonList.length == 0) {
-    // return fallbackPokemonList;
-  }
-  let formattedList = { array: [] };
-  for (let entry of jsonList) {
-    let pokemon = {};
-    pokemon.id = entry.PokemonId;
-    pokemon.name = entry.Pokemons[0].Name;
-    pokemon.imageUrl = entry.Pokemons[0].PokemonPictureFileNameLink;
-    pokemon.isShiny = entry.Pokemons[0].isShiny;
-    if (entry.Pokemons[0].HasForm) {
-      pokemon.form = entry.Pokemons[0].Form;
-    }
-
-    formattedList["array"].push(pokemon);
-  }
-  return formattedList["array"];
 }
 
 export default angular
