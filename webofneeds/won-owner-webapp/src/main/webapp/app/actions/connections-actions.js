@@ -336,27 +336,30 @@ function connectReactionAtom(
     // add persona
     if (personaUri) {
       const persona = getIn(state, ["atoms", personaUri]);
-      const response = await ownerApi.serverSideConnect(
-        {
-          pending: false,
-          socket: atomUtils.getSocketUri(
-            persona,
-            won.HOLD.HolderSocketCompacted
-          ),
-        },
-        {
-          pending: true,
-          socket: `${atomUri}#holdableSocket`,
-          // FIXME: does not work as new atom is not in state yet
-          //socket: getIn(state, ["atoms", atomUri, "content", "sockets"]).keyOf(
-          //  "hold:HoldableSocket"
-          //),
-        }
-      );
-      if (!response.ok) {
-        const errorMsg = await response.text();
-        throw new Error(`Could not connect identity: ${errorMsg}`);
-      }
+      ownerApi
+        .serverSideConnect(
+          {
+            pending: false,
+            socket: atomUtils.getSocketUri(
+              persona,
+              won.HOLD.HolderSocketCompacted
+            ),
+          },
+          {
+            pending: true,
+            socket: `${atomUri}#holdableSocket`,
+            // FIXME: does not work as new atom is not in state yet
+            //socket: getIn(state, ["atoms", atomUri, "content", "sockets"]).keyOf(
+            //  "hold:HoldableSocket"
+            //),
+          }
+        )
+        .then(async response => {
+          if (!response.ok) {
+            const errorMsg = await response.text();
+            throw new Error(`Could not connect identity: ${errorMsg}`);
+          }
+        });
     }
 
     // establish connection

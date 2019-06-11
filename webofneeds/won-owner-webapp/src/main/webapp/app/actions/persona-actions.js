@@ -123,28 +123,31 @@ async function connectReview(
 }
 
 export function connectPersona(atomUri, personaUri) {
-  return async dispatch => {
-    const response = await ownerApi.serverSideConnect(
-      {
-        pending: false,
-        socket: `${personaUri}#holderSocket`,
-      },
-      {
-        pending: false,
-        socket: `${atomUri}#holdableSocket`,
-      }
-    );
-    if (!response.ok) {
-      const errorMsg = await response.text();
-      throw new Error(`Could not connect identity: ${errorMsg}`);
-    }
-    dispatch({
-      type: actionTypes.personas.connect,
-      payload: {
-        atomUri: atomUri,
-        personaUri: personaUri,
-      },
-    });
+  return dispatch => {
+    return ownerApi
+      .serverSideConnect(
+        {
+          pending: false,
+          socket: `${personaUri}#holderSocket`,
+        },
+        {
+          pending: false,
+          socket: `${atomUri}#holdableSocket`,
+        }
+      )
+      .then(async response => {
+        if (!response.ok) {
+          const errorMsg = await response.text();
+          throw new Error(`Could not connect identity: ${errorMsg}`);
+        }
+        dispatch({
+          type: actionTypes.personas.connect,
+          payload: {
+            atomUri: atomUri,
+            personaUri: personaUri,
+          },
+        });
+      });
   };
 }
 

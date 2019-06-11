@@ -82,25 +82,33 @@ export function atomCreate(draft, persona, nodeUri) {
         nodeUri
       );
       if (persona) {
-        const response = await ownerApi.serverSideConnect(
-          {
-            pending: false,
-            socket: `${persona}#holderSocket`,
-          },
-          {
-            pending: true,
-            socket: `${atomUri}#holdableSocket`,
-          }
-        );
-        if (!response.ok) {
-          const errorMsg = await response.text();
-          throw new Error(`Could not connect identity: ${errorMsg}`);
-        }
+        return ownerApi
+          .serverSideConnect(
+            {
+              pending: false,
+              socket: `${persona}#holderSocket`,
+            },
+            {
+              pending: true,
+              socket: `${atomUri}#holdableSocket`,
+            }
+          )
+          .then(async response => {
+            if (!response.ok) {
+              const errorMsg = await response.text();
+              throw new Error(`Could not connect identity: ${errorMsg}`);
+            }
+            dispatch({
+              type: actionTypes.atoms.create,
+              payload: { eventUri, message, atomUri, atom: draft },
+            });
+          });
+      } else {
+        dispatch({
+          type: actionTypes.atoms.create,
+          payload: { eventUri, message, atomUri, atom: draft },
+        });
       }
-      dispatch({
-        type: actionTypes.atoms.create,
-        payload: { eventUri, message, atomUri, atom: draft },
-      });
     });
   };
 }
