@@ -41,12 +41,6 @@ function addConnectionFull(atomState, connection) {
 
       if (realSocket === won.HOLD.HolderSocketCompacted) {
         const holdsUri = targetAtomUri;
-        console.debug(
-          "Handling a holderSocket-connection within atom: ",
-          atomUri,
-          " setting holds to holdsUri: ",
-          holdsUri
-        );
 
         if (holdsUri) {
           const currentHolds = getIn(atomState, [atomUri, "holds"]);
@@ -59,12 +53,6 @@ function addConnectionFull(atomState, connection) {
       } else if (realSocket === won.HOLD.HoldableSocketCompacted) {
         //holdableSocket Connection from atom to persona -> need to add heldBy targetAtomUri to the atom
         const heldByUri = targetAtomUri;
-        console.debug(
-          "Handling a holdableSocket-connection within atom: ",
-          atomUri,
-          " setting heldBy to heldByUri: ",
-          heldByUri
-        );
 
         if (heldByUri) {
           atomState = atomState.setIn([atomUri, "heldBy"], heldByUri);
@@ -89,6 +77,28 @@ function addConnectionFull(atomState, connection) {
             ["data", "targetSocket"],
             realTargetSocket
           );
+        }
+
+        if (
+          realSocket === won.BUDDY.BuddySocketCompacted &&
+          realTargetSocket === won.BUDDY.BuddySocketCompacted
+        ) {
+          const currentBuddies = getIn(atomState, [atomUri, "buddies"]);
+          if (currentBuddies && !currentBuddies.includes(targetAtomUri)) {
+            atomState = atomState.updateIn([atomUri, "buddies"], buddyList =>
+              buddyList.push(targetAtomUri)
+            );
+          }
+          const currentTargetBuddies = getIn(atomState, [
+            targetAtomUri,
+            "buddies",
+          ]);
+          if (currentTargetBuddies && !currentTargetBuddies.includes(atomUri)) {
+            atomState = atomState.updateIn(
+              [targetAtomUri, "buddies"],
+              buddyList => buddyList.push(atomUri)
+            );
+          }
         }
       }
 
