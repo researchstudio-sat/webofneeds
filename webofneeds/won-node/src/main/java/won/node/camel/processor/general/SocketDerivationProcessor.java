@@ -7,15 +7,17 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import won.node.protocol.MatcherProtocolMatcherServiceClientSide;
+import won.node.protocol.impl.MatcherProtocolMatcherClientImpl;
 import won.node.socket.ConnectionStateChange;
 import won.node.socket.SocketService;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageDirection;
 import won.protocol.message.processor.camel.WonCamelConstants;
-import won.protocol.model.Connection;
 import won.protocol.model.Atom;
-import won.protocol.repository.ConnectionRepository;
+import won.protocol.model.Connection;
 import won.protocol.repository.AtomRepository;
+import won.protocol.repository.ConnectionRepository;
 
 /**
  * Compares the connection state found in the header of the 'in' message with
@@ -28,6 +30,8 @@ public class SocketDerivationProcessor implements Processor {
     AtomRepository atomRepository;
     @Autowired
     SocketService derivationService;
+    @Autowired
+    protected MatcherProtocolMatcherServiceClientSide matcherProtocolMatcherClient;
 
     public SocketDerivationProcessor() {
     }
@@ -65,7 +69,11 @@ public class SocketDerivationProcessor implements Processor {
                 con = Optional.of(connectionRepository.findOneByConnectionURI(conUri));
             }
             Atom atom = atomRepository.findOneByAtomURI(con.get().getAtomURI());
-            derivationService.deriveDataForStateChange(connectionStateChange, atom, con.get());
+            boolean changed = derivationService.deriveDataForStateChange(connectionStateChange, atom, con.get());
+            if (changed) {
+                // trigger rematch
+                matcherProtocolMatcherClient.atomModified(atom.getAtomURI(), null);
+            }
         }
     }
 }

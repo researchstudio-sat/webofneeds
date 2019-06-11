@@ -62,7 +62,15 @@ public class SocketService {
         return false;
     }
 
-    public void deriveDataForStateChange(ConnectionStateChange stateChange, Atom atom, Connection con) {
+    /**
+     * Performs the data derivation in response to a connection state change.
+     * 
+     * @param stateChange
+     * @param atom
+     * @param con
+     * @return true if a the derived data was modified, false otherwise.
+     */
+    public boolean deriveDataForStateChange(ConnectionStateChange stateChange, Atom atom, Connection con) {
         if (stateChange.isConnect() || stateChange.isDisconnect()) {
             logger.info("performing data derivation for connection {}", con.getConnectionURI());
             Dataset atomDataset = atom.getDatatsetHolder().getDataset();
@@ -97,7 +105,9 @@ public class SocketService {
             atom.incrementVersion();
             atom.getDatatsetHolder().setDataset(atomDataset);
             atomRepository.save(atom);
+            return true;
         }
+        return false;
     }
 
     private Optional<SocketDefinition> getSocketConfig(URI socketType) {
