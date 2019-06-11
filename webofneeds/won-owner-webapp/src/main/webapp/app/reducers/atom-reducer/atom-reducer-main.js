@@ -4,7 +4,7 @@
 import { actionTypes } from "../../actions/actions.js";
 import Immutable from "immutable";
 import won from "../../won-es6.js";
-import { msStringToDate, get, getIn } from "../../utils.js";
+import { msStringToDate, getIn } from "../../utils.js";
 import {
   addAtomStubs,
   addAtom,
@@ -42,7 +42,6 @@ import {
   setShowPetriNetData,
   setMultiSelectType,
 } from "./reduce-connections.js";
-import * as atomUtils from "../../atom-utils.js";
 
 const initialState = Immutable.fromJS({});
 
@@ -257,15 +256,8 @@ export default function(allAtomsInState = initialState, action = {}) {
         return addMessage(stateUpdated, optimisticEvent);
       } else {
         const tmpConnectionUri = "connectionFrom:" + eventUri;
-        //TODO: FIGURE OUT A WAY TO INCLUDE THE CORRECT SOCKET FOR ALL POSSIBLE CASES (e.g senderSocket -> get Socket from atom -> store said socket)
-        let connSenderSocket = won.CHAT.ChatSocketCompacted; //Default add optimistic Connection as ChatConnection
-        const ownedAtom = get(allAtomsInState, ownedAtomUri);
-        if (
-          !atomUtils.hasChatSocket(ownedAtom) &&
-          atomUtils.hasGroupSocket(ownedAtom)
-        ) {
-          connSenderSocket = won.GROUP.GroupSocketCompacted; //assume the connection is from group to x if the atom has the group but not the chat socket
-        }
+        const socketUri = action.payload.socketUri;
+        const targetSocketUri = action.payload.targetSocketUri;
 
         //need to wait for success-response to set that
         const optimisticConnection = Immutable.fromJS({
@@ -275,7 +267,8 @@ export default function(allAtomsInState = initialState, action = {}) {
           targetAtomUri: theirAtomUri,
           targetConnectionUri: undefined,
           unread: false,
-          socket: connSenderSocket,
+          socketUri: socketUri,
+          targetSocketUri: targetSocketUri,
           agreementData: {
             agreementUris: Immutable.Set(),
             pendingProposalUris: Immutable.Set(),

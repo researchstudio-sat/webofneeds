@@ -9,6 +9,7 @@ import labelledHrModule from "./labelled-hr.js";
 import postContentGeneral from "./post-content-general.js";
 import postContentPersona from "./post-content-persona.js";
 import postContentParticipants from "./post-content-participants.js";
+import atomContentBuddies from "./atom-content-buddies.js";
 import postHeaderModule from "./post-header.js";
 import trigModule from "./trig.js";
 import { attach, getIn, get } from "../utils.js";
@@ -85,6 +86,9 @@ function genComponentConf() {
           
           <!-- PARTICIPANT INFORMATION -->
           <won-post-content-participants ng-if="self.isSelectedTab('PARTICIPANTS')" post-uri="self.postUri"></won-post-content-participants>
+          
+          <!-- BUDDY INFORMATION -->
+          <won-atom-content-buddies ng-if="self.isSelectedTab('BUDDIES')" atom-uri="self.postUri"></won-atom-content-buddies>
 
           <!-- REVIEW INFORMATION -->
           <div class="post-content__reviews" ng-if="self.isSelectedTab('REVIEWS')">
@@ -365,6 +369,7 @@ export default angular
     postContentPersona,
     postContentParticipants,
     postHeaderModule,
+    atomContentBuddies,
     trigModule,
     inviewModule.name,
     elmModule,

@@ -5,6 +5,7 @@ import { markUriAsRead } from "../../won-localstorage.js";
 
 import { markAtomAsRead } from "./reduce-atoms.js";
 import { getIn, get } from "../../utils.js";
+import * as connectionUtils from "../../connection-utils";
 
 export function storeConnectionsData(state, connectionsToStore) {
   if (connectionsToStore && connectionsToStore.size > 0) {
@@ -39,14 +40,11 @@ function addConnectionFull(atomState, connection) {
 
       parsedConnection = parsedConnection.setIn(["data", "socket"], realSocket);
 
-      if (realSocket === won.HOLD.HolderSocketCompacted) {
+      if (
+        realSocket === won.HOLD.HolderSocketCompacted &&
+        connectionUtils.isConnected(parsedConnection)
+      ) {
         const holdsUri = targetAtomUri;
-        console.debug(
-          "Handling a holderSocket-connection within atom: ",
-          atomUri,
-          " setting holds to holdsUri: ",
-          holdsUri
-        );
 
         if (holdsUri) {
           const currentHolds = getIn(atomState, [atomUri, "holds"]);
@@ -56,15 +54,12 @@ function addConnectionFull(atomState, connection) {
             );
           }
         }
-      } else if (realSocket === won.HOLD.HoldableSocketCompacted) {
+      } else if (
+        realSocket === won.HOLD.HoldableSocketCompacted &&
+        connectionUtils.isConnected(parsedConnection)
+      ) {
         //holdableSocket Connection from atom to persona -> need to add heldBy targetAtomUri to the atom
         const heldByUri = targetAtomUri;
-        console.debug(
-          "Handling a holdableSocket-connection within atom: ",
-          atomUri,
-          " setting heldBy to heldByUri: ",
-          heldByUri
-        );
 
         if (heldByUri) {
           atomState = atomState.setIn([atomUri, "heldBy"], heldByUri);
@@ -89,6 +84,29 @@ function addConnectionFull(atomState, connection) {
             ["data", "targetSocket"],
             realTargetSocket
           );
+        }
+
+        if (
+          connectionUtils.isConnected(parsedConnection) &&
+          realSocket === won.BUDDY.BuddySocketCompacted &&
+          realTargetSocket === won.BUDDY.BuddySocketCompacted
+        ) {
+          const currentBuddies = getIn(atomState, [atomUri, "buddies"]);
+          if (currentBuddies && !currentBuddies.includes(targetAtomUri)) {
+            atomState = atomState.updateIn([atomUri, "buddies"], buddyList =>
+              buddyList.push(targetAtomUri)
+            );
+          }
+          const currentTargetBuddies = getIn(atomState, [
+            targetAtomUri,
+            "buddies",
+          ]);
+          if (currentTargetBuddies && !currentTargetBuddies.includes(atomUri)) {
+            atomState = atomState.updateIn(
+              [targetAtomUri, "buddies"],
+              buddyList => buddyList.push(atomUri)
+            );
+          }
         }
       }
 

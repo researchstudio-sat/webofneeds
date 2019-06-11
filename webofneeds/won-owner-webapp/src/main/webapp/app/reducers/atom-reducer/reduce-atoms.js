@@ -34,6 +34,15 @@ export function addAtom(atoms, jsonldAtom) {
           }
         });
       }
+
+      const buddyUris = get(parsedAtom, "buddies");
+      if (buddyUris.size > 0) {
+        buddyUris.map(atomUri => {
+          if (!get(atoms, atomUri)) {
+            atoms = addAtomStub(atoms, atomUri);
+          }
+        });
+      }
     }
 
     return atoms.set(parsedAtomUri, parsedAtom);

@@ -212,6 +212,10 @@ export function hasReviewSocket(atom) {
   return hasSocket(atom, won.REVIEW.ReviewSocketCompacted);
 }
 
+export function hasBuddySocket(atom) {
+  return hasSocket(atom, won.BUDDY.BuddySocketCompacted);
+}
+
 export function hasSocket(atom, socket) {
   return (
     getIn(atom, ["content", "sockets"]) &&
@@ -360,6 +364,17 @@ export function getSocketsWithKeysReset(atomImm) {
   return undefined;
 }
 
+export function getSocketUri(atomImm, socketType) {
+  return (
+    atomImm &&
+    atomImm
+      .getIn(["content", "sockets"])
+      .filter(type => type === socketType)
+      .keySeq()
+      .first()
+  );
+}
+
 export function getDefaultSocketWithKeyReset(atomImm) {
   const defaultSocket = getIn(atomImm, ["content", "defaultSocket"]);
 
@@ -429,6 +444,9 @@ function getSocketKeysReset(socketsImm) {
     }
     if (value === "review:ReviewSocket") {
       return "#reviewSocket";
+    }
+    if (value === "buddy:BuddySocket") {
+      return "#buddySocket";
     }
   });
 }

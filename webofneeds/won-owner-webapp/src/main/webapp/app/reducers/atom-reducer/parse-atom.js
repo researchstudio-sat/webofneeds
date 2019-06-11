@@ -26,6 +26,9 @@ export function parseAtom(jsonldAtom) {
       holds:
         won.parseListFrom(jsonldAtomImm, ["hold:holds"], "xsd:ID") ||
         Immutable.List(),
+      buddies:
+        won.parseListFrom(jsonldAtomImm, ["buddy:buddy"], "xsd:ID") ||
+        Immutable.List(),
       rating: extractRating(jsonldAtomImm),
       groupMembers:
         won.parseListFrom(jsonldAtomImm, ["group:groupMember"], "xsd:ID") ||

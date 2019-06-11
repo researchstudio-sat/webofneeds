@@ -5,6 +5,7 @@ import { actionTypes } from "./actions";
 import { getOwnedAtomByConnectionUri } from "../selectors/general-selectors";
 import { getOwnedConnectionByUri } from "../selectors/connection-selectors";
 import { buildConnectMessage, buildCloseMessage } from "../won-message-utils";
+import * as atomUtils from "../atom-utils.js";
 
 export function createPersona(persona, nodeUri) {
   return (dispatch, getState) => {
@@ -28,6 +29,10 @@ export function createPersona(persona, nodeUri) {
         {
           "@id": "#reviewSocket",
           "won:socketDefinition": { "@id": "review:ReviewSocket" },
+        },
+        {
+          "@id": "#buddySocket",
+          "won:socketDefinition": { "@id": "buddy:BuddySocket" },
         },
       ],
       "match:flag": [
@@ -71,20 +76,26 @@ async function connectReview(
   connectMessage,
   connectionUri = undefined
 ) {
-  const getSocket = persona => {
-    const reviewSocket = persona
-      .getIn(["content", "sockets"])
-      .filter(socketType => socketType == "review:ReviewSocket")
-      .keySeq()
-      .first();
+  const socketUri = atomUtils.getSocketUri(
+    ownPersona,
+    won.REVIEW.ReviewSocketCompacted
+  );
+  const targetSocketUri = atomUtils.getSocketUri(
+    foreignPersona,
+    won.REVIEW.ReviewSocketCompacted
+  );
 
-    if (!reviewSocket) {
-      throw new Error(
-        `Persona ${persona.get("uri")} does not have a review socket`
-      );
-    }
-    return reviewSocket;
-  };
+  if (!socketUri) {
+    throw new Error(
+      `Persona ${ownPersona.get("uri")} does not have a review socket`
+    );
+  }
+
+  if (!targetSocketUri) {
+    throw new Error(
+      `Persona ${foreignPersona.get("uri")} does not have a review socket`
+    );
+  }
 
   const cnctMsg = buildConnectMessage({
     ownedAtomUri: ownPersona.get("uri"),
@@ -93,8 +104,8 @@ async function connectReview(
     theirNodeUri: foreignPersona.get("nodeUri"),
     connectMessage: connectMessage,
     optionalOwnConnectionUri: connectionUri,
-    ownSocket: getSocket(ownPersona),
-    theirSocket: getSocket(foreignPersona),
+    socketUri: socketUri,
+    targetSocketUri: targetSocketUri,
   });
   const optimisticEvent = await won.wonMessageFromJsonLd(cnctMsg.message);
   dispatch({
@@ -104,6 +115,8 @@ async function connectReview(
       message: cnctMsg.message,
       ownConnectionUri: connectionUri,
       optimisticEvent: optimisticEvent,
+      socketUri: socketUri,
+      targetSocketUri: targetSocketUri,
     },
   });
 }

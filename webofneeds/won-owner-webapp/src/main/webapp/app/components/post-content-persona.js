@@ -55,6 +55,10 @@ function genComponentConf() {
         <div class="pcp__holds__label">Holder of {{ self.personaHoldsSize }} Post(s)</div>
         <button class="pcp__holds__view won-button--filled red" ng-click="self.viewPersonaPosts()">View</button>
       </div>
+      <div class="pcp__buddies" ng-if="self.personaHasBuddySocket">
+        <div class="pcp__buddies__label">Buddy of {{ self.personaBuddySize }} Persona(s)</div>
+        <button class="pcp__buddies__view won-button--filled red" ng-click="self.viewPersonaBuddies()">View</button>
+      </div>
       <won-description-viewer detail="::self.descriptionDetail" content="self.personaDescription" ng-if="self.descriptionDetail && self.personaDescription"></won-description-viewer>
       <button ng-if="self.postIsOwned" class="won-button--filled red" ng-click="self.removePersona()">Remove Persona</button>
     `;
@@ -94,6 +98,9 @@ function genComponentConf() {
           personaHasReviewSocket &&
           getIn(persona, ["rating", "aggregateRating"]);
 
+        const personaHasBuddySocket = atomUtils.hasBuddySocket(persona);
+        const personaBuddies = personaHasBuddySocket && get(persona, "buddies");
+
         const process = get(state, "process");
         //TODO: CHECK IF PERSONA HAS REVIEWSOCKET
         return {
@@ -110,8 +117,10 @@ function genComponentConf() {
           personaWebsite: getIn(persona, ["content", "website"]),
           personaVerified,
           personaHoldsSize: personaHolds ? personaHolds.size : 0,
+          personaBuddySize: personaBuddies ? personaBuddies.size : 0,
           personaHasReviewSocket,
           personaHasHolderSocket,
+          personaHasBuddySocket,
           reviewCount:
             personaHasReviewSocket && getIn(persona, ["rating", "reviewCount"]),
           aggregateRatingString: aggregateRating && aggregateRating.toFixed(1),
@@ -132,6 +141,16 @@ function genComponentConf() {
     viewPersonaPosts() {
       this.atoms__selectTab(
         Immutable.fromJS({ atomUri: this.personaUri, selectTab: "HOLDS" })
+      );
+      this.router__stateGoCurrent({
+        viewAtomUri: this.personaUri,
+        viewConnUri: undefined,
+      });
+    }
+
+    viewPersonaBuddies() {
+      this.atoms__selectTab(
+        Immutable.fromJS({ atomUri: this.personaUri, selectTab: "BUDDIES" })
       );
       this.router__stateGoCurrent({
         viewAtomUri: this.personaUri,

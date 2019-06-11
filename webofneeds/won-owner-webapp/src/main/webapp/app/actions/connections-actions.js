@@ -379,6 +379,7 @@ function connectReactionAtom(
     won.wonMessageFromJsonLd(cnctMsg.message).then(optimisticEvent => {
       // connect action to be dispatched when the
       // ad hoc atom has been created:
+      //TODO: FIGURE OUT WHICH SOCKETS WILL BE CONNECTED
       const connectAction = {
         type: actionTypes.atoms.connect,
         payload: {
@@ -491,6 +492,7 @@ function connectAdHoc(theirAtomUri, textMessage, persona, dispatch, getState) {
     won.wonMessageFromJsonLd(cnctMsg.message).then(optimisticEvent => {
       // connect action to be dispatched when the
       // ad hoc atom has been created:
+      //TODO: FIGURE OUT WHICH SOCKETS WILL BE CONNECTED
       const connectAction = {
         type: actionTypes.atoms.connect,
         payload: {

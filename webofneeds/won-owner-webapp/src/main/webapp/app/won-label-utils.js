@@ -2,14 +2,6 @@ import won from "./won-es6.js";
 import { deepFreeze, isValidNumber } from "./utils.js";
 
 export const labels = deepFreeze({
-  type: {
-    [won.WON.BasicAtomTypeDemandCompacted]: "Search", //'I want something',
-    [won.WON.BasicAtomTypeSupplyCompacted]: "Post", //'I offer something',
-    [won.WON.BasicAtomTypeDotogetherCompacted]: "Post + Search", //'I want to do something together',
-    //TODO: Find right declaration
-    [won.WON.BasicAtomTypeCombinedCompacted]: "Post + Search", //'I want to post and search',
-    [won.WON.BasicAtomTypeCritiqueCompacted]: "Post", //'I want to change something',
-  },
   connectionState: {
     [won.WON.Suggested]: "Conversation suggested.",
     [won.WON.RequestSent]: "Conversation requested by you.",
@@ -37,6 +29,7 @@ export const labels = deepFreeze({
     [won.HOLD.HoldableSocketCompacted]: "Holdable",
     [won.HOLD.HolderSocketCompacted]: "Holder",
     [won.REVIEW.ReviewSocketCompacted]: "Review enabled",
+    [won.BUDDY.BuddySocketCompacted]: "Buddy",
   },
 });
 
