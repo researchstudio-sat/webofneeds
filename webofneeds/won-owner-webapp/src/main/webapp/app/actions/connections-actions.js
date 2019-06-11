@@ -302,13 +302,17 @@ export function connectionsOpen(connectionUri, textMessage) {
 export function connectionsConnectReactionAtom(
   connectToAtomUri,
   atomDraft,
-  persona
+  persona,
+  connectToSocketType,
+  atomDraftSocketType
 ) {
   return (dispatch, getState) =>
     connectReactionAtom(
       connectToAtomUri,
       atomDraft,
       persona,
+      connectToSocketType,
+      atomDraftSocketType,
       dispatch,
       getState
     ); // moved to separate function to make transpilation work properly
@@ -317,21 +321,16 @@ function connectReactionAtom(
   connectToAtomUri,
   atomDraft,
   personaUri,
+  connectToSocketType,
+  atomDraftSocketType,
   dispatch,
   getState
 ) {
   ensureLoggedIn(dispatch, getState).then(async () => {
-    //TODO: Determine the ownership of the connectToAtom and if it is owned by you then autoOpen the connection
     const state = getState();
-    const connectoToAtom = getIn(state, ["atoms", connectToAtomUri]);
+    const connectToAtom = getIn(state, ["atoms", connectToAtomUri]);
 
     const nodeUri = getIn(state, ["config", "defaultNodeUri"]);
-
-    // create new atom
-    const { message, eventUri, atomUri } = await buildCreateMessage(
-      atomDraft,
-      nodeUri
-    );
 
     // add persona
     if (personaUri) {
@@ -351,55 +350,121 @@ function connectReactionAtom(
         });
     }
 
-    // establish connection
-    const cnctMsg = buildConnectMessage({
-      ownedAtomUri: atomUri,
-      theirAtomUri: connectToAtomUri,
-      ownNodeUri: nodeUri,
-      theirNodeUri: connectoToAtom.get("nodeUri"),
-      connectMessage: "",
-    });
+    // create new atom
+    const { message, eventUri, atomUri } = await buildCreateMessage(
+      atomDraft,
+      nodeUri
+    );
 
-    won.wonMessageFromJsonLd(cnctMsg.message).then(optimisticEvent => {
-      // connect action to be dispatched when the
-      // ad hoc atom has been created:
-      //TODO: FIGURE OUT WHICH SOCKETS WILL BE CONNECTED
-      const connectAction = {
-        type: actionTypes.atoms.connect,
-        payload: {
-          eventUri: cnctMsg.eventUri,
-          message: cnctMsg.message,
-          optimisticEvent: optimisticEvent,
-        },
+    if (generalSelectors.isAtomOwned(state, connectToAtomUri)) {
+      const connectToSocketUri = connectToSocketType
+        ? atomUtils.getSocketUri(connectToAtom, connectToSocketType)
+        : atomUtils.getDefaultSocketUri(connectToAtom);
+
+      const getSocketFromDraft = atomDraft => {
+        const draftContent = atomDraft["content"];
+        const draftSockets = draftContent["sockets"];
+
+        if (draftSockets && atomDraftSocketType) {
+          for (let socketKey in draftSockets) {
+            if (draftSockets[socketKey] === atomDraftSocketType) {
+              return socketKey;
+            }
+          }
+        }
+
+        const defaultSocket = draftContent["defaultSocket"];
+        return defaultSocket && Object.keys(defaultSocket)[0];
       };
 
-      // register the connect action to be dispatched when
-      // atom creation is successful
-      dispatch({
-        type: actionTypes.messages.dispatchActionOn.registerSuccessOwn,
-        payload: {
-          eventUri: eventUri,
-          actionToDispatch: connectAction,
-        },
+      const atomDraftSocketUri = getSocketFromDraft(atomDraft);
+
+      if (atomDraftSocketUri && connectToSocketUri) {
+        ownerApi
+          .serverSideConnect(
+            connectToSocketUri,
+            `${atomUri}${atomDraftSocketUri}`,
+            false,
+            true
+          )
+          .then(async response => {
+            if (!response.ok) {
+              const errorMsg = await response.text();
+              throw new Error(`Could not connect owned atoms: ${errorMsg}`);
+            }
+          });
+        // create the new atom
+        dispatch({
+          type: actionTypes.atoms.create, // TODO custom action
+          payload: { eventUri, message, atomUri, atom: atomDraft },
+        });
+
+        dispatch(
+          actionCreators.router__stateGo("connections", {
+            useCase: undefined,
+            useCaseGroup: undefined,
+            fromAtomUri: undefined,
+            viewAtomUri: undefined,
+            viewConnUri: undefined,
+            mode: undefined,
+          })
+        );
+      } else {
+        throw new Error(
+          `Could not connect owned atoms did not find necessary sockets`
+        );
+      }
+    } else {
+      // establish connection
+      const cnctMsg = buildConnectMessage({
+        ownedAtomUri: atomUri,
+        theirAtomUri: connectToAtomUri,
+        ownNodeUri: nodeUri,
+        theirNodeUri: connectToAtom.get("nodeUri"),
+        connectMessage: "",
       });
 
-      // create the new atom
-      dispatch({
-        type: actionTypes.atoms.create, // TODO custom action
-        payload: { eventUri, message, atomUri, atom: atomDraft },
-      });
+      won.wonMessageFromJsonLd(cnctMsg.message).then(optimisticEvent => {
+        // connect action to be dispatched when the
+        // ad hoc atom has been created:
+        //TODO: FIGURE OUT WHICH SOCKETS WILL BE CONNECTED
+        const connectAction = {
+          type: actionTypes.atoms.connect,
+          payload: {
+            eventUri: cnctMsg.eventUri,
+            message: cnctMsg.message,
+            optimisticEvent: optimisticEvent,
+          },
+        };
 
-      dispatch(
-        actionCreators.router__stateGo("connections", {
-          useCase: undefined,
-          useCaseGroup: undefined,
-          fromAtomUri: undefined,
-          viewAtomUri: undefined,
-          viewConnUri: undefined,
-          mode: undefined,
-        })
-      );
-    });
+        // register the connect action to be dispatched when
+        // atom creation is successful
+        dispatch({
+          type: actionTypes.messages.dispatchActionOn.registerSuccessOwn,
+          payload: {
+            eventUri: eventUri,
+            actionToDispatch: connectAction,
+          },
+        });
+
+        // create the new atom
+        dispatch({
+          type: actionTypes.atoms.create, // TODO custom action
+          payload: { eventUri, message, atomUri, atom: atomDraft },
+        });
+
+        dispatch(
+          actionCreators.router__stateGo("connections", {
+            useCase: undefined,
+            useCaseGroup: undefined,
+            fromAtomUri: undefined,
+            viewAtomUri: undefined,
+            viewConnUri: undefined,
+            mode: undefined,
+          })
+        );
+      });
+    }
   });
 }
 
