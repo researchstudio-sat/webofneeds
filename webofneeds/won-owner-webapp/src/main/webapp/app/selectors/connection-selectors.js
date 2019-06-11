@@ -72,6 +72,33 @@ export function getSuggestedConnectionsByAtomUri(state, atomUri) {
 }
 
 /**
+ * Returns all buddyConnections of an atom
+ * @param state
+ * @param atomUri
+ * @param excludeClosed  -> exclude Closed connections
+ * @param excludeSuggested -> exclude Suggested connections
+ * @returns {*}
+ */
+export function getBuddyConnectionsByAtomUri(
+  state,
+  atomUri,
+  excludeClosed = false,
+  excludeSuggested = false
+) {
+  const atoms = getAtoms(state);
+  const connections = getIn(atoms, [atomUri, "connections"]);
+
+  return connections
+    ? connections
+        .filter(conn => isBuddyConnection(atoms, conn))
+        .filter(conn => !(excludeClosed && connectionUtils.isClosed(conn)))
+        .filter(
+          conn => !(excludeSuggested && connectionUtils.isSuggested(conn))
+        )
+    : Immutable.Map();
+}
+
+/**
  * @param state
  * @returns {Immutable.Map|*}
  */
@@ -137,6 +164,21 @@ export function isChatToChatConnection(allAtoms, connection) {
   return (
     socket === won.CHAT.ChatSocketCompacted &&
     targetSocket === won.CHAT.ChatSocketCompacted
+  );
+}
+
+/**
+ * Returns true if both sockets are BuddySockets
+ * @param allAtoms all atoms of the state
+ * @param connection to check sockettypes of
+ * @returns {boolean}
+ */
+export function isBuddyConnection(allAtoms, connection) {
+  const { socket, targetSocket } = getSockets(allAtoms, connection);
+
+  return (
+    socket === won.BUDDY.BuddySocketCompacted &&
+    targetSocket === won.BUDDY.BuddySocketCompacted
   );
 }
 
