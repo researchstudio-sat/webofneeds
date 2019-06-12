@@ -6,7 +6,7 @@ import { getOwnedAtomByConnectionUri } from "../selectors/general-selectors";
 import { getOwnedConnectionByUri } from "../selectors/connection-selectors";
 import { buildConnectMessage, buildCloseMessage } from "../won-message-utils";
 import * as atomUtils from "../atom-utils.js";
-import * as ownerApi from "../owner-api";
+import * as ownerApi from "../owner-api.js";
 
 export function createPersona(persona, nodeUri) {
   return (dispatch, getState) => {
@@ -148,16 +148,18 @@ export function connectPersona(atomUri, personaUri) {
 export function disconnectPersona(atomUri, personaUri) {
   return (dispatch, getState) => {
     const state = getState();
-    const persona = state.getIn(["atoms", personaUri]);
-    const atom = state.getIn(["atoms", atomUri]);
+    const persona = getIn(state, ["atoms", personaUri]);
+    const atom = getIn(state, ["atoms", atomUri]);
 
-    const connectionUri = persona
-      .get("connections")
-      .filter(
-        connection =>
-          connection.get("targetAtomUri") == atom.get("uri") &&
-          connection.get("socket") == won.HOLD.HolderSocketCompacted
-      )
+    const connectionUri = get(persona, "connections")
+      .filter(connection => {
+        const socketUri = get(connection, "socketUri");
+        const socketType = getIn(atom, ["content", "sockets", socketUri]);
+        return (
+          get(connection, "targetAtomUri") === atomUri &&
+          socketType === won.HOLD.HolderSocketCompacted
+        );
+      })
       .keySeq()
       .first();
 
@@ -200,13 +202,19 @@ export function reviewPersona(reviewableConnectionUri, review) {
     };
 
     const getConnection = (ownPersona, foreignPersona) => {
-      return ownPersona
-        .get("connections")
-        .filter(
-          connection =>
-            connection.get("targetAtomUri") == foreignPersona.get("uri") &&
-            connection.get("socket") == won.REVIEW.ReviewSocket
-        )
+      return get(ownPersona, "connections")
+        .filter(connection => {
+          const socketUri = get(connection, "socketUri");
+          const socketType = getIn(ownPersona, [
+            "content",
+            "sockets",
+            socketUri,
+          ]);
+          return (
+            get(connection, "targetAtomUri") === get(foreignPersona, "uri") &&
+            socketType === won.REVIEW.ReviewSocketCompacted
+          );
+        })
         .keySeq()
         .first();
     };
