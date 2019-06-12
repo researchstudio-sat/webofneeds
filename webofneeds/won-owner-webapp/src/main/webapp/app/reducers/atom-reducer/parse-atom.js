@@ -23,16 +23,16 @@ export function parseAtom(jsonldAtom) {
       nodeUri: jsonldAtomImm.getIn(["won:wonNode", "@id"]),
       state: extractState(jsonldAtomImm),
       heldBy: won.parseFrom(jsonldAtomImm, ["hold:heldBy"], "xsd:ID"),
-      holds:
-        won.parseListFrom(jsonldAtomImm, ["hold:holds"], "xsd:ID") ||
-        Immutable.List(),
-      buddies:
-        won.parseListFrom(jsonldAtomImm, ["buddy:buddy"], "xsd:ID") ||
-        Immutable.List(),
+      holds: Immutable.Set(
+        won.parseListFrom(jsonldAtomImm, ["hold:holds"], "xsd:ID")
+      ),
+      buddies: Immutable.Set(
+        won.parseListFrom(jsonldAtomImm, ["buddy:buddy"], "xsd:ID")
+      ),
       rating: extractRating(jsonldAtomImm),
-      groupMembers:
-        won.parseListFrom(jsonldAtomImm, ["group:groupMember"], "xsd:ID") ||
-        Immutable.List(),
+      groupMembers: Immutable.Set(
+        won.parseListFrom(jsonldAtomImm, ["group:groupMember"], "xsd:ID")
+      ),
       content: generateContent(jsonldAtomImm, detailsToParse),
       seeks: generateContent(jsonldAtomImm.get("match:seeks"), detailsToParse),
       creationDate: extractCreationDate(jsonldAtomImm),

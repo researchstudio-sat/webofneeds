@@ -156,7 +156,8 @@ export default function(allAtomsInState = initialState, action = {}) {
             sockets: Immutable.Map(),
           },
           connections: Immutable.Map(),
-          holds: Immutable.List(),
+          holds: Immutable.Set(),
+          buddies: Immutable.Set(),
           rating: { aggregateRating: 0.0, reviewCount: 0 },
         })
       );

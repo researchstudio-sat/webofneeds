@@ -45,12 +45,9 @@ function addConnectionFull(atomState, connection) {
         const holdsUri = targetAtomUri;
 
         if (holdsUri) {
-          const currentHolds = getIn(atomState, [atomUri, "holds"]);
-          if (currentHolds && !currentHolds.includes(holdsUri)) {
-            atomState = atomState.updateIn([atomUri, "holds"], holdsList =>
-              holdsList.push(holdsUri)
-            );
-          }
+          atomState = atomState.updateIn([atomUri, "holds"], holds =>
+            holds.add(holdsUri)
+          );
         }
       } else if (
         socketType === won.HOLD.HoldableSocketCompacted &&
@@ -82,22 +79,12 @@ function addConnectionFull(atomState, connection) {
           socketType === won.BUDDY.BuddySocketCompacted &&
           realTargetSocket === won.BUDDY.BuddySocketCompacted
         ) {
-          const currentBuddies = getIn(atomState, [atomUri, "buddies"]);
-          if (currentBuddies && !currentBuddies.includes(targetAtomUri)) {
-            atomState = atomState.updateIn([atomUri, "buddies"], buddyList =>
-              buddyList.push(targetAtomUri)
-            );
-          }
-          const currentTargetBuddies = getIn(atomState, [
-            targetAtomUri,
-            "buddies",
-          ]);
-          if (currentTargetBuddies && !currentTargetBuddies.includes(atomUri)) {
-            atomState = atomState.updateIn(
-              [targetAtomUri, "buddies"],
-              buddyList => buddyList.push(atomUri)
-            );
-          }
+          atomState = atomState.updateIn([atomUri, "buddies"], buddies =>
+            buddies.add(targetAtomUri)
+          );
+          atomState = atomState.updateIn([targetAtomUri, "buddies"], buddies =>
+            buddies.add(atomUri)
+          );
         }
       }
 
@@ -219,7 +206,7 @@ export function changeConnectionState(allAtoms, connectionUri, newState) {
       );
     } else if (newState === won.WON.Connected) {
       allAtoms = allAtoms.updateIn([atomUri, "holds"], holds =>
-        holds.push(targetAtomUri)
+        holds.add(targetAtomUri)
       );
     }
   } else if (socketType === won.HOLD.HoldableSocketCompacted) {
