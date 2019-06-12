@@ -186,7 +186,7 @@ function genComponentConf() {
               caption: "Yes",
               callback: () => {
                 this.atoms__delete(this.post.get("uri"));
-                this.router__stateGo("inventory");
+                this.router__stateGoAbs("inventory");
                 this.view__hideModalDialog();
               },
             },
