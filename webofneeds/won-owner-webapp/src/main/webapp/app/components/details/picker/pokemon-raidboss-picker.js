@@ -204,7 +204,7 @@ function genComponentConf() {
 
     getCurrentPokemon() {
       // TODO: change this URL for any live system
-      const url = "http://localhost:1234/all";
+      const url = "http://localhost:1234/current";
 
       return fetch(url)
         .then(response => {
@@ -216,14 +216,14 @@ function genComponentConf() {
         .then(jsonResponse => this.formatPokemonJson(jsonResponse))
         .catch(error => {
           console.log("Pokemon Data could not be fetched: ", error.message);
-          return this.detail.fallbackPokemonList;
+          return this.detail.fullPokemonList;
         });
     }
 
     formatPokemonJson(jsonList) {
       if (!jsonList || jsonList.length == 0) {
-        console.log("jsonList is: " + jsonList);
-        return this.detail.fallbackPokemonList;
+        console.debug("jsonList is: " + jsonList);
+        return this.detail.fullPokemonList;
       }
       let formattedList = { array: [] };
       for (let entry of jsonList) {
