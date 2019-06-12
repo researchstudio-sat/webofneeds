@@ -6,6 +6,7 @@ import { getOwnedAtomByConnectionUri } from "../selectors/general-selectors";
 import { getOwnedConnectionByUri } from "../selectors/connection-selectors";
 import { buildConnectMessage, buildCloseMessage } from "../won-message-utils";
 import * as atomUtils from "../atom-utils.js";
+import * as ownerApi from "../owner-api";
 
 export function createPersona(persona, nodeUri) {
   return (dispatch, getState) => {
@@ -122,35 +123,25 @@ async function connectReview(
 }
 
 export function connectPersona(atomUri, personaUri) {
-  return async dispatch => {
-    const response = await fetch("rest/action/connect", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify([
-        {
-          pending: false,
-          socket: `${personaUri}#holderSocket`,
-        },
-        {
-          pending: false,
-          socket: `${atomUri}#holdableSocket`,
-        },
-      ]),
-      credentials: "include",
-    });
-    if (!response.ok) {
-      const errorMsg = await response.text();
-      throw new Error(`Could not connect identity: ${errorMsg}`);
-    }
-    dispatch({
-      type: actionTypes.personas.connect,
-      payload: {
-        atomUri: atomUri,
-        personaUri: personaUri,
-      },
-    });
+  return dispatch => {
+    return ownerApi
+      .serverSideConnect(
+        `${personaUri}#holderSocket`,
+        `${atomUri}#holdableSocket`
+      )
+      .then(async response => {
+        if (!response.ok) {
+          const errorMsg = await response.text();
+          throw new Error(`Could not connect identity: ${errorMsg}`);
+        }
+        dispatch({
+          type: actionTypes.personas.connect,
+          payload: {
+            atomUri: atomUri,
+            personaUri: personaUri,
+          },
+        });
+      });
   };
 }
 

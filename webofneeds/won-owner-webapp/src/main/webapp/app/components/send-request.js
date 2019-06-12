@@ -80,7 +80,10 @@ function genComponentConf() {
           isConnectible && !isOwned && hasReactionUseCases;
 
         const showAdHocRequestField =
-          isConnectible && !showEnabledUseCases && !showReactionUseCases;
+          !isOwned &&
+          isConnectible &&
+          !showEnabledUseCases &&
+          !showReactionUseCases;
 
         const viewState = get(state, "view");
         const visibleTab = viewUtils.getVisibleTabByAtomUri(viewState, atomUri);

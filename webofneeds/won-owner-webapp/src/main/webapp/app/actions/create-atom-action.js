@@ -11,6 +11,7 @@ import { ensureLoggedIn } from "./account-actions.js";
 import { get, getIn } from "../utils.js";
 
 import * as accountUtils from "../account-utils.js";
+import * as ownerApi from "../owner-api";
 
 export function atomEdit(draft, oldAtom, nodeUri) {
   return (dispatch, getState) => {
@@ -81,32 +82,29 @@ export function atomCreate(draft, persona, nodeUri) {
         nodeUri
       );
       if (persona) {
-        const response = await fetch("rest/action/connect", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify([
-            {
-              pending: false,
-              socket: `${persona}#holderSocket`,
-            },
-            {
-              pending: true,
-              socket: `${atomUri}#holdableSocket`,
-            },
-          ]),
-          credentials: "include",
+        return ownerApi
+          .serverSideConnect(
+            `${persona}#holderSocket`,
+            `${atomUri}#holdableSocket`,
+            false,
+            true
+          )
+          .then(async response => {
+            if (!response.ok) {
+              const errorMsg = await response.text();
+              throw new Error(`Could not connect identity: ${errorMsg}`);
+            }
+            dispatch({
+              type: actionTypes.atoms.create,
+              payload: { eventUri, message, atomUri, atom: draft },
+            });
+          });
+      } else {
+        dispatch({
+          type: actionTypes.atoms.create,
+          payload: { eventUri, message, atomUri, atom: draft },
         });
-        if (!response.ok) {
-          const errorMsg = await response.text();
-          throw new Error(`Could not connect identity: ${errorMsg}`);
-        }
       }
-      dispatch({
-        type: actionTypes.atoms.create,
-        payload: { eventUri, message, atomUri, atom: draft },
-      });
     });
   };
 }

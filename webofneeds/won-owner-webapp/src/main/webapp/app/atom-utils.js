@@ -375,6 +375,16 @@ export function getSocketUri(atomImm, socketType) {
   );
 }
 
+export function getDefaultSocketUri(atomImm) {
+  return (
+    atomImm &&
+    atomImm
+      .getIn(["content", "defaultSocket"])
+      .keySeq()
+      .first()
+  );
+}
+
 export function getDefaultSocketWithKeyReset(atomImm) {
   const defaultSocket = getIn(atomImm, ["content", "defaultSocket"]);
 
