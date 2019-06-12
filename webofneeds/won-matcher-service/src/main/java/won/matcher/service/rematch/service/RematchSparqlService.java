@@ -1,10 +1,9 @@
 package won.matcher.service.rematch.service;
 
 import java.io.StringWriter;
+import java.net.URI;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
 
@@ -21,14 +20,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-import won.matcher.service.common.event.BulkAtomEvent;
-import won.matcher.service.common.event.Cause;
 import won.matcher.service.common.event.AtomEvent;
 import won.matcher.service.common.event.AtomEvent.TYPE;
+import won.matcher.service.common.event.BulkAtomEvent;
+import won.matcher.service.common.event.Cause;
 import won.matcher.service.common.service.sparql.SparqlService;
 import won.matcher.service.crawler.config.CrawlConfig;
-import won.matcher.service.crawler.msg.CrawlUriMessage;
 import won.protocol.util.AtomModelWrapper;
+import won.protocol.util.linkeddata.LinkedDataSource;
 
 /**
  * Sparql service extended with methods for rematching
@@ -38,6 +37,8 @@ import won.protocol.util.AtomModelWrapper;
 @Component
 public class RematchSparqlService extends SparqlService {
     private static final String HTTP_HEADER_SEPARATOR = ", ";
+    @Autowired
+    LinkedDataSource linkedDataSource;
 
     @Autowired
     public RematchSparqlService(@Value("${uri.sparql.endpoint}") final String sparqlEndpoint) {
@@ -176,7 +177,7 @@ public class RematchSparqlService extends SparqlService {
             while (results.hasNext()) {
                 QuerySolution qs = results.nextSolution();
                 String atomUri = qs.get("atomUri").asResource().getURI();
-                Dataset ds = retrieveAtomDataset(atomUri);
+                Dataset ds = linkedDataSource.getDataForResource(URI.create(atomUri));
                 if (AtomModelWrapper.isAAtom(ds)) {
                     StringWriter sw = new StringWriter();
                     RDFDataMgr.write(sw, ds, RDFFormat.TRIG.getLang());
@@ -189,5 +190,9 @@ public class RematchSparqlService extends SparqlService {
         }
         log.debug("atomEvents for rematching: " + bulkAtomEvent.getAtomEvents().size());
         return bulkAtomEvent;
+    }
+
+    public void setLinkedDataSource(LinkedDataSource linkedDataSource) {
+        this.linkedDataSource = linkedDataSource;
     }
 }
