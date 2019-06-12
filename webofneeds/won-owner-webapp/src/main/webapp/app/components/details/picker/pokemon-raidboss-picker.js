@@ -65,7 +65,7 @@ function genComponentConf() {
             'prbp__pokemonlist__pokemon--selected': self.pokemonRaidBoss.id == pokemon.id && (!self.pokemonRaidBoss.form || self.pokemonRaidBoss.form == pokemon.form)
           }"
           ng-click="self.updatePokemon(pokemon.id, pokemon.form)">
-          <img class="prbp__pokemonlist__pokemon__image" src={{pokemon.imageUrl}}/>
+          <img class="prbp__pokemonlist__pokemon__image" src="{{pokemon.imageUrl}}"/>
           <div class="prbp__pokemonlist__pokemon__id">
             #{{pokemon.id}}
           </div>
@@ -215,7 +215,10 @@ function genComponentConf() {
         })
         .then(jsonResponse => this.formatPokemonJson(jsonResponse))
         .catch(error => {
-          console.log("Pokemon Data could not be fetched: ", error.message);
+          console.warn(
+            "Pokemon Data could not be fetched, using fallback list."
+          );
+          console.debug(error);
           return this.detail.fullPokemonList;
         });
     }
