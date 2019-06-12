@@ -125,7 +125,6 @@ async function connectReview(
 export function connectPersona(atomUri, personaUri) {
   return dispatch => {
     return ownerApi
-      .serverSideConnect()
       .serverSideConnect(
         `${personaUri}#holderSocket`,
         `${atomUri}#holdableSocket`
