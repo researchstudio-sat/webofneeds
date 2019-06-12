@@ -343,16 +343,23 @@ function genComponentConf() {
 
     save() {
       if (this.loggedIn && this.isFromAtomOwned) {
-        this.draftObject.useCase = get(this.useCase, "identifier");
-
-        if (!isBranchContentPresent(this.draftObject.content, true)) {
-          delete this.draftObject.content;
-        }
-        if (!isBranchContentPresent(this.draftObject.seeks, true)) {
-          delete this.draftObject.seeks;
-        }
+        this.sanitizeDraftObject();
 
         this.atoms__edit(this.draftObject, this.fromAtom);
+      }
+    }
+
+    /**
+     * Removes empty branches from the draft, and adds the proper useCase to the draft
+     */
+    sanitizeDraftObject() {
+      this.draftObject.useCase = get(this.useCase, "identifier");
+
+      if (!isBranchContentPresent(this.draftObject.content, true)) {
+        delete this.draftObject.content;
+      }
+      if (!isBranchContentPresent(this.draftObject.seeks, true)) {
+        delete this.draftObject.seeks;
       }
     }
 
@@ -361,6 +368,8 @@ function genComponentConf() {
         console.debug("publish in process, do not take any action");
         return;
       }
+
+      this.sanitizeDraftObject();
 
       if (this.connectToAtomUri) {
         const tempConnectToAtomUri = this.connectToAtomUri;
@@ -398,15 +407,6 @@ function genComponentConf() {
           );
         }
       } else {
-        this.draftObject.useCase = get(this.useCase, "identifier");
-
-        if (!isBranchContentPresent(this.draftObject.content, true)) {
-          delete this.draftObject.content;
-        }
-        if (!isBranchContentPresent(this.draftObject.seeks, true)) {
-          delete this.draftObject.seeks;
-        }
-
         const tempDraft = this.draftObject;
         const tempDefaultNodeUri = this.$ngRedux
           .getState()

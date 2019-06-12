@@ -66,6 +66,8 @@ export const cyclingPlan = {
         buddy: won.defaultContext["buddy"],
         hold: won.defaultContext["hold"],
         s: won.defaultContext["s"],
+        demo: won.defaultContext["demo"],
+        match: won.defaultContext["match"],
       },
       distinct: true,
       variables: [resultName, "?score"],
@@ -126,6 +128,7 @@ export const cyclingInterest = {
         s: won.defaultContext["s"],
         won: won.defaultContext["won"],
         con: won.defaultContext["con"],
+        demo: won.defaultContext["demo"],
       },
       geoCoordinates: getIn(draft, ["content", "location"]),
     });
