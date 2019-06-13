@@ -14,11 +14,7 @@ import { attach, delay, getIn, get } from "../utils.js";
 import * as processUtils from "../process-utils.js";
 import * as connectionUtils from "../connection-utils.js";
 import * as messageUtils from "../message-utils.js";
-import {
-  fetchAgreementProtocolUris,
-  fetchPetriNetUris,
-  fetchMessage,
-} from "../won-message-utils.js";
+import * as ownerApi from "../owner-api.js";
 import { actionCreators } from "../actions/actions.js";
 import * as generalSelectors from "../selectors/general-selectors.js";
 import { hasMessagesToLoad } from "../selectors/connection-selectors.js";
@@ -502,7 +498,8 @@ function genComponentConf() {
             loadingPetriNetData: true,
           });
 
-          fetchPetriNetUris(connectionUri)
+          ownerApi
+            .getPetriNetUris(connectionUri)
             .then(response => {
               const petriNetData = {};
 
@@ -542,7 +539,8 @@ function genComponentConf() {
             connectionUri: this.selectedConnectionUri,
             loadingAgreementData: true,
           });
-          fetchAgreementProtocolUris(this.connection.get("uri"))
+          ownerApi
+            .getAgreementProtocolUris(this.connection.get("uri"))
             .then(response => {
               let proposedMessageUris = [];
               const pendingProposals = response.pendingProposals;
@@ -812,7 +810,7 @@ function genComponentConf() {
 
     addMessageToState(eventUri, key) {
       const ownedAtomUri = this.ownedAtom.get("uri");
-      return fetchMessage(ownedAtomUri, eventUri).then(response => {
+      return ownerApi.getMessage(ownedAtomUri, eventUri).then(response => {
         won.wonMessageFromJsonLd(response).then(msg => {
           if (msg.isFromOwner() && msg.getRecipientAtom() === ownedAtomUri) {
             /*if we find out that the recipientatom of the crawled event is actually our

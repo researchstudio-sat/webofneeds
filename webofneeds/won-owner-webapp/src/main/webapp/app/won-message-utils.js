@@ -4,15 +4,13 @@
 
 import won from "./won-es6.js";
 import Immutable from "immutable";
-import { checkHttpStatus, urisToLookupMap, is } from "./utils.js";
-
-import { ownerBaseUrl } from "~/config/default.js";
-import urljoin from "url-join";
+import { urisToLookupMap, is } from "./utils.js";
 
 import { getRandomWonId } from "./won-utils.js";
 import * as useCaseUtils from "./usecase-utils.js";
 import * as connectionUtils from "./connection-utils.js";
 import { actionTypes } from "./actions/actions.js";
+import * as ownerApi from "./owner-api.js";
 
 /**
  * Checks if a wonMessage contains content/references that make it necessary for us to check which effects
@@ -550,7 +548,7 @@ export function fetchDataForNonOwnedAtomOnly(atomUri, dispatch) {
 }
 
 export function fetchUnloadedData(dispatch) {
-  return fetchOwnedInactiveAtomUris().then(atomUris => {
+  return ownerApi.getOwnedInactiveAtomUris().then(atomUris => {
     dispatch({
       type: actionTypes.atoms.storeOwnedInactiveUrisInLoading,
       payload: Immutable.fromJS({ uris: atomUris }),
@@ -560,14 +558,15 @@ export function fetchUnloadedData(dispatch) {
 }
 
 export function fetchOwnedData(dispatch) {
-  return fetchOwnedInactiveAtomUris()
+  return ownerApi
+    .getOwnedInactiveAtomUris()
     .then(inactiveAtomUris =>
       dispatch({
         type: actionTypes.atoms.storeOwnedInactiveUris,
         payload: Immutable.fromJS({ uris: inactiveAtomUris }),
       })
     )
-    .then(() => fetchOwnedActiveAtomUris())
+    .then(() => ownerApi.getOwnedActiveAtomUris())
     .then(atomUris => {
       dispatch({
         type: actionTypes.atoms.storeOwnedActiveUris,
@@ -583,7 +582,7 @@ export function fetchWhatsNew(
   getState,
   modifiedAfterDate = new Date(Date.now() - 30 /*Days before*/ * 86400000)
 ) {
-  return fetchAllMetaAtoms(modifiedAfterDate).then(atoms => {
+  return ownerApi.getAllMetaAtoms(modifiedAfterDate).then(atoms => {
     const atomsImm = Immutable.fromJS(atoms);
     const atomUris = [...atomsImm.keys()];
 
@@ -595,31 +594,6 @@ export function fetchWhatsNew(
   });
 }
 
-function fetchAllMetaAtoms(modifiedAfterDate, state = "ACTIVE", limit = 200) {
-  return fetch(
-    urljoin(
-      ownerBaseUrl,
-      "/rest/atoms/all?state=" +
-        state +
-        (modifiedAfterDate
-          ? "&modifiedafter=" + modifiedAfterDate.toISOString()
-          : "") +
-        "&limit=" +
-        limit
-    ),
-    {
-      method: "get",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-    }
-  )
-    .then(checkHttpStatus)
-    .then(response => response.json());
-}
-
 export function fetchWhatsAround(
   dispatch,
   getState,
@@ -627,8 +601,9 @@ export function fetchWhatsAround(
   location,
   maxDistance
 ) {
-  return fetchAllMetaAtomsNear(modifiedAfterDate, location, maxDistance).then(
-    atoms => {
+  return ownerApi
+    .getAllMetaAtomsNear(modifiedAfterDate, location, maxDistance)
+    .then(atoms => {
       const atomsImm = Immutable.fromJS(atoms);
       const atomUris = [...atomsImm.keys()];
 
@@ -641,164 +616,7 @@ export function fetchWhatsAround(
         }),
       });
       return atomUris;
-    }
-  );
-}
-
-function fetchAllMetaAtomsNear(
-  modifiedAfterDate,
-  location,
-  maxDistance = 5000,
-  limit = 200,
-  state = "ACTIVE"
-) {
-  if (location && location.lat && location.lng) {
-    return fetch(
-      urljoin(
-        ownerBaseUrl,
-        "/rest/atoms/all?state=" +
-          state +
-          "&limit=" +
-          limit +
-          "&latitude=" +
-          location.lat +
-          "&longitude=" +
-          location.lng +
-          "&maxDistance" +
-          maxDistance +
-          (modifiedAfterDate
-            ? "&modifiedafter=" + modifiedAfterDate.toISOString()
-            : "")
-      ),
-      {
-        method: "get",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(),
-        credentials: "include",
-      }
-    )
-      .then(checkHttpStatus)
-      .then(response => response.json());
-  } else {
-    return Promise.reject();
-  }
-}
-
-function fetchOwnedInactiveAtomUris() {
-  return fetch(urljoin(ownerBaseUrl, "/rest/atoms?state=INACTIVE"), {
-    method: "get",
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-    },
-    credentials: "include",
-  })
-    .then(checkHttpStatus)
-    .then(response => response.json());
-}
-
-function fetchOwnedActiveAtomUris() {
-  return fetch(urljoin(ownerBaseUrl, "/rest/atoms?state=ACTIVE"), {
-    method: "get",
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-    },
-    credentials: "include",
-  })
-    .then(checkHttpStatus)
-    .then(response => response.json());
-}
-
-export function fetchAgreementProtocolUris(connectionUri) {
-  console.debug("fetchAgreementProtocolUris: ", connectionUri);
-  const url = urljoin(
-    ownerBaseUrl,
-    "/rest/agreement/getAgreementProtocolUris",
-    `?connectionUri=${connectionUri}`
-  );
-
-  return fetch(url, {
-    method: "get",
-    headers: {
-      Accept: "application/ld+json",
-      "Content-Type": "application/ld+json",
-    },
-    credentials: "include",
-  })
-    .then(checkHttpStatus)
-    .then(response => response.json());
-}
-
-export function fetchPetriNetUris(connectionUri) {
-  console.debug("fetchPetriNetUris: ", connectionUri);
-  const url = urljoin(
-    ownerBaseUrl,
-    "/rest/petrinet/getPetriNetUris",
-    `?connectionUri=${connectionUri}`
-  );
-
-  return fetch(url, {
-    method: "get",
-    headers: {
-      Accept: "application/ld+json",
-      "Content-Type": "application/ld+json",
-    },
-    credentials: "include",
-  })
-    .then(checkHttpStatus)
-    .then(response => response.json());
-}
-
-export function fetchMessageEffects(connectionUri, messageUri) {
-  console.debug(
-    "fetchMessageEffects: ",
-    connectionUri,
-    " messageUri:",
-    messageUri
-  );
-
-  const url = urljoin(
-    ownerBaseUrl,
-    "/rest/agreement/getMessageEffects",
-    `?connectionUri=${connectionUri}`,
-    `&messageUri=${messageUri}`
-  );
-
-  return fetch(url, {
-    method: "get",
-    headers: {
-      Accept: "application/ld+json",
-      "Content-Type": "application/ld+json",
-    },
-    credentials: "include",
-  })
-    .then(checkHttpStatus)
-    .then(response => response.json());
-}
-
-export function fetchMessage(atomUri, eventUri) {
-  console.debug("fetchMessage: ", atomUri, " eventUri: ", eventUri);
-  const url = urljoin(
-    ownerBaseUrl,
-    "/rest/linked-data/",
-    `?requester=${encodeURI(atomUri)}`,
-    `&uri=${encodeURI(eventUri)}`
-  );
-  const httpOptions = {
-    method: "get",
-    headers: {
-      Accept: "application/ld+json",
-      "Content-Type": "application/ld+json",
-    },
-    credentials: "include",
-  };
-  return fetch(url, httpOptions)
-    .then(checkHttpStatus)
-    .then(response => response.json());
+    });
 }
 
 export async function fetchDataForOwnedAtoms(ownedAtomUris, dispatch) {

@@ -13,14 +13,13 @@ import * as generalSelectors from "../selectors/general-selectors.js";
 import {
   fetchDataForOwnedAtoms,
   fetchDataForNonOwnedAtomOnly,
-  fetchMessageEffects,
-  fetchPetriNetUris,
   isFetchMessageEffectsNeeded,
   buildChatMessage,
   fetchTheirAtomAndDispatch,
   fetchActiveConnectionAndDispatch,
 } from "../won-message-utils.js";
 import * as atomUtils from "../atom-utils.js";
+import * as ownerApi from "../owner-api.js";
 
 export function successfulCloseAtom(event) {
   return (dispatch, getState) => {
@@ -354,7 +353,8 @@ export function processConnectionMessage(event) {
         },
       });
 
-      fetchPetriNetUris(connectionUri)
+      ownerApi
+        .getPetriNetUris(connectionUri)
         .then(response => {
           const petriNetData = {};
 
@@ -386,8 +386,9 @@ export function processConnectionMessage(event) {
         });
 
       //PETRINET DATA PART END **************************
-      fetchMessageEffects(connectionUri, event.getMessageUri()).then(
-        response => {
+      ownerApi
+        .getMessageEffects(connectionUri, event.getMessageUri())
+        .then(response => {
           for (const effect of response) {
             switch (effect.type) {
               case "ACCEPTS":
@@ -549,8 +550,7 @@ export function processConnectionMessage(event) {
             type: actionTypes.messages.processConnectionMessage,
             payload: event,
           });
-        }
-      );
+        });
     } else {
       dispatch({
         type: actionTypes.messages.processConnectionMessage,
@@ -1068,7 +1068,8 @@ export function dispatchActionOnSuccessRemote(event) {
         },
       });
 
-      fetchPetriNetUris(connectionUri)
+      ownerApi
+        .getPetriNetUris(connectionUri)
         .then(response => {
           const petriNetData = {};
 

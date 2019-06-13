@@ -6,8 +6,7 @@ import { connect2Redux } from "../../won-utils.js";
 import { attach, getIn } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
 import { getOwnedAtomByConnectionUri } from "../../selectors/general-selectors.js";
-import { labels } from "../../won-label-utils.js";
-import { fetchMessage } from "../../won-message-utils.js";
+import * as ownerApi from "../../owner-api.js";
 import { classOnComponentRoot } from "../../cstm-ng-utils.js";
 
 import "~/style/_referenced-message-content.scss";
@@ -208,8 +207,6 @@ function genComponentConf() {
     constructor(/* arguments = dependency injections */) {
       attach(this, serviceDependencies, arguments);
 
-      this.labels = labels;
-
       const selectFromState = state => {
         const ownedAtom =
           this.connectionUri &&
@@ -342,7 +339,7 @@ function genComponentConf() {
 
     addMessageToState(eventUri) {
       const ownedAtomUri = this.ownedAtomUri;
-      return fetchMessage(ownedAtomUri, eventUri).then(response => {
+      return ownerApi.getMessage(ownedAtomUri, eventUri).then(response => {
         won.wonMessageFromJsonLd(response).then(msg => {
           if (msg.isFromOwner() && msg.getRecipientAtom() === ownedAtomUri) {
             /*if we find out that the recipientatom of the crawled event is actually our
