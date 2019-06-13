@@ -292,7 +292,7 @@ export function connectionsOpen(connectionUri, textMessage) {
     });
 
     dispatch(
-      actionCreators.router__stateGoCurrent({
+      actionCreators.router__stateGoAbs("connections", {
         connectionUri: optimisticEvent.getSenderConnection(),
       })
     );
