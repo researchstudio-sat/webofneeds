@@ -2,6 +2,7 @@
  * Created by ksinger on 04.08.2017.
  */
 
+import won from "../won-es6.js";
 import { buildCreateMessage, buildEditMessage } from "../won-message-utils.js";
 
 import { actionCreators, actionTypes } from "./actions.js";
@@ -11,7 +12,8 @@ import { ensureLoggedIn } from "./account-actions.js";
 import { get, getIn } from "../utils.js";
 
 import * as accountUtils from "../account-utils.js";
-import * as ownerApi from "../owner-api";
+import * as atomUtils from "../atom-utils.js";
+import * as ownerApi from "../owner-api.js";
 
 export function atomEdit(draft, oldAtom, nodeUri) {
   return (dispatch, getState) => {
@@ -53,7 +55,7 @@ export function atomEdit(draft, oldAtom, nodeUri) {
   };
 }
 
-export function atomCreate(draft, persona, nodeUri) {
+export function atomCreate(draft, personaUri, nodeUri) {
   return (dispatch, getState) => {
     const state = getState();
 
@@ -81,10 +83,17 @@ export function atomCreate(draft, persona, nodeUri) {
         draft,
         nodeUri
       );
+
+      dispatch({
+        type: actionTypes.atoms.create,
+        payload: { eventUri, message, atomUri, atom: draft },
+      });
+
+      const persona = getIn(state, ["atoms", personaUri]);
       if (persona) {
         return ownerApi
           .serverSideConnect(
-            `${persona}#holderSocket`,
+            atomUtils.getSocketUri(persona, won.HOLD.HolderSocketCompacted),
             `${atomUri}#holdableSocket`,
             false,
             true
@@ -94,16 +103,7 @@ export function atomCreate(draft, persona, nodeUri) {
               const errorMsg = await response.text();
               throw new Error(`Could not connect identity: ${errorMsg}`);
             }
-            dispatch({
-              type: actionTypes.atoms.create,
-              payload: { eventUri, message, atomUri, atom: draft },
-            });
           });
-      } else {
-        dispatch({
-          type: actionTypes.atoms.create,
-          payload: { eventUri, message, atomUri, atom: draft },
-        });
       }
     });
   };

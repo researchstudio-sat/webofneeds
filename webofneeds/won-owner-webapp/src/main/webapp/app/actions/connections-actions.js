@@ -332,7 +332,30 @@ function connectReactionAtom(
 
     const nodeUri = getIn(state, ["config", "defaultNodeUri"]);
 
-    // add persona
+    // create new atom
+    const { message, eventUri, atomUri } = await buildCreateMessage(
+      atomDraft,
+      nodeUri
+    );
+
+    // create the new atom
+    dispatch({
+      type: actionTypes.atoms.create, // TODO custom action
+      payload: { eventUri, message, atomUri, atom: atomDraft },
+    });
+
+    dispatch(
+      actionCreators.router__stateGo("connections", {
+        useCase: undefined,
+        useCaseGroup: undefined,
+        fromAtomUri: undefined,
+        viewAtomUri: undefined,
+        viewConnUri: undefined,
+        mode: undefined,
+      })
+    );
+
+    // add persona if present
     if (personaUri) {
       const persona = getIn(state, ["atoms", personaUri]);
       ownerApi
@@ -349,12 +372,6 @@ function connectReactionAtom(
           }
         });
     }
-
-    // create new atom
-    const { message, eventUri, atomUri } = await buildCreateMessage(
-      atomDraft,
-      nodeUri
-    );
 
     if (generalSelectors.isAtomOwned(state, connectToAtomUri)) {
       const connectToSocketUri = connectToSocketType
@@ -393,22 +410,6 @@ function connectReactionAtom(
               throw new Error(`Could not connect owned atoms: ${errorMsg}`);
             }
           });
-        // create the new atom
-        dispatch({
-          type: actionTypes.atoms.create, // TODO custom action
-          payload: { eventUri, message, atomUri, atom: atomDraft },
-        });
-
-        dispatch(
-          actionCreators.router__stateGo("connections", {
-            useCase: undefined,
-            useCaseGroup: undefined,
-            fromAtomUri: undefined,
-            viewAtomUri: undefined,
-            viewConnUri: undefined,
-            mode: undefined,
-          })
-        );
       } else {
         throw new Error(
           `Could not connect owned atoms did not find necessary sockets`
@@ -446,23 +447,6 @@ function connectReactionAtom(
             actionToDispatch: connectAction,
           },
         });
-
-        // create the new atom
-        dispatch({
-          type: actionTypes.atoms.create, // TODO custom action
-          payload: { eventUri, message, atomUri, atom: atomDraft },
-        });
-
-        dispatch(
-          actionCreators.router__stateGo("connections", {
-            useCase: undefined,
-            useCaseGroup: undefined,
-            fromAtomUri: undefined,
-            viewAtomUri: undefined,
-            viewConnUri: undefined,
-            mode: undefined,
-          })
-        );
       });
     }
   });

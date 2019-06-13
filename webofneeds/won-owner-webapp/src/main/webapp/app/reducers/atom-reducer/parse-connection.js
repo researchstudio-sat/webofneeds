@@ -1,6 +1,6 @@
 import Immutable from "immutable";
 import won from "../../won-es6.js";
-
+import { get } from "../../utils.js";
 import { isUriRead } from "../../won-localstorage.js";
 
 export function parseConnection(jsonldConnection) {
@@ -9,11 +9,11 @@ export function parseConnection(jsonldConnection) {
   let parsedConnection = {
     belongsToUri: jsonldConnectionImm.get("sourceAtom"),
     data: {
-      uri: jsonldConnectionImm.get("uri"),
-      state: jsonldConnectionImm.get("connectionState"),
+      uri: get(jsonldConnectionImm, "uri"),
+      state: get(jsonldConnectionImm, "connectionState"),
       messages: Immutable.Map(),
-      socketUri: jsonldConnectionImm.get("socket"),
-      targetSocketUri: jsonldConnectionImm.get("targetSocket"),
+      socketUri: get(jsonldConnectionImm, "socket"),
+      targetSocketUri: get(jsonldConnectionImm, "targetSocket"),
       agreementData: {
         agreementUris: Immutable.Set(),
         pendingProposalUris: Immutable.Set(),
@@ -27,8 +27,8 @@ export function parseConnection(jsonldConnection) {
         claimedMessageUris: Immutable.Set(),
       },
       petriNetData: Immutable.Map(),
-      targetAtomUri: jsonldConnectionImm.get("targetAtom"),
-      targetConnectionUri: jsonldConnectionImm.get("targetConnection"),
+      targetAtomUri: get(jsonldConnectionImm, "targetAtom"),
+      targetConnectionUri: get(jsonldConnectionImm, "targetConnection"),
       creationDate: undefined,
       lastUpdateDate: undefined,
       unread: undefined,

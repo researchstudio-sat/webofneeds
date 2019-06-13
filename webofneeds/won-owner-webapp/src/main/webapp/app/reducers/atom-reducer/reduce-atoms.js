@@ -77,6 +77,14 @@ export function deleteAtom(atoms, deletedAtomUri) {
       );
     };
 
+    const removeBuddies = atom => {
+      return atom.updateIn(
+        ["buddies"],
+        buddies =>
+          buddies && buddies.filter(heldItem => heldItem != deletedAtomUri)
+      );
+    };
+
     const removeConnections = atom => {
       return atom.updateIn(
         ["connections"],
@@ -89,7 +97,7 @@ export function deleteAtom(atoms, deletedAtomUri) {
     };
 
     return removeConnections(
-      removeHeld(removeHolder(removeGroupMembers(atom)))
+      removeHeld(removeHolder(removeGroupMembers(removeBuddies(atom))))
     );
   });
 }
