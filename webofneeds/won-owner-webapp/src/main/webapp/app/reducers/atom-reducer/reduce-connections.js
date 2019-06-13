@@ -400,6 +400,8 @@ export function addConnectionToLoad(state, atomUri, conn) {
       return won.HOLD.HolderSocketCompacted;
     } else if (socketType === won.HOLD.HoldableSocket) {
       return won.HOLD.HoldableSocketCompacted;
+    } else if (socketType === won.BUDDY.BuddySocket) {
+      return won.BUDDY.BuddySocketCompacted;
     } else {
       console.warn(
         "Unknown socketType: ",
