@@ -8,7 +8,7 @@ import dropdownModule from "./covering-dropdown.js";
 import { attach, delay, get, getIn, toAbsoluteURL } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { connect2Redux, parseRestErrorMessage } from "../won-utils.js";
-import { ownerBaseUrl } from "config";
+import { ownerBaseUrl } from "~/config/default.js";
 import { getVerificationTokenFromRoute } from "../selectors/general-selectors.js";
 import * as viewSelectors from "../selectors/view-selectors.js";
 import * as processSelectors from "../selectors/process-selectors.js";
@@ -16,7 +16,7 @@ import * as processSelectors from "../selectors/process-selectors.js";
 import * as srefUtils from "../sref-utils.js";
 import * as accountUtils from "../account-utils.js";
 
-import "style/_slidein.scss";
+import "~/style/_slidein.scss";
 
 function genSlideInConf() {
   let template = `
@@ -169,7 +169,7 @@ function genSlideInConf() {
               <h3>Therefore:</h3>
               <p>
                 <ul>
-                  <li><b><a href="{{ self.absHRef(self.$state, 'signup') }}">Consider signing up!</a></b> It will allow us to contact you if there is relevant activity.</li>
+                  <li><b><a class="clickable" ng-click="self.router__stateGo('signup')" ">Consider signing up!</a></b> It will allow us to contact you if there is relevant activity.</li>
                   <li>Alternatively, we can <b>send you the login link</b> by email.</li>
                 </ul>
               </p>
@@ -243,7 +243,7 @@ function genSlideInConf() {
         const accountState = get(state, "account");
 
         const privateId = accountUtils.getPrivateId(accountState);
-        const path = "#!/connections" + `?privateId=${privateId}`;
+        const path = "#!/inventory" + `?privateId=${privateId}`;
 
         const anonymousLink = toAbsoluteURL(ownerBaseUrl).toString() + path;
         const isLoggedIn = accountUtils.isLoggedIn(accountState);

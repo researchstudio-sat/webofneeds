@@ -1,6 +1,6 @@
 import angular from "angular";
 
-import "style/_labelledhr.scss";
+import "~/style/_labelledhr.scss";
 
 function genComponentConf() {
   let template = `<div class="wlh__label">

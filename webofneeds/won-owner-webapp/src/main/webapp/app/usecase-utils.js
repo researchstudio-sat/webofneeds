@@ -2,8 +2,8 @@
  * Created by quasarchimaere on 11.02.2019.
  */
 
-import * as useCaseDefinitions from "useCaseDefinitions";
-import { messageDetails } from "detailDefinitions";
+import * as useCaseDefinitions from "../config/usecase-definitions.js";
+import { messageDetails } from "../config/detail-definitions.js";
 import { getIn, get } from "./utils.js";
 import { values } from "min-dash";
 import won from "./won-es6.js";
@@ -253,20 +253,6 @@ export function getUseCase(useCaseString) {
   return undefined;
 }
 
-/**
- * This fucntion returns all UseCases that are defined with "showInList = true", this is so we can define useCases
- * that show up within our connection-overview "quick item"-buttons, e.g. if we want to define a usecase that is
- * always available from this list
- * @returns {{}}
- */
-export function getListUseCases() {
-  const useCasesImm = Immutable.fromJS(useCaseDefinitions.getAllUseCases());
-  const listUseCases =
-    useCasesImm && useCasesImm.filter(useCase => get(useCase, "showInList"));
-
-  return listUseCases && listUseCases.toJS();
-}
-
 export function getUseCaseGroupByIdentifier(groupIdentifier) {
   if (groupIdentifier) {
     const useCaseGroups = useCaseDefinitions.getAllUseCaseGroups();
@@ -290,6 +276,7 @@ export function isDisplayableUseCase(useCase) {
   return (
     useCase &&
     useCase.identifier &&
+    !useCase.hidden &&
     (useCase.label || useCase.icon) &&
     !useCase.subItems
   );

@@ -26,14 +26,15 @@ export const rehearsalRoomOffer = {
   draft: {
     ...mergeInEmptyDraft({
       content: {
-        type: ["won:RehearsalRoomRentOffer"],
+        type: ["demo:RehearsalRoomRentOffer"],
         title: "Offer Rehearsal Room!",
       },
       seeks: {
-        type: ["won:RehearsalRoomRentDemand"],
+        type: ["demo:RehearsalRoomRentDemand"],
       },
     }),
   },
+  reactionUseCases: ["rehearsalRoomSearch"],
   details: {
     title: { ...details.title },
     description: { ...details.description },
@@ -59,6 +60,7 @@ export const rehearsalRoomOffer = {
     },
     fromDatetime: { ...details.fromDatetime },
     throughDatetime: { ...details.throughDatetime },
+    images: { ...details.images },
   },
 
   seeksDetails: undefined,
@@ -81,11 +83,13 @@ export const rehearsalRoomOffer = {
             s: won.defaultContext["s"],
             geo: "http://www.bigdata.com/rdf/geospatial#",
             xsd: "http://www.w3.org/2001/XMLSchema#",
+            match: won.defaultContext["match"],
+            demo: won.defaultContext["demo"],
           },
           operations: [
             `${resultName} a won:Atom.`,
-            `${resultName} won:seeks ?seeks.`,
-            `${resultName} rdf:type won:RehearsalRoomRentDemand.`,
+            `${resultName} match:seeks ?seeks.`,
+            `${resultName} rdf:type demo:RehearsalRoomRentDemand.`,
             "?seeks (won:location|s:location) ?location.",
             "?location s:geo ?location_geo.",
             "?location_geo s:latitude ?location_lat;",
@@ -108,6 +112,7 @@ export const rehearsalRoomOffer = {
 
       filter = concatenateFilters(filters);
     } else {
+      //Location is set to mandatory, hence this clause will never get called
       const filters = [
         {
           // to select is-branch
@@ -115,11 +120,13 @@ export const rehearsalRoomOffer = {
             won: won.defaultContext["won"],
             rdf: won.defaultContext["rdf"],
             sh: won.defaultContext["sh"], //needed for the filterNumericProperty calls
+            match: won.defaultContext["match"],
+            demo: won.defaultContext["demo"],
           },
           operations: [
             `${resultName} a won:Atom.`,
-            `${resultName} won:seeks ?seeks.`,
-            `${resultName} rdf:type won:RehearsalRoomRentDemand.`,
+            `${resultName} match:seeks ?seeks.`,
+            `${resultName} rdf:type demo:RehearsalRoomRentDemand.`,
           ],
         },
         rent && filterPrice("?seeks", rent.amount, rent.currency, "rent"),

@@ -1,22 +1,12 @@
-FROM ubuntu
+FROM openjdk:8-jre
 RUN apt-get update && apt-get install -y \
     gnupg \
     vim \
     less \
-	dos2unix
-
-# install oracle jre 8 latest version
-RUN echo "deb http://ppa.launchpad.net/webupd8team/java/ubuntu trusty main" | tee /etc/apt/sources.list.d/webupd8team-java.list
-RUN "deb-src http://ppa.launchpad.net/webupd8team/java/ubuntu trusty main" | tee -a /etc/apt/sources.list.d/webupd8team-java.list
-RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys EEA14886
-RUN apt-get update -y
-RUN echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | /usr/bin/debconf-set-selections
-RUN apt-get install oracle-java8-installer -y
-RUN apt-get install oracle-java8-set-default
-
+    dos2unix
 
 #keytool path, used by certificate generation script for creating jks
-ENV KEYTOOL /usr/lib/jvm/java-8-oracle/bin/keytool
+ENV KEYTOOL keytool
 
 #specify your password when run via -e "PASS=pass:<your_password>" or in a file like "PASS=file:<your_file>"
 ENV DEFAULT_PASS pass:changeit

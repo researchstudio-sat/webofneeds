@@ -5,6 +5,8 @@ import { actionTypes } from "./actions";
 import { getOwnedAtomByConnectionUri } from "../selectors/general-selectors";
 import { getOwnedConnectionByUri } from "../selectors/connection-selectors";
 import { buildConnectMessage, buildCloseMessage } from "../won-message-utils";
+import * as atomUtils from "../atom-utils.js";
+import * as ownerApi from "../owner-api.js";
 
 export function createPersona(persona, nodeUri) {
   return (dispatch, getState) => {
@@ -29,10 +31,14 @@ export function createPersona(persona, nodeUri) {
           "@id": "#reviewSocket",
           "won:socketDefinition": { "@id": "review:ReviewSocket" },
         },
+        {
+          "@id": "#buddySocket",
+          "won:socketDefinition": { "@id": "buddy:BuddySocket" },
+        },
       ],
-      "won:flag": [
-        { "@id": "won:NoHintForCounterpart" },
-        { "@id": "won:NoHintForMe" },
+      "match:flag": [
+        { "@id": "match:NoHintForCounterpart" },
+        { "@id": "match:NoHintForMe" },
       ],
       "s:name": persona.displayName,
       "s:description": persona.aboutMe || undefined,
@@ -71,20 +77,26 @@ async function connectReview(
   connectMessage,
   connectionUri = undefined
 ) {
-  const getSocket = persona => {
-    const reviewSocket = persona
-      .getIn(["content", "sockets"])
-      .filter(socketType => socketType == "review:ReviewSocket")
-      .keySeq()
-      .first();
+  const socketUri = atomUtils.getSocketUri(
+    ownPersona,
+    won.REVIEW.ReviewSocketCompacted
+  );
+  const targetSocketUri = atomUtils.getSocketUri(
+    foreignPersona,
+    won.REVIEW.ReviewSocketCompacted
+  );
 
-    if (!reviewSocket) {
-      throw new Error(
-        `Persona ${persona.get("uri")} does not have a review socket`
-      );
-    }
-    return reviewSocket;
-  };
+  if (!socketUri) {
+    throw new Error(
+      `Persona ${ownPersona.get("uri")} does not have a review socket`
+    );
+  }
+
+  if (!targetSocketUri) {
+    throw new Error(
+      `Persona ${foreignPersona.get("uri")} does not have a review socket`
+    );
+  }
 
   const cnctMsg = buildConnectMessage({
     ownedAtomUri: ownPersona.get("uri"),
@@ -93,8 +105,8 @@ async function connectReview(
     theirNodeUri: foreignPersona.get("nodeUri"),
     connectMessage: connectMessage,
     optionalOwnConnectionUri: connectionUri,
-    ownSocket: getSocket(ownPersona),
-    theirSocket: getSocket(foreignPersona),
+    socketUri: socketUri,
+    targetSocketUri: targetSocketUri,
   });
   const optimisticEvent = await won.wonMessageFromJsonLd(cnctMsg.message);
   dispatch({
@@ -104,56 +116,50 @@ async function connectReview(
       message: cnctMsg.message,
       ownConnectionUri: connectionUri,
       optimisticEvent: optimisticEvent,
+      socketUri: socketUri,
+      targetSocketUri: targetSocketUri,
     },
   });
 }
 
 export function connectPersona(atomUri, personaUri) {
-  return async dispatch => {
-    const response = await fetch("rest/action/connect", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify([
-        {
-          pending: false,
-          socket: `${personaUri}#holderSocket`,
-        },
-        {
-          pending: false,
-          socket: `${atomUri}#holdableSocket`,
-        },
-      ]),
-      credentials: "include",
-    });
-    if (!response.ok) {
-      const errorMsg = await response.text();
-      throw new Error(`Could not connect identity: ${errorMsg}`);
-    }
-    dispatch({
-      type: actionTypes.personas.connect,
-      payload: {
-        atomUri: atomUri,
-        personaUri: personaUri,
-      },
-    });
+  return dispatch => {
+    return ownerApi
+      .serverSideConnect(
+        `${personaUri}#holderSocket`,
+        `${atomUri}#holdableSocket`
+      )
+      .then(async response => {
+        if (!response.ok) {
+          const errorMsg = await response.text();
+          throw new Error(`Could not connect identity: ${errorMsg}`);
+        }
+        dispatch({
+          type: actionTypes.personas.connect,
+          payload: {
+            atomUri: atomUri,
+            personaUri: personaUri,
+          },
+        });
+      });
   };
 }
 
 export function disconnectPersona(atomUri, personaUri) {
   return (dispatch, getState) => {
     const state = getState();
-    const persona = state.getIn(["atoms", personaUri]);
-    const atom = state.getIn(["atoms", atomUri]);
+    const persona = getIn(state, ["atoms", personaUri]);
+    const atom = getIn(state, ["atoms", atomUri]);
 
-    const connectionUri = persona
-      .get("connections")
-      .filter(
-        connection =>
-          connection.get("targetAtomUri") == atom.get("uri") &&
-          connection.get("socket") == won.HOLD.HolderSocketCompacted
-      )
+    const connectionUri = get(persona, "connections")
+      .filter(connection => {
+        const socketUri = get(connection, "socketUri");
+        const socketType = getIn(atom, ["content", "sockets", socketUri]);
+        return (
+          get(connection, "targetAtomUri") === atomUri &&
+          socketType === won.HOLD.HolderSocketCompacted
+        );
+      })
       .keySeq()
       .first();
 
@@ -196,13 +202,19 @@ export function reviewPersona(reviewableConnectionUri, review) {
     };
 
     const getConnection = (ownPersona, foreignPersona) => {
-      return ownPersona
-        .get("connections")
-        .filter(
-          connection =>
-            connection.get("targetAtomUri") == foreignPersona.get("uri") &&
-            connection.get("socket") == won.REVIEW.ReviewSocket
-        )
+      return get(ownPersona, "connections")
+        .filter(connection => {
+          const socketUri = get(connection, "socketUri");
+          const socketType = getIn(ownPersona, [
+            "content",
+            "sockets",
+            socketUri,
+          ]);
+          return (
+            get(connection, "targetAtomUri") === get(foreignPersona, "uri") &&
+            socketType === won.REVIEW.ReviewSocketCompacted
+          );
+        })
         .keySeq()
         .first();
     };

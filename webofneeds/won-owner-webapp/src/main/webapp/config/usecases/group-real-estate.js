@@ -6,7 +6,7 @@ import { rehearsalRoomSearch } from "./uc-rehearsal-room-search.js";
 export const realEstateGroup = {
   identifier: "realestategroup",
   label: "Homes",
-  icon: undefined,
+  icon: "#ico36_uc_realestate",
   subItems: {
     rentRealEstateSearch: rentRealEstateSearch,
     rentRealEstateOffer: rentRealEstateOffer,

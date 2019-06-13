@@ -1,3 +1,5 @@
+@prefix con:   <https://w3id.org/won/content#> .
+@prefix match:   <https://w3id.org/won/matching#> .
 @prefix msg:   <https://w3id.org/won/message#> .
 @prefix conn:  <https://satvm05.researchstudio.at/won/resource/connection/> .
 @prefix atom:  <https://satvm05.researchstudio.at/won/resource/atom/> .
@@ -102,7 +104,7 @@
             a             won:Atom ;
             won:goal      [ won:shapesGraph  <https://satvm05.researchstudio.at/won/resource/event/bzzhdyfl5v2r2nloruo7#content-p93v> ] ;
             won:socket  won:ChatSocket ;
-            won:flag   won:NoHintForCounterpart , won:NoHintForMe ;
+            match:flag   match:NoHintForCounterpart , match:NoHintForMe ;
             dc:title  "TaxiBot Offer" .
 }
 

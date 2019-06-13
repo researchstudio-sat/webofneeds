@@ -1,29 +1,59 @@
 @prefix : <https://w3id.org/won/ext/hold#> .
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix won: <https://w3id.org/won/core#> .
 @prefix xml: <http://www.w3.org/XML/1998/namespace> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-@base <https://w3id.org/won/ext/hold#> .
+@prefix vann: <http://purl.org/vocab/vann/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@base <https://w3id.org/won/ext/hold> .
 
 <https://w3id.org/won/ext/hold> rdf:type owl:Ontology ;
-                                 owl:imports <https://w3id.org/won/core> .
+                                 owl:versionIRI <https://w3id.org/won/ext/hold/1.0> ;
+                                 owl:imports <https://w3id.org/won/core> ;
+                                 dc:abstract "This ontology contains the definition of the *HolderSocket* and the *HoldableSocket*, the *holds* and the *heldBy* properties. These express control relationships in WoN. The Atoms holding other atoms represent agents (users or programs) and can themselves not be held."@en ;
+                                 dc:creator "Florian Kleedorfer" ;
+                                 dc:date "2019-04-15"^^xsd:date ;
+                                 dc:title "Web of Needs Hold Extension" ;
+                                 dcterms:license <https://creativecommons.org/licenses/by/4.0/> ;
+                                 vann:preferredNamespacePrefix "wx-hold" .
 
 #################################################################
 #    Annotation properties
 #################################################################
 
-###  https://w3id.org/won/ext/hold#heldBy
-:heldBy rdf:type owl:AnnotationProperty ;
-        rdfs:range won:Atom ;
-        rdfs:domain won:Atom .
+###  http://purl.org/dc/elements/1.1/abstract
+dc:abstract rdf:type owl:AnnotationProperty .
 
 
-###  https://w3id.org/won/ext/hold#holds
-:holds rdf:type owl:AnnotationProperty ;
-       rdfs:range won:Atom ;
-       rdfs:domain won:Atom .
+###  http://purl.org/dc/elements/1.1/creator
+dc:creator rdf:type owl:AnnotationProperty .
+
+
+###  http://purl.org/dc/elements/1.1/date
+dc:date rdf:type owl:AnnotationProperty .
+
+
+###  http://purl.org/dc/elements/1.1/description
+dc:description rdf:type owl:AnnotationProperty .
+
+
+###  http://purl.org/dc/elements/1.1/title
+dc:title rdf:type owl:AnnotationProperty .
+
+
+###  http://purl.org/dc/terms/license
+dcterms:license rdf:type owl:AnnotationProperty .
+
+
+###  http://purl.org/vocab/vann/preferredNamespacePrefix
+vann:preferredNamespacePrefix rdf:type owl:AnnotationProperty .
+
+
+###  http://www.w3.org/2000/01/rdf-schema#labels
+rdfs:labels rdf:type owl:AnnotationProperty .
 
 
 #################################################################
@@ -31,62 +61,64 @@
 #################################################################
 
 ###  https://w3id.org/won/ext/hold#heldBy
-:heldBy rdf:type owl:ObjectProperty .
+:heldBy rdf:type owl:ObjectProperty ;
+        rdfs:domain won:Atom ;
+        rdfs:range won:Atom ;
+        owl:propertyDisjointWith :holds .
 
 
 ###  https://w3id.org/won/ext/hold#holds
-:holds rdf:type owl:ObjectProperty .
+:holds rdf:type owl:ObjectProperty ;
+       rdfs:domain won:Atom ;
+       rdfs:range won:Atom .
 
 
 #################################################################
 #    Individuals
 #################################################################
 
-###  http://example.com/won/ext/hold#MyConcreteHoldableSocket
-<http://example.com/won/ext/hold#MyConcreteHoldableSocket> rdf:type owl:NamedIndividual ;
-                                                           won:socketDefinition :HoldableSocket .
-
-
-###  http://example.com/won/ext/hold#MyConcreteHolderSocket
-<http://example.com/won/ext/hold#MyConcreteHolderSocket> rdf:type owl:NamedIndividual ;
-                                                         won:socketDefinition :HolderSocket .
-
-
 ###  https://w3id.org/won/ext/hold#HoldableSocket
 :HoldableSocket rdf:type owl:NamedIndividual ,
                          won:SocketDefinition ;
-                rdfs:comment "An Atom uses a Socket with this configuration to connect to the Persona Atom that holds it."@en ;
-                won:autoOpen "false"^^xsd:boolean ;
                 won:compatibleSocketDefinition :HolderSocket ;
                 won:derivesAtomProperty :heldBy ;
-                won:socketCapacity 1 .
+                won:autoOpen "false"^^xsd:boolean ;
+                won:socketCapacity 1 ;
+                rdfs:comment "An Atom uses a Socket with this configuration to connect to the Persona Atom that holds it."@en ;
+                rdfs:label "HoldableSocket" .
 
 
 ###  https://w3id.org/won/ext/hold#HolderSocket
 :HolderSocket rdf:type owl:NamedIndividual ,
                        won:SocketDefinition ;
-              rdfs:comment "A Persona Atom uses a Socket with this configuration to connect to Atoms it holds."@en ;
-              won:autoOpen "false"^^xsd:boolean ;
               won:compatibleSocketDefinition :HoldableSocket ;
-              won:derivesAtomProperty :holds .
-
-
-###  https://w3id.org/won/ext/hold#heldBy
-:heldBy rdf:type owl:NamedIndividual .
-
-
-###  https://w3id.org/won/ext/hold#holds
-:holds rdf:type owl:NamedIndividual .
+              won:derivesAtomProperty :holds ;
+              won:autoOpen "false"^^xsd:boolean ;
+              rdfs:comment "A Persona Atom uses a Socket with this configuration to connect to Atoms it holds."@en ;
+              rdfs:label "HolderSocket" .
 
 
 #################################################################
 #    Annotations
 #################################################################
 
-:heldBy rdfs:comment "Links an Atom to the Atom representing the agent (a person, organization, bot, ...) that controls both."@en .
+:heldBy rdfs:label "heldBy" ;
+        rdfs:comment "Links an Atom to the Atom representing the agent (a person, organization, bot, ...) that controls both."@en .
 
 
-:holds rdfs:comment "Links the Atom representing an agent (a person, organization, bot, ...) to another Atom they control."@en .
+:holds rdfs:label "holds" ;
+       rdfs:comment "Links the Atom representing an agent (a person, organization, bot, ...) to another Atom they control."@en .
 
 
-###  Generated by the OWL API (version 4.2.8.20170104-2310) https://github.com/owlcs/owlapi
+#################################################################
+#    General axioms
+#################################################################
+
+[ rdf:type owl:AllDifferent ;
+  owl:distinctMembers ( :HoldableSocket
+                        :HolderSocket
+                      )
+] .
+
+
+###  Generated by the OWL API (version 4.5.9.2019-02-01T07:24:44Z) https://github.com/owlcs/owlapi

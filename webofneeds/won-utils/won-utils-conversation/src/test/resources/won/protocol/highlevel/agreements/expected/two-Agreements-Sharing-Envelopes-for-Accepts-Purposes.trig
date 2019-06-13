@@ -1,3 +1,5 @@
+@prefix con:   <https://w3id.org/won/content#> .
+@prefix match:   <https://w3id.org/won/matching#> .
 @prefix msg:   <https://w3id.org/won/message#> .
 @prefix conn:  <https://localhost:8443/won/resource/connection/> .
 @prefix woncrypt: <https://w3id.org/won/core#> .
@@ -20,13 +22,13 @@
 
 <https://localhost:8443/won/resource/event/00d5wzbbf8hzzt2eewcc> {
     event:usi9yhill1lo2xi70sjx
-            won:textMessage  "Greetings! \nI am the DebugBot. I can simulate multiple other users so you can test things. I understand a few commands. \nTo see which ones, type \n\n'usage'\n\n (without the quotes)." .
+            con:text  "Greetings! \nI am the DebugBot. I can simulate multiple other users so you can test things. I understand a few commands. \nTo see which ones, type \n\n'usage'\n\n (without the quotes)." .
 }
 
 <https://localhost:8443/won/resource/event/5669098069340991000> {
     event:6671551888677331000
             won:socket        won:ChatSocket ;
             won:targetSocket  won:ChatSocket ;
-            won:textMessage  "hi" .
+            con:text  "hi" .
 }
 

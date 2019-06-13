@@ -12,7 +12,7 @@ import { labels, relativeTime } from "../won-label-utils.js";
 import { attach, getIn, get } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
 import * as atomUtils from "../atom-utils.js";
-import { isChatToGroup } from "../connection-utils.js";
+import * as connectionSelectors from "../selectors/connection-selectors.js";
 import { getHumanReadableStringFromMessage } from "../reducers/atom-reducer/parse-message.js";
 import {
   selectLastUpdateTime,
@@ -24,7 +24,7 @@ import { getMessagesByConnectionUri } from "../selectors/message-selectors.js";
 import connectionStateModule from "./connection-state.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
 
-import "style/_connection-header.scss";
+import "~/style/_connection-header.scss";
 
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
@@ -170,10 +170,9 @@ function genComponentConf() {
           ownedAtom,
           targetAtom,
           remotePersonaName,
-          isConnectionToGroup: isChatToGroup(
-            state.get("atoms"),
-            get(ownedAtom, "uri"),
-            this.connectionUri
+          isConnectionToGroup: connectionSelectors.isChatToGroupConnection(
+            getAtoms(state),
+            connection
           ),
           isDirectResponseFromRemote: atomUtils.isDirectResponseAtom(
             targetAtom

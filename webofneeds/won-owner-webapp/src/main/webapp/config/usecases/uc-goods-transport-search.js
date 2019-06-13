@@ -249,6 +249,7 @@ export const goodsTransportSearch = {
       },
     },
     tags: { ...details.tags },
+    images: { ...details.images },
   },
   seeksDetails: {
     travelAction: { ...details.travelAction },

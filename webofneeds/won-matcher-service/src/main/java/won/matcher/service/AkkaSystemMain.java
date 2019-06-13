@@ -9,6 +9,8 @@ import akka.actor.ActorSystem;
 import won.matcher.service.common.spring.MatcherServiceAppConfiguration;
 import won.matcher.service.common.spring.SpringExtension;
 import won.matcher.service.nodemanager.actor.WonNodeControllerActor;
+import won.matcher.service.rematch.actor.RematchActor;
+import won.matcher.service.rematch.config.RematchConfig;
 
 /**
  * User: hfriedrich Date: 27.03.2015
@@ -21,5 +23,7 @@ public class AkkaSystemMain {
         ActorRef wonNodeControllerActor = system.actorOf(
                         SpringExtension.SpringExtProvider.get(system).props(WonNodeControllerActor.class),
                         "WonNodeControllerActor");
+        ActorRef rematchActor = system.actorOf(SpringExtension.SpringExtProvider.get(system).props(RematchActor.class),
+                        "RematchActor");
     }
 }

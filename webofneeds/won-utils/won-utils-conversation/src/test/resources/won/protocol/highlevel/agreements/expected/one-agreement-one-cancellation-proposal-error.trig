@@ -1,3 +1,5 @@
+@prefix con:   <https://w3id.org/won/content#> .
+@prefix match:   <https://w3id.org/won/matching#> .
 @prefix msg:   <https://w3id.org/won/message#> .
 @prefix conn:  <https://localhost:8443/won/resource/connection/> .
 @prefix woncrypt: <https://w3id.org/won/core#> .
@@ -19,5 +21,5 @@
 @prefix agr: <https://w3id.org/won/agreement#> .
 
 <https://localhost:8443/won/resource/event/557600936467257340> {
-     event:5669098069340991000 won:textMessage  "one" .    
+     event:5669098069340991000 con:text  "one" .    
 }

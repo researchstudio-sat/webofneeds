@@ -9,42 +9,30 @@ import org.apache.jena.rdf.model.Model;
  * Event is used to generate hints inside the matcher-service User: hfriedrich
  * Date: 23.06.2015
  */
-public class HintEvent implements Serializable {
-    private String fromAtomUri;
-    private String fromWonNodeUri;
-    private String toAtomUri;
-    private String toWonNodeUri;
-    private String matcherUri;
-    private double score;
-    private URI generatedEventUri;
-    private String serializedExplanationModel;
-    private String serializationLangName;
-    private String serializationLangContentType;
+public abstract class HintEvent implements Serializable {
+    private static final long serialVersionUID = 2780602425768268632L;
+    protected final String recipientWonNodeUri;
+    protected final String targetWonNodeUri;
+    protected final String matcherUri;
+    protected final double score;
+    protected URI generatedEventUri;
+    protected final Cause cause;
 
-    public HintEvent(String fromWonNodeUri, String fromAtomUri, String toWonNodeUri, String toAtomUri,
-                    String matcherUri, double score) {
-        this.fromWonNodeUri = fromWonNodeUri;
-        this.fromAtomUri = fromAtomUri;
-        this.toWonNodeUri = toWonNodeUri;
-        this.toAtomUri = toAtomUri;
+    public HintEvent(String recipientWonNodeUri, String targetWonNodeUri,
+                    String matcherUri, double score, Cause cause) {
+        this.recipientWonNodeUri = recipientWonNodeUri;
+        this.targetWonNodeUri = targetWonNodeUri;
         this.matcherUri = matcherUri;
         this.score = score;
+        this.cause = cause;
     }
 
-    public String getFromAtomUri() {
-        return fromAtomUri;
+    public String getRecipientWonNodeUri() {
+        return recipientWonNodeUri;
     }
 
-    public String getToAtomUri() {
-        return toAtomUri;
-    }
-
-    public String getFromWonNodeUri() {
-        return fromWonNodeUri;
-    }
-
-    public String getToWonNodeUri() {
-        return toWonNodeUri;
+    public String getTargetWonNodeUri() {
+        return targetWonNodeUri;
     }
 
     public String getMatcherUri() {
@@ -53,6 +41,10 @@ public class HintEvent implements Serializable {
 
     public double getScore() {
         return score;
+    }
+
+    public Cause getCause() {
+        return cause;
     }
 
     public Model deserializeExplanationModel() {
@@ -67,31 +59,11 @@ public class HintEvent implements Serializable {
         this.generatedEventUri = generatedEventUri;
     }
 
-    public void setSerializedExplanationModel(final String serializedExplanationModel) {
-        this.serializedExplanationModel = serializedExplanationModel;
-    }
-
-    public void setSerializationLangName(final String serializationLangName) {
-        this.serializationLangName = serializationLangName;
-    }
-
-    public void setSerializationLangContentType(final String serializationLangContentType) {
-        this.serializationLangContentType = serializationLangContentType;
-    }
-
-    @Override
-    public HintEvent clone() {
-        HintEvent e = new HintEvent(fromWonNodeUri, fromAtomUri, toWonNodeUri, toAtomUri, matcherUri, score);
-        e.setGeneratedEventUri(this.getGeneratedEventUri());
-        e.setSerializationLangContentType(this.serializationLangContentType);
-        e.setSerializationLangName(this.serializationLangName);
-        e.setSerializedExplanationModel(this.serializedExplanationModel);
-        return e;
-    }
-
-    @Override
-    public String toString() {
-        return "HintEvent: (" + getFromWonNodeUri() + ", " + getFromAtomUri() + ", " + getToWonNodeUri() + ", "
-                        + getToAtomUri() + ", " + getMatcherUri() + ", " + getScore() + ")";
-    }
+    /**
+     * Return a String that can be used to check if this HintEvent object means the
+     * same hint as another object by comparing the strings for equality.
+     * 
+     * @return
+     */
+    public abstract String getIdentifyingString();
 }

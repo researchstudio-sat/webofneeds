@@ -14,7 +14,7 @@ import * as generalSelectors from "../selectors/general-selectors.js";
 import * as useCaseUtils from "../usecase-utils.js";
 import * as accountUtils from "../account-utils.js";
 
-import "style/_usecase-picker.scss";
+import "~/style/_usecase-picker.scss";
 
 const serviceDependencies = [
   "$ngRedux",
@@ -25,16 +25,11 @@ const serviceDependencies = [
 function genComponentConf() {
   const template = `
         <!-- HEADER -->
-        <div class="ucp__header" ng-if="self.showAll">
+        <div class="ucp__header">
             <a class="ucp__header__back clickable"
-                ng-click="self.router__stateGoCurrent({useCase: undefined, useCaseGroup: undefined})">
-                <svg style="--local-primary:var(--won-primary-color);"
-                    class="ucp__header__back__icon show-in-responsive">
+                ng-click="self.router__back()">
+                <svg class="ucp__header__back__icon">
                     <use xlink:href="#ico36_backarrow" href="#ico36_backarrow"></use>
-                </svg>
-                <svg style="--local-primary:var(--won-primary-color);"
-                    class="ucp__header__back__icon hide-in-responsive">
-                    <use xlink:href="#ico36_close" href="#ico36_close"></use>
                 </svg>
             </a>
             <span class="ucp__header__title">Pick one!</span>
@@ -44,7 +39,7 @@ function genComponentConf() {
         <div class="ucp__createx">
             <button class="won-button--filled red ucp__createx__button"
                     ng-click="self.viewWhatsAround()">
-                <svg class="won-button-icon" style="--local-primary:white;">
+                <svg class="won-button-icon">
                     <use xlink:href="#ico36_location_current" href="#ico36_location_current"></use>
                 </svg>
                 <span>What's in your Area?</span>
@@ -62,7 +57,6 @@ function genComponentConf() {
         <!-- SEARCH FIELD -->
         <div class="ucp__main__search">
           <svg class="ucp__main__search__icon clickable"
-              style="--local-primary:var(--won-primary-color);"
               ng-if="self.showResetButton"
               ng-click="self.resetSearch()">
               <use xlink:href="#ico36_close" href="#ico36_close"></use>
@@ -153,7 +147,6 @@ function genComponentConf() {
             state
           ),
           loggedIn: accountUtils.isLoggedIn(get(state, "account")),
-          showAll: generalSelectors.getUseCaseGroupFromRoute(state) === "all",
           connectionHasBeenLost: !generalSelectors.selectIsConnected(state),
           useCaseGroups: useCaseUtils.getUseCaseGroups(),
           customUseCase: useCaseUtils.getCustomUseCase(),

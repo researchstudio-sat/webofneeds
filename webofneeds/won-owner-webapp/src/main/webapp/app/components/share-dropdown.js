@@ -7,7 +7,7 @@ import ngAnimate from "angular-animate";
 import { attach } from "../utils.js";
 import shareModule from "./post-share-link.js";
 
-import "style/_share-dropdown.scss";
+import "~/style/_share-dropdown.scss";
 
 const serviceDependencies = ["$scope", "$element"];
 function genComponentConf() {

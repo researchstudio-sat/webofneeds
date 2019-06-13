@@ -1,3 +1,5 @@
+@prefix con:   <https://w3id.org/won/content#> .
+@prefix match:   <https://w3id.org/won/matching#> .
 # example 2: all information necessary to make a valid goal instance (proposal) is available in the goals of the two atoms and the conversation (=> taxi:hasPickupTime)
 
 @prefix msg:   <https://w3id.org/won/message#> .
@@ -314,7 +316,7 @@
 
 <https://localhost:8443/won/resource/event/llc7hdkk9l4yt9easlyu#content-3chm> {
     event:llc7hdkk9l4yt9easlyu
-            won:textMessage  "Ok, I'm going to validate the data in our connection. This may take a while." .
+            con:text  "Ok, I'm going to validate the data in our connection. This may take a while." .
 }
 
 <https://localhost:8443/won/resource/event/2178696747724085200#envelope-0oug> {
@@ -1149,7 +1151,7 @@
 
 <https://localhost:8443/won/resource/event/9092731957586352000#content> {
     event:9092731957586352000
-            won:textMessage  "ah nothing ..." .
+            con:text  "ah nothing ..." .
 }
 
 <https://localhost:8443/won/resource/event/9092731957586352000#envelope-5ews> {
@@ -1379,7 +1381,7 @@
 
 <https://localhost:8443/won/resource/event/7741472099153082000#content> {
      event:7741472099153082000
-            won:textMessage  "Here i send you the missing pickup time" .
+            con:text  "Here i send you the missing pickup time" .
      ex2:myRide taxi:hasPickupTime "2017-11-23T09:30:00Z"^^xsd:dateTime .
 }
 
@@ -1475,7 +1477,7 @@
 
 <https://localhost:8443/won/resource/event/sf3zrqmkhe77jds4zsqu#content-46rh> {
     event:sf3zrqmkhe77jds4zsqu
-            won:textMessage  "Why do you ask ?" .
+            con:text  "Why do you ask ?" .
 }
 
 <https://localhost:8443/won/resource/event/sf3zrqmkhe77jds4zsqu#envelope-vlic-sig> {
@@ -1798,7 +1800,7 @@
 
 <https://localhost:8443/won/resource/event/3s32pqs80zz2n0sxnrwa#content-uwyg> {
     event:3s32pqs80zz2n0sxnrwa
-            won:textMessage  "What does that suggest to you ?" .
+            con:text  "What does that suggest to you ?" .
 }
 
 <https://localhost:8443/won/resource/event/dssbvofhtly928vl4i4m#envelope-g134> {
@@ -1941,7 +1943,7 @@
 
 <https://localhost:8443/won/resource/event/k432v1ilpl2365r35ll6#content-cjru> {
     event:k432v1ilpl2365r35ll6
-            won:textMessage  "Hi there!" .
+            con:text  "Hi there!" .
 }
 
 <https://localhost:8443/won/resource/event/golbvzem4lerfw6n7ryu#envelope-o04e-sig> {
@@ -1990,7 +1992,7 @@
 
 <https://localhost:8443/won/resource/event/5239455422558978000#content> {
     event:5239455422558978000
-            won:textMessage  "I want to know" .
+            con:text  "I want to know" .
 }
 
 <https://localhost:8443/won/resource/event/5239455422558978000#envelope-c141> {
@@ -2080,7 +2082,7 @@
 
 <https://localhost:8443/won/resource/event/shbpua34q1oujs0x4r17#content-n68e> {
     event:shbpua34q1oujs0x4r17
-            won:textMessage  "What would it mean to you if you got to know  ?" .
+            con:text  "What would it mean to you if you got to know  ?" .
 }
 
 <https://localhost:8443/won/resource/event/shbpua34q1oujs0x4r17#envelope-hoft> {
@@ -2143,7 +2145,7 @@
     event:7mdtft0gjbr2m4kw2t13
             won:socket        won:ChatSocket ;
             won:targetSocket  won:ChatSocket ;
-            won:textMessage  "Greetings! \nI am the DebugBot. I can simulate multiple other users so you can test things. I understand a few commands. \nTo see which ones, type \n\n'usage'\n\n (without the quotes)." .
+            con:text  "Greetings! \nI am the DebugBot. I can simulate multiple other users so you can test things. I understand a few commands. \nTo see which ones, type \n\n'usage'\n\n (without the quotes)." .
 }
 
 <https://localhost:8443/won/resource/event/900271114760450000#data> {
@@ -2176,7 +2178,7 @@
 
 <https://localhost:8443/won/resource/event/900271114760450000#content> {
     event:900271114760450000
-            won:textMessage  "validate" .
+            con:text  "validate" .
 }
 
 <https://localhost:8443/won/resource/event/32mnd6j6ozfwr1fty4v3#envelope-2pwu-sig> {

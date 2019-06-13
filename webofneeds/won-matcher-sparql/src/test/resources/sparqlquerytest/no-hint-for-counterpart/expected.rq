@@ -1,6 +1,6 @@
 SELECT  ?result ?score
 WHERE
-  { ?result  <https://w3id.org/won/core#flag>  <https://w3id.org/won/core#NoHintForCounterpart>
+  { ?result  <https://w3id.org/won/matching#flag>  <https://w3id.org/won/matching#NoHintForCounterpart>
     { BIND(( ( ( ( ( ( ( year(?created) - 1970 ) * 315360000 ) + ( month(?created) * 26280000 ) ) + ( day(?created) * 86400 ) ) + ( hours(?created) * 3600 ) ) + ( minutes(?created) * 60 ) ) + seconds(?created) ) AS ?score)
       ?result  a                     <https://w3id.org/won/core#Atom> ;
                <https://w3id.org/won/core#atomState>  <https://w3id.org/won/core#Active> ;

@@ -22,6 +22,7 @@ won-group-post-messages {
 
     &__back {
       grid-area: header_back;
+      display: grid;
 
       &:hover {
         filter: brightness(85%);

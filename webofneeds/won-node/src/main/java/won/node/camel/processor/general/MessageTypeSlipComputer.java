@@ -67,11 +67,10 @@ public class MessageTypeSlipComputer implements InitializingBean, ApplicationCon
         URI direction = (URI) exchange.getIn().getHeader(WonCamelConstants.DIRECTION_HEADER);
         assert direction != null : "direction header must not be null";
         try {
-            String bean = computeMessageTypeSlip(messageType, direction);
-            if (bean == null) {
+            slip = computeMessageTypeSlip(messageType, direction);
+            if (slip == null || slip.isEmpty()) {
                 return null;
             }
-            slip = "bean:" + bean + "?method=process";
         } catch (NoSuchMethodException e) {
             logger.error(e.getMessage(), e);
         } catch (InvocationTargetException e) {
@@ -85,13 +84,18 @@ public class MessageTypeSlipComputer implements InitializingBean, ApplicationCon
     private String computeMessageTypeSlip(URI messageType, URI direction)
                     throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         Iterator iter = fixedMessageProcessorsMap.entrySet().iterator();
+        StringBuilder slipBuilder = new StringBuilder();
         while (iter.hasNext()) {
             Map.Entry pair = (Map.Entry) iter.next();
             Processor wonMessageProcessor = (Processor) pair.getValue();
             Annotation annotation = AopUtils.getTargetClass(wonMessageProcessor).getAnnotation(annotationClazz);
             if (matches(annotation, messageType, direction, null)) {
-                return pair.getKey().toString();
+                slipBuilder.append("bean:").append(pair.getKey().toString()).append("?method=process,");
             }
+        }
+        String slip = slipBuilder.toString();
+        if (!slip.isEmpty()) {
+            return slip.substring(0, slip.length() - 1); // cut off the trailing comma
         }
         if (allowNoMatchingProcessor) {
             return null;
@@ -107,18 +111,33 @@ public class MessageTypeSlipComputer implements InitializingBean, ApplicationCon
                     throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         if (annotation == null || messageType == null || direction == null)
             return false;
-        if (annotationFeatureMismatch(annotation, messageType.toString(), "messageType")
-                        || annotationFeatureMismatch(annotation, direction.toString(), "direction")) {
+        if (!annotationFeatureMatches(annotation, messageType.toString(), "messageType")) {
             return false;
         }
-        if (socketType != null && annotationFeatureMismatch(annotation, socketType.toString(), "socketType")) {
+        if (!annotationFeatureMatches(annotation, direction.toString(), "direction")) {
+            return false;
+        }
+        if (socketType != null && !annotationFeatureMatches(annotation, socketType.toString(), "socketType")) {
             return false;
         }
         return true;
     }
 
-    private boolean annotationFeatureMismatch(Annotation annotation, String expected, String featureName)
+    /**
+     * An annotation feature matches if it is not specified (default value "ANY") or
+     * it is specified and its value is equal to the expected value.
+     * 
+     * @param annotation
+     * @param expected
+     * @param featureName
+     * @return
+     * @throws NoSuchMethodException
+     * @throws InvocationTargetException
+     * @throws IllegalAccessException
+     */
+    private boolean annotationFeatureMatches(Annotation annotation, String expected, String featureName)
                     throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        return !expected.equals(annotation.annotationType().getDeclaredMethod(featureName).invoke(annotation));
+        Object actualValue = annotation.annotationType().getDeclaredMethod(featureName).invoke(annotation);
+        return "ANY".equals(actualValue) || expected.equals(actualValue);
     }
 }

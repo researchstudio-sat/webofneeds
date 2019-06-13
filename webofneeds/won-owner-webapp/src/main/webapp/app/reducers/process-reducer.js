@@ -362,7 +362,7 @@ export default function(processState = initialState, action = {}) {
 
     case actionTypes.connections.sendChatMessageClaimOnSuccess:
     case actionTypes.connections.sendChatMessageRefreshDataOnSuccess: {
-      const connUri = action.payload.optimisticEvent.getSender();
+      const connUri = action.payload.optimisticEvent.getSenderConnection();
 
       return updateConnectionProcess(processState, connUri, {
         petriNetData: { dirty: true },
@@ -504,6 +504,17 @@ export default function(processState = initialState, action = {}) {
             groupMemberUris.map(groupMemberUri => {
               if (!processUtils.isAtomLoaded(processState, groupMemberUri)) {
                 processState = updateAtomProcess(processState, groupMemberUri, {
+                  toLoad: true,
+                });
+              }
+            });
+          }
+
+          const buddyUris = parsedAtom.get("buddies");
+          if (buddyUris.size > 0) {
+            buddyUris.map(buddyUri => {
+              if (!processUtils.isAtomLoaded(processState, buddyUri)) {
+                processState = updateAtomProcess(processState, buddyUri, {
                   toLoad: true,
                 });
               }

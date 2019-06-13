@@ -35,12 +35,6 @@ won-usecase-picker {
     padding-bottom: 0.5rem;
     border-bottom: $thinGrayBorder;
 
-    // so it doesn't interset with the speech-bubble tail coming in from the left on the desktop version
-    padding-left: 0.5rem;
-    @media (max-width: $responsivenessBreakPoint) {
-      padding-left: 0;
-    }
-
     &__title {
       grid-area: header_title;
       color: $won-subtitle-gray;
@@ -50,10 +44,10 @@ won-usecase-picker {
 
     &__back {
       grid-area: header_back;
+      display: grid;
+
       &__icon {
-        /*@media (max-width: $responsivenessBreakPoint) {
-          @include fixed-square(2.5rem);
-        }*/
+        --local-primary: #{$won-primary-color};
         @include fixed-square($backIconSize);
       }
     }
@@ -74,9 +68,6 @@ won-usecase-picker {
       @media (min-width: $responsivenessBreakPoint) {
         white-space: nowrap;
       }
-    }
-
-    &__button {
       white-space: normal;
     }
 
@@ -94,7 +85,12 @@ won-usecase-picker {
     display: grid;
     grid-auto-rows: min-content;
     grid-auto-flow: row dense;
-    grid-template-columns: 1fr 1fr 1fr;
+    @media (min-width: $responsivenessBreakPoint) {
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+    @media (max-width: $responsivenessBreakPoint) {
+      grid-template-columns: 1fr 1fr;
+    }
     grid-gap: $gridRowGap;
 
     &__noresults,
@@ -129,6 +125,7 @@ won-usecase-picker {
       }
 
       &__icon {
+        --local-primary: #{$won-primary-color};
         @include fixed-square($bigiconSize);
         position: absolute;
         right: 0.5rem;
@@ -145,26 +142,28 @@ won-usecase-picker {
     &__newcustom,
     &__searchresult,
     &__usecase-group {
-      display: flex;
+      display: grid;
+      grid-template-columns: min-content 1fr;
+      grid-template-areas: "ucpi__icon ucpi__label";
+
       align-items: center;
-      flex-direction: column;
-      justify-content: center;
       padding: 0.5rem;
       border-radius: 0.19rem;
       background: $won-secondary-color-light;
-      min-height: $iconSize + $normalFontSize + 0.5rem; // icon + label + 0.5rem padding
 
       &:hover {
         filter: brightness(85%);
       }
 
       &__icon {
+        grid-area: ucpi__icon;
         @include fixed-square($iconSize);
         --local-primary: #{$won-secondary-text-color};
+        margin-right: 0.5rem;
       }
       &__label {
+        grid-area: ucpi__label;
         color: $won-secondary-text-color;
-        text-align: center;
       }
     }
 

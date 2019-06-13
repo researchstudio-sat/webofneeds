@@ -7,14 +7,18 @@ won-datetime-picker {
   position: relative;
   display: grid;
   grid-gap: 0.5rem;
-  grid-template-columns: auto 0.9fr 0.9fr;
+  grid-template-columns: min-content 1fr 1fr;
 
-  .datetimep__button {
-    margin-right: 0.5rem;
+  .datetimep__button.won-button--filled {
+    @media (max-width: $responsivenessBreakPoint) {
+      padding: 0.5rem;
+    }
+    padding: 0.5rem 1rem;
   }
 
   .datetimep__input {
     position: relative;
+    overflow: hidden;
 
     .datetimep__input__icon {
       @include fixed-square($bigiconSize);

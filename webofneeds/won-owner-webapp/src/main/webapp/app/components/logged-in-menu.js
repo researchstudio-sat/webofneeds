@@ -6,24 +6,19 @@ import { attach, get } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { connect2Redux } from "../won-utils.js";
 
-import * as srefUtils from "../sref-utils.js";
 import * as accountUtils from "../account-utils.js";
 
 function genComponentConf() {
   let template = `
     <span class="dd__userlabel show-in-responsive" ng-if="self.loggedIn" title="{{ self.getEmail() }}">{{ self.getEmail() }}</span>
     <hr class="show-in-responsive"/>
-    <a
-        ng-if="self.isAnonymous"
-        href="{{ self.absHRef(self.$state, 'signup') }}"
+    <a ng-if="self.isAnonymous"
         class="won-button--outlined thin red show-in-responsive"
-        ng-click="self.view__hideMainMenu()">
+        ng-click="self.view__hideMainMenu() && self.router__stateGo('signup')">
         Sign up
     </a>
-    <a
-        href="{{ self.absHRef(self.$state, 'settings') }}"
-        class="won-button--outlined thin red"
-        ng-click="self.view__hideMainMenu()">
+    <a class="won-button--outlined thin red"
+        ng-click="self.view__hideMainMenu() && self.router__stateGo('settings')">
         <span>Account Settings</span>
     </a>
     <hr/>
@@ -44,7 +39,6 @@ function genComponentConf() {
   class Controller {
     constructor(/* arguments <- serviceDependencies */) {
       attach(this, serviceDependencies, arguments);
-      Object.assign(this, srefUtils);
 
       window.lopu4dbg = this;
 

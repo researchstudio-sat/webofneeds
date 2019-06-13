@@ -3,24 +3,24 @@ WHERE
   { { { { { VALUES ?radius { 10 }
             ?result  a                     <https://w3id.org/won/core#Atom> ;
                      <https://w3id.org/won/core#atomState>  <https://w3id.org/won/core#Active> .
-            ?result (<https://w3id.org/won/core#seeks>)?/((((<https://w3id.org/won/core#location>|<http://schema.org/jobLocation>)|<http://schema.org/location>)|<http://schema.org/fromLocation>)|<http://schema.org/toLocation>) ?location .
+            ?result (<https://w3id.org/won/matching#seeks>)?/((((<https://w3id.org/won/core#location>|<http://schema.org/jobLocation>)|<http://schema.org/location>)|<http://schema.org/fromLocation>)|<http://schema.org/toLocation>) ?location .
             ?location  <http://schema.org/geo>  ?location_geo
           }
           SERVICE <http://www.bigdata.com/rdf/geospatial#search>
             { ?location_geo
                         <http://www.bigdata.com/rdf/geospatial#search>  "inCircle" ;
                         <http://www.bigdata.com/rdf/geospatial#searchDatatype>  <http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon> ;
-                        <http://www.bigdata.com/rdf/geospatial#predicate>  <https://w3id.org/won/core#geoSpatial> ;
+                        <http://www.bigdata.com/rdf/geospatial#predicate>  <https://w3id.org/won/content#geoSpatial> ;
                         <http://www.bigdata.com/rdf/geospatial#spatialCircleCenter>  "48.22507335#16.3583975990458" ;
                         <http://www.bigdata.com/rdf/geospatial#spatialCircleRadius>  ?radius ;
                         <http://www.bigdata.com/rdf/geospatial#distanceValue>  ?location_geoDistance}
         }
         FILTER ( ?location_geoDistance < ?radius )
-        FILTER NOT EXISTS { ?result  <https://w3id.org/won/core#flag>  <https://w3id.org/won/core#NoHintForCounterpart> }
-        FILTER NOT EXISTS { ?result  <https://w3id.org/won/core#flag>  <https://w3id.org/won/core#WhatsNew> }
-        FILTER NOT EXISTS { ?result  <https://w3id.org/won/core#flag>  <https://w3id.org/won/core#WhatsAround> }
+        FILTER NOT EXISTS { ?result  <https://w3id.org/won/matching#flag>  <https://w3id.org/won/matching#NoHintForCounterpart> }
+        FILTER NOT EXISTS { ?result  <https://w3id.org/won/matching#flag>  <https://w3id.org/won/matching#WhatsNew> }
+        FILTER NOT EXISTS { ?result  <https://w3id.org/won/matching#flag>  <https://w3id.org/won/matching#WhatsAround> }
       }
       BIND(( ( ?radius - ?location_geoDistance ) / ?radius ) AS ?score)
     }
-    FILTER NOT EXISTS { ?result  <https://w3id.org/won/core#flag>  <https://w3id.org/won/core#NoHintForCounterpart> }
+    FILTER NOT EXISTS { ?result  <https://w3id.org/won/matching#flag>  <https://w3id.org/won/matching#NoHintForCounterpart> }
   }

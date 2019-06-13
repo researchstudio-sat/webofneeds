@@ -1,3 +1,5 @@
+@prefix con:   <https://w3id.org/won/content#> .
+@prefix match:   <https://w3id.org/won/matching#> .
 @prefix msg:   <https://w3id.org/won/message#> .
 @prefix woncrypt: <https://w3id.org/won/core#> .
 @prefix rdfg:  <http://www.w3.org/2004/03/trix/rdfg-1/> .
@@ -33,10 +35,10 @@
 <https://satvm05.researchstudio.at/won/resource/event/wh698cvrukwu#atom> {
     <https://satvm05.researchstudio.at/won/resource/atom/fw1tqsz1grkz>
             a                    won:Atom ;
-            won:doNotMatchAfter  "2018-09-18T07:14:57.185Z"^^xsd:dateTime ;
+            match:doNotMatchAfter  "2018-09-18T07:14:57.185Z"^^xsd:dateTime ;
             won:socket         won:ChatSocket ;
             dc:title    "Title" ;
-            won:tag  "Tag" ;
+            con:tag  "Tag" ;
             cert:key             [ cert:PublicKey  [ a                       woncrypt:ECCPublicKey ;
                                                      woncrypt:ecc_algorithm  "EC" ;
                                                      woncrypt:ecc_curveId    "secp384r1" ;

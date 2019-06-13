@@ -28,7 +28,7 @@ import won.bot.framework.eventbot.event.AtomCreationFailedEvent;
 import won.bot.framework.eventbot.event.impl.lifecycle.ActEvent;
 import won.bot.framework.eventbot.event.impl.atomlifecycle.AtomCreatedEvent;
 import won.bot.framework.eventbot.event.impl.atomlifecycle.AtomProducerExhaustedEvent;
-import won.bot.framework.eventbot.event.impl.wonmessage.HintFromMatcherEvent;
+import won.bot.framework.eventbot.event.impl.wonmessage.AtomHintFromMatcherEvent;
 import won.bot.framework.eventbot.listener.BaseEventListener;
 import won.bot.framework.eventbot.listener.EventListener;
 import won.bot.framework.eventbot.listener.impl.ActionOnEventListener;
@@ -96,7 +96,7 @@ public class AtomCreatorBot extends EventBot {
         EventListener loadTestMonitor = new ActionOnEventListener(ctx, "loadTestMonitor",
                         new MatchingLoadTestMonitorAction(ctx));
         bus.subscribe(AtomCreatedEvent.class, loadTestMonitor);
-        bus.subscribe(HintFromMatcherEvent.class, loadTestMonitor);
+        bus.subscribe(AtomHintFromMatcherEvent.class, loadTestMonitor);
         // wait for the targetCountReached event of the finishedCounter. We don't use
         // another target counter, so we don't need to do more filtering.
         // this.workDoneSignaller = new ActionOnEventListener(

@@ -15,6 +15,9 @@ import {
   fetchUnloadedData,
   fetchDataForNonOwnedAtomOnly,
 } from "../won-message-utils.js";
+import * as connectionUtils from "../connection-utils.js";
+import * as atomUtils from "../atom-utils.js";
+import { get } from "../utils.js";
 
 export function fetchUnloadedAtoms() {
   return async dispatch => {
@@ -33,12 +36,30 @@ export function atomsConnect(
   ownedAtomUri,
   ownConnectionUri,
   theirAtomUri,
-  connectMessage
+  connectMessage,
+  socketType,
+  targetSocketType
 ) {
   return async (dispatch, getState) => {
     const state = getState();
     const ownedAtom = state.getIn(["atoms", ownedAtomUri]);
     const theirAtom = state.getIn(["atoms", theirAtomUri]);
+
+    const socketUri = atomUtils.getSocketUri(ownedAtom, socketType);
+    const targetSocketUri = atomUtils.getSocketUri(theirAtom, targetSocketType);
+
+    if (socketType && !socketUri) {
+      throw new Error(
+        `Atom ${ownedAtom.get("uri")} does not have a ${socketType}`
+      );
+    }
+
+    if (targetSocketType && !targetSocketUri) {
+      throw new Error(
+        `Atom ${theirAtom.get("uri")} does not have a ${targetSocketType}`
+      );
+    }
+
     const cnctMsg = await buildConnectMessage({
       ownedAtomUri: ownedAtomUri,
       theirAtomUri: theirAtomUri,
@@ -46,6 +67,8 @@ export function atomsConnect(
       theirNodeUri: theirAtom.get("nodeUri"),
       connectMessage: connectMessage,
       optionalOwnConnectionUri: ownConnectionUri,
+      socketUri: socketUri,
+      targetSocketUri: targetSocketUri,
     });
     const optimisticEvent = await won.wonMessageFromJsonLd(cnctMsg.message);
     dispatch({
@@ -55,6 +78,8 @@ export function atomsConnect(
         message: cnctMsg.message,
         ownConnectionUri: ownConnectionUri,
         optimisticEvent: optimisticEvent,
+        socketUri: socketUri,
+        targetSocketUri: targetSocketUri,
       },
     });
   };
@@ -77,17 +102,9 @@ export function atomsClose(atomUri) {
         //Close all the open connections of the atom
         getState()
           .getIn(["atoms", atomUri, "connections"])
-          .map(function(con) {
-            if (
-              getState().getIn([
-                "atoms",
-                atomUri,
-                "connections",
-                con.get("uri"),
-                "state",
-              ]) === won.WON.Connected
-            ) {
-              dispatch(actionCreators.connections__close(con.get("uri")));
+          .map(conn => {
+            if (connectionUtils.isConnected(conn)) {
+              dispatch(actionCreators.connections__close(get(conn, "uri")));
             }
           });
       })

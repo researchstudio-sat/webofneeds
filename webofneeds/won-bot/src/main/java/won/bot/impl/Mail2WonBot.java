@@ -7,6 +7,7 @@ import org.springframework.messaging.MessageChannel;
 
 import won.bot.framework.bot.base.EventBot;
 import won.bot.framework.eventbot.EventListenerContext;
+import won.bot.framework.eventbot.action.EventBotAction;
 import won.bot.framework.eventbot.action.impl.mail.receive.CreateAtomFromMailAction;
 import won.bot.framework.eventbot.action.impl.mail.receive.MailCommandAction;
 import won.bot.framework.eventbot.action.impl.mail.receive.MailContentExtractor;
@@ -28,9 +29,10 @@ import won.bot.framework.eventbot.event.impl.mail.MailCommandEvent;
 import won.bot.framework.eventbot.event.impl.mail.MailReceivedEvent;
 import won.bot.framework.eventbot.event.impl.mail.SubscribeUnsubscribeEvent;
 import won.bot.framework.eventbot.event.impl.mail.WelcomeMailEvent;
+import won.bot.framework.eventbot.event.impl.wonmessage.AtomHintFromMatcherEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.ConnectFromOtherAtomEvent;
-import won.bot.framework.eventbot.event.impl.wonmessage.HintFromMatcherEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.MessageFromOtherAtomEvent;
+import won.bot.framework.eventbot.event.impl.wonmessage.SocketHintFromMatcherEvent;
 import won.bot.framework.eventbot.listener.impl.ActionOnEventListener;
 
 /**
@@ -75,8 +77,11 @@ public class Mail2WonBot extends EventBot {
         bus.subscribe(SubscribeUnsubscribeEvent.class, new ActionOnEventListener(ctx, "SubscribeUnsubscribeEvent",
                         new SubscribeUnsubscribeAction(ctx)));
         // WON initiated Events
-        bus.subscribe(HintFromMatcherEvent.class, new ActionOnEventListener(ctx, "HintReceived",
-                        new Hint2MailParserAction(mailGenerator, sendEmailChannel)));
+        EventBotAction hint2MailParserAction = new Hint2MailParserAction(mailGenerator, sendEmailChannel);
+        bus.subscribe(AtomHintFromMatcherEvent.class,
+                        new ActionOnEventListener(ctx, "AtomHintReceived", hint2MailParserAction));
+        bus.subscribe(SocketHintFromMatcherEvent.class,
+                        new ActionOnEventListener(ctx, "SocketHintReceived", hint2MailParserAction));
         bus.subscribe(ConnectFromOtherAtomEvent.class, new ActionOnEventListener(ctx, "ConnectReceived",
                         new Connect2MailParserAction(mailGenerator, sendEmailChannel)));
         bus.subscribe(MessageFromOtherAtomEvent.class, new ActionOnEventListener(ctx, "ReceivedTextMessage",

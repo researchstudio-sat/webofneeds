@@ -13,7 +13,7 @@ import {
 } from "../selectors/general-selectors.js";
 import { connect2Redux } from "../won-utils.js";
 
-import "style/_petrinet-state.scss";
+import "~/style/_petrinet-state.scss";
 
 const serviceDependencies = ["$ngRedux", "$scope"];
 function genComponentConf() {

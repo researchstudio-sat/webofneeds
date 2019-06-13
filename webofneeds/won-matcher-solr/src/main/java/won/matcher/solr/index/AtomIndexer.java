@@ -31,6 +31,7 @@ import won.protocol.model.Coordinate;
 import won.protocol.util.DefaultAtomModelWrapper;
 import won.protocol.util.AtomModelWrapper;
 import won.protocol.vocabulary.WON;
+import won.protocol.vocabulary.WONMATCH;
 
 /**
  * Created by hfriedrich on 03.08.2016.
@@ -61,7 +62,7 @@ public class AtomIndexer {
             String atomUri = atomModelWrapper.getAtomUri();
             atomModel = atomModelWrapper.normalizeAtomModel();
             // check if test index should be used for atom
-            boolean usedForTesting = atomModelWrapper.flag(WON.UsedForTesting);
+            boolean usedForTesting = atomModelWrapper.flag(WONMATCH.UsedForTesting);
             indexAtomModel(atomModel, atomUri, usedForTesting);
         }
     }

@@ -31,12 +31,6 @@ won-create-search {
     align-items: center;
     border-bottom: $thinGrayBorder;
 
-    // so it doesn't interset with the speech-bubble tail coming in from the left on the desktop version
-    padding-left: 0.5rem;
-    @media (max-width: $responsivenessBreakPoint) {
-      padding-left: 0;
-    }
-
     &__title {
       grid-area: header_title;
       color: $won-subtitle-gray;
@@ -45,13 +39,17 @@ won-create-search {
     }
 
     &__icon {
+      --local-primary: #{$won-subtitle-gray};
       grid-area: header_icon;
       @include fixed-square($postIconSize);
     }
 
     &__back {
       grid-area: header_back;
+      display: grid;
+
       &__icon {
+        --local-primary: #{$won-primary-color};
         @include fixed-square($backIconSize);
       }
     }

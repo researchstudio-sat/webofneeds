@@ -1,3 +1,5 @@
+@prefix con:   <https://w3id.org/won/content#> .
+@prefix match:   <https://w3id.org/won/matching#> .
 @prefix atom:  <http://localhost:8080/won/resource/atom/> .
 @prefix dc:    <http://purl.org/dc/elements/1.1/> .
 @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .

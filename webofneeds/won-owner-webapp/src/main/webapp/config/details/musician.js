@@ -2,7 +2,7 @@
  * Created by fsuda on 18.09.2018.
  */
 import Immutable from "immutable";
-import { details } from "detailDefinitions";
+import { details } from "../detail-definitions.js";
 
 import { is } from "../../app/utils.js";
 
@@ -15,12 +15,12 @@ export const instrumentsDetail = {
   messageEnabled: false,
   parseToRDF: function({ value }) {
     if (!value) {
-      return { "won:instruments": undefined };
+      return { "demo:instrument": undefined };
     }
-    return { "won:instruments": value };
+    return { "demo:instrument": value };
   },
   parseFromRDF: function(jsonLDImm) {
-    const instruments = jsonLDImm && jsonLDImm.get("won:instruments");
+    const instruments = jsonLDImm && jsonLDImm.get("demo:instrument");
     if (!instruments) {
       return undefined;
     } else if (is("String", instruments)) {
@@ -49,12 +49,12 @@ export const genresDetail = {
   messageEnabled: false,
   parseToRDF: function({ value }) {
     if (!value) {
-      return { "won:genres": undefined };
+      return { "demo:genre": undefined };
     }
-    return { "won:genres": value };
+    return { "demo:genre": value };
   },
   parseFromRDF: function(jsonLDImm) {
-    const genres = jsonLDImm && jsonLDImm.get("won:genres");
+    const genres = jsonLDImm && jsonLDImm.get("demo:genre");
     if (!genres) {
       return undefined;
     } else if (is("String", genres)) {

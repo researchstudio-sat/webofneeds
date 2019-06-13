@@ -36,15 +36,13 @@ public class MatcherActiveMQServiceImpl extends ActiveMQServiceImpl implements M
     private List<String> matcherProtocolTopicList;
     private String pathInformation;
     private static final String PATH_MATCHER_PROTOCOL_OUT_ATOM_CREATED = "<" + WON.supportsWonProtocolImpl + ">/<"
-                    + WON.activeMQMatcherProtocolOutAtomCreatedTopicName + ">";
+                    + WON.atomCreatedTopic + ">";
     private static final String PATH_MATCHER_PROTOCOL_OUT_ATOM_ACTIVATED = "<" + WON.supportsWonProtocolImpl + ">/<"
-                    + WON.activeMQMatcherProtocolOutAtomActivatedTopicName + ">";
+                    + WON.atomActivatedTopic + ">";
     private static final String PATH_MATCHER_PROTOCOL_OUT_ATOM_DEACTIVATED = "<" + WON.supportsWonProtocolImpl + ">/<"
-                    + WON.activeMQMatcherProtocolOutAtomDeactivatedTopicName + ">";
-    private static final String PATH_MATCHER_PROTOCOL_OUT_MATCHER_REGISTERED = "<" + WON.supportsWonProtocolImpl + ">/<"
-                    + WON.activeMQMatcherProtocolOutMatcherRegisteredTopicName + ">";
+                    + WON.atomDeactivatedTopic + ">";
     private static final String PATH_MATCHER_PROTOCOL_QUEUE_NAME = "<" + WON.supportsWonProtocolImpl + ">/<"
-                    + WON.activeMQMatcherProtocolQueueName + ">";
+                    + WON.matcherQueue + ">";
 
     public MatcherActiveMQServiceImpl(ProtocolType type) {
         super(type);

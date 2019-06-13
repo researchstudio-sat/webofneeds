@@ -20,6 +20,8 @@ import petrinettransitionPickerModule from "./petrinettransition-picker.js";
 import reviewPickerModule from "./review-picker.js";
 import suggestPostPickerModule from "./suggestpost-picker.js";
 import paypalPaymentPickerModule from "./paypal-payment-picker.js";
+import pokemonRaidbossPickerModule from "./pokemon-raidboss-picker.js";
+import pokemonGymPickerModule from "./pokemon-gym-picker.js";
 
 /**
  * module names for angular's module system
@@ -47,4 +49,6 @@ export default [
   reviewPickerModule,
   suggestPostPickerModule,
   paypalPaymentPickerModule,
+  pokemonRaidbossPickerModule,
+  pokemonGymPickerModule,
 ];

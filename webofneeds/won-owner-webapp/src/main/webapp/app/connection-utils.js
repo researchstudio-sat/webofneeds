@@ -3,108 +3,7 @@
  */
 
 import won from "./won-es6.js";
-import { hasGroupSocket, hasChatSocket } from "./atom-utils.js";
-import { get, getIn } from "./utils.js";
-/**
- * Determines if a given connection is a chatConnection
- * @param conn
- * @returns {*|boolean}
- */
-export function isChatConnection(conn) {
-  return (
-    conn &&
-    conn.get("socket") &&
-    conn.get("socket") === won.CHAT.ChatSocketCompacted
-  );
-}
-
-/**
- * Determines if a given connection is a groupChatConnection
- * @param conn
- * @returns {*|boolean}
- */
-export function isGroupChatConnection(conn) {
-  return (
-    conn &&
-    conn.get("socket") &&
-    conn.get("socket") === won.GROUP.GroupSocketCompacted
-  );
-}
-
-/**
- * Determines if a given connection is a chatConnection on the remoteSide
- * @param conn
- * @returns {*|boolean}
- */
-export function isRemoteChatConnection(conn) {
-  return (
-    conn &&
-    conn.get("socket") &&
-    conn.get("socket") === won.CHAT.ChatSocketCompacted
-  );
-}
-
-/**
- * Determines if a given connection is a groupChatConnection on the remoteSide
- * @param conn
- * @returns {*|boolean}
- */
-export function isRemoteGroupChatConnection(conn) {
-  return (
-    conn &&
-    conn.get("targetSocket") &&
-    conn.get("targetSocket") === won.GROUP.GroupSocketCompacted
-  );
-}
-
-/**
- * Determines if a given connection is a chatConnection connected to a groupSocket on the remoteSide
- * @param conn
- * @returns {*|boolean}
- */
-function isChatConnectionToGroup(conn) {
-  return isChatConnection(conn) && isRemoteGroupChatConnection(conn);
-}
-
-/**
- * Determines if the connection is between a single atom and a groupChat
- * This method is only necessary because certain connections (e.g. suggested connections), do not have a targetConnection
- * and therefore we can't distinguish between chatToGroup and chatToChat connections without looking into the targetAtom
- * in addition to the connection itself -> should be resolved once the hints store the targetSocket in addition to the socket
- * FIXME: Current workaround for suggestedConnections that do not contains a targetSocket
- * FIXME: once both remote and own socket are present in the connection we should be able to use the isChatConnectionToGroup function without any workaround
- * @param atoms reduxState atoms
- * @param connUri to check
- * @param atomUri to check
- * @returns {boolean}
- */
-export function isChatToGroup(atoms, atomUri, connUri) {
-  const atom = get(atoms, atomUri);
-  const conn = getIn(atom, ["connections", connUri]);
-
-  if (isChatConnectionToGroup(conn)) {
-    return true;
-  } else {
-    const targetAtomUri = get(conn, "targetAtomUri");
-    const targetAtom = get(atoms, targetAtomUri);
-
-    if (hasGroupSocket(targetAtom)) {
-      if (hasChatSocket(targetAtom)) {
-        console.warn(
-          "The targetAtom contains the chatSocket as well as the groupSocket, we do not know if this connection is connecting with the groupSocket or with the chatSocket just yet: targetAtom:",
-          targetAtom,
-          ", atom:",
-          atom,
-          " conn:",
-          conn
-        );
-      }
-      return true;
-    } else {
-      return false;
-    }
-  }
-}
+import { get } from "./utils.js";
 
 export function isRequestSent(connection) {
   return get(connection, "state") === won.WON.RequestSent;
@@ -124,6 +23,10 @@ export function isConnected(connection) {
 
 export function isClosed(connection) {
   return get(connection, "state") === won.WON.Closed;
+}
+
+export function isUnread(connection) {
+  return !!get(connection, "unread");
 }
 
 /**

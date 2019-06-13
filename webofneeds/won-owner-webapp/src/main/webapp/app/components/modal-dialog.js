@@ -8,7 +8,7 @@ import { attach } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
 import * as srefUtils from "../sref-utils.js";
 
-import "style/_modal-dialog.scss";
+import "~/style/_modal-dialog.scss";
 
 const serviceDependencies = ["$scope", "$ngRedux", "$element", "$state"];
 function genComponentConf() {

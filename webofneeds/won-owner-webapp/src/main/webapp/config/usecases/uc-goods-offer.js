@@ -18,6 +18,7 @@ export const goodsOffer = {
       },
     }),
   },
+  reactionUseCases: ["goodsServiceSearch"],
   details: {
     title: { ...details.title, mandatory: true },
     description: { ...details.description },

@@ -26,7 +26,7 @@ import won.protocol.model.SocketType;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.AtomModelWrapper;
 import won.protocol.util.RdfUtils;
-import won.protocol.vocabulary.WON;
+import won.protocol.vocabulary.WONMATCH;
 
 /**
  * Base class for actions that create atoms.
@@ -85,11 +85,11 @@ public abstract class AbstractCreateAtomAction extends BaseEventBotAction {
                     throws WonMessageBuilderException {
         AtomModelWrapper atomModelWrapper = new AtomModelWrapper(atomDataset);
         if (doNotMatch) {
-            atomModelWrapper.addFlag(WON.NoHintForMe);
-            atomModelWrapper.addFlag(WON.NoHintForCounterpart);
+            atomModelWrapper.addFlag(WONMATCH.NoHintForMe);
+            atomModelWrapper.addFlag(WONMATCH.NoHintForCounterpart);
         }
         if (usedForTesting) {
-            atomModelWrapper.addFlag(WON.UsedForTesting);
+            atomModelWrapper.addFlag(WONMATCH.UsedForTesting);
         }
         RdfUtils.replaceBaseURI(atomDataset, atomURI.toString(), true);
         return WonMessageBuilder.setMessagePropertiesForCreate(wonNodeInformationService.generateEventURI(wonNodeURI),

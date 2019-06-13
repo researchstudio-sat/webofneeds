@@ -1,0 +1,155 @@
+@import "won-config";
+@import "sizing-utils";
+@import "fonts";
+@import "flex-layout";
+
+main.ownerwelcome {
+  grid-column: 1 / -1;
+  box-sizing: border-box;
+  align-items: stretch;
+  max-width: 45rem;
+  width: 100%;
+  margin: 0 auto;
+  background: white;
+  border: $thinGrayBorder;
+  border-top: 0;
+
+  padding: 3rem $minContentPadding 3rem $minContentPadding;
+  @media (max-width: $responsivenessBreakPoint) {
+    padding: 2rem 0.5rem 2rem;
+    border-left: 0;
+    border-right: 0;
+  }
+
+  .ownerwelcome__text {
+    padding-bottom: 1rem;
+
+    h1 {
+      color: $won-primary-color;
+      font-weight: normal;
+      font-size: $bigFontSize;
+      padding-bottom: 1.5rem;
+      text-align: center;
+    }
+    p {
+      padding-bottom: 1.5rem;
+      text-align: center;
+    }
+    h3 {
+      text-align: center;
+    }
+  }
+}
+
+main.ownerinventory {
+  grid-column: 1 / -1;
+  padding: 0;
+  box-sizing: border-box;
+  align-items: stretch;
+  max-width: $maxContentWidth;
+  width: 100%;
+  margin: 0 auto;
+
+  & .ownerinventory__header {
+    display: grid;
+    grid-template-columns: 1fr min-content;
+    grid-gap: 0.5rem;
+    border-bottom: $thinGrayBorder;
+    padding: 0.5rem;
+    @media (min-width: $maxContentWidth) {
+      padding-right: 0;
+    }
+    align-items: center;
+
+    &__title {
+      font-size: $mediumFontSize;
+    }
+  }
+
+  .ownerinventory__noresults {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    padding: 0.5rem;
+
+    &__label {
+      font-size: $normalFontSize;
+      color: $won-primary-text-color;
+      text-align: center;
+      max-width: 25rem;
+    }
+  }
+
+  .ownerinventory__content {
+    display: flex;
+    flex-wrap: wrap;
+    padding: 0.5rem;
+
+    won-atom-card.ownerinventory__content__atom {
+      border: $thinGrayBorder;
+      background: $won-light-gray;
+
+      margin-right: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .ownerinventory__content__createatom {
+      border: $thinGrayBorder;
+      background: $won-light-gray;
+      padding: 0.5rem;
+      margin-right: 1rem;
+      margin-bottom: 1rem;
+      cursor: pointer;
+      display: grid;
+      grid-gap: 0.5rem;
+      grid-auto-flow: row;
+      justify-content: center;
+      align-content: center;
+      grid-template-rows: min-content min-content;
+      box-sizing: border-box;
+
+      @media (max-width: $responsivenessBreakPoint) {
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+      }
+
+      @media (min-width: $responsivenessBreakPoint) {
+        width: 15rem;
+        max-width: 15rem;
+        box-sizing: content-box;
+      }
+
+      &:hover {
+        border-color: $won-primary-color;
+
+        .ownerinventory__content__createatom__label {
+          color: $won-primary-color;
+        }
+
+        .ownerinventory__content__createatom__icon {
+          --local-primary: #{$won-primary-color};
+        }
+      }
+
+      .ownerinventory__content__createatom__label {
+        font-size: $mediumFontSize;
+        text-align: center;
+        color: $won-line-gray;
+      }
+
+      .ownerinventory__content__createatom__icon {
+        @include fixed-square($hugeiconSize);
+        --local-primary: #{$won-line-gray};
+      }
+    }
+
+    @media (max-width: $responsivenessBreakPoint) {
+      display: block;
+
+      won-atom-card.ownerinventory__content__atom {
+        margin-right: 0;
+      }
+    }
+  }
+}

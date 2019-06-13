@@ -5,7 +5,6 @@
 import { actionTypes } from "../actions/actions.js";
 import Immutable from "immutable";
 import { messagesReducer } from "./message-reducers.js";
-//import { isChatConnection } from "../connection-utils.js";
 import reduceReducers from "reduce-reducers";
 import atomReducer from "./atom-reducer/atom-reducer-main.js";
 import accountReducer from "./account-reducer.js";
@@ -120,9 +119,12 @@ const reducers = {
       case actionTypes.personas.removeDeleted:
       case actionTypes.atoms.delete: {
         const atomUri = action.payload.get("uri");
-        const atomUris = owner.get("atomUris");
+        const whatsAround = owner.get("whatsAround");
+        const whatsNew = owner.get("whatsNew");
 
-        return owner.set("atomUris", atomUris.remove(atomUri));
+        return owner
+          .set("whatsAround", whatsAround.remove(atomUri))
+          .set("whatsNew", whatsNew.remove(atomUri));
       }
 
       default:
@@ -195,17 +197,6 @@ function deleteChatConnectionsBetweenOwnedAtoms(state) {
     atoms = atoms.map(function(atom) {
       let connections = atom.get("connections");
 
-      //TODO: FIXME, use special case handling for this, currently dont strip any connections between atoms for debug reasons
-      /*connections =
-        connections &&
-        connections.filter(function(conn) {
-          //Any connection that is not of type chatSocket will be exempt from deletion
-          if (isChatConnection(conn)) {
-            //Any other connection will be checked if it would be connected to the ownedAtom, if so we remove it.
-            return !generalSelectors.isAtomOwned(state, conn.get("targetAtomUri"));
-          }
-          return true;
-        });*/
       return atom.set("connections", connections);
     });
     return state.set("atoms", atoms);

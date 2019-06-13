@@ -1,7 +1,5 @@
 module PublishButton exposing (main)
 
-import Actions
-import Application
 import Browser.Dom as Dom exposing (Element)
 import Browser.Events
 import Color
@@ -17,10 +15,11 @@ import Persona exposing (Persona)
 import Random
 import Task
 import Uuid exposing (Uuid)
+import Widget
 
 
 main =
-    Application.element
+    Widget.widget
         { init = init
         , subscriptions = subscriptions
         , update = update
@@ -169,7 +168,6 @@ popupDirection buttonPosition =
 view :
     { model : Model
     , props : Props
-    , style : Application.Style
     }
     -> Html Msg
 view { model, props } =
@@ -317,6 +315,10 @@ update :
         }
     -> ( Model, Cmd Msg )
 update msg { model, props } =
+    let
+        noOp =
+            ( model, Cmd.none )
+    in
     case msg of
         ToggleDropdown ->
             ( { model
@@ -366,7 +368,7 @@ update msg { model, props } =
                     )
 
                 _ ->
-                    ( model, Cmd.none )
+                    noOp
 
         GotDimensions element ->
             case model.buttonPosition of
@@ -393,16 +395,10 @@ update msg { model, props } =
                     )
 
                 NotQueried ->
-                    ( model, Cmd.none )
+                    noOp
 
         FailedToGetDimensions error ->
-            ( model
-            , Application.logError
-                (case error of
-                    Dom.NotFound id ->
-                        "Could not find element id " ++ id
-                )
-            )
+            noOp
 
         GotAnimationFrame ->
             ( model
@@ -420,16 +416,19 @@ update msg { model, props } =
 
 publish : SelectedPersona -> Cmd msg
 publish personaChoice =
-    Actions.emitEvent
-        { eventName = "publish"
-        , payload =
-            case personaChoice of
-                Persona personaId ->
-                    Encode.string personaId
+    Widget.emitEvent
+        "onPublish"
+        (Encode.object
+            [ ( "personaId"
+              , case personaChoice of
+                    Persona personaId ->
+                        Encode.string personaId
 
-                Anonymous ->
-                    Encode.null
-        }
+                    Anonymous ->
+                        Encode.null
+              )
+            ]
+        )
 
 
 getRandomId : Cmd Msg

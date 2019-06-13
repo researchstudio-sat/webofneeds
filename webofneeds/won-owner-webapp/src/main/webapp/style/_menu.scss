@@ -1,0 +1,72 @@
+@import "won-config";
+@import "sizing-utils";
+
+won-menu {
+  background: $won-light-gray;
+  border-bottom: $thinGrayBorder;
+
+  > .menu {
+    display: grid;
+    grid-auto-flow: column;
+    grid-gap: 0.5rem;
+    justify-content: center;
+    margin: 0 auto;
+    padding: 0 0.5rem;
+    box-sizing: border-box;
+    max-width: $maxContentWidth;
+
+    > .menu__tab {
+      cursor: pointer;
+      padding: 0.5rem;
+      color: $won-primary-text-color;
+      box-sizing: border-box;
+      border-bottom: $won-light-gray 0.25rem solid;
+
+      &.menu__tab--selected {
+        cursor: default;
+        pointer-events: none;
+        border-bottom-color: $won-primary-color;
+
+        &:not(.menu__tab--inactive) {
+          color: $won-primary-color;
+        }
+      }
+      &.menu__tab--inactive {
+        color: $won-line-gray;
+      }
+
+      &.menu__tab--unread {
+        & > .menu__tab__unread {
+          display: inline-block;
+          background-color: $won-unread-attention;
+          border-radius: 100%;
+          opacity: 1;
+          @include fixed-square(0.5rem);
+          margin-right: 0.25rem;
+          transition: max-width 0.25s ease-in-out, opacity 0.25s ease-in-out,
+            margin-right 0.25s ease-in-out;
+        }
+      }
+
+      &:not(.menu__tab--unread) {
+        & > .menu__tab__unread {
+          display: inline-block;
+          max-width: 0;
+          height: 0;
+          opacity: 0;
+          overflow: hidden;
+          margin-right: 0;
+          transition: max-width 0.25s ease-in-out, opacity 0.25s ease-in-out,
+            margin-right 0.25s ease-in-out;
+        }
+      }
+
+      &:not(.menu__tab--selected) {
+        &:hover {
+          border-bottom-color: $won-primary-color-light;
+          color: $won-primary-color-light;
+        }
+      }
+    }
+  }
+}

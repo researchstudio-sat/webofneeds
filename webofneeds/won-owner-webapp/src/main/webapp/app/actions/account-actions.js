@@ -25,7 +25,7 @@ import { stateGoCurrent } from "./cstm-router-actions.js";
 import { checkAccessToCurrentRoute } from "../configRouting.js";
 
 import { get } from "../utils.js";
-import { getOwnedConnectionUris } from "../selectors/connection-selectors.js";
+import * as connectionSelectors from "../selectors/connection-selectors.js";
 import { loadLatestMessagesOfConnection } from "./connections-actions.js";
 import { getPrivateIdFromRoute } from "../selectors/general-selectors.js";
 
@@ -147,7 +147,7 @@ export function accountLogin(credentials, redirectToFeed = false) {
       .then(() => {
         if (redirectToFeed) {
           return dispatch(
-            actionCreators.router__stateGoResetParams("connections")
+            actionCreators.router__stateGoResetParams("inventory")
           );
         }
         return Promise.resolve();
@@ -344,7 +344,7 @@ export function reconnect() {
       /* 
        * -- loading latest messages for all connections (we might have missed some during the dc) --
        */
-      const connectionUris = getOwnedConnectionUris(state);
+      const connectionUris = connectionSelectors.getOwnedConnectionUris(state);
       await Promise.all(
         connectionUris.map(connectionUri =>
           loadLatestMessagesOfConnection({

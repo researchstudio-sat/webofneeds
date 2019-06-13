@@ -1,4 +1,6 @@
 @prefix msg:   <https://w3id.org/won/message#> .
+@prefix con:   <https://w3id.org/won/content#> .
+@prefix match:   <https://w3id.org/won/matching#> .
 @prefix conn:  <https://node.matchat.org/won/resource/connection/> .
 @prefix woncrypt: <https://w3id.org/won/core#> .
 @prefix atom:  <https://node.matchat.org/won/resource/atom/> .
@@ -21,14 +23,14 @@
     atom:3030440624813201400
             a                     won:Atom ;
             dc:title                "Offering tennis lessons";
-            won:tag              "tennis" , "lesson", "offer" ;
+            con:tag              "tennis" , "lesson", "offer" ;
             dc:description  "tennis lessons for kids and adults of all levels";
             s:location  [ a                   s:Place ;
-                                won:boundingBox  [ won:northWestCorner  [ a              <s:GeoCoordinates> ;
+                                con:boundingBox  [ con:northWestCorner  [ a              <s:GeoCoordinates> ;
                                                                                 s:latitude   "48.213814" ;
                                                                                 s:longitude  "16.340870"
                                                                               ] ;
-                                                      won:southEastCorner  [ a              s:GeoCoordinates ;
+                                                      con:southEastCorner  [ a              s:GeoCoordinates ;
                                                                                 s:latitude   "48.236309" ;
                                                                                 s:longitude  "16.370149"
                                                                               ]
@@ -39,15 +41,15 @@
                                                     ] ;
                                 s:name            "Alsergrund, Wien, 1090, Österreich"
                               ] ;
-            won:seeks     [ a                       won:AtomContent ;
+            match:seeks     [ a                       won:AtomContent ;
                             dc:title                "tennis students";
-                            won:tag              "tennis" , "lesson" ;
+                            con:tag              "tennis" , "lesson" ;
                             dc:description  "people learning tennis"
                                                           ] ;
 
             won:socket          won:ChatSocket ;
-            won:flag           won:UsedForTesting ;
-            won:flag           won:NoHintForMe;
+            match:flag           match:UsedForTesting ;
+            match:flag           match:NoHintForMe;
             cert:key              [ cert:PublicKey  [ a                       woncrypt:ECCPublicKey ;
                                                       woncrypt:ecc_algorithm  "EC" ;
                                                       woncrypt:ecc_curveId    "secp384r1" ;

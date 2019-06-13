@@ -1,5 +1,4 @@
 import { getBreakfast } from "./uc-get-breakfast";
-import { getLunch } from "./uc-get-lunch";
 import { afterparty } from "./uc-afterparty";
 import { sightseeing } from "./uc-sightseeing";
 import { getToKnow } from "./uc-get-to-know.js";
@@ -9,14 +8,13 @@ import { handleComplaint } from "./uc-handle-complaint";
 export const socialGroup = {
   identifier: "socialgroup",
   label: "Social",
-  icon: undefined,
+  icon: "#ico36_uc_find_people",
   subItems: {
     getBreakfast: getBreakfast,
-    getLunch: getLunch,
     afterparty: afterparty,
-    sightseeing: sightseeing,
-    getToKnow: getToKnow,
     complain: complain,
+    getToKnow: getToKnow,
+    sightseeing: sightseeing,
     handleComplaint: handleComplaint,
   },
 };

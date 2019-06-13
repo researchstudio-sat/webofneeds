@@ -6,11 +6,12 @@ import won from "./won-es6.js";
 import Immutable from "immutable";
 import { checkHttpStatus, urisToLookupMap, is } from "./utils.js";
 
-import { ownerBaseUrl } from "config";
+import { ownerBaseUrl } from "~/config/default.js";
 import urljoin from "url-join";
 
 import { getRandomWonId } from "./won-utils.js";
 import * as useCaseUtils from "./usecase-utils.js";
+import * as connectionUtils from "./connection-utils.js";
 import { actionTypes } from "./actions/actions.js";
 
 /**
@@ -196,8 +197,8 @@ export function buildConnectMessage({
   theirNodeUri,
   connectMessage,
   optionalOwnConnectionUri,
-  ownSocket,
-  theirSocket,
+  socketUri,
+  targetSocketUri,
 }) {
   const envelopeData = won.getEnvelopeDataforNewConnection(
     ownedAtomUri,
@@ -208,11 +209,11 @@ export function buildConnectMessage({
   if (optionalOwnConnectionUri) {
     envelopeData[won.WONMSG.sender] = optionalOwnConnectionUri;
   }
-  if (ownSocket) {
-    envelopeData[won.WONMSG.senderSocket] = ownSocket;
+  if (socketUri) {
+    envelopeData[won.WONMSG.senderSocket] = socketUri;
   }
-  if (theirSocket) {
-    envelopeData[won.WONMSG.recipientSocket] = theirSocket;
+  if (targetSocketUri) {
+    envelopeData[won.WONMSG.recipientSocket] = targetSocketUri;
   }
   //TODO: use event URI pattern specified by WoN node
   const eventUri =
@@ -282,10 +283,7 @@ export function buildChatMessage({
       ) {
         //add the chatMessage as normal text message
         if (chatMessage) {
-          wonMessageBuilder.addContentGraphData(
-            won.WON.textMessage,
-            chatMessage
-          );
+          wonMessageBuilder.addContentGraphData(won.WONCON.text, chatMessage);
         }
 
         if (additionalContent) {
@@ -851,7 +849,7 @@ function fetchConnectionsOfAtomAndDispatch(atomUri, dispatch) {
       });
 
       const activeConnectionUris = connectionsWithStateAndSocket
-        .filter(conn => conn.connectionState !== won.WON.Closed)
+        .filter(conn => !connectionUtils.isClosed(conn))
         .map(conn => conn.connectionUri);
 
       dispatch({

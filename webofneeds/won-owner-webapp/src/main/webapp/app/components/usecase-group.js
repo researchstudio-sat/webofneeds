@@ -8,7 +8,7 @@ import { connect2Redux } from "../won-utils.js";
 import * as useCaseUtils from "../usecase-utils.js";
 import { getUseCaseGroupFromRoute } from "../selectors/general-selectors.js";
 
-import "style/_usecase-group.scss";
+import "~/style/_usecase-group.scss";
 
 const serviceDependencies = [
   "$ngRedux",
@@ -20,15 +20,10 @@ function genComponentConf() {
   const template = `
       <!-- HEADER -->
       <div class="ucg__header">
-          <a class="cp__header__back clickable"
+          <a class="ucg__header__back clickable"
               ng-click="self.router__back()">
-              <svg style="--local-primary:var(--won-primary-color);"
-                  class="ucg__header__back__icon show-in-responsive">
+              <svg class="ucg__header__back__icon">
                   <use xlink:href="#ico36_backarrow" href="#ico36_backarrow"></use>
-              </svg>
-              <svg style="--local-primary:var(--won-primary-color);"
-                  class="ucg__header__back__icon hide-in-responsive">
-                  <use xlink:href="#ico36_close" href="#ico36_close"></use>
               </svg>
           </a>
           <svg class="ucg__header__icon"

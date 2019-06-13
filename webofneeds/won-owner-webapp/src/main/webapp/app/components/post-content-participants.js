@@ -17,7 +17,7 @@ import * as generalSelectors from "../selectors/general-selectors.js";
 import { actionCreators } from "../actions/actions.js";
 import ngAnimate from "angular-animate";
 
-import "style/_post-content-participants.scss";
+import "~/style/_post-content-participants.scss";
 
 const CONNECTION_READ_TIMEOUT = 1500;
 
@@ -153,7 +153,7 @@ function genComponentConf() {
       const connUri = conn.get("uri");
 
       if (rateBad) {
-        this.connections__rate(connUri, won.WON.binaryRatingBad);
+        this.connections__rate(connUri, won.WONCON.binaryRatingBad);
       }
 
       if (conn.get("unread")) {
@@ -198,7 +198,7 @@ function genComponentConf() {
         });
       }
 
-      this.connections__rate(connUri, won.WON.binaryRatingGood);
+      this.connections__rate(connUri, won.WONCON.binaryRatingGood);
       this.atoms__connect(this.postUri, connUri, targetAtomUri, message);
     }
 

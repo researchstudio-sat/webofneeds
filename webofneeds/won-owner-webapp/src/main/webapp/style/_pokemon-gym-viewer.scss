@@ -1,0 +1,21 @@
+@import "won-config";
+@import "sizing-utils";
+
+pokemon-gym-viewer {
+  @include won-detail-viewer("pgv");
+
+  .pgv__content {
+    display: grid;
+    grid-gap: 0.5rem;
+    &:not(.won-in-message) {
+      padding-left: 0;
+    }
+
+    &__ex {
+      background-color: $won-primary-color;
+      color: $won-secondary-text-color;
+      padding: 0.25rem;
+      text-align: center;
+    }
+  }
+}

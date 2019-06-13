@@ -41,7 +41,7 @@ public class ConnectionStateChangeBuilder {
     }
 
     public boolean canBuild() {
-        return newState.isPresent();
+        return oldState.isPresent() && newState.isPresent();
     }
 
     public ConnectionStateChange build() {

@@ -1,6 +1,7 @@
 import { parseAtom } from "./parse-atom.js";
 import Immutable from "immutable";
 import { get } from "../../utils.js";
+import won from "../../won-es6.js";
 
 export function addAtom(atoms, jsonldAtom) {
   let newState;
@@ -28,6 +29,15 @@ export function addAtom(atoms, jsonldAtom) {
       const groupMemberUris = get(parsedAtom, "groupMembers");
       if (groupMemberUris.size > 0) {
         groupMemberUris.map(atomUri => {
+          if (!get(atoms, atomUri)) {
+            atoms = addAtomStub(atoms, atomUri);
+          }
+        });
+      }
+
+      const buddyUris = get(parsedAtom, "buddies");
+      if (buddyUris.size > 0) {
+        buddyUris.map(atomUri => {
           if (!get(atoms, atomUri)) {
             atoms = addAtomStub(atoms, atomUri);
           }
@@ -67,6 +77,14 @@ export function deleteAtom(atoms, deletedAtomUri) {
       );
     };
 
+    const removeBuddies = atom => {
+      return atom.updateIn(
+        ["buddies"],
+        buddies =>
+          buddies && buddies.filter(heldItem => heldItem != deletedAtomUri)
+      );
+    };
+
     const removeConnections = atom => {
       return atom.updateIn(
         ["connections"],
@@ -79,7 +97,7 @@ export function deleteAtom(atoms, deletedAtomUri) {
     };
 
     return removeConnections(
-      removeHeld(removeHolder(removeGroupMembers(atom)))
+      removeHeld(removeHolder(removeGroupMembers(removeBuddies(atom))))
     );
   });
 }
@@ -129,9 +147,11 @@ export function addAtomInCreation(atoms, atomInCreation, atomUri) {
   let atom = Immutable.fromJS(atomInCreation);
 
   if (atom) {
-    atom = atom.set("uri", atomUri);
-    atom = atom.set("isBeingCreated", true);
-    atom = atom.set("connections", Immutable.Map());
+    atom = atom
+      .set("uri", atomUri)
+      .set("state", won.WON.ActiveCompacted)
+      .set("isBeingCreated", true)
+      .set("connections", Immutable.Map());
 
     let title = undefined;
 

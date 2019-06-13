@@ -1,3 +1,5 @@
+@prefix con:   <https://w3id.org/won/content#> .
+@prefix match:   <https://w3id.org/won/matching#> .
 @prefix msg:   <https://w3id.org/won/message#> .
 @prefix conn:  <https://satvm05.researchstudio.at/won/resource/connection/> .
 @prefix atom:  <https://satvm05.researchstudio.at/won/resource/atom/> .
@@ -145,7 +147,7 @@
 
 <https://satvm05.researchstudio.at/won/resource/event/wxmlua2uu1gu#content> {
     event:wxmlua2uu1gu
-            won:textMessage  "Forwarded message" .
+            con:text  "Forwarded message" .
 }
 
 <https://satvm05.researchstudio.at/won/resource/event/hsvug43m3rvz9qei25zh#envelope-llgv> {

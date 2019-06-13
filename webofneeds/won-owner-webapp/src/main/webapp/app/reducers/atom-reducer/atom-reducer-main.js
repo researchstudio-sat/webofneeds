@@ -4,7 +4,7 @@
 import { actionTypes } from "../../actions/actions.js";
 import Immutable from "immutable";
 import won from "../../won-es6.js";
-import { msStringToDate, get, getIn } from "../../utils.js";
+import { msStringToDate, getIn } from "../../utils.js";
 import {
   addAtomStubs,
   addAtom,
@@ -42,7 +42,6 @@ import {
   setShowPetriNetData,
   setMultiSelectType,
 } from "./reduce-connections.js";
-import * as atomUtils from "../../atom-utils.js";
 
 const initialState = Immutable.fromJS({});
 
@@ -157,7 +156,8 @@ export default function(allAtomsInState = initialState, action = {}) {
             sockets: Immutable.Map(),
           },
           connections: Immutable.Map(),
-          holds: Immutable.List(),
+          holds: Immutable.Set(),
+          buddies: Immutable.Set(),
           rating: { aggregateRating: 0.0, reviewCount: 0 },
         })
       );
@@ -257,15 +257,8 @@ export default function(allAtomsInState = initialState, action = {}) {
         return addMessage(stateUpdated, optimisticEvent);
       } else {
         const tmpConnectionUri = "connectionFrom:" + eventUri;
-        //TODO: FIGURE OUT A WAY TO INCLUDE THE CORRECT SOCKET FOR ALL POSSIBLE CASES (e.g senderSocket -> get Socket from atom -> store said socket)
-        let connSenderSocket = won.CHAT.ChatSocketCompacted; //Default add optimistic Connection as ChatConnection
-        const ownedAtom = get(allAtomsInState, ownedAtomUri);
-        if (
-          !atomUtils.hasChatSocket(ownedAtom) &&
-          atomUtils.hasGroupSocket(ownedAtom)
-        ) {
-          connSenderSocket = won.GROUP.GroupSocketCompacted; //assume the connection is from group to x if the atom has the group but not the chat socket
-        }
+        const socketUri = action.payload.socketUri;
+        const targetSocketUri = action.payload.targetSocketUri;
 
         //need to wait for success-response to set that
         const optimisticConnection = Immutable.fromJS({
@@ -275,7 +268,8 @@ export default function(allAtomsInState = initialState, action = {}) {
           targetAtomUri: theirAtomUri,
           targetConnectionUri: undefined,
           unread: false,
-          socket: connSenderSocket,
+          socketUri: socketUri,
+          targetSocketUri: targetSocketUri,
           agreementData: {
             agreementUris: Immutable.Set(),
             pendingProposalUris: Immutable.Set(),
@@ -404,9 +398,9 @@ export default function(allAtomsInState = initialState, action = {}) {
       // use the remote success message to obtain the remote connection
       // uri (which we may not have known)
       const wonMessage = action.payload;
-      const connectionUri = wonMessage.getReceiver();
+      const connectionUri = wonMessage.getRecipientConnection();
       const atomUri = wonMessage.getRecipientAtom();
-      const targetConnectionUri = wonMessage.getSender();
+      const targetConnectionUri = wonMessage.getSenderConnection();
 
       if (allAtomsInState.getIn([atomUri, "connections", connectionUri])) {
         const eventUri = wonMessage.getIsRemoteResponseTo();
@@ -442,7 +436,7 @@ export default function(allAtomsInState = initialState, action = {}) {
       // changeConnectionState
       const wonMessage = action.payload;
       const eventUri = wonMessage.getIsResponseTo();
-      const connUri = wonMessage.getReceiver();
+      const connUri = wonMessage.getRecipientConnection();
 
       const tmpConnUri = "connectionFrom:" + wonMessage.getIsResponseTo();
       const tmpAtom = getAtomByConnectionUri(allAtomsInState, tmpConnUri);
@@ -532,7 +526,7 @@ export default function(allAtomsInState = initialState, action = {}) {
     case actionTypes.messages.close.success:
       return changeConnectionState(
         allAtomsInState,
-        action.payload.getReceiver(),
+        action.payload.getRecipientConnection(),
         won.WON.Closed
       );
     case actionTypes.messages.viewState.markExpandReference:
@@ -719,7 +713,7 @@ export default function(allAtomsInState = initialState, action = {}) {
       const wonMessage = getIn(action, ["payload"]);
       const eventUri = wonMessage.getIsResponseTo();
       const atomUri = wonMessage.getRecipientAtom();
-      const connectionUri = wonMessage.getReceiver();
+      const connectionUri = wonMessage.getRecipientConnection();
       // we want to use the response date to update the original message
       // date
       // in order to use server timestamps everywhere
@@ -758,7 +752,7 @@ export default function(allAtomsInState = initialState, action = {}) {
         ? wonMessage.getIsRemoteResponseTo()
         : wonMessage.getIsResponseTo();
       const atomUri = wonMessage.getRecipientAtom();
-      const connectionUri = wonMessage.getReceiver();
+      const connectionUri = wonMessage.getRecipientConnection();
 
       allAtomsInState = allAtomsInState.setIn(
         [
@@ -778,7 +772,7 @@ export default function(allAtomsInState = initialState, action = {}) {
       const wonMessage = getIn(action, ["payload"]);
       const eventUri = wonMessage.getIsRemoteResponseTo();
       const atomUri = wonMessage.getRecipientAtom();
-      const connectionUri = wonMessage.getReceiver();
+      const connectionUri = wonMessage.getRecipientConnection();
       const path = [
         atomUri,
         "connections",

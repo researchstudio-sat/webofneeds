@@ -14,7 +14,6 @@ import won.owner.protocol.message.OwnerCallback;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageDirection;
 import won.protocol.model.Connection;
-import won.protocol.model.Match;
 
 /**
  * OwnerProtocolOwnerServiceCallback that dispatches the calls to the bots.
@@ -41,17 +40,34 @@ public class BotOwnerCallback implements OwnerCallback {
     }
 
     @Override
-    public void onHintFromMatcher(final Match match, final WonMessage wonMessage) {
+    public void onAtomHintFromMatcher(final WonMessage wonMessage) {
         taskScheduler.schedule(new Runnable() {
             public void run() {
                 if (wonMessage.getEnvelopeType() != WonMessageDirection.FROM_OWNER) {
                     try {
-                        getBotForAtomUri(match.getFromAtom()).onHintFromMatcher(match, wonMessage);
+                        getBotForAtomUri(wonMessage.getRecipientAtomURI()).onAtomHintFromMatcher(wonMessage);
                     } catch (Exception e) {
-                        logger.warn("error while handling onHintFromMatcher()", e);
+                        logger.warn("error while handling onAtomHintFromMatcher()", e);
                     }
                 } else {
-                    logger.debug("Received echo for onHintFromMatcher");
+                    logger.debug("Received echo for onAtomHintFromMatcher");
+                }
+            }
+        }, new Date());
+    }
+
+    @Override
+    public void onSocketHintFromMatcher(final WonMessage wonMessage) {
+        taskScheduler.schedule(new Runnable() {
+            public void run() {
+                if (wonMessage.getEnvelopeType() != WonMessageDirection.FROM_OWNER) {
+                    try {
+                        getBotForAtomUri(wonMessage.getRecipientAtomURI()).onSocketHintFromMatcher(wonMessage);
+                    } catch (Exception e) {
+                        logger.warn("error while handling onAtomHintFromMatcher()", e);
+                    }
+                } else {
+                    logger.debug("Received echo for onAtomHintFromMatcher");
                 }
             }
         }, new Date());

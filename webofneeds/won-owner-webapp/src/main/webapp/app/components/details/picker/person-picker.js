@@ -4,7 +4,7 @@ import { DomCache } from "../../../cstm-ng-utils.js";
 import Immutable from "immutable";
 import wonInput from "../../../directives/input.js";
 
-import "style/_personpicker.scss";
+import "~/style/_personpicker.scss";
 
 const serviceDependencies = ["$scope", "$element"];
 function genComponentConf() {

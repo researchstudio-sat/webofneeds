@@ -8,11 +8,12 @@ import { actionCreators } from "../actions/actions.js";
 import { attach, get, getIn, toAbsoluteURL } from "../utils.js";
 import * as generalSelectors from "../selectors/general-selectors.js";
 import { connect2Redux } from "../won-utils.js";
-import { ownerBaseUrl } from "config";
+import { ownerBaseUrl } from "~/config/default.js";
 import * as connectionUtils from "../connection-utils.js";
+import * as connectionSelectors from "../selectors/connection-selectors.js";
 import * as processUtils from "../process-utils.js";
 
-import "style/_context-dropdown.scss";
+import "~/style/_context-dropdown.scss";
 
 const serviceDependencies = ["$scope", "$ngRedux", "$element"];
 function genComponentConf() {
@@ -58,13 +59,13 @@ function genComponentConf() {
                     <button
                         class="won-button--outlined thin red"
                         ng-if="self.isTargetAtomUsableAsTemplate"
-                        ng-click="self.router__stateGoAbs('connections', {fromAtomUri: self.targetAtomUri, mode: 'DUPLICATE'})">
+                        ng-click="self.router__stateGoAbs('create', {fromAtomUri: self.targetAtomUri, mode: 'DUPLICATE'})">
                         Post this too!
                     </button>
                     <button
                         class="won-button--outlined thin red"
                         ng-if="self.isTargetAtomEditable"
-                        ng-click="self.router__stateGoAbs('connections', {fromAtomUri: self.atomUri, mode: 'EDIT'})">
+                        ng-click="self.router__stateGoAbs('create', {fromAtomUri: self.atomUri, mode: 'EDIT'})">
                         Edit
                     </button>
                     <a class="won-button--outlined thin red"
@@ -109,10 +110,9 @@ function genComponentConf() {
           adminEmail: getIn(state, ["config", "theme", "adminEmail"]),
           targetAtomUri,
           linkToPost,
-          isConnectionToGroup: connectionUtils.isChatToGroup(
-            state.get("atoms"),
-            get(post, "uri"),
-            connectionUri
+          isConnectionToGroup: connectionSelectors.isChatToGroupConnection(
+            get(state, "atoms"),
+            connection
           ),
           showAgreementData: connection && connection.get("showAgreementData"),
           isConnected: connectionUtils.isConnected(connection),

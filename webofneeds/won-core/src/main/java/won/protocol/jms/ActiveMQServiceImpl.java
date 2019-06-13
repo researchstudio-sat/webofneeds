@@ -38,9 +38,9 @@ import won.protocol.vocabulary.WON;
 public class ActiveMQServiceImpl implements ActiveMQService {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private static final String PATH_OWNER_PROTOCOL_QUEUE_NAME = "<" + WON.supportsWonProtocolImpl + ">/<"
-                    + WON.activeMQOwnerProtocolQueueName + ">";
+                    + WON.ownerQueue + ">";
     private static final String PATH_ATOM_PROTOCOL_QUEUE_NAME = "<" + WON.supportsWonProtocolImpl + ">/<"
-                    + WON.activeMQAtomProtocolQueueName + ">";
+                    + WON.nodeQueue + ">";
     private static final String PATH_BROKER_URI = "<" + WON.supportsWonProtocolImpl + ">/<" + WON.brokerUri + ">";
     protected String queueNamePath;
     private List<String> matcherProtocolTopicList;

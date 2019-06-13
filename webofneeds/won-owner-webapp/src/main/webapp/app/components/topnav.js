@@ -11,70 +11,54 @@ import { connect2Redux } from "../won-utils.js";
 import { isLoading } from "../selectors/process-selectors.js";
 import * as viewSelectors from "../selectors/view-selectors.js";
 
-import * as srefUtils from "../sref-utils.js";
 import * as accountUtils from "../account-utils.js";
 
-import "style/_responsiveness-utils.scss";
-import "style/_topnav.scss";
+import "~/style/_responsiveness-utils.scss";
+import "~/style/_topnav.scss";
+
+const serviceDependencies = ["$ngRedux", "$scope", "$state", "$element"];
 
 function genTopnavConf() {
   let template = `
         <nav class="topnav">
-            <div class="topnav__inner">
-                <div class="topnav__inner__left">
-                    <a href="{{ self.defaultRouteHRef(self.$state) }}"
-                        class="topnav__button">
-                            <img src="skin/{{self.themeName}}/images/logo.svg"
-                                class="topnav__button__icon">
-                            <span class="topnav__page-title topnav__button__caption hide-in-responsive">
-                                {{ self.appTitle }}
-                            </span>
-                    </a>
-                    <div class="topnav__inner__left__slideintoggle"
-                        ng-if="self.showSlideInIndicator"
-                        ng-click="self.view__toggleSlideIns()">
-                        <svg class="topnav__inner__left__slideintoggle__icon">
-                            <use xlink:href="#ico16_indicator_warning" href="#ico16_indicator_warning"></use>
-                        </svg>
-                        <svg class="topnav__inner__left__slideintoggle__carret">
-                            <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
-                        </svg>
-                    </div>
-                </div>
-                <div class="topnav__inner__center"></div>
-                <div class="topnav__inner__right">
-                    <ul class="topnav__list">
-                        <li class="topnav__list__loading" ng-if="self.showLoadingIndicator">
-                          <svg class="topnav__list__loading__spinner hspinner">
-                              <use xlink:href="#ico_loading_anim" href="#ico_loading_anim"></use>
-                          </svg>
-                        </li>
-                        <li ng-show="!self.isSignUpView && (self.isAnonymous || !self.loggedIn)">
-                            <a  ui-sref="{{ self.absSRef('signup') }}"
-                                class="topnav__signupbtn">
-                                    Sign up
-                            </a>
-                        </li>
-                        <li>
-                            <won-account-menu>
-                            </won-account-menu>
-                        </li>
-                    </ul>
-                </div>
+            <img src="skin/{{self.themeName}}/images/logo.svg" class="topnav__logo clickable" ng-click="self.router__stateGoDefault()">
+            <div class="topnav__title">
+              <span class="topnav__app-title hide-in-responsive" ng-click="self.router__stateGoDefault()">
+                  {{ self.appTitle }}
+              </span>
+              <span class="topnav__divider hide-in-responsive" ng-if="self.pageTitle">
+                  &mdash;
+              </span>
+              <span class="topnav__page-title" ng-if="self.pageTitle">
+                  {{ self.pageTitle }}
+              </span>
             </div>
+            <div class="topnav__slideintoggle"
+                ng-if="self.showSlideInIndicator"
+                ng-click="self.view__toggleSlideIns()">
+                <svg class="topnav__slideintoggle__icon">
+                    <use xlink:href="#ico16_indicator_warning" href="#ico16_indicator_warning"></use>
+                </svg>
+                <svg class="topnav__slideintoggle__carret">
+                    <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
+                </svg>
+            </div>
+            <div class="topnav__loading" ng-if="self.showLoadingIndicator">
+                <svg class="topnav__loading__spinner hspinner">
+                    <use xlink:href="#ico_loading_anim" href="#ico_loading_anim"></use>
+                </svg>
+            </div>
+            <button ng-click="self.router__stateGo('signup')" class="topnav__signupbtn won-button--filled red" ng-if="!self.isSignUpView && (self.isAnonymous || !self.loggedIn)">
+                Sign up
+            </button>
+            <won-account-menu>
+            </won-account-menu>
         </nav>
     `;
-
-  const serviceDependencies = [
-    "$ngRedux",
-    "$scope",
-    "$state" /*injections as strings here*/,
-  ];
 
   class Controller {
     constructor(/* arguments <- serviceDependencies */) {
       attach(this, serviceDependencies, arguments);
-      Object.assign(this, srefUtils); // bind srefUtils to scope
 
       window.tnc4dbg = this;
 
@@ -95,14 +79,16 @@ function genTopnavConf() {
         };
       };
 
-      connect2Redux(selectFromState, actionCreators, [], this);
+      connect2Redux(selectFromState, actionCreators, ["self.pageTitle"], this);
     }
   }
   Controller.$inject = serviceDependencies;
 
   return {
     restrict: "E",
-    scope: {}, //isolate scope to allow usage within other controllers/components
+    scope: {
+      pageTitle: "=",
+    }, //isolate scope to allow usage within other controllers/components
     controller: Controller,
     controllerAs: "self",
     bindToController: true, //scope-bindings -> ctrl

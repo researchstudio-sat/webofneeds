@@ -3,7 +3,7 @@
 
 # use java as a base image
 # fix java version here until the following issue is resolved: https://github.com/researchstudio-sat/webofneeds/issues/1229
-FROM openjdk:8u121-jdk
+FROM openjdk:8-jdk
 
 # install python + required packages
 RUN apt-get update && apt-get install -y python-numpy python-scipy

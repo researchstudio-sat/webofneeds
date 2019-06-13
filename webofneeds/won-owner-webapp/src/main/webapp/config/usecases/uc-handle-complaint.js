@@ -13,15 +13,16 @@ export const handleComplaint = {
   draft: {
     ...mergeInEmptyDraft({
       content: {
-        type: ["won:HandleComplaint"],
+        type: ["demo:HandleComplaint"],
         title: "I'll discuss complaints",
         searchString: "wtf",
       },
       seeks: {
-        type: ["won:Complaint"],
+        type: ["demo:Complaint"],
       },
     }),
   },
+  reactionUseCases: ["complain"],
   details: {
     title: { ...details.title },
     description: { ...details.description },

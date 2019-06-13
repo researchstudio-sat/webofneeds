@@ -516,7 +516,7 @@ public class Validator {
     public void testCQTag1() {
         System.out.println("executing queries...");
         String queryString = sparqlPreface + "SELECT ?atom ?tag WHERE {?atom rdf:type won:Atom. "
-                        + "?atom won:content ?content." + "?content won:tag ?tag." + "}";
+                        + "?atom won:content ?content." + "?content con:tag ?tag." + "}";
         Query query = QueryFactory.create(queryString);
         QueryExecution qExec = QueryExecutionFactory.create(query, ontModel);
         List<String> actualList = new ArrayList<String>();
@@ -546,7 +546,7 @@ public class Validator {
         loadOntologies();
         System.out.println("executing queries...");
         String queryString = sparqlPreface + "SELECT ?atom ?tag WHERE {?atom rdf:type won:Atom. "
-                        + "?atom won:content ?content." + "?content won:tag ?tag." + "}";
+                        + "?atom won:content ?content." + "?content con:tag ?tag." + "}";
         Query query = QueryFactory.create(queryString);
         QueryExecution qExec = QueryExecutionFactory.create(query, ontModel);
         try {

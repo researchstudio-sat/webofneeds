@@ -23,8 +23,8 @@ import { getUnreadMessagesByConnectionUri } from "../selectors/message-selectors
 import autoresizingTextareaModule from "../directives/textarea-autogrow.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
 
-import "style/_group-post-messages.scss";
-import "style/_rdflink.scss";
+import "~/style/_group-post-messages.scss";
+import "~/style/_rdflink.scss";
 
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 
@@ -160,9 +160,7 @@ function genComponentConf() {
         "Use it, so your TTL can be found when parsing the messages. " +
         "See `won.defaultTurtlePrefixes` " +
         "for prefixes that will be added automatically. E.g." +
-        `\`<${
-          won.WONMSG.uriPlaceholder.event
-        }> won:textMessage "hello world!". \``;
+        `\`<${won.WONMSG.uriPlaceholder.event}> con:text "hello world!". \``;
 
       this.scrollContainer().addEventListener("scroll", e => this.onScroll(e));
 
@@ -177,7 +175,8 @@ function genComponentConf() {
           allChatMessages &&
           allChatMessages
             .filter(msg => !msg.getIn(["references", "forwards"])) //FILTER OUT ALL FORWARD MESSAGE ENVELOPES JUST IN CASE
-            .filter(msg => !messageUtils.isHintMessage(msg)); //FILTER OUT ALL HINT MESSAGES
+            .filter(msg => !messageUtils.isAtomHintMessage(msg)) //FILTER OUT ALL HINT MESSAGES
+            .filter(msg => !messageUtils.isSocketHintMessage(msg));
         const hasConnectionMessagesToLoad = hasMessagesToLoad(
           state,
           connectionUri
@@ -390,7 +389,7 @@ function genComponentConf() {
 
         //this.router__stateGoCurrent({connectionUri: null, sendAdHocRequest: null});
       } else {
-        this.connections__rate(this.connectionUri, won.WON.binaryRatingGood);
+        this.connections__rate(this.connectionUri, won.WONCON.binaryRatingGood);
         this.atoms__connect(
           this.ownedAtom.get("uri"),
           this.connectionUri,
@@ -405,7 +404,7 @@ function genComponentConf() {
       rateBad &&
         this.connections__rate(
           this.connection.get("uri"),
-          won.WON.binaryRatingBad
+          won.WONCON.binaryRatingBad
         );
       this.connections__close(this.connection.get("uri"));
       this.router__stateGoCurrent({ connectionUri: null });
@@ -416,13 +415,19 @@ function genComponentConf() {
         return;
       }
       switch (rating) {
-        case won.WON.binaryRatingGood:
-          this.connections__rate(this.connectionUri, won.WON.binaryRatingGood);
+        case won.WONCON.binaryRatingGood:
+          this.connections__rate(
+            this.connectionUri,
+            won.WONCON.binaryRatingGood
+          );
           break;
 
-        case won.WON.binaryRatingBad:
+        case won.WONCON.binaryRatingBad:
           this.connections__close(this.connectionUri);
-          this.connections__rate(this.connectionUri, won.WON.binaryRatingBad);
+          this.connections__rate(
+            this.connectionUri,
+            won.WONCON.binaryRatingBad
+          );
           this.router__stateGoCurrent({ connectionUri: null });
           break;
       }

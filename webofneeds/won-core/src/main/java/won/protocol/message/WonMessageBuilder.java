@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
@@ -17,6 +18,7 @@ import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Resource;
 
 import won.protocol.exception.WonMessageBuilderException;
+import won.protocol.message.WonMessageType;
 import won.protocol.util.CheapInsecureRandomString;
 import won.protocol.util.DefaultPrefixUtils;
 import won.protocol.util.RdfUtils;
@@ -45,12 +47,12 @@ public class WonMessageBuilder {
     private URI recipientAtomURI;
     private URI recipientNodeURI;
     private URI recipientSocketURI;
+    private URI hintTargetAtomURI;
+    private URI hintTargetSocketURI;
+    private Double hintScore;
     private Set<URI> injectIntoConnections = new HashSet<>();
     private WonMessageType wonMessageType;
     private WonMessageDirection wonMessageDirection;
-    // a message may refer to a number of other messages (e.g. previously sent
-    // messages)
-    private Set<URI> refersToURIs = new HashSet<>();
     // if the message is a response message, it MUST have exactly one
     // isResponseToMessageURI set.
     private URI isResponseToMessageURI;
@@ -158,14 +160,44 @@ public class WonMessageBuilder {
             messageEventResource.addProperty(WONMSG.recipientSocket,
                             envelopeGraph.createResource(recipientSocketURI.toString()));
         }
+        // add hint properties
+        if (this.wonMessageType == WonMessageType.ATOM_HINT_MESSAGE) {
+            if (hintTargetAtomURI == null) {
+                throw new IllegalArgumentException("AtomHintMessage must have a hintTargetAtom");
+            }
+            if (hintScore == null) {
+                throw new IllegalArgumentException("AtomHintMessage must have a hintScore");
+            }
+            if (hintTargetSocketURI != null) {
+                throw new IllegalArgumentException("AtomHintMessage must not have a hintTargetSocket");
+            }
+            if (recipientSocketURI != null) {
+                throw new IllegalArgumentException("AtomHintMessage must not have a recipientSocket");
+            }
+            messageEventResource.addProperty(WONMSG.hintTargetAtom,
+                            envelopeGraph.createResource(hintTargetAtomURI.toString()));
+            messageEventResource.addProperty(WONMSG.hintScore, hintScore.toString(), XSDDatatype.XSDfloat);
+        } else if (this.wonMessageType == WonMessageType.SOCKET_HINT_MESSAGE) {
+            if (hintTargetSocketURI == null) {
+                throw new IllegalArgumentException("SocketHintMessage must have a hintTargetSocket");
+            }
+            if (hintScore == null) {
+                throw new IllegalArgumentException("SocketHintMessage must have a hintScore");
+            }
+            if (hintTargetAtomURI != null) {
+                throw new IllegalArgumentException("SocketHintMessage must not have a hintTargetAtom");
+            }
+            if (recipientSocketURI == null) {
+                throw new IllegalArgumentException("SocketHintMessage must have a recipientSocket");
+            }
+            messageEventResource.addProperty(WONMSG.hintTargetSocket,
+                            envelopeGraph.createResource(hintTargetSocketURI.toString()));
+            messageEventResource.addProperty(WONMSG.hintScore, hintScore.toString(), XSDDatatype.XSDfloat);
+        }
         // add forwards
         if (!injectIntoConnections.isEmpty()) {
             injectIntoConnections.forEach(receiver -> messageEventResource.addProperty(WONMSG.injectIntoConnection,
                             envelopeGraph.getResource(receiver.toString())));
-        }
-        // add refersTo
-        for (URI refersToURI : refersToURIs) {
-            messageEventResource.addProperty(WONMSG.refersTo, envelopeGraph.createResource(refersToURI.toString()));
         }
         if (isResponseToMessageURI != null) {
             if (wonMessageType != WonMessageType.SUCCESS_RESPONSE
@@ -472,26 +504,32 @@ public class WonMessageBuilder {
                         .setSentTimestampToNow();
     }
 
-    public static WonMessageBuilder setMessagePropertiesForHint(URI messageURI, URI atomURI,
-                    Optional<URI> atomSocketURI, URI wonNodeURI, URI otherAtomURI, Optional<URI> otherAtomSocket,
-                    URI matcherURI, double score) {
-        Model contentModel = ModelFactory.createDefaultModel();
-        RdfUtils.findOrCreateBaseResource(contentModel);
-        Resource msgResource = contentModel.createResource(messageURI.toString());
-        RdfUtils.replaceBaseResource(contentModel, msgResource);
-        contentModel.add(msgResource, WON.matchScore, contentModel.createTypedLiteral(score));
-        contentModel.add(msgResource, WON.matchCounterpart, contentModel.createResource(otherAtomURI.toString()));
+    public static WonMessageBuilder setMessagePropertiesForHintToAtom(URI messageURI, URI atomURI, URI wonNodeURI,
+                    URI otherAtomURI, URI matcherURI, double score) {
         WonMessageBuilder builder = new WonMessageBuilder(messageURI)
                         .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL)
-                        .setWonMessageType(WonMessageType.HINT_MESSAGE).setSenderNodeURI(matcherURI)
-                        .setRecipientAtomURI(atomURI).setRecipientNodeURI(wonNodeURI);
-        if (atomSocketURI.isPresent()) {
-            builder.setSenderSocketURI(atomSocketURI.get());
-        }
-        if (otherAtomSocket.isPresent()) {
-            builder.setRecipientSocketURI(otherAtomSocket.get());
-        }
-        return builder.setSentTimestampToNow().addContent(contentModel);
+                        .setWonMessageType(WonMessageType.ATOM_HINT_MESSAGE)
+                        .setSenderNodeURI(matcherURI)
+                        .setRecipientAtomURI(atomURI)
+                        .setRecipientNodeURI(wonNodeURI)
+                        .setHintTargetAtomURI(otherAtomURI)
+                        .setHintScore(score);
+        return builder.setSentTimestampToNow();
+    }
+
+    public static WonMessageBuilder setMessagePropertiesForHintToSocket(URI messageURI, URI recipientAtomURI,
+                    URI recipientSocketURI,
+                    URI wonNodeURI, URI targetSocketURI, URI matcherURI, double score) {
+        WonMessageBuilder builder = new WonMessageBuilder(messageURI)
+                        .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL)
+                        .setWonMessageType(WonMessageType.SOCKET_HINT_MESSAGE)
+                        .setSenderNodeURI(matcherURI)
+                        .setRecipientAtomURI(recipientAtomURI)
+                        .setRecipientSocketURI(recipientSocketURI)
+                        .setRecipientNodeURI(wonNodeURI)
+                        .setHintTargetSocketURI(targetSocketURI)
+                        .setHintScore(score);
+        return builder.setSentTimestampToNow();
     }
 
     public static WonMessageBuilder setMessagePropertiesForHintFeedback(URI messageURI, URI connectionURI, URI atomURI,
@@ -753,11 +791,6 @@ public class WonMessageBuilder {
         return contentGraph;
     }
 
-    public WonMessageBuilder addRefersToURI(URI refersTo) {
-        refersToURIs.add(refersTo);
-        return this;
-    }
-
     public WonMessageBuilder setIsResponseToMessageURI(URI isResponseToMessageURI) {
         this.isResponseToMessageURI = isResponseToMessageURI;
         return this;
@@ -808,9 +841,24 @@ public class WonMessageBuilder {
         return this;
     }
 
+    public WonMessageBuilder setHintScore(Double hintScore) {
+        this.hintScore = hintScore;
+        return this;
+    }
+
+    public WonMessageBuilder setHintTargetAtomURI(URI hintTargetAtomURI) {
+        this.hintTargetAtomURI = hintTargetAtomURI;
+        return this;
+    }
+
+    public WonMessageBuilder setHintTargetSocketURI(URI hintTargetSocketURI) {
+        this.hintTargetSocketURI = hintTargetSocketURI;
+        return this;
+    }
+
     /**
-     * Adds a won:textMessage triple to one of the unsigned content graphs in this
-     * builder. Creates a new unsigned content graph if none is found.
+     * Adds a con:text triple to one of the unsigned content graphs in this builder.
+     * Creates a new unsigned content graph if none is found.
      * 
      * @param textMessage may be null in which case the builder is not modified
      * @return

@@ -24,6 +24,12 @@ main.postcontent {
     border-right: none;
   }
 
+  & > won-send-request > won-post-content,
+  & > won-send-request > .post-info__footer {
+    display: block;
+    padding: 0.5rem;
+  }
+
   & > .pc__loading {
     display: flex;
     flex-direction: column;

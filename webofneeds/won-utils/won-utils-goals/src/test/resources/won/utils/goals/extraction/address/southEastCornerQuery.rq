@@ -1,3 +1,4 @@
+PREFIX con: <https://w3id.org/won/content#>
 prefix s:     <http://schema.org/>
 prefix won:   <https://w3id.org/won/core#>
 
@@ -5,8 +6,8 @@ Select ?lat ?lon
 
 where {
 	?main a s:Place;
-          won:boundingBox ?boundingBox .
-    ?boundingBox won:southEastCorner ?geoCoordinates .
+          con:boundingBox ?boundingBox .
+    ?boundingBox con:southEastCorner ?geoCoordinates .
     ?geoCoordinates s:latitude ?lat;
                     s:longitude ?lon.
 }

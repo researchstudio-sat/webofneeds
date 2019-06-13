@@ -5,10 +5,9 @@
 import won from "../won-es6.js";
 import Immutable from "immutable";
 
-import {
-  getConnectionUriFromRoute,
-  getOwnedAtomByConnectionUri,
-} from "../selectors/general-selectors.js";
+import * as generalSelectors from "../selectors/general-selectors.js";
+import * as atomUtils from "../atom-utils.js";
+import * as ownerApi from "../owner-api.js";
 import { getOwnedConnectionByUri } from "../selectors/connection-selectors.js";
 
 import { get, getIn, urisToLookupSuccessAndFailedMap } from "../utils.js";
@@ -293,8 +292,8 @@ export function connectionsOpen(connectionUri, textMessage) {
     });
 
     dispatch(
-      actionCreators.router__stateGoCurrent({
-        connectionUri: optimisticEvent.getSender(),
+      actionCreators.router__stateGoAbs("connections", {
+        connectionUri: optimisticEvent.getSenderConnection(),
       })
     );
   };
@@ -303,13 +302,17 @@ export function connectionsOpen(connectionUri, textMessage) {
 export function connectionsConnectReactionAtom(
   connectToAtomUri,
   atomDraft,
-  persona
+  persona,
+  connectToSocketType,
+  atomDraftSocketType
 ) {
   return (dispatch, getState) =>
     connectReactionAtom(
       connectToAtomUri,
       atomDraft,
       persona,
+      connectToSocketType,
+      atomDraftSocketType,
       dispatch,
       getState
     ); // moved to separate function to make transpilation work properly
@@ -317,25 +320,17 @@ export function connectionsConnectReactionAtom(
 function connectReactionAtom(
   connectToAtomUri,
   atomDraft,
-  persona,
+  personaUri,
+  connectToSocketType,
+  atomDraftSocketType,
   dispatch,
   getState
 ) {
   ensureLoggedIn(dispatch, getState).then(async () => {
     const state = getState();
-    const connectoToAtom = getIn(state, ["atoms", connectToAtomUri]);
-    const nodeUri = getIn(state, ["config", "defaultNodeUri"]);
+    const connectToAtom = getIn(state, ["atoms", connectToAtomUri]);
 
-    //add flags
-    atomDraft.content.flags
-      ? atomDraft.content.flags.push(
-          "won:NoHintForCounterpart",
-          "won:NoHintForMe"
-        )
-      : (atomDraft.content.flags = [
-          "won:NoHintForCounterpart",
-          "won:NoHintForMe",
-        ]);
+    const nodeUri = getIn(state, ["config", "defaultNodeUri"]);
 
     // create new atom
     const { message, eventUri, atomUri } = await buildCreateMessage(
@@ -343,91 +338,117 @@ function connectReactionAtom(
       nodeUri
     );
 
-    // add persona
-    if (persona) {
-      const response = await fetch("rest/action/connect", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify([
-          {
-            pending: false,
-            //socket: `${persona}#holderSocket`,
-            socket: getIn(state, [
-              "atoms",
-              persona,
-              "content",
-              "sockets",
-            ]).keyOf("hold:HolderSocket"),
-          },
-          {
-            pending: true,
-            socket: `${atomUri}#holdableSocket`,
-            // FIXME: does not work as new atom is not in state yet
-            //socket: getIn(state, ["atoms", atomUri, "content", "sockets"]).keyOf(
-            //  "hold:HoldableSocket"
-            //),
-          },
-        ]),
-        credentials: "include",
-      });
-      if (!response.ok) {
-        const errorMsg = await response.text();
-        throw new Error(`Could not connect identity: ${errorMsg}`);
-      }
+    // create the new atom
+    dispatch({
+      type: actionTypes.atoms.create, // TODO custom action
+      payload: { eventUri, message, atomUri, atom: atomDraft },
+    });
+
+    dispatch(
+      actionCreators.router__stateGo("connections", {
+        useCase: undefined,
+        useCaseGroup: undefined,
+        fromAtomUri: undefined,
+        viewAtomUri: undefined,
+        viewConnUri: undefined,
+        mode: undefined,
+      })
+    );
+
+    // add persona if present
+    if (personaUri) {
+      const persona = getIn(state, ["atoms", personaUri]);
+      ownerApi
+        .serverSideConnect(
+          atomUtils.getSocketUri(persona, won.HOLD.HolderSocketCompacted),
+          `${atomUri}#holdableSocket`,
+          false,
+          true
+        )
+        .then(async response => {
+          if (!response.ok) {
+            const errorMsg = await response.text();
+            throw new Error(`Could not connect identity: ${errorMsg}`);
+          }
+        });
     }
 
-    // establish connection
-    const cnctMsg = buildConnectMessage({
-      ownedAtomUri: atomUri,
-      theirAtomUri: connectToAtomUri,
-      ownNodeUri: nodeUri,
-      theirNodeUri: connectoToAtom.get("nodeUri"),
-      connectMessage: "",
-    });
+    if (generalSelectors.isAtomOwned(state, connectToAtomUri)) {
+      const connectToSocketUri = connectToSocketType
+        ? atomUtils.getSocketUri(connectToAtom, connectToSocketType)
+        : atomUtils.getDefaultSocketUri(connectToAtom);
 
-    won.wonMessageFromJsonLd(cnctMsg.message).then(optimisticEvent => {
-      // connect action to be dispatched when the
-      // ad hoc atom has been created:
-      const connectAction = {
-        type: actionTypes.atoms.connect,
-        payload: {
-          eventUri: cnctMsg.eventUri,
-          message: cnctMsg.message,
-          optimisticEvent: optimisticEvent,
-        },
+      const getSocketFromDraft = atomDraft => {
+        const draftContent = atomDraft["content"];
+        const draftSockets = draftContent["sockets"];
+
+        if (draftSockets && atomDraftSocketType) {
+          for (let socketKey in draftSockets) {
+            if (draftSockets[socketKey] === atomDraftSocketType) {
+              return socketKey;
+            }
+          }
+        }
+
+        const defaultSocket = draftContent["defaultSocket"];
+        return defaultSocket && Object.keys(defaultSocket)[0];
       };
 
-      // register the connect action to be dispatched when
-      // atom creation is successful
-      dispatch({
-        type: actionTypes.messages.dispatchActionOn.registerSuccessOwn,
-        payload: {
-          eventUri: eventUri,
-          actionToDispatch: connectAction,
-        },
+      const atomDraftSocketUri = getSocketFromDraft(atomDraft);
+
+      if (atomDraftSocketUri && connectToSocketUri) {
+        ownerApi
+          .serverSideConnect(
+            connectToSocketUri,
+            `${atomUri}${atomDraftSocketUri}`,
+            false,
+            true
+          )
+          .then(async response => {
+            if (!response.ok) {
+              const errorMsg = await response.text();
+              throw new Error(`Could not connect owned atoms: ${errorMsg}`);
+            }
+          });
+      } else {
+        throw new Error(
+          `Could not connect owned atoms did not find necessary sockets`
+        );
+      }
+    } else {
+      // establish connection
+      const cnctMsg = buildConnectMessage({
+        ownedAtomUri: atomUri,
+        theirAtomUri: connectToAtomUri,
+        ownNodeUri: nodeUri,
+        theirNodeUri: connectToAtom.get("nodeUri"),
+        connectMessage: "",
       });
 
-      // create the new atom
-      dispatch({
-        type: actionTypes.atoms.create, // TODO custom action
-        payload: { eventUri, message, atomUri, atom: atomDraft },
-      });
+      won.wonMessageFromJsonLd(cnctMsg.message).then(optimisticEvent => {
+        // connect action to be dispatched when the
+        // ad hoc atom has been created:
+        //TODO: FIGURE OUT WHICH SOCKETS WILL BE CONNECTED
+        const connectAction = {
+          type: actionTypes.atoms.connect,
+          payload: {
+            eventUri: cnctMsg.eventUri,
+            message: cnctMsg.message,
+            optimisticEvent: optimisticEvent,
+          },
+        };
 
-      dispatch(
-        actionCreators.router__stateGo("connections", {
-          useCase: undefined,
-          useCaseGroup: undefined,
-          postUri: atomUri,
-          atomUri: undefined,
-          fromAtomUri: undefined,
-          viewAtomUri: undefined,
-          viewConnUri: undefined,
-          mode: undefined,
-        })
-      );
-    });
+        // register the connect action to be dispatched when
+        // atom creation is successful
+        dispatch({
+          type: actionTypes.messages.dispatchActionOn.registerSuccessOwn,
+          payload: {
+            eventUri: eventUri,
+            actionToDispatch: connectAction,
+          },
+        });
+      });
+    }
   });
 }
 
@@ -435,7 +456,13 @@ export function connectionsConnectAdHoc(theirAtomUri, textMessage, persona) {
   return (dispatch, getState) =>
     connectAdHoc(theirAtomUri, textMessage, persona, dispatch, getState); // moved to separate function to make transpilation work properly
 }
-function connectAdHoc(theirAtomUri, textMessage, persona, dispatch, getState) {
+function connectAdHoc(
+  theirAtomUri,
+  textMessage,
+  personaUri,
+  dispatch,
+  getState
+) {
   ensureLoggedIn(dispatch, getState).then(async () => {
     const state = getState();
     const theirAtom = getIn(state, ["atoms", theirAtomUri]);
@@ -443,9 +470,9 @@ function connectAdHoc(theirAtomUri, textMessage, persona, dispatch, getState) {
       content: {
         responseToUri: theirAtomUri,
         flags: [
-          "won:DirectResponse",
-          "won:NoHintForCounterpart",
-          "won:NoHintForMe",
+          "con:DirectResponse",
+          "match:NoHintForCounterpart",
+          "match:NoHintForMe",
         ],
       },
     };
@@ -458,34 +485,14 @@ function connectAdHoc(theirAtomUri, textMessage, persona, dispatch, getState) {
     );
 
     // add persona
-    if (persona) {
-      const response = await fetch("rest/action/connect", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify([
-          {
-            pending: false,
-            //socket: `${persona}#holderSocket`,
-            socket: getIn(state, [
-              "atoms",
-              persona,
-              "content",
-              "sockets",
-            ]).keyOf("hold:HolderSocket"),
-          },
-          {
-            pending: true,
-            socket: `${atomUri}#holdableSocket`,
-            // FIXME: does not work as new atom is not in state yet
-            //socket: getIn(state, ["atoms", atomUri, "content", "sockets"]).keyOf(
-            //  "hold:HoldableSocket"
-            //),
-          },
-        ]),
-        credentials: "include",
-      });
+    if (personaUri) {
+      const persona = getIn(state, ["atoms", personaUri]);
+      const response = await ownerApi.serverSideConnect(
+        atomUtils.getSocketUri(persona, won.HOLD.HolderSocketCompacted),
+        `${atomUri}#holdableSocket`,
+        false,
+        true
+      );
       if (!response.ok) {
         const errorMsg = await response.text();
         throw new Error(`Could not connect identity: ${errorMsg}`);
@@ -504,6 +511,7 @@ function connectAdHoc(theirAtomUri, textMessage, persona, dispatch, getState) {
     won.wonMessageFromJsonLd(cnctMsg.message).then(optimisticEvent => {
       // connect action to be dispatched when the
       // ad hoc atom has been created:
+      //TODO: FIGURE OUT WHICH SOCKETS WILL BE CONNECTED
       const connectAction = {
         type: actionTypes.atoms.connect,
         payload: {
@@ -522,8 +530,6 @@ function connectAdHoc(theirAtomUri, textMessage, persona, dispatch, getState) {
           actionToDispatch: {
             effect: "stateGoCurrent",
             connectionUri: "responseEvent::receiverUri",
-            postUri: theirAtom,
-            atomUri: atomUri,
           },
         },
       });
@@ -589,7 +595,7 @@ export function connectionsClose(connectionUri) {
 export function connectionsCloseRemote(message) {
   //Closes the 'targetConnection' again, if closeConnections(...) only closes the 'own' connection
   return dispatch => {
-    const connectionUri = message.getSender();
+    const connectionUri = message.getSenderConnection();
     const targetAtomUri = message.getSenderAtom();
     const remoteNode = message.getSenderNode();
     const ownedAtomUri = message.getRecipientAtom();
@@ -680,9 +686,10 @@ export function showLatestMessages(connectionUriParam, numberOfEvents) {
   return (dispatch, getState) => {
     const state = getState();
     const connectionUri =
-      connectionUriParam || getConnectionUriFromRoute(state);
+      connectionUriParam || generalSelectors.getConnectionUriFromRoute(state);
     const atom =
-      connectionUri && getOwnedAtomByConnectionUri(state, connectionUri);
+      connectionUri &&
+      generalSelectors.getOwnedAtomByConnectionUri(state, connectionUri);
     const atomUri = atom && atom.get("uri");
     const connection =
       connectionUri && getOwnedConnectionByUri(state, connectionUri);
@@ -744,7 +751,8 @@ export function loadLatestMessagesOfConnection({
   dispatch,
 }) {
   const atom =
-    connectionUri && getOwnedAtomByConnectionUri(state, connectionUri);
+    connectionUri &&
+    generalSelectors.getOwnedAtomByConnectionUri(state, connectionUri);
   const atomUri = atom && atom.get("uri");
   const connection =
     connectionUri && getOwnedConnectionByUri(state, connectionUri);
@@ -814,9 +822,10 @@ export function showMoreMessages(connectionUriParam, numberOfEvents) {
   return (dispatch, getState) => {
     const state = getState();
     const connectionUri =
-      connectionUriParam || getConnectionUriFromRoute(state);
+      connectionUriParam || generalSelectors.getConnectionUriFromRoute(state);
     const atom =
-      connectionUri && getOwnedAtomByConnectionUri(state, connectionUri);
+      connectionUri &&
+      generalSelectors.getOwnedAtomByConnectionUri(state, connectionUri);
     const atomUri = atom && atom.get("uri");
     const connection = atom && atom.getIn(["connections", connectionUri]);
     const connectionMessages = connection && connection.get("messages");

@@ -15,7 +15,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import won.matcher.rescal.config.RescalMatcherConfig;
+import won.matcher.service.common.event.AtomHintEvent;
 import won.matcher.service.common.event.BulkHintEvent;
+import won.matcher.service.common.event.Cause;
 import won.matcher.service.common.event.HintEvent;
 import won.matcher.utils.tensor.TensorMatchingData;
 
@@ -99,8 +101,8 @@ public class HintReader {
                 // wonNodeUri must have been set as attribute before to be able to read it here
                 String fromWonNodeUri = matchingData.getFirstAttributeOfAtom(atomUri1, "wonNodeUri");
                 String toWonNodeUri = matchingData.getFirstAttributeOfAtom(atomUri2, "wonNodeUri");
-                HintEvent hint = new HintEvent(fromWonNodeUri, atomUri1, toWonNodeUri, atomUri2,
-                                config.getPublicMatcherUri(), value);
+                HintEvent hint = new AtomHintEvent(atomUri1, fromWonNodeUri, atomUri2, toWonNodeUri,
+                                config.getPublicMatcherUri(), value, Cause.MATCHED_OFFLINE);
                 hints.addHintEvent(hint);
             } else {
                 throw new IllegalStateException(

@@ -28,7 +28,7 @@ import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.WonRdfUtils;
-import won.protocol.vocabulary.WON;
+import won.protocol.vocabulary.WONCON;
 
 /**
  * Action executing a ConnectCommandEvent, connecting to the targetAtom on
@@ -79,6 +79,6 @@ public class ExecuteFeedbackCommandAction extends ExecuteSendMessageCommandActio
         // TODO: make more generic by using the URIs specified in the command.
         return WonMessageBuilder.setMessagePropertiesForHintFeedback(
                         wonNodeInformationService.generateEventURI(wonNode), connectionURI, localAtom, wonNode,
-                        URI.create(WON.Good.getURI()).equals(feedbackCommandEvent.getValue())).build();
+                        URI.create(WONCON.Good.getURI()).equals(feedbackCommandEvent.getValue())).build();
     }
 }

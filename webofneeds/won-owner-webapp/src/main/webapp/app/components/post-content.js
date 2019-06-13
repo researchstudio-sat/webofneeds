@@ -9,6 +9,7 @@ import labelledHrModule from "./labelled-hr.js";
 import postContentGeneral from "./post-content-general.js";
 import postContentPersona from "./post-content-persona.js";
 import postContentParticipants from "./post-content-participants.js";
+import atomContentBuddies from "./atom-content-buddies.js";
 import postHeaderModule from "./post-header.js";
 import trigModule from "./trig.js";
 import { attach, getIn, get } from "../utils.js";
@@ -28,8 +29,8 @@ import { classOnComponentRoot } from "../cstm-ng-utils.js";
 import ngAnimate from "angular-animate";
 import { Elm } from "../../elm/AddPersona.elm";
 
-import "style/_post-content.scss";
-import "style/_rdflink.scss";
+import "~/style/_post-content.scss";
+import "~/style/_rdflink.scss";
 import elmModule from "./elm.js";
 
 const CONNECTION_READ_TIMEOUT = 1500;
@@ -85,6 +86,9 @@ function genComponentConf() {
           
           <!-- PARTICIPANT INFORMATION -->
           <won-post-content-participants ng-if="self.isSelectedTab('PARTICIPANTS')" post-uri="self.postUri"></won-post-content-participants>
+          
+          <!-- BUDDY INFORMATION -->
+          <won-atom-content-buddies ng-if="self.isSelectedTab('BUDDIES')" atom-uri="self.postUri"></won-atom-content-buddies>
 
           <!-- REVIEW INFORMATION -->
           <div class="post-content__reviews" ng-if="self.isSelectedTab('REVIEWS')">
@@ -247,7 +251,7 @@ function genComponentConf() {
       const connUri = conn.get("uri");
 
       if (rateBad) {
-        this.connections__rate(connUri, won.WON.binaryRatingBad);
+        this.connections__rate(connUri, won.WONCON.binaryRatingBad);
       }
 
       if (conn.get("unread")) {
@@ -275,8 +279,13 @@ function genComponentConf() {
         });
       }
 
-      this.connections__rate(connUri, won.WON.binaryRatingGood);
+      this.connections__rate(connUri, won.WONCON.binaryRatingGood);
       this.atoms__connect(this.postUri, connUri, targetAtomUri, message);
+      this.router__stateGo("connections", {
+        connectionUri: connUri,
+        viewAtomUri: undefined,
+        viewConnUri: undefined,
+      });
     }
 
     addPersona(persona) {
@@ -360,6 +369,7 @@ export default angular
     postContentPersona,
     postContentParticipants,
     postHeaderModule,
+    atomContentBuddies,
     trigModule,
     inviewModule.name,
     elmModule,

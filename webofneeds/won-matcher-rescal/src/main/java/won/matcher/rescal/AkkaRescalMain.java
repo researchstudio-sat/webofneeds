@@ -17,7 +17,7 @@ public class AkkaRescalMain {
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(
                         MatcherRescalAppConfiguration.class);
         ActorSystem system = ctx.getBean(ActorSystem.class);
-        system.actorOf(SpringExtension.SpringExtProvider.get(system).props(RescalMatcherActor.class),
-                        "RescalMatcherActor");
+        system.actorOf(SpringExtension.SpringExtProvider.get(system).props(RescalMatcherActor.class)
+                        .withDispatcher("prio-dispatcher"), "RescalMatcherActor");
     }
 }

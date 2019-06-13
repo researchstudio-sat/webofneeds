@@ -1,3 +1,4 @@
+PREFIX match: <https://w3id.org/won/matching#>
 prefix won: <https://w3id.org/won/core#>
 prefix rdfs: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 prefix dc: <http://purl.org/dc/elements/1.1/>
@@ -9,8 +10,8 @@ SELECT DISTINCT ?slice ?atom ?value WHERE {
     ?atom won:crawlDate ?date.
     ?atom won:atomState won:Active.
     ?atom won:is/dc:description ?value.
-    OPTIONAL {?atomUri won:flag ?flag}.
-    FILTER (!bound(?flag) || (?flag != won:DoNotMatch && ?flag != won:UsedForTesting))
+    OPTIONAL {?atomUri match:flag ?flag}.
+    FILTER (!bound(?flag) || (?flag != won:DoNotMatch && ?flag != match:UsedForTesting))
     FILTER (?date >= ?from && ?date < ?to)  # bind variables ?from and ?to here
     FILTER (?crawlStatus = 'DONE' || ?crawlStatus = 'SAVE')
 } 

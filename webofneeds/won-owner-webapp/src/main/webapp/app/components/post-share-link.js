@@ -4,11 +4,11 @@ import { actionCreators } from "../actions/actions.js";
 import { attach, toAbsoluteURL } from "../utils.js";
 
 import { connect2Redux, generateSvgQrCode } from "../won-utils.js";
-import { ownerBaseUrl } from "config";
+import { ownerBaseUrl } from "~/config/default.js";
 
 import * as generalSelectors from "../selectors/general-selectors.js";
 
-import "style/_post-share-link.scss";
+import "~/style/_post-share-link.scss";
 
 const serviceDependencies = ["$scope", "$ngRedux", "$element"];
 function genComponentConf() {

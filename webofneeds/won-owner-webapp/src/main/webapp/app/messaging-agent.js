@@ -19,7 +19,7 @@
 import won from "./won-es6.js";
 import { watchImmutableRdxState, getIn } from "./utils.js";
 
-import { ownerBaseUrl } from "config";
+import { ownerBaseUrl } from "~/config/default.js";
 import urljoin from "url-join";
 
 import { actionTypes, actionCreators } from "./actions/actions.js";
@@ -37,8 +37,25 @@ export function runMessagingAgent(redux) {
   const messageProcessingArray = [
     function(message) {
       /* Other clients or matcher initiated stuff: */
-      if (message.isFromExternal() && message.isHintMessage()) {
-        redux.dispatch(actionCreators.messages__processHintMessage(message));
+      if (message.isFromExternal() && message.isAtomHintMessage()) {
+        console.warn(
+          "Omit further handling of received AtomHintMessage: ",
+          message,
+          "TODO: IMPL"
+        );
+        /*redux.dispatch(
+          actionCreators.messages__processAtomHintMessage(message)
+        );
+        return true;*/
+      }
+      return false;
+    },
+    function(message) {
+      /* Other clients or matcher initiated stuff: */
+      if (message.isFromExternal() && message.isSocketHintMessage()) {
+        redux.dispatch(
+          actionCreators.messages__processSocketHintMessage(message)
+        );
         return true;
       }
       return false;
@@ -177,8 +194,7 @@ export function runMessagingAgent(redux) {
                      */
           redux.dispatch(
             actionCreators.router__stateGoAbs("connections", {
-              postUri: message.getSenderAtom(),
-              connectionUri: message.getSender(),
+              connectionUri: message.getSenderConnection(),
             })
           );
           return true;
@@ -194,7 +210,7 @@ export function runMessagingAgent(redux) {
           return true;
         } else if (message.isFailureResponse()) {
           //Resend the failed close message
-          const connectionUri = message.getSender();
+          const connectionUri = message.getSenderConnection();
           if (connectionUri) {
             console.warn("RESEND CLOSE MESSAGE FOR: ", connectionUri);
             redux.dispatch(actionCreators.connections__closeRemote(message));

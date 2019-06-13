@@ -11,7 +11,7 @@ import { classOnComponentRoot } from "../../cstm-ng-utils.js";
 
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 
-import "style/_post-content-message.scss";
+import "~/style/_post-content-message.scss";
 
 function genComponentConf() {
   let template = `

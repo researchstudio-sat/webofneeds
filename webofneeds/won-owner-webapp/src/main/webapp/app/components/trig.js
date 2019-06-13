@@ -2,7 +2,7 @@ import angular from "angular";
 import { attach, trigPrefixesAndBody } from "../utils.js";
 import won from "../won-es6.js";
 
-import "style/_trig.scss";
+import "~/style/_trig.scss";
 
 const serviceDependencies = ["$scope"];
 function genComponentConf() {

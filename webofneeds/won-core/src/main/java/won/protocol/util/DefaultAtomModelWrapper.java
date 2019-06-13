@@ -11,10 +11,13 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.DC;
 import org.apache.jena.vocabulary.RDF;
-import won.protocol.model.Coordinate;
+
 import won.protocol.model.AtomGraphType;
+import won.protocol.model.Coordinate;
 import won.protocol.vocabulary.SCHEMA;
 import won.protocol.vocabulary.WON;
+import won.protocol.vocabulary.WONCON;
+import won.protocol.vocabulary.WONMATCH;
 
 /**
  * Extends {@link AtomModelWrapper} to add matchat specific methods to access
@@ -106,24 +109,24 @@ public class DefaultAtomModelWrapper extends AtomModelWrapper {
 
     public void addTag(String tag) {
         Resource atomNode = getAtomNode(AtomGraphType.ATOM);
-        atomNode.addLiteral(WON.tag, tag);
+        atomNode.addLiteral(WONCON.tag, tag);
     }
 
     public void addSeeksTag(String tag) {
         createSeeksNodeIfNonExist();
-        addSeeksPropertyStringValue(WON.tag, tag);
+        addSeeksPropertyStringValue(WONCON.tag, tag);
     }
 
     public Collection<String> getTags(Resource contentNode) {
-        return getContentPropertyStringValues(contentNode, WON.tag, null);
+        return getContentPropertyStringValues(contentNode, WONCON.tag, null);
     }
 
     public Collection<String> getAllTags() {
-        return getAllContentPropertyStringValues(WON.tag, null);
+        return getAllContentPropertyStringValues(WONCON.tag, null);
     }
 
     public Collection<URI> getAllFlags() {
-        Collection<RDFNode> rdfFlags = getContentPropertyObjects(WON.flag);
+        Collection<RDFNode> rdfFlags = getContentPropertyObjects(WONMATCH.flag);
         Collection<URI> uriFlags = new LinkedList<>();
         for (RDFNode rdfFlag : rdfFlags) {
             if (rdfFlag.isURIResource()) {
@@ -164,14 +167,33 @@ public class DefaultAtomModelWrapper extends AtomModelWrapper {
     }
 
     public Coordinate getLocationCoordinate(Resource contentNode) {
+        return getLocationCoordinate(contentNode, SCHEMA.LOCATION);
+    }
+
+    public Coordinate getJobLocationCoordinate() {
+        return getJobLocationCoordinate(getAtomContentNode());
+    }
+
+    public Coordinate getJobLocationCoordinate(Resource contentNode) {
+        return getLocationCoordinate(contentNode, SCHEMA.JOBLOCATION);
+    }
+
+    /**
+     * Tries to retrieve the coordinates of the location stored in the contentNode
+     * within the given locationProperty
+     * 
+     * @param contentNode contentNode in which the locationProperty is searched for
+     * @param locationProperty e.g SCHEMA.LOCATION or SCHEMA.JOBLOCATION
+     * @param fallbackProperty nullable, will be checked if locationProperty itself
+     * is not present in the contentNode
+     * @return Coordinate if found otherwise null
+     */
+    private Coordinate getLocationCoordinate(Resource contentNode, Property locationProperty) {
         Model atomModel = getAtomModel();
         Property geoProperty = atomModel.createProperty("http://schema.org/", "geo");
         Property longitudeProperty = atomModel.createProperty("http://schema.org/", "longitude");
         Property latitudeProperty = atomModel.createProperty("http://schema.org/", "latitude");
         RDFNode locationNode = RdfUtils.findOnePropertyFromResource(atomModel, contentNode, SCHEMA.LOCATION);
-        if (locationNode == null) {
-            locationNode = RdfUtils.findOnePropertyFromResource(atomModel, contentNode, WON.location);
-        }
         RDFNode geoNode = (locationNode != null && locationNode.isResource())
                         ? RdfUtils.findOnePropertyFromResource(atomModel, locationNode.asResource(), geoProperty)
                         : null;

@@ -18,8 +18,7 @@ public class AkkaSolrMain {
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(
                         MatcherSolrAppConfiguration.class);
         ActorSystem system = ctx.getBean(ActorSystem.class);
-        ActorRef matcherPubSubActor = system.actorOf(
-                        SpringExtension.SpringExtProvider.get(system).props(MatcherPubSubActor.class),
-                        "MatcherPubSubActor");
+        ActorRef matcherPubSubActor = system.actorOf(SpringExtension.SpringExtProvider.get(system)
+                        .props(MatcherPubSubActor.class).withDispatcher("prio-dispatcher"), "MatcherPubSubActor");
     }
 }

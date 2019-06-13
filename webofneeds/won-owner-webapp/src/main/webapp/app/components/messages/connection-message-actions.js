@@ -1,29 +1,14 @@
 import angular from "angular";
 
-import won from "../../won-es6.js";
 import Immutable from "immutable";
 import { connect2Redux } from "../../won-utils.js";
 import { attach, getIn } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
 import { getOwnedAtomByConnectionUri } from "../../selectors/general-selectors.js";
-import {
-  isMessageProposable,
-  isMessageClaimable,
-  isMessageCancelable,
-  isMessageRetractable,
-  isMessageAcceptable,
-  isMessageRejectable,
-  isMessageProposed,
-  isMessageClaimed,
-  isMessageRejected,
-  isMessageAccepted,
-  isMessageRetracted,
-  isMessageCancelled,
-  isMessageCancellationPending,
-  isMessageUnread,
-} from "../../message-utils.js";
+import * as messageUtils from "../../message-utils.js";
+import * as connectionUtils from "../../connection-utils.js";
 
-import "style/_connection-message-actions.scss";
+import "~/style/_connection-message-actions.scss";
 
 const serviceDependencies = ["$ngRedux", "$scope"];
 
@@ -107,26 +92,26 @@ function genComponentConf() {
           ownedAtom,
           message,
           multiSelectType: connection && connection.get("multiSelectType"),
-          isProposed: isMessageProposed(message),
-          isClaimed: isMessageClaimed(message),
-          isAccepted: isMessageAccepted(message),
-          isRejected: isMessageRejected(message),
-          isRetracted: isMessageRetracted(message),
-          isCancellationPending: isMessageCancellationPending(message),
-          isCancelled: isMessageCancelled(message),
+          isProposed: messageUtils.isMessageProposed(message),
+          isClaimed: messageUtils.isMessageClaimed(message),
+          isAccepted: messageUtils.isMessageAccepted(message),
+          isRejected: messageUtils.isMessageRejected(message),
+          isRetracted: messageUtils.isMessageRetracted(message),
+          isCancellationPending: messageUtils.isMessageCancellationPending(
+            message
+          ),
+          isCancelled: messageUtils.isMessageCancelled(message),
           isProposable:
-            connection &&
-            connection.get("state") === won.WON.Connected &&
-            isMessageProposable(message),
+            connectionUtils.isConnected(connection) &&
+            messageUtils.isMessageProposable(message),
           isClaimable:
-            connection &&
-            connection.get("state") === won.WON.Connected &&
-            isMessageClaimable(message),
-          isCancelable: isMessageCancelable(message),
-          isRetractable: isMessageRetractable(message),
-          isRejectable: isMessageRejectable(message),
-          isAcceptable: isMessageAcceptable(message),
-          isUnread: isMessageUnread(message),
+            connectionUtils.isConnected(connection) &&
+            messageUtils.isMessageClaimable(message),
+          isCancelable: messageUtils.isMessageCancelable(message),
+          isRetractable: messageUtils.isMessageRetractable(message),
+          isRejectable: messageUtils.isMessageRejectable(message),
+          isAcceptable: messageUtils.isMessageAcceptable(message),
+          isUnread: messageUtils.isMessageUnread(message),
           isFromSystem: message && message.get("systemMessage"),
           hasReferences: message && message.get("hasReferences"),
         };

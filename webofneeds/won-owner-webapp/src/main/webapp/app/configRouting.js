@@ -8,10 +8,22 @@ import { accountLogin } from "./actions/account-actions.js";
 import { getCurrentParamsFromRoute } from "./selectors/general-selectors.js";
 import { privateId2Credentials } from "./won-utils.js";
 
-import { get, getIn, firstToLowerCase, hyphen2Camel } from "./utils.js";
+import { get, getIn } from "./utils.js";
 
 import * as accountUtils from "./account-utils.js";
 import * as processUtils from "./process-utils.js";
+
+import settingsComponent from "./pages/settings.jsx";
+import postComponent from "./pages/post.jsx";
+import overviewComponent from "./pages/overview.jsx";
+import mapComponent from "./pages/map.jsx";
+import createComponent from "./pages/create.jsx";
+import aboutComponent from "./pages/about.jsx";
+import connectionsComponent from "./pages/connections.jsx";
+import signupComponent from "./pages/signup.jsx";
+import inventoryComponent from "./pages/inventory.jsx";
+
+import jsxRenderer from "@depack/render";
 
 /**
  * As we have configured our router to keep parameters unchanged,
@@ -40,7 +52,7 @@ export const resetParamsImm = Immutable.fromJS(resetParams);
 /**
  * Default Route
  */
-export const defaultRoute = "connections";
+export const defaultRoute = "inventory";
 
 /**
  * Adapted from https://github.com/neilff/redux-ui-router/blob/master/example/index.js
@@ -56,42 +68,66 @@ export const configRouting = [
 
       const origParams = $location.search();
       if (origParams) {
-        const onlyConstParams = addConstParams({}, origParams);
-        //updatedRoute.search(onlyConstParams); // strip all but "constant" parameters
-        $location.search(onlyConstParams);
+        $location.search(addConstParams({}, origParams));
       }
 
       //return updatedRoute;
     });
 
     [
-      { path: "/about?aboutSection", component: "about" },
-      { path: "/overview?viewAtomUri?viewConnUri", component: "overview" },
-      { path: "/map?viewAtomUri?viewConnUri", component: "map" },
-      { path: "/signup", component: "signup" },
-      { path: "/settings", component: "settings" },
       {
-        path:
-          "/connections?privateId?postUri?connectionUri?useCase?useCaseGroup?token?viewAtomUri?viewConnUri?fromAtomUri?mode",
-        component: "connections",
+        path: "/signup",
+        component: signupComponent,
+        as: "signup",
+      },
+      {
+        path: "/about?aboutSection",
+        component: aboutComponent,
+        as: "about",
+      },
+      {
+        path: "/map?viewAtomUri?viewConnUri",
+        component: mapComponent,
+        as: "map",
+      },
+      {
+        path: "/create?useCase?useCaseGroup?fromAtomUri?mode",
+        component: createComponent,
+        as: "create",
+      },
+      {
+        path: "/inventory?viewAtomUri?viewConnUri?token?privateId",
+        component: inventoryComponent,
+        as: "inventory",
+      },
+      {
+        path: "/connections?connectionUri?viewAtomUri?viewConnUri",
+        component: connectionsComponent,
         as: "connections",
       },
       {
+        path: "/overview?viewAtomUri?viewConnUri",
+        component: overviewComponent,
+        as: "overview",
+      },
+      {
         path: "/post/?postUri?viewAtomUri?viewConnUri",
-        component: "post",
+        component: postComponent,
         as: "post",
       },
+      {
+        //path: "/settings{settingsParams:.*}",
+        path: "/settings",
+        component: settingsComponent,
+        as: "settings",
+      },
     ].forEach(({ path, component, as }) => {
-      const cmlComponent = hyphen2Camel(component);
-
-      if (!path) path = `/${component}`;
-      if (!as) as = firstToLowerCase(cmlComponent);
-
       $stateProvider.state(as, {
         url: path,
-        templateUrl: `./app/components/${component}/${component}.html`,
-        // template: `<${component}></${component>` TODO use directives instead of view+ctrl
-        controller: `${cmlComponent}Controller`,
+        template: component.template.children
+          .map(vnode => jsxRenderer(vnode))
+          .join(""),
+        controller: component.controller,
         controllerAs: "self",
         scope: {},
       });
@@ -144,19 +180,6 @@ export function accessControl({
     "\" that won't work" +
     "without logging in. Blocking route-change.";
   switch (toState.name) {
-    case defaultRoute:
-    case "connections": {
-      //If we know the user is not loggedIn and there is a postUri in the route, we link to the post-visitor view
-      const postUriFromRoute = toParams["postUri"];
-      if (
-        !accountUtils.isLoggedIn(get(state, "account")) &&
-        !!postUriFromRoute
-      ) {
-        dispatch(actionCreators.router__stateGoResetParams(defaultRoute));
-      }
-      return;
-    }
-
     case "post": {
       const postUriFromRoute = toParams["postUri"];
 
@@ -175,6 +198,10 @@ export function accessControl({
       }
       return;
 
+    case defaultRoute:
+    case "connections":
+    case "create":
+    case "inventory":
     case "overview":
     case "map":
     case "signup":

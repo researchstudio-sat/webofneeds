@@ -2,8 +2,11 @@
 FROM openjdk:8u121-jdk
 
 # install certbot
-ADD ./jessie-backports.list /etc/apt/sources.list.d/jessie-backports.list
-RUN apt-get update && apt-get install -y certbot -t jessie-backports dos2unix cron
+# next 3 and a half lines as per https://unix.stackexchange.com/questions/508724/failed-to-fetch-jessie-backports-repository (second answer)
+RUN echo "deb [check-valid-until=no] http://cdn-fastly.deb.debian.org/debian jessie main" > /etc/apt/sources.list.d/jessie.list
+RUN echo "deb [check-valid-until=no] http://archive.debian.org/debian jessie-backports main" > /etc/apt/sources.list.d/jessie-backports.list
+RUN sed -i '/deb http:\/\/deb.debian.org\/debian jessie-updates main/d' /etc/apt/sources.list
+RUN apt-get -o Acquire::Check-Valid-Until=false update && apt-get -o Acquire::Check-Valid-Until=false install -y certbot -t jessie-backports dos2unix
 
 # main directory where the certificates are generated. This directory should be mounted to the host since other
 # directories inside (e.g. "live") use symlinks which should not be broken by mounting
@@ -35,6 +38,9 @@ RUN chmod +x /usr/local/bin/certificate-request-and-renew.sh
 RUN dos2unix /usr/local/bin/certificate-request-and-renew.sh
 
 # execute cron to keep container running
-RUN touch /var/log/cron.log
-CMD cron && tail -f /var/log/cron.log
+#RUN touch /var/log/cron.log
+#CMD cron && tail -f /var/log/cron.log
 
+# try to renew letsencrypt certificates
+# Changed from 'RUN' command as this is not a command to change the container but the command to be executed when the container runs
+ENTRYPOINT /usr/local/bin/certificate-request-and-renew.sh

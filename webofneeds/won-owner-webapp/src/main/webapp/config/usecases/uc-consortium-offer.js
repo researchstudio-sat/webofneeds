@@ -13,13 +13,14 @@ export const consortiumOffer = {
   draft: {
     ...mergeInEmptyDraft({
       content: {
-        type: ["won:ConsortiumOffer"],
+        type: ["demo:ConsortiumOffer"],
         title: "Offering a slot in a project consortium",
         tags: ["offer-consortium"],
         searchString: "search-consortium",
       },
     }),
   },
+  reactionUseCases: ["consortiumSearch"],
   details: {
     title: { ...details.title },
     description: { ...details.description },

@@ -1,3 +1,5 @@
+@prefix con:   <https://w3id.org/won/content#> .
+@prefix match:   <https://w3id.org/won/matching#> .
 <https://satvm05.researchstudio.at/won/resource/event/k5g40aj5p9akbum5olil#envelope-cla6-sig> {
     <https://satvm05.researchstudio.at/won/resource/event/k5g40aj5p9akbum5olil#envelope-cla6-sig>
             a       <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature> ;

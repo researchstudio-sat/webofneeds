@@ -9,9 +9,9 @@ import { actionCreators } from "../actions/actions.js";
 import { connect2Redux } from "../won-utils.js";
 import "angular-marked";
 
-import "style/_responsiveness-utils.scss";
-import "style/_toasts.scss";
-import "style/_won-markdown.scss";
+import "~/style/_responsiveness-utils.scss";
+import "~/style/_toasts.scss";
+import "~/style/_won-markdown.scss";
 
 function genToastConf() {
   let template = `

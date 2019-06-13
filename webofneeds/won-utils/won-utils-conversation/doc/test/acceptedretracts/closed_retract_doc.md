@@ -12,7 +12,7 @@
 ```
 <https://localhost:8443/won/resource/event/4055709708568209400#content> {
     event:4055709708568209400
-            won:textMessage  "two" ;
+            con:text  "two" ;
             mod:retracts event:6149800720990867000 .
 }
 
@@ -46,12 +46,12 @@
 
 <https://localhost:8443/won/resource/event/cbcccoqqqbec6bxkl3y3#content-3j4j> {
      event:cbcccoqqqbec6bxkl3y3
-            won:textMessage  "You are connected to the debug bot. You can issue commands that will cause interactions with your atom." .
+            con:text  "You are connected to the debug bot. You can issue commands that will cause interactions with your atom." .
  }
 
 <https://localhost:8443/won/resource/event/m8b6jvgclclzy48p7wqd#content-9icc> {
      event:m8b6jvgclclzy48p7wqd
-            won:textMessage  "    'hint':        create a new atom and send hint to it" ;
+            con:text  "    'hint':        create a new atom and send hint to it" ;
             mod:retracts event:cbcccoqqqbec6bxkl3y3 .  
 ```
 
@@ -71,12 +71,12 @@ event:m8b6jvgclclzy48p7wqd  mod:retracts event:cbcccoqqqbec6bxkl3y3 .
 ```
  <https://localhost:8443/won/resource/event/8h7v5ml1aflqmoyem61a#content-7rw4> {
      event:8h7v5ml1aflqmoyem61a
-            won:textMessage  "Usage:" .
+            con:text  "Usage:" .
  }
 
  <https://localhost:8443/won/resource/event/m8b6jvgclclzy48p7wqd#content-9icc> {
      event:m8b6jvgclclzy48p7wqd
-             won:textMessage  "    'hint':        create a new atom and send hint to it" ;
+             con:text  "    'hint':        create a new atom and send hint to it" ;
            mod:retracts event:8h7v5ml1aflqmoyem61a .
            
  }
@@ -98,18 +98,18 @@ event:m8b6jvgclclzy48p7wqd   mod:retracts event:8h7v5ml1aflqmoyem61a .
 ```
  <https://localhost:8443/won/resource/event/cbcccoqqqbec6bxkl3y3#content-3j4j> {
     event:cbcccoqqqbec6bxkl3y3
-             won:textMessage  "You are connected to the debug bot. You can issue commands that will cause interactions with your atom." .
+             con:text  "You are connected to the debug bot. You can issue commands that will cause interactions with your atom." .
  }
 
  <https://localhost:8443/won/resource/event/orj8iruy8pcer6zzxlra#content-wi31> {
      event:orj8iruy8pcer6zzxlra
-             won:textMessage  "    'close':       close the current connection" ;
+             con:text  "    'close':       close the current connection" ;
              mod:retracts event:m8b6jvgclclzy48p7wqd .
  }
 
  <https://localhost:8443/won/resource/event/m8b6jvgclclzy48p7wqd#content-9icc> {
      event:m8b6jvgclclzy48p7wqd
-             won:textMessage  "    'hint':        create a new atom and send hint to it" ;
+             con:text  "    'hint':        create a new atom and send hint to it" ;
            mod:retracts event:cbcccoqqqbec6bxkl3y3 .
  }   
 ```
@@ -137,7 +137,7 @@ event:m8b6jvgclclzy48p7wqd mod:retracts event:cbcccoqqqbec6bxkl3y3 .
 
 <https://localhost:8443/won/resource/event/gv6zk2yqk6o8bl574n36#content-paqe> {
     event:gv6zk2yqk6o8bl574n36
-            won:textMessage  "Greetings! \nI am the DebugBot. I can simulate multiple other users so you can test things. I understand a few commands. \nTo see which ones, type \n\n'usage'\n\n (without the quotes)." .
+            con:text  "Greetings! \nI am the DebugBot. I can simulate multiple other users so you can test things. I understand a few commands. \nTo see which ones, type \n\n'usage'\n\n (without the quotes)." .
 }
 
 <https://localhost:8443/won/resource/event/4846251213444807000#envelope-tsng> {
@@ -160,7 +160,7 @@ event:m8b6jvgclclzy48p7wqd mod:retracts event:cbcccoqqqbec6bxkl3y3 .
 ```
 <https://localhost:8443/won/resource/event/8h7v5ml1aflqmoyem61a#content-7rw4> {
     event:8h7v5ml1aflqmoyem61a
-            won:textMessage  "Usage:" ;
+            con:text  "Usage:" ;
             mod:retracts event:6149800720990867000 .
 }
 
@@ -176,7 +176,7 @@ event:m8b6jvgclclzy48p7wqd mod:retracts event:cbcccoqqqbec6bxkl3y3 .
     event:6149800720990867000
             won:socket        won:OwnerSocket ;
             won:targetSocket  won:OwnerSocket ;
-            won:textMessage  "Hello, debugbot!" .
+            con:text  "Hello, debugbot!" .
 }
 ```
 
@@ -192,13 +192,13 @@ event:m8b6jvgclclzy48p7wqd mod:retracts event:cbcccoqqqbec6bxkl3y3 .
 ```
 <https://localhost:8443/won/resource/event/8h7v5ml1aflqmoyem61a#content-7rw4> {
     event:8h7v5ml1aflqmoyem61a
-            won:textMessage  "Usage:" ;
+            con:text  "Usage:" ;
             mod:retracts event:m8b6jvgclclzy48p7wqd .
 }
 
 <https://localhost:8443/won/resource/event/m8b6jvgclclzy48p7wqd#content-9icc> {
     event:m8b6jvgclclzy48p7wqd
-            won:textMessage  "    'hint':        create a new atom and send hint to it" .
+            con:text  "    'hint':        create a new atom and send hint to it" .
 }
 ```
 
@@ -214,7 +214,7 @@ event:m8b6jvgclclzy48p7wqd mod:retracts event:cbcccoqqqbec6bxkl3y3 .
 ```
 <https://localhost:8443/won/resource/event/8h7v5ml1aflqmoyem61a#content-7rw4> {
     event:8h7v5ml1aflqmoyem61a
-            won:textMessage  "Usage:" ;
+            con:text  "Usage:" ;
             mod:retracts event:8h7v5ml1aflqmoyem61a .
 }
 ```
@@ -231,13 +231,13 @@ event:m8b6jvgclclzy48p7wqd mod:retracts event:cbcccoqqqbec6bxkl3y3 .
 ```
 <https://localhost:8443/won/resource/event/4846251213444807000#content> {
     event:4846251213444807000
-            won:textMessage  "one" ;
+            con:text  "one" ;
             mod:retracts event:8h7v5ml1aflqmoyem61a .
 }
 
 <https://localhost:8443/won/resource/event/8h7v5ml1aflqmoyem61a#content-7rw4> {
     event:8h7v5ml1aflqmoyem61a
-            won:textMessage  "Usage:" .
+            con:text  "Usage:" .
 }
 ```
 
@@ -253,13 +253,13 @@ event:m8b6jvgclclzy48p7wqd mod:retracts event:cbcccoqqqbec6bxkl3y3 .
 ```
 <https://localhost:8443/won/resource/event/4846251213444807000#content> {
     event:4846251213444807000
-            won:textMessage  "one" ;
+            con:text  "one" ;
             mod:retracts event:4055709708568209400 .
 }
 
 <https://localhost:8443/won/resource/event/4055709708568209400#content> {
     event:4055709708568209400
-            won:textMessage  "two" .
+            con:text  "two" .
 }
 ```
 
@@ -275,7 +275,7 @@ event:m8b6jvgclclzy48p7wqd mod:retracts event:cbcccoqqqbec6bxkl3y3 .
 ```
 <https://localhost:8443/won/resource/event/4055709708568209400#content> {
     event:4055709708568209400
-            won:textMessage  "two" ;
+            con:text  "two" ;
             mod:retracts event:4055709708568209400 .
 }
 ```

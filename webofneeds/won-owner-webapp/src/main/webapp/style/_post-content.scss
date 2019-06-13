@@ -8,8 +8,6 @@ won-post-content {
     display: flex;
     flex-direction: column;
     align-items: stretch;
-
-    overflow: auto;
     word-wrap: break-word;
 
     won-labelled-hr .wlh__label,
@@ -129,7 +127,6 @@ won-post-content {
         }
 
         &__actions {
-          border-right: $thinGrayBorder;
           padding-right: 0.5rem;
           display: grid;
           grid-auto-flow: column;

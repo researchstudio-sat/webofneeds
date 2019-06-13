@@ -5,7 +5,7 @@ import { personalTransportSearch } from "./uc-personal-transport-search.js";
 export const personalMobilityGroup = {
   identifier: "mobilitygroup",
   label: "Mobility",
-  icon: undefined,
+  icon: "#ico36_uc_route_demand",
   subItems: {
     personalTransportSearch: personalTransportSearch,
     taxiOffer: taxiOffer,

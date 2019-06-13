@@ -10,7 +10,7 @@ import postHeaderModule from "../../post-header.js";
 import labelledHrModule from "../../labelled-hr.js";
 import { getActiveAtoms } from "../../../selectors/general-selectors.js";
 
-import "style/_suggestpostpicker.scss";
+import "~/style/_suggestpostpicker.scss";
 
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {

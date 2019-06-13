@@ -72,7 +72,12 @@ public class LinkedDataRestClientHttps extends LinkedDataRestClient {
         } catch (Exception e) {
             throw new RuntimeException("Failed to create rest template for webID '" + webID + "'", e);
         }
-        template.getMessageConverters().add(datasetConverter);
+        // we add our DatasetConverter before any other converter because the jackson
+        // converter feels responsible for "application/*+json" (which matches
+        // "application/ld+json") and is confident it can produce a jena Dataset - but
+        // then of course fails to instantiate one. By putting our converter first, we
+        // can be sure it is used when a jena Dataset is requested.
+        template.getMessageConverters().add(0, datasetConverter);
         return template;
     }
 

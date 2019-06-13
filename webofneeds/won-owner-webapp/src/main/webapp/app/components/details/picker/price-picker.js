@@ -2,7 +2,7 @@ import angular from "angular";
 import { attach, delay, isValidNumber } from "../../../utils.js";
 import wonInput from "../../../directives/input.js";
 
-import "style/_pricepicker.scss";
+import "~/style/_pricepicker.scss";
 
 const serviceDependencies = ["$scope", "$element"];
 function genComponentConf() {

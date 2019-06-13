@@ -7,12 +7,12 @@ import { rehearsalRoomSearch } from "./uc-rehearsal-room-search.js";
 export const artistGroup = {
   identifier: "artistgroup",
   label: "Music",
-  icon: undefined,
+  icon: "#ico36_detail_instrument",
   subItems: {
+    rehearsalRoomOffer: rehearsalRoomOffer,
     bandSearch: bandSearch,
-    musicianSearch: musicianSearch,
     serviceOffer: serviceOffer,
     rehearsalRoomSearch: rehearsalRoomSearch,
-    rehearsalRoomOffer: rehearsalRoomOffer,
+    musicianSearch: musicianSearch,
   },
 };

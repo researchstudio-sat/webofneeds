@@ -2,6 +2,7 @@
  * Created by ksinger on 04.08.2017.
  */
 
+import won from "../won-es6.js";
 import { buildCreateMessage, buildEditMessage } from "../won-message-utils.js";
 
 import { actionCreators, actionTypes } from "./actions.js";
@@ -11,6 +12,8 @@ import { ensureLoggedIn } from "./account-actions.js";
 import { get, getIn } from "../utils.js";
 
 import * as accountUtils from "../account-utils.js";
+import * as atomUtils from "../atom-utils.js";
+import * as ownerApi from "../owner-api.js";
 
 export function atomEdit(draft, oldAtom, nodeUri) {
   return (dispatch, getState) => {
@@ -52,7 +55,7 @@ export function atomEdit(draft, oldAtom, nodeUri) {
   };
 }
 
-export function atomCreate(draft, persona, nodeUri) {
+export function atomCreate(draft, personaUri, nodeUri) {
   return (dispatch, getState) => {
     const state = getState();
 
@@ -75,49 +78,33 @@ export function atomCreate(draft, persona, nodeUri) {
       delete prevParams.privateId;
     }
 
-    return ensureLoggedIn(dispatch, getState)
-      .then(() => {
-        return dispatch(actionCreators.router__stateGoDefault());
-      })
-      .then(async () => {
-        const { message, eventUri, atomUri } = await buildCreateMessage(
-          draft,
-          nodeUri
-        );
-        if (persona) {
-          const response = await fetch("rest/action/connect", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify([
-              {
-                pending: false,
-                socket: `${persona}#holderSocket`,
-              },
-              {
-                pending: true,
-                socket: `${atomUri}#holdableSocket`,
-              },
-            ]),
-            credentials: "include",
-          });
-          if (!response.ok) {
-            const errorMsg = await response.text();
-            throw new Error(`Could not connect identity: ${errorMsg}`);
-          }
-        }
-        dispatch({
-          type: actionTypes.atoms.create,
-          payload: { eventUri, message, atomUri, atom: draft },
-        });
+    return ensureLoggedIn(dispatch, getState).then(async () => {
+      const { message, eventUri, atomUri } = await buildCreateMessage(
+        draft,
+        nodeUri
+      );
 
-        dispatch(
-          actionCreators.router__stateGoAbs("connections", {
-            postUri: undefined,
-            connectionUri: undefined,
-          })
-        );
+      dispatch({
+        type: actionTypes.atoms.create,
+        payload: { eventUri, message, atomUri, atom: draft },
       });
+
+      const persona = getIn(state, ["atoms", personaUri]);
+      if (persona) {
+        return ownerApi
+          .serverSideConnect(
+            atomUtils.getSocketUri(persona, won.HOLD.HolderSocketCompacted),
+            `${atomUri}#holdableSocket`,
+            false,
+            true
+          )
+          .then(async response => {
+            if (!response.ok) {
+              const errorMsg = await response.text();
+              throw new Error(`Could not connect identity: ${errorMsg}`);
+            }
+          });
+      }
+    });
   };
 }
