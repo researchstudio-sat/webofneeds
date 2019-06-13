@@ -142,6 +142,15 @@ export function addAtomStubs(atoms, atomUris, state) {
   return newState;
 }
 
+export function addMetaAtomStubs(atoms, metaAtoms) {
+  let newState = atoms;
+  metaAtoms &&
+    metaAtoms.map((metaAtom, metaAtomUri) => {
+      newState = addAtomStub(newState, metaAtomUri, get(metaAtom, "state")); //TODO: ADD META ATOM AND NOT ONLY THE STUB
+    });
+  return newState;
+}
+
 export function addAtomInCreation(atoms, atomInCreation, atomUri) {
   let newState;
   let atom = Immutable.fromJS(atomInCreation);

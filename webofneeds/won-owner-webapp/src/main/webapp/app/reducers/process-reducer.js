@@ -4,9 +4,10 @@
 import { actionTypes } from "../actions/actions.js";
 import Immutable from "immutable";
 import { getIn } from "../utils.js";
-import { parseAtom } from "./atom-reducer/parse-atom.js";
+import { parseAtom, parseMetaAtom } from "./atom-reducer/parse-atom.js";
 import { parseMessage } from "./atom-reducer/parse-message.js";
 import * as processUtils from "../process-utils.js";
+import * as atomUtils from "../atom-utils.js";
 
 const initialState = Immutable.fromJS({
   processingInitialLoad: true,
@@ -524,25 +525,23 @@ export default function(processState = initialState, action = {}) {
       return processState;
     }
 
-    case actionTypes.atoms.storeOwnedActiveUris: {
-      const atomUris = action.payload.get("uris");
-      atomUris &&
-        atomUris.forEach(atomUri => {
-          processState = updateAtomProcess(processState, atomUri, {
-            loading: true, //FIXME: once we dont actually retrieve the atoms right after this dispatch we need to set "toLoad" instead of loading
-          });
-        });
-      return processState;
-    }
+    case actionTypes.atoms.storeOwnedMetaAtoms: {
+      const metaAtoms = action.payload.get("metaAtoms");
 
-    case actionTypes.atoms.storeOwnedInactiveUris: {
-      const atomUris = action.payload.get("uris");
-      atomUris &&
-        atomUris.forEach(atomUri => {
-          processState = updateAtomProcess(processState, atomUri, {
-            toLoad: true,
-          });
+      metaAtoms &&
+        metaAtoms.map((metaAtom, metaAtomUri) => {
+          const metaAtomImm = parseMetaAtom(metaAtom);
+          if (atomUtils.isActive(metaAtomImm)) {
+            processState = updateAtomProcess(processState, metaAtomUri, {
+              loading: true,
+            });
+          } else if (atomUtils.isInactive(metaAtomImm)) {
+            processState = updateAtomProcess(processState, metaAtomUri, {
+              toLoad: true,
+            });
+          }
         });
+
       return processState;
     }
 

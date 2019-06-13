@@ -1,7 +1,6 @@
 import urljoin from "url-join";
 import { checkHttpStatus } from "./utils";
 import { ownerBaseUrl } from "~/config/default.js";
-import Immutable from "immutable";
 
 /**
  * Created by quasarchimaere on 11.06.2019.
@@ -53,22 +52,6 @@ export function getOwnedMetaAtoms(state) {
   })
     .then(checkHttpStatus)
     .then(response => response.json());
-}
-
-export function getOwnedInactiveAtomUris() {
-  return getOwnedMetaAtoms("INACTIVE").then(metaAtoms => {
-    console.debug("metaAtoms: ", metaAtoms);
-    const atomsImm = Immutable.fromJS(metaAtoms);
-    return [...atomsImm.keys()];
-  });
-}
-
-export function getOwnedActiveAtomUris() {
-  return getOwnedMetaAtoms("ACTIVE").then(metaAtoms => {
-    console.debug("metaAtoms: ", metaAtoms);
-    const atomsImm = Immutable.fromJS(metaAtoms);
-    return [...atomsImm.keys()];
-  });
 }
 
 export function getMessage(atomUri, eventUri) {

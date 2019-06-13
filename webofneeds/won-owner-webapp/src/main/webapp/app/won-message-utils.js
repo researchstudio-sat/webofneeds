@@ -8,9 +8,11 @@ import { urisToLookupMap, is } from "./utils.js";
 
 import { getRandomWonId } from "./won-utils.js";
 import * as useCaseUtils from "./usecase-utils.js";
+import * as atomUtils from "./atom-utils.js";
 import * as connectionUtils from "./connection-utils.js";
 import { actionTypes } from "./actions/actions.js";
 import * as ownerApi from "./owner-api.js";
+import { parseMetaAtom } from "./reducers/atom-reducer/parse-atom.js";
 
 /**
  * Checks if a wonMessage contains content/references that make it necessary for us to check which effects
@@ -548,33 +550,43 @@ export function fetchDataForNonOwnedAtomOnly(atomUri, dispatch) {
 }
 
 export function fetchUnloadedData(dispatch) {
-  return ownerApi.getOwnedInactiveAtomUris().then(atomUris => {
-    dispatch({
-      type: actionTypes.atoms.storeOwnedInactiveUrisInLoading,
-      payload: Immutable.fromJS({ uris: atomUris }),
+  return ownerApi
+    .getOwnedMetaAtoms("INACTIVE")
+    .then(metaAtoms => {
+      console.debug("metaAtoms: ", metaAtoms);
+      const atomsImm = Immutable.fromJS(metaAtoms);
+      return [...atomsImm.keys()];
+    })
+    .then(atomUris => {
+      dispatch({
+        type: actionTypes.atoms.storeOwnedInactiveUrisInLoading,
+        payload: Immutable.fromJS({ uris: atomUris }),
+      });
+      return fetchDataForOwnedAtoms(atomUris, dispatch);
     });
-    return fetchDataForOwnedAtoms(atomUris, dispatch);
-  });
 }
 
 export function fetchOwnedData(dispatch) {
   return ownerApi
-    .getOwnedInactiveAtomUris()
-    .then(inactiveAtomUris =>
+    .getOwnedMetaAtoms()
+    .then(metaAtoms => {
+      const atomsImm = Immutable.fromJS(metaAtoms);
       dispatch({
-        type: actionTypes.atoms.storeOwnedInactiveUris,
-        payload: Immutable.fromJS({ uris: inactiveAtomUris }),
-      })
-    )
-    .then(() => ownerApi.getOwnedActiveAtomUris())
-    .then(atomUris => {
-      dispatch({
-        type: actionTypes.atoms.storeOwnedActiveUris,
-        payload: Immutable.fromJS({ uris: atomUris }),
+        type: actionTypes.atoms.storeOwnedMetaAtoms,
+        payload: Immutable.fromJS({
+          metaAtoms: atomsImm ? atomsImm : Immutable.Map(),
+        }),
       });
-      return atomUris;
+
+      const activeAtomsImm =
+        atomsImm &&
+        atomsImm.filter(metaAtom =>
+          atomUtils.isActive(parseMetaAtom(metaAtom))
+        );
+
+      return [...activeAtomsImm.keys()];
     })
-    .then(atomUris => fetchDataForOwnedAtoms(atomUris, dispatch));
+    .then(activeAtomUris => fetchDataForOwnedAtoms(activeAtomUris, dispatch));
 }
 
 export function fetchWhatsNew(

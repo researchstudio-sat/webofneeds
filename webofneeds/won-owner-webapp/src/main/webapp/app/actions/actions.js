@@ -160,9 +160,8 @@ const actionHierarchy = {
     storeWhatsNew: INJ_DEFAULT,
     storeWhatsAround: INJ_DEFAULT,
 
-    storeOwnedInactiveUris: INJ_DEFAULT,
     storeOwnedInactiveUrisInLoading: INJ_DEFAULT,
-    storeOwnedActiveUris: INJ_DEFAULT,
+    storeOwnedMetaAtoms: INJ_DEFAULT,
     storeTheirUrisInLoading: INJ_DEFAULT,
 
     storeOwned: INJ_DEFAULT,

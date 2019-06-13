@@ -9,6 +9,7 @@ import {
   addAtomStubs,
   addAtom,
   addAtomInCreation,
+  addMetaAtomStubs,
   deleteAtom,
 } from "./reduce-atoms.js";
 import {
@@ -58,22 +59,18 @@ export default function(allAtomsInState = initialState, action = {}) {
         atom.set("connections", Immutable.Map())
       );
 
-    case actionTypes.atoms.storeOwnedActiveUris: {
-      return addAtomStubs(
-        allAtomsInState,
-        action.payload.get("uris"),
-        won.WON.ActiveCompacted
-      );
-    }
-
-    case actionTypes.atoms.storeOwnedInactiveUrisInLoading:
-    case actionTypes.atoms.storeOwnedInactiveUris: {
+    case actionTypes.atoms.storeOwnedInactiveUrisInLoading: {
       return addAtomStubs(
         allAtomsInState,
         action.payload.get("uris"),
         won.WON.InactiveCompacted
       );
     }
+
+    case actionTypes.atoms.storeOwnedMetaAtoms: {
+      return addMetaAtomStubs(allAtomsInState, action.payload.get("metaAtoms"));
+    }
+
     case actionTypes.atoms.storeWhatsNew:
     case actionTypes.atoms.storeWhatsAround: {
       const metaAtoms = action.payload.get("metaAtoms");
