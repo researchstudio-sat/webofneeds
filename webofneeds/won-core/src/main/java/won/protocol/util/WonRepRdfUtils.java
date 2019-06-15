@@ -1,12 +1,9 @@
 package won.protocol.util;
 
-import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.rdf.model.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import won.protocol.vocabulary.WONCON;
 
 public class WonRepRdfUtils extends WonRdfUtils {
     private static final Logger logger = LoggerFactory.getLogger(WonRepRdfUtils.class);
