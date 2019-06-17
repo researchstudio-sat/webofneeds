@@ -1,4 +1,4 @@
-import { parseAtom } from "./parse-atom.js";
+import { parseAtom, parseMetaAtom } from "./parse-atom.js";
 import Immutable from "immutable";
 import { get } from "../../utils.js";
 import won from "../../won-es6.js";
@@ -145,10 +145,25 @@ export function addAtomStubs(atoms, atomUris, state) {
 export function addMetaAtomStubs(atoms, metaAtoms) {
   let newState = atoms;
   metaAtoms &&
-    metaAtoms.map((metaAtom, metaAtomUri) => {
-      newState = addAtomStub(newState, metaAtomUri, get(metaAtom, "state")); //TODO: ADD META ATOM AND NOT ONLY THE STUB
+    metaAtoms.map(metaAtom => {
+      newState = addMetaAtomStub(newState, metaAtom);
     });
   return newState;
+}
+
+function addMetaAtomStub(atoms, metaAtom) {
+  const parsedMetaAtom = parseMetaAtom(metaAtom);
+
+  const parsedAtomUri = get(parsedMetaAtom, "uri");
+  let existingAtom = get(atoms, parsedAtomUri);
+
+  if (parsedAtomUri && !existingAtom) {
+    return atoms.set(parsedAtomUri, parsedMetaAtom);
+  } else {
+    console.error("Tried to add invalid atom-object: ", metaAtom);
+  }
+
+  return atoms;
 }
 
 export function addAtomInCreation(atoms, atomInCreation, atomUri) {

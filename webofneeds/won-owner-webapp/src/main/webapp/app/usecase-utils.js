@@ -85,18 +85,20 @@ export function findUseCaseByAtom(atomImm) {
         contentTypes.includes("s:PlanAction")
       ) {
         matchingUseCases = matchingUseCases.filter(useCase => {
-          let eventObject = getIn(useCase, ["draft", "content", "eventObject"]);
-
-          if (Immutable.List.isList(eventObject)) {
-            const eventObjectSize = eventObject.size;
-            const matchingEventObjectSize = eventObject.filter(object =>
-              getIn(atomImm, ["content", "eventObject"]).includes(object)
+          const draftEventObject = getIn(useCase, [
+            "draft",
+            "content",
+            "eventObject",
+          ]);
+          const atomEventObject = getIn(atomImm, ["content", "eventObject"]);
+          if (Immutable.List.isList(draftEventObject)) {
+            const eventObjectSize = draftEventObject.size;
+            const matchingEventObjectSize = draftEventObject.filter(
+              object => atomEventObject && atomEventObject.includes(object)
             ).size;
             return eventObjectSize == matchingEventObjectSize;
           }
-          return getIn(atomImm, ["content", "eventObject"]).includes(
-            eventObject
-          );
+          return atomEventObject && atomEventObject.includes(draftEventObject);
         });
       }
 
@@ -113,17 +115,22 @@ export function findUseCaseByAtom(atomImm) {
         seeksTypes.includes("s:PlanAction")
       ) {
         matchingUseCases = matchingUseCases.filter(useCase => {
-          let eventObject = getIn(useCase, ["draft", "seeks", "eventObject"]);
+          const draftEventObject = getIn(useCase, [
+            "draft",
+            "seeks",
+            "eventObject",
+          ]);
+          const atomEventObject = getIn(atomImm, ["seeks", "eventObject"]);
 
-          if (Immutable.List.isList(eventObject)) {
+          if (Immutable.List.isList(draftEventObject)) {
             //Fixme: work with check for all list objects
-            const eventObjectSize = eventObject.size;
-            const matchingEventObjectSize = eventObject.filter(object =>
-              getIn(atomImm, ["seeks", "eventObject"]).includes(object)
+            const eventObjectSize = draftEventObject.size;
+            const matchingEventObjectSize = draftEventObject.filter(
+              object => atomEventObject && atomEventObject.includes(object)
             ).size;
             return eventObjectSize == matchingEventObjectSize;
           }
-          return getIn(atomImm, ["seeks", "eventObject"]).includes(eventObject);
+          return atomEventObject && atomEventObject.includes(draftEventObject);
         });
       }
 

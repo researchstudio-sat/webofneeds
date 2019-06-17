@@ -45,7 +45,7 @@ export function parseAtom(jsonldAtom) {
         enabledUseCases: undefined,
         reactionUseCases: undefined,
       },
-      background: generateBackground(jsonldAtomImm),
+      background: generateBackground(get(jsonldAtomImm, "@id")),
       unread: false,
       isBeingCreated: false,
       jsonld: jsonldAtom,
@@ -115,6 +115,8 @@ export function parseMetaAtom(metaAtom) {
       types.map(type =>
         type
           .replace("https://w3id.org/won/core#", "won:")
+          .replace("https://w3id.org/won/content#", "con:")
+          .replace("https://w3id.org/won/ext/demo#", "demo:")
           .replace("http://schema.org/", "s:")
       )
     );
@@ -123,6 +125,8 @@ export function parseMetaAtom(metaAtom) {
     flags.map(flag =>
       flag
         .replace("https://w3id.org/won/core#", "won:")
+        .replace("https://w3id.org/won/content#", "con:")
+        .replace("https://w3id.org/won/ext/demo#", "demo:")
         .replace("http://schema.org/", "s:")
     );
   const extractLocation = location =>
@@ -147,7 +151,14 @@ export function parseMetaAtom(metaAtom) {
   if (metaAtomImm) {
     let parsedMetaAtom = {
       uri: get(metaAtomImm, "uri"),
+      identiconSvg: undefined,
+      nodeUri: undefined,
       state: extractStateFromMeta(get(metaAtomImm, "state")),
+      heldBy: undefined,
+      holds: Immutable.Set(),
+      buddies: Immutable.Set(),
+      rating: undefined,
+      groupMembers: Immutable.Set(),
       content: {
         type: extractTypes(get(metaAtomImm, "types")),
         flags: extractFlags(get(metaAtomImm, "flags")),
@@ -163,6 +174,21 @@ export function parseMetaAtom(metaAtom) {
       creationDate:
         get(metaAtomImm, "creationDate") &&
         new Date(get(metaAtomImm, "creationDate")),
+      lastUpdateDate:
+        get(metaAtomImm, "creationDate") &&
+        new Date(get(metaAtomImm, "creationDate")),
+      humanReadable: undefined,
+      matchedUseCase: {
+        identifier: undefined,
+        icon: undefined,
+        enabledUseCases: undefined,
+        reactionUseCases: undefined,
+      },
+      background: generateBackground(get(metaAtomImm, "uri")),
+      unread: false,
+      isBeingCreated: false,
+      jsonld: undefined,
+      connections: Immutable.Map(),
     };
 
     if (
@@ -170,7 +196,31 @@ export function parseMetaAtom(metaAtom) {
       parsedMetaAtom.modifiedDate &&
       parsedMetaAtom.creationDate
     ) {
-      return Immutable.fromJS(parsedMetaAtom);
+      const parsedAtomImm = Immutable.fromJS(parsedMetaAtom);
+
+      if (!isPersona(parsedAtomImm)) {
+        const matchingUseCase = useCaseUtils.findUseCaseByAtom(parsedAtomImm);
+
+        if (matchingUseCase) {
+          return parsedAtomImm
+            .setIn(["matchedUseCase", "identifier"], matchingUseCase.identifier)
+            .setIn(["matchedUseCase", "icon"], matchingUseCase.icon)
+            .setIn(
+              ["matchedUseCase", "enabledUseCases"],
+              matchingUseCase.enabledUseCases
+                ? Immutable.fromJS(matchingUseCase.enabledUseCases)
+                : Immutable.List()
+            )
+            .setIn(
+              ["matchedUseCase", "reactionUseCases"],
+              matchingUseCase.reactionUseCases
+                ? Immutable.fromJS(matchingUseCase.reactionUseCases)
+                : Immutable.List()
+            );
+        }
+      }
+
+      return parsedAtomImm;
     } else {
       console.error(
         "Cant parse metaAtom, data is an invalid atom-object: ",
@@ -240,9 +290,7 @@ function generateIdenticon(atomJsonLd) {
   return idc.toString();
 }
 
-function generateBackground(atomJsonLd) {
-  const atomUri = atomJsonLd.get("@id");
-
+function generateBackground(atomUri) {
   if (!atomUri) {
     return;
   }
