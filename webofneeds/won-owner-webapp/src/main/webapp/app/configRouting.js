@@ -6,7 +6,7 @@ import Immutable from "immutable";
 import { actionCreators } from "./actions/actions.js";
 import { accountLogin } from "./actions/account-actions.js";
 import { getCurrentParamsFromRoute } from "./selectors/general-selectors.js";
-import { privateId2Credentials } from "./won-utils.js";
+import * as wonUtils from "./won-utils.js";
 
 import { get, getIn } from "./utils.js";
 
@@ -260,7 +260,9 @@ function reactToPrivateIdChanges(
 ) {
   const state = getState();
 
-  const { email } = toPrivateId ? privateId2Credentials(toPrivateId) : {};
+  const { email } = toPrivateId
+    ? wonUtils.privateId2Credentials(toPrivateId)
+    : {};
   if (processUtils.isProcessingLogin(get(state, "process"))) {
     console.debug(
       "There's already a login in process with the email " +

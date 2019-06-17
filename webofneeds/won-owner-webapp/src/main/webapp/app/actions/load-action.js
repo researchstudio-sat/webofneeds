@@ -7,11 +7,11 @@ import { actionTypes, actionCreators } from "./actions.js";
 
 import { checkAccessToCurrentRoute } from "../configRouting.js";
 
-import * as wonUtils from "../won-utils.js";
+import * as ownerApi from "../owner-api.js";
 import * as stateStore from "../redux/state-store.js";
 
 export const pageLoadAction = () => (dispatch, getState) => {
-  wonUtils
+  ownerApi
     .checkLoginStatus()
     /* handle data, dispatch actions */
     .then(data =>

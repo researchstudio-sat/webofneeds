@@ -6,10 +6,8 @@ import angular from "angular";
 import ngAnimate from "angular-animate";
 import { actionCreators } from "../actions/actions.js";
 import { attach, toAbsoluteURL, getIn, get } from "../utils.js";
-import {
-  connect2Redux,
-  createDocumentDefinitionFromPost,
-} from "../won-utils.js";
+import { connect2Redux } from "../won-utils.js";
+import * as wonUtils from "../won-utils.js";
 import * as atomUtils from "../atom-utils.js";
 import * as processUtils from "../process-utils.js";
 import * as generalSelectors from "../selectors/general-selectors.js";
@@ -217,7 +215,9 @@ function genComponentConf() {
 
     exportPdf() {
       if (!this.post) return;
-      const docDefinition = createDocumentDefinitionFromPost(this.post);
+      const docDefinition = wonUtils.createDocumentDefinitionFromPost(
+        this.post
+      );
 
       if (docDefinition) {
         pdfMake.vfs = pdfFonts.pdfMake.vfs;

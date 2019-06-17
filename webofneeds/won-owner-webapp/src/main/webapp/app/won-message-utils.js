@@ -4,7 +4,7 @@
 
 import won from "./won-es6.js";
 
-import { getRandomWonId } from "./won-utils.js";
+import * as wonUtils from "./won-utils.js";
 import * as useCaseUtils from "./usecase-utils.js";
 
 /**
@@ -38,7 +38,9 @@ export function buildRateMessage(
     const buildMessage = function(envelopeData) {
       //TODO: use event URI pattern specified by WoN node
       const eventUri =
-        envelopeData[won.WONMSG.senderNode] + "/event/" + getRandomWonId();
+        envelopeData[won.WONMSG.senderNode] +
+        "/event/" +
+        wonUtils.getRandomWonId();
       const message = new won.MessageBuilder(won.WONMSG.feedbackMessage) //TODO: Looks like a copy-paste-leftover from connect
         .eventURI(eventUri)
         .ownerDirection()
@@ -79,7 +81,9 @@ export function buildCloseMessage(
   const buildMessage = function(envelopeData) {
     //TODO: use event URI pattern specified by WoN node
     const eventUri =
-      envelopeData[won.WONMSG.senderNode] + "/event/" + getRandomWonId();
+      envelopeData[won.WONMSG.senderNode] +
+      "/event/" +
+      wonUtils.getRandomWonId();
     const message = new won.MessageBuilder(won.WONMSG.closeMessage)
       .eventURI(eventUri)
       .forEnvelopeData(envelopeData)
@@ -111,7 +115,9 @@ export function buildCloseMessage(
 export function buildCloseAtomMessage(atomUri, wonNodeUri) {
   const buildMessage = function(envelopeData) {
     const eventUri =
-      envelopeData[won.WONMSG.senderNode] + "/event/" + getRandomWonId();
+      envelopeData[won.WONMSG.senderNode] +
+      "/event/" +
+      wonUtils.getRandomWonId();
     const message = new won.MessageBuilder(won.WONMSG.closeAtomMessage)
       .eventURI(eventUri)
       .recipientNode(wonNodeUri)
@@ -134,7 +140,9 @@ export function buildCloseAtomMessage(atomUri, wonNodeUri) {
 export function buildDeleteAtomMessage(atomUri, wonNodeUri) {
   const buildMessage = function(envelopeData) {
     const eventUri =
-      envelopeData[won.WONMSG.senderNode] + "/event/" + getRandomWonId();
+      envelopeData[won.WONMSG.senderNode] +
+      "/event/" +
+      wonUtils.getRandomWonId();
     const message = new won.MessageBuilder(won.WONMSG.deleteAtomMessage)
       .eventURI(eventUri)
       .recipientNode(wonNodeUri)
@@ -157,7 +165,9 @@ export function buildDeleteAtomMessage(atomUri, wonNodeUri) {
 export function buildOpenAtomMessage(atomUri, wonNodeUri) {
   const buildMessage = function(envelopeData) {
     const eventUri =
-      envelopeData[won.WONMSG.senderNode] + "/event/" + getRandomWonId();
+      envelopeData[won.WONMSG.senderNode] +
+      "/event/" +
+      wonUtils.getRandomWonId();
     const message = new won.MessageBuilder(won.WONMSG.activateAtomMessage)
       .eventURI(eventUri)
       .recipientNode(wonNodeUri)
@@ -210,7 +220,7 @@ export function buildConnectMessage({
   }
   //TODO: use event URI pattern specified by WoN node
   const eventUri =
-    envelopeData[won.WONMSG.senderNode] + "/event/" + getRandomWonId();
+    envelopeData[won.WONMSG.senderNode] + "/event/" + wonUtils.getRandomWonId();
   const messageBuilder = new won.MessageBuilder(won.WONMSG.connectMessage);
   messageBuilder.eventURI(eventUri);
   messageBuilder.forEnvelopeData(envelopeData);
@@ -255,7 +265,9 @@ export function buildChatMessage({
   const messageP = Promise.all([envelopeDataP, jsonldGraphPayloadP]).then(
     ([envelopeData, graphPayload]) => {
       const eventUri =
-        envelopeData[won.WONMSG.senderNode] + "/event/" + getRandomWonId();
+        envelopeData[won.WONMSG.senderNode] +
+        "/event/" +
+        wonUtils.getRandomWonId();
 
       /*
              * Build the json-ld message that's signed on the owner-server
@@ -405,7 +417,9 @@ export function buildOpenMessage(
     .then(envelopeData => {
       //TODO: use event URI pattern specified by WoN node
       const eventUri =
-        envelopeData[won.WONMSG.senderNode] + "/event/" + getRandomWonId();
+        envelopeData[won.WONMSG.senderNode] +
+        "/event/" +
+        wonUtils.getRandomWonId();
       const message = new won.MessageBuilder(won.WONMSG.openMessage)
         .eventURI(eventUri)
         .forEnvelopeData(envelopeData)
@@ -450,7 +464,7 @@ export async function buildEditMessage(editedAtomData, oldAtom, wonNodeUri) {
     socket: editedAtomData.socket,
   });
 
-  const msgUri = wonNodeUri + "/event/" + getRandomWonId(); //mandatory
+  const msgUri = wonNodeUri + "/event/" + wonUtils.getRandomWonId(); //mandatory
   const msgJson = won.buildMessageRdf(contentRdf, {
     recipientNode: wonNodeUri, //mandatory
     senderNode: wonNodeUri, //mandatory
@@ -493,7 +507,7 @@ export async function buildCreateMessage(atomData, wonNodeUri) {
         throw new Error('Tried to create post without type or title. ', atomData);
     */
 
-  const publishedContentUri = wonNodeUri + "/atom/" + getRandomWonId();
+  const publishedContentUri = wonNodeUri + "/atom/" + wonUtils.getRandomWonId();
 
   //if type  create -> use atomBuilder as well
   const prepareContentNodeData = async atomData => ({
@@ -517,7 +531,7 @@ export async function buildCreateMessage(atomData, wonNodeUri) {
     socket: atomData.socket,
   });
 
-  const msgUri = wonNodeUri + "/event/" + getRandomWonId(); //mandatory
+  const msgUri = wonNodeUri + "/event/" + wonUtils.getRandomWonId(); //mandatory
   const msgJson = won.buildMessageRdf(contentRdf, {
     recipientNode: wonNodeUri, //mandatory
     senderNode: wonNodeUri, //mandatory

@@ -3,7 +3,8 @@ import ngAnimate from "angular-animate";
 import { actionCreators } from "../actions/actions.js";
 import { attach, toAbsoluteURL } from "../utils.js";
 
-import { connect2Redux, generateSvgQrCode } from "../won-utils.js";
+import { connect2Redux } from "../won-utils.js";
+import * as wonUtils from "../won-utils.js";
 import { ownerBaseUrl } from "~/config/default.js";
 
 import * as generalSelectors from "../selectors/general-selectors.js";
@@ -55,7 +56,7 @@ function genComponentConf() {
 
           linkToPost = toAbsoluteURL(ownerBaseUrl).toString() + path;
         }
-        let svgQrCodeToPost = generateSvgQrCode(linkToPost);
+        let svgQrCodeToPost = wonUtils.generateSvgQrCode(linkToPost);
 
         return {
           post,

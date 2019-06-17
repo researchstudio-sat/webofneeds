@@ -1,10 +1,5 @@
 import { get, getIn, getFromJsonLd } from "../../app/utils.js";
-import {
-  genSPlace,
-  genDetailBaseUri,
-  parseSPlace,
-  parsePlaceLeniently,
-} from "../../app/won-utils.js";
+import * as wonUtils from "../../app/won-utils.js";
 import Immutable from "immutable";
 import won from "../../app/won-es6.js";
 
@@ -22,9 +17,9 @@ export const location = {
   },
   parseToRDF: function({ value, identifier, contentUri }) {
     return {
-      "s:location": genSPlace({
+      "s:location": wonUtils.genSPlace({
         geoData: value,
-        baseUri: genDetailBaseUri(contentUri, identifier),
+        baseUri: wonUtils.genDetailBaseUri(contentUri, identifier),
       }),
     };
   },
@@ -32,7 +27,7 @@ export const location = {
     const jsonldLocation =
       jsonLDImm &&
       (jsonLDImm.get("s:location") || jsonLDImm.get("won:location"));
-    return parseSPlace(jsonldLocation);
+    return wonUtils.parseSPlace(jsonldLocation);
   },
   generateHumanReadable: function({ value, includeLabel }) {
     return sPlaceToHumanReadable({
@@ -52,15 +47,15 @@ export const jobLocation = {
   messageEnabled: true,
   parseToRDF: function({ value, identifier, contentUri }) {
     return {
-      "s:jobLocation": genSPlace({
+      "s:jobLocation": wonUtils.genSPlace({
         geoData: value,
-        baseUri: genDetailBaseUri(contentUri, identifier),
+        baseUri: wonUtils.genDetailBaseUri(contentUri, identifier),
       }),
     };
   },
   parseFromRDF: function(jsonLDImm) {
     const jsonldLocation = jsonLDImm && jsonLDImm.get("s:jobLocation");
-    return parseSPlace(jsonldLocation);
+    return wonUtils.parseSPlace(jsonldLocation);
   },
   generateHumanReadable: function({ value, includeLabel }) {
     return sPlaceToHumanReadable({
@@ -86,12 +81,12 @@ export const travelAction = {
       return { "con:travelAction": undefined };
     }
 
-    const baseUri = genDetailBaseUri(contentUri, identifier);
+    const baseUri = wonUtils.genDetailBaseUri(contentUri, identifier);
     return {
       "con:travelAction": {
         "@id": baseUri,
         "@type": "s:TravelAction",
-        "s:fromLocation": genSPlace({
+        "s:fromLocation": wonUtils.genSPlace({
           geoData: {
             lat: getIn(value, ["fromLocation", "lat"]),
             lng: getIn(value, ["fromLocation", "lng"]),
@@ -101,7 +96,7 @@ export const travelAction = {
           baseUri: baseUri && baseUri + "/fromLocation",
         }),
 
-        "s:toLocation": genSPlace({
+        "s:toLocation": wonUtils.genSPlace({
           geoData: {
             lat: getIn(value, ["toLocation", "lat"]),
             lng: getIn(value, ["toLocation", "lng"]),
@@ -119,10 +114,10 @@ export const travelAction = {
 
     const jsonLdTravelActionImm = Immutable.fromJS(jsonLdTravelAction);
 
-    const fromLocation = parsePlaceLeniently(
+    const fromLocation = wonUtils.parsePlaceLeniently(
       getFromJsonLd(jsonLdTravelActionImm, "s:fromLocation", won.defaultContext)
     );
-    const toLocation = parsePlaceLeniently(
+    const toLocation = wonUtils.parsePlaceLeniently(
       getFromJsonLd(jsonLdTravelActionImm, "s:toLocation", won.defaultContext)
     );
 

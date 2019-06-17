@@ -27,7 +27,7 @@ import {
   get,
   getInFromJsonLd,
 } from "../utils.js";
-import { parseJsonldLeaf, parseJsonldLeafsImm } from "../won-utils.js";
+import * as wonUtils from "../won-utils.js";
 
 import { ownerBaseUrl } from "~/config/default.js";
 import urljoin from "url-join";
@@ -1805,7 +1805,7 @@ function groupByGraphs(jsonldData, addDefaultContext = true) {
 
 /**
  * Traverses the `path` into the json-ld object and then tries to
- * parse that node as RDF literal object (see `parseJsonldLeafsImm` for
+ * parse that node as RDF literal object (see `wonUtils.parseJsonldLeafsImm` for
  * details on that).
  *
  * @param {*} jsonld
@@ -1816,7 +1816,10 @@ function groupByGraphs(jsonldData, addDefaultContext = true) {
  */
 won.parseListFrom = (jsonld, path, type, context = won.defaultContext) => {
   try {
-    return parseJsonldLeafsImm(getInFromJsonLd(jsonld, path, context), type);
+    return wonUtils.parseJsonldLeafsImm(
+      getInFromJsonLd(jsonld, path, context),
+      type
+    );
   } catch (err) {
     console.error("Could not parse From list: ", err);
     return undefined;
@@ -1825,7 +1828,7 @@ won.parseListFrom = (jsonld, path, type, context = won.defaultContext) => {
 
 /**
  * Traverses the `path` into the json-ld object and then tries to
- * parse that node as RDF literal object (see `parseJsonldLeafsImm` for
+ * parse that node as RDF literal object (see `wonUtils.parseJsonldLeaf` for
  * details on that).
  *
  * @param {*} jsonld
@@ -1835,5 +1838,5 @@ won.parseListFrom = (jsonld, path, type, context = won.defaultContext) => {
  * @return the value at the path
  */
 won.parseFrom = (jsonld, path, type, context = won.defaultContext) => {
-  return parseJsonldLeaf(getInFromJsonLd(jsonld, path, context), type);
+  return wonUtils.parseJsonldLeaf(getInFromJsonLd(jsonld, path, context), type);
 };

@@ -15,7 +15,7 @@ import {
 } from "../../../utils.js";
 import { doneTypingBufferNg, DomCache } from "../../../cstm-ng-utils.js";
 
-import { initLeaflet, leafletBounds } from "../../../won-utils.js";
+import * as wonUtils from "../../../won-utils.js";
 import titlePickerModule from "./title-picker.js";
 
 import "~/style/_locationpicker.scss";
@@ -98,7 +98,7 @@ function genComponentConf() {
       attach(this, serviceDependencies, arguments);
       this.domCache = new DomCache(this.$element);
 
-      this.map = initLeaflet(this.mapMount());
+      this.map = wonUtils.initLeaflet(this.mapMount());
       this.map.on("click", e => onMapClick(e, this));
 
       this.locationIsSaved = !!this.initialValue;
@@ -197,7 +197,7 @@ function genComponentConf() {
       this.showResetButton = true;
 
       this.placeMarkers([location]);
-      this.map.fitBounds(leafletBounds(location), { animate: true });
+      this.map.fitBounds(wonUtils.leafletBounds(location), { animate: true });
       this.markers[0].openPopup();
     }
 

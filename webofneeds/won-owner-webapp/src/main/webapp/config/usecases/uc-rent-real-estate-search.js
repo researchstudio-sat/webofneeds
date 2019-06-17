@@ -9,7 +9,7 @@ import {
   realEstateNumberOfRoomsRangeDetail,
 } from "../details/real-estate.js";
 
-import { findLatestIntervallEndInJsonLdOrNowAndAddMillis } from "../../app/won-utils.js";
+import * as wonUtils from "../../app/won-utils.js";
 import {
   filterFloorSizeRange,
   filterNumOfRoomsRange,
@@ -24,7 +24,7 @@ export const rentRealEstateSearch = {
   label: "Find a place to rent",
   icon: "#ico36_uc_realestate",
   timeToLiveMillisDefault: 1000 * 60 * 60 * 24 * 30 * 3,
-  doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
+  doNotMatchAfter: wonUtils.findLatestIntervallEndInJsonLdOrNowAndAddMillis,
   draft: {
     ...mergeInEmptyDraft({
       seeks: {

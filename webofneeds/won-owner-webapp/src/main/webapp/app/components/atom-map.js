@@ -7,7 +7,8 @@ import inviewModule from "angular-inview";
 import { attach } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import L from "../leaflet-bundleable.js";
-import { initLeaflet, connect2Redux } from "../won-utils.js";
+import { connect2Redux } from "../won-utils.js";
+import * as wonUtils from "../won-utils.js";
 
 import { DomCache } from "../cstm-ng-utils.js";
 
@@ -41,7 +42,7 @@ function genComponentConf() {
           }
         : {};
 
-      this.map = initLeaflet(this.mapMount(), overrideOptions);
+      this.map = wonUtils.initLeaflet(this.mapMount(), overrideOptions);
 
       this.$scope.$watchGroup(
         ["self.locations", "self.currentLocation"],
