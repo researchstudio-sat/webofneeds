@@ -7,7 +7,7 @@ import { actionTypes, actionCreators } from "./actions.js";
 import { getIn } from "../utils.js";
 
 import Immutable from "immutable";
-import { getOwnMessageUri } from "../message-utils.js";
+import { getOwnMessageUri } from "../redux/utils/message-utils.js";
 import * as generalSelectors from "../selectors/general-selectors.js";
 
 import {

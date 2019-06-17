@@ -2,7 +2,7 @@ import { parseMessage } from "./parse-message.js";
 import { markUriAsRead } from "../../won-localstorage.js";
 import { markConnectionAsRead } from "./reduce-connections.js";
 import { addAtomStub } from "./reduce-atoms.js";
-import { getOwnMessageUri } from "../../message-utils.js";
+import { getOwnMessageUri } from "../../redux/utils/message-utils.js";
 import * as connectionSelectors from "../../selectors/connection-selectors.js";
 import { getIn } from "../../utils.js";
 
