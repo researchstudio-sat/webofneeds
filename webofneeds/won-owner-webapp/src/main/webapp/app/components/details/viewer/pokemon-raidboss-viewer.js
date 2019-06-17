@@ -2,7 +2,7 @@ import angular from "angular";
 import { attach, get } from "../../../utils.js";
 import "ng-redux";
 import { actionCreators } from "../../../actions/actions.js";
-import { connect2Redux } from "../../../won-utils.js";
+import { connect2Redux } from "../../../configRedux.js";
 import { relativeTime } from "../../../won-label-utils.js";
 import { selectLastUpdateTime } from "../../../redux/selectors/general-selectors.js";
 import "/style/_pokemon-raidboss-viewer.scss";

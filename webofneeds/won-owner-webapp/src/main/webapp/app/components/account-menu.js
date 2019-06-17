@@ -4,7 +4,7 @@
 import angular from "angular";
 import { attach, get } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
-import { connect2Redux } from "../won-utils.js";
+import { connect2Redux } from "../configRedux.js";
 
 import dropdownModule from "./covering-dropdown.js";
 import loginFormModule from "./login-form.js";

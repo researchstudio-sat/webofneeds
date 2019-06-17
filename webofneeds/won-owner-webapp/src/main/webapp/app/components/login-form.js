@@ -4,7 +4,8 @@
 import angular from "angular";
 import { attach, get, getIn } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
-import { connect2Redux, parseRestErrorMessage } from "../won-utils.js";
+import { parseRestErrorMessage } from "../won-utils.js";
+import { connect2Redux } from "../configRedux.js";
 import won from "../won-es6.js";
 import "angular-marked";
 import "~/style/_won-markdown.scss";

@@ -3,7 +3,7 @@
  */
 import angular from "angular";
 import { attach, get, getIn } from "../utils.js";
-import { connect2Redux } from "../won-utils.js";
+import { connect2Redux } from "../configRedux.js";
 import { getPostUriFromRoute } from "../redux/selectors/general-selectors.js";
 import { actionCreators } from "../actions/actions.js";
 import postContextDropDownModule from "../components/post-context-dropdown.js";

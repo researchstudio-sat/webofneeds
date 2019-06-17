@@ -12,7 +12,7 @@ import squareImageModule from "./square-image.js";
 import { actionCreators } from "../actions/actions.js";
 import { labels } from "../won-label-utils.js";
 import { attach, get } from "../utils.js";
-import { connect2Redux } from "../won-utils.js";
+import { connect2Redux } from "../configRedux.js";
 import {
   getOwnedAtomByConnectionUri,
   getAtoms,

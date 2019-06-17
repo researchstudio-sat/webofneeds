@@ -5,7 +5,7 @@
 import angular from "angular";
 import { actionCreators } from "../actions/actions.js";
 import { attach } from "../utils.js";
-import { connect2Redux } from "../won-utils.js";
+import { connect2Redux } from "../configRedux.js";
 import * as srefUtils from "../sref-utils.js";
 
 import "~/style/_modal-dialog.scss";

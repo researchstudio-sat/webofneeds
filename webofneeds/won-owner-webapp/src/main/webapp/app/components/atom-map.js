@@ -7,7 +7,7 @@ import inviewModule from "angular-inview";
 import { attach } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import L from "../leaflet-bundleable.js";
-import { connect2Redux } from "../won-utils.js";
+import { connect2Redux } from "../configRedux.js";
 import * as wonUtils from "../won-utils.js";
 
 import { DomCache } from "../cstm-ng-utils.js";

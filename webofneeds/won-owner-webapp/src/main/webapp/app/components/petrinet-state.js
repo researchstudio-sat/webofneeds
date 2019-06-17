@@ -11,7 +11,7 @@ import {
   getOwnedAtomByConnectionUri,
   getConnectionUriFromRoute,
 } from "../redux/selectors/general-selectors.js";
-import { connect2Redux } from "../won-utils.js";
+import { connect2Redux } from "../configRedux.js";
 
 import "~/style/_petrinet-state.scss";
 

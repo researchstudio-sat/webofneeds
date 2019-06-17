@@ -7,7 +7,7 @@ import chatTextFieldModule from "./chat-textfield.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as processSelectors from "../redux/selectors/process-selectors.js";
-import { connect2Redux } from "../won-utils.js";
+import { connect2Redux } from "../configRedux.js";
 import { attach, get, getIn } from "../utils.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import { actionCreators } from "../actions/actions.js";

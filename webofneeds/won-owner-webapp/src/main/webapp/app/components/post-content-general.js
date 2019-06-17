@@ -6,7 +6,7 @@ import angular from "angular";
 import { attach, get, getIn } from "../utils.js";
 import won from "../won-es6.js";
 import { relativeTime } from "../won-label-utils.js";
-import { connect2Redux } from "../won-utils.js";
+import { connect2Redux } from "../configRedux.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as viewUtils from "../redux/utils/view-utils.js";
 import {

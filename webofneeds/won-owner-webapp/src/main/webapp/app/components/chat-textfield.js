@@ -25,7 +25,7 @@ import {
   isMessageRejectable,
   isMessageSelected,
 } from "../redux/utils/message-utils.js";
-import { connect2Redux } from "../won-utils.js";
+import { connect2Redux } from "../configRedux.js";
 import * as useCaseUtils from "../usecase-utils.js";
 import autoresizingTextareaModule from "../directives/textarea-autogrow.js";
 import { actionCreators } from "../actions/actions.js";

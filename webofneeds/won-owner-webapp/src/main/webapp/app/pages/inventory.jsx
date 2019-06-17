@@ -3,7 +3,7 @@
 import angular from "angular";
 import ngAnimate from "angular-animate";
 import { attach, get, sortByDate } from "../utils.js";
-import { connect2Redux } from "../won-utils.js";
+import { connect2Redux } from "../configRedux.js";
 import { actionCreators } from "../actions/actions.js";
 import postMessagesModule from "../components/post-messages.js";
 import atomCardModule from "../components/atom-card.js";

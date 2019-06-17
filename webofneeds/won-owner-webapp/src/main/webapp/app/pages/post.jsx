@@ -5,7 +5,7 @@
 import angular from "angular";
 import ngAnimate from "angular-animate";
 import { attach, getIn, get, delay } from "../utils.js";
-import { connect2Redux } from "../won-utils.js";
+import { connect2Redux } from "../configRedux.js";
 import won from "../won-es6.js";
 
 import { actionCreators } from "../actions/actions.js";

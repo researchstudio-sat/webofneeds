@@ -1,7 +1,7 @@
 import angular from "angular";
 
 import won from "../../won-es6.js";
-import { connect2Redux } from "../../won-utils.js";
+import { connect2Redux } from "../../configRedux.js";
 import { attach, get, getIn } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
 import {

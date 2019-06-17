@@ -3,7 +3,7 @@ import "ng-redux";
 import { actionCreators } from "../../../actions/actions.js";
 import postHeaderModule from "../../post-header.js";
 import { attach } from "../../../utils.js";
-import { connect2Redux } from "../../../won-utils.js";
+import { connect2Redux } from "../../../configRedux.js";
 
 import "~/style/_paypalpayment-viewer.scss";
 

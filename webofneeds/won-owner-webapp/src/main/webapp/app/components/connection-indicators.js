@@ -16,7 +16,7 @@ import * as connectionUtils from "../redux/utils/connection-utils.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 
 import { attach, sortByDate, getIn, get } from "../utils.js";
-import { connect2Redux } from "../won-utils.js";
+import { connect2Redux } from "../configRedux.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
 
 import "~/style/_connection-indicators.scss";

@@ -9,7 +9,7 @@ import connectionHeaderModule from "./connection-header.js";
 import shareDropdownModule from "./share-dropdown.js";
 import labelledHrModule from "./labelled-hr.js";
 import connectionContextDropdownModule from "./connection-context-dropdown.js";
-import { connect2Redux } from "../won-utils.js";
+import { connect2Redux } from "../configRedux.js";
 import { attach, delay, getIn, get } from "../utils.js";
 import * as processUtils from "../redux/utils/process-utils.js";
 import * as connectionUtils from "../redux/utils/connection-utils.js";

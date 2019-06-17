@@ -2,7 +2,7 @@ import angular from "angular";
 import "ng-redux";
 import { actionCreators } from "../../../actions/actions.js";
 import { attach, get } from "../../../utils.js";
-import { connect2Redux } from "../../../won-utils.js";
+import { connect2Redux } from "../../../configRedux.js";
 
 import "/style/_pokemon-gym-viewer.scss";
 import "/style/_won-markdown.scss";

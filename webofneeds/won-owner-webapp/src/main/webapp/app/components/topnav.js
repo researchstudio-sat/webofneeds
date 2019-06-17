@@ -7,7 +7,7 @@ import dropdownModule from "./covering-dropdown.js";
 import accountMenuModule from "./account-menu.js";
 import { attach, get, getIn } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
-import { connect2Redux } from "../won-utils.js";
+import { connect2Redux } from "../configRedux.js";
 import { isLoading } from "../redux/selectors/process-selectors.js";
 import * as viewSelectors from "../redux/selectors/view-selectors.js";
 

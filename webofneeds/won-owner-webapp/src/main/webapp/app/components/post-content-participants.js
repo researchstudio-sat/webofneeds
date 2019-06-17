@@ -9,7 +9,7 @@ import postHeaderModule from "./post-header.js";
 import suggestPostPickerModule from "./details/picker/suggestpost-picker.js";
 import { attach, getIn, get } from "../utils.js";
 import won from "../won-es6.js";
-import { connect2Redux } from "../won-utils.js";
+import { connect2Redux } from "../configRedux.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as connectionSelectors from "../redux/selectors/connection-selectors.js";
 import * as connectionUtils from "../redux/utils/connection-utils.js";

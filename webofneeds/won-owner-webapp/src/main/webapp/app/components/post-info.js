@@ -10,7 +10,7 @@ import postMenuModule from "./post-menu.js";
 import shareDropdownModule from "./share-dropdown.js";
 import chatTextFieldModule from "./chat-textfield.js";
 import { attach, get, getIn } from "../utils.js";
-import { connect2Redux } from "../won-utils.js";
+import { connect2Redux } from "../configRedux.js";
 import * as viewUtils from "../redux/utils/view-utils.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import { actionCreators } from "../actions/actions.js";

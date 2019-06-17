@@ -4,7 +4,7 @@ import Immutable from "immutable";
 import { attach, sortBy, get, getIn, delay } from "../../../utils.js";
 import { DomCache } from "../../../cstm-ng-utils.js";
 import wonInput from "../../../directives/input.js";
-import { connect2Redux } from "../../../won-utils.js";
+import { connect2Redux } from "../../../configRedux.js";
 import { actionCreators } from "../../../actions/actions.js";
 import postHeaderModule from "../../post-header.js";
 import labelledHrModule from "../../labelled-hr.js";

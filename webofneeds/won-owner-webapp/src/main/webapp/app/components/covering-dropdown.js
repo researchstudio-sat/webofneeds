@@ -5,7 +5,7 @@
 import angular from "angular";
 import { actionCreators } from "../actions/actions.js";
 import { attach } from "../utils.js";
-import { connect2Redux } from "../won-utils.js";
+import { connect2Redux } from "../configRedux.js";
 
 import "~/style/_covering-dropdown.scss";
 

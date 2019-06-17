@@ -3,7 +3,7 @@ import ngAnimate from "angular-animate";
 import { actionCreators } from "../actions/actions.js";
 import { attach, toAbsoluteURL } from "../utils.js";
 
-import { connect2Redux } from "../won-utils.js";
+import { connect2Redux } from "../configRedux.js";
 import * as wonUtils from "../won-utils.js";
 import { ownerBaseUrl } from "~/config/default.js";
 

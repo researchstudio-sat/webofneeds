@@ -4,7 +4,7 @@
 
 import angular from "angular";
 import { attach, getIn, get } from "../utils.js";
-import { connect2Redux } from "../won-utils.js";
+import { connect2Redux } from "../configRedux.js";
 import { actionCreators } from "../actions/actions.js";
 import {
   getConnectionUriFromRoute,

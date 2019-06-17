@@ -6,7 +6,7 @@ import angular from "angular";
 import Immutable from "immutable";
 import { attach, getIn, get } from "../utils.js";
 import { labels } from "../won-label-utils.js";
-import { connect2Redux } from "../won-utils.js";
+import { connect2Redux } from "../configRedux.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as viewUtils from "../redux/utils/view-utils.js";
 import * as processUtils from "../redux/utils/process-utils.js";

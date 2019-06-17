@@ -10,7 +10,7 @@ import { actionCreators } from "../actions/actions.js";
 
 import { attach } from "../utils.js";
 import { getOwnedAtomByConnectionUri } from "../redux/selectors/general-selectors.js";
-import { connect2Redux } from "../won-utils.js";
+import { connect2Redux } from "../configRedux.js";
 
 const serviceDependencies = ["$ngRedux", "$scope"];
 function genComponentConf() {
