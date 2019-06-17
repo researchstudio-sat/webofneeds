@@ -1,5 +1,6 @@
 import angular from "angular";
 import L from "../../../leaflet-bundleable.js";
+import { initLeaflet } from "../../../leaflet-bundleable.js";
 import {
   attach,
   searchNominatim,
@@ -10,8 +11,6 @@ import {
   getIn,
 } from "../../../utils.js";
 import { DomCache } from "../../../cstm-ng-utils.js";
-
-import * as wonUtils from "../../../won-utils.js";
 
 import "~/style/_travelactionpicker.scss";
 import "leaflet/dist/leaflet.css";
@@ -133,7 +132,7 @@ function genComponentConf() {
       attach(this, serviceDependencies, arguments);
       this.domCache = new DomCache(this.$element);
 
-      this.map = wonUtils.initLeaflet(this.mapMount());
+      this.map = initLeaflet(this.mapMount());
       //this.map.on("click", e => onMapClick(e, this));
 
       // debug output
