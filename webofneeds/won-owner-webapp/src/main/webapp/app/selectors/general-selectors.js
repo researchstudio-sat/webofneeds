@@ -9,7 +9,7 @@ import * as connectionSelectors from "./connection-selectors.js";
 import * as atomUtils from "../atom-utils.js";
 import * as connectionUtils from "../connection-utils.js";
 import * as accountUtils from "../redux/utils/account-utils.js";
-import * as viewUtils from "../view-utils.js";
+import * as viewUtils from "../redux/utils/view-utils.js";
 import Color from "color";
 
 export const selectLastUpdateTime = state => state.get("lastUpdateTime");

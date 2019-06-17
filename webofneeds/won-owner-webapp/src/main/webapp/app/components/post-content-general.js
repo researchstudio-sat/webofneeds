@@ -8,7 +8,7 @@ import won from "../won-es6.js";
 import { relativeTime } from "../won-label-utils.js";
 import { connect2Redux } from "../won-utils.js";
 import * as atomUtils from "../atom-utils.js";
-import * as viewUtils from "../view-utils.js";
+import * as viewUtils from "../redux/utils/view-utils.js";
 import {
   selectLastUpdateTime,
   getConnectionUriFromRoute,

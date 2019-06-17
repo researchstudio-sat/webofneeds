@@ -17,7 +17,7 @@ import { h } from "preact";
 import "~/style/_inventory.scss";
 import "~/style/_atom-overlay.scss";
 import "~/style/_connection-overlay.scss";
-import * as viewUtils from "../view-utils";
+import * as viewUtils from "../redux/utils/view-utils";
 import { getIn } from "../utils";
 import * as accountUtils from "../redux/utils/account-utils";
 

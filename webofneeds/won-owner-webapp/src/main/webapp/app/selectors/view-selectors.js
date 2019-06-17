@@ -2,7 +2,7 @@
  * Created by quasarchimaere on 21.01.2019.
  */
 import { get, getIn } from "../utils.js";
-import * as viewUtils from "../view-utils.js";
+import * as viewUtils from "../redux/utils/view-utils.js";
 import * as accountUtils from "../redux/utils/account-utils.js";
 import { getVerificationTokenFromRoute } from "./general-selectors.js";
 

@@ -16,7 +16,7 @@ import { attach, getIn, get } from "../utils.js";
 import won from "../won-es6.js";
 import { connect2Redux } from "../won-utils.js";
 import * as atomUtils from "../atom-utils.js";
-import * as viewUtils from "../view-utils.js";
+import * as viewUtils from "../redux/utils/view-utils.js";
 import * as processUtils from "../process-utils.js";
 import * as connectionSelectors from "../selectors/connection-selectors.js";
 import {
