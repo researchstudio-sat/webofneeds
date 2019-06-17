@@ -135,6 +135,16 @@ won-atom-card {
 
   .card__persona {
     grid-area: card__persona;
+
+    @media (max-width: $responsivenessBreakPoint) {
+      width: 100%;
+    }
+
+    @media (min-width: $responsivenessBreakPoint) {
+      max-width: 15rem;
+      width: 15rem;
+    }
+
     margin-top: 0.5rem;
 
     display: grid;
@@ -160,6 +170,9 @@ won-atom-card {
 
       &__label {
         font-size: $normalFontSize;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
 
       &__verification {
