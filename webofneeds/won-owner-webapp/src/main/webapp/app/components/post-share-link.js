@@ -7,7 +7,7 @@ import { connect2Redux } from "../won-utils.js";
 import * as wonUtils from "../won-utils.js";
 import { ownerBaseUrl } from "~/config/default.js";
 
-import * as generalSelectors from "../selectors/general-selectors.js";
+import * as generalSelectors from "../redux/selectors/general-selectors.js";
 
 import "~/style/_post-share-link.scss";
 

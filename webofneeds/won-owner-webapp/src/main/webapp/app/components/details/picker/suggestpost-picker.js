@@ -8,7 +8,7 @@ import { connect2Redux } from "../../../won-utils.js";
 import { actionCreators } from "../../../actions/actions.js";
 import postHeaderModule from "../../post-header.js";
 import labelledHrModule from "../../labelled-hr.js";
-import { getActiveAtoms } from "../../../selectors/general-selectors.js";
+import { getActiveAtoms } from "../../../redux/selectors/general-selectors.js";
 
 import "~/style/_suggestpostpicker.scss";
 

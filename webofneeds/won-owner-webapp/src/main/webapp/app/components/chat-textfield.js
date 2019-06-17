@@ -14,8 +14,8 @@ import { dispatchEvent, attach, delay, get } from "../utils.js";
 import {
   getOwnedAtomByConnectionUri,
   getOwnedPersonas,
-} from "../selectors/general-selectors.js";
-import { getMessagesByConnectionUri } from "../selectors/message-selectors.js";
+} from "../redux/selectors/general-selectors.js";
+import { getMessagesByConnectionUri } from "../redux/selectors/message-selectors.js";
 import {
   isMessageProposable,
   isMessageClaimable,
@@ -31,7 +31,7 @@ import autoresizingTextareaModule from "../directives/textarea-autogrow.js";
 import { actionCreators } from "../actions/actions.js";
 import labelledHrModule from "./labelled-hr.js";
 import { getHumanReadableStringFromMessage } from "../reducers/atom-reducer/parse-message.js";
-import * as connectionSelectors from "../selectors/connection-selectors.js";
+import * as connectionSelectors from "../redux/selectors/connection-selectors.js";
 import * as connectionUtils from "../redux/utils/connection-utils.js";
 import * as accountUtils from "../redux/utils/account-utils.js";
 

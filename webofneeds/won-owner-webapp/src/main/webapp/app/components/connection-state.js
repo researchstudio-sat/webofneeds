@@ -9,7 +9,7 @@ import { labels } from "../won-label-utils.js";
 import { actionCreators } from "../actions/actions.js";
 
 import { attach } from "../utils.js";
-import { getOwnedAtomByConnectionUri } from "../selectors/general-selectors.js";
+import { getOwnedAtomByConnectionUri } from "../redux/selectors/general-selectors.js";
 import { connect2Redux } from "../won-utils.js";
 
 const serviceDependencies = ["$ngRedux", "$scope"];

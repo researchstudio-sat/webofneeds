@@ -5,7 +5,7 @@ import won from "../../won-es6.js";
 import { connect2Redux } from "../../won-utils.js";
 import { attach, getIn } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
-import { getOwnedAtomByConnectionUri } from "../../selectors/general-selectors.js";
+import { getOwnedAtomByConnectionUri } from "../../redux/selectors/general-selectors.js";
 import * as ownerApi from "../../owner-api.js";
 import { classOnComponentRoot } from "../../cstm-ng-utils.js";
 

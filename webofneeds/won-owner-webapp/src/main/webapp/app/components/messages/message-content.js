@@ -5,7 +5,7 @@ import { connect2Redux } from "../../won-utils.js";
 import * as useCaseUtils from "../../usecase-utils.js";
 import { attach, getIn, get } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
-import { getOwnedAtomByConnectionUri } from "../../selectors/general-selectors.js";
+import { getOwnedAtomByConnectionUri } from "../../redux/selectors/general-selectors.js";
 import "angular-marked";
 
 import "~/style/_message-content.scss";

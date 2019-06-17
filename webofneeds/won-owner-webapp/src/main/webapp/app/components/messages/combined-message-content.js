@@ -7,8 +7,8 @@ import { actionCreators } from "../../actions/actions.js";
 import {
   getOwnedAtomByConnectionUri,
   getAtoms,
-} from "../../selectors/general-selectors.js";
-import { getOwnedConnections } from "../../selectors/connection-selectors.js";
+} from "../../redux/selectors/general-selectors.js";
+import { getOwnedConnections } from "../../redux/selectors/connection-selectors.js";
 import trigModule from "../trig.js";
 import { labels } from "../../won-label-utils.js";
 import { classOnComponentRoot } from "../../cstm-ng-utils.js";

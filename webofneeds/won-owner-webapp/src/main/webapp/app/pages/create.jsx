@@ -11,8 +11,8 @@ import usecasePickerModule from "../components/usecase-picker.js";
 import usecaseGroupModule from "../components/usecase-group.js";
 import { attach, getIn, get } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
-import * as generalSelectors from "../selectors/general-selectors.js";
-import * as viewSelectors from "../selectors/view-selectors.js";
+import * as generalSelectors from "../redux/selectors/general-selectors.js";
+import * as viewSelectors from "../redux/selectors/view-selectors.js";
 import { h } from "preact";
 
 import "~/style/_create.scss";

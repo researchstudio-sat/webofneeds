@@ -12,7 +12,7 @@ import chatTextFieldModule from "./chat-textfield.js";
 import { attach, get, getIn } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
 import * as viewUtils from "../redux/utils/view-utils.js";
-import * as generalSelectors from "../selectors/general-selectors.js";
+import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import { actionCreators } from "../actions/actions.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
 
@@ -20,7 +20,7 @@ import { getUseCaseLabel, getUseCaseIcon } from "../usecase-utils.js";
 
 import "~/style/_post-info.scss";
 import * as atomUtils from "../redux/utils/atom-utils.js";
-import * as processSelectors from "../selectors/process-selectors.js";
+import * as processSelectors from "../redux/selectors/process-selectors.js";
 import * as accountUtils from "../redux/utils/account-utils.js";
 import Immutable from "immutable";
 

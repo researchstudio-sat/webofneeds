@@ -9,7 +9,7 @@ import { actionCreators } from "../actions/actions.js";
 import { relativeTime } from "../won-label-utils.js";
 import { attach, getIn, get, delay } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
-import { selectLastUpdateTime } from "../selectors/general-selectors.js";
+import { selectLastUpdateTime } from "../redux/selectors/general-selectors.js";
 import won from "../won-es6.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";

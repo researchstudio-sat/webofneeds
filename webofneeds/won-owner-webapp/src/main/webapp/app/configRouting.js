@@ -5,7 +5,7 @@
 import Immutable from "immutable";
 import { actionCreators } from "./actions/actions.js";
 import { accountLogin } from "./actions/account-actions.js";
-import { getCurrentParamsFromRoute } from "./selectors/general-selectors.js";
+import { getCurrentParamsFromRoute } from "./redux/selectors/general-selectors.js";
 import * as wonUtils from "./won-utils.js";
 
 import { get, getIn } from "./utils.js";

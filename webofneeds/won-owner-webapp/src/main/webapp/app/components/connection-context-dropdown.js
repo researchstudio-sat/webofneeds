@@ -6,11 +6,11 @@ import angular from "angular";
 import ngAnimate from "angular-animate";
 import { actionCreators } from "../actions/actions.js";
 import { attach, get, getIn, toAbsoluteURL } from "../utils.js";
-import * as generalSelectors from "../selectors/general-selectors.js";
+import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import { connect2Redux } from "../won-utils.js";
 import { ownerBaseUrl } from "~/config/default.js";
 import * as connectionUtils from "../redux/utils/connection-utils.js";
-import * as connectionSelectors from "../selectors/connection-selectors.js";
+import * as connectionSelectors from "../redux/selectors/connection-selectors.js";
 import * as processUtils from "../redux/utils/process-utils.js";
 
 import "~/style/_context-dropdown.scss";

@@ -11,8 +11,8 @@ import { attach, get, getIn, toAbsoluteURL } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { ownerBaseUrl } from "~/config/default.js";
 import * as srefUtils from "../sref-utils.js";
-import * as generalSelectors from "../selectors/general-selectors.js";
-import * as viewSelectors from "../selectors/view-selectors.js";
+import * as generalSelectors from "../redux/selectors/general-selectors.js";
+import * as viewSelectors from "../redux/selectors/view-selectors.js";
 import * as accountUtils from "../redux/utils/account-utils.js";
 import { h } from "preact";
 

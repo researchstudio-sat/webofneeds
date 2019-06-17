@@ -5,7 +5,7 @@ import postHeaderModule from "../../post-header.js";
 import { attach, getIn, get } from "../../../utils.js";
 import { connect2Redux } from "../../../won-utils.js";
 import * as atomUtils from "../../../redux/utils/atom-utils.js";
-import * as generalSelectors from "../../../selectors/general-selectors.js";
+import * as generalSelectors from "../../../redux/selectors/general-selectors.js";
 
 import "~/style/_suggestpost-viewer.scss";
 

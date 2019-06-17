@@ -17,9 +17,9 @@ import { actionCreators } from "../actions/actions.js";
 import {
   getConnectionUriFromRoute,
   getOwnedAtomByConnectionUri,
-} from "../selectors/general-selectors.js";
-import { hasMessagesToLoad } from "../selectors/connection-selectors.js";
-import { getUnreadMessagesByConnectionUri } from "../selectors/message-selectors.js";
+} from "../redux/selectors/general-selectors.js";
+import { hasMessagesToLoad } from "../redux/selectors/connection-selectors.js";
+import { getUnreadMessagesByConnectionUri } from "../redux/selectors/message-selectors.js";
 import autoresizingTextareaModule from "../directives/textarea-autogrow.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
 

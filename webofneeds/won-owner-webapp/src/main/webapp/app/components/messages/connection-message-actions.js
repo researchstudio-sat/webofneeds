@@ -4,7 +4,7 @@ import Immutable from "immutable";
 import { connect2Redux } from "../../won-utils.js";
 import { attach, getIn } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
-import { getOwnedAtomByConnectionUri } from "../../selectors/general-selectors.js";
+import { getOwnedAtomByConnectionUri } from "../../redux/selectors/general-selectors.js";
 import * as messageUtils from "../../redux/utils/message-utils.js";
 import * as connectionUtils from "../../redux/utils/connection-utils.js";
 

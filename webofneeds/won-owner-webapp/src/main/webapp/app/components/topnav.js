@@ -8,8 +8,8 @@ import accountMenuModule from "./account-menu.js";
 import { attach, get, getIn } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { connect2Redux } from "../won-utils.js";
-import { isLoading } from "../selectors/process-selectors.js";
-import * as viewSelectors from "../selectors/view-selectors.js";
+import { isLoading } from "../redux/selectors/process-selectors.js";
+import * as viewSelectors from "../redux/selectors/view-selectors.js";
 
 import * as accountUtils from "../redux/utils/account-utils.js";
 

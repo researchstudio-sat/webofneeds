@@ -6,7 +6,7 @@ import angular from "angular";
 import Immutable from "immutable";
 import { attach, get, getIn } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
-import * as generalSelectors from "../selectors/general-selectors.js";
+import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as processUtils from "../redux/utils/process-utils.js";
 import { actionCreators } from "../actions/actions.js";
@@ -18,7 +18,7 @@ import { Elm } from "../../elm/RatingView.elm";
 import elmModule from "./elm.js";
 
 import "~/style/_post-content-persona.scss";
-import { getOwnedConnectionByUri } from "../selectors/connection-selectors.js";
+import { getOwnedConnectionByUri } from "../redux/selectors/connection-selectors.js";
 
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {

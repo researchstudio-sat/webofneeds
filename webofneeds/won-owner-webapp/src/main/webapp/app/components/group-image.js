@@ -16,7 +16,7 @@ import { connect2Redux } from "../won-utils.js";
 import {
   getOwnedAtomByConnectionUri,
   getAtoms,
-} from "../selectors/general-selectors.js";
+} from "../redux/selectors/general-selectors.js";
 
 import "~/style/_group-image.scss";
 

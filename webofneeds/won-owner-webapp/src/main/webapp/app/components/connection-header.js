@@ -12,15 +12,15 @@ import { labels, relativeTime } from "../won-label-utils.js";
 import { attach, getIn, get } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
-import * as connectionSelectors from "../selectors/connection-selectors.js";
+import * as connectionSelectors from "../redux/selectors/connection-selectors.js";
 import { getHumanReadableStringFromMessage } from "../reducers/atom-reducer/parse-message.js";
 import {
   selectLastUpdateTime,
   getOwnedAtomByConnectionUri,
   getAtoms,
-} from "../selectors/general-selectors.js";
-import { getUnreadMessagesByConnectionUri } from "../selectors/message-selectors.js";
-import { getMessagesByConnectionUri } from "../selectors/message-selectors.js";
+} from "../redux/selectors/general-selectors.js";
+import { getUnreadMessagesByConnectionUri } from "../redux/selectors/message-selectors.js";
+import { getMessagesByConnectionUri } from "../redux/selectors/message-selectors.js";
 import connectionStateModule from "./connection-state.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
 

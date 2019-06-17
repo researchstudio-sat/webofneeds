@@ -9,10 +9,10 @@ import {
   getOwnedPosts,
   getAtoms,
 } from "./general-selectors.js";
-import * as connectionUtils from "../redux/utils/connection-utils.js";
-import won from "../won-es6.js";
-import { get, getIn } from "../utils.js";
-import * as processUtils from "../redux/utils/process-utils.js";
+import * as connectionUtils from "../utils/connection-utils.js";
+import won from "../../won-es6.js";
+import { get, getIn } from "../../utils.js";
+import * as processUtils from "../utils/process-utils.js";
 
 /**
  * Get the connection for a given connectionUri

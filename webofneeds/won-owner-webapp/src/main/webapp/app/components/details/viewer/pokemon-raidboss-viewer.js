@@ -4,7 +4,7 @@ import "ng-redux";
 import { actionCreators } from "../../../actions/actions.js";
 import { connect2Redux } from "../../../won-utils.js";
 import { relativeTime } from "../../../won-label-utils.js";
-import { selectLastUpdateTime } from "../../../selectors/general-selectors.js";
+import { selectLastUpdateTime } from "../../../redux/selectors/general-selectors.js";
 import "/style/_pokemon-raidboss-viewer.scss";
 
 const serviceDependencies = ["$scope", "$ngRedux", "$element"];

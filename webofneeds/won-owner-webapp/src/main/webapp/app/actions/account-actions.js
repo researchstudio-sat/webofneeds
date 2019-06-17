@@ -13,9 +13,9 @@ import { stateGoCurrent } from "./cstm-router-actions.js";
 import { checkAccessToCurrentRoute } from "../configRouting.js";
 
 import { get } from "../utils.js";
-import * as connectionSelectors from "../selectors/connection-selectors.js";
+import * as connectionSelectors from "../redux/selectors/connection-selectors.js";
 import { loadLatestMessagesOfConnection } from "./connections-actions.js";
-import { getPrivateIdFromRoute } from "../selectors/general-selectors.js";
+import { getPrivateIdFromRoute } from "../redux/selectors/general-selectors.js";
 
 import * as accountUtils from "../redux/utils/account-utils.js";
 import * as processUtils from "../redux/utils/process-utils.js";

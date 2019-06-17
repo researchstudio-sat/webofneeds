@@ -5,7 +5,7 @@ import "./identicon.js";
 import {
   getOwnedPersonas,
   currentSkin,
-} from "../selectors/general-selectors.js";
+} from "../redux/selectors/general-selectors.js";
 import { get } from "../utils";
 import * as accountUtils from "../redux/utils/account-utils.js";
 

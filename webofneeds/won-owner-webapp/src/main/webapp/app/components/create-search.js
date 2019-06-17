@@ -10,7 +10,7 @@ import labelledHrModule from "./labelled-hr.js";
 import { attach, get } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { connect2Redux } from "../won-utils.js";
-import { selectIsConnected } from "../selectors/general-selectors.js";
+import { selectIsConnected } from "../redux/selectors/general-selectors.js";
 
 import * as accountUtils from "../redux/utils/account-utils.js";
 import * as processUtils from "../redux/utils/process-utils.js";

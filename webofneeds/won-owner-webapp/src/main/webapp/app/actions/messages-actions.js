@@ -8,7 +8,7 @@ import { getIn } from "../utils.js";
 
 import Immutable from "immutable";
 import { getOwnMessageUri } from "../redux/utils/message-utils.js";
-import * as generalSelectors from "../selectors/general-selectors.js";
+import * as generalSelectors from "../redux/selectors/general-selectors.js";
 
 import {
   isFetchMessageEffectsNeeded,

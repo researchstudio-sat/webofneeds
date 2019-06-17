@@ -7,8 +7,11 @@ import won from "../won-es6.js";
 import "ng-redux";
 import { labels } from "../won-label-utils.js";
 import { actionCreators } from "../actions/actions.js";
-import { getPosts, getOwnedPosts } from "../selectors/general-selectors.js";
-import * as connectionSelectors from "../selectors/connection-selectors.js";
+import {
+  getPosts,
+  getOwnedPosts,
+} from "../redux/selectors/general-selectors.js";
+import * as connectionSelectors from "../redux/selectors/connection-selectors.js";
 import * as connectionUtils from "../redux/utils/connection-utils.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 

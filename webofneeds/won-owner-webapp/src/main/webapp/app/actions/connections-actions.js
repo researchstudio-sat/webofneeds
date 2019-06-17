@@ -5,10 +5,10 @@
 import won from "../won-es6.js";
 import Immutable from "immutable";
 
-import * as generalSelectors from "../selectors/general-selectors.js";
+import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as ownerApi from "../owner-api.js";
-import { getOwnedConnectionByUri } from "../selectors/connection-selectors.js";
+import { getOwnedConnectionByUri } from "../redux/selectors/connection-selectors.js";
 
 import { get, getIn, urisToLookupSuccessAndFailedMap } from "../utils.js";
 

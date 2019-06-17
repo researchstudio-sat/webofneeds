@@ -11,8 +11,8 @@ import { attach, getIn, get } from "../utils.js";
 import won from "../won-es6.js";
 import { connect2Redux } from "../won-utils.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
-import * as connectionSelectors from "../selectors/connection-selectors.js";
-import * as generalSelectors from "../selectors/general-selectors.js";
+import * as connectionSelectors from "../redux/selectors/connection-selectors.js";
+import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import { actionCreators } from "../actions/actions.js";
 import ngAnimate from "angular-animate";
 

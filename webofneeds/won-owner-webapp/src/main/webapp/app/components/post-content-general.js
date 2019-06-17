@@ -13,11 +13,11 @@ import {
   selectLastUpdateTime,
   getConnectionUriFromRoute,
   getOwnedAtomByConnectionUri,
-} from "../selectors/general-selectors.js";
+} from "../redux/selectors/general-selectors.js";
 import { actionCreators } from "../actions/actions.js";
 
 import "~/style/_post-content-general.scss";
-import { getOwnedConnectionByUri } from "../selectors/connection-selectors.js";
+import { getOwnedConnectionByUri } from "../redux/selectors/connection-selectors.js";
 
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {

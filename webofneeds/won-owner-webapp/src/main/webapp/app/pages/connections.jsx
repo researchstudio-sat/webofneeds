@@ -8,10 +8,10 @@ import groupPostMessagesModule from "../components/group-post-messages.js";
 import connectionsOverviewModule from "../components/connections-overview.js";
 import { attach, getIn, get } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
-import * as generalSelectors from "../selectors/general-selectors.js";
-import * as connectionSelectors from "../selectors/connection-selectors.js";
+import * as generalSelectors from "../redux/selectors/general-selectors.js";
+import * as connectionSelectors from "../redux/selectors/connection-selectors.js";
 import * as connectionUtils from "../redux/utils/connection-utils.js";
-import * as viewSelectors from "../selectors/view-selectors.js";
+import * as viewSelectors from "../redux/selectors/view-selectors.js";
 import { h } from "preact";
 
 import "~/style/_connections.scss";

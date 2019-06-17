@@ -8,7 +8,7 @@ import { actionCreators } from "../actions/actions.js";
 import { connect2Redux } from "../won-utils.js";
 
 import "~/style/_howto.scss";
-import * as generalSelectors from "../selectors/general-selectors";
+import * as generalSelectors from "../redux/selectors/general-selectors";
 
 function genTopnavConf() {
   let template = `

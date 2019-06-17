@@ -8,8 +8,8 @@ import { actionCreators } from "../actions/actions.js";
 import postMessagesModule from "../components/post-messages.js";
 import atomCardModule from "../components/atom-card.js";
 import howToModule from "../components/howto.js";
-import * as generalSelectors from "../selectors/general-selectors.js";
-import * as viewSelectors from "../selectors/view-selectors.js";
+import * as generalSelectors from "../redux/selectors/general-selectors.js";
+import * as viewSelectors from "../redux/selectors/view-selectors.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 
 import { h } from "preact";

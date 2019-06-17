@@ -16,14 +16,14 @@ import * as connectionUtils from "../redux/utils/connection-utils.js";
 import * as messageUtils from "../redux/utils/message-utils.js";
 import * as ownerApi from "../owner-api.js";
 import { actionCreators } from "../actions/actions.js";
-import * as generalSelectors from "../selectors/general-selectors.js";
-import { hasMessagesToLoad } from "../selectors/connection-selectors.js";
+import * as generalSelectors from "../redux/selectors/general-selectors.js";
+import { hasMessagesToLoad } from "../redux/selectors/connection-selectors.js";
 import {
   getAgreementMessagesByConnectionUri,
   getCancellationPendingMessagesByConnectionUri,
   getProposalMessagesByConnectionUri,
   getUnreadMessagesByConnectionUri,
-} from "../selectors/message-selectors.js";
+} from "../redux/selectors/message-selectors.js";
 import autoresizingTextareaModule from "../directives/textarea-autogrow.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
 import "~/style/_post-messages.scss";
