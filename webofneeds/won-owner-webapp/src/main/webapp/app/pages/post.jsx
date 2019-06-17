@@ -17,7 +17,6 @@ import visitorTitleBarModule from "../components/visitor-title-bar.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as viewSelectors from "../redux/selectors/view-selectors.js";
 import * as processUtils from "../redux/utils/process-utils.js";
-import * as srefUtils from "../sref-utils.js";
 import { h } from "preact";
 
 import "~/style/_post-visitor.scss";
@@ -89,7 +88,6 @@ class Controller {
     this.selection = 0;
     window.p4dbg = this;
     this.WON = won.WON;
-    Object.assign(this, srefUtils); // bind srefUtils to scope
 
     const selectFromState = state => {
       const atomUri = generalSelectors.getPostUriFromRoute(state);

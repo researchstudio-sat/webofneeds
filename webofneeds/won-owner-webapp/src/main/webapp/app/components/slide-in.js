@@ -12,12 +12,12 @@ import { parseRestErrorMessage } from "../won-utils.js";
 import { connect2Redux } from "../configRedux.js";
 import { ownerBaseUrl } from "~/config/default.js";
 import { getVerificationTokenFromRoute } from "../redux/selectors/general-selectors.js";
+import { absHRef } from "../configRouting.js";
 import * as viewSelectors from "../redux/selectors/view-selectors.js";
+
 import * as processSelectors from "../redux/selectors/process-selectors.js";
 
-import * as srefUtils from "../sref-utils.js";
 import * as accountUtils from "../redux/utils/account-utils.js";
-
 import "~/style/_slidein.scss";
 
 function genSlideInConf() {
@@ -234,7 +234,7 @@ function genSlideInConf() {
   class Controller {
     constructor(/* arguments <- serviceDependencies */) {
       attach(this, serviceDependencies, arguments);
-      Object.assign(this, srefUtils); // bind srefUtils to scope
+      this.absHRef = absHRef;
       this.parseRestErrorMessage = parseRestErrorMessage;
 
       this.anonymousEmail = undefined;

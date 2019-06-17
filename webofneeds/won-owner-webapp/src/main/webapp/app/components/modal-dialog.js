@@ -6,7 +6,7 @@ import angular from "angular";
 import { actionCreators } from "../actions/actions.js";
 import { attach } from "../cstm-ng-utils.js";
 import { connect2Redux } from "../configRedux.js";
-import * as srefUtils from "../sref-utils.js";
+import { absHRef } from "../configRouting.js";
 
 import "~/style/_modal-dialog.scss";
 
@@ -41,7 +41,7 @@ function genComponentConf() {
   class Controller {
     constructor() {
       attach(this, serviceDependencies, arguments);
-      Object.assign(this, srefUtils); // bind srefUtils to scope
+      this.absHRef = absHRef;
 
       const selectFromState = state => {
         const modalDialog = state.getIn(["view", "modalDialog"]);

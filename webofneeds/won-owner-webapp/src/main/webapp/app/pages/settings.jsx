@@ -12,8 +12,6 @@ import settingsWrapper from "../components/settings-wrapper.js";
 import * as viewSelectors from "../redux/selectors/view-selectors.js";
 import { h } from "preact";
 
-import * as srefUtils from "../sref-utils.js";
-
 import "~/style/_signup.scss";
 
 const template = (
@@ -39,7 +37,6 @@ class SettingsController {
   constructor(/* arguments <- serviceDependencies */) {
     attach(this, serviceDependencies, arguments);
     this.rememberMe = false;
-    Object.assign(this, srefUtils); // bind srefUtils to scope
 
     const select = state => {
       return {
