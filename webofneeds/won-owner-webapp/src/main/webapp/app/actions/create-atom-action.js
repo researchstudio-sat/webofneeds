@@ -13,7 +13,7 @@ import { get, getIn } from "../utils.js";
 
 import * as accountUtils from "../redux/utils/account-utils.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
-import * as ownerApi from "../owner-api.js";
+import * as ownerApi from "../api/owner-api.js";
 
 export function atomEdit(draft, oldAtom, nodeUri) {
   return (dispatch, getState) => {

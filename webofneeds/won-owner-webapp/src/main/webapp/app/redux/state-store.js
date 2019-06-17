@@ -1,4 +1,4 @@
-import * as ownerApi from "../owner-api.js";
+import * as ownerApi from "../api/owner-api.js";
 import Immutable from "immutable";
 import { actionTypes } from "../actions/actions.js";
 import * as atomUtils from "./utils/atom-utils.js";

@@ -7,7 +7,7 @@ import { actionTypes, actionCreators } from "./actions.js";
 
 import { checkAccessToCurrentRoute } from "../configRouting.js";
 
-import * as ownerApi from "../owner-api.js";
+import * as ownerApi from "../api/owner-api.js";
 import * as stateStore from "../redux/state-store.js";
 
 export const pageLoadAction = () => (dispatch, getState) => {

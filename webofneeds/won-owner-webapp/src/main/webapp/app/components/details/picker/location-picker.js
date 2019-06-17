@@ -5,14 +5,13 @@
 import angular from "angular";
 import L from "../../../leaflet-bundleable.js";
 import { initLeaflet, leafletBounds } from "../../../leaflet-bundleable.js";
+import { delay, getIn } from "../../../utils.js";
 import {
   searchNominatim,
   reverseSearchNominatim,
-  nominatim2draftLocation,
   scrubSearchResults,
-  delay,
-  getIn,
-} from "../../../utils.js";
+  nominatim2draftLocation,
+} from "../../../api/nominatim-api.js";
 import {
   attach,
   doneTypingBufferNg,

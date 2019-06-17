@@ -7,7 +7,7 @@ import Immutable from "immutable";
 
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
-import * as ownerApi from "../owner-api.js";
+import * as ownerApi from "../api/owner-api.js";
 import { getOwnedConnectionByUri } from "../redux/selectors/connection-selectors.js";
 
 import { get, getIn, is } from "../utils.js";

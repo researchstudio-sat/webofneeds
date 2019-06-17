@@ -7,7 +7,7 @@ import Immutable from "immutable";
 import { actionTypes, actionCreators } from "./actions.js";
 import * as stateStore from "../redux/state-store.js";
 import * as wonUtils from "../won-utils.js";
-import * as ownerApi from "../owner-api.js";
+import * as ownerApi from "../api/owner-api.js";
 import { setDisclaimerAccepted } from "../won-localstorage.js";
 import { stateGoCurrent } from "./cstm-router-actions.js";
 import { checkAccessToCurrentRoute } from "../configRouting.js";

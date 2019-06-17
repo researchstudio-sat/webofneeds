@@ -6,7 +6,7 @@ import { getOwnedAtomByConnectionUri } from "../redux/selectors/general-selector
 import { getOwnedConnectionByUri } from "../redux/selectors/connection-selectors";
 import { buildConnectMessage, buildCloseMessage } from "../won-message-utils";
 import * as atomUtils from "../redux/utils/atom-utils.js";
-import * as ownerApi from "../owner-api.js";
+import * as ownerApi from "../api/owner-api.js";
 
 export function createPersona(persona, nodeUri) {
   return (dispatch, getState) => {

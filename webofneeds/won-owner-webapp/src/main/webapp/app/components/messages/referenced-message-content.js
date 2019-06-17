@@ -6,7 +6,7 @@ import { connect2Redux } from "../../configRedux.js";
 import { getIn } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
 import { getOwnedAtomByConnectionUri } from "../../redux/selectors/general-selectors.js";
-import * as ownerApi from "../../owner-api.js";
+import * as ownerApi from "../../api/owner-api.js";
 import { attach, classOnComponentRoot } from "../../cstm-ng-utils.js";
 
 import "~/style/_referenced-message-content.scss";

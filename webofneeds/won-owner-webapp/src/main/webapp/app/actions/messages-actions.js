@@ -16,7 +16,7 @@ import {
 } from "../won-message-utils.js";
 import * as stateStore from "../redux/state-store.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
-import * as ownerApi from "../owner-api.js";
+import * as ownerApi from "../api/owner-api.js";
 
 export function successfulCloseAtom(event) {
   return (dispatch, getState) => {

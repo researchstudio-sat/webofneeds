@@ -1,6 +1,6 @@
 import urljoin from "url-join";
 import { ownerBaseUrl } from "~/config/default.js";
-import * as wonUtils from "./won-utils.js";
+import * as wonUtils from "../won-utils.js";
 
 /**
  * Created by quasarchimaere on 11.06.2019.

@@ -5,10 +5,12 @@ import {
   getIn,
   get,
   delay,
-  reverseSearchNominatim,
-  searchNominatim,
-  scrubSearchResults,
 } from "../utils.js";
+import {
+  searchNominatim,
+  reverseSearchNominatim,
+  scrubSearchResults,
+} from "../api/nominatim-api.js";
 import { attach } from "../cstm-ng-utils.js";
 import Immutable from "immutable";
 import { connect2Redux } from "../configRedux.js";

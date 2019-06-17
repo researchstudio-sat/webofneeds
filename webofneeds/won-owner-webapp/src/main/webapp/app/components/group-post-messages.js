@@ -12,7 +12,7 @@ import { delay, getIn, get } from "../utils.js";
 import * as messageUtils from "../redux/utils/message-utils.js";
 import * as connectionUtils from "../redux/utils/connection-utils.js";
 import * as processUtils from "../redux/utils/process-utils.js";
-import * as ownerApi from "../owner-api.js";
+import * as ownerApi from "../api/owner-api.js";
 import { actionCreators } from "../actions/actions.js";
 import {
   getConnectionUriFromRoute,

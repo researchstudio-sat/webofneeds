@@ -1,14 +1,13 @@
 import angular from "angular";
 import L from "../../../leaflet-bundleable.js";
 import { initLeaflet } from "../../../leaflet-bundleable.js";
+import { delay, getIn } from "../../../utils.js";
 import {
   searchNominatim,
   reverseSearchNominatim,
   scrubSearchResults,
   nominatim2draftLocation,
-  delay,
-  getIn,
-} from "../../../utils.js";
+} from "../../../api/nominatim-api.js";
 import { attach, DomCache } from "../../../cstm-ng-utils.js";
 
 import "~/style/_travelactionpicker.scss";

@@ -1,5 +1,5 @@
 import { getIn, get, clone } from "../utils.js";
-import * as ownerApi from "../owner-api.js";
+import * as ownerApi from "../api/owner-api.js";
 import { actionTypes } from "./actions";
 
 import loadCSS from "loadcss";
