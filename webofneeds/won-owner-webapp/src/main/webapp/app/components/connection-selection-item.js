@@ -3,7 +3,7 @@
  */
 
 import angular from "angular";
-import { attach, getIn, get } from "../utils.js";
+import { getIn, get } from "../utils.js";
 import { connect2Redux } from "../configRedux.js";
 import { actionCreators } from "../actions/actions.js";
 import {
@@ -12,7 +12,7 @@ import {
 } from "../redux/selectors/general-selectors.js";
 
 import connectionHeaderModule from "./connection-header.js";
-import { classOnComponentRoot } from "../cstm-ng-utils.js";
+import { classOnComponentRoot, attach } from "../cstm-ng-utils.js";
 
 import "~/style/_connection-selection-item-line.scss";
 

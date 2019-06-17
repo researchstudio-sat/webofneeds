@@ -6,7 +6,6 @@ import angular from "angular";
 import L from "../../../leaflet-bundleable.js";
 import { initLeaflet, leafletBounds } from "../../../leaflet-bundleable.js";
 import {
-  attach,
   searchNominatim,
   reverseSearchNominatim,
   nominatim2draftLocation,
@@ -14,7 +13,11 @@ import {
   delay,
   getIn,
 } from "../../../utils.js";
-import { doneTypingBufferNg, DomCache } from "../../../cstm-ng-utils.js";
+import {
+  attach,
+  doneTypingBufferNg,
+  DomCache,
+} from "../../../cstm-ng-utils.js";
 
 import titlePickerModule from "./title-picker.js";
 

@@ -3,7 +3,8 @@
  */
 
 import angular from "angular";
-import { attach, get, getIn } from "../utils.js";
+import { get, getIn } from "../utils.js";
+import { attach } from "../cstm-ng-utils.js";
 import won from "../won-es6.js";
 import { relativeTime } from "../won-label-utils.js";
 import { connect2Redux } from "../configRedux.js";

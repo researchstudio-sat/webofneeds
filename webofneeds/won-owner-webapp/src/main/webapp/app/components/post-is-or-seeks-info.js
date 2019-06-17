@@ -5,7 +5,7 @@ import angular from "angular";
 
 import "ng-redux";
 
-import { attach } from "../utils.js";
+import { attach } from "../cstm-ng-utils.js";
 import * as useCaseUtils from "../usecase-utils.js";
 import { connect2Redux } from "../configRedux.js";
 import { actionCreators } from "../actions/actions.js";

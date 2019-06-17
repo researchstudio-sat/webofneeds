@@ -5,7 +5,8 @@
  */
 import angular from "angular";
 import ngAnimate from "angular-animate";
-import { attach, getIn } from "../utils.js";
+import { getIn } from "../utils.js";
+import { attach } from "../cstm-ng-utils.js";
 import { actionCreators } from "../actions/actions.js";
 import settingsWrapper from "../components/settings-wrapper.js";
 import * as viewSelectors from "../redux/selectors/view-selectors.js";

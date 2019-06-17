@@ -13,7 +13,8 @@ import postHeaderModule from "./post-header.js";
 import connectionIndicatorsModule from "./connection-indicators.js";
 import connectionSelectionItemModule from "./connection-selection-item.js";
 
-import { attach, delay, sortByDate, get, getIn } from "../utils.js";
+import { delay, sortByDate, get, getIn } from "../utils.js";
+import { attach } from "../cstm-ng-utils.js";
 import { connect2Redux } from "../configRedux.js";
 import { actionCreators } from "../actions/actions.js";
 

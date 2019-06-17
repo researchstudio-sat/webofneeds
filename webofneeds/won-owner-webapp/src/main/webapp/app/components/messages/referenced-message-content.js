@@ -3,11 +3,11 @@ import angular from "angular";
 import Immutable from "immutable";
 import won from "../../won-es6.js";
 import { connect2Redux } from "../../configRedux.js";
-import { attach, getIn } from "../../utils.js";
+import { getIn } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
 import { getOwnedAtomByConnectionUri } from "../../redux/selectors/general-selectors.js";
 import * as ownerApi from "../../owner-api.js";
-import { classOnComponentRoot } from "../../cstm-ng-utils.js";
+import { attach, classOnComponentRoot } from "../../cstm-ng-utils.js";
 
 import "~/style/_referenced-message-content.scss";
 

@@ -12,12 +12,12 @@ import combinedMessageContentModule from "./combined-message-content.js";
 import labelledHrModule from "../labelled-hr.js";
 
 import { connect2Redux } from "../../configRedux.js";
-import { attach, getIn, get } from "../../utils.js";
+import { getIn, get } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
 import { getOwnedAtomByConnectionUri } from "../../redux/selectors/general-selectors.js";
 import * as messageUtils from "../../redux/utils/message-utils.js";
 import * as connectionUtils from "../../redux/utils/connection-utils.js";
-import { classOnComponentRoot } from "../../cstm-ng-utils.js";
+import { attach, classOnComponentRoot } from "../../cstm-ng-utils.js";
 
 import { ownerBaseUrl } from "~/config/default.js";
 import urljoin from "url-join";

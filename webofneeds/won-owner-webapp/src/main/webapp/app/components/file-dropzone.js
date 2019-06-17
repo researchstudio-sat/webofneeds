@@ -3,7 +3,8 @@
  */
 import angular from "angular";
 import enterModule from "../directives/enter.js";
-import { dispatchEvent, attach, readAsDataURL } from "../utils.js";
+import { dispatchEvent, readAsDataURL } from "../utils.js";
+import { attach } from "../cstm-ng-utils.js";
 import globToRegexp from "glob-to-regexp";
 
 import "~/style/_file-dropzone.scss";

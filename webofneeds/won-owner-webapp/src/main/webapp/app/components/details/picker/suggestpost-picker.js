@@ -1,8 +1,8 @@
 import angular from "angular";
 import "ng-redux";
 import Immutable from "immutable";
-import { attach, sortBy, get, getIn, delay } from "../../../utils.js";
-import { DomCache } from "../../../cstm-ng-utils.js";
+import { sortBy, get, getIn, delay } from "../../../utils.js";
+import { attach, DomCache } from "../../../cstm-ng-utils.js";
 import wonInput from "../../../directives/input.js";
 import { connect2Redux } from "../../../configRedux.js";
 import { actionCreators } from "../../../actions/actions.js";

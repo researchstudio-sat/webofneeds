@@ -2,7 +2,6 @@ import angular from "angular";
 import L from "../../../leaflet-bundleable.js";
 import { initLeaflet } from "../../../leaflet-bundleable.js";
 import {
-  attach,
   searchNominatim,
   reverseSearchNominatim,
   scrubSearchResults,
@@ -10,7 +9,7 @@ import {
   delay,
   getIn,
 } from "../../../utils.js";
-import { DomCache } from "../../../cstm-ng-utils.js";
+import { attach, DomCache } from "../../../cstm-ng-utils.js";
 
 import "~/style/_travelactionpicker.scss";
 import "leaflet/dist/leaflet.css";

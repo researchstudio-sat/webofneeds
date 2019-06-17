@@ -2,7 +2,6 @@
 import angular from "angular";
 import ngAnimate from "angular-animate";
 import {
-  attach,
   getIn,
   get,
   delay,
@@ -10,6 +9,7 @@ import {
   searchNominatim,
   scrubSearchResults,
 } from "../utils.js";
+import { attach } from "../cstm-ng-utils.js";
 import Immutable from "immutable";
 import { connect2Redux } from "../configRedux.js";
 import { actionCreators } from "../actions/actions.js";

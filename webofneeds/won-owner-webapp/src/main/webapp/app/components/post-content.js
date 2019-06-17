@@ -12,7 +12,7 @@ import postContentParticipants from "./post-content-participants.js";
 import atomContentBuddies from "./atom-content-buddies.js";
 import postHeaderModule from "./post-header.js";
 import trigModule from "./trig.js";
-import { attach, getIn, get } from "../utils.js";
+import { getIn, get } from "../utils.js";
 import won from "../won-es6.js";
 import { connect2Redux } from "../configRedux.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
@@ -25,7 +25,7 @@ import {
   isAtomOwned,
 } from "../redux/selectors/general-selectors.js";
 import { actionCreators } from "../actions/actions.js";
-import { classOnComponentRoot } from "../cstm-ng-utils.js";
+import { classOnComponentRoot, attach } from "../cstm-ng-utils.js";
 import ngAnimate from "angular-animate";
 import { Elm } from "../../elm/AddPersona.elm";
 

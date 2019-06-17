@@ -5,7 +5,8 @@
 import angular from "angular";
 import ngAnimate from "angular-animate";
 import { actionCreators } from "../actions/actions.js";
-import { attach, get, getIn, toAbsoluteURL } from "../utils.js";
+import { get, getIn, toAbsoluteURL } from "../utils.js";
+import { attach } from "../cstm-ng-utils.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import { connect2Redux } from "../configRedux.js";
 import { ownerBaseUrl } from "~/config/default.js";

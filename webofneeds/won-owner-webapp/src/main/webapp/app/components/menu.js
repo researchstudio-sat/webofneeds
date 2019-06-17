@@ -2,7 +2,8 @@
  * Created by quasarchimaere on 19.11.2018.
  */
 import angular from "angular";
-import { attach, getIn } from "../utils.js";
+import { getIn } from "../utils.js";
+import { attach } from "../cstm-ng-utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { connect2Redux } from "../configRedux.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";

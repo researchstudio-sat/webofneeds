@@ -8,7 +8,7 @@ import "ng-redux";
 import { labels } from "../won-label-utils.js";
 import { actionCreators } from "../actions/actions.js";
 
-import { attach } from "../utils.js";
+import { attach } from "../cstm-ng-utils.js";
 import { getOwnedAtomByConnectionUri } from "../redux/selectors/general-selectors.js";
 import { connect2Redux } from "../configRedux.js";
 

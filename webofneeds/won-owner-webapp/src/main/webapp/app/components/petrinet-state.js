@@ -6,7 +6,8 @@ import angular from "angular";
 import "ng-redux";
 import { actionCreators } from "../actions/actions.js";
 
-import { attach, generateSimpleTransitionLabel, getIn } from "../utils.js";
+import { generateSimpleTransitionLabel, getIn } from "../utils.js";
+import { attach } from "../cstm-ng-utils.js";
 import {
   getOwnedAtomByConnectionUri,
   getConnectionUriFromRoute,

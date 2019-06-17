@@ -2,7 +2,7 @@ import angular from "angular";
 
 import won from "../../won-es6.js";
 import { connect2Redux } from "../../configRedux.js";
-import { attach, get, getIn } from "../../utils.js";
+import { get, getIn } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
 import {
   getOwnedAtomByConnectionUri,
@@ -11,7 +11,7 @@ import {
 import { getOwnedConnections } from "../../redux/selectors/connection-selectors.js";
 import trigModule from "../trig.js";
 import { labels } from "../../won-label-utils.js";
-import { classOnComponentRoot } from "../../cstm-ng-utils.js";
+import { attach, classOnComponentRoot } from "../../cstm-ng-utils.js";
 import squareImageModule from "../square-image.js";
 
 import "~/style/_combined-message-content.scss";

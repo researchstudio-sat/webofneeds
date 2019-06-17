@@ -7,7 +7,8 @@ import labelledHrModule from "./labelled-hr.js";
 
 import "ng-redux";
 import Immutable from "immutable";
-import { attach, get } from "../utils.js";
+import { get } from "../utils.js";
+import { attach } from "../cstm-ng-utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { connect2Redux } from "../configRedux.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";

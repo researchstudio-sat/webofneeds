@@ -1,5 +1,6 @@
 import angular from "angular";
-import { attach, get } from "../../../utils.js";
+import { get } from "../../../utils.js";
+import { attach } from "../../../cstm-ng-utils.js";
 import "ng-redux";
 import { actionCreators } from "../../../actions/actions.js";
 import { connect2Redux } from "../../../configRedux.js";

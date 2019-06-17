@@ -3,7 +3,8 @@ import angular from "angular";
 import Immutable from "immutable";
 import { relativeTime } from "../../won-label-utils.js";
 import { connect2Redux } from "../../configRedux.js";
-import { attach, getIn } from "../../utils.js";
+import { getIn } from "../../utils.js";
+import { attach } from "../../cstm-ng-utils.js";
 import { actionCreators } from "../../actions/actions.js";
 import { getOwnedAtomByConnectionUri } from "../../redux/selectors/general-selectors.js";
 

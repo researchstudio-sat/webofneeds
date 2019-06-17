@@ -5,7 +5,8 @@
  */
 import angular from "angular";
 import ngAnimate from "angular-animate";
-import { attach, getIn, get, delay, sortByDate } from "../utils.js";
+import { getIn, get, delay, sortByDate } from "../utils.js";
+import { attach } from "../cstm-ng-utils.js";
 import { connect2Redux } from "../configRedux.js";
 import { actionCreators } from "../actions/actions.js";
 import postMessagesModule from "../components/post-messages.js";

@@ -8,7 +8,7 @@ import shareDropdownModule from "./share-dropdown.js";
 import labelledHrModule from "./labelled-hr.js";
 import connectionContextDropdownModule from "./connection-context-dropdown.js";
 import { connect2Redux } from "../configRedux.js";
-import { attach, delay, getIn, get } from "../utils.js";
+import { delay, getIn, get } from "../utils.js";
 import * as messageUtils from "../redux/utils/message-utils.js";
 import * as connectionUtils from "../redux/utils/connection-utils.js";
 import * as processUtils from "../redux/utils/process-utils.js";
@@ -21,7 +21,7 @@ import {
 import { hasMessagesToLoad } from "../redux/selectors/connection-selectors.js";
 import { getUnreadMessagesByConnectionUri } from "../redux/selectors/message-selectors.js";
 import autoresizingTextareaModule from "../directives/textarea-autogrow.js";
-import { classOnComponentRoot } from "../cstm-ng-utils.js";
+import { attach, classOnComponentRoot } from "../cstm-ng-utils.js";
 
 import "~/style/_group-post-messages.scss";
 import "~/style/_rdflink.scss";

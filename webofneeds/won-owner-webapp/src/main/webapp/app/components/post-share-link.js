@@ -1,7 +1,8 @@
 import angular from "angular";
 import ngAnimate from "angular-animate";
 import { actionCreators } from "../actions/actions.js";
-import { attach, toAbsoluteURL } from "../utils.js";
+import { toAbsoluteURL } from "../utils.js";
+import { attach } from "../cstm-ng-utils.js";
 
 import { connect2Redux } from "../configRedux.js";
 import * as wonUtils from "../won-utils.js";

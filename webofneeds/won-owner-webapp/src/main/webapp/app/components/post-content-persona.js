@@ -4,7 +4,8 @@
 
 import angular from "angular";
 import Immutable from "immutable";
-import { attach, get, getIn } from "../utils.js";
+import { get, getIn } from "../utils.js";
+import { attach } from "../cstm-ng-utils.js";
 import { connect2Redux } from "../configRedux.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";

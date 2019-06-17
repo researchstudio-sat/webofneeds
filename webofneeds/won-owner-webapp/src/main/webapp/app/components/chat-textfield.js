@@ -10,7 +10,8 @@
 import angular from "angular";
 import "ng-redux";
 import ngAnimate from "angular-animate";
-import { dispatchEvent, attach, delay, get } from "../utils.js";
+import { dispatchEvent, delay, get } from "../utils.js";
+import { attach } from "../cstm-ng-utils.js";
 import {
   getOwnedAtomByConnectionUri,
   getOwnedPersonas,

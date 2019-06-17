@@ -4,7 +4,7 @@
 
 import angular from "angular";
 import Immutable from "immutable";
-import { attach, getIn, get } from "../utils.js";
+import { getIn, get } from "../utils.js";
 import { labels } from "../won-label-utils.js";
 import { connect2Redux } from "../configRedux.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
@@ -14,7 +14,7 @@ import * as connectionSelectors from "../redux/selectors/connection-selectors.js
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as connectionUtils from "../redux/utils/connection-utils.js";
 import { actionCreators } from "../actions/actions.js";
-import { classOnComponentRoot } from "../cstm-ng-utils.js";
+import { attach, classOnComponentRoot } from "../cstm-ng-utils.js";
 
 import "~/style/_post-menu.scss";
 

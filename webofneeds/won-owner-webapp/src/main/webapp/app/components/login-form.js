@@ -2,7 +2,8 @@
  * Created by ksinger on 01.09.2017.
  */
 import angular from "angular";
-import { attach, get, getIn } from "../utils.js";
+import { get, getIn } from "../utils.js";
+import { attach } from "../cstm-ng-utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { parseRestErrorMessage } from "../won-utils.js";
 import { connect2Redux } from "../configRedux.js";

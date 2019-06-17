@@ -5,7 +5,8 @@
  */
 import angular from "angular";
 import ngAnimate from "angular-animate";
-import { attach, get } from "../utils.js";
+import { get } from "../utils.js";
+import { attach } from "../cstm-ng-utils.js";
 import { actionCreators } from "../actions/actions.js";
 
 import labelledHrModule from "../components/labelled-hr.js";
