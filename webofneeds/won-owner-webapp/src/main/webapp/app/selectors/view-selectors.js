@@ -3,7 +3,7 @@
  */
 import { get, getIn } from "../utils.js";
 import * as viewUtils from "../view-utils.js";
-import * as accountUtils from "../account-utils.js";
+import * as accountUtils from "../redux/utils/account-utils.js";
 import { getVerificationTokenFromRoute } from "./general-selectors.js";
 
 /**

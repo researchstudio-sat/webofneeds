@@ -7,7 +7,7 @@ import {
   currentSkin,
 } from "../selectors/general-selectors.js";
 import { get } from "../utils";
-import * as accountUtils from "../account-utils.js";
+import * as accountUtils from "../redux/utils/account-utils.js";
 
 function genComponentConf($ngRedux) {
   return {

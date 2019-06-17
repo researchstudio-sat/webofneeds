@@ -13,7 +13,7 @@ import { ownerBaseUrl } from "~/config/default.js";
 import * as srefUtils from "../sref-utils.js";
 import * as generalSelectors from "../selectors/general-selectors.js";
 import * as viewSelectors from "../selectors/view-selectors.js";
-import * as accountUtils from "../account-utils.js";
+import * as accountUtils from "../redux/utils/account-utils.js";
 import { h } from "preact";
 
 import "~/style/_about.scss";

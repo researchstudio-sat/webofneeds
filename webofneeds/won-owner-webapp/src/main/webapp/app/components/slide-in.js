@@ -14,7 +14,7 @@ import * as viewSelectors from "../selectors/view-selectors.js";
 import * as processSelectors from "../selectors/process-selectors.js";
 
 import * as srefUtils from "../sref-utils.js";
-import * as accountUtils from "../account-utils.js";
+import * as accountUtils from "../redux/utils/account-utils.js";
 
 import "~/style/_slidein.scss";
 

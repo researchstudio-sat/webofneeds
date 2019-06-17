@@ -10,7 +10,7 @@ import { actionCreators } from "../actions/actions.js";
 
 import labelledHrModule from "../components/labelled-hr.js";
 
-import * as accountUtils from "../account-utils.js";
+import * as accountUtils from "../redux/utils/account-utils.js";
 import * as viewSelectors from "../selectors/view-selectors.js";
 import { h } from "preact";
 

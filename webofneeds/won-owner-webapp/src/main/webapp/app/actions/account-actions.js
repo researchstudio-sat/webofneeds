@@ -17,7 +17,7 @@ import * as connectionSelectors from "../selectors/connection-selectors.js";
 import { loadLatestMessagesOfConnection } from "./connections-actions.js";
 import { getPrivateIdFromRoute } from "../selectors/general-selectors.js";
 
-import * as accountUtils from "../account-utils.js";
+import * as accountUtils from "../redux/utils/account-utils.js";
 import * as processUtils from "../process-utils.js";
 
 /**

@@ -12,7 +12,7 @@ import { attach, get, getIn } from "../utils.js";
 import * as atomUtils from "../atom-utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { getUseCaseLabel, getUseCaseIcon } from "../usecase-utils.js";
-import * as accountUtils from "../account-utils.js";
+import * as accountUtils from "../redux/utils/account-utils.js";
 import * as viewUtils from "../view-utils.js";
 
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];

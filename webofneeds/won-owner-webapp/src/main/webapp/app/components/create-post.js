@@ -15,7 +15,7 @@ import * as generalSelectors from "../selectors/general-selectors.js";
 import * as atomUtils from "../atom-utils.js";
 import * as processSelectors from "../selectors/process-selectors.js";
 import * as useCaseUtils from "../usecase-utils.js";
-import * as accountUtils from "../account-utils.js";
+import * as accountUtils from "../redux/utils/account-utils.js";
 import { Elm } from "../../elm/PublishButton.elm";
 import elmModule from "./elm.js";
 

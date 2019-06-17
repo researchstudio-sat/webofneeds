@@ -10,7 +10,7 @@ import dropdownModule from "./covering-dropdown.js";
 import loginFormModule from "./login-form.js";
 import loggedInMenuModule from "./logged-in-menu.js";
 
-import * as accountUtils from "../account-utils.js";
+import * as accountUtils from "../redux/utils/account-utils.js";
 
 import "~/style/_login.scss";
 

@@ -11,7 +11,7 @@ import { connect2Redux } from "../won-utils.js";
 import { isLoading } from "../selectors/process-selectors.js";
 import * as viewSelectors from "../selectors/view-selectors.js";
 
-import * as accountUtils from "../account-utils.js";
+import * as accountUtils from "../redux/utils/account-utils.js";
 
 import "~/style/_responsiveness-utils.scss";
 import "~/style/_topnav.scss";

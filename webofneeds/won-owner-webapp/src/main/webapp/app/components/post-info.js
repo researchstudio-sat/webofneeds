@@ -21,7 +21,7 @@ import { getUseCaseLabel, getUseCaseIcon } from "../usecase-utils.js";
 import "~/style/_post-info.scss";
 import * as atomUtils from "../atom-utils.js";
 import * as processSelectors from "../selectors/process-selectors.js";
-import * as accountUtils from "../account-utils.js";
+import * as accountUtils from "../redux/utils/account-utils.js";
 import Immutable from "immutable";
 
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];

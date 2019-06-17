@@ -8,7 +8,7 @@ import { decodeUriComponentProperly, getIn, get } from "../utils.js";
 import * as connectionSelectors from "./connection-selectors.js";
 import * as atomUtils from "../atom-utils.js";
 import * as connectionUtils from "../connection-utils.js";
-import * as accountUtils from "../account-utils.js";
+import * as accountUtils from "../redux/utils/account-utils.js";
 import * as viewUtils from "../view-utils.js";
 import Color from "color";
 

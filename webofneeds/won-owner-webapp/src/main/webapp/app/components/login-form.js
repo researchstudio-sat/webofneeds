@@ -9,7 +9,7 @@ import won from "../won-es6.js";
 import "angular-marked";
 import "~/style/_won-markdown.scss";
 
-import * as accountUtils from "../account-utils.js";
+import * as accountUtils from "../redux/utils/account-utils.js";
 
 function genLoginConf() {
   let template = `

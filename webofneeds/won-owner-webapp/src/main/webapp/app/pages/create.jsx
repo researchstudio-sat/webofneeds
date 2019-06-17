@@ -17,7 +17,7 @@ import { h } from "preact";
 
 import "~/style/_create.scss";
 import "~/style/_responsiveness-utils.scss";
-import * as accountUtils from "../account-utils";
+import * as accountUtils from "../redux/utils/account-utils";
 
 const template = (
   <container>
