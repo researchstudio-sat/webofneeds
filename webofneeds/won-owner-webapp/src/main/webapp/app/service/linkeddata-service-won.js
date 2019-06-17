@@ -17,7 +17,7 @@
 /**
  * Created by fkleedorfer on 05.09.2014.
  */
-import { entries, is, clone, getIn, get, getInFromJsonLd } from "../utils.js";
+import { is, clone, getIn, get, getInFromJsonLd } from "../utils.js";
 import * as wonUtils from "../won-utils.js";
 
 import { ownerBaseUrl } from "~/config/default.js";
@@ -46,6 +46,25 @@ import won from "./won.js";
     "timeof",
     "deep",
   ];
+
+  /**
+   * taken from: https://esdiscuss.org/topic/es6-iteration-over-object-values
+   *
+   * example usage:
+   *
+   * ```javascript
+   * for (let [key, value] of entries(o)) {
+   *   console.log(key, ' --> ', value)
+   * }
+   * ```
+   * @param obj the object to generate a (key,value)-pair iterator for
+   */
+  function* entries(obj) {
+    for (let key of Object.keys(obj)) {
+      yield [key, obj[key]];
+    }
+  }
+
   /**
    * This function is used to generate the query-strings.
    * Should anything about the way the API is accessed changed,
