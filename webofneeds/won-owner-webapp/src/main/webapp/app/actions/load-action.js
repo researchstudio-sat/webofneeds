@@ -8,7 +8,7 @@ import { actionTypes, actionCreators } from "./actions.js";
 import { checkAccessToCurrentRoute } from "../configRouting.js";
 
 import * as wonUtils from "../won-utils.js";
-import * as wonMessageUtils from "../won-message-utils.js";
+import * as stateStore from "../redux/state-store.js";
 
 export const pageLoadAction = () => (dispatch, getState) => {
   wonUtils
@@ -31,14 +31,14 @@ export const pageLoadAction = () => (dispatch, getState) => {
 function loadingWhileSignedIn(dispatch) {
   // reset websocket to make sure it's using the logged-in session
   dispatch(actionCreators.reconnect__start());
-  return wonMessageUtils.fetchOwnedData(dispatch);
+  return stateStore.fetchOwnedData(dispatch);
 }
 
 export const fetchWhatsNew = modifiedAfterDate => (dispatch, getState) => {
   dispatch({
     type: actionTypes.atoms.fetchWhatsNew,
   });
-  return wonMessageUtils.fetchWhatsNew(dispatch, getState, modifiedAfterDate);
+  return stateStore.fetchWhatsNew(dispatch, getState, modifiedAfterDate);
 };
 
 export const fetchWhatsAround = (modifiedAfterDate, location, maxDistance) => (
@@ -48,7 +48,7 @@ export const fetchWhatsAround = (modifiedAfterDate, location, maxDistance) => (
   dispatch({
     type: actionTypes.atoms.fetchWhatsAround,
   });
-  return wonMessageUtils.fetchWhatsAround(
+  return stateStore.fetchWhatsAround(
     dispatch,
     getState,
     modifiedAfterDate,

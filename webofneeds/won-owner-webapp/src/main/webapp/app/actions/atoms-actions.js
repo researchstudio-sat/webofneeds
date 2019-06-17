@@ -12,22 +12,21 @@ import {
   buildCloseAtomMessage,
   buildOpenAtomMessage,
   buildDeleteAtomMessage,
-  fetchUnloadedData,
-  fetchDataForNonOwnedAtomOnly,
 } from "../won-message-utils.js";
 import * as connectionUtils from "../connection-utils.js";
 import * as atomUtils from "../atom-utils.js";
+import * as stateStore from "../redux/state-store.js";
 import { get } from "../utils.js";
 
 export function fetchUnloadedAtoms() {
   return async dispatch => {
-    fetchUnloadedData(dispatch);
+    stateStore.fetchUnloadedData(dispatch);
   };
 }
 
 export function fetchUnloadedAtom(atomUri) {
   return async dispatch => {
-    fetchDataForNonOwnedAtomOnly(atomUri, dispatch);
+    stateStore.fetchDataForNonOwnedAtomOnly(atomUri, dispatch);
   };
 }
 

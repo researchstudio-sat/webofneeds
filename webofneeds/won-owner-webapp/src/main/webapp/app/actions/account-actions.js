@@ -5,7 +5,7 @@
 import won from "../won-es6.js";
 import Immutable from "immutable";
 import { actionTypes, actionCreators } from "./actions.js";
-import { fetchOwnedData } from "../won-message-utils.js";
+import * as stateStore from "../redux/state-store.js";
 import {
   registerAccount,
   changePassword,
@@ -119,7 +119,7 @@ export function accountLogin(credentials, redirectToFeed = false) {
         })
       )
       .then(() => dispatch({ type: actionTypes.upgradeHttpSession }))
-      .then(() => fetchOwnedData(dispatch))
+      .then(() => stateStore.fetchOwnedData(dispatch))
       .then(() => dispatch({ type: actionTypes.account.loginFinished }))
       .catch(error =>
         error.response.json().then(loginError => {
