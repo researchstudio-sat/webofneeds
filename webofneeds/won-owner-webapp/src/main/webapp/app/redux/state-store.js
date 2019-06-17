@@ -5,7 +5,7 @@ import * as atomUtils from "./utils/atom-utils.js";
 import { parseMetaAtom } from "../reducers/atom-reducer/parse-atom.js";
 import { is, urisToLookupMap } from "../utils.js";
 import won from "../won-es6";
-import * as connectionUtils from "../connection-utils.js";
+import * as connectionUtils from "./utils/connection-utils.js";
 
 export function fetchOwnedData(dispatch) {
   return ownerApi

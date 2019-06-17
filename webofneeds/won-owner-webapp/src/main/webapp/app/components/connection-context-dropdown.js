@@ -9,7 +9,7 @@ import { attach, get, getIn, toAbsoluteURL } from "../utils.js";
 import * as generalSelectors from "../selectors/general-selectors.js";
 import { connect2Redux } from "../won-utils.js";
 import { ownerBaseUrl } from "~/config/default.js";
-import * as connectionUtils from "../connection-utils.js";
+import * as connectionUtils from "../redux/utils/connection-utils.js";
 import * as connectionSelectors from "../selectors/connection-selectors.js";
 import * as processUtils from "../process-utils.js";
 

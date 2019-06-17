@@ -9,7 +9,7 @@ import {
   getOwnedPosts,
   getAtoms,
 } from "./general-selectors.js";
-import * as connectionUtils from "../connection-utils.js";
+import * as connectionUtils from "../redux/utils/connection-utils.js";
 import won from "../won-es6.js";
 import { get, getIn } from "../utils.js";
 import * as processUtils from "../process-utils.js";

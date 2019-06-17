@@ -12,7 +12,7 @@ import * as viewUtils from "../redux/utils/view-utils.js";
 import * as processUtils from "../process-utils.js";
 import * as connectionSelectors from "../selectors/connection-selectors.js";
 import * as generalSelectors from "../selectors/general-selectors.js";
-import * as connectionUtils from "../connection-utils.js";
+import * as connectionUtils from "../redux/utils/connection-utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
 

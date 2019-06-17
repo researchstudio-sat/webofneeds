@@ -32,7 +32,7 @@ import { actionCreators } from "../actions/actions.js";
 import labelledHrModule from "./labelled-hr.js";
 import { getHumanReadableStringFromMessage } from "../reducers/atom-reducer/parse-message.js";
 import * as connectionSelectors from "../selectors/connection-selectors.js";
-import * as connectionUtils from "../connection-utils.js";
+import * as connectionUtils from "../redux/utils/connection-utils.js";
 import * as accountUtils from "../redux/utils/account-utils.js";
 
 import { Elm } from "../../elm/PublishButton.elm";

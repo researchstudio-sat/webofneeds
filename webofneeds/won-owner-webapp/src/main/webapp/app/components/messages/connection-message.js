@@ -16,7 +16,7 @@ import { attach, getIn, get } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
 import { getOwnedAtomByConnectionUri } from "../../selectors/general-selectors.js";
 import * as messageUtils from "../../message-utils.js";
-import * as connectionUtils from "../../connection-utils.js";
+import * as connectionUtils from "../../redux/utils/connection-utils.js";
 import { classOnComponentRoot } from "../../cstm-ng-utils.js";
 
 import { ownerBaseUrl } from "~/config/default.js";

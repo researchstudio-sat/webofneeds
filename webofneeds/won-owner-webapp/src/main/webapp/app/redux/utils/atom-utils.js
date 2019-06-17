@@ -5,7 +5,7 @@
 import won from "../../won-es6.js";
 import { get, getIn, calculateDistance } from "../../utils.js";
 import { labels } from "../../won-label-utils.js";
-import * as connectionUtils from "../../connection-utils.js";
+import * as connectionUtils from "./connection-utils.js";
 import * as useCaseUtils from "../../usecase-utils.js";
 
 /**

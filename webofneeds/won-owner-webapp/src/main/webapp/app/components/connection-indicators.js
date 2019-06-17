@@ -9,7 +9,7 @@ import { labels } from "../won-label-utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { getPosts, getOwnedPosts } from "../selectors/general-selectors.js";
 import * as connectionSelectors from "../selectors/connection-selectors.js";
-import * as connectionUtils from "../connection-utils.js";
+import * as connectionUtils from "../redux/utils/connection-utils.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 
 import { attach, sortByDate, getIn, get } from "../utils.js";

@@ -10,7 +10,7 @@ import { attach, getIn, get } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import * as generalSelectors from "../selectors/general-selectors.js";
 import * as connectionSelectors from "../selectors/connection-selectors.js";
-import * as connectionUtils from "../connection-utils.js";
+import * as connectionUtils from "../redux/utils/connection-utils.js";
 import * as viewSelectors from "../selectors/view-selectors.js";
 import { h } from "preact";
 
