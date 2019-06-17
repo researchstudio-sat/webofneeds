@@ -17,15 +17,7 @@
 /**
  * Created by fkleedorfer on 05.09.2014.
  */
-import {
-  entries,
-  is,
-  clone,
-  contains,
-  getIn,
-  get,
-  getInFromJsonLd,
-} from "../utils.js";
+import { entries, is, clone, getIn, get, getInFromJsonLd } from "../utils.js";
 import * as wonUtils from "../won-utils.js";
 
 import { ownerBaseUrl } from "~/config/default.js";
@@ -80,6 +72,11 @@ import won from "./won.js";
     // The owner hands this part -- the one in the `uri=` paramater -- directly to the node.
     let firstParam = true;
     let queryOnNode = dataUri;
+
+    const contains = (arr, el) => {
+      return arr.indexOf(el) > 0;
+    };
+
     for (let [paramName, paramValue] of entries(queryParams)) {
       if (contains(legitQueryParameters, paramName)) {
         queryOnNode = queryOnNode + (firstParam ? "?" : "&");

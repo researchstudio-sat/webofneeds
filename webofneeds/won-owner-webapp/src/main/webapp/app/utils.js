@@ -671,10 +671,6 @@ export function getFromJsonLd(obj, predicate, context) {
   }
 }
 
-export function contains(arr, el) {
-  return arr.indexOf(el) > 0;
-}
-
 /**
  * zipWith :: (a -> b -> c) -> [a] -> [b] -> [c]
  * e.g. zipWith((x,y)=>x-y, [8,9,3], [3,2]) // => [5,7]
