@@ -11,7 +11,7 @@ import { connect2Redux } from "../won-utils.js";
 import { attach, delay, getIn, get } from "../utils.js";
 import * as messageUtils from "../redux/utils/message-utils.js";
 import * as connectionUtils from "../redux/utils/connection-utils.js";
-import * as processUtils from "../process-utils.js";
+import * as processUtils from "../redux/utils/process-utils.js";
 import * as ownerApi from "../owner-api.js";
 import { actionCreators } from "../actions/actions.js";
 import {

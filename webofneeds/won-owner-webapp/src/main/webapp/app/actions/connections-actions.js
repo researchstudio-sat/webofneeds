@@ -25,7 +25,7 @@ import {
   buildConnectMessage,
 } from "../won-message-utils.js";
 
-import * as processUtils from "../process-utils.js";
+import * as processUtils from "../redux/utils/process-utils.js";
 
 export function connectionsChatMessageClaimOnSuccess(
   chatMessage,

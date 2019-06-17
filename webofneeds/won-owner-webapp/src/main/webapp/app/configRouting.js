@@ -11,7 +11,7 @@ import * as wonUtils from "./won-utils.js";
 import { get, getIn } from "./utils.js";
 
 import * as accountUtils from "./redux/utils/account-utils.js";
-import * as processUtils from "./process-utils.js";
+import * as processUtils from "./redux/utils/process-utils.js";
 
 import settingsComponent from "./pages/settings.jsx";
 import postComponent from "./pages/post.jsx";

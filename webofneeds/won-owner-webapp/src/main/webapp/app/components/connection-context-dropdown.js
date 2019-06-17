@@ -11,7 +11,7 @@ import { connect2Redux } from "../won-utils.js";
 import { ownerBaseUrl } from "~/config/default.js";
 import * as connectionUtils from "../redux/utils/connection-utils.js";
 import * as connectionSelectors from "../selectors/connection-selectors.js";
-import * as processUtils from "../process-utils.js";
+import * as processUtils from "../redux/utils/process-utils.js";
 
 import "~/style/_context-dropdown.scss";
 

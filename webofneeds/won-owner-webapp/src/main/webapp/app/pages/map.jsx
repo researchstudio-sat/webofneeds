@@ -19,7 +19,7 @@ import atomMapModule from "../components/atom-map.js";
 import postHeaderModule from "../components/post-header.js";
 import * as generalSelectors from "../selectors/general-selectors.js";
 import * as viewSelectors from "../selectors/view-selectors.js";
-import * as processUtils from "../process-utils.js";
+import * as processUtils from "../redux/utils/process-utils.js";
 import * as wonLabelUtils from "../won-label-utils.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import wonInput from "../directives/input.js";

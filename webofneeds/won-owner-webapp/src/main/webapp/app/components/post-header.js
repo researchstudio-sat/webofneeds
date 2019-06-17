@@ -13,7 +13,7 @@ import { selectLastUpdateTime } from "../selectors/general-selectors.js";
 import won from "../won-es6.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
-import * as processUtils from "../process-utils.js";
+import * as processUtils from "../redux/utils/process-utils.js";
 
 import "~/style/_post-header.scss";
 

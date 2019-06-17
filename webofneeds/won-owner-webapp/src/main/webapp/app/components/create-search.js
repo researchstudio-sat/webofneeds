@@ -13,7 +13,7 @@ import { connect2Redux } from "../won-utils.js";
 import { selectIsConnected } from "../selectors/general-selectors.js";
 
 import * as accountUtils from "../redux/utils/account-utils.js";
-import * as processUtils from "../process-utils.js";
+import * as processUtils from "../redux/utils/process-utils.js";
 
 //TODO can't inject $scope with the angular2-router, preventing redux-cleanup
 const serviceDependencies = [

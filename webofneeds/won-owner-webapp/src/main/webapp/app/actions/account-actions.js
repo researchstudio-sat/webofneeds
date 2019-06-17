@@ -18,7 +18,7 @@ import { loadLatestMessagesOfConnection } from "./connections-actions.js";
 import { getPrivateIdFromRoute } from "../selectors/general-selectors.js";
 
 import * as accountUtils from "../redux/utils/account-utils.js";
-import * as processUtils from "../process-utils.js";
+import * as processUtils from "../redux/utils/process-utils.js";
 
 /**
  * Makes sure user is either logged in

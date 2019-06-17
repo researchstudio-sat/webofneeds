@@ -9,7 +9,7 @@ import { attach, toAbsoluteURL, getIn, get } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
 import * as wonUtils from "../won-utils.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
-import * as processUtils from "../process-utils.js";
+import * as processUtils from "../redux/utils/process-utils.js";
 import * as generalSelectors from "../selectors/general-selectors.js";
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";

@@ -6,7 +6,7 @@ import Immutable from "immutable";
 import { getIn } from "../utils.js";
 import { parseAtom, parseMetaAtom } from "./atom-reducer/parse-atom.js";
 import { parseMessage } from "./atom-reducer/parse-message.js";
-import * as processUtils from "../process-utils.js";
+import * as processUtils from "../redux/utils/process-utils.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 
 const initialState = Immutable.fromJS({

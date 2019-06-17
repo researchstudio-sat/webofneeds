@@ -15,7 +15,7 @@ import groupPostMessagesModule from "../components/group-post-messages.js";
 import visitorTitleBarModule from "../components/visitor-title-bar.js";
 import * as generalSelectors from "../selectors/general-selectors.js";
 import * as viewSelectors from "../selectors/view-selectors.js";
-import * as processUtils from "../process-utils.js";
+import * as processUtils from "../redux/utils/process-utils.js";
 import * as srefUtils from "../sref-utils.js";
 import { h } from "preact";
 
