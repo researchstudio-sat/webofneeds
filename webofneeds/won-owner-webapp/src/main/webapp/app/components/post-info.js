@@ -19,7 +19,7 @@ import { classOnComponentRoot } from "../cstm-ng-utils.js";
 import { getUseCaseLabel, getUseCaseIcon } from "../usecase-utils.js";
 
 import "~/style/_post-info.scss";
-import * as atomUtils from "../atom-utils.js";
+import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as processSelectors from "../selectors/process-selectors.js";
 import * as accountUtils from "../redux/utils/account-utils.js";
 import Immutable from "immutable";

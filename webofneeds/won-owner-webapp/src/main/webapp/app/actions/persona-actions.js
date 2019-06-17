@@ -5,7 +5,7 @@ import { actionTypes } from "./actions";
 import { getOwnedAtomByConnectionUri } from "../selectors/general-selectors";
 import { getOwnedConnectionByUri } from "../selectors/connection-selectors";
 import { buildConnectMessage, buildCloseMessage } from "../won-message-utils";
-import * as atomUtils from "../atom-utils.js";
+import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as ownerApi from "../owner-api.js";
 
 export function createPersona(persona, nodeUri) {

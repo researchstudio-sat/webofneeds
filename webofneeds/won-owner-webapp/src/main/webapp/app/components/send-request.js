@@ -9,7 +9,7 @@ import * as generalSelectors from "../selectors/general-selectors.js";
 import * as processSelectors from "../selectors/process-selectors.js";
 import { connect2Redux } from "../won-utils.js";
 import { attach, get, getIn } from "../utils.js";
-import * as atomUtils from "../atom-utils.js";
+import * as atomUtils from "../redux/utils/atom-utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { getUseCaseLabel, getUseCaseIcon } from "../usecase-utils.js";
 import * as accountUtils from "../redux/utils/account-utils.js";

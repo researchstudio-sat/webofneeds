@@ -8,7 +8,7 @@ import { connect2Redux } from "../won-utils.js";
 import { actionCreators } from "../actions/actions.js";
 
 import "~/style/_atom-suggestions-indicator.scss";
-import * as atomUtils from "../atom-utils";
+import * as atomUtils from "../redux/utils/atom-utils";
 
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {

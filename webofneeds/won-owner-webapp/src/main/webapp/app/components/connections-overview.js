@@ -22,7 +22,7 @@ import "~/style/_connections-overview.scss";
 import * as generalSelectors from "../selectors/general-selectors.js";
 import * as connectionSelectors from "../selectors/connection-selectors.js";
 import * as connectionUtils from "../connection-utils.js";
-import * as atomUtils from "../atom-utils.js";
+import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as processUtils from "../process-utils.js";
 
 const serviceDependencies = ["$ngRedux", "$scope"];

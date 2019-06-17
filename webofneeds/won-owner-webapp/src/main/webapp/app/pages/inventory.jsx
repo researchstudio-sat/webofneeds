@@ -10,7 +10,7 @@ import atomCardModule from "../components/atom-card.js";
 import howToModule from "../components/howto.js";
 import * as generalSelectors from "../selectors/general-selectors.js";
 import * as viewSelectors from "../selectors/view-selectors.js";
-import * as atomUtils from "../atom-utils.js";
+import * as atomUtils from "../redux/utils/atom-utils.js";
 
 import { h } from "preact";
 

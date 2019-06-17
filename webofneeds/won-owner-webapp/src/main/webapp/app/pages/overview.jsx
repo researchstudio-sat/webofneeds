@@ -15,7 +15,7 @@ import * as generalSelectors from "../selectors/general-selectors.js";
 import * as viewSelectors from "../selectors/view-selectors.js";
 import * as processUtils from "../process-utils.js";
 import * as wonLabelUtils from "../won-label-utils.js";
-import * as atomUtils from "../atom-utils.js";
+import * as atomUtils from "../redux/utils/atom-utils.js";
 import { h } from "preact";
 
 import "~/style/_overview.scss";

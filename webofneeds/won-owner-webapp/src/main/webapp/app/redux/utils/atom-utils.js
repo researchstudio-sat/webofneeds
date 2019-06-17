@@ -2,11 +2,11 @@
  * Created by fsuda on 08.11.2018.
  */
 
-import won from "./won-es6.js";
-import { get, getIn, calculateDistance } from "./utils.js";
-import { labels } from "./won-label-utils.js";
-import * as connectionUtils from "./connection-utils.js";
-import * as useCaseUtils from "./usecase-utils.js";
+import won from "../../won-es6.js";
+import { get, getIn, calculateDistance } from "../../utils.js";
+import { labels } from "../../won-label-utils.js";
+import * as connectionUtils from "../../connection-utils.js";
+import * as useCaseUtils from "../../usecase-utils.js";
 
 /**
  * Determines if a given atom is a Active

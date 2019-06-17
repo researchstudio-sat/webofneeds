@@ -1,7 +1,7 @@
 import * as ownerApi from "../owner-api.js";
 import Immutable from "immutable";
 import { actionTypes } from "../actions/actions.js";
-import * as atomUtils from "../atom-utils.js";
+import * as atomUtils from "./utils/atom-utils.js";
 import { parseMetaAtom } from "../reducers/atom-reducer/parse-atom.js";
 import { is, urisToLookupMap } from "../utils.js";
 import won from "../won-es6";

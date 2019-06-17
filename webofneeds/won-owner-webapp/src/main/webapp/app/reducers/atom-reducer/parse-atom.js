@@ -1,7 +1,7 @@
 import Immutable from "immutable";
 import won from "../../won-es6.js";
 import * as useCaseUtils from "../../usecase-utils.js";
-import { isSearchAtom, isPersona } from "../../atom-utils.js";
+import { isSearchAtom, isPersona } from "../../redux/utils/atom-utils.js";
 import {
   generateHexColor,
   generateRgbColorArray,

@@ -14,7 +14,7 @@ import {
   buildDeleteAtomMessage,
 } from "../won-message-utils.js";
 import * as connectionUtils from "../connection-utils.js";
-import * as atomUtils from "../atom-utils.js";
+import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as stateStore from "../redux/state-store.js";
 import { get } from "../utils.js";
 

@@ -15,7 +15,7 @@ import {
   buildChatMessage,
 } from "../won-message-utils.js";
 import * as stateStore from "../redux/state-store.js";
-import * as atomUtils from "../atom-utils.js";
+import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as ownerApi from "../owner-api.js";
 
 export function successfulCloseAtom(event) {

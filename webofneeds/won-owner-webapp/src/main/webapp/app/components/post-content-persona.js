@@ -7,7 +7,7 @@ import Immutable from "immutable";
 import { attach, get, getIn } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
 import * as generalSelectors from "../selectors/general-selectors.js";
-import * as atomUtils from "../atom-utils.js";
+import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as processUtils from "../process-utils.js";
 import { actionCreators } from "../actions/actions.js";
 import squareImageModule from "./square-image.js";

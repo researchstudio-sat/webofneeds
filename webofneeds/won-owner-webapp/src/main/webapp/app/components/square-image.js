@@ -1,7 +1,7 @@
 import angular from "angular";
 
 import { attach, get, getIn } from "../utils.js";
-import * as atomUtils from "../atom-utils.js";
+import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as processUtils from "../process-utils.js";
 import { connect2Redux } from "../won-utils.js";
 import { actionCreators } from "../actions/actions.js";

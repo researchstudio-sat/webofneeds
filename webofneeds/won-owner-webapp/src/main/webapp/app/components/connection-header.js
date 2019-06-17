@@ -11,7 +11,7 @@ import { actionCreators } from "../actions/actions.js";
 import { labels, relativeTime } from "../won-label-utils.js";
 import { attach, getIn, get } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
-import * as atomUtils from "../atom-utils.js";
+import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as connectionSelectors from "../selectors/connection-selectors.js";
 import { getHumanReadableStringFromMessage } from "../reducers/atom-reducer/parse-message.js";
 import {
