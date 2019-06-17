@@ -61,27 +61,24 @@ export function parseAtom(jsonldAtom) {
     }
 
     let parsedAtomImm = Immutable.fromJS(parsedAtom);
+    const matchingUseCase = useCaseUtils.findUseCaseByAtom(parsedAtomImm);
 
-    if (!isPersona(parsedAtomImm)) {
-      const matchingUseCase = useCaseUtils.findUseCaseByAtom(parsedAtomImm);
-
-      if (matchingUseCase) {
-        parsedAtomImm = parsedAtomImm
-          .setIn(["matchedUseCase", "identifier"], matchingUseCase.identifier)
-          .setIn(["matchedUseCase", "icon"], matchingUseCase.icon)
-          .setIn(
-            ["matchedUseCase", "enabledUseCases"],
-            matchingUseCase.enabledUseCases
-              ? Immutable.fromJS(matchingUseCase.enabledUseCases)
-              : Immutable.List()
-          )
-          .setIn(
-            ["matchedUseCase", "reactionUseCases"],
-            matchingUseCase.reactionUseCases
-              ? Immutable.fromJS(matchingUseCase.reactionUseCases)
-              : Immutable.List()
-          );
-      }
+    if (matchingUseCase) {
+      parsedAtomImm = parsedAtomImm
+        .setIn(["matchedUseCase", "identifier"], matchingUseCase.identifier)
+        .setIn(["matchedUseCase", "icon"], matchingUseCase.icon)
+        .setIn(
+          ["matchedUseCase", "enabledUseCases"],
+          matchingUseCase.enabledUseCases
+            ? Immutable.fromJS(matchingUseCase.enabledUseCases)
+            : Immutable.List()
+        )
+        .setIn(
+          ["matchedUseCase", "reactionUseCases"],
+          matchingUseCase.reactionUseCases
+            ? Immutable.fromJS(matchingUseCase.reactionUseCases)
+            : Immutable.List()
+        );
     }
 
     parsedAtomImm = parsedAtomImm.set(
@@ -197,27 +194,24 @@ export function parseMetaAtom(metaAtom) {
       parsedMetaAtom.creationDate
     ) {
       const parsedAtomImm = Immutable.fromJS(parsedMetaAtom);
+      const matchingUseCase = useCaseUtils.findUseCaseByAtom(parsedAtomImm);
 
-      if (!isPersona(parsedAtomImm)) {
-        const matchingUseCase = useCaseUtils.findUseCaseByAtom(parsedAtomImm);
-
-        if (matchingUseCase) {
-          return parsedAtomImm
-            .setIn(["matchedUseCase", "identifier"], matchingUseCase.identifier)
-            .setIn(["matchedUseCase", "icon"], matchingUseCase.icon)
-            .setIn(
-              ["matchedUseCase", "enabledUseCases"],
-              matchingUseCase.enabledUseCases
-                ? Immutable.fromJS(matchingUseCase.enabledUseCases)
-                : Immutable.List()
-            )
-            .setIn(
-              ["matchedUseCase", "reactionUseCases"],
-              matchingUseCase.reactionUseCases
-                ? Immutable.fromJS(matchingUseCase.reactionUseCases)
-                : Immutable.List()
-            );
-        }
+      if (matchingUseCase) {
+        return parsedAtomImm
+          .setIn(["matchedUseCase", "identifier"], matchingUseCase.identifier)
+          .setIn(["matchedUseCase", "icon"], matchingUseCase.icon)
+          .setIn(
+            ["matchedUseCase", "enabledUseCases"],
+            matchingUseCase.enabledUseCases
+              ? Immutable.fromJS(matchingUseCase.enabledUseCases)
+              : Immutable.List()
+          )
+          .setIn(
+            ["matchedUseCase", "reactionUseCases"],
+            matchingUseCase.reactionUseCases
+              ? Immutable.fromJS(matchingUseCase.reactionUseCases)
+              : Immutable.List()
+          );
       }
 
       return parsedAtomImm;
