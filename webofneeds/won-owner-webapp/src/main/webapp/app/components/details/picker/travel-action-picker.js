@@ -586,7 +586,3 @@ function genComponentConf() {
 export default angular
   .module("won.owner.components.travelActionPicker", [])
   .directive("wonTravelActionPicker", genComponentConf).name;
-
-window.searchNominatim4dbg = searchNominatim;
-window.reverseSearchNominatim4dbg = reverseSearchNominatim;
-window.nominatim2wonLocation4dbg = nominatim2draftLocation;

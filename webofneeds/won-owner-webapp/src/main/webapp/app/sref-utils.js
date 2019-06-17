@@ -2,8 +2,6 @@
  * Created by ksinger on 21.08.2017.
  */
 
-import { getParameters } from "./utils.js";
-
 import { resetParamsImm, addConstParams } from "./configRouting.js";
 
 /**
@@ -21,6 +19,32 @@ function absParams(queryParams) {
     currentParams
   );
   return paramsWithConst;
+}
+
+/**
+ * Retrieves parameters from the url-bar or parses them from a passed url.
+ * @param url
+ * @returns {{}}
+ */
+function getParameters(url) {
+  const url_ = url ? url : window.location.href; // e.g. url_ = "http://example.org/?privateId=5kpskm09-ocri63&foo=bar&asdf"
+  const [, paramsString] = url_.split("?"); // e.g. paramsString = "privateId=5kpskm09-ocri63&foo=bar&asdf"
+
+  if (!paramsString) {
+    // no parameters present
+    return {};
+  }
+
+  const paramsKconstray = paramsString
+    .split("&") // e.g. ["privateId=5kpskm09-ocri63", "foo=bar", "asdf"]
+    .map(p => p.split("=")) // e.g. [["privateId", "5kpskm09-ocri63"], ["foo", "bar"], ["asdf"]]
+    .filter(p => p.length === 2); // filter out parameter that's not a proper key-value pair, e.g. "asdf"
+
+  // create object from kv-pairs
+  const params = {};
+  paramsKconstray.forEach(kv => (params[kv[0]] = kv[1]));
+
+  return params;
 }
 
 /**

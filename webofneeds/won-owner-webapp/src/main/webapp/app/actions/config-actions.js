@@ -1,4 +1,5 @@
-import { getIn, get, checkHttpStatus, clone } from "../utils.js";
+import { getIn, get, clone } from "../utils.js";
+import * as ownerApi from "../owner-api.js";
 import { actionTypes } from "./actions";
 
 import loadCSS from "loadcss";
@@ -12,15 +13,17 @@ export function configInit() {
   return (dispatch, getState) => {
     const defaultTheme = getIn(getState(), ["config", "theme"]);
     const defaultThemeName = get(defaultTheme, "name");
-    Promise.all([loadDefaultNodeUri(), loadSkinConfig(defaultThemeName)]).then(
-      ([defaultNodeUri, defaultThemeConfig]) =>
-        dispatch({
-          type: actionTypes.config.init,
-          payload: {
-            defaultNodeUri,
-            theme: defaultTheme.mergeDeep(defaultThemeConfig).toJS(),
-          },
-        })
+    Promise.all([
+      ownerApi.getDefaultNodeUri(),
+      loadSkinConfig(defaultThemeName),
+    ]).then(([defaultNodeUri, defaultThemeConfig]) =>
+      dispatch({
+        type: actionTypes.config.init,
+        payload: {
+          defaultNodeUri,
+          theme: defaultTheme.mergeDeep(defaultThemeConfig).toJS(),
+        },
+      })
     );
   };
 }
@@ -48,24 +51,6 @@ export function update(patch) {
       });
     }
   };
-}
-async function loadDefaultNodeUri() {
-  /* this allows the owner-app-server to dynamically switch default nodes. */
-  return fetch(/*relativePathToConfig=*/ "appConfig/getDefaultWonNodeUri")
-    .then(checkHttpStatus)
-    .then(resp => resp.json())
-    .catch((/*err*/) => {
-      const defaultNodeUri = `${location.protocol}://${
-        location.host
-      }/won/resource`;
-      console.warn(
-        "Failed to fetch default node uri at the relative path `",
-        "appConfig/getDefaultWonNodeUri",
-        "` (is the API endpoint there up and reachable?) -> falling back to the default ",
-        defaultNodeUri
-      );
-      return defaultNodeUri;
-    });
 }
 
 let _themeCssElement;

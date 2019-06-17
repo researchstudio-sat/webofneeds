@@ -1,11 +1,29 @@
 import urljoin from "url-join";
-import { checkHttpStatus } from "./utils";
 import { ownerBaseUrl } from "~/config/default.js";
 import * as wonUtils from "./won-utils.js";
 
 /**
  * Created by quasarchimaere on 11.06.2019.
  */
+
+export function getDefaultNodeUri() {
+  /* this allows the owner-app-server to dynamically switch default nodes. */
+  return fetch(/*relativePathToConfig=*/ "appConfig/getDefaultWonNodeUri")
+    .then(checkHttpStatus)
+    .then(resp => resp.json())
+    .catch((/*err*/) => {
+      const defaultNodeUri = `${location.protocol}://${
+        location.host
+      }/won/resource`;
+      console.warn(
+        "Failed to fetch default node uri at the relative path `",
+        "appConfig/getDefaultWonNodeUri",
+        "` (is the API endpoint there up and reachable?) -> falling back to the default ",
+        defaultNodeUri
+      );
+      return defaultNodeUri;
+    });
+}
 
 /**
  * @param credentials either {email, password} or {privateId}
@@ -477,4 +495,20 @@ export function getPetriNetUris(connectionUri) {
   })
     .then(checkHttpStatus)
     .then(response => response.json());
+}
+
+/**
+ * Throws an error if this isn't a good http-response
+ * @param response
+ * @returns {*}
+ */
+function checkHttpStatus(response) {
+  if (response.status >= 200 && response.status < 300) {
+    return response;
+  } else {
+    const error = new Error(response.statusText);
+    error.response = response;
+    error.status = response.status;
+    throw error;
+  }
 }

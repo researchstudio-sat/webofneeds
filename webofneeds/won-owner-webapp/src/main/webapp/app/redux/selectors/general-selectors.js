@@ -4,7 +4,7 @@
 
 import { createSelector } from "reselect";
 
-import { decodeUriComponentProperly, getIn, get } from "../../utils.js";
+import { getIn, get } from "../../utils.js";
 import * as connectionSelectors from "./connection-selectors.js";
 import * as atomUtils from "../utils/atom-utils.js";
 import * as connectionUtils from "../utils/connection-utils.js";
@@ -340,4 +340,10 @@ export function isLocationAccessDenied(state) {
 export function getCurrentLocation(state) {
   const viewState = get(state, "view");
   return viewState && viewUtils.getCurrentLocation(viewState);
+}
+
+function decodeUriComponentProperly(encodedUri) {
+  if (!encodedUri) return undefined;
+  //for some reason decodeUri(undefined) yields "undefined"
+  else return decodeURIComponent(encodedUri);
 }

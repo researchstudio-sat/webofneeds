@@ -4,26 +4,6 @@
 import GeoPoint from "geopoint";
 import Immutable from "immutable";
 
-export function hyphen2Camel(hyphened) {
-  return hyphened
-    .replace(/^([a-z])/, args => args[0].toUpperCase()) //capitalize first letter
-    .replace(/-([a-z])/g, args => args[1].toUpperCase()); //hyphens to camel-case
-}
-
-export function camel2Hyphen(cammelled) {
-  return cammelled
-    .replace(/^([A-Z])/, args => args[0].toLowerCase()) //de-capitalize first letter
-    .replace(/(.)([A-Z])/g, args => args[0] + "-" + args[1].toLowerCase()); // camel-case to hyphens
-}
-
-export function firstToLowerCase(str) {
-  return str.replace(/^([A-Z])/, args => args[0].toLowerCase()); //de-capitalize first letter
-}
-
-window.hyphen2Camel = hyphen2Camel;
-window.camel2Hyphen = camel2Hyphen;
-window.firstToLowerCase = firstToLowerCase;
-
 /**
  * Attaches the contents of `attachments` to `target` using the constiable names from `names`
  * @param target the object
@@ -220,31 +200,6 @@ export function watchImmutableRdxState(redux, path, callback) {
 }
 
 /**
- * generates a string of random characters
- *
- * @param {*} length the length of the string to be generated. e.g. in the example below: 5
- * @param {*} chars the allowed characters, e.g. "abc123" to generate strings like "a3cba"
- */
-export function getRandomString(
-  length,
-  chars = "abcdefghijklmnopqrstuvwxyz0123456789"
-) {
-  const randomChar = () => chars[Math.floor(Math.random() * chars.length)];
-  return Array.from(
-    {
-      length: length,
-    },
-    randomChar
-  ).join("");
-}
-
-export function isString(o) {
-  return (
-    typeof o == "string" || (typeof o == "object" && o.constructor === String)
-  );
-}
-
-/**
  * Generate string of [a-z0-9] with specified length
  * @param length
  * @returns {*}
@@ -262,7 +217,7 @@ export function generateIdString(length) {
  * @param length
  * @returns {*}
  */
-export function arrayOfRandoms(length) {
+function arrayOfRandoms(length) {
   return Array.apply(null, Array(length)).map(() => Math.random());
 }
 
@@ -275,22 +230,6 @@ export function readAsDataURL(file) {
 
     reader.readAsDataURL(file);
   });
-}
-
-/**
- * Throws an error if this isn't a good http-response
- * @param response
- * @returns {*}
- */
-export function checkHttpStatus(response) {
-  if (response.status >= 200 && response.status < 300) {
-    return response;
-  } else {
-    const error = new Error(response.statusText);
-    error.response = response;
-    error.status = response.status;
-    throw error;
-  }
 }
 
 /**
@@ -312,21 +251,6 @@ export function* entries(obj) {
 }
 
 /**
- * Maps over the (value,key)-pairs of the object and produces
- * a new object with the same keys but the function's result
- * as values.
- * @param obj
- * @param f  a function `(value, key) => result` or `value => result`
- */
-export function mapObj(obj, f) {
-  const accumulator = {};
-  for (let [key, value] of entries(obj)) {
-    accumulator[key] = f(value, key);
-  }
-  return accumulator;
-}
-
-/**
  * @param listOfLists e.g. [ [1,2], [3], [], [3,4,5] ]
  * @return {*} e.g. [1,2,3,3,4,5]
  */
@@ -336,18 +260,6 @@ export function flatten(listOfLists) {
       innerList ? flattendList.concat(innerList) : [], //not concatenating `undefined`s
     [] //concat onto empty list as start
   );
-}
-
-/**
- * @param objOfObj e.g. { a: { x: 1, y: 2}, b: {z: 3}, c: {} }
- * @return {*} e.g. {x: 1, y: 2, z: 3}
- */
-export function flattenObj(objOfObj) {
-  let flattened = {};
-  for (const [, innerObjects] of entries(objOfObj)) {
-    flattened = Object.assign(flattened, innerObjects);
-  }
-  return flattened;
 }
 
 /**
@@ -467,33 +379,6 @@ export function urisToLookupSuccessAndFailedMap(
 }
 
 /**
- * Maps an asynchronous function over the values of an object or
- * the elements of an array. It returns a promise with the result,
- * when all applications of the asyncFunction have finished.
- * @param object
- * @param asyncFunction
- * @return {*}
- */
-export function mapJoin(object, asyncFunction) {
-  if (is("Array", object)) {
-    const promises = object.map(el => asyncFunction(el));
-    return Promise.all(promises);
-  } else if (is("Object", object)) {
-    const keys = Object.keys(object);
-    const promises = keys.map(k => asyncFunction(object[k]));
-    return Promise.all(promises).then(results => {
-      const acc = {};
-      results.forEach((result, i) => {
-        acc[keys[i]] = result;
-      });
-      return acc;
-    });
-  } else {
-    return undefined;
-  }
-}
-
-/**
  * Stable method of determining the type
  * taken from http://bonsaiden.github.io/JavaScript-Garden/
  *
@@ -512,12 +397,6 @@ export function is(type, obj) {
 export function isValidNumber(num) {
   // isNaN accepts string-numbers, `is` catches that
   return !isNaN(num) && is("Number", num);
-}
-
-export function decodeUriComponentProperly(encodedUri) {
-  if (!encodedUri) return undefined;
-  //for some reason decodeUri(undefined) yields "undefined"
-  else return decodeURIComponent(encodedUri);
 }
 
 export function msStringToDate(ts) {
@@ -725,7 +604,6 @@ export function getIn(obj, path) {
     }
   }
 }
-window.getIn4dbg = getIn;
 
 /**
  * Like `getIn` but allows passing a context
@@ -813,155 +691,6 @@ export function zipWith(f, xs, ys) {
   );
 }
 
-export function all(boolArr) {
-  return boolArr.reduce((b1, b2) => b1 && b2, true);
-}
-
-/**
- * compares two arrays and checks if their contents are equal
- */
-export function arrEq(xs, ys) {
-  return (
-    xs.length === ys.length &&
-    all(
-      //elementwise comparison
-      zipWith((x, y) => x === y, xs, ys)
-    )
-  );
-}
-
-/**
- *
- * Adapted from https://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript
- *
- * Usage:
- * ```
- * // query string: ?foo=lorem&bar=&baz
- * const foo = getParameterByName('foo'); // "lorem"
- * const bar = getParameterByName('bar'); // "" (present with empty value)
- * const baz = getParameterByName('baz'); // "" (present with no value)
- * const qux = getParameterByName('qux'); // null (absent)
- * ```
- * @param name
- * @param url
- * @returns {*}
- */
-export function getParameterByName(name, url) {
-  if (!url) url = window.location.href;
-  name = name.replace(/[[\]]/g, "\\$&");
-  const regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)");
-  const results = regex.exec(url);
-  if (!results) return null;
-  if (!results[2]) return "";
-  return decodeURIComponent(results[2].replace(/\+/g, " "));
-}
-
-/**
- * Retrieves parameters from the url-bar or parses them from a passed url.
- * @param url
- * @returns {{}}
- */
-export function getParameters(url) {
-  const url_ = url ? url : window.location.href; // e.g. url_ = "http://example.org/?privateId=5kpskm09-ocri63&foo=bar&asdf"
-  const [, paramsString] = url_.split("?"); // e.g. paramsString = "privateId=5kpskm09-ocri63&foo=bar&asdf"
-
-  if (!paramsString) {
-    // no parameters present
-    return {};
-  }
-
-  const paramsKconstray = paramsString
-    .split("&") // e.g. ["privateId=5kpskm09-ocri63", "foo=bar", "asdf"]
-    .map(p => p.split("=")) // e.g. [["privateId", "5kpskm09-ocri63"], ["foo", "bar"], ["asdf"]]
-    .filter(p => p.length === 2); // filter out parameter that's not a proper key-value pair, e.g. "asdf"
-
-  // create object from kv-pairs
-  const params = {};
-  paramsKconstray.forEach(kv => (params[kv[0]] = kv[1]));
-
-  return params;
-}
-
-// from https://github.com/gagan-bansal/parse-svg/blob/master/index.js
-export function parseSVG(xmlString) {
-  const div = document.createElementNS("http://www.w3.org/1999/xhtml", "div");
-  div.innerHTML =
-    '<svg xmlns="http://www.w3.org/2000/svg">' + xmlString + "</svg>";
-  const frag = document.createDocumentFragment();
-  while (div.firstChild.firstChild) frag.appendChild(div.firstChild.firstChild);
-  return frag;
-}
-
-/**
- * Fetch and inline an icon-spritemap so it can be colored using css-constiables.
- */
-export function inlineSVGSpritesheet(path, id) {
-  return fetch(path)
-    .then(res => res.text())
-    .then(xmlString => parseSVG(xmlString))
-    .then(svgDocumentFragment => {
-      if (!svgDocumentFragment)
-        throw new Error("Couldn't parse icon-spritesheet.");
-      document.body.appendChild(svgDocumentFragment);
-      const svgNode = document.body.lastChild; // the node resulting from the fragment we just appended
-      if (svgNode && svgNode.style) {
-        svgNode.style.display = "none";
-      }
-      if (id) {
-        svgNode.id = id;
-      }
-      //svgNode.style.display = "none"; // don't want it to show up in full, only via the fragment-references to it.
-      //window.svgNode4dbg = svgNode;
-      //window.foo4dbg = document.body.appendChild(svgNode);
-    });
-}
-
-/**
- * Optionally prepends a string, and then throws
- * whatever it gets as proper javascript error.
- * Note, that throwing an error will also
- * reject in a `Promise`-constructor-callback.
- * @param {*} e
- * @param {*} prependedMsg
- */
-export function rethrow(e, prependedMsg = "") {
-  prependedMsg = prependedMsg ? prependedMsg + "\n" : "";
-
-  if (is("String", e)) {
-    throw new Error(prependedMsg + e);
-  } else if (e.stack && e.message) {
-    // a class defined
-    const g = new Error(prependedMsg + e.message);
-    g.stack = e.stack;
-    g.response = e.response; //we add the response so we can look up why a request threw an error
-
-    throw g;
-  } else {
-    throw new Error(prependedMsg + JSON.stringify(e));
-  }
-}
-
-/**
- * Parses an rdf-uri and gets the base-uri, i.e.
- * the part before and including the fragment identifier
- * ("#") or last slash ("/").
- * @param {*} uri
- */
-export function prefixOfUri(uri) {
-  // if there's hash-tags, the first of these
-  // is the fragment identifier and everything
-  // after is the id. remove everything following it.
-  let prefix = uri.replace(/#.*/, "#");
-
-  // if there's no fragment-identifier, the
-  // everything after the last slash is removed.
-  if (!prefix.endsWith("#")) {
-    prefix = prefix.replace(/\/([^/]*)$/, "/");
-  }
-
-  return prefix;
-}
-
 /**
  * Sorts the elements by Date (default order is descending)
  * @param elementsImm elements from state that need to be returned as a sorted array
@@ -1020,12 +749,6 @@ export function sortBy(elementsImm, selector = elem => elem, order = "ASC") {
   }
 
   return sortedElements;
-}
-
-export function clamp(value, lower, upper) {
-  if (lower > value) return lower;
-  if (upper < value) return upper;
-  return value;
 }
 
 export function generateHexColor(text) {
@@ -1104,17 +827,6 @@ export function trigPrefixesAndBody(trigString) {
   return { trigPrefixes: prefixes, trigBody: body };
 }
 
-export function callBuffer(fn, delay = 1000) {
-  let timeout = undefined;
-  const buffer = (...args) => {
-    if (timeout) {
-      clearTimeout(timeout);
-    }
-    timeout = setTimeout(() => fn(...args), delay);
-  };
-  return buffer;
-}
-
 export function scrubSearchResults(searchResults) {
   return (
     Immutable.fromJS(searchResults.map(nominatim2draftLocation))
@@ -1171,45 +883,6 @@ export function findAllFieldOccurancesRecursively(fieldName, obj, _acc = []) {
   }
 
   return _acc;
-}
-
-/**
- * Takes an ISO-8601 string and returns a `Date` that marks
- * the exact time or the end of the year, month or day
- * e.g. xsd:dateTime: "2011-04-11T10:20:30Z"
- *
- * @param {*} dateStr
- */
-export function endOfDateStrInterval(dateStr) {
-  // "2011-04-11T10:20:30Z".split(/[-T]/) => ["2011", "04", "11", "10:20:30Z"]
-  // "2011-04-11".split(/[-T]/) => ["2011", "04", "11"]
-  const split = dateStr.split(/[-T]/);
-  if (split.length > 3) {
-    // precise datetime
-    return new Date(dateStr);
-  } else if (split.length === 3) {
-    // end of day
-    const year = split[0];
-    const monthIdx = split[1] - 1;
-    const day = split[2];
-    return new Date(year, monthIdx, day, 23, 59, 59);
-  } else if (split.length === 2) {
-    // end of month
-    const year = split[0];
-    const monthIdx = split[1] - 1;
-    const firstOfNextMonth = new Date(year, monthIdx + 1, 1, 23, 59, 59);
-    return new Date(firstOfNextMonth - 1000 * 60 * 60 * 24);
-  } else if (split.length === 1) {
-    // end of year
-    const year = split[0];
-    const monthIdx = 11;
-    return new Date(year, monthIdx, 31, 23, 59, 59);
-  } else {
-    console.error(
-      "Found unexpected date when calculating exact end-datetime of date-string: ",
-      dateStr
-    );
-  }
 }
 
 /**
@@ -1290,16 +963,6 @@ export function toLocalISODateString(dateTime) {
 }
 
 /**
- * Method that checks if the given element is already an array, if so return it, if not
- * return the element as a single element array, if element is undefined return undefined
- * @param elements
- * @returns {*}
- */
-export function createArray(elements) {
-  return !elements || Array.isArray(elements) ? elements : [elements];
-}
-
-/**
  * Method to create a simple Label for a given uri
  * @param str
  * @returns {*}
@@ -1313,45 +976,4 @@ export function generateSimpleTransitionLabel(str) {
     }
   }
   return str;
-}
-
-window.toLocalISODateString4dbg = toLocalISODateString;
-
-/**
- * Calculates distance between two locations in meters
- * If any of the locations or lat, lng of the location are undefined/null, return undefined
- * @param locationA json {lat, lng]
- * @param locationB json {lat, lng]
- * @returns {number} distance between these two coordinates in meters
- */
-export function calculateDistance(locationA, locationB) {
-  const locationAImm = locationA && Immutable.fromJS(locationA);
-  const locationBImm = locationB && Immutable.fromJS(locationB);
-
-  if (
-    !locationAImm ||
-    !locationAImm.get("lat") ||
-    !locationAImm.get("lng") ||
-    !locationBImm ||
-    !locationBImm.get("lat") ||
-    !locationBImm.get("lng")
-  ) {
-    return;
-  }
-
-  const earthRadius = 6371000; // earth radius in meters
-  const dLat =
-    ((locationBImm.get("lat") - locationAImm.get("lat")) * Math.PI) / 180;
-  const dLon =
-    ((locationBImm.get("lng") - locationAImm.get("lng")) * Math.PI) / 180;
-  const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos((locationAImm.get("lat") * Math.PI) / 180) *
-      Math.cos((locationBImm.get("lat") * Math.PI) / 180) *
-      Math.sin(dLon / 2) *
-      Math.sin(dLon / 2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  const d = earthRadius * c;
-
-  return Math.round(d);
 }

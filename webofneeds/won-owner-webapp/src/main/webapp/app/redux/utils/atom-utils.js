@@ -3,10 +3,11 @@
  */
 
 import won from "../../won-es6.js";
-import { get, getIn, calculateDistance } from "../../utils.js";
+import { get, getIn } from "../../utils.js";
 import { labels } from "../../won-label-utils.js";
 import * as connectionUtils from "./connection-utils.js";
 import * as useCaseUtils from "../../usecase-utils.js";
+import Immutable from "immutable";
 
 /**
  * Determines if a given atom is a Active
@@ -108,6 +109,45 @@ export function getLocation(atom) {
  */
 export function getDistanceFrom(atom, location) {
   const atomLocation = getLocation(atom);
+
+  /**
+   * Calculates distance between two locations in meters
+   * If any of the locations or lat, lng of the location are undefined/null, return undefined
+   * @param locationA json {lat, lng]
+   * @param locationB json {lat, lng]
+   * @returns {number} distance between these two coordinates in meters
+   */
+  const calculateDistance = (locationA, locationB) => {
+    const locationAImm = locationA && Immutable.fromJS(locationA);
+    const locationBImm = locationB && Immutable.fromJS(locationB);
+
+    if (
+      !locationAImm ||
+      !locationAImm.get("lat") ||
+      !locationAImm.get("lng") ||
+      !locationBImm ||
+      !locationBImm.get("lat") ||
+      !locationBImm.get("lng")
+    ) {
+      return;
+    }
+
+    const earthRadius = 6371000; // earth radius in meters
+    const dLat =
+      ((locationBImm.get("lat") - locationAImm.get("lat")) * Math.PI) / 180;
+    const dLon =
+      ((locationBImm.get("lng") - locationAImm.get("lng")) * Math.PI) / 180;
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos((locationAImm.get("lat") * Math.PI) / 180) *
+        Math.cos((locationBImm.get("lat") * Math.PI) / 180) *
+        Math.sin(dLon / 2) *
+        Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const d = earthRadius * c;
+
+    return Math.round(d);
+  };
 
   return calculateDistance(atomLocation, location);
 }

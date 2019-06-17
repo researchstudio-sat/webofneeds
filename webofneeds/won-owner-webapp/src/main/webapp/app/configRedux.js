@@ -9,7 +9,7 @@ import { piwikMiddleware } from "./piwik.js";
 
 import { devToolsEnhancer } from "redux-devtools-extension";
 
-import { getIn, arrEq } from "./utils.js";
+import { getIn, zipWith } from "./utils.js";
 
 export default function configRedux(appModule) {
   appModule.config(createStore);
@@ -117,4 +117,21 @@ function reduxSelectDependsOnProperties(properties, selectFromState, ctrl) {
       firstTime = false;
     }
   });
+}
+
+/**
+ * compares two arrays and checks if their contents are equal
+ */
+function arrEq(xs, ys) {
+  return (
+    xs.length === ys.length &&
+    all(
+      //elementwise comparison
+      zipWith((x, y) => x === y, xs, ys)
+    )
+  );
+}
+
+function all(boolArr) {
+  return boolArr.reduce((b1, b2) => b1 && b2, true);
 }

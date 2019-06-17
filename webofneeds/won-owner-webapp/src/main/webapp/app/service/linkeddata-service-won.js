@@ -22,7 +22,6 @@ import {
   is,
   clone,
   contains,
-  rethrow,
   getIn,
   get,
   getInFromJsonLd,
@@ -1801,6 +1800,31 @@ function groupByGraphs(jsonldData, addDefaultContext = true) {
     });
 
   return seperatedGraphsP;
+}
+
+/**
+ * Optionally prepends a string, and then throws
+ * whatever it gets as proper javascript error.
+ * Note, that throwing an error will also
+ * reject in a `Promise`-constructor-callback.
+ * @param {*} e
+ * @param {*} prependedMsg
+ */
+function rethrow(e, prependedMsg = "") {
+  prependedMsg = prependedMsg ? prependedMsg + "\n" : "";
+
+  if (is("String", e)) {
+    throw new Error(prependedMsg + e);
+  } else if (e.stack && e.message) {
+    // a class defined
+    const g = new Error(prependedMsg + e.message);
+    g.stack = e.stack;
+    g.response = e.response; //we add the response so we can look up why a request threw an error
+
+    throw g;
+  } else {
+    throw new Error(prependedMsg + JSON.stringify(e));
+  }
 }
 
 /**

@@ -369,7 +369,3 @@ function onMapClick(e, ctrl) {
 export default angular
   .module("won.owner.components.locationPicker", [titlePickerModule])
   .directive("wonLocationPicker", genComponentConf).name;
-
-window.searchNominatim4dbg = searchNominatim;
-window.reverseSearchNominatim4dbg = reverseSearchNominatim;
-window.nominatim2wonLocation4dbg = nominatim2draftLocation;

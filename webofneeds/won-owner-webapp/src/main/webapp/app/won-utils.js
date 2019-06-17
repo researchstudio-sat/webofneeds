@@ -4,11 +4,9 @@
 
 import {
   generateIdString,
-  getRandomString,
   findAllFieldOccurancesRecursively,
   is,
   isValidNumber,
-  endOfDateStrInterval,
   getFromJsonLd,
   toAbsoluteURL,
 } from "./utils.js";
@@ -67,6 +65,25 @@ export function getRandomWonId() {
   );
 }
 
+/**
+ * generates a string of random characters
+ *
+ * @param {*} length the length of the string to be generated. e.g. in the example below: 5
+ * @param {*} chars the allowed characters, e.g. "abc123" to generate strings like "a3cba"
+ */
+function getRandomString(
+  length,
+  chars = "abcdefghijklmnopqrstuvwxyz0123456789"
+) {
+  const randomChar = () => chars[Math.floor(Math.random() * chars.length)];
+  return Array.from(
+    {
+      length: length,
+    },
+    randomChar
+  ).join("");
+}
+
 export function findLatestIntervallEndInJsonLdOrNowAndAddMillis(
   draft,
   jsonld,
@@ -93,7 +110,45 @@ export function findLatestIntervallEndInJsonLdOrNowAndAddMillis(
 
     if (allTimesStrs.length === 0) return undefined; // no time strings found
 
-    // determine if any of them are intervals (e.g. days or months) and if so calculate the end of these
+    /**
+     * Takes an ISO-8601 string and returns a `Date` that marks
+     * the exact time or the end of the year, month or day
+     * e.g. xsd:dateTime: "2011-04-11T10:20:30Z"
+     *
+     * @param {*} dateStr
+     */
+    const endOfDateStrInterval = dateStr => {
+      // "2011-04-11T10:20:30Z".split(/[-T]/) => ["2011", "04", "11", "10:20:30Z"]
+      // "2011-04-11".split(/[-T]/) => ["2011", "04", "11"]
+      const split = dateStr.split(/[-T]/);
+      if (split.length > 3) {
+        // precise datetime
+        return new Date(dateStr);
+      } else if (split.length === 3) {
+        // end of day
+        const year = split[0];
+        const monthIdx = split[1] - 1;
+        const day = split[2];
+        return new Date(year, monthIdx, day, 23, 59, 59);
+      } else if (split.length === 2) {
+        // end of month
+        const year = split[0];
+        const monthIdx = split[1] - 1;
+        const firstOfNextMonth = new Date(year, monthIdx + 1, 1, 23, 59, 59);
+        return new Date(firstOfNextMonth - 1000 * 60 * 60 * 24);
+      } else if (split.length === 1) {
+        // end of year
+        const year = split[0];
+        const monthIdx = 11;
+        return new Date(year, monthIdx, 31, 23, 59, 59);
+      } else {
+        console.error(
+          "Found unexpected date when calculating exact end-datetime of date-string: ",
+          dateStr
+        );
+      }
+    };
+
     const endDatetimes = allTimesStrs.map(str => endOfDateStrInterval(str));
 
     // find the latest mentioned point in time
