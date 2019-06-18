@@ -5,7 +5,6 @@ import * as atomUtils from "./utils/atom-utils.js";
 import { parseMetaAtom } from "../reducers/atom-reducer/parse-atom.js";
 import { is } from "../utils.js";
 import won from "../won-es6";
-import * as connectionUtils from "./utils/connection-utils.js";
 
 export function fetchOwnedData(dispatch) {
   return ownerApi
@@ -222,7 +221,8 @@ function fetchConnectionsOfAtomAndDispatch(atomUri, dispatch) {
       });
 
       const activeConnectionUris = connectionsWithStateAndSocket
-        .filter(conn => !connectionUtils.isClosed(conn))
+        .filter(conn => conn.connectionState !== won.WON.Closed)
+        //.filter(conn => conn.connectionState !== won.WON.Suggested)
         .map(conn => conn.connectionUri);
 
       dispatch({

@@ -1189,7 +1189,11 @@ import won from "./won.js";
           return {
             connectionUri: x.connectionUri.value,
             connectionState: x.connectionState.value,
+            socketUri: x.socketUri.value,
             socketType: x.socketType.value,
+            targetAtomUri: x.targetAtomUri.value,
+            targetSocketUri: x.targetSocketUri.value,
+            targetSocketType: x.targetSocketType.value,
           };
         })
       );
@@ -1704,14 +1708,24 @@ import won from "./won.js";
       query:
         "prefix won: <https://w3id.org/won/core#> \n" +
         "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> \n" +
-        "select ?connectionUri ?connectionState ?socketType \n" +
-        " where { \n" +
+        "select " +
+        "?connectionUri " +
+        "?connectionState " +
+        "?socketType " +
+        "?socketUri " +
+        "?targetAtomUri " +
+        "?targetSocketType " +
+        "?targetSocketUri " +
+        "\n where { \n" +
         " <::baseUri::> a won:Atom; \n" +
         "           won:connections ?connections.\n" +
         "  ?connections rdfs:member ?connectionUri. \n" +
         "  ?connectionUri won:connectionState ?connectionState. \n" +
+        "  ?connectionUri won:targetAtom ?targetAtomUri. \n" +
         "  ?connectionUri won:socket ?socketUri. \n" +
         "  ?socketUri won:socketDefinition ?socketType. \n" +
+        "  ?connectionUri won:targetSocket ?targetSocketUri. \n" +
+        "  ?targetSocketUri won:socketDefinition ?targetSocketType. \n" +
         "} \n",
     },
   };
