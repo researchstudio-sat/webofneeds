@@ -941,20 +941,7 @@ export function processSocketHintMessage(event) {
             recipientAtomUri,
             dispatch
           )
-        )
-        .then(connection => {
-          const targetAtomUri = connection && connection.targetAtom;
-          const targetAtom = getIn(currentState, ["atoms", targetAtomUri]);
-
-          if (targetAtom) {
-            return Promise.resolve(won.invalidateCacheForAtom(targetAtomUri));
-          } else {
-            return stateStore.fetchTheirAtomAndDispatch(
-              targetAtomUri,
-              dispatch
-            );
-          }
-        });
+        );
     }
   };
 }
