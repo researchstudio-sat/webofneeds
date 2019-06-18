@@ -84,7 +84,7 @@ function genComponentConf() {
 
         const ratingConnectionUri =
           get(connection, "targetAtomUri") == this.postUri &&
-          get(ownAtom, "heldBy")
+          atomUtils.getHeldByUri(ownAtom)
             ? connectionUri
             : null;
 

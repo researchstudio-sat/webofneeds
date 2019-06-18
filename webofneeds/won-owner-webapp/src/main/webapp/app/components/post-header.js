@@ -122,7 +122,7 @@ function genComponentConf() {
         const responseToAtom =
           responseToUri && getIn(state, ["atoms", responseToUri]);
 
-        const personaUri = get(atom, "heldBy");
+        const personaUri = atomUtils.getHeldByUri(atom);
         const persona = personaUri && getIn(state, ["atoms", personaUri]);
         const personaName = get(persona, "humanReadable");
 

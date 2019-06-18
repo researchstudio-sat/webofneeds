@@ -81,7 +81,7 @@ function genComponentConf() {
           </div>
       </div>
       <div class="ac-buddies__empty"
-          ng-if="(!self.isOwned && !self.buddies) || (self.isOwned && !self.hasBuddyConnections)">
+          ng-if="!self.buddies && !self.hasBuddyConnections">
           No Buddies present.
       </div>
       <won-labelled-hr label="::'Request'" class="ac-buddies__labelledhr" ng-if="self.isOwned"></won-labelled-hr>

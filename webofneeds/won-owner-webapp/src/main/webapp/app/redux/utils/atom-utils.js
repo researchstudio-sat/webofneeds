@@ -425,6 +425,14 @@ export function getDefaultSocketUri(atomImm) {
   );
 }
 
+export function getHeldByUri(atomImm) {
+  return hasHoldableSocket(atomImm) && get(atomImm, "heldBy");
+}
+
+export function isHeld(atomImm) {
+  return !!getHeldByUri(atomImm);
+}
+
 export function getDefaultSocketWithKeyReset(atomImm) {
   const defaultSocket = getIn(atomImm, ["content", "defaultSocket"]);
 

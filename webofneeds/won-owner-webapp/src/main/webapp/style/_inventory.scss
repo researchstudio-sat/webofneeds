@@ -50,6 +50,17 @@ main.ownerinventory {
   width: 100%;
   margin: 0 auto;
 
+  & .ownerinventory__personas {
+    padding: 1rem 0;
+    display: grid;
+    grid-gap: 1rem;
+
+    > won-post-info.ownerinventory__personas__persona {
+      background: white;
+      border: $thinGrayBorder;
+    }
+  }
+
   & .ownerinventory__header {
     display: grid;
     grid-template-columns: 1fr min-content;

@@ -29,7 +29,7 @@ function genComponentConf() {
               <span class="post-menu__item__label">Detail</span>
             </div>
             <div class="post-menu__item"
-              ng-if="self.hasHeldBy"
+              ng-if="self.isHeld"
               ng-click="self.selectTab('HELDBY')"
               ng-class="{
                 'post-menu__item--selected': self.isSelectedTab('HELDBY'),
@@ -38,7 +38,7 @@ function genComponentConf() {
               <span class="post-menu__item__rating" ng-if="self.personaAggregateRatingString">(★ {{ self.personaAggregateRatingString }})</span>
             </div>
             <div class="post-menu__item"
-              ng-if="!self.hasHeldBy && self.isHoldable && self.isOwned"
+              ng-if="!self.isHeld && self.isHoldable && self.isOwned"
               ng-click="self.selectTab('HELDBY')"
               ng-class="{
                 'post-menu__item--selected': self.isSelectedTab('HELDBY'),
@@ -165,10 +165,9 @@ function genComponentConf() {
         //TODO: BLARGH GROUPCHATCONN FILTER
 
         const heldPosts = hasHolderSocket && get(post, "holds");
-        const heldByUri =
-          atomUtils.hasHoldableSocket(post) && get(post, "heldBy");
-        const hasHeldBy = !!heldByUri; //aka Persona that holds this post
-        const persona = hasHeldBy && getIn(state, ["atoms", heldByUri]);
+        const heldByUri = atomUtils.getHeldByUri(post);
+        const isHeld = atomUtils.isHeld(post);
+        const persona = getIn(state, ["atoms", heldByUri]);
         const personaHasReviewSocket = atomUtils.hasReviewSocket(persona);
         const personaAggregateRating =
           personaHasReviewSocket &&
@@ -206,7 +205,7 @@ function genComponentConf() {
           isPersona,
           isHoldable: atomUtils.hasHoldableSocket(post),
           isOwned,
-          hasHeldBy,
+          isHeld,
           personaHasReviewSocket,
           personaAggregateRatingString:
             personaAggregateRating && personaAggregateRating.toFixed(1),

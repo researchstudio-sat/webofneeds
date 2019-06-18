@@ -162,7 +162,7 @@ function genComponentConf() {
 
         const isPersona = atomUtils.isPersona(atom);
 
-        const personaUri = get(atom, "heldBy");
+        const personaUri = atomUtils.getHeldByUri(atom);
         const persona = personaUri && getIn(state, ["atoms", personaUri]);
         const personaName = get(persona, "humanReadable");
         const personaHolds = persona && get(persona, "holds");

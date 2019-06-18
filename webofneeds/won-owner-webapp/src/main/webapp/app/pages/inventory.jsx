@@ -46,31 +46,34 @@ const template = (
       <won-how-to />
     </main>
     <main className="ownerinventory" ng-if="self.isLoggedIn">
-      <won-post-info
-        ng-if="self.hasOwnedActivePersonas"
-        ng-repeat="personaUri in self.sortedOwnedActivePersonaUriArray track by personaUri"
-        atom-uri="personaUri"
-      />
+      <div className="ownerinventory__personas" ng-if="self.hasOwnedActivePersonas">
+        <won-post-info
+          class="ownerinventory__personas__persona"
+          ng-repeat="personaUri in self.sortedOwnedActivePersonaUriArray track by personaUri"
+          atom-uri="personaUri"
+          hide-back-button="true"
+        />
+      </div>
       <div className="ownerinventory__header">
         <div className="ownerinventory__header__title">
-          Active
+          Unassigned
           <span
             className="ownerinventory__header__title__count"
-            ng-if="self.hasOwnedActiveAtomUris"
+            ng-if="self.hasOwnedUnassignedAtomUris"
           >
-            {"({{self.sortedOwnedActiveAtomUriSize}})"}
+            {"({{self.unassignedAtomSize}})"}
           </span>
         </div>
       </div>
       <div
         className="ownerinventory__content"
-        ng-if="self.hasOwnedActiveAtomUris"
+        ng-if="self.hasOwnedUnassignedAtomUris"
       >
         <won-atom-card
           className="ownerinventory__content__atom"
           atom-uri="atomUri"
           current-location="self.currentLocation"
-          ng-repeat="atomUri in self.sortedOwnedActiveAtomUriArray track by atomUri"
+          ng-repeat="atomUri in self.sortedOwnedUnassignedAtomUriArray track by atomUri"
           show-suggestions="::true"
           show-persona="::true"
         />
@@ -89,7 +92,7 @@ const template = (
       </div>
       <div
         className="ownerinventory__noresults"
-        ng-if="!self.hasOwnedActiveAtomUris"
+        ng-if="!self.hasOwnedUnassignedAtomUris"
       >
         <span className="ownerinventory__noresults__label">
           Nothing to display
@@ -102,7 +105,7 @@ const template = (
         <div className="ownerinventory__header__title">
           Archived
           <span className="ownerinventory__header__title__count">
-            {"({{self.sortedOwnedInactiveAtomUriSize}})"}
+            {"({{self.inactiveAtomUriSize}})"}
           </span>
         </div>
       </div>
@@ -135,26 +138,23 @@ class Controller {
       const viewAtomUri = generalSelectors.getViewAtomUriFromRoute(state);
       const viewConnUri = generalSelectors.getViewConnectionUriFromRoute(state);
 
-      const ownedPersonas = generalSelectors.getOwnedPersonas(state);
-      const ownedActivePersonas = ownedPersonas && ownedPersonas.filter(atom =>
-        atomUtils.isActive(atom)
-      );
+      const ownedActivePersonas = generalSelectors
+        .getOwnedPersonas(state)
+        .filter(atom => atomUtils.isActive(atom));
+      const ownedUnassignedActivePosts = generalSelectors
+        .getOwnedPosts(state)
+        .filter(atom => atomUtils.isActive(atom))
+        .filter(atom => !atomUtils.isHeld(atom));
+      const ownedInactiveAtoms = generalSelectors
+        .getOwnedAtoms(state)
+        .filter(atom => atomUtils.isInactive(atom));
 
-
-      const ownedAtoms = generalSelectors.getOwnedAtoms(state);
-      const ownedActiveAtoms = ownedAtoms.filter(atom =>
-        atomUtils.isActive(atom)
-      );
-      const ownedInactiveAtoms = ownedAtoms.filter(atom =>
-        atomUtils.isInactive(atom)
-      );
-
-      const sortedOwnedActiveAtoms = sortByDate(
-        ownedActiveAtoms,
+      const sortedOwnedUnassignedActivePosts = sortByDate(
+        ownedUnassignedActivePosts,
         "creationDate"
       );
-      const sortedOwnedActiveAtomUriArray = sortedOwnedActiveAtoms && [
-        ...sortedOwnedActiveAtoms.flatMap(atom => get(atom, "uri")),
+      const sortedOwnedUnassignedAtomUriArray = sortedOwnedUnassignedActivePosts && [
+        ...sortedOwnedUnassignedActivePosts.flatMap(atom => get(atom, "uri")),
       ];
 
       const sortedOwnedInactiveAtoms = sortByDate(
@@ -186,18 +186,18 @@ class Controller {
         isLoggedIn: accountUtils.isLoggedIn(accountState),
         welcomeTemplatePath: "./skin/" + themeName + "/" + welcomeTemplate,
         currentLocation: generalSelectors.getCurrentLocation(state),
-        sortedOwnedActiveAtomUriArray,
+        sortedOwnedUnassignedAtomUriArray,
         sortedOwnedInactiveAtomUriArray,
-        hasOwnedActiveAtomUris:
-          sortedOwnedActiveAtomUriArray &&
-          sortedOwnedActiveAtomUriArray.length > 0,
+        hasOwnedUnassignedAtomUris:
+          sortedOwnedUnassignedAtomUriArray &&
+          sortedOwnedUnassignedAtomUriArray.length > 0,
         hasOwnedInactiveAtomUris:
           sortedOwnedInactiveAtomUriArray &&
           sortedOwnedInactiveAtomUriArray.length > 0,
-        sortedOwnedActiveAtomUriSize: sortedOwnedActiveAtomUriArray
-          ? sortedOwnedActiveAtomUriArray.length
+        unassignedAtomSize: sortedOwnedUnassignedAtomUriArray
+          ? sortedOwnedUnassignedAtomUriArray.length
           : 0,
-        sortedOwnedInactiveAtomUriSize: sortedOwnedInactiveAtomUriArray
+        inactiveAtomUriSize: sortedOwnedInactiveAtomUriArray
           ? sortedOwnedInactiveAtomUriArray.length
           : 0,
         hasOwnedActivePersonas:

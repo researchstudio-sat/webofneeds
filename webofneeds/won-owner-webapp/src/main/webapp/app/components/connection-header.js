@@ -159,7 +159,7 @@ function genComponentConf() {
 
         const groupMembers = targetAtom && targetAtom.get("groupMembers");
 
-        const remotePersonaUri = get(targetAtom, "heldBy");
+        const remotePersonaUri = atomUtils.getHeldByUri(targetAtom);
         const remotePersona =
           remotePersonaUri && getIn(state, ["atoms", remotePersonaUri]);
         const remotePersonaName = get(remotePersona, "humanReadable");

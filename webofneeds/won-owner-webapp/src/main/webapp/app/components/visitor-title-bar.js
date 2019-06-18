@@ -53,7 +53,7 @@ function genComponentConf() {
         const postUri = getPostUriFromRoute(state);
         const post = state.getIn(["atoms", postUri]);
 
-        const personaUri = get(post, "heldBy");
+        const personaUri = atomUtils.getHeldByUri(post);
         const persona = personaUri && getIn(state, ["atoms", personaUri]);
         const personaName = get(persona, "humanReadable");
         const isDirectResponse = atomUtils.isDirectResponseAtom(post);

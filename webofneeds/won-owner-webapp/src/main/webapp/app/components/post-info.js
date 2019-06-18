@@ -27,8 +27,8 @@ import Immutable from "immutable";
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
   let template = `
-        <div class="post-info__header" ng-if="!self.hideHeader">
-            <div class="post-info__header__back">
+        <div class="post-info__header" ng-if="!self.hideHeader" ng-class="{'post-info__header--noBackButton': self.hideBackButton}">
+            <div class="post-info__header__back" ng-if="!self.hideBackButton">
               <a class="post-info__header__back__button clickable"
                   ng-click="self.router__back()">
                   <svg class="post-info__header__back__button__icon clickable hide-in-responsive">
@@ -140,7 +140,7 @@ function genComponentConf() {
       connect2Redux(
         selectFromState,
         actionCreators,
-        ["self.atomUri", "self.hideHeader"],
+        ["self.atomUri", "self.hideHeader", "self.hideBackButton"],
         this
       );
 
@@ -211,6 +211,7 @@ function genComponentConf() {
     scope: {
       atomUri: "=",
       hideHeader: "=",
+      hideBackButton: "=",
     },
   };
 }

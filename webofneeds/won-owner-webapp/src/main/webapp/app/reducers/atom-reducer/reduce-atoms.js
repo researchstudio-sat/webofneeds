@@ -2,6 +2,7 @@ import { parseAtom, parseMetaAtom } from "./parse-atom.js";
 import Immutable from "immutable";
 import { get } from "../../utils.js";
 import won from "../../won-es6.js";
+import * as atomUtils from "../../redux/utils/atom-utils.js";
 
 export function addAtom(atoms, jsonldAtom) {
   let newState;
@@ -57,7 +58,7 @@ export function addAtom(atoms, jsonldAtom) {
 export function deleteAtom(atoms, deletedAtomUri) {
   return atoms.delete(deletedAtomUri).map(atom => {
     const removeHolder = atom => {
-      if (atom.get("heldBy") === deletedAtomUri) {
+      if (atomUtils.getHeldByUri(atom) === deletedAtomUri) {
         return atom.delete("heldBy");
       } else return atom;
     };

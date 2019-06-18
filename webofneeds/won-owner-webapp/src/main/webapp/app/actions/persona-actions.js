@@ -195,7 +195,7 @@ export function reviewPersona(reviewableConnectionUri, review) {
     const foreignAtom = getIn(state, ["atoms", foreignAtomUri]);
 
     const getPersona = atom => {
-      const personaUri = get(atom, "heldBy");
+      const personaUri = atomUtils.getHeldByUri(atom);
       const persona = state.getIn(["atoms", personaUri]);
 
       return persona;

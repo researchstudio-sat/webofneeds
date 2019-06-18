@@ -81,12 +81,12 @@ function genComponentConf() {
 
         const ratingConnectionUri =
           get(connection, "targetAtomUri") == this.holdsUri &&
-          get(ownAtom, "heldBy")
+          atomUtils.isHeld(ownAtom)
             ? connectionUri
             : null;
 
         const post = this.holdsUri && getIn(state, ["atoms", this.holdsUri]);
-        const personaUri = get(post, "heldBy");
+        const personaUri = atomUtils.getHeldByUri(post);
         const persona = post ? getIn(state, ["atoms", personaUri]) : undefined;
 
         const personaHasHolderSocket = atomUtils.hasHolderSocket(persona);

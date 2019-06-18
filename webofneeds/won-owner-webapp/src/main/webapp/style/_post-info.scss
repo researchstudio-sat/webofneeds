@@ -26,6 +26,11 @@ won-post-info {
     min-width: 0;
     align-items: center;
 
+    &--noBackButton {
+      grid-template-columns: 1fr auto auto;
+      grid-template-areas: "header_title header_share header_context";
+    }
+
     &__back {
       grid-area: header_back;
       display: grid;

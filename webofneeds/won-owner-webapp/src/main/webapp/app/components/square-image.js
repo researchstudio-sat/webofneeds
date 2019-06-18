@@ -33,7 +33,7 @@ function genComponentConf() {
 
       const selectFromState = state => {
         const atom = getIn(state, ["atoms", this.uri]);
-        const personaUri = get(atom, "heldBy");
+        const personaUri = atomUtils.getHeldByUri(atom);
         const persona = getIn(state, ["atoms", personaUri]);
         const personaIdenticonSvg = atomUtils.getIdenticonSvg(persona);
 
