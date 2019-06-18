@@ -46,6 +46,11 @@ const template = (
       <won-how-to />
     </main>
     <main className="ownerinventory" ng-if="self.isLoggedIn">
+      <won-post-info
+        ng-if="self.hasOwnedActivePersonas"
+        ng-repeat="personaUri in self.sortedOwnedActivePersonaUriArray track by personaUri"
+        atom-uri="personaUri"
+      />
       <div className="ownerinventory__header">
         <div className="ownerinventory__header__title">
           Active
@@ -130,6 +135,12 @@ class Controller {
       const viewAtomUri = generalSelectors.getViewAtomUriFromRoute(state);
       const viewConnUri = generalSelectors.getViewConnectionUriFromRoute(state);
 
+      const ownedPersonas = generalSelectors.getOwnedPersonas(state);
+      const ownedActivePersonas = ownedPersonas && ownedPersonas.filter(atom =>
+        atomUtils.isActive(atom)
+      );
+
+
       const ownedAtoms = generalSelectors.getOwnedAtoms(state);
       const ownedActiveAtoms = ownedAtoms.filter(atom =>
         atomUtils.isActive(atom)
@@ -152,6 +163,15 @@ class Controller {
       );
       const sortedOwnedInactiveAtomUriArray = sortedOwnedInactiveAtoms && [
         ...sortedOwnedInactiveAtoms.flatMap(atom => get(atom, "uri")),
+      ];
+
+      const sortedOwnedActivePersonas = sortByDate(
+        ownedActivePersonas,
+        "modifiedDate"
+      );
+
+      const sortedOwnedActivePersonaUriArray = sortedOwnedActivePersonas && [
+        ...sortedOwnedActivePersonas.flatMap(atom => get(atom, "uri")),
       ];
 
       const viewState = get(state, "view");
@@ -180,6 +200,10 @@ class Controller {
         sortedOwnedInactiveAtomUriSize: sortedOwnedInactiveAtomUriArray
           ? sortedOwnedInactiveAtomUriArray.length
           : 0,
+        hasOwnedActivePersonas:
+          sortedOwnedActivePersonaUriArray &&
+          sortedOwnedActivePersonaUriArray.length > 0,
+        sortedOwnedActivePersonaUriArray,
         showSlideIns:
           viewSelectors.hasSlideIns(state) && viewSelectors.showSlideIns(state),
         showModalDialog: viewSelectors.showModalDialog(state),

@@ -6,7 +6,6 @@ import Immutable from "immutable";
 import {
   getOwnedAtomByConnectionUri,
   getOwnedAtoms,
-  getOwnedPosts,
   getAtoms,
 } from "./general-selectors.js";
 import * as connectionUtils from "../utils/connection-utils.js";
@@ -103,16 +102,14 @@ export function getBuddyConnectionsByAtomUri(
  * @returns {Immutable.Map|*}
  */
 export function getChatConnectionsToCrawl(state) {
-  const atoms = getOwnedPosts(state); //we only check own posts as these are the only ones who have connections stored
+  const allAtoms = getAtoms(state);
+  const ownedAtoms = getOwnedAtoms(state);
   const allConnections =
-    atoms && atoms.flatMap(atom => atom.get("connections"));
+    ownedAtoms && ownedAtoms.flatMap(atom => atom.get("connections"));
+
   const chatConnections =
     allConnections &&
     allConnections
-      .filter(
-        conn =>
-          isChatToXConnection(atoms, conn) || isGroupToXConnection(atoms, conn)
-      )
       .filter(conn => {
         const connUri = get(conn, "uri");
         const process = get(state, "process");
@@ -122,7 +119,12 @@ export function getChatConnectionsToCrawl(state) {
           !processUtils.isConnectionLoadingMessages(process, connUri) &&
           !processUtils.hasConnectionFailedToLoad(process, connUri)
         );
-      });
+      })
+      .filter(
+        conn =>
+          isChatToXConnection(allAtoms, conn) ||
+          isGroupToXConnection(allAtoms, conn)
+      );
 
   const connectionsInStateConnected =
     chatConnections &&
@@ -138,7 +140,8 @@ export function getChatConnectionsToCrawl(state) {
           .filter(msg => msg.get("messageType") === won.WONMSG.connectMessage)
           .size == 0
     );
-  return connectionsWithoutConnectMessage;
+
+  return connectionsWithoutConnectMessage || Immutable.Map();
 }
 
 export function hasMessagesToLoad(state, connUri) {

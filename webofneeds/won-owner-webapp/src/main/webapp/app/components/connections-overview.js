@@ -13,7 +13,7 @@ import postHeaderModule from "./post-header.js";
 import connectionIndicatorsModule from "./connection-indicators.js";
 import connectionSelectionItemModule from "./connection-selection-item.js";
 
-import { delay, sortByDate, get, getIn } from "../utils.js";
+import { sortByDate, get, getIn } from "../utils.js";
 import { attach } from "../cstm-ng-utils.js";
 import { connect2Redux } from "../configRedux.js";
 import { actionCreators } from "../actions/actions.js";
@@ -68,10 +68,6 @@ function genComponentConf() {
         const allAtoms = generalSelectors.getPosts(state);
         const openAtoms = generalSelectors.getChatAtoms(state);
 
-        const connectionsToCrawl = connectionSelectors.getChatConnectionsToCrawl(
-          state
-        );
-
         const connUriInRoute = generalSelectors.getConnectionUriFromRoute(
           state
         );
@@ -86,7 +82,6 @@ function genComponentConf() {
           sortedOpenAtomUris: sortedOpenAtoms && [
             ...sortedOpenAtoms.flatMap(atom => atom.get("uri")),
           ],
-          connectionsToCrawl: connectionsToCrawl || Immutable.Map(),
         };
       };
       connect2Redux(
@@ -95,36 +90,6 @@ function genComponentConf() {
         ["self.connectionUri"],
         this
       );
-
-      this.$scope.$watch("self.connectionsToCrawl", cnctToCrawl =>
-        this.ensureUnreadMessagesAreLoaded(cnctToCrawl)
-      );
-    }
-
-    ensureUnreadMessagesAreLoaded(connectionsToCrawl) {
-      delay(0).then(() => {
-        const MESSAGECOUNT = 10;
-
-        connectionsToCrawl.map(conn => {
-          const messages = conn.get("messages");
-          const messageCount = messages ? messages.size : 0;
-
-          if (messageCount == 0) {
-            this.connections__showLatestMessages(conn.get("uri"), MESSAGECOUNT);
-          } else {
-            const receivedMessages = messages.filter(
-              msg => !msg.get("outgoingMessage")
-            );
-            const receivedMessagesReadPresent = receivedMessages.find(
-              msg => !msg.get("unread")
-            );
-
-            if (!receivedMessagesReadPresent) {
-              this.connections__showMoreMessages(conn.get("uri"), MESSAGECOUNT);
-            }
-          }
-        });
-      });
     }
 
     showAtomDetails(atomUri) {
