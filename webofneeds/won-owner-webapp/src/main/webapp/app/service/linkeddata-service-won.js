@@ -1180,20 +1180,24 @@ import won from "./won.js";
   won.getConnectionUrisWithStateByAtomUri = (atomUri, requesterWebId) => {
     return won
       .executeCrawlableQuery(
-        won.queries["getAllConnectionUrisOfAtom"],
+        won.queries["getAllMetaConnectionsOfAtom"],
         atomUri,
         requesterWebId
       )
       .then(result =>
         result.map(x => {
           return {
-            connectionUri: x.connectionUri.value,
-            connectionState: x.connectionState.value,
-            socketUri: x.socketUri.value,
-            socketType: x.socketType.value,
-            targetAtomUri: x.targetAtomUri.value,
-            targetSocketUri: x.targetSocketUri.value,
-            targetSocketType: x.targetSocketType.value,
+            connectionUri: x.connectionUri && x.connectionUri.value,
+            connectionState: x.connectionState && x.connectionState.value,
+            socketUri: x.socketUri && x.socketUri.value,
+            socketType: x.socketType && x.socketType.value,
+            atomUri: x.atomUri && x.atomUri.value,
+            targetAtomUri: x.targetAtomUri && x.targetAtomUri.value,
+            targetConnectionUri:
+              x.targetConnectionUri && x.targetConnectionUri.value,
+            targetSocketUri: x.targetSocketUri && x.targetSocketUri.value,
+            targetSocketType: x.targetSocketType && x.targetSocketType.value,
+            modified: x.modified && x.modified.value,
           };
         })
       );
@@ -1692,7 +1696,7 @@ import won from "./won.js";
     /**
      * Despite the name, returns the connections fo the specified atom themselves. TODO rename
      */
-    getAllConnectionUrisOfAtom: {
+    getAllMetaConnectionsOfAtom: {
       propertyPaths: [
         {
           prefixes:
@@ -1701,6 +1705,7 @@ import won from "./won.js";
             ": <" +
             won.WON.baseUri +
             "> " +
+            "prefix dct: <http://purl.org/dc/terms/> " +
             "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> ",
           propertyPath: "won:connections",
         },
@@ -1708,28 +1713,86 @@ import won from "./won.js";
       query:
         "prefix won: <https://w3id.org/won/core#> \n" +
         "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> \n" +
+        "prefix dct: <http://purl.org/dc/terms/> \n" +
         "select " +
         "?connectionUri " +
         "?connectionState " +
+        "?atomUri " +
         "?socketType " +
         "?socketUri " +
         "?targetAtomUri " +
+        "?targetConnectionUri " +
         "?targetSocketType " +
         "?targetSocketUri " +
+        "?modified " +
         "\n where { \n" +
         " <::baseUri::> a won:Atom; \n" +
         "           won:connections ?connections.\n" +
         "  ?connections rdfs:member ?connectionUri. \n" +
         "  ?connectionUri won:connectionState ?connectionState. \n" +
+        "  ?connectionUri won:sourceAtom ?atomUri. \n" +
         "  ?connectionUri won:targetAtom ?targetAtomUri. \n" +
         "  ?connectionUri won:socket ?socketUri. \n" +
         "  ?socketUri won:socketDefinition ?socketType. \n" +
         "  ?connectionUri won:targetSocket ?targetSocketUri. \n" +
-        "  ?targetSocketUri won:socketDefinition ?targetSocketType. \n" +
+        "  ?connectionUri dct:modified ?modified. \n" +
+        "  OPTIONAL { ?targetSocketUri won:socketDefinition ?targetSocketType. } \n" +
+        "  OPTIONAL { ?connectionUri won:targetConnection ?targetConnectionUri } \n" +
         "} \n",
     },
   };
 })();
+
+/*
+{
+    "@id" : "conn:aavakck2xsm39hr9kxi2",
+    "@type" : "won:Connection",
+    "http://purl.org/dc/terms/modified" : {
+      "@type" : "xsd:dateTime",
+      "@value" : "2019-06-18T06:27:20.989Z"
+    },
+    "won:connectionState" : {
+      "@id" : "won:Connected"
+    },
+    "won:socket" : {
+      "@id" : "atom:z6ne170yrf0z#holdableSocket"
+    },
+    "won:sourceAtom" : {
+      "@id" : "atom:z6ne170yrf0z"
+    },
+    "won:targetAtom" : {
+      "@id" : "atom:sxxxgf2necv6"
+    },
+    "won:targetConnection" : {
+      "@id" : "conn:totztqjd99h1vt73mi5n"
+    },
+    "won:targetSocket" : {
+      "@id" : "atom:sxxxgf2necv6#holderSocket"
+    }
+  }, {
+    "@id" : "conn:aboy09l0txxkewixlqtq",
+    "@type" : "won:Connection",
+    "http://purl.org/dc/terms/modified" : {
+      "@type" : "xsd:dateTime",
+      "@value" : "2019-06-18T06:27:46.278Z"
+    },
+    "won:connectionState" : {
+      "@id" : "won:Suggested"
+    },
+    "won:socket" : {
+      "@id" : "atom:z6ne170yrf0z#chatSocket"
+    },
+    "won:sourceAtom" : {
+      "@id" : "atom:z6ne170yrf0z"
+    },
+    "won:targetAtom" : {
+      "@id" : "atom:xbszwgx0ey23a9kcm283"
+    },
+    "won:targetSocket" : {
+      "@id" : "atom:xbszwgx0ey23a9kcm283#ChatSocket"
+    }
+  }
+* */
 
 /**
  * Thin wrapper around `rdfstore.load(...)` that returns
