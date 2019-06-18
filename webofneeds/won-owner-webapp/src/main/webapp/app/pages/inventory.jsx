@@ -217,14 +217,6 @@ class Controller {
 
     connect2Redux(selectFromState, actionCreators, [], this);
   }
-
-  toggleClosedAtoms() {
-    //TODO: USE ONCE THIS IS COLLAPSIBLE
-    /*if (this.unloadedAtomsSize > 0) {
-      this.atoms__fetchUnloadedAtoms();
-    }
-    this.view__toggleClosedAtoms();*/
-  }
 }
 
 Controller.$inject = [];

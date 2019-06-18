@@ -40,7 +40,6 @@ import { atomCreate, atomEdit } from "./create-atom-action.js";
 
 import {
   atomsConnect,
-  fetchUnloadedAtoms,
   fetchUnloadedAtom,
   atomsClose,
   atomsDelete,
@@ -151,7 +150,6 @@ const actionHierarchy = {
     closedBySystem: atomsClosedBySystem,
     failed: INJ_DEFAULT,
     connect: atomsConnect,
-    fetchUnloadedAtoms: fetchUnloadedAtoms,
     fetchUnloadedAtom: fetchUnloadedAtom,
 
     fetchWhatsNew: fetchWhatsNew,
@@ -159,7 +157,6 @@ const actionHierarchy = {
     storeWhatsNew: INJ_DEFAULT,
     storeWhatsAround: INJ_DEFAULT,
 
-    storeOwnedInactiveUrisInLoading: INJ_DEFAULT,
     storeOwnedMetaAtoms: INJ_DEFAULT,
     storeTheirUrisInLoading: INJ_DEFAULT,
 

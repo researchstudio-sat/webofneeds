@@ -148,23 +148,6 @@ export function fetchDataForNonOwnedAtomOnly(atomUri, dispatch) {
   return fetchTheirAtomAndDispatch(atomUri, dispatch);
 }
 
-export function fetchUnloadedData(dispatch) {
-  return ownerApi
-    .getOwnedMetaAtoms("INACTIVE")
-    .then(metaAtoms => {
-      console.debug("metaAtoms: ", metaAtoms);
-      const atomsImm = Immutable.fromJS(metaAtoms);
-      return [...atomsImm.keys()];
-    })
-    .then(atomUris => {
-      dispatch({
-        type: actionTypes.atoms.storeOwnedInactiveUrisInLoading,
-        payload: Immutable.fromJS({ uris: atomUris }),
-      });
-      return fetchDataForOwnedAtoms(atomUris, dispatch);
-    });
-}
-
 export function fetchWhatsNew(
   dispatch,
   getState,

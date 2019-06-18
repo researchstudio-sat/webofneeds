@@ -18,16 +18,8 @@ import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as stateStore from "../redux/state-store.js";
 import { get } from "../utils.js";
 
-export function fetchUnloadedAtoms() {
-  return async dispatch => {
-    stateStore.fetchUnloadedData(dispatch);
-  };
-}
-
 export function fetchUnloadedAtom(atomUri) {
-  return async dispatch => {
-    stateStore.fetchDataForNonOwnedAtomOnly(atomUri, dispatch);
-  };
+  return dispatch => stateStore.fetchDataForNonOwnedAtomOnly(atomUri, dispatch);
 }
 
 //ownConnectionUri is optional - set if known

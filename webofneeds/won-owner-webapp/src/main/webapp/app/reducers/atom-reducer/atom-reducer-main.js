@@ -59,14 +59,6 @@ export default function(allAtomsInState = initialState, action = {}) {
         atom.set("connections", Immutable.Map())
       );
 
-    case actionTypes.atoms.storeOwnedInactiveUrisInLoading: {
-      return addAtomStubs(
-        allAtomsInState,
-        action.payload.get("uris"),
-        won.WON.InactiveCompacted
-      );
-    }
-
     case actionTypes.atoms.storeOwnedMetaAtoms: {
       return addMetaAtomStubs(allAtomsInState, action.payload.get("metaAtoms"));
     }
