@@ -47,15 +47,14 @@ export async function fetchDataForOwnedAtoms(ownedAtomUris, dispatch) {
         .filter(connections => connections.size > 0)
         .flatMap(entry => entry)
         .map(conn => conn.get("targetAtom"))
-        .toSet();
-
-      const theirAtomUrisArray = theirAtomUris.toArray();
+        .toSet()
+        .toArray();
 
       dispatch({
         type: actionTypes.atoms.storeTheirUrisInLoading,
-        payload: Immutable.fromJS({ uris: theirAtomUrisArray }),
+        payload: Immutable.fromJS({ uris: theirAtomUris }),
       });
-      return theirAtomUrisArray;
+      return theirAtomUris;
     })
     .then(theirAtomUris =>
       urisToLookupMap(theirAtomUris, uri =>
@@ -221,8 +220,14 @@ function fetchConnectionsOfAtomAndDispatch(atomUri, dispatch) {
       });
       const activeConnectionUris = connectionsWithStateAndSocket
         .filter(conn => conn.connectionState !== won.WON.Closed)
-        //.filter(conn => conn.connectionState !== won.WON.Suggested)
+        .filter(conn => conn.connectionState !== won.WON.Suggested)
         .map(conn => conn.connectionUri);
+
+      const targetAtomUris = connectionsWithStateAndSocket.map(
+        conn => conn.targetAtomUri
+      );
+
+      console.debug("targetAtomUris: ", targetAtomUris);
 
       dispatch({
         type: actionTypes.connections.storeActiveUrisInLoading,
@@ -232,10 +237,13 @@ function fetchConnectionsOfAtomAndDispatch(atomUri, dispatch) {
         }),
       });
 
-      return urisToLookupMap(activeConnectionUris, connUri =>
+      return activeConnectionUris;
+    })
+    .then(activeConnectionUris =>
+      urisToLookupMap(activeConnectionUris, connUri =>
         fetchActiveConnectionAndDispatch(connUri, atomUri, dispatch)
-      );
-    });
+      )
+    );
 }
 
 function fetchOwnedAtomAndDispatch(atomUri, dispatch) {
