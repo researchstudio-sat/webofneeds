@@ -75,7 +75,7 @@ const template = (
           current-location="self.currentLocation"
           ng-repeat="atomUri in self.sortedOwnedUnassignedAtomUriArray track by atomUri"
           show-suggestions="::true"
-          show-persona="::true"
+          show-persona="::false"
         />
         <div
           className="ownerinventory__content__createatom"
