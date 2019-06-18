@@ -244,7 +244,7 @@ function genComponentConf() {
           ),
           isHoldable: useCaseUtils.isHoldable(useCase),
           hasFromAtomFailedToLoad,
-          personas: generalSelectors.getOwnedPersonas(state).toJS(),
+          personas: generalSelectors.getOwnedCondensedPersonaList(state).toJS(),
           showCreateInput:
             useCase &&
             !(

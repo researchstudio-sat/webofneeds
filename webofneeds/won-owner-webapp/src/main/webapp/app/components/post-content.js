@@ -20,7 +20,7 @@ import * as viewUtils from "../redux/utils/view-utils.js";
 import * as processUtils from "../redux/utils/process-utils.js";
 import * as connectionSelectors from "../redux/selectors/connection-selectors.js";
 import {
-  getOwnedPersonas,
+  getOwnedCondensedPersonaList,
   getConnectionUriFromRoute,
   isAtomOwned,
 } from "../redux/selectors/general-selectors.js";
@@ -229,7 +229,7 @@ function genComponentConf() {
           fromConnection: !!openConnectionUri,
           openConnectionUri,
           visibleTab: viewUtils.getVisibleTabByAtomUri(viewState, this.postUri),
-          personas: getOwnedPersonas(state),
+          personas: getOwnedCondensedPersonaList(state),
         };
       };
       connect2Redux(selectFromState, actionCreators, ["self.postUri"], this);

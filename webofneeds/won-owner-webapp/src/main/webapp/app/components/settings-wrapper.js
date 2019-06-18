@@ -3,7 +3,7 @@ import { Elm } from "../../elm/Settings.elm";
 import { actionCreators } from "../actions/actions";
 import "./identicon.js";
 import {
-  getOwnedPersonas,
+  getOwnedCondensedPersonaList,
   currentSkin,
 } from "../redux/selectors/general-selectors.js";
 import { get } from "../utils";
@@ -29,7 +29,7 @@ function genComponentConf($ngRedux) {
       });
 
       elmApp.ports.updatePersonas.subscribe(() => {
-        const personas = getOwnedPersonas($ngRedux.getState());
+        const personas = getOwnedCondensedPersonaList($ngRedux.getState());
         if (personas) {
           elmApp.ports.personaIn.send(personas.toJS());
         }
@@ -53,14 +53,14 @@ function genComponentConf($ngRedux) {
         elmApp.ports.accountInfoIn.send(accountInfo);
       });
 
-      const personas = getOwnedPersonas($ngRedux.getState());
+      const personas = getOwnedCondensedPersonaList($ngRedux.getState());
       if (personas) {
         elmApp.ports.personaIn.send(personas.toJS());
       }
 
       const disconnect = $ngRedux.connect(state => {
         return {
-          personas: getOwnedPersonas(state),
+          personas: getOwnedCondensedPersonaList(state),
           isVerified: accountUtils.isEmailVerified(get(state, "account")),
           accountInfo: {
             email: accountUtils.getEmail(get(state, "account")),

@@ -14,7 +14,7 @@ import { dispatchEvent, delay, get } from "../utils.js";
 import { attach } from "../cstm-ng-utils.js";
 import {
   getOwnedAtomByConnectionUri,
-  getOwnedPersonas,
+  getOwnedCondensedPersonaList,
 } from "../redux/selectors/general-selectors.js";
 import { getMessagesByConnectionUri } from "../redux/selectors/message-selectors.js";
 import {
@@ -369,7 +369,7 @@ function genComponentConf() {
           selectedDetail,
           selectedDetailComponent: selectedDetail && selectedDetail.component,
           isLoggedIn: accountUtils.isLoggedIn(get(state, "account")),
-          personas: getOwnedPersonas(state).toJS(),
+          personas: getOwnedCondensedPersonaList(state).toJS(),
         };
       };
 
