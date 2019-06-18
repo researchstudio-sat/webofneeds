@@ -290,12 +290,6 @@ export function connectionsOpen(connectionUri, textMessage) {
         optimisticEvent,
       },
     });
-
-    dispatch(
-      actionCreators.router__stateGoAbs("connections", {
-        connectionUri: optimisticEvent.getSenderConnection(),
-      })
-    );
   };
 }
 
