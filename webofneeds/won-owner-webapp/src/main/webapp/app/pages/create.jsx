@@ -3,7 +3,6 @@
 import angular from "angular";
 import ngAnimate from "angular-animate";
 import won from "../won-es6.js";
-import sendRequestModule from "../components/send-request.js";
 
 import createPostModule from "../components/create-post.js";
 import createSearchModule from "../components/create-search.js";
@@ -85,7 +84,6 @@ export default {
   module: angular
     .module("won.owner.components.create", [
       ngAnimate,
-      sendRequestModule,
       usecasePickerModule,
       usecaseGroupModule,
       createPostModule,

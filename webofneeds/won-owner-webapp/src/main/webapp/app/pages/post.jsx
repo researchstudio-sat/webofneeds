@@ -10,7 +10,6 @@ import { connect2Redux } from "../configRedux.js";
 import won from "../won-es6.js";
 
 import { actionCreators } from "../actions/actions.js";
-import sendRequestModule from "../components/send-request.js";
 import postMessagesModule from "../components/post-messages.js";
 import groupPostMessagesModule from "../components/group-post-messages.js";
 import visitorTitleBarModule from "../components/visitor-title-bar.js";
@@ -47,9 +46,10 @@ const template = (
         ng-if="!(self.atomLoading || self.atomFailedToLoad)"
         item="self.atom"
       />
-      <won-send-request
+      <won-post-info
         ng-if="!(self.atomLoading || self.atomFailedToLoad) && self.atom"
-        class="won-send-request--noheader"
+        atom-uri="self.atomUri"
+        hide-header="true"
       />
       <div className="pc__loading" ng-if="self.atomLoading">
         <svg className="pc__loading__spinner hspinner">
@@ -147,7 +147,6 @@ Controller.$inject = serviceDependencies;
 export default {
   module: angular
     .module("won.owner.components.post", [
-      sendRequestModule,
       ngAnimate,
       visitorTitleBarModule,
       postMessagesModule,

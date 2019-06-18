@@ -86,7 +86,7 @@ function genComponentConf() {
                 'post-menu__item--selected': self.isSelectedTab('HOLDS'),
                 'post-menu__item--inactive': !self.hasHeldPosts
               }">
-              <span class="post-menu__item__label">Posts of this Persona</span>
+              <span class="post-menu__item__label">Posts</span>
               <span class="post-menu__item__count">({{self.heldPostsSize}})</span>
             </div>
             <div class="post-menu__item"

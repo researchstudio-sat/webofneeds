@@ -27,7 +27,7 @@ import Immutable from "immutable";
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
   let template = `
-        <div class="post-info__header">
+        <div class="post-info__header" ng-if="!self.hideHeader">
             <div class="post-info__header__back">
               <a class="post-info__header__back__button clickable"
                   ng-click="self.router__back()">
@@ -137,9 +137,19 @@ function genComponentConf() {
               showAdHocRequestField),
         };
       };
-      connect2Redux(selectFromState, actionCreators, ["self.atomUri"], this);
+      connect2Redux(
+        selectFromState,
+        actionCreators,
+        ["self.atomUri", "self.hideHeader"],
+        this
+      );
 
       classOnComponentRoot("won-is-loading", () => this.atomLoading, this);
+      classOnComponentRoot(
+        "won-post-info--noheader",
+        () => this.hideHeader,
+        this
+      );
     }
 
     selectUseCase(ucIdentifier) {
@@ -200,6 +210,7 @@ function genComponentConf() {
     template: template,
     scope: {
       atomUri: "=",
+      hideHeader: "=",
     },
   };
 }

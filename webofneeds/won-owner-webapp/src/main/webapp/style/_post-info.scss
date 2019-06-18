@@ -2,15 +2,13 @@
 @import "sizing-utils";
 @import "animate";
 
-won-send-request,
 won-post-info {
   display: grid;
   grid-template-areas: "header" "menu" "main" "footer";
   grid-template-rows: min-content min-content minmax($minimalGridRows, 1fr) min-content;
   box-sizing: border-box;
 
-  &.won-post-info--noheader,
-  &.won-send-request--noheader {
+  &.won-post-info--noheader {
     grid-template-areas: "menu" "main" "footer";
     grid-template-rows: min-content minmax($minimalGridRows, 1fr) min-content;
   }
