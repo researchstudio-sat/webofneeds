@@ -30,7 +30,7 @@ import {
   markMessageExpandReferences,
 } from "./reduce-messages.js";
 import {
-  addConnectionsToLoad,
+  addMetaConnections,
   markConnectionAsRated,
   markConnectionAsRead,
   getAtomByConnectionUri,
@@ -95,8 +95,8 @@ export default function(allAtomsInState = initialState, action = {}) {
       );
     }
 
-    case actionTypes.connections.storeUrisToLoad: {
-      return addConnectionsToLoad(
+    case actionTypes.connections.storeMetaConnections: {
+      return addMetaConnections(
         allAtomsInState,
         action.payload.get("atomUri"),
         action.payload.get("connections")

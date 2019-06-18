@@ -403,7 +403,7 @@ export default function(processState = initialState, action = {}) {
       });
     }
 
-    case actionTypes.connections.storeUrisToLoad: {
+    case actionTypes.connections.storeMetaConnections: {
       const connections = action.payload.get("connections");
 
       connections &&

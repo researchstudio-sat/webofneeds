@@ -213,13 +213,12 @@ function fetchConnectionsOfAtomAndDispatch(atomUri, dispatch) {
     .getConnectionUrisWithStateByAtomUri(atomUri, atomUri)
     .then(connectionsWithStateAndSocket => {
       dispatch({
-        type: actionTypes.connections.storeUrisToLoad,
+        type: actionTypes.connections.storeMetaConnections,
         payload: Immutable.fromJS({
           atomUri: atomUri,
           connections: connectionsWithStateAndSocket,
         }),
       });
-
       const activeConnectionUris = connectionsWithStateAndSocket
         .filter(conn => conn.connectionState !== won.WON.Closed)
         //.filter(conn => conn.connectionState !== won.WON.Suggested)

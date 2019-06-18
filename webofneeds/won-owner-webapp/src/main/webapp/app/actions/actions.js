@@ -132,7 +132,7 @@ const actionHierarchy = {
     updatePetriNetData: INJ_DEFAULT,
 
     storeActiveUrisInLoading: INJ_DEFAULT,
-    storeUrisToLoad: INJ_DEFAULT,
+    storeMetaConnections: INJ_DEFAULT,
     storeActive: INJ_DEFAULT,
 
     storeUriFailed: INJ_DEFAULT,
