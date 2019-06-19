@@ -12,7 +12,6 @@ import won from "../won-es6.js";
 import { actionCreators } from "../actions/actions.js";
 import postMessagesModule from "../components/post-messages.js";
 import groupPostMessagesModule from "../components/group-post-messages.js";
-import visitorTitleBarModule from "../components/visitor-title-bar.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as viewSelectors from "../redux/selectors/view-selectors.js";
 import * as processUtils from "../redux/utils/process-utils.js";
@@ -41,15 +40,10 @@ const template = (
       className="postcontent"
       ng-class="{'postcontent--won-loading': self.atomLoading, 'postcontent--won-failed': self.atomFailedToLoad}"
     >
-      {/*Post info view when there's no connection-state/-type selected*/}
-      <won-visitor-title-bar
-        ng-if="!(self.atomLoading || self.atomFailedToLoad)"
-        item="self.atom"
-      />
       <won-post-info
         ng-if="!(self.atomLoading || self.atomFailedToLoad) && self.atom"
         atom-uri="self.atomUri"
-        hide-header="true"
+        big-header="true"
       />
       <div className="pc__loading" ng-if="self.atomLoading">
         <svg className="pc__loading__spinner hspinner">
@@ -148,7 +142,6 @@ export default {
   module: angular
     .module("won.owner.components.post", [
       ngAnimate,
-      visitorTitleBarModule,
       postMessagesModule,
       groupPostMessagesModule,
     ])

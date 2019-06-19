@@ -5,7 +5,6 @@ import angular from "angular";
 import { get, getIn } from "../utils.js";
 import { attach } from "../cstm-ng-utils.js";
 import { connect2Redux } from "../configRedux.js";
-import { getPostUriFromRoute } from "../redux/selectors/general-selectors.js";
 import { actionCreators } from "../actions/actions.js";
 import postContextDropDownModule from "../components/post-context-dropdown.js";
 import shareDropdownModule from "../components/share-dropdown.js";
@@ -50,11 +49,11 @@ function genComponentConf() {
       window.vtb4dbg = this;
 
       const selectFromState = state => {
-        const postUri = getPostUriFromRoute(state);
+        const postUri = this.atomUri;
         const post = state.getIn(["atoms", postUri]);
 
         const personaUri = atomUtils.getHeldByUri(post);
-        const persona = personaUri && getIn(state, ["atoms", personaUri]);
+        const persona = getIn(state, ["atoms", personaUri]);
         const personaName = get(persona, "humanReadable");
         const isDirectResponse = atomUtils.isDirectResponseAtom(post);
         const responseToUri =
@@ -73,7 +72,7 @@ function genComponentConf() {
           atomTypeLabel: post && atomUtils.generateTypeLabel(post),
         };
       };
-      connect2Redux(selectFromState, actionCreators, [], this);
+      connect2Redux(selectFromState, actionCreators, ["self.atomUri"], this);
     }
 
     hasTitle() {
@@ -99,7 +98,9 @@ function genComponentConf() {
     controller: Controller,
     controllerAs: "self",
     bindToController: true, //scope-bindings -> ctrl
-    scope: { item: "=" },
+    scope: {
+      atomUri: "=",
+    },
     template: template,
   };
 }

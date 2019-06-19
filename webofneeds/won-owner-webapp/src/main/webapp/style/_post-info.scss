@@ -8,9 +8,8 @@ won-post-info {
   grid-template-rows: min-content min-content minmax($minimalGridRows, 1fr) min-content;
   box-sizing: border-box;
 
-  &.won-post-info--noheader {
-    grid-template-areas: "menu" "main" "footer";
-    grid-template-rows: min-content minmax($minimalGridRows, 1fr) min-content;
+  won-visitor-title-bar {
+    grid-area: header;
   }
 
   .post-info__header {

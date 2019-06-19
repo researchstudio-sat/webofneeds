@@ -9,6 +9,7 @@ import postContentModule from "./post-content.js";
 import postMenuModule from "./post-menu.js";
 import shareDropdownModule from "./share-dropdown.js";
 import chatTextFieldModule from "./chat-textfield.js";
+import visitorTitleBarModule from "../components/visitor-title-bar.js";
 import { get, getIn } from "../utils.js";
 import { connect2Redux } from "../configRedux.js";
 import * as viewUtils from "../redux/utils/view-utils.js";
@@ -27,7 +28,7 @@ import Immutable from "immutable";
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
   let template = `
-        <div class="post-info__header" ng-if="!self.hideHeader" ng-class="{'post-info__header--noBackButton': self.hideBackButton}">
+        <div class="post-info__header" ng-if="!self.bigHeader" ng-class="{'post-info__header--noBackButton': self.hideBackButton}">
             <div class="post-info__header__back" ng-if="!self.hideBackButton">
               <a class="post-info__header__back__button clickable"
                   ng-click="self.router__back()">
@@ -43,6 +44,10 @@ function genComponentConf() {
             <won-share-dropdown atom-uri="self.atomUri"></won-share-dropdown>
             <won-post-context-dropdown atom-uri="self.atomUri"></won-post-context-dropdown>
         </div>
+        <won-visitor-title-bar
+            ng-if="self.bigHeader"
+            atom-uri="self.atomUri"
+        ></won-visitor-title-bar>
         <won-post-menu post-uri="self.atomUri"></won-post-menu>
         <won-post-content post-uri="self.atomUri"></won-post-content>
         <div class="post-info__footer" ng-if="self.showFooter">
@@ -140,16 +145,11 @@ function genComponentConf() {
       connect2Redux(
         selectFromState,
         actionCreators,
-        ["self.atomUri", "self.hideHeader", "self.hideBackButton"],
+        ["self.atomUri", "self.bigHeader", "self.hideBackButton"],
         this
       );
 
       classOnComponentRoot("won-is-loading", () => this.atomLoading, this);
-      classOnComponentRoot(
-        "won-post-info--noheader",
-        () => this.hideHeader,
-        this
-      );
     }
 
     selectUseCase(ucIdentifier) {
@@ -210,7 +210,7 @@ function genComponentConf() {
     template: template,
     scope: {
       atomUri: "=",
-      hideHeader: "=",
+      bigHeader: "=",
       hideBackButton: "=",
     },
   };
@@ -224,5 +224,6 @@ export default angular
     postContentModule,
     shareDropdownModule,
     chatTextFieldModule,
+    visitorTitleBarModule,
   ])
   .directive("wonPostInfo", genComponentConf).name;
