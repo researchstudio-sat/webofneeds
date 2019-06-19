@@ -9,7 +9,7 @@ import postContentModule from "./post-content.js";
 import postMenuModule from "./post-menu.js";
 import shareDropdownModule from "./share-dropdown.js";
 import chatTextFieldModule from "./chat-textfield.js";
-import visitorTitleBarModule from "../components/visitor-title-bar.js";
+import atomHeaderBigModule from "./atom-header-big.js";
 import { get, getIn } from "../utils.js";
 import { connect2Redux } from "../configRedux.js";
 import * as viewUtils from "../redux/utils/view-utils.js";
@@ -44,10 +44,11 @@ function genComponentConf() {
             <won-share-dropdown atom-uri="self.atomUri"></won-share-dropdown>
             <won-post-context-dropdown atom-uri="self.atomUri"></won-post-context-dropdown>
         </div>
-        <won-visitor-title-bar
+        <won-atom-header-big
             ng-if="self.bigHeader"
+            hide-back-button="self.hideBackButton"
             atom-uri="self.atomUri"
-        ></won-visitor-title-bar>
+        ></won-atom-header-big>
         <won-post-menu post-uri="self.atomUri"></won-post-menu>
         <won-post-content post-uri="self.atomUri"></won-post-content>
         <div class="post-info__footer" ng-if="self.showFooter">
@@ -224,6 +225,6 @@ export default angular
     postContentModule,
     shareDropdownModule,
     chatTextFieldModule,
-    visitorTitleBarModule,
+    atomHeaderBigModule,
   ])
   .directive("wonPostInfo", genComponentConf).name;

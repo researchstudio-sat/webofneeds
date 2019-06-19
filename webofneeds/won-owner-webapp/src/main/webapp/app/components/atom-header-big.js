@@ -10,31 +10,31 @@ import postContextDropDownModule from "../components/post-context-dropdown.js";
 import shareDropdownModule from "../components/share-dropdown.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 
-import "~/style/_visitor-title-bar.scss";
+import "~/style/_atom-header-big.scss";
 
 const serviceDependencies = ["$ngRedux", "$scope"];
 function genComponentConf() {
   let template = `
-        <nav class="visitor-title-bar">
-            <div class="vtb__inner">
-                <div class="vtb__inner__left">
+        <nav class="atom-header-big">
+            <div class="ahb__inner">
+                <div class="ahb__inner__left">
                     <won-square-image
                         uri="self.postUri">
                     </won-square-image>
                     <hgroup>
-                        <h1 class="vtb__title" ng-if="self.hasTitle()">{{ self.generateTitle() }}</h1>
-                        <h1 class="vtb__title vtb__title--notitle" ng-if="!self.hasTitle() && self.isDirectResponse">RE: no title</h1>
-                        <h1 class="vtb__title vtb__title--notitle" ng-if="!self.hasTitle() && !self.isDirectResponse">no title</h1>
-                        <span class="vtb__titles__persona" ng-if="self.personaName">{{ self.personaName }}</span>
-                        <span class="vtb__titles__groupchat"
+                        <h1 class="ahb__title" ng-if="self.hasTitle()">{{ self.generateTitle() }}</h1>
+                        <h1 class="ahb__title ahb__title--notitle" ng-if="!self.hasTitle() && self.isDirectResponse">RE: no title</h1>
+                        <h1 class="ahb__title ahb__title--notitle" ng-if="!self.hasTitle() && !self.isDirectResponse">no title</h1>
+                        <span class="ahb__titles__persona" ng-if="self.personaName">{{ self.personaName }}</span>
+                        <span class="ahb__titles__groupchat"
                           ng-if="self.isGroupChatEnabled && !self.isChatEnabled">
                           Group Chat
                         </span>
-                        <span class="vtb__titles__groupchat"
+                        <span class="ahb__titles__groupchat"
                           ng-if="self.isGroupChatEnabled && self.isChatEnabled">
                           Group Chat enabled
                         </span>
-                        <div class="vtb__titles__type">{{ self.atomTypeLabel }}</div>
+                        <div class="ahb__titles__type">{{ self.atomTypeLabel }}</div>
                     </hgroup>
                 </div>
             </div>
@@ -46,7 +46,7 @@ function genComponentConf() {
   class Controller {
     constructor() {
       attach(this, serviceDependencies, arguments);
-      window.vtb4dbg = this;
+      window.ahb4dbg = this;
 
       const selectFromState = state => {
         const postUri = this.atomUri;
@@ -72,7 +72,12 @@ function genComponentConf() {
           atomTypeLabel: post && atomUtils.generateTypeLabel(post),
         };
       };
-      connect2Redux(selectFromState, actionCreators, ["self.atomUri"], this);
+      connect2Redux(
+        selectFromState,
+        actionCreators,
+        ["self.atomUri", "self.hideBackButton"],
+        this
+      );
     }
 
     hasTitle() {
@@ -100,14 +105,15 @@ function genComponentConf() {
     bindToController: true, //scope-bindings -> ctrl
     scope: {
       atomUri: "=",
+      hideBackButton: "=",
     },
     template: template,
   };
 }
 
 export default angular
-  .module("won.owner.components.visitorTitleBar", [
+  .module("won.owner.components.atomHeaderBig", [
     postContextDropDownModule,
     shareDropdownModule,
   ])
-  .directive("wonVisitorTitleBar", genComponentConf).name;
+  .directive("wonAtomHeaderBig", genComponentConf).name;

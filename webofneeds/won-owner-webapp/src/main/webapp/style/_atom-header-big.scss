@@ -4,16 +4,16 @@
 @import "sizing-utils";
 @import "square-image";
 
-.visitor-title-bar {
-  @include title-bar("vtb");
+.atom-header-big {
+  @include title-bar("ahb");
   border-top: none;
 
-  .vtb__titles__type {
+  .ahb__titles__type {
     color: #a7a7a7;
     font-size: 0.8rem;
   }
 
-  .vtb__titles__persona {
+  .ahb__titles__persona {
     border-radius: 0.19rem;
     background: $won-secondary-color-lighter;
     color: $won-secondary-text-color;
@@ -21,7 +21,7 @@
     display: inline-block;
   }
 
-  .vtb__titles__groupchat {
+  .ahb__titles__groupchat {
     border-radius: 0.19rem;
     background: $won-line-gray;
     margin: 0.1rem;
@@ -29,8 +29,8 @@
     display: inline-block;
   }
 
-  > .vtb__inner {
-    // vtb isn't using the tri-aligned that it inherits
+  > .ahb__inner {
+    // ahb isn't using the tri-aligned that it inherits
     // via the `@include title-bar` as there's no
     // centered element
     display: flex;
@@ -39,7 +39,7 @@
     align-content: center;
     align-items: center;
 
-    > .vtb__inner__left {
+    > .ahb__inner__left {
       display: flex;
       flex-direction: row;
       align-content: center;
@@ -56,7 +56,7 @@
       }
     }
 
-    > .vtb__inner__right {
+    > .ahb__inner__right {
       //TODO dynamically adapt to number of children(?) or at least pull into a config-variable
       // or make won-tabs a parametrized mixin?
       flex-grow: 1;
@@ -69,14 +69,14 @@
 
       //padding-top: 1rem;
 
-      > .vtb__inner__right__upper {
+      > .ahb__inner__right__upper {
         display: flex;
         flex-direction: row;
         align-content: center;
         align-items: flex-start;
         justify-content: space-between;
 
-        > .vtb__title {
+        > .ahb__title {
           align-self: flex-end;
 
           &--notitle {
@@ -84,18 +84,18 @@
           }
         }
       }
-      > .vtb__inner__right__lower {
+      > .ahb__inner__right__lower {
         display: flex;
         flex-direction: row;
         align-content: center;
         align-items: flex-start;
         justify-content: flex-end;
 
-        > .vtb__titles__type {
+        > .ahb__titles__type {
           /*align-self: flex-start;*/
         }
 
-        > .vtb__tabs {
+        > .ahb__tabs {
           align-self: stretch;
         }
       }
