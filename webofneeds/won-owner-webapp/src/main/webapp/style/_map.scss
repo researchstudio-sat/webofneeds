@@ -39,6 +39,7 @@ main.ownermap {
       grid-area: omh__label;
       white-space: nowrap;
       font-size: $mediumFontSize;
+      font-weight: 300;
     }
 
     &__location,
