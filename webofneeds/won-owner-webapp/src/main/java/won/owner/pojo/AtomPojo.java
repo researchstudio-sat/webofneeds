@@ -36,6 +36,10 @@ public class AtomPojo {
     private ZonedDateTime modifiedZonedDateTime;
     private String modifiedDate;
     private Collection<URI> flags;
+    private Collection<URI> holds;
+    private URI heldBy;
+    private Collection<URI> eventObjects;
+    private Collection<URI> seeksEventObjects;
 
     // TODO: add s:object/s:Event/s:about URI for content and seeks -> otherwise we
     // do not know which interest it is
@@ -58,6 +62,10 @@ public class AtomPojo {
         types = atom.getContentTypes();
         seeksTypes = atom.getSeeksTypes();
         state = atom.getAtomState();
+        // heldBy = atom.getHeldBy(); //TODO: IMPL ME
+        // holds = atom.getHolds(); //TODO: IMPL ME
+        // seeksEventObjects = atom.getSeeksEventObjects(); //TODO: IMPL ME
+        // eventObjects = atom.getContentEventObjects(); //TODO: IMPL ME
     }
 
     /*
@@ -151,6 +159,38 @@ public class AtomPojo {
 
     public void setModifiedZonedDateTime(ZonedDateTime modifiedZonedDateTime) {
         this.modifiedZonedDateTime = modifiedZonedDateTime;
+    }
+
+    public Collection<URI> getHolds() {
+        return holds;
+    }
+
+    public void setHolds(Collection<URI> holds) {
+        this.holds = holds;
+    }
+
+    public URI getHeldBy() {
+        return heldBy;
+    }
+
+    public void setHeldBy(URI heldBy) {
+        this.heldBy = heldBy;
+    }
+
+    public Collection<URI> getEventObjects() {
+        return eventObjects;
+    }
+
+    public void setEventObjects(Collection<URI> eventObjects) {
+        this.eventObjects = eventObjects;
+    }
+
+    public Collection<URI> getSeeksEventObjects() {
+        return seeksEventObjects;
+    }
+
+    public void setSeeksEventObjects(Collection<URI> seeksEventObjects) {
+        this.seeksEventObjects = seeksEventObjects;
     }
 
     @Override
