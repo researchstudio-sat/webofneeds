@@ -69,24 +69,21 @@ main.owneroverview {
   }
 
   .owneroverview__content {
-    display: flex;
-    flex-wrap: wrap;
-    padding: 0.5rem;
+    display: grid;
+    padding: 1rem;
+    grid-gap: 1rem;
+
+    @media (min-width: $responsivenessBreakPoint) {
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+    }
+    @media (max-width: $responsivenessBreakPoint) {
+      //One Column in mobile
+      grid-template-columns: 1fr;
+    }
 
     won-atom-card.owneroverview__content__atom {
       border: $thinGrayBorder;
       background: $won-light-gray;
-
-      margin-right: 1rem;
-      margin-bottom: 1rem;
-    }
-
-    @media (max-width: $responsivenessBreakPoint) {
-      display: block;
-
-      won-atom-card.owneroverview__content__atom {
-        margin-right: 0;
-      }
     }
   }
 }
