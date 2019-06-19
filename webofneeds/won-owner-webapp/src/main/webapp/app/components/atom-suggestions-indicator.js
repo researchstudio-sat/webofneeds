@@ -7,6 +7,7 @@ import { getIn } from "../utils.js";
 import { attach } from "../cstm-ng-utils.js";
 import { connect2Redux } from "../configRedux.js";
 import { actionCreators } from "../actions/actions.js";
+import { classOnComponentRoot } from "../cstm-ng-utils.js";
 
 import "~/style/_atom-suggestions-indicator.scss";
 import * as atomUtils from "../redux/utils/atom-utils";
@@ -30,7 +31,7 @@ function genComponentConf() {
         </div>
         <div class="asi__right__subtitle">
           <div class="asi__right__subtitle__label">
-            <span>{{ self.suggestionsCount }} Suggestions</span>
+            <span >{{ self.suggestionsCount }} Suggestions</span>
             <span ng-if="self.hasUnreadSuggestions">, {{ self.unreadSuggestionsCount }} new</span
           </div>
         </div>
@@ -58,11 +59,17 @@ function genComponentConf() {
         return {
           suggestionsCount,
           unreadSuggestionsCount,
+          hasSuggestions: suggestionsCount > 0,
           hasUnreadSuggestions: unreadSuggestionsCount > 0,
         };
       };
 
       connect2Redux(selectFromState, actionCreators, ["self.atomUri"], this);
+      classOnComponentRoot(
+        "won-no-suggestions",
+        () => !this.hasSuggestions,
+        this
+      );
     }
 
     setOpen() {

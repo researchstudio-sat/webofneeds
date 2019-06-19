@@ -122,7 +122,7 @@ function genComponentConf() {
         </div>
     </div>
     <!-- Attached Persona Info -->
-    <div class="card__persona clickable" ng-if="self.showPersona && self.atomLoaded && self.persona && self.atomHasHoldableSocket" ng-click="self.router__stateGoCurrent({viewAtomUri: self.personaUri})">
+    <div class="card__persona clickable" ng-if="::self.showPersona && self.atomLoaded && self.persona && self.atomHasHoldableSocket" ng-click="self.router__stateGoCurrent({viewAtomUri: self.personaUri})">
           <img class="card__persona__icon"
               ng-if="::self.personaIdenticonSvg"
               alt="Auto-generated title image for persona that holds the atom"
@@ -136,11 +136,11 @@ function genComponentConf() {
           <div class="card__persona__websitelabel" ng-if="self.personaWebsite">Website:</div>
           <a class="card__persona__websitelink" target="_blank" href="{{self.personaWebsite}}" ng-if="self.personaWebsite">{{ self.personaWebsite }}</a>
     </div>
-    <div class="card__nopersona" ng-if="self.showPersona && ((self.atomLoaded && !self.persona && self.atomHasHoldableSocket) || !self.atomLoaded)">
+    <div class="card__nopersona" ng-if="::self.showPersona && ((self.atomLoaded && !self.persona && self.atomHasHoldableSocket) || !self.atomLoaded)">
         <span class="card__nopersona__label" ng-if="self.atomLoaded">No Persona attached</span>
     </div>
     <won-atom-suggestions-indicator
-        ng-if="self.showSuggestions && self.atomHasSuggestions"
+        ng-if="::self.showSuggestions"
         class="card__indicators"
         atom-uri="::self.atomUri"
         on-selected="::self.showAtomSuggestions(self.atomUri)">
