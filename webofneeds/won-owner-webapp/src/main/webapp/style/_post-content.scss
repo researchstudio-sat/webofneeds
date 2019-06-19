@@ -46,40 +46,6 @@ won-post-content {
       }
     }
 
-    .post-content__otheratoms {
-      &__empty {
-        color: $won-line-gray;
-        padding: 0.5rem;
-        text-align: center;
-      }
-
-      & .post-content__otheratoms__otheratom {
-        padding: 0.5rem;
-        border: $thinGrayBorder;
-        background: $won-light-gray;
-        display: grid;
-        grid-template-areas: "member_info member_actions";
-        grid-template-columns: 1fr min-content;
-        grid-gap: 0.25rem;
-        align-items: center;
-        margin-top: 0.5rem;
-
-        &:first-of-type {
-          margin-top: 0;
-        }
-
-        &:hover {
-          background: white;
-        }
-
-        won-post-header {
-          font-size: $normalFontSize;
-          grid-area: member_info;
-        }
-      }
-    }
-
-    .post-content__members,
     .post-content__suggestions {
       &__empty {
         color: $won-line-gray;
@@ -87,7 +53,6 @@ won-post-content {
         text-align: center;
       }
 
-      & .post-content__members__member,
       & .post-content__suggestions__suggestion {
         border: $thinGrayBorder;
         border-left: 0;
@@ -102,7 +67,6 @@ won-post-content {
           margin-top: 0;
         }
 
-        & > .post-content__members__member__indicator,
         & > .post-content__suggestions__suggestion__indicator {
           grid-area: member_indicator;
           box-sizing: border-box;
@@ -110,12 +74,10 @@ won-post-content {
           height: 100%;
         }
 
-        &.won-unread > .post-content__members__member__indicator,
         &.won-unread > .post-content__suggestions__suggestion__indicator {
           border-left: 0.25rem solid $won-unread-attention;
         }
 
-        &:not(.won-unread) > .post-content__members__member__indicator,
         &:not(.won-unread) > .post-content__suggestions__suggestion__indicator {
           border-left: $thinGrayBorder;
         }

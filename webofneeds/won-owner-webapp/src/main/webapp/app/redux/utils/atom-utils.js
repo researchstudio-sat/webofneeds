@@ -433,6 +433,14 @@ export function isHeld(atomImm) {
   return !!getHeldByUri(atomImm);
 }
 
+export function getHeldAtomUris(atomImm) {
+  return hasHolderSocket(atomImm) && get(atomImm, "holds");
+}
+
+export function hasHeldAtoms(atomImm) {
+  return !!getHeldAtomUris(atomImm);
+}
+
 export function getDefaultSocketWithKeyReset(atomImm) {
   const defaultSocket = getIn(atomImm, ["content", "defaultSocket"]);
 

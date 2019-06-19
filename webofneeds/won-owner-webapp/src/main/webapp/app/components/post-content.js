@@ -10,6 +10,7 @@ import postContentGeneral from "./post-content-general.js";
 import postContentPersona from "./post-content-persona.js";
 import postContentParticipants from "./post-content-participants.js";
 import atomContentBuddies from "./atom-content-buddies.js";
+import atomContentHolds from "./atom-content-holds.js";
 import postHeaderModule from "./post-header.js";
 import trigModule from "./trig.js";
 import { getIn, get } from "../utils.js";
@@ -131,23 +132,7 @@ function genComponentConf() {
           </div>
 
           <!-- OTHER ATOMS -->
-          <div class="post-content__members" ng-if="self.isSelectedTab('HOLDS')">
-            <div
-              class="post-content__members__member"
-              ng-if="self.hasHeldPosts"
-              ng-repeat="heldPostUri in self.heldPostsArray track by heldPostUri">
-              <div class="post-content__members__member__indicator"></div>
-              <won-post-header
-                class="clickable"
-                ng-click="self.router__stateGoCurrent({viewAtomUri: heldPostUri, viewConnUri: undefined})"
-                atom-uri="::heldPostUri">
-              </won-post-header>
-            </div>
-            <div class="post-content__members__empty"
-                ng-if="!self.hasHeldPosts">
-                This Persona does not have any Atoms.
-            </div>
-          </div>
+          <won-atom-content-holds ng-if="self.isSelectedTab('HOLDS')" atom-uri="self.postUri"></won-atom-content-holds>
           <!-- RDF REPRESENTATION -->
           <div class="post-info__content__rdf" ng-if="self.isSelectedTab('RDF')">
             <a class="rdflink clickable"
@@ -186,7 +171,6 @@ function genComponentConf() {
       const selectFromState = state => {
         const openConnectionUri = getConnectionUriFromRoute(state);
         const post = getIn(state, ["atoms", this.postUri]);
-        const isPersona = atomUtils.isPersona(post);
         const isOwned = isAtomOwned(state, this.postUri);
         const content = get(post, "content");
 
@@ -195,8 +179,6 @@ function genComponentConf() {
 
         const hasContent = this.hasVisibleDetails(content);
         const hasSeeksBranch = this.hasVisibleDetails(seeks);
-
-        const heldPosts = isPersona && get(post, "holds");
 
         const suggestions = connectionSelectors.getSuggestedConnectionsByAtomUri(
           state,
@@ -210,10 +192,7 @@ function genComponentConf() {
           hasContent,
           hasSeeksBranch,
           post,
-          isPersona,
           isOwned,
-          hasHeldPosts: isPersona && heldPosts && heldPosts.size > 0,
-          heldPostsArray: isPersona && heldPosts && heldPosts.toArray(),
           hasChatSocket: atomUtils.hasChatSocket(post),
           hasHoldableSocket: atomUtils.hasHoldableSocket(post),
           hasSuggestions: isOwned && suggestions && suggestions.size > 0,
@@ -370,6 +349,7 @@ export default angular
     postContentParticipants,
     postHeaderModule,
     atomContentBuddies,
+    atomContentHolds,
     trigModule,
     inviewModule.name,
     elmModule,
