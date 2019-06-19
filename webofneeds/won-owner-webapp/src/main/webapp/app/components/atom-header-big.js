@@ -82,17 +82,17 @@ function genComponentConf() {
 
     hasTitle() {
       if (this.isDirectResponse && this.responseToAtom) {
-        return !!this.responseToAtom.get("humanReadable");
+        return !!get(this.responseToAtom, "humanReadable");
       } else {
-        return !!this.post.get("humanReadable");
+        return !!get(this.post, "humanReadable");
       }
     }
 
     generateTitle() {
       if (this.isDirectResponse && this.responseToAtom) {
-        return "Re: " + this.responseToAtom.get("humanReadable");
+        return "Re: " + get(this.responseToAtom, "humanReadable");
       } else {
-        return this.post.get("humanReadable");
+        return get(this.post, "humanReadable");
       }
     }
   }

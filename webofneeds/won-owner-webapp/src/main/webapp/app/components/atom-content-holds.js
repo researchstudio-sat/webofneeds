@@ -16,17 +16,16 @@ import "~/style/_atom-content-holds.scss";
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
   let template = `
-      <div
-        class="ach__atom"
-        ng-if="self.hasHeldAtoms"
-        ng-repeat="heldAtomUri in self.heldAtomUrisArray track by heldAtomUri">
-        <div class="ach__atom__indicator"></div>
-        <won-post-header
-          class="clickable"
-          ng-click="self.router__stateGoCurrent({viewAtomUri: heldAtomUri, viewConnUri: undefined})"
-          atom-uri="::heldAtomUri">
-        </won-post-header>
-      </div>
+      <won-atom-card
+          class="ach__atom"
+          atom-uri="::heldAtomUri"
+          current-location="self.currentLocation"
+          ng-repeat="heldAtomUri in self.heldAtomUrisArray track by heldAtomUri"
+          ng-click="self.router__stateGoCurrent({viewAtomUri: ::heldAtomUri, viewConnUri: undefined})"
+          ng-if="self.hasHeldAtoms"
+          show-suggestions="::true"
+          show-persona="::false"
+      />
       <div class="ach__empty"
           ng-if="!self.hasHeldAtoms">
           Not one single Atom present.
