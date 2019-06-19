@@ -91,12 +91,21 @@ const template = (
         </div>
       </div>
       <div
-        className="ownerinventory__noresults"
+        className="ownerinventory__content"
         ng-if="!self.hasOwnedUnassignedAtomUris"
       >
-        <span className="ownerinventory__noresults__label">
-          Nothing to display
-        </span>
+        <div
+          className="ownerinventory__content__createatom"
+          ng-click="self.router__stateGo('create')"
+        >
+          <svg
+            className="ownerinventory__content__createatom__icon"
+            title="Create a new post"
+          >
+            <use xlinkHref="#ico36_plus" href="#ico36_plus" />
+          </svg>
+          <span className="ownerinventory__content__createatom__label">New</span>
+        </div>
       </div>
       <div
         className="ownerinventory__header"
@@ -108,10 +117,20 @@ const template = (
             {"({{self.inactiveAtomUriSize}})"}
           </span>
         </div>
+        <svg
+          className="ownerinventory__header__carret"
+          ng-click="self.toggleClosedAtoms()"
+          ng-class="{
+            'ownerinventory__header__carret--expanded': self.showClosedAtoms,
+            'ownerinventory__header__carret--collapsed': !self.showClosedAtoms
+          }"
+        >
+          <use xlinkHref="#ico16_arrow_down" href="#ico16_arrow_down" />
+        </svg>
       </div>
       <div
         className="ownerinventory__content"
-        ng-if="self.hasOwnedInactiveAtomUris"
+        ng-if="self.showClosedAtoms && self.hasOwnedInactiveAtomUris"
       >
         <won-atom-card
           className="ownerinventory__content__atom"
@@ -216,6 +235,10 @@ class Controller {
     };
 
     connect2Redux(selectFromState, actionCreators, [], this);
+  }
+
+  toggleClosedAtoms() {
+    this.view__toggleClosedAtoms();
   }
 }
 
