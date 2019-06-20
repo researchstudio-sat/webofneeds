@@ -59,7 +59,7 @@ import won.protocol.vocabulary.WXREVIEW;
  */
 public class Prefixer {
     private static final Pattern PREFIX_PATTERN = Pattern.compile("[^/#]+$");
-    
+
     private Dataset loadDatasetFromFile(String file) {
         try {
             Dataset dataset = null;
