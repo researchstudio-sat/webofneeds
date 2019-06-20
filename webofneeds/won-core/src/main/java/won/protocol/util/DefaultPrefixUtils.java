@@ -13,6 +13,7 @@ package won.protocol.util;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.shared.PrefixMapping;
 import org.apache.jena.vocabulary.DC;
+import org.apache.jena.vocabulary.DCTerms;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 import org.apache.jena.vocabulary.XSD;
@@ -24,6 +25,11 @@ import won.protocol.vocabulary.WON;
 import won.protocol.vocabulary.WONCON;
 import won.protocol.vocabulary.WONMATCH;
 import won.protocol.vocabulary.WONMSG;
+import won.protocol.vocabulary.WXBUDDY;
+import won.protocol.vocabulary.WXCHAT;
+import won.protocol.vocabulary.WXGROUP;
+import won.protocol.vocabulary.WXHOLD;
+import won.protocol.vocabulary.WXREVIEW;
 
 /**
  * User: fkleedorfer Date: 27.09.13
@@ -54,8 +60,10 @@ public class DefaultPrefixUtils {
         prefixMapping.setNsPrefix("rdfs", RDFS.getURI());
         prefixMapping.setNsPrefix("xsd", XSD.getURI());
         prefixMapping.setNsPrefix("dc", DC.getURI());
+        prefixMapping.setNsPrefix("dct", DCTerms.getURI());
         prefixMapping.setNsPrefix(SCHEMA.DEFAULT_PREFIX, SCHEMA.getURI());
         prefixMapping.setNsPrefix("sh", "http://www.w3.org/ns/shacl#");
+        prefixMapping.setNsPrefix("rdfg", "http://www.w3.org/2004/03/trix/rdfg-1/");
     }
 
     public static PrefixMapping getDefaultPrefixes() {
