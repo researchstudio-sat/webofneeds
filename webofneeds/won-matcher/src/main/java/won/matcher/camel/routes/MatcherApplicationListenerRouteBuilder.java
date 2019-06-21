@@ -61,7 +61,7 @@ public class MatcherApplicationListenerRouteBuilder extends RouteBuilder {
                             .when(header("methodName").isEqualTo("atomDeactivated"))
                             .to("bean:matcherProtocolMatcherServiceJMSBased?method=atomDeactivated")
                             .otherwise()
-                            .to("log: cannot handle incoming message: method ${in.headers.methodName} not supported.");
+                            .to("log: cannot handle incoming message: value of 'in' header 'methodName' not supported.");
         }
     }
 }
