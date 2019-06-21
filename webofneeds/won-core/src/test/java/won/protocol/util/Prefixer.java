@@ -1,10 +1,5 @@
 package won.protocol.util;
 
-import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.io.StringWriter;
-import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -22,7 +17,6 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
-import org.apache.jena.riot.RDFFormat;
 import org.apache.jena.shared.PrefixMapping;
 import org.apache.jena.shared.impl.PrefixMappingImpl;
 import org.apache.jena.vocabulary.DC;
@@ -30,13 +24,11 @@ import org.apache.jena.vocabulary.DCTerms;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 import org.apache.jena.vocabulary.XSD;
-import org.junit.BeforeClass;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StopWatch;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
-import won.protocol.rest.RdfDatasetAttachmentConverter;
 import won.protocol.vocabulary.CERT;
 import won.protocol.vocabulary.SCHEMA;
 import won.protocol.vocabulary.SFSIG;
