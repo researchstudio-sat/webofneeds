@@ -35,17 +35,21 @@ public class ConnectionStateChangeReactionProcessor extends AbstractCamelProcess
     @Override
     public void process(Exchange exchange) throws Exception {
         Optional<Connection> con = Optional.empty();
+        WonMessage wonMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
+        String msgTypeDir = "[message type: "
+                        + wonMessage.getMessageType()
+                        + ", direction: " + wonMessage.getEnvelopeType() + "]";
         ConnectionStateChangeBuilder stateChangeBuilder = (ConnectionStateChangeBuilder) exchange.getIn()
                         .getHeader(WonCamelConstants.CONNECTION_STATE_CHANGE_BUILDER_HEADER);
         if (stateChangeBuilder == null) {
-            logger.info("no stateChangeBuilder found in exchange header, cannot check for state change");
+            logger.info("no stateChangeBuilder found in exchange header, cannot check for state change " + msgTypeDir);
             return;
         }
         // first, try to find the connection uri in the header:
         URI conUri = (URI) exchange.getIn().getHeader(WonCamelConstants.CONNECTION_URI_HEADER);
         if (conUri == null) {
             // not found. get it from the message and put it in the header
-            WonMessage wonMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
+            wonMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
             conUri = wonMessage.getEnvelopeType() == WonMessageDirection.FROM_EXTERNAL ? wonMessage.getRecipientURI()
                             : wonMessage.getSenderURI();
         }
@@ -70,12 +74,13 @@ public class ConnectionStateChangeReactionProcessor extends AbstractCamelProcess
             if (connectionStateChange.isConnect() || connectionStateChange.isDisconnect()) {
                 // trigger rematch
                 matcherProtocolMatcherClient.atomModified(atom.getAtomURI(), null);
-                logger.info("matchers notified of connection state change");
+                logger.info("matchers notified of connection state change " + msgTypeDir);
             } else {
-                logger.debug("no relevant connection state change, not notifying matchers");
+                logger.debug("no relevant connection state change, not notifying matchers " + msgTypeDir);
             }
         } else {
-            logger.info("Could collect ConnectionStateChange information, not checking for state change");
+            logger.info("Could not collect ConnectionStateChange information, not checking for state change "
+                            + msgTypeDir);
         }
     }
 }

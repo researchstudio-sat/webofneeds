@@ -52,13 +52,11 @@ public class GoalInstantiationTest {
         Collection<GoalInstantiationResult> results = goalInstantiation.createAllGoalCombinationInstantiationResults();
         // instantiation of combined goals must be conform
         Assert.assertEquals(1, results.size());
-        System.out.println(results.iterator().next().toString());
         Assert.assertTrue(results.iterator().next().isConform());
         // instantiation of goal of atom1 fails cause driver is missing
         AtomModelWrapper atomWrapper1 = new AtomModelWrapper(atom1);
         Resource goal = atomWrapper1.getGoals().iterator().next();
         GoalInstantiationResult result = goalInstantiation.findInstantiationForGoal(goal);
-        System.out.println(result.toString());
         Assert.assertFalse(result.isConform());
         Assert.assertEquals("hasDriver", result.getShaclReportWrapper().getValidationResults().iterator().next()
                         .getResultPath().getLocalName());
@@ -67,7 +65,6 @@ public class GoalInstantiationTest {
         AtomModelWrapper atomWrapper2 = new AtomModelWrapper(atom2);
         goal = atomWrapper2.getGoals().iterator().next();
         result = goalInstantiation.findInstantiationForGoal(goal);
-        System.out.println(result.toString());
         Assert.assertFalse(result.isConform());
         Assert.assertEquals(3, result.getShaclReportWrapper().getValidationResults().size());
     }
@@ -84,7 +81,6 @@ public class GoalInstantiationTest {
                         conversationWithoutPickupTime, "http://example.org/", "http://example.org/blended/");
         Collection<GoalInstantiationResult> results = goalInstantiation.createAllGoalCombinationInstantiationResults();
         Assert.assertEquals(1, results.size());
-        System.out.println(results.iterator().next().toString());
         Assert.assertFalse(results.iterator().next().isConform());
         // this conversation contains the missing pickup info so the goals can be
         // fulfilled
@@ -92,13 +88,11 @@ public class GoalInstantiationTest {
                         "http://example.org/", "http://example.org/blended/");
         results = goalInstantiation.createAllGoalCombinationInstantiationResults();
         Assert.assertEquals(1, results.size());
-        System.out.println(results.iterator().next().toString());
         Assert.assertTrue(results.iterator().next().isConform());
         // instantiation of goal of atom1 fails cause driver is missing
         AtomModelWrapper atomWrapper1 = new AtomModelWrapper(atom1);
         Resource goal = atomWrapper1.getGoals().iterator().next();
         GoalInstantiationResult result = goalInstantiation.findInstantiationForGoal(goal);
-        System.out.println(result.toString());
         Assert.assertFalse(result.isConform());
         Assert.assertEquals("hasDriver", result.getShaclReportWrapper().getValidationResults().iterator().next()
                         .getResultPath().getLocalName());
@@ -107,7 +101,6 @@ public class GoalInstantiationTest {
         AtomModelWrapper atomWrapper2 = new AtomModelWrapper(atom2);
         goal = atomWrapper2.getGoals().iterator().next();
         result = goalInstantiation.findInstantiationForGoal(goal);
-        System.out.println(result.toString());
         Assert.assertFalse(result.isConform());
         Assert.assertEquals(3, result.getShaclReportWrapper().getValidationResults().size());
     }
@@ -128,9 +121,6 @@ public class GoalInstantiationTest {
             if (result.isConform()) {
                 validResults.add(result.getInstanceModel());
             }
-        }
-        for (Model valid : validResults) {
-            valid.write(System.out, "TRIG");
         }
         Assert.assertEquals(3, validResults.size());
     }
@@ -153,9 +143,6 @@ public class GoalInstantiationTest {
             }
         }
         Assert.assertEquals(1, validResults.size());
-        for (Model valid : validResults) {
-            valid.write(System.out, "TRIG");
-        }
     }
 
     @Test
@@ -198,8 +185,6 @@ public class GoalInstantiationTest {
                         "http://example.org/", "http://example.org/blended/");
         Collection<GoalInstantiationResult> results = goalInstantiation.createGoalInstantiationResultsForAtom1();
         for (GoalInstantiationResult res : results) {
-            System.out.println("Result::::::::::::::::::::::::::::::" + res.isConform());
-            System.out.println(res.toString());
             if (res.isConform()) {
                 Coordinate departureAddress = getAddress(
                                 loadSparqlQuery("/won/utils/goals/extraction/address/fromLocationQuery.rq"),
@@ -236,8 +221,6 @@ public class GoalInstantiationTest {
                         "http://example.org/", "http://example.org/blended/");
         Collection<GoalInstantiationResult> results = goalInstantiation.createGoalInstantiationResultsForAtom1();
         for (GoalInstantiationResult res : results) {
-            System.out.println("Result::::::::::::::::::::::::::::::" + res.isConform());
-            System.out.println(res.toString());
             if (res.isConform()) {
                 Coordinate departureAddress = getAddress(
                                 loadSparqlQuery("/won/utils/goals/extraction/address/fromLocationQuery.rq"),
@@ -278,7 +261,6 @@ public class GoalInstantiationTest {
                         "http://example.org/", "http://example.org/blended/");
         Collection<GoalInstantiationResult> results = goalInstantiation.createGoalInstantiationResultsForAtom1();
         for (GoalInstantiationResult res : results) {
-            res.getInstanceModel().write(System.out, "TRIG");
             Assert.assertTrue(res.isConform());
             Coordinate departureAddress = getAddress(
                             loadSparqlQuery("/won/utils/goals/extraction/address/northWestCornerQuery.rq"),

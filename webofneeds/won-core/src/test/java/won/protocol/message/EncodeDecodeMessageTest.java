@@ -39,13 +39,8 @@ public class EncodeDecodeMessageTest {
     private void performTest(final Dataset msgDatasetIn) {
         WonMessage wonMessageIn = WonMessageDecoder.decodeFromDataset(msgDatasetIn);
         String encoded = WonMessageEncoder.encode(wonMessageIn, LANG);
-        // for debugging
-        System.out.println(encoded);
-        System.out.println();
         WonMessage wonMessageOut = WonMessageDecoder.decode(LANG, encoded);
         Dataset msgDatasetOut = WonMessageEncoder.encodeAsDataset(wonMessageOut);
-        // for debugging
-        System.out.println(RdfUtils.writeDatasetToString(msgDatasetOut, Lang.TRIG));
         Assert.assertTrue(IsoMatcher.isomorphic(msgDatasetIn.asDatasetGraph(), msgDatasetOut.asDatasetGraph()));
     }
 }

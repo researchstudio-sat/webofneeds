@@ -54,11 +54,14 @@ public class MatcherApplicationListenerRouteBuilder extends RouteBuilder {
             from(endpoints.get(i)).routeId("Node2MatcherRoute" + brokerUri + i).choice()
                             .when(header("methodName").isEqualTo("atomCreated"))
                             .to("bean:matcherProtocolMatcherServiceJMSBased?method=atomCreated")
+                            .when(header("methodName").isEqualTo("atomModified"))
+                            .to("bean:matcherProtocolMatcherServiceJMSBased?method=atomModified")
                             .when(header("methodName").isEqualTo("atomActivated"))
                             .to("bean:matcherProtocolMatcherServiceJMSBased?method=atomActivated")
                             .when(header("methodName").isEqualTo("atomDeactivated"))
-                            .to("bean:matcherProtocolMatcherServiceJMSBased?method=atomDeactivated").otherwise()
-                            .to("log:Message Type Not Supported");
+                            .to("bean:matcherProtocolMatcherServiceJMSBased?method=atomDeactivated")
+                            .otherwise()
+                            .to("log: cannot handle incoming message: value of 'in' header 'methodName' not supported.");
         }
     }
 }
