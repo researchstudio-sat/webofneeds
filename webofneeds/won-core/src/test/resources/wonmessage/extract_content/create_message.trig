@@ -1,0 +1,88 @@
+@prefix p0:    <https://node.matchat.org/won/resource/atom/so20ub00h1de#> .
+@prefix schema: <http://schema.org/> .
+@prefix msg:   <https://w3id.org/won/message#> .
+@prefix p1:    <https://node.matchat.org/won/resource/event/bqvmlcrnkv3s#> .
+@prefix rdfg:  <http://www.w3.org/2004/03/trix/rdfg-1/> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix match: <https://w3id.org/won/matching#> .
+@prefix cert:  <http://www.w3.org/ns/auth/cert#> .
+@prefix hold:  <https://w3id.org/won/ext/hold#> .
+@prefix sig:   <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#> .
+@prefix node:  <https://node.matchat.org/won/> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix bdy:   <https://w3id.org/won/ext/buddy#> .
+@prefix review: <https://w3id.org/won/ext/review#> .
+@prefix won:   <https://w3id.org/won/core#> .
+@prefix atom:  <https://node.matchat.org/won/resource/atom/> .
+@prefix event: <https://node.matchat.org/won/resource/event/> .
+
+p1:envelope-he7t {
+    p1:envelope-he7t  a            msg:EnvelopeGraph ;
+            rdfg:subGraphOf        event:bqvmlcrnkv3s ;
+            msg:containsEnvelope   p1:envelope ;
+            msg:containsSignature  p1:envelope-sig .
+    
+    event:bqvmlcrnkv3s
+            a                      msg:FromOwner ;
+            msg:protocolVersion    "1.0" ;
+            msg:receivedTimestamp  "1560428910428"^^xsd:long .
+    
+    p1:envelope-sig  a                      sig:Signature ;
+            sig:hasVerificationCertificate  atom:so20ub00h1de ;
+            sig:signatureValue              "MGYCMQCtCe16iMM4guNO+Y4ez9AcPDmHXfOh+1uP9vKf4oHcUjEjKcp+m+N56bdz0G99i60CMQD1useqNQZt8iaKkDxuF/HiaJO7u85MIFPafGTVEKI6DbE3pFUbfJFaxqCSQFIsEmM=" ;
+            msg:hash                        "TuNqxidQOnGoI34ysGM6fy2dQltfxvPQ1WQe52XY2A5a+DNpxqfpgSeFW5SPTwpahvsG0HBd5yeOfT4XOr2C8rMY9el8hKQEFEaGTR/JVwvRJpmxooQgQohvqm0r6DOTNzRhIaLSU1CZtAV+g2aE7Yds2bSpm8SCY867sjO/9tQ=" ;
+            msg:publicKeyFingerprint        "753GyoDfN6gDf0SVDX3wkqtvVkDePUokg+TMYq9BUHU=" ;
+            msg:signedGraph                 p1:envelope .
+}
+
+p1:envelope-he7t-sig {
+    p1:envelope-he7t-sig
+            a                               sig:Signature ;
+            sig:hasVerificationCertificate  node:resource ;
+            sig:signatureValue              "MGYCMQC+UEDFmELy49LHxswZvq0jRRmVL5LfPgU/zu85BgrXuIBC/mjvxhUj6opUGmBcbOsCMQCXp5u/GVknmbhXPr5mPsN5N67OsBhAYwO+pF3V4dpMIsJxn9srkIoKj9yuMXwaHfY=" ;
+            msg:hash                        "QHALC+Q2wT5maYROJXc6b9T6ZiohHqF/9pvykCRLHXcs5np0uOkdFFS6AhjVZk9GyOTRzBWl6xLxeL6Deg0mPAYC4BHM89AVRmM85Pad+UWFMqR/xgUEbHhG9Alt+Ffl58yRaa+kCpYQ3nnu/CnmN+qxFxfWjwQgQssPoSyyr8g=" ;
+            msg:publicKeyFingerprint        "lZnZ2k4d9Gj7vmf/j14wCepkNF2Mk2ph7YB93BCy1LQ=" ;
+            msg:signedGraph                 p1:envelope-he7t .
+}
+
+p1:envelope {
+    event:bqvmlcrnkv3s
+            a                  msg:FromOwner ;
+            msg:content        p1:atom ;
+            msg:messageType    msg:CreateMessage ;
+            msg:recipientNode  node:resource ;
+            msg:senderAtom     atom:so20ub00h1de ;
+            msg:senderNode     node:resource ;
+            msg:sentTimestamp  1560428908837 .
+    
+    p1:envelope  a                 msg:EnvelopeGraph ;
+            rdfg:subGraphOf        event:bqvmlcrnkv3s ;
+            msg:containsSignature  p1:atom-sig .
+    
+    p1:atom-sig  a                          sig:Signature ;
+            sig:hasVerificationCertificate  atom:so20ub00h1de ;
+            sig:signatureValue              "MGUCMQC69AkAHbM39unLEzv5B34E9cDTZ1aPwdIGaVJSV9zylXTrEi2QTbGNjdVzLXU4PAYCMBDndYMmReEkZj+cFPwIOsJw2zUCguIRMs3evIZNMYdSwWX/GCbpNYPSa1YpfDhlhA==" ;
+            msg:hash                        "AK/bebuX3t9uftC5uBvqQvEu0V9Nne3MnlHMzJ7Q6GB75hwJGJMbU8yzOEUKSqUl9njWzIoRdJFxQgEiU8QKjH6JkASgfRLJsxTatT+dZOk3XGFwdvDwGxzAP/3V9T0/+8Qgw6pOTKtT4Vkd+z2eC/j6NSEzZoRGYyPDfbasp5XN" ;
+            msg:publicKeyFingerprint        "753GyoDfN6gDf0SVDX3wkqtvVkDePUokg+TMYq9BUHU=" ;
+            msg:signedGraph                 p1:atom .
+}
+
+p1:atom {
+    p0:holderSocket  won:socketDefinition  hold:HolderSocket .
+    
+    atom:so20ub00h1de
+            a            won:Persona , won:Atom ;
+            schema:name  "Bikeratops" ;
+            cert:key     [ cert:PublicKey  [ a                  won:ECCPublicKey ;
+                                             won:ecc_algorithm  "EC" ;
+                                             won:ecc_curveId    "secp384r1" ;
+                                             won:ecc_qx         "17c3ed1c2cffed36bd8ecb177c4351cde88873c6defc894807ba271a1c622648ed38c48b3eecf67caea523d2fd03b8f9" ;
+                                             won:ecc_qy         "270c57a103cd8a42e79199cf28df811a3ffc80c7bce3e3d35e0198ed37dd7d225ed91bec211fa1991599225093f0bb79"
+                                           ] ] ;
+            won:socket   p0:buddySocket , p0:reviewSocket , p0:holderSocket ;
+            match:flag   match:NoHintForMe , match:NoHintForCounterpart .
+    
+    p0:buddySocket  won:socketDefinition  bdy:BuddySocket .
+    
+    p0:reviewSocket  won:socketDefinition  review:ReviewSocket .
+}

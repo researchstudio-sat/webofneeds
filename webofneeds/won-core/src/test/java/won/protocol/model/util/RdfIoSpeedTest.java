@@ -50,42 +50,42 @@ public class RdfIoSpeedTest {
             RDFDataMgr.read(dataset, new ByteArrayInputStream(dataTrig), Lang.TRIG);
         }
         watch.stop();
-        System.out.println("trig reading took: " + watch.getTime());
+        // System.out.println("trig reading took: " + watch.getTime());
         watch = new StopWatch();
         watch.start();
         for (int i = 0; i < 10000; i++) {
             RDFDataMgr.write(new ByteArrayOutputStream(), dataset, Lang.TRIG);
         }
         watch.stop();
-        System.out.println("trig writing took: " + watch.getTime());
+        // System.out.println("trig writing took: " + watch.getTime());
         watch = new StopWatch();
         watch.start();
         for (int i = 0; i < 10000; i++) {
             RDFDataMgr.read(dataset, new ByteArrayInputStream(dataRdfq), Lang.NQUADS);
         }
         watch.stop();
-        System.out.println("nquads reading took: " + watch.getTime());
+        // System.out.println("nquads reading took: " + watch.getTime());
         watch = new StopWatch();
         watch.start();
         for (int i = 0; i < 10000; i++) {
             RDFDataMgr.write(new ByteArrayOutputStream(), dataset, Lang.NQUADS);
         }
         watch.stop();
-        System.out.println("nquads writing took: " + watch.getTime());
+        // System.out.println("nquads writing took: " + watch.getTime());
         watch = new StopWatch();
         watch.start();
         for (int i = 0; i < 10000; i++) {
             RDFDataMgr.read(dataset, new ByteArrayInputStream(dataRdft), Lang.RDFTHRIFT);
         }
         watch.stop();
-        System.out.println("rdf-thrift reading took: " + watch.getTime());
+        // System.out.println("rdf-thrift reading took: " + watch.getTime());
         watch = new StopWatch();
         watch.start();
         for (int i = 0; i < 10000; i++) {
             RDFDataMgr.write(new ByteArrayOutputStream(), dataset, Lang.RDFTHRIFT);
         }
         watch.stop();
-        System.out.println("rdf-thrift writing took: " + watch.getTime());
+        // System.out.println("rdf-thrift writing took: " + watch.getTime());
     }
 
     @Test

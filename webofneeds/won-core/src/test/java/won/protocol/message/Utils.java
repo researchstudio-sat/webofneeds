@@ -69,12 +69,4 @@ public class Utils {
         }
         return sb.toString();
     }
-
-    public static void print(Model model) {
-        System.out.println(RdfUtils.writeModelToString(model, Lang.TURTLE));
-    }
-
-    public static void print(Dataset dataset) {
-        System.out.println(RdfUtils.writeDatasetToString(dataset, Lang.TRIG));
-    }
 }
