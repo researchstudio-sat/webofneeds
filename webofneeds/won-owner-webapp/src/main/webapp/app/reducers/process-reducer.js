@@ -496,37 +496,31 @@ export default function(processState = initialState, action = {}) {
           );
 
           const heldAtomUris = parsedAtom.get("holds");
-          if (heldAtomUris.size > 0) {
-            heldAtomUris.map(heldAtomUri => {
-              if (!processUtils.isAtomLoaded(processState, heldAtomUri)) {
-                processState = updateAtomProcess(processState, heldAtomUri, {
-                  toLoad: true,
-                });
-              }
-            });
-          }
+          heldAtomUris.map(heldAtomUri => {
+            if (!processUtils.isAtomLoaded(processState, heldAtomUri)) {
+              processState = updateAtomProcess(processState, heldAtomUri, {
+                toLoad: true,
+              });
+            }
+          });
 
           const groupMemberUris = parsedAtom.get("groupMembers");
-          if (groupMemberUris.size > 0) {
-            groupMemberUris.map(groupMemberUri => {
-              if (!processUtils.isAtomLoaded(processState, groupMemberUri)) {
-                processState = updateAtomProcess(processState, groupMemberUri, {
-                  toLoad: true,
-                });
-              }
-            });
-          }
+          groupMemberUris.map(groupMemberUri => {
+            if (!processUtils.isAtomLoaded(processState, groupMemberUri)) {
+              processState = updateAtomProcess(processState, groupMemberUri, {
+                toLoad: true,
+              });
+            }
+          });
 
           const buddyUris = parsedAtom.get("buddies");
-          if (buddyUris.size > 0) {
-            buddyUris.map(buddyUri => {
-              if (!processUtils.isAtomLoaded(processState, buddyUri)) {
-                processState = updateAtomProcess(processState, buddyUri, {
-                  toLoad: true,
-                });
-              }
-            });
-          }
+          buddyUris.map(buddyUri => {
+            if (!processUtils.isAtomLoaded(processState, buddyUri)) {
+              processState = updateAtomProcess(processState, buddyUri, {
+                toLoad: true,
+              });
+            }
+          });
         });
       return processState;
     }
