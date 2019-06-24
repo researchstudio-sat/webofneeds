@@ -3,7 +3,6 @@
  */
 
 import angular from "angular";
-import inviewModule from "angular-inview";
 import postIsOrSeeksInfoModule from "./post-is-or-seeks-info.js";
 import labelledHrModule from "./labelled-hr.js";
 import postContentGeneral from "./post-content-general.js";
@@ -12,7 +11,6 @@ import postContentParticipants from "./post-content-participants.js";
 import atomContentBuddies from "./atom-content-buddies.js";
 import atomContentHolds from "./atom-content-holds.js";
 import atomContentSuggestions from "./atom-content-suggestions.js";
-import postHeaderModule from "./post-header.js";
 import trigModule from "./trig.js";
 import { getIn, get } from "../utils.js";
 import won from "../won-es6.js";
@@ -20,7 +18,6 @@ import { connect2Redux } from "../configRedux.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as viewUtils from "../redux/utils/view-utils.js";
 import * as processUtils from "../redux/utils/process-utils.js";
-import * as connectionSelectors from "../redux/selectors/connection-selectors.js";
 import {
   getOwnedCondensedPersonaList,
   getConnectionUriFromRoute,
@@ -34,8 +31,6 @@ import { Elm } from "../../elm/AddPersona.elm";
 import "~/style/_post-content.scss";
 import "~/style/_rdflink.scss";
 import elmModule from "./elm.js";
-
-const CONNECTION_READ_TIMEOUT = 1500;
 
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
@@ -101,38 +96,7 @@ function genComponentConf() {
 
           <!-- SUGGESTIONS -->
           <won-atom-content-suggestions ng-if="self.isSelectedTab('SUGGESTIONS')" atom-uri="self.postUri"></won-atom-content-suggestions>
-          <!--div class="post-content__suggestions" ng-if="self.isSelectedTab('SUGGESTIONS')">
-            <div
-              class="post-content__suggestions__suggestion"
-              ng-repeat="conn in self.suggestionsArray"
-              ng-if="self.hasSuggestions"
-              in-view="conn.get('unread') && $inview && self.markAsRead(conn)"
-              ng-class="{'won-unread': conn.get('unread')}">
-                <div class="post-content__suggestions__suggestion__indicator"></div>
-                <won-post-header
-                  class="clickable"
-                  ng-click="self.viewSuggestion(conn)"
-                  atom-uri="::conn.get('targetAtomUri')">
-                </won-post-header>
-                <div class="post-content__suggestions__suggestion__actions">
-                    <div
-                      class="post-content__suggestions__suggestion__actions__button red won-button--outlined thin"
-                      ng-click="self.sendRequest(conn)">
-                        Request
-                    </div>
-                    <div
-                      class="post-content__suggestions__suggestion__actions__button red won-button--outlined thin"
-                      ng-click="self.closeConnection(conn)">
-                        Remove
-                    </div>
-                </div>
-            </div>
-            <div class="post-content__suggestions__empty"
-                ng-if="!self.hasSuggestions">
-                No Suggestions for this Atom.
-            </div>
-          </div-->
-
+          
           <!-- OTHER ATOMS -->
           <won-atom-content-holds ng-if="self.isSelectedTab('HOLDS')" atom-uri="self.postUri"></won-atom-content-holds>
           <!-- RDF REPRESENTATION -->
@@ -182,11 +146,6 @@ function genComponentConf() {
         const hasContent = this.hasVisibleDetails(content);
         const hasSeeksBranch = this.hasVisibleDetails(seeks);
 
-        const suggestions = connectionSelectors.getSuggestedConnectionsByAtomUri(
-          state,
-          this.postUri
-        );
-
         const viewState = get(state, "view");
         const process = get(state, "process");
 
@@ -197,8 +156,6 @@ function genComponentConf() {
           isOwned,
           hasChatSocket: atomUtils.hasChatSocket(post),
           hasHoldableSocket: atomUtils.hasHoldableSocket(post),
-          hasSuggestions: isOwned && suggestions && suggestions.size > 0,
-          suggestionsArray: isOwned && suggestions && suggestions.toArray(),
           postLoading:
             !post || processUtils.isAtomLoading(process, this.postUri),
           postFailedToLoad:
@@ -226,41 +183,6 @@ function genComponentConf() {
 
     isSelectedTab(tabName) {
       return tabName === this.visibleTab;
-    }
-
-    markAsRead(conn) {
-      if (conn && conn.get("unread")) {
-        const payload = {
-          connectionUri: conn.get("uri"),
-          atomUri: this.postUri,
-        };
-
-        const tmp_connections__markAsRead = this.connections__markAsRead;
-
-        setTimeout(function() {
-          tmp_connections__markAsRead(payload);
-        }, CONNECTION_READ_TIMEOUT);
-      }
-    }
-
-    viewSuggestion(conn) {
-      if (!conn) {
-        return;
-      }
-
-      const connUri = conn.get("uri");
-
-      if (conn.get("unread")) {
-        this.connections__markAsRead({
-          connectionUri: connUri,
-          atomUri: this.postUri,
-        });
-      }
-
-      this.router__stateGoCurrent({
-        viewConnUri: connUri,
-        viewAtomUri: undefined,
-      });
     }
 
     /**
@@ -300,12 +222,10 @@ export default angular
     postContentGeneral,
     postContentPersona,
     postContentParticipants,
-    postHeaderModule,
     atomContentBuddies,
     atomContentHolds,
     atomContentSuggestions,
     trigModule,
-    inviewModule.name,
     elmModule,
   ])
   .directive("wonPostContent", genComponentConf).name;

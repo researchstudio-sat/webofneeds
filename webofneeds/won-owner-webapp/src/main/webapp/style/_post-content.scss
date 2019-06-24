@@ -45,63 +45,6 @@ won-post-content {
         text-align: center;
       }
     }
-
-    .post-content__suggestions {
-      &__empty {
-        color: $won-line-gray;
-        padding: 0.5rem;
-        text-align: center;
-      }
-
-      & .post-content__suggestions__suggestion {
-        border: $thinGrayBorder;
-        border-left: 0;
-        background: $won-light-gray;
-        display: grid;
-        grid-template-areas: "member_indicator member_info member_actions";
-        grid-template-columns: min-content 1fr min-content;
-        align-items: center;
-        margin-top: 0.5rem;
-
-        &:first-of-type {
-          margin-top: 0;
-        }
-
-        & > .post-content__suggestions__suggestion__indicator {
-          grid-area: member_indicator;
-          box-sizing: border-box;
-          width: 0.25rem;
-          height: 100%;
-        }
-
-        &.won-unread > .post-content__suggestions__suggestion__indicator {
-          border-left: 0.25rem solid $won-unread-attention;
-        }
-
-        &:not(.won-unread) > .post-content__suggestions__suggestion__indicator {
-          border-left: $thinGrayBorder;
-        }
-
-        won-post-header {
-          padding: 0.5rem 0.25rem;
-          font-size: $normalFontSize;
-          grid-area: member_info;
-        }
-
-        &__actions {
-          padding-right: 0.5rem;
-          display: grid;
-          grid-auto-flow: column;
-          grid-gap: 0.25rem;
-          grid-area: member_actions;
-
-          &__button.won-button--outlined.red.thin {
-            font-size: $smallFontSize;
-            padding: 0.5rem;
-          }
-        }
-      }
-    }
   }
 
   .post-failedtoload {
