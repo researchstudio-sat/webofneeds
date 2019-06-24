@@ -3,7 +3,7 @@
  */
 import { actionTypes } from "../actions/actions.js";
 import Immutable from "immutable";
-import { getIn } from "../utils.js";
+import { getIn, get } from "../utils.js";
 import { parseAtom, parseMetaAtom } from "./atom-reducer/parse-atom.js";
 import { parseMessage } from "./atom-reducer/parse-message.js";
 import * as processUtils from "../redux/utils/process-utils.js";
@@ -415,6 +415,12 @@ export default function(processState = initialState, action = {}) {
               toLoad: true,
             }
           );
+          const targetAtomUri = get(conn, "targetAtomUri");
+          if (!processUtils.isAtomLoaded(processState, targetAtomUri)) {
+            processState = updateAtomProcess(processState, targetAtomUri, {
+              toLoad: true,
+            });
+          }
         });
       return processState;
     }

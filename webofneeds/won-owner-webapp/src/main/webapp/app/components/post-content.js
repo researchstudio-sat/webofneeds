@@ -11,6 +11,7 @@ import postContentPersona from "./post-content-persona.js";
 import postContentParticipants from "./post-content-participants.js";
 import atomContentBuddies from "./atom-content-buddies.js";
 import atomContentHolds from "./atom-content-holds.js";
+import atomContentSuggestions from "./atom-content-suggestions.js";
 import postHeaderModule from "./post-header.js";
 import trigModule from "./trig.js";
 import { getIn, get } from "../utils.js";
@@ -99,7 +100,8 @@ function genComponentConf() {
           </div>
 
           <!-- SUGGESTIONS -->
-          <div class="post-content__suggestions" ng-if="self.isSelectedTab('SUGGESTIONS')">
+          <won-atom-content-suggestions ng-if="self.isSelectedTab('SUGGESTIONS')" atom-uri="self.postUri"></won-atom-content-suggestions>
+          <!--div class="post-content__suggestions" ng-if="self.isSelectedTab('SUGGESTIONS')">
             <div
               class="post-content__suggestions__suggestion"
               ng-repeat="conn in self.suggestionsArray"
@@ -129,7 +131,7 @@ function genComponentConf() {
                 ng-if="!self.hasSuggestions">
                 No Suggestions for this Atom.
             </div>
-          </div>
+          </div-->
 
           <!-- OTHER ATOMS -->
           <won-atom-content-holds ng-if="self.isSelectedTab('HOLDS')" atom-uri="self.postUri"></won-atom-content-holds>
@@ -222,55 +224,6 @@ function genComponentConf() {
       }
     }
 
-    closeConnection(conn, rateBad = false) {
-      if (!conn) {
-        return;
-      }
-
-      const connUri = conn.get("uri");
-
-      if (rateBad) {
-        this.connections__rate(connUri, won.WONCON.binaryRatingBad);
-      }
-
-      if (conn.get("unread")) {
-        this.connections__markAsRead({
-          connectionUri: connUri,
-          atomUri: this.postUri,
-        });
-      }
-
-      this.connections__close(connUri);
-    }
-
-    sendRequest(conn, message = "") {
-      if (!conn) {
-        return;
-      }
-
-      const connUri = get(conn, "uri");
-      const targetAtomUri = get(conn, "targetAtomUri");
-
-      if (conn.get("unread")) {
-        this.connections__markAsRead({
-          connectionUri: connUri,
-          atomUri: this.postUri,
-        });
-      }
-
-      this.connections__rate(connUri, won.WONCON.binaryRatingGood);
-      this.atoms__connect(this.postUri, connUri, targetAtomUri, message);
-      this.router__stateGo("connections", {
-        connectionUri: connUri,
-        viewAtomUri: undefined,
-        viewConnUri: undefined,
-      });
-    }
-
-    addPersona(persona) {
-      this.personas__connect(this.postUri, persona);
-    }
-
     isSelectedTab(tabName) {
       return tabName === this.visibleTab;
     }
@@ -350,6 +303,7 @@ export default angular
     postHeaderModule,
     atomContentBuddies,
     atomContentHolds,
+    atomContentSuggestions,
     trigModule,
     inviewModule.name,
     elmModule,

@@ -1,0 +1,43 @@
+@import "won-config";
+@import "sizing-utils";
+
+won-atom-content-suggestions {
+  display: grid;
+  grid-gap: 1rem;
+  padding: 0.5rem;
+
+  @media (min-width: $responsivenessBreakPoint) {
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+  }
+  @media (max-width: $responsivenessBreakPoint) {
+    //One Column in mobile
+    grid-template-columns: 1fr;
+  }
+
+  & .acs__empty {
+    color: $won-line-gray;
+    text-align: center;
+  }
+
+  & .acs__atom {
+    border: $thinGrayBorder;
+    background: $won-light-gray;
+
+    & > won-atom-card {
+    }
+
+    &__actions {
+      border-top: $thinGrayBorder;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-gap: 0.5rem;
+      padding: 0.5rem;
+
+      &__button.won-button--filled.red,
+      &__button.won-button--outlined.red.thin {
+        font-size: $smallFontSize;
+        padding: 0.5rem;
+      }
+    }
+  }
+}

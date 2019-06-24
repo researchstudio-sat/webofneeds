@@ -92,6 +92,19 @@ export function hasUnreadSuggestedConnections(state) {
   );
 }
 
+export function hasUnreadSuggestedConnectionsInHeldAtoms(state, atomUri) {
+  const allAtoms = getAtoms(state);
+  const atom = get(allAtoms, atomUri);
+  const holds = atomUtils.getHeldAtomUris(atom);
+
+  return (
+    holds &&
+    !!holds.find(holdsUri =>
+      atomUtils.hasUnreadSuggestedConnections(get(allAtoms, holdsUri))
+    )
+  );
+}
+
 /**
  * Determines if there are any buddy connections that are unread
  * (used for the inventory unread indicator)

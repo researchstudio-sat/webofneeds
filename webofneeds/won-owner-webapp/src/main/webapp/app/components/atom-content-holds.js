@@ -3,7 +3,7 @@
  */
 
 import angular from "angular";
-import postHeaderModule from "./post-header.js";
+import atomCardModule from "./atom-card.js";
 import { getIn } from "../utils.js";
 import { attach } from "../cstm-ng-utils.js";
 import { connect2Redux } from "../configRedux.js";
@@ -21,11 +21,11 @@ function genComponentConf() {
           atom-uri="::heldAtomUri"
           current-location="self.currentLocation"
           ng-repeat="heldAtomUri in self.heldAtomUrisArray track by heldAtomUri"
-          ng-click="self.router__stateGoCurrent({viewAtomUri: ::heldAtomUri, viewConnUri: undefined})"
+          ng-click="self.router__stateGoCurrent({viewAtomUri: heldAtomUri, viewConnUri: undefined})"
           ng-if="self.hasHeldAtoms"
           show-suggestions="::true"
           show-persona="::false"
-      />
+      ></won-atom-card>
       <div class="ach__empty"
           ng-if="!self.hasHeldAtoms">
           Not one single Atom present.
@@ -64,8 +64,5 @@ function genComponentConf() {
 }
 
 export default angular
-  .module("won.owner.components.atomContentHolds", [
-    ngAnimate,
-    postHeaderModule,
-  ])
+  .module("won.owner.components.atomContentHolds", [ngAnimate, atomCardModule])
   .directive("wonAtomContentHolds", genComponentConf).name;

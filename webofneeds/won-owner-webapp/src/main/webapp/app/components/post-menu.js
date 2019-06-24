@@ -83,9 +83,11 @@ function genComponentConf() {
               ng-if="self.hasHolderSocket"
               ng-click="self.selectTab('HOLDS')"
               ng-class="{
+                'post-menu__item--unread': self.hasUnreadSuggestedConnectionsInHeldAtoms,
                 'post-menu__item--selected': self.isSelectedTab('HOLDS'),
                 'post-menu__item--inactive': !self.hasHeldPosts
               }">
+              <span class="post-menu__item__unread"></span>
               <span class="post-menu__item__label">Posts</span>
               <span class="post-menu__item__count">({{self.heldPostsSize}})</span>
             </div>
@@ -163,9 +165,12 @@ function genComponentConf() {
               )
           );
 
-        //TODO: BLARGH GROUPCHATCONN FILTER
-
         const heldPosts = hasHolderSocket && get(post, "holds");
+
+        const hasUnreadSuggestedConnectionsInHeldAtoms = generalSelectors.hasUnreadSuggestedConnectionsInHeldAtoms(
+          state,
+          this.postUri
+        );
         const heldByUri = atomUtils.getHeldByUri(post);
         const isHeld = atomUtils.isHeld(post);
         const persona = getIn(state, ["atoms", heldByUri]);
@@ -211,6 +216,7 @@ function genComponentConf() {
           personaAggregateRatingString:
             personaAggregateRating && personaAggregateRating.toFixed(1),
           hasHeldPosts: heldPostsSize > 0,
+          hasUnreadSuggestedConnectionsInHeldAtoms,
           heldPostsSize,
           hasHolderSocket,
           hasGroupSocket,
