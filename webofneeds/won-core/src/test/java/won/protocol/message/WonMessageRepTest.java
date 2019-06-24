@@ -78,8 +78,12 @@ public class WonMessageRepTest {
         Model model = WonRepRdfUtils.createBaseModel();
         Resource baseRes = model.createResource();
 
+        Resource certificate = model.createResource();
+        certificate.addProperty(REP.USER_ID, "1");
+        certificate.addProperty(REP.PUBLIC_KEY, "6lLkr3HbnfuOhGKzEuydFgWZIiWTtXdLKKsXIftYg7E=");
+
         Resource reputationToken = model.createResource();
-        reputationToken.addProperty(CERT.PUBLIC_KEY, "6lLkr3HbnfuOhGKzEuydFgWZIiWTtXdLKKsXIftYg7E=");
+        reputationToken.addProperty(REP.CERTIFICATE, certificate);
 
         // TODO built in property exists?
         reputationToken.addProperty(REP.SIGNED_RANDOM_HASH, "eA0Aum8jgAkHoECTgn6T1ZqjOoE9rbxG9vJDzhnt9dIfp7W7rNBdWbQg/JWXjbGVUmXZTUHm9BhqmVMstma+iSUDsOkdKt+cnYQ8ctt7jcEAhENxJgsL1GmTA07hSunHpD+yTuPVNZyTuKHe47q0hJOvFiKcYN2boEA3iU3uwJA=");
@@ -104,8 +108,12 @@ public class WonMessageRepTest {
         Model model = WonRepRdfUtils.createBaseModel();
         Resource baseRes = model.createResource();
 
+        Resource certificate = model.createResource();
+        certificate.addProperty(REP.USER_ID, "1");
+        certificate.addProperty(REP.PUBLIC_KEY, "6lLkr3HbnfuOhGKzEuydFgWZIiWTtXdLKKsXIftYg7E=");
+
         Resource reputationToken = model.createResource();
-        reputationToken.addProperty(CERT.PUBLIC_KEY, "6lLkr3HbnfuOhGKzEuydFgWZIiWTtXdLKKsXIftYg7E=");
+        reputationToken.addProperty(REP.CERTIFICATE, certificate);
 
         // TODO built in property exists?
         reputationToken.addProperty(REP.SIGNED_RANDOM_HASH, "eA0Aum8jgAkHoECTgn6T1ZqjOoE9rbxG9vJDzhnt9dIfp7W7rNBdWbQg/JWXjbGVUmXZTUHm9BhqmVMstma+iSUDsOkdKt+cnYQ8ctt7jcEAhENxJgsL1GmTA07hSunHpD+yTuPVNZyTuKHe47q0hJOvFiKcYN2boEA3iU3uwJA=");
@@ -131,8 +139,12 @@ public class WonMessageRepTest {
         Model model = WonRepRdfUtils.createBaseModel();
         Resource baseRes = model.createResource();
 
+        Resource certificate = model.createResource();
+        certificate.addProperty(REP.USER_ID, "1");
+        certificate.addProperty(REP.PUBLIC_KEY, "6lLkr3HbnfuOhGKzEuydFgWZIiWTtXdLKKsXIftYg7E=");
+
         Resource reputationToken = model.createResource();
-        reputationToken.addProperty(CERT.PUBLIC_KEY, "6lLkr3HbnfuOhGKzEuydFgWZIiWTtXdLKKsXIftYg7E=");
+        reputationToken.addProperty(REP.CERTIFICATE, certificate);
 
         // TODO built in property exists?
         reputationToken.addProperty(REP.SIGNED_RANDOM_HASH, "eA0Aum8jgAkHoECTgn6T1ZqjOoE9rbxG9vJDzhnt9dIfp7W7rNBdWbQg/JWXjbGVUmXZTUHm9BhqmVMstma+iSUDsOkdKt+cnYQ8ctt7jcEAhENxJgsL1GmTA07hSunHpD+yTuPVNZyTuKHe47q0hJOvFiKcYN2boEA3iU3uwJA=");
@@ -158,8 +170,12 @@ public class WonMessageRepTest {
         Model model = WonRepRdfUtils.createBaseModel();
         Resource baseRes = model.createResource();
 
+        Resource certificate = model.createResource();
+        certificate.addProperty(REP.USER_ID, "1");
+        certificate.addProperty(REP.PUBLIC_KEY, "6lLkr3HbnfuOhGKzEuydFgWZIiWTtXdLKKsXIftYg7E=");
+
         Resource reputationToken = model.createResource();
-        reputationToken.addProperty(CERT.PUBLIC_KEY, "6lLkr3HbnfuOhGKzEuydFgWZIiWTtXdLKKsXIftYg7E=");
+        reputationToken.addProperty(REP.CERTIFICATE, certificate);
 
         // TODO built in property exists?
         reputationToken.addProperty(REP.SIGNED_RANDOM_HASH, "eA0Aum8jgAkHoECTgn6T1ZqjOoE9rbxG9vJDzhnt9dIfp7W7rNBdWbQg/JWXjbGVUmXZTUHm9BhqmVMstma+iSUDsOkdKt+cnYQ8ctt7jcEAhENxJgsL1GmTA07hSunHpD+yTuPVNZyTuKHe47q0hJOvFiKcYN2boEA3iU3uwJA=");
@@ -186,8 +202,12 @@ public class WonMessageRepTest {
         Model model = WonRepRdfUtils.createBaseModel();
         Resource baseRes = model.createResource();
 
+        Resource certificate = model.createResource();
+        certificate.addProperty(REP.USER_ID, "1");
+        certificate.addProperty(REP.PUBLIC_KEY, "6lLkr3HbnfuOhGKzEuydFgWZIiWTtXdLKKsXIftYg7E=");
+
         Resource reputationToken = model.createResource();
-        reputationToken.addProperty(CERT.PUBLIC_KEY, "6lLkr3HbnfuOhGKzEuydFgWZIiWTtXdLKKsXIftYg7E=");
+        reputationToken.addProperty(REP.CERTIFICATE, certificate);
 
         // TODO built in property exists?
         reputationToken.addProperty(REP.SIGNED_RANDOM_HASH, "eA0Aum8jgAkHoECTgn6T1ZqjOoE9rbxG9vJDzhnt9dIfp7W7rNBdWbQg/JWXjbGVUmXZTUHm9BhqmVMstma+iSUDsOkdKt+cnYQ8ctt7jcEAhENxJgsL1GmTA07hSunHpD+yTuPVNZyTuKHe47q0hJOvFiKcYN2boEA3iU3uwJA=");
@@ -215,8 +235,12 @@ public class WonMessageRepTest {
         Model model = WonRepRdfUtils.createBaseModel();
         Resource baseRes = model.createResource();
 
+        Resource certificate = model.createResource();
+        certificate.addProperty(REP.USER_ID, "1");
+        certificate.addProperty(REP.PUBLIC_KEY, "6lLkr3HbnfuOhGKzEuydFgWZIiWTtXdLKKsXIftYg7E=");
+
         Resource reputationToken = model.createResource();
-        reputationToken.addProperty(CERT.PUBLIC_KEY, "6lLkr3HbnfuOhGKzEuydFgWZIiWTtXdLKKsXIftYg7E=");
+        reputationToken.addProperty(REP.CERTIFICATE, certificate);
 
         // TODO built in property exists?
         reputationToken.addProperty(REP.SIGNED_RANDOM_HASH, "eA0Aum8jgAkHoECTgn6T1ZqjOoE9rbxG9vJDzhnt9dIfp7W7rNBdWbQg/JWXjbGVUmXZTUHm9BhqmVMstma+iSUDsOkdKt+cnYQ8ctt7jcEAhENxJgsL1GmTA07hSunHpD+yTuPVNZyTuKHe47q0hJOvFiKcYN2boEA3iU3uwJA=");
