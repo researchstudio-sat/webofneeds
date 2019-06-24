@@ -2,8 +2,8 @@
 @import "sizing-utils";
 @import "animate";
 
-won-post-content-participants {
-  & .pc-participants__empty {
+won-atom-content-participants {
+  & .acp__empty {
     color: $won-line-gray;
     padding: 0.5rem;
     text-align: center;
@@ -15,7 +15,7 @@ won-post-content-participants {
     border: 0.01rem solid var(--won-line-gray);
   }
 
-  & .pc-participants__participant {
+  & .acp__participant {
     border: $thinGrayBorder;
     border-left: 0;
     background: $won-light-gray;
@@ -39,18 +39,18 @@ won-post-content-participants {
       grid-area: participant_info;
     }
 
-    & > .pc-participants__participant__indicator {
+    & > .acp__participant__indicator {
       grid-area: participant_indicator;
       box-sizing: border-box;
       width: 0.25rem;
       height: 100%;
     }
 
-    &.won-unread > .pc-participants__participant__indicator {
+    &.won-unread > .acp__participant__indicator {
       border-left: 0.25rem solid $won-unread-attention;
     }
 
-    &:not(.won-unread) > .pc-participants__participant__indicator {
+    &:not(.won-unread) > .acp__participant__indicator {
       border-left: $thinGrayBorder;
     }
 

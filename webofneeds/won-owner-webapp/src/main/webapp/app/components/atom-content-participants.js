@@ -18,7 +18,7 @@ import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import { actionCreators } from "../actions/actions.js";
 import ngAnimate from "angular-animate";
 
-import "~/style/_post-content-participants.scss";
+import "~/style/_atom-content-participants.scss";
 
 const CONNECTION_READ_TIMEOUT = 1500;
 
@@ -26,66 +26,66 @@ const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
   let template = `
       <div
-          class="pc-participants__participant"
+          class="acp__participant"
           ng-if="!self.isOwned && self.groupMembers"
           ng-repeat="memberUri in self.groupMembersArray track by memberUri">
-          <div class="pc-participants__participant__indicator"></div>
+          <div class="acp__participant__indicator"></div>
           <won-post-header
             class="clickable"
             ng-click="self.router__stateGoCurrent({viewAtomUri: memberUri, viewConnUri: undefined})"
             atom-uri="::memberUri">
           </won-post-header>
-          <div class="pc-participants__participant__actions"></div>
+          <div class="acp__participant__actions"></div>
       </div>
-      <div class="pc-participants__participant"
+      <div class="acp__participant"
           ng-if="self.isOwned && self.hasGroupChatConnections && conn.get('state') !== self.won.WON.Closed"
           ng-repeat="conn in self.groupChatConnectionsArray"
           in-view="conn.get('unread') && $inview && self.markAsRead(conn)"
           ng-class="{'won-unread': conn.get('unread')}">
-          <div class="pc-participants__participant__indicator"></div>
+          <div class="acp__participant__indicator"></div>
           <won-post-header
             class="clickable"
             ng-click="self.router__stateGoCurrent({viewAtomUri: conn.get('targetAtomUri'), viewConnUri: undefined})"
             atom-uri="::conn.get('targetAtomUri')">
           </won-post-header>
-          <div class="pc-participants__participant__actions">
+          <div class="acp__participant__actions">
               <div
-                class="pc-participants__participant__actions__button red won-button--outlined thin"
+                class="acp__participant__actions__button red won-button--outlined thin"
                 ng-click="self.openRequest(conn)"
                 ng-if="conn.get('state') === self.won.WON.RequestReceived">
                   Accept
               </div>
               <div
-                class="pc-participants__participant__actions__button red won-button--outlined thin"
+                class="acp__participant__actions__button red won-button--outlined thin"
                 ng-click="self.closeConnection(conn)"
                 ng-if="conn.get('state') === self.won.WON.RequestReceived">
                   Reject
               </div>
               <div
-                class="pc-participants__participant__actions__button red won-button--outlined thin"
+                class="acp__participant__actions__button red won-button--outlined thin"
                 ng-click="self.sendRequest(conn)"
                 ng-if="conn.get('state') === self.won.WON.Suggested">
                   Request
               </div>
               <div
-                class="pc-participants__participant__actions__button red won-button--outlined thin"
+                class="acp__participant__actions__button red won-button--outlined thin"
                 ng-disabled="true"
                 ng-if="conn.get('state') === self.won.WON.RequestSent">
                   Waiting for Accept...
               </div>
               <div
-                class="pc-participants__participant__actions__button red won-button--outlined thin"
+                class="acp__participant__actions__button red won-button--outlined thin"
                 ng-click="self.closeConnection(conn)"
                 ng-if="conn.get('state') === self.won.WON.Suggested || conn.get('state') === self.won.WON.Connected">
                   Remove
               </div>
           </div>
       </div>
-      <div class="pc-participants__empty"
+      <div class="acp__empty"
           ng-if="(!self.isOwned && !self.groupMembers) || (self.isOwned && !self.hasGroupChatConnections)">
           No Groupmembers present.
       </div>
-      <won-labelled-hr label="::'Invite'" class="pc-participants__labelledhr" ng-if="self.isOwned"></won-labelled-hr>
+      <won-labelled-hr label="::'Invite'" class="acp__labelledhr" ng-if="self.isOwned"></won-labelled-hr>
       <won-suggestpost-picker
           ng-if="self.isOwned"
           initial-value="undefined"
@@ -106,8 +106,8 @@ function genComponentConf() {
       window.postcontentparticipants4dbg = this;
 
       const selectFromState = state => {
-        const post = getIn(state, ["atoms", this.postUri]);
-        const isOwned = generalSelectors.isAtomOwned(state, this.postUri);
+        const post = getIn(state, ["atoms", this.atomUri]);
+        const isOwned = generalSelectors.isAtomOwned(state, this.atomUri);
 
         const hasGroupSocket = atomUtils.hasGroupSocket(post);
 
@@ -117,10 +117,10 @@ function genComponentConf() {
           hasGroupSocket &&
           connectionSelectors.getGroupChatConnectionsByAtomUri(
             state,
-            this.postUri
+            this.atomUri
           );
 
-        let excludedFromInviteUris = [this.postUri];
+        let excludedFromInviteUris = [this.atomUri];
 
         if (groupChatConnections) {
           groupChatConnections
@@ -143,7 +143,7 @@ function genComponentConf() {
           groupMembersArray: groupMembers && groupMembers.toArray(),
         };
       };
-      connect2Redux(selectFromState, actionCreators, ["self.postUri"], this);
+      connect2Redux(selectFromState, actionCreators, ["self.atomUri"], this);
     }
 
     closeConnection(conn, rateBad = false) {
@@ -160,7 +160,7 @@ function genComponentConf() {
       if (conn.get("unread")) {
         this.connections__markAsRead({
           connectionUri: connUri,
-          atomUri: this.postUri,
+          atomUri: this.atomUri,
         });
       }
 
@@ -177,7 +177,7 @@ function genComponentConf() {
       if (conn.get("unread")) {
         this.connections__markAsRead({
           connectionUri: connUri,
-          atomUri: this.postUri,
+          atomUri: this.atomUri,
         });
       }
 
@@ -202,13 +202,13 @@ function genComponentConf() {
               if (conn.get("unread")) {
                 this.connections__markAsRead({
                   connectionUri: connUri,
-                  atomUri: this.postUri,
+                  atomUri: this.atomUri,
                 });
               }
 
               this.connections__rate(connUri, won.WONCON.binaryRatingGood);
               this.atoms__connect(
-                this.postUri,
+                this.atomUri,
                 connUri,
                 targetAtomUri,
                 message
@@ -232,14 +232,14 @@ function genComponentConf() {
         console.warn("Trying to invite to a non-owned or non groupSocket atom");
         return;
       }
-      this.atoms__connect(this.postUri, undefined, atomUri, message);
+      this.atoms__connect(this.atomUri, undefined, atomUri, message);
     }
 
     markAsRead(conn) {
       if (conn && conn.get("unread")) {
         const payload = {
           connectionUri: conn.get("uri"),
-          atomUri: this.postUri,
+          atomUri: this.atomUri,
         };
 
         const tmp_connections__markAsRead = this.connections__markAsRead;
@@ -259,17 +259,17 @@ function genComponentConf() {
     bindToController: true, //scope-bindings -> ctrl
     template: template,
     scope: {
-      postUri: "=",
+      atomUri: "=",
     },
   };
 }
 
 export default angular
-  .module("won.owner.components.postContentParticipants", [
+  .module("won.owner.components.atomContentParticipants", [
     ngAnimate,
     labelledHrModule,
     postHeaderModule,
     suggestPostPickerModule,
     inviewModule.name,
   ])
-  .directive("wonPostContentParticipants", genComponentConf).name;
+  .directive("wonAtomContentParticipants", genComponentConf).name;

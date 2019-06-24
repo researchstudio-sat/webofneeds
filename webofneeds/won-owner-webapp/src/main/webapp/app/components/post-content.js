@@ -7,7 +7,7 @@ import postIsOrSeeksInfoModule from "./post-is-or-seeks-info.js";
 import labelledHrModule from "./labelled-hr.js";
 import postContentGeneral from "./post-content-general.js";
 import postContentPersona from "./post-content-persona.js";
-import postContentParticipants from "./post-content-participants.js";
+import atomContentParticipants from "./atom-content-participants.js";
 import atomContentBuddies from "./atom-content-buddies.js";
 import atomContentHolds from "./atom-content-holds.js";
 import atomContentSuggestions from "./atom-content-suggestions.js";
@@ -82,7 +82,7 @@ function genComponentConf() {
           <won-elm module="self.addPersonaModule" ng-if="self.isSelectedTab('HELDBY') && self.isOwned && self.hasHoldableSocket && !self.post.get('heldBy')" props="{post: self.post.toJS(), personas: self.personas.toJS()}"></won-elm>
           
           <!-- PARTICIPANT INFORMATION -->
-          <won-post-content-participants ng-if="self.isSelectedTab('PARTICIPANTS')" post-uri="self.postUri"></won-post-content-participants>
+          <won-atom-content-participants ng-if="self.isSelectedTab('PARTICIPANTS')" atom-uri="self.postUri"></won-atom-content-participants>
           
           <!-- BUDDY INFORMATION -->
           <won-atom-content-buddies ng-if="self.isSelectedTab('BUDDIES')" atom-uri="self.postUri"></won-atom-content-buddies>
@@ -221,7 +221,7 @@ export default angular
     labelledHrModule,
     postContentGeneral,
     postContentPersona,
-    postContentParticipants,
+    atomContentParticipants,
     atomContentBuddies,
     atomContentHolds,
     atomContentSuggestions,
