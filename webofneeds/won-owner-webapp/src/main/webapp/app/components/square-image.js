@@ -18,13 +18,21 @@ function genComponentConf() {
       </svg>
     </div>
     <img class="image"
-      ng-if="::self.identiconSvg"
+      ng-if="::self.showIdenticon"
       alt="Auto-generated title image"
-      ng-src="data:image/svg+xml;base64,{{::self.identiconSvg}}">
+      ng-src="data:image/svg+xml;base64,{{::self.identiconSvg}}"/>
+    <img class="image"
+      ng-if="::self.showImage"
+      alt="{{self.image.get('name')}}"
+      ng-src="data:{{self.image.get('type')}};base64,{{self.image.get('data')}}"/>
     <img class="personaImage"
-      ng-if="::self.personaIdenticonSvg"
+      ng-if="::self.showPersonaIdenticon"
       alt="Auto-generated title image for persona that holds the atom"
-      ng-src="data:image/svg+xml;base64,{{::self.personaIdenticonSvg}}">
+      ng-src="data:image/svg+xml;base64,{{::self.personaIdenticonSvg}}"/>
+    <img class="personaImage"
+      ng-if="::self.showPersonaImage"
+      alt="{{self.personaImage.get('name')}}"
+      ng-src="data:{{self.personaImage.get('type')}};base64,{{self.personaImage.get('data')}}"/>
   `;
 
   class Controller {
@@ -35,9 +43,12 @@ function genComponentConf() {
         const atom = getIn(state, ["atoms", this.uri]);
         const personaUri = atomUtils.getHeldByUri(atom);
         const persona = getIn(state, ["atoms", personaUri]);
+
+        const personaImage = atomUtils.getDefaultPersonaImage(persona);
         const personaIdenticonSvg = atomUtils.getIdenticonSvg(persona);
 
         const isPersona = atomUtils.isPersona(atom);
+        const image = isPersona && atomUtils.getDefaultPersonaImage(atom);
 
         const useCaseIcon = !isPersona
           ? atomUtils.getMatchedUseCaseIcon(atom)
@@ -52,12 +63,19 @@ function genComponentConf() {
         const process = get(state, "process");
         return {
           isPersona,
+          atomImage: isPersona && atomUtils.getDefaultPersonaImage(atom),
           atomInactive: atomUtils.isInactive(atom),
           atomFailedToLoad:
             atom && processUtils.hasAtomFailedToLoad(process, this.uri),
           useCaseIcon,
           useCaseIconBackground,
+          showIdenticon: !image && identiconSvg,
+          showImage: image,
           identiconSvg,
+          image,
+          showPersonaIdenticon: !personaImage && personaIdenticonSvg,
+          showPersonaImage: personaImage,
+          personaImage,
           personaIdenticonSvg,
         };
       };

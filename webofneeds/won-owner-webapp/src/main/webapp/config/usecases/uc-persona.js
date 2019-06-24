@@ -26,6 +26,7 @@ export const persona = {
     personaName: { ...details.personaName, mandatory: true },
     description: { ...details.description },
     website: { ...details.website },
+    images: { ...details.images },
   },
   seeksDetails: {},
 };

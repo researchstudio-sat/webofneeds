@@ -187,6 +187,26 @@ export function getDefaultImage(atom) {
 }
 
 /**
+ * Returns the "Default" Image (currently the content branch is checked) of an atom which is a persona
+ * if the atom does not have any images we return undefined
+ * @param atom
+ */
+export function getDefaultPersonaImage(atom) {
+  if (hasImages(atom) && isPersona(atom)) {
+    const contentImages = getIn(atom, ["content", "images"]);
+
+    if (contentImages) {
+      const defaultImage = contentImages.find(image => get(image, "default"));
+
+      if (defaultImage) {
+        return defaultImage;
+      }
+    }
+  }
+  return undefined;
+}
+
+/**
  * If an atom is active and has the chat or the group socket we can connect to it.
  * @param atom
  */
