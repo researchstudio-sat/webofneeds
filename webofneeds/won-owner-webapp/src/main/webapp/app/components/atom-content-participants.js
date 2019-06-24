@@ -29,12 +29,15 @@ function genComponentConf() {
           class="acp__participant"
           ng-if="!self.isOwned && self.groupMembers"
           ng-repeat="memberUri in self.groupMembersArray track by memberUri">
-          <div class="acp__participant__indicator"></div>
-          <won-post-header
-            class="clickable"
-            ng-click="self.router__stateGoCurrent({viewAtomUri: memberUri, viewConnUri: undefined})"
-            atom-uri="::memberUri">
-          </won-post-header>
+          <won-atom-card
+              class="clickable"
+              atom-uri="::memberUri"
+              current-location="self.currentLocation"
+              ng-click="self.router__stateGoCurrent({viewAtomUri: memberUri, viewConnUri: undefined})"
+              show-suggestions="::false"
+              show-persona="::true"
+              disable-default-atom-interaction="::true"
+          ></won-atom-card>
           <div class="acp__participant__actions"></div>
       </div>
       <div class="acp__participant"
@@ -42,12 +45,15 @@ function genComponentConf() {
           ng-repeat="conn in self.groupChatConnectionsArray"
           in-view="conn.get('unread') && $inview && self.markAsRead(conn)"
           ng-class="{'won-unread': conn.get('unread')}">
-          <div class="acp__participant__indicator"></div>
-          <won-post-header
-            class="clickable"
-            ng-click="self.router__stateGoCurrent({viewAtomUri: conn.get('targetAtomUri'), viewConnUri: undefined})"
-            atom-uri="::conn.get('targetAtomUri')">
-          </won-post-header>
+          <won-atom-card
+              class="clickable"
+              atom-uri="::conn.get('targetAtomUri')"
+              current-location="self.currentLocation"
+              ng-click="self.router__stateGoCurrent({viewAtomUri: conn.get('targetAtomUri'), viewConnUri: undefined})"
+              show-suggestions="::false"
+              show-persona="::true"
+              disable-default-atom-interaction="::true"
+          ></won-atom-card>
           <div class="acp__participant__actions">
               <div
                 class="acp__participant__actions__button red won-button--outlined thin"
