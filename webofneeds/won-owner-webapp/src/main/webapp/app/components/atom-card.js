@@ -32,7 +32,7 @@ function genComponentConf() {
           'inactive': self.isInactive,
           'card__icon--map': self.showMap,
         }"
-        ng-click="::self.showAtomDetails(self.atomUri)">
+        ng-click="::self.atomClick(self.atomUri)">
         <div class="identicon usecaseimage"
             ng-if="self.showDefaultIcon && self.useCaseIcon">
             <svg>
@@ -55,7 +55,7 @@ function genComponentConf() {
     </div>
     <!-- Main Information -->
     <div class="card__main clickable"
-        ng-if="self.atomLoaded" ng-click="::self.showAtomDetails(self.atomUri)"
+        ng-if="self.atomLoaded" ng-click="::self.atomClick(self.atomUri)"
         ng-class="{
           'card__main--showIcon': !self.showDefaultIcon,
         }">
@@ -232,7 +232,12 @@ function genComponentConf() {
       connect2Redux(
         selectFromState,
         actionCreators,
-        ["self.atomUri", "self.currentLocation", "self.showSuggestions"],
+        [
+          "self.atomUri",
+          "self.currentLocation",
+          "self.showSuggestions",
+          "self.disableDefaultAtomInteraction",
+        ],
         this
       );
 
@@ -276,8 +281,10 @@ function genComponentConf() {
       this.showAtomTab(atomUri, "SUGGESTIONS");
     }
 
-    showAtomDetails(atomUri) {
-      this.showAtomTab(atomUri, "DETAIL");
+    atomClick(atomUri) {
+      if (!this.disableDefaultAtomInteraction) {
+        this.showAtomTab(atomUri, "DETAIL");
+      }
     }
 
     showAtomTab(atomUri, tab = "DETAIL") {
@@ -298,6 +305,7 @@ function genComponentConf() {
       currentLocation: "=",
       showSuggestions: "=",
       showPersona: "=",
+      disableDefaultAtomInteraction: "=",
     },
     template: template,
   };

@@ -27,6 +27,7 @@ function genComponentConf() {
               ng-click="self.viewSuggestion(suggestion)"
               show-suggestions="::false"
               show-persona="::true"
+              disable-default-atom-interaction="::true"
           ></won-atom-card>
           <div class="acs__atom__actions">
               <div
