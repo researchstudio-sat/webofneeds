@@ -20,7 +20,7 @@ export const lunchPlan = {
       content: {
         type: ["s:PlanAction"],
         title: "Let's go get lunch!",
-        eventObject: "http://dbpedia.org/resource/Lunch",
+        eventObjectAboutUris: "http://dbpedia.org/resource/Lunch",
         sockets: {
           "#groupSocket": won.GROUP.GroupSocketCompacted,
           "#holdableSocket": won.HOLD.HoldableSocketCompacted,
@@ -103,7 +103,7 @@ export const lunchInterest = {
       },
       seeks: {
         type: ["s:PlanAction"],
-        eventObject: "http://dbpedia.org/resource/Lunch",
+        eventObjectAboutUris: "http://dbpedia.org/resource/Lunch",
       },
     }),
   },

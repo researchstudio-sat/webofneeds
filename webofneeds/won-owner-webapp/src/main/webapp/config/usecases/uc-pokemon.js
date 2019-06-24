@@ -14,7 +14,7 @@ export const pokemonGoRaid = {
     ...mergeInEmptyDraft({
       content: {
         type: ["s:PlanAction"],
-        eventObject: "http://dbpedia.org/resource/Pokemon_Go",
+        eventObjectAboutUris: "http://dbpedia.org/resource/Pokemon_Go",
         sockets: {
           "#groupSocket": won.GROUP.GroupSocketCompacted,
           "#holdableSocket": won.HOLD.HoldableSocketCompacted,
@@ -45,7 +45,7 @@ export const pokemonInterest = {
       },
       seeks: {
         type: ["s:PlanAction"],
-        eventObject: "http://dbpedia.org/resource/Pokemon_Go",
+        eventObjectAboutUris: "http://dbpedia.org/resource/Pokemon_Go",
       },
     }),
   },

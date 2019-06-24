@@ -88,9 +88,12 @@ export function findUseCaseByAtom(atomImm) {
           const draftEventObject = getIn(useCase, [
             "draft",
             "content",
-            "eventObject",
+            "eventObjectAboutUris",
           ]);
-          const atomEventObject = getIn(atomImm, ["content", "eventObject"]);
+          const atomEventObject = getIn(atomImm, [
+            "content",
+            "eventObjectAboutUris",
+          ]);
           if (Immutable.List.isList(draftEventObject)) {
             const eventObjectSize = draftEventObject.size;
             const matchingEventObjectSize = draftEventObject.filter(
@@ -118,9 +121,12 @@ export function findUseCaseByAtom(atomImm) {
           const draftEventObject = getIn(useCase, [
             "draft",
             "seeks",
-            "eventObject",
+            "eventObjectAboutUris",
           ]);
-          const atomEventObject = getIn(atomImm, ["seeks", "eventObject"]);
+          const atomEventObject = getIn(atomImm, [
+            "seeks",
+            "eventObjectAboutUris",
+          ]);
 
           if (Immutable.List.isList(draftEventObject)) {
             //Fixme: work with check for all list objects

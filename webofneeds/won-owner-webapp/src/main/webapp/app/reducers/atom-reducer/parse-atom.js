@@ -106,6 +106,18 @@ export function parseAtom(jsonldAtom) {
 export function parseMetaAtom(metaAtom) {
   const metaAtomImm = Immutable.fromJS(metaAtom);
 
+  const extractEventObjectAboutUris = eventObjectUris =>
+    eventObjectUris &&
+    Immutable.Set(
+      eventObjectUris.map(eventObjectUri =>
+        eventObjectUri
+          .replace("https://w3id.org/won/core#", "won:")
+          .replace("https://w3id.org/won/content#", "con:")
+          .replace("https://w3id.org/won/ext/demo#", "demo:")
+          .replace("http://schema.org/", "s:")
+      )
+    );
+
   const extractTypes = types =>
     types &&
     Immutable.Set(
@@ -151,8 +163,8 @@ export function parseMetaAtom(metaAtom) {
       identiconSvg: undefined,
       nodeUri: undefined,
       state: extractStateFromMeta(get(metaAtomImm, "state")),
-      heldBy: undefined,
-      holds: Immutable.Set(),
+      heldBy: get(metaAtomImm, "heldBy"),
+      holds: Immutable.Set(get(metaAtomImm, "holds")),
       buddies: Immutable.Set(),
       rating: undefined,
       groupMembers: Immutable.Set(),
@@ -161,9 +173,15 @@ export function parseMetaAtom(metaAtom) {
         flags: extractFlags(get(metaAtomImm, "flags")),
         location: extractLocation(get(metaAtomImm, "location")),
         jobLocation: extractLocation(get(metaAtomImm, "jobLocation")),
+        eventObjectAboutUris: extractEventObjectAboutUris(
+          get(metaAtomImm, "eventObjectAboutUris")
+        ),
       },
       seeks: {
         type: extractTypes(get(metaAtomImm, "seeksTypes")),
+        eventObjectAboutUris: extractEventObjectAboutUris(
+          get(metaAtomImm, "seeksEventObjectAboutUris")
+        ),
       },
       modifiedDate:
         get(metaAtomImm, "modifiedDate") &&
