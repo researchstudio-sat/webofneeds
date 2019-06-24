@@ -204,14 +204,34 @@ function genComponentConf() {
         console.warn("Trying to request a non-owned or non buddySocket atom");
         return;
       }
-      this.atoms__connect(
-        this.atomUri,
-        undefined,
-        targetAtomUri,
-        message,
-        won.BUDDY.BuddySocketCompacted,
-        won.BUDDY.BuddySocketCompacted
-      );
+
+      const payload = {
+        caption: "Buddy Request",
+        text: "Send Request?",
+        buttons: [
+          {
+            caption: "Yes",
+            callback: () => {
+              this.atoms__connect(
+                this.atomUri,
+                undefined,
+                targetAtomUri,
+                message,
+                won.BUDDY.BuddySocketCompacted,
+                won.BUDDY.BuddySocketCompacted
+              );
+              this.view__hideModalDialog();
+            },
+          },
+          {
+            caption: "No",
+            callback: () => {
+              this.view__hideModalDialog();
+            },
+          },
+        ],
+      };
+      this.view__showModalDialog(payload);
     }
 
     markAsRead(conn) {

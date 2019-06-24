@@ -93,10 +93,11 @@ function genComponentConf() {
               ng-if="self.hasBuddySocket"
               ng-click="self.selectTab('BUDDIES')"
               ng-class="{
-                'post-menu__item--unread': self.hasBuddyRequests,
+                'post-menu__item--unread': self.hasUnreadBuddyConnections,
                 'post-menu__item--selected': self.isSelectedTab('BUDDIES'),
                 'post-menu__item--inactive': !self.hasBuddies
               }">
+              <span class="post-menu__item__unread"></span>
               <span class="post-menu__item__label">Buddies</span>
               <span class="post-menu__item__count">({{self.buddyCount}})</span>
             </div>
@@ -186,7 +187,7 @@ function genComponentConf() {
             state,
             this.postUri,
             true,
-            true
+            false
           );
 
         const buddies = isOwned
@@ -215,11 +216,9 @@ function genComponentConf() {
           hasGroupSocket,
           hasReviewSocket,
           hasBuddySocket,
-          hasBuddyRequests:
+          hasUnreadBuddyConnections:
             !!buddyConnections &&
-            !!buddyConnections.find(conn =>
-              connectionUtils.isRequestReceived(conn)
-            ),
+            !!buddyConnections.find(conn => connectionUtils.isUnread(conn)),
           hasBuddies: buddyConnections
             ? buddyConnections.size > 0
             : buddies

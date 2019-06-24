@@ -16,7 +16,7 @@ export const selectLastUpdateTime = state => state.get("lastUpdateTime");
 export const getRouterParams = state =>
   getIn(state, ["router", "currentParams"]);
 
-export const getAtoms = state => state.get("atoms");
+export const getAtoms = state => get(state, "atoms");
 export const getOwnedAtoms = state => {
   const accountState = get(state, "account");
   return getAtoms(state).filter(atom =>
@@ -89,6 +89,37 @@ export function hasUnreadSuggestedConnections(state) {
     !!allOwnedAtoms
       .filter(atom => atomUtils.isActive(atom))
       .find(atom => atomUtils.hasUnreadSuggestedConnections(atom))
+  );
+}
+
+/**
+ * Determines if there are any buddy connections that are unread
+ * (used for the inventory unread indicator)
+ * @param state
+ * @returns {boolean}
+ */
+export function hasUnreadBuddyConnections(
+  state,
+  excludeClosed = false,
+  excludeSuggested = false
+) {
+  const allOwnedAtoms = getOwnedAtoms(state);
+
+  return (
+    allOwnedAtoms &&
+    !!allOwnedAtoms
+      .filter(atom => atomUtils.isActive(atom))
+      .find(
+        atom =>
+          !!connectionSelectors
+            .getBuddyConnectionsByAtomUri(
+              state,
+              get(atom, "uri"),
+              excludeClosed,
+              excludeSuggested
+            )
+            .find(conn => connectionUtils.isUnread(conn))
+      )
   );
 }
 

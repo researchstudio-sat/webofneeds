@@ -16,7 +16,7 @@ function genTopnavConf() {
       <a class="menu__tab" ng-click="self.router__stateGo('inventory')"
         ng-class="{
           'menu__tab--selected': self.showInventory,
-          'menu__tab--unread': self.hasUnreadSuggestedConnections,
+          'menu__tab--unread': self.hasUnreadSuggestedConnections || self.hasUnreadBuddyConnections,
         }"
       >
         <span class="menu__tab__unread"></span>
@@ -60,6 +60,11 @@ function genTopnavConf() {
           hasChatAtoms: generalSelectors.hasChatAtoms(state),
           hasUnreadSuggestedConnections: generalSelectors.hasUnreadSuggestedConnections(
             state
+          ),
+          hasUnreadBuddyConnections: generalSelectors.hasUnreadBuddyConnections(
+            state,
+            true,
+            false
           ),
           hasUnreadChatConnections: generalSelectors.hasUnreadChatConnections(
             state

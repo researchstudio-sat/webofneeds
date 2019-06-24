@@ -286,6 +286,17 @@ export function hasUnreadSuggestedConnections(atom) {
   );
 }
 
+export function hasUnreadBuddyRequests(atom) {
+  return (
+    get(atom, "connections") &&
+    !!get(atom, "connections").find(
+      conn =>
+        connectionUtils.isRequestReceived(conn) ||
+        connectionUtils.isRequestSent(conn)
+    )
+  );
+}
+
 /**
  * Determines if a given atom is a Search-Atom (see draft in create-search.js)
  * @param atom
