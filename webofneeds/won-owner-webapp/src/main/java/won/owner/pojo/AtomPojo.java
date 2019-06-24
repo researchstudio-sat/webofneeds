@@ -38,8 +38,8 @@ public class AtomPojo {
     private Collection<URI> flags;
     private Collection<URI> holds;
     private URI heldBy;
-    private Collection<URI> eventObjects;
-    private Collection<URI> seeksEventObjects;
+    private Collection<URI> eventObjectAboutUris;
+    private Collection<URI> seeksEventObjectAboutUris;
 
     // TODO: add s:object/s:Event/s:about URI for content and seeks -> otherwise we
     // do not know which interest it is
@@ -62,10 +62,10 @@ public class AtomPojo {
         types = atom.getContentTypes();
         seeksTypes = atom.getSeeksTypes();
         state = atom.getAtomState();
-        // heldBy = atom.getHeldBy(); //TODO: IMPL ME
-        // holds = atom.getHolds(); //TODO: IMPL ME
-        // seeksEventObjects = atom.getSeeksEventObjects(); //TODO: IMPL ME
-        // eventObjects = atom.getContentEventObjects(); //TODO: IMPL ME
+        heldBy = atom.getHeldBy();
+        holds = atom.getHolds(); // TODO: IMPL ME
+        seeksEventObjectAboutUris = atom.getSeeksEventObjectAboutUris();
+        eventObjectAboutUris = atom.getContentEventObjectAboutUris();
     }
 
     /*
@@ -177,20 +177,20 @@ public class AtomPojo {
         this.heldBy = heldBy;
     }
 
-    public Collection<URI> getEventObjects() {
-        return eventObjects;
+    public Collection<URI> getEventObjectAboutUris() {
+        return eventObjectAboutUris;
     }
 
-    public void setEventObjects(Collection<URI> eventObjects) {
-        this.eventObjects = eventObjects;
+    public void setEventObjectAboutUris(Collection<URI> eventObjectAboutUris) {
+        this.eventObjectAboutUris = eventObjectAboutUris;
     }
 
-    public Collection<URI> getSeeksEventObjects() {
-        return seeksEventObjects;
+    public Collection<URI> getSeeksEventObjectAboutUris() {
+        return seeksEventObjectAboutUris;
     }
 
-    public void setSeeksEventObjects(Collection<URI> seeksEventObjects) {
-        this.seeksEventObjects = seeksEventObjects;
+    public void setSeeksEventObjectAboutUris(Collection<URI> seeksEventObjectAboutUris) {
+        this.seeksEventObjectAboutUris = seeksEventObjectAboutUris;
     }
 
     @Override

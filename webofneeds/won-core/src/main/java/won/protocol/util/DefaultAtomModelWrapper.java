@@ -14,10 +14,7 @@ import org.apache.jena.vocabulary.RDF;
 
 import won.protocol.model.AtomGraphType;
 import won.protocol.model.Coordinate;
-import won.protocol.vocabulary.SCHEMA;
-import won.protocol.vocabulary.WON;
-import won.protocol.vocabulary.WONCON;
-import won.protocol.vocabulary.WONMATCH;
+import won.protocol.vocabulary.*;
 
 /**
  * Extends {@link AtomModelWrapper} to add matchat specific methods to access
@@ -156,6 +153,55 @@ public class DefaultAtomModelWrapper extends AtomModelWrapper {
             }
         }
         return uriTypes;
+    }
+
+    public Collection<URI> getSeeksEventObjectAboutUris() {
+        return getEventObjectAboutUris(getSeeksPropertyObjects(SCHEMA.OBJECT));
+    }
+
+    public Collection<URI> getContentEventObjectAboutUris() {
+        return getEventObjectAboutUris(getContentPropertyObjects(SCHEMA.OBJECT));
+    }
+
+    private Collection<URI> getEventObjectAboutUris(Collection<RDFNode> rdfEventObjects) {
+        Collection<URI> eventObjectAboutUris = new LinkedList<>();
+        for (RDFNode rdfEventObject : rdfEventObjects) {
+            Collection<RDFNode> rdfEventObjectTypes = getContentPropertyObjects(rdfEventObject.asResource(), RDF.type);
+            boolean isEventType = false;
+            for (RDFNode rdfEventObjectType : rdfEventObjectTypes) {
+                if (SCHEMA.EVENT.toString().equals(rdfEventObjectType.asResource().getURI())) {
+                    isEventType = true;
+                    break;
+                }
+            }
+            if (isEventType) {
+                Collection<RDFNode> rdfEventObjectAbouts = getContentPropertyObjects(rdfEventObject.asResource(),
+                                SCHEMA.ABOUT);
+                for (RDFNode rdfEventObjectAbout : rdfEventObjectAbouts) {
+                    eventObjectAboutUris.add(URI.create(rdfEventObjectAbout.asResource().getURI()));
+                }
+            }
+        }
+        return eventObjectAboutUris;
+    }
+
+    public URI getHeldBy() {
+        // TODO: IMPL
+        // Collection<RDFNode> rdfHeldBy = getContentPropertyObjects(WXHOLD.HELD_BY);
+        // return rdfHeldBy.stream().findFirst().map(rdfNode ->
+        // URI.create(rdfNode.asResource().getURI())).orElse(null);
+        return null;
+    }
+
+    public Collection<URI> getHolds() {
+        Collection<URI> holds = new LinkedList<>();
+        // TODO: IMPL
+        /*
+         * Collection<RDFNode> rdfHolds = getContentPropertyObjects(WXHOLD.HOLDS); for
+         * (RDFNode rdfNode : rdfHolds) {
+         * holds.add(URI.create(rdfNode.asResource().getURI())); }
+         */
+        return holds;
     }
 
     public Collection<String> getAllTitles() {

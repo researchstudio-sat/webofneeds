@@ -80,7 +80,14 @@ public class RestAtomController {
         for (UserAtom userAtom : userAtoms) {
             if (state == null || state.equals(userAtom.getState())) {
                 try {
-                    Dataset atomDataset = WonLinkedDataUtils.getDataForResource(userAtom.getUri(), linkedDataSource);
+                    Dataset atomDataset = WonLinkedDataUtils.getDataForResource(userAtom.getUri(), linkedDataSource); // FIXME:
+                                                                                                                      // SOMEHOW
+                                                                                                                      // DerivedData
+                                                                                                                      // is
+                                                                                                                      // not
+                                                                                                                      // retrieved
+                                                                                                                      // with
+                                                                                                                      // getDataForResource...
                     AtomPojo atom = new AtomPojo(atomDataset);
                     atomMap.put(atom.getUri(), atom);
                 } catch (LinkedDataFetchingException e) {
