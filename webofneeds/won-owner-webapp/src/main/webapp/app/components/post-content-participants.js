@@ -189,18 +189,42 @@ function genComponentConf() {
         return;
       }
 
-      const connUri = get(conn, "uri");
-      const targetAtomUri = get(conn, "targetAtomUri");
+      const payload = {
+        caption: "Group",
+        text: "Add as Participant?",
+        buttons: [
+          {
+            caption: "Yes",
+            callback: () => {
+              const connUri = get(conn, "uri");
+              const targetAtomUri = get(conn, "targetAtomUri");
 
-      if (conn.get("unread")) {
-        this.connections__markAsRead({
-          connectionUri: connUri,
-          atomUri: this.postUri,
-        });
-      }
+              if (conn.get("unread")) {
+                this.connections__markAsRead({
+                  connectionUri: connUri,
+                  atomUri: this.postUri,
+                });
+              }
 
-      this.connections__rate(connUri, won.WONCON.binaryRatingGood);
-      this.atoms__connect(this.postUri, connUri, targetAtomUri, message);
+              this.connections__rate(connUri, won.WONCON.binaryRatingGood);
+              this.atoms__connect(
+                this.postUri,
+                connUri,
+                targetAtomUri,
+                message
+              );
+              this.view__hideModalDialog();
+            },
+          },
+          {
+            caption: "No",
+            callback: () => {
+              this.view__hideModalDialog();
+            },
+          },
+        ],
+      };
+      this.view__showModalDialog(payload);
     }
 
     inviteParticipant(atomUri, message = "") {

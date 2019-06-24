@@ -62,7 +62,7 @@ function genComponentConf() {
               </div>
               <div
                 class="ac-buddies__buddy__actions__button red won-button--outlined thin"
-                ng-click="self.sendRequest(conn)"
+                ng-click="self.requestBuddy(conn)"
                 ng-if="conn.get('state') === self.won.WON.Suggested">
                   Request
               </div>
@@ -206,8 +206,8 @@ function genComponentConf() {
       }
 
       const payload = {
-        caption: "Buddy Request",
-        text: "Send Request?",
+        caption: "Persona",
+        text: "Send Buddy Request?",
         buttons: [
           {
             caption: "Yes",
