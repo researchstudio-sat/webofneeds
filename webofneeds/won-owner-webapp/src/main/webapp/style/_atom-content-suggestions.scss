@@ -17,11 +17,17 @@ won-atom-content-suggestions {
   & .acs__empty {
     color: $won-line-gray;
     text-align: center;
+    grid-column: 1 / -1;
   }
 
   & .acs__atom {
     border: $thinGrayBorder;
     background: $won-light-gray;
+
+    &.won-unread {
+      border-color: $won-primary-color;
+      /*box-shadow: 0px 0px 5px 5px var(--won-primary-color);*/
+    }
 
     & > won-atom-card {
     }
@@ -29,7 +35,7 @@ won-atom-content-suggestions {
     &__actions {
       border-top: $thinGrayBorder;
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-auto-flow: column;
       grid-gap: 0.5rem;
       padding: 0.5rem;
 

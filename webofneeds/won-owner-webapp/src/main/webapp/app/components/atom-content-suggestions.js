@@ -20,8 +20,14 @@ const CONNECTION_READ_TIMEOUT = 1500;
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
   let template = `
-      <div class="acs__atom" ng-repeat="suggestion in self.suggestionsArray" ng-if="self.hasSuggestions" in-view="suggestion.get('unread') && $inview && self.markAsRead(suggestion)">
+      <div 
+        class="acs__atom"
+        ng-repeat="suggestion in self.suggestionsArray"
+        ng-if="self.hasSuggestions"
+        in-view="suggestion.get('unread') && $inview && self.markAsRead(suggestion)"
+        ng-class="{'won-unread': suggestion.get('unread')}">
           <won-atom-card
+              class="clickable"
               atom-uri="::suggestion.get('targetAtomUri')"
               current-location="self.currentLocation"
               ng-click="self.viewSuggestion(suggestion)"
