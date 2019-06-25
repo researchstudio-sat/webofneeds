@@ -41,43 +41,18 @@ won-persona-card {
 
   .card__main {
     grid-area: card__main;
-    display: grid;
-    grid-template-areas: "card__main__topline" "card__main__subtitle";
-    grid-template-columns: 1fr;
-    grid-template-rows: min-content min-content min-content;
 
     @media (min-width: $responsivenessBreakPoint) {
       width: 15rem;
       max-width: 15rem;
     }
 
-    &__topline {
-      grid-area: card__main__topline;
+    &__name {
       min-width: 0;
-
-      &__title {
-        min-width: 0;
-        white-space: nowrap;
-        text-overflow: ellipsis;
-        overflow: hidden;
-        font-weight: 400;
-      }
-    }
-
-    &__subtitle {
-      grid-area: card__main__subtitle;
-      display: grid;
-      grid-template-columns: 1fr min-content;
-      color: $won-subtitle-gray;
-      font-size: $smallFontSize;
-
-      &__date {
-        font-size: $smallFontSize;
-        color: $won-subtitle-gray;
-        white-space: nowrap;
-        padding-left: 0.5rem;
-        min-width: 0;
-      }
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      font-weight: 300;
     }
   }
 }

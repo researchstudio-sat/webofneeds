@@ -1,11 +1,9 @@
 import angular from "angular";
 import "ng-redux";
 import { actionCreators } from "../../actions/actions.js";
-import { relativeTime } from "../../won-label-utils.js";
 import { getIn, get } from "../../utils.js";
 import { attach } from "../../cstm-ng-utils.js";
 import { connect2Redux } from "../../configRedux.js";
-import { selectLastUpdateTime } from "../../redux/selectors/general-selectors.js";
 import * as atomUtils from "../../redux/utils/atom-utils.js";
 
 import "~/style/_persona-card.scss";
@@ -31,15 +29,8 @@ function genComponentConf() {
       </div>
       <!-- Main Information -->
       <div class="card__main clickable" ng-click="::self.atomClick(self.atomUri)">
-          <div class="card__main__topline">
-              <div class="card__main__topline__title">
-                  {{ self.personaName }}
-              </div>
-          </div>
-          <div class="card__main__subtitle">
-              <div class="card__main__subtitle__date">
-                  {{ self.friendlyTimestamp }}
-              </div>
+          <div class="card__main__name">
+              {{ self.personaName }}
           </div>
       </div>
     `;
@@ -57,12 +48,6 @@ function genComponentConf() {
           isInactive: atomUtils.isInactive(atom),
           atom,
           personaName: get(atom, "humanReadable"),
-          friendlyTimestamp:
-            atom &&
-            relativeTime(
-              selectLastUpdateTime(state),
-              get(atom, "lastUpdateDate")
-            ),
           atomImage,
           showDefaultIcon: !atomImage,
           identiconSvg,
