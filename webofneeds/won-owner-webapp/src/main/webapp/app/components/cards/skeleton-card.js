@@ -1,7 +1,3 @@
-/**
- * Component for rendering atom-title
- * Created by ksinger on 10.04.2017.
- */
 import angular from "angular";
 import inviewModule from "angular-inview";
 import "ng-redux";
