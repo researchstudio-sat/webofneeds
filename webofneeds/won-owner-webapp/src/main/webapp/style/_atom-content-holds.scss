@@ -21,8 +21,5 @@ won-atom-content-holds {
 
   & won-atom-card.ach__atom {
     border: $thinGrayBorder;
-    & > div {
-      background: $won-light-gray;
-    }
   }
 }

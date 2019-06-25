@@ -117,9 +117,6 @@ main.ownerinventory {
 
     won-atom-card.ownerinventory__content__atom {
       border: $thinGrayBorder;
-      & > div {
-        background: $won-light-gray;
-      }
     }
 
     .ownerinventory__content__createatom {

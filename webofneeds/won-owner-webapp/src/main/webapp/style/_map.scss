@@ -279,9 +279,6 @@ main.ownermap {
 
     won-atom-card.ownermap__content__atom {
       border: $thinGrayBorder;
-      & > div {
-        background: $won-light-gray;
-      }
     }
   }
 }

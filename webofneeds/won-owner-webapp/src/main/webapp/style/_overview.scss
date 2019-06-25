@@ -83,9 +83,6 @@ main.owneroverview {
 
     won-atom-card.owneroverview__content__atom {
       border: $thinGrayBorder;
-      & > div {
-        background: $won-light-gray;
-      }
     }
   }
 }
