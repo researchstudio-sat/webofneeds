@@ -17,26 +17,24 @@ function genComponentConf() {
   let template = `
         <nav class="atom-header-big">
             <div class="ahb__inner">
-                <div class="ahb__inner__left">
-                    <won-square-image
-                        uri="self.postUri">
-                    </won-square-image>
-                    <hgroup>
-                        <h1 class="ahb__title" ng-if="self.hasTitle()">{{ self.generateTitle() }}</h1>
-                        <h1 class="ahb__title ahb__title--notitle" ng-if="!self.hasTitle() && self.isDirectResponse">RE: no title</h1>
-                        <h1 class="ahb__title ahb__title--notitle" ng-if="!self.hasTitle() && !self.isDirectResponse">no title</h1>
-                        <span class="ahb__titles__persona" ng-if="self.personaName">{{ self.personaName }}</span>
-                        <span class="ahb__titles__groupchat"
-                          ng-if="self.isGroupChatEnabled && !self.isChatEnabled">
-                          Group Chat
-                        </span>
-                        <span class="ahb__titles__groupchat"
-                          ng-if="self.isGroupChatEnabled && self.isChatEnabled">
-                          Group Chat enabled
-                        </span>
-                        <div class="ahb__titles__type">{{ self.atomTypeLabel }}</div>
-                    </hgroup>
-                </div>
+                <won-square-image
+                    uri="self.postUri">
+                </won-square-image>
+                <hgroup>
+                    <h1 class="ahb__title" ng-if="self.hasTitle()">{{ self.generateTitle() }}</h1>
+                    <h1 class="ahb__title ahb__title--notitle" ng-if="!self.hasTitle() && self.isDirectResponse">RE: no title</h1>
+                    <h1 class="ahb__title ahb__title--notitle" ng-if="!self.hasTitle() && !self.isDirectResponse">no title</h1>
+                    <span class="ahb__titles__persona" ng-if="self.personaName">{{ self.personaName }}</span>
+                    <span class="ahb__titles__groupchat"
+                      ng-if="self.isGroupChatEnabled && !self.isChatEnabled">
+                      Group Chat
+                    </span>
+                    <span class="ahb__titles__groupchat"
+                      ng-if="self.isGroupChatEnabled && self.isChatEnabled">
+                      Group Chat enabled
+                    </span>
+                    <div class="ahb__titles__type">{{ self.atomTypeLabel }}</div>
+                </hgroup>
             </div>
             <won-share-dropdown atom-uri="self.postUri"></won-share-dropdown>
             <won-post-context-dropdown atom-uri="self.postUri"></won-post-context-dropdown>

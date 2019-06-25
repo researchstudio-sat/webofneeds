@@ -1,104 +1,59 @@
 @import "won-config";
 @import "flex-layout";
-@import "title-bar";
 @import "sizing-utils";
 @import "square-image";
 
 .atom-header-big {
-  @include title-bar("ahb");
+  background-color: $won-light-gray;
   border-top: none;
+  border-bottom: $thinBorderWidth solid $won-line-gray;
 
-  .ahb__titles__type {
-    color: #a7a7a7;
-    font-size: 0.8rem;
-  }
-
-  .ahb__titles__persona {
-    border-radius: 0.19rem;
-    background: $won-secondary-color-lighter;
-    color: $won-secondary-text-color;
-    padding: 0 0.25rem;
-    display: inline-block;
-  }
-
-  .ahb__titles__groupchat {
-    border-radius: 0.19rem;
-    background: $won-line-gray;
-    margin: 0.1rem;
-    padding: 0 0.25rem;
-    display: inline-block;
-  }
+  @include max-content-width($maxContentWidth, $minContentPadding, "ahb");
 
   > .ahb__inner {
-    // ahb isn't using the tri-aligned that it inherits
-    // via the `@include title-bar` as there's no
-    // centered element
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
     align-content: center;
     align-items: center;
+    justify-content: flex-start;
+    padding: 1rem;
 
-    > .ahb__inner__left {
-      display: flex;
-      flex-direction: row;
-      align-content: center;
-      align-items: center;
-      justify-content: flex-start;
+    @media (max-width: $responsivenessBreakPoint) {
+      @include square-image($postIconSize, 0 0.5rem 0 0);
+    }
+    @media (min-width: $responsivenessBreakPoint) {
+      @include square-image(4.7rem, 0 1rem 0 0);
+    }
 
-      margin: 1rem 0;
+    .ahb__title {
+      font-size: $mediumFontSize;
+      font-weight: 300;
+      padding: 0.1rem;
 
       @media (max-width: $responsivenessBreakPoint) {
-        @include square-image($postIconSize, 0 0.5rem 0 0);
-      }
-      @media (min-width: $responsivenessBreakPoint) {
-        @include square-image(4.7rem, 0 1rem 0 0);
+        font-size: $normalFontSize;
       }
     }
 
-    > .ahb__inner__right {
-      //TODO dynamically adapt to number of children(?) or at least pull into a config-variable
-      // or make won-tabs a parametrized mixin?
-      flex-grow: 1;
-      margin-top: 1rem;
+    .ahb__titles__type {
+      color: #a7a7a7;
+      font-size: 0.8rem;
+    }
 
-      display: flex;
-      flex-direction: column;
-      justify-content: stretch;
-      //align-items: flex-end;
+    .ahb__titles__persona {
+      border-radius: 0.19rem;
+      background: $won-secondary-color-lighter;
+      color: $won-secondary-text-color;
+      padding: 0 0.25rem;
+      display: inline-block;
+    }
 
-      //padding-top: 1rem;
-
-      > .ahb__inner__right__upper {
-        display: flex;
-        flex-direction: row;
-        align-content: center;
-        align-items: flex-start;
-        justify-content: space-between;
-
-        > .ahb__title {
-          align-self: flex-end;
-
-          &--notitle {
-            color: $won-subtitle-gray;
-          }
-        }
-      }
-      > .ahb__inner__right__lower {
-        display: flex;
-        flex-direction: row;
-        align-content: center;
-        align-items: flex-start;
-        justify-content: flex-end;
-
-        > .ahb__titles__type {
-          /*align-self: flex-start;*/
-        }
-
-        > .ahb__tabs {
-          align-self: stretch;
-        }
-      }
+    .ahb__titles__groupchat {
+      border-radius: 0.19rem;
+      background: $won-line-gray;
+      margin: 0.1rem;
+      padding: 0 0.25rem;
+      display: inline-block;
     }
   }
 
