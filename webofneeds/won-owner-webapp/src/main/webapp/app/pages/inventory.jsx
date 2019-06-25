@@ -51,8 +51,6 @@ const template = (
           class="ownerinventory__personas__persona"
           ng-repeat="personaUri in self.sortedOwnedActivePersonaUriArray track by personaUri"
           atom-uri="personaUri"
-          hide-back-button="true"
-          big-header="true"
         />
       </div>
       <div className="ownerinventory__header">

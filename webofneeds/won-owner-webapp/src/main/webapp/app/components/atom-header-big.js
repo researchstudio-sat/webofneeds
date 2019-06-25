@@ -72,12 +72,7 @@ function genComponentConf() {
           atomTypeLabel: post && atomUtils.generateTypeLabel(post),
         };
       };
-      connect2Redux(
-        selectFromState,
-        actionCreators,
-        ["self.atomUri", "self.hideBackButton"],
-        this
-      );
+      connect2Redux(selectFromState, actionCreators, ["self.atomUri"], this);
     }
 
     hasTitle() {
@@ -105,7 +100,6 @@ function genComponentConf() {
     bindToController: true, //scope-bindings -> ctrl
     scope: {
       atomUri: "=",
-      hideBackButton: "=",
     },
     template: template,
   };

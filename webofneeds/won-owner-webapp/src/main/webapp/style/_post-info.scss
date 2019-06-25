@@ -12,52 +12,6 @@ won-post-info {
     grid-area: header;
   }
 
-  .post-info__header {
-    padding: 0.5rem;
-    box-sizing: border-box;
-    display: grid;
-    border-bottom: $thinGrayBorder;
-    grid-template-columns: auto 1fr auto auto;
-    grid-template-areas: "header_back header_title header_share header_context";
-    grid-area: header;
-    font-size: $normalFontSize;
-    text-align: left;
-    min-width: 0;
-    align-items: center;
-
-    &--noBackButton {
-      grid-template-columns: 1fr auto auto;
-      grid-template-areas: "header_title header_share header_context";
-    }
-
-    &__back {
-      grid-area: header_back;
-      display: grid;
-
-      &:hover {
-        filter: brightness(85%);
-      }
-
-      &__button__icon {
-        --local-primary: #{$won-primary-color};
-        @include fixed-square($backIconSize);
-      }
-    }
-
-    won-post-header,
-    won-connection-header {
-      grid-area: header_title;
-    }
-
-    won-post-context-dropdown,
-    won-connection-context-dropdown {
-      grid-area: header_context;
-    }
-
-    won-share-dropdown {
-      grid-area: header_share;
-    }
-  }
   won-post-menu {
     grid-area: menu;
   }

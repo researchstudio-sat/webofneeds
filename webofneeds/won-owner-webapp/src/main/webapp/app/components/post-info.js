@@ -28,27 +28,7 @@ import Immutable from "immutable";
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
   let template = `
-        <div class="post-info__header" ng-if="!self.bigHeader" ng-class="{'post-info__header--noBackButton': self.hideBackButton}">
-            <div class="post-info__header__back" ng-if="!self.hideBackButton">
-              <a class="post-info__header__back__button clickable"
-                  ng-click="self.router__back()">
-                  <svg class="post-info__header__back__button__icon clickable hide-in-responsive">
-                      <use xlink:href="#ico36_close" href="#ico36_close"></use>
-                  </svg>
-                  <svg class="post-info__header__back__button__icon clickable show-in-responsive">
-                      <use xlink:href="#ico36_backarrow" href="#ico36_backarrow"></use>
-                  </svg>
-              </a>
-            </div>
-            <won-post-header atom-uri="self.atomUri"></won-post-header>
-            <won-share-dropdown atom-uri="self.atomUri"></won-share-dropdown>
-            <won-post-context-dropdown atom-uri="self.atomUri"></won-post-context-dropdown>
-        </div>
-        <won-atom-header-big
-            ng-if="self.bigHeader"
-            hide-back-button="self.hideBackButton"
-            atom-uri="self.atomUri"
-        ></won-atom-header-big>
+        <won-atom-header-big atom-uri="self.atomUri"></won-atom-header-big>
         <won-post-menu post-uri="self.atomUri"></won-post-menu>
         <won-post-content post-uri="self.atomUri"></won-post-content>
         <div class="post-info__footer" ng-if="self.showFooter">
@@ -143,12 +123,7 @@ function genComponentConf() {
               showAdHocRequestField),
         };
       };
-      connect2Redux(
-        selectFromState,
-        actionCreators,
-        ["self.atomUri", "self.bigHeader", "self.hideBackButton"],
-        this
-      );
+      connect2Redux(selectFromState, actionCreators, ["self.atomUri"], this);
 
       classOnComponentRoot("won-is-loading", () => this.atomLoading, this);
     }
@@ -211,8 +186,6 @@ function genComponentConf() {
     template: template,
     scope: {
       atomUri: "=",
-      bigHeader: "=",
-      hideBackButton: "=",
     },
   };
 }

@@ -43,7 +43,6 @@ const template = (
       <won-post-info
         ng-if="!(self.atomLoading || self.atomFailedToLoad) && self.atom"
         atom-uri="self.atomUri"
-        big-header="true"
       />
       <div className="pc__loading" ng-if="self.atomLoading">
         <svg className="pc__loading__spinner hspinner">
