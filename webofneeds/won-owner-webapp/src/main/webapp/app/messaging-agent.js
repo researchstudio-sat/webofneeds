@@ -437,11 +437,13 @@ export function runMessagingAgent(redux) {
   }
 
   function checkHeartbeat() {
-    console.debug(
-      "messaging-agent.js: checking heartbeat presence: ",
-      missedHeartbeats,
-      " full intervals of 30s have passed since the last heartbeat."
-    );
+    if (missedHeartbeats > 0) {
+      console.debug(
+        "messaging-agent.js: checking heartbeat presence: ",
+        missedHeartbeats,
+        " full intervals of 30s have passed since the last heartbeat."
+      );
+    }
 
     if (++missedHeartbeats > 3) {
       console.error(
