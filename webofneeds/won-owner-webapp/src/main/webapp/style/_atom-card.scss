@@ -17,7 +17,7 @@ won-atom-card {
     .card__icon {
       grid-area: card__icon;
       display: grid;
-      margin-bottom: 0.5rem;
+      margin-top: 0.5rem;
       user-select: none;
       height: 10rem;
       justify-content: center;
@@ -36,6 +36,10 @@ won-atom-card {
         border-radius: 100%;
         $cardIdenticonSize: 5rem;
         @include fixed-square(#{$cardIdenticonSize});
+      }
+
+      & .image {
+        background: white;
       }
     }
 

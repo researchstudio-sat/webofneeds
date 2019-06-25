@@ -99,7 +99,6 @@ function genComponentConf() {
     <div class="other" ng-if="self.isOtherAtom">
         <!-- Icon Information -->
         <div class="card__icon clickable"
-          style="background-color: {{self.showDefaultIcon && self.iconBackground}}"
           ng-class="{
             'inactive': self.isInactive,
             'card__icon--map': self.showMap,
@@ -267,7 +266,6 @@ function genComponentConf() {
               ),
             atomImage,
             showDefaultIcon: !atomImage,
-            iconBackground,
             identiconSvg,
           };
         } else {
