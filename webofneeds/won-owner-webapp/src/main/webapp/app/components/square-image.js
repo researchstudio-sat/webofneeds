@@ -12,27 +12,27 @@ const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
   let template = `
     <div class="image usecaseimage" style="background-color: {{::self.useCaseIconBackground}}"
-      ng-if="::self.useCaseIcon">
+      ng-if="self.useCaseIcon">
       <svg class="si__usecaseicon">
         <use xlink:href="{{ ::self.useCaseIcon }}" href="{{ ::self.useCaseIcon }}"></use>
       </svg>
     </div>
     <img class="image"
-      ng-if="::self.showIdenticon"
-      alt="Auto-generated title image"
+      ng-if="self.showIdenticon"
+      alt="Auto-generated title icon"
       ng-src="data:image/svg+xml;base64,{{::self.identiconSvg}}"/>
     <img class="image"
-      ng-if="::self.showImage"
+      ng-if="self.showImage"
       alt="{{self.image.get('name')}}"
       ng-src="data:{{self.image.get('type')}};base64,{{self.image.get('data')}}"/>
-    <img class="personaImage"
-      ng-if="::self.showPersonaIdenticon"
+    <img class="holderIcon"
+      ng-if="::self.showHolderIdenticon"
       alt="Auto-generated title image for persona that holds the atom"
-      ng-src="data:image/svg+xml;base64,{{::self.personaIdenticonSvg}}"/>
-    <img class="personaImage"
-      ng-if="::self.showPersonaImage"
-      alt="{{self.personaImage.get('name')}}"
-      ng-src="data:{{self.personaImage.get('type')}};base64,{{self.personaImage.get('data')}}"/>
+      ng-src="data:image/svg+xml;base64,{{::self.holderIdenticonSvg}}"/>
+    <img class="holderIcon"
+      ng-if="::self.showHolderImage"
+      alt="{{self.holderImage.get('name')}}"
+      ng-src="data:{{self.holderImage.get('type')}};base64,{{self.holderImage.get('data')}}"/>
   `;
 
   class Controller {
@@ -41,12 +41,6 @@ function genComponentConf() {
 
       const selectFromState = state => {
         const atom = getIn(state, ["atoms", this.uri]);
-        const personaUri = atomUtils.getHeldByUri(atom);
-        const persona = getIn(state, ["atoms", personaUri]);
-
-        const personaImage = atomUtils.getDefaultPersonaImage(persona);
-        const personaIdenticonSvg = atomUtils.getIdenticonSvg(persona);
-
         const isPersona = atomUtils.isPersona(atom);
         const image = isPersona && atomUtils.getDefaultPersonaImage(atom);
 
@@ -60,6 +54,15 @@ function genComponentConf() {
         const identiconSvg = !useCaseIcon
           ? atomUtils.getIdenticonSvg(atom)
           : undefined;
+
+        // Icons/Images of the AtomHolder
+        const personaUri = atomUtils.getHeldByUri(atom);
+        const persona = getIn(state, ["atoms", personaUri]);
+        const holderImage = atomUtils.getDefaultPersonaImage(persona);
+        const holderIdenticonSvg = atomUtils.getIdenticonSvg(persona);
+        const showHolderIdenticon = !holderImage && holderIdenticonSvg;
+        const showHolderImage = holderImage;
+
         const process = get(state, "process");
         return {
           isPersona,
@@ -73,10 +76,10 @@ function genComponentConf() {
           showImage: image,
           identiconSvg,
           image,
-          showPersonaIdenticon: !personaImage && personaIdenticonSvg,
-          showPersonaImage: personaImage,
-          personaImage,
-          personaIdenticonSvg,
+          showHolderIdenticon,
+          showHolderImage,
+          holderImage,
+          holderIdenticonSvg,
         };
       };
 
