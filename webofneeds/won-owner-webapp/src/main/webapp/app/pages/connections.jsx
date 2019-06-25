@@ -22,9 +22,6 @@ import "~/style/_connection-overlay.scss";
 const template = (
   <container>
     <won-modal-dialog ng-if="self.showModalDialog" />
-    <div className="won-modal-atomview" ng-if="self.showAtomOverlay">
-      <won-post-info atom-uri="self.viewAtomUri" />
-    </div>
     <div
       className="won-modal-connectionview"
       ng-if="self.showConnectionOverlay"
@@ -95,7 +92,6 @@ class ConnectionsController {
 
     const selectFromState = state => {
       const viewConnUri = generalSelectors.getViewConnectionUriFromRoute(state);
-      const viewAtomUri = generalSelectors.getViewAtomUriFromRoute(state);
 
       const selectedConnectionUri = generalSelectors.getConnectionUriFromRoute(
         state
@@ -141,9 +137,7 @@ class ConnectionsController {
             connectionUtils.isSuggested(selectedConnection)),
         showSlideIns:
           viewSelectors.hasSlideIns(state) && viewSelectors.showSlideIns(state),
-        showAtomOverlay: !!viewAtomUri,
         showConnectionOverlay: !!viewConnUri,
-        viewAtomUri,
         viewConnUri,
         hasChatAtoms,
         hideListSideInResponsive: !hasChatAtoms || selectedConnection,

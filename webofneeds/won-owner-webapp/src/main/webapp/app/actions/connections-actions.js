@@ -343,7 +343,6 @@ function connectReactionAtom(
         useCase: undefined,
         useCaseGroup: undefined,
         fromAtomUri: undefined,
-        viewAtomUri: undefined,
         viewConnUri: undefined,
         mode: undefined,
       })

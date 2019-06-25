@@ -36,7 +36,6 @@ import jsxRenderer from "@depack/render";
  */
 export const resetParams = Object.freeze({
   connectionUri: undefined,
-  viewAtomUri: undefined,
   viewConnUri: undefined,
   postUri: undefined,
   useCase: undefined,
@@ -86,7 +85,7 @@ export const configRouting = [
         as: "about",
       },
       {
-        path: "/map?viewAtomUri?viewConnUri",
+        path: "/map?viewConnUri",
         component: mapComponent,
         as: "map",
       },
@@ -96,22 +95,22 @@ export const configRouting = [
         as: "create",
       },
       {
-        path: "/inventory?viewAtomUri?viewConnUri?token?privateId",
+        path: "/inventory?viewConnUri?token?privateId",
         component: inventoryComponent,
         as: "inventory",
       },
       {
-        path: "/connections?connectionUri?viewAtomUri?viewConnUri",
+        path: "/connections?connectionUri?viewConnUri",
         component: connectionsComponent,
         as: "connections",
       },
       {
-        path: "/overview?viewAtomUri?viewConnUri",
+        path: "/overview?viewConnUri",
         component: overviewComponent,
         as: "overview",
       },
       {
-        path: "/post/?postUri?viewAtomUri?viewConnUri",
+        path: "/post/?postUri?viewConnUri",
         component: postComponent,
         as: "post",
       },

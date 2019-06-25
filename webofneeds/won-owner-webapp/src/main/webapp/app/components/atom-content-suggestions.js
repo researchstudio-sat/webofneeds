@@ -104,7 +104,6 @@ function genComponentConf() {
 
       this.router__stateGoCurrent({
         viewConnUri: connUri,
-        viewAtomUri: undefined,
       });
     }
 
@@ -148,7 +147,6 @@ function genComponentConf() {
       this.atoms__connect(this.atomUri, connUri, targetAtomUri, message);
       this.router__stateGo("connections", {
         connectionUri: connUri,
-        viewAtomUri: undefined,
         viewConnUri: undefined,
       });
     }

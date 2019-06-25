@@ -33,9 +33,6 @@ import "~/style/_connection-overlay.scss";
 const template = (
   <container>
     <won-modal-dialog ng-if="self.showModalDialog" />
-    <div className="won-modal-atomview" ng-if="self.showAtomOverlay">
-      <won-post-info atom-uri="self.viewAtomUri" />
-    </div>
     <div
       className="won-modal-connectionview"
       ng-if="self.showConnectionOverlay"
@@ -243,7 +240,6 @@ class Controller {
     window.ownermap4dbg = this;
 
     const selectFromState = state => {
-      const viewAtomUri = generalSelectors.getViewAtomUriFromRoute(state);
       const viewConnUri = generalSelectors.getViewConnectionUriFromRoute(state);
 
       const isLocationAccessDenied = generalSelectors.isLocationAccessDenied(
@@ -331,9 +327,7 @@ class Controller {
         showSlideIns:
           viewSelectors.hasSlideIns(state) && viewSelectors.showSlideIns(state),
         showModalDialog: viewSelectors.showModalDialog(state),
-        showAtomOverlay: !!viewAtomUri,
         showConnectionOverlay: !!viewConnUri,
-        viewAtomUri,
         viewConnUri,
       };
     };

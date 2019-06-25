@@ -194,18 +194,6 @@ export const getCurrentParamsFromRoute = createSelector(
   }
 );
 
-export const getViewAtomUriFromRoute = createSelector(
-  state => state,
-  state => {
-    const encodedAtomUri = getIn(state, [
-      "router",
-      "currentParams",
-      "viewAtomUri",
-    ]);
-    return decodeUriComponentProperly(encodedAtomUri);
-  }
-);
-
 export const getViewConnectionUriFromRoute = createSelector(
   state => state,
   state => {

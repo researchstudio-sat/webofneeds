@@ -134,7 +134,6 @@ function genComponentConf() {
         useCaseGroup: undefined,
         connectionUri: undefined,
         fromAtomUri: this.atomUri,
-        viewAtomUri: undefined,
         viewConnUri: undefined,
         mode: "CONNECT",
       });
