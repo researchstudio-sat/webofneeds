@@ -10,6 +10,9 @@ won-suggestpost-viewer {
       background: $won-light-gray;
 
       & > won-atom-card {
+        & > div {
+          background: $won-light-gray;
+        }
       }
 
       &__actions {

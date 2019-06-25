@@ -366,7 +366,8 @@ export function generateFullSocketLabels(atomImm) {
  * @param {*} atomImm the atom as saved in the state
  */
 export function generateTypeLabel(atomImm) {
-  const useCase = useCaseUtils.getUseCase(getMatchedUseCaseIdentifier(atomImm));
+  const useCase =
+    atomImm && useCaseUtils.getUseCase(getMatchedUseCaseIdentifier(atomImm));
 
   if (useCase) {
     return useCase.label;

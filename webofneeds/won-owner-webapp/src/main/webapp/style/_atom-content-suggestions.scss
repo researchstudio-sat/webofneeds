@@ -30,6 +30,9 @@ won-atom-content-suggestions {
     }
 
     & > won-atom-card {
+      & > div {
+        background: $won-light-gray;
+      }
     }
 
     &__actions {
