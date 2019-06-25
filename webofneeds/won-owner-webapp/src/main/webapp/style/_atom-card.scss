@@ -161,6 +161,7 @@ won-atom-card {
 
       border-radius: 100%;
       @include fixed-square(var(--persona-height));
+      background: white;
     }
 
     &__name {
