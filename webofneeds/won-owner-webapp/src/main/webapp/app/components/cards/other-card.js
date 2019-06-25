@@ -197,7 +197,7 @@ function genComponentConf() {
       if (this.isDirectResponse && this.responseToAtom) {
         return !!this.responseToAtom.get("humanReadable");
       } else {
-        return !!this.atom.get("humanReadable");
+        return !!this.atom && !!this.atom.get("humanReadable");
       }
     }
 
@@ -205,7 +205,7 @@ function genComponentConf() {
       if (this.isDirectResponse && this.responseToAtom) {
         return "Re: " + this.responseToAtom.get("humanReadable");
       } else {
-        return this.atom.get("humanReadable");
+        return this.atom && this.atom.get("humanReadable");
       }
     }
 
