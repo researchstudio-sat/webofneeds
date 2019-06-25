@@ -124,9 +124,13 @@ function genComponentConf() {
     <!-- Attached Persona Info -->
     <div class="card__persona clickable" ng-if="::self.showPersona && self.atomLoaded && self.persona && self.atomHasHoldableSocket" ng-click="self.router__stateGoCurrent({viewAtomUri: self.personaUri})">
           <img class="card__persona__icon"
-              ng-if="::self.personaIdenticonSvg"
+              ng-if="self.showPersonaIdenticon"
               alt="Auto-generated title image for persona that holds the atom"
               ng-src="data:image/svg+xml;base64,{{::self.personaIdenticonSvg}}"/>
+          <img class="card__persona__icon"
+              ng-if="self.showPersonaImage"
+              alt="{{self.personaImage.get('name')}}"
+              ng-src="data:{{self.personaImage.get('type')}};base64,{{self.personaImage.get('data')}}"/>
           <div class="card__persona__name"
               ng-if="self.personaName">
               <span class="card__persona__name__label">{{ self.personaName }}</span>
@@ -171,6 +175,7 @@ function genComponentConf() {
         const process = get(state, "process");
 
         const personaIdenticonSvg = atomUtils.getIdenticonSvg(persona);
+        const personaImage = atomUtils.getDefaultPersonaImage(persona);
         const useCaseIcon = !isPersona
           ? atomUtils.getMatchedUseCaseIcon(atom)
           : undefined;
@@ -222,6 +227,9 @@ function genComponentConf() {
           useCaseIcon,
           identiconSvg,
           personaIdenticonSvg,
+          personaImage,
+          showPersonaImage: personaImage,
+          showPersonaIdenticon: !personaImage && personaIdenticonSvg,
           atomImage,
           atomLocation,
           showDefaultIcon: !atomImage && !atomLocation, //if no image and no location are present we display the defaultIcon in the card__icon area, instead of next to the title
