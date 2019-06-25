@@ -461,6 +461,26 @@ export default function(processState = initialState, action = {}) {
             loading: false,
           });
 
+          const targetAtomUri = get(conn, "targetAtom");
+          const sourceAtomUri = get(conn, "sourceAtom");
+          if (
+            targetAtomUri &&
+            !processUtils.isAtomLoaded(processState, targetAtomUri) &&
+            !processUtils.isAtomLoading(processState, targetAtomUri)
+          ) {
+            processState = updateAtomProcess(processState, targetAtomUri, {
+              toLoad: true,
+            });
+          }
+          if (
+            sourceAtomUri &&
+            !processUtils.isAtomLoaded(processState, sourceAtomUri) &&
+            !processUtils.isAtomLoading(processState, sourceAtomUri)
+          ) {
+            processState = updateAtomProcess(processState, sourceAtomUri, {
+              toLoad: true,
+            });
+          }
           const eventsOfConnection = conn.get("hasEvents");
           eventsOfConnection &&
             eventsOfConnection.map(eventUri => {
