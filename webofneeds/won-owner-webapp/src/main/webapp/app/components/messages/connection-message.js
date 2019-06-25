@@ -34,13 +34,13 @@ function genComponentConf() {
         <won-square-image
             class="clickable"
             uri="::self.theirAtom.get('uri')"
-            ng-click="!self.multiSelectType && self.router__stateGoCurrent({viewAtomUri: self.theirAtom.get('uri'), viewConnUri: undefined})"
+            ng-click="!self.multiSelectType && self.router__stateGo({postUri: self.theirAtom.get('uri')})"
             ng-if="!self.isChangeNotificationMessage && !self.isSent && !(self.isGroupChatMessage && self.originatorUri)">
         </won-square-image>
         <won-square-image
             class="clickable"
             uri="::self.originatorUri"
-            ng-click="!self.multiSelectType && self.router__stateGoCurrent({viewAtomUri: self.originatorUri, viewConnUri: undefined})"
+            ng-click="!self.multiSelectType && self.router__stateGo({postUri: self.originatorUri})"
             ng-if="!self.isChangeNotificationMessage && self.isReceived && self.isGroupChatMessage && self.originatorUri">
         </won-square-image>
         <won-square-image

@@ -122,7 +122,7 @@ function genComponentConf() {
         </div>
     </div>
     <!-- Attached Persona Info -->
-    <div class="card__persona clickable" ng-if="::self.showPersona && self.atomLoaded && self.persona && self.atomHasHoldableSocket" ng-click="self.router__stateGoCurrent({viewAtomUri: self.personaUri})">
+    <div class="card__persona clickable" ng-if="::self.showPersona && self.atomLoaded && self.persona && self.atomHasHoldableSocket" ng-click="self.router__stateGo('post', {postUri: self.personaUri})">
           <img class="card__persona__icon"
               ng-if="self.showPersonaIdenticon"
               alt="Auto-generated title image for persona that holds the atom"

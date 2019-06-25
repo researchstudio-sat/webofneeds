@@ -20,7 +20,6 @@ import * as atomUtils from "../redux/utils/atom-utils.js";
 import { h } from "preact";
 
 import "~/style/_overview.scss";
-import "~/style/_atom-overlay.scss";
 import "~/style/_connection-overlay.scss";
 
 const template = (

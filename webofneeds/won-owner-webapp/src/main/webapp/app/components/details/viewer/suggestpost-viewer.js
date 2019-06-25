@@ -25,11 +25,10 @@ function genComponentConf() {
                 class="clickable"
                 atom-uri="::self.content"
                 current-location="self.currentLocation"
-                ng-click="self.router__stateGoCurrent({viewAtomUri: self.content, viewConnUri: undefined})"
+                ng-click="self.router__stateGo('post', { postUri: self.content })"
                 ng-disabled="!self.fetchedSuggestion"
                 show-suggestions="::false"
                 show-persona="::true"
-                disable-default-atom-interaction="::true"
             ></won-atom-card>
             <div class="suggestpostv__content__post__actions"
               ng-if="self.showActions">

@@ -170,10 +170,8 @@ function genComponentConf() {
     }
 
     goToPost(postUri) {
-      this.router__stateGoCurrent({
-        useCase: undefined,
-        viewAtomUri: postUri,
-        viewConnUri: undefined,
+      this.router__stateGo("post", {
+        postUri: postUri,
       });
     }
 

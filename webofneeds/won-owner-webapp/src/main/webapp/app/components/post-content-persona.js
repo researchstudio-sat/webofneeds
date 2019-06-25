@@ -143,9 +143,8 @@ function genComponentConf() {
       this.atoms__selectTab(
         Immutable.fromJS({ atomUri: this.personaUri, selectTab: "HOLDS" })
       );
-      this.router__stateGoCurrent({
-        viewAtomUri: this.personaUri,
-        viewConnUri: undefined,
+      this.router__stateGo("post", {
+        postUri: this.personaUri,
       });
     }
 
@@ -153,9 +152,8 @@ function genComponentConf() {
       this.atoms__selectTab(
         Immutable.fromJS({ atomUri: this.personaUri, selectTab: "BUDDIES" })
       );
-      this.router__stateGoCurrent({
-        viewAtomUri: this.personaUri,
-        viewConnUri: undefined,
+      this.router__stateGo("post", {
+        postUri: this.personaUri,
       });
     }
 
@@ -163,9 +161,8 @@ function genComponentConf() {
       this.atoms__selectTab(
         Immutable.fromJS({ atomUri: this.personaUri, selectTab: "REVIEWS" })
       );
-      this.router__stateGoCurrent({
-        viewAtomUri: this.personaUri,
-        viewConnUri: undefined,
+      this.router__stateGo("post", {
+        postUri: this.personaUri,
       });
     }
   }

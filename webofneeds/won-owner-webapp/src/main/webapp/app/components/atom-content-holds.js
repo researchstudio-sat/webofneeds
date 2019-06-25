@@ -21,7 +21,7 @@ function genComponentConf() {
           atom-uri="::heldAtomUri"
           current-location="self.currentLocation"
           ng-repeat="heldAtomUri in self.heldAtomUrisArray track by heldAtomUri"
-          ng-click="self.router__stateGoCurrent({viewAtomUri: heldAtomUri, viewConnUri: undefined})"
+          ng-click="self.router__stateGo('post', { postUri: heldAtomUri })"
           ng-if="self.hasHeldAtoms"
           show-suggestions="::true"
           show-persona="::false"

@@ -18,7 +18,6 @@ import * as processUtils from "../redux/utils/process-utils.js";
 import { h } from "preact";
 
 import "~/style/_post-visitor.scss";
-import "~/style/_atom-overlay.scss";
 import "~/style/_connection-overlay.scss";
 
 const template = (

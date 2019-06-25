@@ -32,10 +32,8 @@ function genComponentConf() {
               class="clickable"
               atom-uri="::memberUri"
               current-location="self.currentLocation"
-              ng-click="self.router__stateGoCurrent({viewAtomUri: memberUri, viewConnUri: undefined})"
               show-suggestions="::false"
               show-persona="::false"
-              disable-default-atom-interaction="::true"
           ></won-atom-card>
           <div class="acb__buddy__actions"></div>
       </div>
@@ -48,10 +46,8 @@ function genComponentConf() {
               class="clickable"
               atom-uri="::conn.get('targetAtomUri')"
               current-location="self.currentLocation"
-              ng-click="self.router__stateGoCurrent({viewAtomUri: conn.get('targetAtomUri'), viewConnUri: undefined})"
               show-suggestions="::false"
               show-persona="::false"
-              disable-default-atom-interaction="::true"
           ></won-atom-card>
           <div class="acb__buddy__actions">
               <div
