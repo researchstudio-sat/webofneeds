@@ -49,11 +49,10 @@ function genComponentConf() {
         const atom = getIn(state, ["atoms", this.atomUri]);
         const isPersona = atomUtils.isPersona(atom);
         const process = get(state, "process");
-
         const isSkeleton =
           !(
             processUtils.isAtomLoaded(process, this.atomUri) &&
-            get(atom, "isBeingCreated")
+            !get(atom, "isBeingCreated")
           ) ||
           get(atom, "isBeingCreated") ||
           processUtils.hasAtomFailedToLoad(process, this.atomUri) ||

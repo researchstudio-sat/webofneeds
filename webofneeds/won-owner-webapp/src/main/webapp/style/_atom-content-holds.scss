@@ -17,6 +17,7 @@ won-atom-content-holds {
   & .ach__empty {
     color: $won-line-gray;
     text-align: center;
+    grid-column: 1/-1;
   }
 
   & won-atom-card.ach__atom {

@@ -470,7 +470,8 @@ export function getHeldAtomUris(atomImm) {
 }
 
 export function hasHeldAtoms(atomImm) {
-  return !!getHeldAtomUris(atomImm);
+  const heldAtomUris = getHeldAtomUris(atomImm);
+  return !!heldAtomUris && heldAtomUris.size > 0;
 }
 
 export function getDefaultSocketWithKeyReset(atomImm) {
