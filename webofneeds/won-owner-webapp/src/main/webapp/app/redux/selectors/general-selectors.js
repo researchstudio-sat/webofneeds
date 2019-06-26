@@ -305,9 +305,12 @@ export function getOwnedPersonas(state) {
  * @param state
  * @returns {Iterable<K, {website: *, saved: boolean, displayName: *, url: *, aboutMe: *, timestamp: string | * | number | void}>}
  */
-export function getOwnedCondensedPersonaList(state) {
+export function getOwnedCondensedPersonaList(state, includeArchived = false) {
   const atoms = getOwnedAtoms(state);
-  const personas = atoms.toList().filter(atom => atomUtils.isPersona(atom));
+  const personas = atoms
+    .toList()
+    .filter(atom => atomUtils.isPersona(atom))
+    .filter(atom => includeArchived || atomUtils.isActive(atom));
   return personas.map(persona => {
     return {
       displayName: getIn(persona, ["content", "personaName"]),

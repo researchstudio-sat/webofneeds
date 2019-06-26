@@ -29,7 +29,10 @@ function genComponentConf($ngRedux) {
       });
 
       elmApp.ports.updatePersonas.subscribe(() => {
-        const personas = getOwnedCondensedPersonaList($ngRedux.getState());
+        const personas = getOwnedCondensedPersonaList(
+          $ngRedux.getState(),
+          true
+        );
         if (personas) {
           elmApp.ports.personaIn.send(personas.toJS());
         }
@@ -53,14 +56,14 @@ function genComponentConf($ngRedux) {
         elmApp.ports.accountInfoIn.send(accountInfo);
       });
 
-      const personas = getOwnedCondensedPersonaList($ngRedux.getState());
+      const personas = getOwnedCondensedPersonaList($ngRedux.getState(), true);
       if (personas) {
         elmApp.ports.personaIn.send(personas.toJS());
       }
 
       const disconnect = $ngRedux.connect(state => {
         return {
-          personas: getOwnedCondensedPersonaList(state),
+          personas: getOwnedCondensedPersonaList(state, true),
           isVerified: accountUtils.isEmailVerified(get(state, "account")),
           accountInfo: {
             email: accountUtils.getEmail(get(state, "account")),
