@@ -5,13 +5,13 @@
 import Immutable from "immutable";
 import { actionCreators } from "./actions/actions.js";
 import { accountLogin } from "./actions/account-actions.js";
-import { getCurrentParamsFromRoute } from "./selectors/general-selectors.js";
-import { privateId2Credentials } from "./won-utils.js";
+import { getCurrentParamsFromRoute } from "./redux/selectors/general-selectors.js";
+import * as wonUtils from "./won-utils.js";
 
 import { get, getIn } from "./utils.js";
 
-import * as accountUtils from "./account-utils.js";
-import * as processUtils from "./process-utils.js";
+import * as accountUtils from "./redux/utils/account-utils.js";
+import * as processUtils from "./redux/utils/process-utils.js";
 
 import settingsComponent from "./pages/settings.jsx";
 import postComponent from "./pages/post.jsx";
@@ -36,7 +36,6 @@ import jsxRenderer from "@depack/render";
  */
 export const resetParams = Object.freeze({
   connectionUri: undefined,
-  viewAtomUri: undefined,
   viewConnUri: undefined,
   postUri: undefined,
   useCase: undefined,
@@ -86,7 +85,7 @@ export const configRouting = [
         as: "about",
       },
       {
-        path: "/map?viewAtomUri?viewConnUri",
+        path: "/map?viewConnUri",
         component: mapComponent,
         as: "map",
       },
@@ -96,22 +95,22 @@ export const configRouting = [
         as: "create",
       },
       {
-        path: "/inventory?viewAtomUri?viewConnUri?token?privateId",
+        path: "/inventory?viewConnUri?token?privateId",
         component: inventoryComponent,
         as: "inventory",
       },
       {
-        path: "/connections?connectionUri?viewAtomUri?viewConnUri",
+        path: "/connections?connectionUri?viewConnUri",
         component: connectionsComponent,
         as: "connections",
       },
       {
-        path: "/overview?viewAtomUri?viewConnUri",
+        path: "/overview?viewConnUri",
         component: overviewComponent,
         as: "overview",
       },
       {
-        path: "/post/?postUri?viewAtomUri?viewConnUri",
+        path: "/post/?postUri?viewConnUri",
         component: postComponent,
         as: "post",
       },
@@ -260,7 +259,9 @@ function reactToPrivateIdChanges(
 ) {
   const state = getState();
 
-  const { email } = toPrivateId ? privateId2Credentials(toPrivateId) : {};
+  const { email } = toPrivateId
+    ? wonUtils.privateId2Credentials(toPrivateId)
+    : {};
   if (processUtils.isProcessingLogin(get(state, "process"))) {
     console.debug(
       "There's already a login in process with the email " +
@@ -301,4 +302,60 @@ export function addConstParams(params, paramsInState) {
     [].map(p => [p, paramsInStateImm.get(p)]) // [ [ paramName, paramValue] ]
   );
   return currentConstParams.merge(params).toJS();
+}
+
+/**
+ * Generates an href-string using `$state.href` that makes sure
+ * to keep constant parameters (unless they're explicitly overwritten
+ * in `queryParams`)
+ * @param $state
+ * @param toRouterState
+ * @param queryParams
+ * @returns {*}
+ */
+export function absHRef($state, toRouterState, queryParams) {
+  return $state.href(toRouterState, absParams(queryParams));
+}
+
+/**
+ * Generates an object that contains the constant parameters unless
+ * explicitly overridden in queryParams. This can be used together
+ * with `ui-state-params` (and thus `ui-state`)
+ * NOTE: depending on your version of ui-router, interpolation might not update the hrefs
+ * @param queryParams
+ * @returns {*}
+ */
+function absParams(queryParams) {
+  const currentParams = getParameters();
+  const paramsWithConst = addConstParams(
+    resetParamsImm.merge(queryParams),
+    currentParams
+  );
+  return paramsWithConst;
+}
+
+/**
+ * Retrieves parameters from the url-bar or parses them from a passed url.
+ * @param url
+ * @returns {{}}
+ */
+function getParameters(url) {
+  const url_ = url ? url : window.location.href; // e.g. url_ = "http://example.org/?privateId=5kpskm09-ocri63&foo=bar&asdf"
+  const [, paramsString] = url_.split("?"); // e.g. paramsString = "privateId=5kpskm09-ocri63&foo=bar&asdf"
+
+  if (!paramsString) {
+    // no parameters present
+    return {};
+  }
+
+  const paramsKconstray = paramsString
+    .split("&") // e.g. ["privateId=5kpskm09-ocri63", "foo=bar", "asdf"]
+    .map(p => p.split("=")) // e.g. [["privateId", "5kpskm09-ocri63"], ["foo", "bar"], ["asdf"]]
+    .filter(p => p.length === 2); // filter out parameter that's not a proper key-value pair, e.g. "asdf"
+
+  // create object from kv-pairs
+  const params = {};
+  paramsKconstray.forEach(kv => (params[kv[0]] = kv[1]));
+
+  return params;
 }

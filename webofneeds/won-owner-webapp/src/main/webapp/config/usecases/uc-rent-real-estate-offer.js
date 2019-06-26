@@ -9,7 +9,7 @@ import {
   realEstateFeaturesDetail,
 } from "../details/real-estate.js";
 
-import { findLatestIntervallEndInJsonLdOrNowAndAddMillis } from "../../app/won-utils.js";
+import * as wonUtils from "../../app/won-utils.js";
 import {
   filterNumericProperty,
   filterPrice,
@@ -23,7 +23,7 @@ export const rentRealEstateOffer = {
   label: "Rent a place out",
   icon: "#ico36_uc_realestate",
   timeToLiveMillisDefault: 1000 * 60 * 60 * 24 * 30 * 3,
-  doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
+  doNotMatchAfter: wonUtils.findLatestIntervallEndInJsonLdOrNowAndAddMillis,
   draft: {
     ...mergeInEmptyDraft({
       content: {

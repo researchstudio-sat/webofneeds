@@ -1,11 +1,10 @@
 import won from "../../won-es6.js";
-import Immutable from "immutable";
-import { parseConnection } from "./parse-connection.js";
+import { parseConnection, parseMetaConnection } from "./parse-connection.js";
 import { markUriAsRead } from "../../won-localstorage.js";
 
 import { markAtomAsRead } from "./reduce-atoms.js";
 import { getIn, get } from "../../utils.js";
-import * as connectionUtils from "../../connection-utils";
+import * as connectionUtils from "../../redux/utils/connection-utils";
 
 export function storeConnectionsData(state, connectionsToStore) {
   if (connectionsToStore && connectionsToStore.size > 0) {
@@ -36,27 +35,22 @@ function addConnectionFull(atomState, connection) {
       const connectionUri = getIn(parsedConnection, ["data", "uri"]);
 
       const socketUri = getIn(parsedConnection, ["data", "socketUri"]);
-      const realSocket = getIn(atom, ["content", "sockets", socketUri]);
-
-      parsedConnection = parsedConnection.setIn(["data", "socket"], realSocket);
+      const socketType = getIn(atom, ["content", "sockets", socketUri]);
 
       if (
-        realSocket === won.HOLD.HolderSocketCompacted &&
-        connectionUtils.isConnected(parsedConnection)
+        socketType === won.HOLD.HolderSocketCompacted &&
+        connectionUtils.isConnected(get(parsedConnection, "data"))
       ) {
         const holdsUri = targetAtomUri;
 
         if (holdsUri) {
-          const currentHolds = getIn(atomState, [atomUri, "holds"]);
-          if (currentHolds && !currentHolds.includes(holdsUri)) {
-            atomState = atomState.updateIn([atomUri, "holds"], holdsList =>
-              holdsList.push(holdsUri)
-            );
-          }
+          atomState = atomState.updateIn([atomUri, "holds"], holds =>
+            holds.add(holdsUri)
+          );
         }
       } else if (
-        realSocket === won.HOLD.HoldableSocketCompacted &&
-        connectionUtils.isConnected(parsedConnection)
+        socketType === won.HOLD.HoldableSocketCompacted &&
+        connectionUtils.isConnected(get(parsedConnection, "data"))
       ) {
         //holdableSocket Connection from atom to persona -> need to add heldBy targetAtomUri to the atom
         const heldByUri = targetAtomUri;
@@ -79,49 +73,32 @@ function addConnectionFull(atomState, connection) {
           targetSocketUri,
         ]);
 
-        if (realTargetSocket) {
-          parsedConnection = parsedConnection.setIn(
-            ["data", "targetSocket"],
-            realTargetSocket
-          );
-        }
-
         if (
-          connectionUtils.isConnected(parsedConnection) &&
-          realSocket === won.BUDDY.BuddySocketCompacted &&
+          connectionUtils.isConnected(get(parsedConnection, "data")) &&
+          socketType === won.BUDDY.BuddySocketCompacted &&
           realTargetSocket === won.BUDDY.BuddySocketCompacted
         ) {
-          const currentBuddies = getIn(atomState, [atomUri, "buddies"]);
-          if (currentBuddies && !currentBuddies.includes(targetAtomUri)) {
-            atomState = atomState.updateIn([atomUri, "buddies"], buddyList =>
-              buddyList.push(targetAtomUri)
-            );
-          }
-          const currentTargetBuddies = getIn(atomState, [
-            targetAtomUri,
-            "buddies",
-          ]);
-          if (currentTargetBuddies && !currentTargetBuddies.includes(atomUri)) {
-            atomState = atomState.updateIn(
-              [targetAtomUri, "buddies"],
-              buddyList => buddyList.push(atomUri)
-            );
-          }
+          atomState = atomState.updateIn([atomUri, "buddies"], buddies =>
+            buddies.add(targetAtomUri)
+          );
+          atomState = atomState.updateIn([targetAtomUri, "buddies"], buddies =>
+            buddies.add(atomUri)
+          );
         }
       }
 
-      if (getIn(parsedConnection, ["data", "unread"])) {
+      if (connectionUtils.isUnread(get(parsedConnection, "data"))) {
         //If there is a new message for the connection we will set the connection to newConnection
         atomState = atomState.setIn(
           [atomUri, "lastUpdateDate"],
-          parsedConnection.getIn(["data", "lastUpdateDate"])
+          getIn(parsedConnection, ["data", "lastUpdateDate"])
         );
         atomState = atomState.setIn([atomUri, "unread"], true);
       }
 
       return atomState.mergeDeepIn(
         [atomUri, "connections", connectionUri],
-        parsedConnection.get("data")
+        get(parsedConnection, "data")
       );
     } else {
       console.error(
@@ -199,8 +176,8 @@ export function getAtomByConnectionUri(allAtomsInState, connectionUri) {
   );
 }
 
-export function changeConnectionState(state, connectionUri, newState) {
-  const atom = getAtomByConnectionUri(state, connectionUri);
+export function changeConnectionState(allAtoms, connectionUri, newState) {
+  const atom = getAtomByConnectionUri(allAtoms, connectionUri);
 
   if (!atom) {
     console.warn(
@@ -208,29 +185,38 @@ export function changeConnectionState(state, connectionUri, newState) {
       connectionUri,
       ") -> return unaltered state"
     );
-    return state;
+    return allAtoms;
   }
 
   const atomUri = atom.get("uri");
 
-  const connection = getIn(atom, ["connections", connectionUri]);
-  if (
-    newState === won.WON.Closed &&
-    connection.get("socket") === won.HOLD.HolderSocketCompacted
-  ) {
-    state = state.updateIn([atomUri, "holds"], holds =>
-      holds.delete(connection.get("targetAtomUri"))
-    );
+  const targetAtomUri = getIn(atom, [
+    "connections",
+    connectionUri,
+    "targetAtomUri",
+  ]);
+  const socketUri = getIn(atom, ["connections", connectionUri, "socketUri"]);
+  const socketType = getIn(atom, ["content", "sockets", socketUri]);
+
+  if (socketType === won.HOLD.HolderSocketCompacted) {
+    if (newState === won.WON.Closed) {
+      allAtoms = allAtoms.updateIn([atomUri, "holds"], holds =>
+        holds.delete(targetAtomUri)
+      );
+    } else if (newState === won.WON.Connected) {
+      allAtoms = allAtoms.updateIn([atomUri, "holds"], holds =>
+        holds.add(targetAtomUri)
+      );
+    }
+  } else if (socketType === won.HOLD.HoldableSocketCompacted) {
+    if (newState === won.WON.Closed) {
+      allAtoms = allAtoms.deleteIn([atomUri, "heldBy"]);
+    } else if (newState === won.WON.Connected) {
+      allAtoms = allAtoms.setIn([atomUri, "heldBy"], targetAtomUri);
+    }
   }
 
-  if (
-    newState === won.WON.Closed &&
-    connection.get("socket") === won.HOLD.HoldableSocketCompacted
-  ) {
-    state = state.deleteIn([atomUri, "heldBy"]);
-  }
-
-  return state
+  return allAtoms
     .setIn([atomUri, "connections", connectionUri, "state"], newState)
     .setIn([atomUri, "connections", connectionUri, "unread"], true);
 }
@@ -386,64 +372,42 @@ export function setMultiSelectType(
   return state;
 }
 
-export function addConnectionsToLoad(state, atomUri, connections) {
+export function addMetaConnections(state, atomUri, connections) {
   let newState = state;
   atomUri &&
     connections &&
     connections.forEach(conn => {
-      newState = addConnectionToLoad(newState, atomUri, conn);
+      newState = addMetaConnection(newState, atomUri, conn);
     });
   return newState;
 }
 
-export function addConnectionToLoad(state, atomUri, conn) {
-  const storedAtom = state.get(atomUri);
-  const isConnectionPresent =
-    storedAtom &&
-    !!storedAtom.getIn(["connections", conn.get("connectionUri")]);
+function addMetaConnection(atomState, atomUri, conn) {
+  const storedAtom = get(atomState, atomUri);
+  const storedConnection = getIn(storedAtom, [
+    "connections",
+    get(conn, "connectionUri"),
+  ]);
 
-  const socketTypeToCompacted = socketType => {
-    if (socketType === won.CHAT.ChatSocket) {
-      return won.CHAT.ChatSocketCompacted;
-    } else if (socketType === won.GROUP.GroupSocket) {
-      return won.GROUP.GroupSocketCompacted;
-    } else if (socketType === won.REVIEW.ReviewSocket) {
-      return won.REVIEW.ReviewSocketCompacted;
-    } else if (socketType === won.HOLD.HolderSocket) {
-      return won.HOLD.HolderSocketCompacted;
-    } else if (socketType === won.HOLD.HoldableSocket) {
-      return won.HOLD.HoldableSocketCompacted;
-    } else {
-      console.warn(
-        "Unknown socketType: ",
-        socketType,
-        " - can't compact, return as is"
+  const parsedMetaConnection = parseMetaConnection(conn);
+
+  if (!!storedAtom && !storedConnection && parsedMetaConnection) {
+    const connectionUri = getIn(parsedMetaConnection, ["data", "uri"]);
+
+    if (connectionUtils.isUnread(get(parsedMetaConnection, "data"))) {
+      //If there is a new message for the connection we will set the connection to newConnection
+      atomState = atomState.setIn(
+        [atomUri, "lastUpdateDate"],
+        getIn(parsedMetaConnection, ["data", "lastUpdateDate"])
       );
-      return socketType;
+      atomState = atomState.setIn([atomUri, "unread"], true);
     }
-  };
 
-  if (storedAtom && !isConnectionPresent) {
-    const connection = Immutable.fromJS({
-      uri: conn.get("connectionUri"),
-      state: conn.get("connectionState"),
-      socket: socketTypeToCompacted(conn.get("socketType")),
-      messages: Immutable.Map(),
-      agreementData: undefined,
-      targetAtomUri: undefined,
-      targetConnectionUri: undefined,
-      creationDate: undefined,
-      lastUpdateDate: undefined,
-      unread: undefined,
-      isRated: false,
-      showAgreementData: false,
-    });
-
-    return state.mergeDeepIn(
-      [atomUri, "connections", conn.get("connectionUri")],
-      connection
+    return atomState.mergeDeepIn(
+      [atomUri, "connections", connectionUri],
+      get(parsedMetaConnection, "data")
     );
   }
 
-  return state;
+  return atomState;
 }

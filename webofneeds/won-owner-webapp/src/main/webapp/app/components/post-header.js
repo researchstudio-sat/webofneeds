@@ -7,13 +7,14 @@ import "ng-redux";
 import squareImageModule from "./square-image.js";
 import { actionCreators } from "../actions/actions.js";
 import { relativeTime } from "../won-label-utils.js";
-import { attach, getIn, get, delay } from "../utils.js";
-import { connect2Redux } from "../won-utils.js";
-import { selectLastUpdateTime } from "../selectors/general-selectors.js";
+import { getIn, get, delay } from "../utils.js";
+import { attach } from "../cstm-ng-utils.js";
+import { connect2Redux } from "../configRedux.js";
+import { selectLastUpdateTime } from "../redux/selectors/general-selectors.js";
 import won from "../won-es6.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
-import * as atomUtils from "../atom-utils.js";
-import * as processUtils from "../process-utils.js";
+import * as atomUtils from "../redux/utils/atom-utils.js";
+import * as processUtils from "../redux/utils/process-utils.js";
 
 import "~/style/_post-header.scss";
 
@@ -121,7 +122,7 @@ function genComponentConf() {
         const responseToAtom =
           responseToUri && getIn(state, ["atoms", responseToUri]);
 
-        const personaUri = get(atom, "heldBy");
+        const personaUri = atomUtils.getHeldByUri(atom);
         const persona = personaUri && getIn(state, ["atoms", personaUri]);
         const personaName = get(persona, "humanReadable");
 

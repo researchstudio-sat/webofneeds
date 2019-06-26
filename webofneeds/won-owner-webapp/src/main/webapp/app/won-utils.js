@@ -2,23 +2,16 @@
  * Created by ksinger on 11.08.2016.
  */
 
-import L from "./leaflet-bundleable.js";
 import {
-  arrEq,
-  checkHttpStatus,
   generateIdString,
-  getIn,
-  getRandomString,
   findAllFieldOccurancesRecursively,
   is,
   isValidNumber,
-  endOfDateStrInterval,
   getFromJsonLd,
   toAbsoluteURL,
 } from "./utils.js";
 
 import { ownerBaseUrl } from "~/config/default.js";
-import urljoin from "url-join";
 import qr from "qr-image";
 import jsonld from "jsonld/dist/jsonld.js";
 window.jsonld4dbg = jsonld;
@@ -28,407 +21,6 @@ import { get, parseDatetimeStrictly, isValidDate } from "./utils.js";
 import * as useCaseUtils from "./usecase-utils.js";
 
 import won from "./won-es6.js";
-
-export function initLeaflet(mapMount, overrideOptions) {
-  if (!L) {
-    throw new Error(
-      "Tried to initialize a leaflet widget while leaflet wasn't loaded."
-    );
-  }
-  Error;
-
-  const baseMaps = initLeafletBaseMaps();
-
-  const map = L.map(
-    mapMount,
-    Object.assign(
-      {
-        center: [37.44, -42.89], //centered on north-west africa
-        zoom: 1, //world-map
-        layers: [baseMaps["Detailed default map"]], //initially visible layers
-      },
-      overrideOptions
-    )
-  ); //.setView([51.505, -0.09], 13);
-
-  //map.fitWorld() // shows every continent twice :|
-  map.fitBounds([[-80, -190], [80, 190]]); // fitWorld without repetition
-
-  // Force it to adapt to actual size
-  // for some reason this doesn't happen by default
-  // when the map is within a tag.
-  // this.map.invalidateSize();
-  // ^ doesn't work (needs to be done manually atm);
-
-  return map;
-}
-
-export function initLeafletBaseMaps() {
-  if (!L) {
-    throw new Error(
-      "Tried to initialize leaflet map-sources while leaflet wasn't loaded."
-    );
-  }
-
-  //const secureOsmSource = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"; // secure osm.org
-  const secureOsmSource = "https://www.matchat.org/tile/{z}/{x}/{y}.png"; // TODO: use own tile server instead of proxy
-  const secureOsm = L.tileLayer(secureOsmSource, {
-    attribution:
-      '&copy; <a href="http://osm.org/copyright" target="_blank">OpenStreetMap</a> contributors',
-  });
-
-  const baseMaps = {
-    "Detailed default map": secureOsm,
-  };
-
-  return baseMaps;
-}
-
-export function leafletBounds(location) {
-  if (location && location.nwCorner && location.seCorner) {
-    return new L.latLngBounds(
-      new L.LatLng(location.nwCorner.lat, location.nwCorner.lng),
-      new L.latLng(location.seCorner.lat, location.seCorner.lng)
-    );
-  }
-}
-
-/**
- * Makes sure the select-statement is reevaluated, should
- * one of the watched fields change.
- *
- * example usage:
- * ```
- * reduxSelectDependsOnProperties(['self.atomUri', 'self.timestamp'], selectFromState, this)
- * ```
- *
- * @param properties a list of watch expressions
- * @param selectFromState same as $ngRedux.connect
- * @param ctrl the controller to bind the results to. needs to have `$ngRedux` and `$scope` attached.
- * @returns {*}
- * @returns a function to unregister the watch
- */
-function reduxSelectDependsOnProperties(properties, selectFromState, ctrl) {
-  const firstVals = properties.map(p => getIn(ctrl.$scope, p.split(".")));
-  let firstTime = true;
-  return ctrl.$scope.$watchGroup(properties, (newVals, oldVals) => {
-    if ((firstTime && !arrEq(newVals, firstVals)) || !arrEq(newVals, oldVals)) {
-      const state = ctrl.$ngRedux.getState();
-      const stateSlice = selectFromState(state);
-      Object.assign(ctrl, stateSlice);
-    }
-    if (firstTime) {
-      firstTime = false;
-    }
-  });
-}
-
-/**
- * Connects a component to ng-redux, sets up watches for the
- * properties that `selectFromState` depends on and handles
- * cleanup when the component is destroyed.
- * @param selectFromState
- * @param actionCreators
- * @param properties
- * @param ctrl a controller/component with `$scope` and `$ngRedux` attached
- */
-export function connect2Redux(
-  selectFromState,
-  actionCreators,
-  properties,
-  ctrl
-) {
-  const disconnectRdx = ctrl.$ngRedux.connect(
-    selectFromState,
-    actionCreators
-  )(ctrl);
-  const disconnectProps = reduxSelectDependsOnProperties(
-    properties,
-    selectFromState,
-    ctrl
-  );
-  ctrl.$scope.$on("$destroy", () => {
-    disconnectRdx();
-    disconnectProps();
-  });
-}
-
-/**
- * Checks whether the user has a logged-in session.
- * Returns a promise with the user-object if successful
- * or a failing promise if an error has occured.
- *
- * @returns {*}
- */
-export function checkLoginStatus() {
-  return fetch("rest/users/isSignedIn", { credentials: "include" })
-    .then(checkHttpStatus) // will reject if not logged in
-    .then(resp => resp.json());
-}
-
-/**
- * Registers the account with the server.
- * The returned promise fails if something went
- * wrong during creation.
- *
- * @param credentials either {email, password} or {privateId}
- * @returns {*}
- */
-export function registerAccount(credentials) {
-  const { email, password } = parseCredentials(credentials);
-  const url = urljoin(ownerBaseUrl, "/rest/users/");
-  const httpOptions = {
-    method: "post",
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-    },
-    credentials: "include",
-    body: JSON.stringify({
-      username: email,
-      password: password,
-      privateId: credentials.privateId,
-    }),
-  };
-  return fetch(url, httpOptions).then(checkHttpStatus);
-}
-
-/**
- * Accept the Terms Of Service
- */
-export function acceptTermsOfService() {
-  const url = urljoin(ownerBaseUrl, "/rest/users/acceptTermsOfService");
-  const httpOptions = {
-    method: "post",
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-    },
-    credentials: "include",
-  };
-  return fetch(url, httpOptions)
-    .then(resp => {
-      return resp.json();
-    })
-    .catch(error => {
-      return error.json();
-    });
-}
-
-/**
- * Confirm the Registration with the verificationToken-link provided in the registration-email
- */
-export function confirmRegistration(verificationToken) {
-  const url = urljoin(ownerBaseUrl, "/rest/users/confirmRegistration");
-  const httpOptions = {
-    method: "post",
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      token: verificationToken,
-    }),
-  };
-  return fetch(url, httpOptions)
-    .then(checkHttpStatus)
-    .then(resp => {
-      return resp.json();
-    })
-    .catch(error =>
-      error.response.json().then(errorMessage => {
-        //FIXME: MOVE THIS ERROR HANDLINNG INTO THE ACTION
-        const verificationError = new Error();
-        verificationError.jsonResponse = errorMessage;
-        throw verificationError;
-      })
-    );
-}
-
-/**
- * Resend the verification mail.
- *
- */
-export function resendEmailVerification(email) {
-  const url = urljoin(ownerBaseUrl, "/rest/users/resendVerificationEmail");
-  const httpOptions = {
-    method: "post",
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      username: email,
-    }),
-  };
-  return fetch(url, httpOptions)
-    .then(checkHttpStatus)
-    .then(resp => {
-      return resp.json();
-    })
-    .catch(error =>
-      error.response.json().then(errorMessage => {
-        //FIXME: MOVE THIS ERROR HANDLINNG INTO THE ACTION
-        const resendError = new Error();
-        resendError.jsonResponse = errorMessage;
-        throw resendError;
-      })
-    );
-}
-
-/**
- * Resend the verification mail.
- *
- */
-export function sendAnonymousLinkEmail(email, privateId) {
-  const url = urljoin(ownerBaseUrl, "/rest/users/sendAnonymousLinkEmail");
-  const httpOptions = {
-    method: "post",
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-    },
-    credentials: "include",
-    body: JSON.stringify({
-      email: email,
-      privateId: privateId,
-    }),
-  };
-  return fetch(url, httpOptions)
-    .then(checkHttpStatus)
-    .then(resp => {
-      return resp.json();
-    })
-    .catch(error =>
-      error.response.json().then(errorMessage => {
-        //FIXME: MOVE THIS ERROR HANDLINNG INTO THE ACTION
-        const sendError = new Error();
-        sendError.jsonResponse = errorMessage;
-        throw sendError;
-      })
-    );
-}
-
-/**
- * Transfer an existing privateId User,
- * to a non existing User
- * @param credentials {email, password, privateId}
- * @returns {*}
- */
-export function transferPrivateAccount(credentials) {
-  const { email, password, privateId } = credentials;
-  const privateUsername = privateId2Credentials(privateId).email;
-  const privatePassword = privateId2Credentials(privateId).password;
-
-  return fetch("/owner/rest/users/transfer", {
-    method: "post",
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-    },
-    credentials: "include",
-    body: JSON.stringify({
-      username: email,
-      password: password,
-      privateUsername: privateUsername,
-      privatePassword: privatePassword,
-    }),
-  }).then(checkHttpStatus);
-}
-
-/**
- * Change the password of the user currently logged in.
- * @param credentials { email, oldPassword, newPassword }
- * @returns {*}
- */
-export function changePassword(credentials) {
-  const { email, oldPassword, newPassword } = credentials;
-
-  return fetch("/owner/rest/users/changePassword", {
-    method: "post",
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-    },
-    credentials: "include",
-    body: JSON.stringify({
-      username: email,
-      oldPassword: oldPassword,
-      newPassword: newPassword,
-    }),
-  }).then(checkHttpStatus);
-}
-
-window.changePassword4dbg = changePassword;
-
-/**
- * Change the password of the user currently logged in.
- * @param credentials { email, oldPassword, newPassword }
- * @returns {*}
- */
-export function resetPassword(credentials) {
-  const { email, recoveryKey, newPassword } = credentials;
-
-  return fetch("/owner/rest/users/resetPassword", {
-    method: "post",
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-    },
-    credentials: "include",
-    body: JSON.stringify({
-      username: email,
-      recoveryKey: recoveryKey,
-      newPassword: newPassword,
-      verificationToken: "",
-    }),
-  }).then(checkHttpStatus);
-}
-window.resetPassword4dbg = resetPassword;
-
-/**
- * @param credentials either {email, password} or {privateId}
- * @returns {*}
- */
-export function login(credentials) {
-  const { email, password, rememberMe, privateId } = parseCredentials(
-    credentials
-  );
-  const loginUrl = urljoin(ownerBaseUrl, "/rest/users/signin");
-  const params =
-    "username=" +
-    encodeURIComponent(email) +
-    "&password=" +
-    encodeURIComponent(password) +
-    (rememberMe ? "&remember-me=true" : "") +
-    (privateId ? "&privateId=" + privateId : "");
-
-  return fetch(loginUrl, {
-    method: "post",
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
-    },
-    body: params,
-    credentials: "include",
-  })
-    .then(checkHttpStatus)
-    .then(resp => resp.json());
-}
-
-export function logout() {
-  const url = urljoin(ownerBaseUrl, "/rest/users/signout");
-  const httpOptions = {
-    method: "post",
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-    },
-    credentials: "include",
-    body: JSON.stringify({}),
-  };
-  return fetch(url, httpOptions).then(checkHttpStatus);
-}
 
 /**
  * Generates a privateId of `[usernameFragment]-[password]`
@@ -473,56 +65,105 @@ export function getRandomWonId() {
   );
 }
 
+/**
+ * generates a string of random characters
+ *
+ * @param {*} length the length of the string to be generated. e.g. in the example below: 5
+ * @param {*} chars the allowed characters, e.g. "abc123" to generate strings like "a3cba"
+ */
+function getRandomString(
+  length,
+  chars = "abcdefghijklmnopqrstuvwxyz0123456789"
+) {
+  const randomChar = () => chars[Math.floor(Math.random() * chars.length)];
+  return Array.from(
+    {
+      length: length,
+    },
+    randomChar
+  ).join("");
+}
+
 export function findLatestIntervallEndInJsonLdOrNowAndAddMillis(
   draft,
   jsonld,
   timeToLiveMillisDefault = 1000 * 60 * 30,
   timeToLiveMillisAfterDate = 1000 * 60 * 30
 ) {
+  const findLatestIntervallEndInJsonLdAsDate = (draft, jsonld) => {
+    // get all occurrances of `xsd:dateTime`
+    const allTimes = Array.concat(
+      findAllFieldOccurancesRecursively("xsd:dateTime", jsonld)
+    );
+
+    // filter for string-literals (just in case)
+    const allTimesStrs = allTimes.filter(s => {
+      if (is("String", s)) {
+        return true;
+      } else {
+        console.error(
+          "Found a non-string date. Ignoring it for calculating `doNotMatchAfter`. ",
+          s
+        );
+      }
+    });
+
+    if (allTimesStrs.length === 0) return undefined; // no time strings found
+
+    /**
+     * Takes an ISO-8601 string and returns a `Date` that marks
+     * the exact time or the end of the year, month or day
+     * e.g. xsd:dateTime: "2011-04-11T10:20:30Z"
+     *
+     * @param {*} dateStr
+     */
+    const endOfDateStrInterval = dateStr => {
+      // "2011-04-11T10:20:30Z".split(/[-T]/) => ["2011", "04", "11", "10:20:30Z"]
+      // "2011-04-11".split(/[-T]/) => ["2011", "04", "11"]
+      const split = dateStr.split(/[-T]/);
+      if (split.length > 3) {
+        // precise datetime
+        return new Date(dateStr);
+      } else if (split.length === 3) {
+        // end of day
+        const year = split[0];
+        const monthIdx = split[1] - 1;
+        const day = split[2];
+        return new Date(year, monthIdx, day, 23, 59, 59);
+      } else if (split.length === 2) {
+        // end of month
+        const year = split[0];
+        const monthIdx = split[1] - 1;
+        const firstOfNextMonth = new Date(year, monthIdx + 1, 1, 23, 59, 59);
+        return new Date(firstOfNextMonth - 1000 * 60 * 60 * 24);
+      } else if (split.length === 1) {
+        // end of year
+        const year = split[0];
+        const monthIdx = 11;
+        return new Date(year, monthIdx, 31, 23, 59, 59);
+      } else {
+        console.error(
+          "Found unexpected date when calculating exact end-datetime of date-string: ",
+          dateStr
+        );
+      }
+    };
+
+    const endDatetimes = allTimesStrs.map(str => endOfDateStrInterval(str));
+
+    // find the latest mentioned point in time
+    const sorted = endDatetimes.sort((a, b) => b - a); // sort descending
+    const latest = sorted[0];
+
+    // convert to an `xsd:datetime`/ISO-8601 string and return
+    return latest;
+  };
+
   const date = findLatestIntervallEndInJsonLdAsDate(draft, jsonld);
   if (date) {
     return new Date(date.getTime() + timeToLiveMillisAfterDate).toISOString();
   }
   return new Date(new Date().getTime() + timeToLiveMillisDefault).toISOString();
-}
-
-export function findLatestIntervallEndInJsonLd(draft, jsonld) {
-  const date = findLatestIntervallEndInJsonLdAsDate(draft, jsonld);
-  if (date) {
-    return date.toISOString();
-  }
-  return undefined;
-}
-
-function findLatestIntervallEndInJsonLdAsDate(draft, jsonld) {
-  // get all occurrances of `xsd:dateTime`
-  const allTimes = Array.concat(
-    findAllFieldOccurancesRecursively("xsd:dateTime", jsonld)
-  );
-
-  // filter for string-literals (just in case)
-  const allTimesStrs = allTimes.filter(s => {
-    if (is("String", s)) {
-      return true;
-    } else {
-      console.error(
-        "Found a non-string date. Ignoring it for calculating `doNotMatchAfter`. ",
-        s
-      );
-    }
-  });
-
-  if (allTimesStrs.length === 0) return undefined; // no time strings found
-
-  // determine if any of them are intervals (e.g. days or months) and if so calculate the end of these
-  const endDatetimes = allTimesStrs.map(str => endOfDateStrInterval(str));
-
-  // find the latest mentioned point in time
-  const sorted = endDatetimes.sort((a, b) => b - a); // sort descending
-  const latest = sorted[0];
-
-  // convert to an `xsd:datetime`/ISO-8601 string and return
-  return latest;
 }
 
 /**
@@ -562,107 +203,6 @@ export function parseJsonldLeafsImm(val, type) {
       return undefined;
     }
   }
-}
-
-export function createDocumentDefinitionFromPost(post) {
-  if (!post) return;
-
-  let title = { text: post.get("humanReadable"), style: "title" };
-  let contentHeader = { text: "Description", style: "branchHeader" };
-  let seeksHeader = { text: "Looking For", style: "branchHeader" };
-
-  let content = [];
-  content.push(title);
-
-  const allDetails = useCaseUtils.getAllDetails();
-
-  const postContent = post.get("content");
-  if (postContent) {
-    content.push(contentHeader);
-    postContent.map((detailValue, detailKey) => {
-      const detailJS =
-        detailValue && Immutable.Iterable.isIterable(detailValue)
-          ? detailValue.toJS()
-          : detailValue;
-
-      const detailDefinition = allDetails[detailKey];
-      if (detailDefinition && detailJS) {
-        content.push({ text: detailDefinition.label, style: "detailHeader" });
-        content.push({
-          text: detailDefinition.generateHumanReadable({
-            value: detailJS,
-            includeLabel: false,
-          }),
-          style: "detailText",
-        });
-      }
-    });
-  }
-
-  const seeksBranch = post.get("seeks");
-  if (seeksBranch) {
-    content.push(seeksHeader);
-    seeksBranch.map((detailValue, detailKey) => {
-      const detailJS =
-        detailValue && Immutable.Iterable.isIterable(detailValue)
-          ? detailValue.toJS()
-          : detailValue;
-
-      const detailDefinition = allDetails[detailKey];
-      if (detailDefinition && detailJS) {
-        content.push({ text: detailDefinition.label, style: "detailHeader" });
-        content.push({
-          text: detailDefinition.generateHumanReadable({
-            value: detailJS,
-            includeLabel: false,
-          }),
-          style: "detailText",
-        });
-      }
-    });
-  }
-
-  if (ownerBaseUrl && post) {
-    const path = "#!post/" + `?postUri=${encodeURI(post.get("uri"))}`;
-    const linkToPost = toAbsoluteURL(ownerBaseUrl).toString() + path;
-
-    if (linkToPost) {
-      content.push({ text: linkToPost, style: "postLink" });
-      const base64PngQrCode = generateBase64PngQrCode(linkToPost);
-      if (base64PngQrCode) {
-        content.push({
-          image: "data:image/png;base64," + base64PngQrCode,
-          width: 200,
-          height: 200,
-        });
-      }
-    }
-  }
-
-  let styles = {
-    title: {
-      fontSize: 20,
-      bold: true,
-    },
-    branchHeader: {
-      fontSize: 18,
-      bold: true,
-    },
-    detailHeader: {
-      fontSize: 12,
-      bold: true,
-    },
-    detailText: {
-      fontSize: 12,
-    },
-    postLink: {
-      fontSize: 10,
-    },
-  };
-  return {
-    content: content /*[title, 'This is an sample PDF printed with pdfMake '+this.linkToPost]*/,
-    styles: styles,
-  };
 }
 
 /**
@@ -795,6 +335,107 @@ export function parseJsonldLeaf(val, type) {
   }
 }
 
+export function createDocumentDefinitionFromPost(post) {
+  if (!post) return;
+
+  let title = { text: post.get("humanReadable"), style: "title" };
+  let contentHeader = { text: "Description", style: "branchHeader" };
+  let seeksHeader = { text: "Looking For", style: "branchHeader" };
+
+  let content = [];
+  content.push(title);
+
+  const allDetails = useCaseUtils.getAllDetails();
+
+  const postContent = post.get("content");
+  if (postContent) {
+    content.push(contentHeader);
+    postContent.map((detailValue, detailKey) => {
+      const detailJS =
+        detailValue && Immutable.Iterable.isIterable(detailValue)
+          ? detailValue.toJS()
+          : detailValue;
+
+      const detailDefinition = allDetails[detailKey];
+      if (detailDefinition && detailJS) {
+        content.push({ text: detailDefinition.label, style: "detailHeader" });
+        content.push({
+          text: detailDefinition.generateHumanReadable({
+            value: detailJS,
+            includeLabel: false,
+          }),
+          style: "detailText",
+        });
+      }
+    });
+  }
+
+  const seeksBranch = post.get("seeks");
+  if (seeksBranch) {
+    content.push(seeksHeader);
+    seeksBranch.map((detailValue, detailKey) => {
+      const detailJS =
+        detailValue && Immutable.Iterable.isIterable(detailValue)
+          ? detailValue.toJS()
+          : detailValue;
+
+      const detailDefinition = allDetails[detailKey];
+      if (detailDefinition && detailJS) {
+        content.push({ text: detailDefinition.label, style: "detailHeader" });
+        content.push({
+          text: detailDefinition.generateHumanReadable({
+            value: detailJS,
+            includeLabel: false,
+          }),
+          style: "detailText",
+        });
+      }
+    });
+  }
+
+  if (ownerBaseUrl && post) {
+    const path = "#!post/" + `?postUri=${encodeURI(post.get("uri"))}`;
+    const linkToPost = toAbsoluteURL(ownerBaseUrl).toString() + path;
+
+    if (linkToPost) {
+      content.push({ text: linkToPost, style: "postLink" });
+      const base64PngQrCode = generateBase64PngQrCode(linkToPost);
+      if (base64PngQrCode) {
+        content.push({
+          image: "data:image/png;base64," + base64PngQrCode,
+          width: 200,
+          height: 200,
+        });
+      }
+    }
+  }
+
+  let styles = {
+    title: {
+      fontSize: 20,
+      bold: true,
+    },
+    branchHeader: {
+      fontSize: 18,
+      bold: true,
+    },
+    detailHeader: {
+      fontSize: 12,
+      bold: true,
+    },
+    detailText: {
+      fontSize: 12,
+    },
+    postLink: {
+      fontSize: 10,
+    },
+  };
+  return {
+    content: content /*[title, 'This is an sample PDF printed with pdfMake '+this.linkToPost]*/,
+    styles: styles,
+  };
+}
+
 function throwParsingError(val, type, prependedMsg = "") {
   const fullMsg =
     prependedMsg +
@@ -807,11 +448,11 @@ export function generateSvgQrCode(link) {
   return link && qr.imageSync(link, { type: "svg" });
 }
 
-export function generatePngQrCode(link) {
+function generatePngQrCode(link) {
   return link && qr.imageSync(link, { type: "png" });
 }
 
-export function generateBase64PngQrCode(link) {
+function generateBase64PngQrCode(link) {
   const pngQrCode = generatePngQrCode(link);
   return pngQrCode && btoa(String.fromCharCode.apply(null, pngQrCode));
 }

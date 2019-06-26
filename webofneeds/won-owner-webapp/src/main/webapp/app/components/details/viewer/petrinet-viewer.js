@@ -1,5 +1,5 @@
 import angular from "angular";
-import { attach } from "../../../utils.js";
+import { attach } from "../../../cstm-ng-utils.js";
 import petrinetStateModule from "../../petrinet-state.js";
 
 import "~/style/_petrinet-viewer.scss";

@@ -1,8 +1,8 @@
 /**
  * Created by quasarchimaere on 21.01.2019.
  */
-import { get, getIn } from "../utils.js";
-import * as processUtils from "../process-utils.js";
+import { get, getIn } from "../../utils.js";
+import * as processUtils from "../utils/process-utils.js";
 
 /**
  * Check if anything in the state sub-map of process is currently marked as loading

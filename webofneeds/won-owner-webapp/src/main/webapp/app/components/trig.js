@@ -1,5 +1,6 @@
 import angular from "angular";
-import { attach, trigPrefixesAndBody } from "../utils.js";
+import { trigPrefixesAndBody } from "../utils.js";
+import { attach } from "../cstm-ng-utils.js";
 import won from "../won-es6.js";
 
 import "~/style/_trig.scss";

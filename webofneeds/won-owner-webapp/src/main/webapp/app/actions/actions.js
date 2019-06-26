@@ -36,14 +36,10 @@
  */
 // <utils>
 
-import { tree2constants } from "../utils.js";
-import { hierarchy2Creators } from "./action-utils.js";
-
 import { atomCreate, atomEdit } from "./create-atom-action.js";
 
 import {
   atomsConnect,
-  fetchUnloadedAtoms,
   fetchUnloadedAtom,
   atomsClose,
   atomsDelete,
@@ -94,6 +90,8 @@ import {
   connectPersona,
   disconnectPersona,
 } from "./persona-actions.js";
+import { deepFreeze } from "../utils.js";
+import won from "../won-es6";
 
 // </action-creators>
 
@@ -133,7 +131,7 @@ const actionHierarchy = {
     updatePetriNetData: INJ_DEFAULT,
 
     storeActiveUrisInLoading: INJ_DEFAULT,
-    storeUrisToLoad: INJ_DEFAULT,
+    storeMetaConnections: INJ_DEFAULT,
     storeActive: INJ_DEFAULT,
 
     storeUriFailed: INJ_DEFAULT,
@@ -152,7 +150,6 @@ const actionHierarchy = {
     closedBySystem: atomsClosedBySystem,
     failed: INJ_DEFAULT,
     connect: atomsConnect,
-    fetchUnloadedAtoms: fetchUnloadedAtoms,
     fetchUnloadedAtom: fetchUnloadedAtom,
 
     fetchWhatsNew: fetchWhatsNew,
@@ -160,9 +157,7 @@ const actionHierarchy = {
     storeWhatsNew: INJ_DEFAULT,
     storeWhatsAround: INJ_DEFAULT,
 
-    storeOwnedInactiveUris: INJ_DEFAULT,
-    storeOwnedInactiveUrisInLoading: INJ_DEFAULT,
-    storeOwnedActiveUris: INJ_DEFAULT,
+    storeOwnedMetaAtoms: INJ_DEFAULT,
     storeTheirUrisInLoading: INJ_DEFAULT,
 
     storeOwned: INJ_DEFAULT,
@@ -404,8 +399,137 @@ const actionHierarchy = {
   tick: startTicking,
 };
 
-//as string constans, e.g. actionTypes.atoms.close === "atoms.close"
-export const actionTypes = tree2constants(actionHierarchy);
+//****** SERVICE AND HELPER FUNCTIONS ********************
+/*
+ * @param obj an object-tree.
+ *
+ * @param prefix add a custom prefix to all generated constants.
+ *
+ * @returns a tree using the same structure as `o` but with
+ *          all leaves being strings equal to their lookup path.
+ * e.g.:
+ * tree2constants({foo: null}) -> {foo: 'foo'}
+ * tree2constants{{foo: {bar: null}}) -> {foo: {bar: 'foo.bar'}}
+ * tree2constants{foo: null}, 'pfx') -> {foo: 'pfx.foo'}
+ */
+function tree2constants(obj, prefix = "") {
+  //wrap prefix in array
+  prefix = prefix === "" ? [] : [prefix];
+
+  return deepFreeze(
+    reduceAndMapTreeKeys(
+      (acc, k) => acc.concat(k),
+      acc => acc.join("."),
+      prefix,
+      obj
+    )
+  );
+}
+
+/**
+ * Traverses an object-tree and produces an object
+ * that is just one level deep but concatenating the
+ * traversal path.
+ *
+ * ```
+ * flattenTree({
+ *   myInt: 1,
+ *   myObj: {
+ *      myProp: 2,
+ *      myStr: 'asdf',
+ *      foo: {
+ *        bar: 3
+ *      }
+ *   }
+ * });
+ * // result:
+ * // {
+ * //   'myInt': 1,
+ * //   'myObj__myProp' : 2,
+ * //   'myObj__myStr' : 'asdf',
+ * //   'myObj__foo__bar' : 3
+ * // }
+ * ```
+ *
+ * @param tree {object} the object-tree
+ * @param delimiter {string} will be used to join the path. by default `__`
+ * @returns {object} the flattened object
+ */
+function flattenTree(tree, delimiter = "__") {
+  const accObj = {}; //the accumulator accObject
+  function _flattenTree(node, pathAcc = []) {
+    for (let k of Object.keys(node)) {
+      const pathAccUpd = pathAcc.concat(k);
+      if (typeof node[k] === "object" && node[k] !== null) {
+        _flattenTree(node[k], pathAccUpd);
+      } else {
+        const propertyName = pathAccUpd.join(delimiter);
+        accObj[propertyName] = node[k];
+      }
+    }
+  }
+  _flattenTree(tree);
+  return accObj;
+}
+
+function hierarchy2Creators(actionHierarchy) {
+  const actionTypes = tree2constants(actionHierarchy);
+  return Object.freeze(
+    flattenTree(
+      reduceAndMapTreeKeys(
+        (path, k) => path.concat(k), //construct paths, e.g. ['draft', 'new']
+        path => {
+          /* leaf can either be a defined creator or a
+                 * placeholder asking to generate one.
+                 */
+          const potentialCreator = won.lookup(actionHierarchy, path);
+          if (typeof potentialCreator === "function") {
+            return potentialCreator; //already a defined creator. hopefully.
+          } else {
+            const type = won.lookup(actionTypes, path);
+            return createActionCreator(type);
+          }
+        },
+        [],
+        actionHierarchy
+      ),
+      "__"
+    )
+  );
+}
+
+function createActionCreator(type) {
+  return payload => {
+    return { type, payload };
+  };
+}
+
+/**
+ * Traverses down an object, reducing the keys with the reducer
+ * and then applying the mapper once it reaches the leaves.
+ * The function doesn't modify the input-object.
+ * @param obj
+ * @param acc the initial accumulator
+ * @param reducer (acc, key) => newAcc
+ * @param mapper (acc) => newAcc
+ * @returns {*}
+ */
+function reduceAndMapTreeKeys(reducer, mapper, acc, obj) {
+  if (typeof obj === "object" && obj !== null) {
+    const accObj = {};
+    for (let k of Object.keys(obj)) {
+      accObj[k] = reduceAndMapTreeKeys(
+        reducer,
+        mapper,
+        reducer(acc, k),
+        obj[k]
+      );
+    }
+    return accObj;
+  } else {
+    return mapper(acc);
+  }
+}
 
 /**
  * actionCreators are functions that take the payload and output
@@ -424,6 +548,9 @@ export const actionTypes = tree2constants(actionHierarchy);
  * ```
  */
 export const actionCreators = hierarchy2Creators(actionHierarchy);
+
+//as string constans, e.g. actionTypes.atoms.close === "atoms.close"
+export const actionTypes = tree2constants(actionHierarchy);
 
 /*
  * TODO deletme; for debugging

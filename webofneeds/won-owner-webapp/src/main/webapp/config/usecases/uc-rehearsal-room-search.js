@@ -8,7 +8,7 @@ import {
 } from "../details/real-estate.js";
 import won from "../../app/won-es6.js";
 import { perHourRentRangeDetail } from "../details/musician.js";
-import { findLatestIntervallEndInJsonLdOrNowAndAddMillis } from "../../app/won-utils.js";
+import * as wonUtils from "../../app/won-utils.js";
 import {
   filterFloorSizeRange,
   filterPriceRange,
@@ -21,7 +21,7 @@ export const rehearsalRoomSearch = {
   label: "Find Rehearsal Room",
   icon: "#ico36_uc_realestate",
   timeToLiveMillisDefault: 1000 * 60 * 60 * 24 * 7,
-  doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
+  doNotMatchAfter: wonUtils.findLatestIntervallEndInJsonLdOrNowAndAddMillis,
   draft: {
     ...mergeInEmptyDraft({
       content: {

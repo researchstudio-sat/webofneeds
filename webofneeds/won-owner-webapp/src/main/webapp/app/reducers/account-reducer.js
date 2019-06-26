@@ -35,13 +35,18 @@ export default function(userData = initialState, action = {}) {
         .set("isAnonymous", isAnonymous)
         .set("privateId", privateId);
     }
-    case actionTypes.atoms.storeOwnedInactiveUris:
-    case actionTypes.atoms.storeOwnedActiveUris: {
-      const ownedAtomUris = userData.get("ownedAtomUris");
-      return userData.set(
-        "ownedAtomUris",
-        ownedAtomUris.merge(action.payload.get("uris"))
-      );
+
+    case actionTypes.atoms.storeOwnedMetaAtoms: {
+      const metaAtoms = action.payload.get("metaAtoms");
+
+      metaAtoms &&
+        metaAtoms.map((metaAtom, metaAtomUri) => {
+          userData = userData.update("ownedAtomUris", ownedAtomUris =>
+            ownedAtomUris.add(metaAtomUri)
+          );
+        });
+
+      return userData;
     }
 
     case actionTypes.atoms.removeDeleted:

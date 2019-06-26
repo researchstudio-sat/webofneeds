@@ -1,11 +1,12 @@
 import { getIn, get, generateIdString } from "../utils";
 import won from "../won-es6";
-import { getRandomWonId } from "../won-utils";
+import * as wonUtils from "../won-utils.js";
 import { actionTypes } from "./actions";
-import { getOwnedAtomByConnectionUri } from "../selectors/general-selectors";
-import { getOwnedConnectionByUri } from "../selectors/connection-selectors";
+import { getOwnedAtomByConnectionUri } from "../redux/selectors/general-selectors";
+import { getOwnedConnectionByUri } from "../redux/selectors/connection-selectors";
 import { buildConnectMessage, buildCloseMessage } from "../won-message-utils";
-import * as atomUtils from "../atom-utils.js";
+import * as atomUtils from "../redux/utils/atom-utils.js";
+import * as ownerApi from "../api/owner-api.js";
 
 export function createPersona(persona, nodeUri) {
   return (dispatch, getState) => {
@@ -14,8 +15,8 @@ export function createPersona(persona, nodeUri) {
       nodeUri = getIn(state, ["config", "defaultNodeUri"]);
     }
 
-    const publishedContentUri = nodeUri + "/atom/" + getRandomWonId();
-    const msgUri = nodeUri + "/event/" + getRandomWonId();
+    const publishedContentUri = nodeUri + "/atom/" + wonUtils.getRandomWonId();
+    const msgUri = nodeUri + "/event/" + wonUtils.getRandomWonId();
 
     //FIXME: THIS SHOULD NOT USE ANY OF THE CODE BELOW BUT EXECUTE OUR ALREADY PRESENT ATOM-CREATION WITH A GIVEN DRAFT INSTEAD
     const graph = {
@@ -122,51 +123,43 @@ async function connectReview(
 }
 
 export function connectPersona(atomUri, personaUri) {
-  return async dispatch => {
-    const response = await fetch("rest/action/connect", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify([
-        {
-          pending: false,
-          socket: `${personaUri}#holderSocket`,
-        },
-        {
-          pending: false,
-          socket: `${atomUri}#holdableSocket`,
-        },
-      ]),
-      credentials: "include",
-    });
-    if (!response.ok) {
-      const errorMsg = await response.text();
-      throw new Error(`Could not connect identity: ${errorMsg}`);
-    }
-    dispatch({
-      type: actionTypes.personas.connect,
-      payload: {
-        atomUri: atomUri,
-        personaUri: personaUri,
-      },
-    });
+  return dispatch => {
+    return ownerApi
+      .serverSideConnect(
+        `${personaUri}#holderSocket`,
+        `${atomUri}#holdableSocket`
+      )
+      .then(async response => {
+        if (!response.ok) {
+          const errorMsg = await response.text();
+          throw new Error(`Could not connect identity: ${errorMsg}`);
+        }
+        dispatch({
+          type: actionTypes.personas.connect,
+          payload: {
+            atomUri: atomUri,
+            personaUri: personaUri,
+          },
+        });
+      });
   };
 }
 
 export function disconnectPersona(atomUri, personaUri) {
   return (dispatch, getState) => {
     const state = getState();
-    const persona = state.getIn(["atoms", personaUri]);
-    const atom = state.getIn(["atoms", atomUri]);
+    const persona = getIn(state, ["atoms", personaUri]);
+    const atom = getIn(state, ["atoms", atomUri]);
 
-    const connectionUri = persona
-      .get("connections")
-      .filter(
-        connection =>
-          connection.get("targetAtomUri") == atom.get("uri") &&
-          connection.get("socket") == won.HOLD.HolderSocketCompacted
-      )
+    const connectionUri = get(persona, "connections")
+      .filter(connection => {
+        const socketUri = get(connection, "socketUri");
+        const socketType = getIn(atom, ["content", "sockets", socketUri]);
+        return (
+          get(connection, "targetAtomUri") === atomUri &&
+          socketType === won.HOLD.HolderSocketCompacted
+        );
+      })
       .keySeq()
       .first();
 
@@ -202,20 +195,26 @@ export function reviewPersona(reviewableConnectionUri, review) {
     const foreignAtom = getIn(state, ["atoms", foreignAtomUri]);
 
     const getPersona = atom => {
-      const personaUri = get(atom, "heldBy");
+      const personaUri = atomUtils.getHeldByUri(atom);
       const persona = state.getIn(["atoms", personaUri]);
 
       return persona;
     };
 
     const getConnection = (ownPersona, foreignPersona) => {
-      return ownPersona
-        .get("connections")
-        .filter(
-          connection =>
-            connection.get("targetAtomUri") == foreignPersona.get("uri") &&
-            connection.get("socket") == won.REVIEW.ReviewSocket
-        )
+      return get(ownPersona, "connections")
+        .filter(connection => {
+          const socketUri = get(connection, "socketUri");
+          const socketType = getIn(ownPersona, [
+            "content",
+            "sockets",
+            socketUri,
+          ]);
+          return (
+            get(connection, "targetAtomUri") === get(foreignPersona, "uri") &&
+            socketType === won.REVIEW.ReviewSocketCompacted
+          );
+        })
         .keySeq()
         .first();
     };

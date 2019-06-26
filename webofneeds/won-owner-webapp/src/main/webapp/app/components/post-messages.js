@@ -9,27 +9,23 @@ import connectionHeaderModule from "./connection-header.js";
 import shareDropdownModule from "./share-dropdown.js";
 import labelledHrModule from "./labelled-hr.js";
 import connectionContextDropdownModule from "./connection-context-dropdown.js";
-import { connect2Redux } from "../won-utils.js";
-import { attach, delay, getIn, get } from "../utils.js";
-import * as processUtils from "../process-utils.js";
-import * as connectionUtils from "../connection-utils.js";
-import * as messageUtils from "../message-utils.js";
-import {
-  fetchAgreementProtocolUris,
-  fetchPetriNetUris,
-  fetchMessage,
-} from "../won-message-utils.js";
+import { connect2Redux } from "../configRedux.js";
+import { delay, getIn, get } from "../utils.js";
+import * as processUtils from "../redux/utils/process-utils.js";
+import * as connectionUtils from "../redux/utils/connection-utils.js";
+import * as messageUtils from "../redux/utils/message-utils.js";
+import * as ownerApi from "../api/owner-api.js";
 import { actionCreators } from "../actions/actions.js";
-import * as generalSelectors from "../selectors/general-selectors.js";
-import { hasMessagesToLoad } from "../selectors/connection-selectors.js";
+import * as generalSelectors from "../redux/selectors/general-selectors.js";
+import { hasMessagesToLoad } from "../redux/selectors/connection-selectors.js";
 import {
   getAgreementMessagesByConnectionUri,
   getCancellationPendingMessagesByConnectionUri,
   getProposalMessagesByConnectionUri,
   getUnreadMessagesByConnectionUri,
-} from "../selectors/message-selectors.js";
+} from "../redux/selectors/message-selectors.js";
 import autoresizingTextareaModule from "../directives/textarea-autogrow.js";
-import { classOnComponentRoot } from "../cstm-ng-utils.js";
+import { attach, classOnComponentRoot } from "../cstm-ng-utils.js";
 import "~/style/_post-messages.scss";
 import "~/style/_rdflink.scss";
 
@@ -502,7 +498,8 @@ function genComponentConf() {
             loadingPetriNetData: true,
           });
 
-          fetchPetriNetUris(connectionUri)
+          ownerApi
+            .getPetriNetUris(connectionUri)
             .then(response => {
               const petriNetData = {};
 
@@ -542,7 +539,8 @@ function genComponentConf() {
             connectionUri: this.selectedConnectionUri,
             loadingAgreementData: true,
           });
-          fetchAgreementProtocolUris(this.connection.get("uri"))
+          ownerApi
+            .getAgreementProtocolUris(this.connection.get("uri"))
             .then(response => {
               let proposedMessageUris = [];
               const pendingProposals = response.pendingProposals;
@@ -812,7 +810,7 @@ function genComponentConf() {
 
     addMessageToState(eventUri, key) {
       const ownedAtomUri = this.ownedAtom.get("uri");
-      return fetchMessage(ownedAtomUri, eventUri).then(response => {
+      return ownerApi.getMessage(ownedAtomUri, eventUri).then(response => {
         won.wonMessageFromJsonLd(response).then(msg => {
           if (msg.isFromOwner() && msg.getRecipientAtom() === ownedAtomUri) {
             /*if we find out that the recipientatom of the crawled event is actually our

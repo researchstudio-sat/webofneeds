@@ -7,20 +7,16 @@ import { actionTypes, actionCreators } from "./actions.js";
 import { getIn } from "../utils.js";
 
 import Immutable from "immutable";
-import { getOwnMessageUri } from "../message-utils.js";
-import * as generalSelectors from "../selectors/general-selectors.js";
+import { getOwnMessageUri } from "../redux/utils/message-utils.js";
+import * as generalSelectors from "../redux/selectors/general-selectors.js";
 
 import {
-  fetchDataForOwnedAtoms,
-  fetchDataForNonOwnedAtomOnly,
-  fetchMessageEffects,
-  fetchPetriNetUris,
   isFetchMessageEffectsNeeded,
   buildChatMessage,
-  fetchTheirAtomAndDispatch,
-  fetchActiveConnectionAndDispatch,
 } from "../won-message-utils.js";
-import * as atomUtils from "../atom-utils.js";
+import * as stateStore from "../redux/state-store.js";
+import * as atomUtils from "../redux/utils/atom-utils.js";
+import * as ownerApi from "../api/owner-api.js";
 
 export function successfulCloseAtom(event) {
   return (dispatch, getState) => {
@@ -59,7 +55,7 @@ export function failedCloseAtom(event) {
       .then(() =>
         // as the atom and it's connections have been marked dirty
         // they will be reloaded on this action.
-        fetchDataForOwnedAtoms([atomUri], dispatch)
+        stateStore.fetchDataForOwnedAtoms([atomUri], dispatch)
       )
       .then(allThatData =>
         dispatch({
@@ -155,7 +151,7 @@ export function successfulEdit(event) {
     won
       //.invalidateCacheForAtom(atomURI)
       .clearStoreWithPromise()
-      .then(() => fetchDataForOwnedAtoms([atomURI], dispatch))
+      .then(() => stateStore.fetchDataForOwnedAtoms([atomURI], dispatch))
       .then(() => {
         dispatch(
           actionCreators.atoms__editSuccessful({
@@ -196,7 +192,10 @@ export function processOpenMessage(event) {
       //We know that all own atoms are already stored within the state, so we do not have to retrieve it
       senderAtomP = Promise.resolve(won.invalidateCacheForAtom(senderAtomUri));
     } else {
-      senderAtomP = fetchTheirAtomAndDispatch(senderAtomUri, dispatch);
+      senderAtomP = stateStore.fetchTheirAtomAndDispatch(
+        senderAtomUri,
+        dispatch
+      );
     }
 
     let recipientAtomP;
@@ -206,7 +205,10 @@ export function processOpenMessage(event) {
         won.invalidateCacheForAtom(recipientAtomUri)
       );
     } else {
-      recipientAtomP = fetchTheirAtomAndDispatch(recipientAtomUri, dispatch);
+      recipientAtomP = stateStore.fetchTheirAtomAndDispatch(
+        recipientAtomUri,
+        dispatch
+      );
     }
 
     let senderConnectionP;
@@ -220,11 +222,13 @@ export function processOpenMessage(event) {
         .invalidateCacheForNewConnection(senderConnectionUri, senderAtomUri)
         .then(() => true);
     } else {
-      senderConnectionP = fetchActiveConnectionAndDispatch(
-        senderConnectionUri,
-        senderAtomUri,
-        dispatch
-      ).then(() => true);
+      senderConnectionP = stateStore
+        .fetchActiveConnectionAndDispatch(
+          senderConnectionUri,
+          senderAtomUri,
+          dispatch
+        )
+        .then(() => true);
     }
 
     let receiverConnectionP;
@@ -241,11 +245,13 @@ export function processOpenMessage(event) {
         )
         .then(() => true);
     } else {
-      receiverConnectionP = fetchActiveConnectionAndDispatch(
-        receiverConnectionUri,
-        recipientAtomUri,
-        dispatch
-      ).then(() => true);
+      receiverConnectionP = stateStore
+        .fetchActiveConnectionAndDispatch(
+          receiverConnectionUri,
+          recipientAtomUri,
+          dispatch
+        )
+        .then(() => true);
     }
 
     Promise.all([
@@ -307,9 +313,9 @@ export function processChangeNotificationMessage(event) {
       .clearStoreWithPromise()
       .then(() => {
         if (generalSelectors.isAtomOwned(getState(), atomUriToLoad)) {
-          fetchDataForOwnedAtoms([atomUriToLoad], dispatch);
+          stateStore.fetchDataForOwnedAtoms([atomUriToLoad], dispatch);
         } else {
-          fetchDataForNonOwnedAtomOnly(atomUriToLoad, dispatch);
+          stateStore.fetchDataForNonOwnedAtomOnly(atomUriToLoad, dispatch);
         }
       });
 
@@ -354,7 +360,8 @@ export function processConnectionMessage(event) {
         },
       });
 
-      fetchPetriNetUris(connectionUri)
+      ownerApi
+        .getPetriNetUris(connectionUri)
         .then(response => {
           const petriNetData = {};
 
@@ -386,8 +393,9 @@ export function processConnectionMessage(event) {
         });
 
       //PETRINET DATA PART END **************************
-      fetchMessageEffects(connectionUri, event.getMessageUri()).then(
-        response => {
+      ownerApi
+        .getMessageEffects(connectionUri, event.getMessageUri())
+        .then(response => {
           for (const effect of response) {
             switch (effect.type) {
               case "ACCEPTS":
@@ -549,8 +557,7 @@ export function processConnectionMessage(event) {
             type: actionTypes.messages.processConnectionMessage,
             payload: event,
           });
-        }
-      );
+        });
     } else {
       dispatch({
         type: actionTypes.messages.processConnectionMessage,
@@ -582,7 +589,10 @@ export function processConnectMessage(event) {
       //We know that all own atoms are already stored within the state, so we do not have to retrieve it
       senderAtomP = Promise.resolve(won.invalidateCacheForAtom(senderAtomUri));
     } else {
-      senderAtomP = fetchTheirAtomAndDispatch(senderAtomUri, dispatch);
+      senderAtomP = stateStore.fetchTheirAtomAndDispatch(
+        senderAtomUri,
+        dispatch
+      );
     }
 
     let recipientAtomP;
@@ -592,7 +602,10 @@ export function processConnectMessage(event) {
         won.invalidateCacheForAtom(recipientAtomUri)
       );
     } else {
-      recipientAtomP = fetchTheirAtomAndDispatch(recipientAtomUri, dispatch);
+      recipientAtomP = stateStore.fetchTheirAtomAndDispatch(
+        recipientAtomUri,
+        dispatch
+      );
     }
 
     let senderCP;
@@ -610,11 +623,13 @@ export function processConnectMessage(event) {
         won.invalidateCacheForNewConnection(senderConnectionUri, senderAtomUri)
       ).then(() => true);
     } else {
-      senderCP = fetchActiveConnectionAndDispatch(
-        senderConnectionUri,
-        senderAtomUri,
-        dispatch
-      ).then(() => true);
+      senderCP = stateStore
+        .fetchActiveConnectionAndDispatch(
+          senderConnectionUri,
+          senderAtomUri,
+          dispatch
+        )
+        .then(() => true);
     }
 
     let receiverCP;
@@ -635,11 +650,13 @@ export function processConnectMessage(event) {
         )
         .then(() => true);
     } else {
-      receiverCP = fetchActiveConnectionAndDispatch(
-        receiverConnectionUri,
-        recipientAtomUri,
-        dispatch
-      ).then(() => true);
+      receiverCP = stateStore
+        .fetchActiveConnectionAndDispatch(
+          receiverConnectionUri,
+          recipientAtomUri,
+          dispatch
+        )
+        .then(() => true);
     }
 
     //we have to retrieve the personas too
@@ -918,23 +935,13 @@ export function processSocketHintMessage(event) {
     } else {
       won
         .invalidateCacheForNewConnection(recipientConnUri, recipientAtomUri)
-        .then(() => {
-          return fetchActiveConnectionAndDispatch(
+        .then(() =>
+          stateStore.fetchActiveConnectionAndDispatch(
             recipientConnUri,
             recipientAtomUri,
             dispatch
-          );
-        })
-        .then(connection => {
-          const targetAtomUri = connection && connection.targetAtom;
-          const targetAtom = getIn(currentState, ["atoms", targetAtomUri]);
-
-          if (targetAtom) {
-            return Promise.resolve(won.invalidateCacheForAtom(targetAtomUri));
-          } else {
-            return fetchTheirAtomAndDispatch(targetAtomUri, dispatch);
-          }
-        });
+          )
+        );
     }
   };
 }
@@ -966,11 +973,14 @@ export function processAtomHintMessage(event) {
           if (targetAtom) {
             return Promise.resolve(won.invalidateCacheForAtom(targetAtomUri));
           } else {
-            return fetchTheirAtomAndDispatch(targetAtomUri, dispatch);
+            return stateStore.fetchTheirAtomAndDispatch(
+              targetAtomUri,
+              dispatch
+            );
           }
         })
         .then(() =>
-          fetchActiveConnectionAndDispatch(
+          stateStore.fetchActiveConnectionAndDispatch(
             ownedConnectionUri,
             ownedAtomUri,
             dispatch
@@ -1068,7 +1078,8 @@ export function dispatchActionOnSuccessRemote(event) {
         },
       });
 
-      fetchPetriNetUris(connectionUri)
+      ownerApi
+        .getPetriNetUris(connectionUri)
         .then(response => {
           const petriNetData = {};
 

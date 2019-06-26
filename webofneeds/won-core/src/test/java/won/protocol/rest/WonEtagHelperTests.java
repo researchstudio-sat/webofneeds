@@ -95,7 +95,13 @@ public class WonEtagHelperTests {
         mediaTypes.add(new MediaType("application", "*"));
         headers.setAccept(mediaTypes);
         headers.setIfNoneMatch("\"1 text/html");
-        WonEtagHelper helper = WonEtagHelper.fromHeaderIfCompatibleWithAcceptHeader(headers);
+        WonEtagHelper helper = null;
+        try {
+            helper = WonEtagHelper.fromHeaderIfCompatibleWithAcceptHeader(headers);
+            Assert.fail("expected exception not thrown");
+        } catch (Exception e) {
+            // expected
+        }
         Assert.assertNull(helper);
     }
 }

@@ -1,6 +1,5 @@
 import angular from "angular";
-import { attach } from "../../../utils.js";
-import { DomCache } from "../../../cstm-ng-utils.js";
+import { attach, DomCache } from "../../../cstm-ng-utils.js";
 
 import datetimePickerModule from "./datetime-picker.js";
 

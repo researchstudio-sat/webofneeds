@@ -23,13 +23,8 @@ public class ReadWriteTest {
     public void testTrigRoundTrip() throws Exception {
         Dataset datasetIn = Utils.createTestDataset(RESOURCE_FILE);
         String datasetInString = RdfUtils.writeDatasetToString(datasetIn, Lang.TRIG);
-        System.out.println("TRIG IN");
-        System.out.println(datasetInString);
-        System.out.println();
         Dataset datasetOut = RdfUtils.readDatasetFromString(datasetInString, Lang.TRIG);
         String datasetOutString = RdfUtils.writeDatasetToString(datasetOut, Lang.TRIG);
-        System.out.println("TRIG OUT");
-        System.out.println(datasetOutString);
         Assert.assertTrue(IsoMatcher.isomorphic(datasetIn.asDatasetGraph(), datasetOut.asDatasetGraph()));
     }
 }

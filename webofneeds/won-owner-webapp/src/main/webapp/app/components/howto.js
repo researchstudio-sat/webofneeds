@@ -3,12 +3,13 @@
  */
 import angular from "angular";
 import Immutable from "immutable";
-import { attach, getIn } from "../utils.js";
+import { getIn } from "../utils.js";
+import { attach } from "../cstm-ng-utils.js";
 import { actionCreators } from "../actions/actions.js";
-import { connect2Redux } from "../won-utils.js";
+import { connect2Redux } from "../configRedux.js";
 
 import "~/style/_howto.scss";
-import * as generalSelectors from "../selectors/general-selectors";
+import * as generalSelectors from "../redux/selectors/general-selectors";
 
 function genTopnavConf() {
   let template = `

@@ -5,13 +5,14 @@
 import angular from "angular";
 import ngAnimate from "angular-animate";
 import { actionCreators } from "../actions/actions.js";
-import { attach, get, getIn, toAbsoluteURL } from "../utils.js";
-import * as generalSelectors from "../selectors/general-selectors.js";
-import { connect2Redux } from "../won-utils.js";
+import { get, getIn, toAbsoluteURL } from "../utils.js";
+import { attach } from "../cstm-ng-utils.js";
+import * as generalSelectors from "../redux/selectors/general-selectors.js";
+import { connect2Redux } from "../configRedux.js";
 import { ownerBaseUrl } from "~/config/default.js";
-import * as connectionUtils from "../connection-utils.js";
-import * as connectionSelectors from "../selectors/connection-selectors.js";
-import * as processUtils from "../process-utils.js";
+import * as connectionUtils from "../redux/utils/connection-utils.js";
+import * as connectionSelectors from "../redux/selectors/connection-selectors.js";
+import * as processUtils from "../redux/utils/process-utils.js";
 
 import "~/style/_context-dropdown.scss";
 
@@ -169,10 +170,8 @@ function genComponentConf() {
     }
 
     goToPost(postUri) {
-      this.router__stateGoCurrent({
-        useCase: undefined,
-        viewAtomUri: postUri,
-        viewConnUri: undefined,
+      this.router__stateGo("post", {
+        postUri: postUri,
       });
     }
 

@@ -2,8 +2,8 @@
  * Created by fsuda on 05.11.2018.
  */
 
-import won from "./won-es6.js";
-import { get } from "./utils.js";
+import won from "../../won-es6.js";
+import { get } from "../../utils.js";
 
 export function isRequestSent(connection) {
   return get(connection, "state") === won.WON.RequestSent;

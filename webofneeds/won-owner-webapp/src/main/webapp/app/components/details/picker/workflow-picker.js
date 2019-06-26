@@ -1,6 +1,6 @@
 import angular from "angular";
-import { attach, delay } from "../../../utils.js";
-import { DomCache } from "../../../cstm-ng-utils.js";
+import { delay } from "../../../utils.js";
+import { attach, DomCache } from "../../../cstm-ng-utils.js";
 import dropzoneModule from "../../file-dropzone.js";
 import BpmnViewer from "bpmn-js";
 

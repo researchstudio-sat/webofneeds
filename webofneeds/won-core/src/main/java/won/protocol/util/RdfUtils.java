@@ -23,6 +23,9 @@ import java.util.Set;
 import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -64,7 +67,6 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.Iterators;
 
 import won.protocol.exception.IncorrectPropertyCountException;
-import won.protocol.vocabulary.WON;
 
 /**
  * Utilities for RDF manipulation with Jena.
@@ -415,12 +417,34 @@ public class RdfUtils {
         model.setNsPrefix("", baseURI);
     }
 
+    /**
+     * Rename resources in all models of the dataset, replacing the prefix string by
+     * the replacement string.
+     * 
+     * @param dataset
+     * @param prefix
+     * @param replacement
+     */
     public static void renameResourceWithPrefix(Dataset dataset, String prefix, String replacement) {
         visit(dataset, new ModelVisitor<Void>() {
             public Void visit(Model model) {
                 renameResourceWithPrefix(model, prefix, replacement);
                 return null;
             }
+        });
+        Iterator<String> modelNames = dataset.listNames();
+        Map<String, String> toReplace = new HashMap<>();
+        while (modelNames.hasNext()) {
+            String modelName = modelNames.next();
+            if (modelName.startsWith(prefix)) {
+                String newModelName = replacement + modelName.substring(prefix.length());
+                toReplace.put(modelName, newModelName);
+            }
+        }
+        toReplace.entrySet().stream().forEach(e -> {
+            Model model = dataset.getNamedModel(e.getKey());
+            dataset.removeNamedModel(e.getKey());
+            dataset.addNamedModel(e.getValue(), model);
         });
     }
 
@@ -438,7 +462,7 @@ public class RdfUtils {
         Set<Resource> uriResources = listUriResources(model);
         for (Resource r : uriResources) {
             if (r.getURI().startsWith(prefix)) {
-                ResourceUtils.renameResource(r, r.getURI().replaceFirst(prefix, replacement));
+                ResourceUtils.renameResource(r, replacement + r.getURI().substring(prefix.length()));
             }
         }
     }
@@ -1699,9 +1723,23 @@ public class RdfUtils {
         return RdfUtils.findOne(dataset, new RdfUtils.ModelVisitor<Resource>() {
             @Override
             public Resource visit(final Model model) {
-                return findOneSubjectResource(model, property, object);
+                return findOneOrNoSubjectResource(model, property, object);
             }
         }, true);
+    }
+
+    public static List<Resource> findSubjectResources(Dataset dataset, Property property, RDFNode object) {
+        return RdfUtils.visitFlattenedToList(dataset, new RdfUtils.ModelVisitor<List<Resource>>() {
+            @Override
+            public List<Resource> visit(final Model model) {
+                List<Resource> ret = new ArrayList<>();
+                ResIterator it = model.listSubjectsWithProperty(property, object);
+                while (it.hasNext()) {
+                    ret.add(it.next());
+                }
+                return ret;
+            }
+        });
     }
 
     public static Resource findOneSubjectResource(Model model, Property property, RDFNode object) {
@@ -1717,6 +1755,19 @@ public class RdfUtils {
         if (resource == null) {
             throw new IncorrectPropertyCountException("expecting exactly one subject resource for property "
                             + property.getURI() + " and object " + object.toString(), 1, 0);
+        }
+        return resource;
+    }
+
+    public static Resource findOneOrNoSubjectResource(Model model, Property property, RDFNode object) {
+        Resource resource = null;
+        ResIterator iter = model.listSubjectsWithProperty(property, object);
+        while (iter.hasNext()) {
+            resource = iter.next();
+            if (iter.hasNext()) {
+                throw new IncorrectPropertyCountException("expecting one or no subject resource for property "
+                                + property.getURI() + " and object " + object.toString(), 1, 2);
+            }
         }
         return resource;
     }
@@ -1870,6 +1921,32 @@ public class RdfUtils {
         Dataset dataset = DatasetFactory.createGeneral();
         RDFDataMgr.read(dataset, sr, "no:uri", lang);
         return dataset;
+    }
+
+    /**
+     * Returns the names of all models that mention the specified resource.
+     * 
+     * @param resource
+     * @return
+     */
+    public static Set<String> getModelsOfResource(Dataset dataset, RDFNode resource) {
+        return toNamedModelStream(dataset, false)
+                        .map(nm -> nm.model.containsResource(resource) ? nm.name : null)
+                        .filter(name -> name != null).collect(Collectors.toSet());
+    }
+
+    /**
+     * Returns the names of all models that mention the specified resource in the
+     * subject of a triple
+     * 
+     * @param resource
+     * @return
+     */
+    public static Set<String> getModelsOfSubjectResource(Dataset dataset, RDFNode resource) {
+        return toNamedModelStream(dataset, false)
+                        .map(nm -> nm.model.contains(resource.asResource(), (Property) null, (RDFNode) null) ? nm.name
+                                        : null)
+                        .filter(name -> name != null).collect(Collectors.toSet());
     }
 
     /**

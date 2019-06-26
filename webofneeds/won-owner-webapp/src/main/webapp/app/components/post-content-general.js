@@ -3,21 +3,22 @@
  */
 
 import angular from "angular";
-import { attach, get, getIn } from "../utils.js";
+import { get, getIn } from "../utils.js";
+import { attach } from "../cstm-ng-utils.js";
 import won from "../won-es6.js";
 import { relativeTime } from "../won-label-utils.js";
-import { connect2Redux } from "../won-utils.js";
-import * as atomUtils from "../atom-utils.js";
-import * as viewUtils from "../view-utils.js";
+import { connect2Redux } from "../configRedux.js";
+import * as atomUtils from "../redux/utils/atom-utils.js";
+import * as viewUtils from "../redux/utils/view-utils.js";
 import {
   selectLastUpdateTime,
   getConnectionUriFromRoute,
   getOwnedAtomByConnectionUri,
-} from "../selectors/general-selectors.js";
+} from "../redux/selectors/general-selectors.js";
 import { actionCreators } from "../actions/actions.js";
 
 import "~/style/_post-content-general.scss";
-import { getOwnedConnectionByUri } from "../selectors/connection-selectors.js";
+import { getOwnedConnectionByUri } from "../redux/selectors/connection-selectors.js";
 
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
@@ -83,7 +84,7 @@ function genComponentConf() {
 
         const ratingConnectionUri =
           get(connection, "targetAtomUri") == this.postUri &&
-          get(ownAtom, "heldBy")
+          atomUtils.getHeldByUri(ownAtom)
             ? connectionUri
             : null;
 

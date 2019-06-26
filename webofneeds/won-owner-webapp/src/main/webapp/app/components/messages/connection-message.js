@@ -11,13 +11,13 @@ import referencedMessageContentModule from "./referenced-message-content.js";
 import combinedMessageContentModule from "./combined-message-content.js";
 import labelledHrModule from "../labelled-hr.js";
 
-import { connect2Redux } from "../../won-utils.js";
-import { attach, getIn, get } from "../../utils.js";
+import { connect2Redux } from "../../configRedux.js";
+import { getIn, get } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
-import { getOwnedAtomByConnectionUri } from "../../selectors/general-selectors.js";
-import * as messageUtils from "../../message-utils.js";
-import * as connectionUtils from "../../connection-utils.js";
-import { classOnComponentRoot } from "../../cstm-ng-utils.js";
+import { getOwnedAtomByConnectionUri } from "../../redux/selectors/general-selectors.js";
+import * as messageUtils from "../../redux/utils/message-utils.js";
+import * as connectionUtils from "../../redux/utils/connection-utils.js";
+import { attach, classOnComponentRoot } from "../../cstm-ng-utils.js";
 
 import { ownerBaseUrl } from "~/config/default.js";
 import urljoin from "url-join";
@@ -34,13 +34,13 @@ function genComponentConf() {
         <won-square-image
             class="clickable"
             uri="::self.theirAtom.get('uri')"
-            ng-click="!self.multiSelectType && self.router__stateGoCurrent({viewAtomUri: self.theirAtom.get('uri'), viewConnUri: undefined})"
+            ng-click="!self.multiSelectType && self.router__stateGo({postUri: self.theirAtom.get('uri')})"
             ng-if="!self.isChangeNotificationMessage && !self.isSent && !(self.isGroupChatMessage && self.originatorUri)">
         </won-square-image>
         <won-square-image
             class="clickable"
             uri="::self.originatorUri"
-            ng-click="!self.multiSelectType && self.router__stateGoCurrent({viewAtomUri: self.originatorUri, viewConnUri: undefined})"
+            ng-click="!self.multiSelectType && self.router__stateGo({postUri: self.originatorUri})"
             ng-if="!self.isChangeNotificationMessage && self.isReceived && self.isGroupChatMessage && self.originatorUri">
         </won-square-image>
         <won-square-image

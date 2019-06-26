@@ -1,0 +1,69 @@
+@import "won-config";
+@import "flex-layout";
+@import "sizing-utils";
+@import "square-image";
+
+.atom-header-big {
+  background-color: $won-light-gray;
+  border-top: none;
+  border-bottom: $thinBorderWidth solid $won-line-gray;
+
+  @include max-content-width($maxContentWidth, $minContentPadding, "ahb");
+
+  > .ahb__inner {
+    display: flex;
+    flex-direction: row;
+    align-content: center;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 1rem;
+
+    @media (max-width: $responsivenessBreakPoint) {
+      @include square-image($postIconSize, 0 0.5rem 0 0);
+    }
+    @media (min-width: $responsivenessBreakPoint) {
+      @include square-image(4.7rem, 0 1rem 0 0);
+    }
+
+    .ahb__title {
+      font-size: $mediumFontSize;
+      font-weight: 300;
+      padding: 0.1rem;
+
+      @media (max-width: $responsivenessBreakPoint) {
+        font-size: $normalFontSize;
+      }
+    }
+
+    .ahb__titles__type {
+      color: #a7a7a7;
+      font-size: 0.8rem;
+    }
+
+    .ahb__titles__persona {
+      border-radius: 0.19rem;
+      background: $won-secondary-color-lighter;
+      color: $won-secondary-text-color;
+      padding: 0 0.25rem;
+      display: inline-block;
+    }
+
+    .ahb__titles__groupchat {
+      border-radius: 0.19rem;
+      background: $won-line-gray;
+      margin: 0.1rem;
+      padding: 0 0.25rem;
+      display: inline-block;
+    }
+  }
+
+  > won-post-context-dropdown,
+  > won-share-dropdown {
+    margin-top: 1rem;
+    margin-right: 0.5rem;
+  }
+
+  > won-share-dropdown {
+    margin-right: 1rem;
+  }
+}

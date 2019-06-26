@@ -9,6 +9,7 @@ import {
   addAtomStubs,
   addAtom,
   addAtomInCreation,
+  addMetaAtomStubs,
   deleteAtom,
 } from "./reduce-atoms.js";
 import {
@@ -29,7 +30,7 @@ import {
   markMessageExpandReferences,
 } from "./reduce-messages.js";
 import {
-  addConnectionsToLoad,
+  addMetaConnections,
   markConnectionAsRated,
   markConnectionAsRead,
   getAtomByConnectionUri,
@@ -58,22 +59,10 @@ export default function(allAtomsInState = initialState, action = {}) {
         atom.set("connections", Immutable.Map())
       );
 
-    case actionTypes.atoms.storeOwnedActiveUris: {
-      return addAtomStubs(
-        allAtomsInState,
-        action.payload.get("uris"),
-        won.WON.ActiveCompacted
-      );
+    case actionTypes.atoms.storeOwnedMetaAtoms: {
+      return addMetaAtomStubs(allAtomsInState, action.payload.get("metaAtoms"));
     }
 
-    case actionTypes.atoms.storeOwnedInactiveUrisInLoading:
-    case actionTypes.atoms.storeOwnedInactiveUris: {
-      return addAtomStubs(
-        allAtomsInState,
-        action.payload.get("uris"),
-        won.WON.InactiveCompacted
-      );
-    }
     case actionTypes.atoms.storeWhatsNew:
     case actionTypes.atoms.storeWhatsAround: {
       const metaAtoms = action.payload.get("metaAtoms");
@@ -98,8 +87,8 @@ export default function(allAtomsInState = initialState, action = {}) {
       );
     }
 
-    case actionTypes.connections.storeUrisToLoad: {
-      return addConnectionsToLoad(
+    case actionTypes.connections.storeMetaConnections: {
+      return addMetaConnections(
         allAtomsInState,
         action.payload.get("atomUri"),
         action.payload.get("connections")
@@ -156,7 +145,8 @@ export default function(allAtomsInState = initialState, action = {}) {
             sockets: Immutable.Map(),
           },
           connections: Immutable.Map(),
-          holds: Immutable.List(),
+          holds: Immutable.Set(),
+          buddies: Immutable.Set(),
           rating: { aggregateRating: 0.0, reviewCount: 0 },
         })
       );

@@ -8,7 +8,7 @@ import {
   isMessageClaim,
   isMessageUnread,
   isMessageAgreement,
-} from "../message-utils.js";
+} from "../utils/message-utils.js";
 import { getOwnedAtomByConnectionUri } from "./general-selectors.js";
 
 export function getMessagesByConnectionUri(state, connectionUri) {

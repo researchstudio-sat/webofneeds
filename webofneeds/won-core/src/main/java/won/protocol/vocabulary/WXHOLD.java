@@ -2,6 +2,7 @@ package won.protocol.vocabulary;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 
 public class WXHOLD {
@@ -16,4 +17,6 @@ public class WXHOLD {
     public static final Resource holds = m.createResource(holdsString);
     public static final String heldByString = BASE_URI + "heldBy";
     public static final Resource heldBy = m.createResource(heldByString);
+    public static final Property HELD_BY = m.createProperty(heldByString);
+    public static final Property HOLDS = m.createProperty(holdsString);
 }

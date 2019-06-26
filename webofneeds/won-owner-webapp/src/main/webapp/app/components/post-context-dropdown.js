@@ -5,14 +5,13 @@
 import angular from "angular";
 import ngAnimate from "angular-animate";
 import { actionCreators } from "../actions/actions.js";
-import { attach, toAbsoluteURL, getIn, get } from "../utils.js";
-import {
-  connect2Redux,
-  createDocumentDefinitionFromPost,
-} from "../won-utils.js";
-import * as atomUtils from "../atom-utils.js";
-import * as processUtils from "../process-utils.js";
-import * as generalSelectors from "../selectors/general-selectors.js";
+import { toAbsoluteURL, getIn, get } from "../utils.js";
+import { attach } from "../cstm-ng-utils.js";
+import { connect2Redux } from "../configRedux.js";
+import * as wonUtils from "../won-utils.js";
+import * as atomUtils from "../redux/utils/atom-utils.js";
+import * as processUtils from "../redux/utils/process-utils.js";
+import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 
@@ -186,7 +185,7 @@ function genComponentConf() {
               caption: "Yes",
               callback: () => {
                 this.atoms__delete(this.post.get("uri"));
-                this.router__stateGo("inventory");
+                this.router__stateGoAbs("inventory");
                 this.view__hideModalDialog();
               },
             },
@@ -217,7 +216,9 @@ function genComponentConf() {
 
     exportPdf() {
       if (!this.post) return;
-      const docDefinition = createDocumentDefinitionFromPost(this.post);
+      const docDefinition = wonUtils.createDocumentDefinitionFromPost(
+        this.post
+      );
 
       if (docDefinition) {
         pdfMake.vfs = pdfFonts.pdfMake.vfs;

@@ -91,7 +91,7 @@ public class DebugBot extends EventBot {
     protected BaseEventListener atomCloser;
     protected BaseEventListener messageFromOtherAtomListener;
     protected BaseEventListener usageMessageSender;
-    private int registrationMatcherRetryInterval;
+    private int registrationMatcherRetryInterval = 30000;
 
     public void setRegistrationMatcherRetryInterval(final int registrationMatcherRetryInterval) {
         this.registrationMatcherRetryInterval = registrationMatcherRetryInterval;

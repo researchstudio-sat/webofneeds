@@ -18,7 +18,7 @@
  * Created by LEIH-NB on 19.08.2014.
  */
 "format es6" /* required to force babel to transpile this so the minifier is happy */;
-import { is, prefixOfUri, isArray, clone, createArray } from "../utils.js";
+import { is, isArray, clone } from "../utils.js";
 import {
   clearReadUris,
   clearDisclaimerAccepted,
@@ -479,6 +479,16 @@ function lookup(o, propertyPath) {
   } else {
     return lookup(resolvedStep, propertyPath.slice(1));
   }
+}
+
+/**
+ * Method that checks if the given element is already an array, if so return it, if not
+ * return the element as a single element array, if element is undefined return undefined
+ * @param elements
+ * @returns {*}
+ */
+function createArray(elements) {
+  return !elements || Array.isArray(elements) ? elements : [elements];
 }
 
 //get the URI from a jsonld resource (expects an object with an '@id' property)
@@ -1135,6 +1145,27 @@ WonMessage.prototype = {
               JSON.stringify(contentGraphs)
           );
         }
+        /**
+         * Parses an rdf-uri and gets the base-uri, i.e.
+         * the part before and including the fragment identifier
+         * ("#") or last slash ("/").
+         * @param {*} uri
+         */
+        const prefixOfUri = uri => {
+          // if there's hash-tags, the first of these
+          // is the fragment identifier and everything
+          // after is the id. remove everything following it.
+          let prefix = uri.replace(/#.*/, "#");
+
+          // if there's no fragment-identifier, the
+          // everything after the last slash is removed.
+          if (!prefix.endsWith("#")) {
+            prefix = prefix.replace(/\/([^/]*)$/, "/");
+          }
+
+          return prefix;
+        };
+
         const eventUriPrefix = prefixOfUri(this.getMessageUri());
         const jsonldData = {
           "@context": Object.assign(

@@ -3,21 +3,21 @@
 import angular from "angular";
 import ngAnimate from "angular-animate";
 import won from "../won-es6.js";
-import sendRequestModule from "../components/send-request.js";
 
 import createPostModule from "../components/create-post.js";
 import createSearchModule from "../components/create-search.js";
 import usecasePickerModule from "../components/usecase-picker.js";
 import usecaseGroupModule from "../components/usecase-group.js";
-import { attach, getIn, get } from "../utils.js";
+import { getIn, get } from "../utils.js";
+import { attach } from "../cstm-ng-utils.js";
 import { actionCreators } from "../actions/actions.js";
-import * as generalSelectors from "../selectors/general-selectors.js";
-import * as viewSelectors from "../selectors/view-selectors.js";
+import * as generalSelectors from "../redux/selectors/general-selectors.js";
+import * as viewSelectors from "../redux/selectors/view-selectors.js";
 import { h } from "preact";
 
 import "~/style/_create.scss";
 import "~/style/_responsiveness-utils.scss";
-import * as accountUtils from "../account-utils";
+import * as accountUtils from "../redux/utils/account-utils";
 
 const template = (
   <container>
@@ -84,7 +84,6 @@ export default {
   module: angular
     .module("won.owner.components.create", [
       ngAnimate,
-      sendRequestModule,
       usecasePickerModule,
       usecaseGroupModule,
       createPostModule,

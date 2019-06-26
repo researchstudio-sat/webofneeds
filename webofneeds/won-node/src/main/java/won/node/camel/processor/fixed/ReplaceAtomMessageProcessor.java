@@ -29,6 +29,7 @@ import won.protocol.model.Socket;
 import won.protocol.model.Atom;
 import won.protocol.model.AtomMessageContainer;
 import won.protocol.util.DataAccessUtils;
+import won.protocol.util.RdfUtils;
 import won.protocol.util.AtomModelWrapper;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WONMSG;
@@ -73,6 +74,7 @@ public class ReplaceAtomMessageProcessor extends AbstractCamelProcessor {
         atomMessageContainer.getEvents()
                         .add(messageEventRepository.findOneByMessageURIforUpdate(wonMessage.getMessageURI()));
         // store the atom content
+        URI messageURI = wonMessage.getMessageURI();
         DatasetHolder datasetHolder = atom.getDatatsetHolder();
         // replace attachments
         List<DatasetHolder> attachments = new ArrayList<>(attachmentHolders.size());
@@ -81,6 +83,9 @@ public class ReplaceAtomMessageProcessor extends AbstractCamelProcessor {
                             attachmentHolder.getAttachmentDataset());
             attachments.add(datasetHolder);
         }
+        // rename the content graphs and signature graphs so they start with the atom
+        // uri
+        RdfUtils.renameResourceWithPrefix(atomContent, messageURI.toString(), atomURI.toString());
         // analyzed change in socket data
         List<Socket> existingSockets = socketRepository.findByAtomURI(atomURI);
         AtomModelWrapper atomModelWrapper = new AtomModelWrapper(atomContent);

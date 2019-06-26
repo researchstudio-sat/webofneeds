@@ -1,6 +1,6 @@
 import angular from "angular";
-import { attach, delay, dispatchEvent, is } from "../../../utils.js";
-import { DomCache } from "../../../cstm-ng-utils.js";
+import { delay, dispatchEvent, is } from "../../../utils.js";
+import { attach, DomCache } from "../../../cstm-ng-utils.js";
 import wonInput from "../../../directives/input.js";
 
 import "~/style/_tagspicker.scss";

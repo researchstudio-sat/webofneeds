@@ -8,14 +8,15 @@ import ngAnimate from "angular-animate";
 import "ng-redux";
 import labelledHrModule from "./labelled-hr.js";
 import createIsseeksModule from "./create-isseeks.js";
-import { get, attach, delay, getIn } from "../utils.js";
+import { get, delay, getIn } from "../utils.js";
+import { attach } from "../cstm-ng-utils.js";
 import { actionCreators } from "../actions/actions.js";
-import { connect2Redux } from "../won-utils.js";
-import * as generalSelectors from "../selectors/general-selectors.js";
-import * as atomUtils from "../atom-utils.js";
-import * as processSelectors from "../selectors/process-selectors.js";
+import { connect2Redux } from "../configRedux.js";
+import * as generalSelectors from "../redux/selectors/general-selectors.js";
+import * as atomUtils from "../redux/utils/atom-utils.js";
+import * as processSelectors from "../redux/selectors/process-selectors.js";
 import * as useCaseUtils from "../usecase-utils.js";
-import * as accountUtils from "../account-utils.js";
+import * as accountUtils from "../redux/utils/account-utils.js";
 import { Elm } from "../../elm/PublishButton.elm";
 import elmModule from "./elm.js";
 
@@ -200,18 +201,20 @@ function genComponentConf() {
               useCase.draft.seeks = fromAtomSeeks.toJS();
             }
 
-            if (socketsReset) {
-              useCase.draft.content.sockets = socketsReset.toJS();
-            }
-            if (defaultSocketReset) {
-              useCase.draft.content.defaultSocket = defaultSocketReset.toJS();
-            }
+            if (!isEditFromAtom) {
+              if (socketsReset) {
+                useCase.draft.content.sockets = socketsReset.toJS();
+              }
+              if (defaultSocketReset) {
+                useCase.draft.content.defaultSocket = defaultSocketReset.toJS();
+              }
 
-            if (seeksSocketsReset) {
-              useCase.draft.seeks.sockets = seeksSocketsReset.toJS();
-            }
-            if (seeksDefaultSocketReset) {
-              useCase.draft.seeks.defaultSocket = seeksDefaultSocketReset.toJS();
+              if (seeksSocketsReset) {
+                useCase.draft.seeks.sockets = seeksSocketsReset.toJS();
+              }
+              if (seeksDefaultSocketReset) {
+                useCase.draft.seeks.defaultSocket = seeksDefaultSocketReset.toJS();
+              }
             }
           }
         } else {
@@ -243,7 +246,7 @@ function genComponentConf() {
           ),
           isHoldable: useCaseUtils.isHoldable(useCase),
           hasFromAtomFailedToLoad,
-          personas: generalSelectors.getOwnedPersonas(state).toJS(),
+          personas: generalSelectors.getOwnedCondensedPersonaList(state).toJS(),
           showCreateInput:
             useCase &&
             !(
@@ -343,16 +346,23 @@ function genComponentConf() {
 
     save() {
       if (this.loggedIn && this.isFromAtomOwned) {
-        this.draftObject.useCase = get(this.useCase, "identifier");
-
-        if (!isBranchContentPresent(this.draftObject.content, true)) {
-          delete this.draftObject.content;
-        }
-        if (!isBranchContentPresent(this.draftObject.seeks, true)) {
-          delete this.draftObject.seeks;
-        }
+        this.sanitizeDraftObject();
 
         this.atoms__edit(this.draftObject, this.fromAtom);
+      }
+    }
+
+    /**
+     * Removes empty branches from the draft, and adds the proper useCase to the draft
+     */
+    sanitizeDraftObject() {
+      this.draftObject.useCase = get(this.useCase, "identifier");
+
+      if (!isBranchContentPresent(this.draftObject.content, true)) {
+        delete this.draftObject.content;
+      }
+      if (!isBranchContentPresent(this.draftObject.seeks, true)) {
+        delete this.draftObject.seeks;
       }
     }
 
@@ -361,6 +371,8 @@ function genComponentConf() {
         console.debug("publish in process, do not take any action");
         return;
       }
+
+      this.sanitizeDraftObject();
 
       if (this.connectToAtomUri) {
         const tempConnectToAtomUri = this.connectToAtomUri;
@@ -398,15 +410,6 @@ function genComponentConf() {
           );
         }
       } else {
-        this.draftObject.useCase = get(this.useCase, "identifier");
-
-        if (!isBranchContentPresent(this.draftObject.content, true)) {
-          delete this.draftObject.content;
-        }
-        if (!isBranchContentPresent(this.draftObject.seeks, true)) {
-          delete this.draftObject.seeks;
-        }
-
         const tempDraft = this.draftObject;
         const tempDefaultNodeUri = this.$ngRedux
           .getState()

@@ -17,7 +17,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface FixedMessageProcessor {
-    String direction();
+    String direction() default "ANY";
 
-    String messageType();
+    String messageType() default "ANY";
 }

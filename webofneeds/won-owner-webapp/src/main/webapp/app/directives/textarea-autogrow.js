@@ -1,6 +1,5 @@
 // code adapted from https://stackoverflow.com/questions/17731083/how-to-autogrow-text-area-with-css3
 import angular from "angular";
-import { clamp } from "../utils.js";
 
 function genDirectiveConf() {
   return {
@@ -49,6 +48,12 @@ function genDirectiveConf() {
           }
 
           const height = area.scrollHeight - offsets;
+
+          const clamp = (value, lower, upper) => {
+            if (lower > value) return lower;
+            if (upper < value) return upper;
+            return value;
+          };
 
           const lines = clamp(
             Math.round(height / lineHeight),

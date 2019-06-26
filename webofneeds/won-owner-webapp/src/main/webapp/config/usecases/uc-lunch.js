@@ -6,7 +6,7 @@ import {
 import { getIn } from "../../app/utils.js";
 import { Generator } from "sparqljs";
 import won from "../../app/service/won.js";
-import { findLatestIntervallEndInJsonLdOrNowAndAddMillis } from "../../app/won-utils.js";
+import * as wonUtils from "../../app/won-utils.js";
 
 window.SparqlGenerator4dbg = Generator;
 
@@ -14,13 +14,13 @@ export const lunchPlan = {
   identifier: "lunchPlan",
   label: "Plan Lunch!",
   icon: "#ico36_uc_meal-half",
-  doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
+  doNotMatchAfter: wonUtils.findLatestIntervallEndInJsonLdOrNowAndAddMillis,
   draft: {
     ...mergeInEmptyDraft({
       content: {
         type: ["s:PlanAction"],
         title: "Let's go get lunch!",
-        eventObject: "http://dbpedia.org/resource/Lunch",
+        eventObjectAboutUris: "http://dbpedia.org/resource/Lunch",
         sockets: {
           "#groupSocket": won.GROUP.GroupSocketCompacted,
           "#holdableSocket": won.HOLD.HoldableSocketCompacted,
@@ -103,7 +103,7 @@ export const lunchInterest = {
       },
       seeks: {
         type: ["s:PlanAction"],
-        eventObject: "http://dbpedia.org/resource/Lunch",
+        eventObjectAboutUris: "http://dbpedia.org/resource/Lunch",
       },
     }),
   },

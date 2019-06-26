@@ -2,14 +2,14 @@
  * Created by fsuda on 18.09.2018.
  */
 import { details, mergeInEmptyDraft } from "../detail-definitions.js";
-import { findLatestIntervallEndInJsonLdOrNowAndAddMillis } from "../../app/won-utils.js";
+import * as wonUtils from "../../app/won-utils.js";
 
 export const complain = {
   identifier: "complain",
   label: "Complain about something",
   icon: "#ico36_uc_wtf",
   timeToLiveMillisDefault: 1000 * 60 * 60 * 24 * 30,
-  doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
+  doNotMatchAfter: wonUtils.findLatestIntervallEndInJsonLdOrNowAndAddMillis,
   draft: {
     ...mergeInEmptyDraft({
       content: {

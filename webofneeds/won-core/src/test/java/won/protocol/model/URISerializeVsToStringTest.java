@@ -46,9 +46,9 @@ public class URISerializeVsToStringTest {
             writeWatch.suspend();
             stopWatch.suspend();
         }
-        System.out.println("test1 took " + stopWatch.getTime() + " millis");
-        System.out.println("write test2 took " + writeWatch.getTime() + " millis");
-        System.out.println("read test2 took " + readWatch.getTime() + " millis");
+        // System.out.println("test1 took " + stopWatch.getTime() + " millis");
+        // System.out.println("write test2 took " + writeWatch.getTime() + " millis");
+        // System.out.println("read test2 took " + readWatch.getTime() + " millis");
         readWatch.reset();
         readWatch.start();
         readWatch.suspend();
@@ -76,8 +76,8 @@ public class URISerializeVsToStringTest {
             readWatch.suspend();
             stopWatch.suspend();
         }
-        System.out.println("test2 took " + stopWatch.getTime() + " millis");
-        System.out.println("write test2 took " + writeWatch.getTime() + " millis");
-        System.out.println("read test2 took " + readWatch.getTime() + " millis");
+        // System.out.println("test2 took " + stopWatch.getTime() + " millis");
+        // System.out.println("write test2 took " + writeWatch.getTime() + " millis");
+        // System.out.println("read test2 took " + readWatch.getTime() + " millis");
     }
 }

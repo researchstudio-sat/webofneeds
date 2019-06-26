@@ -6,7 +6,7 @@ import {
 import won from "../../app/service/won.js";
 import { getIn } from "../../app/utils.js";
 import { Generator } from "sparqljs";
-import { findLatestIntervallEndInJsonLdOrNowAndAddMillis } from "../../app/won-utils.js";
+import * as wonUtils from "../../app/won-utils.js";
 
 window.SparqlGenerator4dbg = Generator;
 
@@ -14,13 +14,13 @@ export const cyclingPlan = {
   identifier: "cyclingPlan",
   label: "Plan a Ride!",
   icon: "#ico36_uc_cycling_cropped",
-  doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
+  doNotMatchAfter: wonUtils.findLatestIntervallEndInJsonLdOrNowAndAddMillis,
   draft: {
     ...mergeInEmptyDraft({
       content: {
         type: ["s:PlanAction"],
         title: "Let's go for a bike ride!",
-        eventObject: "http://dbpedia.org/resource/Cycling",
+        eventObjectAboutUris: "http://dbpedia.org/resource/Cycling",
         sockets: {
           "#groupSocket": won.GROUP.GroupSocketCompacted,
           "#holdableSocket": won.HOLD.HoldableSocketCompacted,
@@ -66,6 +66,8 @@ export const cyclingPlan = {
         buddy: won.defaultContext["buddy"],
         hold: won.defaultContext["hold"],
         s: won.defaultContext["s"],
+        demo: won.defaultContext["demo"],
+        match: won.defaultContext["match"],
       },
       distinct: true,
       variables: [resultName, "?score"],
@@ -101,7 +103,7 @@ export const cyclingInterest = {
       },
       seeks: {
         type: ["s:PlanAction"],
-        eventObject: "http://dbpedia.org/resource/Cycling",
+        eventObjectAboutUris: "http://dbpedia.org/resource/Cycling",
       },
     }),
   },
@@ -126,6 +128,7 @@ export const cyclingInterest = {
         s: won.defaultContext["s"],
         won: won.defaultContext["won"],
         con: won.defaultContext["con"],
+        demo: won.defaultContext["demo"],
       },
       geoCoordinates: getIn(draft, ["content", "location"]),
     });

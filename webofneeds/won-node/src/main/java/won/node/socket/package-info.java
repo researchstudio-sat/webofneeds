@@ -8,8 +8,4 @@
  * KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-/**
- * Deprecated package, needs to be refactored.
- */
-@Deprecated
 package won.node.socket;

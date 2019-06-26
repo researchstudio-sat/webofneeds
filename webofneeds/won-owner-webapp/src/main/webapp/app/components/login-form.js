@@ -2,14 +2,16 @@
  * Created by ksinger on 01.09.2017.
  */
 import angular from "angular";
-import { attach, get, getIn } from "../utils.js";
+import { get, getIn } from "../utils.js";
+import { attach } from "../cstm-ng-utils.js";
 import { actionCreators } from "../actions/actions.js";
-import { connect2Redux, parseRestErrorMessage } from "../won-utils.js";
+import { parseRestErrorMessage } from "../won-utils.js";
+import { connect2Redux } from "../configRedux.js";
 import won from "../won-es6.js";
 import "angular-marked";
 import "~/style/_won-markdown.scss";
 
-import * as accountUtils from "../account-utils.js";
+import * as accountUtils from "../redux/utils/account-utils.js";
 
 function genLoginConf() {
   let template = `

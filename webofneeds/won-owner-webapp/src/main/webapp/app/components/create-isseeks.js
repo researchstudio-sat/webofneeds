@@ -2,7 +2,8 @@ import angular from "angular";
 
 import "ng-redux";
 import won from "../won-es6.js";
-import { attach, clone, delay, dispatchEvent } from "../utils.js";
+import { clone, delay, dispatchEvent } from "../utils.js";
+import { attach } from "../cstm-ng-utils.js";
 
 import "~/style/_create-isseeks.scss";
 

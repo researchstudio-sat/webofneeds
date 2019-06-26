@@ -1,7 +1,7 @@
 import Immutable from "immutable";
 import won from "../../won-es6.js";
 import * as useCaseUtils from "../../usecase-utils.js";
-import { isSearchAtom, isPersona } from "../../atom-utils.js";
+import { isSearchAtom, isPersona } from "../../redux/utils/atom-utils.js";
 import {
   generateHexColor,
   generateRgbColorArray,
@@ -23,16 +23,16 @@ export function parseAtom(jsonldAtom) {
       nodeUri: jsonldAtomImm.getIn(["won:wonNode", "@id"]),
       state: extractState(jsonldAtomImm),
       heldBy: won.parseFrom(jsonldAtomImm, ["hold:heldBy"], "xsd:ID"),
-      holds:
-        won.parseListFrom(jsonldAtomImm, ["hold:holds"], "xsd:ID") ||
-        Immutable.List(),
-      buddies:
-        won.parseListFrom(jsonldAtomImm, ["buddy:buddy"], "xsd:ID") ||
-        Immutable.List(),
+      holds: Immutable.Set(
+        won.parseListFrom(jsonldAtomImm, ["hold:holds"], "xsd:ID")
+      ),
+      buddies: Immutable.Set(
+        won.parseListFrom(jsonldAtomImm, ["buddy:buddy"], "xsd:ID")
+      ),
       rating: extractRating(jsonldAtomImm),
-      groupMembers:
-        won.parseListFrom(jsonldAtomImm, ["group:groupMember"], "xsd:ID") ||
-        Immutable.List(),
+      groupMembers: Immutable.Set(
+        won.parseListFrom(jsonldAtomImm, ["group:groupMember"], "xsd:ID")
+      ),
       content: generateContent(jsonldAtomImm, detailsToParse),
       seeks: generateContent(jsonldAtomImm.get("match:seeks"), detailsToParse),
       creationDate: extractCreationDate(jsonldAtomImm),
@@ -45,7 +45,7 @@ export function parseAtom(jsonldAtom) {
         enabledUseCases: undefined,
         reactionUseCases: undefined,
       },
-      background: generateBackground(jsonldAtomImm),
+      background: generateBackground(get(jsonldAtomImm, "@id")),
       unread: false,
       isBeingCreated: false,
       jsonld: jsonldAtom,
@@ -61,27 +61,24 @@ export function parseAtom(jsonldAtom) {
     }
 
     let parsedAtomImm = Immutable.fromJS(parsedAtom);
+    const matchingUseCase = useCaseUtils.findUseCaseByAtom(parsedAtomImm);
 
-    if (!isPersona(parsedAtomImm)) {
-      const matchingUseCase = useCaseUtils.findUseCaseByAtom(parsedAtomImm);
-
-      if (matchingUseCase) {
-        parsedAtomImm = parsedAtomImm
-          .setIn(["matchedUseCase", "identifier"], matchingUseCase.identifier)
-          .setIn(["matchedUseCase", "icon"], matchingUseCase.icon)
-          .setIn(
-            ["matchedUseCase", "enabledUseCases"],
-            matchingUseCase.enabledUseCases
-              ? Immutable.fromJS(matchingUseCase.enabledUseCases)
-              : Immutable.List()
-          )
-          .setIn(
-            ["matchedUseCase", "reactionUseCases"],
-            matchingUseCase.reactionUseCases
-              ? Immutable.fromJS(matchingUseCase.reactionUseCases)
-              : Immutable.List()
-          );
-      }
+    if (matchingUseCase) {
+      parsedAtomImm = parsedAtomImm
+        .setIn(["matchedUseCase", "identifier"], matchingUseCase.identifier)
+        .setIn(["matchedUseCase", "icon"], matchingUseCase.icon)
+        .setIn(
+          ["matchedUseCase", "enabledUseCases"],
+          matchingUseCase.enabledUseCases
+            ? Immutable.fromJS(matchingUseCase.enabledUseCases)
+            : Immutable.List()
+        )
+        .setIn(
+          ["matchedUseCase", "reactionUseCases"],
+          matchingUseCase.reactionUseCases
+            ? Immutable.fromJS(matchingUseCase.reactionUseCases)
+            : Immutable.List()
+        );
     }
 
     parsedAtomImm = parsedAtomImm.set(
@@ -109,12 +106,26 @@ export function parseAtom(jsonldAtom) {
 export function parseMetaAtom(metaAtom) {
   const metaAtomImm = Immutable.fromJS(metaAtom);
 
+  const extractEventObjectAboutUris = eventObjectUris =>
+    eventObjectUris &&
+    Immutable.Set(
+      eventObjectUris.map(eventObjectUri =>
+        eventObjectUri
+          .replace("https://w3id.org/won/core#", "won:")
+          .replace("https://w3id.org/won/content#", "con:")
+          .replace("https://w3id.org/won/ext/demo#", "demo:")
+          .replace("http://schema.org/", "s:")
+      )
+    );
+
   const extractTypes = types =>
     types &&
     Immutable.Set(
       types.map(type =>
         type
           .replace("https://w3id.org/won/core#", "won:")
+          .replace("https://w3id.org/won/content#", "con:")
+          .replace("https://w3id.org/won/ext/demo#", "demo:")
           .replace("http://schema.org/", "s:")
       )
     );
@@ -123,6 +134,8 @@ export function parseMetaAtom(metaAtom) {
     flags.map(flag =>
       flag
         .replace("https://w3id.org/won/core#", "won:")
+        .replace("https://w3id.org/won/content#", "con:")
+        .replace("https://w3id.org/won/ext/demo#", "demo:")
         .replace("http://schema.org/", "s:")
     );
   const extractLocation = location =>
@@ -147,15 +160,28 @@ export function parseMetaAtom(metaAtom) {
   if (metaAtomImm) {
     let parsedMetaAtom = {
       uri: get(metaAtomImm, "uri"),
+      identiconSvg: undefined,
+      nodeUri: undefined,
       state: extractStateFromMeta(get(metaAtomImm, "state")),
+      heldBy: get(metaAtomImm, "heldBy"),
+      holds: Immutable.Set(get(metaAtomImm, "holds")),
+      buddies: Immutable.Set(),
+      rating: undefined,
+      groupMembers: Immutable.Set(),
       content: {
         type: extractTypes(get(metaAtomImm, "types")),
         flags: extractFlags(get(metaAtomImm, "flags")),
         location: extractLocation(get(metaAtomImm, "location")),
         jobLocation: extractLocation(get(metaAtomImm, "jobLocation")),
+        eventObjectAboutUris: extractEventObjectAboutUris(
+          get(metaAtomImm, "eventObjectAboutUris")
+        ),
       },
       seeks: {
         type: extractTypes(get(metaAtomImm, "seeksTypes")),
+        eventObjectAboutUris: extractEventObjectAboutUris(
+          get(metaAtomImm, "seeksEventObjectAboutUris")
+        ),
       },
       modifiedDate:
         get(metaAtomImm, "modifiedDate") &&
@@ -163,6 +189,21 @@ export function parseMetaAtom(metaAtom) {
       creationDate:
         get(metaAtomImm, "creationDate") &&
         new Date(get(metaAtomImm, "creationDate")),
+      lastUpdateDate:
+        get(metaAtomImm, "creationDate") &&
+        new Date(get(metaAtomImm, "creationDate")),
+      humanReadable: undefined,
+      matchedUseCase: {
+        identifier: undefined,
+        icon: undefined,
+        enabledUseCases: undefined,
+        reactionUseCases: undefined,
+      },
+      background: generateBackground(get(metaAtomImm, "uri")),
+      unread: false,
+      isBeingCreated: false,
+      jsonld: undefined,
+      connections: Immutable.Map(),
     };
 
     if (
@@ -170,7 +211,28 @@ export function parseMetaAtom(metaAtom) {
       parsedMetaAtom.modifiedDate &&
       parsedMetaAtom.creationDate
     ) {
-      return Immutable.fromJS(parsedMetaAtom);
+      const parsedAtomImm = Immutable.fromJS(parsedMetaAtom);
+      const matchingUseCase = useCaseUtils.findUseCaseByAtom(parsedAtomImm);
+
+      if (matchingUseCase) {
+        return parsedAtomImm
+          .setIn(["matchedUseCase", "identifier"], matchingUseCase.identifier)
+          .setIn(["matchedUseCase", "icon"], matchingUseCase.icon)
+          .setIn(
+            ["matchedUseCase", "enabledUseCases"],
+            matchingUseCase.enabledUseCases
+              ? Immutable.fromJS(matchingUseCase.enabledUseCases)
+              : Immutable.List()
+          )
+          .setIn(
+            ["matchedUseCase", "reactionUseCases"],
+            matchingUseCase.reactionUseCases
+              ? Immutable.fromJS(matchingUseCase.reactionUseCases)
+              : Immutable.List()
+          );
+      }
+
+      return parsedAtomImm;
     } else {
       console.error(
         "Cant parse metaAtom, data is an invalid atom-object: ",
@@ -240,9 +302,7 @@ function generateIdenticon(atomJsonLd) {
   return idc.toString();
 }
 
-function generateBackground(atomJsonLd) {
-  const atomUri = atomJsonLd.get("@id");
-
+function generateBackground(atomUri) {
   if (!atomUri) {
     return;
   }

@@ -4,17 +4,17 @@
 
 import angular from "angular";
 import Immutable from "immutable";
-import { attach, getIn, get } from "../utils.js";
+import { getIn, get } from "../utils.js";
 import { labels } from "../won-label-utils.js";
-import { connect2Redux } from "../won-utils.js";
-import * as atomUtils from "../atom-utils.js";
-import * as viewUtils from "../view-utils.js";
-import * as processUtils from "../process-utils.js";
-import * as connectionSelectors from "../selectors/connection-selectors.js";
-import * as generalSelectors from "../selectors/general-selectors.js";
-import * as connectionUtils from "../connection-utils.js";
+import { connect2Redux } from "../configRedux.js";
+import * as atomUtils from "../redux/utils/atom-utils.js";
+import * as viewUtils from "../redux/utils/view-utils.js";
+import * as processUtils from "../redux/utils/process-utils.js";
+import * as connectionSelectors from "../redux/selectors/connection-selectors.js";
+import * as generalSelectors from "../redux/selectors/general-selectors.js";
+import * as connectionUtils from "../redux/utils/connection-utils.js";
 import { actionCreators } from "../actions/actions.js";
-import { classOnComponentRoot } from "../cstm-ng-utils.js";
+import { attach, classOnComponentRoot } from "../cstm-ng-utils.js";
 
 import "~/style/_post-menu.scss";
 
@@ -29,7 +29,7 @@ function genComponentConf() {
               <span class="post-menu__item__label">Detail</span>
             </div>
             <div class="post-menu__item"
-              ng-if="self.hasHeldBy"
+              ng-if="self.isHeld"
               ng-click="self.selectTab('HELDBY')"
               ng-class="{
                 'post-menu__item--selected': self.isSelectedTab('HELDBY'),
@@ -38,7 +38,7 @@ function genComponentConf() {
               <span class="post-menu__item__rating" ng-if="self.personaAggregateRatingString">(★ {{ self.personaAggregateRatingString }})</span>
             </div>
             <div class="post-menu__item"
-              ng-if="!self.hasHeldBy && self.isHoldable && self.isOwned"
+              ng-if="!self.isHeld && self.isHoldable && self.isOwned"
               ng-click="self.selectTab('HELDBY')"
               ng-class="{
                 'post-menu__item--selected': self.isSelectedTab('HELDBY'),
@@ -83,20 +83,23 @@ function genComponentConf() {
               ng-if="self.hasHolderSocket"
               ng-click="self.selectTab('HOLDS')"
               ng-class="{
+                'post-menu__item--unread': self.hasUnreadSuggestedConnectionsInHeldAtoms,
                 'post-menu__item--selected': self.isSelectedTab('HOLDS'),
                 'post-menu__item--inactive': !self.hasHeldPosts
               }">
-              <span class="post-menu__item__label">Posts of this Persona</span>
+              <span class="post-menu__item__unread"></span>
+              <span class="post-menu__item__label">Posts</span>
               <span class="post-menu__item__count">({{self.heldPostsSize}})</span>
             </div>
             <div class="post-menu__item"
               ng-if="self.hasBuddySocket"
               ng-click="self.selectTab('BUDDIES')"
               ng-class="{
-                'post-menu__item--unread': self.hasBuddyRequests,
+                'post-menu__item--unread': self.hasUnreadBuddyConnections,
                 'post-menu__item--selected': self.isSelectedTab('BUDDIES'),
                 'post-menu__item--inactive': !self.hasBuddies
               }">
+              <span class="post-menu__item__unread"></span>
               <span class="post-menu__item__label">Buddies</span>
               <span class="post-menu__item__count">({{self.buddyCount}})</span>
             </div>
@@ -162,13 +165,15 @@ function genComponentConf() {
               )
           );
 
-        //TODO: BLARGH GROUPCHATCONN FILTER
-
         const heldPosts = hasHolderSocket && get(post, "holds");
-        const heldByUri =
-          atomUtils.hasHoldableSocket(post) && get(post, "heldBy");
-        const hasHeldBy = !!heldByUri; //aka Persona that holds this post
-        const persona = hasHeldBy && getIn(state, ["atoms", heldByUri]);
+
+        const hasUnreadSuggestedConnectionsInHeldAtoms = generalSelectors.hasUnreadSuggestedConnectionsInHeldAtoms(
+          state,
+          this.postUri
+        );
+        const heldByUri = atomUtils.getHeldByUri(post);
+        const isHeld = atomUtils.isHeld(post);
+        const persona = getIn(state, ["atoms", heldByUri]);
         const personaHasReviewSocket = atomUtils.hasReviewSocket(persona);
         const personaAggregateRating =
           personaHasReviewSocket &&
@@ -187,7 +192,7 @@ function genComponentConf() {
             state,
             this.postUri,
             true,
-            true
+            false
           );
 
         const buddies = isOwned
@@ -206,21 +211,20 @@ function genComponentConf() {
           isPersona,
           isHoldable: atomUtils.hasHoldableSocket(post),
           isOwned,
-          hasHeldBy,
+          isHeld,
           personaHasReviewSocket,
           personaAggregateRatingString:
             personaAggregateRating && personaAggregateRating.toFixed(1),
           hasHeldPosts: heldPostsSize > 0,
+          hasUnreadSuggestedConnectionsInHeldAtoms,
           heldPostsSize,
           hasHolderSocket,
           hasGroupSocket,
           hasReviewSocket,
           hasBuddySocket,
-          hasBuddyRequests:
+          hasUnreadBuddyConnections:
             !!buddyConnections &&
-            !!buddyConnections.find(conn =>
-              connectionUtils.isRequestReceived(conn)
-            ),
+            !!buddyConnections.find(conn => connectionUtils.isUnread(conn)),
           hasBuddies: buddyConnections
             ? buddyConnections.size > 0
             : buddies

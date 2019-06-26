@@ -7,12 +7,13 @@ import labelledHrModule from "./labelled-hr.js";
 
 import "ng-redux";
 import Immutable from "immutable";
-import { attach, get } from "../utils.js";
+import { get } from "../utils.js";
+import { attach } from "../cstm-ng-utils.js";
 import { actionCreators } from "../actions/actions.js";
-import { connect2Redux } from "../won-utils.js";
-import * as generalSelectors from "../selectors/general-selectors.js";
+import { connect2Redux } from "../configRedux.js";
+import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as useCaseUtils from "../usecase-utils.js";
-import * as accountUtils from "../account-utils.js";
+import * as accountUtils from "../redux/utils/account-utils.js";
 
 import "~/style/_usecase-picker.scss";
 

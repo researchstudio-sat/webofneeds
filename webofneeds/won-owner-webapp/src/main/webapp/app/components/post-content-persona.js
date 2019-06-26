@@ -4,11 +4,12 @@
 
 import angular from "angular";
 import Immutable from "immutable";
-import { attach, get, getIn } from "../utils.js";
-import { connect2Redux } from "../won-utils.js";
-import * as generalSelectors from "../selectors/general-selectors.js";
-import * as atomUtils from "../atom-utils.js";
-import * as processUtils from "../process-utils.js";
+import { get, getIn } from "../utils.js";
+import { attach } from "../cstm-ng-utils.js";
+import { connect2Redux } from "../configRedux.js";
+import * as generalSelectors from "../redux/selectors/general-selectors.js";
+import * as atomUtils from "../redux/utils/atom-utils.js";
+import * as processUtils from "../redux/utils/process-utils.js";
 import { actionCreators } from "../actions/actions.js";
 import squareImageModule from "./square-image.js";
 import descriptionDetailViewerModule from "./details/viewer/description-viewer.js";
@@ -18,7 +19,7 @@ import { Elm } from "../../elm/RatingView.elm";
 import elmModule from "./elm.js";
 
 import "~/style/_post-content-persona.scss";
-import { getOwnedConnectionByUri } from "../selectors/connection-selectors.js";
+import { getOwnedConnectionByUri } from "../redux/selectors/connection-selectors.js";
 
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
@@ -80,12 +81,12 @@ function genComponentConf() {
 
         const ratingConnectionUri =
           get(connection, "targetAtomUri") == this.holdsUri &&
-          get(ownAtom, "heldBy")
+          atomUtils.isHeld(ownAtom)
             ? connectionUri
             : null;
 
         const post = this.holdsUri && getIn(state, ["atoms", this.holdsUri]);
-        const personaUri = get(post, "heldBy");
+        const personaUri = atomUtils.getHeldByUri(post);
         const persona = post ? getIn(state, ["atoms", personaUri]) : undefined;
 
         const personaHasHolderSocket = atomUtils.hasHolderSocket(persona);
@@ -142,9 +143,8 @@ function genComponentConf() {
       this.atoms__selectTab(
         Immutable.fromJS({ atomUri: this.personaUri, selectTab: "HOLDS" })
       );
-      this.router__stateGoCurrent({
-        viewAtomUri: this.personaUri,
-        viewConnUri: undefined,
+      this.router__stateGo("post", {
+        postUri: this.personaUri,
       });
     }
 
@@ -152,9 +152,8 @@ function genComponentConf() {
       this.atoms__selectTab(
         Immutable.fromJS({ atomUri: this.personaUri, selectTab: "BUDDIES" })
       );
-      this.router__stateGoCurrent({
-        viewAtomUri: this.personaUri,
-        viewConnUri: undefined,
+      this.router__stateGo("post", {
+        postUri: this.personaUri,
       });
     }
 
@@ -162,9 +161,8 @@ function genComponentConf() {
       this.atoms__selectTab(
         Immutable.fromJS({ atomUri: this.personaUri, selectTab: "REVIEWS" })
       );
-      this.router__stateGoCurrent({
-        viewAtomUri: this.personaUri,
-        viewConnUri: undefined,
+      this.router__stateGo("post", {
+        postUri: this.personaUri,
       });
     }
   }

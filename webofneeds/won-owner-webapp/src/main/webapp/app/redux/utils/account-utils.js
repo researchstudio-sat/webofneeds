@@ -2,7 +2,7 @@
  * Created by fsuda on 19.03.2019.
  */
 
-import { get, getIn } from "./utils.js";
+import { get, getIn } from "../../utils.js";
 
 /**
  * Determines if a there is currently a user logged in or not
