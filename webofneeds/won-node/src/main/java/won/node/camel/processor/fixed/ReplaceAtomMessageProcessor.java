@@ -13,6 +13,8 @@ import java.util.stream.Stream;
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.apache.jena.query.Dataset;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
 import org.springframework.stereotype.Service;
 
 import won.node.camel.processor.AbstractCamelProcessor;
@@ -76,6 +78,10 @@ public class ReplaceAtomMessageProcessor extends AbstractCamelProcessor {
         // store the atom content
         URI messageURI = wonMessage.getMessageURI();
         DatasetHolder datasetHolder = atom.getDatatsetHolder();
+        // get the derived data, we don't change that here
+        Dataset atomDataset = atom.getDatatsetHolder().getDataset();
+        Optional<Model> derivationModel = Optional
+                        .ofNullable(atomDataset.getNamedModel(atom.getAtomURI() + "#derivedData"));
         // replace attachments
         List<DatasetHolder> attachments = new ArrayList<>(attachmentHolders.size());
         for (WonMessage.AttachmentHolder attachmentHolder : attachmentHolders) {
@@ -107,6 +113,9 @@ public class ReplaceAtomMessageProcessor extends AbstractCamelProcessor {
         socketRepository.save(newSocketEntities);
         socketRepository.save(changedSockets);
         socketRepository.delete(removedSockets);
+        if (derivationModel.isPresent()) {
+            atomContent.addNamedModel(atom.getAtomURI().toString() + "#derivedData", derivationModel.get());
+        }
         datasetHolder.setDataset(atomContent);
         atom.setDatatsetHolder(datasetHolder);
         atom.setAttachmentDatasetHolders(attachments);
