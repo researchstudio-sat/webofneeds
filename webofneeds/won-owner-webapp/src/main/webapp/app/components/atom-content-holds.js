@@ -10,7 +10,7 @@ import { connect2Redux } from "../configRedux.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import { actionCreators } from "../actions/actions.js";
 import ngAnimate from "angular-animate";
-
+import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import "~/style/_atom-content-holds.scss";
 
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
@@ -23,7 +23,7 @@ function genComponentConf() {
           ng-repeat="heldAtomUri in self.heldAtomUrisArray track by heldAtomUri"
           ng-click="self.router__stateGo('post', { postUri: heldAtomUri })"
           ng-if="self.hasHeldAtoms"
-          show-suggestions="::true"
+          show-suggestions="self.isOwned"
           show-persona="::false"
       ></won-atom-card>
       <div class="ach__empty"
@@ -42,6 +42,7 @@ function genComponentConf() {
         const heldAtomUris = atomUtils.getHeldAtomUris(atom);
 
         return {
+          isOwned: generalSelectors.isAtomOwned(state, this.atomUri),
           hasHeldAtoms: atomUtils.hasHeldAtoms(atom),
           heldAtomUrisArray: heldAtomUris && heldAtomUris.toArray(),
         };
