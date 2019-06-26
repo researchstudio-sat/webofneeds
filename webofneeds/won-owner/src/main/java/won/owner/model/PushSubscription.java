@@ -2,21 +2,41 @@ package won.owner.model;
 
 import nl.martijndwars.webpush.Subscription;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
+import javax.persistence.*;
+import java.util.Date;
 import java.util.Objects;
 
 @Entity
-@Table(name = "pushSubscriptions", uniqueConstraints = @UniqueConstraint(columnNames = { "endpoint" }))
+@Table(name = "pushSubscriptions", uniqueConstraints = { @UniqueConstraint(columnNames = { "user_id", "endpoint" }) })
 public class PushSubscription {
     @Id
+    @GeneratedValue
+    @Column(name = "id")
+    private Long id;
+    @Column(nullable = false)
     private String endpoint;
+    @Column(nullable = false)
     private String key;
+    @Column(nullable = false)
     private String auth;
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(nullable = false)
+    private Date updated;
 
     public PushSubscription() {
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        updated = new Date();
+    }
+
+    protected void updateDate() {
+        updated = new Date();
+    }
+
+    public String getEndpoint() {
+        return endpoint;
     }
 
     public PushSubscription(Subscription subscription) {
@@ -36,11 +56,11 @@ public class PushSubscription {
         if (o == null || getClass() != o.getClass())
             return false;
         PushSubscription that = (PushSubscription) o;
-        return endpoint.equals(that.endpoint);
+        return id == that.id;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(endpoint);
+        return Objects.hash(id);
     }
 }

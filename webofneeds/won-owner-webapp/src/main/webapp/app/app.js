@@ -68,51 +68,7 @@ window.won = won;
 import { runMessagingAgent } from "./messaging-agent.js";
 
 import detailModules from "./components/details/details.js";
-
-//import serviceWorkerRuntime from "serviceworker-webpack-plugin/lib/runtime";
-
-function base64UrlToUint8Array(base64UrlData) {
-  const padding = "=".repeat((4 - (base64UrlData.length % 4)) % 4);
-  const base64 = (base64UrlData + padding)
-    .replace(/-/g, "+")
-    .replace(/_/g, "/");
-
-  const rawData = atob(base64);
-  const buffer = new Uint8Array(rawData.length);
-
-  for (const i of buffer.keys()) {
-    buffer[i] = rawData.charCodeAt(i);
-  }
-
-  return buffer;
-}
-
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("../sw.js");
-  (async function() {
-    console.log("starting reg");
-    const reg = await navigator.serviceWorker.ready;
-    console.log(reg);
-    const pushKeyResponse = await fetch("/owner/appConfig/getWebPushKey");
-    const pushKey = base64UrlToUint8Array(await pushKeyResponse.json());
-    console.log(pushKey);
-    const pushReg = await reg.pushManager.subscribe({
-      userVisibleOnly: true,
-      applicationServerKey: pushKey,
-    });
-    await fetch("/owner/rest/users/subscribeNotifications", {
-      body: JSON.stringify(pushReg.toJSON()),
-      method: "POST",
-      headers: new Headers({
-        "Content-Type": "application/json",
-      }),
-      credentials: "include",
-    });
-    console.log(pushReg);
-  })().then(() => {
-    console.log("done");
-  });
-}
+import { runPushAgent } from "./push-agent";
 
 let app = angular.module("won.owner", [
   /* to enable legacy $stateChange* events in ui-router (see
@@ -194,6 +150,8 @@ app.config(configRouting).config([
   },
 ]);
 app.run(["$ngRedux", $ngRedux => runMessagingAgent($ngRedux)]);
+
+app.run(["$ngRedux", $ngRedux => runPushAgent($ngRedux)]);
 
 app.run([
   "$ngRedux",

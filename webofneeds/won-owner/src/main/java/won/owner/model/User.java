@@ -294,7 +294,11 @@ public class User implements UserDetails, Persistable<Long> {
     }
 
     public void addPushSubscription(PushSubscription subscription) {
-        pushSubscriptions.add(subscription);
+        PushSubscription currentSub = pushSubscriptions.stream()
+                        .filter(sub -> sub.getEndpoint().equals(subscription.getEndpoint())).findAny()
+                        .orElse(subscription);
+        currentSub.updateDate();
+        pushSubscriptions.add(currentSub);
     }
 
     public Iterable<PushSubscription> getPushSubscriptions() {

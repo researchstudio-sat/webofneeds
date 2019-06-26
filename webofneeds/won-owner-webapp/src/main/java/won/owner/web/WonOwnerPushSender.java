@@ -8,6 +8,7 @@ import org.jose4j.lang.JoseException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
+import won.owner.model.User;
 
 import javax.annotation.PostConstruct;
 import java.io.*;
@@ -44,6 +45,16 @@ public class WonOwnerPushSender {
 
     public PublicKey getPublicKey() {
         return pushService.getPublicKey();
+    }
+
+    public void sendNotification(User user, String payload) {
+        user.getPushSubscriptions().forEach(subscription -> {
+            try {
+                sendNotification(new Notification(subscription.toSubscription(), payload));
+            } catch (InvalidKeySpecException | NoSuchProviderException | NoSuchAlgorithmException e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
     public void sendNotification(Notification notification) {
