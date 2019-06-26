@@ -78,8 +78,8 @@ function genComponentConf() {
           <won-post-is-or-seeks-info branch="::'seeks'" ng-if="self.isSelectedTab('DETAIL') && self.hasSeeksBranch" post-uri="self.postUri"></won-post-is-or-seeks-info>
 
           <!-- PERSONA INFORMATION -->
-          <won-post-content-persona ng-if="self.isSelectedTab('HELDBY') && self.post.get('heldBy')" holds-uri="self.postUri"></won-post-content-persona>
-          <won-elm module="self.addPersonaModule" ng-if="self.isSelectedTab('HELDBY') && self.isOwned && self.hasHoldableSocket && !self.post.get('heldBy')" props="{post: self.post.toJS(), personas: self.personas.toJS()}"></won-elm>
+          <won-post-content-persona ng-if="self.isSelectedTab('HELDBY') && self.isHeld" holds-uri="self.postUri"></won-post-content-persona>
+          <won-elm module="self.addPersonaModule" ng-if="self.isSelectedTab('HELDBY') && self.isOwned && self.isActive && self.hasHoldableSocket && !self.isHeld" props="{post: self.post.toJS(), personas: self.personas.toJS()}"></won-elm>
           
           <!-- PARTICIPANT INFORMATION -->
           <won-atom-content-participants ng-if="self.isSelectedTab('PARTICIPANTS')" atom-uri="self.postUri"></won-atom-content-participants>
@@ -138,6 +138,7 @@ function genComponentConf() {
         const openConnectionUri = getConnectionUriFromRoute(state);
         const post = getIn(state, ["atoms", this.postUri]);
         const isOwned = isAtomOwned(state, this.postUri);
+        const isActive = atomUtils.isActive(post);
         const content = get(post, "content");
 
         //TODO it will be possible to have more than one seeks
@@ -154,6 +155,8 @@ function genComponentConf() {
           hasSeeksBranch,
           post,
           isOwned,
+          isActive,
+          isHeld: atomUtils.isHeld(post),
           hasChatSocket: atomUtils.hasChatSocket(post),
           hasHoldableSocket: atomUtils.hasHoldableSocket(post),
           postLoading:
