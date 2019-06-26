@@ -2,11 +2,12 @@
  * Created by ksinger on 20.08.2015.
  */
 import angular from "angular";
-import { attach, get } from "../utils.js";
+import { get } from "../utils.js";
+import { attach } from "../cstm-ng-utils.js";
 import { actionCreators } from "../actions/actions.js";
-import { connect2Redux } from "../won-utils.js";
+import { connect2Redux } from "../configRedux.js";
 
-import * as accountUtils from "../account-utils.js";
+import * as accountUtils from "../redux/utils/account-utils.js";
 
 function genComponentConf() {
   let template = `

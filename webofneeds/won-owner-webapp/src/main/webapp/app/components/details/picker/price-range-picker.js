@@ -1,5 +1,6 @@
 import angular from "angular";
-import { getIn, attach, delay, isValidNumber } from "../../../utils.js";
+import { getIn, delay, isValidNumber } from "../../../utils.js";
+import { attach } from "../../../cstm-ng-utils.js";
 import wonInput from "../../../directives/input.js";
 
 import "~/style/_pricerangepicker.scss";

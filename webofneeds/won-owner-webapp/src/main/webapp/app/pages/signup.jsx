@@ -5,13 +5,14 @@
  */
 import angular from "angular";
 import ngAnimate from "angular-animate";
-import { attach, get } from "../utils.js";
+import { get } from "../utils.js";
+import { attach } from "../cstm-ng-utils.js";
 import { actionCreators } from "../actions/actions.js";
 
 import labelledHrModule from "../components/labelled-hr.js";
 
-import * as accountUtils from "../account-utils.js";
-import * as viewSelectors from "../selectors/view-selectors.js";
+import * as accountUtils from "../redux/utils/account-utils.js";
+import * as viewSelectors from "../redux/selectors/view-selectors.js";
 import { h } from "preact";
 
 import "~/style/_signup.scss";

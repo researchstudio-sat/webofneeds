@@ -11,7 +11,7 @@ import {
   resetParamsImm,
   addConstParams,
 } from "../configRouting.js";
-import { getCurrentParamsFromRoute } from "../selectors/general-selectors.js";
+import { getCurrentParamsFromRoute } from "../redux/selectors/general-selectors.js";
 
 /**
  * Action-Creator that goes back in the browser history

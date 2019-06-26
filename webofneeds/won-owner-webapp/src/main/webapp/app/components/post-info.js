@@ -9,40 +9,26 @@ import postContentModule from "./post-content.js";
 import postMenuModule from "./post-menu.js";
 import shareDropdownModule from "./share-dropdown.js";
 import chatTextFieldModule from "./chat-textfield.js";
-import { attach, get, getIn } from "../utils.js";
-import { connect2Redux } from "../won-utils.js";
-import * as viewUtils from "../view-utils.js";
-import * as generalSelectors from "../selectors/general-selectors.js";
+import atomHeaderBigModule from "./atom-header-big.js";
+import { get, getIn } from "../utils.js";
+import { connect2Redux } from "../configRedux.js";
+import * as viewUtils from "../redux/utils/view-utils.js";
+import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import { actionCreators } from "../actions/actions.js";
-import { classOnComponentRoot } from "../cstm-ng-utils.js";
+import { classOnComponentRoot, attach } from "../cstm-ng-utils.js";
 
 import { getUseCaseLabel, getUseCaseIcon } from "../usecase-utils.js";
 
 import "~/style/_post-info.scss";
-import * as atomUtils from "../atom-utils.js";
-import * as processSelectors from "../selectors/process-selectors.js";
-import * as accountUtils from "../account-utils.js";
+import * as atomUtils from "../redux/utils/atom-utils.js";
+import * as processSelectors from "../redux/selectors/process-selectors.js";
+import * as accountUtils from "../redux/utils/account-utils.js";
 import Immutable from "immutable";
 
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
   let template = `
-        <div class="post-info__header">
-            <div class="post-info__header__back">
-              <a class="post-info__header__back__button clickable"
-                  ng-click="self.router__back()">
-                  <svg class="post-info__header__back__button__icon clickable hide-in-responsive">
-                      <use xlink:href="#ico36_close" href="#ico36_close"></use>
-                  </svg>
-                  <svg class="post-info__header__back__button__icon clickable show-in-responsive">
-                      <use xlink:href="#ico36_backarrow" href="#ico36_backarrow"></use>
-                  </svg>
-              </a>
-            </div>
-            <won-post-header atom-uri="self.atomUri"></won-post-header>
-            <won-share-dropdown atom-uri="self.atomUri"></won-share-dropdown>
-            <won-post-context-dropdown atom-uri="self.atomUri"></won-post-context-dropdown>
-        </div>
+        <won-atom-header-big atom-uri="self.atomUri"></won-atom-header-big>
         <won-post-menu post-uri="self.atomUri"></won-post-menu>
         <won-post-content post-uri="self.atomUri"></won-post-content>
         <div class="post-info__footer" ng-if="self.showFooter">
@@ -148,7 +134,6 @@ function genComponentConf() {
         useCaseGroup: undefined,
         connectionUri: undefined,
         fromAtomUri: this.atomUri,
-        viewAtomUri: undefined,
         viewConnUri: undefined,
         mode: "CONNECT",
       });
@@ -212,5 +197,6 @@ export default angular
     postContentModule,
     shareDropdownModule,
     chatTextFieldModule,
+    atomHeaderBigModule,
   ])
   .directive("wonPostInfo", genComponentConf).name;

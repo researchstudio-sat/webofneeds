@@ -6,25 +6,22 @@ import won from "../won-es6.js";
 import postMessagesModule from "../components/post-messages.js";
 import groupPostMessagesModule from "../components/group-post-messages.js";
 import connectionsOverviewModule from "../components/connections-overview.js";
-import { attach, getIn, get } from "../utils.js";
+import { getIn, get } from "../utils.js";
+import { attach } from "../cstm-ng-utils.js";
 import { actionCreators } from "../actions/actions.js";
-import * as generalSelectors from "../selectors/general-selectors.js";
-import * as connectionSelectors from "../selectors/connection-selectors.js";
-import * as connectionUtils from "../connection-utils.js";
-import * as viewSelectors from "../selectors/view-selectors.js";
+import * as generalSelectors from "../redux/selectors/general-selectors.js";
+import * as connectionSelectors from "../redux/selectors/connection-selectors.js";
+import * as connectionUtils from "../redux/utils/connection-utils.js";
+import * as viewSelectors from "../redux/selectors/view-selectors.js";
 import { h } from "preact";
 
 import "~/style/_connections.scss";
 import "~/style/_responsiveness-utils.scss";
-import "~/style/_atom-overlay.scss";
 import "~/style/_connection-overlay.scss";
 
 const template = (
   <container>
     <won-modal-dialog ng-if="self.showModalDialog" />
-    <div className="won-modal-atomview" ng-if="self.showAtomOverlay">
-      <won-post-info atom-uri="self.viewAtomUri" />
-    </div>
     <div
       className="won-modal-connectionview"
       ng-if="self.showConnectionOverlay"
@@ -95,7 +92,6 @@ class ConnectionsController {
 
     const selectFromState = state => {
       const viewConnUri = generalSelectors.getViewConnectionUriFromRoute(state);
-      const viewAtomUri = generalSelectors.getViewAtomUriFromRoute(state);
 
       const selectedConnectionUri = generalSelectors.getConnectionUriFromRoute(
         state
@@ -141,9 +137,7 @@ class ConnectionsController {
             connectionUtils.isSuggested(selectedConnection)),
         showSlideIns:
           viewSelectors.hasSlideIns(state) && viewSelectors.showSlideIns(state),
-        showAtomOverlay: !!viewAtomUri,
         showConnectionOverlay: !!viewConnUri,
-        viewAtomUri,
         viewConnUri,
         hasChatAtoms,
         hideListSideInResponsive: !hasChatAtoms || selectedConnection,

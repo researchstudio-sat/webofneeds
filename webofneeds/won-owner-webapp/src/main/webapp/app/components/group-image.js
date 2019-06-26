@@ -11,12 +11,13 @@ import "ng-redux";
 import squareImageModule from "./square-image.js";
 import { actionCreators } from "../actions/actions.js";
 import { labels } from "../won-label-utils.js";
-import { attach, get } from "../utils.js";
-import { connect2Redux } from "../won-utils.js";
+import { get } from "../utils.js";
+import { attach } from "../cstm-ng-utils.js";
+import { connect2Redux } from "../configRedux.js";
 import {
   getOwnedAtomByConnectionUri,
   getAtoms,
-} from "../selectors/general-selectors.js";
+} from "../redux/selectors/general-selectors.js";
 
 import "~/style/_group-image.scss";
 

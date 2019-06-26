@@ -5,12 +5,12 @@
 import won from "../won-es6.js";
 import Immutable from "immutable";
 
-import * as generalSelectors from "../selectors/general-selectors.js";
-import * as atomUtils from "../atom-utils.js";
-import * as ownerApi from "../owner-api.js";
-import { getOwnedConnectionByUri } from "../selectors/connection-selectors.js";
+import * as generalSelectors from "../redux/selectors/general-selectors.js";
+import * as atomUtils from "../redux/utils/atom-utils.js";
+import * as ownerApi from "../api/owner-api.js";
+import { getOwnedConnectionByUri } from "../redux/selectors/connection-selectors.js";
 
-import { get, getIn, urisToLookupSuccessAndFailedMap } from "../utils.js";
+import { get, getIn, is } from "../utils.js";
 
 import { ensureLoggedIn } from "./account-actions";
 
@@ -25,7 +25,7 @@ import {
   buildConnectMessage,
 } from "../won-message-utils.js";
 
-import * as processUtils from "../process-utils.js";
+import * as processUtils from "../redux/utils/process-utils.js";
 
 export function connectionsChatMessageClaimOnSuccess(
   chatMessage,
@@ -290,12 +290,6 @@ export function connectionsOpen(connectionUri, textMessage) {
         optimisticEvent,
       },
     });
-
-    dispatch(
-      actionCreators.router__stateGoAbs("connections", {
-        connectionUri: optimisticEvent.getSenderConnection(),
-      })
-    );
   };
 }
 
@@ -349,7 +343,6 @@ function connectReactionAtom(
         useCase: undefined,
         useCaseGroup: undefined,
         fromAtomUri: undefined,
-        viewAtomUri: undefined,
         viewConnUri: undefined,
         mode: undefined,
       })
@@ -972,4 +965,54 @@ function limitNumberOfEventsToFetchInConnection(
     });
 
   return messagesToFetch;
+}
+
+/**
+ * Takes a single uri or an array of uris, performs the lookup function on each
+ * of them seperately, collects the results and builds an map/object
+ * with the uris as keys and the results as values.
+ * If any call to the asyncLookupFunction fails, the corresponding
+ * key-value-pair will not be contained in the success-result but rather in the failed-results.
+ * @param uris
+ * @param asyncLookupFunction
+ * @param excludeUris uris to exclude from lookup
+ * @return {*}
+ */
+function urisToLookupSuccessAndFailedMap(
+  uris,
+  asyncLookupFunction,
+  excludeUris = []
+) {
+  //make sure we have an array and not a single uri.
+  const urisAsArray = is("Array", uris) ? uris : [uris];
+  const excludeUrisAsArray = is("Array", excludeUris)
+    ? excludeUris
+    : [excludeUris];
+
+  const urisAsArrayWithoutExcludes = urisAsArray.filter(uri => {
+    const exclude = excludeUrisAsArray.indexOf(uri) < 0;
+    if (exclude) {
+      return true;
+    } else {
+      return false;
+    }
+  });
+
+  const asyncLookups = urisAsArrayWithoutExcludes.map(uri =>
+    asyncLookupFunction(uri).catch(error => {
+      return error;
+    })
+  );
+  return Promise.all(asyncLookups).then(dataObjects => {
+    const lookupMap = { success: {}, failed: {} };
+    //make sure there's the same
+    uris.forEach((uri, i) => {
+      if (dataObjects[i] instanceof Error) {
+        lookupMap["failed"][uri] = dataObjects[i];
+      } else if (dataObjects[i]) {
+        lookupMap["success"][uri] = dataObjects[i];
+      }
+    });
+    return lookupMap;
+  });
 }

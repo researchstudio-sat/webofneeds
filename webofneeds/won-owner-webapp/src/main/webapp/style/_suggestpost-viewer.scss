@@ -6,36 +6,30 @@ won-suggestpost-viewer {
 
   .suggestpostv__content {
     & .suggestpostv__content__post {
-      padding: 0.25rem;
       border: $thinGrayBorder;
-      background: white;
-      display: grid;
-      grid-row-gap: 0.5rem;
-      grid-template-areas:
-        "suggest_postheader suggest_action"
-        "suggest_info suggest_info";
-      grid-template-columns: 1fr min-content;
-      align-items: center;
+      background: $won-light-gray;
 
-      won-post-header {
-        grid-area: suggest_postheader;
+      & > won-atom-card {
       }
 
-      & .suggestpostv__content__post__action.won-button--outlined.red.thin {
-        grid-area: suggest_action;
-        font-size: $smallFontSize;
-        padding: 0.5rem;
-        height: 100%;
-        margin-left: 0.5rem;
-      }
-
-      & .suggestpostv__content__post__info {
-        grid-area: suggest_info;
-        color: $won-skeleton-color;
-        font-size: $smallFontSize;
+      &__actions {
         border-top: $thinGrayBorder;
-        padding-top: 0.25rem;
+        display: grid;
+        grid-auto-flow: column;
+        grid-gap: 0.5rem;
+        padding: 0.5rem;
+
+        &__button.won-button--outlined.red.thin {
+          font-size: $smallFontSize;
+          padding: 0.5rem;
+        }
       }
+    }
+    & .suggestpostv__content__info {
+      color: $won-skeleton-color;
+      font-size: $smallFontSize;
+      padding-top: 0.5rem;
+      text-align: center;
     }
   }
 }

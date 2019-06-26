@@ -1,0 +1,26 @@
+@import "won-config";
+@import "sizing-utils";
+
+won-atom-content-holds {
+  display: grid;
+  grid-gap: 1rem;
+  padding: 0.5rem;
+
+  @media (min-width: $responsivenessBreakPoint) {
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+  }
+  @media (max-width: $responsivenessBreakPoint) {
+    //One Column in mobile
+    grid-template-columns: 1fr;
+  }
+
+  & .ach__empty {
+    color: $won-line-gray;
+    text-align: center;
+    grid-column: 1/-1;
+  }
+
+  & won-atom-card.ach__atom {
+    border: $thinGrayBorder;
+  }
+}

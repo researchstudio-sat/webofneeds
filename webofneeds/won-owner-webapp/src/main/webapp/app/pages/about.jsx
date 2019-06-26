@@ -7,13 +7,13 @@ import compareToModule from "../directives/compareTo.js";
 import howToModule from "../components/howto.js";
 import accordionModule from "../components/accordion.js";
 import flexGridModule from "../components/flexgrid.js";
-import { attach, get, getIn, toAbsoluteURL } from "../utils.js";
+import { get, getIn, toAbsoluteURL } from "../utils.js";
+import { attach } from "../cstm-ng-utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { ownerBaseUrl } from "~/config/default.js";
-import * as srefUtils from "../sref-utils.js";
-import * as generalSelectors from "../selectors/general-selectors.js";
-import * as viewSelectors from "../selectors/view-selectors.js";
-import * as accountUtils from "../account-utils.js";
+import * as generalSelectors from "../redux/selectors/general-selectors.js";
+import * as viewSelectors from "../redux/selectors/view-selectors.js";
+import * as accountUtils from "../redux/utils/account-utils.js";
 import { h } from "preact";
 
 import "~/style/_about.scss";
@@ -273,7 +273,6 @@ const questions = [
 class AboutController {
   constructor(/* arguments <- serviceDependencies */) {
     attach(this, serviceDependencies, arguments);
-    Object.assign(this, srefUtils);
 
     window.ab4dbg = this;
 

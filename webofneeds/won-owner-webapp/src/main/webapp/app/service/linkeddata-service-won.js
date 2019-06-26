@@ -17,17 +17,8 @@
 /**
  * Created by fkleedorfer on 05.09.2014.
  */
-import {
-  entries,
-  is,
-  clone,
-  contains,
-  rethrow,
-  getIn,
-  get,
-  getInFromJsonLd,
-} from "../utils.js";
-import { parseJsonldLeaf, parseJsonldLeafsImm } from "../won-utils.js";
+import { is, clone, getIn, get, getInFromJsonLd } from "../utils.js";
+import * as wonUtils from "../won-utils.js";
 
 import { ownerBaseUrl } from "~/config/default.js";
 import urljoin from "url-join";
@@ -55,6 +46,25 @@ import won from "./won.js";
     "timeof",
     "deep",
   ];
+
+  /**
+   * taken from: https://esdiscuss.org/topic/es6-iteration-over-object-values
+   *
+   * example usage:
+   *
+   * ```javascript
+   * for (let [key, value] of entries(o)) {
+   *   console.log(key, ' --> ', value)
+   * }
+   * ```
+   * @param obj the object to generate a (key,value)-pair iterator for
+   */
+  function* entries(obj) {
+    for (let key of Object.keys(obj)) {
+      yield [key, obj[key]];
+    }
+  }
+
   /**
    * This function is used to generate the query-strings.
    * Should anything about the way the API is accessed changed,
@@ -81,6 +91,11 @@ import won from "./won.js";
     // The owner hands this part -- the one in the `uri=` paramater -- directly to the node.
     let firstParam = true;
     let queryOnNode = dataUri;
+
+    const contains = (arr, el) => {
+      return arr.indexOf(el) > 0;
+    };
+
     for (let [paramName, paramValue] of entries(queryParams)) {
       if (contains(legitQueryParameters, paramName)) {
         queryOnNode = queryOnNode + (firstParam ? "?" : "&");
@@ -1165,16 +1180,24 @@ import won from "./won.js";
   won.getConnectionUrisWithStateByAtomUri = (atomUri, requesterWebId) => {
     return won
       .executeCrawlableQuery(
-        won.queries["getAllConnectionUrisOfAtom"],
+        won.queries["getAllMetaConnectionsOfAtom"],
         atomUri,
         requesterWebId
       )
       .then(result =>
         result.map(x => {
           return {
-            connectionUri: x.connectionUri.value,
-            connectionState: x.connectionState.value,
-            socketType: x.socketType.value,
+            connectionUri: x.connectionUri && x.connectionUri.value,
+            connectionState: x.connectionState && x.connectionState.value,
+            socketUri: x.socketUri && x.socketUri.value,
+            socketType: x.socketType && x.socketType.value,
+            atomUri: x.atomUri && x.atomUri.value,
+            targetAtomUri: x.targetAtomUri && x.targetAtomUri.value,
+            targetConnectionUri:
+              x.targetConnectionUri && x.targetConnectionUri.value,
+            targetSocketUri: x.targetSocketUri && x.targetSocketUri.value,
+            targetSocketType: x.targetSocketType && x.targetSocketType.value,
+            modified: x.modified && x.modified.value,
           };
         })
       );
@@ -1673,7 +1696,7 @@ import won from "./won.js";
     /**
      * Despite the name, returns the connections fo the specified atom themselves. TODO rename
      */
-    getAllConnectionUrisOfAtom: {
+    getAllMetaConnectionsOfAtom: {
       propertyPaths: [
         {
           prefixes:
@@ -1682,6 +1705,7 @@ import won from "./won.js";
             ": <" +
             won.WON.baseUri +
             "> " +
+            "prefix dct: <http://purl.org/dc/terms/> " +
             "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> ",
           propertyPath: "won:connections",
         },
@@ -1689,18 +1713,86 @@ import won from "./won.js";
       query:
         "prefix won: <https://w3id.org/won/core#> \n" +
         "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> \n" +
-        "select ?connectionUri ?connectionState ?socketType \n" +
-        " where { \n" +
+        "prefix dct: <http://purl.org/dc/terms/> \n" +
+        "select " +
+        "?connectionUri " +
+        "?connectionState " +
+        "?atomUri " +
+        "?socketType " +
+        "?socketUri " +
+        "?targetAtomUri " +
+        "?targetConnectionUri " +
+        "?targetSocketType " +
+        "?targetSocketUri " +
+        "?modified " +
+        "\n where { \n" +
         " <::baseUri::> a won:Atom; \n" +
         "           won:connections ?connections.\n" +
         "  ?connections rdfs:member ?connectionUri. \n" +
         "  ?connectionUri won:connectionState ?connectionState. \n" +
+        "  ?connectionUri won:sourceAtom ?atomUri. \n" +
+        "  ?connectionUri won:targetAtom ?targetAtomUri. \n" +
         "  ?connectionUri won:socket ?socketUri. \n" +
         "  ?socketUri won:socketDefinition ?socketType. \n" +
+        "  ?connectionUri won:targetSocket ?targetSocketUri. \n" +
+        "  ?connectionUri dct:modified ?modified. \n" +
+        "  OPTIONAL { ?targetSocketUri won:socketDefinition ?targetSocketType. } \n" +
+        "  OPTIONAL { ?connectionUri won:targetConnection ?targetConnectionUri } \n" +
         "} \n",
     },
   };
 })();
+
+/*
+{
+    "@id" : "conn:aavakck2xsm39hr9kxi2",
+    "@type" : "won:Connection",
+    "http://purl.org/dc/terms/modified" : {
+      "@type" : "xsd:dateTime",
+      "@value" : "2019-06-18T06:27:20.989Z"
+    },
+    "won:connectionState" : {
+      "@id" : "won:Connected"
+    },
+    "won:socket" : {
+      "@id" : "atom:z6ne170yrf0z#holdableSocket"
+    },
+    "won:sourceAtom" : {
+      "@id" : "atom:z6ne170yrf0z"
+    },
+    "won:targetAtom" : {
+      "@id" : "atom:sxxxgf2necv6"
+    },
+    "won:targetConnection" : {
+      "@id" : "conn:totztqjd99h1vt73mi5n"
+    },
+    "won:targetSocket" : {
+      "@id" : "atom:sxxxgf2necv6#holderSocket"
+    }
+  }, {
+    "@id" : "conn:aboy09l0txxkewixlqtq",
+    "@type" : "won:Connection",
+    "http://purl.org/dc/terms/modified" : {
+      "@type" : "xsd:dateTime",
+      "@value" : "2019-06-18T06:27:46.278Z"
+    },
+    "won:connectionState" : {
+      "@id" : "won:Suggested"
+    },
+    "won:socket" : {
+      "@id" : "atom:z6ne170yrf0z#chatSocket"
+    },
+    "won:sourceAtom" : {
+      "@id" : "atom:z6ne170yrf0z"
+    },
+    "won:targetAtom" : {
+      "@id" : "atom:xbszwgx0ey23a9kcm283"
+    },
+    "won:targetSocket" : {
+      "@id" : "atom:xbszwgx0ey23a9kcm283#ChatSocket"
+    }
+  }
+* */
 
 /**
  * Thin wrapper around `rdfstore.load(...)` that returns
@@ -1804,8 +1896,33 @@ function groupByGraphs(jsonldData, addDefaultContext = true) {
 }
 
 /**
+ * Optionally prepends a string, and then throws
+ * whatever it gets as proper javascript error.
+ * Note, that throwing an error will also
+ * reject in a `Promise`-constructor-callback.
+ * @param {*} e
+ * @param {*} prependedMsg
+ */
+function rethrow(e, prependedMsg = "") {
+  prependedMsg = prependedMsg ? prependedMsg + "\n" : "";
+
+  if (is("String", e)) {
+    throw new Error(prependedMsg + e);
+  } else if (e.stack && e.message) {
+    // a class defined
+    const g = new Error(prependedMsg + e.message);
+    g.stack = e.stack;
+    g.response = e.response; //we add the response so we can look up why a request threw an error
+
+    throw g;
+  } else {
+    throw new Error(prependedMsg + JSON.stringify(e));
+  }
+}
+
+/**
  * Traverses the `path` into the json-ld object and then tries to
- * parse that node as RDF literal object (see `parseJsonldLeafsImm` for
+ * parse that node as RDF literal object (see `wonUtils.parseJsonldLeafsImm` for
  * details on that).
  *
  * @param {*} jsonld
@@ -1816,7 +1933,10 @@ function groupByGraphs(jsonldData, addDefaultContext = true) {
  */
 won.parseListFrom = (jsonld, path, type, context = won.defaultContext) => {
   try {
-    return parseJsonldLeafsImm(getInFromJsonLd(jsonld, path, context), type);
+    return wonUtils.parseJsonldLeafsImm(
+      getInFromJsonLd(jsonld, path, context),
+      type
+    );
   } catch (err) {
     console.error("Could not parse From list: ", err);
     return undefined;
@@ -1825,7 +1945,7 @@ won.parseListFrom = (jsonld, path, type, context = won.defaultContext) => {
 
 /**
  * Traverses the `path` into the json-ld object and then tries to
- * parse that node as RDF literal object (see `parseJsonldLeafsImm` for
+ * parse that node as RDF literal object (see `wonUtils.parseJsonldLeaf` for
  * details on that).
  *
  * @param {*} jsonld
@@ -1835,5 +1955,5 @@ won.parseListFrom = (jsonld, path, type, context = won.defaultContext) => {
  * @return the value at the path
  */
 won.parseFrom = (jsonld, path, type, context = won.defaultContext) => {
-  return parseJsonldLeaf(getInFromJsonLd(jsonld, path, context), type);
+  return wonUtils.parseJsonldLeaf(getInFromJsonLd(jsonld, path, context), type);
 };

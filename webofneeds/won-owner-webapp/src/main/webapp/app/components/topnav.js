@@ -5,13 +5,15 @@ import angular from "angular";
 import ngAnimate from "angular-animate";
 import dropdownModule from "./covering-dropdown.js";
 import accountMenuModule from "./account-menu.js";
-import { attach, get, getIn } from "../utils.js";
+import { get, getIn } from "../utils.js";
+import { attach } from "../cstm-ng-utils.js";
 import { actionCreators } from "../actions/actions.js";
-import { connect2Redux } from "../won-utils.js";
-import { isLoading } from "../selectors/process-selectors.js";
-import * as viewSelectors from "../selectors/view-selectors.js";
-
-import * as accountUtils from "../account-utils.js";
+import { connect2Redux } from "../configRedux.js";
+import { isLoading } from "../redux/selectors/process-selectors.js";
+import * as viewSelectors from "../redux/selectors/view-selectors.js";
+import * as connectionSelectors from "../redux/selectors/connection-selectors";
+import * as accountUtils from "../redux/utils/account-utils.js";
+import { delay } from "../utils.js";
 
 import "~/style/_responsiveness-utils.scss";
 import "~/style/_topnav.scss";
@@ -61,6 +63,7 @@ function genTopnavConf() {
       attach(this, serviceDependencies, arguments);
 
       window.tnc4dbg = this;
+      window.tnc4dbg.connectionSelectors = connectionSelectors;
 
       const selectFromState = state => {
         const currentRoute = getIn(state, ["router", "currentState", "name"]);
@@ -76,10 +79,48 @@ function genTopnavConf() {
           showSlideInIndicator:
             viewSelectors.hasSlideIns(state) &&
             !viewSelectors.showSlideIns(state),
+          connectionsToCrawl: connectionSelectors.getChatConnectionsToCrawl(
+            state
+          ),
         };
       };
 
       connect2Redux(selectFromState, actionCreators, ["self.pageTitle"], this);
+
+      this.$scope.$watch("self.connectionsToCrawl", connectionsToCrawl =>
+        this.ensureUnreadMessagesAreLoaded(connectionsToCrawl)
+      );
+    }
+
+    ensureUnreadMessagesAreLoaded(connectionsToCrawl) {
+      delay(0).then(() => {
+        const MESSAGECOUNT = 10;
+        console.debug(
+          "connectionsToCrawl: ",
+          connectionsToCrawl,
+          " Size: ",
+          connectionsToCrawl.size
+        );
+        connectionsToCrawl.map(conn => {
+          const messages = conn.get("messages");
+          const messageCount = messages ? messages.size : 0;
+
+          if (messageCount == 0) {
+            this.connections__showLatestMessages(conn.get("uri"), MESSAGECOUNT);
+          } else {
+            const receivedMessages = messages.filter(
+              msg => !msg.get("outgoingMessage")
+            );
+            const receivedMessagesReadPresent = receivedMessages.find(
+              msg => !msg.get("unread")
+            );
+
+            if (!receivedMessagesReadPresent) {
+              this.connections__showMoreMessages(conn.get("uri"), MESSAGECOUNT);
+            }
+          }
+        });
+      });
     }
   }
   Controller.$inject = serviceDependencies;

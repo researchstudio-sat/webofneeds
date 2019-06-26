@@ -1,0 +1,99 @@
+@import "won-config";
+@import "sizing-utils";
+@import "animate";
+
+won-skeleton-card {
+  display: grid;
+  grid-template-areas: "card__icon" "card__main" "card__persona" "card__indicators";
+  grid-template-rows: max-content 1fr min-content min-content;
+  background: $won-light-gray;
+  padding: 0.5rem;
+  color: black;
+
+  &.won-is-toload,
+  &.won-is-loading {
+    @include animateOpacityHeartBeat();
+    pointer-events: none;
+
+    .card__main {
+      grid-row-gap: 0.15rem;
+    }
+
+    .card__main__subtitle__type {
+      height: $smallFontSize - 0.1rem;
+      width: 5rem;
+      background-color: $won-skeleton-color;
+    }
+
+    .card__main__topline__title {
+      height: $smallFontSize - 0.05rem;
+      width: 7rem;
+      background-color: $won-skeleton-color;
+    }
+  }
+  .card__icon__skeleton {
+    height: 10rem;
+    background-color: $won-skeleton-color;
+    margin-bottom: 0.5rem;
+  }
+
+  // Defines the height of the (no)persona-div, so that they no-persona is the same height as attached personas
+  --persona-height: 2.5rem;
+
+  .card__nopersona {
+    grid-area: card__persona;
+    margin-top: 0.5rem;
+    display: grid;
+    grid-column-gap: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: $thinGrayBorder;
+    justify-items: center;
+    align-items: center;
+    height: var(--persona-height);
+  }
+
+  .card__indicators {
+    grid-area: card__indicators;
+    margin-top: 0.5rem;
+  }
+
+  .card__main {
+    grid-area: card__main;
+    display: grid;
+    grid-template-areas: "card__main__topline" "card__main__subtitle";
+    grid-template-columns: 1fr;
+    grid-template-rows: min-content min-content min-content;
+
+    @media (min-width: $responsivenessBreakPoint) {
+      width: 15rem;
+      max-width: 15rem;
+    }
+
+    &__topline {
+      grid-area: card__main__topline;
+      min-width: 0;
+
+      &__title {
+        min-width: 0;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        font-weight: 300;
+      }
+    }
+
+    &__subtitle {
+      grid-area: card__main__subtitle;
+      display: grid;
+      grid-template-columns: 1fr min-content;
+      color: $won-subtitle-gray;
+      font-size: $smallFontSize;
+
+      &__type {
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+      }
+    }
+  }
+}

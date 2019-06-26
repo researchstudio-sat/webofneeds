@@ -13,6 +13,7 @@ import { interestsGroup } from "./usecases/group-interests";
 import { lunchPlan } from "./usecases/uc-lunch.js";
 import { cyclingPlan } from "./usecases/uc-cycling.js";
 import { pokemonGoRaid } from "./usecases/uc-pokemon.js";
+import { persona } from "./usecases/uc-persona.js";
 
 /**
  * USE CASE REQUIREMENTS
@@ -74,6 +75,7 @@ export const hiddenUseCases = {
   pokemonGoRaid: pokemonGoRaid,
   lunchPlan: lunchPlan,
   cyclingPlan: cyclingPlan,
+  persona: persona,
 };
 
 // generate a list of usecases from all use case groups

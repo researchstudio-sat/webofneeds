@@ -50,6 +50,8 @@ public class SCHEMA {
     public static final Property REVIEW_RATING = m.createProperty(BASE_URI + "reviewRating");
     public static final Property AGGREGATE_RATING = m.createProperty(BASE_URI + "aggregateRating");
     public static final Property REVIEW_COUNT = m.createProperty(BASE_URI + "reviewCount");
+    public static final Property OBJECT = m.createProperty(BASE_URI + "object");
+    public static final Property EVENT = m.createProperty(BASE_URI + "Event");
     public static final RDFDatatype TEXT = new BaseDatatype(BASE_URI + "Text");
 
     /**

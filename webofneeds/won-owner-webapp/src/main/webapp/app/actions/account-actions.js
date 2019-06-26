@@ -5,32 +5,20 @@
 import won from "../won-es6.js";
 import Immutable from "immutable";
 import { actionTypes, actionCreators } from "./actions.js";
-import { fetchOwnedData } from "../won-message-utils.js";
-import {
-  registerAccount,
-  changePassword,
-  transferPrivateAccount,
-  acceptTermsOfService,
-  confirmRegistration,
-  resendEmailVerification,
-  sendAnonymousLinkEmail,
-  login,
-  logout,
-  parseCredentials,
-  generatePrivateId,
-  checkLoginStatus,
-} from "../won-utils.js";
+import * as stateStore from "../redux/state-store.js";
+import * as wonUtils from "../won-utils.js";
+import * as ownerApi from "../api/owner-api.js";
 import { setDisclaimerAccepted } from "../won-localstorage.js";
 import { stateGoCurrent } from "./cstm-router-actions.js";
 import { checkAccessToCurrentRoute } from "../configRouting.js";
 
 import { get } from "../utils.js";
-import * as connectionSelectors from "../selectors/connection-selectors.js";
+import * as connectionSelectors from "../redux/selectors/connection-selectors.js";
 import { loadLatestMessagesOfConnection } from "./connections-actions.js";
-import { getPrivateIdFromRoute } from "../selectors/general-selectors.js";
+import { getPrivateIdFromRoute } from "../redux/selectors/general-selectors.js";
 
-import * as accountUtils from "../account-utils.js";
-import * as processUtils from "../process-utils.js";
+import * as accountUtils from "../redux/utils/account-utils.js";
+import * as processUtils from "../redux/utils/process-utils.js";
 
 /**
  * Makes sure user is either logged in
@@ -42,7 +30,7 @@ export async function ensureLoggedIn(dispatch, getState) {
     return;
   }
 
-  const privateId = generatePrivateId();
+  const privateId = wonUtils.generatePrivateId();
   try {
     await accountRegister({ privateId })(dispatch, getState);
   } catch (err) {
@@ -65,7 +53,7 @@ export function accountLogin(credentials, redirectToFeed = false) {
   return (dispatch, getState) => {
     const state = getState();
 
-    const { email } = parseCredentials(credentials);
+    const { email } = wonUtils.parseCredentials(credentials);
 
     const accountState = get(state, "account");
     const isLoggedIn = accountUtils.isLoggedIn(accountState);
@@ -108,10 +96,10 @@ export function accountLogin(credentials, redirectToFeed = false) {
       })
       .then(() => {
         if (isLoggedIn) {
-          return logout();
+          return ownerApi.logout();
         }
       })
-      .then(() => login(credentials))
+      .then(() => ownerApi.login(credentials))
       .then(data =>
         dispatch({
           type: actionTypes.account.store,
@@ -119,7 +107,7 @@ export function accountLogin(credentials, redirectToFeed = false) {
         })
       )
       .then(() => dispatch({ type: actionTypes.upgradeHttpSession }))
-      .then(() => fetchOwnedData(dispatch))
+      .then(() => stateStore.fetchOwnedData(dispatch))
       .then(() => dispatch({ type: actionTypes.account.loginFinished }))
       .catch(error =>
         error.response.json().then(loginError => {
@@ -180,7 +168,7 @@ export function accountLogout() {
 
     return Promise.resolve()
       .then(() => dispatch({ type: actionTypes.account.logoutStarted }))
-      .then(() => logout())
+      .then(() => ownerApi.logout())
       .catch(error => {
         //TODO: PRINT ERROR MESSAGE AND CHANGE STATE ACCORDINGLY
         console.error("Error while trying to log out: ", error);
@@ -208,7 +196,8 @@ export function accountLogout() {
  */
 export function accountRegister(credentials) {
   return (dispatch, getState) =>
-    registerAccount(credentials)
+    ownerApi
+      .registerAccount(credentials)
       .then(() => accountLogin(credentials, true)(dispatch, getState))
       .catch(error => {
         //TODO: PRINT MORE SPECIFIC ERROR MESSAGE, already registered/password to short etc.
@@ -228,7 +217,8 @@ export function accountRegister(credentials) {
 export function accountTransfer(credentials) {
   //FIXME: accountTransfer only works if we have the full privateId which we might not have anymore after the refactoring
   return (dispatch, getState) =>
-    transferPrivateAccount(credentials)
+    ownerApi
+      .transferPrivateAccount(credentials)
       .then(() => {
         credentials.privateId = undefined;
         return accountLogin(credentials, true)(dispatch, getState);
@@ -249,7 +239,8 @@ export function accountTransfer(credentials) {
  */
 export function accountChangePassword(credentials) {
   return dispatch =>
-    changePassword(credentials)
+    ownerApi
+      .changePassword(credentials)
       .then(() => {
         dispatch({ type: actionTypes.account.changePasswordSuccess });
       })
@@ -268,7 +259,8 @@ export function accountAcceptDisclaimer() {
 export function accountAcceptTermsOfService() {
   return dispatch => {
     dispatch({ type: actionTypes.account.acceptTermsOfServiceStarted });
-    acceptTermsOfService()
+    ownerApi
+      .acceptTermsOfService()
       .then(() => {
         dispatch({ type: actionTypes.account.acceptTermsOfServiceSuccess });
       })
@@ -281,7 +273,8 @@ export function accountAcceptTermsOfService() {
 export function accountVerifyEmailAddress(verificationToken) {
   return dispatch => {
     dispatch({ type: actionTypes.account.verifyEmailAddressStarted });
-    confirmRegistration(verificationToken)
+    ownerApi
+      .confirmRegistration(verificationToken)
       .then(() => {
         dispatch({ type: actionTypes.account.verifyEmailAddressSuccess });
       })
@@ -299,7 +292,8 @@ export function accountVerifyEmailAddress(verificationToken) {
 export function accountResendVerificationEmail(email) {
   return dispatch => {
     dispatch({ type: actionTypes.account.resendVerificationEmailStarted });
-    resendEmailVerification(email)
+    ownerApi
+      .resendEmailVerification(email)
       .then(() => {
         dispatch({ type: actionTypes.account.resendVerificationEmailSuccess });
       })
@@ -317,7 +311,8 @@ export function accountResendVerificationEmail(email) {
 export function accountSendAnonymousLinkEmail(email, privateId) {
   return dispatch => {
     dispatch({ type: actionTypes.account.sendAnonymousLinkEmailStarted });
-    sendAnonymousLinkEmail(email, privateId)
+    ownerApi
+      .sendAnonymousLinkEmail(email, privateId)
       .then(() => {
         dispatch({ type: actionTypes.account.sendAnonymousLinkEmailSuccess });
       })
@@ -336,7 +331,7 @@ export function reconnect() {
   return async (dispatch, getState) => {
     dispatch({ type: actionTypes.reconnect.start });
     try {
-      await checkLoginStatus();
+      await ownerApi.checkLoginStatus();
       dispatch({ type: actionTypes.reconnect.success });
 
       const state = getState();

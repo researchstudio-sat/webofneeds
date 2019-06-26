@@ -1,7 +1,8 @@
-import { parseAtom } from "./parse-atom.js";
+import { parseAtom, parseMetaAtom } from "./parse-atom.js";
 import Immutable from "immutable";
 import { get } from "../../utils.js";
 import won from "../../won-es6.js";
+import * as atomUtils from "../../redux/utils/atom-utils.js";
 
 export function addAtom(atoms, jsonldAtom) {
   let newState;
@@ -57,7 +58,7 @@ export function addAtom(atoms, jsonldAtom) {
 export function deleteAtom(atoms, deletedAtomUri) {
   return atoms.delete(deletedAtomUri).map(atom => {
     const removeHolder = atom => {
-      if (atom.get("heldBy") === deletedAtomUri) {
+      if (atomUtils.getHeldByUri(atom) === deletedAtomUri) {
         return atom.delete("heldBy");
       } else return atom;
     };
@@ -140,6 +141,30 @@ export function addAtomStubs(atoms, atomUris, state) {
       newState = addAtomStub(newState, atomUri, state);
     });
   return newState;
+}
+
+export function addMetaAtomStubs(atoms, metaAtoms) {
+  let newState = atoms;
+  metaAtoms &&
+    metaAtoms.map(metaAtom => {
+      newState = addMetaAtomStub(newState, metaAtom);
+    });
+  return newState;
+}
+
+function addMetaAtomStub(atoms, metaAtom) {
+  const parsedMetaAtom = parseMetaAtom(metaAtom);
+
+  const parsedAtomUri = get(parsedMetaAtom, "uri");
+  let existingAtom = get(atoms, parsedAtomUri);
+
+  if (parsedAtomUri && !existingAtom) {
+    return atoms.set(parsedAtomUri, parsedMetaAtom);
+  } else {
+    console.error("Tried to add invalid atom-object: ", metaAtom);
+  }
+
+  return atoms;
 }
 
 export function addAtomInCreation(atoms, atomInCreation, atomUri) {

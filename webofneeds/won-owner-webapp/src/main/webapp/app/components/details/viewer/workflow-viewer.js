@@ -1,5 +1,6 @@
 import angular from "angular";
-import { attach, delay } from "../../../utils.js";
+import { delay } from "../../../utils.js";
+import { attach } from "../../../cstm-ng-utils.js";
 import BpmnViewer from "bpmn-js";
 
 import "~/style/_workflow-viewer.scss";

@@ -1,70 +1,60 @@
 @import "won-config";
 @import "sizing-utils";
-@import "animate";
 
 won-atom-content-buddies {
-  & .ac-buddies__empty {
+  display: grid;
+  grid-gap: 1rem;
+  padding: 0.5rem;
+
+  @media (min-width: $responsivenessBreakPoint) {
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+  }
+  @media (max-width: $responsivenessBreakPoint) {
+    //One Column in mobile
+    grid-template-columns: 1fr;
+  }
+
+  & .acb__empty {
     color: $won-line-gray;
-    padding: 0.5rem;
     text-align: center;
+    grid-column: 1 / -1;
   }
 
-  & won-suggestpost-picker {
-    background: var(--won-light-gray);
-    padding: 0.5rem;
-    border: 0.01rem solid var(--won-line-gray);
-  }
-
-  & .ac-buddies__buddy {
+  & .acb__buddy {
     border: $thinGrayBorder;
-    border-left: 0;
     background: $won-light-gray;
-    display: grid;
-    grid-template-areas: "buddy_indicator buddy_info buddy_actions";
-    grid-template-columns: min-content 1fr min-content;
-    align-items: center;
-    margin-top: 0.5rem;
 
-    &:first-of-type {
-      margin-top: 0;
+    &.won-unread {
+      border-color: $won-primary-color;
+      /*box-shadow: 0px 0px 5px 5px var(--won-primary-color);*/
     }
 
-    &:hover {
-      background: white;
-    }
-
-    won-post-header {
-      padding: 0.5rem 0.25rem;
-      font-size: $normalFontSize;
-      grid-area: buddy_info;
-    }
-
-    & > .ac-buddies__buddy__indicator {
-      grid-area: buddy_indicator;
-      box-sizing: border-box;
-      width: 0.25rem;
-      height: 100%;
-    }
-
-    &.won-unread > .ac-buddies__buddy__indicator {
-      border-left: 0.25rem solid $won-unread-attention;
-    }
-
-    &:not(.won-unread) > .ac-buddies__buddy__indicator {
-      border-left: $thinGrayBorder;
+    & > won-atom-card {
     }
 
     &__actions {
-      padding-right: 0.5rem;
+      border-top: $thinGrayBorder;
       display: grid;
       grid-auto-flow: column;
-      grid-gap: 0.25rem;
-      grid-area: buddy_actions;
+      grid-gap: 0.5rem;
+      padding: 0.5rem;
 
+      &__button.won-button--filled.red,
       &__button.won-button--outlined.red.thin {
         font-size: $smallFontSize;
         padding: 0.5rem;
       }
     }
+  }
+
+  & > won-labelled-hr.acb__labelledhr {
+    grid-column: 1 / -1;
+  }
+
+  & > won-suggestpost-picker {
+    grid-column: 1 / -1;
+    background: var(--won-light-gray);
+    padding: 0.5rem;
+    border: 0.01rem solid var(--won-line-gray);
   }
 }

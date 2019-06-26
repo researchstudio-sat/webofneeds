@@ -4,18 +4,20 @@
 
 import angular from "angular";
 import L from "../../../leaflet-bundleable.js";
+import { initLeaflet, leafletBounds } from "../../../leaflet-bundleable.js";
+import { delay, getIn } from "../../../utils.js";
 import {
-  attach,
   searchNominatim,
   reverseSearchNominatim,
-  nominatim2draftLocation,
   scrubSearchResults,
-  delay,
-  getIn,
-} from "../../../utils.js";
-import { doneTypingBufferNg, DomCache } from "../../../cstm-ng-utils.js";
+  nominatim2draftLocation,
+} from "../../../api/nominatim-api.js";
+import {
+  attach,
+  doneTypingBufferNg,
+  DomCache,
+} from "../../../cstm-ng-utils.js";
 
-import { initLeaflet, leafletBounds } from "../../../won-utils.js";
 import titlePickerModule from "./title-picker.js";
 
 import "~/style/_locationpicker.scss";
@@ -369,7 +371,3 @@ function onMapClick(e, ctrl) {
 export default angular
   .module("won.owner.components.locationPicker", [titlePickerModule])
   .directive("wonLocationPicker", genComponentConf).name;
-
-window.searchNominatim4dbg = searchNominatim;
-window.reverseSearchNominatim4dbg = reverseSearchNominatim;
-window.nominatim2wonLocation4dbg = nominatim2draftLocation;

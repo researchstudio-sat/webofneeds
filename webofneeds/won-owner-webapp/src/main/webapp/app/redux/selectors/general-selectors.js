@@ -4,19 +4,19 @@
 
 import { createSelector } from "reselect";
 
-import { decodeUriComponentProperly, getIn, get } from "../utils.js";
+import { getIn, get } from "../../utils.js";
 import * as connectionSelectors from "./connection-selectors.js";
-import * as atomUtils from "../atom-utils.js";
-import * as connectionUtils from "../connection-utils.js";
-import * as accountUtils from "../account-utils.js";
-import * as viewUtils from "../view-utils.js";
+import * as atomUtils from "../utils/atom-utils.js";
+import * as connectionUtils from "../utils/connection-utils.js";
+import * as accountUtils from "../utils/account-utils.js";
+import * as viewUtils from "../utils/view-utils.js";
 import Color from "color";
 
 export const selectLastUpdateTime = state => state.get("lastUpdateTime");
 export const getRouterParams = state =>
   getIn(state, ["router", "currentParams"]);
 
-export const getAtoms = state => state.get("atoms");
+export const getAtoms = state => get(state, "atoms");
 export const getOwnedAtoms = state => {
   const accountState = get(state, "account");
   return getAtoms(state).filter(atom =>
@@ -92,6 +92,50 @@ export function hasUnreadSuggestedConnections(state) {
   );
 }
 
+export function hasUnreadSuggestedConnectionsInHeldAtoms(state, atomUri) {
+  const allAtoms = getAtoms(state);
+  const atom = get(allAtoms, atomUri);
+  const holds = atomUtils.getHeldAtomUris(atom);
+
+  return (
+    holds &&
+    !!holds.find(holdsUri =>
+      atomUtils.hasUnreadSuggestedConnections(get(allAtoms, holdsUri))
+    )
+  );
+}
+
+/**
+ * Determines if there are any buddy connections that are unread
+ * (used for the inventory unread indicator)
+ * @param state
+ * @returns {boolean}
+ */
+export function hasUnreadBuddyConnections(
+  state,
+  excludeClosed = false,
+  excludeSuggested = false
+) {
+  const allOwnedAtoms = getOwnedAtoms(state);
+
+  return (
+    allOwnedAtoms &&
+    !!allOwnedAtoms
+      .filter(atom => atomUtils.isActive(atom))
+      .find(
+        atom =>
+          !!connectionSelectors
+            .getBuddyConnectionsByAtomUri(
+              state,
+              get(atom, "uri"),
+              excludeClosed,
+              excludeSuggested
+            )
+            .find(conn => connectionUtils.isUnread(conn))
+      )
+  );
+}
+
 export function hasUnreadChatConnections(state) {
   const chatAtoms = getChatAtoms(state);
 
@@ -147,18 +191,6 @@ export const getCurrentParamsFromRoute = createSelector(
   state => state,
   state => {
     return getIn(state, ["router", "currentParams"]);
-  }
-);
-
-export const getViewAtomUriFromRoute = createSelector(
-  state => state,
-  state => {
-    const encodedAtomUri = getIn(state, [
-      "router",
-      "currentParams",
-      "viewAtomUri",
-    ]);
-    return decodeUriComponentProperly(encodedAtomUri);
   }
 );
 
@@ -264,7 +296,21 @@ export const getAboutSectionFromRoute = createSelector(
 
 export function getOwnedPersonas(state) {
   const atoms = getOwnedAtoms(state);
-  const personas = atoms.toList().filter(atom => atomUtils.isPersona(atom));
+  return atoms && atoms.filter(atom => atomUtils.isPersona(atom));
+}
+
+/**
+ * Returns all owned Personas as a List, condenses the information of the persona so that only some attributes are included.
+ * This Function is currently used for persona lists/views based on elm (as they are not based on our general atom-structure)
+ * @param state
+ * @returns {Iterable<K, {website: *, saved: boolean, displayName: *, url: *, aboutMe: *, timestamp: string | * | number | void}>}
+ */
+export function getOwnedCondensedPersonaList(state, includeArchived = false) {
+  const atoms = getOwnedAtoms(state);
+  const personas = atoms
+    .toList()
+    .filter(atom => atomUtils.isPersona(atom))
+    .filter(atom => includeArchived || atomUtils.isActive(atom));
   return personas.map(persona => {
     return {
       displayName: getIn(persona, ["content", "personaName"]),
@@ -340,4 +386,10 @@ export function isLocationAccessDenied(state) {
 export function getCurrentLocation(state) {
   const viewState = get(state, "view");
   return viewState && viewUtils.getCurrentLocation(viewState);
+}
+
+function decodeUriComponentProperly(encodedUri) {
+  if (!encodedUri) return undefined;
+  //for some reason decodeUri(undefined) yields "undefined"
+  else return decodeURIComponent(encodedUri);
 }

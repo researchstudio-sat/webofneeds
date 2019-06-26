@@ -452,8 +452,8 @@ export const defaultSocket = {
 /*
   Use this detail with the s:PlanAction type -> if you use this detail make sure you add the s:PlanAction type to the corresponding branch (content or seeks)
 */
-export const eventObject = {
-  identifier: "eventObject",
+export const eventObjectAboutUris = {
+  identifier: "eventObjectAboutUris",
   label: "Event",
   icon: "#ico36_detail_title",
   placeholder: "What? (Short title shown in lists)",

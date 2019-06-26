@@ -73,24 +73,29 @@ public class RestAtomController {
      */
     @ResponseBody
     @RequestMapping(value = { "/", "" }, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
-    public List<URI> getAllAtomsOfUser(@RequestParam(value = "state", required = false) AtomState state) {
+    public Map<URI, AtomPojo> getAllAtomsOfUser(@RequestParam(value = "state", required = false) AtomState state) {
         User user = getCurrentUser();
         List<UserAtom> userAtoms = user.getUserAtoms();
-        List<URI> atomUris = new ArrayList(userAtoms.size());
-        if (state == null) {
-            logger.debug("Getting all atomuris of user: " + user.getUsername());
-            for (UserAtom userAtom : userAtoms) {
-                atomUris.add(userAtom.getUri());
-            }
-        } else {
-            logger.debug("Getting all atomuris of user: " + user.getUsername() + "filtered by state: " + state);
-            for (UserAtom userAtom : userAtoms) {
-                if (state.equals(userAtom.getState())) {
-                    atomUris.add(userAtom.getUri());
+        Map<URI, AtomPojo> atomMap = new HashMap<>();
+        for (UserAtom userAtom : userAtoms) {
+            if (state == null || state.equals(userAtom.getState())) {
+                try {
+                    Dataset atomDataset = WonLinkedDataUtils.getDataForResource(userAtom.getUri(), linkedDataSource); // FIXME:
+                                                                                                                      // SOMEHOW
+                                                                                                                      // DerivedData
+                                                                                                                      // is
+                                                                                                                      // not
+                                                                                                                      // retrieved
+                                                                                                                      // with
+                                                                                                                      // getDataForResource...
+                    AtomPojo atom = new AtomPojo(atomDataset);
+                    atomMap.put(atom.getUri(), atom);
+                } catch (LinkedDataFetchingException e) {
+                    logger.debug("Could not retrieve atom<" + userAtom.getUri() + "> cause: " + e.getMessage());
                 }
             }
         }
-        return atomUris;
+        return atomMap;
     }
 
     /**
