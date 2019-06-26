@@ -201,18 +201,20 @@ function genComponentConf() {
               useCase.draft.seeks = fromAtomSeeks.toJS();
             }
 
-            if (socketsReset) {
-              useCase.draft.content.sockets = socketsReset.toJS();
-            }
-            if (defaultSocketReset) {
-              useCase.draft.content.defaultSocket = defaultSocketReset.toJS();
-            }
+            if (!isEditFromAtom) {
+              if (socketsReset) {
+                useCase.draft.content.sockets = socketsReset.toJS();
+              }
+              if (defaultSocketReset) {
+                useCase.draft.content.defaultSocket = defaultSocketReset.toJS();
+              }
 
-            if (seeksSocketsReset) {
-              useCase.draft.seeks.sockets = seeksSocketsReset.toJS();
-            }
-            if (seeksDefaultSocketReset) {
-              useCase.draft.seeks.defaultSocket = seeksDefaultSocketReset.toJS();
+              if (seeksSocketsReset) {
+                useCase.draft.seeks.sockets = seeksSocketsReset.toJS();
+              }
+              if (seeksDefaultSocketReset) {
+                useCase.draft.seeks.defaultSocket = seeksDefaultSocketReset.toJS();
+              }
             }
           }
         } else {
