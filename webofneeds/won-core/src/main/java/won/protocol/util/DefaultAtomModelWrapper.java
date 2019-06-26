@@ -229,9 +229,8 @@ public class DefaultAtomModelWrapper extends AtomModelWrapper {
      * within the given locationProperty
      * 
      * @param contentNode contentNode in which the locationProperty is searched for
-     * @param locationProperty e.g SCHEMA.LOCATION or SCHEMA.JOBLOCATION
-     * @param fallbackProperty nullable, will be checked if locationProperty itself
-     * is not present in the contentNode
+     * @param locationProperty e.g SCHEMA.LOCATION or SCHEMA.JOBLOCATION is not
+     * present in the contentNode
      * @return Coordinate if found otherwise null
      */
     private Coordinate getLocationCoordinate(Resource contentNode, Property locationProperty) {
@@ -239,7 +238,7 @@ public class DefaultAtomModelWrapper extends AtomModelWrapper {
         Property geoProperty = atomModel.createProperty("http://schema.org/", "geo");
         Property longitudeProperty = atomModel.createProperty("http://schema.org/", "longitude");
         Property latitudeProperty = atomModel.createProperty("http://schema.org/", "latitude");
-        RDFNode locationNode = RdfUtils.findOnePropertyFromResource(atomModel, contentNode, SCHEMA.LOCATION);
+        RDFNode locationNode = RdfUtils.findOnePropertyFromResource(atomModel, contentNode, locationProperty);
         RDFNode geoNode = (locationNode != null && locationNode.isResource())
                         ? RdfUtils.findOnePropertyFromResource(atomModel, locationNode.asResource(), geoProperty)
                         : null;

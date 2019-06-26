@@ -136,7 +136,7 @@ function genComponentConf() {
         const responseToAtom = getIn(state, ["atoms", responseToUri]);
 
         const atomImage = atomUtils.getDefaultImage(atom);
-        const atomLocation = atomUtils.getLocation(atom); //include the comment instead of the false, to display location in the atom-card
+        const atomLocation = atomUtils.getLocation(atom);
         const personaUri = atomUtils.getHeldByUri(atom);
         const persona = getIn(state, ["atoms", personaUri]);
         const personaName = get(persona, "humanReadable");
