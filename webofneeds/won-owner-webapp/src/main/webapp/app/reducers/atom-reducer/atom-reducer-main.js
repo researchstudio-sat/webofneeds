@@ -59,15 +59,10 @@ export default function(allAtomsInState = initialState, action = {}) {
         atom.set("connections", Immutable.Map())
       );
 
+    case actionTypes.atoms.storeWhatsNew:
+    case actionTypes.atoms.storeWhatsAround:
     case actionTypes.atoms.storeOwnedMetaAtoms: {
       return addMetaAtomStubs(allAtomsInState, action.payload.get("metaAtoms"));
-    }
-
-    case actionTypes.atoms.storeWhatsNew:
-    case actionTypes.atoms.storeWhatsAround: {
-      const metaAtoms = action.payload.get("metaAtoms");
-      const atomUris = metaAtoms && [...metaAtoms.keys()];
-      return addAtomStubs(allAtomsInState, atomUris);
     }
 
     case actionTypes.personas.storeTheirUrisInLoading:

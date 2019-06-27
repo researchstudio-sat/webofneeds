@@ -160,8 +160,6 @@ function addMetaAtomStub(atoms, metaAtom) {
 
   if (parsedAtomUri && !existingAtom) {
     return atoms.set(parsedAtomUri, parsedMetaAtom);
-  } else {
-    console.error("Tried to add invalid atom-object: ", metaAtom);
   }
 
   return atoms;

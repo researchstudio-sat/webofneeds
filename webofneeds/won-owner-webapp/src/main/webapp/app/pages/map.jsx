@@ -256,7 +256,7 @@ class Controller {
         "lastWhatsAroundMaxDistance",
       ]);
 
-      const whatsNewMetaAtoms = getIn(state, ["owner", "whatsAround"])
+      const whatsAroundMetaAtoms = generalSelectors.getWhatsAroundAtoms(state)
         .filter(metaAtom => atomUtils.isActive(metaAtom))
         .filter(metaAtom => !atomUtils.isSearchAtom(metaAtom))
         .filter(metaAtom => !atomUtils.isDirectResponseAtom(metaAtom))
@@ -278,7 +278,7 @@ class Controller {
         });
 
       const sortedVisibleAtoms = atomUtils.sortByDistanceFrom(
-        whatsNewMetaAtoms,
+        whatsAroundMetaAtoms,
         lastWhatsAroundLocation
       );
       const sortedVisibleAtomUriArray = sortedVisibleAtoms && [
@@ -298,8 +298,8 @@ class Controller {
         !lastAtomUrisUpdateDate && !isOwnerAtomUrisLoading;
 
       let locations = [];
-      whatsNewMetaAtoms &&
-        whatsNewMetaAtoms.map(atom => {
+      whatsAroundMetaAtoms &&
+        whatsAroundMetaAtoms.map(atom => {
           const atomLocation = atomUtils.getLocation(atom);
           locations.push(atomLocation);
         });
