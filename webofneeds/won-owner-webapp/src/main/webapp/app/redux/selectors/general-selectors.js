@@ -24,6 +24,18 @@ export const getOwnedAtoms = state => {
   );
 };
 
+export const getWhatsNewAtoms = state => {
+  return getAtoms(state).filter(
+    (atom, atomUri) => !!getIn(state, ["owner", "whatsNewUris", atomUri])
+  );
+};
+
+export const getWhatsAroundAtoms = state => {
+  return getAtoms(state).filter(
+    (atom, atomUri) => !!getIn(state, ["owner", "whatsAroundUris", atomUri])
+  );
+};
+
 export function getPosts(state) {
   const atoms = getAtoms(state);
   return atoms.filter(atom => {

@@ -1,6 +1,6 @@
 import { parseAtom, parseMetaAtom } from "./parse-atom.js";
 import Immutable from "immutable";
-import { get } from "../../utils.js";
+import { get, getIn } from "../../utils.js";
 import won from "../../won-es6.js";
 import * as atomUtils from "../../redux/utils/atom-utils.js";
 
@@ -21,27 +21,21 @@ export function addAtom(atoms, jsonldAtom) {
       const heldAtomUris = get(parsedAtom, "holds");
       if (heldAtomUris.size > 0) {
         heldAtomUris.map(atomUri => {
-          if (!get(atoms, atomUri)) {
-            atoms = addAtomStub(atoms, atomUri);
-          }
+          atoms = addAtomStub(atoms, atomUri);
         });
       }
 
       const groupMemberUris = get(parsedAtom, "groupMembers");
       if (groupMemberUris.size > 0) {
         groupMemberUris.map(atomUri => {
-          if (!get(atoms, atomUri)) {
-            atoms = addAtomStub(atoms, atomUri);
-          }
+          atoms = addAtomStub(atoms, atomUri);
         });
       }
 
       const buddyUris = get(parsedAtom, "buddies");
       if (buddyUris.size > 0) {
         buddyUris.map(atomUri => {
-          if (!get(atoms, atomUri)) {
-            atoms = addAtomStub(atoms, atomUri);
-          }
+          atoms = addAtomStub(atoms, atomUri);
         });
       }
     }
@@ -108,19 +102,18 @@ export function deleteAtom(atoms, deletedAtomUri) {
  * Checks if stub/atom already exists, if so do nothing
  * @param atoms redux atom state
  * @param atomUri stub accessible under uri
- * @param state not mandatory will be set undefined if not set, otherwise the atomState is stored (e.g. Active/Inactive)
  * @returns {*}
  */
-export function addAtomStub(atoms, atomUri, state) {
-  if (get(atoms, atomUri)) {
+export function addAtomStub(atoms, atomUri) {
+  if (atoms && atoms.has(atomUri)) {
     return atoms;
   } else {
     return atoms.setIn(
       [atomUri],
       Immutable.fromJS({
         uri: atomUri,
-        state: state,
         connections: Immutable.Map(),
+        uriStub: true,
       })
     );
   }
@@ -131,14 +124,13 @@ export function addAtomStub(atoms, atomUri, state) {
  * Checks if stub/atom already exists, if so do nothing
  * @param atoms redux atom state
  * @param atomUris stub accessible under uris
- * @param state not mandatory will be set undefined if not set, otherwise the atomState is stored (e.g. Active/Inactive)
  * @returns {*}
  */
-export function addAtomStubs(atoms, atomUris, state) {
+export function addAtomStubs(atoms, atomUris) {
   let newState = atoms;
   atomUris &&
     atomUris.forEach(atomUri => {
-      newState = addAtomStub(newState, atomUri, state);
+      newState = addAtomStub(newState, atomUri);
     });
   return newState;
 }
@@ -156,12 +148,13 @@ function addMetaAtomStub(atoms, metaAtom) {
   const parsedMetaAtom = parseMetaAtom(metaAtom);
 
   const parsedAtomUri = get(parsedMetaAtom, "uri");
-  let existingAtom = get(atoms, parsedAtomUri);
 
-  if (parsedAtomUri && !existingAtom) {
+  if (
+    parsedAtomUri &&
+    atoms &&
+    (!atoms.has(parsedAtomUri) || getIn(atoms, [parsedAtomUri, "uriStub"]))
+  ) {
     return atoms.set(parsedAtomUri, parsedMetaAtom);
-  } else {
-    console.error("Tried to add invalid atom-object: ", metaAtom);
   }
 
   return atoms;

@@ -100,7 +100,7 @@ class Controller {
     const selectFromState = state => {
       const viewConnUri = generalSelectors.getViewConnectionUriFromRoute(state);
 
-      const whatsNewMetaAtoms = getIn(state, ["owner", "whatsNew"])
+      const whatsAroundMetaAtoms = generalSelectors.getWhatsNewAtoms(state)
         .filter(metaAtom => atomUtils.isActive(metaAtom))
         .filter(metaAtom => !atomUtils.isSearchAtom(metaAtom))
         .filter(metaAtom => !atomUtils.isDirectResponseAtom(metaAtom))
@@ -110,7 +110,7 @@ class Controller {
             !generalSelectors.isAtomOwned(state, metaAtomUri)
         );
 
-      const sortedVisibleAtoms = sortByDate(whatsNewMetaAtoms, "creationDate");
+      const sortedVisibleAtoms = sortByDate(whatsAroundMetaAtoms, "creationDate");
       const sortedVisibleAtomUriArray = sortedVisibleAtoms && [
         ...sortedVisibleAtoms.flatMap(visibleAtom => get(visibleAtom, "uri")),
       ];
