@@ -303,6 +303,20 @@ _:genid8 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/19
 <https://w3id.org/won/core#brokerUri> <http://www.w3.org/2000/01/rdf-schema#comment> "The URI of the activeMQ broker"@en .
 <https://w3id.org/won/core#brokerUri> <http://www.w3.org/2000/01/rdf-schema#label> "brokerUri" .
 # 
+# https://w3id.org/won/core#closedCount
+<https://w3id.org/won/core#closedCount> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
+<https://w3id.org/won/core#closedCount> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/core#ConnectionContainer> .
+<https://w3id.org/won/core#closedCount> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#integer> .
+<https://w3id.org/won/core#closedCount> <http://www.w3.org/2000/01/rdf-schema#comment> "The number of connections in the container that are in state CLOSED."@en .
+<https://w3id.org/won/core#closedCount> <http://www.w3.org/2000/01/rdf-schema#label> "closedCount" .
+# 
+# https://w3id.org/won/core#connectedCount
+<https://w3id.org/won/core#connectedCount> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
+<https://w3id.org/won/core#connectedCount> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/core#ConnectionContainer> .
+<https://w3id.org/won/core#connectedCount> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#integer> .
+<https://w3id.org/won/core#connectedCount> <http://www.w3.org/2000/01/rdf-schema#comment> "The number of connections in the container that are in state CONNECTED."@en .
+<https://w3id.org/won/core#connectedCount> <http://www.w3.org/2000/01/rdf-schema#label> "connectedCount" .
+# 
 # https://w3id.org/won/core#connectionUriPrefix
 <https://w3id.org/won/core#connectionUriPrefix> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
 <https://w3id.org/won/core#connectionUriPrefix> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/core#UriPrefixSpecification> .
@@ -338,12 +352,33 @@ _:genid8 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/19
 <https://w3id.org/won/core#ownerQueue> <http://www.w3.org/2000/01/rdf-schema#comment> "The activeMQ queue to be used by owners to send messages to the node."@en .
 <https://w3id.org/won/core#ownerQueue> <http://www.w3.org/2000/01/rdf-schema#label> "ownerQueue" .
 # 
+# https://w3id.org/won/core#requestReceivedCount
+<https://w3id.org/won/core#requestReceivedCount> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
+<https://w3id.org/won/core#requestReceivedCount> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/core#ConnectionContainer> .
+<https://w3id.org/won/core#requestReceivedCount> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#integer> .
+<https://w3id.org/won/core#requestReceivedCount> <http://www.w3.org/2000/01/rdf-schema#comment> "The number of connections in the container that are in state REQUEST_RECEIVED."@en .
+<https://w3id.org/won/core#requestReceivedCount> <http://www.w3.org/2000/01/rdf-schema#label> "requestReceivedCount" .
+# 
+# https://w3id.org/won/core#requestSentCount
+<https://w3id.org/won/core#requestSentCount> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
+<https://w3id.org/won/core#requestSentCount> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/core#ConnectionContainer> .
+<https://w3id.org/won/core#requestSentCount> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#integer> .
+<https://w3id.org/won/core#requestSentCount> <http://www.w3.org/2000/01/rdf-schema#comment> "The number of connections in the container that are in state REQUEST_RECEIVED."@en .
+<https://w3id.org/won/core#requestSentCount> <http://www.w3.org/2000/01/rdf-schema#label> "requestSentCount" .
+# 
 # https://w3id.org/won/core#socketCapacity
 <https://w3id.org/won/core#socketCapacity> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
 <https://w3id.org/won/core#socketCapacity> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/core#SocketDefinition> .
 <https://w3id.org/won/core#socketCapacity> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#integer> .
 <https://w3id.org/won/core#socketCapacity> <http://www.w3.org/2000/01/rdf-schema#comment> "Defines the maximum number of established connections supported by the socket."@en .
 <https://w3id.org/won/core#socketCapacity> <http://www.w3.org/2000/01/rdf-schema#label> "socketCapacity" .
+# 
+# https://w3id.org/won/core#suggestedCount
+<https://w3id.org/won/core#suggestedCount> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
+<https://w3id.org/won/core#suggestedCount> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/core#ConnectionContainer> .
+<https://w3id.org/won/core#suggestedCount> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#integer> .
+<https://w3id.org/won/core#suggestedCount> <http://www.w3.org/2000/01/rdf-schema#comment> "The number of connections in the container that are in state SUGGESTED."@en .
+<https://w3id.org/won/core#suggestedCount> <http://www.w3.org/2000/01/rdf-schema#label> "suggestedCount" .
 # 
 # 
 # 

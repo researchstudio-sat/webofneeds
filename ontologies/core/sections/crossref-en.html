@@ -215,6 +215,15 @@ The container supports LDP paging as described here: https://github.com/research
             <a href="#http://www.w3.org/ns/ldp#CompositeContainer" title="http://www.w3.org/ns/ldp#CompositeContainer">composite container</a>
             <sup class="type-c" title="class">c</sup>
          </dd>
+         <dt>is in domain of</dt>
+         <dd>
+            <a href="#closedCount" title="https://w3id.org/won/core#closedCount">closedCount</a>
+            <sup class="type-dp" title="data property">dp</sup>, <a href="#connectedCount" title="https://w3id.org/won/core#connectedCount">connectedCount</a>
+            <sup class="type-dp" title="data property">dp</sup>, <a href="#requestReceivedCount" title="https://w3id.org/won/core#requestReceivedCount">requestReceivedCount</a>
+            <sup class="type-dp" title="data property">dp</sup>, <a href="#requestSentCount" title="https://w3id.org/won/core#requestSentCount">requestSentCount</a>
+            <sup class="type-dp" title="data property">dp</sup>, <a href="#suggestedCount" title="https://w3id.org/won/core#suggestedCount">suggestedCount</a>
+            <sup class="type-dp" title="data property">dp</sup>
+         </dd>
          <dt>is in range of</dt>
          <dd>
             <a href="#connections" title="https://w3id.org/won/core#connections">connections</a>
@@ -1118,6 +1127,12 @@ The container supports LDP paging as described here: https://github.com/research
          <a href="#brokerUri" title="https://w3id.org/won/core#brokerUri">brokerUri</a>
       </li>
       <li>
+         <a href="#closedCount" title="https://w3id.org/won/core#closedCount">closedCount</a>
+      </li>
+      <li>
+         <a href="#connectedCount" title="https://w3id.org/won/core#connectedCount">connectedCount</a>
+      </li>
+      <li>
          <a href="#connectionUriPrefix" title="https://w3id.org/won/core#connectionUriPrefix">connectionUriPrefix</a>
       </li>
       <li>
@@ -1133,7 +1148,16 @@ The container supports LDP paging as described here: https://github.com/research
          <a href="#ownerQueue" title="https://w3id.org/won/core#ownerQueue">ownerQueue</a>
       </li>
       <li>
+         <a href="#requestReceivedCount" title="https://w3id.org/won/core#requestReceivedCount">requestReceivedCount</a>
+      </li>
+      <li>
+         <a href="#requestSentCount" title="https://w3id.org/won/core#requestSentCount">requestSentCount</a>
+      </li>
+      <li>
          <a href="#socketCapacity" title="https://w3id.org/won/core#socketCapacity">socketCapacity</a>
+      </li>
+      <li>
+         <a href="#suggestedCount" title="https://w3id.org/won/core#suggestedCount">suggestedCount</a>
       </li>
    </ul>
    <div class="entity" id="atomActivatedTopic">
@@ -1328,6 +1352,54 @@ The container supports LDP paging as described here: https://github.com/research
          </dl>
       </div>
    </div>
+   <div class="entity" id="closedCount">
+      <h3>closedCount<sup class="type-dp" title="data property">dp</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#dataproperties">Data Property ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/core#closedCount</p>
+      <div class="comment">
+         <span class="markdown">The number of connections in the container that are in state CLOSED.</span>
+      </div>
+      <div class="description">
+         <dl>
+            <dt>has domain</dt>
+            <dd>
+               <a href="#ConnectionContainer" title="https://w3id.org/won/core#ConnectionContainer">ConnectionContainer</a>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
+            <dt>has range</dt>
+            <dd>
+               <span class="dotted" title="http://www.w3.org/2001/XMLSchema#integer">integer</span>
+            </dd>
+         </dl>
+      </div>
+   </div>
+   <div class="entity" id="connectedCount">
+      <h3>connectedCount<sup class="type-dp" title="data property">dp</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#dataproperties">Data Property ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/core#connectedCount</p>
+      <div class="comment">
+         <span class="markdown">The number of connections in the container that are in state CONNECTED.</span>
+      </div>
+      <div class="description">
+         <dl>
+            <dt>has domain</dt>
+            <dd>
+               <a href="#ConnectionContainer" title="https://w3id.org/won/core#ConnectionContainer">ConnectionContainer</a>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
+            <dt>has range</dt>
+            <dd>
+               <span class="dotted" title="http://www.w3.org/2001/XMLSchema#integer">integer</span>
+            </dd>
+         </dl>
+      </div>
+   </div>
    <div class="entity" id="connectionUriPrefix">
       <h3>connectionUriPrefix<sup class="type-dp" title="data property">dp</sup>
          <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#dataproperties">Data Property ToC</a>
@@ -1448,6 +1520,54 @@ The container supports LDP paging as described here: https://github.com/research
          </dl>
       </div>
    </div>
+   <div class="entity" id="requestReceivedCount">
+      <h3>requestReceivedCount<sup class="type-dp" title="data property">dp</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#dataproperties">Data Property ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/core#requestReceivedCount</p>
+      <div class="comment">
+         <span class="markdown">The number of connections in the container that are in state REQUEST_RECEIVED.</span>
+      </div>
+      <div class="description">
+         <dl>
+            <dt>has domain</dt>
+            <dd>
+               <a href="#ConnectionContainer" title="https://w3id.org/won/core#ConnectionContainer">ConnectionContainer</a>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
+            <dt>has range</dt>
+            <dd>
+               <span class="dotted" title="http://www.w3.org/2001/XMLSchema#integer">integer</span>
+            </dd>
+         </dl>
+      </div>
+   </div>
+   <div class="entity" id="requestSentCount">
+      <h3>requestSentCount<sup class="type-dp" title="data property">dp</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#dataproperties">Data Property ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/core#requestSentCount</p>
+      <div class="comment">
+         <span class="markdown">The number of connections in the container that are in state REQUEST_RECEIVED.</span>
+      </div>
+      <div class="description">
+         <dl>
+            <dt>has domain</dt>
+            <dd>
+               <a href="#ConnectionContainer" title="https://w3id.org/won/core#ConnectionContainer">ConnectionContainer</a>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
+            <dt>has range</dt>
+            <dd>
+               <span class="dotted" title="http://www.w3.org/2001/XMLSchema#integer">integer</span>
+            </dd>
+         </dl>
+      </div>
+   </div>
    <div class="entity" id="socketCapacity">
       <h3>socketCapacity<sup class="type-dp" title="data property">dp</sup>
          <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#dataproperties">Data Property ToC</a>
@@ -1463,6 +1583,30 @@ The container supports LDP paging as described here: https://github.com/research
             <dt>has domain</dt>
             <dd>
                <a href="#SocketDefinition" title="https://w3id.org/won/core#SocketDefinition">SocketDefinition</a>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
+            <dt>has range</dt>
+            <dd>
+               <span class="dotted" title="http://www.w3.org/2001/XMLSchema#integer">integer</span>
+            </dd>
+         </dl>
+      </div>
+   </div>
+   <div class="entity" id="suggestedCount">
+      <h3>suggestedCount<sup class="type-dp" title="data property">dp</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#dataproperties">Data Property ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/core#suggestedCount</p>
+      <div class="comment">
+         <span class="markdown">The number of connections in the container that are in state SUGGESTED.</span>
+      </div>
+      <div class="description">
+         <dl>
+            <dt>has domain</dt>
+            <dd>
+               <a href="#ConnectionContainer" title="https://w3id.org/won/core#ConnectionContainer">ConnectionContainer</a>
                <sup class="type-c" title="class">c</sup>
             </dd>
             <dt>has range</dt>
