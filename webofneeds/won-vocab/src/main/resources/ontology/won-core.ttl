@@ -327,6 +327,41 @@ xsd:duration rdf:type rdfs:Datatype .
            rdfs:label "brokerUri" .
 
 
+###  https://w3id.org/won/core#connectedCount
+:connectedCount rdf:type owl:DatatypeProperty ;
+                rdfs:domain :ConnectionContainer ;
+                rdfs:range xsd:integer ;
+                rdfs:comment "The number of connections in the container that are in state CONNECTED."@en ;
+                rdfs:label "connectedCount".
+
+###  https://w3id.org/won/core#suggestedCount
+:suggestedCount rdf:type owl:DatatypeProperty ;
+                rdfs:domain :ConnectionContainer ;
+                rdfs:range xsd:integer ;
+                rdfs:comment "The number of connections in the container that are in state SUGGESTED."@en ;
+                rdfs:label "suggestedCount".
+
+###  https://w3id.org/won/core#requestReceivedCount
+:requestReceivedCount rdf:type owl:DatatypeProperty ;
+                rdfs:domain :ConnectionContainer ;
+                rdfs:range xsd:integer ;
+                rdfs:comment "The number of connections in the container that are in state REQUEST_RECEIVED."@en ;
+                rdfs:label "requestReceivedCount".
+
+###  https://w3id.org/won/core#requestSentCount
+:requestSentCount rdf:type owl:DatatypeProperty ;
+                rdfs:domain :ConnectionContainer ;
+                rdfs:range xsd:integer ;
+                rdfs:comment "The number of connections in the container that are in state REQUEST_RECEIVED."@en ;
+                rdfs:label "requestSentCount".
+
+###  https://w3id.org/won/core#closedCount
+:closedCount rdf:type owl:DatatypeProperty ;
+                rdfs:domain :ConnectionContainer ;
+                rdfs:range xsd:integer ;
+                rdfs:comment "The number of connections in the container that are in state CLOSED."@en ;
+                rdfs:label "closedCount".
+
 ###  https://w3id.org/won/core#connectionUriPrefix
 :connectionUriPrefix rdf:type owl:DatatypeProperty ;
                      rdfs:domain :UriPrefixSpecification ;

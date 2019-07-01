@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -21,6 +22,7 @@ import org.apache.jena.shared.PrefixMapping;
 import org.apache.jena.shared.impl.PrefixMappingImpl;
 import org.apache.jena.vocabulary.DC;
 import org.apache.jena.vocabulary.DCTerms;
+import org.apache.jena.vocabulary.OWL;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 import org.apache.jena.vocabulary.XSD;
@@ -93,7 +95,13 @@ public class Prefixer {
         prefixMapping.setNsPrefix("schema", SCHEMA.getURI());
         prefixMapping.setNsPrefix("sh", "http://www.w3.org/ns/shacl#");
         prefixMapping.setNsPrefix("rdfg", "http://www.w3.org/2004/03/trix/rdfg-1/");
+        prefixMapping.setNsPrefix("owl", OWL.getURI());
+        prefixMapping.setNsPrefix("vann", "http://purl.org/vocab/vann/");
         return prefixMapping;
+    }
+    
+    public Set<String> getBlacklist(){
+        return Stream.of("https://w3id.org/won/ext/", "https://w3id.org/won/").collect(Collectors.toSet());
     }
 
     public void setUsedPrefixes(Dataset ds) {
@@ -122,7 +130,9 @@ public class Prefixer {
                 prefixes.remove(entry.getValue());
             }
         });
-        prefixes.stream().forEach(prefix -> {
+        prefixes.removeAll(getBlacklist());
+        prefixes.stream()
+            .forEach(prefix -> {
             dm.setNsPrefix("p" + cnt.getAndIncrement(), prefix);
         });
         sw.stop();
@@ -138,18 +148,22 @@ public class Prefixer {
 
     public Optional<String> getUriPrefix(RDFNode node) {
         if (node.isURIResource()) {
-            return Optional.of(toPrefix(node.asResource().getURI()));
+            return Optional.ofNullable(toPrefix(node.asResource().getURI()));
         }
         if (node.isLiteral()) {
             if (node.asLiteral().getDatatypeURI() != null) {
-                return Optional.of(toPrefix(node.asLiteral().getDatatypeURI()));
+                return Optional.ofNullable(toPrefix(node.asLiteral().getDatatypeURI()));
             }
         }
         return Optional.empty();
     }
 
     public String toPrefix(String uri) {
-        return PREFIX_PATTERN.matcher(uri).replaceAll("");
+        Matcher m = PREFIX_PATTERN.matcher(uri);
+        if (!m.find()) {
+            return null;
+        }
+        return m.replaceAll("");
     }
 
     public static void main(String[] args) {
