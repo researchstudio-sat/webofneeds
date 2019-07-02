@@ -99,7 +99,7 @@ public class Prefixer {
         prefixMapping.setNsPrefix("vann", "http://purl.org/vocab/vann/");
         return prefixMapping;
     }
-    
+
     public Set<String> getBlacklist() {
         return Stream.of("https://w3id.org/won/ext/", "https://w3id.org/won/").collect(Collectors.toSet());
     }
@@ -132,9 +132,9 @@ public class Prefixer {
         });
         prefixes.removeAll(getBlacklist());
         prefixes.stream()
-            .forEach(prefix -> {
-            dm.setNsPrefix("p" + cnt.getAndIncrement(), prefix);
-        });
+                        .forEach(prefix -> {
+                            dm.setNsPrefix("p" + cnt.getAndIncrement(), prefix);
+                        });
         sw.stop();
     }
 
