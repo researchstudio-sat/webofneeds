@@ -69,6 +69,7 @@ import { runMessagingAgent } from "./messaging-agent.js";
 
 import detailModules from "./components/details/details.js";
 import { runPushAgent } from "./push-agent";
+import { enableNotifications } from "../config/default";
 
 let app = angular.module("won.owner", [
   /* to enable legacy $stateChange* events in ui-router (see
@@ -151,7 +152,9 @@ app.config(configRouting).config([
 ]);
 app.run(["$ngRedux", $ngRedux => runMessagingAgent($ngRedux)]);
 
-app.run(["$ngRedux", $ngRedux => runPushAgent($ngRedux)]);
+if (enableNotifications) {
+  app.run(["$ngRedux", $ngRedux => runPushAgent($ngRedux)]);
+}
 
 app.run([
   "$ngRedux",
