@@ -23,6 +23,9 @@ public class PushSubscription {
     @Column(nullable = false)
     private Date updated;
 
+    @JoinColumn(nullable = false, name = "user_id")
+    private Long user_id;
+
     public PushSubscription() {
     }
 

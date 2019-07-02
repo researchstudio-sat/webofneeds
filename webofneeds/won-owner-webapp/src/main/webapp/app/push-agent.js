@@ -29,14 +29,7 @@ export function runPushAgent(redux) {
     ]);
 
     if (pushReg && pushReg.options.applicationServerKey === serverKey) {
-      await fetch(`${ownerBaseUrl}/rest/users/subscribeNotifications`, {
-        body: JSON.stringify(pushReg.toJSON()),
-        method: "POST",
-        headers: new Headers({
-          "Content-Type": "application/json",
-        }),
-        credentials: "include",
-      });
+      await sendSubscriptionToServer(pushReg);
     }
   });
 
