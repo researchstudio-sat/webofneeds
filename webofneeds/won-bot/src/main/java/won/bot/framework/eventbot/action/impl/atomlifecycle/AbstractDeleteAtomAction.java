@@ -10,6 +10,7 @@
  */
 package won.bot.framework.eventbot.action.impl.atomlifecycle;
 
+import org.apache.jena.query.Dataset;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.protocol.exception.WonMessageBuilderException;
@@ -34,7 +35,28 @@ public abstract class AbstractDeleteAtomAction extends BaseEventBotAction {
         this.uriListName = uriListName;
     }
 
-    protected WonMessage deleteWonMessage(WonNodeInformationService wonNodeInformationService, URI atomURI,
+    /**
+     * Builds a delete message for the given atomURI wonNodeInformationService and
+     * nodeUri will be taken from the eventListenerContext of the Action
+     * 
+     * @param atomURI uri of the atom that should be deleted
+     * @return delete WonMessage
+     */
+    protected WonMessage buildWonMessage(URI atomURI) {
+        return this.buildWonMessage(getEventListenerContext().getWonNodeInformationService(), atomURI,
+                        getEventListenerContext().getNodeURISource().getNodeURI());
+    }
+
+    /**
+     * Builds a delete message for the given atomURI wonNodeInformationService and
+     * nodeUri will be taken from the eventListenerContext of the Action
+     * 
+     * @param wonNodeInformationService
+     * @param atomURI uri of the atom that should be deleted
+     * @param wonNodeURI
+     * @return delete WonMessage
+     */
+    protected WonMessage buildWonMessage(WonNodeInformationService wonNodeInformationService, URI atomURI,
                     URI wonNodeURI)
                     throws WonMessageBuilderException {
         return WonMessageBuilder.setMessagePropertiesForDeleteFromOwner(

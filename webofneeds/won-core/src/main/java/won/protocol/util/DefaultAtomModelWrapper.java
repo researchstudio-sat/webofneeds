@@ -23,6 +23,10 @@ import won.protocol.vocabulary.*;
  * Created by hfriedrich on 16.03.2017.
  */
 public class DefaultAtomModelWrapper extends AtomModelWrapper {
+    public DefaultAtomModelWrapper(final URI atomUri) {
+        this(atomUri.toString());
+    }
+
     public DefaultAtomModelWrapper(final String atomUri) {
         super(atomUri);
     }
