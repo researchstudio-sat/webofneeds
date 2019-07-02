@@ -1,5 +1,6 @@
 package won.protocol.util;
 
+import java.net.URI;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
@@ -61,6 +62,15 @@ public class AtomModelWrapper {
     protected Dataset atomDataset;
     private String sysInfoGraphName;
     private String atomModelGraphName;
+
+    /**
+     * Create a new atom model (incluing sysinfo)
+     *
+     * @param atomUri atom uri to create the atom models for
+     */
+    public AtomModelWrapper(URI atomUri) {
+        this(atomUri.toString());
+    }
 
     /**
      * Create a new atom model (incluing sysinfo)

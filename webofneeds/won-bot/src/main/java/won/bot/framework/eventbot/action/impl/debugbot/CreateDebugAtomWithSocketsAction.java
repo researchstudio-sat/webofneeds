@@ -102,7 +102,7 @@ public class CreateDebugAtomWithSocketsAction extends AbstractCreateAtomAction {
         EventBus bus = ctx.getEventBus();
         final URI wonNodeUri = ctx.getNodeURISource().getNodeURI();
         final URI atomURI = wonNodeInformationService.generateAtomURI(wonNodeUri);
-        DefaultAtomModelWrapper atomModelWrapper = new DefaultAtomModelWrapper(atomURI.toString());
+        DefaultAtomModelWrapper atomModelWrapper = new DefaultAtomModelWrapper(atomURI);
         atomModelWrapper.setTitle(replyText);
         atomModelWrapper.setDescription("This is an atom automatically created by the DebugBot.");
         atomModelWrapper.setSeeksTitle(replyText);

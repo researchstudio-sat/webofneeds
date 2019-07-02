@@ -58,7 +58,7 @@ public class CreateEchoAtomWithSocketsAction extends AbstractCreateAtomAction {
         WonNodeInformationService wonNodeInformationService = ctx.getWonNodeInformationService();
         final URI wonNodeUri = ctx.getNodeURISource().getNodeURI();
         final URI atomURI = wonNodeInformationService.generateAtomURI(wonNodeUri);
-        atomModelWrapper = new DefaultAtomModelWrapper(atomURI.toString());
+        atomModelWrapper = new DefaultAtomModelWrapper(atomURI);
         atomModelWrapper.setTitle("RE: " + replyText);
         atomModelWrapper.setDescription("This is an atom automatically created by the EchoBot.");
         atomModelWrapper.setSeeksTitle("RE: " + replyText);
