@@ -22,6 +22,7 @@ public class PushSubscription {
     @Temporal(TemporalType.TIMESTAMP)
     @Column(nullable = false)
     private Date updated;
+    @ManyToOne
     @JoinColumn(nullable = false, name = "user_id")
     private Long user_id;
 
