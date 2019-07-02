@@ -55,6 +55,12 @@ export function runPushAgent(redux) {
               !pushSubscription ||
               pushSubscription.options.applicationServerKey != serverKey
             ) {
+              console.debug(
+                "Subscription is stale, trying to generate new one"
+              );
+              if (pushSubscription) {
+                await pushSubscription.unsubscribe();
+              }
               pushSubscription = await swReg.pushManager.subscribe({
                 userVisibleOnly: true,
                 applicationServerKey: serverKey,
