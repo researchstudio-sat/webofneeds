@@ -100,7 +100,7 @@ public class Prefixer {
         return prefixMapping;
     }
     
-    public Set<String> getBlacklist(){
+    public Set<String> getBlacklist() {
         return Stream.of("https://w3id.org/won/ext/", "https://w3id.org/won/").collect(Collectors.toSet());
     }
 
