@@ -26,17 +26,37 @@ import java.net.URI;
  * Base class for actions that modifies atoms.
  */
 public abstract class AbstractModifyAtomAction extends BaseEventBotAction {
-    protected String uriListName;
-
     public AbstractModifyAtomAction(EventListenerContext eventListenerContext) {
-        this(eventListenerContext, eventListenerContext.getBotContextWrapper().getAtomCreateListName());
-    }
-
-    public AbstractModifyAtomAction(EventListenerContext eventListenerContext, String uriListName) {
         super(eventListenerContext);
-        this.uriListName = uriListName;
     }
 
+    /**
+     * Builds a modify message with the given atomURI using the atomDataset as the
+     * content wonNodeInformationService and nodeUri will be taken from the
+     * eventListenerContext of the Action
+     * 
+     * @param atomURI uri of the atom that should be replaced
+     * @param atomDataset updated content that should be used instead of the
+     * existing one
+     * @return modify WonMessage
+     */
+    protected WonMessage buildWonMessage(URI atomURI, Dataset atomDataset) {
+        return this.buildWonMessage(getEventListenerContext().getWonNodeInformationService(), atomURI,
+                        getEventListenerContext().getNodeURISource().getNodeURI(), atomDataset);
+    }
+
+    /**
+     * Builds a modify message with the given atomURI using the atomDataset as the
+     * content wonNodeInformationService and nodeUri will be taken from the
+     * eventListenerContext of the Action
+     * 
+     * @param wonNodeInformationService
+     * @param atomURI uri of the atom that should be replaced
+     * @param wonNodeURI
+     * @param atomDataset updated content that should be used instead of the
+     * existing one
+     * @return modify WonMessage
+     */
     protected WonMessage buildWonMessage(WonNodeInformationService wonNodeInformationService, URI atomURI,
                     URI wonNodeURI, Dataset atomDataset)
                     throws WonMessageBuilderException {
