@@ -10,34 +10,39 @@
  */
 package won.bot.framework.eventbot.action.impl.atomlifecycle;
 
+import org.apache.jena.query.Dataset;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
 import won.protocol.service.WonNodeInformationService;
+import won.protocol.util.AtomModelWrapper;
+import won.protocol.util.RdfUtils;
 
 import java.net.URI;
 
 /**
- * Base class for actions that create atoms.
+ * Base class for actions that modifies atoms.
  */
-public abstract class AbstractDeleteAtomAction extends BaseEventBotAction {
+public abstract class AbstractModifyAtomAction extends BaseEventBotAction {
     protected String uriListName;
 
-    public AbstractDeleteAtomAction(EventListenerContext eventListenerContext) {
+    public AbstractModifyAtomAction(EventListenerContext eventListenerContext) {
         this(eventListenerContext, eventListenerContext.getBotContextWrapper().getAtomCreateListName());
     }
 
-    public AbstractDeleteAtomAction(EventListenerContext eventListenerContext, String uriListName) {
+    public AbstractModifyAtomAction(EventListenerContext eventListenerContext, String uriListName) {
         super(eventListenerContext);
         this.uriListName = uriListName;
     }
 
     protected WonMessage buildWonMessage(WonNodeInformationService wonNodeInformationService, URI atomURI,
-                    URI wonNodeURI)
+                    URI wonNodeURI, Dataset atomDataset)
                     throws WonMessageBuilderException {
-        return WonMessageBuilder.setMessagePropertiesForDeleteFromOwner(
-                        wonNodeInformationService.generateEventURI(wonNodeURI), atomURI, wonNodeURI).build();
+        RdfUtils.replaceBaseURI(atomDataset, atomURI.toString(), true);
+        AtomModelWrapper atomModelWrapper = new AtomModelWrapper(atomDataset);
+        return WonMessageBuilder.setMessagePropertiesForReplace(wonNodeInformationService.generateEventURI(wonNodeURI),
+                        atomURI, wonNodeURI).addContent(atomModelWrapper.copyDataset()).build();
     }
 }
