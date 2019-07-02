@@ -5,6 +5,7 @@ import org.apache.jena.datatypes.RDFDatatype;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.Resource;
 
 /**
  * SCHEMA vocabulary. USER: MS Date: 01.10.2018
@@ -51,7 +52,10 @@ public class SCHEMA {
     public static final Property AGGREGATE_RATING = m.createProperty(BASE_URI + "aggregateRating");
     public static final Property REVIEW_COUNT = m.createProperty(BASE_URI + "reviewCount");
     public static final Property OBJECT = m.createProperty(BASE_URI + "object");
-    public static final Property EVENT = m.createProperty(BASE_URI + "Event");
+    public static final Resource EVENT = m.createResource(BASE_URI + "Event");
+    public static final Resource PLANACTION = m.createResource(BASE_URI + "PlanAction");
+    public static final Property VALID_FROM = m.createProperty(BASE_URI + "validFrom");
+    public static final Property VALID_THROUGH = m.createProperty(BASE_URI + "validThrough");
     public static final RDFDatatype TEXT = new BaseDatatype(BASE_URI + "Text");
 
     /**
