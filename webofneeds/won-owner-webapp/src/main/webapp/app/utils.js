@@ -558,6 +558,20 @@ export function base64UrlToUint8Array(base64UrlData) {
   for (const i of buffer.keys()) {
     buffer[i] = rawData.charCodeAt(i);
   }
+  return buffer.buffer;
+}
 
-  return buffer;
+export function compareArrayBuffers(left, right) {
+  const leftArray = new Uint8Array(left);
+  const rightArray = new Uint8Array(right);
+
+  if (leftArray.length != rightArray.length) return false;
+
+  for (const [index] of leftArray.entries()) {
+    if (leftArray[index] != rightArray[index]) {
+      return false;
+    }
+  }
+
+  return true;
 }

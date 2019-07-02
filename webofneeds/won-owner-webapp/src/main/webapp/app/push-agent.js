@@ -1,5 +1,5 @@
 import { ownerBaseUrl } from "../config/default";
-import { base64UrlToUint8Array } from "./utils";
+import { base64UrlToUint8Array, compareArrayBuffers } from "./utils";
 
 function getServerKey() {
   return fetch(`${ownerBaseUrl}/appConfig/getWebPushKey`)
@@ -53,7 +53,10 @@ export function runPushAgent(redux) {
             let pushSubscription = await swReg.pushManager.getSubscription();
             if (
               !pushSubscription ||
-              pushSubscription.options.applicationServerKey != serverKey
+              !compareArrayBuffers(
+                pushSubscription.options.applicationServerKey,
+                serverKey
+              )
             ) {
               console.debug(
                 "Subscription is stale, trying to generate new one"
