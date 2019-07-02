@@ -29,6 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import won.cryptography.rdfsign.SignatureVerificationState;
 import won.cryptography.rdfsign.WonKeysReaderWriter;
 import won.protocol.message.WonMessage;
+import won.protocol.message.WonMessageType;
 import won.protocol.message.processor.WonMessageProcessor;
 import won.protocol.message.processor.exception.WonMessageProcessingException;
 import won.protocol.util.RdfUtils;
@@ -54,6 +55,15 @@ public class SignatureCheckingWonMessageProcessor implements WonMessageProcessor
     @Override
     public WonMessage process(final WonMessage message) throws WonMessageProcessingException {
         SignatureVerificationState result = null;
+        /*
+         * If the message is a successResponse to a delete Message then we can't check
+         * the signature as it is stored in the deleted Atom, so we just accept the
+         * message as valid and return it.
+         */
+        if (message.getIsResponseToMessageType() == WonMessageType.DELETE
+                        && message.getMessageType() == WonMessageType.SUCCESS_RESPONSE) {
+            return message;
+        }
         try {
             // obtain public keys
             Map<String, PublicKey> keys = getRequiredPublicKeys(message.getCompleteDataset());
