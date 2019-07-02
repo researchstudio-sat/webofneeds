@@ -26,12 +26,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.web.client.HttpClientErrorException;
 import won.cryptography.rdfsign.SignatureVerificationState;
 import won.cryptography.rdfsign.WonKeysReaderWriter;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageType;
 import won.protocol.message.processor.WonMessageProcessor;
 import won.protocol.message.processor.exception.WonMessageProcessingException;
+import won.protocol.rest.LinkedDataFetchingException;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.linkeddata.LinkedDataSource;
 
@@ -71,6 +74,22 @@ public class SignatureCheckingWonMessageProcessor implements WonMessageProcessor
             result = WonMessageSignerVerifier.verify(keys, message);
             logger.debug("VERIFIED=" + result.isVerificationPassed() + " with keys: " + keys.values() + " for\n"
                             + RdfUtils.writeDatasetToString(message.getCompleteDataset(), Lang.TRIG));
+        } catch (LinkedDataFetchingException e) {
+            /*
+             * If a delete message could not be validated because the atom was already
+             * deleted, we assume that this message is just mirrored back to the owner and
+             * is to be accepteed
+             */
+            if (WonMessageType.DELETE.equals(message.getMessageType())) {
+                if (e.getCause() instanceof HttpClientErrorException
+                                && HttpStatus.GONE.equals(((HttpClientErrorException) e.getCause()).getStatusCode())) {
+                    logger.debug("Failure during processing signature check of message" + message.getMessageURI()
+                                    + " (messageType was DELETE, but atom is already deleted, accept message anyway)");
+                    return message;
+                }
+            }
+            // TODO SignatureProcessingException?
+            throw new WonMessageProcessingException("Could not verify message " + message.getMessageURI(), e);
         } catch (Exception e) {
             // TODO SignatureProcessingException?
             throw new WonMessageProcessingException("Could not verify message " + message.getMessageURI(), e);
