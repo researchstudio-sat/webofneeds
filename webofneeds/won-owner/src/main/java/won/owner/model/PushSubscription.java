@@ -42,7 +42,8 @@ public class PushSubscription {
         return endpoint;
     }
 
-    public PushSubscription(Subscription subscription) {
+    public PushSubscription(User owner, Subscription subscription) {
+        this.owner = owner;
         this.endpoint = subscription.endpoint;
         this.key = subscription.keys.p256dh;
         this.auth = subscription.keys.auth;

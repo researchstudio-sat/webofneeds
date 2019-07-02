@@ -470,7 +470,7 @@ public class RestUserController {
         if (user == null) {
             return generateStatusResponse(RestStatusResponse.USER_NOT_SIGNED_IN);
         }
-        userService.addPushSubscription(user, new PushSubscription(subscription));
+        userService.addPushSubscription(user, new PushSubscription(user, subscription));
         return generateStatusResponse(RestStatusResponse.SUBSCRIBE_SUCCESS);
     }
 
