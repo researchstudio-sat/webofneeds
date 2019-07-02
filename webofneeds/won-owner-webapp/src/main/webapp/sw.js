@@ -24,7 +24,6 @@ self.addEventListener("push", async event => {
               atomUri: payload.atomUri,
               connectionUri: payload.connectionUri,
             },
-            body: `They wrote:\n${payload.message}`,
           }
         );
         break;
