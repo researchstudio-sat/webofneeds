@@ -33,7 +33,7 @@ public class BotManagerImpl implements BotManager {
                 return bot;
         }
         // check each bot, return first that knows the atomUri
-        logger.debug("bots size:{} ", bots.size());
+        logger.trace("bots size:{} ", bots.size());
         for (Bot mybot : bots) {
             // logger.debug("bot knows atom: {}", mybot.knowsAtomURI(atomUri));
             if (mybot.knowsAtomURI(atomUri)) {
