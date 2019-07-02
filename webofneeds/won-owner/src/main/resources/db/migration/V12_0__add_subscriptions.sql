@@ -1,12 +1,17 @@
-CREATE TABLE pushSubscriptions
+CREATE TABLE pushsubscriptions
 (
-    id BIGINT PRIMARY KEY NOT NULL,
-    endpoint VARCHAR(255) NOT NULL,
-    key VARCHAR(255) NOT NULL,
-    auth VARCHAR(255) NOT NULL,
-    updated TIMESTAMP NOT NULL,
-    user_id BIGINT NOT NULL,
-    CONSTRAINT fk_pushsubtouser FOREIGN KEY (user_id) REFERENCES wonuser (id)
+  id bigint NOT NULL,
+  auth character varying(255) NOT NULL,
+  endpoint character varying(255) NOT NULL,
+  key character varying(255) NOT NULL,
+  updated timestamp without time zone NOT NULL,
+  user_id bigint,
+  CONSTRAINT pushsubscriptions_pkey PRIMARY KEY (id),
+  CONSTRAINT fkabdxvemxlapjt0mkbme2r6h72 FOREIGN KEY (user_id)
+      REFERENCES public.wonuser (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT uk3q280oqug9ms3deq019x9e19w UNIQUE (user_id, endpoint)
+)
+WITH (
+  OIDS=FALSE
 );
-
-CREATE UNIQUE INDEX uk_pushsubendpoint ON pushSubscriptions (user_id, endpoint);

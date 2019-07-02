@@ -22,9 +22,6 @@ public class PushSubscription {
     @Temporal(TemporalType.TIMESTAMP)
     @Column(nullable = false)
     private Date updated;
-    @ManyToOne(targetEntity = User.class)
-    @JoinColumn(nullable = false, name = "user_id")
-    private User owner;
 
     public PushSubscription() {
     }
@@ -42,8 +39,7 @@ public class PushSubscription {
         return endpoint;
     }
 
-    public PushSubscription(User owner, Subscription subscription) {
-        this.owner = owner;
+    public PushSubscription(Subscription subscription) {
         this.endpoint = subscription.endpoint;
         this.key = subscription.keys.p256dh;
         this.auth = subscription.keys.auth;
