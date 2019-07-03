@@ -1049,19 +1049,13 @@ won.ttlToJsonLd = async function(ttl, prependWonPrefixes = true) {
 
   const tryConversion = async () => {
     const { quads /*prefixes*/ } = await won.n3Parse(ttl_);
-    const placeholderGraphUri = "ignoredgraphuri:placeholder";
-
-    // overwrite empty graphUri (ttl is just triples) with placeholder string
-    quads.forEach(t => {
-      t.graph.id = placeholderGraphUri;
-    });
 
     const quadString = await won.n3Write(quads, {
       format: "application/n-quads",
     });
 
     const parsedJsonld = await jsonld.promises.fromRDF(quadString, {
-      format: "application/nquads",
+      format: "application/n-quads",
     });
 
     return parsedJsonld;
