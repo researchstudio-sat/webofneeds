@@ -354,6 +354,7 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
                     }
                     pushSender.sendNotification(user, stringifiedJson);
                 }
+                return;
             case CONNECT:
                 if (userAtom.isRequests()) {
                     ObjectMapper mapper = new ObjectMapper();
