@@ -1042,13 +1042,9 @@ won.n3Parse = async function(rdf, parserArgs) {
  * @param {string} ttl
  * @param {boolean} prependWonPrefixes
  */
-won.ttlToJsonLd = async function(ttl, prependWonPrefixes = true) {
-  const ttl_ = prependWonPrefixes
-    ? won.defaultTurtlePrefixes + "\n" + ttl
-    : ttl;
-
+won.ttlToJsonLd = async function(ttl) {
   const tryConversion = async () => {
-    const { quads /*prefixes*/ } = await won.n3Parse(ttl_);
+    const { quads /*prefixes*/ } = await won.n3Parse(ttl);
 
     const quadString = await won.n3Write(quads, {
       format: "application/n-quads",
@@ -1063,7 +1059,7 @@ won.ttlToJsonLd = async function(ttl, prependWonPrefixes = true) {
   return tryConversion().catch(e => {
     e.message =
       "error while parsing the following turtle:\n\n" +
-      ttl_ +
+      ttl +
       "\n\n----\n\n" +
       e.message;
     throw e;
