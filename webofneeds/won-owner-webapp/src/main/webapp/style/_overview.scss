@@ -73,13 +73,7 @@ main.owneroverview {
     padding: 1rem;
     grid-gap: 1rem;
 
-    @media (min-width: $responsivenessBreakPoint) {
-      grid-template-columns: 1fr 1fr 1fr 1fr;
-    }
-    @media (max-width: $responsivenessBreakPoint) {
-      //One Column in mobile
-      grid-template-columns: 1fr;
-    }
+    grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
 
     won-atom-card.owneroverview__content__atom {
       border: $thinGrayBorder;

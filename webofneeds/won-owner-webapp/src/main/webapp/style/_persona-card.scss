@@ -42,11 +42,6 @@ won-persona-card {
   .card__main {
     grid-area: card__main;
 
-    @media (min-width: $responsivenessBreakPoint) {
-      width: 15rem;
-      max-width: 15rem;
-    }
-
     &__name {
       min-width: 0;
       white-space: nowrap;

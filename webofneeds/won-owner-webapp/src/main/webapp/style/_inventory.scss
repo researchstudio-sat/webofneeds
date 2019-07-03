@@ -107,13 +107,7 @@ main.ownerinventory {
     padding: 1rem;
     grid-gap: 1rem;
 
-    @media (min-width: $responsivenessBreakPoint) {
-      grid-template-columns: 1fr 1fr 1fr 1fr;
-    }
-    @media (max-width: $responsivenessBreakPoint) {
-      //One Column in mobile
-      grid-template-columns: 1fr;
-    }
+    grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
 
     won-atom-card.ownerinventory__content__atom {
       border: $thinGrayBorder;
@@ -131,16 +125,6 @@ main.ownerinventory {
       align-content: center;
       grid-template-rows: min-content min-content;
       box-sizing: border-box;
-
-      @media (max-width: $responsivenessBreakPoint) {
-        width: 100%;
-        max-width: 100%;
-      }
-
-      @media (min-width: $responsivenessBreakPoint) {
-        width: 15rem;
-        max-width: 15rem;
-      }
 
       &:hover {
         border-color: $won-primary-color;
