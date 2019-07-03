@@ -64,11 +64,6 @@ won-skeleton-card {
     grid-template-columns: 1fr;
     grid-template-rows: min-content min-content min-content;
 
-    @media (min-width: $responsivenessBreakPoint) {
-      width: 15rem;
-      max-width: 15rem;
-    }
-
     &__topline {
       grid-area: card__main__topline;
       min-width: 0;

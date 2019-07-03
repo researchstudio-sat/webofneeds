@@ -54,15 +54,7 @@ won-other-card {
 
     & .image,
     & won-atom-map.location {
-      @media (max-width: $responsivenessBreakPoint) {
-        width: 100%;
-        height: 10rem;
-      }
-
-      @media (min-width: $responsivenessBreakPoint) {
-        width: 15rem;
-        height: 10rem;
-      }
+      height: 10rem;
     }
 
     & .image {
@@ -106,15 +98,6 @@ won-other-card {
 
   .card__persona {
     grid-area: card__persona;
-
-    @media (max-width: $responsivenessBreakPoint) {
-      width: 100%;
-    }
-
-    @media (min-width: $responsivenessBreakPoint) {
-      max-width: 15rem;
-      width: 15rem;
-    }
 
     margin-top: 0.5rem;
 
@@ -176,11 +159,6 @@ won-other-card {
     grid-template-areas: "card__main__topline" "card__main__subtitle";
     grid-template-columns: 1fr;
     grid-template-rows: min-content min-content min-content;
-
-    @media (min-width: $responsivenessBreakPoint) {
-      width: 15rem;
-      max-width: 15rem;
-    }
 
     &--showIcon {
       grid-template-areas: "card__main__icon card__main__topline" "card__main__icon card__main__subtitle";
