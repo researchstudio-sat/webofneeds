@@ -10,26 +10,41 @@
  */
 package won.owner.web.rest;
 
-import java.net.URI;
-
+import nl.martijndwars.webpush.Base64Encoder;
+import nl.martijndwars.webpush.Utils;
+import org.bouncycastle.jce.interfaces.ECPublicKey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-
+import won.owner.web.WonOwnerPushSender;
 import won.protocol.service.WonNodeInformationService;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.security.PublicKey;
 
 @Controller
 @RequestMapping("/appConfig")
 public class AppConfigController {
     @Autowired
     private WonNodeInformationService wonNodeInformationService;
+    @Autowired
+    private WonOwnerPushSender wonOnwerPushSender;
 
     @RequestMapping(value = "/getDefaultWonNodeUri", method = RequestMethod.GET)
-    public ResponseEntity<URI> getDefaultWonNodeUri() {
-        return new ResponseEntity(this.wonNodeInformationService.getDefaultWonNodeURI().toString(), HttpStatus.OK);
+    public ResponseEntity<URI> getDefaultWonNodeUri() throws URISyntaxException {
+        return new ResponseEntity<URI>(new URI(this.wonNodeInformationService.getDefaultWonNodeURI().toString()),
+                        HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/getWebPushKey", method = RequestMethod.GET)
+    public ResponseEntity<String> getWebPushKey() {
+        PublicKey pub = wonOnwerPushSender.getPublicKey();
+        Utils.encode((ECPublicKey) pub);
+        return new ResponseEntity<String>(Base64Encoder.encodeUrl(Utils.encode((ECPublicKey) pub)), HttpStatus.OK);
     }
 
     public void setWonNodeInformationService(final WonNodeInformationService wonNodeInformationService) {

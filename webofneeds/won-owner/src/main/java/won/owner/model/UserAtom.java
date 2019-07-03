@@ -40,7 +40,7 @@ public class UserAtom {
     @Convert(converter = URIConverter.class)
     private URI uri;
     @Column(name = "matches")
-    private boolean matches;
+    private boolean matches = true;
     @Column(name = "requests")
     private boolean requests = true;
     @Column(name = "conversations")

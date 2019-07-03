@@ -11,6 +11,7 @@
 package won.owner.web.websocket;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.net.URI;
 import java.security.Principal;
 import java.text.MessageFormat;
@@ -19,6 +20,9 @@ import java.util.Iterator;
 import java.util.Optional;
 import java.util.Set;
 
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.node.ObjectNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -43,6 +47,7 @@ import won.owner.repository.UserRepository;
 import won.owner.service.impl.KeystoreEnabledUserDetails;
 import won.owner.service.impl.OwnerApplicationService;
 import won.owner.web.WonOwnerMailSender;
+import won.owner.web.WonOwnerPushSender;
 import won.owner.web.service.ServerSideActionService;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageDecoder;
@@ -76,6 +81,8 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
     SessionRepository sessionRepository;
     @Autowired
     private WonOwnerMailSender emailSender;
+    @Autowired
+    private WonOwnerPushSender pushSender;
     @Autowired
     private EagerlyCachePopulatingMessageProcessor eagerlyCachePopulatingProcessor;
     @Autowired
@@ -276,9 +283,14 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
             }
             if (successfullySent == 0) {
                 // we did not manage to send the message via the websocket, send it by email.
-                logger.debug("cannot deliver message of type {} for atom {}, receiver {}: none of the associated websocket sessions worked. Trying to send message by email.",
+                logger.debug("cannot deliver message of type {} for atom {}, receiver {}: none of the associated websocket sessions worked. Trying to send message by webpush and email.",
                                 new Object[] { wonMessage.getMessageType(), wonMessage.getRecipientAtomURI(),
                                                 wonMessage.getRecipientURI() });
+                // TODO: ideally in this case
+                // 1. collect multiple events occurring in close succession
+                // 2. try to push
+                // 3. email only if push was not successful
+                notifyPerPush(user, atomUri, wonMessage);
                 notifyPerEmail(user, atomUri, wonMessage);
             }
             return wonMessage;
@@ -286,6 +298,81 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
             // in any case, let the serversideactionservice do its work, if there is any to
             // do:
             serverSideActionService.process(wonMessage);
+        }
+    }
+
+    private void notifyPerPush(final User user, final URI atomUri, final WonMessage wonMessage) {
+        if (wonMessage.getEnvelopeType() == WonMessageDirection.FROM_OWNER) {
+            // we assume that this message, coming from the server here, can only be an
+            // echoed message. don't send by email.
+            logger.debug("not sending notification to user: message {} looks like an echo from the server",
+                            wonMessage.getMessageURI());
+            return;
+        }
+        if (user == null) {
+            logger.info("not sending notification to user: user not specified");
+            return;
+        }
+        UserAtom userAtom = getAtomOfUser(user, atomUri);
+        if (userAtom == null) {
+            logger.debug("not sending notification to user: atom uri not specified");
+            return;
+        }
+        String textMsg = WonRdfUtils.MessageUtils.getTextMessage(wonMessage);
+        switch (wonMessage.getMessageType()) {
+            case CONNECTION_MESSAGE:
+            case OPEN:
+                if (userAtom.isConversations()) {
+                    ObjectMapper mapper = new ObjectMapper();
+                    ObjectNode rootNode = mapper.createObjectNode();
+                    rootNode.put("type", "MESSAGE");
+                    rootNode.put("atomUri", userAtom.getUri().toString());
+                    rootNode.put("connectionUri", wonMessage.getRecipientURI().toString());
+                    rootNode.put("message", textMsg);
+                    String stringifiedJson;
+                    try {
+                        stringifiedJson = mapper.writer().writeValueAsString(rootNode);
+                    } catch (IOException e) {
+                        throw new UncheckedIOException(e);
+                    }
+                    pushSender.sendNotification(user, stringifiedJson);
+                }
+                return;
+            case SOCKET_HINT_MESSAGE:
+                if (userAtom.isMatches()) {
+                    ObjectMapper mapper = new ObjectMapper();
+                    ObjectNode rootNode = mapper.createObjectNode();
+                    rootNode.put("type", "MESSAGE");
+                    rootNode.put("atomUri", userAtom.getUri().toString());
+                    rootNode.put("connectionUri", wonMessage.getRecipientURI().toString());
+                    rootNode.put("message", "New match for you!");
+                    String stringifiedJson;
+                    try {
+                        stringifiedJson = mapper.writer().writeValueAsString(rootNode);
+                    } catch (IOException e) {
+                        throw new UncheckedIOException(e);
+                    }
+                    pushSender.sendNotification(user, stringifiedJson);
+                }
+            case CONNECT:
+                if (userAtom.isRequests()) {
+                    ObjectMapper mapper = new ObjectMapper();
+                    ObjectNode rootNode = mapper.createObjectNode();
+                    rootNode.put("type", "CONNECT");
+                    rootNode.put("atomUri", userAtom.getUri().toString());
+                    rootNode.put("connectionUri", wonMessage.getRecipientURI().toString());
+                    rootNode.put("message", textMsg);
+                    String stringifiedJson;
+                    try {
+                        stringifiedJson = mapper.writer().writeValueAsString(rootNode);
+                    } catch (IOException e) {
+                        throw new UncheckedIOException(e);
+                    }
+                    pushSender.sendNotification(user, stringifiedJson);
+                }
+                return;
+            default:
+                return;
         }
     }
 

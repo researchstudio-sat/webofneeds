@@ -21,7 +21,7 @@ import * as accountUtils from "../redux/utils/account-utils.js";
 import "~/style/_slidein.scss";
 
 function genSlideInConf() {
-  let template = `
+  let template = /*html*/ `
         <svg class="si__toggle"
             ng-click="self.view__toggleSlideIns()">
             <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>

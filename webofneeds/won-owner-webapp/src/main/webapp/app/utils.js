@@ -545,3 +545,33 @@ export function generateSimpleTransitionLabel(str) {
   }
   return str;
 }
+
+export function base64UrlToUint8Array(base64UrlData) {
+  const padding = "=".repeat((4 - (base64UrlData.length % 4)) % 4);
+  const base64 = (base64UrlData + padding)
+    .replace(/-/g, "+")
+    .replace(/_/g, "/");
+
+  const rawData = atob(base64);
+  const buffer = new Uint8Array(rawData.length);
+
+  for (const i of buffer.keys()) {
+    buffer[i] = rawData.charCodeAt(i);
+  }
+  return buffer.buffer;
+}
+
+export function compareArrayBuffers(left, right) {
+  const leftArray = new Uint8Array(left);
+  const rightArray = new Uint8Array(right);
+
+  if (leftArray.length != rightArray.length) return false;
+
+  for (const [index] of leftArray.entries()) {
+    if (leftArray[index] != rightArray[index]) {
+      return false;
+    }
+  }
+
+  return true;
+}

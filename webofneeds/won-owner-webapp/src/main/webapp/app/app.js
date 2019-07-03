@@ -68,12 +68,8 @@ window.won = won;
 import { runMessagingAgent } from "./messaging-agent.js";
 
 import detailModules from "./components/details/details.js";
-
-//import serviceWorkerRuntime from "serviceworker-webpack-plugin/lib/runtime";
-
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("../sw.js");
-}
+import { runPushAgent } from "./push-agent";
+import { enableNotifications } from "../config/default";
 
 let app = angular.module("won.owner", [
   /* to enable legacy $stateChange* events in ui-router (see
@@ -155,6 +151,10 @@ app.config(configRouting).config([
   },
 ]);
 app.run(["$ngRedux", $ngRedux => runMessagingAgent($ngRedux)]);
+
+if (enableNotifications) {
+  app.run(["$ngRedux", $ngRedux => runPushAgent($ngRedux)]);
+}
 
 app.run([
   "$ngRedux",
