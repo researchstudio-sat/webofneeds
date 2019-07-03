@@ -5,13 +5,7 @@ self.addEventListener("push", async event => {
   const payload = event.data.json();
   const clientWindows = await self.clients.matchAll({ type: "window" });
   const activeWindows = clientWindows.filter(client => {
-    if (!client.focused) {
-      return false;
-    }
-    const [, clientQuery] = client.url.split("?");
-
-    const param = new URLSearchParams(clientQuery).get("connectionUri");
-    return param == payload.connectionUri;
+    return client.focused;
   });
 
   if (activeWindows.length == 0) {
