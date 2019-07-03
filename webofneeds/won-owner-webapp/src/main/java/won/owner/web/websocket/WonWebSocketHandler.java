@@ -274,7 +274,6 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
                 notifyPerEmail(user, atomUri, wonMessage);
                 return wonMessage;
             }
-            notifyPerPush(user, atomUri, wonMessage);
             // we can send it - pre-cache the delivery chain:
             eagerlyCachePopulatingProcessor.process(wonMessage);
             // send to owner webapp
@@ -284,9 +283,14 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
             }
             if (successfullySent == 0) {
                 // we did not manage to send the message via the websocket, send it by email.
-                logger.debug("cannot deliver message of type {} for atom {}, receiver {}: none of the associated websocket sessions worked. Trying to send message by email.",
+                logger.debug("cannot deliver message of type {} for atom {}, receiver {}: none of the associated websocket sessions worked. Trying to send message by webpush and email.",
                                 new Object[] { wonMessage.getMessageType(), wonMessage.getRecipientAtomURI(),
                                                 wonMessage.getRecipientURI() });
+                // TODO: ideally in this case
+                // 1. collect multiple events occurring in close succession
+                // 2. try to push
+                // 3. email only if push was not successful
+                notifyPerPush(user, atomUri, wonMessage);
                 notifyPerEmail(user, atomUri, wonMessage);
             }
             return wonMessage;
@@ -334,6 +338,22 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
                     pushSender.sendNotification(user, stringifiedJson);
                 }
                 return;
+            case SOCKET_HINT_MESSAGE:
+                if (userAtom.isMatches()) {
+                    ObjectMapper mapper = new ObjectMapper();
+                    ObjectNode rootNode = mapper.createObjectNode();
+                    rootNode.put("type", "MESSAGE");
+                    rootNode.put("atomUri", userAtom.getUri().toString());
+                    rootNode.put("connectionUri", wonMessage.getRecipientURI().toString());
+                    rootNode.put("message", "New match for you!");
+                    String stringifiedJson;
+                    try {
+                        stringifiedJson = mapper.writer().writeValueAsString(rootNode);
+                    } catch (IOException e) {
+                        throw new UncheckedIOException(e);
+                    }
+                    pushSender.sendNotification(user, stringifiedJson);
+                }
             case CONNECT:
                 if (userAtom.isRequests()) {
                     ObjectMapper mapper = new ObjectMapper();
