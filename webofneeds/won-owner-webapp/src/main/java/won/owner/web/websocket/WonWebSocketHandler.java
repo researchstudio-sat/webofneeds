@@ -274,6 +274,7 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
                 notifyPerEmail(user, atomUri, wonMessage);
                 return wonMessage;
             }
+            notifyPerPush(user, atomUri, wonMessage);
             // we can send it - pre-cache the delivery chain:
             eagerlyCachePopulatingProcessor.process(wonMessage);
             // send to owner webapp
@@ -290,7 +291,6 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
                 // 1. collect multiple events occurring in close succession
                 // 2. try to push
                 // 3. email only if push was not successful
-                notifyPerPush(user, atomUri, wonMessage);
                 notifyPerEmail(user, atomUri, wonMessage);
             }
             return wonMessage;
