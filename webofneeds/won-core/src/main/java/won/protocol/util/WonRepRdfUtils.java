@@ -9,10 +9,11 @@ public class WonRepRdfUtils extends WonRdfUtils {
     private static final Logger logger = LoggerFactory.getLogger(WonRepRdfUtils.class);
 
     public static Model addStuff(Model model) {
-//        Model messageModel = createModelWithBaseResource();
-//        Resource baseRes = messageModel.createResource(messageModel.getNsPrefixURI(""));
-//        baseRes.addProperty(WONCON.text, message, XSDDatatype.XSDstring);
-//        return messageModel;
+        // Model messageModel = createModelWithBaseResource();
+        // Resource baseRes =
+        // messageModel.createResource(messageModel.getNsPrefixURI(""));
+        // baseRes.addProperty(WONCON.text, message, XSDDatatype.XSDstring);
+        // return messageModel;
         return null;
     }
 
