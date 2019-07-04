@@ -15,6 +15,7 @@ self.addEventListener("push", async event => {
           data: {
             atomUri: payload.atomUri,
             connectionUri: payload.connectionUri,
+            type: payload.type,
           },
           tag: "won-connect",
           icon: payload.icon,
@@ -26,6 +27,7 @@ self.addEventListener("push", async event => {
           data: {
             atomUri: payload.atomUri,
             connectionUri: payload.connectionUri,
+            type: payload.type,
           },
           tag: "won-message",
           icon: payload.icon,
@@ -37,6 +39,7 @@ self.addEventListener("push", async event => {
           data: {
             atomUri: payload.atomUri,
             connectionUri: payload.connectionUri,
+            type: payload.type,
           },
           tag: "won-hint",
           icon: payload.icon,
@@ -53,6 +56,7 @@ self.addEventListener("notificationclick", event => {
 async function openNotifiedPage(event) {
   console.log(event.notification.data);
   const connectionUri = event.notification.data.connectionUri;
+  const type = event.notification.data.type;
   const atomUri = event.notification.data.atomUri;
   const clientWindows = await self.clients.matchAll({ type: "window" });
   const urlWindows = clientWindows.filter(client => {
@@ -70,7 +74,7 @@ async function openNotifiedPage(event) {
     return genericUris.find(uri => client.url.startsWith(uri)) !== undefined;
   });
   const targetUri =
-    event.notification.data === "HINT"
+    type === "HINT"
       ? `${self.registration.scope}#!/post/?postUri=${atomUri}`
       : `${
           self.registration.scope
