@@ -17,7 +17,7 @@ self.addEventListener("push", async event => {
             connectionUri: payload.connectionUri,
           },
           tag: "won-connect",
-          icon: "skin/current/images/logo.svg",
+          icon: payload.icon,
           body: payload.message,
         });
         break;
@@ -28,7 +28,7 @@ self.addEventListener("push", async event => {
             connectionUri: payload.connectionUri,
           },
           tag: "won-message",
-          icon: "skin/current/images/logo.svg",
+          icon: payload.icon,
           body: payload.message,
         });
         break;
@@ -39,7 +39,7 @@ self.addEventListener("push", async event => {
             connectionUri: payload.connectionUri,
           },
           tag: "won-hint",
-          icon: "skin/current/images/logo.svg",
+          icon: payload.icon,
         });
         break;
     }
