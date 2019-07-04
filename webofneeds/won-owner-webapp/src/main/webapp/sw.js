@@ -53,6 +53,7 @@ self.addEventListener("notificationclick", event => {
 async function openNotifiedPage(event) {
   console.log(event.notification.data);
   const connectionUri = event.notification.data.connectionUri;
+  const atomUri = event.notification.data.atomUri;
   const clientWindows = await self.clients.matchAll({ type: "window" });
   const urlWindows = clientWindows.filter(client => {
     const [, clientQuery] = client.url.split("?");
@@ -68,9 +69,12 @@ async function openNotifiedPage(event) {
     ];
     return genericUris.find(uri => client.url.startsWith(uri)) !== undefined;
   });
-  const targetUri = `${
-    self.registration.scope
-  }#!/connections?connectionUri=${connectionUri}`;
+  const targetUri =
+    event.notification.data === "HINT"
+      ? `${self.registration.scope}#!/post/?postUri=${atomUri}`
+      : `${
+          self.registration.scope
+        }#!/connections?connectionUri=${connectionUri}`;
   console.log(targetUri);
 
   if (urlWindows.length > 0) {
