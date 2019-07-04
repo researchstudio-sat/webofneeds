@@ -322,7 +322,7 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
             return;
         }
         String textMsg = WonRdfUtils.MessageUtils.getTextMessage(wonMessage);
-        String iconUrl = uriService.getOwnerProtocolOwnerURI().toString() + "/skin/current/images/logo.svg";
+        String iconUrl = uriService.getOwnerProtocolOwnerURI().toString() + "/skin/current/images/logo.png";
         switch (wonMessage.getMessageType()) {
             case CONNECTION_MESSAGE:
             case OPEN:
