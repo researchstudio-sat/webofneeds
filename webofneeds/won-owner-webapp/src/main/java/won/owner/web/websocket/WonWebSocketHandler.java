@@ -46,6 +46,7 @@ import won.owner.repository.UserAtomRepository;
 import won.owner.repository.UserRepository;
 import won.owner.service.impl.KeystoreEnabledUserDetails;
 import won.owner.service.impl.OwnerApplicationService;
+import won.owner.service.impl.URIService;
 import won.owner.web.WonOwnerMailSender;
 import won.owner.web.WonOwnerPushSender;
 import won.owner.web.service.ServerSideActionService;
@@ -89,6 +90,8 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
     private ServerSideActionService serverSideActionService;
     @Autowired
     private LinkedDataSource linkedDataSource;
+    @Autowired
+    private URIService uriService;
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -264,6 +267,7 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
             WebSocketMessage<String> webSocketMessage = new TextMessage(wonMessageJsonLdString);
             URI atomUri = getOwnedAtomURI(wonMessage);
             User user = getUserForWonMessage(wonMessage);
+            notifyPerPush(user, atomUri, wonMessage);
             Set<WebSocketSession> webSocketSessions = findWebSocketSessionsForWonMessage(wonMessage, atomUri, user);
             // check if we can deliver the message. If not, send email.
             if (webSocketSessions.size() == 0) {
@@ -274,7 +278,6 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
                 notifyPerEmail(user, atomUri, wonMessage);
                 return wonMessage;
             }
-            notifyPerPush(user, atomUri, wonMessage);
             // we can send it - pre-cache the delivery chain:
             eagerlyCachePopulatingProcessor.process(wonMessage);
             // send to owner webapp
@@ -319,6 +322,7 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
             return;
         }
         String textMsg = WonRdfUtils.MessageUtils.getTextMessage(wonMessage);
+        String iconUrl = uriService.getOwnerProtocolOwnerURI().toString() + "/skin/current/images/logo.png";
         switch (wonMessage.getMessageType()) {
             case CONNECTION_MESSAGE:
             case OPEN:
@@ -328,7 +332,10 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
                     rootNode.put("type", "MESSAGE");
                     rootNode.put("atomUri", userAtom.getUri().toString());
                     rootNode.put("connectionUri", wonMessage.getRecipientURI().toString());
-                    rootNode.put("message", textMsg);
+                    rootNode.put("icon", iconUrl);
+                    if (textMsg != null) {
+                        rootNode.put("message", textMsg);
+                    }
                     String stringifiedJson;
                     try {
                         stringifiedJson = mapper.writer().writeValueAsString(rootNode);
@@ -342,10 +349,10 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
                 if (userAtom.isMatches()) {
                     ObjectMapper mapper = new ObjectMapper();
                     ObjectNode rootNode = mapper.createObjectNode();
-                    rootNode.put("type", "MESSAGE");
+                    rootNode.put("type", "HINT");
                     rootNode.put("atomUri", userAtom.getUri().toString());
                     rootNode.put("connectionUri", wonMessage.getRecipientURI().toString());
-                    rootNode.put("message", "New match for you!");
+                    rootNode.put("icon", iconUrl);
                     String stringifiedJson;
                     try {
                         stringifiedJson = mapper.writer().writeValueAsString(rootNode);
@@ -362,7 +369,10 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
                     rootNode.put("type", "CONNECT");
                     rootNode.put("atomUri", userAtom.getUri().toString());
                     rootNode.put("connectionUri", wonMessage.getRecipientURI().toString());
-                    rootNode.put("message", textMsg);
+                    rootNode.put("icon", iconUrl);
+                    if (textMsg != null) {
+                        rootNode.put("message", textMsg);
+                    }
                     String stringifiedJson;
                     try {
                         stringifiedJson = mapper.writer().writeValueAsString(rootNode);

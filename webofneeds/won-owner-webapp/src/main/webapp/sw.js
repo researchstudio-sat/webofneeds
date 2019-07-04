@@ -11,23 +11,38 @@ self.addEventListener("push", async event => {
   if (activeWindows.length == 0) {
     switch (payload.type) {
       case "CONNECT":
-        self.registration.showNotification(
-          "Someone wants to connect to your post",
-          {
-            data: {
-              atomUri: payload.atomUri,
-              connectionUri: payload.connectionUri,
-            },
-          }
-        );
-        break;
-      case "MESSAGE":
-        self.registration.showNotification("You received a new message", {
+        self.registration.showNotification("New Conversation!", {
           data: {
             atomUri: payload.atomUri,
             connectionUri: payload.connectionUri,
+            type: payload.type,
           },
+          tag: "won-connect",
+          icon: payload.icon,
           body: payload.message,
+        });
+        break;
+      case "MESSAGE":
+        self.registration.showNotification("New message!", {
+          data: {
+            atomUri: payload.atomUri,
+            connectionUri: payload.connectionUri,
+            type: payload.type,
+          },
+          tag: "won-message",
+          icon: payload.icon,
+          body: payload.message,
+        });
+        break;
+      case "HINT":
+        self.registration.showNotification("New Match!", {
+          data: {
+            atomUri: payload.atomUri,
+            connectionUri: payload.connectionUri,
+            type: payload.type,
+          },
+          tag: "won-hint",
+          icon: payload.icon,
         });
         break;
     }
@@ -41,6 +56,8 @@ self.addEventListener("notificationclick", event => {
 async function openNotifiedPage(event) {
   console.log(event.notification.data);
   const connectionUri = event.notification.data.connectionUri;
+  const type = event.notification.data.type;
+  const atomUri = event.notification.data.atomUri;
   const clientWindows = await self.clients.matchAll({ type: "window" });
   const urlWindows = clientWindows.filter(client => {
     const [, clientQuery] = client.url.split("?");
@@ -56,9 +73,12 @@ async function openNotifiedPage(event) {
     ];
     return genericUris.find(uri => client.url.startsWith(uri)) !== undefined;
   });
-  const targetUri = `${
-    self.registration.scope
-  }#!/connections?connectionUri=${connectionUri}`;
+  const targetUri =
+    type === "HINT"
+      ? `${self.registration.scope}#!/post/?postUri=${atomUri}` // when deeplink works, append &viewConnUri=${connectionUri}` see https://github.com/researchstudio-sat/webofneeds/issues/2985
+      : `${
+          self.registration.scope
+        }#!/connections?connectionUri=${connectionUri}`;
   console.log(targetUri);
 
   if (urlWindows.length > 0) {
