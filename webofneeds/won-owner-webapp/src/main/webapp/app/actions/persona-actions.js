@@ -1,12 +1,12 @@
 import { getIn, get, generateIdString } from "../utils";
 import won from "../won-es6";
-import { getRandomWonId } from "../won-utils";
+import * as wonUtils from "../won-utils.js";
 import { actionTypes } from "./actions";
-import { getOwnedAtomByConnectionUri } from "../selectors/general-selectors";
-import { getOwnedConnectionByUri } from "../selectors/connection-selectors";
+import { getOwnedAtomByConnectionUri } from "../redux/selectors/general-selectors";
+import { getOwnedConnectionByUri } from "../redux/selectors/connection-selectors";
 import { buildConnectMessage, buildCloseMessage } from "../won-message-utils";
-import * as atomUtils from "../atom-utils.js";
-import * as ownerApi from "../owner-api.js";
+import * as atomUtils from "../redux/utils/atom-utils.js";
+import * as ownerApi from "../api/owner-api.js";
 
 export function createPersona(persona, nodeUri) {
   return (dispatch, getState) => {
@@ -15,8 +15,8 @@ export function createPersona(persona, nodeUri) {
       nodeUri = getIn(state, ["config", "defaultNodeUri"]);
     }
 
-    const publishedContentUri = nodeUri + "/atom/" + getRandomWonId();
-    const msgUri = nodeUri + "/event/" + getRandomWonId();
+    const publishedContentUri = nodeUri + "/atom/" + wonUtils.getRandomWonId();
+    const msgUri = nodeUri + "/event/" + wonUtils.getRandomWonId();
 
     //FIXME: THIS SHOULD NOT USE ANY OF THE CODE BELOW BUT EXECUTE OUR ALREADY PRESENT ATOM-CREATION WITH A GIVEN DRAFT INSTEAD
     const graph = {
@@ -195,7 +195,7 @@ export function reviewPersona(reviewableConnectionUri, review) {
     const foreignAtom = getIn(state, ["atoms", foreignAtomUri]);
 
     const getPersona = atom => {
-      const personaUri = get(atom, "heldBy");
+      const personaUri = atomUtils.getHeldByUri(atom);
       const persona = state.getIn(["atoms", personaUri]);
 
       return persona;

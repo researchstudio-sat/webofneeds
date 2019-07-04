@@ -74,6 +74,17 @@ public abstract class AbstractCreateAtomAction extends BaseEventBotAction {
         this.uriListName = uriListName;
     }
 
+    protected WonMessage createWonMessage(URI atomURI, Dataset atomDataset) throws WonMessageBuilderException {
+        return createWonMessage(atomURI, atomDataset, false, false);
+    }
+
+    protected WonMessage createWonMessage(URI atomURI, Dataset atomDataset, final boolean usedForTesting,
+                    final boolean doNotMatch) {
+        return createWonMessage(getEventListenerContext().getWonNodeInformationService(), atomURI,
+                        getEventListenerContext().getNodeURISource().getNodeURI(), atomDataset, usedForTesting,
+                        doNotMatch);
+    }
+
     protected WonMessage createWonMessage(WonNodeInformationService wonNodeInformationService, URI atomURI,
                     URI wonNodeURI, Dataset atomDataset) throws WonMessageBuilderException {
         return createWonMessage(wonNodeInformationService, atomURI, wonNodeURI, atomDataset, usedForTesting,

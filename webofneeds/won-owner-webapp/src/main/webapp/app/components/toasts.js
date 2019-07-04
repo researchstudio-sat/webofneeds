@@ -4,9 +4,10 @@
 import won from "../won-es6.js";
 import angular from "angular";
 import ngAnimate from "angular-animate";
-import { attach, getIn } from "../utils.js";
+import { getIn } from "../utils.js";
+import { attach } from "../cstm-ng-utils.js";
 import { actionCreators } from "../actions/actions.js";
-import { connect2Redux } from "../won-utils.js";
+import { connect2Redux } from "../configRedux.js";
 import "angular-marked";
 
 import "~/style/_responsiveness-utils.scss";

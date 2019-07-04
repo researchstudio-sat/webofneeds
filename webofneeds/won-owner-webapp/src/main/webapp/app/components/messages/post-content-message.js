@@ -4,10 +4,10 @@ import squareImageModule from "../square-image.js";
 import postContentModule from "../post-content.js";
 import postMenuModule from "../post-menu.js";
 
-import { connect2Redux } from "../../won-utils.js";
-import { attach, getIn } from "../../utils.js";
+import { connect2Redux } from "../../configRedux.js";
+import { getIn } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
-import { classOnComponentRoot } from "../../cstm-ng-utils.js";
+import { attach, classOnComponentRoot } from "../../cstm-ng-utils.js";
 
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 

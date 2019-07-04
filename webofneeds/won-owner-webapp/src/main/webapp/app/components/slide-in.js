@@ -5,21 +5,23 @@ import won from "../won-es6.js";
 import angular from "angular";
 import ngAnimate from "angular-animate";
 import dropdownModule from "./covering-dropdown.js";
-import { attach, delay, get, getIn, toAbsoluteURL } from "../utils.js";
+import { delay, get, getIn, toAbsoluteURL } from "../utils.js";
+import { attach } from "../cstm-ng-utils.js";
 import { actionCreators } from "../actions/actions.js";
-import { connect2Redux, parseRestErrorMessage } from "../won-utils.js";
+import { parseRestErrorMessage } from "../won-utils.js";
+import { connect2Redux } from "../configRedux.js";
 import { ownerBaseUrl } from "~/config/default.js";
-import { getVerificationTokenFromRoute } from "../selectors/general-selectors.js";
-import * as viewSelectors from "../selectors/view-selectors.js";
-import * as processSelectors from "../selectors/process-selectors.js";
+import { getVerificationTokenFromRoute } from "../redux/selectors/general-selectors.js";
+import { absHRef } from "../configRouting.js";
+import * as viewSelectors from "../redux/selectors/view-selectors.js";
 
-import * as srefUtils from "../sref-utils.js";
-import * as accountUtils from "../account-utils.js";
+import * as processSelectors from "../redux/selectors/process-selectors.js";
 
+import * as accountUtils from "../redux/utils/account-utils.js";
 import "~/style/_slidein.scss";
 
 function genSlideInConf() {
-  let template = `
+  let template = /*html*/ `
         <svg class="si__toggle"
             ng-click="self.view__toggleSlideIns()">
             <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
@@ -232,7 +234,7 @@ function genSlideInConf() {
   class Controller {
     constructor(/* arguments <- serviceDependencies */) {
       attach(this, serviceDependencies, arguments);
-      Object.assign(this, srefUtils); // bind srefUtils to scope
+      this.absHRef = absHRef;
       this.parseRestErrorMessage = parseRestErrorMessage;
 
       this.anonymousEmail = undefined;

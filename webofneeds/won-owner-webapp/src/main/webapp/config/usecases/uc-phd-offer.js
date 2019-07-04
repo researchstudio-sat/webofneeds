@@ -3,13 +3,13 @@
  */
 import { details, mergeInEmptyDraft } from "../detail-definitions.js";
 import { interestsDetail, skillsDetail } from "../details/person.js";
-import { findLatestIntervallEndInJsonLdOrNowAndAddMillis } from "../../app/won-utils.js";
+import * as wonUtils from "../../app/won-utils.js";
 
 export const phdOffer = {
   identifier: "phdOffer",
   label: "Offer a PhD position",
   icon: "#ico36_uc_phd",
-  doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
+  doNotMatchAfter: wonUtils.findLatestIntervallEndInJsonLdOrNowAndAddMillis,
   draft: {
     ...mergeInEmptyDraft({
       content: {

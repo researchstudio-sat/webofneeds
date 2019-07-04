@@ -1,6 +1,6 @@
 import angular from "angular";
-import { attach, delay } from "../../../utils.js";
-import { DomCache } from "../../../cstm-ng-utils.js";
+import { delay } from "../../../utils.js";
+import { attach, DomCache } from "../../../cstm-ng-utils.js";
 import datetimePickerModule from "./datetime-picker.js";
 import titlePickerModule from "./title-picker.js";
 

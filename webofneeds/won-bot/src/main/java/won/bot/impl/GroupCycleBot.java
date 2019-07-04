@@ -640,7 +640,7 @@ public class GroupCycleBot extends EventBot {
 
     private Dataset createAtomDataset(String title, String description) {
         URI atomURI = getEventListenerContext().getWonNodeInformationService().generateAtomURI();
-        DefaultAtomModelWrapper atomModelWrapper = new DefaultAtomModelWrapper(atomURI.toString());
+        DefaultAtomModelWrapper atomModelWrapper = new DefaultAtomModelWrapper(atomURI);
         atomModelWrapper.setTitle(title);
         atomModelWrapper.setDescription(description);
         return atomModelWrapper.copyDataset();

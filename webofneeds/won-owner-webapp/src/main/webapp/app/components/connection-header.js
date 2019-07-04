@@ -9,18 +9,19 @@ import squareImageModule from "./square-image.js";
 import groupImageModule from "./group-image.js";
 import { actionCreators } from "../actions/actions.js";
 import { labels, relativeTime } from "../won-label-utils.js";
-import { attach, getIn, get } from "../utils.js";
-import { connect2Redux } from "../won-utils.js";
-import * as atomUtils from "../atom-utils.js";
-import * as connectionSelectors from "../selectors/connection-selectors.js";
+import { getIn, get } from "../utils.js";
+import { attach } from "../cstm-ng-utils.js";
+import { connect2Redux } from "../configRedux.js";
+import * as atomUtils from "../redux/utils/atom-utils.js";
+import * as connectionSelectors from "../redux/selectors/connection-selectors.js";
 import { getHumanReadableStringFromMessage } from "../reducers/atom-reducer/parse-message.js";
 import {
   selectLastUpdateTime,
   getOwnedAtomByConnectionUri,
   getAtoms,
-} from "../selectors/general-selectors.js";
-import { getUnreadMessagesByConnectionUri } from "../selectors/message-selectors.js";
-import { getMessagesByConnectionUri } from "../selectors/message-selectors.js";
+} from "../redux/selectors/general-selectors.js";
+import { getUnreadMessagesByConnectionUri } from "../redux/selectors/message-selectors.js";
+import { getMessagesByConnectionUri } from "../redux/selectors/message-selectors.js";
 import connectionStateModule from "./connection-state.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
 
@@ -158,7 +159,7 @@ function genComponentConf() {
 
         const groupMembers = targetAtom && targetAtom.get("groupMembers");
 
-        const remotePersonaUri = get(targetAtom, "heldBy");
+        const remotePersonaUri = atomUtils.getHeldByUri(targetAtom);
         const remotePersona =
           remotePersonaUri && getIn(state, ["atoms", remotePersonaUri]);
         const remotePersonaName = get(remotePersona, "humanReadable");

@@ -1,11 +1,12 @@
 import angular from "angular";
 import "ng-redux";
 import { actionCreators } from "../../../actions/actions.js";
-import postHeaderModule from "../../post-header.js";
-import { attach, getIn, get } from "../../../utils.js";
-import { connect2Redux } from "../../../won-utils.js";
-import * as atomUtils from "../../../atom-utils.js";
-import * as generalSelectors from "../../../selectors/general-selectors.js";
+import atomCardModule from "../../atom-card.js";
+import { getIn, get } from "../../../utils.js";
+import { attach } from "../../../cstm-ng-utils.js";
+import { connect2Redux } from "../../../configRedux.js";
+import * as atomUtils from "../../../redux/utils/atom-utils.js";
+import * as generalSelectors from "../../../redux/selectors/general-selectors.js";
 
 import "~/style/_suggestpost-viewer.scss";
 
@@ -19,36 +20,42 @@ function genComponentConf() {
           <span class="suggestpostv__header__label" ng-if="self.detail.label">{{self.detail.label}}</span>
         </div>
         <div class="suggestpostv__content">
-          <div class="suggestpostv__content__post">
-            <won-post-header
+          <div class="suggestpostv__content__post">            
+            <won-atom-card
                 class="clickable"
-                atom-uri="self.content"
-                ng-click="self.router__stateGoCurrent({viewAtomUri: self.content, viewConnUri: undefined})"
-                ng-disabled="!self.fetchedSuggestion">
-            </won-post-header>
-            <button class="suggestpostv__content__post__action won-button--outlined thin red"
-              ng-if="self.failedToLoad"
-              ng-click="self.reloadSuggestion()">
-              Reload
-            </button>
-            <button class="suggestpostv__content__post__action won-button--outlined thin red"
-              ng-if="self.showConnectAction"
-              ng-click="self.connectWithPost()">
-              Connect
-            </button>
-            <button class="suggestpostv__content__post__action won-button--outlined thin red"
-              ng-if="self.showJoinAction"
-              ng-click="self.connectWithPost()">
-              Join
-            </button>
-            <button class="suggestpostv__content__post__action won-button--outlined thin red"
-              ng-if="self.hasConnectionBetweenPosts"
-              ng-click="self.router__stateGoCurrent({connectionUri: self.establishedConnectionUri})">
-              View Chat
-            </button>
-            <div class="suggestpostv__content__post__info">
-              {{ self.getInfoText() }}
+                atom-uri="::self.content"
+                current-location="self.currentLocation"
+                ng-click="self.router__stateGo('post', { postUri: self.content })"
+                ng-disabled="!self.fetchedSuggestion"
+                show-suggestions="::false"
+                show-persona="::true"
+            ></won-atom-card>
+            <div class="suggestpostv__content__post__actions"
+              ng-if="self.showActions">
+              <button class="suggestpostv__content__post__actions__button won-button--outlined thin red"
+                ng-if="self.failedToLoad"
+                ng-click="self.reloadSuggestion()">
+                Reload
+              </button>
+              <button class="suggestpostv__content__post__actions__button won-button--outlined thin red"
+                ng-if="self.showConnectAction"
+                ng-click="self.connectWithPost()">
+                Connect
+              </button>
+              <button class="suggestpostv__content__post__actions__button won-button--outlined thin red"
+                ng-if="self.showJoinAction"
+                ng-click="self.connectWithPost()">
+                Join
+              </button>
+              <button class="suggestpostv__content__post__actions__button won-button--outlined thin red"
+                ng-if="self.hasConnectionBetweenPosts"
+                ng-click="self.router__stateGoCurrent({connectionUri: self.establishedConnectionUri})">
+                View Chat
+              </button>
             </div>
+          </div>
+          <div class="suggestpostv__content__info">
+              {{ self.getInfoText() }}
           </div>
         </div>
     `;
@@ -112,30 +119,38 @@ function genComponentConf() {
           suggestedPostUri
         );
 
+        const showConnectAction =
+          suggestedPost &&
+          fetchedSuggestion &&
+          atomUtils.isActive(suggestedPost) &&
+          !atomUtils.hasGroupSocket(suggestedPost) &&
+          atomUtils.hasChatSocket(suggestedPost) &&
+          !hasConnectionBetweenPosts &&
+          !isSuggestedOwned &&
+          openedOwnPost;
+        const showJoinAction =
+          suggestedPost &&
+          fetchedSuggestion &&
+          atomUtils.isActive(suggestedPost) &&
+          atomUtils.hasGroupSocket(suggestedPost) &&
+          !atomUtils.hasChatSocket(suggestedPost) &&
+          !hasConnectionBetweenPosts &&
+          !isSuggestedOwned &&
+          openedOwnPost;
+
         return {
           suggestedPost,
           openedOwnPost,
           hasChatSocket: atomUtils.hasChatSocket(suggestedPost),
           hasGroupSocket: atomUtils.hasGroupSocket(suggestedPost),
           isSuggestedOwned,
-          showConnectAction:
-            suggestedPost &&
-            fetchedSuggestion &&
-            atomUtils.isActive(suggestedPost) &&
-            !atomUtils.hasGroupSocket(suggestedPost) &&
-            atomUtils.hasChatSocket(suggestedPost) &&
-            !hasConnectionBetweenPosts &&
-            !isSuggestedOwned &&
-            openedOwnPost,
-          showJoinAction:
-            suggestedPost &&
-            fetchedSuggestion &&
-            atomUtils.isActive(suggestedPost) &&
-            atomUtils.hasGroupSocket(suggestedPost) &&
-            !atomUtils.hasChatSocket(suggestedPost) &&
-            !hasConnectionBetweenPosts &&
-            !isSuggestedOwned &&
-            openedOwnPost,
+          showActions:
+            failedToLoad ||
+            showConnectAction ||
+            showJoinAction ||
+            hasConnectionBetweenPosts,
+          showConnectAction,
+          showJoinAction,
           isLoading,
           toLoad,
           failedToLoad,
@@ -231,5 +246,5 @@ function genComponentConf() {
 }
 
 export default angular
-  .module("won.owner.components.suggestpostViewer", [postHeaderModule])
+  .module("won.owner.components.suggestpostViewer", [atomCardModule])
   .directive("wonSuggestpostViewer", genComponentConf).name;

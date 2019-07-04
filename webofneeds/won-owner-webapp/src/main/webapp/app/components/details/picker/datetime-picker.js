@@ -1,12 +1,11 @@
 import angular from "angular";
 import {
-  attach,
   delay,
   isValidDate,
   toLocalISODateString,
   get,
 } from "../../../utils.js";
-import { DomCache } from "../../../cstm-ng-utils.js";
+import { attach, DomCache } from "../../../cstm-ng-utils.js";
 
 import "~/style/_datetimepicker.scss";
 

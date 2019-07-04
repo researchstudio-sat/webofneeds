@@ -35,7 +35,7 @@
         <!--property name="ownerService" ref="ownerProtocolAtomServiceClient" /-->
         <property name="matcherProtocolAtomServiceClient" ref="matcherProtocolAtomServiceClient"/>
         <property name="matcherProtocolMatcherService" ref="matcherProtocolMatcherServiceJMSBased"/>
-        <property name="registrationMatcherRetryInterval" value="5000"/>
+        <property name="registrationMatcherRetryInterval" value="30000"/>
 
         <property name="trigger">
             <bean class="org.springframework.scheduling.support.PeriodicTrigger">

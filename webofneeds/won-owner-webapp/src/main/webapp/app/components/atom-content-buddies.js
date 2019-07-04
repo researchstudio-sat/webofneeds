@@ -5,14 +5,15 @@
 import angular from "angular";
 import inviewModule from "angular-inview";
 import labelledHrModule from "./labelled-hr.js";
-import postHeaderModule from "./post-header.js";
+import atomCardModule from "./atom-card.js";
 import suggestPostPickerModule from "./details/picker/suggestpost-picker.js";
-import { attach, getIn, get } from "../utils.js";
+import { getIn, get } from "../utils.js";
+import { attach } from "../cstm-ng-utils.js";
 import won from "../won-es6.js";
-import { connect2Redux } from "../won-utils.js";
-import * as atomUtils from "../atom-utils.js";
-import * as connectionSelectors from "../selectors/connection-selectors.js";
-import * as generalSelectors from "../selectors/general-selectors.js";
+import { connect2Redux } from "../configRedux.js";
+import * as atomUtils from "../redux/utils/atom-utils.js";
+import * as connectionSelectors from "../redux/selectors/connection-selectors.js";
+import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import { actionCreators } from "../actions/actions.js";
 import ngAnimate from "angular-animate";
 
@@ -24,66 +25,68 @@ const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
   let template = `
       <div
-          class="ac-buddies__buddy"
+          class="acb__buddy"
           ng-if="!self.isOwned && self.hasBuddies"
           ng-repeat="memberUri in self.buddiesArray track by memberUri">
-          <div class="ac-buddies__buddy__indicator"></div>
-          <won-post-header
-            class="clickable"
-            ng-click="self.router__stateGoCurrent({viewAtomUri: memberUri, viewConnUri: undefined})"
-            atom-uri="::memberUri">
-          </won-post-header>
-          <div class="ac-buddies__buddy__actions"></div>
+          <won-atom-card
+              class="clickable"
+              atom-uri="::memberUri"
+              current-location="self.currentLocation"
+              show-suggestions="::false"
+              show-persona="::false"
+          ></won-atom-card>
+          <div class="acb__buddy__actions"></div>
       </div>
-      <div class="ac-buddies__buddy"
+      <div class="acb__buddy"
           ng-if="self.isOwned && self.hasBuddyConnections && conn.get('state') !== self.won.WON.Closed"
           ng-repeat="conn in self.buddyConnectionsArray"
           in-view="conn.get('unread') && $inview && self.markAsRead(conn)"
           ng-class="{'won-unread': conn.get('unread')}">
-          <div class="ac-buddies__buddy__indicator"></div>
-          <won-post-header
-            class="clickable"
-            ng-click="self.router__stateGoCurrent({viewAtomUri: conn.get('targetAtomUri'), viewConnUri: undefined})"
-            atom-uri="::conn.get('targetAtomUri')">
-          </won-post-header>
-          <div class="ac-buddies__buddy__actions">
+          <won-atom-card
+              class="clickable"
+              atom-uri="::conn.get('targetAtomUri')"
+              current-location="self.currentLocation"
+              show-suggestions="::false"
+              show-persona="::false"
+          ></won-atom-card>
+          <div class="acb__buddy__actions">
               <div
-                class="ac-buddies__buddy__actions__button red won-button--outlined thin"
+                class="acb__buddy__actions__button red won-button--filled"
                 ng-click="self.openRequest(conn)"
                 ng-if="conn.get('state') === self.won.WON.RequestReceived">
                   Accept
               </div>
               <div
-                class="ac-buddies__buddy__actions__button red won-button--outlined thin"
-                ng-click="self.closeConnection(conn)"
+                class="acb__buddy__actions__button red won-button--outlined thin"
+                ng-click="self.rejectConnection(conn)"
                 ng-if="conn.get('state') === self.won.WON.RequestReceived">
                   Reject
               </div>
               <div
-                class="ac-buddies__buddy__actions__button red won-button--outlined thin"
-                ng-click="self.sendRequest(conn)"
+                class="acb__buddy__actions__button red won-button--filled"
+                ng-click="self.requestBuddy(conn)"
                 ng-if="conn.get('state') === self.won.WON.Suggested">
                   Request
               </div>
               <div
-                class="ac-buddies__buddy__actions__button red won-button--outlined thin"
+                class="acb__buddy__actions__button red won-button--outlined thin"
                 ng-disabled="true"
                 ng-if="conn.get('state') === self.won.WON.RequestSent">
                   Waiting for Accept...
               </div>
               <div
-                class="ac-buddies__buddy__actions__button red won-button--outlined thin"
+                class="acb__buddy__actions__button red won-button--outlined thin"
                 ng-click="self.closeConnection(conn)"
                 ng-if="conn.get('state') === self.won.WON.Suggested || conn.get('state') === self.won.WON.Connected">
                   Remove
               </div>
           </div>
       </div>
-      <div class="ac-buddies__empty"
-          ng-if="(!self.isOwned && !self.buddies) || (self.isOwned && !self.hasBuddyConnections)">
+      <div class="acb__empty"
+          ng-if="!self.buddies && !self.hasBuddyConnections">
           No Buddies present.
       </div>
-      <won-labelled-hr label="::'Request'" class="ac-buddies__labelledhr" ng-if="self.isOwned"></won-labelled-hr>
+      <won-labelled-hr label="::'Request'" class="acb__labelledhr" ng-if="self.isOwned"></won-labelled-hr>
       <won-suggestpost-picker
           ng-if="self.isOwned"
           initial-value="undefined"
@@ -143,25 +146,76 @@ function genComponentConf() {
       connect2Redux(selectFromState, actionCreators, ["self.atomUri"], this);
     }
 
-    closeConnection(conn, rateBad = false) {
+    closeConnection(conn) {
       if (!conn) {
         return;
       }
 
-      const connUri = conn.get("uri");
+      const payload = {
+        caption: "Persona",
+        text: "Remove Buddy?",
+        buttons: [
+          {
+            caption: "Yes",
+            callback: () => {
+              const connUri = conn.get("uri");
 
-      if (rateBad) {
-        this.connections__rate(connUri, won.WONCON.binaryRatingBad);
+              if (conn.get("unread")) {
+                this.connections__markAsRead({
+                  connectionUri: connUri,
+                  atomUri: this.atomUri,
+                });
+              }
+
+              this.connections__close(connUri);
+              this.view__hideModalDialog();
+            },
+          },
+          {
+            caption: "No",
+            callback: () => {
+              this.view__hideModalDialog();
+            },
+          },
+        ],
+      };
+      this.view__showModalDialog(payload);
+    }
+
+    rejectConnection(conn) {
+      if (!conn) {
+        return;
       }
 
-      if (conn.get("unread")) {
-        this.connections__markAsRead({
-          connectionUri: connUri,
-          atomUri: this.atomUri,
-        });
-      }
+      const payload = {
+        caption: "Persona",
+        text: "Reject Buddy Request?",
+        buttons: [
+          {
+            caption: "Yes",
+            callback: () => {
+              const connUri = conn.get("uri");
 
-      this.connections__close(connUri);
+              if (conn.get("unread")) {
+                this.connections__markAsRead({
+                  connectionUri: connUri,
+                  atomUri: this.atomUri,
+                });
+              }
+
+              this.connections__close(connUri);
+              this.view__hideModalDialog();
+            },
+          },
+          {
+            caption: "No",
+            callback: () => {
+              this.view__hideModalDialog();
+            },
+          },
+        ],
+      };
+      this.view__showModalDialog(payload);
     }
 
     openRequest(conn, message = "") {
@@ -203,14 +257,34 @@ function genComponentConf() {
         console.warn("Trying to request a non-owned or non buddySocket atom");
         return;
       }
-      this.atoms__connect(
-        this.atomUri,
-        undefined,
-        targetAtomUri,
-        message,
-        won.BUDDY.BuddySocketCompacted,
-        won.BUDDY.BuddySocketCompacted
-      );
+
+      const payload = {
+        caption: "Persona",
+        text: "Send Buddy Request?",
+        buttons: [
+          {
+            caption: "Yes",
+            callback: () => {
+              this.atoms__connect(
+                this.atomUri,
+                undefined,
+                targetAtomUri,
+                message,
+                won.BUDDY.BuddySocketCompacted,
+                won.BUDDY.BuddySocketCompacted
+              );
+              this.view__hideModalDialog();
+            },
+          },
+          {
+            caption: "No",
+            callback: () => {
+              this.view__hideModalDialog();
+            },
+          },
+        ],
+      };
+      this.view__showModalDialog(payload);
     }
 
     markAsRead(conn) {
@@ -246,7 +320,7 @@ export default angular
   .module("won.owner.components.atomContentBuddies", [
     ngAnimate,
     labelledHrModule,
-    postHeaderModule,
+    atomCardModule,
     suggestPostPickerModule,
     inviewModule.name,
   ])

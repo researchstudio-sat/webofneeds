@@ -2,10 +2,11 @@
  * Created by quasarchimaere on 19.11.2018.
  */
 import angular from "angular";
-import { attach, getIn } from "../utils.js";
+import { getIn } from "../utils.js";
+import { attach } from "../cstm-ng-utils.js";
 import { actionCreators } from "../actions/actions.js";
-import { connect2Redux } from "../won-utils.js";
-import * as generalSelectors from "../selectors/general-selectors.js";
+import { connect2Redux } from "../configRedux.js";
+import * as generalSelectors from "../redux/selectors/general-selectors.js";
 
 import "~/style/_menu.scss";
 
@@ -15,7 +16,7 @@ function genTopnavConf() {
       <a class="menu__tab" ng-click="self.router__stateGo('inventory')"
         ng-class="{
           'menu__tab--selected': self.showInventory,
-          'menu__tab--unread': self.hasUnreadSuggestedConnections,
+          'menu__tab--unread': self.hasUnreadSuggestedConnections || self.hasUnreadBuddyConnections,
         }"
       >
         <span class="menu__tab__unread"></span>
@@ -59,6 +60,11 @@ function genTopnavConf() {
           hasChatAtoms: generalSelectors.hasChatAtoms(state),
           hasUnreadSuggestedConnections: generalSelectors.hasUnreadSuggestedConnections(
             state
+          ),
+          hasUnreadBuddyConnections: generalSelectors.hasUnreadBuddyConnections(
+            state,
+            true,
+            false
           ),
           hasUnreadChatConnections: generalSelectors.hasUnreadChatConnections(
             state

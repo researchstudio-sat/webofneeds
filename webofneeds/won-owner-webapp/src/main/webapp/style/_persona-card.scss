@@ -1,0 +1,53 @@
+@import "won-config";
+@import "sizing-utils";
+@import "animate";
+
+won-persona-card {
+  grid-area: card;
+  display: grid;
+  grid-template-areas: "card__main" "card__icon";
+  grid-template-rows: max-content 1fr;
+  padding: 0.5rem;
+  color: black;
+
+  .card__icon {
+    grid-area: card__icon;
+    display: grid;
+    margin-top: 0.5rem;
+    user-select: none;
+    height: 10rem;
+    justify-content: center;
+    align-items: center;
+
+    &.inactive {
+      -webkit-filter: grayscale(100%);
+      filter: grayscale(100%);
+    }
+
+    & .image,
+    & .identicon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 100%;
+      $cardIdenticonSize: 5rem;
+      @include fixed-square(#{$cardIdenticonSize});
+    }
+
+    & .image {
+      background: white;
+    }
+  }
+
+  .card__main {
+    grid-area: card__main;
+
+    &__name {
+      min-width: 0;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      font-weight: 300;
+    }
+  }
+}

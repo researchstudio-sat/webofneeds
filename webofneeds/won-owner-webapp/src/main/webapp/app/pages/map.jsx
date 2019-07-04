@@ -2,39 +2,37 @@
 import angular from "angular";
 import ngAnimate from "angular-animate";
 import {
-  attach,
   getIn,
   get,
   delay,
-  reverseSearchNominatim,
-  searchNominatim,
-  scrubSearchResults,
 } from "../utils.js";
+import {
+  searchNominatim,
+  reverseSearchNominatim,
+  scrubSearchResults,
+} from "../api/nominatim-api.js";
+import { attach } from "../cstm-ng-utils.js";
 import Immutable from "immutable";
-import { connect2Redux } from "../won-utils.js";
+import { connect2Redux } from "../configRedux.js";
 import { actionCreators } from "../actions/actions.js";
 import postMessagesModule from "../components/post-messages.js";
 import atomCardModule from "../components/atom-card.js";
 import atomMapModule from "../components/atom-map.js";
 import postHeaderModule from "../components/post-header.js";
-import * as generalSelectors from "../selectors/general-selectors.js";
-import * as viewSelectors from "../selectors/view-selectors.js";
-import * as processUtils from "../process-utils.js";
+import * as generalSelectors from "../redux/selectors/general-selectors.js";
+import * as viewSelectors from "../redux/selectors/view-selectors.js";
+import * as processUtils from "../redux/utils/process-utils.js";
 import * as wonLabelUtils from "../won-label-utils.js";
-import * as atomUtils from "../atom-utils.js";
+import * as atomUtils from "../redux/utils/atom-utils.js";
 import wonInput from "../directives/input.js";
 import { h } from "preact";
 
 import "~/style/_map.scss";
-import "~/style/_atom-overlay.scss";
 import "~/style/_connection-overlay.scss";
 
 const template = (
   <container>
     <won-modal-dialog ng-if="self.showModalDialog" />
-    <div className="won-modal-atomview" ng-if="self.showAtomOverlay">
-      <won-post-info atom-uri="self.viewAtomUri" />
-    </div>
     <div
       className="won-modal-connectionview"
       ng-if="self.showConnectionOverlay"
@@ -242,7 +240,6 @@ class Controller {
     window.ownermap4dbg = this;
 
     const selectFromState = state => {
-      const viewAtomUri = generalSelectors.getViewAtomUriFromRoute(state);
       const viewConnUri = generalSelectors.getViewConnectionUriFromRoute(state);
 
       const isLocationAccessDenied = generalSelectors.isLocationAccessDenied(
@@ -259,7 +256,7 @@ class Controller {
         "lastWhatsAroundMaxDistance",
       ]);
 
-      const whatsNewMetaAtoms = getIn(state, ["owner", "whatsAround"])
+      const whatsAroundMetaAtoms = generalSelectors.getWhatsAroundAtoms(state)
         .filter(metaAtom => atomUtils.isActive(metaAtom))
         .filter(metaAtom => !atomUtils.isSearchAtom(metaAtom))
         .filter(metaAtom => !atomUtils.isDirectResponseAtom(metaAtom))
@@ -281,7 +278,7 @@ class Controller {
         });
 
       const sortedVisibleAtoms = atomUtils.sortByDistanceFrom(
-        whatsNewMetaAtoms,
+        whatsAroundMetaAtoms,
         lastWhatsAroundLocation
       );
       const sortedVisibleAtomUriArray = sortedVisibleAtoms && [
@@ -301,8 +298,8 @@ class Controller {
         !lastAtomUrisUpdateDate && !isOwnerAtomUrisLoading;
 
       let locations = [];
-      whatsNewMetaAtoms &&
-        whatsNewMetaAtoms.map(atom => {
+      whatsAroundMetaAtoms &&
+        whatsAroundMetaAtoms.map(atom => {
           const atomLocation = atomUtils.getLocation(atom);
           locations.push(atomLocation);
         });
@@ -330,9 +327,7 @@ class Controller {
         showSlideIns:
           viewSelectors.hasSlideIns(state) && viewSelectors.showSlideIns(state),
         showModalDialog: viewSelectors.showModalDialog(state),
-        showAtomOverlay: !!viewAtomUri,
         showConnectionOverlay: !!viewConnUri,
-        viewAtomUri,
         viewConnUri,
       };
     };

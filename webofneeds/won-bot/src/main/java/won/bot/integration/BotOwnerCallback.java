@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.TaskScheduler;
 
+import won.bot.exception.NoBotResponsibleException;
 import won.bot.framework.bot.Bot;
 import won.bot.framework.manager.BotManager;
 import won.owner.protocol.message.OwnerCallback;
@@ -32,6 +33,8 @@ public class BotOwnerCallback implements OwnerCallback {
                     logger.debug("onCloseFromOtherAtom received for connection {}, message {} ", con.getConnectionURI(),
                                     wonMessage.getMessageURI());
                     getBotForAtomUri(con.getAtomURI()).onCloseFromOtherAtom(con, wonMessage);
+                } catch (NoBotResponsibleException e) {
+                    logger.debug("error while handling onCloseFromOtherAtom()", e.getMessage());
                 } catch (Exception e) {
                     logger.warn("error while handling onCloseFromOtherAtom()", e);
                 }
@@ -46,6 +49,8 @@ public class BotOwnerCallback implements OwnerCallback {
                 if (wonMessage.getEnvelopeType() != WonMessageDirection.FROM_OWNER) {
                     try {
                         getBotForAtomUri(wonMessage.getRecipientAtomURI()).onAtomHintFromMatcher(wonMessage);
+                    } catch (NoBotResponsibleException e) {
+                        logger.debug("error while handling onAtomHintFromMatcher()", e.getMessage());
                     } catch (Exception e) {
                         logger.warn("error while handling onAtomHintFromMatcher()", e);
                     }
@@ -63,6 +68,8 @@ public class BotOwnerCallback implements OwnerCallback {
                 if (wonMessage.getEnvelopeType() != WonMessageDirection.FROM_OWNER) {
                     try {
                         getBotForAtomUri(wonMessage.getRecipientAtomURI()).onSocketHintFromMatcher(wonMessage);
+                    } catch (NoBotResponsibleException e) {
+                        logger.debug("error while handling onAtomHintFromMatcher()", e.getMessage());
                     } catch (Exception e) {
                         logger.warn("error while handling onAtomHintFromMatcher()", e);
                     }
@@ -82,6 +89,8 @@ public class BotOwnerCallback implements OwnerCallback {
                         logger.debug("onConnectFromOtherAtom called for connection {}, message {}",
                                         con.getConnectionURI(), wonMessage.getMessageURI());
                         getBotForAtomUri(con.getAtomURI()).onConnectFromOtherAtom(con, wonMessage);
+                    } catch (NoBotResponsibleException e) {
+                        logger.debug("error while handling onConnectFromOtherAtom()", e.getMessage());
                     } catch (Exception e) {
                         logger.warn("error while handling onConnectFromOtherAtom()", e);
                     }
@@ -99,6 +108,8 @@ public class BotOwnerCallback implements OwnerCallback {
                 if (wonMessage.getEnvelopeType() != WonMessageDirection.FROM_OWNER) {
                     try {
                         getBotForAtomUri(con.getAtomURI()).onOpenFromOtherAtom(con, wonMessage);
+                    } catch (NoBotResponsibleException e) {
+                        logger.debug("error while handling onOpenFromOtherAtom()", e.getMessage());
                     } catch (Exception e) {
                         logger.warn("error while handling onOpenFromOtherAtom()", e);
                     }
@@ -118,6 +129,8 @@ public class BotOwnerCallback implements OwnerCallback {
                         logger.debug("onMessageFromOtherAtom for Connection {}, message {}", con.getConnectionURI(),
                                         wonMessage.getMessageURI());
                         getBotForAtomUri(con.getAtomURI()).onMessageFromOtherAtom(con, wonMessage);
+                    } catch (NoBotResponsibleException e) {
+                        logger.debug("error while handling onMessageFromOtherAtom()", e.getMessage());
                     } catch (Exception e) {
                         logger.warn("error while handling onMessageFromOtherAtom()", e);
                     }
@@ -136,6 +149,8 @@ public class BotOwnerCallback implements OwnerCallback {
                     logger.debug("onSuccessResponse for message {} ", successfulMessageUri);
                     URI atomUri = wonMessage.getRecipientAtomURI();
                     getBotForAtomUri(atomUri).onSuccessResponse(successfulMessageUri, wonMessage);
+                } catch (NoBotResponsibleException e) {
+                    logger.debug("error while handling onSuccessResponse()", e.getMessage());
                 } catch (Exception e) {
                     logger.warn("error while handling onSuccessResponse()", e);
                 }
@@ -151,6 +166,8 @@ public class BotOwnerCallback implements OwnerCallback {
                     logger.debug("onFailureResponse for message {} ", failedMessageUri);
                     URI atomUri = wonMessage.getRecipientAtomURI();
                     getBotForAtomUri(atomUri).onFailureResponse(failedMessageUri, wonMessage);
+                } catch (NoBotResponsibleException e) {
+                    logger.debug("error while handling onFailureResponse()", e.getMessage());
                 } catch (Exception e) {
                     logger.warn("error while handling onFailureResponse()", e);
                 }
@@ -169,9 +186,9 @@ public class BotOwnerCallback implements OwnerCallback {
     private Bot getBotForAtomUri(URI atomUri) {
         Bot bot = botManager.getBotForAtomURI(atomUri);
         if (bot == null)
-            throw new IllegalStateException("No bot registered for uri " + atomUri);
+            throw new NoBotResponsibleException("No bot registered for uri " + atomUri);
         if (!bot.getLifecyclePhase().isActive()) {
-            throw new IllegalStateException("bot responsible for atom " + atomUri
+            throw new NoBotResponsibleException("bot responsible for atom " + atomUri
                             + " is not active (lifecycle phase is: " + bot.getLifecyclePhase() + ")");
         }
         return bot;

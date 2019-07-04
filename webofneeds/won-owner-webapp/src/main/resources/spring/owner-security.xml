@@ -17,7 +17,7 @@
 		<!-- we do not need CSRF protection for these resources as accessing them is not state-changing - however, it would be better to have it.. -->
 		<csrf disabled="true" />
 	</http>
-	<http use-expressions="true" pattern="(/generated/.+|/images/.+|/favicon.ico|/app/.+|bower_components/.+|/fonts/.+|/scripts/.+|/style/.+|/index.html|/appConfig/.+|/jspm_packages/.+|/jspm_config.js)" request-matcher="regex" entry-point-ref="ajaxLoginUrlAuthenticationEntryPoint" security-context-repository-ref="securityContextRepository">
+	<http use-expressions="true" pattern="(/index.html|/appConfig/.+)" request-matcher="regex" entry-point-ref="ajaxLoginUrlAuthenticationEntryPoint" security-context-repository-ref="securityContextRepository">
 		<!--
 			This is static stuff, which may change, but usually doesn't.
 			If it changes, we want clients to notice the change via If-None-Match Etag validation.
@@ -39,6 +39,7 @@
 		<intercept-url pattern="/rest/users/signout" access="permitAll()"/>
 		<intercept-url pattern="/rest/users/isSignedIn" access="permitAll()"/>
 		<intercept-url pattern="/rest/users/signin" access="permitAll()"/>
+		<intercept-url pattern="/rest/users/subscribeNotifications" access="isAuthenticated()" />
 		<intercept-url pattern="/rest/users/changePassword" access="isAuthenticated()" />
 		<intercept-url pattern="/rest/users/resetPassword" access="isAuthenticated()" />
 		<intercept-url pattern="/rest/users/confirmRegistration" access="permitAll()"/>

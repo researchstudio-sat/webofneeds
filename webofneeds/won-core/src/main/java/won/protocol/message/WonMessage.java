@@ -4,10 +4,11 @@ import java.io.Serializable;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -26,8 +27,8 @@ import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.NodeIterator;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.ResIterator;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.rdf.model.impl.ResourceImpl;
 import org.apache.jena.tdb.TDB;
@@ -39,6 +40,7 @@ import com.google.common.collect.Sets;
 
 import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.RDFG;
+import won.protocol.vocabulary.SFSIG;
 import won.protocol.vocabulary.WONMSG;
 
 /**
@@ -80,6 +82,7 @@ public class WonMessage implements Serializable {
     private URI forwardedMessageURI;
     private URI innermostMessageURI;
     private List<AttachmentHolder> attachmentHolders;
+    private Map<String, Resource> graphSignatures;
 
     // private Resource msgBnode;
     // private Signature signature;
@@ -181,8 +184,9 @@ public class WonMessage implements Serializable {
     }
 
     /**
-     * Creates a copy of the message dataset where all traces of the envelope graph
-     * are deleted.
+     * Creates a new dataset containing only the content graph(s) of the message and
+     * their signature (if present). Each signature is put in a separate graph whose
+     * name is the URI of the signature.
      *
      * @return
      */
@@ -193,28 +197,18 @@ public class WonMessage implements Serializable {
             Dataset newMsgContent = DatasetFactory.createGeneral();
             Iterator<String> modelNames = this.completeDataset.listNames();
             List<String> envelopeGraphNames = getEnvelopeGraphURIs();
-            // add all models that are not envelope graphs to the messageContent
-            while (modelNames.hasNext()) {
-                String modelName = modelNames.next();
-                if (envelopeGraphNames.contains(modelName)) {
-                    continue;
-                }
+            List<String> contentGraphs = getContentGraphURIs();
+            // add all models that are not envelope graphs or signature graphs to the
+            // messageContent
+            for (String modelName : contentGraphs) {
                 newMsgContent.addNamedModel(modelName, this.completeDataset.getNamedModel(modelName));
-            }
-            // copy the default model, but delete the triples referencing the envelope
-            // graphs
-            // TODO: this deletion is no longer necessary, right?
-            Model newDefaultModel = ModelFactory.createDefaultModel();
-            newDefaultModel.add(this.completeDataset.getDefaultModel());
-            StmtIterator it = newDefaultModel.listStatements(null, RDF.type, WONMSG.EnvelopeGraph);
-            while (it.hasNext()) {
-                Statement stmt = it.nextStatement();
-                String subjString = stmt.getSubject().toString();
-                if (envelopeGraphNames.contains(subjString)) {
-                    it.remove();
+                if (graphSignatures.containsKey(modelName)) {
+                    Resource sig = graphSignatures.get(modelName);
+                    Model sigModel = ModelFactory.createDefaultModel();
+                    sigModel.add(sig.listProperties());
+                    newMsgContent.addNamedModel(sig.getURI(), sigModel);
                 }
             }
-            newMsgContent.setDefaultModel(newDefaultModel);
             this.messageContent = newMsgContent;
         }
         return RdfUtils.cloneDataset(this.messageContent);
@@ -312,6 +306,7 @@ public class WonMessage implements Serializable {
         List<Model> allEnvelopes = new ArrayList<Model>();
         this.envelopeGraphNames = new ArrayList<String>();
         this.contentGraphNames = new ArrayList<String>();
+        this.graphSignatures = new HashMap<String, Resource>();
         URI currentMessageURI = null;
         this.outerEnvelopeGraph = null;
         Set<String> envelopesContainedInOthers = new HashSet<String>();
@@ -345,6 +340,13 @@ public class WonMessage implements Serializable {
                         this.contentGraphNames.add(node.asResource().toString());
                     }
                 }
+            }
+            // check if the graph contains a signature and if so, remember it
+            ResIterator it = envelopeGraph.listSubjectsWithProperty(RDF.type, SFSIG.SIGNATURE);
+            while (it.hasNext()) {
+                Resource sig = it.next();
+                Resource signedGraph = sig.getPropertyResourceValue(WONMSG.signedGraph);
+                this.graphSignatures.put(signedGraph.getURI(), sig);
             }
         }
         Set<String> candidatesForOuterEnvelope = Sets.symmetricDifference(allEnvelopeGraphNames,

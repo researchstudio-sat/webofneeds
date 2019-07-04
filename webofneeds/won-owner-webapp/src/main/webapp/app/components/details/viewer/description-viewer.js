@@ -1,5 +1,5 @@
 import angular from "angular";
-import { attach } from "../../../utils.js";
+import { attach } from "../../../cstm-ng-utils.js";
 import "angular-marked";
 
 import "~/style/_description-viewer.scss";

@@ -3,10 +3,11 @@
  */
 import { actionTypes } from "../actions/actions.js";
 import Immutable from "immutable";
-import { getIn } from "../utils.js";
-import { parseAtom } from "./atom-reducer/parse-atom.js";
+import { getIn, get } from "../utils.js";
+import { parseAtom, parseMetaAtom } from "./atom-reducer/parse-atom.js";
 import { parseMessage } from "./atom-reducer/parse-message.js";
-import * as processUtils from "../process-utils.js";
+import * as processUtils from "../redux/utils/process-utils.js";
+import * as atomUtils from "../redux/utils/atom-utils.js";
 
 const initialState = Immutable.fromJS({
   processingInitialLoad: true,
@@ -402,7 +403,7 @@ export default function(processState = initialState, action = {}) {
       });
     }
 
-    case actionTypes.connections.storeUrisToLoad: {
+    case actionTypes.connections.storeMetaConnections: {
       const connections = action.payload.get("connections");
 
       connections &&
@@ -414,6 +415,12 @@ export default function(processState = initialState, action = {}) {
               toLoad: true,
             }
           );
+          const targetAtomUri = get(conn, "targetAtomUri");
+          if (!processUtils.isAtomLoaded(processState, targetAtomUri)) {
+            processState = updateAtomProcess(processState, targetAtomUri, {
+              toLoad: true,
+            });
+          }
         });
       return processState;
     }
@@ -454,6 +461,26 @@ export default function(processState = initialState, action = {}) {
             loading: false,
           });
 
+          const targetAtomUri = get(conn, "targetAtom");
+          const sourceAtomUri = get(conn, "sourceAtom");
+          if (
+            targetAtomUri &&
+            !processUtils.isAtomLoaded(processState, targetAtomUri) &&
+            !processUtils.isAtomLoading(processState, targetAtomUri)
+          ) {
+            processState = updateAtomProcess(processState, targetAtomUri, {
+              toLoad: true,
+            });
+          }
+          if (
+            sourceAtomUri &&
+            !processUtils.isAtomLoaded(processState, sourceAtomUri) &&
+            !processUtils.isAtomLoading(processState, sourceAtomUri)
+          ) {
+            processState = updateAtomProcess(processState, sourceAtomUri, {
+              toLoad: true,
+            });
+          }
           const eventsOfConnection = conn.get("hasEvents");
           eventsOfConnection &&
             eventsOfConnection.map(eventUri => {
@@ -489,60 +516,52 @@ export default function(processState = initialState, action = {}) {
           );
 
           const heldAtomUris = parsedAtom.get("holds");
-          if (heldAtomUris.size > 0) {
-            heldAtomUris.map(heldAtomUri => {
-              if (!processUtils.isAtomLoaded(processState, heldAtomUri)) {
-                processState = updateAtomProcess(processState, heldAtomUri, {
-                  toLoad: true,
-                });
-              }
-            });
-          }
+          heldAtomUris.map(heldAtomUri => {
+            if (!processUtils.isAtomLoaded(processState, heldAtomUri)) {
+              processState = updateAtomProcess(processState, heldAtomUri, {
+                toLoad: true,
+              });
+            }
+          });
 
           const groupMemberUris = parsedAtom.get("groupMembers");
-          if (groupMemberUris.size > 0) {
-            groupMemberUris.map(groupMemberUri => {
-              if (!processUtils.isAtomLoaded(processState, groupMemberUri)) {
-                processState = updateAtomProcess(processState, groupMemberUri, {
-                  toLoad: true,
-                });
-              }
-            });
-          }
+          groupMemberUris.map(groupMemberUri => {
+            if (!processUtils.isAtomLoaded(processState, groupMemberUri)) {
+              processState = updateAtomProcess(processState, groupMemberUri, {
+                toLoad: true,
+              });
+            }
+          });
 
           const buddyUris = parsedAtom.get("buddies");
-          if (buddyUris.size > 0) {
-            buddyUris.map(buddyUri => {
-              if (!processUtils.isAtomLoaded(processState, buddyUri)) {
-                processState = updateAtomProcess(processState, buddyUri, {
-                  toLoad: true,
-                });
-              }
+          buddyUris.map(buddyUri => {
+            if (!processUtils.isAtomLoaded(processState, buddyUri)) {
+              processState = updateAtomProcess(processState, buddyUri, {
+                toLoad: true,
+              });
+            }
+          });
+        });
+      return processState;
+    }
+
+    case actionTypes.atoms.storeOwnedMetaAtoms: {
+      const metaAtoms = action.payload.get("metaAtoms");
+
+      metaAtoms &&
+        metaAtoms.map((metaAtom, metaAtomUri) => {
+          const metaAtomImm = parseMetaAtom(metaAtom);
+          if (atomUtils.isActive(metaAtomImm)) {
+            processState = updateAtomProcess(processState, metaAtomUri, {
+              loading: true,
+            });
+          } else if (atomUtils.isInactive(metaAtomImm)) {
+            processState = updateAtomProcess(processState, metaAtomUri, {
+              toLoad: true,
             });
           }
         });
-      return processState;
-    }
 
-    case actionTypes.atoms.storeOwnedActiveUris: {
-      const atomUris = action.payload.get("uris");
-      atomUris &&
-        atomUris.forEach(atomUri => {
-          processState = updateAtomProcess(processState, atomUri, {
-            loading: true, //FIXME: once we dont actually retrieve the atoms right after this dispatch we need to set "toLoad" instead of loading
-          });
-        });
-      return processState;
-    }
-
-    case actionTypes.atoms.storeOwnedInactiveUris: {
-      const atomUris = action.payload.get("uris");
-      atomUris &&
-        atomUris.forEach(atomUri => {
-          processState = updateAtomProcess(processState, atomUri, {
-            toLoad: true,
-          });
-        });
       return processState;
     }
 

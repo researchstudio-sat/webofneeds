@@ -3,7 +3,7 @@ import {
   abstractDetails,
   mergeInEmptyDraft,
 } from "../detail-definitions.js";
-import { findLatestIntervallEndInJsonLdOrNowAndAddMillis } from "../../app/won-utils.js";
+import * as wonUtils from "../../app/won-utils.js";
 import { sparqlQuery } from "../../app/sparql-builder-utils.js";
 import won from "../../app/won-es6.js";
 
@@ -13,7 +13,7 @@ export const goodsTransportSearch = {
   identifier: "goodsTransportSearch",
   label: "Send something",
   icon: "#ico36_uc_transport_demand",
-  doNotMatchAfter: findLatestIntervallEndInJsonLdOrNowAndAddMillis,
+  doNotMatchAfter: wonUtils.findLatestIntervallEndInJsonLdOrNowAndAddMillis,
   draft: {
     ...mergeInEmptyDraft({
       content: {

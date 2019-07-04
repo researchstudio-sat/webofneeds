@@ -1,14 +1,14 @@
 import angular from "angular";
 import "ng-redux";
 import Immutable from "immutable";
-import { attach, sortBy, get, getIn, delay } from "../../../utils.js";
-import { DomCache } from "../../../cstm-ng-utils.js";
+import { sortBy, get, getIn, delay } from "../../../utils.js";
+import { attach, DomCache } from "../../../cstm-ng-utils.js";
 import wonInput from "../../../directives/input.js";
-import { connect2Redux } from "../../../won-utils.js";
+import { connect2Redux } from "../../../configRedux.js";
 import { actionCreators } from "../../../actions/actions.js";
 import postHeaderModule from "../../post-header.js";
 import labelledHrModule from "../../labelled-hr.js";
-import { getActiveAtoms } from "../../../selectors/general-selectors.js";
+import { getActiveAtoms } from "../../../redux/selectors/general-selectors.js";
 
 import "~/style/_suggestpostpicker.scss";
 

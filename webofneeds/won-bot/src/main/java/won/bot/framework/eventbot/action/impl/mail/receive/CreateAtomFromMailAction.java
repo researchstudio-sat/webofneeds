@@ -62,7 +62,7 @@ public class CreateAtomFromMailAction extends AbstractCreateAtomAction {
                 WonNodeInformationService wonNodeInformationService = ctx.getWonNodeInformationService();
                 final URI wonNodeUri = ctx.getNodeURISource().getNodeURI();
                 final URI atomURI = wonNodeInformationService.generateAtomURI(wonNodeUri);
-                DefaultAtomModelWrapper atomModelWrapper = new DefaultAtomModelWrapper(atomURI.toString());
+                DefaultAtomModelWrapper atomModelWrapper = new DefaultAtomModelWrapper(atomURI);
                 switch (type) {
                     case OFFER:
                         atomModelWrapper.setTitle(title);

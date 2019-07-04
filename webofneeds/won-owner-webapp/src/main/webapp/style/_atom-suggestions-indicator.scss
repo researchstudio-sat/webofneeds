@@ -15,6 +15,15 @@ won-atom-suggestions-indicator {
   cursor: pointer;
   border-top: $thinGrayBorder;
 
+  &.won-no-suggestions > * {
+    transition: opacity linear 0.25s;
+    opacity: 0.25;
+  }
+  &:not(.won-no-suggestions) > * {
+    opacity: 1;
+    transition: opacity linear 0.25s;
+  }
+
   .asi__icon {
     box-sizing: border-box;
     padding: 0.25rem;

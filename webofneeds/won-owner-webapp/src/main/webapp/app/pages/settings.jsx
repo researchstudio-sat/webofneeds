@@ -5,13 +5,12 @@
  */
 import angular from "angular";
 import ngAnimate from "angular-animate";
-import { attach, getIn } from "../utils.js";
+import { getIn } from "../utils.js";
+import { attach } from "../cstm-ng-utils.js";
 import { actionCreators } from "../actions/actions.js";
 import settingsWrapper from "../components/settings-wrapper.js";
-import * as viewSelectors from "../selectors/view-selectors.js";
+import * as viewSelectors from "../redux/selectors/view-selectors.js";
 import { h } from "preact";
-
-import * as srefUtils from "../sref-utils.js";
 
 import "~/style/_signup.scss";
 
@@ -38,7 +37,6 @@ class SettingsController {
   constructor(/* arguments <- serviceDependencies */) {
     attach(this, serviceDependencies, arguments);
     this.rememberMe = false;
-    Object.assign(this, srefUtils); // bind srefUtils to scope
 
     const select = state => {
       return {

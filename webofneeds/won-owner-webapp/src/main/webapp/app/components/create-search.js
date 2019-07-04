@@ -7,13 +7,14 @@ import ngAnimate from "angular-animate";
 
 import "ng-redux";
 import labelledHrModule from "./labelled-hr.js";
-import { attach, get } from "../utils.js";
+import { get } from "../utils.js";
+import { attach } from "../cstm-ng-utils.js";
 import { actionCreators } from "../actions/actions.js";
-import { connect2Redux } from "../won-utils.js";
-import { selectIsConnected } from "../selectors/general-selectors.js";
+import { connect2Redux } from "../configRedux.js";
+import { selectIsConnected } from "../redux/selectors/general-selectors.js";
 
-import * as accountUtils from "../account-utils.js";
-import * as processUtils from "../process-utils.js";
+import * as accountUtils from "../redux/utils/account-utils.js";
+import * as processUtils from "../redux/utils/process-utils.js";
 
 //TODO can't inject $scope with the angular2-router, preventing redux-cleanup
 const serviceDependencies = [

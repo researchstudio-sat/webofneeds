@@ -1,11 +1,10 @@
 import won from "../../won-es6.js";
-import Immutable from "immutable";
-import { parseConnection } from "./parse-connection.js";
+import { parseConnection, parseMetaConnection } from "./parse-connection.js";
 import { markUriAsRead } from "../../won-localstorage.js";
 
 import { markAtomAsRead } from "./reduce-atoms.js";
 import { getIn, get } from "../../utils.js";
-import * as connectionUtils from "../../connection-utils";
+import * as connectionUtils from "../../redux/utils/connection-utils";
 
 export function storeConnectionsData(state, connectionsToStore) {
   if (connectionsToStore && connectionsToStore.size > 0) {
@@ -373,66 +372,42 @@ export function setMultiSelectType(
   return state;
 }
 
-export function addConnectionsToLoad(state, atomUri, connections) {
+export function addMetaConnections(state, atomUri, connections) {
   let newState = state;
   atomUri &&
     connections &&
     connections.forEach(conn => {
-      newState = addConnectionToLoad(newState, atomUri, conn);
+      newState = addMetaConnection(newState, atomUri, conn);
     });
   return newState;
 }
 
-export function addConnectionToLoad(state, atomUri, conn) {
-  const storedAtom = state.get(atomUri);
-  const isConnectionPresent =
-    storedAtom &&
-    !!storedAtom.getIn(["connections", conn.get("connectionUri")]);
+function addMetaConnection(atomState, atomUri, conn) {
+  const storedAtom = get(atomState, atomUri);
+  const storedConnection = getIn(storedAtom, [
+    "connections",
+    get(conn, "connectionUri"),
+  ]);
 
-  const socketTypeToCompacted = socketType => {
-    if (socketType === won.CHAT.ChatSocket) {
-      return won.CHAT.ChatSocketCompacted;
-    } else if (socketType === won.GROUP.GroupSocket) {
-      return won.GROUP.GroupSocketCompacted;
-    } else if (socketType === won.REVIEW.ReviewSocket) {
-      return won.REVIEW.ReviewSocketCompacted;
-    } else if (socketType === won.HOLD.HolderSocket) {
-      return won.HOLD.HolderSocketCompacted;
-    } else if (socketType === won.HOLD.HoldableSocket) {
-      return won.HOLD.HoldableSocketCompacted;
-    } else if (socketType === won.BUDDY.BuddySocket) {
-      return won.BUDDY.BuddySocketCompacted;
-    } else {
-      console.warn(
-        "Unknown socketType: ",
-        socketType,
-        " - can't compact, return as is"
+  const parsedMetaConnection = parseMetaConnection(conn);
+
+  if (!!storedAtom && !storedConnection && parsedMetaConnection) {
+    const connectionUri = getIn(parsedMetaConnection, ["data", "uri"]);
+
+    if (connectionUtils.isUnread(get(parsedMetaConnection, "data"))) {
+      //If there is a new message for the connection we will set the connection to newConnection
+      atomState = atomState.setIn(
+        [atomUri, "lastUpdateDate"],
+        getIn(parsedMetaConnection, ["data", "lastUpdateDate"])
       );
-      return socketType;
+      atomState = atomState.setIn([atomUri, "unread"], true);
     }
-  };
 
-  if (storedAtom && !isConnectionPresent) {
-    const connection = Immutable.fromJS({
-      uri: conn.get("connectionUri"),
-      state: conn.get("connectionState"),
-      socket: socketTypeToCompacted(conn.get("socketType")),
-      messages: Immutable.Map(),
-      agreementData: undefined,
-      targetAtomUri: undefined,
-      targetConnectionUri: undefined,
-      creationDate: undefined,
-      lastUpdateDate: undefined,
-      unread: undefined,
-      isRated: false,
-      showAgreementData: false,
-    });
-
-    return state.mergeDeepIn(
-      [atomUri, "connections", conn.get("connectionUri")],
-      connection
+    return atomState.mergeDeepIn(
+      [atomUri, "connections", connectionUri],
+      get(parsedMetaConnection, "data")
     );
   }
 
-  return state;
+  return atomState;
 }

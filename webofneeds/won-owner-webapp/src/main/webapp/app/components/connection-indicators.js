@@ -7,14 +7,17 @@ import won from "../won-es6.js";
 import "ng-redux";
 import { labels } from "../won-label-utils.js";
 import { actionCreators } from "../actions/actions.js";
-import { getPosts, getOwnedPosts } from "../selectors/general-selectors.js";
-import * as connectionSelectors from "../selectors/connection-selectors.js";
-import * as connectionUtils from "../connection-utils.js";
-import * as atomUtils from "../atom-utils.js";
+import {
+  getPosts,
+  getOwnedPosts,
+} from "../redux/selectors/general-selectors.js";
+import * as connectionSelectors from "../redux/selectors/connection-selectors.js";
+import * as connectionUtils from "../redux/utils/connection-utils.js";
+import * as atomUtils from "../redux/utils/atom-utils.js";
 
-import { attach, sortByDate, getIn, get } from "../utils.js";
-import { connect2Redux } from "../won-utils.js";
-import { classOnComponentRoot } from "../cstm-ng-utils.js";
+import { sortByDate, getIn, get } from "../utils.js";
+import { connect2Redux } from "../configRedux.js";
+import { classOnComponentRoot, attach } from "../cstm-ng-utils.js";
 
 import "~/style/_connection-indicators.scss";
 

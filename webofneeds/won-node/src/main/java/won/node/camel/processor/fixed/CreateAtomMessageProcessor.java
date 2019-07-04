@@ -30,6 +30,7 @@ import won.protocol.model.AtomMessageContainer;
 import won.protocol.model.AtomState;
 import won.protocol.model.OwnerApplication;
 import won.protocol.util.AtomModelWrapper;
+import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WONMSG;
 
@@ -52,6 +53,7 @@ public class CreateAtomMessageProcessor extends AbstractCamelProcessor {
         List<WonMessage.AttachmentHolder> attachmentHolders = wonMessage.getAttachments();
         // remove attachment and its signature from the atomContent
         removeAttachmentsFromAtomContent(atomContent, attachmentHolders);
+        URI messageURI = wonMessage.getMessageURI();
         URI atomURI = getAtomURIFromWonMessage(atomContent);
         if (!atomURI.equals(wonMessage.getSenderAtomURI()))
             throw new IllegalArgumentException("recipientAtomURI and AtomURI of the content are not equal");
@@ -67,6 +69,9 @@ public class CreateAtomMessageProcessor extends AbstractCamelProcessor {
             throw new UriAlreadyInUseException("Found an AtomMessageContainer for the atom we're about to create ("
                             + atomURI + ") - aborting");
         }
+        // rename the content graphs and signature graphs so they start with the atom
+        // uri
+        RdfUtils.renameResourceWithPrefix(atomContent, messageURI.toString(), atomURI.toString());
         atom.setWonNodeURI(wonMessage.getRecipientNodeURI());
         ConnectionContainer connectionContainer = new ConnectionContainer(atom);
         atom.setConnectionContainer(connectionContainer);

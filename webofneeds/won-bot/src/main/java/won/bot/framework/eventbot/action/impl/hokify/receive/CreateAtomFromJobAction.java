@@ -126,7 +126,7 @@ public class CreateAtomFromJobAction extends AbstractCreateAtomAction {
     }
 
     private Dataset generateJobAtomStructure(URI atomURI, HokifyJob hokifyJob) {
-        DefaultAtomModelWrapper atomModelWrapper = new DefaultAtomModelWrapper(atomURI.toString());
+        DefaultAtomModelWrapper atomModelWrapper = new DefaultAtomModelWrapper(atomURI);
         Resource atom = atomModelWrapper.getAtomModel().createResource(atomURI.toString());
         Resource seeksPart = atom.getModel().createResource();
         // @type

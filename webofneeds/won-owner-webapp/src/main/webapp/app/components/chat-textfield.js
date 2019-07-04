@@ -10,12 +10,13 @@
 import angular from "angular";
 import "ng-redux";
 import ngAnimate from "angular-animate";
-import { dispatchEvent, attach, delay, get } from "../utils.js";
+import { dispatchEvent, delay, get } from "../utils.js";
+import { attach } from "../cstm-ng-utils.js";
 import {
   getOwnedAtomByConnectionUri,
-  getOwnedPersonas,
-} from "../selectors/general-selectors.js";
-import { getMessagesByConnectionUri } from "../selectors/message-selectors.js";
+  getOwnedCondensedPersonaList,
+} from "../redux/selectors/general-selectors.js";
+import { getMessagesByConnectionUri } from "../redux/selectors/message-selectors.js";
 import {
   isMessageProposable,
   isMessageClaimable,
@@ -24,16 +25,16 @@ import {
   isMessageAcceptable,
   isMessageRejectable,
   isMessageSelected,
-} from "../message-utils.js";
-import { connect2Redux } from "../won-utils.js";
+} from "../redux/utils/message-utils.js";
+import { connect2Redux } from "../configRedux.js";
 import * as useCaseUtils from "../usecase-utils.js";
 import autoresizingTextareaModule from "../directives/textarea-autogrow.js";
 import { actionCreators } from "../actions/actions.js";
 import labelledHrModule from "./labelled-hr.js";
 import { getHumanReadableStringFromMessage } from "../reducers/atom-reducer/parse-message.js";
-import * as connectionSelectors from "../selectors/connection-selectors.js";
-import * as connectionUtils from "../connection-utils.js";
-import * as accountUtils from "../account-utils.js";
+import * as connectionSelectors from "../redux/selectors/connection-selectors.js";
+import * as connectionUtils from "../redux/utils/connection-utils.js";
+import * as accountUtils from "../redux/utils/account-utils.js";
 
 import { Elm } from "../../elm/PublishButton.elm";
 import elmModule from "./elm.js";
@@ -368,7 +369,7 @@ function genComponentConf() {
           selectedDetail,
           selectedDetailComponent: selectedDetail && selectedDetail.component,
           isLoggedIn: accountUtils.isLoggedIn(get(state, "account")),
-          personas: getOwnedPersonas(state).toJS(),
+          personas: getOwnedCondensedPersonaList(state).toJS(),
         };
       };
 

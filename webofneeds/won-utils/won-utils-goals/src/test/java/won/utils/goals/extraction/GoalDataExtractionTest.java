@@ -35,7 +35,6 @@ public class GoalDataExtractionTest {
         Model shapesModel = ds.getNamedModel("http://example.org/ns#shapes");
         Model actual = GoalUtils.extractGoalData(dataModel, shapesModel);
         Model expected = loadModel(baseFolder + "additional-node-not-covered-by-shape-expected-result.trig");
-        RDFDataMgr.write(System.out, actual, Lang.TRIG);
         Assert.assertTrue(actual.isIsomorphicWith(expected));
     }
 
@@ -47,7 +46,6 @@ public class GoalDataExtractionTest {
         Model actual = GoalUtils.extractGoalData(dataModel, shapesModel);
         Model expected = loadModel(
                         baseFolder + "additional-node-not-covered-by-shape-person-closed-expected-result.trig");
-        RDFDataMgr.write(System.out, actual, Lang.TRIG);
         Assert.assertTrue(actual.isIsomorphicWith(expected));
     }
 
@@ -58,8 +56,6 @@ public class GoalDataExtractionTest {
         Model shapesModel = ds.getNamedModel("http://example.org/ns#shapes");
         Model actual = GoalUtils.extractGoalData(dataModel, shapesModel);
         Model expected = loadModel(baseFolder + "SequencePath-expected-result.trig");
-        RDFDataMgr.write(System.out, actual, Lang.TRIG);
-        RDFDataMgr.write(System.out, expected, Lang.TRIG);
         Assert.assertTrue(actual.isIsomorphicWith(expected));
     }
 

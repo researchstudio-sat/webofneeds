@@ -3,11 +3,11 @@ import { Elm } from "../../elm/Settings.elm";
 import { actionCreators } from "../actions/actions";
 import "./identicon.js";
 import {
-  getOwnedPersonas,
+  getOwnedCondensedPersonaList,
   currentSkin,
-} from "../selectors/general-selectors.js";
+} from "../redux/selectors/general-selectors.js";
 import { get } from "../utils";
-import * as accountUtils from "../account-utils.js";
+import * as accountUtils from "../redux/utils/account-utils.js";
 
 function genComponentConf($ngRedux) {
   return {
@@ -29,7 +29,10 @@ function genComponentConf($ngRedux) {
       });
 
       elmApp.ports.updatePersonas.subscribe(() => {
-        const personas = getOwnedPersonas($ngRedux.getState());
+        const personas = getOwnedCondensedPersonaList(
+          $ngRedux.getState(),
+          true
+        );
         if (personas) {
           elmApp.ports.personaIn.send(personas.toJS());
         }
@@ -53,14 +56,14 @@ function genComponentConf($ngRedux) {
         elmApp.ports.accountInfoIn.send(accountInfo);
       });
 
-      const personas = getOwnedPersonas($ngRedux.getState());
+      const personas = getOwnedCondensedPersonaList($ngRedux.getState(), true);
       if (personas) {
         elmApp.ports.personaIn.send(personas.toJS());
       }
 
       const disconnect = $ngRedux.connect(state => {
         return {
-          personas: getOwnedPersonas(state),
+          personas: getOwnedCondensedPersonaList(state, true),
           isVerified: accountUtils.isEmailVerified(get(state, "account")),
           accountInfo: {
             email: accountUtils.getEmail(get(state, "account")),

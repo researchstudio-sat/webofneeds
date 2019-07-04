@@ -81,7 +81,7 @@ public class TelegramCreateAction extends AbstractCreateAtomAction {
                 WonNodeInformationService wonNodeInformationService = ctx.getWonNodeInformationService();
                 final URI wonNodeUri = ctx.getNodeURISource().getNodeURI();
                 final URI atomURI = wonNodeInformationService.generateAtomURI(wonNodeUri);
-                DefaultAtomModelWrapper wrapper = new DefaultAtomModelWrapper(atomURI.toString());
+                DefaultAtomModelWrapper wrapper = new DefaultAtomModelWrapper(atomURI);
                 switch (type) {
                     case OFFER:
                         wrapper.setTitle(title);

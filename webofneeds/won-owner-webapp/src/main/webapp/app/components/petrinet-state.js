@@ -6,12 +6,13 @@ import angular from "angular";
 import "ng-redux";
 import { actionCreators } from "../actions/actions.js";
 
-import { attach, generateSimpleTransitionLabel, getIn } from "../utils.js";
+import { generateSimpleTransitionLabel, getIn } from "../utils.js";
+import { attach } from "../cstm-ng-utils.js";
 import {
   getOwnedAtomByConnectionUri,
   getConnectionUriFromRoute,
-} from "../selectors/general-selectors.js";
-import { connect2Redux } from "../won-utils.js";
+} from "../redux/selectors/general-selectors.js";
+import { connect2Redux } from "../configRedux.js";
 
 import "~/style/_petrinet-state.scss";
 

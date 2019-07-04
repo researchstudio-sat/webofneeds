@@ -24,8 +24,8 @@ main.postcontent {
     border-right: none;
   }
 
-  & > won-send-request > won-post-content,
-  & > won-send-request > .post-info__footer {
+  & > won-post-info > won-post-content,
+  & > won-post-info > .post-info__footer {
     display: block;
     padding: 0.5rem;
   }

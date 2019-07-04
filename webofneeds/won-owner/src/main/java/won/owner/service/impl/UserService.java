@@ -20,15 +20,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import won.owner.model.EmailVerificationToken;
-import won.owner.model.KeyStoreIOException;
-import won.owner.model.KeystoreHolder;
-import won.owner.model.KeystorePasswordHolder;
-import won.owner.model.User;
-import won.owner.repository.EmailVerificationRepository;
-import won.owner.repository.KeystorePasswordRepository;
-import won.owner.repository.PersistentLoginRepository;
-import won.owner.repository.UserRepository;
+import won.owner.model.*;
+import won.owner.repository.*;
 import won.protocol.util.ExpensiveSecureRandomString;
 
 /**
@@ -43,6 +36,8 @@ public class UserService {
     private EmailVerificationRepository emailVerificationRepository;
     @Autowired
     private PersistentLoginRepository persistentLoginRepository;
+    @Autowired
+    private PushSubscriptionRepository pushSubscriptionRepository;
     @Autowired
     private KeystorePasswordRepository keystorePasswordRepository;
     private ExpensiveSecureRandomString randomStringGenerator = new ExpensiveSecureRandomString();
@@ -367,5 +362,10 @@ public class UserService {
 
     public void save(User user) {
         userRepository.save(user);
+    }
+
+    public void addPushSubscription(User user, PushSubscription subscription) {
+        user.addPushSubscription(subscription);
+        save(user);
     }
 }
