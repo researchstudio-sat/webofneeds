@@ -75,7 +75,9 @@ async function openNotifiedPage(event) {
   });
   const targetUri =
     type === "HINT"
-      ? `${self.registration.scope}#!/post/?postUri=${atomUri}`
+      ? `${
+          self.registration.scope
+        }#!/post/?postUri=${atomUri}&viewConnUri=${connectionUri}`
       : `${
           self.registration.scope
         }#!/connections?connectionUri=${connectionUri}`;
