@@ -342,10 +342,9 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
                 if (userAtom.isMatches()) {
                     ObjectMapper mapper = new ObjectMapper();
                     ObjectNode rootNode = mapper.createObjectNode();
-                    rootNode.put("type", "MESSAGE");
+                    rootNode.put("type", "HINT");
                     rootNode.put("atomUri", userAtom.getUri().toString());
                     rootNode.put("connectionUri", wonMessage.getRecipientURI().toString());
-                    rootNode.put("message", "New match for you!");
                     String stringifiedJson;
                     try {
                         stringifiedJson = mapper.writer().writeValueAsString(rootNode);

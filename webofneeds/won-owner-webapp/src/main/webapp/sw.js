@@ -11,23 +11,35 @@ self.addEventListener("push", async event => {
   if (activeWindows.length == 0) {
     switch (payload.type) {
       case "CONNECT":
-        self.registration.showNotification(
-          "Someone wants to connect to your post",
-          {
-            data: {
-              atomUri: payload.atomUri,
-              connectionUri: payload.connectionUri,
-            },
-          }
-        );
-        break;
-      case "MESSAGE":
-        self.registration.showNotification("You received a new message", {
+        self.registration.showNotification("New Conversation!", {
           data: {
             atomUri: payload.atomUri,
             connectionUri: payload.connectionUri,
           },
+          tag: "won-connect",
+          icon: "skin/current/images/logo.svg",
           body: payload.message,
+        });
+        break;
+      case "MESSAGE":
+        self.registration.showNotification("New message!", {
+          data: {
+            atomUri: payload.atomUri,
+            connectionUri: payload.connectionUri,
+          },
+          tag: "won-message",
+          icon: "skin/current/images/logo.svg",
+          body: payload.message,
+        });
+        break;
+      case "HINT":
+        self.registration.showNotification("New Match!", {
+          data: {
+            atomUri: payload.atomUri,
+            connectionUri: payload.connectionUri,
+          },
+          tag: "won-hint",
+          icon: "skin/current/images/logo.svg",
         });
         break;
     }
