@@ -267,6 +267,7 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
             WebSocketMessage<String> webSocketMessage = new TextMessage(wonMessageJsonLdString);
             URI atomUri = getOwnedAtomURI(wonMessage);
             User user = getUserForWonMessage(wonMessage);
+            notifyPerPush(user, atomUri, wonMessage);
             Set<WebSocketSession> webSocketSessions = findWebSocketSessionsForWonMessage(wonMessage, atomUri, user);
             // check if we can deliver the message. If not, send email.
             if (webSocketSessions.size() == 0) {
@@ -277,7 +278,6 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
                 notifyPerEmail(user, atomUri, wonMessage);
                 return wonMessage;
             }
-            notifyPerPush(user, atomUri, wonMessage);
             // we can send it - pre-cache the delivery chain:
             eagerlyCachePopulatingProcessor.process(wonMessage);
             // send to owner webapp
