@@ -455,12 +455,6 @@ public class WonWebSocketHandler extends TextWebSocketHandler
                     }
                     return;
                 case ATOM_HINT_MESSAGE:
-                    if (userAtom.isMatches()) {
-                        String targetAtomUri = wonMessage.getHintTargetAtomURI().toString();
-                        emailSender.sendHintNotificationMessage(user.getEmail(), atomUri.toString(), targetAtomUri,
-                                        wonMessage.getRecipientURI().toString());
-                    }
-                    return;
                 case SOCKET_HINT_MESSAGE:
                     if (userAtom.isMatches()) {
                         Optional<URI> targetAtomUri = WonLinkedDataUtils
@@ -497,8 +491,6 @@ public class WonWebSocketHandler extends TextWebSocketHandler
                                     emailSender.sendMultipleHintsNotificationMessage(a[0], hintCounts);
                                 }
                             }, config);
-                            emailSender.sendHintNotificationMessage(user.getEmail(), atomUri.toString(),
-                                            targetAtomUri.get().toString(), wonMessage.getRecipientURI().toString());
                         } else {
                             logger.info("received socket hint to {} but could not identify corresponding atom - no mail sent.",
                                             wonMessage.getHintTargetSocketURI());
