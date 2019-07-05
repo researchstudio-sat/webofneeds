@@ -3,7 +3,10 @@ package won.owner.web;
 import java.io.File;
 import java.io.StringWriter;
 import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 import org.apache.jena.query.Dataset;
 import org.apache.velocity.Template;
@@ -37,6 +40,7 @@ public class WonOwnerMailSender {
     private static final String SUBJECT_CONVERSATION_MESSAGE = "New message";
     private static final String SUBJECT_CONNECT = "New conversation request";
     private static final String SUBJECT_MATCH = "New match";
+    private static final String SUBJECT_MULTI_MATCH = " new matches";
     private static final String SUBJECT_CLOSE = "Conversation closed";
     private static final String SUBJECT_SYSTEM_CLOSE = "Conversation closed by system";
     private static final String SUBJECT_ATOM_MESSAGE = "Notification from WoN node";
@@ -60,6 +64,7 @@ public class WonOwnerMailSender {
     private Template closeNotificationTemplate;
     private Template systemCloseNotificationTemplate;
     private Template hintNotificationTemplate;
+    private Template multipleHintsNotificationTemplate;
     private Template atomMessageNotificationTemplate;
     private Template systemDeactivateNotificationTemplate;
     private Template verificationTemplate;
@@ -81,6 +86,7 @@ public class WonOwnerMailSender {
         closeNotificationTemplate = velocityEngine.getTemplate("mail-templates/close-notification.vm");
         systemCloseNotificationTemplate = velocityEngine.getTemplate("mail-templates/systemclose-notification.vm");
         hintNotificationTemplate = velocityEngine.getTemplate("mail-templates/hint-notification.vm");
+        multipleHintsNotificationTemplate = velocityEngine.getTemplate("mail-templates/multiple-hints-notification.vm");
         atomMessageNotificationTemplate = velocityEngine.getTemplate("mail-templates/atommessage-notification.vm");
         systemDeactivateNotificationTemplate = velocityEngine
                         .getTemplate("mail-templates/system-deactivate-notification.vm");
@@ -185,6 +191,31 @@ public class WonOwnerMailSender {
         return velocityContext;
     }
 
+    private VelocityContext createMultipleHintsContext(Map<String, Long> hintCountPerAtom) {
+        String ownerAppLink = uriService.getOwnerProtocolOwnerURI().toString();
+        VelocityContext velocityContext = new VelocityContext();
+        EventCartridge ec = new EventCartridge();
+        ec.addEventHandler(new EscapeHtmlReference());
+        ec.attachToContext(velocityContext);
+        velocityContext.put("hintCount", hintCountPerAtom);
+        velocityContext.put("serviceName", this.ownerWebappUri);
+        velocityContext.put("atoms", hintCountPerAtom.keySet());
+        Map<String, String> atomLinks = new HashMap<>();
+        Map<String, String> atomTitles = new HashMap<>();
+        hintCountPerAtom.keySet().stream().forEach(localAtom -> {
+            Dataset localAtomDataset = linkedDataSource.getDataForResource(URI.create(localAtom));
+            DefaultAtomModelWrapper localAtomWrapper = new DefaultAtomModelWrapper(localAtomDataset);
+            String localAtomTitle = localAtomWrapper.getSomeTitleFromIsOrAll("en", "de");
+            localAtomTitle = useValueOrDefaultValue(localAtomTitle, "(no title)");
+            String linkLocalAtom = ownerAppLink + OWNER_LOCAL_ATOM_LINK + localAtom;
+            atomLinks.put(localAtom, linkLocalAtom);
+            atomTitles.put(localAtom, localAtomTitle);
+        });
+        velocityContext.put("atomTitle", atomTitles);
+        velocityContext.put("atomLink", atomTitles);
+        return velocityContext;
+    }
+
     public void sendConversationNotificationMessage(String toEmail, String localAtom, String targetAtom,
                     String localConnection, String textMsg) {
         if (textMsg != null && !textMsg.isEmpty()) {
@@ -224,6 +255,15 @@ public class WonOwnerMailSender {
         hintNotificationTemplate.merge(context, writer);
         logger.debug("sending " + SUBJECT_MATCH + " to " + toEmail);
         this.wonMailSender.sendTextMessage(toEmail, SUBJECT_MATCH, writer.toString());
+    }
+
+    public void sendMultipleHintsNotificationMessage(String toEmail, Map<String, Long> hintCounts) {
+        StringWriter writer = new StringWriter();
+        VelocityContext context = createMultipleHintsContext(hintCounts);
+        multipleHintsNotificationTemplate.merge(context, writer);
+        long hintCount = hintCounts.values().stream().collect(Collectors.summingLong(cnt -> cnt));
+        logger.debug("sending " + hintCount + SUBJECT_MULTI_MATCH + " to " + toEmail);
+        this.wonMailSender.sendTextMessage(toEmail, hintCount + SUBJECT_MULTI_MATCH, writer.toString());
     }
 
     public void sendAtomMessageNotificationMessage(String toEmail, String localAtom, String textMsg) {

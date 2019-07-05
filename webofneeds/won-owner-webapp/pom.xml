@@ -53,6 +53,11 @@
 			<artifactId>won-utils-conversation</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>at.researchstudio.sat</groupId>
+			<artifactId>won-utils-batch</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 		<!-- JSTL/Servlet -->
 		<dependency>
 			<groupId>javax.servlet</groupId>

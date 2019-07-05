@@ -19,6 +19,7 @@
         <module>won-utils-goals</module>
         <module>won-utils-conversation</module>
         <module>won-utils-tls</module>
+        <module>won-utils-batch</module>
     </modules>
     <packaging>pom</packaging>
 </project>

@@ -1,0 +1,12 @@
+Hi,
+
+Multple matches were found for you:
+
+#foreach ($atom in $atoms)
+* $hintCount($atom) for '$atomTitle($atom)'
+ 	 - see Suggestions: $atomLink($atom)
+#end
+
+Best wishes, 
+
+The team at $serviceName
