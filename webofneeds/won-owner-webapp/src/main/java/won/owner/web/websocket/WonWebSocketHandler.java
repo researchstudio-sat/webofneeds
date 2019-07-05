@@ -19,6 +19,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
 import java.text.MessageFormat;
 import java.time.Duration;
+import java.util.Base64;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
@@ -469,7 +470,7 @@ public class WonWebSocketHandler extends TextWebSocketHandler
                             // users emails in memory all the time
                             MessageDigest digest = MessageDigest.getInstance("SHA-256");
                             byte[] hash = digest.digest(user.getEmail().getBytes(StandardCharsets.UTF_8));
-                            String key = "HINT" + new String(hash);
+                            String key = "HINT" + Base64.getEncoder().encodeToString(hash);
                             String[] args = new String[] {
                                             user.getEmail(),
                                             atomUri.toString(),
