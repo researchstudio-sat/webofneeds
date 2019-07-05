@@ -1,19 +1,19 @@
 Hi,
 
-
-#if [$atoms.size() > 1]
+#if ( $atoms.size() > 1 )
 Multple matches were found for you:
 #foreach ($atom in $atoms)
 * $hintCount[$atom] for '$atomTitle[$atom]'
-    View them: $atomLink[$atom]
+    Go to your 'Suggestions' tab: $atomLink[$atom]
+
 #end
 #else
 #foreach ($atom in $atoms)
 $hintCount[$atom] matches were found for your post '$atomTitle[$atom]'
 
-View them: $atomLink[$atom]
-#fi
-
+Go to your 'Suggestions' tab: $atomLink[$atom]
+#end
+#end
 Best wishes, 
 
 The team at $serviceName
