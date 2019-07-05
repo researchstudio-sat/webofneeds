@@ -211,2502 +211,3756 @@ export const pokemonRaid = {
   fullPokemonList: [
     {
       id: 1,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/001-00.png",
       name: "Bisasam",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 2,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/002-00.png",
       name: "Bisaknosp",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 3,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/003-00.png",
       name: "Bisaflor",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 4,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/004-00.png",
       name: "Glumanda",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 5,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/005-00.png",
       name: "Glutexo",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 6,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/006-00.png",
       name: "Glurak",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 7,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/007-00.png",
       name: "Schiggy",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 8,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/008-00.png",
       name: "Schillok",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 9,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/009-00.png",
       name: "Turtok",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 10,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/010-00.png",
       name: "Raupy",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 11,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/011-00.png",
       name: "Safcon",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 12,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/012-00.png",
       name: "Smettbo",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 13,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/013-00.png",
       name: "Hornliu",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 14,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/014-00.png",
       name: "Kokuna",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 15,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/015-00.png",
       name: "Bibor",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 16,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/016-00.png",
       name: "Taubsi",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 17,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/017-00.png",
       name: "Tauboga",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 18,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/018-00.png",
       name: "Tauboss",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 19,
-      name: "Rattfratz",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
       form: "Standardform",
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/019-01.png",
+      name: "Rattfratz",
+      isShiny: false,
+    },
+    {
+      id: 19,
+      form: "Alola-Form",
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/019-61.png",
+      name: "Rattfratz",
+      isShiny: false,
     },
     {
       id: 20,
-      name: "Rattikarl",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
       form: "Standardform",
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/020-01.png",
+      name: "Rattikarl",
+      isShiny: false,
+    },
+    {
+      id: 20,
+      form: "Alola-Form",
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/020-61.png",
+      name: "Rattikarl",
+      isShiny: false,
     },
     {
       id: 21,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/021-00.png",
       name: "Habitak",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 22,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/022-00.png",
       name: "Ibitak",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 23,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/023-00.png",
       name: "Rettan",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 24,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/024-00.png",
       name: "Arbok",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 25,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/025-00.png",
       name: "Pikachu",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 26,
-      name: "Raichu",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
       form: "Standardform",
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/026-01.png",
+      name: "Raichu",
+      isShiny: false,
+    },
+    {
+      id: 26,
+      form: "Alola-Form",
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/026-61.png",
+      name: "Raichu",
+      isShiny: false,
     },
     {
       id: 27,
-      name: "Sandan",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
       form: "Standardform",
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/027-00.png",
+      name: "Sandan",
+      isShiny: false,
+    },
+    {
+      id: 27,
+      form: "Alola-Form",
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/027-61.png",
+      name: "Sandan",
+      isShiny: false,
     },
     {
       id: 28,
-      name: "Sandamer",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
       form: "Standardform",
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/028-00.png",
+      name: "Sandamer",
+      isShiny: false,
+    },
+    {
+      id: 28,
+      form: "Alola-Form",
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/028-61.png",
+      name: "Sandamer",
+      isShiny: false,
     },
     {
       id: 29,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/029-00.png",
       name: "Nidoran?",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 30,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/030-00.png",
       name: "Nidorina",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 31,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/031-00.png",
       name: "Nidoqueen",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 32,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/032-00.png",
       name: "Nidoran?",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 33,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/033-00.png",
       name: "Nidorino",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 34,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/034-00.png",
       name: "Nidoking",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 35,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/035-00.png",
       name: "Piepi",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 36,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/036-00.png",
       name: "Pixi",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 37,
-      name: "Vulpix",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
       form: "Standardform",
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/037-00.png",
+      name: "Vulpix",
+      isShiny: false,
+    },
+    {
+      id: 37,
+      form: "Alola-Form",
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/037-61.png",
+      name: "Vulpix",
+      isShiny: false,
     },
     {
       id: 38,
-      name: "Vulnona",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
       form: "Standardform",
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/038-00.png",
+      name: "Vulnona",
+      isShiny: false,
+    },
+    {
+      id: 38,
+      form: "Alola-Form",
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/038-61.png",
+      name: "Vulnona",
+      isShiny: false,
     },
     {
       id: 39,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/039-00.png",
       name: "Pummeluff",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 40,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/040-00.png",
       name: "Knuddeluff",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 41,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/041-00.png",
       name: "Zubat",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 42,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/042-00.png",
       name: "Golbat",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 43,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/043-00.png",
       name: "Myrapla",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 44,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/044-00.png",
       name: "Duflor",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 45,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/045-00.png",
       name: "Giflor",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 46,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/046-00.png",
       name: "Paras",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 47,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/047-00.png",
       name: "Parasek",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 48,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/048-00.png",
       name: "Bluzuk",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 49,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/049-00.png",
       name: "Omot",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 50,
-      name: "Digda",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
       form: "Standardform",
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/050-00.png",
+      name: "Digda",
+      isShiny: false,
+    },
+    {
+      id: 50,
+      form: "Alola-Form",
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/050-61.png",
+      name: "Digda",
+      isShiny: false,
     },
     {
       id: 51,
-      name: "Digdri",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
       form: "Standardform",
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/051-00.png",
+      name: "Digdri",
+      isShiny: false,
+    },
+    {
+      id: 51,
+      form: "Alola-Form",
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/051-61.png",
+      name: "Digdri",
+      isShiny: false,
     },
     {
       id: 52,
-      name: "Mauzi",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
       form: "Standardform",
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/052-00.png",
+      name: "Mauzi",
+      isShiny: false,
+    },
+    {
+      id: 52,
+      form: "Alola-Form",
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/052-61.png",
+      name: "Mauzi",
+      isShiny: false,
     },
     {
       id: 53,
-      name: "Snobilikat",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
       form: "Standardform",
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/053-00.png",
+      name: "Snobilikat",
+      isShiny: false,
+    },
+    {
+      id: 53,
+      form: "Alola-Form",
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/053-61.png",
+      name: "Snobilikat",
+      isShiny: false,
     },
     {
       id: 54,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/054-00.png",
       name: "Enton",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 55,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/055-00.png",
       name: "Entoron",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 56,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/056-00.png",
       name: "Menki",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 57,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/057-00.png",
       name: "Rasaff",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 58,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/058-00.png",
       name: "Fukano",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 59,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/059-00.png",
       name: "Arkani",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 60,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/060-00.png",
       name: "Quapsel",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 61,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/061-00.png",
       name: "Quaputzi",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 62,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/062-00.png",
       name: "Quappo",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 63,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/063-00.png",
       name: "Abra",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 64,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/064-00.png",
       name: "Kadabra",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 65,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/065-00.png",
       name: "Simsala",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 66,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/066-00.png",
       name: "Machollo",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 67,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/067-00.png",
       name: "Maschock",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 68,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/068-00.png",
       name: "Machomei",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 69,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/069-00.png",
       name: "Knofensa",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 70,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/070-00.png",
       name: "Ultrigaria",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 71,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/071-00.png",
       name: "Sarzenia",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 72,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/072-00.png",
       name: "Tentacha",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 73,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/073-00.png",
       name: "Tentoxa",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 74,
-      name: "Kleinstein",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
       form: "Standardform",
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/074-00.png",
+      name: "Kleinstein",
+      isShiny: false,
+    },
+    {
+      id: 74,
+      form: "Alola-Form",
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/074-61.png",
+      name: "Kleinstein",
+      isShiny: false,
     },
     {
       id: 75,
-      name: "Georok",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
       form: "Standardform",
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/075-00.png",
+      name: "Georok",
+      isShiny: false,
+    },
+    {
+      id: 75,
+      form: "Alola-Form",
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/075-61.png",
+      name: "Georok",
+      isShiny: false,
     },
     {
       id: 76,
-      name: "Geowaz",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
       form: "Standardform",
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/076-00.png",
+      name: "Geowaz",
+      isShiny: false,
+    },
+    {
+      id: 76,
+      form: "Alola-Form",
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/076-61.png",
+      name: "Geowaz",
+      isShiny: false,
     },
     {
       id: 77,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/077-00.png",
       name: "Ponita",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 78,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/078-00.png",
       name: "Gallopa",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 79,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/079-00.png",
       name: "Flegmon",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 80,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/080-00.png",
       name: "Lahmus",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 81,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/081-00.png",
       name: "Magnetilo",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 82,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/082-00.png",
       name: "Magneton",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 83,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/083-00.png",
       name: "Porenta",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 84,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/084-00.png",
       name: "Dodu",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 85,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/085-00.png",
       name: "Dodri",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 86,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/086-00.png",
       name: "Jurob",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 87,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/087-00.png",
       name: "Jugong",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 88,
-      name: "Sleima",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
       form: "Standardform",
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/088-00.png",
+      name: "Sleima",
+      isShiny: false,
+    },
+    {
+      id: 88,
+      form: "Alola-Form",
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/088-61.png",
+      name: "Sleima",
+      isShiny: false,
     },
     {
       id: 89,
-      name: "Sleimok",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
       form: "Standardform",
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/089-00.png",
+      name: "Sleimok",
+      isShiny: false,
+    },
+    {
+      id: 89,
+      form: "Alola-Form",
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/089-61.png",
+      name: "Sleimok",
+      isShiny: false,
     },
     {
       id: 90,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/090-00.png",
       name: "Muschas",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 91,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/091-00.png",
       name: "Austos",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 92,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/092-00.png",
       name: "Nebulak",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 93,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/093-00.png",
       name: "Alpollo",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 94,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/094-00.png",
       name: "Gengar",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 95,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/095-00.png",
       name: "Onix",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 96,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/096-00.png",
       name: "Traumato",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 97,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/097-00.png",
       name: "Hypno",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 98,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/098-00.png",
       name: "Krabby",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 99,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/099-00.png",
       name: "Kingler",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 100,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/100-00.png",
       name: "Voltobal",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 101,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/101-00.png",
       name: "Lektrobal",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 102,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/102-00.png",
       name: "Owei",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 103,
-      name: "Kokowei",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
       form: "Standardform",
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/103-00.png",
+      name: "Kokowei",
+      isShiny: false,
+    },
+    {
+      id: 103,
+      form: "Alola-Form",
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/103-61.png",
+      name: "Kokowei",
+      isShiny: false,
     },
     {
       id: 104,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/104-00.png",
       name: "Tragosso",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 105,
-      name: "Knogga",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
       form: "Standardform",
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/105-00.png",
+      name: "Knogga",
+      isShiny: false,
+    },
+    {
+      id: 105,
+      form: "Alola-Form",
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/105-61.png",
+      name: "Knogga",
+      isShiny: false,
     },
     {
       id: 106,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/106-00.png",
       name: "Kicklee",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 107,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/107-00.png",
       name: "Nockchan",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 108,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/108-00.png",
       name: "Schlurp",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 109,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/109-00.png",
       name: "Smogon",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 110,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/110-00.png",
       name: "Smogmog",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 111,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/111-00.png",
       name: "Rihorn",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 112,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/112-00.png",
       name: "Rizeros",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 113,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/113-00.png",
       name: "Chaneira",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 114,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/114-00.png",
       name: "Tangela",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 115,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/115-00.png",
       name: "Kangama",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 116,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/116-00.png",
       name: "Seeper",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 117,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/117-00.png",
       name: "Seemon",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 118,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/118-00.png",
       name: "Goldini",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 119,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/119-00.png",
       name: "Golking",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 120,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/120-00.png",
       name: "Sterndu",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 121,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/121-00.png",
       name: "Starmie",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 122,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/122-00.png",
       name: "Pantimos",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 123,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/123-00.png",
       name: "Sichlor",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 124,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/124-00.png",
       name: "Rossana",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 125,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/125-00.png",
       name: "Elektek",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 126,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/126-00.png",
       name: "Magmar",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 127,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/127-00.png",
       name: "Pinsir",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 128,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/128-00.png",
       name: "Tauros",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 129,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/129-00.png",
       name: "Karpador",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 130,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/130-00.png",
       name: "Garados",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 131,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/131-00.png",
       name: "Lapras",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 132,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/132-00.png",
       name: "Ditto",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 133,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/133-00.png",
       name: "Evoli",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 134,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/134-00.png",
       name: "Aquana",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 135,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/135-00.png",
       name: "Blitza",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 136,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/136-00.png",
       name: "Flamara",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 137,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/137-00.png",
       name: "Porygon",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 138,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/138-00.png",
       name: "Amonitas",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 139,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/139-00.png",
       name: "Amoroso",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 140,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/140-00.png",
       name: "Kabuto",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 141,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/141-00.png",
       name: "Kabutops",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 142,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/142-00.png",
       name: "Aerodactyl",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 143,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/143-00.png",
       name: "Relaxo",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 144,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/144-00.png",
       name: "Arktos",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 145,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/145-00.png",
       name: "Zapdos",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 146,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/146-00.png",
       name: "Lavados",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 147,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/147-00.png",
       name: "Dratini",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 148,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/148-00.png",
       name: "Dragonir",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 149,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/149-00.png",
       name: "Dragoran",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 150,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/150-00.png",
       name: "Mewtu",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 151,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/151-00.png",
       name: "Mew",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 152,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/152-00.png",
       name: "Endivie",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 153,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/153-00.png",
       name: "Lorblatt",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 154,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/154-00.png",
       name: "Meganie",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 155,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/155-00.png",
       name: "Feurigel",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 156,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/156-00.png",
       name: "Igelavar",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 157,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/157-00.png",
       name: "Tornupto",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 158,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/158-00.png",
       name: "Karnimani",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 159,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/159-00.png",
       name: "Tyracroc",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 160,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/160-00.png",
       name: "Impergator",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 161,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/161-00.png",
       name: "Wiesor",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 162,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/162-00.png",
       name: "Wiesenior",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 163,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/163-00.png",
       name: "Hoothoot",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 164,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/164-00.png",
       name: "Noctuh",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 165,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/165-00.png",
       name: "Ledyba",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 166,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/166-00.png",
       name: "Ledian",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 167,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/167-00.png",
       name: "Webarak",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 168,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/168-00.png",
       name: "Ariados",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 169,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/169-00.png",
       name: "Iksbat",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 170,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/170-00.png",
       name: "Lampi",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 171,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/171-00.png",
       name: "Lanturn",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 172,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/172-00.png",
       name: "Pichu",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 173,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/173-00.png",
       name: "Pii",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 174,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/174-00.png",
       name: "Fluffeluff",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 175,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/175-00.png",
       name: "Togepi",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 176,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/176-00.png",
       name: "Togetic",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 177,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/177-00.png",
       name: "Natu",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 178,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/178-00.png",
       name: "Xatu",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 179,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/179-00.png",
       name: "Voltilamm",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 180,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/180-00.png",
       name: "Waaty",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 181,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/181-00.png",
       name: "Ampharos",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 182,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/182-00.png",
       name: "Blubella",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 183,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/183-00.png",
       name: "Marill",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 184,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/184-00.png",
       name: "Azumarill",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 185,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/185-00.png",
       name: "Mogelbaum",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 186,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/186-00.png",
       name: "Quaxo",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 187,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/187-00.png",
       name: "Hoppspross",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 188,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/188-00.png",
       name: "Hubelupf",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 189,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/189-00.png",
       name: "Papungha",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 190,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/190-00.png",
       name: "Griffel",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 191,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/191-00.png",
       name: "Sonnkern",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 192,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/192-00.png",
       name: "Sonnflora",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 193,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/193-00.png",
       name: "Yanma",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 194,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/194-00.png",
       name: "Felino",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 195,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/195-00.png",
       name: "Morlord",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 196,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/196-00.png",
       name: "Psiana",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 197,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/197-00.png",
       name: "Nachtara",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 198,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/198-00.png",
       name: "Kramurx",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 199,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/199-00.png",
       name: "Laschoking",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 200,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/200-00.png",
       name: "Traunfugil",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 201,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/201-00.png",
       name: "Icognito",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 202,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/202-00.png",
       name: "Woingenau",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 203,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/203-00.png",
       name: "Girafarig",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 204,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/204-00.png",
       name: "Tannza",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 205,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/205-00.png",
       name: "Forstellka",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 206,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/206-00.png",
       name: "Dummisel",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 207,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/207-00.png",
       name: "Skorgla",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 208,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/208-00.png",
       name: "Stahlos",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 209,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/209-00.png",
       name: "Snubbull",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 210,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/210-00.png",
       name: "Granbull",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 211,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/211-00.png",
       name: "Baldorfish",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 212,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/212-00.png",
       name: "Scherox",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 213,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/213-00.png",
       name: "Pottrott",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 214,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/214-00.png",
       name: "Skaraborn",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 215,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/215-00.png",
       name: "Sniebel",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 216,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/216-00.png",
       name: "Teddiursa",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 217,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/217-00.png",
       name: "Ursaring",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 218,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/218-00.png",
       name: "Schneckmag",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 219,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/219-00.png",
       name: "Magcargo",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 220,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/220-00.png",
       name: "Quiekel",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 221,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/221-00.png",
       name: "Keifel",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 222,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/222-00.png",
       name: "Corasonn",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 223,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/223-00.png",
       name: "Remoraid",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 224,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/224-00.png",
       name: "Octillery",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 225,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/225-00.png",
       name: "Botogel",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 226,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/226-00.png",
       name: "Mantax",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 227,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/227-00.png",
       name: "Panzaeron",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 228,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/228-00.png",
       name: "Hunduster",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 229,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/229-00.png",
       name: "Hundemon",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 230,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/230-00.png",
       name: "Seedraking",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 231,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/231-00.png",
       name: "Phanpy",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 232,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/232-00.png",
       name: "Donphan",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 233,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/233-00.png",
       name: "Porygon2",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 234,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/234-00.png",
       name: "Damhirplex",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 235,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/235-00.png",
       name: "Farbeagle",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 236,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/236-00.png",
       name: "Rabauz",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 237,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/237-00.png",
       name: "Kapoera",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 238,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/238-00.png",
       name: "Kussilla",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 239,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/239-00.png",
       name: "Elekid",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 240,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/240-00.png",
       name: "Magby",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 241,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/241-00.png",
       name: "Miltank",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 242,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/242-00.png",
       name: "Heiteira",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 243,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/243-00.png",
       name: "Raikou",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 244,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/244-00.png",
       name: "Entei",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 245,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/245-00.png",
       name: "Suicune",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 246,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/246-00.png",
       name: "Larvitar",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 247,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/247-00.png",
       name: "Pupitar",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 248,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/248-00.png",
       name: "Despotar",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 249,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/249-00.png",
       name: "Lugia",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 250,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/250-00.png",
       name: "Ho-Oh",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 251,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/251-00.png",
       name: "Celebi",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 252,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/252-00.png",
       name: "Geckarbor",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 253,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/253-00.png",
       name: "Reptain",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 254,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/254-00.png",
       name: "Gewaldro",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 255,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/255-00.png",
       name: "Flemmli",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 256,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/256-00.png",
       name: "Jungglut",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 257,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/257-00.png",
       name: "Lohgock",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 258,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/258-00.png",
       name: "Hydropi",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 259,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/259-00.png",
       name: "Moorabbel",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 260,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/260-00.png",
       name: "Sumpex",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 261,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/261-00.png",
       name: "Fiffyen",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 262,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/262-00.png",
       name: "Magnayen",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 263,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/263-00.png",
       name: "Zigzachs",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 264,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/264-00.png",
       name: "Geradaks",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 265,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/265-00.png",
       name: "Waumpel",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 266,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/266-00.png",
       name: "Schaloko",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 267,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/267-00.png",
       name: "Papinella",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 268,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/268-00.png",
       name: "Panekon",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 269,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/269-00.png",
       name: "Pudox",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 270,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/270-00.png",
       name: "Loturzel",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 271,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/271-00.png",
       name: "Lombrero",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 272,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/272-00.png",
       name: "Kappalores",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 273,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/273-00.png",
       name: "Samurzel",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 274,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/274-00.png",
       name: "Blanas",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 275,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/275-00.png",
       name: "Tengulist",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 276,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/276-00.png",
       name: "Schwalbini",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 277,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/277-00.png",
       name: "Schwalboss",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 278,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/278-00.png",
       name: "Wingull",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 279,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/279-00.png",
       name: "Pelipper",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 280,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/280-00.png",
       name: "Trasla",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 281,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/281-00.png",
       name: "Kirlia",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 282,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/282-00.png",
       name: "Guardevoir",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 283,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/283-00.png",
       name: "Gehweiher",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 284,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/284-00.png",
       name: "Maskeregen",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 285,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/285-00.png",
       name: "Knilz",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 286,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/286-00.png",
       name: "Kapilz",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 287,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/287-00.png",
       name: "Bummelz",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 288,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/288-00.png",
       name: "Muntier",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 289,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/289-00.png",
       name: "Letarking",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 290,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/290-00.png",
       name: "Nincada",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 291,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/291-00.png",
       name: "Ninjask",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 292,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/292-00.png",
       name: "Ninjatom",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 293,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/293-00.png",
       name: "Flurmel",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 294,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/294-00.png",
       name: "Krakeelo",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 295,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/295-00.png",
       name: "Krawumms",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 296,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/296-00.png",
       name: "Makuhita",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 297,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/297-00.png",
       name: "Hariyama",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 298,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/298-00.png",
       name: "Azurill",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 299,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/299-00.png",
       name: "Nasgnet",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 300,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/300-00.png",
       name: "Eneco",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 301,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/301-00.png",
       name: "Enekoro",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 302,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/302-00.png",
       name: "Zobiris",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 303,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/303-00.png",
       name: "Flunkifer",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 304,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/304-00.png",
       name: "Stollunior",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 305,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/305-00.png",
       name: "Stollrak",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 306,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/306-00.png",
       name: "Stolloss",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 307,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/307-00.png",
       name: "Meditie",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 308,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/308-00.png",
       name: "Meditalis",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 309,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/309-00.png",
       name: "Frizelbliz",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 310,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/310-00.png",
       name: "Voltenso",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 311,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/311-00.png",
       name: "Plusle",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 312,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/312-00.png",
       name: "Minun",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 313,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/313-00.png",
       name: "Volbeat",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 314,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/314-00.png",
       name: "Illumise",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 315,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/315-00.png",
       name: "Roselia",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 316,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/316-00.png",
       name: "Schluppuck",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 317,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/317-00.png",
       name: "Schlukwech",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 318,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/318-00.png",
       name: "Kanivanha",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 319,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/319-00.png",
       name: "Tohaido",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 320,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/320-00.png",
       name: "Wailmer",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 321,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/321-00.png",
       name: "Wailord",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 322,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/322-00.png",
       name: "Camaub",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 323,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/323-00.png",
       name: "Camerupt",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 324,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/324-00.png",
       name: "Qurtel",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 325,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/325-00.png",
       name: "Spoink",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 326,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/326-00.png",
       name: "Groink",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 327,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/327-00.png",
       name: "Pandir",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 328,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/328-00.png",
       name: "Knacklion",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 329,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/329-00.png",
       name: "Vibrava",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 330,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/330-00.png",
       name: "Libelldra",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 331,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/331-00.png",
       name: "Tuska",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 332,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/332-00.png",
       name: "Noktuska",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 333,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/333-00.png",
       name: "Wablu",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 334,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/334-00.png",
       name: "Altaria",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 335,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/335-00.png",
       name: "Sengo",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 336,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/336-00.png",
       name: "Vipitis",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 337,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/337-00.png",
       name: "Lunastein",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 338,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/338-00.png",
       name: "Sonnfel",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 339,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/339-00.png",
       name: "Schmerbe",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 340,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/340-00.png",
       name: "Welsar",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 341,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/341-00.png",
       name: "Krebscorps",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 342,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/342-00.png",
       name: "Krebutack",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 343,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/343-00.png",
       name: "Puppance",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 344,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/344-00.png",
       name: "Lepumentas",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 345,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/345-00.png",
       name: "Liliep",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 346,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/346-00.png",
       name: "Wielie",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 347,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/347-00.png",
       name: "Anorith",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 348,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/348-00.png",
       name: "Armaldo",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 349,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/349-00.png",
       name: "Barschwa",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 350,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/350-00.png",
       name: "Milotic",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 351,
-      name: "Formeo",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
       form: "Standardform",
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/351-01.png",
+      name: "Formeo",
+      isShiny: false,
+    },
+    {
+      id: 351,
+      form: "Regenform",
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/351-03.png",
+      name: "Formeo",
+      isShiny: false,
+    },
+    {
+      id: 351,
+      form: "Schneeform",
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/351-04.png",
+      name: "Formeo",
+      isShiny: false,
+    },
+    {
+      id: 351,
+      form: "Sonnenform",
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/351-02.png",
+      name: "Formeo",
+      isShiny: false,
     },
     {
       id: 352,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/352-00.png",
       name: "Kecleon",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 353,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/353-00.png",
       name: "Shuppet",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 354,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/354-00.png",
       name: "Banette",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 355,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/355-00.png",
       name: "Zwirrlicht",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 356,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/356-00.png",
       name: "Zwirrklop",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 357,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/357-00.png",
       name: "Tropius",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 358,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/358-00.png",
       name: "Palimpalim",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 359,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/359-00.png",
       name: "Absol",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 360,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/360-00.png",
       name: "Isso",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 361,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/361-00.png",
       name: "Schneppke",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 362,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/362-00.png",
       name: "Firnontor",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 363,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/363-00.png",
       name: "Seemops",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 364,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/364-00.png",
       name: "Seejong",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 365,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/365-00.png",
       name: "Walraisa",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 366,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/366-00.png",
       name: "Perlu",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 367,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/367-00.png",
       name: "Aalabyss",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 368,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/368-00.png",
       name: "Saganabyss",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 369,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/369-00.png",
       name: "Relicanth",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 370,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/370-00.png",
       name: "Liebiskus",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 371,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/371-00.png",
       name: "Kindwurm",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 372,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/372-00.png",
       name: "Draschel",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 373,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/373-00.png",
       name: "Brutalanda",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 374,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/374-00.png",
       name: "Tanhel",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 375,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/375-00.png",
       name: "Metang",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 376,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/376-00.png",
       name: "Metagross",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 377,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/377-00.png",
       name: "Regirock",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 378,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/378-00.png",
       name: "Regice",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 379,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/379-00.png",
       name: "Registeel",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 380,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/380-00.png",
       name: "Latias",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 381,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/381-00.png",
       name: "Latios",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 382,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/382-00.png",
       name: "Kyogre",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 383,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/383-00.png",
       name: "Groudon",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 384,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/384-00.png",
       name: "Rayquaza",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 385,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/385-00.png",
       name: "Jirachi",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 386,
-      name: "Deoxys",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
       form: "Normalform",
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/386-00.png",
+      name: "Deoxys",
+      isShiny: false,
+    },
+    {
+      id: 386,
+      form: "Angriffsform",
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/386-02.png",
+      name: "Deoxys",
+      isShiny: false,
+    },
+    {
+      id: 386,
+      form: "Verteidigungsform",
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/386-03.png",
+      name: "Deoxys",
+      isShiny: false,
+    },
+    {
+      id: 386,
+      form: "Initiativeform",
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/386-04.png",
+      name: "Deoxys",
+      isShiny: false,
     },
     {
       id: 387,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/387-00.png",
       name: "Chelast",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 388,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/388-00.png",
       name: "Chelcarain",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 389,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/389-00.png",
       name: "Chelterrar",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 390,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/390-00.png",
       name: "Panflam",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 391,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/391-00.png",
       name: "Panpyro",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 392,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/392-00.png",
       name: "Panferno",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 393,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/393-00.png",
       name: "Plinfa",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 394,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/394-00.png",
       name: "Pliprin",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 395,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/395-00.png",
       name: "Impoleon",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 396,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/396-00.png",
       name: "Staralili",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 397,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/397-00.png",
       name: "Staravia",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 398,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/398-00.png",
       name: "Staraptor",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 399,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/399-00.png",
       name: "Bidiza",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 400,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/400-00.png",
       name: "Bidifas",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 401,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/401-00.png",
       name: "Zirpurze",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 402,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/402-00.png",
       name: "Zirpeise",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 403,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/403-00.png",
       name: "Sheinux",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 404,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/404-00.png",
       name: "Luxio",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 405,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/405-00.png",
       name: "Luxtra",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 406,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/406-00.png",
       name: "Knospi",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 407,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/407-00.png",
       name: "Roserade",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 408,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/408-00.png",
       name: "Koknodon",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 409,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/409-00.png",
       name: "Rameidon",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 410,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/410-00.png",
       name: "Schilterus",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 411,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/411-00.png",
       name: "Bollterus",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 412,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/412-11.png",
       name: "Burmy",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 413,
-      name: "Burmadame",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
       form: "Pflanzenumhang",
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/413-11.png",
+      name: "Burmadame",
+      isShiny: false,
+    },
+    {
+      id: 413,
+      form: "Sandumhang",
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/413-12.png",
+      name: "Burmadame",
+      isShiny: false,
+    },
+    {
+      id: 413,
+      form: "Lumpenumhang",
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/413-13.png",
+      name: "Burmadame",
+      isShiny: false,
     },
     {
       id: 414,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/414-00.png",
       name: "Moterpel",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 415,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/415-00.png",
       name: "Wadribie",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 416,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/416-00.png",
       name: "Honweisel",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 417,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/417-00.png",
       name: "Pachirisu",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 418,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/418-00.png",
       name: "Bamelin",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 419,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/419-00.png",
       name: "Bojelin",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 420,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/420-00.png",
       name: "Kikugi",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 421,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/421-00.png",
       name: "Kinoso",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 422,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/422-00.png",
       name: "Schalellos",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 423,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/423-00.png",
       name: "Gastrodon",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 424,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/424-00.png",
       name: "Ambidiffel",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 425,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/425-00.png",
       name: "Driftlon",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 426,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/426-00.png",
       name: "Drifzepeli",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 427,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/427-00.png",
       name: "Haspiror",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 428,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/428-00.png",
       name: "Schlapor",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 429,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/429-00.png",
       name: "Traunmagil",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 430,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/430-00.png",
       name: "Kramshef",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 431,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/431-00.png",
       name: "Charmian",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 432,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/432-00.png",
       name: "Shnurgarst",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 433,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/433-00.png",
       name: "Klingplim",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 434,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/434-00.png",
       name: "Skunkapuh",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 435,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/435-00.png",
       name: "Skuntank",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 436,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/436-00.png",
       name: "Bronzel",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 437,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/437-00.png",
       name: "Bronzong",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 438,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/438-00.png",
       name: "Mobai",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 439,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/439-00.png",
       name: "Pantimimi",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 440,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/440-00.png",
       name: "Wonneira",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 441,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/441-00.png",
       name: "Plaudagei",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 442,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/442-00.png",
       name: "Kryppuk",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 443,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/443-00.png",
       name: "Kaumalat",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 444,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/444-00.png",
       name: "Knarksel",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 445,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/445-00.png",
       name: "Knakrack",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 446,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/446-00.png",
       name: "Mampfaxo",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 447,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/447-00.png",
       name: "Riolu",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 448,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/448-00.png",
       name: "Lucario",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 449,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/449-00.png",
       name: "Hippopotas",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 450,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/450-00.png",
       name: "Hippoterus",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 451,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/451-00.png",
       name: "Pionskora",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 452,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/452-00.png",
       name: "Piondragi",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 453,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/453-00.png",
       name: "Glibunkel",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 454,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/454-00.png",
       name: "Toxiquak",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 455,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/455-00.png",
       name: "Venuflibis",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 456,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/456-00.png",
       name: "Finneon",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 457,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/457-00.png",
       name: "Lumineon",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 458,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/458-00.png",
       name: "Mantirps",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 459,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/459-00.png",
       name: "Shnebedeck",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 460,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/460-00.png",
       name: "Rexblisar",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 461,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/461-00.png",
       name: "Snibunna",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 462,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/462-00.png",
       name: "Magnezone",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 463,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/463-00.png",
       name: "Schlurplek",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 464,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/464-00.png",
       name: "Rihornior",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 465,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/465-00.png",
       name: "Tangoloss",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 466,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/466-00.png",
       name: "Elevoltek",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 467,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/467-00.png",
       name: "Magbrant",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 468,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/468-00.png",
       name: "Togekiss",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 469,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/469-00.png",
       name: "Yanmega",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 470,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/470-00.png",
       name: "Folipurba",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 471,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/471-00.png",
       name: "Glaziola",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 472,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/472-00.png",
       name: "Skorgro",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 473,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/473-00.png",
       name: "Mamutel",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 474,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/474-00.png",
       name: "Porygon-Z",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 475,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/475-00.png",
       name: "Galagladi",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 476,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/476-00.png",
       name: "Voluminas",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 477,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/477-00.png",
       name: "Zwirrfinst",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 478,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/478-00.png",
       name: "Frosdedje",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 479,
-      name: "Rotom",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
       form: "Standardform",
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/479-00.png",
+      name: "Rotom",
+      isShiny: false,
+    },
+    {
+      id: 479,
+      form: "Hitze-Form",
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/479-12.png",
+      name: "Rotom",
+      isShiny: false,
+    },
+    {
+      id: 479,
+      form: "Wasch-Form",
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/479-13.png",
+      name: "Rotom",
+      isShiny: false,
+    },
+    {
+      id: 479,
+      form: "Frost-Form",
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/479-14.png",
+      name: "Rotom",
+      isShiny: false,
+    },
+    {
+      id: 479,
+      form: "Wirbel-Form",
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/479-15.png",
+      name: "Rotom",
+      isShiny: false,
+    },
+    {
+      id: 479,
+      form: "Schneid-Form",
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/479-16.png",
+      name: "Rotom",
+      isShiny: false,
     },
     {
       id: 480,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/480-00.png",
       name: "Selfe",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 481,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/481-00.png",
       name: "Vesprit",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 482,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/482-00.png",
       name: "Tobutz",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 483,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/483-00.png",
       name: "Dialga",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 484,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/484-00.png",
       name: "Palkia",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 485,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/485-00.png",
       name: "Heatran",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 486,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/486-00.png",
       name: "Regigigas",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 487,
-      name: "Giratina",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
       form: "Wandelform",
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/487-11.png",
+      name: "Giratina",
+      isShiny: false,
+    },
+    {
+      id: 487,
+      form: "Urform",
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/487-12.png",
+      name: "Giratina",
+      isShiny: false,
     },
     {
       id: 488,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/488-00.png",
       name: "Cresselia",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 489,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/489-00.png",
       name: "Phione",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 490,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/490-00.png",
       name: "Manaphy",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 491,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/491-00.png",
       name: "Darkrai",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 492,
-      name: "Shaymin",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
       form: "Landform",
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/492-00.png",
+      name: "Shaymin",
+      isShiny: false,
+    },
+    {
+      id: 492,
+      form: "Zenitform",
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/492-12.png",
+      name: "Shaymin",
+      isShiny: false,
     },
     {
       id: 493,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/493-00.png",
       name: "Arceus",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 808,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/808-00.png",
       name: "Meltan",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
     {
       id: 809,
+      imageUrl:
+        "https://files.pokefans.net/images/pokemon-go/modelle/809-00.png",
       name: "Melmetal",
-      imageUrl: "https://static.thenounproject.com/png/18316-200.png",
+      isShiny: false,
     },
   ],
 };
