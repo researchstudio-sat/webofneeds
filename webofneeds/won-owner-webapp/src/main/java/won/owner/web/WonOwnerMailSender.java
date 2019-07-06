@@ -212,7 +212,7 @@ public class WonOwnerMailSender {
             atomTitles.put(localAtom, localAtomTitle);
         });
         velocityContext.put("atomTitle", atomTitles);
-        velocityContext.put("atomLink", atomTitles);
+        velocityContext.put("atomLink", atomLinks);
         return velocityContext;
     }
 
