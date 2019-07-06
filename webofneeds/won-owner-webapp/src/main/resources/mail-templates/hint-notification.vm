@@ -1,12 +1,8 @@
 Hi there,
 
-We have news regarding your post '$localAtomTitle' on $serviceName:
+The post '$targetAtomTitle' may be interesting for you. 
 
-We've received a hint that the post '$targetAtomTitle' may be a good match for you.
-    
-Contact the user: $linkConnection
-View your post: $linkLocalAtom  
-View their post: $linkTargetAtom
+Go to your 'Suggestions' tab: $linkLocalAtom
 
 Best wishes, 
 

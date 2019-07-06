@@ -13,20 +13,28 @@ package won.owner.web.websocket;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
 import java.text.MessageFormat;
+import java.time.Duration;
+import java.util.Base64;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
-import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ObjectNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.annotation.Order;
 import org.springframework.mail.MailException;
 import org.springframework.security.core.Authentication;
 import org.springframework.session.Session;
@@ -62,11 +70,13 @@ import won.protocol.util.LoggingUtils;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
+import won.utils.batch.BatchingConsumer;
 
 /**
  * User: syim Date: 06.08.14
  */
-public class WonWebSocketHandler extends TextWebSocketHandler implements WonMessageProcessor, InitializingBean {
+public class WonWebSocketHandler extends TextWebSocketHandler
+                implements WonMessageProcessor, InitializingBean, DisposableBean {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     // if we're receiving a partial message, a StringBuilder will be in the
     // session's attributes map under this key
@@ -92,10 +102,18 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
     private LinkedDataSource linkedDataSource;
     @Autowired
     private URIService uriService;
+    private BatchingConsumer<String, String[]> batchingConsumer = new BatchingConsumer<>();
 
     @Override
     public void afterPropertiesSet() throws Exception {
         this.ownerApplicationService.setMessageProcessorDelegate(this);
+    }
+
+    @Override
+    @Order(1)
+    public void destroy() throws Exception {
+        // send all mails that are being held back for batching
+        this.batchingConsumer.consumeAllBatches();
     }
 
     @Override
@@ -268,7 +286,7 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
             URI atomUri = getOwnedAtomURI(wonMessage);
             User user = getUserForWonMessage(wonMessage);
             notifyPerPush(user, atomUri, wonMessage);
-            Set<WebSocketSession> webSocketSessions = findWebSocketSessionsForWonMessage(wonMessage, atomUri, user);
+            Set<WebSocketSession> webSocketSessions = findWebSocketSessionsForAtomAndUser(atomUri, user);
             // check if we can deliver the message. If not, send email.
             if (webSocketSessions.size() == 0) {
                 logger.debug("cannot deliver message of type {} for atom {}, receiver {}: no websocket session found. Trying to send message by email.",
@@ -437,19 +455,42 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
                     }
                     return;
                 case ATOM_HINT_MESSAGE:
-                    if (userAtom.isMatches()) {
-                        String targetAtomUri = wonMessage.getHintTargetAtomURI().toString();
-                        emailSender.sendHintNotificationMessage(user.getEmail(), atomUri.toString(), targetAtomUri,
-                                        wonMessage.getRecipientURI().toString());
-                    }
-                    return;
                 case SOCKET_HINT_MESSAGE:
                     if (userAtom.isMatches()) {
                         Optional<URI> targetAtomUri = WonLinkedDataUtils
                                         .getAtomOfSocket(wonMessage.getHintTargetSocketURI(), linkedDataSource);
                         if (targetAtomUri.isPresent()) {
-                            emailSender.sendHintNotificationMessage(user.getEmail(), atomUri.toString(),
-                                            targetAtomUri.get().toString(), wonMessage.getRecipientURI().toString());
+                            // user a hash of the user's email address for the key, so as not to hold
+                            // users emails in memory all the time
+                            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+                            byte[] hash = digest.digest(user.getEmail().getBytes(StandardCharsets.UTF_8));
+                            String key = "HINT" + Base64.getEncoder().encodeToString(hash);
+                            String[] args = new String[] {
+                                            user.getEmail(),
+                                            atomUri.toString(),
+                                            targetAtomUri.get().toString(),
+                                            wonMessage.getRecipientURI().toString() };
+                            BatchingConsumer.Config config = new BatchingConsumer.ConfigBuilder()
+                                            .consumeFirst(true) // send the first mail immediately
+                                            .maxBatchAge(Duration.ofHours(24)) // empty batch at least once a day
+                                            .maxItemInterval(Duration.ofMinutes(10)) // wait 10 minutes after the last
+                                                                                     // hint, then send mail
+                                            .minChunkInterval(Duration.ofHours(6)) // send at most 1 mail every 6 hours
+                                                                                   // (not counting the one for the
+                                                                                   // first match)
+                                            .maxBatchSize(50) // as soon as we reach 50 hints, send mail
+                                            .build();
+                            batchingConsumer.accept(key, args, batch -> {
+                                if (batch.size() == 1) {
+                                    String[] a = batch.iterator().next();
+                                    emailSender.sendHintNotificationMessage(a[0], a[1], a[2], a[3]);
+                                } else if (batch.size() > 0) {
+                                    String[] a = batch.iterator().next();
+                                    Map<String, Long> hintCounts = batch.stream().collect(
+                                                    Collectors.groupingBy(item -> item[1], Collectors.counting()));
+                                    emailSender.sendMultipleHintsNotificationMessage(a[0], hintCounts);
+                                }
+                            }, config);
                         } else {
                             logger.info("received socket hint to {} but could not identify corresponding atom - no mail sent.",
                                             wonMessage.getHintTargetSocketURI());
@@ -470,15 +511,12 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
                 default:
                     return;
             }
-        } catch (MailException ex) { // org.springframework.mail.MailException
+        } catch (MailException | NoSuchAlgorithmException ex) {
             logger.error("Email could not be sent", ex);
         }
     }
 
-    private Set<WebSocketSession> findWebSocketSessionsForWonMessage(final WonMessage wonMessage, URI atomUri,
-                    User user) {
-        assert wonMessage != null : "wonMessage must not be null";
-        assert atomUri != null : "atomUri must not be null";
+    private Set<WebSocketSession> findWebSocketSessionsForAtomAndUser(URI atomUri, User user) {
         Set<WebSocketSession> webSocketSessions = webSocketSessionService.getWebSocketSessions(atomUri);
         if (webSocketSessions == null)
             webSocketSessions = new HashSet();
