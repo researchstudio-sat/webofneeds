@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
  * <li>the consumer should be called as soon as possible</li>
  * <li>frequent invocations of the consumer should be avoided</li>
  * </ul>
- * The BatchingConsumer is being <code>accepted</code> <code>items</code>. It
+ * The BatchingConsumer passed <code>items</code> via its <code>accept()</code> method. It
  * consumes them in 'chunks' of one or multiple items at a time. The following
  * properties can be set for each key to govern this behaviour (higher up on
  * this list is more imporant):
@@ -69,6 +69,64 @@ public class BatchingConsumer<K, I> {
         this.defaultConfig = config;
     }
 
+    public void accept(K key, I item, Consumer<Collection<I>> consumer) {
+        accept(key, item, consumer, Optional.empty());
+    }
+
+    public void accept(K key, I item, Consumer<Collection<I>> consumer, Config config) {
+        accept(key, item, consumer, Optional.ofNullable(config));
+    }
+
+    /**
+     * Offer an item to the BatchingConsumer, providing a consumer and an optional
+     * config. The consumer must be specified just in case a new Batch is created in
+     * this invocation. If that happens, the consumer is used, otherwise it will not
+     * be. The config is optional because the BatchingConsumer has a defaultConfig
+     * that is used if no config is specified. Again, the config presented when a
+     * new Batch is instantiated will be used.
+     * 
+     * @param key
+     * @param item
+     * @param consumer
+     * @param config
+     */
+    public void accept(K key, I item, Consumer<Collection<I>> consumer, Optional<Config> config) {
+        Batch<K, I> batch = null;
+        synchronized (batches) {
+            batch = batches.get(key);
+            if (batch == null || batch.isShuttingDown()) {
+                batch = new Batch<K, I>(key, consumer, config.orElse(defaultConfig));
+                batch.scheduleCleanup();
+                batches.put(key, batch);
+            }
+        }
+        batch.add(item);
+        batch.rescheduleChunkConsumption();
+    }
+
+    /**
+     * Invokes the consumers for all batches immediately and removes all batches.
+     */
+    public void consumeAllBatches() {
+        synchronized (batches) {
+            batches.values().forEach(batch -> batch.consumeAll(true));
+            batches.clear();
+        }
+    }
+    
+    /**
+     * Removes the batch, the consumer is not invoked.
+     * @param key
+     */
+    public void cancelBatch(K key) {
+        synchronized (batches) {
+            Batch<K, I> batch = batches.get(key);
+            if (batch != null) {
+                batch.cancelAndCleanup();
+            }
+        }
+    }
+    
     public static class Config {
         public Config(Optional<Duration> maxBatchAge, Optional<Duration> minChunkInterval,
                         Optional<Duration> maxItemInterval, Optional<Boolean> consumeFirst,
@@ -146,6 +204,10 @@ public class BatchingConsumer<K, I> {
             this.consumer = consumer;
         }
 
+        /**
+         * Adds an item to this batch, possibly triggering consumption.
+         * @param item
+         */
         void add(I item) {
             synchronized (monitor) {
                 this.lastChunkInstant = Optional.of(Instant.now());
@@ -164,7 +226,10 @@ public class BatchingConsumer<K, I> {
             return shuttingDown.get();
         }
 
-        void cleanupAndRemove() {
+        /**
+         * Invokes the consumer with the whole batch and removes the batch.
+         */
+        void consumeAllAndCleanup() {
             synchronized (monitor) {
                 this.shuttingDown.set(true);
                 consumeAll(false);
@@ -176,6 +241,21 @@ public class BatchingConsumer<K, I> {
             }
         }
 
+        /**
+         * Removes the batch without invoking the consumer.
+         */
+        void cancelAndCleanup() {
+            synchronized (monitor) {
+                this.shuttingDown.set(true);
+                synchronized (batches) {
+                    batches.remove(this.key);
+                }
+                cancelTask(this.consumeChunkTask);
+                cancelTask(this.cleanupTask);
+            }
+        }
+        
+        
         void cancelTask(Optional<ScheduledFuture<?>> task) {
             synchronized (monitor) {
                 if (task.isPresent()) {
@@ -255,50 +335,10 @@ public class BatchingConsumer<K, I> {
                 return;
             }
             this.cleanupTask = Optional.of(executorSvc.schedule(() -> {
-                cleanupAndRemove();
+                consumeAllAndCleanup();
             }, this.config.maxBatchAge.get().toNanos(), TimeUnit.NANOSECONDS));
         }
     }
 
-    public void accept(K key, I item, Consumer<Collection<I>> consumer) {
-        accept(key, item, consumer, Optional.empty());
-    }
-
-    public void accept(K key, I item, Consumer<Collection<I>> consumer, Config config) {
-        accept(key, item, consumer, Optional.ofNullable(config));
-    }
-
-    /**
-     * Offer an item to the BatchingConsumer, providing a consumer and an optional
-     * config. The consumer must be specified just in case a new Batch is created in
-     * this invocation. If that happens, the consumer is used, otherwise it will not
-     * be. The config is optional because the BatchingConsumer has a defaultConfig
-     * that is used if no config is specified. Again, the config presented when a
-     * new Batch is instantiated will be used.
-     * 
-     * @param key
-     * @param item
-     * @param consumer
-     * @param config
-     */
-    public void accept(K key, I item, Consumer<Collection<I>> consumer, Optional<Config> config) {
-        Batch<K, I> batch = null;
-        synchronized (batches) {
-            batch = batches.get(key);
-            if (batch == null || batch.isShuttingDown()) {
-                batch = new Batch<K, I>(key, consumer, config.orElse(defaultConfig));
-                batch.scheduleCleanup();
-                batches.put(key, batch);
-            }
-        }
-        batch.add(item);
-        batch.rescheduleChunkConsumption();
-    }
-
-    public void consumeAllBatches() {
-        synchronized (batches) {
-            batches.values().forEach(batch -> batch.consumeAll(true));
-            batches.clear();
-        }
-    }
+   
 }

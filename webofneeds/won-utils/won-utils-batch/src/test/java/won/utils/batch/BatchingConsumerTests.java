@@ -50,6 +50,27 @@ public class BatchingConsumerTests {
         Assert.assertEquals(2, counter1.get());
         Assert.assertEquals(2, counter2.get());
     }
+    
+    @Test
+    public void testCancelOneConsumeAllTwoKeys() {
+        BatchingConsumer<String, String> c = new BatchingConsumer<>();
+        AtomicInteger counter1 = new AtomicInteger(0);
+        AtomicInteger counter2 = new AtomicInteger(0);
+        c.accept("key1", "first item", items -> counter1.addAndGet(items.size()));
+        Assert.assertEquals(0, counter1.get());
+        Assert.assertEquals(0, counter2.get());
+        c.accept("key2", "second item", items -> counter2.addAndGet(items.size()));
+        Assert.assertEquals(0, counter1.get());
+        Assert.assertEquals(0, counter2.get());
+        c.cancelBatch("key2");
+        c.accept("key1", "third item", items -> counter1.addAndGet(items.size()));
+        c.accept("key2", "fourth item", items -> counter2.addAndGet(items.size()));
+        Assert.assertEquals(0, counter1.get());
+        Assert.assertEquals(0, counter2.get());
+        c.consumeAllBatches();
+        Assert.assertEquals(2, counter1.get());
+        Assert.assertEquals(1, counter2.get());
+    }
 
     @Test
     public void testConsumeConsumeFirstTwoKeys() throws Exception {
