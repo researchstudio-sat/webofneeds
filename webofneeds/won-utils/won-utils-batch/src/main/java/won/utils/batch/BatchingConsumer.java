@@ -29,10 +29,10 @@ import org.slf4j.LoggerFactory;
  * <li>the consumer should be called as soon as possible</li>
  * <li>frequent invocations of the consumer should be avoided</li>
  * </ul>
- * The BatchingConsumer passed <code>items</code> via its <code>accept()</code> method. It
- * consumes them in 'chunks' of one or multiple items at a time. The following
- * properties can be set for each key to govern this behaviour (higher up on
- * this list is more imporant):
+ * The BatchingConsumer passed <code>items</code> via its <code>accept()</code>
+ * method. It consumes them in 'chunks' of one or multiple items at a time. The
+ * following properties can be set for each key to govern this behaviour (higher
+ * up on this list is more imporant):
  * <ul>
  * <li><code>consumeFirst (boolean)</code>: if set, the filter consumes the
  * accepted item immediately if there is not yet a batch for that key. However,
@@ -113,9 +113,10 @@ public class BatchingConsumer<K, I> {
             batches.clear();
         }
     }
-    
+
     /**
      * Removes the batch, the consumer is not invoked.
+     * 
      * @param key
      */
     public void cancelBatch(K key) {
@@ -126,7 +127,7 @@ public class BatchingConsumer<K, I> {
             }
         }
     }
-    
+
     public static class Config {
         public Config(Optional<Duration> maxBatchAge, Optional<Duration> minChunkInterval,
                         Optional<Duration> maxItemInterval, Optional<Boolean> consumeFirst,
@@ -206,6 +207,7 @@ public class BatchingConsumer<K, I> {
 
         /**
          * Adds an item to this batch, possibly triggering consumption.
+         * 
          * @param item
          */
         void add(I item) {
@@ -254,8 +256,7 @@ public class BatchingConsumer<K, I> {
                 cancelTask(this.cleanupTask);
             }
         }
-        
-        
+
         void cancelTask(Optional<ScheduledFuture<?>> task) {
             synchronized (monitor) {
                 if (task.isPresent()) {
@@ -339,6 +340,4 @@ public class BatchingConsumer<K, I> {
             }, this.config.maxBatchAge.get().toNanos(), TimeUnit.NANOSECONDS));
         }
     }
-
-   
 }

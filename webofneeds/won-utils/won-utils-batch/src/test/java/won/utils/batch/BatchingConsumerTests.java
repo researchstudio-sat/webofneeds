@@ -50,7 +50,7 @@ public class BatchingConsumerTests {
         Assert.assertEquals(2, counter1.get());
         Assert.assertEquals(2, counter2.get());
     }
-    
+
     @Test
     public void testCancelOneConsumeAllTwoKeys() {
         BatchingConsumer<String, String> c = new BatchingConsumer<>();
