@@ -19,6 +19,7 @@ function genComponentConf() {
         </div>
         <div class="prbv__content">
           <div class="prbv__content__level"
+            ng-if="self.level"
             ng-class="{
               'prbv__content__level--normal': self.level == 1 || self.level == 2,
               'prbv__content__level--rare': self.level == 3 || self.level == 4,

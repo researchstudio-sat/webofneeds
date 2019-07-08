@@ -71,9 +71,9 @@ export const pokemonRaid = {
   isValid: function(value) {
     if (
       !value ||
-      !value.level ||
       !value.expires ||
       (!value.id && value.hatched) ||
+      (!value.level && value.hatched) ||
       (!value.hatched && !value.hatches)
     )
       return false;
@@ -192,7 +192,7 @@ export const pokemonRaid = {
             : "") /* +
           ", expires at: " +
           parseDatetimeStrictly(value.expires)*/;
-      } else {
+      } else if (value.level) {
         labelPart = this.getLevelLabel(
           value.level
         ) /* +
