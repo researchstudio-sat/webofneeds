@@ -65,7 +65,6 @@ pokemon-raidboss-viewer {
       display: grid;
       grid-template-areas: "pkmv_image pkmv_name" "pkmv_image pkmv_id";
       grid-template-columns: minmax(3.5rem, min-content) 1fr;
-      grid-template-columns: minmax(3.5rem, 1fr) 1fr;
       grid-column-gap: 0.5rem;
       padding: 0.25rem;
       background: $won-light-gray;
@@ -75,7 +74,6 @@ pokemon-raidboss-viewer {
       &__image {
         grid-area: pkmv_image;
         align-self: center;
-        justify-self: end;
         @include fixed-square(3.5rem);
 
         &--unhatched {

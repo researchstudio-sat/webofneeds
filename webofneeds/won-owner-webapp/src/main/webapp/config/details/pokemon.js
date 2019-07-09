@@ -147,7 +147,7 @@ export const pokemonRaid = {
       "xsd:dateTime"
     );
 
-    if (level && expires) {
+    if (expires) {
       const id = won.parseFrom(
         jsonLDImm,
         ["won:raid", "won:pokemonid"],
@@ -337,7 +337,6 @@ export const pokemonRaid = {
     },
     {
       id: 19,
-      form: "Standardform",
       imageUrl:
         "https://files.pokefans.net/images/pokemon-go/modelle/019-01.png",
       name: "Rattfratz",
@@ -353,7 +352,6 @@ export const pokemonRaid = {
     },
     {
       id: 20,
-      form: "Standardform",
       imageUrl:
         "https://files.pokefans.net/images/pokemon-go/modelle/020-01.png",
       name: "Rattikarl",
@@ -404,7 +402,6 @@ export const pokemonRaid = {
     },
     {
       id: 26,
-      form: "Standardform",
       imageUrl:
         "https://files.pokefans.net/images/pokemon-go/modelle/026-01.png",
       name: "Raichu",
@@ -420,7 +417,6 @@ export const pokemonRaid = {
     },
     {
       id: 27,
-      form: "Standardform",
       imageUrl:
         "https://files.pokefans.net/images/pokemon-go/modelle/027-00.png",
       name: "Sandan",
@@ -436,7 +432,6 @@ export const pokemonRaid = {
     },
     {
       id: 28,
-      form: "Standardform",
       imageUrl:
         "https://files.pokefans.net/images/pokemon-go/modelle/028-00.png",
       name: "Sandamer",
@@ -508,7 +503,6 @@ export const pokemonRaid = {
     },
     {
       id: 37,
-      form: "Standardform",
       imageUrl:
         "https://files.pokefans.net/images/pokemon-go/modelle/037-00.png",
       name: "Vulpix",
@@ -524,7 +518,6 @@ export const pokemonRaid = {
     },
     {
       id: 38,
-      form: "Standardform",
       imageUrl:
         "https://files.pokefans.net/images/pokemon-go/modelle/038-00.png",
       name: "Vulnona",
@@ -617,7 +610,6 @@ export const pokemonRaid = {
     },
     {
       id: 50,
-      form: "Standardform",
       imageUrl:
         "https://files.pokefans.net/images/pokemon-go/modelle/050-00.png",
       name: "Digda",
@@ -633,7 +625,6 @@ export const pokemonRaid = {
     },
     {
       id: 51,
-      form: "Standardform",
       imageUrl:
         "https://files.pokefans.net/images/pokemon-go/modelle/051-00.png",
       name: "Digdri",
@@ -649,7 +640,6 @@ export const pokemonRaid = {
     },
     {
       id: 52,
-      form: "Standardform",
       imageUrl:
         "https://files.pokefans.net/images/pokemon-go/modelle/052-00.png",
       name: "Mauzi",
@@ -665,7 +655,6 @@ export const pokemonRaid = {
     },
     {
       id: 53,
-      form: "Standardform",
       imageUrl:
         "https://files.pokefans.net/images/pokemon-go/modelle/053-00.png",
       name: "Snobilikat",
@@ -821,7 +810,6 @@ export const pokemonRaid = {
     },
     {
       id: 74,
-      form: "Standardform",
       imageUrl:
         "https://files.pokefans.net/images/pokemon-go/modelle/074-00.png",
       name: "Kleinstein",
@@ -837,7 +825,6 @@ export const pokemonRaid = {
     },
     {
       id: 75,
-      form: "Standardform",
       imageUrl:
         "https://files.pokefans.net/images/pokemon-go/modelle/075-00.png",
       name: "Georok",
@@ -853,7 +840,6 @@ export const pokemonRaid = {
     },
     {
       id: 76,
-      form: "Standardform",
       imageUrl:
         "https://files.pokefans.net/images/pokemon-go/modelle/076-00.png",
       name: "Geowaz",
@@ -946,7 +932,6 @@ export const pokemonRaid = {
     },
     {
       id: 88,
-      form: "Standardform",
       imageUrl:
         "https://files.pokefans.net/images/pokemon-go/modelle/088-00.png",
       name: "Sleima",
@@ -962,7 +947,6 @@ export const pokemonRaid = {
     },
     {
       id: 89,
-      form: "Standardform",
       imageUrl:
         "https://files.pokefans.net/images/pokemon-go/modelle/089-00.png",
       name: "Sleimok",
@@ -1069,7 +1053,6 @@ export const pokemonRaid = {
     },
     {
       id: 103,
-      form: "Standardform",
       imageUrl:
         "https://files.pokefans.net/images/pokemon-go/modelle/103-00.png",
       name: "Kokowei",
@@ -1092,7 +1075,6 @@ export const pokemonRaid = {
     },
     {
       id: 105,
-      form: "Standardform",
       imageUrl:
         "https://files.pokefans.net/images/pokemon-go/modelle/105-00.png",
       name: "Knogga",
@@ -2823,7 +2805,6 @@ export const pokemonRaid = {
     },
     {
       id: 351,
-      form: "Standardform",
       imageUrl:
         "https://files.pokefans.net/images/pokemon-go/modelle/351-01.png",
       name: "Formeo",
@@ -3786,7 +3767,6 @@ export const pokemonRaid = {
     },
     {
       id: 479,
-      form: "Standardform",
       imageUrl:
         "https://files.pokefans.net/images/pokemon-go/modelle/479-00.png",
       name: "Rotom",
