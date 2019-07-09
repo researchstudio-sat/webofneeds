@@ -21,6 +21,7 @@ function genComponentConf() {
           <input id="prbp__level__5" type="radio" name="prbp__level" class="prbp__level__option" value="5" ng-checked="self.isLevelChecked(5)"/>
           <label for="prbp__level__5" ng-click="self.updateLevel(5)">{{ self.detail.getLevelLabel(5) }}</label>
       </div>
+
       <label for="prbp__hatched">Hatched</label>
       <input
           type="checkbox"
@@ -28,6 +29,7 @@ function genComponentConf() {
           class="prbp__hatched"
           ng-model="self.pokemonRaidBoss.hatched"
           ng-change="self.updateHatched(self.pokemonRaidBoss.hatched)"/>
+
       <label class="prbp__label" ng-class="{'prbp__label--disabled': self.pokemonRaidBoss.hatched}">Hatches at</label>
       <won-datetime-picker
           ng-class="{'prbp__hatches--disabled': self.pokemonRaidBoss.hatched}"
@@ -36,6 +38,7 @@ function genComponentConf() {
           on-update="self.updateHatches(value)"
           detail="self.detail && self.detail.hatches">
       </won-datetime-picker>
+
       <label class="prbp__label">Expires at</label>
       <won-datetime-picker
           class="prbp__expires"
@@ -43,8 +46,10 @@ function genComponentConf() {
           on-update="self.updateExpires(value)"
           detail="self.detail && self.detail.expires">
       </won-datetime-picker>
+
       <label class="prbp__label"
           ng-class="{'prbp__label--disabled': !self.pokemonRaidBoss.hatched}">Pokemon</label>
+      <!-- POKEMON NAME -->
       <won-title-picker
           ng-class="{'prbp__pokemon--disabled': !self.pokemonRaidBoss.hatched}"
           class="prbp__pokemon"
@@ -52,9 +57,10 @@ function genComponentConf() {
           on-update="self.updatePokemonFilter(value)"
           detail="self.detail && self.detail.filterDetail">
       </won-title-picker>
+      <!-- POKEMON LIST -->
       <div class="prbp__pokemonlist" ng-class="{'prbp__pokemonlist--disabled': !self.pokemonRaidBoss.hatched}">
         <div class="prbp__pokemonlist__pokemon"
-          ng-repeat="pokemon in self.detail.pokemonList | filter:self.filterPokemon(self.pokemonFilter, self.pokemonRaidBoss.id, self.pokemonRaidBoss.form)"
+          ng-repeat="pokemon in self.pokemonList | filter:self.filterPokemon(self.pokemonFilter, self.pokemonRaidBoss.id, self.pokemonRaidBoss.form)"
           ng-class="{
             'prbp__pokemonlist__pokemon--selected': self.pokemonRaidBoss.id == pokemon.id && (!self.pokemonRaidBoss.form || self.pokemonRaidBoss.form == pokemon.form)
           }"
@@ -79,7 +85,6 @@ function genComponentConf() {
       window.pkmRaidBossp4dbg = this;
 
       this.pokemonRaidBoss = this.initialValue || { level: 1 };
-
       this.pokemonFilter = undefined;
 
       delay(0).then(() => this.showInitialValues());
@@ -197,9 +202,58 @@ function genComponentConf() {
       this.update(this.pokemonRaidBoss);
     }
 
+    getCurrentPokemon() {
+      // TODO: change this URL for any live system
+      const url = "https://pokemon.socialmicrolearning.com/current";
+
+      return fetch(url)
+        .then(response => {
+          if (response.ok) {
+            return response.json();
+          }
+          throw new Error("HTTP Error: ", response.status);
+        })
+        .then(jsonResponse => this.formatPokemonJson(jsonResponse))
+        .catch(error => {
+          console.warn(
+            "Pokemon Data could not be fetched, using fallback list."
+          );
+          console.debug(error);
+          return this.detail.fullPokemonList;
+        });
+    }
+
+    formatPokemonJson(jsonList) {
+      if (!jsonList || jsonList.length == 0) {
+        console.debug("jsonList is: " + jsonList);
+        return this.detail.fullPokemonList;
+      }
+      let formattedList = { array: [] };
+      for (let entry of jsonList) {
+        let pokemon = {};
+        pokemon.id = entry.PokemonId;
+        pokemon.name = entry.Pokemons[0].Name;
+        pokemon.imageUrl = entry.Pokemons[0].PokemonPictureFileNameLink;
+        pokemon.isShiny = entry.Pokemons[0].isShiny;
+        if (
+          entry.Pokemons[0].HasForm &&
+          entry.Pokemons[0].Form !== "Standardform"
+        ) {
+          pokemon.form = entry.Pokemons[0].Form;
+        }
+
+        formattedList["array"].push(pokemon);
+      }
+      return formattedList["array"];
+    }
+
     showInitialValues() {
       this.pokemonRaidBoss = this.initialValue || { level: 1 };
-      this.$scope.$apply();
+      // populate pokemonlist
+      this.getCurrentPokemon().then(pokemonList => {
+        this.pokemonList = pokemonList;
+        this.$scope.$apply();
+      });
     }
   }
   Controller.$inject = serviceDependencies;

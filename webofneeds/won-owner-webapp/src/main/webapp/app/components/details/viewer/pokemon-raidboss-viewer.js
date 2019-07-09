@@ -19,6 +19,7 @@ function genComponentConf() {
         </div>
         <div class="prbv__content">
           <div class="prbv__content__level"
+            ng-if="self.level"
             ng-class="{
               'prbv__content__level--normal': self.level == 1 || self.level == 2,
               'prbv__content__level--rare': self.level == 3 || self.level == 4,
@@ -35,7 +36,7 @@ function genComponentConf() {
             </div>
           </div>
           <div class="prbv__content__pokemon" ng-if="!self.hatched || !self.pokemon">
-            <img class="prbv__content__pokemon__image prbv__content__pokemon__image--unhatched" src="{{self.detail.pokemonList[0].imageUrl}}"/>
+            <img class="prbv__content__pokemon__image prbv__content__pokemon__image--unhatched" src="{{self.detail.fullPokemonList[0].imageUrl}}"/>
             <div class="prbv__content__pokemon__id">?</div>
             <div class="prbv__content__pokemon__name" ng-if="!self.shouldHaveHatched">Hatches {{ self.friendlyHatchesTime }} ({{ self.hatchesLocaleString }})</div>
             <div class="prbv__content__pokemon__name" ng-if="self.shouldHaveHatched">Should have hatched {{ self.friendlyHatchesTime }} ({{ self.hatchesLocaleString }})</div>
