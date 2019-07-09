@@ -15,7 +15,7 @@ import java.net.URI;
 import org.apache.jena.rdf.model.Model;
 
 import won.bot.framework.eventbot.event.BaseEvent;
-import won.protocol.model.SocketType;
+// import won.protocol.model.SocketType;
 
 /**
  * User: LEIH-NB Date: 05.02.14
@@ -24,7 +24,7 @@ public class GroupSocketCreatedEvent extends BaseEvent {
     private URI groupSocketURI;
     private URI wonNodeURI;
     private Model model;
-    private final SocketType socketType = SocketType.GroupSocket;
+    // private final SocketType socketType = SocketType.GroupSocket;
 
     public GroupSocketCreatedEvent(URI groupSocketURI, URI wonNodeURI, Model model) {
         this.groupSocketURI = groupSocketURI;

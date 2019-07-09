@@ -19,8 +19,8 @@ import won.bot.framework.eventbot.bus.EventBus;
  * @author MS Handle messagest and requests to hokify in the future
  */
 public class WonHokifyJobBotHandler implements ICommandRegistry {
-    private String token;
-    private String botName;
+    private String token; // TODO: unused variable/parameter
+    private String botName; // TODO: unused variable/parameter
     private EventBus bus;
     private CommandRegistry commandRegistry;
     private HokifyMessageGenerator hokifyMessageGenerator;

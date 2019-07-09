@@ -10,7 +10,10 @@
  */
 package won.bot.framework.eventbot.action.impl.atomlifecycle;
 
+import java.net.URI;
+
 import org.apache.jena.query.Dataset;
+
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.protocol.exception.WonMessageBuilderException;
@@ -19,8 +22,6 @@ import won.protocol.message.WonMessageBuilder;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.AtomModelWrapper;
 import won.protocol.util.RdfUtils;
-
-import java.net.URI;
 
 /**
  * Base class for actions that modifies atoms.

@@ -41,7 +41,7 @@ import java.util.concurrent.TimeUnit;
 @ContextConfiguration(locations = { "classpath:/spring/app/simple2AtomGroupingTest.xml" })
 public class GroupingBotTest {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    private static final int RUN_ONCE = 1;
+    // private static final int RUN_ONCE = 1;
     private static final long ACT_LOOP_TIMEOUT_MILLIS = 100;
     private static final long ACT_LOOP_INITIAL_DELAY_MILLIS = 100;
     private static boolean run = false;
@@ -115,13 +115,14 @@ public class GroupingBotTest {
          * barrier until our bot is done, then execute the asserts.
          */
         CyclicBarrier barrier = new CyclicBarrier(2);
-        private static final String sparqlPrefix = "PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>"
-                        + "PREFIX geo:   <http://www.w3.org/2003/01/geo/wgs84_pos#>"
-                        + "PREFIX xsd:   <http://www.w3.org/2001/XMLSchema#>"
-                        + "PREFIX rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
-                        + "PREFIX won:   <https://w3id.org/won/core#>"
-                        + "PREFIX gr:    <http://purl.org/goodrelations/v1#>"
-                        + "PREFIX ldp:   <http://www.w3.org/ns/ldp#>";
+        // private static final String sparqlPrefix = "PREFIX rdfs:
+        // <http://www.w3.org/2000/01/rdf-schema#>"
+        // + "PREFIX geo: <http://www.w3.org/2003/01/geo/wgs84_pos#>"
+        // + "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>"
+        // + "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
+        // + "PREFIX won: <https://w3id.org/won/core#>" + "PREFIX gr:
+        // <http://purl.org/goodrelations/v1#>"
+        // + "PREFIX ldp: <http://www.w3.org/ns/ldp#>";
 
         /**
          * Default constructor is required for instantiation through Spring.
@@ -137,7 +138,7 @@ public class GroupingBotTest {
             // its only purpose is to trip the CyclicBarrier instance that
             // the test method is waiting on
             getEventBus().subscribe(WorkDoneEvent.class, new ActionOnEventListener(getEventListenerContext(),
-                            new TripBarrierAction(getEventListenerContext(), barrier)));
+                    new TripBarrierAction(getEventListenerContext(), barrier)));
         }
 
         public CyclicBarrier getBarrier() {

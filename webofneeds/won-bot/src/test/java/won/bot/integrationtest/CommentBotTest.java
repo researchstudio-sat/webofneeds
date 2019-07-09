@@ -52,7 +52,7 @@ import java.util.concurrent.TimeUnit;
 @ContextConfiguration(locations = { "classpath:/spring/app/simpleCommentTest.xml" })
 public class CommentBotTest {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    private static final int RUN_ONCE = 1;
+    // private static final int RUN_ONCE = 1;
     private static final long ACT_LOOP_TIMEOUT_MILLIS = 100;
     private static final long ACT_LOOP_INITIAL_DELAY_MILLIS = 100;
     private static MyBot bot;
@@ -122,12 +122,11 @@ public class CommentBotTest {
          */
         CyclicBarrier barrier = new CyclicBarrier(2);
         private static final String sparqlPrefix = "PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>"
-                        + "PREFIX geo:   <http://www.w3.org/2003/01/geo/wgs84_pos#>"
-                        + "PREFIX xsd:   <http://www.w3.org/2001/XMLSchema#>"
-                        + "PREFIX rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
-                        + "PREFIX won:   <https://w3id.org/won/core#>"
-                        + "PREFIX gr:    <http://purl.org/goodrelations/v1#>"
-                        + "PREFIX sioc:  <http://rdfs.org/sioc/ns#>" + "PREFIX ldp:   <http://www.w3.org/ns/ldp#>";
+                + "PREFIX geo:   <http://www.w3.org/2003/01/geo/wgs84_pos#>"
+                + "PREFIX xsd:   <http://www.w3.org/2001/XMLSchema#>"
+                + "PREFIX rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
+                + "PREFIX won:   <https://w3id.org/won/core#>" + "PREFIX gr:    <http://purl.org/goodrelations/v1#>"
+                + "PREFIX sioc:  <http://rdfs.org/sioc/ns#>" + "PREFIX ldp:   <http://www.w3.org/ns/ldp#>";
 
         /**
          * Default constructor is required for instantiation through Spring.
@@ -143,7 +142,7 @@ public class CommentBotTest {
             // its only purpose is to trip the CyclicBarrier instance that
             // the test method is waiting on
             getEventBus().subscribe(WorkDoneEvent.class, new ActionOnEventListener(getEventListenerContext(),
-                            new TripBarrierAction(getEventListenerContext(), barrier)));
+                    new TripBarrierAction(getEventListenerContext(), barrier)));
         }
 
         public CyclicBarrier getBarrier() {
@@ -187,33 +186,30 @@ public class CommentBotTest {
             List<URI> atoms = ((CommentBotContextWrapper) getBotContextWrapper()).getCommentList();
             LinkedDataSource linkedDataSource = getEventListenerContext().getLinkedDataSource();
             List<URI> properties = new ArrayList<>();
-            List<URI> objects = new ArrayList<>();
             properties.add(URI.create(WON.connections.getURI()));
             // properties.add(RDF.type);
             properties.add(URI.create(WON.targetConnection.toString()));
             properties.add(URI.create(WON.targetAtom.toString()));
             properties.add(URI.create(RDFS.member.toString()));
-            List<URI> crawled = new ArrayList<>();
             ((CachingLinkedDataSource) linkedDataSource).clear();
             Dataset dataModel = linkedDataSource.getDataForResourceWithPropertyPath(atoms.get(0),
-                            PropertyPathConfigurator.configurePropertyPaths(), 30, 8, true);
+                    PropertyPathConfigurator.configurePropertyPaths(), 30, 8, true);
             logger.debug("crawled dataset with property path: {}", RdfUtils.toString(dataModel));
             String queryString = sparqlPrefix + "SELECT ?atom ?connection ?atom2 WHERE {" +
             // "GRAPH ?g1 {" +
-                            "   ?atom won:connections ?connections ." +
-                            // "} ." +
-                            // "GRAPH ?g2 {" +
-                            "   ?atom sioc:hasReply ?atom2 ." +
-                            // "} ." +
-                            // "GRAPH ?g3 {" +
-                            "?connections rdfs:member ?connection ." +
-                            // "} ."+
-                            // "Graph ?g4 {" +
-                            "?connection won:socket won:CommentSocket."
-                            + "?connection won:targetConnection ?connection2." + "?connection2 won:sourceAtom ?atom2 ."
-                            +
-                            // "} ."+
-                            "}";
+                    "   ?atom won:connections ?connections ." +
+                    // "} ." +
+                    // "GRAPH ?g2 {" +
+                    "   ?atom sioc:hasReply ?atom2 ." +
+                    // "} ." +
+                    // "GRAPH ?g3 {" +
+                    "?connections rdfs:member ?connection ." +
+                    // "} ."+
+                    // "Graph ?g4 {" +
+                    "?connection won:socket won:CommentSocket." + "?connection won:targetConnection ?connection2."
+                    + "?connection2 won:sourceAtom ?atom2 ." +
+                    // "} ."+
+                    "}";
             Query query = QueryFactory.create(queryString);
             QueryExecution qExec = QueryExecutionFactory.create(query, dataModel);
             ResultSet results = qExec.execSelect();
@@ -221,7 +217,7 @@ public class CommentBotTest {
             for (; results.hasNext();) {
                 QuerySolution soln = results.nextSolution();
                 actualList.add(soln.toString());
-                RDFNode node = soln.get("?connection");
+                // RDFNode node = soln.get("?connection");
             }
             Assert.assertEquals("wrong number of results", 1, actualList.size());
             qExec.close();
@@ -253,7 +249,7 @@ public class CommentBotTest {
             Dataset commentModel = getEventListenerContext().getLinkedDataSource().getDataForResource(atoms.get(0));
             System.out.println("executing queries...");
             String queryString = sparqlPrefix + "SELECT ?atom WHERE {" + "?atom a won:Atom."
-                            + "?atom won:socket won:CommentSocket" + "}";
+                    + "?atom won:socket won:CommentSocket" + "}";
             Query query = QueryFactory.create(queryString);
             QueryExecution qExec = QueryExecutionFactory.create(query, commentModel);
             List<String> actualList = new ArrayList<>();
@@ -273,18 +269,12 @@ public class CommentBotTest {
         public void executeAtomCommentConnectionRDFValidationAsserts(Model atomModel, Model commentModel) {
             System.out.println("executing queries...");
             String queryString = sparqlPrefix + "SELECT ?atom ?connection ?state WHERE {"
-                            + "?atom won:connections ?connections." + "?connections rdfs:member ?connection."
-                            + "?connection won:connectionState ?state." + "}";
+                    + "?atom won:connections ?connections." + "?connections rdfs:member ?connection."
+                    + "?connection won:connectionState ?state." + "}";
             logger.debug(RdfUtils.toString(atomModel));
-            Dataset dataset = null;
-            // Query query = queryString.asQuery();
-            // QueryExecution qExec = QueryExecutionFactory.create(query, dataset);
             Query query = QueryFactory.create(queryString);
             QueryExecution qExec = QueryExecutionFactory.create(query, commentModel);
-            // Query query = QueryFactory.create(queryString);
-            // QueryExecution qExec = QueryExecutionFactory.create(query, dsARQ);
             ResultSet results = qExec.execSelect();
-            // ResultSet results = executeQuery(queryString,atomModel);
             URI atomConnectionCollectionURI = null;
             URI atomConnectionURI = null;
             URI commentConnectionsURI = null;
@@ -300,9 +290,9 @@ public class CommentBotTest {
             qExec.close();
             Assert.assertTrue("wrong number of results", actualList.size() >= 1);
             Dataset atomConnections = getEventListenerContext().getLinkedDataSource()
-                            .getDataForResource(atomConnectionCollectionURI);
+                    .getDataForResource(atomConnectionCollectionURI);
             String queryString2 = sparqlPrefix + "SELECT ?connection WHERE {" + "?connections rdfs:member ?connection"
-                            + "}";
+                    + "}";
             logger.debug(RdfUtils.toString(atomConnections));
             Query query2 = QueryFactory.create(queryString2);
             QueryExecution qExec2 = QueryExecutionFactory.create(query2, atomConnections);
@@ -319,9 +309,9 @@ public class CommentBotTest {
             qExec2.close();
             Assert.assertTrue("wrong number of results", actualList2.size() >= 1);
             Dataset atomConnection = getEventListenerContext().getLinkedDataSource()
-                            .getDataForResource(atomConnectionURI);
+                    .getDataForResource(atomConnectionURI);
             String queryString3 = sparqlPrefix + "SELECT ?targetConnection WHERE {"
-                            + "?connection won:targetConnection ?targetConnection" + "}";
+                    + "?connection won:targetConnection ?targetConnection" + "}";
             logger.debug(RdfUtils.toString(atomConnection));
             Query query3 = QueryFactory.create(queryString3);
             QueryExecution qExec3 = QueryExecutionFactory.create(query3, atomConnection);
@@ -336,9 +326,9 @@ public class CommentBotTest {
             }
             Assert.assertTrue("wrong number of results", actualList3.size() >= 1);
             Dataset targetConnections = getEventListenerContext().getLinkedDataSource()
-                            .getDataForResource(commentConnectionsURI);
+                    .getDataForResource(commentConnectionsURI);
             String queryString4 = sparqlPrefix + "SELECT ?targetConnection WHERE {"
-                            + "?connection won:targetConnection ?targetConnection" + "}";
+                    + "?connection won:targetConnection ?targetConnection" + "}";
             logger.debug(RdfUtils.toString(targetConnections));
             // ResultSet results3 = executeQuery(queryString2, atomConnections);
             Query query4 = QueryFactory.create(queryString4);

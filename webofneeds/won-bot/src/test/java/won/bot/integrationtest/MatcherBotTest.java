@@ -38,7 +38,7 @@ import java.util.concurrent.TimeUnit;
 @ContextConfiguration(locations = { "classpath:/spring/app/simpleMatcherTest.xml" })
 public class MatcherBotTest {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    private static final int RUN_ONCE = 1;
+    // private static final int RUN_ONCE = 1;
     private static final long ACT_LOOP_TIMEOUT_MILLIS = 1000;
     private static final long ACT_LOOP_INITIAL_DELAY_MILLIS = 2000;
     MyBot bot;
@@ -54,7 +54,7 @@ public class MatcherBotTest {
     public void before() {
         // create a bot instance and auto-wire it
         this.bot = (MyBot) applicationContext.getAutowireCapableBeanFactory().autowire(MyBot.class,
-                        AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, false);
+                AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, false);
         // the bot also atoms a trigger so its act() method is called regularly.
         // (there is no trigger bean in the context)
         PeriodicTrigger trigger = new PeriodicTrigger(ACT_LOOP_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
@@ -110,7 +110,7 @@ public class MatcherBotTest {
             // its only purpose is to trip the CyclicBarrier instance that
             // the test method is waiting on
             getEventBus().subscribe(WorkDoneEvent.class, new ActionOnEventListener(getEventListenerContext(),
-                            new TripBarrierAction(getEventListenerContext(), barrier)));
+                    new TripBarrierAction(getEventListenerContext(), barrier)));
         }
 
         public CyclicBarrier getBarrier() {

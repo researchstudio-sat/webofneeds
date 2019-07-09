@@ -48,18 +48,18 @@ public class MatchAtomsAction extends BaseEventBotAction {
         logger.debug("getEventListnerContext():" + getEventListenerContext());
         logger.debug("getMatcherService(): " + getEventListenerContext().getMatcherProtocolAtomServiceClient());
         getEventListenerContext().getMatcherProtocolAtomServiceClient().hint(atom1, atom2, 1.0,
-                        URI.create("http://example.com/matcher"), null,
-                        createWonMessage(atom1, atom2, 1.0, URI.create("http://example.com/matcher")));
+                URI.create("http://example.com/matcher"), null,
+                createWonMessage(atom1, atom2, 1.0, URI.create("http://example.com/matcher")));
     }
 
     private WonMessage createWonMessage(URI atomURI, URI otherAtomURI, double score, URI originator)
-                    throws WonMessageBuilderException {
+            throws WonMessageBuilderException {
         WonNodeInformationService wonNodeInformationService = getEventListenerContext().getWonNodeInformationService();
         URI localWonNode = WonRdfUtils.AtomUtils.getWonNodeURIFromAtom(
-                        getEventListenerContext().getLinkedDataSource().getDataForResource(atomURI), atomURI);
+                getEventListenerContext().getLinkedDataSource().getDataForResource(atomURI), atomURI);
         return WonMessageBuilder
-                        .setMessagePropertiesForHintToAtom(wonNodeInformationService.generateEventURI(localWonNode),
-                                        atomURI, localWonNode, otherAtomURI, originator, score)
-                        .build();
+                .setMessagePropertiesForHintToAtom(wonNodeInformationService.generateEventURI(localWonNode), atomURI,
+                        localWonNode, otherAtomURI, originator, score)
+                .build();
     }
 }

@@ -15,7 +15,7 @@ import java.net.URI;
 import org.apache.jena.rdf.model.Model;
 
 import won.bot.framework.eventbot.event.BaseEvent;
-import won.protocol.model.SocketType;
+// import won.protocol.model.SocketType;
 
 /**
  * User: LEIH-NB Date: 05.02.14
@@ -24,7 +24,7 @@ public class CommentSocketCreatedEvent extends BaseEvent {
     private URI commentSocketURI;
     private URI wonNodeURI;
     private Model model;
-    private final SocketType socketType = SocketType.CommentSocket;
+    // private final SocketType socketType = SocketType.CommentSocket;
 
     public CommentSocketCreatedEvent(URI groupSocketURI, URI wonNodeURI, Model model) {
         this.commentSocketURI = groupSocketURI;

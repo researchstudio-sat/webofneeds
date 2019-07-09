@@ -41,7 +41,6 @@ import java.util.concurrent.atomic.AtomicReference;
 public class LastSeenAtomsMatcherBot extends EventBot {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private BaseEventListener matcherRegistrator;
-    private BaseEventListener matcherIndexer;
     private int registrationMatcherRetryInterval;
 
     public void setRegistrationMatcherRetryInterval(final int registrationMatcherRetryInterval) {
@@ -66,42 +65,39 @@ public class LastSeenAtomsMatcherBot extends EventBot {
         this.matcherRegistrator = new ActionOnEventListener(ctx, registerMatcherAction, 1);
         bus.subscribe(ActEvent.class, this.matcherRegistrator);
         RandomDelayedAction delayedRegistration = new RandomDelayedAction(ctx, registrationMatcherRetryInterval,
-                        registrationMatcherRetryInterval, 0, registerMatcherAction);
+                registrationMatcherRetryInterval, 0, registerMatcherAction);
         ActionOnEventListener matcherRetryRegistrator = new ActionOnEventListener(ctx, delayedRegistration);
         bus.subscribe(MatcherRegisterFailedEvent.class, matcherRetryRegistrator);
         bus.subscribe(AtomCreatedEventForMatcher.class,
-                        new ActionOnEventListener(ctx, "lastSeenAtomsMatcher", new BaseEventBotAction(ctx) {
-                            @Override
-                            protected void doRun(final Event event, EventListener executingListener) throws Exception {
-                                AtomCreatedEventForMatcher atomCreatedEvent = (AtomCreatedEventForMatcher) event;
-                                URI currentAtomURI = atomCreatedEvent.getAtomURI();
-                                URI lastAtomURI = lastAtomUriReference.getAndSet(currentAtomURI);
-                                URI originator = matcherUri;
-                                if (lastAtomURI == null) {
-                                    logger.info("First invocation. Remembering {} for matching it later",
-                                                    currentAtomURI);
-                                    return;
-                                } else {
-                                    logger.info("Sending hint for {} and {}", currentAtomURI, lastAtomURI);
-                                }
-                                ctx.getMatcherProtocolAtomServiceClient().hint(currentAtomURI, lastAtomURI, 0.5,
-                                                originator, null,
-                                                createWonMessage(currentAtomURI, lastAtomURI, 0.5, originator));
-                                ctx.getMatcherProtocolAtomServiceClient().hint(lastAtomURI, currentAtomURI, 0.5,
-                                                originator, null,
-                                                createWonMessage(lastAtomURI, currentAtomURI, 0.5, originator));
-                            }
-                        }));
+                new ActionOnEventListener(ctx, "lastSeenAtomsMatcher", new BaseEventBotAction(ctx) {
+                    @Override
+                    protected void doRun(final Event event, EventListener executingListener) throws Exception {
+                        AtomCreatedEventForMatcher atomCreatedEvent = (AtomCreatedEventForMatcher) event;
+                        URI currentAtomURI = atomCreatedEvent.getAtomURI();
+                        URI lastAtomURI = lastAtomUriReference.getAndSet(currentAtomURI);
+                        URI originator = matcherUri;
+                        if (lastAtomURI == null) {
+                            logger.info("First invocation. Remembering {} for matching it later", currentAtomURI);
+                            return;
+                        } else {
+                            logger.info("Sending hint for {} and {}", currentAtomURI, lastAtomURI);
+                        }
+                        ctx.getMatcherProtocolAtomServiceClient().hint(currentAtomURI, lastAtomURI, 0.5, originator,
+                                null, createWonMessage(currentAtomURI, lastAtomURI, 0.5, originator));
+                        ctx.getMatcherProtocolAtomServiceClient().hint(lastAtomURI, currentAtomURI, 0.5, originator,
+                                null, createWonMessage(lastAtomURI, currentAtomURI, 0.5, originator));
+                    }
+                }));
     }
 
     private WonMessage createWonMessage(URI atomURI, URI otherAtomURI, double score, URI originator)
-                    throws WonMessageBuilderException {
+            throws WonMessageBuilderException {
         WonNodeInformationService wonNodeInformationService = getEventListenerContext().getWonNodeInformationService();
         URI localWonNode = WonRdfUtils.AtomUtils.getWonNodeURIFromAtom(
-                        getEventListenerContext().getLinkedDataSource().getDataForResource(atomURI), atomURI);
+                getEventListenerContext().getLinkedDataSource().getDataForResource(atomURI), atomURI);
         return WonMessageBuilder
-                        .setMessagePropertiesForHintToAtom(wonNodeInformationService.generateEventURI(localWonNode),
-                                        atomURI, localWonNode, otherAtomURI, originator, score)
-                        .build();
+                .setMessagePropertiesForHintToAtom(wonNodeInformationService.generateEventURI(localWonNode), atomURI,
+                        localWonNode, otherAtomURI, originator, score)
+                .build();
     }
 }

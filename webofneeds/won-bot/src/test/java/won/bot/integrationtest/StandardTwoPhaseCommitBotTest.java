@@ -25,7 +25,7 @@ import won.bot.impl.StandardTwoPhaseCommitBot;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "classpath:/spring/app/standardTwoPhaseCommitTest.xml" })
 public class StandardTwoPhaseCommitBotTest {
-    private static final int RUN_ONCE = 1;
+    // private static final int RUN_ONCE = 1;
     private static final long ACT_LOOP_TIMEOUT_MILLIS = 100;
     private static final long ACT_LOOP_INITIAL_DELAY_MILLIS = 100;
     MyBot bot;
