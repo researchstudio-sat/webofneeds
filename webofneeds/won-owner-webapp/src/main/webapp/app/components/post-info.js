@@ -103,6 +103,9 @@ function genComponentConf() {
 
         const atomLoading =
           !atom || processSelectors.isAtomLoading(state, this.atomUri);
+
+        const holderUri = atomUtils.getHeldByUri(atom);
+
         return {
           loggedIn: accountUtils.isLoggedIn(get(state, "account")),
           isInactive: atomUtils.isInactive(atom),
@@ -121,6 +124,8 @@ function genComponentConf() {
             (showEnabledUseCases ||
               showReactionUseCases ||
               showAdHocRequestField),
+          addHolderUri: showEnabledUseCases && holderUri,
+          holderUri,
         };
       };
       connect2Redux(selectFromState, actionCreators, ["self.atomUri"], this);
@@ -136,6 +141,7 @@ function genComponentConf() {
         fromAtomUri: this.atomUri,
         viewConnUri: undefined,
         mode: "CONNECT",
+        holderUri: this.addHolderUri ? this.holderUri : undefined,
       });
     }
 
