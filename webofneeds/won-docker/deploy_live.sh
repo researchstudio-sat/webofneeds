@@ -40,7 +40,7 @@ echo run docker containers using docker-compose:
 docker-compose --tlsverify --tlscacert=/var/lib/jenkins/.docker/ca.pem --tlscert=/var/lib/jenkins/.docker/cert.pem --tlskey=/var/lib/jenkins/.docker/key.pem -H satvm01.researchstudio.at:2376 down
 docker-compose --tlsverify --tlscacert=/var/lib/jenkins/.docker/ca.pem --tlscert=/var/lib/jenkins/.docker/cert.pem --tlskey=/var/lib/jenkins/.docker/key.pem -H satvm01.researchstudio.at:2376 up -d
 
-if [[ ${DEPLOY_TO_DOCKERHUB} ]]
+if [[ -v $DEPLOY_TO_DOCKERHUB ]]
 then
     echo push automatically built webobofneeds images to docker hub
     # 
@@ -54,4 +54,6 @@ then
     docker --tlsverify -H satvm01.researchstudio.at:2376 push webofneeds/solr:live
     docker --tlsverify -H satvm01.researchstudio.at:2376 push webofneeds/postgres:live
     docker --tlsverify -H satvm01.researchstudio.at:2376 push webofneeds/bots:live
+else
+    echo skipping push built webobofneeds images to docker hub because of DEPLOY_TO_DOCKERHUB not enabled
 fi
