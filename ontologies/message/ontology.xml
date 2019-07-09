@@ -151,7 +151,7 @@ If a message is sent to another Atom, a new Message URI is minted on that Atom&a
     <owl:ObjectProperty rdf:about="https://w3id.org/won/message#correspondingRemoteMessage">
         <rdfs:domain rdf:resource="https://w3id.org/won/message#Message"/>
         <rdfs:range rdf:resource="https://w3id.org/won/message#Message"/>
-        <rdfs:comment xml:lang="en">Points to another message. Messages always exist in two copies: one on the sender&apos;s WoN node and one on the receiver&apos;s WoN node. The receiver&apos;s WoN node copies the message, mints a new URI for it and points to the original message using &apos;msg:correspondingRemoteMessage&apos;.</rdfs:comment>
+        <rdfs:comment xml:lang="en">Points to another message. Messages always exist in two copies: one on the sender&apos;s WoN node and one on the receiver&apos;s WoN node. The receiver&apos;s WoN node copies the message, mints a new URI for it and points to the original message using `msg:correspondingRemoteMessage`.</rdfs:comment>
         <rdfs:label>correspondingRemoteMessage</rdfs:label>
     </owl:ObjectProperty>
     
@@ -173,6 +173,40 @@ If a message is sent to another Atom, a new Message URI is minted on that Atom&a
     <owl:ObjectProperty rdf:about="https://w3id.org/won/message#hintTargetSocket">
         <rdfs:comment xml:lang="en">The target Socket of a SocketHintMessage. By sending this message it is suggested to establish a connection between the recipientSocket and the targetSocket.</rdfs:comment>
         <rdfs:label>hintTargetSocket</rdfs:label>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- https://w3id.org/won/message#isRemoteResponseTo -->
+
+
+    <owl:ObjectProperty rdf:about="https://w3id.org/won/message#isRemoteResponseTo">
+        <rdfs:comment xml:lang="en">Links a response message on the recipientAtom&apos;s WoN node to the original message on the senderAtom&apos;s WoN node,</rdfs:comment>
+        <rdfs:label>isRemoteResponseTo</rdfs:label>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- https://w3id.org/won/message#isResponseTo -->
+
+
+    <owl:ObjectProperty rdf:about="https://w3id.org/won/message#isResponseTo">
+        <rdfs:domain rdf:resource="https://w3id.org/won/message#Message"/>
+        <rdfs:range rdf:resource="https://w3id.org/won/message#Message"/>
+        <rdfs:comment xml:lang="en">Links a SuccessResponse or a FailureResponse to the message it is responding to.</rdfs:comment>
+        <rdfs:label>isResponseTo</rdfs:label>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- https://w3id.org/won/message#isResponseToMessageType -->
+
+
+    <owl:ObjectProperty rdf:about="https://w3id.org/won/message#isResponseToMessageType">
+        <rdfs:domain rdf:resource="https://w3id.org/won/message#Message"/>
+        <rdfs:range rdf:resource="https://w3id.org/won/message#MessageType"/>
+        <rdfs:comment xml:lang="en">Used in a response message to indicate the messageType of the original message.</rdfs:comment>
+        <rdfs:label>isResponsToMessageType</rdfs:label>
     </owl:ObjectProperty>
     
 

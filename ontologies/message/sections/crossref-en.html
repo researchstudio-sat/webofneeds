@@ -174,7 +174,10 @@ This section provides details for each class and property defined by Web of Need
             <sup class="type-op" title="object property">op</sup>, <a href="#correspondingRemoteMessage"
                title="https://w3id.org/won/message#correspondingRemoteMessage">correspondingRemoteMessage</a>
             <sup class="type-op" title="object property">op</sup>, <a href="#hintScore" title="https://w3id.org/won/message#hintScore">hintScore</a>
-            <sup class="type-dp" title="data property">dp</sup>, <a href="#messageType" title="https://w3id.org/won/message#messageType">messageType</a>
+            <sup class="type-dp" title="data property">dp</sup>, <a href="#isResponseToMessageType"
+               title="https://w3id.org/won/message#isResponseToMessageType">isResponsToMessageType</a>
+            <sup class="type-op" title="object property">op</sup>, <a href="#isResponseTo" title="https://w3id.org/won/message#isResponseTo">isResponseTo</a>
+            <sup class="type-op" title="object property">op</sup>, <a href="#messageType" title="https://w3id.org/won/message#messageType">messageType</a>
             <sup class="type-op" title="object property">op</sup>, <a href="#previousMessage" title="https://w3id.org/won/message#previousMessage">previousMessage</a>
             <sup class="type-op" title="object property">op</sup>, <a href="#protocolVersion" title="https://w3id.org/won/message#protocolVersion">protocolVersion</a>
             <sup class="type-dp" title="data property">dp</sup>, <a href="#receivedTimestamp" title="https://w3id.org/won/message#receivedTimestamp">receivedTimestamp</a>
@@ -191,6 +194,7 @@ This section provides details for each class and property defined by Web of Need
          <dd>
             <a href="#correspondingRemoteMessage"
                title="https://w3id.org/won/message#correspondingRemoteMessage">correspondingRemoteMessage</a>
+            <sup class="type-op" title="object property">op</sup>, <a href="#isResponseTo" title="https://w3id.org/won/message#isResponseTo">isResponseTo</a>
             <sup class="type-op" title="object property">op</sup>, <a href="#previousMessage" title="https://w3id.org/won/message#previousMessage">previousMessage</a>
             <sup class="type-op" title="object property">op</sup>
          </dd>
@@ -251,7 +255,9 @@ This section provides details for each class and property defined by Web of Need
          </dd>
          <dt>is in range of</dt>
          <dd>
-            <a href="#messageType" title="https://w3id.org/won/message#messageType">messageType</a>
+            <a href="#isResponseToMessageType"
+               title="https://w3id.org/won/message#isResponseToMessageType">isResponsToMessageType</a>
+            <sup class="type-op" title="object property">op</sup>, <a href="#messageType" title="https://w3id.org/won/message#messageType">messageType</a>
             <sup class="type-op" title="object property">op</sup>
          </dd>
          <dt>has members</dt>
@@ -338,6 +344,16 @@ This section provides details for each class and property defined by Web of Need
       </li>
       <li>
          <a href="#hintTargetSocket" title="https://w3id.org/won/message#hintTargetSocket">hintTargetSocket</a>
+      </li>
+      <li>
+         <a href="#isRemoteResponseTo" title="https://w3id.org/won/message#isRemoteResponseTo">isRemoteResponseTo</a>
+      </li>
+      <li>
+         <a href="#isResponseTo" title="https://w3id.org/won/message#isResponseTo">isResponseTo</a>
+      </li>
+      <li>
+         <a href="#isResponseToMessageType"
+            title="https://w3id.org/won/message#isResponseToMessageType">isResponsToMessageType</a>
       </li>
       <li>
          <a href="#messageType" title="https://w3id.org/won/message#messageType">messageType</a>
@@ -457,7 +473,7 @@ This section provides details for each class and property defined by Web of Need
       <p>
          <strong>IRI:</strong> https://w3id.org/won/message#correspondingRemoteMessage</p>
       <div class="comment">
-         <span class="markdown">Points to another message. Messages always exist in two copies: one on the sender's WoN node and one on the receiver's WoN node. The receiver's WoN node copies the message, mints a new URI for it and points to the original message using 'msg:correspondingRemoteMessage'.</span>
+         <span class="markdown">Points to another message. Messages always exist in two copies: one on the sender's WoN node and one on the receiver's WoN node. The receiver's WoN node copies the message, mints a new URI for it and points to the original message using `msg:correspondingRemoteMessage`.</span>
       </div>
       <div class="description">
          <dl>
@@ -494,6 +510,67 @@ This section provides details for each class and property defined by Web of Need
          <strong>IRI:</strong> https://w3id.org/won/message#hintTargetSocket</p>
       <div class="comment">
          <span class="markdown">The target Socket of a SocketHintMessage. By sending this message it is suggested to establish a connection between the recipientSocket and the targetSocket.</span>
+      </div>
+   </div>
+   <div class="entity" id="isRemoteResponseTo">
+      <h3>isRemoteResponseTo<sup class="type-op" title="object property">op</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#objectproperties">Object Property ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/message#isRemoteResponseTo</p>
+      <div class="comment">
+         <span class="markdown">Links a response message on the recipientAtom's WoN node to the original message on the senderAtom's WoN node,</span>
+      </div>
+   </div>
+   <div class="entity" id="isResponseTo">
+      <h3>isResponseTo<sup class="type-op" title="object property">op</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#objectproperties">Object Property ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/message#isResponseTo</p>
+      <div class="comment">
+         <span class="markdown">Links a SuccessResponse or a FailureResponse to the message it is responding to.</span>
+      </div>
+      <div class="description">
+         <dl>
+            <dt>has domain</dt>
+            <dd>
+               <a href="#Message" title="https://w3id.org/won/message#Message">Message</a>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
+            <dt>has range</dt>
+            <dd>
+               <a href="#Message" title="https://w3id.org/won/message#Message">Message</a>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
+         </dl>
+      </div>
+   </div>
+   <div class="entity" id="isResponseToMessageType">
+      <h3>isResponsToMessageType<sup class="type-op" title="object property">op</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#objectproperties">Object Property ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/message#isResponseToMessageType</p>
+      <div class="comment">
+         <span class="markdown">Used in a response message to indicate the messageType of the original message.</span>
+      </div>
+      <div class="description">
+         <dl>
+            <dt>has domain</dt>
+            <dd>
+               <a href="#Message" title="https://w3id.org/won/message#Message">Message</a>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
+            <dt>has range</dt>
+            <dd>
+               <a href="#MessageType" title="https://w3id.org/won/message#MessageType">MessageType</a>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
+         </dl>
       </div>
    </div>
    <div class="entity" id="messageType">

@@ -51,6 +51,16 @@ This ontology has the following classes and properties.</span>
       <a href="#hintTargetSocket" title="https://w3id.org/won/message#hintTargetSocket">hintTargetSocket</a>
    </li>
    <li>
+      <a href="#isRemoteResponseTo" title="https://w3id.org/won/message#isRemoteResponseTo">isRemoteResponseTo</a>
+   </li>
+   <li>
+      <a href="#isResponseTo" title="https://w3id.org/won/message#isResponseTo">isResponseTo</a>
+   </li>
+   <li>
+      <a href="#isResponseToMessageType"
+         title="https://w3id.org/won/message#isResponseToMessageType">isResponsToMessageType</a>
+   </li>
+   <li>
       <a href="#messageType" title="https://w3id.org/won/message#messageType">messageType</a>
    </li>
    <li>

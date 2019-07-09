@@ -77,7 +77,7 @@
 <https://w3id.org/won/message#correspondingRemoteMessage> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
 <https://w3id.org/won/message#correspondingRemoteMessage> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/message#Message> .
 <https://w3id.org/won/message#correspondingRemoteMessage> <http://www.w3.org/2000/01/rdf-schema#range> <https://w3id.org/won/message#Message> .
-<https://w3id.org/won/message#correspondingRemoteMessage> <http://www.w3.org/2000/01/rdf-schema#comment> "Points to another message. Messages always exist in two copies: one on the sender's WoN node and one on the receiver's WoN node. The receiver's WoN node copies the message, mints a new URI for it and points to the original message using 'msg:correspondingRemoteMessage'."@en .
+<https://w3id.org/won/message#correspondingRemoteMessage> <http://www.w3.org/2000/01/rdf-schema#comment> "Points to another message. Messages always exist in two copies: one on the sender's WoN node and one on the receiver's WoN node. The receiver's WoN node copies the message, mints a new URI for it and points to the original message using `msg:correspondingRemoteMessage`."@en .
 <https://w3id.org/won/message#correspondingRemoteMessage> <http://www.w3.org/2000/01/rdf-schema#label> "correspondingRemoteMessage" .
 # 
 # https://w3id.org/won/message#hintTargetAtom
@@ -89,6 +89,25 @@
 <https://w3id.org/won/message#hintTargetSocket> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
 <https://w3id.org/won/message#hintTargetSocket> <http://www.w3.org/2000/01/rdf-schema#comment> "The target Socket of a SocketHintMessage. By sending this message it is suggested to establish a connection between the recipientSocket and the targetSocket."@en .
 <https://w3id.org/won/message#hintTargetSocket> <http://www.w3.org/2000/01/rdf-schema#label> "hintTargetSocket" .
+# 
+# https://w3id.org/won/message#isRemoteResponseTo
+<https://w3id.org/won/message#isRemoteResponseTo> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+<https://w3id.org/won/message#isRemoteResponseTo> <http://www.w3.org/2000/01/rdf-schema#comment> "Links a response message on the recipientAtom's WoN node to the original message on the senderAtom's WoN node,"@en .
+<https://w3id.org/won/message#isRemoteResponseTo> <http://www.w3.org/2000/01/rdf-schema#label> "isRemoteResponseTo" .
+# 
+# https://w3id.org/won/message#isResponseTo
+<https://w3id.org/won/message#isResponseTo> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+<https://w3id.org/won/message#isResponseTo> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/message#Message> .
+<https://w3id.org/won/message#isResponseTo> <http://www.w3.org/2000/01/rdf-schema#range> <https://w3id.org/won/message#Message> .
+<https://w3id.org/won/message#isResponseTo> <http://www.w3.org/2000/01/rdf-schema#comment> "Links a SuccessResponse or a FailureResponse to the message it is responding to."@en .
+<https://w3id.org/won/message#isResponseTo> <http://www.w3.org/2000/01/rdf-schema#label> "isResponseTo" .
+# 
+# https://w3id.org/won/message#isResponseToMessageType
+<https://w3id.org/won/message#isResponseToMessageType> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+<https://w3id.org/won/message#isResponseToMessageType> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/message#Message> .
+<https://w3id.org/won/message#isResponseToMessageType> <http://www.w3.org/2000/01/rdf-schema#range> <https://w3id.org/won/message#MessageType> .
+<https://w3id.org/won/message#isResponseToMessageType> <http://www.w3.org/2000/01/rdf-schema#comment> "Used in a response message to indicate the messageType of the original message."@en .
+<https://w3id.org/won/message#isResponseToMessageType> <http://www.w3.org/2000/01/rdf-schema#label> "isResponsToMessageType" .
 # 
 # https://w3id.org/won/message#messageType
 <https://w3id.org/won/message#messageType> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
