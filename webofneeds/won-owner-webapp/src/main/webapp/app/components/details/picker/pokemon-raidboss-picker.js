@@ -235,7 +235,10 @@ function genComponentConf() {
         pokemon.name = entry.Pokemons[0].Name;
         pokemon.imageUrl = entry.Pokemons[0].PokemonPictureFileNameLink;
         pokemon.isShiny = entry.Pokemons[0].isShiny;
-        if (entry.Pokemons[0].HasForm) {
+        if (
+          entry.Pokemons[0].HasForm &&
+          entry.Pokemons[0].Form !== "Standardform"
+        ) {
           pokemon.form = entry.Pokemons[0].Form;
         }
 
