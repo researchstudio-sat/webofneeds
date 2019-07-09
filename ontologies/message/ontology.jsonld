@@ -262,6 +262,10 @@
 }, {
   "@id" : "https://w3id.org/won/message#ContentGraph",
   "@type" : [ "http://www.w3.org/2002/07/owl#Class" ],
+  "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
+    "@language" : "en",
+    "@value" : "The class of graphs that hold user-defined content."
+  } ],
   "http://www.w3.org/2000/01/rdf-schema#label" : [ {
     "@value" : "ContentGraph"
   } ],
@@ -459,6 +463,10 @@
 }, {
   "@id" : "https://w3id.org/won/message#containsEnvelope",
   "@type" : [ "http://www.w3.org/2002/07/owl#ObjectProperty" ],
+  "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
+    "@language" : "en",
+    "@value" : "Links an envelope to an envelope it 'contains'."
+  } ],
   "http://www.w3.org/2000/01/rdf-schema#domain" : [ {
     "@id" : "https://w3id.org/won/message#EnvelopeGraph"
   } ],
@@ -471,6 +479,10 @@
 }, {
   "@id" : "https://w3id.org/won/message#containsSignature",
   "@type" : [ "http://www.w3.org/2002/07/owl#ObjectProperty" ],
+  "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
+    "@language" : "en",
+    "@value" : "Links an envelope to a signature it 'contains'."
+  } ],
   "http://www.w3.org/2000/01/rdf-schema#domain" : [ {
     "@id" : "https://w3id.org/won/message#EnvelopeGraph"
   } ],
@@ -589,6 +601,10 @@
 }, {
   "@id" : "https://w3id.org/won/message#previousMessage",
   "@type" : [ "http://www.w3.org/2002/07/owl#ObjectProperty" ],
+  "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
+    "@language" : "en",
+    "@value" : "Links a message to an earlier one."
+  } ],
   "http://www.w3.org/2000/01/rdf-schema#domain" : [ {
     "@id" : "https://w3id.org/won/message#Message"
   } ],
@@ -601,6 +617,10 @@
 }, {
   "@id" : "https://w3id.org/won/message#protocolVersion",
   "@type" : [ "http://www.w3.org/2002/07/owl#DatatypeProperty" ],
+  "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
+    "@language" : "en",
+    "@value" : "Protocol version the message adheres to."
+  } ],
   "http://www.w3.org/2000/01/rdf-schema#domain" : [ {
     "@id" : "https://w3id.org/won/message#Message"
   } ],
@@ -774,6 +794,10 @@
 }, {
   "@id" : "https://w3id.org/won/message#signedGraph",
   "@type" : [ "http://www.w3.org/2002/07/owl#ObjectProperty" ],
+  "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
+    "@language" : "en",
+    "@value" : "Links a signature to the graph it signs."
+  } ],
   "http://www.w3.org/2000/01/rdf-schema#domain" : [ {
     "@id" : "http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature"
   } ],

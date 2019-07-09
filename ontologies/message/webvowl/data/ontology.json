@@ -191,24 +191,6 @@
         "undefined" : "OpenMessage"
       }
     }, {
-      "iri" : "https://w3id.org/won/message#DeactivateMessage",
-      "baseIri" : "https://w3id.org/won/message",
-      "annotations" : {
-        "isDefinedBy" : [ {
-          "identifier" : "isDefinedBy",
-          "language" : "undefined",
-          "value" : "https://w3id.org/won/message",
-          "type" : "iri"
-        } ]
-      },
-      "comment" : {
-        "en" : "Type of message that deactivates an Atom."
-      },
-      "labels" : {
-        "IRI-based" : "DeactivateMessage",
-        "undefined" : "DeactivateMessage"
-      }
-    }, {
       "iri" : "https://w3id.org/won/message#ActivateMessage",
       "baseIri" : "https://w3id.org/won/message",
       "annotations" : {
@@ -225,6 +207,24 @@
       "labels" : {
         "IRI-based" : "ActivateMessage",
         "undefined" : "ActivateMessage"
+      }
+    }, {
+      "iri" : "https://w3id.org/won/message#DeactivateMessage",
+      "baseIri" : "https://w3id.org/won/message",
+      "annotations" : {
+        "isDefinedBy" : [ {
+          "identifier" : "isDefinedBy",
+          "language" : "undefined",
+          "value" : "https://w3id.org/won/message",
+          "type" : "iri"
+        } ]
+      },
+      "comment" : {
+        "en" : "Type of message that deactivates an Atom."
+      },
+      "labels" : {
+        "IRI-based" : "DeactivateMessage",
+        "undefined" : "DeactivateMessage"
       }
     }, {
       "iri" : "https://w3id.org/won/message#ChangeNotificationMessage",
@@ -309,24 +309,6 @@
         "undefined" : "ConnectMessage"
       }
     }, {
-      "iri" : "https://w3id.org/won/message#CreateMessage",
-      "baseIri" : "https://w3id.org/won/message",
-      "annotations" : {
-        "isDefinedBy" : [ {
-          "identifier" : "isDefinedBy",
-          "language" : "undefined",
-          "value" : "https://w3id.org/won/message",
-          "type" : "iri"
-        } ]
-      },
-      "comment" : {
-        "en" : "Type of message sent to a WoN Node in order to create a new Atom."
-      },
-      "labels" : {
-        "IRI-based" : "CreateMessage",
-        "undefined" : "CreateMessage"
-      }
-    }, {
       "iri" : "https://w3id.org/won/message#AtomHintMessage",
       "baseIri" : "https://w3id.org/won/message",
       "annotations" : {
@@ -343,6 +325,24 @@
       "labels" : {
         "IRI-based" : "AtomHintMessage",
         "undefined" : "AtomHintMessage"
+      }
+    }, {
+      "iri" : "https://w3id.org/won/message#CreateMessage",
+      "baseIri" : "https://w3id.org/won/message",
+      "annotations" : {
+        "isDefinedBy" : [ {
+          "identifier" : "isDefinedBy",
+          "language" : "undefined",
+          "value" : "https://w3id.org/won/message",
+          "type" : "iri"
+        } ]
+      },
+      "comment" : {
+        "en" : "Type of message sent to a WoN Node in order to create a new Atom."
+      },
+      "labels" : {
+        "IRI-based" : "CreateMessage",
+        "undefined" : "CreateMessage"
       }
     }, {
       "iri" : "https://w3id.org/won/message#ConnectionMessage",
@@ -581,6 +581,9 @@
       "IRI-based" : "ContentGraph",
       "undefined" : "ContentGraph"
     },
+    "comment" : {
+      "en" : "The class of graphs that hold user-defined content."
+    },
     "id" : "19",
     "superClasses" : [ "15" ]
   }, {
@@ -714,6 +717,9 @@
       "undefined" : "containsSignature"
     },
     "domain" : "1",
+    "comment" : {
+      "en" : "Links an envelope to a signature it 'contains'."
+    },
     "attributes" : [ "object" ],
     "id" : "0"
   }, {
@@ -725,6 +731,9 @@
       "undefined" : "previousMessage"
     },
     "domain" : "4",
+    "comment" : {
+      "en" : "Links a message to an earlier one."
+    },
     "attributes" : [ "object" ],
     "id" : "5"
   }, {
@@ -799,6 +808,9 @@
       "undefined" : "signedGraph"
     },
     "domain" : "2",
+    "comment" : {
+      "en" : "Links a signature to the graph it signs."
+    },
     "attributes" : [ "object" ],
     "id" : "16"
   }, {
@@ -1007,6 +1019,9 @@
       "undefined" : "containsEnvelope"
     },
     "domain" : "1",
+    "comment" : {
+      "en" : "Links an envelope to an envelope it 'contains'."
+    },
     "attributes" : [ "object" ],
     "id" : "45"
   }, {
@@ -1042,6 +1057,9 @@
       "undefined" : "protocolVersion"
     },
     "domain" : "4",
+    "comment" : {
+      "en" : "Protocol version the message adheres to."
+    },
     "attributes" : [ "datatype" ],
     "id" : "50"
   }, {

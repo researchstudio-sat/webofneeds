@@ -66,6 +66,7 @@ If a message is sent to another Atom, a new Message URI is minted on that Atom's
 :containsEnvelope rdf:type owl:ObjectProperty ;
                   rdfs:domain :EnvelopeGraph ;
                   rdfs:range :EnvelopeGraph ;
+                  rdfs:comment "Links an envelope to an envelope it 'contains'."@en ;
                   rdfs:label "containsEnvelope" .
 
 
@@ -73,6 +74,7 @@ If a message is sent to another Atom, a new Message URI is minted on that Atom's
 :containsSignature rdf:type owl:ObjectProperty ;
                    rdfs:domain :EnvelopeGraph ;
                    rdfs:range <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature> ;
+                   rdfs:comment "Links an envelope to a signature it 'contains'."@en ;
                    rdfs:label "containsSignature" .
 
 
@@ -118,6 +120,7 @@ If a message is sent to another Atom, a new Message URI is minted on that Atom's
 :previousMessage rdf:type owl:ObjectProperty ;
                  rdfs:domain :Message ;
                  rdfs:range :Message ;
+                 rdfs:comment "Links a message to an earlier one."@en ;
                  rdfs:label "previousMessage" .
 
 
@@ -187,6 +190,7 @@ If a message is sent to another Atom, a new Message URI is minted on that Atom's
 :signedGraph rdf:type owl:ObjectProperty ;
              rdfs:domain <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature> ;
              rdfs:range :MessageGraph ;
+             rdfs:comment "Links a signature to the graph it signs."@en ;
              rdfs:label "signedGraph" .
 
 
@@ -214,6 +218,7 @@ If a message is sent to another Atom, a new Message URI is minted on that Atom's
 :protocolVersion rdf:type owl:DatatypeProperty ;
                  rdfs:domain :Message ;
                  rdfs:range xsd:string ;
+                 rdfs:comment "Protocol version the message adheres to."@en ;
                  rdfs:label "protocolVersion" .
 
 
@@ -264,6 +269,7 @@ If a message is sent to another Atom, a new Message URI is minted on that Atom's
 ###  https://w3id.org/won/message#ContentGraph
 :ContentGraph rdf:type owl:Class ;
               rdfs:subClassOf :MessageGraph ;
+              rdfs:comment "The class of graphs that hold user-defined content."@en ;
               rdfs:label "ContentGraph" .
 
 

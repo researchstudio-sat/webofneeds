@@ -114,6 +114,7 @@ If a message is sent to another Atom, a new Message URI is minted on that Atom&a
     <owl:ObjectProperty rdf:about="https://w3id.org/won/message#containsEnvelope">
         <rdfs:domain rdf:resource="https://w3id.org/won/message#EnvelopeGraph"/>
         <rdfs:range rdf:resource="https://w3id.org/won/message#EnvelopeGraph"/>
+        <rdfs:comment xml:lang="en">Links an envelope to an envelope it &apos;contains&apos;.</rdfs:comment>
         <rdfs:label>containsEnvelope</rdfs:label>
     </owl:ObjectProperty>
     
@@ -125,6 +126,7 @@ If a message is sent to another Atom, a new Message URI is minted on that Atom&a
     <owl:ObjectProperty rdf:about="https://w3id.org/won/message#containsSignature">
         <rdfs:domain rdf:resource="https://w3id.org/won/message#EnvelopeGraph"/>
         <rdfs:range rdf:resource="http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature"/>
+        <rdfs:comment xml:lang="en">Links an envelope to a signature it &apos;contains&apos;.</rdfs:comment>
         <rdfs:label>containsSignature</rdfs:label>
     </owl:ObjectProperty>
     
@@ -194,6 +196,7 @@ If a message is sent to another Atom, a new Message URI is minted on that Atom&a
     <owl:ObjectProperty rdf:about="https://w3id.org/won/message#previousMessage">
         <rdfs:domain rdf:resource="https://w3id.org/won/message#Message"/>
         <rdfs:range rdf:resource="https://w3id.org/won/message#Message"/>
+        <rdfs:comment xml:lang="en">Links a message to an earlier one.</rdfs:comment>
         <rdfs:label>previousMessage</rdfs:label>
     </owl:ObjectProperty>
     
@@ -297,6 +300,7 @@ If a message is sent to another Atom, a new Message URI is minted on that Atom&a
     <owl:ObjectProperty rdf:about="https://w3id.org/won/message#signedGraph">
         <rdfs:domain rdf:resource="http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature"/>
         <rdfs:range rdf:resource="https://w3id.org/won/message#MessageGraph"/>
+        <rdfs:comment xml:lang="en">Links a signature to the graph it signs.</rdfs:comment>
         <rdfs:label>signedGraph</rdfs:label>
     </owl:ObjectProperty>
     
@@ -344,6 +348,7 @@ If a message is sent to another Atom, a new Message URI is minted on that Atom&a
     <owl:DatatypeProperty rdf:about="https://w3id.org/won/message#protocolVersion">
         <rdfs:domain rdf:resource="https://w3id.org/won/message#Message"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <rdfs:comment xml:lang="en">Protocol version the message adheres to.</rdfs:comment>
         <rdfs:label>protocolVersion</rdfs:label>
     </owl:DatatypeProperty>
     
@@ -430,6 +435,7 @@ If a message is sent to another Atom, a new Message URI is minted on that Atom&a
 
     <owl:Class rdf:about="https://w3id.org/won/message#ContentGraph">
         <rdfs:subClassOf rdf:resource="https://w3id.org/won/message#MessageGraph"/>
+        <rdfs:comment xml:lang="en">The class of graphs that hold user-defined content.</rdfs:comment>
         <rdfs:label>ContentGraph</rdfs:label>
     </owl:Class>
     

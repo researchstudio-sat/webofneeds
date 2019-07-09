@@ -55,12 +55,14 @@
 <https://w3id.org/won/message#containsEnvelope> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
 <https://w3id.org/won/message#containsEnvelope> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/message#EnvelopeGraph> .
 <https://w3id.org/won/message#containsEnvelope> <http://www.w3.org/2000/01/rdf-schema#range> <https://w3id.org/won/message#EnvelopeGraph> .
+<https://w3id.org/won/message#containsEnvelope> <http://www.w3.org/2000/01/rdf-schema#comment> "Links an envelope to an envelope it 'contains'."@en .
 <https://w3id.org/won/message#containsEnvelope> <http://www.w3.org/2000/01/rdf-schema#label> "containsEnvelope" .
 # 
 # https://w3id.org/won/message#containsSignature
 <https://w3id.org/won/message#containsSignature> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
 <https://w3id.org/won/message#containsSignature> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/message#EnvelopeGraph> .
 <https://w3id.org/won/message#containsSignature> <http://www.w3.org/2000/01/rdf-schema#range> <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature> .
+<https://w3id.org/won/message#containsSignature> <http://www.w3.org/2000/01/rdf-schema#comment> "Links an envelope to a signature it 'contains'."@en .
 <https://w3id.org/won/message#containsSignature> <http://www.w3.org/2000/01/rdf-schema#label> "containsSignature" .
 # 
 # https://w3id.org/won/message#content
@@ -100,6 +102,7 @@
 <https://w3id.org/won/message#previousMessage> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
 <https://w3id.org/won/message#previousMessage> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/message#Message> .
 <https://w3id.org/won/message#previousMessage> <http://www.w3.org/2000/01/rdf-schema#range> <https://w3id.org/won/message#Message> .
+<https://w3id.org/won/message#previousMessage> <http://www.w3.org/2000/01/rdf-schema#comment> "Links a message to an earlier one."@en .
 <https://w3id.org/won/message#previousMessage> <http://www.w3.org/2000/01/rdf-schema#label> "previousMessage" .
 # 
 # https://w3id.org/won/message#recipient
@@ -170,6 +173,7 @@ _:genid5 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/19
 <https://w3id.org/won/message#signedGraph> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
 <https://w3id.org/won/message#signedGraph> <http://www.w3.org/2000/01/rdf-schema#domain> <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature> .
 <https://w3id.org/won/message#signedGraph> <http://www.w3.org/2000/01/rdf-schema#range> <https://w3id.org/won/message#MessageGraph> .
+<https://w3id.org/won/message#signedGraph> <http://www.w3.org/2000/01/rdf-schema#comment> "Links a signature to the graph it signs."@en .
 <https://w3id.org/won/message#signedGraph> <http://www.w3.org/2000/01/rdf-schema#label> "signedGraph" .
 # 
 # 
@@ -199,6 +203,7 @@ _:genid5 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/19
 <https://w3id.org/won/message#protocolVersion> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
 <https://w3id.org/won/message#protocolVersion> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/message#Message> .
 <https://w3id.org/won/message#protocolVersion> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/won/message#protocolVersion> <http://www.w3.org/2000/01/rdf-schema#comment> "Protocol version the message adheres to."@en .
 <https://w3id.org/won/message#protocolVersion> <http://www.w3.org/2000/01/rdf-schema#label> "protocolVersion" .
 # 
 # https://w3id.org/won/message#publicKeyFingerprint
@@ -246,6 +251,7 @@ _:genid5 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/19
 # https://w3id.org/won/message#ContentGraph
 <https://w3id.org/won/message#ContentGraph> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
 <https://w3id.org/won/message#ContentGraph> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <https://w3id.org/won/message#MessageGraph> .
+<https://w3id.org/won/message#ContentGraph> <http://www.w3.org/2000/01/rdf-schema#comment> "The class of graphs that hold user-defined content."@en .
 <https://w3id.org/won/message#ContentGraph> <http://www.w3.org/2000/01/rdf-schema#label> "ContentGraph" .
 # 
 # https://w3id.org/won/message#EnvelopeGraph
