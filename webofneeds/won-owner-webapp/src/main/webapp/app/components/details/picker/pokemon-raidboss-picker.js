@@ -204,7 +204,7 @@ function genComponentConf() {
 
     getCurrentPokemon() {
       // TODO: change this URL for any live system
-      const url = "http://localhost:1234/current";
+      const url = "https://pokemon.socialmicrolearning.com/current";
 
       return fetch(url)
         .then(response => {
