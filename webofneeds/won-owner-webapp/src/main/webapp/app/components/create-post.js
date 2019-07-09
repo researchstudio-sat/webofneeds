@@ -96,14 +96,15 @@ function genComponentConf() {
                 on-scroll="::self.scrollIntoView(element)">
             </won-create-isseeks>
         </div>
-        <div class="cp__footer" >
+        <div class="cp__footer" ng-if="self.initialLoadFinished">
             <won-labelled-hr label="::'done?'" class="cp__footer__labelledhr"></won-labelled-hr>
             <won-elm
               module="self.publishButton"
               props="{
                 buttonEnabled: self.isValid(),
                 showPersonas: self.isHoldable && self.loggedIn,
-                personas: self.personas
+                personas: self.personas,
+                presetHolderUri: self.isHolderAtomValid ? self.holderUri : undefined,
               }"
               on-publish="self.publish(personaId)"
               ng-if="self.showCreateInput && !self.isEditFromAtom">
@@ -222,8 +223,19 @@ function genComponentConf() {
           useCase = useCaseUtils.getUseCase(useCaseString);
         }
 
+        const holderUri = generalSelectors.getHolderUriFromRoute(state);
+        const isHolderOwned = accountUtils.isAtomOwned(
+          get(state, "account"),
+          holderUri
+        );
+        const holderAtom = isHolderOwned && getIn(state, ["atoms", holderUri]);
+        const isHolderAtomValid =
+          holderAtom && atomUtils.hasHolderSocket(holderAtom);
+
         return {
           loggedIn: accountUtils.isLoggedIn(get(state, "account")),
+          holderUri,
+          isHolderAtomValid,
           connectToAtomUri,
           processingPublish: state.getIn(["process", "processingPublish"]),
           connectionHasBeenLost: !generalSelectors.selectIsConnected(state),
