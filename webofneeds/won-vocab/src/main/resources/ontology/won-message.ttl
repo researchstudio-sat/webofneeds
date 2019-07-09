@@ -67,6 +67,7 @@ vann:preferredNamespacePrefix rdf:type owl:AnnotationProperty .
 :containsEnvelope rdf:type owl:ObjectProperty ;
                   rdfs:domain :EnvelopeGraph ;
                   rdfs:range :EnvelopeGraph ;
+                  rdfs:comment "Links an envelope to an envelope it 'contains'."@en ;
                   rdfs:label "containsEnvelope" .
 
 
@@ -74,6 +75,7 @@ vann:preferredNamespacePrefix rdf:type owl:AnnotationProperty .
 :containsSignature rdf:type owl:ObjectProperty ;
                    rdfs:domain :EnvelopeGraph ;
                    rdfs:range sig:Signature ;
+                   rdfs:comment "Links an envelope to a signature it 'contains'."@en ;
                    rdfs:label "containsSignature" .
 
 
@@ -119,6 +121,7 @@ vann:preferredNamespacePrefix rdf:type owl:AnnotationProperty .
 :previousMessage rdf:type owl:ObjectProperty ;
                  rdfs:domain :Message ;
                  rdfs:range :Message ;
+                 rdfs:comment "Links a message to an earlier one."@en ;
                  rdfs:label "previousMessage" .
 
 
@@ -188,6 +191,7 @@ vann:preferredNamespacePrefix rdf:type owl:AnnotationProperty .
 :signedGraph rdf:type owl:ObjectProperty ;
              rdfs:domain sig:Signature ;
              rdfs:range :MessageGraph ;
+             rdfs:comment "Links a signature to the graph it signs."@en ;
              rdfs:label "signedGraph" .
 
 
@@ -215,6 +219,7 @@ vann:preferredNamespacePrefix rdf:type owl:AnnotationProperty .
 :protocolVersion rdf:type owl:DatatypeProperty ;
                  rdfs:domain :Message ;
                  rdfs:range xsd:string ;
+                 rdfs:comment "Protocol version the message adheres to."@en ;
                  rdfs:label "protocolVersion" .
 
 
@@ -265,6 +270,7 @@ won:Node rdf:type owl:Class .
 ###  https://w3id.org/won/message#ContentGraph
 :ContentGraph rdf:type owl:Class ;
               rdfs:subClassOf :MessageGraph ;
+              rdfs:comment "The class of graphs that hold user-defined content."@en ;
               rdfs:label "ContentGraph" .
 
 
