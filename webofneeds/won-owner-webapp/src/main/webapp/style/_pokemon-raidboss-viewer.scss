@@ -46,6 +46,7 @@ pokemon-raidboss-viewer {
     }
 
     .prbv__content__expires {
+      grid-area: prbv_expires;
       background-color: $won-lighter-gray;
       padding: 0.25rem;
       color: var(--won-subtitle-gray);
