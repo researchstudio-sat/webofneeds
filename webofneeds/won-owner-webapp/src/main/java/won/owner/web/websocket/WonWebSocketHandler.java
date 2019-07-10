@@ -286,10 +286,17 @@ public class WonWebSocketHandler extends TextWebSocketHandler
             String wonMessageJsonLdString = WonMessageEncoder.encodeAsJsonLd(wonMessage);
             WebSocketMessage<String> webSocketMessage = new TextMessage(wonMessageJsonLdString);
             URI atomUri = getOwnedAtomURI(wonMessage);
-            User user = getUserForWonMessage(wonMessage);
+            Set<WebSocketSession> webSocketSessions = webSocketSessionService.getWebSocketSessions(atomUri);
+            Optional<User> userOpt = webSocketSessions == null ? Optional.empty()
+                            : webSocketSessions.stream().filter(s -> s.isOpen()).findFirst()
+                                            .map(s -> getUserForSession(s));
+            if (!userOpt.isPresent()) {
+                userOpt = Optional.ofNullable(getUserForWonMessage(wonMessage));
+            }
+            User user = userOpt.get();
             updateUserAtomAssociation(wonMessage, user);
             notifyPerPush(user, atomUri, wonMessage);
-            Set<WebSocketSession> webSocketSessions = findWebSocketSessionsForAtomAndUser(atomUri, user);
+            webSocketSessions = findWebSocketSessionsForAtomAndUser(atomUri, user);
             // check if we can deliver the message. If not, send email.
             if (webSocketSessions.size() == 0) {
                 logger.debug("cannot deliver message of type {} for atom {}, receiver {}: no websocket session found. Trying to send message by email.",
