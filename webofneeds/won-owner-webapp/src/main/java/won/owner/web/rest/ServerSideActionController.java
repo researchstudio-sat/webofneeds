@@ -3,6 +3,7 @@ package won.owner.web.rest;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,7 +54,7 @@ public class ServerSideActionController {
             return new ResponseEntity("Cannot process connect action: too many sockets specified to be connected.",
                             HttpStatus.CONFLICT);
         }
-        List<UserAtom> atoms = user.getUserAtoms();
+        Set<UserAtom> atoms = user.getUserAtoms();
         // keep sockets we can't process:
         Optional<SocketToConnect> problematicSocket = sockets.stream().filter(socket -> {
             // return false (not problematic) if the socket is pending (i.e., the atom it

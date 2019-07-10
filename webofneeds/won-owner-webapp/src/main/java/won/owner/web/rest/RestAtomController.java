@@ -15,7 +15,12 @@ import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.jena.query.Dataset;
@@ -35,6 +40,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+
 import won.owner.model.Draft;
 import won.owner.model.User;
 import won.owner.model.UserAtom;
@@ -75,7 +81,7 @@ public class RestAtomController {
     @RequestMapping(value = { "/", "" }, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
     public Map<URI, AtomPojo> getAllAtomsOfUser(@RequestParam(value = "state", required = false) AtomState state) {
         User user = getCurrentUser();
-        List<UserAtom> userAtoms = user.getUserAtoms();
+        Set<UserAtom> userAtoms = user.getUserAtoms();
         Map<URI, AtomPojo> atomMap = new HashMap<>();
         for (UserAtom userAtom : userAtoms) {
             if (state == null || state.equals(userAtom.getState())) {
