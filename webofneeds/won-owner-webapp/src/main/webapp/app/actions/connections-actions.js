@@ -33,18 +33,18 @@ export function connectionsChatMessageClaimOnSuccess(
   connectionUri
 ) {
   return (dispatch, getState) => {
-    const ownedAtom = getState()
-      .get("atoms")
-      .find(atom => atom.getIn(["connections", connectionUri]));
-    const theirAtomUri = getState().getIn([
+    const ownedAtom = get(getState(), "atoms").find(atom =>
+      getIn(atom, ["connections", connectionUri])
+    );
+    const theirAtomUri = getIn(getState(), [
       "atoms",
-      ownedAtom.get("uri"),
+      get(ownedAtom, "uri"),
       "connections",
       connectionUri,
       "targetAtomUri",
     ]);
-    const theirAtom = getState().getIn(["atoms", theirAtomUri]);
-    const theirConnectionUri = ownedAtom.getIn([
+    const theirAtom = getIn(getState(), ["atoms", theirAtomUri]);
+    const theirConnectionUri = getIn(ownedAtom, [
       "connections",
       connectionUri,
       "targetConnectionUri",
@@ -55,10 +55,10 @@ export function connectionsChatMessageClaimOnSuccess(
       additionalContent: additionalContent,
       referencedContentUris: undefined,
       connectionUri,
-      ownedAtomUri: ownedAtom.get("uri"),
+      ownedAtomUri: get(ownedAtom, "uri"),
       theirAtomUri: theirAtomUri,
-      ownNodeUri: ownedAtom.get("nodeUri"),
-      theirNodeUri: theirAtom.get("nodeUri"),
+      ownNodeUri: get(ownedAtom, "nodeUri"),
+      theirNodeUri: get(theirAtom, "nodeUri"),
       theirConnectionUri,
       isTTL: false,
     })
@@ -99,18 +99,18 @@ export function connectionsChatMessage(
   isTTL = false
 ) {
   return (dispatch, getState) => {
-    const ownedAtom = getState()
-      .get("atoms")
-      .find(atom => atom.getIn(["connections", connectionUri]));
-    const theirAtomUri = getState().getIn([
+    const ownedAtom = get(getState(), "atoms").find(atom =>
+      getIn(atom, ["connections", connectionUri])
+    );
+    const theirAtomUri = getIn(getState(), [
       "atoms",
-      ownedAtom.get("uri"),
+      get(ownedAtom, "uri"),
       "connections",
       connectionUri,
       "targetAtomUri",
     ]);
-    const theirAtom = getState().getIn(["atoms", theirAtomUri]);
-    const theirConnectionUri = ownedAtom.getIn([
+    const theirAtom = getIn(getState(), ["atoms", theirAtomUri]);
+    const theirConnectionUri = getIn(ownedAtom, [
       "connections",
       connectionUri,
       "targetConnectionUri",
@@ -126,7 +126,7 @@ export function connectionsChatMessage(
         let contentUris = [];
 
         referencedMessages.map(msg => {
-          const correctUri = msg.get("remoteUri") || msg.get("uri");
+          const correctUri = get(msg, "remoteUri") || get(msg, "uri");
           if (correctUri) contentUris.push({ "@id": correctUri });
           //THE PARTS BELOW SHOULD NOT BE CALLED WITHIN THIS DISPATCH
           switch (key) {
@@ -134,9 +134,9 @@ export function connectionsChatMessage(
               dispatch({
                 type: actionTypes.messages.messageStatus.markAsRetracted,
                 payload: {
-                  messageUri: msg.get("uri"),
+                  messageUri: get(msg, "uri"),
                   connectionUri: connectionUri,
-                  atomUri: ownedAtom.get("uri"),
+                  atomUri: get(ownedAtom, "uri"),
                   retracted: true,
                 },
               });
@@ -145,9 +145,9 @@ export function connectionsChatMessage(
               dispatch({
                 type: actionTypes.messages.messageStatus.markAsRejected,
                 payload: {
-                  messageUri: msg.get("uri"),
+                  messageUri: get(msg, "uri"),
                   connectionUri: connectionUri,
-                  atomUri: ownedAtom.get("uri"),
+                  atomUri: get(ownedAtom, "uri"),
                   rejected: true,
                 },
               });
@@ -157,9 +157,9 @@ export function connectionsChatMessage(
                 type:
                   actionTypes.messages.messageStatus.markAsCancellationPending,
                 payload: {
-                  messageUri: msg.get("uri"),
+                  messageUri: get(msg, "uri"),
                   connectionUri: connectionUri,
-                  atomUri: ownedAtom.get("uri"),
+                  atomUri: get(ownedAtom, "uri"),
                   cancellationPending: true,
                 },
               });
@@ -168,9 +168,9 @@ export function connectionsChatMessage(
               dispatch({
                 type: actionTypes.messages.messageStatus.markAsAccepted,
                 payload: {
-                  messageUri: msg.get("uri"),
+                  messageUri: get(msg, "uri"),
                   connectionUri: connectionUri,
-                  atomUri: ownedAtom.get("uri"),
+                  atomUri: get(ownedAtom, "uri"),
                   accepted: true,
                 },
               });
@@ -179,9 +179,9 @@ export function connectionsChatMessage(
               dispatch({
                 type: actionTypes.messages.messageStatus.markAsClaimed,
                 payload: {
-                  messageUri: msg.get("uri"),
+                  messageUri: get(msg, "uri"),
                   connectionUri: connectionUri,
-                  atomUri: ownedAtom.get("uri"),
+                  atomUri: get(ownedAtom, "uri"),
                   claimed: true,
                 },
               });
@@ -190,9 +190,9 @@ export function connectionsChatMessage(
               dispatch({
                 type: actionTypes.messages.messageStatus.markAsProposed,
                 payload: {
-                  messageUri: msg.get("uri"),
+                  messageUri: get(msg, "uri"),
                   connectionUri: connectionUri,
-                  atomUri: ownedAtom.get("uri"),
+                  atomUri: get(ownedAtom, "uri"),
                   proposed: true,
                 },
               });
@@ -211,10 +211,10 @@ export function connectionsChatMessage(
       additionalContent: additionalContent,
       referencedContentUris: referencedContentUris,
       connectionUri,
-      ownedAtomUri: ownedAtom.get("uri"),
+      ownedAtomUri: get(ownedAtom, "uri"),
       theirAtomUri: theirAtomUri,
-      ownNodeUri: ownedAtom.get("nodeUri"),
-      theirNodeUri: theirAtom.get("nodeUri"),
+      ownNodeUri: get(ownedAtom, "nodeUri"),
+      theirNodeUri: get(theirAtom, "nodeUri"),
       theirConnectionUri,
       isTTL,
     })
@@ -251,18 +251,18 @@ export function connectionsChatMessage(
 
 export function connectionsOpen(connectionUri, textMessage) {
   return async (dispatch, getState) => {
-    const ownedAtom = getState()
-      .get("atoms")
-      .find(atom => atom.getIn(["connections", connectionUri]));
-    const theirAtomUri = getState().getIn([
+    const ownedAtom = get(getState(), "atoms").find(atom =>
+      getIn(atom, ["connections", connectionUri])
+    );
+    const theirAtomUri = getIn(getState(), [
       "atoms",
-      ownedAtom.get("uri"),
+      get(ownedAtom, "uri"),
       "connections",
       connectionUri,
       "targetAtomUri",
     ]);
-    const theirAtom = getState().getIn(["atoms", theirAtomUri]);
-    const theirConnectionUri = ownedAtom.getIn([
+    const theirAtom = getIn(getState(), ["atoms", theirAtomUri]);
+    const theirConnectionUri = getIn(ownedAtom, [
       "connections",
       connectionUri,
       "targetConnectionUri",
@@ -270,10 +270,10 @@ export function connectionsOpen(connectionUri, textMessage) {
 
     const openMsg = await buildOpenMessage(
       connectionUri,
-      ownedAtom.get("uri"),
+      get(ownedAtom, "uri"),
       theirAtomUri,
-      ownedAtom.get("nodeUri"),
-      theirAtom.get("nodeUri"),
+      get(ownedAtom, "nodeUri"),
+      get(theirAtom, "nodeUri"),
       theirConnectionUri,
       textMessage
     );
@@ -414,7 +414,7 @@ function connectReactionAtom(
         ownedAtomUri: atomUri,
         theirAtomUri: connectToAtomUri,
         ownNodeUri: nodeUri,
-        theirNodeUri: connectToAtom.get("nodeUri"),
+        theirNodeUri: get(connectToAtom, "nodeUri"),
         connectMessage: "",
       });
 
@@ -502,7 +502,7 @@ function connectAdHoc(
       ownedAtomUri: atomUri,
       theirAtomUri: theirAtomUri,
       ownNodeUri: nodeUri,
-      theirNodeUri: theirAtom.get("nodeUri"),
+      theirNodeUri: get(theirAtom, "nodeUri"),
       connectMessage: textMessage,
     });
 
@@ -553,18 +553,18 @@ function connectAdHoc(
 
 export function connectionsClose(connectionUri) {
   return (dispatch, getState) => {
-    const ownedAtom = getState()
-      .get("atoms")
-      .find(atom => atom.getIn(["connections", connectionUri]));
-    const theirAtomUri = getState().getIn([
+    const ownedAtom = get(getState(), "atoms").find(atom =>
+      getIn(atom, ["connections", connectionUri])
+    );
+    const theirAtomUri = getIn(getState(), [
       "atoms",
-      ownedAtom.get("uri"),
+      get(ownedAtom, "uri"),
       "connections",
       connectionUri,
       "targetAtomUri",
     ]);
-    const theirAtom = getState().getIn(["atoms", theirAtomUri]);
-    const theirConnectionUri = ownedAtom.getIn([
+    const theirAtom = getIn(getState(), ["atoms", theirAtomUri]);
+    const theirConnectionUri = getIn(ownedAtom, [
       "connections",
       connectionUri,
       "targetConnectionUri",
@@ -572,10 +572,10 @@ export function connectionsClose(connectionUri) {
 
     buildCloseMessage(
       connectionUri,
-      ownedAtom.get("uri"),
+      get(ownedAtom, "uri"),
       theirAtomUri,
-      ownedAtom.get("nodeUri"),
-      theirAtom.get("nodeUri"),
+      get(ownedAtom, "nodeUri"),
+      get(theirAtom, "nodeUri"),
       theirConnectionUri
     ).then(({ eventUri, message }) => {
       dispatch({
@@ -621,18 +621,18 @@ export function connectionsRate(connectionUri, rating) {
   return (dispatch, getState) => {
     const state = getState();
 
-    const ownedAtom = state
-      .get("atoms")
-      .find(atom => atom.getIn(["connections", connectionUri]));
-    const theirAtomUri = state.getIn([
+    const ownedAtom = get(state, "atoms").find(atom =>
+      getIn(atom, ["connections", connectionUri])
+    );
+    const theirAtomUri = getIn(state, [
       "atoms",
-      ownedAtom.get("uri"),
+      get(ownedAtom, "uri"),
       "connections",
       connectionUri,
       "targetAtomUri",
     ]);
-    const theirAtom = state.getIn(["atoms", theirAtomUri]);
-    const theirConnectionUri = ownedAtom.getIn([
+    const theirAtom = getIn(state, ["atoms", theirAtomUri]);
+    const theirConnectionUri = getIn(ownedAtom, [
       "connections",
       connectionUri,
       "targetConnectionUri",
@@ -640,17 +640,17 @@ export function connectionsRate(connectionUri, rating) {
 
     won
       .getConnectionWithEventUris(connectionUri, {
-        requesterWebId: ownedAtom.get("uri"),
+        requesterWebId: get(ownedAtom, "uri"),
       })
       .then(connection => {
         let msgToRateFor = { connection: connection };
 
         return buildRateMessage(
           msgToRateFor,
-          ownedAtom.get("uri"),
+          get(ownedAtom, "uri"),
           theirAtomUri,
-          ownedAtom.get("nodeUri"),
-          theirAtom.get("nodeUri"),
+          get(ownedAtom, "nodeUri"),
+          get(theirAtom, "nodeUri"),
           theirConnectionUri,
           rating
         );
@@ -688,7 +688,7 @@ export function showLatestMessages(connectionUriParam, numberOfEvents) {
     const atom =
       connectionUri &&
       generalSelectors.getOwnedAtomByConnectionUri(state, connectionUri);
-    const atomUri = atom && atom.get("uri");
+    const atomUri = get(atom, "uri");
     const connection =
       connectionUri && getOwnedConnectionByUri(state, connectionUri);
     const processState = get(state, "process");
@@ -701,35 +701,19 @@ export function showLatestMessages(connectionUriParam, numberOfEvents) {
       return Promise.resolve(); //only load if not already started and connection itself not loading
     }
 
-    dispatch({
-      type: actionTypes.connections.fetchMessagesStart,
-      payload: Immutable.fromJS({ connectionUri: connectionUri }),
-    });
-
     const fetchParams = {
       requesterWebId: atomUri,
       pagingSize: numOfEvts2pageSize(numberOfEvents),
       deep: true,
     };
-    return won
-      .getConnectionWithEventUris(connectionUri, fetchParams)
-      .then(connection =>
-        getMessageUrisToLoad(
-          dispatch,
-          state,
-          connection,
-          connectionUri,
-          numberOfEvents
-        )
-      )
-      .then(eventUris => {
-        return urisToLookupSuccessAndFailedMap(
-          eventUris,
-          eventUri => won.getWonMessage(eventUri, { requesterWebId: atomUri }),
-          []
-        );
-      })
-      .then(events => storeMessages(dispatch, events, connectionUri));
+    return fetchMessages(
+      dispatch,
+      state,
+      connectionUri,
+      atomUri,
+      numberOfEvents,
+      fetchParams
+    );
   };
 }
 
@@ -742,7 +726,7 @@ export function loadLatestMessagesOfConnection({
   const atom =
     connectionUri &&
     generalSelectors.getOwnedAtomByConnectionUri(state, connectionUri);
-  const atomUri = atom && atom.get("uri");
+  const atomUri = get(atom, "uri");
   const connection =
     connectionUri && getOwnedConnectionByUri(state, connectionUri);
   const processState = get(state, "process");
@@ -755,36 +739,20 @@ export function loadLatestMessagesOfConnection({
     return Promise.resolve(); //only load if not already started and connection itself not loading
   }
 
-  dispatch({
-    type: actionTypes.connections.fetchMessagesStart,
-    payload: Immutable.fromJS({ connectionUri: connectionUri }),
-  });
-
   const fetchParams = {
     requesterWebId: atomUri,
     pagingSize: numOfEvts2pageSize(numberOfEvents),
     deep: true,
   };
 
-  return won
-    .getConnectionWithEventUris(connectionUri, fetchParams)
-    .then(connection =>
-      getMessageUrisToLoad(
-        dispatch,
-        state,
-        connection,
-        connectionUri,
-        numberOfEvents
-      )
-    )
-    .then(eventUris => {
-      return urisToLookupSuccessAndFailedMap(
-        eventUris,
-        eventUri => won.getWonMessage(eventUri, { requesterWebId: atomUri }),
-        []
-      );
-    })
-    .then(events => storeMessages(dispatch, events, connectionUri));
+  fetchMessages(
+    dispatch,
+    state,
+    connectionUri,
+    atomUri,
+    numberOfEvents,
+    fetchParams
+  );
 }
 
 /**
@@ -806,9 +774,9 @@ export function showMoreMessages(connectionUriParam, numberOfEvents) {
     const atom =
       connectionUri &&
       generalSelectors.getOwnedAtomByConnectionUri(state, connectionUri);
-    const atomUri = atom && atom.get("uri");
-    const connection = atom && atom.getIn(["connections", connectionUri]);
-    const connectionMessages = connection && connection.get("messages");
+    const atomUri = get(atom, "uri");
+    const connection = getIn(atom, ["connections", connectionUri]);
+    const connectionMessages = get(connection, "messages");
     const processState = get(state, "process");
     if (
       !connection ||
@@ -821,16 +789,11 @@ export function showMoreMessages(connectionUriParam, numberOfEvents) {
     // determine the oldest loaded event
     const sortedConnectionMessages = connectionMessages
       .valueSeq()
-      .sort((msg1, msg2) => msg1.get("date") - msg2.get("date"));
-    const oldestMessage = sortedConnectionMessages.first();
+      .sort((msg1, msg2) => get(msg1, "date") - get(msg2, "date"));
 
+    const oldestMessageUri = get(sortedConnectionMessages.first(), "uri");
     const messageHashValue =
-      oldestMessage &&
-      oldestMessage.get("uri").replace(/.*\/event\/(.*)/, "$1"); // everything following the `/event/`
-    dispatch({
-      type: actionTypes.connections.fetchMessagesStart,
-      payload: Immutable.fromJS({ connectionUri }),
-    });
+      oldestMessageUri && oldestMessageUri.replace(/.*\/event\/(.*)/, "$1"); // everything following the `/event/`
 
     const fetchParams = {
       requesterWebId: atomUri,
@@ -839,26 +802,49 @@ export function showMoreMessages(connectionUriParam, numberOfEvents) {
       resumebefore: messageHashValue,
     };
 
-    won
-      .getConnectionWithEventUris(connectionUri, fetchParams)
-      .then(connection =>
-        getMessageUrisToLoad(
-          dispatch,
-          state,
-          connection,
-          connectionUri,
-          numberOfEvents
-        )
-      )
-      .then(eventUris => {
-        return urisToLookupSuccessAndFailedMap(
-          eventUris,
-          eventUri => won.getWonMessage(eventUri, { requesterWebId: atomUri }),
-          []
-        );
-      })
-      .then(events => storeMessages(dispatch, events, connectionUri));
+    return fetchMessages(
+      dispatch,
+      state,
+      connectionUri,
+      atomUri,
+      numberOfEvents,
+      fetchParams
+    );
   };
+}
+
+async function fetchMessages(
+  dispatch,
+  state,
+  connectionUri,
+  atomUri,
+  numberOfEvents,
+  fetchParams
+) {
+  dispatch({
+    type: actionTypes.connections.fetchMessagesStart,
+    payload: Immutable.fromJS({ connectionUri: connectionUri }),
+  });
+
+  return won
+    .getConnectionWithEventUris(connectionUri, fetchParams)
+    .then(connection =>
+      getMessageUrisToLoad(
+        dispatch,
+        state,
+        connection,
+        connectionUri,
+        numberOfEvents
+      )
+    )
+    .then(eventUris => {
+      return urisToLookupSuccessAndFailedMap(
+        eventUris,
+        eventUri => won.getWonMessage(eventUri, { requesterWebId: atomUri }),
+        []
+      );
+    })
+    .then(events => storeMessages(dispatch, events, connectionUri));
 }
 
 async function getMessageUrisToLoad(
@@ -900,23 +886,25 @@ async function getMessageUrisToLoad(
 function storeMessages(dispatch, messages, connectionUri) {
   if (messages) {
     const messagesImm = Immutable.fromJS(messages);
+    const successMessages = get(messagesImm, "success");
+    const failedMessages = get(messagesImm, "failed");
 
-    if (messagesImm.get("success").size > 0) {
+    if (successMessages.size > 0) {
       dispatch({
         type: actionTypes.connections.fetchMessagesSuccess,
         payload: Immutable.fromJS({
           connectionUri: connectionUri,
-          events: messagesImm.get("success"),
+          events: successMessages,
         }),
       });
     }
 
-    if (messagesImm.get("failed").size > 0) {
+    if (failedMessages.size > 0) {
       dispatch({
         type: actionTypes.connections.fetchMessagesFailed,
         payload: Immutable.fromJS({
           connectionUri: connectionUri,
-          events: messagesImm.get("failed"),
+          events: failedMessages,
         }),
       });
     }
@@ -925,10 +913,7 @@ function storeMessages(dispatch, messages, connectionUri) {
     we can ensure that there is not going to be a lock on the connection because loadingMessages was complete but never
     reset its status
     */
-    if (
-      messagesImm.get("success").size == 0 &&
-      messagesImm.get("failed").size == 0
-    ) {
+    if (successMessages.size == 0 && failedMessages.size == 0) {
       dispatch({
         type: actionTypes.connections.fetchMessagesEnd,
         payload: Immutable.fromJS({ connectionUri: connectionUri }),
@@ -958,15 +943,18 @@ function limitNumberOfEventsToFetchInConnection(
 ) {
   const connectionImm = Immutable.fromJS(connection);
 
-  const allMessagesToLoad = state
-    .getIn(["process", "connections", connectionUri, "messages"])
-    .filter(msg => msg.get("toLoad") && !msg.get("failedToLoad"));
+  const allMessagesToLoad = getIn(state, [
+    "process",
+    "connections",
+    connectionUri,
+    "messages",
+  ]).filter(msg => get(msg, "toLoad") && !get(msg, "failedToLoad"));
   let messagesToFetch = [];
 
   const fetchedConnectionEvents =
     connectionImm &&
-    connectionImm.get("hasEvents") &&
-    connectionImm.get("hasEvents").filter(eventUri => !!eventUri); //Filter out undefined/null values
+    get(connectionImm, "hasEvents") &&
+    get(connectionImm, "hasEvents").filter(eventUri => !!eventUri); //Filter out undefined/null values
 
   if (fetchedConnectionEvents && fetchedConnectionEvents.size > 0) {
     fetchedConnectionEvents.map(eventUri => {
