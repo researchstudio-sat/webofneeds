@@ -383,7 +383,7 @@ public class WonWebSocketHandler extends TextWebSocketHandler
                     if (wonMessage.getRecipientURI() != null) {
                         rootNode.put("connectionUri", wonMessage.getRecipientURI().toString());
                     } else {
-                        logger.info("received SocketHint for atom {} without recipientURI", userAtom.getUri());
+                        logger.warn("received SocketHint for atom {} without recipientURI", userAtom.getUri());
                     }
                     rootNode.put("icon", iconUrl);
                     String stringifiedJson;
