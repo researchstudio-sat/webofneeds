@@ -672,7 +672,7 @@ public class WonWebSocketHandler extends TextWebSocketHandler
         // reload the user so we can save it
         // (the user object we get from getUserForSession is detached)
         user = userRepository.findOne(user.getId());
-        userAtomRepository.save(userAtom);
+        userAtom = userAtomRepository.save(userAtom);
         logger.debug("saved user atom {}", userAtom.getId());
         user.addAtomUri(userAtom);
         userRepository.save(user);
