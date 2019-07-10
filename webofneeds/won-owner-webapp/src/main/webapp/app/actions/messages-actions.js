@@ -152,10 +152,7 @@ export function successfulEdit(event) {
 
     const processState = get(getState(), "process");
 
-    if (
-      processUtils.isAtomLoading(processState, atomURI) ||
-      processUtils.isAtomProcessingUpdate(processState, atomURI)
-    ) {
+    if (processUtils.isAtomLoading(processState, atomURI)) {
       console.debug(
         "successfulEdit: Atom is currently loading DO NOT FETCH AGAIN"
       );
