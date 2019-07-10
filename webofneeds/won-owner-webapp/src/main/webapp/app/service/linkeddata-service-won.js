@@ -137,6 +137,7 @@ import won from "./won.js";
   };
 
   won.clearStoreWithPromise = async function() {
+    //TODO: CHECK IF THERE ARE CURRENTLY LOCKS IN PLACE
     won.clearStore();
   };
 

@@ -6,7 +6,7 @@ import Immutable from "immutable";
 import won from "../../won-es6.js";
 import { msStringToDate, getIn, get } from "../../utils.js";
 import {
-  addAtomStubs,
+  addAtomStub,
   addAtom,
   addAtomInCreation,
   addMetaAtomStubs,
@@ -66,9 +66,9 @@ export default function(allAtomsInState = initialState, action = {}) {
       return addMetaAtomStubs(allAtomsInState, action.payload.get("metaAtoms"));
     }
 
-    case actionTypes.personas.storeTheirUrisInLoading:
-    case actionTypes.atoms.storeTheirUrisInLoading: {
-      return addAtomStubs(allAtomsInState, action.payload.get("uris"));
+    case actionTypes.personas.storeUriInLoading:
+    case actionTypes.atoms.storeUriInLoading: {
+      return addAtomStub(allAtomsInState, action.payload.get("uri"));
     }
 
     case actionTypes.atoms.storeOwned:

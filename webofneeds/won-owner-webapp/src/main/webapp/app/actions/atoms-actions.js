@@ -19,7 +19,8 @@ import * as stateStore from "../redux/state-store.js";
 import { get } from "../utils.js";
 
 export function fetchUnloadedAtom(atomUri) {
-  return dispatch => stateStore.fetchDataForNonOwnedAtomOnly(atomUri, dispatch);
+  return (dispatch, getState) =>
+    stateStore.fetchDataForNonOwnedAtomOnly(atomUri, dispatch, getState);
 }
 
 //ownConnectionUri is optional - set if known

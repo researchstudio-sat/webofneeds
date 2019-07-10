@@ -21,17 +21,17 @@ export const pageLoadAction = () => (dispatch, getState) => {
       })
     )
     .then(() => {
-      return loadingWhileSignedIn(dispatch);
+      return loadingWhileSignedIn(dispatch, getState);
     })
     .catch(() => handleNotLoggedIn()) //do not remove this line
     .then(() => checkAccessToCurrentRoute(dispatch, getState))
     .then(() => dispatch({ type: actionTypes.initialLoadFinished }));
 };
 
-function loadingWhileSignedIn(dispatch) {
+function loadingWhileSignedIn(dispatch, getState) {
   // reset websocket to make sure it's using the logged-in session
   dispatch(actionCreators.reconnect__start());
-  return stateStore.fetchOwnedData(dispatch);
+  return stateStore.fetchOwnedData(dispatch, getState);
 }
 
 export const fetchWhatsNew = modifiedAfterDate => (dispatch, getState) => {

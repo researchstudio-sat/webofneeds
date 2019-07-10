@@ -2,11 +2,12 @@ import * as ownerApi from "../api/owner-api.js";
 import Immutable from "immutable";
 import { actionTypes } from "../actions/actions.js";
 import * as atomUtils from "./utils/atom-utils.js";
+import * as processUtils from "./utils/process-utils.js";
 import { parseMetaAtom } from "../reducers/atom-reducer/parse-atom.js";
 import { is, get, getIn, numOfEvts2pageSize } from "../utils.js";
 import won from "../won-es6";
 
-export function fetchOwnedData(dispatch) {
+export function fetchOwnedData(dispatch, getState) {
   return ownerApi
     .getOwnedMetaAtoms()
     .then(metaAtoms => {
@@ -26,16 +27,22 @@ export function fetchOwnedData(dispatch) {
 
       return [...activeAtomsImm.keys()];
     })
-    .then(activeAtomUris => fetchDataForOwnedAtoms(activeAtomUris, dispatch));
+    .then(activeAtomUris =>
+      fetchDataForOwnedAtoms(activeAtomUris, dispatch, getState)
+    );
 }
 
-export async function fetchDataForOwnedAtoms(ownedAtomUris, dispatch) {
+export async function fetchDataForOwnedAtoms(
+  ownedAtomUris,
+  dispatch,
+  getState
+) {
   if (!is("Array", ownedAtomUris) || ownedAtomUris.length === 0) {
     return;
   }
 
   return urisToLookupMap(ownedAtomUris, uri =>
-    fetchOwnedAtomAndDispatch(uri, dispatch)
+    fetchOwnedAtomAndDispatch(uri, dispatch, getState)
   )
     .then(() =>
       urisToLookupMap(ownedAtomUris, atomUri =>
@@ -50,15 +57,11 @@ export async function fetchDataForOwnedAtoms(ownedAtomUris, dispatch) {
         .toSet()
         .toArray();
 
-      dispatch({
-        type: actionTypes.atoms.storeTheirUrisInLoading,
-        payload: Immutable.fromJS({ uris: theirAtomUris }),
-      });
       return theirAtomUris;
     })
     .then(theirAtomUris =>
       urisToLookupMap(theirAtomUris, uri =>
-        fetchTheirAtomAndDispatch(uri, dispatch)
+        fetchTheirAtomAndDispatch(uri, dispatch, getState)
       )
     );
 }
@@ -82,15 +85,28 @@ export function fetchActiveConnectionAndDispatch(connUri, atomUri, dispatch) {
     });
 }
 
-export function fetchTheirAtomAndDispatch(atomUri, dispatch) {
+export function fetchTheirAtomAndDispatch(atomUri, dispatch, getState) {
+  const processState = get(getState(), "process");
+
+  if (processUtils.isAtomLoading(processState, atomUri)) {
+    //TODO: OMIT FETCH AGAIN
+    console.debug("Atom is currently loading TODO: OMIT NEW FETCH");
+  }
+
+  dispatch({
+    type: actionTypes.atoms.storeUriInLoading,
+    payload: Immutable.fromJS({ uri: atomUri }),
+  });
+
   return won
     .getAtom(atomUri)
     .then(atom => {
       if (atom["hold:heldBy"] && atom["hold:heldBy"]["@id"]) {
         const personaUri = atom["hold:heldBy"]["@id"];
+        //TODO: CHECK IF FETCH IS ALREADY RUNNING FOR PERSONA OR PERSONA ALREADY PRESENT
         dispatch({
-          type: actionTypes.personas.storeTheirUrisInLoading,
-          payload: Immutable.fromJS({ uris: [personaUri] }),
+          type: actionTypes.personas.storeUriInLoading,
+          payload: Immutable.fromJS({ uri: personaUri }),
         });
         return won
           .getAtom(personaUri)
@@ -140,12 +156,8 @@ export function fetchTheirAtomAndDispatch(atomUri, dispatch) {
     });
 }
 
-export function fetchDataForNonOwnedAtomOnly(atomUri, dispatch) {
-  dispatch({
-    type: actionTypes.atoms.storeTheirUrisInLoading,
-    payload: Immutable.fromJS({ uris: [atomUri] }),
-  });
-  return fetchTheirAtomAndDispatch(atomUri, dispatch);
+export function fetchDataForNonOwnedAtomOnly(atomUri, dispatch, getState) {
+  return fetchTheirAtomAndDispatch(atomUri, dispatch, getState);
 }
 
 export function fetchWhatsNew(
@@ -338,7 +350,8 @@ function fetchConnectionsOfAtomAndDispatch(atomUri, dispatch) {
     );
 }
 
-function fetchOwnedAtomAndDispatch(atomUri, dispatch) {
+function fetchOwnedAtomAndDispatch(atomUri, dispatch, getState) {
+  //TODO: CHECK IF FETCH IS CURRENTLY RUNNING OR SOMETHING
   return won
     .getAtom(atomUri)
     .then(atom => {
@@ -349,7 +362,11 @@ function fetchOwnedAtomAndDispatch(atomUri, dispatch) {
       return atom;
     })
     .catch(err => {
+      const state = getState();
+      console.debug("currentState: ", state);
+      console.debug("fetchOwnedAtomAndDispatch error: ", err);
       const errResponse = err && err.response;
+      console.debug("fetchOwnedAtomAndDispatch errResponse: ", errResponse);
       const isDeleted = !!(errResponse && errResponse.status == 410);
 
       dispatch({

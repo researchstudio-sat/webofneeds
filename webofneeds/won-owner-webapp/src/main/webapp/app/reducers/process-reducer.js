@@ -567,16 +567,16 @@ export default function(processState = initialState, action = {}) {
       return processState;
     }
 
-    case actionTypes.personas.storeTheirUrisInLoading:
-    case actionTypes.atoms.storeTheirUrisInLoading: {
-      const atomUris = get(action.payload, "uris");
-      atomUris &&
-        atomUris.forEach(atomUri => {
-          processState = updateAtomProcess(processState, atomUri, {
-            toLoad: false,
-            loading: true,
-          });
+    case actionTypes.personas.storeUriInLoading:
+    case actionTypes.atoms.storeUriInLoading: {
+      const atomUri = get(action.payload, "uri");
+
+      if (atomUri) {
+        processState = updateAtomProcess(processState, atomUri, {
+          toLoad: false,
+          loading: true,
         });
+      }
       return processState;
     }
 

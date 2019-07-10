@@ -33,7 +33,7 @@ export function successfulCloseAtom(event) {
   };
 }
 export function failedCloseAtom(event) {
-  return dispatch => {
+  return (dispatch, getState) => {
     const atomUri = event.getRecipientAtom();
     /*
         * TODO not sure if it's necessary to invalidate
@@ -55,7 +55,7 @@ export function failedCloseAtom(event) {
       .then(() =>
         // as the atom and it's connections have been marked dirty
         // they will be reloaded on this action.
-        stateStore.fetchDataForOwnedAtoms([atomUri], dispatch)
+        stateStore.fetchDataForOwnedAtoms([atomUri], dispatch, getState)
       )
       .then(allThatData =>
         dispatch({
@@ -142,7 +142,7 @@ export function successfulCreate(event) {
 }
 
 export function successfulEdit(event) {
-  return dispatch => {
+  return (dispatch, getState) => {
     console.debug("Received success replace message:", event);
     //const state = getState();
     //load the edited data into the local rdf store and publish AtomEditEvent when done
@@ -151,7 +151,9 @@ export function successfulEdit(event) {
     won
       //.invalidateCacheForAtom(atomURI)
       .clearStoreWithPromise()
-      .then(() => stateStore.fetchDataForOwnedAtoms([atomURI], dispatch))
+      .then(() =>
+        stateStore.fetchDataForOwnedAtoms([atomURI], dispatch, getState)
+      )
       .then(() => {
         dispatch(
           actionCreators.atoms__editSuccessful({
@@ -194,7 +196,8 @@ export function processOpenMessage(event) {
     } else {
       senderAtomP = stateStore.fetchTheirAtomAndDispatch(
         senderAtomUri,
-        dispatch
+        dispatch,
+        getState
       );
     }
 
@@ -207,7 +210,8 @@ export function processOpenMessage(event) {
     } else {
       recipientAtomP = stateStore.fetchTheirAtomAndDispatch(
         recipientAtomUri,
-        dispatch
+        dispatch,
+        getState
       );
     }
 
@@ -305,7 +309,6 @@ export function processAgreementMessage(event) {
 
 export function processChangeNotificationMessage(event) {
   return (dispatch, getState) => {
-    console.debug("processChangeNotificationMessage for: ", event);
     const atomUriToLoad = event.getSenderAtom();
 
     won
@@ -313,9 +316,17 @@ export function processChangeNotificationMessage(event) {
       .clearStoreWithPromise()
       .then(() => {
         if (generalSelectors.isAtomOwned(getState(), atomUriToLoad)) {
-          stateStore.fetchDataForOwnedAtoms([atomUriToLoad], dispatch);
+          stateStore.fetchDataForOwnedAtoms(
+            [atomUriToLoad],
+            dispatch,
+            getState
+          );
         } else {
-          stateStore.fetchDataForNonOwnedAtomOnly(atomUriToLoad, dispatch);
+          stateStore.fetchDataForNonOwnedAtomOnly(
+            atomUriToLoad,
+            dispatch,
+            getState
+          );
         }
       });
 
@@ -591,7 +602,8 @@ export function processConnectMessage(event) {
     } else {
       senderAtomP = stateStore.fetchTheirAtomAndDispatch(
         senderAtomUri,
-        dispatch
+        dispatch,
+        getState
       );
     }
 
@@ -604,7 +616,8 @@ export function processConnectMessage(event) {
     } else {
       recipientAtomP = stateStore.fetchTheirAtomAndDispatch(
         recipientAtomUri,
-        dispatch
+        dispatch,
+        getState
       );
     }
 
@@ -975,7 +988,8 @@ export function processAtomHintMessage(event) {
           } else {
             return stateStore.fetchTheirAtomAndDispatch(
               targetAtomUri,
-              dispatch
+              dispatch,
+              getState
             );
           }
         })

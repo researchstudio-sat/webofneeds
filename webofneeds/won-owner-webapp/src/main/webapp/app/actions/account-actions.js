@@ -107,7 +107,7 @@ export function accountLogin(credentials, redirectToFeed = false) {
         })
       )
       .then(() => dispatch({ type: actionTypes.upgradeHttpSession }))
-      .then(() => stateStore.fetchOwnedData(dispatch))
+      .then(() => stateStore.fetchOwnedData(dispatch, getState))
       .then(() => dispatch({ type: actionTypes.account.loginFinished }))
       .catch(error =>
         error.response.json().then(loginError => {
