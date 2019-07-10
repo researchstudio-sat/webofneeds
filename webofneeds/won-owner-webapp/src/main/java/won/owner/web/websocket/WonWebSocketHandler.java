@@ -293,7 +293,8 @@ public class WonWebSocketHandler extends TextWebSocketHandler
             if (!userOpt.isPresent()) {
                 userOpt = Optional.ofNullable(getUserForWonMessage(wonMessage));
             }
-            User user = userOpt.get();
+            User user = userOpt.orElse(null); // it's quite possible that we don't find the user object this way.
+                                              // Methods below can handle that.
             updateUserAtomAssociation(wonMessage, user);
             notifyPerPush(user, atomUri, wonMessage);
             webSocketSessions = findWebSocketSessionsForAtomAndUser(atomUri, user);
