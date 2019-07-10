@@ -134,7 +134,7 @@ export default function(processState = initialState, action = {}) {
       return processState.set("processingWhatsNew", true);
 
     case actionTypes.atoms.storeWhatsNew: {
-      const metaAtoms = action.payload.get("metaAtoms");
+      const metaAtoms = get(action.payload, "metaAtoms");
       const atomUris = metaAtoms && [...metaAtoms.keys()];
       atomUris &&
         atomUris.forEach(atomUri => {
@@ -148,7 +148,7 @@ export default function(processState = initialState, action = {}) {
     }
 
     case actionTypes.atoms.storeWhatsAround: {
-      const metaAtoms = action.payload.get("metaAtoms");
+      const metaAtoms = get(action.payload, "metaAtoms");
       const atomUris = metaAtoms && [...metaAtoms.keys()];
       atomUris &&
         atomUris.forEach(atomUri => {
@@ -252,7 +252,7 @@ export default function(processState = initialState, action = {}) {
 
     case actionTypes.atoms.storeUriFailed:
     case actionTypes.personas.storeUriFailed: {
-      return updateAtomProcess(processState, action.payload.get("uri"), {
+      return updateAtomProcess(processState, get(action.payload, "uri"), {
         toLoad: false,
         loaded: false,
         failedToLoad: true,
@@ -263,13 +263,13 @@ export default function(processState = initialState, action = {}) {
     case actionTypes.connections.storeUriFailed: {
       return updateConnectionProcess(
         processState,
-        action.payload.get("connUri"),
+        get(action.payload, "connUri"),
         { failedToStore: true, loading: false }
       );
     }
 
     case actionTypes.connections.fetchMessagesStart: {
-      const connUri = action.payload.get("connectionUri");
+      const connUri = get(action.payload, "connectionUri");
 
       return updateConnectionProcess(processState, connUri, {
         loadingMessages: true,
@@ -278,7 +278,7 @@ export default function(processState = initialState, action = {}) {
     }
 
     case actionTypes.connections.fetchMessagesEnd: {
-      const connUri = action.payload.get("connectionUri");
+      const connUri = get(action.payload, "connectionUri");
 
       return updateConnectionProcess(processState, connUri, {
         loadingMessages: false,
@@ -287,8 +287,8 @@ export default function(processState = initialState, action = {}) {
     }
 
     case actionTypes.connections.messageUrisInLoading: {
-      const connUri = action.payload.get("connectionUri");
-      const messageUris = action.payload.get("uris");
+      const connUri = get(action.payload, "connectionUri");
+      const messageUris = get(action.payload, "uris");
 
       if (messageUris) {
         messageUris.map(messageUri => {
@@ -305,9 +305,9 @@ export default function(processState = initialState, action = {}) {
     }
 
     case actionTypes.connections.fetchMessagesSuccess: {
-      const connUri = action.payload.get("connectionUri");
+      const connUri = get(action.payload, "connectionUri");
 
-      const loadedMessages = action.payload.get("events");
+      const loadedMessages = get(action.payload, "events");
       if (loadedMessages) {
         processState = updateConnectionProcess(processState, connUri, {
           loadingMessages: false,
@@ -328,8 +328,8 @@ export default function(processState = initialState, action = {}) {
     }
 
     case actionTypes.connections.fetchMessagesFailed: {
-      const connUri = action.payload.get("connectionUri");
-      const failedMessages = action.payload.get("events");
+      const connUri = get(action.payload, "connectionUri");
+      const failedMessages = get(action.payload, "events");
 
       if (failedMessages) {
         processState = updateConnectionProcess(processState, connUri, {
@@ -404,13 +404,13 @@ export default function(processState = initialState, action = {}) {
     }
 
     case actionTypes.connections.storeMetaConnections: {
-      const connections = action.payload.get("connections");
+      const connections = get(action.payload, "connections");
 
       connections &&
         connections.map(conn => {
           processState = updateConnectionProcess(
             processState,
-            conn.get("connectionUri"),
+            get(conn, "connectionUri"),
             {
               toLoad: true,
             }
@@ -426,7 +426,7 @@ export default function(processState = initialState, action = {}) {
     }
 
     case actionTypes.connections.storeActiveUrisInLoading: {
-      const connUris = action.payload.get("connUris");
+      const connUris = get(action.payload, "connUris");
 
       connUris &&
         connUris.forEach(connUri => {
@@ -452,7 +452,7 @@ export default function(processState = initialState, action = {}) {
     }
 
     case actionTypes.connections.storeActive: {
-      let connections = action.payload.get("connections");
+      let connections = get(action.payload, "connections");
 
       connections &&
         connections.map((conn, connUri) => {
@@ -481,7 +481,7 @@ export default function(processState = initialState, action = {}) {
               toLoad: true,
             });
           }
-          const eventsOfConnection = conn.get("hasEvents");
+          const eventsOfConnection = get(conn, "hasEvents");
           eventsOfConnection &&
             eventsOfConnection.map(eventUri => {
               processState = updateMessageProcess(
@@ -499,54 +499,56 @@ export default function(processState = initialState, action = {}) {
     case actionTypes.atoms.storeTheirs:
     case actionTypes.personas.storeTheirs:
     case actionTypes.atoms.storeOwned: {
-      let atoms = action.payload.get("atoms");
+      let atoms = get(action.payload, "atoms");
 
       atoms &&
         atoms.map(atom => {
           const parsedAtom = parseAtom(atom);
-          processState = updateAtomProcess(
-            processState,
-            parsedAtom.get("uri"),
-            {
-              toLoad: false,
-              failedToLoad: false,
-              loading: false,
-              loaded: true,
-            }
-          );
+          if (parsedAtom) {
+            processState = updateAtomProcess(
+              processState,
+              get(parsedAtom, "uri"),
+              {
+                toLoad: false,
+                failedToLoad: false,
+                loading: false,
+                loaded: true,
+              }
+            );
 
-          const heldAtomUris = parsedAtom.get("holds");
-          heldAtomUris.map(heldAtomUri => {
-            if (!processUtils.isAtomLoaded(processState, heldAtomUri)) {
-              processState = updateAtomProcess(processState, heldAtomUri, {
-                toLoad: true,
-              });
-            }
-          });
+            const heldAtomUris = get(parsedAtom, "holds");
+            heldAtomUris.map(heldAtomUri => {
+              if (!processUtils.isAtomLoaded(processState, heldAtomUri)) {
+                processState = updateAtomProcess(processState, heldAtomUri, {
+                  toLoad: true,
+                });
+              }
+            });
 
-          const groupMemberUris = parsedAtom.get("groupMembers");
-          groupMemberUris.map(groupMemberUri => {
-            if (!processUtils.isAtomLoaded(processState, groupMemberUri)) {
-              processState = updateAtomProcess(processState, groupMemberUri, {
-                toLoad: true,
-              });
-            }
-          });
+            const groupMemberUris = get(parsedAtom, "groupMembers");
+            groupMemberUris.map(groupMemberUri => {
+              if (!processUtils.isAtomLoaded(processState, groupMemberUri)) {
+                processState = updateAtomProcess(processState, groupMemberUri, {
+                  toLoad: true,
+                });
+              }
+            });
 
-          const buddyUris = parsedAtom.get("buddies");
-          buddyUris.map(buddyUri => {
-            if (!processUtils.isAtomLoaded(processState, buddyUri)) {
-              processState = updateAtomProcess(processState, buddyUri, {
-                toLoad: true,
-              });
-            }
-          });
+            const buddyUris = get(parsedAtom, "buddies");
+            buddyUris.map(buddyUri => {
+              if (!processUtils.isAtomLoaded(processState, buddyUri)) {
+                processState = updateAtomProcess(processState, buddyUri, {
+                  toLoad: true,
+                });
+              }
+            });
+          }
         });
       return processState;
     }
 
     case actionTypes.atoms.storeOwnedMetaAtoms: {
-      const metaAtoms = action.payload.get("metaAtoms");
+      const metaAtoms = get(action.payload, "metaAtoms");
 
       metaAtoms &&
         metaAtoms.map((metaAtom, metaAtomUri) => {
@@ -567,7 +569,7 @@ export default function(processState = initialState, action = {}) {
 
     case actionTypes.personas.storeTheirUrisInLoading:
     case actionTypes.atoms.storeTheirUrisInLoading: {
-      const atomUris = action.payload.get("uris");
+      const atomUris = get(action.payload, "uris");
       atomUris &&
         atomUris.forEach(atomUri => {
           processState = updateAtomProcess(processState, atomUri, {
@@ -585,7 +587,7 @@ export default function(processState = initialState, action = {}) {
     case actionTypes.atoms.delete:
     case actionTypes.atoms.removeDeleted:
     case actionTypes.personas.removeDeleted: {
-      const atomUri = action.payload.get("uri");
+      const atomUri = get(action.payload, "uri");
       return processState.deleteIn(["atoms", atomUri]);
     }
 
@@ -628,10 +630,10 @@ export function addOriginatorAtomToLoad(
     );
     if (parsedMessage) {
       const connectionUri =
-        insertIntoConnUri || parsedMessage.get("belongsToUri");
+        insertIntoConnUri || get(parsedMessage, "belongsToUri");
 
       let atomUri = insertIntoAtomUri;
-      if (!atomUri && parsedMessage.getIn(["data", "outgoingMessage"])) {
+      if (!atomUri && getIn(parsedMessage, ["data", "outgoingMessage"])) {
         // atomUri is the message's senderAtom
         atomUri = wonMessage.getSenderAtom();
       } else if (!atomUri) {
@@ -639,7 +641,7 @@ export function addOriginatorAtomToLoad(
         atomUri = wonMessage.getRecipientAtom();
       }
 
-      const originatorUri = parsedMessage.getIn(["data", "originatorUri"]);
+      const originatorUri = getIn(parsedMessage, ["data", "originatorUri"]);
 
       if (originatorUri) {
         //Message is originally from another atom, we might need to add the atom as well
