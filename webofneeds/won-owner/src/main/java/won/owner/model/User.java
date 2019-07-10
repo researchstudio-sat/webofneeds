@@ -215,7 +215,11 @@ public class User implements UserDetails, Persistable<Long> {
      * public List<Atom> getAtoms() { return atoms; }
      */
     public void addAtomUri(UserAtom userAtom) {
-        this.userAtoms.add(userAtom);
+        synchronized (this) {
+            if (!this.userAtoms.contains(userAtom)) {
+                this.userAtoms.add(userAtom);
+            }
+        }
     }
 
     public void deleteAtomUri(UserAtom userAtom) {
