@@ -667,13 +667,16 @@ public class WonWebSocketHandler extends TextWebSocketHandler
     private void saveAtomUriWithUser(final WonMessage wonMessage, final WebSocketSession session) {
         User user = getUserForSession(session);
         URI atomUri = getOwnedAtomURI(wonMessage);
+        logger.debug("adding atom {} to atoms of user {}", atomUri, user.getId());
         UserAtom userAtom = new UserAtom(atomUri);
         // reload the user so we can save it
         // (the user object we get from getUserForSession is detached)
         user = userRepository.findOne(user.getId());
         userAtomRepository.save(userAtom);
+        logger.debug("saved user atom {}", userAtom.getId());
         user.addAtomUri(userAtom);
         userRepository.save(user);
+        logger.debug("atom {} added to atoms of user {}", userAtom.getId(), user.getId());
     }
 
     private void deactivateAtomUri(final WonMessage wonMessage, final WebSocketSession session) {
