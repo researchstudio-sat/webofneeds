@@ -277,14 +277,9 @@ function urisToLookupMap(
     ? excludeUris
     : [excludeUris];
 
-  const urisAsArrayWithoutExcludes = urisAsArray.filter(uri => {
-    const exclude = excludeUrisAsArray.indexOf(uri) < 0;
-    if (exclude) {
-      return true;
-    } else {
-      return false;
-    }
-  });
+  const urisAsArrayWithoutExcludes = urisAsArray.filter(
+    uri => excludeUrisAsArray.indexOf(uri) < 0
+  );
 
   const asyncLookups = urisAsArrayWithoutExcludes.map(uri =>
     asyncLookupFunction(uri).catch(error => {

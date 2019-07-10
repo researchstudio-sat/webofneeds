@@ -713,24 +713,15 @@ export function showLatestMessages(connectionUriParam, numberOfEvents) {
     };
     return won
       .getConnectionWithEventUris(connectionUri, fetchParams)
-      .then(connection => {
-        const messagesToFetch = limitNumberOfEventsToFetchInConnection(
+      .then(connection =>
+        getMessageUrisToLoad(
+          dispatch,
           state,
           connection,
           connectionUri,
           numberOfEvents
-        );
-
-        dispatch({
-          type: actionTypes.connections.messageUrisInLoading,
-          payload: Immutable.fromJS({
-            connectionUri: connectionUri,
-            uris: messagesToFetch,
-          }),
-        });
-
-        return messagesToFetch;
-      })
+        )
+      )
       .then(eventUris => {
         return urisToLookupSuccessAndFailedMap(
           eventUris,
@@ -777,24 +768,15 @@ export function loadLatestMessagesOfConnection({
 
   return won
     .getConnectionWithEventUris(connectionUri, fetchParams)
-    .then(connection => {
-      const messagesToFetch = limitNumberOfEventsToFetchInConnection(
+    .then(connection =>
+      getMessageUrisToLoad(
+        dispatch,
         state,
         connection,
         connectionUri,
         numberOfEvents
-      );
-
-      dispatch({
-        type: actionTypes.connections.messageUrisInLoading,
-        payload: Immutable.fromJS({
-          connectionUri: connectionUri,
-          uris: messagesToFetch,
-        }),
-      });
-
-      return messagesToFetch;
-    })
+      )
+    )
     .then(eventUris => {
       return urisToLookupSuccessAndFailedMap(
         eventUris,
@@ -859,24 +841,15 @@ export function showMoreMessages(connectionUriParam, numberOfEvents) {
 
     won
       .getConnectionWithEventUris(connectionUri, fetchParams)
-      .then(connection => {
-        const messagesToFetch = limitNumberOfEventsToFetchInConnection(
+      .then(connection =>
+        getMessageUrisToLoad(
+          dispatch,
           state,
           connection,
           connectionUri,
           numberOfEvents
-        );
-
-        dispatch({
-          type: actionTypes.connections.messageUrisInLoading,
-          payload: Immutable.fromJS({
-            connectionUri: connectionUri,
-            uris: messagesToFetch,
-          }),
-        });
-
-        return messagesToFetch;
-      })
+        )
+      )
       .then(eventUris => {
         return urisToLookupSuccessAndFailedMap(
           eventUris,
@@ -886,6 +859,37 @@ export function showMoreMessages(connectionUriParam, numberOfEvents) {
       })
       .then(events => storeMessages(dispatch, events, connectionUri));
   };
+}
+
+async function getMessageUrisToLoad(
+  dispatch,
+  state,
+  connection,
+  connectionUri,
+  numberOfEvents
+) {
+  console.debug(
+    "getMessageUrisToLoad of connection(uri:",
+    connectionUri,
+    "): ",
+    connection
+  );
+  const messagesToFetch = limitNumberOfEventsToFetchInConnection(
+    state,
+    connection,
+    connectionUri,
+    numberOfEvents
+  );
+
+  dispatch({
+    type: actionTypes.connections.messageUrisInLoading,
+    payload: Immutable.fromJS({
+      connectionUri: connectionUri,
+      uris: messagesToFetch,
+    }),
+  });
+
+  return messagesToFetch;
 }
 
 /**
@@ -959,8 +963,13 @@ function limitNumberOfEventsToFetchInConnection(
     .filter(msg => msg.get("toLoad") && !msg.get("failedToLoad"));
   let messagesToFetch = [];
 
-  connectionImm &&
-    connectionImm.get("hasEvents").map(eventUri => {
+  const fetchedConnectionEvents =
+    connectionImm &&
+    connectionImm.get("hasEvents") &&
+    connectionImm.get("hasEvents").filter(eventUri => !!eventUri); //Filter out undefined/null values
+
+  if (fetchedConnectionEvents && fetchedConnectionEvents.size > 0) {
+    fetchedConnectionEvents.map(eventUri => {
       if (
         allMessagesToLoad.has(eventUri) &&
         messagesToFetch.length < numOfEvts2pageSize(numberOfEvents)
@@ -968,6 +977,11 @@ function limitNumberOfEventsToFetchInConnection(
         messagesToFetch.push(eventUri);
       }
     });
+  } else {
+    allMessagesToLoad.map((messageStatus, messageUri) => {
+      messagesToFetch.push(messageUri);
+    });
+  }
 
   return messagesToFetch;
 }
@@ -994,14 +1008,9 @@ function urisToLookupSuccessAndFailedMap(
     ? excludeUris
     : [excludeUris];
 
-  const urisAsArrayWithoutExcludes = urisAsArray.filter(uri => {
-    const exclude = excludeUrisAsArray.indexOf(uri) < 0;
-    if (exclude) {
-      return true;
-    } else {
-      return false;
-    }
-  });
+  const urisAsArrayWithoutExcludes = urisAsArray.filter(
+    uri => excludeUrisAsArray.indexOf(uri) < 0
+  );
 
   const asyncLookups = urisAsArrayWithoutExcludes.map(uri =>
     asyncLookupFunction(uri).catch(error => {
