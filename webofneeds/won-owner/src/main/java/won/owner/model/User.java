@@ -214,11 +214,11 @@ public class User implements UserDetails, Persistable<Long> {
     /*
      * public List<Atom> getAtoms() { return atoms; }
      */
-    public void addAtomUri(UserAtom userAtom) {
+    public void addUserAtom(UserAtom userAtom) {
         this.userAtoms.add(userAtom);
     }
 
-    public void deleteAtomUri(UserAtom userAtom) {
+    public void removeUserAtom(UserAtom userAtom) {
         this.userAtoms.remove(userAtom);
     }
 

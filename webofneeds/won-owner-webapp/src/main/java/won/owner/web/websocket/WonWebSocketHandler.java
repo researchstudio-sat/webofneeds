@@ -27,6 +27,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.persistence.criteria.CriteriaBuilder.Case;
+
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ObjectNode;
 import org.slf4j.Logger;
@@ -285,6 +287,7 @@ public class WonWebSocketHandler extends TextWebSocketHandler
             WebSocketMessage<String> webSocketMessage = new TextMessage(wonMessageJsonLdString);
             URI atomUri = getOwnedAtomURI(wonMessage);
             User user = getUserForWonMessage(wonMessage);
+            updateUserAtomAssociation(wonMessage, user);
             notifyPerPush(user, atomUri, wonMessage);
             Set<WebSocketSession> webSocketSessions = findWebSocketSessionsForAtomAndUser(atomUri, user);
             // check if we can deliver the message. If not, send email.
@@ -369,7 +372,11 @@ public class WonWebSocketHandler extends TextWebSocketHandler
                     ObjectNode rootNode = mapper.createObjectNode();
                     rootNode.put("type", "HINT");
                     rootNode.put("atomUri", userAtom.getUri().toString());
-                    rootNode.put("connectionUri", wonMessage.getRecipientURI().toString());
+                    if (wonMessage.getRecipientURI() != null) {
+                        rootNode.put("connectionUri", wonMessage.getRecipientURI().toString());
+                    } else {
+                        logger.info("received SocketHint for atom {} without recipientURI", userAtom.getUri());
+                    }
                     rootNode.put("icon", iconUrl);
                     String stringifiedJson;
                     try {
@@ -571,6 +578,42 @@ public class WonWebSocketHandler extends TextWebSocketHandler
         return null;
     }
 
+    private void updateUserAtomAssociation(WonMessage wonMessage, User user) {
+        URI atomUri = getOwnedAtomURI(wonMessage);
+        Long userId = user != null ? user.getId() : null;
+        if (wonMessage.getMessageType() == WonMessageType.SUCCESS_RESPONSE) {
+            switch (wonMessage.getIsResponseToMessageType()) {
+                case CREATE_ATOM:
+                    try {
+                        saveAtomUriWithUser(wonMessage, user);
+                    } catch (Exception e) {
+                        logger.warn("could not associate atom " + atomUri + " with user " + userId, e);
+                    }
+                    break;
+                case DEACTIVATE:
+                    try {
+                        deactivateAtomUri(wonMessage);
+                    } catch (Exception e) {
+                        logger.warn("could not deactivate atom " + atomUri + " of user " + userId, e);
+                    }
+                    break;
+                case ACTIVATE:
+                    try {
+                        activateAtomUri(wonMessage);
+                    } catch (Exception e) {
+                        logger.warn("could not activate atom " + atomUri + " of user " + userId, e);
+                    }
+                    break;
+                case DELETE:
+                    try {
+                        deleteUserAtom(wonMessage, user);
+                    } catch (Exception e) {
+                        logger.warn("could not delete atom " + atomUri + " of user " + userId, e);
+                    }
+            }
+        }
+    }
+
     /**
      * Sends the specified message over the socket unless it is a successresponse to
      * create, deactivate, activate.
@@ -590,62 +633,6 @@ public class WonWebSocketHandler extends TextWebSocketHandler
             logger.debug("session {} is closed, can't send message", session.getId());
             return false;
         }
-        if (wonMessage.getMessageType() == WonMessageType.SUCCESS_RESPONSE) {
-            if (WonMessageType.CREATE_ATOM == wonMessage.getIsResponseToMessageType()) {
-                try {
-                    saveAtomUriWithUser(wonMessage, session);
-                } catch (Exception e) {
-                    logger.warn("could not associate atom {} with currently logged in user, cannot send message",
-                                    atomUri, e);
-                    if (user != null) {
-                        webSocketSessionService.removeMapping(user, session);
-                    }
-                    if (atomUri != null) {
-                        webSocketSessionService.removeMapping(atomUri, session);
-                    }
-                    return true;
-                }
-            } else if (WonMessageType.DEACTIVATE == wonMessage.getIsResponseToMessageType()) {
-                try {
-                    deactivateAtomUri(wonMessage, session);
-                } catch (Exception e) {
-                    logger.warn("could not deactivate atom {}, cannot send message", atomUri, e);
-                    if (user != null) {
-                        webSocketSessionService.removeMapping(user, session);
-                    }
-                    if (atomUri != null) {
-                        webSocketSessionService.removeMapping(atomUri, session);
-                    }
-                    return true;
-                }
-            } else if (WonMessageType.ACTIVATE == wonMessage.getIsResponseToMessageType()) {
-                try {
-                    activateAtomUri(wonMessage, session);
-                } catch (Exception e) {
-                    logger.warn("could not activate atom {}, cannot send message", atomUri, e);
-                    if (user != null) {
-                        webSocketSessionService.removeMapping(user, session);
-                    }
-                    if (atomUri != null) {
-                        webSocketSessionService.removeMapping(atomUri, session);
-                    }
-                    return true;
-                }
-            } else if (WonMessageType.DELETE == wonMessage.getIsResponseToMessageType()) {
-                try {
-                    deleteAtomUri(wonMessage, session);
-                } catch (Exception e) {
-                    logger.warn("could not deactivate atom {}, cannot send message", atomUri, e);
-                    if (user != null) {
-                        webSocketSessionService.removeMapping(user, session);
-                    }
-                    if (atomUri != null) {
-                        webSocketSessionService.removeMapping(atomUri, session);
-                    }
-                    return true;
-                }
-            }
-        }
         try {
             logger.debug("OA Server - sending WebSocket message: {}", webSocketMessage);
             session.sendMessage(webSocketMessage);
@@ -664,8 +651,7 @@ public class WonWebSocketHandler extends TextWebSocketHandler
         return true;
     }
 
-    private void saveAtomUriWithUser(final WonMessage wonMessage, final WebSocketSession session) {
-        User user = getUserForSession(session);
+    private void saveAtomUriWithUser(final WonMessage wonMessage, User user) {
         URI atomUri = getOwnedAtomURI(wonMessage);
         logger.debug("adding atom {} to atoms of user {}", atomUri, user.getId());
         UserAtom userAtom = new UserAtom(atomUri);
@@ -674,20 +660,20 @@ public class WonWebSocketHandler extends TextWebSocketHandler
         user = userRepository.findOne(user.getId());
         userAtom = userAtomRepository.save(userAtom);
         logger.debug("saved user atom {}", userAtom.getId());
-        user.addAtomUri(userAtom);
+        user.addUserAtom(userAtom);
         userRepository.save(user);
         logger.debug("atom {} added to atoms of user {}", userAtom.getId(), user.getId());
     }
 
-    private void deactivateAtomUri(final WonMessage wonMessage, final WebSocketSession session) {
-        updateAtomUriState(wonMessage, session, AtomState.INACTIVE);
+    private void deactivateAtomUri(final WonMessage wonMessage) {
+        updateAtomUriState(wonMessage, AtomState.INACTIVE);
     }
 
-    private void activateAtomUri(final WonMessage wonMessage, final WebSocketSession session) {
-        updateAtomUriState(wonMessage, session, AtomState.ACTIVE);
+    private void activateAtomUri(final WonMessage wonMessage) {
+        updateAtomUriState(wonMessage, AtomState.ACTIVE);
     }
 
-    private void updateAtomUriState(final WonMessage wonMessage, final WebSocketSession session, AtomState newState) {
+    private void updateAtomUriState(final WonMessage wonMessage, AtomState newState) {
         URI atomUri = getOwnedAtomURI(wonMessage);
         UserAtom userAtom = userAtomRepository.findByAtomUri(atomUri);
         userAtom.setState(newState);
@@ -696,16 +682,13 @@ public class WonWebSocketHandler extends TextWebSocketHandler
         userAtomRepository.save(userAtom);
     }
 
-    private void deleteAtomUri(final WonMessage wonMessage, final WebSocketSession session) {
-        User user = getUserForSession(session);
+    private void deleteUserAtom(final WonMessage wonMessage, User user) {
         URI atomUri = getOwnedAtomURI(wonMessage);
         // Get the atom from owner application db
         UserAtom userAtom = userAtomRepository.findByAtomUri(atomUri);
         if (userAtom.getState() == AtomState.DELETED) {
-            // Get the user from owner application db
-            user = userRepository.findOne(user.getId());
             // Delete atom in users atom list and save changes
-            user.deleteAtomUri(userAtom);
+            user.removeUserAtom(userAtom);
             userRepository.save(user);
             // Delete atom in atom repository
             userAtomRepository.delete(userAtom.getId());
