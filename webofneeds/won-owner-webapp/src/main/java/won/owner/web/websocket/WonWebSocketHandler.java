@@ -647,7 +647,7 @@ public class WonWebSocketHandler extends TextWebSocketHandler
         } catch (Exception e) {
             logger.warn(MessageFormat.format(
                             "caught exception while trying to send on session {1} for atomUri {2}, " + "user {3}",
-                            session.getId(), atomUri, user), e);
+                            session.getId(), atomUri, user == null ? "(null)" : user.getId()), e);
             if (user != null) {
                 webSocketSessionService.removeMapping(user, session);
             }
