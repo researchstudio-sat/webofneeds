@@ -32,12 +32,6 @@ const serviceDependencies = [
 function genComponentConf() {
   const template = `
         <div class="cp__header">
-            <a class="cp__header__back clickable"
-                ng-click="self.router__back()">
-                <svg class="cp__header__back__icon">
-                    <use xlink:href="#ico36_backarrow" href="#ico36_backarrow"></use>
-                </svg>
-            </a>
             <svg class="cp__header__icon"
                 title="{{self.useCase['label']}}"
                 ng-if="self.useCase['icon']">

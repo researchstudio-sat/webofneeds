@@ -20,12 +20,6 @@ function genComponentConf() {
   const template = `
       <!-- HEADER -->
       <div class="ucg__header">
-          <a class="ucg__header__back clickable"
-              ng-click="self.router__back()">
-              <svg class="ucg__header__back__icon">
-                  <use xlink:href="#ico36_backarrow" href="#ico36_backarrow"></use>
-              </svg>
-          </a>
           <svg class="ucg__header__icon"
               ng-if="!!self.useCaseGroup.icon">
               <use xlink:href="{{ self.useCaseGroup.icon }}" href="{{ self.useCaseGroup.icon }}"></use>
