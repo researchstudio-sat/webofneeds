@@ -63,6 +63,7 @@ won-other-card {
 
     & won-atom-map.location {
       display: block;
+      pointer-events: none;
 
       .atom-map__mapmount {
         width: 100%;
