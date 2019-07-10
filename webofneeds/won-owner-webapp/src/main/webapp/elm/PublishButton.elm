@@ -37,6 +37,7 @@ type alias Props =
     , showPersonas : Bool
     , personas : Dict String Persona
     , label : String
+    , presetHolderUri: Maybe String
     }
 
 
@@ -54,7 +55,7 @@ propDecoder =
                         >> Dict.fromList
                     )
     in
-    Decode.map4 Props
+    Decode.map5 Props
         (Decode.field "buttonEnabled" Decode.bool)
         (Decode.field "showPersonas" Decode.bool)
         (Decode.field "personas" dictDecoder)
@@ -62,7 +63,9 @@ propDecoder =
             |> Decode.maybe
             |> Decode.map (Maybe.withDefault defaultLabel)
         )
-
+        (Decode.field "presetHolderUri" Decode.string
+                    |> Decode.maybe
+                )
 
 
 ---- MODEL ----
@@ -113,9 +116,9 @@ type SelectedPersona
 
 
 init : Props -> ( Model, Cmd Msg )
-init _ =
+init props =
     ( { state = Closed
-      , selectedPersona = Anonymous
+      , selectedPersona = props.presetHolderUri |> Maybe.map Persona |> Maybe.withDefault Anonymous
       , buttonPosition = NotQueried
       }
     , getRandomId

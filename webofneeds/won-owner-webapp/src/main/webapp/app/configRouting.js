@@ -90,7 +90,7 @@ export const configRouting = [
         as: "map",
       },
       {
-        path: "/create?useCase?useCaseGroup?fromAtomUri?mode",
+        path: "/create?useCase?useCaseGroup?fromAtomUri?mode?holderUri",
         component: createComponent,
         as: "create",
       },

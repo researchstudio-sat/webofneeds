@@ -26,8 +26,17 @@ function genComponentConf() {
           show-suggestions="self.isOwned"
           show-persona="::false"
       ></won-atom-card>
+      <div class="ach__createatom"
+          ng-if="self.isOwned"
+          ng-click="self.router__stateGo('create', {holderUri: self.atomUri})"
+        >
+          <svg class="ach__createatom__icon" title="Create a new post">
+            <use xlink:href="#ico36_plus" href="#ico36_plus" />
+          </svg>
+          <span class="ach__createatom__label">New</span>
+      </div>
       <div class="ach__empty"
-          ng-if="!self.hasHeldAtoms">
+          ng-if="!self.isOwned && !self.hasHeldAtoms">
           Not one single Atom present.
       </div>
     `;

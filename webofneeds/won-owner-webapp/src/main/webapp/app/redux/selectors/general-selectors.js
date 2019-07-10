@@ -274,6 +274,18 @@ export const getFromAtomUriFromRoute = createSelector(
   }
 );
 
+export const getHolderUriFromRoute = createSelector(
+  state => state,
+  state => {
+    const encodedHolderUri = getIn(state, [
+      "router",
+      "currentParams",
+      "holderUri",
+    ]);
+    return decodeUriComponentProperly(encodedHolderUri);
+  }
+);
+
 export const getModeFromRoute = createSelector(
   state => state,
   state => {
@@ -323,16 +335,18 @@ export function getOwnedCondensedPersonaList(state, includeArchived = false) {
     .toList()
     .filter(atom => atomUtils.isPersona(atom))
     .filter(atom => includeArchived || atomUtils.isActive(atom));
-  return personas.map(persona => {
-    return {
-      displayName: getIn(persona, ["content", "personaName"]),
-      website: getIn(persona, ["content", "website"]),
-      aboutMe: getIn(persona, ["content", "description"]),
-      url: get(persona, "uri"),
-      saved: !get(persona, "isBeingCreated"),
-      timestamp: get(persona, "creationDate").toISOString(),
-    };
-  });
+  return personas
+    .map(persona => {
+      return {
+        displayName: getIn(persona, ["content", "personaName"]),
+        website: getIn(persona, ["content", "website"]),
+        aboutMe: getIn(persona, ["content", "description"]),
+        url: get(persona, "uri"),
+        saved: !get(persona, "isBeingCreated"),
+        timestamp: get(persona, "creationDate").toISOString(),
+      };
+    })
+    .filter(persona => !!persona.displayName);
 }
 
 //TODO: move this method to a place that makes more sense, its not really a selector function
