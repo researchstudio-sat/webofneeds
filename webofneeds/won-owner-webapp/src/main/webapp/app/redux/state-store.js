@@ -89,8 +89,8 @@ export function fetchTheirAtomAndDispatch(atomUri, dispatch, getState) {
   const processState = get(getState(), "process");
 
   if (processUtils.isAtomLoading(processState, atomUri)) {
-    //TODO: OMIT FETCH AGAIN
-    console.debug("Atom is currently loading TODO: OMIT NEW FETCH");
+    console.debug("fetchTheirAtomAndDispatch: Atom is already loading...");
+    //TODO: IMPL OMIT FETCH
   }
 
   dispatch({
@@ -103,7 +103,11 @@ export function fetchTheirAtomAndDispatch(atomUri, dispatch, getState) {
     .then(atom => {
       if (atom["hold:heldBy"] && atom["hold:heldBy"]["@id"]) {
         const personaUri = atom["hold:heldBy"]["@id"];
-        //TODO: CHECK IF FETCH IS ALREADY RUNNING FOR PERSONA OR PERSONA ALREADY PRESENT
+        if (processUtils.isAtomLoading(processState, personaUri)) {
+          console.debug("Persona attached to Atom is currently loading...");
+          //TODO: IMPL OMIT FETCH
+        }
+
         dispatch({
           type: actionTypes.personas.storeUriInLoading,
           payload: Immutable.fromJS({ uri: personaUri }),
@@ -243,12 +247,6 @@ async function getMessageUrisToLoad(
   connectionUri,
   numberOfEvents
 ) {
-  console.debug(
-    "getMessageUrisToLoad of connection(uri:",
-    connectionUri,
-    "): ",
-    connection
-  );
   const messagesToFetch = limitNumberOfEventsToFetchInConnection(
     state,
     connection,
@@ -327,12 +325,6 @@ function fetchConnectionsOfAtomAndDispatch(atomUri, dispatch) {
         .filter(conn => conn.connectionState !== won.WON.Suggested)
         .map(conn => conn.connectionUri);
 
-      const targetAtomUris = connectionsWithStateAndSocket.map(
-        conn => conn.targetAtomUri
-      );
-
-      console.debug("targetAtomUris: ", targetAtomUris);
-
       dispatch({
         type: actionTypes.connections.storeActiveUrisInLoading,
         payload: Immutable.fromJS({
@@ -351,7 +343,6 @@ function fetchConnectionsOfAtomAndDispatch(atomUri, dispatch) {
 }
 
 function fetchOwnedAtomAndDispatch(atomUri, dispatch, getState) {
-  //TODO: CHECK IF FETCH IS CURRENTLY RUNNING OR SOMETHING
   return won
     .getAtom(atomUri)
     .then(atom => {
