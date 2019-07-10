@@ -418,6 +418,10 @@ function connectReactionAtom(
         connectMessage: "",
       });
 
+      const connectToSocketUri = connectToSocketType
+        ? atomUtils.getSocketUri(connectToAtom, connectToSocketType)
+        : atomUtils.getDefaultSocketUri(connectToAtom);
+
       won.wonMessageFromJsonLd(cnctMsg.message).then(optimisticEvent => {
         // connect action to be dispatched when the
         // ad hoc atom has been created:
@@ -428,6 +432,7 @@ function connectReactionAtom(
             eventUri: cnctMsg.eventUri,
             message: cnctMsg.message,
             optimisticEvent: optimisticEvent,
+            targetSocketUri: connectToSocketUri,
           },
         };
 

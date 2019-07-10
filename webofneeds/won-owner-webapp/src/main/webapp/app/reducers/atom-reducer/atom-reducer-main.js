@@ -4,7 +4,7 @@
 import { actionTypes } from "../../actions/actions.js";
 import Immutable from "immutable";
 import won from "../../won-es6.js";
-import { msStringToDate, getIn } from "../../utils.js";
+import { msStringToDate, getIn, get } from "../../utils.js";
 import {
   addAtomStubs,
   addAtom,
@@ -43,6 +43,7 @@ import {
   setShowPetriNetData,
   setMultiSelectType,
 } from "./reduce-connections.js";
+import * as atomUtils from "../../redux/utils/atom-utils.js";
 
 const initialState = Immutable.fromJS({});
 
@@ -432,9 +433,20 @@ export default function(allAtomsInState = initialState, action = {}) {
         // (see connectAdHoc)
         const atomUri = tmpAtom.get("uri");
 
+        //set socketUris to the default SocketUris if the socket Uris where not set yet
+        const socketUri = atomUtils.getDefaultSocketUri(tmpAtom);
+        const targetSocketUri = atomUtils.getDefaultSocketUri(
+          get(allAtomsInState, get(tmpConnection, "targetAtomUri"))
+        );
+
         const properConnection = tmpConnection
           .delete("usingTemporaryUri")
-          .set("uri", connUri);
+          .set("uri", connUri)
+          .set("socketUri", get(tmpConnection, "socketUri") || socketUri)
+          .set(
+            "targetSocketUri",
+            get(tmpConnection, "targetSocketUri") || targetSocketUri
+          );
 
         allAtomsInState = allAtomsInState
           .deleteIn([atomUri, "connections", tmpConnUri])
