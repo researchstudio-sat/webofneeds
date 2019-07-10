@@ -21,7 +21,7 @@ which can be used to deploy all components on one local server.
 
 1. Install and configure docker (https://www.docker.com)
 2. Install and configure docker compose (https://docs.docker.com/compose/)
-3. Download the [docker-compose.yml](deploy/local-image/docker-compose.yml) file that deploys all components at once
+3. Download the [docker-compose.yml](deploy/local_image/docker-compose.yml) file that deploys all components at once
 4. The script needs two environment parameters to be set. Export `deploy_host` to set the host you want to deploy the
    docker containers on. Export `base_folder` to set the folder where data (like certificates) are created and mounted
 5. Make sure no other services on the server are running on the following ports that are used by the different
