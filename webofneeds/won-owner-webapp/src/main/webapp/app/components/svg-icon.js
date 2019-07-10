@@ -11,8 +11,6 @@ class SvgIcon extends HTMLElement {
       "svg"
     );
     svgElement.style.setProperty("--local-primary", this.getAttribute("color"));
-    svgElement.style.width = "100%";
-    svgElement.style.height = "100%";
     const useElement = document.createElementNS(
       "http://www.w3.org/2000/svg",
       "use"
