@@ -1,5 +1,5 @@
 import { details, mergeInEmptyDraft } from "../detail-definitions.js";
-import * as wonUtils from "../../app/won-utils.js";
+import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
 import won from "../../app/won-es6.js";
 import { getIn } from "../../app/utils.js";
 import { sparqlQuery } from "../../app/sparql-builder-utils.js";
@@ -8,7 +8,7 @@ export const goodsTransportOffer = {
   identifier: "goodsTransportOffer",
   label: "Offer goods transport",
   icon: "#ico36_uc_transport_offer",
-  doNotMatchAfter: wonUtils.findLatestIntervallEndInJsonLdOrNowAndAddMillis,
+  doNotMatchAfter: jsonLdUtils.findLatestIntervallEndInJsonLdOrNowAndAddMillis,
   draft: {
     ...mergeInEmptyDraft({
       content: {

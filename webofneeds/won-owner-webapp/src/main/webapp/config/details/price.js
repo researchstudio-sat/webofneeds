@@ -1,6 +1,6 @@
 import { generateIdString } from "../../app/utils.js";
 import Immutable from "immutable";
-import won from "../../app/won-es6.js";
+import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
 
 export const pricerange = {
   identifier: "pricerange",
@@ -53,22 +53,22 @@ export const pricerange = {
     };
   },
   parseFromRDF: function(jsonLDImm) {
-    const minRent = won.parseFrom(
+    const minRent = jsonLdUtils.parseFrom(
       jsonLDImm,
       ["s:priceSpecification", "s:minPrice"],
       "xsd:float"
     );
-    const maxRent = won.parseFrom(
+    const maxRent = jsonLdUtils.parseFrom(
       jsonLDImm,
       ["s:priceSpecification", "s:maxPrice"],
       "xsd:float"
     );
-    const currency = won.parseFrom(
+    const currency = jsonLdUtils.parseFrom(
       jsonLDImm,
       ["s:priceSpecification", "s:priceCurrency"],
       "xsd:string"
     );
-    const unitCode = won.parseFrom(
+    const unitCode = jsonLdUtils.parseFrom(
       jsonLDImm,
       ["s:priceSpecification", "s:unitCode"],
       "xsd:string"
@@ -185,19 +185,19 @@ export const price = {
     };
   },
   parseFromRDF: function(jsonLDImm) {
-    const amount = won.parseFrom(
+    const amount = jsonLdUtils.parseFrom(
       jsonLDImm,
       ["s:priceSpecification", "s:price"],
       "xsd:float"
     );
 
-    const currency = won.parseFrom(
+    const currency = jsonLdUtils.parseFrom(
       jsonLDImm,
       ["s:priceSpecification", "s:priceCurrency"],
       "xsd:string"
     );
 
-    const unitCode = won.parseFrom(
+    const unitCode = jsonLdUtils.parseFrom(
       jsonLDImm,
       ["s:priceSpecification", "s:unitCode"],
       "xsd:string"

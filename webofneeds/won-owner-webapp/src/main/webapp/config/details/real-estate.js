@@ -4,13 +4,9 @@
 import Immutable from "immutable";
 import { details, abstractDetails } from "../detail-definitions.js";
 
-import {
-  is,
-  isValidNumber,
-  getFromJsonLd,
-  getInFromJsonLd,
-} from "../../app/utils.js";
+import { is, isValidNumber } from "../../app/utils.js";
 import won from "../../app/won-es6.js";
+import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
 
 function minMaxLabel(min, max) {
   const min_ = Number.parseFloat(min);
@@ -48,12 +44,12 @@ export const realEstateFloorSizeDetail = {
     }
   },
   parseFromRDF: function(jsonLDImm) {
-    const fs = won.parseFrom(
+    const fs = jsonLdUtils.parseFrom(
       jsonLDImm,
       ["s:floorSize", "s:value"],
       "xsd:float"
     );
-    const unit = getInFromJsonLd(
+    const unit = jsonLdUtils.getInFromJsonLd(
       jsonLDImm,
       ["s:floorSize", "s:unitCode"],
       won.defaultContext
@@ -95,7 +91,7 @@ export const realEstateNumberOfRoomsDetail = {
     }
   },
   parseFromRDF: function(jsonLDImm) {
-    return won.parseFrom(jsonLDImm, ["s:numberOfRooms"], "xsd:float");
+    return jsonLdUtils.parseFrom(jsonLDImm, ["s:numberOfRooms"], "xsd:float");
   },
   generateHumanReadable: function({ value, includeLabel }) {
     if (isValidNumber(value)) {
@@ -131,7 +127,7 @@ export const realEstateNumberOfRoomsRangeDetail = {
     };
   },
   parseFromRDF: function(jsonLDImm) {
-    let properties = getFromJsonLd(
+    let properties = jsonLdUtils.getFromJsonLd(
       jsonLDImm,
       "sh:property",
       won.defaultContext
@@ -143,15 +139,18 @@ export const realEstateNumberOfRoomsRangeDetail = {
 
     const numberOfRooms = properties.find(
       property =>
-        getInFromJsonLd(property, ["sh:path", "@id"], won.defaultContext) ===
-        "s:numberOfRooms"
+        jsonLdUtils.getInFromJsonLd(
+          property,
+          ["sh:path", "@id"],
+          won.defaultContext
+        ) === "s:numberOfRooms"
     );
-    const minNumberOfRooms = getFromJsonLd(
+    const minNumberOfRooms = jsonLdUtils.getFromJsonLd(
       numberOfRooms,
       "sh:minInclusive",
       won.defaultContext
     );
-    const maxNumberOfRooms = getFromJsonLd(
+    const maxNumberOfRooms = jsonLdUtils.getFromJsonLd(
       numberOfRooms,
       "sh:maxInclusive",
       won.defaultContext
@@ -203,7 +202,7 @@ export const realEstateFloorSizeRangeDetail = {
     };
   },
   parseFromRDF: function(jsonLDImm) {
-    let properties = getFromJsonLd(
+    let properties = jsonLdUtils.getFromJsonLd(
       jsonLDImm,
       "sh:property",
       won.defaultContext
@@ -215,16 +214,19 @@ export const realEstateFloorSizeRangeDetail = {
 
     const floorSize = properties.find(
       property =>
-        getInFromJsonLd(property, ["sh:path", "@id"], won.defaultContext) ===
-        "s:floorSize"
+        jsonLdUtils.getInFromJsonLd(
+          property,
+          ["sh:path", "@id"],
+          won.defaultContext
+        ) === "s:floorSize"
     );
 
-    const minFloorSize = getFromJsonLd(
+    const minFloorSize = jsonLdUtils.getFromJsonLd(
       floorSize,
       "sh:minInclusive",
       won.defaultContext
     );
-    const maxFloorSize = getFromJsonLd(
+    const maxFloorSize = jsonLdUtils.getFromJsonLd(
       floorSize,
       "sh:maxInclusive",
       won.defaultContext
@@ -272,7 +274,7 @@ export const realEstateFeaturesDetail = {
     }
   },
   parseFromRDF: function(jsonLDImm) {
-    return won.parseListFrom(
+    return jsonLdUtils.parseListFrom(
       jsonLDImm,
       ["s:amenityFeature"], //, "s:value"],
       "s:Text"

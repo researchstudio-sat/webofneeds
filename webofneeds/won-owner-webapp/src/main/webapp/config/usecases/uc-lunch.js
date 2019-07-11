@@ -6,7 +6,7 @@ import {
 import { getIn } from "../../app/utils.js";
 import { Generator } from "sparqljs";
 import won from "../../app/service/won.js";
-import * as wonUtils from "../../app/won-utils.js";
+import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
 
 window.SparqlGenerator4dbg = Generator;
 
@@ -14,7 +14,7 @@ export const lunchPlan = {
   identifier: "lunchPlan",
   label: "Plan Lunch!",
   icon: "#ico36_uc_meal-half",
-  doNotMatchAfter: wonUtils.findLatestIntervallEndInJsonLdOrNowAndAddMillis,
+  doNotMatchAfter: jsonLdUtils.findLatestIntervallEndInJsonLdOrNowAndAddMillis,
   draft: {
     ...mergeInEmptyDraft({
       content: {

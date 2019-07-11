@@ -1,7 +1,7 @@
 import { details, mergeInEmptyDraft } from "../detail-definitions.js";
 import won from "../../app/service/won.js";
 import { Generator } from "sparqljs";
-import * as wonUtils from "../../app/won-utils.js";
+import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
 
 window.SparqlGenerator4dbg = Generator;
 
@@ -9,7 +9,7 @@ export const pokemonGoRaid = {
   identifier: "pokemonGoRaid",
   label: "Plan a Pokémon Raid",
   icon: "#ico36_pokemon-raid", //TODO: Better Icon
-  doNotMatchAfter: wonUtils.findLatestIntervallEndInJsonLdOrNowAndAddMillis,
+  doNotMatchAfter: jsonLdUtils.findLatestIntervallEndInJsonLdOrNowAndAddMillis,
   draft: {
     ...mergeInEmptyDraft({
       content: {

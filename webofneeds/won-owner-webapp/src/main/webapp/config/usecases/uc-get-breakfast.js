@@ -2,14 +2,14 @@
  * Created by fsuda on 18.09.2018.
  */
 import { details, mergeInEmptyDraft } from "../detail-definitions.js";
-import * as wonUtils from "../../app/won-utils.js";
+import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
 import { interestsDetail } from "../details/person.js";
 
 export const getBreakfast = {
   identifier: "getBreakfast",
   label: "Get breakfast",
   icon: "#ico36_uc_breakfast",
-  doNotMatchAfter: wonUtils.findLatestIntervallEndInJsonLdOrNowAndAddMillis,
+  doNotMatchAfter: jsonLdUtils.findLatestIntervallEndInJsonLdOrNowAndAddMillis,
   draft: {
     ...mergeInEmptyDraft({
       content: {

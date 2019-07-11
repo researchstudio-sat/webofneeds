@@ -1,7 +1,7 @@
-import won from "../../app/won-es6.js";
 import { is, get, getIn } from "../../app/utils.js";
 import { select } from "../details/abstract.js";
 import Immutable from "immutable";
+import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
 
 export const title = {
   identifier: "title",
@@ -18,8 +18,14 @@ export const title = {
     };
   },
   parseFromRDF: function(jsonLDImm) {
-    const dcTitle = won.parseFrom(jsonLDImm, ["dc:title"], "xsd:string");
-    return dcTitle || won.parseFrom(jsonLDImm, ["s:title"], "xsd:string");
+    const dcTitle = jsonLdUtils.parseFrom(
+      jsonLDImm,
+      ["dc:title"],
+      "xsd:string"
+    );
+    return (
+      dcTitle || jsonLdUtils.parseFrom(jsonLDImm, ["s:title"], "xsd:string")
+    );
   },
   generateHumanReadable: function({ value, includeLabel }) {
     if (value) {
@@ -43,7 +49,7 @@ export const personaName = {
     };
   },
   parseFromRDF: function(jsonLDImm) {
-    return won.parseFrom(jsonLDImm, ["s:name"], "xsd:string");
+    return jsonLdUtils.parseFrom(jsonLDImm, ["s:name"], "xsd:string");
   },
   generateHumanReadable: function({ value, includeLabel }) {
     if (value) {
@@ -68,7 +74,7 @@ export const website = {
     };
   },
   parseFromRDF: function(jsonLDImm) {
-    return won.parseFrom(jsonLDImm, ["s:url"], "xsd:string");
+    return jsonLdUtils.parseFrom(jsonLDImm, ["s:url"], "xsd:string");
   },
   generateHumanReadable: function({ value, includeLabel }) {
     if (value) {
@@ -92,7 +98,11 @@ export const searchString = {
     };
   },
   parseFromRDF: function(jsonLDImm) {
-    return won.parseFrom(jsonLDImm, ["match:searchString"], "xsd:string");
+    return jsonLdUtils.parseFrom(
+      jsonLDImm,
+      ["match:searchString"],
+      "xsd:string"
+    );
   },
   generateHumanReadable: function({ value, includeLabel }) {
     if (value) {
@@ -117,13 +127,14 @@ export const description = {
     };
   },
   parseFromRDF: function(jsonLDImm) {
-    const dcDescription = won.parseFrom(
+    const dcDescription = jsonLdUtils.parseFrom(
       jsonLDImm,
       ["dc:description"],
       "xsd:string"
     );
     return (
-      dcDescription || won.parseFrom(jsonLDImm, ["s:description"], "xsd:string")
+      dcDescription ||
+      jsonLdUtils.parseFrom(jsonLDImm, ["s:description"], "xsd:string")
     );
   },
   generateHumanReadable: function({ value, includeLabel }) {
@@ -149,7 +160,7 @@ export const tags = {
     return { "con:tag": value };
   },
   parseFromRDF: function(jsonLDImm) {
-    return won.parseListFrom(jsonLDImm, ["con:tag"], "xsd:string");
+    return jsonLdUtils.parseListFrom(jsonLDImm, ["con:tag"], "xsd:string");
   },
   generateHumanReadable: function({ value, includeLabel }) {
     if (value && is("Array", value) && value.length > 0) {
@@ -247,7 +258,7 @@ export const flags = {
     }
   },
   parseFromRDF: function(jsonLDImm) {
-    return won.parseListFrom(jsonLDImm, ["match:flag"], "xsd:ID");
+    return jsonLdUtils.parseListFrom(jsonLDImm, ["match:flag"], "xsd:ID");
   },
   generateHumanReadable: function({ value, includeLabel }) {
     //TODO: Implement this so that the label shows instead of the value
@@ -489,10 +500,10 @@ export const eventObjectAboutUris = {
       if (Immutable.List.isList(planObjs)) {
         planObjs &&
           planObjs.forEach(planObj => {
-            plns.push(won.parseFrom(planObj, ["s:about"], "xsd:ID"));
+            plns.push(jsonLdUtils.parseFrom(planObj, ["s:about"], "xsd:ID"));
           });
       } else {
-        let pln = won.parseFrom(planObjs, ["s:about"], "xsd:ID");
+        let pln = jsonLdUtils.parseFrom(planObjs, ["s:about"], "xsd:ID");
         if (pln) {
           return Immutable.fromJS([pln]);
         }

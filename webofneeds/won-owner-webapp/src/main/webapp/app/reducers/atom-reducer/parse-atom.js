@@ -10,6 +10,7 @@ import {
 } from "../../utils.js";
 import shajs from "sha.js";
 import Identicon from "identicon.js";
+import * as jsonLdUtils from "../../service/jsonld-utils.js";
 
 export function parseAtom(jsonldAtom) {
   const jsonldAtomImm = Immutable.fromJS(jsonldAtom);
@@ -22,16 +23,20 @@ export function parseAtom(jsonldAtom) {
       identiconSvg: generateIdenticon(jsonldAtomImm),
       nodeUri: jsonldAtomImm.getIn(["won:wonNode", "@id"]),
       state: extractState(jsonldAtomImm),
-      heldBy: won.parseFrom(jsonldAtomImm, ["hold:heldBy"], "xsd:ID"),
+      heldBy: jsonLdUtils.parseFrom(jsonldAtomImm, ["hold:heldBy"], "xsd:ID"),
       holds: Immutable.Set(
-        won.parseListFrom(jsonldAtomImm, ["hold:holds"], "xsd:ID")
+        jsonLdUtils.parseListFrom(jsonldAtomImm, ["hold:holds"], "xsd:ID")
       ),
       buddies: Immutable.Set(
-        won.parseListFrom(jsonldAtomImm, ["buddy:buddy"], "xsd:ID")
+        jsonLdUtils.parseListFrom(jsonldAtomImm, ["buddy:buddy"], "xsd:ID")
       ),
       rating: extractRating(jsonldAtomImm),
       groupMembers: Immutable.Set(
-        won.parseListFrom(jsonldAtomImm, ["group:groupMember"], "xsd:ID")
+        jsonLdUtils.parseListFrom(
+          jsonldAtomImm,
+          ["group:groupMember"],
+          "xsd:ID"
+        )
       ),
       content: generateContent(jsonldAtomImm, detailsToParse),
       seeks: generateContent(jsonldAtomImm.get("match:seeks"), detailsToParse),

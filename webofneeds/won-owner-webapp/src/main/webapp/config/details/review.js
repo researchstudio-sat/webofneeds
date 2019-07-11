@@ -2,7 +2,7 @@
  * Created by fsuda on 03.10.2018.
  */
 import { generateIdString } from "../../app/utils.js";
-import won from "../../app/won-es6.js";
+import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
 
 /*Detail based on https://schema.org/Review*/
 export const review = {
@@ -60,13 +60,13 @@ export const review = {
     };
   },
   parseFromRDF: function(jsonLDImm) {
-    const text = won.parseFrom(
+    const text = jsonLdUtils.parseFrom(
       jsonLDImm,
       ["s:review", "s:description"],
       "xsd:string"
     );
 
-    const rating = won.parseFrom(
+    const rating = jsonLdUtils.parseFrom(
       jsonLDImm,
       ["s:review", "s:reviewRating", "s:ratingValue"],
       "xsd:int"

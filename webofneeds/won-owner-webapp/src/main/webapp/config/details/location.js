@@ -1,7 +1,8 @@
-import { get, getIn, getFromJsonLd } from "../../app/utils.js";
+import { get, getIn } from "../../app/utils.js";
 import * as wonUtils from "../../app/won-utils.js";
 import Immutable from "immutable";
 import won from "../../app/won-es6.js";
+import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
 
 export const location = {
   identifier: "location",
@@ -27,7 +28,7 @@ export const location = {
     const jsonldLocation =
       jsonLDImm &&
       (jsonLDImm.get("s:location") || jsonLDImm.get("won:location"));
-    return wonUtils.parseSPlace(jsonldLocation);
+    return jsonLdUtils.parseSPlace(jsonldLocation);
   },
   generateHumanReadable: function({ value, includeLabel }) {
     return sPlaceToHumanReadable({
@@ -55,7 +56,7 @@ export const jobLocation = {
   },
   parseFromRDF: function(jsonLDImm) {
     const jsonldLocation = jsonLDImm && jsonLDImm.get("s:jobLocation");
-    return wonUtils.parseSPlace(jsonldLocation);
+    return jsonLdUtils.parseSPlace(jsonldLocation);
   },
   generateHumanReadable: function({ value, includeLabel }) {
     return sPlaceToHumanReadable({
@@ -114,11 +115,19 @@ export const travelAction = {
 
     const jsonLdTravelActionImm = Immutable.fromJS(jsonLdTravelAction);
 
-    const fromLocation = wonUtils.parsePlaceLeniently(
-      getFromJsonLd(jsonLdTravelActionImm, "s:fromLocation", won.defaultContext)
+    const fromLocation = jsonLdUtils.parsePlaceLeniently(
+      jsonLdUtils.getFromJsonLd(
+        jsonLdTravelActionImm,
+        "s:fromLocation",
+        won.defaultContext
+      )
     );
-    const toLocation = wonUtils.parsePlaceLeniently(
-      getFromJsonLd(jsonLdTravelActionImm, "s:toLocation", won.defaultContext)
+    const toLocation = jsonLdUtils.parsePlaceLeniently(
+      jsonLdUtils.getFromJsonLd(
+        jsonLdTravelActionImm,
+        "s:toLocation",
+        won.defaultContext
+      )
     );
 
     const travelAction = {

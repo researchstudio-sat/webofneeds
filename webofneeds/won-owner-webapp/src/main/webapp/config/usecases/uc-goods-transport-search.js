@@ -3,17 +3,17 @@ import {
   abstractDetails,
   mergeInEmptyDraft,
 } from "../detail-definitions.js";
-import * as wonUtils from "../../app/won-utils.js";
 import { sparqlQuery } from "../../app/sparql-builder-utils.js";
 import won from "../../app/won-es6.js";
+import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
 
-import { isValidNumber, get, getIn, getInFromJsonLd } from "../../app/utils.js";
+import { isValidNumber, get, getIn } from "../../app/utils.js";
 
 export const goodsTransportSearch = {
   identifier: "goodsTransportSearch",
   label: "Send something",
   icon: "#ico36_uc_transport_demand",
-  doNotMatchAfter: wonUtils.findLatestIntervallEndInJsonLdOrNowAndAddMillis,
+  doNotMatchAfter: jsonLdUtils.findLatestIntervallEndInJsonLdOrNowAndAddMillis,
   draft: {
     ...mergeInEmptyDraft({
       content: {
@@ -39,7 +39,11 @@ export const goodsTransportSearch = {
         }
       },
       parseFromRDF: function(jsonLDImm) {
-        const content = won.parseFrom(jsonLDImm, ["s:name"], "xsd:string");
+        const content = jsonLdUtils.parseFrom(
+          jsonLDImm,
+          ["s:name"],
+          "xsd:string"
+        );
         const type = get(jsonLDImm, "@type");
         if (content && type === "s:Product") {
           return content;
@@ -68,12 +72,12 @@ export const goodsTransportSearch = {
         }
       },
       parseFromRDF: function(jsonLDImm) {
-        const w = won.parseFrom(
+        const w = jsonLdUtils.parseFrom(
           jsonLDImm,
           ["s:weight", "s:value"],
           "xsd:float"
         );
-        const unit = getInFromJsonLd(
+        const unit = jsonLdUtils.getInFromJsonLd(
           jsonLDImm,
           ["s:weight", "s:unitCode"],
           won.defaultContext
@@ -119,12 +123,12 @@ export const goodsTransportSearch = {
         }
       },
       parseFromRDF: function(jsonLDImm) {
-        const l = won.parseFrom(
+        const l = jsonLdUtils.parseFrom(
           jsonLDImm,
           ["s:length", "s:value"],
           "xsd:float"
         );
-        const unit = getInFromJsonLd(
+        const unit = jsonLdUtils.getInFromJsonLd(
           jsonLDImm,
           ["s:length", "s:unitCode"],
           won.defaultContext
@@ -170,8 +174,12 @@ export const goodsTransportSearch = {
         }
       },
       parseFromRDF: function(jsonLDImm) {
-        const w = won.parseFrom(jsonLDImm, ["s:width", "s:value"], "xsd:float");
-        const unit = getInFromJsonLd(
+        const w = jsonLdUtils.parseFrom(
+          jsonLDImm,
+          ["s:width", "s:value"],
+          "xsd:float"
+        );
+        const unit = jsonLdUtils.getInFromJsonLd(
           jsonLDImm,
           ["s:width", "s:unitCode"],
           won.defaultContext
@@ -217,12 +225,12 @@ export const goodsTransportSearch = {
         }
       },
       parseFromRDF: function(jsonLDImm) {
-        const h = won.parseFrom(
+        const h = jsonLdUtils.parseFrom(
           jsonLDImm,
           ["s:height", "s:value"],
           "xsd:float"
         );
-        const unit = getInFromJsonLd(
+        const unit = jsonLdUtils.getInFromJsonLd(
           jsonLDImm,
           ["s:height", "s:unitCode"],
           won.defaultContext

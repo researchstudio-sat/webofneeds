@@ -1,6 +1,6 @@
-import won from "../../app/won-es6.js";
 import { details } from "../detail-definitions.js";
 import { is } from "../../app/utils.js";
+import * as jsonLdUtils from "../../app/service/jsonld-utils";
 
 export const industryDetail = {
   ...details.tags,
@@ -16,7 +16,7 @@ export const industryDetail = {
     }
   },
   parseFromRDF: function(jsonLDImm) {
-    return won.parseListFrom(jsonLDImm, ["s:industry"], "xsd:string");
+    return jsonLdUtils.parseListFrom(jsonLDImm, ["s:industry"], "xsd:string");
   },
 };
 
@@ -34,7 +34,11 @@ export const employmentTypesDetail = {
     }
   },
   parseFromRDF: function(jsonLDImm) {
-    return won.parseListFrom(jsonLDImm, ["s:employmentType"], "xsd:string");
+    return jsonLdUtils.parseListFrom(
+      jsonLDImm,
+      ["s:employmentType"],
+      "xsd:string"
+    );
   },
 };
 
@@ -59,7 +63,7 @@ export const organizationNamesDetail = {
     }
   },
   parseFromRDF: function(jsonLDImm) {
-    return won.parseListFrom(
+    return jsonLdUtils.parseListFrom(
       jsonLDImm,
       ["s:hiringOrganization", "s:name"],
       "xsd:string"

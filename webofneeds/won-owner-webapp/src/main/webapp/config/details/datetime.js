@@ -3,7 +3,7 @@ import {
   parseDatetimeStrictly,
   toLocalISODateString,
 } from "../../app/utils.js";
-import won from "../../app/won-es6.js";
+import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
 
 export const fromDatetime = {
   identifier: "fromDatetime",
@@ -26,7 +26,7 @@ export const fromDatetime = {
     }
   },
   parseFromRDF: function(jsonLDImm) {
-    return won.parseFrom(jsonLDImm, ["s:validFrom"], "xsd:dateTime");
+    return jsonLdUtils.parseFrom(jsonLDImm, ["s:validFrom"], "xsd:dateTime");
   },
   generateHumanReadable: function({ value, includeLabel }) {
     if (value) {
@@ -63,7 +63,7 @@ export const throughDatetime = {
     }
   },
   parseFromRDF: function(jsonLDImm) {
-    return won.parseFrom(jsonLDImm, ["s:validThrough"], "xsd:dateTime");
+    return jsonLdUtils.parseFrom(jsonLDImm, ["s:validThrough"], "xsd:dateTime");
   },
   generateHumanReadable: function({ value, includeLabel }) {
     if (value) {

@@ -9,7 +9,6 @@ import {
   realEstateNumberOfRoomsRangeDetail,
 } from "../details/real-estate.js";
 
-import * as wonUtils from "../../app/won-utils.js";
 import {
   filterFloorSizeRange,
   filterNumOfRoomsRange,
@@ -18,13 +17,14 @@ import {
   sparqlQuery,
 } from "../../app/sparql-builder-utils.js";
 import won from "../../app/won-es6.js";
+import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
 
 export const rentRealEstateSearch = {
   identifier: "rentRealEstateSearch",
   label: "Find a place to rent",
   icon: "#ico36_uc_realestate",
   timeToLiveMillisDefault: 1000 * 60 * 60 * 24 * 30 * 3,
-  doNotMatchAfter: wonUtils.findLatestIntervallEndInJsonLdOrNowAndAddMillis,
+  doNotMatchAfter: jsonLdUtils.findLatestIntervallEndInJsonLdOrNowAndAddMillis,
   draft: {
     ...mergeInEmptyDraft({
       seeks: {

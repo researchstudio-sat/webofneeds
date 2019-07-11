@@ -1,6 +1,6 @@
 import { details, mergeInEmptyDraft } from "../detail-definitions.js";
 import { interestsDetail, skillsDetail } from "../details/person.js";
-import * as wonUtils from "../../app/won-utils.js";
+import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
 import {
   industryDetail,
   employmentTypesDetail,
@@ -20,7 +20,7 @@ export const jobOffer = {
   identifier: "jobOffer",
   label: "Find people for a Job",
   icon: "#ico36_uc_consortium-offer", //TODO proper icon
-  doNotMatchAfter: wonUtils.findLatestIntervallEndInJsonLdOrNowAndAddMillis,
+  doNotMatchAfter: jsonLdUtils.findLatestIntervallEndInJsonLdOrNowAndAddMillis,
   draft: {
     ...mergeInEmptyDraft({
       content: {

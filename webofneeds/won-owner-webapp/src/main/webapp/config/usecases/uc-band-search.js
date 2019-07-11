@@ -4,7 +4,7 @@
 import { details, mergeInEmptyDraft } from "../detail-definitions.js";
 import won from "../../app/won-es6.js";
 import { genresDetail, instrumentsDetail } from "../details/musician.js";
-import * as wonUtils from "../../app/won-utils.js";
+import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
 import {
   vicinityScoreSubQuery,
   tagOverlapScoreSubQuery,
@@ -18,7 +18,7 @@ export const bandSearch = {
   label: "Find Band",
   icon: "#ico36_uc_find_band",
   timeToLiveMillisDefault: 1000 * 60 * 60 * 24 * 30,
-  doNotMatchAfter: wonUtils.findLatestIntervallEndInJsonLdOrNowAndAddMillis,
+  doNotMatchAfter: jsonLdUtils.findLatestIntervallEndInJsonLdOrNowAndAddMillis,
   draft: {
     ...mergeInEmptyDraft({
       content: {

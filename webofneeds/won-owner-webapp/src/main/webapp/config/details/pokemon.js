@@ -1,10 +1,6 @@
 import Immutable from "immutable";
-import won from "../../app/won-es6.js";
-import {
-  isValidDate,
-  //parseDatetimeStrictly,
-  toLocalISODateString,
-} from "../../app/utils.js";
+import { isValidDate, toLocalISODateString } from "../../app/utils.js";
+import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
 
 export const pokemonGymInfo = {
   identifier: "pokemonGymInfo",
@@ -24,7 +20,7 @@ export const pokemonGymInfo = {
   },
   parseFromRDF: function(jsonLDImm) {
     if (jsonLDImm) {
-      const ex = won.parseFrom(jsonLDImm, ["won:gymex"], "xsd:boolean");
+      const ex = jsonLdUtils.parseFrom(jsonLDImm, ["won:gymex"], "xsd:boolean");
 
       if (ex) {
         return Immutable.fromJS({ ex });
@@ -136,19 +132,19 @@ export const pokemonRaid = {
     return undefined;
   },
   parseFromRDF: function(jsonLDImm) {
-    const level = won.parseFrom(
+    const level = jsonLdUtils.parseFrom(
       jsonLDImm,
       ["won:raid", "won:level"],
       "xsd:int"
     );
-    const expires = won.parseFrom(
+    const expires = jsonLdUtils.parseFrom(
       jsonLDImm,
       ["won:raid", "s:validThrough"],
       "xsd:dateTime"
     );
 
     if (expires) {
-      const id = won.parseFrom(
+      const id = jsonLdUtils.parseFrom(
         jsonLDImm,
         ["won:raid", "won:pokemonid"],
         "xsd:int"
@@ -156,11 +152,19 @@ export const pokemonRaid = {
       const hatched = !!id;
       const hatches =
         !hatched &&
-        won.parseFrom(jsonLDImm, ["won:raid", "s:validFrom"], "xsd:dateTime");
+        jsonLdUtils.parseFrom(
+          jsonLDImm,
+          ["won:raid", "s:validFrom"],
+          "xsd:dateTime"
+        );
 
       const form =
         id &&
-        won.parseFrom(jsonLDImm, ["won:raid", "won:pokemonform"], "xsd:string");
+        jsonLdUtils.parseFrom(
+          jsonLDImm,
+          ["won:raid", "won:pokemonform"],
+          "xsd:string"
+        );
 
       if (hatched) {
         return Immutable.fromJS({
