@@ -438,19 +438,6 @@ export default function(processState = initialState, action = {}) {
       return processState;
     }
 
-    case actionTypes.messages.reopenAtom.failed:
-    case actionTypes.messages.closeAtom.failed: {
-      let connections = action.payload.connections;
-
-      connections &&
-        connections.keySeq().forEach(connUri => {
-          processState = updateConnectionProcess(processState, connUri, {
-            loading: false,
-          });
-        });
-      return processState;
-    }
-
     case actionTypes.connections.storeActive: {
       let connections = get(action.payload, "connections");
 

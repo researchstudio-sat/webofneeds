@@ -313,14 +313,6 @@ import won from "./won.js";
     privateData.cacheStatus[uri].timestamp = new Date().getTime();
   };
 
-  const cacheItemMarkDirty = function(uri) {
-    const entry = privateData.cacheStatus[uri];
-    if (typeof entry === "undefined") {
-      return;
-    }
-    privateData.cacheStatus[uri].state = CACHE_ITEM_STATE.DIRTY;
-  };
-
   const cacheItemMarkFetching = function(uri) {
     privateData.cacheStatus[uri] = {
       timestamp: new Date().getTime(),
@@ -330,59 +322,6 @@ import won from "./won.js";
 
   const cacheItemRemove = function(uri) {
     delete privateData.cacheStatus[uri];
-  };
-
-  /**
-   * Invalidates the appropriate linked data cache items (i.e. the set of connections
-   * associated with an atom) such that all information about a
-   * newly created connection is loaded. Should be called when receiving hint or connect.
-   *
-   * Note that this causes an asynchronous call - the cache items may only be invalidated
-   * after some delay.
-   *
-   * @param connectionUri - the uri of the new connection
-   * @param atomUri - the uri of the atom that now has a new connection
-   * @return a promise so the caller can chain promises after this one
-   */
-  won.invalidateCacheForNewConnection = function(connectionUri, atomUri) {
-    if (connectionUri) {
-      cacheItemMarkDirty(connectionUri);
-    }
-    return getConnectionContainerOfAtom(atomUri).then(function(
-      connectionContainerUri
-    ) {
-      if (connectionContainerUri != null) {
-        cacheItemMarkDirty(connectionContainerUri);
-      }
-    });
-  };
-
-  /**
-   * Invalidates the appropriate linked data cache items such that all information about a
-   * newly received connection message is loaded. Should be called when receiving open, close, or message.
-   *
-   * Note that this causes an asynchronous call - the cache items may only be invalidated
-   * after some delay.
-   *
-   * @param connectionUri - the uri of the connection
-   * @return a promise so that the caller can chain another promise
-   */
-  won.invalidateCacheForNewMessage = function(connectionUri) {
-    if (connectionUri != null) {
-      cacheItemMarkDirty(connectionUri);
-    }
-    return won.getNode(connectionUri).then(connection => {
-      if (connection.messageContainer) {
-        cacheItemMarkDirty(connection.messageContainer);
-      }
-    });
-  };
-  won.invalidateCacheForAtom = function(atomUri) {
-    if (atomUri != null) {
-      cacheItemMarkDirty(atomUri);
-      cacheItemMarkDirty(atomUri + "/connections");
-    }
-    return Promise.resolve(true); //return a promise for chaining
   };
 
   const getReadUpdateLockPerUri = function(uri) {
@@ -429,12 +368,9 @@ import won from "./won.js";
    */
   const rejectIfFailed = function(success, data, options) {
     const rejectionMessage = buildRejectionMessage(success, data, options);
-    if (rejectionMessage) {
-      // observation: the error happens for #targetConnection property of suggested connection, but this
-      // property is really not there (and should not be), so in that case it's not an error...
-      return true;
-    }
-    return false;
+    // observation: the error happens for #targetConnection property of suggested connection, but this
+    // property is really not there (and should not be), so in that case it's not an error...
+    return !!rejectionMessage;
   };
 
   function buildRejectionMessage(success, data, options) {
@@ -638,7 +574,7 @@ import won from "./won.js";
       dataset
     ).then(() => tmpstore);
 
-    const allLoadedResourcesP = storeWithDatasetP.then(tmpstore => {
+    return storeWithDatasetP.then(tmpstore => {
       const queryPromise = executeQueryOnRdfStore(
         tmpstore,
         `
@@ -670,8 +606,6 @@ import won from "./won.js";
         queryResults.map(r => r.s.value)
       );
     });
-
-    return allLoadedResourcesP;
   }
 
   /**
@@ -773,7 +707,7 @@ import won from "./won.js";
   function loadFromOwnServerIntoCache(uri, params, removeCacheItem = false) {
     let requestUri = queryString(uri, params);
 
-    const datasetP = fetch(requestUri, {
+    return fetch(requestUri, {
       method: "get",
       credentials: "same-origin",
       headers: {
@@ -823,8 +757,6 @@ import won from "./won.js";
           .then(() => dataset)
       )
       .catch(e => rethrow(e, `failed to load ${uri} due to reason: `));
-
-    return datasetP;
   }
 
   /**
@@ -1010,7 +942,7 @@ import won from "./won.js";
     const context = frame["@context"] ? clone(frame["@context"]) : {}; //TODO
     context.useNativeTypes = true; //do some of the parsing from strings to numbers
 
-    const jsonLdP = jsonld.promises
+    return jsonld.promises
       .fromRDF(jsonldjsQuads, context)
       .then(complexJsonLd => {
         //the framing algorithm expects an js-object with an `@graph`-property
@@ -1027,8 +959,6 @@ import won from "./won.js";
         console.error("Failed to frame atom-data.", atomUri, err);
         throw err;
       });
-
-    return jsonLdP;
   }
 
   /**
@@ -1205,53 +1135,6 @@ import won from "./won.js";
   };
 
   /**
-   *
-   * @param atomUri
-   * @returns {*} the Uri of the connection container (read: set) of
-   *              connections for the given atom
-   */
-  function getConnectionContainerOfAtom(atomUri) {
-    if (typeof atomUri === "undefined" || atomUri == null) {
-      throw { message: "getConnectionsUri: atomUri must not be null" };
-    }
-    return won.ensureLoaded(atomUri).then(function() {
-      const lock = getReadUpdateLockPerUri(atomUri);
-      return lock.acquireReadLock().then(function() {
-        try {
-          const subject = atomUri;
-          const predicate = won.WON.connections;
-          const result = {};
-          privateData.store.node(atomUri, function(success, graph) {
-            const resultGraph = graph.match(subject, predicate, null);
-            if (
-              !rejectIfFailed(success, resultGraph, {
-                allowMultiple: false,
-                allowNone: false,
-                message: "Failed to load connections uri of atom " + atomUri,
-              })
-            ) {
-              result.result = resultGraph.triples[0].object.nominalValue;
-            }
-          });
-          return result.result;
-        } catch (e) {
-          rethrow(
-            "could not get connection URIs of atom + " +
-              atomUri +
-              ". Reason:" +
-              e,
-            e
-          );
-        } finally {
-          //we don't need to release after a promise resolves because
-          //this function isn't deferred.
-          lock.releaseReadLock();
-        }
-      });
-    });
-  }
-
-  /**
    * @param connectionUri
    * @param fetchParams See `ensureLoaded`.
    * @return {*} the connections predicates along with the uris of associated events
@@ -1366,7 +1249,7 @@ import won from "./won.js";
 
     let releaseLock = undefined;
 
-    const nodePromise = won
+    return won
       .ensureLoaded(uri, fetchParams)
       .then(() => {
         const lock = getReadUpdateLockPerUri(uri);
@@ -1433,8 +1316,6 @@ import won from "./won.js";
           "Couldn't get node " + uri + " with params " + fetchParams + "\n"
         );
       });
-
-    return nodePromise;
   };
 
   /**
@@ -1887,13 +1768,11 @@ function groupByGraphs(jsonldData, addDefaultContext = true) {
     }
   };
 
-  const seperatedGraphsP = jsonld.promises
+  return jsonld.promises
     .flatten(jsonldData) // flattening groups by graph as a side-effect
     .then(flattenedData => {
       return Promise.all(flattenedData.map(graph => cleanUpGraph(graph)));
     });
-
-  return seperatedGraphsP;
 }
 
 /**

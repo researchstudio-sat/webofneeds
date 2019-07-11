@@ -98,18 +98,6 @@ export default function(allAtomsInState = initialState, action = {}) {
       );
     }
 
-    case actionTypes.messages.closeAtom.failed:
-      return storeConnectionsData(
-        allAtomsInState,
-        action.payload.get("connections")
-      );
-
-    case actionTypes.messages.reopenAtom.failed:
-      return storeConnectionsData(
-        allAtomsInState,
-        action.payload.get("connections")
-      );
-
     case actionTypes.atoms.reopen:
       return allAtomsInState.setIn(
         [action.payload.ownedAtomUri, "state"],

@@ -22,6 +22,22 @@ import * as processUtils from "../redux/utils/process-utils";
 
 export function successfulCloseAtom(event) {
   return (dispatch, getState) => {
+    //TODO MAYBE DELETE THIS FUNCTION, I THINK IT SERVES NO PURPOSE
+    //TODO maybe refactor these response message handling
+    if (
+      getState().getIn([
+        "messages",
+        "waitingForAnswer",
+        event.getIsRemoteResponseTo(),
+      ])
+    ) {
+      //dispatch(actionCreators.connections__denied(event));
+    }
+  };
+}
+export function successfulReopenAtom(event) {
+  return (dispatch, getState) => {
+    //TODO MAYBE DELETE THIS FUNCTION, I THINK IT SERVES NO PURPOSE
     //TODO maybe refactor these response message handling
     if (
       getState().getIn([
@@ -37,34 +53,26 @@ export function successfulCloseAtom(event) {
 export function failedCloseAtom(event) {
   return (dispatch, getState) => {
     const atomUri = event.getRecipientAtom();
-    /*
-        * TODO not sure if it's necessary to invalidate
-        * the cache here as the previous action will just have
-        * been an optimistic update of the state. Invalidation
-        * should happen in the action that causes the interaction
-        * with the server.
-        */
+
     won
-      .invalidateCacheForAtom(atomUri) // mark atom and it's connection container dirty
-      .then(() => won.getConnectionUrisWithStateByAtomUri(atomUri))
-      .then(connectionsWithStateAndSocket =>
-        Promise.all(
-          connectionsWithStateAndSocket.map(
-            conn => won.invalidateCacheForNewMessage(conn.connectionUri) // mark connections dirty
-          )
-        )
-      )
+      .clearStoreWithPromise()
       .then(() =>
-        // as the atom and it's connections have been marked dirty
-        // they will be reloaded on this action.
         stateStore.fetchDataForOwnedAtoms([atomUri], dispatch, getState)
       )
-      .then(allThatData =>
-        dispatch({
-          type: actionTypes.messages.closeAtom.failed,
-          payload: allThatData,
-        })
-      );
+      .then(() => dispatch({ type: actionTypes.messages.closeAtom.failed }));
+  };
+}
+
+export function failedReopenAtom(event) {
+  return (dispatch, getState) => {
+    const atomUri = event.getRecipientAtom();
+
+    won
+      .clearStoreWithPromise()
+      .then(() =>
+        stateStore.fetchDataForOwnedAtoms([atomUri], dispatch, getState)
+      )
+      .then(() => dispatch({ type: actionTypes.messages.reopenAtom.failed }));
   };
 }
 
@@ -158,7 +166,6 @@ export function successfulEdit(event) {
       );
     } else {
       won
-        //.invalidateCacheForAtom(atomURI)
         .clearStoreWithPromise()
         .then(() =>
           stateStore.fetchDataForOwnedAtoms([atomURI], dispatch, getState)
@@ -202,7 +209,7 @@ export function processOpenMessage(event) {
     let senderAtomP;
     if (isOwnSenderAtom) {
       //We know that all own atoms are already stored within the state, so we do not have to retrieve it
-      senderAtomP = Promise.resolve(won.invalidateCacheForAtom(senderAtomUri));
+      senderAtomP = Promise.resolve(true);
     } else {
       senderAtomP = stateStore.fetchTheirAtomAndDispatch(
         senderAtomUri,
@@ -214,9 +221,7 @@ export function processOpenMessage(event) {
     let recipientAtomP;
     if (isOwnRecipientAtom) {
       //We know that all own atoms are already stored within the state, so we do not have to retrieve it
-      recipientAtomP = Promise.resolve(
-        won.invalidateCacheForAtom(recipientAtomUri)
-      );
+      recipientAtomP = Promise.resolve(true);
     } else {
       recipientAtomP = stateStore.fetchTheirAtomAndDispatch(
         recipientAtomUri,
@@ -228,13 +233,14 @@ export function processOpenMessage(event) {
     let senderConnectionP;
     if (!isSenderConnectionRelevant) {
       console.debug(
-        "senderConnection not relevant, resolve promise with undefined -> ignore the connection"
+        "senderConnection not relevant, resolve with false -> ignore the connection"
       );
       senderConnectionP = Promise.resolve(false);
     } else if (getIn(senderAtom, ["connections", senderConnectionUri])) {
-      senderConnectionP = won
-        .invalidateCacheForNewConnection(senderConnectionUri, senderAtomUri)
-        .then(() => true);
+      console.debug(
+        "senderConnection relevant, resolve with true -> handle the connection"
+      );
+      senderConnectionP = Promise.resolve(true);
     } else {
       senderConnectionP = stateStore
         .fetchActiveConnectionAndDispatch(
@@ -248,16 +254,14 @@ export function processOpenMessage(event) {
     let receiverConnectionP;
     if (!isReceiverConnectionRelevant) {
       console.debug(
-        "receiverConnection not relevant, resolve promise with undefined -> ignore the connection"
+        "receiverConnection not relevant, resolve with false -> ignore the connection"
+      );
+      receiverConnectionP = Promise.resolve(false);
+    } else if (getIn(recipientAtom, ["connections", receiverConnectionUri])) {
+      console.debug(
+        "receiverConnection relevant, resolve with true -> handle the connection"
       );
       receiverConnectionP = Promise.resolve(true);
-    } else if (getIn(recipientAtom, ["connections", receiverConnectionUri])) {
-      receiverConnectionP = won
-        .invalidateCacheForNewConnection(
-          receiverConnectionUri,
-          recipientAtomUri
-        )
-        .then(() => true);
     } else {
       receiverConnectionP = stateStore
         .fetchActiveConnectionAndDispatch(
@@ -338,7 +342,6 @@ export function processChangeNotificationMessage(event) {
     );
     if (!isAtomLoading && !isAtomProcessingUpdate) {
       won
-        //.invalidateCacheForAtom(atomURI)
         .clearStoreWithPromise()
         .then(() =>
           stateStore.fetchDataForNonOwnedAtomOnly(
@@ -626,7 +629,7 @@ export function processConnectMessage(event) {
     let senderAtomP;
     if (isOwnSenderAtom) {
       //We know that all own atoms are already stored within the state, so we do not have to retrieve it
-      senderAtomP = Promise.resolve(won.invalidateCacheForAtom(senderAtomUri));
+      senderAtomP = Promise.resolve(true);
     } else {
       senderAtomP = stateStore.fetchTheirAtomAndDispatch(
         senderAtomUri,
@@ -638,9 +641,7 @@ export function processConnectMessage(event) {
     let recipientAtomP;
     if (isOwnRecipientAtom) {
       //We know that all own atoms are already stored within the state, so we do not have to retrieve it
-      recipientAtomP = Promise.resolve(
-        won.invalidateCacheForAtom(recipientAtomUri)
-      );
+      recipientAtomP = Promise.resolve(true);
     } else {
       recipientAtomP = stateStore.fetchTheirAtomAndDispatch(
         recipientAtomUri,
@@ -659,10 +660,10 @@ export function processConnectMessage(event) {
       senderAtom &&
       senderAtom.getIn(["connections", senderConnectionUri])
     ) {
-      // already in state. invalidate the version in the rdf-store.
-      senderCP = Promise.resolve(
-        won.invalidateCacheForNewConnection(senderConnectionUri, senderAtomUri)
-      ).then(() => true);
+      console.debug(
+        "senderConnection relevant, resolve with true -> handle the connection"
+      );
+      senderCP = Promise.resolve(true);
     } else {
       senderCP = stateStore
         .fetchActiveConnectionAndDispatch(
@@ -683,13 +684,10 @@ export function processConnectMessage(event) {
       recipientAtom &&
       recipientAtom.getIn(["connections", receiverConnectionUri])
     ) {
-      // already in state. invalidate the version in the rdf-store.
-      receiverCP = won
-        .invalidateCacheForNewConnection(
-          receiverConnectionUri,
-          recipientAtomUri
-        )
-        .then(() => true);
+      console.debug(
+        "receiverConnection relevant, resolve with true -> handle the connection"
+      );
+      receiverCP = Promise.resolve(true);
     } else {
       receiverCP = stateStore
         .fetchActiveConnectionAndDispatch(
@@ -974,15 +972,11 @@ export function processSocketHintMessage(event) {
     } else if (!recipientConnUri) {
       console.debug("ignoring hint without a receiver(Connection)Uri:", event);
     } else {
-      won
-        .invalidateCacheForNewConnection(recipientConnUri, recipientAtomUri)
-        .then(() =>
-          stateStore.fetchActiveConnectionAndDispatch(
-            recipientConnUri,
-            recipientAtomUri,
-            dispatch
-          )
-        );
+      stateStore.fetchActiveConnectionAndDispatch(
+        recipientConnUri,
+        recipientAtomUri,
+        dispatch
+      );
     }
   };
 }
@@ -1008,11 +1002,10 @@ export function processAtomHintMessage(event) {
     } else if (atomUtils.isInactive(targetAtom)) {
       console.debug("ignoring hint for an inactive atom:", targetAtomUri);
     } else {
-      won
-        .invalidateCacheForNewConnection(ownedConnectionUri, ownedAtomUri)
+      Promise.resolve()
         .then(() => {
           if (targetAtom) {
-            return Promise.resolve(won.invalidateCacheForAtom(targetAtomUri));
+            return Promise.resolve(true);
           } else {
             return stateStore.fetchTheirAtomAndDispatch(
               targetAtomUri,
