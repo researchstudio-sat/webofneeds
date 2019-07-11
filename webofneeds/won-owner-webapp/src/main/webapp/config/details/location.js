@@ -18,7 +18,7 @@ export const location = {
   },
   parseToRDF: function({ value, identifier, contentUri }) {
     return {
-      "s:location": wonUtils.genSPlace({
+      "s:location": genSPlace({
         geoData: value,
         baseUri: wonUtils.genDetailBaseUri(contentUri, identifier),
       }),
@@ -48,7 +48,7 @@ export const jobLocation = {
   messageEnabled: true,
   parseToRDF: function({ value, identifier, contentUri }) {
     return {
-      "s:jobLocation": wonUtils.genSPlace({
+      "s:jobLocation": genSPlace({
         geoData: value,
         baseUri: wonUtils.genDetailBaseUri(contentUri, identifier),
       }),
@@ -87,7 +87,7 @@ export const travelAction = {
       "con:travelAction": {
         "@id": baseUri,
         "@type": "s:TravelAction",
-        "s:fromLocation": wonUtils.genSPlace({
+        "s:fromLocation": genSPlace({
           geoData: {
             lat: getIn(value, ["fromLocation", "lat"]),
             lng: getIn(value, ["fromLocation", "lng"]),
@@ -97,7 +97,7 @@ export const travelAction = {
           baseUri: baseUri && baseUri + "/fromLocation",
         }),
 
-        "s:toLocation": wonUtils.genSPlace({
+        "s:toLocation": genSPlace({
           geoData: {
             lat: getIn(value, ["toLocation", "lat"]),
             lng: getIn(value, ["toLocation", "lng"]),
@@ -246,4 +246,66 @@ function sPlaceToHumanReadable({ value, label }) {
     }
   }
   return undefined;
+}
+
+/**
+ * Generates rdf from given geoData (e.g. location from a location picker)
+ * @param geoData
+ * @param baseUri
+ * @returns {*}
+ */
+function genSPlace({ geoData, baseUri }) {
+  if (!geoData) {
+    return undefined;
+  }
+  if (!geoData.lat || !geoData.lng || !geoData.name) {
+    return undefined;
+  }
+
+  const genGeo = ({ lat, lng, baseUri }) => {
+    if (isNaN(lat) || isNaN(lng)) {
+      return undefined;
+    }
+    return {
+      "@id": baseUri ? baseUri + "/geo" : undefined,
+      "@type": "s:GeoCoordinates",
+      "s:latitude": lat.toFixed(6),
+      "s:longitude": lng.toFixed(6),
+      "con:geoSpatial": {
+        "@type": "http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon",
+        "@value": `${lat.toFixed(6)}#${lng.toFixed(6)}`,
+      },
+    };
+  };
+  const genBoundingBox = ({ nwCorner, seCorner, baseUri }) => {
+    return !nwCorner || !seCorner
+      ? undefined
+      : {
+          "@id": baseUri ? baseUri + "/bounds" : undefined,
+          "con:northWestCorner": {
+            "@id": baseUri ? baseUri + "/bounds/nw" : undefined,
+            "@type": "s:GeoCoordinates",
+            "s:latitude": nwCorner.lat.toFixed(6),
+            "s:longitude": nwCorner.lng.toFixed(6),
+          },
+          "con:southEastCorner": {
+            "@id": baseUri ? baseUri + "/bounds/se" : undefined,
+            "@type": "s:GeoCoordinates",
+            "s:latitude": seCorner.lat.toFixed(6),
+            "s:longitude": seCorner.lng.toFixed(6),
+          },
+        };
+  };
+
+  return {
+    "@id": baseUri,
+    "@type": "s:Place",
+    "s:name": geoData.name,
+    "s:geo": genGeo({ lat: geoData.lat, lng: geoData.lng, baseUri }),
+    "con:boundingBox": genBoundingBox({
+      nwCorner: geoData.nwCorner,
+      seCorner: geoData.seCorner,
+      baseUri,
+    }),
+  };
 }

@@ -204,69 +204,6 @@ export function parseRestErrorMessage(error) {
   return error;
 }
 
-/**
- * Generates rdf from given geoData (e.g. location from a location picker)
- * @param geoData
- * @param baseUri
- * @returns {*}
- */
-export function genSPlace({ geoData, baseUri }) {
-  if (!geoData) {
-    return undefined;
-  }
-  if (!geoData.lat || !geoData.lng || !geoData.name) {
-    return undefined;
-  }
-
-  return {
-    "@id": baseUri,
-    "@type": "s:Place",
-    "s:name": geoData.name,
-    "s:geo": genGeo({ lat: geoData.lat, lng: geoData.lng, baseUri }),
-    "con:boundingBox": genBoundingBox({
-      nwCorner: geoData.nwCorner,
-      seCorner: geoData.seCorner,
-      baseUri,
-    }),
-  };
-}
-
-function genGeo({ lat, lng, baseUri }) {
-  if (isNaN(lat) || isNaN(lng)) {
-    return undefined;
-  }
-  return {
-    "@id": baseUri ? baseUri + "/geo" : undefined,
-    "@type": "s:GeoCoordinates",
-    "s:latitude": lat.toFixed(6),
-    "s:longitude": lng.toFixed(6),
-    "con:geoSpatial": {
-      "@type": "http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon",
-      "@value": `${lat.toFixed(6)}#${lng.toFixed(6)}`,
-    },
-  };
-}
-
-function genBoundingBox({ nwCorner, seCorner, baseUri }) {
-  return !nwCorner || !seCorner
-    ? undefined
-    : {
-        "@id": baseUri ? baseUri + "/bounds" : undefined,
-        "con:northWestCorner": {
-          "@id": baseUri ? baseUri + "/bounds/nw" : undefined,
-          "@type": "s:GeoCoordinates",
-          "s:latitude": nwCorner.lat.toFixed(6),
-          "s:longitude": nwCorner.lng.toFixed(6),
-        },
-        "con:southEastCorner": {
-          "@id": baseUri ? baseUri + "/bounds/se" : undefined,
-          "@type": "s:GeoCoordinates",
-          "s:latitude": seCorner.lat.toFixed(6),
-          "s:longitude": seCorner.lng.toFixed(6),
-        },
-      };
-}
-
 export function genDetailBaseUri(baseUri, detailIdentifier) {
   if (!baseUri || !detailIdentifier) {
     return undefined;
