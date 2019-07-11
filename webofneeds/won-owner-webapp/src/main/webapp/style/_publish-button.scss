@@ -33,6 +33,10 @@
       flex-shrink: 1;
       won-svg-icon {
         @include fixed-square($iconSize * 0.8);
+
+        & > svg {
+          @include fixed-square($iconSize * 0.8);
+        }
       }
     }
   }
