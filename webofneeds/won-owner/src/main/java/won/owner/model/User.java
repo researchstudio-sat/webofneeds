@@ -71,7 +71,7 @@ public class User implements UserDetails, Persistable<Long> {
     @OneToMany(fetch = FetchType.EAGER)
     @OrderBy("creationDate desc")
     @JoinTable(name = "wonuser_useratom", joinColumns = { @JoinColumn(name = "wonuser_id") })
-    private List<UserAtom> userAtoms;
+    private Set<UserAtom> userAtoms;
     @Column(name = "role")
     private String role;
     @Column(name = "email")
@@ -214,27 +214,19 @@ public class User implements UserDetails, Persistable<Long> {
     /*
      * public List<Atom> getAtoms() { return atoms; }
      */
-    public void addAtomUri(UserAtom userAtom) {
-        synchronized (this) {
-            if (!this.userAtoms.contains(userAtom)) {
-                this.userAtoms.add(userAtom);
-            }
-        }
+    public void addUserAtom(UserAtom userAtom) {
+        this.userAtoms.add(userAtom);
     }
 
-    public void deleteAtomUri(UserAtom userAtom) {
-        for (int i = 0; i < this.userAtoms.size(); i++) {
-            if (this.userAtoms.get(i).getUri().equals(userAtom.getUri())) {
-                this.userAtoms.remove(i);
-            }
-        }
+    public void removeUserAtom(UserAtom userAtom) {
+        this.userAtoms.remove(userAtom);
     }
 
-    public List<UserAtom> getUserAtoms() {
+    public Set<UserAtom> getUserAtoms() {
         return userAtoms;
     }
 
-    public void setUserAtoms(final List<UserAtom> userAtoms) {
+    public void setUserAtoms(final Set<UserAtom> userAtoms) {
         this.userAtoms = userAtoms;
     }
 
