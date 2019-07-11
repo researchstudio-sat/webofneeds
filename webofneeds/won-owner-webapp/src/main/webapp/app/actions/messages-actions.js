@@ -17,6 +17,8 @@ import {
 import * as stateStore from "../redux/state-store.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as ownerApi from "../api/owner-api.js";
+import { get } from "../utils";
+import * as processUtils from "../redux/utils/process-utils";
 
 export function successfulCloseAtom(event) {
   return (dispatch, getState) => {
@@ -33,7 +35,7 @@ export function successfulCloseAtom(event) {
   };
 }
 export function failedCloseAtom(event) {
-  return dispatch => {
+  return (dispatch, getState) => {
     const atomUri = event.getRecipientAtom();
     /*
         * TODO not sure if it's necessary to invalidate
@@ -55,7 +57,7 @@ export function failedCloseAtom(event) {
       .then(() =>
         // as the atom and it's connections have been marked dirty
         // they will be reloaded on this action.
-        stateStore.fetchDataForOwnedAtoms([atomUri], dispatch)
+        stateStore.fetchDataForOwnedAtoms([atomUri], dispatch, getState)
       )
       .then(allThatData =>
         dispatch({
@@ -142,25 +144,35 @@ export function successfulCreate(event) {
 }
 
 export function successfulEdit(event) {
-  return dispatch => {
+  return (dispatch, getState) => {
     console.debug("Received success replace message:", event);
     //const state = getState();
     //load the edited data into the local rdf store and publish AtomEditEvent when done
     const atomURI = event.getRecipientAtom();
 
-    won
-      //.invalidateCacheForAtom(atomURI)
-      .clearStoreWithPromise()
-      .then(() => stateStore.fetchDataForOwnedAtoms([atomURI], dispatch))
-      .then(() => {
-        dispatch(
-          actionCreators.atoms__editSuccessful({
-            eventUri: event.getIsResponseTo(),
-            atomUri: event.getSenderAtom(),
-            //atom: atom,
-          })
-        );
-      });
+    const processState = get(getState(), "process");
+
+    if (processUtils.isAtomLoading(processState, atomURI)) {
+      console.debug(
+        "successfulEdit: Atom is currently loading DO NOT FETCH AGAIN"
+      );
+    } else {
+      won
+        //.invalidateCacheForAtom(atomURI)
+        .clearStoreWithPromise()
+        .then(() =>
+          stateStore.fetchDataForOwnedAtoms([atomURI], dispatch, getState)
+        )
+        .then(() => {
+          dispatch(
+            actionCreators.atoms__editSuccessful({
+              eventUri: event.getIsResponseTo(),
+              atomUri: event.getSenderAtom(),
+              //atom: atom,
+            })
+          );
+        });
+    }
   };
 }
 
@@ -194,7 +206,8 @@ export function processOpenMessage(event) {
     } else {
       senderAtomP = stateStore.fetchTheirAtomAndDispatch(
         senderAtomUri,
-        dispatch
+        dispatch,
+        getState
       );
     }
 
@@ -207,7 +220,8 @@ export function processOpenMessage(event) {
     } else {
       recipientAtomP = stateStore.fetchTheirAtomAndDispatch(
         recipientAtomUri,
-        dispatch
+        dispatch,
+        getState
       );
     }
 
@@ -305,19 +319,44 @@ export function processAgreementMessage(event) {
 
 export function processChangeNotificationMessage(event) {
   return (dispatch, getState) => {
-    console.debug("processChangeNotificationMessage for: ", event);
     const atomUriToLoad = event.getSenderAtom();
 
-    won
-      //.invalidateCacheForAtom(atomURI)
-      .clearStoreWithPromise()
-      .then(() => {
-        if (generalSelectors.isAtomOwned(getState(), atomUriToLoad)) {
-          stateStore.fetchDataForOwnedAtoms([atomUriToLoad], dispatch);
-        } else {
-          stateStore.fetchDataForNonOwnedAtomOnly(atomUriToLoad, dispatch);
-        }
-      });
+    /*
+    Workaround, there is a possibility of a racecondition between the functions processChangeNotificationMessage, and successfulEdit
+    e.g the atom could be fetched into the store twice or multiple times (e.g if an atom gets changed that has connections to multiple
+    of your own needs, and thus the processChangeNotificationMessage would be called multiple times in a row. this way we ensure that
+    there can only be one running fetch/storeClear at a time
+    */
+    const processState = get(getState(), "process");
+    const isAtomLoading = processUtils.isAtomLoading(
+      processState,
+      atomUriToLoad
+    );
+    const isAtomProcessingUpdate = processUtils.isAtomProcessingUpdate(
+      processState,
+      atomUriToLoad
+    );
+    if (!isAtomLoading && !isAtomProcessingUpdate) {
+      won
+        //.invalidateCacheForAtom(atomURI)
+        .clearStoreWithPromise()
+        .then(() =>
+          stateStore.fetchDataForNonOwnedAtomOnly(
+            atomUriToLoad,
+            dispatch,
+            getState
+          )
+        );
+    } else {
+      console.debug(
+        "Omit fetch for processChangeNotificationMessage, fetch is currently in progress for atom: ",
+        atomUriToLoad,
+        " / isAtomLoading: ",
+        isAtomLoading,
+        "isAtomProcessingUpdate: ",
+        isAtomProcessingUpdate
+      );
+    }
 
     dispatch({
       type: actionTypes.messages.processChangeNotificationMessage,
@@ -591,7 +630,8 @@ export function processConnectMessage(event) {
     } else {
       senderAtomP = stateStore.fetchTheirAtomAndDispatch(
         senderAtomUri,
-        dispatch
+        dispatch,
+        getState
       );
     }
 
@@ -604,7 +644,8 @@ export function processConnectMessage(event) {
     } else {
       recipientAtomP = stateStore.fetchTheirAtomAndDispatch(
         recipientAtomUri,
-        dispatch
+        dispatch,
+        getState
       );
     }
 
@@ -975,7 +1016,8 @@ export function processAtomHintMessage(event) {
           } else {
             return stateStore.fetchTheirAtomAndDispatch(
               targetAtomUri,
-              dispatch
+              dispatch,
+              getState
             );
           }
         })

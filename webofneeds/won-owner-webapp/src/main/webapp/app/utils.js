@@ -575,3 +575,8 @@ export function compareArrayBuffers(left, right) {
 
   return true;
 }
+
+export function numOfEvts2pageSize(numberOfEvents) {
+  // `*3*` to compensate for the *roughly* 2 additional success events per chat message
+  return numberOfEvents * 3;
+}
