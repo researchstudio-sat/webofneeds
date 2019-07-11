@@ -211,7 +211,7 @@ export function processOpenMessage(event) {
       //We know that all own atoms are already stored within the state, so we do not have to retrieve it
       senderAtomP = Promise.resolve(true);
     } else {
-      senderAtomP = stateStore.fetchTheirAtomAndDispatch(
+      senderAtomP = stateStore.fetchAtomAndDispatch(
         senderAtomUri,
         dispatch,
         getState
@@ -223,7 +223,7 @@ export function processOpenMessage(event) {
       //We know that all own atoms are already stored within the state, so we do not have to retrieve it
       recipientAtomP = Promise.resolve(true);
     } else {
-      recipientAtomP = stateStore.fetchTheirAtomAndDispatch(
+      recipientAtomP = stateStore.fetchAtomAndDispatch(
         recipientAtomUri,
         dispatch,
         getState
@@ -344,10 +344,11 @@ export function processChangeNotificationMessage(event) {
       won
         .clearStoreWithPromise()
         .then(() =>
-          stateStore.fetchDataForNonOwnedAtomOnly(
+          stateStore.fetchAtomAndDispatch(
             atomUriToLoad,
             dispatch,
-            getState
+            getState,
+            true
           )
         );
     } else {
@@ -631,7 +632,7 @@ export function processConnectMessage(event) {
       //We know that all own atoms are already stored within the state, so we do not have to retrieve it
       senderAtomP = Promise.resolve(true);
     } else {
-      senderAtomP = stateStore.fetchTheirAtomAndDispatch(
+      senderAtomP = stateStore.fetchAtomAndDispatch(
         senderAtomUri,
         dispatch,
         getState
@@ -643,7 +644,7 @@ export function processConnectMessage(event) {
       //We know that all own atoms are already stored within the state, so we do not have to retrieve it
       recipientAtomP = Promise.resolve(true);
     } else {
-      recipientAtomP = stateStore.fetchTheirAtomAndDispatch(
+      recipientAtomP = stateStore.fetchAtomAndDispatch(
         recipientAtomUri,
         dispatch,
         getState
@@ -1007,7 +1008,7 @@ export function processAtomHintMessage(event) {
           if (targetAtom) {
             return Promise.resolve(true);
           } else {
-            return stateStore.fetchTheirAtomAndDispatch(
+            return stateStore.fetchAtomAndDispatch(
               targetAtomUri,
               dispatch,
               getState

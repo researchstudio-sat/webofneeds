@@ -61,7 +61,7 @@ export async function fetchDataForOwnedAtoms(
     })
     .then(theirAtomUris =>
       urisToLookupMap(theirAtomUris, uri =>
-        fetchTheirAtomAndDispatch(uri, dispatch, getState)
+        fetchAtomAndDispatch(uri, dispatch, getState)
       )
     );
 }
@@ -85,13 +85,42 @@ export function fetchActiveConnectionAndDispatch(connUri, atomUri, dispatch) {
     });
 }
 
-export function fetchTheirAtomAndDispatch(atomUri, dispatch, getState) {
+/**
+ * Fetches an atom (incl. the persona that holds it), the fetch is omitted if:
+ * - the atom is already loaded
+ * - the atom is currently loading
+ * Omit fetching the persona attached to the atom if:
+ * - there is no attached persona
+ * - the persona is already loaded
+ * - the persona is currently loading
+ *
+ * If update is set to true, the loaded status of an atom does NOT omit the fetch
+ * @param {String} atomUri
+ * @param dispatch
+ * @param {function} getState
+ * @param {boolean} update, defaults to false
+ * @returns {*}
+ */
+export function fetchAtomAndDispatch(
+  atomUri,
+  dispatch,
+  getState,
+  update = false
+) {
   const processState = get(getState(), "process");
 
-  if (processUtils.isAtomLoading(processState, atomUri)) {
-    console.debug("fetchTheirAtomAndDispatch: Atom is already loading...");
-    //TODO: IMPL OMIT FETCH
+  if (!update && processUtils.isAtomLoaded(processState, atomUri)) {
+    console.debug("Omit Fetch of Atom<", atomUri, ">, it is already loaded...");
+    return Promise.resolve();
+  } else if (processUtils.isAtomLoading(processState, atomUri)) {
+    console.debug(
+      "Omit Fetch of Atom<",
+      atomUri,
+      ">, it is currently loading..."
+    );
+    return Promise.resolve();
   }
+  console.debug("Proceed Fetch of Atom<", atomUri, ">");
 
   dispatch({
     type: actionTypes.atoms.storeUriInLoading,
@@ -103,38 +132,49 @@ export function fetchTheirAtomAndDispatch(atomUri, dispatch, getState) {
     .then(atom => {
       if (atom["hold:heldBy"] && atom["hold:heldBy"]["@id"]) {
         const personaUri = atom["hold:heldBy"]["@id"];
-        if (processUtils.isAtomLoading(processState, personaUri)) {
-          console.debug("Persona attached to Atom is currently loading...");
-          //TODO: IMPL OMIT FETCH
-        }
-
-        dispatch({
-          type: actionTypes.personas.storeUriInLoading,
-          payload: Immutable.fromJS({ uri: personaUri }),
-        });
-        return won
-          .getAtom(personaUri)
-          .then(personaAtom => {
-            dispatch({
-              type: actionTypes.personas.storeTheirs,
-              payload: Immutable.fromJS({
-                atoms: { [personaUri]: personaAtom },
-              }),
-            });
-            return atom;
-          })
-          .catch(err => {
-            const errResponse = err && err.response;
-            const isDeleted = !!(errResponse && errResponse.status == 410);
-
-            dispatch({
-              type: isDeleted
-                ? actionTypes.personas.removeDeleted
-                : actionTypes.personas.storeUriFailed,
-              payload: Immutable.fromJS({ uri: personaUri }),
-            });
-            return atom;
+        if (processUtils.isAtomLoaded(processState, personaUri)) {
+          console.debug(
+            "Omit Fetch of Persona<",
+            personaUri,
+            "> attached to Atom, it is already loaded"
+          );
+          return atom;
+        } else if (processUtils.isAtomLoading(processState, personaUri)) {
+          console.debug(
+            "Omit Fetch of Persona<",
+            personaUri,
+            "> attached to Atom, it is currently loading..."
+          );
+          return atom;
+        } else {
+          dispatch({
+            type: actionTypes.personas.storeUriInLoading,
+            payload: Immutable.fromJS({ uri: personaUri }),
           });
+          return won
+            .getAtom(personaUri)
+            .then(personaAtom => {
+              dispatch({
+                type: actionTypes.personas.storeTheirs,
+                payload: Immutable.fromJS({
+                  atoms: { [personaUri]: personaAtom },
+                }),
+              });
+              return atom;
+            })
+            .catch(err => {
+              const errResponse = err && err.response;
+              const isDeleted = !!(errResponse && errResponse.status == 410);
+
+              dispatch({
+                type: isDeleted
+                  ? actionTypes.personas.removeDeleted
+                  : actionTypes.personas.storeUriFailed,
+                payload: Immutable.fromJS({ uri: personaUri }),
+              });
+              return atom;
+            });
+        }
       } else {
         return atom;
       }
@@ -156,12 +196,7 @@ export function fetchTheirAtomAndDispatch(atomUri, dispatch, getState) {
           : actionTypes.atoms.storeUriFailed,
         payload: Immutable.fromJS({ uri: atomUri }),
       });
-      return;
     });
-}
-
-export function fetchDataForNonOwnedAtomOnly(atomUri, dispatch, getState) {
-  return fetchTheirAtomAndDispatch(atomUri, dispatch, getState);
 }
 
 export function fetchWhatsNew(

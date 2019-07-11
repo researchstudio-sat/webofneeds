@@ -20,7 +20,7 @@ import { get } from "../utils.js";
 
 export function fetchUnloadedAtom(atomUri) {
   return (dispatch, getState) =>
-    stateStore.fetchDataForNonOwnedAtomOnly(atomUri, dispatch, getState);
+    stateStore.fetchAtomAndDispatch(atomUri, dispatch, getState);
 }
 
 //ownConnectionUri is optional - set if known
