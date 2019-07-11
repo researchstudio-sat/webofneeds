@@ -71,9 +71,8 @@ export default function(allAtomsInState = initialState, action = {}) {
       return addAtomStub(allAtomsInState, action.payload.get("uri"));
     }
 
-    case actionTypes.atoms.storeOwned:
-    case actionTypes.atoms.storeTheirs:
-    case actionTypes.personas.storeTheirs: {
+    case actionTypes.atoms.store:
+    case actionTypes.personas.store: {
       let atoms = action.payload.get("atoms");
       atoms = atoms ? atoms : Immutable.Set();
 

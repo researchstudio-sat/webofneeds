@@ -483,9 +483,8 @@ export default function(processState = initialState, action = {}) {
       return processState;
     }
 
-    case actionTypes.atoms.storeTheirs:
-    case actionTypes.personas.storeTheirs:
-    case actionTypes.atoms.storeOwned: {
+    case actionTypes.atoms.store:
+    case actionTypes.personas.store: {
       let atoms = get(action.payload, "atoms");
 
       atoms &&

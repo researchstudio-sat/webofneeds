@@ -160,8 +160,7 @@ const actionHierarchy = {
     storeOwnedMetaAtoms: INJ_DEFAULT,
     storeUriInLoading: INJ_DEFAULT,
 
-    storeOwned: INJ_DEFAULT,
-    storeTheirs: INJ_DEFAULT,
+    store: INJ_DEFAULT,
 
     storeUriFailed: INJ_DEFAULT,
     removeDeleted: INJ_DEFAULT,
@@ -173,7 +172,7 @@ const actionHierarchy = {
     connect: connectPersona,
     disconnect: disconnectPersona,
 
-    storeTheirs: INJ_DEFAULT,
+    store: INJ_DEFAULT,
     storeUriInLoading: INJ_DEFAULT,
 
     storeUriFailed: INJ_DEFAULT,

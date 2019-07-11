@@ -155,7 +155,7 @@ export function fetchAtomAndDispatch(
             .getAtom(personaUri)
             .then(personaAtom => {
               dispatch({
-                type: actionTypes.personas.storeTheirs,
+                type: actionTypes.personas.store,
                 payload: Immutable.fromJS({
                   atoms: { [personaUri]: personaAtom },
                 }),
@@ -181,7 +181,7 @@ export function fetchAtomAndDispatch(
     })
     .then(atom => {
       dispatch({
-        type: actionTypes.atoms.storeTheirs,
+        type: actionTypes.atoms.store,
         payload: Immutable.fromJS({ atoms: { [atomUri]: atom } }),
       });
       return atom;
@@ -382,7 +382,7 @@ function fetchOwnedAtomAndDispatch(atomUri, dispatch, getState) {
     .getAtom(atomUri)
     .then(atom => {
       dispatch({
-        type: actionTypes.atoms.storeOwned,
+        type: actionTypes.atoms.store,
         payload: Immutable.fromJS({ atoms: { [atomUri]: atom } }),
       });
       return atom;
