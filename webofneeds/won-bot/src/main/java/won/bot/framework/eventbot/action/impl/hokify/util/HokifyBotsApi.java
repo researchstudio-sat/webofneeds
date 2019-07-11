@@ -78,7 +78,7 @@ public class HokifyBotsApi {
     }
 
     public HashMap<String, String> fetchGeoLocation(String city, String country) {
-        HashMap<String, String> loc = new HashMap<String, String>();
+        HashMap<String, String> loc = null;
         String cityString = city != null ? city.replace(" ", "+") : "";
         String countrySting = country != null ? country.replace(" ", "+") : "";
         String searchString = geoURL + "?city=" + cityString + "&country=" + countrySting + "&format=json";
@@ -98,6 +98,7 @@ public class HokifyBotsApi {
             }
             JSONArray jsonArray = new JSONArray(sb.toString());
             if (jsonArray.length() > 0) {
+                loc = new HashMap<String, String>();
                 JSONObject obj = jsonArray.getJSONObject(0);
                 JSONArray bBox = (JSONArray) obj.get("boundingbox");
                 loc.put("nwlat", (String) bBox.get(1));
@@ -107,14 +108,6 @@ public class HokifyBotsApi {
                 loc.put("lat", (String) obj.get("lat"));
                 loc.put("lng", (String) obj.get("lon"));
                 loc.put("name", (String) obj.get("display_name"));
-            } else {
-                loc.put("nwlat", "0");
-                loc.put("nwlng", "0");
-                loc.put("selat", "0");
-                loc.put("selng", "0");
-                loc.put("lat", "0");
-                loc.put("lng", "0");
-                loc.put("name", "no location");
             }
             httpClient.close();
             response.getEntity().getContent().close();
