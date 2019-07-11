@@ -269,6 +269,7 @@ import won from "./won.js";
    * undefined-check might catch some bugs early.
    *
    * @param uri
+   * @param partial
    */
   const cacheItemInsertOrOverwrite = function(uri, partial) {
     privateData.cacheStatus[uri] = {
@@ -411,6 +412,7 @@ import won from "./won.js";
    * @param baseUri
    * @param propertyPath
    * @param optionalSparqlPrefixes
+   * @param optionalSparqlFragment
    * @returns {*}
    */
   won.resolvePropertyPathFromBaseUri = function resolvePropertyPath(
@@ -702,6 +704,7 @@ import won from "./won.js";
    *        * pagingSize: if specified the server will return the first
    *            page (unless e.g. `queryParams.p=2` is specified when
    *            it will return the second page of size N)
+   * @param removeCacheItem
    * @return {Promise}
    */
   function loadFromOwnServerIntoCache(uri, params, removeCacheItem = false) {
@@ -1075,6 +1078,11 @@ import won from "./won.js";
    * Fetches a structure that can be used directly (in a JSON-LD node) as the envelope data
    * to send a message via the specified connectionUri (that is interpreted as a local connection.
    * @param connectionUri
+   * @param ownedAtomUri
+   * @param theirAtomUri
+   * @param ownNodeUri
+   * @param theirNodeUri
+   * @param theirConnectionUri
    * @returns a promise to the data
    */
   won.getEnvelopeDataforConnection = async function(
@@ -1239,7 +1247,7 @@ import won from "./won.js";
    *
    * NOTE: Atm it ignores prefixes which might lead to clashes.
    *
-   * @param eventUri
+   * @param uri
    * @param fetchParams See `ensureLoaded`.
    */
   won.getNode = function(uri, fetchParams) {
@@ -1427,6 +1435,7 @@ import won from "./won.js";
 
   /**
    * Thin wrapper around `store.graph` that returns a promise.
+   * @param store
    * @param {*} graphUri
    */
   function rdfStoreGetGraph(store, graphUri) {
