@@ -359,6 +359,10 @@ const actionHierarchy = {
     showMainMenu: INJ_DEFAULT,
     hideMainMenu: INJ_DEFAULT,
 
+    showMenu: INJ_DEFAULT,
+    hideMenu: INJ_DEFAULT,
+    toggleMenu: INJ_DEFAULT,
+
     toggleAddMessageContent: INJ_DEFAULT,
     hideAddMessageContent: INJ_DEFAULT,
 

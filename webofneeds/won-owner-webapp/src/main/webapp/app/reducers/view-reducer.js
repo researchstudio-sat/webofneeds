@@ -9,6 +9,7 @@ const initialState = Immutable.fromJS({
   showRdf: false,
   showClosedAtoms: false,
   showMainMenu: false,
+  showMenu: false,
   showAddMessageContent: false,
   selectedAddMessageContent: undefined,
   showModalDialog: false,
@@ -46,6 +47,16 @@ export default function(viewState = initialState, action = {}) {
     case actionTypes.account.loginFailed:
     case actionTypes.view.showMainMenu:
       return viewState.set("showMainMenu", true);
+
+    case actionTypes.view.showMenu:
+      return viewState.set("showMenu", true);
+
+    case actionTypes.view.hideMenu:
+      return viewState.set("showMenu", false);
+
+    case actionTypes.view.toggleMenu: {
+      return viewState.set("showMenu", !viewState.get("showMenu"));
+    }
 
     case actionTypes.account.reset:
       return initialState;

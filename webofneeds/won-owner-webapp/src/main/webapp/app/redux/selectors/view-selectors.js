@@ -23,6 +23,10 @@ export function showRdf(state) {
   return viewUtils.showRdf(get(state, "view"));
 }
 
+export function showMenu(state) {
+  return viewUtils.showMenu(get(state, "view"));
+}
+
 export function isAnonymousLinkSent(state) {
   return viewUtils.isAnonymousLinkSent(get(state, "view"));
 }

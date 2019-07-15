@@ -25,6 +25,10 @@ export function showRdf(viewState) {
   return get(viewState, "showRdf");
 }
 
+export function showMobileMenu(viewState) {
+  return get(viewState, "showMenu");
+}
+
 export function showClosedAtoms(viewState) {
   return get(viewState, "showClosedAtoms");
 }
