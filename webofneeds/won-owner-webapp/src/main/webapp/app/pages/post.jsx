@@ -17,7 +17,7 @@ import * as viewSelectors from "../redux/selectors/view-selectors.js";
 import * as processUtils from "../redux/utils/process-utils.js";
 import { h } from "preact";
 
-import "~/style/_post-visitor.scss";
+import "~/style/_post.scss";
 import "~/style/_connection-overlay.scss";
 import * as accountUtils from "../redux/utils/account-utils";
 
