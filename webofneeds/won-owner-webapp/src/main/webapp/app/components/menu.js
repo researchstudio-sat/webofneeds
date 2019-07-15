@@ -8,6 +8,7 @@ import { actionCreators } from "../actions/actions.js";
 import { connect2Redux } from "../configRedux.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as viewSelectors from "../redux/selectors/view-selectors.js";
+import { classOnComponentRoot } from "../cstm-ng-utils.js";
 
 import "~/style/_menu.scss";
 import Immutable from "immutable";
@@ -61,6 +62,7 @@ function genTopnavConf() {
     "$ngRedux",
     "$scope",
     "$state" /*injections as strings here*/,
+    "$element",
   ];
 
   class Controller {
@@ -99,6 +101,7 @@ function genTopnavConf() {
       };
 
       connect2Redux(selectFromState, actionCreators, [], this);
+      classOnComponentRoot("won-has-slideins", () => this.hasSlideIns, this);
     }
     //This method is for debug purposes only, we currently dont offer the createSearch within the ui call menu4dbg.createSearchPost() to access the createSearch View
     createSearchPost() {

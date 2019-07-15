@@ -2,8 +2,17 @@
 @import "sizing-utils";
 
 won-menu {
-  background: $won-light-gray;
-  border-bottom: $thinGrayBorder;
+  &.won-has-slideins {
+    //Style if slideins are present
+    background: $won-light-gray;
+    border-bottom: $thinGrayBorder;
+  }
+
+  &:not(.won-has-slideins) {
+    //Style if slideins are NOT present
+    background: $won-light-gray;
+    border-bottom: $thinGrayBorder;
+  }
 
   > .menu {
     display: grid;
