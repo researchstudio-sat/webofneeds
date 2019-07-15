@@ -6,7 +6,7 @@
 body {
   @media (max-width: $responsivenessBreakPoint) {
     --headerHeight: 3.3rem;
-    --menuHeight: 0;
+    --menuHeight: 0rem;
   }
   @media (min-width: $responsivenessBreakPoint) {
     --headerHeight: 3.3rem;
