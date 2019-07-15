@@ -32,13 +32,9 @@ export function fetchOwnedData(dispatch, getState) {
     );
 }
 
-export async function fetchDataForOwnedAtoms(
-  ownedAtomUris,
-  dispatch,
-  getState
-) {
+export function fetchDataForOwnedAtoms(ownedAtomUris, dispatch, getState) {
   if (!is("Array", ownedAtomUris) || ownedAtomUris.length === 0) {
-    return;
+    return Promise.resolve();
   }
 
   return urisToLookupMap(ownedAtomUris, uri =>
@@ -81,7 +77,6 @@ export function fetchActiveConnectionAndDispatch(connUri, atomUri, dispatch) {
         type: actionTypes.connections.storeUriFailed,
         payload: Immutable.fromJS({ uri: connUri }),
       });
-      return;
     });
 }
 
@@ -378,6 +373,26 @@ function fetchConnectionsOfAtomAndDispatch(atomUri, dispatch) {
 }
 
 function fetchOwnedAtomAndDispatch(atomUri, dispatch, getState) {
+  const processState = get(getState(), "process");
+
+  if (processUtils.isAtomLoaded(processState, atomUri)) {
+    console.debug("Omit Fetch of Atom<", atomUri, ">, it is already loaded...");
+    return Promise.resolve();
+  } else if (processUtils.isAtomLoading(processState, atomUri)) {
+    console.debug(
+      "Omit Fetch of Atom<",
+      atomUri,
+      ">, it is currently loading..."
+    );
+    return Promise.resolve();
+  }
+  console.debug("Proceed Fetch of Atom<", atomUri, ">");
+
+  dispatch({
+    type: actionTypes.atoms.storeUriInLoading,
+    payload: Immutable.fromJS({ uri: atomUri }),
+  });
+
   return won
     .getAtom(atomUri)
     .then(atom => {
@@ -388,11 +403,7 @@ function fetchOwnedAtomAndDispatch(atomUri, dispatch, getState) {
       return atom;
     })
     .catch(err => {
-      const state = getState();
-      console.debug("currentState: ", state);
-      console.debug("fetchOwnedAtomAndDispatch error: ", err);
       const errResponse = err && err.response;
-      console.debug("fetchOwnedAtomAndDispatch errResponse: ", errResponse);
       const isDeleted = !!(errResponse && errResponse.status == 410);
 
       dispatch({
@@ -401,7 +412,6 @@ function fetchOwnedAtomAndDispatch(atomUri, dispatch, getState) {
           : actionTypes.atoms.storeUriFailed,
         payload: Immutable.fromJS({ uri: atomUri }),
       });
-      return;
     });
 }
 
