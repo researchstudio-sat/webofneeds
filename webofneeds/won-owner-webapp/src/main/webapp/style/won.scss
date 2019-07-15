@@ -65,8 +65,11 @@ body {
 
     > won-menu {
       grid-area: menu;
+      position: sticky;
       box-sizing: border-box;
       height: var(--menuHeight);
+      top: var(--headerHeight);
+      z-index: 1000;
     }
 
     > aside.overview__left {
