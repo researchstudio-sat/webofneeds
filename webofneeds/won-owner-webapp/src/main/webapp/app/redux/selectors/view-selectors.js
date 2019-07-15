@@ -35,10 +35,6 @@ export function isAnonymousLinkCopied(state) {
   return viewUtils.isAnonymousLinkCopied(get(state, "view"));
 }
 
-export function isAnonymousSlideInExpanded(state) {
-  return viewUtils.isAnonymousSlideInExpanded(get(state, "view"));
-}
-
 export function showAnonymousSlideInEmailInput(state) {
   return viewUtils.showAnonymousSlideInEmailInput(get(state, "view"));
 }

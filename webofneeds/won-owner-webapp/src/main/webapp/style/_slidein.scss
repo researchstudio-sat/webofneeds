@@ -121,73 +121,71 @@ won-slide-in {
   .si__anonymous {
     @include slide-in();
 
-    &--expanded {
+    grid-template-areas:
+      "siIcon siTitle siTitle siButton"
+      "siText siText siText siText"
+      "siButtonSingle siButtonSingle siButtonSingle siButtonSingle"
+      "siButtonLeft siButtonLeft siButtonRight siButtonRight";
+
+    & > .si__buttonSignup,
+    & > .si__buttonCopy,
+    & > .si__buttonEmail {
+      @include won-button--outlined(white);
+      padding: 0.5rem;
+      font-size: $smallFontSize;
+    }
+
+    & > .si__buttonSignup {
+      grid-area: siButtonSingle;
+    }
+
+    & > .si__buttonCopy {
+      grid-area: siButtonLeft;
+    }
+
+    & > .si__buttonEmail {
+      grid-area: siButtonRight;
+    }
+
+    & > .si__text {
+      grid-area: siText;
+      font-size: $smallFontSize;
+      overflow-y: auto;
+      text-align: left;
+      a {
+        color: white;
+        text-decoration: underline;
+      }
+
+      ul {
+        padding: 0.5rem 1rem;
+      }
+    }
+
+    &.si__anonymous--emailInput {
       grid-template-areas:
         "siIcon siTitle siTitle siButton"
         "siText siText siText siText"
         "siButtonSingle siButtonSingle siButtonSingle siButtonSingle"
-        "siButtonLeft siButtonLeft siButtonRight siButtonRight";
+        "siButtonLeft siButtonLeft siButtonRight siButtonRight"
+        "siEmailInput siEmailInput siEmailInput siEmailInput"
+        "siButtonSend siButtonSend siButtonSend siButtonSend";
 
-      & > .si__buttonSignup,
-      & > .si__buttonCopy,
-      & > .si__buttonEmail {
+      & > .hspinner {
+        grid-area: siButtonSend;
+        margin: 0 auto;
+      }
+
+      & > .si__buttonSend {
+        grid-area: siButtonSend;
         @include won-button--outlined(white);
+        font-size: $smallFontSize;
         padding: 0.5rem;
+      }
+
+      & > .si__emailInput {
+        grid-area: siEmailInput;
         font-size: $smallFontSize;
-      }
-
-      & > .si__buttonSignup {
-        grid-area: siButtonSingle;
-      }
-
-      & > .si__buttonCopy {
-        grid-area: siButtonLeft;
-      }
-
-      & > .si__buttonEmail {
-        grid-area: siButtonRight;
-      }
-
-      & > .si__text {
-        grid-area: siText;
-        font-size: $smallFontSize;
-        overflow-y: auto;
-        text-align: left;
-        a {
-          color: white;
-          text-decoration: underline;
-        }
-
-        ul {
-          padding: 0.5rem 1rem;
-        }
-      }
-
-      &.si__anonymous--emailInput {
-        grid-template-areas:
-          "siIcon siTitle siTitle siButton"
-          "siText siText siText siText"
-          "siButtonSingle siButtonSingle siButtonSingle siButtonSingle"
-          "siButtonLeft siButtonLeft siButtonRight siButtonRight"
-          "siEmailInput siEmailInput siEmailInput siEmailInput"
-          "siButtonSend siButtonSend siButtonSend siButtonSend";
-
-        & > .hspinner {
-          grid-area: siButtonSend;
-          margin: 0 auto;
-        }
-
-        & > .si__buttonSend {
-          grid-area: siButtonSend;
-          @include won-button--outlined(white);
-          font-size: $smallFontSize;
-          padding: 0.5rem;
-        }
-
-        & > .si__emailInput {
-          grid-area: siEmailInput;
-          font-size: $smallFontSize;
-        }
       }
     }
   }

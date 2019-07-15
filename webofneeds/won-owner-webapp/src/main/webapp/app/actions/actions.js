@@ -382,8 +382,6 @@ const actionHierarchy = {
     anonymousSlideIn: {
       show: INJ_DEFAULT,
       hide: INJ_DEFAULT,
-      expand: INJ_DEFAULT,
-      collapse: INJ_DEFAULT,
       showEmailInput: INJ_DEFAULT,
     },
 

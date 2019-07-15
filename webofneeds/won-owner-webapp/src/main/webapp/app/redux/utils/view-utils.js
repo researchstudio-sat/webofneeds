@@ -41,10 +41,6 @@ export function isAnonymousLinkCopied(viewState) {
   return getIn(viewState, ["anonymousSlideIn", "linkCopied"]);
 }
 
-export function isAnonymousSlideInExpanded(viewState) {
-  return getIn(viewState, ["anonymousSlideIn", "expanded"]);
-}
-
 export function showAnonymousSlideInEmailInput(viewState) {
   return getIn(viewState, ["anonymousSlideIn", "showEmailInput"]);
 }

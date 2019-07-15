@@ -16,7 +16,6 @@ const initialState = Immutable.fromJS({
   modalDialog: undefined,
   anonymousSlideIn: {
     visible: false,
-    expanded: false,
     showEmailInput: false,
 
     linkSent: false,
@@ -152,23 +151,10 @@ export default function(viewState = initialState, action = {}) {
     case actionTypes.view.anonymousSlideIn.hide:
       return viewState
         .setIn(["anonymousSlideIn", "visible"], false)
-        .setIn(["anonymousSlideIn", "expanded"], false)
         .setIn(["anonymousSlideIn", "linkSent"], false)
         .setIn(["anonymousSlideIn", "linkCopied"], false)
         .setIn(["anonymousSlideIn", "showEmailInput"], false)
         .set("showSlideIns", false);
-
-    case actionTypes.view.anonymousSlideIn.expand:
-      return viewState
-        .setIn(["anonymousSlideIn", "visible"], true)
-        .setIn(["anonymousSlideIn", "expanded"], true)
-        .setIn(["anonymousSlideIn", "showEmailInput"], false);
-
-    case actionTypes.view.anonymousSlideIn.collapse:
-      return viewState
-        .setIn(["anonymousSlideIn", "visible"], true)
-        .setIn(["anonymousSlideIn", "expanded"], false)
-        .setIn(["anonymousSlideIn", "showEmailInput"], false);
 
     case actionTypes.view.anonymousSlideIn.showEmailInput:
       return viewState.setIn(["anonymousSlideIn", "showEmailInput"], true);

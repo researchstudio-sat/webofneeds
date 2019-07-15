@@ -136,7 +136,6 @@ function genSlideInConf() {
         <div class="si__anonymous"
             ng-if="self.showAnonymous"
             ng-class="{
-              'si__anonymous--expanded': self.isAnonymousSlideInExpanded,
               'si__anonymous--emailInput': self.showAnonymousSlideInEmailInput,
             }">
             <svg class="si__icon">
@@ -145,17 +144,11 @@ function genSlideInConf() {
             <span class="si__title">
                 Warning: <b>You could miss out on important activity!</b>
             </span>
-            <svg class="si__carret"
-                ng-click="self.view__anonymousSlideIn__expand()"
-                ng-if="!self.isAnonymousSlideInExpanded">
-                <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
+            <svg class="si__close"
+                ng-click="self.view__anonymousSlideIn__hide()">
+                <use xlink:href="#ico36_close" href="#ico36_close"></use>
             </svg>
-            <svg class="si__carret"
-                ng-click="self.view__anonymousSlideIn__collapse()"
-                ng-if="self.isAnonymousSlideInExpanded">
-                <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
-            </svg>
-            <div class="si__text" ng-if="self.isAnonymousSlideInExpanded">
+            <div class="si__text">
               <h3>You are posting with an anonymous account. This means:</h3>
               <p>
                 <ul>
@@ -173,27 +166,24 @@ function genSlideInConf() {
               </p>
             </div>
             <button class="si__buttonSignup"
-                ng-if="self.isAnonymousSlideInExpanded"
                 ng-click="self.router__stateGoAbs('signup')">
                 Sign up
             </button>
             <button class="si__buttonCopy"
-                ng-if="self.isAnonymousSlideInExpanded"
                 ng-click="self.copyLinkToClipboard()">
                 Copy login link to clipboard
             </button>
             <button class="si__buttonEmail"
-                ng-if="self.isAnonymousSlideInExpanded"
                 ng-click="self.view__anonymousSlideIn__showEmailInput()">
                 Email login link ...
             </button>
             <input class="si__emailInput"
-              ng-if="self.isAnonymousSlideInExpanded && self.showAnonymousSlideInEmailInput"
+              ng-if="self.showAnonymousSlideInEmailInput"
               type="email"
               ng-model="self.anonymousEmail"
               placeholder="Type your email"/>
             <button class="si__buttonSend"
-                ng-if="!self.isProcessingSendAnonymousLinkEmail && self.isAnonymousSlideInExpanded && self.showAnonymousSlideInEmailInput"
+                ng-if="!self.isProcessingSendAnonymousLinkEmail && self.showAnonymousSlideInEmailInput"
                 ng-click="self.account__sendAnonymousLinkEmail(self.anonymousEmail, self.privateId)"
                 ng-disabled="!self.isValidEmail()">
                 Send link to this email
@@ -259,9 +249,6 @@ function genSlideInConf() {
           "lostConnection",
         ]);
 
-        const isAnonymousSlideInExpanded = viewSelectors.isAnonymousSlideInExpanded(
-          state
-        );
         const showAnonymousSlideInEmailInput = viewSelectors.showAnonymousSlideInEmailInput(
           state
         );
@@ -294,7 +281,6 @@ function genSlideInConf() {
           privateId,
           connectionHasBeenLost,
           reconnecting: getIn(state, ["messages", "reconnecting"]),
-          isAnonymousSlideInExpanded,
           showAnonymousSlideInEmailInput,
           anonymousLinkSent,
           anonymousLinkCopied,
@@ -315,8 +301,7 @@ function genSlideInConf() {
             isLoggedIn &&
             isAnonymous &&
             !anonymousLinkSent &&
-            !anonymousLinkCopied &&
-            isAnonymousSlideInExpanded,
+            !anonymousLinkCopied,
         };
       };
 
