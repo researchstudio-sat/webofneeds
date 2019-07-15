@@ -27,13 +27,6 @@ function genComponentConf() {
   const template = `
         <!-- HEADER: -->
         <div class="cp__header">
-            <a class="cp__header__back clickable"
-                ng-click="self.router__back()">
-                <svg style="--local-primary:var(--won-primary-color);"
-                    class="cp__header__back__icon">
-                    <use xlink:href="#ico36_backarrow" href="#ico36_backarrow"></use>
-                </svg>
-            </a>
             <svg class="cp__header__icon"
                 title="Search"
                 style="--local-primary:var(--won-primary-color);">

@@ -149,12 +149,12 @@ public class CreateAtomFromJobAction extends AbstractCreateAtomAction {
         hiringOrganisation.addProperty(SCHEMA.NAME, hokifyJob.getCompany());
         atom.addProperty(SCHEMA.ORGANIZATION, hiringOrganisation);
         // s:jobLocation
-        Resource jobLocation = atom.getModel().createResource();
-        jobLocation.addProperty(RDF.type, SCHEMA.PLACE);
-        // TODO look up lon/lat via nominatim
-        atom.addProperty(SCHEMA.JOBLOCATION, jobLocation);
         HashMap<String, String> location = hokifyBotsApi.fetchGeoLocation(hokifyJob.getCity(), hokifyJob.getCountry());
         if (location != null) {
+            Resource jobLocation = atom.getModel().createResource();
+            jobLocation.addProperty(RDF.type, SCHEMA.PLACE);
+            // TODO look up lon/lat via nominatim
+            atom.addProperty(SCHEMA.JOBLOCATION, jobLocation);
             DecimalFormat df = new DecimalFormat("##.######");
             df.setRoundingMode(RoundingMode.HALF_UP);
             df.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.US));
@@ -186,9 +186,6 @@ public class CreateAtomFromJobAction extends AbstractCreateAtomAction {
             seCornerResource.addProperty(RDF.type, SCHEMA.GEOCOORDINATES);
             seCornerResource.addProperty(SCHEMA.LATITUDE, selat);
             seCornerResource.addProperty(SCHEMA.LONGITUDE, selng);
-        } else {
-            String alternateLocation = hokifyJob.getCity() + " " + hokifyJob.getCountry();
-            jobLocation.addProperty(SCHEMA.NAME, alternateLocation);
         }
         // s:description
         atom.addProperty(SCHEMA.DESCRIPTION, filterDescriptionString(hokifyJob.getDescription()));

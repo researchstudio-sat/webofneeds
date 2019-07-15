@@ -24,8 +24,8 @@ won-usecase-picker {
   .ucp__header {
     grid-area: header;
     display: grid;
-    grid-template-columns: auto 1fr;
-    grid-template-areas: "header_back header_title";
+    grid-template-columns: 1fr;
+    grid-template-areas: "header_title";
     grid-gap: $gridRowGap;
     font-size: $normalFontSize;
     text-align: left;
@@ -40,16 +40,6 @@ won-usecase-picker {
       color: $won-subtitle-gray;
       font-size: $mediumFontSize;
       font-weight: 400;
-    }
-
-    &__back {
-      grid-area: header_back;
-      display: grid;
-
-      &__icon {
-        --local-primary: #{$won-primary-color};
-        @include fixed-square($backIconSize);
-      }
     }
   }
 

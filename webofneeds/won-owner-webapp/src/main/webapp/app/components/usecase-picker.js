@@ -26,12 +26,6 @@ function genComponentConf() {
   const template = `
         <!-- HEADER -->
         <div class="ucp__header">
-            <a class="ucp__header__back clickable"
-                ng-click="self.router__back()">
-                <svg class="ucp__header__back__icon">
-                    <use xlink:href="#ico36_backarrow" href="#ico36_backarrow"></use>
-                </svg>
-            </a>
             <span class="ucp__header__title">Pick one!</span>
         </div>
 
