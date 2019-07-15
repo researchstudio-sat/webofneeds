@@ -6,7 +6,7 @@
 body {
   @media (max-width: $responsivenessBreakPoint) {
     --headerHeight: 3.3rem;
-    --menuHeight: 2.7rem;
+    --menuHeight: 0;
   }
   @media (min-width: $responsivenessBreakPoint) {
     --headerHeight: 3.3rem;
@@ -70,6 +70,16 @@ body {
       height: var(--menuHeight);
       top: var(--headerHeight);
       z-index: 999;
+
+      &.won-menu--show-mobile {
+        height: calc(100vh - var(--headerHeight));
+      }
+
+      &:not(.won-menu--show-mobile) {
+        @media (max-width: $responsivenessBreakPoint) {
+          visibility: hidden;
+        }
+      }
     }
 
     > aside.overview__left {

@@ -25,7 +25,7 @@ export function showRdf(viewState) {
   return get(viewState, "showRdf");
 }
 
-export function showMobileMenu(viewState) {
+export function showMenu(viewState) {
   return get(viewState, "showMenu");
 }
 

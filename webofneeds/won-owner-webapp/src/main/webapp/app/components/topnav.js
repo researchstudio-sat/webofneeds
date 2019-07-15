@@ -13,6 +13,7 @@ import { isLoading } from "../redux/selectors/process-selectors.js";
 import * as connectionSelectors from "../redux/selectors/connection-selectors";
 import * as accountUtils from "../redux/utils/account-utils.js";
 import { delay } from "../utils.js";
+import * as viewSelectors from "../redux/selectors/view-selectors.js";
 
 import "~/style/_responsiveness-utils.scss";
 import "~/style/_topnav.scss";
@@ -22,16 +23,20 @@ const serviceDependencies = ["$ngRedux", "$scope", "$state", "$element"];
 function genTopnavConf() {
   let template = `
         <nav class="topnav">
-            <img src="skin/{{self.themeName}}/images/logo.svg" class="topnav__logo clickable" ng-click="self.router__stateGoDefault()">
+            <img src="skin/{{self.themeName}}/images/logo.svg" class="topnav__logo clickable hide-in-responsive" ng-click="self.router__stateGoDefault()">
+            <img src="skin/{{self.themeName}}/images/logo.svg" class="topnav__logo clickable show-in-responsive" ng-click="self.view__toggleMenu()">
             <div class="topnav__title">
               <span class="topnav__app-title hide-in-responsive" ng-click="self.router__stateGoDefault()">
                   {{ self.appTitle }}
               </span>
-              <span class="topnav__divider hide-in-responsive" ng-if="self.pageTitle">
+              <span class="topnav__divider hide-in-responsive" ng-if="!self.showMenu && self.pageTitle">
                   &mdash;
               </span>
-              <span class="topnav__page-title" ng-if="self.pageTitle">
+              <span class="topnav__page-title" ng-if="!self.showMenu && self.pageTitle">
                   {{ self.pageTitle }}
+              </span>
+              <span class="topnav__page-title" ng-if="self.showMenu">
+                  Menu
               </span>
             </div>
             <div class="topnav__loading" ng-if="self.showLoadingIndicator">
@@ -59,6 +64,7 @@ function genTopnavConf() {
         const accountState = get(state, "account");
 
         return {
+          showMenu: viewSelectors.showMenu(state),
           themeName: getIn(state, ["config", "theme", "name"]),
           appTitle: getIn(state, ["config", "theme", "title"]),
           loggedIn: accountUtils.isLoggedIn(accountState),
