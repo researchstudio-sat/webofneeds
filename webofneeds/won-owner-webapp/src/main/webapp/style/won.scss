@@ -78,6 +78,10 @@ body {
       &:not(.won-menu--show-mobile) {
         @media (max-width: $responsivenessBreakPoint) {
           visibility: hidden;
+
+          > .menu {
+            display: none;
+          }
         }
       }
     }
