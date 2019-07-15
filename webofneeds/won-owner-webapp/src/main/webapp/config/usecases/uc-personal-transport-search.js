@@ -2,7 +2,7 @@
  * Created by fsuda on 18.09.2018.
  */
 import { details, mergeInEmptyDraft } from "../detail-definitions.js";
-import * as wonUtils from "../../app/won-utils.js";
+import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
 import won from "../../app/won-es6.js";
 import { getIn } from "../../app/utils.js";
 import { sparqlQuery } from "../../app/sparql-builder-utils.js";
@@ -11,7 +11,7 @@ export const personalTransportSearch = {
   identifier: "personalTransportSearch",
   label: "Need a Lift",
   icon: "#ico36_uc_route_demand",
-  doNotMatchAfter: wonUtils.findLatestIntervallEndInJsonLdOrNowAndAddMillis,
+  doNotMatchAfter: jsonLdUtils.findLatestIntervallEndInJsonLdOrNowAndAddMillis,
   draft: {
     ...mergeInEmptyDraft({
       content: {

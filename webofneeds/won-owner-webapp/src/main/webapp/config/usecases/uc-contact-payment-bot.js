@@ -1,5 +1,5 @@
 import { mergeInEmptyDraft } from "../detail-definitions.js";
-import * as wonUtils from "../../app/won-utils.js";
+import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
 import { sparqlQuery } from "../../app/sparql-builder-utils.js";
 import won from "../../app/service/won.js";
 
@@ -7,7 +7,7 @@ export const contactPaymentBot = {
   identifier: "contactPaymentBot",
   label: "Contact Payment Bot",
   icon: "#ico36_uc_custom",
-  doNotMatchAfter: wonUtils.findLatestIntervallEndInJsonLdOrNowAndAddMillis,
+  doNotMatchAfter: jsonLdUtils.findLatestIntervallEndInJsonLdOrNowAndAddMillis,
   // TODO: check if this can work like whatsX -> one click for atom creation, because nothing can be changed
   draft: {
     ...mergeInEmptyDraft({

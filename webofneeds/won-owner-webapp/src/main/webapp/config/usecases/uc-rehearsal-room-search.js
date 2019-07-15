@@ -8,20 +8,20 @@ import {
 } from "../details/real-estate.js";
 import won from "../../app/won-es6.js";
 import { perHourRentRangeDetail } from "../details/musician.js";
-import * as wonUtils from "../../app/won-utils.js";
 import {
   filterFloorSizeRange,
   filterPriceRange,
   concatenateFilters,
   sparqlQuery,
 } from "../../app/sparql-builder-utils.js";
+import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
 
 export const rehearsalRoomSearch = {
   identifier: "rehearsalRoomSearch",
   label: "Find Rehearsal Room",
   icon: "#ico36_uc_realestate",
   timeToLiveMillisDefault: 1000 * 60 * 60 * 24 * 7,
-  doNotMatchAfter: wonUtils.findLatestIntervallEndInJsonLdOrNowAndAddMillis,
+  doNotMatchAfter: jsonLdUtils.findLatestIntervallEndInJsonLdOrNowAndAddMillis,
   draft: {
     ...mergeInEmptyDraft({
       content: {

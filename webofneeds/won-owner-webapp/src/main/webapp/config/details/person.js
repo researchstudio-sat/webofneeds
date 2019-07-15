@@ -2,9 +2,9 @@
  * Created by fsuda on 18.09.2018.
  */
 import * as basicDetails from "./basic.js";
-import won from "../../app/won-es6.js";
 import { getIn, generateIdString } from "../../app/utils.js";
 import Immutable from "immutable";
+import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
 
 export const skillsDetail = {
   ...basicDetails.tags,
@@ -20,7 +20,7 @@ export const skillsDetail = {
     return { "s:knowsAbout": value };
   },
   parseFromRDF: function(jsonLDImm) {
-    return won.parseListFrom(jsonLDImm, ["s:knowsAbout"], "xsd:string");
+    return jsonLdUtils.parseListFrom(jsonLDImm, ["s:knowsAbout"], "xsd:string");
   },
 };
 
@@ -38,7 +38,7 @@ export const interestsDetail = {
     return { "foaf:topic_interest": value };
   },
   parseFromRDF: function(jsonLDImm) {
-    return won.parseListFrom(jsonLDImm, "foaf:topic_interest");
+    return jsonLdUtils.parseListFrom(jsonLDImm, "foaf:topic_interest");
   },
 };
 
@@ -90,14 +90,22 @@ export const person = {
       // bio: undefined,
     };
 
-    person.name = won.parseFrom(jsonLDImm, ["foaf:name"], "xsd:string");
-    person.title = won.parseFrom(jsonLDImm, ["foaf:title"], "xsd:string");
-    person.company = won.parseFrom(
+    person.name = jsonLdUtils.parseFrom(jsonLDImm, ["foaf:name"], "xsd:string");
+    person.title = jsonLdUtils.parseFrom(
+      jsonLDImm,
+      ["foaf:title"],
+      "xsd:string"
+    );
+    person.company = jsonLdUtils.parseFrom(
       jsonLDImm,
       ["s:worksFor", "s:name"],
       "xsd:string"
     );
-    person.position = won.parseFrom(jsonLDImm, ["s:jobTitle"], "xsd:string");
+    person.position = jsonLdUtils.parseFrom(
+      jsonLDImm,
+      ["s:jobTitle"],
+      "xsd:string"
+    );
 
     // if there's anything, use it
     if (person.name || person.title || person.company || person.position) {

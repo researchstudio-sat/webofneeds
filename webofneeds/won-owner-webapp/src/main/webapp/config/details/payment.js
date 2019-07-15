@@ -1,6 +1,5 @@
 import { generateIdString } from "../../app/utils.js";
-//import Immutable from "immutable";
-import won from "../../app/won-es6.js";
+import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
 import { get } from "../../app/utils.js";
 
 // TODO: don't demand customer info
@@ -92,12 +91,12 @@ export const paypalPayment = {
     // }
 
     // const customerUri = get(customer, "@id");
-    const amount = won.parseFrom(
+    const amount = jsonLdUtils.parseFrom(
       invoice,
       ["s:totalPaymentDue", "s:price"],
       "xsd:float"
     );
-    const currency = won.parseFrom(
+    const currency = jsonLdUtils.parseFrom(
       invoice,
       ["s:totalPaymentDue", "s:priceCurrency"],
       "xsd:string"

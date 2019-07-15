@@ -71,9 +71,8 @@ export default function(allAtomsInState = initialState, action = {}) {
       return addAtomStub(allAtomsInState, action.payload.get("uri"));
     }
 
-    case actionTypes.atoms.storeOwned:
-    case actionTypes.atoms.storeTheirs:
-    case actionTypes.personas.storeTheirs: {
+    case actionTypes.atoms.store:
+    case actionTypes.personas.store: {
       let atoms = action.payload.get("atoms");
       atoms = atoms ? atoms : Immutable.Set();
 
@@ -97,18 +96,6 @@ export default function(allAtomsInState = initialState, action = {}) {
         action.payload.get("connections")
       );
     }
-
-    case actionTypes.messages.closeAtom.failed:
-      return storeConnectionsData(
-        allAtomsInState,
-        action.payload.get("connections")
-      );
-
-    case actionTypes.messages.reopenAtom.failed:
-      return storeConnectionsData(
-        allAtomsInState,
-        action.payload.get("connections")
-      );
 
     case actionTypes.atoms.reopen:
       return allAtomsInState.setIn(

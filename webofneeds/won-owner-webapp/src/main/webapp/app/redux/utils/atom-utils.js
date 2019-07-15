@@ -437,10 +437,11 @@ export function getSocketsWithKeysReset(atomImm) {
 }
 
 export function getSocketUri(atomImm, socketType) {
+  const sockets = getIn(atomImm, ["content", "sockets"]);
+
   return (
-    atomImm &&
-    atomImm
-      .getIn(["content", "sockets"])
+    sockets &&
+    sockets
       .filter(type => type === socketType)
       .keySeq()
       .first()
@@ -448,13 +449,8 @@ export function getSocketUri(atomImm, socketType) {
 }
 
 export function getDefaultSocketUri(atomImm) {
-  return (
-    atomImm &&
-    atomImm
-      .getIn(["content", "defaultSocket"])
-      .keySeq()
-      .first()
-  );
+  const defaultSocket = getIn(atomImm, ["content", "defaultSocket"]);
+  return defaultSocket && defaultSocket.keySeq().first();
 }
 
 export function getHeldByUri(atomImm) {

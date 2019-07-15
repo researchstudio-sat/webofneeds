@@ -3,13 +3,13 @@
  */
 import { details, mergeInEmptyDraft } from "../detail-definitions.js";
 import { interestsDetail, skillsDetail } from "../details/person.js";
-import * as wonUtils from "../../app/won-utils.js";
+import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
 
 export const consortiumSearch = {
   identifier: "consortiumSearch",
   label: "Find a project consortium to join",
   icon: "#ico36_uc_consortium-search",
-  doNotMatchAfter: wonUtils.findLatestIntervallEndInJsonLdOrNowAndAddMillis,
+  doNotMatchAfter: jsonLdUtils.findLatestIntervallEndInJsonLdOrNowAndAddMillis,
   draft: {
     ...mergeInEmptyDraft({
       content: {

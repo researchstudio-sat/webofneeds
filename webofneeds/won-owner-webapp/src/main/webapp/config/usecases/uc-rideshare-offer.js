@@ -2,7 +2,6 @@
  * Created by fsuda on 18.09.2018.
  */
 import { details, mergeInEmptyDraft } from "../detail-definitions.js";
-import * as wonUtils from "../../app/won-utils.js";
 import won from "../../app/won-es6.js";
 import { getIn, isValidDate } from "../../app/utils.js";
 import {
@@ -10,12 +9,13 @@ import {
   concatenateFilters,
   sparqlQuery,
 } from "../../app/sparql-builder-utils.js";
+import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
 
 export const rideShareOffer = {
   identifier: "rideShareOffer",
   label: "Offer to Share a Ride",
   icon: "#ico36_uc_taxi_offer",
-  doNotMatchAfter: wonUtils.findLatestIntervallEndInJsonLdOrNowAndAddMillis,
+  doNotMatchAfter: jsonLdUtils.findLatestIntervallEndInJsonLdOrNowAndAddMillis,
   draft: {
     ...mergeInEmptyDraft({
       content: {

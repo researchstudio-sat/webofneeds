@@ -4,10 +4,9 @@
 import { actionTypes } from "../actions/actions.js";
 import Immutable from "immutable";
 import { getIn, get } from "../utils.js";
-import { parseAtom, parseMetaAtom } from "./atom-reducer/parse-atom.js";
+import { parseAtom } from "./atom-reducer/parse-atom.js";
 import { parseMessage } from "./atom-reducer/parse-message.js";
 import * as processUtils from "../redux/utils/process-utils.js";
-import * as atomUtils from "../redux/utils/atom-utils.js";
 
 const initialState = Immutable.fromJS({
   processingInitialLoad: true,
@@ -438,19 +437,6 @@ export default function(processState = initialState, action = {}) {
       return processState;
     }
 
-    case actionTypes.messages.reopenAtom.failed:
-    case actionTypes.messages.closeAtom.failed: {
-      let connections = action.payload.connections;
-
-      connections &&
-        connections.keySeq().forEach(connUri => {
-          processState = updateConnectionProcess(processState, connUri, {
-            loading: false,
-          });
-        });
-      return processState;
-    }
-
     case actionTypes.connections.storeActive: {
       let connections = get(action.payload, "connections");
 
@@ -496,9 +482,8 @@ export default function(processState = initialState, action = {}) {
       return processState;
     }
 
-    case actionTypes.atoms.storeTheirs:
-    case actionTypes.personas.storeTheirs:
-    case actionTypes.atoms.storeOwned: {
+    case actionTypes.atoms.store:
+    case actionTypes.personas.store: {
       let atoms = get(action.payload, "atoms");
 
       atoms &&
@@ -552,16 +537,9 @@ export default function(processState = initialState, action = {}) {
 
       metaAtoms &&
         metaAtoms.map((metaAtom, metaAtomUri) => {
-          const metaAtomImm = parseMetaAtom(metaAtom);
-          if (atomUtils.isActive(metaAtomImm)) {
-            processState = updateAtomProcess(processState, metaAtomUri, {
-              loading: true,
-            });
-          } else if (atomUtils.isInactive(metaAtomImm)) {
-            processState = updateAtomProcess(processState, metaAtomUri, {
-              toLoad: true,
-            });
-          }
+          processState = updateAtomProcess(processState, metaAtomUri, {
+            toLoad: true,
+          });
         });
 
       return processState;

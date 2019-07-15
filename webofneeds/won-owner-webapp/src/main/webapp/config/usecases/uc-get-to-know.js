@@ -3,13 +3,13 @@
  */
 import { details, mergeInEmptyDraft } from "../detail-definitions.js";
 import { interestsDetail, skillsDetail } from "../details/person.js";
-import * as wonUtils from "../../app/won-utils.js";
+import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
 
 export const getToKnow = {
   identifier: "getToKnow",
   label: "Meet people",
   icon: "#ico36_uc_find_people",
-  doNotMatchAfter: wonUtils.findLatestIntervallEndInJsonLdOrNowAndAddMillis,
+  doNotMatchAfter: jsonLdUtils.findLatestIntervallEndInJsonLdOrNowAndAddMillis,
   draft: {
     ...mergeInEmptyDraft({
       content: {

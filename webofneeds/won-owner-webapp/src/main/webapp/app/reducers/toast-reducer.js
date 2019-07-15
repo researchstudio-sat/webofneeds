@@ -95,14 +95,14 @@ export default function(allToasts = initialState, action = {}) {
     case actionTypes.messages.closeAtom.failed:
       return pushNewToast(
         allToasts,
-        "Failed to close posting",
+        "Failed to close atom",
         won.WON.errorToast
       );
 
     case actionTypes.messages.reopenAtom.failed:
       return pushNewToast(
         allToasts,
-        "Failed to reopen posting",
+        "Failed to reopen atom",
         won.WON.errorToast
       );
 
