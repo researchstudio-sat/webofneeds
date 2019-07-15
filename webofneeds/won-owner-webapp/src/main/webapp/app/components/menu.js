@@ -16,21 +16,6 @@ import Immutable from "immutable";
 function genTopnavConf() {
   let template = `
     <div class="menu">
-      <div class="menu__slideintoggle" ng-if="self.hasSlideIns"
-        ng-click="self.toggleSlideIns()">
-        <svg class="menu__slideintoggle__icon">
-          <use xlink:href="#ico16_indicator_warning" href="#ico16_indicator_warning"></use>
-        </svg>
-        <svg class="menu__slideintoggle__carret hide-in-responsive" ng-class="{
-          'menu__slideintoggle__carret--expanded': self.isSlideInsVisible,
-        }">
-          <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
-        </svg>
-        <span class="menu__slideintoggle__label show-in-responsive">
-            <span ng-if="self.isSlideInsVisible">Hide Info Slide-Ins</span>
-            <span ng-if="!self.isSlideInsVisible">Show Info Slide-Ins</span>
-        </span>
-      </div>
       <a class="menu__tab" ng-click="self.viewInventory()"
         ng-class="{
           'menu__tab--selected': self.showInventory,
@@ -59,6 +44,21 @@ function genTopnavConf() {
       <a class="menu__tab" ng-click="self.viewWhatsAround()" ng-class="{'menu__tab--selected': self.showWhatsAround}">
         <span class="menu__tab__label">What's Around</span>
       </a>
+      <div class="menu__slideintoggle" ng-if="self.hasSlideIns"
+        ng-click="self.toggleSlideIns()">
+        <svg class="menu__slideintoggle__icon">
+          <use xlink:href="#ico16_indicator_warning" href="#ico16_indicator_warning"></use>
+        </svg>
+        <svg class="menu__slideintoggle__carret hide-in-responsive" ng-class="{
+          'menu__slideintoggle__carret--expanded': self.isSlideInsVisible,
+        }">
+          <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
+        </svg>
+        <span class="menu__slideintoggle__label show-in-responsive">
+            <span ng-if="self.isSlideInsVisible">Hide Info Slide-Ins</span>
+            <span ng-if="!self.isSlideInsVisible">Show Info Slide-Ins</span>
+        </span>
+      </div>
     </div>
   `;
 
