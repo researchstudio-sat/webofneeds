@@ -7,6 +7,7 @@ import { attach } from "../cstm-ng-utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { connect2Redux } from "../configRedux.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
+import * as viewSelectors from "../redux/selectors/view-selectors.js";
 
 import "~/style/_menu.scss";
 import Immutable from "immutable";
@@ -14,6 +15,17 @@ import Immutable from "immutable";
 function genTopnavConf() {
   let template = `
     <div class="menu">
+      <div class="menu__slideintoggle" ng-if="self.hasSlideIns"
+        ng-click="self.view__toggleSlideIns()">
+        <svg class="menu__slideintoggle__icon">
+          <use xlink:href="#ico16_indicator_warning" href="#ico16_indicator_warning"></use>
+        </svg>
+        <svg class="menu__slideintoggle__carret" ng-class="{
+          'menu__slideintoggle__carret--expanded': self.isSlideInsVisible,
+        }">
+          <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
+        </svg>
+      </div>
       <a class="menu__tab" ng-click="self.router__stateGo('inventory')"
         ng-class="{
           'menu__tab--selected': self.showInventory,
@@ -61,6 +73,8 @@ function genTopnavConf() {
         const currentRoute = getIn(state, ["router", "currentState", "name"]);
 
         return {
+          hasSlideIns: viewSelectors.hasSlideIns(state),
+          isSlideInsVisible: viewSelectors.showSlideIns(state),
           isLocationAccessDenied: generalSelectors.isLocationAccessDenied(
             state
           ),

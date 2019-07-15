@@ -9,7 +9,7 @@ won-topnav {
   nav.topnav {
     display: grid;
     grid-auto-flow: column;
-    grid-template-areas: "nav_logo nav_title nav_slideintoggle nav_loading nav_signup nav_accountmenu";
+    grid-template-areas: "nav_logo nav_title nav_loading nav_signup nav_accountmenu";
     grid-template-columns: min-content 1fr min-content min-content min-content;
     margin: 0 auto;
     padding: 0 0.5rem;
@@ -56,23 +56,6 @@ won-topnav {
         color: $won-primary-color;
         font-weight: 700;
         white-space: nowrap;
-      }
-    }
-
-    .topnav__slideintoggle {
-      grid-area: nav_slideintoggle;
-      display: grid;
-      grid-auto-flow: column;
-      cursor: pointer;
-      margin-right: 0.5rem;
-
-      &__icon {
-        @include fixed-square(1.5rem);
-        --local-primary: #{$won-secondary-color};
-      }
-      &__carret {
-        @include fixed-square(1.5rem);
-        --local-primary: #{$won-secondary-color};
       }
     }
 

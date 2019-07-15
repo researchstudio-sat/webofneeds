@@ -22,10 +22,6 @@ import "~/style/_slidein.scss";
 
 function genSlideInConf() {
   let template = /*html*/ `
-        <svg class="si__toggle"
-            ng-click="self.view__toggleSlideIns()">
-            <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
-        </svg>
         <input type='text' class="si__anonymousLink" value="{{ self.anonymousLink }}" ng-if="self.inclAnonymousLinkInput"/>
         <div class="si__connectionlost" ng-if="self.showConnectionLost">
             <svg class="si__icon">

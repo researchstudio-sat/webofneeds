@@ -10,7 +10,6 @@ import { attach } from "../cstm-ng-utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { connect2Redux } from "../configRedux.js";
 import { isLoading } from "../redux/selectors/process-selectors.js";
-import * as viewSelectors from "../redux/selectors/view-selectors.js";
 import * as connectionSelectors from "../redux/selectors/connection-selectors";
 import * as accountUtils from "../redux/utils/account-utils.js";
 import { delay } from "../utils.js";
@@ -34,16 +33,6 @@ function genTopnavConf() {
               <span class="topnav__page-title" ng-if="self.pageTitle">
                   {{ self.pageTitle }}
               </span>
-            </div>
-            <div class="topnav__slideintoggle"
-                ng-if="self.showSlideInIndicator"
-                ng-click="self.view__toggleSlideIns()">
-                <svg class="topnav__slideintoggle__icon">
-                    <use xlink:href="#ico16_indicator_warning" href="#ico16_indicator_warning"></use>
-                </svg>
-                <svg class="topnav__slideintoggle__carret">
-                    <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
-                </svg>
             </div>
             <div class="topnav__loading" ng-if="self.showLoadingIndicator">
                 <svg class="topnav__loading__spinner hspinner">
@@ -76,9 +65,6 @@ function genTopnavConf() {
           isAnonymous: accountUtils.isAnonymous(accountState),
           isSignUpView: currentRoute === "signup",
           showLoadingIndicator: isLoading(state),
-          showSlideInIndicator:
-            viewSelectors.hasSlideIns(state) &&
-            !viewSelectors.showSlideIns(state),
           connectionsToCrawl: connectionSelectors.getChatConnectionsToCrawl(
             state
           ),

@@ -15,6 +15,32 @@ won-menu {
     box-sizing: border-box;
     max-width: $maxContentWidth;
 
+    > .menu__slideintoggle {
+      display: grid;
+      grid-auto-flow: column;
+      cursor: pointer;
+      align-self: center;
+      margin-right: 0.5rem;
+
+      > .menu__slideintoggle__icon {
+        @include fixed-square(1.5rem);
+        --local-primary: #{$won-secondary-color};
+      }
+      > .menu__slideintoggle__carret {
+        @include fixed-square(1.5rem);
+        --local-primary: #{$won-secondary-color};
+
+        &.menu__slideintoggle__carret--expanded {
+          transform: rotate(-180deg);
+          transition: transform linear 0.25s;
+        }
+        &:not(.menu__slideintoggle__carret--expanded) {
+          transform: rotate(0deg);
+          transition: transform linear 0.25s;
+        }
+      }
+    }
+
     > .menu__tab {
       cursor: pointer;
       padding: 0.5rem;

@@ -24,8 +24,8 @@ body {
     @media (max-width: $responsivenessBreakPoint) {
       grid-template-areas:
         "header"
-        "info"
         "menu"
+        "info"
         "list"
         "content"
         "footer";
@@ -35,8 +35,8 @@ body {
     @media (min-width: $responsivenessBreakPoint) {
       grid-template-areas:
         "header header header header"
-        "info info info info"
         "menu menu menu menu"
+        "info info info info"
         ". list content ."
         ". . . ."
         "footer footer footer footer";
