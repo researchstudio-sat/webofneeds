@@ -6,7 +6,6 @@ import ngAnimate from "angular-animate";
 import labelledHrModule from "./labelled-hr.js";
 
 import "ng-redux";
-import Immutable from "immutable";
 import { get } from "../utils.js";
 import { attach } from "../cstm-ng-utils.js";
 import { actionCreators } from "../actions/actions.js";
@@ -34,23 +33,6 @@ function genComponentConf() {
                 </svg>
             </a>
             <span class="ucp__header__title">Pick one!</span>
-        </div>
-
-        <!-- WHAT'S AROUND -->
-        <div class="ucp__createx">
-            <button class="won-button--filled red ucp__createx__button"
-                    ng-click="self.viewWhatsAround()">
-                <svg class="won-button-icon">
-                    <use xlink:href="#ico36_location_current" href="#ico36_location_current"></use>
-                </svg>
-                <span>What's in your Area?</span>
-            </button>
-            <button class="won-button--filled red ucp__createx__button"
-                    ng-click="self.viewWhatsNew()">
-                <span>What's new?</span>
-            </button>
-
-            <won-labelled-hr label="::'Or'" class="ucp__createx__labelledhr"></won-labelled-hr>
         </div>
 
         <div class="ucp__main">
@@ -144,9 +126,6 @@ function genComponentConf() {
         const showGroupsThreshold = 1; // only show groups with more than 1 use case(s) as groups
 
         return {
-          isLocationAccessDenied: generalSelectors.isLocationAccessDenied(
-            state
-          ),
           loggedIn: accountUtils.isLoggedIn(get(state, "account")),
           connectionHasBeenLost: !generalSelectors.selectIsConnected(state),
           useCaseGroups: useCaseUtils.getUseCaseGroups(),
@@ -243,56 +222,6 @@ function genComponentConf() {
         );
       }
       return this._searchInput;
-    }
-
-    viewWhatsAround() {
-      this.viewWhatsX(() => {
-        this.router__stateGo("map");
-      });
-    }
-
-    viewWhatsNew() {
-      this.viewWhatsX(() => {
-        this.router__stateGo("overview");
-      });
-    }
-
-    viewWhatsX(callback) {
-      if (this.isLocationAccessDenied) {
-        callback();
-      } else if ("geolocation" in navigator) {
-        navigator.geolocation.getCurrentPosition(
-          currentLocation => {
-            const lat = currentLocation.coords.latitude;
-            const lng = currentLocation.coords.longitude;
-
-            this.view__updateCurrentLocation(
-              Immutable.fromJS({ location: { lat, lng } })
-            );
-            callback();
-          },
-          error => {
-            //error handler
-            console.error(
-              "Could not retrieve geolocation due to error: ",
-              error.code,
-              ", continuing map initialization without currentLocation. fullerror:",
-              error
-            );
-            this.view__locationAccessDenied();
-            callback();
-          },
-          {
-            //options
-            enableHighAccuracy: true,
-            maximumAge: 30 * 60 * 1000, //use if cache is not older than 30min
-          }
-        );
-      } else {
-        console.error("location could not be retrieved");
-        this.view__locationAccessDenied();
-        callback();
-      }
     }
   }
 

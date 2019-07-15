@@ -5,8 +5,8 @@
 
 won-usecase-picker {
   display: grid;
-  grid-template-areas: "header" "create_x" "main";
-  grid-template-rows: min-content auto minmax($minimalGridRows, 1fr);
+  grid-template-areas: "header" "main";
+  grid-template-rows: min-content minmax($minimalGridRows, 1fr);
   grid-row-gap: $gridRowGap;
   box-sizing: border-box;
   padding: $gridRowGap;
@@ -49,33 +49,6 @@ won-usecase-picker {
       &__icon {
         --local-primary: #{$won-primary-color};
         @include fixed-square($backIconSize);
-      }
-    }
-  }
-
-  .ucp__createx {
-    grid-area: create_x;
-    display: grid;
-    grid-gap: $gridRowGap;
-    grid-auto-rows: min-content;
-    grid-template-columns: 1fr 1fr;
-
-    padding-top: 0.5rem;
-
-    overflow: auto;
-
-    &__button {
-      @media (min-width: $responsivenessBreakPoint) {
-        white-space: nowrap;
-      }
-      white-space: normal;
-    }
-
-    &__labelledhr {
-      grid-column: 1 / -1;
-
-      & .wlh__label .wlh__label__text {
-        background: white;
       }
     }
   }
