@@ -29,8 +29,39 @@ won-topnav {
 
     .topnav__logo {
       grid-area: nav_logo;
-      @include fixed-square($bigiconSize);
       margin-right: 0.5rem;
+
+      > img.topnav__logo__icon {
+        @include fixed-square($bigiconSize);
+      }
+
+      &__menuicon {
+        background: $won-primary-color;
+        display: block;
+        height: 3px;
+        position: relative;
+        width: 0.4rem;
+        background: var(--won-primary-color);
+        top: 1.25rem;
+        left: -0.5rem;
+
+        &:before,
+        &:after {
+          background: $won-primary-color;
+          content: "";
+          display: block;
+          height: 100%;
+          position: absolute;
+          width: 100%;
+        }
+        &:before {
+          top: 10px;
+        }
+
+        &:after {
+          top: -10px;
+        }
+      }
     }
 
     .topnav__title {
