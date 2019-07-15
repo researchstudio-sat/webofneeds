@@ -21,6 +21,7 @@ const template = (
   <container>
     <won-modal-dialog ng-if="self.showModalDialog" />
     <won-topnav page-title="::'Sign Up'" />
+    <won-menu />
     <won-toasts />
     <won-slide-in ng-if="self.showSlideIns" />
     <main className="signup" id="signupSection">

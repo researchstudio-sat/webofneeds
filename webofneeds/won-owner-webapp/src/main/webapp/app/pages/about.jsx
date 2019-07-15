@@ -22,6 +22,7 @@ const template = (
   <container>
     <won-modal-dialog ng-if="self.showModalDialog" />
     <won-topnav page-title="::'About'" />
+    <won-menu />
     <won-toasts />
     <won-slide-in ng-if="self.showSlideIns" />
     <main className="about" id="allSections">
