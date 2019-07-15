@@ -26,7 +26,7 @@ won-menu {
       display: grid;
       grid-auto-flow: column;
       grid-template-columns: min-content 1fr;
-      grid-gap: 0.5rem;
+      grid-gap: 0.25rem;
 
       > .menu__slideintoggle__icon {
         @include fixed-square(1.5rem);
@@ -45,6 +45,13 @@ won-menu {
       border-left: $won-light-gray 0.25rem solid;
       border-bottom: $thinGrayBorder;
 
+      display: grid;
+      grid-template-areas: "menu_label menu_indicator";
+      grid-template-columns: min-content min-content;
+      grid-column-gap: 0.25rem;
+      justify-content: left;
+      align-items: center;
+
       &.menu__tab--selected {
         cursor: default;
         pointer-events: none;
@@ -58,29 +65,31 @@ won-menu {
         color: $won-line-gray;
       }
 
+      > .menu__tab__label {
+        grid-area: menu_label;
+        white-space: nowrap;
+      }
+      > .menu__tab__unread {
+        grid-area: menu_indicator;
+      }
+
       &.menu__tab--unread {
         & > .menu__tab__unread {
-          display: inline-block;
           background-color: $won-unread-attention;
           border-radius: 100%;
           opacity: 1;
           @include fixed-square(0.5rem);
-          margin-right: 0.25rem;
-          transition: max-width 0.25s ease-in-out, opacity 0.25s ease-in-out,
-            margin-right 0.25s ease-in-out;
+          transition: max-width 0.25s ease-in-out, opacity 0.25s ease-in-out;
         }
       }
 
       &:not(.menu__tab--unread) {
         & > .menu__tab__unread {
-          display: inline-block;
           max-width: 0;
           height: 0;
           opacity: 0;
           overflow: hidden;
-          margin-right: 0;
-          transition: max-width 0.25s ease-in-out, opacity 0.25s ease-in-out,
-            margin-right 0.25s ease-in-out;
+          transition: max-width 0.25s ease-in-out, opacity 0.25s ease-in-out;
         }
       }
 
@@ -135,6 +144,20 @@ won-menu {
       box-sizing: border-box;
       border-bottom: $won-light-gray 0.25rem solid;
 
+      display: grid;
+      grid-template-areas: "menu_indicator menu_label";
+      grid-template-columns: min-content min-content;
+      grid-column-gap: 0.25rem;
+      align-items: center;
+
+      > .menu__tab__label {
+        grid-area: menu_label;
+        white-space: nowrap;
+      }
+      > .menu__tab__unread {
+        grid-area: menu_indicator;
+      }
+
       &.menu__tab--selected {
         cursor: default;
         pointer-events: none;
@@ -150,27 +173,21 @@ won-menu {
 
       &.menu__tab--unread {
         & > .menu__tab__unread {
-          display: inline-block;
           background-color: $won-unread-attention;
           border-radius: 100%;
           opacity: 1;
           @include fixed-square(0.5rem);
-          margin-right: 0.25rem;
-          transition: max-width 0.25s ease-in-out, opacity 0.25s ease-in-out,
-            margin-right 0.25s ease-in-out;
+          transition: max-width 0.25s ease-in-out, opacity 0.25s ease-in-out;
         }
       }
 
       &:not(.menu__tab--unread) {
         & > .menu__tab__unread {
-          display: inline-block;
           max-width: 0;
           height: 0;
           opacity: 0;
           overflow: hidden;
-          margin-right: 0;
-          transition: max-width 0.25s ease-in-out, opacity 0.25s ease-in-out,
-            margin-right 0.25s ease-in-out;
+          transition: max-width 0.25s ease-in-out, opacity 0.25s ease-in-out;
         }
       }
 
