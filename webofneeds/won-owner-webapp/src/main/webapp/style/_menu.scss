@@ -35,6 +35,9 @@ won-menu {
       > .menu__slideintoggle__label {
         color: $won-secondary-color;
       }
+      > .menu__slideintoggle__carret {
+        display: none;
+      }
     }
 
     > .menu__tab {
@@ -121,6 +124,9 @@ won-menu {
       > .menu__slideintoggle__icon {
         @include fixed-square(1.5rem);
         --local-primary: #{$won-secondary-color};
+      }
+      > .menu__slideintoggle__label {
+        display: none;
       }
       > .menu__slideintoggle__carret {
         @include fixed-square(1.5rem);

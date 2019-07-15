@@ -49,12 +49,12 @@ function genTopnavConf() {
         <svg class="menu__slideintoggle__icon">
           <use xlink:href="#ico16_indicator_warning" href="#ico16_indicator_warning"></use>
         </svg>
-        <svg class="menu__slideintoggle__carret hide-in-responsive" ng-class="{
+        <svg class="menu__slideintoggle__carret" ng-class="{
           'menu__slideintoggle__carret--expanded': self.isSlideInsVisible,
         }">
           <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
         </svg>
-        <span class="menu__slideintoggle__label show-in-responsive">
+        <span class="menu__slideintoggle__label">
             <span ng-if="self.isSlideInsVisible">Hide Info Slide-Ins</span>
             <span ng-if="!self.isSlideInsVisible">Show Info Slide-Ins</span>
         </span>
