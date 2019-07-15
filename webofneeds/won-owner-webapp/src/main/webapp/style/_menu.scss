@@ -108,7 +108,6 @@ won-menu {
       grid-auto-flow: column;
       cursor: pointer;
       align-self: center;
-      margin-right: 0.5rem;
 
       > .menu__slideintoggle__icon {
         @include fixed-square(1.5rem);
