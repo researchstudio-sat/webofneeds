@@ -21,6 +21,7 @@ import { h } from "preact";
 
 import "~/style/_overview.scss";
 import "~/style/_connection-overlay.scss";
+import * as accountUtils from "../redux/utils/account-utils";
 
 const template = (
   <container>
@@ -32,6 +33,7 @@ const template = (
       <won-post-messages connection-uri="self.viewConnUri" />
     </div>
     <won-topnav page-title="::'What\'s New'" />
+    <won-menu ng-if="self.isLoggedIn" />
     <won-toasts />
     <won-slide-in ng-if="self.showSlideIns" />
     <main className="owneroverview">
@@ -124,7 +126,10 @@ class Controller {
       const isOwnerAtomUrisToLoad =
         !lastAtomUrisUpdateDate && !isOwnerAtomUrisLoading;
 
+      const accountState = get(state, "account");
+
       return {
+        isLoggedIn: accountUtils.isLoggedIn(accountState),
         currentLocation: generalSelectors.getCurrentLocation(state),
         lastAtomUrisUpdateDate,
         friendlyLastAtomUrisUpdateTimestamp:

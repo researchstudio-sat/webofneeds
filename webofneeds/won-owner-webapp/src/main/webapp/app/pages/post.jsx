@@ -19,6 +19,7 @@ import { h } from "preact";
 
 import "~/style/_post-visitor.scss";
 import "~/style/_connection-overlay.scss";
+import * as accountUtils from "../redux/utils/account-utils";
 
 const template = (
   <container>
@@ -30,12 +31,10 @@ const template = (
       <won-post-messages connection-uri="self.viewConnUri" />
     </div>
     <won-topnav page-title="self.atomTitle" />
+    <won-menu ng-if="self.isLoggedIn" />
     <won-toasts />
     <won-slide-in ng-if="self.showSlideIns" />
-    <main
-      className="postcontent"
-      ng-class="{'postcontent--won-loading': self.atomLoading, 'postcontent--won-failed': self.atomFailedToLoad}"
-    >
+    <main className="postcontent">
       <won-post-info
         ng-if="!(self.atomLoading || self.atomFailedToLoad) && self.atom"
         atom-uri="self.atomUri"
@@ -84,8 +83,10 @@ class Controller {
       const atom = getIn(state, ["atoms", atomUri]);
 
       const process = get(state, "process");
+      const accountState = get(state, "account");
 
       return {
+        isLoggedIn: accountUtils.isLoggedIn(accountState),
         atomUri,
         isOwnedAtom: generalSelectors.isAtomOwned(state, atomUri),
         atom,

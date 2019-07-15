@@ -29,6 +29,7 @@ import { h } from "preact";
 
 import "~/style/_map.scss";
 import "~/style/_connection-overlay.scss";
+import * as accountUtils from "../redux/utils/account-utils";
 
 const template = (
   <container>
@@ -40,6 +41,7 @@ const template = (
       <won-post-messages connection-uri="self.viewConnUri" />
     </div>
     <won-topnav page-title="::'What\'s around'" />
+    <won-menu ng-if="self.isLoggedIn" />
     <won-toasts />
     <won-slide-in ng-if="self.showSlideIns" />
     <main className="ownermap">
@@ -304,7 +306,10 @@ class Controller {
           locations.push(atomLocation);
         });
 
+      const accountState = get(state, "account");
+
       return {
+        isLoggedIn: accountUtils.isLoggedIn(accountState),
         currentLocation,
         isLocationAccessDenied,
         lastWhatsAroundLocation,

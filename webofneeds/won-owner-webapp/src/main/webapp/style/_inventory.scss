@@ -40,6 +40,22 @@ main.ownerwelcome {
     }
   }
 }
+main.ownerloading {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 5rem 0;
+
+  > .ownerloading__spinner.hspinner {
+    @include fixed-square(5rem);
+  }
+  > .ownerloading__label {
+    color: $won-line-gray;
+    text-align: center;
+  }
+}
 
 main.ownerinventory {
   grid-column: 1 / -1;

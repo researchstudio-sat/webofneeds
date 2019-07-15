@@ -2,7 +2,7 @@
 
 import angular from "angular";
 import ngAnimate from "angular-animate";
-import { get, sortByDate } from "../utils.js";
+import { get, getIn, sortByDate } from "../utils.js";
 import { attach } from "../cstm-ng-utils.js";
 import { connect2Redux } from "../configRedux.js";
 import { actionCreators } from "../actions/actions.js";
@@ -12,14 +12,14 @@ import howToModule from "../components/howto.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as viewSelectors from "../redux/selectors/view-selectors.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
+import * as processUtils from "../redux/utils/process-utils.js";
+import * as accountUtils from "../redux/utils/account-utils.js";
+import * as viewUtils from "../redux/utils/view-utils.js";
 
 import { h } from "preact";
 
 import "~/style/_inventory.scss";
 import "~/style/_connection-overlay.scss";
-import * as viewUtils from "../redux/utils/view-utils";
-import { getIn } from "../utils";
-import * as accountUtils from "../redux/utils/account-utils";
 
 const template = (
   <container>
@@ -34,6 +34,12 @@ const template = (
     <won-menu ng-if="self.isLoggedIn" />
     <won-toasts />
     <won-slide-in ng-if="self.showSlideIns" />
+    <main className="ownerloading" ng-if="self.isLoggedIn && self.isInitialLoadInProgress">
+      <svg className="ownerloading__spinner hspinner">
+        <use xlinkHref="#ico_loading_anim" href="#ico_loading_anim" />
+      </svg>
+      <span className="ownerloading__label">Gathering your Atoms...</span>
+    </main>
     <main className="ownerwelcome" ng-if="!self.isLoggedIn">
       <div
         className="ownerwelcome__text"
@@ -41,7 +47,7 @@ const template = (
       />
       <won-how-to />
     </main>
-    <main className="ownerinventory" ng-if="self.isLoggedIn">
+    <main className="ownerinventory" ng-if="self.isLoggedIn && !self.isInitialLoadInProgress">
       <div className="ownerinventory__personas" ng-if="self.hasOwnedActivePersonas">
         <won-post-info
           class="ownerinventory__personas__persona"
@@ -194,8 +200,10 @@ class Controller {
       const welcomeTemplate = get(theme, "welcomeTemplate");
 
       const accountState = get(state, "account");
+      const process = get(state, "process");
 
       return {
+        isInitialLoadInProgress: processUtils.isProcessingInitialLoad(process),
         isLoggedIn: accountUtils.isLoggedIn(accountState),
         welcomeTemplatePath: "./skin/" + themeName + "/" + welcomeTemplate,
         currentLocation: generalSelectors.getCurrentLocation(state),
