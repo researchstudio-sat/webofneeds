@@ -30,7 +30,7 @@ const template = (
     >
       <won-post-messages connection-uri="self.viewConnUri" />
     </div>
-    <won-topnav />
+    <won-topnav page-title="::'Inventory'" />
     <won-menu ng-if="self.isLoggedIn" />
     <won-toasts />
     <won-slide-in ng-if="self.showSlideIns" />
