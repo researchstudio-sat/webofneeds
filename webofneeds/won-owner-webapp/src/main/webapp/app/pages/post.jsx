@@ -93,7 +93,7 @@ class Controller {
         atomTitle: get(atom, "humanReadable"),
         won: won.WON,
         showSlideIns:
-          viewSelectors.hasSlideIns(state) && viewSelectors.showSlideIns(state),
+          viewSelectors.hasSlideIns(state) && viewSelectors.isSlideInsVisible(state),
         showModalDialog: viewSelectors.showModalDialog(state),
         showConnectionOverlay: !!viewConnUri,
         viewConnUri,

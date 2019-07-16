@@ -80,8 +80,8 @@ function genTopnavConf() {
 
         return {
           hasSlideIns: viewSelectors.hasSlideIns(state),
-          isMenuVisible: viewSelectors.showMenu(state),
-          isSlideInsVisible: viewSelectors.showSlideIns(state),
+          isMenuVisible: viewSelectors.isMenuVisible(state),
+          isSlideInsVisible: viewSelectors.isSlideInsVisible(state),
           isLocationAccessDenied: generalSelectors.isLocationAccessDenied(
             state
           ),

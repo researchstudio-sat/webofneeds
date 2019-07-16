@@ -136,7 +136,7 @@ class ConnectionsController {
             connectionUtils.isRequestSent(selectedConnection) ||
             connectionUtils.isSuggested(selectedConnection)),
         showSlideIns:
-          viewSelectors.hasSlideIns(state) && viewSelectors.showSlideIns(state),
+          viewSelectors.hasSlideIns(state) && viewSelectors.isSlideInsVisible(state),
         showConnectionOverlay: !!viewConnUri,
         viewConnUri,
         hasChatAtoms,

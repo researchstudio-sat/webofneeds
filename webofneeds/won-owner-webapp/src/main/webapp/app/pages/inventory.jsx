@@ -226,7 +226,7 @@ class Controller {
           sortedOwnedActivePersonaUriArray.length > 0,
         sortedOwnedActivePersonaUriArray,
         showSlideIns:
-          viewSelectors.hasSlideIns(state) && viewSelectors.showSlideIns(state),
+          viewSelectors.hasSlideIns(state) && viewSelectors.isSlideInsVisible(state),
         showModalDialog: viewSelectors.showModalDialog(state),
         showConnectionOverlay: !!viewConnUri,
         viewConnUri,

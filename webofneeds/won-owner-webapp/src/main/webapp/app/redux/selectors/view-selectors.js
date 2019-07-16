@@ -11,8 +11,8 @@ import { getVerificationTokenFromRoute } from "./general-selectors.js";
  * @param state (full redux-state)
  * @returns {*}
  */
-export function showSlideIns(state) {
-  return viewUtils.showSlideIns(get(state, "view"));
+export function isSlideInsVisible(state) {
+  return viewUtils.isSlideInsVisible(get(state, "view"));
 }
 
 export function showModalDialog(state) {
@@ -23,8 +23,8 @@ export function showRdf(state) {
   return viewUtils.showRdf(get(state, "view"));
 }
 
-export function showMenu(state) {
-  return viewUtils.showMenu(get(state, "view"));
+export function isMenuVisible(state) {
+  return viewUtils.isMenuVisible(get(state, "view"));
 }
 
 export function isAnonymousLinkSent(state) {

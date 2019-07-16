@@ -147,7 +147,7 @@ class Controller {
         isOwnerAtomUrisLoading,
         isOwnerAtomUrisToLoad,
         showSlideIns:
-          viewSelectors.hasSlideIns(state) && viewSelectors.showSlideIns(state),
+          viewSelectors.hasSlideIns(state) && viewSelectors.isSlideInsVisible(state),
         showModalDialog: viewSelectors.showModalDialog(state),
         showConnectionOverlay: !!viewConnUri,
         viewConnUri,

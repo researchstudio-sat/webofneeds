@@ -67,7 +67,7 @@ class CreateController {
         showCreatePost,
         showCreateSearch,
         showSlideIns:
-          viewSelectors.hasSlideIns(state) && viewSelectors.showSlideIns(state),
+          viewSelectors.hasSlideIns(state) && viewSelectors.isSlideInsVisible(state),
       };
     };
 

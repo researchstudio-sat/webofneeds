@@ -79,8 +79,8 @@ function genTopnavConf() {
 
         return {
           hasSlideIns: viewSelectors.hasSlideIns(state),
-          isSlideInsVisible: viewSelectors.showSlideIns(state),
-          isMenuVisible: viewSelectors.showMenu(state),
+          isSlideInsVisible: viewSelectors.isSlideInsVisible(state),
+          isMenuVisible: viewSelectors.isMenuVisible(state),
           themeName: getIn(state, ["config", "theme", "name"]),
           appTitle: getIn(state, ["config", "theme", "title"]),
           loggedIn: accountUtils.isLoggedIn(accountState),

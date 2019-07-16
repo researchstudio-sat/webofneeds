@@ -13,7 +13,7 @@ import { get, getIn } from "../../utils.js";
  * @param state (view-state)
  * @returns {*}
  */
-export function showSlideIns(viewState) {
+export function isSlideInsVisible(viewState) {
   return get(viewState, "showSlideIns");
 }
 
@@ -25,7 +25,7 @@ export function showRdf(viewState) {
   return get(viewState, "showRdf");
 }
 
-export function showMenu(viewState) {
+export function isMenuVisible(viewState) {
   return get(viewState, "showMenu");
 }
 
