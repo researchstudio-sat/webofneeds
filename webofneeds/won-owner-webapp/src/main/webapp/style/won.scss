@@ -24,12 +24,11 @@ body {
     @media (max-width: $responsivenessBreakPoint) {
       grid-template-areas:
         "header"
-        "menu"
         "info"
         "list"
         "content"
         "footer";
-      grid-template-rows: min-content min-content min-content min-content 1fr min-content;
+      grid-template-rows: min-content min-content min-content 1fr min-content;
     }
 
     @media (min-width: $responsivenessBreakPoint) {
@@ -65,23 +64,32 @@ body {
 
     > won-menu {
       grid-area: menu;
-      position: sticky;
       box-sizing: border-box;
       height: var(--menuHeight);
       top: var(--headerHeight);
       z-index: 999;
 
       &.won-menu--show-mobile {
+        position: fixed;
         height: calc(100vh - var(--headerHeight));
+        width: 80vw;
+        max-width: 80vw;
+        transition: max-width linear 0.5s;
+        overflow-y: hidden;
+        border-right: $thinGrayBorder;
       }
 
       &:not(.won-menu--show-mobile) {
-        @media (max-width: $responsivenessBreakPoint) {
-          visibility: hidden;
+        position: sticky;
 
-          > .menu {
-            display: none;
-          }
+        @media (max-width: $responsivenessBreakPoint) {
+          position: fixed;
+          height: calc(100vh - var(--headerHeight));
+          width: 80vw;
+          max-width: 0;
+          transition: max-width linear 0.5s;
+          overflow-y: hidden;
+          border-right: 0;
         }
       }
     }
