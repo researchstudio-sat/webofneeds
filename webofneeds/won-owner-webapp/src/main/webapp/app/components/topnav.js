@@ -25,7 +25,7 @@ function genTopnavConf() {
         <nav class="topnav">
             <div class="topnav__logo clickable">
                 <img src="skin/{{self.themeName}}/images/logo.svg" class="topnav__logo__icon hide-in-responsive" ng-click="self.hideMenu() && self.router__stateGoDefault()">
-                <span class="topnav__logo__menuicon show-in-responsive" ng-if="self.loggedIn || !self.showMenu" ng-click="self.menuAction()"></span>
+                <span class="topnav__logo__menuicon show-in-responsive" ng-if="self.loggedIn || self.showMenu" ng-click="self.menuAction()"></span>
                 <img src="skin/{{self.themeName}}/images/logo.svg" class="topnav__logo__icon show-in-responsive" ng-click="self.menuAction()">
             </div>
             <div class="topnav__title">
