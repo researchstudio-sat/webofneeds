@@ -9,8 +9,8 @@ won-topnav {
   nav.topnav {
     display: grid;
     grid-auto-flow: column;
-    grid-template-areas: "nav_logo nav_title nav_loading nav_signup nav_accountmenu";
-    grid-template-columns: min-content 1fr min-content min-content min-content;
+    grid-template-areas: "nav_logo nav_title nav_loading nav_slideintoggle nav_signup nav_accountmenu";
+    grid-template-columns: min-content 1fr min-content min-content min-content min-content;
     margin: 0 auto;
     padding: 0 0.5rem;
     box-sizing: border-box;
@@ -60,6 +60,33 @@ won-topnav {
 
         &:after {
           top: -10px;
+        }
+      }
+    }
+
+    > .topnav__slideintoggle {
+      grid-area: nav_slideintoggle;
+      display: grid;
+      grid-auto-flow: column;
+      cursor: pointer;
+      align-self: center;
+      margin-right: 0.5rem;
+
+      > .topnav__slideintoggle__icon {
+        @include fixed-square(1.5rem);
+        --local-primary: #{$won-secondary-color};
+      }
+      > .topnav__slideintoggle__carret {
+        @include fixed-square(1.5rem);
+        --local-primary: #{$won-secondary-color};
+
+        &.topnav__slideintoggle__carret--expanded {
+          transform: rotate(-180deg);
+          transition: transform linear 0.25s;
+        }
+        &:not(.topnav__slideintoggle__carret--expanded) {
+          transform: rotate(0deg);
+          transition: transform linear 0.25s;
         }
       }
     }

@@ -44,7 +44,7 @@ function genTopnavConf() {
       <a class="menu__tab" ng-click="self.viewWhatsAround()" ng-class="{'menu__tab--selected': self.showWhatsAround}">
         <span class="menu__tab__label">What's Around</span>
       </a>
-      <div class="menu__slideintoggle" ng-if="self.hasSlideIns"
+      <div class="menu__slideintoggle hide-in-responsive" ng-if="self.hasSlideIns"
         ng-click="self.toggleSlideIns()">
         <svg class="menu__slideintoggle__icon">
           <use xlink:href="#ico16_indicator_warning" href="#ico16_indicator_warning"></use>

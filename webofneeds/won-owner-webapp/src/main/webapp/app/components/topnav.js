@@ -47,6 +47,17 @@ function genTopnavConf() {
                     <use xlink:href="#ico_loading_anim" href="#ico_loading_anim"></use>
                 </svg>
             </div>
+            <div class="topnav__slideintoggle show-in-responsive" ng-if="self.hasSlideIns"
+                ng-click="self.toggleSlideIns()">
+                <svg class="topnav__slideintoggle__icon">
+                    <use xlink:href="#ico16_indicator_warning" href="#ico16_indicator_warning"></use>
+                </svg>
+                <svg class="topnav__slideintoggle__carret" ng-class="{
+                    'topnav__slideintoggle__carret--expanded': self.isSlideInsVisible,
+                }">
+                    <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
+                </svg>
+            </div>
             <button ng-click="self.router__stateGo('signup')" class="topnav__signupbtn won-button--filled red" ng-if="!self.isSignUpView && (self.isAnonymous || !self.loggedIn)">
                 Sign up
             </button>
@@ -67,6 +78,8 @@ function genTopnavConf() {
         const accountState = get(state, "account");
 
         return {
+          hasSlideIns: viewSelectors.hasSlideIns(state),
+          isSlideInsVisible: viewSelectors.showSlideIns(state),
           showMenu: viewSelectors.showMenu(state),
           themeName: getIn(state, ["config", "theme", "name"]),
           appTitle: getIn(state, ["config", "theme", "title"]),
@@ -91,6 +104,10 @@ function genTopnavConf() {
       if (this.showMenu) {
         this.view__hideMenu();
       }
+    }
+
+    toggleSlideIns() {
+      this.view__toggleSlideIns();
     }
 
     menuAction() {
