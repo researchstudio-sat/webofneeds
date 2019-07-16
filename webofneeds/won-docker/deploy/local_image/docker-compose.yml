@@ -108,7 +108,8 @@ services:
   # bigdata rdf store for matcher service
   bigdata:
     restart: always
-    build: ../../image/bigdata
+    #build: ../../image/bigdata
+    image: webofneeds/bigdata:latest
     #volumes:
     #  - $base_folder/bigdata/data/:/usr/src/bigdata/data
     ports:
