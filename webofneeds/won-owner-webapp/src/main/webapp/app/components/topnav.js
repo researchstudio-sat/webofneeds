@@ -23,11 +23,11 @@ const serviceDependencies = ["$ngRedux", "$scope", "$state", "$element"];
 function genTopnavConf() {
   let template = `
         <nav class="topnav">
-            <div class="topnav__logo clickable">
-                <img src="skin/{{self.themeName}}/images/logo.svg" class="topnav__logo__icon hide-in-responsive" ng-click="self.hideMenu() && self.router__stateGoDefault()">
-                <span class="topnav__logo__menuicon show-in-responsive" ng-if="self.loggedIn || self.showMenu" ng-click="self.menuAction()"></span>
-                <img src="skin/{{self.themeName}}/images/logo.svg" class="topnav__logo__icon show-in-responsive" ng-click="self.menuAction()">
-            </div>
+            <svg class="topnav__menuicon clickable" ng-class="{'topnav__menuicon--hide': !self.loggedIn, 'topnav__menuicon--show': self.isMenuVisible}" ng-click="self.menuAction()">
+                <use xlink:href="#ico16_burger" href="#ico16_burger"></use>
+            </svg>
+            <img src="skin/{{self.themeName}}/images/logo.svg" class="topnav__logo clickable hide-in-responsive" ng-click="self.hideMenu() && self.router__stateGoDefault()">
+            <img src="skin/{{self.themeName}}/images/logo.svg" class="topnav__logo clickable show-in-responsive" ng-click="self.menuAction()">
             <div class="topnav__title">
               <span class="topnav__app-title hide-in-responsive" ng-click="self.router__stateGoDefault()" ng-if="!self.showMenu">
                   {{ self.appTitle }}
@@ -107,6 +107,9 @@ function genTopnavConf() {
     }
 
     toggleSlideIns() {
+      if (this.isMenuVisible) {
+        this.view__hideMenu();
+      }
       this.view__toggleSlideIns();
     }
 

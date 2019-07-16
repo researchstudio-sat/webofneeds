@@ -9,10 +9,10 @@ won-topnav {
   nav.topnav {
     display: grid;
     grid-auto-flow: column;
-    grid-template-areas: "nav_logo nav_title nav_loading nav_slideintoggle nav_signup nav_accountmenu";
-    grid-template-columns: min-content 1fr min-content min-content min-content min-content;
+    grid-template-areas: "nav_menuicon nav_logo nav_title nav_loading nav_slideintoggle nav_signup nav_accountmenu";
+    grid-template-columns: min-content min-content 1fr min-content min-content min-content min-content;
     margin: 0 auto;
-    padding: 0 0.5rem;
+    padding: 0 0.5rem 0 0;
     box-sizing: border-box;
     height: 100%;
     align-items: center;
@@ -27,41 +27,28 @@ won-topnav {
       }
     }
 
+    .topnav__menuicon {
+      grid-area: nav_menuicon;
+      --local-primary: #{$won-primary-color};
+      height: $bigiconSize;
+      width: 0.4rem;
+      margin-right: 0.1rem;
+
+      &.topnav__menuicon--hide {
+        visibility: hidden;
+      }
+
+      &:not(.topnav__menuicon--show) {
+        @media (min-width: $responsivenessBreakPoint) {
+          visibility: hidden;
+        }
+      }
+    }
+
     .topnav__logo {
       grid-area: nav_logo;
+      @include fixed-square($bigiconSize);
       margin-right: 0.5rem;
-
-      > img.topnav__logo__icon {
-        @include fixed-square($bigiconSize);
-      }
-
-      &__menuicon {
-        background: $won-primary-color;
-        display: block;
-        height: 3px;
-        position: relative;
-        width: 0.4rem;
-        background: var(--won-primary-color);
-        top: 1.25rem;
-        left: -0.5rem;
-
-        &:before,
-        &:after {
-          background: $won-primary-color;
-          content: "";
-          display: block;
-          height: 100%;
-          position: absolute;
-          width: 100%;
-        }
-        &:before {
-          top: 10px;
-        }
-
-        &:after {
-          top: -10px;
-        }
-      }
     }
 
     > .topnav__slideintoggle {
