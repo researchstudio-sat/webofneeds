@@ -80,7 +80,7 @@ function genTopnavConf() {
 
         return {
           hasSlideIns: viewSelectors.hasSlideIns(state),
-          showMenu: viewSelectors.showMenu(state),
+          isMenuVisible: viewSelectors.showMenu(state),
           isSlideInsVisible: viewSelectors.showSlideIns(state),
           isLocationAccessDenied: generalSelectors.isLocationAccessDenied(
             state
@@ -107,11 +107,15 @@ function genTopnavConf() {
 
       connect2Redux(selectFromState, actionCreators, [], this);
       classOnComponentRoot("won-has-slideins", () => this.hasSlideIns, this);
-      classOnComponentRoot("won-menu--show-mobile", () => this.showMenu, this);
+      classOnComponentRoot(
+        "won-menu--show-mobile",
+        () => this.isMenuVisible,
+        this
+      );
     }
     //This method is for debug purposes only, we currently dont offer the createSearch within the ui call menu4dbg.createSearchPost() to access the createSearch View
     createSearchPost() {
-      if (this.showMenu) {
+      if (this.isMenuVisible) {
         this.view__hideMenu();
       }
       this.router__stateGo("create", {
@@ -123,28 +127,28 @@ function genTopnavConf() {
     }
 
     toggleSlideIns() {
-      if (this.showMenu) {
+      if (this.isMenuVisible) {
         this.view__hideMenu();
       }
       this.view__toggleSlideIns();
     }
 
     viewCreate() {
-      if (this.showMenu) {
+      if (this.isMenuVisible) {
         this.view__hideMenu();
       }
       this.router__stateGo("create");
     }
 
     viewChats() {
-      if (this.showMenu) {
+      if (this.isMenuVisible) {
         this.view__hideMenu();
       }
       this.router__stateGo("connections");
     }
 
     viewInventory() {
-      if (this.showMenu) {
+      if (this.isMenuVisible) {
         this.view__hideMenu();
       }
       this.router__stateGo("inventory");
@@ -152,7 +156,7 @@ function genTopnavConf() {
 
     viewWhatsAround() {
       this.viewWhatsX(() => {
-        if (this.showMenu) {
+        if (this.isMenuVisible) {
           this.view__hideMenu();
         }
         this.router__stateGo("map");
@@ -161,7 +165,7 @@ function genTopnavConf() {
 
     viewWhatsNew() {
       this.viewWhatsX(() => {
-        if (this.showMenu) {
+        if (this.isMenuVisible) {
           this.view__hideMenu();
         }
         this.router__stateGo("overview");
