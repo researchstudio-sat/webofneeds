@@ -1,153 +1,189 @@
 @import "won-config";
 @import "sizing-utils";
 
-won-menu {
-  background: $won-light-gray;
-  @media (min-width: $responsivenessBreakPoint) {
-    border-bottom: $thinGrayBorder;
+@mixin desktopMenuTab() {
+  border-bottom: $won-light-gray 0.25rem solid;
+  grid-template-areas: "menu_indicator menu_label";
+
+  &.menu__tab--selected {
+    border-bottom-color: $won-primary-color;
   }
 
-  > .menu {
-    display: grid;
-    box-sizing: border-box;
+  &:not(.menu__tab--selected):hover {
+    border-bottom-color: $won-primary-color-light;
+    color: $won-primary-color-light;
+  }
+}
 
-    > .menu__slideintoggle {
-      display: grid;
-      cursor: pointer;
-      grid-auto-flow: column;
+@mixin mobileMenuTab() {
+  border-left: $won-light-gray 0.25rem solid;
+  border-bottom: $thinGrayBorder;
 
-      > .menu__slideintoggle__icon {
-        @include fixed-square(1.5rem);
-        --local-primary: #{$won-secondary-color};
+  grid-template-areas: "menu_label menu_indicator";
+  justify-content: left;
+
+  &.menu__tab--selected {
+    border-left-color: $won-primary-color;
+  }
+
+  &:not(.menu__tab--selected):hover {
+    border-left-color: $won-primary-color-light;
+    color: $won-primary-color-light;
+  }
+}
+
+@mixin desktopMenu() {
+  grid-auto-flow: column;
+  grid-gap: 0.5rem;
+  justify-content: center;
+  margin: 0 auto;
+  padding: 0 0.5rem;
+  max-width: $maxContentWidth;
+
+  > .menu__slideintoggle {
+    align-self: center;
+
+    > .menu__slideintoggle__label {
+      display: none;
+    }
+    > .menu__slideintoggle__carret {
+      @include fixed-square(1.5rem);
+      --local-primary: #{$won-secondary-color};
+
+      &.menu__slideintoggle__carret--expanded {
+        transform: rotate(-180deg);
+        transition: transform linear 0.25s;
+      }
+      &:not(.menu__slideintoggle__carret--expanded) {
+        transform: rotate(0deg);
+        transition: transform linear 0.25s;
       }
     }
+  }
+}
+
+@mixin mobileMenu() {
+  grid-auto-flow: row;
+
+  > .menu__slideintoggle {
+    border-bottom: $thinGrayBorder;
+    padding: 0.5rem;
+    grid-gap: 0.25rem;
+    grid-template-columns: min-content 1fr;
+
+    > .menu__slideintoggle__label {
+      color: $won-secondary-color;
+    }
+    > .menu__slideintoggle__carret {
+      display: none;
+    }
+  }
+}
+
+@mixin genericMenu() {
+  display: grid;
+  box-sizing: border-box;
+
+  > .menu__slideintoggle {
+    display: grid;
+    cursor: pointer;
+    grid-auto-flow: column;
+
+    > .menu__slideintoggle__icon {
+      @include fixed-square(1.5rem);
+      --local-primary: #{$won-secondary-color};
+    }
+  }
+}
+
+@mixin genericMenuTab() {
+  display: grid;
+  grid-column-gap: 0.25rem;
+  align-items: center;
+  grid-template-columns: min-content min-content;
+  cursor: pointer;
+  padding: 0.5rem;
+  color: $won-primary-text-color;
+  box-sizing: border-box;
+
+  &.menu__tab--inactive {
+    color: $won-line-gray;
+  }
+
+  > .menu__tab__label {
+    grid-area: menu_label;
+    white-space: nowrap;
+  }
+  > .menu__tab__unread {
+    grid-area: menu_indicator;
+  }
+
+  &.menu__tab--selected {
+    cursor: default;
+    pointer-events: none;
+
+    &:not(.menu__tab--inactive) {
+      color: $won-primary-color;
+    }
+  }
+
+  &.menu__tab--unread {
+    & > .menu__tab__unread {
+      background-color: $won-unread-attention;
+      border-radius: 100%;
+      opacity: 1;
+      @include fixed-square(0.5rem);
+      transition: max-width 0.25s ease-in-out, opacity 0.25s ease-in-out;
+    }
+  }
+
+  &:not(.menu__tab--unread) {
+    & > .menu__tab__unread {
+      max-width: 0;
+      height: 0;
+      opacity: 0;
+      overflow: hidden;
+      transition: max-width 0.25s ease-in-out, opacity 0.25s ease-in-out;
+    }
+  }
+}
+
+won-menu.won-menu--show-mobile {
+  background: $won-light-gray;
+
+  > .menu {
+    @include genericMenu();
+    @include mobileMenu();
+
+    & > .menu__tab {
+      @include genericMenuTab();
+      @include mobileMenuTab();
+    }
+  }
+}
+
+won-menu:not(.won-menu--show-mobile) {
+  background: $won-light-gray;
+  border-bottom: $thinGrayBorder;
+
+  > .menu {
+    @include genericMenu();
 
     @media (min-width: $responsivenessBreakPoint) {
-      grid-auto-flow: column;
-      grid-gap: 0.5rem;
-      justify-content: center;
-      margin: 0 auto;
-      padding: 0 0.5rem;
-      max-width: $maxContentWidth;
-
-      > .menu__slideintoggle {
-        align-self: center;
-
-        > .menu__slideintoggle__label {
-          display: none;
-        }
-        > .menu__slideintoggle__carret {
-          @include fixed-square(1.5rem);
-          --local-primary: #{$won-secondary-color};
-
-          &.menu__slideintoggle__carret--expanded {
-            transform: rotate(-180deg);
-            transition: transform linear 0.25s;
-          }
-          &:not(.menu__slideintoggle__carret--expanded) {
-            transform: rotate(0deg);
-            transition: transform linear 0.25s;
-          }
-        }
-      }
+      @include desktopMenu();
     }
     @media (max-width: $responsivenessBreakPoint) {
-      grid-auto-flow: row;
-
-      > .menu__slideintoggle {
-        border-bottom: $thinGrayBorder;
-        padding: 0.5rem;
-        grid-gap: 0.25rem;
-        grid-template-columns: min-content 1fr;
-
-        > .menu__slideintoggle__label {
-          color: $won-secondary-color;
-        }
-        > .menu__slideintoggle__carret {
-          display: none;
-        }
-      }
+      @include mobileMenu();
     }
 
     & > .menu__tab {
-      display: grid;
-      grid-column-gap: 0.25rem;
-      align-items: center;
-      grid-template-columns: min-content min-content;
-      cursor: pointer;
-      padding: 0.5rem;
-      color: $won-primary-text-color;
-      box-sizing: border-box;
-
-      &.menu__tab--inactive {
-        color: $won-line-gray;
-      }
-
-      > .menu__tab__label {
-        grid-area: menu_label;
-        white-space: nowrap;
-      }
-      > .menu__tab__unread {
-        grid-area: menu_indicator;
-      }
-
-      &.menu__tab--selected {
-        cursor: default;
-        pointer-events: none;
-
-        &:not(.menu__tab--inactive) {
-          color: $won-primary-color;
-        }
-      }
-
-      &.menu__tab--unread {
-        & > .menu__tab__unread {
-          background-color: $won-unread-attention;
-          border-radius: 100%;
-          opacity: 1;
-          @include fixed-square(0.5rem);
-          transition: max-width 0.25s ease-in-out, opacity 0.25s ease-in-out;
-        }
-      }
-
-      &:not(.menu__tab--unread) {
-        & > .menu__tab__unread {
-          max-width: 0;
-          height: 0;
-          opacity: 0;
-          overflow: hidden;
-          transition: max-width 0.25s ease-in-out, opacity 0.25s ease-in-out;
-        }
-      }
+      @include genericMenuTab();
 
       @media (min-width: $responsivenessBreakPoint) {
-        border-bottom: $won-light-gray 0.25rem solid;
-        grid-template-areas: "menu_indicator menu_label";
-
-        &.menu__tab--selected {
-          border-bottom-color: $won-primary-color;
-        }
-
-        &:not(.menu__tab--selected):hover {
-          border-bottom-color: $won-primary-color-light;
-          color: $won-primary-color-light;
-        }
+        @include desktopMenuTab();
       }
       @media (max-width: $responsivenessBreakPoint) {
-        border-left: $won-light-gray 0.25rem solid;
-        border-bottom: $thinGrayBorder;
-
-        grid-template-areas: "menu_label menu_indicator";
-        justify-content: left;
-
-        &.menu__tab--selected {
-          border-left-color: $won-primary-color;
-        }
-
-        &:not(.menu__tab--selected):hover {
-          border-left-color: $won-primary-color-light;
-          color: $won-primary-color-light;
-        }
+        @include mobileMenuTab();
       }
     }
   }
