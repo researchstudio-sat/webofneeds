@@ -12,6 +12,7 @@ import { actionCreators } from "../actions/actions.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as connectionSelectors from "../redux/selectors/connection-selectors.js";
 import * as connectionUtils from "../redux/utils/connection-utils.js";
+import * as accountUtils from "../redux/utils/account-utils.js";
 import * as viewSelectors from "../redux/selectors/view-selectors.js";
 import { h } from "preact";
 
@@ -29,7 +30,7 @@ const template = (
       <won-post-messages connection-uri="self.viewConnUri" />
     </div>
     <won-topnav page-title="::'Chats'" />
-    <won-menu />
+    <won-menu ng-if="self.isLoggedIn" />
     <won-toasts />
     <won-slide-in ng-if="self.showSlideIns" />
     <aside
@@ -116,7 +117,10 @@ class ConnectionsController {
 
       const hasChatAtoms = chatAtoms && chatAtoms.size > 0;
 
+      const accountState = get(state, "account");
+
       return {
+        isLoggedIn: accountUtils.isLoggedIn(accountState),
         showModalDialog: getIn(state, ["view", "showModalDialog"]),
         showListSide: hasChatAtoms,
         showNoSelectionSide:
