@@ -232,3 +232,11 @@ svg {
   background-color: $won-primary-color;
   border-radius: 100%;
 }
+
+//QUICK FIX for broken elm back button
+main.settings won-svg-icon {
+  @include fixed-square($postIconSize);
+  > svg {
+    @include fixed-square($postIconSize);
+  }
+}
