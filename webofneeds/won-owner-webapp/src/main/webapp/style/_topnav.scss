@@ -133,10 +133,8 @@ won-topnav {
 
     won-account-menu {
       grid-area: nav_accountmenu;
-
-      .topnav__carret {
-        // with svg-included margins
-        @include carretSized;
+      .topnav__button__caption {
+        margin-right: 0.5rem;
       }
     }
   }

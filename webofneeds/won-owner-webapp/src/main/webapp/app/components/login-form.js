@@ -54,7 +54,7 @@ function genLoginConf() {
                 ng-model="self.rememberMe"
                 type="checkbox"/> Remember me
         </form>
-        <won-labelled-hr label="or" ></won-labelled-hr>
+        <won-labelled-hr label="::'or'" ></won-labelled-hr>
         <div class="wl__register">
             <button
                 class="won-button--filled red"

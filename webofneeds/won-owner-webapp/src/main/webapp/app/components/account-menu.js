@@ -25,10 +25,6 @@ function genLogoutConf() {
                     {{self.loggedIn? self.getEmail() : "Sign In"}}
                 </span>
 
-                <svg class="topnav__carret" style="--local-primary:var(--won-primary-color);">
-                    <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
-                </svg>
-
                 <svg class="topnav__button__icon" style="--local-primary:var(--won-primary-color);" ng-if="!self.isAnonymous">
                     <use xlink:href="#ico36_person" href="#ico36_person"></use>
                 </svg>
