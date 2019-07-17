@@ -5,11 +5,12 @@
  */
 import angular from "angular";
 import ngAnimate from "angular-animate";
-import { getIn } from "../utils.js";
+import { getIn, get } from "../utils.js";
 import { attach } from "../cstm-ng-utils.js";
 import { actionCreators } from "../actions/actions.js";
 import settingsWrapper from "../components/settings-wrapper.js";
 import * as viewSelectors from "../redux/selectors/view-selectors.js";
+import * as accountUtils from "../redux/utils/account-utils.js";
 import { h } from "preact";
 
 import "~/style/_signup.scss";
@@ -18,7 +19,7 @@ const template = (
   <container>
     <won-modal-dialog ng-if="self.showModalDialog" />
     <won-topnav page-title="::'Settings'" />
-    <won-menu />
+    <won-menu ng-if="self.isLoggedIn" />
     <won-toasts />
     <won-slide-in ng-if="self.showSlideIns" />
     <main className="settings">
@@ -40,7 +41,10 @@ class SettingsController {
     this.rememberMe = false;
 
     const select = state => {
+      const accountState = get(state, "account");
+
       return {
+        isLoggedIn: accountUtils.isLoggedIn(accountState),
         appTitle: getIn(state, ["config", "theme", "title"]),
         showModalDialog: state.getIn(["view", "showModalDialog"]),
         showSlideIns:

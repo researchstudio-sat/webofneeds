@@ -46,9 +46,24 @@ won-topnav {
     }
 
     .topnav__logo {
+      display: grid;
       grid-area: nav_logo;
-      @include fixed-square($bigiconSize);
       margin-right: 0.5rem;
+      position: relative;
+
+      &__image {
+        @include fixed-square($bigiconSize);
+      }
+
+      &__unreads {
+        position: absolute;
+        background-color: $won-unread-attention;
+        border-radius: 100%;
+        opacity: 1;
+        @include fixed-square(0.5rem);
+        right: 0;
+        top: 0;
+      }
     }
 
     > .topnav__slideintoggle {
@@ -118,10 +133,8 @@ won-topnav {
 
     won-account-menu {
       grid-area: nav_accountmenu;
-
-      .topnav__carret {
-        // with svg-included margins
-        @include carretSized;
+      .topnav__button__caption {
+        margin-right: 0.5rem;
       }
     }
   }

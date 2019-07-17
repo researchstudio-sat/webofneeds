@@ -109,7 +109,7 @@ won-connection-header {
 
         &__message.won-unread,
         &__unreadcount {
-          color: $won-primary-color;
+          color: $won-unread-attention;
         }
 
         &__message {

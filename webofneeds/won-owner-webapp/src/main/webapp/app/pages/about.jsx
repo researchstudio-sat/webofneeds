@@ -22,7 +22,7 @@ const template = (
   <container>
     <won-modal-dialog ng-if="self.showModalDialog" />
     <won-topnav page-title="::'About'" />
-    <won-menu />
+    <won-menu ng-if="self.isLoggedIn" />
     <won-toasts />
     <won-slide-in ng-if="self.showSlideIns" />
     <main className="about" id="allSections">
@@ -281,7 +281,7 @@ class AboutController {
       const visibleSection = generalSelectors.getAboutSectionFromRoute(state);
       const themeName = getIn(state, ["config", "theme", "name"]);
       return {
-        loggedIn: accountUtils.isLoggedIn(get(state, "account")),
+        isLoggedIn: accountUtils.isLoggedIn(get(state, "account")),
         themeName,
         visibleSection,
         tosTemplate:
