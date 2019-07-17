@@ -11,6 +11,8 @@ import won from "../won-es6.js";
 import "angular-marked";
 import "~/style/_won-markdown.scss";
 
+import labelledHrModule from "../components/labelled-hr.js";
+
 import * as accountUtils from "../redux/utils/account-utils.js";
 
 function genLoginConf() {
@@ -52,11 +54,13 @@ function genLoginConf() {
                 ng-model="self.rememberMe"
                 type="checkbox"/> Remember me
         </form>
+        <won-labelled-hr label="or" ></won-labelled-hr>
         <div class="wl__register">
-            No account yet?
-            <a class="clickable" ng-click="self.view__hideMainMenu() && self.router__stateGo('signup')">
-                Sign up
-            </a>
+            <button
+                class="won-button--filled red"
+                ng-click="self.view__hideMainMenu() && self.router__stateGo('signup')">
+                    Sign up
+            </button>
         </div>`;
 
   const serviceDependencies = [
@@ -122,5 +126,5 @@ function genLoginConf() {
 }
 
 export default angular
-  .module("won.owner.components.loginForm", ["hc.marked"])
+  .module("won.owner.components.loginForm", ["hc.marked", labelledHrModule])
   .directive("wonLoginForm", genLoginConf).name;

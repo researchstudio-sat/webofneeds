@@ -19,7 +19,7 @@ won-atom-content-participants {
     background: $won-light-gray;
 
     &.won-unread {
-      border-color: $won-primary-color;
+      border-color: $won-unread-attention;
       /*box-shadow: 0px 0px 5px 5px var(--won-primary-color);*/
     }
 

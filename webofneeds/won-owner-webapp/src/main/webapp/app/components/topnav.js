@@ -17,6 +17,7 @@ import * as viewSelectors from "../redux/selectors/view-selectors.js";
 
 import "~/style/_responsiveness-utils.scss";
 import "~/style/_topnav.scss";
+import * as generalSelectors from "../redux/selectors/general-selectors";
 
 const serviceDependencies = ["$ngRedux", "$scope", "$state", "$element"];
 
@@ -26,19 +27,22 @@ function genTopnavConf() {
             <svg class="topnav__menuicon clickable" ng-class="{'topnav__menuicon--hide': !self.loggedIn, 'topnav__menuicon--show': self.isMenuVisible}" ng-click="self.menuAction()">
                 <use xlink:href="#ico16_burger" href="#ico16_burger"></use>
             </svg>
-            <img src="skin/{{self.themeName}}/images/logo.svg" class="topnav__logo clickable hide-in-responsive" ng-click="self.hideMenu() && self.router__stateGoDefault()">
-            <img src="skin/{{self.themeName}}/images/logo.svg" class="topnav__logo clickable show-in-responsive" ng-click="self.menuAction()">
+            <div class="topnav__logo clickable">
+                <img src="skin/{{self.themeName}}/images/logo.svg" class="topnav__logo__image hide-in-responsive" ng-click="self.hideMenu() && self.router__stateGoDefault()">
+                <img src="skin/{{self.themeName}}/images/logo.svg" class="topnav__logo__image show-in-responsive" ng-click="self.menuAction()">
+                <span class="topnav__logo__unreads show-in-responsive" ng-if="self.hasUnreads && !self.isMenuVisible"></span>
+            </div>
             <div class="topnav__title">
-              <span class="topnav__app-title hide-in-responsive" ng-click="self.router__stateGoDefault()" ng-if="!self.showMenu">
+              <span class="topnav__app-title hide-in-responsive" ng-click="self.router__stateGoDefault()" ng-if="!self.isMenuVisible">
                   {{ self.appTitle }}
               </span>
-              <span class="topnav__divider hide-in-responsive" ng-if="!self.showMenu && self.pageTitle">
+              <span class="topnav__divider hide-in-responsive" ng-if="!self.isMenuVisible && self.pageTitle">
                   &mdash;
               </span>
-              <span class="topnav__page-title" ng-if="!self.showMenu && self.pageTitle">
+              <span class="topnav__page-title" ng-if="!self.isMenuVisible && self.pageTitle">
                   {{ self.pageTitle }}
               </span>
-              <span class="topnav__page-title" ng-if="self.showMenu" ng-click="self.menuAction()">
+              <span class="topnav__page-title" ng-if="self.isMenuVisible" ng-click="self.menuAction()">
                   Menu
               </span>
             </div>
@@ -58,7 +62,7 @@ function genTopnavConf() {
                     <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
                 </svg>
             </div>
-            <button ng-click="self.router__stateGo('signup')" class="topnav__signupbtn won-button--filled red" ng-if="!self.isSignUpView && (self.isAnonymous || !self.loggedIn)">
+            <button ng-click="self.router__stateGo('signup')" class="topnav__signupbtn won-button--filled red hide-in-responsive" ng-if="!self.isSignUpView && (self.isAnonymous || !self.loggedIn)">
                 Sign up
             </button>
             <won-account-menu>
@@ -84,12 +88,15 @@ function genTopnavConf() {
           themeName: getIn(state, ["config", "theme", "name"]),
           appTitle: getIn(state, ["config", "theme", "title"]),
           loggedIn: accountUtils.isLoggedIn(accountState),
-          isAnonymous: accountUtils.isAnonymous(accountState),
           isSignUpView: currentRoute === "signup",
           showLoadingIndicator: isLoading(state),
           connectionsToCrawl: connectionSelectors.getChatConnectionsToCrawl(
             state
           ),
+          hasUnreads:
+            generalSelectors.hasUnreadSuggestedConnections(state) ||
+            generalSelectors.hasUnreadBuddyConnections(state, true, false) ||
+            generalSelectors.hasUnreadChatConnections(state),
         };
       };
 
