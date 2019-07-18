@@ -116,7 +116,7 @@ function genTopnavConf() {
 
     goDefault() {
       this.hideMenu();
-      self.router__stateGoDefault();
+      this.router__stateGoDefault();
     }
 
     toggleSlideIns() {
