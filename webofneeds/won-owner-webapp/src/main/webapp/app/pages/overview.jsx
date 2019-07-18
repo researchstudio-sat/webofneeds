@@ -109,10 +109,6 @@ const template = (
           <div
             className="owneroverview__usecases__usecase__atoms"
             ng-if="self.isUseCaseExpanded(ucIdentifier)"
-            ng-class="{
-              'owneroverview__usecases__usecase__atoms--expanded': self.isUseCaseExpanded(ucIdentifier),
-              'owneroverview__usecases__usecase__atoms--collapsed': !self.isUseCaseExpanded(ucIdentifier)
-            }"
           >
             <won-atom-card
               className="owneroverview__usecases__usecase__atoms__atom"
@@ -146,10 +142,6 @@ const template = (
           <div
             className="owneroverview__usecases__usecase__atoms"
             ng-if="self.isUseCaseExpanded(undefined)"
-            ng-class="{
-              'owneroverview__usecases__usecase__atoms--expanded': self.isUseCaseExpanded(undefined),
-              'owneroverview__usecases__usecase__atoms--collapsed': !self.isUseCaseExpanded(undefined)
-            }"
           >
             <won-atom-card
               className="owneroverview__usecases__usecase__atoms__atom"

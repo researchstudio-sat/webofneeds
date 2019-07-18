@@ -2,6 +2,7 @@
 @import "sizing-utils";
 @import "fonts";
 @import "flex-layout";
+@import "animate";
 
 main.owneroverview {
   grid-column: 1 / -1;
@@ -121,17 +122,18 @@ main.owneroverview {
       }
 
       &__atoms {
+        display: grid;
         padding: 1rem;
         grid-gap: 1rem;
 
         grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
-
-        &--collapsed {
-          display: none;
-        }
-        &--expanded {
-          display: grid;
-        }
+        @include slideAnimationFixedHorizontal(
+          0.25s,
+          ease-in-out,
+          100vh,
+          1rem,
+          1rem
+        );
 
         won-atom-card.owneroverview__usecases__usecase__atoms__atom {
           border: $thinGrayBorder;
