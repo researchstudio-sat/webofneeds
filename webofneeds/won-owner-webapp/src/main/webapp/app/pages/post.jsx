@@ -73,7 +73,6 @@ const serviceDependencies = ["$ngRedux", "$scope"];
 class Controller {
   constructor() {
     attach(this, serviceDependencies, arguments);
-    this.selection = 0;
     window.p4dbg = this;
     this.WON = won.WON;
 

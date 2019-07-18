@@ -238,7 +238,6 @@ const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 class Controller {
   constructor() {
     attach(this, serviceDependencies, arguments);
-    this.selection = 0;
     window.ownermap4dbg = this;
 
     const selectFromState = state => {
