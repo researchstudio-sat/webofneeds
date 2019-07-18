@@ -26,10 +26,12 @@ import * as wonLabelUtils from "../won-label-utils.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import wonInput from "../directives/input.js";
 import { h } from "preact";
+import * as accountUtils from "../redux/utils/account-utils.js";
+import { classOnComponentRoot } from "../cstm-ng-utils.js";
 
 import "~/style/_map.scss";
 import "~/style/_connection-overlay.scss";
-import * as accountUtils from "../redux/utils/account-utils";
+
 
 const template = (
   <container>
@@ -337,7 +339,7 @@ class Controller {
     };
 
     connect2Redux(selectFromState, actionCreators, [], this);
-
+    classOnComponentRoot("won-signed-out", () => !this.isLoggedIn, this);
     this.$scope.$watch(
       () => this.isOwnerAtomUrisToLoad && this.currentLocation,
       () => delay(0).then(() => this.ensureAtomUrisLoaded())

@@ -12,6 +12,7 @@ import settingsWrapper from "../components/settings-wrapper.js";
 import * as viewSelectors from "../redux/selectors/view-selectors.js";
 import * as accountUtils from "../redux/utils/account-utils.js";
 import { h } from "preact";
+import { classOnComponentRoot } from "../cstm-ng-utils.js";
 
 import "~/style/_signup.scss";
 
@@ -33,6 +34,7 @@ const serviceDependencies = [
   "$ngRedux",
   "$scope",
   "$state" /*'$routeParams' /*injections as strings here*/,
+  "$element",
 ];
 
 class SettingsController {
@@ -52,6 +54,7 @@ class SettingsController {
       };
     };
     const disconnect = this.$ngRedux.connect(select, actionCreators)(this);
+    classOnComponentRoot("won-signed-out", () => !this.isLoggedIn, this);
     this.$scope.$on("$destroy", disconnect);
   }
 }

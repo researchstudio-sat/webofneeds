@@ -15,6 +15,7 @@ import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as processUtils from "../redux/utils/process-utils.js";
 import * as accountUtils from "../redux/utils/account-utils.js";
 import * as viewUtils from "../redux/utils/view-utils.js";
+import { classOnComponentRoot } from "../cstm-ng-utils.js";
 
 import { h } from "preact";
 
@@ -234,6 +235,7 @@ class Controller {
     };
 
     connect2Redux(selectFromState, actionCreators, [], this);
+    classOnComponentRoot("won-signed-out", () => !this.isLoggedIn, this);
   }
 
   toggleClosedAtoms() {

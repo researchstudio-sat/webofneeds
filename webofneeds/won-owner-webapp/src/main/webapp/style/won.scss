@@ -21,31 +21,61 @@ body {
     display: grid;
     min-height: 100vh;
 
-    @media (max-width: $responsivenessBreakPoint) {
-      grid-template-areas:
-        "header"
-        "info"
-        "list"
-        "content"
-        "footer";
-      grid-template-rows: min-content min-content min-content 1fr min-content;
+    &:not(.won-signed-out) {
+      @media (max-width: $responsivenessBreakPoint) {
+        grid-template-areas:
+          "header"
+          "info"
+          "list"
+          "content"
+          "footer";
+        grid-template-rows: min-content min-content min-content 1fr min-content;
+      }
+
+      @media (min-width: $responsivenessBreakPoint) {
+        grid-template-areas:
+          "header header header header"
+          "menu menu menu menu"
+          "info info info info"
+          ". list content ."
+          ". . . ."
+          "footer footer footer footer";
+        grid-template-rows: min-content min-content min-content max-content 1fr min-content;
+        grid-template-columns:
+          1fr minmax(min-content, $maxContentWidth/2) minmax(
+            min-content,
+            $maxContentWidth/2
+          )
+          1fr;
+      }
     }
 
-    @media (min-width: $responsivenessBreakPoint) {
-      grid-template-areas:
-        "header header header header"
-        "menu menu menu menu"
-        "info info info info"
-        ". list content ."
-        ". . . ."
-        "footer footer footer footer";
-      grid-template-rows: min-content min-content min-content max-content 1fr min-content;
-      grid-template-columns:
-        1fr minmax(min-content, $maxContentWidth/2) minmax(
-          min-content,
-          $maxContentWidth/2
-        )
-        1fr;
+    &.won-signed-out {
+      @media (max-width: $responsivenessBreakPoint) {
+        grid-template-areas:
+          "header"
+          "info"
+          "list"
+          "content"
+          "footer";
+        grid-template-rows: min-content min-content min-content 1fr min-content;
+      }
+
+      @media (min-width: $responsivenessBreakPoint) {
+        grid-template-areas:
+          "header header header header"
+          "info info info info"
+          ". list content ."
+          ". . . ."
+          "footer footer footer footer";
+        grid-template-rows: min-content min-content max-content 1fr min-content;
+        grid-template-columns:
+          1fr minmax(min-content, $maxContentWidth/2) minmax(
+            min-content,
+            $maxContentWidth/2
+          )
+          1fr;
+      }
     }
 
     > won-topnav {

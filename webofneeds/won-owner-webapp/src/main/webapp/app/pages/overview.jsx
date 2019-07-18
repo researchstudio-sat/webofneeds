@@ -19,6 +19,7 @@ import * as wonLabelUtils from "../won-label-utils.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as useCaseUtils from "../usecase-utils.js";
 import { h } from "preact";
+import { classOnComponentRoot } from "../cstm-ng-utils.js";
 
 import "~/style/_overview.scss";
 import "~/style/_connection-overlay.scss";
@@ -174,7 +175,7 @@ const template = (
   </container>
 );
 
-const serviceDependencies = ["$ngRedux", "$scope"];
+const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 class Controller {
   constructor() {
     attach(this, serviceDependencies, arguments);
@@ -249,6 +250,7 @@ class Controller {
     };
 
     connect2Redux(selectFromState, actionCreators, [], this);
+    classOnComponentRoot("won-signed-out", () => !this.isLoggedIn, this);
 
     this.$scope.$watch(
       () => this.isOwnerAtomUrisToLoad,

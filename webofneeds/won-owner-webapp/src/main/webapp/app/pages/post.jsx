@@ -16,6 +16,7 @@ import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as viewSelectors from "../redux/selectors/view-selectors.js";
 import * as processUtils from "../redux/utils/process-utils.js";
 import { h } from "preact";
+import { classOnComponentRoot } from "../cstm-ng-utils.js";
 
 import "~/style/_post.scss";
 import "~/style/_connection-overlay.scss";
@@ -69,7 +70,7 @@ const template = (
   </container>
 );
 
-const serviceDependencies = ["$ngRedux", "$scope"];
+const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 class Controller {
   constructor() {
     attach(this, serviceDependencies, arguments);
@@ -104,6 +105,7 @@ class Controller {
     };
 
     connect2Redux(selectFromState, actionCreators, [], this);
+    classOnComponentRoot("won-signed-out", () => !this.isLoggedIn, this);
 
     this.$scope.$watch(
       () =>

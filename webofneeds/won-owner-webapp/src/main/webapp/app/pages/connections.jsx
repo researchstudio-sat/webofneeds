@@ -15,6 +15,7 @@ import * as connectionUtils from "../redux/utils/connection-utils.js";
 import * as accountUtils from "../redux/utils/account-utils.js";
 import * as viewSelectors from "../redux/selectors/view-selectors.js";
 import { h } from "preact";
+import { classOnComponentRoot } from "../cstm-ng-utils.js";
 
 import "~/style/_connections.scss";
 import "~/style/_responsiveness-utils.scss";
@@ -153,6 +154,7 @@ class ConnectionsController {
     const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(
       this
     );
+    classOnComponentRoot("won-signed-out", () => !this.isLoggedIn, this);
     this.$scope.$on("$destroy", disconnect);
   }
 
