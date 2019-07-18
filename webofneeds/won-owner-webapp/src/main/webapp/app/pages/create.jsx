@@ -14,6 +14,7 @@ import { actionCreators } from "../actions/actions.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as viewSelectors from "../redux/selectors/view-selectors.js";
 import { h } from "preact";
+import { classOnComponentRoot } from "../cstm-ng-utils.js";
 
 import "~/style/_create.scss";
 import "~/style/_responsiveness-utils.scss";
@@ -74,6 +75,7 @@ class CreateController {
     const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(
       this
     );
+    classOnComponentRoot("won-signed-out", () => !this.isLoggedIn, this);
     this.$scope.$on("$destroy", disconnect);
   }
 }

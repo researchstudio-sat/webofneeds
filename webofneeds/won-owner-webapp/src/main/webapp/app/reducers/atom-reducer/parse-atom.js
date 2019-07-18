@@ -119,6 +119,7 @@ export function parseMetaAtom(metaAtom) {
           .replace("https://w3id.org/won/core#", "won:")
           .replace("https://w3id.org/won/content#", "con:")
           .replace("https://w3id.org/won/ext/demo#", "demo:")
+          .replace("https://w3id.org/won/matching#", "match:")
           .replace("http://schema.org/", "s:")
       )
     );
@@ -131,6 +132,7 @@ export function parseMetaAtom(metaAtom) {
           .replace("https://w3id.org/won/core#", "won:")
           .replace("https://w3id.org/won/content#", "con:")
           .replace("https://w3id.org/won/ext/demo#", "demo:")
+          .replace("https://w3id.org/won/matching#", "match:")
           .replace("http://schema.org/", "s:")
       )
     );
@@ -141,6 +143,7 @@ export function parseMetaAtom(metaAtom) {
         .replace("https://w3id.org/won/core#", "won:")
         .replace("https://w3id.org/won/content#", "con:")
         .replace("https://w3id.org/won/ext/demo#", "demo:")
+        .replace("https://w3id.org/won/matching#", "match:")
         .replace("http://schema.org/", "s:")
     );
   const extractLocation = location =>

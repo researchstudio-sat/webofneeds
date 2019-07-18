@@ -15,6 +15,7 @@ import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as viewSelectors from "../redux/selectors/view-selectors.js";
 import * as accountUtils from "../redux/utils/account-utils.js";
 import { h } from "preact";
+import { classOnComponentRoot } from "../cstm-ng-utils.js";
 
 import "~/style/_about.scss";
 
@@ -130,6 +131,7 @@ const serviceDependencies = [
   "$ngRedux",
   "$state",
   "$scope" /*'$routeParams' /*injections as strings here*/,
+  "$element",
 ];
 
 const peopleGrid = ({ themeName }) => [
@@ -306,7 +308,7 @@ class AboutController {
       };
     };
     const disconnect = this.$ngRedux.connect(select, actionCreators)(this);
-
+    classOnComponentRoot("won-signed-out", () => !this.isLoggedIn, this);
     this.$scope.$on("$destroy", disconnect);
 
     this.questions = questions;

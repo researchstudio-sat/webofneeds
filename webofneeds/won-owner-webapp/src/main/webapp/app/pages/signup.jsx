@@ -14,7 +14,7 @@ import labelledHrModule from "../components/labelled-hr.js";
 import * as accountUtils from "../redux/utils/account-utils.js";
 import * as viewSelectors from "../redux/selectors/view-selectors.js";
 import { h } from "preact";
-
+import { classOnComponentRoot } from "../cstm-ng-utils.js";
 import "~/style/_signup.scss";
 
 const template = (
@@ -156,6 +156,7 @@ const serviceDependencies = [
   "$ngRedux",
   "$scope",
   "$state" /*'$routeParams' /*injections as strings here*/,
+  "$element",
 ];
 
 class SignupController {
@@ -177,6 +178,7 @@ class SignupController {
       };
     };
     const disconnect = this.$ngRedux.connect(select, actionCreators)(this);
+    classOnComponentRoot("won-signed-out", () => !this.isLoggedIn, this);
     this.$scope.$on("$destroy", disconnect);
   }
 

@@ -17,7 +17,9 @@ import * as viewSelectors from "../redux/selectors/view-selectors.js";
 import * as processUtils from "../redux/utils/process-utils.js";
 import * as wonLabelUtils from "../won-label-utils.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
+import * as useCaseUtils from "../usecase-utils.js";
 import { h } from "preact";
+import { classOnComponentRoot } from "../cstm-ng-utils.js";
 
 import "~/style/_overview.scss";
 import "~/style/_connection-overlay.scss";
@@ -42,7 +44,7 @@ const template = (
           {"What's new? "}
           <span
             className="owneroverview__header__title__count"
-            ng-if="!self.isOwnerAtomUrisLoading && self.hasVisibleAtomUris"
+            ng-if="!self.isOwnerAtomUrisLoading && self.hasVisibleAtomUris && !self.whatsNewUseCaseIdentifierArray"
           >
             {"({{ self.sortedVisibleAtomUriSize }})"}
           </span>
@@ -69,15 +71,88 @@ const template = (
           </div>
         </div>
       </div>
-      <div className="owneroverview__content" ng-if="self.hasVisibleAtomUris">
-        <won-atom-card
-          className="owneroverview__content__atom"
-          atom-uri="atomUri"
-          current-location="self.currentLocation"
-          ng-repeat="atomUri in self.sortedVisibleAtomUriArray track by atomUri"
-          show-suggestions="::false"
-          show-persona="::true"
-        />
+      <div
+        className="owneroverview__usecases"
+        ng-if="self.hasVisibleAtomUris"
+      >
+        <div
+          className="owneroverview__usecases__usecase"
+          ng-repeat="ucIdentifier in self.whatsNewUseCaseIdentifierArray track by ucIdentifier"
+        >
+          <div className="owneroverview__usecases__usecase__header">
+            <svg
+              className="owneroverview__usecases__usecase__header__icon"
+              ng-if="self.getUseCaseIcon(ucIdentifier)"
+            >
+              <use
+                xlinkHref="{{ self.getUseCaseIcon(ucIdentifier) }}"
+                href="{{ self.getUseCaseIcon(ucIdentifier) }}"
+              />
+            </svg>
+            <div className="owneroverview__usecases__usecase__header__title">
+              {"{{self.getUseCaseLabel(ucIdentifier)}}"}
+              <span className="owneroverview__usecases__usecase__header__title__count">
+                ({"{{ self.getAtomsSizeByUseCase(ucIdentifier) }}"})
+              </span>
+            </div>
+            <svg
+              className="owneroverview__usecases__usecase__header__carret"
+              ng-click="self.toggleUseCase(ucIdentifier)"
+              ng-class="{
+              'owneroverview__usecases__usecase__header__carret--expanded': self.isUseCaseExpanded(ucIdentifier),
+              'owneroverview__usecases__usecase__header__carret--collapsed': !self.isUseCaseExpanded(ucIdentifier)
+            }"
+            >
+              <use xlinkHref="#ico16_arrow_down" href="#ico16_arrow_down" />
+            </svg>
+          </div>
+          <div
+            className="owneroverview__usecases__usecase__atoms"
+            ng-if="self.isUseCaseExpanded(ucIdentifier)"
+          >
+            <won-atom-card
+              className="owneroverview__usecases__usecase__atoms__atom"
+              atom-uri="atomUri"
+              current-location="self.currentLocation"
+              ng-repeat="atomUri in self.getSortedVisibleAtomUriArrayByUseCase(ucIdentifier) track by atomUri"
+              show-suggestions="::false"
+              show-persona="::true"
+            />
+          </div>
+        </div>
+        <div className="owneroverview__usecases__usecase" ng-if="self.hasOtherAtoms()">
+          <div className="owneroverview__usecases__usecase__header" ng-if="self.whatsNewUseCaseIdentifierArray">
+            <div className="owneroverview__usecases__usecase__header__title">
+              Other
+              <span className="owneroverview__usecases__usecase__header__title__count">
+                ({"{{ self.getOtherAtomsSize() }}"})
+              </span>
+            </div>
+            <svg
+              className="owneroverview__usecases__usecase__header__carret"
+              ng-click="self.toggleUseCase(undefined)"
+              ng-class="{
+              'owneroverview__usecases__usecase__header__carret--expanded': self.isUseCaseExpanded(undefined),
+              'owneroverview__usecases__usecase__header__carret--collapsed': !self.isUseCaseExpanded(undefined)
+            }"
+            >
+              <use xlinkHref="#ico16_arrow_down" href="#ico16_arrow_down" />
+            </svg>
+          </div>
+          <div
+            className="owneroverview__usecases__usecase__atoms"
+            ng-if="self.isUseCaseExpanded(undefined)"
+          >
+            <won-atom-card
+              className="owneroverview__usecases__usecase__atoms__atom"
+              atom-uri="atomUri"
+              current-location="self.currentLocation"
+              ng-repeat="atomUri in self.getSortedVisibleOtherAtomUriArray() track by atomUri"
+              show-suggestions="::false"
+              show-persona="::true"
+            />
+          </div>
+        </div>
       </div>
       <div
         className="owneroverview__noresults"
@@ -92,17 +167,17 @@ const template = (
   </container>
 );
 
-const serviceDependencies = ["$ngRedux", "$scope"];
+const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 class Controller {
   constructor() {
     attach(this, serviceDependencies, arguments);
-    this.selection = 0;
     window.overview4dbg = this;
+    this.open = [];
 
     const selectFromState = state => {
       const viewConnUri = generalSelectors.getViewConnectionUriFromRoute(state);
-
-      const whatsAroundMetaAtoms = generalSelectors.getWhatsNewAtoms(state)
+      const whatsNewAtoms = generalSelectors
+        .getWhatsNewAtoms(state)
         .filter(metaAtom => atomUtils.isActive(metaAtom))
         .filter(metaAtom => !atomUtils.isSearchAtom(metaAtom))
         .filter(metaAtom => !atomUtils.isDirectResponseAtom(metaAtom))
@@ -112,7 +187,16 @@ class Controller {
             !generalSelectors.isAtomOwned(state, metaAtomUri)
         );
 
-      const sortedVisibleAtoms = sortByDate(whatsAroundMetaAtoms, "creationDate");
+      const whatsNewUseCaseIdentifierArray = whatsNewAtoms
+        .map(atom => getIn(atom, ["matchedUseCase", "identifier"]))
+        .filter(identifier => !!identifier)
+        .toSet()
+        .toArray();
+
+      const sortedVisibleAtoms = sortByDate(
+        whatsNewAtoms,
+        "creationDate"
+      );
       const sortedVisibleAtomUriArray = sortedVisibleAtoms && [
         ...sortedVisibleAtoms.flatMap(visibleAtom => get(visibleAtom, "uri")),
       ];
@@ -129,6 +213,8 @@ class Controller {
       const accountState = get(state, "account");
 
       return {
+        whatsNewUseCaseIdentifierArray: whatsNewUseCaseIdentifierArray,
+        whatsNewAtoms: whatsNewAtoms,
         isLoggedIn: accountUtils.isLoggedIn(accountState),
         currentLocation: generalSelectors.getCurrentLocation(state),
         lastAtomUrisUpdateDate,
@@ -147,7 +233,8 @@ class Controller {
         isOwnerAtomUrisLoading,
         isOwnerAtomUrisToLoad,
         showSlideIns:
-          viewSelectors.hasSlideIns(state) && viewSelectors.isSlideInsVisible(state),
+          viewSelectors.hasSlideIns(state) &&
+          viewSelectors.isSlideInsVisible(state),
         showModalDialog: viewSelectors.showModalDialog(state),
         showConnectionOverlay: !!viewConnUri,
         viewConnUri,
@@ -155,11 +242,73 @@ class Controller {
     };
 
     connect2Redux(selectFromState, actionCreators, [], this);
+    classOnComponentRoot("won-signed-out", () => !this.isLoggedIn, this);
 
     this.$scope.$watch(
       () => this.isOwnerAtomUrisToLoad,
       () => delay(0).then(() => this.ensureAtomUrisLoaded())
     );
+  }
+
+  getUseCaseLabel(ucIdentifier) {
+    return useCaseUtils.getUseCaseLabel(ucIdentifier);
+  }
+
+  getUseCaseIcon(ucIdentifier) {
+    return useCaseUtils.getUseCaseIcon(ucIdentifier);
+  }
+
+  getSortedVisibleAtomUriArrayByUseCase(ucIdentifier) {
+    const useCaseAtoms = this.whatsNewAtoms.filter(
+      atom => atomUtils.getMatchedUseCaseIdentifier(atom) === ucIdentifier
+    );
+    const sortedUseCaseAtoms = sortByDate(useCaseAtoms, "creationDate");
+    return (
+      sortedUseCaseAtoms && [
+        ...sortedUseCaseAtoms.flatMap(atom => get(atom, "uri")),
+      ]
+    );
+  }
+  getSortedVisibleOtherAtomUriArray(ucIdentifier) {
+    const useCaseAtoms = this.whatsNewAtoms.filter(
+      atom => !atomUtils.hasMatchedUseCase(atom)
+    );
+    const sortedUseCaseAtoms = sortByDate(useCaseAtoms, "creationDate");
+    return (
+      sortedUseCaseAtoms && [
+        ...sortedUseCaseAtoms.flatMap(atom => get(atom, "uri")),
+      ]
+    );
+  }
+
+  hasOtherAtoms() {
+    return !!this.whatsNewAtoms.find(atom => !atomUtils.hasMatchedUseCase(atom));
+  }
+
+  getOtherAtomsSize() {
+    const useCaseAtoms = this.whatsNewAtoms.filter(
+      atom => !atomUtils.hasMatchedUseCase(atom)
+    );
+    return useCaseAtoms ? useCaseAtoms.size : 0;
+  }
+
+  getAtomsSizeByUseCase(ucIdentifier) {
+    const useCaseAtoms = this.whatsNewAtoms.filter(
+      atom => atomUtils.getMatchedUseCaseIdentifier(atom) === ucIdentifier
+    );
+    return useCaseAtoms ? useCaseAtoms.size : 0;
+  }
+
+  toggleUseCase(ucIdentifier) {
+    if (this.isUseCaseExpanded(ucIdentifier)) {
+      this.open = this.open.filter(element => ucIdentifier !== element);
+    } else {
+      this.open.push(ucIdentifier);
+    }
+  }
+
+  isUseCaseExpanded(ucIdentifier) {
+    return this.open.includes(ucIdentifier);
   }
 
   ensureAtomUrisLoaded() {

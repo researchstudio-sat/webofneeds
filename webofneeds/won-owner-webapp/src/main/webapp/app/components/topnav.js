@@ -28,7 +28,7 @@ function genTopnavConf() {
                 <use xlink:href="#ico16_burger" href="#ico16_burger"></use>
             </svg>
             <div class="topnav__logo clickable">
-                <img src="skin/{{self.themeName}}/images/logo.svg" class="topnav__logo__image hide-in-responsive" ng-click="self.hideMenu() && self.router__stateGoDefault()">
+                <img src="skin/{{self.themeName}}/images/logo.svg" class="topnav__logo__image hide-in-responsive" ng-click="self.goDefault()">
                 <img src="skin/{{self.themeName}}/images/logo.svg" class="topnav__logo__image show-in-responsive" ng-click="self.menuAction()">
                 <span class="topnav__logo__unreads show-in-responsive" ng-if="self.hasUnreads && !self.isMenuVisible"></span>
             </div>
@@ -111,6 +111,12 @@ function genTopnavConf() {
       if (this.isMenuVisible) {
         this.view__hideMenu();
       }
+      return true;
+    }
+
+    goDefault() {
+      this.hideMenu();
+      this.router__stateGoDefault();
     }
 
     toggleSlideIns() {

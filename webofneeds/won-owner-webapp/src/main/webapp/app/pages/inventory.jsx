@@ -15,6 +15,7 @@ import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as processUtils from "../redux/utils/process-utils.js";
 import * as accountUtils from "../redux/utils/account-utils.js";
 import * as viewUtils from "../redux/utils/view-utils.js";
+import { classOnComponentRoot } from "../cstm-ng-utils.js";
 
 import { h } from "preact";
 
@@ -151,7 +152,6 @@ const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 class Controller {
   constructor() {
     attach(this, serviceDependencies, arguments);
-    this.selection = 0;
     window.inventory4dbg = this;
 
     const selectFromState = state => {
@@ -235,6 +235,7 @@ class Controller {
     };
 
     connect2Redux(selectFromState, actionCreators, [], this);
+    classOnComponentRoot("won-signed-out", () => !this.isLoggedIn, this);
   }
 
   toggleClosedAtoms() {
