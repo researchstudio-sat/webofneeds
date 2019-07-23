@@ -1,6 +1,6 @@
 ## Start WoN with Docker Tutorial
 
-This tutorial will guide you quick through all the necessary steps to run the following webofneeds components locally with docker.
+This tutorial is part of the [How to WoN](/documentation/how-to-won/how-to-won.md) and will guide you quick through all the necessary steps to run the following webofneeds components locally with docker.
 
 WoN components:
 
@@ -34,4 +34,4 @@ WoN components:
 - The scripts define the `deploy_host` which represents the docker local network address: Check if this matches your local docker network address
 - The scripts define a default `base_folder`: Change it to another existing folder
 
-For a more detailed overview about the WoN docker setup see [here](/webofneeds/won-docker/README.md)
+For a more detailed overview about the WoN docker setup see [here](/webofneeds/won-docker/README.md).

@@ -21,7 +21,7 @@ There are two ways of running WoN locally:
 #### 1. Docker
 
 The "fastest" way to run the WoN locally ist to use the provided Docker container and setup. We recommend this solution if you want to try the WoN locally for the first time to have a quick hands on.
-For running WoN with Docker locally follow this [link](/webofneeds/won-docker/README.md).
+For running WoN with Docker locally follow the steps in the [Start WoN with Docker Tutorial](/documentation/how-to-won/docker.md).
 
 #### 2. Tomcat
 
