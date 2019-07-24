@@ -19,7 +19,7 @@ which can be used to deploy all components on one local server.
 
 ### How to deploy and run all webofneeds components on a single server
 
-**There is also quick guide tutorial [here](/documentation/how-to-won/docker.md)**
+**We recommend using the quick guide [tutorial](/documentation/how-to-won/docker.md)**
 
 1. Install docker (https://www.docker.com) (make sure after installing Docker Desktop, that it has enough resources on your machine `Docker Desktop` -> `Settings` -> `Advanced`)
 2. Install docker compose (https://docs.docker.com/compose/)
