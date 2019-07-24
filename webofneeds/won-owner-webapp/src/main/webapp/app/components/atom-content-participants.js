@@ -87,9 +87,9 @@ function genComponentConf() {
           ng-if="(!self.isOwned && !self.groupMembers) || (self.isOwned && !self.hasGroupChatConnections)">
           No Groupmembers present.
       </div>
-      <won-labelled-hr label="::'Invite'" class="acp__labelledhr" ng-if="self.isOwned"></won-labelled-hr>
+      <won-labelled-hr label="::'Invite'" class="acp__labelledhr" ng-if="self.isOwned" arrow="self.suggestAtomExpanded? 'up' : 'down'" ng-click="self.suggestAtomExpanded = !self.suggestAtomExpanded"></won-labelled-hr>
       <won-suggestpost-picker
-          ng-if="self.isOwned"
+          ng-if="self.isOwned && self.suggestAtomExpanded"
           initial-value="undefined"
           on-update="self.inviteParticipant(value)"
           detail="::{placeholder: 'Insert AtomUri to invite'}"
@@ -105,6 +105,7 @@ function genComponentConf() {
     constructor() {
       attach(this, serviceDependencies, arguments);
       this.won = won;
+      this.suggestAtomExpanded = false;
       window.postcontentparticipants4dbg = this;
 
       const selectFromState = state => {
