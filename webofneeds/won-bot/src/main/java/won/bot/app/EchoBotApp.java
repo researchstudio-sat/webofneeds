@@ -14,7 +14,8 @@ import org.springframework.boot.SpringApplication;
 // import org.springframework.context.ConfigurableApplicationContext;
 
 /**
- * App for EchoBot
+ * App for EchoBot.
+ * The echo bot echoes all sent messages back to the user.
  */
 public class EchoBotApp {
     public static void main(String[] args) throws Exception {
