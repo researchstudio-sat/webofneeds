@@ -10,24 +10,24 @@
  */
 package won.bot.integration;
 
-import java.net.URI;
-import java.util.Date;
-import java.util.List;
-
 import org.apache.jena.query.Dataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.TaskScheduler;
-
 import won.bot.framework.bot.Bot;
 import won.bot.framework.manager.BotManager;
 import won.matcher.protocol.MatcherProtocolMatcherServiceCallback;
+
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.Date;
+import java.util.List;
 
 /**
  * OwnerProtocolOwnerServiceCallback that dispatches the calls to the bots.
  */
 public class BotMatcherProtocolMatcherServiceCallback implements MatcherProtocolMatcherServiceCallback {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     BotManager botManager;
     TaskScheduler taskScheduler;
 

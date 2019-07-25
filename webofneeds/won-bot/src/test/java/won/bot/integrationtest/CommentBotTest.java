@@ -10,20 +10,7 @@
  */
 package won.bot.integrationtest;
 
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.BrokenBarrierException;
-import java.util.concurrent.CyclicBarrier;
-import java.util.concurrent.TimeUnit;
-
-import org.apache.jena.query.Dataset;
-import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.query.QueryFactory;
-import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.ResultSet;
+import org.apache.jena.query.*;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.vocabulary.RDFS;
@@ -39,7 +26,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.support.PeriodicTrigger;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
 import won.bot.PropertyPathConfigurator;
 import won.bot.framework.bot.context.CommentBotContextWrapper;
 import won.bot.framework.eventbot.event.impl.lifecycle.WorkDoneEvent;
@@ -51,13 +37,21 @@ import won.protocol.util.linkeddata.CachingLinkedDataSource;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.vocabulary.WON;
 
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.TimeUnit;
+
 /**
  * Integration test.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "classpath:/spring/app/simpleCommentTest.xml" })
 public class CommentBotTest {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static final int RUN_ONCE = 1;
     private static final long ACT_LOOP_TIMEOUT_MILLIS = 100;
     private static final long ACT_LOOP_INITIAL_DELAY_MILLIS = 100;
@@ -122,7 +116,6 @@ public class CommentBotTest {
      * information during the run that we later check with asserts.
      */
     public static class MyBot extends CommentBot {
-        private final Logger logger = LoggerFactory.getLogger(getClass());
         /**
          * Used for synchronization with the @TestD method: it should wait at the
          * barrier until our bot is done, then execute the asserts.

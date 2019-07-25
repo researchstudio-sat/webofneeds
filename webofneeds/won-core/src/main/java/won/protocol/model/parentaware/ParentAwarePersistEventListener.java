@@ -10,8 +10,6 @@
  */
 package won.protocol.model.parentaware;
 
-import java.util.Map;
-
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.event.spi.PersistEvent;
@@ -20,8 +18,11 @@ import org.hibernate.proxy.HibernateProxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.invoke.MethodHandles;
+import java.util.Map;
+
 public class ParentAwarePersistEventListener implements PersistEventListener {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     public static final ParentAwarePersistEventListener INSTANCE = new ParentAwarePersistEventListener();
 
     @Override

@@ -16,13 +16,15 @@ import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.filter.EventFilter;
 
+import java.lang.invoke.MethodHandles;
+
 /**
  * Counts how often it is called, offers to call a callback when a certain
  * number is reached. After the target count of events is reached, a
  * FinishedEvent is published. This allows for chaining listeners.
  */
 public abstract class AbstractDoOnceAfterNEventsListener extends BaseEventListener implements CountingListener {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private int targetCount;
     private int count = 0;
     private Object monitor = new Object();

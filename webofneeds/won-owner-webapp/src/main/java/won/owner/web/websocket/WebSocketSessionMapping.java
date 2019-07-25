@@ -1,14 +1,15 @@
 package won.owner.web.websocket;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.web.socket.WebSocketSession;
+
+import java.lang.invoke.MethodHandles;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.web.socket.WebSocketSession;
 
 /**
  * This service stores the connection between the WebSocket sessions and a given
@@ -17,7 +18,7 @@ import org.springframework.web.socket.WebSocketSession;
  * @author Fabian Salcher
  */
 public class WebSocketSessionMapping<T> {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     // ToDo (FS): make this persistent
     private Map<T, Set<WebSocketSession>> mapping = new HashMap<T, Set<WebSocketSession>>();
     private Object lock;

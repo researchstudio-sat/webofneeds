@@ -1,20 +1,20 @@
 package won.cryptography.service;
 
-import java.io.File;
-import java.io.IOException;
-import java.security.KeyStore;
-import java.security.cert.Certificate;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import won.cryptography.service.keystore.FileBasedKeyStoreService;
+
+import java.io.File;
+import java.io.IOException;
+import java.lang.invoke.MethodHandles;
+import java.security.KeyStore;
+import java.security.cert.Certificate;
 
 /**
  * User: ypanchenko Date: 05.08.2015
  */
 public class TrustStoreService {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private FileBasedKeyStoreService serviceImpl;
 
     public TrustStoreService(String filePath, String storePW) {

@@ -1,9 +1,6 @@
 package won.bot.framework.eventbot.action.impl.wonmessage.execCommand;
 
-import java.net.URI;
-
 import org.apache.jena.query.Dataset;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.bot.framework.eventbot.EventListenerContext;
@@ -22,11 +19,14 @@ import won.protocol.message.WonMessageBuilder;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.WonRdfUtils;
 
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+
 /**
  * Created by fsuda on 17.05.2017.
  */
 public class ExecuteDeactivateAtomCommandAction extends BaseEventBotAction {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public ExecuteDeactivateAtomCommandAction(EventListenerContext eventListenerContext) {
         super(eventListenerContext);

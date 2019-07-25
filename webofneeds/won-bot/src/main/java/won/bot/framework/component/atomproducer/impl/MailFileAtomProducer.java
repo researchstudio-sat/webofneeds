@@ -10,12 +10,6 @@
  */
 package won.bot.framework.component.atomproducer.impl;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-
-import javax.mail.internet.MimeMessage;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.mail.util.MimeMessageParser;
 import org.apache.jena.query.Dataset;
@@ -23,15 +17,20 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import won.bot.framework.component.atomproducer.FileBasedAtomProducer;
 import won.protocol.util.DefaultAtomModelWrapper;
+
+import javax.mail.internet.MimeMessage;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.lang.invoke.MethodHandles;
 
 /**
  * User: fkleedorfer Date: 17.12.13
  */
 public class MailFileAtomProducer implements FileBasedAtomProducer {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override
     public synchronized Dataset readAtomFromFile(final File file) throws IOException {

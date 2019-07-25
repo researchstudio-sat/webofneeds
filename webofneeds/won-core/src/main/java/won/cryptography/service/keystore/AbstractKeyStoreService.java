@@ -1,17 +1,18 @@
 package won.cryptography.service.keystore;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
+import java.lang.invoke.MethodHandles;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.Certificate;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public abstract class AbstractKeyStoreService implements KeyStoreService {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static final String PROVIDER_BC = org.bouncycastle.jce.provider.BouncyCastleProvider.PROVIDER_NAME;
     private static final String KEY_STORE_TYPE = "UBER";
     // 'UBER' is more secure, 'PKCS12' is supported by all tools, easier for

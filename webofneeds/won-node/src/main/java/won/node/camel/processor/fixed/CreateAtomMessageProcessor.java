@@ -1,14 +1,5 @@
 package won.node.camel.processor.fixed;
 
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.apache.jena.query.Dataset;
@@ -18,23 +9,21 @@ import org.javasimon.Stopwatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-
 import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.camel.processor.annotation.FixedMessageProcessor;
 import won.protocol.message.WonMessage;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.message.processor.exception.UriAlreadyInUseException;
-import won.protocol.model.ConnectionContainer;
-import won.protocol.model.DatasetHolder;
-import won.protocol.model.Socket;
-import won.protocol.model.Atom;
-import won.protocol.model.AtomMessageContainer;
-import won.protocol.model.AtomState;
-import won.protocol.model.OwnerApplication;
+import won.protocol.model.*;
 import won.protocol.util.AtomModelWrapper;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WONMSG;
+
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * User: syim Date: 02.03.2015
@@ -42,7 +31,7 @@ import won.protocol.vocabulary.WONMSG;
 @Service
 @FixedMessageProcessor(direction = WONMSG.FromOwnerString, messageType = WONMSG.CreateMessageString)
 public class CreateAtomMessageProcessor extends AbstractCamelProcessor {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override
     public void process(final Exchange exchange) throws Exception {

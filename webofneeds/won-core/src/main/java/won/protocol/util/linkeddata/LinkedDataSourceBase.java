@@ -10,20 +10,6 @@
  */
 package won.protocol.util.linkeddata;
 
-import java.net.URI;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.function.BiFunction;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
@@ -41,19 +27,29 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
-
 import won.protocol.rest.DatasetResponseWithStatusCodeAndHeaders;
 import won.protocol.rest.LinkedDataFetchingException;
 import won.protocol.rest.LinkedDataRestClient;
 import won.protocol.util.AuthenticationThreadLocal;
 import won.protocol.util.RdfUtils;
 
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.function.BiFunction;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
 /**
  * LinkedDataSource implementation that delegates fetching linked data resources
  * to the provided LinedDataRestClient.
  */
 public class LinkedDataSourceBase implements LinkedDataSource {
-    private final Logger logger = LoggerFactory.getLogger(LinkedDataSourceBase.class);
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     protected LinkedDataRestClient linkedDataRestClient;
     @Autowired
     private ThreadPoolExecutor parallelRequestsThreadpool;

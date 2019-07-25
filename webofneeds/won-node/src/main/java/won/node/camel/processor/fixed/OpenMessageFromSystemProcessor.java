@@ -11,6 +11,8 @@ import won.protocol.message.WonMessage;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.vocabulary.WONMSG;
 
+import java.lang.invoke.MethodHandles;
+
 /**
  * Required for auto-open sockets. Delegates the processing method to the
  * OpenMessageFromOwnerProcessor.
@@ -18,7 +20,7 @@ import won.protocol.vocabulary.WONMSG;
 @Component
 @FixedMessageProcessor(direction = WONMSG.FromSystemString, messageType = WONMSG.OpenMessageString)
 public class OpenMessageFromSystemProcessor extends AbstractCamelProcessor {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     @Autowired
     private OpenMessageFromOwnerProcessor openFromOwnerProcessor;
 

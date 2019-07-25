@@ -12,18 +12,19 @@ package won.bot.framework.eventbot.action.impl.wonmessage.execCommand;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.impl.command.MessageCommandFailureEvent;
 import won.bot.framework.eventbot.listener.EventListener;
 
+import java.lang.invoke.MethodHandles;
+
 /**
  * Logs type and optional message of a MessageCommandFailureEvent.
  */
 public class LogMessageCommandFailureAction extends BaseEventBotAction {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public LogMessageCommandFailureAction(EventListenerContext eventListenerContext) {
         super(eventListenerContext);

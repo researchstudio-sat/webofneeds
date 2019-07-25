@@ -16,6 +16,7 @@ import won.protocol.model.ConnectionState;
 import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.WONMSG;
 
+import java.lang.invoke.MethodHandles;
 import java.net.URI;
 
 /**
@@ -24,7 +25,7 @@ import java.net.URI;
 @Component
 @FixedMessageProcessor(direction = WONMSG.FromExternalString, messageType = WONMSG.ChangeNotificationMessageString)
 public class SendChangeNotificationMessageFromNodeProcessor extends AbstractCamelProcessor {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public void process(final Exchange exchange) throws Exception {
         Message message = exchange.getIn();

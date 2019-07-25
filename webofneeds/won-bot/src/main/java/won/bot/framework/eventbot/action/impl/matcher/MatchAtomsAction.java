@@ -10,11 +10,6 @@
  */
 package won.bot.framework.eventbot.action.impl.matcher;
 
-import java.net.URI;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Optional;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.bot.framework.eventbot.EventListenerContext;
@@ -27,12 +22,17 @@ import won.protocol.message.WonMessageBuilder;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.WonRdfUtils;
 
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.Collection;
+import java.util.Iterator;
+
 /**
  * BaseEventBotAction that sends a hint message to the first atom in the context
  * to the second.
  */
 public class MatchAtomsAction extends BaseEventBotAction {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public MatchAtomsAction(final EventListenerContext eventListenerContext) {
         super(eventListenerContext);

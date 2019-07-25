@@ -10,25 +10,25 @@
  */
 package won.bot.framework.bot.base;
 
-import java.net.URI;
-
 import org.apache.jena.query.Dataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
-
 import won.bot.framework.bot.Bot;
 import won.bot.framework.bot.BotLifecyclePhase;
 import won.bot.framework.bot.context.BotContextWrapper;
 import won.protocol.message.WonMessage;
 import won.protocol.model.Connection;
 
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+
 /**
  * Basic Bot implementation intended to be extended. Does nothing.
  */
 public abstract class BaseBot implements Bot {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private BotLifecyclePhase lifecyclePhase = BotLifecyclePhase.DOWN;
     private boolean workDone = false;
     @Autowired

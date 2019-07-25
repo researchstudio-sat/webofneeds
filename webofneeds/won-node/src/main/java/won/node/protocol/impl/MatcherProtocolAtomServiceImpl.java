@@ -10,25 +10,24 @@
  */
 package won.node.protocol.impl;
 
-import java.net.URI;
-
-import javax.jws.WebMethod;
-
 import org.apache.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-
 import won.protocol.matcher.MatcherProtocolAtomService;
 import won.protocol.message.WonMessage;
 import won.protocol.service.MatcherFacingAtomCommunicationService;
+
+import javax.jws.WebMethod;
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
 
 /**
  * User: fkleedorfer Date: 02.11.12
  */
 @Service
 public class MatcherProtocolAtomServiceImpl implements MatcherProtocolAtomService {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private MatcherFacingAtomCommunicationService matcherFacingAtomCommunicationService;
 
     @Override

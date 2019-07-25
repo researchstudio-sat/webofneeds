@@ -10,10 +10,7 @@
  */
 package won.bot.framework.eventbot.action.impl.wonmessage;
 
-import java.net.URI;
-
 import org.apache.jena.query.Dataset;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.bot.framework.eventbot.EventListenerContext;
@@ -27,12 +24,15 @@ import won.protocol.message.WonMessageBuilder;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.WonRdfUtils;
 
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+
 /**
  * Listener that will try to obtain a connectionURI from any event passed to it
  * and close that connection.
  */
 public class CloseConnectionAction extends BaseEventBotAction {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private String farewellMessage;
 
     public CloseConnectionAction(final EventListenerContext context, String farewellMessage) {

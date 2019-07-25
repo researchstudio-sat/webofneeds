@@ -4,12 +4,13 @@ import org.apache.camel.Exchange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-
 import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.camel.processor.annotation.DefaultSocketMessageProcessor;
 import won.node.camel.processor.annotation.SocketMessageProcessor;
 import won.protocol.vocabulary.WONMSG;
 import won.protocol.vocabulary.WXCHAT;
+
+import java.lang.invoke.MethodHandles;
 
 /**
  * User: syim Date: 05.03.2015
@@ -18,7 +19,7 @@ import won.protocol.vocabulary.WXCHAT;
 @DefaultSocketMessageProcessor(direction = WONMSG.FromExternalString, messageType = WONMSG.CloseMessageString)
 @SocketMessageProcessor(socketType = WXCHAT.ChatSocketString, direction = WONMSG.FromExternalString, messageType = WONMSG.CloseMessageString)
 public class CloseFromNodeChatSocketImpl extends AbstractCamelProcessor {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override
     public void process(final Exchange exchange) {

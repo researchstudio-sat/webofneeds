@@ -1,18 +1,6 @@
 package won.matcher.service.crawler.service;
 
-import java.io.StringWriter;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.Set;
-
-import org.apache.jena.query.Dataset;
-import org.apache.jena.query.ParameterizedSparqlString;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.ResultSet;
+import org.apache.jena.query.*;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
 import org.slf4j.Logger;
@@ -21,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
-
 import won.matcher.service.common.event.AtomEvent;
 import won.matcher.service.common.event.BulkAtomEvent;
 import won.matcher.service.common.event.Cause;
@@ -30,6 +17,10 @@ import won.matcher.service.crawler.config.CrawlConfig;
 import won.matcher.service.crawler.msg.CrawlUriMessage;
 import won.protocol.util.AtomModelWrapper;
 
+import java.io.StringWriter;
+import java.lang.invoke.MethodHandles;
+import java.util.*;
+
 /**
  * Sparql service extended with methods for crawling
  * <p>
@@ -37,7 +28,7 @@ import won.protocol.util.AtomModelWrapper;
  */
 @Component
 public class CrawlSparqlService extends SparqlService {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static final String HTTP_HEADER_SEPARATOR = ", ";
 
     @Autowired

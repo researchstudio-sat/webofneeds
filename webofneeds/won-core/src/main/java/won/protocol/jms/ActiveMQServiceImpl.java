@@ -10,11 +10,6 @@
  */
 package won.protocol.jms;
 
-import java.net.URI;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import org.apache.jena.query.Dataset;
 import org.apache.jena.shared.PrefixMapping;
 import org.apache.jena.sparql.path.Path;
@@ -25,18 +20,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpClientErrorException;
-
 import won.protocol.model.ProtocolType;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
 import won.protocol.vocabulary.WON;
 
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 /**
  * User: sbyim Date: 28.11.13
  */
 public class ActiveMQServiceImpl implements ActiveMQService {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static final String PATH_OWNER_PROTOCOL_QUEUE_NAME = "<" + WON.supportsWonProtocolImpl + ">/<"
                     + WON.ownerQueue + ">";
     private static final String PATH_ATOM_PROTOCOL_QUEUE_NAME = "<" + WON.supportsWonProtocolImpl + ">/<"

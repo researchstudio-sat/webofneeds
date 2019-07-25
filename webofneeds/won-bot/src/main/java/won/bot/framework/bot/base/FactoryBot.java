@@ -1,7 +1,5 @@
 package won.bot.framework.bot.base;
 
-import java.util.Optional;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.bot.framework.bot.context.FactoryBotContextWrapper;
@@ -11,8 +9,11 @@ import won.bot.framework.eventbot.behaviour.ExecuteWonMessageCommandBehaviour;
 import won.bot.framework.eventbot.behaviour.FactoryBotHintBehaviour;
 import won.bot.framework.eventbot.behaviour.FactoryBotInitBehaviour;
 
+import java.lang.invoke.MethodHandles;
+import java.util.Optional;
+
 public abstract class FactoryBot extends EventBot {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override
     protected final void initializeEventListeners() {

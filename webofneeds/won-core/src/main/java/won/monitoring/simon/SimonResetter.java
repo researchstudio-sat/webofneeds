@@ -14,14 +14,15 @@ import org.javasimon.SimonManager;
 import org.javasimon.utils.SimonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import won.monitoring.MonitoringResetter;
+
+import java.lang.invoke.MethodHandles;
 
 /**
  * Resetter for the Simon monitoring framework.
  */
 public class SimonResetter implements MonitoringResetter {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override
     public void resetMonitoringStatistics() {

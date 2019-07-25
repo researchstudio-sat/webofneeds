@@ -37,16 +37,16 @@ import org.springframework.web.servlet.HandlerMapping;
 import won.cryptography.service.RegistrationServer;
 import won.node.service.impl.URIService;
 import won.protocol.exception.IncorrectPropertyCountException;
-import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchAtomException;
+import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.WonProtocolException;
 import won.protocol.message.WonMessageType;
+import won.protocol.model.AtomState;
 import won.protocol.model.Connection;
 import won.protocol.model.DataWithEtag;
-import won.protocol.model.AtomState;
 import won.protocol.rest.WonEtagHelper;
-import won.protocol.service.LinkedDataService;
 import won.protocol.service.AtomInformationService;
+import won.protocol.service.LinkedDataService;
 import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.CNT;
 import won.protocol.vocabulary.HTTP;
@@ -56,6 +56,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.lang.invoke.MethodHandles;
 import java.net.URI;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -108,7 +109,7 @@ import java.util.regex.Pattern;
 @Controller
 @RequestMapping("/")
 public class LinkedDataWebController {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     // full prefix of an atom resource
     private String atomResourceURIPrefix;
     // path of an atom resource

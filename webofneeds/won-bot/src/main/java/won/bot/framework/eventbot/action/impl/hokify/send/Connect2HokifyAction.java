@@ -1,9 +1,6 @@
 package won.bot.framework.eventbot.action.impl.hokify.send;
 
-import java.net.URI;
-
 import org.apache.jena.rdf.model.Model;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.bot.framework.bot.context.HokifyJobBotContextWrapper;
@@ -20,11 +17,14 @@ import won.bot.framework.eventbot.listener.impl.ActionOnFirstEventListener;
 import won.protocol.model.Connection;
 import won.protocol.util.WonRdfUtils;
 
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+
 /**
  * Created by ms on 24.09.2018.
  */
 public class Connect2HokifyAction extends BaseEventBotAction {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public Connect2HokifyAction(EventListenerContext ctx) {
         super(ctx);

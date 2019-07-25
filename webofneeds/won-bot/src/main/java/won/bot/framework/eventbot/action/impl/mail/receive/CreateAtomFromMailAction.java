@@ -1,24 +1,16 @@
 package won.bot.framework.eventbot.action.impl.mail.receive;
 
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Arrays;
-
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.query.Dataset;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.bot.framework.bot.context.MailBotContextWrapper;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.EventBotActionUtils;
+import won.bot.framework.eventbot.action.impl.atomlifecycle.AbstractCreateAtomAction;
 import won.bot.framework.eventbot.action.impl.mail.model.MailPropertyType;
 import won.bot.framework.eventbot.action.impl.mail.model.UriType;
 import won.bot.framework.eventbot.action.impl.mail.model.WonURI;
-import won.bot.framework.eventbot.action.impl.atomlifecycle.AbstractCreateAtomAction;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.impl.mail.CreateAtomFromMailEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.FailureResponseEvent;
@@ -30,11 +22,18 @@ import won.protocol.util.DefaultAtomModelWrapper;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Arrays;
+
 /**
  * Created by fsuda on 30.09.2016.
  */
 public class CreateAtomFromMailAction extends AbstractCreateAtomAction {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private MailContentExtractor mailContentExtractor;
 
     public CreateAtomFromMailAction(EventListenerContext eventListenerContext,

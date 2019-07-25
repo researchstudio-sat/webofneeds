@@ -10,15 +10,7 @@
  */
 package won.bot.framework.eventbot.action.impl.wonmessage;
 
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-
 import org.apache.jena.rdf.model.Model;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.bot.framework.eventbot.EventListenerContext;
@@ -38,6 +30,10 @@ import won.protocol.util.RdfUtils.Pair;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
+
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.*;
 
 /**
  * BaseEventBotAction connecting two atoms on the specified sockets, or on other
@@ -63,7 +59,7 @@ import won.protocol.util.linkeddata.WonLinkedDataUtils;
  * </ul>
  */
 public class HintAssociatedAtomAction extends BaseEventBotAction {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private Optional<URI> targetSocketType = Optional.empty();
     private Optional<URI> localSocketType = Optional.empty();
     private URI matcherURI;

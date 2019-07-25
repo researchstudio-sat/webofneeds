@@ -10,13 +10,7 @@
  */
 package won.bot.framework.eventbot.action.impl.wonmessage;
 
-import java.net.URI;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Optional;
-
 import org.apache.jena.query.Dataset;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.bot.framework.eventbot.EventListenerContext;
@@ -30,13 +24,19 @@ import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
 
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Optional;
+
 /**
  * BaseEventBotAction connecting two atoms on the specified sockets. The atom's
  * URIs are obtained from the bot context. The first two URIs found there are
  * used.
  */
 public class ConnectTwoAtomsAction extends BaseEventBotAction {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private Optional<URI> targetSocketType = Optional.empty();
     private Optional<URI> localSocketType = Optional.empty();
     private String welcomeMessage;

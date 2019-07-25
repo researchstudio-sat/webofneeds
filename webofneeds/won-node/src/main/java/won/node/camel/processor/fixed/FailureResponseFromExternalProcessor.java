@@ -11,13 +11,15 @@ import won.protocol.message.WonMessageType;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.vocabulary.WONMSG;
 
+import java.lang.invoke.MethodHandles;
+
 /**
  * User: quasarchimaere Date: 03.04.2019
  */
 @Component
 @FixedMessageProcessor(direction = WONMSG.FromOwnerString, messageType = WONMSG.FailureResponseString)
 public class FailureResponseFromExternalProcessor extends AbstractCamelProcessor {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public void process(final Exchange exchange) throws Exception {
         WonMessage responseMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);

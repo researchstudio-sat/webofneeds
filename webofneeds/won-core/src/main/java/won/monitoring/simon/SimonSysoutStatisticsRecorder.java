@@ -13,17 +13,18 @@ package won.monitoring.simon;
 import org.javasimon.Simon;
 import org.javasimon.SimonManager;
 import org.javasimon.utils.SimonUtils;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.monitoring.AbstractRecorder;
+
+import java.lang.invoke.MethodHandles;
 
 /**
  * MonitoringStatisticsRecorder that prints the statistics via the logger with
  * loglevel 'debug'.
  */
 public class SimonSysoutStatisticsRecorder extends AbstractRecorder {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override
     public void recordMonitoringStatistics() {

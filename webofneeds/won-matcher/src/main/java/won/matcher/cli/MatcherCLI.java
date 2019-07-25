@@ -1,14 +1,9 @@
 package won.matcher.cli;
 
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
-import java.net.URISyntaxException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
-
 import won.matcher.protocol.impl.MatcherProtocolAtomServiceClient;
 import won.protocol.exception.IllegalMessageForAtomStateException;
 import won.protocol.exception.NoSuchAtomException;
@@ -19,6 +14,10 @@ import won.protocol.message.WonMessageDirection;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
+
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 /**
  * User: gabriel Date: 14.02.13 Time: 15:00
@@ -41,7 +40,8 @@ public class MatcherCLI implements CommandLineRunner {
         for (int i = 0; i < args.length; i++) {
             switch (args[i]) {
                 case "-h":
-                    System.out.println("USAGE: java MatcherCLI [-n1 atom1] [-n2 atom2] [-o originator] [-s score] [-h]");
+                    System.out.println(
+                                    "USAGE: java MatcherCLI [-n1 atom1] [-n2 atom2] [-o originator] [-s score] [-h]");
                     System.exit(0);
                 case "-n1":
                     atom1 = args[++i];

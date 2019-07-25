@@ -1,12 +1,13 @@
 package won.cryptography.ssl;
 
-import java.net.Socket;
-import java.util.Map;
-
 import org.apache.http.ssl.PrivateKeyDetails;
 import org.apache.http.ssl.PrivateKeyStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.lang.invoke.MethodHandles;
+import java.net.Socket;
+import java.util.Map;
 
 /**
  * When the server requests a certificate, and if it does not specify which one
@@ -20,7 +21,7 @@ import org.slf4j.LoggerFactory;
  * 27.07.2015
  */
 public class PredefinedAliasPrivateKeyStrategy implements PrivateKeyStrategy {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private String alias;
 
     public PredefinedAliasPrivateKeyStrategy(String alias) {

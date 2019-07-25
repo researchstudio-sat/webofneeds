@@ -17,11 +17,13 @@ import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.listener.EventListener;
 
+import java.lang.invoke.MethodHandles;
+
 /**
  * Outputs a message via the configured logging system.
  */
 public class LogAction extends BaseEventBotAction {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     protected String message;
 
     public LogAction(final EventListenerContext eventListenerContext) {

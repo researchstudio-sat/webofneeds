@@ -10,10 +10,7 @@
  */
 package won.node.camel.processor.general;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import won.protocol.message.WonMessage;
 import won.protocol.message.processor.WonMessageProcessor;
 import won.protocol.message.processor.exception.WonMessageProcessingException;
@@ -22,7 +19,6 @@ import won.protocol.message.processor.exception.WonMessageProcessingException;
  * Created by fkleedorfer on 22.07.2016.
  */
 public class ReferenceToUnreferencedMessageAddingProcessor implements WonMessageProcessor {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
     @Autowired
     private MessageReferencer messageReferencer;
 

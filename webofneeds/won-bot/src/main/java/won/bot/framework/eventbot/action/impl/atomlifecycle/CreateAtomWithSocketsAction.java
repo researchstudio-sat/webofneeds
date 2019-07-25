@@ -10,18 +10,15 @@
  */
 package won.bot.framework.eventbot.action.impl.atomlifecycle;
 
-import java.net.URI;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Resource;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.EventBotActionUtils;
-import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.AtomCreationFailedEvent;
+import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.impl.atomlifecycle.AtomCreatedEvent;
 import won.bot.framework.eventbot.event.impl.atomlifecycle.AtomProducerExhaustedEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.FailureResponseEvent;
@@ -32,12 +29,15 @@ import won.protocol.util.AtomModelWrapper;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+
 /**
  * Creates an atom with the specified sockets. If no socket is specified, the
  * chatSocket will be used.
  */
 public class CreateAtomWithSocketsAction extends AbstractCreateAtomAction {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public CreateAtomWithSocketsAction(EventListenerContext eventListenerContext, String uriListName, URI... sockets) {
         this(eventListenerContext, uriListName, true, false, sockets);

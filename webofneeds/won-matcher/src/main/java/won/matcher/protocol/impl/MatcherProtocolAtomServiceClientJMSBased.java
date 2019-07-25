@@ -10,15 +10,10 @@
  */
 package won.matcher.protocol.impl;
 
-import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.Lang;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import won.protocol.jms.CamelConfiguration;
 import won.protocol.jms.MatcherProtocolCommunicationService;
 import won.protocol.jms.MessagingService;
@@ -27,11 +22,16 @@ import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageEncoder;
 import won.protocol.util.RdfUtils;
 
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * User: gabriel Date: 12.02.13 Time: 17:26
  */
 public class MatcherProtocolAtomServiceClientJMSBased implements MatcherProtocolAtomServiceClientSide {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private MessagingService messagingService;
     private MatcherProtocolCommunicationService matcherProtocolCommunicationService;
     private String startingEndpoint;

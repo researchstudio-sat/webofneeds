@@ -1,8 +1,5 @@
 package won.matcher.service.common.service.monitoring;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.javasimon.SimonManager;
 import org.javasimon.Split;
 import org.javasimon.Stopwatch;
@@ -12,13 +9,17 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import java.lang.invoke.MethodHandles;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Created by hfriedrich on 09.10.2015.
  */
 @Component
 @Scope("singleton")
 public class MonitoringService {
-    private final Logger log = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     public static final String ATOM_HINT_STOPWATCH = "AtomReceivedUntilFirstHintSent";
     private Map<String, Map<String, Split>> stopWatchSplits = new HashMap<>();
     @Value("${matcher.service.monitoring}")
@@ -36,7 +37,8 @@ public class MonitoringService {
                 stopWatchSplits.put(stopWatchName, splits);
             }
             if (splits.get(splitName) != null) {
-                log.warn("Split '{}' in stopwatch {} already set for monitoring start event", splitName, stopWatchName);
+                logger.warn("Split '{}' in stopwatch {} already set for monitoring start event", splitName,
+                                stopWatchName);
                 return;
             }
             Stopwatch stopwatch = SimonManager.getStopwatch(stopWatchName);
@@ -49,12 +51,12 @@ public class MonitoringService {
         if (isMonitoringEnabled()) {
             Map<String, Split> splits = stopWatchSplits.get(stopWatchName);
             if (splits == null) {
-                log.warn("No stopwatch '{}' found for monitoring end event", stopWatchName);
+                logger.warn("No stopwatch '{}' found for monitoring end event", stopWatchName);
                 return;
             }
             Split split = splits.get(splitName);
             if (split == null) {
-                log.warn("No split '{}' in stopwatch '{}' found for monitoring end event", splitName, stopWatchName);
+                logger.warn("No split '{}' in stopwatch '{}' found for monitoring end event", splitName, stopWatchName);
                 return;
             }
             split.stop();

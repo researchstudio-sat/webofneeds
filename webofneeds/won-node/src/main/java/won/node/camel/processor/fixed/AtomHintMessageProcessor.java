@@ -1,39 +1,27 @@
 package won.node.camel.processor.fixed;
 
-import java.net.URI;
-import java.util.Optional;
-
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
 import won.node.camel.processor.AbstractCamelProcessor;
-import won.node.camel.processor.annotation.FixedMessageProcessor;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageType;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.message.processor.exception.MissingMessagePropertyException;
-import won.protocol.model.Atom;
-import won.protocol.model.Connection;
-import won.protocol.model.ConnectionEventType;
-import won.protocol.model.ConnectionState;
-import won.protocol.model.Socket;
-import won.protocol.repository.ConnectionRepository;
-import won.protocol.util.RdfUtils;
-import won.protocol.util.WonRdfUtils;
-import won.protocol.vocabulary.WON;
 import won.protocol.vocabulary.WONMSG;
+
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
 
 /**
  * User: syim Date: 02.03.2015
  */
 @Component
 public class AtomHintMessageProcessor extends AbstractCamelProcessor {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     @Value("${ignore.hints.suggested.connection.count.max}")
     private Long maxAtomHintsCount = 100L;
 

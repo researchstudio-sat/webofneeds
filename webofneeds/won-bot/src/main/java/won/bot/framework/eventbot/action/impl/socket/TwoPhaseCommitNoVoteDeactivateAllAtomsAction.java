@@ -10,13 +10,9 @@
  */
 package won.bot.framework.eventbot.action.impl.socket;
 
-import java.net.URI;
-import java.util.Collection;
-
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.NodeIterator;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.bot.framework.eventbot.EventListenerContext;
@@ -33,11 +29,15 @@ import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.Collection;
+
 /**
  * User: Danijel Date: 21.5.14.
  */
 public class TwoPhaseCommitNoVoteDeactivateAllAtomsAction extends BaseEventBotAction {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public TwoPhaseCommitNoVoteDeactivateAllAtomsAction(EventListenerContext eventListenerContext) {
         super(eventListenerContext);

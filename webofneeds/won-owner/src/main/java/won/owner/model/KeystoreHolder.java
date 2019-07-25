@@ -1,22 +1,15 @@
 package won.owner.model;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.persistence.*;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.invoke.MethodHandles;
 import java.security.KeyStore;
-import java.security.cert.CertificateException;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Lob;
-import javax.persistence.Table;
-import javax.persistence.Transient;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Entity
 @Table(name = "keystore")
@@ -29,7 +22,7 @@ public class KeystoreHolder {
     @Column(name = "id")
     private Long id;
     @Transient
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     // the keystore as a byte array
     @Lob
     @Column(name = "keystore_data", nullable = false, length = 10000000)

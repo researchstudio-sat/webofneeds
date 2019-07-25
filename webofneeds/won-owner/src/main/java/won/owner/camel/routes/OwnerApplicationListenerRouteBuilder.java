@@ -10,17 +10,17 @@
  */
 package won.owner.camel.routes;
 
-import java.net.URI;
-
 import org.apache.camel.CamelContext;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.PredicateBuilder;
 import org.apache.camel.builder.RouteBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.vocabulary.WONMSG;
+
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
 
 // TODO: This route builder should not be loaded on startup, but it's being
 // loaded..
@@ -30,7 +30,7 @@ import won.protocol.vocabulary.WONMSG;
  * generate routes dynamically in runtime that listen to those queues.
  */
 public class OwnerApplicationListenerRouteBuilder extends RouteBuilder {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private String endpoint;
     private URI brokerUri;
 

@@ -1,12 +1,8 @@
 package won.protocol.message.processor.impl;
 
-import java.security.PrivateKey;
-import java.security.PublicKey;
-
 import org.apache.jena.riot.Lang;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import won.cryptography.keymanagement.KeyPairAliasDerivationStrategy;
 import won.cryptography.service.CryptographyService;
 import won.protocol.message.WonMessage;
@@ -14,11 +10,15 @@ import won.protocol.message.WonMessageEncoder;
 import won.protocol.message.processor.WonMessageProcessor;
 import won.protocol.message.processor.exception.WonMessageProcessingException;
 
+import java.lang.invoke.MethodHandles;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+
 /**
  * User: ypanchenko Date: 03.04.2015
  */
 public class SignatureAddingWonMessageProcessor implements WonMessageProcessor {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private CryptographyService cryptographyService;
     private KeyPairAliasDerivationStrategy keyPairAliasDerivationStrategy;
 

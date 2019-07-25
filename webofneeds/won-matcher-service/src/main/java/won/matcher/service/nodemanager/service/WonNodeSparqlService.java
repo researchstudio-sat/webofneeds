@@ -1,15 +1,6 @@
 package won.matcher.service.nodemanager.service;
 
-import java.net.URI;
-import java.util.HashSet;
-import java.util.Set;
-
-import org.apache.jena.query.Dataset;
-import org.apache.jena.query.ParameterizedSparqlString;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.ResultSet;
+import org.apache.jena.query.*;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.slf4j.Logger;
@@ -17,12 +8,16 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
 import won.matcher.service.common.service.sparql.SparqlService;
 import won.protocol.exception.DataIntegrityException;
 import won.protocol.service.WonNodeInfo;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WON;
+
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Sparql service extended with methods for won node controller User: hfriedrich
@@ -30,7 +25,7 @@ import won.protocol.vocabulary.WON;
  */
 @Component
 public class WonNodeSparqlService extends SparqlService {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Autowired
     public WonNodeSparqlService(@Value("${uri.sparql.endpoint}") final String sparqlEndpoint) {

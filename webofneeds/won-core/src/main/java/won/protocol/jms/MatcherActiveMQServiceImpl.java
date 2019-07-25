@@ -10,29 +10,25 @@
  */
 package won.protocol.jms;
 
+import org.apache.jena.shared.PrefixMapping;
+import org.apache.jena.sparql.path.Path;
+import org.apache.jena.sparql.path.PathParser;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.client.HttpClientErrorException;
+import won.protocol.model.ProtocolType;
+import won.protocol.util.RdfUtils;
+import won.protocol.vocabulary.WON;
+
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.jena.shared.PrefixMapping;
-import org.apache.jena.sparql.path.Path;
-import org.apache.jena.sparql.path.PathParser;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.client.HttpClientErrorException;
-
-import won.protocol.model.ProtocolType;
-import won.protocol.util.RdfUtils;
-import won.protocol.vocabulary.WON;
-
 /**
  * User: sbyim Date: 28.11.13
  */
 public class MatcherActiveMQServiceImpl extends ActiveMQServiceImpl implements MatcherActiveMQService {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
     private List<String> matcherProtocolTopicList;
     private String pathInformation;
     private static final String PATH_MATCHER_PROTOCOL_OUT_ATOM_CREATED = "<" + WON.supportsWonProtocolImpl + ">/<"

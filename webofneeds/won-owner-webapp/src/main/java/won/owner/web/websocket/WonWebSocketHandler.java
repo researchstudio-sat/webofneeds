@@ -10,25 +10,6 @@
  */
 package won.owner.web.websocket;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.net.URI;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.Principal;
-import java.text.MessageFormat;
-import java.time.Duration;
-import java.util.Base64;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import javax.persistence.criteria.CriteriaBuilder.Case;
-
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ObjectNode;
 import org.slf4j.Logger;
@@ -49,7 +30,6 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
-
 import won.owner.model.User;
 import won.owner.model.UserAtom;
 import won.owner.repository.UserAtomRepository;
@@ -60,11 +40,7 @@ import won.owner.service.impl.URIService;
 import won.owner.web.WonOwnerMailSender;
 import won.owner.web.WonOwnerPushSender;
 import won.owner.web.service.ServerSideActionService;
-import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageDecoder;
-import won.protocol.message.WonMessageDirection;
-import won.protocol.message.WonMessageEncoder;
-import won.protocol.message.WonMessageType;
+import won.protocol.message.*;
 import won.protocol.message.processor.WonMessageProcessor;
 import won.protocol.model.AtomState;
 import won.protocol.util.AuthenticationThreadLocal;
@@ -74,12 +50,25 @@ import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
 import won.utils.batch.BatchingConsumer;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.Principal;
+import java.text.MessageFormat;
+import java.time.Duration;
+import java.util.*;
+import java.util.stream.Collectors;
+
 /**
  * User: syim Date: 06.08.14
  */
 public class WonWebSocketHandler extends TextWebSocketHandler
                 implements WonMessageProcessor, InitializingBean, DisposableBean {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     // if we're receiving a partial message, a StringBuilder will be in the
     // session's attributes map under this key
     private static final String SESSION_ATTRIBUTE_PARTIAL_MESSAGE = "partialMessage";

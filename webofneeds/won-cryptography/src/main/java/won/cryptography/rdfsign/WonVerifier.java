@@ -1,17 +1,8 @@
 package won.cryptography.rdfsign;
 
-import static won.cryptography.rdfsign.WonSigner.ENV_HASH_ALGORITHM;
-import static won.cryptography.rdfsign.WonSigner.SIGNING_ALGORITHM_PROVIDER;
-
-import java.io.StringWriter;
-import java.math.BigInteger;
-import java.security.MessageDigest;
-import java.security.Provider;
-import java.security.PublicKey;
-import java.security.Signature;
-import java.util.Base64;
-import java.util.Map;
-
+import de.uni_koblenz.aggrimm.icp.crypto.sign.algorithm.SignatureAlgorithmInterface;
+import de.uni_koblenz.aggrimm.icp.crypto.sign.algorithm.algorithm.SignatureAlgorithmFisteus2010;
+import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.GraphCollection;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
@@ -21,20 +12,29 @@ import org.apache.jena.riot.RDFDataMgr;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import de.uni_koblenz.aggrimm.icp.crypto.sign.algorithm.SignatureAlgorithmInterface;
-import de.uni_koblenz.aggrimm.icp.crypto.sign.algorithm.algorithm.SignatureAlgorithmFisteus2010;
-import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.GraphCollection;
 import won.protocol.message.WonSignatureData;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WONMSG;
 
+import java.io.StringWriter;
+import java.lang.invoke.MethodHandles;
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.Provider;
+import java.security.PublicKey;
+import java.security.Signature;
+import java.util.Base64;
+import java.util.Map;
+
+import static won.cryptography.rdfsign.WonSigner.ENV_HASH_ALGORITHM;
+import static won.cryptography.rdfsign.WonSigner.SIGNING_ALGORITHM_PROVIDER;
+
 /**
  * User: ypanchenko Date: 15.07.2014
  */
 public class WonVerifier {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private Dataset dataset;
     private SignatureVerificationState verificationState = new SignatureVerificationState();
 

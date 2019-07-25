@@ -10,33 +10,26 @@
  */
 package won.bot.framework.eventbot.action.impl.wonmessage;
 
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-
 import org.apache.jena.query.Dataset;
-
-import com.esotericsoftware.kryo.serializers.TaggedFieldSerializer.Tag;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
-import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.AtomSpecificEvent;
+import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.listener.EventListener;
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
 import won.protocol.service.WonNodeInformationService;
-import won.protocol.util.WonRdfUtils;
 import won.protocol.util.RdfUtils.Pair;
+import won.protocol.util.WonRdfUtils;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
+
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.*;
 
 /**
  * BaseEventBotAction connecting two atoms on the specified sockets or on two
@@ -45,7 +38,7 @@ import won.protocol.util.linkeddata.WonLinkedDataUtils;
  * botContext.saveToObjectMap method.
  */
 public class ConnectWithAssociatedAtomAction extends BaseEventBotAction {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private Optional<URI> targetSocketType = Optional.empty();
     private Optional<URI> localSocketType = Optional.empty();
     private String welcomeMessage;

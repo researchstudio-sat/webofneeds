@@ -1,12 +1,5 @@
 package won.owner.web.rest;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +8,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-
 import won.owner.model.User;
 import won.owner.model.UserAtom;
 import won.owner.pojo.SocketToConnect;
@@ -23,10 +15,14 @@ import won.owner.repository.UserAtomRepository;
 import won.owner.service.impl.UserService;
 import won.owner.web.service.ServerSideActionService;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
 @Controller
 @RequestMapping("/rest/action")
 public class ServerSideActionController {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
     @Autowired
     private UserAtomRepository userAtomRepository;
     @Autowired

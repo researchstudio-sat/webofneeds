@@ -10,14 +10,6 @@
  */
 package won.node.maintenance;
 
-import java.text.SimpleDateFormat;
-import java.time.Duration;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
@@ -30,10 +22,18 @@ import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.Trigger;
 import org.springframework.scheduling.support.PeriodicTrigger;
 import org.springframework.stereotype.Component;
-
 import won.node.service.impl.AtomManagementService;
 import won.protocol.model.Atom;
 import won.protocol.repository.AtomRepository;
+
+import java.lang.invoke.MethodHandles;
+import java.text.SimpleDateFormat;
+import java.time.Duration;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Uses a timer to check atoms for inactivity and send them warnings or
@@ -41,7 +41,7 @@ import won.protocol.repository.AtomRepository;
  */
 @Component
 public class AtomInactivityChecker implements InitializingBean, DisposableBean {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private Trigger trigger;
     private TaskScheduler taskScheduler;
     private int inactivityCheckInterval = -1;

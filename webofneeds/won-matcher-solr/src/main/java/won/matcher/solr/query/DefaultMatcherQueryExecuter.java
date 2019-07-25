@@ -1,9 +1,5 @@
 package won.matcher.solr.query;
 
-import java.io.IOException;
-
-import javax.annotation.PostConstruct;
-
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -16,17 +12,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import won.matcher.solr.config.SolrMatcherConfig;
 import won.matcher.solr.hints.HintBuilder;
 import won.matcher.solr.query.factory.MatchingContextQueryFactory;
+
+import javax.annotation.PostConstruct;
+import java.io.IOException;
+import java.lang.invoke.MethodHandles;
 
 /**
  * Created by hfriedrich on 12.08.2016.
  */
 @Component
 public class DefaultMatcherQueryExecuter implements SolrMatcherQueryExecutor {
-    private final Logger log = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     @Autowired
     SolrMatcherConfig config;
     SolrClient solrClient;
@@ -40,11 +39,11 @@ public class DefaultMatcherQueryExecuter implements SolrMatcherQueryExecutor {
     public SolrDocumentList executeAtomQuery(String queryString, int maxHints, SolrParams params,
                     String... filterQueries) throws IOException, SolrServerException {
         if (queryString == null) {
-            log.debug("query string is null, do execute any query!");
+            logger.debug("query string is null, do execute any query!");
             return null;
         }
         SolrQuery query = new SolrQuery();
-        log.debug("use query: {} with filters {}", queryString, filterQueries);
+        logger.debug("use query: {} with filters {}", queryString, filterQueries);
         query.setQuery(queryString);
         query.setFields("id", "score", HintBuilder.WON_NODE_SOLR_FIELD, HintBuilder.HAS_FLAG_SOLR_FIELD,
                         MatchingContextQueryFactory.MATCHING_CONTEXT_SOLR_FIELD);
@@ -73,7 +72,7 @@ public class DefaultMatcherQueryExecuter implements SolrMatcherQueryExecutor {
             }
             return results;
         } catch (SolrException e) {
-            log.warn("Exception {} thrown for query: {}", e, queryString);
+            logger.warn("Exception {} thrown for query: {}", e, queryString);
         }
         return null;
     }

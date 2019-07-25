@@ -18,24 +18,24 @@ import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.action.impl.MultipleActions;
 import won.bot.framework.eventbot.action.impl.ProbabilisticSelectionAction;
 import won.bot.framework.eventbot.action.impl.RandomDelayedAction;
+import won.bot.framework.eventbot.action.impl.atomlifecycle.CreateAtomWithSocketsAction;
 import won.bot.framework.eventbot.action.impl.counter.Counter;
 import won.bot.framework.eventbot.action.impl.counter.CounterImpl;
 import won.bot.framework.eventbot.action.impl.counter.DecrementCounterAction;
 import won.bot.framework.eventbot.action.impl.counter.IncrementCounterAction;
 import won.bot.framework.eventbot.action.impl.lifecycle.SignalWorkDoneAction;
-import won.bot.framework.eventbot.action.impl.atomlifecycle.CreateAtomWithSocketsAction;
 import won.bot.framework.eventbot.action.impl.wonmessage.CloseConnectionAction;
 import won.bot.framework.eventbot.action.impl.wonmessage.OpenConnectionAction;
 import won.bot.framework.eventbot.action.impl.wonmessage.SendFeedbackForHintAction;
 import won.bot.framework.eventbot.action.impl.wonmessage.SendMessageAction;
 import won.bot.framework.eventbot.bus.EventBus;
-import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.AtomCreationFailedEvent;
-import won.bot.framework.eventbot.event.impl.lifecycle.ActEvent;
+import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.impl.atomlifecycle.AtomCreatedEvent;
 import won.bot.framework.eventbot.event.impl.atomlifecycle.AtomProducerExhaustedEvent;
-import won.bot.framework.eventbot.event.impl.wonmessage.ConnectFromOtherAtomEvent;
+import won.bot.framework.eventbot.event.impl.lifecycle.ActEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.AtomHintFromMatcherEvent;
+import won.bot.framework.eventbot.event.impl.wonmessage.ConnectFromOtherAtomEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.MessageFromOtherAtomEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.OpenFromOtherAtomEvent;
 import won.bot.framework.eventbot.listener.BaseEventListener;
@@ -43,11 +43,13 @@ import won.bot.framework.eventbot.listener.EventListener;
 import won.bot.framework.eventbot.listener.impl.ActionOnEventListener;
 import won.bot.framework.eventbot.listener.impl.ActionOnceAfterNEventsListener;
 
+import java.lang.invoke.MethodHandles;
+
 /**
  *
  */
 public class RandomSimulatorBot extends EventBot {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static final double PROB_OPEN_ON_HINT = 0.3;
     private static final double PROB_MESSAGE_ON_OPEN = 0.5;
     private static final double PROB_MESSAGE_ON_MESSAGE = 0.5;

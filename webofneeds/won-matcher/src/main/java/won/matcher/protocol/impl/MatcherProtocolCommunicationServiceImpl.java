@@ -1,22 +1,16 @@
 package won.matcher.protocol.impl;
 
-import java.net.URI;
-import java.util.Set;
-
 import org.apache.activemq.camel.component.ActiveMQComponent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import won.cryptography.service.RegistrationRestClientHttps;
 import won.protocol.exception.CamelConfigurationFailedException;
 import won.protocol.exception.NoSuchConnectionException;
-import won.protocol.jms.ActiveMQService;
-import won.protocol.jms.CamelConfiguration;
-import won.protocol.jms.CamelConfigurator;
-import won.protocol.jms.MatcherActiveMQService;
-import won.protocol.jms.MatcherProtocolCamelConfigurator;
-import won.protocol.jms.MatcherProtocolCommunicationService;
-import won.protocol.jms.AtomProtocolCamelConfigurator;
+import won.protocol.jms.*;
+
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.Set;
 
 /**
  * User: ypanchenko Date: 02.09.2015
@@ -25,7 +19,7 @@ public class MatcherProtocolCommunicationServiceImpl implements MatcherProtocolC
     private RegistrationRestClientHttps registrationClient;
     private MatcherProtocolCamelConfigurator matcherProtocolCamelConfigurator;
     private MatcherActiveMQService activeMQService;
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public void setRegistrationClient(final RegistrationRestClientHttps registrationClient) {
         this.registrationClient = registrationClient;

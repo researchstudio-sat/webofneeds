@@ -1,13 +1,5 @@
 package won.owner.web;
 
-import java.io.File;
-import java.io.StringWriter;
-import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
-import java.util.stream.Collectors;
-
 import org.apache.jena.query.Dataset;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
@@ -18,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-
 import won.owner.model.EmailVerificationToken;
 import won.owner.model.User;
 import won.owner.service.impl.URIService;
@@ -26,11 +17,20 @@ import won.protocol.util.DefaultAtomModelWrapper;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.utils.mail.WonMailSender;
 
+import java.io.File;
+import java.io.StringWriter;
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+import java.util.stream.Collectors;
+
 /**
  * User: ypanchenko Date: 23.02.2015
  */
 public class WonOwnerMailSender {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static final String OWNER_TARGET_ATOM_LINK = "/#!post/?postUri=";
     private static final String OWNER_CONNECTION_LINK = "/#!connections?connectionUri=%s";
     private static final String OWNER_LOCAL_ATOM_LINK = "/#!post/?postUri=";

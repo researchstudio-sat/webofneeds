@@ -10,22 +10,22 @@
  */
 package won.bot.framework.component.nodeurisource.impl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import won.bot.framework.component.nodeurisource.NodeURISource;
+
+import java.lang.invoke.MethodHandles;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import won.bot.framework.component.nodeurisource.NodeURISource;
-
 /**
  * User: fkleedorfer Date: 19.12.13
  */
 public class RandomMultiNodeUriSource implements NodeURISource {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private List<URI> nodeURIs = null;
     private long seed = System.currentTimeMillis();
     private Random random = new Random(seed);

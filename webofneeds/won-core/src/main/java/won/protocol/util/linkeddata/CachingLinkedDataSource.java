@@ -10,10 +10,26 @@
  */
 package won.protocol.util.linkeddata;
 
-import static java.util.EnumSet.noneOf;
+import net.sf.ehcache.CacheException;
+import net.sf.ehcache.Ehcache;
+import net.sf.ehcache.Element;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.DatasetFactory;
+import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFDataMgr;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.cache.ehcache.EhCacheCacheManager;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import won.protocol.rest.DatasetResponseWithStatusCodeAndHeaders;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.lang.invoke.MethodHandles;
 import java.net.URI;
 import java.text.MessageFormat;
 import java.text.ParseException;
@@ -28,23 +44,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.jena.query.Dataset;
-import org.apache.jena.query.DatasetFactory;
-import org.apache.jena.riot.Lang;
-import org.apache.jena.riot.RDFDataMgr;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.cache.ehcache.EhCacheCacheManager;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-
-import net.sf.ehcache.CacheException;
-import net.sf.ehcache.Ehcache;
-import net.sf.ehcache.Element;
-import won.protocol.rest.DatasetResponseWithStatusCodeAndHeaders;
+import static java.util.EnumSet.noneOf;
 
 /**
  * LinkedDataSource implementation that uses an ehcache for caching.
@@ -55,7 +55,7 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
     private static final String HTTP_DATE_FORMAT = "EEE, dd MMM yyyy HH:mm:ss z";
     private static final int DEFAULT_EXPIRY_PERIOD = 600;
     private static final int DEFAULT_BYTE_ARRAY_SIZE = 500;
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     @Autowired(required = true)
     private EhCacheCacheManager cacheManager;
     private Ehcache cache;

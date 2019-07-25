@@ -12,7 +12,6 @@ package won.bot.framework.eventbot.action.impl.maintenance;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.bus.EventBus;
@@ -20,11 +19,13 @@ import won.bot.framework.eventbot.bus.impl.EventBusStatistics;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.listener.EventListener;
 
+import java.lang.invoke.MethodHandles;
+
 /*
  * Collects the EventBusStatistics and logs them.
  */
 public class StatisticsLoggingAction extends BaseEventBotAction {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public StatisticsLoggingAction(EventListenerContext eventListenerContext) {
         super(eventListenerContext);

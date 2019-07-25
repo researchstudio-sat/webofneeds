@@ -1,9 +1,6 @@
 package won.node.socket.impl;
 
 import org.apache.jena.rdf.model.Model;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import won.protocol.exception.ConnectionAlreadyExistsException;
 import won.protocol.exception.IllegalMessageForAtomStateException;
 import won.protocol.exception.NoSuchAtomException;
@@ -16,8 +13,6 @@ import won.protocol.model.SocketType;
  * change this template use File | Settings | File Templates.
  */
 public class ChatSocketImpl extends AbstractSocket {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
-
     @Override
     public SocketType getSocketType() {
         return SocketType.ChatSocket;

@@ -1,12 +1,13 @@
 package won.protocol.util.linkeddata;
 
-import java.net.URI;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.apache.jena.query.Dataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * User: ypanchenko Date: 06.11.2015
@@ -17,7 +18,7 @@ public class CachingAllButListsLinkedDataSource extends CachingLinkedDataSource 
     // TODO actually the connection itself should also not be cached - i.e. status
     // can be updated
     private Pattern pattern_connections_list_uri = Pattern.compile("(.+)/connections(/)?");
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override
     public Dataset getDataForResource(URI resource) {

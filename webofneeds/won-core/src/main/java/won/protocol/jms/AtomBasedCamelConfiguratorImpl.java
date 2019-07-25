@@ -10,21 +10,20 @@
  */
 package won.protocol.jms;
 
-import java.net.URI;
-
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import org.apache.activemq.camel.component.ActiveMQComponent;
 import org.apache.camel.CamelContext;
 import org.apache.camel.RoutesBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
-
 import won.cryptography.ssl.MessagingContext;
 import won.protocol.exception.CamelConfigurationFailedException;
 import won.protocol.model.MessagingType;
+
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
 
 // import won.node.camel.routes.AtomProtocolDynamicRoutes;
 /**
@@ -42,7 +41,7 @@ public abstract class AtomBasedCamelConfiguratorImpl implements AtomProtocolCame
     private MessagingContext messagingContext;
     @Autowired
     protected BrokerComponentFactory brokerComponentFactory;
-    private Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override
     public synchronized String configureCamelEndpointForAtomUri(URI wonNodeURI, URI brokerUri,

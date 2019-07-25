@@ -1,30 +1,30 @@
 package won.node.socket.impl;
 
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.shared.PrefixMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import won.protocol.exception.IllegalMessageForConnectionStateException;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.message.WonMessage;
+import won.protocol.model.Atom;
 import won.protocol.model.Connection;
 import won.protocol.model.SocketType;
-import won.protocol.model.Atom;
 import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.SIOC;
+
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * User: gabriel Date: 17/01/14
  */
 public class CommentSocket extends AbstractSocket {
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override
     public SocketType getSocketType() {

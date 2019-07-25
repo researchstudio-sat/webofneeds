@@ -10,13 +10,10 @@
  */
 package won.node.camel.processor.fixed;
 
-import java.net.URI;
-
 import org.apache.camel.Exchange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-
 import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.camel.processor.annotation.FixedMessageProcessor;
 import won.protocol.message.WonMessage;
@@ -27,10 +24,13 @@ import won.protocol.model.AtomState;
 import won.protocol.util.DataAccessUtils;
 import won.protocol.vocabulary.WONMSG;
 
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+
 @Component
 @FixedMessageProcessor(direction = WONMSG.FromSystemString, messageType = WONMSG.DeactivateMessageString)
 public class DeactivateMessageFromSystemProcessor extends AbstractCamelProcessor {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override
     public void process(Exchange exchange) throws Exception {

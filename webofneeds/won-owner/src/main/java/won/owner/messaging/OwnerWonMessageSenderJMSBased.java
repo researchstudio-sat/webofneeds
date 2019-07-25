@@ -10,17 +10,11 @@
  */
 package won.owner.messaging;
 
-import java.net.URI;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.jena.riot.Lang;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
-
 import won.protocol.jms.MessagingService;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageEncoder;
@@ -29,15 +23,21 @@ import won.protocol.message.processor.impl.SignatureAddingWonMessageProcessor;
 import won.protocol.message.sender.WonMessageSender;
 import won.protocol.model.WonNode;
 import won.protocol.repository.WonNodeRepository;
-import won.protocol.util.RdfUtils;
 import won.protocol.util.LoggingUtils;
+import won.protocol.util.RdfUtils;
+
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * User: LEIH-NB Date: 17.10.13 Instance of this class receives events upon
  * which it tries to register at the default won node using JMS.
  */
 public class OwnerWonMessageSenderJMSBased implements ApplicationListener<WonNodeRegistrationEvent>, WonMessageSender {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private boolean isDefaultWonNodeRegistered = false;
     private MessagingService messagingService;
     private URI defaultNodeURI;

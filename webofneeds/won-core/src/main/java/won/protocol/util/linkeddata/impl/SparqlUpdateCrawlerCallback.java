@@ -10,10 +10,6 @@
  */
 package won.protocol.util.linkeddata.impl;
 
-import java.io.StringWriter;
-import java.net.URI;
-import java.util.Iterator;
-
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.Lang;
@@ -24,15 +20,19 @@ import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import won.protocol.util.linkeddata.CrawlerCallback;
+
+import java.io.StringWriter;
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.Iterator;
 
 /**
  * Crawler callback implementation that writes crawled data to a predefined
  * sparql endpoint.
  */
 public class SparqlUpdateCrawlerCallback implements CrawlerCallback {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     String sparqlEndpoint = null;
 
     public void setSparqlEndpoint(final String sparqlEndpoint) {

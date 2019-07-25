@@ -29,24 +29,24 @@ import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 import won.cryptography.rdfsign.WonKeysReaderWriter;
 import won.cryptography.service.CryptographyService;
-import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchAtomException;
+import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.message.WonMessageType;
 import won.protocol.model.*;
 import won.protocol.model.unread.UnreadMessageInfo;
 import won.protocol.model.unread.UnreadMessageInfoForAtom;
+import won.protocol.repository.AtomRepository;
 import won.protocol.repository.DatasetHolderRepository;
 import won.protocol.repository.MessageEventRepository;
-import won.protocol.repository.AtomRepository;
-import won.protocol.service.LinkedDataService;
 import won.protocol.service.AtomInformationService;
+import won.protocol.service.LinkedDataService;
 import won.protocol.service.impl.UnreadInformationService;
 import won.protocol.util.DefaultPrefixUtils;
 import won.protocol.util.RdfUtils;
-import won.protocol.vocabulary.LDP;
 import won.protocol.vocabulary.RDFG;
 import won.protocol.vocabulary.WON;
 
+import java.lang.invoke.MethodHandles;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
@@ -58,7 +58,7 @@ import java.util.stream.Collectors;
  * sorting
  */
 public class LinkedDataServiceImpl implements LinkedDataService {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     // prefix of an atom resource
     private String atomResourceURIPrefix;
     // prefix of a connection resource

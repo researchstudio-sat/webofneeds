@@ -2,13 +2,7 @@ package won.utils.batch;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Queue;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -17,9 +11,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Accepts items together with a key for grouping them, a
@@ -51,7 +42,6 @@ import org.slf4j.LoggerFactory;
  * @author fkleedorfer
  */
 public class BatchingConsumer<K, I> {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
     private final Map<K, Batch<K, I>> batches = new HashMap<K, Batch<K, I>>(10);
     ScheduledExecutorService executorSvc = Executors.newSingleThreadScheduledExecutor();
     private Config defaultConfig = new ConfigBuilder()

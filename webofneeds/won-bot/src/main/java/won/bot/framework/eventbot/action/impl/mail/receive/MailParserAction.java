@@ -1,10 +1,5 @@
 package won.bot.framework.eventbot.action.impl.mail.receive;
 
-import java.io.IOException;
-
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.bot.framework.bot.context.MailBotContextWrapper;
@@ -19,11 +14,16 @@ import won.bot.framework.eventbot.event.impl.mail.MailReceivedEvent;
 import won.bot.framework.eventbot.event.impl.mail.WelcomeMailEvent;
 import won.bot.framework.eventbot.listener.EventListener;
 
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
+import java.io.IOException;
+import java.lang.invoke.MethodHandles;
+
 /**
  * Created by fsuda on 30.09.2016.
  */
 public class MailParserAction extends BaseEventBotAction {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private MailContentExtractor mailContentExtractor;
 
     public MailParserAction(EventListenerContext eventListenerContext, MailContentExtractor mailContentExtractor) {

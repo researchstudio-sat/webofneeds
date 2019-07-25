@@ -1,14 +1,10 @@
 package won.node.camel.processor.socket.groupSocket;
 
-import java.net.URI;
-import java.util.List;
-
 import org.apache.camel.Exchange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.camel.processor.annotation.SocketMessageProcessor;
 import won.protocol.message.WonMessage;
@@ -22,6 +18,10 @@ import won.protocol.util.linkeddata.WonLinkedDataUtils;
 import won.protocol.vocabulary.WONMSG;
 import won.protocol.vocabulary.WXGROUP;
 
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.List;
+
 /**
  * Created with IntelliJ IDEA. User: gabriel Date: 16.09.13 Time: 18:42 To
  * change this template use File | Settings | File Templates.
@@ -29,7 +29,7 @@ import won.protocol.vocabulary.WXGROUP;
 @Component
 @SocketMessageProcessor(socketType = WXGROUP.GroupSocketString, direction = WONMSG.FromExternalString, messageType = WONMSG.ConnectionMessageString)
 public class SendMessageFromNodeGroupSocketImpl extends AbstractCamelProcessor {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     @Autowired
     private ConnectionRepository connectionRepository;
 

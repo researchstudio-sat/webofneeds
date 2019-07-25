@@ -10,25 +10,25 @@
  */
 package won.bot.framework.component.atomproducer.impl;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import won.bot.framework.component.atomproducer.FileBasedAtomProducer;
 import won.protocol.util.AtomModelWrapper;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.lang.invoke.MethodHandles;
 
 /**
  * User: fkleedorfer Date: 17.12.13
  */
 public class TrigFileAtomProducer implements FileBasedAtomProducer {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override
     public synchronized Dataset readAtomFromFile(final File file) throws IOException {

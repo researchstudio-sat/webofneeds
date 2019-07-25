@@ -5,22 +5,23 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.shared.PrefixMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import won.protocol.exception.ConnectionAlreadyExistsException;
 import won.protocol.exception.IllegalMessageForAtomStateException;
 import won.protocol.exception.NoSuchAtomException;
 import won.protocol.message.WonMessage;
+import won.protocol.model.Atom;
 import won.protocol.model.Connection;
 import won.protocol.model.SocketType;
-import won.protocol.model.Atom;
 import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.SIOC;
+
+import java.lang.invoke.MethodHandles;
 
 /**
  * User: gabriel Date: 17/01/14
  */
 public class CommentUnrestrictedSocket extends AbstractSocket {
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override
     public SocketType getSocketType() {

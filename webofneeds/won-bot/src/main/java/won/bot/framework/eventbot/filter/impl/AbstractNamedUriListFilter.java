@@ -10,21 +10,21 @@
  */
 package won.bot.framework.eventbot.filter.impl;
 
-import java.net.URI;
-import java.util.Collection;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.event.Event;
+
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.Collection;
 
 /**
  * Event filter that accepts atom specific events the URI of which is found in
  * the specified named URI list.
  */
 public abstract class AbstractNamedUriListFilter extends EventListenerContextAwareFilter {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private String listname;
 
     public AbstractNamedUriListFilter(final EventListenerContext context, final String listname) {

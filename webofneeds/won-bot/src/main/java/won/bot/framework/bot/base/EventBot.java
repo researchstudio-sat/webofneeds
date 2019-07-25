@@ -10,14 +10,10 @@
  */
 package won.bot.framework.bot.base;
 
-import java.net.URI;
-import java.util.concurrent.Executor;
-
 import org.apache.jena.query.Dataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.TaskScheduler;
-
 import won.bot.framework.bot.BotLifecyclePhase;
 import won.bot.framework.bot.context.BotContext;
 import won.bot.framework.bot.context.BotContextWrapper;
@@ -32,21 +28,8 @@ import won.bot.framework.eventbot.event.impl.lifecycle.ActEvent;
 import won.bot.framework.eventbot.event.impl.lifecycle.ErrorEvent;
 import won.bot.framework.eventbot.event.impl.lifecycle.InitializeEvent;
 import won.bot.framework.eventbot.event.impl.lifecycle.ShutdownEvent;
-import won.bot.framework.eventbot.event.impl.matcher.AtomActivatedEventForMatcher;
-import won.bot.framework.eventbot.event.impl.matcher.AtomCreatedEventForMatcher;
-import won.bot.framework.eventbot.event.impl.matcher.AtomDeactivatedEventForMatcher;
-import won.bot.framework.eventbot.event.impl.matcher.AtomModifiedEventForMatcher;
-import won.bot.framework.eventbot.event.impl.matcher.MatcherRegisteredEvent;
-import won.bot.framework.eventbot.event.impl.wonmessage.AtomHintFromMatcherEvent;
-import won.bot.framework.eventbot.event.impl.wonmessage.CloseFromOtherAtomEvent;
-import won.bot.framework.eventbot.event.impl.wonmessage.ConnectFromOtherAtomEvent;
-import won.bot.framework.eventbot.event.impl.wonmessage.FailureResponseEvent;
-import won.bot.framework.eventbot.event.impl.wonmessage.MessageFromOtherAtomEvent;
-import won.bot.framework.eventbot.event.impl.wonmessage.OpenFromOtherAtomEvent;
-import won.bot.framework.eventbot.event.impl.wonmessage.SocketHintFromMatcherEvent;
-import won.bot.framework.eventbot.event.impl.wonmessage.SuccessResponseEvent;
-import won.bot.framework.eventbot.event.impl.wonmessage.WonMessageSentEvent;
-import won.bot.framework.eventbot.event.impl.wonmessage.WonMessageSentOnConnectionEvent;
+import won.bot.framework.eventbot.event.impl.matcher.*;
+import won.bot.framework.eventbot.event.impl.wonmessage.*;
 import won.bot.framework.eventbot.listener.BaseEventListener;
 import won.matcher.component.MatcherNodeURISource;
 import won.matcher.protocol.impl.MatcherProtocolMatcherServiceImplJMSBased;
@@ -59,6 +42,10 @@ import won.protocol.model.Connection;
 import won.protocol.model.SocketType;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.linkeddata.LinkedDataSource;
+
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.concurrent.Executor;
 
 /**
  * Base class for bots that define their behaviour through event listeners. Once
@@ -92,7 +79,7 @@ import won.protocol.util.linkeddata.LinkedDataSource;
  * on the internal event bus) if it is in lifecycle phase ACTIVE.
  */
 public abstract class EventBot extends TriggeredBot {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private EventBus eventBus;
     private EventListenerContext eventListenerContext = new MyEventListenerContext();
     private EventGeneratingWonMessageSenderWrapper wonMessageSenderWrapper;
@@ -394,8 +381,6 @@ public abstract class EventBot extends TriggeredBot {
      * ErrorEvents and will not react to a WorkDoneEvent.
      */
     private class ErrorEventListener extends BaseEventListener {
-        private final Logger logger = LoggerFactory.getLogger(getClass());
-
         public ErrorEventListener(EventListenerContext context) {
             super(context);
         }

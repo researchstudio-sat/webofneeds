@@ -1,21 +1,18 @@
 package won.matcher.service.common.service.http;
 
-import java.nio.charset.Charset;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+
+import java.lang.invoke.MethodHandles;
+import java.nio.charset.Charset;
 
 /**
  * Service to use HTTP to request resources
@@ -25,7 +22,7 @@ import org.springframework.web.client.RestTemplate;
 @Component
 @Scope("prototype")
 public class HttpService {
-    private final Logger log = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private RestTemplate restTemplate;
     private HttpHeaders jsonHeaders;
 
@@ -51,11 +48,11 @@ public class HttpService {
 
     public void postJsonRequest(String uri, String body) {
         ResponseEntity<String> response = null;
-        log.debug("POST URI: {}", uri);
+        logger.debug("POST URI: {}", uri);
         HttpEntity<String> jsonEntity = new HttpEntity(body, jsonHeaders);
         response = restTemplate.exchange(uri, HttpMethod.POST, jsonEntity, String.class);
         if (response.getStatusCode() != HttpStatus.OK) {
-            log.warn("HTTP POST request returned status code: {}", response.getStatusCode());
+            logger.warn("HTTP POST request returned status code: {}", response.getStatusCode());
             throw new HttpClientErrorException(response.getStatusCode());
         }
     }

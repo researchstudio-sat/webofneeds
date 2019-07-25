@@ -10,22 +10,11 @@
  */
 package won.protocol.message.processor.impl;
 
-import java.net.URI;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.PublicKey;
-import java.security.SignatureException;
-import java.security.spec.InvalidKeySpecException;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.jena.query.Dataset;
 import org.apache.jena.riot.Lang;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpClientErrorException;
 import won.cryptography.rdfsign.SignatureVerificationState;
@@ -38,12 +27,23 @@ import won.protocol.rest.LinkedDataFetchingException;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.linkeddata.LinkedDataSource;
 
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.PublicKey;
+import java.security.SignatureException;
+import java.security.spec.InvalidKeySpecException;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.Set;
+
 /**
  * Checks all signatures found in a WonMessage. It is assumed that the message
  * is well-formed.
  */
 public class SignatureCheckingWonMessageProcessor implements WonMessageProcessor {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public SignatureCheckingWonMessageProcessor() {
     }

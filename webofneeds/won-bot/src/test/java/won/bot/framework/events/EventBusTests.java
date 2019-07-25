@@ -10,24 +10,24 @@
  */
 package won.bot.framework.events;
 
-import java.util.concurrent.CountDownLatch;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
-
 import won.bot.framework.eventbot.bus.impl.AsyncEventBusImpl;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.listener.EventListener;
+
+import java.lang.invoke.MethodHandles;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * User: fkleedorfer Date: 30.01.14
  */
 public class EventBusTests {
-    private Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private ThreadPoolTaskScheduler taskScheduler = new ThreadPoolTaskScheduler();
 
     @Before

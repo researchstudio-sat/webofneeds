@@ -10,8 +10,6 @@
  */
 package won.bot.framework.component.atomproducer.impl;
 
-import java.io.IOException;
-
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.Lang;
@@ -19,17 +17,19 @@ import org.apache.jena.riot.RDFLanguages;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
-
 import won.protocol.model.AtomGraphType;
 import won.protocol.util.AtomModelWrapper;
 import won.protocol.util.RdfUtils;
+
+import java.io.IOException;
+import java.lang.invoke.MethodHandles;
 
 /**
  * AtomProducer that reads an atom model at startup time and overlays it with
  * the data retrieved from the atom factory it wraps.
  */
 public class TemplateBasedAtomProducer extends AbstractAtomProducerWrapper {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private Model templateModel;
     private Resource template;
     private boolean initialized = false;

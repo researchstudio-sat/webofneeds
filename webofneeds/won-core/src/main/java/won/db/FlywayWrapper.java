@@ -1,18 +1,19 @@
 package won.db;
 
-import javax.sql.DataSource;
-
 import org.flywaydb.core.Flyway;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
+
+import javax.sql.DataSource;
+import java.lang.invoke.MethodHandles;
 
 /**
  * This Bean is used to determine whether or not an update/validation of the ddl
  * is done via flywaydb.
  */
 public class FlywayWrapper implements InitializingBean {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private String ddlStrategy = "";
     private DataSource dataSource;
 

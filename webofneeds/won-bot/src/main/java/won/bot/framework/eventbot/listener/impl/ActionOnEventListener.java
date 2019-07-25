@@ -18,12 +18,14 @@ import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.filter.EventFilter;
 import won.bot.framework.eventbot.listener.BaseEventListener;
 
+import java.lang.invoke.MethodHandles;
+
 /**
  * Executes a task when an event is seen. If the property timesToRun > 0, will
  * unregister after that number of events.
  */
 public class ActionOnEventListener extends BaseEventListener {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private EventBotAction task;
     private int timesRun = 0;
     private int timesToRun = -1;

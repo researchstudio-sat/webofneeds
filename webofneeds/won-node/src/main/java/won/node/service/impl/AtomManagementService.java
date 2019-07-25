@@ -10,15 +10,10 @@
  */
 package won.node.service.impl;
 
-import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import won.protocol.jms.MessagingService;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
@@ -27,12 +22,17 @@ import won.protocol.model.Atom;
 import won.protocol.repository.AtomRepository;
 import won.protocol.service.WonNodeInformationService;
 
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Manipulates atoms from the system side by generating msg:FromSystem messages.
  */
 @Component
 public class AtomManagementService {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     @Autowired
     private MessagingService messagingService;
     @Autowired
@@ -46,7 +46,8 @@ public class AtomManagementService {
             return;
         }
         if (message == null || message.trim().length() == 0) {
-            logger.warn("sendTextMessageToOwner called for atom {}, but message is null or empty - doing nothing");
+            logger.warn("sendTextMessageToOwner called for atom {}, but message is null or empty - doing nothing",
+                            atomURI);
             return;
         }
         logger.debug("Sending FromSystem text message to atom {}", atomURI);
@@ -54,12 +55,14 @@ public class AtomManagementService {
         // does not exist at all)
         Atom atom = atomRepository.findOneByAtomURI(atomURI);
         if (atom == null) {
-            logger.debug("deactivateAtom called for atom {} but that atom was not found in the repository - doing nothing");
+            logger.debug("deactivateAtom called for atom {} but that atom was not found in the repository - doing nothing",
+                            atomURI);
             return;
         }
         URI wonNodeURI = wonNodeInformationService.getWonNodeUri(atomURI);
         if (wonNodeURI == null) {
-            logger.debug("deactivateAtom called for atom {} but we could not find a WonNodeURI for that atom - doing nothing");
+            logger.debug("deactivateAtom called for atom {} but we could not find a WonNodeURI for that atom - doing nothing",
+                            atomURI);
             return;
         }
         URI messageURI = wonNodeInformationService.generateEventURI(wonNodeURI);

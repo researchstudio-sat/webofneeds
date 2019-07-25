@@ -1,17 +1,14 @@
 package won.matcher.solr.query.factory;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Resource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import won.matcher.solr.utils.MatcherAtomContentPropertyType;
 import won.protocol.model.Coordinate;
 import won.protocol.util.DefaultAtomModelWrapper;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by hfriedrich on 01.08.2016.
@@ -52,7 +49,6 @@ public class BasicAtomQueryFactory extends AtomDatasetQueryFactory {
         locationFieldMap.put(MatcherAtomContentPropertyType.SEEKS, "seeks_atom_location");
         locationFieldMap.put(MatcherAtomContentPropertyType.SEEKS_SEEKS, "seeksSeeks_atom_location");
     }
-    private final Logger log = LoggerFactory.getLogger(getClass());
     protected ArrayList<SolrQueryFactory> contentFactories;
     protected ArrayList<SolrQueryFactory> locationFactories;
     protected DefaultAtomModelWrapper atomModelWrapper;

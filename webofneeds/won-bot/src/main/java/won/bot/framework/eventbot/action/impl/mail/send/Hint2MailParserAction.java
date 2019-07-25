@@ -1,15 +1,9 @@
 package won.bot.framework.eventbot.action.impl.mail.send;
 
-import java.net.URI;
-import java.util.Optional;
-
-import javax.mail.internet.MimeMessage;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.support.GenericMessage;
-
 import won.bot.framework.bot.context.MailBotContextWrapper;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
@@ -23,11 +17,16 @@ import won.bot.framework.eventbot.event.impl.wonmessage.AtomHintFromMatcherEvent
 import won.bot.framework.eventbot.event.impl.wonmessage.SocketHintFromMatcherEvent;
 import won.bot.framework.eventbot.listener.EventListener;
 
+import javax.mail.internet.MimeMessage;
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.Optional;
+
 /**
  * Created by fsuda on 03.10.2016.
  */
 public class Hint2MailParserAction extends BaseEventBotAction {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private MessageChannel sendChannel;
     private WonMimeMessageGenerator mailGenerator;
 

@@ -10,10 +10,6 @@
  */
 package won.bot.impl;
 
-import java.net.URI;
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.bot.framework.bot.base.EventBot;
@@ -24,8 +20,8 @@ import won.bot.framework.eventbot.action.impl.matcher.RegisterMatcherAction;
 import won.bot.framework.eventbot.bus.EventBus;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.impl.lifecycle.ActEvent;
-import won.bot.framework.eventbot.event.impl.matcher.MatcherRegisterFailedEvent;
 import won.bot.framework.eventbot.event.impl.matcher.AtomCreatedEventForMatcher;
+import won.bot.framework.eventbot.event.impl.matcher.MatcherRegisterFailedEvent;
 import won.bot.framework.eventbot.listener.BaseEventListener;
 import won.bot.framework.eventbot.listener.EventListener;
 import won.bot.framework.eventbot.listener.impl.ActionOnEventListener;
@@ -35,11 +31,15 @@ import won.protocol.message.WonMessageBuilder;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.WonRdfUtils;
 
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.concurrent.atomic.AtomicReference;
+
 /**
  * Bot that connects the two last seen atoms using a hint.
  */
 public class LastSeenAtomsMatcherBot extends EventBot {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private BaseEventListener matcherRegistrator;
     private BaseEventListener matcherIndexer;
     private int registrationMatcherRetryInterval;

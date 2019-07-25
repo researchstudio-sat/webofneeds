@@ -1,23 +1,10 @@
 package won.bot.framework.eventbot.behaviour;
 
-import java.io.StringWriter;
-import java.net.URI;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.bot.framework.bot.context.BotContext;
@@ -27,11 +14,7 @@ import won.bot.framework.eventbot.action.impl.factory.model.Precondition;
 import won.bot.framework.eventbot.action.impl.factory.model.Proposal;
 import won.bot.framework.eventbot.action.impl.factory.model.ProposalState;
 import won.bot.framework.eventbot.bus.EventBus;
-import won.bot.framework.eventbot.event.ConnectionSpecificEvent;
-import won.bot.framework.eventbot.event.Event;
-import won.bot.framework.eventbot.event.MessageEvent;
-import won.bot.framework.eventbot.event.AtomSpecificEvent;
-import won.bot.framework.eventbot.event.TargetAtomSpecificEvent;
+import won.bot.framework.eventbot.event.*;
 import won.bot.framework.eventbot.event.impl.analyzation.agreement.AgreementCancellationAcceptedEvent;
 import won.bot.framework.eventbot.event.impl.analyzation.agreement.ProposalAcceptedEvent;
 import won.bot.framework.eventbot.event.impl.analyzation.precondition.PreconditionMetEvent;
@@ -54,8 +37,16 @@ import won.protocol.util.linkeddata.WonLinkedDataUtils;
 import won.utils.goals.GoalInstantiationProducer;
 import won.utils.goals.GoalInstantiationResult;
 
+import java.io.StringWriter;
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.*;
+
 public class AnalyzeBehaviour extends BotBehaviour {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final BotContext botContext;
     private final String preconditionToProposalListMapName;
     private final String proposalToPreconditionListMapName;

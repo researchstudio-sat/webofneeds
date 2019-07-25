@@ -15,7 +15,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-
 import won.owner.protocol.message.OwnerCallback;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageType;
@@ -24,13 +23,15 @@ import won.protocol.message.processor.exception.WonMessageProcessingException;
 import won.protocol.model.Connection;
 import won.protocol.util.RdfUtils;
 
+import java.lang.invoke.MethodHandles;
+
 /**
  * Maps incoming messages from the WonMessageProcessor interface to the
  * WonEventCallback interface. Outgoing messages sent by calling the adaptee's
  * send(msg) method are delegated to the
  */
 public abstract class OwnerCallbackAdapter implements WonMessageProcessor {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private OwnerCallback adaptee;
 
     protected OwnerCallbackAdapter() {

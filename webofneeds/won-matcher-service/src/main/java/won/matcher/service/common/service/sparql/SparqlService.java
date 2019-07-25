@@ -1,22 +1,6 @@
 package won.matcher.service.common.service.sparql;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringWriter;
-import java.nio.charset.StandardCharsets;
-import java.util.Iterator;
-
-import org.apache.jena.query.Dataset;
-import org.apache.jena.query.DatasetFactory;
-import org.apache.jena.query.ParameterizedSparqlString;
-import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.query.QueryFactory;
-import org.apache.jena.query.QueryParseException;
-import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.ResultSet;
+import org.apache.jena.query.*;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
@@ -34,8 +18,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
 import won.protocol.util.RdfUtils;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringWriter;
+import java.lang.invoke.MethodHandles;
+import java.nio.charset.StandardCharsets;
+import java.util.Iterator;
 
 /**
  * Service to access of Sparql enpoint database to save or query linked data.
@@ -43,7 +34,7 @@ import won.protocol.util.RdfUtils;
  */
 @Component
 public class SparqlService {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     protected String sparqlEndpoint;
     // protected DatasetAccessor accessor;
 
