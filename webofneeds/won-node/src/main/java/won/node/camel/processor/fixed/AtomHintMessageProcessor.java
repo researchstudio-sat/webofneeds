@@ -5,6 +5,8 @@ import java.util.Optional;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -31,6 +33,7 @@ import won.protocol.vocabulary.WONMSG;
  */
 @Component
 public class AtomHintMessageProcessor extends AbstractCamelProcessor {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     @Value("${ignore.hints.suggested.connection.count.max}")
     private Long maxAtomHintsCount = 100L;
 

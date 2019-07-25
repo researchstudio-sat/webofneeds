@@ -13,6 +13,8 @@ package won.bot.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import won.bot.framework.bot.base.EventBot;
 import won.bot.framework.bot.context.GroupBotContextWrapper;
 import won.bot.framework.eventbot.EventListenerContext;
@@ -50,6 +52,7 @@ import won.protocol.util.WonRdfUtils;
  *
  */
 public class GroupingBot extends EventBot {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     protected static final int NO_OF_GROUPMEMBERS = 5;
     protected static final int NO_OF_MESSAGES = 5;
     protected static final long MILLIS_BETWEEN_MESSAGES = 1;

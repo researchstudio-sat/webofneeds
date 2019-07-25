@@ -15,6 +15,8 @@ import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -36,6 +38,7 @@ import won.protocol.util.linkeddata.LinkedDataSource;
  */
 @Component
 public class RematchSparqlService extends SparqlService {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private static final String HTTP_HEADER_SEPARATOR = ", ";
     @Autowired
     LinkedDataSource linkedDataSource;
@@ -150,7 +153,7 @@ public class RematchSparqlService extends SparqlService {
     }
 
     public BulkAtomEvent findAtomsForRematching() {
-        log.debug("searching atoms for rematching");
+        logger.debug("searching atoms for rematching");
         StringBuilder builder = new StringBuilder();
         // Selects atomUris using a back-off strategy, each time doubling
         // the time difference to the reference date
@@ -188,7 +191,7 @@ public class RematchSparqlService extends SparqlService {
                 }
             }
         }
-        log.debug("atomEvents for rematching: " + bulkAtomEvent.getAtomEvents().size());
+        logger.debug("atomEvents for rematching: " + bulkAtomEvent.getAtomEvents().size());
         return bulkAtomEvent;
     }
 

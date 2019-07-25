@@ -18,6 +18,8 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import won.node.camel.processor.AbstractCamelProcessor;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
@@ -33,6 +35,8 @@ import won.protocol.util.WonRdfUtils;
  * is set).
  */
 public class FailResponder extends AbstractCamelProcessor {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
     @Override
     public void process(final Exchange exchange) throws Exception {
         Exception exception = null;

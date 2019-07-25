@@ -16,6 +16,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.action.EventBotActionUtils;
@@ -49,6 +51,7 @@ import won.protocol.vocabulary.WON;
  * chatSocket will be used.
  */
 public class ReplaceDebugAtomContentAction extends BaseEventBotAction {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private Counter counter = new CounterImpl("DebugAtomsReplaceCounter");
 
     public ReplaceDebugAtomContentAction(final EventListenerContext eventListenerContext) {

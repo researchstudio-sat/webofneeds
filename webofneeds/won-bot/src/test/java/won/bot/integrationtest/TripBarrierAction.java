@@ -12,6 +12,8 @@ package won.bot.integrationtest;
 
 import java.util.concurrent.CyclicBarrier;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.event.Event;
@@ -22,6 +24,7 @@ import won.bot.framework.eventbot.listener.EventListener;
  * with bot execution.
  */
 public class TripBarrierAction extends BaseEventBotAction {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private CyclicBarrier barrier;
 
     public TripBarrierAction(final EventListenerContext eventListenerContext, final CyclicBarrier barrier) {

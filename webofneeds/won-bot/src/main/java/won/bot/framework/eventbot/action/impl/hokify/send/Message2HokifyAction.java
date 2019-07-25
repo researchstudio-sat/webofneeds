@@ -4,6 +4,8 @@ import java.net.URI;
 
 import org.apache.jena.rdf.model.Model;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import won.bot.framework.bot.context.HokifyJobBotContextWrapper;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
@@ -19,6 +21,7 @@ import won.protocol.util.WonRdfUtils;
  * Created by MS on 24.09.2018.
  */
 public class Message2HokifyAction extends BaseEventBotAction {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     WonHokifyJobBotHandler wonHokifyBotHandler;
 
     public Message2HokifyAction(EventListenerContext ctx) {

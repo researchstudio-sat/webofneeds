@@ -2,6 +2,8 @@ package won.bot.framework.eventbot.action.impl.telegram.send;
 
 import java.net.URI;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 
@@ -21,6 +23,7 @@ import won.protocol.model.Connection;
  * Created by fsuda on 18.10.2016.
  */
 public class Message2TelegramAction extends BaseEventBotAction {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     WonTelegramBotHandler wonTelegramBotHandler;
 
     public Message2TelegramAction(EventListenerContext ctx, WonTelegramBotHandler wonTelegramBotHandler) {

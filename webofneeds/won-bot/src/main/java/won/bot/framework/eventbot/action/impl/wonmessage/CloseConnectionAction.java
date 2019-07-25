@@ -14,6 +14,8 @@ import java.net.URI;
 
 import org.apache.jena.query.Dataset;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.event.ConnectionSpecificEvent;
@@ -30,6 +32,7 @@ import won.protocol.util.WonRdfUtils;
  * and close that connection.
  */
 public class CloseConnectionAction extends BaseEventBotAction {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private String farewellMessage;
 
     public CloseConnectionAction(final EventListenerContext context, String farewellMessage) {

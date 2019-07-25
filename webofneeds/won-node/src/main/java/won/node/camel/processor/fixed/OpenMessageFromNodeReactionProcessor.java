@@ -5,6 +5,8 @@ import java.util.Optional;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import won.node.camel.processor.AbstractCamelProcessor;
@@ -22,6 +24,8 @@ import won.protocol.vocabulary.WONMSG;
 @Component
 @FixedMessageReactionProcessor(direction = WONMSG.FromExternalString, messageType = WONMSG.OpenMessageString)
 public class OpenMessageFromNodeReactionProcessor extends AbstractCamelProcessor {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
     @Override
     public void process(Exchange exchange) throws Exception {
         // if the connection's socket isAutoOpen and the connection state is
@@ -50,7 +54,7 @@ public class OpenMessageFromNodeReactionProcessor extends AbstractCamelProcessor
                         .setMessagePropertiesForOpen(messageURI, connectMessageToReactTo,
                                         "This is an automatic OPEN message sent by the WoN node")
                         .setWonMessageDirection(WonMessageDirection.FROM_SYSTEM).build();
-        logger.info("sending auto-open for connection {}, reacting to open", msg.getSenderURI());
+        logger.debug("sending auto-open for connection {}, reacting to open", msg.getSenderURI());
         super.sendSystemMessage(msg);
     }
 }

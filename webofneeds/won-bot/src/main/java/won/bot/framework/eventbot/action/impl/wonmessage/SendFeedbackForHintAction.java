@@ -15,6 +15,8 @@ import java.util.Random;
 
 import org.apache.jena.query.Dataset;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.event.Event;
@@ -30,6 +32,7 @@ import won.protocol.util.WonRdfUtils;
  * User: fkleedorfer Date: 30.01.14
  */
 public class SendFeedbackForHintAction extends BaseEventBotAction {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     // random number generator needed for random feedback value
     Random random = new Random(System.currentTimeMillis());
 

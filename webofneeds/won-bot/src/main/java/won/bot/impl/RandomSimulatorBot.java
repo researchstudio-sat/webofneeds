@@ -10,6 +10,8 @@
  */
 package won.bot.impl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import won.bot.framework.bot.base.EventBot;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
@@ -45,6 +47,7 @@ import won.bot.framework.eventbot.listener.impl.ActionOnceAfterNEventsListener;
  *
  */
 public class RandomSimulatorBot extends EventBot {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private static final double PROB_OPEN_ON_HINT = 0.3;
     private static final double PROB_MESSAGE_ON_OPEN = 0.5;
     private static final double PROB_MESSAGE_ON_MESSAGE = 0.5;

@@ -3,6 +3,8 @@ package won.bot.impl;
 import java.time.Duration;
 import java.util.ArrayList;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import won.bot.framework.bot.base.EventBot;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
@@ -35,6 +37,7 @@ import won.bot.framework.eventbot.listener.impl.ActionOnFirstEventListener;
  * created by MS on 17.09.2018
  */
 public class HokifyJobBot extends EventBot {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private String botName;
     private int updateTime;
     private String jsonURL;
@@ -102,7 +105,7 @@ public class HokifyJobBot extends EventBot {
             bus.publish(new StartHokifyFetchEvent());
             bus.publish(new FetchHokifyJobDataEvent());
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error(e.getMessage(), e);
         }
     }
 

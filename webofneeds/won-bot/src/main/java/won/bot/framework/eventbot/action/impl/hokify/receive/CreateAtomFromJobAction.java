@@ -16,6 +16,8 @@ import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.RDF;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import won.bot.framework.bot.context.HokifyJobBotContextWrapper;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.EventBotActionUtils;
@@ -42,6 +44,7 @@ import won.protocol.vocabulary.WXCHAT;
  * Created by MS on 18.09.2018.
  */
 public class CreateAtomFromJobAction extends AbstractCreateAtomAction {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private HokifyBotsApi hokifyBotsApi;
     private boolean createAllInOne;
 

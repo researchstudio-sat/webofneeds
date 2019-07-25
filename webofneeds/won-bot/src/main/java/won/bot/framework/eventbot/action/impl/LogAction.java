@@ -10,6 +10,8 @@
  */
 package won.bot.framework.eventbot.action.impl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.event.Event;
@@ -19,6 +21,7 @@ import won.bot.framework.eventbot.listener.EventListener;
  * Outputs a message via the configured logging system.
  */
 public class LogAction extends BaseEventBotAction {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     protected String message;
 
     public LogAction(final EventListenerContext eventListenerContext) {

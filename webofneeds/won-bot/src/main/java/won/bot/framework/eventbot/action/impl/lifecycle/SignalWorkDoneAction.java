@@ -10,6 +10,8 @@
  */
 package won.bot.framework.eventbot.action.impl.lifecycle;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import won.bot.framework.bot.Bot;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
@@ -21,6 +23,7 @@ import won.bot.framework.eventbot.listener.EventListener;
  * BaseEventBotAction telling the framework that the bot's work is done.
  */
 public class SignalWorkDoneAction extends BaseEventBotAction {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private Bot bot;
 
     public SignalWorkDoneAction(EventListenerContext eventListenerContext, Bot bot) {

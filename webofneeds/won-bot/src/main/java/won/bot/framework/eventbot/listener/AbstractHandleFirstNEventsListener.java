@@ -10,6 +10,8 @@
  */
 package won.bot.framework.eventbot.listener;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.filter.EventFilter;
@@ -19,6 +21,7 @@ import won.bot.framework.eventbot.filter.EventFilter;
  * number is reached.
  */
 public abstract class AbstractHandleFirstNEventsListener extends BaseEventListener implements CountingListener {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private int targetCount;
     private int count = 0;
     private Object monitor = new Object();

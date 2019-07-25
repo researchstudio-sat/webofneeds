@@ -6,6 +6,8 @@ import java.util.Optional;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import won.node.camel.processor.AbstractCamelProcessor;
@@ -28,6 +30,8 @@ import won.protocol.vocabulary.WONMSG;
 @Component
 @FixedMessageProcessor(direction = WONMSG.FromOwnerString, messageType = WONMSG.OpenMessageString)
 public class OpenMessageFromOwnerProcessor extends AbstractCamelProcessor {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
     public void process(final Exchange exchange) throws Exception {
         Message message = exchange.getIn();
         WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.MESSAGE_HEADER);

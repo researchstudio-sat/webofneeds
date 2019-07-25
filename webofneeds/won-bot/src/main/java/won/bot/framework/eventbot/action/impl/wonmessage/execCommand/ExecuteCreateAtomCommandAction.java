@@ -17,6 +17,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Resource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.action.EventBotActionUtils;
@@ -40,6 +42,8 @@ import won.protocol.vocabulary.WONMATCH;
  * Action executing a CreateAtomCommandEvent, creating the specified atom.
  */
 public class ExecuteCreateAtomCommandAction extends BaseEventBotAction {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
     public ExecuteCreateAtomCommandAction(final EventListenerContext eventListenerContext) {
         super(eventListenerContext);
     }

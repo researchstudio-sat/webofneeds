@@ -14,6 +14,8 @@ import java.net.URI;
 
 import org.apache.camel.Exchange;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import won.node.camel.processor.AbstractCamelProcessor;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
@@ -28,6 +30,8 @@ import won.protocol.message.processor.exception.WonMessageProcessingException;
  * senderAtomURI is set).
  */
 public class SuccessResponder extends AbstractCamelProcessor {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
     @Override
     public void process(final Exchange exchange) throws Exception {
         WonMessage originalMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);

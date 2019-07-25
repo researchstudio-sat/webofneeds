@@ -18,6 +18,8 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import won.bot.framework.bot.context.BotContext;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
@@ -53,6 +55,7 @@ import won.utils.goals.GoalInstantiationProducer;
 import won.utils.goals.GoalInstantiationResult;
 
 public class AnalyzeBehaviour extends BotBehaviour {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private final BotContext botContext;
     private final String preconditionToProposalListMapName;
     private final String proposalToPreconditionListMapName;

@@ -10,6 +10,8 @@
  */
 package won.bot.framework.eventbot.action.impl.wonmessage.execCommand;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.action.EventBotActionUtils;
@@ -38,6 +40,7 @@ import won.protocol.util.WonRdfUtils;
  * registered
  */
 public abstract class ExecuteSendMessageCommandAction<T extends MessageCommandEvent> extends BaseEventBotAction {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private boolean messageIsSentToRemoteNode = true;
 
     protected ExecuteSendMessageCommandAction(EventListenerContext eventListenerContext,

@@ -10,9 +10,6 @@
  */
 package won.bot.integrationtest;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.TestCase.assertTrue;
-
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -125,6 +122,7 @@ public class CommentBotTest {
      * information during the run that we later check with asserts.
      */
     public static class MyBot extends CommentBot {
+        private final Logger logger = LoggerFactory.getLogger(getClass());
         /**
          * Used for synchronization with the @TestD method: it should wait at the
          * barrier until our bot is done, then execute the asserts.
@@ -232,7 +230,7 @@ public class CommentBotTest {
                 actualList.add(soln.toString());
                 RDFNode node = soln.get("?connection");
             }
-            assertEquals("wrong number of results", 1, actualList.size());
+            Assert.assertEquals("wrong number of results", 1, actualList.size());
             qExec.close();
         }
 
@@ -250,7 +248,7 @@ public class CommentBotTest {
                 QuerySolution soln = results.nextSolution();
                 actualList.add(soln.toString());
             }
-            assertTrue("wrong number of results", actualList.size() >= 1);
+            Assert.assertTrue("wrong number of results", actualList.size() >= 1);
             // String expected1 = "( ?event = <" + EXAMPLE_ONTOLOGY_URI + "Open_01_1> ) (
             // ?eventType = <" + WON_ONTOLOGY_URI + "Open> )";
             // assertThat(actualList, hasItems(expected1));
@@ -275,7 +273,7 @@ public class CommentBotTest {
             } finally {
                 qExec.close();
             }
-            assertTrue("wrong number of results", actualList.size() >= 1);
+            Assert.assertTrue("wrong number of results", actualList.size() >= 1);
             return commentModel;
         }
 
@@ -307,7 +305,7 @@ public class CommentBotTest {
                 atomConnectionCollectionURI = URI.create(nodeStr);
             }
             qExec.close();
-            assertTrue("wrong number of results", actualList.size() >= 1);
+            Assert.assertTrue("wrong number of results", actualList.size() >= 1);
             Dataset atomConnections = getEventListenerContext().getLinkedDataSource()
                             .getDataForResource(atomConnectionCollectionURI);
             String queryString2 = sparqlPrefix + "SELECT ?connection WHERE {" + "?connections rdfs:member ?connection"
@@ -326,7 +324,7 @@ public class CommentBotTest {
                 atomConnectionURI = URI.create(nodeStr);
             }
             qExec2.close();
-            assertTrue("wrong number of results", actualList2.size() >= 1);
+            Assert.assertTrue("wrong number of results", actualList2.size() >= 1);
             Dataset atomConnection = getEventListenerContext().getLinkedDataSource()
                             .getDataForResource(atomConnectionURI);
             String queryString3 = sparqlPrefix + "SELECT ?targetConnection WHERE {"
@@ -343,7 +341,7 @@ public class CommentBotTest {
                 String nodeStr = node.toString();
                 commentConnectionsURI = URI.create(nodeStr);
             }
-            assertTrue("wrong number of results", actualList3.size() >= 1);
+            Assert.assertTrue("wrong number of results", actualList3.size() >= 1);
             Dataset targetConnections = getEventListenerContext().getLinkedDataSource()
                             .getDataForResource(commentConnectionsURI);
             String queryString4 = sparqlPrefix + "SELECT ?targetConnection WHERE {"
@@ -362,8 +360,8 @@ public class CommentBotTest {
                 atomConnectionURICheck = URI.create(nodeStr);
             }
             qExec4.close();
-            assertTrue("wrong number of results", actualList4.size() >= 1);
-            assertEquals(atomConnectionURI, atomConnectionURICheck);
+            Assert.assertTrue("wrong number of results", actualList4.size() >= 1);
+            Assert.assertEquals(atomConnectionURI, atomConnectionURICheck);
         }
 
         public ResultSet executeQuery(String queryString, Model model) {

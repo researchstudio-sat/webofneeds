@@ -25,6 +25,8 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.StopWatch;
 
 import won.bot.framework.eventbot.EventListenerContext;
@@ -64,6 +66,7 @@ import won.protocol.validation.WonConnectionValidator;
  * them
  */
 public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAction {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     Pattern PATTERN_USAGE = Pattern.compile("^usage|\\?|help|debug$", Pattern.CASE_INSENSITIVE);
     Pattern PATTERN_HINT = Pattern.compile("^hint(\\s+((random|incompatible)\\s+)?socket)?$", Pattern.CASE_INSENSITIVE);
     Pattern PATTERN_CLOSE = Pattern.compile("^close$", Pattern.CASE_INSENSITIVE);

@@ -12,6 +12,8 @@ package won.bot.framework.eventbot.action.impl.wonmessage;
 
 import java.net.URI;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.action.BotActionUtils;
@@ -23,6 +25,7 @@ import won.bot.framework.eventbot.listener.EventListener;
  * Action that sends a generic message.
  */
 public class SendMessageAction extends BaseEventBotAction {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private String message = "Hello World";
 
     public SendMessageAction(final EventListenerContext eventListenerContext) {

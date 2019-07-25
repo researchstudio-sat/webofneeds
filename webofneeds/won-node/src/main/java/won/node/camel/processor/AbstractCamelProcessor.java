@@ -22,6 +22,7 @@ import java.util.concurrent.ExecutorService;
 
 import org.apache.camel.Processor;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import won.cryptography.service.RandomNumberService;
@@ -54,7 +55,7 @@ import won.protocol.util.linkeddata.LinkedDataSource;
  * User: syim Date: 02.03.2015
  */
 public abstract class AbstractCamelProcessor implements Processor {
-    protected Logger logger = org.slf4j.LoggerFactory.getLogger(this.getClass());
+    private static final Logger logger = LoggerFactory.getLogger(AbstractCamelProcessor.class);
     @Autowired
     protected MessagingService messagingService;
     @Autowired

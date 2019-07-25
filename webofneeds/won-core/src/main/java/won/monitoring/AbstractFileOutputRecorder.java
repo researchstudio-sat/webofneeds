@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class AbstractFileOutputRecorder extends AbstractRecorder {
     private static final String TEMPDIR_PREFIX = "monitoringStatsCSV";
-    protected final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(AbstractFileOutputRecorder.class);
     private File outputDirectory;
     /**
      * DateFormat pattern for creating the filename for the date it is written.

@@ -10,6 +10,8 @@
  */
 package won.bot.impl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import won.bot.framework.bot.base.EventBot;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
@@ -37,6 +39,7 @@ import won.bot.framework.eventbot.listener.impl.ActionOnEventListener;
  *
  */
 public class AtomCreatorBot extends EventBot {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     protected BaseEventListener groupMemberCreator;
     protected BaseEventListener workDoneSignaller;
 

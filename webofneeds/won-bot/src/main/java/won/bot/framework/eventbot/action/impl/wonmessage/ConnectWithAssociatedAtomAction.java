@@ -22,6 +22,8 @@ import org.apache.jena.query.Dataset;
 
 import com.esotericsoftware.kryo.serializers.TaggedFieldSerializer.Tag;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.event.Event;
@@ -43,6 +45,7 @@ import won.protocol.util.linkeddata.WonLinkedDataUtils;
  * botContext.saveToObjectMap method.
  */
 public class ConnectWithAssociatedAtomAction extends BaseEventBotAction {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private Optional<URI> targetSocketType = Optional.empty();
     private Optional<URI> localSocketType = Optional.empty();
     private String welcomeMessage;

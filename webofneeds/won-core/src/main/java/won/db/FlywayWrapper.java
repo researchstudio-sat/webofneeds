@@ -12,7 +12,7 @@ import org.springframework.beans.factory.InitializingBean;
  * is done via flywaydb.
  */
 public class FlywayWrapper implements InitializingBean {
-    protected final Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private String ddlStrategy = "";
     private DataSource dataSource;
 

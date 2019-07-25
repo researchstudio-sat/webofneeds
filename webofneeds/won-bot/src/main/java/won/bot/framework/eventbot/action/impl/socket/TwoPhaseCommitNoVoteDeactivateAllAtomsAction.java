@@ -17,6 +17,8 @@ import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.NodeIterator;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.event.Event;
@@ -35,6 +37,8 @@ import won.protocol.util.WonRdfUtils;
  * User: Danijel Date: 21.5.14.
  */
 public class TwoPhaseCommitNoVoteDeactivateAllAtomsAction extends BaseEventBotAction {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
     public TwoPhaseCommitNoVoteDeactivateAllAtomsAction(EventListenerContext eventListenerContext) {
         super(eventListenerContext);
     }

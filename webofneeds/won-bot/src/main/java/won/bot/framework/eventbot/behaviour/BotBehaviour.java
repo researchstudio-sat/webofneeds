@@ -25,7 +25,7 @@ import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.listener.EventListener;
 
 public abstract class BotBehaviour {
-    protected final Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private AtomicBoolean active = new AtomicBoolean(false);
     protected final String name;
     protected final EventListenerContext context;

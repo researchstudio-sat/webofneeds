@@ -23,7 +23,7 @@ import won.bot.framework.eventbot.filter.EventFilter;
  * Base class for event listeners
  */
 public abstract class BaseEventListener implements EventListener {
-    protected final Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private EventListenerContext context;
     private int eventCount = 0;
     private int exceptionCount = 0;
@@ -64,9 +64,7 @@ public abstract class BaseEventListener implements EventListener {
             // allow for ignoring events. Such event are not counted.
             return;
         }
-        if (logger.isDebugEnabled()) {
-            logger.debug("handling event {} with listener {}", event, this);
-        }
+        logger.debug("handling event {} with listener {}", event, this);
         countEvent(event);
         long startTime = System.currentTimeMillis();
         try {

@@ -19,6 +19,8 @@ import java.util.Set;
 
 import org.apache.jena.rdf.model.Model;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.event.AtomSpecificEvent;
@@ -61,6 +63,7 @@ import won.protocol.util.linkeddata.WonLinkedDataUtils;
  * </ul>
  */
 public class HintAssociatedAtomAction extends BaseEventBotAction {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private Optional<URI> targetSocketType = Optional.empty();
     private Optional<URI> localSocketType = Optional.empty();
     private URI matcherURI;

@@ -4,6 +4,8 @@ import java.net.URI;
 
 import javax.mail.internet.MimeMessage;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.support.GenericMessage;
 
@@ -22,6 +24,7 @@ import won.protocol.model.Connection;
  * Created by fsuda on 03.10.2016.
  */
 public class Connect2MailParserAction extends BaseEventBotAction {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private MessageChannel sendChannel;
     private WonMimeMessageGenerator mailGenerator;
 

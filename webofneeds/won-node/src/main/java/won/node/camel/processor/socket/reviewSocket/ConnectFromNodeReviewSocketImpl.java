@@ -10,6 +10,8 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import won.node.camel.processor.AbstractCamelProcessor;
@@ -29,6 +31,8 @@ import won.protocol.vocabulary.WXREVIEW;
 @Component
 @SocketMessageProcessor(socketType = WXREVIEW.ReviewSocketString, direction = WONMSG.FromExternalString, messageType = WONMSG.ConnectMessageString)
 public class ConnectFromNodeReviewSocketImpl extends AbstractCamelProcessor {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
     @Override
     public void process(final Exchange exchange) {
         Message message = exchange.getIn();

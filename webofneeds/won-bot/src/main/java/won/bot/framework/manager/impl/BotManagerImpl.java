@@ -18,7 +18,7 @@ import won.bot.framework.manager.BotManager;
  * BotManager, simple in-memory implementation.
  */
 public class BotManagerImpl implements BotManager {
-    protected final Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private List<Bot> bots = new LinkedList<Bot>();
     private Map<URI, Bot> botByUri = new HashMap<URI, Bot>();
     private Map<URI, List<Bot>> botListByUri = new HashMap<URI, List<Bot>>();

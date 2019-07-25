@@ -7,6 +7,8 @@ import java.util.Arrays;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.query.Dataset;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 
@@ -33,6 +35,7 @@ import won.protocol.util.WonRdfUtils;
  * Created by fsuda on 15.12.2016.
  */
 public class TelegramCreateAction extends AbstractCreateAtomAction {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private WonTelegramBotHandler wonTelegramBotHandler;
     private TelegramContentExtractor telegramContentExtractor;
 

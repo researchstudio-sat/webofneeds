@@ -15,6 +15,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.event.Event;
@@ -30,6 +32,8 @@ import won.protocol.util.WonRdfUtils;
  * to the second.
  */
 public class MatchAtomsAction extends BaseEventBotAction {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
     public MatchAtomsAction(final EventListenerContext eventListenerContext) {
         super(eventListenerContext);
     }

@@ -25,6 +25,8 @@ import org.javasimon.SimonManager;
 import org.javasimon.Split;
 import org.javasimon.Stopwatch;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.event.Event;
@@ -42,6 +44,7 @@ import won.protocol.message.WonMessage;
 import won.protocol.util.RdfUtils;
 
 public class MessageLifecycleMonitoringAction extends BaseEventBotAction {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     Map<String, Split> msgSplitsB = Collections.synchronizedMap(new HashMap<>());
     Map<String, Split> msgSplitsBC = Collections.synchronizedMap(new HashMap<>());
     Map<String, Split> msgSplitsBCD = Collections.synchronizedMap(new HashMap<>());

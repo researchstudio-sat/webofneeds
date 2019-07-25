@@ -12,8 +12,8 @@ package won.protocol.rest;
 
 import java.util.List;
 
-import org.hibernate.annotations.common.util.impl.LoggerFactory;
-import org.jboss.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
@@ -21,7 +21,7 @@ import org.springframework.http.MediaType;
  * Utils for our very specific way of creating/parsing etags.
  */
 public class WonEtagHelper {
-    private static final Logger logger = LoggerFactory.logger(WonEtagHelper.class);
+    private static final Logger logger = LoggerFactory.getLogger(WonEtagHelper.class);
     private static final char VERSION_MEDIATYPE_DELIMITER = ' ';
     private String version = null;
     private MediaType mediaType = null;

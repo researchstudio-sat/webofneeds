@@ -19,6 +19,8 @@ import java.util.Set;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.event.Event;
@@ -34,6 +36,7 @@ import won.protocol.util.WonRdfUtils;
  * messages via its connections spontaneously.
  */
 public class SendChattyMessageAction extends BaseEventBotAction {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private double probabilityOfSendingMessage = 0.1;
     private String[] messagesForShortInactivity;
     public static final String KEY_CHATTY_CONNECTIONS = "chattyConnections";

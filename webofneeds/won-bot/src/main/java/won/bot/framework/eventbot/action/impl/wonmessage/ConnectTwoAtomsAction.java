@@ -17,6 +17,8 @@ import java.util.Optional;
 
 import org.apache.jena.query.Dataset;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.event.Event;
@@ -34,6 +36,7 @@ import won.protocol.util.linkeddata.WonLinkedDataUtils;
  * used.
  */
 public class ConnectTwoAtomsAction extends BaseEventBotAction {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private Optional<URI> targetSocketType = Optional.empty();
     private Optional<URI> localSocketType = Optional.empty();
     private String welcomeMessage;

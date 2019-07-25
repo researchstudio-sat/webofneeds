@@ -5,6 +5,8 @@ import java.net.URI;
 import org.apache.camel.Exchange;
 import org.apache.jena.query.Dataset;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import won.node.camel.processor.AbstractCamelProcessor;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageDirection;
@@ -15,6 +17,8 @@ import won.protocol.model.MessageEventPlaceholder;
  * User: ypanchenko Date: 27.04.2015
  */
 public class ResponseResenderProcessor extends AbstractCamelProcessor {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
     @Override
     public void process(final Exchange exchange) throws Exception {
         WonMessage originalMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.ORIGINAL_MESSAGE_HEADER);

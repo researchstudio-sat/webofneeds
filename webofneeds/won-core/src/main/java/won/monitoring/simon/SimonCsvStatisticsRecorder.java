@@ -19,6 +19,8 @@ import org.javasimon.Sample;
 import org.javasimon.Simon;
 import org.javasimon.SimonManager;
 import org.javasimon.Stopwatch;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.supercsv.cellprocessor.Optional;
 import org.supercsv.cellprocessor.constraint.NotNull;
 import org.supercsv.cellprocessor.ift.CellProcessor;
@@ -32,6 +34,8 @@ import won.monitoring.AbstractFileOutputRecorder;
  * Recorder that writes the Simon stats to a csv file.
  */
 public class SimonCsvStatisticsRecorder extends AbstractFileOutputRecorder {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
     /**
      * Sets up the processors used.
      * 

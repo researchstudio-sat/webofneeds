@@ -1,5 +1,7 @@
 package won.bot.impl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.telegram.telegrambots.ApiContextInitializer;
 import org.telegram.telegrambots.TelegramBotsApi;
@@ -35,6 +37,7 @@ import won.bot.framework.eventbot.listener.impl.ActionOnEventListener;
  * 14.12.2016.
  */
 public class Telegram2WonBot extends EventBot {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private String botName;
     private String token;
     private EventBus bus;

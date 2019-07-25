@@ -4,6 +4,8 @@ import java.net.URI;
 
 import org.apache.jena.query.Dataset;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.action.EventBotActionUtils;
@@ -24,6 +26,8 @@ import won.protocol.util.WonRdfUtils;
  * Created by fsuda on 17.05.2017.
  */
 public class ExecuteDeactivateAtomCommandAction extends BaseEventBotAction {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
     public ExecuteDeactivateAtomCommandAction(EventListenerContext eventListenerContext) {
         super(eventListenerContext);
     }

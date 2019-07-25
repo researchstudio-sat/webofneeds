@@ -28,7 +28,7 @@ import won.protocol.model.Connection;
  * Basic Bot implementation intended to be extended. Does nothing.
  */
 public abstract class BaseBot implements Bot {
-    protected final Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private BotLifecyclePhase lifecyclePhase = BotLifecyclePhase.DOWN;
     private boolean workDone = false;
     @Autowired
@@ -53,7 +53,7 @@ public abstract class BaseBot implements Bot {
         try {
             botContextWrapper.getBotContext().saveToObjectMap("temp", "temp", "temp");
             Object o = botContextWrapper.getBotContext().loadFromObjectMap("temp", "temp");
-            Assert.isTrue(o.equals("temp"));
+            Assert.isTrue("temp".equals(o), "does not equal 'temp'");
         } catch (Exception e) {
             logger.error("Bot cannot establish connection with bot context");
             throw e;

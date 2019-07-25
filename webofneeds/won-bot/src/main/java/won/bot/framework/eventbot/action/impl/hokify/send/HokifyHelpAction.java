@@ -1,5 +1,7 @@
 package won.bot.framework.eventbot.action.impl.hokify.send;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.action.impl.hokify.WonHokifyJobBotHandler;
@@ -11,6 +13,7 @@ import won.bot.framework.eventbot.listener.EventListener;
  * Created by MS on 24.09.2018.
  */
 public class HokifyHelpAction extends BaseEventBotAction {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private WonHokifyJobBotHandler wonHokifyJobBotHandler;
 
     public HokifyHelpAction(EventListenerContext eventListenerContext, WonHokifyJobBotHandler wonHokifyJobBotHandler) {

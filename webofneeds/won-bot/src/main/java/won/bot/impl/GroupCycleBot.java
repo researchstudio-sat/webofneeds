@@ -18,6 +18,8 @@ import java.util.Set;
 
 import org.apache.jena.query.Dataset;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import won.bot.framework.bot.base.EventBot;
 import won.bot.framework.bot.context.GroupBotContextWrapper;
 import won.bot.framework.eventbot.EventListenerContext;
@@ -64,6 +66,7 @@ import won.protocol.util.WonRdfUtils;
  * that the group socket suppresses echos.
  */
 public class GroupCycleBot extends EventBot {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private final int NUMBER_OF_GROUPMEMBERS = 3;
     private final int NUMBER_OF_GROUPS = 10;
     private final ConnectionHolder connectionForFirstMessage = new ConnectionHolder();
@@ -327,6 +330,8 @@ public class GroupCycleBot extends EventBot {
     }
 
     private class ConnectGroupsBehaviour extends BotBehaviour {
+        private final Logger logger = LoggerFactory.getLogger(getClass());
+
         public ConnectGroupsBehaviour(EventListenerContext context) {
             super(context);
         }

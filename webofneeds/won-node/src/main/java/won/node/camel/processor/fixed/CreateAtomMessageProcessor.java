@@ -15,6 +15,8 @@ import org.apache.jena.query.Dataset;
 import org.javasimon.SimonManager;
 import org.javasimon.Split;
 import org.javasimon.Stopwatch;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import won.node.camel.processor.AbstractCamelProcessor;
@@ -40,6 +42,8 @@ import won.protocol.vocabulary.WONMSG;
 @Service
 @FixedMessageProcessor(direction = WONMSG.FromOwnerString, messageType = WONMSG.CreateMessageString)
 public class CreateAtomMessageProcessor extends AbstractCamelProcessor {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
     @Override
     public void process(final Exchange exchange) throws Exception {
         Message message = exchange.getIn();

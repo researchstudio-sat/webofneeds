@@ -20,6 +20,8 @@ import org.javasimon.SimonManager;
 import org.javasimon.Split;
 import org.javasimon.Stopwatch;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.event.Event;
@@ -32,6 +34,7 @@ import won.bot.framework.eventbot.listener.EventListener;
  * Created by hfriedrich on 02.10.2015.
  */
 public class MatchingLoadTestMonitorAction extends BaseEventBotAction {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     Map<String, Long> atomEventStartTime = Collections.synchronizedMap(new HashMap<>());
     Map<String, List<Long>> hintEventReceivedTime = Collections.synchronizedMap(new HashMap<>());
     Map<String, Split> atomSplits = Collections.synchronizedMap(new HashMap<>());

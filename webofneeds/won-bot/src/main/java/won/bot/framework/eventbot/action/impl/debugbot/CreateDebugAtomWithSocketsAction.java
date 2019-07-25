@@ -15,6 +15,8 @@ import java.net.URI;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.query.Dataset;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.EventBotActionUtils;
 import won.bot.framework.eventbot.action.impl.atomlifecycle.AbstractCreateAtomAction;
@@ -45,6 +47,7 @@ import won.protocol.vocabulary.WONMATCH;
  * chatSocket will be used.
  */
 public class CreateDebugAtomWithSocketsAction extends AbstractCreateAtomAction {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private Counter counter = new CounterImpl("DebugAtomsCounter");
     private boolean isInitialForHint;
     private boolean isInitialForConnect;

@@ -10,6 +10,8 @@ import javax.mail.internet.MimeMessage;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.query.Dataset;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import won.bot.framework.bot.context.MailBotContextWrapper;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.EventBotActionUtils;
@@ -32,6 +34,7 @@ import won.protocol.util.WonRdfUtils;
  * Created by fsuda on 30.09.2016.
  */
 public class CreateAtomFromMailAction extends AbstractCreateAtomAction {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private MailContentExtractor mailContentExtractor;
 
     public CreateAtomFromMailAction(EventListenerContext eventListenerContext,

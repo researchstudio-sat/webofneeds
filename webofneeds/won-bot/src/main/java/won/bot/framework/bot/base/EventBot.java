@@ -14,6 +14,8 @@ import java.net.URI;
 import java.util.concurrent.Executor;
 
 import org.apache.jena.query.Dataset;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.TaskScheduler;
 
 import won.bot.framework.bot.BotLifecyclePhase;
@@ -90,6 +92,7 @@ import won.protocol.util.linkeddata.LinkedDataSource;
  * on the internal event bus) if it is in lifecycle phase ACTIVE.
  */
 public abstract class EventBot extends TriggeredBot {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private EventBus eventBus;
     private EventListenerContext eventListenerContext = new MyEventListenerContext();
     private EventGeneratingWonMessageSenderWrapper wonMessageSenderWrapper;
@@ -391,6 +394,8 @@ public abstract class EventBot extends TriggeredBot {
      * ErrorEvents and will not react to a WorkDoneEvent.
      */
     private class ErrorEventListener extends BaseEventListener {
+        private final Logger logger = LoggerFactory.getLogger(getClass());
+
         public ErrorEventListener(EventListenerContext context) {
             super(context);
         }

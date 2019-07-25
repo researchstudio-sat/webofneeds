@@ -13,6 +13,8 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import won.bot.framework.bot.context.MailBotContextWrapper;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
@@ -39,6 +41,7 @@ import won.protocol.util.WonRdfUtils;
  * Created by fsuda on 18.10.2016.
  */
 public class MailCommandAction extends BaseEventBotAction {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private MailContentExtractor mailContentExtractor;
 
     public MailCommandAction(EventListenerContext eventListenerContext, MailContentExtractor mailContentExtractor) {

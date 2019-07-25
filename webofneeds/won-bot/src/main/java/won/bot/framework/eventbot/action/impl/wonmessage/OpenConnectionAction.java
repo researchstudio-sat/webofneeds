@@ -15,6 +15,8 @@ import java.util.Optional;
 
 import org.apache.jena.query.Dataset;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.action.BotActionUtils;
@@ -37,6 +39,7 @@ import won.protocol.util.linkeddata.WonLinkedDataUtils;
  * User: fkleedorfer Date: 30.01.14
  */
 public class OpenConnectionAction extends BaseEventBotAction {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private String welcomeMessage;
 
     public OpenConnectionAction(final EventListenerContext context, final String welcomeMessage) {

@@ -13,6 +13,8 @@ package won.bot.framework.eventbot.action.impl.wonmessage;
 import java.net.URI;
 import java.util.Date;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.action.BotActionUtils;
@@ -25,6 +27,7 @@ import won.bot.framework.eventbot.listener.EventListener;
  * configured to apply a timeout (non-blocking) before sending messages.
  */
 public class RespondToMessageAction extends BaseEventBotAction {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private long millisTimeoutBeforeReply = 0;
     private String message = null;
 

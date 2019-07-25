@@ -10,6 +10,8 @@
  */
 package won.bot.framework.eventbot.listener.impl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.EventBotAction;
 import won.bot.framework.eventbot.event.Event;
@@ -21,6 +23,7 @@ import won.bot.framework.eventbot.listener.BaseEventListener;
  * unregister after that number of events.
  */
 public class ActionOnEventListener extends BaseEventListener {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private EventBotAction task;
     private int timesRun = 0;
     private int timesToRun = -1;

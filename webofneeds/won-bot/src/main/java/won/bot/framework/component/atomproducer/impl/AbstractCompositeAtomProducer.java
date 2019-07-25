@@ -25,7 +25,7 @@ import won.bot.framework.component.atomproducer.AtomProducer;
  */
 public abstract class AbstractCompositeAtomProducer implements AtomProducer {
     private Set<AtomProducer> atomFactories = new HashSet<AtomProducer>();
-    protected final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(AbstractCompositeAtomProducer.class);
 
     @Override
     public synchronized Dataset create() {

@@ -14,6 +14,8 @@ import org.javasimon.Simon;
 import org.javasimon.SimonManager;
 import org.javasimon.utils.SimonUtils;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import won.monitoring.AbstractRecorder;
 
 /**
@@ -21,10 +23,12 @@ import won.monitoring.AbstractRecorder;
  * loglevel 'debug'.
  */
 public class SimonSysoutStatisticsRecorder extends AbstractRecorder {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
     @Override
     public void recordMonitoringStatistics() {
-        Simon rootSimon = SimonManager.getRootSimon();
         if (logger.isDebugEnabled()) {
+            Simon rootSimon = SimonManager.getRootSimon();
             logger.debug("Monitoring statistics: \n" + SimonUtils.simonTreeString(rootSimon));
         }
     }

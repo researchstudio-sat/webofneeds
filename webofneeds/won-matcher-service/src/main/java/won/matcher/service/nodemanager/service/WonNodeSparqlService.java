@@ -12,6 +12,8 @@ import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -28,6 +30,8 @@ import won.protocol.vocabulary.WON;
  */
 @Component
 public class WonNodeSparqlService extends SparqlService {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
     @Autowired
     public WonNodeSparqlService(@Value("${uri.sparql.endpoint}") final String sparqlEndpoint) {
         super(sparqlEndpoint);
@@ -45,8 +49,8 @@ public class WonNodeSparqlService extends SparqlService {
         ParameterizedSparqlString pps = new ParameterizedSparqlString();
         pps.setCommandText(queryString);
         pps.setNsPrefix("won", "https://w3id.org/won/core#");
-        log.debug("Query SPARQL Endpoint: {}", sparqlEndpoint);
-        log.debug("Execute query: {}", pps.toString());
+        logger.debug("Query SPARQL Endpoint: {}", sparqlEndpoint);
+        logger.debug("Execute query: {}", pps.toString());
         try (QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, pps.asQuery())) {
             ResultSet results = qexec.execSelect();
             while (results.hasNext()) {

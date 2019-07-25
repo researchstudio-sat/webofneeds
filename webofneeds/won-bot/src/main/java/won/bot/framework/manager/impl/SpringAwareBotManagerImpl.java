@@ -4,6 +4,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +29,7 @@ import won.bot.framework.bot.Bot;
  */
 public class SpringAwareBotManagerImpl extends BotManagerImpl
                 implements ApplicationContextAware, DisposableBean, ApplicationListener {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private ApplicationContext applicationContext;
     private Trigger checkWorkDoneTrigger = null;
     @Autowired

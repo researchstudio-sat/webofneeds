@@ -14,6 +14,8 @@ import java.net.URI;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import won.bot.framework.bot.base.EventBot;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
@@ -37,6 +39,7 @@ import won.protocol.util.WonRdfUtils;
  * Bot that connects the two last seen atoms using a hint.
  */
 public class LastSeenAtomsMatcherBot extends EventBot {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private BaseEventListener matcherRegistrator;
     private BaseEventListener matcherIndexer;
     private int registrationMatcherRetryInterval;

@@ -3,6 +3,8 @@ package won.bot.framework.eventbot.action.impl.hokify.send;
 import java.net.URI;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import won.bot.framework.bot.context.HokifyJobBotContextWrapper;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
@@ -19,6 +21,7 @@ import won.protocol.message.WonMessage;
  * Created by MS on 24.09.2018.
  */
 public class Hint2HokifyAction extends BaseEventBotAction {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     WonHokifyJobBotHandler wonHokifyJobBotHandler;
 
     public Hint2HokifyAction(EventListenerContext ctx) {

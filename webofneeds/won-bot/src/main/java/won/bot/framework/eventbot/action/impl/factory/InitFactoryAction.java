@@ -6,6 +6,8 @@ import java.time.Duration;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Resource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import won.bot.framework.bot.context.FactoryBotContextWrapper;
 import won.bot.framework.component.atomproducer.AtomProducer;
 import won.bot.framework.eventbot.EventListenerContext;
@@ -50,6 +52,7 @@ import won.protocol.util.WonRdfUtils;
  * InitFactoryFinishedEvent once it is completed
  */
 public class InitFactoryAction extends AbstractCreateAtomAction {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private static int FACTORYATOMCREATION_DURATION_INMILLIS = 250;
     private int targetInFlightCount;
     private int maxInFlightCount;

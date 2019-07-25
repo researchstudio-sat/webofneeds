@@ -43,7 +43,7 @@ import won.protocol.util.RdfUtils;
  */
 @Component
 public class SparqlService {
-    protected final Logger log = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     protected String sparqlEndpoint;
     // protected DatasetAccessor accessor;
 
@@ -91,7 +91,7 @@ public class SparqlService {
         String query = "";
         Iterator<String> graphNames = ds.listNames();
         while (graphNames.hasNext()) {
-            log.debug("Save dataset");
+            logger.debug("Save dataset");
             String graphName = graphNames.next();
             Model model = ds.getNamedModel(graphName);
             query += createUpdateNamedGraphQuery(graphName, model);
@@ -151,14 +151,14 @@ public class SparqlService {
      */
     public void executeUpdateQuery(String updateQuery) {
         try {
-            log.debug("Update SPARQL Endpoint: {}", sparqlEndpoint);
-            log.debug("Execute query: {}", updateQuery);
+            logger.debug("Update SPARQL Endpoint: {}", sparqlEndpoint);
+            logger.debug("Execute query: {}", updateQuery);
             UpdateRequest query = UpdateFactory.create(updateQuery);
             UpdateProcessRemote riStore = (UpdateProcessRemote) UpdateExecutionFactory.createRemote(query,
                             sparqlEndpoint);
             riStore.execute();
         } catch (QueryParseException e) {
-            log.warn("Error parsing update query: " + updateQuery, e);
+            logger.warn("Error parsing update query: " + updateQuery, e);
         }
     }
 }

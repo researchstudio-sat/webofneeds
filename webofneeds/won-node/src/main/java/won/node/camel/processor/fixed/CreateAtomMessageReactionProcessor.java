@@ -16,6 +16,8 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.ModelFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -37,6 +39,7 @@ import won.protocol.vocabulary.WONMSG;
 @Service
 @FixedMessageReactionProcessor(direction = WONMSG.FromOwnerString, messageType = WONMSG.CreateMessageString)
 public class CreateAtomMessageReactionProcessor extends AbstractCamelProcessor {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     @Autowired
     AtomRepository atomRepository;
 

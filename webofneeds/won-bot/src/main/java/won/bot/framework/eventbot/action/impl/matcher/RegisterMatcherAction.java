@@ -15,6 +15,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.action.EventBotActionUtils;
@@ -26,6 +28,7 @@ import won.bot.framework.eventbot.listener.EventListener;
  * User: fkleedorfer Date: 28.03.14
  */
 public class RegisterMatcherAction extends BaseEventBotAction {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private List<URI> registeredNodes = new LinkedList<>();
 
     public RegisterMatcherAction(final EventListenerContext eventListenerContext) {

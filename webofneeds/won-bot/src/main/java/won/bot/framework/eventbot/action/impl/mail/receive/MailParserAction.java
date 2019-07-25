@@ -5,6 +5,8 @@ import java.io.IOException;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import won.bot.framework.bot.context.MailBotContextWrapper;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
@@ -21,6 +23,7 @@ import won.bot.framework.eventbot.listener.EventListener;
  * Created by fsuda on 30.09.2016.
  */
 public class MailParserAction extends BaseEventBotAction {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private MailContentExtractor mailContentExtractor;
 
     public MailParserAction(EventListenerContext eventListenerContext, MailContentExtractor mailContentExtractor) {

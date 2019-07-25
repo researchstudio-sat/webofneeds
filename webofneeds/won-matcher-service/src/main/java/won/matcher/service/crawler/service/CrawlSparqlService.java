@@ -15,6 +15,8 @@ import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -35,6 +37,7 @@ import won.protocol.util.AtomModelWrapper;
  */
 @Component
 public class CrawlSparqlService extends SparqlService {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private static final String HTTP_HEADER_SEPARATOR = ", ";
 
     @Autowired
@@ -137,8 +140,8 @@ public class CrawlSparqlService extends SparqlService {
         pps.setNsPrefix("won", "https://w3id.org/won/core#");
         pps.setCommandText(queryString);
         pps.setLiteral("status", status.toString());
-        log.debug("Query SPARQL Endpoint: {}", sparqlEndpoint);
-        log.debug("Execute query: {}", pps.toString());
+        logger.debug("Query SPARQL Endpoint: {}", sparqlEndpoint);
+        logger.debug("Execute query: {}", pps.toString());
         try (QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, pps.asQuery())) {
             ResultSet results = qexec.execSelect();
             while (results.hasNext()) {
@@ -157,7 +160,7 @@ public class CrawlSparqlService extends SparqlService {
                 }
                 msg = new CrawlUriMessage(uri, baseUri, wonNode, CrawlUriMessage.STATUS.PROCESS,
                                 System.currentTimeMillis(), etags);
-                log.debug("Created message: {}", msg);
+                logger.debug("Created message: {}", msg);
                 msgs.add(msg);
             }
             return msgs;
@@ -258,8 +261,8 @@ public class CrawlSparqlService extends SparqlService {
         }
         pps.setIri("baseUriWithoutTrailingSlash", baseUri);
         pps.setIri("baseUriWithTrailingSlash", baseUri + "/");
-        log.debug("Query SPARQL Endpoint: {}", sparqlEndpoint);
-        log.debug("Execute query: {}", pps.toString());
+        logger.debug("Query SPARQL Endpoint: {}", sparqlEndpoint);
+        logger.debug("Execute query: {}", pps.toString());
         try (QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, pps.asQuery())) {
             ResultSet results = qexec.execSelect();
             while (results.hasNext()) {
@@ -271,7 +274,7 @@ public class CrawlSparqlService extends SparqlService {
                     etags = commaConcatenatedStringToSet(etagsString);
                 }
                 CrawlUriMessage newUriMsg = null;
-                log.debug("Extracted URI: {}", extractedUri);
+                logger.debug("Extracted URI: {}", extractedUri);
                 if (baseProperty) {
                     newUriMsg = new CrawlUriMessage(extractedUri, extractedUri, wonNodeUri,
                                     CrawlUriMessage.STATUS.PROCESS, crawlDate, etags);
@@ -349,7 +352,7 @@ public class CrawlSparqlService extends SparqlService {
         // query template to retrieve all alctive cralwed/saved atoms in a certain date
         // range
         String orderClause = sortAscending ? "ORDER BY ?date\n" : "ORDER BY DESC(?date)\n";
-        log.debug("bulk load atom data from sparql endpoint in date range: [{},{}]", fromDate, toDate);
+        logger.debug("bulk load atom data from sparql endpoint in date range: [{},{}]", fromDate, toDate);
         String queryTemplate = "SELECT ?atomUri ?wonNodeUri ?date WHERE {  \n" + "  ?atomUri a won:Atom. \n"
                         + "  ?atomUri won:crawlDate ?date.  \n" + "  ?atomUri won:atomState won:Active. \n"
                         + "  ?atomUri won:wonNode ?wonNodeUri. \n"
@@ -363,8 +366,8 @@ public class CrawlSparqlService extends SparqlService {
         pps.setLiteral("toDate", toDate);
         pps.setLiteral("offset", offset);
         pps.setLiteral("limit", limit);
-        log.debug("Query SPARQL Endpoint: {}", sparqlEndpoint);
-        log.debug("Execute query: {}", pps.toString());
+        logger.debug("Query SPARQL Endpoint: {}", sparqlEndpoint);
+        logger.debug("Execute query: {}", pps.toString());
         try (QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, pps.asQuery())) {
             ResultSet results = qexec.execSelect();
             // load all the atoms into one bulk atom event
@@ -383,7 +386,7 @@ public class CrawlSparqlService extends SparqlService {
                     bulkAtomEvent.addAtomEvent(atomEvent);
                 }
             }
-            log.debug("number of atom events created: " + bulkAtomEvent.getAtomEvents().size());
+            logger.debug("number of atom events created: " + bulkAtomEvent.getAtomEvents().size());
             return bulkAtomEvent;
         }
     }

@@ -27,7 +27,7 @@ import won.bot.framework.eventbot.listener.EventListener;
  *
  */
 public abstract class BaseEventBotAction implements won.bot.framework.eventbot.action.EventBotAction {
-    protected final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(BaseEventBotAction.class);
     private EventListenerContext eventListenerContext;
     private static final String EXCEPTION_TAG = "failed";
     private final String stopwatchName = getClass().getName();

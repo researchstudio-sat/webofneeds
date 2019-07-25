@@ -13,6 +13,8 @@ package won.node.camel.processor.fixed;
 import java.net.URI;
 
 import org.apache.camel.Exchange;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import won.node.camel.processor.AbstractCamelProcessor;
@@ -28,6 +30,8 @@ import won.protocol.vocabulary.WONMSG;
 @Component
 @FixedMessageProcessor(direction = WONMSG.FromSystemString, messageType = WONMSG.DeactivateMessageString)
 public class DeactivateMessageFromSystemProcessor extends AbstractCamelProcessor {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
     @Override
     public void process(Exchange exchange) throws Exception {
         WonMessage wonMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
