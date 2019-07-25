@@ -28,8 +28,6 @@ import org.bouncycastle.jce.ECNamedCurveTable;
 import org.bouncycastle.jce.interfaces.ECPublicKey;
 import org.bouncycastle.jce.spec.ECNamedCurveParameterSpec;
 import org.bouncycastle.jce.spec.ECPublicKeySpec;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import won.cryptography.exception.KeyNotSupportedException;
 import won.cryptography.key.KeyInformationExtractor;
@@ -45,8 +43,6 @@ import won.protocol.vocabulary.WON;
  * 27.03.2015
  */
 public class WonKeysReaderWriter {
-    private static final Logger logger = LoggerFactory.getLogger(WonKeysReaderWriter.class);
-
     public WonKeysReaderWriter() {
     }
 
@@ -165,8 +161,7 @@ public class WonKeysReaderWriter {
                 return ret;
             }
         });
-        Set<String> ret = new HashSet<>();
-        ret.addAll(keyRefs);
+        Set<String> ret = new HashSet<>(keyRefs);
         return ret;
     }
 

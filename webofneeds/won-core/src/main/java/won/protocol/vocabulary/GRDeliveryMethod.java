@@ -1,5 +1,6 @@
 package won.protocol.vocabulary;
 
+import java.lang.invoke.MethodHandles;
 import java.net.URI;
 
 import org.slf4j.Logger;
@@ -12,7 +13,7 @@ public enum GRDeliveryMethod {
     DELIVERY_MODE_DIRECT_DOWNLOAD("DeliveryModeDirectDownload"), DELIVERY_MODE_FREIGHT("DeliveryModeFreight"),
     DELIVERY_MODE_MAIL("DeliveryModeMail"), DELIVERY_MODE_OWN_FLEET("DeliveryModeOwnFleet"),
     DELIVERY_MODE_PICK_UP("DeliveryModePickUp");
-    private static final Logger logger = LoggerFactory.getLogger(GRDeliveryMethod.class);
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private String name;
 
     private GRDeliveryMethod(String name) {

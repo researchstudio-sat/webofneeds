@@ -12,6 +12,7 @@ package won.monitoring;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.invoke.MethodHandles;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -26,7 +27,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class AbstractFileOutputRecorder extends AbstractRecorder {
     private static final String TEMPDIR_PREFIX = "monitoringStatsCSV";
-    private static final Logger logger = LoggerFactory.getLogger(AbstractFileOutputRecorder.class);
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private File outputDirectory;
     /**
      * DateFormat pattern for creating the filename for the date it is written.

@@ -10,6 +10,7 @@
  */
 package won.protocol.util.linkeddata;
 
+import java.lang.invoke.MethodHandles;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.ZonedDateTime;
@@ -33,7 +34,6 @@ import org.apache.jena.shared.impl.PrefixMappingImpl;
 import org.apache.jena.sparql.path.Path;
 import org.apache.jena.sparql.path.PathParser;
 import org.apache.jena.vocabulary.RDFS;
-import org.bouncycastle.asn1.sec.SECNamedCurves;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,7 +51,7 @@ import won.protocol.vocabulary.WONMSG;
  * Utilitiy functions for common linked data lookups.
  */
 public class WonLinkedDataUtils {
-    private static final Logger logger = LoggerFactory.getLogger(WonLinkedDataUtils.class);
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public static URI getConnectionStateforConnectionURI(URI connectionURI, LinkedDataSource linkedDataSource) {
         assert linkedDataSource != null : "linkedDataSource must not be null";

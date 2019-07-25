@@ -7,8 +7,6 @@ import java.security.interfaces.ECPublicKey;
 import java.security.spec.ECParameterSpec;
 
 import org.bouncycastle.jce.spec.ECNamedCurveSpec;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import won.cryptography.exception.KeyNotSupportedException;
 
@@ -16,8 +14,6 @@ import won.cryptography.exception.KeyNotSupportedException;
  * User: fsalcher Date: 24.07.2014
  */
 public class KeyInformationExtractorBouncyCastle implements KeyInformationExtractor {
-    private static final Logger logger = LoggerFactory.getLogger(KeyInformationExtractorBouncyCastle.class);
-
     public String getAlgorithm(Key key) {
         return key.getAlgorithm();
     }

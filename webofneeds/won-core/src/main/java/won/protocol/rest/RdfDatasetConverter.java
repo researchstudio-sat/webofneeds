@@ -1,6 +1,7 @@
 package won.protocol.rest;
 
 import java.io.IOException;
+import java.lang.invoke.MethodHandles;
 import java.util.Arrays;
 import java.util.List;
 
@@ -11,7 +12,6 @@ import org.apache.jena.riot.RDFFormat;
 import org.apache.jena.riot.RDFLanguages;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.MediaType;
@@ -32,7 +32,7 @@ import won.protocol.util.RdfUtils;
  * </p>
  */
 public class RdfDatasetConverter extends AbstractHttpMessageConverter<Dataset> {
-    private static final Logger logger = LoggerFactory.getLogger(RdfDatasetConverter.class);
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static final MediaType[] supportedMediaTypes = {
                     RDFMediaType.APPLICATION_TRIG,
                     RDFMediaType.APPLICATION_NQUADS,

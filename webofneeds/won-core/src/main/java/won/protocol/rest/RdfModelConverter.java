@@ -11,6 +11,7 @@
 package won.protocol.rest;
 
 import java.io.IOException;
+import java.lang.invoke.MethodHandles;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -38,7 +39,7 @@ import org.springframework.http.converter.HttpMessageNotWritableException;
  * formats jena supports, plus JSON-LD
  */
 public class RdfModelConverter extends AbstractHttpMessageConverter<Model> {
-    private static final Logger logger = LoggerFactory.getLogger(RdfModelConverter.class);
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public RdfModelConverter() {
         this(buildMediaTypeArray());
@@ -84,7 +85,7 @@ public class RdfModelConverter extends AbstractHttpMessageConverter<Model> {
     private static MediaType[] buildMediaTypeArray() {
         // now register the media types this converter can handle
         Collection<Lang> languages = RDFLanguages.getRegisteredLanguages();
-        Set<MediaType> mediaTypeSet = new HashSet<MediaType>();
+        Set<MediaType> mediaTypeSet = new HashSet<>();
         for (Lang lang : languages) {
             if (datasetWriterExistsForLang(lang)) {
                 ContentType ct = lang.getContentType();
@@ -93,7 +94,7 @@ public class RdfModelConverter extends AbstractHttpMessageConverter<Model> {
                 mediaTypeSet.add(mt);
             }
         }
-        return mediaTypeSet.toArray(new MediaType[mediaTypeSet.size()]);
+        return mediaTypeSet.toArray(new MediaType[0]);
     }
 
     private static boolean datasetWriterExistsForLang(Lang lang) {

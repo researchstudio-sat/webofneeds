@@ -6,8 +6,6 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.jena.query.Dataset;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
 import org.telegram.telegrambots.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.api.objects.replykeyboard.buttons.InlineKeyboardButton;
@@ -21,7 +19,6 @@ import won.protocol.util.WonRdfUtils;
  * Created by fsuda on 16.12.2016.
  */
 public class TelegramMessageGenerator {
-    private static final Logger logger = LoggerFactory.getLogger(TelegramMessageGenerator.class);
     private EventListenerContext eventListenerContext;
 
     public SendMessage getHintMessage(Long chatId, URI targetAtomUri, URI yourAtomUri) {

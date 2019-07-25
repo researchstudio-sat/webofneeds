@@ -2,6 +2,7 @@ package won.utils.crawl.app;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.lang.invoke.MethodHandles;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -42,7 +43,7 @@ import won.protocol.vocabulary.sparql.WonQueries;
  */
 @Component
 public class CLRunnerBean implements CommandLineRunner {
-    private static final Logger logger = LoggerFactory.getLogger(CLRunnerBean.class);
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private LinkedDataSource linkedDataSource;
 
     @Override
@@ -165,7 +166,7 @@ public class CLRunnerBean implements CommandLineRunner {
      * Build the property paths needed for crawling atom data
      */
     private static List<Path> configurePropertyPaths() {
-        List<Path> propertyPaths = new ArrayList<Path>();
+        List<Path> propertyPaths = new ArrayList<>();
         addPropertyPath(propertyPaths, "<" + WON.connections + ">");
         addPropertyPath(propertyPaths, "<" + WON.connections + ">" + "/" + "rdfs:member");
         addPropertyPath(propertyPaths,
@@ -178,7 +179,7 @@ public class CLRunnerBean implements CommandLineRunner {
     }
 
     private static List<Path> configurePropertyPathAll() {
-        List<Path> propertyPaths = new ArrayList<Path>();
+        List<Path> propertyPaths = new ArrayList<>();
         addPropertyPath(propertyPaths, "rdfs:member");
         addPropertyPath(propertyPaths, "rdfs:member/" + "<" + WON.connections + ">");
         addPropertyPath(propertyPaths, "rdfs:member/" + "<" + WON.connections + ">" + "/" + "rdfs:member");

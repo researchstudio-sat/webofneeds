@@ -10,6 +10,7 @@
  */
 package won.bot.framework.eventbot.action;
 
+import java.lang.invoke.MethodHandles;
 import java.net.URI;
 
 import org.slf4j.Logger;
@@ -29,7 +30,7 @@ import won.protocol.message.WonMessage;
  * User: fkleedorfer Date: 02.02.14
  */
 public class EventBotActionUtils {
-    private static final Logger logger = LoggerFactory.getLogger(EventBotActionUtils.class);
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public static void rememberInList(EventListenerContext ctx, URI uri, String uriListName) {
         if (uriListName != null && uriListName.trim().length() > 0) {

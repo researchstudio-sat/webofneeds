@@ -10,6 +10,7 @@
  */
 package won.bot.framework.component.atomproducer.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -24,8 +25,8 @@ import won.bot.framework.component.atomproducer.AtomProducer;
  * delegate request is not guaranteed. Not thread safe.
  */
 public abstract class AbstractCompositeAtomProducer implements AtomProducer {
-    private Set<AtomProducer> atomFactories = new HashSet<AtomProducer>();
-    private static final Logger logger = LoggerFactory.getLogger(AbstractCompositeAtomProducer.class);
+    private Set<AtomProducer> atomFactories = new HashSet<>();
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override
     public synchronized Dataset create() {

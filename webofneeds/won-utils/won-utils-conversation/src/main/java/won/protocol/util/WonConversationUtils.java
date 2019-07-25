@@ -1,5 +1,6 @@
 package won.protocol.util;
 
+import java.lang.invoke.MethodHandles;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -20,7 +21,7 @@ import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
 
 public class WonConversationUtils {
-    private static final Logger logger = LoggerFactory.getLogger(WonConversationUtils.class);
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private static <T> T getFirstOrNull(Dataset dataset, Function<Dataset, List<T>> function) {
         // RDFDataMgr.write(System.err, dataset, Lang.TRIG);
@@ -126,7 +127,7 @@ public class WonConversationUtils {
 
     private static boolean recrawl(Set<URI> recrawled, URI connectionUri, URI atomUri,
                     LinkedDataSource linkedDataSource, URI... uris) {
-        Set<URI> urisToCrawl = new HashSet<URI>();
+        Set<URI> urisToCrawl = new HashSet<>();
         Arrays.stream(uris).filter(x -> !recrawled.contains(x)).forEach(urisToCrawl::add);
         if (urisToCrawl.isEmpty()) {
             if (logger.isDebugEnabled()) {

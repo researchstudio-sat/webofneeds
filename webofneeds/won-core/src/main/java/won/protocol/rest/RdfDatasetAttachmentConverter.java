@@ -10,8 +10,6 @@ import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.NodeIterator;
 import org.apache.jena.rdf.model.Property;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.MediaType;
@@ -28,7 +26,6 @@ import won.protocol.vocabulary.WONMSG;
  * User: fsalcher Date: 15.09.2014
  */
 public class RdfDatasetAttachmentConverter extends AbstractHttpMessageConverter<Dataset> {
-    private static final Logger logger = LoggerFactory.getLogger(RdfDatasetAttachmentConverter.class);
     private static final MediaType[] supportedMediaTypes = { MediaType.ALL // we can do this because we have placed a
                                                                            // hack
                                                                            // in the LinkedDataWebController that

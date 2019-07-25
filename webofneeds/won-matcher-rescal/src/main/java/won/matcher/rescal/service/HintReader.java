@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,7 +30,7 @@ import won.matcher.utils.tensor.TensorMatchingData;
  */
 @Component
 public class HintReader {
-    private static final Logger log = LoggerFactory.getLogger(HintReader.class);
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     @Autowired
     private RescalMatcherConfig config;
 
@@ -50,7 +51,7 @@ public class HintReader {
         // connection entries)
         fis = new FileInputStream(config.getExecutionDirectory() + "/output/hints.mtx");
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(fis, "UTF-8"));
-        StringBuffer stringBuffer = new StringBuffer();
+        StringBuilder stringBuffer = new StringBuilder();
         while ((line = bufferedReader.readLine()) != null) {
             if (line.startsWith("%%MatrixMarket")) {
                 if (!line.contains("row-major") || !line.contains("column-major")) {
@@ -70,8 +71,8 @@ public class HintReader {
             // IllegalArgumentException can occur here if we have no atoms and thus now
             // hints, catch this case and return
             // null to indicate no hints were found
-            log.warn("Cannot load hint matrix file. This can happen if no hints were created");
-            log.debug("Exception was: ", e);
+            logger.warn("Cannot load hint matrix file. This can happen if no hints were created");
+            logger.debug("Exception was: ", e);
             return null;
         }
         // create the hint events and return them in one bulk hint object

@@ -10,6 +10,7 @@
  */
 package won.protocol.rest;
 
+import java.lang.invoke.MethodHandles;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -21,7 +22,7 @@ import org.springframework.http.MediaType;
  * Utils for our very specific way of creating/parsing etags.
  */
 public class WonEtagHelper {
-    private static final Logger logger = LoggerFactory.getLogger(WonEtagHelper.class);
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static final char VERSION_MEDIATYPE_DELIMITER = ' ';
     private String version = null;
     private MediaType mediaType = null;

@@ -4,6 +4,7 @@ import static won.protocol.util.RdfUtils.findOnePropertyFromResource;
 import static won.protocol.util.RdfUtils.findOrCreateBaseResource;
 import static won.protocol.util.RdfUtils.visit;
 
+import java.lang.invoke.MethodHandles;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -54,7 +55,6 @@ import org.apache.jena.sparql.algebra.op.OpProject;
 import org.apache.jena.sparql.algebra.op.OpUnion;
 import org.apache.jena.sparql.core.BasicPattern;
 import org.apache.jena.sparql.core.Var;
-import org.apache.jena.sparql.function.library.leviathan.sec;
 import org.apache.jena.sparql.path.Path;
 import org.apache.jena.sparql.path.PathParser;
 import org.apache.jena.tdb.TDB;
@@ -87,17 +87,14 @@ import won.protocol.vocabulary.WONMSG;
  */
 public class WonRdfUtils {
     public static final String NAMED_GRAPH_SUFFIX = "#data";
-    private static final Logger logger = LoggerFactory.getLogger(WonRdfUtils.class);
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public static class SignatureUtils {
         public static boolean isSignatureGraph(String graphUri, Model model) {
             // TODO check the presence of all the required triples
             Resource resource = model.getResource(graphUri);
             StmtIterator si = model.listStatements(resource, RDF.type, SFSIG.SIGNATURE);
-            if (si.hasNext()) {
-                return true;
-            }
-            return false;
+            return si.hasNext();
         }
 
         public static boolean isSignature(Model model, String modelName) {
@@ -372,10 +369,7 @@ public class WonRdfUtils {
                 return messageModel;
             for (URI uri : toAccept) {
                 if (uri != null) {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("checking uri for addProposesToCancel{} with uri {} ({} of {})",
-                                        new Object[] { uri });
-                    }
+                    logger.debug("checking uri for addProposesToCancel with uri {}", uri);
                     baseRes.addProperty(WONAGR.accepts, baseRes.getModel().getResource(uri.toString()));
                 }
             }
@@ -388,10 +382,7 @@ public class WonRdfUtils {
                 return messageModel;
             for (URI uri : toProposesToCancel) {
                 if (uri != null) {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("checking uri for addProposesToCancel{} with uri {} ({} of {})",
-                                        new Object[] { uri });
-                    }
+                    logger.debug("checking uri for addProposesToCancel with uri {}", uri);
                     baseRes.addProperty(WONAGR.proposesToCancel, baseRes.getModel().getResource(uri.toString()));
                 }
             }
@@ -672,7 +663,7 @@ public class WonRdfUtils {
                 ResultSet rs = qexec.execSelect();
                 if (rs.hasNext()) {
                     QuerySolution qs = rs.nextSolution();
-                    Map<Property, String> reviewData = new HashMap<Property, String>();
+                    Map<Property, String> reviewData = new HashMap<>();
                     reviewData.put(SCHEMA.REVIEW, rdfNodeToString(qs.get("review")));
                     reviewData.put(SCHEMA.RATING, rdfNodeToString(qs.get("rating")));
                     reviewData.put(SCHEMA.ABOUT, rdfNodeToString(qs.get("about")));
@@ -711,9 +702,8 @@ public class WonRdfUtils {
         }
 
         public static WonMessage copyByDatasetSerialization(final WonMessage toWrap) {
-            WonMessage copied = new WonMessage(RdfUtils.readDatasetFromString(
+            return new WonMessage(RdfUtils.readDatasetFromString(
                             RdfUtils.writeDatasetToString(toWrap.getCompleteDataset(), Lang.TRIG), Lang.TRIG));
-            return copied;
         }
     }
 
@@ -809,10 +799,7 @@ public class WonRdfUtils {
             if (!firstDef.isPresent()) {
                 throw new IllegalArgumentException("No socket definition found for " + firstAtomSocket);
             }
-            if (!secondCompatibleDefs.isEmpty() && !secondCompatibleDefs.contains(firstDef.get())) {
-                return false;
-            }
-            return true;
+            return secondCompatibleDefs.isEmpty() || secondCompatibleDefs.contains(firstDef.get());
         }
 
         public static Optional<URI> getSocketDefinition(Dataset dataset, URI socket) {
@@ -873,7 +860,7 @@ public class WonRdfUtils {
         public static Collection<URI> getSockets(Model content) {
             Resource baseRes = RdfUtils.getBaseResource(content);
             StmtIterator stmtIterator = baseRes.listProperties(WON.socket);
-            LinkedList<URI> ret = new LinkedList<URI>();
+            LinkedList<URI> ret = new LinkedList<>();
             while (stmtIterator.hasNext()) {
                 RDFNode object = stmtIterator.nextStatement().getObject();
                 if (object.isURIResource()) {
@@ -936,7 +923,7 @@ public class WonRdfUtils {
         public static Collection<URI> getSocketsOfType(Model model, Resource subject, URI socketType) {
             StmtIterator stmtIterator = subject.listProperties(WON.socket);
             Resource socketTypeResource = model.getResource(socketType.toString());
-            LinkedList<URI> ret = new LinkedList<URI>();
+            LinkedList<URI> ret = new LinkedList<>();
             while (stmtIterator.hasNext()) {
                 RDFNode socket = stmtIterator.nextStatement().getObject();
                 if (socket.isResource() && socket.isURIResource()) {
@@ -1328,7 +1315,7 @@ public class WonRdfUtils {
             if (!unions.isPresent()) {
                 return Collections.EMPTY_SET;
             }
-            Op op = new OpProject((Op) unions.get(), Arrays.asList(Var.alloc("remoteCon")));
+            Op op = new OpProject((Op) unions.get(), Collections.singletonList(Var.alloc("remoteCon")));
             Query q = OpAsQuery.asQuery(op);
             q.setQuerySelectType();
             Set<URI> result = new HashSet();

@@ -1,5 +1,6 @@
 package won.cryptogrpahy.service;
 
+import java.lang.invoke.MethodHandles;
 import java.security.KeyPair;
 
 import org.junit.Assert;
@@ -18,7 +19,7 @@ import won.cryptography.service.KeyPairService;
  * User: fsalcher Date: 17.07.2014
  */
 public class CryptographyServiceTest {
-    private final Logger LOGGER = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private ApplicationContext context;
 
     @Before
@@ -49,13 +50,13 @@ public class CryptographyServiceTest {
         KeyInformationExtractorBouncyCastle extractor = new KeyInformationExtractorBouncyCastle();
         try {
             Assert.assertEquals("ECDSA", extractor.getAlgorithm(keypair.getPublic()));
-            LOGGER.debug("algorithm: " + extractor.getAlgorithm(keypair.getPublic()));
+            logger.debug("algorithm: " + extractor.getAlgorithm(keypair.getPublic()));
             Assert.assertEquals("brainpoolp384r1", extractor.getCurveID(keypair.getPublic()));
-            LOGGER.debug("curveID: " + extractor.getCurveID(keypair.getPublic()));
+            logger.debug("curveID: " + extractor.getCurveID(keypair.getPublic()));
             Assert.assertNotNull(extractor.getQX(keypair.getPublic()));
-            LOGGER.debug("qx: " + extractor.getQX(keypair.getPublic()));
+            logger.debug("qx: " + extractor.getQX(keypair.getPublic()));
             Assert.assertNotNull(extractor.getQY(keypair.getPublic()));
-            LOGGER.debug("qy: " + extractor.getQY(keypair.getPublic()));
+            logger.debug("qy: " + extractor.getQY(keypair.getPublic()));
         } catch (KeyNotSupportedException ex) {
             Assert.fail(ex.getMessage());
         }
@@ -68,13 +69,13 @@ public class CryptographyServiceTest {
         KeyInformationExtractorBouncyCastle extractor = new KeyInformationExtractorBouncyCastle();
         try {
             Assert.assertEquals("ECDSA", extractor.getAlgorithm(keypair.getPublic()));
-            LOGGER.debug("algorithm: " + extractor.getAlgorithm(keypair.getPublic()));
+            logger.debug("algorithm: " + extractor.getAlgorithm(keypair.getPublic()));
             Assert.assertEquals("secp384r1", extractor.getCurveID(keypair.getPublic()));
-            LOGGER.debug("curveID: " + extractor.getCurveID(keypair.getPublic()));
+            logger.debug("curveID: " + extractor.getCurveID(keypair.getPublic()));
             Assert.assertNotNull(extractor.getQX(keypair.getPublic()));
-            LOGGER.debug("qx: " + extractor.getQX(keypair.getPublic()));
+            logger.debug("qx: " + extractor.getQX(keypair.getPublic()));
             Assert.assertNotNull(extractor.getQY(keypair.getPublic()));
-            LOGGER.debug("qy: " + extractor.getQY(keypair.getPublic()));
+            logger.debug("qy: " + extractor.getQY(keypair.getPublic()));
         } catch (KeyNotSupportedException ex) {
             Assert.fail(ex.getMessage());
         }
