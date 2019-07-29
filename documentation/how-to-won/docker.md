@@ -33,5 +33,6 @@ WoN components:
 
 - The scripts define the `deploy_host` which represents the docker local network address: Check if this matches your local docker network address
 - The scripts define a default `base_folder`: Change it to another existing folder
+- If the scripts say that the `base_folder` does not exist, you might create this folder, or change the path to an existing in the script
 
 For a more detailed overview about the WoN docker setup see [here](/webofneeds/won-docker/README.md).
