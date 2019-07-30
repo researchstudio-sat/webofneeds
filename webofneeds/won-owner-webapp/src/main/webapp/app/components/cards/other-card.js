@@ -1,14 +1,15 @@
 import angular from "angular";
 import "ng-redux";
 import atomMapModule from "../atom-map.js";
-import atomSuggestionsIndicatorModule from "../atom-suggestions-indicator.js";
 import { actionCreators } from "../../actions/actions.js";
 import { relativeTime } from "../../won-label-utils.js";
-import { getIn, get } from "../../utils.js";
+import { get, getIn } from "../../utils.js";
 import { attach } from "../../cstm-ng-utils.js";
 import { connect2Redux } from "../../configRedux.js";
 import { selectLastUpdateTime } from "../../redux/selectors/general-selectors.js";
 import * as atomUtils from "../../redux/utils/atom-utils.js";
+import preactModule from "../preact-module.js";
+import WonAtomSuggestionsIndicator from "../atom-suggestions-indicator.jsx";
 
 import "~/style/_other-card.scss";
 import Immutable from "immutable";
@@ -110,17 +111,14 @@ function genComponentConf() {
       <div class="card__nopersona" ng-if="::self.showPersona && !self.persona && self.atomHasHoldableSocket">
           <span class="card__nopersona__label">No Persona attached</span>
       </div>
-      <won-atom-suggestions-indicator
-          ng-if="::self.showSuggestions"
-          class="card__indicators"
-          atom-uri="::self.atomUri"
-          on-selected="::self.showAtomSuggestions(self.atomUri)">
-      </won-atom-suggestions-indicator>
+      <won-preact component="self.WonAtomSuggestionsIndicator" class="card__indicators" props="::{atomUri: self.atomUri}"></won-preact>
     `;
 
   class Controller {
     constructor() {
       attach(this, serviceDependencies, arguments);
+
+      this.WonAtomSuggestionsIndicator = WonAtomSuggestionsIndicator;
 
       const selectFromState = state => {
         const atom = getIn(state, ["atoms", this.atomUri]);
@@ -244,8 +242,5 @@ function genComponentConf() {
 }
 
 export default angular
-  .module("won.owner.components.otherCard", [
-    atomMapModule,
-    atomSuggestionsIndicatorModule,
-  ])
+  .module("won.owner.components.otherCard", [atomMapModule, preactModule])
   .directive("wonOtherCard", genComponentConf).name;
