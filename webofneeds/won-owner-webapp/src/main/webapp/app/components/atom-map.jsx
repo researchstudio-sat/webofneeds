@@ -24,12 +24,13 @@ export default class WonAtomMap extends React.Component {
       const currentLocationTupel = currentLocation && [currentLocation.get("lat"), currentLocation.get("lng")];
       const firstLocationTupel = locations[0] && [locations[0].get("lat"), locations[0].get("lng")];
 
-      const locationMarkers = locations.map(location => {
+      const locationMarkers = locations.map((location, index) => {
           const lat = location && location.get("lat");
           const lng = location && location.get("lng");
           if (lat != undefined && lng != undefined) {
             const locationTupel = [lat, lng];
-            return <Marker key={locationTupel.toString()} position={locationTupel} />;
+            //We should use key here, but i do not know if we can find a unique key from the provided properties :-/
+            return <Marker key={locationTupel.toString() + "/" + index} position={locationTupel} />;
           }
       });
 

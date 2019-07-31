@@ -126,7 +126,7 @@ main.ownerinventory {
     }
   }
 
-  .ownerinventory__content {
+  .ownerinventory__content > won-preact {
     display: grid;
     padding: 1rem;
     grid-gap: 1rem;
@@ -136,6 +136,10 @@ main.ownerinventory {
     > won-atom-card {
       border: $thinGrayBorder;
     }
+  }
+
+  .ownerinventory__content {
+    padding: 1rem;
 
     .ownerinventory__content__createatom {
       border: $thinGrayBorder;
