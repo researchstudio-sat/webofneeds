@@ -18,7 +18,7 @@ import * as wonLabelUtils from "../won-label-utils.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as useCaseUtils from "../usecase-utils.js";
 import preactModule from "../components/preact-module.js";
-import WonAtomCard from "../components/atom-card.jsx";
+import WonAtomCardGrid from "../components/atom-card-grid.jsx";
 import {h} from "preact";
 
 import "~/style/_overview.scss";
@@ -110,9 +110,11 @@ const template = (
             className="owneroverview__usecases__usecase__atoms"
             ng-if="self.isUseCaseExpanded(ucIdentifier)"
           >
-            <won-preact className="owneroverview__usecases__usecase__atoms__atom" component="self.WonAtomCard"
-                        props="{ atomUri: atomUri, currentLocation: self.currentLocation, showSuggestions: false, showPersona: true }"
-                        ng-repeat="atomUri in self.getSortedVisibleAtomUriArrayByUseCase(ucIdentifier) track by atomUri"/>
+            <won-preact
+              component="self.WonAtomCardGrid"
+              props="{ atomUris: self.getSortedVisibleAtomUriArrayByUseCase(ucIdentifier), currentLocation: self.currentLocation, showSuggestions: false, showPersona: true }"
+              ng-if="self.hasVisibleAtomUris"
+            />
           </div>
         </div>
         <div className="owneroverview__usecases__usecase" ng-if="self.hasOtherAtoms()">
@@ -138,9 +140,10 @@ const template = (
             className="owneroverview__usecases__usecase__atoms"
             ng-if="self.isUseCaseExpanded(undefined)"
           >
-            <won-preact className="owneroverview__usecases__usecase__atoms__atom" component="self.WonAtomCard"
-                        props="{ atomUri: atomUri, currentLocation: self.currentLocation, showSuggestions: false, showPersona: true }"
-                        ng-repeat="atomUri in self.getSortedVisibleOtherAtomUriArray() track by atomUri"/>
+            <won-preact
+              component="self.WonAtomCardGrid"
+              props="{ atomUris: self.getSortedVisibleOtherAtomUriArray(), currentLocation: self.currentLocation, showSuggestions: false, showPersona: true }"
+            />
           </div>
         </div>
       </div>
@@ -164,7 +167,7 @@ class Controller {
     window.overview4dbg = this;
     this.open = [];
 
-    this.WonAtomCard = WonAtomCard;
+    this.WonAtomCardGrid = WonAtomCardGrid;
 
     const selectFromState = state => {
       const viewConnUri = generalSelectors.getViewConnectionUriFromRoute(state);

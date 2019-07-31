@@ -264,14 +264,14 @@ main.ownermap {
     }
   }
 
-  .ownermap__content {
+  .ownermap__content > won-preact {
     display: grid;
     padding: 1rem;
     grid-gap: 1rem;
 
     grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
 
-    .ownermap__content__atom {
+    > won-atom-card {
       border: $thinGrayBorder;
     }
   }

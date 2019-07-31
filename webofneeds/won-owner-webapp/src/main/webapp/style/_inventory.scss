@@ -133,7 +133,7 @@ main.ownerinventory {
 
     grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
 
-    .ownerinventory__content__atom {
+    > won-atom-card {
       border: $thinGrayBorder;
     }
 

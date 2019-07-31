@@ -18,7 +18,7 @@ import wonInput from "../directives/input.js";
 import {h} from "preact";
 import * as accountUtils from "../redux/utils/account-utils.js";
 import preactModule from "../components/preact-module.js";
-import WonAtomCard from "../components/atom-card.jsx";
+import WonAtomCardGrid from "../components/atom-card-grid.jsx";
 import WonAtomMap from "../components/atom-map.jsx";
 
 import "~/style/_map.scss";
@@ -201,10 +201,11 @@ const template = (
         className="ownermap__content"
         ng-if="self.lastWhatsAroundLocation && self.hasVisibleAtomUris"
       >
-        <won-preact className="ownermap__content__atom" component="self.WonAtomCard"
-                    props="{ atomUri: atomUri, currentLocation: self.lastWhatsAroundLocation, showSuggestions: false, showPersona: true }"
-                    ng-repeat="atomUri in self.sortedVisibleAtomUriArray track by atomUri"
-                    ng-if="self.hasVisibleAtomUris"/>
+        <won-preact
+          component="self.WonAtomCardGrid"
+          props="{ atomUris: self.sortedVisibleAtomUriArray, currentLocation: self.lastWhatsAroundLocation, showSuggestions: false, showPersona: true }"
+          ng-if="self.hasVisibleAtomUris"
+        />
       </div>
       <div
         className="ownermap__noresults"
@@ -226,7 +227,7 @@ class Controller {
     attach(this, serviceDependencies, arguments);
     window.ownermap4dbg = this;
     this.WonAtomMap = WonAtomMap;
-    this.WonAtomCard = WonAtomCard;
+    this.WonAtomCardGrid = WonAtomCardGrid;
 
     const selectFromState = state => {
       const viewConnUri = generalSelectors.getViewConnectionUriFromRoute(state);

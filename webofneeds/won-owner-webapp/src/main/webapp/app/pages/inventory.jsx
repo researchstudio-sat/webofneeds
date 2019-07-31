@@ -15,7 +15,7 @@ import * as processUtils from "../redux/utils/process-utils.js";
 import * as accountUtils from "../redux/utils/account-utils.js";
 import * as viewUtils from "../redux/utils/view-utils.js";
 import preactModule from "../components/preact-module.js";
-import WonAtomCard from "../components/atom-card.jsx";
+import WonAtomCardGrid from "../components/atom-card-grid.jsx";
 
 import {h} from "preact";
 
@@ -71,9 +71,10 @@ const template = (
         className="ownerinventory__content"
         ng-if="self.hasOwnedUnassignedAtomUris"
       >
-        <won-preact class="ownerinventory__content__atom" component="self.WonAtomCard"
-                    props="{ atomUri: atomUri, currentLocation: self.currentLocation, showSuggestions: true, showPersona: true }"
-                    ng-repeat="atomUri in self.sortedOwnedUnassignedAtomUriArray track by atomUri"></won-preact>
+        <won-preact
+          component="self.WonAtomCardGrid"
+          props="{ atomUris: self.sortedOwnedUnassignedAtomUriArray, currentLocation: self.currentLocation, showSuggestions: true, showPersona: true }"
+        />
         <div
           className="ownerinventory__content__createatom"
           ng-click="self.router__stateGo('create')"
@@ -129,9 +130,10 @@ const template = (
         className="ownerinventory__content"
         ng-if="self.showClosedAtoms && self.hasOwnedInactiveAtomUris"
       >
-        <won-preact className="ownerinventory__content__atom" component="self.WonAtomCard"
-                    props="{ atomUri: atomUri, currentLocation: self.currentLocation, showSuggestions: false, showPersona: false }"
-                    ng-repeat="atomUri in self.sortedOwnedInactiveAtomUriArray track by atomUri"/>
+        <won-preact
+          component="self.WonAtomCardGrid"
+          props="{ atomUris: self.sortedOwnedInactiveAtomUriArray, currentLocation: self.currentLocation, showSuggestions: false, showPersona: false }"
+        />
       </div>
     </main>
     <won-footer />
@@ -144,7 +146,7 @@ class Controller {
     attach(this, serviceDependencies, arguments);
     window.inventory4dbg = this;
 
-    this.WonAtomCard = WonAtomCard;
+    this.WonAtomCardGrid = WonAtomCardGrid;
     const selectFromState = state => {
       const viewConnUri = generalSelectors.getViewConnectionUriFromRoute(state);
 
