@@ -1,6 +1,5 @@
 import angular from "angular";
 import "ng-redux";
-import otherCardModule from "./cards/other-card.js";
 import { actionCreators } from "../actions/actions.js";
 import { get, getIn } from "../utils.js";
 import { attach } from "../cstm-ng-utils.js";
@@ -10,6 +9,7 @@ import * as processUtils from "../redux/utils/process-utils.js";
 import preactModule from "./preact-module.js";
 import WonSkeletonCard from "./cards/skeleton-card.jsx";
 import WonPersonaCard from "./cards/persona-card.jsx";
+import WonOtherCard from "./cards/other-card.jsx";
 
 import "~/style/_atom-card.scss";
 
@@ -23,14 +23,7 @@ function genComponentConf() {
     <won-preact class="won-persona-card" component="self.WonPersonaCard" props="{atomUri: self.atomUri, disableDefaultAtomInteraction: self.disableDefaultAtomInteraction}" ng-if="self.isPersona"></won-preact>
     
     <!-- OTHER POSTS VIEW -->
-    <won-other-card
-        ng-if="self.isOtherAtom"
-        atom-uri="self.atomUri"
-        current-location="self.currentLocation"
-        show-persona="self.showPersona"
-        show-suggestions="::self.showSuggestions"
-        disable-default-atom-interaction="self.disableDefaultAtomInteraction">
-    </won-other-card>    
+    <won-preact class="won-other-card" component="self.WonOtherCard"  props="{atomUri: self.atomUri, showSuggestions: self.showSuggestions, showPersona: self.showPersona, disableDefaultAtomInteraction: self.disableDefaultAtomInteraction, currentLocation: self.currentLocation}" ng-if="self.isOtherAtom"></won-preact>
     `;
 
   class Controller {
@@ -39,6 +32,7 @@ function genComponentConf() {
 
       this.WonSkeletonCard = WonSkeletonCard;
       this.WonPersonaCard = WonPersonaCard;
+      this.WonOtherCard = WonOtherCard;
 
       const selectFromState = state => {
         const atom = getIn(state, ["atoms", this.atomUri]);
@@ -107,5 +101,5 @@ function genComponentConf() {
 }
 
 export default angular
-  .module("won.owner.components.atomCard", [preactModule, otherCardModule])
+  .module("won.owner.components.atomCard", [preactModule])
   .directive("wonAtomCard", genComponentConf).name;
