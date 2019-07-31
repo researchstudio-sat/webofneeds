@@ -3,7 +3,6 @@
  */
 
 import angular from "angular";
-import atomCardModule from "./atom-card.js";
 import { getIn } from "../utils.js";
 import { attach } from "../cstm-ng-utils.js";
 import { connect2Redux } from "../configRedux.js";
@@ -12,20 +11,17 @@ import { actionCreators } from "../actions/actions.js";
 import ngAnimate from "angular-animate";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import "~/style/_atom-content-holds.scss";
+import preactModule from "./preact-module.js";
+import WonAtomCard from "./atom-card.jsx";
 
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
   let template = `
-      <won-atom-card
-          class="ach__atom"
-          atom-uri="::heldAtomUri"
-          current-location="self.currentLocation"
-          ng-repeat="heldAtomUri in self.heldAtomUrisArray track by heldAtomUri"
-          ng-click="self.router__stateGo('post', { postUri: heldAtomUri })"
-          ng-if="self.hasHeldAtoms"
-          show-suggestions="self.isOwned"
-          show-persona="::false"
-      ></won-atom-card>
+      <won-preact class="ach__atom" component="self.WonAtomCard"
+                        props="{ atomUri: heldAtomUri, currentLocation: self.currentLocation, showSuggestions: self.isOwned, showPersona: false }"
+                        ng-repeat="heldAtomUri in self.heldAtomUrisArray track by heldAtomUri"
+                        ng-if="self.hasHeldAtoms"></won-preact>
+      
       <div class="ach__createatom"
           ng-if="self.isOwned"
           ng-click="self.router__stateGo('create', {holderUri: self.atomUri})"
@@ -45,6 +41,7 @@ function genComponentConf() {
     constructor() {
       attach(this, serviceDependencies, arguments);
       window.atomContentHolds4dbg = this;
+      this.WonAtomCard = WonAtomCard;
 
       const selectFromState = state => {
         const atom = getIn(state, ["atoms", this.atomUri]);
@@ -74,5 +71,5 @@ function genComponentConf() {
 }
 
 export default angular
-  .module("won.owner.components.atomContentHolds", [ngAnimate, atomCardModule])
+  .module("won.owner.components.atomContentHolds", [ngAnimate, preactModule])
   .directive("wonAtomContentHolds", genComponentConf).name;

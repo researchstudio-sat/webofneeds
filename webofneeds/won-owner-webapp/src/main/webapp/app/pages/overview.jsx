@@ -5,12 +5,11 @@
  */
 import angular from "angular";
 import ngAnimate from "angular-animate";
-import { getIn, get, delay, sortByDate } from "../utils.js";
-import { attach } from "../cstm-ng-utils.js";
-import { connect2Redux } from "../configRedux.js";
-import { actionCreators } from "../actions/actions.js";
+import {delay, get, getIn, sortByDate} from "../utils.js";
+import {attach, classOnComponentRoot} from "../cstm-ng-utils.js";
+import {connect2Redux} from "../configRedux.js";
+import {actionCreators} from "../actions/actions.js";
 import postMessagesModule from "../components/post-messages.js";
-import atomCardModule from "../components/atom-card.js";
 import postHeaderModule from "../components/post-header.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as viewSelectors from "../redux/selectors/view-selectors.js";
@@ -18,8 +17,9 @@ import * as processUtils from "../redux/utils/process-utils.js";
 import * as wonLabelUtils from "../won-label-utils.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as useCaseUtils from "../usecase-utils.js";
-import { h } from "preact";
-import { classOnComponentRoot } from "../cstm-ng-utils.js";
+import preactModule from "../components/preact-module.js";
+import WonAtomCard from "../components/atom-card.jsx";
+import {h} from "preact";
 
 import "~/style/_overview.scss";
 import "~/style/_connection-overlay.scss";
@@ -110,14 +110,9 @@ const template = (
             className="owneroverview__usecases__usecase__atoms"
             ng-if="self.isUseCaseExpanded(ucIdentifier)"
           >
-            <won-atom-card
-              className="owneroverview__usecases__usecase__atoms__atom"
-              atom-uri="atomUri"
-              current-location="self.currentLocation"
-              ng-repeat="atomUri in self.getSortedVisibleAtomUriArrayByUseCase(ucIdentifier) track by atomUri"
-              show-suggestions="::false"
-              show-persona="::true"
-            />
+            <won-preact className="owneroverview__usecases__usecase__atoms__atom" component="self.WonAtomCard"
+                        props="{ atomUri: atomUri, currentLocation: self.currentLocation, showSuggestions: false, showPersona: true }"
+                        ng-repeat="atomUri in self.getSortedVisibleAtomUriArrayByUseCase(ucIdentifier) track by atomUri"/>
           </div>
         </div>
         <div className="owneroverview__usecases__usecase" ng-if="self.hasOtherAtoms()">
@@ -143,14 +138,9 @@ const template = (
             className="owneroverview__usecases__usecase__atoms"
             ng-if="self.isUseCaseExpanded(undefined)"
           >
-            <won-atom-card
-              className="owneroverview__usecases__usecase__atoms__atom"
-              atom-uri="atomUri"
-              current-location="self.currentLocation"
-              ng-repeat="atomUri in self.getSortedVisibleOtherAtomUriArray() track by atomUri"
-              show-suggestions="::false"
-              show-persona="::true"
-            />
+            <won-preact className="owneroverview__usecases__usecase__atoms__atom" component="self.WonAtomCard"
+                        props="{ atomUri: atomUri, currentLocation: self.currentLocation, showSuggestions: false, showPersona: true }"
+                        ng-repeat="atomUri in self.getSortedVisibleOtherAtomUriArray() track by atomUri"/>
           </div>
         </div>
       </div>
@@ -173,6 +163,8 @@ class Controller {
     attach(this, serviceDependencies, arguments);
     window.overview4dbg = this;
     this.open = [];
+
+    this.WonAtomCard = WonAtomCard;
 
     const selectFromState = state => {
       const viewConnUri = generalSelectors.getViewConnectionUriFromRoute(state);
@@ -334,7 +326,7 @@ export default {
     .module("won.owner.components.overview", [
       ngAnimate,
       postMessagesModule,
-      atomCardModule,
+      preactModule,
       postHeaderModule,
     ])
     .controller("OverviewController", Controller).name,

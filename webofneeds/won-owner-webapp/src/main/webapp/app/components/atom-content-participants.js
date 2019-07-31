@@ -7,7 +7,7 @@ import inviewModule from "angular-inview";
 import labelledHrModule from "./labelled-hr.js";
 import postHeaderModule from "./post-header.js";
 import suggestPostPickerModule from "./details/picker/suggestpost-picker.js";
-import { getIn, get } from "../utils.js";
+import { get, getIn } from "../utils.js";
 import { attach } from "../cstm-ng-utils.js";
 import won from "../won-es6.js";
 import { connect2Redux } from "../configRedux.js";
@@ -16,6 +16,8 @@ import * as connectionSelectors from "../redux/selectors/connection-selectors.js
 import * as connectionUtils from "../redux/utils/connection-utils.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import { actionCreators } from "../actions/actions.js";
+import preactModule from "./preact-module.js";
+import WonAtomCard from "./atom-card.jsx";
 import ngAnimate from "angular-animate";
 
 import "~/style/_atom-content-participants.scss";
@@ -29,13 +31,7 @@ function genComponentConf() {
           class="acp__participant"
           ng-if="!self.isOwned && self.groupMembers"
           ng-repeat="memberUri in self.groupMembersArray track by memberUri">
-          <won-atom-card
-              class="clickable"
-              atom-uri="::memberUri"
-              current-location="self.currentLocation"
-              show-suggestions="::false"
-              show-persona="::true"
-          ></won-atom-card>
+          <won-preact class="clickable" component="self.WonAtomCard" props="{ atomUri: memberUri, currentLocation: self.currentLocation, showSuggestions: false, showPersona: true }"></won-preact>
           <div class="acp__participant__actions"></div>
       </div>
       <div class="acp__participant"
@@ -43,13 +39,7 @@ function genComponentConf() {
           ng-repeat="conn in self.groupChatConnectionsArray"
           in-view="conn.get('unread') && $inview && self.markAsRead(conn)"
           ng-class="{'won-unread': conn.get('unread')}">
-          <won-atom-card
-              class="clickable"
-              atom-uri="::conn.get('targetAtomUri')"
-              current-location="self.currentLocation"
-              show-suggestions="::false"
-              show-persona="::true"
-          ></won-atom-card>
+          <won-preact class="clickable" component="self.WonAtomCard" props="{ atomUri: conn.get('targetAtomUri'), currentLocation: self.currentLocation, showSuggestions: false, showPersona: true }"></won-preact>
           <div class="acp__participant__actions">
               <div
                 class="acp__participant__actions__button red won-button--outlined thin"
@@ -107,6 +97,7 @@ function genComponentConf() {
       this.won = won;
       this.suggestAtomExpanded = false;
       window.postcontentparticipants4dbg = this;
+      this.WonAtomCard = WonAtomCard;
 
       const selectFromState = state => {
         const post = getIn(state, ["atoms", this.atomUri]);
@@ -273,6 +264,7 @@ export default angular
     labelledHrModule,
     postHeaderModule,
     suggestPostPickerModule,
+    preactModule,
     inviewModule.name,
   ])
   .directive("wonAtomContentParticipants", genComponentConf).name;

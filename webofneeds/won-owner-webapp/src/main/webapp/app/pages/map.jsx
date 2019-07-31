@@ -8,7 +8,6 @@ import Immutable from "immutable";
 import {connect2Redux} from "../configRedux.js";
 import {actionCreators} from "../actions/actions.js";
 import postMessagesModule from "../components/post-messages.js";
-import atomCardModule from "../components/atom-card.js";
 import postHeaderModule from "../components/post-header.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as viewSelectors from "../redux/selectors/view-selectors.js";
@@ -19,6 +18,7 @@ import wonInput from "../directives/input.js";
 import {h} from "preact";
 import * as accountUtils from "../redux/utils/account-utils.js";
 import preactModule from "../components/preact-module.js";
+import WonAtomCard from "../components/atom-card.jsx";
 import WonAtomMap from "../components/atom-map.jsx";
 
 import "~/style/_map.scss";
@@ -201,15 +201,10 @@ const template = (
         className="ownermap__content"
         ng-if="self.lastWhatsAroundLocation && self.hasVisibleAtomUris"
       >
-        <won-atom-card
-          className="ownermap__content__atom"
-          atom-uri="atomUri"
-          current-location="self.lastWhatsAroundLocation"
-          ng-repeat="atomUri in self.sortedVisibleAtomUriArray track by atomUri"
-          ng-if="self.hasVisibleAtomUris"
-          show-suggestions="::false"
-          show-persona="::true"
-        />
+        <won-preact className="ownermap__content__atom" component="self.WonAtomCard"
+                    props="{ atomUri: atomUri, currentLocation: self.lastWhatsAroundLocation, showSuggestions: false, showPersona: true }"
+                    ng-repeat="atomUri in self.sortedVisibleAtomUriArray track by atomUri"
+                    ng-if="self.hasVisibleAtomUris"/>
       </div>
       <div
         className="ownermap__noresults"
@@ -231,6 +226,8 @@ class Controller {
     attach(this, serviceDependencies, arguments);
     window.ownermap4dbg = this;
     this.WonAtomMap = WonAtomMap;
+    this.WonAtomCard = WonAtomCard;
+
     const selectFromState = state => {
       const viewConnUri = generalSelectors.getViewConnectionUriFromRoute(state);
 
@@ -530,7 +527,6 @@ export default {
       ngAnimate,
       postMessagesModule,
       preactModule,
-      atomCardModule,
       postHeaderModule,
       wonInput,
     ])

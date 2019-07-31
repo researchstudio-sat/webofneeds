@@ -4,10 +4,11 @@
 
 import angular from "angular";
 import inviewModule from "angular-inview";
-import atomCardModule from "./atom-card.js";
 import { attach } from "../cstm-ng-utils.js";
 import { connect2Redux } from "../configRedux.js";
 import { actionCreators } from "../actions/actions.js";
+import preactModule from "./preact-module.js";
+import WonAtomCard from "./atom-card.jsx";
 import ngAnimate from "angular-animate";
 
 import "~/style/_atom-content-suggestions.scss";
@@ -26,15 +27,10 @@ function genComponentConf() {
         ng-if="self.hasSuggestions"
         in-view="suggestion.get('unread') && $inview && self.markAsRead(suggestion)"
         ng-class="{'won-unread': suggestion.get('unread')}">
-          <won-atom-card
-              class="clickable"
-              atom-uri="::suggestion.get('targetAtomUri')"
-              current-location="self.currentLocation"
-              ng-click="self.viewSuggestion(suggestion)"
-              show-suggestions="::false"
-              show-persona="::true"
-              disable-default-atom-interaction="::true"
-          ></won-atom-card>
+          <won-preact class="clickable" component="self.WonAtomCard"
+                        props="{ atomUri: suggestion.get('targetAtomUri'), currentLocation: self.currentLocation, showSuggestions: false, showPersona: true, disableDefaultAtomInteraction: true }"
+                        ng-if="self.hasHeldAtoms"
+                        ng-click="self.viewSuggestion(suggestion)"></won-preact>
           <div class="acs__atom__actions">
               <div
                   class="acs__atom__actions__button red won-button--filled"
@@ -58,6 +54,7 @@ function genComponentConf() {
     constructor() {
       attach(this, serviceDependencies, arguments);
       window.atomContentSuggestions4dbg = this;
+      this.WonAtomCard = WonAtomCard;
 
       const selectFromState = state => {
         const suggestions = connectionSelectors.getSuggestedConnectionsByAtomUri(
@@ -168,7 +165,7 @@ function genComponentConf() {
 export default angular
   .module("won.owner.components.atomContentSuggestions", [
     ngAnimate,
-    atomCardModule,
+    preactModule,
     inviewModule.name,
   ])
   .directive("wonAtomContentSuggestions", genComponentConf).name;

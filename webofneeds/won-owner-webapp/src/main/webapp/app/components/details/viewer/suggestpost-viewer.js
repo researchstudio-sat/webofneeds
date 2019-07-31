@@ -1,8 +1,9 @@
 import angular from "angular";
 import "ng-redux";
 import { actionCreators } from "../../../actions/actions.js";
-import atomCardModule from "../../atom-card.js";
-import { getIn, get } from "../../../utils.js";
+import preactModule from "../../preact-module.js";
+import WonAtomCard from "../../atom-card.jsx";
+import { get, getIn } from "../../../utils.js";
 import { attach } from "../../../cstm-ng-utils.js";
 import { connect2Redux } from "../../../configRedux.js";
 import * as atomUtils from "../../../redux/utils/atom-utils.js";
@@ -21,15 +22,9 @@ function genComponentConf() {
         </div>
         <div class="suggestpostv__content">
           <div class="suggestpostv__content__post">            
-            <won-atom-card
-                class="clickable"
-                atom-uri="::self.content"
-                current-location="self.currentLocation"
-                ng-click="self.router__stateGo('post', { postUri: self.content })"
-                ng-disabled="!self.fetchedSuggestion"
-                show-suggestions="::false"
-                show-persona="::true"
-            ></won-atom-card>
+            <won-preact class="clickable" component="self.WonAtomCard"
+                        props="{ atomUri: self.content, currentLocation: self.currentLocation, showSuggestions: false, showPersona: true }"
+                        ng-disabled="!self.fetchedSuggestion"></won-preact>
             <div class="suggestpostv__content__post__actions"
               ng-if="self.showActions">
               <button class="suggestpostv__content__post__actions__button won-button--outlined thin red"
@@ -64,6 +59,7 @@ function genComponentConf() {
     constructor() {
       attach(this, serviceDependencies, arguments);
       window.suggestpostv4dbg = this;
+      this.WonAtomCard = WonAtomCard;
 
       const selectFromState = state => {
         const openedConnectionUri = generalSelectors.getConnectionUriFromRoute(
@@ -246,5 +242,5 @@ function genComponentConf() {
 }
 
 export default angular
-  .module("won.owner.components.suggestpostViewer", [atomCardModule])
+  .module("won.owner.components.suggestpostViewer", [preactModule])
   .directive("wonSuggestpostViewer", genComponentConf).name;

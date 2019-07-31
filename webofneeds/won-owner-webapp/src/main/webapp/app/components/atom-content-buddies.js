@@ -5,9 +5,8 @@
 import angular from "angular";
 import inviewModule from "angular-inview";
 import labelledHrModule from "./labelled-hr.js";
-import atomCardModule from "./atom-card.js";
 import suggestPostPickerModule from "./details/picker/suggestpost-picker.js";
-import { getIn, get } from "../utils.js";
+import { get, getIn } from "../utils.js";
 import { attach } from "../cstm-ng-utils.js";
 import won from "../won-es6.js";
 import { connect2Redux } from "../configRedux.js";
@@ -15,6 +14,8 @@ import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as connectionSelectors from "../redux/selectors/connection-selectors.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import { actionCreators } from "../actions/actions.js";
+import preactModule from "./preact-module.js";
+import WonAtomCard from "./atom-card.jsx";
 import ngAnimate from "angular-animate";
 
 import "~/style/_atom-content-buddies.scss";
@@ -28,13 +29,7 @@ function genComponentConf() {
           class="acb__buddy"
           ng-if="!self.isOwned && self.hasBuddies"
           ng-repeat="memberUri in self.buddiesArray track by memberUri">
-          <won-atom-card
-              class="clickable"
-              atom-uri="::memberUri"
-              current-location="self.currentLocation"
-              show-suggestions="::false"
-              show-persona="::false"
-          ></won-atom-card>
+          <won-preact class="clickable" component="self.WonAtomCard" props="{ atomUri: memberUri, currentLocation: self.currentLocation, showSuggestions: false, showPersona: false }"></won-preact>
           <div class="acb__buddy__actions"></div>
       </div>
       <div class="acb__buddy"
@@ -42,13 +37,7 @@ function genComponentConf() {
           ng-repeat="conn in self.buddyConnectionsArray"
           in-view="conn.get('unread') && $inview && self.markAsRead(conn)"
           ng-class="{'won-unread': conn.get('unread')}">
-          <won-atom-card
-              class="clickable"
-              atom-uri="::conn.get('targetAtomUri')"
-              current-location="self.currentLocation"
-              show-suggestions="::false"
-              show-persona="::false"
-          ></won-atom-card>
+          <won-preact class="clickable" component="self.WonAtomCard" props="{ atomUri: conn.get('targetAtomUri'), currentLocation: self.currentLocation, showSuggestions: false, showPersona: false }"></won-preact>
           <div class="acb__buddy__actions">
               <div
                 class="acb__buddy__actions__button red won-button--filled"
@@ -106,6 +95,7 @@ function genComponentConf() {
       this.won = won;
       this.suggestAtomExpanded = false;
       window.atomContentBuddies4dbg = this;
+      this.WonAtomCard = WonAtomCard;
 
       const selectFromState = state => {
         const atom = getIn(state, ["atoms", this.atomUri]);
@@ -321,7 +311,7 @@ export default angular
   .module("won.owner.components.atomContentBuddies", [
     ngAnimate,
     labelledHrModule,
-    atomCardModule,
+    preactModule,
     suggestPostPickerModule,
     inviewModule.name,
   ])

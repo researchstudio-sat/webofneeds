@@ -2,12 +2,11 @@
 
 import angular from "angular";
 import ngAnimate from "angular-animate";
-import { get, getIn, sortByDate } from "../utils.js";
-import { attach } from "../cstm-ng-utils.js";
-import { connect2Redux } from "../configRedux.js";
-import { actionCreators } from "../actions/actions.js";
+import {get, getIn, sortByDate} from "../utils.js";
+import {attach, classOnComponentRoot} from "../cstm-ng-utils.js";
+import {connect2Redux} from "../configRedux.js";
+import {actionCreators} from "../actions/actions.js";
 import postMessagesModule from "../components/post-messages.js";
-import atomCardModule from "../components/atom-card.js";
 import howToModule from "../components/howto.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as viewSelectors from "../redux/selectors/view-selectors.js";
@@ -15,9 +14,10 @@ import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as processUtils from "../redux/utils/process-utils.js";
 import * as accountUtils from "../redux/utils/account-utils.js";
 import * as viewUtils from "../redux/utils/view-utils.js";
-import { classOnComponentRoot } from "../cstm-ng-utils.js";
+import preactModule from "../components/preact-module.js";
+import WonAtomCard from "../components/atom-card.jsx";
 
-import { h } from "preact";
+import {h} from "preact";
 
 import "~/style/_inventory.scss";
 import "~/style/_connection-overlay.scss";
@@ -71,14 +71,9 @@ const template = (
         className="ownerinventory__content"
         ng-if="self.hasOwnedUnassignedAtomUris"
       >
-        <won-atom-card
-          className="ownerinventory__content__atom"
-          atom-uri="atomUri"
-          current-location="self.currentLocation"
-          ng-repeat="atomUri in self.sortedOwnedUnassignedAtomUriArray track by atomUri"
-          show-suggestions="::true"
-          show-persona="::false"
-        />
+        <won-preact class="ownerinventory__content__atom" component="self.WonAtomCard"
+                    props="{ atomUri: atomUri, currentLocation: self.currentLocation, showSuggestions: true, showPersona: true }"
+                    ng-repeat="atomUri in self.sortedOwnedUnassignedAtomUriArray track by atomUri"></won-preact>
         <div
           className="ownerinventory__content__createatom"
           ng-click="self.router__stateGo('create')"
@@ -134,14 +129,9 @@ const template = (
         className="ownerinventory__content"
         ng-if="self.showClosedAtoms && self.hasOwnedInactiveAtomUris"
       >
-        <won-atom-card
-          className="ownerinventory__content__atom"
-          atom-uri="atomUri"
-          current-location="self.currentLocation"
-          ng-repeat="atomUri in self.sortedOwnedInactiveAtomUriArray track by atomUri"
-          show-suggestions="::false"
-          show-persona="::false"
-        />
+        <won-preact className="ownerinventory__content__atom" component="self.WonAtomCard"
+                    props="{ atomUri: atomUri, currentLocation: self.currentLocation, showSuggestions: false, showPersona: false }"
+                    ng-repeat="atomUri in self.sortedOwnedInactiveAtomUriArray track by atomUri"/>
       </div>
     </main>
     <won-footer />
@@ -154,6 +144,7 @@ class Controller {
     attach(this, serviceDependencies, arguments);
     window.inventory4dbg = this;
 
+    this.WonAtomCard = WonAtomCard;
     const selectFromState = state => {
       const viewConnUri = generalSelectors.getViewConnectionUriFromRoute(state);
 
@@ -250,7 +241,7 @@ export default {
     .module("won.owner.components.inventory", [
       ngAnimate,
       postMessagesModule,
-      atomCardModule,
+      preactModule,
       howToModule,
     ])
     .controller("InventoryController", [...serviceDependencies, Controller])

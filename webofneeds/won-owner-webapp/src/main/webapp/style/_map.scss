@@ -271,7 +271,7 @@ main.ownermap {
 
     grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
 
-    won-atom-card.ownermap__content__atom {
+    .ownermap__content__atom {
       border: $thinGrayBorder;
     }
   }
