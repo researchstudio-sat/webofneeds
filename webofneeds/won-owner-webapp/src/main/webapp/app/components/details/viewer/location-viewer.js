@@ -1,8 +1,9 @@
 import angular from "angular";
 import { attach } from "../../../cstm-ng-utils.js";
-import atomMapModule from "../../atom-map.js";
 
 import "~/style/_location-viewer.scss";
+import preactModule from "../../preact-module.js";
+import WonAtomMap from "../../atom-map.jsx";
 
 const serviceDependencies = ["$scope", "$element"];
 function genComponentConf() {
@@ -27,10 +28,7 @@ function genComponentConf() {
                    <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
                 </svg>
           </div>
-          <won-atom-map
-            locations="[self.content]"
-            ng-if="self.content && self.showMap">
-          </won-atom-map>
+          <won-preact class="won-atom-map" component="self.WonAtomMap" props="{ locations: [self.content] }" ng-if="self.content && self.showMap"></won-preact>
         </div>
     `;
 
@@ -39,7 +37,7 @@ function genComponentConf() {
       attach(this, serviceDependencies, arguments);
       window.lv4dbg = this;
       this.showMap = false;
-
+      this.WonAtomMap = WonAtomMap;
       this.$scope.$watch("self.content", (newContent, prevContent) =>
         this.updatedContent(newContent, prevContent)
       );
@@ -79,5 +77,5 @@ function genComponentConf() {
 }
 
 export default angular
-  .module("won.owner.components.locationViewer", [atomMapModule])
+  .module("won.owner.components.locationViewer", [preactModule])
   .directive("wonLocationViewer", genComponentConf).name;

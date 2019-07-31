@@ -14,7 +14,7 @@ won-travel-action-viewer {
         @include fixed-square(1rem);
       }
     }
-
+    .won-atom-map,
     won-atom-map {
       display: block;
       @include slideWithOpacityAnimation(0.5s, linear, 20rem);

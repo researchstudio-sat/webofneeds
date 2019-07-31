@@ -1,17 +1,15 @@
-/** @jsx h */
-
 /**
  * Created by quasarchimaere on 30.07.2019.
  */
+import React from "react";
 import {getIn} from "../utils.js";
 import {actionCreators} from "../actions/actions.js";
-import {Component, h} from "preact";
 
 import "~/style/_atom-suggestions-indicator.scss";
 import Immutable from "immutable";
 import * as atomUtils from "../redux/utils/atom-utils";
 
-class WonAtomSuggestionsIndicator extends Component {
+export default class WonAtomSuggestionsIndicator extends React.Component {
   componentDidMount() {
     this.atomUri = this.props.atomUri;
     this.disconnect = this.props.ngRedux.connect(
@@ -26,9 +24,9 @@ class WonAtomSuggestionsIndicator extends Component {
     this.disconnect();
   }
 
-  componentWillReceiveProps(nextProps, nextState) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     this.atomUri = nextProps.atomUri;
-    this.setState(this.selectFromState(this.redux.getState()));
+    this.setState(this.selectFromState(this.props.ngRedux.getState()));
   }
 
   selectFromState(state) {
@@ -60,10 +58,14 @@ class WonAtomSuggestionsIndicator extends Component {
     this.ngRedux.dispatch(actionCreators.router__stateGo("post", { postUri: atomUri }));
   }
 
-  render(props, state, context) {
+  render() {
+    if (!this.state) {
+      console.debug("render with null state");
+      return <div/>;
+    }
     return (
-      <won-atom-suggestions-indicator className={(!state.hasSuggestions ? "won-no-suggestions" : "")} onClick={this.showAtomSuggestions}>
-        <svg className={"asi__icon " + (state.hasUnreadSuggestions ? "asi__icon--unreads" : "asi__icon--reads")}>
+      <won-atom-suggestions-indicator className={(!this.state.hasSuggestions ? "won-no-suggestions" : "")} onClick={this.showAtomSuggestions}>
+        <svg className={"asi__icon " + (this.state.hasUnreadSuggestions ? "asi__icon--unreads" : "asi__icon--reads")}>
           <use xlinkHref="#ico36_match" href="#ico36_match"></use>
         </svg>
         <div className="asi__right">
@@ -74,9 +76,9 @@ class WonAtomSuggestionsIndicator extends Component {
           </div>
           <div className="asi__right__subtitle">
             <div className="asi__right__subtitle__label">
-              <span>{state.suggestionsCount + " Suggestions"}</span>
-              { state.hasUnreadSuggestions
-                  ? <span>{", " + state.unreadSuggestionsCount + " new"}</span>
+              <span>{this.state.suggestionsCount + " Suggestions"}</span>
+              { this.state.hasUnreadSuggestions
+                  ? <span>{", " + this.state.unreadSuggestionsCount + " new"}</span>
                   : null
               }
             </div>
@@ -86,5 +88,3 @@ class WonAtomSuggestionsIndicator extends Component {
     );
   }
 }
-
-export default WonAtomSuggestionsIndicator;

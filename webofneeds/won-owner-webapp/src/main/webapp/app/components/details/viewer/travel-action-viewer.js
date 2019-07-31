@@ -1,6 +1,7 @@
 import angular from "angular";
 import { attach } from "../../../cstm-ng-utils.js";
-import atomMapModule from "../../atom-map.js";
+import preactModule from "../../preact-module.js";
+import WonAtomMap from "../../atom-map.jsx";
 
 import "~/style/_travel-action-viewer.scss";
 
@@ -35,10 +36,7 @@ function genComponentConf() {
                    <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
                 </svg>
           </div>
-          <won-atom-map
-            locations="[self.content.get('fromLocation'), self.content.get('toLocation')]"
-            ng-if="self.showMap && self.content && (self.content.get('fromLocation') || self.content.get('toLocation'))">
-          </won-atom-map>
+          <won-preact class="won-atom-map" component="self.WonAtomMap" props="{ locations: [self.content.get('fromLocation'), self.content.get('toLocation')] }" ng-if="self.showMap && self.content && (self.content.get('fromLocation') || self.content.get('toLocation'))"></won-preact>
         </div>
     `;
 
@@ -46,6 +44,7 @@ function genComponentConf() {
     constructor() {
       attach(this, serviceDependencies, arguments);
       this.showMap = false;
+      this.WonAtomMap = WonAtomMap;
 
       this.$scope.$watch("self.content", (newContent, prevContent) =>
         this.updatedContent(newContent, prevContent)
@@ -86,5 +85,5 @@ function genComponentConf() {
 }
 
 export default angular
-  .module("won.owner.components.travelActionViewer", [atomMapModule])
+  .module("won.owner.components.travelActionViewer", [preactModule])
   .directive("wonTravelActionViewer", genComponentConf).name;

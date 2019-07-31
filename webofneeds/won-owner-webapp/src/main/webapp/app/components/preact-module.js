@@ -1,5 +1,6 @@
 import angular from "angular";
-import { h, render } from "preact";
+import { createElement } from "react";
+import { render } from "react-dom";
 
 function genComponentConf($ngRedux) {
   return {
@@ -11,13 +12,15 @@ function genComponentConf($ngRedux) {
     },
     link: (scope, element) => {
       scope.props.ngRedux = $ngRedux;
-      render(h(scope.component, scope.props), element[0]);
+      render(createElement(scope.component, scope.props), element[0]);
 
       scope.$watch("props", props => {
-        render(h(scope.component, props), element[0]);
+        props.ngRedux = $ngRedux;
+        render(createElement(scope.component, props), element[0]);
       });
       scope.$watch("component", component => {
-        render(h(component, scope.props), element[0]);
+        scope.props.ngRedux = $ngRedux;
+        render(createElement(component, scope.props), element[0]);
       });
       scope.$on("$destroy", () => {
         //TODO: DESTROY PREACT IF NECESSARY

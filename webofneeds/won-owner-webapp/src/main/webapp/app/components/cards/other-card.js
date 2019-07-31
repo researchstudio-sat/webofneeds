@@ -10,6 +10,7 @@ import { selectLastUpdateTime } from "../../redux/selectors/general-selectors.js
 import * as atomUtils from "../../redux/utils/atom-utils.js";
 import preactModule from "../preact-module.js";
 import WonAtomSuggestionsIndicator from "../atom-suggestions-indicator.jsx";
+import WonAtomMap from "../atom-map.jsx";
 
 import "~/style/_other-card.scss";
 import Immutable from "immutable";
@@ -39,8 +40,7 @@ function genComponentConf() {
               ng-if="self.atomImage"
               alt="{{self.atomImage.get('name')}}"
               ng-src="data:{{self.atomImage.get('type')}};base64,{{self.atomImage.get('data')}}"/>
-          <won-atom-map class="location" locations="[self.atomLocation]" ng-if="self.showMap" disable-controls current-location="self.currentLocation">
-          </won-atom-map>
+          <won-preact class="location won-atom-map" component="self.WonAtomMap" props="{ locations: [self.atomLocation], currentLocation: self.currentLocation, disableControls: true }" ng-if="self.showMap"></won-preact>
       </div>
       <!-- Main Information -->
       <div class="card__main clickable" ng-click="::self.atomClick(self.atomUri)"
@@ -119,6 +119,7 @@ function genComponentConf() {
       attach(this, serviceDependencies, arguments);
 
       this.WonAtomSuggestionsIndicator = WonAtomSuggestionsIndicator;
+      this.WonAtomMap = WonAtomMap;
 
       const selectFromState = state => {
         const atom = getIn(state, ["atoms", this.atomUri]);
