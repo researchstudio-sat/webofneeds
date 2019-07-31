@@ -7,6 +7,7 @@ won-atom-card {
   grid-template-areas: "card";
 
   > won-preact.won-skeleton-card,
+  > won-preact.won-persona-card,
   > won-skeleton-card,
   > won-other-card,
   > won-persona-card {
