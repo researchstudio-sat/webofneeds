@@ -1,6 +1,5 @@
 import angular from "angular";
 import "ng-redux";
-import atomMapModule from "../atom-map.js";
 import { actionCreators } from "../../actions/actions.js";
 import { relativeTime } from "../../won-label-utils.js";
 import { get, getIn } from "../../utils.js";
@@ -243,5 +242,5 @@ function genComponentConf() {
 }
 
 export default angular
-  .module("won.owner.components.otherCard", [atomMapModule, preactModule])
+  .module("won.owner.components.otherCard", [preactModule])
   .directive("wonOtherCard", genComponentConf).name;
