@@ -64,7 +64,7 @@ export default class WonAtomSuggestionsIndicator extends React.Component {
       return <div/>;
     }
     return (
-      <won-atom-suggestions-indicator className={(!this.state.hasSuggestions ? "won-no-suggestions" : "")} onClick={() => this.showAtomSuggestions()}>
+      <won-atom-suggestions-indicator class={(!this.state.hasSuggestions ? "won-no-suggestions" : "")} onClick={() => this.showAtomSuggestions()}>
         <svg className={"asi__icon " + (this.state.hasUnreadSuggestions ? "asi__icon--unreads" : "asi__icon--reads")}>
           <use xlinkHref="#ico36_match" href="#ico36_match"></use>
         </svg>

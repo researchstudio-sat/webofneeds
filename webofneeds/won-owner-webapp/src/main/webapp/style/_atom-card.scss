@@ -6,15 +6,11 @@ won-atom-card {
   display: grid;
   grid-template-areas: "card";
 
+  > won-preact.won-skeleton-card,
   > won-skeleton-card,
   > won-other-card,
   > won-persona-card {
     grid-area: card;
     background: $won-light-gray;
-  }
-
-  > won-skeleton-card {
-    position: relative;
-    z-index: -1;
   }
 }

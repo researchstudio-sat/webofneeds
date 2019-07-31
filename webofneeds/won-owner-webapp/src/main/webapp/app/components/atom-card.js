@@ -1,14 +1,15 @@
 import angular from "angular";
 import "ng-redux";
-import skeletonCardModule from "./cards/skeleton-card.js";
 import otherCardModule from "./cards/other-card.js";
 import personaCardModule from "./cards/persona-card.js";
 import { actionCreators } from "../actions/actions.js";
-import { getIn, get } from "../utils.js";
+import { get, getIn } from "../utils.js";
 import { attach } from "../cstm-ng-utils.js";
 import { connect2Redux } from "../configRedux.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as processUtils from "../redux/utils/process-utils.js";
+import preactModule from "./preact-module.js";
+import WonSkeletonCard from "./cards/skeleton-card.jsx";
 
 import "~/style/_atom-card.scss";
 
@@ -16,12 +17,7 @@ const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
   let template = `
     <!-- ATOM SKELETON VIEW-->
-    <won-skeleton-card
-        ng-if="self.isSkeleton"
-        atom-uri="self.atomUri"
-        show-suggestions="::self.showSuggestions"
-        show-persona="self.showPersona">
-    </won-skeleton-card>
+    <won-preact class="won-skeleton-card" component="self.WonSkeletonCard" props="{atomUri: self.atomUri, showSuggestions: self.showSuggestions, showPersona: self.showPersona}" ng-if="self.isSkeleton"></won-preact>
     
     <!-- PERSONA VIEW -->
     <won-persona-card
@@ -44,6 +40,8 @@ function genComponentConf() {
   class Controller {
     constructor() {
       attach(this, serviceDependencies, arguments);
+
+      this.WonSkeletonCard = WonSkeletonCard;
 
       const selectFromState = state => {
         const atom = getIn(state, ["atoms", this.atomUri]);
@@ -113,7 +111,7 @@ function genComponentConf() {
 
 export default angular
   .module("won.owner.components.atomCard", [
-    skeletonCardModule,
+    preactModule,
     personaCardModule,
     otherCardModule,
   ])
