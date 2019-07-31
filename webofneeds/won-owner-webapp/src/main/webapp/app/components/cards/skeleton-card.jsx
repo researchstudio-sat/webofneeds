@@ -55,8 +55,6 @@ export default class WonSkeletonCard extends React.Component {
     };
   }
 
-  //this.ngRedux
-
   render() {
     if (!this.state) {
       console.debug("render with null state");
