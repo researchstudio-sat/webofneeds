@@ -165,7 +165,7 @@ export default class WonOtherCard extends React.Component {
     const cardSuggestionIndicators = this.props.showSuggestions
       ? (
         <div className="card__indicators">
-          <WonAtomSuggestionsIndicator atomUri={this.state.atomUri} ngRedux={this.props.ngRedux}/>
+          <WonAtomSuggestionsIndicator atomUri={this.atomUri} ngRedux={this.props.ngRedux}/>
         </div>
       )
       : undefined;
