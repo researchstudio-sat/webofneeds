@@ -64,7 +64,7 @@ export default class WonSkeletonCard extends React.Component {
     const showPersona = !!(this.props && this.props.showPersona);
 
     const cardIconSkeleton = !this.state.atomLoaded
-      ? <VisibilitySensor onChange={(isVisible) => { this.onChange(isVisible) }}><div className="card__icon__skeleton"/></VisibilitySensor>
+      ? <VisibilitySensor onChange={(isVisible) => { this.onChange(isVisible) }} intervalDelay={200}><div className="card__icon__skeleton"/></VisibilitySensor>
       : undefined;
 
     const cardMainFailed = this.state.atomFailedToLoad
