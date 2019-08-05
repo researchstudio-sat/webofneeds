@@ -1,6 +1,6 @@
 import angular from "angular";
 import { createElement } from "react";
-import { render } from "react-dom";
+import { render, unmountComponentAtNode } from "react-dom";
 
 function genComponentConf($ngRedux) {
   return {
@@ -23,7 +23,7 @@ function genComponentConf($ngRedux) {
         render(createElement(component, scope.props), element[0]);
       });
       scope.$on("$destroy", () => {
-        //TODO: DESTROY PREACT IF NECESSARY
+        unmountComponentAtNode(element[0]);
       });
     },
   };
