@@ -5,6 +5,7 @@
 import React from "react";
 import {Map, Marker, TileLayer} from "react-leaflet";
 import Leaflet from "leaflet";
+import VisibilitySensor from "react-visibility-sensor";
 
 const currentLocationIcon = Leaflet.divIcon({
   className: "wonCurrentLocationMarkerIcon",
@@ -39,14 +40,32 @@ export default class WonAtomMap extends React.Component {
         : undefined;
 
       return (
-          <Map ref="map" center={currentLocationTupel ? currentLocationTupel : firstLocationTupel} className="atom-map__mapmount" zoom={zoom} zoomControl={!disableControls}>
-            <TileLayer
-              attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-              url="https://www.matchat.org/tile/{z}/{x}/{y}.png"
-            />
-            {locationMarkers}
-            {currentLocationMarker}
-          </Map>
+          <VisibilitySensor
+            partialVisibility={true}
+          >
+            {
+              ({isVisible}) => {
+                if(isVisible) {
+                  return (
+                    <Map ref="map" center={currentLocationTupel ? currentLocationTupel : firstLocationTupel} className="atom-map__mapmount" zoom={zoom} zoomControl={!disableControls}>
+                      <TileLayer
+                        attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+                        url="https://www.matchat.org/tile/{z}/{x}/{y}.png"
+                      />
+                      {locationMarkers}
+                      {currentLocationMarker}
+                    </Map>
+                  );
+                } else {
+                  return (
+                    <div className="atom-map__mapmount atom-map__mapmount--loading">
+                      <svg className="won-atom-map__spinner hspinner"><use xlinkHref="#ico_loading_anim" href="#ico_loading_anim"/></svg>
+                    </div>
+                  );
+                }
+              }
+            }
+          </VisibilitySensor>
       );
     }
     console.debug("render with no location(s)");
@@ -55,7 +74,10 @@ export default class WonAtomMap extends React.Component {
 
   componentDidUpdate(){
     console.debug("componentDidUpdate");
-    var map = this.refs.map.leafletElement;
-    map.invalidateSize()
+    var map = this.refs.map;
+    if(this.refs.map) {
+      var leafletElement = this.refs.map.leafletElement;
+      leafletElement && leafletElement.invalidateSize();
+    }
   }
 }

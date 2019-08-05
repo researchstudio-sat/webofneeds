@@ -26,6 +26,16 @@ won-travel-action-viewer {
         @media (max-width: $responsivenessBreakPoint) {
           height: 15rem;
         }
+
+        &--loading {
+          display: grid;
+          justify-content: center;
+          align-items: center;
+
+          .won-atom-map__spinner {
+            @include fixed-square($postIconSize);
+          }
+        }
       }
     }
   }
