@@ -9,7 +9,6 @@ import * as generalSelectors from "../redux/selectors/general-selectors";
 import WonAtomCard from "./atom-card.jsx";
 
 import "~/style/_atom-content-holds.scss";
-import Immutable from "immutable";
 
 export default class WonAtomContentHolds extends React.Component {
   // TODO: Implement fetch if in view
@@ -44,10 +43,6 @@ export default class WonAtomContentHolds extends React.Component {
   }
 
   createAtom() {
-    this.props.ngRedux.dispatch(actionCreators.atoms__selectTab(
-      Immutable.fromJS({ atomUri: this.atomUri, selectTab: "SUGGESTIONS" })
-    ));
-
     this.props.ngRedux.dispatch(actionCreators.router__stateGo('create', {holderUri: this.atomUri}));
   }
 
