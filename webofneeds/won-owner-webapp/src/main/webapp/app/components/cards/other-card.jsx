@@ -133,10 +133,8 @@ export default class WonOtherCard extends React.Component {
               {
                 ({isVisible}) => {
                   if(isVisible) {
-                    console.debug(this.atomUri, " WonAtomMap is visible, proceed with render...");
                     return <div className="won-atom-map location"><WonAtomMap locations={[this.state.atomLocation]} currentLocation={this.state.currentLocation} disableControls={true}/></div>;
                   } else {
-                    console.debug(this.atomUri, " WonAtomMap is invisible, omit render.");
                     return <div className="won-atom-map location won-atom-map--loading"><svg className="won-atom-map__spinner hspinner"><use xlinkHref="#ico_loading_anim" href="#ico_loading_anim"/></svg></div>;
                   }
                 }

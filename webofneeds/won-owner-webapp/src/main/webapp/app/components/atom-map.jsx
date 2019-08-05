@@ -35,11 +35,11 @@ export default class WonAtomMap extends React.Component {
       });
 
       const currentLocationMarker = currentLocationTupel
-        ? <Marker position={currentLocationTupel} />
+        ? <Marker position={currentLocationTupel} icon={currentLocationIcon}/>
         : undefined;
 
       return (
-          <Map ref="map" center={firstLocationTupel} className="atom-map__mapmount" zoom={zoom} zoomControl={!disableControls}>
+          <Map ref="map" center={currentLocationTupel ? currentLocationTupel : firstLocationTupel} className="atom-map__mapmount" zoom={zoom} zoomControl={!disableControls}>
             <TileLayer
               attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
               url="https://www.matchat.org/tile/{z}/{x}/{y}.png"
