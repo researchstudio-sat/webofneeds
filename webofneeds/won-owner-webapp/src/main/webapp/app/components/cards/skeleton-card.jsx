@@ -2,7 +2,7 @@
  * Created by quasarchimaere on 30.07.2019.
  */
 import React from "react";
-//import TrackVisibility from 'react-on-screen';
+import VisibilitySensor from "react-visibility-sensor";
 import {get, getIn} from "../../utils.js";
 import {actionCreators} from "../../actions/actions.js";
 
@@ -29,7 +29,6 @@ export default class WonSkeletonCard extends React.Component {
   UNSAFE_componentWillReceiveProps(nextProps) {
     this.atomUri = nextProps.atomUri;
     this.setState(this.selectFromState(this.props.ngRedux.getState()));
-    this.ensureAtomIsLoaded(); //TODO Implement fetch if in view instead
   }
 
   selectFromState(state) {
@@ -64,9 +63,8 @@ export default class WonSkeletonCard extends React.Component {
     const showSuggestions = !!(this.props && this.props.showSuggestions);
     const showPersona = !!(this.props && this.props.showPersona);
 
-    //TODO HANDLE IN VIEW FOR THE ELEMENT BELOW: in-view="$inview && self.atomToLoad && self.ensureAtomIsLoaded()"
     const cardIconSkeleton = !this.state.atomLoaded
-      ? <div className="card__icon__skeleton"/>
+      ? <VisibilitySensor onChange={(isVisible) => { this.onChange(isVisible) }}><div className="card__icon__skeleton"/></VisibilitySensor>
       : undefined;
 
     const cardMainFailed = this.state.atomFailedToLoad
@@ -128,6 +126,12 @@ export default class WonSkeletonCard extends React.Component {
       this.state.atomToLoad
     ) {
       this.props.ngRedux.dispatch(actionCreators.atoms__fetchUnloadedAtom(this.atomUri));
+    }
+  }
+
+  onChange(isVisible) {
+    if (isVisible) {
+      this.ensureAtomIsLoaded();
     }
   }
 }
