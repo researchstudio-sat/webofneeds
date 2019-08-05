@@ -108,12 +108,11 @@ const template = (
           </div>
           <div
             className="owneroverview__usecases__usecase__atoms"
-            ng-if="self.isUseCaseExpanded(ucIdentifier)"
+            ng-show="self.isUseCaseExpanded(ucIdentifier)"
           >
             <won-preact
               component="self.WonAtomCardGrid"
               props="{ atomUris: self.getSortedVisibleAtomUriArrayByUseCase(ucIdentifier), currentLocation: self.currentLocation, showSuggestions: false, showPersona: true }"
-              ng-if="self.hasVisibleAtomUris"
             />
           </div>
         </div>
@@ -138,7 +137,7 @@ const template = (
           </div>
           <div
             className="owneroverview__usecases__usecase__atoms"
-            ng-if="self.isUseCaseExpanded(undefined)"
+            ng-show="self.isUseCaseExpanded(undefined)"
           >
             <won-preact
               component="self.WonAtomCardGrid"
