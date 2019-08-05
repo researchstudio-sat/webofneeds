@@ -52,7 +52,10 @@ export default class WonAtomMap extends React.Component {
       );
 
       return (
-        <VisibilitySensor partialVisibility={true}>
+        <VisibilitySensor
+          partialVisibility={true}
+          offset={{top: -300, bottom: -300}}
+        >
           {({ isVisible }) => {
             if (isVisible) {
               return (
