@@ -10,6 +10,7 @@ import "~/style/_other-card.scss";
 import Immutable from "immutable";
 import {relativeTime} from "../../won-label-utils.js";
 import {selectLastUpdateTime} from "../../redux/selectors/general-selectors.js";
+import VisibilitySensor from "react-visibility-sensor";
 import WonAtomMap from "../atom-map.jsx";
 import WonAtomSuggestionsIndicator from "../atom-suggestions-indicator.jsx";
 
@@ -126,9 +127,21 @@ export default class WonOtherCard extends React.Component {
         {
           this.state.showMap
           ? (
-            <div className="won-atom-map location">
-              <WonAtomMap locations={[this.state.atomLocation]} currentLocation={this.state.currentLocation} disableControls={true}/>
-            </div>
+            <VisibilitySensor
+              partialVisibility={true}
+            >
+              {
+                ({isVisible}) => {
+                  if(isVisible) {
+                    console.debug(this.atomUri, " WonAtomMap is visible, proceed with render...");
+                    return <div className="won-atom-map location"><WonAtomMap locations={[this.state.atomLocation]} currentLocation={this.state.currentLocation} disableControls={true}/></div>;
+                  } else {
+                    console.debug(this.atomUri, " WonAtomMap is invisible, omit render.");
+                    return <div className="won-atom-map location won-atom-map--loading"><svg className="won-atom-map__spinner hspinner"><use xlinkHref="#ico_loading_anim" href="#ico_loading_anim"/></svg></div>;
+                  }
+                }
+              }
+            </VisibilitySensor>
           )
           : undefined
         }

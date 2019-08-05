@@ -56,6 +56,16 @@ won-other-card {
     & .won-atom-map.location,
     & won-atom-map.location {
       height: 10rem;
+
+      &.won-atom-map--loading {
+        display: grid;
+        justify-content: center;
+        align-items: center;
+
+        .won-atom-map__spinner {
+          @include fixed-square($postIconSize);
+        }
+      }
     }
 
     & .image {
