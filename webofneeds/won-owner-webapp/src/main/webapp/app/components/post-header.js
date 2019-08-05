@@ -4,28 +4,23 @@
  */
 import angular from "angular";
 import "ng-redux";
-import squareImageModule from "./square-image.js";
 import { actionCreators } from "../actions/actions.js";
 import { relativeTime } from "../won-label-utils.js";
-import { getIn, get, delay } from "../utils.js";
-import { attach } from "../cstm-ng-utils.js";
+import { delay, get, getIn } from "../utils.js";
+import { attach, classOnComponentRoot } from "../cstm-ng-utils.js";
 import { connect2Redux } from "../configRedux.js";
 import { selectLastUpdateTime } from "../redux/selectors/general-selectors.js";
 import won from "../won-es6.js";
-import { classOnComponentRoot } from "../cstm-ng-utils.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as processUtils from "../redux/utils/process-utils.js";
 
 import "~/style/_post-header.scss";
+import WonAtomIcon from "./atom-icon.jsx";
 
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
   let template = `
-
-    <won-square-image
-        ng-if="!self.atomLoading"
-        uri="::self.atomUri">
-    </won-square-image>
+    <won-preact class="atomImage" ng-if="!self.atomLoading" component="self.WonAtomIcon" props="{atomUri: self.atomUri}"></won-preact>
     <div class="ph__right" ng-if="!self.atom.get('isBeingCreated') && !self.atomLoading">
       <div class="ph__right__topline" ng-if="!self.atomFailedToLoad">
         <div class="ph__right__topline__title" ng-if="self.hasTitle()">
@@ -112,6 +107,7 @@ function genComponentConf() {
     constructor() {
       attach(this, serviceDependencies, arguments);
       window.ph4dbg = this;
+      this.WonAtomIcon = WonAtomIcon;
 
       this.WON = won.WON;
       const selectFromState = state => {
@@ -202,5 +198,5 @@ function genComponentConf() {
 }
 
 export default angular
-  .module("won.owner.components.postHeader", [squareImageModule])
+  .module("won.owner.components.postHeader", [])
   .directive("wonPostHeader", genComponentConf).name;

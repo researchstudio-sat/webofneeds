@@ -2,7 +2,6 @@ import angular from "angular";
 import { attach } from "../../../cstm-ng-utils.js";
 
 import "~/style/_location-viewer.scss";
-import preactModule from "../../preact-module.js";
 import WonAtomMap from "../../atom-map.jsx";
 
 const serviceDependencies = ["$scope", "$element"];
@@ -77,5 +76,5 @@ function genComponentConf() {
 }
 
 export default angular
-  .module("won.owner.components.locationViewer", [preactModule])
+  .module("won.owner.components.locationViewer", [])
   .directive("wonLocationViewer", genComponentConf).name;

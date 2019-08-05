@@ -3,7 +3,6 @@ import inviewModule from "angular-inview";
 
 import won from "../../won-es6.js";
 import Immutable from "immutable";
-import squareImageModule from "../square-image.js";
 import connectionMessageStatusModule from "./connection-message-status.js";
 import connectionMessageActionsModule from "./connection-message-actions.js";
 import messageContentModule from "./message-content.js"; // due to our need of recursivley integrating the combinedMessageContentModule within referencedMessageModule, we need to import the components here otherwise we will not be able to generate the component
@@ -12,7 +11,7 @@ import combinedMessageContentModule from "./combined-message-content.js";
 import labelledHrModule from "../labelled-hr.js";
 
 import { connect2Redux } from "../../configRedux.js";
-import { getIn, get } from "../../utils.js";
+import { get, getIn } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
 import { getOwnedAtomByConnectionUri } from "../../redux/selectors/general-selectors.js";
 import * as messageUtils from "../../redux/utils/message-utils.js";
@@ -24,6 +23,7 @@ import urljoin from "url-join";
 
 import "~/style/_connection-message.scss";
 import "~/style/_rdflink.scss";
+import WonAtomIcon from "../atom-icon.jsx";
 
 const MESSAGE_READ_TIMEOUT = 1500;
 
@@ -31,22 +31,25 @@ const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 
 function genComponentConf() {
   let template = `
-        <won-square-image
-            class="clickable"
-            uri="::self.theirAtom.get('uri')"
+        <won-preact 
+            class="atomImage clickable" 
+            component="self.WonAtomIcon" 
+            props="{atomUri: self.theirAtom.get('uri')}" 
             ng-click="!self.multiSelectType && self.router__stateGo({postUri: self.theirAtom.get('uri')})"
-            ng-if="!self.isChangeNotificationMessage && !self.isSent && !(self.isGroupChatMessage && self.originatorUri)">
-        </won-square-image>
-        <won-square-image
-            class="clickable"
-            uri="::self.originatorUri"
+            ng-if="!self.isChangeNotificationMessage && !self.isSent && !(self.isGroupChatMessage && self.originatorUri)"
+        ></won-preact>
+        <won-preact
+            class="atomImage clickable" 
+            component="self.WonAtomIcon" 
+            props="{atomUri: self.originatorUri}"
             ng-click="!self.multiSelectType && self.router__stateGo({postUri: self.originatorUri})"
-            ng-if="!self.isChangeNotificationMessage && self.isReceived && self.isGroupChatMessage && self.originatorUri">
-        </won-square-image>
-        <won-square-image
-            uri="::self.messageSenderUri"
-            ng-if="!self.isChangeNotificationMessage && self.isFromSystem">
-        </won-square-image>
+            ng-if="!self.isChangeNotificationMessage && self.isReceived && self.isGroupChatMessage && self.originatorUri"
+        ></won-preact>
+        <won-preact 
+            class="atomImage " 
+            component="self.WonAtomIcon"
+            props="{atomUri: self.messageSenderUri}"
+            ng-if="!self.isChangeNotificationMessage && self.isFromSystem"></won-preact>
         <div class="won-cm__center"
                 ng-class="{
                   'won-cm__center--nondisplayable': self.isConnectionMessage && !self.isParsable,
@@ -105,6 +108,7 @@ function genComponentConf() {
     constructor(/* arguments = dependency injections */) {
       attach(this, serviceDependencies, arguments);
       this.won = won;
+      this.WonAtomIcon = WonAtomIcon;
 
       const selectFromState = state => {
         const ownedAtom =
@@ -351,7 +355,6 @@ function genComponentConf() {
 
 export default angular
   .module("won.owner.components.connectionMessage", [
-    squareImageModule,
     connectionMessageStatusModule,
     connectionMessageActionsModule,
     messageContentModule,

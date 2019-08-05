@@ -12,7 +12,6 @@ import atomContentBuddies from "./atom-content-buddies.js";
 import WonAtomContentHolds from "./atom-content-holds.jsx";
 import WonAtomContentSuggestions from "./atom-content-suggestions.jsx";
 import trigModule from "./trig.js";
-import preactModule from "./preact-module.js";
 import { get, getIn } from "../utils.js";
 import won from "../won-es6.js";
 import { connect2Redux } from "../configRedux.js";
@@ -232,6 +231,5 @@ export default angular
     atomContentBuddies,
     trigModule,
     elmModule,
-    preactModule,
   ])
   .directive("wonPostContent", genComponentConf).name;

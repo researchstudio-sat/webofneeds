@@ -38,6 +38,7 @@ won-post-header {
 
   @include square-image($postIconSize);
 
+  won-preact.atomImage,
   won-square-image {
     grid-area: icon;
   }

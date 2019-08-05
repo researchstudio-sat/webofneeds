@@ -8,6 +8,7 @@ import { connect2Redux } from "../configRedux.js";
 import { actionCreators } from "../actions/actions.js";
 import postContextDropDownModule from "../components/post-context-dropdown.js";
 import shareDropdownModule from "../components/share-dropdown.js";
+import WonAtomIcon from "../components/atom-icon.jsx";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 
 import "~/style/_atom-header-big.scss";
@@ -17,9 +18,7 @@ function genComponentConf() {
   let template = `
         <nav class="atom-header-big">
             <div class="ahb__inner">
-                <won-square-image
-                    uri="self.postUri">
-                </won-square-image>
+                <won-preact class="atomImage" component="self.WonAtomIcon" props="{atomUri: self.postUri}"></won-preact>
                 <hgroup>
                     <h1 class="ahb__title" ng-if="self.hasTitle()">{{ self.generateTitle() }}</h1>
                     <h1 class="ahb__title ahb__title--notitle" ng-if="!self.hasTitle() && self.isDirectResponse">RE: no title</h1>
@@ -45,6 +44,7 @@ function genComponentConf() {
     constructor() {
       attach(this, serviceDependencies, arguments);
       window.ahb4dbg = this;
+      this.WonAtomIcon = WonAtomIcon;
 
       const selectFromState = state => {
         const postUri = this.atomUri;

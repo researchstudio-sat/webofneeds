@@ -17,7 +17,6 @@ import * as atomUtils from "../redux/utils/atom-utils.js";
 import wonInput from "../directives/input.js";
 import {h} from "preact";
 import * as accountUtils from "../redux/utils/account-utils.js";
-import preactModule from "../components/preact-module.js";
 import WonAtomCardGrid from "../components/atom-card-grid.jsx";
 import WonAtomMap from "../components/atom-map.jsx";
 
@@ -527,7 +526,6 @@ export default {
     .module("won.owner.components.map", [
       ngAnimate,
       postMessagesModule,
-      preactModule,
       postHeaderModule,
       wonInput,
     ])

@@ -1,6 +1,5 @@
 import angular from "angular";
 import { attach } from "../../../cstm-ng-utils.js";
-import preactModule from "../../preact-module.js";
 import WonAtomMap from "../../atom-map.jsx";
 
 import "~/style/_travel-action-viewer.scss";
@@ -85,5 +84,5 @@ function genComponentConf() {
 }
 
 export default angular
-  .module("won.owner.components.travelActionViewer", [preactModule])
+  .module("won.owner.components.travelActionViewer", [])
   .directive("wonTravelActionViewer", genComponentConf).name;

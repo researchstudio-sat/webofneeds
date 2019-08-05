@@ -16,7 +16,6 @@ import * as connectionSelectors from "../redux/selectors/connection-selectors.js
 import * as connectionUtils from "../redux/utils/connection-utils.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import { actionCreators } from "../actions/actions.js";
-import preactModule from "./preact-module.js";
 import WonAtomCard from "./atom-card.jsx";
 import ngAnimate from "angular-animate";
 
@@ -264,7 +263,7 @@ export default angular
     labelledHrModule,
     postHeaderModule,
     suggestPostPickerModule,
-    preactModule,
+
     inviewModule.name,
   ])
   .directive("wonAtomContentParticipants", genComponentConf).name;

@@ -17,7 +17,6 @@ import * as processUtils from "../redux/utils/process-utils.js";
 import * as wonLabelUtils from "../won-label-utils.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as useCaseUtils from "../usecase-utils.js";
-import preactModule from "../components/preact-module.js";
 import WonAtomCardGrid from "../components/atom-card-grid.jsx";
 import {h} from "preact";
 
@@ -328,7 +327,6 @@ export default {
     .module("won.owner.components.overview", [
       ngAnimate,
       postMessagesModule,
-      preactModule,
       postHeaderModule,
     ])
     .controller("OverviewController", Controller).name,

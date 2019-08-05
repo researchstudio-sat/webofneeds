@@ -1,7 +1,6 @@
 import angular from "angular";
 import "ng-redux";
 import { actionCreators } from "../../../actions/actions.js";
-import preactModule from "../../preact-module.js";
 import WonAtomCard from "../../atom-card.jsx";
 import { get, getIn } from "../../../utils.js";
 import { attach } from "../../../cstm-ng-utils.js";
@@ -242,5 +241,5 @@ function genComponentConf() {
 }
 
 export default angular
-  .module("won.owner.components.suggestpostViewer", [preactModule])
+  .module("won.owner.components.suggestpostViewer", [])
   .directive("wonSuggestpostViewer", genComponentConf).name;

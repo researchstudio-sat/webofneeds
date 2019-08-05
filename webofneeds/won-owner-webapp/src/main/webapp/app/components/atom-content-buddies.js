@@ -14,7 +14,6 @@ import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as connectionSelectors from "../redux/selectors/connection-selectors.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import { actionCreators } from "../actions/actions.js";
-import preactModule from "./preact-module.js";
 import WonAtomCard from "./atom-card.jsx";
 import ngAnimate from "angular-animate";
 
@@ -311,7 +310,7 @@ export default angular
   .module("won.owner.components.atomContentBuddies", [
     ngAnimate,
     labelledHrModule,
-    preactModule,
+
     suggestPostPickerModule,
     inviewModule.name,
   ])
