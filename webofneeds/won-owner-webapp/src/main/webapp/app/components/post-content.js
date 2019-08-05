@@ -9,22 +9,23 @@ import postContentGeneral from "./post-content-general.js";
 import postContentPersona from "./post-content-persona.js";
 import atomContentParticipants from "./atom-content-participants.js";
 import atomContentBuddies from "./atom-content-buddies.js";
-import atomContentHolds from "./atom-content-holds.js";
+import WonAtomContentHolds from "./atom-content-holds.jsx";
 import atomContentSuggestions from "./atom-content-suggestions.js";
 import trigModule from "./trig.js";
-import { getIn, get } from "../utils.js";
+import preactModule from "./preact-module.js";
+import { get, getIn } from "../utils.js";
 import won from "../won-es6.js";
 import { connect2Redux } from "../configRedux.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as viewUtils from "../redux/utils/view-utils.js";
 import * as processUtils from "../redux/utils/process-utils.js";
 import {
-  getOwnedCondensedPersonaList,
   getConnectionUriFromRoute,
+  getOwnedCondensedPersonaList,
   isAtomOwned,
 } from "../redux/selectors/general-selectors.js";
 import { actionCreators } from "../actions/actions.js";
-import { classOnComponentRoot, attach } from "../cstm-ng-utils.js";
+import { attach, classOnComponentRoot } from "../cstm-ng-utils.js";
 import ngAnimate from "angular-animate";
 import { Elm } from "../../elm/AddPersona.elm";
 
@@ -98,7 +99,8 @@ function genComponentConf() {
           <won-atom-content-suggestions ng-if="self.isSelectedTab('SUGGESTIONS')" atom-uri="self.postUri"></won-atom-content-suggestions>
           
           <!-- OTHER ATOMS -->
-          <won-atom-content-holds ng-if="self.isSelectedTab('HOLDS')" atom-uri="self.postUri"></won-atom-content-holds>
+          <won-preact component="self.WonAtomContentHolds" props="{atomUri: self.postUri}" ng-if="self.isSelectedTab('HOLDS')"></won-preact>
+          
           <!-- RDF REPRESENTATION -->
           <div class="post-info__content__rdf" ng-if="self.isSelectedTab('RDF')">
             <a class="rdflink clickable"
@@ -133,6 +135,7 @@ function genComponentConf() {
       window.postcontent4dbg = this;
 
       this.addPersonaModule = Elm.AddPersona;
+      this.WonAtomContentHolds = WonAtomContentHolds;
 
       const selectFromState = state => {
         const openConnectionUri = getConnectionUriFromRoute(state);
@@ -226,9 +229,9 @@ export default angular
     postContentPersona,
     atomContentParticipants,
     atomContentBuddies,
-    atomContentHolds,
     atomContentSuggestions,
     trigModule,
     elmModule,
+    preactModule,
   ])
   .directive("wonPostContent", genComponentConf).name;
