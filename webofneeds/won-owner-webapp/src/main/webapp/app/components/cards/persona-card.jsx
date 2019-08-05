@@ -72,7 +72,9 @@ export default class WonPersonaCard extends React.Component {
   }
 
   atomClick() {
-    if (!this.props.disableDefaultAtomInteraction) {
+    if (this.props.onAtomClick) {
+      this.props.onAtomClick();
+    } else {
       this.props.ngRedux.dispatch(actionCreators.atoms__selectTab(
         Immutable.fromJS({ atomUri: this.atomUri, selectTab: "DETAIL" })
       ));

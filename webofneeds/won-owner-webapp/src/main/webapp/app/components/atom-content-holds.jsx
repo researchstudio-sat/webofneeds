@@ -11,7 +11,6 @@ import WonAtomCard from "./atom-card.jsx";
 import "~/style/_atom-content-holds.scss";
 
 export default class WonAtomContentHolds extends React.Component {
-  // TODO: Implement fetch if in view
   componentDidMount() {
     this.atomUri = this.props.atomUri;
     this.disconnect = this.props.ngRedux.connect(
@@ -56,7 +55,7 @@ export default class WonAtomContentHolds extends React.Component {
       const atomCards = this.state.hasHeldAtoms
         ? this.state.heldAtomUrisArray.map(atomUri => {
           return (
-            <WonAtomCard class="ach__atom" atomUri={atomUri} currentLocation={this.state.currentLocation} showSuggestions={false} showPersona={false} ngRedux={this.props.ngRedux}/>
+            <WonAtomCard key={atomUri} atomUri={atomUri} currentLocation={this.state.currentLocation} showSuggestions={this.state.isOwned} showPersona={false} ngRedux={this.props.ngRedux}/>
           );
         })
         : undefined;

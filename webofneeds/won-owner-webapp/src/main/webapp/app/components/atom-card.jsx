@@ -75,9 +75,9 @@ export default class WonAtomCard extends React.Component {
     if (this.state.isSkeleton) {
       return <won-atom-card><WonSkeletonCard atomUri={this.atomUri} showSuggestions={this.props.showSuggestions} showPersona={this.props.showPersona} ngRedux={this.props.ngRedux}/></won-atom-card>;
     } else if(this.state.isPersona) {
-      return <won-atom-card><WonPersonaCard atomUri={this.atomUri} disableDefaultAtomInteraction={this.props.disableDefaultAtomInteraction} ngRedux={this.props.ngRedux}/></won-atom-card>;
+      return <won-atom-card><WonPersonaCard atomUri={this.atomUri} onAtomClick={this.props.onAtomClick} ngRedux={this.props.ngRedux}/></won-atom-card>;
     } else {
-      return <won-atom-card><WonOtherCard atomUri={this.atomUri} showSuggestions={this.props.showSuggestions} showPersona={this.props.showPersona} disableDefaultAtomInteraction={this.props.disableDefaultAtomInteraction} currentLocation={this.props.currentLocation} ngRedux={this.props.ngRedux}/></won-atom-card>;
+      return <won-atom-card><WonOtherCard atomUri={this.atomUri} showSuggestions={this.props.showSuggestions} showPersona={this.props.showPersona} onAtomClick={this.props.onAtomClick} currentLocation={this.props.currentLocation} ngRedux={this.props.ngRedux}/></won-atom-card>;
     }
   }
 }

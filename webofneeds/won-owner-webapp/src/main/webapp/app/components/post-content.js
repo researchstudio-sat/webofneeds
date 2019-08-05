@@ -10,7 +10,7 @@ import postContentPersona from "./post-content-persona.js";
 import atomContentParticipants from "./atom-content-participants.js";
 import atomContentBuddies from "./atom-content-buddies.js";
 import WonAtomContentHolds from "./atom-content-holds.jsx";
-import atomContentSuggestions from "./atom-content-suggestions.js";
+import WonAtomContentSuggestions from "./atom-content-suggestions.jsx";
 import trigModule from "./trig.js";
 import preactModule from "./preact-module.js";
 import { get, getIn } from "../utils.js";
@@ -96,7 +96,7 @@ function genComponentConf() {
           </div>
 
           <!-- SUGGESTIONS -->
-          <won-atom-content-suggestions ng-if="self.isSelectedTab('SUGGESTIONS')" atom-uri="self.postUri"></won-atom-content-suggestions>
+          <won-preact component="self.WonAtomContentSuggestions" props="{atomUri: self.postUri}" ng-if="self.isSelectedTab('SUGGESTIONS')"></won-preact>
           
           <!-- OTHER ATOMS -->
           <won-preact component="self.WonAtomContentHolds" props="{atomUri: self.postUri}" ng-if="self.isSelectedTab('HOLDS')"></won-preact>
@@ -136,6 +136,7 @@ function genComponentConf() {
 
       this.addPersonaModule = Elm.AddPersona;
       this.WonAtomContentHolds = WonAtomContentHolds;
+      this.WonAtomContentSuggestions = WonAtomContentSuggestions;
 
       const selectFromState = state => {
         const openConnectionUri = getConnectionUriFromRoute(state);
@@ -229,7 +230,6 @@ export default angular
     postContentPersona,
     atomContentParticipants,
     atomContentBuddies,
-    atomContentSuggestions,
     trigModule,
     elmModule,
     preactModule,

@@ -8,13 +8,13 @@ won-atom-content-suggestions {
 
   grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
 
-  & .acs__empty {
+  & > .acs__empty {
     color: $won-line-gray;
     text-align: center;
     grid-column: 1 / -1;
   }
 
-  & .acs__atom {
+  & > .acs__atom {
     border: $thinGrayBorder;
     background: $won-light-gray;
 
@@ -23,15 +23,15 @@ won-atom-content-suggestions {
       /*box-shadow: 0px 0px 5px 5px var(--won-primary-color);*/
     }
 
-    &__actions {
+    > .acs__atom__actions {
       border-top: $thinGrayBorder;
       display: grid;
       grid-auto-flow: column;
       grid-gap: 0.5rem;
       padding: 0.5rem;
 
-      &__button.won-button--filled.red,
-      &__button.won-button--outlined.red.thin {
+      .acs__atom__actions__button.won-button--filled.red,
+      .acs__atom__actions__button.won-button--outlined.red.thin {
         font-size: $smallFontSize;
         padding: 0.5rem;
       }

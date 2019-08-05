@@ -13,7 +13,6 @@ export default class WonAtomCardGrid extends React.Component {
       const showPersona = this.props.showPersona;
       const showSuggestions = this.props.showSuggestions;
       const currentLocation = this.props.currentLocation;
-      const disableDefaultAtomInteraction = this.props.disableDefaultAtomInteraction;
       const ngRedux = this.props && this.props.ngRedux;
 
       console.debug(
@@ -21,13 +20,12 @@ export default class WonAtomCardGrid extends React.Component {
         "atomUris: ", atomUris, "\n",
         "showPersona: ", showPersona, "\n",
         "showSuggestions: ", showSuggestions, "\n",
-        "currentLocation: ", currentLocation, "\n",
-        "disableDefaultAtomInteraction: ", disableDefaultAtomInteraction,"\n","ngRedux: ", ngRedux
+        "currentLocation: ", currentLocation
       );
 
       return atomUris.map(atomUri => {
         return (
-          <WonAtomCard key={atomUri} atomUri={atomUri} showPersona={showPersona} showSuggestions={showSuggestions} currentLocation={currentLocation} disableDefaultAtomInteraction={disableDefaultAtomInteraction} ngRedux={ngRedux} />
+          <WonAtomCard key={atomUri} atomUri={atomUri} showPersona={showPersona} showSuggestions={showSuggestions} currentLocation={currentLocation} ngRedux={ngRedux} />
         );
       });
     }

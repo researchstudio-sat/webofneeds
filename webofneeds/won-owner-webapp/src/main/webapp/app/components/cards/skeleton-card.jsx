@@ -11,7 +11,6 @@ import * as processUtils from "../../redux/utils/process-utils.js";
 import WonAtomSuggestionsIndicator from "../atom-suggestions-indicator.jsx";
 
 export default class WonSkeletonCard extends React.Component {
-  // TODO: Implement fetch if in view
   componentDidMount() {
     this.atomUri = this.props.atomUri;
     this.disconnect = this.props.ngRedux.connect(

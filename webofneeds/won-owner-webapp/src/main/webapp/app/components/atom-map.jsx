@@ -97,13 +97,4 @@ export default class WonAtomMap extends React.Component {
     console.debug("render with no location(s)");
     return <div />;
   }
-
-  componentDidUpdate() {
-    console.debug("componentDidUpdate");
-    let map = this.refs.map;
-    if (this.refs.map) {
-      let leafletElement = this.refs.map.leafletElement;
-      leafletElement && leafletElement.invalidateSize();
-    }
-  }
 }
