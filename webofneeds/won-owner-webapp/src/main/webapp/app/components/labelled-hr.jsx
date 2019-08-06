@@ -15,7 +15,7 @@ export default class WonLabelledHr extends React.Component {
           {
             this.props.arrow
               ? (
-                <svg className="wlh__label__carret clickable" >
+                <svg className="wlh__label__carret clickable" onClick={this.props.onClick}>
                   <use xlinkHref={(this.props.arrow == 'down') ? "#ico16_arrow_down" : "#ico16_arrow_up"} href={(this.props.arrow == 'down') ? "#ico16_arrow_down" : "#ico16_arrow_up"}/>
                 </svg>
               )

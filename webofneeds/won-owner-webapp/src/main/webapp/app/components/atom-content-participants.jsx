@@ -17,14 +17,21 @@ import "~/style/_atom-content-participants.scss";
 import VisibilitySensor from "react-visibility-sensor";
 
 export default class WonAtomContentParticipants extends React.Component {
-  //TODO: FIGURE OUT HOW TO HANDLE this.suggestAtomExpanded = false;
+  constructor(props){
+    super(props);
+    this.localState = {
+      suggestAtomExpanded: false
+    };
+  }
+
+
   componentDidMount() {
     this.atomUri = this.props.atomUri;
     this.disconnect = this.props.ngRedux.connect(
       this.selectFromState.bind(this),
       actionCreators
     )(state => {
-      this.setState(state);
+      this.setState({...state, ...this.localState});
     });
   }
 
@@ -34,7 +41,12 @@ export default class WonAtomContentParticipants extends React.Component {
 
   UNSAFE_componentWillReceiveProps(nextProps) {
     this.atomUri = nextProps.atomUri;
-    this.setState(this.selectFromState(this.props.ngRedux.getState()));
+    this.setState({...this.selectFromState(this.props.ngRedux.getState()), ...this.localState});
+  }
+
+  toggleSuggestions() {
+    this.localState.suggestAtomExpanded = !this.localState.suggestAtomExpanded;
+    this.setState({...this.state, ...this.localState});
   }
 
   selectFromState(state) {
@@ -163,18 +175,24 @@ export default class WonAtomContentParticipants extends React.Component {
       return (
         <won-atom-content-participants>
           {participants}
-          <WonLabelledHr label="Invite" arrow={this.suggestAtomExpanded? "up" : "down"} onClick={() => {this.suggestAtomExpanded = !this.suggestAtomExpanded}}/>
-          <WonSuggestAtomPicker
-            initialValue={undefined}
-            onUpdate={this.inviteParticipant}
-            detail={{placeholder: "Insert AtomUri to invite"}}
-            excludedUris={this.state.excludedFromInviteUris}
-            allowedSockets={[self.won.CHAT.ChatSocketCompacted, self.won.GROUP.GroupSocketCompacted]}
-            excludedText="Invitation does not work for atoms that are already part of the Group, or the group itself"
-            notAllowedSocketText="Invitation does not work on atoms without Group or Chat Socket"
-            noSuggestionsText="No Participants available to invite"
-            ngRedux={this.props.ngRedux}
-          />
+          <WonLabelledHr label="Invite" arrow={this.state.suggestAtomExpanded? "up" : "down"} onClick={() => this.toggleSuggestions()}/>
+          {
+            this.state.suggestAtomExpanded
+            ? (
+              <WonSuggestAtomPicker
+                initialValue={undefined}
+                onUpdate={this.inviteParticipant}
+                detail={{placeholder: "Insert AtomUri to invite"}}
+                excludedUris={this.state.excludedFromInviteUris}
+                allowedSockets={[self.won.CHAT.ChatSocketCompacted, self.won.GROUP.GroupSocketCompacted]}
+                excludedText="Invitation does not work for atoms that are already part of the Group, or the group itself"
+                notAllowedSocketText="Invitation does not work on atoms without Group or Chat Socket"
+                noSuggestionsText="No Participants available to invite"
+                ngRedux={this.props.ngRedux}
+              />
+            )
+            : undefined
+          }
         </won-atom-content-participants>
       );
     } else {
