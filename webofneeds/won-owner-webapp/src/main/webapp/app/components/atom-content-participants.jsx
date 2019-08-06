@@ -181,7 +181,7 @@ export default class WonAtomContentParticipants extends React.Component {
             ? (
               <WonSuggestAtomPicker
                 initialValue={undefined}
-                onUpdate={this.inviteParticipant}
+                onUpdate={({value}) => this.inviteParticipant(value)}
                 detail={{placeholder: "Insert AtomUri to invite"}}
                 excludedUris={this.state.excludedFromInviteUris}
                 allowedSockets={[won.CHAT.ChatSocketCompacted, won.GROUP.GroupSocketCompacted]}

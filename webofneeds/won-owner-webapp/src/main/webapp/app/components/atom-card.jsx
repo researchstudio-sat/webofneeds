@@ -7,9 +7,10 @@ import {actionCreators} from "../actions/actions.js";
 
 import "~/style/_atom-card.scss";
 import * as atomUtils from "../redux/utils/atom-utils.js";
-import * as processUtils from "../redux/utils/process-utils";
-import WonOtherCard from "./cards/other-card";
-import WonSkeletonCard from "./cards/skeleton-card";
+import * as processUtils from "../redux/utils/process-utils.js";
+import WonOtherCard from "./cards/other-card.jsx";
+import WonSkeletonCard from "./cards/skeleton-card.jsx";
+import WonPersonaCard from "./cards/persona-card.jsx";
 
 export default class WonAtomCard extends React.Component {
   componentDidMount() {

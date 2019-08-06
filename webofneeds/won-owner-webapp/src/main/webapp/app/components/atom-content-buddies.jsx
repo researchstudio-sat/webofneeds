@@ -13,7 +13,7 @@ import WonLabelledHr from "./labelled-hr.jsx";
 import WonSuggestAtomPicker from "./details/picker/suggest-atom-picker.jsx";
 import WonAtomCard from "./atom-card.jsx";
 
-import "~/style/_atom-content-participants.scss";
+import "~/style/_atom-content-buddies.scss";
 import VisibilitySensor from "react-visibility-sensor";
 
 export default class WonAtomContentBuddies extends React.Component {
@@ -88,17 +88,16 @@ export default class WonAtomContentBuddies extends React.Component {
   }
 
   render() {
-    //TODO
     if (!this.state) {
       console.debug("render with null state");
       return <div/>;
     }
 
-    let participants;
+    let buddies;
 
     if (this.state.isOwned) {
       if (this.state.hasBuddyConnections) {
-        participants = this.state.buddyConnectionsArray.map(conn => {
+        buddies = this.state.buddyConnectionsArray.map(conn => {
           if(!connectionUtils.isClosed(conn)) {
             let actionButtons;
 
@@ -167,21 +166,21 @@ export default class WonAtomContentBuddies extends React.Component {
           }
         });
       } else {
-        participants = (
+        buddies = (
           <div className="acp__empty">No Buddies present.</div>
         );
       }
 
       return (
-        <won-atom-content-participants>
-          {participants}
+        <won-atom-content-buddies>
+          {buddies}
           <WonLabelledHr label="Request" arrow={this.state.suggestAtomExpanded? "up" : "down"} onClick={() => this.toggleSuggestions()}/>
           {
             this.state.suggestAtomExpanded
             ? (
               <WonSuggestAtomPicker
                 initialValue={undefined}
-                onUpdate={this.requestBuddy}
+                onUpdate={({value}) => this.requestBuddy(value)}
                 detail={{placeholder: "Insert AtomUri to invite"}}
                 excludedUris={this.state.excludedFromRequestUris}
                 allowedSockets={[won.BUDDY.BuddySocketCompacted]}
@@ -193,11 +192,11 @@ export default class WonAtomContentBuddies extends React.Component {
             )
             : undefined
           }
-        </won-atom-content-participants>
+        </won-atom-content-buddies>
       );
     } else {
       if (this.state.hasBuddies) {
-        participants = this.state.buddiesArray.map(memberUri => {
+        buddies = this.state.buddiesArray.map(memberUri => {
           return (
             <div className="acb__buddy" key={memberUri}>
               <WonAtomCard atomUri={memberUri} currentLocation={this.state.currentLocation} showSuggestions={false} showPersona={false} ngRedux={this.props.ngRedux}/>
@@ -206,15 +205,15 @@ export default class WonAtomContentBuddies extends React.Component {
           );
         });
       } else {
-        participants = (
+        buddies = (
           <div className="acp__empty">No Buddies present.</div>
         );
       }
 
       return (
-        <won-atom-content-participants>
-          {participants}
-        </won-atom-content-participants>
+        <won-atom-content-buddies>
+          {buddies}
+        </won-atom-content-buddies>
       );
     }
   }
@@ -309,7 +308,7 @@ export default class WonAtomContentBuddies extends React.Component {
   }
 
   requestBuddy(targetAtomUri, message = "") {
-    if (!this.isOwned || !this.hasBuddySocket) {
+    if (!this.state.isOwned || !this.state.hasBuddySocket) {
       console.warn("Trying to request a non-owned or non buddySocket atom");
       return;
     }
@@ -341,59 +340,6 @@ export default class WonAtomContentBuddies extends React.Component {
       ],
     };
     this.props.ngRedux.dispatch(actionCreators.view__showModalDialog(payload));
-  }
-
-  sendRequest(conn, message = "") {
-    //TODO
-    if (!conn) {
-      return;
-    }
-
-    const payload = {
-      caption: "Group",
-      text: "Add as Participant?",
-      buttons: [
-        {
-          caption: "Yes",
-          callback: () => {
-            const connUri = get(conn, "uri");
-            const targetAtomUri = get(conn, "targetAtomUri");
-
-            if (connectionUtils.isUnread(conn)) {
-              this.props.ngRedux.dispatch(actionCreators.connections__markAsRead({
-                connectionUri: connUri,
-                atomUri: this.atomUri,
-              }));
-            }
-
-            this.props.ngRedux.dispatch(actionCreators.connections__rate(connUri, won.WONCON.binaryRatingGood));
-            this.props.ngRedux.dispatch(actionCreators.atoms__connect(
-              this.atomUri,
-              connUri,
-              targetAtomUri,
-              message
-            ));
-            this.props.ngRedux.dispatch(actionCreators.view__hideModalDialog());
-          },
-        },
-        {
-          caption: "No",
-          callback: () => {
-            this.props.ngRedux.dispatch(actionCreators.view__hideModalDialog());
-          },
-        },
-      ],
-    };
-    this.props.ngRedux.dispatch(actionCreators.view__showModalDialog(payload));
-  }
-
-  inviteParticipant(atomUri, message = "") {
-    //TODO
-    if (!this.state.isOwned || !this.state.hasGroupSocket) {
-      console.warn("Trying to invite to a non-owned or non groupSocket atom");
-      return;
-    }
-    this.props.ngRedux.dispatch(actionCreators.atoms__connect(this.atomUri, undefined, atomUri, message));
   }
 
   markAsRead(conn) {

@@ -40,7 +40,7 @@ won-suggest-atom-picker {
 
     .sap__input__icon {
       &.clickable {
-        --local-primary: $won-primary-color;
+        --local-primary: #{$won-primary-color};
       }
 
       @include fixed-square($bigiconSize);
