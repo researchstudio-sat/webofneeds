@@ -43,7 +43,8 @@ won-atom-content-participants {
     grid-column: 1 / -1;
   }
 
-  & > won-suggestpost-picker {
+  & > won-suggest-atom-picker,
+  & > won-preact.suggestAtomPicker {
     grid-column: 1 / -1;
     background: var(--won-light-gray);
     padding: 0.5rem;

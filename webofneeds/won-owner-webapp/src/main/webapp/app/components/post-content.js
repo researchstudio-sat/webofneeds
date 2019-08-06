@@ -10,6 +10,7 @@ import atomContentParticipants from "./atom-content-participants.js";
 import atomContentBuddies from "./atom-content-buddies.js";
 import WonAtomContentHolds from "./atom-content-holds.jsx";
 import WonAtomContentSuggestions from "./atom-content-suggestions.jsx";
+import WonLabelledHr from "./labelled-hr.jsx";
 import trigModule from "./trig.js";
 import { get, getIn } from "../utils.js";
 import won from "../won-es6.js";
@@ -135,7 +136,7 @@ function genComponentConf() {
       this.addPersonaModule = Elm.AddPersona;
       this.WonAtomContentHolds = WonAtomContentHolds;
       this.WonAtomContentSuggestions = WonAtomContentSuggestions;
-      this.WonLabelledHr = this.WonLabelledHr;
+      this.WonLabelledHr = WonLabelledHr;
 
       const selectFromState = state => {
         const openConnectionUri = getConnectionUriFromRoute(state);

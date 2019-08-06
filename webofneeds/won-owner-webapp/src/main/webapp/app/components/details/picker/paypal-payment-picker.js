@@ -3,8 +3,6 @@ import { delay, isValidNumber } from "../../../utils.js";
 import { attach } from "../../../cstm-ng-utils.js";
 import wonInput from "../../../directives/input.js";
 
-import suggestpostPickerModule from "./suggestpost-picker.js";
-
 import "~/style/_paypalpaymentpicker.scss";
 
 const serviceDependencies = ["$scope", "$element"];
@@ -57,39 +55,6 @@ function genComponentConf() {
           </svg>
         </div>
       </div>
-      <!-- Not in use: secret
-      <div class="paypalpaymentp__label">
-        {{ self.detail.secretLabel }}
-      </div>
-      <div class="paypalpaymentp__textinput">
-        <input
-            type="text"
-            class="paypalpaymentp__textinput__secret"
-            placeholder="{{self.detail.secretPlaceholder}}"
-            ng-blur="::self.updateSecret(true)"
-            won-input="::self.updateSecret(false)"
-            ng-class="{'paypalpaymentp__textinput__secret--withreset' : self.showSecretResetButton}"/>
-        <div class="paypalpaymentp__textinput__reset clickable">
-          <svg class="paypalpaymentp__textinput__reset__icon"
-            style="--local-primary:var(--won-primary-color);"
-            ng-if="self.showSecretResetButton"
-            ng-click="self.resetSecret(true)">
-            <use xlink:href="#ico36_close" href="#ico36_close"></use>
-          </svg>
-        </div>
-      </div>
-      -->
-      <!-- Not in use: customer information
-      <div class="paypalpaymentp__label" ng-if="self.isValidPayment()">
-        {{ self.detail.customerLabel }}
-      </div>
-      <won-suggestpost-picker
-      ng-if="self.isValidPayment()"
-          initial-value="self.initialValue && self.initialValue.customerUri"
-          on-update="self.updateCostumerUri(value)"
-          detail="self.detail && self.detail.suggestPost"
-      ></won-suggestpost-picker>
-      -->
     `;
 
   class Controller {
@@ -112,7 +77,6 @@ function genComponentConf() {
 
       this.showAmountResetButton = false;
       this.showReceiverResetButton = false;
-      // this.showSecretResetButton = false;
 
       delay(0).then(() => this.showInitialValues());
     }
@@ -205,33 +169,6 @@ function genComponentConf() {
       }
     }
 
-    // updateCostumerUri(customerUri) {
-    //   this.customerUri = customerUri;
-    //   this.update(
-    //     this.addedNumber,
-    //     this.selectedCurrency,
-    //     this.customerUri,
-    //     this.secret,
-    //     this.receiver
-    //   );
-    // }
-
-    // updateSecret() {
-    //   this.secret = this.secretInput().value;
-
-    //   if (this.secret) {
-    //     //todo: check if secret is at least 4 chars long
-    //     this.showSecretResetButton = true;
-    //   }
-    //   this.update(
-    //     this.addedNumber,
-    //     this.selectedCurrency,
-    //     this.customerUri,
-    //     this.secret,
-    //     this.receiver
-    //   );
-    // }
-
     updateReceiver() {
       this.receiver = this.receiverInput().value;
 
@@ -287,22 +224,6 @@ function genComponentConf() {
       );
     }
 
-    // resetSecret(resetInput) {
-    //   this.secret = undefined;
-
-    //   if (resetInput) {
-    //     this.secretInput().value = "";
-    //     this.showSecretResetButton = false;
-    //   }
-    //   this.update(
-    //     this.addedNumber,
-    //     this.selectedCurrency,
-    //     // this.customerUri,
-    //     // this.secret,
-    //     this.receiver
-    //   );
-    // }
-
     resetReceiver(resetInput) {
       this.receiver = undefined;
 
@@ -345,15 +266,6 @@ function genComponentConf() {
       }
       return this._receiver;
     }
-
-    // secretInput() {
-    //   if (!this._secret) {
-    //     this._secret = this.$element[0].querySelector(
-    //       ".paypalpaymentp__textinput__secret"
-    //     );
-    //   }
-    //   return this._secret;
-    // }
   }
   Controller.$inject = serviceDependencies;
 
@@ -372,8 +284,5 @@ function genComponentConf() {
 }
 
 export default angular
-  .module("won.owner.components.paypalPaymentPicker", [
-    wonInput,
-    suggestpostPickerModule,
-  ])
+  .module("won.owner.components.paypalPaymentPicker", [wonInput])
   .directive("wonPaypalPaymentPicker", genComponentConf).name;

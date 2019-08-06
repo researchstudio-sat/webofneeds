@@ -5,7 +5,6 @@
 import angular from "angular";
 import inviewModule from "angular-inview";
 import WonLabelledHr from "./labelled-hr.jsx";
-import suggestPostPickerModule from "./details/picker/suggestpost-picker.js";
 import { get, getIn } from "../utils.js";
 import { attach } from "../cstm-ng-utils.js";
 import won from "../won-es6.js";
@@ -16,6 +15,7 @@ import * as connectionUtils from "../redux/utils/connection-utils.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import { actionCreators } from "../actions/actions.js";
 import WonAtomCard from "./atom-card.jsx";
+import WonSuggestAtomPicker from "./details/picker/suggest-atom-picker.jsx";
 import ngAnimate from "angular-animate";
 
 import "~/style/_atom-content-participants.scss";
@@ -76,17 +76,22 @@ function genComponentConf() {
           No Groupmembers present.
       </div>
       <won-preact component="self.WonLabelledHr" class="labelledHr acp__labelledhr" ng-if="self.isOwned" props="{label: 'Invite', arrow: self.suggestAtomExpanded? 'up': 'down'}" ng-click="self.suggestAtomExpanded = !self.suggestAtomExpanded"></won-preact>
-      <won-suggestpost-picker
-          ng-if="self.isOwned && self.suggestAtomExpanded"
-          initial-value="undefined"
-          on-update="self.inviteParticipant(value)"
-          detail="::{placeholder: 'Insert AtomUri to invite'}"
-          excluded-uris="self.excludedFromInviteUris"
-          allowed-sockets="::[self.won.CHAT.ChatSocketCompacted, self.won.GROUP.GroupSocketCompacted]"
-          excluded-text="::'Invitation does not work for atoms that are already part of the Group, or the group itself'"
-          not-allowed-socket-text="::'Invitation does not work on atoms without Group or Chat Socket'"
-          no-suggestions-text="::'No Participants available to invite'"
-      ></won-suggestpost-picker>
+      <won-preact 
+        class="suggestAtomPicker"
+        ng-if="self.isOwned && self.suggestAtomExpanded"
+        component="self.WonSuggestAtomPicker"
+        props="{
+            initialValue: undefined,
+            onUpdate: self.inviteParticipant,
+            detail: {placeholder: 'Insert AtomUri to invite'},
+            excludedUris: self.excludedFromInviteUris,
+            allowedSockets: [self.won.CHAT.ChatSocketCompacted, self.won.GROUP.GroupSocketCompacted],
+            excludedText: 'Invitation does not work for atoms that are already part of the Group, or the group itself',
+            notAllowedSocketText: 'Invitation does not work on atoms without Group or Chat Socket',
+            noSuggestionsText: 'No Participants available to invite',
+        }"
+      >
+      </won-preact>
     `;
 
   class Controller {
@@ -97,6 +102,7 @@ function genComponentConf() {
       window.postcontentparticipants4dbg = this;
       this.WonAtomCard = WonAtomCard;
       this.WonLabelledHr = WonLabelledHr;
+      this.WonSuggestAtomPicker = WonSuggestAtomPicker;
 
       const selectFromState = state => {
         const post = getIn(state, ["atoms", this.atomUri]);
@@ -260,7 +266,6 @@ function genComponentConf() {
 export default angular
   .module("won.owner.components.atomContentParticipants", [
     ngAnimate,
-    suggestPostPickerModule,
     inviewModule.name,
   ])
   .directive("wonAtomContentParticipants", genComponentConf).name;

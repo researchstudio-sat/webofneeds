@@ -5,7 +5,6 @@
 import angular from "angular";
 import inviewModule from "angular-inview";
 import WonLabelledHr from "./labelled-hr.jsx";
-import suggestPostPickerModule from "./details/picker/suggestpost-picker.js";
 import { get, getIn } from "../utils.js";
 import { attach } from "../cstm-ng-utils.js";
 import won from "../won-es6.js";
@@ -15,8 +14,9 @@ import * as connectionSelectors from "../redux/selectors/connection-selectors.js
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import { actionCreators } from "../actions/actions.js";
 import WonAtomCard from "./atom-card.jsx";
-import ngAnimate from "angular-animate";
+import WonSuggestAtomPicker from "./details/picker/suggest-atom-picker.jsx";
 
+import ngAnimate from "angular-animate";
 import "~/style/_atom-content-buddies.scss";
 
 const CONNECTION_READ_TIMEOUT = 1500;
@@ -74,18 +74,30 @@ function genComponentConf() {
           ng-if="!self.buddies && !self.hasBuddyConnections">
           No Buddies present.
       </div>
-      <won-preact component="self.WonLabelledHr" class="labelledHr acb__labelledhr" ng-if="self.isOwned" props="{label: 'Request', arrow: self.suggestAtomExpanded? 'up': 'down'}" ng-click="self.suggestAtomExpanded = !self.suggestAtomExpanded"></won-preact>
-      <won-suggestpost-picker
-          ng-if="self.isOwned && self.suggestAtomExpanded"
-          initial-value="undefined"
-          on-update="self.requestBuddy(value)"
-          detail="::{placeholder: 'Insert AtomUri to invite'}"
-          excluded-uris="self.excludedFromRequestUris"
-          allowed-sockets="::[self.won.BUDDY.BuddySocketCompacted]"
-          excluded-text="::'Requesting yourself or someone who is already your Buddy is not allowed'"
-          not-allowed-socket-text="::'Request does not work on atoms without the Buddy Socket'"
-          no-suggestions-text="::'No known Personas available'"
-      ></won-suggestpost-picker>
+      <won-preact
+        component="self.WonLabelledHr"
+        class="labelledHr acb__labelledhr"
+        ng-if="self.isOwned"
+        props="{label: 'Request', arrow: self.suggestAtomExpanded? 'up': 'down'}"
+        ng-click="self.suggestAtomExpanded = !self.suggestAtomExpanded"
+      >
+      </won-preact>
+      <won-preact 
+        class="suggestAtomPicker"
+        ng-if="self.isOwned && self.suggestAtomExpanded"
+        component="self.WonSuggestAtomPicker"
+        props="{
+            initialValue: undefined,
+            onUpdate: self.requestBuddy,
+            detail: {placeholder: 'Insert AtomUri to invite'},
+            excludedUris: self.excludedFromRequestUris,
+            allowedSockets: [self.won.BUDDY.BuddySocketCompacted],
+            excludedText: 'Requesting yourself or someone who is already your Buddy is not allowed',
+            notAllowedSocketText: 'Request does not work on atoms without the Buddy Socket',
+            noSuggestionsText: 'No known Personas available',
+        }"
+      >
+      </won-preact>
     `;
 
   class Controller {
@@ -96,6 +108,7 @@ function genComponentConf() {
       window.atomContentBuddies4dbg = this;
       this.WonAtomCard = WonAtomCard;
       this.WonLabelledHr = WonLabelledHr;
+      this.WonSuggestAtomPicker = WonSuggestAtomPicker;
 
       const selectFromState = state => {
         const atom = getIn(state, ["atoms", this.atomUri]);
@@ -310,7 +323,6 @@ function genComponentConf() {
 export default angular
   .module("won.owner.components.atomContentBuddies", [
     ngAnimate,
-    suggestPostPickerModule,
     inviewModule.name,
   ])
   .directive("wonAtomContentBuddies", genComponentConf).name;

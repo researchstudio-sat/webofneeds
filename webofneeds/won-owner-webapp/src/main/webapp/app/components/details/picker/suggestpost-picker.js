@@ -2,7 +2,7 @@ import angular from "angular";
 import "ng-redux";
 import Immutable from "immutable";
 import { delay, get, getIn, sortBy } from "../../../utils.js";
-import { attach, DomCache } from "../../../cstm-ng-utils.js";
+import { attach } from "../../../cstm-ng-utils.js";
 import wonInput from "../../../directives/input.js";
 import { connect2Redux } from "../../../configRedux.js";
 import { actionCreators } from "../../../actions/actions.js";
@@ -67,7 +67,6 @@ function genComponentConf() {
   class Controller {
     constructor() {
       attach(this, serviceDependencies, arguments);
-      this.domCache = new DomCache(this.$element);
 
       window.suggestpostp4dbg = this;
 
