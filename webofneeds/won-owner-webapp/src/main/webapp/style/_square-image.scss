@@ -2,7 +2,7 @@
 
 @mixin square-image($size, $margin: 0) {
   > won-preact.atomImage > won-atom-icon,
-  > won-square-image {
+  > won-atom-icon {
     display: block;
     user-select: none;
     margin: $margin;

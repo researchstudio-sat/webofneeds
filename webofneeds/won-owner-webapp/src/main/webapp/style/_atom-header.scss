@@ -3,7 +3,7 @@
 @import "square-image";
 @import "animate";
 
-won-post-header {
+won-atom-header {
   &.won-is-loading {
     @include animateOpacityHeartBeat();
     pointer-events: none;
@@ -39,7 +39,7 @@ won-post-header {
   @include square-image($postIconSize);
 
   won-preact.atomImage,
-  won-square-image {
+  won-atom-image {
     grid-area: icon;
   }
 

@@ -10,7 +10,6 @@ import {attach, classOnComponentRoot} from "../cstm-ng-utils.js";
 import {connect2Redux} from "../configRedux.js";
 import {actionCreators} from "../actions/actions.js";
 import postMessagesModule from "../components/post-messages.js";
-import postHeaderModule from "../components/post-header.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as viewSelectors from "../redux/selectors/view-selectors.js";
 import * as processUtils from "../redux/utils/process-utils.js";
@@ -327,7 +326,6 @@ export default {
     .module("won.owner.components.overview", [
       ngAnimate,
       postMessagesModule,
-      postHeaderModule,
     ])
     .controller("OverviewController", Controller).name,
   controller: "OverviewController",

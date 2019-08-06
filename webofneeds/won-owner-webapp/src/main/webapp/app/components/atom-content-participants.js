@@ -5,7 +5,6 @@
 import angular from "angular";
 import inviewModule from "angular-inview";
 import labelledHrModule from "./labelled-hr.js";
-import postHeaderModule from "./post-header.js";
 import suggestPostPickerModule from "./details/picker/suggestpost-picker.js";
 import { get, getIn } from "../utils.js";
 import { attach } from "../cstm-ng-utils.js";
@@ -261,7 +260,6 @@ export default angular
   .module("won.owner.components.atomContentParticipants", [
     ngAnimate,
     labelledHrModule,
-    postHeaderModule,
     suggestPostPickerModule,
 
     inviewModule.name,

@@ -1,14 +1,14 @@
 import angular from "angular";
 import "ng-redux";
 import Immutable from "immutable";
-import { sortBy, get, getIn, delay } from "../../../utils.js";
+import { delay, get, getIn, sortBy } from "../../../utils.js";
 import { attach, DomCache } from "../../../cstm-ng-utils.js";
 import wonInput from "../../../directives/input.js";
 import { connect2Redux } from "../../../configRedux.js";
 import { actionCreators } from "../../../actions/actions.js";
-import postHeaderModule from "../../post-header.js";
 import labelledHrModule from "../../labelled-hr.js";
 import { getActiveAtoms } from "../../../redux/selectors/general-selectors.js";
+import WonAtomHeader from "../../atom-header.jsx";
 
 import "~/style/_suggestpostpicker.scss";
 
@@ -20,9 +20,11 @@ function genComponentConf() {
           ng-class="{'won--selected': self.isSelected(atom)}"
           ng-repeat="atom in self.sortedActiveAtoms"
           ng-click="self.selectAtom(atom)">
-          <won-post-header
-              atom-uri="atom.get('uri')">
-          </won-post-header>
+          <won-preact
+              class="atomHeader"
+              component="self.WonAtomHeader"
+              props="{atomUri: atom.get('uri')}">
+          </won-preact>
         </div>
       </div>
       <div class="suggestpostp__noposts" ng-if="!self.suggestionsAvailable">
@@ -74,6 +76,8 @@ function genComponentConf() {
       this.showResetButton = false;
 
       this.uriToFetch = undefined;
+
+      this.WonAtomHeader = WonAtomHeader;
 
       const selectFromState = state => {
         const suggestedAtomUri = this.initialValue;
@@ -298,7 +302,6 @@ function genComponentConf() {
 export default angular
   .module("won.owner.components.suggestpostPicker", [
     wonInput,
-    postHeaderModule,
     labelledHrModule,
   ])
   .directive("wonSuggestpostPicker", genComponentConf).name;

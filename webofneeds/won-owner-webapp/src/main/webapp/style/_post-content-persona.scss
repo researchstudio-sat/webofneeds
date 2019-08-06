@@ -18,7 +18,7 @@ won-post-content-persona {
 
     @include square-image($postIconSize);
     won-preact.atomImage,
-    won-square-image {
+    won-atom-image {
       grid-area: p_icon;
     }
 

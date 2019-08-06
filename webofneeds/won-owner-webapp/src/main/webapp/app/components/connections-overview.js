@@ -8,9 +8,9 @@
 import angular from "angular";
 import Immutable from "immutable";
 import ngAnimate from "angular-animate";
-import postHeaderModule from "./post-header.js";
 import connectionIndicatorsModule from "./connection-indicators.js";
 import connectionSelectionItemModule from "./connection-selection-item.js";
+import WonAtomHeader from "./atom-header.jsx";
 
 import { get, getIn, sortByDate } from "../utils.js";
 import { attach } from "../cstm-ng-utils.js";
@@ -31,11 +31,13 @@ function genComponentConf() {
         <div ng-repeat="atomUri in self.sortedOpenAtomUris track by atomUri" class="co__item">
             <div class="co__item__atom">
                 <div class="co__item__atom__header">
-                    <won-post-header
-                        atom-uri="::atomUri"
-                        ng-click="!self.isAtomLoading(atomUri) && self.showAtomDetails(atomUri)"
-                        ng-class="{ 'clickable' : !self.isAtomLoading(atomUri) }">
-                    </won-post-header>
+                    <won-preact
+                        class="atomHeader"
+                        component="self.WonAtomHeader"
+                        props="{atomUri: atomUri}"
+                        ng-class="{ 'clickable' : !self.isAtomLoading(atomUri) }"
+                        ng-click="!self.isAtomLoading(atomUri) && self.showAtomDetails(atomUri)">
+                    </won-preact>
                     <won-connection-indicators
                         on-selected-connection="::self.selectConnection(connectionUri)"
                         atom-uri="::atomUri">
@@ -62,6 +64,7 @@ function genComponentConf() {
     constructor() {
       attach(this, serviceDependencies, arguments);
       window.co4dbg = this;
+      this.WonAtomHeader = WonAtomHeader;
 
       const selectFromState = state => {
         const allAtoms = generalSelectors.getPosts(state);
@@ -177,7 +180,6 @@ function genComponentConf() {
 export default angular
   .module("won.owner.components.connectionsOverview", [
     connectionSelectionItemModule,
-    postHeaderModule,
     connectionIndicatorsModule,
     ngAnimate,
   ])

@@ -119,7 +119,7 @@ export default class WonAtomIcon extends React.Component {
       atomIcon = (
         <div className="image usecaseimage" style={style}>
           <svg className="si__usecaseicon">
-            <use xlinkHref="{{ ::self.useCaseIcon }}" href="{{ ::self.useCaseIcon }}"></use>
+            <use xlinkHref={this.state.useCaseIcon} href={this.state.useCaseIcon}></use>
           </svg>
         </div>
       );
