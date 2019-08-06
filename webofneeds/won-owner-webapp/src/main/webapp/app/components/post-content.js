@@ -6,10 +6,10 @@ import angular from "angular";
 import postIsOrSeeksInfoModule from "./post-is-or-seeks-info.js";
 import postContentGeneral from "./post-content-general.js";
 import postContentPersona from "./post-content-persona.js";
-import atomContentParticipants from "./atom-content-participants.js";
 import atomContentBuddies from "./atom-content-buddies.js";
 import WonAtomContentHolds from "./atom-content-holds.jsx";
 import WonAtomContentSuggestions from "./atom-content-suggestions.jsx";
+import WonAtomContentParticipants from "./atom-content-participants.jsx";
 import WonLabelledHr from "./labelled-hr.jsx";
 import trigModule from "./trig.js";
 import { get, getIn } from "../utils.js";
@@ -82,7 +82,7 @@ function genComponentConf() {
           <won-elm module="self.addPersonaModule" ng-if="self.isSelectedTab('HELDBY') && self.isOwned && self.isActive && self.hasHoldableSocket && !self.isHeld" props="{post: self.post.toJS(), personas: self.personas.toJS()}"></won-elm>
           
           <!-- PARTICIPANT INFORMATION -->
-          <won-atom-content-participants ng-if="self.isSelectedTab('PARTICIPANTS')" atom-uri="self.postUri"></won-atom-content-participants>
+          <won-preact component="self.WonAtomContentParticipants" props="{atomUri: self.postUri}" ng-if="self.isSelectedTab('PARTICIPANTS')"></won-preact>
           
           <!-- BUDDY INFORMATION -->
           <won-atom-content-buddies ng-if="self.isSelectedTab('BUDDIES')" atom-uri="self.postUri"></won-atom-content-buddies>
@@ -136,6 +136,7 @@ function genComponentConf() {
       this.addPersonaModule = Elm.AddPersona;
       this.WonAtomContentHolds = WonAtomContentHolds;
       this.WonAtomContentSuggestions = WonAtomContentSuggestions;
+      this.WonAtomContentParticipants = WonAtomContentParticipants;
       this.WonLabelledHr = WonLabelledHr;
 
       const selectFromState = state => {
@@ -227,7 +228,6 @@ export default angular
     postIsOrSeeksInfoModule,
     postContentGeneral,
     postContentPersona,
-    atomContentParticipants,
     atomContentBuddies,
     trigModule,
     elmModule,

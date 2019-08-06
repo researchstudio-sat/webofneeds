@@ -7,8 +7,9 @@ import WonAtomCard from "./atom-card.jsx";
 
 import "~/style/_atom-content-suggestions.scss";
 import * as connectionSelectors from "../redux/selectors/connection-selectors.js";
+import * as connectionUtils from "../redux/utils/connection-utils.js";
 import VisibilitySensor from "react-visibility-sensor";
-import {get} from "../utils";
+import {get} from "../utils.js";
 import won from "../won-es6";
 
 export default class WonAtomContentSuggestions extends React.Component {
@@ -44,9 +45,9 @@ export default class WonAtomContentSuggestions extends React.Component {
   }
 
   markAsRead(conn) {
-    if (conn && conn.get("unread")) {
+    if (connectionUtils.isUnread(conn)) {
       const payload = {
-        connectionUri: conn.get("uri"),
+        connectionUri: get(conn, "uri"),
         atomUri: this.atomUri,
       };
 
@@ -59,9 +60,9 @@ export default class WonAtomContentSuggestions extends React.Component {
       return;
     }
 
-    const connUri = conn.get("uri");
+    const connUri = get(conn, "uri");
 
-    if (conn.get("unread")) {
+    if (connectionUtils.isUnread(conn)) {
       this.props.ngRedux.dispatch(actionCreators.connections__markAsRead({
         connectionUri: connUri,
         atomUri: this.atomUri,
@@ -78,13 +79,13 @@ export default class WonAtomContentSuggestions extends React.Component {
       return;
     }
 
-    const connUri = conn.get("uri");
+    const connUri = get(conn, "uri");
 
     if (rateBad) {
       this.props.ngRedux.dispatch(actionCreators.connections__rate(connUri, won.WONCON.binaryRatingBad));
     }
 
-    if (conn.get("unread")) {
+    if (connectionUtils.isUnread(conn)) {
       this.props.ngRedux.dispatch(actionCreators.connections__markAsRead({
         connectionUri: connUri,
         atomUri: this.atomUri,
@@ -102,7 +103,7 @@ export default class WonAtomContentSuggestions extends React.Component {
     const connUri = get(conn, "uri");
     const targetAtomUri = get(conn, "targetAtomUri");
 
-    if (conn.get("unread")) {
+    if (connectionUtils.isUnread(conn)) {
       this.props.ngRedux.dispatch(actionCreators.connections__markAsRead({
         connectionUri: connUri,
         atomUri: this.atomUri,
@@ -126,10 +127,10 @@ export default class WonAtomContentSuggestions extends React.Component {
     if (this.state.hasSuggestions) {
       const atomCards = this.state.suggestionsArray.map(suggestion => {
         return (
-          <VisibilitySensor key={suggestion.get("uri")} onChange={(isVisible) => { isVisible && suggestion.get("unread") && this.markAsRead(suggestion) }} intervalDelay={2000}>
-            <div className={"acs__atom " + (suggestion.get("unread") ? "won-unread" : "")}>
+          <VisibilitySensor key={get(suggestion, "uri")} onChange={(isVisible) => { isVisible && connectionUtils.isUnread(suggestion) && this.markAsRead(suggestion) }} intervalDelay={2000}>
+            <div className={"acs__atom " + (connectionUtils.isUnread(suggestion) ? "won-unread" : "")}>
               <WonAtomCard
-                atomUri={suggestion.get("targetAtomUri")}
+                atomUri={get(suggestion, "targetAtomUri")}
                 currentLocation={this.state.currentLocation}
                 showSuggestions={false}
                 showPersona={true}
@@ -158,11 +159,13 @@ export default class WonAtomContentSuggestions extends React.Component {
         </won-atom-content-suggestions>
       );
     } else {
-      <won-atom-content-suggestions>
-        <div className="acs__empty">
-          No Suggestions for this Atom.
-        </div>
-      </won-atom-content-suggestions>
+      return (
+        <won-atom-content-suggestions>
+          <div className="acs__empty">
+            No Suggestions for this Atom.
+          </div>
+        </won-atom-content-suggestions>
+      );
     }
   }
 }
