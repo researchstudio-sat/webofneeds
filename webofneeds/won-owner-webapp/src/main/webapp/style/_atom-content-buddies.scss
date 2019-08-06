@@ -37,13 +37,12 @@ won-atom-content-buddies {
       }
     }
   }
-  & > won-preact.labelledHr.acb__labelledhr,
-  & > won-labelled-hr.acb__labelledhr {
+
+  & > won-labelled-hr {
     grid-column: 1 / -1;
   }
 
-  & > won-suggest-atom-picker,
-  & > won-preact.suggestAtomPicker {
+  & > won-suggest-atom-picker {
     grid-column: 1 / -1;
     background: var(--won-light-gray);
     padding: 0.5rem;

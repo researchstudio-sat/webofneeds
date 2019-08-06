@@ -6,10 +6,10 @@ import angular from "angular";
 import postIsOrSeeksInfoModule from "./post-is-or-seeks-info.js";
 import postContentGeneral from "./post-content-general.js";
 import postContentPersona from "./post-content-persona.js";
-import atomContentBuddies from "./atom-content-buddies.js";
 import WonAtomContentHolds from "./atom-content-holds.jsx";
 import WonAtomContentSuggestions from "./atom-content-suggestions.jsx";
 import WonAtomContentParticipants from "./atom-content-participants.jsx";
+import WonAtomContentBuddies from "./atom-content-buddies.jsx";
 import WonLabelledHr from "./labelled-hr.jsx";
 import trigModule from "./trig.js";
 import { get, getIn } from "../utils.js";
@@ -85,7 +85,7 @@ function genComponentConf() {
           <won-preact component="self.WonAtomContentParticipants" props="{atomUri: self.postUri}" ng-if="self.isSelectedTab('PARTICIPANTS')"></won-preact>
           
           <!-- BUDDY INFORMATION -->
-          <won-atom-content-buddies ng-if="self.isSelectedTab('BUDDIES')" atom-uri="self.postUri"></won-atom-content-buddies>
+          <won-preact component="self.WonAtomContentBuddies" props="{atomUri: self.postUri}" ng-if="self.isSelectedTab('BUDDIES')"></won-preact>
 
           <!-- REVIEW INFORMATION -->
           <div class="post-content__reviews" ng-if="self.isSelectedTab('REVIEWS')">
@@ -137,6 +137,7 @@ function genComponentConf() {
       this.WonAtomContentHolds = WonAtomContentHolds;
       this.WonAtomContentSuggestions = WonAtomContentSuggestions;
       this.WonAtomContentParticipants = WonAtomContentParticipants;
+      this.WonAtomContentBuddies = WonAtomContentBuddies;
       this.WonLabelledHr = WonLabelledHr;
 
       const selectFromState = state => {
@@ -228,7 +229,6 @@ export default angular
     postIsOrSeeksInfoModule,
     postContentGeneral,
     postContentPersona,
-    atomContentBuddies,
     trigModule,
     elmModule,
   ])

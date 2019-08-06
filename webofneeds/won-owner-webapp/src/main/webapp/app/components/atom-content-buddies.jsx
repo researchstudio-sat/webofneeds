@@ -16,7 +16,7 @@ import WonAtomCard from "./atom-card.jsx";
 import "~/style/_atom-content-participants.scss";
 import VisibilitySensor from "react-visibility-sensor";
 
-export default class WonAtomContentParticipants extends React.Component {
+export default class WonAtomContentBuddies extends React.Component {
   constructor(props){
     super(props);
     this.localState = {
@@ -50,45 +50,45 @@ export default class WonAtomContentParticipants extends React.Component {
   }
 
   selectFromState(state) {
-    const post = getIn(state, ["atoms", this.atomUri]);
+    const atom = getIn(state, ["atoms", this.atomUri]);
     const isOwned = generalSelectors.isAtomOwned(state, this.atomUri);
 
-    const hasGroupSocket = atomUtils.hasGroupSocket(post);
+    const hasBuddySocket = atomUtils.hasBuddySocket(atom);
 
-    const groupMembers = hasGroupSocket && get(post, "groupMembers");
-    const groupChatConnections =
+    const buddies = hasBuddySocket && get(atom, "buddies");
+
+    const buddyConnections =
       isOwned &&
-      hasGroupSocket &&
-      connectionSelectors.getGroupChatConnectionsByAtomUri(
+      hasBuddySocket &&
+      connectionSelectors.getBuddyConnectionsByAtomUri(
         state,
-        this.atomUri
+        this.atomUri,
+        true,
+        true
       );
 
-    let excludedFromInviteUris = [this.atomUri];
+    let excludedFromRequestUris = [this.atomUri];
 
-    if (groupChatConnections) {
-      groupChatConnections
-        .filter(conn => !connectionUtils.isClosed(conn))
-        .map(conn =>
-          excludedFromInviteUris.push(get(conn, "targetAtomUri"))
-        );
+    if (buddyConnections) {
+      buddyConnections.map(conn =>
+        excludedFromRequestUris.push(get(conn, "targetAtomUri"))
+      );
     }
 
     return {
-      post,
+      atom,
       isOwned,
-      hasGroupSocket,
-      groupMembers: groupMembers && groupMembers.size > 0,
-      hasGroupChatConnections:
-        groupChatConnections && groupChatConnections.size > 0,
-      groupChatConnectionsArray:
-        groupChatConnections && groupChatConnections.toArray(),
-      excludedFromInviteUris,
-      groupMembersArray: groupMembers && groupMembers.toArray(),
+      hasBuddySocket,
+      hasBuddies: buddies && buddies.size > 0,
+      hasBuddyConnections: buddyConnections && buddyConnections.size > 0,
+      buddyConnectionsArray: buddyConnections && buddyConnections.toArray(),
+      excludedFromRequestUris,
+      buddiesArray: buddies && buddies.toArray(),
     };
   }
 
   render() {
+    //TODO
     if (!this.state) {
       console.debug("render with null state");
       return <div/>;
@@ -97,21 +97,21 @@ export default class WonAtomContentParticipants extends React.Component {
     let participants;
 
     if (this.state.isOwned) {
-      if (this.state.hasGroupChatConnections) {
-        participants = this.state.groupChatConnectionsArray.map(conn => {
+      if (this.state.hasBuddyConnections) {
+        participants = this.state.buddyConnectionsArray.map(conn => {
           if(!connectionUtils.isClosed(conn)) {
             let actionButtons;
 
             if(connectionUtils.isRequestReceived(conn)) {
               actionButtons = (
-                <div className="acp__participant__actions">
+                <div className="acb__buddy__actions">
                   <div
-                    className="acp__participant__actions__button red won-button--outlined thin"
+                    className="acb__buddy__actions__button red won-button--outlined thin"
                     onClick={() => this.openRequest(conn)}>
                     Accept
                   </div>
                   <div
-                    className="acp__participant__actions__button red won-button--outlined thin"
+                    className="acb__buddy__actions__button red won-button--outlined thin"
                     onClick={() => this.closeConnection(conn)}>
                     Reject
                   </div>
@@ -119,14 +119,14 @@ export default class WonAtomContentParticipants extends React.Component {
               );
             } else if (connectionUtils.isSuggested(conn)) {
               actionButtons = (
-                <div className="acp__participant__actions">
+                <div className="acb__buddy__actions">
                   <div
-                    className="acp__participant__actions__button red won-button--outlined thin"
-                    onClick={() => this.sendRequest(conn)}>
+                    className="acb__buddy__actions__button red won-button--outlined thin"
+                    onClick={() => this.requestBuddy(conn)}>
                     Request
                   </div>
                   <div
-                    className="acp__participant__actions__button red won-button--outlined thin"
+                    className="acb__buddy__actions__button red won-button--outlined thin"
                     onClick={() => this.closeConnection(conn)}>
                     Remove
                   </div>
@@ -134,17 +134,17 @@ export default class WonAtomContentParticipants extends React.Component {
               )
             } else if (connectionUtils.isRequestSent(conn)) {
               actionButtons = (
-                <div className="acp__participant__actions">
-                  <div className="acp__participant__actions__button red won-button--outlined thin" disabled={true}>
+                <div className="acb__buddy__actions">
+                  <div className="acb__buddy__actions__button red won-button--outlined thin" disabled={true}>
                     Waiting for Accept...
                   </div>
                 </div>
               );
             } else if (connectionUtils.isConnected(conn)) {
               actionButtons = (
-                <div className="acp__participant__actions">
+                <div className="acb__buddy__actions">
                   <div
-                    className="acp__participant__actions__button red won-button--outlined thin"
+                    className="acb__buddy__actions__button red won-button--outlined thin"
                     onClick={() => this.closeConnection(conn)}>
                     Remove
                   </div>
@@ -152,14 +152,14 @@ export default class WonAtomContentParticipants extends React.Component {
               );
             } else {
               actionButtons = (
-                <div className="acp__participant__actions"/>
+                <div className="acb__buddy__actions"/>
               );
             }
 
             return (
               <VisibilitySensor key={get(conn, "uri")} onChange={(isVisible) => { isVisible && connectionUtils.isUnread(conn) && this.markAsRead(conn) }} intervalDelay={2000}>
-                <div className={"acp__participant " + (connectionUtils.isUnread(conn) ? " won-unread " : "")}>
-                  <WonAtomCard atomUri={get(conn, 'targetAtomUri')} currentLocation={this.state.currentLocation} showSuggestions={false} showPersona={true} ngRedux={this.props.ngRedux}/>
+                <div className={"acb__buddy " + (connectionUtils.isUnread(conn) ? " won-unread " : "")}>
+                  <WonAtomCard atomUri={get(conn, 'targetAtomUri')} currentLocation={this.state.currentLocation} showSuggestions={false} showPersona={false} ngRedux={this.props.ngRedux}/>
                   {actionButtons}
                 </div>
               </VisibilitySensor>
@@ -168,26 +168,26 @@ export default class WonAtomContentParticipants extends React.Component {
         });
       } else {
         participants = (
-          <div className="acp__empty">No Groupmembers present.</div>
+          <div className="acp__empty">No Buddies present.</div>
         );
       }
 
       return (
         <won-atom-content-participants>
           {participants}
-          <WonLabelledHr label="Invite" arrow={this.state.suggestAtomExpanded? "up" : "down"} onClick={() => this.toggleSuggestions()}/>
+          <WonLabelledHr label="Request" arrow={this.state.suggestAtomExpanded? "up" : "down"} onClick={() => this.toggleSuggestions()}/>
           {
             this.state.suggestAtomExpanded
             ? (
               <WonSuggestAtomPicker
                 initialValue={undefined}
-                onUpdate={this.inviteParticipant}
+                onUpdate={this.requestBuddy}
                 detail={{placeholder: "Insert AtomUri to invite"}}
-                excludedUris={this.state.excludedFromInviteUris}
-                allowedSockets={[won.CHAT.ChatSocketCompacted, won.GROUP.GroupSocketCompacted]}
-                excludedText="Invitation does not work for atoms that are already part of the Group, or the group itself"
-                notAllowedSocketText="Invitation does not work on atoms without Group or Chat Socket"
-                noSuggestionsText="No Participants available to invite"
+                excludedUris={this.state.excludedFromRequestUris}
+                allowedSockets={[won.BUDDY.BuddySocketCompacted]}
+                excludedText="Requesting yourself or someone who is already your Buddy is not allowed"
+                notAllowedSocketText="Request does not work on atoms without the Buddy Socket"
+                noSuggestionsText="No known Personas available"
                 ngRedux={this.props.ngRedux}
               />
             )
@@ -196,18 +196,18 @@ export default class WonAtomContentParticipants extends React.Component {
         </won-atom-content-participants>
       );
     } else {
-      if (this.state.groupMembers) {
-        participants = this.state.groupMembersArray.map(memberUri => {
+      if (this.state.hasBuddies) {
+        participants = this.state.buddiesArray.map(memberUri => {
           return (
-            <div className="acp__participant" key={memberUri}>
-              <WonAtomCard atomUri={memberUri} currentLocation={this.state.currentLocation} showSuggestions={false} showPersona={true} ngRedux={this.props.ngRedux}/>
-              <div className="acp__participant__actions"></div>
+            <div className="acb__buddy" key={memberUri}>
+              <WonAtomCard atomUri={memberUri} currentLocation={this.state.currentLocation} showSuggestions={false} showPersona={false} ngRedux={this.props.ngRedux}/>
+              <div className="acb__buddy__actions"></div>
             </div>
           );
         });
       } else {
         participants = (
-          <div className="acp__empty">No Groupmembers present.</div>
+          <div className="acp__empty">No Buddies present.</div>
         );
       }
 
@@ -224,20 +224,71 @@ export default class WonAtomContentParticipants extends React.Component {
       return;
     }
 
-    const connUri = get(conn, "uri");
+    const payload = {
+      caption: "Persona",
+      text: "Remove Buddy?",
+      buttons: [
+        {
+          caption: "Yes",
+          callback: () => {
+            const connUri = get(conn, "uri");
 
-    if (rateBad) {
-      this.props.ngRedux.dispatch(actionCreators.connections__rate(connUri, won.WONCON.binaryRatingBad));
+            if (connectionUtils.isUnread(conn)) {
+              this.props.ngRedux.dispatch(actionCreators.connections__markAsRead({
+                connectionUri: connUri,
+                atomUri: this.atomUri,
+              }));
+            }
+
+            this.props.ngRedux.dispatch(actionCreators.connections__close(connUri));
+            this.props.ngRedux.dispatch(actionCreators.view__hideModalDialog());
+          },
+        },
+        {
+          caption: "No",
+          callback: () => {
+            this.props.ngRedux.dispatch(actionCreators.view__hideModalDialog());
+          },
+        },
+      ],
+    };
+    this.props.ngRedux.dispatch(actionCreators.view__showModalDialog(payload));
+  }
+
+  rejectConnection(conn) {
+    if (!conn) {
+      return;
     }
 
-    if (connectionUtils.isUnread(conn)) {
-      this.props.ngRedux.dispatch(actionCreators.connections__markAsRead({
-        connectionUri: connUri,
-        atomUri: this.atomUri,
-      }));
-    }
+    const payload = {
+      caption: "Persona",
+      text: "Reject Buddy Request?",
+      buttons: [
+        {
+          caption: "Yes",
+          callback: () => {
+            const connUri = get(conn, "uri");
 
-    this.props.ngRedux.dispatch(actionCreators.connections__close(connUri));
+            if (connectionUtils.isUnread(conn)) {
+              this.props.ngRedux.dispatch(actionCreators.connections__markAsRead({
+                connectionUri: connUri,
+                atomUri: this.atomUri,
+              }));
+            }
+
+            this.props.ngRedux.dispatch(actionCreators.connections__close(connUri));
+            this.props.ngRedux.dispatch(actionCreators.view__hideModalDialog());
+          },
+        },
+        {
+          caption: "No",
+          callback: () => {
+            this.props.ngRedux.dispatch(actionCreators.view__hideModalDialog());
+          },
+        },
+      ],
+    };
+    this.props.ngRedux.dispatch(actionCreators.view__showModalDialog(payload));
   }
 
   openRequest(conn, message = "") {
@@ -257,7 +308,43 @@ export default class WonAtomContentParticipants extends React.Component {
     this.props.ngRedux.dispatch(actionCreators.connections__open(connUri, message));
   }
 
+  requestBuddy(targetAtomUri, message = "") {
+    if (!this.isOwned || !this.hasBuddySocket) {
+      console.warn("Trying to request a non-owned or non buddySocket atom");
+      return;
+    }
+
+    const payload = {
+      caption: "Persona",
+      text: "Send Buddy Request?",
+      buttons: [
+        {
+          caption: "Yes",
+          callback: () => {
+            this.props.ngRedux.dispatch(actionCreators.atoms__connect(
+              this.atomUri,
+              undefined,
+              targetAtomUri,
+              message,
+              won.BUDDY.BuddySocketCompacted,
+              won.BUDDY.BuddySocketCompacted
+            ));
+            this.props.ngRedux.dispatch(actionCreators.view__hideModalDialog());
+          },
+        },
+        {
+          caption: "No",
+          callback: () => {
+            this.props.ngRedux.dispatch(actionCreators.view__hideModalDialog());
+          },
+        },
+      ],
+    };
+    this.props.ngRedux.dispatch(actionCreators.view__showModalDialog(payload));
+  }
+
   sendRequest(conn, message = "") {
+    //TODO
     if (!conn) {
       return;
     }
@@ -301,6 +388,7 @@ export default class WonAtomContentParticipants extends React.Component {
   }
 
   inviteParticipant(atomUri, message = "") {
+    //TODO
     if (!this.state.isOwned || !this.state.hasGroupSocket) {
       console.warn("Trying to invite to a non-owned or non groupSocket atom");
       return;
