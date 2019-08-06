@@ -1,5 +1,5 @@
 import angular from "angular";
-import labelledHrModule from "./labelled-hr.js";
+import WonLabelledHr from "./labelled-hr.jsx";
 
 import "~/style/_flexgrid.scss";
 
@@ -20,7 +20,7 @@ function genComponentConf() {
                     </span>
                     <span class="fgi__text" ng-show="item.text2 !== undefined && item.separatorText !== undefined">
                         {{item.text}}
-                        <won-labelled-hr label="::item.separatorText"></won-labelled-hr>
+                        <won-preact component="self.WonLabelledHr" class="labelledHr" props="{label: item.separatorText}"></won-preact>
                         {{item.text2}}
                     </span>
                     <svg style="--local-primary:var(--won-primary-color);"
@@ -39,7 +39,9 @@ function genComponentConf() {
     `;
 
   class Controller {
-    constructor() {}
+    constructor() {
+      this.WonLabelledHr = WonLabelledHr;
+    }
 
     openElement(index) {
       if (index === this.selectedIdx) {
@@ -61,5 +63,5 @@ function genComponentConf() {
 }
 
 export default angular
-  .module("won.owner.components.flexgrid", [labelledHrModule])
+  .module("won.owner.components.flexgrid", [])
   .directive("wonFlexGrid", genComponentConf).name;

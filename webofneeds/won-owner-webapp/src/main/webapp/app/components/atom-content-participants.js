@@ -4,7 +4,7 @@
 
 import angular from "angular";
 import inviewModule from "angular-inview";
-import labelledHrModule from "./labelled-hr.js";
+import WonLabelledHr from "./labelled-hr.jsx";
 import suggestPostPickerModule from "./details/picker/suggestpost-picker.js";
 import { get, getIn } from "../utils.js";
 import { attach } from "../cstm-ng-utils.js";
@@ -75,7 +75,7 @@ function genComponentConf() {
           ng-if="(!self.isOwned && !self.groupMembers) || (self.isOwned && !self.hasGroupChatConnections)">
           No Groupmembers present.
       </div>
-      <won-labelled-hr label="::'Invite'" class="acp__labelledhr" ng-if="self.isOwned" arrow="self.suggestAtomExpanded? 'up' : 'down'" ng-click="self.suggestAtomExpanded = !self.suggestAtomExpanded"></won-labelled-hr>
+      <won-preact component="self.WonLabelledHr" class="labelledHr acp__labelledhr" ng-if="self.isOwned" props="{label: 'Invite', arrow: self.suggestAtomExpanded? 'up': 'down'}" ng-click="self.suggestAtomExpanded = !self.suggestAtomExpanded"></won-preact>
       <won-suggestpost-picker
           ng-if="self.isOwned && self.suggestAtomExpanded"
           initial-value="undefined"
@@ -96,6 +96,7 @@ function genComponentConf() {
       this.suggestAtomExpanded = false;
       window.postcontentparticipants4dbg = this;
       this.WonAtomCard = WonAtomCard;
+      this.WonLabelledHr = WonLabelledHr;
 
       const selectFromState = state => {
         const post = getIn(state, ["atoms", this.atomUri]);
@@ -259,9 +260,7 @@ function genComponentConf() {
 export default angular
   .module("won.owner.components.atomContentParticipants", [
     ngAnimate,
-    labelledHrModule,
     suggestPostPickerModule,
-
     inviewModule.name,
   ])
   .directive("wonAtomContentParticipants", genComponentConf).name;

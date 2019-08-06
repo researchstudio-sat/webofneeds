@@ -38,6 +38,7 @@ won-atom-content-participants {
     }
   }
 
+  & > won-preact.labelledHr.acp__labelledhr,
   & > won-labelled-hr.acp__labelledhr {
     grid-column: 1 / -1;
   }

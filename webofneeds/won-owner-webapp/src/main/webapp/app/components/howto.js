@@ -7,6 +7,7 @@ import { getIn } from "../utils.js";
 import { attach } from "../cstm-ng-utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { connect2Redux } from "../configRedux.js";
+import WonLabelledHr from "./labelled-hr.jsx";
 
 import "~/style/_howto.scss";
 import * as generalSelectors from "../redux/selectors/general-selectors";
@@ -89,10 +90,7 @@ function genTopnavConf() {
           >
             <span>What's new?</span>
           </button>
-          <won-labelled-hr
-            label="::'Or'"
-            class="howto__createx__labelledhr"
-          ></won-labelled-hr>
+          <won-preact component="self.WonLabelledHr" class="labelledHr howto__createx__labelledhr" props="{label: 'Or'}"></won-preact>
           <button
             class="won-button--filled red howto__createx__spanbutton"
             ng-click="self.router__stateGo('create')"
@@ -141,6 +139,7 @@ function genTopnavConf() {
   class Controller {
     constructor(/* arguments <- serviceDependencies */) {
       attach(this, serviceDependencies, arguments);
+      this.WonLabelledHr = WonLabelledHr;
 
       const selectFromState = state => {
         return {

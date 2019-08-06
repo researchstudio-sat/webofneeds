@@ -4,7 +4,6 @@
 
 import angular from "angular";
 import postIsOrSeeksInfoModule from "./post-is-or-seeks-info.js";
-import labelledHrModule from "./labelled-hr.js";
 import postContentGeneral from "./post-content-general.js";
 import postContentPersona from "./post-content-persona.js";
 import atomContentParticipants from "./atom-content-participants.js";
@@ -74,7 +73,7 @@ function genComponentConf() {
           <won-post-content-general ng-if="self.isSelectedTab('DETAIL')" post-uri="self.postUri"></won-post-content-general>
           <!-- DETAIL INFORMATION -->
           <won-post-is-or-seeks-info branch="::'content'" ng-if="self.isSelectedTab('DETAIL') && self.hasContent" post-uri="self.postUri"></won-post-is-or-seeks-info>
-          <won-labelled-hr label="::'Search'" class="cp__labelledhr" ng-show="self.isSelectedTab('DETAIL') && self.hasContent && self.hasSeeksBranch"></won-labelled-hr>
+          <won-preact component="self.WonLabelledHr" class="labelledHr cp__labelledhr" props="{label: 'Search'}" ng-show="self.isSelectedTab('DETAIL') && self.hasContent && self.hasSeeksBranch"></won-preact>
           <won-post-is-or-seeks-info branch="::'seeks'" ng-if="self.isSelectedTab('DETAIL') && self.hasSeeksBranch" post-uri="self.postUri"></won-post-is-or-seeks-info>
 
           <!-- PERSONA INFORMATION -->
@@ -136,6 +135,7 @@ function genComponentConf() {
       this.addPersonaModule = Elm.AddPersona;
       this.WonAtomContentHolds = WonAtomContentHolds;
       this.WonAtomContentSuggestions = WonAtomContentSuggestions;
+      this.WonLabelledHr = this.WonLabelledHr;
 
       const selectFromState = state => {
         const openConnectionUri = getConnectionUriFromRoute(state);
@@ -224,7 +224,6 @@ export default angular
   .module("won.owner.components.postContent", [
     ngAnimate,
     postIsOrSeeksInfoModule,
-    labelledHrModule,
     postContentGeneral,
     postContentPersona,
     atomContentParticipants,

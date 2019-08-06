@@ -6,7 +6,6 @@ import { attach, DomCache } from "../../../cstm-ng-utils.js";
 import wonInput from "../../../directives/input.js";
 import { connect2Redux } from "../../../configRedux.js";
 import { actionCreators } from "../../../actions/actions.js";
-import labelledHrModule from "../../labelled-hr.js";
 import { getActiveAtoms } from "../../../redux/selectors/general-selectors.js";
 import WonAtomHeader from "../../atom-header.jsx";
 
@@ -30,7 +29,7 @@ function genComponentConf() {
       <div class="suggestpostp__noposts" ng-if="!self.suggestionsAvailable">
         {{ self.noSuggestionsLabel }}
       </div>
-      <won-labelled-hr label="::'Not happy with the options? Add an Atom-URI below'" class="suggestpostp__labelledhr"></won-labelled-hr>
+      <won-preact component="self.WonLabelledHr" class="labelledHr suggestpostp__labelledhr" props="{label: 'Not happy with the options? Add an Atom-URI below'}"></won-preact>
       <div class="suggestpostp__input">
          <svg class="suggestpostp__input__icon clickable"
             style="--local-primary:var(--won-primary-color);"
@@ -300,8 +299,5 @@ function genComponentConf() {
 }
 
 export default angular
-  .module("won.owner.components.suggestpostPicker", [
-    wonInput,
-    labelledHrModule,
-  ])
+  .module("won.owner.components.suggestpostPicker", [wonInput])
   .directive("wonSuggestpostPicker", genComponentConf).name;

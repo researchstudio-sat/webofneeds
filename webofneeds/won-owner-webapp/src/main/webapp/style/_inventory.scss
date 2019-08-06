@@ -22,6 +22,15 @@ main.ownerwelcome {
     background: white;
   }
 
+  > won-how-to
+    > .howto__createx
+    > won-preact.labelledHr
+    > won-labelled-hr
+    > .wlh__label
+    > .wlh__label__text {
+    background: white;
+  }
+
   padding: 3rem $minContentPadding 3rem $minContentPadding;
   @media (max-width: $responsivenessBreakPoint) {
     padding: 2rem 0.5rem 2rem;

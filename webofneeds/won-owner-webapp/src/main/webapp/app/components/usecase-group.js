@@ -1,6 +1,5 @@
 import angular from "angular";
 import ngAnimate from "angular-animate";
-import labelledHrModule from "./labelled-hr.js";
 import "ng-redux";
 import { attach } from "../cstm-ng-utils.js";
 import { actionCreators } from "../actions/actions.js";
@@ -101,5 +100,5 @@ function genComponentConf() {
 
 export default //.controller('CreateAtomController', [...serviceDependencies, CreateAtomController])
 angular
-  .module("won.owner.components.usecaseGroup", [ngAnimate, labelledHrModule])
+  .module("won.owner.components.usecaseGroup", [ngAnimate])
   .directive("wonUsecaseGroup", genComponentConf).name;
