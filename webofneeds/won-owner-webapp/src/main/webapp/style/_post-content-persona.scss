@@ -17,7 +17,8 @@ won-post-content-persona {
     border-bottom: $thinGrayBorder;
 
     @include square-image($postIconSize);
-    won-square-image {
+    won-preact.atomImage,
+    won-atom-image {
       grid-area: p_icon;
     }
 

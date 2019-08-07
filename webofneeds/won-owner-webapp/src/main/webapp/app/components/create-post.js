@@ -6,9 +6,9 @@ import Immutable from "immutable";
 import ngAnimate from "angular-animate";
 
 import "ng-redux";
-import labelledHrModule from "./labelled-hr.js";
+import WonLabelledHr from "./labelled-hr.jsx";
 import createIsseeksModule from "./create-isseeks.js";
-import { get, delay, getIn } from "../utils.js";
+import { delay, get, getIn } from "../utils.js";
 import { attach } from "../cstm-ng-utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { connect2Redux } from "../configRedux.js";
@@ -91,7 +91,7 @@ function genComponentConf() {
             </won-create-isseeks>
         </div>
         <div class="cp__footer" ng-if="self.initialLoadFinished">
-            <won-labelled-hr label="::'done?'" class="cp__footer__labelledhr"></won-labelled-hr>
+            <won-preact component="self.WonLabelledHr" class="labelledHr cp__footer__labelledhr" props="{label: 'done?'}"></won-preact>
             <won-elm
               module="self.publishButton"
               props="{
@@ -125,6 +125,7 @@ function genComponentConf() {
       attach(this, serviceDependencies, arguments);
       this.focusedElement = null;
       window.cnc4dbg = this;
+      this.WonLabelledHr = WonLabelledHr;
 
       this.windowHeight = window.screen.height;
       this.scrollContainer().addEventListener("scroll", e => this.onResize(e));
@@ -488,7 +489,6 @@ function mandatoryDetailsSet(isOrSeeks, useCaseBranchDetails) {
 export default //.controller('CreateAtomController', [...serviceDependencies, CreateAtomController])
 angular
   .module("won.owner.components.createPost", [
-    labelledHrModule,
     createIsseeksModule,
     ngAnimate,
     elmModule,

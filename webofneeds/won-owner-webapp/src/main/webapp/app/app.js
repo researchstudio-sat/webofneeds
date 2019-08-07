@@ -9,36 +9,26 @@
 //---- app.js-Dependencies ----
 import "babel-polyfill";
 import svgs from "../images/won-icons/*.svg";
-
-console.log(svgs);
-
 import "../style/won.scss";
 
 import angular from "angular";
-window.angular = angular; // for compatibility with pre-ES6/commonjs scripts
-
 import "whatwg-fetch"; //polyfill for window.fetch (for backward-compatibility with older browsers)
-
 import "redux";
 import ngReduxModule from "ng-redux";
 import ngReduxRouterModule from "redux-ui-router";
 import uiRouterModule from "angular-ui-router";
-
 /* angular-ui-router-shim (release/stateEvents.js) used to enable legacy $stateChange* events in ui-router (see
  * here for details: https://ui-router.github.io/guide/ng1/migrate-to-1_0#state-change-events)
- * 
+ *
  * delete at your own peril
  */
 import "angular-ui-router/release/stateEvents.js";
 import { delay } from "./utils.js";
-
 //---------- Config -----------
 import { configRouting, runAccessControl } from "./configRouting.js";
 import configRedux from "./configRedux.js";
-
 //--------- Actions -----------
 import { actionCreators } from "./actions/actions.js";
-
 //-------- Components ---------
 import topnav from "./components/topnav.js";
 import menu from "./components/menu.js";
@@ -56,11 +46,9 @@ import signupComponent from "./pages/signup.jsx";
 import settingsComponent from "./pages/settings.jsx";
 import inventoryComponent from "./pages/inventory.jsx";
 import createComponent from "./pages/create.jsx";
-
+import preactModule from "./components/preact-module.js";
 //won import (used so you can access the debugmode variable without reloading the page)
 import won from "./service/won.js";
-window.won = won;
-
 /* TODO this fragment is part of an attempt to sketch a different
  * approach to asynchronity (Remove it or the thunk-based
  * solution afterwards)
@@ -70,6 +58,11 @@ import { runMessagingAgent } from "./messaging-agent.js";
 import detailModules from "./components/details/details.js";
 import { runPushAgent } from "./push-agent";
 import { enableNotifications } from "../config/default";
+
+console.log(svgs);
+
+window.angular = angular; // for compatibility with pre-ES6/commonjs scripts
+window.won = won;
 
 let app = angular.module("won.owner", [
   /* to enable legacy $stateChange* events in ui-router (see
@@ -89,6 +82,7 @@ let app = angular.module("won.owner", [
   toasts,
   slideIn,
   postInfo,
+  preactModule,
 
   //details
   ...detailModules,

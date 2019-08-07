@@ -8,17 +8,17 @@ won-atom-content-holds {
 
   grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
 
-  & .ach__empty {
+  & > .ach__empty {
     color: $won-line-gray;
     text-align: center;
     grid-column: 1/-1;
   }
 
-  & won-atom-card.ach__atom {
+  & > won-atom-card {
     border: $thinGrayBorder;
   }
 
-  & .ach__createatom {
+  & > .ach__createatom {
     border: $thinGrayBorder;
     background: $won-light-gray;
     padding: 0.5rem;

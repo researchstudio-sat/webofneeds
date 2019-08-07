@@ -1,6 +1,5 @@
 import angular from "angular";
 
-import squareImageModule from "../square-image.js";
 import postContentModule from "../post-content.js";
 import postMenuModule from "../post-menu.js";
 
@@ -8,10 +7,9 @@ import { connect2Redux } from "../../configRedux.js";
 import { getIn } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
 import { attach, classOnComponentRoot } from "../../cstm-ng-utils.js";
+import "~/style/_post-content-message.scss";
 
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
-
-import "~/style/_post-content-message.scss";
 
 function genComponentConf() {
   let template = `
@@ -65,7 +63,6 @@ function genComponentConf() {
 
 export default angular
   .module("won.owner.components.postContentMessage", [
-    squareImageModule,
     postMenuModule,
     postContentModule,
   ])

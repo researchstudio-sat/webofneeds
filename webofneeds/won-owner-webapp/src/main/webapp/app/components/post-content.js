@@ -4,27 +4,27 @@
 
 import angular from "angular";
 import postIsOrSeeksInfoModule from "./post-is-or-seeks-info.js";
-import labelledHrModule from "./labelled-hr.js";
 import postContentGeneral from "./post-content-general.js";
 import postContentPersona from "./post-content-persona.js";
-import atomContentParticipants from "./atom-content-participants.js";
-import atomContentBuddies from "./atom-content-buddies.js";
-import atomContentHolds from "./atom-content-holds.js";
-import atomContentSuggestions from "./atom-content-suggestions.js";
+import WonAtomContentHolds from "./atom-content-holds.jsx";
+import WonAtomContentSuggestions from "./atom-content-suggestions.jsx";
+import WonAtomContentParticipants from "./atom-content-participants.jsx";
+import WonAtomContentBuddies from "./atom-content-buddies.jsx";
+import WonLabelledHr from "./labelled-hr.jsx";
 import trigModule from "./trig.js";
-import { getIn, get } from "../utils.js";
+import { get, getIn } from "../utils.js";
 import won from "../won-es6.js";
 import { connect2Redux } from "../configRedux.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as viewUtils from "../redux/utils/view-utils.js";
 import * as processUtils from "../redux/utils/process-utils.js";
 import {
-  getOwnedCondensedPersonaList,
   getConnectionUriFromRoute,
+  getOwnedCondensedPersonaList,
   isAtomOwned,
 } from "../redux/selectors/general-selectors.js";
 import { actionCreators } from "../actions/actions.js";
-import { classOnComponentRoot, attach } from "../cstm-ng-utils.js";
+import { attach, classOnComponentRoot } from "../cstm-ng-utils.js";
 import ngAnimate from "angular-animate";
 import { Elm } from "../../elm/AddPersona.elm";
 
@@ -74,7 +74,7 @@ function genComponentConf() {
           <won-post-content-general ng-if="self.isSelectedTab('DETAIL')" post-uri="self.postUri"></won-post-content-general>
           <!-- DETAIL INFORMATION -->
           <won-post-is-or-seeks-info branch="::'content'" ng-if="self.isSelectedTab('DETAIL') && self.hasContent" post-uri="self.postUri"></won-post-is-or-seeks-info>
-          <won-labelled-hr label="::'Search'" class="cp__labelledhr" ng-show="self.isSelectedTab('DETAIL') && self.hasContent && self.hasSeeksBranch"></won-labelled-hr>
+          <won-preact component="self.WonLabelledHr" class="labelledHr cp__labelledhr" props="{label: 'Search'}" ng-show="self.isSelectedTab('DETAIL') && self.hasContent && self.hasSeeksBranch"></won-preact>
           <won-post-is-or-seeks-info branch="::'seeks'" ng-if="self.isSelectedTab('DETAIL') && self.hasSeeksBranch" post-uri="self.postUri"></won-post-is-or-seeks-info>
 
           <!-- PERSONA INFORMATION -->
@@ -82,10 +82,10 @@ function genComponentConf() {
           <won-elm module="self.addPersonaModule" ng-if="self.isSelectedTab('HELDBY') && self.isOwned && self.isActive && self.hasHoldableSocket && !self.isHeld" props="{post: self.post.toJS(), personas: self.personas.toJS()}"></won-elm>
           
           <!-- PARTICIPANT INFORMATION -->
-          <won-atom-content-participants ng-if="self.isSelectedTab('PARTICIPANTS')" atom-uri="self.postUri"></won-atom-content-participants>
+          <won-preact component="self.WonAtomContentParticipants" props="{atomUri: self.postUri}" ng-if="self.isSelectedTab('PARTICIPANTS')"></won-preact>
           
           <!-- BUDDY INFORMATION -->
-          <won-atom-content-buddies ng-if="self.isSelectedTab('BUDDIES')" atom-uri="self.postUri"></won-atom-content-buddies>
+          <won-preact component="self.WonAtomContentBuddies" props="{atomUri: self.postUri}" ng-if="self.isSelectedTab('BUDDIES')"></won-preact>
 
           <!-- REVIEW INFORMATION -->
           <div class="post-content__reviews" ng-if="self.isSelectedTab('REVIEWS')">
@@ -95,10 +95,11 @@ function genComponentConf() {
           </div>
 
           <!-- SUGGESTIONS -->
-          <won-atom-content-suggestions ng-if="self.isSelectedTab('SUGGESTIONS')" atom-uri="self.postUri"></won-atom-content-suggestions>
+          <won-preact component="self.WonAtomContentSuggestions" props="{atomUri: self.postUri}" ng-if="self.isSelectedTab('SUGGESTIONS')"></won-preact>
           
           <!-- OTHER ATOMS -->
-          <won-atom-content-holds ng-if="self.isSelectedTab('HOLDS')" atom-uri="self.postUri"></won-atom-content-holds>
+          <won-preact component="self.WonAtomContentHolds" props="{atomUri: self.postUri}" ng-if="self.isSelectedTab('HOLDS')"></won-preact>
+          
           <!-- RDF REPRESENTATION -->
           <div class="post-info__content__rdf" ng-if="self.isSelectedTab('RDF')">
             <a class="rdflink clickable"
@@ -133,6 +134,11 @@ function genComponentConf() {
       window.postcontent4dbg = this;
 
       this.addPersonaModule = Elm.AddPersona;
+      this.WonAtomContentHolds = WonAtomContentHolds;
+      this.WonAtomContentSuggestions = WonAtomContentSuggestions;
+      this.WonAtomContentParticipants = WonAtomContentParticipants;
+      this.WonAtomContentBuddies = WonAtomContentBuddies;
+      this.WonLabelledHr = WonLabelledHr;
 
       const selectFromState = state => {
         const openConnectionUri = getConnectionUriFromRoute(state);
@@ -221,13 +227,8 @@ export default angular
   .module("won.owner.components.postContent", [
     ngAnimate,
     postIsOrSeeksInfoModule,
-    labelledHrModule,
     postContentGeneral,
     postContentPersona,
-    atomContentParticipants,
-    atomContentBuddies,
-    atomContentHolds,
-    atomContentSuggestions,
     trigModule,
     elmModule,
   ])

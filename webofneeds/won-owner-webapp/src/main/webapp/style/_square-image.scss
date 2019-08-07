@@ -1,7 +1,8 @@
 @import "sizing-utils";
 
 @mixin square-image($size, $margin: 0) {
-  > won-square-image {
+  > won-preact.atomImage > won-atom-icon,
+  > won-atom-icon {
     display: block;
     user-select: none;
     margin: $margin;

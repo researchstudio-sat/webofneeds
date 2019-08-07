@@ -29,11 +29,13 @@ won-connections-overview {
         min-width: 0;
 
         & > won-connection-indicators,
-        & > won-post-header {
+        & > won-preact.atomHeader > won-atom-header,
+        & > won-atom-header {
           max-height: 2.5rem;
         }
 
-        & > won-post-header {
+        & > won-preact.atomHeader > won-atom-header,
+        & > won-atom-header {
           padding-right: 0.5rem;
         }
       }

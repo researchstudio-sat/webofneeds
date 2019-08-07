@@ -3,7 +3,6 @@
  */
 
 import angular from "angular";
-import postHeaderModule from "./post-header.js";
 import postContextDropdownModule from "./post-context-dropdown.js";
 import postContentModule from "./post-content.js";
 import postMenuModule from "./post-menu.js";
@@ -15,9 +14,9 @@ import { connect2Redux } from "../configRedux.js";
 import * as viewUtils from "../redux/utils/view-utils.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import { actionCreators } from "../actions/actions.js";
-import { classOnComponentRoot, attach } from "../cstm-ng-utils.js";
+import { attach, classOnComponentRoot } from "../cstm-ng-utils.js";
 
-import { getUseCaseLabel, getUseCaseIcon } from "../usecase-utils.js";
+import { getUseCaseIcon, getUseCaseLabel } from "../usecase-utils.js";
 
 import "~/style/_post-info.scss";
 import * as atomUtils from "../redux/utils/atom-utils.js";
@@ -197,7 +196,6 @@ function genComponentConf() {
 
 export default angular
   .module("won.owner.components.postInfo", [
-    postHeaderModule,
     postMenuModule,
     postContextDropdownModule,
     postContentModule,

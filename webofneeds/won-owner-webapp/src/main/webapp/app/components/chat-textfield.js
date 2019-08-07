@@ -10,7 +10,7 @@
 import angular from "angular";
 import "ng-redux";
 import ngAnimate from "angular-animate";
-import { dispatchEvent, delay, get } from "../utils.js";
+import { delay, dispatchEvent, get } from "../utils.js";
 import { attach } from "../cstm-ng-utils.js";
 import {
   getOwnedAtomByConnectionUri,
@@ -18,19 +18,19 @@ import {
 } from "../redux/selectors/general-selectors.js";
 import { getMessagesByConnectionUri } from "../redux/selectors/message-selectors.js";
 import {
-  isMessageProposable,
-  isMessageClaimable,
-  isMessageCancelable,
-  isMessageRetractable,
   isMessageAcceptable,
+  isMessageCancelable,
+  isMessageClaimable,
+  isMessageProposable,
   isMessageRejectable,
+  isMessageRetractable,
   isMessageSelected,
 } from "../redux/utils/message-utils.js";
 import { connect2Redux } from "../configRedux.js";
 import * as useCaseUtils from "../usecase-utils.js";
 import autoresizingTextareaModule from "../directives/textarea-autogrow.js";
 import { actionCreators } from "../actions/actions.js";
-import labelledHrModule from "./labelled-hr.js";
+import WonLabelledHr from "./labelled-hr.jsx";
 import { getHumanReadableStringFromMessage } from "../reducers/atom-reducer/parse-message.js";
 import * as connectionSelectors from "../redux/selectors/connection-selectors.js";
 import * as connectionUtils from "../redux/utils/connection-utils.js";
@@ -49,8 +49,7 @@ function genComponentConf() {
           ng-if="self.allowDetails && self.showAddMessageContent">
           <div class="cts__details__grid"
               ng-if="!self.selectedDetail && !self.multiSelectType">
-            <won-labelled-hr label="::'Actions'" class="cts__details__grid__hr"
-              ng-if="!self.multiSelectType && self.isConnected && !self.isChatToGroupConnection"></won-labelled-hr>
+            <won-preact component="self.WonLabelledHr" class="labelledHr cts__details__grid__hr" ng-if="!self.multiSelectType && self.isConnected && !self.isChatToGroupConnection" props="{label: 'Actions'}"></won-preact>
             <button
                 ng-if="!self.showAgreementData && !self.isChatToGroupConnection"
                 class="cts__details__grid__action won-button--filled red"
@@ -92,8 +91,7 @@ function genComponentConf() {
                 ng-disabled="!self.hasRetractableMessages">
                 Retract Message(s)
             </button>
-            <won-labelled-hr label="::'Details'" class="cts__details__grid__hr"
-              ng-if="!self.multiSelectType && self.isConnected"></won-labelled-hr>
+            <won-preact component="self.WonLabelledHr" class="labelledHr cts__details__grid__hr" ng-if="!self.multiSelectType && self.isConnected" props="{label: 'Details'}"></won-preact>
             <div class="cts__details__grid__detail"
               ng-repeat="detail in self.allMessageDetails"
               ng-if="detail.component"
@@ -289,6 +287,7 @@ function genComponentConf() {
       window.ctfs4dbg = this;
       this.allMessageDetails = useCaseUtils.getAllMessageDetails();
 
+      this.WonLabelledHr = WonLabelledHr;
       this.draftObject = {};
       this.publishButton = Elm.PublishButton;
       this.additionalContent = new Map(); //Stores the additional Detail content of a message
@@ -702,7 +701,6 @@ function genComponentConf() {
 
 export default angular
   .module("won.owner.components.chatTextfield", [
-    labelledHrModule,
     autoresizingTextareaModule,
     elmModule,
     ngAnimate,

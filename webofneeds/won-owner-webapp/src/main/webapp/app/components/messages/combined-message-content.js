@@ -5,16 +5,16 @@ import { connect2Redux } from "../../configRedux.js";
 import { get, getIn } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
 import {
-  getOwnedAtomByConnectionUri,
   getAtoms,
+  getOwnedAtomByConnectionUri,
 } from "../../redux/selectors/general-selectors.js";
 import { getOwnedConnections } from "../../redux/selectors/connection-selectors.js";
 import trigModule from "../trig.js";
 import { labels } from "../../won-label-utils.js";
 import { attach, classOnComponentRoot } from "../../cstm-ng-utils.js";
-import squareImageModule from "../square-image.js";
 
 import "~/style/_combined-message-content.scss";
+import WonAtomIcon from "../atom-icon.jsx";
 
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 
@@ -31,20 +31,18 @@ function genComponentConf() {
       </div>
       <div class="msg__header msg__header--forwarded-from" ng-if="self.isConnectionMessage && self.originatorUri && !self.hasNotBeenLoaded && !self.isGroupChatMessage">
           <div class="msg__header__type">Forwarded from:</div>
-          <won-square-image
-            class="msg__header__originator"
-            uri="::self.originatorUri">
-          </won-square-image>
+          <won-preact class="atomImage msg__header__originator" component="self.WonAtomIcon" props="{atomUri: self.originatorUri}"></won-preact>
       </div>
       <div class="msg__header msg__header--inject-into" ng-if="self.isConnectionMessage && self.isInjectIntoMessage && !self.hasNotBeenLoaded && !self.isGroupChatMessage">
           <div class="msg__header__type">Forward to:</div>
-          <won-square-image
-            class="msg__header__inject"
-            ng-class="{'clickable': self.isInjectIntoConnectionPresent(connUri)}"
+          <won-preact
+            class="atomImage msg__header__inject"
             ng-repeat="connUri in self.injectIntoArray"
-            uri="self.getInjectIntoAtomUri(connUri)"
-            ng-click="!self.multiSelectType && self.isInjectIntoConnectionPresent(connUri) && self.router__stateGoCurrent({connectionUri: connUri})">
-          </won-square-image>
+            component="self.WonAtomIcon"
+            props="{atomUri: self.getInjectIntoAtomUri(connUri)}"
+            ng-class="{'clickable': self.isInjectIntoConnectionPresent(connUri)}"
+            ng-click="!self.multiSelectType && self.isInjectIntoConnectionPresent(connUri) && self.router__stateGoCurrent({connectionUri: connUri})"
+          ></won-preact>
       </div>
       <won-message-content
           ng-if="self.hasContent || self.hasNotBeenLoaded"
@@ -65,6 +63,7 @@ function genComponentConf() {
   class Controller {
     constructor(/* arguments = dependency injections */) {
       attach(this, serviceDependencies, arguments);
+      this.WonAtomIcon = WonAtomIcon;
 
       const selectFromState = state => {
         const ownedAtom =
@@ -265,8 +264,5 @@ function genComponentConf() {
 }
 
 export default angular
-  .module("won.owner.components.combinedMessageContent", [
-    trigModule,
-    squareImageModule,
-  ])
+  .module("won.owner.components.combinedMessageContent", [trigModule])
   .directive("wonCombinedMessageContent", genComponentConf).name;

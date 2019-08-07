@@ -28,7 +28,7 @@ won-footer {
 
     .footer__logo {
       grid-area: footerLogo;
-      --local-primary: $won-subtitle-gray;
+      --local-primary: #{$won-subtitle-gray};
       height: 3rem;
       width: 3rem;
     }

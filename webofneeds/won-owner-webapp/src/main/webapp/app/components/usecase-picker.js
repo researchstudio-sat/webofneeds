@@ -3,7 +3,6 @@
  */
 import angular from "angular";
 import ngAnimate from "angular-animate";
-import labelledHrModule from "./labelled-hr.js";
 
 import "ng-redux";
 import { get } from "../utils.js";
@@ -235,5 +234,5 @@ function genComponentConf() {
 
 export default //.controller('CreateAtomController', [...serviceDependencies, CreateAtomController])
 angular
-  .module("won.owner.components.usecasePicker", [ngAnimate, labelledHrModule])
+  .module("won.owner.components.usecasePicker", [ngAnimate])
   .directive("wonUsecasePicker", genComponentConf).name;

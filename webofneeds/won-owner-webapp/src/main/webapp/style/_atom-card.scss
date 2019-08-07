@@ -12,9 +12,4 @@ won-atom-card {
     grid-area: card;
     background: $won-light-gray;
   }
-
-  > won-skeleton-card {
-    position: relative;
-    z-index: -1;
-  }
 }

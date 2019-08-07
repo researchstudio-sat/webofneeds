@@ -22,6 +22,15 @@ main.ownerwelcome {
     background: white;
   }
 
+  > won-how-to
+    > .howto__createx
+    > won-preact.labelledHr
+    > won-labelled-hr
+    > .wlh__label
+    > .wlh__label__text {
+    background: white;
+  }
+
   padding: 3rem $minContentPadding 3rem $minContentPadding;
   @media (max-width: $responsivenessBreakPoint) {
     padding: 2rem 0.5rem 2rem;
@@ -126,18 +135,18 @@ main.ownerinventory {
     }
   }
 
-  .ownerinventory__content {
+  .ownerinventory__content > won-preact {
     display: grid;
     padding: 1rem;
     grid-gap: 1rem;
 
     grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
 
-    won-atom-card.ownerinventory__content__atom {
+    > won-atom-card {
       border: $thinGrayBorder;
     }
 
-    .ownerinventory__content__createatom {
+    > won-create-card {
       border: $thinGrayBorder;
       background: $won-light-gray;
       padding: 0.5rem;
@@ -153,22 +162,22 @@ main.ownerinventory {
       &:hover {
         border-color: $won-primary-color;
 
-        .ownerinventory__content__createatom__label {
+        .createcard__label {
           color: $won-primary-color;
         }
 
-        .ownerinventory__content__createatom__icon {
+        .createcard__icon {
           --local-primary: #{$won-primary-color};
         }
       }
 
-      .ownerinventory__content__createatom__label {
+      > .createcard__label {
         font-size: $mediumFontSize;
         text-align: center;
         color: $won-line-gray;
       }
 
-      .ownerinventory__content__createatom__icon {
+      > .createcard__icon {
         @include fixed-square($hugeiconSize);
         --local-primary: #{$won-line-gray};
       }

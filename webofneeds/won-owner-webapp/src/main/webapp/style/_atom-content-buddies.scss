@@ -23,9 +23,6 @@ won-atom-content-buddies {
       /*box-shadow: 0px 0px 5px 5px var(--won-primary-color);*/
     }
 
-    & > won-atom-card {
-    }
-
     &__actions {
       border-top: $thinGrayBorder;
       display: grid;
@@ -41,11 +38,11 @@ won-atom-content-buddies {
     }
   }
 
-  & > won-labelled-hr.acb__labelledhr {
+  & > won-labelled-hr {
     grid-column: 1 / -1;
   }
 
-  & > won-suggestpost-picker {
+  & > won-suggest-atom-picker {
     grid-column: 1 / -1;
     background: var(--won-light-gray);
     padding: 0.5rem;

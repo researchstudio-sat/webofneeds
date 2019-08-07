@@ -15,6 +15,7 @@ won-location-viewer {
       }
     }
 
+    .won-atom-map,
     won-atom-map {
       display: block;
       @include slideWithOpacityAnimation(0.5s, linear, 20rem);
@@ -25,6 +26,16 @@ won-location-viewer {
 
         @media (max-width: $responsivenessBreakPoint) {
           height: 15rem;
+        }
+
+        &--loading {
+          display: grid;
+          justify-content: center;
+          align-items: center;
+
+          .won-atom-map__spinner {
+            @include fixed-square($postIconSize);
+          }
         }
       }
     }

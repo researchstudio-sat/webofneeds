@@ -10,9 +10,7 @@ import { connect2Redux } from "../configRedux.js";
 import won from "../won-es6.js";
 import "angular-marked";
 import "~/style/_won-markdown.scss";
-
-import labelledHrModule from "../components/labelled-hr.js";
-
+import WonLabelledHr from "./labelled-hr.jsx";
 import * as accountUtils from "../redux/utils/account-utils.js";
 
 function genLoginConf() {
@@ -54,7 +52,7 @@ function genLoginConf() {
                 ng-model="self.rememberMe"
                 type="checkbox"/> Remember me
         </form>
-        <won-labelled-hr label="::'or'" ></won-labelled-hr>
+        <won-preact component="self.WonLabelledHr" class="labelledHr" props="{label: 'Or'}"></won-preact>
         <div class="wl__register">
             <button
                 class="won-button--filled red"
@@ -73,6 +71,7 @@ function genLoginConf() {
   class Controller {
     constructor(/* arguments <- serviceDependencies */) {
       attach(this, serviceDependencies, arguments);
+      this.WonLabelledHr = WonLabelledHr;
       this.parseRestErrorMessage = parseRestErrorMessage;
       window.lic4dbg = this;
 
@@ -126,5 +125,5 @@ function genLoginConf() {
 }
 
 export default angular
-  .module("won.owner.components.loginForm", ["hc.marked", labelledHrModule])
+  .module("won.owner.components.loginForm", ["hc.marked"])
   .directive("wonLoginForm", genLoginConf).name;

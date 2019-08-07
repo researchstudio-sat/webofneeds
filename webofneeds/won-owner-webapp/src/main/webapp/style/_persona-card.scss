@@ -24,8 +24,8 @@ won-persona-card {
       filter: grayscale(100%);
     }
 
-    & .image,
-    & .identicon {
+    .image,
+    .identicon {
       display: flex;
       align-items: center;
       justify-content: center;
@@ -34,7 +34,7 @@ won-persona-card {
       @include fixed-square(#{$cardIdenticonSize});
     }
 
-    & .image {
+    .image {
       background: white;
     }
   }

@@ -6,7 +6,7 @@ import Immutable from "immutable";
 import ngAnimate from "angular-animate";
 
 import "ng-redux";
-import labelledHrModule from "./labelled-hr.js";
+import WonLabelledHr from "./labelled-hr.jsx";
 import { get } from "../utils.js";
 import { attach } from "../cstm-ng-utils.js";
 import { actionCreators } from "../actions/actions.js";
@@ -46,7 +46,7 @@ function genComponentConf() {
             
             <!-- PUBLISH BUTTON - RESPONSIVE MODE -->
             <div class="cp__content__responsivebuttons show-in-responsive">
-              <won-labelled-hr label="::'done?'" class="cp__content__labelledhr"></won-labelled-hr>
+              <won-preact component="self.WonLabelledHr" class="labelledHr cp__content__labelledhr" props="{label: 'done?'}"></won-preact>
               <button type="submit" class="won-button--filled red cp__content__publish"
                       ng-disabled="!self.isValid()"
                       ng-click="::self.publish()">
@@ -62,7 +62,7 @@ function genComponentConf() {
 
         <!-- FOOTER: PUBLISH BUTTON - NON-RESPONSIVE MODE -->
         <div class="cp__footer hide-in-responsive" >
-            <won-labelled-hr label="::'done?'" class="cp__footer__labelledhr"></won-labelled-hr>
+            <won-preact component="self.WonLabelledHr" class="labelledHr cp__footer__labelledhr" props="{label: 'done?'}"></won-preact>
             <button type="submit" class="won-button--filled red cp__footer__publish"
                     ng-disabled="!self.isValid()"
                     ng-click="::self.publish()">
@@ -82,6 +82,7 @@ function genComponentConf() {
       this.focusedElement = null;
       //TODO debug; deleteme
       window.cns4dbg = this;
+      this.WonLabelledHr = WonLabelledHr;
 
       this.windowHeight = window.screen.height;
       this.scrollContainer().addEventListener("scroll", e => this.onResize(e));
@@ -203,5 +204,5 @@ function genComponentConf() {
 }
 
 export default angular
-  .module("won.owner.components.createSearch", [labelledHrModule, ngAnimate])
+  .module("won.owner.components.createSearch", [ngAnimate])
   .directive("wonCreateSearch", genComponentConf).name;

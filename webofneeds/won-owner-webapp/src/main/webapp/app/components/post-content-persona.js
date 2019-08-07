@@ -11,7 +11,6 @@ import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as processUtils from "../redux/utils/process-utils.js";
 import { actionCreators } from "../actions/actions.js";
-import squareImageModule from "./square-image.js";
 import descriptionDetailViewerModule from "./details/viewer/description-viewer.js";
 import { details } from "../../config/detail-definitions.js";
 
@@ -20,14 +19,13 @@ import elmModule from "./elm.js";
 
 import "~/style/_post-content-persona.scss";
 import { getOwnedConnectionByUri } from "../redux/selectors/connection-selectors.js";
+import WonAtomIcon from "./atom-icon.jsx";
 
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
   let template = `
       <div class="pcp__header">
-          <won-square-image ng-if="!self.personaLoading"
-              uri="::self.personaUri">
-          </won-square-image>
+          <won-preact class="atomImage" ng-if="!self.personaLoading" component="self.WonAtomIcon" props="{atomUri: self.personaUri}"></won-preact>
           <div class="pcp__header__name"
               ng-if="self.personaName">
               <span class="pcp__header__name__label">{{ self.personaName }}</span>
@@ -68,6 +66,7 @@ function genComponentConf() {
     constructor() {
       attach(this, serviceDependencies, arguments);
       window.pcp4dbg = this;
+      this.WonAtomIcon = WonAtomIcon;
 
       this.ratingView = Elm.RatingView;
 
@@ -183,7 +182,6 @@ function genComponentConf() {
 export default angular
   .module("won.owner.components.postContentPersona", [
     elmModule,
-    squareImageModule,
     descriptionDetailViewerModule,
   ])
   .directive("wonPostContentPersona", genComponentConf).name;

@@ -5,10 +5,10 @@ import connectionMessageModule from "./messages/connection-message.js";
 import postContentMessageModule from "./messages/post-content-message.js";
 import connectionHeaderModule from "./connection-header.js";
 import shareDropdownModule from "./share-dropdown.js";
-import labelledHrModule from "./labelled-hr.js";
+import WonLabelledHr from "./labelled-hr.jsx";
 import connectionContextDropdownModule from "./connection-context-dropdown.js";
 import { connect2Redux } from "../configRedux.js";
-import { delay, getIn, get } from "../utils.js";
+import { delay, get, getIn } from "../utils.js";
 import * as messageUtils from "../redux/utils/message-utils.js";
 import * as connectionUtils from "../redux/utils/connection-utils.js";
 import * as processUtils from "../redux/utils/process-utils.js";
@@ -125,7 +125,7 @@ function genComponentConf() {
                 submit-button-label="::'Accept&#160;Invite'"
             >
             </chat-textfield>
-            <won-labelled-hr label="::'Or'" class="gpm__footer__labelledhr"></won-labelled-hr>
+            <won-preact component="self.WonLabelledHr" class="labelledHr gpm__footer__labelledhr" props="{label: 'Or'}"></won-preact>
             <button class="gpm__footer__button won-button--filled black" ng-click="self.closeConnection()">
                 Decline
             </button>
@@ -141,7 +141,7 @@ function genComponentConf() {
                 submit-button-label="::'Ask&#160;to&#160;Join'"
             >
             </chat-textfield>
-            <won-labelled-hr label="::'Or'" class="gpm__footer__labelledhr"></won-labelled-hr>
+            <won-preact component="self.WonLabelledHr" class="labelledHr gpm__footer__labelledhr" props="{label: 'Or'}"></won-preact>
             <button class="gpm__footer__button won-button--filled black" ng-click="self.closeConnection(true)">
                 Bad match - remove!
             </button>
@@ -152,7 +152,7 @@ function genComponentConf() {
     constructor(/* arguments = dependency injections */) {
       attach(this, serviceDependencies, arguments);
       window.pm4dbg = this;
-
+      this.WonLabelledHr = WonLabelledHr;
       this.rdfTextfieldHelpText =
         "Expects valid turtle. " +
         `<${won.WONMSG.uriPlaceholder.event}> will ` +
@@ -451,7 +451,6 @@ export default angular
     chatTextFieldModule,
     connectionMessageModule,
     connectionHeaderModule,
-    labelledHrModule,
     connectionContextDropdownModule,
     postContentMessageModule,
     shareDropdownModule,

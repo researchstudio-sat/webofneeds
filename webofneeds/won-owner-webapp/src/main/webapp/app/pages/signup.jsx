@@ -5,16 +5,14 @@
  */
 import angular from "angular";
 import ngAnimate from "angular-animate";
-import { get } from "../utils.js";
-import { attach } from "../cstm-ng-utils.js";
-import { actionCreators } from "../actions/actions.js";
-
-import labelledHrModule from "../components/labelled-hr.js";
+import {get} from "../utils.js";
+import {attach, classOnComponentRoot} from "../cstm-ng-utils.js";
+import {actionCreators} from "../actions/actions.js";
+import WonLabelledHr from "../components/labelled-hr.jsx";
 
 import * as accountUtils from "../redux/utils/account-utils.js";
 import * as viewSelectors from "../redux/selectors/view-selectors.js";
-import { h } from "preact";
-import { classOnComponentRoot } from "../cstm-ng-utils.js";
+import {h} from "preact";
 import "~/style/_signup.scss";
 
 const template = (
@@ -137,7 +135,7 @@ const template = (
         >
           <span>Keep Postings</span>
         </button>
-        <won-labelled-hr label="or" ng-if="self.isAnonymous" />
+        <won-preact className="labelledHr" component="self.WonLabelledHr" props="{label: 'or'}" ng-if="self.isAnonymous"/>
         <button
           className="won-button--filled red"
           ng-disabled="registerForm.$invalid"
@@ -164,6 +162,7 @@ class SignupController {
     attach(this, serviceDependencies, arguments);
     this.rememberMe = false;
     this.acceptToS = false;
+    this.WonLabelledHr = WonLabelledHr;
 
     const select = state => {
       const accountState = get(state, "account");
@@ -208,7 +207,6 @@ class SignupController {
 export default {
   module: angular
     .module("won.owner.components.signup", [
-      labelledHrModule,
       ngAnimate,
     ])
     .controller("SignupController", [...serviceDependencies, SignupController])

@@ -9,9 +9,6 @@ won-suggestpost-viewer {
       border: $thinGrayBorder;
       background: $won-light-gray;
 
-      & > won-atom-card {
-      }
-
       &__actions {
         border-top: $thinGrayBorder;
         display: grid;

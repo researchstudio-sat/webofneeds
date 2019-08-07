@@ -1,33 +1,23 @@
 /** @jsx h */
 import angular from "angular";
 import ngAnimate from "angular-animate";
-import {
-  getIn,
-  get,
-  delay,
-} from "../utils.js";
-import {
-  searchNominatim,
-  reverseSearchNominatim,
-  scrubSearchResults,
-} from "../api/nominatim-api.js";
-import { attach } from "../cstm-ng-utils.js";
+import {delay, get, getIn,} from "../utils.js";
+import {reverseSearchNominatim, scrubSearchResults, searchNominatim,} from "../api/nominatim-api.js";
+import {attach, classOnComponentRoot} from "../cstm-ng-utils.js";
 import Immutable from "immutable";
-import { connect2Redux } from "../configRedux.js";
-import { actionCreators } from "../actions/actions.js";
+import {connect2Redux} from "../configRedux.js";
+import {actionCreators} from "../actions/actions.js";
 import postMessagesModule from "../components/post-messages.js";
-import atomCardModule from "../components/atom-card.js";
-import atomMapModule from "../components/atom-map.js";
-import postHeaderModule from "../components/post-header.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as viewSelectors from "../redux/selectors/view-selectors.js";
 import * as processUtils from "../redux/utils/process-utils.js";
 import * as wonLabelUtils from "../won-label-utils.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import wonInput from "../directives/input.js";
-import { h } from "preact";
+import {h} from "preact";
 import * as accountUtils from "../redux/utils/account-utils.js";
-import { classOnComponentRoot } from "../cstm-ng-utils.js";
+import WonAtomCardGrid from "../components/atom-card-grid.jsx";
+import WonAtomMap from "../components/atom-map.jsx";
 
 import "~/style/_map.scss";
 import "~/style/_connection-overlay.scss";
@@ -201,25 +191,18 @@ const template = (
           {"See What's Around"}
         </div>
       </div>
-      <won-atom-map
-        className="ownermap__map hide-in-responsive"
-        ng-class="{'ownermap__map--visible': !(self.showLocationInput || (self.isLocationAccessDenied && !self.lastWhatsAroundLocation))}"
-        locations="self.locations"
-        current-location="self.lastWhatsAroundLocation"
-        ng-if="!self.isOwnerAtomUrisToLoad && self.lastWhatsAroundLocation"
-      />
+      <won-preact className="ownermap__map hide-in-responsive won-atom-map" component="self.WonAtomMap"
+                  ng-class="{'ownermap__map--visible': !(self.showLocationInput || (self.isLocationAccessDenied && !self.lastWhatsAroundLocation))}"
+                  props="{ locations: self.locations, currentLocation: self.lastWhatsAroundLocation }"
+                  ng-if="!self.isOwnerAtomUrisToLoad && self.lastWhatsAroundLocation"/>
       <div
         className="ownermap__content"
         ng-if="self.lastWhatsAroundLocation && self.hasVisibleAtomUris"
       >
-        <won-atom-card
-          className="ownermap__content__atom"
-          atom-uri="atomUri"
-          current-location="self.lastWhatsAroundLocation"
-          ng-repeat="atomUri in self.sortedVisibleAtomUriArray track by atomUri"
+        <won-preact
+          component="self.WonAtomCardGrid"
+          props="{ atomUris: self.sortedVisibleAtomUriArray, currentLocation: self.lastWhatsAroundLocation, showSuggestions: false, showPersona: true, showCreate: false }"
           ng-if="self.hasVisibleAtomUris"
-          show-suggestions="::false"
-          show-persona="::true"
         />
       </div>
       <div
@@ -241,6 +224,8 @@ class Controller {
   constructor() {
     attach(this, serviceDependencies, arguments);
     window.ownermap4dbg = this;
+    this.WonAtomMap = WonAtomMap;
+    this.WonAtomCardGrid = WonAtomCardGrid;
 
     const selectFromState = state => {
       const viewConnUri = generalSelectors.getViewConnectionUriFromRoute(state);
@@ -540,9 +525,6 @@ export default {
     .module("won.owner.components.map", [
       ngAnimate,
       postMessagesModule,
-      atomMapModule,
-      atomCardModule,
-      postHeaderModule,
       wonInput,
     ])
     .controller("MapController", Controller).name,

@@ -30,6 +30,7 @@ won-login-form {
     padding-bottom: 0.5rem;
   }
 
+  > won-preact.labelledHr won-labelled-hr > .wlh__label > .wlh__label__text,
   > won-labelled-hr > .wlh__label > .wlh__label__text {
     background: white;
   }

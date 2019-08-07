@@ -1,0 +1,80 @@
+@import "won-config";
+@import "textfield";
+@import "sizing-utils";
+
+won-suggest-atom-picker {
+  display: grid;
+  grid-gap: 0.5rem;
+
+  .sap__posts {
+    display: grid;
+    grid-gap: 0.25rem;
+
+    &__post {
+      border: $thinGrayBorder;
+      padding: 0.25rem;
+      background: white;
+
+      &.won--selected {
+        background: $won-line-gray;
+      }
+    }
+  }
+
+  .sap__noposts {
+    font-size: $normalFontSize;
+  }
+
+  > won-labelled-hr {
+    .wlh__label {
+      .wlh__label__text {
+        background: $won-light-gray;
+        white-space: nowrap;
+      }
+    }
+  }
+
+  .sap__input {
+    position: relative;
+    display: grid;
+
+    .sap__input__icon {
+      &.clickable {
+        --local-primary: #{$won-primary-color};
+      }
+
+      @include fixed-square($bigiconSize);
+      position: absolute;
+      right: 0.5rem;
+      top: $formInputHeight / 2 - $bigiconSize / 2;
+      z-index: 1;
+    }
+
+    .sap__input__inner {
+      @extend .won-txt;
+      border: $thinGrayBorder;
+      min-height: $formInputHeight;
+      min-height: $formInputHeight;
+      word-wrap: break-word;
+      box-sizing: border-box;
+
+      $verticalPadding: calcVerticalPaddingToHeight(
+        $normalFontSize,
+        22/16,
+        $thinBorderWidth,
+        $formInputHeight
+      );
+      padding: $verticalPadding 0.438rem + $bigiconSize $verticalPadding
+        0.438rem;
+    }
+
+    .sap__input__inner::-ms-clear {
+      width: 0;
+      height: 0;
+    }
+  }
+
+  .sap__error {
+    font-size: $smallFontSize;
+  }
+}

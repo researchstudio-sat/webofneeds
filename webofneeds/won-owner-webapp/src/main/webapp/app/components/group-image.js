@@ -8,18 +8,18 @@
 import angular from "angular";
 import won from "../won-es6.js";
 import "ng-redux";
-import squareImageModule from "./square-image.js";
 import { actionCreators } from "../actions/actions.js";
 import { labels } from "../won-label-utils.js";
 import { get } from "../utils.js";
 import { attach } from "../cstm-ng-utils.js";
 import { connect2Redux } from "../configRedux.js";
 import {
-  getOwnedAtomByConnectionUri,
   getAtoms,
+  getOwnedAtomByConnectionUri,
 } from "../redux/selectors/general-selectors.js";
 
 import "~/style/_group-image.scss";
+import WonAtomIcon from "./atom-icon.jsx";
 
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
@@ -28,9 +28,7 @@ function genComponentConf() {
         ng-repeat="groupMemberUri in self.groupMembersArray"
         ng-class="{'gi__icons__icon--spanCol': self.groupMembersSize == 1}"
         ng-if="self.groupMembersSize <= 4 || $index < 3">
-        <won-square-image
-          uri="::groupMemberUri">
-        </won-square-image>
+        <won-preact class="atomImage" component="self.WonAtomIcon" props="{atomUri: groupMemberUri}"></won-preact>
       </div>
       <div class="gi__icons__more" ng-if="self.groupMembersSize > 4">
          +
@@ -51,6 +49,8 @@ function genComponentConf() {
       attach(this, serviceDependencies, arguments);
       this.labels = labels;
       this.WON = won.WON;
+      this.WonAtomIcon = WonAtomIcon;
+
       const selectFromState = state => {
         let groupMembers;
 
@@ -99,5 +99,5 @@ function genComponentConf() {
 }
 
 export default angular
-  .module("won.owner.components.groupImage", [squareImageModule])
+  .module("won.owner.components.groupImage", [])
   .directive("wonGroupImage", genComponentConf).name;

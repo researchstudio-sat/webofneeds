@@ -5,36 +5,34 @@
 import angular from "angular";
 import won from "../won-es6.js";
 import "ng-redux";
-import squareImageModule from "./square-image.js";
 import groupImageModule from "./group-image.js";
 import { actionCreators } from "../actions/actions.js";
 import { labels, relativeTime } from "../won-label-utils.js";
-import { getIn, get } from "../utils.js";
-import { attach } from "../cstm-ng-utils.js";
+import { get, getIn } from "../utils.js";
+import { attach, classOnComponentRoot } from "../cstm-ng-utils.js";
 import { connect2Redux } from "../configRedux.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as connectionSelectors from "../redux/selectors/connection-selectors.js";
 import { getHumanReadableStringFromMessage } from "../reducers/atom-reducer/parse-message.js";
 import {
-  selectLastUpdateTime,
-  getOwnedAtomByConnectionUri,
   getAtoms,
+  getOwnedAtomByConnectionUri,
+  selectLastUpdateTime,
 } from "../redux/selectors/general-selectors.js";
-import { getUnreadMessagesByConnectionUri } from "../redux/selectors/message-selectors.js";
-import { getMessagesByConnectionUri } from "../redux/selectors/message-selectors.js";
+import {
+  getMessagesByConnectionUri,
+  getUnreadMessagesByConnectionUri,
+} from "../redux/selectors/message-selectors.js";
 import connectionStateModule from "./connection-state.js";
-import { classOnComponentRoot } from "../cstm-ng-utils.js";
 
 import "~/style/_connection-header.scss";
+import WonAtomIcon from "./atom-icon.jsx";
 
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
   let template = `
       <div class="ch__icon" ng-if="!self.connectionOrAtomsLoading && !self.isConnectionToGroup">
-          <won-square-image
-            class="ch__icon__theiratom"
-            uri="::self.targetAtom.get('uri')">
-          </won-square-image>
+          <won-preact class="atomImage ch__icon__theiratom" component="self.WonAtomIcon" props="{atomUri: self.targetAtom.get('uri')}"></won-preact>
       </div>
       <won-group-image
         class="ch__groupicons"
@@ -120,6 +118,8 @@ function genComponentConf() {
       attach(this, serviceDependencies, arguments);
       this.labels = labels;
       this.WON = won.WON;
+      this.WonAtomIcon = WonAtomIcon;
+
       const selectFromState = state => {
         const ownedAtom = getOwnedAtomByConnectionUri(
           state,
@@ -269,7 +269,6 @@ function genComponentConf() {
 
 export default angular
   .module("won.owner.components.connectionHeader", [
-    squareImageModule,
     groupImageModule,
     connectionStateModule,
   ])

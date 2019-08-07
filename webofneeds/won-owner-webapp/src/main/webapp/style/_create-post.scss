@@ -113,6 +113,7 @@ won-create-search {
     &__responsivebuttons {
       padding: 0 0.5rem;
 
+      won-preact.labelledHr .wlh__label__text,
       won-labelled-hr .wlh__label__text {
         background-color: white;
       }
@@ -128,6 +129,7 @@ won-create-search {
     grid-area: footer;
     display: grid;
 
+    won-preact.labelledHr .wlh__label__text,
     won-labelled-hr .wlh__label__text {
       background-color: white;
     }
@@ -158,6 +160,7 @@ won-create-search {
       padding-left: 0;
       padding-right: 0;
 
+      won-preact.labelledHr .wlh__label__text,
       won-labelled-hr .wlh__label__text {
         background-color: white;
       }

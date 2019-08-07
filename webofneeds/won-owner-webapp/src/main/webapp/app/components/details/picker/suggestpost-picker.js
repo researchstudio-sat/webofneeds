@@ -1,14 +1,13 @@
 import angular from "angular";
 import "ng-redux";
 import Immutable from "immutable";
-import { sortBy, get, getIn, delay } from "../../../utils.js";
-import { attach, DomCache } from "../../../cstm-ng-utils.js";
+import { delay, get, getIn, sortBy } from "../../../utils.js";
+import { attach } from "../../../cstm-ng-utils.js";
 import wonInput from "../../../directives/input.js";
 import { connect2Redux } from "../../../configRedux.js";
 import { actionCreators } from "../../../actions/actions.js";
-import postHeaderModule from "../../post-header.js";
-import labelledHrModule from "../../labelled-hr.js";
 import { getActiveAtoms } from "../../../redux/selectors/general-selectors.js";
+import WonAtomHeader from "../../atom-header.jsx";
 
 import "~/style/_suggestpostpicker.scss";
 
@@ -20,15 +19,17 @@ function genComponentConf() {
           ng-class="{'won--selected': self.isSelected(atom)}"
           ng-repeat="atom in self.sortedActiveAtoms"
           ng-click="self.selectAtom(atom)">
-          <won-post-header
-              atom-uri="atom.get('uri')">
-          </won-post-header>
+          <won-preact
+              class="atomHeader"
+              component="self.WonAtomHeader"
+              props="{atomUri: atom.get('uri')}">
+          </won-preact>
         </div>
       </div>
       <div class="suggestpostp__noposts" ng-if="!self.suggestionsAvailable">
         {{ self.noSuggestionsLabel }}
       </div>
-      <won-labelled-hr label="::'Not happy with the options? Add an Atom-URI below'" class="suggestpostp__labelledhr"></won-labelled-hr>
+      <won-preact component="self.WonLabelledHr" class="labelledHr suggestpostp__labelledhr" props="{label: 'Not happy with the options? Add an Atom-URI below'}"></won-preact>
       <div class="suggestpostp__input">
          <svg class="suggestpostp__input__icon clickable"
             style="--local-primary:var(--won-primary-color);"
@@ -66,7 +67,6 @@ function genComponentConf() {
   class Controller {
     constructor() {
       attach(this, serviceDependencies, arguments);
-      this.domCache = new DomCache(this.$element);
 
       window.suggestpostp4dbg = this;
 
@@ -74,6 +74,8 @@ function genComponentConf() {
       this.showResetButton = false;
 
       this.uriToFetch = undefined;
+
+      this.WonAtomHeader = WonAtomHeader;
 
       const selectFromState = state => {
         const suggestedAtomUri = this.initialValue;
@@ -296,9 +298,5 @@ function genComponentConf() {
 }
 
 export default angular
-  .module("won.owner.components.suggestpostPicker", [
-    wonInput,
-    postHeaderModule,
-    labelledHrModule,
-  ])
+  .module("won.owner.components.suggestpostPicker", [wonInput])
   .directive("wonSuggestpostPicker", genComponentConf).name;

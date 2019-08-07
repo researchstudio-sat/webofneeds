@@ -12,7 +12,10 @@ won-post-content {
 
     won-labelled-hr .wlh__label,
     won-labelled-hr .wlh__label__text,
-    won-labelled-hr .wlh__label__carret {
+    won-labelled-hr .wlh__label__carret,
+    won-preact.labelledHr won-labelled-hr .wlh__label,
+    won-preact.labelledHr won-labelled-hr .wlh__label__text,
+    won-preact.labelledHr won-labelled-hr .wlh__label__carret {
       background-color: white;
     }
 

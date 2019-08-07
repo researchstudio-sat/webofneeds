@@ -14,7 +14,7 @@ won-travel-action-viewer {
         @include fixed-square(1rem);
       }
     }
-
+    .won-atom-map,
     won-atom-map {
       display: block;
       @include slideWithOpacityAnimation(0.5s, linear, 20rem);
@@ -25,6 +25,16 @@ won-travel-action-viewer {
 
         @media (max-width: $responsivenessBreakPoint) {
           height: 15rem;
+        }
+
+        &--loading {
+          display: grid;
+          justify-content: center;
+          align-items: center;
+
+          .won-atom-map__spinner {
+            @include fixed-square($postIconSize);
+          }
         }
       }
     }
