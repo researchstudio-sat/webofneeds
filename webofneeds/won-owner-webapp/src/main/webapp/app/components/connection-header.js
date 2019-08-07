@@ -22,11 +22,11 @@ import {
   getMessagesByConnectionUri,
   getUnreadMessagesByConnectionUri,
 } from "../redux/selectors/message-selectors.js";
-import connectionStateModule from "./connection-state.js";
 
 import "~/style/_connection-header.scss";
 import WonAtomIcon from "./atom-icon.jsx";
 import WonGroupIcon from "./group-icon.jsx";
+import WonConnectionState from "./connection-state.jsx";
 
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
@@ -66,9 +66,7 @@ function genComponentConf() {
               ng-if="self.isGroupChatEnabled && self.isChatEnabled">
               Group Chat enabled
             </span>
-            <won-connection-state
-              connection-uri="self.connection.get('uri')">
-            </won-connection-state>
+            <won-preact component="self.WonConnectionState" props="{connectionUri: self.connection.get('uri')}"></won-preact>
             <span class="ch__right__subtitle__type__state" ng-if="!self.unreadMessageCount && !self.latestMessageHumanReadableString">
               {{ self.connection && self.getTextForConnectionState(self.connection.get('state')) }}
             </span>
@@ -121,6 +119,7 @@ function genComponentConf() {
       this.WON = won.WON;
       this.WonAtomIcon = WonAtomIcon;
       this.WonGroupIcon = WonGroupIcon;
+      this.WonConnectionState = WonConnectionState;
 
       const selectFromState = state => {
         const ownedAtom = getOwnedAtomByConnectionUri(
@@ -270,5 +269,5 @@ function genComponentConf() {
 }
 
 export default angular
-  .module("won.owner.components.connectionHeader", [connectionStateModule])
+  .module("won.owner.components.connectionHeader", [])
   .directive("wonConnectionHeader", genComponentConf).name;

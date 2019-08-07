@@ -102,8 +102,13 @@ won-connection-header {
           display: inline-block;
           padding-right: 0.25rem;
 
-          svg {
+          svg.cs__state__icon {
             @include fixed-square($smallFontSize);
+            --local-primary: #{$won-primary-color-light};
+
+            &.won-unread {
+              --local-primary: #{$won-primary-color};
+            }
           }
         }
 
