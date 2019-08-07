@@ -15,11 +15,13 @@ import org.apache.camel.builder.RouteBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.invoke.MethodHandles;
+
 /**
  * User: LEIH-NB Date: 25.11.13
  */
 public class AtomProtocolDynamicRoutes extends RouteBuilder {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private String from;
 
     public AtomProtocolDynamicRoutes(CamelContext camelContext, String from) {

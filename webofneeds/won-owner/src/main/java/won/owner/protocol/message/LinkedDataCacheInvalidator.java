@@ -1,11 +1,8 @@
 package won.owner.protocol.message;
 
-import java.net.URI;
-
 import org.apache.jena.query.Dataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageType;
 import won.protocol.message.processor.WonMessageProcessor;
@@ -14,12 +11,15 @@ import won.protocol.util.AtomModelWrapper;
 import won.protocol.util.linkeddata.CachingLinkedDataSource;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
 
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+
 /**
  * Removes elements from the linked data cache when certain messages are seen.
  * User: ypanchenko Date: 27.10.2015
  */
 public class LinkedDataCacheInvalidator implements WonMessageProcessor {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public void setLinkedDataSource(final CachingLinkedDataSource linkedDataSource) {
         this.linkedDataSource = linkedDataSource;

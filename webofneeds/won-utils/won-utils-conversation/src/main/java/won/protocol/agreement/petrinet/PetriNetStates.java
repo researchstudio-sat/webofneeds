@@ -1,13 +1,5 @@
 package won.protocol.agreement.petrinet;
 
-import java.net.URI;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
@@ -15,13 +7,16 @@ import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import uk.ac.imperial.pipe.models.petrinet.PetriNet;
 import won.protocol.agreement.AgreementProtocolState;
 import won.protocol.vocabulary.WONWF;
 
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.*;
+
 public class PetriNetStates {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private AgreementProtocolState agreementProtocolState;
     private Dataset conversation;
     private Map<URI, PetriNetState> petrinetStates = new HashMap<>();

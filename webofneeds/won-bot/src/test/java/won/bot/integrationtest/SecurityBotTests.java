@@ -10,9 +10,6 @@
  */
 package won.bot.integrationtest;
 
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,7 +22,6 @@ import org.springframework.scheduling.support.PeriodicTrigger;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.concurrent.SettableListenableFuture;
-
 import won.bot.IntegrationtestBot;
 import won.bot.framework.bot.base.TriggeredBot;
 import won.bot.framework.eventbot.EventListenerContext;
@@ -40,9 +36,13 @@ import won.bot.framework.eventbot.listener.EventListener;
 import won.bot.framework.eventbot.listener.impl.ActionOnEventListener;
 import won.bot.framework.manager.BotManager;
 import won.bot.integrationtest.security.DelayedDuplicateMessageSendingConversationBot;
+import won.bot.integrationtest.security.DuplicateAtomURIFailureBot;
 import won.bot.integrationtest.security.DuplicateMessageSendingConversationBot;
 import won.bot.integrationtest.security.DuplicateMessageURIFailureBot;
-import won.bot.integrationtest.security.DuplicateAtomURIFailureBot;
+
+import java.lang.invoke.MethodHandles;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Integration test.
@@ -50,7 +50,7 @@ import won.bot.integrationtest.security.DuplicateAtomURIFailureBot;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "classpath:/spring/app/securityBotTest.xml" })
 public class SecurityBotTests {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     @Autowired
     private BotManager botManager;
     @Autowired

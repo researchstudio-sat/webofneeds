@@ -1,29 +1,27 @@
 package won.matcher.service.nodemanager.config;
 
-import java.util.UUID;
-
-import javax.net.ssl.KeyManager;
-import javax.net.ssl.TrustManager;
-
+import akka.actor.ActorRef;
+import akka.actor.Props;
+import akka.actor.UntypedActorContext;
+import akka.camel.Camel;
+import akka.camel.CamelExtension;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.ActiveMQSslConnectionFactory;
 import org.apache.camel.FailedToCreateConsumerException;
 import org.apache.camel.component.jms.JmsComponent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import akka.actor.ActorRef;
-import akka.actor.Props;
-import akka.actor.UntypedActorContext;
-import akka.camel.Camel;
-import akka.camel.CamelExtension;
 import won.cryptography.ssl.MessagingContext;
 import won.matcher.service.common.spring.SpringExtension;
-import won.matcher.service.nodemanager.actor.HintProducerProtocolActor;
 import won.matcher.service.nodemanager.actor.AtomConsumerProtocolActor;
+import won.matcher.service.nodemanager.actor.HintProducerProtocolActor;
 import won.matcher.service.nodemanager.pojo.WonNodeConnection;
 import won.protocol.service.WonNodeInfo;
 import won.protocol.vocabulary.WON;
+
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.TrustManager;
+import java.util.UUID;
 
 /**
  * Factory for creating a
@@ -34,7 +32,7 @@ import won.protocol.vocabulary.WON;
  */
 // TODO reuse BrokerComponentFactory
 public class ActiveMqWonNodeConnectionFactory {
-    protected static final Logger log = LoggerFactory.getLogger(ActiveMqWonNodeConnectionFactory.class);
+    protected static final Logger logger = LoggerFactory.getLogger(ActiveMqWonNodeConnectionFactory.class);
 
     /**
      * Create a {@link won.matcher.service.nodemanager.pojo.WonNodeConnection} for
@@ -68,7 +66,7 @@ public class ActiveMqWonNodeConnectionFactory {
         Props createdProps = SpringExtension.SpringExtProvider.get(context.system())
                         .props(AtomConsumerProtocolActor.class, createdComponent);
         ActorRef created = context.actorOf(createdProps, "ActiveMqAtomCreatedConsumerProtocolActor-" + uuid);
-        log.info("Create camel component JMS listener {} for won node {}", createdComponent,
+        logger.info("Create camel component JMS listener {} for won node {}", createdComponent,
                         wonNodeInfo.getWonNodeURI());
         ActorRef activated = created;
         if (!activatedTopic.equals(createdTopic)) {
@@ -76,7 +74,7 @@ public class ActiveMqWonNodeConnectionFactory {
             Props activatedProps = SpringExtension.SpringExtProvider.get(context.system())
                             .props(AtomConsumerProtocolActor.class, activatedComponent);
             activated = context.actorOf(activatedProps, "ActiveMqAtomActivatedConsumerProtocolActor-" + uuid);
-            log.info("Create camel component JMS listener {} for won node {}", activatedComponent,
+            logger.info("Create camel component JMS listener {} for won node {}", activatedComponent,
                             wonNodeInfo.getWonNodeURI());
         }
         ActorRef deactivated;
@@ -90,7 +88,7 @@ public class ActiveMqWonNodeConnectionFactory {
             Props deactivatedProps = SpringExtension.SpringExtProvider.get(context.system())
                             .props(AtomConsumerProtocolActor.class, deactivatedComponent);
             deactivated = context.actorOf(deactivatedProps, "ActiveMqAtomDeactivatedConsumerProtocolActor-" + uuid);
-            log.info("Create camel component JMS listener {} for won node {}", deactivatedComponent,
+            logger.info("Create camel component JMS listener {} for won node {}", deactivatedComponent,
                             wonNodeInfo.getWonNodeURI());
         }
         // create the actor that sends messages (hint events)
@@ -98,7 +96,8 @@ public class ActiveMqWonNodeConnectionFactory {
         Props hintProps = SpringExtension.SpringExtProvider.get(context.system()).props(HintProducerProtocolActor.class,
                         hintComponent, null);
         ActorRef hintProducer = context.actorOf(hintProps, "ActiveMqHintProducerProtocolActor-" + uuid);
-        log.info("Create camel component JMS listener {} for won node {}", hintComponent, wonNodeInfo.getWonNodeURI());
+        logger.info("Create camel component JMS listener {} for won node {}", hintComponent,
+                        wonNodeInfo.getWonNodeURI());
         // watch the created consumers from the context to get informed when they are
         // terminated
         context.watch(created);
@@ -120,7 +119,7 @@ public class ActiveMqWonNodeConnectionFactory {
                 keyManager = messagingContext.getClientKeyManager();
                 trustManager = messagingContext.getClientTrustManager();
             } catch (Exception e) {
-                log.error("Key- or Trust- manager initialization problem", e);
+                logger.error("Key- or Trust- manager initialization problem", e);
             }
         }
         // jms.prefetchPolicy parameter is added to prevent matcher-consumer death due
@@ -140,7 +139,7 @@ public class ActiveMqWonNodeConnectionFactory {
             connectionFactory.setKeyAndTrustManagers(new KeyManager[] { keyManager },
                             new TrustManager[] { trustManager }, null);
         } else {
-            log.warn("key or trust manager was null, therefore do not set them in connection factory");
+            logger.warn("key or trust manager was null, therefore do not set them in connection factory");
         }
         return connectionFactory;
     }

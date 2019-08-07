@@ -1,8 +1,5 @@
 package won.node.camel.processor.socket.reviewSocket;
 
-import java.net.URI;
-import java.util.Map;
-
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.apache.jena.query.Dataset;
@@ -10,8 +7,9 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-
 import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.camel.processor.annotation.SocketMessageProcessor;
 import won.protocol.message.WonMessage;
@@ -19,9 +17,12 @@ import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.model.Atom;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.SCHEMA;
-import won.protocol.vocabulary.WON;
 import won.protocol.vocabulary.WONMSG;
 import won.protocol.vocabulary.WXREVIEW;
+
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.Map;
 
 /**
  * User: MS Date: 12.12.2018
@@ -29,6 +30,8 @@ import won.protocol.vocabulary.WXREVIEW;
 @Component
 @SocketMessageProcessor(socketType = WXREVIEW.ReviewSocketString, direction = WONMSG.FromExternalString, messageType = WONMSG.ConnectMessageString)
 public class ConnectFromNodeReviewSocketImpl extends AbstractCamelProcessor {
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
     @Override
     public void process(final Exchange exchange) {
         Message message = exchange.getIn();

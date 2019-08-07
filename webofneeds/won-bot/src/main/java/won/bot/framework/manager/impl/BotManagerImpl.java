@@ -1,24 +1,19 @@
 package won.bot.framework.manager.impl;
 
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import won.bot.framework.bot.Bot;
 import won.bot.framework.manager.BotManager;
+
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.*;
 
 /**
  * BotManager, simple in-memory implementation.
  */
 public class BotManagerImpl implements BotManager {
-    protected final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private List<Bot> bots = new LinkedList<Bot>();
     private Map<URI, Bot> botByUri = new HashMap<URI, Bot>();
     private Map<URI, List<Bot>> botListByUri = new HashMap<URI, List<Bot>>();

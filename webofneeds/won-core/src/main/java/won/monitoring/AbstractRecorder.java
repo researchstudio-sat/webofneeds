@@ -17,7 +17,6 @@ import org.slf4j.LoggerFactory;
  * Simple base class for recorders.
  */
 public abstract class AbstractRecorder implements MonitoringStatisticsRecorder {
-    protected final Logger logger = LoggerFactory.getLogger(getClass());
     private String recorderName;
 
     protected AbstractRecorder() {

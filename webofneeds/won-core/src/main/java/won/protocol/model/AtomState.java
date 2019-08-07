@@ -10,6 +10,7 @@
  */
 package won.protocol.model;
 
+import java.lang.invoke.MethodHandles;
 import java.net.URI;
 
 import org.slf4j.Logger;
@@ -22,7 +23,7 @@ import won.protocol.vocabulary.WON;
  */
 public enum AtomState {
     INACTIVE("Inactive"), ACTIVE("Active"), DELETED("Deleted");
-    private static final Logger logger = LoggerFactory.getLogger(AtomState.class);
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private String name;
 
     private AtomState(String name) {

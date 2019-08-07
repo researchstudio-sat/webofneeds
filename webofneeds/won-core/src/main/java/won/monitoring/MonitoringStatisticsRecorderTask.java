@@ -10,17 +10,18 @@
  */
 package won.monitoring;
 
-import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.lang.invoke.MethodHandles;
+import java.util.List;
 
 /**
  * Task intended to be scheduled regularly. In each execution it triggers all
  * MonitoringStatisticsRecorders it has been provided.
  */
 public class MonitoringStatisticsRecorderTask implements Runnable {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private List<MonitoringStatisticsRecorder> monitoringStatisticsRecorders;
     private boolean resetMonitorAfterRecording;
     private MonitoringResetter monitoringResetter;

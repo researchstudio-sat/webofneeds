@@ -1,10 +1,11 @@
 package won.cryptography.service;
 
-import java.io.IOException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
+
+import java.io.IOException;
+import java.lang.invoke.MethodHandles;
 
 /**
  * Checks if the node certificate is already present in the specified keystore
@@ -14,7 +15,7 @@ import org.springframework.beans.factory.InitializingBean;
  */
 @Deprecated
 public class CertificateOnStartupCreator implements InitializingBean {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private CryptographyService cryptographyService;
 
     @Override

@@ -1,22 +1,6 @@
 package won.matcher.service.common.service.sparql;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringWriter;
-import java.nio.charset.StandardCharsets;
-import java.util.Iterator;
-
-import org.apache.jena.query.Dataset;
-import org.apache.jena.query.DatasetFactory;
-import org.apache.jena.query.ParameterizedSparqlString;
-import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.query.QueryFactory;
-import org.apache.jena.query.QueryParseException;
-import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.ResultSet;
+import org.apache.jena.query.*;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
@@ -34,8 +18,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
 import won.protocol.util.RdfUtils;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringWriter;
+import java.lang.invoke.MethodHandles;
+import java.nio.charset.StandardCharsets;
+import java.util.Iterator;
 
 /**
  * Service to access of Sparql enpoint database to save or query linked data.
@@ -43,7 +34,7 @@ import won.protocol.util.RdfUtils;
  */
 @Component
 public class SparqlService {
-    protected final Logger log = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     protected String sparqlEndpoint;
     // protected DatasetAccessor accessor;
 
@@ -91,7 +82,7 @@ public class SparqlService {
         String query = "";
         Iterator<String> graphNames = ds.listNames();
         while (graphNames.hasNext()) {
-            log.debug("Save dataset");
+            logger.debug("Save dataset");
             String graphName = graphNames.next();
             Model model = ds.getNamedModel(graphName);
             query += createUpdateNamedGraphQuery(graphName, model);
@@ -151,14 +142,14 @@ public class SparqlService {
      */
     public void executeUpdateQuery(String updateQuery) {
         try {
-            log.debug("Update SPARQL Endpoint: {}", sparqlEndpoint);
-            log.debug("Execute query: {}", updateQuery);
+            logger.debug("Update SPARQL Endpoint: {}", sparqlEndpoint);
+            logger.debug("Execute query: {}", updateQuery);
             UpdateRequest query = UpdateFactory.create(updateQuery);
             UpdateProcessRemote riStore = (UpdateProcessRemote) UpdateExecutionFactory.createRemote(query,
                             sparqlEndpoint);
             riStore.execute();
         } catch (QueryParseException e) {
-            log.warn("Error parsing update query: " + updateQuery, e);
+            logger.warn("Error parsing update query: " + updateQuery, e);
         }
     }
 }

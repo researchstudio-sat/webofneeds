@@ -1,7 +1,5 @@
 package won.node.socket.impl;
 
-import java.util.List;
-
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Resource;
@@ -9,12 +7,7 @@ import org.apache.jena.rdf.model.StmtIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import won.protocol.exception.ConnectionAlreadyExistsException;
-import won.protocol.exception.IllegalMessageForConnectionStateException;
-import won.protocol.exception.IllegalMessageForAtomStateException;
-import won.protocol.exception.NoSuchConnectionException;
-import won.protocol.exception.NoSuchAtomException;
+import won.protocol.exception.*;
 import won.protocol.message.WonMessage;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionState;
@@ -22,12 +15,15 @@ import won.protocol.model.SocketType;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.vocabulary.WON;
 
+import java.lang.invoke.MethodHandles;
+import java.util.List;
+
 /**
  * Created with IntelliJ IDEA. User: Danijel Date: 9.12.13. Time: 19.20 To
  * change this template use File | Settings | File Templates.
  */
 public class CoordinatorSocketImpl extends AbstractSocket {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     @Autowired
     private ConnectionRepository connectionRepository;
 

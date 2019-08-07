@@ -1,9 +1,5 @@
 package won.node.service.impl;
 
-import java.net.URI;
-import java.util.List;
-import java.util.Optional;
-
 import org.apache.jena.graph.TripleBoundary;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
@@ -14,36 +10,23 @@ import org.apache.jena.rdf.model.StatementTripleBoundary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import won.protocol.exception.ConnectionAlreadyExistsException;
-import won.protocol.exception.IllegalMessageForAtomStateException;
-import won.protocol.exception.IllegalMessageForConnectionStateException;
-import won.protocol.exception.NoSuchAtomException;
-import won.protocol.exception.NoSuchConnectionException;
-import won.protocol.model.Atom;
-import won.protocol.model.AtomState;
-import won.protocol.model.Connection;
-import won.protocol.model.ConnectionEventType;
-import won.protocol.model.ConnectionMessageContainer;
-import won.protocol.model.ConnectionState;
-import won.protocol.model.DatasetHolder;
-import won.protocol.model.Socket;
-import won.protocol.repository.AtomMessageContainerRepository;
-import won.protocol.repository.AtomRepository;
-import won.protocol.repository.ConnectionContainerRepository;
-import won.protocol.repository.ConnectionMessageContainerRepository;
-import won.protocol.repository.ConnectionRepository;
-import won.protocol.repository.DatasetHolderRepository;
-import won.protocol.repository.SocketRepository;
+import won.protocol.exception.*;
+import won.protocol.model.*;
+import won.protocol.repository.*;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.DataAccessUtils;
 import won.protocol.vocabulary.WONCON;
+
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * T User: gabriel Date: 06/11/13
  */
 public class DataAccessServiceImpl implements won.node.service.DataAccessService {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private URIService URIService;
     @Autowired
     private AtomRepository atomRepository;

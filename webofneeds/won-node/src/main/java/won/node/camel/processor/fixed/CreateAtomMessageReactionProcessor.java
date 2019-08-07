@@ -10,15 +10,14 @@
  */
 package won.node.camel.processor.fixed;
 
-import java.net.URI;
-
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.ModelFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.camel.processor.annotation.FixedMessageReactionProcessor;
 import won.protocol.exception.NoSuchAtomException;
@@ -31,12 +30,16 @@ import won.protocol.repository.AtomRepository;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WONMSG;
 
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+
 /**
  * Reacts to a CREATE message, informing matchers of the newly created atom.
  */
 @Service
 @FixedMessageReactionProcessor(direction = WONMSG.FromOwnerString, messageType = WONMSG.CreateMessageString)
 public class CreateAtomMessageReactionProcessor extends AbstractCamelProcessor {
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     @Autowired
     AtomRepository atomRepository;
 

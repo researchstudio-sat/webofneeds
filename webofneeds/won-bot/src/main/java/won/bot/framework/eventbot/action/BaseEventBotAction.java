@@ -10,6 +10,7 @@
  */
 package won.bot.framework.eventbot.action;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Objects;
 
 import org.javasimon.SimonManager;
@@ -27,7 +28,7 @@ import won.bot.framework.eventbot.listener.EventListener;
  *
  */
 public abstract class BaseEventBotAction implements won.bot.framework.eventbot.action.EventBotAction {
-    protected final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private EventListenerContext eventListenerContext;
     private static final String EXCEPTION_TAG = "failed";
     private final String stopwatchName = getClass().getName();

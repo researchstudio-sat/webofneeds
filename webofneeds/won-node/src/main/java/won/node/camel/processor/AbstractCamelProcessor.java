@@ -21,7 +21,6 @@ import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 
 import org.apache.camel.Processor;
-import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import won.cryptography.service.RandomNumberService;
@@ -54,7 +53,6 @@ import won.protocol.util.linkeddata.LinkedDataSource;
  * User: syim Date: 02.03.2015
  */
 public abstract class AbstractCamelProcessor implements Processor {
-    protected Logger logger = org.slf4j.LoggerFactory.getLogger(this.getClass());
     @Autowired
     protected MessagingService messagingService;
     @Autowired
@@ -174,7 +172,7 @@ public abstract class AbstractCamelProcessor implements Processor {
     }
 
     protected List<String> toStringIds(final List<OwnerApplication> ownerApplications) {
-        List<String> ownerApplicationIds = new ArrayList<String>(ownerApplications.size());
+        List<String> ownerApplicationIds = new ArrayList<>(ownerApplications.size());
         for (OwnerApplication app : ownerApplications) {
             ownerApplicationIds.add(app.getOwnerApplicationId());
         }

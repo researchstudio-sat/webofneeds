@@ -10,15 +10,19 @@
  */
 package won.bot.framework.bot.base;
 
-import java.util.concurrent.ScheduledFuture;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.Trigger;
+
+import java.lang.invoke.MethodHandles;
+import java.util.concurrent.ScheduledFuture;
 
 /**
  * Bot base class that expects a trigger to be injected that will cause the
  * act() method to be called according to the trigger's specification.
  */
 public abstract class TriggeredBot extends ScheduledActionBot {
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private Trigger trigger;
     private ScheduledFuture scheduledExecution;
 

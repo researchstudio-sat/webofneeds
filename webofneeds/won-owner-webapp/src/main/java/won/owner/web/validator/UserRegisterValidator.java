@@ -4,13 +4,10 @@
  */
 package won.owner.web.validator;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
-
 import won.owner.model.User;
 import won.owner.pojo.UserPojo;
 import won.owner.service.impl.WONUserDetailService;
@@ -20,7 +17,6 @@ import won.owner.service.impl.WONUserDetailService;
  */
 @Component
 public class UserRegisterValidator implements Validator {
-    private final static Logger log = LoggerFactory.getLogger(UserRegisterValidator.class);
     private final Validator validator;
     private final WONUserDetailService wonUserDetailService;
 

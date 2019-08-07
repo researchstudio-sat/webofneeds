@@ -1,5 +1,6 @@
 package won.protocol.message.processor.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.security.PublicKey;
 
 import org.apache.jena.query.Dataset;
@@ -28,7 +29,7 @@ import won.protocol.message.processor.exception.WonMessageProcessingException;
  * (browser). User: ypanchenko Date: 10.04.2015
  */
 public class KeyForNewAtomAddingProcessor implements WonMessageProcessor {
-    private static final Logger logger = LoggerFactory.getLogger(KeyForNewAtomAddingProcessor.class);
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private CryptographyService cryptographyService;
     private KeyPairAliasDerivationStrategy keyPairAliasDerivationStrategy;
 

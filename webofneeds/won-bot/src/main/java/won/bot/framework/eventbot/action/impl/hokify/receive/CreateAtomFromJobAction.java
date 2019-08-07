@@ -1,21 +1,13 @@
 package won.bot.framework.eventbot.action.impl.hokify.receive;
 
-import java.math.RoundingMode;
-import java.net.URI;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Random;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.datatypes.BaseDatatype;
 import org.apache.jena.datatypes.RDFDatatype;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.RDF;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import won.bot.framework.bot.context.HokifyJobBotContextWrapper;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.EventBotActionUtils;
@@ -38,10 +30,21 @@ import won.protocol.vocabulary.WONCON;
 import won.protocol.vocabulary.WONMATCH;
 import won.protocol.vocabulary.WXCHAT;
 
+import java.lang.invoke.MethodHandles;
+import java.math.RoundingMode;
+import java.net.URI;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Random;
+
 /**
  * Created by MS on 18.09.2018.
  */
 public class CreateAtomFromJobAction extends AbstractCreateAtomAction {
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private HokifyBotsApi hokifyBotsApi;
     private boolean createAllInOne;
 

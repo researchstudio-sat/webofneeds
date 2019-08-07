@@ -10,9 +10,13 @@
  */
 package won.bot.framework.eventbot.listener;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.filter.EventFilter;
+
+import java.lang.invoke.MethodHandles;
 
 /**
  * Base class for listeners that eventually stop listening. When the decision is
@@ -20,6 +24,7 @@ import won.bot.framework.eventbot.filter.EventFilter;
  * from all further events.
  */
 public abstract class AbstractFinishingListener extends BaseEventListener implements FinishingListener {
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private Object monitor = new Object();
     private boolean finished = false;
 

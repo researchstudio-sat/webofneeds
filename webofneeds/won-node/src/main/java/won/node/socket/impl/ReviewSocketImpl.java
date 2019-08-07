@@ -1,9 +1,6 @@
 package won.node.socket.impl;
 
 import org.apache.jena.rdf.model.Model;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import won.protocol.exception.ConnectionAlreadyExistsException;
 import won.protocol.exception.IllegalMessageForAtomStateException;
 import won.protocol.exception.NoSuchAtomException;
@@ -15,8 +12,6 @@ import won.protocol.model.SocketType;
  * created by MS on 12.12.2018
  */
 public class ReviewSocketImpl extends AbstractSocket {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
-
     @Override
     public SocketType getSocketType() {
         return SocketType.ReviewSocket;

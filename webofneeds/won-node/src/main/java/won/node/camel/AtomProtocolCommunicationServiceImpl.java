@@ -10,21 +10,17 @@
  */
 package won.node.camel;
 
-import java.net.URI;
-
 import org.apache.activemq.camel.component.ActiveMQComponent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import won.cryptography.service.RegistrationClient;
 import won.cryptography.service.RegistrationRestClientHttps;
 import won.protocol.exception.NoSuchConnectionException;
-import won.protocol.jms.ActiveMQService;
-import won.protocol.jms.CamelConfiguration;
-import won.protocol.jms.CamelConfigurator;
-import won.protocol.jms.AtomProtocolCamelConfigurator;
-import won.protocol.jms.AtomProtocolCommunicationService;
+import won.protocol.jms.*;
+
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
 
 /**
  * User: syim Date: 27.01.14
@@ -40,12 +36,12 @@ public class AtomProtocolCommunicationServiceImpl implements AtomProtocolCommuni
         this.registrationClient = registrationClient;
     }
 
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public synchronized CamelConfiguration configureCamelEndpoint(URI wonNodeUri) throws Exception {
         String atomProtocolQueueName;
         CamelConfiguration camelConfiguration = new CamelConfiguration();
-        logger.debug("ensuring camel is configured for remote wonNodeUri", new Object[] { wonNodeUri });
+        logger.debug("ensuring camel is configured for remote wonNodeUri {}", wonNodeUri);
         URI remoteNodeBrokerUri = activeMQService.getBrokerEndpoint(wonNodeUri);
         if (atomProtocolCamelConfigurator.getBrokerComponentNameWithBrokerUri(remoteNodeBrokerUri) != null) {
             logger.debug("broker component name is already known");

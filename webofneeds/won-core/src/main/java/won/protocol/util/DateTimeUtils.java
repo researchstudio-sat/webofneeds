@@ -9,14 +9,11 @@ import org.apache.jena.datatypes.xsd.XSDDateTime;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * User: atus Date: 23.04.13
  */
 public class DateTimeUtils {
-    private static final Logger logger = LoggerFactory.getLogger(DateTimeUtils.class);
     private static SimpleDateFormat sdf;
     private static final String DATE_FORMAT_XSD_DATE_TIME_STAMP = "yyyy-MM-DD'T'hh:mm:ss.sssZ";
 

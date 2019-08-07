@@ -10,45 +10,32 @@
  */
 package won.bot.framework.eventbot.action.impl.debugbot;
 
-import java.net.URI;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
-import won.bot.framework.eventbot.action.EventBotActionUtils;
 import won.bot.framework.eventbot.action.impl.counter.Counter;
 import won.bot.framework.eventbot.action.impl.counter.CounterImpl;
-import won.bot.framework.eventbot.action.impl.atomlifecycle.AbstractCreateAtomAction;
 import won.bot.framework.eventbot.bus.EventBus;
 import won.bot.framework.eventbot.event.Event;
-import won.bot.framework.eventbot.event.AtomCreationFailedEvent;
-import won.bot.framework.eventbot.event.AtomSpecificEvent;
 import won.bot.framework.eventbot.event.impl.command.replace.ReplaceCommandEvent;
-import won.bot.framework.eventbot.event.impl.debugbot.ConnectDebugCommandEvent;
-import won.bot.framework.eventbot.event.impl.debugbot.HintDebugCommandEvent;
-import won.bot.framework.eventbot.event.impl.debugbot.AtomCreatedEventForDebugConnect;
-import won.bot.framework.eventbot.event.impl.debugbot.AtomCreatedEventForDebugHint;
 import won.bot.framework.eventbot.event.impl.debugbot.ReplaceDebugAtomContentCommandEvent;
-import won.bot.framework.eventbot.event.impl.matcher.AtomCreatedEventForMatcher;
-import won.bot.framework.eventbot.event.impl.atomlifecycle.AtomCreatedEvent;
-import won.bot.framework.eventbot.event.impl.wonmessage.FailureResponseEvent;
 import won.bot.framework.eventbot.listener.EventListener;
-import won.protocol.message.WonMessage;
-import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.DefaultAtomModelWrapper;
-import won.protocol.util.AtomModelWrapper;
 import won.protocol.util.RdfUtils;
-import won.protocol.util.WonRdfUtils;
-import won.protocol.vocabulary.WON;
+
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
 
 /**
  * Creates an atom with the specified sockets. If no socket is specified, the
  * chatSocket will be used.
  */
 public class ReplaceDebugAtomContentAction extends BaseEventBotAction {
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private Counter counter = new CounterImpl("DebugAtomsReplaceCounter");
 
     public ReplaceDebugAtomContentAction(final EventListenerContext eventListenerContext) {

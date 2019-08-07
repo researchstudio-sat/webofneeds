@@ -14,7 +14,6 @@ import org.apache.jena.query.Dataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StopWatch;
-
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.event.Event;
@@ -23,13 +22,15 @@ import won.bot.framework.eventbot.event.impl.crawl.CrawlCommandFailureEvent;
 import won.bot.framework.eventbot.event.impl.crawl.CrawlCommandSuccessEvent;
 import won.bot.framework.eventbot.listener.EventListener;
 
+import java.lang.invoke.MethodHandles;
+
 /**
  * Expects a CrawlCommandEvent to contain the required crawl information. Crawls
  * the data using the LinkedDataSource and publishes a CrawlSuccessEvent when
  * done.
  */
 public class CrawlAction extends BaseEventBotAction {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public CrawlAction(EventListenerContext eventListenerContext) {
         super(eventListenerContext);

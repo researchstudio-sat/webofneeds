@@ -1,13 +1,5 @@
 package won.matcher.solr.hints;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
@@ -15,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import won.matcher.service.common.event.AtomEvent;
 import won.matcher.service.common.event.AtomHintEvent;
 import won.matcher.service.common.event.BulkHintEvent;
@@ -23,15 +14,18 @@ import won.matcher.solr.config.SolrMatcherConfig;
 import won.matcher.solr.query.factory.MatchingContextQueryFactory;
 import won.matcher.solr.utils.Katomle;
 import won.protocol.util.AtomModelWrapper;
-import won.protocol.vocabulary.WONCON;
 import won.protocol.vocabulary.WONMATCH;
+
+import java.lang.invoke.MethodHandles;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by hfriedrich on 02.08.2016.
  */
 @Component
 public class HintBuilder {
-    private final Logger log = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     public final static String WON_NODE_SOLR_FIELD = "_graph.http___purl.org_webofneeds_model_wonNode._id";
     public final static String HAS_FLAG_SOLR_FIELD = "_graph.http___purl.org_webofneeds_model_flag._id";
     @Autowired
@@ -42,11 +36,11 @@ public class HintBuilder {
         if (docs == null || docs.size() == 0) {
             return matches;
         }
-        if (log.isDebugEnabled()) {
+        if (logger.isDebugEnabled()) {
             for (SolrDocument doc : docs) {
                 String atomUri = doc.getFieldValue("id").toString();
                 double score = Double.valueOf(doc.getFieldValue("score").toString());
-                log.debug("retrieved match {} from Solr score {}: ", atomUri, score);
+                logger.debug("retrieved match {} from Solr score {}: ", atomUri, score);
             }
         }
         // sort the documents according to their score value descending
@@ -76,7 +70,7 @@ public class HintBuilder {
             int[] elbows = katomle.detectElbowPoints(x, y);
             if (elbows.length >= config.getCutAfterIthElbowInScore()) {
                 cutScoreLowerThan = y[elbows[elbows.length - config.getCutAfterIthElbowInScore()]];
-                log.debug("Calculated elbow score point after {} elbows for document scores: {}",
+                logger.debug("Calculated elbow score point after {} elbows for document scores: {}",
                                 config.getCutAfterIthElbowInScore(), cutScoreLowerThan);
             }
         }
@@ -84,7 +78,7 @@ public class HintBuilder {
             // if score is lower threshold or we arrived at the elbow point to cut after
             double score = Double.valueOf(sortedDocs.get(i).getFieldValue("score").toString());
             if (score < config.getScoreThreshold() || score <= cutScoreLowerThan) {
-                log.debug("cut result documents, current score is {}, score threshold is {}", score,
+                logger.debug("cut result documents, current score is {}, score threshold is {}", score,
                                 config.getScoreThreshold());
                 break;
             }
@@ -103,11 +97,11 @@ public class HintBuilder {
             newDocs = calculateMatchingResults(docs);
         }
         BulkHintEvent bulkHintEvent = new BulkHintEvent();
-        log.info("Received {} matches as query result for atom {}, keeping the top {} ",
+        logger.info("Received {} matches as query result for atom {}, keeping the top {} ",
                         new Object[] { (docs != null) ? docs.size() : 0, atom, newDocs.size() });
         boolean noHintForMe = atomModelWrapper.flag(WONMATCH.NoHintForMe);
         boolean noHintForCounterpart = atomModelWrapper.flag(WONMATCH.NoHintForCounterpart);
-        log.debug("atom to be matched has NoHintForMe: {}, NoHintForCounterpart: {} ", noHintForMe,
+        logger.debug("atom to be matched has NoHintForMe: {}, NoHintForCounterpart: {} ", noHintForMe,
                         noHintForCounterpart);
         for (SolrDocument doc : newDocs) {
             // NOTE: not the whole document is loaded here. The fields that are selected are
@@ -117,7 +111,7 @@ public class HintBuilder {
             // has to be extended in that class.
             String matchedAtomUri = doc.getFieldValue("id").toString();
             if (matchedAtomUri == null) {
-                log.debug("omitting matched atom: could not extract atom URI");
+                logger.debug("omitting matched atom: could not extract atom URI");
                 continue;
             }
             List<String> flags = getValueList(doc, HAS_FLAG_SOLR_FIELD);
@@ -150,30 +144,30 @@ public class HintBuilder {
             // or if it was specified in the calling parameters or matching contexts
             doSuppressHintForMatchedAtoms = noHintForCounterpart || matchedAtomNoHintForMe
                             || doSuppressHintForMatchedAtoms || suppressHintsForCounterpartContexts;
-            if (log.isDebugEnabled()) {
-                log.debug("matched atom has NoHintForMe: {}, NoHintForCounterpart: {}", matchedAtomNoHintForMe,
+            if (logger.isDebugEnabled()) {
+                logger.debug("matched atom has NoHintForMe: {}, NoHintForCounterpart: {}", matchedAtomNoHintForMe,
                                 matchedAtomNoHintForCounterpart);
-                log.debug("atom will receive a hint: {} (uri: {})", !doSuppressHintForAtom, atom.getUri());
-                log.debug("matched atom atom will receive a hint: {} (uri: {})", !doSuppressHintForMatchedAtoms,
+                logger.debug("atom will receive a hint: {} (uri: {})", !doSuppressHintForAtom, atom.getUri());
+                logger.debug("matched atom atom will receive a hint: {} (uri: {})", !doSuppressHintForMatchedAtoms,
                                 matchedAtomUri);
-                log.debug("atom matching contexts: {}", matchingContexts);
-                log.debug("matched atom matching contexts: {}", matchedAtomMatchingContexts);
+                logger.debug("atom matching contexts: {}", matchingContexts);
+                logger.debug("matched atom matching contexts: {}", matchedAtomMatchingContexts);
             }
             if (doSuppressHintForAtom && doSuppressHintForMatchedAtoms) {
-                log.debug("no hints to be sent because of Suppress settings");
+                logger.debug("no hints to be sent because of Suppress settings");
                 continue;
             }
             // wonNodeUri can be returned as either a String or ArrayList, not sure on what
             // this depends
             String wonNodeUri = getFieldValueFirstOfListIfNecessary(doc, WON_NODE_SOLR_FIELD);
             if (wonNodeUri == null) {
-                log.debug("omitting matched atom {}: could not extract WoN node URI", matchedAtomUri);
+                logger.debug("omitting matched atom {}: could not extract WoN node URI", matchedAtomUri);
                 continue;
             }
             // normalize the final score
             double score = Double.valueOf(doc.getFieldValue("score").toString()) * config.getScoreNormalizationFactor();
             score = Math.max(0, Math.min(1, score));
-            log.debug("generate hint for match {} with normalized score {}", matchedAtomUri, score);
+            logger.debug("generate hint for match {} with normalized score {}", matchedAtomUri, score);
             if (!doSuppressHintForAtom) {
                 bulkHintEvent.addHintEvent(
                                 new AtomHintEvent(atom.getUri(), atom.getWonNodeUri(), matchedAtomUri, wonNodeUri,

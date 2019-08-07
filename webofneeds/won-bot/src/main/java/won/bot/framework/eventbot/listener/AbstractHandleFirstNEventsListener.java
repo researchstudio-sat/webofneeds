@@ -10,15 +10,20 @@
  */
 package won.bot.framework.eventbot.listener;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.filter.EventFilter;
+
+import java.lang.invoke.MethodHandles;
 
 /**
  * Counts how often it is called, offers to call a callback when a certain
  * number is reached.
  */
 public abstract class AbstractHandleFirstNEventsListener extends BaseEventListener implements CountingListener {
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private int targetCount;
     private int count = 0;
     private Object monitor = new Object();

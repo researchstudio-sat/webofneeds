@@ -1,19 +1,16 @@
 package won.bot.impl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.telegram.telegrambots.ApiContextInitializer;
 import org.telegram.telegrambots.TelegramBotsApi;
 import org.telegram.telegrambots.exceptions.TelegramApiRequestException;
-
 import won.bot.framework.bot.base.EventBot;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.impl.telegram.WonTelegramBotHandler;
 import won.bot.framework.eventbot.action.impl.telegram.receive.TelegramMessageReceivedAction;
-import won.bot.framework.eventbot.action.impl.telegram.send.Connect2TelegramAction;
-import won.bot.framework.eventbot.action.impl.telegram.send.Hint2TelegramAction;
-import won.bot.framework.eventbot.action.impl.telegram.send.Message2TelegramAction;
-import won.bot.framework.eventbot.action.impl.telegram.send.TelegramCreateAction;
-import won.bot.framework.eventbot.action.impl.telegram.send.TelegramHelpAction;
+import won.bot.framework.eventbot.action.impl.telegram.send.*;
 import won.bot.framework.eventbot.action.impl.telegram.util.TelegramContentExtractor;
 import won.bot.framework.eventbot.action.impl.telegram.util.TelegramMessageGenerator;
 import won.bot.framework.eventbot.behaviour.BotBehaviour;
@@ -24,10 +21,12 @@ import won.bot.framework.eventbot.bus.EventBus;
 import won.bot.framework.eventbot.event.impl.telegram.SendHelpEvent;
 import won.bot.framework.eventbot.event.impl.telegram.TelegramCreateAtomEvent;
 import won.bot.framework.eventbot.event.impl.telegram.TelegramMessageReceivedEvent;
-import won.bot.framework.eventbot.event.impl.wonmessage.ConnectFromOtherAtomEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.AtomHintFromMatcherEvent;
+import won.bot.framework.eventbot.event.impl.wonmessage.ConnectFromOtherAtomEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.MessageFromOtherAtomEvent;
 import won.bot.framework.eventbot.listener.impl.ActionOnEventListener;
+
+import java.lang.invoke.MethodHandles;
 
 /**
  * This Bot checks the Telegram-Messages sent to a given telegram-bot and
@@ -35,6 +34,7 @@ import won.bot.framework.eventbot.listener.impl.ActionOnEventListener;
  * 14.12.2016.
  */
 public class Telegram2WonBot extends EventBot {
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private String botName;
     private String token;
     private EventBus bus;

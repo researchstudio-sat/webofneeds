@@ -1,16 +1,9 @@
 package won.owner.service.impl;
 
-import java.security.KeyStore;
-
-import javax.transaction.Transactional;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.core.Authentication;
-
 import won.owner.model.KeystoreHolder;
 import won.owner.model.KeystorePasswordHolder;
 import won.owner.model.User;
@@ -18,8 +11,10 @@ import won.owner.repository.KeystoreHolderRepository;
 import won.owner.repository.KeystorePasswordRepository;
 import won.owner.repository.UserRepository;
 
+import javax.transaction.Transactional;
+import java.security.KeyStore;
+
 public class KeystoreEnabledDaoAuthenticationProvider extends DaoAuthenticationProvider {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
     @Autowired
     UserRepository userRepository;
     @Autowired

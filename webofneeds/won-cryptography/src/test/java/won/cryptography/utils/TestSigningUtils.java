@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.lang.invoke.MethodHandles;
 import java.math.BigInteger;
 import java.security.KeyPair;
 import java.security.Security;
@@ -42,7 +43,7 @@ import won.cryptography.service.keystore.KeyStoreService;
  * User: ypanchenko Date: 24.03.2015
  */
 public class TestSigningUtils {
-    private final static Logger LOGGER = LoggerFactory.getLogger(TestSigningUtils.class);
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     public static final String KEYS_FILE = "/won-signed-messages/test-keys.jks";
     // theoretically can be a public key WebID...
     public static String atomCertUri = "http://localhost:8080/won/resource/atom/3144709509622353000";
@@ -92,7 +93,7 @@ public class TestSigningUtils {
     }
 
     public static Set<String> getSubjects(Model model) {
-        Set<String> subjs = new HashSet<String>();
+        Set<String> subjs = new HashSet<>();
         StmtIterator sti = model.listStatements();
         while (sti.hasNext()) {
             Statement st = sti.next();
@@ -103,7 +104,7 @@ public class TestSigningUtils {
     }
 
     public static Set<String> getUriResourceObjects(Model model) {
-        Set<String> objs = new HashSet<String>();
+        Set<String> objs = new HashSet<>();
         StmtIterator sti = model.listStatements();
         while (sti.hasNext()) {
             Statement st = sti.next();
@@ -196,7 +197,7 @@ public class TestSigningUtils {
         BigInteger serialNumber = BigInteger.valueOf(1);
         Certificate cert = certificateService.createSelfSignedCertificate(serialNumber, keyPair, certUri, certUri);
         storeService.putKey(certUri, keyPair.getPrivate(), new Certificate[] { cert }, false);
-        LOGGER.debug("Adding for uri {} certificate {}", certUri, cert);
+        logger.debug("Adding for uri {} certificate {}", certUri, cert);
         // KeyInformationExtractorBouncyCastle extractor = new
         // KeyInformationExtractorBouncyCastle();
     }
@@ -215,7 +216,7 @@ public class TestSigningUtils {
 
     public static void writeToTempFile(final Dataset testDataset) throws IOException {
         File outFile = File.createTempFile("won", ".trig");
-        LOGGER.debug("Check output in temp file: " + outFile);
+        logger.debug("Check output in temp file: " + outFile);
         OutputStream os = new FileOutputStream(outFile);
         RDFDataMgr.write(os, testDataset, RDFFormat.TRIG.getLang());
         os.close();

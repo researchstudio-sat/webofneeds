@@ -1,5 +1,6 @@
 package won.node.socket.businessactivity.participantcompletion;
 
+import java.lang.invoke.MethodHandles;
 import java.net.URI;
 
 import org.slf4j.Logger;
@@ -223,7 +224,7 @@ public enum BAPCState {
             return null;
         }
     };
-    private static final Logger logger = LoggerFactory.getLogger(BAPCState.class);
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private String name;
     private Phase phase;
     private static BAPCEventType resendEvent = null;

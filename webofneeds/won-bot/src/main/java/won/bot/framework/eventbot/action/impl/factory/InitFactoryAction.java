@@ -1,33 +1,23 @@
 package won.bot.framework.eventbot.action.impl.factory;
 
-import java.net.URI;
-import java.time.Duration;
-
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Resource;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import won.bot.framework.bot.context.FactoryBotContextWrapper;
 import won.bot.framework.component.atomproducer.AtomProducer;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.action.impl.MultipleActions;
 import won.bot.framework.eventbot.action.impl.PublishEventAction;
-import won.bot.framework.eventbot.action.impl.counter.Counter;
-import won.bot.framework.eventbot.action.impl.counter.CounterImpl;
-import won.bot.framework.eventbot.action.impl.counter.DecrementCounterAction;
-import won.bot.framework.eventbot.action.impl.counter.IncrementCounterAction;
-import won.bot.framework.eventbot.action.impl.counter.TargetCountReachedEvent;
-import won.bot.framework.eventbot.action.impl.counter.TargetCounterDecorator;
 import won.bot.framework.eventbot.action.impl.atomlifecycle.AbstractCreateAtomAction;
-import won.bot.framework.eventbot.action.impl.trigger.ActionOnTriggerEventListener;
-import won.bot.framework.eventbot.action.impl.trigger.BotTrigger;
-import won.bot.framework.eventbot.action.impl.trigger.BotTriggerEvent;
-import won.bot.framework.eventbot.action.impl.trigger.StartBotTriggerCommandEvent;
-import won.bot.framework.eventbot.action.impl.trigger.StopBotTriggerCommandEvent;
+import won.bot.framework.eventbot.action.impl.counter.*;
+import won.bot.framework.eventbot.action.impl.trigger.*;
 import won.bot.framework.eventbot.action.impl.wonmessage.execCommand.ExecuteCreateAtomCommandAction;
 import won.bot.framework.eventbot.action.impl.wonmessage.execCommand.LogMessageCommandFailureAction;
 import won.bot.framework.eventbot.bus.EventBus;
 import won.bot.framework.eventbot.event.Event;
+import won.bot.framework.eventbot.event.impl.atomlifecycle.AtomProducerExhaustedEvent;
 import won.bot.framework.eventbot.event.impl.command.MessageCommandEvent;
 import won.bot.framework.eventbot.event.impl.command.MessageCommandFailureEvent;
 import won.bot.framework.eventbot.event.impl.command.MessageCommandResultEvent;
@@ -38,18 +28,22 @@ import won.bot.framework.eventbot.event.impl.factory.FactoryAtomCreationSkippedE
 import won.bot.framework.eventbot.event.impl.factory.InitFactoryFinishedEvent;
 import won.bot.framework.eventbot.event.impl.factory.StartFactoryAtomCreationEvent;
 import won.bot.framework.eventbot.event.impl.lifecycle.InitializeEvent;
-import won.bot.framework.eventbot.event.impl.atomlifecycle.AtomProducerExhaustedEvent;
 import won.bot.framework.eventbot.filter.impl.TargetCounterFilter;
 import won.bot.framework.eventbot.listener.EventListener;
 import won.bot.framework.eventbot.listener.impl.ActionOnEventListener;
 import won.bot.framework.eventbot.listener.impl.ActionOnFirstEventListener;
 import won.protocol.util.WonRdfUtils;
 
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.time.Duration;
+
 /**
  * Action that creates all atoms from the atomproducer and publishes the
  * InitFactoryFinishedEvent once it is completed
  */
 public class InitFactoryAction extends AbstractCreateAtomAction {
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static int FACTORYATOMCREATION_DURATION_INMILLIS = 250;
     private int targetInFlightCount;
     private int maxInFlightCount;

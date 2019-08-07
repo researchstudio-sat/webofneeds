@@ -10,11 +10,9 @@
  */
 package won.bot.framework.eventbot.action.impl.wonmessage;
 
-import java.net.URI;
-import java.util.Optional;
-
 import org.apache.jena.query.Dataset;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.action.BotActionUtils;
@@ -33,10 +31,15 @@ import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
 
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.Optional;
+
 /**
  * User: fkleedorfer Date: 30.01.14
  */
 public class OpenConnectionAction extends BaseEventBotAction {
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private String welcomeMessage;
 
     public OpenConnectionAction(final EventListenerContext context, final String welcomeMessage) {

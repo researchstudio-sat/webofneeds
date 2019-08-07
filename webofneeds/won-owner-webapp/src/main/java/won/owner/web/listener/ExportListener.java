@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.invoke.MethodHandles;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.security.KeyStoreException;
@@ -38,7 +39,7 @@ import won.protocol.util.linkeddata.WonLinkedDataUtils;
 
 @Component
 public class ExportListener implements ApplicationListener<OnExportUserEvent> {
-    private static final Logger logger = LoggerFactory.getLogger(ExportListener.class);
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     @Autowired
     private LinkedDataSource linkedDataSourceOnBehalfOfAtom;
     @Autowired
@@ -116,7 +117,7 @@ public class ExportListener implements ApplicationListener<OnExportUserEvent> {
     }
 
     private static boolean recrawl(Set<URI> recrawled, URI atomUri, LinkedDataSource linkedDataSource, URI... uris) {
-        Set<URI> urisToCrawl = new HashSet<URI>();
+        Set<URI> urisToCrawl = new HashSet<>();
         Arrays.stream(uris).filter(x -> !recrawled.contains(x)).forEach(urisToCrawl::add);
         if (urisToCrawl.isEmpty()) {
             if (logger.isDebugEnabled()) {
@@ -143,8 +144,7 @@ public class ExportListener implements ApplicationListener<OnExportUserEvent> {
         while (true) {
             // we leave the loop either with a runtime exception or with the result
             try {
-                Dataset atomDataset = WonLinkedDataUtils.getFullAtomDataset(atomUri, linkedDataSourceOnBehalfOfAtom);
-                return atomDataset;
+                return WonLinkedDataUtils.getFullAtomDataset(atomUri, linkedDataSourceOnBehalfOfAtom);
             } catch (LinkedDataFetchingException e) {
                 // we may have tried to crawl a conversation dataset of which messages
                 // were still in-flight. we allow one re-crawl attempt per exception before

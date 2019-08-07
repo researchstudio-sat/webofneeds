@@ -1,9 +1,5 @@
 package won.utils.mail;
 
-import java.io.File;
-
-import javax.mail.internet.MimeMessage;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.mail.MailException;
@@ -11,13 +7,17 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 
+import javax.mail.internet.MimeMessage;
+import java.io.File;
+import java.lang.invoke.MethodHandles;
+
 /**
  * User: ypanchenko Date: 23.02.2015
  */
 public class WonMailSender {
     private JavaMailSender mailSender;
     private SimpleMailMessage templateMessage;
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public void setMailSender(JavaMailSender mailSender) {
         this.mailSender = mailSender;

@@ -1,6 +1,7 @@
 package won.protocol.message;
 
 import java.io.StringReader;
+import java.lang.invoke.MethodHandles;
 
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
@@ -13,7 +14,7 @@ import org.slf4j.LoggerFactory;
  * User: ypanchenko Date: 04.08.2014
  */
 public class WonMessageDecoder {
-    private static final Logger logger = LoggerFactory.getLogger(WonMessageDecoder.class);
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public static WonMessage decodeFromJsonLd(String message) {
         return decode(Lang.JSONLD, message);

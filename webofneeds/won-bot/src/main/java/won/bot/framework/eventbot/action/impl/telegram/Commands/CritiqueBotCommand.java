@@ -15,7 +15,6 @@ import won.bot.framework.eventbot.event.impl.telegram.TelegramCreateAtomEvent;
  * Created by fsuda on 15.12.2016.
  */
 public class CritiqueBotCommand extends BotCommand {
-    protected final Logger logger = LoggerFactory.getLogger(getClass());
     private EventBus bus;
 
     public CritiqueBotCommand(String commandIdentifier, String description, EventBus bus) {

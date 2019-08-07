@@ -13,11 +13,13 @@ package won.cryptography.keymanagement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.invoke.MethodHandles;
+
 /**
  * Created by fkleedorfer on 22.03.2017.
  */
 public class KeyPairAliasDerivationStrategyFactory {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private String predefinedAlias = null;
 
     public KeyPairAliasDerivationStrategy create() {

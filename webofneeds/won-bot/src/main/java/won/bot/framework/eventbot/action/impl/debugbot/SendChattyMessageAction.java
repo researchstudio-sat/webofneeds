@@ -10,15 +10,10 @@
  */
 package won.bot.framework.eventbot.action.impl.debugbot;
 
-import java.net.URI;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Random;
-import java.util.Set;
-
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.event.Event;
@@ -29,11 +24,19 @@ import won.protocol.model.ConnectionModelMapper;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Random;
+import java.util.Set;
+
 /**
  * Action to perform when the debug bot is set to be 'chatty' - that is, sends
  * messages via its connections spontaneously.
  */
 public class SendChattyMessageAction extends BaseEventBotAction {
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private double probabilityOfSendingMessage = 0.1;
     private String[] messagesForShortInactivity;
     public static final String KEY_CHATTY_CONNECTIONS = "chattyConnections";

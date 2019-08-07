@@ -14,14 +14,10 @@ import java.net.URI;
 import java.util.Iterator;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * User: LEIH-NB Date: 11.04.14
  */
 public class MatcherNodeURISourceImpl implements MatcherNodeURISource {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
     private List<URI> nodeURIs = null;
 
     @Override

@@ -10,23 +10,7 @@
  */
 package won.bot.integrationtest;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.TestCase.assertTrue;
-
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.BrokenBarrierException;
-import java.util.concurrent.CyclicBarrier;
-import java.util.concurrent.TimeUnit;
-
-import org.apache.jena.query.Dataset;
-import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.query.QueryFactory;
-import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.ResultSet;
+import org.apache.jena.query.*;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.vocabulary.RDFS;
@@ -42,7 +26,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.support.PeriodicTrigger;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
 import won.bot.PropertyPathConfigurator;
 import won.bot.framework.bot.context.CommentBotContextWrapper;
 import won.bot.framework.eventbot.event.impl.lifecycle.WorkDoneEvent;
@@ -54,13 +37,21 @@ import won.protocol.util.linkeddata.CachingLinkedDataSource;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.vocabulary.WON;
 
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.TimeUnit;
+
 /**
  * Integration test.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "classpath:/spring/app/simpleCommentTest.xml" })
 public class CommentBotTest {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static final int RUN_ONCE = 1;
     private static final long ACT_LOOP_TIMEOUT_MILLIS = 100;
     private static final long ACT_LOOP_INITIAL_DELAY_MILLIS = 100;
@@ -232,7 +223,7 @@ public class CommentBotTest {
                 actualList.add(soln.toString());
                 RDFNode node = soln.get("?connection");
             }
-            assertEquals("wrong number of results", 1, actualList.size());
+            Assert.assertEquals("wrong number of results", 1, actualList.size());
             qExec.close();
         }
 
@@ -250,7 +241,7 @@ public class CommentBotTest {
                 QuerySolution soln = results.nextSolution();
                 actualList.add(soln.toString());
             }
-            assertTrue("wrong number of results", actualList.size() >= 1);
+            Assert.assertTrue("wrong number of results", actualList.size() >= 1);
             // String expected1 = "( ?event = <" + EXAMPLE_ONTOLOGY_URI + "Open_01_1> ) (
             // ?eventType = <" + WON_ONTOLOGY_URI + "Open> )";
             // assertThat(actualList, hasItems(expected1));
@@ -275,7 +266,7 @@ public class CommentBotTest {
             } finally {
                 qExec.close();
             }
-            assertTrue("wrong number of results", actualList.size() >= 1);
+            Assert.assertTrue("wrong number of results", actualList.size() >= 1);
             return commentModel;
         }
 
@@ -307,7 +298,7 @@ public class CommentBotTest {
                 atomConnectionCollectionURI = URI.create(nodeStr);
             }
             qExec.close();
-            assertTrue("wrong number of results", actualList.size() >= 1);
+            Assert.assertTrue("wrong number of results", actualList.size() >= 1);
             Dataset atomConnections = getEventListenerContext().getLinkedDataSource()
                             .getDataForResource(atomConnectionCollectionURI);
             String queryString2 = sparqlPrefix + "SELECT ?connection WHERE {" + "?connections rdfs:member ?connection"
@@ -326,7 +317,7 @@ public class CommentBotTest {
                 atomConnectionURI = URI.create(nodeStr);
             }
             qExec2.close();
-            assertTrue("wrong number of results", actualList2.size() >= 1);
+            Assert.assertTrue("wrong number of results", actualList2.size() >= 1);
             Dataset atomConnection = getEventListenerContext().getLinkedDataSource()
                             .getDataForResource(atomConnectionURI);
             String queryString3 = sparqlPrefix + "SELECT ?targetConnection WHERE {"
@@ -343,7 +334,7 @@ public class CommentBotTest {
                 String nodeStr = node.toString();
                 commentConnectionsURI = URI.create(nodeStr);
             }
-            assertTrue("wrong number of results", actualList3.size() >= 1);
+            Assert.assertTrue("wrong number of results", actualList3.size() >= 1);
             Dataset targetConnections = getEventListenerContext().getLinkedDataSource()
                             .getDataForResource(commentConnectionsURI);
             String queryString4 = sparqlPrefix + "SELECT ?targetConnection WHERE {"
@@ -362,8 +353,8 @@ public class CommentBotTest {
                 atomConnectionURICheck = URI.create(nodeStr);
             }
             qExec4.close();
-            assertTrue("wrong number of results", actualList4.size() >= 1);
-            assertEquals(atomConnectionURI, atomConnectionURICheck);
+            Assert.assertTrue("wrong number of results", actualList4.size() >= 1);
+            Assert.assertEquals(atomConnectionURI, atomConnectionURICheck);
         }
 
         public ResultSet executeQuery(String queryString, Model model) {

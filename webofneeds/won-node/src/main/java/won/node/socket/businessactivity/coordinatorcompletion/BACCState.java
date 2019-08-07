@@ -2,9 +2,6 @@ package won.node.socket.businessactivity.coordinatorcompletion;
 
 import java.net.URI;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import won.node.socket.impl.WON_TX;
 
 /**
@@ -286,7 +283,6 @@ public enum BACCState {
             return null;
         }
     };
-    private static final Logger logger = LoggerFactory.getLogger(BACCState.class);
     private String name;
     private Phase phase;
     private static BACCEventType resendEvent = null;

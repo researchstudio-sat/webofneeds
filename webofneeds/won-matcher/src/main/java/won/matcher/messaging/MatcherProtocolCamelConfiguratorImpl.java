@@ -10,20 +10,20 @@
  */
 package won.matcher.messaging;
 
-import java.net.URI;
-import java.util.Set;
-
 import org.apache.activemq.camel.component.ActiveMQComponent;
 import org.apache.camel.RoutesBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import won.matcher.camel.routes.Matcher2NodeDynamicRoutes;
 import won.matcher.camel.routes.MatcherApplicationListenerRouteBuilder;
 import won.protocol.exception.CamelConfigurationFailedException;
-import won.protocol.jms.MatcherProtocolCamelConfigurator;
 import won.protocol.jms.AtomBasedCamelConfiguratorImpl;
+import won.protocol.jms.MatcherProtocolCamelConfigurator;
 import won.protocol.model.MessagingType;
+
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.Set;
 
 // import won.node.camel.routes.AtomProtocolDynamicRoutes;
 /**
@@ -31,7 +31,7 @@ import won.protocol.model.MessagingType;
  */
 public class MatcherProtocolCamelConfiguratorImpl extends AtomBasedCamelConfiguratorImpl
                 implements MatcherProtocolCamelConfigurator {
-    private Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override
     public synchronized void addRemoteTopicListeners(final Set<String> endpoints, final URI remoteEndpoint)

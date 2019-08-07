@@ -10,28 +10,32 @@
  */
 package won.monitoring.simon;
 
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.javasimon.Sample;
 import org.javasimon.Simon;
 import org.javasimon.SimonManager;
 import org.javasimon.Stopwatch;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.supercsv.cellprocessor.Optional;
 import org.supercsv.cellprocessor.constraint.NotNull;
 import org.supercsv.cellprocessor.ift.CellProcessor;
 import org.supercsv.io.CsvMapWriter;
 import org.supercsv.io.ICsvMapWriter;
 import org.supercsv.prefs.CsvPreference;
-
 import won.monitoring.AbstractFileOutputRecorder;
+
+import java.io.FileWriter;
+import java.io.IOException;
+import java.lang.invoke.MethodHandles;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Recorder that writes the Simon stats to a csv file.
  */
 public class SimonCsvStatisticsRecorder extends AbstractFileOutputRecorder {
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
     /**
      * Sets up the processors used.
      * 

@@ -10,9 +10,6 @@
  */
 package won.protocol.rest;
 
-import java.net.URI;
-import java.text.MessageFormat;
-
 import org.apache.jena.query.Dataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,8 +22,12 @@ import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.text.MessageFormat;
+
 public abstract class LinkedDataRestClient {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     /**
      * Retrieves RDF for the specified resource URI. Expects that the resource URI

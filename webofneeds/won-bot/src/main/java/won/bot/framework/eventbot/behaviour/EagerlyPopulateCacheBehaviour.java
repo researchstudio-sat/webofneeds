@@ -1,14 +1,7 @@
 package won.bot.framework.eventbot.behaviour;
 
-import java.net.URI;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.event.Event;
@@ -22,8 +15,15 @@ import won.protocol.util.WonRdfUtils;
 import won.protocol.util.linkeddata.CachingLinkedDataSource;
 import won.protocol.util.linkeddata.LinkedDataSource;
 
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
 public class EagerlyPopulateCacheBehaviour extends BotBehaviour {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public EagerlyPopulateCacheBehaviour(EventListenerContext context) {
         super(context);

@@ -1,13 +1,9 @@
 package won.bot.integration;
 
-import java.net.URI;
-import java.util.Date;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.TaskScheduler;
-
 import won.bot.exception.NoBotResponsibleException;
 import won.bot.framework.bot.Bot;
 import won.bot.framework.manager.BotManager;
@@ -16,12 +12,16 @@ import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageDirection;
 import won.protocol.model.Connection;
 
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.Date;
+
 /**
  * OwnerProtocolOwnerServiceCallback that dispatches the calls to the bots.
  */
 @Qualifier("default")
 public class BotOwnerCallback implements OwnerCallback {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     BotManager botManager;
     TaskScheduler taskScheduler;
 

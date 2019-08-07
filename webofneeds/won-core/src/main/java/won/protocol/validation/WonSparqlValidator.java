@@ -11,25 +11,20 @@
 package won.protocol.validation;
 
 import org.apache.jena.graph.Node;
-import org.apache.jena.query.Dataset;
-import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.query.ReadWrite;
-import org.apache.jena.query.ResultSet;
-import org.apache.jena.query.ResultSetFormatter;
-import org.apache.jena.query.Syntax;
+import org.apache.jena.query.*;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.binding.Binding;
 import org.apache.jena.tdb.TDB;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.invoke.MethodHandles;
+
 /**
  * User: ypanchenko Date: 02.06.2015
  */
 public class WonSparqlValidator {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     public static final Var SELECT_VALIDATION_VARIABLE = Var.alloc("check");
     public static final String SELECT_VALIDATION_PASSED_VALUE = "OK";
     private Query constraint;

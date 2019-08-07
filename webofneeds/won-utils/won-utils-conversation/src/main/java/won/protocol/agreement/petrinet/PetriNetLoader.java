@@ -1,19 +1,15 @@
 package won.protocol.agreement.petrinet;
 
+import uk.ac.imperial.pipe.io.PetriNetIO;
+import uk.ac.imperial.pipe.io.PetriNetIOImpl;
+import uk.ac.imperial.pipe.models.petrinet.PetriNet;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.util.Base64;
 import java.util.Optional;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import uk.ac.imperial.pipe.io.PetriNetIO;
-import uk.ac.imperial.pipe.io.PetriNetIOImpl;
-import uk.ac.imperial.pipe.models.petrinet.PetriNet;
-
 public class PetriNetLoader {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
     private Optional<PetriNetIOImpl> petriNetIO = Optional.empty();
 
     private synchronized PetriNetIO getPetriNetIO() {

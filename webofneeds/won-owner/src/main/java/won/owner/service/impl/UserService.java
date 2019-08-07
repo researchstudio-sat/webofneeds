@@ -1,15 +1,5 @@
 package won.owner.service.impl;
 
-import java.security.Key;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
-import java.security.cert.Certificate;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.UUID;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,17 +9,23 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-
 import won.owner.model.*;
 import won.owner.repository.*;
 import won.protocol.util.ExpensiveSecureRandomString;
+
+import java.lang.invoke.MethodHandles;
+import java.security.*;
+import java.security.cert.Certificate;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * Created by fsuda on 28.05.2018.
  */
 @Service
 public class UserService {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     @Autowired
     private UserRepository userRepository;
     @Autowired

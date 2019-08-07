@@ -1,9 +1,5 @@
 package won.node.socket.impl;
 
-import java.io.StringWriter;
-import java.net.URI;
-import java.util.concurrent.ExecutorService;
-
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
@@ -14,23 +10,22 @@ import org.apache.jena.riot.RDFDataMgr;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import won.node.service.DataAccessService;
-import won.protocol.exception.ConnectionAlreadyExistsException;
-import won.protocol.exception.IllegalMessageForConnectionStateException;
-import won.protocol.exception.IllegalMessageForAtomStateException;
-import won.protocol.exception.NoSuchConnectionException;
-import won.protocol.exception.NoSuchAtomException;
-import won.protocol.exception.WonMessageBuilderException;
+import won.protocol.exception.*;
 import won.protocol.message.WonMessage;
-import won.protocol.model.Connection;
 import won.protocol.model.Atom;
 import won.protocol.model.AtomState;
-import won.protocol.repository.DatasetHolderRepository;
+import won.protocol.model.Connection;
 import won.protocol.repository.AtomRepository;
+import won.protocol.repository.DatasetHolderRepository;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.vocabulary.WON;
+
+import java.io.StringWriter;
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.concurrent.ExecutorService;
 
 /**
  * Created with IntelliJ IDEA. User: gabriel Date: 16.09.13 Time: 17:09 To
@@ -42,7 +37,7 @@ public abstract class AbstractSocket implements SocketLogic {
     // so as to form a unique graph name used for storing data that is managed by
     // the socket
     private static final String SOCKET_GRAPH_PATH = "socketgraph";
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     @Autowired
     protected WonNodeInformationService wonNodeInformationService;
     @Autowired

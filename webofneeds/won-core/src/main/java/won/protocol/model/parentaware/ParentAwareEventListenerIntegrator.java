@@ -19,13 +19,15 @@ import org.hibernate.service.spi.SessionFactoryServiceRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.invoke.MethodHandles;
+
 /**
  * Integrator for hibernate to allow listening to entity changes and update
  * parent entity versions. Modeled after this example:
  * https://vladmihalcea.com/2016/08/30/how-to-increment-the-parent-entity-version-whenever-a-child-entity-gets-modified-with-jpa-and-hibernate/
  */
 public class ParentAwareEventListenerIntegrator implements Integrator {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public ParentAwareEventListenerIntegrator() {
     }

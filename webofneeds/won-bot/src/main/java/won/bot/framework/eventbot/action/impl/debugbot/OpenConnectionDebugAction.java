@@ -10,13 +10,9 @@
  */
 package won.bot.framework.eventbot.action.impl.debugbot;
 
-import java.net.URI;
-import java.util.Date;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.apache.jena.query.Dataset;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.event.ConnectionSpecificEvent;
@@ -30,10 +26,17 @@ import won.protocol.message.WonMessageBuilder;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.WonRdfUtils;
 
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.Date;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * User: fkleedorfer Date: 30.01.14
  */
 public class OpenConnectionDebugAction extends BaseEventBotAction {
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private String welcomeMessage;
     private Pattern PATTERN_WAIT = Pattern.compile("wait(\\s+([0-9]{1,2}))?");
     private Pattern PATTERN_DENY = Pattern.compile("deny");

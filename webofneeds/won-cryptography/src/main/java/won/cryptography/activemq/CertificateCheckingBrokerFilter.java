@@ -10,8 +10,6 @@
  */
 package won.cryptography.activemq;
 
-import java.security.cert.X509Certificate;
-
 import org.apache.activemq.broker.Broker;
 import org.apache.activemq.broker.BrokerFilter;
 import org.apache.activemq.broker.ConnectionContext;
@@ -19,9 +17,11 @@ import org.apache.activemq.broker.region.Subscription;
 import org.apache.activemq.command.ConsumerInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import won.cryptography.ssl.AliasFromFingerprintGenerator;
 import won.cryptography.ssl.AliasGenerator;
+
+import java.lang.invoke.MethodHandles;
+import java.security.cert.X509Certificate;
 
 /**
  * BrokerFilter implementation that authorizes consumers if their TLS
@@ -31,7 +31,7 @@ import won.cryptography.ssl.AliasGenerator;
 public class CertificateCheckingBrokerFilter extends BrokerFilter {
     private String queueNamePrefixToCheck;
     private AliasGenerator aliasGenerator = new AliasFromFingerprintGenerator();
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public CertificateCheckingBrokerFilter(final Broker next, String queueNamePrefixToCheck) {
         super(next);

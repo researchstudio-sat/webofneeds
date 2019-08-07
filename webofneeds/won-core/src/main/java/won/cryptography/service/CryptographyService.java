@@ -1,7 +1,15 @@
 package won.cryptography.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import won.cryptography.service.keystore.FileBasedKeyStoreService;
+import won.cryptography.service.keystore.KeyStoreService;
+
+import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
+import java.lang.invoke.MethodHandles;
 import java.math.BigInteger;
 import java.security.KeyPair;
 import java.security.KeyStoreException;
@@ -12,20 +20,11 @@ import java.security.cert.X509Certificate;
 import java.util.Collections;
 import java.util.Optional;
 
-import javax.annotation.PostConstruct;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import won.cryptography.service.keystore.FileBasedKeyStoreService;
-import won.cryptography.service.keystore.KeyStoreService;
-
 /**
  * User: fsalcher Date: 12.06.2014
  */
 public class CryptographyService {
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private KeyPairService keyPairService;
     private CertificateService certificateService;
     private KeyStoreService keyStoreService;

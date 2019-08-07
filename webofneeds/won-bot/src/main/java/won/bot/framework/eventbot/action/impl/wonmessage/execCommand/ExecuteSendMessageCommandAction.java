@@ -10,12 +10,14 @@
  */
 package won.bot.framework.eventbot.action.impl.wonmessage.execCommand;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.action.EventBotActionUtils;
+import won.bot.framework.eventbot.event.AtomSpecificEvent;
 import won.bot.framework.eventbot.event.ConnectionSpecificEvent;
 import won.bot.framework.eventbot.event.Event;
-import won.bot.framework.eventbot.event.AtomSpecificEvent;
 import won.bot.framework.eventbot.event.TargetAtomSpecificEvent;
 import won.bot.framework.eventbot.event.impl.command.MessageCommandEvent;
 import won.bot.framework.eventbot.event.impl.command.MessageCommandFailureEvent;
@@ -29,6 +31,8 @@ import won.protocol.message.WonMessage;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 
+import java.lang.invoke.MethodHandles;
+
 /**
  * Action executing a MessageCommandEvent and publishing MessageCommandSuccess
  * and MessageCommandFailure events indicating how well sending that message
@@ -38,6 +42,7 @@ import won.protocol.util.WonRdfUtils;
  * registered
  */
 public abstract class ExecuteSendMessageCommandAction<T extends MessageCommandEvent> extends BaseEventBotAction {
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private boolean messageIsSentToRemoteNode = true;
 
     protected ExecuteSendMessageCommandAction(EventListenerContext eventListenerContext,

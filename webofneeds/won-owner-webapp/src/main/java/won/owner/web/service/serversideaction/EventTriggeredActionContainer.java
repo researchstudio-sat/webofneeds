@@ -1,25 +1,19 @@
 package won.owner.web.service.serversideaction;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import won.protocol.util.LoggingUtils;
+
+import java.lang.invoke.MethodHandles;
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import won.protocol.util.LoggingUtils;
-
 public class EventTriggeredActionContainer<E> {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private List<EventTriggeredAction<E>> actions = new ArrayList<>();
     private List<EventTriggeredAction<E>> actionsToAdd = new ArrayList<>();
     private Duration maxAge = Duration.ofMinutes(10);

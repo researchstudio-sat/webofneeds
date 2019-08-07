@@ -10,27 +10,27 @@
  */
 package won.bot.framework.component.atomproducer.impl;
 
-import java.io.File;
-import java.io.FileFilter;
-import java.io.IOException;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import org.apache.commons.io.filefilter.RegexFileFilter;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.jena.query.Dataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import won.bot.framework.component.atomproducer.FileBasedAtomProducer;
 import won.bot.framework.component.atomproducer.AtomProducer;
+import won.bot.framework.component.atomproducer.FileBasedAtomProducer;
 import won.protocol.exception.DataIntegrityException;
+
+import java.io.File;
+import java.io.FileFilter;
+import java.io.IOException;
+import java.lang.invoke.MethodHandles;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * AtomProducer that is configured to read atoms from a directory.
  */
 public class DirectoryBasedAtomProducer implements AtomProducer {
     private static final int NOT_INITIALIZED = -1;
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private File directory;
     // true if the factory should keep creating atoms after having used each file,
     // false if the factory should use each file only once.

@@ -1,17 +1,9 @@
 package won.node.socket.impl;
 
-import java.net.URI;
-import java.util.List;
-
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.rdf.model.NodeIterator;
-import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import won.node.socket.businessactivity.coordinatorcompletion.BACCEventType;
 import won.node.socket.businessactivity.coordinatorcompletion.BACCState;
 import won.node.socket.businessactivity.statemanager.BAStateManager;
@@ -24,11 +16,15 @@ import won.protocol.model.SocketType;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.util.WonRdfUtils;
 
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.List;
+
 /**
  * User: Danijel Date: 26.3.14.
  */
 public class BAAtomicCCCoordinatorSocketImpl extends AbstractBASocket {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     @Autowired
     private ConnectionRepository connectionRepository;
     private BAStateManager stateManager;

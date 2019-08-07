@@ -1,16 +1,9 @@
 package won.cryptography.rdfsign;
 
-import java.io.StringWriter;
-import java.security.MessageDigest;
-import java.security.PrivateKey;
-import java.security.Provider;
-import java.security.PublicKey;
-import java.security.Signature;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.Collection;
-import java.util.List;
-
+import de.uni_koblenz.aggrimm.icp.crypto.sign.algorithm.SignatureAlgorithmInterface;
+import de.uni_koblenz.aggrimm.icp.crypto.sign.algorithm.algorithm.SignatureAlgorithmFisteus2010;
+import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.GraphCollection;
+import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.SignatureData;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
@@ -21,19 +14,22 @@ import org.apache.jena.vocabulary.RDF;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import de.uni_koblenz.aggrimm.icp.crypto.sign.algorithm.SignatureAlgorithmInterface;
-import de.uni_koblenz.aggrimm.icp.crypto.sign.algorithm.algorithm.SignatureAlgorithmFisteus2010;
-import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.GraphCollection;
-import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.SignatureData;
 import won.protocol.message.WonSignatureData;
 import won.protocol.vocabulary.SFSIG;
+
+import java.io.StringWriter;
+import java.lang.invoke.MethodHandles;
+import java.security.*;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Created by ypanchenko on 12.06.2014.
  */
 public class WonSigner {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     // TODO make it configurable which algorithm is used RSA or ECDSA
     public static final String SIGNING_ALGORITHM_NAME = "NONEwithECDSA";
     public static final String SIGNING_ALGORITHM_PROVIDER = "BC";

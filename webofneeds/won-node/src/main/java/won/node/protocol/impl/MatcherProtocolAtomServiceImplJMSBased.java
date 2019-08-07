@@ -10,17 +10,14 @@
  */
 package won.node.protocol.impl;
 
-import java.net.URI;
-
 import org.apache.camel.Header;
 import org.apache.jena.riot.Lang;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-
 import won.protocol.matcher.MatcherProtocolAtomService;
 import won.protocol.message.WonMessageDecoder;
 import won.protocol.util.RdfUtils;
+
+import java.net.URI;
 
 /**
  * User: fkleedorfer Date: 02.11.12
@@ -28,7 +25,6 @@ import won.protocol.util.RdfUtils;
 @Service
 public class MatcherProtocolAtomServiceImplJMSBased// implements MatcherProtocolAtomService
 {
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
     private MatcherProtocolAtomService delegate;
 
     public void hint(@Header("atomURI") final String atomURI, @Header("otherAtomURI") final String otherAtomURI,

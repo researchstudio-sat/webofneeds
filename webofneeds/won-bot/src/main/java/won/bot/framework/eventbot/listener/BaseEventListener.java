@@ -12,18 +12,19 @@ package won.bot.framework.eventbot.listener;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.impl.lifecycle.ErrorEvent;
 import won.bot.framework.eventbot.event.impl.listener.FinishedEvent;
 import won.bot.framework.eventbot.filter.EventFilter;
 
+import java.lang.invoke.MethodHandles;
+
 /**
  * Base class for event listeners
  */
 public abstract class BaseEventListener implements EventListener {
-    protected final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private EventListenerContext context;
     private int eventCount = 0;
     private int exceptionCount = 0;
@@ -64,9 +65,7 @@ public abstract class BaseEventListener implements EventListener {
             // allow for ignoring events. Such event are not counted.
             return;
         }
-        if (logger.isDebugEnabled()) {
-            logger.debug("handling event {} with listener {}", event, this);
-        }
+        logger.debug("handling event {} with listener {}", event, this);
         countEvent(event);
         long startTime = System.currentTimeMillis();
         try {

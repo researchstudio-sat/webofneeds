@@ -1,20 +1,24 @@
 package won.node.camel.processor.general;
 
-import java.net.URI;
-
 import org.apache.camel.Exchange;
 import org.apache.jena.query.Dataset;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import won.node.camel.processor.AbstractCamelProcessor;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageDirection;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.model.MessageEventPlaceholder;
 
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+
 /**
  * User: ypanchenko Date: 27.04.2015
  */
 public class ResponseResenderProcessor extends AbstractCamelProcessor {
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
     @Override
     public void process(final Exchange exchange) throws Exception {
         WonMessage originalMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.ORIGINAL_MESSAGE_HEADER);

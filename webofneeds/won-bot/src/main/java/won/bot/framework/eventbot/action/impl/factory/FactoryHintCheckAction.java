@@ -10,9 +10,8 @@
  */
 package won.bot.framework.eventbot.action.impl.factory;
 
-import java.net.URI;
-import java.util.Optional;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import won.bot.framework.bot.context.FactoryBotContextWrapper;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
@@ -24,10 +23,16 @@ import won.bot.framework.eventbot.event.impl.wonmessage.AtomHintFromMatcherEvent
 import won.bot.framework.eventbot.event.impl.wonmessage.SocketHintFromMatcherEvent;
 import won.bot.framework.eventbot.listener.EventListener;
 
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.Optional;
+
 /**
  * Checks if the received hint is for a factoryURI
  */
 public class FactoryHintCheckAction extends BaseEventBotAction {
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
     public FactoryHintCheckAction(EventListenerContext eventListenerContext) {
         super(eventListenerContext);
     }

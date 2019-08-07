@@ -10,22 +10,14 @@
  */
 package won.owner.messaging;
 
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import org.apache.activemq.camel.component.ActiveMQComponent;
 import org.apache.camel.CamelContext;
 import org.apache.camel.RoutesBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
-
 import won.cryptography.ssl.MessagingContext;
 import won.owner.camel.routes.OwnerApplicationListenerRouteBuilder;
 import won.owner.camel.routes.OwnerProtocolDynamicRoutes;
@@ -33,8 +25,15 @@ import won.protocol.exception.CamelConfigurationFailedException;
 import won.protocol.jms.BrokerComponentFactory;
 import won.protocol.jms.OwnerProtocolCamelConfigurator;
 import won.protocol.model.MessagingType;
-import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.AtomRepository;
+import won.protocol.repository.ConnectionRepository;
+
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * User: LEIH-NB Date: 28.01.14
@@ -48,7 +47,7 @@ public class OwnerProtocolCamelConfiguratorImpl implements OwnerProtocolCamelCon
     private ConnectionRepository connectionRepository;
     @Autowired
     private BrokerComponentFactory brokerComponentFactory;
-    private Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private BiMap<URI, String> endpointMap = HashBiMap.create();
     private Map<URI, String> startingComponentMap = new HashMap<>();
     private BiMap<URI, String> brokerComponentMap = HashBiMap.create();

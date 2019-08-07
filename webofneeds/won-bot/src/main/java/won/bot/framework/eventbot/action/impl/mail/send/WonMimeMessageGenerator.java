@@ -3,6 +3,7 @@ package won.bot.framework.eventbot.action.impl.mail.send;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
+import java.lang.invoke.MethodHandles;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -43,7 +44,7 @@ import won.protocol.vocabulary.sparql.WonQueries;
  * Mail2WonBot
  */
 public class WonMimeMessageGenerator {
-    private static final Logger logger = LoggerFactory.getLogger(WonMimeMessageGenerator.class);
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     @Autowired
     private VelocityEngine velocityEngine;
     private int MAX_CONVERSATION_DEPTH = 3;
@@ -251,7 +252,7 @@ public class WonMimeMessageGenerator {
                 velocityContext.put("messages", messages);
             }
         } catch (QueryParseException e) {
-            logger.error("query parse exception {}", e);
+            logger.error("query parse exception", e);
         }
     }
 

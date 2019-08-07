@@ -10,6 +10,18 @@
  */
 package won.node.camel.processor.general;
 
+import org.apache.camel.Exchange;
+import org.apache.camel.Expression;
+import org.springframework.aop.support.AopUtils;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import won.node.camel.processor.annotation.DefaultSocketMessageProcessor;
+import won.node.camel.processor.annotation.SocketMessageProcessor;
+import won.protocol.message.WonMessage;
+import won.protocol.message.processor.camel.WonCamelConstants;
+import won.protocol.message.processor.exception.WonMessageProcessingException;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
@@ -17,30 +29,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import org.apache.camel.Exchange;
-import org.apache.camel.Expression;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.aop.support.AopUtils;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
-
-import won.node.camel.processor.annotation.DefaultSocketMessageProcessor;
-import won.node.camel.processor.annotation.SocketMessageProcessor;
-import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageDirection;
-import won.protocol.message.WonMessageType;
-import won.protocol.message.processor.camel.WonCamelConstants;
-import won.protocol.message.processor.exception.MissingMessagePropertyException;
-import won.protocol.message.processor.exception.WonMessageProcessingException;
-import won.protocol.vocabulary.WONMSG;
-
 /**
  * User: syim Date: 11.03.2015
  */
 public class SocketTypeSlipComputer implements InitializingBean, ApplicationContextAware, Expression {
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private HashMap<String, Object> socketMessageProcessorsMap;
     private ApplicationContext applicationContext;
 

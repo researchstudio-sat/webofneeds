@@ -1,10 +1,9 @@
 package won.bot.framework.eventbot.action.impl.telegram.send;
 
-import java.net.URI;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
-
 import won.bot.framework.bot.context.TelegramBotContextWrapper;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
@@ -16,10 +15,14 @@ import won.bot.framework.eventbot.event.impl.wonmessage.ConnectFromOtherAtomEven
 import won.bot.framework.eventbot.listener.EventListener;
 import won.protocol.model.Connection;
 
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+
 /**
  * Created by fsuda on 03.10.2016.
  */
 public class Connect2TelegramAction extends BaseEventBotAction {
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     WonTelegramBotHandler wonTelegramBotHandler;
 
     public Connect2TelegramAction(EventListenerContext ctx, WonTelegramBotHandler wonTelegramBotHandler) {

@@ -14,9 +14,10 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import won.protocol.message.WonMessage;
 import won.protocol.message.processor.camel.WonCamelConstants;
+
+import java.lang.invoke.MethodHandles;
 
 /**
  * Processor that expects an outgoingMessageFactory in the respecitve in header,
@@ -24,7 +25,7 @@ import won.protocol.message.processor.camel.WonCamelConstants;
  * WonOutgoingMessage header
  */
 public class OutboundMessageCreatingProcessor implements Processor {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override
     public void process(Exchange exchange) throws Exception {

@@ -10,10 +10,6 @@
  */
 package won.bot.integrationtest;
 
-import java.util.concurrent.BrokenBarrierException;
-import java.util.concurrent.CyclicBarrier;
-import java.util.concurrent.TimeUnit;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -26,7 +22,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.support.PeriodicTrigger;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
 import won.bot.framework.eventbot.event.impl.lifecycle.WorkDoneEvent;
 import won.bot.framework.eventbot.listener.BaseEventListener;
 import won.bot.framework.eventbot.listener.CountingListener;
@@ -34,13 +29,18 @@ import won.bot.framework.eventbot.listener.impl.ActionOnEventListener;
 import won.bot.framework.manager.impl.SpringAwareBotManagerImpl;
 import won.bot.impl.GroupingBot;
 
+import java.lang.invoke.MethodHandles;
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.TimeUnit;
+
 /**
  * Integration test.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "classpath:/spring/app/simple2AtomGroupingTest.xml" })
 public class GroupingBotTest {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static final int RUN_ONCE = 1;
     private static final long ACT_LOOP_TIMEOUT_MILLIS = 100;
     private static final long ACT_LOOP_INITIAL_DELAY_MILLIS = 100;

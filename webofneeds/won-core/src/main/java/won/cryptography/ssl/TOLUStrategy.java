@@ -1,13 +1,13 @@
 package won.cryptography.ssl;
 
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
-
 import org.apache.http.ssl.TrustStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import won.cryptography.service.TrustStoreService;
+
+import java.lang.invoke.MethodHandles;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 
 /**
  * Can be useful for development: a certificate will become trusted after
@@ -18,7 +18,7 @@ import won.cryptography.service.TrustStoreService;
 public class TOLUStrategy implements TrustStrategy {
     private TrustStoreService trustStoreService;
     private AliasGenerator aliasGenerator;
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public void setTrustStoreService(TrustStoreService trustStoreService) {
         this.trustStoreService = trustStoreService;

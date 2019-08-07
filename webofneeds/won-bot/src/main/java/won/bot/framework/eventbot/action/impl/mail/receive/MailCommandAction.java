@@ -1,18 +1,10 @@
 package won.bot.framework.eventbot.action.impl.mail.receive;
 
-import java.io.IOException;
-import java.net.URI;
-import java.security.AccessControlException;
-import java.util.List;
-
-import javax.mail.MessagingException;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import won.bot.framework.bot.context.MailBotContextWrapper;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
@@ -28,17 +20,27 @@ import won.bot.framework.eventbot.event.impl.command.deactivate.DeactivateAtomCo
 import won.bot.framework.eventbot.event.impl.mail.MailCommandEvent;
 import won.bot.framework.eventbot.event.impl.mail.SubscribeUnsubscribeEvent;
 import won.bot.framework.eventbot.listener.EventListener;
+import won.protocol.model.AtomState;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionModelMapper;
-import won.protocol.model.AtomState;
 import won.protocol.util.DefaultAtomModelWrapper;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
+
+import javax.mail.MessagingException;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+import java.io.IOException;
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.security.AccessControlException;
+import java.util.List;
 
 /**
  * Created by fsuda on 18.10.2016.
  */
 public class MailCommandAction extends BaseEventBotAction {
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private MailContentExtractor mailContentExtractor;
 
     public MailCommandAction(EventListenerContext eventListenerContext, MailContentExtractor mailContentExtractor) {

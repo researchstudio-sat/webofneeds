@@ -1,18 +1,18 @@
 package won.cryptography.webid;
 
+import org.apache.http.ssl.TrustStrategy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import won.cryptography.service.CertificateService;
+import won.protocol.util.linkeddata.LinkedDataSource;
+
+import java.lang.invoke.MethodHandles;
 import java.net.URI;
 import java.security.PublicKey;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
 import java.util.List;
-
-import org.apache.http.ssl.TrustStrategy;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import won.cryptography.service.CertificateService;
-import won.protocol.util.linkeddata.LinkedDataSource;
 
 /**
  * Trust all the certificates that contains at least one verified webID in
@@ -21,7 +21,7 @@ import won.protocol.util.linkeddata.LinkedDataSource;
  * public key of the presented certificate. User: ypanchenko Date: 23.10.2015
  */
 public class TrustWebIdStrategy implements TrustStrategy {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private WebIDVerificationAgent verificationAgent;
 
     public TrustWebIdStrategy(LinkedDataSource linkedDataSource) {

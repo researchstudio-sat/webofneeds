@@ -1,16 +1,17 @@
 package won.protocol.jms;
 
-import javax.jms.ConnectionFactory;
-
 import org.apache.camel.component.jms.JmsConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.jms.ConnectionFactory;
+import java.lang.invoke.MethodHandles;
 
 /**
  * User: LEIH-NB Date: 28.04.14
  */
 public class WonJmsConfiguration extends JmsConfiguration {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public WonJmsConfiguration(ConnectionFactory connectionFactory) {
         super(connectionFactory);

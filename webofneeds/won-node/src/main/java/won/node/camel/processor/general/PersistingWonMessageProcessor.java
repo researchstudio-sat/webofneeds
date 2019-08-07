@@ -10,12 +10,9 @@
  */
 package won.node.camel.processor.general;
 
-import java.net.URI;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import won.node.service.DataAccessService;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageEncoder;
@@ -23,21 +20,20 @@ import won.protocol.message.WonMessageType;
 import won.protocol.message.WonMessageUtils;
 import won.protocol.message.processor.WonMessageProcessor;
 import won.protocol.message.processor.exception.WonMessageProcessingException;
-import won.protocol.model.ConnectionMessageContainer;
-import won.protocol.model.DatasetHolder;
-import won.protocol.model.MessageContainer;
-import won.protocol.model.MessageEventPlaceholder;
-import won.protocol.model.AtomMessageContainer;
+import won.protocol.model.*;
+import won.protocol.repository.AtomMessageContainerRepository;
 import won.protocol.repository.ConnectionMessageContainerRepository;
 import won.protocol.repository.DatasetHolderRepository;
 import won.protocol.repository.MessageEventRepository;
-import won.protocol.repository.AtomMessageContainerRepository;
+
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
 
 /**
  * Persists the specified WonMessage.
  */
 public class PersistingWonMessageProcessor implements WonMessageProcessor {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     @Autowired
     protected MessageEventRepository messageEventRepository;
     @Autowired

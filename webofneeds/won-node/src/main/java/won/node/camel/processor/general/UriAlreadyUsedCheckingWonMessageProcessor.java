@@ -10,26 +10,23 @@
  */
 package won.node.camel.processor.general;
 
-import java.net.URI;
-
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.sparql.util.IsoMatcher;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageType;
 import won.protocol.message.processor.WonMessageProcessor;
 import won.protocol.message.processor.exception.EventAlreadyProcessedException;
 import won.protocol.message.processor.exception.UriAlreadyInUseException;
-import won.protocol.model.MessageEventPlaceholder;
 import won.protocol.model.Atom;
-import won.protocol.repository.MessageEventRepository;
+import won.protocol.model.MessageEventPlaceholder;
 import won.protocol.repository.AtomRepository;
+import won.protocol.repository.MessageEventRepository;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
+
+import java.net.URI;
 
 /**
  * Checks whether the event or atom URI is already used. It is possible that
@@ -42,7 +39,6 @@ import won.protocol.util.WonRdfUtils;
  * User: ypanchenko Date: 23.04.2015
  */
 public class UriAlreadyUsedCheckingWonMessageProcessor implements WonMessageProcessor {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
     @Autowired
     private MessageEventRepository messageEventRepository;
     @Autowired

@@ -10,23 +10,12 @@
  */
 package won.bot.framework.eventbot.action.impl.debugbot;
 
-import java.net.URI;
-import java.text.DecimalFormat;
-import java.time.Duration;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.StopWatch;
-
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.behaviour.CrawlConnectionDataBehaviour;
@@ -40,15 +29,7 @@ import won.bot.framework.eventbot.event.impl.command.connectionmessage.Connectio
 import won.bot.framework.eventbot.event.impl.command.deactivate.DeactivateAtomCommandEvent;
 import won.bot.framework.eventbot.event.impl.crawlconnection.CrawlConnectionCommandEvent;
 import won.bot.framework.eventbot.event.impl.crawlconnection.CrawlConnectionCommandSuccessEvent;
-import won.bot.framework.eventbot.event.impl.debugbot.ConnectDebugCommandEvent;
-import won.bot.framework.eventbot.event.impl.debugbot.HintDebugCommandEvent;
-import won.bot.framework.eventbot.event.impl.debugbot.HintType;
-import won.bot.framework.eventbot.event.impl.debugbot.MessageToElizaEvent;
-import won.bot.framework.eventbot.event.impl.debugbot.ReplaceDebugAtomContentCommandEvent;
-import won.bot.framework.eventbot.event.impl.debugbot.SendNDebugCommandEvent;
-import won.bot.framework.eventbot.event.impl.debugbot.SetCacheEagernessCommandEvent;
-import won.bot.framework.eventbot.event.impl.debugbot.SetChattinessDebugCommandEvent;
-import won.bot.framework.eventbot.event.impl.debugbot.UsageDebugCommandEvent;
+import won.bot.framework.eventbot.event.impl.debugbot.*;
 import won.bot.framework.eventbot.listener.EventListener;
 import won.protocol.agreement.AgreementProtocolState;
 import won.protocol.message.WonMessage;
@@ -59,11 +40,21 @@ import won.protocol.util.WonRdfUtils;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
 import won.protocol.validation.WonConnectionValidator;
 
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.text.DecimalFormat;
+import java.time.Duration;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
 /**
  * Listener that reacts to incoming messages, creating internal bot events for
  * them
  */
 public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAction {
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     Pattern PATTERN_USAGE = Pattern.compile("^usage|\\?|help|debug$", Pattern.CASE_INSENSITIVE);
     Pattern PATTERN_HINT = Pattern.compile("^hint(\\s+((random|incompatible)\\s+)?socket)?$", Pattern.CASE_INSENSITIVE);
     Pattern PATTERN_CLOSE = Pattern.compile("^close$", Pattern.CASE_INSENSITIVE);

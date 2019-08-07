@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -19,7 +20,7 @@ import org.slf4j.LoggerFactory;
  * User: hfriedrich Date: 17.07.2014
  */
 public class TensorMatchingData {
-    private static final Logger logger = LoggerFactory.getLogger(TensorMatchingData.class);
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static final int MAX_DIMENSION = 1000000;
     public static final String HEADERS_FILE = "headers.txt";
     public static final String ATOM_INDICES_FILE = "atomIndices.txt";
@@ -225,7 +226,7 @@ public class TensorMatchingData {
     }
 
     public List<String> getAtoms() {
-        ArrayList<String> continuousList = new ArrayList<String>();
+        ArrayList<String> continuousList = new ArrayList<>();
         for (String atom : atoms) {
             if (atom != null) {
                 continuousList.add(atom);
@@ -235,7 +236,7 @@ public class TensorMatchingData {
     }
 
     public List<String> getAttributes() {
-        ArrayList<String> continuousList = new ArrayList<String>();
+        ArrayList<String> continuousList = new ArrayList<>();
         for (String attr : attributes) {
             if (attr != null) {
                 continuousList.add(attr);
@@ -245,8 +246,7 @@ public class TensorMatchingData {
     }
 
     public List<String> getSlices() {
-        ArrayList<String> continuousList = new ArrayList<String>();
-        continuousList.addAll(slices);
+        ArrayList<String> continuousList = new ArrayList<>(slices);
         return continuousList;
     }
 
@@ -313,7 +313,7 @@ public class TensorMatchingData {
         OutputStreamWriter os = new OutputStreamWriter(fos, "UTF-8");
         for (int i = 0; i < nextIndex; i++) {
             String entity = (atoms.get(i) != null) ? atoms.get(i) : attributes.get(i);
-            os.append(entity + "\n");
+            os.append(entity).append("\n");
         }
         os.close();
         // write the atom indices file
@@ -321,7 +321,7 @@ public class TensorMatchingData {
         os = new OutputStreamWriter(fos, "UTF-8");
         for (int i = 0; i < nextIndex; i++) {
             if (atoms.get(i) != null) {
-                os.append(i + "\n");
+                os.append(String.valueOf(i)).append("\n");
             }
         }
         os.close();

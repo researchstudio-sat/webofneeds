@@ -1,16 +1,8 @@
 package won.cryptography.rdfsign;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import won.protocol.message.WonSignatureData;
+
+import java.util.*;
 
 /**
  * User: ypanchenko Date: 24.03.2015
@@ -23,7 +15,6 @@ public class SignatureVerificationState {
     private Map<String, String> signatureGraphNameToSignedGraphName = new HashMap<>();
     private Map<String, String> signatureGraphNameToSignatureValue = new HashMap<>();
     private List<WonSignatureData> signatures = new ArrayList<>();
-    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     public void addSignedGraphName(String signedGraphName) {
         if (!signedGraphNameToSignatureGraphName.containsKey(signedGraphName)) {

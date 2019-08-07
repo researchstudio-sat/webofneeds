@@ -1,14 +1,10 @@
 package won.matcher.solr.index;
 
-import java.io.IOException;
-import java.io.StringWriter;
-import java.util.Map;
-
-import org.apache.jena.query.Dataset;
-import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.query.QueryFactory;
+import com.github.jsonldjava.core.JsonLdError;
+import com.github.jsonldjava.core.JsonLdOptions;
+import com.github.jsonldjava.core.JsonLdProcessor;
+import com.github.jsonldjava.utils.JsonUtils;
+import org.apache.jena.query.*;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.riot.Lang;
@@ -19,19 +15,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
-
-import com.github.jsonldjava.core.JsonLdError;
-import com.github.jsonldjava.core.JsonLdOptions;
-import com.github.jsonldjava.core.JsonLdProcessor;
-import com.github.jsonldjava.utils.JsonUtils;
-
 import won.matcher.service.common.service.http.HttpService;
 import won.matcher.solr.config.SolrMatcherConfig;
 import won.protocol.model.Coordinate;
-import won.protocol.util.DefaultAtomModelWrapper;
 import won.protocol.util.AtomModelWrapper;
+import won.protocol.util.DefaultAtomModelWrapper;
 import won.protocol.vocabulary.WON;
 import won.protocol.vocabulary.WONMATCH;
+
+import java.io.IOException;
+import java.io.StringWriter;
+import java.lang.invoke.MethodHandles;
+import java.util.Map;
 
 /**
  * Created by hfriedrich on 03.08.2016.
@@ -39,7 +34,7 @@ import won.protocol.vocabulary.WONMATCH;
 @Component
 @Scope("prototype")
 public class AtomIndexer {
-    private final Logger log = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     public static final String SOLR_IS_LOCATION_COORDINATES_FIELD = "is_atom_location";
     public static final String SOLR_SEEKS_LOCATION_COORDINATES_FIELD = "seeks_atom_location";
     public static final String SOLR_SEEKS_SEEKS_LOCATION_COORDINATES_FIELD = "seeksSeeks_atom_location";
@@ -111,11 +106,11 @@ public class AtomIndexer {
         if (config.isCommitIndexedAtomImmediately()) {
             indexUri += "?commit=" + config.isCommitIndexedAtomImmediately();
         }
-        log.debug("Post atom to solr index. \n Solr URI: {} \n Atom (JSON): {}", indexUri, atomJson);
+        logger.debug("Post atom to solr index. \n Solr URI: {} \n Atom (JSON): {}", indexUri, atomJson);
         try {
             httpService.postJsonRequest(indexUri, atomJson);
         } catch (HttpClientErrorException e) {
-            log.info("Error indexing atom with solr. \n Solr URI: {} \n Atom (JSON): {}", indexUri, atomJson);
+            logger.info("Error indexing atom with solr. \n Solr URI: {} \n Atom (JSON): {}", indexUri, atomJson);
         }
     }
 }

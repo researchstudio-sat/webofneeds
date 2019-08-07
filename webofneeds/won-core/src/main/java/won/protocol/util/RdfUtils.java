@@ -1,55 +1,10 @@
 package won.protocol.util;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.net.URI;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.Spliterator;
-import java.util.Spliterators;
-import java.util.function.Function;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
-
+import com.google.common.collect.Iterators;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
-import org.apache.jena.query.Dataset;
-import org.apache.jena.query.DatasetFactory;
-import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.query.QueryFactory;
-import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.QuerySolutionMap;
-import org.apache.jena.query.ReadWrite;
-import org.apache.jena.query.ResultSet;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.rdf.model.NodeIterator;
-import org.apache.jena.rdf.model.Property;
-import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.ResIterator;
-import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.Statement;
-import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.query.*;
+import org.apache.jena.rdf.model.*;
 import org.apache.jena.rdf.model.impl.StatementImpl;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
@@ -63,10 +18,17 @@ import org.apache.jena.util.FileUtils;
 import org.apache.jena.util.ResourceUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.collect.Iterators;
-
 import won.protocol.exception.IncorrectPropertyCountException;
+
+import java.io.*;
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 /**
  * Utilities for RDF manipulation with Jena.
@@ -74,7 +36,7 @@ import won.protocol.exception.IncorrectPropertyCountException;
 public class RdfUtils {
     public static final RDFNode EMPTY_RDF_NODE = null;
     private static final CheapInsecureRandomString randomString = new CheapInsecureRandomString();
-    private static final Logger logger = LoggerFactory.getLogger(RdfUtils.class);
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public static String toString(Model model) {
         String ret = "";
@@ -224,10 +186,7 @@ public class RdfUtils {
             if (!dataset.containsNamedModel(name)) {
                 // treat empty named graphs same as non-existent ones: check if the named graph
                 // in the otherDataset is empty
-                if (otherDataset.getNamedModel(name).isEmpty()) {
-                    return true;
-                }
-                return false;
+                return otherDataset.getNamedModel(name).isEmpty();
             }
         }
         return true;
@@ -260,7 +219,7 @@ public class RdfUtils {
             cloneSecond = cloneModel(secondModel);
         }
         if (firstModel == null || secondModel == null) {
-            return new Pair<Model>(cloneFirst, cloneSecond);
+            return new Pair<>(cloneFirst, cloneSecond);
         }
         // both models are non-null:
         // remove all statements from clones that exist in the other one, too (excluding
@@ -313,7 +272,7 @@ public class RdfUtils {
                 cloneFirst.remove(stmt);
             }
         }
-        return new Pair<Model>(cloneFirst, cloneSecond);
+        return new Pair<>(cloneFirst, cloneSecond);
     }
 
     public static Pair<Dataset> diff(Dataset firstDataset, Dataset secondDataset) {
@@ -346,7 +305,7 @@ public class RdfUtils {
                 secondResultDataset.addNamedModel(name, cloneModel(secondDataset.getNamedModel(name)));
             }
         }
-        return new Pair<Dataset>(firstResultDataset, secondResultDataset);
+        return new Pair<>(firstResultDataset, secondResultDataset);
     }
 
     public static class Pair<E> {
@@ -688,7 +647,7 @@ public class RdfUtils {
 
     public static Set<URI> getGraphUris(Dataset dataset) {
         Iterator<String> urisIterator = dataset.listNames();
-        Set<URI> uris = new HashSet<URI>();
+        Set<URI> uris = new HashSet<>();
         while (urisIterator.hasNext()) {
             uris.add(URI.create(urisIterator.next()));
         }
@@ -770,7 +729,7 @@ public class RdfUtils {
      */
     public static Map<String, String> mergeNsPrefixes(final Map<String, String> prioritaryPrefixes,
                     final Map<String, String> additionalPrefixes) {
-        Map<String, String> mergedPrefixes = new HashMap<String, String>();
+        Map<String, String> mergedPrefixes = new HashMap<>();
         mergedPrefixes.putAll(additionalPrefixes);
         mergedPrefixes.putAll(prioritaryPrefixes); // overwrites the additional prefixes when clashing
         return mergedPrefixes;
@@ -1141,9 +1100,8 @@ public class RdfUtils {
      * @return
      */
     public static Iterator<Node> getNodesForPropertyPath(final Model model, URI resourceURI, Path propertyPath) {
-        Iterator<Node> result = PathEval.eval(model.getGraph(), model.getResource(resourceURI.toString()).asNode(),
+        return PathEval.eval(model.getGraph(), model.getResource(resourceURI.toString()).asNode(),
                         propertyPath, Context.emptyContext);
-        return result;
     }
 
     /**
@@ -1233,7 +1191,7 @@ public class RdfUtils {
                     return Collections.emptyList();
                 }
                 NodeIterator it = model.listObjectsOfProperty(res, model.createProperty(property.toString()));
-                List<T> ret = new ArrayList<T>();
+                List<T> ret = new ArrayList<>();
                 while (it.hasNext()) {
                     RDFNode node = it.next();
                     ret.add(resultMapper.apply(node));
@@ -1351,7 +1309,7 @@ public class RdfUtils {
     }
 
     public static Stream<Statement> toStatementStream(final Dataset dataset, final ModelSelector modelSelector) {
-        List<Statement> results = new LinkedList<Statement>();
+        List<Statement> results = new LinkedList<>();
         for (Iterator<Model> modelIterator = modelSelector.select(dataset); modelIterator.hasNext();) {
             Model m = modelIterator.next();
             for (StmtIterator stmtIt = m.listStatements(); stmtIt.hasNext();) {
@@ -1362,7 +1320,7 @@ public class RdfUtils {
     }
 
     public static Stream<Statement> toStatementStream(final Model model) {
-        List<Statement> results = new LinkedList<Statement>();
+        List<Statement> results = new LinkedList<>();
         for (StmtIterator stmtIt = model.listStatements(); stmtIt.hasNext();) {
             results.add(stmtIt.next());
         }
@@ -1370,7 +1328,7 @@ public class RdfUtils {
     }
 
     public static Stream<Model> toModelStream(final Dataset dataset) {
-        List<Model> ret = new LinkedList<Model>();
+        List<Model> ret = new LinkedList<>();
         Model model = dataset.getDefaultModel();
         if (model != null) {
             ret.add(model);
@@ -1382,7 +1340,7 @@ public class RdfUtils {
     }
 
     public static Stream<NamedModel> toNamedModelStream(final Dataset dataset, boolean includeDefaultModel) {
-        List<NamedModel> ret = new LinkedList<NamedModel>();
+        List<NamedModel> ret = new LinkedList<>();
         if (includeDefaultModel) {
             Model model = dataset.getDefaultModel();
             if (model != null) {
@@ -1438,7 +1396,7 @@ public class RdfUtils {
      * @return
      */
     public static <T> Iterator<T> visit(Dataset dataset, ModelVisitor<T> visitor, ModelSelector modelSelector) {
-        List<T> results = new LinkedList<T>();
+        List<T> results = new LinkedList<>();
         for (Iterator<Model> modelIterator = modelSelector.select(dataset); modelIterator.hasNext();) {
             results.add(visitor.visit(modelIterator.next()));
         }
@@ -1461,7 +1419,7 @@ public class RdfUtils {
      */
     public static <E, T extends Collection<E>> List<E> visitFlattenedToList(Dataset dataset, ModelVisitor<T> visitor,
                     ModelSelector modelSelector) {
-        List<E> results = new ArrayList<E>();
+        List<E> results = new ArrayList<>();
         for (Iterator<Model> modelIterator = modelSelector.select(dataset); modelIterator.hasNext();) {
             results.addAll(visitor.visit(modelIterator.next()));
         }
@@ -1511,7 +1469,7 @@ public class RdfUtils {
      * @return
      */
     public static <T> T findFirst(Dataset dataset, ModelVisitor<T> visitor, ModelSelector modelSelector) {
-        List<T> results = new LinkedList<T>();
+        List<T> results = new LinkedList<>();
         for (Iterator<Model> modelIterator = modelSelector.select(dataset); modelIterator.hasNext();) {
             T result = visitor.visit(modelIterator.next());
             if (result != null)
@@ -1699,7 +1657,7 @@ public class RdfUtils {
 
     public static RDFNode findOnePropertyFromResource(final Model model, final Resource resource,
                     final Property property) {
-        List<RDFNode> foundNodes = new ArrayList<RDFNode>();
+        List<RDFNode> foundNodes = new ArrayList<>();
         NodeIterator iterator = model.listObjectsOfProperty(resource, property);
         while (iterator.hasNext()) {
             foundNodes.add(iterator.next());
@@ -1887,22 +1845,22 @@ public class RdfUtils {
             if (uri == null) { // if no such prefix-uri yet, add it
                 toModel.setNsPrefix(prefix, fromModel.getNsPrefixURI(prefix));
             } else {
-                if (uri.equals(fromModel.getNsPrefixURI(prefix))) {
-                    // prefix-uri is already there, do nothing
-                } else {
+                if (!uri.equals(fromModel.getNsPrefixURI(prefix))) {
                     // prefix-uri collision, redefine prefix
                     int counter = 2;
                     while (!toModel.getNsPrefixMap().containsKey(prefix + counter)) {
                         counter++;
                     }
                     toModel.setNsPrefix(prefix + counter, fromModel.getNsPrefixURI(prefix));
-                }
+                } /*
+                   * else { // prefix-uri is already there, do nothing }
+                   */
             }
         }
     }
 
     public static List<String> getModelNames(Dataset dataset) {
-        List<String> modelNames = new ArrayList<String>();
+        List<String> modelNames = new ArrayList<>();
         Iterator<String> names = dataset.listNames();
         while (names.hasNext()) {
             modelNames.add(names.next());

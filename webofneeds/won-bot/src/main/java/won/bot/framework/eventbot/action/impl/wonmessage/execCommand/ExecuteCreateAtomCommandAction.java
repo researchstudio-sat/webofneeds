@@ -10,13 +10,11 @@
  */
 package won.bot.framework.eventbot.action.impl.wonmessage.execCommand;
 
-import java.net.URI;
-import java.util.List;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Resource;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.action.EventBotActionUtils;
@@ -36,10 +34,16 @@ import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WONMATCH;
 
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.List;
+
 /**
  * Action executing a CreateAtomCommandEvent, creating the specified atom.
  */
 public class ExecuteCreateAtomCommandAction extends BaseEventBotAction {
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
     public ExecuteCreateAtomCommandAction(final EventListenerContext eventListenerContext) {
         super(eventListenerContext);
     }

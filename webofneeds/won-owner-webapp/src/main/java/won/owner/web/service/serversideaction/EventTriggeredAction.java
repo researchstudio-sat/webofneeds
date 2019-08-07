@@ -7,15 +7,11 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class EventTriggeredAction<E> {
     private Predicate<Optional<E>> triggerPredicate;
     // a function accepting one event of type T, and produces zero or more
     // EventTriggeredActions
     private Function<Optional<E>, Collection<EventTriggeredAction<E>>> action;
-    private final Logger logger = LoggerFactory.getLogger(getClass());
     private String name;
     private Date created = new Date();
 

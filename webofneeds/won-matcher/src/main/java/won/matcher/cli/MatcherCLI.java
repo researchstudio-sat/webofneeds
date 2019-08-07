@@ -1,14 +1,9 @@
 package won.matcher.cli;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Optional;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
-
 import won.matcher.protocol.impl.MatcherProtocolAtomServiceClient;
 import won.protocol.exception.IllegalMessageForAtomStateException;
 import won.protocol.exception.NoSuchAtomException;
@@ -20,11 +15,15 @@ import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
 
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.net.URISyntaxException;
+
 /**
  * User: gabriel Date: 14.02.13 Time: 15:00
  */
 public class MatcherCLI implements CommandLineRunner {
-    private static final Logger logger = LoggerFactory.getLogger(MatcherCLI.class);
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     @Autowired
     private MatcherProtocolAtomServiceClient client;
     @Autowired
@@ -39,17 +38,23 @@ public class MatcherCLI implements CommandLineRunner {
         String org = "http://localhost:8080/matcher";
         double score = 1;
         for (int i = 0; i < args.length; i++) {
-            if (args[i].equals("-h")) {
-                System.out.println("USAGE: java MatcherCLI [-n1 atom1] [-n2 atom2] [-o originator] [-s score] [-h]");
-                System.exit(0);
-            } else if (args[i].equals("-n1")) {
-                atom1 = args[++i];
-            } else if (args[i].equals("-n2")) {
-                atom2 = args[++i];
-            } else if (args[i].equals("-o")) {
-                org = args[++i];
-            } else if (args[i].equals("-s")) {
-                score = Double.parseDouble(args[++i]);
+            switch (args[i]) {
+                case "-h":
+                    System.out.println(
+                                    "USAGE: java MatcherCLI [-n1 atom1] [-n2 atom2] [-o originator] [-s score] [-h]");
+                    System.exit(0);
+                case "-n1":
+                    atom1 = args[++i];
+                    break;
+                case "-n2":
+                    atom2 = args[++i];
+                    break;
+                case "-o":
+                    org = args[++i];
+                    break;
+                case "-s":
+                    score = Double.parseDouble(args[++i]);
+                    break;
             }
         }
         try {

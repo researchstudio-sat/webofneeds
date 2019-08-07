@@ -9,12 +9,14 @@ import won.protocol.message.WonMessage;
 import won.protocol.message.processor.WonMessageProcessor;
 import won.protocol.message.sender.WonMessageSender;
 
+import java.lang.invoke.MethodHandles;
+
 /**
  * Service that connects client-side logic (e.g. the WonWebSocketHandler in
  * won-owner-webapp) with facilities for sending and receiving messages.
  */
 public class OwnerApplicationService implements WonMessageProcessor, WonMessageSender {
-    private static final Logger logger = LoggerFactory.getLogger(OwnerApplicationService.class);
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     @Autowired
     @Qualifier("default")
     private WonMessageSender wonMessageSenderDelegate;

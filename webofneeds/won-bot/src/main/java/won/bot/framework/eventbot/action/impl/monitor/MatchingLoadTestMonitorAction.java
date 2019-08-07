@@ -10,16 +10,11 @@
  */
 package won.bot.framework.eventbot.action.impl.monitor;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
 import org.javasimon.SimonManager;
 import org.javasimon.Split;
 import org.javasimon.Stopwatch;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.event.Event;
@@ -28,10 +23,14 @@ import won.bot.framework.eventbot.event.impl.wonmessage.AtomHintFromMatcherEvent
 import won.bot.framework.eventbot.event.impl.wonmessage.SocketHintFromMatcherEvent;
 import won.bot.framework.eventbot.listener.EventListener;
 
+import java.lang.invoke.MethodHandles;
+import java.util.*;
+
 /**
  * Created by hfriedrich on 02.10.2015.
  */
 public class MatchingLoadTestMonitorAction extends BaseEventBotAction {
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     Map<String, Long> atomEventStartTime = Collections.synchronizedMap(new HashMap<>());
     Map<String, List<Long>> hintEventReceivedTime = Collections.synchronizedMap(new HashMap<>());
     Map<String, Split> atomSplits = Collections.synchronizedMap(new HashMap<>());

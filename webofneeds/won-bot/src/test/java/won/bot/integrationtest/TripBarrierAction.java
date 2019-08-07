@@ -10,18 +10,22 @@
  */
 package won.bot.integrationtest;
 
-import java.util.concurrent.CyclicBarrier;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.listener.EventListener;
+
+import java.lang.invoke.MethodHandles;
+import java.util.concurrent.CyclicBarrier;
 
 /**
  * Action that trips the specified barrier. Used to synchronize test execution
  * with bot execution.
  */
 public class TripBarrierAction extends BaseEventBotAction {
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private CyclicBarrier barrier;
 
     public TripBarrierAction(final EventListenerContext eventListenerContext, final CyclicBarrier barrier) {

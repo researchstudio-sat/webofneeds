@@ -14,9 +14,10 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import won.protocol.message.WonMessage;
 import won.protocol.message.processor.WonMessageProcessor;
+
+import java.lang.invoke.MethodHandles;
 
 /**
  * Adapts a WonMessageProcessor to act as a camel processor. The WonMessage
@@ -25,7 +26,7 @@ import won.protocol.message.processor.WonMessageProcessor;
  * object replaces the original one.
  */
 public class WonMessageProcessorCamelAdapter implements Processor {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     public static String WON_MESSAGE_HEADER = "wonMessage";
     private WonMessageProcessor adaptee;
 

@@ -10,6 +10,7 @@
  */
 package won.protocol.model;
 
+import java.lang.invoke.MethodHandles;
 import java.net.URI;
 
 import org.slf4j.Logger;
@@ -23,7 +24,7 @@ import won.protocol.vocabulary.WON;
 public enum ConnectionState {
     SUGGESTED("Suggested"), REQUEST_SENT("RequestSent"), REQUEST_RECEIVED("RequestReceived"), CONNECTED("Connected"),
     CLOSED("Closed"), DELETED("Deleted");
-    private static final Logger logger = LoggerFactory.getLogger(ConnectionState.class);
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private String name;
 
     private ConnectionState(String name) {

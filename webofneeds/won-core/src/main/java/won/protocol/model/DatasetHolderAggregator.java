@@ -10,13 +10,6 @@
  */
 package won.protocol.model;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.io.SequenceInputStream;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.riot.Lang;
@@ -25,6 +18,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StopWatch;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.io.SequenceInputStream;
+import java.lang.invoke.MethodHandles;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+
 /**
  * Aggregates the datasets wrapped by a number of dataset holders. As soon as
  * the aggregate() function is called, all datasetHolders added so far are read
@@ -32,7 +33,7 @@ import org.springframework.util.StopWatch;
  * All subsequent calls to aggregate just yield the already aggregated dataset.
  */
 public class DatasetHolderAggregator {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private List<InputStream> inputStreams = null;
     private Lang rdfLanguage = null;
     private static final Lang DEFAULT_RDF_LANGUAGE = Lang.NQUADS;

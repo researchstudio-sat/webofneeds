@@ -1,23 +1,19 @@
 package won.owner.service.impl;
 
-import java.security.KeyStore;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-
 import won.cryptography.service.keystore.AbstractKeyStoreService;
 import won.owner.model.User;
 import won.owner.repository.KeystoreHolderRepository;
 import won.protocol.util.AuthenticationThreadLocal;
 
+import java.security.KeyStore;
+
 @Component
 public class PerUserKeystoreService extends AbstractKeyStoreService {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
     @Autowired
     private AuthenticationManager authenticationManager;
     @Autowired

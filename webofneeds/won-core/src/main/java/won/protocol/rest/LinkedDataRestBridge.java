@@ -1,26 +1,26 @@
 package won.protocol.rest;
 
-import javax.annotation.PostConstruct;
-
 import org.apache.http.ssl.TrustStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.DefaultResponseErrorHandler;
 import org.springframework.web.client.RestTemplate;
-
-import won.cryptography.keymanagement.KeyPairAliasDerivationStrategy;
 import won.cryptography.keymanagement.AtomUriAsAliasStrategy;
+import won.cryptography.keymanagement.KeyPairAliasDerivationStrategy;
 import won.cryptography.service.CryptographyUtils;
 import won.cryptography.service.TrustStoreService;
 import won.cryptography.service.keystore.KeyStoreService;
 import won.cryptography.ssl.PredefinedAliasPrivateKeyStrategy;
 
+import javax.annotation.PostConstruct;
+import java.lang.invoke.MethodHandles;
+
 /**
  * User: ypanchenko Date: 02.02.2016
  */
 public class LinkedDataRestBridge {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private RestTemplate restTemplateWithDefaultWebId;
     private Integer readTimeout;
     private Integer connectionTimeout;

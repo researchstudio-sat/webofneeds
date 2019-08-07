@@ -1,9 +1,7 @@
 package won.bot.framework.manager.impl;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,8 +14,12 @@ import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.Trigger;
-
 import won.bot.framework.bot.Bot;
+
+import java.lang.invoke.MethodHandles;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Spring context aware bot registry that adds all beans of type Bot defined in
@@ -27,6 +29,7 @@ import won.bot.framework.bot.Bot;
  */
 public class SpringAwareBotManagerImpl extends BotManagerImpl
                 implements ApplicationContextAware, DisposableBean, ApplicationListener {
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private ApplicationContext applicationContext;
     private Trigger checkWorkDoneTrigger = null;
     @Autowired

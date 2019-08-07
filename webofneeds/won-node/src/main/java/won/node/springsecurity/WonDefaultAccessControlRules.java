@@ -1,23 +1,23 @@
 package won.node.springsecurity;
 
-import java.net.URI;
-import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import won.cryptography.webid.AccessControlRules;
 import won.node.service.impl.URIService;
+import won.protocol.repository.AtomMessageContainerRepository;
 import won.protocol.repository.ConnectionMessageContainerRepository;
 import won.protocol.repository.MessageEventRepository;
-import won.protocol.repository.AtomMessageContainerRepository;
+
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.List;
 
 /**
  * User: ypanchenko Date: 28.07.2015
  */
 public class WonDefaultAccessControlRules implements AccessControlRules {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     // TODO this is tepmorary, untill the acl source is defined
     @Autowired
     protected MessageEventRepository messageEventRepository;

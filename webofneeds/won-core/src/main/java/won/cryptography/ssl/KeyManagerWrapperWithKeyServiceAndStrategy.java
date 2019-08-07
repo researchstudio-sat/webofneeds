@@ -1,22 +1,21 @@
 package won.cryptography.ssl;
 
+import org.apache.http.ssl.PrivateKeyDetails;
+import org.apache.http.ssl.PrivateKeyStrategy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import won.cryptography.service.keystore.KeyStoreService;
+
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.X509KeyManager;
+import java.lang.invoke.MethodHandles;
 import java.net.Socket;
 import java.security.Principal;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.net.ssl.KeyManager;
-import javax.net.ssl.KeyManagerFactory;
-import javax.net.ssl.X509KeyManager;
-
-import org.apache.http.ssl.PrivateKeyDetails;
-import org.apache.http.ssl.PrivateKeyStrategy;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import won.cryptography.service.keystore.KeyStoreService;
 
 /**
  * User: ypanchenko Date: 12.08.2015 This class is similar to the implementation
@@ -28,7 +27,7 @@ import won.cryptography.service.keystore.KeyStoreService;
  * https://hc.apache.org/httpcomponents-client-4.4.x/httpclient/xref/org/apache/http/conn/ssl/SSLContextBuilder.html
  */
 public class KeyManagerWrapperWithKeyServiceAndStrategy implements X509KeyManager {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final X509KeyManager keyManager;
     private final PrivateKeyStrategy aliasStrategy;
 

@@ -10,12 +10,11 @@
  */
 package won.node.camel.processor.fixed;
 
-import java.net.URI;
-
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-
 import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.camel.processor.annotation.FixedMessageProcessor;
 import won.node.camel.processor.general.OutboundMessageFactoryProcessor;
@@ -27,6 +26,9 @@ import won.protocol.model.Connection;
 import won.protocol.model.ConnectionEventType;
 import won.protocol.model.ConnectionState;
 import won.protocol.vocabulary.WONMSG;
+
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
 
 /**
  * Processes a CLOSE message coming from the FROM_SYSTEM direction. The effects
@@ -41,6 +43,8 @@ import won.protocol.vocabulary.WONMSG;
 @Component
 @FixedMessageProcessor(direction = WONMSG.FromSystemString, messageType = WONMSG.CloseMessageString)
 public class CloseMessageFromSystemProcessor extends AbstractCamelProcessor {
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
     public void process(final Exchange exchange) throws Exception {
         Message message = exchange.getIn();
         WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.MESSAGE_HEADER);

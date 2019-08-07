@@ -10,11 +10,9 @@
  */
 package won.bot.framework.eventbot.action.impl.wonmessage;
 
-import java.net.URI;
-import java.util.Date;
-
 import org.apache.jena.query.Dataset;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.event.ConnectionSpecificEvent;
@@ -27,11 +25,16 @@ import won.protocol.message.WonMessageBuilder;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.WonRdfUtils;
 
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.Date;
+
 /**
  * Listener that responds to open and message events with automatic messages.
  * Can be configured to apply a timeout (non-blocking) before sending messages.
  */
 public class RespondWithEchoToMessageAction extends BaseEventBotAction {
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private long millisTimeoutBeforeReply = 0;
 
     public RespondWithEchoToMessageAction(EventListenerContext eventListenerContext) {

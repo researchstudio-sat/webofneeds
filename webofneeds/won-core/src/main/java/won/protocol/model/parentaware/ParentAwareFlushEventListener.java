@@ -22,8 +22,10 @@ import org.hibernate.proxy.HibernateProxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.invoke.MethodHandles;
+
 public class ParentAwareFlushEventListener implements FlushEntityEventListener {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     public static final ParentAwareFlushEventListener INSTANCE = new ParentAwareFlushEventListener();
 
     @Override

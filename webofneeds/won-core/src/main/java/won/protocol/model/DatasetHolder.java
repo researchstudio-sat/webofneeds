@@ -10,22 +10,6 @@
  */
 package won.protocol.model;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.net.URI;
-
-import javax.persistence.Column;
-import javax.persistence.Convert;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Lob;
-import javax.persistence.PrePersist;
-import javax.persistence.PreUpdate;
-import javax.persistence.Table;
-import javax.persistence.Transient;
-
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.riot.Lang;
@@ -33,6 +17,13 @@ import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RiotException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.persistence.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
 
 /**
  * Encapsulates a jena dataset for storing it in a relational db.
@@ -49,7 +40,7 @@ public class DatasetHolder {
     @Column(name = "version", columnDefinition = "integer DEFAULT 0", nullable = false)
     private int version = 0;
     @Transient
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     @Column(name = "datasetURI", unique = true)
     @Convert(converter = URIConverter.class)
     private URI uri;

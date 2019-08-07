@@ -1,20 +1,20 @@
 package won.matcher.protocol.impl;
 
-import java.net.URI;
-
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import won.protocol.matcher.MatcherProtocolAtomServiceClientSide;
 import won.protocol.message.WonMessage;
+
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
 
 /**
  * User: gabriel Date: 12.02.13 Time: 17:26
  */
 public class MatcherProtocolAtomServiceClient implements MatcherProtocolAtomServiceClientSide {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     MatcherProtocolAtomServiceClientSide delegate;
 
     public void hint(URI atomURI, URI otherAtom, double score, URI originator, Model content, WonMessage wonMessage)
