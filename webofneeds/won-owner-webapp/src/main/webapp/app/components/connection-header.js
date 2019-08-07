@@ -5,7 +5,6 @@
 import angular from "angular";
 import won from "../won-es6.js";
 import "ng-redux";
-import groupImageModule from "./group-image.js";
 import { actionCreators } from "../actions/actions.js";
 import { labels, relativeTime } from "../won-label-utils.js";
 import { get, getIn } from "../utils.js";
@@ -27,6 +26,7 @@ import connectionStateModule from "./connection-state.js";
 
 import "~/style/_connection-header.scss";
 import WonAtomIcon from "./atom-icon.jsx";
+import WonGroupIcon from "./group-icon.jsx";
 
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
@@ -34,11 +34,12 @@ function genComponentConf() {
       <div class="ch__icon" ng-if="!self.connectionOrAtomsLoading && !self.isConnectionToGroup">
           <won-preact class="atomImage ch__icon__theiratom" component="self.WonAtomIcon" props="{atomUri: self.targetAtom.get('uri')}"></won-preact>
       </div>
-      <won-group-image
-        class="ch__groupicons"
+      <won-preact
+        class="groupIcon ch__groupicons"
+        component="self.WonGroupIcon"
+        props="{connectionUri: self.connectionUri}"
         ng-if="!self.connectionOrAtomsLoading && self.isConnectionToGroup"
-        connection-uri="self.connectionUri">
-      </won-group-image>
+      ></won-preact>
       <div class="ch__right" ng-if="!self.connectionOrAtomsLoading">
         <div class="ch__right__topline" ng-if="!self.targetAtomFailedToLoad">
           <div class="ch__right__topline__title" ng-if="!self.isDirectResponseFromRemote && self.targetAtom.get('humanReadable')" title="{{ self.targetAtom.get('humanReadable') }}">
@@ -119,6 +120,7 @@ function genComponentConf() {
       this.labels = labels;
       this.WON = won.WON;
       this.WonAtomIcon = WonAtomIcon;
+      this.WonGroupIcon = WonGroupIcon;
 
       const selectFromState = state => {
         const ownedAtom = getOwnedAtomByConnectionUri(
@@ -268,8 +270,5 @@ function genComponentConf() {
 }
 
 export default angular
-  .module("won.owner.components.connectionHeader", [
-    groupImageModule,
-    connectionStateModule,
-  ])
+  .module("won.owner.components.connectionHeader", [connectionStateModule])
   .directive("wonConnectionHeader", genComponentConf).name;
