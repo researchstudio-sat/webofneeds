@@ -110,7 +110,7 @@ const template = (
           >
             <won-preact
               component="self.WonAtomCardGrid"
-              props="{ atomUris: self.getSortedVisibleAtomUriArrayByUseCase(ucIdentifier), currentLocation: self.currentLocation, showSuggestions: false, showPersona: true }"
+              props="{ atomUris: self.getSortedVisibleAtomUriArrayByUseCase(ucIdentifier), currentLocation: self.currentLocation, showSuggestions: false, showPersona: true, showCreate: false }"
             />
           </div>
         </div>
@@ -139,7 +139,7 @@ const template = (
           >
             <won-preact
               component="self.WonAtomCardGrid"
-              props="{ atomUris: self.getSortedVisibleOtherAtomUriArray(), currentLocation: self.currentLocation, showSuggestions: false, showPersona: true }"
+              props="{ atomUris: self.getSortedVisibleOtherAtomUriArray(), currentLocation: self.currentLocation, showSuggestions: false, showPersona: true, showCreate: false }"
             />
           </div>
         </div>

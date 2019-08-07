@@ -72,20 +72,8 @@ const template = (
       >
         <won-preact
           component="self.WonAtomCardGrid"
-          props="{ atomUris: self.sortedOwnedUnassignedAtomUriArray, currentLocation: self.currentLocation, showSuggestions: true, showPersona: true }"
+          props="{ atomUris: self.sortedOwnedUnassignedAtomUriArray, currentLocation: self.currentLocation, showSuggestions: true, showPersona: true, showCreate: true }"
         />
-        <div
-          className="ownerinventory__content__createatom"
-          ng-click="self.router__stateGo('create')"
-        >
-          <svg
-            className="ownerinventory__content__createatom__icon"
-            title="Create a new post"
-          >
-            <use xlinkHref="#ico36_plus" href="#ico36_plus" />
-          </svg>
-          <span className="ownerinventory__content__createatom__label">New</span>
-        </div>
       </div>
       <div
         className="ownerinventory__content"
@@ -131,7 +119,7 @@ const template = (
       >
         <won-preact
           component="self.WonAtomCardGrid"
-          props="{ atomUris: self.sortedOwnedInactiveAtomUriArray, currentLocation: self.currentLocation, showSuggestions: false, showPersona: false }"
+          props="{ atomUris: self.sortedOwnedInactiveAtomUriArray, currentLocation: self.currentLocation, showSuggestions: false, showPersona: false, showCreate: false }"
         />
       </div>
     </main>

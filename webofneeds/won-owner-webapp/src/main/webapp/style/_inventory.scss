@@ -145,12 +145,8 @@ main.ownerinventory {
     > won-atom-card {
       border: $thinGrayBorder;
     }
-  }
 
-  .ownerinventory__content {
-    padding: 1rem;
-
-    .ownerinventory__content__createatom {
+    > won-create-card {
       border: $thinGrayBorder;
       background: $won-light-gray;
       padding: 0.5rem;
@@ -166,22 +162,22 @@ main.ownerinventory {
       &:hover {
         border-color: $won-primary-color;
 
-        .ownerinventory__content__createatom__label {
+        .createcard__label {
           color: $won-primary-color;
         }
 
-        .ownerinventory__content__createatom__icon {
+        .createcard__icon {
           --local-primary: #{$won-primary-color};
         }
       }
 
-      .ownerinventory__content__createatom__label {
+      > .createcard__label {
         font-size: $mediumFontSize;
         text-align: center;
         color: $won-line-gray;
       }
 
-      .ownerinventory__content__createatom__icon {
+      > .createcard__icon {
         @include fixed-square($hugeiconSize);
         --local-primary: #{$won-line-gray};
       }

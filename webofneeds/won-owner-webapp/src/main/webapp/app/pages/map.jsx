@@ -201,7 +201,7 @@ const template = (
       >
         <won-preact
           component="self.WonAtomCardGrid"
-          props="{ atomUris: self.sortedVisibleAtomUriArray, currentLocation: self.lastWhatsAroundLocation, showSuggestions: false, showPersona: true }"
+          props="{ atomUris: self.sortedVisibleAtomUriArray, currentLocation: self.lastWhatsAroundLocation, showSuggestions: false, showPersona: true, showCreate: false }"
           ng-if="self.hasVisibleAtomUris"
         />
       </div>
