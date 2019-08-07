@@ -8,9 +8,9 @@
 import angular from "angular";
 import Immutable from "immutable";
 import ngAnimate from "angular-animate";
-import connectionIndicatorsModule from "./connection-indicators.js";
-import connectionSelectionItemModule from "./connection-selection-item.js";
 import WonAtomHeader from "./atom-header.jsx";
+import WonConnectionSelectionItem from "./connection-selection-item.jsx";
+import WonConnectionIndicators from "./connection-indicators.jsx";
 
 import { get, getIn, sortByDate } from "../utils.js";
 import { attach } from "../cstm-ng-utils.js";
@@ -38,10 +38,7 @@ function genComponentConf() {
                         ng-class="{ 'clickable' : !self.isAtomLoading(atomUri) }"
                         ng-click="!self.isAtomLoading(atomUri) && self.showAtomDetails(atomUri)">
                     </won-preact>
-                    <won-connection-indicators
-                        on-selected-connection="::self.selectConnection(connectionUri)"
-                        atom-uri="::atomUri">
-                    </won-connection-indicators>
+                    <won-preact class="connectionIndicators" component="self.WonConnectionIndicators" props="{atomUri: atomUri}"></won-preact> <!-- todo: set prop, onSelectedConnection: () => self.selectConnection(connUri)-->
                 </div>
             </div>
             <div class="co__item__connections">
@@ -50,11 +47,7 @@ function genComponentConf() {
                   ng-class="{
                     'won-unread': self.isConnectionUnread(atomUri, connUri)
                   }">
-                  <won-connection-selection-item
-                      on-selected-connection="::self.selectConnection(connectionUri)"
-                      connection-uri="::connUri"
-                      ng-class="{'won-unread': self.isConnectionUnread(atomUri, connUri)}">
-                  </won-connection-selection-item>
+                  <won-preact class="connectionSelectionItem" component="self.WonConnectionSelectionItem" props="{connectionUri: connUri}"></won-preact> <!-- todo: set prop, onSelectedConnection: () => self.selectConnection(connUri)-->
                 </div>
             </div>
         </div>
@@ -65,6 +58,8 @@ function genComponentConf() {
       attach(this, serviceDependencies, arguments);
       window.co4dbg = this;
       this.WonAtomHeader = WonAtomHeader;
+      this.WonConnectionSelectionItem = WonConnectionSelectionItem;
+      this.WonConnectionIndicators = WonConnectionIndicators;
 
       const selectFromState = state => {
         const allAtoms = generalSelectors.getPosts(state);
@@ -178,9 +173,5 @@ function genComponentConf() {
 }
 
 export default angular
-  .module("won.owner.components.connectionsOverview", [
-    connectionSelectionItemModule,
-    connectionIndicatorsModule,
-    ngAnimate,
-  ])
+  .module("won.owner.components.connectionsOverview", [ngAnimate])
   .directive("wonConnectionsOverview", genComponentConf).name;

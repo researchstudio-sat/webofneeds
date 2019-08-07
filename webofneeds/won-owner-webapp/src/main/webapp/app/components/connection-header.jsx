@@ -232,7 +232,7 @@ export default class WonConnectionHeader extends React.Component {
 
         headerRightContent = (
           <React.Fragment>
-            <div className="ch__right__topline">{headerRightContentTitle}</div>
+            <div className="ch__right__topline">{headerRightToplineContent}</div>
             <div className="ch__right__subtitle">
               <span className="ch__right__subtitle__type">
                 {personaName}
@@ -249,7 +249,7 @@ export default class WonConnectionHeader extends React.Component {
 
 
       return (
-        <won-connection-header>
+        <won-connection-header onClick={() => this.props.onClick()} class={this.props.onClick ? "clickable" : ""}>
           {headerIcon}
           <div className="ch__right">
             {headerRightContent}
