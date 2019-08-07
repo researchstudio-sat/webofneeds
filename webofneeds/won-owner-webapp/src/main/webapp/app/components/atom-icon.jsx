@@ -126,7 +126,7 @@ export default class WonAtomIcon extends React.Component {
     }
 
     return (
-      <won-atom-icon class={(this.state.isPersona ? " won-is-persona " : "") + (this.state.atomFailedToLoad ? " won-failed-to-load " : "") + (this.state.isInactive ? " inactive " : "")}>
+      <won-atom-icon class={(this.state.isPersona ? " won-is-persona " : "") + (this.state.atomFailedToLoad ? " won-failed-to-load " : "") + (this.state.atomInactive ? " inactive " : "")}>
         {atomIcon}
         {holderIcon}
       </won-atom-icon>
