@@ -80,10 +80,10 @@ export default class WonOtherCard extends React.Component {
       showPersonaIdenticon: !personaImage && personaIdenticonSvg,
       personaIdenticonSvg,
       personaImage,
-      showMap: !atomImage && atomLocation, //if no image is present but a location is, we display a map instead
+      showMap: false, //!atomImage && atomLocation, //if no image is present but a location is, we display a map instead
       atomLocation,
       atomImage,
-      showDefaultIcon: !atomImage && !atomLocation, //if no image and no location are present we display the defaultIcon in the card__icon area, instead of next to the title
+      showDefaultIcon: !atomImage, //&& !atomLocation, //if no image and no location are present we display the defaultIcon in the card__icon area, instead of next to the title
       useCaseIcon,
       iconBackground,
       identiconSvg,
