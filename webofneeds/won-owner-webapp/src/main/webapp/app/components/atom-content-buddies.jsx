@@ -137,6 +137,11 @@ export default class WonAtomContentBuddies extends React.Component {
                   <div className="acb__buddy__actions__button red won-button--outlined thin" disabled={true}>
                     Waiting for Accept...
                   </div>
+                  <div
+                    className="acb__buddy__actions__button red won-button--outlined thin"
+                    onClick={() => this.closeConnection(conn, "Cancel Buddy Request?")}>
+                    Cancel
+                  </div>
                 </div>
               );
             } else if (connectionUtils.isConnected(conn)) {

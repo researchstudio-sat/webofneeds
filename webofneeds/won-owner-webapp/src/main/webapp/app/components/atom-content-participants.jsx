@@ -138,6 +138,11 @@ export default class WonAtomContentParticipants extends React.Component {
                   <div className="acp__participant__actions__button red won-button--outlined thin" disabled={true}>
                     Waiting for Accept...
                   </div>
+                  <div
+                    className="acp__participant__actions__button red won-button--outlined thin"
+                    onClick={() => this.closeConnection(conn, "Cancel Participant Request?")}>
+                    Cancel
+                  </div>
                 </div>
               );
             } else if (connectionUtils.isConnected(conn)) {
