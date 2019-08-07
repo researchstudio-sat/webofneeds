@@ -43,6 +43,7 @@ import won.owner.web.service.ServerSideActionService;
 import won.protocol.message.*;
 import won.protocol.message.processor.WonMessageProcessor;
 import won.protocol.model.AtomState;
+import won.protocol.model.ConnectionState;
 import won.protocol.util.AuthenticationThreadLocal;
 import won.protocol.util.LoggingUtils;
 import won.protocol.util.WonRdfUtils;
@@ -339,6 +340,11 @@ public class WonWebSocketHandler extends TextWebSocketHandler
             logger.debug("not sending notification to user: atom uri not specified");
             return;
         }
+        UserAtom senderAtom = getAtomOfUser(user, wonMessage.getSenderAtomURI());
+        if (senderAtom != null) {
+            logger.debug("not sending notification to user: sender and recipient atoms are controlled by same user.");
+            return;
+        }
         String textMsg = WonRdfUtils.MessageUtils.getTextMessage(wonMessage);
         String iconUrl = uriService.getOwnerProtocolOwnerURI().toString() + "/skin/current/images/logo.png";
         switch (wonMessage.getMessageType()) {
@@ -365,6 +371,12 @@ public class WonWebSocketHandler extends TextWebSocketHandler
                 return;
             case SOCKET_HINT_MESSAGE:
                 if (userAtom.isMatches()) {
+                    if (!isConnectionInSuggestedState(wonMessage.getRecipientURI())) {
+                        // we only want to notify if the connection is in state won:Suggested.
+                        // otherwise, the owner has already handled another suggestion, or
+                        // found the connection previously and we don't want to notify them
+                        return;
+                    }
                     ObjectMapper mapper = new ObjectMapper();
                     ObjectNode rootNode = mapper.createObjectNode();
                     rootNode.put("type", "HINT");
@@ -373,6 +385,7 @@ public class WonWebSocketHandler extends TextWebSocketHandler
                         rootNode.put("connectionUri", wonMessage.getRecipientURI().toString());
                     } else {
                         logger.warn("received SocketHint for atom {} without recipientURI", userAtom.getUri());
+                        return; // we are not going to notify if the message is missing this
                     }
                     rootNode.put("icon", iconUrl);
                     String stringifiedJson;
@@ -434,6 +447,11 @@ public class WonWebSocketHandler extends TextWebSocketHandler
             logger.debug("not sending email to user: atom uri not specified");
             return;
         }
+        UserAtom senderAtom = getAtomOfUser(user, wonMessage.getSenderAtomURI());
+        if (senderAtom != null) {
+            logger.debug("not sending email to user: sender and recipient atoms are controlled by same user.");
+            return;
+        }
         String textMsg = WonRdfUtils.MessageUtils.getTextMessage(wonMessage);
         try {
             switch (wonMessage.getMessageType()) {
@@ -463,6 +481,12 @@ public class WonWebSocketHandler extends TextWebSocketHandler
                     if (userAtom.isMatches()) {
                         Optional<URI> targetAtomUri = WonLinkedDataUtils
                                         .getAtomOfSocket(wonMessage.getHintTargetSocketURI(), linkedDataSource);
+                        if (!isConnectionInSuggestedState(wonMessage.getRecipientURI())) {
+                            // we only want to notify if the connection is in state won:Suggested.
+                            // otherwise, the owner has already handled another suggestion, or
+                            // found the connection previously and we don't want to notify them
+                            return;
+                        }
                         if (targetAtomUri.isPresent()) {
                             // user a hash of the user's email address for the key, so as not to hold
                             // users emails in memory all the time
@@ -518,6 +542,13 @@ public class WonWebSocketHandler extends TextWebSocketHandler
         } catch (MailException | NoSuchAlgorithmException ex) {
             logger.error("Email could not be sent", ex);
         }
+    }
+
+    private boolean isConnectionInSuggestedState(URI connectionURI) {
+        if (connectionURI == null)
+            return false;
+        URI state = WonLinkedDataUtils.getConnectionStateforConnectionURI(connectionURI, linkedDataSource);
+        return ConnectionState.SUGGESTED.equals(ConnectionState.fromURI(state));
     }
 
     private Set<WebSocketSession> findWebSocketSessionsForAtomAndUser(URI atomUri, User user) {

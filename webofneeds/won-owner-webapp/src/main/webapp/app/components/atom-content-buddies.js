@@ -86,9 +86,9 @@ function genComponentConf() {
           ng-if="!self.buddies && !self.hasBuddyConnections">
           No Buddies present.
       </div>
-      <won-labelled-hr label="::'Request'" class="acb__labelledhr" ng-if="self.isOwned"></won-labelled-hr>
+      <won-labelled-hr label="::'Request'" class="acb__labelledhr" ng-if="self.isOwned" arrow="self.suggestAtomExpanded? 'up' : 'down'" ng-click="self.suggestAtomExpanded = !self.suggestAtomExpanded"></won-labelled-hr>
       <won-suggestpost-picker
-          ng-if="self.isOwned"
+          ng-if="self.isOwned && self.suggestAtomExpanded"
           initial-value="undefined"
           on-update="self.requestBuddy(value)"
           detail="::{placeholder: 'Insert AtomUri to invite'}"
@@ -104,6 +104,7 @@ function genComponentConf() {
     constructor() {
       attach(this, serviceDependencies, arguments);
       this.won = won;
+      this.suggestAtomExpanded = false;
       window.atomContentBuddies4dbg = this;
 
       const selectFromState = state => {
