@@ -66,31 +66,11 @@ const template = (
           </span>
         </div>
       </div>
-      <div
-        className="ownerinventory__content"
-        ng-if="self.hasOwnedUnassignedAtomUris"
-      >
+      <div className="ownerinventory__content">
         <won-preact
           component="self.WonAtomCardGrid"
           props="{ atomUris: self.sortedOwnedUnassignedAtomUriArray, currentLocation: self.currentLocation, showSuggestions: true, showPersona: true, showCreate: true }"
         />
-      </div>
-      <div
-        className="ownerinventory__content"
-        ng-if="!self.hasOwnedUnassignedAtomUris"
-      >
-        <div
-          className="ownerinventory__content__createatom"
-          ng-click="self.router__stateGo('create')"
-        >
-          <svg
-            className="ownerinventory__content__createatom__icon"
-            title="Create a new post"
-          >
-            <use xlinkHref="#ico36_plus" href="#ico36_plus" />
-          </svg>
-          <span className="ownerinventory__content__createatom__label">New</span>
-        </div>
       </div>
       <div
         className="ownerinventory__header"
@@ -152,17 +132,17 @@ class Controller {
         ownedUnassignedActivePosts,
         "creationDate"
       );
-      const sortedOwnedUnassignedAtomUriArray = sortedOwnedUnassignedActivePosts && [
+      const sortedOwnedUnassignedAtomUriArray = sortedOwnedUnassignedActivePosts ? [
         ...sortedOwnedUnassignedActivePosts.flatMap(atom => get(atom, "uri")),
-      ];
+      ] : [];
 
       const sortedOwnedInactiveAtoms = sortByDate(
         ownedInactiveAtoms,
         "creationDate"
       );
-      const sortedOwnedInactiveAtomUriArray = sortedOwnedInactiveAtoms && [
+      const sortedOwnedInactiveAtomUriArray = sortedOwnedInactiveAtoms ? [
         ...sortedOwnedInactiveAtoms.flatMap(atom => get(atom, "uri")),
-      ];
+      ] : [];
 
       const sortedOwnedActivePersonas = sortByDate(
         ownedActivePersonas,
