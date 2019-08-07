@@ -3,27 +3,23 @@
  */
 
 import angular from "angular";
-import { getIn, get } from "../utils.js";
+import { get, getIn } from "../utils.js";
 import { connect2Redux } from "../configRedux.js";
 import { actionCreators } from "../actions/actions.js";
+import WonConnectionHeader from "./connection-header.jsx";
 import {
   getConnectionUriFromRoute,
   getOwnedAtomByConnectionUri,
 } from "../redux/selectors/general-selectors.js";
 
-import connectionHeaderModule from "./connection-header.js";
-import { classOnComponentRoot, attach } from "../cstm-ng-utils.js";
+import { attach, classOnComponentRoot } from "../cstm-ng-utils.js";
 
 import "~/style/_connection-selection-item-line.scss";
 
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
   let template = `
-      <won-connection-header
-        connection-uri="::self.connectionUri"
-        ng-click="self.setOpen()"
-        class="clickable">
-      </won-connection-header>
+      <won-preact class="connectionHeader clickable" component="self.WonConnectionHeader" props="{connectionUri: self.connectionUri}" ng-click="self.setOpen()"></won-preact>
       <button
         class="csi__closebutton red won-button--outlined thin"
         ng-click="self.closeConnection()"
@@ -35,7 +31,7 @@ function genComponentConf() {
   class Controller {
     constructor() {
       attach(this, serviceDependencies, arguments);
-
+      this.WonConnectionHeader = WonConnectionHeader;
       const selectFromState = state => {
         const ownedAtom = getOwnedAtomByConnectionUri(
           state,
@@ -99,7 +95,5 @@ function genComponentConf() {
   };
 }
 export default angular
-  .module("won.owner.components.connectionSelectionItem", [
-    connectionHeaderModule,
-  ])
+  .module("won.owner.components.connectionSelectionItem", [])
   .directive("wonConnectionSelectionItem", genComponentConf).name;

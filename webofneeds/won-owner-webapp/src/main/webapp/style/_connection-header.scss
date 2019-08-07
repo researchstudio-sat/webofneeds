@@ -35,7 +35,7 @@ won-connection-header {
   grid-column-gap: 0.5rem;
   min-width: 0;
 
-  .ch__groupicons,
+  won-group-icon,
   .ch__icon {
     grid-area: icon;
     width: $postIconSize;
