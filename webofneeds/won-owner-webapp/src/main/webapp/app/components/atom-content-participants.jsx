@@ -112,7 +112,7 @@ export default class WonAtomContentParticipants extends React.Component {
                   </div>
                   <div
                     className="acp__participant__actions__button red won-button--outlined thin"
-                    onClick={() => this.closeConnection(conn)}>
+                    onClick={() => this.closeConnection(conn, "Reject Participant Request?")}>
                     Reject
                   </div>
                 </div>
@@ -127,7 +127,7 @@ export default class WonAtomContentParticipants extends React.Component {
                   </div>
                   <div
                     className="acp__participant__actions__button red won-button--outlined thin"
-                    onClick={() => this.closeConnection(conn)}>
+                    onClick={() => this.closeConnection(conn, "Remove Participant Suggestion?")}>
                     Remove
                   </div>
                 </div>
@@ -219,25 +219,39 @@ export default class WonAtomContentParticipants extends React.Component {
     }
   }
 
-  closeConnection(conn, rateBad = false) {
+  closeConnection(conn, dialogText = "Remove Participant?") {
     if (!conn) {
       return;
     }
 
-    const connUri = get(conn, "uri");
+    const payload = {
+      caption: "Group",
+      text: dialogText,
+      buttons: [
+        {
+          caption: "Yes",
+          callback: () => {
+            const connUri = get(conn, "uri");
 
-    if (rateBad) {
-      this.props.ngRedux.dispatch(actionCreators.connections__rate(connUri, won.WONCON.binaryRatingBad));
-    }
+            if (connectionUtils.isUnread(conn)) {
+              this.props.ngRedux.dispatch(actionCreators.connections__markAsRead({
+                connectionUri: connUri,
+                atomUri: this.atomUri,
+              }));
+            }
 
-    if (connectionUtils.isUnread(conn)) {
-      this.props.ngRedux.dispatch(actionCreators.connections__markAsRead({
-        connectionUri: connUri,
-        atomUri: this.atomUri,
-      }));
-    }
-
-    this.props.ngRedux.dispatch(actionCreators.connections__close(connUri));
+            this.props.ngRedux.dispatch(actionCreators.connections__close(connUri));
+          },
+        },
+        {
+          caption: "No",
+          callback: () => {
+            this.props.ngRedux.dispatch(actionCreators.view__hideModalDialog());
+          },
+        },
+      ],
+    };
+    this.props.ngRedux.dispatch(actionCreators.view__showModalDialog(payload));
   }
 
   openRequest(conn, message = "") {

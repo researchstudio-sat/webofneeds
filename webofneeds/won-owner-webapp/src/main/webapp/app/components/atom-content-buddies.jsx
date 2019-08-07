@@ -111,7 +111,7 @@ export default class WonAtomContentBuddies extends React.Component {
                   </div>
                   <div
                     className="acb__buddy__actions__button red won-button--outlined thin"
-                    onClick={() => this.closeConnection(conn)}>
+                    onClick={() => this.closeConnection(conn, "Reject Buddy Request?")}>
                     Reject
                   </div>
                 </div>
@@ -126,7 +126,7 @@ export default class WonAtomContentBuddies extends React.Component {
                   </div>
                   <div
                     className="acb__buddy__actions__button red won-button--outlined thin"
-                    onClick={() => this.closeConnection(conn)}>
+                    onClick={() => this.closeConnection(conn, "Reject Buddy Suggestion?")}>
                     Remove
                   </div>
                 </div>
@@ -218,50 +218,14 @@ export default class WonAtomContentBuddies extends React.Component {
     }
   }
 
-  closeConnection(conn, rateBad = false) {
+  closeConnection(conn, dialogText = "Remove Buddy?") {
     if (!conn) {
       return;
     }
 
     const payload = {
       caption: "Persona",
-      text: "Remove Buddy?",
-      buttons: [
-        {
-          caption: "Yes",
-          callback: () => {
-            const connUri = get(conn, "uri");
-
-            if (connectionUtils.isUnread(conn)) {
-              this.props.ngRedux.dispatch(actionCreators.connections__markAsRead({
-                connectionUri: connUri,
-                atomUri: this.atomUri,
-              }));
-            }
-
-            this.props.ngRedux.dispatch(actionCreators.connections__close(connUri));
-            this.props.ngRedux.dispatch(actionCreators.view__hideModalDialog());
-          },
-        },
-        {
-          caption: "No",
-          callback: () => {
-            this.props.ngRedux.dispatch(actionCreators.view__hideModalDialog());
-          },
-        },
-      ],
-    };
-    this.props.ngRedux.dispatch(actionCreators.view__showModalDialog(payload));
-  }
-
-  rejectConnection(conn) {
-    if (!conn) {
-      return;
-    }
-
-    const payload = {
-      caption: "Persona",
-      text: "Reject Buddy Request?",
+      text: dialogText,
       buttons: [
         {
           caption: "Yes",
