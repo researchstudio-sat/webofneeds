@@ -245,6 +245,7 @@ export default class WonSuggestAtomPicker extends React.Component {
    * Checks validity and uses callback method
    */
   update(title) {
+    console.debug("suggest-atom-picker: ", "update(", title, ")");
     if (title && title.trim().length > 0) {
       this.props.onUpdate({ value: title });
     } else {
@@ -253,6 +254,7 @@ export default class WonSuggestAtomPicker extends React.Component {
   }
 
   updateFetchAtomUriField() {
+    console.debug("suggest-atom-picker: ", "updateFetchAtomUriField()");
     const text = this.uriInput && this.uriInput.value;
     this.localState.uriToFetch = undefined;
 
@@ -269,11 +271,13 @@ export default class WonSuggestAtomPicker extends React.Component {
   }
 
   fetchAtomUriFieldHasText() {
+    console.debug("suggest-atom-picker: ", "fetchAtomUriFieldHasText()");
     const text = this.uriInput && this.uriInput.value;
     return text && text.length > 0;
   }
 
   resetAtomUriField() {
+    console.debug("suggest-atom-picker: ", "resetAtomUriField(", omitUpdate, ")");
     if (this.uriInput) {
       this.uriInput.value = "";
     }
@@ -286,7 +290,7 @@ export default class WonSuggestAtomPicker extends React.Component {
   fetchAtom() {
     let uriToFetch = this.uriInput && this.uriInput.value;
     uriToFetch = uriToFetch && uriToFetch.trim();
-
+    console.debug("suggest-atom-picker: ", "fetchAtom()", " uriToFetch: ", uriToFetch);
     if (
       !getIn(this.state.allSuggestableAtoms, uriToFetch) &&
       !get(this.state.allForbiddenAtoms, uriToFetch)
@@ -302,6 +306,7 @@ export default class WonSuggestAtomPicker extends React.Component {
   }
 
   selectAtom(atom) {
+    console.debug("suggest-atom-picker: ", "selectAtom(", atom, ")");
     const atomUri = get(atom, "uri");
 
     if (atomUri) {

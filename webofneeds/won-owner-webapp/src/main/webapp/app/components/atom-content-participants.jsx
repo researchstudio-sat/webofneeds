@@ -241,6 +241,7 @@ export default class WonAtomContentParticipants extends React.Component {
             }
 
             this.props.ngRedux.dispatch(actionCreators.connections__close(connUri));
+            this.props.ngRedux.dispatch(actionCreators.view__hideModalDialog());
           },
         },
         {
@@ -319,7 +320,27 @@ export default class WonAtomContentParticipants extends React.Component {
       console.warn("Trying to invite to a non-owned or non groupSocket atom");
       return;
     }
-    this.props.ngRedux.dispatch(actionCreators.atoms__connect(this.atomUri, undefined, atomUri, message));
+
+    const payload = {
+      caption: "Group",
+      text: "Invite as Participant?",
+      buttons: [
+        {
+          caption: "Yes",
+          callback: () => {
+            this.props.ngRedux.dispatch(actionCreators.atoms__connect(this.atomUri, undefined, atomUri, message));
+            this.props.ngRedux.dispatch(actionCreators.view__hideModalDialog());
+          },
+        },
+        {
+          caption: "No",
+          callback: () => {
+            this.props.ngRedux.dispatch(actionCreators.view__hideModalDialog());
+          },
+        },
+      ],
+    };
+    this.props.ngRedux.dispatch(actionCreators.view__showModalDialog(payload));
   }
 
   markAsRead(conn) {
