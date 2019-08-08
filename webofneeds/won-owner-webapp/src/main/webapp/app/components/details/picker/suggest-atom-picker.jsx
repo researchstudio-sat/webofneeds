@@ -68,7 +68,7 @@ export default class WonSuggestAtomPicker extends React.Component {
       allActiveAtoms.filter(atom => !this.isSuggestable(atom));
 
     const suggestedAtom = get(allSuggestableAtoms, suggestedAtomUri);
-    const sortedActiveAtoms =
+    const sortedActiveAtomsArray =
       allSuggestableAtoms &&
       sortBy(allSuggestableAtoms, elem =>
         (elem.get("humanReadable") || "").toLowerCase()
@@ -99,7 +99,7 @@ export default class WonSuggestAtomPicker extends React.Component {
       allSuggestableAtoms,
       allForbiddenAtoms,
       suggestionsAvailable: allSuggestableAtoms && allSuggestableAtoms.size > 0,
-      sortedActiveAtoms,
+      sortedActiveAtomsArray,
       suggestedAtom,
       noSuggestionsLabel:
         this.props.noSuggestionsText || "No Atoms available to suggest",
@@ -126,22 +126,23 @@ export default class WonSuggestAtomPicker extends React.Component {
     let suggestions;
 
     if (this.state.suggestionsAvailable) {
-      const suggestionItems = this.state.sortedActiveAtoms.map(
-        (atom, atomUri) => {
-          return (
-            <div
-              key={atomUri}
-              onClick={() => this.selectAtom(atom)}
-              className={
-                "sap__posts__post clickable " +
-                (this.isSelected(atom) ? "won--selected" : "")
-              }
-            >
-              <WonAtomHeader atomUri={atomUri} ngRedux={this.props.ngRedux} />
-            </div>
-          );
-        }
-      );
+      const suggestionItems = this.state.sortedActiveAtomsArray.map(atom => {
+        return (
+          <div
+            key={get(atom, "uri")}
+            onClick={() => this.selectAtom(atom)}
+            className={
+              "sap__posts__post clickable " +
+              (this.isSelected(atom) ? "won--selected" : "")
+            }
+          >
+            <WonAtomHeader
+              atomUri={get(atom, "uri")}
+              ngRedux={this.props.ngRedux}
+            />
+          </div>
+        );
+      });
 
       suggestions = <div className="sap__posts">{suggestionItems}</div>;
     } else {
