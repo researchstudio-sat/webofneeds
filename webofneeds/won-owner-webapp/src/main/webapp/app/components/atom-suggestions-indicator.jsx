@@ -52,27 +52,6 @@ export default class WonAtomSuggestionsIndicator extends React.Component {
     };
   }
 
-  /*shouldComponentUpdate(nextProps, nextState) {
-    let shouldUpdate = false;
-    if (nextProps.atomUri !== this.props.atomUri) {
-      shouldUpdate = true;
-    } else if (nextState.hasSuggestions != this.state.hasSuggestions) {
-      shouldUpdate = true;
-    } else if (
-      nextState.hasUnreadSuggestions != this.state.hasUnreadSuggestions
-    ) {
-      shouldUpdate = true;
-    } else if (nextState.suggestionsCount != this.state.suggestionsCount) {
-      shouldUpdate = true;
-    } else if (
-      nextState.unreadSuggestionsCount != this.state.unreadSuggestionsCount
-    ) {
-      shouldUpdate = true;
-    }
-    console.debug("Suggestions Indicators shouldUpdate:", shouldUpdate);
-    return shouldUpdate;
-  }*/
-
   showAtomSuggestions() {
     this.props.ngRedux.dispatch(
       actionCreators.atoms__selectTab(
