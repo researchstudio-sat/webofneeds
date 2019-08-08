@@ -5,14 +5,14 @@
  */
 import angular from "angular";
 import ngAnimate from "angular-animate";
-import {get} from "../utils.js";
-import {attach, classOnComponentRoot} from "../cstm-ng-utils.js";
-import {actionCreators} from "../actions/actions.js";
+import { get } from "../utils.js";
+import { attach, classOnComponentRoot } from "../cstm-ng-utils.js";
+import { actionCreators } from "../actions/actions.js";
 import WonLabelledHr from "../components/labelled-hr.jsx";
 
 import * as accountUtils from "../redux/utils/account-utils.js";
 import * as viewSelectors from "../redux/selectors/view-selectors.js";
-import {h} from "preact";
+import { h } from "preact";
 import "~/style/_signup.scss";
 
 const template = (
@@ -121,7 +121,10 @@ const template = (
             />
             <label htmlFor="acceptToS">
               I accept the{" "}
-              <a className="clickable" ng-click="self.router__stateGo('about', {'aboutSection': 'aboutTermsOfService'})">
+              <a
+                className="clickable"
+                ng-click="self.router__stateGo('about', {'aboutSection': 'aboutTermsOfService'})"
+              >
                 Terms Of Service
               </a>
             </label>
@@ -135,7 +138,12 @@ const template = (
         >
           <span>Keep Postings</span>
         </button>
-        <won-preact className="labelledHr" component="self.WonLabelledHr" props="{label: 'or'}" ng-if="self.isAnonymous"/>
+        <won-preact
+          className="labelledHr"
+          component="self.WonLabelledHr"
+          props="{label: 'or'}"
+          ng-if="self.isAnonymous"
+        />
         <button
           className="won-button--filled red"
           ng-disabled="registerForm.$invalid"
@@ -173,7 +181,8 @@ class SignupController {
         privateId: accountUtils.getPrivateId(accountState),
         showModalDialog: state.getIn(["view", "showModalDialog"]),
         showSlideIns:
-          viewSelectors.hasSlideIns(state) && viewSelectors.isSlideInsVisible(state),
+          viewSelectors.hasSlideIns(state) &&
+          viewSelectors.isSlideInsVisible(state),
       };
     };
     const disconnect = this.$ngRedux.connect(select, actionCreators)(this);
@@ -206,9 +215,7 @@ class SignupController {
 
 export default {
   module: angular
-    .module("won.owner.components.signup", [
-      ngAnimate,
-    ])
+    .module("won.owner.components.signup", [ngAnimate])
     .controller("SignupController", [...serviceDependencies, SignupController])
     .name,
   controller: "SignupController",

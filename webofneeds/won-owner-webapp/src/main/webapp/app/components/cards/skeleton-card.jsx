@@ -3,14 +3,22 @@
  */
 import React from "react";
 import VisibilitySensor from "react-visibility-sensor";
-import {get, getIn} from "../../utils.js";
-import {actionCreators} from "../../actions/actions.js";
+import { get, getIn } from "../../utils.js";
+import { actionCreators } from "../../actions/actions.js";
 
 import "~/style/_skeleton-card.scss";
 import * as processUtils from "../../redux/utils/process-utils.js";
 import WonAtomSuggestionsIndicator from "../atom-suggestions-indicator.jsx";
+import PropTypes from "prop-types";
 
 export default class WonSkeletonCard extends React.Component {
+  static propTypes = {
+    atomUri: PropTypes.string.isRequired,
+    showPersona: PropTypes.bool,
+    showSuggestions: PropTypes.bool,
+    ngRedux: PropTypes.object.isRequired,
+  };
+
   componentDidMount() {
     this.atomUri = this.props.atomUri;
     this.disconnect = this.props.ngRedux.connect(
@@ -56,56 +64,81 @@ export default class WonSkeletonCard extends React.Component {
   render() {
     if (!this.state) {
       console.debug("render with null state");
-      return <div/>;
+      return <div />;
     }
 
-    const showSuggestions = !!(this.props && this.props.showSuggestions);
-    const showPersona = !!(this.props && this.props.showPersona);
+    const cardIconSkeleton = !this.state.atomLoaded ? (
+      <VisibilitySensor
+        onChange={isVisible => {
+          this.onChange(isVisible);
+        }}
+        intervalDelay={200}
+        partialVisibility={true}
+        offset={{ top: -300, bottom: -300 }}
+      >
+        <div className="card__icon__skeleton" />
+      </VisibilitySensor>
+    ) : (
+      undefined
+    );
 
-    const cardIconSkeleton = !this.state.atomLoaded
-      ? <VisibilitySensor onChange={(isVisible) => { this.onChange(isVisible) }} intervalDelay={200} partialVisibility={true} offset={{top: -300, bottom: -300}}><div className="card__icon__skeleton"/></VisibilitySensor>
-      : undefined;
-
-    const cardMainFailed = this.state.atomFailedToLoad
-      ? (
-        <div className="card__main">
-          <div className="card__main__topline">
-            <div className="card__main__topline__notitle">
-              Atom Loading failed
-            </div>
-          </div>
-          <div className="card__main__subtitle">
-            <span className="card__main__subtitle__type">
-              Atom might have been deleted.
-            </span>
-          </div>
-        </div>
-      )
-      : undefined;
-
-    const cardMain = (this.state.atomLoading || this.state.atomToLoad || this.state.atomInCreation)
-      ? (
-        <div className="card__main">
-          <div className="card__main__topline">
-            <div className="card__main__topline__title"></div>
-          </div>
-          <div className="card__main__subtitle">
-            <span className="card__main__subtitle__type"></span>
+    const cardMainFailed = this.state.atomFailedToLoad ? (
+      <div className="card__main">
+        <div className="card__main__topline">
+          <div className="card__main__topline__notitle">
+            Atom Loading failed
           </div>
         </div>
-    )
-    : undefined;
+        <div className="card__main__subtitle">
+          <span className="card__main__subtitle__type">
+            Atom might have been deleted.
+          </span>
+        </div>
+      </div>
+    ) : (
+      undefined
+    );
 
-    const cardPersona = (this.props.showPersona && !this.state.atomLoaded)
-      ? <div className="card__nopersona"/>
-      : undefined;
+    const cardMain =
+      this.state.atomLoading ||
+      this.state.atomToLoad ||
+      this.state.atomInCreation ? (
+        <div className="card__main">
+          <div className="card__main__topline">
+            <div className="card__main__topline__title" />
+          </div>
+          <div className="card__main__subtitle">
+            <span className="card__main__subtitle__type" />
+          </div>
+        </div>
+      ) : (
+        undefined
+      );
 
-    const cardSuggestions = (this.props.showSuggestions)
-      ? <WonAtomSuggestionsIndicator atomUri={this.atomUri} ngRedux={this.props.ngRedux}/>
-      : undefined;
+    const cardPersona =
+      this.props.showPersona && !this.state.atomLoaded ? (
+        <div className="card__nopersona" />
+      ) : (
+        undefined
+      );
+
+    const cardSuggestions = this.props.showSuggestions ? (
+      <WonAtomSuggestionsIndicator
+        atomUri={this.atomUri}
+        ngRedux={this.props.ngRedux}
+      />
+    ) : (
+      undefined
+    );
 
     return (
-      <won-skeleton-card class={(this.state.atomLoading || this.state.atomInCreation ? " won-is-loading " : "") + (this.state.atomToLoad ? "won-is-toload" : "")}>
+      <won-skeleton-card
+        class={
+          (this.state.atomLoading || this.state.atomInCreation
+            ? " won-is-loading "
+            : "") + (this.state.atomToLoad ? "won-is-toload" : "")
+        }
+      >
         {cardIconSkeleton}
         {cardMainFailed}
         {cardMain}
@@ -124,7 +157,9 @@ export default class WonSkeletonCard extends React.Component {
       !this.state.atomInCreation &&
       this.state.atomToLoad
     ) {
-      this.props.ngRedux.dispatch(actionCreators.atoms__fetchUnloadedAtom(this.atomUri));
+      this.props.ngRedux.dispatch(
+        actionCreators.atoms__fetchUnloadedAtom(this.atomUri)
+      );
     }
   }
 

@@ -2,14 +2,21 @@
  * Created by quasarchimaere on 30.07.2019.
  */
 import React from "react";
-import {get, getIn} from "../../utils.js";
-import {actionCreators} from "../../actions/actions.js";
+import { get, getIn } from "../../utils.js";
+import { actionCreators } from "../../actions/actions.js";
 import * as atomUtils from "../../redux/utils/atom-utils.js";
 
 import "~/style/_persona-card.scss";
 import Immutable from "immutable";
+import PropTypes from "prop-types";
 
 export default class WonPersonaCard extends React.Component {
+  static propTypes = {
+    atomUri: PropTypes.string.isRequired,
+    ngRedux: PropTypes.object.isRequired,
+    onAtomClick: PropTypes.func,
+  };
+
   componentDidMount() {
     this.atomUri = this.props.atomUri;
     this.disconnect = this.props.ngRedux.connect(
@@ -47,20 +54,42 @@ export default class WonPersonaCard extends React.Component {
   render() {
     if (!this.state) {
       console.debug("render with null state");
-      return <div/>;
+      return <div />;
     }
 
-    const personaIdenticon = this.state.showDefaultIcon && this.state.identiconSvg
-      ? <img className="identicon" alt="Auto-generated title image" src={"data:image/svg+xml;base64,"+this.state.identiconSvg}/>
-      : undefined;
+    const personaIdenticon =
+      this.state.showDefaultIcon && this.state.identiconSvg ? (
+        <img
+          className="identicon"
+          alt="Auto-generated title image"
+          src={"data:image/svg+xml;base64," + this.state.identiconSvg}
+        />
+      ) : (
+        undefined
+      );
 
-    const personaImage = this.state.atomImage
-      ? <img className="image" alt={this.state.atomImage.get('name')} src={"data:"+this.state.atomImage.get('type')+";base64,"+this.state.atomImage.get('data')}/>
-      : undefined;
+    const personaImage = this.state.atomImage ? (
+      <img
+        className="image"
+        alt={this.state.atomImage.get("name")}
+        src={
+          "data:" +
+          this.state.atomImage.get("type") +
+          ";base64," +
+          this.state.atomImage.get("data")
+        }
+      />
+    ) : (
+      undefined
+    );
 
     return (
       <won-persona-card onClick={() => this.atomClick()}>
-        <div className={"card__icon clickable " + (this.state.isInactive ? "inactive" : "")}>
+        <div
+          className={
+            "card__icon clickable " + (this.state.isInactive ? "inactive" : "")
+          }
+        >
           {personaIdenticon}
           {personaImage}
         </div>
@@ -75,10 +104,14 @@ export default class WonPersonaCard extends React.Component {
     if (this.props.onAtomClick) {
       this.props.onAtomClick();
     } else {
-      this.props.ngRedux.dispatch(actionCreators.atoms__selectTab(
-        Immutable.fromJS({ atomUri: this.atomUri, selectTab: "DETAIL" })
-      ));
-      this.props.ngRedux.dispatch(actionCreators.router__stateGo("post", { postUri: this.atomUri }));
+      this.props.ngRedux.dispatch(
+        actionCreators.atoms__selectTab(
+          Immutable.fromJS({ atomUri: this.atomUri, selectTab: "DETAIL" })
+        )
+      );
+      this.props.ngRedux.dispatch(
+        actionCreators.router__stateGo("post", { postUri: this.atomUri })
+      );
     }
   }
 }

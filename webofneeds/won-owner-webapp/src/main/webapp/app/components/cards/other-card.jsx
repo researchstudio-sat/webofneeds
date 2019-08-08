@@ -2,18 +2,28 @@
  * Created by quasarchimaere on 30.07.2019.
  */
 import React from "react";
-import {get, getIn} from "../../utils.js";
-import {actionCreators} from "../../actions/actions.js";
+import { get, getIn } from "../../utils.js";
+import { actionCreators } from "../../actions/actions.js";
 import * as atomUtils from "../../redux/utils/atom-utils.js";
 
 import "~/style/_other-card.scss";
 import Immutable from "immutable";
-import {relativeTime} from "../../won-label-utils.js";
-import {selectLastUpdateTime} from "../../redux/selectors/general-selectors.js";
+import { relativeTime } from "../../won-label-utils.js";
+import { selectLastUpdateTime } from "../../redux/selectors/general-selectors.js";
 import WonAtomMap from "../atom-map.jsx";
 import WonAtomSuggestionsIndicator from "../atom-suggestions-indicator.jsx";
+import PropTypes from "prop-types";
 
 export default class WonOtherCard extends React.Component {
+  static propTypes = {
+    atomUri: PropTypes.string.isRequired,
+    showPersona: PropTypes.bool,
+    showSuggestions: PropTypes.bool,
+    currentLocation: PropTypes.object,
+    onAtomClick: PropTypes.func,
+    ngRedux: PropTypes.object.isRequired,
+  };
+
   componentDidMount() {
     this.atomUri = this.props.atomUri;
     this.disconnect = this.props.ngRedux.connect(
@@ -52,8 +62,7 @@ export default class WonOtherCard extends React.Component {
     const persona = getIn(state, ["atoms", personaUri]);
     const personaName = get(persona, "humanReadable");
     const personaHolds = persona && get(persona, "holds");
-    const personaVerified =
-      personaHolds && personaHolds.includes(this.atomUri);
+    const personaVerified = personaHolds && personaHolds.includes(this.atomUri);
     const personaIdenticonSvg = atomUtils.getIdenticonSvg(persona);
     const personaImage = atomUtils.getDefaultPersonaImage(persona);
 
@@ -72,10 +81,7 @@ export default class WonOtherCard extends React.Component {
       isChatEnabled: atomUtils.hasChatSocket(atom),
       friendlyTimestamp:
         atom &&
-        relativeTime(
-          selectLastUpdateTime(state),
-          get(atom, "lastUpdateDate")
-        ),
+        relativeTime(selectLastUpdateTime(state), get(atom, "lastUpdateDate")),
       showPersonaImage: personaImage,
       showPersonaIdenticon: !personaImage && personaIdenticonSvg,
       personaIdenticonSvg,
@@ -93,82 +99,124 @@ export default class WonOtherCard extends React.Component {
   render() {
     if (!this.state) {
       console.debug("render with null state");
-      return <div/>;
+      return <div />;
     }
 
-    const style = (this.state.showDefaultIcon && this.state.iconBackground) ? {
-      backgroundColor: this.state.iconBackground
-    } : undefined;
+    const style =
+      this.state.showDefaultIcon && this.state.iconBackground
+        ? {
+            backgroundColor: this.state.iconBackground,
+          }
+        : undefined;
 
     const cardIcon = (
-      <div className={"card__icon clickable " + (this.state.isInactive? " inactive " : "") + (this.state.showMap ? "card__icon--map" : "")} onClick={() => this.atomClick()} style={style} >
-        {
-          (this.state.showDefaultIcon && this.state.useCaseIcon)
-            ? (
-              <div className="identicon usecaseimage">
-                <svg>
-                  <use xlinkHref={this.state.useCaseIcon} href={this.state.useCaseIcon}/>
-                </svg>
-              </div>
-            )
-            : undefined
+      <div
+        className={
+          "card__icon clickable " +
+          (this.state.isInactive ? " inactive " : "") +
+          (this.state.showMap ? "card__icon--map" : "")
         }
-        {
-          (this.state.showDefaultIcon && this.state.identiconSvg)
-          ? <img className="identicon" alt="Auto-generated title image" src={"data:image/svg+xml;base64," + this.state.identiconSvg}/>
-          : undefined
-        }
-        {
-          this.state.atomImage
-          ? <img className="image" alt={this.state.atomImage.get('name')} src={"data:"+this.state.atomImage.get('type')+";base64,"+this.state.atomImage.get('data')} />
-          : undefined
-        }
-        {
-          this.state.showMap
-          ? (
-            <div className="won-atom-map location">
-              <WonAtomMap locations={[this.state.atomLocation]} currentLocation={this.state.currentLocation} disableControls={true}/>
-            </div>
-          )
-          : undefined
-        }
+        onClick={() => this.atomClick()}
+        style={style}
+      >
+        {this.state.showDefaultIcon && this.state.useCaseIcon ? (
+          <div className="identicon usecaseimage">
+            <svg>
+              <use
+                xlinkHref={this.state.useCaseIcon}
+                href={this.state.useCaseIcon}
+              />
+            </svg>
+          </div>
+        ) : (
+          undefined
+        )}
+        {this.state.showDefaultIcon && this.state.identiconSvg ? (
+          <img
+            className="identicon"
+            alt="Auto-generated title image"
+            src={"data:image/svg+xml;base64," + this.state.identiconSvg}
+          />
+        ) : (
+          undefined
+        )}
+        {this.state.atomImage ? (
+          <img
+            className="image"
+            alt={this.state.atomImage.get("name")}
+            src={
+              "data:" +
+              this.state.atomImage.get("type") +
+              ";base64," +
+              this.state.atomImage.get("data")
+            }
+          />
+        ) : (
+          undefined
+        )}
+        {this.state.showMap ? (
+          <div className="won-atom-map location">
+            <WonAtomMap
+              locations={[this.state.atomLocation]}
+              currentLocation={this.state.currentLocation}
+              disableControls={true}
+            />
+          </div>
+        ) : (
+          undefined
+        )}
       </div>
     );
 
     const cardMain = (
-      <div className={"card__main clickable " + (!this.state.showDefaultIcon ? "card__main--showIcon" : "")} onClick={() => this.atomClick()}>
+      <div
+        className={
+          "card__main clickable " +
+          (!this.state.showDefaultIcon ? "card__main--showIcon" : "")
+        }
+        onClick={() => this.atomClick()}
+      >
         {this.createCardMainIcon()}
         {this.createCardMainTopline()}
         {this.createCardMainSubtitle()}
       </div>
     );
 
-    const cardPersonaInfo = this.props.showPersona && this.state.persona && this.state.atomHasHoldableSocket
-      ? (
-        <div className="card__persona clickable" onClick={() => this.personaClick(this.state.personaUri)}>
+    const cardPersonaInfo =
+      this.props.showPersona &&
+      this.state.persona &&
+      this.state.atomHasHoldableSocket ? (
+        <div
+          className="card__persona clickable"
+          onClick={() => this.personaClick(this.state.personaUri)}
+        >
           {this.createPersonaInfoIcon()}
-          {
-            this.state.personaName
-            ? (
-              <div className="card__persona__name">
-                <span className="card__persona__name__label">{this.state.personaName}</span>
-                {this.createVerificationLabel()}
-              </div>
-            )
-            : undefined
-          }
+          {this.state.personaName ? (
+            <div className="card__persona__name">
+              <span className="card__persona__name__label">
+                {this.state.personaName}
+              </span>
+              {this.createVerificationLabel()}
+            </div>
+          ) : (
+            undefined
+          )}
           {this.createPersonaWebsite()}
         </div>
-      )
-      : undefined;
+      ) : (
+        undefined
+      );
 
-    const cardSuggestionIndicators = this.props.showSuggestions
-      ? (
-        <div className="card__indicators">
-          <WonAtomSuggestionsIndicator atomUri={this.atomUri} ngRedux={this.props.ngRedux}/>
-        </div>
-      )
-      : undefined;
+    const cardSuggestionIndicators = this.props.showSuggestions ? (
+      <div className="card__indicators">
+        <WonAtomSuggestionsIndicator
+          atomUri={this.atomUri}
+          ngRedux={this.props.ngRedux}
+        />
+      </div>
+    ) : (
+      undefined
+    );
 
     return (
       <won-other-card>
@@ -182,8 +230,12 @@ export default class WonOtherCard extends React.Component {
 
   createCardMainSubtitle() {
     const createGroupChatLabel = () => {
-      if(this.state.isGroupChatEnabled) {
-        return <span className="card__main__subtitle__type__groupchat">{"Group Chat"+ (this.state.isChatEnabled ? " enabled" : "")}</span>;
+      if (this.state.isGroupChatEnabled) {
+        return (
+          <span className="card__main__subtitle__type__groupchat">
+            {"Group Chat" + (this.state.isChatEnabled ? " enabled" : "")}
+          </span>
+        );
       }
       return undefined;
     };
@@ -192,9 +244,7 @@ export default class WonOtherCard extends React.Component {
       <div className="card__main__subtitle">
         <span className="card__main__subtitle__type">
           {createGroupChatLabel()}
-          <span>
-            {this.state.atomTypeLabel}
-          </span>
+          <span>{this.state.atomTypeLabel}</span>
         </span>
         <div className="card__main__subtitle__date">
           {this.state.friendlyTimestamp}
@@ -221,69 +271,87 @@ export default class WonOtherCard extends React.Component {
     };
 
     const generateCardTitle = () => {
-      if(hasTitle()) {
-        return <div className="card__main__topline__title">{generateTitleString()}</div>;
+      if (hasTitle()) {
+        return (
+          <div className="card__main__topline__title">
+            {generateTitleString()}
+          </div>
+        );
       } else {
-        if(this.state.isDirectResponse) {
+        if (this.state.isDirectResponse) {
           return <div className="card__main__topline__notitle">no title</div>;
         } else {
-          return <div className="card__main__topline__notitle">Re: no title</div>
+          return (
+            <div className="card__main__topline__notitle">Re: no title</div>
+          );
         }
       }
     };
 
-    return (
-      <div className="card__main__topline">
-        {generateCardTitle()}
-      </div>);
+    return <div className="card__main__topline">{generateCardTitle()}</div>;
   }
 
   createCardMainIcon() {
-    if(!this.state.showDefaultIcon) {
-      const style = (!this.state.hasImage && this.state.iconBackground) ? {
-        backgroundColor: this.state.iconBackground
-      } : undefined;
+    if (!this.state.showDefaultIcon) {
+      const style =
+        !this.state.hasImage && this.state.iconBackground
+          ? {
+              backgroundColor: this.state.iconBackground,
+            }
+          : undefined;
 
       return (
         <div className="card__main__icon" style={style}>
-          {
-            this.state.useCaseIcon
-            ? (
-              <div className="card__main__icon__usecaseimage">
-                <svg>
-                  <use xlinkHref={this.state.useCaseIcon} href={this.state.useCaseUtils} />
-                </svg>
-              </div>
-            )
-            : undefined
-          }
-          {
-            this.state.identiconSvg
-            ? <img className="card__main__icon__identicon" alt="Auto-generated title image" src={"data:image/svg+xml;base64,"+ this.state.identiconSvg} />
-            : undefined
-          }
-
+          {this.state.useCaseIcon ? (
+            <div className="card__main__icon__usecaseimage">
+              <svg>
+                <use
+                  xlinkHref={this.state.useCaseIcon}
+                  href={this.state.useCaseUtils}
+                />
+              </svg>
+            </div>
+          ) : (
+            undefined
+          )}
+          {this.state.identiconSvg ? (
+            <img
+              className="card__main__icon__identicon"
+              alt="Auto-generated title image"
+              src={"data:image/svg+xml;base64," + this.state.identiconSvg}
+            />
+          ) : (
+            undefined
+          )}
         </div>
       );
     }
   }
 
   createPersonaWebsite() {
-    if(this.state.personaWebsite) {
+    if (this.state.personaWebsite) {
       return (
-        [
+        <React.Fragment>
           <div className="card__persona__websitelabel">Website:</div>,
-          <a className="card__persona__websitelink" target="_blank" href={this.state.personaWebsite}>{this.state.personaWebsite}</a>
-        ]
+          <a
+            className="card__persona__websitelink"
+            target="_blank"
+            rel="noopener noreferrer"
+            href={this.state.personaWebsite}
+          >
+            {this.state.personaWebsite}
+          </a>
+        </React.Fragment>
       );
     }
   }
   createVerificationLabel() {
-    if(this.state.personaVerified) {
+    if (this.state.personaVerified) {
       return (
         <span
           className="card__persona__name__verification card__persona__name__verification--verified"
-          title="The Persona-Relation of this Post is verified by the Persona">
+          title="The Persona-Relation of this Post is verified by the Persona"
+        >
           Verified
         </span>
       );
@@ -291,7 +359,8 @@ export default class WonOtherCard extends React.Component {
       return (
         <span
           className="card__persona__name__verification card__persona__name__verification--unverified"
-          title="The Persona-Relation of this Post is NOT verified by the Persona">
+          title="The Persona-Relation of this Post is NOT verified by the Persona"
+        >
           Unverified!
         </span>
       );
@@ -299,41 +368,53 @@ export default class WonOtherCard extends React.Component {
   }
 
   createPersonaInfoIcon() {
-    if(this.state.showPersonaIdenticon) {
+    if (this.state.showPersonaIdenticon) {
       return (
-        <img className="card__persona__icon"
-           alt="Auto-generated title image for persona that holds the atom"
-           src={"data:image/svg+xml;base64," + this.state.personaIdenticonSvg}
+        <img
+          className="card__persona__icon"
+          alt="Auto-generated title image for persona that holds the atom"
+          src={"data:image/svg+xml;base64," + this.state.personaIdenticonSvg}
         />
       );
     }
-    if(this.state.showPersonaImage) {
+    if (this.state.showPersonaImage) {
       return (
-        <img className="card__persona__icon"
-            alt={this.state.personaImage.get('name')}
-            src={"data:"+ this.state.personaImage.get("type") + ";base64," + this.state.personaImage.get('data')}
+        <img
+          className="card__persona__icon"
+          alt={this.state.personaImage.get("name")}
+          src={
+            "data:" +
+            this.state.personaImage.get("type") +
+            ";base64," +
+            this.state.personaImage.get("data")
+          }
         />
       );
     }
-
-
-
   }
 
   atomClick() {
     if (this.props.onAtomClick) {
       this.props.onAtomClick();
     } else {
-      this.props.ngRedux.dispatch(actionCreators.atoms__selectTab(
-        Immutable.fromJS({ atomUri: this.atomUri, selectTab: "DETAIL" })
-      ));
-      this.props.ngRedux.dispatch(actionCreators.router__stateGo("post", { postUri: this.atomUri }));
+      this.props.ngRedux.dispatch(
+        actionCreators.atoms__selectTab(
+          Immutable.fromJS({ atomUri: this.atomUri, selectTab: "DETAIL" })
+        )
+      );
+      this.props.ngRedux.dispatch(
+        actionCreators.router__stateGo("post", { postUri: this.atomUri })
+      );
     }
   }
   personaClick(personaUri) {
-    this.props.ngRedux.dispatch(actionCreators.atoms__selectTab(
-      Immutable.fromJS({ atomUri: personaUri, selectTab: "DETAIL" })
-    ));
-    this.props.ngRedux.dispatch(actionCreators.router__stateGo("post", { postUri: personaUri }));
+    this.props.ngRedux.dispatch(
+      actionCreators.atoms__selectTab(
+        Immutable.fromJS({ atomUri: personaUri, selectTab: "DETAIL" })
+      )
+    );
+    this.props.ngRedux.dispatch(
+      actionCreators.router__stateGo("post", { postUri: personaUri })
+    );
   }
 }

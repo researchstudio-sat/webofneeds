@@ -1,12 +1,16 @@
 /** @jsx h */
 import angular from "angular";
 import ngAnimate from "angular-animate";
-import {delay, get, getIn,} from "../utils.js";
-import {reverseSearchNominatim, scrubSearchResults, searchNominatim,} from "../api/nominatim-api.js";
-import {attach, classOnComponentRoot} from "../cstm-ng-utils.js";
+import { delay, get, getIn } from "../utils.js";
+import {
+  reverseSearchNominatim,
+  scrubSearchResults,
+  searchNominatim,
+} from "../api/nominatim-api.js";
+import { attach, classOnComponentRoot } from "../cstm-ng-utils.js";
 import Immutable from "immutable";
-import {connect2Redux} from "../configRedux.js";
-import {actionCreators} from "../actions/actions.js";
+import { connect2Redux } from "../configRedux.js";
+import { actionCreators } from "../actions/actions.js";
 import postMessagesModule from "../components/post-messages.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as viewSelectors from "../redux/selectors/view-selectors.js";
@@ -14,14 +18,13 @@ import * as processUtils from "../redux/utils/process-utils.js";
 import * as wonLabelUtils from "../won-label-utils.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import wonInput from "../directives/input.js";
-import {h} from "preact";
+import { h } from "preact";
 import * as accountUtils from "../redux/utils/account-utils.js";
 import WonAtomCardGrid from "../components/atom-card-grid.jsx";
 import WonAtomMap from "../components/atom-map.jsx";
 
 import "~/style/_map.scss";
 import "~/style/_connection-overlay.scss";
-
 
 const template = (
   <container>
@@ -191,10 +194,13 @@ const template = (
           {"See What's Around"}
         </div>
       </div>
-      <won-preact className="ownermap__map hide-in-responsive won-atom-map" component="self.WonAtomMap"
-                  ng-class="{'ownermap__map--visible': !(self.showLocationInput || (self.isLocationAccessDenied && !self.lastWhatsAroundLocation))}"
-                  props="{ locations: self.locations, currentLocation: self.lastWhatsAroundLocation }"
-                  ng-if="!self.isOwnerAtomUrisToLoad && self.lastWhatsAroundLocation"/>
+      <won-preact
+        className="ownermap__map hide-in-responsive won-atom-map"
+        component="self.WonAtomMap"
+        ng-class="{'ownermap__map--visible': !(self.showLocationInput || (self.isLocationAccessDenied && !self.lastWhatsAroundLocation))}"
+        props="{ locations: self.locations, currentLocation: self.lastWhatsAroundLocation }"
+        ng-if="!self.isOwnerAtomUrisToLoad && self.lastWhatsAroundLocation"
+      />
       <div
         className="ownermap__content"
         ng-if="self.lastWhatsAroundLocation && self.hasVisibleAtomUris"
@@ -244,7 +250,8 @@ class Controller {
         "lastWhatsAroundMaxDistance",
       ]);
 
-      const whatsAroundMetaAtoms = generalSelectors.getWhatsAroundAtoms(state)
+      const whatsAroundMetaAtoms = generalSelectors
+        .getWhatsAroundAtoms(state)
         .filter(metaAtom => atomUtils.isActive(metaAtom))
         .filter(metaAtom => !atomUtils.isSearchAtom(metaAtom))
         .filter(metaAtom => !atomUtils.isDirectResponseAtom(metaAtom))
@@ -316,7 +323,8 @@ class Controller {
         isOwnerAtomUrisLoading,
         isOwnerAtomUrisToLoad,
         showSlideIns:
-          viewSelectors.hasSlideIns(state) && viewSelectors.isSlideInsVisible(state),
+          viewSelectors.hasSlideIns(state) &&
+          viewSelectors.isSlideInsVisible(state),
         showModalDialog: viewSelectors.showModalDialog(state),
         showConnectionOverlay: !!viewConnUri,
         viewConnUri,

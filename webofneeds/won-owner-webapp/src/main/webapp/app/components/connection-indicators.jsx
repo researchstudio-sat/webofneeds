@@ -6,16 +6,23 @@
  * Created by quasarchimaere on 15.01.2019.
  */
 import React from "react";
-import {actionCreators} from "../actions/actions.js";
+import { actionCreators } from "../actions/actions.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as connectionSelectors from "../redux/selectors/connection-selectors.js";
-import {get, getIn, sortByDate} from "../utils.js";
+import { get, getIn, sortByDate } from "../utils.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as connectionUtils from "../redux/utils/connection-utils.js";
 
 import "~/style/_connection-indicators.scss";
+import PropTypes from "prop-types";
 
 export default class WonConnectionIndicators extends React.Component {
+  static propTypes = {
+    atomUri: PropTypes.string.isRequired,
+    ngRedux: PropTypes.object.isRequired,
+    onClick: PropTypes.func.isRequired,
+  };
+
   componentDidMount() {
     this.atomUri = this.props.atomUri;
     this.disconnect = this.props.ngRedux.connect(
@@ -58,10 +65,7 @@ export default class WonConnectionIndicators extends React.Component {
           targetAtomActiveOrLoading &&
           (connectionSelectors.isChatToXConnection(allPosts, conn) ||
             connectionSelectors.isGroupToXConnection(allPosts, conn)) &&
-          !(
-            connectionUtils.isSuggested(conn) ||
-            connectionUtils.isClosed(conn)
-          )
+          !(connectionUtils.isSuggested(conn) || connectionUtils.isClosed(conn))
         );
       });
 
@@ -77,7 +81,6 @@ export default class WonConnectionIndicators extends React.Component {
       latestConnectedUri: this.retrieveLatestUri(connected),
     };
   }
-
 
   /**
    * This method returns either the latest unread uri of the given connection elements, or the latest uri of a read connection, if nothing is found undefined is returned
@@ -107,19 +110,17 @@ export default class WonConnectionIndicators extends React.Component {
   render() {
     if (!this.state) {
       console.debug("render with null state");
-      return <div/>;
+      return <div />;
     }
 
-    let icon;
-
-    if(this.state.postLoading) {
+    if (this.state.postLoading) {
       return (
         <won-connection-indicators class="won-is-loading">
           <div className="indicators__item indicators__item--skeleton">
             <svg className="indicators__item__icon">
-              <use xlinkHref="#ico36_message" href="#ico36_message"/>
+              <use xlinkHref="#ico36_message" href="#ico36_message" />
             </svg>
-            <span className="indicators__item__caption"/>
+            <span className="indicators__item__caption" />
           </div>
         </won-connection-indicators>
       );
@@ -128,15 +129,24 @@ export default class WonConnectionIndicators extends React.Component {
         <won-connection-indicators>
           <a
             className={
-              "indicators__item "
-              + ((!this.state.unreadConnected && this.state.latestConnectedUri)? " indicators__item--reads ": "")
-              + ((this.state.unreadConnected && this.state.latestConnectedUri)? " indicators__item--unreads ": "")
-              + (!this.state.latestConnectedUri? " indicators__item--disabled ": "")
+              "indicators__item " +
+              (!this.state.unreadConnected && this.state.latestConnectedUri
+                ? " indicators__item--reads "
+                : "") +
+              (this.state.unreadConnected && this.state.latestConnectedUri
+                ? " indicators__item--unreads "
+                : "") +
+              (!this.state.latestConnectedUri
+                ? " indicators__item--disabled "
+                : "")
             }
             onClick={() => this.setOpen()}
           >
-            <svg className="indicators__item__icon" title="Show latest message/request">
-              <use xlinkHref="#ico36_message" href="#ico36_message"></use>
+            <svg
+              className="indicators__item__icon"
+              title="Show latest message/request"
+            >
+              <use xlinkHref="#ico36_message" href="#ico36_message" />
             </svg>
           </a>
         </won-connection-indicators>
@@ -145,7 +155,7 @@ export default class WonConnectionIndicators extends React.Component {
   }
 
   setOpen() {
-    if(this.state.latestConnectedUri) {
+    if (this.state.latestConnectedUri) {
       this.props.onClick(this.state.latestConnectedUri);
     }
   }

@@ -5,14 +5,13 @@
  */
 import angular from "angular";
 import ngAnimate from "angular-animate";
-import { getIn, get } from "../utils.js";
-import { attach } from "../cstm-ng-utils.js";
+import { get, getIn } from "../utils.js";
+import { attach, classOnComponentRoot } from "../cstm-ng-utils.js";
 import { actionCreators } from "../actions/actions.js";
 import settingsWrapper from "../components/settings-wrapper.js";
 import * as viewSelectors from "../redux/selectors/view-selectors.js";
 import * as accountUtils from "../redux/utils/account-utils.js";
 import { h } from "preact";
-import { classOnComponentRoot } from "../cstm-ng-utils.js";
 
 import "~/style/_signup.scss";
 
@@ -50,7 +49,8 @@ class SettingsController {
         appTitle: getIn(state, ["config", "theme", "title"]),
         showModalDialog: state.getIn(["view", "showModalDialog"]),
         showSlideIns:
-          viewSelectors.hasSlideIns(state) && viewSelectors.isSlideInsVisible(state),
+          viewSelectors.hasSlideIns(state) &&
+          viewSelectors.isSlideInsVisible(state),
       };
     };
     const disconnect = this.$ngRedux.connect(select, actionCreators)(this);

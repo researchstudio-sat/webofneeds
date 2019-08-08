@@ -2,8 +2,8 @@
  * Created by quasarchimaere on 30.07.2019.
  */
 import React from "react";
-import {get, getIn, sortBy} from "../../../utils.js";
-import {actionCreators} from "../../../actions/actions.js";
+import { get, getIn, sortBy } from "../../../utils.js";
+import { actionCreators } from "../../../actions/actions.js";
 
 import * as generalSelectors from "../../../redux/selectors/general-selectors.js";
 
@@ -11,8 +11,20 @@ import "~/style/_suggest-atom-picker.scss";
 import Immutable from "immutable";
 import WonAtomHeader from "../../atom-header.jsx";
 import WonLabelledHr from "../../labelled-hr.jsx";
+import PropTypes from "prop-types";
 
 export default class WonSuggestAtomPicker extends React.Component {
+  static propTypes = {
+    initialValue: PropTypes.any,
+    detail: PropTypes.any,
+    excludedUris: PropTypes.arrayOf(PropTypes.string),
+    allowedSockets: PropTypes.arrayOf(PropTypes.string),
+    excludedText: PropTypes.string,
+    notAllowedSocketText: PropTypes.string,
+    noSuggestionsText: PropTypes.string,
+    ngRedux: PropTypes.object.isRequired,
+    onUpdate: PropTypes.func.isRequired,
+  };
   //TODO: CHANGE AND UPDATE LISTENERS DONT WORK
   //TODO: IMPLEMENT ->
   /*
@@ -60,8 +72,7 @@ export default class WonSuggestAtomPicker extends React.Component {
     const allActiveAtoms = generalSelectors.getActiveAtoms(state);
 
     const allSuggestableAtoms =
-      allActiveAtoms &&
-      allActiveAtoms.filter(atom => this.isSuggestable(atom));
+      allActiveAtoms && allActiveAtoms.filter(atom => this.isSuggestable(atom));
 
     const allForbiddenAtoms =
       allActiveAtoms &&
@@ -98,12 +109,11 @@ export default class WonSuggestAtomPicker extends React.Component {
       uriToFetchIsNotAllowed,
       allSuggestableAtoms,
       allForbiddenAtoms,
-      suggestionsAvailable:
-        allSuggestableAtoms && allSuggestableAtoms.size > 0,
+      suggestionsAvailable: allSuggestableAtoms && allSuggestableAtoms.size > 0,
       sortedActiveAtoms,
       suggestedAtom,
       noSuggestionsLabel:
-        this.noSuggestionsText || "No Atoms available to suggest",
+        this.props.noSuggestionsText || "No Atoms available to suggest",
       uriToFetchSuccess:
         this.state.uriToFetch &&
         !uriToFetchLoading &&
@@ -121,84 +131,94 @@ export default class WonSuggestAtomPicker extends React.Component {
   render() {
     if (!this.state) {
       console.debug("render with null state");
-      return <div/>;
+      return <div />;
     }
 
     let suggestions;
 
     if (this.state.suggestionsAvailable) {
-      const suggestionItems = this.state.sortedActiveAtoms.map((atom, atomUri) => {
-        return (
-          <div
-            key={atom.get('uri')}
-            onClick={() => this.selectAtom(atom)}
-            className={"sap__posts__post clickable " + (this.isSelected(atom) ? "won--selected" : "")}
-          >
-            <WonAtomHeader atomUri={atom.get('uri')} ngRedux={this.props.ngRedux}/>
-          </div>
-        );
-      });
-
-      suggestions = (
-        <div className="sap__posts">{suggestionItems}</div>
+      const suggestionItems = this.state.sortedActiveAtoms.map(
+        (atom, atomUri) => {
+          return (
+            <div
+              key={atomUri}
+              onClick={() => this.selectAtom(atom)}
+              className={
+                "sap__posts__post clickable " +
+                (this.isSelected(atom) ? "won--selected" : "")
+              }
+            >
+              <WonAtomHeader atomUri={atomUri} ngRedux={this.props.ngRedux} />
+            </div>
+          );
+        }
       );
+
+      suggestions = <div className="sap__posts">{suggestionItems}</div>;
     } else {
       suggestions = (
-        <div className="sap__noposts">{this.props.noSuggestionsLabel}</div>
+        <div className="sap__noposts">{this.state.noSuggestionsLabel}</div>
       );
     }
 
     let suggestPostInputIcon;
 
-    if(this.state.uriToFetchLoading) {
+    if (this.state.uriToFetchLoading) {
       suggestPostInputIcon = (
         <svg className="sap__input__icon hspinner">
-          <use xlinkHref="#ico_loading_anim" href="#ico_loading_anim"></use>
+          <use xlinkHref="#ico_loading_anim" href="#ico_loading_anim" />
         </svg>
       );
     } else if (this.fetchAtomUriFieldHasText()) {
       if (this.state.showFetchButton && !this.state.uriToFetchFailed) {
         suggestPostInputIcon = (
-          <svg className="sap__input__icon clickable" onClick={() => this.fetchAtom()}>
-            <use xlinkHref="#ico16_checkmark" href="#ico16_checkmark"></use>
+          <svg
+            className="sap__input__icon clickable"
+            onClick={() => this.fetchAtom()}
+          >
+            <use xlinkHref="#ico16_checkmark" href="#ico16_checkmark" />
           </svg>
         );
       } else if (this.state.showResetButton || this.state.uriToFetchFailed) {
         suggestPostInputIcon = (
-          <svg className="sap__input__icon clickable" onClick={() => this.resetAtomUriField()}>
-            <use xlinkHref="#ico36_close" href="#ico36_close"></use>
+          <svg
+            className="sap__input__icon clickable"
+            onClick={() => this.resetAtomUriField()}
+          >
+            <use xlinkHref="#ico36_close" href="#ico36_close" />
           </svg>
         );
       }
     }
 
     let suggestPostErrors;
-    if(this.fetchAtomUriFieldHasText()) {
+    if (this.fetchAtomUriFieldHasText()) {
       let errorText;
 
-      if(this.state.uriToFetchFailedToLoad) {
+      if (this.state.uriToFetchFailedToLoad) {
         errorText = "Failed to Load Suggestion, might not be a valid uri.";
-      } else if(this.state.uriToFetchIsExcluded) {
+      } else if (this.state.uriToFetchIsExcluded) {
         errorText = this.props.excludedText;
-      } else if(this.state.uriToFetchIsNotAllowed) {
+      } else if (this.state.uriToFetchIsNotAllowed) {
         errorText = this.props.notAllowedSocketText;
       }
 
-      suggestPostErrors = (<div className="sap__error">{errorText}</div>);
-    };
+      suggestPostErrors = <div className="sap__error">{errorText}</div>;
+    }
 
     return (
       <won-suggest-atom-picker>
         {suggestions}
-        <WonLabelledHr label="Not happy with the options? Add an Atom-URI below"/>
+        <WonLabelledHr label="Not happy with the options? Add an Atom-URI below" />
         <div className="sap__input">
           {suggestPostInputIcon}
           <input
-            ref={uriInput => this.uriInput = uriInput}
+            ref={uriInput => (this.uriInput = uriInput)}
             type="url"
             placeholder={this.props.detail.placeholder}
             className="sap__input__inner"
-            onChange={() => this.updateFetchAtomUriField()}/>
+            onChange={() => this.updateFetchAtomUriField()}
+          />
         </div>
         {suggestPostErrors}
       </won-suggest-atom-picker>
@@ -228,9 +248,7 @@ export default class WonSuggestAtomPicker extends React.Component {
   }
 
   isSuggestable(atom) {
-    return (
-      !this.isExcludedAtom(atom) && this.hasAtLeastOneAllowedSocket(atom)
-    );
+    return !this.isExcludedAtom(atom) && this.hasAtLeastOneAllowedSocket(atom);
   }
 
   isSelected(atom) {
@@ -268,7 +286,11 @@ export default class WonSuggestAtomPicker extends React.Component {
         showFetchButton = false;
       }
     }
-    this.setState({uriToFetch: undefined, showResetButton: showResetButton, showFetchButton: showFetchButton});
+    this.setState({
+      uriToFetch: undefined,
+      showResetButton: showResetButton,
+      showFetchButton: showFetchButton,
+    });
   }
 
   fetchAtomUriFieldHasText() {
@@ -278,25 +300,35 @@ export default class WonSuggestAtomPicker extends React.Component {
   }
 
   resetAtomUriField() {
-    console.debug("suggest-atom-picker: ", "resetAtomUriField(", omitUpdate, ")");
     if (this.uriInput) {
       this.uriInput.value = "";
     }
-    this.setState({uriToFetch: undefined, showResetButton: false, showFetchButton: false});
+    this.setState({
+      uriToFetch: undefined,
+      showResetButton: false,
+      showFetchButton: false,
+    });
   }
 
   fetchAtom() {
     let uriToFetch = this.uriInput && this.uriInput.value;
     uriToFetch = uriToFetch && uriToFetch.trim();
-    console.debug("suggest-atom-picker: ", "fetchAtom()", " uriToFetch: ", uriToFetch);
+    console.debug(
+      "suggest-atom-picker: ",
+      "fetchAtom()",
+      " uriToFetch: ",
+      uriToFetch
+    );
     if (
       !getIn(this.state.allSuggestableAtoms, uriToFetch) &&
       !get(this.state.allForbiddenAtoms, uriToFetch)
     ) {
-      this.props.ngRedux.dispatch(actionCreators.atoms__fetchUnloadedAtom(uriToFetch));
-      this.setState({uriToFetch: uriToFetch});
+      this.props.ngRedux.dispatch(
+        actionCreators.atoms__fetchUnloadedAtom(uriToFetch)
+      );
+      this.setState({ uriToFetch: uriToFetch });
     } else if (get(this.state.allForbiddenAtoms, uriToFetch)) {
-      this.setState({uriToFetch: uriToFetch});
+      this.setState({ uriToFetch: uriToFetch });
     } else {
       this.update(uriToFetch);
     }

@@ -3,15 +3,22 @@
  */
 
 import React from "react";
-import {Map, Marker, TileLayer} from "react-leaflet";
+import { Map, Marker, TileLayer } from "react-leaflet";
 import Leaflet from "leaflet";
 import VisibilitySensor from "react-visibility-sensor";
+import PropTypes from "prop-types";
 
 const currentLocationIcon = Leaflet.divIcon({
   className: "wonCurrentLocationMarkerIcon",
 });
 
 export default class WonAtomMap extends React.Component {
+  static propTypes = {
+    locations: PropTypes.arrayOf(PropTypes.object).isRequired,
+    currentLocation: PropTypes.object,
+    disableControls: PropTypes.bool,
+  };
+
   render() {
     // TODO Impl Center and zoom to all markers (work with bounds: <Map ref="map" bounds={bounds} className="atom-map__mapmount" boundsOptions={{padding: [50, 50]}} zoom={zoom}>)
     // TODO Impl MarkerClusters see -> https://yuzhva.github.io/react-leaflet-markercluster/
@@ -54,13 +61,12 @@ export default class WonAtomMap extends React.Component {
       return (
         <VisibilitySensor
           partialVisibility={true}
-          offset={{top: -300, bottom: -300}}
+          offset={{ top: -300, bottom: -300 }}
         >
           {({ isVisible }) => {
             if (isVisible) {
               return (
                 <Map
-                  ref="map"
                   center={
                     currentLocationTupel
                       ? currentLocationTupel

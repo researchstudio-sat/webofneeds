@@ -2,14 +2,20 @@
  * Created by quasarchimaere on 30.07.2019.
  */
 import React from "react";
-import {getIn} from "../utils.js";
-import {actionCreators} from "../actions/actions.js";
+import { getIn } from "../utils.js";
+import { actionCreators } from "../actions/actions.js";
 
 import "~/style/_atom-suggestions-indicator.scss";
 import Immutable from "immutable";
 import * as atomUtils from "../redux/utils/atom-utils";
+import PropTypes from "prop-types";
 
 export default class WonAtomSuggestionsIndicator extends React.Component {
+  static propTypes = {
+    atomUri: PropTypes.string.isRequired,
+    ngRedux: PropTypes.object.isRequired,
+  };
+
   componentDidMount() {
     this.atomUri = this.props.atomUri;
     this.disconnect = this.props.ngRedux.connect(
@@ -52,35 +58,46 @@ export default class WonAtomSuggestionsIndicator extends React.Component {
   }
 
   showAtomSuggestions() {
-    this.props.ngRedux.dispatch(actionCreators.atoms__selectTab(
-      Immutable.fromJS({ atomUri: this.atomUri, selectTab: "SUGGESTIONS" })
-    ));
-    this.props.ngRedux.dispatch(actionCreators.router__stateGo("post", { postUri: this.atomUri }));
+    this.props.ngRedux.dispatch(
+      actionCreators.atoms__selectTab(
+        Immutable.fromJS({ atomUri: this.atomUri, selectTab: "SUGGESTIONS" })
+      )
+    );
+    this.props.ngRedux.dispatch(
+      actionCreators.router__stateGo("post", { postUri: this.atomUri })
+    );
   }
 
   render() {
     if (!this.state) {
       console.debug("render with null state");
-      return <div/>;
+      return <div />;
     }
     return (
-      <won-atom-suggestions-indicator class={(!this.state.hasSuggestions ? "won-no-suggestions" : "")} onClick={() => this.showAtomSuggestions()}>
-        <svg className={"asi__icon " + (this.state.hasUnreadSuggestions ? "asi__icon--unreads" : "asi__icon--reads")}>
-          <use xlinkHref="#ico36_match" href="#ico36_match"></use>
+      <won-atom-suggestions-indicator
+        class={!this.state.hasSuggestions ? "won-no-suggestions" : ""}
+        onClick={() => this.showAtomSuggestions()}
+      >
+        <svg
+          className={
+            "asi__icon " +
+            (this.state.hasUnreadSuggestions
+              ? "asi__icon--unreads"
+              : "asi__icon--reads")
+          }
+        >
+          <use xlinkHref="#ico36_match" href="#ico36_match" />
         </svg>
         <div className="asi__right">
           <div className="asi__right__topline">
-            <div className="asi__right__topline__title">
-              Suggestions
-            </div>
+            <div className="asi__right__topline__title">Suggestions</div>
           </div>
           <div className="asi__right__subtitle">
             <div className="asi__right__subtitle__label">
               <span>{this.state.suggestionsCount + " Suggestions"}</span>
-              { this.state.hasUnreadSuggestions
-                  ? <span>{", " + this.state.unreadSuggestionsCount + " new"}</span>
-                  : null
-              }
+              {this.state.hasUnreadSuggestions ? (
+                <span>{", " + this.state.unreadSuggestionsCount + " new"}</span>
+              ) : null}
             </div>
           </div>
         </div>
