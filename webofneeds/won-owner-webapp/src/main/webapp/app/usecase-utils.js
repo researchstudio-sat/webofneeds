@@ -4,12 +4,14 @@
 
 import * as useCaseDefinitions from "../config/usecase-definitions.js";
 import { messageDetails } from "../config/detail-definitions.js";
-import { getIn, get } from "./utils.js";
+import { get, getIn } from "./utils.js";
 import { values } from "min-dash";
 import won from "./won-es6.js";
 
 import Immutable from "immutable";
 
+const useCasesImm = Immutable.fromJS(useCaseDefinitions.getAllUseCases());
+console.debug("useCasesImm: ", useCasesImm);
 /**
  * Returns all the details that are defined in any useCase Defined in the useCaseDefinitions
  * and in the messageDetails
@@ -52,8 +54,6 @@ export function findUseCaseByAtom(atomImm) {
   const useCases = useCaseDefinitions.getAllUseCases();
 
   if (hasSubElements(useCases)) {
-    const useCasesImm = Immutable.fromJS(useCases);
-
     if (useCasesImm && useCasesImm.size > 0) {
       const hasExactMatchingTypes = (useCase, types, branch) => {
         const typesSize = types ? types.size : 0;
@@ -257,10 +257,7 @@ export function getCustomUseCase() {
  */
 export function getUseCase(useCaseString) {
   if (useCaseString) {
-    const useCasesImm = Immutable.fromJS(useCaseDefinitions.getAllUseCases());
-    const foundUseCase =
-      useCasesImm &&
-      useCasesImm.find(useCase => get(useCase, "identifier") === useCaseString);
+    const foundUseCase = get(useCasesImm, useCaseString);
     return foundUseCase && foundUseCase.toJS();
   }
   return undefined;
@@ -413,11 +410,9 @@ export function isHoldable(useCase) {
 }
 
 export function getUseCaseLabel(identifier) {
-  const useCase = getUseCase(identifier);
-  return useCase.label;
+  return getIn(useCasesImm, [identifier, "label"]);
 }
 
 export function getUseCaseIcon(identifier) {
-  const useCase = getUseCase(identifier);
-  return useCase.icon;
+  return getIn(useCasesImm, [identifier, "icon"]);
 }
