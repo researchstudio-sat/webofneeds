@@ -16,12 +16,6 @@ import VisibilitySensor from "react-visibility-sensor";
 import PropTypes from "prop-types";
 
 export default class WonAtomHeader extends React.Component {
-  static propTypes = {
-    atomUri: PropTypes.string.isRequired,
-    ngRedux: PropTypes.object.isRequired,
-    onClick: PropTypes.func,
-  };
-
   componentDidMount() {
     this.atomUri = this.props.atomUri;
     this.disconnect = this.props.ngRedux.connect(
@@ -251,3 +245,9 @@ export default class WonAtomHeader extends React.Component {
     }
   }
 }
+
+WonAtomHeader.propTypes = {
+  atomUri: PropTypes.string.isRequired,
+  ngRedux: PropTypes.object.isRequired,
+  onClick: PropTypes.func,
+};

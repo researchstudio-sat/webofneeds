@@ -17,12 +17,6 @@ import "~/style/_connection-indicators.scss";
 import PropTypes from "prop-types";
 
 export default class WonConnectionIndicators extends React.Component {
-  static propTypes = {
-    atomUri: PropTypes.string.isRequired,
-    ngRedux: PropTypes.object.isRequired,
-    onClick: PropTypes.func.isRequired,
-  };
-
   componentDidMount() {
     this.atomUri = this.props.atomUri;
     this.disconnect = this.props.ngRedux.connect(
@@ -160,3 +154,8 @@ export default class WonConnectionIndicators extends React.Component {
     }
   }
 }
+WonConnectionIndicators.propTypes = {
+  atomUri: PropTypes.string.isRequired,
+  ngRedux: PropTypes.object.isRequired,
+  onClick: PropTypes.func.isRequired,
+};

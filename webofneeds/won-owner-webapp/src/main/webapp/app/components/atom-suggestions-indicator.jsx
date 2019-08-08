@@ -2,20 +2,15 @@
  * Created by quasarchimaere on 30.07.2019.
  */
 import React from "react";
-import { getIn } from "../utils.js";
-import { actionCreators } from "../actions/actions.js";
-
-import "~/style/_atom-suggestions-indicator.scss";
 import Immutable from "immutable";
-import * as atomUtils from "../redux/utils/atom-utils";
+import { actionCreators } from "../actions/actions.js";
+import { getIn } from "../utils.js";
+
+import * as atomUtils from "../redux/utils/atom-utils.js";
+import "~/style/_atom-suggestions-indicator.scss";
 import PropTypes from "prop-types";
 
 export default class WonAtomSuggestionsIndicator extends React.Component {
-  static propTypes = {
-    atomUri: PropTypes.string.isRequired,
-    ngRedux: PropTypes.object.isRequired,
-  };
-
   componentDidMount() {
     this.atomUri = this.props.atomUri;
     this.disconnect = this.props.ngRedux.connect(
@@ -56,6 +51,27 @@ export default class WonAtomSuggestionsIndicator extends React.Component {
       hasUnreadSuggestions: unreadSuggestionsCount > 0,
     };
   }
+
+  /*shouldComponentUpdate(nextProps, nextState) {
+    let shouldUpdate = false;
+    if (nextProps.atomUri !== this.props.atomUri) {
+      shouldUpdate = true;
+    } else if (nextState.hasSuggestions != this.state.hasSuggestions) {
+      shouldUpdate = true;
+    } else if (
+      nextState.hasUnreadSuggestions != this.state.hasUnreadSuggestions
+    ) {
+      shouldUpdate = true;
+    } else if (nextState.suggestionsCount != this.state.suggestionsCount) {
+      shouldUpdate = true;
+    } else if (
+      nextState.unreadSuggestionsCount != this.state.unreadSuggestionsCount
+    ) {
+      shouldUpdate = true;
+    }
+    console.debug("Suggestions Indicators shouldUpdate:", shouldUpdate);
+    return shouldUpdate;
+  }*/
 
   showAtomSuggestions() {
     this.props.ngRedux.dispatch(
@@ -105,3 +121,7 @@ export default class WonAtomSuggestionsIndicator extends React.Component {
     );
   }
 }
+WonAtomSuggestionsIndicator.propTypes = {
+  atomUri: PropTypes.string.isRequired,
+  ngRedux: PropTypes.object.isRequired,
+};

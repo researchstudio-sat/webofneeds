@@ -8,15 +8,6 @@ import { actionCreators } from "../actions/actions.js";
 import PropTypes from "prop-types";
 
 export default class WonAtomCardGrid extends React.Component {
-  static propTypes = {
-    atomUris: PropTypes.arrayOf(PropTypes.string).isRequired,
-    showPersona: PropTypes.bool,
-    showSuggestions: PropTypes.bool,
-    showCreate: PropTypes.bool,
-    currentLocation: PropTypes.object,
-    ngRedux: PropTypes.object.isRequired,
-  };
-
   render() {
     const atomUris = this.props.atomUris;
     const showPersona = this.props.showPersona;
@@ -83,3 +74,12 @@ export default class WonAtomCardGrid extends React.Component {
     );
   }
 }
+
+WonAtomCardGrid.propTypes = {
+  atomUris: PropTypes.arrayOf(PropTypes.string).isRequired,
+  showPersona: PropTypes.bool,
+  showSuggestions: PropTypes.bool,
+  showCreate: PropTypes.bool,
+  currentLocation: PropTypes.object,
+  ngRedux: PropTypes.object.isRequired,
+};

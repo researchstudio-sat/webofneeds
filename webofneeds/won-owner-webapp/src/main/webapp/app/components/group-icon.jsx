@@ -15,12 +15,6 @@ import "~/style/_group-icon.scss";
 import PropTypes from "prop-types";
 
 export default class WonGroupIcon extends React.Component {
-  static propTypes = {
-    connectionUri: PropTypes.string,
-    atomUri: PropTypes.string,
-    ngRedux: PropTypes.object.isRequired,
-  };
-
   componentDidMount() {
     this.atomUri = this.props.atomUri;
     this.connectionUri = this.props.connectionUri;
@@ -129,3 +123,8 @@ export default class WonGroupIcon extends React.Component {
     );
   }
 }
+WonGroupIcon.propTypes = {
+  connectionUri: PropTypes.string,
+  atomUri: PropTypes.string,
+  ngRedux: PropTypes.object.isRequired,
+};

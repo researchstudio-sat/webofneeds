@@ -14,17 +14,6 @@ import WonLabelledHr from "../../labelled-hr.jsx";
 import PropTypes from "prop-types";
 
 export default class WonSuggestAtomPicker extends React.Component {
-  static propTypes = {
-    initialValue: PropTypes.any,
-    detail: PropTypes.any,
-    excludedUris: PropTypes.arrayOf(PropTypes.string),
-    allowedSockets: PropTypes.arrayOf(PropTypes.string),
-    excludedText: PropTypes.string,
-    notAllowedSocketText: PropTypes.string,
-    noSuggestionsText: PropTypes.string,
-    ngRedux: PropTypes.object.isRequired,
-    onUpdate: PropTypes.func.isRequired,
-  };
   //TODO: CHANGE AND UPDATE LISTENERS DONT WORK
   //TODO: IMPLEMENT ->
   /*
@@ -343,3 +332,14 @@ export default class WonSuggestAtomPicker extends React.Component {
     }
   }
 }
+WonSuggestAtomPicker.propTypes = {
+  initialValue: PropTypes.any,
+  detail: PropTypes.any,
+  excludedUris: PropTypes.arrayOf(PropTypes.string),
+  allowedSockets: PropTypes.arrayOf(PropTypes.string),
+  excludedText: PropTypes.string,
+  notAllowedSocketText: PropTypes.string,
+  noSuggestionsText: PropTypes.string,
+  ngRedux: PropTypes.object.isRequired,
+  onUpdate: PropTypes.func.isRequired,
+};

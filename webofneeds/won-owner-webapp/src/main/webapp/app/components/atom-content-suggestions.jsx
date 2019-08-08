@@ -14,11 +14,6 @@ import won from "../won-es6";
 import PropTypes from "prop-types";
 
 export default class WonAtomContentSuggestions extends React.Component {
-  static propTypes = {
-    atomUri: PropTypes.string.isRequired,
-    ngRedux: PropTypes.object.isRequired,
-  };
-
   componentDidMount() {
     this.atomUri = this.props.atomUri;
     this.disconnect = this.props.ngRedux.connect(
@@ -216,3 +211,7 @@ export default class WonAtomContentSuggestions extends React.Component {
     }
   }
 }
+WonAtomContentSuggestions.propTypes = {
+  atomUri: PropTypes.string.isRequired,
+  ngRedux: PropTypes.object.isRequired,
+};

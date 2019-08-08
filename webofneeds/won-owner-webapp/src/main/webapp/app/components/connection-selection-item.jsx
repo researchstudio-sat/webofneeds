@@ -10,12 +10,6 @@ import WonConnectionHeader from "./connection-header.jsx";
 import "~/style/_connection-selection-item-line.scss";
 
 export default class WonConnectionSelectionItem extends React.Component {
-  static propTypes = {
-    connectionUri: PropTypes.string.isRequired,
-    ngRedux: PropTypes.object.isRequired,
-    onClick: PropTypes.func,
-  };
-
   componentDidMount() {
     this.connectionUri = this.props.connectionUri;
     this.disconnect = this.props.ngRedux.connect(
@@ -101,3 +95,9 @@ export default class WonConnectionSelectionItem extends React.Component {
     );
   }
 }
+
+WonConnectionSelectionItem.propTypes = {
+  connectionUri: PropTypes.string.isRequired,
+  ngRedux: PropTypes.object.isRequired,
+  onClick: PropTypes.func,
+};

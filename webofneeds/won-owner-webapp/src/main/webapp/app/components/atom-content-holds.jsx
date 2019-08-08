@@ -12,11 +12,6 @@ import "~/style/_atom-content-holds.scss";
 import PropTypes from "prop-types";
 
 export default class WonAtomContentHolds extends React.Component {
-  static propTypes = {
-    atomUri: PropTypes.string.isRequired,
-    ngRedux: PropTypes.object.isRequired,
-  };
-
   componentDidMount() {
     this.atomUri = this.props.atomUri;
     this.disconnect = this.props.ngRedux.connect(
@@ -106,3 +101,7 @@ export default class WonAtomContentHolds extends React.Component {
     }
   }
 }
+WonAtomContentHolds.propTypes = {
+  atomUri: PropTypes.string.isRequired,
+  ngRedux: PropTypes.object.isRequired,
+};

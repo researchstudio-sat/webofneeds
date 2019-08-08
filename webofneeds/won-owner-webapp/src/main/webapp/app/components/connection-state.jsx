@@ -16,11 +16,6 @@ import * as connectionUtils from "../redux/utils/connection-utils.js";
 import won from "../won-es6";
 
 export default class WonConnectionState extends React.Component {
-  static propTypes = {
-    connectionUri: PropTypes.string.isRequired,
-    ngRedux: PropTypes.object.isRequired,
-  };
-
   componentDidMount() {
     this.connectionUri = this.props.connectionUri;
     this.disconnect = this.props.ngRedux.connect(
@@ -101,3 +96,7 @@ export default class WonConnectionState extends React.Component {
     );
   }
 }
+WonConnectionState.propTypes = {
+  connectionUri: PropTypes.string.isRequired,
+  ngRedux: PropTypes.object.isRequired,
+};

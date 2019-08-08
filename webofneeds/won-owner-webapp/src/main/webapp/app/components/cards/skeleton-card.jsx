@@ -12,13 +12,6 @@ import WonAtomSuggestionsIndicator from "../atom-suggestions-indicator.jsx";
 import PropTypes from "prop-types";
 
 export default class WonSkeletonCard extends React.Component {
-  static propTypes = {
-    atomUri: PropTypes.string.isRequired,
-    showPersona: PropTypes.bool,
-    showSuggestions: PropTypes.bool,
-    ngRedux: PropTypes.object.isRequired,
-  };
-
   componentDidMount() {
     this.atomUri = this.props.atomUri;
     this.disconnect = this.props.ngRedux.connect(
@@ -169,3 +162,9 @@ export default class WonSkeletonCard extends React.Component {
     }
   }
 }
+WonSkeletonCard.propTypes = {
+  atomUri: PropTypes.string.isRequired,
+  showPersona: PropTypes.bool,
+  showSuggestions: PropTypes.bool,
+  ngRedux: PropTypes.object.isRequired,
+};

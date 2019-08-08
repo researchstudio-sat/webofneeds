@@ -15,10 +15,6 @@ import "~/style/_connections-overview.scss";
 import PropTypes from "prop-types";
 
 export default class WonConnectionsOverview extends React.Component {
-  static propTypes = {
-    ngRedux: PropTypes.object.isRequired,
-  };
-
   componentDidMount() {
     this.disconnect = this.props.ngRedux.connect(
       this.selectFromState.bind(this),
@@ -221,3 +217,6 @@ export default class WonConnectionsOverview extends React.Component {
     );
   }
 }
+WonConnectionsOverview.propTypes = {
+  ngRedux: PropTypes.object.isRequired,
+};

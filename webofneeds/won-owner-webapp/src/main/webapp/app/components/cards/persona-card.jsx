@@ -11,12 +11,6 @@ import Immutable from "immutable";
 import PropTypes from "prop-types";
 
 export default class WonPersonaCard extends React.Component {
-  static propTypes = {
-    atomUri: PropTypes.string.isRequired,
-    ngRedux: PropTypes.object.isRequired,
-    onAtomClick: PropTypes.func,
-  };
-
   componentDidMount() {
     this.atomUri = this.props.atomUri;
     this.disconnect = this.props.ngRedux.connect(
@@ -115,3 +109,8 @@ export default class WonPersonaCard extends React.Component {
     }
   }
 }
+WonPersonaCard.propTypes = {
+  atomUri: PropTypes.string.isRequired,
+  ngRedux: PropTypes.object.isRequired,
+  onAtomClick: PropTypes.func,
+};

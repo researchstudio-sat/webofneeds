@@ -10,11 +10,6 @@ import * as atomUtils from "../redux/utils/atom-utils";
 import PropTypes from "prop-types";
 
 export default class WonAtomIcon extends React.Component {
-  static propTypes = {
-    atomUri: PropTypes.string.isRequired,
-    ngRedux: PropTypes.object.isRequired,
-  };
-
   componentDidMount() {
     this.atomUri = this.props.atomUri;
     this.disconnect = this.props.ngRedux.connect(
@@ -162,3 +157,7 @@ export default class WonAtomIcon extends React.Component {
     );
   }
 }
+WonAtomIcon.propTypes = {
+  atomUri: PropTypes.string.isRequired,
+  ngRedux: PropTypes.object.isRequired,
+};

@@ -20,12 +20,6 @@ import WonConnectionState from "./connection-state";
 import PropTypes from "prop-types";
 
 export default class WonConnectionHeader extends React.Component {
-  static propTypes = {
-    connectionUri: PropTypes.string.isRequired,
-    ngRedux: PropTypes.object.isRequired,
-    onClick: PropTypes.func.isRequired,
-  };
-
   componentDidMount() {
     this.connectionUri = this.props.connectionUri;
     this.disconnect = this.props.ngRedux.connect(
@@ -324,3 +318,8 @@ export default class WonConnectionHeader extends React.Component {
     }
   }
 }
+WonConnectionHeader.propTypes = {
+  connectionUri: PropTypes.string.isRequired,
+  ngRedux: PropTypes.object.isRequired,
+  onClick: PropTypes.func.isRequired,
+};

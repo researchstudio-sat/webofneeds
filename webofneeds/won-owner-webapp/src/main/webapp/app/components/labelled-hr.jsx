@@ -8,12 +8,6 @@ import "~/style/_labelledhr.scss";
 import PropTypes from "prop-types";
 
 export default class WonLabelledHr extends React.Component {
-  static propTypes = {
-    arrow: PropTypes.string,
-    label: PropTypes.string,
-    onClick: PropTypes.func,
-  };
-
   render() {
     return (
       <won-labelled-hr>
@@ -45,3 +39,8 @@ export default class WonLabelledHr extends React.Component {
     );
   }
 }
+WonLabelledHr.propTypes = {
+  arrow: PropTypes.string,
+  label: PropTypes.string,
+  onClick: PropTypes.func,
+};

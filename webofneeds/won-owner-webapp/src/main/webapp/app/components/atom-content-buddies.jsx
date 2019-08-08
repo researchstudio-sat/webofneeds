@@ -18,11 +18,6 @@ import VisibilitySensor from "react-visibility-sensor";
 import PropTypes from "prop-types";
 
 export default class WonAtomContentBuddies extends React.Component {
-  static propTypes = {
-    atomUri: PropTypes.string.isRequired,
-    ngRedux: PropTypes.object.isRequired,
-  };
-
   constructor(props) {
     super(props);
     this.state = {
@@ -368,3 +363,7 @@ export default class WonAtomContentBuddies extends React.Component {
     }
   }
 }
+WonAtomContentBuddies.propTypes = {
+  atomUri: PropTypes.string.isRequired,
+  ngRedux: PropTypes.object.isRequired,
+};
