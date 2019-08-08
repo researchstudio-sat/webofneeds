@@ -10,7 +10,7 @@ import * as generalSelectors from "../../../redux/selectors/general-selectors.js
 import "~/style/_suggest-atom-picker.scss";
 import Immutable from "immutable";
 import WonAtomHeader from "../../atom-header.jsx";
-import WonLabelledHr from "../../labelled-hr";
+import WonLabelledHr from "../../labelled-hr.jsx";
 
 export default class WonSuggestAtomPicker extends React.Component {
   //TODO: CHANGE AND UPDATE LISTENERS DONT WORK

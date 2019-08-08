@@ -9,12 +9,11 @@ import React from "react";
 import {actionCreators} from "../actions/actions.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as connectionSelectors from "../redux/selectors/connection-selectors.js";
-import {get, getIn} from "../utils.js";
+import {get, getIn, sortByDate} from "../utils.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as connectionUtils from "../redux/utils/connection-utils.js";
 
 import "~/style/_connection-indicators.scss";
-import {sortByDate} from "../utils";
 
 export default class WonConnectionIndicators extends React.Component {
   componentDidMount() {
