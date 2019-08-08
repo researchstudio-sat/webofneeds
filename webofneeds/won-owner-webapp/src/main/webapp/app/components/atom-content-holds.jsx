@@ -2,13 +2,14 @@
  * Created by quasarchimaere on 05.08.2019.
  */
 import React from "react";
-import {getIn} from "../utils";
-import {actionCreators} from "../actions/actions.js";
+import { getIn } from "../utils";
+import { actionCreators } from "../actions/actions.js";
 import * as atomUtils from "../redux/utils/atom-utils";
 import * as generalSelectors from "../redux/selectors/general-selectors";
 import WonAtomCard from "./atom-card.jsx";
 
 import "~/style/_atom-content-holds.scss";
+import PropTypes from "prop-types";
 
 export default class WonAtomContentHolds extends React.Component {
   componentDidMount() {
@@ -42,36 +43,48 @@ export default class WonAtomContentHolds extends React.Component {
   }
 
   createAtom() {
-    this.props.ngRedux.dispatch(actionCreators.router__stateGo('create', {holderUri: this.atomUri}));
+    this.props.ngRedux.dispatch(
+      actionCreators.router__stateGo("create", { holderUri: this.atomUri })
+    );
   }
 
   render() {
     if (!this.state) {
       console.debug("render with null state");
-      return <div/>;
+      return <div />;
     }
 
-    if(this.state.isOwned || this.state.hasHeldAtoms) {
+    if (this.state.isOwned || this.state.hasHeldAtoms) {
       const atomCards = this.state.hasHeldAtoms
         ? this.state.heldAtomUrisArray.map(atomUri => {
-          return (
-            <WonAtomCard key={atomUri} atomUri={atomUri} currentLocation={this.state.currentLocation} showSuggestions={this.state.isOwned} showPersona={false} ngRedux={this.props.ngRedux}/>
-          );
-        })
+            return (
+              <WonAtomCard
+                key={atomUri}
+                atomUri={atomUri}
+                currentLocation={this.state.currentLocation}
+                showSuggestions={this.state.isOwned}
+                showPersona={false}
+                ngRedux={this.props.ngRedux}
+              />
+            );
+          })
         : undefined;
 
-      const createAtom = this.state.isOwned
-        ? (
-          <div className="ach__createatom"
-               onClick={() => {this.createAtom()}}
-          >
-            <svg className="ach__createatom__icon" title="Create a new post">
-              <use xlinkHref="#ico36_plus" href="#ico36_plus"/>
-            </svg>
-            <span className="ach__createatom__label">New</span>
-          </div>
-        )
-        : undefined;
+      const createAtom = this.state.isOwned ? (
+        <div
+          className="ach__createatom"
+          onClick={() => {
+            this.createAtom();
+          }}
+        >
+          <svg className="ach__createatom__icon" title="Create a new post">
+            <use xlinkHref="#ico36_plus" href="#ico36_plus" />
+          </svg>
+          <span className="ach__createatom__label">New</span>
+        </div>
+      ) : (
+        undefined
+      );
 
       return (
         <won-atom-content-holds>
@@ -88,3 +101,7 @@ export default class WonAtomContentHolds extends React.Component {
     }
   }
 }
+WonAtomContentHolds.propTypes = {
+  atomUri: PropTypes.string.isRequired,
+  ngRedux: PropTypes.object.isRequired,
+};

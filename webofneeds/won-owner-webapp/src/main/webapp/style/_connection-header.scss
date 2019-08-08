@@ -35,7 +35,7 @@ won-connection-header {
   grid-column-gap: 0.5rem;
   min-width: 0;
 
-  .ch__groupicons,
+  won-group-icon,
   .ch__icon {
     grid-area: icon;
     width: $postIconSize;
@@ -102,8 +102,13 @@ won-connection-header {
           display: inline-block;
           padding-right: 0.25rem;
 
-          svg {
+          svg.cs__state__icon {
             @include fixed-square($smallFontSize);
+            --local-primary: #{$won-primary-color-light};
+
+            &.won-unread {
+              --local-primary: #{$won-primary-color};
+            }
           }
         }
 

@@ -514,3 +514,14 @@ export function numOfEvts2pageSize(numberOfEvents) {
   // `*3*` to compensate for the *roughly* 2 additional success events per chat message
   return numberOfEvents * 3;
 }
+
+/*export function shouldUpdate(name, oldState, newState) {
+  let shouldUpdate = false;
+  const oldStateImm = Immutable.fromJS(oldState);
+  const newStateImm = Immutable.fromJS(newState);
+
+  shouldUpdate = !newStateImm.equals(oldStateImm);
+
+  console.debug(name, " shouldComponentUpdate: ", shouldUpdate);
+  return shouldUpdate;
+}*/

@@ -4,10 +4,10 @@
 
 import React from "react";
 import WonAtomCard from "./atom-card.jsx";
-import {actionCreators} from "../actions/actions.js";
+import { actionCreators } from "../actions/actions.js";
+import PropTypes from "prop-types";
 
 export default class WonAtomCardGrid extends React.Component {
-
   render() {
     const atomUris = this.props.atomUris;
     const showPersona = this.props.showPersona;
@@ -18,11 +18,20 @@ export default class WonAtomCardGrid extends React.Component {
 
     console.debug(
       "Render WonAtomCard-Grid for: \n",
-      "atomUris: ", atomUris, "\n",
-      "showPersona: ", showPersona, "\n",
-      "showSuggestions: ", showSuggestions, "\n",
-      "showCreate: ", showCreate, "\n",
-      "currentLocation: ", currentLocation
+      "atomUris: ",
+      atomUris,
+      "\n",
+      "showPersona: ",
+      showPersona,
+      "\n",
+      "showSuggestions: ",
+      showSuggestions,
+      "\n",
+      "showCreate: ",
+      showCreate,
+      "\n",
+      "currentLocation: ",
+      currentLocation
     );
 
     let atomCards = undefined;
@@ -30,22 +39,32 @@ export default class WonAtomCardGrid extends React.Component {
     if (atomUris && atomUris.length > 0) {
       atomCards = atomUris.map(atomUri => {
         return (
-          <WonAtomCard key={atomUri} atomUri={atomUri} showPersona={showPersona} showSuggestions={showSuggestions}
-                       currentLocation={currentLocation} ngRedux={ngRedux}/>
+          <WonAtomCard
+            key={atomUri}
+            atomUri={atomUri}
+            showPersona={showPersona}
+            showSuggestions={showSuggestions}
+            currentLocation={currentLocation}
+            ngRedux={ngRedux}
+          />
         );
       });
     }
 
-    const createAtom = showCreate
-      ? (
-        <won-create-card onClick={() => this.props.ngRedux.dispatch(actionCreators.router__stateGo('create'))}>
-          <svg className="createcard__icon" title="Create a new post">
-            <use xlinkHref="#ico36_plus" href="#ico36_plus" />
-          </svg>
-          <span className="createcard__label">New</span>
-        </won-create-card>
-      )
-      : undefined;
+    const createAtom = showCreate ? (
+      <won-create-card
+        onClick={() =>
+          this.props.ngRedux.dispatch(actionCreators.router__stateGo("create"))
+        }
+      >
+        <svg className="createcard__icon" title="Create a new post">
+          <use xlinkHref="#ico36_plus" href="#ico36_plus" />
+        </svg>
+        <span className="createcard__label">New</span>
+      </won-create-card>
+    ) : (
+      undefined
+    );
 
     return (
       <React.Fragment>
@@ -55,3 +74,12 @@ export default class WonAtomCardGrid extends React.Component {
     );
   }
 }
+
+WonAtomCardGrid.propTypes = {
+  atomUris: PropTypes.arrayOf(PropTypes.string).isRequired,
+  showPersona: PropTypes.bool,
+  showSuggestions: PropTypes.bool,
+  showCreate: PropTypes.bool,
+  currentLocation: PropTypes.object,
+  ngRedux: PropTypes.object.isRequired,
+};

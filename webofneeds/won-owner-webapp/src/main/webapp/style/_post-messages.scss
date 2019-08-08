@@ -35,6 +35,7 @@ won-post-messages {
     }
 
     &__title,
+    won-preact.connectionHeader,
     won-connection-header {
       grid-area: header_title;
     }

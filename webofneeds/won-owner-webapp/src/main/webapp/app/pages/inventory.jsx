@@ -2,10 +2,10 @@
 
 import angular from "angular";
 import ngAnimate from "angular-animate";
-import {get, getIn, sortByDate} from "../utils.js";
-import {attach, classOnComponentRoot} from "../cstm-ng-utils.js";
-import {connect2Redux} from "../configRedux.js";
-import {actionCreators} from "../actions/actions.js";
+import { get, getIn, sortByDate } from "../utils.js";
+import { attach, classOnComponentRoot } from "../cstm-ng-utils.js";
+import { connect2Redux } from "../configRedux.js";
+import { actionCreators } from "../actions/actions.js";
 import postMessagesModule from "../components/post-messages.js";
 import howToModule from "../components/howto.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
@@ -16,7 +16,7 @@ import * as accountUtils from "../redux/utils/account-utils.js";
 import * as viewUtils from "../redux/utils/view-utils.js";
 import WonAtomCardGrid from "../components/atom-card-grid.jsx";
 
-import {h} from "preact";
+import { h } from "preact";
 
 import "~/style/_inventory.scss";
 import "~/style/_connection-overlay.scss";
@@ -34,7 +34,10 @@ const template = (
     <won-menu ng-if="self.isLoggedIn" />
     <won-toasts />
     <won-slide-in ng-if="self.showSlideIns" />
-    <main className="ownerloading" ng-if="self.isLoggedIn && self.isInitialLoadInProgress">
+    <main
+      className="ownerloading"
+      ng-if="self.isLoggedIn && self.isInitialLoadInProgress"
+    >
       <svg className="ownerloading__spinner hspinner">
         <use xlinkHref="#ico_loading_anim" href="#ico_loading_anim" />
       </svg>
@@ -47,8 +50,14 @@ const template = (
       />
       <won-how-to />
     </main>
-    <main className="ownerinventory" ng-if="self.isLoggedIn && !self.isInitialLoadInProgress">
-      <div className="ownerinventory__personas" ng-if="self.hasOwnedActivePersonas">
+    <main
+      className="ownerinventory"
+      ng-if="self.isLoggedIn && !self.isInitialLoadInProgress"
+    >
+      <div
+        className="ownerinventory__personas"
+        ng-if="self.hasOwnedActivePersonas"
+      >
         <won-post-info
           class="ownerinventory__personas__persona"
           ng-repeat="personaUri in self.sortedOwnedActivePersonaUriArray track by personaUri"
@@ -132,17 +141,21 @@ class Controller {
         ownedUnassignedActivePosts,
         "creationDate"
       );
-      const sortedOwnedUnassignedAtomUriArray = sortedOwnedUnassignedActivePosts ? [
-        ...sortedOwnedUnassignedActivePosts.flatMap(atom => get(atom, "uri")),
-      ] : [];
+      const sortedOwnedUnassignedAtomUriArray = sortedOwnedUnassignedActivePosts
+        ? [
+            ...sortedOwnedUnassignedActivePosts.flatMap(atom =>
+              get(atom, "uri")
+            ),
+          ]
+        : [];
 
       const sortedOwnedInactiveAtoms = sortByDate(
         ownedInactiveAtoms,
         "creationDate"
       );
-      const sortedOwnedInactiveAtomUriArray = sortedOwnedInactiveAtoms ? [
-        ...sortedOwnedInactiveAtoms.flatMap(atom => get(atom, "uri")),
-      ] : [];
+      const sortedOwnedInactiveAtomUriArray = sortedOwnedInactiveAtoms
+        ? [...sortedOwnedInactiveAtoms.flatMap(atom => get(atom, "uri"))]
+        : [];
 
       const sortedOwnedActivePersonas = sortByDate(
         ownedActivePersonas,
@@ -186,7 +199,8 @@ class Controller {
           sortedOwnedActivePersonaUriArray.length > 0,
         sortedOwnedActivePersonaUriArray,
         showSlideIns:
-          viewSelectors.hasSlideIns(state) && viewSelectors.isSlideInsVisible(state),
+          viewSelectors.hasSlideIns(state) &&
+          viewSelectors.isSlideInsVisible(state),
         showModalDialog: viewSelectors.showModalDialog(state),
         showConnectionOverlay: !!viewConnUri,
         viewConnUri,

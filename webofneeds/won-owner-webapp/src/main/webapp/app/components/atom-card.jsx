@@ -2,8 +2,8 @@
  * Created by quasarchimaere on 30.07.2019.
  */
 import React from "react";
-import {get, getIn} from "../utils.js";
-import {actionCreators} from "../actions/actions.js";
+import { get, getIn } from "../utils.js";
+import { actionCreators } from "../actions/actions.js";
 
 import "~/style/_atom-card.scss";
 import * as atomUtils from "../redux/utils/atom-utils.js";
@@ -11,6 +11,7 @@ import * as processUtils from "../redux/utils/process-utils.js";
 import WonOtherCard from "./cards/other-card.jsx";
 import WonSkeletonCard from "./cards/skeleton-card.jsx";
 import WonPersonaCard from "./cards/persona-card.jsx";
+import PropTypes from "prop-types";
 
 export default class WonAtomCard extends React.Component {
   componentDidMount() {
@@ -70,15 +71,52 @@ export default class WonAtomCard extends React.Component {
   render() {
     if (!this.state) {
       console.debug("render with null state");
-      return <div/>;
+      return <div />;
     }
 
     if (this.state.isSkeleton) {
-      return <won-atom-card><WonSkeletonCard atomUri={this.atomUri} showSuggestions={this.props.showSuggestions} showPersona={this.props.showPersona} ngRedux={this.props.ngRedux}/></won-atom-card>;
-    } else if(this.state.isPersona) {
-      return <won-atom-card><WonPersonaCard atomUri={this.atomUri} onAtomClick={this.props.onAtomClick} ngRedux={this.props.ngRedux}/></won-atom-card>;
+      return (
+        <won-atom-card>
+          <WonSkeletonCard
+            atomUri={this.atomUri}
+            showSuggestions={this.props.showSuggestions}
+            showPersona={this.props.showPersona}
+            ngRedux={this.props.ngRedux}
+          />
+        </won-atom-card>
+      );
+    } else if (this.state.isPersona) {
+      return (
+        <won-atom-card>
+          <WonPersonaCard
+            atomUri={this.atomUri}
+            onAtomClick={this.props.onAtomClick}
+            ngRedux={this.props.ngRedux}
+          />
+        </won-atom-card>
+      );
     } else {
-      return <won-atom-card><WonOtherCard atomUri={this.atomUri} showSuggestions={this.props.showSuggestions} showPersona={this.props.showPersona} onAtomClick={this.props.onAtomClick} currentLocation={this.props.currentLocation} ngRedux={this.props.ngRedux}/></won-atom-card>;
+      return (
+        <won-atom-card>
+          <WonOtherCard
+            atomUri={this.atomUri}
+            showSuggestions={this.props.showSuggestions}
+            showPersona={this.props.showPersona}
+            onAtomClick={this.props.onAtomClick}
+            currentLocation={this.props.currentLocation}
+            ngRedux={this.props.ngRedux}
+          />
+        </won-atom-card>
+      );
     }
   }
 }
+
+WonAtomCard.propTypes = {
+  atomUri: PropTypes.string.isRequired,
+  showPersona: PropTypes.bool,
+  showSuggestions: PropTypes.bool,
+  currentLocation: PropTypes.object,
+  onAtomClick: PropTypes.func,
+  ngRedux: PropTypes.object.isRequired,
+};

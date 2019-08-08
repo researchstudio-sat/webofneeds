@@ -1,21 +1,19 @@
 /** @jsx h */
 
 import angular from "angular";
-import Immutable from "immutable";
 import ngAnimate from "angular-animate";
 import compareToModule from "../directives/compareTo.js";
 import howToModule from "../components/howto.js";
 import accordionModule from "../components/accordion.js";
 import flexGridModule from "../components/flexgrid.js";
 import { get, getIn, toAbsoluteURL } from "../utils.js";
-import { attach } from "../cstm-ng-utils.js";
+import { attach, classOnComponentRoot } from "../cstm-ng-utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { ownerBaseUrl } from "~/config/default.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as viewSelectors from "../redux/selectors/view-selectors.js";
 import * as accountUtils from "../redux/utils/account-utils.js";
 import { h } from "preact";
-import { classOnComponentRoot } from "../cstm-ng-utils.js";
 
 import "~/style/_about.scss";
 
@@ -304,7 +302,8 @@ class AboutController {
         peopleGrid: peopleGrid({ themeName }),
         showModalDialog: state.getIn(["view", "showModalDialog"]),
         showSlideIns:
-          viewSelectors.hasSlideIns(state) && viewSelectors.isSlideInsVisible(state),
+          viewSelectors.hasSlideIns(state) &&
+          viewSelectors.isSlideInsVisible(state),
       };
     };
     const disconnect = this.$ngRedux.connect(select, actionCreators)(this);

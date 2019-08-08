@@ -8,13 +8,12 @@ import createPostModule from "../components/create-post.js";
 import createSearchModule from "../components/create-search.js";
 import usecasePickerModule from "../components/usecase-picker.js";
 import usecaseGroupModule from "../components/usecase-group.js";
-import { getIn, get } from "../utils.js";
-import { attach } from "../cstm-ng-utils.js";
+import { get, getIn } from "../utils.js";
+import { attach, classOnComponentRoot } from "../cstm-ng-utils.js";
 import { actionCreators } from "../actions/actions.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as viewSelectors from "../redux/selectors/view-selectors.js";
 import { h } from "preact";
-import { classOnComponentRoot } from "../cstm-ng-utils.js";
 
 import "~/style/_create.scss";
 import "~/style/_responsiveness-utils.scss";
@@ -55,7 +54,8 @@ class CreateController {
       const showCreateFromPost = !!(fromAtomUri && mode);
 
       const showUseCaseGroups = !useCase && !!useCaseGroup;
-      const showCreatePost = showCreateFromPost || (!!useCase && useCase !== "search");
+      const showCreatePost =
+        showCreateFromPost || (!!useCase && useCase !== "search");
       const showCreateSearch = !!useCase && useCase === "search";
 
       const accountState = get(state, "account");
@@ -63,12 +63,17 @@ class CreateController {
       return {
         isLoggedIn: accountUtils.isLoggedIn(accountState),
         showModalDialog: getIn(state, ["view", "showModalDialog"]),
-        showUseCasePicker: !(showUseCaseGroups || showCreatePost || showCreateSearch),
+        showUseCasePicker: !(
+          showUseCaseGroups ||
+          showCreatePost ||
+          showCreateSearch
+        ),
         showUseCaseGroups,
         showCreatePost,
         showCreateSearch,
         showSlideIns:
-          viewSelectors.hasSlideIns(state) && viewSelectors.isSlideInsVisible(state),
+          viewSelectors.hasSlideIns(state) &&
+          viewSelectors.isSlideInsVisible(state),
       };
     };
 
@@ -91,7 +96,8 @@ export default {
       createPostModule,
       createSearchModule,
     ])
-    .controller("CreateController", [...serviceDependencies, CreateController]).name,
+    .controller("CreateController", [...serviceDependencies, CreateController])
+    .name,
   controller: "CreateController",
   template: template,
 };

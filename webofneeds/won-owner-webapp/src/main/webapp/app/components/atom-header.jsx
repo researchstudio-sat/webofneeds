@@ -2,10 +2,10 @@
  * Created by quasarchimaere on 30.07.2019.
  */
 import React from "react";
-import {get, getIn} from "../utils.js";
-import {actionCreators} from "../actions/actions.js";
-import {relativeTime} from "../won-label-utils.js";
-import {selectLastUpdateTime} from "../redux/selectors/general-selectors.js";
+import { get, getIn } from "../utils.js";
+import { actionCreators } from "../actions/actions.js";
+import { relativeTime } from "../won-label-utils.js";
+import { selectLastUpdateTime } from "../redux/selectors/general-selectors.js";
 
 import * as processUtils from "../redux/utils/process-utils.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
@@ -13,6 +13,7 @@ import * as atomUtils from "../redux/utils/atom-utils.js";
 import "~/style/_atom-header.scss";
 import WonAtomIcon from "./atom-icon.jsx";
 import VisibilitySensor from "react-visibility-sensor";
+import PropTypes from "prop-types";
 
 export default class WonAtomHeader extends React.Component {
   componentDidMount() {
@@ -53,8 +54,7 @@ export default class WonAtomHeader extends React.Component {
       atom,
       atomTypeLabel: atom && atomUtils.generateTypeLabel(atom),
       personaName,
-      atomLoading:
-        !atom || processUtils.isAtomLoading(process, this.atomUri),
+      atomLoading: !atom || processUtils.isAtomLoading(process, this.atomUri),
       atomToLoad: !atom || processUtils.isAtomToLoad(process, this.atomUri),
       atomFailedToLoad:
         atom && processUtils.hasAtomFailedToLoad(process, this.atomUri),
@@ -63,37 +63,38 @@ export default class WonAtomHeader extends React.Component {
       isChatEnabled: atomUtils.hasChatSocket(atom),
       friendlyTimestamp:
         atom &&
-        relativeTime(
-          selectLastUpdateTime(state),
-          get(atom, "lastUpdateDate")
-        ),
+        relativeTime(selectLastUpdateTime(state), get(atom, "lastUpdateDate")),
     };
   }
 
   render() {
     if (!this.state) {
       console.debug("render with null state");
-      return <div/>;
+      return <div />;
     }
 
     let atomHeaderContent;
     let atomHeaderIcon;
 
-    if (this.atomLoading) { //Loading View
+    if (this.atomLoading) {
+      //Loading View
 
-      atomHeaderIcon = (<div className="ph__icon__skeleton"/>);
+      atomHeaderIcon = <div className="ph__icon__skeleton" />;
       atomHeaderContent = (
         <div className="ph__right">
           <div className="ph__right__topline">
-            <div className="ph__right__topline__title"></div>
+            <div className="ph__right__topline__title" />
           </div>
           <div className="ph__right__subtitle">
-            <span className="ph__right__subtitle__type"></span>
+            <span className="ph__right__subtitle__type" />
           </div>
         </div>
       );
-    } else if(get(this.state.atom,"isBeingCreated")) { //In Creation View
-      atomHeaderIcon = (<WonAtomIcon atomUri={this.atomUri} ngRedux={this.props.ngRedux}/>);
+    } else if (get(this.state.atom, "isBeingCreated")) {
+      //In Creation View
+      atomHeaderIcon = (
+        <WonAtomIcon atomUri={this.atomUri} ngRedux={this.props.ngRedux} />
+      );
       atomHeaderContent = (
         <div className="ph__right">
           <div className="ph__right__topline">
@@ -101,62 +102,113 @@ export default class WonAtomHeader extends React.Component {
           </div>
           <div className="ph__right__subtitle">
             <span className="ph__right__subtitle__type">
-              { this.state.personaName ? <span className="ph__right__subtitle__type__persona">{this.state.personaName}</span> : undefined }
-              { this.state.isGroupChatEnabled ? <span className="ph__right__subtitle__type__groupchat">{this.state.isChatEnabled ? "Group Chat enabled" : "Group Chat"}</span> : undefined}
-              <span className="ph__right__subtitle__type">{this.state.atomTypeLabel}</span>
+              {this.state.personaName ? (
+                <span className="ph__right__subtitle__type__persona">
+                  {this.state.personaName}
+                </span>
+              ) : (
+                undefined
+              )}
+              {this.state.isGroupChatEnabled ? (
+                <span className="ph__right__subtitle__type__groupchat">
+                  {this.state.isChatEnabled
+                    ? "Group Chat enabled"
+                    : "Group Chat"}
+                </span>
+              ) : (
+                undefined
+              )}
+              <span className="ph__right__subtitle__type">
+                {this.state.atomTypeLabel}
+              </span>
             </span>
           </div>
         </div>
       );
-    } else if(this.state.atomFailedToLoad) { //FailedToLoad View
-      atomHeaderIcon = (<WonAtomIcon atomUri={this.atomUri} ngRedux={this.props.ngRedux}/>);
-      atomHeaderContent = (
-        <div className="ph__right">
-          <div className="ph__right__topline">
-            <div className="ph__right__topline__notitle">Atom Loading failed</div>
-          </div>
-          <div className="ph__right__subtitle">
-            <span className="ph__right__subtitle__type">Atom might have been deleted.</span>
-          </div>
-        </div>
+    } else if (this.state.atomFailedToLoad) {
+      //FailedToLoad View
+      atomHeaderIcon = (
+        <WonAtomIcon atomUri={this.atomUri} ngRedux={this.props.ngRedux} />
       );
-    } else { //Normal View
-      atomHeaderIcon = (<WonAtomIcon atomUri={this.atomUri} ngRedux={this.props.ngRedux}/>);
       atomHeaderContent = (
         <div className="ph__right">
           <div className="ph__right__topline">
-            <div className="ph__right__topline__title">
-              {
-                this.hasTitle()
-                ? this.generateTitle()
-                : (
-                  this.state.isDirectResponse
-                  ? "RE: no title"
-                  : "no title"
-                )
-              }
+            <div className="ph__right__topline__notitle">
+              Atom Loading failed
             </div>
           </div>
           <div className="ph__right__subtitle">
             <span className="ph__right__subtitle__type">
-              { this.state.personaName ? <span className="ph__right__subtitle__type__persona">{this.state.personaName}</span> : undefined }
-              { this.state.isGroupChatEnabled ? <span className="ph__right__subtitle__type__groupchat">{this.state.isChatEnabled ? "Group Chat enabled" : "Group Chat"}</span> : undefined}
+              Atom might have been deleted.
+            </span>
+          </div>
+        </div>
+      );
+    } else {
+      //Normal View
+      atomHeaderIcon = (
+        <WonAtomIcon atomUri={this.atomUri} ngRedux={this.props.ngRedux} />
+      );
+      atomHeaderContent = (
+        <div className="ph__right">
+          <div className="ph__right__topline">
+            <div className="ph__right__topline__title">
+              {this.hasTitle()
+                ? this.generateTitle()
+                : this.state.isDirectResponse
+                  ? "RE: no title"
+                  : "no title"}
+            </div>
+          </div>
+          <div className="ph__right__subtitle">
+            <span className="ph__right__subtitle__type">
+              {this.state.personaName ? (
+                <span className="ph__right__subtitle__type__persona">
+                  {this.state.personaName}
+                </span>
+              ) : (
+                undefined
+              )}
+              {this.state.isGroupChatEnabled ? (
+                <span className="ph__right__subtitle__type__groupchat">
+                  {this.state.isChatEnabled
+                    ? "Group Chat enabled"
+                    : "Group Chat"}
+                </span>
+              ) : (
+                undefined
+              )}
               <span>{this.state.atomTypeLabel}</span>
             </span>
-            <div className="ph__right__subtitle__date">{this.state.friendlyTimestamp}</div>
+            <div className="ph__right__subtitle__date">
+              {this.state.friendlyTimestamp}
+            </div>
           </div>
         </div>
       );
     }
 
     return (
-
-        <won-atom-header class={(this.state.atomLoading ? " won-is-loading " : "") + (this.state.atomToLoad ? " won-to-load " : "")}>
-          {atomHeaderIcon}
-          <VisibilitySensor onChange={(isVisible) => { this.onChange(isVisible) }} intervalDelay={200} partialVisibility={true} offset={{top: -300, bottom: -300}}>
-            {atomHeaderContent}
-          </VisibilitySensor>
-        </won-atom-header>
+      <won-atom-header
+        class={
+          (this.state.atomLoading ? " won-is-loading " : "") +
+          (this.state.atomToLoad ? " won-to-load " : "") +
+          (this.props.onClick ? " clickable " : "")
+        }
+        onClick={this.props.onClick}
+      >
+        {atomHeaderIcon}
+        <VisibilitySensor
+          onChange={isVisible => {
+            this.onChange(isVisible);
+          }}
+          intervalDelay={200}
+          partialVisibility={true}
+          offset={{ top: -300, bottom: -300 }}
+        >
+          {atomHeaderContent}
+        </VisibilitySensor>
+      </won-atom-header>
     );
   }
 
@@ -165,7 +217,9 @@ export default class WonAtomHeader extends React.Component {
       this.state.atomUri &&
       (!this.state.atom || (this.state.atomToLoad && !this.state.atomLoading))
     ) {
-      this.props.ngRedux.dispatch(actionCreators.atoms__fetchUnloadedAtom(this.state.atomUri));
+      this.props.ngRedux.dispatch(
+        actionCreators.atoms__fetchUnloadedAtom(this.state.atomUri)
+      );
     }
   }
 
@@ -191,3 +245,9 @@ export default class WonAtomHeader extends React.Component {
     }
   }
 }
+
+WonAtomHeader.propTypes = {
+  atomUri: PropTypes.string.isRequired,
+  ngRedux: PropTypes.object.isRequired,
+  onClick: PropTypes.func,
+};

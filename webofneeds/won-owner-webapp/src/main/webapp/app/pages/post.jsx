@@ -4,8 +4,8 @@
  */
 import angular from "angular";
 import ngAnimate from "angular-animate";
-import { getIn, get, delay } from "../utils.js";
-import { attach } from "../cstm-ng-utils.js";
+import { delay, get, getIn } from "../utils.js";
+import { attach, classOnComponentRoot } from "../cstm-ng-utils.js";
 import { connect2Redux } from "../configRedux.js";
 import won from "../won-es6.js";
 
@@ -16,7 +16,6 @@ import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as viewSelectors from "../redux/selectors/view-selectors.js";
 import * as processUtils from "../redux/utils/process-utils.js";
 import { h } from "preact";
-import { classOnComponentRoot } from "../cstm-ng-utils.js";
 
 import "~/style/_post.scss";
 import "~/style/_connection-overlay.scss";
@@ -93,7 +92,8 @@ class Controller {
         atomTitle: get(atom, "humanReadable"),
         won: won.WON,
         showSlideIns:
-          viewSelectors.hasSlideIns(state) && viewSelectors.isSlideInsVisible(state),
+          viewSelectors.hasSlideIns(state) &&
+          viewSelectors.isSlideInsVisible(state),
         showModalDialog: viewSelectors.showModalDialog(state),
         showConnectionOverlay: !!viewConnUri,
         viewConnUri,

@@ -2,11 +2,12 @@
  * Created by quasarchimaere on 30.07.2019.
  */
 import React from "react";
-import {get, getIn} from "../utils.js";
-import {actionCreators} from "../actions/actions.js";
+import { get, getIn } from "../utils.js";
+import { actionCreators } from "../actions/actions.js";
 
 import * as processUtils from "../redux/utils/process-utils.js";
 import * as atomUtils from "../redux/utils/atom-utils";
+import PropTypes from "prop-types";
 
 export default class WonAtomIcon extends React.Component {
   componentDidMount() {
@@ -75,7 +76,7 @@ export default class WonAtomIcon extends React.Component {
   render() {
     if (!this.state) {
       console.debug("render with null state");
-      return <div/>;
+      return <div />;
     }
 
     let holderIcon = undefined;
@@ -83,53 +84,80 @@ export default class WonAtomIcon extends React.Component {
 
     if (this.state.showHolderIdenticon) {
       holderIcon = (
-        <img className="holderIcon"
-             alt="Auto-generated title image for persona that holds the atom"
-             src={"data:image/svg+xml;base64," + this.state.holderIdenticonSvg}
+        <img
+          className="holderIcon"
+          alt="Auto-generated title image for persona that holds the atom"
+          src={"data:image/svg+xml;base64," + this.state.holderIdenticonSvg}
         />
       );
     } else if (this.state.showHolderImage) {
       holderIcon = (
-        <img className="holderIcon"
-             alt={this.state.holderImage.get('name')}
-             src={"data:" + this.state.holderImage.get('type') + ";base64," + this.state.holderImage.get('data')}
+        <img
+          className="holderIcon"
+          alt={this.state.holderImage.get("name")}
+          src={
+            "data:" +
+            this.state.holderImage.get("type") +
+            ";base64," +
+            this.state.holderImage.get("data")
+          }
         />
       );
     }
 
     if (this.state.showIdenticon) {
       atomIcon = (
-        <img className="image"
-             alt="Auto-generated title icon"
-             src={"data:image/svg+xml;base64," + this.state.identiconSvg}
+        <img
+          className="image"
+          alt="Auto-generated title icon"
+          src={"data:image/svg+xml;base64," + this.state.identiconSvg}
         />
       );
     } else if (this.state.showImage) {
       atomIcon = (
-        <img className="image"
-             alt={this.state.image.get('name')}
-             src={"data:" + this.state.image.get('type') + ";base64," + this.state.image.get('data')}
+        <img
+          className="image"
+          alt={this.state.image.get("name")}
+          src={
+            "data:" +
+            this.state.image.get("type") +
+            ";base64," +
+            this.state.image.get("data")
+          }
         />
       );
     } else if (this.state.useCaseIcon) {
       const style = {
-        backgroundColor: this.state.useCaseIconBackground
+        backgroundColor: this.state.useCaseIconBackground,
       };
 
       atomIcon = (
         <div className="image usecaseimage" style={style}>
           <svg className="si__usecaseicon">
-            <use xlinkHref={this.state.useCaseIcon} href={this.state.useCaseIcon}></use>
+            <use
+              xlinkHref={this.state.useCaseIcon}
+              href={this.state.useCaseIcon}
+            />
           </svg>
         </div>
       );
     }
 
     return (
-      <won-atom-icon class={(this.state.isPersona ? " won-is-persona " : "") + (this.state.atomFailedToLoad ? " won-failed-to-load " : "") + (this.state.isInactive ? " inactive " : "")}>
+      <won-atom-icon
+        class={
+          (this.state.isPersona ? " won-is-persona " : "") +
+          (this.state.atomFailedToLoad ? " won-failed-to-load " : "") +
+          (this.state.atomInactive ? " inactive " : "")
+        }
+      >
         {atomIcon}
         {holderIcon}
       </won-atom-icon>
     );
   }
 }
+WonAtomIcon.propTypes = {
+  atomUri: PropTypes.string.isRequired,
+  ngRedux: PropTypes.object.isRequired,
+};

@@ -3,7 +3,6 @@ import angular from "angular";
 import chatTextFieldModule from "./chat-textfield.js";
 import connectionMessageModule from "./messages/connection-message.js";
 import postContentMessageModule from "./messages/post-content-message.js";
-import connectionHeaderModule from "./connection-header.js";
 import shareDropdownModule from "./share-dropdown.js";
 import WonLabelledHr from "./labelled-hr.jsx";
 import connectionContextDropdownModule from "./connection-context-dropdown.js";
@@ -22,7 +21,7 @@ import { hasMessagesToLoad } from "../redux/selectors/connection-selectors.js";
 import { getUnreadMessagesByConnectionUri } from "../redux/selectors/message-selectors.js";
 import autoresizingTextareaModule from "../directives/textarea-autogrow.js";
 import { attach, classOnComponentRoot } from "../cstm-ng-utils.js";
-
+import WonConnectionHeader from "./connection-header.jsx";
 import "~/style/_group-post-messages.scss";
 import "~/style/_rdflink.scss";
 
@@ -45,9 +44,7 @@ function genComponentConf() {
                     </svg>
                 </a>
             </div>
-            <won-connection-header
-                connection-uri="self.connectionUri">
-            </won-connection-header>
+            <won-preact class="connectionHeader" component="self.WonConnectionHeader" props="{connectionUri: self.connectionUri}"></won-preact>
             <won-share-dropdown atom-uri="self.targetAtomUri"></won-share-dropdown>
             <won-connection-context-dropdown show-petri-net-data-field="" show-agreement-data-field=""></won-connection-context-dropdown>
         </div>
@@ -153,6 +150,7 @@ function genComponentConf() {
       attach(this, serviceDependencies, arguments);
       window.pm4dbg = this;
       this.WonLabelledHr = WonLabelledHr;
+      this.WonConnectionHeader = WonConnectionHeader;
       this.rdfTextfieldHelpText =
         "Expects valid turtle. " +
         `<${won.WONMSG.uriPlaceholder.event}> will ` +
@@ -450,7 +448,6 @@ export default angular
     autoresizingTextareaModule,
     chatTextFieldModule,
     connectionMessageModule,
-    connectionHeaderModule,
     connectionContextDropdownModule,
     postContentMessageModule,
     shareDropdownModule,

@@ -5,10 +5,10 @@
  */
 import angular from "angular";
 import ngAnimate from "angular-animate";
-import {delay, get, getIn, sortByDate} from "../utils.js";
-import {attach, classOnComponentRoot} from "../cstm-ng-utils.js";
-import {connect2Redux} from "../configRedux.js";
-import {actionCreators} from "../actions/actions.js";
+import { delay, get, getIn, sortByDate } from "../utils.js";
+import { attach, classOnComponentRoot } from "../cstm-ng-utils.js";
+import { connect2Redux } from "../configRedux.js";
+import { actionCreators } from "../actions/actions.js";
 import postMessagesModule from "../components/post-messages.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as viewSelectors from "../redux/selectors/view-selectors.js";
@@ -17,7 +17,7 @@ import * as wonLabelUtils from "../won-label-utils.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as useCaseUtils from "../usecase-utils.js";
 import WonAtomCardGrid from "../components/atom-card-grid.jsx";
-import {h} from "preact";
+import { h } from "preact";
 
 import "~/style/_overview.scss";
 import "~/style/_connection-overlay.scss";
@@ -69,10 +69,7 @@ const template = (
           </div>
         </div>
       </div>
-      <div
-        className="owneroverview__usecases"
-        ng-if="self.hasVisibleAtomUris"
-      >
+      <div className="owneroverview__usecases" ng-if="self.hasVisibleAtomUris">
         <div
           className="owneroverview__usecases__usecase"
           ng-repeat="ucIdentifier in self.whatsNewUseCaseIdentifierArray track by ucIdentifier"
@@ -114,8 +111,14 @@ const template = (
             />
           </div>
         </div>
-        <div className="owneroverview__usecases__usecase" ng-if="self.hasOtherAtoms()">
-          <div className="owneroverview__usecases__usecase__header" ng-if="self.whatsNewUseCaseIdentifierArray">
+        <div
+          className="owneroverview__usecases__usecase"
+          ng-if="self.hasOtherAtoms()"
+        >
+          <div
+            className="owneroverview__usecases__usecase__header"
+            ng-if="self.whatsNewUseCaseIdentifierArray"
+          >
             <div className="owneroverview__usecases__usecase__header__title">
               Other
               <span className="owneroverview__usecases__usecase__header__title__count">
@@ -185,10 +188,7 @@ class Controller {
         .toSet()
         .toArray();
 
-      const sortedVisibleAtoms = sortByDate(
-        whatsNewAtoms,
-        "creationDate"
-      );
+      const sortedVisibleAtoms = sortByDate(whatsNewAtoms, "creationDate");
       const sortedVisibleAtomUriArray = sortedVisibleAtoms && [
         ...sortedVisibleAtoms.flatMap(visibleAtom => get(visibleAtom, "uri")),
       ];
@@ -261,7 +261,7 @@ class Controller {
       ]
     );
   }
-  getSortedVisibleOtherAtomUriArray(ucIdentifier) {
+  getSortedVisibleOtherAtomUriArray() {
     const useCaseAtoms = this.whatsNewAtoms.filter(
       atom => !atomUtils.hasMatchedUseCase(atom)
     );
@@ -274,7 +274,9 @@ class Controller {
   }
 
   hasOtherAtoms() {
-    return !!this.whatsNewAtoms.find(atom => !atomUtils.hasMatchedUseCase(atom));
+    return !!this.whatsNewAtoms.find(
+      atom => !atomUtils.hasMatchedUseCase(atom)
+    );
   }
 
   getOtherAtomsSize() {
@@ -323,10 +325,7 @@ Controller.$inject = serviceDependencies;
 
 export default {
   module: angular
-    .module("won.owner.components.overview", [
-      ngAnimate,
-      postMessagesModule,
-    ])
+    .module("won.owner.components.overview", [ngAnimate, postMessagesModule])
     .controller("OverviewController", Controller).name,
   controller: "OverviewController",
   template: template,

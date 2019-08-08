@@ -3,9 +3,10 @@
  */
 
 import React from "react";
-import {Map, Marker, TileLayer} from "react-leaflet";
+import { Map, Marker, TileLayer } from "react-leaflet";
 import Leaflet from "leaflet";
 import VisibilitySensor from "react-visibility-sensor";
+import PropTypes from "prop-types";
 
 const currentLocationIcon = Leaflet.divIcon({
   className: "wonCurrentLocationMarkerIcon",
@@ -54,13 +55,12 @@ export default class WonAtomMap extends React.Component {
       return (
         <VisibilitySensor
           partialVisibility={true}
-          offset={{top: -300, bottom: -300}}
+          offset={{ top: -300, bottom: -300 }}
         >
           {({ isVisible }) => {
             if (isVisible) {
               return (
                 <Map
-                  ref="map"
                   center={
                     currentLocationTupel
                       ? currentLocationTupel
@@ -98,3 +98,8 @@ export default class WonAtomMap extends React.Component {
     return <div />;
   }
 }
+WonAtomMap.propTypes = {
+  locations: PropTypes.arrayOf(PropTypes.object).isRequired,
+  currentLocation: PropTypes.object,
+  disableControls: PropTypes.bool,
+};
