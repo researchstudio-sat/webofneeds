@@ -19,7 +19,7 @@ import VisibilitySensor from "react-visibility-sensor";
 export default class WonAtomContentBuddies extends React.Component {
   constructor(props){
     super(props);
-    this.localState = {
+    this.state = {
       suggestAtomExpanded: false
     };
   }
@@ -31,7 +31,7 @@ export default class WonAtomContentBuddies extends React.Component {
       this.selectFromState.bind(this),
       actionCreators
     )(state => {
-      this.setState({...state, ...this.localState});
+      this.setState(state);
     });
   }
 
@@ -41,12 +41,11 @@ export default class WonAtomContentBuddies extends React.Component {
 
   UNSAFE_componentWillReceiveProps(nextProps) {
     this.atomUri = nextProps.atomUri;
-    this.setState({...this.selectFromState(this.props.ngRedux.getState()), ...this.localState});
+    this.setState(his.selectFromState(this.props.ngRedux.getState()));
   }
 
   toggleSuggestions() {
-    this.localState.suggestAtomExpanded = !this.localState.suggestAtomExpanded;
-    this.setState({...this.state, ...this.localState});
+    this.setState({suggestAtomExpanded: !this.state.suggestAtomExpanded});
   }
 
   selectFromState(state) {

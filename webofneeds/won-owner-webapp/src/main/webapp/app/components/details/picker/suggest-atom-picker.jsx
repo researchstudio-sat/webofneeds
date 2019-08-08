@@ -29,7 +29,7 @@ export default class WonSuggestAtomPicker extends React.Component {
    */
   constructor(props) {
     super(props);
-    this.localState = {
+    this.state = {
       showFetchButton: false,
       showResetButton: false,
       uriToFetch: undefined,
@@ -42,7 +42,7 @@ export default class WonSuggestAtomPicker extends React.Component {
       this.selectFromState.bind(this),
       actionCreators
     )(state => {
-      this.setState({...state, ...this.localState});
+      this.setState(state);
     });
   }
 
@@ -52,7 +52,7 @@ export default class WonSuggestAtomPicker extends React.Component {
 
   UNSAFE_componentWillReceiveProps(nextProps) {
     this.initialValue = nextProps.initialValue;
-    this.setState({...this.selectFromState(this.props.ngRedux.getState()), ...this.localState});
+    this.setState(this.selectFromState(this.props.ngRedux.getState()));
   }
 
   selectFromState(state) {
@@ -77,17 +77,17 @@ export default class WonSuggestAtomPicker extends React.Component {
     const uriToFetchProcess = getIn(state, [
       "process",
       "atoms",
-      this.localState.uriToFetch,
+      this.state.uriToFetch,
     ]);
     const uriToFetchLoading = !!get(uriToFetchProcess, "loading");
     const uriToFetchFailedToLoad = !!get(uriToFetchProcess, "failedToLoad");
     const uriToFetchIsNotAllowed =
-      !!get(allForbiddenAtoms, this.localState.uriToFetch) &&
+      !!get(allForbiddenAtoms, this.state.uriToFetch) &&
       !this.hasAtLeastOneAllowedSocket(
-        get(allForbiddenAtoms, this.localState.uriToFetch)
+        get(allForbiddenAtoms, this.state.uriToFetch)
       );
     const uriToFetchIsExcluded = this.isExcludedAtom(
-      get(allForbiddenAtoms, this.localState.uriToFetch)
+      get(allForbiddenAtoms, this.state.uriToFetch)
     );
 
     return {
@@ -105,12 +105,12 @@ export default class WonSuggestAtomPicker extends React.Component {
       noSuggestionsLabel:
         this.noSuggestionsText || "No Atoms available to suggest",
       uriToFetchSuccess:
-        this.localState.uriToFetch &&
+        this.state.uriToFetch &&
         !uriToFetchLoading &&
         !uriToFetchFailedToLoad &&
-        get(allSuggestableAtoms, this.localState.uriToFetch),
+        get(allSuggestableAtoms, this.state.uriToFetch),
       uriToFetchFailed:
-        this.localState.uriToFetch &&
+        this.state.uriToFetch &&
         !uriToFetchLoading &&
         (uriToFetchFailedToLoad ||
           uriToFetchIsExcluded ||
@@ -256,18 +256,19 @@ export default class WonSuggestAtomPicker extends React.Component {
   updateFetchAtomUriField() {
     console.debug("suggest-atom-picker: ", "updateFetchAtomUriField()");
     const text = this.uriInput && this.uriInput.value;
-    this.localState.uriToFetch = undefined;
 
+    let showFetchButton;
+    let showResetButton;
     if (text && text.trim().length > 0) {
       if (this.uriInput.checkValidity()) {
-        this.localState.showResetButton = false;
-        this.localState.showFetchButton = true;
+        showResetButton = false;
+        showFetchButton = true;
       } else {
-        this.localState.showResetButton = true;
-        this.localState.showFetchButton = false;
+        showResetButton = true;
+        showFetchButton = false;
       }
     }
-    this.setState({...this.state, ...this.localState});
+    this.setState({uriToFetch: undefined, showResetButton: showResetButton, showFetchButton: showFetchButton});
   }
 
   fetchAtomUriFieldHasText() {
@@ -281,10 +282,7 @@ export default class WonSuggestAtomPicker extends React.Component {
     if (this.uriInput) {
       this.uriInput.value = "";
     }
-    this.localState.showResetButton = false;
-    this.localState.showFetchButton = false;
-    this.localState.uriToFetch = undefined;
-    this.setState({...this.state, ...this.localState});
+    this.setState({uriToFetch: undefined, showResetButton: false, showFetchButton: false});
   }
 
   fetchAtom() {
@@ -295,14 +293,13 @@ export default class WonSuggestAtomPicker extends React.Component {
       !getIn(this.state.allSuggestableAtoms, uriToFetch) &&
       !get(this.state.allForbiddenAtoms, uriToFetch)
     ) {
-      this.localState.uriToFetch = uriToFetch;
       this.props.ngRedux.dispatch(actionCreators.atoms__fetchUnloadedAtom(uriToFetch));
+      this.setState({uriToFetch: uriToFetch});
     } else if (get(this.state.allForbiddenAtoms, uriToFetch)) {
-      this.localState.uriToFetch = uriToFetch;
+      this.setState({uriToFetch: uriToFetch});
     } else {
       this.update(uriToFetch);
     }
-    this.setState({...this.state, ...this.localState});
   }
 
   selectAtom(atom) {
