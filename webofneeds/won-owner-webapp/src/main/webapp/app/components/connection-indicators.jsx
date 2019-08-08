@@ -147,7 +147,7 @@ export default class WonConnectionIndicators extends React.Component {
 
   setOpen() {
     if(this.state.latestConnectedUri) {
-      this.props.onSelectedConnection({ connectionUri: this.state.latestConnectedUri }); //trigger callback with scope-object
+      this.props.onClick(this.state.latestConnectedUri);
     }
   }
 }

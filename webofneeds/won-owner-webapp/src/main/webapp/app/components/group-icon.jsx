@@ -64,7 +64,7 @@ export default class WonGroupIcon extends React.Component {
     const groupMemberElements = this.state.groupMembersArray.map((groupMemberUri, index) => {
       if(this.state.groupMembersSize <= 4 || index < 3) {
         return (
-          <div className={"gi__icons__icon " + (this.state.groupMembersSize == 1 ? " gi__icons__icon--spanCol " : "")}>
+          <div key={groupMemberUri} className={"gi__icons__icon " + (this.state.groupMembersSize == 1 ? " gi__icons__icon--spanCol " : "")}>
             <WonAtomIcon atomUri={groupMemberUri} ngRedux={this.props.ngRedux}/>
           </div>
         );

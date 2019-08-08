@@ -2,20 +2,18 @@
 
 import angular from "angular";
 import ngAnimate from "angular-animate";
-import won from "../won-es6.js";
 import postMessagesModule from "../components/post-messages.js";
 import groupPostMessagesModule from "../components/group-post-messages.js";
-import connectionsOverviewModule from "../components/connections-overview.js";
-import { getIn, get } from "../utils.js";
-import { attach } from "../cstm-ng-utils.js";
-import { actionCreators } from "../actions/actions.js";
+import WonConnectionsOverview from "../components/connections-overview.jsx";
+import {get, getIn} from "../utils.js";
+import {attach, classOnComponentRoot} from "../cstm-ng-utils.js";
+import {actionCreators} from "../actions/actions.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as connectionSelectors from "../redux/selectors/connection-selectors.js";
 import * as connectionUtils from "../redux/utils/connection-utils.js";
 import * as accountUtils from "../redux/utils/account-utils.js";
 import * as viewSelectors from "../redux/selectors/view-selectors.js";
-import { h } from "preact";
-import { classOnComponentRoot } from "../cstm-ng-utils.js";
+import {h} from "preact";
 
 import "~/style/_connections.scss";
 import "~/style/_responsiveness-utils.scss";
@@ -39,7 +37,7 @@ const template = (
       ng-class="{'hide-in-responsive': self.hideListSideInResponsive}"
       ng-if="self.showListSide"
     >
-      <won-connections-overview on-selected-connection="::self.selectConnection(connectionUri)" />
+      <won-preact component="self.WonConnectionsOverview" props="{}"/>
     </aside>
     {/* RIGHT SIDE */}
     <main
@@ -90,7 +88,7 @@ const serviceDependencies = ["$element", "$ngRedux", "$scope", "$state"];
 class ConnectionsController {
   constructor() {
     attach(this, serviceDependencies, arguments);
-    this.WON = won.WON;
+    this.WonConnectionsOverview = WonConnectionsOverview;
 
     const selectFromState = state => {
       const viewConnUri = generalSelectors.getViewConnectionUriFromRoute(state);
@@ -157,32 +155,6 @@ class ConnectionsController {
     classOnComponentRoot("won-signed-out", () => !this.isLoggedIn, this);
     this.$scope.$on("$destroy", disconnect);
   }
-
-  selectConnection(connectionUri) {
-    this.markAsRead(connectionUri);
-    this.router__stateGoCurrent({ connectionUri: connectionUri });
-  }
-
-  markAsRead(connectionUri) {
-    const atom = generalSelectors.getOwnedAtomByConnectionUri(
-      this.$ngRedux.getState(),
-      connectionUri
-    );
-
-    const connUnread = getIn(atom, ["connections", connectionUri, "unread"]);
-    const connNotConnected =
-      getIn(atom, ["connections", connectionUri, "state"]) !==
-      won.WON.Connected;
-
-    if (connUnread && connNotConnected) {
-      const payload = {
-        connectionUri: connectionUri,
-        atomUri: atom.get("uri"),
-      };
-
-      this.connections__markAsRead(payload);
-    }
-  }
 }
 
 ConnectionsController.$inject = [];
@@ -193,7 +165,6 @@ export default {
       ngAnimate,
       postMessagesModule,
       groupPostMessagesModule,
-      connectionsOverviewModule,
     ])
     .controller("ConnectionsController", [
       ...serviceDependencies,

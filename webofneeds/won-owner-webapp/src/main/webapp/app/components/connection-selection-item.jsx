@@ -65,7 +65,7 @@ export default class WonConnectionSelectionItem extends React.Component {
 
     return (
       <won-connection-selection-item class={(this.state.openConnectionUri === this.connectionUri ? "selected " : "") + (this.state.isUnread ? "won-unread" : "")}>
-        <WonConnectionHeader connectionUri={this.connectionUri} ngRedux={this.props.ngRedux} onClick={this.props.onSelectedConnection}/>
+        <WonConnectionHeader connectionUri={this.connectionUri} ngRedux={this.props.ngRedux} onClick={this.props.onClick}/>
         {closeButton}
       </won-connection-selection-item>
     );

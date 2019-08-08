@@ -151,7 +151,7 @@ export default class WonAtomHeader extends React.Component {
 
     return (
 
-        <won-atom-header class={(this.state.atomLoading ? " won-is-loading " : "") + (this.state.atomToLoad ? " won-to-load " : "")}>
+        <won-atom-header class={(this.state.atomLoading ? " won-is-loading " : "") + (this.state.atomToLoad ? " won-to-load " : "") + (this.props.onClick? " clickable " : "")} onClick={this.props.onClick}>
           {atomHeaderIcon}
           <VisibilitySensor onChange={(isVisible) => { this.onChange(isVisible) }} intervalDelay={200} partialVisibility={true} offset={{top: -300, bottom: -300}}>
             {atomHeaderContent}
