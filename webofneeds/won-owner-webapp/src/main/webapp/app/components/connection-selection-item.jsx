@@ -13,7 +13,7 @@ export default class WonConnectionSelectionItem extends React.Component {
   static propTypes = {
     connectionUri: PropTypes.string.isRequired,
     ngRedux: PropTypes.object.isRequired,
-    onClick: PropTypes.function,
+    onClick: PropTypes.func,
   };
 
   componentDidMount() {
