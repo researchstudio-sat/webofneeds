@@ -70,8 +70,6 @@ export default class WonAtomContentDetails extends React.Component {
         return undefined;
       });
 
-    console.debug("contentDetailsMap: ", contentDetailsMap);
-
     const contentDetailsArray = contentDetailsMap
       ? contentDetailsMap.toArray()
       : [];
