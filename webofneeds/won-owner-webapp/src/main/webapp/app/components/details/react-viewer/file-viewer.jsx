@@ -23,41 +23,41 @@ export default class WonFileViewer extends React.Component {
       filesArray.map((file, index) => {
         return (
           <div className="filev__content__item" key={index}>
-            this.isImage(file) ? (
-            <a
-              className="filev__content__item__inner"
-              href={
-                "data:" + get(file, "type") + ";base64," + get(file, "data")
-              }
-              download={get(file, "name")}
-            >
-              <svg className="filev__content__item__inner__typeicon">
-                <use
-                  xlinkHref="#ico36_uc_transport_demand"
-                  href="#ico36_uc_transport_demand"
-                />
-              </svg>
-              <div className="filev__content__item__inner__label">
-                {get(file, "name")}
-              </div>
-            </a>
-            ) :(
-            <a
-              className="filev__content__item__inner"
-              onClick={() => this.openImageInNewTab(file)}
-            >
-              <img
-                className="filev__content__item__inner__image"
-                alt={get(file, "name")}
-                src={
+            {this.isImage(file) ? (
+              <a
+                className="filev__content__item__inner"
+                href={
                   "data:" + get(file, "type") + ";base64," + get(file, "data")
                 }
-              />
-              <div className="filev__content__item__inner__label">
-                {get(file, "name")}
-              </div>
-            </a>
-            )
+                download={get(file, "name")}
+              >
+                <svg className="filev__content__item__inner__typeicon">
+                  <use
+                    xlinkHref="#ico36_uc_transport_demand"
+                    href="#ico36_uc_transport_demand"
+                  />
+                </svg>
+                <div className="filev__content__item__inner__label">
+                  {get(file, "name")}
+                </div>
+              </a>
+            ) : (
+              <a
+                className="filev__content__item__inner"
+                onClick={() => this.openImageInNewTab(file)}
+              >
+                <img
+                  className="filev__content__item__inner__image"
+                  alt={get(file, "name")}
+                  src={
+                    "data:" + get(file, "type") + ";base64," + get(file, "data")
+                  }
+                />
+                <div className="filev__content__item__inner__label">
+                  {get(file, "name")}
+                </div>
+              </a>
+            )}
           </div>
         );
       });
@@ -71,6 +71,10 @@ export default class WonFileViewer extends React.Component {
         <div className="titlev__content">{files}</div>
       </won-file-viewer>
     );
+  }
+
+  isImage(file) {
+    return file && /^image\//.test(file.get("type"));
   }
 
   openImageInNewTab(file) {
