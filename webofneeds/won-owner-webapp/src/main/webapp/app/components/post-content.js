@@ -3,9 +3,9 @@
  */
 
 import angular from "angular";
-import postIsOrSeeksInfoModule from "./post-is-or-seeks-info.js";
 import postContentGeneral from "./post-content-general.js";
 import postContentPersona from "./post-content-persona.js";
+import WonAtomContentDetails from "./atom-content-details.jsx";
 import WonAtomContentHolds from "./atom-content-holds.jsx";
 import WonAtomContentSuggestions from "./atom-content-suggestions.jsx";
 import WonAtomContentParticipants from "./atom-content-participants.jsx";
@@ -73,9 +73,9 @@ function genComponentConf() {
           <!-- GENERAL INFORMATION -->
           <won-post-content-general ng-if="self.isSelectedTab('DETAIL')" post-uri="self.postUri"></won-post-content-general>
           <!-- DETAIL INFORMATION -->
-          <won-post-is-or-seeks-info branch="::'content'" ng-if="self.isSelectedTab('DETAIL') && self.hasContent" post-uri="self.postUri"></won-post-is-or-seeks-info>
+          <won-preact component="self.WonAtomContentDetails" props="{atomUri: self.postUri, branch: 'content'}" ng-if="self.isSelectedTab('DETAIL') && self.hasContent" ></won-preact>
           <won-preact component="self.WonLabelledHr" class="labelledHr cp__labelledhr" props="{label: 'Search'}" ng-show="self.isSelectedTab('DETAIL') && self.hasContent && self.hasSeeksBranch"></won-preact>
-          <won-post-is-or-seeks-info branch="::'seeks'" ng-if="self.isSelectedTab('DETAIL') && self.hasSeeksBranch" post-uri="self.postUri"></won-post-is-or-seeks-info>
+          <won-preact component="self.WonAtomContentDetails" props="{atomUri: self.postUri, branch: 'seeks'}" ng-if="self.isSelectedTab('DETAIL') && self.hasSeeksBranch"></won-preact>
 
           <!-- PERSONA INFORMATION -->
           <won-post-content-persona ng-if="self.isSelectedTab('HELDBY') && self.isHeld" holds-uri="self.postUri"></won-post-content-persona>
@@ -136,6 +136,7 @@ function genComponentConf() {
       this.addPersonaModule = Elm.AddPersona;
       this.WonAtomContentHolds = WonAtomContentHolds;
       this.WonAtomContentSuggestions = WonAtomContentSuggestions;
+      this.WonAtomContentDetails = WonAtomContentDetails;
       this.WonAtomContentParticipants = WonAtomContentParticipants;
       this.WonAtomContentBuddies = WonAtomContentBuddies;
       this.WonLabelledHr = WonLabelledHr;
@@ -226,7 +227,6 @@ function genComponentConf() {
 export default angular
   .module("won.owner.components.postContent", [
     ngAnimate,
-    postIsOrSeeksInfoModule,
     postContentGeneral,
     postContentPersona,
     trigModule,

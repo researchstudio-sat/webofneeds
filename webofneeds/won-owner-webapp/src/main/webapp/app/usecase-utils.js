@@ -11,12 +11,32 @@ import won from "./won-es6.js";
 import Immutable from "immutable";
 
 const useCasesImm = Immutable.fromJS(useCaseDefinitions.getAllUseCases());
+const allDetailsImm = Immutable.fromJS(initializeAllDetails());
+
 console.debug("useCasesImm: ", useCasesImm);
+console.debug("allDetailsImm: ", allDetailsImm);
+
 /**
  * Returns all the details that are defined in any useCase Defined in the useCaseDefinitions
  * and in the messageDetails
  */
 export function getAllDetails() {
+  return allDetailsImm.toJS();
+}
+
+/**
+ * Returns all the details that are defined in any useCase Defined in the useCaseDefinitions
+ * and in the messageDetails as an ImmutableJS Object
+ */
+export function getAllDetailsImm() {
+  return allDetailsImm;
+}
+
+/**
+ * Initialize all the details that are defined in any useCase Defined in the useCaseDefinitions
+ * and in the messageDetails
+ */
+function initializeAllDetails() {
   let allDetails = {};
   const useCases = useCaseDefinitions.getAllUseCases();
 
