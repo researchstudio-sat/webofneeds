@@ -5,10 +5,10 @@ import won from "../../won-es6.js";
 import Immutable from "immutable";
 import connectionMessageStatusModule from "./connection-message-status.js";
 import connectionMessageActionsModule from "./connection-message-actions.js";
-import messageContentModule from "./message-content.js"; // due to our need of recursivley integrating the combinedMessageContentModule within referencedMessageModule, we need to import the components here otherwise we will not be able to generate the component
 import referencedMessageContentModule from "./referenced-message-content.js";
 import combinedMessageContentModule from "./combined-message-content.js";
 import WonLabelledHr from "../labelled-hr.jsx";
+import WonMessageContent from "./message-content.jsx";
 
 import { connect2Redux } from "../../configRedux.js";
 import { get, getIn } from "../../utils.js";
@@ -69,7 +69,8 @@ function genComponentConf() {
     			        ng-if="!self.isCollapsed"
     			        message-uri="::self.messageUri"
                   connection-uri="self.connectionUri"
-                  group-chat-message="self.isGroupChatMessage">
+                  group-chat-message="self.isGroupChatMessage"
+                  message-content="self.WonMessageContent">
     			      </won-combined-message-content>
     			      <div class="won-cm__center__bubble__collapsed clickable"
     			        ng-if="self.isCollapsed"
@@ -106,6 +107,7 @@ function genComponentConf() {
       this.won = won;
       this.WonAtomIcon = WonAtomIcon;
       this.WonLabelledHr = WonLabelledHr;
+      this.WonMessageContent = WonMessageContent;
 
       const selectFromState = state => {
         const ownedAtom =
@@ -354,7 +356,6 @@ export default angular
   .module("won.owner.components.connectionMessage", [
     connectionMessageStatusModule,
     connectionMessageActionsModule,
-    messageContentModule,
     referencedMessageContentModule,
     combinedMessageContentModule,
     inviewModule.name,

@@ -44,15 +44,19 @@ function genComponentConf() {
             ng-click="!self.multiSelectType && self.isInjectIntoConnectionPresent(connUri) && self.router__stateGoCurrent({connectionUri: connUri})"
           ></won-preact>
       </div>
-      <won-message-content
+      <won-preact
+          component="self.messageContent"
+          props="{
+            messageUri: self.messageUri,
+            connectionUri: self.connectionUri,
+          }"
           ng-if="self.hasContent || self.hasNotBeenLoaded"
-          message-uri="::self.messageUri"
-          connection-uri="::self.connectionUri">
-      </won-message-content>
+      ></won-preact>
       <won-referenced-message-content
           ng-if="self.hasReferences"
           message-uri="::self.messageUri"
-          connection-uri="::self.connectionUri">
+          connection-uri="::self.connectionUri"
+          message-content="self.messageContent">
       </won-referenced-message-content>
       <won-trig
           trig="self.contentGraphTrig"
@@ -258,6 +262,7 @@ function genComponentConf() {
       messageUri: "=",
       connectionUri: "=",
       groupChatMessage: "=",
+      messageContent: "=", //TODO ONLY USED FOR REACT COMP INJECTION
     },
     template: template,
   };

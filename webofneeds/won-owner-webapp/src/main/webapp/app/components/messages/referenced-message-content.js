@@ -38,7 +38,8 @@ function genComponentConf() {
               'won-cm--right' : self.getReferencedMessage(msgUri) && self.getReferencedMessage(msgUri).get('outgoingMessage'),
             }"
             message-uri="self.getReferencedMessage(msgUri).get('uri')"
-            connection-uri="self.connection.get('uri')">
+            connection-uri="self.connection.get('uri')"
+            message-content="self.messageContent">
           </won-combined-message-content>
         </div>
       </div>
@@ -65,7 +66,8 @@ function genComponentConf() {
               'won-cm--right' : self.getReferencedMessage(msgUri) && self.getReferencedMessage(msgUri).get('outgoingMessage'),
             }"
             message-uri="self.getReferencedMessage(msgUri).get('uri')"
-            connection-uri="self.connection.get('uri')">
+            connection-uri="self.connection.get('uri')"
+            message-content="self.messageContent">
           </won-combined-message-content>
         </div>
       </div>
@@ -92,7 +94,8 @@ function genComponentConf() {
               'won-cm--right' : self.getReferencedMessage(msgUri) && self.getReferencedMessage(msgUri).get('outgoingMessage'),
             }"
             message-uri="self.getReferencedMessage(msgUri).get('uri')"
-            connection-uri="self.connection.get('uri')">
+            connection-uri="self.connection.get('uri')"
+            message-content="self.messageContent">
           </won-combined-message-content>
         </div>
       </div>
@@ -119,7 +122,8 @@ function genComponentConf() {
               'won-cm--right' : self.getReferencedMessage(msgUri) && self.getReferencedMessage(msgUri).get('outgoingMessage'),
             }"
             message-uri="self.getReferencedMessage(msgUri).get('uri')"
-            connection-uri="self.connection.get('uri')">
+            connection-uri="self.connection.get('uri')"
+            message-content="self.messageContent">
           </won-combined-message-content>
         </div>
       </div>
@@ -146,7 +150,8 @@ function genComponentConf() {
               'won-cm--right' : self.getReferencedMessage(msgUri) && self.getReferencedMessage(msgUri).get('outgoingMessage'),
             }"
             message-uri="self.getReferencedMessage(msgUri).get('uri')"
-            connection-uri="self.connection.get('uri')">
+            connection-uri="self.connection.get('uri')"
+            message-content="self.messageContent">
           </won-combined-message-content>
         </div>
       </div>
@@ -173,7 +178,8 @@ function genComponentConf() {
               'won-cm--right' : self.getReferencedMessage(msgUri) && self.getReferencedMessage(msgUri).get('outgoingMessage'),
             }"
             message-uri="self.getReferencedMessage(msgUri).get('uri')"
-            connection-uri="self.connection.get('uri')">
+            connection-uri="self.connection.get('uri')"
+            message-content="self.messageContent">
           </won-combined-message-content>
         </div>
       </div>
@@ -197,7 +203,8 @@ function genComponentConf() {
             ng-repeat="msgUri in self.forwardUrisArray"
             class="won-cm--forward"
             message-uri="self.getReferencedMessage(msgUri).get('uri')"
-            connection-uri="self.connection.get('uri')">
+            connection-uri="self.connection.get('uri')"
+            message-content="self.messageContent">
           </won-combined-message-content>
         </div>
       </div>
@@ -364,6 +371,7 @@ function genComponentConf() {
     scope: {
       messageUri: "=",
       connectionUri: "=",
+      messageContent: "=", //only used for react comp injection
     },
     template: template,
   };
