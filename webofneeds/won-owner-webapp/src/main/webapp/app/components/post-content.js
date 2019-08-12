@@ -10,8 +10,8 @@ import WonAtomContentHolds from "./atom-content-holds.jsx";
 import WonAtomContentSuggestions from "./atom-content-suggestions.jsx";
 import WonAtomContentParticipants from "./atom-content-participants.jsx";
 import WonAtomContentBuddies from "./atom-content-buddies.jsx";
+import WonTrig from "./trig.jsx";
 import WonLabelledHr from "./labelled-hr.jsx";
-import trigModule from "./trig.js";
 import { get, getIn } from "../utils.js";
 import won from "../won-es6.js";
 import { connect2Redux } from "../configRedux.js";
@@ -119,10 +119,7 @@ function genComponentConf() {
                   </svg>
                   <span class="rdflink__label">Connection</span>
             </a>
-            <won-trig
-              ng-if="self.post.get('jsonld')"
-              jsonld="self.post.get('jsonld')">
-            </won-trig>
+            <won-preact component="self.WonTrig" props="{jsonld: self.post.get('jsonld')}" ng-if="self.post.get('jsonld')"></won-preact>
           </div>
         </div>
     `;
@@ -140,6 +137,7 @@ function genComponentConf() {
       this.WonAtomContentParticipants = WonAtomContentParticipants;
       this.WonAtomContentBuddies = WonAtomContentBuddies;
       this.WonLabelledHr = WonLabelledHr;
+      this.WonTrig = WonTrig;
 
       const selectFromState = state => {
         const openConnectionUri = getConnectionUriFromRoute(state);
@@ -229,7 +227,6 @@ export default angular
     ngAnimate,
     postContentGeneral,
     postContentPersona,
-    trigModule,
     elmModule,
   ])
   .directive("wonPostContent", genComponentConf).name;
