@@ -11,7 +11,7 @@ import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as processUtils from "../redux/utils/process-utils.js";
 import { actionCreators } from "../actions/actions.js";
-import descriptionDetailViewerModule from "./details/viewer/description-viewer.js";
+import descriptionDetailViewerModule from "./details/_angular_viewer/description-viewer.js";
 import { details } from "../../config/detail-definitions.js";
 
 import { Elm } from "../../elm/RatingView.elm";

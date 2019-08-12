@@ -2,10 +2,10 @@ import { get, getIn, is } from "../../app/utils.js";
 import { select } from "../details/abstract.js";
 import Immutable from "immutable";
 import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
-import WonTitleViewer from "../../app/components/details/react-viewer/title-viewer.jsx";
-import WonDescriptionViewer from "../../app/components/details/react-viewer/description-viewer.jsx";
-import WonTagsViewer from "../../app/components/details/react-viewer/tags-viewer.jsx";
-import WonSuggestPostViewer from "../../app/components/details/react-viewer/suggestpost-viewer.jsx";
+import WonTitleViewer from "../../app/components/details/viewer/title-viewer.jsx";
+import WonDescriptionViewer from "../../app/components/details/viewer/description-viewer.jsx";
+import WonTagsViewer from "../../app/components/details/viewer/tags-viewer.jsx";
+import WonSuggestPostViewer from "../../app/components/details/viewer/suggestpost-viewer.jsx";
 
 export const title = {
   identifier: "title",
@@ -13,8 +13,7 @@ export const title = {
   icon: "#ico36_detail_title",
   placeholder: "What? (Short title shown in lists)",
   component: "won-title-picker",
-  viewerComponent: "won-title-viewer",
-  reactViewerComponent: WonTitleViewer,
+  viewerComponent: WonTitleViewer,
   parseToRDF: function({ value }) {
     const val = value ? value : undefined;
     return {
@@ -46,8 +45,7 @@ export const personaName = {
   icon: "#ico36_detail_title",
   placeholder: "Your Name",
   component: "won-title-picker",
-  viewerComponent: "won-title-viewer",
-  reactViewerComponent: WonTitleViewer,
+  viewerComponent: WonTitleViewer,
   parseToRDF: function({ value }) {
     const val = value ? value : undefined;
     return {
@@ -72,8 +70,7 @@ export const website = {
   icon: "#ico36_detail_title",
   placeholder: "Website",
   component: "won-title-picker",
-  viewerComponent: "won-title-viewer",
-  reactViewerComponent: WonTitleViewer,
+  viewerComponent: WonTitleViewer,
   parseToRDF: function({ value }) {
     const val = value ? value : undefined;
     return {
@@ -97,8 +94,7 @@ export const searchString = {
   icon: "#ico36_search",
   placeholder: "What do you look for?",
   component: "won-title-picker",
-  viewerComponent: "won-title-viewer",
-  reactViewerComponent: WonTitleViewer,
+  viewerComponent: WonTitleViewer,
   parseToRDF: function({ value }) {
     const val = value ? value : undefined;
     return {
@@ -126,8 +122,7 @@ export const description = {
   icon: "#ico36_detail_description",
   placeholder: "Enter Description...",
   component: "won-description-picker",
-  viewerComponent: "won-description-viewer",
-  reactViewerComponent: WonDescriptionViewer,
+  viewerComponent: WonDescriptionViewer,
   parseToRDF: function({ value }) {
     const val = value ? value : undefined;
     return {
@@ -160,8 +155,7 @@ export const tags = {
   icon: "#ico36_detail_tags",
   placeholder: "e.g. couch, free",
   component: "won-tags-picker",
-  viewerComponent: "won-tags-viewer",
-  reactViewerComponent: WonTagsViewer,
+  viewerComponent: WonTagsViewer,
   messageEnabled: true,
   parseToRDF: function({ value }) {
     if (!value) {
@@ -188,8 +182,7 @@ export const suggestPost = {
   icon: "#ico36_detail_title", //TODO: CORRECT ICON
   placeholder: "Insert PostUri and Accept",
   component: "won-suggestpost-picker",
-  viewerComponent: "won-suggestpost-viewer",
-  reactViewerComponent: WonSuggestPostViewer,
+  viewerComponent: WonSuggestPostViewer,
   parseToRDF: function({ value }) {
     const val = value ? value : undefined;
 
@@ -218,8 +211,7 @@ export const responseToUri = {
   icon: "#ico36_detail_title", //TODO: CORRECT ICON
   placeholder: "Insert PostUri and Accept",
   component: "won-suggestpost-picker",
-  viewerComponent: "won-suggestpost-viewer",
-  reactViewerComponent: WonSuggestPostViewer,
+  viewerComponent: WonSuggestPostViewer,
   messageEnabled: false,
   parseToRDF: function({ value }) {
     const val = value ? value : undefined;
@@ -248,7 +240,6 @@ export const flags = {
   identifier: "flags",
   label: "Flags",
   icon: "#ico36_detail_title", //TODO: CORRECT ICON
-  reactViewerComponent: undefined, //this is so we do not display this with a detail-viewer,
   viewerComponent: undefined, //this is so we do not display this with a detail-viewer,
   component: undefined, //this is so we do not display the component as a detail-picker, but are still able to use the parseToRDF, parseFromRDF functions
   multiSelect: true,
@@ -289,7 +280,6 @@ export const type = {
   identifier: "type",
   label: "Types",
   icon: "#ico36_detail_title", //TODO: CORRECT ICON
-  reactViewerComponent: undefined, //this is so we do not display this with a detail-viewer,
   viewerComponent: undefined, //this is so we do not display this with a detail-viewer,
   component: undefined, //this is so we do not display the component as a detail-picker, but are still able to use the parseToRDF, parseFromRDF functions
   multiSelect: true,
@@ -336,8 +326,7 @@ export const sockets = {
   identifier: "sockets",
   label: "Sockets",
   icon: "#ico36_detail_title", //TODO: CORRECT ICON
-  reactViewerComponent: undefined, //this is so we do not display this with a detail-viewer,
-  viewerComponent: undefined,
+  viewerComponent: undefined, //this is so we do not display this with a detail-viewer,
   component: undefined,
   multiSelect: true,
   options: [
@@ -419,8 +408,7 @@ export const defaultSocket = {
   identifier: "defaultSocket",
   label: "Default Socket",
   icon: "#ico36_detail_title", //TODO: CORRECT ICON
-  reactViewerComponent: undefined, //this is so we do not display this with a detail-viewer,
-  viewerComponent: undefined,
+  viewerComponent: undefined, //this is so we do not display this with a detail-viewer,
   component: undefined,
   multiSelect: false,
   parseToRDF: function({ value }) {

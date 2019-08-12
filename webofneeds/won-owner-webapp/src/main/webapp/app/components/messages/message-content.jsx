@@ -106,10 +106,7 @@ export default class WonMessageContent extends React.Component {
         this.state.content &&
         this.state.content.map((contentDetail, contentDetailKey) => {
           const detailDefinition = get(allDetailsImm, contentDetailKey);
-          const ReactViewerComponent = get(
-            detailDefinition,
-            "reactViewerComponent"
-          );
+          const ReactViewerComponent = get(detailDefinition, "viewerComponent");
 
           if (detailDefinition && ReactViewerComponent) {
             return (

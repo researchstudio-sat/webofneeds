@@ -1,6 +1,6 @@
 import { generateIdString, get } from "../../app/utils.js";
 import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
-import WonPaypalPaymentViewer from "../../app/components/details/react-viewer/paypal-payment-viewer.jsx";
+import WonPaypalPaymentViewer from "../../app/components/details/viewer/paypal-payment-viewer.jsx";
 
 // TODO: don't demand customer info
 export const paypalPayment = {
@@ -15,8 +15,7 @@ export const paypalPayment = {
   // secretPlaceholder: "Enter Secret...",
   //customerLabel: "Invoice will be sent to...",
   component: "won-paypal-payment-picker",
-  viewerComponent: "won-paypal-payment-viewer",
-  reactViewerComponent: WonPaypalPaymentViewer,
+  viewerComponent: WonPaypalPaymentViewer,
   currency: [
     { value: "EUR", label: "€", default: true },
     { value: "USD", label: "$" },

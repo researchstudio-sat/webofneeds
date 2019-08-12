@@ -1,7 +1,7 @@
 import { generateIdString } from "../../app/utils.js";
 import Immutable from "immutable";
 import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
-import WonPriceViewer from "../../app/components/details/react-viewer/price-viewer.jsx";
+import WonPriceViewer from "../../app/components/details/viewer/price-viewer.jsx";
 
 export const pricerange = {
   identifier: "pricerange",
@@ -24,8 +24,7 @@ export const pricerange = {
     { value: "", label: "total", default: true },
   ],
   component: "won-price-range-picker",
-  viewerComponent: "won-price-viewer",
-  reactViewerComponent: WonPriceViewer,
+  viewerComponent: WonPriceViewer,
   messageEnabled: true,
   parseToRDF: function({ value, identifier, contentUri }) {
     if (
@@ -149,8 +148,7 @@ export const price = {
   icon: "#ico36_detail_price",
   placeholder: "Enter Price...",
   component: "won-price-picker",
-  viewerComponent: "won-price-viewer",
-  reactViewerComponent: WonPriceViewer,
+  viewerComponent: WonPriceViewer,
   currency: [
     { value: "EUR", label: "€", default: true },
     { value: "USD", label: "$" },

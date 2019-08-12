@@ -49,10 +49,7 @@ export default class WonAtomContentDetails extends React.Component {
           detailDefinition &&
           !this.shouldOmitDetail(contentDetail, contentDetailKey)
         ) {
-          const ReactViewerComponent = get(
-            detailDefinition,
-            "reactViewerComponent"
-          );
+          const ReactViewerComponent = get(detailDefinition, "viewerComponent");
 
           if (ReactViewerComponent) {
             return (

@@ -5,7 +5,7 @@ import * as basicDetails from "./basic.js";
 import { generateIdString, getIn } from "../../app/utils.js";
 import Immutable from "immutable";
 import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
-import WonPersonViewer from "../../app/components/details/react-viewer/person-viewer.jsx";
+import WonPersonViewer from "../../app/components/details/viewer/person-viewer.jsx";
 
 export const skillsDetail = {
   ...basicDetails.tags,
@@ -49,8 +49,7 @@ export const person = {
   icon: "#ico36_detail_person",
   placeholder: undefined,
   component: "won-person-picker",
-  viewerComponent: "won-person-viewer",
-  reactViewerComponent: WonPersonViewer,
+  viewerComponent: WonPersonViewer,
   messageEnabled: true,
   parseToRDF: function({ value, identifier, contentUri }) {
     if (!value) {

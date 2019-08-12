@@ -3,10 +3,10 @@
  * you will need to alter the identifier, label, icon, parseToRDF, and parseFromRDF if
  * you want to use it.
  */
-import WonRangeViewer from "../../app/components/details/react-viewer/range-viewer.jsx";
-import WonNumberViewer from "../../app/components/details/react-viewer/number-viewer.jsx";
-import WonSelectViewer from "../../app/components/details/react-viewer/select-viewer.jsx";
-import WonDropdownViewer from "../../app/components/details/react-viewer/dropdown-viewer.jsx";
+import WonRangeViewer from "../../app/components/details/viewer/range-viewer.jsx";
+import WonNumberViewer from "../../app/components/details/viewer/number-viewer.jsx";
+import WonSelectViewer from "../../app/components/details/viewer/select-viewer.jsx";
+import WonDropdownViewer from "../../app/components/details/viewer/dropdown-viewer.jsx";
 
 export const range = {
   identifier: function() {
@@ -25,8 +25,7 @@ export const range = {
   maxPlaceholder: undefined,
   icon: undefined,
   component: "won-range-picker",
-  reactViewerComponent: WonRangeViewer,
-  viewerComponent: "won-range-viewer",
+  viewerComponent: WonRangeViewer,
   parseToRDF: function() {
     throw "abstract Detail does not override necessary function";
   },
@@ -46,8 +45,7 @@ export const number = {
   },
   icon: undefined,
   component: "won-number-picker",
-  viewerComponent: "won-number-viewer",
-  reactViewerComponent: WonNumberViewer,
+  viewerComponent: WonNumberViewer,
   parseToRDF: function() {
     throw "abstract Detail does not override necessary function";
   },
@@ -67,8 +65,7 @@ export const select = {
   },
   icon: undefined,
   component: "won-select-picker",
-  viewerComponent: "won-select-viewer",
-  reactViewerComponent: WonSelectViewer,
+  viewerComponent: WonSelectViewer,
   multiSelect: false,
   options: function() {
     throw 'abstract Detail does not override necessary options array(structure: [{value: val, label: "labeltext"}...]';
@@ -102,8 +99,7 @@ export const dropdown = {
   },
   icon: undefined,
   component: "won-dropdown-picker",
-  viewerComponent: "won-dropdown-viewer",
-  reactViewerComponent: WonDropdownViewer,
+  viewerComponent: WonDropdownViewer,
   options: function() {
     throw 'abstract Detail does not override necessary options array(structure: [{value: val, label: "labeltext"}...]';
     /**

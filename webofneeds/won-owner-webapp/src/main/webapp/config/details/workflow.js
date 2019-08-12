@@ -4,9 +4,9 @@ import {
   get,
 } from "../../app/utils.js";
 import Immutable from "immutable";
-import WonWorkflowViewer from "../../app/components/details/react-viewer/workflow-viewer.jsx";
-import WonPetrinetViewer from "../../app/components/details/react-viewer/petrinet-viewer.jsx";
-import WonPetrinetTransitionViewer from "../../app/components/details/react-viewer/petrinettransition-viewer.jsx";
+import WonWorkflowViewer from "../../app/components/details/viewer/workflow-viewer.jsx";
+import WonPetrinetViewer from "../../app/components/details/viewer/petrinet-viewer.jsx";
+import WonPetrinetTransitionViewer from "../../app/components/details/viewer/petrinettransition-viewer.jsx";
 
 export const bpmnWorkflow = {
   identifier: "bpmnWorkflow",
@@ -16,8 +16,7 @@ export const bpmnWorkflow = {
   //accepts: "application/octet-stream",
   accepts: "",
   component: "won-workflow-picker",
-  viewerComponent: "won-workflow-viewer",
-  reactViewerComponent: WonWorkflowViewer,
+  viewerComponent: WonWorkflowViewer,
   messageEnabled: true,
   parseToRDF: function({ value, identifier, contentUri }) {
     if (value && value.name && value.data) {
@@ -67,8 +66,7 @@ export const petriNetWorkflow = {
   //accepts: "application/octet-stream",
   accepts: "",
   component: "won-petrinet-picker",
-  viewerComponent: "won-petrinet-viewer",
-  reactViewerComponent: WonPetrinetViewer,
+  viewerComponent: WonPetrinetViewer,
   messageEnabled: true,
   parseToRDF: function({ value, identifier, contentUri }) {
     if (value && value.name && value.data) {
@@ -119,8 +117,7 @@ export const petriNetTransition = {
   label: "Transition",
   icon: "#ico36_detail_workflow", //TODO: CORRECT ICON
   component: "won-petrinettransition-picker",
-  viewerComponent: "won-petrinettransition-viewer",
-  reactViewerComponent: WonPetrinetTransitionViewer,
+  viewerComponent: WonPetrinetTransitionViewer,
   messageEnabled: true,
   parseToRDF: function({ value }) {
     if (value && value.petriNetUri && value.transitionUri) {
