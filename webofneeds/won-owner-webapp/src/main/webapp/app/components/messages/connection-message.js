@@ -6,7 +6,6 @@ import Immutable from "immutable";
 import connectionMessageStatusModule from "./connection-message-status.js";
 import connectionMessageActionsModule from "./connection-message-actions.js";
 import WonLabelledHr from "../labelled-hr.jsx";
-import WonMessageContent from "./message-content.jsx";
 import WonCombinedMessageContent from "./combined-message-content.jsx";
 import WonAtomIcon from "../atom-icon.jsx";
 
@@ -109,7 +108,6 @@ function genComponentConf() {
       this.won = won;
       this.WonAtomIcon = WonAtomIcon;
       this.WonLabelledHr = WonLabelledHr;
-      this.WonMessageContent = WonMessageContent;
       this.WonCombinedMessageContent = WonCombinedMessageContent;
 
       const selectFromState = state => {

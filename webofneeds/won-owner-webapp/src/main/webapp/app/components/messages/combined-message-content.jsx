@@ -135,7 +135,7 @@ export default class WonCombinedMessageContent extends React.Component {
     let messageHeaderInjectInElement;
     if (!this.state.isConnectionMessage) {
       const headerLabel =
-        labels.messageType[this.messageType] || this.state.messageType;
+        labels.messageType[this.state.messageType] || this.state.messageType;
 
       messageHeaderElement = !this.state.hasNotBeenLoaded ? (
         <div className="msg__header">
