@@ -20,15 +20,13 @@ export default class WonLocationViewer extends React.Component {
 
   render() {
     const icon = this.props.detail.icon && (
-      <svg className="locationv__header__icon">
+      <svg className="lv__header__icon">
         <use xlinkHref={this.props.detail.icon} href={this.props.detail.icon} />
       </svg>
     );
 
     const label = this.props.detail.icon && (
-      <span className="locationv__header__label">
-        {this.props.detail.label}
-      </span>
+      <span className="lv__header__label">{this.props.detail.label}</span>
     );
 
     const address = get(this.props.content, "address");
@@ -62,11 +60,11 @@ export default class WonLocationViewer extends React.Component {
 
     return (
       <won-location-viewer>
-        <div className="locationv__header">
+        <div className="lv__header">
           {icon}
           {label}
         </div>
-        <div className="locationv__content">
+        <div className="lv__content">
           {addressElement}
           {map}
         </div>
