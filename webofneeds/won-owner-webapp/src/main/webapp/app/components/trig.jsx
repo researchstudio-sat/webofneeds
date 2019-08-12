@@ -7,7 +7,7 @@ import React from "react";
 import "~/style/_trig.scss";
 import PropTypes from "prop-types";
 
-export default class WonLabelledHr extends React.Component {
+export default class WonTrig extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -73,7 +73,7 @@ export default class WonLabelledHr extends React.Component {
   //   this.trigBody = trigBody;
   // }
 }
-WonLabelledHr.propTypes = {
+WonTrig.propTypes = {
   trig: PropTypes.string,
   jsonld: PropTypes.object,
 };

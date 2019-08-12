@@ -121,7 +121,8 @@ won-connection-message {
   &.won-is-retracted:not(.won-is-collapsed) {
     opacity: 0.35;
     .won-cm__center__bubble {
-      won-combined-message-content {
+      won-combined-message-content,
+      won-preact > won-combined-message-content {
         text-decoration: line-through;
         text-decoration-color: black;
       }
@@ -156,7 +157,7 @@ won-connection-message {
       > won-connection-message-actions {
         grid-column: 1 / span 2;
       }
-
+      > won-preact.combinedMessageContent,
       > won-combined-message-content {
         grid-column: 1 / span 1;
       }

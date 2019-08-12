@@ -5,10 +5,10 @@ import won from "../../won-es6.js";
 import Immutable from "immutable";
 import connectionMessageStatusModule from "./connection-message-status.js";
 import connectionMessageActionsModule from "./connection-message-actions.js";
-import referencedMessageContentModule from "./referenced-message-content.js";
-import combinedMessageContentModule from "./combined-message-content.js";
 import WonLabelledHr from "../labelled-hr.jsx";
 import WonMessageContent from "./message-content.jsx";
+import WonCombinedMessageContent from "./combined-message-content.jsx";
+import WonAtomIcon from "../atom-icon.jsx";
 
 import { connect2Redux } from "../../configRedux.js";
 import { get, getIn } from "../../utils.js";
@@ -23,7 +23,6 @@ import urljoin from "url-join";
 
 import "~/style/_connection-message.scss";
 import "~/style/_rdflink.scss";
-import WonAtomIcon from "../atom-icon.jsx";
 
 const MESSAGE_READ_TIMEOUT = 1500;
 
@@ -65,13 +64,16 @@ function genComponentConf() {
                   'partiallyLoaded': self.isPartiallyLoaded,
                   'failure': self.isSent && self.isFailedToSend,
     			      }">
-    			      <won-combined-message-content
-    			        ng-if="!self.isCollapsed"
-    			        message-uri="::self.messageUri"
-                  connection-uri="self.connectionUri"
-                  group-chat-message="self.isGroupChatMessage"
-                  message-content="self.WonMessageContent">
-    			      </won-combined-message-content>
+    			      <won-preact
+                    class="combinedMessageContent"
+                    component="self.WonCombinedMessageContent"
+    			          ng-if="!self.isCollapsed"
+    			          props="{
+    			              messageUri: self.messageUri,
+    			              connectionUri: self.connectionUri,
+    			              groupChatMessage: self.isGroupChatMessage,
+    			          }"
+    			      ></won-preact>
     			      <div class="won-cm__center__bubble__collapsed clickable"
     			        ng-if="self.isCollapsed"
     			        ng-click="self.expandMessage()">
@@ -108,6 +110,7 @@ function genComponentConf() {
       this.WonAtomIcon = WonAtomIcon;
       this.WonLabelledHr = WonLabelledHr;
       this.WonMessageContent = WonMessageContent;
+      this.WonCombinedMessageContent = WonCombinedMessageContent;
 
       const selectFromState = state => {
         const ownedAtom =
@@ -356,8 +359,6 @@ export default angular
   .module("won.owner.components.connectionMessage", [
     connectionMessageStatusModule,
     connectionMessageActionsModule,
-    referencedMessageContentModule,
-    combinedMessageContentModule,
     inviewModule.name,
   ])
   .directive("wonConnectionMessage", genComponentConf).name;

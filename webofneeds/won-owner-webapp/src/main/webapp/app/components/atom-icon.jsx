@@ -146,6 +146,8 @@ export default class WonAtomIcon extends React.Component {
     return (
       <won-atom-icon
         class={
+          (this.props.className ? this.props.className : "") +
+          " " +
           (this.state.isPersona ? " won-is-persona " : "") +
           (this.state.atomFailedToLoad ? " won-failed-to-load " : "") +
           (this.state.atomInactive ? " inactive " : "")
@@ -160,4 +162,5 @@ export default class WonAtomIcon extends React.Component {
 WonAtomIcon.propTypes = {
   atomUri: PropTypes.string.isRequired,
   ngRedux: PropTypes.object.isRequired,
+  className: PropTypes.string,
 };

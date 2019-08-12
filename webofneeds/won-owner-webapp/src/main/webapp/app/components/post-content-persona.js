@@ -11,7 +11,6 @@ import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as processUtils from "../redux/utils/process-utils.js";
 import { actionCreators } from "../actions/actions.js";
-import descriptionDetailViewerModule from "./details/_angular_viewer/description-viewer.js";
 import { details } from "../../config/detail-definitions.js";
 
 import { Elm } from "../../elm/RatingView.elm";
@@ -20,6 +19,7 @@ import elmModule from "./elm.js";
 import "~/style/_post-content-persona.scss";
 import { getOwnedConnectionByUri } from "../redux/selectors/connection-selectors.js";
 import WonAtomIcon from "./atom-icon.jsx";
+import WonDescriptionViewer from "./details/viewer/description-viewer.jsx";
 
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
@@ -58,7 +58,7 @@ function genComponentConf() {
         <div class="pcp__buddies__label">Buddy of {{ self.personaBuddySize }} Persona(s)</div>
         <button class="pcp__buddies__view won-button--filled red" ng-click="self.viewPersonaBuddies()">View</button>
       </div>
-      <won-description-viewer detail="::self.descriptionDetail" content="self.personaDescription" ng-if="self.descriptionDetail && self.personaDescription"></won-description-viewer>
+      <won-preact component="self.WonDescriptionViewer" props="{detail: self.descriptionDetail, content: self.personaDescription}" ng-if="self.descriptionDetail && self.personaDescription"></won-preact>
       <button ng-if="self.postIsOwned" class="won-button--filled red" ng-click="self.removePersona()">Remove Persona</button>
     `;
 
@@ -67,6 +67,7 @@ function genComponentConf() {
       attach(this, serviceDependencies, arguments);
       window.pcp4dbg = this;
       this.WonAtomIcon = WonAtomIcon;
+      this.WonDescriptionViewer = WonDescriptionViewer;
 
       this.ratingView = Elm.RatingView;
 
@@ -180,8 +181,5 @@ function genComponentConf() {
 }
 
 export default angular
-  .module("won.owner.components.postContentPersona", [
-    elmModule,
-    descriptionDetailViewerModule,
-  ])
+  .module("won.owner.components.postContentPersona", [elmModule])
   .directive("wonPostContentPersona", genComponentConf).name;
