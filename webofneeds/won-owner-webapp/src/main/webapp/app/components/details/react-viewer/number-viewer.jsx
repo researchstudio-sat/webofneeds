@@ -16,7 +16,7 @@ export default class WonNumberViewer extends React.Component {
     );
 
     return (
-      <won-number-viewer>
+      <won-number-viewer class={this.props.className}>
         <div className="numberv__header">
           {icon}
           {label}
@@ -29,4 +29,5 @@ export default class WonNumberViewer extends React.Component {
 WonNumberViewer.propTypes = {
   detail: PropTypes.object,
   content: PropTypes.object,
+  className: PropTypes.string,
 };

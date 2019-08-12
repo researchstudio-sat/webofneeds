@@ -152,7 +152,7 @@ export default class PokemonRaidbossViewer extends React.Component {
       );
 
     return (
-      <pokemon-raidboss-viewer>
+      <pokemon-raidboss-viewer class={this.props.className}>
         <div className="prbv__header">
           {icon}
           {label}
@@ -170,4 +170,5 @@ PokemonRaidbossViewer.propTypes = {
   ngRedux: PropTypes.object.isRequired,
   detail: PropTypes.object,
   content: PropTypes.object,
+  className: PropTypes.string,
 };

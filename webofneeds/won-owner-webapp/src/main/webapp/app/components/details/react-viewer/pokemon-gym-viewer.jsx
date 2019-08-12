@@ -20,7 +20,7 @@ export default class PokemonGymViewer extends React.Component {
     );
 
     return (
-      <pokemon-gym-viewer>
+      <pokemon-gym-viewer class={this.props.className}>
         <div className="pgv__header">
           {icon}
           {label}
@@ -33,4 +33,5 @@ export default class PokemonGymViewer extends React.Component {
 PokemonGymViewer.propTypes = {
   detail: PropTypes.object,
   content: PropTypes.object,
+  className: PropTypes.string,
 };

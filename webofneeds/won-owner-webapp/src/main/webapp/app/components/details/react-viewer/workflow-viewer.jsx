@@ -18,7 +18,7 @@ export default class WonWorkflowViewer extends React.Component {
     );
 
     return (
-      <won-workflow-viewer>
+      <won-workflow-viewer class={this.props.className}>
         <div className="workflowv__header">
           {icon}
           {label}
@@ -31,4 +31,5 @@ export default class WonWorkflowViewer extends React.Component {
 WonWorkflowViewer.propTypes = {
   detail: PropTypes.object,
   content: PropTypes.object,
+  className: PropTypes.string,
 };

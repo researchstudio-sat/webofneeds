@@ -28,7 +28,7 @@ export default class WonTagsViewer extends React.Component {
       });
 
     return (
-      <won-tags-viewer>
+      <won-tags-viewer class={this.props.className}>
         <div className="tv__header">
           {icon}
           {label}
@@ -41,4 +41,5 @@ export default class WonTagsViewer extends React.Component {
 WonTagsViewer.propTypes = {
   detail: PropTypes.object,
   content: PropTypes.object,
+  className: PropTypes.string,
 };

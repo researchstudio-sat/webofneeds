@@ -86,7 +86,7 @@ export default class WonTravelActionViewer extends React.Component {
       );
 
     return (
-      <won-travel-action-viewer>
+      <won-travel-action-viewer class={this.props.className}>
         <div className="rv__header">
           {icon}
           {label}
@@ -102,4 +102,5 @@ export default class WonTravelActionViewer extends React.Component {
 WonTravelActionViewer.propTypes = {
   detail: PropTypes.object,
   content: PropTypes.object,
+  className: PropTypes.string,
 };

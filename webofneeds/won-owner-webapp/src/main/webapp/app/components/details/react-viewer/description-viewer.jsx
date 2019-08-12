@@ -17,7 +17,7 @@ export default class WonDescriptionViewer extends React.Component {
     );
 
     return (
-      <won-description-viewer>
+      <won-description-viewer class={this.props.className}>
         <div className="dv__header">
           {icon}
           {label}
@@ -30,4 +30,5 @@ export default class WonDescriptionViewer extends React.Component {
 WonDescriptionViewer.propTypes = {
   detail: PropTypes.object,
   content: PropTypes.object,
+  className: PropTypes.string,
 };

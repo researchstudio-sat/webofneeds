@@ -35,7 +35,7 @@ export default class WonSelectViewer extends React.Component {
       });
 
     return (
-      <won-select-viewer>
+      <won-select-viewer class={this.props.className}>
         <div className="selectv__header">
           {icon}
           {label}
@@ -52,4 +52,5 @@ export default class WonSelectViewer extends React.Component {
 WonSelectViewer.propTypes = {
   detail: PropTypes.object,
   content: PropTypes.object,
+  className: PropTypes.string,
 };

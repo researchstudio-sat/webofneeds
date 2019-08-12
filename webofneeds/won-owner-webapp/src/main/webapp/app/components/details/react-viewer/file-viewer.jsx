@@ -63,7 +63,7 @@ export default class WonFileViewer extends React.Component {
       });
 
     return (
-      <won-file-viewer>
+      <won-file-viewer class={this.props.className}>
         <div className="titlev__header">
           {icon}
           {label}
@@ -90,4 +90,5 @@ export default class WonFileViewer extends React.Component {
 WonFileViewer.propTypes = {
   detail: PropTypes.object,
   content: PropTypes.object,
+  className: PropTypes.string,
 };

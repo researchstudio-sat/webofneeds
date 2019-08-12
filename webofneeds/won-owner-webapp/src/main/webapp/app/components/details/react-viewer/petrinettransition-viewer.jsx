@@ -18,7 +18,7 @@ export default class WonPetrinetTransitionViewer extends React.Component {
     );
 
     return (
-      <won-petrinettransition-viewer>
+      <won-petrinettransition-viewer class={this.props.className}>
         <div className="petrinettransitionv__header">
           {icon}
           {label}
@@ -36,4 +36,5 @@ export default class WonPetrinetTransitionViewer extends React.Component {
 WonPetrinetTransitionViewer.propTypes = {
   detail: PropTypes.object,
   content: PropTypes.object,
+  className: PropTypes.string,
 };

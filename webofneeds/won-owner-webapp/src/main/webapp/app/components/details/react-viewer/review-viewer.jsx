@@ -16,7 +16,7 @@ export default class WonReviewViewer extends React.Component {
     );
 
     return (
-      <won-review-viewer>
+      <won-review-viewer class={this.props.className}>
         <div className="reviewv__header">
           {icon}
           {label}
@@ -34,4 +34,5 @@ export default class WonReviewViewer extends React.Component {
 WonReviewViewer.propTypes = {
   detail: PropTypes.object,
   content: PropTypes.object,
+  className: PropTypes.string,
 };

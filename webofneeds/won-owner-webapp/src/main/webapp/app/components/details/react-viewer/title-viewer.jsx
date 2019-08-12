@@ -16,7 +16,7 @@ export default class WonTitleViewer extends React.Component {
     );
 
     return (
-      <won-title-viewer>
+      <won-title-viewer class={this.props.className}>
         <div className="titlev__header">
           {icon}
           {label}
@@ -29,4 +29,5 @@ export default class WonTitleViewer extends React.Component {
 WonTitleViewer.propTypes = {
   detail: PropTypes.object,
   content: PropTypes.object,
+  className: PropTypes.string,
 };

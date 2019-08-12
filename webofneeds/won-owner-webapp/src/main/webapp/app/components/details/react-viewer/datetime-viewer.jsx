@@ -18,7 +18,7 @@ export default class WonDateTimeViewer extends React.Component {
     );
 
     return (
-      <won-datetime-viewer>
+      <won-datetime-viewer class={this.props.className}>
         <div className="datetimev__header">
           {icon}
           {label}
@@ -33,4 +33,5 @@ export default class WonDateTimeViewer extends React.Component {
 WonDateTimeViewer.propTypes = {
   detail: PropTypes.object,
   content: PropTypes.object,
+  className: PropTypes.string,
 };

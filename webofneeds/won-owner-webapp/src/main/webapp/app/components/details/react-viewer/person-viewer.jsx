@@ -53,7 +53,7 @@ export default class WonPersonViewer extends React.Component {
     );
 
     return (
-      <won-person-viewer>
+      <won-person-viewer class={this.props.className}>
         <div className="pv__header">
           {icon}
           {label}
@@ -71,4 +71,5 @@ export default class WonPersonViewer extends React.Component {
 WonPersonViewer.propTypes = {
   detail: PropTypes.object,
   content: PropTypes.object,
+  className: PropTypes.string,
 };

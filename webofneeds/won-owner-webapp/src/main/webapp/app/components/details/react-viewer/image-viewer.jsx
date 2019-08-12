@@ -53,7 +53,7 @@ export default class WonImageViewer extends React.Component {
       });
 
     return (
-      <won-image-viewer>
+      <won-image-viewer class={this.props.className}>
         <div className="imagev__header">
           {icon}
           {label}
@@ -87,4 +87,5 @@ export default class WonImageViewer extends React.Component {
 WonImageViewer.propTypes = {
   detail: PropTypes.object,
   content: PropTypes.object,
+  className: PropTypes.string,
 };

@@ -18,7 +18,7 @@ export default class WonSuggestPostViewer extends React.Component {
     );
 
     return (
-      <won-suggestpost-viewer>
+      <won-suggestpost-viewer class={this.props.className}>
         <div className="suggestpostv__header">
           {icon}
           {label}
@@ -31,4 +31,5 @@ export default class WonSuggestPostViewer extends React.Component {
 WonSuggestPostViewer.propTypes = {
   detail: PropTypes.object,
   content: PropTypes.object,
+  className: PropTypes.string,
 };

@@ -18,7 +18,7 @@ export default class WonPetrinetViewer extends React.Component {
     );
 
     return (
-      <won-petrinet-viewer>
+      <won-petrinet-viewer class={this.props.className}>
         <div className="petrinetv__header">
           {icon}
           {label}
@@ -31,4 +31,5 @@ export default class WonPetrinetViewer extends React.Component {
 WonPetrinetViewer.propTypes = {
   detail: PropTypes.object,
   content: PropTypes.object,
+  className: PropTypes.string,
 };

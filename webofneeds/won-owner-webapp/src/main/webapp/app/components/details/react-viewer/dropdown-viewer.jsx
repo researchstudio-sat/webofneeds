@@ -18,7 +18,7 @@ export default class WonDropdownViewer extends React.Component {
     );
 
     return (
-      <won-dropdown-viewer>
+      <won-dropdown-viewer class={this.props.className}>
         <div className="dropdownv__header">
           {icon}
           {label}
@@ -31,4 +31,5 @@ export default class WonDropdownViewer extends React.Component {
 WonDropdownViewer.propTypes = {
   detail: PropTypes.object,
   content: PropTypes.object,
+  className: PropTypes.string,
 };

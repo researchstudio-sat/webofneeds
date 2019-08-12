@@ -16,7 +16,7 @@ export default class WonPriceViewer extends React.Component {
     );
 
     return (
-      <won-price-viewer>
+      <won-price-viewer class={this.props.className}>
         <div className="pricev__header">
           {icon}
           {label}
@@ -34,4 +34,5 @@ export default class WonPriceViewer extends React.Component {
 WonPriceViewer.propTypes = {
   detail: PropTypes.object,
   content: PropTypes.object,
+  className: PropTypes.string,
 };

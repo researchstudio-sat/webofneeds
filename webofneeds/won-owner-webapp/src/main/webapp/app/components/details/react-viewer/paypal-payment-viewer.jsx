@@ -19,7 +19,7 @@ export default class WonPaypalPaymentViewer extends React.Component {
     );
 
     return (
-      <won-paypal-payment-viewer>
+      <won-paypal-payment-viewer class={this.props.className}>
         <div className="paypalpaymentv__header">
           {icon}
           {label}
@@ -62,4 +62,5 @@ export default class WonPaypalPaymentViewer extends React.Component {
 WonPaypalPaymentViewer.propTypes = {
   detail: PropTypes.object,
   content: PropTypes.object,
+  className: PropTypes.string,
 };

@@ -16,7 +16,7 @@ export default class WonRangeViewer extends React.Component {
     );
 
     return (
-      <won-range-viewer>
+      <won-range-viewer class={this.props.className}>
         <div className="rangev__header">
           {icon}
           {label}
@@ -34,4 +34,5 @@ export default class WonRangeViewer extends React.Component {
 WonRangeViewer.propTypes = {
   detail: PropTypes.object,
   content: PropTypes.object,
+  className: PropTypes.string,
 };

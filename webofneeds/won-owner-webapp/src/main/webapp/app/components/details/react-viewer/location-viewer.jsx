@@ -59,7 +59,7 @@ export default class WonLocationViewer extends React.Component {
       );
 
     return (
-      <won-location-viewer>
+      <won-location-viewer class={this.props.className}>
         <div className="lv__header">
           {icon}
           {label}
@@ -75,4 +75,5 @@ export default class WonLocationViewer extends React.Component {
 WonLocationViewer.propTypes = {
   detail: PropTypes.object,
   content: PropTypes.object,
+  className: PropTypes.string,
 };
