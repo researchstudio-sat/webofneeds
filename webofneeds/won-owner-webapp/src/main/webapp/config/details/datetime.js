@@ -4,6 +4,7 @@ import {
   toLocalISODateString,
 } from "../../app/utils.js";
 import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
+import WonDateTimeViewer from "../../app/components/details/react-viewer/datetime-viewer.jsx";
 
 export const fromDatetime = {
   identifier: "fromDatetime",
@@ -12,6 +13,7 @@ export const fromDatetime = {
   placeholder: "Enter Date and Time...",
   component: "won-datetime-picker",
   viewerComponent: "won-datetime-viewer",
+  reactViewerComponent: WonDateTimeViewer,
   messageEnabled: true,
   parseToRDF: function({ value }) {
     // value can be an xsd:datetime-string or a javascript date object
@@ -45,7 +47,7 @@ export const throughDatetime = {
   icon: "#ico36_detail_datetime",
   placeholder: "Enter Date and Time...",
   component: "won-datetime-picker",
-  viewerComponent: "won-datetime-viewer",
+  reactViewerComponent: WonDateTimeViewer,
   messageEnabled: true,
   parseToRDF: function({ value }) {
     // value can be an xsd:datetime-string or a javascript date object
@@ -83,6 +85,7 @@ export const datetimeRange = {
   placeholder: undefined,
   component: "won-datetime-range-picker",
   viewerComponent: "won-datetime-viewer", // not used, values are read as fromDatetime and throughDatetime
+  reactViewerComponent: WonDateTimeViewer,
   messageEnabled: false,
   parseToRDF: function({ value }) {
     if (value) {

@@ -1,5 +1,7 @@
 import { generateIdString, get } from "../../app/utils.js";
 import Immutable from "immutable";
+import WonFileViewer from "../../app/components/details/react-viewer/file-viewer.jsx";
+import WonImageViewer from "../../app/components/details/react-viewer/image-viewer.jsx";
 
 export const files = {
   identifier: "files",
@@ -10,6 +12,7 @@ export const files = {
   multiSelect: true,
   component: "won-file-picker",
   viewerComponent: "won-file-viewer",
+  reactViewerComponent: WonFileViewer,
   messageEnabled: true,
   parseToRDF: function({ value, identifier, contentUri }) {
     if (!value) {
@@ -91,6 +94,7 @@ export const images = {
   multiSelect: true,
   component: "won-image-picker",
   viewerComponent: "won-image-viewer",
+  reactViewerComponent: WonImageViewer,
   messageEnabled: true,
   parseToRDF: function({ value, identifier, contentUri }) {
     if (!value) {

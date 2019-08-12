@@ -3,6 +3,8 @@ import * as wonUtils from "../../app/won-utils.js";
 import Immutable from "immutable";
 import won from "../../app/won-es6.js";
 import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
+import WonLocationViewer from "../../app/components/details/react-viewer/location-viewer.jsx";
+import WonTravelActionViewer from "../../app/components/details/react-viewer/travel-action-viewer.jsx";
 
 export const location = {
   identifier: "location",
@@ -11,6 +13,7 @@ export const location = {
   placeholder: "Search for location",
   component: "won-location-picker",
   viewerComponent: "won-location-viewer",
+  reactViewerComponent: WonLocationViewer,
   messageEnabled: true,
   overrideAddressDetail: {
     placeholder:
@@ -45,6 +48,7 @@ export const jobLocation = {
   icon: "#ico36_detail_location",
   component: "won-location-picker",
   viewerComponent: "won-location-viewer",
+  reactViewerComponent: WonLocationViewer,
   messageEnabled: true,
   parseToRDF: function({ value, identifier, contentUri }) {
     return {
@@ -76,6 +80,7 @@ export const travelAction = {
   },
   component: "won-travel-action-picker",
   viewerComponent: "won-travel-action-viewer",
+  reactViewerComponent: WonTravelActionViewer,
   messageEnabled: true,
   parseToRDF: function({ value, identifier, contentUri }) {
     if (!value) {

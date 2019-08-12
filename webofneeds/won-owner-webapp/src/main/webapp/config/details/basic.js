@@ -1,7 +1,11 @@
-import { is, get, getIn } from "../../app/utils.js";
+import { get, getIn, is } from "../../app/utils.js";
 import { select } from "../details/abstract.js";
 import Immutable from "immutable";
 import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
+import WonTitleViewer from "../../app/components/details/react-viewer/title-viewer.jsx";
+import WonDescriptionViewer from "../../app/components/details/react-viewer/description-viewer.jsx";
+import WonTagsViewer from "../../app/components/details/react-viewer/tags-viewer.jsx";
+import WonSuggestPostViewer from "../../app/components/details/react-viewer/suggestpost-viewer.jsx";
 
 export const title = {
   identifier: "title",
@@ -10,6 +14,7 @@ export const title = {
   placeholder: "What? (Short title shown in lists)",
   component: "won-title-picker",
   viewerComponent: "won-title-viewer",
+  reactViewerComponent: WonTitleViewer,
   parseToRDF: function({ value }) {
     const val = value ? value : undefined;
     return {
@@ -42,6 +47,7 @@ export const personaName = {
   placeholder: "Your Name",
   component: "won-title-picker",
   viewerComponent: "won-title-viewer",
+  reactViewerComponent: WonTitleViewer,
   parseToRDF: function({ value }) {
     const val = value ? value : undefined;
     return {
@@ -67,6 +73,7 @@ export const website = {
   placeholder: "Website",
   component: "won-title-picker",
   viewerComponent: "won-title-viewer",
+  reactViewerComponent: WonTitleViewer,
   parseToRDF: function({ value }) {
     const val = value ? value : undefined;
     return {
@@ -91,6 +98,7 @@ export const searchString = {
   placeholder: "What do you look for?",
   component: "won-title-picker",
   viewerComponent: "won-title-viewer",
+  reactViewerComponent: WonTitleViewer,
   parseToRDF: function({ value }) {
     const val = value ? value : undefined;
     return {
@@ -119,6 +127,7 @@ export const description = {
   placeholder: "Enter Description...",
   component: "won-description-picker",
   viewerComponent: "won-description-viewer",
+  reactViewerComponent: WonDescriptionViewer,
   parseToRDF: function({ value }) {
     const val = value ? value : undefined;
     return {
@@ -152,6 +161,7 @@ export const tags = {
   placeholder: "e.g. couch, free",
   component: "won-tags-picker",
   viewerComponent: "won-tags-viewer",
+  reactViewerComponent: WonTagsViewer,
   messageEnabled: true,
   parseToRDF: function({ value }) {
     if (!value) {
@@ -179,6 +189,7 @@ export const suggestPost = {
   placeholder: "Insert PostUri and Accept",
   component: "won-suggestpost-picker",
   viewerComponent: "won-suggestpost-viewer",
+  reactViewerComponent: WonSuggestPostViewer,
   parseToRDF: function({ value }) {
     const val = value ? value : undefined;
 
@@ -208,6 +219,7 @@ export const responseToUri = {
   placeholder: "Insert PostUri and Accept",
   component: "won-suggestpost-picker",
   viewerComponent: "won-suggestpost-viewer",
+  reactViewerComponent: WonSuggestPostViewer,
   messageEnabled: false,
   parseToRDF: function({ value }) {
     const val = value ? value : undefined;

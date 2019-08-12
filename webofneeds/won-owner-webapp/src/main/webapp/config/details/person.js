@@ -2,9 +2,10 @@
  * Created by fsuda on 18.09.2018.
  */
 import * as basicDetails from "./basic.js";
-import { getIn, generateIdString } from "../../app/utils.js";
+import { generateIdString, getIn } from "../../app/utils.js";
 import Immutable from "immutable";
 import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
+import WonPersonViewer from "../../app/components/details/react-viewer/person-viewer.jsx";
 
 export const skillsDetail = {
   ...basicDetails.tags,
@@ -49,6 +50,7 @@ export const person = {
   placeholder: undefined,
   component: "won-person-picker",
   viewerComponent: "won-person-viewer",
+  reactViewerComponent: WonPersonViewer,
   messageEnabled: true,
   parseToRDF: function({ value, identifier, contentUri }) {
     if (!value) {

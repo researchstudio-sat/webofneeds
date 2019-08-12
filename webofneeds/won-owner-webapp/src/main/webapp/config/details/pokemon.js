@@ -1,6 +1,8 @@
 import Immutable from "immutable";
 import { isValidDate, toLocalISODateString } from "../../app/utils.js";
 import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
+import PokemonGymViewer from "../../app/components/details/react-viewer/pokemon-gym-viewer.jsx";
+import PokemonRaidbossViewer from "../../app/components/details/react-viewer/pokemon-raidboss-viewer.jsx";
 
 export const pokemonGymInfo = {
   identifier: "pokemonGymInfo",
@@ -9,6 +11,7 @@ export const pokemonGymInfo = {
   messageEnabled: false,
   component: "pokemon-gym-picker",
   viewerComponent: "pokemon-gym-viewer",
+  reactViewerComponent: PokemonGymViewer,
   isValid: function(value) {
     return value && value.ex;
   },
@@ -43,6 +46,7 @@ export const pokemonRaid = {
   messageEnabled: false,
   component: "pokemon-raidboss-picker",
   viewerComponent: "pokemon-raidboss-viewer",
+  reactViewerComponent: PokemonRaidbossViewer,
   filterDetail: {
     placeholder: "Filter by (name or id)",
   },

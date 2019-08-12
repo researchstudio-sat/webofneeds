@@ -3,6 +3,7 @@
  */
 import { generateIdString } from "../../app/utils.js";
 import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
+import WonReviewViewer from "../../app/components/details/react-viewer/review-viewer.jsx";
 
 /*Detail based on https://schema.org/Review*/
 export const review = {
@@ -11,6 +12,7 @@ export const review = {
   icon: "#ico36_detail_title" /*TODO: REVIEW/RATING ICON*/,
   component: "won-review-picker",
   viewerComponent: "won-review-viewer",
+  reactViewerComponent: WonReviewViewer,
   placeholder: "Review Text (optional)",
   rating: [
     { value: undefined, label: "Select a Rating", default: true },
