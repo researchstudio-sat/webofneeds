@@ -3,11 +3,11 @@ import inviewModule from "angular-inview";
 
 import won from "../../won-es6.js";
 import Immutable from "immutable";
-import connectionMessageStatusModule from "./connection-message-status.js";
 import connectionMessageActionsModule from "./connection-message-actions.js";
 import WonLabelledHr from "../labelled-hr.jsx";
 import WonCombinedMessageContent from "./combined-message-content.jsx";
 import WonAtomIcon from "../atom-icon.jsx";
+import WonConnectionMessageStatus from "./connection-message-status.jsx";
 
 import { connect2Redux } from "../../configRedux.js";
 import { get, getIn } from "../../utils.js";
@@ -91,8 +91,7 @@ function genComponentConf() {
                 <won-connection-message-actions message-uri="::self.messageUri" connection-uri="self.connectionUri" ng-if="!self.isCollapsed && self.showActionButtons()">
                 </won-connection-message-actions>
             </div>
-            <won-connection-message-status message-uri="::self.messageUri" connection-uri="self.connectionUri">
-            </won-connection-message-status>
+            <won-preact component="self.WonConnectionMessageStatus" props="{messageUri: self.messageUri, connectionUri: self.connectionUri}"></won-preact>
             <a ng-if="self.rdfLinkURL" target="_blank" href="{{self.rdfLinkURL}}">
                 <svg class="rdflink__small clickable">
                     <use xlink:href="#rdf_logo_2" href="#rdf_logo_2"></use>
@@ -109,6 +108,7 @@ function genComponentConf() {
       this.WonAtomIcon = WonAtomIcon;
       this.WonLabelledHr = WonLabelledHr;
       this.WonCombinedMessageContent = WonCombinedMessageContent;
+      this.WonConnectionMessageStatus = WonConnectionMessageStatus;
 
       const selectFromState = state => {
         const ownedAtom =
@@ -355,7 +355,6 @@ function genComponentConf() {
 
 export default angular
   .module("won.owner.components.connectionMessage", [
-    connectionMessageStatusModule,
     connectionMessageActionsModule,
     inviewModule.name,
   ])
