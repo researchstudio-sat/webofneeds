@@ -42,7 +42,7 @@ export default class WonLocationViewer extends React.Component {
           <use xlinkHref="#ico-filter_map" href="#ico-filter_map" />
         </svg>
         <svg className="lv__content__text__carret">
-          {this.props.content && this.state.locationExanded ? (
+          {this.state.locationExanded ? (
             <use xlinkHref="#ico16_arrow_up" href="#ico16_arrow_up" />
           ) : (
             <use xlinkHref="#ico16_arrow_down" href="#ico16_arrow_down" />
@@ -53,11 +53,12 @@ export default class WonLocationViewer extends React.Component {
       undefined
     );
 
-    const map = this.state.locationExpanded ? (
-      <WonAtomMap locations={[this.props.content]} />
-    ) : (
-      undefined
-    );
+    const map =
+      this.props.content && this.state.locationExpanded ? (
+        <WonAtomMap locations={[this.props.content]} />
+      ) : (
+        undefined
+      );
 
     return (
       <won-location-viewer>
