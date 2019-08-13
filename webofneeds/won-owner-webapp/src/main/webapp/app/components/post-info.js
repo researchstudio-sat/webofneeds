@@ -3,7 +3,6 @@
  */
 
 import angular from "angular";
-import postContextDropdownModule from "./post-context-dropdown.js";
 import postContentModule from "./post-content.js";
 import postMenuModule from "./post-menu.js";
 import chatTextFieldModule from "./chat-textfield.js";
@@ -196,7 +195,6 @@ function genComponentConf() {
 export default angular
   .module("won.owner.components.postInfo", [
     postMenuModule,
-    postContextDropdownModule,
     postContentModule,
     chatTextFieldModule,
     atomHeaderBigModule,

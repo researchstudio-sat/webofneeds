@@ -2,7 +2,7 @@
 @import "won-config";
 @import "animate";
 
-won-post-context-dropdown,
+won-atom-context-dropdown,
 won-connection-context-dropdown {
   .cdd__icon__small {
     @include fixed-square($postIconSizeMobile);

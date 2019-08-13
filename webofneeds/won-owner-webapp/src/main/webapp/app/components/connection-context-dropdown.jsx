@@ -239,15 +239,34 @@ export default class WonConnectionContextDropdown extends React.Component {
   }
 
   closeConnection() {
-    this.props.ngRedux.dispatch(
-      actionCreators.connections__close(this.connectionUri)
-    );
-    this.props.ngRedux.dispatch(
-      actionCreators.router__stateGoCurrent({
-        useCase: undefined,
-        connectionUri: undefined,
-      })
-    );
+    const payload = {
+      caption: "Attention!",
+      text: "Do you want to close the connection?",
+      buttons: [
+        {
+          caption: "Yes",
+          callback: () => {
+            this.props.ngRedux.dispatch(
+              actionCreators.connections__close(this.connectionUri)
+            );
+            this.props.ngRedux.dispatch(
+              actionCreators.router__stateGoCurrent({
+                useCase: undefined,
+                connectionUri: undefined,
+              })
+            );
+            this.props.ngRedux.dispatch(actionCreators.view__hideModalDialog());
+          },
+        },
+        {
+          caption: "No",
+          callback: () => {
+            this.props.ngRedux.dispatch(actionCreators.view__hideModalDialog());
+          },
+        },
+      ],
+    };
+    this.props.ngRedux.dispatch(actionCreators.view__showModalDialog(payload));
   }
 
   goToPost(postUri) {
