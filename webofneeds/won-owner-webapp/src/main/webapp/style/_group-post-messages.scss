@@ -44,7 +44,8 @@ won-group-post-messages {
       grid-area: header_context;
     }
 
-    won-share-dropdown {
+    > won-preact.shareDropdown,
+    > won-share-dropdown {
       grid-area: header_share;
     }
   }

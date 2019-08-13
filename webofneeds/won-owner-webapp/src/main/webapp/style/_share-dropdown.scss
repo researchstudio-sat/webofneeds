@@ -4,6 +4,7 @@
 
 won-share-dropdown {
   .sdd__icon__small {
+    --local-primary: #{$won-secondary-color};
     @include fixed-square($postIconSizeMobile);
     padding-left: 0.5rem;
     padding-right: 0.25rem;
@@ -14,6 +15,7 @@ won-share-dropdown {
   }
 
   .sdd__icon__small__sharemenu {
+    --local-primary: black;
     @include fixed-square($postIconSizeMobile);
     //padding-left: 0.5rem;
     position: relative;

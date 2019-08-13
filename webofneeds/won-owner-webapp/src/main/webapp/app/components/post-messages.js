@@ -3,7 +3,7 @@ import Immutable from "immutable";
 import angular from "angular";
 import chatTextFieldModule from "./chat-textfield.js";
 import postContentMessageModule from "./messages/post-content-message.js";
-import shareDropdownModule from "./share-dropdown.js";
+import WonShareDropdown from "./share-dropdown.jsx";
 import WonLabelledHr from "./labelled-hr.jsx";
 import WonConnectionHeader from "./connection-header.jsx";
 import WonConnectionMessage from "./messages/connection-message.jsx";
@@ -60,7 +60,7 @@ function genComponentConf() {
               </a>
             </div>
             <won-preact class="connectionHeader" component="self.WonConnectionHeader" props="{connectionUri: self.selectedConnectionUri}"></won-preact>
-            <won-share-dropdown atom-uri="self.targetAtomUri"></won-share-dropdown>
+            <won-preact class="shareDropdown" component="self.WonShareDropdown" props="{atomUri: self.targetAtomUri}"></won-preact>
             <won-connection-context-dropdown show-petri-net-data-field="::self.showPetriNetDataField()" show-agreement-data-field="::self.showAgreementDataField()"></won-connection-context-dropdown>
         </div>
         <div class="pm__header" ng-if="self.showAgreementData">
@@ -275,6 +275,7 @@ function genComponentConf() {
       this.WonLabelledHr = WonLabelledHr;
       this.WonConnectionHeader = WonConnectionHeader;
       this.WonConnectionMessage = WonConnectionMessage;
+      this.WonShareDropdown = WonShareDropdown;
 
       this.rdfTextfieldHelpText =
         "Expects valid turtle. " +
@@ -923,6 +924,5 @@ export default angular
     chatTextFieldModule,
     connectionContextDropdownModule,
     postContentMessageModule,
-    shareDropdownModule,
   ])
   .directive("wonPostMessages", genComponentConf).name;

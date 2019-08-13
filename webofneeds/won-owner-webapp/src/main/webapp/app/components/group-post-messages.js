@@ -2,7 +2,7 @@ import won from "../won-es6.js";
 import angular from "angular";
 import chatTextFieldModule from "./chat-textfield.js";
 import postContentMessageModule from "./messages/post-content-message.js";
-import shareDropdownModule from "./share-dropdown.js";
+import WonShareDropdown from "./share-dropdown.jsx";
 import WonLabelledHr from "./labelled-hr.jsx";
 import WonConnectionMessage from "./messages/connection-message.jsx";
 import connectionContextDropdownModule from "./connection-context-dropdown.js";
@@ -45,7 +45,7 @@ function genComponentConf() {
                 </a>
             </div>
             <won-preact class="connectionHeader" component="self.WonConnectionHeader" props="{connectionUri: self.connectionUri}"></won-preact>
-            <won-share-dropdown atom-uri="self.targetAtomUri"></won-share-dropdown>
+            <won-preact class="shareDropdown" component="self.WonShareDropdown" props="{atomUri: self.targetAtomUri}"></won-preact>
             <won-connection-context-dropdown show-petri-net-data-field="" show-agreement-data-field=""></won-connection-context-dropdown>
         </div>
         <div
@@ -154,6 +154,7 @@ function genComponentConf() {
       attach(this, serviceDependencies, arguments);
       window.pm4dbg = this;
       this.WonLabelledHr = WonLabelledHr;
+      this.WonShareDropdown = WonShareDropdown;
       this.WonConnectionHeader = WonConnectionHeader;
       this.WonConnectionMessage = WonConnectionMessage;
       this.rdfTextfieldHelpText =
@@ -454,6 +455,5 @@ export default angular
     chatTextFieldModule,
     connectionContextDropdownModule,
     postContentMessageModule,
-    shareDropdownModule,
   ])
   .directive("wonGroupPostMessages", genComponentConf).name;

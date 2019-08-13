@@ -6,7 +6,6 @@ import angular from "angular";
 import postContextDropdownModule from "./post-context-dropdown.js";
 import postContentModule from "./post-content.js";
 import postMenuModule from "./post-menu.js";
-import shareDropdownModule from "./share-dropdown.js";
 import chatTextFieldModule from "./chat-textfield.js";
 import atomHeaderBigModule from "./atom-header-big.js";
 import { get, getIn } from "../utils.js";
@@ -199,7 +198,6 @@ export default angular
     postMenuModule,
     postContextDropdownModule,
     postContentModule,
-    shareDropdownModule,
     chatTextFieldModule,
     atomHeaderBigModule,
   ])

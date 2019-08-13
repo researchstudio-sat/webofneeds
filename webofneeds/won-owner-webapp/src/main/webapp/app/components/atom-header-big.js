@@ -7,8 +7,8 @@ import { attach } from "../cstm-ng-utils.js";
 import { connect2Redux } from "../configRedux.js";
 import { actionCreators } from "../actions/actions.js";
 import postContextDropDownModule from "../components/post-context-dropdown.js";
-import shareDropdownModule from "../components/share-dropdown.js";
 import WonAtomIcon from "../components/atom-icon.jsx";
+import WonShareDropdown from "../components/share-dropdown.jsx";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 
 import "~/style/_atom-header-big.scss";
@@ -35,7 +35,7 @@ function genComponentConf() {
                     <div class="ahb__titles__type">{{ self.atomTypeLabel }}</div>
                 </hgroup>
             </div>
-            <won-share-dropdown atom-uri="self.postUri"></won-share-dropdown>
+            <won-preact class="shareDropdown" component="self.WonShareDropdown" props="{atomUri: self.postUri}"></won-preact>
             <won-post-context-dropdown atom-uri="self.postUri"></won-post-context-dropdown>
         </nav>
     `;
@@ -45,6 +45,7 @@ function genComponentConf() {
       attach(this, serviceDependencies, arguments);
       window.ahb4dbg = this;
       this.WonAtomIcon = WonAtomIcon;
+      this.WonShareDropdown = WonShareDropdown;
 
       const selectFromState = state => {
         const postUri = this.atomUri;
@@ -104,8 +105,5 @@ function genComponentConf() {
 }
 
 export default angular
-  .module("won.owner.components.atomHeaderBig", [
-    postContextDropDownModule,
-    shareDropdownModule,
-  ])
+  .module("won.owner.components.atomHeaderBig", [postContextDropDownModule])
   .directive("wonAtomHeaderBig", genComponentConf).name;
