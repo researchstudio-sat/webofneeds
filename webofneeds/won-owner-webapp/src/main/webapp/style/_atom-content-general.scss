@@ -2,7 +2,7 @@
 @import "sizing-utils";
 @import "animate";
 
-won-post-content-general {
+won-atom-content-general {
   display: grid;
   grid-gap: 0.25rem;
   grid-template-columns: 1fr 1fr;
@@ -11,7 +11,7 @@ won-post-content-general {
   border: $thinGrayBorder;
   padding: 0.5rem;
 
-  .pcg__item {
+  .acg__item {
     display: grid;
     grid-template-areas: "grid-item-label grid-item-value";
     grid-template-columns: min-content 1fr;

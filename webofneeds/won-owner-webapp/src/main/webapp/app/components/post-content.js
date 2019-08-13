@@ -3,13 +3,13 @@
  */
 
 import angular from "angular";
-import postContentGeneral from "./post-content-general.js";
 import postContentPersona from "./post-content-persona.js";
 import WonAtomContentDetails from "./atom-content-details.jsx";
 import WonAtomContentHolds from "./atom-content-holds.jsx";
 import WonAtomContentSuggestions from "./atom-content-suggestions.jsx";
 import WonAtomContentParticipants from "./atom-content-participants.jsx";
 import WonAtomContentBuddies from "./atom-content-buddies.jsx";
+import WonAtomContentGeneral from "./atom-content-general.jsx";
 import WonTrig from "./trig.jsx";
 import WonLabelledHr from "./labelled-hr.jsx";
 import { get, getIn } from "../utils.js";
@@ -71,7 +71,8 @@ function genComponentConf() {
             <span class="post-content__updateindicator__label">Processing changes...</span>
           </div>
           <!-- GENERAL INFORMATION -->
-          <won-post-content-general ng-if="self.isSelectedTab('DETAIL')" post-uri="self.postUri"></won-post-content-general>
+          <won-preact component="self.WonAtomContentGeneral" props="{atomUri: self.postUri}" ng-if="self.isSelectedTab('DETAIL')"></won-preact>
+          
           <!-- DETAIL INFORMATION -->
           <won-preact component="self.WonAtomContentDetails" props="{atomUri: self.postUri, branch: 'content'}" ng-if="self.isSelectedTab('DETAIL') && self.hasContent" ></won-preact>
           <won-preact component="self.WonLabelledHr" class="labelledHr cp__labelledhr" props="{label: 'Search'}" ng-show="self.isSelectedTab('DETAIL') && self.hasContent && self.hasSeeksBranch"></won-preact>
@@ -133,6 +134,7 @@ function genComponentConf() {
       window.postcontent4dbg = this;
 
       this.addPersonaModule = Elm.AddPersona;
+      this.WonAtomContentGeneral = WonAtomContentGeneral;
       this.WonAtomContentHolds = WonAtomContentHolds;
       this.WonAtomContentSuggestions = WonAtomContentSuggestions;
       this.WonAtomContentDetails = WonAtomContentDetails;
@@ -227,7 +229,6 @@ function genComponentConf() {
 export default angular
   .module("won.owner.components.postContent", [
     ngAnimate,
-    postContentGeneral,
     postContentPersona,
     elmModule,
   ])
