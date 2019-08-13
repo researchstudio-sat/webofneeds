@@ -130,7 +130,8 @@ won-post-messages {
       font-size: $normalFontSize;
       color: $won-subtitle-gray;
     }
-    &__petrinet__process {
+    won-preact.pm__content__petrinet__process__content > won-petrinet-state,
+    won-petrinet-state.pm__content__petrinet__process__content {
       display: grid;
       grid-gap: 0.5rem;
       padding: 0.5rem;

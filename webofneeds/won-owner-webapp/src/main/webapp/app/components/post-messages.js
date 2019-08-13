@@ -3,7 +3,6 @@ import Immutable from "immutable";
 import angular from "angular";
 import chatTextFieldModule from "./chat-textfield.js";
 import postContentMessageModule from "./messages/post-content-message.js";
-import petrinetStateModule from "./petrinet-state.js";
 import shareDropdownModule from "./share-dropdown.js";
 import WonLabelledHr from "./labelled-hr.jsx";
 import WonConnectionHeader from "./connection-header.jsx";
@@ -198,10 +197,11 @@ function genComponentConf() {
               <div class="pm__content__petrinet__process__header">
                 ProcessURI: {{ process.get('processURI') }}
               </div>
-              <won-petrinet-state
+              <won-preact
+                component="self.WonPetrinetState"
                 class="pm__content__petrinet__process__content"
-                process-uri="process.get('processURI')">
-              </won-petrinet-state>
+                props="{processUri: process.get('processURI')}"
+              ></won-preact>
             </div>
             <!-- PETRINETVIEW SPECIFIC CONTENT END -->
 
@@ -923,7 +923,6 @@ export default angular
     chatTextFieldModule,
     connectionContextDropdownModule,
     postContentMessageModule,
-    petrinetStateModule,
     shareDropdownModule,
   ])
   .directive("wonPostMessages", genComponentConf).name;
