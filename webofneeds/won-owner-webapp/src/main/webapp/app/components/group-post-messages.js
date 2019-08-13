@@ -5,7 +5,7 @@ import postContentMessageModule from "./messages/post-content-message.js";
 import WonShareDropdown from "./share-dropdown.jsx";
 import WonLabelledHr from "./labelled-hr.jsx";
 import WonConnectionMessage from "./messages/connection-message.jsx";
-import connectionContextDropdownModule from "./connection-context-dropdown.js";
+import WonConnectionContextDropdown from "./connection-context-dropdown.jsx";
 import { connect2Redux } from "../configRedux.js";
 import { delay, get, getIn } from "../utils.js";
 import * as messageUtils from "../redux/utils/message-utils.js";
@@ -46,7 +46,7 @@ function genComponentConf() {
             </div>
             <won-preact class="connectionHeader" component="self.WonConnectionHeader" props="{connectionUri: self.connectionUri}"></won-preact>
             <won-preact class="shareDropdown" component="self.WonShareDropdown" props="{atomUri: self.targetAtomUri}"></won-preact>
-            <won-connection-context-dropdown show-petri-net-data-field="" show-agreement-data-field=""></won-connection-context-dropdown>
+            <won-preact class="connectionContextDropdown" component="self.WonConnectionContextDropdown" props="{}"></won-preact>
         </div>
         <div
           class="gpm__content">
@@ -157,6 +157,7 @@ function genComponentConf() {
       this.WonShareDropdown = WonShareDropdown;
       this.WonConnectionHeader = WonConnectionHeader;
       this.WonConnectionMessage = WonConnectionMessage;
+      this.WonConnectionContextDropdown = WonConnectionContextDropdown;
       this.rdfTextfieldHelpText =
         "Expects valid turtle. " +
         `<${won.WONMSG.uriPlaceholder.event}> will ` +
@@ -453,7 +454,6 @@ export default angular
   .module("won.owner.components.groupPostMessages", [
     autoresizingTextareaModule,
     chatTextFieldModule,
-    connectionContextDropdownModule,
     postContentMessageModule,
   ])
   .directive("wonGroupPostMessages", genComponentConf).name;

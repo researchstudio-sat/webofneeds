@@ -7,9 +7,17 @@ won-connection-context-dropdown {
   .cdd__icon__small {
     @include fixed-square($postIconSizeMobile);
     padding-left: 0.5rem;
+
+    &:not(.clickable) {
+      --local-primary: #{$won-skeleton-color};
+    }
+    &.clickable {
+      --local-padding: #{$won-secondary-color};
+    }
   }
 
   .cdd__icon__small__contextmenu {
+    --local-primary: black;
     @include fixed-square($postIconSizeMobile);
     //padding-left: 0.5rem;
     position: relative;

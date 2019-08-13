@@ -40,7 +40,8 @@ won-post-messages {
       grid-area: header_title;
     }
 
-    won-connection-context-dropdown {
+    > won-preact.connectionContextDropdown,
+    > won-connection-context-dropdown {
       grid-area: header_context;
     }
 

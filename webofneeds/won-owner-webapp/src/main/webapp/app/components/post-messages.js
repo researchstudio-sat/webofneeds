@@ -7,7 +7,7 @@ import WonShareDropdown from "./share-dropdown.jsx";
 import WonLabelledHr from "./labelled-hr.jsx";
 import WonConnectionHeader from "./connection-header.jsx";
 import WonConnectionMessage from "./messages/connection-message.jsx";
-import connectionContextDropdownModule from "./connection-context-dropdown.js";
+import WonConnectionContextDropdown from "./connection-context-dropdown.jsx";
 import { connect2Redux } from "../configRedux.js";
 import { delay, get, getIn } from "../utils.js";
 import * as processUtils from "../redux/utils/process-utils.js";
@@ -61,7 +61,7 @@ function genComponentConf() {
             </div>
             <won-preact class="connectionHeader" component="self.WonConnectionHeader" props="{connectionUri: self.selectedConnectionUri}"></won-preact>
             <won-preact class="shareDropdown" component="self.WonShareDropdown" props="{atomUri: self.targetAtomUri}"></won-preact>
-            <won-connection-context-dropdown show-petri-net-data-field="::self.showPetriNetDataField()" show-agreement-data-field="::self.showAgreementDataField()"></won-connection-context-dropdown>
+            <won-preact class="connectionContextDropdown" component="self.WonConnectionContextDropdown" props="{showPetriNetDataField: self.showPetriNetDataField, showAgreementDataField: self.showAgreementDataField}"></won-preact>
         </div>
         <div class="pm__header" ng-if="self.showAgreementData">
             <div class="pm__header__back">
@@ -76,7 +76,7 @@ function genComponentConf() {
                 ng-click="self.setShowAgreementData(false)">
               Showing Agreement Data
             </div>
-            <won-connection-context-dropdown show-petri-net-data-field="::self.showPetriNetDataField()" show-agreement-data-field="::self.showAgreementDataField()"></won-connection-context-dropdown>
+            <won-preact class="connectionContextDropdown" component="self.WonConnectionContextDropdown" props="{showPetriNetDataField: self.showPetriNetDataField, showAgreementDataField: self.showAgreementDataField}"></won-preact>
         </div>
         <div class="pm__header" ng-if="self.showPetriNetData">
             <div class="pm__header__back">
@@ -91,7 +91,7 @@ function genComponentConf() {
                 ng-click="self.setShowAgreementData(false)">
               Showing PetriNet Data
             </div>
-            <won-connection-context-dropdown show-petri-net-data-field="::self.showPetriNetDataField()" show-agreement-data-field="::self.showAgreementDataField()"></won-connection-context-dropdown>
+            <won-preact class="connectionContextDropdown" component="self.WonConnectionContextDropdown" props="{showPetriNetDataField: self.showPetriNetDataField, showAgreementDataField: self.showAgreementDataField}"></won-preact>
         </div>
         <div
           class="pm__content"
@@ -276,6 +276,7 @@ function genComponentConf() {
       this.WonConnectionHeader = WonConnectionHeader;
       this.WonConnectionMessage = WonConnectionMessage;
       this.WonShareDropdown = WonShareDropdown;
+      this.WonConnectionContextDropdown = WonConnectionContextDropdown;
 
       this.rdfTextfieldHelpText =
         "Expects valid turtle. " +
@@ -922,7 +923,6 @@ export default angular
   .module("won.owner.components.postMessages", [
     autoresizingTextareaModule,
     chatTextFieldModule,
-    connectionContextDropdownModule,
     postContentMessageModule,
   ])
   .directive("wonPostMessages", genComponentConf).name;
