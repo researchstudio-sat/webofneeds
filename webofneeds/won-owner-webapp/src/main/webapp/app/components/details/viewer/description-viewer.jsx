@@ -29,6 +29,6 @@ export default class WonDescriptionViewer extends React.Component {
 }
 WonDescriptionViewer.propTypes = {
   detail: PropTypes.object,
-  content: PropTypes.object,
+  content: PropTypes.string,
   className: PropTypes.string,
 };

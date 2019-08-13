@@ -87,6 +87,7 @@ function genSlideInConf() {
             <span class="si__title">
                 You have not accepted the
                 <a target="_blank"
+                   rel="noopener noreferrer"
                    href="{{ self.absHRef(self.$state, 'about', {'aboutSection': 'aboutTermsOfService'}) }}">
                    Terms Of Service
                  </a> yet.
@@ -117,12 +118,14 @@ function genSlideInConf() {
                 	<li> The messages you exchange with others are private, but stored in clear text on our servers. </li>
                 </ul>     
                 <a target="_blank"
+                   rel="noopener noreferrer"
                    href="{{ self.absHRef(self.$state, 'about', {'aboutSection': 'aboutPrivacyPolicy'}) }}">
                    See Privacy Policy.
                 </a>
                 <br />
                 We use cookies to track your session using a self-hosted analytics tool.
                 <a target="_blank"
+                   rel="noopener noreferrer"
                    href="/piwik/index.php?module=CoreAdminHome&action=optOut&language=en">
                    Suppress tracking.
                 </a>

@@ -10,7 +10,9 @@ import PropTypes from "prop-types";
 export default class WonLabelledHr extends React.Component {
   render() {
     return (
-      <won-labelled-hr>
+      <won-labelled-hr
+        class={this.props.className ? this.props.className : undefined}
+      >
         <div className="wlh__label">
           <span className="wlh__label__text">{this.props.label}</span>
           {this.props.arrow ? (
@@ -43,4 +45,5 @@ WonLabelledHr.propTypes = {
   arrow: PropTypes.string,
   label: PropTypes.string,
   onClick: PropTypes.func,
+  className: PropTypes.string,
 };

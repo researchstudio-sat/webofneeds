@@ -1,10 +1,10 @@
 import won from "../won-es6.js";
 import angular from "angular";
 import chatTextFieldModule from "./chat-textfield.js";
-import connectionMessageModule from "./messages/connection-message.js";
 import postContentMessageModule from "./messages/post-content-message.js";
 import shareDropdownModule from "./share-dropdown.js";
 import WonLabelledHr from "./labelled-hr.jsx";
+import WonConnectionMessage from "./messages/connection-message.jsx";
 import connectionContextDropdownModule from "./connection-context-dropdown.js";
 import { connect2Redux } from "../configRedux.js";
 import { delay, get, getIn } from "../utils.js";
@@ -75,17 +75,21 @@ function genComponentConf() {
             </button>
 
             <!-- CHATVIEW SPECIFIC CONTENT START-->
-            <won-connection-message
+            <won-preact
+                component="self.WonConnectionMessage"
+                props="{
+                    connectionUri: self.connectionUri,
+                    messageUri: msgUri,
+                    groupChatMessage: true
+                }"
                 ng-repeat="msgUri in self.sortedMessageUris"
-                connection-uri="::self.connectionUri"
-                message-uri="::msgUri"
-                group-chat-message="::true">
-            </won-connection-message>
+            ></won-preact>
             <!-- CHATVIEW SPECIFIC CONTENT END-->
 
             <a class="rdflink clickable"
                ng-if="self.shouldShowRdf"
                target="_blank"
+               rel="noopener noreferrer"
                href="{{ self.connectionUri }}">
                     <svg class="rdflink__small">
                         <use xlink:href="#rdf_logo_1" href="#rdf_logo_1"></use>
@@ -151,6 +155,7 @@ function genComponentConf() {
       window.pm4dbg = this;
       this.WonLabelledHr = WonLabelledHr;
       this.WonConnectionHeader = WonConnectionHeader;
+      this.WonConnectionMessage = WonConnectionMessage;
       this.rdfTextfieldHelpText =
         "Expects valid turtle. " +
         `<${won.WONMSG.uriPlaceholder.event}> will ` +
@@ -447,7 +452,6 @@ export default angular
   .module("won.owner.components.groupPostMessages", [
     autoresizingTextareaModule,
     chatTextFieldModule,
-    connectionMessageModule,
     connectionContextDropdownModule,
     postContentMessageModule,
     shareDropdownModule,

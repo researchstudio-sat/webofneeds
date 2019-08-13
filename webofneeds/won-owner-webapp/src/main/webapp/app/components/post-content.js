@@ -104,6 +104,7 @@ function genComponentConf() {
           <div class="post-info__content__rdf" ng-if="self.isSelectedTab('RDF')">
             <a class="rdflink clickable"
               target="_blank"
+              rel="noopener noreferrer"
               href="{{self.postUri}}">
                   <svg class="rdflink__small">
                       <use xlink:href="#rdf_logo_1" href="#rdf_logo_1"></use>
@@ -113,6 +114,7 @@ function genComponentConf() {
             <a class="rdflink clickable"
              ng-if="self.openConnectionUri"
              target="_blank"
+             rel="noopener noreferrer"
              href="{{ self.openConnectionUri }}">
                   <svg class="rdflink__small">
                       <use xlink:href="#rdf_logo_1" href="#rdf_logo_1"></use>

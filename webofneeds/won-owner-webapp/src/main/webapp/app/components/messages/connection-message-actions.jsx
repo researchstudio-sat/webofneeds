@@ -1,6 +1,3 @@
-/**
- * Created by quasarchimaere on 30.07.2019.
- */
 import React from "react";
 import Immutable from "immutable";
 import PropTypes from "prop-types";

@@ -33,7 +33,7 @@ function genComponentConf() {
               <span class="pcp__header__name__verification pcp__header__name__verification--unverified" ng-if="!self.personaVerified" title="The Persona-Relation of this Post is NOT verified by the Persona">Unverified!</span>
           </div>
           <div class="pcp__websitelabel" ng-if="self.personaWebsite">Website:</div>
-          <a class="pcp__websitelink" target="_blank" href="{{self.personaWebsite}}" ng-if="self.personaWebsite">{{ self.personaWebsite }}</a>
+          <a class="pcp__websitelink" target="_blank" rel="noopener noreferrer" href="{{self.personaWebsite}}" ng-if="self.personaWebsite">{{ self.personaWebsite }}</a>
       </div>
       <div class="pcp__rating" ng-if="self.personaHasReviewSocket">
         <div class="pcp__rating__label">

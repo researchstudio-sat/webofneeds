@@ -120,7 +120,7 @@ app.config(configRouting).config([
               href +
               '"' +
               (title ? ' title="' + title + '"' : "") +
-              ' target="_blank">' +
+              ' target="_blank" rel="noopener noreferrer">' +
               text +
               "</a>"
             );
@@ -132,7 +132,7 @@ app.config(configRouting).config([
               href +
               '"' +
               (title ? ' title="' + title + '"' : "") +
-              ' target="_blank">' +
+              ' target="_blank" rel="noopener noreferrer">' +
               href +
               "</a>)"
             );

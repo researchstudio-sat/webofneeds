@@ -2,12 +2,12 @@ import won from "../won-es6.js";
 import Immutable from "immutable";
 import angular from "angular";
 import chatTextFieldModule from "./chat-textfield.js";
-import connectionMessageModule from "./messages/connection-message.js";
 import postContentMessageModule from "./messages/post-content-message.js";
 import petrinetStateModule from "./petrinet-state.js";
 import shareDropdownModule from "./share-dropdown.js";
 import WonLabelledHr from "./labelled-hr.jsx";
 import WonConnectionHeader from "./connection-header.jsx";
+import WonConnectionMessage from "./messages/connection-message.jsx";
 import connectionContextDropdownModule from "./connection-context-dropdown.js";
 import { connect2Redux } from "../configRedux.js";
 import { delay, get, getIn } from "../utils.js";
@@ -131,13 +131,16 @@ function genComponentConf() {
             </button>
 
             <!-- CHATVIEW SPECIFIC CONTENT START-->
-            <won-connection-message
+            <won-preact
+                component="self.WonConnectionMessage"
+                props="{
+                    connectionUri: self.selectedConnectionUri,
+                    messageUri: msgUri
+                }"
+                ng-repeat="msgUri in self.sortedMessageUris"
                 ng-if="self.showChatData"
                 ng-click="self.multiSelectType && self.selectMessage(msgUri)"
-                ng-repeat="msgUri in self.sortedMessageUris"
-                connection-uri="self.selectedConnectionUri"
-                message-uri="::msgUri">
-            </won-connection-message>
+            ></won-preact>
             <!-- CHATVIEW SPECIFIC CONTENT END-->
 
             <!-- AGREEMENTVIEW SPECIFIC CONTENT START-->
@@ -147,33 +150,42 @@ function genComponentConf() {
             <div class="pm__content__agreement__title" ng-if="self.showAgreementData && self.hasAgreementMessages && !self.isProcessingLoadingAgreementData">
               Agreements
             </div>
-            <won-connection-message
-              ng-if="self.showAgreementData && !self.isProcessingLoadingAgreementData"
-              ng-click="self.multiSelectType && self.selectMessage(agreementUri)"
-              ng-repeat="agreementUri in self.agreementMessageUris"
-              connection-uri="self.selectedConnectionUri"
-              message-uri="::agreementUri">
-            </won-connection-message>
+            <won-preact
+                component="self.WonConnectionMessage"
+                props="{
+                    connectionUri: self.selectedConnectionUri,
+                    messageUri: agreementUri
+                }"
+                ng-repeat="agreementUri in self.agreementMessageUris"
+                ng-if="self.showAgreementData && !self.isProcessingLoadingAgreementData"
+                ng-click="self.multiSelectType && self.selectMessage(agreementUri)"
+            ></won-preact>
             <div class="pm__content__agreement__title" ng-if="self.showAgreementData && self.hasCancellationPendingMessages && !self.isProcessingLoadingAgreementData">
               Agreements with Pending Cancellation
             </div>
-            <won-connection-message
-              ng-if="self.showAgreementData && !self.isProcessingLoadingAgreementData"
-              ng-click="self.multiSelectType && self.selectMessage(proposesToCancelUri)"
-              ng-repeat="proposesToCancelUri in self.cancellationPendingMessageUris"
-              connection-uri="self.selectedConnectionUri"
-              message-uri="::proposesToCancelUri">
-            </won-connection-message>
+            <won-preact
+                component="self.WonConnectionMessage"
+                props="{
+                    connectionUri: self.selectedConnectionUri,
+                    messageUri: proposesToCancelUri
+                }"
+                ng-repeat="proposesToCancelUri in self.cancellationPendingMessageUris"
+                ng-if="self.showAgreementData && !self.isProcessingLoadingAgreementData"
+                ng-click="self.multiSelectType && self.selectMessage(proposesToCancelUri)"
+            ></won-preact>
             <div class="pm__content__agreement__title" ng-if="self.showAgreementData && self.hasProposalMessages && !self.isProcessingLoadingAgreementData">
               Open Proposals
             </div>
-            <won-connection-message
-              ng-if="self.showAgreementData && !self.isProcessingLoadingAgreementData"
-              ng-click="self.multiSelectType && self.selectMessage(proposalUri)"
-              ng-repeat="proposalUri in self.proposalMessageUris"
-              connection-uri="self.selectedConnectionUri"
-              message-uri="::proposalUri">
-            </won-connection-message>
+            <won-preact
+                component="self.WonConnectionMessage"
+                props="{
+                    connectionUri: self.selectedConnectionUri,
+                    messageUri: proposalUri
+                }"
+                ng-repeat="proposalUri in self.proposalMessageUris"
+                ng-if="self.showAgreementData && !self.isProcessingLoadingAgreementData"
+                ng-click="self.multiSelectType && self.selectMessage(proposalUri)"
+            ></won-preact>
             <!-- AGREEMENTVIEW SPECIFIC CONTENT END-->
 
             <!-- PETRINETVIEW SPECIFIC CONTENT START -->
@@ -196,6 +208,7 @@ function genComponentConf() {
             <a class="rdflink clickable"
                ng-if="self.shouldShowRdf"
                target="_blank"
+               rel="noopener noreferrer"
                href="{{ self.selectedConnectionUri }}">
                     <svg class="rdflink__small">
                         <use xlink:href="#rdf_logo_1" href="#rdf_logo_1"></use>
@@ -261,6 +274,7 @@ function genComponentConf() {
       window.pm4dbg = this;
       this.WonLabelledHr = WonLabelledHr;
       this.WonConnectionHeader = WonConnectionHeader;
+      this.WonConnectionMessage = WonConnectionMessage;
 
       this.rdfTextfieldHelpText =
         "Expects valid turtle. " +
@@ -907,7 +921,6 @@ export default angular
   .module("won.owner.components.postMessages", [
     autoresizingTextareaModule,
     chatTextFieldModule,
-    connectionMessageModule,
     connectionContextDropdownModule,
     postContentMessageModule,
     petrinetStateModule,

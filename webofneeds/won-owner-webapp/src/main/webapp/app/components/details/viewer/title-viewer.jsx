@@ -28,6 +28,6 @@ export default class WonTitleViewer extends React.Component {
 }
 WonTitleViewer.propTypes = {
   detail: PropTypes.object,
-  content: PropTypes.object,
+  content: PropTypes.string,
   className: PropTypes.string,
 };
