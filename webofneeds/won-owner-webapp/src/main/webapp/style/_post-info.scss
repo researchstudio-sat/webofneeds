@@ -13,7 +13,8 @@ won-post-info {
     grid-area: header;
   }
 
-  won-post-menu {
+  > won-preact.atomMenu,
+  > won-atom-menu {
     grid-area: menu;
   }
 

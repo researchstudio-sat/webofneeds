@@ -38,7 +38,8 @@ won-post-content-message {
         2.9rem
       );
 
-      > won-post-menu {
+      > won-preact.atomMenu,
+      > won-atom-menu {
         grid-area: postmenu;
       }
 
