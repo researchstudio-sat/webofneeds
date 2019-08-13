@@ -2,29 +2,29 @@
 @import "animate";
 @import "sizing-utils";
 
-won-post-share-link {
-  .psl__content {
+won-atom-share-link {
+  .asl__content {
     border-top: $thinGrayBorder;
 
-    .psl__info,
-    .psl__text {
+    .asl__info,
+    .asl__text {
       font-size: $smallFontSize;
     }
 
-    .psl__text {
+    .asl__text {
       padding: 0.25rem 0;
     }
 
-    .psl__info {
+    .asl__info {
       padding-top: 0.25rem;
     }
   }
-  .psl__tabs {
+  .asl__tabs {
     display: grid;
     grid-gap: 0.25rem;
     grid-template-columns: min-content min-content;
 
-    .psl__tabs__tab {
+    .asl__tabs__tab {
       white-space: nowrap;
       padding: 0.25rem 0.5rem;
 
@@ -39,14 +39,14 @@ won-post-share-link {
     }
   }
 
-  .psl__link {
+  .asl__link {
     background: white;
     padding: 0.5rem;
 
-    .psl__link__copyfield {
+    .asl__link__copyfield {
       display: flex;
 
-      .psl__link__copyfield__input {
+      .asl__link__copyfield__input {
         width: 100%;
         border-top-right-radius: 0;
         border-bottom-right-radius: 0;
@@ -55,20 +55,21 @@ won-post-share-link {
         font-size: $smallFontSize;
       }
 
-      .psl__link__copyfield__copy-button {
+      .asl__link__copyfield__copy-button {
         border-top-left-radius: 0;
         border-bottom-left-radius: 0;
         width: 1.5rem;
         padding: 0.25rem 1.5rem;
       }
 
-      .psl__link__copyfield__copy-button__icon {
+      .asl__link__copyfield__copy-button__icon {
+        --local-primary: white;
         @include fixed-square(1.25rem);
       }
     }
   }
 
-  .psl__qrcode {
+  .asl__qrcode {
     display: flex;
     flex-direction: column;
     align-items: center;

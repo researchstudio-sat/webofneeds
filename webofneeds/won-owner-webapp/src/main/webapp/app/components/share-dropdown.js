@@ -5,7 +5,7 @@
 import angular from "angular";
 import ngAnimate from "angular-animate";
 import { attach } from "../cstm-ng-utils.js";
-import shareModule from "./post-share-link.js";
+import WonAtomShareLink from "./atom-share-link.jsx";
 
 import "~/style/_share-dropdown.scss";
 
@@ -32,7 +32,7 @@ function genComponentConf() {
                             <use xlink:href="#ico16_share" href="#ico16_share"></use>
                         </svg>
                     </div>
-                    <won-post-share-link post-uri="self.atomUri"></won-post-share-link>
+                    <won-preact component="self.WonAtomShareLink" props="{atomUri: self.atomUri}"/>
                 </div>
             </div>
         `;
@@ -40,6 +40,7 @@ function genComponentConf() {
   class Controller {
     constructor() {
       attach(this, serviceDependencies, arguments);
+      this.WonAtomShareLink = WonAtomShareLink;
 
       const callback = event => {
         const clickedElement = event.target;
@@ -75,5 +76,5 @@ function genComponentConf() {
 }
 
 export default angular
-  .module("won.owner.components.shareDropdown", [ngAnimate, shareModule])
+  .module("won.owner.components.shareDropdown", [ngAnimate])
   .directive("wonShareDropdown", genComponentConf).name;
