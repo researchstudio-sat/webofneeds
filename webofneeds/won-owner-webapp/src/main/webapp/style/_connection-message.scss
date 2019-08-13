@@ -154,6 +154,7 @@ won-connection-message {
         }
       }
 
+      > won-preact.connectionMessageActions,
       > won-connection-message-actions {
         grid-column: 1 / span 2;
       }

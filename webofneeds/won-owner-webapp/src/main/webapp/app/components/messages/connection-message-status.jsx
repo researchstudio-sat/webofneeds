@@ -110,7 +110,10 @@ export default class WonConnectionMessageStatus extends React.Component {
     ) {
       timeStampLabel = (
         <div className="msgstatus__time">
-          {relativeTime(self.lastUpdateTime, self.message.get("date"))}
+          {relativeTime(
+            this.state.lastUpdateTime,
+            this.state.message.get("date")
+          )}
         </div>
       );
     }

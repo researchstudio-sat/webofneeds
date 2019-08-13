@@ -3,11 +3,11 @@ import inviewModule from "angular-inview";
 
 import won from "../../won-es6.js";
 import Immutable from "immutable";
-import connectionMessageActionsModule from "./connection-message-actions.js";
 import WonLabelledHr from "../labelled-hr.jsx";
 import WonCombinedMessageContent from "./combined-message-content.jsx";
 import WonAtomIcon from "../atom-icon.jsx";
 import WonConnectionMessageStatus from "./connection-message-status.jsx";
+import WonConnectionMessageActions from "./connection-message-actions.jsx";
 
 import { connect2Redux } from "../../configRedux.js";
 import { get, getIn } from "../../utils.js";
@@ -88,8 +88,7 @@ function genComponentConf() {
                         <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
                     </svg>
                 </div>
-                <won-connection-message-actions message-uri="::self.messageUri" connection-uri="self.connectionUri" ng-if="!self.isCollapsed && self.showActionButtons()">
-                </won-connection-message-actions>
+                <won-preact class="connectionMessageActions" component="self.WonConnectionMessageActions" props="{messageUri: self.messageUri, connectionUri: self.connectionUri}" ng-if="!self.isCollapsed && self.showActionButtons()"></won-preact>                
             </div>
             <won-preact component="self.WonConnectionMessageStatus" props="{messageUri: self.messageUri, connectionUri: self.connectionUri}"></won-preact>
             <a ng-if="self.rdfLinkURL" target="_blank" href="{{self.rdfLinkURL}}">
@@ -109,6 +108,7 @@ function genComponentConf() {
       this.WonLabelledHr = WonLabelledHr;
       this.WonCombinedMessageContent = WonCombinedMessageContent;
       this.WonConnectionMessageStatus = WonConnectionMessageStatus;
+      this.WonConnectionMessageActions = WonConnectionMessageActions;
 
       const selectFromState = state => {
         const ownedAtom =
@@ -354,8 +354,5 @@ function genComponentConf() {
 }
 
 export default angular
-  .module("won.owner.components.connectionMessage", [
-    connectionMessageActionsModule,
-    inviewModule.name,
-  ])
+  .module("won.owner.components.connectionMessage", [inviewModule.name])
   .directive("wonConnectionMessage", genComponentConf).name;
