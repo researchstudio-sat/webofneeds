@@ -8,7 +8,8 @@ won-post-info {
   grid-template-rows: min-content min-content minmax($minimalGridRows, 1fr) min-content;
   box-sizing: border-box;
 
-  won-atom-header-big {
+  > won-preact.atomHeaderBig,
+  > won-atom-header-big {
     grid-area: header;
   }
 

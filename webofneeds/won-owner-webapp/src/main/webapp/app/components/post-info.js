@@ -6,7 +6,7 @@ import angular from "angular";
 import postContentModule from "./post-content.js";
 import postMenuModule from "./post-menu.js";
 import chatTextFieldModule from "./chat-textfield.js";
-import atomHeaderBigModule from "./atom-header-big.js";
+import WonAtomHeaderBig from "./atom-header-big.jsx";
 import { get, getIn } from "../utils.js";
 import { connect2Redux } from "../configRedux.js";
 import * as viewUtils from "../redux/utils/view-utils.js";
@@ -25,7 +25,7 @@ import Immutable from "immutable";
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
   let template = `
-        <won-atom-header-big atom-uri="self.atomUri"></won-atom-header-big>
+        <won-preact class="atomHeaderBig" component="self.WonAtomHeaderBig" props="{atomUri: self.atomUri}"></won-preact>
         <won-post-menu post-uri="self.atomUri"></won-post-menu>
         <won-post-content post-uri="self.atomUri"></won-post-content>
         <div class="post-info__footer" ng-if="self.showFooter">
@@ -71,6 +71,7 @@ function genComponentConf() {
     constructor() {
       attach(this, serviceDependencies, arguments);
       window.pi4dbg = this;
+      this.WonAtomHeaderBig = WonAtomHeaderBig;
 
       const selectFromState = state => {
         const atom = getIn(state, ["atoms", this.atomUri]);
@@ -197,6 +198,5 @@ export default angular
     postMenuModule,
     postContentModule,
     chatTextFieldModule,
-    atomHeaderBigModule,
   ])
   .directive("wonPostInfo", genComponentConf).name;
