@@ -37,22 +37,22 @@ export default class WonAtomMenu extends React.Component {
   }
 
   selectFromState(state) {
-    const post = getIn(state, ["atoms", this.atomUri]);
-    const isPersona = atomUtils.isPersona(post);
+    const atom = getIn(state, ["atoms", this.atomUri]);
+    const isPersona = atomUtils.isPersona(atom);
     const isOwned = generalSelectors.isAtomOwned(state, this.atomUri);
 
-    const hasHolderSocket = atomUtils.hasHolderSocket(post);
-    const hasGroupSocket = atomUtils.hasGroupSocket(post);
-    const hasReviewSocket = atomUtils.hasReviewSocket(post);
-    const hasBuddySocket = atomUtils.hasBuddySocket(post);
+    const hasHolderSocket = atomUtils.hasHolderSocket(atom);
+    const hasGroupSocket = atomUtils.hasGroupSocket(atom);
+    const hasReviewSocket = atomUtils.hasReviewSocket(atom);
+    const hasBuddySocket = atomUtils.hasBuddySocket(atom);
     const reviewCount =
-      hasReviewSocket && getIn(post, ["rating", "reviewCount"]);
+      hasReviewSocket && getIn(atom, ["rating", "reviewCount"]);
 
-    const groupMembers = hasGroupSocket && get(post, "groupMembers");
+    const groupMembers = hasGroupSocket && get(atom, "groupMembers");
     const groupChatConnections =
       isOwned &&
       hasGroupSocket &&
-      connectionSelectors.getGroupChatConnectionsByAtomUri(state, this.postUri);
+      connectionSelectors.getGroupChatConnectionsByAtomUri(state, this.atomUri);
     const connectedGroupChatConnections =
       groupChatConnections &&
       groupChatConnections.filter(conn => connectionUtils.isConnected(conn));
@@ -63,14 +63,14 @@ export default class WonAtomMenu extends React.Component {
           !(connectionUtils.isConnected(conn) || connectionUtils.isClosed(conn))
       );
 
-    const heldPosts = hasHolderSocket && get(post, "holds");
+    const heldAtoms = hasHolderSocket && get(atom, "holds");
 
     const hasUnreadSuggestedConnectionsInHeldAtoms = generalSelectors.hasUnreadSuggestedConnectionsInHeldAtoms(
       state,
-      this.postUri
+      this.atomUri
     );
-    const heldByUri = atomUtils.getHeldByUri(post);
-    const isHeld = atomUtils.isHeld(post);
+    const heldByUri = atomUtils.getHeldByUri(atom);
+    const isHeld = atomUtils.isHeld(atom);
     const persona = getIn(state, ["atoms", heldByUri]);
     const personaHasReviewSocket = atomUtils.hasReviewSocket(persona);
     const personaAggregateRating =
@@ -78,40 +78,40 @@ export default class WonAtomMenu extends React.Component {
 
     const suggestions =
       isOwned &&
-      connectionSelectors.getSuggestedConnectionsByAtomUri(state, this.postUri);
+      connectionSelectors.getSuggestedConnectionsByAtomUri(state, this.atomUri);
 
     const buddyConnections =
       isOwned &&
       connectionSelectors.getBuddyConnectionsByAtomUri(
         state,
-        this.postUri,
+        this.atomUri,
         true,
         false
       );
 
     const buddies = isOwned
       ? buddyConnections.filter(conn => connectionUtils.isConnected(conn))
-      : get(post, "buddies");
+      : get(atom, "buddies");
 
     const viewState = get(state, "view");
     const process = get(state, "process");
 
     const suggestionsSize = suggestions ? suggestions.size : 0;
     const groupMembersSize = groupMembers ? groupMembers.size : 0;
-    const heldPostsSize = heldPosts ? heldPosts.size : 0;
+    const heldAtomsSize = heldAtoms ? heldAtoms.size : 0;
 
     return {
-      post,
+      atom,
       isPersona,
-      isHoldable: atomUtils.hasHoldableSocket(post),
+      isHoldable: atomUtils.hasHoldableSocket(atom),
       isOwned,
       isHeld,
       personaHasReviewSocket,
       personaAggregateRatingString:
         personaAggregateRating && personaAggregateRating.toFixed(1),
-      hasHeldPosts: heldPostsSize > 0,
+      hasHeldAtoms: heldAtomsSize > 0,
       hasUnreadSuggestedConnectionsInHeldAtoms,
-      heldPostsSize,
+      heldAtomsSize,
       hasHolderSocket,
       hasGroupSocket,
       hasReviewSocket,
@@ -127,7 +127,7 @@ export default class WonAtomMenu extends React.Component {
       buddyCount: buddies ? buddies.size : 0,
       hasReviews: reviewCount > 0,
       reviewCount,
-      hasChatSocket: atomUtils.hasChatSocket(post),
+      hasChatSocket: atomUtils.hasChatSocket(atom),
       groupMembers: groupMembersSize > 0,
       groupMembersSize,
       connectedGroupChatConnectionsSize:
@@ -143,11 +143,11 @@ export default class WonAtomMenu extends React.Component {
           ? !!suggestions.find(conn => get(conn, "unread"))
           : false,
       suggestionsSize,
-      postLoading: !post || processUtils.isAtomLoading(process, this.postUri),
-      postFailedToLoad:
-        post && processUtils.hasAtomFailedToLoad(process, this.postUri),
+      atomLoading: !atom || processUtils.isAtomLoading(process, this.atomUri),
+      atomFailedToLoad:
+        atom && processUtils.hasAtomFailedToLoad(process, this.atomUri),
       shouldShowRdf: viewUtils.showRdf(viewState),
-      visibleTab: viewUtils.getVisibleTabByAtomUri(viewState, this.postUri),
+      visibleTab: viewUtils.getVisibleTabByAtomUri(viewState, this.atomUri),
     };
   }
 
@@ -166,7 +166,7 @@ export default class WonAtomMenu extends React.Component {
         )}
         onClick={() => this.selectTab("DETAIL")}
       >
-        <span className="post-menu__item__label">Detail</span>
+        <span className="atom-menu__item__label">Detail</span>
       </div>
     );
 
@@ -178,9 +178,9 @@ export default class WonAtomMenu extends React.Component {
           )}
           onClick={() => this.selectTab("HELDBY")}
         >
-          <span className="post-menu__item__label">Persona</span>
+          <span className="atom-menu__item__label">Persona</span>
           {this.state.personaAggregateRatingString && (
-            <span className="post-menu__item__rating">
+            <span className="atom-menu__item__rating">
               (★ {this.state.personaAggregateRatingString})
             </span>
           )}
@@ -194,9 +194,9 @@ export default class WonAtomMenu extends React.Component {
           )}
           onClick={() => this.selectTab("HELDBY")}
         >
-          <span className="post-menu__item__label">+ Persona</span>
+          <span className="atom-menu__item__label">+ Persona</span>
           {this.state.personaAggregateRatingString && (
-            <span className="post-menu__item__rating">
+            <span className="atom-menu__item__rating">
               (★ {this.state.personaAggregateRatingString})
             </span>
           )}
@@ -215,10 +215,10 @@ export default class WonAtomMenu extends React.Component {
               )}
               onClick={() => this.selectTab("PARTICIPANTS")}
             >
-              <span className="post-menu__item__unread" />
-              <span className="post-menu__item__label">Group Members</span>
+              <span className="atom-menu__item__unread" />
+              <span className="atom-menu__item__label">Group Members</span>
               {this.state.connectedGroupChatConnectionsSize && (
-                <span className="post-menu__item__count">
+                <span className="atom-menu__item__count">
                   ({this.state.connectedGroupChatConnectionsSize})
                 </span>
               )}
@@ -232,8 +232,8 @@ export default class WonAtomMenu extends React.Component {
               )}
               onClick={() => this.selectTab("PARTICIPANTS")}
             >
-              <span className="post-menu__item__label">Group Members</span>
-              <span className="post-menu__item__count">
+              <span className="atom-menu__item__label">Group Members</span>
+              <span className="atom-menu__item__count">
                 ({this.state.groupMembersSize})
               </span>
             </div>
@@ -251,9 +251,9 @@ export default class WonAtomMenu extends React.Component {
           )}
           onClick={() => this.selectTab("SUGGESTIONS")}
         >
-          <span className="post-menu__item__unread" />
-          <span className="post-menu__item__label">Suggestions</span>
-          <span className="post-menu__item__count">
+          <span className="atom-menu__item__unread" />
+          <span className="atom-menu__item__label">Suggestions</span>
+          <span className="atom-menu__item__count">
             ({this.state.suggestionsSize})
           </span>
         </div>
@@ -264,15 +264,15 @@ export default class WonAtomMenu extends React.Component {
         <div
           className={this.generateAtomItemCssClasses(
             this.isSelectedTab("HOLDS"),
-            !this.state.hasHeldPosts,
+            !this.state.hasHeldAtoms,
             this.state.hasUnreadSuggestedConnectionsInHeldAtoms
           )}
           onClick={() => this.selectTab("HOLDS")}
         >
-          <span className="post-menu__item__unread" />
-          <span className="post-menu__item__label">Posts</span>
-          <span className="post-menu__item__count">
-            ({this.state.heldPostsSize})
+          <span className="atom-menu__item__unread" />
+          <span className="atom-menu__item__label">Posts</span>
+          <span className="atom-menu__item__count">
+            ({this.state.heldAtomsSize})
           </span>
         </div>
       );
@@ -287,9 +287,9 @@ export default class WonAtomMenu extends React.Component {
           )}
           onClick={() => this.selectTab("BUDDIES")}
         >
-          <span className="post-menu__item__unread" />
-          <span className="post-menu__item__label">Buddies</span>
-          <span className="post-menu__item__count">
+          <span className="atom-menu__item__unread" />
+          <span className="atom-menu__item__label">Buddies</span>
+          <span className="atom-menu__item__count">
             ({this.state.buddyCount})
           </span>
         </div>
@@ -304,9 +304,9 @@ export default class WonAtomMenu extends React.Component {
           )}
           onClick={() => this.selectTab("REVIEWS")}
         >
-          <span className="post-menu__item__label">Reviews</span>
+          <span className="atom-menu__item__label">Reviews</span>
           {this.state.hasReviews && (
-            <span className="post-menu__item__rating">
+            <span className="atom-menu__item__rating">
               ({this.state.reviewCount})
             </span>
           )}
@@ -318,7 +318,7 @@ export default class WonAtomMenu extends React.Component {
           className={this.generateAtomItemCssClasses(this.isSelectedTab("RDF"))}
           onClick={() => this.selectTab("RDF")}
         >
-          <span className="post-menu__item__label">RDF</span>
+          <span className="atom-menu__item__label">RDF</span>
         </div>
       );
 
@@ -331,8 +331,8 @@ export default class WonAtomMenu extends React.Component {
 
   generateParentCssClasses() {
     const cssClassNames = [];
-    this.state.postLoading && cssClassNames.push("won-is-loading");
-    this.state.postFailedToLoad && cssClassNames.push("won-failed-to-load");
+    this.state.atomLoading && cssClassNames.push("won-is-loading");
+    this.state.atomFailedToLoad && cssClassNames.push("won-failed-to-load");
 
     return cssClassNames.join(" ");
   }
@@ -342,11 +342,11 @@ export default class WonAtomMenu extends React.Component {
     inactive = false,
     unread = false
   ) {
-    const cssClassNames = ["post-menu__item"];
+    const cssClassNames = ["atom-menu__item"];
 
-    selected && cssClassNames.push("post-menu__item--selected");
-    inactive && cssClassNames.push("post-menu__item--inactive");
-    unread && cssClassNames.push("post-menu__item--unread");
+    selected && cssClassNames.push("atom-menu__item--selected");
+    inactive && cssClassNames.push("atom-menu__item--inactive");
+    unread && cssClassNames.push("atom-menu__item--unread");
 
     return cssClassNames.join(" ");
   }
@@ -359,7 +359,7 @@ export default class WonAtomMenu extends React.Component {
     this.props.ngRedux.dispatch(
       actionCreators.atoms__selectTab(
         Immutable.fromJS({
-          atomUri: get(this.state.post, "uri"),
+          atomUri: this.atomUri,
           selectTab: tabName,
         })
       )
