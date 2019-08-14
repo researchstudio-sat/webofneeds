@@ -184,7 +184,7 @@ export default class WonCombinedMessageContent extends React.Component {
                   <WonAtomIcon
                     key={connUri}
                     className={
-                      "atomImage msg__header__inject " +
+                      "msg__header__inject " +
                       (this.isInjectIntoConnectionPresent(connUri)
                         ? "clickable"
                         : "")

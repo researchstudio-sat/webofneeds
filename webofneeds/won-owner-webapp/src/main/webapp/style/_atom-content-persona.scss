@@ -2,11 +2,11 @@
 @import "sizing-utils";
 @import "square-image";
 
-won-post-content-persona {
+won-atom-content-persona {
   display: grid;
   grid-gap: 0.5rem;
 
-  .pcp__header {
+  .ac-persona__header {
     display: grid;
     grid-template-areas:
       "p_icon p_name p_name"
@@ -17,7 +17,6 @@ won-post-content-persona {
     border-bottom: $thinGrayBorder;
 
     @include square-image($postIconSize);
-    won-preact.atomImage,
     won-atom-image {
       grid-area: p_icon;
     }
@@ -44,18 +43,18 @@ won-post-content-persona {
       }
     }
 
-    .pcp__websitelabel {
+    .ac-persona__websitelabel {
       font-size: $smallFontSize;
       grid-area: p_websitelabel;
     }
-    .pcp__websitelink {
+    .ac-persona__websitelink {
       font-size: $smallFontSize;
       grid-area: p_websitelink;
     }
   }
 
-  .pcp__buddies,
-  .pcp__holds {
+  .ac-persona__buddies,
+  .ac-persona__holds {
     display: grid;
     grid-template-columns: 1fr min-content;
     align-items: center;
@@ -65,7 +64,7 @@ won-post-content-persona {
     }
   }
 
-  .pcp__rating {
+  .ac-persona__rating {
     display: grid;
     grid-template-areas: "r_header r_header" "r_reviewcount r_button" "r_rate r_rate";
     white-space: nowrap;

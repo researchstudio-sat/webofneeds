@@ -3,12 +3,12 @@
  */
 
 import angular from "angular";
-import postContentPersona from "./post-content-persona.js";
 import WonAtomContentDetails from "./atom-content-details.jsx";
 import WonAtomContentHolds from "./atom-content-holds.jsx";
 import WonAtomContentSuggestions from "./atom-content-suggestions.jsx";
 import WonAtomContentParticipants from "./atom-content-participants.jsx";
 import WonAtomContentBuddies from "./atom-content-buddies.jsx";
+import WonAtomContentPersona from "./atom-content-persona.jsx";
 import WonAtomContentGeneral from "./atom-content-general.jsx";
 import WonTrig from "./trig.jsx";
 import WonLabelledHr from "./labelled-hr.jsx";
@@ -79,7 +79,7 @@ function genComponentConf() {
           <won-preact component="self.WonAtomContentDetails" props="{atomUri: self.postUri, branch: 'seeks'}" ng-if="self.isSelectedTab('DETAIL') && self.hasSeeksBranch"></won-preact>
 
           <!-- PERSONA INFORMATION -->
-          <won-post-content-persona ng-if="self.isSelectedTab('HELDBY') && self.isHeld" holds-uri="self.postUri"></won-post-content-persona>
+          <won-preact component="self.WonAtomContentPersona" props="{holdsUri: self.postUri}" ng-if="self.isSelectedTab('HELDBY') && self.isHeld"></won-preact>
           <won-elm module="self.addPersonaModule" ng-if="self.isSelectedTab('HELDBY') && self.isOwned && self.isActive && self.hasHoldableSocket && !self.isHeld" props="{post: self.post.toJS(), personas: self.personas.toJS()}"></won-elm>
           
           <!-- PARTICIPANT INFORMATION -->
@@ -140,6 +140,7 @@ function genComponentConf() {
       this.WonAtomContentDetails = WonAtomContentDetails;
       this.WonAtomContentParticipants = WonAtomContentParticipants;
       this.WonAtomContentBuddies = WonAtomContentBuddies;
+      this.WonAtomContentPersona = WonAtomContentPersona;
       this.WonLabelledHr = WonLabelledHr;
       this.WonTrig = WonTrig;
 
@@ -227,9 +228,5 @@ function genComponentConf() {
 }
 
 export default angular
-  .module("won.owner.components.postContent", [
-    ngAnimate,
-    postContentPersona,
-    elmModule,
-  ])
+  .module("won.owner.components.postContent", [ngAnimate, elmModule])
   .directive("wonPostContent", genComponentConf).name;
