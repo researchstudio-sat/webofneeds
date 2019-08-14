@@ -1,12 +1,11 @@
 import angular from "angular";
-import L from "../../../leaflet-bundleable.js";
-import { initLeaflet } from "../../../leaflet-bundleable.js";
+import L, { initLeaflet } from "../../../leaflet-bundleable.js";
 import { delay, getIn } from "../../../utils.js";
 import {
-  searchNominatim,
+  nominatim2draftLocation,
   reverseSearchNominatim,
   scrubSearchResults,
-  nominatim2draftLocation,
+  searchNominatim,
 } from "../../../api/nominatim-api.js";
 import { attach, DomCache } from "../../../cstm-ng-utils.js";
 

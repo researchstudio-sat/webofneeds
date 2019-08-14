@@ -7,7 +7,7 @@ import ngAnimate from "angular-animate";
 
 import "ng-redux";
 import WonLabelledHr from "./labelled-hr.jsx";
-import createIsseeksModule from "./create-isseeks.js";
+import WonCreateIsSeeks from "./create-isseeks.jsx";
 import { delay, get, getIn } from "../utils.js";
 import { attach } from "../cstm-ng-utils.js";
 import { actionCreators } from "../actions/actions.js";
@@ -69,26 +69,28 @@ function genComponentConf() {
               ng-if="self.showCreateInput && self.useCase.details">
               Your offer or self description
             </div>
-            <won-create-isseeks 
+            <won-preact
+                component="self.WonCreateIsSeeks"
+                props="{
+                    detailList: self.useCase.details,
+                    initialDraft: self.useCase.draft.content,
+                    onUpdate: self.updateDraftContent
+                }"
                 ng-if="self.showCreateInput && self.useCase.details"
-                is-or-seeks="::'Description'"
-                detail-list="self.useCase.details"
-                initial-draft="self.useCase.draft.content"
-                on-update="::self.updateDraft(draft, 'content')"
-                on-scroll="::self.scrollIntoView(element)">
-            </won-create-isseeks>
+            ></won-preact>
             <div class="cp__content__branchheader"
               ng-if="self.showCreateInput && self.useCase.seeksDetails">
               Looking For
             </div>
-            <won-create-isseeks 
+            <won-preact
+                component="self.WonCreateIsSeeks"
+                props="{
+                    detailList: self.useCase.seeksDetails,
+                    initialDraft: self.useCase.draft.seeks,
+                    onUpdate: self.updateDraftSeeks
+                }"
                 ng-if="self.showCreateInput && self.useCase.seeksDetails"
-                is-or-seeks="::'Search'" 
-                detail-list="self.useCase.seeksDetails"
-                initial-draft="self.useCase.draft.seeks"
-                on-update="::self.updateDraft(draft, 'seeks')" 
-                on-scroll="::self.scrollIntoView(element)">
-            </won-create-isseeks>
+            ></won-preact>
         </div>
         <div class="cp__footer" ng-if="self.initialLoadFinished">
             <won-preact component="self.WonLabelledHr" class="labelledHr cp__footer__labelledhr" props="{label: 'done?'}"></won-preact>
@@ -126,6 +128,7 @@ function genComponentConf() {
       this.focusedElement = null;
       window.cnc4dbg = this;
       this.WonLabelledHr = WonLabelledHr;
+      this.WonCreateIsSeeks = WonCreateIsSeeks;
 
       this.windowHeight = window.screen.height;
       this.scrollContainer().addEventListener("scroll", e => this.onResize(e));
@@ -287,18 +290,9 @@ function genComponentConf() {
       if (this.focusedElement) {
         if (this.windowHeight < window.screen.height) {
           this.windowHeight < window.screen.height;
-          this.scrollIntoView(document.querySelector(this.focusedElement));
         } else {
           this.windowHeight = window.screen.height;
         }
-      }
-    }
-
-    scrollIntoView(element) {
-      this._programmaticallyScrolling = true;
-
-      if (element) {
-        element.scrollIntoView({ behavior: "smooth", block: "nearest" });
       }
     }
 
@@ -341,6 +335,14 @@ function genComponentConf() {
         this.draftObject = JSON.parse(JSON.stringify(this.useCase.draft));
         delay(0).then(() => this.$scope.$digest());
       }
+    }
+
+    updateDraftSeeks(updatedDraftJson) {
+      this.updateDraft(updatedDraftJson.draft, "seeks");
+    }
+
+    updateDraftContent(updatedDraftJson) {
+      this.updateDraft(updatedDraftJson.draft, "content");
     }
 
     updateDraft(updatedDraft, branch) {
@@ -488,9 +490,5 @@ function mandatoryDetailsSet(isOrSeeks, useCaseBranchDetails) {
 
 export default //.controller('CreateAtomController', [...serviceDependencies, CreateAtomController])
 angular
-  .module("won.owner.components.createPost", [
-    createIsseeksModule,
-    ngAnimate,
-    elmModule,
-  ])
+  .module("won.owner.components.createPost", [ngAnimate, elmModule])
   .directive("wonCreatePost", genComponentConf).name;

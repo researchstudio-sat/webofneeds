@@ -3,6 +3,9 @@ import Immutable from "immutable";
 import WonFileViewer from "../../app/components/details/viewer/file-viewer.jsx";
 import WonImageViewer from "../../app/components/details/viewer/image-viewer.jsx";
 
+import WonFilePicker from "../../app/components/details/picker/file-picker.jsx";
+import WonImagePicker from "../../app/components/details/picker/image-picker.jsx";
+
 export const files = {
   identifier: "files",
   label: "Files",
@@ -10,7 +13,7 @@ export const files = {
   placeholder: "",
   accepts: "",
   multiSelect: true,
-  component: "won-file-picker",
+  component: WonFilePicker,
   viewerComponent: WonFileViewer,
   messageEnabled: true,
   parseToRDF: function({ value, identifier, contentUri }) {
@@ -91,7 +94,7 @@ export const images = {
   placeholder: "",
   accepts: "image/*",
   multiSelect: true,
-  component: "won-image-picker",
+  component: WonImagePicker,
   viewerComponent: WonImageViewer,
   messageEnabled: true,
   parseToRDF: function({ value, identifier, contentUri }) {

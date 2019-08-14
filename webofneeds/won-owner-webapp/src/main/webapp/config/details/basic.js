@@ -2,17 +2,23 @@ import { get, getIn, is } from "../../app/utils.js";
 import { select } from "../details/abstract.js";
 import Immutable from "immutable";
 import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
+
 import WonTitleViewer from "../../app/components/details/viewer/title-viewer.jsx";
 import WonDescriptionViewer from "../../app/components/details/viewer/description-viewer.jsx";
 import WonTagsViewer from "../../app/components/details/viewer/tags-viewer.jsx";
 import WonSuggestPostViewer from "../../app/components/details/viewer/suggestpost-viewer.jsx";
+
+import WonTitlePicker from "../../app/components/details/picker/title-picker.jsx";
+import WonDescriptionPicker from "../../app/components/details/picker/description-picker.jsx";
+import WonTagsPicker from "../../app/components/details/picker/tags-picker.jsx";
+import WonSuggestAtomPicker from "../../app/components/details/picker/suggest-atom-picker.jsx";
 
 export const title = {
   identifier: "title",
   label: "Title",
   icon: "#ico36_detail_title",
   placeholder: "What? (Short title shown in lists)",
-  component: "won-title-picker",
+  component: WonTitlePicker,
   viewerComponent: WonTitleViewer,
   parseToRDF: function({ value }) {
     const val = value ? value : undefined;
@@ -44,7 +50,7 @@ export const personaName = {
   label: "Name",
   icon: "#ico36_detail_title",
   placeholder: "Your Name",
-  component: "won-title-picker",
+  component: WonTitlePicker,
   viewerComponent: WonTitleViewer,
   parseToRDF: function({ value }) {
     const val = value ? value : undefined;
@@ -69,7 +75,7 @@ export const website = {
   label: "Website",
   icon: "#ico36_detail_title",
   placeholder: "Website",
-  component: "won-title-picker",
+  component: WonTitlePicker,
   viewerComponent: WonTitleViewer,
   parseToRDF: function({ value }) {
     const val = value ? value : undefined;
@@ -93,7 +99,7 @@ export const searchString = {
   label: "Searching for",
   icon: "#ico36_search",
   placeholder: "What do you look for?",
-  component: "won-title-picker",
+  component: WonTitlePicker,
   viewerComponent: WonTitleViewer,
   parseToRDF: function({ value }) {
     const val = value ? value : undefined;
@@ -121,7 +127,7 @@ export const description = {
   label: "Description",
   icon: "#ico36_detail_description",
   placeholder: "Enter Description...",
-  component: "won-description-picker",
+  component: WonDescriptionPicker,
   viewerComponent: WonDescriptionViewer,
   parseToRDF: function({ value }) {
     const val = value ? value : undefined;
@@ -154,7 +160,7 @@ export const tags = {
   label: "Tags",
   icon: "#ico36_detail_tags",
   placeholder: "e.g. couch, free",
-  component: "won-tags-picker",
+  component: WonTagsPicker,
   viewerComponent: WonTagsViewer,
   messageEnabled: true,
   parseToRDF: function({ value }) {
@@ -181,7 +187,7 @@ export const suggestPost = {
   label: "Suggest Post",
   icon: "#ico36_detail_title", //TODO: CORRECT ICON
   placeholder: "Insert PostUri and Accept",
-  component: "won-suggestpost-picker",
+  component: WonSuggestAtomPicker,
   viewerComponent: WonSuggestPostViewer,
   parseToRDF: function({ value }) {
     const val = value ? value : undefined;
@@ -210,7 +216,7 @@ export const responseToUri = {
   label: "Response To Post",
   icon: "#ico36_detail_title", //TODO: CORRECT ICON
   placeholder: "Insert PostUri and Accept",
-  component: "won-suggestpost-picker",
+  component: WonSuggestAtomPicker,
   viewerComponent: WonSuggestPostViewer,
   messageEnabled: false,
   parseToRDF: function({ value }) {

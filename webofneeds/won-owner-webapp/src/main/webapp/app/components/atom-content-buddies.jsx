@@ -10,7 +10,7 @@ import * as connectionSelectors from "../redux/selectors/connection-selectors";
 import * as connectionUtils from "../redux/utils/connection-utils";
 import won from "../won-es6";
 import WonLabelledHr from "./labelled-hr.jsx";
-import WonSuggestAtomPicker from "./details/picker/suggest-atom-picker.jsx";
+import WonSuggestAtomPicker from "./details/_angular_picker/suggest-atom-picker.jsx";
 import WonAtomCard from "./atom-card.jsx";
 
 import "~/style/_atom-content-buddies.scss";

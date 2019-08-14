@@ -8,6 +8,7 @@ won-title-picker {
     display: grid;
 
     .titlep__input__icon {
+      --local-primary: #{$won-primary-color};
       @include fixed-square($bigiconSize);
       position: absolute;
       right: 0.5rem;

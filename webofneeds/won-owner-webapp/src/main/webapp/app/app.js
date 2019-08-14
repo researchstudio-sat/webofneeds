@@ -55,7 +55,6 @@ import won from "./service/won.js";
  */
 import { runMessagingAgent } from "./messaging-agent.js";
 
-import detailModules from "./components/details/details.js";
 import { runPushAgent } from "./push-agent";
 import { enableNotifications } from "../config/default";
 
@@ -83,9 +82,6 @@ let app = angular.module("won.owner", [
   slideIn,
   postInfo,
   preactModule,
-
-  //details
-  ...detailModules,
 
   //views
   connectionsComponent.module,

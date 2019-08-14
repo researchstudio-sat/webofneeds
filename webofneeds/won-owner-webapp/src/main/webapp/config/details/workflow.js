@@ -7,6 +7,9 @@ import Immutable from "immutable";
 import WonWorkflowViewer from "../../app/components/details/viewer/workflow-viewer.jsx";
 import WonPetrinetViewer from "../../app/components/details/viewer/petrinet-viewer.jsx";
 import WonPetrinetTransitionViewer from "../../app/components/details/viewer/petrinettransition-viewer.jsx";
+import WonWorkflowPicker from "../../app/components/details/picker/workflow-picker.jsx";
+import WonPetrinetPicker from "../../app/components/details/picker/petrinet-picker.jsx";
+import WonPetrinetTransitionPicker from "../../app/components/details/picker/petrinettransition-picker.jsx";
 
 export const bpmnWorkflow = {
   identifier: "bpmnWorkflow",
@@ -15,7 +18,7 @@ export const bpmnWorkflow = {
   placeholder: "",
   //accepts: "application/octet-stream",
   accepts: "",
-  component: "won-workflow-picker",
+  component: WonWorkflowPicker,
   viewerComponent: WonWorkflowViewer,
   messageEnabled: true,
   parseToRDF: function({ value, identifier, contentUri }) {
@@ -65,7 +68,7 @@ export const petriNetWorkflow = {
   placeholder: "",
   //accepts: "application/octet-stream",
   accepts: "",
-  component: "won-petrinet-picker",
+  component: WonPetrinetPicker,
   viewerComponent: WonPetrinetViewer,
   messageEnabled: true,
   parseToRDF: function({ value, identifier, contentUri }) {
@@ -116,7 +119,7 @@ export const petriNetTransition = {
   identifier: "petriNetTransition",
   label: "Transition",
   icon: "#ico36_detail_workflow", //TODO: CORRECT ICON
-  component: "won-petrinettransition-picker",
+  component: WonPetrinetTransitionPicker,
   viewerComponent: WonPetrinetTransitionViewer,
   messageEnabled: true,
   parseToRDF: function({ value }) {

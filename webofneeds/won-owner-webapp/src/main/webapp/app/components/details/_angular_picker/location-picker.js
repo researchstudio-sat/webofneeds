@@ -3,19 +3,18 @@
  */
 
 import angular from "angular";
-import L from "../../../leaflet-bundleable.js";
-import { initLeaflet, leafletBounds } from "../../../leaflet-bundleable.js";
+import L, { initLeaflet, leafletBounds } from "../../../leaflet-bundleable.js";
 import { delay, getIn } from "../../../utils.js";
 import {
-  searchNominatim,
+  nominatim2draftLocation,
   reverseSearchNominatim,
   scrubSearchResults,
-  nominatim2draftLocation,
+  searchNominatim,
 } from "../../../api/nominatim-api.js";
 import {
   attach,
-  doneTypingBufferNg,
   DomCache,
+  doneTypingBufferNg,
 } from "../../../cstm-ng-utils.js";
 
 import titlePickerModule from "./title-picker.js";

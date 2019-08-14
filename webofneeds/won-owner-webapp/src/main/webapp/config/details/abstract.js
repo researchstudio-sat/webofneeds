@@ -8,6 +8,11 @@ import WonNumberViewer from "../../app/components/details/viewer/number-viewer.j
 import WonSelectViewer from "../../app/components/details/viewer/select-viewer.jsx";
 import WonDropdownViewer from "../../app/components/details/viewer/dropdown-viewer.jsx";
 
+import WonRangePicker from "../../app/components/details/picker/range-picker.jsx";
+import WonNumberPicker from "../../app/components/details/picker/number-picker.jsx";
+import WonSelectPicker from "../../app/components/details/picker/select-picker.jsx";
+import WonDropdownPicker from "../../app/components/details/picker/dropdown-picker.jsx";
+
 export const range = {
   identifier: function() {
     throw "abstract Detail does not override necessary identifier";
@@ -24,7 +29,7 @@ export const range = {
   minPlaceholder: undefined,
   maxPlaceholder: undefined,
   icon: undefined,
-  component: "won-range-picker",
+  component: WonRangePicker,
   viewerComponent: WonRangeViewer,
   parseToRDF: function() {
     throw "abstract Detail does not override necessary function";
@@ -44,7 +49,7 @@ export const number = {
     throw "abstract Detail does not override necessary label";
   },
   icon: undefined,
-  component: "won-number-picker",
+  component: WonNumberPicker,
   viewerComponent: WonNumberViewer,
   parseToRDF: function() {
     throw "abstract Detail does not override necessary function";
@@ -64,7 +69,7 @@ export const select = {
     throw "abstract Detail does not override necessary label";
   },
   icon: undefined,
-  component: "won-select-picker",
+  component: WonSelectPicker,
   viewerComponent: WonSelectViewer,
   multiSelect: false,
   options: function() {
@@ -98,7 +103,7 @@ export const dropdown = {
     throw "abstract Detail does not override necessary label";
   },
   icon: undefined,
-  component: "won-dropdown-picker",
+  component: WonDropdownPicker,
   viewerComponent: WonDropdownViewer,
   options: function() {
     throw 'abstract Detail does not override necessary options array(structure: [{value: val, label: "labeltext"}...]';
