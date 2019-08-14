@@ -149,8 +149,20 @@ const mapDispatchToProps = dispatch => {
     routerBack: () => {
       dispatch(actionCreators.router__back());
     },
+    routerGo: (path, props) => {
+      dispatch(actionCreators.router__stateGo(path, props));
+    },
     atomsEdit: (draft, atom) => {
       dispatch(actionCreators.atoms__edit(draft, atom));
+    },
+    atomsCreate: (draft, persona, nodeUri) => {
+      dispatch(actionCreators.atoms__create(draft, persona, nodeUri));
+    },
+    hideModalDialog: () => {
+      dispatch(actionCreators.view__hideModalDialog());
+    },
+    showTermsDialog: payload => {
+      dispatch(actionCreators.view__showTermsDialog(payload));
     },
   };
 };
@@ -465,27 +477,27 @@ class CreateAtom extends React.Component {
           tempDraft,
           persona
         );
-        this.router__stateGo("connections", {
+        this.props.routerGo("connections", {
           useCase: undefined,
           connectionUri: undefined,
         });
       } else {
-        this.view__showTermsDialog(
+        this.props.showTermsDialog(
           Immutable.fromJS({
             acceptCallback: () => {
-              this.view__hideModalDialog();
+              this.props.hideModalDialog();
               this.connections__connectReactionAtom(
                 tempConnectToAtomUri,
                 tempDraft,
                 persona
               );
-              this.router__stateGo("connections", {
+              this.props.routerGo("connections", {
                 useCase: undefined,
                 connectionUri: undefined,
               });
             },
             cancelCallback: () => {
-              this.view__hideModalDialog();
+              this.props.hideModalDialog();
             },
           })
         );
@@ -497,18 +509,18 @@ class CreateAtom extends React.Component {
         .getIn(["config", "defaultNodeUri"]);
 
       if (this.props.loggedIn) {
-        this.atoms__create(tempDraft, persona, tempDefaultNodeUri);
-        this.router__stateGo("inventory");
+        this.props.atomsCreate(tempDraft, persona, tempDefaultNodeUri);
+        this.props.routerGo("inventory");
       } else {
-        this.view__showTermsDialog(
+        this.props.showTermsDialog(
           Immutable.fromJS({
             acceptCallback: () => {
-              this.view__hideModalDialog();
-              this.atoms__create(tempDraft, persona, tempDefaultNodeUri);
-              this.router__stateGo("inventory");
+              this.props.hideModalDialog();
+              this.props.atomsCreate(tempDraft, persona, tempDefaultNodeUri);
+              this.props.routerGo("inventory");
             },
             cancelCallback: () => {
-              this.view__hideModalDialog();
+              this.props.hideModalDialog();
             },
           })
         );
@@ -518,29 +530,33 @@ class CreateAtom extends React.Component {
 }
 
 CreateAtom.propTypes = {
-  loggedIn: PropTypes.bool,
-  holderUri: PropTypes.string,
-  isHolderAtomValid: PropTypes.bool,
+  atomsCreate: PropTypes.func,
+  atomsEdit: PropTypes.func,
   connectToAtomUri: PropTypes.string,
-  processingPublish: PropTypes.bool,
   connectionHasBeenLost: PropTypes.bool,
-  useCase: PropTypes.object,
+  fetchUnloadedAtom: PropTypes.func,
   fromAtom: PropTypes.object,
   fromAtomUri: PropTypes.string,
-  isFromAtomOwned: PropTypes.bool,
+  hasFromAtomFailedToLoad: PropTypes.bool,
+  hideModalDialog: PropTypes.func,
+  holderUri: PropTypes.string,
   isCreateFromAtom: PropTypes.bool,
   isEditFromAtom: PropTypes.bool,
-  isFromAtomLoading: PropTypes.bool,
-  isFromAtomToLoad: PropTypes.bool,
   isFromAtomEditable: PropTypes.bool,
+  isFromAtomLoading: PropTypes.bool,
+  isFromAtomOwned: PropTypes.bool,
+  isFromAtomToLoad: PropTypes.bool,
   isFromAtomUsableAsTemplate: PropTypes.bool,
   isHoldable: PropTypes.bool,
-  hasFromAtomFailedToLoad: PropTypes.bool,
+  isHolderAtomValid: PropTypes.bool,
+  loggedIn: PropTypes.bool,
   personas: PropTypes.arrayOf(PropTypes.object),
-  showCreateInput: PropTypes.bool,
+  processingPublish: PropTypes.bool,
   routerBack: PropTypes.func,
-  fetchUnloadedAtom: PropTypes.func,
-  atomsEdit: PropTypes.func,
+  routerGo: PropTypes.func,
+  showCreateInput: PropTypes.bool,
+  showTermsDialog: PropTypes.func,
+  useCase: PropTypes.object,
 };
 
 export default connect(
