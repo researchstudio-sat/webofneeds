@@ -3,7 +3,7 @@
 @import "square-image";
 @import "animate";
 
-won-post-content-message {
+won-atom-content-message {
   &.won-is-loading {
     @include animateOpacityHeartBeat();
   }
@@ -38,12 +38,10 @@ won-post-content-message {
         2.9rem
       );
 
-      > won-preact.atomMenu,
       > won-atom-menu {
         grid-area: postmenu;
       }
 
-      > won-preact.atomContent,
       > won-atom-content {
         grid-area: postcontent;
         padding: 0.5rem;

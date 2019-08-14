@@ -2,7 +2,7 @@ import won from "../won-es6.js";
 import Immutable from "immutable";
 import angular from "angular";
 import chatTextFieldModule from "./chat-textfield.js";
-import postContentMessageModule from "./messages/post-content-message.js";
+import WonAtomContentMessage from "./messages/atom-content-message.jsx";
 import WonShareDropdown from "./share-dropdown.jsx";
 import WonLabelledHr from "./labelled-hr.jsx";
 import WonConnectionHeader from "./connection-header.jsx";
@@ -106,11 +106,13 @@ function genComponentConf() {
                 {{self.unreadMessageCount}} unread Messages
               </div>
             </div>
-            <won-post-content-message
-              ng-if="self.showPostContentMessage"
-              post-uri="self.targetAtomUri"
-              connection-uri="self.selectedConnectionUri">
-            </won-post-content-message>
+            <won-preact
+                component="self.WonAtomContentMessage"
+                props="{
+                    atomUri: self.targetAtomUri,
+                }"
+                ng-if="self.showPostContentMessage"
+            ></won-preact>
             <div class="pm__content__loadspinner"
                 ng-if="self.isConnectionLoading || self.isProcessingLoadingMessages || (self.showAgreementData && self.isProcessingLoadingAgreementData) || (self.showPetriNetData && self.isProcessingLoadingPetriNetData && !self.hasPetriNetData)">
                 <svg class="hspinner">
@@ -275,6 +277,7 @@ function genComponentConf() {
       this.WonLabelledHr = WonLabelledHr;
       this.WonConnectionHeader = WonConnectionHeader;
       this.WonConnectionMessage = WonConnectionMessage;
+      this.WonAtomContentMessage = WonAtomContentMessage;
       this.WonShareDropdown = WonShareDropdown;
       this.WonConnectionContextDropdown = WonConnectionContextDropdown;
 
@@ -923,6 +926,5 @@ export default angular
   .module("won.owner.components.postMessages", [
     autoresizingTextareaModule,
     chatTextFieldModule,
-    postContentMessageModule,
   ])
   .directive("wonPostMessages", genComponentConf).name;
