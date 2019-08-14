@@ -1,38 +1,74 @@
 # Bots
 
-A bot is a so-called 'owner application'. It can communicate with WoN nodes and matchers, create and manage atoms and send messages to connected atoms. For further information on nodes, matchers and atoms, see [LINK TBD]().
+A bot is a so-called 'owner application'. It can communicate with WoN nodes and matchers, create and manage atoms and send messages to connected atoms. Further information on nodes, matchers and atoms can be found in the general [documentation on Github](https://github.com/researchstudio-sat/webofneeds).
 
-<!-- That is, it communicates with WoN nodes and creates and manages atoms on them. It also acts on their behalf, i.e., causes them to send messages to their connected atoms. -->
+Bots in the Web of Needs are generally reactive. Each bot uses [event listeners](src/main/java/won/bot/framework/eventbot/listener) to listen to events published on the bot's [event bus](src/main/java/won/bot/framework/eventbot/bus/EventBus.java). If an event occurs, a predefined [action](src/main/java/won/bot/framework/eventbot/action) can be executed. Event listeners and actions can also be combined into [behaviours](src/main/java/won/bot/framework/eventbot/behaviour) that determine how the bot acts. 
 
-A bot is mostly reactive. Its behaviour is determined by [event listeners](src/main/java/won/bot/framework/eventbot/listener) that are configured to react to events published on the bot's [event bus](src/main/java/won/bot/framework/eventbot/bus/EventBus.java).
+<!-- TODO: bot lifecycle -->
 
-## Events
+## Components
 
-Events are generated in different situations:
+### Events
 
+Events can be generated in different situations:
+
+- as the bot reaches certain [stages in its life cycle](src/main/java/won/bot/framework/eventbot/event/impl/lifecycle), e.g. the [InitializeEvent](src/main/java/won/bot/framework/eventbot/event/impl/lifecycle/InitializeEvent.java) or the [WorkDoneEvent](src/main/java/won/bot/framework/eventbot/event/impl/lifecycle/WorkDoneEvent.java).
 - whenever a message is received for one of the atoms controlled by the bot.
-- as the bot reaches certain [stages in its life cycle](src/main/java/won/bot/framework/eventbot/event/impl/lifecycle)
+- at regular intervals, by attaching a [trigger](src\main\java\won\bot\framework\eventbot\action\impl\trigger\BotTrigger.java) to the bot that publishes [ActEvents](src/main/java/won/bot/framework/eventbot/event/impl/lifecycle/ActEvent.java) at regular intervals.
+- as part of an action that is executed by the bot.
 
-  - most notably, there is an [ActEvent](src/main/java/won/bot/framework/eventbot/event/impl/lifecycle/ActEvent.java) that is published at regular intervals. By reacting to it, a bot can act without an external stimulus.
+<!-- TODO: maybe have some more concrete event examples here -->
 
-  <!-- if there is an act event, why do we even have a timed trigger? -->
+### Actions
 
-Common bot implementations will do several of the following
+Actions are predefined operations that determine the bot's behaviour. Each action is bound to an event listener and triggered by the corresponding event. For example, an `InitializationAction` could listen for an `InitializeEvent` and, once triggered, perform various initialization tasks like creating an atom, setting up additional event listeners or sending out other events. 
 
-- perform some intialization work by reacting to the [InitializeEvent](src/main/java/won/bot/framework/eventbot/event/impl/lifecycle/InitializeEvent.java)
-- do something without external stimulus by reacting to the [ActEvent](src/main/java/won/bot/framework/eventbot/event/impl/lifecycle/ActEvent.java)
-- when it's work is done, publish the [WorkDoneEvent](src/main/java/won/bot/framework/eventbot/event/impl/lifecycle/WorkDoneEvent.java) (some bots' work is never done though)
-- perform some cleanup work by reacting to the [Shutdownevent](src/main/java/won/bot/framework/eventbot/event/impl/lifecycle/ShutdownEvent.java)
+<!--
+to be added:
+* information about bot inheritance: Bot -> BaseBot -> BasicServiceBot -> ScheduledActionBot -> TriggeredBot -> EventBot -> FactoryBot
+* more info about EventBus, EventListener, Action and BotTrigger interactions
+* more info about Behaviours - esp. activate/deactivate
+* more info about variables and methods in bot base classes (tbd via javadoc)
+* prepared bot template (maybe echo bot?)
 
-## Actions
+to be done:
+* think about deleting tests (outdated?)
+* see if one or two of the base bots can be merged to others
+* see if telegram bot and hokify bot can be moved to separate subfolders
+* check for duplicate implementations of actions/behaviours
+* think about making bots only interact with one node (nodeURI) and making a separate subclass for multi-node bots (uriSource)
+* BotBehaviour uses its own subclass -> maybe merge those?
+* draw diagram of bot class inheritance
+-->
 
-Event listeners on the event bus can be configured to execute predefined actions every time an event occurs.
+### EventListeners/The EventListenerContext
 
-## Behaviours
+A bot is connected to the resources it uses through the [EventListenerContext](src/main/java/won/bot/framework/eventbot/EventListenerContext.java). Resources of interest might be:
+
+- The [LinkedDataSource](/webofneeds/won-core/src/main/java/won/protocol/util/linkeddata/LinkedDataSource.java) obtained via `EventListenerContext.getLinkedDataSource()`. It is used to query linked data.
+- The [AtomProducer](src/main/java/won/bot/framework/component/atomproducer/AtomProducer.java) obtained via `EventListenerContext.getAtomProducer()`. It's a facility for creating atoms, much like an iterator. Depending on the configured implementation, data can be read from any source and transformed into an atom. To see how this is done in practice, look at the [MailFileAtomProducer](src/main/java/won/bot/framework/component/atomproducer/impl/MailFileAtomProducer.java)
+- The [WonMessageSender](/webofneeds/won-core/src/main/java/won/protocol/message/sender/WonMessageSender.java) obtained via `EventListenerContext.getWonMessageSender()`. This object allows the bot to send WoN messages.
+
+### Behaviours
 
 Behaviours act as a wrapper to event listeners and actions and can be activated and deactivated. This is useful for event/action combinations that are used often or for event listeners that should only be active under certain conditions.
 
+### The BotContext
+
+A bot manages the data it needs to operate in the [BotContext](src/main/java/won/bot/framework/bot/context/BotContext.java). Most importantly, the botContext contains all atom URIs that the bot is responsible for. That particular information is required by the framework to decide which events should be routed to the bot, as it might be managing a number of bots. Other information in the bot context is just for the bot's internal purposes (i.e. your purposes).
+
+### The BotContextWrapper
+
+A bot always contains a specific [BotContextWrapper](src/main/java/won/bot/framework/bot/context/BotContextWrapper.java). This class or the respective subclasses enable you to access the BotContext described above, and facilitates HelperMethods for BotContext-DataRetrieval
+
+
 ## Implementing a Bot
+
+### The Bot's App
+
+The java application that runs a bot is usually a spring-boot application that loads all the necessary config and then starts the bot. For examples, look at the existing [Bot Apps](src/main/java/won/bot/app).
+
+To create a new app (which is what you want if you want to run a bot), it's easiest to copy it's app class and the corresponding spring config files, and then making modifications.
 
 ### Base Class
 
@@ -76,29 +112,10 @@ new ActionOnFirstNEventsListener(
 bus.subscribe(ActEvent.class, atomCreator);
 ```
 
-## The EventListenerContext
 
-A bot is connected to the resources it uses through the [EventListenerContext](src/main/java/won/bot/framework/eventbot/EventListenerContext.java). Resources of interest might be:
 
-- The [LinkedDataSource](/webofneeds/won-core/src/main/java/won/protocol/util/linkeddata/LinkedDataSource.java) obtained via `EventListenerContext.getLinkedDataSource()`. It is used to query linked data.
-- The [AtomProducer](src/main/java/won/bot/framework/component/atomproducer/AtomProducer.java) obtained via `EventListenerContext.getAtomProducer()`. It's a facility for creating atoms, much like an iterator. Depending on the configured implementation, data can be read from any source and transformed into an atom. To see how this is done in practice, look at the [MailFileAtomProducer](src/main/java/won/bot/framework/component/atomproducer/impl/MailFileAtomProducer.java)
-- The [WonMessageSender](/webofneeds/won-core/src/main/java/won/protocol/message/sender/WonMessageSender.java) obtained via `EventListenerContext.getWonMessageSender()`. This object allows the bot to send WoN messages.
 
-## The BotContext
-
-A bot manages the data it needs to operate in the [BotContext](src/main/java/won/bot/framework/bot/context/BotContext.java). Most importantly, the botContext contains all atom URIs that the bot is responsible for. That particular information is required by the framework to decide which events should be routed to the bot, as it might be managing a number of bots. Other information in the bot context is just for the bot's internal purposes (i.e. your purposes).
-
-## The BotContextWrapper
-
-A bot always contains a specific [BotContextWrapper](src/main/java/won/bot/framework/bot/context/BotContextWrapper.java). This class or the respective subclasses enable you to access the BotContext described above, and facilitates HelperMethods for BotContext-DataRetrieval
-
-## The Bot's App
-
-The java application that runs a bot is usually a spring-boot application that loads all the necessary config and then starts the bot. For examples, look at the existing [Bot Apps](src/main/java/won/bot/app).
-
-To create a new app (which is what you want if you want to run a bot), it's easiest to copy it's app class and the corresponding spring config files, and then making modifications.
-
-## Sending WoN messages
+### Sending WoN messages
 
 For doing anything on the WoN, a bot must send messages. This is done in two steps:
 
@@ -122,11 +139,11 @@ WonMessageBuilder builder = WonMessageBuilder
 
 Note that the WoN node will always answer with a similar message (`SuccessResponse` or `FailureResponse`) that will tell you if what you did worked or not. It's possible to add callbacks for both responses so as to be able to take the necessary measures.
 
-## Creating Atoms
+### Creating Atoms
 
 Atoms are created by sending a specific message. If using the dedicated [CreateAtomsWithSocketsAction](src/main/java/won/bot/framework/eventbot/action/impl/atomlifecycle/CreateAtomWithSocketsAction.java), most of the boilerplate code is taken care of. If the bot is meant to publish an existing collection of resources, e.g. files or database objects in the form of atoms, it's a question of configuring the `AtomProducer` to access that data and produce a Jena RDF Model that represents an atom. (For an example, look at the [MailFileAtomProducer](src/main/java/won/bot/framework/component/atomproducer/impl/MailFileAtomProducer.java)
 
-## How to Learn Writing Bots
+## Additional Resources
 
 A good starting point for understanding the framework is the [EchoBot](src/main/java/won/bot/impl/EchoBot.java) and its corresponding [EchoBotApp](src/main/java/won/bot/app/EchoBotApp.java). This bot creates one atom at startup, and it registers with the WoN node configured in its [node-uri-source.properties](/webofneeds/conf/node-uri-source.properties) file so it is always notified when a new atom is created. When that happens, the bot attempts to establish a connection with the new atom and if the new atom accepts it, the bot echoes any text message received from the new atom.
 
@@ -225,21 +242,3 @@ A Replymail that starts with:
 A Replymail for an already open connection(connectionState: Connected) will send teh replymessage-body as a textmessage
 
 Every Remote Message sent to this Connection will be sent to you as an e-mail as well.
-
-<!--
-to be added:
-* information about bot inheritance: Bot -> BaseBot -> BasicServiceBot -> ScheduledActionBot -> TriggeredBot -> EventBot -> FactoryBot
-* more info about EventBus, EventListener, Action and BotTrigger interactions
-* more info about Behaviours - esp. activate/deactivate
-* more info about variables and methods in bot base classes (tbd via javadoc)
-* prepared bot template (maybe echo bot?)
-
-to be done:
-* think about deleting tests (outdated?)
-* see if one or two of the base bots can be merged to others
-* see if telegram bot and hokify bot can be moved to separate subfolders
-* check for duplicate implementations of actions/behaviours
-* think about making bots only interact with one node (nodeURI) and making a separate subclass for multi-node bots (uriSource)
-* BotBehaviour uses its own subclass -> maybe merge those?
-* draw diagram of bot class inheritance
--->
