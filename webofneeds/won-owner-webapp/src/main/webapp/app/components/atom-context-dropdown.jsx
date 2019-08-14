@@ -201,12 +201,12 @@ export default class WonAtomContextDropdown extends React.Component {
     }
 
     return (
-      <won-connection-context-dropdown
+      <won-atom-context-dropdown
         class={this.props.className ? this.props.className : undefined}
       >
         {iconElement}
         {dropdownElement}
-      </won-connection-context-dropdown>
+      </won-atom-context-dropdown>
     );
   }
 

@@ -43,7 +43,8 @@ won-post-content-message {
         grid-area: postmenu;
       }
 
-      > won-post-content {
+      > won-preact.atomContent,
+      > won-atom-content {
         grid-area: postcontent;
         padding: 0.5rem;
         background: white;

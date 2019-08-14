@@ -18,7 +18,8 @@ won-post-info {
     grid-area: menu;
   }
 
-  won-post-content {
+  > won-preact.atomContent,
+  > won-atom-content {
     padding: 0.5rem;
     box-sizing: border-box;
     grid-area: main;

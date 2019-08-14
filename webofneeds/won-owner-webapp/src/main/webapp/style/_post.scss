@@ -22,7 +22,8 @@ main.postcontent {
     border: $thinGrayBorder;
     background: white;
 
-    & > won-post-content,
+    & > won-preact.atomContent,
+    & > won-atom-content,
     & > .post-info__footer {
       display: block;
       padding: 0.5rem;

@@ -2,20 +2,17 @@
 @import "sizing-utils";
 @import "animate";
 
-won-post-content {
-  .post-skeleton,
-  .post-content {
+won-atom-content {
+  .atom-skeleton,
+  .atom-content {
     display: flex;
     flex-direction: column;
     align-items: stretch;
     word-wrap: break-word;
 
-    won-labelled-hr .wlh__label,
-    won-labelled-hr .wlh__label__text,
-    won-labelled-hr .wlh__label__carret,
-    won-preact.labelledHr won-labelled-hr .wlh__label,
-    won-preact.labelledHr won-labelled-hr .wlh__label__text,
-    won-preact.labelledHr won-labelled-hr .wlh__label__carret {
+    won-labelled-hr.cp__labelledhr .wlh__label,
+    won-labelled-hr.cp__labelledhr .wlh__label__text,
+    won-labelled-hr.cp__labelledhr .wlh__label__carret {
       background-color: white;
     }
 
@@ -25,7 +22,7 @@ won-post-content {
       padding: 0.5rem;
     }
 
-    .post-content__updateindicator {
+    .atom-content__updateindicator {
       display: flex;
       flex-direction: row;
       justify-content: center;
@@ -41,7 +38,7 @@ won-post-content {
       }
     }
 
-    .post-content__reviews {
+    .atom-content__reviews {
       &__empty {
         color: $won-line-gray;
         padding: 0.5rem;
@@ -50,7 +47,7 @@ won-post-content {
     }
   }
 
-  .post-failedtoload {
+  .atom-failedtoload {
     display: grid;
     grid-template-areas: "failed_icon failed_label" "failed_actions failed_actions";
     align-items: center;
@@ -58,17 +55,17 @@ won-post-content {
     padding: 5rem 0;
     grid-gap: 0.5rem;
 
-    > .post-failedtoload__icon {
+    > .atom-failedtoload__icon {
       grid-area: failed_icon;
       @include fixed-square(5rem);
       --local-primary: #{$won-primary-color};
     }
-    > .post-failedtoload__label {
+    > .atom-failedtoload__label {
       grid-area: failed_label;
       text-align: center;
     }
 
-    > .post-failedtoload__actions {
+    > .atom-failedtoload__actions {
       grid-area: failed_actions;
       display: flex;
       justify-content: center;
@@ -81,13 +78,13 @@ won-post-content {
   &.won-is-loading {
     @include animateOpacityHeartBeat();
 
-    .post-skeleton__details {
+    .atom-skeleton__details {
       height: $normalFontSize;
       width: 100%;
       background-color: $won-skeleton-color;
       margin-top: 0.25rem;
     }
-    .post-skeleton__heading {
+    .atom-skeleton__heading {
       height: $normalFontSize;
       width: 5rem;
       background-color: $won-skeleton-color;

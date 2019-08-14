@@ -3,9 +3,10 @@
  */
 
 import angular from "angular";
-import postContentModule from "./post-content.js";
 import chatTextFieldModule from "./chat-textfield.js";
 import WonAtomHeaderBig from "./atom-header-big.jsx";
+import WonAtomContent from "./atom-content.jsx";
+import WonAtomMenu from "./atom-menu.jsx";
 import { get, getIn } from "../utils.js";
 import { connect2Redux } from "../configRedux.js";
 import * as viewUtils from "../redux/utils/view-utils.js";
@@ -20,14 +21,13 @@ import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as processSelectors from "../redux/selectors/process-selectors.js";
 import * as accountUtils from "../redux/utils/account-utils.js";
 import Immutable from "immutable";
-import WonAtomMenu from "./atom-menu";
 
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
   let template = `
         <won-preact class="atomHeaderBig" component="self.WonAtomHeaderBig" props="{atomUri: self.atomUri}"></won-preact>
         <won-preact class="atomMenu" component="self.WonAtomMenu" props="{atomUri: self.atomUri}"></won-preact>
-        <won-post-content post-uri="self.atomUri"></won-post-content>
+        <won-preact class="atomContent" component="self.WonAtomContent" props="{atomUri: self.atomUri}"></won-preact>
         <div class="post-info__footer" ng-if="self.showFooter">
             <!-- AdHoc Request Field -->
             <chat-textfield
@@ -73,6 +73,7 @@ function genComponentConf() {
       window.pi4dbg = this;
       this.WonAtomHeaderBig = WonAtomHeaderBig;
       this.WonAtomMenu = WonAtomMenu;
+      this.WonAtomContent = WonAtomContent;
 
       const selectFromState = state => {
         const atom = getIn(state, ["atoms", this.atomUri]);
@@ -195,8 +196,5 @@ function genComponentConf() {
 }
 
 export default angular
-  .module("won.owner.components.postInfo", [
-    postContentModule,
-    chatTextFieldModule,
-  ])
+  .module("won.owner.components.postInfo", [chatTextFieldModule])
   .directive("wonPostInfo", genComponentConf).name;

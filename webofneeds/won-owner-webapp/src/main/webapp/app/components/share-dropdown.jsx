@@ -5,7 +5,7 @@ import WonAtomShareLink from "./atom-share-link.jsx";
 
 import "~/style/_share-dropdown.scss";
 
-export default class WonLabelledHr extends React.Component {
+export default class WonShareDropdown extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -49,7 +49,7 @@ export default class WonLabelledHr extends React.Component {
     );
   }
 }
-WonLabelledHr.propTypes = {
+WonShareDropdown.propTypes = {
   atomUri: PropTypes.string.isRequired,
   ngRedux: PropTypes.object.isRequired,
   className: PropTypes.string,

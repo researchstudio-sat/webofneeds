@@ -1,7 +1,7 @@
 import angular from "angular";
 
-import postContentModule from "../post-content.js";
 import WonAtomMenu from "../atom-menu.jsx";
+import WonAtomContent from "../atom-content.jsx";
 
 import { connect2Redux } from "../../configRedux.js";
 import { getIn } from "../../utils.js";
@@ -16,7 +16,7 @@ function genComponentConf() {
         <div class="won-cm__center">
             <div class="won-cm__center__bubble">
                 <won-preact class="atomMenu" component="self.WonAtomMenu" props="{atomUri: self.postUri}"></won-preact>
-                <won-post-content post-uri="self.postUri"></won-post-content>
+                <won-preact class="atomContent" component="self.WonAtomContent" props="{atomUri: self.postUri}"></won-preact>
             </div>
         </div>
     `;
@@ -26,6 +26,7 @@ function genComponentConf() {
       attach(this, serviceDependencies, arguments);
       window.pcm4dbg = this;
       this.WonAtomMenu = WonAtomMenu;
+      this.WonAtomContent = WonAtomContent;
 
       const selectFromState = state => {
         const post = this.postUri && state.getIn(["atoms", this.postUri]);
@@ -63,5 +64,5 @@ function genComponentConf() {
 }
 
 export default angular
-  .module("won.owner.components.postContentMessage", [postContentModule])
+  .module("won.owner.components.postContentMessage", [])
   .directive("wonPostContentMessage", genComponentConf).name;
