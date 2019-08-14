@@ -161,6 +161,7 @@ export default class WonAtomMenu extends React.Component {
 
     buttons.push(
       <div
+        key="detail"
         className={this.generateAtomItemCssClasses(
           this.isSelectedTab("DETAIL")
         )}
@@ -173,6 +174,7 @@ export default class WonAtomMenu extends React.Component {
     if (this.state.isHeld) {
       buttons.push(
         <div
+          key="heldby"
           className={this.generateAtomItemCssClasses(
             this.isSelectedTab("HELDBY")
           )}
@@ -189,6 +191,7 @@ export default class WonAtomMenu extends React.Component {
     } else if (this.state.isHoldable && this.state.isOwned) {
       buttons.push(
         <div
+          key="heldby"
           className={this.generateAtomItemCssClasses(
             this.isSelectedTab("HELDBY")
           )}
@@ -208,6 +211,7 @@ export default class WonAtomMenu extends React.Component {
       this.state.isOwned
         ? buttons.push(
             <div
+              key="participants"
               className={this.generateAtomItemCssClasses(
                 this.isSelectedTab("PARTICIPANTS"),
                 false,
@@ -226,6 +230,7 @@ export default class WonAtomMenu extends React.Component {
           )
         : buttons.push(
             <div
+              key="participants"
               className={this.generateAtomItemCssClasses(
                 this.isSelectedTab("PARTICIPANTS"),
                 !this.state.groupMembers
@@ -244,6 +249,7 @@ export default class WonAtomMenu extends React.Component {
       this.state.hasChatSocket &&
       buttons.push(
         <div
+          key="suggestions"
           className={this.generateAtomItemCssClasses(
             this.isSelectedTab("SUGGESTIONS"),
             !this.state.hasSuggestions,
@@ -262,6 +268,7 @@ export default class WonAtomMenu extends React.Component {
     this.state.hasHolderSocket &&
       buttons.push(
         <div
+          key="holds"
           className={this.generateAtomItemCssClasses(
             this.isSelectedTab("HOLDS"),
             !this.state.hasHeldAtoms,
@@ -280,6 +287,7 @@ export default class WonAtomMenu extends React.Component {
     this.state.hasBuddySocket &&
       buttons.push(
         <div
+          key="buddies"
           className={this.generateAtomItemCssClasses(
             this.isSelectedTab("BUDDIES"),
             !this.state.hasBuddies,
@@ -297,6 +305,7 @@ export default class WonAtomMenu extends React.Component {
     this.state.hasReviewSocket &&
       buttons.push(
         <div
+          key="reviews"
           className={this.generateAtomItemCssClasses(
             this.isSelectedTab("REVIEWS"),
             !this.state.hasReviews,
@@ -315,6 +324,7 @@ export default class WonAtomMenu extends React.Component {
     this.state.shouldShowRdf &&
       buttons.push(
         <div
+          key="rdf"
           className={this.generateAtomItemCssClasses(this.isSelectedTab("RDF"))}
           onClick={() => this.selectTab("RDF")}
         >
