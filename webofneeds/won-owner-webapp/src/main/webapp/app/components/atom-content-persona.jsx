@@ -171,7 +171,6 @@ export default class WonAtomContentPersona extends React.Component {
             </div>
             <ElmReact
               src={Elm.RatingView}
-              ngRedux={this.props.ngRedux}
               flags={{
                 rating: this.state.aggregateRatingRounded,
                 connectionUri: this.state.ratingConnectionUri,

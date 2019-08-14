@@ -2,6 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import ElmComponent from "react-elm-components";
 import { actionCreators } from "../actions/actions.js";
+import { ReactReduxContext } from "react-redux";
 
 import "./svg-icon.js";
 
@@ -46,7 +47,7 @@ export default class ElmReact extends React.Component {
         switch (message.type) {
           case "action":
             if (actionCreators[message.name]) {
-              this.props.ngRedux.dispatch(
+              this.context.dispatch(
                 actionCreators[message.name](...message.arguments)
               );
             } else {
@@ -54,14 +55,11 @@ export default class ElmReact extends React.Component {
             }
             break;
           case "event": {
-            const eventAttrName = message.name
-              .replace(/([A-Z])/g, "-$1")
-              .toLowerCase();
-            if (typeof this.props[eventAttrName] === "function") {
-              this.props[eventAttrName](message.payload);
+            if (typeof this.props[message.name] === "function") {
+              this.props[message.name](message.payload);
             } else {
               console.error(
-                `Could not find eventHandler ${eventAttrName}`,
+                `Could not find eventHandler ${message.name}`,
                 this.props
               );
             }
@@ -78,5 +76,5 @@ export default class ElmReact extends React.Component {
 ElmReact.propTypes = {
   src: PropTypes.object.isRequired,
   flags: PropTypes.object,
-  ngRedux: PropTypes.object.isRequired,
 };
+ElmReact.contextType = ReactReduxContext;

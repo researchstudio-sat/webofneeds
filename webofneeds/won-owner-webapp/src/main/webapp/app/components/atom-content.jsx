@@ -192,7 +192,6 @@ export default class WonAtomContent extends React.Component {
           visibleTabFragment = (
             <ElmReact
               src={Elm.AddPersona}
-              ngRedux={this.props.ngRedux}
               flags={{
                 post: this.state.atom.toJS(),
                 personas: this.state.personas.toJS(),

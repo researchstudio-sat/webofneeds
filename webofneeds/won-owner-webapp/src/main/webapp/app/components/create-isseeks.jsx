@@ -157,7 +157,7 @@ export default class WonCreateIsSeeks extends React.Component {
     this.setState({
       draftObject: _draftObject,
     });
-    this.onUpdate({ draft: _draftObject });
+    this.props.onUpdate({ draft: _draftObject });
   }
 }
 WonCreateIsSeeks.propTypes = {
