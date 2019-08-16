@@ -99,6 +99,7 @@ export default class WonAtomContextDropdown extends React.Component {
 
       buttons.push(
         <button
+          key="export"
           className="won-button--outlined thin red"
           onClick={() => this.exportPdf()}
         >
@@ -108,6 +109,7 @@ export default class WonAtomContextDropdown extends React.Component {
       this.state.isUsableAsTemplate &&
         buttons.push(
           <button
+            key="duplicate"
             className="won-button--outlined thin red"
             onClick={() =>
               this.props.ngRedux.dispatch(
@@ -124,6 +126,7 @@ export default class WonAtomContextDropdown extends React.Component {
       this.state.isEditable &&
         buttons.push(
           <button
+            key="edit"
             className="won-button--outlined thin red"
             onClick={() =>
               this.props.ngRedux.dispatch(
@@ -140,6 +143,7 @@ export default class WonAtomContextDropdown extends React.Component {
       this.state.adminEmail &&
         buttons.push(
           <a
+            key="report"
             className="won-button--outlined thin red"
             href={
               "mailto:" +
@@ -155,6 +159,7 @@ export default class WonAtomContextDropdown extends React.Component {
         this.state.isInactive &&
         buttons.push(
           <button
+            key="reopen"
             className="won-button--filled red"
             onClick={() => this.reOpenAtom()}
           >
@@ -165,6 +170,7 @@ export default class WonAtomContextDropdown extends React.Component {
         this.state.isInactive &&
         buttons.push(
           <button
+            key="delete"
             className="won-button--filled red"
             onClick={() => this.deleteAtom()}
           >
@@ -175,6 +181,7 @@ export default class WonAtomContextDropdown extends React.Component {
         this.state.isActive &&
         buttons.push(
           <button
+            key="close"
             className="won-button--filled red"
             onClick={() => this.closeAtom()}
           >

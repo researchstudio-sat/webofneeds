@@ -10,11 +10,6 @@ won-create-search {
   grid-row-gap: $gridRowGap;
   box-sizing: border-box;
 
-  /*
-  &.create-post-mobile {
-    grid-template-rows: min-content minmax($mobileGridRows, 1fr) min-content;
-  }*/
-
   .cp__header {
     margin: $gridRowGap;
     margin-bottom: 0;

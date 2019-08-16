@@ -21,6 +21,38 @@ import ElmReact from "./elm-react.jsx";
 import { Elm } from "../../elm/PublishButton.elm";
 import { actionCreators } from "../actions/actions";
 
+//TODO: figure out setting initial draft
+//TODO: figure out initial load of atom
+
+/* old code:
+      this.$scope.$watch(
+        () => this.isFromAtomToLoad,
+        () => delay(0).then(() => this.ensureFromAtomIsLoaded())
+      );
+
+      this.$scope.$watch(
+        () => this.showCreateInput,
+        () => delay(0).then(() => this.loadInitialDraft())
+      );
+
+  //was called if "isFromAtomToLoad" was true
+  ensureFromAtomIsLoaded() {
+    if (this.props.isFromAtomToLoad) {
+      this.props.fetchUnloadedAtom(this.props.fromAtomUri);
+    }
+  }
+
+  //was called when showCreateInput was true
+  loadInitialDraft() {
+    if (this.props.showCreateInput && this.props.useCase.draft) {
+      // deep clone of draft
+      this.setState({
+        draftObject: JSON.parse(JSON.stringify(this.props.useCase.draft)),
+      });
+    }
+  }
+ */
+
 const mapStateToProps = state => {
   const fromAtomUri = generalSelectors.getFromAtomUriFromRoute(state);
   const mode = generalSelectors.getModeFromRoute(state);
@@ -46,10 +78,9 @@ const mapStateToProps = state => {
       fromAtomUri
     );
     fromAtom =
-      !isFromAtomLoading &&
-      !isFromAtomToLoad &&
-      !hasFromAtomFailedToLoad &&
-      getIn(state, ["atoms", fromAtomUri]);
+      !isFromAtomLoading && !isFromAtomToLoad && !hasFromAtomFailedToLoad
+        ? getIn(state, ["atoms", fromAtomUri])
+        : undefined;
 
     if (fromAtom) {
       const matchedUseCaseIdentifier = atomUtils.getMatchedUseCaseIdentifier(
@@ -109,6 +140,7 @@ const mapStateToProps = state => {
   const isHolderAtomValid = holderAtom && atomUtils.hasHolderSocket(holderAtom);
 
   return {
+    defaultNodeUri: getIn(state, ["config", "defaultNodeUri"]),
     loggedIn: accountUtils.isLoggedIn(get(state, "account")),
     holderUri,
     isHolderAtomValid,
@@ -164,12 +196,22 @@ const mapDispatchToProps = dispatch => {
     showTermsDialog: payload => {
       dispatch(actionCreators.view__showTermsDialog(payload));
     },
+    connectionsConnectReactionAtom: (connectToAtomUri, draft, persona) => {
+      dispatch(
+        actionCreators.connections__connectReactionAtom(
+          connectToAtomUri,
+          draft,
+          persona
+        )
+      );
+    },
   };
 };
 
 class CreateAtom extends React.Component {
   constructor(props) {
     super(props);
+
     this.state = {
       isNew: true,
       draftObject: {},
@@ -177,7 +219,11 @@ class CreateAtom extends React.Component {
   }
 
   render() {
-    //TODO
+    if (!this.props.useCase) {
+      console.debug("no usecase specified, return empty div");
+      return <div />;
+    }
+
     const headerIconElement = this.props.useCase["icon"] && (
       <svg className="cp__header__icon" title={this.props.useCase["label"]}>
         <use
@@ -344,34 +390,7 @@ class CreateAtom extends React.Component {
     }
   }
 
-  ensureFromAtomIsLoaded() {
-    //TODO
-    if (this.props.isFromAtomToLoad) {
-      this.props.fetchUnloadedAtom(this.props.fromAtomUri);
-    }
-  }
-
-  onResize() {
-    //TODO
-    if (this.focusedElement) {
-      if (this.windowHeight < window.screen.height) {
-        this.windowHeight < window.screen.height;
-      } else {
-        this.windowHeight = window.screen.height;
-      }
-    }
-  }
-
-  scrollContainer() {
-    //TODO
-    if (!this._scrollContainer) {
-      this._scrollContainer = this.$element[0].querySelector(".cp__content");
-    }
-    return this._scrollContainer;
-  }
-
   isValid() {
-    //TODO
     const draft = this.state.draftObject;
     const draftContent = get(draft, "content");
     const seeksBranch = get(draft, "seeks");
@@ -397,23 +416,11 @@ class CreateAtom extends React.Component {
     return false;
   }
 
-  loadInitialDraft() {
-    //TODO
-    if (this.props.showCreateInput && this.props.useCase.draft) {
-      // deep clone of draft
-      this.setState({
-        draftObject: JSON.parse(JSON.stringify(this.props.useCase.draft)),
-      });
-    }
-  }
-
   updateDraftSeeks(updatedDraftJson) {
-    //TODO
     this.updateDraft(updatedDraftJson.draft, "seeks");
   }
 
   updateDraftContent(updatedDraftJson) {
-    //TODO
     this.updateDraft(updatedDraftJson.draft, "content");
   }
 
@@ -434,17 +441,17 @@ class CreateAtom extends React.Component {
   }
 
   save() {
-    //TODO
     if (this.props.loggedIn && this.props.isFromAtomOwned) {
-      this.sanitizeDraftObject();
-      this.props.atomsEdit(this.state.draftObject, this.props.fromAtom);
+      this.sanitizeDraftObject(() => {
+        this.props.atomsEdit(this.state.draftObject, this.props.fromAtom);
+      });
     }
   }
 
   /**
    * Removes empty branches from the draft, and adds the proper useCase to the draft
    */
-  sanitizeDraftObject() {
+  sanitizeDraftObject(callback) {
     const _draftObject = this.state.draftObject;
     _draftObject.useCase = get(this.props.useCase, "identifier");
 
@@ -455,81 +462,79 @@ class CreateAtom extends React.Component {
       delete _draftObject.seeks;
     }
 
-    this.setState({ draftObject: _draftObject });
+    this.setState({ draftObject: _draftObject }, callback);
   }
 
   publish(persona) {
-    //TODO
     if (this.props.processingPublish) {
       console.debug("publish in process, do not take any action");
       return;
     }
 
-    this.sanitizeDraftObject();
+    this.sanitizeDraftObject(() => {
+      if (this.props.connectToAtomUri) {
+        const tempConnectToAtomUri = this.props.connectToAtomUri;
+        const tempDraft = this.state.draftObject;
 
-    if (this.props.connectToAtomUri) {
-      const tempConnectToAtomUri = this.props.connectToAtomUri;
-      const tempDraft = this.state.draftObject;
-
-      if (this.props.loggedIn) {
-        this.connections__connectReactionAtom(
-          tempConnectToAtomUri,
-          tempDraft,
-          persona
-        );
-        this.props.routerGo("connections", {
-          useCase: undefined,
-          connectionUri: undefined,
-        });
+        if (this.props.loggedIn) {
+          this.props.connectionsConnectReactionAtom(
+            tempConnectToAtomUri,
+            tempDraft,
+            persona
+          );
+          this.props.routerGo("connections", {
+            useCase: undefined,
+            connectionUri: undefined,
+          });
+        } else {
+          this.props.showTermsDialog(
+            Immutable.fromJS({
+              acceptCallback: () => {
+                this.props.hideModalDialog();
+                this.props.connectionsConnectReactionAtom(
+                  tempConnectToAtomUri,
+                  tempDraft,
+                  persona
+                );
+                this.props.routerGo("connections", {
+                  useCase: undefined,
+                  connectionUri: undefined,
+                });
+              },
+              cancelCallback: () => {
+                this.props.hideModalDialog();
+              },
+            })
+          );
+        }
       } else {
-        this.props.showTermsDialog(
-          Immutable.fromJS({
-            acceptCallback: () => {
-              this.props.hideModalDialog();
-              this.connections__connectReactionAtom(
-                tempConnectToAtomUri,
-                tempDraft,
-                persona
-              );
-              this.props.routerGo("connections", {
-                useCase: undefined,
-                connectionUri: undefined,
-              });
-            },
-            cancelCallback: () => {
-              this.props.hideModalDialog();
-            },
-          })
-        );
-      }
-    } else {
-      const tempDraft = this.state.draftObject;
-      const tempDefaultNodeUri = this.$ngRedux
-        .getState()
-        .getIn(["config", "defaultNodeUri"]);
+        const tempDraft = this.state.draftObject;
+        const tempDefaultNodeUri = this.props.defaultNodeUri;
 
-      if (this.props.loggedIn) {
-        this.props.atomsCreate(tempDraft, persona, tempDefaultNodeUri);
-        this.props.routerGo("inventory");
-      } else {
-        this.props.showTermsDialog(
-          Immutable.fromJS({
-            acceptCallback: () => {
-              this.props.hideModalDialog();
-              this.props.atomsCreate(tempDraft, persona, tempDefaultNodeUri);
-              this.props.routerGo("inventory");
-            },
-            cancelCallback: () => {
-              this.props.hideModalDialog();
-            },
-          })
-        );
+        if (this.props.loggedIn) {
+          this.props.atomsCreate(tempDraft, persona, tempDefaultNodeUri);
+          this.props.routerGo("inventory");
+        } else {
+          this.props.showTermsDialog(
+            Immutable.fromJS({
+              acceptCallback: () => {
+                this.props.hideModalDialog();
+                this.props.atomsCreate(tempDraft, persona, tempDefaultNodeUri);
+                this.props.routerGo("inventory");
+              },
+              cancelCallback: () => {
+                this.props.hideModalDialog();
+              },
+            })
+          );
+        }
       }
-    }
+    });
   }
 }
 
 CreateAtom.propTypes = {
+  defaultNodeUri: PropTypes.string,
   atomsCreate: PropTypes.func,
   atomsEdit: PropTypes.func,
   connectToAtomUri: PropTypes.string,
@@ -556,6 +561,7 @@ CreateAtom.propTypes = {
   routerGo: PropTypes.func,
   showCreateInput: PropTypes.bool,
   showTermsDialog: PropTypes.func,
+  connectionsConnectReactionAtom: PropTypes.func,
   useCase: PropTypes.object,
 };
 

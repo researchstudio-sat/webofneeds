@@ -106,6 +106,7 @@ export default class WonConnectionContextDropdown extends React.Component {
       !this.state.isSuggested &&
         buttons.push(
           <button
+            key="details"
             className="won-button--outlined thin red"
             onClick={() => this.goToPost(this.state.targetAtomUri)}
           >
@@ -118,6 +119,7 @@ export default class WonConnectionContextDropdown extends React.Component {
         !this.state.showAgreementData &&
         buttons.push(
           <button
+            key="agrdata"
             className="won-button--outlined thin red"
             onClick={() => this.props.showAgreementDataField()}
           >
@@ -130,6 +132,7 @@ export default class WonConnectionContextDropdown extends React.Component {
         !this.state.showPetriNetData &&
         buttons.push(
           <button
+            key="petrinetdata"
             className="won-button--outlined thin red"
             onClick={() => this.props.showPetriNetDataField()}
           >
@@ -139,6 +142,7 @@ export default class WonConnectionContextDropdown extends React.Component {
       this.state.isTargetAtomUsableAsTemplate &&
         buttons.push(
           <button
+            key="duplicate"
             className="won-button--outlined thin red"
             onClick={() =>
               this.props.ngRedux.dispatch(
@@ -155,6 +159,7 @@ export default class WonConnectionContextDropdown extends React.Component {
       this.state.isTargetAtomEditable &&
         buttons.push(
           <button
+            key="edit"
             className="won-button--outlined thin red"
             onClick={() =>
               this.props.ngRedux.dispatch(
@@ -171,6 +176,7 @@ export default class WonConnectionContextDropdown extends React.Component {
       this.state.adminEmail &&
         buttons.push(
           <a
+            key="report"
             className="won-button--outlined thin red"
             href={
               "mailto:" +
@@ -184,6 +190,7 @@ export default class WonConnectionContextDropdown extends React.Component {
         );
       buttons.push(
         <button
+          key="close"
           className="won-button--filled red"
           onClick={() => this.closeConnection()}
         >
