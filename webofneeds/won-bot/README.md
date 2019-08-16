@@ -19,6 +19,24 @@ Events can be generated in different situations:
 
 <!-- TODO: maybe have some more concrete event examples here -->
 
+### EventListeners/EventBus
+
+### Context
+
+Each bot provides a [BotContext](src/main/java/won/bot/framework/bot/context/BotContext.java) and an [EventListenerContext](src/main/java/won/bot/framework/eventbot/EventListenerContext.java), both are initialized as singe instances that can be accessed at any point within the bot and are used to connect to various resources. 
+
+The `BotContext` is used by a bot to keep track of atoms, nodes or other objects it knows or is responsible for. This information can be used by both the bot itself and the framework to decide which events should be routed to which bot. 
+
+While it is necessary that each bot remembers which atoms it created, all other information stored within the `BotContext` depends on the intended purpose of any given bot. In addition to the `BotContext`, a [BotContextWrapper](src/main/java/won/bot/framework/bot/context/BotContextWrapper.java) provides access utility methods to interact with the `BotContext`.
+
+---
+
+The `EventListenerContext` is used to connect the bot to various resources it may use, including:
+
+- The [LinkedDataSource](/webofneeds/won-core/src/main/java/won/protocol/util/linkeddata/LinkedDataSource.java) obtained via `EventListenerContext.getLinkedDataSource()`. It is used to query linked data.
+- The [AtomProducer](src/main/java/won/bot/framework/component/atomproducer/AtomProducer.java) obtained via `EventListenerContext.getAtomProducer()`. It's a facility for creating atoms, much like an iterator. Depending on the configured implementation, data can be read from any source and transformed into an atom. To see how this is done in practice, look at the [MailFileAtomProducer](src/main/java/won/bot/framework/component/atomproducer/impl/MailFileAtomProducer.java)
+- The [WonMessageSender](/webofneeds/won-core/src/main/java/won/protocol/message/sender/WonMessageSender.java) obtained via `EventListenerContext.getWonMessageSender()`. This object allows the bot to send WoN messages.
+
 ### Actions
 
 Actions are predefined operations that determine the bot's behaviour. Each action is bound to an event listener and triggered by the corresponding event. For example, an `InitializationAction` could listen for an `InitializeEvent` and, once triggered, perform various initialization tasks like creating an atom, setting up additional event listeners or sending out other events. 
@@ -41,25 +59,10 @@ to be done:
 * draw diagram of bot class inheritance
 -->
 
-### EventListeners/The EventListenerContext
-
-A bot is connected to the resources it uses through the [EventListenerContext](src/main/java/won/bot/framework/eventbot/EventListenerContext.java). Resources of interest might be:
-
-- The [LinkedDataSource](/webofneeds/won-core/src/main/java/won/protocol/util/linkeddata/LinkedDataSource.java) obtained via `EventListenerContext.getLinkedDataSource()`. It is used to query linked data.
-- The [AtomProducer](src/main/java/won/bot/framework/component/atomproducer/AtomProducer.java) obtained via `EventListenerContext.getAtomProducer()`. It's a facility for creating atoms, much like an iterator. Depending on the configured implementation, data can be read from any source and transformed into an atom. To see how this is done in practice, look at the [MailFileAtomProducer](src/main/java/won/bot/framework/component/atomproducer/impl/MailFileAtomProducer.java)
-- The [WonMessageSender](/webofneeds/won-core/src/main/java/won/protocol/message/sender/WonMessageSender.java) obtained via `EventListenerContext.getWonMessageSender()`. This object allows the bot to send WoN messages.
 
 ### Behaviours
 
 Behaviours act as a wrapper to event listeners and actions and can be activated and deactivated. This is useful for event/action combinations that are used often or for event listeners that should only be active under certain conditions.
-
-### The BotContext
-
-A bot manages the data it needs to operate in the [BotContext](src/main/java/won/bot/framework/bot/context/BotContext.java). Most importantly, the botContext contains all atom URIs that the bot is responsible for. That particular information is required by the framework to decide which events should be routed to the bot, as it might be managing a number of bots. Other information in the bot context is just for the bot's internal purposes (i.e. your purposes).
-
-### The BotContextWrapper
-
-A bot always contains a specific [BotContextWrapper](src/main/java/won/bot/framework/bot/context/BotContextWrapper.java). This class or the respective subclasses enable you to access the BotContext described above, and facilitates HelperMethods for BotContext-DataRetrieval
 
 
 ## Implementing a Bot
