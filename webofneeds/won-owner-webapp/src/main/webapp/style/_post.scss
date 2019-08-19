@@ -18,13 +18,13 @@ main.postcontent {
     border-right: none;
   }
 
-  & > won-post-info {
+  & > won-preact.atomInfo > won-atom-info,
+  & > won-atom-info {
     border: $thinGrayBorder;
     background: white;
 
-    & > won-preact.atomContent,
     & > won-atom-content,
-    & > .post-info__footer {
+    & > .atom-info__footer {
       display: block;
       padding: 0.5rem;
     }

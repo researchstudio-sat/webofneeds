@@ -10,6 +10,7 @@ import { connect2Redux } from "../configRedux.js";
 import won from "../won-es6.js";
 
 import { actionCreators } from "../actions/actions.js";
+import WonAtomInfo from "../components/atom-info.jsx";
 import postMessagesModule from "../components/post-messages.js";
 import groupPostMessagesModule from "../components/group-post-messages.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
@@ -35,9 +36,11 @@ const template = (
     <won-toasts />
     <won-slide-in ng-if="self.showSlideIns" />
     <main className="postcontent">
-      <won-post-info
+      <won-preact
+        class="atomInfo"
+        component="self.WonAtomInfo"
+        props="{atomUri: self.atomUri}"
         ng-if="!(self.atomLoading || self.atomFailedToLoad) && self.atom"
-        atom-uri="self.atomUri"
       />
       <div className="pc__loading" ng-if="self.atomLoading">
         <svg className="pc__loading__spinner hspinner">
@@ -75,6 +78,7 @@ class Controller {
     attach(this, serviceDependencies, arguments);
     window.p4dbg = this;
     this.WON = won.WON;
+    this.WonAtomInfo = WonAtomInfo;
 
     const selectFromState = state => {
       const atomUri = generalSelectors.getPostUriFromRoute(state);

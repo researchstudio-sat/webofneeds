@@ -36,7 +36,6 @@ import footer from "./components/footer.js";
 import modalDialog from "./components/modal-dialog.js";
 import toasts from "./components/toasts.js";
 import slideIn from "./components/slide-in.js";
-import postInfo from "./components/post-info.js";
 import connectionsComponent from "./pages/connections.jsx";
 import overviewComponent from "./pages/overview.jsx";
 import mapComponent from "./pages/map.jsx";
@@ -80,7 +79,6 @@ let app = angular.module("won.owner", [
   modalDialog,
   toasts,
   slideIn,
-  postInfo,
   preactModule,
 
   //views

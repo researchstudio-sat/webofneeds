@@ -88,7 +88,8 @@ main.ownerinventory {
     display: grid;
     grid-gap: 1rem;
 
-    > won-post-info.ownerinventory__personas__persona {
+    > won-preact.atomInfo.ownerinventory__personas__persona,
+    > won-atom-info.ownerinventory__personas__persona {
       background: white;
       border: $thinGrayBorder;
     }

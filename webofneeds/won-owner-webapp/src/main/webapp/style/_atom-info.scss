@@ -2,23 +2,20 @@
 @import "sizing-utils";
 @import "animate";
 
-won-post-info {
+won-atom-info {
   display: grid;
   grid-template-areas: "header" "menu" "main" "footer";
   grid-template-rows: min-content min-content minmax($minimalGridRows, 1fr) min-content;
   box-sizing: border-box;
 
-  > won-preact.atomHeaderBig,
   > won-atom-header-big {
     grid-area: header;
   }
 
-  > won-preact.atomMenu,
   > won-atom-menu {
     grid-area: menu;
   }
 
-  > won-preact.atomContent,
   > won-atom-content {
     padding: 0.5rem;
     box-sizing: border-box;
@@ -26,7 +23,7 @@ won-post-info {
     display: grid;
   }
 
-  .post-info__footer {
+  .atom-info__footer {
     grid-area: footer;
     display: grid;
     grid-gap: 0.5rem;
@@ -36,6 +33,10 @@ won-post-info {
 
     &__button {
       width: 100%;
+
+      > svg.won-button-icon {
+        --local-primary: white;
+      }
     }
 
     &__infolabel {

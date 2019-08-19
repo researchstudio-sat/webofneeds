@@ -15,6 +15,7 @@ import * as processUtils from "../redux/utils/process-utils.js";
 import * as accountUtils from "../redux/utils/account-utils.js";
 import * as viewUtils from "../redux/utils/view-utils.js";
 import WonAtomCardGrid from "../components/atom-card-grid.jsx";
+import WonAtomInfo from "../components/atom-info.jsx";
 
 import { h } from "preact";
 
@@ -58,10 +59,11 @@ const template = (
         className="ownerinventory__personas"
         ng-if="self.hasOwnedActivePersonas"
       >
-        <won-post-info
-          class="ownerinventory__personas__persona"
+        <won-preact
+          className="atomInfo ownerinventory__personas__persona"
+          component="self.WonAtomInfo"
+          props="{atomUri: personaUri}"
           ng-repeat="personaUri in self.sortedOwnedActivePersonaUriArray track by personaUri"
-          atom-uri="personaUri"
         />
       </div>
       <div className="ownerinventory__header">
@@ -123,6 +125,8 @@ class Controller {
     window.inventory4dbg = this;
 
     this.WonAtomCardGrid = WonAtomCardGrid;
+    this.WonAtomInfo = WonAtomInfo;
+
     const selectFromState = state => {
       const viewConnUri = generalSelectors.getViewConnectionUriFromRoute(state);
 
