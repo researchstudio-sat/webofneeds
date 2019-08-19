@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
-import { get } from "../utils.js";
+import { get, getIn } from "../utils.js";
 
 import ElmReact from "./elm-react.jsx";
 import WonLabelledHr from "./labelled-hr.jsx";
@@ -10,21 +10,10 @@ import { actionCreators } from "../actions/actions.js";
 
 import { Elm } from "../../elm/PublishButton.elm";
 
-import {
-  getOwnedAtomByConnectionUri,
-  getOwnedCondensedPersonaList,
-} from "../redux/selectors/general-selectors.js";
 import { getMessagesByConnectionUri } from "../redux/selectors/message-selectors.js";
-import {
-  isMessageAcceptable,
-  isMessageCancelable,
-  isMessageClaimable,
-  isMessageProposable,
-  isMessageRejectable,
-  isMessageRetractable,
-  isMessageSelected,
-} from "../redux/utils/message-utils.js";
 import { getHumanReadableStringFromMessage } from "../reducers/atom-reducer/parse-message.js";
+import * as generalSelectors from "../redux/selectors/general-selectors.js";
+import * as messageUtils from "../redux/utils/message-utils.js";
 import * as connectionSelectors from "../redux/selectors/connection-selectors.js";
 import * as connectionUtils from "../redux/utils/connection-utils.js";
 import * as accountUtils from "../redux/utils/account-utils.js";
@@ -36,28 +25,27 @@ import "~/style/_textfield.scss";
 const allMessageDetails = useCaseUtils.getAllMessageDetails();
 
 const mapStateToProps = (state, ownProps) => {
-  const post =
+  const atom =
     ownProps.connectionUri &&
-    getOwnedAtomByConnectionUri(state, ownProps.connectionUri);
-  const connection =
-    post && post.getIn(["connections", ownProps.connectionUri]);
+    generalSelectors.getOwnedAtomByConnectionUri(state, ownProps.connectionUri);
+  const connection = getIn(atom, ["connections", ownProps.connectionUri]);
 
   const messages = getMessagesByConnectionUri(state, ownProps.connectionUri);
 
   const selectedMessages =
-    messages && messages.filter(msg => isMessageSelected(msg));
+    messages && messages.filter(msg => messageUtils.isMessageSelected(msg));
   const rejectableMessages =
-    messages && messages.filter(msg => isMessageRejectable(msg));
+    messages && messages.filter(msg => messageUtils.isMessageRejectable(msg));
   const retractableMessages =
-    messages && messages.filter(msg => isMessageRetractable(msg));
+    messages && messages.filter(msg => messageUtils.isMessageRetractable(msg));
   const acceptableMessages =
-    messages && messages.filter(msg => isMessageAcceptable(msg));
+    messages && messages.filter(msg => messageUtils.isMessageAcceptable(msg));
   const proposableMessages =
-    messages && messages.filter(msg => isMessageProposable(msg));
+    messages && messages.filter(msg => messageUtils.isMessageProposable(msg));
   const cancelableMessages =
-    messages && messages.filter(msg => isMessageCancelable(msg));
+    messages && messages.filter(msg => messageUtils.isMessageCancelable(msg));
   const claimableMessages =
-    messages && messages.filter(msg => isMessageClaimable(msg));
+    messages && messages.filter(msg => messageUtils.isMessageClaimable(msg));
 
   const hasRejectableMessages =
     rejectableMessages && rejectableMessages.size > 0;
@@ -72,7 +60,7 @@ const mapStateToProps = (state, ownProps) => {
     cancelableMessages && cancelableMessages.size > 0;
   const hasClaimableMessages = claimableMessages && claimableMessages.size > 0;
 
-  const selectedDetailIdentifier = state.getIn([
+  const selectedDetailIdentifier = getIn(state, [
     "view",
     "selectedAddMessageContent",
   ]);
@@ -89,9 +77,9 @@ const mapStateToProps = (state, ownProps) => {
     allowEmptySubmit: ownProps.allowEmptySubmit,
     showPersonas: ownProps.showPersonas,
     showPersonasSelection: ownProps.showPersonas || false,
-    post,
-    multiSelectType: connection && connection.get("multiSelectType"),
-    showAgreementData: connection && connection.get("showAgreementData"),
+    atom,
+    multiSelectType: get(connection, "multiSelectType"),
+    showAgreementData: get(connection, "showAgreementData"),
     isChatToGroupConnection: connectionSelectors.isChatToGroupConnection(
       get(state, "atoms"),
       connection
@@ -105,13 +93,13 @@ const mapStateToProps = (state, ownProps) => {
     hasRetractableMessages,
     hasRejectableMessages,
     connectionHasBeenLost:
-      state.getIn(["messages", "reconnecting"]) ||
-      state.getIn(["messages", "lostConnection"]),
-    showAddMessageContent: state.getIn(["view", "showAddMessageContent"]),
+      getIn(state, ["messages", "reconnecting"]) ||
+      getIn(state, ["messages", "lostConnection"]),
+    showAddMessageContent: getIn(state, ["view", "showAddMessageContent"]),
     selectedDetail,
     selectedDetailComponent: selectedDetail && selectedDetail.component,
     isLoggedIn: accountUtils.isLoggedIn(get(state, "account")),
-    personas: getOwnedCondensedPersonaList(state).toJS(),
+    personas: generalSelectors.getOwnedCondensedPersonaList(state).toJS(),
     submitButtonLabel: ownProps.submitButtonLabel,
     onSubmit: ownProps.onSubmit,
   };
@@ -227,7 +215,7 @@ class ChatTextfield extends React.Component {
                     this.props.markMessageAsUnselected(
                       get(msg, "uri"),
                       this.props.connectionUri,
-                      get(this.props.post, "uri")
+                      get(this.props.atom, "uri")
                     )
                   }
                 >
@@ -355,7 +343,8 @@ class ChatTextfield extends React.Component {
                 onUpdate={({ value }) =>
                   this.updateDetail(this.props.selectedDetail.identifier, value)
                 }
-                initialValue={this.state.additionalContent.get(
+                initialValue={get(
+                  this.state.additionalContent,
                   this.props.selectedDetail.identifier
                 )}
                 detail={this.props.selectedDetail}
@@ -457,7 +446,7 @@ class ChatTextfield extends React.Component {
         this.getReferencedContentKeysArray() &&
         this.getReferencedContentKeysArray().length > 0 &&
         this.getReferencedContentKeysArray().map((ref, index) => {
-          const referencedMessages = this.state.referencedContent.get(ref);
+          const referencedMessages = get(this.state.referencedContent, ref);
           const referencedMessagesSize = referencedMessages
             ? referencedMessages.size
             : 0;
@@ -527,7 +516,7 @@ class ChatTextfield extends React.Component {
           const humanReadableDetail =
             usedDetail &&
             usedDetail.generateHumanReadable({
-              value: this.state.additionalContent.get(key),
+              value: get(this.state.additionalContent, key),
               includeLabel: true,
             });
 
@@ -645,14 +634,13 @@ class ChatTextfield extends React.Component {
 
   activateMultiSelect(type) {
     this.props.setMultiSelectType(this.props.connectionUri, type);
-    const referencedContent =
-      this.state.referencedContent && this.state.referencedContent.get(type);
+    const referencedContent = get(this.state.referencedContent, type);
     if (referencedContent) {
       referencedContent.forEach(msg => {
         this.props.markMessageAsSelected(
           get(msg, "uri"),
           this.props.connectionUri,
-          get(this.props.post, "uri")
+          get(this.props.atom, "uri")
         );
       });
     }
@@ -769,7 +757,7 @@ ChatTextfield.propTypes = {
   allowDetails: PropTypes.bool,
   allowEmptySubmit: PropTypes.bool,
   showPersonas: PropTypes.bool,
-  post: PropTypes.object,
+  atom: PropTypes.object,
   multiSelectType: PropTypes.bool,
   showAgreementData: PropTypes.bool,
   isChatToGroupConnection: PropTypes.bool,
