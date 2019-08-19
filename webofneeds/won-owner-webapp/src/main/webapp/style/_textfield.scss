@@ -50,7 +50,9 @@
 .won-txt {
   border-style: solid;
   border-radius: 0.19rem;
+  border-color: $won-line-gray;
   min-width: 0;
+  resize: none !important;
   // so a size is specified and break-word works
   word-break: break-word;
   @include textfieldPadding(
@@ -61,12 +63,6 @@
   );
   &:focus {
     color: black;
-  }
-  &.won-txt--valid {
-    border-color: $won-line-gray;
-  }
-  &.won-txt--invalid {
-    border-color: $won-primary-color;
   }
   &.won-txt--code {
     @include textfieldPadding(

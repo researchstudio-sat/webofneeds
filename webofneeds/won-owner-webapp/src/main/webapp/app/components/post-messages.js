@@ -1,13 +1,13 @@
 import won from "../won-es6.js";
 import Immutable from "immutable";
 import angular from "angular";
-import chatTextFieldModule from "./chat-textfield.js";
 import WonAtomContentMessage from "./messages/atom-content-message.jsx";
 import WonShareDropdown from "./share-dropdown.jsx";
 import WonLabelledHr from "./labelled-hr.jsx";
 import WonConnectionHeader from "./connection-header.jsx";
 import WonConnectionMessage from "./messages/connection-message.jsx";
 import WonConnectionContextDropdown from "./connection-context-dropdown.jsx";
+import ChatTextfield from "./chat-textfield.jsx";
 import { connect2Redux } from "../configRedux.js";
 import { delay, get, getIn } from "../utils.js";
 import * as processUtils from "../redux/utils/process-utils.js";
@@ -23,7 +23,6 @@ import {
   getProposalMessagesByConnectionUri,
   getUnreadMessagesByConnectionUri,
 } from "../redux/selectors/message-selectors.js";
-import autoresizingTextareaModule from "../directives/textarea-autogrow.js";
 import { attach, classOnComponentRoot } from "../cstm-ng-utils.js";
 import "~/style/_post-messages.scss";
 import "~/style/_rdflink.scss";
@@ -219,50 +218,57 @@ function genComponentConf() {
             </a>
         </div>
         <div class="pm__footer" ng-if="!self.showPetriNetData && self.isConnected">
-            <chat-textfield
-                class="pm__footer__chattexfield"
-                connection-uri="self.selectedConnectionUri"
-                placeholder="self.shouldShowRdf? 'Enter TTL...' : 'Your message...'"
-                submit-button-label="self.shouldShowRdf? 'Send&#160;RDF' : 'Send'"
-                on-submit="::self.send(value, additionalContent, referencedContent, self.shouldShowRdf)"
-                help-text="self.shouldShowRdf? self.rdfTextfieldHelpText : ''"
-                allow-empty-submit="::false"
-                allow-details="!self.shouldShowRdf"
-                is-code="self.shouldShowRdf? 'true' : ''"
-            >
-            </chat-textfield>
+            <won-preact class="pm__footer__chattexfield chatTextfield"
+                component="self.ChatTextfield"
+                props="{
+                    connectionUri: self.selectedConnectionUri,
+                    placeholder: self.shouldShowRdf? 'Enter TTL...' : 'Your message...',
+                    submitButtonLabel: self.shouldShowRdf? 'Send&#160;RDF' : 'Send',
+                    helpText: self.shouldShowRdf? self.rdfTextfieldHelpText : '',  
+                    allowEmptySubmit: false,
+                    allowDetails: !self.shouldShowRdf,
+                    isCode: self.shouldShowRdf,
+                    onSubmit: self.send
+                }"
+            ></won-preact>
+            <!-- TODO refactor the old ng reference to the react one on-submit="::self.send(value, additionalContent, referencedContent, self.shouldShowRdf)" -->
         </div>
         <div class="pm__footer" ng-if="!self.showPetriNetData && !self.multiSelectType && self.isSentRequest">
             Waiting for them to accept your chat request.
         </div>
 
         <div class="pm__footer" ng-if="!self.showPetriNetData && !self.multiSelectType && self.isReceivedRequest">
-            <chat-textfield
-                class="pm__footer__chattexfield"
-                connection-uri="self.selectedConnectionUri"
-                placeholder="::'Message (optional)'"
-                on-submit="::self.openRequest(value)"
-                allow-details="::false"
-                allow-empty-submit="::true"
-                submit-button-label="::'Accept&#160;Chat'"
-            >
-            </chat-textfield>
+            <won-preact class="pm__footer__chattexfield chatTextfield"
+                component="self.ChatTextfield"
+                props="{
+                    connectionUri: self.selectedConnectionUri,
+                    placeholder: 'Message (optional)',
+                    submitButtonLabel: 'Accept&#160;Chat',
+                    allowEmptySubmit: true,
+                    allowDetails: false,
+                    onSubmit: self.openRequest
+                }"
+            ></won-preact>
+            <!-- TODO refactor the old ng reference to the react one on-submit="::self.openRequest(value)" -->
             <won-preact component="self.WonLabelledHr" class="labelledHr pm__footer__labelledhr" props="{label: 'Or'}"></won-preact>
             <button class="pm__footer__button won-button--filled black" ng-click="self.closeConnection()">
                 Decline
             </button>
         </div>
         <div class="pm__footer" ng-if="!self.showPetriNetData && !self.multiSelectType && self.isSuggested">
-            <chat-textfield
-                placeholder="::'Message (optional)'"
-                connection-uri="self.selectedConnectionUri"
-                on-submit="::self.sendRequest(value, selectedPersona)"
-                allow-details="::false"
-                allow-empty-submit="::true"
-                show-personas="!self.connection"
-                submit-button-label="::'Ask&#160;to&#160;Chat'"
-            >
-            </chat-textfield>
+            <won-preact class="pm__footer__chattextfield chatTextfield"
+                component="self.ChatTextfield"
+                props="{
+                    connectionUri: self.selectedConnectionUri,
+                    placeholder: 'Message (optional)',
+                    submitButtonLabel: 'Ask&#160;to&#160;Chat',
+                    allowEmptySubmit: true,
+                    allowDetails: false,
+                    onSubmit: self.sendRequest,
+                    showPersonas: !self.connection
+                }"
+            ></won-preact>
+            <!-- TODO refactor the old ng reference to the react one on-submit="::self.sendRequest(value, selectedPersona)" -->
             <won-preact component="self.WonLabelledHr" class="labelledHr pm__footer__labelledhr" props="{label: 'Or'}"></won-preact>
             <button class="pm__footer__button won-button--filled black" ng-click="self.closeConnection(true)">
                 Bad match - remove!
@@ -280,6 +286,7 @@ function genComponentConf() {
       this.WonAtomContentMessage = WonAtomContentMessage;
       this.WonShareDropdown = WonShareDropdown;
       this.WonConnectionContextDropdown = WonConnectionContextDropdown;
+      this.ChatTextfield = ChatTextfield;
 
       this.rdfTextfieldHelpText =
         "Expects valid turtle. " +
@@ -923,8 +930,5 @@ function genComponentConf() {
 }
 
 export default angular
-  .module("won.owner.components.postMessages", [
-    autoresizingTextareaModule,
-    chatTextFieldModule,
-  ])
+  .module("won.owner.components.postMessages", [])
   .directive("wonPostMessages", genComponentConf).name;

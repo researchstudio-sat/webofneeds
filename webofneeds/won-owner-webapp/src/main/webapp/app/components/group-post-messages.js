@@ -1,11 +1,11 @@
 import won from "../won-es6.js";
 import angular from "angular";
-import chatTextFieldModule from "./chat-textfield.js";
 import WonAtomContentMessage from "./messages/atom-content-message.jsx";
 import WonShareDropdown from "./share-dropdown.jsx";
 import WonLabelledHr from "./labelled-hr.jsx";
 import WonConnectionMessage from "./messages/connection-message.jsx";
 import WonConnectionContextDropdown from "./connection-context-dropdown.jsx";
+import ChatTextfield from "./chat-textfield.jsx";
 import { connect2Redux } from "../configRedux.js";
 import { delay, get, getIn } from "../utils.js";
 import * as messageUtils from "../redux/utils/message-utils.js";
@@ -19,7 +19,6 @@ import {
 } from "../redux/selectors/general-selectors.js";
 import { hasMessagesToLoad } from "../redux/selectors/connection-selectors.js";
 import { getUnreadMessagesByConnectionUri } from "../redux/selectors/message-selectors.js";
-import autoresizingTextareaModule from "../directives/textarea-autogrow.js";
 import { attach, classOnComponentRoot } from "../cstm-ng-utils.js";
 import WonConnectionHeader from "./connection-header.jsx";
 import "~/style/_group-post-messages.scss";
@@ -100,50 +99,57 @@ function genComponentConf() {
             </a>
         </div>
         <div class="gpm__footer" ng-if="self.isConnected">
-            <chat-textfield
-                class="gpm__footer__chattexfield"
-                connection-uri="self.connectionUri"
-                placeholder="self.shouldShowRdf? 'Enter TTL...' : 'Your message...'"
-                submit-button-label="self.shouldShowRdf? 'Send&#160;RDF' : 'Send'"
-                on-submit="self.send(value, additionalContent, referencedContent, self.shouldShowRdf)"
-                help-text="self.shouldShowRdf? self.rdfTextfieldHelpText : ''"
-                allow-empty-submit="::false"
-                allow-details="!self.shouldShowRdf"
-                is-code="self.shouldShowRdf? 'true' : ''"
-            >
-            </chat-textfield>
+            <won-preact class="gpm__footer__chattexfield chatTextfield"
+                component="self.ChatTextfield"
+                props="{
+                    connectionUri: self.connectionUri,
+                    placeholder: self.shouldShowRdf? 'Enter TTL...' : 'Your message...',
+                    submitButtonLabel: self.shouldShowRdf? 'Send&#160;RDF' : 'Send',
+                    helpText: self.shouldShowRdf? self.rdfTextfieldHelpText : '',  
+                    allowEmptySubmit: false,
+                    allowDetails: !self.shouldShowRdf,
+                    isCode: self.shouldShowRdf,
+                    onSubmit: self.send
+                }"
+            ></won-preact>
+            <!-- TODO refactor the old ng reference to the react one on-submit="::self.send(value, additionalContent, referencedContent, self.shouldShowRdf)" -->
         </div>
         <div class="gpm__footer" ng-if="self.isSentRequest">
             Waiting for the Group Administrator to accept your request.
         </div>
 
         <div class="gpm__footer" ng-if="self.isReceivedRequest">
-            <chat-textfield
-                class="gpm__footer__chattexfield"
-                connection-uri="self.connectionUri"
-                placeholder="::'Message (optional)'"
-                on-submit="::self.openRequest(value)"
-                allow-details="::false"
-                allow-empty-submit="::true"
-                submit-button-label="::'Accept&#160;Invite'"
-            >
-            </chat-textfield>
+            <won-preact class="gpm__footer__chattexfield chatTextfield"
+                component="self.ChatTextfield"
+                props="{
+                    connectionUri: self.connectionUri,
+                    placeholder: 'Message (optional)',
+                    submitButtonLabel: 'Accept&#160;Invite',
+                    allowEmptySubmit: true,
+                    allowDetails: false,
+                    onSubmit: self.openRequest
+                }"
+            ></won-preact>
+            <!-- TODO refactor the old ng reference to the react one on-submit="::self.openRequest(value)" -->
             <won-preact component="self.WonLabelledHr" class="labelledHr gpm__footer__labelledhr" props="{label: 'Or'}"></won-preact>
             <button class="gpm__footer__button won-button--filled black" ng-click="self.closeConnection()">
                 Decline
             </button>
         </div>
         <div class="gpm__footer" ng-if="self.isSuggested">
-            <chat-textfield
-                placeholder="::'Message (optional)'"
-                connection-uri="self.connectionUri"
-                on-submit="::self.sendRequest(value, selectedPersona)"
-                allow-details="::false"
-                allow-empty-submit="::true"
-                show-personas="!self.connection"
-                submit-button-label="::'Ask&#160;to&#160;Join'"
-            >
-            </chat-textfield>
+            <won-preact class="gpm__footer__chattexfield chatTextfield"
+                component="self.ChatTextfield"
+                props="{
+                    connectionUri: self.connectionUri,
+                    placeholder: 'Message (optional)',
+                    submitButtonLabel: 'Ask&#160;to&#160;Join',
+                    allowEmptySubmit: true,
+                    allowDetails: false,
+                    onSubmit: self.sendRequest,
+                    showPersonas: !self.connection
+                }"
+            ></won-preact>
+            <!-- TODO refactor the old ng reference to the react one on-submit="::self.sendRequest(value, selectedPersona)" -->
             <won-preact component="self.WonLabelledHr" class="labelledHr gpm__footer__labelledhr" props="{label: 'Or'}"></won-preact>
             <button class="gpm__footer__button won-button--filled black" ng-click="self.closeConnection(true)">
                 Bad match - remove!
@@ -161,6 +167,7 @@ function genComponentConf() {
       this.WonConnectionMessage = WonConnectionMessage;
       this.WonAtomContentMessage = WonAtomContentMessage;
       this.WonConnectionContextDropdown = WonConnectionContextDropdown;
+      this.ChatTextfield = ChatTextfield;
       this.rdfTextfieldHelpText =
         "Expects valid turtle. " +
         `<${won.WONMSG.uriPlaceholder.event}> will ` +
@@ -454,8 +461,5 @@ function genComponentConf() {
 }
 
 export default angular
-  .module("won.owner.components.groupPostMessages", [
-    autoresizingTextareaModule,
-    chatTextFieldModule,
-  ])
+  .module("won.owner.components.groupPostMessages", [])
   .directive("wonGroupPostMessages", genComponentConf).name;

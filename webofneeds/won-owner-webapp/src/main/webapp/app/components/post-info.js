@@ -3,10 +3,10 @@
  */
 
 import angular from "angular";
-import chatTextFieldModule from "./chat-textfield.js";
 import WonAtomHeaderBig from "./atom-header-big.jsx";
 import WonAtomContent from "./atom-content.jsx";
 import WonAtomMenu from "./atom-menu.jsx";
+import ChatTextfield from "./chat-textfield.jsx";
 import { get, getIn } from "../utils.js";
 import { connect2Redux } from "../configRedux.js";
 import * as viewUtils from "../redux/utils/view-utils.js";
@@ -30,15 +30,19 @@ function genComponentConf() {
         <won-preact class="atomContent" component="self.WonAtomContent" props="{atomUri: self.atomUri}"></won-preact>
         <div class="post-info__footer" ng-if="self.showFooter">
             <!-- AdHoc Request Field -->
-            <chat-textfield
+            <won-preact
+                class="chatTextfield"
+                component="self.ChatTextfield"
+                props="{
+                    placeholder: 'Message (optional)',
+                    allowEmptySubmit: true,
+                    showPersonas: true,
+                    submitButtonLabel: 'Ask&#160;to&#160;Chat',
+                    onSubmit: self.sendAdHocRequest                    
+                }"
                 ng-if="self.showAdHocRequestField"
-                placeholder="::'Message (optional)'"
-                on-submit="::self.sendAdHocRequest(value, selectedPersona)"
-                allow-empty-submit="::true"
-                show-personas="true"
-                submit-button-label="::'Ask&#160;to&#160;Chat'">
-
-            </chat-textfield>
+            ></won-preact>
+            <!-- TODO refactor the old ng reference to the react one on-submit="::self.sendAdHocRequest(value, selectedPersona)" -->
             <!-- Reaction Use Cases -->
             <button class="won-button--filled red post-info__footer__button"
                     ng-if="self.showReactionUseCases"
@@ -74,6 +78,7 @@ function genComponentConf() {
       this.WonAtomHeaderBig = WonAtomHeaderBig;
       this.WonAtomMenu = WonAtomMenu;
       this.WonAtomContent = WonAtomContent;
+      this.ChatTextfield = ChatTextfield;
 
       const selectFromState = state => {
         const atom = getIn(state, ["atoms", this.atomUri]);
@@ -196,5 +201,5 @@ function genComponentConf() {
 }
 
 export default angular
-  .module("won.owner.components.postInfo", [chatTextFieldModule])
+  .module("won.owner.components.postInfo", [])
   .directive("wonPostInfo", genComponentConf).name;
