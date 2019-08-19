@@ -11,7 +11,7 @@ import won from "../won-es6.js";
 
 import { actionCreators } from "../actions/actions.js";
 import WonAtomInfo from "../components/atom-info.jsx";
-import postMessagesModule from "../components/post-messages.js";
+import WonAtomMessages from "../components/atom-messages.jsx";
 import groupPostMessagesModule from "../components/group-post-messages.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as viewSelectors from "../redux/selectors/view-selectors.js";
@@ -29,7 +29,11 @@ const template = (
       className="won-modal-connectionview"
       ng-if="self.showConnectionOverlay"
     >
-      <won-post-messages connection-uri="self.viewConnUri" />
+      <won-preact
+        component="self.WonAtomMessages"
+        props="{connectionUri: self.viewConnUri}"
+        className="atomMessages"
+      />
     </div>
     <won-topnav page-title="self.atomTitle" />
     <won-menu ng-if="self.isLoggedIn" />
@@ -79,6 +83,7 @@ class Controller {
     window.p4dbg = this;
     this.WON = won.WON;
     this.WonAtomInfo = WonAtomInfo;
+    this.WonAtomMessages = WonAtomMessages;
 
     const selectFromState = state => {
       const atomUri = generalSelectors.getPostUriFromRoute(state);
@@ -138,11 +143,7 @@ Controller.$inject = serviceDependencies;
 
 export default {
   module: angular
-    .module("won.owner.components.post", [
-      ngAnimate,
-      postMessagesModule,
-      groupPostMessagesModule,
-    ])
+    .module("won.owner.components.post", [ngAnimate, groupPostMessagesModule])
     .controller("PostController", Controller).name,
   controller: "PostController",
   template: template,

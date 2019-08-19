@@ -69,6 +69,7 @@ const mapStateToProps = (state, ownProps) => {
     selectedDetailIdentifier &&
     allMessageDetails[selectedDetailIdentifier];
   return {
+    className: ownProps.className,
     connectionUri: ownProps.connectionUri,
     placeholder: ownProps.placeholder,
     helpText: ownProps.helpText,
@@ -564,7 +565,7 @@ class ChatTextfield extends React.Component {
     }
 
     return (
-      <chat-textfield>
+      <chat-textfield class={this.props.className || ""}>
         {detailDrawerElement}
         {detailDrawerToggleElement}
 
@@ -750,6 +751,7 @@ class ChatTextfield extends React.Component {
 }
 
 ChatTextfield.propTypes = {
+  className: PropTypes.string,
   connectionUri: PropTypes.string,
   placeholder: PropTypes.string,
   helpText: PropTypes.string,

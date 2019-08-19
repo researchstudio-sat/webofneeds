@@ -11,7 +11,6 @@ import { attach, classOnComponentRoot } from "../cstm-ng-utils.js";
 import Immutable from "immutable";
 import { connect2Redux } from "../configRedux.js";
 import { actionCreators } from "../actions/actions.js";
-import postMessagesModule from "../components/post-messages.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as viewSelectors from "../redux/selectors/view-selectors.js";
 import * as processUtils from "../redux/utils/process-utils.js";
@@ -22,6 +21,7 @@ import { h } from "preact";
 import * as accountUtils from "../redux/utils/account-utils.js";
 import WonAtomCardGrid from "../components/atom-card-grid.jsx";
 import WonAtomMap from "../components/atom-map.jsx";
+import WonAtomMessages from "../components/atom-messages.jsx";
 
 import "~/style/_map.scss";
 import "~/style/_connection-overlay.scss";
@@ -33,7 +33,11 @@ const template = (
       className="won-modal-connectionview"
       ng-if="self.showConnectionOverlay"
     >
-      <won-post-messages connection-uri="self.viewConnUri" />
+      <won-preact
+        component="self.WonAtomMessages"
+        props="{connectionUri: self.viewConnUri}"
+        className="atomMessages"
+      />
     </div>
     <won-topnav page-title="::'What\'s around'" />
     <won-menu ng-if="self.isLoggedIn" />
@@ -232,6 +236,7 @@ class Controller {
     window.ownermap4dbg = this;
     this.WonAtomMap = WonAtomMap;
     this.WonAtomCardGrid = WonAtomCardGrid;
+    this.WonAtomMessages = WonAtomMessages;
 
     const selectFromState = state => {
       const viewConnUri = generalSelectors.getViewConnectionUriFromRoute(state);
@@ -530,11 +535,7 @@ Controller.$inject = serviceDependencies;
 
 export default {
   module: angular
-    .module("won.owner.components.map", [
-      ngAnimate,
-      postMessagesModule,
-      wonInput,
-    ])
+    .module("won.owner.components.map", [ngAnimate, wonInput])
     .controller("MapController", Controller).name,
   controller: "MapController",
   template: template,

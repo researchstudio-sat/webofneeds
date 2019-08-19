@@ -189,7 +189,7 @@ export default class WonPetrinetState extends React.Component {
 
     return (
       <won-petrinet-state
-        class={this.props.className ? this.props.className : undefined}
+        class={this.props.className ? this.props.className : ""}
       >
         {petrinetActiveElement}
         {petrinetInactiveElement}

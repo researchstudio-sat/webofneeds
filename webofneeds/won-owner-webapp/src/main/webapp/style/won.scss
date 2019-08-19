@@ -168,7 +168,8 @@ body {
       }
 
       > won-group-post-messages,
-      > won-post-messages {
+      > won-preact.atomMessages,
+      > won-atom-messages {
         height: calc(100vh - var(--headerHeight) - var(--menuHeight));
       }
     }

@@ -2,7 +2,7 @@
 @import "won-config";
 @import "animate";
 
-won-post-messages {
+won-atom-messages {
   display: grid;
   grid-template-areas: "header" "main" "footer";
   grid-template-rows: min-content minmax($minimalGridRows, 1fr) min-content;
@@ -35,17 +35,14 @@ won-post-messages {
     }
 
     &__title,
-    won-preact.connectionHeader,
     won-connection-header {
       grid-area: header_title;
     }
 
-    > won-preact.connectionContextDropdown,
     > won-connection-context-dropdown {
       grid-area: header_context;
     }
 
-    > won-preact.shareDropdown,
     > won-share-dropdown {
       grid-area: header_share;
     }
@@ -132,7 +129,6 @@ won-post-messages {
       font-size: $normalFontSize;
       color: $won-subtitle-gray;
     }
-    won-preact.pm__content__petrinet__process__content > won-petrinet-state,
     won-petrinet-state.pm__content__petrinet__process__content {
       display: grid;
       grid-gap: 0.5rem;
