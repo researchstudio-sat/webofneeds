@@ -10,37 +10,17 @@
 import angular from "angular";
 import "ng-redux";
 import ngAnimate from "angular-animate";
-import { delay, dispatchEvent, get } from "../utils.js";
+import { delay, dispatchEvent } from "../utils.js";
 import { attach } from "../cstm-ng-utils.js";
-import {
-  getOwnedAtomByConnectionUri,
-  getOwnedCondensedPersonaList,
-} from "../redux/selectors/general-selectors.js";
-import { getMessagesByConnectionUri } from "../redux/selectors/message-selectors.js";
-import {
-  isMessageAcceptable,
-  isMessageCancelable,
-  isMessageClaimable,
-  isMessageProposable,
-  isMessageRejectable,
-  isMessageRetractable,
-  isMessageSelected,
-} from "../redux/utils/message-utils.js";
-import { connect2Redux } from "../configRedux.js";
 import * as useCaseUtils from "../usecase-utils.js";
 import autoresizingTextareaModule from "../directives/textarea-autogrow.js";
-import { actionCreators } from "../actions/actions.js";
 import WonLabelledHr from "./labelled-hr.jsx";
 import { getHumanReadableStringFromMessage } from "../reducers/atom-reducer/parse-message.js";
-import * as connectionSelectors from "../redux/selectors/connection-selectors.js";
-import * as connectionUtils from "../redux/utils/connection-utils.js";
-import * as accountUtils from "../redux/utils/account-utils.js";
 
 import { Elm } from "../../elm/PublishButton.elm";
 import elmModule from "./elm.js";
 
 import "~/style/_chattextfield.scss";
-import "~/style/_textfield.scss";
 
 function genComponentConf() {
   let template = `
@@ -298,86 +278,6 @@ function genComponentConf() {
       this.$scope.$watch("self.showPersonas", newValue => {
         this.showPersonasSelection = newValue || false;
       });
-
-      const selectFromState = state => {
-        const post =
-          this.connectionUri &&
-          getOwnedAtomByConnectionUri(state, this.connectionUri);
-        const connection =
-          post && post.getIn(["connections", this.connectionUri]);
-
-        const messages = getMessagesByConnectionUri(state, this.connectionUri);
-
-        const selectedMessages =
-          messages && messages.filter(msg => isMessageSelected(msg));
-        const rejectableMessages =
-          messages && messages.filter(msg => isMessageRejectable(msg));
-        const retractableMessages =
-          messages && messages.filter(msg => isMessageRetractable(msg));
-        const acceptableMessages =
-          messages && messages.filter(msg => isMessageAcceptable(msg));
-        const proposableMessages =
-          messages && messages.filter(msg => isMessageProposable(msg));
-        const cancelableMessages =
-          messages && messages.filter(msg => isMessageCancelable(msg));
-        const claimableMessages =
-          messages && messages.filter(msg => isMessageClaimable(msg));
-
-        const hasRejectableMessages =
-          rejectableMessages && rejectableMessages.size > 0;
-        const hasRetractableMessages =
-          retractableMessages && retractableMessages.size > 0;
-
-        const hasAcceptableMessages =
-          acceptableMessages && acceptableMessages.size > 0;
-        const hasProposableMessages =
-          proposableMessages && proposableMessages.size > 0;
-        const hasCancelableMessages =
-          cancelableMessages && cancelableMessages.size > 0;
-        const hasClaimableMessages =
-          claimableMessages && claimableMessages.size > 0;
-
-        const selectedDetailIdentifier = state.getIn([
-          "view",
-          "selectedAddMessageContent",
-        ]);
-        const selectedDetail =
-          this.allMessageDetails &&
-          selectedDetailIdentifier &&
-          this.allMessageDetails[selectedDetailIdentifier];
-        return {
-          post,
-          multiSelectType: connection && connection.get("multiSelectType"),
-          showAgreementData: connection && connection.get("showAgreementData"),
-          isChatToGroupConnection: connectionSelectors.isChatToGroupConnection(
-            get(state, "atoms"),
-            connection
-          ),
-          isConnected: connectionUtils.isConnected(connection),
-          selectedMessages: selectedMessages,
-          hasClaimableMessages,
-          hasProposableMessages,
-          hasCancelableMessages,
-          hasAcceptableMessages,
-          hasRetractableMessages,
-          hasRejectableMessages,
-          connectionHasBeenLost:
-            state.getIn(["messages", "reconnecting"]) ||
-            state.getIn(["messages", "lostConnection"]),
-          showAddMessageContent: state.getIn(["view", "showAddMessageContent"]),
-          selectedDetail,
-          selectedDetailComponent: selectedDetail && selectedDetail.component,
-          isLoggedIn: accountUtils.isLoggedIn(get(state, "account")),
-          personas: getOwnedCondensedPersonaList(state).toJS(),
-        };
-      };
-
-      connect2Redux(
-        selectFromState,
-        actionCreators,
-        ["self.connectionUri"],
-        this
-      );
 
       this.textFieldNg().bind("input", () => {
         this.input();
@@ -665,36 +565,7 @@ function genComponentConf() {
     controller: Controller,
     controllerAs: "self",
     bindToController: true, //scope-bindings -> ctrl
-    scope: {
-      connectionUri: "=",
-      placeholder: "=", // NOTE: bound only once
-      maxChars: "=",
-      helpText: "=",
 
-      isCode: "=", // whether or not the text is code and e.g. should use monospace
-      allowDetails: "=", //whether or not it is allowed to add content other than text
-
-      allowEmptySubmit: "=", // allows submitting empty messages
-      showPersonas: "=", // show a persona drop-up
-
-      /*
-             * Usage:
-             *  on-input="::myCallback(value, valid)"
-             */
-      onInput: "&",
-      /*
-             * Usage:
-             *  on-paste="::myCallback(value, valid)"
-             */
-      onPaste: "&",
-
-      submitButtonLabel: "=",
-      /*
-             * Usage:
-             *  on-submit="::myCallback(value)"
-             */
-      onSubmit: "&",
-    },
     template: template,
   };
 }
