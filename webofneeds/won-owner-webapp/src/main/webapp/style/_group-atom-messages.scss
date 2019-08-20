@@ -2,7 +2,7 @@
 @import "won-config";
 @import "animate";
 
-won-group-post-messages {
+won-group-atom-messages {
   display: grid;
   grid-template-areas: "header" "main" "footer";
   grid-template-rows: min-content minmax($minimalGridRows, 1fr) min-content;
@@ -35,17 +35,14 @@ won-group-post-messages {
     }
 
     &__title,
-    won-preact.connectionHeader,
     won-connection-header {
       grid-area: header_title;
     }
 
-    > won-preact.connectionContextDropdown,
     > won-connection-context-dropdown {
       grid-area: header_context;
     }
 
-    > won-preact.shareDropdown,
     > won-share-dropdown {
       grid-area: header_share;
     }

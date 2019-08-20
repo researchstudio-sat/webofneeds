@@ -906,11 +906,7 @@ class AtomMessages extends React.Component {
   unsnapFromBottom() {
     this.setState({ snapBottom: false });
   }
-  updateScrollposition() {
-    if (this.state.snapBottom) {
-      this.scrollToBottom();
-    }
-  }
+
   scrollToBottom() {
     this.chatContainerRef.current.scrollTop = this.chatContainerRef.current.scrollHeight;
   }
