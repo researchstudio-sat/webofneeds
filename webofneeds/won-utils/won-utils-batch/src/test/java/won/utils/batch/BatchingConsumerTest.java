@@ -3,8 +3,6 @@ package won.utils.batch;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Phaser;
-import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -14,7 +12,8 @@ import org.junit.Test;
 import won.utils.batch.BatchingConsumer.Config;
 import won.utils.batch.BatchingConsumer.ConfigBuilder;
 
-public class BatchingConsumerTests {
+
+public class BatchingConsumerTest {
     @Test
     public void testConsumeAllOneKey() {
         BatchingConsumer<String, String> c = new BatchingConsumer<>();
@@ -26,6 +25,38 @@ public class BatchingConsumerTests {
         c.accept("key1", "third item", items -> counter.set(-2));
         Assert.assertEquals(0, counter.get());
         c.accept("key1", "fourth item", items -> counter.set(-3));
+        Assert.assertEquals(0, counter.get());
+        c.consumeAllBatches();
+        Assert.assertEquals(4, counter.get());
+    }
+
+    @Test
+    public void testConsumeAllOneKeyOneDuplicate() {
+        BatchingConsumer<String, String> c = new BatchingConsumer<>();
+        AtomicInteger counter = new AtomicInteger(0);
+        c.accept("key1", "first item", "a", items -> counter.addAndGet(items.size()));
+        Assert.assertEquals(0, counter.get());
+        c.accept("key1", "second item", "a", items -> counter.set(-1));
+        Assert.assertEquals(0, counter.get());
+        c.accept("key1", "third item", "b", items -> counter.set(-2));
+        Assert.assertEquals(0, counter.get());
+        c.accept("key1", "fourth item", "c", items -> counter.set(-3));
+        Assert.assertEquals(0, counter.get());
+        c.consumeAllBatches();
+        Assert.assertEquals(3, counter.get());
+    }
+
+    @Test
+    public void testConsumeAllOneKeyNoDuplicatesOneNull() {
+        BatchingConsumer<String, String> c = new BatchingConsumer<>();
+        AtomicInteger counter = new AtomicInteger(0);
+        c.accept("key1", "first item", "a", items -> counter.addAndGet(items.size()));
+        Assert.assertEquals(0, counter.get());
+        c.accept("key1", "second item", null, items -> counter.set(-1));
+        Assert.assertEquals(0, counter.get());
+        c.accept("key1", "third item", "b", items -> counter.set(-2));
+        Assert.assertEquals(0, counter.get());
+        c.accept("key1", "fourth item", "c", items -> counter.set(-3));
         Assert.assertEquals(0, counter.get());
         c.consumeAllBatches();
         Assert.assertEquals(4, counter.get());
@@ -49,6 +80,46 @@ public class BatchingConsumerTests {
         c.consumeAllBatches();
         Assert.assertEquals(2, counter1.get());
         Assert.assertEquals(2, counter2.get());
+    }
+
+    @Test
+    public void testConsumeAllTwoKeysTwoDuplicates() {
+        BatchingConsumer<String, String> c = new BatchingConsumer<>();
+        AtomicInteger counter1 = new AtomicInteger(0);
+        AtomicInteger counter2 = new AtomicInteger(0);
+        c.accept("key1", "first item", "a", items -> counter1.addAndGet(items.size()));
+        Assert.assertEquals(0, counter1.get());
+        Assert.assertEquals(0, counter2.get());
+        c.accept("key2", "second item", "b", items -> counter2.addAndGet(items.size()));
+        Assert.assertEquals(0, counter1.get());
+        Assert.assertEquals(0, counter2.get());
+        c.accept("key1", "third item", "a", items -> counter1.addAndGet(items.size()));
+        c.accept("key2", "fourth item", "b", items -> counter2.addAndGet(items.size()));
+        Assert.assertEquals(0, counter1.get());
+        Assert.assertEquals(0, counter2.get());
+        c.consumeAllBatches();
+        Assert.assertEquals(1, counter1.get());
+        Assert.assertEquals(1, counter2.get());
+    }
+
+    @Test
+    public void testConsumeAllTwoKeysTwoDuplicatesSameDedupkeyDifferentBatches() {
+        BatchingConsumer<String, String> c = new BatchingConsumer<>();
+        AtomicInteger counter1 = new AtomicInteger(0);
+        AtomicInteger counter2 = new AtomicInteger(0);
+        c.accept("key1", "first item", "a", items -> counter1.addAndGet(items.size()));
+        Assert.assertEquals(0, counter1.get());
+        Assert.assertEquals(0, counter2.get());
+        c.accept("key2", "second item", "a", items -> counter2.addAndGet(items.size()));
+        Assert.assertEquals(0, counter1.get());
+        Assert.assertEquals(0, counter2.get());
+        c.accept("key1", "third item", "a", items -> counter1.addAndGet(items.size()));
+        c.accept("key2", "fourth item", "a", items -> counter2.addAndGet(items.size()));
+        Assert.assertEquals(0, counter1.get());
+        Assert.assertEquals(0, counter2.get());
+        c.consumeAllBatches();
+        Assert.assertEquals(1, counter1.get());
+        Assert.assertEquals(1, counter2.get());
     }
 
     @Test
