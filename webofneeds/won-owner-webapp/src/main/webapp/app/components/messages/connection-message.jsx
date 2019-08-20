@@ -169,7 +169,7 @@ export default class WonConnectionMessage extends React.Component {
             atomUri={get(this.state.theirAtom, "uri")}
             ngRedux={this.props.ngRedux}
             onClick={
-              !this.state.multiSelectType
+              !this.props.onClick
                 ? () => {
                     this.props.ngRedux.dispatch(
                       actionCreators.router__stateGo({
@@ -193,7 +193,7 @@ export default class WonConnectionMessage extends React.Component {
             atomUri={this.state.originatorUri}
             ngRedux={this.props.ngRedux}
             onClick={
-              !this.state.multiSelectType
+              !this.props.onClick
                 ? () => {
                     this.props.ngRedux.dispatch(
                       actionCreators.router__stateGo({
@@ -307,7 +307,10 @@ export default class WonConnectionMessage extends React.Component {
     }
 
     return (
-      <won-connection-message class={this.generateParentCssClasses()}>
+      <won-connection-message
+        class={this.generateParentCssClasses()}
+        onClick={this.props.onClick}
+      >
         {messageContentElement}
       </won-connection-message>
     );
@@ -457,4 +460,5 @@ WonConnectionMessage.propTypes = {
   connectionUri: PropTypes.string.isRequired,
   groupChatMessage: PropTypes.bool,
   ngRedux: PropTypes.object.isRequired,
+  onClick: PropTypes.func,
 };

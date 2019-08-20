@@ -296,7 +296,7 @@ export default class WonConnectionHeader extends React.Component {
 
       return (
         <won-connection-header
-          onClick={() => this.props.onClick()}
+          onClick={this.props.onClick ? () => this.props.onClick() : undefined}
           class={this.props.onClick ? "clickable" : ""}
         >
           {headerIcon}
@@ -321,5 +321,5 @@ export default class WonConnectionHeader extends React.Component {
 WonConnectionHeader.propTypes = {
   connectionUri: PropTypes.string.isRequired,
   ngRedux: PropTypes.object.isRequired,
-  onClick: PropTypes.func.isRequired,
+  onClick: PropTypes.func,
 };

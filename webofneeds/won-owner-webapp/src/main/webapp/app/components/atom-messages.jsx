@@ -478,7 +478,11 @@ class AtomMessages extends React.Component {
                     messageUri={msgUri}
                     connectionUri={this.props.selectedConnectionUri}
                     ngRedux={store}
-                    ng-click="this.props.multiSelectType && this.selectMessage(msgUri)"
+                    onClick={
+                      this.props.multiSelectType
+                        ? () => this.selectMessage(msgUri)
+                        : undefined
+                    }
                   />
                 );
               });
@@ -563,7 +567,11 @@ class AtomMessages extends React.Component {
                     messageUri={agreementUri}
                     connectionUri={this.props.selectedConnectionUri}
                     ngRedux={store}
-                    ng-click="this.props.multiSelectType && this.selectMessage(agreementUri)"
+                    onClick={
+                      this.props.multiSelectType
+                        ? () => this.selectMessage(agreementUri)
+                        : undefined
+                    }
                   />
                 );
               });
@@ -579,7 +587,11 @@ class AtomMessages extends React.Component {
                       messageUri={proposesToCancelUri}
                       connectionUri={this.props.selectedConnectionUri}
                       ngRedux={store}
-                      ng-click="this.props.multiSelectType && this.selectMessage(proposesToCancelUri)"
+                      onClick={
+                        this.props.multiSelectType
+                          ? () => this.selectMessage(proposesToCancelUri)
+                          : undefined
+                      }
                     />
                   );
                 }
@@ -595,7 +607,11 @@ class AtomMessages extends React.Component {
                     messageUri={proposalUri}
                     connectionUri={this.props.selectedConnectionUri}
                     ngRedux={store}
-                    ng-click="this.props.multiSelectType && this.selectMessage(proposalUri)"
+                    onClick={
+                      this.props.multiSelectType
+                        ? () => this.selectMessage(proposalUri)
+                        : undefined
+                    }
                   />
                 );
               });
