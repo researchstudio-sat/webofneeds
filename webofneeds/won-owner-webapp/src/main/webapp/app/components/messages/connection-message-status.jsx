@@ -46,7 +46,7 @@ export default class WonConnectionMessageStatus extends React.Component {
     return {
       connection,
       message,
-      lastUpdateTime: state.get("lastUpdateTime"),
+      lastUpdateTime: get(state, "lastUpdateTime"),
     };
   }
 
@@ -112,7 +112,7 @@ export default class WonConnectionMessageStatus extends React.Component {
         <div className="msgstatus__time">
           {relativeTime(
             this.state.lastUpdateTime,
-            this.state.message.get("date")
+            get(this.state.message, "date")
           )}
         </div>
       );

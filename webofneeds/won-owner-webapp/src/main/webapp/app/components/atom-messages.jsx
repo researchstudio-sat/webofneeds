@@ -47,16 +47,13 @@ const mapStateToProps = (state, ownProps) => {
     state,
     selectedConnectionUri
   );
-  const connection =
-    ownedAtom && ownedAtom.getIn(["connections", selectedConnectionUri]);
-  const targetAtomUri = connection && connection.get("targetAtomUri");
-  const targetAtom = targetAtomUri && state.getIn(["atoms", targetAtomUri]);
+  const connection = getIn(ownedAtom, ["connections", selectedConnectionUri]);
+  const targetAtomUri = get(connection, "targetAtomUri");
+  const targetAtom = targetAtomUri && getIn(state, ["atoms", targetAtomUri]);
   const chatMessages =
-    connection &&
-    connection.get("messages") &&
-    connection
-      .get("messages")
-      .filter(msg => !msg.get("forwardMessage"))
+    get(connection, "messages") &&
+    get(connection, "messages")
+      .filter(msg => !get(msg, "forwardMessage"))
       .filter(msg => !messageUtils.isAtomHintMessage(msg))
       .filter(msg => !messageUtils.isSocketHintMessage(msg));
   const hasConnectionMessagesToLoad = hasMessagesToLoad(
@@ -64,8 +61,8 @@ const mapStateToProps = (state, ownProps) => {
     selectedConnectionUri
   );
 
-  const agreementData = connection && connection.get("agreementData");
-  const petriNetData = connection && connection.get("petriNetData");
+  const agreementData = get(connection, "agreementData");
+  const petriNetData = get(connection, "petriNetData");
 
   const agreementMessages = getAgreementMessagesByConnectionUri(
     state,
@@ -83,8 +80,8 @@ const mapStateToProps = (state, ownProps) => {
   let sortedMessages = chatMessages && chatMessages.toArray();
   sortedMessages &&
     sortedMessages.sort(function(a, b) {
-      const aDate = a.get("date");
-      const bDate = b.get("date");
+      const aDate = get(a, "date");
+      const bDate = get(b, "date");
 
       const aTime = aDate && aDate.getTime();
       const bTime = bDate && bDate.getTime();
@@ -99,15 +96,16 @@ const mapStateToProps = (state, ownProps) => {
 
   const chatMessagesWithUnknownState =
     chatMessages &&
-    chatMessages.filter(msg => !msg.get("isMessageStatusUpToDate"));
+    chatMessages.filter(msg => !get(msg, "isMessageStatusUpToDate"));
 
   const showChatData =
     connection &&
     !(
-      connection.get("showAgreementData") || connection.get("showPetriNetData")
+      get(connection, "showAgreementData") ||
+      get(connection, "showPetriNetData")
     );
 
-  const multiSelectType = connection && connection.get("multiSelectType");
+  const multiSelectType = get(connection, "multiSelectType");
 
   const process = get(state, "process");
 
@@ -120,7 +118,7 @@ const mapStateToProps = (state, ownProps) => {
     selectedConnectionUri,
     connection,
     sortedMessageUris: sortedMessages && [
-      ...sortedMessages.flatMap(msg => msg.get("uri")),
+      ...sortedMessages.flatMap(msg => get(msg, "uri")),
     ],
     chatMessages,
     chatMessagesWithUnknownState,
@@ -140,8 +138,8 @@ const mapStateToProps = (state, ownProps) => {
         process,
         selectedConnectionUri
       ),
-    showAgreementData: connection && connection.get("showAgreementData"),
-    showPetriNetData: connection && connection.get("showPetriNetData"),
+    showAgreementData: get(connection, "showAgreementData"),
+    showPetriNetData: get(connection, "showPetriNetData"),
     showChatData,
     agreementData,
     petriNetData,
@@ -159,28 +157,28 @@ const mapStateToProps = (state, ownProps) => {
         selectedConnectionUri
       ),
     multiSelectType,
-    lastUpdateTimestamp: connection && connection.get("lastUpdateDate"),
+    lastUpdateTimestamp: get(connection, "lastUpdateDate"),
     isSentRequest: connectionUtils.isRequestSent(connection),
     isReceivedRequest: connectionUtils.isRequestReceived(connection),
     isConnected: connectionUtils.isConnected(connection),
     isSuggested: connectionUtils.isSuggested(connection),
     debugmode: won.debugmode,
-    shouldShowRdf: state.getIn(["view", "showRdf"]),
+    shouldShowRdf: getIn(state, ["view", "showRdf"]),
     hasConnectionMessagesToLoad,
     hasAgreementMessages: agreementMessages && agreementMessages.size > 0,
     hasPetriNetData: petriNetData && petriNetData.size > 0,
-    agreementMessageUris: agreementMessages && agreementMessages.toArray(),
+    agreementMessageArray: agreementMessages && agreementMessages.toArray(),
     hasProposalMessages: proposalMessages && proposalMessages.size > 0,
-    proposalMessageUris: proposalMessages && proposalMessages.toArray(),
+    proposalMessageArray: proposalMessages && proposalMessages.toArray(),
     hasCancellationPendingMessages:
       cancellationPendingMessages && cancellationPendingMessages.size > 0,
-    cancellationPendingMessageUris:
+    cancellationPendingMessageArray:
       cancellationPendingMessages && cancellationPendingMessages.toArray(),
     connectionOrAtomsLoading:
       !connection ||
       !targetAtom ||
       !ownedAtom ||
-      processUtils.isAtomLoading(process, ownedAtom.get("uri")) ||
+      processUtils.isAtomLoading(process, get(ownedAtom, "uri")) ||
       processUtils.isAtomLoading(process, targetAtomUri) ||
       processUtils.isConnectionLoading(process, selectedConnectionUri),
     isConnectionLoading: processUtils.isConnectionLoading(
@@ -215,7 +213,7 @@ const mapDispatchToProps = dispatch => {
       dispatch(
         actionCreators.connections__showAgreementData({
           connectionUri: connectionUri,
-          showPetriNetData: showAgreementData,
+          showAgreementData: showAgreementData,
         })
       );
     },
@@ -340,27 +338,6 @@ const mapDispatchToProps = dispatch => {
   };
 };
 
-/*
-      OLD CODE from post-messages.js
-
-      this.$scope.$watchGroup(["self.connection"], () => {
-        this.ensureMessagesAreLoaded();
-        this.ensureAgreementDataIsLoaded();
-        this.ensurePetriNetDataIsLoaded();
-        this.ensureMessageStateIsUpToDate();
-      });
-
-      this.$scope.$watch(
-        () => this.sortedMessageUris && this.sortedMessageUris.length, // trigger if there's messages added (or removed)
-        () =>
-          delay(0).then(() =>
-            // scroll to bottom directly after rendering, if snapped
-            this.updateScrollposition()
-          )
-      );
-*/
-//TODO: load messages
-
 class AtomMessages extends React.Component {
   constructor(props) {
     super(props);
@@ -463,8 +440,10 @@ class AtomMessages extends React.Component {
                 />
                 <WonConnectionContextDropdown
                   ngRedux={store}
-                  showPetriNetDataField={this.showPetriNetDataField}
-                  showAgreementDataField={this.showAgreementDataField}
+                  showPetriNetDataField={this.showPetriNetDataField.bind(this)}
+                  showAgreementDataField={this.showAgreementDataField.bind(
+                    this
+                  )}
                 />
               </div>
             );
@@ -551,25 +530,27 @@ class AtomMessages extends React.Component {
                 </div>
                 <WonConnectionContextDropdown
                   ngRedux={store}
-                  showPetriNetDataField={this.showPetriNetDataField}
-                  showAgreementDataField={this.showAgreementDataField}
+                  showPetriNetDataField={this.showPetriNetDataField.bind(this)}
+                  showAgreementDataField={this.showAgreementDataField.bind(
+                    this
+                  )}
                 />
               </div>
             );
 
             const agreementMessages =
               !this.props.isProcessingLoadingAgreementData &&
-              this.props.agreementMessageUris &&
-              this.props.agreementMessageUris.map((agreementUri, index) => {
+              this.props.agreementMessageArray &&
+              this.props.agreementMessageArray.map((msg, index) => {
                 return (
                   <WonConnectionMessage
-                    key={agreementUri + "-" + index}
-                    messageUri={agreementUri}
+                    key={get(msg, "uri") + "-" + index}
+                    messageUri={get(msg, "uri")}
                     connectionUri={this.props.selectedConnectionUri}
                     ngRedux={store}
                     onClick={
                       this.props.multiSelectType
-                        ? () => this.selectMessage(agreementUri)
+                        ? () => this.selectMessage(get(msg, "uri"))
                         : undefined
                     }
                   />
@@ -578,38 +559,36 @@ class AtomMessages extends React.Component {
 
             const cancellationPendingMessages =
               !this.props.isProcessingLoadingAgreementData &&
-              this.props.cancellationPendingMessageUris &&
-              this.props.cancellationPendingMessageUris.map(
-                (proposesToCancelUri, index) => {
-                  return (
-                    <WonConnectionMessage
-                      key={proposesToCancelUri + "-" + index}
-                      messageUri={proposesToCancelUri}
-                      connectionUri={this.props.selectedConnectionUri}
-                      ngRedux={store}
-                      onClick={
-                        this.props.multiSelectType
-                          ? () => this.selectMessage(proposesToCancelUri)
-                          : undefined
-                      }
-                    />
-                  );
-                }
-              );
-
-            const proposalMessages =
-              !this.props.isProcessingLoadingAgreementData &&
-              this.props.proposalMessageUris &&
-              this.props.proposalMessageUris.map((proposalUri, index) => {
+              this.props.cancellationPendingMessageArray &&
+              this.props.cancellationPendingMessageArray.map((msg, index) => {
                 return (
                   <WonConnectionMessage
-                    key={proposalUri + "-" + index}
-                    messageUri={proposalUri}
+                    key={get(msg, "uri") + "-" + index}
+                    messageUri={get(msg, "uri")}
                     connectionUri={this.props.selectedConnectionUri}
                     ngRedux={store}
                     onClick={
                       this.props.multiSelectType
-                        ? () => this.selectMessage(proposalUri)
+                        ? () => this.selectMessage(get(msg, "uri"))
+                        : undefined
+                    }
+                  />
+                );
+              });
+
+            const proposalMessages =
+              !this.props.isProcessingLoadingAgreementData &&
+              this.props.proposalMessageArray &&
+              this.props.proposalMessageArray.map((msg, index) => {
+                return (
+                  <WonConnectionMessage
+                    key={get(msg, "uri") + "-" + index}
+                    messageUri={get(msg, "uri")}
+                    connectionUri={this.props.selectedConnectionUri}
+                    ngRedux={store}
+                    onClick={
+                      this.props.multiSelectType
+                        ? () => this.selectMessage(get(msg, "uri"))
                         : undefined
                     }
                   />
@@ -708,8 +687,10 @@ class AtomMessages extends React.Component {
                 </div>
                 <WonConnectionContextDropdown
                   ngRedux={store}
-                  showPetriNetDataField={this.showPetriNetDataField}
-                  showAgreementDataField={this.showAgreementDataField}
+                  showPetriNetDataField={this.showPetriNetDataField.bind(this)}
+                  showAgreementDataField={this.showAgreementDataField.bind(
+                    this
+                  )}
                 />
               </div>
             );
@@ -726,7 +707,7 @@ class AtomMessages extends React.Component {
                       key={get(process, "processURI") + "-" + index}
                     >
                       <div className="pm__content__petrinet__process__header">
-                        ProcessURI: {process.get("processURI")}
+                        ProcessURI: {get(process, "processURI")}
                       </div>
                       <WonPetrinetState
                         className="pm__content__petrinet__process__content"
@@ -886,9 +867,14 @@ class AtomMessages extends React.Component {
   }
 
   componentDidUpdate() {
-    if (this.state.snapBottom && this.state.showChatData) {
+    if (this.state.snapBottom && this.props.showChatData) {
       this.scrollToBottom();
     }
+
+    this.ensureMessagesAreLoaded();
+    this.ensureAgreementDataIsLoaded();
+    this.ensurePetriNetDataIsLoaded();
+    this.ensureMessageStateIsUpToDate();
   }
 
   showAgreementDataField() {
@@ -1168,9 +1154,9 @@ class AtomMessages extends React.Component {
         " Messages"
       );
       this.props.chatMessagesWithUnknownState.forEach(msg => {
-        let messageStatus = msg && msg.get("messageStatus");
-        const msgUri = msg.get("uri");
-        const remoteMsgUri = msg.get("remoteUri");
+        let messageStatus = get(msg, "messageStatus");
+        const msgUri = get(msg, "uri");
+        const remoteMsgUri = get(msg, "remoteUri");
 
         const acceptedUris = get(this.props.agreementData, "agreementUris");
         const rejectedUris = get(
@@ -1301,11 +1287,11 @@ AtomMessages.propTypes = {
   hasConnectionMessagesToLoad: PropTypes.bool,
   hasAgreementMessages: PropTypes.bool,
   hasPetriNetData: PropTypes.bool,
-  agreementMessageUris: PropTypes.arrayOf(PropTypes.string),
+  agreementMessageArray: PropTypes.arrayOf(PropTypes.object),
   hasProposalMessages: PropTypes.bool,
-  proposalMessageUris: PropTypes.arrayOf(PropTypes.string),
+  proposalMessageArray: PropTypes.arrayOf(PropTypes.object),
   hasCancellationPendingMessages: PropTypes.bool,
-  cancellationPendingMessageUris: PropTypes.arrayOf(PropTypes.string),
+  cancellationPendingMessageArray: PropTypes.arrayOf(PropTypes.object),
   connectionOrAtomsLoading: PropTypes.bool,
   isConnectionLoading: PropTypes.bool,
   showPostContentMessage: PropTypes.bool,
