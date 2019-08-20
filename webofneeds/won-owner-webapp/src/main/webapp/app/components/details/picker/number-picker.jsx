@@ -26,7 +26,7 @@ export default class WonNumberPicker extends React.Component {
             </svg>
           )}
           <input
-            type="text"
+            type="number"
             className="numberp__input__inner"
             placeholder={this.props.detail.placeholder}
             value={this.state.value}
