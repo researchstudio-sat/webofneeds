@@ -61,13 +61,12 @@ won-atom-messages {
   }
 
   .pm__content {
-  }
-  .pm__content {
     grid-area: main;
     padding: 0.5rem 0.5rem 0.5rem 0;
     background: white;
     border: $thinGrayBorder;
     overflow: auto;
+    scroll-behavior: smooth;
     flex-grow: 1;
 
     &__unreadindicator {

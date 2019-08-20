@@ -343,10 +343,6 @@ const mapDispatchToProps = dispatch => {
 /*
       OLD CODE from post-messages.js
 
-      this.scrollContainer().addEventListener("scroll", e => this.onScroll(e));
-
-      this._snapBottom = true; //Don't snap to bottom immediately, because this scrolls the whole page... somehow?
-
       this.$scope.$watchGroup(["self.connection"], () => {
         this.ensureMessagesAreLoaded();
         this.ensureAgreementDataIsLoaded();
@@ -364,9 +360,16 @@ const mapDispatchToProps = dispatch => {
       );
 */
 //TODO: load messages
-//TODO: scroll to bottom on new message when snapped to bottom
 
 class AtomMessages extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      snapBottom: true,
+    };
+    this.chatContainerRef = React.createRef();
+  }
+
   render() {
     return (
       <ReactReduxContext.Consumer>
@@ -390,7 +393,7 @@ class AtomMessages extends React.Component {
           );
 
           const unreadIndicatorElement =
-            this.props.unreadMessageCount && !self._snapBottom ? (
+            this.props.unreadMessageCount && !this.state.snapBottom ? (
               <div className="pm__content__unreadindicator">
                 <div
                   className="pm__content__unreadindicator__content won-button--filled red"
@@ -481,7 +484,11 @@ class AtomMessages extends React.Component {
               });
 
             contentElement = (
-              <div className="pm__content">
+              <div
+                className="pm__content"
+                ref={this.chatContainerRef}
+                onScroll={this.onScroll.bind(this)}
+              >
                 {unreadIndicatorElement}
                 {this.props.showPostContentMessage && (
                   <WonAtomContentMessage atomUri={this.props.targetAtomUri} />
@@ -594,7 +601,10 @@ class AtomMessages extends React.Component {
               });
 
             contentElement = (
-              <div className="pm__content won-agreement-content">
+              <div
+                className="pm__content won-agreement-content"
+                ref={this.chatContainerRef}
+              >
                 {unreadIndicatorElement}
                 {(this.props.isConnectionLoading ||
                   this.props.isProcessingLoadingMessages ||
@@ -713,7 +723,10 @@ class AtomMessages extends React.Component {
               });
 
             contentElement = (
-              <div className="pm__content won-petrinet-content">
+              <div
+                className="pm__content won-petrinet-content"
+                ref={this.chatContainerRef}
+              >
                 {unreadIndicatorElement}
                 {(this.props.isConnectionLoading ||
                   this.props.isProcessingLoadingMessages ||
@@ -856,6 +869,12 @@ class AtomMessages extends React.Component {
     );
   }
 
+  componentDidUpdate() {
+    if (this.state.snapBottom && this.state.showChatData) {
+      this.scrollToBottom();
+    }
+  }
+
   showAgreementDataField() {
     this.props.setShowPetriNetData(this.props.selectedConnectionUri, false);
     this.props.setShowAgreementData(this.props.selectedConnectionUri, true);
@@ -877,53 +896,37 @@ class AtomMessages extends React.Component {
   }
 
   snapToBottom() {
-    //TODO
-    console.debug("called snapToBottom, needs to be implemented still");
-    this._snapBottom = true;
+    if (!this.state.snapBottom) {
+      this.setState({ snapBottom: true });
+    }
     this.scrollToBottom();
   }
   unsnapFromBottom() {
-    //TODO
-    console.debug("called unsnapFromBottom, needs to be implemented still");
-    this._snapBottom = false;
+    this.setState({ snapBottom: false });
   }
   updateScrollposition() {
-    //TODO
-    console.debug("called updateScrollposition, needs to be implemented still");
-    if (this._snapBottom) {
+    if (this.state.snapBottom) {
       this.scrollToBottom();
     }
   }
   scrollToBottom() {
-    //TODO
-    console.debug("called scrollToBottom, needs to be implemented still");
-    this._programmaticallyScrolling = true;
-
-    this.scrollContainer().scrollTop = this.scrollContainer().scrollHeight;
+    this.chatContainerRef.current.scrollTop = this.chatContainerRef.current.scrollHeight;
   }
   onScroll() {
-    //TODO
-    console.debug("called onScroll, needs to be implemented still");
+    //TODO IMPL PROGRAMMATIC SCROLLING
+    /*console.debug("called onScroll, needs to be implemented still");
     if (!this._programmaticallyScrolling) {
       //only unsnap if the user scrolled themselves
       this.unsnapFromBottom();
     }
 
-    const sc = this.scrollContainer();
+    const sc = this.chatContainerRef.current;
     const isAtBottom = sc.scrollTop + sc.offsetHeight >= sc.scrollHeight;
     if (isAtBottom) {
       this.snapToBottom();
     }
 
-    this._programmaticallyScrolling = false;
-  }
-  scrollContainer() {
-    //TODO
-    console.debug("called scrollContainer, needs to be implemented still");
-    if (!this._scrollContainer) {
-      this._scrollContainer = this.$element[0].querySelector(".pm__content");
-    }
-    return this._scrollContainer;
+    this._programmaticallyScrolling = false;*/
   }
 
   send(chatMessage, additionalContent, referencedContent, isTTL = false) {
