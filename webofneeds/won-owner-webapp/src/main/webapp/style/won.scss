@@ -167,8 +167,25 @@ body {
         background: white;
       }
 
+      //FIXME: This can be removed once the pages are react components
+      > won-preact.atomMessages {
+        display: block;
+        height: calc(100vh - var(--headerHeight) - var(--menuHeight));
+        > won-atom-messages {
+          height: 100%;
+        }
+      }
+      //FIXME: This can be removed once the pages are react components
+      > won-preact.groupAtomMessages {
+        display: block;
+        height: calc(100vh - var(--headerHeight) - var(--menuHeight));
+
+        > won-group-atom-messages {
+          height: 100%;
+        }
+      }
+
       > won-group-post-messages,
-      > won-preact.atomMessages,
       > won-atom-messages {
         height: calc(100vh - var(--headerHeight) - var(--menuHeight));
       }

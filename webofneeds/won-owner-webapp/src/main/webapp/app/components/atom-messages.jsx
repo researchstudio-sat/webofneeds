@@ -11,7 +11,7 @@ import {
   getProposalMessagesByConnectionUri,
   getUnreadMessagesByConnectionUri,
 } from "../redux/selectors/message-selectors";
-import { get } from "../utils";
+import { get, getIn } from "../utils";
 import * as processUtils from "../redux/utils/process-utils.js";
 import * as connectionUtils from "../redux/utils/connection-utils.js";
 import won from "../won-es6.js";
@@ -25,8 +25,10 @@ import ChatTextfield from "./chat-textfield.jsx";
 import WonLabelledHr from "./labelled-hr.jsx";
 import WonPetrinetState from "./petrinet-state.jsx";
 import WonAtomContentMessage from "./messages/atom-content-message.jsx";
-import WonConnectionMessage from "./messages/connection-message";
-import { actionCreators } from "../actions/actions";
+import WonConnectionMessage from "./messages/connection-message.jsx";
+import { actionCreators } from "../actions/actions.js";
+import * as ownerApi from "../api/owner-api.js";
+import Immutable from "immutable";
 
 const rdfTextfieldHelpText =
   "Expects valid turtle. " +
@@ -198,15 +200,177 @@ const mapDispatchToProps = dispatch => {
     routerGoCurrent: props => {
       dispatch(actionCreators.router__stateGoCurrent(props));
     },
+    routerGoResetParams: path => {
+      dispatch(actionCreators.router__stateGoResetParams(path));
+    },
+    setShowPetriNetData: (connectionUri, showPetriNetData) => {
+      dispatch(
+        actionCreators.connections__showPetriNetData({
+          connectionUri: connectionUri,
+          showPetriNetData: showPetriNetData,
+        })
+      );
+    },
+    setShowAgreementData: (connectionUri, showAgreementData) => {
+      dispatch(
+        actionCreators.connections__showAgreementData({
+          connectionUri: connectionUri,
+          showPetriNetData: showAgreementData,
+        })
+      );
+    },
+    setLoadingAgreementData: (connectionUri, loadingAgreementData) => {
+      dispatch(
+        actionCreators.connections__setLoadingAgreementData({
+          connectionUri: connectionUri,
+          loadingAgreementData: loadingAgreementData,
+        })
+      );
+    },
+    setLoadingPetriNetData: (connectionUri, loadingPetriNetData) => {
+      dispatch(
+        actionCreators.connections__setLoadingPetriNetData({
+          connectionUri: connectionUri,
+          loadingPetriNetData: loadingPetriNetData,
+        })
+      );
+    },
+    hideAddMessageContent: () => {
+      dispatch(actionCreators.view__hideAddMessageContent());
+    },
+    sendChatMessage: (
+      trimmedMsg,
+      additionalContent,
+      referencedContent,
+      connectionUri,
+      isTTL
+    ) => {
+      dispatch(
+        actionCreators.connections__sendChatMessage(
+          trimmedMsg,
+          additionalContent,
+          referencedContent,
+          connectionUri,
+          isTTL
+        )
+      );
+    },
+    openRequest: (connectionUri, message) => {
+      dispatch(actionCreators.connections__open(connectionUri, message));
+    },
+    rateConnection: (connectionUri, rating) => {
+      dispatch(actionCreators.connections__rate(connectionUri, rating));
+    },
+    closeConnection: connectionUri => {
+      dispatch(actionCreators.connections__close(connectionUri));
+    },
+    selectMessage: (messageUri, connectionUri, atomUri, isSelected) => {
+      dispatch(
+        actionCreators.messages__viewState__markAsSelected({
+          messageUri: messageUri,
+          connectionUri: connectionUri,
+          atomUri: atomUri,
+          isSelected: isSelected,
+        })
+      );
+    },
+    processAgreementMessage: message => {
+      dispatch(actionCreators.messages__processAgreementMessage(message));
+    },
+    updateMessageStatus: (
+      messageUri,
+      connectionUri,
+      atomUri,
+      messageStatus
+    ) => {
+      dispatch(
+        actionCreators.messages__updateMessageStatus({
+          messageUri: messageUri,
+          connectionUri: connectionUri,
+          atomUri: atomUri,
+          messageStatus: messageStatus,
+        })
+      );
+    },
+    updateAgreementData: (connectionUri, agreementDataImm) => {
+      dispatch(
+        actionCreators.connections__updateAgreementData({
+          connectionUri: connectionUri,
+          agreementData: agreementDataImm,
+        })
+      );
+    },
+    updatePetriNetData: (connectionUri, petriNetDataImm) => {
+      dispatch(
+        actionCreators.connections__updatePetriNetData({
+          connectionUri: connectionUri,
+          petriNetData: petriNetDataImm,
+        })
+      );
+    },
+    connectAdHoc: (targetAtomUri, message, persona) => {
+      dispatch(
+        actionCreators.connections__connectAdHoc(
+          targetAtomUri,
+          message,
+          persona
+        )
+      );
+    },
+    connect: (ownedAtomUri, connectionUri, targetAtomUri, message) => {
+      dispatch(
+        actionCreators.atoms__connect(
+          ownedAtomUri,
+          connectionUri,
+          targetAtomUri,
+          message
+        )
+      );
+    },
+    showMoreMessages: (connectionUri, msgCount) => {
+      dispatch(
+        actionCreators.connections__showMoreMessages(connectionUri, msgCount)
+      );
+    },
+    showLatestMessages: (connectionUri, msgCount) => {
+      dispatch(
+        actionCreators.connections__showLatestMessages(connectionUri, msgCount)
+      );
+    },
   };
 };
+
+/*
+      OLD CODE from post-messages.js
+
+      this.scrollContainer().addEventListener("scroll", e => this.onScroll(e));
+
+      this._snapBottom = true; //Don't snap to bottom immediately, because this scrolls the whole page... somehow?
+
+      this.$scope.$watchGroup(["self.connection"], () => {
+        this.ensureMessagesAreLoaded();
+        this.ensureAgreementDataIsLoaded();
+        this.ensurePetriNetDataIsLoaded();
+        this.ensureMessageStateIsUpToDate();
+      });
+
+      this.$scope.$watch(
+        () => this.sortedMessageUris && this.sortedMessageUris.length, // trigger if there's messages added (or removed)
+        () =>
+          delay(0).then(() =>
+            // scroll to bottom directly after rendering, if snapped
+            this.updateScrollposition()
+          )
+      );
+*/
+//TODO: load messages
+//TODO: scroll to bottom on new message when snapped to bottom
 
 class AtomMessages extends React.Component {
   render() {
     return (
       <ReactReduxContext.Consumer>
         {({ store }) => {
-          //TODO
           let headerElement = undefined;
           let contentElement = undefined;
           let footerElement = undefined;
@@ -348,7 +512,12 @@ class AtomMessages extends React.Component {
                 <div className="pm__header__back">
                   <a
                     className="pm__header__back__button clickable"
-                    onClick={() => this.setShowAgreementData(false)}
+                    onClick={() =>
+                      this.props.setShowAgreementData(
+                        this.props.selectedConnectionUri,
+                        false
+                      )
+                    }
                   >
                     <svg className="pm__header__back__button__icon clickable">
                       <use
@@ -360,7 +529,12 @@ class AtomMessages extends React.Component {
                 </div>
                 <div
                   className="pm__header__title clickable"
-                  onClick={() => this.setShowAgreementData(false)}
+                  onClick={() =>
+                    this.props.setShowAgreementData(
+                      this.props.selectedConnectionUri,
+                      false
+                    )
+                  }
                 >
                   Showing Agreement Data
                 </div>
@@ -419,7 +593,6 @@ class AtomMessages extends React.Component {
                 );
               });
 
-            //TODO IMPL
             contentElement = (
               <div className="pm__content won-agreement-content">
                 {unreadIndicatorElement}
@@ -481,7 +654,12 @@ class AtomMessages extends React.Component {
                 <div className="pm__header__back">
                   <a
                     className="pm__header__back__button clickable"
-                    onClick={() => this.setShowPetriNetData(false)}
+                    onClick={() =>
+                      this.props.setShowPetriNetData(
+                        this.props.selectedConnectionUri,
+                        false
+                      )
+                    }
                   >
                     <svg className="pm__header__back__button__icon clickable">
                       <use
@@ -493,7 +671,12 @@ class AtomMessages extends React.Component {
                 </div>
                 <div
                   className="pm__header__title clickable"
-                  onClick={() => this.setShowPetriNetData(false)}
+                  onClick={() =>
+                    this.props.setShowPetriNetData(
+                      this.props.selectedConnectionUri,
+                      false
+                    )
+                  }
                 >
                   Showing PetriNet Data
                 </div>
@@ -606,7 +789,12 @@ class AtomMessages extends React.Component {
                       submitButtonLabel="Accept&#160;Chat"
                       allowEmptySubmit={true}
                       allowDetails={false}
-                      onSubmit={({ value }) => this.openRequest(value)}
+                      onSubmit={({ value }) =>
+                        this.props.openRequest(
+                          this.props.selectedConnectionUri,
+                          value
+                        )
+                      }
                     />
                     <WonLabelledHr
                       className="pm__footer__labelledhr"
@@ -669,30 +857,394 @@ class AtomMessages extends React.Component {
   }
 
   showAgreementDataField() {
-    //TODO
-    this.setShowPetriNetData(false);
-    this.setShowAgreementData(true);
+    this.props.setShowPetriNetData(this.props.selectedConnectionUri, false);
+    this.props.setShowAgreementData(this.props.selectedConnectionUri, true);
   }
 
   showPetriNetDataField() {
-    //TODO
-    this.setShowAgreementData(false);
-    this.setShowPetriNetData(true);
+    this.props.setShowAgreementData(this.props.selectedConnectionUri, false);
+    this.props.setShowPetriNetData(this.props.selectedConnectionUri, true);
   }
-  setShowAgreementData(value) {
+
+  goToUnreadMessages() {
+    if (this.props.showAgreementData) {
+      this.props.setShowAgreementData(this.props.selectedConnectionUri, false);
+    }
+    if (this.props.showPetriNetData) {
+      this.props.setShowPetriNetData(this.props.selectedConnectionUri, false);
+    }
+    this.snapToBottom();
+  }
+
+  snapToBottom() {
     //TODO
-    this.connections__showAgreementData({
-      connectionUri: this.selectedConnectionUri,
-      showAgreementData: value,
+    console.debug("called snapToBottom, needs to be implemented still");
+    this._snapBottom = true;
+    this.scrollToBottom();
+  }
+  unsnapFromBottom() {
+    //TODO
+    console.debug("called unsnapFromBottom, needs to be implemented still");
+    this._snapBottom = false;
+  }
+  updateScrollposition() {
+    //TODO
+    console.debug("called updateScrollposition, needs to be implemented still");
+    if (this._snapBottom) {
+      this.scrollToBottom();
+    }
+  }
+  scrollToBottom() {
+    //TODO
+    console.debug("called scrollToBottom, needs to be implemented still");
+    this._programmaticallyScrolling = true;
+
+    this.scrollContainer().scrollTop = this.scrollContainer().scrollHeight;
+  }
+  onScroll() {
+    //TODO
+    console.debug("called onScroll, needs to be implemented still");
+    if (!this._programmaticallyScrolling) {
+      //only unsnap if the user scrolled themselves
+      this.unsnapFromBottom();
+    }
+
+    const sc = this.scrollContainer();
+    const isAtBottom = sc.scrollTop + sc.offsetHeight >= sc.scrollHeight;
+    if (isAtBottom) {
+      this.snapToBottom();
+    }
+
+    this._programmaticallyScrolling = false;
+  }
+  scrollContainer() {
+    //TODO
+    console.debug("called scrollContainer, needs to be implemented still");
+    if (!this._scrollContainer) {
+      this._scrollContainer = this.$element[0].querySelector(".pm__content");
+    }
+    return this._scrollContainer;
+  }
+
+  send(chatMessage, additionalContent, referencedContent, isTTL = false) {
+    this.props.setShowAgreementData(this.props.selectedConnectionUri, false);
+    this.props.hideAddMessageContent();
+
+    const trimmedMsg = chatMessage.trim();
+    if (trimmedMsg || additionalContent || referencedContent) {
+      this.props.sendChatMessage(
+        trimmedMsg,
+        additionalContent,
+        referencedContent,
+        get(this.props.connection, "uri"),
+        isTTL
+      );
+    }
+  }
+
+  addMessageToState(eventUri, key) {
+    const ownedAtomUri = get(this.props.ownedAtom, "uri");
+    return ownerApi.getMessage(ownedAtomUri, eventUri).then(response => {
+      won.wonMessageFromJsonLd(response).then(msg => {
+        if (msg.isFromOwner() && msg.getRecipientAtom() === ownedAtomUri) {
+          /*if we find out that the recipientatom of the crawled event is actually our
+            atom we will call the method again but this time with the correct eventUri
+          */
+          this.addMessageToState(msg.getRemoteMessageUri(), key);
+        } else {
+          //If message isnt in the state we add it
+          if (!get(this.props.chatMessages, eventUri)) {
+            this.props.processAgreementMessage(msg);
+          }
+        }
+      });
     });
   }
 
-  setShowPetriNetData(value) {
-    //TODO
-    this.connections__showPetriNetData({
-      connectionUri: this.selectedConnectionUri,
-      showPetriNetData: value,
-    });
+  sendRequest(message, persona) {
+    if (!this.props.connection) {
+      this.props.routerGoResetParams("connections");
+
+      if (this.props.targetAtomUri) {
+        this.props.connectAdHoc(this.props.targetAtomUri, message, persona);
+      }
+    } else {
+      this.props.rateConnection(
+        this.props.selectedConnectionUri,
+        won.WONCON.binaryRatingGood
+      );
+      this.props.connect(
+        get(this.props.ownedAtom, "uri"),
+        this.props.selectedConnectionUri,
+        this.props.targetAtomUri,
+        message
+      );
+      if (this.showOverlayConnection) {
+        this.props.routerBack();
+      } else {
+        this.props.routerGoCurrent({
+          connectionUri: this.props.selectedConnectionUri,
+        });
+      }
+    }
+  }
+
+  closeConnection(rateBad = false) {
+    if (rateBad) {
+      this.props.rateConnection(
+        get(this.props.connection, "uri"),
+        won.WONCON.binaryRatingBad
+      );
+    }
+    this.props.closeConnection(get(this.props.connection, "uri"));
+
+    if (this.showOverlayConnection) {
+      this.props.routerBack();
+    } else {
+      this.props.routerGoCurrent({ connectionUri: null });
+    }
+  }
+
+  selectMessage(msgUri) {
+    const msg = getIn(this.props.connection, ["messages", msgUri]);
+
+    if (msg) {
+      this.props.selectMessage(
+        msgUri,
+        get(this.props.connection, "uri"),
+        get(this.props.ownedAtom, "uri"),
+        !getIn(msg, ["viewState", "isSelected"])
+      );
+    }
+  }
+
+  ensureMessagesAreLoaded() {
+    // make sure latest messages are loaded
+    const INITIAL_MESSAGECOUNT = 15;
+    if (
+      this.props.connection &&
+      !this.props.isConnectionLoading &&
+      !this.props.isProcessingLoadingMessages &&
+      get(this.props.connection, "messages").size < INITIAL_MESSAGECOUNT &&
+      this.props.hasConnectionMessagesToLoad
+    ) {
+      this.props.showLatestMessages(
+        get(this.props.connection, "uri"),
+        INITIAL_MESSAGECOUNT
+      );
+    }
+  }
+
+  ensurePetriNetDataIsLoaded(forceFetch = false) {
+    if (
+      forceFetch ||
+      (this.props.isConnected &&
+        !this.props.isProcessingLoadingPetriNetData &&
+        !this.props.petriNetDataLoaded)
+    ) {
+      const connectionUri = get(this.props.connection, "uri");
+
+      this.props.setLoadingPetriNetData(connectionUri, true);
+
+      ownerApi
+        .getPetriNetUris(connectionUri)
+        .then(response => {
+          const petriNetData = {};
+
+          response.forEach(entry => {
+            if (entry.processURI) {
+              petriNetData[entry.processURI] = entry;
+            }
+          });
+
+          const petriNetDataImm = Immutable.fromJS(petriNetData);
+          this.props.updatePetriNetData(connectionUri, petriNetDataImm);
+        })
+        .catch(error => {
+          console.error("Error:", error);
+          this.props.setLoadingPetriNetData(connectionUri, false);
+        });
+    }
+  }
+
+  ensureAgreementDataIsLoaded(forceFetch = false) {
+    if (
+      forceFetch ||
+      (this.props.isConnected &&
+        !this.props.isProcessingLoadingAgreementData &&
+        !this.props.agreementDataLoaded)
+    ) {
+      this.props.setLoadingAgreementData(
+        this.props.selectedConnectionUri,
+        true
+      );
+      ownerApi
+        .getAgreementProtocolUris(get(this.props.connection, "uri"))
+        .then(response => {
+          let proposedMessageUris = [];
+          const pendingProposals = response.pendingProposals;
+
+          if (pendingProposals) {
+            pendingProposals.forEach(prop => {
+              if (prop.proposes) {
+                proposedMessageUris = proposedMessageUris.concat(prop.proposes);
+              }
+            });
+          }
+
+          const agreementDataImm = Immutable.fromJS({
+            agreementUris: Immutable.Set(response.agreementUris),
+            pendingProposalUris: Immutable.Set(response.pendingProposalUris),
+            acceptedCancellationProposalUris: Immutable.Set(
+              response.acceptedCancellationProposalUris
+            ),
+            cancellationPendingAgreementUris: Immutable.Set(
+              response.cancellationPendingAgreementUris
+            ),
+            pendingCancellationProposalUris: Immutable.Set(
+              response.pendingCancellationProposalUris
+            ),
+            cancelledAgreementUris: Immutable.Set(
+              response.cancelledAgreementUris
+            ),
+            rejectedMessageUris: Immutable.Set(response.rejectedMessageUris),
+            retractedMessageUris: Immutable.Set(response.retractedMessageUris),
+            proposedMessageUris: Immutable.Set(proposedMessageUris),
+            claimedMessageUris: Immutable.Set(response.claimedMessageUris),
+          });
+
+          this.props.updateAgreementData(
+            this.props.selectedConnectionUri,
+            agreementDataImm
+          );
+
+          //Retrieve all the relevant messages
+          agreementDataImm.map((uriList, key) =>
+            uriList.map(uri => this.addMessageToState(uri, key))
+          );
+        })
+        .catch(error => {
+          console.error("Error:", error);
+          this.props.setLoadingAgreementData(
+            this.props.selectedConnectionUri,
+            false
+          );
+        });
+    }
+  }
+
+  ensureMessageStateIsUpToDate() {
+    if (
+      this.props.isConnected &&
+      !this.props.isConnectionLoading &&
+      !this.props.isProcessingLoadingAgreementData &&
+      !this.props.isProcessingLoadingMessages &&
+      this.props.agreementDataLoaded &&
+      this.props.chatMessagesWithUnknownState &&
+      this.props.chatMessagesWithUnknownState.size > 0
+    ) {
+      console.debug(
+        "Ensure Message Status is up-to-date for: ",
+        this.props.chatMessagesWithUnknownState.size,
+        " Messages"
+      );
+      this.props.chatMessagesWithUnknownState.forEach(msg => {
+        let messageStatus = msg && msg.get("messageStatus");
+        const msgUri = msg.get("uri");
+        const remoteMsgUri = msg.get("remoteUri");
+
+        const acceptedUris = get(this.props.agreementData, "agreementUris");
+        const rejectedUris = get(
+          this.props.agreementData,
+          "rejectedMessageUris"
+        );
+
+        const retractedUris = get(
+          this.props.agreementData,
+          "retractedMessageUris"
+        );
+        const cancelledUris = get(
+          this.props.agreementData,
+          "cancelledAgreementUris"
+        );
+        const cancellationPendingUris = get(
+          this.props.agreementData,
+          "cancellationPendingAgreementUris"
+        );
+        const claimedUris = get(this.props.agreementData, "claimedMessageUris");
+        const proposedUris = get(
+          this.props.agreementData,
+          "proposedMessageUris"
+        );
+
+        const isProposed = get(messageStatus, "isProposed");
+        const isClaimed = get(messageStatus, "isClaimed");
+        const isAccepted = get(messageStatus, "isAccepted");
+        const isRejected = get(messageStatus, "isRejected");
+        const isRetracted = get(messageStatus, "isRetracted");
+        const isCancelled = get(messageStatus, "isCancelled");
+        const isCancellationPending = get(
+          messageStatus,
+          "isCancellationPending"
+        );
+
+        const isOldProposed = !!(
+          get(proposedUris, msgUri) || get(proposedUris, remoteMsgUri)
+        );
+        const isOldClaimed = !!(
+          get(claimedUris, msgUri) || get(claimedUris, remoteMsgUri)
+        );
+        const isOldAccepted = !!(
+          get(acceptedUris, msgUri) || get(acceptedUris, remoteMsgUri)
+        );
+        const isOldRejected = !!(
+          get(rejectedUris, msgUri) || get(rejectedUris, remoteMsgUri)
+        );
+        const isOldRetracted = !!(
+          get(retractedUris, msgUri) || get(retractedUris, remoteMsgUri)
+        );
+        const isOldCancelled = !!(
+          get(cancelledUris, msgUri) || get(cancelledUris, remoteMsgUri)
+        );
+        const isOldCancellationPending = !!(
+          get(cancellationPendingUris, msgUri) ||
+          get(cancellationPendingUris, remoteMsgUri)
+        );
+
+        messageStatus = messageStatus
+          .set("isProposed", isProposed || isOldProposed)
+          .set("isClaimed", isClaimed || isOldClaimed)
+          .set("isAccepted", isAccepted || isOldAccepted)
+          .set("isRejected", isRejected || isOldRejected)
+          .set("isRetracted", isRetracted || isOldRetracted)
+          .set("isCancelled", isCancelled || isOldCancelled)
+          .set(
+            "isCancellationPending",
+            isCancellationPending || isOldCancellationPending
+          );
+
+        this.props.updateMessageStatus(
+          msgUri,
+          this.props.selectedConnectionUri,
+          get(this.props.ownedAtom, "uri"),
+          messageStatus
+        );
+      });
+    }
+  }
+
+  loadPreviousMessages() {
+    const MORE_MESSAGECOUNT = 5;
+    if (
+      this.props.connection &&
+      !this.props.isConnectionLoading &&
+      !this.props.isProcessingLoadingMessages
+    ) {
+      this.props.showMoreMessages(
+        get(this.props.connection, "uri"),
+        MORE_MESSAGECOUNT
+      );
+    }
   }
 }
 
@@ -705,8 +1257,8 @@ AtomMessages.propTypes = {
   selectedConnectionUri: PropTypes.string,
   connection: PropTypes.object,
   sortedMessageUris: PropTypes.arrayOf(PropTypes.string),
-  chatMessages: PropTypes.arrayOf(PropTypes.object),
-  chatMessagesWithUnknownState: PropTypes.arrayOf(PropTypes.object),
+  chatMessages: PropTypes.object,
+  chatMessagesWithUnknownState: PropTypes.object,
   unreadMessageCount: PropTypes.number,
   isProcessingLoadingMessages: PropTypes.bool,
   isProcessingLoadingAgreementData: PropTypes.bool,
@@ -741,6 +1293,25 @@ AtomMessages.propTypes = {
   showOverlayConnection: PropTypes.bool,
   routerBack: PropTypes.func,
   routerGoCurrent: PropTypes.func,
+  routerGoResetParams: PropTypes.func,
+  setShowPetriNetData: PropTypes.func,
+  setShowAgreementData: PropTypes.func,
+  hideAddMessageContent: PropTypes.func,
+  sendChatMessage: PropTypes.func,
+  connect: PropTypes.func,
+  connectAdHoc: PropTypes.func,
+  openRequest: PropTypes.func,
+  rateConnection: PropTypes.func,
+  closeConnection: PropTypes.func,
+  selectMessage: PropTypes.func,
+  processAgreementMessage: PropTypes.func,
+  setLoadingAgreementData: PropTypes.func,
+  setLoadingPetriNetData: PropTypes.func,
+  updateMessageStatus: PropTypes.func,
+  updatePetriNetData: PropTypes.func,
+  updateAgreementData: PropTypes.func,
+  showMoreMessages: PropTypes.func,
+  showLatestMessages: PropTypes.func,
 };
 
 export default connect(
