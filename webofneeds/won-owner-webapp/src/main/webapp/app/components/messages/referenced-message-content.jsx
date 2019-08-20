@@ -128,6 +128,7 @@ export default class WonReferencedMessageContent extends React.Component {
           this.state.claimUrisArray &&
           this.state.claimUrisArray.map(msgUri => {
             <WonCombinedMessageContent
+              key={msgUri}
               messageUri={get(this.getReferencedMessage(msgUri), "uri")}
               connectionUri={get(this.state.connection, "uri")}
               ngRedux={this.props.ngRedux}
@@ -188,6 +189,7 @@ export default class WonReferencedMessageContent extends React.Component {
           this.state.acceptUrisArray &&
           this.state.acceptUrisArray.map(msgUri => {
             <WonCombinedMessageContent
+              key={msgUri}
               messageUri={get(this.getReferencedMessage(msgUri), "uri")}
               connectionUri={get(this.state.connection, "uri")}
               ngRedux={this.props.ngRedux}
@@ -248,6 +250,7 @@ export default class WonReferencedMessageContent extends React.Component {
           this.state.retractUrisArray &&
           this.state.retractUrisArray.map(msgUri => {
             <WonCombinedMessageContent
+              key={msgUri}
               messageUri={get(this.getReferencedMessage(msgUri), "uri")}
               connectionUri={get(this.state.connection, "uri")}
               ngRedux={this.props.ngRedux}
@@ -308,6 +311,7 @@ export default class WonReferencedMessageContent extends React.Component {
           this.state.rejectUrisArray &&
           this.state.rejectUrisArray.map(msgUri => {
             <WonCombinedMessageContent
+              key={msgUri}
               messageUri={get(this.getReferencedMessage(msgUri), "uri")}
               connectionUri={get(this.state.connection, "uri")}
               ngRedux={this.props.ngRedux}
@@ -368,6 +372,7 @@ export default class WonReferencedMessageContent extends React.Component {
           this.state.proposeUrisArray &&
           this.state.proposeUrisArray.map(msgUri => {
             <WonCombinedMessageContent
+              key={msgUri}
               messageUri={get(this.getReferencedMessage(msgUri), "uri")}
               connectionUri={get(this.state.connection, "uri")}
               ngRedux={this.props.ngRedux}
@@ -428,6 +433,7 @@ export default class WonReferencedMessageContent extends React.Component {
           this.state.proposeToCancelUrisArray &&
           this.state.proposeToCancelUrisArray.map(msgUri => {
             <WonCombinedMessageContent
+              key={msgUri}
               messageUri={get(this.getReferencedMessage(msgUri), "uri")}
               connectionUri={get(this.state.connection, "uri")}
               ngRedux={this.props.ngRedux}
@@ -490,6 +496,7 @@ export default class WonReferencedMessageContent extends React.Component {
           this.state.forwardUrisArray &&
           this.state.forwardUrisArray.map(msgUri => {
             <WonCombinedMessageContent
+              key={msgUri}
               messageUri={get(this.getReferencedMessage(msgUri), "uri")}
               connectionUri={get(this.state.connection, "uri")}
               ngRedux={this.props.ngRedux}

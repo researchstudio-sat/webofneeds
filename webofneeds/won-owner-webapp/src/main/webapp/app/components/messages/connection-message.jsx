@@ -366,7 +366,7 @@ export default class WonConnectionMessage extends React.Component {
   }
 
   generateCollapsedLabel() {
-    if (this.message) {
+    if (this.state.message) {
       let label;
 
       if (this.state.isClaimed) label = "Message was claimed.";
@@ -431,7 +431,7 @@ export default class WonConnectionMessage extends React.Component {
     this.props.ngRedux.dispatch(
       actionCreators.messages__viewState__markShowActions({
         messageUri: get(this.state.message, "uri"),
-        connectionUri: this.state.connectionUri,
+        connectionUri: this.connectionUri,
         atomUri: get(this.state.ownedAtom, "uri"),
         showActions: !this.state.showActions,
       })
