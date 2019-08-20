@@ -126,7 +126,7 @@ export default class WonReferencedMessageContent extends React.Component {
       if (this.isReferenceExpanded("claims")) {
         const messageElements =
           this.state.claimUrisArray &&
-          this.state.claimUrisArray.map(msgUri => {
+          this.state.claimUrisArray.map(msgUri => (
             <WonCombinedMessageContent
               key={msgUri}
               messageUri={get(this.getReferencedMessage(msgUri), "uri")}
@@ -143,8 +143,8 @@ export default class WonReferencedMessageContent extends React.Component {
                   : "")
               }
               onClick={() => this.loadMessage(msgUri)}
-            />;
-          });
+            />
+          ));
 
         fragmentBody = (
           <div className="refmsgcontent__fragment__body">{messageElements}</div>
@@ -187,7 +187,7 @@ export default class WonReferencedMessageContent extends React.Component {
       if (this.isReferenceExpanded("accepts")) {
         const messageElements =
           this.state.acceptUrisArray &&
-          this.state.acceptUrisArray.map(msgUri => {
+          this.state.acceptUrisArray.map(msgUri => (
             <WonCombinedMessageContent
               key={msgUri}
               messageUri={get(this.getReferencedMessage(msgUri), "uri")}
@@ -204,8 +204,8 @@ export default class WonReferencedMessageContent extends React.Component {
                   : "")
               }
               onClick={() => this.loadMessage(msgUri)}
-            />;
-          });
+            />
+          ));
 
         fragmentBody = (
           <div className="refmsgcontent__fragment__body">{messageElements}</div>
@@ -248,7 +248,7 @@ export default class WonReferencedMessageContent extends React.Component {
       if (this.isReferenceExpanded("retracts")) {
         const messageElements =
           this.state.retractUrisArray &&
-          this.state.retractUrisArray.map(msgUri => {
+          this.state.retractUrisArray.map(msgUri => (
             <WonCombinedMessageContent
               key={msgUri}
               messageUri={get(this.getReferencedMessage(msgUri), "uri")}
@@ -265,8 +265,8 @@ export default class WonReferencedMessageContent extends React.Component {
                   : "")
               }
               onClick={() => this.loadMessage(msgUri)}
-            />;
-          });
+            />
+          ));
 
         fragmentBody = (
           <div className="refmsgcontent__fragment__body">{messageElements}</div>
@@ -309,7 +309,7 @@ export default class WonReferencedMessageContent extends React.Component {
       if (this.isReferenceExpanded("rejects")) {
         const messageElements =
           this.state.rejectUrisArray &&
-          this.state.rejectUrisArray.map(msgUri => {
+          this.state.rejectUrisArray.map(msgUri => (
             <WonCombinedMessageContent
               key={msgUri}
               messageUri={get(this.getReferencedMessage(msgUri), "uri")}
@@ -326,8 +326,8 @@ export default class WonReferencedMessageContent extends React.Component {
                   : "")
               }
               onClick={() => this.loadMessage(msgUri)}
-            />;
-          });
+            />
+          ));
 
         fragmentBody = (
           <div className="refmsgcontent__fragment__body">{messageElements}</div>
@@ -370,7 +370,7 @@ export default class WonReferencedMessageContent extends React.Component {
       if (this.isReferenceExpanded("proposes")) {
         const messageElements =
           this.state.proposeUrisArray &&
-          this.state.proposeUrisArray.map(msgUri => {
+          this.state.proposeUrisArray.map(msgUri => (
             <WonCombinedMessageContent
               key={msgUri}
               messageUri={get(this.getReferencedMessage(msgUri), "uri")}
@@ -387,8 +387,8 @@ export default class WonReferencedMessageContent extends React.Component {
                   : "")
               }
               onClick={() => this.loadMessage(msgUri)}
-            />;
-          });
+            />
+          ));
 
         fragmentBody = (
           <div className="refmsgcontent__fragment__body">{messageElements}</div>
@@ -431,7 +431,7 @@ export default class WonReferencedMessageContent extends React.Component {
       if (this.isReferenceExpanded("proposesToCancel")) {
         const messageElements =
           this.state.proposeToCancelUrisArray &&
-          this.state.proposeToCancelUrisArray.map(msgUri => {
+          this.state.proposeToCancelUrisArray.map(msgUri => (
             <WonCombinedMessageContent
               key={msgUri}
               messageUri={get(this.getReferencedMessage(msgUri), "uri")}
@@ -448,8 +448,8 @@ export default class WonReferencedMessageContent extends React.Component {
                   : "")
               }
               onClick={() => this.loadMessage(msgUri)}
-            />;
-          });
+            />
+          ));
 
         fragmentBody = (
           <div className="refmsgcontent__fragment__body">{messageElements}</div>
@@ -494,7 +494,7 @@ export default class WonReferencedMessageContent extends React.Component {
       if (this.isReferenceExpanded("forwards")) {
         const messageElements =
           this.state.forwardUrisArray &&
-          this.state.forwardUrisArray.map(msgUri => {
+          this.state.forwardUrisArray.map(msgUri => (
             <WonCombinedMessageContent
               key={msgUri}
               messageUri={get(this.getReferencedMessage(msgUri), "uri")}
@@ -502,8 +502,8 @@ export default class WonReferencedMessageContent extends React.Component {
               ngRedux={this.props.ngRedux}
               className="won-cm--forward"
               onClick={() => this.loadMessage(msgUri)}
-            />;
-          });
+            />
+          ));
 
         fragmentBody = (
           <div className="refmsgcontent__fragment__body">{messageElements}</div>
