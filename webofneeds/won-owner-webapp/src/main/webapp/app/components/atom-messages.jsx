@@ -185,7 +185,11 @@ const mapStateToProps = (state, ownProps) => {
       process,
       selectedConnectionUri
     ),
-    showPostContentMessage: showChatData && !multiSelectType && targetAtomUri,
+    showPostContentMessage: !!(
+      showChatData &&
+      !multiSelectType &&
+      targetAtomUri
+    ),
     showOverlayConnection: !!ownProps.connectionUri,
   };
 };

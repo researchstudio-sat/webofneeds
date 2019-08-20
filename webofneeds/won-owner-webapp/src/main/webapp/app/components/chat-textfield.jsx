@@ -22,7 +22,7 @@ import * as useCaseUtils from "../usecase-utils.js";
 import "~/style/_chattextfield.scss";
 import "~/style/_textfield.scss";
 
-const allMessageDetails = useCaseUtils.getAllMessageDetails();
+const allMessageDetailsImm = useCaseUtils.getAllMessageDetailsImm();
 
 const mapStateToProps = (state, ownProps) => {
   const atom =
@@ -65,9 +65,8 @@ const mapStateToProps = (state, ownProps) => {
     "selectedAddMessageContent",
   ]);
   const selectedDetail =
-    allMessageDetails &&
     selectedDetailIdentifier &&
-    allMessageDetails[selectedDetailIdentifier];
+    get(allMessageDetailsImm, selectedDetailIdentifier);
   return {
     className: ownProps.className,
     connectionUri: ownProps.connectionUri,
@@ -98,7 +97,7 @@ const mapStateToProps = (state, ownProps) => {
       getIn(state, ["messages", "lostConnection"]),
     showAddMessageContent: getIn(state, ["view", "showAddMessageContent"]),
     selectedDetail,
-    selectedDetailComponent: selectedDetail && selectedDetail.component,
+    selectedDetailComponent: get(selectedDetail, "component"),
     isLoggedIn: accountUtils.isLoggedIn(get(state, "account")),
     personas: generalSelectors.getOwnedCondensedPersonaList(state).toJS(),
     submitButtonLabel: ownProps.submitButtonLabel,
@@ -122,7 +121,7 @@ const mapDispatchToProps = dispatch => {
     selectDetail: detail => {
       dispatch(
         actionCreators.view__selectAddMessageContent({
-          selectedDetail: detail.identifier,
+          selectedDetail: get(detail, "identifier"),
         })
       );
     },
@@ -168,26 +167,35 @@ class ChatTextfield extends React.Component {
   render() {
     let detailDrawerElement;
 
+    console.debug(
+      "allowDetails: ",
+      this.props.allowDetails,
+      "showAddMessageContent: ",
+      this.props.showAddMessageContent
+    );
     if (this.props.allowDetails && this.props.showAddMessageContent) {
       const selectDetailButtonElements =
-        allMessageDetails &&
-        allMessageDetails.length > 0 &&
-        allMessageDetails.map(detail => {
-          if (detail.component) {
+        allMessageDetailsImm &&
+        allMessageDetailsImm.size > 0 &&
+        allMessageDetailsImm.toArray().map(detail => {
+          if (get(detail, "component")) {
             return (
               <div
-                key={detail.identifier}
+                key={get(detail, "identifier")}
                 className="cts__details__grid__detail"
                 onClick={() => this.props.selectDetail(detail)}
               >
-                {detail.icon && (
+                {get(detail, "icon") && (
                   <svg className="cts__details__grid__detail__icon">
-                    <use xlinkHref={detail.icon} href={detail.icon} />
+                    <use
+                      xlinkHref={get(detail, "icon")}
+                      href={get(detail, "icon")}
+                    />
                   </svg>
                 )}
-                {detail.label && (
+                {get(detail, "label") && (
                   <div className="cts__details__grid__detail__label">
-                    {detail.label}
+                    {get(detail, "label")}
                   </div>
                 )}
               </div>
@@ -330,23 +338,26 @@ class ChatTextfield extends React.Component {
               </svg>
               <svg className="cts__details__input__header__icon">
                 <use
-                  xlinkHref={this.props.selectedDetail.icon}
-                  href={this.props.selectedDetail.icon}
+                  xlinkHref={get(this.props.selectedDetail, "icon")}
+                  href={get(this.props.selectedDetail, "icon")}
                 />
               </svg>
               <div className="cts__details__input__header__label">
-                {this.props.selectedDetail.label}
+                {get(this.props.selectedDetail, "label")}
               </div>
             </div>
             {this.props.selectedDetailComponent && (
               <this.props.selectedDetailComponent
                 className="cts__details__input__content"
                 onUpdate={({ value }) =>
-                  this.updateDetail(this.props.selectedDetail.identifier, value)
+                  this.updateDetail(
+                    get(this.props.selectedDetail, "identifier"),
+                    value
+                  )
                 }
                 initialValue={get(
                   this.state.additionalContent,
-                  this.props.selectedDetail.identifier
+                  get(this.props.selectedDetail, "identifier")
                 )}
                 detail={this.props.selectedDetail}
               />
@@ -512,11 +523,16 @@ class ChatTextfield extends React.Component {
         this.getAdditionalContentKeysArray() &&
         this.getAdditionalContentKeysArray().length > 0 &&
         this.getAdditionalContentKeysArray().map((key, index) => {
-          const usedDetail = allMessageDetails[key];
+          const usedDetail = get(allMessageDetailsImm, key);
+
+          const generateHumanReadable = get(
+            usedDetail,
+            "generateHumanReadable"
+          );
 
           const humanReadableDetail =
-            usedDetail &&
-            usedDetail.generateHumanReadable({
+            generateHumanReadable &&
+            generateHumanReadable({
               value: get(this.state.additionalContent, key),
               includeLabel: true,
             });
@@ -528,16 +544,16 @@ class ChatTextfield extends React.Component {
             >
               <svg
                 className="cts__additionalcontent__list__item__icon clickable"
-                onClick={() => this.props.selectDetail(allMessageDetails[key])}
+                onClick={() => this.props.selectDetail(usedDetail)}
               >
                 <use
-                  xlinkHref={allMessageDetails[key].icon}
-                  href={allMessageDetails[key].icon}
+                  xlinkHref={get(usedDetail, "icon")}
+                  href={get(usedDetail, "icon")}
                 />
               </svg>
               <span
                 className="cts__additionalcontent__list__item__label clickable"
-                onClick={() => this.props.selectDetail(allMessageDetails[key])}
+                onClick={() => this.props.selectDetail(usedDetail)}
               >
                 {humanReadableDetail}
               </span>
@@ -774,7 +790,7 @@ ChatTextfield.propTypes = {
   connectionHasBeenLost: PropTypes.bool,
   showAddMessageContent: PropTypes.bool,
   selectedDetail: PropTypes.object,
-  selectedDetailComponent: PropTypes.object,
+  selectedDetailComponent: PropTypes.func,
   isLoggedIn: PropTypes.bool,
   personas: PropTypes.arrayOf(PropTypes.object),
   submitButtonLabel: PropTypes.string,

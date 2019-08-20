@@ -168,17 +168,9 @@ function hasContent(content) {
       content[prop] !== undefined &&
       content[prop] != null
     ) {
-      console.debug(
-        "content: ",
-        content,
-        "hasContent: true",
-        prop,
-        content[prop]
-      );
       return true;
     }
   }
-  console.debug("content: ", content, "hasContent: false");
   return false;
 }
 
