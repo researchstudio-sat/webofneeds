@@ -7,7 +7,7 @@ export default class WonTitlePicker extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      addedTitle: props.initialValue,
+      value: props.initialValue,
     };
   }
 
@@ -15,10 +15,10 @@ export default class WonTitlePicker extends React.Component {
     return (
       <won-title-picker>
         <div className="titlep__input">
-          {this.state.addedTitle && (
+          {this.state.value && (
             <svg
               className="titlep__input__icon clickable"
-              onClick={() => this.resetTitle()}
+              onClick={() => this.reset()}
             >
               <use xlinkHref="#ico36_close" href="#ico36_close" />
             </svg>
@@ -27,28 +27,28 @@ export default class WonTitlePicker extends React.Component {
             type="text"
             className="titlep__input__inner"
             placeholder={this.props.detail.placeholder}
-            value={this.state.addedTitle}
-            onChange={event => this.updateTitle(event)}
+            value={this.state.value}
+            onChange={event => this.update(event)}
           />
         </div>
       </won-title-picker>
     );
   }
 
-  updateTitle(event) {
+  update(event) {
     const text = event.target.value;
 
     if (text.trim().length > 0) {
-      this.setState({ addedTitle: text });
+      this.setState({ value: text });
       this.props.onUpdate({ value: text.trim() });
     }
   }
 
-  resetTitle() {
+  reset() {
     this.props.onUpdate({ value: undefined });
 
     this.setState({
-      addedTitle: undefined,
+      value: undefined,
     });
   }
 }
