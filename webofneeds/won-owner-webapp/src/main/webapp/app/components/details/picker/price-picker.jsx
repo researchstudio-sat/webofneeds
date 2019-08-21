@@ -2,7 +2,7 @@ import React from "react";
 
 import "~/style/_pricepicker.scss";
 import PropTypes from "prop-types";
-import { isValidNumber } from "../../../utils";
+import { isValidNumber } from "../../../utils.js";
 
 export default class WonPricePicker extends React.Component {
   constructor(props) {
@@ -22,23 +22,27 @@ export default class WonPricePicker extends React.Component {
   }
 
   render() {
+    const showResetButton =
+      this.state.amount !== "" && this.state.amount !== undefined;
     return (
       <won-price-picker>
         <div className="pricep__input">
           <div className="pricep__input__reset clickable">
-            {this.state.amount !== "" &&
-              this.state.amount !== undefined && (
-                <svg
-                  className="pricep__input__reset__icon clickable"
-                  onClick={() => this.reset(true)}
-                >
-                  <use xlinkHref="#ico36_close" href="#ico36_close" />
-                </svg>
-              )}
+            {showResetButton && (
+              <svg
+                className="pricep__input__reset__icon clickable"
+                onClick={() => this.reset(true)}
+              >
+                <use xlinkHref="#ico36_close" href="#ico36_close" />
+              </svg>
+            )}
           </div>
           <input
             type="number"
-            className="pricep__input__inner"
+            className={
+              "pricep__input__inner " +
+              (showResetButton ? "pricep__input__inner--withreset" : "")
+            }
             placeholder={this.props.detail.placeholder}
             value={this.state.amount}
             onChange={event => this.updateAmount(event, false)}
@@ -89,7 +93,7 @@ export default class WonPricePicker extends React.Component {
   }
 
   update() {
-    if (isValidNumber(this.state.amount)) {
+    if (isValidNumber(this.state.amount) && this.state.currency) {
       this.props.onUpdate({ value: this.state });
     } else {
       this.props.onUpdate({ value: undefined });
@@ -107,7 +111,6 @@ export default class WonPricePicker extends React.Component {
   }
 
   updateAmount(event, resetInput) {
-    if (resetInput) console.debug("CALLED FROM onBlur");
     const amount = Number.parseFloat(event.target.value);
 
     if (isValidNumber(amount)) {
