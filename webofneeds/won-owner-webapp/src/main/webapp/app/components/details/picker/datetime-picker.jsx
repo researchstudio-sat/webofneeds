@@ -48,7 +48,7 @@ export default class WonDatetimePicker extends React.Component {
   }
 }
 WonDatetimePicker.propTypes = {
-  initialValue: PropTypes.string,
+  initialValue: PropTypes.object,
   detail: PropTypes.object,
   onUpdate: PropTypes.func.isRequired,
 };
