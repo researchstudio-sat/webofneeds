@@ -42,7 +42,6 @@ export default class WonDatetimeRangePicker extends React.Component {
   }
 
   update() {
-    console.debug("do update! ", this.state);
     // TODO: think about adding sanity checking (from < to)
     if (this.state.fromDatetime || this.state.toDatetime) {
       this.props.onUpdate({ value: this.state });
