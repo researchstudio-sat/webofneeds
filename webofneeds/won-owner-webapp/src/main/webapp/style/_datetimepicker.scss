@@ -7,7 +7,7 @@ won-datetime-picker {
   position: relative;
   display: grid;
   grid-gap: 0.5rem;
-  grid-template-columns: min-content 1fr 1fr;
+  grid-template-columns: min-content 1fr;
 
   .datetimep__button.won-button--filled {
     @media (max-width: $responsivenessBreakPoint) {
@@ -16,49 +16,24 @@ won-datetime-picker {
     padding: 0.5rem 1rem;
   }
 
-  .datetimep__input {
-    position: relative;
-    overflow: hidden;
-
-    .datetimep__input__icon {
-      @include fixed-square($bigiconSize);
-      position: absolute;
-      right: 0.5rem;
-      top: $formInputHeight / 2 - $bigiconSize / 2;
-      z-index: 1;
-    }
-
-    .datetimep__input__inner {
+  .react-datetime-picker {
+    .react-datetime-picker__wrapper {
       @extend .won-txt;
       width: 100%;
       box-sizing: border-box;
       border: $thinGrayBorder;
-      min-height: $formInputHeight;
-      min-height: $formInputHeight;
-      word-wrap: break-word;
+      background: white;
 
-      $verticalPadding: calcVerticalPaddingToHeight(
-        $normalFontSize,
-        22/16,
-        $thinBorderWidth,
-        $formInputHeight
-      );
-      padding: $verticalPadding 0.438rem $verticalPadding 0.438rem;
-
-      &--withreset {
-        padding: $verticalPadding 0.438rem + $bigiconSize $verticalPadding
-          0.438rem;
+      .react-datetime-picker__button {
+        &:hover {
+          > svg {
+            stroke: $won-primary-color-light;
+          }
+        }
+        > svg {
+          stroke: $won-primary-color;
+        }
       }
-    }
-
-    .datetimep__input__inner::-ms-clear {
-      width: 0;
-      height: 0;
-    }
-
-    input[type="date"]::-webkit-clear-button,
-    input[type="time"]::-webkit-clear-button {
-      -webkit-appearance: none;
     }
   }
 }
