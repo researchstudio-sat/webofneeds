@@ -7,9 +7,9 @@ import { isValidNumber } from "../../../utils.js";
 export default class WonNumberPicker extends React.Component {
   constructor(props) {
     super(props);
-    const parsedNum = Number.parseFloat(this.initialValue);
+    const parsedNum = Number.parseFloat(props.initialValue);
     this.state = {
-      value: isValidNumber(parsedNum) ? parsedNum : undefined,
+      value: isValidNumber(parsedNum) ? parsedNum : "",
     };
   }
 
@@ -17,14 +17,17 @@ export default class WonNumberPicker extends React.Component {
     return (
       <won-number-picker>
         <div className="numberp__input">
-          {this.state.value && (
-            <svg
-              className="numberp__input__icon clickable"
-              onClick={() => this.reset(true)}
-            >
-              <use xlinkHref="#ico36_close" href="#ico36_close" />
-            </svg>
-          )}
+          <div className="numberp__input__reset clickable">
+            {this.state.value !== "" &&
+              this.state.value !== undefined && (
+                <svg
+                  className="numberp__input__reset__icon clickable"
+                  onClick={() => this.reset(true)}
+                >
+                  <use xlinkHref="#ico36_close" href="#ico36_close" />
+                </svg>
+              )}
+          </div>
           <input
             type="number"
             className="numberp__input__inner"
@@ -42,9 +45,8 @@ export default class WonNumberPicker extends React.Component {
     const number = Number.parseFloat(event.target.value);
 
     if (isValidNumber(number)) {
-      this.addedNumber = number;
-      this.update(this.addedNumber);
-      this.showResetButton = true;
+      this.props.onUpdate({ value: number });
+      this.setState({ value: number });
     } else {
       this.reset(resetInput);
     }
@@ -55,13 +57,13 @@ export default class WonNumberPicker extends React.Component {
 
     if (resetInput) {
       this.setState({
-        value: undefined,
+        value: "",
       });
     }
   }
 }
 WonNumberPicker.propTypes = {
-  initialValue: PropTypes.string,
+  initialValue: PropTypes.number,
   detail: PropTypes.object,
   onUpdate: PropTypes.func.isRequired,
 };

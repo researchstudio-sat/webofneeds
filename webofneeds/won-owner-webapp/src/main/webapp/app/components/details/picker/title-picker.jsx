@@ -7,7 +7,7 @@ export default class WonTitlePicker extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      value: props.initialValue,
+      value: props.initialValue || "",
     };
   }
 
@@ -39,17 +39,19 @@ export default class WonTitlePicker extends React.Component {
     const text = event.target.value;
 
     if (text.trim().length > 0) {
-      this.setState({ value: text });
-      this.props.onUpdate({ value: text.trim() });
+      this.setState({ value: text }, () =>
+        this.props.onUpdate({ value: this.state.value.trim() })
+      );
     }
   }
 
   reset() {
-    this.props.onUpdate({ value: undefined });
-
-    this.setState({
-      value: undefined,
-    });
+    this.setState(
+      {
+        value: "",
+      },
+      () => this.props.onUpdate({ value: undefined })
+    );
   }
 }
 WonTitlePicker.propTypes = {
