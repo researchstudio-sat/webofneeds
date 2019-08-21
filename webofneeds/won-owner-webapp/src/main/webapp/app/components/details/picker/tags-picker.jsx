@@ -19,7 +19,6 @@ export default class WonTagsPicker extends React.Component {
           value={this.state.tags}
           onChange={this.changeTags.bind(this)}
           onlyUnique={true}
-          pasteSplit={this.pasteSplit}
           renderInput={this.autosizingRenderInput}
           addKeys={[13, 188]}
         />
@@ -29,14 +28,12 @@ export default class WonTagsPicker extends React.Component {
 
   changeTags(tags) {
     this.setState({ tags: tags }, () => {
-      this.onUpdate({
+      this.props.onUpdate({
         value: this.state.tags && this.state.tags.length > 0 ? tags : undefined,
       });
     });
   }
-  pasteSplit(data) {
-    return data.split(",").map(d => d.trim());
-  }
+
   autosizingRenderInput({ ...props }) {
     let { onChange, value, ...other } = props;
     return (
