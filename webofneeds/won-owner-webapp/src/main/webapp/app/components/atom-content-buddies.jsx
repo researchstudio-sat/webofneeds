@@ -10,7 +10,7 @@ import * as connectionSelectors from "../redux/selectors/connection-selectors";
 import * as connectionUtils from "../redux/utils/connection-utils";
 import won from "../won-es6";
 import WonLabelledHr from "./labelled-hr.jsx";
-import WonSuggestAtomPicker from "./details/_angular_picker/suggest-atom-picker.jsx";
+import WonSuggestAtomPicker from "./details/picker/suggest-atom-picker.jsx";
 import WonAtomCard from "./atom-card.jsx";
 
 import "~/style/_atom-content-buddies.scss";
@@ -223,7 +223,6 @@ export default class WonAtomContentBuddies extends React.Component {
               excludedText="Requesting yourself or someone who is already your Buddy is not allowed"
               notAllowedSocketText="Request does not work on atoms without the Buddy Socket"
               noSuggestionsText="No known Personas available"
-              ngRedux={this.props.ngRedux}
             />
           ) : (
             undefined

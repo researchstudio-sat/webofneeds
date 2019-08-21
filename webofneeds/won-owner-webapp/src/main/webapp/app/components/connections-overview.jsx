@@ -92,7 +92,6 @@ export default class WonConnectionsOverview extends React.Component {
               <div className="co__item__atom__header">
                 <WonAtomHeader
                   atomUri={atomUri}
-                  ngRedux={this.props.ngRedux}
                   onClick={
                     !this.isAtomLoading(atomUri)
                       ? () => {

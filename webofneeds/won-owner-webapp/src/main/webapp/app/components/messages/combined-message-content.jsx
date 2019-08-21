@@ -169,7 +169,6 @@ export default class WonCombinedMessageContent extends React.Component {
               <WonAtomIcon
                 className="msg__header msg__header__originator"
                 atomUri={this.state.originatorUri}
-                ngRedux={this.props.ngRedux}
               />
             </div>
           ) : (

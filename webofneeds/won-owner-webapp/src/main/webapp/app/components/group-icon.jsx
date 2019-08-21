@@ -81,10 +81,7 @@ export default class WonGroupIcon extends React.Component {
                   : "")
               }
             >
-              <WonAtomIcon
-                atomUri={groupMemberUri}
-                ngRedux={this.props.ngRedux}
-              />
+              <WonAtomIcon atomUri={groupMemberUri} />
             </div>
           );
         }

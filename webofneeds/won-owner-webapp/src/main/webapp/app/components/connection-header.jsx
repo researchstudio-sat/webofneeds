@@ -154,10 +154,7 @@ export default class WonConnectionHeader extends React.Component {
         />
       ) : (
         <div className="ch__icon">
-          <WonAtomIcon
-            atomUri={get(this.state.targetAtom, "uri")}
-            ngRedux={this.props.ngRedux}
-          />
+          <WonAtomIcon atomUri={get(this.state.targetAtom, "uri")} />
         </div>
       );
 

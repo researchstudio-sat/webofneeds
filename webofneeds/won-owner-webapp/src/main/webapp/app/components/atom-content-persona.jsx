@@ -150,10 +150,7 @@ export default class WonAtomContentPersona extends React.Component {
       <won-atom-content-persona>
         <div className="ac-persona__header">
           {!this.state.personaLoading && (
-            <WonAtomIcon
-              atomUri={this.state.personaUri}
-              ngRedux={this.props.ngRedux}
-            />
+            <WonAtomIcon atomUri={this.state.personaUri} />
           )}
           {personaNameElement}
           {websiteFragment}

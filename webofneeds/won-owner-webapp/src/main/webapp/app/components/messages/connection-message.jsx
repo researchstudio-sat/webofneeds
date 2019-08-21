@@ -167,7 +167,6 @@ export default class WonConnectionMessage extends React.Component {
         messageIcon.push(
           <WonAtomIcon
             atomUri={get(this.state.theirAtom, "uri")}
-            ngRedux={this.props.ngRedux}
             onClick={
               !this.props.onClick
                 ? () => {
@@ -191,7 +190,6 @@ export default class WonConnectionMessage extends React.Component {
         messageIcon.push(
           <WonAtomIcon
             atomUri={this.state.originatorUri}
-            ngRedux={this.props.ngRedux}
             onClick={
               !this.props.onClick
                 ? () => {
@@ -208,12 +206,7 @@ export default class WonConnectionMessage extends React.Component {
       }
 
       if (this.state.isFromSystem) {
-        messageIcon.push(
-          <WonAtomIcon
-            atomUri={this.state.messageSenderUri}
-            ngRedux={this.props.ngRedux}
-          />
-        );
+        messageIcon.push(<WonAtomIcon atomUri={this.state.messageSenderUri} />);
       }
 
       let messageCenterContentElement;
