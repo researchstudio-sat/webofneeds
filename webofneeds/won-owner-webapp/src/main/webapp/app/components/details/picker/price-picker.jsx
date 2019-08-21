@@ -47,11 +47,11 @@ export default class WonPricePicker extends React.Component {
           <select
             className="pricep__input__currency"
             disabled={this.props.detail.currency.length <= 1}
-            onChange={event => this.updateCurrency(event)}
+            onChange={this.updateCurrency.bind(this)}
             value={this.state.currency}
           >
             {this.props.detail.currency.map((currency, index) => (
-              <option key={currency + "-" + index} value={currency.value}>
+              <option key={currency.value + "-" + index} value={currency.value}>
                 {currency.label}
               </option>
             ))}
@@ -60,11 +60,14 @@ export default class WonPricePicker extends React.Component {
             <select
               className="pricep__input__unitCode"
               disabled={this.props.detail.unitCode.length <= 1}
-              onChange={event => this.updateUnitCode(event)}
+              onChange={this.updateUnitCode.bind(this)}
               value={this.state.unitCode}
             >
               {this.props.detail.unitCode.map((unitCode, index) => (
-                <option key={unitCode + "-" + index} value={unitCode.value}>
+                <option
+                  key={unitCode.value + "-" + index}
+                  value={unitCode.value}
+                >
                   {unitCode.label}
                 </option>
               ))}
