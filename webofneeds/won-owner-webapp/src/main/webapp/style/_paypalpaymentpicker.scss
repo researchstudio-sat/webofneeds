@@ -24,6 +24,7 @@ won-paypal-payment-picker {
 
       &__icon {
         @include fixed-square($bigiconSize);
+        --local-primary: #{$won-primary-color};
         position: absolute;
         right: 0;
         top: 0.5rem;
@@ -132,6 +133,7 @@ won-paypal-payment-picker {
 
       &__icon {
         @include fixed-square($bigiconSize);
+        --local-primary: #{$won-primary-color};
         position: absolute;
         left: 0;
         top: 0.5rem;

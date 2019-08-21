@@ -13,6 +13,7 @@ won-range-picker {
 
       &__icon {
         @include fixed-square($bigiconSize);
+        --local-primary: #{$won-primary-color};
         position: absolute;
         left: 0;
         top: 0.5rem;

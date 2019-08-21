@@ -13,6 +13,7 @@ won-review-picker {
 
       &__icon {
         @include fixed-square($bigiconSize);
+        --local-primary: #{$won-primary-color};
         position: absolute;
         right: 0;
         top: 0.5rem;
