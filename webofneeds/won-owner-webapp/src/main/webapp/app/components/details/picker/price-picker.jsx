@@ -115,7 +115,7 @@ export default class WonPricePicker extends React.Component {
         this.update.bind(this)
       );
     } else {
-      this.reset(resetInput);
+      this.reset(resetInput || event.target.value === "");
     }
   }
 

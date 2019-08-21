@@ -12,6 +12,7 @@ won-description-picker {
 
     .dp__input__icon {
       @include fixed-square($bigiconSize);
+      --local-primary: #{$won-primary-color};
       position: absolute;
       right: 0.5rem;
       top: $formInputHeight / 2 - $bigiconSize / 2;

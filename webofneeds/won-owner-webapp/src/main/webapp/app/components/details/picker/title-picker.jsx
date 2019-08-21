@@ -18,7 +18,7 @@ export default class WonTitlePicker extends React.Component {
           {this.state.value && (
             <svg
               className="titlep__input__icon clickable"
-              onClick={() => this.reset()}
+              onClick={this.reset.bind(this)}
             >
               <use xlinkHref="#ico36_close" href="#ico36_close" />
             </svg>
@@ -28,7 +28,7 @@ export default class WonTitlePicker extends React.Component {
             className="titlep__input__inner"
             placeholder={this.props.detail.placeholder}
             value={this.state.value}
-            onChange={event => this.update(event)}
+            onChange={this.update.bind(this)}
           />
         </div>
       </won-title-picker>
@@ -42,6 +42,8 @@ export default class WonTitlePicker extends React.Component {
       this.setState({ value: text }, () =>
         this.props.onUpdate({ value: this.state.value.trim() })
       );
+    } else {
+      this.reset();
     }
   }
 

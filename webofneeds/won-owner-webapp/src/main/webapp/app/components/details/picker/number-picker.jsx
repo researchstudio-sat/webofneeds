@@ -48,17 +48,20 @@ export default class WonNumberPicker extends React.Component {
       this.props.onUpdate({ value: number });
       this.setState({ value: number });
     } else {
-      this.reset(resetInput);
+      this.reset(resetInput || event.target.value === "");
     }
   }
 
   reset(resetInput) {
-    this.props.onUpdate({ value: undefined });
-
     if (resetInput) {
-      this.setState({
-        value: "",
-      });
+      this.setState(
+        {
+          value: "",
+        },
+        () => this.props.onUpdate({ value: undefined })
+      );
+    } else {
+      this.props.onUpdate({ value: undefined });
     }
   }
 }
