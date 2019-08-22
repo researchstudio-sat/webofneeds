@@ -33,14 +33,14 @@ export default class WonLocationViewer extends React.Component {
     const addressElement = address ? (
       <div
         className="lv__content__text clickable"
-        onClick={() => this.toggleLocation()}
+        onClick={this.toggleLocation.bind(this)}
       >
         {address}
         <svg className="lv__content__text__carret">
           <use xlinkHref="#ico-filter_map" href="#ico-filter_map" />
         </svg>
         <svg className="lv__content__text__carret">
-          {this.state.locationExanded ? (
+          {this.state.locationExpanded ? (
             <use xlinkHref="#ico16_arrow_up" href="#ico16_arrow_up" />
           ) : (
             <use xlinkHref="#ico16_arrow_down" href="#ico16_arrow_down" />

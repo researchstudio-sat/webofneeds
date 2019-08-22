@@ -15,7 +15,6 @@ won-location-viewer {
       }
     }
 
-    .won-atom-map,
     won-atom-map {
       display: block;
       @include slideWithOpacityAnimation(0.5s, linear, 20rem);

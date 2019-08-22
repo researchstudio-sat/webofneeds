@@ -55,45 +55,47 @@ export default class WonAtomMap extends React.Component {
       );
 
       return (
-        <VisibilitySensor
-          partialVisibility={true}
-          offset={{ top: -300, bottom: -300 }}
-        >
-          {({ isVisible }) => {
-            if (isVisible) {
-              return (
-                <Map
-                  center={
-                    currentLocationTupel
-                      ? currentLocationTupel
-                      : firstLocationTupel
-                  }
-                  className="atom-map__mapmount"
-                  zoom={zoom}
-                  zoomControl={!disableControls}
-                >
-                  <TileLayer
-                    attribution="&amp;copy <a href=&quot;http://osm.org/copyright&quot;>OpenStreetMap</a> contributors"
-                    url="https://www.matchat.org/tile/{z}/{x}/{y}.png"
-                  />
-                  {locationMarkers}
-                  {currentLocationMarker}
-                </Map>
-              );
-            } else {
-              return (
-                <div className="atom-map__mapmount atom-map__mapmount--loading">
-                  <svg className="won-atom-map__spinner hspinner">
-                    <use
-                      xlinkHref="#ico_loading_anim"
-                      href="#ico_loading_anim"
+        <won-atom-map class={this.props.className ? this.props.className : ""}>
+          <VisibilitySensor
+            partialVisibility={true}
+            offset={{ top: -300, bottom: -300 }}
+          >
+            {({ isVisible }) => {
+              if (isVisible) {
+                return (
+                  <Map
+                    center={
+                      currentLocationTupel
+                        ? currentLocationTupel
+                        : firstLocationTupel
+                    }
+                    className="atom-map__mapmount"
+                    zoom={zoom}
+                    zoomControl={!disableControls}
+                  >
+                    <TileLayer
+                      attribution="&amp;copy <a href=&quot;http://osm.org/copyright&quot;>OpenStreetMap</a> contributors"
+                      url="https://www.matchat.org/tile/{z}/{x}/{y}.png"
                     />
-                  </svg>
-                </div>
-              );
-            }
-          }}
-        </VisibilitySensor>
+                    {locationMarkers}
+                    {currentLocationMarker}
+                  </Map>
+                );
+              } else {
+                return (
+                  <div className="atom-map__mapmount atom-map__mapmount--loading">
+                    <svg className="won-atom-map__spinner hspinner">
+                      <use
+                        xlinkHref="#ico_loading_anim"
+                        href="#ico_loading_anim"
+                      />
+                    </svg>
+                  </div>
+                );
+              }
+            }}
+          </VisibilitySensor>
+        </won-atom-map>
       );
     }
     console.debug("render with no location(s)");
@@ -101,6 +103,7 @@ export default class WonAtomMap extends React.Component {
   }
 }
 WonAtomMap.propTypes = {
+  className: PropTypes.string,
   locations: PropTypes.arrayOf(PropTypes.object).isRequired,
   currentLocation: PropTypes.object,
   disableControls: PropTypes.bool,

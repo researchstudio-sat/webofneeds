@@ -53,7 +53,6 @@ won-other-card {
     }
 
     & .image,
-    & .won-atom-map.location,
     & won-atom-map.location {
       height: 10rem;
     }
@@ -62,7 +61,6 @@ won-other-card {
       object-fit: cover;
     }
 
-    & .won-atom-map.location,
     & won-atom-map.location {
       display: block;
       pointer-events: none;

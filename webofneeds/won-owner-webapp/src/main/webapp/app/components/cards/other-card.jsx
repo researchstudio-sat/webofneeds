@@ -146,13 +146,12 @@ export default class WonOtherCard extends React.Component {
           undefined
         )}
         {this.state.showMap ? (
-          <div className="won-atom-map location">
-            <WonAtomMap
-              locations={[this.state.atomLocation]}
-              currentLocation={this.state.currentLocation}
-              disableControls={true}
-            />
-          </div>
+          <WonAtomMap
+            className="location"
+            locations={[this.state.atomLocation]}
+            currentLocation={this.state.currentLocation}
+            disableControls={true}
+          />
         ) : (
           undefined
         )}

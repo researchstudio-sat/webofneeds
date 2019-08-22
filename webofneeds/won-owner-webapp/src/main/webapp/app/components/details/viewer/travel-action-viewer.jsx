@@ -59,7 +59,7 @@ export default class WonTravelActionViewer extends React.Component {
             <use xlinkHref="#ico-filter_map" href="#ico-filter_map" />
           </svg>
           <svg className="lv__content__text__carret">
-            {this.state.locationExanded ? (
+            {this.state.locationExpanded ? (
               <use xlinkHref="#ico16_arrow_up" href="#ico16_arrow_up" />
             ) : (
               <use xlinkHref="#ico16_arrow_down" href="#ico16_arrow_down" />
