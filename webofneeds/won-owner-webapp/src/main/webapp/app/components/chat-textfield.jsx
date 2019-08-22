@@ -523,16 +523,12 @@ class ChatTextfield extends React.Component {
         this.getAdditionalContentKeysArray() &&
         this.getAdditionalContentKeysArray().length > 0 &&
         this.getAdditionalContentKeysArray().map((key, index) => {
-          const usedDetail = get(allMessageDetailsImm, key);
-
-          const generateHumanReadable = get(
-            usedDetail,
-            "generateHumanReadable"
-          );
+          const usedDetailImm = get(allMessageDetailsImm, key);
+          const usedDetail = usedDetailImm && usedDetailImm.toJS();
 
           const humanReadableDetail =
-            generateHumanReadable &&
-            generateHumanReadable({
+            usedDetail &&
+            usedDetail.generateHumanReadable({
               value: get(this.state.additionalContent, key),
               includeLabel: true,
             });
@@ -544,16 +540,16 @@ class ChatTextfield extends React.Component {
             >
               <svg
                 className="cts__additionalcontent__list__item__icon clickable"
-                onClick={() => this.props.selectDetail(usedDetail)}
+                onClick={() => this.props.selectDetail(usedDetailImm)}
               >
                 <use
-                  xlinkHref={get(usedDetail, "icon")}
-                  href={get(usedDetail, "icon")}
+                  xlinkHref={get(usedDetailImm, "icon")}
+                  href={get(usedDetailImm, "icon")}
                 />
               </svg>
               <span
                 className="cts__additionalcontent__list__item__label clickable"
-                onClick={() => this.props.selectDetail(usedDetail)}
+                onClick={() => this.props.selectDetail(usedDetailImm)}
               >
                 {humanReadableDetail}
               </span>
