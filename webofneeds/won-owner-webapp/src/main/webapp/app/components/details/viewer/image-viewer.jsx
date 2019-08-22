@@ -59,8 +59,22 @@ export default class WonImageViewer extends React.Component {
           {label}
         </div>
         <div className="imagev__content">
-          {/*TODO: CONTENT*/}
-          {thumbNails}
+          <div className="imagev__content__selected">
+            <img
+              className="imagev__content__selected__image"
+              onClick={() => this.openImageInNewTab(this.getSelectedImage())}
+              alt={this.getSelectedImage().get("name")}
+              src={
+                "data:" +
+                this.getSelectedImage().get("type") +
+                ";base64," +
+                this.getSelectedImage().get("data")
+              }
+            />
+          </div>
+          {this.props.content.size > 1 && (
+            <div className="imagev__content__thumbnails">{thumbNails}</div>
+          )}
         </div>
       </won-image-viewer>
     );
@@ -72,6 +86,13 @@ export default class WonImageViewer extends React.Component {
 
   changeSelectedIndex(index) {
     this.setState({ selectedIndex: index });
+  }
+
+  getSelectedImage() {
+    return (
+      this.props.content &&
+      this.props.content.toArray()[this.state.selectedIndex]
+    );
   }
 
   openImageInNewTab(file) {
