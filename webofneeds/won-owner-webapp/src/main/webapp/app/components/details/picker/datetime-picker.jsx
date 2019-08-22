@@ -15,7 +15,9 @@ export default class WonDatetimePicker extends React.Component {
 
   render() {
     return (
-      <won-datetime-picker>
+      <won-datetime-picker
+        class={this.props.className ? this.props.className : undefined}
+      >
         <button
           className="datetimep__button won-button--filled red"
           onClick={this.currentDatetime.bind(this)}
@@ -48,6 +50,7 @@ export default class WonDatetimePicker extends React.Component {
   }
 }
 WonDatetimePicker.propTypes = {
+  className: PropTypes.string,
   initialValue: PropTypes.object,
   detail: PropTypes.object,
   onUpdate: PropTypes.func.isRequired,

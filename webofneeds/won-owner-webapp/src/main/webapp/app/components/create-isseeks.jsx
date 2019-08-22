@@ -67,7 +67,7 @@ export default class WonCreateIsSeeks extends React.Component {
                 {this.state.details.has(detail.identifier) &&
                   this.state.openDetail !== detail.identifier && (
                     <div className="cis__detail__items__item__header__content">
-                      {this.suggestatomvanReadable(detail)}
+                      {this.generateHumanReadable(detail)}
                     </div>
                   )}
                 {detail.mandatory &&

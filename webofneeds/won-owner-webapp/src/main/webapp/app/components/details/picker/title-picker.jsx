@@ -13,7 +13,9 @@ export default class WonTitlePicker extends React.Component {
 
   render() {
     return (
-      <won-title-picker>
+      <won-title-picker
+        class={this.props.className ? this.props.className : undefined}
+      >
         <div className="titlep__input">
           {this.state.value && (
             <svg
@@ -57,6 +59,7 @@ export default class WonTitlePicker extends React.Component {
   }
 }
 WonTitlePicker.propTypes = {
+  className: PropTypes.string,
   initialValue: PropTypes.string,
   detail: PropTypes.object,
   onUpdate: PropTypes.func.isRequired,
