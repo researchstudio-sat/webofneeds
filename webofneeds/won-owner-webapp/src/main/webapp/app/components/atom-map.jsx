@@ -8,6 +8,8 @@ import L from "leaflet";
 import VisibilitySensor from "react-visibility-sensor";
 import PropTypes from "prop-types";
 
+import "leaflet/dist/leaflet.css";
+
 const currentLocationIcon = L.divIcon({
   className: "wonCurrentLocationMarkerIcon",
 });

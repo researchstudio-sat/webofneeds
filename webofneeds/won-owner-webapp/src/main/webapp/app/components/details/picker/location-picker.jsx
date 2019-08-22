@@ -4,6 +4,7 @@ import "~/style/_locationpicker.scss";
 import PropTypes from "prop-types";
 import WonTitlePicker from "./title-picker";
 
+import "leaflet/dist/leaflet.css";
 export default class WonLocationPicker extends React.Component {
   constructor(props) {
     super(props);
@@ -19,7 +20,7 @@ export default class WonLocationPicker extends React.Component {
           onUpdate={this.doneTyping.bind(this)}
           detail={{ placeholder: this.props.detail.placeholder }}
         />
-        <Map className="lp__mapmount">
+        <Map className="lp__mapmount" zoom={13} center={[48.210033, 16.363449]}>
           <TileLayer
             attribution="&amp;copy <a href=&quot;http://osm.org/copyright&quot;>OpenStreetMap</a> contributors"
             url="https://www.matchat.org/tile/{z}/{x}/{y}.png"
