@@ -1,11 +1,11 @@
 @import "sizing-utils";
 @import "won-config";
 
-won-suggestpost-viewer {
-  @include won-detail-viewer("suggestpostv");
+won-suggest-atom-viewer {
+  @include won-detail-viewer("suggestatomv");
 
-  .suggestpostv__content {
-    & .suggestpostv__content__post {
+  .suggestatomv__content {
+    & .suggestatomv__content__post {
       border: $thinGrayBorder;
       background: $won-light-gray;
 
@@ -22,7 +22,7 @@ won-suggestpost-viewer {
         }
       }
     }
-    & .suggestpostv__content__info {
+    & .suggestatomv__content__info {
       color: $won-skeleton-color;
       font-size: $smallFontSize;
       padding-top: 0.5rem;

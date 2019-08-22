@@ -6,7 +6,7 @@ import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
 import WonTitleViewer from "../../app/components/details/viewer/title-viewer.jsx";
 import WonDescriptionViewer from "../../app/components/details/viewer/description-viewer.jsx";
 import WonTagsViewer from "../../app/components/details/viewer/tags-viewer.jsx";
-import WonSuggestPostViewer from "../../app/components/details/viewer/suggestpost-viewer.jsx";
+import WonSuggestAtomViewer from "../../app/components/details/viewer/suggest-atom-viewer.jsx";
 
 import WonTitlePicker from "../../app/components/details/picker/title-picker.jsx";
 import WonDescriptionPicker from "../../app/components/details/picker/description-picker.jsx";
@@ -188,7 +188,7 @@ export const suggestPost = {
   icon: "#ico36_detail_title", //TODO: CORRECT ICON
   placeholder: "Insert PostUri and Accept",
   component: WonSuggestAtomPicker,
-  viewerComponent: WonSuggestPostViewer,
+  viewerComponent: WonSuggestAtomViewer,
   parseToRDF: function({ value }) {
     const val = value ? value : undefined;
 
@@ -217,7 +217,7 @@ export const responseToUri = {
   icon: "#ico36_detail_title", //TODO: CORRECT ICON
   placeholder: "Insert PostUri and Accept",
   component: WonSuggestAtomPicker,
-  viewerComponent: WonSuggestPostViewer,
+  viewerComponent: WonSuggestAtomViewer,
   messageEnabled: false,
   parseToRDF: function({ value }) {
     const val = value ? value : undefined;
