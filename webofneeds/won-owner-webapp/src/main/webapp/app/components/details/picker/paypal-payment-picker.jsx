@@ -9,8 +9,7 @@ export default class WonPaypalPaymentPicker extends React.Component {
     super(props);
     this.state = {
       amount: (this.initialValue && this.initialValue.amount) || "",
-      selectedCurrency:
-        (this.initialValue && this.initialValue.currency) || "EUR",
+      currency: (this.initialValue && this.initialValue.currency) || "EUR",
       receiver: (this.initialValue && this.initialValue.receiver) || "",
     };
   }
@@ -53,7 +52,7 @@ export default class WonPaypalPaymentPicker extends React.Component {
             className="paypalpaymentp__input__currency"
             disabled={this.props.detail.currency.length <= 1}
             onChange={this.updateCurrency.bind(this)}
-            value={this.state.selectedCurrency}
+            value={this.state.currency}
           >
             {this.props.detail.currency.map((currency, index) => (
               <option key={currency.value + "-" + index} value={currency.value}>
@@ -99,7 +98,7 @@ export default class WonPaypalPaymentPicker extends React.Component {
       this.setState(
         {
           amount: "",
-          selectedCurrency: this.getDefaultCurrency(),
+          currency: this.getDefaultCurrency(),
         },
         this.update.bind(this)
       );
@@ -159,7 +158,7 @@ export default class WonPaypalPaymentPicker extends React.Component {
     const currency = event.target.value;
     this.setState(
       {
-        selectedCurrency: currency,
+        currency: currency,
       },
       this.update.bind(this)
     );
