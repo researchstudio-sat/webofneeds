@@ -7,13 +7,13 @@ import PropTypes from "prop-types";
 export default class WonFileViewer extends React.Component {
   render() {
     const icon = this.props.detail.icon && (
-      <svg className="titlev__header__icon">
+      <svg className="filev__header__icon">
         <use xlinkHref={this.props.detail.icon} href={this.props.detail.icon} />
       </svg>
     );
 
     const label = this.props.detail.icon && (
-      <span className="titlev__header__label">{this.props.detail.label}</span>
+      <span className="filev__header__label">{this.props.detail.label}</span>
     );
 
     const filesArray = this.props.content && this.props.content.toArray();
@@ -64,11 +64,11 @@ export default class WonFileViewer extends React.Component {
 
     return (
       <won-file-viewer class={this.props.className}>
-        <div className="titlev__header">
+        <div className="filev__header">
           {icon}
           {label}
         </div>
-        <div className="titlev__content">{files}</div>
+        <div className="filev__content">{files}</div>
       </won-file-viewer>
     );
   }
