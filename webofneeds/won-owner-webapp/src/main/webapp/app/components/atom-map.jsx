@@ -4,11 +4,11 @@
 
 import React from "react";
 import { Map, Marker, TileLayer } from "react-leaflet";
-import Leaflet from "leaflet";
+import L from "leaflet";
 import VisibilitySensor from "react-visibility-sensor";
 import PropTypes from "prop-types";
 
-const currentLocationIcon = Leaflet.divIcon({
+const currentLocationIcon = L.divIcon({
   className: "wonCurrentLocationMarkerIcon",
 });
 

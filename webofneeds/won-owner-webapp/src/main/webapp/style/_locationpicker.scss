@@ -12,54 +12,9 @@ won-location-picker {
     height: 0;
   }
 
-  .lp__searchbox {
-    position: relative; // needed for position: absolute of icon
-
-    .lp__searchbox__icon {
-      @include fixed-square($bigiconSize);
-      position: absolute;
-      right: 0.5rem;
-      top: $formInputHeight / 2 - $bigiconSize / 2;
-      z-index: 1;
-    }
-
-    .lp__searchbox__inner {
-      border: $thinGrayBorder;
-      background-color: white;
-      border-bottom-left-radius: 0;
-      border-bottom-right-radius: 0;
-
-      @include textfieldPadding(
-        $normalFontSize,
-        22/16,
-        $thinBorderWidth,
-        $formInputHeight
-      );
-
-      box-sizing: border-box;
-      min-height: $formInputHeight;
-      min-width: 0; // so a size is specified and break-word works
-      width: 100%;
-
-      word-wrap: break-word;
-
-      &--withreset {
-        $verticalPadding: calcVerticalPaddingToHeight(
-          $normalFontSize,
-          22/16,
-          $thinBorderWidth,
-          $formInputHeight
-        );
-        padding: $verticalPadding 0.438rem + $bigiconSize $verticalPadding
-          0.438rem;
-      }
-    }
-
-    // remove X rendered by IE and Edge as we have our own clear button
-    .lp__searchbox__inner::-ms-clear {
-      width: 0;
-      height: 0;
-    }
+  won-title-picker.lp__searchbox > .titlep__input > .titlep__input__inner {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
   }
 
   // show search results when search box is focused

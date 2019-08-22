@@ -455,7 +455,7 @@ export function getDefaultSocketUri(atomImm) {
 }
 
 export function getHeldByUri(atomImm) {
-  return hasHoldableSocket(atomImm) && get(atomImm, "heldBy");
+  return hasHoldableSocket(atomImm) ? get(atomImm, "heldBy") : undefined;
 }
 
 export function isHeld(atomImm) {

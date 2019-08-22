@@ -18,7 +18,7 @@
     "identicon.js": "^2.3.3",
     "immutable": "^3.8.2",
     "jsonld": "^1.2.1",
-    "leaflet": "^0.7.7",
+    "leaflet": "^1.5.1",
     "loadcss": "^0.0.2",
     "n3": "^1.0.2",
     "ng-redux": "^3.5.2",
