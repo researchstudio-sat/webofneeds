@@ -21,8 +21,9 @@ const mapStateToProps = (state, ownProps) => {
   const isDirectResponse = atomUtils.isDirectResponseAtom(atom);
   const responseToUri =
     isDirectResponse && getIn(atom, ["content", "responseToUri"]);
-  const responseToAtom =
-    responseToUri && getIn(state, ["atoms", responseToUri]);
+  const responseToAtom = responseToUri
+    ? getIn(state, ["atoms", responseToUri])
+    : undefined;
 
   const personaUri = atomUtils.getHeldByUri(atom);
   const persona = personaUri && getIn(state, ["atoms", personaUri]);

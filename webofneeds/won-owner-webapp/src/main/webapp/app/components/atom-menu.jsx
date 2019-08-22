@@ -183,7 +183,7 @@ export default class WonAtomMenu extends React.Component {
           <span className="atom-menu__item__label">Persona</span>
           {this.state.personaAggregateRatingString && (
             <span className="atom-menu__item__rating">
-              (★ {this.state.personaAggregateRatingString})
+              (★ {this.state.personaAggregateRatingString + ")"}
             </span>
           )}
         </div>
@@ -200,7 +200,7 @@ export default class WonAtomMenu extends React.Component {
           <span className="atom-menu__item__label">+ Persona</span>
           {this.state.personaAggregateRatingString && (
             <span className="atom-menu__item__rating">
-              (★ {this.state.personaAggregateRatingString})
+              {"(★ " + this.state.personaAggregateRatingString + ")"}
             </span>
           )}
         </div>
@@ -221,9 +221,9 @@ export default class WonAtomMenu extends React.Component {
             >
               <span className="atom-menu__item__unread" />
               <span className="atom-menu__item__label">Group Members</span>
-              {this.state.connectedGroupChatConnectionsSize && (
+              {!!this.state.connectedGroupChatConnectionsSize && (
                 <span className="atom-menu__item__count">
-                  ({this.state.connectedGroupChatConnectionsSize})
+                  {"(" + this.state.connectedGroupChatConnectionsSize + ")"}
                 </span>
               )}
             </div>
@@ -239,7 +239,7 @@ export default class WonAtomMenu extends React.Component {
             >
               <span className="atom-menu__item__label">Group Members</span>
               <span className="atom-menu__item__count">
-                ({this.state.groupMembersSize})
+                {"(" + this.state.groupMembersSize + ")"}
               </span>
             </div>
           );
@@ -260,7 +260,7 @@ export default class WonAtomMenu extends React.Component {
           <span className="atom-menu__item__unread" />
           <span className="atom-menu__item__label">Suggestions</span>
           <span className="atom-menu__item__count">
-            ({this.state.suggestionsSize})
+            {"(" + this.state.suggestionsSize + ")"}
           </span>
         </div>
       );
@@ -279,7 +279,7 @@ export default class WonAtomMenu extends React.Component {
           <span className="atom-menu__item__unread" />
           <span className="atom-menu__item__label">Posts</span>
           <span className="atom-menu__item__count">
-            ({this.state.heldAtomsSize})
+            {"(" + this.state.heldAtomsSize + ")"}
           </span>
         </div>
       );
@@ -298,7 +298,7 @@ export default class WonAtomMenu extends React.Component {
           <span className="atom-menu__item__unread" />
           <span className="atom-menu__item__label">Buddies</span>
           <span className="atom-menu__item__count">
-            ({this.state.buddyCount})
+            {"(" + this.state.buddyCount + ")"}
           </span>
         </div>
       );
@@ -316,7 +316,7 @@ export default class WonAtomMenu extends React.Component {
           <span className="atom-menu__item__label">Reviews</span>
           {this.state.hasReviews && (
             <span className="atom-menu__item__rating">
-              ({this.state.reviewCount})
+              {"(" + this.state.reviewCount + ")"}
             </span>
           )}
         </div>

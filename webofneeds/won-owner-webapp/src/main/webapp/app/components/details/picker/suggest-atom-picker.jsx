@@ -65,52 +65,24 @@ const mapStateToProps = (state, ownProps) => {
       (elem.get("humanReadable") || "").toLowerCase()
     );
 
-  const uriToFetchProcess = getIn(state, [
-    "process",
-    "atoms",
-    this.state.uriToFetch,
-  ]);
-  const uriToFetchLoading = !!get(uriToFetchProcess, "loading");
-  const uriToFetchFailedToLoad = !!get(uriToFetchProcess, "failedToLoad");
-  const uriToFetchIsNotAllowed =
-    !!get(allForbiddenAtoms, this.state.uriToFetch) &&
-    !hasAtLeastOneAllowedSocket(
-      get(allForbiddenAtoms, this.state.uriToFetch),
-      ownProps.allowedSockets
-    );
-  const uriToFetchIsExcluded = isExcludedAtom(
-    get(allForbiddenAtoms, this.state.uriToFetch),
-    ownProps.excludedUris
-  );
-
   return {
     initialValue: ownProps.initialValue,
     detail: ownProps.detail,
     excludedText: ownProps.excludedText,
     notAllowedSocketText: ownProps.notAllowedSocketText,
     onUpdate: ownProps.onUpdate,
-    uriToFetchLoading,
-    uriToFetchFailedToLoad,
-    uriToFetchIsExcluded,
-    uriToFetchIsNotAllowed,
+    processState: get(state, ["process"]),
     allSuggestableAtoms,
     allForbiddenAtoms,
+    allowedSockets: ownProps.allowedSockets,
+    excludedUris: ownProps.excludedUris,
     suggestionsAvailable: allSuggestableAtoms && allSuggestableAtoms.size > 0,
     sortedActiveAtomsArray,
     suggestedAtom,
     noSuggestionsLabel:
       ownProps.noSuggestionsText || "No Atoms available to suggest",
-    uriToFetchSuccess:
-      this.state.uriToFetch &&
-      !uriToFetchLoading &&
-      !uriToFetchFailedToLoad &&
-      get(allSuggestableAtoms, this.state.uriToFetch),
-    uriToFetchFailed:
-      this.state.uriToFetch &&
-      !uriToFetchLoading &&
-      (uriToFetchFailedToLoad ||
-        uriToFetchIsExcluded ||
-        uriToFetchIsNotAllowed),
+    hasAtLeastOneAllowedSocket,
+    isExcludedAtom,
   };
 };
 
@@ -123,27 +95,79 @@ const mapDispatchToProps = dispatch => {
 };
 
 class WonSuggestAtomPicker extends React.Component {
-  //TODO: CHANGE AND UPDATE LISTENERS DONT WORK
-  //TODO: IMPLEMENT ->
-  /*
-    this.$scope.$watch(
-        () => this.state.uriToFetchSuccess,
-        () =>
-          delay(0).then(() => {
-            if (this.state.uriToFetchSuccess) {
-              this.update(this.uriToFetch);
-              this.resetAtomUriField();
-            }
-          })
-      );
-   */
   constructor(props) {
     super(props);
     this.state = {
+      uriToFetchLoading: false,
+      uriToFetchFailedToLoad: false,
+      uriToFetchFailed: false,
+      uriToFetchIsNotAllowed: false,
+      uriToFetchIsExcluded: false,
       showFetchButton: false,
       showResetButton: false,
-      uriToFetch: undefined,
+      uriToFetch: "",
     };
+  }
+
+  static getDerivedStateFromProps(props, state) {
+    const uriToFetchProcess = getIn(props.processState, [
+      "atoms",
+      state.uriToFetch,
+    ]);
+    const uriToFetchLoading = !!get(uriToFetchProcess, "loading");
+    const uriToFetchFailedToLoad = !!get(uriToFetchProcess, "failedToLoad");
+    const uriToFetchIsNotAllowed =
+      !!get(props.allForbiddenAtoms, state.uriToFetch) &&
+      !props.hasAtLeastOneAllowedSocket(
+        get(props.allForbiddenAtoms, state.uriToFetch),
+        props.allowedSockets
+      );
+    const uriToFetchIsExcluded = props.isExcludedAtom(
+      get(props.allForbiddenAtoms, state.uriToFetch),
+      props.excludedUris
+    );
+    const uriToFetchSuccess =
+      state.uriToFetch &&
+      !uriToFetchLoading &&
+      !uriToFetchFailedToLoad &&
+      get(props.allSuggestableAtoms, state.uriToFetch);
+    console.debug("TODO: HANDLE URITOFETCHSUCCESS: ", uriToFetchSuccess);
+    const uriToFetchFailed =
+      state.uriToFetch &&
+      !uriToFetchLoading &&
+      (uriToFetchFailedToLoad ||
+        uriToFetchIsExcluded ||
+        uriToFetchIsNotAllowed);
+
+    if (uriToFetchSuccess) {
+      if (state.uriToFetch && state.uriToFetch.trim().length > 0) {
+        props.onUpdate({ value: state.uriToFetch });
+      } else {
+        props.onUpdate({ value: undefined });
+      }
+
+      return {
+        uriToFetchLoading: uriToFetchLoading,
+        uriToFetchFailedToLoad: uriToFetchFailedToLoad,
+        uriToFetchFailed: uriToFetchFailed,
+        uriToFetchIsNotAllowed: uriToFetchIsNotAllowed,
+        uriToFetchIsExcluded: uriToFetchIsExcluded,
+        uriToFetch: "",
+        showResetButton: false,
+        showFetchButton: false,
+      };
+    } else {
+      return {
+        uriToFetchLoading: uriToFetchLoading,
+        uriToFetchFailedToLoad: uriToFetchFailedToLoad,
+        uriToFetchFailed: uriToFetchFailed,
+        uriToFetchIsNotAllowed: uriToFetchIsNotAllowed,
+        uriToFetchIsExcluded: uriToFetchIsExcluded,
+        uriToFetch: state.uriToFetch,
+        showResetButton: state.showResetButton,
+        showFetchButton: state.showFetchButton,
+      };
+    }
   }
 
   render() {
@@ -174,27 +198,27 @@ class WonSuggestAtomPicker extends React.Component {
 
     let suggestPostInputIcon;
 
-    if (this.props.uriToFetchLoading) {
+    if (this.state.uriToFetchLoading) {
       suggestPostInputIcon = (
         <svg className="sap__input__icon hspinner">
           <use xlinkHref="#ico_loading_anim" href="#ico_loading_anim" />
         </svg>
       );
     } else if (this.fetchAtomUriFieldHasText()) {
-      if (this.state.showFetchButton && !this.props.uriToFetchFailed) {
+      if (this.state.showFetchButton && !this.state.uriToFetchFailed) {
         suggestPostInputIcon = (
           <svg
             className="sap__input__icon clickable"
-            onClick={() => this.fetchAtom()}
+            onClick={this.fetchAtom.bind(this)}
           >
             <use xlinkHref="#ico16_checkmark" href="#ico16_checkmark" />
           </svg>
         );
-      } else if (this.state.showResetButton || this.props.uriToFetchFailed) {
+      } else if (this.state.showResetButton || this.state.uriToFetchFailed) {
         suggestPostInputIcon = (
           <svg
             className="sap__input__icon clickable"
-            onClick={() => this.resetAtomUriField()}
+            onClick={this.resetAtomUriField.bind(this)}
           >
             <use xlinkHref="#ico36_close" href="#ico36_close" />
           </svg>
@@ -206,11 +230,11 @@ class WonSuggestAtomPicker extends React.Component {
     if (this.fetchAtomUriFieldHasText()) {
       let errorText;
 
-      if (this.props.uriToFetchFailedToLoad) {
+      if (this.state.uriToFetchFailedToLoad) {
         errorText = "Failed to Load Suggestion, might not be a valid uri.";
-      } else if (this.props.uriToFetchIsExcluded) {
+      } else if (this.state.uriToFetchIsExcluded) {
         errorText = this.props.excludedText;
-      } else if (this.props.uriToFetchIsNotAllowed) {
+      } else if (this.state.uriToFetchIsNotAllowed) {
         errorText = this.props.notAllowedSocketText;
       }
 
@@ -224,11 +248,11 @@ class WonSuggestAtomPicker extends React.Component {
         <div className="sap__input">
           {suggestPostInputIcon}
           <input
-            ref={uriInput => (this.uriInput = uriInput)}
             type="url"
             placeholder={this.props.detail.placeholder}
             className="sap__input__inner"
-            onChange={() => this.updateFetchAtomUriField()}
+            value={this.state.uriToFetch}
+            onChange={this.updateFetchAtomUriField.bind(this)}
           />
         </div>
         {suggestPostErrors}
@@ -256,14 +280,13 @@ class WonSuggestAtomPicker extends React.Component {
     }
   }
 
-  updateFetchAtomUriField() {
-    console.debug("suggest-atom-picker: ", "updateFetchAtomUriField()");
-    const text = this.uriInput && this.uriInput.value;
+  updateFetchAtomUriField(event) {
+    const text = event.target.value;
 
     let showFetchButton;
     let showResetButton;
     if (text && text.trim().length > 0) {
-      if (this.uriInput.checkValidity()) {
+      if (event.target.checkValidity()) {
         showResetButton = false;
         showFetchButton = true;
       } else {
@@ -272,48 +295,38 @@ class WonSuggestAtomPicker extends React.Component {
       }
     }
     this.setState({
-      uriToFetch: undefined,
+      uriToFetch: text.trim(),
       showResetButton: showResetButton,
       showFetchButton: showFetchButton,
     });
   }
 
   fetchAtomUriFieldHasText() {
-    console.debug("suggest-atom-picker: ", "fetchAtomUriFieldHasText()");
-    const text = this.uriInput && this.uriInput.value;
-    return text && text.length > 0;
+    return this.state.uriToFetch && this.state.uriToFetch.length > 0;
   }
 
   resetAtomUriField() {
-    if (this.uriInput) {
-      this.uriInput.value = "";
-    }
     this.setState({
-      uriToFetch: undefined,
+      uriToFetch: "",
       showResetButton: false,
       showFetchButton: false,
     });
   }
 
   fetchAtom() {
-    let uriToFetch = this.uriInput && this.uriInput.value;
-    uriToFetch = uriToFetch && uriToFetch.trim();
     console.debug(
       "suggest-atom-picker: ",
       "fetchAtom()",
       " uriToFetch: ",
-      uriToFetch
+      this.state.uriToFetch
     );
     if (
-      !getIn(this.props.allSuggestableAtoms, uriToFetch) &&
-      !get(this.props.allForbiddenAtoms, uriToFetch)
+      !getIn(this.props.allSuggestableAtoms, this.state.uriToFetch) &&
+      !get(this.props.allForbiddenAtoms, this.state.uriToFetch)
     ) {
-      this.props.fetchAtom(uriToFetch);
-      this.setState({ uriToFetch: uriToFetch });
-    } else if (get(this.props.allForbiddenAtoms, uriToFetch)) {
-      this.setState({ uriToFetch: uriToFetch });
+      this.props.fetchAtom(this.state.uriToFetch);
     } else {
-      this.update(uriToFetch);
+      this.update(this.state.uriToFetch);
     }
   }
 
@@ -333,19 +346,18 @@ WonSuggestAtomPicker.propTypes = {
   notAllowedSocketText: PropTypes.string,
   noSuggestionsText: PropTypes.string,
   onUpdate: PropTypes.func.isRequired,
-  uriToFetchLoading: PropTypes.bool,
-  uriToFetchFailedToLoad: PropTypes.bool,
-  uriToFetchIsExcluded: PropTypes.bool,
-  uriToFetchIsNotAllowed: PropTypes.bool,
   allSuggestableAtoms: PropTypes.object,
   allForbiddenAtoms: PropTypes.object,
   suggestionsAvailable: PropTypes.bool,
   sortedActiveAtomsArray: PropTypes.arrayOf(PropTypes.object),
   suggestedAtom: PropTypes.object,
   noSuggestionsLabel: PropTypes.string,
-  uriToFetchSuccess: PropTypes.bool,
-  uriToFetchFailed: PropTypes.bool,
   fetchAtom: PropTypes.func,
+  processState: PropTypes.object,
+  excludedUris: PropTypes.arrayOf(PropTypes.string),
+  allowedSockets: PropTypes.arrayOf(PropTypes.string),
+  isExcludedAtom: PropTypes.func,
+  hasAtLeastOneAllowedSocket: PropTypes.func,
 };
 
 export default connect(

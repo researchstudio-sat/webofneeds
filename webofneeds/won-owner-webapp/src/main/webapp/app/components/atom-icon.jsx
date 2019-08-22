@@ -12,7 +12,7 @@ import { connect } from "react-redux";
 const mapStateToProps = (state, ownProps) => {
   const atom = getIn(state, ["atoms", ownProps.atomUri]);
   const isPersona = atomUtils.isPersona(atom);
-  const image = isPersona && atomUtils.getDefaultPersonaImage(atom);
+  const image = isPersona ? atomUtils.getDefaultPersonaImage(atom) : undefined;
 
   const useCaseIcon = !isPersona
     ? atomUtils.getMatchedUseCaseIcon(atom)
@@ -147,7 +147,7 @@ WonAtomIcon.propTypes = {
   atomImage: PropTypes.object,
   atomInactive: PropTypes.bool,
   atomFailedToLoad: PropTypes.bool,
-  useCaseIcon: PropTypes.object,
+  useCaseIcon: PropTypes.string,
   useCaseIconBackground: PropTypes.string,
   showIdenticon: PropTypes.bool,
   showImage: PropTypes.bool,
