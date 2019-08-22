@@ -44,18 +44,20 @@ export default class WonAtomContentDetails extends React.Component {
     const contentDetailsMap =
       this.state.details &&
       this.state.details.map((contentDetail, contentDetailKey) => {
-        const detailDefinition = get(allDetailsImm, contentDetailKey);
+        const detailDefinitionImm = get(allDetailsImm, contentDetailKey);
         if (
-          detailDefinition &&
+          detailDefinitionImm &&
           !this.shouldOmitDetail(contentDetail, contentDetailKey)
         ) {
-          const ReactViewerComponent = get(detailDefinition, "viewerComponent");
+          const detailDefinition = detailDefinitionImm.toJS();
+          const ReactViewerComponent =
+            detailDefinition && detailDefinition.viewerComponent;
 
           if (ReactViewerComponent) {
             return (
               <div key={contentDetailKey} className="pis__component">
                 <ReactViewerComponent
-                  detail={detailDefinition.toJS()}
+                  detail={detailDefinition}
                   content={contentDetail}
                   ngRedux={this.props.ngRedux}
                 />

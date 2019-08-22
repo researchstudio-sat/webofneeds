@@ -359,7 +359,7 @@ class ChatTextfield extends React.Component {
                   this.state.additionalContent,
                   get(this.props.selectedDetail, "identifier")
                 )}
-                detail={this.props.selectedDetail}
+                detail={this.props.selectedDetail.toJS()}
               />
             )}
           </div>

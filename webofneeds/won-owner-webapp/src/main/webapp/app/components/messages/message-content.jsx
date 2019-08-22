@@ -105,15 +105,19 @@ export default class WonMessageContent extends React.Component {
       const contentDetailsMap =
         this.state.content &&
         this.state.content.map((contentDetail, contentDetailKey) => {
-          const detailDefinition = get(allDetailsImm, contentDetailKey);
-          const ReactViewerComponent = get(detailDefinition, "viewerComponent");
+          const detailDefinitionImm = get(allDetailsImm, contentDetailKey);
+
+          const detailDefinition =
+            detailDefinitionImm && detailDefinitionImm.toJS();
+          const ReactViewerComponent =
+            detailDefinition && detailDefinition.viewerComponent;
 
           if (detailDefinition && ReactViewerComponent) {
             return (
               <div key={contentDetailKey} className="msg__content">
                 <ReactViewerComponent
                   className="won-in-message"
-                  detail={detailDefinition.toJS()}
+                  detail={detailDefinition}
                   content={contentDetail}
                   ngRedux={this.props.ngRedux}
                 />

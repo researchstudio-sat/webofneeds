@@ -120,24 +120,24 @@ const mapDispatchToProps = dispatch => {
 class WonSuggestAtomViewer extends React.Component {
   render() {
     const icon = this.props.detail.icon && (
-      <svg className="suggestpostv__header__icon">
+      <svg className="suggestatomv__header__icon">
         <use xlinkHref={this.props.detail.icon} href={this.props.detail.icon} />
       </svg>
     );
 
     const label = this.props.detail.icon && (
-      <span className="suggestpostv__header__label">
+      <span className="suggestatomv__header__label">
         {this.props.detail.label}
       </span>
     );
 
     return (
-      <won-suggestpost-viewer class={this.props.className}>
-        <div className="suggestpostv__header">
+      <won-suggest-atom-viewer class={this.props.className}>
+        <div className="suggestatomv__header">
           {icon}
           {label}
         </div>
-        <div className="suggestpostv__content">
+        <div className="suggestatomv__content">
           <div className="suggestatomv__content__post">
             <WonAtomCard
               atomUri={this.props.content}
@@ -200,7 +200,7 @@ class WonSuggestAtomViewer extends React.Component {
             {this.getInfoText()}
           </div>
         </div>
-      </won-suggestpost-viewer>
+      </won-suggest-atom-viewer>
     );
   }
 
