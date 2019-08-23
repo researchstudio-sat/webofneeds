@@ -68,7 +68,6 @@ const mapStateToProps = (state, ownProps) => {
 };
 
 const mapDispatchToProps = dispatch => {
-  //TODO
   return {
     viewRemoveAddMessageContent: () => {
       dispatch(actionCreators.view__removeAddMessageContent());

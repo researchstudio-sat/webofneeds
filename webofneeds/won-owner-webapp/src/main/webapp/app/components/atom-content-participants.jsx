@@ -192,7 +192,6 @@ export default class WonAtomContentParticipants extends React.Component {
                     currentLocation={this.state.currentLocation}
                     showSuggestions={false}
                     showPersona={true}
-                    ngRedux={this.props.ngRedux}
                   />
                   {actionButtons}
                 </div>
@@ -243,7 +242,6 @@ export default class WonAtomContentParticipants extends React.Component {
                 currentLocation={this.state.currentLocation}
                 showSuggestions={false}
                 showPersona={true}
-                ngRedux={this.props.ngRedux}
               />
               <div className="acp__participant__actions" />
             </div>

@@ -14,7 +14,6 @@ export default class WonAtomCardGrid extends React.Component {
     const showSuggestions = this.props.showSuggestions;
     const showCreate = this.props.showCreate;
     const currentLocation = this.props.currentLocation;
-    const ngRedux = this.props && this.props.ngRedux;
 
     console.debug(
       "Render WonAtomCard-Grid for: \n",
@@ -45,7 +44,6 @@ export default class WonAtomCardGrid extends React.Component {
             showPersona={showPersona}
             showSuggestions={showSuggestions}
             currentLocation={currentLocation}
-            ngRedux={ngRedux}
           />
         );
       });

@@ -193,7 +193,6 @@ export default class WonAtomContentBuddies extends React.Component {
                     currentLocation={this.state.currentLocation}
                     showSuggestions={false}
                     showPersona={false}
-                    ngRedux={this.props.ngRedux}
                   />
                   {actionButtons}
                 </div>
@@ -239,7 +238,6 @@ export default class WonAtomContentBuddies extends React.Component {
                 currentLocation={this.state.currentLocation}
                 showSuggestions={false}
                 showPersona={false}
-                ngRedux={this.props.ngRedux}
               />
               <div className="acb__buddy__actions" />
             </div>

@@ -171,7 +171,6 @@ export default class WonAtomContentSuggestions extends React.Component {
                 currentLocation={this.state.currentLocation}
                 showSuggestions={false}
                 showPersona={true}
-                ngRedux={this.props.ngRedux}
                 onAtomClick={() => {
                   this.viewSuggestion(suggestion);
                 }}

@@ -10,7 +10,7 @@ import WonOtherCard from "./cards/other-card.jsx";
 import WonSkeletonCard from "./cards/skeleton-card.jsx";
 import WonPersonaCard from "./cards/persona-card.jsx";
 import PropTypes from "prop-types";
-import { connect, ReactReduxContext } from "react-redux";
+import { connect } from "react-redux";
 
 import "~/style/_atom-card.scss";
 
@@ -69,47 +69,32 @@ class WonAtomCard extends React.Component {
     if (this.props.isSkeleton) {
       return (
         <won-atom-card>
-          <ReactReduxContext.Consumer>
-            {({ store }) => (
-              <WonSkeletonCard
-                atomUri={this.props.atomUri}
-                showSuggestions={this.props.showSuggestions}
-                showPersona={this.props.showPersona}
-                ngRedux={store}
-              />
-            )}
-          </ReactReduxContext.Consumer>
+          <WonSkeletonCard
+            atomUri={this.props.atomUri}
+            showSuggestions={this.props.showSuggestions}
+            showPersona={this.props.showPersona}
+          />
         </won-atom-card>
       );
     } else if (this.props.isPersona) {
       return (
         <won-atom-card>
-          <ReactReduxContext.Consumer>
-            {({ store }) => (
-              <WonPersonaCard
-                atomUri={this.props.atomUri}
-                onAtomClick={this.props.onAtomClick}
-                ngRedux={store}
-              />
-            )}
-          </ReactReduxContext.Consumer>
+          <WonPersonaCard
+            atomUri={this.props.atomUri}
+            onAtomClick={this.props.onAtomClick}
+          />
         </won-atom-card>
       );
     } else {
       return (
         <won-atom-card>
-          <ReactReduxContext.Consumer>
-            {({ store }) => (
-              <WonOtherCard
-                atomUri={this.props.atomUri}
-                showSuggestions={this.props.showSuggestions}
-                showPersona={this.props.showPersona}
-                onAtomClick={this.props.onAtomClick}
-                currentLocation={this.props.currentLocation}
-                ngRedux={store}
-              />
-            )}
-          </ReactReduxContext.Consumer>
+          <WonOtherCard
+            atomUri={this.props.atomUri}
+            showSuggestions={this.props.showSuggestions}
+            showPersona={this.props.showPersona}
+            onAtomClick={this.props.onAtomClick}
+            currentLocation={this.props.currentLocation}
+          />
         </won-atom-card>
       );
     }

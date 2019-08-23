@@ -64,7 +64,6 @@ export default class WonAtomContentHolds extends React.Component {
                 currentLocation={this.state.currentLocation}
                 showSuggestions={this.state.isOwned}
                 showPersona={false}
-                ngRedux={this.props.ngRedux}
               />
             );
           })
