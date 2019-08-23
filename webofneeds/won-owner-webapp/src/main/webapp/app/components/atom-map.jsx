@@ -17,7 +17,8 @@ const currentLocationIcon = L.divIcon({
 
 const locationIcon = L.divIcon({
   className: "wonLocationMarkerIcon",
-  html: "<div class='marker'></div>",
+  html:
+    "<svg class='marker__icon'><use xlink:href='#ico36_detail_location' href='#ico36_detail_location' /></svg>",
 });
 
 export default class WonAtomMap extends React.Component {
