@@ -274,11 +274,34 @@ svg {
 //TODO the :hover isn't usable on touch displays (require alternate path to get to the help text) - dog-ears + peel-slide?
 //TODO enable keyboard selection. add aria-information
 
-.wonCurrentLocationMarkerIcon {
+.wonCurrentLocationMarkerIcon > .marker {
   width: 15px;
   height: 15px;
   background-color: $won-primary-color;
   border-radius: 100%;
+}
+
+.wonLocationMarkerIcon > .marker {
+  //TODO: FIGURE OUT A BETTER MARKER ICON
+  width: 20px;
+  height: 20px;
+  border-radius: 50% 50% 50% 0;
+  background-color: $won-secondary-color-light;
+  position: absolute;
+  transform: rotate(-45deg);
+  left: 50%;
+  top: 50%;
+  margin: -20px 0 0 -20px;
+  box-shadow: 2px 2px 10px black;
+  &:after {
+    content: "";
+    width: 10px;
+    height: 10px;
+    margin: 5px 0 0 5px;
+    background: white;
+    position: absolute;
+    border-radius: 50%;
+  }
 }
 
 //QUICK FIX for broken elm back button

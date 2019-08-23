@@ -12,6 +12,12 @@ import "leaflet/dist/leaflet.css";
 
 const currentLocationIcon = L.divIcon({
   className: "wonCurrentLocationMarkerIcon",
+  html: "<div class='marker'></div>",
+});
+
+const locationIcon = L.divIcon({
+  className: "wonLocationMarkerIcon",
+  html: "<div class='marker'></div>",
 });
 
 export default class WonAtomMap extends React.Component {
@@ -43,6 +49,7 @@ export default class WonAtomMap extends React.Component {
             <Marker
               key={locationTupel.toString() + "/" + index}
               position={locationTupel}
+              icon={locationIcon}
             />
           );
         }
