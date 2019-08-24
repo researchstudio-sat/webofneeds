@@ -108,6 +108,7 @@ won-travel-action-picker {
     height: 31rem;
     z-index: 0;
     margin-top: 0.5rem;
+    box-sizing: border-box;
 
     @media (max-width: $responsivenessBreakPoint) {
       height: 15rem;

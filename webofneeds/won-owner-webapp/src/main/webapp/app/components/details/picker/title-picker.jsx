@@ -3,6 +3,7 @@ import React from "react";
 import "~/style/_titlepicker.scss";
 import PropTypes from "prop-types";
 
+//TODO: IMPLEMENT DEBOUNCE HOOK IF PROP IS SET
 export default class WonTitlePicker extends React.Component {
   constructor(props) {
     super(props);
@@ -28,7 +29,7 @@ export default class WonTitlePicker extends React.Component {
           <input
             type="text"
             className="titlep__input__inner"
-            placeholder={this.props.detail.placeholder}
+            placeholder={this.props.detail && this.props.detail.placeholder}
             value={this.state.value}
             onChange={this.update.bind(this)}
           />

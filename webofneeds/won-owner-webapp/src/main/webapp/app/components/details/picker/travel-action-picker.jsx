@@ -16,7 +16,7 @@ export default class WonTravelActionPicker extends React.Component {
   }
 }
 WonTravelActionPicker.propTypes = {
-  initialValue: PropTypes.string,
+  initialValue: PropTypes.object,
   detail: PropTypes.object,
   onUpdate: PropTypes.func.isRequired,
 };

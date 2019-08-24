@@ -6,15 +6,19 @@ won-location-picker {
   display: block;
   position: relative;
 
-  // remove X rendered by IE and Edge as we have our own clear button
-  ::-ms-clear {
-    width: 0;
-    height: 0;
-  }
-
   won-title-picker.lp__searchbox > .titlep__input > .titlep__input__inner {
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
+    outline: none;
+  }
+
+  won-title-picker.lp__addressoverride
+    > .titlep__input
+    > .titlep__input__inner {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    border-top: 0;
+    outline: none;
   }
 
   // show search results when search box is focused
@@ -50,6 +54,11 @@ won-location-picker {
 
       padding: 1rem 0.5rem;
       font-size: $normalFontSize;
+      cursor: pointer;
+
+      &:hover {
+        background-color: $won-lighter-gray;
+      }
 
       .lp__searchresult__text {
         padding: 0 0.5rem;
@@ -57,6 +66,7 @@ won-location-picker {
 
       .lp__searchresult__icon {
         @include fixed-square(1.5rem);
+        --local-primary: #{$won-subtitle-gray};
       }
     }
   }
@@ -67,12 +77,10 @@ won-location-picker {
     z-index: 0;
     border: $thinGrayBorder;
     border-top: 0;
+    box-sizing: border-box;
 
     @media (max-width: $responsivenessBreakPoint) {
       height: 15rem;
     }
-  }
-  .highlightedText {
-    font-weight: bold;
   }
 }
