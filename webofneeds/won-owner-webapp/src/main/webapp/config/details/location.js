@@ -50,6 +50,10 @@ export const jobLocation = {
   component: WonLocationPicker,
   viewerComponent: WonLocationViewer,
   messageEnabled: true,
+  overrideAddressDetail: {
+    placeholder:
+      "Alternative Address name (e.g. if doornumber should be included)",
+  },
   parseToRDF: function({ value, identifier, contentUri }) {
     return {
       "s:jobLocation": genSPlace({
