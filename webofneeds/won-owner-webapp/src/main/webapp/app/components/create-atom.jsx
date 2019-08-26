@@ -206,6 +206,11 @@ class CreateAtom extends React.Component {
       isNew: true,
       draftObject: {},
     };
+
+    this.save = this.save.bind(this);
+    this.publish = this.publish.bind(this);
+    this.updateDraftContent = this.updateDraftContent.bind(this);
+    this.updateDraftSeeks = this.updateDraftSeeks.bind(this);
   }
 
   componentDidMount() {
@@ -255,7 +260,7 @@ class CreateAtom extends React.Component {
           <WonCreateIsSeeks
             detailList={this.props.useCase.details}
             initialDraft={this.props.useCase.draft.content}
-            onUpdate={this.updateDraftContent.bind(this)}
+            onUpdate={this.updateDraftContent}
           />
         </React.Fragment>
       );
@@ -266,7 +271,7 @@ class CreateAtom extends React.Component {
           <WonCreateIsSeeks
             detailList={this.props.useCase.seeksDetails}
             initialDraft={this.props.useCase.draft.seeks}
-            onUpdate={this.updateDraftSeeks.bind(this)}
+            onUpdate={this.updateDraftSeeks}
           />
         </React.Fragment>
       );
@@ -295,7 +300,7 @@ class CreateAtom extends React.Component {
                     ? this.props.holderUri
                     : undefined,
                 }}
-                onPublish={this.publish.bind(this)}
+                onPublish={this.publish}
               />
             )}
             {this.props.loggedIn &&
@@ -304,7 +309,7 @@ class CreateAtom extends React.Component {
                 <div className="cp__footer__edit">
                   <button
                     className="cp__footer__edit__save won-button--filled red"
-                    onClick={this.save.bind(this)}
+                    onClick={this.save}
                     disabled={!this.isValid()}
                   >
                     Save
