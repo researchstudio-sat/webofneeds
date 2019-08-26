@@ -1,6 +1,5 @@
 import React from "react";
-import { searchNominatim } from "../../../api/nominatim-api.js";
-import { Map, TileLayer, Marker } from "react-leaflet";
+import { Map, Marker, TileLayer } from "react-leaflet";
 import "~/style/_locationpicker.scss";
 import PropTypes from "prop-types";
 import WonTitlePicker from "./title-picker.jsx";
@@ -8,6 +7,7 @@ import {
   nominatim2draftLocation,
   reverseSearchNominatim,
   scrubSearchResults,
+  searchNominatim,
 } from "../../../api/nominatim-api.js";
 import L from "leaflet";
 

@@ -1,5 +1,4 @@
 @import "won";
-@import "border-utils";
 @import "textfield";
 
 won-location-picker {
@@ -21,13 +20,9 @@ won-location-picker {
     outline: none;
   }
 
-  // show search results when search box is focused
-  .lp__searchbox:focus-within + .lp__searchresults {
-    display: block;
-  }
-
-  // needed to make search results appear long enough to be clickable
+  .lp__searchbox:focus-within + .lp__searchresults, // show search results when search box is focused
   .lp__searchresults:hover {
+    // needed to make search results appear long enough to be clickable
     display: block;
   }
 
@@ -36,7 +31,7 @@ won-location-picker {
     border: none;
 
     &.lp__searchresults--filled {
-      @include thin-border;
+      border: $thinGrayBorder;
     }
 
     width: 100%;
