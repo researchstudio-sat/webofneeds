@@ -99,32 +99,32 @@ export default class WonAtomContentParticipants extends React.Component {
             if (connectionUtils.isRequestReceived(conn)) {
               actionButtons = (
                 <div className="acp__participant__actions">
-                  <div
+                  <button
                     className="acp__participant__actions__button red won-button--outlined thin"
                     onClick={() => this.openRequest(conn)}
                   >
                     Accept
-                  </div>
-                  <div
+                  </button>
+                  <button
                     className="acp__participant__actions__button red won-button--outlined thin"
                     onClick={() =>
                       this.closeConnection(conn, "Reject Participant Request?")
                     }
                   >
                     Reject
-                  </div>
+                  </button>
                 </div>
               );
             } else if (connectionUtils.isSuggested(conn)) {
               actionButtons = (
                 <div className="acp__participant__actions">
-                  <div
+                  <button
                     className="acp__participant__actions__button red won-button--outlined thin"
                     onClick={() => this.sendRequest(conn)}
                   >
                     Request
-                  </div>
-                  <div
+                  </button>
+                  <button
                     className="acp__participant__actions__button red won-button--outlined thin"
                     onClick={() =>
                       this.closeConnection(
@@ -134,37 +134,37 @@ export default class WonAtomContentParticipants extends React.Component {
                     }
                   >
                     Remove
-                  </div>
+                  </button>
                 </div>
               );
             } else if (connectionUtils.isRequestSent(conn)) {
               actionButtons = (
                 <div className="acp__participant__actions">
-                  <div
+                  <button
                     className="acp__participant__actions__button red won-button--outlined thin"
                     disabled={true}
                   >
                     Waiting for Accept...
-                  </div>
-                  <div
+                  </button>
+                  <button
                     className="acp__participant__actions__button red won-button--outlined thin"
                     onClick={() =>
                       this.closeConnection(conn, "Cancel Participant Request?")
                     }
                   >
                     Cancel
-                  </div>
+                  </button>
                 </div>
               );
             } else if (connectionUtils.isConnected(conn)) {
               actionButtons = (
                 <div className="acp__participant__actions">
-                  <div
+                  <button
                     className="acp__participant__actions__button red won-button--outlined thin"
                     onClick={() => this.closeConnection(conn)}
                   >
                     Remove
-                  </div>
+                  </button>
                 </div>
               );
             } else {
