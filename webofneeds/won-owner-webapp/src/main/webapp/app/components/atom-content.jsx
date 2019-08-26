@@ -1,6 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { actionCreators } from "../actions/actions.js";
+import { connect } from "react-redux";
 import { get, getIn } from "../utils.js";
 
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
@@ -23,72 +24,57 @@ import { Elm } from "../../elm/AddPersona.elm";
 import "~/style/_atom-content.scss";
 import "~/style/_rdflink.scss";
 
-export default class WonAtomContent extends React.Component {
-  componentDidMount() {
-    this.atomUri = this.props.atomUri;
-    this.disconnect = this.props.ngRedux.connect(
-      this.selectFromState.bind(this),
-      actionCreators
-    )(state => {
-      this.setState(state);
-    });
-  }
+const mapStateToProps = (state, ownProps) => {
+  const openConnectionUri = generalSelectors.getConnectionUriFromRoute(state);
+  const atom = getIn(state, ["atoms", ownProps.atomUri]);
+  const isOwned = generalSelectors.isAtomOwned(state, ownProps.atomUri);
+  const isActive = atomUtils.isActive(atom);
+  const content = get(atom, "content");
 
-  componentWillUnmount() {
-    this.disconnect();
-  }
+  //TODO it will be possible to have more than one seeks
+  const seeks = get(atom, "seeks");
 
-  UNSAFE_componentWillReceiveProps(nextProps) {
-    this.atomUri = nextProps.atomUri;
-    this.setState(this.selectFromState(this.props.ngRedux.getState()));
-  }
+  const hasContent = this.hasVisibleDetails(content);
+  const hasSeeksBranch = this.hasVisibleDetails(seeks);
 
-  selectFromState(state) {
-    const openConnectionUri = generalSelectors.getConnectionUriFromRoute(state);
-    const atom = getIn(state, ["atoms", this.atomUri]);
-    const isOwned = generalSelectors.isAtomOwned(state, this.atomUri);
-    const isActive = atomUtils.isActive(atom);
-    const content = get(atom, "content");
+  const viewState = get(state, "view");
+  const process = get(state, "process");
 
-    //TODO it will be possible to have more than one seeks
-    const seeks = get(atom, "seeks");
+  return {
+    atomUri: ownProps.atomUri,
+    hasContent,
+    hasSeeksBranch,
+    atom,
+    isOwned,
+    isActive,
+    isHeld: atomUtils.isHeld(atom),
+    hasChatSocket: atomUtils.hasChatSocket(atom),
+    hasHoldableSocket: atomUtils.hasHoldableSocket(atom),
+    atomLoading: !atom || processUtils.isAtomLoading(process, ownProps.atomUri),
+    atomFailedToLoad:
+      atom && processUtils.hasAtomFailedToLoad(process, ownProps.atomUri),
+    atomProcessingUpdate:
+      atom && processUtils.isAtomProcessingUpdate(process, ownProps.atomUri),
+    createdTimestamp: atom && atom.get("creationDate"),
+    shouldShowRdf: viewUtils.showRdf(viewState),
+    fromConnection: !!openConnectionUri,
+    openConnectionUri,
+    visibleTab: viewUtils.getVisibleTabByAtomUri(viewState, ownProps.atomUri),
+    personas: generalSelectors.getOwnedCondensedPersonaList(state),
+  };
+};
 
-    const hasContent = this.hasVisibleDetails(content);
-    const hasSeeksBranch = this.hasVisibleDetails(seeks);
+const mapDispatchToProps = dispatch => {
+  return {
+    fetchAtom: atomUri => {
+      dispatch(actionCreators.atoms__fetchUnloadedAtom(atomUri));
+    },
+  };
+};
 
-    const viewState = get(state, "view");
-    const process = get(state, "process");
-
-    return {
-      hasContent,
-      hasSeeksBranch,
-      atom,
-      isOwned,
-      isActive,
-      isHeld: atomUtils.isHeld(atom),
-      hasChatSocket: atomUtils.hasChatSocket(atom),
-      hasHoldableSocket: atomUtils.hasHoldableSocket(atom),
-      atomLoading: !atom || processUtils.isAtomLoading(process, this.atomUri),
-      atomFailedToLoad:
-        atom && processUtils.hasAtomFailedToLoad(process, this.atomUri),
-      atomProcessingUpdate:
-        atom && processUtils.isAtomProcessingUpdate(process, this.atomUri),
-      createdTimestamp: atom && atom.get("creationDate"),
-      shouldShowRdf: viewUtils.showRdf(viewState),
-      fromConnection: !!openConnectionUri,
-      openConnectionUri,
-      visibleTab: viewUtils.getVisibleTabByAtomUri(viewState, this.atomUri),
-      personas: generalSelectors.getOwnedCondensedPersonaList(state),
-    };
-  }
-
+class WonAtomContent extends React.Component {
   render() {
-    if (!this.state) {
-      console.debug("render with null state");
-      return <div />;
-    }
-
-    if (this.state.atomLoading) {
+    if (this.props.atomLoading) {
       return (
         <won-atom-content class="won-is-loading">
           <div className="atom-skeleton">
@@ -107,7 +93,7 @@ export default class WonAtomContent extends React.Component {
           </div>
         </won-atom-content>
       );
-    } else if (this.state.atomFailedToLoad) {
+    } else if (this.props.atomFailedToLoad) {
       return (
         <won-atom-content>
           <div className="atom-failedtoload">
@@ -132,7 +118,7 @@ export default class WonAtomContent extends React.Component {
         </won-atom-content>
       );
     } else {
-      const processingUpdateElement = this.state.atomProcessingUpdate && (
+      const processingUpdateElement = this.props.atomProcessingUpdate && (
         <div className="atom-content__updateindicator">
           <svg className="hspinner atom-content__updateindicator__spinner">
             <use xlinkHref="#ico_loading_anim" href="#ico_loading_anim" />
@@ -147,63 +133,53 @@ export default class WonAtomContent extends React.Component {
       if (this.isSelectedTab("DETAIL")) {
         visibleTabFragment = (
           <React.Fragment>
-            <WonAtomContentGeneral
-              atomUri={this.atomUri}
-              ngRedux={this.props.ngRedux}
-            />
+            <WonAtomContentGeneral atomUri={this.props.atomUri} />
 
-            {this.state.hasContent && (
-              <WonAtomContentDetails atomUri={this.atomUri} branch="content" />
+            {this.props.hasContent && (
+              <WonAtomContentDetails
+                atomUri={this.props.atomUri}
+                branch="content"
+              />
             )}
-            {this.state.hasContent &&
-              this.state.hasSeeksBranch && (
-                <WonLabelledHr
-                  label="Search"
-                  className="cp__labelledhr"
-                  ngRedux={this.props.ngRedux}
-                />
+            {this.props.hasContent &&
+              this.props.hasSeeksBranch && (
+                <WonLabelledHr label="Search" className="cp__labelledhr" />
               )}
-            {this.state.hasSeeksBranch && (
-              <WonAtomContentDetails atomUri={this.atomUri} branch="seeks" />
+            {this.props.hasSeeksBranch && (
+              <WonAtomContentDetails
+                atomUri={this.props.atomUri}
+                branch="seeks"
+              />
             )}
           </React.Fragment>
         );
       } else if (this.isSelectedTab("HELDBY")) {
-        if (this.state.isHeld) {
+        if (this.props.isHeld) {
           visibleTabFragment = (
-            <WonAtomContentPersona
-              holdsUri={this.atomUri}
-              ngRedux={this.props.ngRedux}
-            />
+            <WonAtomContentPersona holdsUri={this.props.atomUri} />
           );
         } else if (
-          this.state.isActive &&
-          this.state.hasHoldableSocket &&
-          this.state.isOwned
+          this.props.isActive &&
+          this.props.hasHoldableSocket &&
+          this.props.isOwned
         ) {
           visibleTabFragment = (
             <ElmReact
               src={Elm.AddPersona}
               flags={{
-                post: this.state.atom.toJS(),
-                personas: this.state.personas.toJS(),
+                post: this.props.atom.toJS(),
+                personas: this.props.personas.toJS(),
               }}
             />
           );
         }
       } else if (this.isSelectedTab("PARTICIPANTS")) {
         visibleTabFragment = (
-          <WonAtomContentParticipants
-            atomUri={this.atomUri}
-            ngRedux={this.props.ngRedux}
-          />
+          <WonAtomContentParticipants atomUri={this.props.atomUri} />
         );
       } else if (this.isSelectedTab("BUDDIES")) {
         visibleTabFragment = (
-          <WonAtomContentBuddies
-            atomUri={this.atomUri}
-            ngRedux={this.props.ngRedux}
-          />
+          <WonAtomContentBuddies atomUri={this.props.atomUri} />
         );
       } else if (this.isSelectedTab("REVIEWS")) {
         visibleTabFragment = (
@@ -215,17 +191,11 @@ export default class WonAtomContent extends React.Component {
         );
       } else if (this.isSelectedTab("SUGGESTIONS")) {
         visibleTabFragment = (
-          <WonAtomContentSuggestions
-            atomUri={this.atomUri}
-            ngRedux={this.props.ngRedux}
-          />
+          <WonAtomContentSuggestions atomUri={this.props.atomUri} />
         );
       } else if (this.isSelectedTab("HOLDS")) {
         visibleTabFragment = (
-          <WonAtomContentHolds
-            atomUri={this.atomUri}
-            ngRedux={this.props.ngRedux}
-          />
+          <WonAtomContentHolds atomUri={this.props.atomUri} />
         );
       } else if (this.isSelectedTab("RDF")) {
         visibleTabFragment = (
@@ -234,19 +204,19 @@ export default class WonAtomContent extends React.Component {
               className="rdflink clickable"
               target="_blank"
               rel="noopener noreferrer"
-              href={this.atomUri}
+              href={this.props.atomUri}
             >
               <svg className="rdflink__small">
                 <use xlinkHref="#rdf_logo_1" href="#rdf_logo_1" />
               </svg>
               <span className="rdflink__label">Atom</span>
             </a>
-            {this.state.openConnectionUri && (
+            {this.props.openConnectionUri && (
               <a
                 className="rdflink clickable"
                 target="_blank"
                 rel="noopener noreferrer"
-                href={this.state.openConnectionUri}
+                href={this.props.openConnectionUri}
               >
                 <svg className="rdflink__small">
                   <use xlinkHref="#rdf_logo_1" href="#rdf_logo_1" />
@@ -254,8 +224,8 @@ export default class WonAtomContent extends React.Component {
                 <span className="rdflink__label">Connection</span>
               </a>
             )}
-            {this.state.atom.get("jsonld") && (
-              <WonTrig jsonld={this.state.atom.get("jsonld")} />
+            {this.props.atom.get("jsonld") && (
+              <WonTrig jsonld={this.props.atom.get("jsonld")} />
             )}
           </div>
         );
@@ -273,15 +243,13 @@ export default class WonAtomContent extends React.Component {
   }
 
   tryReload() {
-    if (this.atomUri && this.state.atomFailedToLoad) {
-      this.props.ngRedux.dispatch(
-        actionCreators.atoms__fetchUnloadedAtom(this.atomUri)
-      );
+    if (this.props.atomUri && this.props.atomFailedToLoad) {
+      this.props.fetchAtom(this.props.atomUri);
     }
   }
 
   isSelectedTab(tabName) {
-    return tabName === this.state.visibleTab;
+    return tabName === this.props.visibleTab;
   }
 
   /**
@@ -301,5 +269,27 @@ export default class WonAtomContent extends React.Component {
 }
 WonAtomContent.propTypes = {
   atomUri: PropTypes.string.isRequired,
-  ngRedux: PropTypes.object.isRequired,
+  hasContent: PropTypes.bool,
+  hasSeeksBranch: PropTypes.bool,
+  atom: PropTypes.object,
+  isOwned: PropTypes.bool,
+  isActive: PropTypes.bool,
+  isHeld: PropTypes.bool,
+  hasChatSocket: PropTypes.bool,
+  hasHoldableSocket: PropTypes.bool,
+  atomLoading: PropTypes.bool,
+  atomFailedToLoad: PropTypes.bool,
+  atomProcessingUpdate: PropTypes.bool,
+  createdTimestamp: PropTypes.string,
+  shouldShowRdf: PropTypes.bool,
+  fromConnection: PropTypes.bool,
+  openConnectionUri: PropTypes.string,
+  visibleTab: PropTypes.string,
+  personas: PropTypes.object,
+  fetchAtom: PropTypes.func,
 };
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(WonAtomContent);

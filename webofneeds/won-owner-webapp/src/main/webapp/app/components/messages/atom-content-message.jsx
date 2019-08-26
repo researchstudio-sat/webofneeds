@@ -3,7 +3,7 @@
  */
 import React from "react";
 import PropTypes from "prop-types";
-import { connect, ReactReduxContext } from "react-redux";
+import { connect } from "react-redux";
 import { getIn } from "../../utils.js";
 
 import "~/style/_atom-content-message.scss";
@@ -23,22 +23,14 @@ const mapStateToProps = (state, ownProps) => {
 
 const AtomContentMessage = props => {
   return (
-    <ReactReduxContext.Consumer>
-      {({ store }) => {
-        return (
-          <won-atom-content-message
-            class={props.atomLoading && "won-is-loading"}
-          >
-            <div className="won-cm__center">
-              <div className="won-cm__center__bubble">
-                <WonAtomMenu atomUri={props.atomUri} ngRedux={store} />
-                <WonAtomContent atomUri={props.atomUri} ngRedux={store} />
-              </div>
-            </div>
-          </won-atom-content-message>
-        );
-      }}
-    </ReactReduxContext.Consumer>
+    <won-atom-content-message class={props.atomLoading && "won-is-loading"}>
+      <div className="won-cm__center">
+        <div className="won-cm__center__bubble">
+          <WonAtomMenu atomUri={props.atomUri} />
+          <WonAtomContent atomUri={props.atomUri} />
+        </div>
+      </div>
+    </won-atom-content-message>
   );
 };
 

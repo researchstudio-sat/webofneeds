@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import Immutable from "immutable";
-import { connect, ReactReduxContext } from "react-redux";
+import { connect } from "react-redux";
 import { get, getIn } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import WonAtomHeaderBig from "./atom-header-big.jsx";
@@ -98,97 +98,91 @@ const mapDispatchToProps = dispatch => {
 
 class AtomInfo extends React.Component {
   render() {
-    return (
-      <ReactReduxContext.Consumer>
-        {({ store }) => {
-          let footerElement;
+    let footerElement;
 
-          if (this.props.showFooter) {
-            const reactionUseCaseElements =
-              this.props.showReactionUseCases &&
-              this.props.reactionUseCasesArray &&
-              this.props.reactionUseCasesArray.map((ucIdentifier, index) => {
-                return (
-                  <button
-                    key={ucIdentifier + "-" + index}
-                    className="won-button--filled red atom-info__footer__button"
-                    onClick={() => this.selectUseCase(ucIdentifier)}
-                  >
-                    {useCaseUtils.getUseCaseIcon(ucIdentifier) && (
-                      <svg className="won-button-icon">
-                        <use
-                          xlinkHref={useCaseUtils.getUseCaseIcon(ucIdentifier)}
-                          href={useCaseUtils.getUseCaseIcon(ucIdentifier)}
-                        />
-                      </svg>
-                    )}
-                    <span>{useCaseUtils.getUseCaseLabel(ucIdentifier)}</span>
-                  </button>
-                );
-              });
-
-            const enabledUseCaseElements =
-              this.props.showEnabledUseCases &&
-              this.props.enabledUseCasesArray &&
-              this.props.enabledUseCasesArray.map((ucIdentifier, index) => {
-                return (
-                  <button
-                    key={ucIdentifier + "-" + index}
-                    className="won-button--filled red atom-info__footer__button"
-                    onClick={() => this.selectUseCase(ucIdentifier)}
-                  >
-                    {useCaseUtils.getUseCaseIcon(ucIdentifier) && (
-                      <svg className="won-button-icon">
-                        <use
-                          xlinkHref={useCaseUtils.getUseCaseIcon(ucIdentifier)}
-                          href={useCaseUtils.getUseCaseIcon(ucIdentifier)}
-                        />
-                      </svg>
-                    )}
-                    <span>{useCaseUtils.getUseCaseLabel(ucIdentifier)}</span>
-                  </button>
-                );
-              });
-
-            footerElement = (
-              <div className="atom-info__footer">
-                {this.props.showAdHocRequestField && (
-                  <ChatTextfield
-                    placeholder="Message (optional)"
-                    allowEmptySubmit={true}
-                    showPersonas={true}
-                    submitButtonLabel="Ask&#160;to&#160;Chat"
-                    onSubmit={({ value, selectedPersona }) =>
-                      this.sendAdHocRequest(value, selectedPersona)
-                    }
-                  />
-                )}
-                {reactionUseCaseElements}
-                {enabledUseCaseElements}
-                {this.props.isInactive && (
-                  <div className="atom-info__footer__infolabel">
-                    Atom is inactive, no requests allowed
-                  </div>
-                )}
-              </div>
-            );
-          }
-
+    if (this.props.showFooter) {
+      const reactionUseCaseElements =
+        this.props.showReactionUseCases &&
+        this.props.reactionUseCasesArray &&
+        this.props.reactionUseCasesArray.map((ucIdentifier, index) => {
           return (
-            <won-atom-info
-              class={
-                (this.props.className ? this.props.className : "") +
-                (this.props.atomLoading && " won-is-loading ")
-              }
+            <button
+              key={ucIdentifier + "-" + index}
+              className="won-button--filled red atom-info__footer__button"
+              onClick={() => this.selectUseCase(ucIdentifier)}
             >
-              <WonAtomHeaderBig atomUri={this.props.atomUri} ngRedux={store} />
-              <WonAtomMenu atomUri={this.props.atomUri} ngRedux={store} />
-              <WonAtomContent atomUri={this.props.atomUri} ngRedux={store} />
-              {footerElement}
-            </won-atom-info>
+              {useCaseUtils.getUseCaseIcon(ucIdentifier) && (
+                <svg className="won-button-icon">
+                  <use
+                    xlinkHref={useCaseUtils.getUseCaseIcon(ucIdentifier)}
+                    href={useCaseUtils.getUseCaseIcon(ucIdentifier)}
+                  />
+                </svg>
+              )}
+              <span>{useCaseUtils.getUseCaseLabel(ucIdentifier)}</span>
+            </button>
           );
-        }}
-      </ReactReduxContext.Consumer>
+        });
+
+      const enabledUseCaseElements =
+        this.props.showEnabledUseCases &&
+        this.props.enabledUseCasesArray &&
+        this.props.enabledUseCasesArray.map((ucIdentifier, index) => {
+          return (
+            <button
+              key={ucIdentifier + "-" + index}
+              className="won-button--filled red atom-info__footer__button"
+              onClick={() => this.selectUseCase(ucIdentifier)}
+            >
+              {useCaseUtils.getUseCaseIcon(ucIdentifier) && (
+                <svg className="won-button-icon">
+                  <use
+                    xlinkHref={useCaseUtils.getUseCaseIcon(ucIdentifier)}
+                    href={useCaseUtils.getUseCaseIcon(ucIdentifier)}
+                  />
+                </svg>
+              )}
+              <span>{useCaseUtils.getUseCaseLabel(ucIdentifier)}</span>
+            </button>
+          );
+        });
+
+      footerElement = (
+        <div className="atom-info__footer">
+          {this.props.showAdHocRequestField && (
+            <ChatTextfield
+              placeholder="Message (optional)"
+              allowEmptySubmit={true}
+              showPersonas={true}
+              submitButtonLabel="Ask&#160;to&#160;Chat"
+              onSubmit={({ value, selectedPersona }) =>
+                this.sendAdHocRequest(value, selectedPersona)
+              }
+            />
+          )}
+          {reactionUseCaseElements}
+          {enabledUseCaseElements}
+          {this.props.isInactive && (
+            <div className="atom-info__footer__infolabel">
+              Atom is inactive, no requests allowed
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    return (
+      <won-atom-info
+        class={
+          (this.props.className ? this.props.className : "") +
+          (this.props.atomLoading && " won-is-loading ")
+        }
+      >
+        <WonAtomHeaderBig atomUri={this.props.atomUri} />
+        <WonAtomMenu atomUri={this.props.atomUri} />
+        <WonAtomContent atomUri={this.props.atomUri} />
+        {footerElement}
+      </won-atom-info>
     );
   }
 

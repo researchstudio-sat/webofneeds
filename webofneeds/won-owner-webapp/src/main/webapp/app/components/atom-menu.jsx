@@ -4,7 +4,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { actionCreators } from "../actions/actions.js";
-
+import { connect } from "react-redux";
 import { get, getIn } from "../utils.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
@@ -16,147 +16,141 @@ import Immutable from "immutable";
 
 import "~/style/_atom-menu.scss";
 
-export default class WonAtomMenu extends React.Component {
-  componentDidMount() {
-    this.atomUri = this.props.atomUri;
-    this.disconnect = this.props.ngRedux.connect(
-      this.selectFromState.bind(this),
-      actionCreators
-    )(state => {
-      this.setState(state);
-    });
-  }
+const mapStateToProps = (state, ownProps) => {
+  const atom = getIn(state, ["atoms", ownProps.atomUri]);
+  const isPersona = atomUtils.isPersona(atom);
+  const isOwned = generalSelectors.isAtomOwned(state, ownProps.atomUri);
 
-  componentWillUnmount() {
-    this.disconnect();
-  }
+  const hasHolderSocket = atomUtils.hasHolderSocket(atom);
+  const hasGroupSocket = atomUtils.hasGroupSocket(atom);
+  const hasReviewSocket = atomUtils.hasReviewSocket(atom);
+  const hasBuddySocket = atomUtils.hasBuddySocket(atom);
+  const reviewCount = hasReviewSocket && getIn(atom, ["rating", "reviewCount"]);
 
-  UNSAFE_componentWillReceiveProps(nextProps) {
-    this.atomUri = nextProps.atomUri;
-    this.setState(this.selectFromState(this.props.ngRedux.getState()));
-  }
-
-  selectFromState(state) {
-    const atom = getIn(state, ["atoms", this.atomUri]);
-    const isPersona = atomUtils.isPersona(atom);
-    const isOwned = generalSelectors.isAtomOwned(state, this.atomUri);
-
-    const hasHolderSocket = atomUtils.hasHolderSocket(atom);
-    const hasGroupSocket = atomUtils.hasGroupSocket(atom);
-    const hasReviewSocket = atomUtils.hasReviewSocket(atom);
-    const hasBuddySocket = atomUtils.hasBuddySocket(atom);
-    const reviewCount =
-      hasReviewSocket && getIn(atom, ["rating", "reviewCount"]);
-
-    const groupMembers = hasGroupSocket && get(atom, "groupMembers");
-    const groupChatConnections =
-      isOwned &&
-      hasGroupSocket &&
-      connectionSelectors.getGroupChatConnectionsByAtomUri(state, this.atomUri);
-    const connectedGroupChatConnections =
-      groupChatConnections &&
-      groupChatConnections.filter(conn => connectionUtils.isConnected(conn));
-    const nonClosedNonConnectedGroupChatConnections =
-      groupChatConnections &&
-      groupChatConnections.filter(
-        conn =>
-          !(connectionUtils.isConnected(conn) || connectionUtils.isClosed(conn))
-      );
-
-    const heldAtoms = hasHolderSocket && get(atom, "holds");
-
-    const hasUnreadSuggestedConnectionsInHeldAtoms = generalSelectors.hasUnreadSuggestedConnectionsInHeldAtoms(
+  const groupMembers = hasGroupSocket && get(atom, "groupMembers");
+  const groupChatConnections =
+    isOwned &&
+    hasGroupSocket &&
+    connectionSelectors.getGroupChatConnectionsByAtomUri(
       state,
-      this.atomUri
+      ownProps.atomUri
     );
-    const heldByUri = atomUtils.getHeldByUri(atom);
-    const isHeld = atomUtils.isHeld(atom);
-    const persona = getIn(state, ["atoms", heldByUri]);
-    const personaHasReviewSocket = atomUtils.hasReviewSocket(persona);
-    const personaAggregateRating =
-      personaHasReviewSocket && getIn(persona, ["rating", "aggregateRating"]);
+  const connectedGroupChatConnections =
+    groupChatConnections &&
+    groupChatConnections.filter(conn => connectionUtils.isConnected(conn));
+  const nonClosedNonConnectedGroupChatConnections =
+    groupChatConnections &&
+    groupChatConnections.filter(
+      conn =>
+        !(connectionUtils.isConnected(conn) || connectionUtils.isClosed(conn))
+    );
 
-    const suggestions =
-      isOwned &&
-      connectionSelectors.getSuggestedConnectionsByAtomUri(state, this.atomUri);
+  const heldAtoms = hasHolderSocket && get(atom, "holds");
 
-    const buddyConnections =
-      isOwned &&
-      connectionSelectors.getBuddyConnectionsByAtomUri(
-        state,
-        this.atomUri,
-        true,
-        false
-      );
+  const hasUnreadSuggestedConnectionsInHeldAtoms = generalSelectors.hasUnreadSuggestedConnectionsInHeldAtoms(
+    state,
+    ownProps.atomUri
+  );
+  const heldByUri = atomUtils.getHeldByUri(atom);
+  const isHeld = atomUtils.isHeld(atom);
+  const persona = getIn(state, ["atoms", heldByUri]);
+  const personaHasReviewSocket = atomUtils.hasReviewSocket(persona);
+  const personaAggregateRating =
+    personaHasReviewSocket && getIn(persona, ["rating", "aggregateRating"]);
 
-    const buddies = isOwned
-      ? buddyConnections.filter(conn => connectionUtils.isConnected(conn))
-      : get(atom, "buddies");
+  const suggestions =
+    isOwned &&
+    connectionSelectors.getSuggestedConnectionsByAtomUri(
+      state,
+      ownProps.atomUri
+    );
 
-    const viewState = get(state, "view");
-    const process = get(state, "process");
+  const buddyConnections =
+    isOwned &&
+    connectionSelectors.getBuddyConnectionsByAtomUri(
+      state,
+      ownProps.atomUri,
+      true,
+      false
+    );
 
-    const suggestionsSize = suggestions ? suggestions.size : 0;
-    const groupMembersSize = groupMembers ? groupMembers.size : 0;
-    const heldAtomsSize = heldAtoms ? heldAtoms.size : 0;
+  const buddies = isOwned
+    ? buddyConnections.filter(conn => connectionUtils.isConnected(conn))
+    : get(atom, "buddies");
 
-    return {
-      atom,
-      isPersona,
-      isHoldable: atomUtils.hasHoldableSocket(atom),
-      isOwned,
-      isHeld,
-      personaHasReviewSocket,
-      personaAggregateRatingString:
-        personaAggregateRating && personaAggregateRating.toFixed(1),
-      hasHeldAtoms: heldAtomsSize > 0,
-      hasUnreadSuggestedConnectionsInHeldAtoms,
-      heldAtomsSize,
-      hasHolderSocket,
-      hasGroupSocket,
-      hasReviewSocket,
-      hasBuddySocket,
-      hasUnreadBuddyConnections:
-        !!buddyConnections &&
-        !!buddyConnections.find(conn => connectionUtils.isUnread(conn)),
-      hasBuddies: buddyConnections
-        ? buddyConnections.size > 0
-        : buddies
-          ? buddies.size > 0
-          : false,
-      buddyCount: buddies ? buddies.size : 0,
-      hasReviews: reviewCount > 0,
-      reviewCount,
-      hasChatSocket: atomUtils.hasChatSocket(atom),
-      groupMembers: groupMembersSize > 0,
-      groupMembersSize,
-      connectedGroupChatConnectionsSize:
-        connectedGroupChatConnections && connectedGroupChatConnections.size,
-      hasUnreadGroupChatRequests: nonClosedNonConnectedGroupChatConnections
-        ? nonClosedNonConnectedGroupChatConnections.filter(conn =>
-            get(conn, "unread")
-          ).size > 0
+  const viewState = get(state, "view");
+  const process = get(state, "process");
+
+  const suggestionsSize = suggestions ? suggestions.size : 0;
+  const groupMembersSize = groupMembers ? groupMembers.size : 0;
+  const heldAtomsSize = heldAtoms ? heldAtoms.size : 0;
+
+  return {
+    atomUri: ownProps.atomUri,
+    atom,
+    isPersona,
+    isHoldable: atomUtils.hasHoldableSocket(atom),
+    isOwned,
+    isHeld,
+    personaHasReviewSocket,
+    personaAggregateRatingString:
+      personaAggregateRating && personaAggregateRating.toFixed(1),
+    hasHeldAtoms: heldAtomsSize > 0,
+    hasUnreadSuggestedConnectionsInHeldAtoms,
+    heldAtomsSize,
+    hasHolderSocket,
+    hasGroupSocket,
+    hasReviewSocket,
+    hasBuddySocket,
+    hasUnreadBuddyConnections:
+      !!buddyConnections &&
+      !!buddyConnections.find(conn => connectionUtils.isUnread(conn)),
+    hasBuddies: buddyConnections
+      ? buddyConnections.size > 0
+      : buddies
+        ? buddies.size > 0
         : false,
-      hasSuggestions: suggestionsSize > 0,
-      hasUnreadSuggestions:
-        suggestionsSize > 0
-          ? !!suggestions.find(conn => get(conn, "unread"))
-          : false,
-      suggestionsSize,
-      atomLoading: !atom || processUtils.isAtomLoading(process, this.atomUri),
-      atomFailedToLoad:
-        atom && processUtils.hasAtomFailedToLoad(process, this.atomUri),
-      shouldShowRdf: viewUtils.showRdf(viewState),
-      visibleTab: viewUtils.getVisibleTabByAtomUri(viewState, this.atomUri),
-    };
-  }
+    buddyCount: buddies ? buddies.size : 0,
+    hasReviews: reviewCount > 0,
+    reviewCount,
+    hasChatSocket: atomUtils.hasChatSocket(atom),
+    groupMembers: groupMembersSize > 0,
+    groupMembersSize,
+    connectedGroupChatConnectionsSize:
+      connectedGroupChatConnections && connectedGroupChatConnections.size,
+    hasUnreadGroupChatRequests: nonClosedNonConnectedGroupChatConnections
+      ? nonClosedNonConnectedGroupChatConnections.filter(conn =>
+          get(conn, "unread")
+        ).size > 0
+      : false,
+    hasSuggestions: suggestionsSize > 0,
+    hasUnreadSuggestions:
+      suggestionsSize > 0
+        ? !!suggestions.find(conn => get(conn, "unread"))
+        : false,
+    suggestionsSize,
+    atomLoading: !atom || processUtils.isAtomLoading(process, ownProps.atomUri),
+    atomFailedToLoad:
+      atom && processUtils.hasAtomFailedToLoad(process, ownProps.atomUri),
+    shouldShowRdf: viewUtils.showRdf(viewState),
+    visibleTab: viewUtils.getVisibleTabByAtomUri(viewState, ownProps.atomUri),
+  };
+};
 
+const mapDispatchToProps = dispatch => {
+  return {
+    selectTab: (atomUri, tab) => {
+      dispatch(
+        actionCreators.atoms__selectTab(
+          Immutable.fromJS({ atomUri: atomUri, selectTab: tab })
+        )
+      );
+    },
+  };
+};
+
+class WonAtomMenu extends React.Component {
   render() {
-    if (!this.state) {
-      console.debug("render with null state");
-      return <div />;
-    }
-
     const buttons = [];
 
     buttons.push(
@@ -171,7 +165,7 @@ export default class WonAtomMenu extends React.Component {
       </div>
     );
 
-    if (this.state.isHeld) {
+    if (this.props.isHeld) {
       buttons.push(
         <div
           key="heldby"
@@ -181,14 +175,14 @@ export default class WonAtomMenu extends React.Component {
           onClick={() => this.selectTab("HELDBY")}
         >
           <span className="atom-menu__item__label">Persona</span>
-          {this.state.personaAggregateRatingString && (
+          {this.props.personaAggregateRatingString && (
             <span className="atom-menu__item__rating">
-              (★ {this.state.personaAggregateRatingString + ")"}
+              (★ {this.props.personaAggregateRatingString + ")"}
             </span>
           )}
         </div>
       );
-    } else if (this.state.isHoldable && this.state.isOwned) {
+    } else if (this.props.isHoldable && this.props.isOwned) {
       buttons.push(
         <div
           key="heldby"
@@ -198,32 +192,32 @@ export default class WonAtomMenu extends React.Component {
           onClick={() => this.selectTab("HELDBY")}
         >
           <span className="atom-menu__item__label">+ Persona</span>
-          {this.state.personaAggregateRatingString && (
+          {this.props.personaAggregateRatingString && (
             <span className="atom-menu__item__rating">
-              {"(★ " + this.state.personaAggregateRatingString + ")"}
+              {"(★ " + this.props.personaAggregateRatingString + ")"}
             </span>
           )}
         </div>
       );
     }
 
-    if (this.state.hasGroupSocket) {
-      this.state.isOwned
+    if (this.props.hasGroupSocket) {
+      this.props.isOwned
         ? buttons.push(
             <div
               key="participants"
               className={this.generateAtomItemCssClasses(
                 this.isSelectedTab("PARTICIPANTS"),
                 false,
-                this.state.hasUnreadGroupChatRequests
+                this.props.hasUnreadGroupChatRequests
               )}
               onClick={() => this.selectTab("PARTICIPANTS")}
             >
               <span className="atom-menu__item__unread" />
               <span className="atom-menu__item__label">Group Members</span>
-              {!!this.state.connectedGroupChatConnectionsSize && (
+              {!!this.props.connectedGroupChatConnectionsSize && (
                 <span className="atom-menu__item__count">
-                  {"(" + this.state.connectedGroupChatConnectionsSize + ")"}
+                  {"(" + this.props.connectedGroupChatConnectionsSize + ")"}
                 </span>
               )}
             </div>
@@ -233,95 +227,95 @@ export default class WonAtomMenu extends React.Component {
               key="participants"
               className={this.generateAtomItemCssClasses(
                 this.isSelectedTab("PARTICIPANTS"),
-                !this.state.groupMembers
+                !this.props.groupMembers
               )}
               onClick={() => this.selectTab("PARTICIPANTS")}
             >
               <span className="atom-menu__item__label">Group Members</span>
               <span className="atom-menu__item__count">
-                {"(" + this.state.groupMembersSize + ")"}
+                {"(" + this.props.groupMembersSize + ")"}
               </span>
             </div>
           );
     }
 
-    this.state.isOwned &&
-      this.state.hasChatSocket &&
+    this.props.isOwned &&
+      this.props.hasChatSocket &&
       buttons.push(
         <div
           key="suggestions"
           className={this.generateAtomItemCssClasses(
             this.isSelectedTab("SUGGESTIONS"),
-            !this.state.hasSuggestions,
-            this.state.hasUnreadSuggestions
+            !this.props.hasSuggestions,
+            this.props.hasUnreadSuggestions
           )}
           onClick={() => this.selectTab("SUGGESTIONS")}
         >
           <span className="atom-menu__item__unread" />
           <span className="atom-menu__item__label">Suggestions</span>
           <span className="atom-menu__item__count">
-            {"(" + this.state.suggestionsSize + ")"}
+            {"(" + this.props.suggestionsSize + ")"}
           </span>
         </div>
       );
 
-    this.state.hasHolderSocket &&
+    this.props.hasHolderSocket &&
       buttons.push(
         <div
           key="holds"
           className={this.generateAtomItemCssClasses(
             this.isSelectedTab("HOLDS"),
-            !this.state.hasHeldAtoms,
-            this.state.hasUnreadSuggestedConnectionsInHeldAtoms
+            !this.props.hasHeldAtoms,
+            this.props.hasUnreadSuggestedConnectionsInHeldAtoms
           )}
           onClick={() => this.selectTab("HOLDS")}
         >
           <span className="atom-menu__item__unread" />
           <span className="atom-menu__item__label">Posts</span>
           <span className="atom-menu__item__count">
-            {"(" + this.state.heldAtomsSize + ")"}
+            {"(" + this.props.heldAtomsSize + ")"}
           </span>
         </div>
       );
 
-    this.state.hasBuddySocket &&
+    this.props.hasBuddySocket &&
       buttons.push(
         <div
           key="buddies"
           className={this.generateAtomItemCssClasses(
             this.isSelectedTab("BUDDIES"),
-            !this.state.hasBuddies,
-            this.state.hasUnreadBuddyConnections
+            !this.props.hasBuddies,
+            this.props.hasUnreadBuddyConnections
           )}
           onClick={() => this.selectTab("BUDDIES")}
         >
           <span className="atom-menu__item__unread" />
           <span className="atom-menu__item__label">Buddies</span>
           <span className="atom-menu__item__count">
-            {"(" + this.state.buddyCount + ")"}
+            {"(" + this.props.buddyCount + ")"}
           </span>
         </div>
       );
-    this.state.hasReviewSocket &&
+    this.props.hasReviewSocket &&
       buttons.push(
         <div
           key="reviews"
           className={this.generateAtomItemCssClasses(
             this.isSelectedTab("REVIEWS"),
-            !this.state.hasReviews,
+            !this.props.hasReviews,
             false
           )}
           onClick={() => this.selectTab("REVIEWS")}
         >
           <span className="atom-menu__item__label">Reviews</span>
-          {this.state.hasReviews && (
+          {this.props.hasReviews && (
             <span className="atom-menu__item__rating">
-              {"(" + this.state.reviewCount + ")"}
+              {"(" + this.props.reviewCount + ")"}
             </span>
           )}
         </div>
       );
-    this.state.shouldShowRdf &&
+    this.props.shouldShowRdf &&
       buttons.push(
         <div
           key="rdf"
@@ -341,8 +335,8 @@ export default class WonAtomMenu extends React.Component {
 
   generateParentCssClasses() {
     const cssClassNames = [];
-    this.state.atomLoading && cssClassNames.push("won-is-loading");
-    this.state.atomFailedToLoad && cssClassNames.push("won-failed-to-load");
+    this.props.atomLoading && cssClassNames.push("won-is-loading");
+    this.props.atomFailedToLoad && cssClassNames.push("won-failed-to-load");
 
     return cssClassNames.join(" ");
   }
@@ -362,21 +356,50 @@ export default class WonAtomMenu extends React.Component {
   }
 
   isSelectedTab(tabName) {
-    return tabName === this.state.visibleTab;
+    return tabName === this.props.visibleTab;
   }
 
   selectTab(tabName) {
-    this.props.ngRedux.dispatch(
-      actionCreators.atoms__selectTab(
-        Immutable.fromJS({
-          atomUri: this.atomUri,
-          selectTab: tabName,
-        })
-      )
-    );
+    this.props.selectTab(this.props.atomUri, tabName);
   }
 }
 WonAtomMenu.propTypes = {
   atomUri: PropTypes.string.isRequired,
-  ngRedux: PropTypes.object.isRequired,
+  selectTab: PropTypes.func,
+  atom: PropTypes.object,
+  isPersona: PropTypes.bool,
+  isHoldable: PropTypes.bool,
+  isOwned: PropTypes.bool,
+  isHeld: PropTypes.bool,
+  personaHasReviewSocket: PropTypes.bool,
+  personaAggregateRatingString: PropTypes.string,
+  hasHeldAtoms: PropTypes.bool,
+  hasUnreadSuggestedConnectionsInHeldAtoms: PropTypes.bool,
+  heldAtomsSize: PropTypes.number,
+  hasHolderSocket: PropTypes.bool,
+  hasGroupSocket: PropTypes.bool,
+  hasReviewSocket: PropTypes.bool,
+  hasBuddySocket: PropTypes.bool,
+  hasUnreadBuddyConnections: PropTypes.bool,
+  hasBuddies: PropTypes.bool,
+  buddyCount: PropTypes.number,
+  hasReviews: PropTypes.bool,
+  reviewCount: PropTypes.number,
+  hasChatSocket: PropTypes.bool,
+  groupMembers: PropTypes.bool,
+  groupMembersSize: PropTypes.number,
+  connectedGroupChatConnectionsSize: PropTypes.number,
+  hasUnreadGroupChatRequests: PropTypes.bool,
+  hasSuggestions: PropTypes.bool,
+  hasUnreadSuggestions: PropTypes.bool,
+  suggestionsSize: PropTypes.number,
+  atomLoading: PropTypes.bool,
+  atomFailedToLoad: PropTypes.bool,
+  shouldShowRdf: PropTypes.bool,
+  visibleTab: PropTypes.string,
 };
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(WonAtomMenu);
