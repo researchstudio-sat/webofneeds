@@ -4,6 +4,7 @@
 import React from "react";
 import { getIn } from "../utils";
 import { actionCreators } from "../actions/actions.js";
+import { connect } from "react-redux";
 import * as atomUtils from "../redux/utils/atom-utils";
 import * as generalSelectors from "../redux/selectors/general-selectors";
 import WonAtomCard from "./atom-card.jsx";
@@ -11,65 +12,51 @@ import WonAtomCard from "./atom-card.jsx";
 import "~/style/_atom-content-holds.scss";
 import PropTypes from "prop-types";
 
-export default class WonAtomContentHolds extends React.Component {
-  componentDidMount() {
-    this.atomUri = this.props.atomUri;
-    this.disconnect = this.props.ngRedux.connect(
-      this.selectFromState.bind(this),
-      actionCreators
-    )(state => {
-      this.setState(state);
+const mapStateToProps = (state, ownProps) => {
+  const atom = getIn(state, ["atoms", ownProps.atomUri]);
+  const heldAtomUris = atomUtils.getHeldAtomUris(atom);
+
+  return {
+    atomUri: ownProps.atomUri,
+    isOwned: generalSelectors.isAtomOwned(state, ownProps.atomUri),
+    hasHeldAtoms: atomUtils.hasHeldAtoms(atom),
+    heldAtomUrisArray: heldAtomUris && heldAtomUris.toArray(),
+    currentLocation: generalSelectors.getCurrentLocation(state),
+  };
+};
+
+const mapDispatchToProps = dispatch => {
+  return {
+    routerGo: (path, props) => {
+      dispatch(actionCreators.router__stateGo(path, props));
+    },
+  };
+};
+
+class WonAtomContentHolds extends React.Component {
+  createAtom() {
+    this.props.routerGo("create", {
+      holderUri: this.props.atomUri,
     });
   }
 
-  componentWillUnmount() {
-    this.disconnect();
-  }
-
-  UNSAFE_componentWillReceiveProps(nextProps) {
-    this.atomUri = nextProps.atomUri;
-    this.setState(this.selectFromState(this.props.ngRedux.getState()));
-  }
-
-  selectFromState(state) {
-    const atom = getIn(state, ["atoms", this.atomUri]);
-    const heldAtomUris = atomUtils.getHeldAtomUris(atom);
-
-    return {
-      isOwned: generalSelectors.isAtomOwned(state, this.atomUri),
-      hasHeldAtoms: atomUtils.hasHeldAtoms(atom),
-      heldAtomUrisArray: heldAtomUris && heldAtomUris.toArray(),
-    };
-  }
-
-  createAtom() {
-    this.props.ngRedux.dispatch(
-      actionCreators.router__stateGo("create", { holderUri: this.atomUri })
-    );
-  }
-
   render() {
-    if (!this.state) {
-      console.debug("render with null state");
-      return <div />;
-    }
-
-    if (this.state.isOwned || this.state.hasHeldAtoms) {
-      const atomCards = this.state.hasHeldAtoms
-        ? this.state.heldAtomUrisArray.map(atomUri => {
+    if (this.props.isOwned || this.props.hasHeldAtoms) {
+      const atomCards = this.props.hasHeldAtoms
+        ? this.props.heldAtomUrisArray.map(atomUri => {
             return (
               <WonAtomCard
                 key={atomUri}
                 atomUri={atomUri}
-                currentLocation={this.state.currentLocation}
-                showSuggestions={this.state.isOwned}
+                currentLocation={this.props.currentLocation}
+                showSuggestions={this.props.isOwned}
                 showPersona={false}
               />
             );
           })
         : undefined;
 
-      const createAtom = this.state.isOwned ? (
+      const createAtom = this.props.isOwned ? (
         <div
           className="ach__createatom"
           onClick={() => {
@@ -102,5 +89,14 @@ export default class WonAtomContentHolds extends React.Component {
 }
 WonAtomContentHolds.propTypes = {
   atomUri: PropTypes.string.isRequired,
-  ngRedux: PropTypes.object.isRequired,
+  isOwned: PropTypes.bool,
+  hasHeldAtoms: PropTypes.bool,
+  heldAtomUrisArray: PropTypes.arrayOf(PropTypes.string),
+  currentLocation: PropTypes.object,
+  routerGo: PropTypes.func,
 };
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(WonAtomContentHolds);
