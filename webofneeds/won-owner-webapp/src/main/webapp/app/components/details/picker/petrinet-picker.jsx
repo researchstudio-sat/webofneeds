@@ -11,6 +11,9 @@ export default class WonPetrinetPicker extends React.Component {
     this.state = {
       addedWorkflow: props.initialValue,
     };
+    this.update = this.update.bind(this);
+    this.updateWorkflow = this.updateWorkflow.bind(this);
+    this.removeWorkflow = this.removeWorkflow.bind(this);
   }
 
   render() {
@@ -23,7 +26,7 @@ export default class WonPetrinetPicker extends React.Component {
             </div>
             <svg
               className="petrinetp__preview__remove"
-              onClick={this.removeWorkflow.bind(this)}
+              onClick={this.removeWorkflow}
             >
               <use xlinkHref="#ico36_close" href="#ico36_close" />
             </svg>
@@ -36,7 +39,7 @@ export default class WonPetrinetPicker extends React.Component {
           </div>
         ) : (
           <WonFileDropzone
-            onFilePicked={this.updateWorkflow.bind(this)}
+            onFilePicked={this.updateWorkflow}
             accepts={this.props.detail.accepts}
             multiSelect={false}
           />
@@ -52,7 +55,7 @@ export default class WonPetrinetPicker extends React.Component {
   }
 
   removeWorkflow() {
-    this.setState({ addedWorkflow: undefined }, this.update.bind(this));
+    this.setState({ addedWorkflow: undefined }, this.update);
   }
   update() {
     this.props.onUpdate({ value: this.state.addedWorkflow });
