@@ -153,11 +153,7 @@ export default class WonAtomContent extends React.Component {
             />
 
             {this.state.hasContent && (
-              <WonAtomContentDetails
-                atomUri={this.atomUri}
-                branch="content"
-                ngRedux={this.props.ngRedux}
-              />
+              <WonAtomContentDetails atomUri={this.atomUri} branch="content" />
             )}
             {this.state.hasContent &&
               this.state.hasSeeksBranch && (
@@ -168,11 +164,7 @@ export default class WonAtomContent extends React.Component {
                 />
               )}
             {this.state.hasSeeksBranch && (
-              <WonAtomContentDetails
-                atomUri={this.atomUri}
-                branch="seeks"
-                ngRedux={this.props.ngRedux}
-              />
+              <WonAtomContentDetails atomUri={this.atomUri} branch="seeks" />
             )}
           </React.Fragment>
         );
