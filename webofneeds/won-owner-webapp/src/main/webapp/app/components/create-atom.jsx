@@ -41,16 +41,6 @@ import { actionCreators } from "../actions/actions";
       this.props.fetchUnloadedAtom(this.props.fromAtomUri);
     }
   }
-
-  //was called when showCreateInput was true
-  loadInitialDraft() {
-    if (this.props.showCreateInput && this.props.useCase.draft) {
-      // deep clone of draft
-      this.setState({
-        draftObject: JSON.parse(JSON.stringify(this.props.useCase.draft)),
-      });
-    }
-  }
  */
 
 const mapStateToProps = state => {
@@ -216,6 +206,15 @@ class CreateAtom extends React.Component {
       isNew: true,
       draftObject: {},
     };
+  }
+
+  componentDidMount() {
+    if (this.props.showCreateInput && this.props.useCase.draft) {
+      // deep clone of draft
+      this.setState({
+        draftObject: JSON.parse(JSON.stringify(this.props.useCase.draft)),
+      });
+    }
   }
 
   render() {
