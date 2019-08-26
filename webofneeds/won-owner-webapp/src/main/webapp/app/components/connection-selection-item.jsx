@@ -88,7 +88,6 @@ class WonConnectionSelectionItem extends React.Component {
 
 WonConnectionSelectionItem.propTypes = {
   connectionUri: PropTypes.string.isRequired,
-  ngRedux: PropTypes.object.isRequired,
   onClick: PropTypes.func,
   openConnectionUri: PropTypes.string,
   lastUpdateTimestamp: PropTypes.string,

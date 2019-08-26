@@ -6,7 +6,7 @@
  * Created by quasarchimaere on 15.01.2019.
  */
 import React from "react";
-import { actionCreators } from "../actions/actions.js";
+import { connect } from "react-redux";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as connectionSelectors from "../redux/selectors/connection-selectors.js";
 import { get, getIn, sortByDate } from "../utils.js";
@@ -16,72 +16,42 @@ import * as connectionUtils from "../redux/utils/connection-utils.js";
 import "~/style/_connection-indicators.scss";
 import PropTypes from "prop-types";
 
-export default class WonConnectionIndicators extends React.Component {
-  componentDidMount() {
-    this.atomUri = this.props.atomUri;
-    this.disconnect = this.props.ngRedux.connect(
-      this.selectFromState.bind(this),
-      actionCreators
-    )(state => {
-      this.setState(state);
+const mapStateToProps = (state, ownProps) => {
+  const ownedPosts = generalSelectors.getOwnedPosts(state);
+  const allPosts = generalSelectors.getPosts(state);
+  const ownedPost = ownedPosts && ownedPosts.get(ownProps.atomUri);
+  const chatConnectionsByAtomUri =
+    ownProps.atomUri &&
+    connectionSelectors.getChatConnectionsByAtomUri(state, ownProps.atomUri);
+
+  const connected =
+    chatConnectionsByAtomUri &&
+    chatConnectionsByAtomUri.filter(conn => {
+      const targetAtomUri = conn.get("targetAtomUri");
+      const targetAtomActiveOrLoading =
+        targetAtomUri &&
+        allPosts &&
+        allPosts.get(targetAtomUri) &&
+        (getIn(state, ["process", "atoms", targetAtomUri, "loading"]) ||
+          atomUtils.isActive(get(allPosts, targetAtomUri)));
+
+      return (
+        targetAtomActiveOrLoading &&
+        (connectionSelectors.isChatToXConnection(allPosts, conn) ||
+          connectionSelectors.isGroupToXConnection(allPosts, conn)) &&
+        !(connectionUtils.isSuggested(conn) || connectionUtils.isClosed(conn))
+      );
     });
-  }
 
-  componentWillUnmount() {
-    this.disconnect();
-  }
-
-  UNSAFE_componentWillReceiveProps(nextProps) {
-    this.atomUri = nextProps.atomUri;
-    this.setState(this.selectFromState(this.props.ngRedux.getState()));
-  }
-
-  selectFromState(state) {
-    const ownedPosts = generalSelectors.getOwnedPosts(state);
-    const allPosts = generalSelectors.getPosts(state);
-    const ownedPost = ownedPosts && ownedPosts.get(this.atomUri);
-    const chatConnectionsByAtomUri =
-      this.atomUri &&
-      connectionSelectors.getChatConnectionsByAtomUri(state, this.atomUri);
-
-    const connected =
-      chatConnectionsByAtomUri &&
-      chatConnectionsByAtomUri.filter(conn => {
-        const targetAtomUri = conn.get("targetAtomUri");
-        const targetAtomActiveOrLoading =
-          targetAtomUri &&
-          allPosts &&
-          allPosts.get(targetAtomUri) &&
-          (getIn(state, ["process", "atoms", targetAtomUri, "loading"]) ||
-            atomUtils.isActive(get(allPosts, targetAtomUri)));
-
-        return (
-          targetAtomActiveOrLoading &&
-          (connectionSelectors.isChatToXConnection(allPosts, conn) ||
-            connectionSelectors.isGroupToXConnection(allPosts, conn)) &&
-          !(connectionUtils.isSuggested(conn) || connectionUtils.isClosed(conn))
-        );
-      });
-
-    const unreadConnected =
-      connected && !!connected.find(conn => conn.get("unread"));
-
-    return {
-      ownedPost,
-      postLoading:
-        !ownedPost ||
-        getIn(state, ["process", "atoms", ownedPost.get("uri"), "loading"]),
-      unreadConnected,
-      latestConnectedUri: this.retrieveLatestUri(connected),
-    };
-  }
+  const unreadConnected =
+    connected && !!connected.find(conn => conn.get("unread"));
 
   /**
    * This method returns either the latest unread uri of the given connection elements, or the latest uri of a read connection, if nothing is found undefined is returned
    * @param elements connection elements to retrieve the latest uri from
    * @returns {*}
    */
-  retrieveLatestUri(elements) {
+  const retrieveLatestUri = elements => {
     const unreadElements =
       elements && elements.filter(conn => conn.get("unread"));
 
@@ -99,15 +69,23 @@ export default class WonConnectionIndicators extends React.Component {
         sortedElements && sortedElements[0] && sortedElements[0].get("uri")
       );
     }
-  }
+  };
 
+  return {
+    atomUri: ownProps.atomUri,
+    onClick: ownProps.onClick,
+    ownedPost,
+    postLoading:
+      !ownedPost ||
+      getIn(state, ["process", "atoms", ownedPost.get("uri"), "loading"]),
+    unreadConnected,
+    latestConnectedUri: retrieveLatestUri(connected),
+  };
+};
+
+class WonConnectionIndicators extends React.Component {
   render() {
-    if (!this.state) {
-      console.debug("render with null state");
-      return <div />;
-    }
-
-    if (this.state.postLoading) {
+    if (this.props.postLoading) {
       return (
         <won-connection-indicators class="won-is-loading">
           <div className="indicators__item indicators__item--skeleton">
@@ -124,13 +102,13 @@ export default class WonConnectionIndicators extends React.Component {
           <a
             className={
               "indicators__item " +
-              (!this.state.unreadConnected && this.state.latestConnectedUri
+              (!this.props.unreadConnected && this.props.latestConnectedUri
                 ? " indicators__item--reads "
                 : "") +
-              (this.state.unreadConnected && this.state.latestConnectedUri
+              (this.props.unreadConnected && this.props.latestConnectedUri
                 ? " indicators__item--unreads "
                 : "") +
-              (!this.state.latestConnectedUri
+              (!this.props.latestConnectedUri
                 ? " indicators__item--disabled "
                 : "")
             }
@@ -149,13 +127,18 @@ export default class WonConnectionIndicators extends React.Component {
   }
 
   setOpen() {
-    if (this.state.latestConnectedUri) {
-      this.props.onClick(this.state.latestConnectedUri);
+    if (this.props.latestConnectedUri) {
+      this.props.onClick(this.props.latestConnectedUri);
     }
   }
 }
 WonConnectionIndicators.propTypes = {
   atomUri: PropTypes.string.isRequired,
-  ngRedux: PropTypes.object.isRequired,
   onClick: PropTypes.func.isRequired,
+  ownedPost: PropTypes.object,
+  postLoading: PropTypes.bool,
+  unreadConnected: PropTypes.number,
+  latestConnectedUri: PropTypes.string,
 };
+
+export default connect(mapStateToProps)(WonConnectionIndicators);
