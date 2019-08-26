@@ -5,9 +5,18 @@
 import React from "react";
 import WonAtomCard from "./atom-card.jsx";
 import { actionCreators } from "../actions/actions.js";
+import { connect } from "react-redux";
 import PropTypes from "prop-types";
 
-export default class WonAtomCardGrid extends React.Component {
+const mapDispatchToProps = dispatch => {
+  return {
+    routerGo: (path, props) => {
+      dispatch(actionCreators.router__stateGo(path, props));
+    },
+  };
+};
+
+class WonAtomCardGrid extends React.Component {
   render() {
     const atomUris = this.props.atomUris;
     const showPersona = this.props.showPersona;
@@ -50,11 +59,7 @@ export default class WonAtomCardGrid extends React.Component {
     }
 
     const createAtom = showCreate ? (
-      <won-create-card
-        onClick={() =>
-          this.props.ngRedux.dispatch(actionCreators.router__stateGo("create"))
-        }
-      >
+      <won-create-card onClick={() => this.props.routerGo("create")}>
         <svg className="createcard__icon" title="Create a new post">
           <use xlinkHref="#ico36_plus" href="#ico36_plus" />
         </svg>
@@ -79,5 +84,10 @@ WonAtomCardGrid.propTypes = {
   showSuggestions: PropTypes.bool,
   showCreate: PropTypes.bool,
   currentLocation: PropTypes.object,
-  ngRedux: PropTypes.object.isRequired,
+  routerGo: PropTypes.func,
 };
+
+export default connect(
+  undefined,
+  mapDispatchToProps
+)(WonAtomCardGrid);
