@@ -101,10 +101,7 @@ export default class WonAtomHeaderBig extends React.Component {
               </div>
             </hgroup>
           </div>
-          <WonShareDropdown
-            atomUri={this.atomUri}
-            ngRedux={this.props.ngRedux}
-          />
+          <WonShareDropdown atomUri={this.atomUri} />
           <WonAtomContextDropdown
             atomUri={this.atomUri}
             ngRedux={this.props.ngRedux}

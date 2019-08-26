@@ -438,10 +438,7 @@ class AtomMessages extends React.Component {
                   connectionUri={this.props.selectedConnectionUri}
                   ngRedux={store}
                 />
-                <WonShareDropdown
-                  atomUri={this.props.targetAtomUri}
-                  ngRedux={store}
-                />
+                <WonShareDropdown atomUri={this.props.targetAtomUri} />
                 <WonConnectionContextDropdown
                   ngRedux={store}
                   showPetriNetDataField={this.showPetriNetDataField.bind(this)}

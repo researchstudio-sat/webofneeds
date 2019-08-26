@@ -1,7 +1,7 @@
 import React from "react";
 
 import PropTypes from "prop-types";
-import { actionCreators } from "../actions/actions.js";
+import { connect } from "react-redux";
 import { get, getIn, toAbsoluteURL } from "../utils.js";
 import { ownerBaseUrl } from "~/config/default.js";
 import * as wonUtils from "../won-utils.js";
@@ -9,53 +9,35 @@ import * as generalSelectors from "../redux/selectors/general-selectors.js";
 
 import "~/style/_atom-share-link.scss";
 
-export default class WonAtomShareLink extends React.Component {
+const mapStateToProps = (state, ownProps) => {
+  const atom = ownProps.atomUri && getIn(state, ["atoms", ownProps.atomUri]);
+
+  let linkToPost;
+  if (ownerBaseUrl && atom) {
+    const path = "#!post/" + `?postUri=${encodeURI(ownProps.atomUri)}`;
+
+    linkToPost = toAbsoluteURL(ownerBaseUrl).toString() + path;
+  }
+  let svgQrCodeToPost = wonUtils.generateSvgQrCode(linkToPost);
+
+  return {
+    atomUri: ownProps.atomUri,
+    className: ownProps.className,
+    hasConnections: get(atom, "connections")
+      ? get(atom, "connections").size > 0
+      : false,
+    isOwned: generalSelectors.isAtomOwned(state, ownProps.atomUri),
+    linkToPost,
+    svgQrCodeToPost,
+  };
+};
+
+class WonAtomShareLink extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       showLink: true,
       copied: false,
-    };
-  }
-
-  componentDidMount() {
-    this.atomUri = this.props.atomUri;
-    this.disconnect = this.props.ngRedux.connect(
-      this.selectFromState.bind(this),
-      actionCreators
-    )(state => {
-      this.setState(state);
-    });
-  }
-
-  componentWillUnmount() {
-    this.disconnect();
-  }
-
-  UNSAFE_componentWillReceiveProps(nextProps) {
-    this.atomUri = nextProps.atomUri;
-    this.setState(this.selectFromState(this.props.ngRedux.getState()));
-  }
-
-  selectFromState(state) {
-    const atom = this.atomUri && getIn(state, ["atoms", this.atomUri]);
-
-    let linkToPost;
-    if (ownerBaseUrl && atom) {
-      const path = "#!post/" + `?postUri=${encodeURI(this.atomUri)}`;
-
-      linkToPost = toAbsoluteURL(ownerBaseUrl).toString() + path;
-    }
-    let svgQrCodeToPost = wonUtils.generateSvgQrCode(linkToPost);
-
-    return {
-      atom,
-      hasConnections: get(atom, "connections")
-        ? get(atom, "connections").size > 0
-        : false,
-      isOwned: generalSelectors.isAtomOwned(state, this.atomUri),
-      linkToPost,
-      svgQrCodeToPost,
     };
   }
 
@@ -65,8 +47,8 @@ export default class WonAtomShareLink extends React.Component {
       return <div />;
     }
 
-    const labelElement = ((this.state.hasConnections && this.state.isOwned) ||
-      !this.state.isOwned) && (
+    const labelElement = ((this.props.hasConnections && this.props.isOwned) ||
+      !this.props.isOwned) && (
       <p className="asl__text">
         Know someone who might also be interested in this atom? Consider sharing
         the link below in social media.
@@ -79,7 +61,7 @@ export default class WonAtomShareLink extends React.Component {
           <input
             ref={linkInput => (this.linkInput = linkInput)}
             className="asl__link__copyfield__input"
-            value={this.state.linkToPost}
+            value={this.props.linkToPost}
             readOnly
             type="text"
             onFocus={() => this.selectLink()}
@@ -106,7 +88,7 @@ export default class WonAtomShareLink extends React.Component {
       <div className="asl__qrcode">
         <img
           className="asl__qrcode__code"
-          src={"data:image/svg+xml;utf8," + this.state.svgQrCodeToPost}
+          src={"data:image/svg+xml;utf8," + this.props.svgQrCodeToPost}
         />
       </div>
     );
@@ -182,6 +164,11 @@ export default class WonAtomShareLink extends React.Component {
 }
 WonAtomShareLink.propTypes = {
   atomUri: PropTypes.string.isRequired,
-  ngRedux: PropTypes.object.isRequired,
   className: PropTypes.string,
+  hasConnections: PropTypes.bool,
+  isOwned: PropTypes.bool,
+  linkToPost: PropTypes.string,
+  svgQrCodeToPost: PropTypes.string,
 };
+
+export default connect(mapStateToProps)(WonAtomShareLink);

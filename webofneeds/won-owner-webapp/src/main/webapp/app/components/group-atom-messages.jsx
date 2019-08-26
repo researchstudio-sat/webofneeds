@@ -255,10 +255,7 @@ class GroupAtomMessages extends React.Component {
                 connectionUri={this.props.connectionUri}
                 ngRedux={store}
               />
-              <WonShareDropdown
-                atomUri={this.props.targetAtomUri}
-                ngRedux={store}
-              />
+              <WonShareDropdown atomUri={this.props.targetAtomUri} />
               <WonConnectionContextDropdown ngRedux={store} />
             </div>
           );

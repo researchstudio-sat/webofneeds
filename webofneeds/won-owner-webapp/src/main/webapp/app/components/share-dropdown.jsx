@@ -26,10 +26,7 @@ export default class WonShareDropdown extends React.Component {
               <use xlinkHref="#ico16_share" href="#ico16_share" />
             </svg>
           </div>
-          <WonAtomShareLink
-            atomUri={this.props.atomUri}
-            ngRedux={this.props.ngRedux}
-          />
+          <WonAtomShareLink atomUri={this.props.atomUri} />
         </div>
       </div>
     );
@@ -51,6 +48,5 @@ export default class WonShareDropdown extends React.Component {
 }
 WonShareDropdown.propTypes = {
   atomUri: PropTypes.string.isRequired,
-  ngRedux: PropTypes.object.isRequired,
   className: PropTypes.string,
 };
