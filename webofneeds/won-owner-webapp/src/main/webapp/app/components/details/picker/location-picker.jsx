@@ -205,21 +205,20 @@ export default class WonLocationPicker extends React.Component {
   }
 
   doneTyping({ value }) {
-    //TODO Impl resetLocation for some reason
-    //this.resetLocation() //--> so we remove all the existing Markers?
+    this.resetLocation(() => {
+      if (value) {
+        searchNominatim(value).then(searchResults => {
+          const parsedResults = scrubSearchResults(searchResults, value);
 
-    if (value) {
-      searchNominatim(value).then(searchResults => {
-        const parsedResults = scrubSearchResults(searchResults, value);
-
-        this.setState({
-          searchResults: parsedResults || [],
-          lastSearchedFor: value,
+          this.setState({
+            searchResults: parsedResults || [],
+            lastSearchedFor: value,
+          });
         });
-      });
-    } else {
-      this.resetSearchResults();
-    }
+      } else {
+        this.resetSearchResults();
+      }
+    });
   }
 
   update() {
@@ -261,14 +260,17 @@ export default class WonLocationPicker extends React.Component {
     );
   }
 
-  resetLocation() {
+  resetLocation(callback) {
     this.setState(
       {
         previousLocation: this.state.pickedLocation,
         pickedLocation: undefined,
         alternativeName: "",
       },
-      this.update
+      () => {
+        this.update();
+        callback();
+      }
     );
   }
 }
