@@ -716,7 +716,6 @@ class AtomMessages extends React.Component {
                       <WonPetrinetState
                         className="pm__content__petrinet__process__content"
                         processUri={get(process, "processURI")}
-                        ngRedux={store}
                       />
                     </div>
                   );

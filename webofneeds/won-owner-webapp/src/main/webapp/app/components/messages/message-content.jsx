@@ -119,7 +119,6 @@ export default class WonMessageContent extends React.Component {
                   className="won-in-message"
                   detail={detailDefinition}
                   content={contentDetail}
-                  ngRedux={this.props.ngRedux}
                 />
               </div>
             );

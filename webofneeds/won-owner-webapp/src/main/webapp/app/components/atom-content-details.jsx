@@ -59,7 +59,6 @@ export default class WonAtomContentDetails extends React.Component {
                 <ReactViewerComponent
                   detail={detailDefinition}
                   content={contentDetail}
-                  ngRedux={this.props.ngRedux}
                 />
               </div>
             );

@@ -23,7 +23,6 @@ export default class WonPetrinetViewer extends React.Component {
       <WonPetrinetState
         className="petrinetv__content__state"
         processUri={get(this.props.content, "processURI")}
-        ngRedux={this.props.ngRedux}
       />
     );
 
@@ -68,5 +67,4 @@ WonPetrinetViewer.propTypes = {
   detail: PropTypes.object,
   content: PropTypes.object,
   className: PropTypes.string,
-  ngRedux: PropTypes.object,
 };
