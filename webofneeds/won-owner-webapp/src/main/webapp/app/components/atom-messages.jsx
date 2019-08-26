@@ -440,7 +440,6 @@ class AtomMessages extends React.Component {
                 />
                 <WonShareDropdown atomUri={this.props.targetAtomUri} />
                 <WonConnectionContextDropdown
-                  ngRedux={store}
                   showPetriNetDataField={this.showPetriNetDataField.bind(this)}
                   showAgreementDataField={this.showAgreementDataField.bind(
                     this
@@ -530,7 +529,6 @@ class AtomMessages extends React.Component {
                   Showing Agreement Data
                 </div>
                 <WonConnectionContextDropdown
-                  ngRedux={store}
                   showPetriNetDataField={this.showPetriNetDataField.bind(this)}
                   showAgreementDataField={this.showAgreementDataField.bind(
                     this
@@ -687,7 +685,6 @@ class AtomMessages extends React.Component {
                   Showing PetriNet Data
                 </div>
                 <WonConnectionContextDropdown
-                  ngRedux={store}
                   showPetriNetDataField={this.showPetriNetDataField.bind(this)}
                   showAgreementDataField={this.showAgreementDataField.bind(
                     this
