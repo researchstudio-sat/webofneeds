@@ -2,6 +2,7 @@ import React from "react";
 
 import PropTypes from "prop-types";
 import { actionCreators } from "../actions/actions.js";
+import { connect } from "react-redux";
 import * as generalSelectors from "../redux/selectors/general-selectors";
 import { get, getIn, toAbsoluteURL } from "../utils";
 import * as atomUtils from "../redux/utils/atom-utils.js";
@@ -13,7 +14,62 @@ import pdfFonts from "pdfmake/build/vfs_fonts";
 
 import "~/style/_context-dropdown.scss";
 
-export default class WonAtomContextDropdown extends React.Component {
+const mapStateToProps = (state, ownProps) => {
+  const atom = ownProps.atomUri && getIn(state, ["atoms", ownProps.atomUri]);
+
+  let linkToAtom;
+  if (ownerBaseUrl && atom) {
+    const path = "#!post/" + `?postUri=${encodeURI(get(atom, "uri"))}`;
+
+    linkToAtom = toAbsoluteURL(ownerBaseUrl).toString() + path;
+  }
+
+  const process = get(state, "process");
+
+  return {
+    atomUri: ownProps.atomUri,
+    className: ownProps.className,
+    adminEmail: getIn(state, ["config", "theme", "adminEmail"]),
+    isOwnAtom: generalSelectors.isAtomOwned(state, ownProps.atomUri),
+    isActive: atomUtils.isActive(atom),
+    isInactive: atomUtils.isInactive(atom),
+    isUsableAsTemplate: generalSelectors.isAtomUsableAsTemplate(
+      state,
+      ownProps.atomUri
+    ),
+    isEditable: generalSelectors.isAtomEditable(state, ownProps.atomUri),
+    atom,
+    atomLoading: !atom || processUtils.isAtomLoading(process, get(atom, "uri")),
+    atomFailedToLoad:
+      atom && processUtils.hasAtomFailedToLoad(process, get(atom, "uri")),
+    linkToAtom,
+  };
+};
+
+const mapDispatchToProps = dispatch => {
+  return {
+    routerGoAbs: (path, props) => {
+      dispatch(actionCreators.router__stateGoAbs(path, props));
+    },
+    atomReOpen: atomUri => {
+      dispatch(actionCreators.atoms__reopen(atomUri));
+    },
+    atomClose: atomUri => {
+      dispatch(actionCreators.atoms__close(atomUri));
+    },
+    atomDelete: atomUri => {
+      dispatch(actionCreators.atoms__delete(atomUri));
+    },
+    hideModalDialog: () => {
+      dispatch(actionCreators.view__hideModalDialog());
+    },
+    showModalDialog: payload => {
+      dispatch(actionCreators.view__showModalDialog(payload));
+    },
+  };
+};
+
+class WonAtomContextDropdown extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -22,62 +78,7 @@ export default class WonAtomContextDropdown extends React.Component {
     //TODO: REACT ON CLICK OUTSIDE OF COMPONENT AND CLOSE THE DIALOG (maybe with hooks)
   }
 
-  componentDidMount() {
-    this.atomUri = this.props.atomUri;
-    this.disconnect = this.props.ngRedux.connect(
-      this.selectFromState.bind(this),
-      actionCreators
-    )(state => {
-      this.setState(state);
-    });
-  }
-
-  UNSAFE_componentWillReceiveProps(nextProps) {
-    this.atomUri = nextProps.atomUri;
-    this.setState(this.selectFromState(this.props.ngRedux.getState()));
-  }
-
-  componentWillUnmount() {
-    this.disconnect();
-  }
-
-  selectFromState(state) {
-    const atom = this.atomUri && getIn(state, ["atoms", this.atomUri]);
-
-    let linkToAtom;
-    if (ownerBaseUrl && atom) {
-      const path = "#!post/" + `?postUri=${encodeURI(get(atom, "uri"))}`;
-
-      linkToAtom = toAbsoluteURL(ownerBaseUrl).toString() + path;
-    }
-
-    const process = get(state, "process");
-
-    return {
-      adminEmail: getIn(state, ["config", "theme", "adminEmail"]),
-      isOwnAtom: generalSelectors.isAtomOwned(state, this.atomUri),
-      isActive: atomUtils.isActive(atom),
-      isInactive: atomUtils.isInactive(atom),
-      isUsableAsTemplate: generalSelectors.isAtomUsableAsTemplate(
-        state,
-        this.atomUri
-      ),
-      isEditable: generalSelectors.isAtomEditable(state, this.atomUri),
-      atom,
-      atomLoading:
-        !atom || processUtils.isAtomLoading(process, get(atom, "uri")),
-      atomFailedToLoad:
-        atom && processUtils.hasAtomFailedToLoad(process, get(atom, "uri")),
-      linkToAtom,
-    };
-  }
-
   render() {
-    if (!this.state) {
-      console.debug("render with null state");
-      return <div />;
-    }
-
     const iconElement =
       this.state.atomLoading || this.state.atomFailedToLoad ? (
         <svg className="cdd__icon__small">
@@ -112,12 +113,10 @@ export default class WonAtomContextDropdown extends React.Component {
             key="duplicate"
             className="won-button--outlined thin red"
             onClick={() =>
-              this.props.ngRedux.dispatch(
-                actionCreators.router__stateGoAbs("create", {
-                  fromAtomUri: this.atomUri,
-                  mode: "DUPLICATE",
-                })
-              )
+              this.props.routerGoAbs("create", {
+                fromAtomUri: this.props.atomUri,
+                mode: "DUPLICATE",
+              })
             }
           >
             Post this too!
@@ -129,12 +128,10 @@ export default class WonAtomContextDropdown extends React.Component {
             key="edit"
             className="won-button--outlined thin red"
             onClick={() =>
-              this.props.ngRedux.dispatch(
-                actionCreators.router__stateGoAbs("create", {
-                  fromAtomUri: this.atomUri,
-                  mode: "EDIT",
-                })
-              )
+              this.props.routerGoAbs("create", {
+                fromAtomUri: this.props.atomUri,
+                mode: "EDIT",
+              })
             }
           >
             Edit
@@ -219,7 +216,7 @@ export default class WonAtomContextDropdown extends React.Component {
 
   generateReportAtomMailParams() {
     //todo
-    const subject = `[Report Atom] - ${this.atomUri}`;
+    const subject = `[Report Atom] - ${this.props.atomUri}`;
     const body = `Link to Atom: ${this.linkToAtom}%0D%0AReason:%0D%0A`; //hint: %0D%0A adds a linebreak
 
     return `subject=${subject}&body=${body}`;
@@ -239,7 +236,7 @@ export default class WonAtomContextDropdown extends React.Component {
 
   reOpenAtom() {
     if (this.state.isOwnAtom) {
-      this.props.ngRedux.dispatch(actionCreators.atoms__reopen(this.atomUri));
+      this.props.atomReOpen(this.props.atomUri);
     }
   }
 
@@ -252,30 +249,20 @@ export default class WonAtomContextDropdown extends React.Component {
           {
             caption: "Yes",
             callback: () => {
-              this.props.ngRedux.dispatch(
-                actionCreators.atoms__delete(this.atomUri)
-              );
-              this.props.ngRedux.dispatch(
-                actionCreators.router__stateGoAbs("inventory")
-              );
-              this.props.ngRedux.dispatch(
-                actionCreators.view__hideModalDialog()
-              );
+              this.props.atomDelete(this.props.atomUri);
+              this.props.routerGoAbs("inventory");
+              this.props.hideModalDialog();
             },
           },
           {
             caption: "No",
             callback: () => {
-              this.props.ngRedux.dispatch(
-                actionCreators.view__hideModalDialog()
-              );
+              this.props.hideModalDialog();
             },
           },
         ],
       };
-      this.props.ngRedux.dispatch(
-        actionCreators.view__showModalDialog(payload)
-      );
+      this.props.showModalDialog(payload);
     }
   }
 
@@ -295,32 +282,44 @@ export default class WonAtomContextDropdown extends React.Component {
           {
             caption: "Archive",
             callback: () => {
-              this.props.ngRedux.dispatch(
-                actionCreators.atoms__close(this.atomUri)
-              );
-              this.props.ngRedux.dispatch(
-                actionCreators.view__hideModalDialog()
-              );
+              this.props.atomClose(this.props.atomUri);
+              this.props.hideModalDialog();
             },
           },
           {
             caption: "Cancel",
             callback: () => {
-              this.props.ngRedux.dispatch(
-                actionCreators.view__hideModalDialog()
-              );
+              this.props.hideModalDialog();
             },
           },
         ],
       };
-      this.props.ngRedux.dispatch(
-        actionCreators.view__showModalDialog(payload)
-      );
+      this.props.showModalDialog(payload);
     }
   }
 }
 WonAtomContextDropdown.propTypes = {
   atomUri: PropTypes.string.isRequired,
-  ngRedux: PropTypes.object.isRequired,
   className: PropTypes.string,
+  adminEmail: PropTypes.string,
+  isOwnAtom: PropTypes.bool,
+  isActive: PropTypes.bool,
+  isInactive: PropTypes.bool,
+  isUsableAsTemplate: PropTypes.bool,
+  isEditable: PropTypes.bool,
+  atom: PropTypes.object,
+  atomLoading: PropTypes.bool,
+  atomFailedToLoad: PropTypes.bool,
+  linkToAtom: PropTypes.string,
+  routerGoAbs: PropTypes.func,
+  atomReOpen: PropTypes.func,
+  atomClose: PropTypes.func,
+  atomDelete: PropTypes.func,
+  hideModalDialog: PropTypes.func,
+  showModalDialog: PropTypes.func,
 };
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(WonAtomContextDropdown);
