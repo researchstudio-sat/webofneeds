@@ -190,7 +190,6 @@ class GroupAtomMessages extends React.Component {
     return (
       <ReactReduxContext.Consumer>
         {({ store }) => {
-          //TODO
           let footerElement = undefined;
 
           const rdfLinkToConnection = this.props.shouldShowRdf && (
@@ -251,10 +250,7 @@ class GroupAtomMessages extends React.Component {
                   </svg>
                 </a>
               </div>
-              <WonConnectionHeader
-                connectionUri={this.props.connectionUri}
-                ngRedux={store}
-              />
+              <WonConnectionHeader connectionUri={this.props.connectionUri} />
               <WonShareDropdown atomUri={this.props.targetAtomUri} />
               <WonConnectionContextDropdown />
             </div>

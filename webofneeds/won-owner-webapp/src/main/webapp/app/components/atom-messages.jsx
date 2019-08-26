@@ -436,7 +436,6 @@ class AtomMessages extends React.Component {
                 <div className="pm__header__back">{backButtonElement}</div>
                 <WonConnectionHeader
                   connectionUri={this.props.selectedConnectionUri}
-                  ngRedux={store}
                 />
                 <WonShareDropdown atomUri={this.props.targetAtomUri} />
                 <WonConnectionContextDropdown

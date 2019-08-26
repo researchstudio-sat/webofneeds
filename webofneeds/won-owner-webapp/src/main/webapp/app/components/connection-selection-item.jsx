@@ -2,6 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import { get, getIn } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
+import { connect } from "react-redux";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as processUtils from "../redux/utils/process-utils.js";
 import * as connectionUtils from "../redux/utils/connection-utils.js";
@@ -9,55 +10,49 @@ import WonConnectionHeader from "./connection-header.jsx";
 
 import "~/style/_connection-selection-item-line.scss";
 
-export default class WonConnectionSelectionItem extends React.Component {
-  componentDidMount() {
-    this.connectionUri = this.props.connectionUri;
-    this.disconnect = this.props.ngRedux.connect(
-      this.selectFromState.bind(this),
-      actionCreators
-    )(state => {
-      this.setState(state);
-    });
-  }
+const mapStateToProps = (state, ownProps) => {
+  const ownedAtom = generalSelectors.getOwnedAtomByConnectionUri(
+    state,
+    ownProps.connectionUri
+  );
+  const connection = getIn(ownedAtom, ["connections", ownProps.connectionUri]);
+  const targetAtomUri = get(connection, "targetAtomUri");
+  const processState = get(state, "process");
+  return {
+    connectionUri: ownProps.connectionUri,
+    onClick: ownProps.onClick,
+    openConnectionUri: generalSelectors.getConnectionUriFromRoute(state),
+    lastUpdateTimestamp: get(connection, "lastUpdateDate"),
+    targetAtomFailedToLoad: processUtils.hasAtomFailedToLoad(
+      processState,
+      targetAtomUri
+    ),
+    isUnread: connectionUtils.isUnread(connection),
+  };
+};
 
-  componentWillUnmount() {
-    this.disconnect();
-  }
+const mapDispatchToProps = dispatch => {
+  return {
+    routerGoCurrent: props => {
+      dispatch(actionCreators.router__stateGoCurrent(props));
+    },
+    connectionClose: connectionUri => {
+      dispatch(actionCreators.connections__close(connectionUri));
+    },
+  };
+};
 
-  UNSAFE_componentWillReceiveProps(nextProps) {
-    this.connectionUri = nextProps.connectionUri;
-    this.setState(this.selectFromState(this.props.ngRedux.getState()));
-  }
-
-  selectFromState(state) {
-    const ownedAtom = generalSelectors.getOwnedAtomByConnectionUri(
-      state,
-      this.connectionUri
-    );
-    const connection = getIn(ownedAtom, ["connections", this.connectionUri]);
-    const targetAtomUri = get(connection, "targetAtomUri");
-    const processState = get(state, "process");
-    return {
-      openConnectionUri: generalSelectors.getConnectionUriFromRoute(state),
-      lastUpdateTimestamp: get(connection, "lastUpdateDate"),
-      targetAtomFailedToLoad: processUtils.hasAtomFailedToLoad(
-        processState,
-        targetAtomUri
-      ),
-      isUnread: connectionUtils.isUnread(connection),
-    };
+class WonConnectionSelectionItem extends React.Component {
+  constructor(props) {
+    super(props);
+    this.closeConnection = this.closeConnection.bind(this);
   }
 
   render() {
-    if (!this.state) {
-      console.debug("render with null state");
-      return <div />;
-    }
-
-    const closeButton = this.state.targetAtomFailedToLoad ? (
+    const closeButton = this.props.targetAtomFailedToLoad ? (
       <button
         className="csi__closebutton red won-button--outlined thin"
-        onClick="() => this.closeConnection()"
+        onClick={this.closeConnection}
       >
         Close
       </button>
@@ -68,14 +63,13 @@ export default class WonConnectionSelectionItem extends React.Component {
     return (
       <won-connection-selection-item
         class={
-          (this.state.openConnectionUri === this.connectionUri
+          (this.props.openConnectionUri === this.props.connectionUri
             ? "selected "
-            : "") + (this.state.isUnread ? "won-unread" : "")
+            : "") + (this.props.isUnread ? "won-unread" : "")
         }
       >
         <WonConnectionHeader
-          connectionUri={this.connectionUri}
-          ngRedux={this.props.ngRedux}
+          connectionUri={this.props.connectionUri}
           onClick={this.props.onClick}
         />
         {closeButton}
@@ -84,15 +78,11 @@ export default class WonConnectionSelectionItem extends React.Component {
   }
 
   closeConnection() {
-    this.props.ngRedux.dispatch(
-      actionCreators.connections__close(this.connectionUri)
-    );
-    this.props.ngRedux.dispatch(
-      actionCreators.router__stateGoCurrent({
-        useCase: undefined,
-        connectionUri: undefined,
-      })
-    );
+    this.props.connectionClose(this.props.connectionUri);
+    this.props.routerGoCurrent({
+      useCase: undefined,
+      connectionUri: undefined,
+    });
   }
 }
 
@@ -100,4 +90,15 @@ WonConnectionSelectionItem.propTypes = {
   connectionUri: PropTypes.string.isRequired,
   ngRedux: PropTypes.object.isRequired,
   onClick: PropTypes.func,
+  openConnectionUri: PropTypes.string,
+  lastUpdateTimestamp: PropTypes.string,
+  targetAtomFailedToLoad: PropTypes.bool,
+  isUnread: PropTypes.bool,
+  connectionClose: PropTypes.func,
+  routerGoCurrent: PropTypes.func,
 };
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(WonConnectionSelectionItem);
