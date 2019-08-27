@@ -151,7 +151,7 @@ WonAtomIcon.propTypes = {
   useCaseIconBackground: PropTypes.string,
   showIdenticon: PropTypes.bool,
   showImage: PropTypes.bool,
-  identiconSvg: PropTypes.object,
+  identiconSvg: PropTypes.string,
   image: PropTypes.object,
   showHolderIdenticon: PropTypes.bool,
   showHolderImage: PropTypes.bool,

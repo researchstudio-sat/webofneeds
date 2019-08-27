@@ -420,7 +420,7 @@ WonOtherCard.propTypes = {
   atomHasHoldableSocket: PropTypes.bool,
   isGroupChatEnabled: PropTypes.bool,
   isChatEnabled: PropTypes.bool,
-  friendlyTimestamp: PropTypes.date,
+  friendlyTimestamp: PropTypes.any,
   showPersonaImage: PropTypes.bool,
   showPersonaIdenticon: PropTypes.bool,
   personaIdenticonSvg: PropTypes.string,

@@ -116,8 +116,9 @@ const mapStateToProps = (state, ownProps) => {
     hasChatSocket: atomUtils.hasChatSocket(atom),
     groupMembers: groupMembersSize > 0,
     groupMembersSize,
-    connectedGroupChatConnectionsSize:
-      connectedGroupChatConnections && connectedGroupChatConnections.size,
+    connectedGroupChatConnectionsSize: connectedGroupChatConnections
+      ? connectedGroupChatConnections.size
+      : 0,
     hasUnreadGroupChatRequests: nonClosedNonConnectedGroupChatConnections
       ? nonClosedNonConnectedGroupChatConnections.filter(conn =>
           get(conn, "unread")

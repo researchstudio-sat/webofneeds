@@ -137,7 +137,7 @@ WonConnectionIndicators.propTypes = {
   onClick: PropTypes.func.isRequired,
   ownedPost: PropTypes.object,
   postLoading: PropTypes.bool,
-  unreadConnected: PropTypes.number,
+  unreadConnected: PropTypes.bool,
   latestConnectedUri: PropTypes.string,
 };
 

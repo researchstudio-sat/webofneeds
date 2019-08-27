@@ -527,7 +527,7 @@ GroupAtomMessages.propTypes = {
   chatMessages: PropTypes.object,
   unreadMessageCount: PropTypes.number,
   isProcessingLoadingMessages: PropTypes.bool,
-  lastUpdateTimestamp: PropTypes.date,
+  lastUpdateTimestamp: PropTypes.any,
   isSentRequest: PropTypes.bool,
   isReceivedRequest: PropTypes.bool,
   isConnected: PropTypes.bool,

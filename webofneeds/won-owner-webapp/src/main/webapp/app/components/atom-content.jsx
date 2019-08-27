@@ -38,7 +38,7 @@ const mapStateToProps = (state, ownProps) => {
    * This function checks if there is at least one detail present that is displayable
    */
   const hasVisibleDetails = contentBranchImm => {
-    return (
+    return !!(
       contentBranchImm &&
       contentBranchImm.find(
         (detailValue, detailKey) =>

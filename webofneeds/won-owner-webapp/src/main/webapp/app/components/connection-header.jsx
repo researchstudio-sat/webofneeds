@@ -312,7 +312,7 @@ WonConnectionHeader.propTypes = {
   latestMessageHumanReadableString: PropTypes.string,
   latestMessageUnread: PropTypes.bool,
   unreadMessageCount: PropTypes.number,
-  friendlyTimestamp: PropTypes.date,
+  friendlyTimestamp: PropTypes.any,
   targetAtomFailedToLoad: PropTypes.bool,
   connectionOrAtomsLoading: PropTypes.bool,
   fetchAtom: PropTypes.func,

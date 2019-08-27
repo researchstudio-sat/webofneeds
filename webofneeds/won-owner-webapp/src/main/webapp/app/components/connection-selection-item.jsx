@@ -90,7 +90,7 @@ WonConnectionSelectionItem.propTypes = {
   connectionUri: PropTypes.string.isRequired,
   onClick: PropTypes.func,
   openConnectionUri: PropTypes.string,
-  lastUpdateTimestamp: PropTypes.date,
+  lastUpdateTimestamp: PropTypes.any,
   targetAtomFailedToLoad: PropTypes.bool,
   isUnread: PropTypes.bool,
   connectionClose: PropTypes.func,

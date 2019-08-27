@@ -1231,7 +1231,7 @@ AtomMessages.propTypes = {
   agreementDataLoaded: PropTypes.bool,
   petriNetDataLoaded: PropTypes.bool,
   multiSelectType: PropTypes.string,
-  lastUpdateTimestamp: PropTypes.date,
+  lastUpdateTimestamp: PropTypes.any,
   isSentRequest: PropTypes.bool,
   isReceivedRequest: PropTypes.bool,
   isConnected: PropTypes.bool,
