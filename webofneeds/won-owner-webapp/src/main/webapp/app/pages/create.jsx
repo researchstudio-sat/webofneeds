@@ -7,6 +7,7 @@ import WonCreateAtom from "../components/create-atom.jsx";
 import WonModalDialog from "../components/modal-dialog.jsx";
 import WonToasts from "../components/toasts.jsx";
 import WonMenu from "../components/menu.jsx";
+import WonFooter from "../components/footer.jsx";
 import createSearchModule from "../components/create-search.js";
 import usecasePickerModule from "../components/usecase-picker.js";
 import usecaseGroupModule from "../components/usecase-group.js";
@@ -49,7 +50,7 @@ const template = (
       />
       <won-create-search ng-if="self.showCreateSearch" />
     </main>
-    <won-footer />
+    <won-preact className="footer" component="self.WonFooter" props="{}" />
   </container>
 );
 
@@ -62,6 +63,7 @@ class CreateController {
     this.WonModalDialog = WonModalDialog;
     this.WonToasts = WonToasts;
     this.WonMenu = WonMenu;
+    this.WonFooter = WonFooter;
 
     const selectFromState = state => {
       const useCase = generalSelectors.getUseCaseFromRoute(state);

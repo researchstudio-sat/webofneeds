@@ -14,6 +14,7 @@ import * as accountUtils from "../redux/utils/account-utils.js";
 import WonModalDialog from "../components/modal-dialog.jsx";
 import WonToasts from "../components/toasts.jsx";
 import WonMenu from "../components/menu.jsx";
+import WonFooter from "../components/footer.jsx";
 
 import { h } from "preact";
 
@@ -39,7 +40,7 @@ const template = (
     <main className="settings">
       <won-settings-wrapper />
     </main>
-    <won-footer />
+    <won-preact className="footer" component="self.WonFooter" props="{}" />
   </container>
 );
 
@@ -57,6 +58,7 @@ class SettingsController {
     this.WonModalDialog = WonModalDialog;
     this.WonToasts = WonToasts;
     this.WonMenu = WonMenu;
+    this.WonFooter = WonFooter;
 
     const select = state => {
       const accountState = get(state, "account");

@@ -8,6 +8,7 @@ import WonGroupAtomMessages from "../components/group-atom-messages.jsx";
 import WonModalDialog from "../components/modal-dialog.jsx";
 import WonToasts from "../components/toasts.jsx";
 import WonMenu from "../components/menu.jsx";
+import WonFooter from "../components/footer.jsx";
 import { get, getIn } from "../utils.js";
 import { attach, classOnComponentRoot } from "../cstm-ng-utils.js";
 import { actionCreators } from "../actions/actions.js";
@@ -101,9 +102,13 @@ const template = (
         </div>
       </div>
     </main>
-    <won-footer ng-class="{'hide-in-responsive': self.hideFooterInResponsive }">
-      {/* Connection view does not show the footer in responsive mode as there should not be two scrollable areas imho */}
-    </won-footer>
+    {/* Connection view does not show the footer in responsive mode as there should not be two scrollable areas imho */}
+    <won-preact
+      className="footer"
+      component="self.WonFooter"
+      props="{}"
+      ng-class="{'hide-in-responsive': self.hideFooterInResponsive }"
+    />
   </container>
 );
 
@@ -118,6 +123,7 @@ class ConnectionsController {
     this.WonModalDialog = WonModalDialog;
     this.WonToasts = WonToasts;
     this.WonMenu = WonMenu;
+    this.WonFooter = WonFooter;
 
     const selectFromState = state => {
       const viewConnUri = generalSelectors.getViewConnectionUriFromRoute(state);

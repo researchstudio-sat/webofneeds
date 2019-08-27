@@ -12,6 +12,7 @@ import WonLabelledHr from "../components/labelled-hr.jsx";
 import WonModalDialog from "../components/modal-dialog.jsx";
 import WonToasts from "../components/toasts.jsx";
 import WonMenu from "../components/menu.jsx";
+import WonFooter from "../components/footer.jsx";
 
 import * as accountUtils from "../redux/utils/account-utils.js";
 import * as viewSelectors from "../redux/selectors/view-selectors.js";
@@ -167,7 +168,7 @@ const template = (
         </button>
       </div>
     </main>
-    <won-footer />
+    <won-preact className="footer" component="self.WonFooter" props="{}" />
   </container>
 );
 
@@ -187,6 +188,7 @@ class SignupController {
     this.WonModalDialog = WonModalDialog;
     this.WonToasts = WonToasts;
     this.WonMenu = WonMenu;
+    this.WonFooter = WonFooter;
 
     const select = state => {
       const accountState = get(state, "account");

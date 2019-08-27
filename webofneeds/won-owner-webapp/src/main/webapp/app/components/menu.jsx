@@ -62,6 +62,7 @@ class WonMenu extends React.Component {
     this.viewInventory = this.viewInventory.bind(this);
     this.viewWhatsAround = this.viewWhatsAround.bind(this);
     this.viewWhatsNew = this.viewWhatsNew.bind(this);
+    this.toggleSlideIns = this.toggleSlideIns.bind(this);
   }
 
   render() {

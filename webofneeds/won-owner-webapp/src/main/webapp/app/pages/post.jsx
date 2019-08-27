@@ -15,6 +15,7 @@ import WonAtomMessages from "../components/atom-messages.jsx";
 import WonModalDialog from "../components/modal-dialog.jsx";
 import WonToasts from "../components/toasts.jsx";
 import WonMenu from "../components/menu.jsx";
+import WonFooter from "../components/footer.jsx";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as viewSelectors from "../redux/selectors/view-selectors.js";
 import * as processUtils from "../redux/utils/process-utils.js";
@@ -84,7 +85,7 @@ const template = (
         </div>
       </div>
     </main>
-    <won-footer />
+    <won-preact className="footer" component="self.WonFooter" props="{}" />
   </container>
 );
 
@@ -99,6 +100,7 @@ class Controller {
     this.WonModalDialog = WonModalDialog;
     this.WonToasts = WonToasts;
     this.WonMenu = WonMenu;
+    this.WonFooter = WonFooter;
 
     const selectFromState = state => {
       const atomUri = generalSelectors.getPostUriFromRoute(state);

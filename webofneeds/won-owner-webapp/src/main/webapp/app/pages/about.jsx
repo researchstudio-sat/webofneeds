@@ -5,6 +5,7 @@ import ngAnimate from "angular-animate";
 import WonModalDialog from "../components/modal-dialog.jsx";
 import WonToasts from "../components/toasts.jsx";
 import WonMenu from "../components/menu.jsx";
+import WonFooter from "../components/footer.jsx";
 import compareToModule from "../directives/compareTo.js";
 import howToModule from "../components/howto.js";
 import accordionModule from "../components/accordion.js";
@@ -134,7 +135,7 @@ const template = (
         />
       </section>
     </main>
-    <won-footer />
+    <won-preact class="footer" component="self.WonFooter" props="{}" />
   </container>
 );
 
@@ -290,6 +291,7 @@ class AboutController {
     this.WonModalDialog = WonModalDialog;
     this.WonToasts = WonToasts;
     this.WonMenu = WonMenu;
+    this.WonFooter = WonFooter;
 
     window.ab4dbg = this;
 

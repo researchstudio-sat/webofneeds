@@ -37,10 +37,7 @@ class WonToasts extends React.Component {
               case won.WON.warnToast:
                 return (
                   <div className="topnav__toasts__element warn" key={index}>
-                    <svg
-                      className="topnav__toasts__element__icon"
-                      style="--local-primary:#CCD2D2"
-                    >
+                    <svg className="topnav__toasts__element__icon">
                       <use
                         xlinkHref="#ico16_indicator_warning"
                         href="#ico16_indicator_warning"
@@ -57,7 +54,6 @@ class WonToasts extends React.Component {
                     <svg
                       className="topnav__toasts__element__close clickable"
                       onClick={() => this.props.toastDelete(toast)}
-                      style="--local-primary:var(--won-primary-color);"
                     >
                       <use xlinkHref="#ico27_close" href="#ico27_close" />
                     </svg>
@@ -67,10 +63,7 @@ class WonToasts extends React.Component {
               case won.WON.infoToast:
                 return (
                   <div className="topnav__toasts__element info" key={index}>
-                    <svg
-                      className="topnav__toasts__element__icon"
-                      style="--local-primary:#CCD2D2"
-                    >
+                    <svg className="topnav__toasts__element__icon">
                       <use
                         xlinkHref="#ico16_indicator_info"
                         href="#ico16_indicator_info"
@@ -87,7 +80,6 @@ class WonToasts extends React.Component {
                     <svg
                       className="topnav__toasts__element__close clickable"
                       onClick={() => this.props.toastDelete(toast)}
-                      style="--local-primary:var(--won-primary-color);"
                     >
                       <use xlinkHref="#ico27_close" href="#ico27_close" />
                     </svg>
@@ -98,10 +90,7 @@ class WonToasts extends React.Component {
               default:
                 return (
                   <div className="topnav__toasts__element error" key={index}>
-                    <svg
-                      className="topnav__toasts__element__icon"
-                      style="--local-primary:#CCD2D2"
-                    >
+                    <svg className="topnav__toasts__element__icon">
                       <use
                         xlinkHref="#ico16_indicator_error"
                         href="#ico16_indicator_error"
@@ -124,7 +113,6 @@ class WonToasts extends React.Component {
                     <svg
                       className="topnav__toasts__element__close clickable"
                       onClick={() => this.props.toastDelete(toast)}
-                      style="--local-primary:var(--won-primary-color);"
                     >
                       <use xlinkHref="#ico27_close" href="#ico27_close" />
                     </svg>
