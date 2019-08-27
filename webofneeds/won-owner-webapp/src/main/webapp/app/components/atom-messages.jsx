@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { connect, ReactReduxContext } from "react-redux";
+import { connect } from "react-redux";
 
 import * as generalSelectors from "../redux/selectors/general-selectors";
 import * as messageUtils from "../redux/utils/message-utils";
@@ -352,513 +352,475 @@ class AtomMessages extends React.Component {
   }
 
   render() {
-    return (
-      <ReactReduxContext.Consumer>
-        {({ store }) => {
-          let headerElement = undefined;
-          let contentElement = undefined;
-          let footerElement = undefined;
+    let headerElement = undefined;
+    let contentElement = undefined;
+    let footerElement = undefined;
 
-          const rdfLinkToConnection = this.props.shouldShowRdf && (
-            <a
-              className="rdflink clickable"
-              target="_blank"
-              rel="noopener noreferrer"
-              href={this.props.selectedConnectionUri}
-            >
-              <svg className="rdflink__small">
-                <use xlinkHref="#rdf_logo_1" href="#rdf_logo_1" />
-              </svg>
-              <span className="rdflink__label">Connection</span>
-            </a>
+    const rdfLinkToConnection = this.props.shouldShowRdf && (
+      <a
+        className="rdflink clickable"
+        target="_blank"
+        rel="noopener noreferrer"
+        href={this.props.selectedConnectionUri}
+      >
+        <svg className="rdflink__small">
+          <use xlinkHref="#rdf_logo_1" href="#rdf_logo_1" />
+        </svg>
+        <span className="rdflink__label">Connection</span>
+      </a>
+    );
+
+    const unreadIndicatorElement =
+      this.props.unreadMessageCount && !this.state.snapBottom ? (
+        <div className="pm__content__unreadindicator">
+          <div
+            className="pm__content__unreadindicator__content won-button--filled red"
+            onClick={this.goToUnreadMessages.bind(this)}
+          >
+            {this.props.unreadMessageCount} unread Messages
+          </div>
+        </div>
+      ) : (
+        undefined
+      );
+
+    const loadSpinnerElement = (
+      <div className="pm__content__loadspinner">
+        <svg className="hspinner">
+          <use xlinkHref="#ico_loading_anim" href="#ico_loading_anim" />
+        </svg>
+      </div>
+    );
+
+    if (this.props.showChatData) {
+      const backButtonElement = this.props.showOverlayConnection ? (
+        <a
+          className="pm__header__back__button clickable"
+          onClick={this.props.routerBack.bind(this)}
+        >
+          <svg className="pm__header__back__button__icon clickable hide-in-responsive">
+            <use xlinkHref="#ico36_close" href="#ico36_close" />
+          </svg>
+          <svg className="pm__header__back__button__icon clickable show-in-responsive">
+            <use xlinkHref="#ico36_backarrow" href="#ico36_backarrow" />
+          </svg>
+        </a>
+      ) : (
+        <React.Fragment>
+          <a
+            className="pm__header__back__button clickable show-in-responsive"
+            onClick={this.props.routerBack.bind(this)}
+          >
+            <svg className="pm__header__back__button__icon">
+              <use xlinkHref="#ico36_backarrow" href="#ico36_backarrow" />
+            </svg>
+          </a>
+          <a
+            className="pm__header__back__button clickable hide-in-responsive"
+            onClick={() =>
+              this.props.routerGoCurrent({ connectionUri: undefined })
+            }
+          >
+            <svg className="pm__header__back__button__icon">
+              <use xlinkHref="#ico36_backarrow" href="#ico36_backarrow" />
+            </svg>
+          </a>
+        </React.Fragment>
+      );
+
+      headerElement = (
+        <div className="pm__header">
+          <div className="pm__header__back">{backButtonElement}</div>
+          <WonConnectionHeader
+            connectionUri={this.props.selectedConnectionUri}
+          />
+          <WonShareDropdown atomUri={this.props.targetAtomUri} />
+          <WonConnectionContextDropdown
+            showPetriNetDataField={this.showPetriNetDataField.bind(this)}
+            showAgreementDataField={this.showAgreementDataField.bind(this)}
+          />
+        </div>
+      );
+
+      const chatMessages =
+        this.props.sortedMessageUris &&
+        this.props.sortedMessageUris.map((msgUri, index) => {
+          return (
+            <WonConnectionMessage
+              key={msgUri + "-" + index}
+              messageUri={msgUri}
+              connectionUri={this.props.selectedConnectionUri}
+              onClick={
+                this.props.multiSelectType
+                  ? () => this.selectMessage(msgUri)
+                  : undefined
+              }
+            />
           );
+        });
 
-          const unreadIndicatorElement =
-            this.props.unreadMessageCount && !this.state.snapBottom ? (
-              <div className="pm__content__unreadindicator">
-                <div
-                  className="pm__content__unreadindicator__content won-button--filled red"
-                  onClick={this.goToUnreadMessages.bind(this)}
-                >
-                  {this.props.unreadMessageCount} unread Messages
+      contentElement = (
+        <div
+          className="pm__content"
+          ref={this.chatContainerRef}
+          onScroll={this.onScroll.bind(this)}
+        >
+          {unreadIndicatorElement}
+          {this.props.showPostContentMessage && (
+            <WonAtomContentMessage atomUri={this.props.targetAtomUri} />
+          )}
+          {(this.props.isConnectionLoading ||
+            this.props.isProcessingLoadingMessages) &&
+            loadSpinnerElement}
+          {!this.props.isSuggested &&
+            !this.props.isConnectionLoading &&
+            !this.props.isProcessingLoadingMessages &&
+            this.props.hasConnectionMessagesToLoad && (
+              <button
+                className="pm__content__loadbutton won-button--outlined thin red"
+                onClick={this.loadPreviousMessages.bind(this)}
+              >
+                Load previous messages
+              </button>
+            )}
+
+          {chatMessages}
+
+          {rdfLinkToConnection}
+        </div>
+      );
+    } else if (this.props.showAgreementData) {
+      headerElement = (
+        <div className="pm__header">
+          <div className="pm__header__back">
+            <a
+              className="pm__header__back__button clickable"
+              onClick={() =>
+                this.props.setShowAgreementData(
+                  this.props.selectedConnectionUri,
+                  false
+                )
+              }
+            >
+              <svg className="pm__header__back__button__icon clickable">
+                <use xlinkHref="#ico36_backarrow" href="#ico36_backarrow" />
+              </svg>
+            </a>
+          </div>
+          <div
+            className="pm__header__title clickable"
+            onClick={() =>
+              this.props.setShowAgreementData(
+                this.props.selectedConnectionUri,
+                false
+              )
+            }
+          >
+            Showing Agreement Data
+          </div>
+          <WonConnectionContextDropdown
+            showPetriNetDataField={this.showPetriNetDataField.bind(this)}
+            showAgreementDataField={this.showAgreementDataField.bind(this)}
+          />
+        </div>
+      );
+
+      const agreementMessages =
+        !this.props.isProcessingLoadingAgreementData &&
+        this.props.agreementMessageArray &&
+        this.props.agreementMessageArray.map((msg, index) => {
+          return (
+            <WonConnectionMessage
+              key={get(msg, "uri") + "-" + index}
+              messageUri={get(msg, "uri")}
+              connectionUri={this.props.selectedConnectionUri}
+              onClick={
+                this.props.multiSelectType
+                  ? () => this.selectMessage(get(msg, "uri"))
+                  : undefined
+              }
+            />
+          );
+        });
+
+      const cancellationPendingMessages =
+        !this.props.isProcessingLoadingAgreementData &&
+        this.props.cancellationPendingMessageArray &&
+        this.props.cancellationPendingMessageArray.map((msg, index) => {
+          return (
+            <WonConnectionMessage
+              key={get(msg, "uri") + "-" + index}
+              messageUri={get(msg, "uri")}
+              connectionUri={this.props.selectedConnectionUri}
+              onClick={
+                this.props.multiSelectType
+                  ? () => this.selectMessage(get(msg, "uri"))
+                  : undefined
+              }
+            />
+          );
+        });
+
+      const proposalMessages =
+        !this.props.isProcessingLoadingAgreementData &&
+        this.props.proposalMessageArray &&
+        this.props.proposalMessageArray.map((msg, index) => {
+          return (
+            <WonConnectionMessage
+              key={get(msg, "uri") + "-" + index}
+              messageUri={get(msg, "uri")}
+              connectionUri={this.props.selectedConnectionUri}
+              onClick={
+                this.props.multiSelectType
+                  ? () => this.selectMessage(get(msg, "uri"))
+                  : undefined
+              }
+            />
+          );
+        });
+
+      contentElement = (
+        <div
+          className="pm__content won-agreement-content"
+          ref={this.chatContainerRef}
+        >
+          {unreadIndicatorElement}
+          {(this.props.isConnectionLoading ||
+            this.props.isProcessingLoadingMessages ||
+            (this.props.showAgreementData &&
+              this.props.isProcessingLoadingAgreementData)) &&
+            loadSpinnerElement}
+          {this.props.isProcessingLoadingAgreementData && (
+            <div className="pm__content__agreement__loadingtext">
+              Calculating Agreement Status
+            </div>
+          )}
+
+          {!(
+            this.props.hasAgreementMessages ||
+            this.props.hasCancellationPendingMessages ||
+            this.props.hasProposalMessages
+          ) &&
+            !this.props.isProcessingLoadingAgreementData && (
+              <div className="pm__content__agreement__emptytext">
+                No Agreements within this Conversation
+              </div>
+            )}
+
+          {this.props.hasAgreementMessages &&
+            !this.props.isProcessingLoadingAgreementData && (
+              <div className="pm__content__agreement__title">Agreements</div>
+            )}
+
+          {agreementMessages}
+
+          {this.props.hasCancellationPendingMessages &&
+            !this.props.isProcessingLoadingAgreementData && (
+              <div className="pm__content__agreement__title">
+                Agreements with Pending Cancellation
+              </div>
+            )}
+
+          {cancellationPendingMessages}
+
+          {this.props.hasProposalMessages &&
+            !this.props.isProcessingLoadingAgreementData && (
+              <div className="pm__content__agreement__title">
+                Open Proposals
+              </div>
+            )}
+
+          {proposalMessages}
+
+          {rdfLinkToConnection}
+        </div>
+      );
+    } else if (this.props.showPetriNetData) {
+      headerElement = (
+        <div className="pm__header">
+          <div className="pm__header__back">
+            <a
+              className="pm__header__back__button clickable"
+              onClick={() =>
+                this.props.setShowPetriNetData(
+                  this.props.selectedConnectionUri,
+                  false
+                )
+              }
+            >
+              <svg className="pm__header__back__button__icon clickable">
+                <use xlinkHref="#ico36_backarrow" href="#ico36_backarrow" />
+              </svg>
+            </a>
+          </div>
+          <div
+            className="pm__header__title clickable"
+            onClick={() =>
+              this.props.setShowPetriNetData(
+                this.props.selectedConnectionUri,
+                false
+              )
+            }
+          >
+            Showing PetriNet Data
+          </div>
+          <WonConnectionContextDropdown
+            showPetriNetDataField={this.showPetriNetDataField.bind(this)}
+            showAgreementDataField={this.showAgreementDataField.bind(this)}
+          />
+        </div>
+      );
+
+      const petrinetProcessArray =
+        (!this.props.isProcessingLoadingPetriNetData ||
+          this.props.hasPetriNetData) &&
+        this.props.petriNetDataArray &&
+        this.props.petriNetDataArray.map((process, index) => {
+          if (get(process, "processURI")) {
+            return (
+              <div
+                className="pm__content__petrinet__process"
+                key={get(process, "processURI") + "-" + index}
+              >
+                <div className="pm__content__petrinet__process__header">
+                  ProcessURI: {get(process, "processURI")}
                 </div>
+                <WonPetrinetState
+                  className="pm__content__petrinet__process__content"
+                  processUri={get(process, "processURI")}
+                />
+              </div>
+            );
+          }
+        });
+
+      contentElement = (
+        <div
+          className="pm__content won-petrinet-content"
+          ref={this.chatContainerRef}
+        >
+          {unreadIndicatorElement}
+          {(this.props.isConnectionLoading ||
+            this.props.isProcessingLoadingMessages ||
+            (this.props.isProcessingLoadingPetriNetData &&
+              !this.props.hasPetriNetData)) &&
+            loadSpinnerElement}
+          {!this.props.hasPetriNetData &&
+            (this.props.isProcessingLoadingPetriNetData ? (
+              <div className="pm__content__petrinet__loadingtext">
+                Calculating PetriNet Status
               </div>
             ) : (
-              undefined
-            );
+              <div className="pm__content__petrinet__emptytext">
+                No PetriNet Data within this Conversation
+              </div>
+            ))}
+          {petrinetProcessArray}
+          {rdfLinkToConnection}
+        </div>
+      );
+    }
 
-          const loadSpinnerElement = (
-            <div className="pm__content__loadspinner">
-              <svg className="hspinner">
-                <use xlinkHref="#ico_loading_anim" href="#ico_loading_anim" />
-              </svg>
+    if (!this.props.showPetriNetData) {
+      if (this.props.isConnected) {
+        footerElement = (
+          <div className="pm__footer">
+            <ChatTextfield
+              className="pm__footer__chattextfield"
+              connectionUri={this.props.selectedConnectionUri}
+              placeholder={
+                this.props.shouldShowRdf ? "Enter TTL..." : "Your message..."
+              }
+              submitButtonLabel={
+                this.props.shouldShowRdf ? "Send&#160;RDF" : "Send"
+              }
+              helpText={this.props.shouldShowRdf ? rdfTextfieldHelpText : ""}
+              allowEmptySubmit={false}
+              allowDetails={!this.props.shouldShowRdf}
+              isCode={this.props.shouldShowRdf}
+              onSubmit={({ value, additionalContent, referencedContent }) =>
+                this.send(
+                  value,
+                  additionalContent,
+                  referencedContent,
+                  this.props.shouldShowRdf
+                )
+              }
+            />
+          </div>
+        );
+      } else if (!this.props.multiSelectType) {
+        if (this.props.isSentRequest) {
+          footerElement = (
+            <div className="pm__footer">
+              Waiting for them to accept your chat request.
             </div>
           );
-
-          if (this.props.showChatData) {
-            const backButtonElement = this.props.showOverlayConnection ? (
-              <a
-                className="pm__header__back__button clickable"
-                onClick={this.props.routerBack.bind(this)}
-              >
-                <svg className="pm__header__back__button__icon clickable hide-in-responsive">
-                  <use xlinkHref="#ico36_close" href="#ico36_close" />
-                </svg>
-                <svg className="pm__header__back__button__icon clickable show-in-responsive">
-                  <use xlinkHref="#ico36_backarrow" href="#ico36_backarrow" />
-                </svg>
-              </a>
-            ) : (
-              <React.Fragment>
-                <a
-                  className="pm__header__back__button clickable show-in-responsive"
-                  onClick={this.props.routerBack.bind(this)}
-                >
-                  <svg className="pm__header__back__button__icon">
-                    <use xlinkHref="#ico36_backarrow" href="#ico36_backarrow" />
-                  </svg>
-                </a>
-                <a
-                  className="pm__header__back__button clickable hide-in-responsive"
-                  onClick={() =>
-                    this.props.routerGoCurrent({ connectionUri: undefined })
-                  }
-                >
-                  <svg className="pm__header__back__button__icon">
-                    <use xlinkHref="#ico36_backarrow" href="#ico36_backarrow" />
-                  </svg>
-                </a>
-              </React.Fragment>
-            );
-
-            headerElement = (
-              <div className="pm__header">
-                <div className="pm__header__back">{backButtonElement}</div>
-                <WonConnectionHeader
-                  connectionUri={this.props.selectedConnectionUri}
-                />
-                <WonShareDropdown atomUri={this.props.targetAtomUri} />
-                <WonConnectionContextDropdown
-                  showPetriNetDataField={this.showPetriNetDataField.bind(this)}
-                  showAgreementDataField={this.showAgreementDataField.bind(
-                    this
-                  )}
-                />
-              </div>
-            );
-
-            const chatMessages =
-              this.props.sortedMessageUris &&
-              this.props.sortedMessageUris.map((msgUri, index) => {
-                return (
-                  <WonConnectionMessage
-                    key={msgUri + "-" + index}
-                    messageUri={msgUri}
-                    connectionUri={this.props.selectedConnectionUri}
-                    ngRedux={store}
-                    onClick={
-                      this.props.multiSelectType
-                        ? () => this.selectMessage(msgUri)
-                        : undefined
-                    }
-                  />
-                );
-              });
-
-            contentElement = (
-              <div
-                className="pm__content"
-                ref={this.chatContainerRef}
-                onScroll={this.onScroll.bind(this)}
-              >
-                {unreadIndicatorElement}
-                {this.props.showPostContentMessage && (
-                  <WonAtomContentMessage atomUri={this.props.targetAtomUri} />
-                )}
-                {(this.props.isConnectionLoading ||
-                  this.props.isProcessingLoadingMessages) &&
-                  loadSpinnerElement}
-                {!this.props.isSuggested &&
-                  !this.props.isConnectionLoading &&
-                  !this.props.isProcessingLoadingMessages &&
-                  this.props.hasConnectionMessagesToLoad && (
-                    <button
-                      className="pm__content__loadbutton won-button--outlined thin red"
-                      onClick={this.loadPreviousMessages.bind(this)}
-                    >
-                      Load previous messages
-                    </button>
-                  )}
-
-                {chatMessages}
-
-                {rdfLinkToConnection}
-              </div>
-            );
-          } else if (this.props.showAgreementData) {
-            headerElement = (
-              <div className="pm__header">
-                <div className="pm__header__back">
-                  <a
-                    className="pm__header__back__button clickable"
-                    onClick={() =>
-                      this.props.setShowAgreementData(
-                        this.props.selectedConnectionUri,
-                        false
-                      )
-                    }
-                  >
-                    <svg className="pm__header__back__button__icon clickable">
-                      <use
-                        xlinkHref="#ico36_backarrow"
-                        href="#ico36_backarrow"
-                      />
-                    </svg>
-                  </a>
-                </div>
-                <div
-                  className="pm__header__title clickable"
-                  onClick={() =>
-                    this.props.setShowAgreementData(
-                      this.props.selectedConnectionUri,
-                      false
-                    )
-                  }
-                >
-                  Showing Agreement Data
-                </div>
-                <WonConnectionContextDropdown
-                  showPetriNetDataField={this.showPetriNetDataField.bind(this)}
-                  showAgreementDataField={this.showAgreementDataField.bind(
-                    this
-                  )}
-                />
-              </div>
-            );
-
-            const agreementMessages =
-              !this.props.isProcessingLoadingAgreementData &&
-              this.props.agreementMessageArray &&
-              this.props.agreementMessageArray.map((msg, index) => {
-                return (
-                  <WonConnectionMessage
-                    key={get(msg, "uri") + "-" + index}
-                    messageUri={get(msg, "uri")}
-                    connectionUri={this.props.selectedConnectionUri}
-                    ngRedux={store}
-                    onClick={
-                      this.props.multiSelectType
-                        ? () => this.selectMessage(get(msg, "uri"))
-                        : undefined
-                    }
-                  />
-                );
-              });
-
-            const cancellationPendingMessages =
-              !this.props.isProcessingLoadingAgreementData &&
-              this.props.cancellationPendingMessageArray &&
-              this.props.cancellationPendingMessageArray.map((msg, index) => {
-                return (
-                  <WonConnectionMessage
-                    key={get(msg, "uri") + "-" + index}
-                    messageUri={get(msg, "uri")}
-                    connectionUri={this.props.selectedConnectionUri}
-                    ngRedux={store}
-                    onClick={
-                      this.props.multiSelectType
-                        ? () => this.selectMessage(get(msg, "uri"))
-                        : undefined
-                    }
-                  />
-                );
-              });
-
-            const proposalMessages =
-              !this.props.isProcessingLoadingAgreementData &&
-              this.props.proposalMessageArray &&
-              this.props.proposalMessageArray.map((msg, index) => {
-                return (
-                  <WonConnectionMessage
-                    key={get(msg, "uri") + "-" + index}
-                    messageUri={get(msg, "uri")}
-                    connectionUri={this.props.selectedConnectionUri}
-                    ngRedux={store}
-                    onClick={
-                      this.props.multiSelectType
-                        ? () => this.selectMessage(get(msg, "uri"))
-                        : undefined
-                    }
-                  />
-                );
-              });
-
-            contentElement = (
-              <div
-                className="pm__content won-agreement-content"
-                ref={this.chatContainerRef}
-              >
-                {unreadIndicatorElement}
-                {(this.props.isConnectionLoading ||
-                  this.props.isProcessingLoadingMessages ||
-                  (this.props.showAgreementData &&
-                    this.props.isProcessingLoadingAgreementData)) &&
-                  loadSpinnerElement}
-                {this.props.isProcessingLoadingAgreementData && (
-                  <div className="pm__content__agreement__loadingtext">
-                    Calculating Agreement Status
-                  </div>
-                )}
-
-                {!(
-                  this.props.hasAgreementMessages ||
-                  this.props.hasCancellationPendingMessages ||
-                  this.props.hasProposalMessages
-                ) &&
-                  !this.props.isProcessingLoadingAgreementData && (
-                    <div className="pm__content__agreement__emptytext">
-                      No Agreements within this Conversation
-                    </div>
-                  )}
-
-                {this.props.hasAgreementMessages &&
-                  !this.props.isProcessingLoadingAgreementData && (
-                    <div className="pm__content__agreement__title">
-                      Agreements
-                    </div>
-                  )}
-
-                {agreementMessages}
-
-                {this.props.hasCancellationPendingMessages &&
-                  !this.props.isProcessingLoadingAgreementData && (
-                    <div className="pm__content__agreement__title">
-                      Agreements with Pending Cancellation
-                    </div>
-                  )}
-
-                {cancellationPendingMessages}
-
-                {this.props.hasProposalMessages &&
-                  !this.props.isProcessingLoadingAgreementData && (
-                    <div className="pm__content__agreement__title">
-                      Open Proposals
-                    </div>
-                  )}
-
-                {proposalMessages}
-
-                {rdfLinkToConnection}
-              </div>
-            );
-          } else if (this.props.showPetriNetData) {
-            headerElement = (
-              <div className="pm__header">
-                <div className="pm__header__back">
-                  <a
-                    className="pm__header__back__button clickable"
-                    onClick={() =>
-                      this.props.setShowPetriNetData(
-                        this.props.selectedConnectionUri,
-                        false
-                      )
-                    }
-                  >
-                    <svg className="pm__header__back__button__icon clickable">
-                      <use
-                        xlinkHref="#ico36_backarrow"
-                        href="#ico36_backarrow"
-                      />
-                    </svg>
-                  </a>
-                </div>
-                <div
-                  className="pm__header__title clickable"
-                  onClick={() =>
-                    this.props.setShowPetriNetData(
-                      this.props.selectedConnectionUri,
-                      false
-                    )
-                  }
-                >
-                  Showing PetriNet Data
-                </div>
-                <WonConnectionContextDropdown
-                  showPetriNetDataField={this.showPetriNetDataField.bind(this)}
-                  showAgreementDataField={this.showAgreementDataField.bind(
-                    this
-                  )}
-                />
-              </div>
-            );
-
-            const petrinetProcessArray =
-              (!this.props.isProcessingLoadingPetriNetData ||
-                this.props.hasPetriNetData) &&
-              this.props.petriNetDataArray &&
-              this.props.petriNetDataArray.map((process, index) => {
-                if (get(process, "processURI")) {
-                  return (
-                    <div
-                      className="pm__content__petrinet__process"
-                      key={get(process, "processURI") + "-" + index}
-                    >
-                      <div className="pm__content__petrinet__process__header">
-                        ProcessURI: {get(process, "processURI")}
-                      </div>
-                      <WonPetrinetState
-                        className="pm__content__petrinet__process__content"
-                        processUri={get(process, "processURI")}
-                      />
-                    </div>
-                  );
+        } else if (this.props.isReceivedRequest) {
+          footerElement = (
+            <div className="pm__footer">
+              <ChatTextfield
+                className="pm__footer__chattextfield"
+                connectionUri={this.props.selectedConnectionUri}
+                placeholder="Message (optional)"
+                submitButtonLabel="Accept&#160;Chat"
+                allowEmptySubmit={true}
+                allowDetails={false}
+                onSubmit={({ value }) =>
+                  this.props.openRequest(
+                    this.props.selectedConnectionUri,
+                    value
+                  )
                 }
-              });
-
-            contentElement = (
-              <div
-                className="pm__content won-petrinet-content"
-                ref={this.chatContainerRef}
+              />
+              <WonLabelledHr className="pm__footer__labelledhr" label="Or" />
+              <button
+                className="pm__footer__button won-button--filled black"
+                onClick={() => this.closeConnection()}
               >
-                {unreadIndicatorElement}
-                {(this.props.isConnectionLoading ||
-                  this.props.isProcessingLoadingMessages ||
-                  (this.props.isProcessingLoadingPetriNetData &&
-                    !this.props.hasPetriNetData)) &&
-                  loadSpinnerElement}
-                {!this.props.hasPetriNetData &&
-                  (this.props.isProcessingLoadingPetriNetData ? (
-                    <div className="pm__content__petrinet__loadingtext">
-                      Calculating PetriNet Status
-                    </div>
-                  ) : (
-                    <div className="pm__content__petrinet__emptytext">
-                      No PetriNet Data within this Conversation
-                    </div>
-                  ))}
-                {petrinetProcessArray}
-                {rdfLinkToConnection}
-              </div>
-            );
-          }
-
-          if (!this.props.showPetriNetData) {
-            if (this.props.isConnected) {
-              footerElement = (
-                <div className="pm__footer">
-                  <ChatTextfield
-                    className="pm__footer__chattextfield"
-                    connectionUri={this.props.selectedConnectionUri}
-                    placeholder={
-                      this.props.shouldShowRdf
-                        ? "Enter TTL..."
-                        : "Your message..."
-                    }
-                    submitButtonLabel={
-                      this.props.shouldShowRdf ? "Send&#160;RDF" : "Send"
-                    }
-                    helpText={
-                      this.props.shouldShowRdf ? rdfTextfieldHelpText : ""
-                    }
-                    allowEmptySubmit={false}
-                    allowDetails={!this.props.shouldShowRdf}
-                    isCode={this.props.shouldShowRdf}
-                    onSubmit={({
-                      value,
-                      additionalContent,
-                      referencedContent,
-                    }) =>
-                      this.send(
-                        value,
-                        additionalContent,
-                        referencedContent,
-                        this.props.shouldShowRdf
-                      )
-                    }
-                  />
-                </div>
-              );
-            } else if (!this.props.multiSelectType) {
-              if (this.props.isSentRequest) {
-                footerElement = (
-                  <div className="pm__footer">
-                    Waiting for them to accept your chat request.
-                  </div>
-                );
-              } else if (this.props.isReceivedRequest) {
-                footerElement = (
-                  <div className="pm__footer">
-                    <ChatTextfield
-                      className="pm__footer__chattextfield"
-                      connectionUri={this.props.selectedConnectionUri}
-                      placeholder="Message (optional)"
-                      submitButtonLabel="Accept&#160;Chat"
-                      allowEmptySubmit={true}
-                      allowDetails={false}
-                      onSubmit={({ value }) =>
-                        this.props.openRequest(
-                          this.props.selectedConnectionUri,
-                          value
-                        )
-                      }
-                    />
-                    <WonLabelledHr
-                      className="pm__footer__labelledhr"
-                      label="Or"
-                    />
-                    <button
-                      className="pm__footer__button won-button--filled black"
-                      onClick={() => this.closeConnection()}
-                    >
-                      Decline
-                    </button>
-                  </div>
-                );
-              } else if (this.props.isSuggested) {
-                footerElement = (
-                  <div className="pm__footer">
-                    <ChatTextfield
-                      className="pm__footer__chattextfield"
-                      connectionUri={this.props.selectedConnectionUri}
-                      placeholder="Message (optional)"
-                      submitButtonLabel="Ask&#160;to&#160;Chat"
-                      allowEmptySubmit={true}
-                      allowDetails={false}
-                      showPersonas={!this.props.connection}
-                      onSubmit={({ value, selectedPersona }) =>
-                        this.sendRequest(value, selectedPersona)
-                      }
-                    />
-                    <WonLabelledHr
-                      className="pm__footer__labelledhr"
-                      label="Or"
-                    />
-                    <button
-                      className="pm__footer__button won-button--filled black"
-                      onClick={() => this.closeConnection(true)}
-                    >
-                      Bad match - remove!
-                    </button>
-                  </div>
-                );
-              }
-            }
-          }
-
-          return (
-            <won-atom-messages
-              class={
-                (this.props.className || "") +
-                (this.props.connectionOrAtomsLoading && " won-is-loading ")
-              }
-            >
-              {headerElement}
-              {contentElement}
-              {footerElement}
-            </won-atom-messages>
+                Decline
+              </button>
+            </div>
           );
-        }}
-      </ReactReduxContext.Consumer>
+        } else if (this.props.isSuggested) {
+          footerElement = (
+            <div className="pm__footer">
+              <ChatTextfield
+                className="pm__footer__chattextfield"
+                connectionUri={this.props.selectedConnectionUri}
+                placeholder="Message (optional)"
+                submitButtonLabel="Ask&#160;to&#160;Chat"
+                allowEmptySubmit={true}
+                allowDetails={false}
+                showPersonas={!this.props.connection}
+                onSubmit={({ value, selectedPersona }) =>
+                  this.sendRequest(value, selectedPersona)
+                }
+              />
+              <WonLabelledHr className="pm__footer__labelledhr" label="Or" />
+              <button
+                className="pm__footer__button won-button--filled black"
+                onClick={() => this.closeConnection(true)}
+              >
+                Bad match - remove!
+              </button>
+            </div>
+          );
+        }
+      }
+    }
+
+    return (
+      <won-atom-messages
+        class={
+          (this.props.className || "") +
+          (this.props.connectionOrAtomsLoading && " won-is-loading ")
+        }
+      >
+        {headerElement}
+        {contentElement}
+        {footerElement}
+      </won-atom-messages>
     );
   }
 

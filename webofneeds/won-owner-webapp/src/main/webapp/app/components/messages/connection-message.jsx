@@ -6,6 +6,7 @@ import * as messageUtils from "../../redux/utils/message-utils.js";
 import * as connectionUtils from "../../redux/utils/connection-utils.js";
 import { get, getIn } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
+import { connect } from "react-redux";
 import { getOwnedAtomByConnectionUri } from "../../redux/selectors/general-selectors.js";
 import { ownerBaseUrl } from "~/config/default.js";
 
@@ -21,133 +22,145 @@ import "~/style/_rdflink.scss";
 
 const MESSAGE_READ_TIMEOUT = 1500;
 
-export default class WonConnectionMessage extends React.Component {
-  componentDidMount() {
-    this.messageUri = this.props.messageUri;
-    this.connectionUri = this.props.connectionUri;
-    this.groupChatMessage = this.props.groupChatMessage;
-    this.disconnect = this.props.ngRedux.connect(
-      this.selectFromState.bind(this),
-      actionCreators
-    )(state => {
-      this.setState(state);
-    });
+const mapStateToProps = (state, ownProps) => {
+  const ownedAtom =
+    ownProps.connectionUri &&
+    getOwnedAtomByConnectionUri(state, ownProps.connectionUri);
+  const connection = getIn(ownedAtom, ["connections", ownProps.connectionUri]);
+  const theirAtom = getIn(state, ["atoms", get(connection, "targetAtomUri")]);
+  const message =
+    connection && ownProps.messageUri
+      ? getIn(connection, ["messages", ownProps.messageUri])
+      : Immutable.Map();
+
+  const shouldShowRdf = getIn(state, ["view", "showRdf"]);
+
+  let rdfLinkURL;
+  if (shouldShowRdf && ownerBaseUrl && ownedAtom && message) {
+    rdfLinkURL = urljoin(
+      ownerBaseUrl,
+      "/rest/linked-data/",
+      `?requester=${encodeURIComponent(get(ownedAtom, "uri"))}`,
+      `&uri=${encodeURIComponent(get(message, "uri"))}`,
+      get(message, "outgoingMessage") ? "&deep=true" : ""
+    );
   }
+  const isSent = get(message, "outgoingMessage");
+  const isReceived = !get(message, "outgoingMessage");
+  const isFailedToSend = get(message, "failedToSend");
+  const isReceivedByOwn = get(message, "isReceivedByOwn");
+  const isReceivedByRemote = get(message, "isReceivedByRemote");
 
-  componentWillUnmount() {
-    this.disconnect();
-  }
+  // determines if the sent message is not received by any of the servers yet but not failed either
+  const isPending =
+    isSent && !isFailedToSend && !isReceivedByOwn && !isReceivedByRemote;
 
-  UNSAFE_componentWillReceiveProps(nextProps) {
-    this.messageUri = nextProps.messageUri;
-    this.connectionUri = nextProps.connectionUri;
-    this.groupChatMessage = nextProps.groupChatMessage;
-    this.setState(this.selectFromState(this.props.ngRedux.getState()));
-  }
+  // determines if the sent message is received by any of the servers yet but not failed either
+  const isPartiallyLoaded =
+    isSent &&
+    !isFailedToSend &&
+    (!(isReceivedByOwn && isReceivedByRemote) &&
+      (isReceivedByOwn || isReceivedByRemote));
 
-  selectFromState(state) {
-    const ownedAtom =
-      this.connectionUri &&
-      getOwnedAtomByConnectionUri(state, this.connectionUri);
-    const connection = getIn(ownedAtom, ["connections", this.connectionUri]);
-    const theirAtom = getIn(state, ["atoms", get(connection, "targetAtomUri")]);
-    const message =
-      connection && this.messageUri
-        ? getIn(connection, ["messages", this.messageUri])
-        : Immutable.Map();
+  const injectInto = get(message, "injectInto");
 
-    const shouldShowRdf = getIn(state, ["view", "showRdf"]);
+  return {
+    connectionUri: ownProps.connectionUri,
+    messageUri: ownProps.messageUri,
+    onClick: ownProps.onClick,
+    groupChatMessage: ownProps.groupChatMessage,
+    ownedAtom,
+    theirAtom,
+    message,
+    messageSenderUri: get(message, "senderUri"),
+    originatorUri: get(message, "originatorUri"),
+    isConnectionMessage: messageUtils.isConnectionMessage(message),
+    isChangeNotificationMessage: messageUtils.isChangeNotificationMessage(
+      message
+    ),
+    isSelected: getIn(message, ["viewState", "isSelected"]),
+    isCollapsed: getIn(message, ["viewState", "isCollapsed"]),
+    showActions: getIn(message, ["viewState", "showActions"]),
+    multiSelectType: get(connection, "multiSelectType"),
+    shouldShowRdf,
+    rdfLinkURL,
+    isParsable: messageUtils.isParsable(message),
+    isClaimed: messageUtils.isMessageClaimed(message),
+    isProposed: messageUtils.isMessageProposed(message),
+    isAccepted: messageUtils.isMessageAccepted(message),
+    isRejected: messageUtils.isMessageRejected(message),
+    isRetracted: messageUtils.isMessageRetracted(message),
+    isCancellationPending: messageUtils.isMessageCancellationPending(message),
+    isCancelled: messageUtils.isMessageCancelled(message),
+    isProposable:
+      connectionUtils.isConnected(connection) &&
+      messageUtils.isMessageProposable(message),
+    isClaimable:
+      connectionUtils.isConnected(connection) &&
+      messageUtils.isMessageClaimable(message),
+    isCancelable: messageUtils.isMessageCancelable(message),
+    isRetractable: messageUtils.isMessageRetractable(message),
+    isRejectable: messageUtils.isMessageRejectable(message),
+    isAcceptable: messageUtils.isMessageAcceptable(message),
+    isUnread: messageUtils.isMessageUnread(message),
+    isInjectIntoMessage: injectInto && injectInto.size > 0,
+    injectInto: injectInto,
+    isReceived,
+    isSent,
+    isFailedToSend,
+    isPending,
+    isPartiallyLoaded,
+    isFromSystem: get(message, "systemMessage"),
+    hasReferences: get(message, "hasReferences"),
+  };
+};
 
-    let rdfLinkURL;
-    if (shouldShowRdf && ownerBaseUrl && ownedAtom && message) {
-      rdfLinkURL = urljoin(
-        ownerBaseUrl,
-        "/rest/linked-data/",
-        `?requester=${this.encodeParam(get(ownedAtom, "uri"))}`,
-        `&uri=${this.encodeParam(get(message, "uri"))}`,
-        get(message, "outgoingMessage") ? "&deep=true" : ""
+const mapDispatchToProps = dispatch => {
+  return {
+    routerGo: (path, props) => {
+      dispatch(actionCreators.router__stateGo(path, props));
+    },
+    messageMarkAsCollapsed: (messageUri, connectionUri, atomUri, collapsed) => {
+      dispatch(
+        actionCreators.messages__viewState__markAsCollapsed({
+          messageUri: messageUri,
+          connectionUri: connectionUri,
+          atomUri: atomUri,
+          isCollapsed: collapsed,
+        })
       );
-    }
-    const isSent = get(message, "outgoingMessage");
-    const isReceived = !get(message, "outgoingMessage");
-    const isFailedToSend = get(message, "failedToSend");
-    const isReceivedByOwn = get(message, "isReceivedByOwn");
-    const isReceivedByRemote = get(message, "isReceivedByRemote");
+    },
+    markMessageAsRead: (messageUri, connectionUri, atomUri) => {
+      dispatch(
+        actionCreators.messages__markAsRead({
+          messageUri: messageUri,
+          connectionUri: connectionUri,
+          atomUri: atomUri,
+        })
+      );
+    },
+    showMessageActions: (messageUri, connectionUri, atomUri, showActions) => {
+      this.props.ngRedux.dispatch(
+        actionCreators.messages__viewState__markShowActions({
+          messageUri: messageUri,
+          connectionUri: connectionUri,
+          atomUri: atomUri,
+          showActions: showActions,
+        })
+      );
+    },
+  };
+};
 
-    // determines if the sent message is not received by any of the servers yet but not failed either
-    const isPending =
-      isSent && !isFailedToSend && !isReceivedByOwn && !isReceivedByRemote;
-
-    // determines if the sent message is received by any of the servers yet but not failed either
-    const isPartiallyLoaded =
-      isSent &&
-      !isFailedToSend &&
-      (!(isReceivedByOwn && isReceivedByRemote) &&
-        (isReceivedByOwn || isReceivedByRemote));
-
-    const injectInto = get(message, "injectInto");
-
-    return {
-      ownedAtom,
-      theirAtom,
-      message,
-      messageSenderUri: get(message, "senderUri"),
-      isGroupChatMessage: this.groupChatMessage,
-      originatorUri: get(message, "originatorUri"),
-      isConnectionMessage: messageUtils.isConnectionMessage(message),
-      isChangeNotificationMessage: messageUtils.isChangeNotificationMessage(
-        message
-      ),
-      isSelected: getIn(message, ["viewState", "isSelected"]),
-      isCollapsed: getIn(message, ["viewState", "isCollapsed"]),
-      showActions: getIn(message, ["viewState", "showActions"]),
-      multiSelectType: get(connection, "multiSelectType"),
-      shouldShowRdf,
-      rdfLinkURL,
-      isParsable: messageUtils.isParsable(message),
-      isClaimed: messageUtils.isMessageClaimed(message),
-      isProposed: messageUtils.isMessageProposed(message),
-      isAccepted: messageUtils.isMessageAccepted(message),
-      isRejected: messageUtils.isMessageRejected(message),
-      isRetracted: messageUtils.isMessageRetracted(message),
-      isCancellationPending: messageUtils.isMessageCancellationPending(message),
-      isCancelled: messageUtils.isMessageCancelled(message),
-      isProposable:
-        connectionUtils.isConnected(connection) &&
-        messageUtils.isMessageProposable(message),
-      isClaimable:
-        connectionUtils.isConnected(connection) &&
-        messageUtils.isMessageClaimable(message),
-      isCancelable: messageUtils.isMessageCancelable(message),
-      isRetractable: messageUtils.isMessageRetractable(message),
-      isRejectable: messageUtils.isMessageRejectable(message),
-      isAcceptable: messageUtils.isMessageAcceptable(message),
-      isUnread: messageUtils.isMessageUnread(message),
-      isInjectIntoMessage: injectInto && injectInto.size > 0,
-      injectInto: injectInto,
-      isReceived,
-      isSent,
-      isFailedToSend,
-      isPending,
-      isPartiallyLoaded,
-      isFromSystem: get(message, "systemMessage"),
-      hasReferences: get(message, "hasReferences"),
-    };
-  }
-
+class WonConnectionMessage extends React.Component {
   render() {
-    if (!this.state) {
-      console.debug("render with null state");
-      return <div />;
-    }
-
     let messageContentElement;
 
-    if (this.state.isChangeNotificationMessage) {
+    if (this.props.isChangeNotificationMessage) {
       messageContentElement = (
         <VisibilitySensor
           onChange={isVisible => {
-            isVisible && this.state.isUnread && this.markAsRead();
+            isVisible && this.props.isUnread && this.markAsRead();
           }}
           intervalDelay={MESSAGE_READ_TIMEOUT}
         >
@@ -161,20 +174,18 @@ export default class WonConnectionMessage extends React.Component {
       const messageIcon = [];
 
       if (
-        !this.state.isSent &&
-        !(this.state.isGroupChatMessage && this.state.originatorUri)
+        !this.props.isSent &&
+        !(this.props.groupChatMessage && this.props.originatorUri)
       ) {
         messageIcon.push(
           <WonAtomIcon
-            atomUri={get(this.state.theirAtom, "uri")}
+            atomUri={get(this.props.theirAtom, "uri")}
             onClick={
               !this.props.onClick
                 ? () => {
-                    this.props.ngRedux.dispatch(
-                      actionCreators.router__stateGo({
-                        postUri: get(this.state.theirAtom, "uri"),
-                      })
-                    );
+                    this.props.routerGo("post", {
+                      postUri: get(this.props.theirAtom, "uri"),
+                    });
                   }
                 : undefined
             }
@@ -183,21 +194,19 @@ export default class WonConnectionMessage extends React.Component {
       }
 
       if (
-        this.state.isReceived &&
-        this.state.isGroupChatMessage &&
-        this.state.originatorUri
+        this.props.isReceived &&
+        this.props.groupChatMessage &&
+        this.props.originatorUri
       ) {
         messageIcon.push(
           <WonAtomIcon
-            atomUri={this.state.originatorUri}
+            atomUri={this.props.originatorUri}
             onClick={
               !this.props.onClick
                 ? () => {
-                    this.props.ngRedux.dispatch(
-                      actionCreators.router__stateGo({
-                        postUri: this.state.originatorUri,
-                      })
-                    );
+                    this.props.routerGo("post", {
+                      postUri: this.props.originatorUri,
+                    });
                   }
                 : undefined
             }
@@ -205,12 +214,12 @@ export default class WonConnectionMessage extends React.Component {
         );
       }
 
-      if (this.state.isFromSystem) {
-        messageIcon.push(<WonAtomIcon atomUri={this.state.messageSenderUri} />);
+      if (this.props.isFromSystem) {
+        messageIcon.push(<WonAtomIcon atomUri={this.props.messageSenderUri} />);
       }
 
       let messageCenterContentElement;
-      if (this.state.isCollapsed) {
+      if (this.props.isCollapsed) {
         messageCenterContentElement = (
           <div
             className="won-cm__center__bubble__collapsed clickable"
@@ -223,20 +232,19 @@ export default class WonConnectionMessage extends React.Component {
         messageCenterContentElement = (
           <React.Fragment>
             <WonCombinedMessageContent
-              messageUri={this.messageUri}
-              connectionUri={this.connectionUri}
-              ngRedux={this.props.ngRedux}
-              groupChatMessage={this.state.isGroupChatMessage}
+              messageUri={this.props.messageUri}
+              connectionUri={this.props.connectionUri}
+              groupChatMessage={this.props.groupChatMessage}
             />
-            {!this.state.isGroupChatMessage &&
-            (this.state.isProposable || this.state.isClaimable) &&
-            !this.state.multiSelectType ? (
+            {!this.props.groupChatMessage &&
+            (this.props.isProposable || this.props.isClaimable) &&
+            !this.props.multiSelectType ? (
               <div
                 className="won-cm__center__bubble__carret clickable"
                 onClick={() => this.toggleActions()}
               >
                 <svg>
-                  {this.state.showActions ? (
+                  {this.props.showActions ? (
                     <use xlinkHref="#ico16_arrow_up" href="#ico16_arrow_up" />
                   ) : (
                     <use
@@ -251,9 +259,8 @@ export default class WonConnectionMessage extends React.Component {
             )}
             {this.showActionButtons() ? (
               <WonConnectionMessageActions
-                messageUri={this.messageUri}
-                connectionUri={this.connectionUri}
-                ngRedux={this.props.ngRedux}
+                messageUri={this.props.messageUri}
+                connectionUri={this.props.connectionUri}
               />
             ) : (
               undefined
@@ -267,7 +274,7 @@ export default class WonConnectionMessage extends React.Component {
           {messageIcon}
           <VisibilitySensor
             onChange={isVisible => {
-              isVisible && this.state.isUnread && this.markAsRead();
+              isVisible && this.props.isUnread && this.markAsRead();
             }}
             intervalDelay={MESSAGE_READ_TIMEOUT}
           >
@@ -276,15 +283,14 @@ export default class WonConnectionMessage extends React.Component {
                 {messageCenterContentElement}
               </div>
               <WonConnectionMessageStatus
-                messageUri={this.messageUri}
-                connectionUri={this.connectionUri}
-                ngRedux={this.props.ngRedux}
+                messageUri={this.props.messageUri}
+                connectionUri={this.props.connectionUri}
               />
-              {this.state.rdfLinkURL ? (
+              {this.props.rdfLinkURL ? (
                 <a
                   target="_blank"
                   rel="noopener noreferrer"
-                  href={this.state.rdfLinkURL}
+                  href={this.props.rdfLinkURL}
                 >
                   <svg className="rdflink__small clickable">
                     <use xlinkHref="#rdf_logo_2" href="#rdf_logo_2" />
@@ -311,23 +317,23 @@ export default class WonConnectionMessage extends React.Component {
 
   generateParentCssClasses() {
     const cssClassNames = [];
-    this.state.isReceived && cssClassNames.push("won-cm--left");
-    this.state.isSent && cssClassNames.push("won-cm--right");
-    !!this.state.multiSelectType && cssClassNames.push("won-is-multiSelect");
+    this.props.isReceived && cssClassNames.push("won-cm--left");
+    this.props.isSent && cssClassNames.push("won-cm--right");
+    !!this.props.multiSelectType && cssClassNames.push("won-is-multiSelect");
     !this.isSelectable() && cssClassNames.push("won-not-selectable");
-    this.state.isSelected && cssClassNames.push("won-is-selected");
-    this.state.isProposed && cssClassNames.push("won-is-proposed");
-    this.state.isClaimed && cssClassNames.push("won-is-claimed");
-    this.state.isRejected && cssClassNames.push("won-is-rejected");
-    this.state.isRetracted && cssClassNames.push("won-is-retracted");
-    this.state.isAccepted && cssClassNames.push("won-is-accepted");
-    this.state.isCancelled && cssClassNames.push("won-is-cancelled");
-    this.state.isCollapsed && cssClassNames.push("won-is-collapsed");
-    this.state.isChangeNotificationMessage &&
+    this.props.isSelected && cssClassNames.push("won-is-selected");
+    this.props.isProposed && cssClassNames.push("won-is-proposed");
+    this.props.isClaimed && cssClassNames.push("won-is-claimed");
+    this.props.isRejected && cssClassNames.push("won-is-rejected");
+    this.props.isRetracted && cssClassNames.push("won-is-retracted");
+    this.props.isAccepted && cssClassNames.push("won-is-accepted");
+    this.props.isCancelled && cssClassNames.push("won-is-cancelled");
+    this.props.isCollapsed && cssClassNames.push("won-is-collapsed");
+    this.props.isChangeNotificationMessage &&
       cssClassNames.push("won-is-changeNotification");
-    this.state.isCancellationPending &&
+    this.props.isCancellationPending &&
       cssClassNames.push("won-is-cancellationPending");
-    this.state.isUnread && cssClassNames.push("won-unread");
+    this.props.isUnread && cssClassNames.push("won-unread");
 
     return cssClassNames.join(" ");
   }
@@ -335,11 +341,11 @@ export default class WonConnectionMessage extends React.Component {
   generateCenterCssClasses() {
     const cssClassNames = ["won-cm__center"];
 
-    this.state.isConnectionMessage &&
-      !this.state.isParsable &&
+    this.props.isConnectionMessage &&
+      !this.props.isParsable &&
       cssClassNames.push("won-cm__center--nondisplayable");
-    this.state.isFromSystem && cssClassNames.push("won-cm__center--system");
-    this.state.isInjectIntoMessage &&
+    this.props.isFromSystem && cssClassNames.push("won-cm__center--system");
+    this.props.isInjectIntoMessage &&
       cssClassNames.push("won-cm__center--inject-into");
 
     return cssClassNames.join(" ");
@@ -348,28 +354,28 @@ export default class WonConnectionMessage extends React.Component {
   generateCenterBubbleCssClasses() {
     const cssClassNames = ["won-cm__center__bubble"];
 
-    this.state.hasReferences && cssClassNames.push("references");
-    this.state.isPending && cssClassNames.push("pending");
-    this.state.isPartiallyLoaded && cssClassNames.push("partiallyLoaded");
-    this.state.isSent &&
-      this.state.isFailedToSend &&
+    this.props.hasReferences && cssClassNames.push("references");
+    this.props.isPending && cssClassNames.push("pending");
+    this.props.isPartiallyLoaded && cssClassNames.push("partiallyLoaded");
+    this.props.isSent &&
+      this.props.isFailedToSend &&
       cssClassNames.push("failure");
 
     return cssClassNames.join(" ");
   }
 
   generateCollapsedLabel() {
-    if (this.state.message) {
+    if (this.props.message) {
       let label;
 
-      if (this.state.isClaimed) label = "Message was claimed.";
-      else if (this.state.isProposed) label = "Message was proposed.";
-      else if (this.state.isAccepted) label = "Message was accepted.";
-      else if (this.state.isRejected) label = "Message was rejected.";
-      else if (this.state.isRetracted) label = "Message was retracted.";
-      else if (this.state.isCancellationPending)
+      if (this.props.isClaimed) label = "Message was claimed.";
+      else if (this.props.isProposed) label = "Message was proposed.";
+      else if (this.props.isAccepted) label = "Message was accepted.";
+      else if (this.props.isRejected) label = "Message was rejected.";
+      else if (this.props.isRetracted) label = "Message was retracted.";
+      else if (this.props.isCancellationPending)
         label = "Cancellation pending.";
-      else if (this.state.isCancelled) label = "Cancelled.";
+      else if (this.props.isCancelled) label = "Cancelled.";
       else label = "Message collapsed.";
 
       return label + " Click to expand.";
@@ -378,71 +384,61 @@ export default class WonConnectionMessage extends React.Component {
   }
 
   isSelectable() {
-    if (this.state.message && this.state.multiSelectType) {
-      switch (this.state.multiSelectType) {
+    if (this.props.message && this.props.multiSelectType) {
+      switch (this.props.multiSelectType) {
         case "rejects":
-          return this.state.isRejectable;
+          return this.props.isRejectable;
         case "retracts":
-          return this.state.isRetractable;
+          return this.props.isRetractable;
         case "proposesToCancel":
-          return this.state.isCancelable;
+          return this.props.isCancelable;
         case "accepts":
-          return this.state.isAcceptable;
+          return this.props.isAcceptable;
         case "proposes":
-          return this.state.isProposable;
+          return this.props.isProposable;
         case "claims":
-          return this.state.isClaimable;
+          return this.props.isClaimable;
       }
     }
     return false;
   }
 
   expandMessage() {
-    if (this.state.message && !this.state.multiSelectType) {
-      this.props.ngRedux.dispatch(
-        actionCreators.messages__viewState__markAsCollapsed({
-          messageUri: get(this.state.message, "uri"),
-          connectionUri: this.connectionUri,
-          atomUri: get(this.state.ownedAtom, "uri"),
-          isCollapsed: false,
-        })
+    if (this.props.message && !this.props.multiSelectType) {
+      this.props.messageMarkAsCollapsed(
+        get(this.props.message, "uri"),
+        this.props.connectionUri,
+        get(this.props.ownedAtom, "uri"),
+        false
       );
     }
   }
 
   showActionButtons() {
     return (
-      !this.state.isGroupChatMessage &&
-      (this.state.showActions ||
-        messageUtils.hasProposesReferences(this.state.message) ||
-        messageUtils.hasClaimsReferences(this.state.message) ||
-        messageUtils.hasProposesToCancelReferences(this.state.message))
+      !this.props.groupChatMessage &&
+      (this.props.showActions ||
+        messageUtils.hasProposesReferences(this.props.message) ||
+        messageUtils.hasClaimsReferences(this.props.message) ||
+        messageUtils.hasProposesToCancelReferences(this.props.message))
     );
   }
 
   toggleActions() {
-    this.props.ngRedux.dispatch(
-      actionCreators.messages__viewState__markShowActions({
-        messageUri: get(this.state.message, "uri"),
-        connectionUri: this.connectionUri,
-        atomUri: get(this.state.ownedAtom, "uri"),
-        showActions: !this.state.showActions,
-      })
+    this.props.showMessageActions(
+      get(this.props.message, "uri"),
+      this.props.connectionUri,
+      get(this.props.ownedAtom, "uri"),
+      !this.props.showActions
     );
   }
 
-  encodeParam(param) {
-    return encodeURIComponent(param);
-  }
-
   markAsRead() {
-    if (this.state.isUnread) {
-      this.props.ngRedux.dispatch(
-        actionCreators.messages__markAsRead({
-          messageUri: this.messageUri,
-          connectionUri: this.connectionUri,
-          atomUri: get(this.state.ownedAtom, "uri"),
-        })
+    if (this.props.isUnread) {
+      this.props.messageMarkAsRead(
+        this.props.messageUri,
+        this.props.connectionUri,
+        get(this.props.ownedAtom, "uri")
       );
     }
   }
@@ -452,6 +448,51 @@ WonConnectionMessage.propTypes = {
   messageUri: PropTypes.string.isRequired,
   connectionUri: PropTypes.string.isRequired,
   groupChatMessage: PropTypes.bool,
-  ngRedux: PropTypes.object.isRequired,
   onClick: PropTypes.func,
+  ownedAtom: PropTypes.object,
+  theirAtom: PropTypes.object,
+  message: PropTypes.object,
+  messageSenderUri: PropTypes.string,
+  originatorUri: PropTypes.string,
+  isConnectionMessage: PropTypes.bool,
+  isChangeNotificationMessage: PropTypes.bool,
+  isSelected: PropTypes.bool,
+  isCollapsed: PropTypes.bool,
+  showActions: PropTypes.bool,
+  multiSelectType: PropTypes.string,
+  shouldShowRdf: PropTypes.bool,
+  rdfLinkURL: PropTypes.string,
+  isParsable: PropTypes.bool,
+  isClaimed: PropTypes.bool,
+  isProposed: PropTypes.bool,
+  isAccepted: PropTypes.bool,
+  isRejected: PropTypes.bool,
+  isRetracted: PropTypes.bool,
+  isCancellationPending: PropTypes.bool,
+  isCancelled: PropTypes.bool,
+  isProposable: PropTypes.bool,
+  isClaimable: PropTypes.bool,
+  isCancelable: PropTypes.bool,
+  isRetractable: PropTypes.bool,
+  isRejectable: PropTypes.bool,
+  isAcceptable: PropTypes.bool,
+  isUnread: PropTypes.bool,
+  isInjectIntoMessage: PropTypes.bool,
+  injectInto: PropTypes.object,
+  isReceived: PropTypes.bool,
+  isSent: PropTypes.bool,
+  isFailedToSend: PropTypes.bool,
+  isPending: PropTypes.bool,
+  isPartiallyLoaded: PropTypes.bool,
+  isFromSystem: PropTypes.bool,
+  hasReferences: PropTypes.bool,
+  routerGo: PropTypes.func,
+  messageMarkAsCollapsed: PropTypes.func,
+  messageMarkAsRead: PropTypes.func,
+  showMessageActions: PropTypes.func,
 };
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(WonConnectionMessage);

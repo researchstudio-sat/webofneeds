@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { connect, ReactReduxContext } from "react-redux";
+import { connect } from "react-redux";
 
 import * as generalSelectors from "../redux/selectors/general-selectors";
 import * as messageUtils from "../redux/utils/message-utils";
@@ -187,219 +187,208 @@ class GroupAtomMessages extends React.Component {
   }
 
   render() {
+    let footerElement = undefined;
+
+    const rdfLinkToConnection = this.props.shouldShowRdf && (
+      <a
+        className="rdflink clickable"
+        target="_blank"
+        rel="noopener noreferrer"
+        href={this.props.connectionUri}
+      >
+        <svg className="rdflink__small">
+          <use xlinkHref="#rdf_logo_1" href="#rdf_logo_1" />
+        </svg>
+        <span className="rdflink__label">Connection</span>
+      </a>
+    );
+
+    const unreadIndicatorElement =
+      this.props.unreadMessageCount && !this.state.snapBottom ? (
+        <div className="gpm__content__unreadindicator">
+          <div
+            className="gpm__content__unreadindicator__content won-button--filled red"
+            onClick={this.goToUnreadMessages.bind(this)}
+          >
+            {this.props.unreadMessageCount} unread Messages
+          </div>
+        </div>
+      ) : (
+        undefined
+      );
+
+    const loadSpinnerElement = (
+      <div className="gpm__content__loadspinner">
+        <svg className="hspinner">
+          <use xlinkHref="#ico_loading_anim" href="#ico_loading_anim" />
+        </svg>
+      </div>
+    );
+
+    const headerElement = (
+      <div className="gpm__header">
+        <div className="gpm__header__back">
+          <a
+            className="gpm__header__back__button clickable show-in-responsive"
+            onClick={this.props.routerBack.bind(this)}
+          >
+            <svg className="gpm__header__back__button__icon">
+              <use xlinkHref="#ico36_backarrow" href="#ico36_backarrow" />
+            </svg>
+          </a>
+          <a
+            className="gpm__header__back__button clickable hide-in-responsive"
+            onClick={() =>
+              this.props.routerGoCurrent({ connectionUri: undefined })
+            }
+          >
+            <svg className="gpm__header__back__button__icon">
+              <use xlinkHref="#ico36_backarrow" href="#ico36_backarrow" />
+            </svg>
+          </a>
+        </div>
+        <WonConnectionHeader connectionUri={this.props.connectionUri} />
+        <WonShareDropdown atomUri={this.props.targetAtomUri} />
+        <WonConnectionContextDropdown />
+      </div>
+    );
+
+    const chatMessages =
+      this.props.sortedMessageUris &&
+      this.props.sortedMessageUris.map((msgUri, index) => {
+        return (
+          <WonConnectionMessage
+            key={msgUri + "-" + index}
+            messageUri={msgUri}
+            connectionUri={this.props.connectionUri}
+            groupChatMessage={true}
+          />
+        );
+      });
+
+    const contentElement = (
+      <div
+        className="pm__content"
+        ref={this.chatContainerRef}
+        onScroll={this.onScroll.bind(this)}
+      >
+        {unreadIndicatorElement}
+        {this.props.targetAtomUri && (
+          <WonAtomContentMessage atomUri={this.props.targetAtomUri} />
+        )}
+        {(this.props.isConnectionLoading ||
+          this.props.isProcessingLoadingMessages) &&
+          loadSpinnerElement}
+        {!this.props.isSuggested &&
+          !this.props.isConnectionLoading &&
+          !this.props.isProcessingLoadingMessages &&
+          this.props.hasConnectionMessagesToLoad && (
+            <button
+              className="gpm__content__loadbutton won-button--outlined thin red"
+              onClick={this.loadPreviousMessages.bind(this)}
+            >
+              Load previous messages
+            </button>
+          )}
+
+        {chatMessages}
+        {rdfLinkToConnection}
+      </div>
+    );
+
+    if (this.props.isConnected) {
+      footerElement = (
+        <div className="gpm__footer">
+          <ChatTextfield
+            className="gpm__footer__chattextfield"
+            connectionUri={this.props.connectionUri}
+            placeholder={
+              this.props.shouldShowRdf ? "Enter TTL..." : "Your message..."
+            }
+            submitButtonLabel={
+              this.props.shouldShowRdf ? "Send&#160;RDF" : "Send"
+            }
+            helpText={this.props.shouldShowRdf ? rdfTextfieldHelpText : ""}
+            allowEmptySubmit={false}
+            allowDetails={!this.props.shouldShowRdf}
+            isCode={this.props.shouldShowRdf}
+            onSubmit={({ value, additionalContent, referencedContent }) =>
+              this.send(
+                value,
+                additionalContent,
+                referencedContent,
+                this.props.shouldShowRdf
+              )
+            }
+          />
+        </div>
+      );
+    } else if (this.props.isSentRequest) {
+      footerElement = (
+        <div className="gpm__footer">
+          Waiting for the Group Administrator to accept your request.
+        </div>
+      );
+    } else if (this.props.isReceivedRequest) {
+      footerElement = (
+        <div className="gpm__footer">
+          <ChatTextfield
+            className="gpm__footer__chattextfield"
+            connectionUri={this.props.connectionUri}
+            placeholder="Message (optional)"
+            submitButtonLabel="Accept&#160;Invite"
+            allowEmptySubmit={true}
+            allowDetails={false}
+            onSubmit={({ value }) =>
+              this.props.openRequest(this.props.connectionUri, value)
+            }
+          />
+          <WonLabelledHr className="gpm__footer__labelledhr" label="Or" />
+          <button
+            className="gpm__footer__button won-button--filled black"
+            onClick={() => this.closeConnection()}
+          >
+            Decline
+          </button>
+        </div>
+      );
+    } else if (this.props.isSuggested) {
+      footerElement = (
+        <div className="gpm__footer">
+          <ChatTextfield
+            className="gpm__footer__chattextfield"
+            connectionUri={this.props.connectionUri}
+            placeholder="Message (optional)"
+            submitButtonLabel="Ask&#160;to&#160;Join"
+            allowEmptySubmit={true}
+            allowDetails={false}
+            showPersonas={!this.props.connection}
+            onSubmit={({ value, selectedPersona }) =>
+              this.sendRequest(value, selectedPersona)
+            }
+          />
+          <WonLabelledHr className="gpm__footer__labelledhr" label="Or" />
+          <button
+            className="gpm__footer__button won-button--filled black"
+            onClick={() => this.closeConnection(true)}
+          >
+            Bad match - remove!
+          </button>
+        </div>
+      );
+    }
+
     return (
-      <ReactReduxContext.Consumer>
-        {({ store }) => {
-          let footerElement = undefined;
-
-          const rdfLinkToConnection = this.props.shouldShowRdf && (
-            <a
-              className="rdflink clickable"
-              target="_blank"
-              rel="noopener noreferrer"
-              href={this.props.connectionUri}
-            >
-              <svg className="rdflink__small">
-                <use xlinkHref="#rdf_logo_1" href="#rdf_logo_1" />
-              </svg>
-              <span className="rdflink__label">Connection</span>
-            </a>
-          );
-
-          const unreadIndicatorElement =
-            this.props.unreadMessageCount && !this.state.snapBottom ? (
-              <div className="gpm__content__unreadindicator">
-                <div
-                  className="gpm__content__unreadindicator__content won-button--filled red"
-                  onClick={this.goToUnreadMessages.bind(this)}
-                >
-                  {this.props.unreadMessageCount} unread Messages
-                </div>
-              </div>
-            ) : (
-              undefined
-            );
-
-          const loadSpinnerElement = (
-            <div className="gpm__content__loadspinner">
-              <svg className="hspinner">
-                <use xlinkHref="#ico_loading_anim" href="#ico_loading_anim" />
-              </svg>
-            </div>
-          );
-
-          const headerElement = (
-            <div className="gpm__header">
-              <div className="gpm__header__back">
-                <a
-                  className="gpm__header__back__button clickable show-in-responsive"
-                  onClick={this.props.routerBack.bind(this)}
-                >
-                  <svg className="gpm__header__back__button__icon">
-                    <use xlinkHref="#ico36_backarrow" href="#ico36_backarrow" />
-                  </svg>
-                </a>
-                <a
-                  className="gpm__header__back__button clickable hide-in-responsive"
-                  onClick={() =>
-                    this.props.routerGoCurrent({ connectionUri: undefined })
-                  }
-                >
-                  <svg className="gpm__header__back__button__icon">
-                    <use xlinkHref="#ico36_backarrow" href="#ico36_backarrow" />
-                  </svg>
-                </a>
-              </div>
-              <WonConnectionHeader connectionUri={this.props.connectionUri} />
-              <WonShareDropdown atomUri={this.props.targetAtomUri} />
-              <WonConnectionContextDropdown />
-            </div>
-          );
-
-          const chatMessages =
-            this.props.sortedMessageUris &&
-            this.props.sortedMessageUris.map((msgUri, index) => {
-              return (
-                <WonConnectionMessage
-                  key={msgUri + "-" + index}
-                  messageUri={msgUri}
-                  connectionUri={this.props.connectionUri}
-                  groupChatMessage={true}
-                  ngRedux={store}
-                />
-              );
-            });
-
-          const contentElement = (
-            <div
-              className="pm__content"
-              ref={this.chatContainerRef}
-              onScroll={this.onScroll.bind(this)}
-            >
-              {unreadIndicatorElement}
-              {this.props.targetAtomUri && (
-                <WonAtomContentMessage atomUri={this.props.targetAtomUri} />
-              )}
-              {(this.props.isConnectionLoading ||
-                this.props.isProcessingLoadingMessages) &&
-                loadSpinnerElement}
-              {!this.props.isSuggested &&
-                !this.props.isConnectionLoading &&
-                !this.props.isProcessingLoadingMessages &&
-                this.props.hasConnectionMessagesToLoad && (
-                  <button
-                    className="gpm__content__loadbutton won-button--outlined thin red"
-                    onClick={this.loadPreviousMessages.bind(this)}
-                  >
-                    Load previous messages
-                  </button>
-                )}
-
-              {chatMessages}
-              {rdfLinkToConnection}
-            </div>
-          );
-
-          if (this.props.isConnected) {
-            footerElement = (
-              <div className="gpm__footer">
-                <ChatTextfield
-                  className="gpm__footer__chattextfield"
-                  connectionUri={this.props.connectionUri}
-                  placeholder={
-                    this.props.shouldShowRdf
-                      ? "Enter TTL..."
-                      : "Your message..."
-                  }
-                  submitButtonLabel={
-                    this.props.shouldShowRdf ? "Send&#160;RDF" : "Send"
-                  }
-                  helpText={
-                    this.props.shouldShowRdf ? rdfTextfieldHelpText : ""
-                  }
-                  allowEmptySubmit={false}
-                  allowDetails={!this.props.shouldShowRdf}
-                  isCode={this.props.shouldShowRdf}
-                  onSubmit={({ value, additionalContent, referencedContent }) =>
-                    this.send(
-                      value,
-                      additionalContent,
-                      referencedContent,
-                      this.props.shouldShowRdf
-                    )
-                  }
-                />
-              </div>
-            );
-          } else if (this.props.isSentRequest) {
-            footerElement = (
-              <div className="gpm__footer">
-                Waiting for the Group Administrator to accept your request.
-              </div>
-            );
-          } else if (this.props.isReceivedRequest) {
-            footerElement = (
-              <div className="gpm__footer">
-                <ChatTextfield
-                  className="gpm__footer__chattextfield"
-                  connectionUri={this.props.connectionUri}
-                  placeholder="Message (optional)"
-                  submitButtonLabel="Accept&#160;Invite"
-                  allowEmptySubmit={true}
-                  allowDetails={false}
-                  onSubmit={({ value }) =>
-                    this.props.openRequest(this.props.connectionUri, value)
-                  }
-                />
-                <WonLabelledHr className="gpm__footer__labelledhr" label="Or" />
-                <button
-                  className="gpm__footer__button won-button--filled black"
-                  onClick={() => this.closeConnection()}
-                >
-                  Decline
-                </button>
-              </div>
-            );
-          } else if (this.props.isSuggested) {
-            footerElement = (
-              <div className="gpm__footer">
-                <ChatTextfield
-                  className="gpm__footer__chattextfield"
-                  connectionUri={this.props.connectionUri}
-                  placeholder="Message (optional)"
-                  submitButtonLabel="Ask&#160;to&#160;Join"
-                  allowEmptySubmit={true}
-                  allowDetails={false}
-                  showPersonas={!this.props.connection}
-                  onSubmit={({ value, selectedPersona }) =>
-                    this.sendRequest(value, selectedPersona)
-                  }
-                />
-                <WonLabelledHr className="gpm__footer__labelledhr" label="Or" />
-                <button
-                  className="gpm__footer__button won-button--filled black"
-                  onClick={() => this.closeConnection(true)}
-                >
-                  Bad match - remove!
-                </button>
-              </div>
-            );
-          }
-
-          return (
-            <won-group-atom-messages
-              class={
-                (this.props.className || "") +
-                (this.props.connectionOrAtomsLoading && " won-is-loading ")
-              }
-            >
-              {headerElement}
-              {contentElement}
-              {footerElement}
-            </won-group-atom-messages>
-          );
-        }}
-      </ReactReduxContext.Consumer>
+      <won-group-atom-messages
+        class={
+          (this.props.className || "") +
+          (this.props.connectionOrAtomsLoading && " won-is-loading ")
+        }
+      >
+        {headerElement}
+        {contentElement}
+        {footerElement}
+      </won-group-atom-messages>
     );
   }
 

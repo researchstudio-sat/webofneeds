@@ -3,93 +3,92 @@ import Immutable from "immutable";
 import PropTypes from "prop-types";
 import { get, getIn } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
+import { connect } from "react-redux";
 import { getOwnedAtomByConnectionUri } from "../../redux/selectors/general-selectors.js";
 
 import "~/style/_connection-message-actions.scss";
-import * as messageUtils from "../../redux/utils/message-utils";
-import * as connectionUtils from "../../redux/utils/connection-utils";
+import * as messageUtils from "../../redux/utils/message-utils.js";
+import * as connectionUtils from "../../redux/utils/connection-utils.js";
 
-export default class WonConnectionMessageActions extends React.Component {
-  componentDidMount() {
-    this.messageUri = this.props.messageUri;
-    this.connectionUri = this.props.connectionUri;
-    this.disconnect = this.props.ngRedux.connect(
-      this.selectFromState.bind(this),
-      actionCreators
-    )(state => {
-      this.setState(state);
-    });
-  }
+const mapStateToProps = (state, ownProps) => {
+  const ownedAtom =
+    ownProps.connectionUri &&
+    getOwnedAtomByConnectionUri(state, ownProps.connectionUri);
+  const connection = getIn(ownedAtom, ["connections", ownProps.connectionUri]);
+  const message =
+    connection && ownProps.messageUri
+      ? getIn(connection, ["messages", ownProps.messageUri])
+      : Immutable.Map();
 
-  componentWillUnmount() {
-    this.disconnect();
-  }
+  return {
+    messageUri: ownProps.messageUri,
+    connectionUri: ownProps.connectionUri,
+    ownedAtom,
+    message,
+    multiSelectType: get(connection, "multiSelectType"),
+    isProposed: messageUtils.isMessageProposed(message),
+    isClaimed: messageUtils.isMessageClaimed(message),
+    isAccepted: messageUtils.isMessageAccepted(message),
+    isRejected: messageUtils.isMessageRejected(message),
+    isRetracted: messageUtils.isMessageRetracted(message),
+    isCancellationPending: messageUtils.isMessageCancellationPending(message),
+    isCancelled: messageUtils.isMessageCancelled(message),
+    isProposable:
+      connectionUtils.isConnected(connection) &&
+      messageUtils.isMessageProposable(message),
+    isClaimable:
+      connectionUtils.isConnected(connection) &&
+      messageUtils.isMessageClaimable(message),
+    isCancelable: messageUtils.isMessageCancelable(message),
+    isRetractable: messageUtils.isMessageRetractable(message),
+    isRejectable: messageUtils.isMessageRejectable(message),
+    isAcceptable: messageUtils.isMessageAcceptable(message),
+    isUnread: messageUtils.isMessageUnread(message),
+    isFromSystem: get(message, "systemMessage"),
+    hasReferences: get(message, "hasReferences"),
+  };
+};
 
-  UNSAFE_componentWillReceiveProps(nextProps) {
-    this.messageUri = nextProps.messageUri;
-    this.connectionUri = nextProps.connectionUri;
-    this.setState(this.selectFromState(this.props.ngRedux.getState()));
-  }
+const mapDispatchToProps = dispatch => {
+  return {
+    sendChatMessage: (
+      trimmedMsg,
+      additionalContent,
+      referencedContent,
+      connectionUri,
+      isTTL
+    ) => {
+      dispatch(
+        actionCreators.connections__sendChatMessage(
+          trimmedMsg,
+          additionalContent,
+          referencedContent,
+          connectionUri,
+          isTTL
+        )
+      );
+    },
+  };
+};
 
-  selectFromState(state) {
-    const ownedAtom =
-      this.connectionUri &&
-      getOwnedAtomByConnectionUri(state, this.connectionUri);
-    const connection = getIn(ownedAtom, ["connections", this.connectionUri]);
-    const message =
-      connection && this.messageUri
-        ? getIn(connection, ["messages", this.messageUri])
-        : Immutable.Map();
-
-    return {
-      ownedAtom,
-      message,
-      multiSelectType: get(connection, "multiSelectType"),
-      isProposed: messageUtils.isMessageProposed(message),
-      isClaimed: messageUtils.isMessageClaimed(message),
-      isAccepted: messageUtils.isMessageAccepted(message),
-      isRejected: messageUtils.isMessageRejected(message),
-      isRetracted: messageUtils.isMessageRetracted(message),
-      isCancellationPending: messageUtils.isMessageCancellationPending(message),
-      isCancelled: messageUtils.isMessageCancelled(message),
-      isProposable:
-        connectionUtils.isConnected(connection) &&
-        messageUtils.isMessageProposable(message),
-      isClaimable:
-        connectionUtils.isConnected(connection) &&
-        messageUtils.isMessageClaimable(message),
-      isCancelable: messageUtils.isMessageCancelable(message),
-      isRetractable: messageUtils.isMessageRetractable(message),
-      isRejectable: messageUtils.isMessageRejectable(message),
-      isAcceptable: messageUtils.isMessageAcceptable(message),
-      isUnread: messageUtils.isMessageUnread(message),
-      isFromSystem: get(message, "systemMessage"),
-      hasReferences: get(message, "hasReferences"),
-    };
-  }
-
+class WonConnectionMessageActions extends React.Component {
   render() {
-    if (!this.state) {
-      console.debug("render with null state");
-      return <div />;
-    }
-
-    const proposeButton = this.state.isProposable ? (
+    const proposeButton = this.props.isProposable ? (
       <button
         className="won-button--filled thin black"
-        disabled={this.state.multiSelectType || this.state.clicked}
+        disabled={this.props.multiSelectType || this.state.clicked}
         onClick={() => this.sendActionMessage("proposes")}
       >
-        {this.state.isProposed ? "Propose (again)" : "Propose"}
+        {this.props.isProposed ? "Propose (again)" : "Propose"}
       </button>
     ) : (
       undefined
     );
 
-    const claimButton = this.state.isClaimable ? (
+    const claimButton = this.props.isClaimable ? (
       <button
         className="won-button--filled thin black"
-        disabled={this.state.multiSelectType || this.state.clicked}
+        disabled={this.props.multiSelectType || this.state.clicked}
         onClick={() => this.sendActionMessage("claims")}
       >
         Claim
@@ -98,10 +97,10 @@ export default class WonConnectionMessageActions extends React.Component {
       undefined
     );
 
-    const acceptButton = this.state.isAcceptable ? (
+    const acceptButton = this.props.isAcceptable ? (
       <button
         className="won-button--filled thin red"
-        disabled={this.state.multiSelectType || this.state.clicked}
+        disabled={this.props.multiSelectType || this.state.clicked}
         onClick={() => this.sendActionMessage("accepts")}
       >
         Accept
@@ -110,10 +109,10 @@ export default class WonConnectionMessageActions extends React.Component {
       undefined
     );
 
-    const rejectButton = this.state.isRejectable ? (
+    const rejectButton = this.props.isRejectable ? (
       <button
         className="won-button--filled thin black"
-        disabled={this.state.multiSelectType || this.state.clicked}
+        disabled={this.props.multiSelectType || this.state.clicked}
         onClick={() => this.sendActionMessage("rejects")}
       >
         Reject
@@ -122,10 +121,10 @@ export default class WonConnectionMessageActions extends React.Component {
       undefined
     );
 
-    const retractButton = this.state.isRetractable ? (
+    const retractButton = this.props.isRetractable ? (
       <button
         className="won-button--filled thin black"
-        disabled={this.state.multiSelectType || this.state.clicked}
+        disabled={this.props.multiSelectType || this.state.clicked}
         onClick={() => this.sendActionMessage("retracts")}
       >
         Retract
@@ -134,10 +133,10 @@ export default class WonConnectionMessageActions extends React.Component {
       undefined
     );
 
-    const cancelButton = this.state.isCancelable ? (
+    const cancelButton = this.props.isCancelable ? (
       <button
         className="won-button--filled thin red"
-        disabled={this.state.multiSelectType || this.state.clicked}
+        disabled={this.props.multiSelectType || this.state.clicked}
         onClick={() => this.sendActionMessage("proposesToCancel")}
       >
         Propose To Cancel
@@ -146,7 +145,7 @@ export default class WonConnectionMessageActions extends React.Component {
       undefined
     );
 
-    const cancelationPendingButton = this.state.isCancellationPending ? (
+    const cancelationPendingButton = this.props.isCancellationPending ? (
       <button className="won-button--filled thin red" disabled={true}>
         Cancellation Pending...
       </button>
@@ -154,7 +153,7 @@ export default class WonConnectionMessageActions extends React.Component {
       undefined
     );
 
-    const cancelledButton = this.state.isCancelled ? (
+    const cancelledButton = this.props.isCancelled ? (
       <button className="won-button--filled thin red" disabled={true}>
         Cancelled
       </button>
@@ -162,7 +161,7 @@ export default class WonConnectionMessageActions extends React.Component {
       undefined
     );
 
-    const rejectedButton = this.state.isRejected ? (
+    const rejectedButton = this.props.isRejected ? (
       <button className="won-button--filled thin red" disabled={true}>
         Rejected
       </button>
@@ -170,7 +169,7 @@ export default class WonConnectionMessageActions extends React.Component {
       undefined
     );
 
-    const retractedButton = this.state.isRetracted ? (
+    const retractedButton = this.props.isRetracted ? (
       <button className="won-button--filled thin red" disabled={true}>
         Retracted
       </button>
@@ -196,17 +195,15 @@ export default class WonConnectionMessageActions extends React.Component {
 
   sendActionMessage(type) {
     this.setState({ clicked: true });
-    this.props.ngRedux.dispatch(
-      actionCreators.connections__sendChatMessage(
-        undefined,
-        undefined,
-        new Map().set(
-          type,
-          Immutable.Map().set(this.state.message.get("uri"), this.state.message)
-        ),
-        this.connectionUri,
-        false
-      )
+    this.props.sendChatMessage(
+      undefined,
+      undefined,
+      new Map().set(
+        type,
+        Immutable.Map().set(this.props.messageUri, this.props.message)
+      ),
+      this.props.connectionUri,
+      false
     );
   }
 }
@@ -214,5 +211,29 @@ export default class WonConnectionMessageActions extends React.Component {
 WonConnectionMessageActions.propTypes = {
   messageUri: PropTypes.string.isRequired,
   connectionUri: PropTypes.string.isRequired,
-  ngRedux: PropTypes.object.isRequired,
+  ownedAtom: PropTypes.object,
+  message: PropTypes.object,
+  multiSelectType: PropTypes.string,
+  isProposed: PropTypes.bool,
+  isClaimed: PropTypes.bool,
+  isAccepted: PropTypes.bool,
+  isRejected: PropTypes.bool,
+  isRetracted: PropTypes.bool,
+  isCancellationPending: PropTypes.bool,
+  isCancelled: PropTypes.bool,
+  isProposable: PropTypes.bool,
+  isClaimable: PropTypes.bool,
+  isCancelable: PropTypes.bool,
+  isRetractable: PropTypes.bool,
+  isRejectable: PropTypes.bool,
+  isAcceptable: PropTypes.bool,
+  isUnread: PropTypes.bool,
+  isFromSystem: PropTypes.bool,
+  hasReferences: PropTypes.bool,
+  sendChatMessage: PropTypes.func,
 };
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(WonConnectionMessageActions);

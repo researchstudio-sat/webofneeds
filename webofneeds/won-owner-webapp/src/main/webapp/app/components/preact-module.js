@@ -12,7 +12,6 @@ function genComponentConf($ngRedux) {
       onAction: "&",
     },
     link: (scope, element) => {
-      scope.props.ngRedux = $ngRedux; //TODO: REMOVE ONCE ALL COMPONENTS USE STORE
       render(
         createElement(Provider, { store: $ngRedux }, [
           createElement(scope.component, scope.props),
@@ -21,7 +20,6 @@ function genComponentConf($ngRedux) {
       );
 
       scope.$watch("props", props => {
-        props.ngRedux = $ngRedux;
         render(
           createElement(Provider, { store: $ngRedux }, [
             createElement(scope.component, props),
@@ -30,7 +28,6 @@ function genComponentConf($ngRedux) {
         );
       });
       scope.$watch("component", component => {
-        scope.props.ngRedux = $ngRedux;
         render(
           createElement(Provider, { store: $ngRedux }, [
             createElement(component, scope.props),

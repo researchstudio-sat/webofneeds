@@ -3,6 +3,7 @@
  */
 import React from "react";
 import { actionCreators } from "../../actions/actions.js";
+import { connect } from "react-redux";
 
 import PropTypes from "prop-types";
 import {
@@ -20,111 +21,94 @@ import WonReferencedMessageContent from "./referenced-message-content.jsx";
 
 import "~/style/_combined-message-content.scss";
 
-export default class WonCombinedMessageContent extends React.Component {
-  componentDidMount() {
-    this.messageUri = this.props.messageUri;
-    this.connectionUri = this.props.connectionUri;
-    this.groupChatMessage = this.props.groupChatMessage;
-    this.disconnect = this.props.ngRedux.connect(
-      this.selectFromState.bind(this),
-      actionCreators
-    )(state => {
-      this.setState(state);
-    });
-  }
+const mapStateToProps = (state, ownProps) => {
+  const ownedAtom =
+    ownProps.connectionUri &&
+    getOwnedAtomByConnectionUri(state, ownProps.connectionUri);
+  const connection =
+    ownedAtom && ownedAtom.getIn(["connections", ownProps.connectionUri]);
 
-  componentWillUnmount() {
-    this.disconnect();
-  }
+  const message =
+    connection &&
+    ownProps.messageUri &&
+    getIn(connection, ["messages", ownProps.messageUri]);
 
-  UNSAFE_componentWillReceiveProps(nextProps) {
-    this.messageUri = nextProps.messageUri;
-    this.connectionUri = nextProps.connectionUri;
-    this.groupChatMessage = nextProps.groupChatMessage;
-    this.setState(this.selectFromState(this.props.ngRedux.getState()));
-  }
+  const messageType = message && message.get("messageType");
+  const injectInto = message && message.get("injectInto");
 
-  selectFromState(state) {
-    const ownedAtom =
-      this.connectionUri &&
-      getOwnedAtomByConnectionUri(state, this.connectionUri);
-    const connection =
-      ownedAtom && ownedAtom.getIn(["connections", this.connectionUri]);
+  const hasReferences = message && message.get("hasReferences");
+  const references = message && message.get("references");
+  const referencesProposes = references && references.get("proposes");
+  const referencesClaims = references && references.get("claims");
 
-    const message =
-      connection &&
-      this.messageUri &&
-      getIn(connection, ["messages", this.messageUri]);
+  const allConnections = getOwnedConnections(state);
+  const allAtoms = getAtoms(state);
 
-    const messageType = message && message.get("messageType");
-    const injectInto = message && message.get("injectInto");
+  /*Extract persona name from message:
 
-    const hasReferences = message && message.get("hasReferences");
-    const references = message && message.get("references");
-    const referencesProposes = references && references.get("proposes");
-    const referencesClaims = references && references.get("claims");
+   either within the atom of the originatorUri-atom (in group-chat-messages)
+   or
+   within the targetAtomUri-atom of the connection (for 1:1 chats)
+   */
+  const relevantAtomUri =
+    !get(message, "outgoingMessage") &&
+    (ownProps.groupChatMessage
+      ? get(message, "originatorUri")
+      : get(connection, "targetAtomUri"));
+  const relevantPersonaUri =
+    relevantAtomUri && getIn(allAtoms, [relevantAtomUri, "heldBy"]);
+  const personaName =
+    relevantPersonaUri &&
+    getIn(allAtoms, [relevantPersonaUri, "content", "personaName"]);
 
-    const allConnections = getOwnedConnections(state);
-    const allAtoms = getAtoms(state);
+  return {
+    messageUri: ownProps.messageUri,
+    connectionUri: ownProps.connectionUri,
+    groupChatMessage: ownProps.groupChatMessage,
+    className: ownProps.className,
+    onClick: ownProps.onClick,
+    allAtoms,
+    allConnections,
+    personaName,
+    multiSelectType: connection && connection.get("multiSelectType"),
+    contentGraphTrig: get(message, "contentGraphTrigRaw"),
+    shouldShowRdf: state.getIn(["view", "showRdf"]),
+    hasContent: message && message.get("hasContent"),
+    hasNotBeenLoaded: !message,
+    hasReferences,
+    hasClaims: referencesClaims && referencesClaims.size > 0,
+    hasProposes: referencesProposes && referencesProposes.size > 0,
+    messageStatus: message && message.get("messageStatus"),
+    isInjectIntoMessage: injectInto && injectInto.size > 0, //contains the targetConnectionUris
+    originatorUri: message && message.get("originatorUri"),
+    injectIntoArray: injectInto && Array.from(injectInto.toSet()),
+    messageType,
+    isConnectionMessage: messageType === won.WONMSG.connectionMessage,
+  };
+};
 
-    /*Extract persona name from message:
+const mapDispatchToProps = dispatch => {
+  return {
+    routerGoCurrent: props => {
+      dispatch(actionCreators.router__stateGoCurrent(props));
+    },
+  };
+};
 
-     either within the atom of the originatorUri-atom (in group-chat-messages)
-     or
-     within the targetAtomUri-atom of the connection (for 1:1 chats)
-     */
-    const relevantAtomUri =
-      !get(message, "outgoingMessage") &&
-      (this.groupChatMessage
-        ? get(message, "originatorUri")
-        : get(connection, "targetAtomUri"));
-    const relevantPersonaUri =
-      relevantAtomUri && getIn(allAtoms, [relevantAtomUri, "heldBy"]);
-    const personaName =
-      relevantPersonaUri &&
-      getIn(allAtoms, [relevantPersonaUri, "content", "personaName"]);
-
-    return {
-      allAtoms,
-      allConnections,
-      personaName,
-      multiSelectType: connection && connection.get("multiSelectType"),
-      contentGraphTrig: get(message, "contentGraphTrigRaw"),
-      shouldShowRdf: state.getIn(["view", "showRdf"]),
-      hasContent: message && message.get("hasContent"),
-      hasNotBeenLoaded: !message,
-      hasReferences,
-      hasClaims: referencesClaims && referencesClaims.size > 0,
-      hasProposes: referencesProposes && referencesProposes.size > 0,
-      messageStatus: message && message.get("messageStatus"),
-      isGroupChatMessage: this.groupChatMessage,
-      isInjectIntoMessage: injectInto && injectInto.size > 0, //contains the targetConnectionUris
-      originatorUri: message && message.get("originatorUri"),
-      injectIntoArray: injectInto && Array.from(injectInto.toSet()),
-      messageType,
-      isConnectionMessage: messageType === won.WONMSG.connectionMessage,
-    };
-  }
-
+class WonCombinedMessageContent extends React.Component {
   render() {
-    if (!this.state) {
-      console.debug("render with null state");
-      return <div />;
-    }
-
     const trigElement =
-      this.state.shouldShowRdf && this.state.contentGraphTrig ? (
-        <WonTrig trig={this.state.contentGraphTrig} />
+      this.props.shouldShowRdf && this.props.contentGraphTrig ? (
+        <WonTrig trig={this.props.contentGraphTrig} />
       ) : (
         undefined
       );
 
     const messageContentElement =
-      this.state.hasContent || this.state.hasNotBeenLoaded ? (
+      this.props.hasContent || this.props.hasNotBeenLoaded ? (
         <WonMessageContent
-          messageUri={this.messageUri}
-          connectionUri={this.connectionUri}
-          ngRedux={this.props.ngRedux}
+          messageUri={this.props.messageUri}
+          connectionUri={this.props.connectionUri}
         />
       ) : (
         undefined
@@ -133,11 +117,11 @@ export default class WonCombinedMessageContent extends React.Component {
     let messageHeaderElement;
     let messageHeaderOriginatorElement;
     let messageHeaderInjectInElement;
-    if (!this.state.isConnectionMessage) {
+    if (!this.props.isConnectionMessage) {
       const headerLabel =
-        labels.messageType[this.state.messageType] || this.state.messageType;
+        labels.messageType[this.props.messageType] || this.props.messageType;
 
-      messageHeaderElement = !this.state.hasNotBeenLoaded ? (
+      messageHeaderElement = !this.props.hasNotBeenLoaded ? (
         <div className="msg__header">
           <div className="msg__header__type">{headerLabel}</div>
         </div>
@@ -145,8 +129,8 @@ export default class WonCombinedMessageContent extends React.Component {
         undefined
       );
     } else {
-      if (!this.state.hasNotBeenLoaded) {
-        if (this.state.hasClaims || this.state.hasProposes) {
+      if (!this.props.hasNotBeenLoaded) {
+        if (this.props.hasClaims || this.props.hasProposes) {
           messageHeaderElement = (
             <div className="msg__header msg__header--agreement">
               <div className="msg__header__type">
@@ -154,31 +138,31 @@ export default class WonCombinedMessageContent extends React.Component {
               </div>
             </div>
           );
-        } else if (this.state.personaName) {
+        } else if (this.props.personaName) {
           messageHeaderElement = (
             <div className="msg__header">
-              <div className="msg__header__type">{this.state.personaName}</div>
+              <div className="msg__header__type">{this.props.personaName}</div>
             </div>
           );
         }
 
-        if (!this.state.isGroupChatMessage) {
-          messageHeaderOriginatorElement = this.state.originatorUri ? (
+        if (!this.props.groupChatMessage) {
+          messageHeaderOriginatorElement = this.props.originatorUri ? (
             <div className="msg__header msg__header--forwarded-from">
               <div className="msg__header__type">Forwarded from:</div>
               <WonAtomIcon
                 className="msg__header msg__header__originator"
-                atomUri={this.state.originatorUri}
+                atomUri={this.props.originatorUri}
               />
             </div>
           ) : (
             undefined
           );
 
-          if (this.state.isInjectIntoMessage) {
+          if (this.props.isInjectIntoMessage) {
             const injectIntoIcons =
-              this.state.injectIntoArray &&
-              this.state.injectIntoArray.map(connUri => {
+              this.props.injectIntoArray &&
+              this.props.injectIntoArray.map(connUri => {
                 return (
                   <WonAtomIcon
                     key={connUri}
@@ -190,13 +174,11 @@ export default class WonCombinedMessageContent extends React.Component {
                     }
                     atomUri={this.getInjectIntoAtomUri(connUri)}
                     onClick={() => {
-                      !this.state.multiSelectType &&
+                      !this.props.multiSelectType &&
                         this.isInjectIntoConnectionPresent(connUri) &&
-                        this.props.ngRedux.dispatch(
-                          actionCreators.router__stateGoCurrent({
-                            connectionUri: connUri,
-                          })
-                        );
+                        this.props.routerGoCurrent({
+                          connectionUri: connUri,
+                        });
                     }}
                   />
                 );
@@ -213,11 +195,10 @@ export default class WonCombinedMessageContent extends React.Component {
       }
     }
 
-    const referencedMessageElements = this.state.hasReferences ? (
+    const referencedMessageElements = this.props.hasReferences ? (
       <WonReferencedMessageContent
         messageUri={this.props.messageUri}
         connectionUri={this.props.connectionUri}
-        ngRedux={this.props.ngRedux}
       />
     ) : (
       undefined
@@ -229,13 +210,13 @@ export default class WonCombinedMessageContent extends React.Component {
           (this.props.className ? this.props.className : "") +
           " " +
           (this.props.onClick ? " clickable " : "") +
-          (this.state.hasReferences ? " won-has-ref-content " : "") +
-          (!this.state.isConnectionMessage ||
-          this.state.hasContent ||
-          this.state.hasNotBeenLoaded ||
-          this.state.hasClaims ||
-          this.state.hasProposes ||
-          this.state.originatorUri
+          (this.props.hasReferences ? " won-has-ref-content " : "") +
+          (!this.props.isConnectionMessage ||
+          this.props.hasContent ||
+          this.props.hasNotBeenLoaded ||
+          this.props.hasClaims ||
+          this.props.hasProposes ||
+          this.props.originatorUri
             ? " won-has-non-ref-content "
             : "")
         }
@@ -252,44 +233,44 @@ export default class WonCombinedMessageContent extends React.Component {
   }
 
   getAgreementHeaderLabel() {
-    if (this.state.hasClaims && this.state.hasProposes) {
-      if (this.state.messageStatus) {
-        if (this.state.messageStatus.get("isCancelled"))
+    if (this.props.hasClaims && this.props.hasProposes) {
+      if (this.props.messageStatus) {
+        if (this.props.messageStatus.get("isCancelled"))
           return "Agreement/Claim - Cancelled";
-        if (this.state.messageStatus.get("isCancellationPending"))
+        if (this.props.messageStatus.get("isCancellationPending"))
           return "Agreement/Claim - Accepted(Pending Cancellation)";
-        if (this.state.messageStatus.get("isAccepted"))
+        if (this.props.messageStatus.get("isAccepted"))
           return "Agreement/Claim - Accepted";
-        if (this.state.messageStatus.get("isRetracted"))
+        if (this.props.messageStatus.get("isRetracted"))
           return "Proposal/Claim - Retracted";
-        if (this.state.messageStatus.get("isRejected"))
+        if (this.props.messageStatus.get("isRejected"))
           return "Proposal/Claim - Rejected";
       }
       return "Proposal/Claim";
-    } else if (this.state.hasClaims) {
-      if (this.state.messageStatus) {
-        if (this.state.messageStatus.get("isCancelled"))
+    } else if (this.props.hasClaims) {
+      if (this.props.messageStatus) {
+        if (this.props.messageStatus.get("isCancelled"))
           return "Claim - Cancelled";
-        if (this.state.messageStatus.get("isCancellationPending"))
+        if (this.props.messageStatus.get("isCancellationPending"))
           return "Claim - Accepted(Pending Cancellation)";
-        if (this.state.messageStatus.get("isAccepted"))
+        if (this.props.messageStatus.get("isAccepted"))
           return "Claim - Accepted";
-        if (this.state.messageStatus.get("isRetracted"))
+        if (this.props.messageStatus.get("isRetracted"))
           return "Claim - Retracted";
-        if (this.state.messageStatus.get("isRejected"))
+        if (this.props.messageStatus.get("isRejected"))
           return "Claim - Rejected";
       }
       return "Claim";
-    } else if (this.state.hasProposes) {
-      if (this.state.messageStatus) {
-        if (this.state.messageStatus.get("isCancelled"))
+    } else if (this.props.hasProposes) {
+      if (this.props.messageStatus) {
+        if (this.props.messageStatus.get("isCancelled"))
           return "Agreement - Cancelled";
-        if (this.state.messageStatus.get("isCancellationPending"))
+        if (this.props.messageStatus.get("isCancellationPending"))
           return "Agreement - Pending Cancellation";
-        if (this.state.messageStatus.get("isAccepted")) return "Agreement";
-        if (this.state.messageStatus.get("isRetracted"))
+        if (this.props.messageStatus.get("isAccepted")) return "Agreement";
+        if (this.props.messageStatus.get("isRetracted"))
           return "Proposal - Retracted";
-        if (this.state.messageStatus.get("isRejected"))
+        if (this.props.messageStatus.get("isRejected"))
           return "Proposal - Rejected";
       }
       return "Proposal";
@@ -341,7 +322,29 @@ WonCombinedMessageContent.propTypes = {
   messageUri: PropTypes.string.isRequired,
   connectionUri: PropTypes.string.isRequired,
   groupChatMessage: PropTypes.bool,
-  ngRedux: PropTypes.object.isRequired,
   className: PropTypes.string,
   onClick: PropTypes.func,
+  allAtoms: PropTypes.object,
+  allConnections: PropTypes.object,
+  personaName: PropTypes.string,
+  multiSelectType: PropTypes.string,
+  contentGraphTrig: PropTypes.object,
+  shouldShowRdf: PropTypes.bool,
+  hasContent: PropTypes.bool,
+  hasNotBeenLoaded: PropTypes.bool,
+  hasReferences: PropTypes.bool,
+  hasClaims: PropTypes.bool,
+  hasProposes: PropTypes.bool,
+  messageStatus: PropTypes.string,
+  isInjectIntoMessage: PropTypes.bool,
+  originatorUri: PropTypes.string,
+  injectIntoArray: PropTypes.arrayOf(PropTypes.string),
+  messageType: PropTypes.string,
+  isConnectionMessage: PropTypes.bool,
+  routerGoCurrent: PropTypes.func,
 };
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(WonCombinedMessageContent);

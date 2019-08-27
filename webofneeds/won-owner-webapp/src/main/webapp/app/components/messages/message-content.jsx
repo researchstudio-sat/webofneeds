@@ -5,7 +5,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import ReactMarkdown from "react-markdown";
 import { get, getIn } from "../../utils.js";
-import { actionCreators } from "../../actions/actions.js";
+import { connect } from "react-redux";
 import { getOwnedAtomByConnectionUri } from "../../redux/selectors/general-selectors.js";
 import * as usecaseUtils from "../../usecase-utils.js";
 
@@ -13,89 +13,64 @@ import "~/style/_message-content.scss";
 import "~/style/_won-markdown.scss";
 import won from "../../won-es6";
 
-export default class WonMessageContent extends React.Component {
-  componentDidMount() {
-    this.noParsableContentPlaceholder =
-      "«This message couldn't be displayed as it didn't contain," +
-      "any parsable content! " +
-      'Click on the "Show raw RDF data"-button in ' +
-      'the footer of the page to see the "raw" message-data.»';
+const noParsableContentPlaceholder =
+  "«This message couldn't be displayed as it didn't contain," +
+  "any parsable content! " +
+  'Click on the "Show raw RDF data"-button in ' +
+  'the footer of the page to see the "raw" message-data.»';
 
-    this.messageUri = this.props.messageUri;
-    this.connectionUri = this.props.connectionUri;
-    this.disconnect = this.props.ngRedux.connect(
-      this.selectFromState.bind(this),
-      actionCreators
-    )(state => {
-      this.setState(state);
-    });
-  }
+const mapStateToProps = (state, ownProps) => {
+  const ownedAtom =
+    ownProps.connectionUri &&
+    getOwnedAtomByConnectionUri(state, ownProps.connectionUri);
+  const connection =
+    ownedAtom && ownedAtom.getIn(["connections", ownProps.connectionUri]);
+  const message =
+    connection &&
+    ownProps.messageUri &&
+    getIn(connection, ["messages", ownProps.messageUri]);
 
-  componentWillUnmount() {
-    this.disconnect();
-  }
+  const content = get(message, "content");
+  const matchScore = get(content, "matchScore");
+  const text = get(content, "text");
 
-  UNSAFE_componentWillReceiveProps(nextProps) {
-    this.messageUri = nextProps.messageUri;
-    this.connectionUri = nextProps.connectionUri;
-    this.setState(this.selectFromState(this.props.ngRedux.getState()));
-  }
+  return {
+    messageUri: ownProps.messageUri,
+    connectionUri: ownProps.connectionUri,
+    message,
+    messageType: message && message.get("messageType"),
+    matchScorePercentage: matchScore && matchScore * 100,
+    matchScore,
+    text,
+    content,
+  };
+};
 
-  selectFromState(state) {
-    const ownedAtom =
-      this.connectionUri &&
-      getOwnedAtomByConnectionUri(state, this.connectionUri);
-    const connection =
-      ownedAtom && ownedAtom.getIn(["connections", this.connectionUri]);
-    const message =
-      connection &&
-      this.messageUri &&
-      getIn(connection, ["messages", this.messageUri]);
-
-    const content = get(message, "content");
-    const matchScore = get(content, "matchScore");
-    const text = get(content, "text");
-
-    return {
-      connection,
-      message,
-      messageType: message && message.get("messageType"),
-      matchScorePercentage: matchScore && matchScore * 100,
-      matchScore,
-      text,
-      content,
-    };
-  }
-
+class WonMessageContent extends React.Component {
   render() {
-    if (!this.state) {
-      console.debug("render with null state");
-      return <div />;
-    }
-
-    if (this.state.message) {
-      const markdownText = this.state.text ? (
+    if (this.props.message) {
+      const markdownText = this.props.text ? (
         <ReactMarkdown
           className="msg__text markdown"
-          source={this.state.text}
+          source={this.props.text}
         />
       ) : (
         undefined
       );
-      const matchScore = this.state.matchScore ? (
+      const matchScore = this.props.matchScore ? (
         <div className="msg__matchScore">
-          MatchScore: {this.state.matchScorePercentage}%
+          MatchScore: {this.props.matchScorePercentage}%
         </div>
       ) : (
         undefined
       );
 
       const noParsableContent =
-        this.state.messageType !== won.WONMSG.connectMessage &&
-        this.state.messageType !== won.WONMSG.openMessage &&
-        !get(this.state.message, "isParsable") ? (
+        this.props.messageType !== won.WONMSG.connectMessage &&
+        this.props.messageType !== won.WONMSG.openMessage &&
+        !get(this.props.message, "isParsable") ? (
           <div className="msg__text markdown">
-            {this.noParsableContentPlaceholder}
+            {noParsableContentPlaceholder}
           </div>
         ) : (
           undefined
@@ -103,8 +78,8 @@ export default class WonMessageContent extends React.Component {
 
       const allDetailsImm = usecaseUtils.getAllDetailsImm();
       const contentDetailsMap =
-        this.state.content &&
-        this.state.content.map((contentDetail, contentDetailKey) => {
+        this.props.content &&
+        this.props.content.map((contentDetail, contentDetailKey) => {
           const detailDefinitionImm = get(allDetailsImm, contentDetailKey);
 
           const detailDefinition =
@@ -157,5 +132,12 @@ export default class WonMessageContent extends React.Component {
 WonMessageContent.propTypes = {
   messageUri: PropTypes.string.isRequired,
   connectionUri: PropTypes.string.isRequired,
-  ngRedux: PropTypes.object.isRequired,
+  message: PropTypes.object,
+  messageType: PropTypes.string,
+  text: PropTypes.string,
+  matchScore: PropTypes.number,
+  matchScorePercentage: PropTypes.number,
+  content: PropTypes.object,
 };
+
+export default connect(mapStateToProps)(WonMessageContent);

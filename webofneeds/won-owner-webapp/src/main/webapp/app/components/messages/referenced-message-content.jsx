@@ -3,6 +3,7 @@
  */
 import React from "react";
 import { actionCreators } from "../../actions/actions.js";
+import { connect } from "react-redux";
 
 import PropTypes from "prop-types";
 import { getOwnedAtomByConnectionUri } from "../../redux/selectors/general-selectors.js";
@@ -14,104 +15,106 @@ import WonCombinedMessageContent from "./combined-message-content.jsx";
 
 import "~/style/_referenced-message-content.scss";
 
-export default class WonReferencedMessageContent extends React.Component {
-  componentDidMount() {
-    this.messageUri = this.props.messageUri;
-    this.connectionUri = this.props.connectionUri;
-    this.disconnect = this.props.ngRedux.connect(
-      this.selectFromState.bind(this),
-      actionCreators
-    )(state => {
-      this.setState(state);
-    });
-  }
+const mapStateToProps = (state, ownProps) => {
+  const ownedAtom =
+    ownProps.connectionUri &&
+    getOwnedAtomByConnectionUri(state, ownProps.connectionUri);
+  const connection = getIn(ownedAtom, ["connections", ownProps.connectionUri]);
+  const message =
+    connection && ownProps.messageUri
+      ? getIn(connection, ["messages", ownProps.messageUri])
+      : Immutable.Map();
 
-  componentWillUnmount() {
-    this.disconnect();
-  }
+  const expandedReferences = getIn(message, [
+    "viewState",
+    "expandedReferences",
+  ]);
 
-  UNSAFE_componentWillReceiveProps(nextProps) {
-    this.messageUri = nextProps.messageUri;
-    this.connectionUri = nextProps.connectionUri;
-    this.setState(this.selectFromState(this.props.ngRedux.getState()));
-  }
+  const chatMessages = get(connection, "messages");
 
-  selectFromState(state) {
-    const ownedAtom =
-      this.connectionUri &&
-      getOwnedAtomByConnectionUri(state, this.connectionUri);
-    const connection = getIn(ownedAtom, ["connections", this.connectionUri]);
-    const message =
-      connection && this.messageUri
-        ? getIn(connection, ["messages", this.messageUri])
-        : Immutable.Map();
+  const references = get(message, "references");
 
-    const expandedReferences = getIn(message, [
-      "viewState",
-      "expandedReferences",
-    ]);
+  const rejectUris = get(references, "rejects");
+  const retractUris = get(references, "retracts");
+  const proposeUris = get(references, "proposes");
+  const proposeToCancelUris = get(references, "proposesToCancel");
+  const acceptUris = get(references, "accepts");
+  const forwardUris = get(references, "forwards");
+  const claimUris = get(references, "claims");
 
-    const chatMessages = get(connection, "messages");
+  const acceptUrisSize = acceptUris ? acceptUris.size : 0;
+  const proposeUrisSize = proposeUris ? proposeUris.size : 0;
+  const proposeToCancelUrisSize = proposeToCancelUris
+    ? proposeToCancelUris.size
+    : 0;
+  const rejectUrisSize = rejectUris ? rejectUris.size : 0;
+  const retractUrisSize = retractUris ? retractUris.size : 0;
+  const forwardUrisSize = forwardUris ? forwardUris.size : 0;
+  const claimUrisSize = claimUris ? claimUris.size : 0;
 
-    const references = get(message, "references");
+  return {
+    connectionUri: ownProps.connectionUri,
+    messageUri: ownProps.messageUri,
+    ownedAtomUri: get(ownedAtom, "uri"),
+    message,
+    chatMessages: chatMessages,
+    connection,
+    acceptUrisSize,
+    proposeUrisSize,
+    proposeToCancelUrisSize,
+    rejectUrisSize,
+    retractUrisSize,
+    forwardUrisSize,
+    claimUrisSize,
+    expandedReferences,
+    hasProposeUris: proposeUrisSize > 0,
+    hasAcceptUris: acceptUrisSize > 0,
+    hasProposeToCancelUris: proposeToCancelUrisSize > 0,
+    hasRetractUris: retractUrisSize > 0,
+    hasRejectUris: rejectUrisSize > 0,
+    hasForwardUris: forwardUrisSize > 0,
+    hasClaimUris: claimUrisSize > 0,
+    proposeUrisArray: proposeUris && Array.from(proposeUris.toSet()),
+    retractUrisArray: retractUris && Array.from(retractUris.toSet()),
+    rejectUrisArray: rejectUris && Array.from(rejectUris.toSet()),
+    forwardUrisArray: forwardUris && Array.from(forwardUris.toSet()),
+    proposeToCancelUrisArray:
+      proposeToCancelUris && Array.from(proposeToCancelUris.toSet()),
+    acceptUrisArray: acceptUris && Array.from(acceptUris.toSet()),
+    claimUrisArray: claimUris && Array.from(claimUris.toSet()),
+    hasContent: get(message, "hasContent"),
+    hasNotBeenLoaded: !message,
+    multiSelectType: get(connection, "multiSelectType"),
+  };
+};
 
-    const rejectUris = get(references, "rejects");
-    const retractUris = get(references, "retracts");
-    const proposeUris = get(references, "proposes");
-    const proposeToCancelUris = get(references, "proposesToCancel");
-    const acceptUris = get(references, "accepts");
-    const forwardUris = get(references, "forwards");
-    const claimUris = get(references, "claims");
+const mapDispatchToProps = dispatch => {
+  return {
+    processAgreementMessage: msg => {
+      dispatch(actionCreators.messages__processAgreementMessage(msg));
+    },
+    messageMarkExpandReference: (
+      msgUri,
+      connUri,
+      atomUri,
+      expanded,
+      reference
+    ) => {
+      this.props.ngRedux.dispatch(
+        actionCreators.messages__viewState__markExpandReference({
+          messageUri: msgUri,
+          connectionUri: connUri,
+          atomUri: atomUri,
+          isExpanded: expanded,
+          reference: reference,
+        })
+      );
+    },
+  };
+};
 
-    const acceptUrisSize = acceptUris ? acceptUris.size : 0;
-    const proposeUrisSize = proposeUris ? proposeUris.size : 0;
-    const proposeToCancelUrisSize = proposeToCancelUris
-      ? proposeToCancelUris.size
-      : 0;
-    const rejectUrisSize = rejectUris ? rejectUris.size : 0;
-    const retractUrisSize = retractUris ? retractUris.size : 0;
-    const forwardUrisSize = forwardUris ? forwardUris.size : 0;
-    const claimUrisSize = claimUris ? claimUris.size : 0;
-
-    return {
-      ownedAtomUri: get(ownedAtom, "uri"),
-      message,
-      chatMessages: chatMessages,
-      connection,
-      acceptUrisSize,
-      proposeUrisSize,
-      proposeToCancelUrisSize,
-      rejectUrisSize,
-      retractUrisSize,
-      forwardUrisSize,
-      claimUrisSize,
-      expandedReferences,
-      hasProposeUris: proposeUrisSize > 0,
-      hasAcceptUris: acceptUrisSize > 0,
-      hasProposeToCancelUris: proposeToCancelUrisSize > 0,
-      hasRetractUris: retractUrisSize > 0,
-      hasRejectUris: rejectUrisSize > 0,
-      hasForwardUris: forwardUrisSize > 0,
-      hasClaimUris: claimUrisSize > 0,
-      proposeUrisArray: proposeUris && Array.from(proposeUris.toSet()),
-      retractUrisArray: retractUris && Array.from(retractUris.toSet()),
-      rejectUrisArray: rejectUris && Array.from(rejectUris.toSet()),
-      forwardUrisArray: forwardUris && Array.from(forwardUris.toSet()),
-      proposeToCancelUrisArray:
-        proposeToCancelUris && Array.from(proposeToCancelUris.toSet()),
-      acceptUrisArray: acceptUris && Array.from(acceptUris.toSet()),
-      claimUrisArray: claimUris && Array.from(claimUris.toSet()),
-      hasContent: get(message, "hasContent"),
-      hasNotBeenLoaded: !message,
-    };
-  }
-
+class WonReferencedMessageContent extends React.Component {
   render() {
-    if (!this.state) {
-      console.debug("render with null state");
-      return <div />;
-    }
-
     let claimElements;
     let acceptElements;
     let forwardElements;
@@ -120,18 +123,17 @@ export default class WonReferencedMessageContent extends React.Component {
     let proposeToCancelElements;
     let rejectElements;
 
-    if (this.state.hasClaimUris) {
+    if (this.props.hasClaimUris) {
       let fragmentBody;
 
       if (this.isReferenceExpanded("claims")) {
         const messageElements =
-          this.state.claimUrisArray &&
-          this.state.claimUrisArray.map(msgUri => (
+          this.props.claimUrisArray &&
+          this.props.claimUrisArray.map(msgUri => (
             <WonCombinedMessageContent
               key={msgUri}
               messageUri={get(this.getReferencedMessage(msgUri), "uri")}
-              connectionUri={get(this.state.connection, "uri")}
-              ngRedux={this.props.ngRedux}
+              connectionUri={get(this.props.connection, "uri")}
               className={
                 (this.getReferencedMessage(msgUri) &&
                 !get(this.getReferencedMessage(msgUri), "outgoingMessage")
@@ -164,8 +166,8 @@ export default class WonReferencedMessageContent extends React.Component {
           >
             <div className="refmsgcontent__fragment__header__label">
               Claiming{" "}
-              {this.state.claimUrisSize +
-                (this.state.claimUrisSize == 1 ? " Message" : " Messages")}
+              {this.props.claimUrisSize +
+                (this.props.claimUrisSize == 1 ? " Message" : " Messages")}
             </div>
             <div className="refmsgcontent__fragment__header__carret">
               <svg>
@@ -181,18 +183,17 @@ export default class WonReferencedMessageContent extends React.Component {
         </div>
       );
     }
-    if (this.state.hasAcceptUris) {
+    if (this.props.hasAcceptUris) {
       let fragmentBody;
 
       if (this.isReferenceExpanded("accepts")) {
         const messageElements =
-          this.state.acceptUrisArray &&
-          this.state.acceptUrisArray.map(msgUri => (
+          this.props.acceptUrisArray &&
+          this.props.acceptUrisArray.map(msgUri => (
             <WonCombinedMessageContent
               key={msgUri}
               messageUri={get(this.getReferencedMessage(msgUri), "uri")}
-              connectionUri={get(this.state.connection, "uri")}
-              ngRedux={this.props.ngRedux}
+              connectionUri={get(this.props.connection, "uri")}
               className={
                 (this.getReferencedMessage(msgUri) &&
                 !get(this.getReferencedMessage(msgUri), "outgoingMessage")
@@ -225,8 +226,8 @@ export default class WonReferencedMessageContent extends React.Component {
           >
             <div className="refmsgcontent__fragment__header__label">
               Accepting{" "}
-              {this.state.acceptUrisSize +
-                (this.state.acceptUrisSize == 1 ? " Message" : " Messages")}
+              {this.props.acceptUrisSize +
+                (this.props.acceptUrisSize == 1 ? " Message" : " Messages")}
             </div>
             <div className="refmsgcontent__fragment__header__carret">
               <svg>
@@ -242,18 +243,17 @@ export default class WonReferencedMessageContent extends React.Component {
         </div>
       );
     }
-    if (this.state.hasRetractUris) {
+    if (this.props.hasRetractUris) {
       let fragmentBody;
 
       if (this.isReferenceExpanded("retracts")) {
         const messageElements =
-          this.state.retractUrisArray &&
-          this.state.retractUrisArray.map(msgUri => (
+          this.props.retractUrisArray &&
+          this.props.retractUrisArray.map(msgUri => (
             <WonCombinedMessageContent
               key={msgUri}
               messageUri={get(this.getReferencedMessage(msgUri), "uri")}
-              connectionUri={get(this.state.connection, "uri")}
-              ngRedux={this.props.ngRedux}
+              connectionUri={get(this.props.connection, "uri")}
               className={
                 (this.getReferencedMessage(msgUri) &&
                 !get(this.getReferencedMessage(msgUri), "outgoingMessage")
@@ -286,8 +286,8 @@ export default class WonReferencedMessageContent extends React.Component {
           >
             <div className="refmsgcontent__fragment__header__label">
               Retracting{" "}
-              {this.state.retractUrisSize +
-                (this.state.retractUrisSize == 1 ? " Message" : " Messages")}
+              {this.props.retractUrisSize +
+                (this.props.retractUrisSize == 1 ? " Message" : " Messages")}
             </div>
             <div className="refmsgcontent__fragment__header__carret clickable">
               <svg>
@@ -303,18 +303,17 @@ export default class WonReferencedMessageContent extends React.Component {
         </div>
       );
     }
-    if (this.state.hasRejectUris) {
+    if (this.props.hasRejectUris) {
       let fragmentBody;
 
       if (this.isReferenceExpanded("rejects")) {
         const messageElements =
-          this.state.rejectUrisArray &&
-          this.state.rejectUrisArray.map(msgUri => (
+          this.props.rejectUrisArray &&
+          this.props.rejectUrisArray.map(msgUri => (
             <WonCombinedMessageContent
               key={msgUri}
               messageUri={get(this.getReferencedMessage(msgUri), "uri")}
-              connectionUri={get(this.state.connection, "uri")}
-              ngRedux={this.props.ngRedux}
+              connectionUri={get(this.props.connection, "uri")}
               className={
                 (this.getReferencedMessage(msgUri) &&
                 !get(this.getReferencedMessage(msgUri), "outgoingMessage")
@@ -347,8 +346,8 @@ export default class WonReferencedMessageContent extends React.Component {
           >
             <div className="refmsgcontent__fragment__header__label">
               Rejecting{" "}
-              {this.state.rejectUrisSize +
-                (this.state.rejectUrisSize == 1 ? " Message" : " Messages")}
+              {this.props.rejectUrisSize +
+                (this.props.rejectUrisSize == 1 ? " Message" : " Messages")}
             </div>
             <div className="refmsgcontent__fragment__header__carret">
               <svg>
@@ -364,18 +363,17 @@ export default class WonReferencedMessageContent extends React.Component {
         </div>
       );
     }
-    if (this.state.hasProposeUris) {
+    if (this.props.hasProposeUris) {
       let fragmentBody;
 
       if (this.isReferenceExpanded("proposes")) {
         const messageElements =
-          this.state.proposeUrisArray &&
-          this.state.proposeUrisArray.map(msgUri => (
+          this.props.proposeUrisArray &&
+          this.props.proposeUrisArray.map(msgUri => (
             <WonCombinedMessageContent
               key={msgUri}
               messageUri={get(this.getReferencedMessage(msgUri), "uri")}
-              connectionUri={get(this.state.connection, "uri")}
-              ngRedux={this.props.ngRedux}
+              connectionUri={get(this.props.connection, "uri")}
               className={
                 (this.getReferencedMessage(msgUri) &&
                 !get(this.getReferencedMessage(msgUri), "outgoingMessage")
@@ -408,8 +406,8 @@ export default class WonReferencedMessageContent extends React.Component {
           >
             <div className="refmsgcontent__fragment__header__label">
               Proposing{" "}
-              {this.state.proposeUrisSize +
-                (this.state.proposeUrisSize == 1 ? " Message" : " Messages")}
+              {this.props.proposeUrisSize +
+                (this.props.proposeUrisSize == 1 ? " Message" : " Messages")}
             </div>
             <div className="refmsgcontent__fragment__header__carret">
               <svg>
@@ -425,18 +423,17 @@ export default class WonReferencedMessageContent extends React.Component {
         </div>
       );
     }
-    if (this.state.hasProposeToCancelUris) {
+    if (this.props.hasProposeToCancelUris) {
       let fragmentBody;
 
       if (this.isReferenceExpanded("proposesToCancel")) {
         const messageElements =
-          this.state.proposeToCancelUrisArray &&
-          this.state.proposeToCancelUrisArray.map(msgUri => (
+          this.props.proposeToCancelUrisArray &&
+          this.props.proposeToCancelUrisArray.map(msgUri => (
             <WonCombinedMessageContent
               key={msgUri}
               messageUri={get(this.getReferencedMessage(msgUri), "uri")}
-              connectionUri={get(this.state.connection, "uri")}
-              ngRedux={this.props.ngRedux}
+              connectionUri={get(this.props.connection, "uri")}
               className={
                 (this.getReferencedMessage(msgUri) &&
                 !get(this.getReferencedMessage(msgUri), "outgoingMessage")
@@ -469,8 +466,8 @@ export default class WonReferencedMessageContent extends React.Component {
           >
             <div className="refmsgcontent__fragment__header__label">
               Proposing to cancel{" "}
-              {this.state.proposeToCancelUrisSize +
-                (this.state.proposeToCancelUrisSize == 1
+              {this.props.proposeToCancelUrisSize +
+                (this.props.proposeToCancelUrisSize == 1
                   ? " Message"
                   : " Messages")}
             </div>
@@ -488,18 +485,17 @@ export default class WonReferencedMessageContent extends React.Component {
         </div>
       );
     }
-    if (this.state.hasForwardUris) {
+    if (this.props.hasForwardUris) {
       let fragmentBody;
 
       if (this.isReferenceExpanded("forwards")) {
         const messageElements =
-          this.state.forwardUrisArray &&
-          this.state.forwardUrisArray.map(msgUri => (
+          this.props.forwardUrisArray &&
+          this.props.forwardUrisArray.map(msgUri => (
             <WonCombinedMessageContent
               key={msgUri}
               messageUri={get(this.getReferencedMessage(msgUri), "uri")}
-              connectionUri={get(this.state.connection, "uri")}
-              ngRedux={this.props.ngRedux}
+              connectionUri={get(this.props.connection, "uri")}
               className="won-cm--forward"
               onClick={() => this.loadMessage(msgUri)}
             />
@@ -523,8 +519,8 @@ export default class WonReferencedMessageContent extends React.Component {
           >
             <div className="refmsgcontent__fragment__header__label">
               Forwarding{" "}
-              {this.state.forwardUrisSize +
-                (this.state.forwardUrisSize == 1 ? " Message" : " Messages")}
+              {this.props.forwardUrisSize +
+                (this.props.forwardUrisSize == 1 ? " Message" : " Messages")}
             </div>
             <div className="refmsgcontent__fragment__header__carret">
               <svg>
@@ -544,7 +540,7 @@ export default class WonReferencedMessageContent extends React.Component {
     return (
       <won-referenced-message-content
         class={
-          this.state.hasContent || this.state.hasNotBeenLoaded
+          this.props.hasContent || this.props.hasNotBeenLoaded
             ? "won-has-non-ref-content"
             : ""
         }
@@ -567,7 +563,7 @@ export default class WonReferencedMessageContent extends React.Component {
   }
 
   addMessageToState(eventUri) {
-    const ownedAtomUri = this.state.ownedAtomUri;
+    const ownedAtomUri = this.props.ownedAtomUri;
     return ownerApi.getMessage(ownedAtomUri, eventUri).then(response => {
       won.wonMessageFromJsonLd(response).then(msg => {
         if (msg.isFromOwner() && msg.getRecipientAtom() === ownedAtomUri) {
@@ -577,21 +573,19 @@ export default class WonReferencedMessageContent extends React.Component {
           this.addMessageToState(msg.getRemoteMessageUri());
         } else {
           //If message isnt in the state we add it
-          this.props.ngRedux.dispatch(
-            actionCreators.messages__processAgreementMessage(msg)
-          );
+          this.props.processAgreementMessage(msg);
         }
       });
     });
   }
   getReferencedMessage(messageUri) {
-    let referencedMessage = get(this.state.chatMessages, messageUri);
+    let referencedMessage = get(this.props.chatMessages, messageUri);
     if (referencedMessage) {
       return referencedMessage;
     } else {
       return (
-        this.state.chatMessages &&
-        this.state.chatMessages.find(
+        this.props.chatMessages &&
+        this.props.chatMessages.find(
           msg => get(msg, "remoteUri") === messageUri
         )
       );
@@ -599,28 +593,61 @@ export default class WonReferencedMessageContent extends React.Component {
   }
 
   toggleReferenceExpansion(reference) {
-    const currentExpansionState = get(this.state.expandedReferences, reference);
+    const currentExpansionState = get(this.props.expandedReferences, reference);
 
-    if (this.state.message && !this.state.multiSelectType) {
-      this.props.ngRedux.dispatch(
-        actionCreators.messages__viewState__markExpandReference({
-          messageUri: this.messageUri,
-          connectionUri: this.connectionUri,
-          atomUri: this.state.ownedAtomUri,
-          isExpanded: !currentExpansionState,
-          reference: reference,
-        })
+    if (this.props.message && !this.props.multiSelectType) {
+      this.props.messageMarkExpandReference(
+        this.props.messageUri,
+        this.props.connectionUri,
+        this.props.ownedAtomUri,
+        !currentExpansionState,
+        reference
       );
     }
   }
 
   isReferenceExpanded(reference) {
-    return get(this.state.expandedReferences, reference);
+    return get(this.props.expandedReferences, reference);
   }
 }
 
 WonReferencedMessageContent.propTypes = {
   messageUri: PropTypes.string.isRequired,
   connectionUri: PropTypes.string.isRequired,
-  ngRedux: PropTypes.object.isRequired,
+  ownedAtomUri: PropTypes.string,
+  message: PropTypes.object,
+  chatMessages: PropTypes.object,
+  connection: PropTypes.object,
+  acceptUrisSize: PropTypes.number,
+  proposeUrisSize: PropTypes.number,
+  proposeToCancelUrisSize: PropTypes.number,
+  rejectUrisSize: PropTypes.number,
+  retractUrisSize: PropTypes.number,
+  forwardUrisSize: PropTypes.number,
+  claimUrisSize: PropTypes.number,
+  multiSelectType: PropTypes.string,
+  expandedReferences: PropTypes.object,
+  hasProposeUris: PropTypes.bool,
+  hasAcceptUris: PropTypes.bool,
+  hasProposeToCancelUris: PropTypes.bool,
+  hasRetractUris: PropTypes.bool,
+  hasRejectUris: PropTypes.bool,
+  hasForwardUris: PropTypes.bool,
+  hasClaimUris: PropTypes.bool,
+  proposeUrisArray: PropTypes.arrayOf(PropTypes.string),
+  retractUrisArray: PropTypes.arrayOf(PropTypes.string),
+  rejectUrisArray: PropTypes.arrayOf(PropTypes.string),
+  forwardUrisArray: PropTypes.arrayOf(PropTypes.string),
+  proposeToCancelUrisArray: PropTypes.arrayOf(PropTypes.string),
+  acceptUrisArray: PropTypes.arrayOf(PropTypes.string),
+  claimUrisArray: PropTypes.arrayOf(PropTypes.string),
+  hasContent: PropTypes.bool,
+  hasNotBeenLoaded: PropTypes.bool,
+  messageMarkExpandReference: PropTypes.func,
+  processAgreementMessage: PropTypes.func,
 };
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(WonReferencedMessageContent);

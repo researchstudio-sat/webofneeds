@@ -15,7 +15,7 @@ import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as connectionUtils from "../redux/utils/connection-utils.js";
 import won from "../won-es6";
 
-const mapStateToDispatch = (state, ownProps) => {
+const mapStateToProps = (state, ownProps) => {
   const atom = generalSelectors.getOwnedAtomByConnectionUri(
     state,
     ownProps.connectionUri
@@ -81,4 +81,4 @@ WonConnectionState.propTypes = {
   unread: PropTypes.bool,
 };
 
-export default connect(mapStateToDispatch)(WonConnectionState);
+export default connect(mapStateToProps)(WonConnectionState);

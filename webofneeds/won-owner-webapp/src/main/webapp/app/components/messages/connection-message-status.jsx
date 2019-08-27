@@ -6,60 +6,36 @@ import Immutable from "immutable";
 import PropTypes from "prop-types";
 import { relativeTime } from "../../won-label-utils.js";
 import { get, getIn } from "../../utils.js";
-import { actionCreators } from "../../actions/actions.js";
+import { connect } from "react-redux";
 import { getOwnedAtomByConnectionUri } from "../../redux/selectors/general-selectors.js";
 
 import "~/style/_connection-message-status.scss";
 
-export default class WonConnectionMessageStatus extends React.Component {
-  componentDidMount() {
-    this.messageUri = this.props.messageUri;
-    this.connectionUri = this.props.connectionUri;
-    this.disconnect = this.props.ngRedux.connect(
-      this.selectFromState.bind(this),
-      actionCreators
-    )(state => {
-      this.setState(state);
-    });
-  }
+const mapStateToProps = (state, ownProps) => {
+  const ownedAtom =
+    ownProps.connectionUri &&
+    getOwnedAtomByConnectionUri(state, ownProps.connectionUri);
+  const connection = getIn(ownedAtom, ["connections", ownProps.connectionUri]);
+  const message =
+    connection && ownProps.messageUri
+      ? getIn(connection, ["messages", ownProps.messageUri])
+      : Immutable.Map();
 
-  componentWillUnmount() {
-    this.disconnect();
-  }
+  return {
+    messageUri: ownProps.messageUri,
+    connectionUri: ownProps.connectionUri,
+    connection,
+    message,
+    lastUpdateTime: get(state, "lastUpdateTime"),
+  };
+};
 
-  UNSAFE_componentWillReceiveProps(nextProps) {
-    this.messageUri = nextProps.messageUri;
-    this.connectionUri = nextProps.connectionUri;
-    this.setState(this.selectFromState(this.props.ngRedux.getState()));
-  }
-
-  selectFromState(state) {
-    const ownedAtom =
-      this.connectionUri &&
-      getOwnedAtomByConnectionUri(state, this.connectionUri);
-    const connection = getIn(ownedAtom, ["connections", this.connectionUri]);
-    const message =
-      connection && this.messageUri
-        ? getIn(connection, ["messages", this.messageUri])
-        : Immutable.Map();
-
-    return {
-      connection,
-      message,
-      lastUpdateTime: get(state, "lastUpdateTime"),
-    };
-  }
-
+class WonConnectionMessageStatus extends React.Component {
   render() {
-    if (!this.state) {
-      console.debug("render with null state");
-      return <div />;
-    }
-
-    const isOutgoingMessage = get(this.state.message, "outgoingMessage");
-    const isFailedToSend = get(this.state.message, "failedToSend");
-    const isReceivedByOwn = get(this.state.message, "isReceivedByOwn");
-    const isReceivedByRemote = get(this.state.message, "isReceivedByRemote");
+    const isOutgoingMessage = get(this.props.message, "outgoingMessage");
+    const isFailedToSend = get(this.props.message, "failedToSend");
+    const isReceivedByOwn = get(this.props.message, "isReceivedByOwn");
+    const isReceivedByRemote = get(this.props.message, "isReceivedByRemote");
 
     let statusIcons;
 
@@ -111,8 +87,8 @@ export default class WonConnectionMessageStatus extends React.Component {
       timeStampLabel = (
         <div className="msgstatus__time">
           {relativeTime(
-            this.state.lastUpdateTime,
-            get(this.state.message, "date")
+            this.props.lastUpdateTime,
+            get(this.props.message, "date")
           )}
         </div>
       );
@@ -148,5 +124,9 @@ export default class WonConnectionMessageStatus extends React.Component {
 WonConnectionMessageStatus.propTypes = {
   messageUri: PropTypes.string.isRequired,
   connectionUri: PropTypes.string.isRequired,
-  ngRedux: PropTypes.object.isRequired,
+  connection: PropTypes.object,
+  message: PropTypes.object,
+  lastUpdateTime: PropTypes.string,
 };
+
+export default connect(mapStateToProps)(WonConnectionMessageStatus);
