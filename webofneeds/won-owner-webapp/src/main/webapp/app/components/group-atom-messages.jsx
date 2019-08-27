@@ -305,9 +305,7 @@ class GroupAtomMessages extends React.Component {
             placeholder={
               this.props.shouldShowRdf ? "Enter TTL..." : "Your message..."
             }
-            submitButtonLabel={
-              this.props.shouldShowRdf ? "Send&#160;RDF" : "Send"
-            }
+            submitButtonLabel={this.props.shouldShowRdf ? "Send RDF" : "Send"}
             helpText={this.props.shouldShowRdf ? rdfTextfieldHelpText : ""}
             allowEmptySubmit={false}
             allowDetails={!this.props.shouldShowRdf}
