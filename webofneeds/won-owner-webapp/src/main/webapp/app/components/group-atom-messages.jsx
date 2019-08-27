@@ -396,7 +396,6 @@ class GroupAtomMessages extends React.Component {
     }
 
     this.ensureMessagesAreLoaded();
-    this.ensureMessageStateIsUpToDate();
   }
 
   goToUnreadMessages() {
