@@ -267,7 +267,7 @@ class GroupAtomMessages extends React.Component {
 
     const contentElement = (
       <div
-        className="pm__content"
+        className="gpm__content"
         ref={this.chatContainerRef}
         onScroll={this.onScroll.bind(this)}
       >
