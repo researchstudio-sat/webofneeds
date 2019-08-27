@@ -9,6 +9,8 @@ won-trig {
     max-width: 100%; // necessary for `white-space: pre-wrap` in childs
     display: flex;
     flex-direction: column;
+    padding: 0.5rem;
+    box-sizing: border-box;
 
     &__prefixes {
       display: inline-block;

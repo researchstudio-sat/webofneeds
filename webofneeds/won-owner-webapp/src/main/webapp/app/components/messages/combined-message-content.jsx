@@ -57,9 +57,9 @@ const mapStateToProps = (state, ownProps) => {
       : get(connection, "targetAtomUri"));
   const relevantPersonaUri =
     relevantAtomUri && getIn(allAtoms, [relevantAtomUri, "heldBy"]);
-  const personaName =
-    relevantPersonaUri &&
-    getIn(allAtoms, [relevantPersonaUri, "content", "personaName"]);
+  const personaName = relevantPersonaUri
+    ? getIn(allAtoms, [relevantPersonaUri, "content", "personaName"])
+    : undefined;
 
   return {
     messageUri: ownProps.messageUri,
@@ -328,14 +328,14 @@ WonCombinedMessageContent.propTypes = {
   allConnections: PropTypes.object,
   personaName: PropTypes.string,
   multiSelectType: PropTypes.string,
-  contentGraphTrig: PropTypes.object,
+  contentGraphTrig: PropTypes.string,
   shouldShowRdf: PropTypes.bool,
   hasContent: PropTypes.bool,
   hasNotBeenLoaded: PropTypes.bool,
   hasReferences: PropTypes.bool,
   hasClaims: PropTypes.bool,
   hasProposes: PropTypes.bool,
-  messageStatus: PropTypes.string,
+  messageStatus: PropTypes.object,
   isInjectIntoMessage: PropTypes.bool,
   originatorUri: PropTypes.string,
   injectIntoArray: PropTypes.arrayOf(PropTypes.string),

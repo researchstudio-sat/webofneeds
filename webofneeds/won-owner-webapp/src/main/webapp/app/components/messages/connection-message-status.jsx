@@ -126,7 +126,7 @@ WonConnectionMessageStatus.propTypes = {
   connectionUri: PropTypes.string.isRequired,
   connection: PropTypes.object,
   message: PropTypes.object,
-  lastUpdateTime: PropTypes.string,
+  lastUpdateTime: PropTypes.number,
 };
 
 export default connect(mapStateToProps)(WonConnectionMessageStatus);

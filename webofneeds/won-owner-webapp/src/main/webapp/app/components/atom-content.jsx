@@ -34,8 +34,23 @@ const mapStateToProps = (state, ownProps) => {
   //TODO it will be possible to have more than one seeks
   const seeks = get(atom, "seeks");
 
-  const hasContent = this.hasVisibleDetails(content);
-  const hasSeeksBranch = this.hasVisibleDetails(seeks);
+  /**
+   * This function checks if there is at least one detail present that is displayable
+   */
+  const hasVisibleDetails = contentBranchImm => {
+    return (
+      contentBranchImm &&
+      contentBranchImm.find(
+        (detailValue, detailKey) =>
+          detailKey != "type" &&
+          detailKey != "sockets" &&
+          detailKey != "defaultSocket"
+      )
+    );
+  };
+
+  const hasContent = hasVisibleDetails(content);
+  const hasSeeksBranch = hasVisibleDetails(seeks);
 
   const viewState = get(state, "view");
   const process = get(state, "process");
@@ -251,21 +266,6 @@ class WonAtomContent extends React.Component {
   isSelectedTab(tabName) {
     return tabName === this.props.visibleTab;
   }
-
-  /**
-   * This function checks if there is at least one detail present that is displayable
-   */
-  hasVisibleDetails(contentBranchImm) {
-    return (
-      contentBranchImm &&
-      contentBranchImm.find(
-        (detailValue, detailKey) =>
-          detailKey != "type" &&
-          detailKey != "sockets" &&
-          detailKey != "defaultSocket"
-      )
-    );
-  }
 }
 WonAtomContent.propTypes = {
   atomUri: PropTypes.string.isRequired,
@@ -280,7 +280,7 @@ WonAtomContent.propTypes = {
   atomLoading: PropTypes.bool,
   atomFailedToLoad: PropTypes.bool,
   atomProcessingUpdate: PropTypes.bool,
-  createdTimestamp: PropTypes.string,
+  createdTimestamp: PropTypes.any,
   shouldShowRdf: PropTypes.bool,
   fromConnection: PropTypes.bool,
   openConnectionUri: PropTypes.string,

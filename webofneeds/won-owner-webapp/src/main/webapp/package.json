@@ -18,6 +18,7 @@
     "jsonld": "^1.2.1",
     "leaflet": "^1.5.1",
     "loadcss": "^0.0.2",
+    "min-dash": "^3.5.1",
     "n3": "^1.0.2",
     "ng-redux": "^3.5.2",
     "parcel-bundler": "^1.12.3",

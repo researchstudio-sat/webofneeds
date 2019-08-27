@@ -240,7 +240,7 @@ WonAtomHeader.propTypes = {
   isDirectResponse: PropTypes.bool,
   isGroupChatEnabled: PropTypes.bool,
   isChatEnabled: PropTypes.bool,
-  friendlyTimestamp: PropTypes.string,
+  friendlyTimestamp: PropTypes.date,
 };
 
 export default connect(

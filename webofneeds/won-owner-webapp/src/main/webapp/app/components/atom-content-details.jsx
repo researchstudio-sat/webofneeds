@@ -71,7 +71,7 @@ class WonAtomContentDetails extends React.Component {
 WonAtomContentDetails.propTypes = {
   atomUri: PropTypes.string.isRequired,
   branch: PropTypes.string.isRequired,
-  details: PropTypes.arrayOf(PropTypes.object),
+  details: PropTypes.object,
 };
 
 export default connect(mapStateToProps)(WonAtomContentDetails);

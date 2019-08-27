@@ -6,59 +6,74 @@ import React from "react";
 
 import "~/style/_trig.scss";
 import PropTypes from "prop-types";
+import { trigPrefixesAndBody } from "../utils";
 
 export default class WonTrig extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       prefixesExpanded: false,
+      trigPrefixes: undefined,
+      trigBody: undefined,
     };
+    this.togglePrefixes = this.togglePrefixes.bind(this);
   }
 
   togglePrefixes() {
     this.setState({ prefixesExpanded: !this.state.prefixesExpanded });
   }
 
-  render() {
-    const trigBody = undefined; //TODO: IMPL FETCH OF TRIGBODY
-    const trigPrefixes = undefined; //TODO: IMPL FETCH OF TRIGPREFIXES
+  static getDerivedStateFromProps(props, state) {
+    if (props.jsonld) {
+      console.debug("jsonld: ", props.jsonld);
+      /*const trigString = await won.jsonLdToTrig(props.jsonld.toJS());
+      const { trigPrefixes, trigBody } = trigPrefixesAndBody(trigString);
+      //TODO: FIGURE OUT HOW TO DO THAT
+      */
+      return {
+        prefixesExpanded: state.prefixesExpanded,
+        trigPrefixes: "TODO FROM JSONLD",
+        trigBody: "TODO FROM JSONLD",
+      };
+    } else {
+      const { trigPrefixes, trigBody } = trigPrefixesAndBody(props.trig);
 
-    const trigBodyElement = trigBody ? (
-      <div onClick={() => this.togglePrefixes()} className="trig">
+      return {
+        prefixesExpanded: state.prefixesExpanded,
+        trigPrefixes: trigPrefixes,
+        trigBody: trigBody,
+      };
+    }
+  }
+
+  render() {
+    const trigBodyElement = this.state.trigBody ? (
+      <div
+        onClick={!this.state.prefixesExpanded ? this.togglePrefixes : undefined}
+        className={
+          "trig " + (!this.state.prefixesExpanded ? " clickable " : "")
+        }
+      >
         {/*no spaces or newlines within the code-tag, because it is preformatted*/}
         <code className="trig__prefixes">
-          {this.state.prefixesExpanded ? trigPrefixes : "@prefix ..."}
+          {this.state.prefixesExpanded
+            ? this.state.trigPrefixes
+            : "@prefix ..."}
         </code>
-        <code className="trig__contentgraph">{trigBody}</code>
+        <code className="trig__contentgraph">{this.state.trigBody}</code>
       </div>
     ) : (
       undefined
     );
 
-    return (
-      <won-trig>
-        TODO!
-        {trigBodyElement}
-      </won-trig>
-    );
+    return <won-trig>{trigBodyElement}</won-trig>;
   }
 
   // OLD ANGULAR CODE:
   // constructor(/* arguments = dependency injections */) {
-  //   attach(this, serviceDependencies, arguments);
-  //
-  //   this.$scope.$watch("self.trig", (newTrig, prevTrig) =>
-  //     this.updatedTrig(newTrig, prevTrig)
-  //   );
   //   this.$scope.$watch("self.jsonld", (newJsonld, prevJsonld) =>
   //     this.updatedJsonld(newJsonld, prevJsonld)
   //   );
-  // }
-  // updatedTrig(newTrig, prevTrig) {
-  //   // generate new trig body and prefixes, if the trig-input has changed or it hasn't been generated before
-  //   if (newTrig && (newTrig != prevTrig || !this.trigBody)) {
-  //     this.setTrig(newTrig);
-  //   }
   // }
   // async updatedJsonld(newJsonld, prevJsonld) {
   //   // generate new trig body and prefixes, if the json-ld has changed or it hasn't been generated before

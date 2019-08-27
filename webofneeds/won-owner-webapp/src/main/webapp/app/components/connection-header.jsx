@@ -91,7 +91,7 @@ const mapStateToProps = (state, ownProps) => {
       targetAtom &&
       relativeTime(
         generalSelectors.selectLastUpdateTime(state),
-        this.timestamp || get(targetAtom, "lastUpdateDate")
+        get(targetAtom, "lastUpdateDate")
       ),
     targetAtomFailedToLoad:
       targetAtom &&
@@ -312,7 +312,7 @@ WonConnectionHeader.propTypes = {
   latestMessageHumanReadableString: PropTypes.string,
   latestMessageUnread: PropTypes.bool,
   unreadMessageCount: PropTypes.number,
-  friendlyTimestamp: PropTypes.string,
+  friendlyTimestamp: PropTypes.date,
   targetAtomFailedToLoad: PropTypes.bool,
   connectionOrAtomsLoading: PropTypes.bool,
   fetchAtom: PropTypes.func,

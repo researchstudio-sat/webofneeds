@@ -130,7 +130,7 @@ const mapDispatchToProps = dispatch => {
         })
       );
     },
-    markMessageAsRead: (messageUri, connectionUri, atomUri) => {
+    messageMarkAsRead: (messageUri, connectionUri, atomUri) => {
       dispatch(
         actionCreators.messages__markAsRead({
           messageUri: messageUri,
@@ -179,6 +179,7 @@ class WonConnectionMessage extends React.Component {
       ) {
         messageIcon.push(
           <WonAtomIcon
+            key="theirAtomUri"
             atomUri={get(this.props.theirAtom, "uri")}
             onClick={
               !this.props.onClick
@@ -200,6 +201,7 @@ class WonConnectionMessage extends React.Component {
       ) {
         messageIcon.push(
           <WonAtomIcon
+            key="originatorUri"
             atomUri={this.props.originatorUri}
             onClick={
               !this.props.onClick
@@ -215,7 +217,12 @@ class WonConnectionMessage extends React.Component {
       }
 
       if (this.props.isFromSystem) {
-        messageIcon.push(<WonAtomIcon atomUri={this.props.messageSenderUri} />);
+        messageIcon.push(
+          <WonAtomIcon
+            key="messageSenderUri"
+            atomUri={this.props.messageSenderUri}
+          />
+        );
       }
 
       let messageCenterContentElement;

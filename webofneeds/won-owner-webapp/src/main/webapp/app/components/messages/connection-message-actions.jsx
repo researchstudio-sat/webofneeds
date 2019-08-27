@@ -72,6 +72,13 @@ const mapDispatchToProps = dispatch => {
 };
 
 class WonConnectionMessageActions extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      clicked: false,
+    };
+  }
+
   render() {
     const proposeButton = this.props.isProposable ? (
       <button
@@ -194,17 +201,19 @@ class WonConnectionMessageActions extends React.Component {
   }
 
   sendActionMessage(type) {
-    this.setState({ clicked: true });
-    this.props.sendChatMessage(
-      undefined,
-      undefined,
-      new Map().set(
-        type,
-        Immutable.Map().set(this.props.messageUri, this.props.message)
-      ),
-      this.props.connectionUri,
-      false
-    );
+    this.setState({ clicked: true }, () => {
+      this.props.sendChatMessage(
+        undefined,
+        undefined,
+        new Map().set(
+          type,
+          Immutable.Map().set(this.props.messageUri, this.props.message)
+        ),
+        this.props.connectionUri,
+        false
+      );
+      this.setState({ clicked: false });
+    });
   }
 }
 
