@@ -105,7 +105,6 @@ const mapStateToProps = (state, ownProps) => {
 };
 
 const mapDispatchToProps = dispatch => {
-  //TODO
   return {
     routerBack: () => {
       dispatch(actionCreators.router__back());

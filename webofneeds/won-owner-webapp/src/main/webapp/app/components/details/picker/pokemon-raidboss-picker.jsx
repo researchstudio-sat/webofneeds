@@ -262,7 +262,7 @@ export default class PokemonRaidbossPicker extends React.Component {
   }
 
   getCurrentPokemon() {
-    // TODO: change this URL for any live system
+    //Change this URL for any live system
     const url = "https://pokemon.socialmicrolearning.com/current";
 
     return fetch(url)

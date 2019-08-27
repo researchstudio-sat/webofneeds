@@ -96,7 +96,7 @@ class WonAtomContextDropdown extends React.Component {
     let dropdownElement;
 
     if (this.state.contextMenuOpen) {
-      const buttons = []; //TODO
+      const buttons = [];
 
       buttons.push(
         <button

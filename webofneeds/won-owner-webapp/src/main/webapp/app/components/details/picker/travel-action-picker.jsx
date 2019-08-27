@@ -20,7 +20,6 @@ const locationIcon = L.divIcon({
 });
 
 //TODO: SELECT BOTH LOCATIONS BY CLICKING ON THE MAP
-//TODO: FIT BOUNDS OF MAP TO SHOW ALL MARKERS
 export default class WonTravelActionPicker extends React.Component {
   constructor(props) {
     super(props);
