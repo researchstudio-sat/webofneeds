@@ -140,7 +140,7 @@ const mapDispatchToProps = dispatch => {
       );
     },
     showMessageActions: (messageUri, connectionUri, atomUri, showActions) => {
-      this.props.ngRedux.dispatch(
+      dispatch(
         actionCreators.messages__viewState__markShowActions({
           messageUri: messageUri,
           connectionUri: connectionUri,

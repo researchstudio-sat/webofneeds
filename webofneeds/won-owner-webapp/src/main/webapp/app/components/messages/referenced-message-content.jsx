@@ -100,7 +100,7 @@ const mapDispatchToProps = dispatch => {
       expanded,
       reference
     ) => {
-      this.props.ngRedux.dispatch(
+      dispatch(
         actionCreators.messages__viewState__markExpandReference({
           messageUri: msgUri,
           connectionUri: connUri,
