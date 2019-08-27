@@ -36,7 +36,7 @@ const mapStateToProps = (state, ownProps) => {
       true
     );
 
-  let excludedFromRequestUris = [this.atomUri];
+  let excludedFromRequestUris = [ownProps.atomUri];
 
   if (buddyConnections) {
     buddyConnections.map(conn =>
