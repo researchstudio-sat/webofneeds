@@ -64,8 +64,8 @@ const mapStateToProps = (state, ownProps) => {
     friendlyTimestamp:
       atom &&
       relativeTime(selectLastUpdateTime(state), get(atom, "lastUpdateDate")),
-    showPersonaImage: personaImage,
-    showPersonaIdenticon: !personaImage && personaIdenticonSvg,
+    showPersonaImage: !!personaImage,
+    showPersonaIdenticon: !personaImage && !!personaIdenticonSvg,
     personaIdenticonSvg,
     personaImage,
     showMap: false, //!atomImage && atomLocation, //if no image is present but a location is, we display a map instead
