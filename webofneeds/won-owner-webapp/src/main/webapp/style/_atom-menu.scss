@@ -1,0 +1,111 @@
+@import "won-config";
+@import "sizing-utils";
+
+won-atom-menu {
+  display: flex;
+  align-items: flex-end;
+  background-color: $won-lighter-gray;
+  border-bottom: $thinGrayBorder;
+  padding: 0.5rem 0.5rem 0 0.5rem;
+
+  &.won-failed-to-load,
+  &.won-is-loading {
+    & > .atom-menu__item {
+      color: $won-line-gray;
+
+      &.atom-menu__item--inactive {
+        color: $won-line-gray;
+        cursor: default;
+        pointer-events: none;
+      }
+
+      &.atom-menu__item--selected {
+        color: $won-line-gray;
+        border-bottom: 0.2rem solid $won-line-gray;
+      }
+    }
+  }
+
+  & > .atom-menu__item {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    padding: 0.25rem 0.5rem;
+    border-bottom: 0.2rem solid $won-lighter-gray;
+
+    &.atom-menu__item--inactive {
+      color: $won-line-gray;
+      &.atom-menu__item--selected {
+        border-bottom-color: 0.2rem solid $won-line-gray;
+      }
+
+      & > .atom-menu__item__rating,
+      & > .atom-menu__item__count {
+        height: 0;
+        width: 0;
+        opacity: 0;
+        margin-left: 0;
+        overflow: hidden;
+        transition: opacity 0.25s ease-in-out, margin-left 0.25s ease-in-out;
+      }
+    }
+
+    &.atom-menu__item--unread {
+      & > .atom-menu__item__rating,
+      & > .atom-menu__item__count,
+      & > .atom-menu__item__label {
+        color: $won-unread-attention;
+      }
+      & > .atom-menu__item__unread {
+        display: inline-block;
+        background-color: $won-unread-attention;
+        border-radius: 100%;
+        opacity: 1;
+        @include fixed-square(0.5rem);
+        margin-right: 0.25rem;
+        transition: max-width 0.25s ease-in-out, opacity 0.25s ease-in-out,
+          margin-right 0.25s ease-in-out;
+      }
+    }
+
+    &:not(.atom-menu__item--unread) {
+      & > .atom-menu__item__unread {
+        display: inline-block;
+        max-width: 0;
+        height: 0;
+        opacity: 0;
+        overflow: hidden;
+        margin-right: 0;
+        transition: max-width 0.25s ease-in-out, opacity 0.25s ease-in-out,
+          margin-right 0.25s ease-in-out;
+      }
+    }
+
+    &.atom-menu__item--selected {
+      color: $won-primary-color;
+      border-bottom: 0.2rem solid $won-primary-color;
+      cursor: default;
+      pointer-events: none;
+    }
+
+    &:hover {
+      color: $won-primary-color-light;
+      border-bottom: 0.2rem solid $won-primary-color-light;
+    }
+
+    & > .atom-menu__item__rating,
+    & > .atom-menu__item__count,
+    & > .atom-menu__item__label {
+      font-size: $normalFontSize;
+    }
+
+    & > .atom-menu__item__rating,
+    & > .atom-menu__item__count {
+      display: inline-block;
+      margin-left: 0.25rem;
+      overflow: hidden;
+      opacity: 1;
+      transition: opacity 0.25s ease-in-out, margin-left 0.25s ease-in-out;
+    }
+  }
+}

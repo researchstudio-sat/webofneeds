@@ -22,6 +22,7 @@ won-connection-message-status {
     display: inline-block;
     &__icon {
       display: inline-block;
+      margin-right: 0.25rem;
       @include fixed-square(0.5rem);
 
       --local-primary: #{$won-line-gray};

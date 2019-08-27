@@ -17,7 +17,8 @@
     left: 0;
     background: rgba(0, 0, 0, 0.5);
 
-    > won-post-messages {
+    > won-preact.atomMessages > won-atom-messages,
+    > won-atom-messages {
       width: 100%;
       height: 100%;
       background: white;
@@ -43,7 +44,8 @@
     left: 0;
     background: rgba(0, 0, 0, 0.5);
 
-    > won-post-messages {
+    > won-preact.atomMessages > won-atom-messages,
+    > won-atom-messages {
       max-width: $maxContentWidth/2;
       min-width: $maxContentWidth/2;
       background: white;

@@ -1,8 +1,8 @@
 import Immutable from "immutable";
 import {
+  isValidNumber,
   msStringToDate,
   trigPrefixesAndBody,
-  isValidNumber,
 } from "../../utils.js";
 import { isUriRead } from "../../won-localstorage.js";
 import * as useCaseUtils from "../../usecase-utils.js";
@@ -163,7 +163,11 @@ window.parseMessage4dbg = parseMessage;
 
 function hasContent(content) {
   for (let prop in content) {
-    if (content[prop] !== undefined && content[prop] != null) {
+    if (
+      prop !== "type" &&
+      content[prop] !== undefined &&
+      content[prop] != null
+    ) {
       return true;
     }
   }

@@ -1,14 +1,18 @@
 import Immutable from "immutable";
 import { isValidDate, toLocalISODateString } from "../../app/utils.js";
 import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
+import PokemonGymViewer from "../../app/components/details/viewer/pokemon-gym-viewer.jsx";
+import PokemonRaidbossViewer from "../../app/components/details/viewer/pokemon-raidboss-viewer.jsx";
+import PokemonGymPicker from "../../app/components/details/picker/pokemon-gym-picker";
+import PokemonRaidbossPicker from "../../app/components/details/picker/pokemon-raidboss-picker.jsx";
 
 export const pokemonGymInfo = {
   identifier: "pokemonGymInfo",
   label: "Additional Gym Info",
   icon: "#ico36_dumbbell", //TODO: Create and use better icon
   messageEnabled: false,
-  component: "pokemon-gym-picker",
-  viewerComponent: "pokemon-gym-viewer",
+  component: PokemonGymPicker,
+  viewerComponent: PokemonGymViewer,
   isValid: function(value) {
     return value && value.ex;
   },
@@ -41,8 +45,8 @@ export const pokemonRaid = {
   label: "Raid Boss",
   icon: "#ico36_pokeball", //TODO: Create and use better icon
   messageEnabled: false,
-  component: "pokemon-raidboss-picker",
-  viewerComponent: "pokemon-raidboss-viewer",
+  component: PokemonRaidbossPicker,
+  viewerComponent: PokemonRaidbossViewer,
   filterDetail: {
     placeholder: "Filter by (name or id)",
   },

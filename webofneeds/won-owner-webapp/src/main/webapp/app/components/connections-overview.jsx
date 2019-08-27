@@ -1,6 +1,7 @@
 import React from "react";
 import Immutable from "immutable";
 import { actionCreators } from "../actions/actions.js";
+import { connect } from "react-redux";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as connectionSelectors from "../redux/selectors/connection-selectors.js";
 import { get, getIn, sortByDate } from "../utils.js";
@@ -14,110 +15,111 @@ import WonAtomHeader from "./atom-header.jsx";
 import "~/style/_connections-overview.scss";
 import PropTypes from "prop-types";
 
-export default class WonConnectionsOverview extends React.Component {
-  componentDidMount() {
-    this.disconnect = this.props.ngRedux.connect(
-      this.selectFromState.bind(this),
-      actionCreators
-    )(state => {
-      this.setState(state);
-    });
-  }
+const mapStateToProps = state => {
+  const allAtoms = generalSelectors.getPosts(state);
+  const ownedAtoms = generalSelectors.getOwnedAtoms(state);
+  const openAtoms = generalSelectors.getChatAtoms(state);
 
-  componentWillUnmount() {
-    this.disconnect();
-  }
+  const connUriInRoute = generalSelectors.getConnectionUriFromRoute(state);
 
-  UNSAFE_componentWillReceiveProps(/*nextProps*/) {
-    this.setState(this.selectFromState(this.props.ngRedux.getState()));
-  }
+  const sortedOpenAtoms = sortByDate(openAtoms, "creationDate");
+  const process = get(state, "process");
 
-  selectFromState(state) {
-    const allAtoms = generalSelectors.getPosts(state);
-    const openAtoms = generalSelectors.getChatAtoms(state);
+  return {
+    ownedAtoms,
+    allAtoms,
+    process,
+    connUriInRoute,
+    sortedOpenAtomUris: sortedOpenAtoms
+      ? [...sortedOpenAtoms.flatMap(atom => atom.get("uri"))]
+      : [],
+  };
+};
 
-    const connUriInRoute = generalSelectors.getConnectionUriFromRoute(state);
+const mapDispatchToProps = dispatch => {
+  return {
+    selectTab: (atomUri, tab) => {
+      dispatch(
+        actionCreators.atoms__selectTab(
+          Immutable.fromJS({ atomUri: atomUri, selectTab: tab })
+        )
+      );
+    },
+    routerGo: (path, props) => {
+      dispatch(actionCreators.router__stateGo(path, props));
+    },
+    routerGoCurrent: props => {
+      dispatch(actionCreators.router__stateGoCurrent(props));
+    },
+    connectionMarkAsRead: (connectionUri, atomUri) => {
+      dispatch(
+        actionCreators.connections__markAsRead({
+          connectionUri: connectionUri,
+          atomUri: atomUri,
+        })
+      );
+    },
+  };
+};
 
-    const sortedOpenAtoms = sortByDate(openAtoms, "creationDate");
-    const process = get(state, "process");
-
-    return {
-      allAtoms,
-      process,
-      connUriInRoute,
-      sortedOpenAtomUris: sortedOpenAtoms && [
-        ...sortedOpenAtoms.flatMap(atom => atom.get("uri")),
-      ],
-    };
-  }
-
+class WonConnectionsOverview extends React.Component {
   render() {
-    if (!this.state) {
-      console.debug("render with null state");
-      return <div />;
-    }
+    const atomElements = this.props.sortedOpenAtomUris.map(atomUri => {
+      const connectionUris = this.getOpenChatConnectionUrisArraySorted(
+        atomUri,
+        this.props.allAtoms,
+        this.props.process
+      );
 
-    const atomElements =
-      this.state.sortedOpenAtomUris &&
-      this.state.sortedOpenAtomUris.map(atomUri => {
-        const connectionUris = this.getOpenChatConnectionUrisArraySorted(
-          atomUri,
-          this.state.allAtoms,
-          this.state.process
-        );
-
-        const connectionElements =
-          connectionUris &&
-          connectionUris.map(connUri => {
-            return (
-              <div
-                className={
-                  "co__item__connections__item " +
-                  (this.isConnectionUnread(atomUri, connUri) && " won-unread ")
-                }
-                key={connUri}
-              >
-                <WonConnectionSelectionItem
-                  connectionUri={connUri}
-                  ngRedux={this.props.ngRedux}
-                  onClick={() => this.selectConnection(connUri)}
-                />
-              </div>
-            );
-          });
-
-        return (
-          <div className="co__item" key={atomUri}>
-            <div className="co__item__atom">
-              <div className="co__item__atom__header">
-                <WonAtomHeader
-                  atomUri={atomUri}
-                  ngRedux={this.props.ngRedux}
-                  onClick={
-                    !this.isAtomLoading(atomUri)
-                      ? () => {
-                          this.showAtomDetails(atomUri);
-                        }
-                      : undefined
-                  }
-                />
-                <WonConnectionIndicators
-                  atomUri={atomUri}
-                  ngRedux={this.props.ngRedux}
-                  onClick={
-                    !this.isAtomLoading(atomUri)
-                      ? connUri => {
-                          this.selectConnection(connUri);
-                        }
-                      : undefined
-                  }
-                />
-              </div>
+      const connectionElements =
+        connectionUris &&
+        connectionUris.map(connUri => {
+          return (
+            <div
+              className={
+                "co__item__connections__item " +
+                (this.isConnectionUnread(atomUri, connUri) && " won-unread ")
+              }
+              key={connUri}
+            >
+              <WonConnectionSelectionItem
+                connectionUri={connUri}
+                onClick={() => this.selectConnection(connUri)}
+              />
             </div>
-            <div className="co__item__connections">{connectionElements}</div>
+          );
+        });
+
+      return (
+        <div className="co__item" key={atomUri}>
+          <div className="co__item__atom">
+            <div className="co__item__atom__header">
+              <WonAtomHeader
+                atomUri={atomUri}
+                onClick={
+                  !this.isAtomLoading(atomUri)
+                    ? () => {
+                        this.showAtomDetails(atomUri);
+                      }
+                    : undefined
+                }
+              />
+              <WonConnectionIndicators
+                atomUri={atomUri}
+                onClick={
+                  !this.isAtomLoading(atomUri)
+                    ? connUri => {
+                        this.selectConnection(connUri);
+                      }
+                    : undefined
+                }
+              />
+            </div>
           </div>
-        );
-      });
+          <div className="co__item__connections">{connectionElements}</div>
+        </div>
+      );
+    });
 
     return <won-connections-overview>{atomElements}</won-connections-overview>;
   }
@@ -127,18 +129,12 @@ export default class WonConnectionsOverview extends React.Component {
   }
 
   showAtomTab(atomUri, tab = "DETAIL") {
-    this.props.ngRedux.dispatch(
-      actionCreators.atoms__selectTab(
-        Immutable.fromJS({ atomUri: atomUri, selectTab: tab })
-      )
-    );
-    this.props.ngRedux.dispatch(
-      actionCreators.router__stateGo("post", { postUri: atomUri })
-    );
+    this.props.selectTab(atomUri, tab);
+    this.props.routerGo("post", { postUri: atomUri });
   }
 
   isConnectionUnread(atomUri, connUri) {
-    const conn = getIn(this.state.allAtoms, [atomUri, "connections", connUri]);
+    const conn = getIn(this.props.allAtoms, [atomUri, "connections", connUri]);
     return connectionUtils.isUnread(conn);
   }
 
@@ -148,16 +144,15 @@ export default class WonConnectionsOverview extends React.Component {
 
   selectConnection(connectionUri) {
     this.markAsRead(connectionUri);
-    this.props.ngRedux.dispatch(
-      actionCreators.router__stateGoCurrent({ connectionUri: connectionUri })
-    );
+    this.props.routerGoCurrent({ connectionUri: connectionUri });
   }
 
   markAsRead(connectionUri) {
-    const atom = generalSelectors.getOwnedAtomByConnectionUri(
-      this.props.ngRedux.getState(),
-      connectionUri
-    );
+    const atom =
+      this.props.ownedAtoms &&
+      this.props.ownedAtoms.find(atom =>
+        atom.getIn(["connections", connectionUri])
+      );
 
     if (atom) {
       const connection = getIn(atom, ["connections", connectionUri]);
@@ -165,12 +160,7 @@ export default class WonConnectionsOverview extends React.Component {
       const connNotConnected = !connectionUtils.isConnected(connection);
 
       if (connUnread && connNotConnected) {
-        this.props.ngRedux.dispatch(
-          actionCreators.connections__markAsRead({
-            connectionUri: connectionUri,
-            atomUri: get(atom, "uri"),
-          })
-        );
+        this.props.connectionMarkAsRead(connectionUri, get(atom, "uri"));
       }
     }
   }
@@ -218,5 +208,18 @@ export default class WonConnectionsOverview extends React.Component {
   }
 }
 WonConnectionsOverview.propTypes = {
-  ngRedux: PropTypes.object.isRequired,
+  ownedAtoms: PropTypes.object,
+  allAtoms: PropTypes.object,
+  process: PropTypes.object,
+  connUriInRoute: PropTypes.string,
+  sortedOpenAtomUris: PropTypes.arrayOf(PropTypes.string),
+  selectTab: PropTypes.func,
+  routerGo: PropTypes.func,
+  routerGoCurrent: PropTypes.func,
+  connectionMarkAsRead: PropTypes.func,
 };
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(WonConnectionsOverview);

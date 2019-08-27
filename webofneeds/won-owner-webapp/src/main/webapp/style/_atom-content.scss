@@ -1,0 +1,95 @@
+@import "won-config";
+@import "sizing-utils";
+@import "animate";
+
+won-atom-content {
+  .atom-skeleton,
+  .atom-content {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    word-wrap: break-word;
+
+    won-labelled-hr.cp__labelledhr .wlh__label,
+    won-labelled-hr.cp__labelledhr .wlh__label__text,
+    won-labelled-hr.cp__labelledhr .wlh__label__carret {
+      background-color: white;
+    }
+
+    won-trig {
+      background-color: $won-light-gray;
+      border: $thinGrayBorder;
+    }
+
+    .atom-content__updateindicator {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+
+      padding: 0.25rem;
+      background: $won-secondary-color-light;
+      color: $won-secondary-text-color;
+
+      &__label {
+        margin-left: 0.5rem;
+        white-space: nowrap;
+      }
+    }
+
+    .atom-content__reviews {
+      &__empty {
+        color: $won-line-gray;
+        padding: 0.5rem;
+        text-align: center;
+      }
+    }
+  }
+
+  .atom-failedtoload {
+    display: grid;
+    grid-template-areas: "failed_icon failed_label" "failed_actions failed_actions";
+    align-items: center;
+    justify-content: center;
+    padding: 5rem 0;
+    grid-gap: 0.5rem;
+
+    > .atom-failedtoload__icon {
+      grid-area: failed_icon;
+      @include fixed-square(5rem);
+      --local-primary: #{$won-primary-color};
+    }
+    > .atom-failedtoload__label {
+      grid-area: failed_label;
+      text-align: center;
+    }
+
+    > .atom-failedtoload__actions {
+      grid-area: failed_actions;
+      display: flex;
+      justify-content: center;
+
+      > .pc__failed__actions__button {
+      }
+    }
+  }
+
+  &.won-is-loading {
+    @include animateOpacityHeartBeat();
+
+    .atom-skeleton__details {
+      height: $normalFontSize;
+      width: 100%;
+      background-color: $won-skeleton-color;
+      margin-top: 0.25rem;
+    }
+    .atom-skeleton__heading {
+      height: $normalFontSize;
+      width: 5rem;
+      background-color: $won-skeleton-color;
+      margin-top: 1rem;
+      font-size: $normalFontSize;
+      font-weight: 700;
+    }
+  }
+}

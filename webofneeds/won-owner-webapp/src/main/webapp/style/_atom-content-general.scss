@@ -1,0 +1,40 @@
+@import "won-config";
+@import "sizing-utils";
+@import "animate";
+
+won-atom-content-general {
+  display: grid;
+  grid-gap: 0.25rem;
+  grid-template-columns: 1fr 1fr;
+  font-size: $smallFontSize;
+  background: var(--won-lighter-gray);
+  border: $thinGrayBorder;
+  padding: 0.5rem;
+
+  .acg__item {
+    display: grid;
+    grid-template-areas: "grid-item-label grid-item-value";
+    grid-template-columns: min-content 1fr;
+    grid-gap: 0.5rem;
+
+    &__label {
+      grid-area: grid-item-label;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      font-weight: bold;
+    }
+    &__value {
+      grid-area: grid-item-value;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+
+      &__socket,
+      &__flag {
+        border-radius: 0.19rem;
+        background: $won-line-gray;
+        margin: 0.1rem;
+        padding: 0 0.25rem;
+      }
+    }
+  }
+}

@@ -2,9 +2,11 @@
  * Created by fsuda on 18.09.2018.
  */
 import * as basicDetails from "./basic.js";
-import { getIn, generateIdString } from "../../app/utils.js";
+import { generateIdString, getIn } from "../../app/utils.js";
 import Immutable from "immutable";
 import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
+import WonPersonViewer from "../../app/components/details/viewer/person-viewer.jsx";
+import WonPersonPicker from "../../app/components/details/picker/person-picker.jsx";
 
 export const skillsDetail = {
   ...basicDetails.tags,
@@ -47,8 +49,8 @@ export const person = {
   label: "Person",
   icon: "#ico36_detail_person",
   placeholder: undefined,
-  component: "won-person-picker",
-  viewerComponent: "won-person-viewer",
+  component: WonPersonPicker,
+  viewerComponent: WonPersonViewer,
   messageEnabled: true,
   parseToRDF: function({ value, identifier, contentUri }) {
     if (!value) {

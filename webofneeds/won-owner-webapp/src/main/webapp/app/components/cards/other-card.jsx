@@ -2,101 +2,111 @@
  * Created by quasarchimaere on 30.07.2019.
  */
 import React from "react";
+import { connect } from "react-redux";
 import { get, getIn } from "../../utils.js";
-import { actionCreators } from "../../actions/actions.js";
-import * as atomUtils from "../../redux/utils/atom-utils.js";
-
-import "~/style/_other-card.scss";
 import Immutable from "immutable";
-import { relativeTime } from "../../won-label-utils.js";
-import { selectLastUpdateTime } from "../../redux/selectors/general-selectors.js";
-import WonAtomMap from "../atom-map.jsx";
-import WonAtomSuggestionsIndicator from "../atom-suggestions-indicator.jsx";
+import { actionCreators } from "../../actions/actions.js";
 import PropTypes from "prop-types";
 
-export default class WonOtherCard extends React.Component {
-  componentDidMount() {
-    this.atomUri = this.props.atomUri;
-    this.disconnect = this.props.ngRedux.connect(
-      this.selectFromState.bind(this),
-      actionCreators
-    )(state => {
-      this.setState(state);
-    });
+import WonAtomMap from "../atom-map.jsx";
+import WonAtomSuggestionsIndicator from "../atom-suggestions-indicator.jsx";
+import * as atomUtils from "../../redux/utils/atom-utils.js";
+import { relativeTime } from "../../won-label-utils.js";
+import { selectLastUpdateTime } from "../../redux/selectors/general-selectors.js";
+
+import "~/style/_other-card.scss";
+
+const mapStateToProps = (state, ownProps) => {
+  const atom = getIn(state, ["atoms", ownProps.atomUri]);
+  const useCaseIcon = atomUtils.getMatchedUseCaseIcon(atom);
+  const iconBackground = atomUtils.getBackground(atom);
+  const identiconSvg = !useCaseIcon
+    ? atomUtils.getIdenticonSvg(atom)
+    : undefined;
+
+  const isDirectResponse = atomUtils.isDirectResponseAtom(atom);
+  const responseToUri =
+    isDirectResponse && getIn(atom, ["content", "responseToUri"]);
+  const responseToAtom = responseToUri
+    ? getIn(state, ["atoms", responseToUri])
+    : undefined;
+
+  const atomImage = atomUtils.getDefaultImage(atom);
+  const atomLocation = atomUtils.getLocation(atom);
+  const personaUri = atomUtils.getHeldByUri(atom);
+  const persona = getIn(state, ["atoms", personaUri]);
+  const personaName = get(persona, "humanReadable");
+  const personaHolds = persona && get(persona, "holds");
+  const personaVerified =
+    personaHolds && personaHolds.includes(ownProps.atomUri);
+  const personaIdenticonSvg = atomUtils.getIdenticonSvg(persona);
+  const personaImage = atomUtils.getDefaultPersonaImage(persona);
+
+  return {
+    atomUri: ownProps.atomUri,
+    onAtomClick: ownProps.onAtomClick,
+    showPersona: ownProps.showPersona,
+    showSuggestions: ownProps.showSuggestions,
+    currentLocation: ownProps.currentLocation,
+    isDirectResponse: isDirectResponse,
+    isInactive: atomUtils.isInactive(atom),
+    responseToAtom,
+    atom,
+    persona,
+    personaName,
+    personaVerified,
+    personaWebsite: getIn(persona, ["content", "website"]),
+    personaUri,
+    atomTypeLabel: atomUtils.generateTypeLabel(atom),
+    atomHasHoldableSocket: atomUtils.hasHoldableSocket(atom),
+    isGroupChatEnabled: atomUtils.hasGroupSocket(atom),
+    isChatEnabled: atomUtils.hasChatSocket(atom),
+    friendlyTimestamp:
+      atom &&
+      relativeTime(selectLastUpdateTime(state), get(atom, "lastUpdateDate")),
+    showPersonaImage: !!personaImage,
+    showPersonaIdenticon: !personaImage && !!personaIdenticonSvg,
+    personaIdenticonSvg,
+    personaImage,
+    showMap: false, //!atomImage && atomLocation, //if no image is present but a location is, we display a map instead
+    atomLocation,
+    atomImage,
+    showDefaultIcon: !atomImage, //&& !atomLocation, //if no image and no location are present we display the defaultIcon in the card__icon area, instead of next to the title
+    useCaseIcon,
+    iconBackground,
+    identiconSvg,
+  };
+};
+
+const mapDispatchToProps = dispatch => {
+  return {
+    routerGo: (path, props) => {
+      dispatch(actionCreators.router__stateGo(path, props));
+    },
+    selectAtomTab: (atomUri, selectTab) => {
+      dispatch(
+        actionCreators.atoms__selectTab(
+          Immutable.fromJS({
+            atomUri: atomUri,
+            selectTab: selectTab,
+          })
+        )
+      );
+    },
+  };
+};
+
+class WonOtherCard extends React.Component {
+  constructor(props) {
+    super(props);
+    this.atomClick = this.atomClick.bind(this);
+    this.personaClick = this.personaClick.bind(this);
   }
-
-  componentWillUnmount() {
-    this.disconnect();
-  }
-
-  UNSAFE_componentWillReceiveProps(nextProps) {
-    this.atomUri = nextProps.atomUri;
-    this.setState(this.selectFromState(this.props.ngRedux.getState()));
-  }
-
-  selectFromState(state) {
-    const atom = getIn(state, ["atoms", this.atomUri]);
-    const useCaseIcon = atomUtils.getMatchedUseCaseIcon(atom);
-    const iconBackground = atomUtils.getBackground(atom);
-    const identiconSvg = !useCaseIcon
-      ? atomUtils.getIdenticonSvg(atom)
-      : undefined;
-
-    const isDirectResponse = atomUtils.isDirectResponseAtom(atom);
-    const responseToUri =
-      isDirectResponse && getIn(atom, ["content", "responseToUri"]);
-    const responseToAtom = getIn(state, ["atoms", responseToUri]);
-
-    const atomImage = atomUtils.getDefaultImage(atom);
-    const atomLocation = atomUtils.getLocation(atom);
-    const personaUri = atomUtils.getHeldByUri(atom);
-    const persona = getIn(state, ["atoms", personaUri]);
-    const personaName = get(persona, "humanReadable");
-    const personaHolds = persona && get(persona, "holds");
-    const personaVerified = personaHolds && personaHolds.includes(this.atomUri);
-    const personaIdenticonSvg = atomUtils.getIdenticonSvg(persona);
-    const personaImage = atomUtils.getDefaultPersonaImage(persona);
-
-    return {
-      isDirectResponse: isDirectResponse,
-      isInactive: atomUtils.isInactive(atom),
-      responseToAtom,
-      atom,
-      persona,
-      personaName,
-      personaVerified,
-      personaUri,
-      atomTypeLabel: atomUtils.generateTypeLabel(atom),
-      atomHasHoldableSocket: atomUtils.hasHoldableSocket(atom),
-      isGroupChatEnabled: atomUtils.hasGroupSocket(atom),
-      isChatEnabled: atomUtils.hasChatSocket(atom),
-      friendlyTimestamp:
-        atom &&
-        relativeTime(selectLastUpdateTime(state), get(atom, "lastUpdateDate")),
-      showPersonaImage: personaImage,
-      showPersonaIdenticon: !personaImage && personaIdenticonSvg,
-      personaIdenticonSvg,
-      personaImage,
-      showMap: false, //!atomImage && atomLocation, //if no image is present but a location is, we display a map instead
-      atomLocation,
-      atomImage,
-      showDefaultIcon: !atomImage, //&& !atomLocation, //if no image and no location are present we display the defaultIcon in the card__icon area, instead of next to the title
-      useCaseIcon,
-      iconBackground,
-      identiconSvg,
-    };
-  }
-
   render() {
-    if (!this.state) {
-      console.debug("render with null state");
-      return <div />;
-    }
-
     const style =
-      this.state.showDefaultIcon && this.state.iconBackground
+      this.props.showDefaultIcon && this.props.iconBackground
         ? {
-            backgroundColor: this.state.iconBackground,
+            backgroundColor: this.props.iconBackground,
           }
         : undefined;
 
@@ -104,55 +114,54 @@ export default class WonOtherCard extends React.Component {
       <div
         className={
           "card__icon clickable " +
-          (this.state.isInactive ? " inactive " : "") +
-          (this.state.showMap ? "card__icon--map" : "")
+          (this.props.isInactive ? " inactive " : "") +
+          (this.props.showMap ? "card__icon--map" : "")
         }
-        onClick={() => this.atomClick()}
+        onClick={this.atomClick}
         style={style}
       >
-        {this.state.showDefaultIcon && this.state.useCaseIcon ? (
+        {this.props.showDefaultIcon && this.props.useCaseIcon ? (
           <div className="identicon usecaseimage">
             <svg>
               <use
-                xlinkHref={this.state.useCaseIcon}
-                href={this.state.useCaseIcon}
+                xlinkHref={this.props.useCaseIcon}
+                href={this.props.useCaseIcon}
               />
             </svg>
           </div>
         ) : (
           undefined
         )}
-        {this.state.showDefaultIcon && this.state.identiconSvg ? (
+        {this.props.showDefaultIcon && this.props.identiconSvg ? (
           <img
             className="identicon"
             alt="Auto-generated title image"
-            src={"data:image/svg+xml;base64," + this.state.identiconSvg}
+            src={"data:image/svg+xml;base64," + this.props.identiconSvg}
           />
         ) : (
           undefined
         )}
-        {this.state.atomImage ? (
+        {this.props.atomImage ? (
           <img
             className="image"
-            alt={this.state.atomImage.get("name")}
+            alt={this.props.atomImage.get("name")}
             src={
               "data:" +
-              this.state.atomImage.get("type") +
+              this.props.atomImage.get("type") +
               ";base64," +
-              this.state.atomImage.get("data")
+              this.props.atomImage.get("data")
             }
           />
         ) : (
           undefined
         )}
-        {this.state.showMap ? (
-          <div className="won-atom-map location">
-            <WonAtomMap
-              locations={[this.state.atomLocation]}
-              currentLocation={this.state.currentLocation}
-              disableControls={true}
-            />
-          </div>
+        {this.props.showMap ? (
+          <WonAtomMap
+            className="location"
+            locations={[this.props.atomLocation]}
+            currentLocation={this.props.currentLocation}
+            disableControls={true}
+          />
         ) : (
           undefined
         )}
@@ -163,9 +172,9 @@ export default class WonOtherCard extends React.Component {
       <div
         className={
           "card__main clickable " +
-          (!this.state.showDefaultIcon ? "card__main--showIcon" : "")
+          (!this.props.showDefaultIcon ? "card__main--showIcon" : "")
         }
-        onClick={() => this.atomClick()}
+        onClick={this.atomClick}
       >
         {this.createCardMainIcon()}
         {this.createCardMainTopline()}
@@ -175,17 +184,14 @@ export default class WonOtherCard extends React.Component {
 
     const cardPersonaInfo =
       this.props.showPersona &&
-      this.state.persona &&
-      this.state.atomHasHoldableSocket ? (
-        <div
-          className="card__persona clickable"
-          onClick={() => this.personaClick(this.state.personaUri)}
-        >
+      this.props.persona &&
+      this.props.atomHasHoldableSocket ? (
+        <div className="card__persona clickable" onClick={this.personaClick}>
           {this.createPersonaInfoIcon()}
-          {this.state.personaName ? (
+          {this.props.personaName ? (
             <div className="card__persona__name">
               <span className="card__persona__name__label">
-                {this.state.personaName}
+                {this.props.personaName}
               </span>
               {this.createVerificationLabel()}
             </div>
@@ -200,10 +206,7 @@ export default class WonOtherCard extends React.Component {
 
     const cardSuggestionIndicators = this.props.showSuggestions ? (
       <div className="card__indicators">
-        <WonAtomSuggestionsIndicator
-          atomUri={this.atomUri}
-          ngRedux={this.props.ngRedux}
-        />
+        <WonAtomSuggestionsIndicator atomUri={this.props.atomUri} />
       </div>
     ) : (
       undefined
@@ -221,10 +224,10 @@ export default class WonOtherCard extends React.Component {
 
   createCardMainSubtitle() {
     const createGroupChatLabel = () => {
-      if (this.state.isGroupChatEnabled) {
+      if (this.props.isGroupChatEnabled) {
         return (
           <span className="card__main__subtitle__type__groupchat">
-            {"Group Chat" + (this.state.isChatEnabled ? " enabled" : "")}
+            {"Group Chat" + (this.props.isChatEnabled ? " enabled" : "")}
           </span>
         );
       }
@@ -235,10 +238,10 @@ export default class WonOtherCard extends React.Component {
       <div className="card__main__subtitle">
         <span className="card__main__subtitle__type">
           {createGroupChatLabel()}
-          <span>{this.state.atomTypeLabel}</span>
+          <span>{this.props.atomTypeLabel}</span>
         </span>
         <div className="card__main__subtitle__date">
-          {this.state.friendlyTimestamp}
+          {this.props.friendlyTimestamp}
         </div>
       </div>
     );
@@ -246,18 +249,18 @@ export default class WonOtherCard extends React.Component {
 
   createCardMainTopline() {
     const hasTitle = () => {
-      if (this.state.isDirectResponse && this.state.responseToAtom) {
-        return !!this.state.responseToAtom.get("humanReadable");
+      if (this.props.isDirectResponse && this.props.responseToAtom) {
+        return !!this.props.responseToAtom.get("humanReadable");
       } else {
-        return !!this.state.atom && !!this.state.atom.get("humanReadable");
+        return !!this.props.atom && !!this.props.atom.get("humanReadable");
       }
     };
 
     const generateTitleString = () => {
-      if (this.state.isDirectResponse && this.state.responseToAtom) {
-        return "Re: " + this.state.responseToAtom.get("humanReadable");
+      if (this.props.isDirectResponse && this.props.responseToAtom) {
+        return "Re: " + this.props.responseToAtom.get("humanReadable");
       } else {
-        return this.state.atom && this.state.atom.get("humanReadable");
+        return this.props.atom && this.props.atom.get("humanReadable");
       }
     };
 
@@ -269,7 +272,7 @@ export default class WonOtherCard extends React.Component {
           </div>
         );
       } else {
-        if (this.state.isDirectResponse) {
+        if (this.props.isDirectResponse) {
           return <div className="card__main__topline__notitle">no title</div>;
         } else {
           return (
@@ -283,33 +286,33 @@ export default class WonOtherCard extends React.Component {
   }
 
   createCardMainIcon() {
-    if (!this.state.showDefaultIcon) {
+    if (!this.props.showDefaultIcon) {
       const style =
-        !this.state.hasImage && this.state.iconBackground
+        !this.props.atomImage && this.props.iconBackground
           ? {
-              backgroundColor: this.state.iconBackground,
+              backgroundColor: this.props.iconBackground,
             }
           : undefined;
 
       return (
         <div className="card__main__icon" style={style}>
-          {this.state.useCaseIcon ? (
+          {this.props.useCaseIcon ? (
             <div className="card__main__icon__usecaseimage">
               <svg>
                 <use
-                  xlinkHref={this.state.useCaseIcon}
-                  href={this.state.useCaseUtils}
+                  xlinkHref={this.props.useCaseIcon}
+                  href={this.props.useCaseIcon}
                 />
               </svg>
             </div>
           ) : (
             undefined
           )}
-          {this.state.identiconSvg ? (
+          {this.props.identiconSvg ? (
             <img
               className="card__main__icon__identicon"
               alt="Auto-generated title image"
-              src={"data:image/svg+xml;base64," + this.state.identiconSvg}
+              src={"data:image/svg+xml;base64," + this.props.identiconSvg}
             />
           ) : (
             undefined
@@ -320,7 +323,7 @@ export default class WonOtherCard extends React.Component {
   }
 
   createPersonaWebsite() {
-    if (this.state.personaWebsite) {
+    if (this.props.personaWebsite) {
       return (
         <React.Fragment>
           <div className="card__persona__websitelabel">Website:</div>,
@@ -328,16 +331,16 @@ export default class WonOtherCard extends React.Component {
             className="card__persona__websitelink"
             target="_blank"
             rel="noopener noreferrer"
-            href={this.state.personaWebsite}
+            href={this.props.personaWebsite}
           >
-            {this.state.personaWebsite}
+            {this.props.personaWebsite}
           </a>
         </React.Fragment>
       );
     }
   }
   createVerificationLabel() {
-    if (this.state.personaVerified) {
+    if (this.props.personaVerified) {
       return (
         <span
           className="card__persona__name__verification card__persona__name__verification--verified"
@@ -359,25 +362,25 @@ export default class WonOtherCard extends React.Component {
   }
 
   createPersonaInfoIcon() {
-    if (this.state.showPersonaIdenticon) {
+    if (this.props.showPersonaIdenticon) {
       return (
         <img
           className="card__persona__icon"
           alt="Auto-generated title image for persona that holds the atom"
-          src={"data:image/svg+xml;base64," + this.state.personaIdenticonSvg}
+          src={"data:image/svg+xml;base64," + this.props.personaIdenticonSvg}
         />
       );
     }
-    if (this.state.showPersonaImage) {
+    if (this.props.showPersonaImage) {
       return (
         <img
           className="card__persona__icon"
-          alt={this.state.personaImage.get("name")}
+          alt={this.props.personaImage.get("name")}
           src={
             "data:" +
-            this.state.personaImage.get("type") +
+            this.props.personaImage.get("type") +
             ";base64," +
-            this.state.personaImage.get("data")
+            this.props.personaImage.get("data")
           }
         />
       );
@@ -388,25 +391,13 @@ export default class WonOtherCard extends React.Component {
     if (this.props.onAtomClick) {
       this.props.onAtomClick();
     } else {
-      this.props.ngRedux.dispatch(
-        actionCreators.atoms__selectTab(
-          Immutable.fromJS({ atomUri: this.atomUri, selectTab: "DETAIL" })
-        )
-      );
-      this.props.ngRedux.dispatch(
-        actionCreators.router__stateGo("post", { postUri: this.atomUri })
-      );
+      this.props.selectAtomTab(this.props.atomUri, "DETAIL");
+      this.props.routerGo("post", { postUri: this.props.atomUri });
     }
   }
-  personaClick(personaUri) {
-    this.props.ngRedux.dispatch(
-      actionCreators.atoms__selectTab(
-        Immutable.fromJS({ atomUri: personaUri, selectTab: "DETAIL" })
-      )
-    );
-    this.props.ngRedux.dispatch(
-      actionCreators.router__stateGo("post", { postUri: personaUri })
-    );
+  personaClick() {
+    this.props.selectAtomTab(this.props.personaUri, "DETAIL");
+    this.props.routerGo("post", { postUri: this.props.personaUri });
   }
 }
 WonOtherCard.propTypes = {
@@ -415,5 +406,37 @@ WonOtherCard.propTypes = {
   showSuggestions: PropTypes.bool,
   currentLocation: PropTypes.object,
   onAtomClick: PropTypes.func,
-  ngRedux: PropTypes.object.isRequired,
+  routerGo: PropTypes.func,
+  selectAtomTab: PropTypes.func,
+
+  isDirectResponse: PropTypes.bool,
+  isInactive: PropTypes.bool,
+  responseToAtom: PropTypes.object,
+  atom: PropTypes.object,
+  persona: PropTypes.object,
+  personaName: PropTypes.string,
+  personaVerified: PropTypes.bool,
+  personaWebsite: PropTypes.string,
+  personaUri: PropTypes.string,
+  atomTypeLabel: PropTypes.string,
+  atomHasHoldableSocket: PropTypes.bool,
+  isGroupChatEnabled: PropTypes.bool,
+  isChatEnabled: PropTypes.bool,
+  friendlyTimestamp: PropTypes.any,
+  showPersonaImage: PropTypes.bool,
+  showPersonaIdenticon: PropTypes.bool,
+  personaIdenticonSvg: PropTypes.string,
+  personaImage: PropTypes.string,
+  showMap: PropTypes.bool,
+  atomLocation: PropTypes.object,
+  atomImage: PropTypes.string,
+  showDefaultIcon: PropTypes.bool,
+  useCaseIcon: PropTypes.string,
+  iconBackground: PropTypes.string,
+  identiconSvg: PropTypes.string,
 };
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(WonOtherCard);

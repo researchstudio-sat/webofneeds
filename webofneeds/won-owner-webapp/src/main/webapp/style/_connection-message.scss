@@ -11,12 +11,11 @@ won-connection-message {
   display: grid;
   grid-template-areas: "icon content";
 
-  &.won-change-notification {
+  &.won-is-changeNotification {
     grid-template-columns: 1fr;
     grid-template-areas: "labelledhr";
 
-    & > won-preact.labelledHr.won-cm__modified,
-    won-labelled-hr.won-cm__modified {
+    & > won-labelled-hr.won-cm__modified {
       grid-area: labelledhr;
 
       .wlh__label__text {
@@ -25,7 +24,7 @@ won-connection-message {
     }
   }
 
-  &.won-is-multiSelect:not(.won-change-notification) {
+  &.won-is-multiSelect:not(.won-is-changeNotification) {
     padding-left: 3rem;
     cursor: pointer;
 
@@ -64,7 +63,6 @@ won-connection-message {
     }
   }
 
-  won-preact.atomImage,
   won-atom-image {
     grid-area: icon;
   }
@@ -156,7 +154,6 @@ won-connection-message {
       > won-connection-message-actions {
         grid-column: 1 / span 2;
       }
-
       > won-combined-message-content {
         grid-column: 1 / span 1;
       }

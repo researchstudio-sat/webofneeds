@@ -3,9 +3,11 @@
  */
 import React from "react";
 import { actionCreators } from "../actions/actions.js";
+import { connect } from "react-redux";
 import WonAtomCard from "./atom-card.jsx";
 
 import "~/style/_atom-content-suggestions.scss";
+import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as connectionSelectors from "../redux/selectors/connection-selectors.js";
 import * as connectionUtils from "../redux/utils/connection-utils.js";
 import VisibilitySensor from "react-visibility-sensor";
@@ -13,48 +15,59 @@ import { get } from "../utils.js";
 import won from "../won-es6";
 import PropTypes from "prop-types";
 
-export default class WonAtomContentSuggestions extends React.Component {
-  componentDidMount() {
-    this.atomUri = this.props.atomUri;
-    this.disconnect = this.props.ngRedux.connect(
-      this.selectFromState.bind(this),
-      actionCreators
-    )(state => {
-      this.setState(state);
-    });
-  }
+const mapStateToProps = (state, ownProps) => {
+  const suggestions = connectionSelectors.getSuggestedConnectionsByAtomUri(
+    state,
+    ownProps.atomUri
+  );
 
-  componentWillUnmount() {
-    this.disconnect();
-  }
+  return {
+    atomUri: ownProps.atomUri,
+    hasSuggestions: suggestions && suggestions.size > 0,
+    suggestionsArray: suggestions && suggestions.toArray(),
+    currentLocation: generalSelectors.getCurrentLocation(state),
+  };
+};
 
-  UNSAFE_componentWillReceiveProps(nextProps) {
-    this.atomUri = nextProps.atomUri;
-    this.setState(this.selectFromState(this.props.ngRedux.getState()));
-  }
+const mapDispatchToProps = dispatch => {
+  return {
+    routerGoCurrent: props => {
+      dispatch(actionCreators.router__stateGoCurrent(props));
+    },
+    routerGo: (path, props) => {
+      dispatch(actionCreators.router__stateGo(path, props));
+    },
+    connectionClose: connectionUri => {
+      dispatch(actionCreators.connections__close(connectionUri));
+    },
+    connectionMarkAsRead: (connectionUri, atomUri) => {
+      dispatch(
+        actionCreators.connections__markAsRead({
+          connectionUri: connectionUri,
+          atomUri: atomUri,
+        })
+      );
+    },
+    connect: (ownedAtomUri, connectionUri, targetAtomUri, message) => {
+      dispatch(
+        actionCreators.atoms__connect(
+          ownedAtomUri,
+          connectionUri,
+          targetAtomUri,
+          message
+        )
+      );
+    },
+    rateConnection: (connectionUri, rating) => {
+      dispatch(actionCreators.connections__rate(connectionUri, rating));
+    },
+  };
+};
 
-  selectFromState(state) {
-    const suggestions = connectionSelectors.getSuggestedConnectionsByAtomUri(
-      state,
-      this.atomUri
-    );
-
-    return {
-      hasSuggestions: suggestions && suggestions.size > 0,
-      suggestionsArray: suggestions && suggestions.toArray(),
-    };
-  }
-
+class WonAtomContentSuggestions extends React.Component {
   markAsRead(conn) {
     if (connectionUtils.isUnread(conn)) {
-      const payload = {
-        connectionUri: get(conn, "uri"),
-        atomUri: this.atomUri,
-      };
-
-      this.props.ngRedux.dispatch(
-        actionCreators.connections__markAsRead(payload)
-      );
+      this.props.connectionMarkAsRead(get(conn, "uri"), this.props.atomUri);
     }
   }
 
@@ -66,19 +79,9 @@ export default class WonAtomContentSuggestions extends React.Component {
     const connUri = get(conn, "uri");
 
     if (connectionUtils.isUnread(conn)) {
-      this.props.ngRedux.dispatch(
-        actionCreators.connections__markAsRead({
-          connectionUri: connUri,
-          atomUri: this.atomUri,
-        })
-      );
+      this.props.connectionMarkAsRead(connUri, this.props.atomUri);
     }
-
-    this.props.ngRedux.dispatch(
-      actionCreators.router__stateGoCurrent({
-        viewConnUri: connUri,
-      })
-    );
+    this.props.routerGoCurrent({ viewConnUri: connUri });
   }
 
   closeConnection(conn, rateBad = false) {
@@ -89,21 +92,13 @@ export default class WonAtomContentSuggestions extends React.Component {
     const connUri = get(conn, "uri");
 
     if (rateBad) {
-      this.props.ngRedux.dispatch(
-        actionCreators.connections__rate(connUri, won.WONCON.binaryRatingBad)
-      );
+      this.props.rateConnection(connUri, won.WONCON.binaryRatingBad);
     }
 
     if (connectionUtils.isUnread(conn)) {
-      this.props.ngRedux.dispatch(
-        actionCreators.connections__markAsRead({
-          connectionUri: connUri,
-          atomUri: this.atomUri,
-        })
-      );
+      this.props.connectionMarkAsRead(connUri, this.props.atomUri);
     }
-
-    this.props.ngRedux.dispatch(actionCreators.connections__close(connUri));
+    this.props.connectionClose(connUri);
   }
 
   sendRequest(conn, message = "") {
@@ -115,41 +110,20 @@ export default class WonAtomContentSuggestions extends React.Component {
     const targetAtomUri = get(conn, "targetAtomUri");
 
     if (connectionUtils.isUnread(conn)) {
-      this.props.ngRedux.dispatch(
-        actionCreators.connections__markAsRead({
-          connectionUri: connUri,
-          atomUri: this.atomUri,
-        })
-      );
+      this.props.connectionMarkAsRead(connUri, this.props.atomUri);
     }
 
-    this.props.ngRedux.dispatch(
-      actionCreators.connections__rate(connUri, won.WONCON.binaryRatingGood)
-    );
-    this.props.ngRedux.dispatch(
-      actionCreators.atoms__connect(
-        this.atomUri,
-        connUri,
-        targetAtomUri,
-        message
-      )
-    );
-    this.props.ngRedux.dispatch(
-      actionCreators.router__stateGo("connections", {
-        connectionUri: connUri,
-        viewConnUri: undefined,
-      })
-    );
+    this.props.rateConnection(connUri, won.WONCON.binaryRatingGood);
+    this.props.connect(this.props.atomUri, connUri, targetAtomUri, message);
+    this.props.routerGo("connections", {
+      connectionUri: connUri,
+      viewConnUri: undefined,
+    });
   }
 
   render() {
-    if (!this.state) {
-      console.debug("render with null state");
-      return <div />;
-    }
-
-    if (this.state.hasSuggestions) {
-      const atomCards = this.state.suggestionsArray.map(suggestion => {
+    if (this.props.hasSuggestions) {
+      const atomCards = this.props.suggestionsArray.map(suggestion => {
         return (
           <VisibilitySensor
             key={get(suggestion, "uri")}
@@ -168,10 +142,9 @@ export default class WonAtomContentSuggestions extends React.Component {
             >
               <WonAtomCard
                 atomUri={get(suggestion, "targetAtomUri")}
-                currentLocation={this.state.currentLocation}
+                currentLocation={this.props.currentLocation}
                 showSuggestions={false}
                 showPersona={true}
-                ngRedux={this.props.ngRedux}
                 onAtomClick={() => {
                   this.viewSuggestion(suggestion);
                 }}
@@ -213,5 +186,18 @@ export default class WonAtomContentSuggestions extends React.Component {
 }
 WonAtomContentSuggestions.propTypes = {
   atomUri: PropTypes.string.isRequired,
-  ngRedux: PropTypes.object.isRequired,
+  hasSuggestions: PropTypes.bool,
+  suggestionsArray: PropTypes.arrayOf(PropTypes.object),
+  currentLocation: PropTypes.object,
+  routerGoCurrent: PropTypes.func,
+  routerGo: PropTypes.func,
+  connectionClose: PropTypes.func,
+  connectionMarkAsRead: PropTypes.func,
+  connect: PropTypes.func,
+  rateConnection: PropTypes.func,
 };
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(WonAtomContentSuggestions);

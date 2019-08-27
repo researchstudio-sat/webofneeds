@@ -11,12 +11,34 @@ import won from "./won-es6.js";
 import Immutable from "immutable";
 
 const useCasesImm = Immutable.fromJS(useCaseDefinitions.getAllUseCases());
+const allDetailsImm = Immutable.fromJS(initializeAllDetails());
+const allMessageDetailsImm = Immutable.fromJS(initializeAllMessageDetails());
+
 console.debug("useCasesImm: ", useCasesImm);
+console.debug("allDetailsImm: ", allDetailsImm);
+console.debug("allMessageDetailsImm: ", allMessageDetailsImm);
+
 /**
  * Returns all the details that are defined in any useCase Defined in the useCaseDefinitions
  * and in the messageDetails
  */
 export function getAllDetails() {
+  return allDetailsImm.toJS();
+}
+
+/**
+ * Returns all the details that are defined in any useCase Defined in the useCaseDefinitions
+ * and in the messageDetails as an ImmutableJS Object
+ */
+export function getAllDetailsImm() {
+  return allDetailsImm;
+}
+
+/**
+ * Initialize all the details that are defined in any useCase Defined in the useCaseDefinitions
+ * and in the messageDetails
+ */
+function initializeAllDetails() {
   let allDetails = {};
   const useCases = useCaseDefinitions.getAllUseCases();
 
@@ -168,6 +190,7 @@ export function findUseCaseByAtom(atomImm) {
 }
 
 window.findUseCaseByAtom4Dbg = findUseCaseByAtom;
+
 /**
  * Returns all the details that are defined in any useCase in the useCaseDefinitions
  * and has the messageEnabled Flag set to true
@@ -176,9 +199,18 @@ window.findUseCaseByAtom4Dbg = findUseCaseByAtom;
  * messages)
  *
  * the messageEnabled-flag indicates if the detail is allowed to be sent as a part of a connectionMessage
+ * as immutable Object
  * @returns {{}}
  */
-export function getAllMessageDetails() {
+export function getAllMessageDetailsImm() {
+  return allMessageDetailsImm;
+}
+
+/**
+ * Initialize all the details that are defined in any useCase Defined in the useCaseDefinitions
+ * and in the messageDetails
+ */
+function initializeAllMessageDetails() {
   let allDetails = {};
   const useCases = useCaseDefinitions.getAllUseCases();
 

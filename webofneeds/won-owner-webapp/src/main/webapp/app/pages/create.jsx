@@ -2,9 +2,8 @@
 
 import angular from "angular";
 import ngAnimate from "angular-animate";
-import won from "../won-es6.js";
 
-import createPostModule from "../components/create-post.js";
+import WonCreateAtom from "../components/create-atom.jsx";
 import createSearchModule from "../components/create-search.js";
 import usecasePickerModule from "../components/usecase-picker.js";
 import usecaseGroupModule from "../components/usecase-group.js";
@@ -30,7 +29,11 @@ const template = (
     <main className="ownercreate">
       <won-usecase-picker ng-if="self.showUseCasePicker" />
       <won-usecase-group ng-if="self.showUseCaseGroups" />
-      <won-create-post ng-if="self.showCreatePost" />
+      <won-preact
+        component="self.WonCreateAtom"
+        props="{}"
+        ng-if="self.showCreatePost"
+      />
       <won-create-search ng-if="self.showCreateSearch" />
     </main>
     <won-footer />
@@ -42,7 +45,7 @@ const serviceDependencies = ["$element", "$ngRedux", "$scope", "$state"];
 class CreateController {
   constructor() {
     attach(this, serviceDependencies, arguments);
-    this.WON = won.WON;
+    this.WonCreateAtom = WonCreateAtom;
 
     const selectFromState = state => {
       const useCase = generalSelectors.getUseCaseFromRoute(state);
@@ -93,7 +96,6 @@ export default {
       ngAnimate,
       usecasePickerModule,
       usecaseGroupModule,
-      createPostModule,
       createSearchModule,
     ])
     .controller("CreateController", [...serviceDependencies, CreateController])

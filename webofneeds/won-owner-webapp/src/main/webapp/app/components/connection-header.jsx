@@ -2,8 +2,14 @@
  * Created by quasarchimaere on 30.07.2019.
  */
 import React from "react";
+import WonAtomIcon from "./atom-icon.jsx";
+import WonGroupIcon from "./group-icon.jsx";
+import WonConnectionState from "./connection-state.jsx";
+import PropTypes from "prop-types";
+import VisibilitySensor from "react-visibility-sensor";
 import { get, getIn } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
+import { connect } from "react-redux";
 import { labels, relativeTime } from "../won-label-utils.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as messageSelectors from "../redux/selectors/message-selectors.js";
@@ -14,127 +20,127 @@ import * as processUtils from "../redux/utils/process-utils.js";
 import { getHumanReadableStringFromMessage } from "../reducers/atom-reducer/parse-message.js";
 
 import "~/style/_connection-header.scss";
-import WonAtomIcon from "./atom-icon.jsx";
-import WonGroupIcon from "./group-icon";
-import WonConnectionState from "./connection-state";
-import PropTypes from "prop-types";
 
-export default class WonConnectionHeader extends React.Component {
-  componentDidMount() {
-    this.connectionUri = this.props.connectionUri;
-    this.disconnect = this.props.ngRedux.connect(
-      this.selectFromState.bind(this),
-      actionCreators
-    )(state => {
-      this.setState(state);
+const mapStateToProps = (state, ownProps) => {
+  const ownedAtom = generalSelectors.getOwnedAtomByConnectionUri(
+    state,
+    ownProps.connectionUri
+  );
+  const connection = getIn(ownedAtom, ["connections", ownProps.connectionUri]);
+  const targetAtomUri = get(connection, "targetAtomUri");
+  const targetAtom = get(generalSelectors.getAtoms(state), targetAtomUri);
+  const allMessages = messageSelectors.getMessagesByConnectionUri(
+    state,
+    ownProps.connectionUri
+  );
+  const unreadMessages = messageSelectors.getUnreadMessagesByConnectionUri(
+    state,
+    ownProps.connectionUri
+  );
+
+  const sortedMessages = allMessages && allMessages.toArray();
+  if (sortedMessages) {
+    sortedMessages.sort(function(a, b) {
+      const aDate = get(a, "date");
+      const bDate = get(b, "date");
+
+      const aTime = aDate && aDate.getTime();
+      const bTime = bDate && bDate.getTime();
+
+      return bTime - aTime;
     });
   }
 
-  componentWillUnmount() {
-    this.disconnect();
-  }
+  const latestMessage = sortedMessages && sortedMessages[0];
+  const latestMessageHumanReadableString =
+    latestMessage && getHumanReadableStringFromMessage(latestMessage);
+  const latestMessageUnread = messageUtils.isMessageUnread(latestMessage);
 
-  UNSAFE_componentWillReceiveProps(nextProps) {
-    this.connectionUri = nextProps.connectionUri;
-    this.setState(this.selectFromState(this.props.ngRedux.getState()));
-  }
+  const groupMembers = get(targetAtom, "groupMembers");
 
-  selectFromState(state) {
-    const ownedAtom = generalSelectors.getOwnedAtomByConnectionUri(
-      state,
-      this.connectionUri
-    );
-    const connection = getIn(ownedAtom, ["connections", this.connectionUri]);
-    const targetAtom = get(
+  const remotePersonaUri = atomUtils.getHeldByUri(targetAtom);
+  const remotePersona = getIn(state, ["atoms", remotePersonaUri]);
+  const remotePersonaName = get(remotePersona, "humanReadable");
+
+  const processState = get(state, "process");
+
+  const targetAtomLoading = processUtils.isAtomLoading(
+    processState,
+    get(targetAtom, "uri")
+  );
+
+  return {
+    connectionUri: ownProps.connectionUri,
+    onClick: ownProps.onClick,
+    connection,
+    groupMembersArray: groupMembers && groupMembers.toArray(),
+    groupMembersSize: groupMembers ? groupMembers.size : 0,
+    ownedAtom,
+    targetAtomUri,
+    targetAtom,
+    remotePersonaName,
+    isConnectionToGroup: connectionSelectors.isChatToGroupConnection(
       generalSelectors.getAtoms(state),
-      get(connection, "targetAtomUri")
-    );
-    const allMessages = messageSelectors.getMessagesByConnectionUri(
-      state,
-      this.connectionUri
-    );
-    const unreadMessages = messageSelectors.getUnreadMessagesByConnectionUri(
-      state,
-      this.connectionUri
-    );
-
-    const sortedMessages = allMessages && allMessages.toArray();
-    if (sortedMessages) {
-      sortedMessages.sort(function(a, b) {
-        const aDate = get(a, "date");
-        const bDate = get(b, "date");
-
-        const aTime = aDate && aDate.getTime();
-        const bTime = bDate && bDate.getTime();
-
-        return bTime - aTime;
-      });
-    }
-
-    const latestMessage = sortedMessages && sortedMessages[0];
-    const latestMessageHumanReadableString =
-      latestMessage && getHumanReadableStringFromMessage(latestMessage);
-    const latestMessageUnread = messageUtils.isMessageUnread(latestMessage);
-
-    const groupMembers = get(targetAtom, "groupMembers");
-
-    const remotePersonaUri = atomUtils.getHeldByUri(targetAtom);
-    const remotePersona = getIn(state, ["atoms", remotePersonaUri]);
-    const remotePersonaName = get(remotePersona, "humanReadable");
-
-    const processState = get(state, "process");
-
-    return {
-      connection,
-      groupMembersArray: groupMembers && groupMembers.toArray(),
-      groupMembersSize: groupMembers ? groupMembers.size : 0,
-      ownedAtom,
-      targetAtom,
-      remotePersonaName,
-      isConnectionToGroup: connectionSelectors.isChatToGroupConnection(
-        generalSelectors.getAtoms(state),
-        connection
+      connection
+    ),
+    isDirectResponseFromRemote: atomUtils.isDirectResponseAtom(targetAtom),
+    isGroupChatEnabled: atomUtils.hasGroupSocket(targetAtom),
+    isChatEnabled: atomUtils.hasChatSocket(targetAtom),
+    latestMessageHumanReadableString,
+    latestMessageUnread,
+    unreadMessageCount:
+      unreadMessages && unreadMessages.size > 0
+        ? unreadMessages.size
+        : undefined,
+    friendlyTimestamp:
+      targetAtom &&
+      relativeTime(
+        generalSelectors.selectLastUpdateTime(state),
+        get(targetAtom, "lastUpdateDate")
       ),
-      isDirectResponseFromRemote: atomUtils.isDirectResponseAtom(targetAtom),
-      isGroupChatEnabled: atomUtils.hasGroupSocket(targetAtom),
-      isChatEnabled: atomUtils.hasChatSocket(targetAtom),
-      latestMessageHumanReadableString,
-      latestMessageUnread,
-      unreadMessageCount:
-        unreadMessages && unreadMessages.size > 0
-          ? unreadMessages.size
-          : undefined,
-      friendlyTimestamp:
-        targetAtom &&
-        relativeTime(
-          generalSelectors.selectLastUpdateTime(state),
-          this.timestamp || get(targetAtom, "lastUpdateDate")
-        ),
-      targetAtomFailedToLoad:
-        targetAtom &&
-        processUtils.hasAtomFailedToLoad(processState, get(targetAtom, "uri")),
-      connectionOrAtomsLoading:
-        !connection ||
-        !targetAtom ||
-        !ownedAtom ||
-        processUtils.isAtomLoading(processState, get(ownedAtom, "uri")) ||
-        processUtils.isAtomLoading(processState, get(targetAtom, "uri")) ||
-        processUtils.isConnectionLoading(processState, get(connection, "uri")),
-    };
-  }
+    targetAtomFailedToLoad:
+      targetAtom &&
+      processUtils.hasAtomFailedToLoad(processState, get(targetAtom, "uri")),
+    targetAtomToLoad: processUtils.isAtomToLoad(
+      processState,
+      get(targetAtom, "uri")
+    ),
+    targetAtomLoading,
+    connectionOrAtomsLoading:
+      !connection ||
+      !targetAtom ||
+      !ownedAtom ||
+      processUtils.isAtomLoading(processState, get(ownedAtom, "uri")) ||
+      targetAtomLoading ||
+      processUtils.isConnectionLoading(processState, get(connection, "uri")),
+  };
+};
 
+const mapDispatchToProps = dispatch => {
+  return {
+    fetchAtom: atomUri => {
+      dispatch(actionCreators.atoms__fetchUnloadedAtom(atomUri));
+    },
+  };
+};
+
+class WonConnectionHeader extends React.Component {
   render() {
-    if (!this.state) {
-      console.debug("render with null state");
-      return <div />;
-    }
-
-    if (this.state.connectionOrAtomsLoading) {
+    if (this.props.connectionOrAtomsLoading) {
       return (
         <won-connection-header class="won-is-loading">
-          <div className="ch__icon">
-            <div className="ch__icon__skeleton" />
-          </div>
+          <VisibilitySensor
+            onChange={isVisible => {
+              this.onChange(isVisible);
+            }}
+            intervalDelay={200}
+            partialVisibility={true}
+            offset={{ top: -300, bottom: -300 }}
+          >
+            <div className="ch__icon">
+              <div className="ch__icon__skeleton" />
+            </div>
+          </VisibilitySensor>
           <div className="ch__right">
             <div className="ch__right__topline">
               <div className="ch__right__topline__title" />
@@ -147,22 +153,16 @@ export default class WonConnectionHeader extends React.Component {
         </won-connection-header>
       );
     } else {
-      const headerIcon = this.state.isConnectionToGroup ? (
-        <WonGroupIcon
-          connectionUri={this.connectionUri}
-          ngRedux={this.props.ngRedux}
-        />
+      const headerIcon = this.props.isConnectionToGroup ? (
+        <WonGroupIcon connectionUri={this.props.connectionUri} />
       ) : (
         <div className="ch__icon">
-          <WonAtomIcon
-            atomUri={get(this.state.targetAtom, "uri")}
-            ngRedux={this.props.ngRedux}
-          />
+          <WonAtomIcon atomUri={get(this.props.targetAtom, "uri")} />
         </div>
       );
 
       let headerRightContent;
-      if (this.state.targetAtomFailedToLoad) {
+      if (this.props.targetAtomFailedToLoad) {
         headerRightContent = (
           <React.Fragment>
             <div className="ch__right__topline">
@@ -182,14 +182,14 @@ export default class WonConnectionHeader extends React.Component {
         );
       } else {
         let headerRightToplineContent;
-        if (!this.state.isDirectResponseFromRemote) {
-          if (get(this.state.targetAtom, "humanReadable")) {
+        if (!this.props.isDirectResponseFromRemote) {
+          if (get(this.props.targetAtom, "humanReadable")) {
             headerRightToplineContent = (
               <div
                 className="ch__right__topline__title"
-                title={get(this.state.targetAtom, "humanReadable")}
+                title={get(this.props.targetAtom, "humanReadable")}
               >
-                {get(this.state.targetAtom, "humanReadable")}
+                {get(this.props.targetAtom, "humanReadable")}
               </div>
             );
           } else {
@@ -211,17 +211,17 @@ export default class WonConnectionHeader extends React.Component {
         }
 
         const personaName =
-          this.state.remotePersonaName && !this.state.isGroupChatEnabled ? (
+          this.props.remotePersonaName && !this.props.isGroupChatEnabled ? (
             <span className="ch__right__subtitle__type__persona">
-              {this.state.remotePersonaName}
+              {this.props.remotePersonaName}
             </span>
           ) : (
             undefined
           );
 
-        const groupChatLabel = this.state.isGroupChatEnabled ? (
+        const groupChatLabel = this.props.isGroupChatEnabled ? (
           <span className="ch__right__subtitle__type__groupchat">
-            {"Group Chat" + (this.state.isChatEnabled ? " enabled" : "")}
+            {"Group Chat" + (this.props.isChatEnabled ? " enabled" : "")}
           </span>
         ) : (
           undefined
@@ -229,15 +229,15 @@ export default class WonConnectionHeader extends React.Component {
 
         let unreadCount;
 
-        if (this.state.unreadMessageCount > 1) {
+        if (this.props.unreadMessageCount > 1) {
           unreadCount = (
             <span className="ch__right__subtitle__type__unreadcount">
-              {this.state.unreadMessageCount + " unread Messages"}
+              {this.props.unreadMessageCount + " unread Messages"}
             </span>
           );
         } else if (
-          this.state.unreadMessageCount == 1 &&
-          !this.state.latestMessageHumanReadableString
+          this.props.unreadMessageCount == 1 &&
+          !this.props.latestMessageHumanReadableString
         ) {
           unreadCount = (
             <span className="ch__right__subtitle__type__unreadcount">
@@ -247,23 +247,23 @@ export default class WonConnectionHeader extends React.Component {
         }
 
         let messageOrState;
-        if (this.state.latestMessageHumanReadableString) {
-          messageOrState = !(this.state.unreadMessageCount > 1) ? (
+        if (this.props.latestMessageHumanReadableString) {
+          messageOrState = !(this.props.unreadMessageCount > 1) ? (
             <span
               className={
                 "ch__right__subtitle__type__message " +
-                (this.state.latestMessageUnread ? "won-unread" : "")
+                (this.props.latestMessageUnread ? "won-unread" : "")
               }
             >
-              {this.state.latestMessageHumanReadableString}
+              {this.props.latestMessageHumanReadableString}
             </span>
           ) : (
             undefined
           );
         } else {
-          messageOrState = !this.state.unreadMessageCount ? (
+          messageOrState = !this.props.unreadMessageCount ? (
             <span className="ch__right__subtitle__type__state">
-              {labels.connectionState[get(this.state.connection, "state")]}
+              {labels.connectionState[get(this.props.connection, "state")]}
             </span>
           ) : (
             undefined
@@ -280,14 +280,13 @@ export default class WonConnectionHeader extends React.Component {
                 {personaName}
                 {groupChatLabel}
                 <WonConnectionState
-                  connectionUri={get(this.state.connection, "uri")}
-                  ngRedux={this.props.ngRedux}
+                  connectionUri={get(this.props.connection, "uri")}
                 />
                 {unreadCount}
                 {messageOrState}
               </span>
               <div className="ch__right__subtitle__date">
-                {this.state.friendlyTimestamp}
+                {this.props.friendlyTimestamp}
               </div>
             </div>
           </React.Fragment>
@@ -296,7 +295,7 @@ export default class WonConnectionHeader extends React.Component {
 
       return (
         <won-connection-header
-          onClick={() => this.props.onClick()}
+          onClick={this.props.onClick ? () => this.props.onClick() : undefined}
           class={this.props.onClick ? "clickable" : ""}
         >
           {headerIcon}
@@ -305,21 +304,48 @@ export default class WonConnectionHeader extends React.Component {
       );
     }
   }
+  onChange(isVisible) {
+    if (isVisible) {
+      this.ensureAtomIsLoaded();
+    }
+  }
 
   ensureAtomIsLoaded() {
-    //TODO: Fetch atoms if not present
     if (
-      this.state.atomUri &&
-      (!this.state.atom || (this.state.atomToLoad && !this.state.atomLoading))
+      this.props.targetAtomUri &&
+      (!this.props.targetAtom ||
+        (this.props.targetAtomToLoad && !this.props.targetAtomLoading))
     ) {
-      this.props.ngRedux.dispatch(
-        actionCreators.atoms__fetchUnloadedAtom(this.state.atomUri)
-      );
+      this.props.fetchAtom(this.props.targetAtomUri);
     }
   }
 }
 WonConnectionHeader.propTypes = {
   connectionUri: PropTypes.string.isRequired,
-  ngRedux: PropTypes.object.isRequired,
-  onClick: PropTypes.func.isRequired,
+  onClick: PropTypes.func,
+  connection: PropTypes.object,
+  groupMembersArray: PropTypes.arrayOf(PropTypes.object),
+  groupMembersSize: PropTypes.number,
+  ownedAtom: PropTypes.object,
+  targetAtom: PropTypes.object,
+  remotePersonaName: PropTypes.string,
+  isConnectionToGroup: PropTypes.bool,
+  isDirectResponseFromRemote: PropTypes.bool,
+  isGroupChatEnabled: PropTypes.bool,
+  isChatEnabled: PropTypes.bool,
+  latestMessageHumanReadableString: PropTypes.string,
+  latestMessageUnread: PropTypes.bool,
+  unreadMessageCount: PropTypes.number,
+  friendlyTimestamp: PropTypes.any,
+  targetAtomUri: PropTypes.string,
+  targetAtomToLoad: PropTypes.bool,
+  targetAtomLoading: PropTypes.bool,
+  targetAtomFailedToLoad: PropTypes.bool,
+  connectionOrAtomsLoading: PropTypes.bool,
+  fetchAtom: PropTypes.func,
 };
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(WonConnectionHeader);

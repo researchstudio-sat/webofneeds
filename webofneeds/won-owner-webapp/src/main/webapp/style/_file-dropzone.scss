@@ -3,13 +3,7 @@
 @import "positioning-utils";
 
 won-file-dropzone {
-  $borderSize: 5.66rem;
-  $padding: 1rem;
-  width: 100%;
-  height: $borderSize;
   display: block;
-  position: relative;
-
   background-color: white;
 
   cursor: pointer;
@@ -21,27 +15,45 @@ won-file-dropzone {
     display: none;
   }
 
-  & .wid__dropzone__bg {
-    @extend %center--absolute;
-    --local-primary: #{$won-line-gray};
-    pointer-events: none;
+  .wfd__dropzone {
+    display: grid;
+    justify-content: center;
+    justify-items: center;
+    padding: 1rem;
+    box-sizing: border-box;
+    grid-gap: 0.5rem;
+    outline: none;
 
-    @include max-square($borderSize - 2 * $padding - 2 * $boldBorderWidth);
+    > .wfd__dropzone__icon {
+      --local-primary: #{$won-line-gray};
+      pointer-events: none;
+
+      @include fixed-square($hugeiconSize);
+    }
+    > .wfd__dropzone__label {
+      color: $won-line-gray;
+    }
   }
 
   &.valid {
     $messagecolor: rgb(80, 206, 55);
     border-color: $messagecolor;
-    & .wid__dropzone__bg {
+    > .wid__dropzone__icon {
       --local-primary: #{$messagecolor};
+    }
+    > .wid__dropzone__label {
+      color: $messagecolor;
     }
   }
 
   &.invalid {
     $messagecolor: tomato;
     border-color: $messagecolor;
-    & .wid__dropzone__bg {
+    > .wid__dropzone__icon {
       --local-primary: #{$messagecolor};
+    }
+    > .wid__dropzone__label {
+      color: $messagecolor;
     }
   }
 }

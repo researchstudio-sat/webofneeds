@@ -2,18 +2,13 @@
 @import "animate";
 @import "sizing-utils";
 
-won-create-post,
+won-create-atom,
 won-create-search {
   display: grid;
   grid-template-areas: "header" "main" "footer";
   grid-template-rows: min-content minmax($minimalGridRows, 1fr) min-content;
   grid-row-gap: $gridRowGap;
   box-sizing: border-box;
-
-  /*
-  &.create-post-mobile {
-    grid-template-rows: min-content minmax($mobileGridRows, 1fr) min-content;
-  }*/
 
   .cp__header {
     margin: $gridRowGap;
@@ -113,7 +108,6 @@ won-create-search {
     &__responsivebuttons {
       padding: 0 0.5rem;
 
-      won-preact.labelledHr .wlh__label__text,
       won-labelled-hr .wlh__label__text {
         background-color: white;
       }
@@ -129,7 +123,6 @@ won-create-search {
     grid-area: footer;
     display: grid;
 
-    won-preact.labelledHr .wlh__label__text,
     won-labelled-hr .wlh__label__text {
       background-color: white;
     }
@@ -160,7 +153,6 @@ won-create-search {
       padding-left: 0;
       padding-right: 0;
 
-      won-preact.labelledHr .wlh__label__text,
       won-labelled-hr .wlh__label__text {
         background-color: white;
       }

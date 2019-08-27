@@ -1,0 +1,52 @@
+@import "won-config";
+@import "speech-bubble";
+@import "square-image";
+@import "animate";
+
+won-atom-content-message {
+  &.won-is-loading {
+    @include animateOpacityHeartBeat();
+  }
+
+  padding: 0 0 0.5rem 0.5rem;
+  @include square-image($postIconSize, 0 0.5rem 0 0);
+  display: grid;
+  grid-template-areas: "content";
+  grid-template-columns: 1fr;
+
+  .won-cm__center {
+    grid-area: content;
+    font-size: $smallFontSize;
+    max-width: 100%;
+
+    .won-cm__center__bubble {
+      display: grid;
+      grid-template-areas: "postmenu" "postcontent";
+      grid-template-rows: min-content min-content;
+      grid-template-columns: 1fr;
+      border: $thinGrayBorder;
+      word-break: break-word;
+      box-sizing: border-box; // background: $won-light-gray;
+      background-color: white; // like the error toast-notifications
+      color: black;
+
+      @include speech-bubble-top(
+        $won-lighter-gray,
+        $won-line-gray,
+        $speechBubbleTailSize / 2,
+        $thinBorderWidth,
+        2.9rem
+      );
+
+      > won-atom-menu {
+        grid-area: postmenu;
+      }
+
+      > won-atom-content {
+        grid-area: postcontent;
+        padding: 0.5rem;
+        background: white;
+      }
+    }
+  }
+}

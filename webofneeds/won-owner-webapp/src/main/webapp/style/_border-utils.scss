@@ -1,7 +1,0 @@
-@import "won-config";
-
-@mixin thin-border() {
-  border-style: solid;
-  border-width: $thinBorderWidth;
-  border-color: $won-line-gray;
-}

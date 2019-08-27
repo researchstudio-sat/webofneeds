@@ -5,33 +5,33 @@ won-workflow-viewer {
   @include won-detail-viewer("workflowv");
 
   .workflowv__content {
-    width: 100%;
     display: grid;
-    grid-template-rows: min-content 1fr;
-    border: $thinGrayBorder;
-    border-radius: 0.19rem;
-    background: $won-lighter-gray;
     grid-gap: 0.25rem;
-    padding: 0.25rem;
-    justify-items: center;
 
-    .workflowv__content__diagram {
-      grid-row: 2 / span 1;
-      height: 20rem;
-      max-width: 100%;
-      overflow-y: auto;
-      overflow-x: hidden;
-      width: 100%;
-    }
+    .workflowv__content__download {
+      display: grid;
+      grid-template-columns: min-content 1fr;
+      border: $thinGrayBorder;
+      border-radius: 0.19rem;
+      background: $won-lighter-gray;
+      grid-gap: 0.25rem;
+      padding: 0.25rem;
+      justify-items: center;
+      align-items: center;
 
-    .workflowv__content__label {
-      grid-row: 1 / span 1;
-      font-size: $smallFontSize;
-      color: $won-primary-text-color;
-      text-overflow: ellipsis;
-      overflow: hidden;
-      max-width: 100%;
-      white-space: nowrap;
+      .workflowv__content__download__label {
+        font-size: $smallFontSize;
+        color: $won-line-gray;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+      }
+
+      .workflowv__content__download__typeicon {
+        height: 2rem;
+        width: 2rem;
+        --local-primary: #{$won-line-gray};
+      }
     }
   }
 }

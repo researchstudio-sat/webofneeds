@@ -9,7 +9,6 @@ import { delay, get, getIn, sortByDate } from "../utils.js";
 import { attach, classOnComponentRoot } from "../cstm-ng-utils.js";
 import { connect2Redux } from "../configRedux.js";
 import { actionCreators } from "../actions/actions.js";
-import postMessagesModule from "../components/post-messages.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as viewSelectors from "../redux/selectors/view-selectors.js";
 import * as processUtils from "../redux/utils/process-utils.js";
@@ -17,6 +16,7 @@ import * as wonLabelUtils from "../won-label-utils.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as useCaseUtils from "../usecase-utils.js";
 import WonAtomCardGrid from "../components/atom-card-grid.jsx";
+import WonAtomMessages from "../components/atom-messages.jsx";
 import { h } from "preact";
 
 import "~/style/_overview.scss";
@@ -30,7 +30,11 @@ const template = (
       className="won-modal-connectionview"
       ng-if="self.showConnectionOverlay"
     >
-      <won-post-messages connection-uri="self.viewConnUri" />
+      <won-preact
+        component="self.WonAtomMessages"
+        props="{connectionUri: self.viewConnUri}"
+        className="atomMessages"
+      />
     </div>
     <won-topnav page-title="::'What\'s New'" />
     <won-menu ng-if="self.isLoggedIn" />
@@ -168,6 +172,7 @@ class Controller {
     this.open = [];
 
     this.WonAtomCardGrid = WonAtomCardGrid;
+    this.WonAtomMessages = WonAtomMessages;
 
     const selectFromState = state => {
       const viewConnUri = generalSelectors.getViewConnectionUriFromRoute(state);
@@ -325,7 +330,7 @@ Controller.$inject = serviceDependencies;
 
 export default {
   module: angular
-    .module("won.owner.components.overview", [ngAnimate, postMessagesModule])
+    .module("won.owner.components.overview", [ngAnimate])
     .controller("OverviewController", Controller).name,
   controller: "OverviewController",
   template: template,

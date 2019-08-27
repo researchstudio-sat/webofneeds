@@ -1,0 +1,83 @@
+@import "won-config";
+@import "animate";
+@import "sizing-utils";
+
+won-atom-share-link {
+  .asl__content {
+    border-top: $thinGrayBorder;
+
+    .asl__info,
+    .asl__text {
+      font-size: $smallFontSize;
+    }
+
+    .asl__text {
+      padding: 0.25rem 0;
+    }
+
+    .asl__info {
+      padding-top: 0.25rem;
+    }
+  }
+  .asl__tabs {
+    display: grid;
+    grid-gap: 0.25rem;
+    grid-template-columns: min-content min-content;
+
+    .asl__tabs__tab {
+      white-space: nowrap;
+      padding: 0.25rem 0.5rem;
+
+      &:hover {
+        background: white;
+      }
+
+      &--selected {
+        background: white;
+        color: $won-primary-color;
+      }
+    }
+  }
+
+  .asl__link {
+    background: white;
+    padding: 0.5rem;
+
+    .asl__link__copyfield {
+      display: flex;
+
+      .asl__link__copyfield__input {
+        width: 100%;
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+        border-right: none;
+        padding: 0.25rem;
+        font-size: $smallFontSize;
+      }
+
+      .asl__link__copyfield__copy-button {
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+        width: 1.5rem;
+        padding: 0.25rem 1.5rem;
+      }
+
+      .asl__link__copyfield__copy-button__icon {
+        --local-primary: white;
+        @include fixed-square(1.25rem);
+      }
+    }
+  }
+
+  .asl__qrcode {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: white;
+    padding: 0.5rem;
+
+    &__code {
+      height: 10rem;
+    }
+  }
+}

@@ -3,140 +3,118 @@
  */
 import React from "react";
 import { get, getIn } from "../utils.js";
-import { actionCreators } from "../actions/actions.js";
 
 import * as processUtils from "../redux/utils/process-utils.js";
 import * as atomUtils from "../redux/utils/atom-utils";
 import PropTypes from "prop-types";
+import { connect } from "react-redux";
 
-export default class WonAtomIcon extends React.Component {
-  componentDidMount() {
-    this.atomUri = this.props.atomUri;
-    this.disconnect = this.props.ngRedux.connect(
-      this.selectFromState.bind(this),
-      actionCreators
-    )(state => {
-      this.setState(state);
-    });
-  }
+const mapStateToProps = (state, ownProps) => {
+  const atom = getIn(state, ["atoms", ownProps.atomUri]);
+  const isPersona = atomUtils.isPersona(atom);
+  const image = isPersona ? atomUtils.getDefaultPersonaImage(atom) : undefined;
 
-  componentWillUnmount() {
-    this.disconnect();
-  }
+  const useCaseIcon = !isPersona
+    ? atomUtils.getMatchedUseCaseIcon(atom)
+    : undefined;
+  const useCaseIconBackground = !isPersona
+    ? atomUtils.getBackground(atom)
+    : undefined;
 
-  UNSAFE_componentWillReceiveProps(nextProps) {
-    this.atomUri = nextProps.atomUri;
-    this.setState(this.selectFromState(this.props.ngRedux.getState()));
-  }
+  const identiconSvg = !useCaseIcon
+    ? atomUtils.getIdenticonSvg(atom)
+    : undefined;
 
-  selectFromState(state) {
-    const atom = getIn(state, ["atoms", this.atomUri]);
-    const isPersona = atomUtils.isPersona(atom);
-    const image = isPersona && atomUtils.getDefaultPersonaImage(atom);
+  // Icons/Images of the AtomHolder
+  const personaUri = atomUtils.getHeldByUri(atom);
+  const persona = getIn(state, ["atoms", personaUri]);
+  const holderImage = atomUtils.getDefaultPersonaImage(persona);
+  const holderIdenticonSvg = atomUtils.getIdenticonSvg(persona);
+  const showHolderIdenticon = !holderImage && !!holderIdenticonSvg;
+  const showHolderImage = holderImage;
 
-    const useCaseIcon = !isPersona
-      ? atomUtils.getMatchedUseCaseIcon(atom)
-      : undefined;
-    const useCaseIconBackground = !isPersona
-      ? atomUtils.getBackground(atom)
-      : undefined;
+  const process = get(state, "process");
+  return {
+    className: ownProps.className,
+    onClick: ownProps.onClick,
+    isPersona,
+    atomImage: isPersona ? atomUtils.getDefaultPersonaImage(atom) : undefined,
+    atomInactive: atomUtils.isInactive(atom),
+    atomFailedToLoad:
+      atom && processUtils.hasAtomFailedToLoad(process, ownProps.atomUri),
+    useCaseIcon,
+    useCaseIconBackground,
+    showIdenticon: !image && !!identiconSvg,
+    showImage: !!image,
+    identiconSvg,
+    image,
+    showHolderIdenticon,
+    showHolderImage,
+    holderImage,
+    holderIdenticonSvg,
+  };
+};
 
-    const identiconSvg = !useCaseIcon
-      ? atomUtils.getIdenticonSvg(atom)
-      : undefined;
-
-    // Icons/Images of the AtomHolder
-    const personaUri = atomUtils.getHeldByUri(atom);
-    const persona = getIn(state, ["atoms", personaUri]);
-    const holderImage = atomUtils.getDefaultPersonaImage(persona);
-    const holderIdenticonSvg = atomUtils.getIdenticonSvg(persona);
-    const showHolderIdenticon = !holderImage && holderIdenticonSvg;
-    const showHolderImage = holderImage;
-
-    const process = get(state, "process");
-    return {
-      isPersona,
-      atomImage: isPersona && atomUtils.getDefaultPersonaImage(atom),
-      atomInactive: atomUtils.isInactive(atom),
-      atomFailedToLoad:
-        atom && processUtils.hasAtomFailedToLoad(process, this.uri),
-      useCaseIcon,
-      useCaseIconBackground,
-      showIdenticon: !image && identiconSvg,
-      showImage: image,
-      identiconSvg,
-      image,
-      showHolderIdenticon,
-      showHolderImage,
-      holderImage,
-      holderIdenticonSvg,
-    };
-  }
-
+class WonAtomIcon extends React.Component {
   render() {
-    if (!this.state) {
-      console.debug("render with null state");
-      return <div />;
-    }
-
     let holderIcon = undefined;
     let atomIcon = undefined;
 
-    if (this.state.showHolderIdenticon) {
+    if (this.props.showHolderIdenticon) {
       holderIcon = (
         <img
           className="holderIcon"
           alt="Auto-generated title image for persona that holds the atom"
-          src={"data:image/svg+xml;base64," + this.state.holderIdenticonSvg}
+          src={"data:image/svg+xml;base64," + this.props.holderIdenticonSvg}
         />
       );
-    } else if (this.state.showHolderImage) {
+    } else if (this.props.showHolderImage) {
       holderIcon = (
         <img
           className="holderIcon"
-          alt={this.state.holderImage.get("name")}
+          alt={this.props.holderImage.get("name")}
           src={
             "data:" +
-            this.state.holderImage.get("type") +
+            this.props.holderImage.get("type") +
             ";base64," +
-            this.state.holderImage.get("data")
+            this.props.holderImage.get("data")
           }
         />
       );
     }
 
-    if (this.state.showIdenticon) {
+    if (this.props.showIdenticon) {
       atomIcon = (
         <img
           className="image"
           alt="Auto-generated title icon"
-          src={"data:image/svg+xml;base64," + this.state.identiconSvg}
+          src={"data:image/svg+xml;base64," + this.props.identiconSvg}
         />
       );
-    } else if (this.state.showImage) {
+    } else if (this.props.showImage) {
       atomIcon = (
         <img
           className="image"
-          alt={this.state.image.get("name")}
+          alt={this.props.image.get("name")}
           src={
             "data:" +
-            this.state.image.get("type") +
+            this.props.image.get("type") +
             ";base64," +
-            this.state.image.get("data")
+            this.props.image.get("data")
           }
         />
       );
-    } else if (this.state.useCaseIcon) {
+    } else if (this.props.useCaseIcon) {
       const style = {
-        backgroundColor: this.state.useCaseIconBackground,
+        backgroundColor: this.props.useCaseIconBackground,
       };
 
       atomIcon = (
         <div className="image usecaseimage" style={style}>
           <svg className="si__usecaseicon">
             <use
-              xlinkHref={this.state.useCaseIcon}
-              href={this.state.useCaseIcon}
+              xlinkHref={this.props.useCaseIcon}
+              href={this.props.useCaseIcon}
             />
           </svg>
         </div>
@@ -146,10 +124,14 @@ export default class WonAtomIcon extends React.Component {
     return (
       <won-atom-icon
         class={
-          (this.state.isPersona ? " won-is-persona " : "") +
-          (this.state.atomFailedToLoad ? " won-failed-to-load " : "") +
-          (this.state.atomInactive ? " inactive " : "")
+          (this.props.className ? this.props.className : "") +
+          " " +
+          (this.props.isPersona ? " won-is-persona " : "") +
+          (this.props.atomFailedToLoad ? " won-failed-to-load " : "") +
+          (this.props.atomInactive ? " inactive " : "") +
+          (this.props.onClick ? " clickable " : "")
         }
+        onClick={this.props.onClick}
       >
         {atomIcon}
         {holderIcon}
@@ -159,5 +141,22 @@ export default class WonAtomIcon extends React.Component {
 }
 WonAtomIcon.propTypes = {
   atomUri: PropTypes.string.isRequired,
-  ngRedux: PropTypes.object.isRequired,
+  className: PropTypes.string,
+  onClick: PropTypes.func,
+  isPersona: PropTypes.bool,
+  atomImage: PropTypes.object,
+  atomInactive: PropTypes.bool,
+  atomFailedToLoad: PropTypes.bool,
+  useCaseIcon: PropTypes.string,
+  useCaseIconBackground: PropTypes.string,
+  showIdenticon: PropTypes.bool,
+  showImage: PropTypes.bool,
+  identiconSvg: PropTypes.string,
+  image: PropTypes.object,
+  showHolderIdenticon: PropTypes.bool,
+  showHolderImage: PropTypes.bool,
+  holderImage: PropTypes.object,
+  holderIdenticonSvg: PropTypes.string,
 };
+
+export default connect(mapStateToProps)(WonAtomIcon);

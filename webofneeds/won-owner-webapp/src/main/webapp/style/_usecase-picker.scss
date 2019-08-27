@@ -11,11 +11,6 @@ won-usecase-picker {
   box-sizing: border-box;
   padding: $gridRowGap;
 
-  /*
-  &.create-post-mobile {
-    grid-template-rows: min-content minmax($mobileGridRows, 1fr) min-content;
-  }*/
-
   & .clickable,
   & button {
     transform: translate3d(0, 0, 0);

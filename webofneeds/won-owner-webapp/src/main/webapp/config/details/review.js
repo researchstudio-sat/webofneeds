@@ -3,14 +3,16 @@
  */
 import { generateIdString } from "../../app/utils.js";
 import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
+import WonReviewViewer from "../../app/components/details/viewer/review-viewer.jsx";
+import WonReviewPicker from "../../app/components/details/picker/review-picker.jsx";
 
 /*Detail based on https://schema.org/Review*/
 export const review = {
   identifier: "review",
   label: "Review",
   icon: "#ico36_detail_title" /*TODO: REVIEW/RATING ICON*/,
-  component: "won-review-picker",
-  viewerComponent: "won-review-viewer",
+  component: WonReviewPicker,
+  viewerComponent: WonReviewViewer,
   placeholder: "Review Text (optional)",
   rating: [
     { value: undefined, label: "Select a Rating", default: true },

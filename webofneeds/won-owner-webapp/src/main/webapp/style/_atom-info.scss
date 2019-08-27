@@ -1,0 +1,46 @@
+@import "won-config";
+@import "sizing-utils";
+@import "animate";
+
+won-atom-info {
+  display: grid;
+  grid-template-areas: "header" "menu" "main" "footer";
+  grid-template-rows: min-content min-content minmax($minimalGridRows, 1fr) min-content;
+  box-sizing: border-box;
+
+  > won-atom-header-big {
+    grid-area: header;
+  }
+
+  > won-atom-menu {
+    grid-area: menu;
+  }
+
+  > won-atom-content {
+    padding: 0.5rem;
+    box-sizing: border-box;
+    grid-area: main;
+    display: grid;
+  }
+
+  .atom-info__footer {
+    grid-area: footer;
+    display: grid;
+    grid-gap: 0.5rem;
+    padding: 0.5rem;
+    box-sizing: border-box;
+    border-top: $thinGrayBorder;
+
+    &__button {
+      width: 100%;
+
+      > svg.won-button-icon {
+        --local-primary: white;
+      }
+    }
+
+    &__infolabel {
+      text-align: center;
+    }
+  }
+}

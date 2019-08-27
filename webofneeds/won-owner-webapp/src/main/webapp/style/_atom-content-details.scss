@@ -1,0 +1,10 @@
+@import "won-config";
+@import "sizing-utils";
+@import "animate";
+
+won-atom-content-details {
+  display: grid;
+  grid-auto-flow: row;
+  grid-gap: 1rem; /*describes the gap between each content-detail-viewer*/
+  padding: 0.5rem 0;
+}

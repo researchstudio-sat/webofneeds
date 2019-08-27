@@ -1,6 +1,7 @@
 import angular from "angular";
 import { createElement } from "react";
 import { render, unmountComponentAtNode } from "react-dom";
+import { Provider } from "react-redux";
 
 function genComponentConf($ngRedux) {
   return {
@@ -11,16 +12,28 @@ function genComponentConf($ngRedux) {
       onAction: "&",
     },
     link: (scope, element) => {
-      scope.props.ngRedux = $ngRedux;
-      render(createElement(scope.component, scope.props), element[0]);
+      render(
+        createElement(Provider, { store: $ngRedux }, [
+          createElement(scope.component, scope.props),
+        ]),
+        element[0]
+      );
 
       scope.$watch("props", props => {
-        props.ngRedux = $ngRedux;
-        render(createElement(scope.component, props), element[0]);
+        render(
+          createElement(Provider, { store: $ngRedux }, [
+            createElement(scope.component, props),
+          ]),
+          element[0]
+        );
       });
       scope.$watch("component", component => {
-        scope.props.ngRedux = $ngRedux;
-        render(createElement(component, scope.props), element[0]);
+        render(
+          createElement(Provider, { store: $ngRedux }, [
+            createElement(component, scope.props),
+          ]),
+          element[0]
+        );
       });
       scope.$on("$destroy", () => {
         unmountComponentAtNode(element[0]);

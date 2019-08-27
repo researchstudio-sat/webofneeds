@@ -3,14 +3,18 @@ import * as wonUtils from "../../app/won-utils.js";
 import Immutable from "immutable";
 import won from "../../app/won-es6.js";
 import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
+import WonLocationViewer from "../../app/components/details/viewer/location-viewer.jsx";
+import WonTravelActionViewer from "../../app/components/details/viewer/travel-action-viewer.jsx";
+import WonLocationPicker from "../../app/components/details/picker/location-picker.jsx";
+import WonTravelActionPicker from "../../app/components/details/picker/travel-action-picker.jsx";
 
 export const location = {
   identifier: "location",
   label: "Location",
   icon: "#ico36_detail_location",
   placeholder: "Search for location",
-  component: "won-location-picker",
-  viewerComponent: "won-location-viewer",
+  component: WonLocationPicker,
+  viewerComponent: WonLocationViewer,
   messageEnabled: true,
   overrideAddressDetail: {
     placeholder:
@@ -43,9 +47,13 @@ export const jobLocation = {
   label: "Job Location",
   placeholder: "Search for location",
   icon: "#ico36_detail_location",
-  component: "won-location-picker",
-  viewerComponent: "won-location-viewer",
+  component: WonLocationPicker,
+  viewerComponent: WonLocationViewer,
   messageEnabled: true,
+  overrideAddressDetail: {
+    placeholder:
+      "Alternative Address name (e.g. if doornumber should be included)",
+  },
   parseToRDF: function({ value, identifier, contentUri }) {
     return {
       "s:jobLocation": genSPlace({
@@ -74,8 +82,8 @@ export const travelAction = {
     departure: "Start location",
     destination: "Destination",
   },
-  component: "won-travel-action-picker",
-  viewerComponent: "won-travel-action-viewer",
+  component: WonTravelActionPicker,
+  viewerComponent: WonTravelActionViewer,
   messageEnabled: true,
   parseToRDF: function({ value, identifier, contentUri }) {
     if (!value) {

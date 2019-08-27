@@ -2,9 +2,9 @@
 
 import angular from "angular";
 import ngAnimate from "angular-animate";
-import postMessagesModule from "../components/post-messages.js";
-import groupPostMessagesModule from "../components/group-post-messages.js";
 import WonConnectionsOverview from "../components/connections-overview.jsx";
+import WonAtomMessages from "../components/atom-messages.jsx";
+import WonGroupAtomMessages from "../components/group-atom-messages.jsx";
 import { get, getIn } from "../utils.js";
 import { attach, classOnComponentRoot } from "../cstm-ng-utils.js";
 import { actionCreators } from "../actions/actions.js";
@@ -26,7 +26,11 @@ const template = (
       className="won-modal-connectionview"
       ng-if="self.showConnectionOverlay"
     >
-      <won-post-messages connection-uri="self.viewConnUri" />
+      <won-preact
+        component="self.WonAtomMessages"
+        props="{connectionUri: self.viewConnUri}"
+        className="atomMessages"
+      />
     </div>
     <won-topnav page-title="::'Chats'" />
     <won-menu ng-if="self.isLoggedIn" />
@@ -61,8 +65,18 @@ const template = (
       </div>
     </main>
     <main className="overview__right" ng-if="self.showContentSide">
-      <won-post-messages ng-if="self.showPostMessages" />
-      <won-group-post-messages ng-if="self.showGroupPostMessages" />
+      <won-preact
+        component="self.WonAtomMessages"
+        ng-if="self.showPostMessages"
+        props="{}"
+        className="atomMessages"
+      />
+      <won-preact
+        component="self.WonGroupAtomMessages"
+        ng-if="self.showGroupPostMessages"
+        props="{}"
+        className="groupAtomMessages"
+      />
     </main>
     <main className="overview__nochats" ng-if="!self.showListSide">
       <div className="overview__nochats__empty">
@@ -86,6 +100,8 @@ class ConnectionsController {
   constructor() {
     attach(this, serviceDependencies, arguments);
     this.WonConnectionsOverview = WonConnectionsOverview;
+    this.WonAtomMessages = WonAtomMessages;
+    this.WonGroupAtomMessages = WonGroupAtomMessages;
 
     const selectFromState = state => {
       const viewConnUri = generalSelectors.getViewConnectionUriFromRoute(state);
@@ -162,11 +178,7 @@ ConnectionsController.$inject = [];
 
 export default {
   module: angular
-    .module("won.owner.components.connections", [
-      ngAnimate,
-      postMessagesModule,
-      groupPostMessagesModule,
-    ])
+    .module("won.owner.components.connections", [ngAnimate])
     .controller("ConnectionsController", [
       ...serviceDependencies,
       ConnectionsController,

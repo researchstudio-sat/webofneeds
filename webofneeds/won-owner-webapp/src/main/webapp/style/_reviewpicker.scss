@@ -8,45 +8,6 @@ won-review-picker {
     display: grid;
     grid-template-columns: 1fr auto;
 
-    &__reset {
-      position: relative;
-
-      &__icon {
-        @include fixed-square($bigiconSize);
-        position: absolute;
-        right: 0;
-        top: 0.5rem;
-      }
-    }
-
-    .reviewp__input__inner {
-      @extend .won-txt;
-      border: $thinGrayBorder;
-
-      @include textfieldPadding(
-        $normalFontSize,
-        22/16,
-        $thinBorderWidth,
-        $formInputHeight
-      );
-      word-wrap: break-word;
-
-      &:invalid {
-        /*TODO: Define styling for invalid input field*/
-      }
-
-      &.reviewp__input__inner--withreset {
-        $verticalPadding: calcVerticalPaddingToHeight(
-          $normalFontSize,
-          22/16,
-          $thinBorderWidth,
-          $formInputHeight
-        );
-        padding: $verticalPadding 0.438rem + $bigiconSize $verticalPadding
-          0.438rem;
-      }
-    }
-
     .reviewp__input__rating {
       grid-column: 1 / span 2;
       border: $thinGrayBorder;

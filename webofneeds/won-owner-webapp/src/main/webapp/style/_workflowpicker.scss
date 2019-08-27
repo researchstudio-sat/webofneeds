@@ -19,14 +19,13 @@ won-workflow-picker {
     padding: 0.25rem;
     justify-items: center;
 
-    .workflowp__preview__diagram {
+    .workflowp__preview__typeicon {
       grid-row: 2 / span 1;
       grid-column: 1 / span 2;
-      height: 20rem;
+      height: 5rem;
       max-width: 100%;
-      overflow-y: auto;
-      overflow-x: hidden;
       width: 100%;
+      --local-primary: #{$won-line-gray};
     }
 
     .workflowp__preview__label {

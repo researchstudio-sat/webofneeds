@@ -9,54 +9,31 @@ import React from "react";
 import PropTypes from "prop-types";
 import { labels } from "../won-label-utils.js";
 import { get, getIn } from "../utils.js";
-import { actionCreators } from "../actions/actions.js";
+import { connect } from "react-redux";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 
 import * as connectionUtils from "../redux/utils/connection-utils.js";
 import won from "../won-es6";
 
-export default class WonConnectionState extends React.Component {
-  componentDidMount() {
-    this.connectionUri = this.props.connectionUri;
-    this.disconnect = this.props.ngRedux.connect(
-      this.selectFromState.bind(this),
-      actionCreators
-    )(state => {
-      this.setState(state);
-    });
-  }
+const mapStateToProps = (state, ownProps) => {
+  const atom = generalSelectors.getOwnedAtomByConnectionUri(
+    state,
+    ownProps.connectionUri
+  );
+  const connection = getIn(atom, ["connections", ownProps.connectionUri]);
 
-  componentWillUnmount() {
-    this.disconnect();
-  }
+  return {
+    connectionUri: ownProps.connectionUri,
+    connectionState: get(connection, "state"),
+    unread: connectionUtils.isUnread(connection),
+  };
+};
 
-  UNSAFE_componentWillReceiveProps(nextProps) {
-    this.connectionUri = nextProps.connectionUri;
-    this.setState(this.selectFromState(this.props.ngRedux.getState()));
-  }
-
-  selectFromState(state) {
-    const atom = generalSelectors.getOwnedAtomByConnectionUri(
-      state,
-      this.connectionUri
-    );
-    const connection = getIn(atom, ["connections", this.connectionUri]);
-
-    return {
-      connectionState: get(connection, "state"),
-      unread: connectionUtils.isUnread(connection),
-    };
-  }
-
+class WonConnectionState extends React.Component {
   render() {
-    if (!this.state) {
-      console.debug("render with null state");
-      return <div />;
-    }
-
     let icon;
 
-    switch (this.state.connectionState) {
+    switch (this.props.connectionState) {
       case won.WON.Suggested:
         icon = <use xlinkHref="#ico36_match" href="#ico36_match" />;
         break;
@@ -81,16 +58,18 @@ export default class WonConnectionState extends React.Component {
       <won-connection-state>
         <div
           className="cs__state"
-          title={labels.connectionState[this.state.connectionState]}
+          title={labels.connectionState[this.props.connectionState]}
         >
-          <svg
-            className={
-              "cs__state__icon " + (this.state.unread ? " won-unread " : "")
-            }
-            ng-if="self.unread && self.state === self.WON.Suggested"
-          >
-            {icon}
-          </svg>
+          {this.props.unread &&
+            this.props.connectionState === won.WON.Suggested && (
+              <svg
+                className={
+                  "cs__state__icon " + (this.props.unread ? " won-unread " : "")
+                }
+              >
+                {icon}
+              </svg>
+            )}
         </div>
       </won-connection-state>
     );
@@ -98,5 +77,8 @@ export default class WonConnectionState extends React.Component {
 }
 WonConnectionState.propTypes = {
   connectionUri: PropTypes.string.isRequired,
-  ngRedux: PropTypes.object.isRequired,
+  connectionState: PropTypes.string,
+  unread: PropTypes.bool,
 };
+
+export default connect(mapStateToProps)(WonConnectionState);

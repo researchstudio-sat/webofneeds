@@ -1,6 +1,9 @@
 import { generateIdString } from "../../app/utils.js";
 import Immutable from "immutable";
 import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
+import WonPriceViewer from "../../app/components/details/viewer/price-viewer.jsx";
+import WonPricePicker from "../../app/components/details/picker/price-picker.jsx";
+import WonPriceRangePicker from "../../app/components/details/picker/price-range-picker.jsx";
 
 export const pricerange = {
   identifier: "pricerange",
@@ -22,8 +25,8 @@ export const pricerange = {
     { value: "HUR", label: "per hour" },
     { value: "", label: "total", default: true },
   ],
-  component: "won-price-range-picker",
-  viewerComponent: "won-price-viewer",
+  component: WonPriceRangePicker,
+  viewerComponent: WonPriceViewer,
   messageEnabled: true,
   parseToRDF: function({ value, identifier, contentUri }) {
     if (
@@ -146,8 +149,8 @@ export const price = {
   label: "Price",
   icon: "#ico36_detail_price",
   placeholder: "Enter Price...",
-  component: "won-price-picker",
-  viewerComponent: "won-price-viewer",
+  component: WonPricePicker,
+  viewerComponent: WonPriceViewer,
   currency: [
     { value: "EUR", label: "€", default: true },
     { value: "USD", label: "$" },

@@ -5,62 +5,48 @@ import React from "react";
 import VisibilitySensor from "react-visibility-sensor";
 import { get, getIn } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
+import { connect } from "react-redux";
 
 import "~/style/_skeleton-card.scss";
 import * as processUtils from "../../redux/utils/process-utils.js";
 import WonAtomSuggestionsIndicator from "../atom-suggestions-indicator.jsx";
 import PropTypes from "prop-types";
 
-export default class WonSkeletonCard extends React.Component {
-  componentDidMount() {
-    this.atomUri = this.props.atomUri;
-    this.disconnect = this.props.ngRedux.connect(
-      this.selectFromState.bind(this),
-      actionCreators
-    )(state => {
-      this.setState(state);
-    });
-  }
+const mapStateToProps = (state, ownProps) => {
+  const atom = getIn(state, ["atoms", ownProps.atomUri]);
+  const process = get(state, "process");
 
-  componentWillUnmount() {
-    this.disconnect();
-  }
+  const atomInCreation = get(atom, "isBeingCreated");
+  const atomLoaded =
+    processUtils.isAtomLoaded(process, ownProps.atomUri) && !atomInCreation;
+  const atomLoading = processUtils.isAtomLoading(process, ownProps.atomUri);
+  const atomToLoad = processUtils.isAtomToLoad(process, ownProps.atomUri);
+  const atomFailedToLoad = processUtils.hasAtomFailedToLoad(
+    process,
+    ownProps.atomUri
+  );
 
-  UNSAFE_componentWillReceiveProps(nextProps) {
-    this.atomUri = nextProps.atomUri;
-    this.setState(this.selectFromState(this.props.ngRedux.getState()));
-  }
+  return {
+    atomUri: ownProps.atomUri,
+    atomLoaded,
+    atomLoading,
+    atomInCreation,
+    atomToLoad,
+    atomFailedToLoad,
+  };
+};
 
-  selectFromState(state) {
-    const atom = getIn(state, ["atoms", this.atomUri]);
-    const process = get(state, "process");
+const mapDispatchToProps = dispatch => {
+  return {
+    fetchAtom: uri => {
+      dispatch(actionCreators.atoms__fetchUnloadedAtom(uri));
+    },
+  };
+};
 
-    const atomInCreation = get(atom, "isBeingCreated");
-    const atomLoaded =
-      processUtils.isAtomLoaded(process, this.atomUri) && !atomInCreation;
-    const atomLoading = processUtils.isAtomLoading(process, this.atomUri);
-    const atomToLoad = processUtils.isAtomToLoad(process, this.atomUri);
-    const atomFailedToLoad = processUtils.hasAtomFailedToLoad(
-      process,
-      this.atomUri
-    );
-
-    return {
-      atomLoaded,
-      atomLoading,
-      atomInCreation,
-      atomToLoad,
-      atomFailedToLoad,
-    };
-  }
-
+class WonSkeletonCard extends React.Component {
   render() {
-    if (!this.state) {
-      console.debug("render with null state");
-      return <div />;
-    }
-
-    const cardIconSkeleton = !this.state.atomLoaded ? (
+    const cardIconSkeleton = !this.props.atomLoaded ? (
       <VisibilitySensor
         onChange={isVisible => {
           this.onChange(isVisible);
@@ -75,7 +61,7 @@ export default class WonSkeletonCard extends React.Component {
       undefined
     );
 
-    const cardMainFailed = this.state.atomFailedToLoad ? (
+    const cardMainFailed = this.props.atomFailedToLoad ? (
       <div className="card__main">
         <div className="card__main__topline">
           <div className="card__main__topline__notitle">
@@ -93,9 +79,9 @@ export default class WonSkeletonCard extends React.Component {
     );
 
     const cardMain =
-      this.state.atomLoading ||
-      this.state.atomToLoad ||
-      this.state.atomInCreation ? (
+      this.props.atomLoading ||
+      this.props.atomToLoad ||
+      this.props.atomInCreation ? (
         <div className="card__main">
           <div className="card__main__topline">
             <div className="card__main__topline__title" />
@@ -109,17 +95,14 @@ export default class WonSkeletonCard extends React.Component {
       );
 
     const cardPersona =
-      this.props.showPersona && !this.state.atomLoaded ? (
+      this.props.showPersona && !this.props.atomLoaded ? (
         <div className="card__nopersona" />
       ) : (
         undefined
       );
 
     const cardSuggestions = this.props.showSuggestions ? (
-      <WonAtomSuggestionsIndicator
-        atomUri={this.atomUri}
-        ngRedux={this.props.ngRedux}
-      />
+      <WonAtomSuggestionsIndicator atomUri={this.props.atomUri} />
     ) : (
       undefined
     );
@@ -127,9 +110,9 @@ export default class WonSkeletonCard extends React.Component {
     return (
       <won-skeleton-card
         class={
-          (this.state.atomLoading || this.state.atomInCreation
+          (this.props.atomLoading || this.props.atomInCreation
             ? " won-is-loading "
-            : "") + (this.state.atomToLoad ? "won-is-toload" : "")
+            : "") + (this.props.atomToLoad ? "won-is-toload" : "")
         }
       >
         {cardIconSkeleton}
@@ -143,16 +126,14 @@ export default class WonSkeletonCard extends React.Component {
 
   ensureAtomIsLoaded() {
     if (
-      this.state &&
-      this.atomUri &&
-      !this.state.atomLoaded &&
-      !this.state.atomLoading &&
-      !this.state.atomInCreation &&
-      this.state.atomToLoad
+      this.props &&
+      this.props.atomUri &&
+      !this.props.atomLoaded &&
+      !this.props.atomLoading &&
+      !this.props.atomInCreation &&
+      this.props.atomToLoad
     ) {
-      this.props.ngRedux.dispatch(
-        actionCreators.atoms__fetchUnloadedAtom(this.atomUri)
-      );
+      this.props.fetchAtom(this.props.atomUri);
     }
   }
 
@@ -166,5 +147,15 @@ WonSkeletonCard.propTypes = {
   atomUri: PropTypes.string.isRequired,
   showPersona: PropTypes.bool,
   showSuggestions: PropTypes.bool,
-  ngRedux: PropTypes.object.isRequired,
+  atomLoaded: PropTypes.bool,
+  atomLoading: PropTypes.bool,
+  atomInCreation: PropTypes.bool,
+  atomToLoad: PropTypes.bool,
+  atomFailedToLoad: PropTypes.bool,
+  fetchAtom: PropTypes.func,
 };
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(WonSkeletonCard);

@@ -1,35 +1,36 @@
-import won from "./won-es6.js";
 import { deepFreeze, isValidNumber } from "./utils.js";
 
 export const labels = deepFreeze({
+  //FIXME: USE THE CONSTANTS FROM won.js again, but be aware that that might causes a cyclic dependency we need to extract this away from won-es6.js or won.js
   connectionState: {
-    [won.WON.Suggested]: "Conversation suggested.",
-    [won.WON.RequestSent]: "Conversation requested by you.",
-    [won.WON.RequestReceived]: "Conversation requested.",
-    [won.WON.Connected]: "Conversation open.",
-    [won.WON.Closed]: "Conversation closed.",
+    ["https://w3id.org/won/core#Suggested"]: "Conversation suggested.",
+    ["https://w3id.org/won/core#RequestSent"]: "Conversation requested by you.",
+    ["https://w3id.org/won/core#RequestReceived"]: "Conversation requested.",
+    ["https://w3id.org/won/core#Connected"]: "Conversation open.",
+    ["https://w3id.org/won/core#Closed"]: "Conversation closed.",
   },
   messageType: {
-    [won.WONMSG.connectMessage]: "Contact Request",
-    [won.WONMSG.openMessage]: "Accepted Contact Request",
-    [won.WONMSG.closeMessage]: "Close Message",
-    [won.WONMSG.connectionMessage]: "Chat Message",
-    [won.WONMSG.atomHintMessage]: "Atom Hint Message",
-    [won.WONMSG.socketHintMessage]: "Socket Hint Message",
-    [won.WONMSG.hintFeedbackMessage]: "Hint Feedback Message",
+    ["https://w3id.org/won/message#ConnectMessage"]: "Contact Request",
+    ["https://w3id.org/won/message#OpenMessage"]: "Accepted Contact Request",
+    ["https://w3id.org/won/message#CloseMessage"]: "Close Message",
+    ["https://w3id.org/won/message#ConnectionMessage"]: "Chat Message",
+    ["https://w3id.org/won/message#AtomHintMessage"]: "Atom Hint Message",
+    ["https://w3id.org/won/message#SocketHintMessage"]: "Socket Hint Message",
+    ["https://w3id.org/won/message#HintFeedbackMessage"]:
+      "Hint Feedback Message",
   },
   flags: {
-    [won.WONMATCH.NoHintForCounterpartCompacted]: "Invisible",
-    [won.WONMATCH.NoHintForMeCompacted]: "Silent",
-    [won.WONMATCH.UsedForTestingCompacted]: "Used For Testing",
+    ["match:NoHintForCounterpart"]: "Invisible",
+    ["match:NoHintForMeCompacted"]: "Silent",
+    ["match:UsedForTestingCompacted"]: "Used For Testing",
   },
   sockets: {
-    [won.GROUP.GroupSocketCompacted]: "Group Chat enabled",
-    [won.CHAT.ChatSocketCompacted]: "Chat enabled",
-    [won.HOLD.HoldableSocketCompacted]: "Holdable",
-    [won.HOLD.HolderSocketCompacted]: "Holder",
-    [won.REVIEW.ReviewSocketCompacted]: "Review enabled",
-    [won.BUDDY.BuddySocketCompacted]: "Buddy",
+    ["group:GroupSocket"]: "Group Chat enabled",
+    ["chat:ChatSocket"]: "Chat enabled",
+    ["hold:HoldableSocket"]: "Holdable",
+    ["hold:HolderSocket"]: "Holder",
+    ["review:ReviewSocket"]: "Review enabled",
+    ["buddy:BuddySocket"]: "Buddy",
   },
 });
 

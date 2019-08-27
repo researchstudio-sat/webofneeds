@@ -10,8 +10,8 @@ import { connect2Redux } from "../configRedux.js";
 import won from "../won-es6.js";
 
 import { actionCreators } from "../actions/actions.js";
-import postMessagesModule from "../components/post-messages.js";
-import groupPostMessagesModule from "../components/group-post-messages.js";
+import WonAtomInfo from "../components/atom-info.jsx";
+import WonAtomMessages from "../components/atom-messages.jsx";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as viewSelectors from "../redux/selectors/view-selectors.js";
 import * as processUtils from "../redux/utils/process-utils.js";
@@ -28,16 +28,22 @@ const template = (
       className="won-modal-connectionview"
       ng-if="self.showConnectionOverlay"
     >
-      <won-post-messages connection-uri="self.viewConnUri" />
+      <won-preact
+        component="self.WonAtomMessages"
+        props="{connectionUri: self.viewConnUri}"
+        className="atomMessages"
+      />
     </div>
     <won-topnav page-title="self.atomTitle" />
     <won-menu ng-if="self.isLoggedIn" />
     <won-toasts />
     <won-slide-in ng-if="self.showSlideIns" />
     <main className="postcontent">
-      <won-post-info
+      <won-preact
+        class="atomInfo"
+        component="self.WonAtomInfo"
+        props="{atomUri: self.atomUri}"
         ng-if="!(self.atomLoading || self.atomFailedToLoad) && self.atom"
-        atom-uri="self.atomUri"
       />
       <div className="pc__loading" ng-if="self.atomLoading">
         <svg className="pc__loading__spinner hspinner">
@@ -75,6 +81,8 @@ class Controller {
     attach(this, serviceDependencies, arguments);
     window.p4dbg = this;
     this.WON = won.WON;
+    this.WonAtomInfo = WonAtomInfo;
+    this.WonAtomMessages = WonAtomMessages;
 
     const selectFromState = state => {
       const atomUri = generalSelectors.getPostUriFromRoute(state);
@@ -134,11 +142,7 @@ Controller.$inject = serviceDependencies;
 
 export default {
   module: angular
-    .module("won.owner.components.post", [
-      ngAnimate,
-      postMessagesModule,
-      groupPostMessagesModule,
-    ])
+    .module("won.owner.components.post", [ngAnimate])
     .controller("PostController", Controller).name,
   controller: "PostController",
   template: template,

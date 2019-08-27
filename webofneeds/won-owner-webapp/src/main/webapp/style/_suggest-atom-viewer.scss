@@ -1,0 +1,32 @@
+@import "sizing-utils";
+@import "won-config";
+
+won-suggest-atom-viewer {
+  @include won-detail-viewer("suggestatomv");
+
+  .suggestatomv__content {
+    & .suggestatomv__content__post {
+      border: $thinGrayBorder;
+      background: $won-light-gray;
+
+      &__actions {
+        border-top: $thinGrayBorder;
+        display: grid;
+        grid-auto-flow: column;
+        grid-gap: 0.5rem;
+        padding: 0.5rem;
+
+        &__button.won-button--outlined.red.thin {
+          font-size: $smallFontSize;
+          padding: 0.5rem;
+        }
+      }
+    }
+    & .suggestatomv__content__info {
+      color: $won-skeleton-color;
+      font-size: $smallFontSize;
+      padding-top: 0.5rem;
+      text-align: center;
+    }
+  }
+}

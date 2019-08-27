@@ -3,80 +3,69 @@
  */
 import React from "react";
 import Immutable from "immutable";
+import PropTypes from "prop-types";
+import { connect } from "react-redux";
 import { actionCreators } from "../actions/actions.js";
 import { getIn } from "../utils.js";
 
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import "~/style/_atom-suggestions-indicator.scss";
-import PropTypes from "prop-types";
 
-export default class WonAtomSuggestionsIndicator extends React.Component {
-  componentDidMount() {
-    this.atomUri = this.props.atomUri;
-    this.disconnect = this.props.ngRedux.connect(
-      this.selectFromState.bind(this),
-      actionCreators
-    )(state => {
-      this.setState(state);
-    });
+const mapStateToProps = (state, ownProps) => {
+  const atom = getIn(state, ["atoms", ownProps.atomUri]);
+  const suggestedConnections = atomUtils.getSuggestedConnections(atom);
+
+  const suggestionsCount = suggestedConnections ? suggestedConnections.size : 0;
+  const unreadSuggestions =
+    suggestedConnections &&
+    suggestedConnections.filter(conn => conn.get("unread"));
+  const unreadSuggestionsCount = unreadSuggestions ? unreadSuggestions.size : 0;
+
+  return {
+    atomUri: ownProps.atomUri,
+    suggestionsCount,
+    unreadSuggestionsCount,
+  };
+};
+
+const mapDispatchToProps = dispatch => {
+  return {
+    routerGo: (path, props) => {
+      dispatch(actionCreators.router__stateGo(path, props));
+    },
+    selectAtomTab: (atomUri, selectTab) => {
+      dispatch(
+        actionCreators.atoms__selectTab(
+          Immutable.fromJS({
+            atomUri: atomUri,
+            selectTab: selectTab,
+          })
+        )
+      );
+    },
+  };
+};
+
+class WonAtomSuggestionsIndicator extends React.Component {
+  constructor(props) {
+    super(props);
+    this.showAtomSuggestions = this.showAtomSuggestions.bind(this);
   }
-
-  componentWillUnmount() {
-    this.disconnect();
-  }
-
-  UNSAFE_componentWillReceiveProps(nextProps) {
-    this.atomUri = nextProps.atomUri;
-    this.setState(this.selectFromState(this.props.ngRedux.getState()));
-  }
-
-  selectFromState(state) {
-    const atom = getIn(state, ["atoms", this.atomUri]);
-    const suggestedConnections = atomUtils.getSuggestedConnections(atom);
-
-    const suggestionsCount = suggestedConnections
-      ? suggestedConnections.size
-      : 0;
-    const unreadSuggestions =
-      suggestedConnections &&
-      suggestedConnections.filter(conn => conn.get("unread"));
-    const unreadSuggestionsCount = unreadSuggestions
-      ? unreadSuggestions.size
-      : 0;
-
-    return {
-      suggestionsCount,
-      unreadSuggestionsCount,
-      hasSuggestions: suggestionsCount > 0,
-      hasUnreadSuggestions: unreadSuggestionsCount > 0,
-    };
-  }
-
   showAtomSuggestions() {
-    this.props.ngRedux.dispatch(
-      actionCreators.atoms__selectTab(
-        Immutable.fromJS({ atomUri: this.atomUri, selectTab: "SUGGESTIONS" })
-      )
-    );
-    this.props.ngRedux.dispatch(
-      actionCreators.router__stateGo("post", { postUri: this.atomUri })
-    );
+    this.props.selectAtomTab(this.props.atomUri, "SUGGESTIONS");
+    this.props.routerGo("post", { postUri: this.props.atomUri });
   }
 
   render() {
-    if (!this.state) {
-      console.debug("render with null state");
-      return <div />;
-    }
     return (
       <won-atom-suggestions-indicator
-        class={!this.state.hasSuggestions ? "won-no-suggestions" : ""}
-        onClick={() => this.showAtomSuggestions()}
+        class={!this.props.suggestionsCount > 0 ? "won-no-suggestions" : ""}
+        onClick={this.showAtomSuggestions}
       >
         <svg
           className={
             "asi__icon " +
-            (this.state.hasUnreadSuggestions
+            (this.props.unreadSuggestionsCount > 0
               ? "asi__icon--unreads"
               : "asi__icon--reads")
           }
@@ -89,9 +78,9 @@ export default class WonAtomSuggestionsIndicator extends React.Component {
           </div>
           <div className="asi__right__subtitle">
             <div className="asi__right__subtitle__label">
-              <span>{this.state.suggestionsCount + " Suggestions"}</span>
-              {this.state.hasUnreadSuggestions ? (
-                <span>{", " + this.state.unreadSuggestionsCount + " new"}</span>
+              <span>{this.props.suggestionsCount + " Suggestions"}</span>
+              {this.props.unreadSuggestionsCount > 0 ? (
+                <span>{", " + this.props.unreadSuggestionsCount + " new"}</span>
               ) : null}
             </div>
           </div>
@@ -102,5 +91,13 @@ export default class WonAtomSuggestionsIndicator extends React.Component {
 }
 WonAtomSuggestionsIndicator.propTypes = {
   atomUri: PropTypes.string.isRequired,
-  ngRedux: PropTypes.object.isRequired,
+  suggestionsCount: PropTypes.number,
+  unreadSuggestionsCount: PropTypes.number,
+  routerGo: PropTypes.func,
+  selectAtomTab: PropTypes.func,
 };
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(WonAtomSuggestionsIndicator);

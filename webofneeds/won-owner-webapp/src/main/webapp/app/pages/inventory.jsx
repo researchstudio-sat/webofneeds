@@ -6,7 +6,6 @@ import { get, getIn, sortByDate } from "../utils.js";
 import { attach, classOnComponentRoot } from "../cstm-ng-utils.js";
 import { connect2Redux } from "../configRedux.js";
 import { actionCreators } from "../actions/actions.js";
-import postMessagesModule from "../components/post-messages.js";
 import howToModule from "../components/howto.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as viewSelectors from "../redux/selectors/view-selectors.js";
@@ -15,6 +14,8 @@ import * as processUtils from "../redux/utils/process-utils.js";
 import * as accountUtils from "../redux/utils/account-utils.js";
 import * as viewUtils from "../redux/utils/view-utils.js";
 import WonAtomCardGrid from "../components/atom-card-grid.jsx";
+import WonAtomInfo from "../components/atom-info.jsx";
+import WonAtomMessages from "../components/atom-messages.jsx";
 
 import { h } from "preact";
 
@@ -28,7 +29,11 @@ const template = (
       className="won-modal-connectionview"
       ng-if="self.showConnectionOverlay"
     >
-      <won-post-messages connection-uri="self.viewConnUri" />
+      <won-preact
+        component="self.WonAtomMessages"
+        props="{connectionUri: self.viewConnUri}"
+        className="atomMessages"
+      />
     </div>
     <won-topnav page-title="::'Inventory'" />
     <won-menu ng-if="self.isLoggedIn" />
@@ -58,10 +63,11 @@ const template = (
         className="ownerinventory__personas"
         ng-if="self.hasOwnedActivePersonas"
       >
-        <won-post-info
-          class="ownerinventory__personas__persona"
+        <won-preact
+          className="atomInfo ownerinventory__personas__persona"
+          component="self.WonAtomInfo"
+          props="{atomUri: personaUri}"
           ng-repeat="personaUri in self.sortedOwnedActivePersonaUriArray track by personaUri"
-          atom-uri="personaUri"
         />
       </div>
       <div className="ownerinventory__header">
@@ -123,6 +129,9 @@ class Controller {
     window.inventory4dbg = this;
 
     this.WonAtomCardGrid = WonAtomCardGrid;
+    this.WonAtomInfo = WonAtomInfo;
+    this.WonAtomMessages = WonAtomMessages;
+
     const selectFromState = state => {
       const viewConnUri = generalSelectors.getViewConnectionUriFromRoute(state);
 
@@ -221,12 +230,7 @@ Controller.$inject = [];
 
 export default {
   module: angular
-    .module("won.owner.components.inventory", [
-      ngAnimate,
-      postMessagesModule,
-
-      howToModule,
-    ])
+    .module("won.owner.components.inventory", [ngAnimate, howToModule])
     .controller("InventoryController", [...serviceDependencies, Controller])
     .name,
   controller: "InventoryController",

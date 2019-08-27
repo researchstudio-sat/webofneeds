@@ -1,0 +1,156 @@
+@import "sizing-utils";
+@import "won-config";
+@import "animate";
+
+won-atom-messages {
+  display: grid;
+  grid-template-areas: "header" "main" "footer";
+  grid-template-rows: min-content minmax($minimalGridRows, 1fr) min-content;
+  grid-row-gap: $gridRowGap;
+  box-sizing: border-box;
+  padding: $gridRowGap;
+
+  .pm__header {
+    display: grid;
+    grid-template-columns: auto 1fr auto auto;
+    grid-template-areas: "header_back header_title header_share header_context";
+    grid-area: header;
+    font-size: $normalFontSize;
+    text-align: left;
+    min-width: 0;
+    align-items: center;
+
+    &__back {
+      grid-area: header_back;
+      display: grid;
+
+      &:hover {
+        filter: brightness(85%);
+      }
+
+      &__button__icon {
+        --local-primary: #{$won-primary-color};
+        @include fixed-square($backIconSize);
+      }
+    }
+
+    &__title,
+    won-connection-header {
+      grid-area: header_title;
+    }
+
+    > won-connection-context-dropdown {
+      grid-area: header_context;
+    }
+
+    > won-share-dropdown {
+      grid-area: header_share;
+    }
+  }
+
+  .pm__footer {
+    grid-area: footer;
+
+    &__chattextfield {
+      padding: 0.5rem 0;
+    }
+
+    &__button {
+      width: 100%;
+    }
+  }
+
+  .pm__content {
+    grid-area: main;
+    padding: 0.5rem 0.5rem 0.5rem 0;
+    background: white;
+    border: $thinGrayBorder;
+    overflow: auto;
+    scroll-behavior: smooth;
+    flex-grow: 1;
+
+    &__unreadindicator {
+      height: 3rem;
+      top: 0;
+      position: sticky;
+      z-index: 10;
+      margin-bottom: 0.5rem;
+      margin-left: 0.5rem;
+
+      @include slideWithOpacityAnimationFixedHorizontal(
+        0.5s,
+        linear,
+        3rem,
+        0,
+        0,
+        0,
+        0.5rem
+      );
+
+      &__content {
+        height: 3rem;
+        padding: 0.66em;
+        margin-bottom: 0.5rem;
+        box-sizing: border-box;
+        font-size: $normalFontSize;
+        line-height: $normalFontSize;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+    }
+    &__loadbutton, /* just so the button and spinner won't make the chatmessages "jump"*/
+    &__loadspinner {
+      width: calc(100% - 0.5rem);
+      height: 3rem;
+      padding: 0.66em 2em;
+      margin-left: 0.5rem;
+      text-align: center;
+      box-sizing: border-box;
+    }
+    &.won-petrinet-content,
+    &.won-agreement-content {
+      background: $won-lighter-gray;
+    }
+    &__petrinet__loadingtext,
+    &__agreement__loadingtext {
+      padding-left: 0.5rem;
+      box-sizing: border-box;
+      font-size: $smallFontSize;
+      color: $won-subtitle-gray;
+      text-align: center;
+    }
+    &__petrinet__emptytext,
+    &__agreement__emptytext {
+      padding-left: 0.5rem;
+      box-sizing: border-box;
+      text-align: center;
+      font-size: $normalFontSize;
+      color: $won-subtitle-gray;
+    }
+    won-petrinet-state.pm__content__petrinet__process__content {
+      display: grid;
+      grid-gap: 0.5rem;
+      padding: 0.5rem;
+      margin: 0 0 1rem 0;
+      border: $thinGrayBorder;
+      background: white;
+      &__header {
+        color: $won-subtitle-gray;
+        border-bottom: $thinGrayBorder;
+        padding-bottom: 0.25rem;
+        word-break: break-all;
+      }
+      &__content {
+      }
+    }
+    &__agreement__title {
+      color: $won-subtitle-gray;
+      font-size: $normalFontSize;
+      border-bottom: $thinGrayBorder;
+      padding-bottom: 0.25rem;
+      padding-left: 0.5rem;
+      margin-bottom: 0.25rem;
+    }
+  }
+}

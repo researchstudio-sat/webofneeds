@@ -36,7 +36,6 @@ import footer from "./components/footer.js";
 import modalDialog from "./components/modal-dialog.js";
 import toasts from "./components/toasts.js";
 import slideIn from "./components/slide-in.js";
-import postInfo from "./components/post-info.js";
 import connectionsComponent from "./pages/connections.jsx";
 import overviewComponent from "./pages/overview.jsx";
 import mapComponent from "./pages/map.jsx";
@@ -55,7 +54,6 @@ import won from "./service/won.js";
  */
 import { runMessagingAgent } from "./messaging-agent.js";
 
-import detailModules from "./components/details/details.js";
 import { runPushAgent } from "./push-agent";
 import { enableNotifications } from "../config/default";
 
@@ -81,11 +79,7 @@ let app = angular.module("won.owner", [
   modalDialog,
   toasts,
   slideIn,
-  postInfo,
   preactModule,
-
-  //details
-  ...detailModules,
 
   //views
   connectionsComponent.module,
@@ -120,7 +114,7 @@ app.config(configRouting).config([
               href +
               '"' +
               (title ? ' title="' + title + '"' : "") +
-              ' target="_blank">' +
+              ' target="_blank" rel="noopener noreferrer">' +
               text +
               "</a>"
             );
@@ -132,7 +126,7 @@ app.config(configRouting).config([
               href +
               '"' +
               (title ? ' title="' + title + '"' : "") +
-              ' target="_blank">' +
+              ' target="_blank" rel="noopener noreferrer">' +
               href +
               "</a>)"
             );

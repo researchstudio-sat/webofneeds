@@ -3,63 +3,53 @@
 @import "sizing-utils";
 
 won-tags-picker {
-  .tp__input {
-    position: relative;
-
-    .tp__input__icon {
-      @include fixed-square($bigiconSize);
-      position: absolute;
-      right: 0.5rem;
-      top: $formInputHeight / 2 - $bigiconSize / 2;
-      z-index: 1;
-    }
-
-    .tp__input__inner {
-      border: $thinGrayBorder;
-
-      @include textfieldPadding(
-        $normalFontSize,
-        22/16,
-        $thinBorderWidth,
-        $formInputHeight
-      );
-
-      box-sizing: border-box;
-      min-height: $formInputHeight;
-      min-width: 0; // so a size is specified and break-word works
-      width: 100%;
-
-      word-wrap: break-word;
-
-      &--withreset {
-        $verticalPadding: calcVerticalPaddingToHeight(
-          $normalFontSize,
-          22/16,
-          $thinBorderWidth,
-          $formInputHeight
-        );
-        padding: $verticalPadding 0.438rem + $bigiconSize $verticalPadding
-          0.438rem;
-      }
-    }
-
-    .tp__input__inner::-ms-clear {
-      width: 0;
-      height: 0;
-    }
+  .react-tagsinput {
+    background-color: white;
+    box-sizing: border-box;
+    border-radius: 0.19rem;
+    border: $thinGrayBorder;
+    overflow: hidden;
+    padding: 0.66rem;
   }
 
-  .tp__taglist {
-    display: flex;
-    flex-wrap: wrap;
-    margin: 0.5rem 0;
+  .react-tagsinput--focused {
+    outline-color: $won-secondary-color;
+  }
 
-    .tp__taglist__tag {
-      border-radius: 0.5rem;
-      background: $won-primary-color;
-      color: white;
-      margin: 0.25rem 0.25rem 0.25rem 0;
-      padding: 0.25rem 0.5rem;
+  .react-tagsinput-tag {
+    background: $won-primary-color;
+    border-radius: 0.5rem;
+    color: white;
+    display: inline-block;
+    font-size: 16px;
+    margin-right: 0.25rem;
+    word-break: break-word;
+    padding: 0.25rem 0.5rem;
+  }
+
+  .react-tagsinput-remove {
+    cursor: pointer;
+    font-weight: bold;
+    color: white;
+  }
+
+  .react-tagsinput-tag a::before {
+    content: " ×";
+  }
+
+  .react-tagsinput-input > input[type="text"] {
+    display: inline-block;
+    background: transparent;
+    border: 0;
+    color: black;
+    font-size: 16px;
+    outline: none;
+    padding: 5px;
+    width: 80px;
+    box-sizing: content-box;
+    border-radius: 0;
+    &:focus {
+      outline-color: none;
     }
   }
 }

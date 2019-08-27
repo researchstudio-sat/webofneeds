@@ -4,6 +4,7 @@
 import React from "react";
 import { get, getIn, sortBy } from "../../../utils.js";
 import { actionCreators } from "../../../actions/actions.js";
+import { connect } from "react-redux";
 
 import * as generalSelectors from "../../../redux/selectors/general-selectors.js";
 
@@ -13,120 +14,167 @@ import WonAtomHeader from "../../atom-header.jsx";
 import WonLabelledHr from "../../labelled-hr.jsx";
 import PropTypes from "prop-types";
 
-export default class WonSuggestAtomPicker extends React.Component {
-  //TODO: CHANGE AND UPDATE LISTENERS DONT WORK
-  //TODO: IMPLEMENT ->
-  /*
-    this.$scope.$watch(
-        () => this.state.uriToFetchSuccess,
-        () =>
-          delay(0).then(() => {
-            if (this.state.uriToFetchSuccess) {
-              this.update(this.uriToFetch);
-              this.resetAtomUriField();
-            }
-          })
+const mapStateToProps = (state, ownProps) => {
+  const hasAtLeastOneAllowedSocket = (atom, allowedSockets) => {
+    if (allowedSockets) {
+      const allowedSocketsImm = Immutable.fromJS(allowedSockets);
+      const atomSocketsImm = getIn(atom, ["content", "sockets"]);
+
+      return (
+        atomSocketsImm &&
+        atomSocketsImm.find(socket => allowedSocketsImm.contains(socket))
       );
-   */
+    }
+    return true;
+  };
+
+  const isExcludedAtom = (atom, excludedUris) => {
+    if (excludedUris) {
+      const excludedUrisImm = Immutable.fromJS(excludedUris);
+
+      return excludedUrisImm.contains(get(atom, "uri"));
+    }
+    return false;
+  };
+
+  const suggestedAtomUri = ownProps.initialValue;
+  const allActiveAtoms = generalSelectors.getActiveAtoms(state);
+
+  const allSuggestableAtoms =
+    allActiveAtoms &&
+    allActiveAtoms.filter(
+      atom =>
+        !isExcludedAtom(atom, ownProps.excludedUris) &&
+        hasAtLeastOneAllowedSocket(atom, ownProps.allowedSockets)
+    );
+
+  const allForbiddenAtoms =
+    allActiveAtoms &&
+    allActiveAtoms.filter(
+      atom =>
+        !(
+          !isExcludedAtom(atom, ownProps.excludedUris) &&
+          hasAtLeastOneAllowedSocket(atom, ownProps.allowedSockets)
+        )
+    );
+
+  const suggestedAtom = get(allSuggestableAtoms, suggestedAtomUri);
+  const sortedActiveAtomsArray =
+    allSuggestableAtoms &&
+    sortBy(allSuggestableAtoms, elem =>
+      (elem.get("humanReadable") || "").toLowerCase()
+    );
+
+  return {
+    initialValue: ownProps.initialValue,
+    detail: ownProps.detail,
+    excludedText: ownProps.excludedText,
+    notAllowedSocketText: ownProps.notAllowedSocketText,
+    onUpdate: ownProps.onUpdate,
+    processState: get(state, ["process"]),
+    allSuggestableAtoms,
+    allForbiddenAtoms,
+    allowedSockets: ownProps.allowedSockets,
+    excludedUris: ownProps.excludedUris,
+    suggestionsAvailable: allSuggestableAtoms && allSuggestableAtoms.size > 0,
+    sortedActiveAtomsArray,
+    suggestedAtom,
+    noSuggestionsLabel:
+      ownProps.noSuggestionsText || "No Atoms available to suggest",
+    hasAtLeastOneAllowedSocket,
+    isExcludedAtom,
+  };
+};
+
+const mapDispatchToProps = dispatch => {
+  return {
+    fetchAtom: uri => {
+      dispatch(actionCreators.atoms__fetchUnloadedAtom(uri));
+    },
+  };
+};
+
+class WonSuggestAtomPicker extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      uriToFetchLoading: false,
+      uriToFetchFailedToLoad: false,
+      uriToFetchFailed: false,
+      uriToFetchIsNotAllowed: false,
+      uriToFetchIsExcluded: false,
       showFetchButton: false,
       showResetButton: false,
-      uriToFetch: undefined,
+      uriToFetch: "",
     };
   }
 
-  componentDidMount() {
-    this.initialValue = this.props.initialValue;
-    this.disconnect = this.props.ngRedux.connect(
-      this.selectFromState.bind(this),
-      actionCreators
-    )(state => {
-      this.setState(state);
-    });
-  }
-
-  componentWillUnmount() {
-    this.disconnect();
-  }
-
-  UNSAFE_componentWillReceiveProps(nextProps) {
-    this.initialValue = nextProps.initialValue;
-    this.setState(this.selectFromState(this.props.ngRedux.getState()));
-  }
-
-  selectFromState(state) {
-    const suggestedAtomUri = this.initialValue;
-    const allActiveAtoms = generalSelectors.getActiveAtoms(state);
-
-    const allSuggestableAtoms =
-      allActiveAtoms && allActiveAtoms.filter(atom => this.isSuggestable(atom));
-
-    const allForbiddenAtoms =
-      allActiveAtoms &&
-      allActiveAtoms.filter(atom => !this.isSuggestable(atom));
-
-    const suggestedAtom = get(allSuggestableAtoms, suggestedAtomUri);
-    const sortedActiveAtomsArray =
-      allSuggestableAtoms &&
-      sortBy(allSuggestableAtoms, elem =>
-        (elem.get("humanReadable") || "").toLowerCase()
-      );
-
-    const uriToFetchProcess = getIn(state, [
-      "process",
+  static getDerivedStateFromProps(props, state) {
+    const uriToFetchProcess = getIn(props.processState, [
       "atoms",
-      this.state.uriToFetch,
+      state.uriToFetch,
     ]);
     const uriToFetchLoading = !!get(uriToFetchProcess, "loading");
     const uriToFetchFailedToLoad = !!get(uriToFetchProcess, "failedToLoad");
     const uriToFetchIsNotAllowed =
-      !!get(allForbiddenAtoms, this.state.uriToFetch) &&
-      !this.hasAtLeastOneAllowedSocket(
-        get(allForbiddenAtoms, this.state.uriToFetch)
+      !!get(props.allForbiddenAtoms, state.uriToFetch) &&
+      !props.hasAtLeastOneAllowedSocket(
+        get(props.allForbiddenAtoms, state.uriToFetch),
+        props.allowedSockets
       );
-    const uriToFetchIsExcluded = this.isExcludedAtom(
-      get(allForbiddenAtoms, this.state.uriToFetch)
+    const uriToFetchIsExcluded = props.isExcludedAtom(
+      get(props.allForbiddenAtoms, state.uriToFetch),
+      props.excludedUris
     );
+    const uriToFetchSuccess =
+      state.uriToFetch &&
+      !uriToFetchLoading &&
+      !uriToFetchFailedToLoad &&
+      get(props.allSuggestableAtoms, state.uriToFetch);
+    console.debug("TODO: HANDLE URITOFETCHSUCCESS: ", uriToFetchSuccess);
+    const uriToFetchFailed =
+      state.uriToFetch &&
+      !uriToFetchLoading &&
+      (uriToFetchFailedToLoad ||
+        uriToFetchIsExcluded ||
+        uriToFetchIsNotAllowed);
 
-    return {
-      suggestedAtomUri,
-      uriToFetchLoading,
-      uriToFetchFailedToLoad,
-      uriToFetchIsExcluded,
-      uriToFetchIsNotAllowed,
-      allSuggestableAtoms,
-      allForbiddenAtoms,
-      suggestionsAvailable: allSuggestableAtoms && allSuggestableAtoms.size > 0,
-      sortedActiveAtomsArray,
-      suggestedAtom,
-      noSuggestionsLabel:
-        this.props.noSuggestionsText || "No Atoms available to suggest",
-      uriToFetchSuccess:
-        this.state.uriToFetch &&
-        !uriToFetchLoading &&
-        !uriToFetchFailedToLoad &&
-        get(allSuggestableAtoms, this.state.uriToFetch),
-      uriToFetchFailed:
-        this.state.uriToFetch &&
-        !uriToFetchLoading &&
-        (uriToFetchFailedToLoad ||
-          uriToFetchIsExcluded ||
-          uriToFetchIsNotAllowed),
-    };
+    if (uriToFetchSuccess) {
+      if (state.uriToFetch && state.uriToFetch.trim().length > 0) {
+        props.onUpdate({ value: state.uriToFetch });
+      } else {
+        props.onUpdate({ value: undefined });
+      }
+
+      return {
+        uriToFetchLoading: uriToFetchLoading,
+        uriToFetchFailedToLoad: uriToFetchFailedToLoad,
+        uriToFetchFailed: uriToFetchFailed,
+        uriToFetchIsNotAllowed: uriToFetchIsNotAllowed,
+        uriToFetchIsExcluded: uriToFetchIsExcluded,
+        uriToFetch: "",
+        showResetButton: false,
+        showFetchButton: false,
+      };
+    } else {
+      return {
+        uriToFetchLoading: uriToFetchLoading,
+        uriToFetchFailedToLoad: uriToFetchFailedToLoad,
+        uriToFetchFailed: uriToFetchFailed,
+        uriToFetchIsNotAllowed: uriToFetchIsNotAllowed,
+        uriToFetchIsExcluded: uriToFetchIsExcluded,
+        uriToFetch: state.uriToFetch,
+        showResetButton: state.showResetButton,
+        showFetchButton: state.showFetchButton,
+      };
+    }
   }
 
   render() {
-    if (!this.state) {
-      console.debug("render with null state");
-      return <div />;
-    }
-
     let suggestions;
 
-    if (this.state.suggestionsAvailable) {
-      const suggestionItems = this.state.sortedActiveAtomsArray.map(atom => {
+    if (this.props.suggestionsAvailable) {
+      const suggestionItems = this.props.sortedActiveAtomsArray.map(atom => {
         return (
           <div
             key={get(atom, "uri")}
@@ -136,10 +184,7 @@ export default class WonSuggestAtomPicker extends React.Component {
               (this.isSelected(atom) ? "won--selected" : "")
             }
           >
-            <WonAtomHeader
-              atomUri={get(atom, "uri")}
-              ngRedux={this.props.ngRedux}
-            />
+            <WonAtomHeader atomUri={get(atom, "uri")} />
           </div>
         );
       });
@@ -147,7 +192,7 @@ export default class WonSuggestAtomPicker extends React.Component {
       suggestions = <div className="sap__posts">{suggestionItems}</div>;
     } else {
       suggestions = (
-        <div className="sap__noposts">{this.state.noSuggestionsLabel}</div>
+        <div className="sap__noposts">{this.props.noSuggestionsLabel}</div>
       );
     }
 
@@ -164,7 +209,7 @@ export default class WonSuggestAtomPicker extends React.Component {
         suggestPostInputIcon = (
           <svg
             className="sap__input__icon clickable"
-            onClick={() => this.fetchAtom()}
+            onClick={this.fetchAtom.bind(this)}
           >
             <use xlinkHref="#ico16_checkmark" href="#ico16_checkmark" />
           </svg>
@@ -173,7 +218,7 @@ export default class WonSuggestAtomPicker extends React.Component {
         suggestPostInputIcon = (
           <svg
             className="sap__input__icon clickable"
-            onClick={() => this.resetAtomUriField()}
+            onClick={this.resetAtomUriField.bind(this)}
           >
             <use xlinkHref="#ico36_close" href="#ico36_close" />
           </svg>
@@ -203,11 +248,11 @@ export default class WonSuggestAtomPicker extends React.Component {
         <div className="sap__input">
           {suggestPostInputIcon}
           <input
-            ref={uriInput => (this.uriInput = uriInput)}
             type="url"
             placeholder={this.props.detail.placeholder}
             className="sap__input__inner"
-            onChange={() => this.updateFetchAtomUriField()}
+            value={this.state.uriToFetch}
+            onChange={this.updateFetchAtomUriField.bind(this)}
           />
         </div>
         {suggestPostErrors}
@@ -215,37 +260,11 @@ export default class WonSuggestAtomPicker extends React.Component {
     );
   }
 
-  hasAtLeastOneAllowedSocket(atom) {
-    if (this.props.allowedSockets) {
-      const allowedSocketsImm = Immutable.fromJS(this.props.allowedSockets);
-      const atomSocketsImm = getIn(atom, ["content", "sockets"]);
-
-      return (
-        atomSocketsImm &&
-        atomSocketsImm.find(socket => allowedSocketsImm.contains(socket))
-      );
-    }
-    return true;
-  }
-
-  isExcludedAtom(atom) {
-    if (this.props.excludedUris) {
-      const excludedUrisImm = Immutable.fromJS(this.props.excludedUris);
-
-      return excludedUrisImm.contains(get(atom, "uri"));
-    }
-    return false;
-  }
-
-  isSuggestable(atom) {
-    return !this.isExcludedAtom(atom) && this.hasAtLeastOneAllowedSocket(atom);
-  }
-
   isSelected(atom) {
     return (
       atom &&
-      this.state.suggestedAtom &&
-      get(atom, "uri") === get(this.state.suggestedAtom, "uri")
+      this.props.suggestedAtom &&
+      get(atom, "uri") === get(this.props.suggestedAtom, "uri")
     );
   }
 
@@ -261,14 +280,13 @@ export default class WonSuggestAtomPicker extends React.Component {
     }
   }
 
-  updateFetchAtomUriField() {
-    console.debug("suggest-atom-picker: ", "updateFetchAtomUriField()");
-    const text = this.uriInput && this.uriInput.value;
+  updateFetchAtomUriField(event) {
+    const text = event.target.value;
 
     let showFetchButton;
     let showResetButton;
     if (text && text.trim().length > 0) {
-      if (this.uriInput.checkValidity()) {
+      if (event.target.checkValidity()) {
         showResetButton = false;
         showFetchButton = true;
       } else {
@@ -277,50 +295,38 @@ export default class WonSuggestAtomPicker extends React.Component {
       }
     }
     this.setState({
-      uriToFetch: undefined,
+      uriToFetch: text.trim(),
       showResetButton: showResetButton,
       showFetchButton: showFetchButton,
     });
   }
 
   fetchAtomUriFieldHasText() {
-    console.debug("suggest-atom-picker: ", "fetchAtomUriFieldHasText()");
-    const text = this.uriInput && this.uriInput.value;
-    return text && text.length > 0;
+    return this.state.uriToFetch && this.state.uriToFetch.length > 0;
   }
 
   resetAtomUriField() {
-    if (this.uriInput) {
-      this.uriInput.value = "";
-    }
     this.setState({
-      uriToFetch: undefined,
+      uriToFetch: "",
       showResetButton: false,
       showFetchButton: false,
     });
   }
 
   fetchAtom() {
-    let uriToFetch = this.uriInput && this.uriInput.value;
-    uriToFetch = uriToFetch && uriToFetch.trim();
     console.debug(
       "suggest-atom-picker: ",
       "fetchAtom()",
       " uriToFetch: ",
-      uriToFetch
+      this.state.uriToFetch
     );
     if (
-      !getIn(this.state.allSuggestableAtoms, uriToFetch) &&
-      !get(this.state.allForbiddenAtoms, uriToFetch)
+      !getIn(this.props.allSuggestableAtoms, this.state.uriToFetch) &&
+      !get(this.props.allForbiddenAtoms, this.state.uriToFetch)
     ) {
-      this.props.ngRedux.dispatch(
-        actionCreators.atoms__fetchUnloadedAtom(uriToFetch)
-      );
-      this.setState({ uriToFetch: uriToFetch });
-    } else if (get(this.state.allForbiddenAtoms, uriToFetch)) {
-      this.setState({ uriToFetch: uriToFetch });
+      this.props.fetchAtom(this.state.uriToFetch);
     } else {
-      this.update(uriToFetch);
+      this.update(this.state.uriToFetch);
     }
   }
 
@@ -336,11 +342,25 @@ export default class WonSuggestAtomPicker extends React.Component {
 WonSuggestAtomPicker.propTypes = {
   initialValue: PropTypes.any,
   detail: PropTypes.any,
-  excludedUris: PropTypes.arrayOf(PropTypes.string),
-  allowedSockets: PropTypes.arrayOf(PropTypes.string),
   excludedText: PropTypes.string,
   notAllowedSocketText: PropTypes.string,
   noSuggestionsText: PropTypes.string,
-  ngRedux: PropTypes.object.isRequired,
   onUpdate: PropTypes.func.isRequired,
+  allSuggestableAtoms: PropTypes.object,
+  allForbiddenAtoms: PropTypes.object,
+  suggestionsAvailable: PropTypes.bool,
+  sortedActiveAtomsArray: PropTypes.arrayOf(PropTypes.object),
+  suggestedAtom: PropTypes.object,
+  noSuggestionsLabel: PropTypes.string,
+  fetchAtom: PropTypes.func,
+  processState: PropTypes.object,
+  excludedUris: PropTypes.arrayOf(PropTypes.string),
+  allowedSockets: PropTypes.arrayOf(PropTypes.string),
+  isExcludedAtom: PropTypes.func,
+  hasAtLeastOneAllowedSocket: PropTypes.func,
 };
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(WonSuggestAtomPicker);

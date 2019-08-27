@@ -10,56 +10,5 @@ won-person-picker {
     .pp__detail__label {
       @include default-font;
     }
-
-    .pp__detail__input {
-      border: $thinGrayBorder;
-
-      @include textfieldPadding(
-        $normalFontSize,
-        22/16,
-        $thinBorderWidth,
-        $formInputHeight
-      );
-
-      box-sizing: border-box;
-      min-height: $formInputHeight;
-      min-width: 0; // so a size is specified and break-word works
-      width: 100%;
-
-      word-wrap: break-word;
-
-      &--withreset {
-        $verticalPadding: calcVerticalPaddingToHeight(
-          $normalFontSize,
-          22/16,
-          $thinBorderWidth,
-          $formInputHeight
-        );
-        padding: $verticalPadding 0.438rem + $bigiconSize $verticalPadding
-          0.438rem;
-      }
-    }
-
-    .pp__detail__input::-ms-clear {
-      width: 0;
-      height: 0;
-    }
-
-    .pp__detail__icon {
-      @include fixed-square($bigiconSize);
-
-      $verticalPosition: calcVerticalPaddingToHeight(
-        $normalFontSize,
-        22/16,
-        $thinBorderWidth,
-        $formInputHeight
-      );
-
-      position: absolute;
-      right: 0.5rem;
-      top: $formInputHeight / 2 - $bigiconSize / 2 + $normalFontSize +
-        $verticalPosition / 2;
-      z-index: 1;
-    }
   }
 }
