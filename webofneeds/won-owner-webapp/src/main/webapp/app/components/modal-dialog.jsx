@@ -56,12 +56,12 @@ class WonModalDialog extends React.Component {
             <React.Fragment>
               <div className="md__dialog__header">
                 <span className="md__dialog__header__caption">
-                  {self.modalDialogCaption}
+                  {this.props.modalDialogCaption}
                 </span>
               </div>
               <div className="md__dialog__content">
                 <span className="md__dialog__content__text">
-                  {self.modalDialogText}
+                  {this.props.modalDialogText}
                 </span>
               </div>
             </React.Fragment>
