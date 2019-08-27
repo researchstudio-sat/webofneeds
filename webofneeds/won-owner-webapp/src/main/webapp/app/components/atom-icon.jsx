@@ -30,7 +30,7 @@ const mapStateToProps = (state, ownProps) => {
   const persona = getIn(state, ["atoms", personaUri]);
   const holderImage = atomUtils.getDefaultPersonaImage(persona);
   const holderIdenticonSvg = atomUtils.getIdenticonSvg(persona);
-  const showHolderIdenticon = !holderImage && holderIdenticonSvg;
+  const showHolderIdenticon = !holderImage && !!holderIdenticonSvg;
   const showHolderImage = holderImage;
 
   const process = get(state, "process");
@@ -156,7 +156,7 @@ WonAtomIcon.propTypes = {
   showHolderIdenticon: PropTypes.bool,
   showHolderImage: PropTypes.bool,
   holderImage: PropTypes.object,
-  holderIdenticonSvg: PropTypes.object,
+  holderIdenticonSvg: PropTypes.string,
 };
 
 export default connect(mapStateToProps)(WonAtomIcon);

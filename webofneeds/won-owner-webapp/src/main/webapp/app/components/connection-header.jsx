@@ -2,6 +2,11 @@
  * Created by quasarchimaere on 30.07.2019.
  */
 import React from "react";
+import WonAtomIcon from "./atom-icon.jsx";
+import WonGroupIcon from "./group-icon.jsx";
+import WonConnectionState from "./connection-state.jsx";
+import PropTypes from "prop-types";
+import VisibilitySensor from "react-visibility-sensor";
 import { get, getIn } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { connect } from "react-redux";
@@ -15,10 +20,6 @@ import * as processUtils from "../redux/utils/process-utils.js";
 import { getHumanReadableStringFromMessage } from "../reducers/atom-reducer/parse-message.js";
 
 import "~/style/_connection-header.scss";
-import WonAtomIcon from "./atom-icon.jsx";
-import WonGroupIcon from "./group-icon";
-import WonConnectionState from "./connection-state";
-import PropTypes from "prop-types";
 
 const mapStateToProps = (state, ownProps) => {
   const ownedAtom = generalSelectors.getOwnedAtomByConnectionUri(
@@ -26,10 +27,8 @@ const mapStateToProps = (state, ownProps) => {
     ownProps.connectionUri
   );
   const connection = getIn(ownedAtom, ["connections", ownProps.connectionUri]);
-  const targetAtom = get(
-    generalSelectors.getAtoms(state),
-    get(connection, "targetAtomUri")
-  );
+  const targetAtomUri = get(connection, "targetAtomUri");
+  const targetAtom = get(generalSelectors.getAtoms(state), targetAtomUri);
   const allMessages = messageSelectors.getMessagesByConnectionUri(
     state,
     ownProps.connectionUri
@@ -65,6 +64,11 @@ const mapStateToProps = (state, ownProps) => {
 
   const processState = get(state, "process");
 
+  const targetAtomLoading = processUtils.isAtomLoading(
+    processState,
+    get(targetAtom, "uri")
+  );
+
   return {
     connectionUri: ownProps.connectionUri,
     onClick: ownProps.onClick,
@@ -72,6 +76,7 @@ const mapStateToProps = (state, ownProps) => {
     groupMembersArray: groupMembers && groupMembers.toArray(),
     groupMembersSize: groupMembers ? groupMembers.size : 0,
     ownedAtom,
+    targetAtomUri,
     targetAtom,
     remotePersonaName,
     isConnectionToGroup: connectionSelectors.isChatToGroupConnection(
@@ -96,12 +101,17 @@ const mapStateToProps = (state, ownProps) => {
     targetAtomFailedToLoad:
       targetAtom &&
       processUtils.hasAtomFailedToLoad(processState, get(targetAtom, "uri")),
+    targetAtomToLoad: processUtils.isAtomToLoad(
+      processState,
+      get(targetAtom, "uri")
+    ),
+    targetAtomLoading,
     connectionOrAtomsLoading:
       !connection ||
       !targetAtom ||
       !ownedAtom ||
       processUtils.isAtomLoading(processState, get(ownedAtom, "uri")) ||
-      processUtils.isAtomLoading(processState, get(targetAtom, "uri")) ||
+      targetAtomLoading ||
       processUtils.isConnectionLoading(processState, get(connection, "uri")),
   };
 };
@@ -119,9 +129,18 @@ class WonConnectionHeader extends React.Component {
     if (this.props.connectionOrAtomsLoading) {
       return (
         <won-connection-header class="won-is-loading">
-          <div className="ch__icon">
-            <div className="ch__icon__skeleton" />
-          </div>
+          <VisibilitySensor
+            onChange={isVisible => {
+              this.onChange(isVisible);
+            }}
+            intervalDelay={200}
+            partialVisibility={true}
+            offset={{ top: -300, bottom: -300 }}
+          >
+            <div className="ch__icon">
+              <div className="ch__icon__skeleton" />
+            </div>
+          </VisibilitySensor>
           <div className="ch__right">
             <div className="ch__right__topline">
               <div className="ch__right__topline__title" />
@@ -285,15 +304,20 @@ class WonConnectionHeader extends React.Component {
       );
     }
   }
+  onChange(isVisible) {
+    if (isVisible) {
+      this.ensureAtomIsLoaded();
+    }
+  }
 
   ensureAtomIsLoaded() {
-    //TODO: Fetch atoms if not present
-    /*if (
-      this.props.atomUri &&
-      (!this.props.atom || (this.props.atomToLoad && !this.props.atomLoading))
+    if (
+      this.props.targetAtomUri &&
+      (!this.props.targetAtom ||
+        (this.props.targetAtomToLoad && !this.props.targetAtomLoading))
     ) {
-      this.props.fetchAtom(this.props.atomUri);
-    }*/
+      this.props.fetchAtom(this.props.targetAtomUri);
+    }
   }
 }
 WonConnectionHeader.propTypes = {
@@ -313,6 +337,9 @@ WonConnectionHeader.propTypes = {
   latestMessageUnread: PropTypes.bool,
   unreadMessageCount: PropTypes.number,
   friendlyTimestamp: PropTypes.any,
+  targetAtomUri: PropTypes.string,
+  targetAtomToLoad: PropTypes.bool,
+  targetAtomLoading: PropTypes.bool,
   targetAtomFailedToLoad: PropTypes.bool,
   connectionOrAtomsLoading: PropTypes.bool,
   fetchAtom: PropTypes.func,
