@@ -22,6 +22,7 @@ import * as accountUtils from "../redux/utils/account-utils";
 const template = (
   <container>
     <won-preact
+      className="modalDialog"
       component="self.WonModalDialog"
       props="{}"
       ng-if="self.showModalDialog"

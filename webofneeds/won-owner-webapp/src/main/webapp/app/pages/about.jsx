@@ -21,6 +21,7 @@ import "~/style/_about.scss";
 const template = (
   <container>
     <won-preact
+      className="modalDialog"
       component="self.WonModalDialog"
       props="{}"
       ng-if="self.showModalDialog"

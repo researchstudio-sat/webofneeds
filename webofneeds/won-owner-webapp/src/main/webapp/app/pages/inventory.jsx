@@ -26,6 +26,7 @@ import "~/style/_connection-overlay.scss";
 const template = (
   <container>
     <won-preact
+      className="modalDialog"
       component="self.WonModalDialog"
       props="{}"
       ng-if="self.showModalDialog"
