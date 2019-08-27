@@ -80,7 +80,7 @@ class WonAtomContextDropdown extends React.Component {
 
   render() {
     const iconElement =
-      this.state.atomLoading || this.state.atomFailedToLoad ? (
+      this.props.atomLoading || this.props.atomFailedToLoad ? (
         <svg className="cdd__icon__small">
           <use xlinkHref="#ico16_contextmenu" href="#ico16_contextmenu" />
         </svg>
@@ -107,7 +107,7 @@ class WonAtomContextDropdown extends React.Component {
           Export as PDF
         </button>
       );
-      this.state.isUsableAsTemplate &&
+      this.props.isUsableAsTemplate &&
         buttons.push(
           <button
             key="duplicate"
@@ -122,7 +122,7 @@ class WonAtomContextDropdown extends React.Component {
             Post this too!
           </button>
         );
-      this.state.isEditable &&
+      this.props.isEditable &&
         buttons.push(
           <button
             key="edit"
@@ -137,14 +137,14 @@ class WonAtomContextDropdown extends React.Component {
             Edit
           </button>
         );
-      this.state.adminEmail &&
+      this.props.adminEmail &&
         buttons.push(
           <a
             key="report"
             className="won-button--outlined thin red"
             href={
               "mailto:" +
-              this.state.adminEmail +
+              this.props.adminEmail +
               "?" +
               this.generateReportAtomMailParams()
             }
@@ -152,8 +152,8 @@ class WonAtomContextDropdown extends React.Component {
             Report
           </a>
         );
-      this.state.isOwnAtom &&
-        this.state.isInactive &&
+      this.props.isOwnAtom &&
+        this.props.isInactive &&
         buttons.push(
           <button
             key="reopen"
@@ -163,8 +163,8 @@ class WonAtomContextDropdown extends React.Component {
             Reopen
           </button>
         );
-      this.state.isOwnAtom &&
-        this.state.isInactive &&
+      this.props.isOwnAtom &&
+        this.props.isInactive &&
         buttons.push(
           <button
             key="delete"
@@ -174,8 +174,8 @@ class WonAtomContextDropdown extends React.Component {
             Delete
           </button>
         );
-      this.state.isOwnAtom &&
-        this.state.isActive &&
+      this.props.isOwnAtom &&
+        this.props.isActive &&
         buttons.push(
           <button
             key="close"
@@ -223,9 +223,9 @@ class WonAtomContextDropdown extends React.Component {
   }
 
   exportPdf() {
-    if (!this.state.atom) return;
+    if (!this.props.atom) return;
     const docDefinition = wonUtils.createDocumentDefinitionFromPost(
-      this.state.atom
+      this.props.atom
     );
 
     if (docDefinition) {
@@ -235,13 +235,13 @@ class WonAtomContextDropdown extends React.Component {
   }
 
   reOpenAtom() {
-    if (this.state.isOwnAtom) {
+    if (this.props.isOwnAtom) {
       this.props.atomReOpen(this.props.atomUri);
     }
   }
 
   deleteAtom() {
-    if (this.state.isOwnAtom) {
+    if (this.props.isOwnAtom) {
       const payload = {
         caption: "Attention!",
         text: "Deleting the Atom is irreversible, do you want to proceed?",
@@ -267,7 +267,7 @@ class WonAtomContextDropdown extends React.Component {
   }
 
   closeAtom() {
-    if (this.state.isOwnAtom) {
+    if (this.props.isOwnAtom) {
       const payload = {
         caption: "Attention!",
         text:
