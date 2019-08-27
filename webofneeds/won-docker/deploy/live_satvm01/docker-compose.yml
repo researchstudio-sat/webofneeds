@@ -44,7 +44,7 @@ services:
     build: ../../image/letsencrypt
     image: webofneeds/letsencrypt:live
     environment:
-      - "key_store_password=$uki_certificate_passwd"
+      - "key_store_password=$won_certificate_passwd"
       - "domain_params=-d hackathon.matchat.org"
       - "key_pem_file=/etc/letsencrypt/live/hackathon.matchat.org/privkey.pem"
       - "cert_pem_file=/etc/letsencrypt/live/hackathon.matchat.org/fullchain.pem"
