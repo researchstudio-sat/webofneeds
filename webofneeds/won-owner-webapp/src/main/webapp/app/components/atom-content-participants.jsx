@@ -4,6 +4,7 @@
 import React from "react";
 import { get, getIn } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
+import { connect } from "react-redux";
 import * as atomUtils from "../redux/utils/atom-utils";
 import * as generalSelectors from "../redux/selectors/general-selectors";
 import * as connectionSelectors from "../redux/selectors/connection-selectors";
@@ -17,82 +18,101 @@ import "~/style/_atom-content-participants.scss";
 import VisibilitySensor from "react-visibility-sensor";
 import PropTypes from "prop-types";
 
-export default class WonAtomContentParticipants extends React.Component {
+const mapStateToProps = (state, ownProps) => {
+  const post = getIn(state, ["atoms", ownProps.atomUri]);
+  const isOwned = generalSelectors.isAtomOwned(state, ownProps.atomUri);
+
+  const hasGroupSocket = atomUtils.hasGroupSocket(post);
+
+  const groupMembers = hasGroupSocket && get(post, "groupMembers");
+  const groupChatConnections =
+    isOwned &&
+    hasGroupSocket &&
+    connectionSelectors.getGroupChatConnectionsByAtomUri(
+      state,
+      ownProps.atomUri
+    );
+
+  let excludedFromInviteUris = [ownProps.atomUri];
+
+  if (groupChatConnections) {
+    groupChatConnections
+      .filter(conn => !connectionUtils.isClosed(conn))
+      .map(conn => excludedFromInviteUris.push(get(conn, "targetAtomUri")));
+  }
+
+  return {
+    atomUri: ownProps.atomUri,
+    isOwned,
+    hasGroupSocket,
+    groupMembers: groupMembers && groupMembers.size > 0,
+    hasGroupChatConnections:
+      groupChatConnections && groupChatConnections.size > 0,
+    groupChatConnectionsArray:
+      groupChatConnections && groupChatConnections.toArray(),
+    excludedFromInviteUris,
+    groupMembersArray: groupMembers && groupMembers.toArray(),
+    currentLocation: generalSelectors.getCurrentLocation(state),
+  };
+};
+
+const mapDispatchToProps = dispatch => {
+  return {
+    connectionMarkAsRead: (connectionUri, atomUri) => {
+      dispatch(
+        actionCreators.connections__markAsRead({
+          connectionUri: connectionUri,
+          atomUri: atomUri,
+        })
+      );
+    },
+    hideModalDialog: () => {
+      dispatch(actionCreators.view__hideModalDialog());
+    },
+    showModalDialog: payload => {
+      dispatch(actionCreators.view__showModalDialog(payload));
+    },
+    connect: (ownedAtomUri, connectionUri, targetAtomUri, message) => {
+      dispatch(
+        actionCreators.atoms__connect(
+          ownedAtomUri,
+          connectionUri,
+          targetAtomUri,
+          message
+        )
+      );
+    },
+    connectionClose: connectionUri => {
+      dispatch(actionCreators.connections__close(connectionUri));
+    },
+    connectionOpen: (connectionUri, message) => {
+      dispatch(actionCreators.connections__open(connectionUri, message));
+    },
+    rateConnection: (connectionUri, rating) => {
+      dispatch(actionCreators.connections__rate(connectionUri, rating));
+    },
+  };
+};
+
+class WonAtomContentParticipants extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       suggestAtomExpanded: false,
     };
-  }
-
-  componentDidMount() {
-    this.atomUri = this.props.atomUri;
-    this.disconnect = this.props.ngRedux.connect(
-      this.selectFromState.bind(this),
-      actionCreators
-    )(state => {
-      this.setState(state);
-    });
-  }
-
-  componentWillUnmount() {
-    this.disconnect();
-  }
-
-  UNSAFE_componentWillReceiveProps(nextProps) {
-    this.atomUri = nextProps.atomUri;
-    this.setState(this.selectFromState(this.props.ngRedux.getState()));
+    this.toggleSuggestions = this.toggleSuggestions.bind(this);
   }
 
   toggleSuggestions() {
     this.setState({ suggestAtomExpanded: !this.state.suggestAtomExpanded });
   }
 
-  selectFromState(state) {
-    const post = getIn(state, ["atoms", this.atomUri]);
-    const isOwned = generalSelectors.isAtomOwned(state, this.atomUri);
-
-    const hasGroupSocket = atomUtils.hasGroupSocket(post);
-
-    const groupMembers = hasGroupSocket && get(post, "groupMembers");
-    const groupChatConnections =
-      isOwned &&
-      hasGroupSocket &&
-      connectionSelectors.getGroupChatConnectionsByAtomUri(state, this.atomUri);
-
-    let excludedFromInviteUris = [this.atomUri];
-
-    if (groupChatConnections) {
-      groupChatConnections
-        .filter(conn => !connectionUtils.isClosed(conn))
-        .map(conn => excludedFromInviteUris.push(get(conn, "targetAtomUri")));
-    }
-
-    return {
-      post,
-      isOwned,
-      hasGroupSocket,
-      groupMembers: groupMembers && groupMembers.size > 0,
-      hasGroupChatConnections:
-        groupChatConnections && groupChatConnections.size > 0,
-      groupChatConnectionsArray:
-        groupChatConnections && groupChatConnections.toArray(),
-      excludedFromInviteUris,
-      groupMembersArray: groupMembers && groupMembers.toArray(),
-    };
-  }
-
   render() {
-    if (!this.state) {
-      console.debug("render with null state");
-      return <div />;
-    }
-
     let participants;
 
-    if (this.state.isOwned) {
-      if (this.state.hasGroupChatConnections) {
-        participants = this.state.groupChatConnectionsArray.map(conn => {
+    if (this.props.isOwned) {
+      if (this.props.hasGroupChatConnections) {
+        participants = this.props.groupChatConnectionsArray.map(conn => {
           if (!connectionUtils.isClosed(conn)) {
             let actionButtons;
 
@@ -189,7 +209,7 @@ export default class WonAtomContentParticipants extends React.Component {
                 >
                   <WonAtomCard
                     atomUri={get(conn, "targetAtomUri")}
-                    currentLocation={this.state.currentLocation}
+                    currentLocation={this.props.currentLocation}
                     showSuggestions={false}
                     showPersona={true}
                   />
@@ -211,14 +231,14 @@ export default class WonAtomContentParticipants extends React.Component {
           <WonLabelledHr
             label="Invite"
             arrow={this.state.suggestAtomExpanded ? "up" : "down"}
-            onClick={() => this.toggleSuggestions()}
+            onClick={this.toggleSuggestions}
           />
           {this.state.suggestAtomExpanded ? (
             <WonSuggestAtomPicker
               initialValue={undefined}
               onUpdate={({ value }) => this.inviteParticipant(value)}
               detail={{ placeholder: "Insert AtomUri to invite" }}
-              excludedUris={this.state.excludedFromInviteUris}
+              excludedUris={this.props.excludedFromInviteUris}
               allowedSockets={[
                 won.CHAT.ChatSocketCompacted,
                 won.GROUP.GroupSocketCompacted,
@@ -233,13 +253,13 @@ export default class WonAtomContentParticipants extends React.Component {
         </won-atom-content-participants>
       );
     } else {
-      if (this.state.groupMembers) {
-        participants = this.state.groupMembersArray.map(memberUri => {
+      if (this.props.groupMembers) {
+        participants = this.props.groupMembersArray.map(memberUri => {
           return (
             <div className="acp__participant" key={memberUri}>
               <WonAtomCard
                 atomUri={memberUri}
-                currentLocation={this.state.currentLocation}
+                currentLocation={this.props.currentLocation}
                 showSuggestions={false}
                 showPersona={true}
               />
@@ -276,29 +296,22 @@ export default class WonAtomContentParticipants extends React.Component {
             const connUri = get(conn, "uri");
 
             if (connectionUtils.isUnread(conn)) {
-              this.props.ngRedux.dispatch(
-                actionCreators.connections__markAsRead({
-                  connectionUri: connUri,
-                  atomUri: this.atomUri,
-                })
-              );
+              this.props.connectionMarkAsRead(connUri, this.props.atomUri);
             }
 
-            this.props.ngRedux.dispatch(
-              actionCreators.connections__close(connUri)
-            );
-            this.props.ngRedux.dispatch(actionCreators.view__hideModalDialog());
+            this.props.connectionClose(connUri);
+            this.props.hideModalDialog();
           },
         },
         {
           caption: "No",
           callback: () => {
-            this.props.ngRedux.dispatch(actionCreators.view__hideModalDialog());
+            this.props.hideModalDialog();
           },
         },
       ],
     };
-    this.props.ngRedux.dispatch(actionCreators.view__showModalDialog(payload));
+    this.props.showModalDialog(payload);
   }
 
   openRequest(conn, message = "") {
@@ -309,17 +322,10 @@ export default class WonAtomContentParticipants extends React.Component {
     const connUri = get(conn, "uri");
 
     if (connectionUtils.isUnread(conn)) {
-      this.props.ngRedux.dispatch(
-        actionCreators.connections__markAsRead({
-          connectionUri: connUri,
-          atomUri: this.atomUri,
-        })
-      );
+      this.props.connectionMarkAsRead(connUri, this.props.atomUri);
     }
 
-    this.props.ngRedux.dispatch(
-      actionCreators.connections__open(connUri, message)
-    );
+    this.props.connectionOpen(connUri, message);
   }
 
   sendRequest(conn, message = "") {
@@ -338,44 +344,32 @@ export default class WonAtomContentParticipants extends React.Component {
             const targetAtomUri = get(conn, "targetAtomUri");
 
             if (connectionUtils.isUnread(conn)) {
-              this.props.ngRedux.dispatch(
-                actionCreators.connections__markAsRead({
-                  connectionUri: connUri,
-                  atomUri: this.atomUri,
-                })
-              );
+              this.props.connectionMarkAsRead(connUri, this.props.atomUri);
             }
 
-            this.props.ngRedux.dispatch(
-              actionCreators.connections__rate(
-                connUri,
-                won.WONCON.binaryRatingGood
-              )
+            this.props.rateConnection(connUri, won.WONCON.binaryRatingGood);
+            this.props.connect(
+              this.props.atomUri,
+              connUri,
+              targetAtomUri,
+              message
             );
-            this.props.ngRedux.dispatch(
-              actionCreators.atoms__connect(
-                this.atomUri,
-                connUri,
-                targetAtomUri,
-                message
-              )
-            );
-            this.props.ngRedux.dispatch(actionCreators.view__hideModalDialog());
+            this.props.hideModalDialog();
           },
         },
         {
           caption: "No",
           callback: () => {
-            this.props.ngRedux.dispatch(actionCreators.view__hideModalDialog());
+            this.props.hideModalDialog();
           },
         },
       ],
     };
-    this.props.ngRedux.dispatch(actionCreators.view__showModalDialog(payload));
+    this.props.showModalDialog(payload);
   }
 
   inviteParticipant(atomUri, message = "") {
-    if (!this.state.isOwned || !this.state.hasGroupSocket) {
+    if (!this.props.isOwned || !this.props.hasGroupSocket) {
       console.warn("Trying to invite to a non-owned or non groupSocket atom");
       return;
     }
@@ -387,40 +381,47 @@ export default class WonAtomContentParticipants extends React.Component {
         {
           caption: "Yes",
           callback: () => {
-            this.props.ngRedux.dispatch(
-              actionCreators.atoms__connect(
-                this.atomUri,
-                undefined,
-                atomUri,
-                message
-              )
-            );
-            this.props.ngRedux.dispatch(actionCreators.view__hideModalDialog());
+            this.props.connect(this.props.atomUri, undefined, atomUri, message);
+            this.props.hideModalDialog();
           },
         },
         {
           caption: "No",
           callback: () => {
-            this.props.ngRedux.dispatch(actionCreators.view__hideModalDialog());
+            this.props.hideModalDialog();
           },
         },
       ],
     };
-    this.props.ngRedux.dispatch(actionCreators.view__showModalDialog(payload));
+    this.props.showModalDialog(payload);
   }
 
   markAsRead(conn) {
     if (connectionUtils.isUnread(conn)) {
-      this.props.ngRedux.dispatch(
-        actionCreators.connections__markAsRead({
-          connectionUri: get(conn, "uri"),
-          atomUri: this.atomUri,
-        })
-      );
+      this.props.connectionMarkAsRead(get(conn, "uri"), this.props.atomUri);
     }
   }
 }
 WonAtomContentParticipants.propTypes = {
   atomUri: PropTypes.string.isRequired,
-  ngRedux: PropTypes.object.isRequired,
+  isOwned: PropTypes.bool,
+  hasGroupSocket: PropTypes.bool,
+  groupMembers: PropTypes.bool,
+  hasGroupChatConnections: PropTypes.bool,
+  groupChatConnectionsArray: PropTypes.arrayOf(PropTypes.object),
+  excludedFromInviteUris: PropTypes.arrayOf(PropTypes.string),
+  groupMembersArray: PropTypes.arrayOf(PropTypes.string),
+  currentLocation: PropTypes.object,
+  connectionMarkAsRead: PropTypes.func,
+  hideModalDialog: PropTypes.func,
+  showModalDialog: PropTypes.func,
+  connect: PropTypes.func,
+  connectionClose: PropTypes.func,
+  connectionOpen: PropTypes.func,
+  rateConnection: PropTypes.func,
 };
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(WonAtomContentParticipants);
