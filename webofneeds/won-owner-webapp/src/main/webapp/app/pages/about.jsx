@@ -3,6 +3,7 @@
 import angular from "angular";
 import ngAnimate from "angular-animate";
 import WonModalDialog from "../components/modal-dialog.jsx";
+import WonToasts from "../components/toasts.jsx";
 import compareToModule from "../directives/compareTo.js";
 import howToModule from "../components/howto.js";
 import accordionModule from "../components/accordion.js";
@@ -28,7 +29,7 @@ const template = (
     />
     <won-topnav page-title="::'About'" />
     <won-menu ng-if="self.isLoggedIn" />
-    <won-toasts />
+    <won-preact className="toasts" component="self.WonToasts" props="{}" />
     <won-slide-in ng-if="self.showSlideIns" />
     <main className="about" id="allSections">
       <section className="about__welcome" ng-if="!self.visibleSection">
@@ -281,6 +282,7 @@ class AboutController {
   constructor(/* arguments <- serviceDependencies */) {
     attach(this, serviceDependencies, arguments);
     this.WonModalDialog = WonModalDialog;
+    this.WonToasts = WonToasts;
 
     window.ab4dbg = this;
 

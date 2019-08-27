@@ -18,6 +18,7 @@ import * as useCaseUtils from "../usecase-utils.js";
 import WonAtomCardGrid from "../components/atom-card-grid.jsx";
 import WonAtomMessages from "../components/atom-messages.jsx";
 import WonModalDialog from "../components/modal-dialog.jsx";
+import WonToasts from "../components/toasts.jsx";
 import { h } from "preact";
 
 import "~/style/_overview.scss";
@@ -44,7 +45,7 @@ const template = (
     </div>
     <won-topnav page-title="::'What\'s New'" />
     <won-menu ng-if="self.isLoggedIn" />
-    <won-toasts />
+    <won-preact className="toasts" component="self.WonToasts" props="{}" />
     <won-slide-in ng-if="self.showSlideIns" />
     <main className="owneroverview">
       <div className="owneroverview__header">
@@ -180,6 +181,7 @@ class Controller {
     this.WonAtomCardGrid = WonAtomCardGrid;
     this.WonAtomMessages = WonAtomMessages;
     this.WonModalDialog = WonModalDialog;
+    this.WonToasts = WonToasts;
 
     const selectFromState = state => {
       const viewConnUri = generalSelectors.getViewConnectionUriFromRoute(state);

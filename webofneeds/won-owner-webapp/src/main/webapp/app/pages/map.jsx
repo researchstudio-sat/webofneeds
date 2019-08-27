@@ -23,6 +23,7 @@ import WonAtomCardGrid from "../components/atom-card-grid.jsx";
 import WonAtomMap from "../components/atom-map.jsx";
 import WonAtomMessages from "../components/atom-messages.jsx";
 import WonModalDialog from "../components/modal-dialog.jsx";
+import WonToasts from "../components/toasts.jsx";
 
 import "~/style/_map.scss";
 import "~/style/_connection-overlay.scss";
@@ -47,7 +48,7 @@ const template = (
     </div>
     <won-topnav page-title="::'What\'s around'" />
     <won-menu ng-if="self.isLoggedIn" />
-    <won-toasts />
+    <won-preact className="toasts" component="self.WonToasts" props="{}" />
     <won-slide-in ng-if="self.showSlideIns" />
     <main className="ownermap">
       <div
@@ -244,6 +245,7 @@ class Controller {
     this.WonAtomCardGrid = WonAtomCardGrid;
     this.WonAtomMessages = WonAtomMessages;
     this.WonModalDialog = WonModalDialog;
+    this.WonToasts = WonToasts;
 
     const selectFromState = state => {
       const viewConnUri = generalSelectors.getViewConnectionUriFromRoute(state);

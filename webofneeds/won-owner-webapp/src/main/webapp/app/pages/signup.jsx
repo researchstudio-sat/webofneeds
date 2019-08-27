@@ -10,6 +10,7 @@ import { attach, classOnComponentRoot } from "../cstm-ng-utils.js";
 import { actionCreators } from "../actions/actions.js";
 import WonLabelledHr from "../components/labelled-hr.jsx";
 import WonModalDialog from "../components/modal-dialog.jsx";
+import WonToasts from "../components/toasts.jsx";
 
 import * as accountUtils from "../redux/utils/account-utils.js";
 import * as viewSelectors from "../redux/selectors/view-selectors.js";
@@ -26,7 +27,7 @@ const template = (
     />
     <won-topnav page-title="::'Sign Up'" />
     <won-menu ng-if="self.isLoggedIn" />
-    <won-toasts />
+    <won-preact className="toasts" component="self.WonToasts" props="{}" />
     <won-slide-in ng-if="self.showSlideIns" />
     <main className="signup" id="signupSection">
       <div className="signup__content">
@@ -178,6 +179,7 @@ class SignupController {
     this.acceptToS = false;
     this.WonLabelledHr = WonLabelledHr;
     this.WonModalDialog = WonModalDialog;
+    this.WonToasts = WonToasts;
 
     const select = state => {
       const accountState = get(state, "account");

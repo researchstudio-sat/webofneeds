@@ -13,6 +13,7 @@ import { actionCreators } from "../actions/actions.js";
 import WonAtomInfo from "../components/atom-info.jsx";
 import WonAtomMessages from "../components/atom-messages.jsx";
 import WonModalDialog from "../components/modal-dialog.jsx";
+import WonToasts from "../components/toasts.jsx";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as viewSelectors from "../redux/selectors/view-selectors.js";
 import * as processUtils from "../redux/utils/process-utils.js";
@@ -42,7 +43,7 @@ const template = (
     </div>
     <won-topnav page-title="self.atomTitle" />
     <won-menu ng-if="self.isLoggedIn" />
-    <won-toasts />
+    <won-preact className="toasts" component="self.WonToasts" props="{}" />
     <won-slide-in ng-if="self.showSlideIns" />
     <main className="postcontent">
       <won-preact
@@ -90,6 +91,7 @@ class Controller {
     this.WonAtomInfo = WonAtomInfo;
     this.WonAtomMessages = WonAtomMessages;
     this.WonModalDialog = WonModalDialog;
+    this.WonToasts = WonToasts;
 
     const selectFromState = state => {
       const atomUri = generalSelectors.getPostUriFromRoute(state);

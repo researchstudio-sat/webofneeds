@@ -6,6 +6,7 @@ import WonConnectionsOverview from "../components/connections-overview.jsx";
 import WonAtomMessages from "../components/atom-messages.jsx";
 import WonGroupAtomMessages from "../components/group-atom-messages.jsx";
 import WonModalDialog from "../components/modal-dialog.jsx";
+import WonToasts from "../components/toasts.jsx";
 import { get, getIn } from "../utils.js";
 import { attach, classOnComponentRoot } from "../cstm-ng-utils.js";
 import { actionCreators } from "../actions/actions.js";
@@ -40,7 +41,7 @@ const template = (
     </div>
     <won-topnav page-title="::'Chats'" />
     <won-menu ng-if="self.isLoggedIn" />
-    <won-toasts />
+    <won-preact className="toasts" component="self.WonToasts" props="{}" />
     <won-slide-in ng-if="self.showSlideIns" />
     <aside
       className="overview__left"
@@ -109,6 +110,7 @@ class ConnectionsController {
     this.WonAtomMessages = WonAtomMessages;
     this.WonGroupAtomMessages = WonGroupAtomMessages;
     this.WonModalDialog = WonModalDialog;
+    this.WonToasts = WonToasts;
 
     const selectFromState = state => {
       const viewConnUri = generalSelectors.getViewConnectionUriFromRoute(state);

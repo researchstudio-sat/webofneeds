@@ -87,6 +87,7 @@ body {
       z-index: 1000;
     }
 
+    > won-preact.toasts,
     > won-toasts,
     > won-slide-in {
       grid-area: info;

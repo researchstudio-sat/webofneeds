@@ -5,6 +5,7 @@ import ngAnimate from "angular-animate";
 
 import WonCreateAtom from "../components/create-atom.jsx";
 import WonModalDialog from "../components/modal-dialog.jsx";
+import WonToasts from "../components/toasts.jsx";
 import createSearchModule from "../components/create-search.js";
 import usecasePickerModule from "../components/usecase-picker.js";
 import usecaseGroupModule from "../components/usecase-group.js";
@@ -29,7 +30,7 @@ const template = (
     />
     <won-topnav page-title="::'Create'" />
     <won-menu ng-if="self.isLoggedIn" />
-    <won-toasts />
+    <won-preact className="toasts" component="self.WonToasts" props="{}" />
     <won-slide-in ng-if="self.showSlideIns" />
     {/* RIGHT SIDE */}
     <main className="ownercreate">
@@ -53,6 +54,7 @@ class CreateController {
     attach(this, serviceDependencies, arguments);
     this.WonCreateAtom = WonCreateAtom;
     this.WonModalDialog = WonModalDialog;
+    this.WonToasts = WonToasts;
 
     const selectFromState = state => {
       const useCase = generalSelectors.getUseCaseFromRoute(state);
