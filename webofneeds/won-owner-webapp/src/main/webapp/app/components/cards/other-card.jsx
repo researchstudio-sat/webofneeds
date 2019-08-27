@@ -27,7 +27,9 @@ const mapStateToProps = (state, ownProps) => {
   const isDirectResponse = atomUtils.isDirectResponseAtom(atom);
   const responseToUri =
     isDirectResponse && getIn(atom, ["content", "responseToUri"]);
-  const responseToAtom = getIn(state, ["atoms", responseToUri]);
+  const responseToAtom = responseToUri
+    ? getIn(state, ["atoms", responseToUri])
+    : undefined;
 
   const atomImage = atomUtils.getDefaultImage(atom);
   const atomLocation = atomUtils.getLocation(atom);
