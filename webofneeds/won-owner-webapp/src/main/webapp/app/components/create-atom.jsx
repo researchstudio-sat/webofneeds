@@ -469,7 +469,7 @@ class CreateAtom extends React.Component {
     this.setState({ draftObject: _draftObject }, callback);
   }
 
-  publish(persona) {
+  publish({ personaId }) {
     if (this.props.processingPublish) {
       console.debug("publish in process, do not take any action");
       return;
@@ -484,7 +484,7 @@ class CreateAtom extends React.Component {
           this.props.connectionsConnectReactionAtom(
             tempConnectToAtomUri,
             tempDraft,
-            persona
+            personaId
           );
           this.props.routerGo("connections", {
             useCase: undefined,
@@ -498,7 +498,7 @@ class CreateAtom extends React.Component {
                 this.props.connectionsConnectReactionAtom(
                   tempConnectToAtomUri,
                   tempDraft,
-                  persona
+                  personaId
                 );
                 this.props.routerGo("connections", {
                   useCase: undefined,
@@ -516,14 +516,18 @@ class CreateAtom extends React.Component {
         const tempDefaultNodeUri = this.props.defaultNodeUri;
 
         if (this.props.loggedIn) {
-          this.props.atomsCreate(tempDraft, persona, tempDefaultNodeUri);
+          this.props.atomsCreate(tempDraft, personaId, tempDefaultNodeUri);
           this.props.routerGo("inventory");
         } else {
           this.props.showTermsDialog(
             Immutable.fromJS({
               acceptCallback: () => {
                 this.props.hideModalDialog();
-                this.props.atomsCreate(tempDraft, persona, tempDefaultNodeUri);
+                this.props.atomsCreate(
+                  tempDraft,
+                  personaId,
+                  tempDefaultNodeUri
+                );
                 this.props.routerGo("inventory");
               },
               cancelCallback: () => {
