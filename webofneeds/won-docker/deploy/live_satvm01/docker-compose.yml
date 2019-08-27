@@ -39,6 +39,21 @@ services:
       - $base_folder/letsencrypt/certs:/etc/letsencrypt
       - $base_folder/letsencrypt/acme-challenge:/usr/share/nginx/html
 
+  letsencrypt_hackathon:
+    restart: always
+    build: ../../image/letsencrypt
+    image: webofneeds/letsencrypt:live
+    environment:
+      - "key_store_password=$uki_certificate_passwd"
+      - "domain_params=-d hackathon.matchat.org"
+      - "key_pem_file=/etc/letsencrypt/live/hackathon.matchat.org/privkey.pem"
+      - "cert_pem_file=/etc/letsencrypt/live/hackathon.matchat.org/fullchain.pem"
+      - "pfx_store_file=/etc/letsencrypt/live/hackathon.matchat.org/t-key-cert.pfx"
+      - "jks_store_file=/etc/letsencrypt/live/hackathon.matchat.org/t-keystore.jks"
+    volumes:
+      - $base_folder/letsencrypt/certs:/etc/letsencrypt
+      - $base_folder/letsencrypt/acme-challenge:/usr/share/nginx/html
+
   # owner server self-signed certificate for communication with wonnode
   gencert:
     build: ../../image/gencert
