@@ -22,13 +22,18 @@ import * as accountUtils from "../redux/utils/account-utils.js";
 import WonAtomCardGrid from "../components/atom-card-grid.jsx";
 import WonAtomMap from "../components/atom-map.jsx";
 import WonAtomMessages from "../components/atom-messages.jsx";
+import WonModalDialog from "../components/modal-dialog.jsx";
 
 import "~/style/_map.scss";
 import "~/style/_connection-overlay.scss";
 
 const template = (
   <container>
-    <won-modal-dialog ng-if="self.showModalDialog" />
+    <won-preact
+      component="self.WonModalDialog"
+      props="{}"
+      ng-if="self.showModalDialog"
+    />
     <div
       className="won-modal-connectionview"
       ng-if="self.showConnectionOverlay"
@@ -237,6 +242,7 @@ class Controller {
     this.WonAtomMap = WonAtomMap;
     this.WonAtomCardGrid = WonAtomCardGrid;
     this.WonAtomMessages = WonAtomMessages;
+    this.WonModalDialog = WonModalDialog;
 
     const selectFromState = state => {
       const viewConnUri = generalSelectors.getViewConnectionUriFromRoute(state);

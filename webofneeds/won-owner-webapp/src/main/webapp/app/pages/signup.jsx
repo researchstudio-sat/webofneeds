@@ -9,6 +9,7 @@ import { get } from "../utils.js";
 import { attach, classOnComponentRoot } from "../cstm-ng-utils.js";
 import { actionCreators } from "../actions/actions.js";
 import WonLabelledHr from "../components/labelled-hr.jsx";
+import WonModalDialog from "../components/modal-dialog.jsx";
 
 import * as accountUtils from "../redux/utils/account-utils.js";
 import * as viewSelectors from "../redux/selectors/view-selectors.js";
@@ -17,7 +18,11 @@ import "~/style/_signup.scss";
 
 const template = (
   <container>
-    <won-modal-dialog ng-if="self.showModalDialog" />
+    <won-preact
+      component="self.WonModalDialog"
+      props="{}"
+      ng-if="self.showModalDialog"
+    />
     <won-topnav page-title="::'Sign Up'" />
     <won-menu ng-if="self.isLoggedIn" />
     <won-toasts />
@@ -171,6 +176,7 @@ class SignupController {
     this.rememberMe = false;
     this.acceptToS = false;
     this.WonLabelledHr = WonLabelledHr;
+    this.WonModalDialog = WonModalDialog;
 
     const select = state => {
       const accountState = get(state, "account");

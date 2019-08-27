@@ -2,6 +2,7 @@
 
 import angular from "angular";
 import ngAnimate from "angular-animate";
+import WonModalDialog from "../components/modal-dialog.jsx";
 import compareToModule from "../directives/compareTo.js";
 import howToModule from "../components/howto.js";
 import accordionModule from "../components/accordion.js";
@@ -19,7 +20,11 @@ import "~/style/_about.scss";
 
 const template = (
   <container>
-    <won-modal-dialog ng-if="self.showModalDialog" />
+    <won-preact
+      component="self.WonModalDialog"
+      props="{}"
+      ng-if="self.showModalDialog"
+    />
     <won-topnav page-title="::'About'" />
     <won-menu ng-if="self.isLoggedIn" />
     <won-toasts />
@@ -274,6 +279,7 @@ const questions = [
 class AboutController {
   constructor(/* arguments <- serviceDependencies */) {
     attach(this, serviceDependencies, arguments);
+    this.WonModalDialog = WonModalDialog;
 
     window.ab4dbg = this;
 

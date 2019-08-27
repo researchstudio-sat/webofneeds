@@ -5,6 +5,7 @@ import ngAnimate from "angular-animate";
 import WonConnectionsOverview from "../components/connections-overview.jsx";
 import WonAtomMessages from "../components/atom-messages.jsx";
 import WonGroupAtomMessages from "../components/group-atom-messages.jsx";
+import WonModalDialog from "../components/modal-dialog.jsx";
 import { get, getIn } from "../utils.js";
 import { attach, classOnComponentRoot } from "../cstm-ng-utils.js";
 import { actionCreators } from "../actions/actions.js";
@@ -21,7 +22,11 @@ import "~/style/_connection-overlay.scss";
 
 const template = (
   <container>
-    <won-modal-dialog ng-if="self.showModalDialog" />
+    <won-preact
+      component="self.WonModalDialog"
+      props="{}"
+      ng-if="self.showModalDialog"
+    />
     <div
       className="won-modal-connectionview"
       ng-if="self.showConnectionOverlay"
@@ -102,6 +107,7 @@ class ConnectionsController {
     this.WonConnectionsOverview = WonConnectionsOverview;
     this.WonAtomMessages = WonAtomMessages;
     this.WonGroupAtomMessages = WonGroupAtomMessages;
+    this.WonModalDialog = WonModalDialog;
 
     const selectFromState = state => {
       const viewConnUri = generalSelectors.getViewConnectionUriFromRoute(state);

@@ -4,6 +4,7 @@ import angular from "angular";
 import ngAnimate from "angular-animate";
 
 import WonCreateAtom from "../components/create-atom.jsx";
+import WonModalDialog from "../components/modal-dialog.jsx";
 import createSearchModule from "../components/create-search.js";
 import usecasePickerModule from "../components/usecase-picker.js";
 import usecaseGroupModule from "../components/usecase-group.js";
@@ -20,7 +21,11 @@ import * as accountUtils from "../redux/utils/account-utils";
 
 const template = (
   <container>
-    <won-modal-dialog ng-if="self.showModalDialog" />
+    <won-preact
+      component="self.WonModalDialog"
+      props="{}"
+      ng-if="self.showModalDialog"
+    />
     <won-topnav page-title="::'Create'" />
     <won-menu ng-if="self.isLoggedIn" />
     <won-toasts />
@@ -46,6 +51,7 @@ class CreateController {
   constructor() {
     attach(this, serviceDependencies, arguments);
     this.WonCreateAtom = WonCreateAtom;
+    this.WonModalDialog = WonModalDialog;
 
     const selectFromState = state => {
       const useCase = generalSelectors.getUseCaseFromRoute(state);

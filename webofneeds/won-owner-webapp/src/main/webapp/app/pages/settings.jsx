@@ -11,13 +11,19 @@ import { actionCreators } from "../actions/actions.js";
 import settingsWrapper from "../components/settings-wrapper.js";
 import * as viewSelectors from "../redux/selectors/view-selectors.js";
 import * as accountUtils from "../redux/utils/account-utils.js";
+import WonModalDialog from "../components/modal-dialog.jsx";
+
 import { h } from "preact";
 
 import "~/style/_signup.scss";
 
 const template = (
   <container>
-    <won-modal-dialog ng-if="self.showModalDialog" />
+    <won-preact
+      component="self.WonModalDialog"
+      props="{}"
+      ng-if="self.showModalDialog"
+    />
     <won-topnav page-title="::'Settings'" />
     <won-menu ng-if="self.isLoggedIn" />
     <won-toasts />
@@ -40,6 +46,7 @@ class SettingsController {
   constructor(/* arguments <- serviceDependencies */) {
     attach(this, serviceDependencies, arguments);
     this.rememberMe = false;
+    this.WonModalDialog = WonModalDialog;
 
     const select = state => {
       const accountState = get(state, "account");

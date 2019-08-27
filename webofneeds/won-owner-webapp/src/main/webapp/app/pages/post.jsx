@@ -12,6 +12,7 @@ import won from "../won-es6.js";
 import { actionCreators } from "../actions/actions.js";
 import WonAtomInfo from "../components/atom-info.jsx";
 import WonAtomMessages from "../components/atom-messages.jsx";
+import WonModalDialog from "../components/modal-dialog.jsx";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as viewSelectors from "../redux/selectors/view-selectors.js";
 import * as processUtils from "../redux/utils/process-utils.js";
@@ -23,7 +24,11 @@ import * as accountUtils from "../redux/utils/account-utils";
 
 const template = (
   <container>
-    <won-modal-dialog ng-if="self.showModalDialog" />
+    <won-preact
+      component="self.WonModalDialog"
+      props="{}"
+      ng-if="self.showModalDialog"
+    />
     <div
       className="won-modal-connectionview"
       ng-if="self.showConnectionOverlay"
@@ -83,6 +88,7 @@ class Controller {
     this.WON = won.WON;
     this.WonAtomInfo = WonAtomInfo;
     this.WonAtomMessages = WonAtomMessages;
+    this.WonModalDialog = WonModalDialog;
 
     const selectFromState = state => {
       const atomUri = generalSelectors.getPostUriFromRoute(state);
