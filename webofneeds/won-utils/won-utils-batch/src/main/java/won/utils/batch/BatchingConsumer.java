@@ -2,7 +2,13 @@ package won.utils.batch;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Queue;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -11,6 +17,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import com.google.common.base.Charsets;
+import com.google.common.hash.BloomFilter;
+import com.google.common.hash.Funnels;
 
 /**
  * Accepts items together with a key for grouping them, a
@@ -60,27 +70,41 @@ public class BatchingConsumer<K, I> {
     }
 
     public void accept(K key, I item, Consumer<Collection<I>> consumer) {
-        accept(key, item, consumer, Optional.empty());
+        accept(key, item, Optional.empty(), consumer, Optional.empty());
     }
 
     public void accept(K key, I item, Consumer<Collection<I>> consumer, Config config) {
-        accept(key, item, consumer, Optional.ofNullable(config));
+        accept(key, item, Optional.empty(), consumer, Optional.ofNullable(config));
+    }
+
+    public void accept(K key, I item, String deduplicationKey, Consumer<Collection<I>> consumer) {
+        accept(key, item, Optional.ofNullable(deduplicationKey), consumer, Optional.empty());
+    }
+
+    public void accept(K key, I item, String deduplicationKey, Consumer<Collection<I>> consumer, Config config) {
+        accept(key, item, Optional.ofNullable(deduplicationKey), consumer, Optional.ofNullable(config));
     }
 
     /**
-     * Offer an item to the BatchingConsumer, providing a consumer and an optional
-     * config. The consumer must be specified just in case a new Batch is created in
-     * this invocation. If that happens, the consumer is used, otherwise it will not
-     * be. The config is optional because the BatchingConsumer has a defaultConfig
-     * that is used if no config is specified. Again, the config presented when a
-     * new Batch is instantiated will be used.
+     * Offer an item to the BatchingConsumer, providing an optional
+     * deduplicationKey, a consumer and an optional config. The consumer must be
+     * specified just in case a new Batch is created in this invocation. If that
+     * happens, the consumer is used, otherwise it will not be. The config is
+     * optional because the BatchingConsumer has a defaultConfig that is used if no
+     * config is specified. Again, the config presented when a new Batch is
+     * instantiated will be used. The deduplicationKey is used to avoid adding the
+     * same item multiple times: if accept() is called multiple times with the same
+     * deduplicationKey, only the first one is actually accepted, the subsequent
+     * ones are dropped silently. Note: There is a small chance that an item with a
+     * deduplicationKey will be dropped despite being the first one with that key.
      * 
      * @param key
      * @param item
      * @param consumer
      * @param config
      */
-    public void accept(K key, I item, Consumer<Collection<I>> consumer, Optional<Config> config) {
+    public void accept(K key, I item, Optional<String> deduplicationKey, Consumer<Collection<I>> consumer,
+                    Optional<Config> config) {
         Batch<K, I> batch = null;
         synchronized (batches) {
             batch = batches.get(key);
@@ -90,7 +114,7 @@ public class BatchingConsumer<K, I> {
                 batches.put(key, batch);
             }
         }
-        batch.add(item);
+        batch.add(item, deduplicationKey);
         batch.rescheduleChunkConsumption();
     }
 
@@ -188,6 +212,8 @@ public class BatchingConsumer<K, I> {
         private final AtomicBoolean firstAdd = new AtomicBoolean(true);
         private final AtomicBoolean shuttingDown = new AtomicBoolean(false);
         private final Object monitor = new Object();
+        private final BloomFilter<CharSequence> duplicateFilter = BloomFilter
+                        .create(Funnels.stringFunnel(Charsets.UTF_8), 100, 0.01);
 
         Batch(K key, Consumer<Collection<I>> consumer, Config config) {
             this.key = key;
@@ -198,10 +224,19 @@ public class BatchingConsumer<K, I> {
         /**
          * Adds an item to this batch, possibly triggering consumption.
          * 
-         * @param item
+         * @param item the item
+         * @param deduplicationKey an optional string used for deduplication: subsequent
+         * add() operations with the same deduplicationKey will not have any effect.
          */
-        void add(I item) {
+        void add(I item, Optional<String> deduplicationKey) {
             synchronized (monitor) {
+                if (deduplicationKey.isPresent()) {
+                    if (this.duplicateFilter.mightContain(deduplicationKey.get())) {
+                        return;
+                    } else {
+                        this.duplicateFilter.put(deduplicationKey.get());
+                    }
+                }
                 this.lastChunkInstant = Optional.of(Instant.now());
                 if (this.config.consumeFirst.orElse(false) && this.firstAdd.compareAndSet(true, false)) {
                     consume(Stream.of(item).collect(Collectors.toList()), false);

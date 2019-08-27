@@ -498,6 +498,9 @@ public class WonWebSocketHandler extends TextWebSocketHandler
                                             atomUri.toString(),
                                             targetAtomUri.get().toString(),
                                             wonMessage.getRecipientURI().toString() };
+                            // only count 1 item per atom/atom combination per batch key.
+                            String deduplicationKey = atomUri.toString() + targetAtomUri.toString();
+                            // set the configuration
                             BatchingConsumer.Config config = new BatchingConsumer.ConfigBuilder()
                                             .consumeFirst(true) // send the first mail immediately
                                             .maxBatchAge(Duration.ofHours(24)) // empty batch at least once a day
@@ -508,7 +511,7 @@ public class WonWebSocketHandler extends TextWebSocketHandler
                                                                                    // first match)
                                             .maxBatchSize(50) // as soon as we reach 50 hints, send mail
                                             .build();
-                            batchingConsumer.accept(key, args, batch -> {
+                            batchingConsumer.accept(key, args, deduplicationKey, batch -> {
                                 if (batch.size() == 1) {
                                     String[] a = batch.iterator().next();
                                     emailSender.sendHintNotificationMessage(a[0], a[1], a[2], a[3]);
