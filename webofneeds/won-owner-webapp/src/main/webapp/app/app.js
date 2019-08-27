@@ -31,7 +31,6 @@ import configRedux from "./configRedux.js";
 import { actionCreators } from "./actions/actions.js";
 //-------- Components ---------
 import topnav from "./components/topnav.js";
-import menu from "./components/menu.js";
 import footer from "./components/footer.js";
 import slideIn from "./components/slide-in.js";
 import connectionsComponent from "./pages/connections.jsx";
@@ -72,7 +71,6 @@ let app = angular.module("won.owner", [
 
   //components
   topnav,
-  menu,
   footer,
   slideIn,
   preactModule,

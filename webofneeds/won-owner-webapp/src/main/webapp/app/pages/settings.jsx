@@ -13,6 +13,7 @@ import * as viewSelectors from "../redux/selectors/view-selectors.js";
 import * as accountUtils from "../redux/utils/account-utils.js";
 import WonModalDialog from "../components/modal-dialog.jsx";
 import WonToasts from "../components/toasts.jsx";
+import WonMenu from "../components/menu.jsx";
 
 import { h } from "preact";
 
@@ -27,7 +28,12 @@ const template = (
       ng-if="self.showModalDialog"
     />
     <won-topnav page-title="::'Settings'" />
-    <won-menu ng-if="self.isLoggedIn" />
+    <won-preact
+      className="menu"
+      component="self.WonMenu"
+      props="{}"
+      ng-if="self.isLoggedIn"
+    />
     <won-preact className="toasts" component="self.WonToasts" props="{}" />
     <won-slide-in ng-if="self.showSlideIns" />
     <main className="settings">
@@ -50,6 +56,7 @@ class SettingsController {
     this.rememberMe = false;
     this.WonModalDialog = WonModalDialog;
     this.WonToasts = WonToasts;
+    this.WonMenu = WonMenu;
 
     const select = state => {
       const accountState = get(state, "account");
