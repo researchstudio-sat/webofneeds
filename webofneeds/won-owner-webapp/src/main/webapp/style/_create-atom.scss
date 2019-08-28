@@ -2,8 +2,7 @@
 @import "animate";
 @import "sizing-utils";
 
-won-create-atom,
-won-create-search {
+won-create-atom {
   display: grid;
   grid-template-areas: "header" "main" "footer";
   grid-template-rows: min-content minmax($minimalGridRows, 1fr) min-content;

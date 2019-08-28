@@ -11,7 +11,6 @@ import WonSlideIn from "../components/slide-in.jsx";
 import WonFooter from "../components/footer.jsx";
 import WonUseCasePicker from "../components/usecase-picker.jsx";
 import WonUseCaseGroup from "../components/usecase-group.jsx";
-import createSearchModule from "../components/create-search.js";
 import { get, getIn } from "../utils.js";
 import { attach, classOnComponentRoot } from "../cstm-ng-utils.js";
 import { actionCreators } from "../actions/actions.js";
@@ -62,7 +61,6 @@ const template = (
         props="{}"
         ng-if="self.showCreatePost"
       />
-      <won-create-search ng-if="self.showCreateSearch" />
     </main>
     <won-preact className="footer" component="self.WonFooter" props="{}" />
   </container>
@@ -92,23 +90,16 @@ class CreateController {
       const showCreateFromPost = !!(fromAtomUri && mode);
 
       const showUseCaseGroup = !useCase && !!useCaseGroup;
-      const showCreatePost =
-        showCreateFromPost || (!!useCase && useCase !== "search");
-      const showCreateSearch = !!useCase && useCase === "search";
+      const showCreatePost = showCreateFromPost || !!useCase;
 
       const accountState = get(state, "account");
 
       return {
         isLoggedIn: accountUtils.isLoggedIn(accountState),
         showModalDialog: getIn(state, ["view", "showModalDialog"]),
-        showUseCasePicker: !(
-          showUseCaseGroup ||
-          showCreatePost ||
-          showCreateSearch
-        ),
+        showUseCasePicker: !(showUseCaseGroup || showCreatePost),
         showUseCaseGroup,
         showCreatePost,
-        showCreateSearch,
         showSlideIns:
           viewSelectors.hasSlideIns(state) &&
           viewSelectors.isSlideInsVisible(state),
@@ -127,7 +118,7 @@ CreateController.$inject = [];
 
 export default {
   module: angular
-    .module("won.owner.components.create", [ngAnimate, createSearchModule])
+    .module("won.owner.components.create", [ngAnimate])
     .controller("CreateController", [...serviceDependencies, CreateController])
     .name,
   controller: "CreateController",
