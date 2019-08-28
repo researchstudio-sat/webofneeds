@@ -9,7 +9,7 @@ import WonSlideIn from "../components/slide-in.jsx";
 import WonFooter from "../components/footer.jsx";
 import WonHowTo from "../components/howto.jsx";
 import WonFlexGrid from "../components/flexgrid.jsx";
-import accordionModule from "../components/accordion.js";
+import WonAccordion from "../components/accordion.jsx";
 import { get, getIn, toAbsoluteURL } from "../utils.js";
 import { attach, classOnComponentRoot } from "../cstm-ng-utils.js";
 import { actionCreators } from "../actions/actions.js";
@@ -137,9 +137,10 @@ const template = (
         ng-if="!self.visibleSection || self.visibleSection === 'aboutFaq'"
       >
         <div className="about__faq__title">FAQs</div>
-        <won-accordion
+        <won-preact
           className="about__faq__questions"
-          items="::self.questions"
+          props="{items: self.questions, className: 'about__faq__questions'}"
+          component="self.WonAccordion"
         />
       </section>
     </main>
@@ -303,6 +304,7 @@ class AboutController {
     this.WonFooter = WonFooter;
     this.WonHowTo = WonHowTo;
     this.WonFlexGrid = WonFlexGrid;
+    this.WonAccordion = WonAccordion;
 
     window.ab4dbg = this;
 
@@ -351,7 +353,7 @@ class AboutController {
 
 export default {
   module: angular
-    .module("won.owner.components.about", [accordionModule, ngAnimate])
+    .module("won.owner.components.about", [ngAnimate])
     .controller("AboutController", [...serviceDependencies, AboutController])
     .name,
   controller: "AboutController",

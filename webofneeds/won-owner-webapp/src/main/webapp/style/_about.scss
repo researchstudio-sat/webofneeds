@@ -198,7 +198,8 @@ main.about {
       padding-bottom: 2rem;
     }
 
-    won-accordion.about__faq__questions {
+    > won-preact.about__faq__questions,
+    > won-accordion.about__faq__questions {
       display: block;
       max-width: 45rem;
       margin: 0 auto;

@@ -25,6 +25,10 @@ won-accordion {
       display: table-cell;
       width: 1rem;
       height: 1rem;
+
+      &.clickable {
+        --local-primary: #{$won-primary-color};
+      }
     }
   }
 }
