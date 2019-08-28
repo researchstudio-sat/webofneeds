@@ -20,7 +20,7 @@ Furthermore, the `FactoryBot` builds upon the `EventBot` and adds some additiona
 
 Events can be generated in different situations:
 
-- as the bot reaches certain [stages in its life cycle](src/main/java/won/bot/framework/eventbot/event/impl/lifecycle), e.g. the [InitializeEvent](src/main/java/won/bot/framework/eventbot/event/impl/lifecycle/InitializeEvent.java) or the [WorkDoneEvent](src/main/java/won/bot/framework/eventbot/event/impl/lifecycle/WorkDoneEvent.java).
+- as a bot reaches certain [stages in its life cycle](src/main/java/won/bot/framework/eventbot/event/impl/lifecycle), e.g. the [InitializeEvent](src/main/java/won/bot/framework/eventbot/event/impl/lifecycle/InitializeEvent.java) or the [WorkDoneEvent](src/main/java/won/bot/framework/eventbot/event/impl/lifecycle/WorkDoneEvent.java).
 - whenever a message is received for one of the atoms controlled by the bot.
 - at regular intervals, by attaching a [trigger](src/main/java/won/bot/framework/eventbot/action/impl/trigger/BotTrigger.java) to the bot that publishes [ActEvents](src/main/java/won/bot/framework/eventbot/event/impl/lifecycle/ActEvent.java) at regular intervals.
 - as part of an action that is executed by the bot.
@@ -35,7 +35,7 @@ Each bot has an [event bus]() that receives all events sent to the bot. To liste
 
 ### Context
 
-Each bot provides a [BotContext](src/main/java/won/bot/framework/bot/context/BotContext.java) and an [EventListenerContext](src/main/java/won/bot/framework/eventbot/EventListenerContext.java), both are initialized as singe instances that can be accessed at any point within the bot and are used to connect to various resources.
+Each bot provides a [BotContext](src/main/java/won/bot/framework/bot/context/BotContext.java) and an [EventListenerContext](src/main/java/won/bot/framework/eventbot/EventListenerContext.java), both are initialized as single instances that can be accessed anywhere within the bot and are used to connect to various resources.
 
 The `BotContext` is used by a bot to keep track of atoms, nodes or other objects it knows or is responsible for. This information can be used by both the bot itself and the framework to decide which events should be routed to which bot.
 
@@ -53,7 +53,7 @@ The `EventListenerContext` is used to connect the bot to various resources it ma
 
 [Actions](src/main/java/won/bot/framework/eventbot/action) are predefined operations that determine the bot's behaviour. Each action is bound to an `EventListener` and triggered by the corresponding event. For example, an `InitializationAction` could listen for an `InitializeEvent` and, once triggered, perform various initialization tasks like creating an atom, setting up additional event listeners or sending out other events.
 
-While event listeners and event generally provide the framework for when a bot acts, actions determine what a bot actually does.
+While event listeners and events generally provide the framework for when a bot acts, actions determine what a bot actually does.
 
 ### Behaviours
 
