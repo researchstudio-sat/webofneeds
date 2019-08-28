@@ -8,9 +8,8 @@ import WonMenu from "../components/menu.jsx";
 import WonSlideIn from "../components/slide-in.jsx";
 import WonFooter from "../components/footer.jsx";
 import WonHowTo from "../components/howto.jsx";
-import compareToModule from "../directives/compareTo.js";
+import WonFlexGrid from "../components/flexgrid.jsx";
 import accordionModule from "../components/accordion.js";
-import flexGridModule from "../components/flexgrid.js";
 import { get, getIn, toAbsoluteURL } from "../utils.js";
 import { attach, classOnComponentRoot } from "../cstm-ng-utils.js";
 import { actionCreators } from "../actions/actions.js";
@@ -47,9 +46,10 @@ const template = (
     <main className="about" id="allSections">
       <section className="about__welcome" ng-if="!self.visibleSection">
         <div className="about__welcome__title">What is the Web of Needs?</div>
-        <won-flex-grid
-          className="about__welcome__grid"
-          items="::self.peopleGrid"
+        <won-preact
+          className="about__welcome__grid flexGrid"
+          props="{items: self.peopleGrid, className: 'about__welcome__grid'}"
+          component="self.WonFlexGrid"
         />
         <div className="about__welcome__description">
           <span className="about__welcome__description__title">
@@ -302,6 +302,7 @@ class AboutController {
     this.WonSlideIn = WonSlideIn;
     this.WonFooter = WonFooter;
     this.WonHowTo = WonHowTo;
+    this.WonFlexGrid = WonFlexGrid;
 
     window.ab4dbg = this;
 
@@ -350,12 +351,7 @@ class AboutController {
 
 export default {
   module: angular
-    .module("won.owner.components.about", [
-      accordionModule,
-      flexGridModule,
-      compareToModule,
-      ngAnimate,
-    ])
+    .module("won.owner.components.about", [accordionModule, ngAnimate])
     .controller("AboutController", [...serviceDependencies, AboutController])
     .name,
   controller: "AboutController",

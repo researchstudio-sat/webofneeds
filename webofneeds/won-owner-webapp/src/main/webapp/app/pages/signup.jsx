@@ -14,6 +14,7 @@ import WonToasts from "../components/toasts.jsx";
 import WonMenu from "../components/menu.jsx";
 import WonSlideIn from "../components/slide-in.jsx";
 import WonFooter from "../components/footer.jsx";
+import compareToModule from "../directives/compareTo.js";
 
 import * as accountUtils from "../redux/utils/account-utils.js";
 import * as viewSelectors from "../redux/selectors/view-selectors.js";
@@ -240,7 +241,7 @@ class SignupController {
 
 export default {
   module: angular
-    .module("won.owner.components.signup", [ngAnimate])
+    .module("won.owner.components.signup", [ngAnimate, compareToModule])
     .controller("SignupController", [...serviceDependencies, SignupController])
     .name,
   controller: "SignupController",

@@ -46,7 +46,7 @@ main.about {
       color: white;
     }
 
-    .about__welcome__grid {
+    > .about__welcome__grid {
       margin-left: auto;
       margin-right: auto;
       $fourPortraitsWidth: 59rem;
