@@ -101,55 +101,57 @@ class WonUsecasePicker extends React.Component {
           ) : (
             <React.Fragment>
               {/*<!-- USE CASE GROUPS -->*/}
-              {Object.values(this.useCaseGroups).map((ucg, index) => {
-                if (
-                  useCaseUtils.isDisplayableUseCaseGroup(ucg) &&
-                  useCaseUtils.countDisplayableItemsInGroup(ucg) >
-                    this.showGroupsThreshold
-                ) {
-                  return (
-                    <div
-                      key={ucg.identifier + "-" + index}
-                      className="ucp__main__usecase-group clickable"
-                      onClick={() => this.viewUseCaseGroup(ucg)}
-                    >
-                      {!!ucg.icon && (
-                        <svg className="ucp__main__usecase-group__icon">
-                          <use xlinkHref={ucg.icon} href={ucg.icon} />
-                        </svg>
-                      )}
-                      {!!ucg.label && (
-                        <div className="ucp__main__usecase-group__label">
-                          {ucg.label}
-                        </div>
-                      )}
-                    </div>
-                  );
-                }
-              })}
+              {!!this.useCaseGroups &&
+                Object.values(this.useCaseGroups).map((ucg, index) => {
+                  if (
+                    useCaseUtils.isDisplayableUseCaseGroup(ucg) &&
+                    useCaseUtils.countDisplayableItemsInGroup(ucg) >
+                      this.showGroupsThreshold
+                  ) {
+                    return (
+                      <div
+                        key={ucg.identifier + "-" + index}
+                        className="ucp__main__usecase-group clickable"
+                        onClick={() => this.viewUseCaseGroup(ucg)}
+                      >
+                        {!!ucg.icon && (
+                          <svg className="ucp__main__usecase-group__icon">
+                            <use xlinkHref={ucg.icon} href={ucg.icon} />
+                          </svg>
+                        )}
+                        {!!ucg.label && (
+                          <div className="ucp__main__usecase-group__label">
+                            {ucg.label}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  }
+                })}
               {/*<!-- USE CASES WITHOUT GROUPS -->*/}
-              {Object.values(this.ungroupedUseCases).map((useCase, index) => {
-                if (useCaseUtils.isDisplayableUseCase(useCase)) {
-                  return (
-                    <div
-                      key={useCase.identifier + "-" + index}
-                      className="ucp__main__usecase-group clickable"
-                      onClick={() => this.startFrom(useCase)}
-                    >
-                      {!!useCase.icon && (
-                        <svg className="ucp__main__usecase-group__icon">
-                          <use xlinkHref={useCase.icon} href={useCase.icon} />
-                        </svg>
-                      )}
-                      {!!useCase.label && (
-                        <div className="ucp__main__usecase-group__label">
-                          {useCase.label}
-                        </div>
-                      )}
-                    </div>
-                  );
-                }
-              })}
+              {!!this.ungroupedUseCases &&
+                Object.values(this.ungroupedUseCases).map((useCase, index) => {
+                  if (useCaseUtils.isDisplayableUseCase(useCase)) {
+                    return (
+                      <div
+                        key={useCase.identifier + "-" + index}
+                        className="ucp__main__usecase-group clickable"
+                        onClick={() => this.startFrom(useCase)}
+                      >
+                        {!!useCase.icon && (
+                          <svg className="ucp__main__usecase-group__icon">
+                            <use xlinkHref={useCase.icon} href={useCase.icon} />
+                          </svg>
+                        )}
+                        {!!useCase.label && (
+                          <div className="ucp__main__usecase-group__label">
+                            {useCase.label}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  }
+                })}
             </React.Fragment>
           )}
         </div>

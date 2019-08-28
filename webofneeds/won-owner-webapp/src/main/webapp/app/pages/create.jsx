@@ -10,8 +10,8 @@ import WonMenu from "../components/menu.jsx";
 import WonSlideIn from "../components/slide-in.jsx";
 import WonFooter from "../components/footer.jsx";
 import WonUseCasePicker from "../components/usecase-picker.jsx";
+import WonUseCaseGroup from "../components/usecase-group.jsx";
 import createSearchModule from "../components/create-search.js";
-import usecaseGroupModule from "../components/usecase-group.js";
 import { get, getIn } from "../utils.js";
 import { attach, classOnComponentRoot } from "../cstm-ng-utils.js";
 import { actionCreators } from "../actions/actions.js";
@@ -52,7 +52,11 @@ const template = (
         props="{}"
         ng-if="self.showUseCasePicker"
       />
-      <won-usecase-group ng-if="self.showUseCaseGroups" />
+      <won-preact
+        component="self.WonUseCaseGroup"
+        props="{}"
+        ng-if="self.showUseCaseGroup"
+      />
       <won-preact
         component="self.WonCreateAtom"
         props="{}"
@@ -76,6 +80,7 @@ class CreateController {
     this.WonSlideIn = WonSlideIn;
     this.WonFooter = WonFooter;
     this.WonUseCasePicker = WonUseCasePicker;
+    this.WonUseCaseGroup = WonUseCaseGroup;
 
     const selectFromState = state => {
       const useCase = generalSelectors.getUseCaseFromRoute(state);
@@ -86,7 +91,7 @@ class CreateController {
 
       const showCreateFromPost = !!(fromAtomUri && mode);
 
-      const showUseCaseGroups = !useCase && !!useCaseGroup;
+      const showUseCaseGroup = !useCase && !!useCaseGroup;
       const showCreatePost =
         showCreateFromPost || (!!useCase && useCase !== "search");
       const showCreateSearch = !!useCase && useCase === "search";
@@ -97,11 +102,11 @@ class CreateController {
         isLoggedIn: accountUtils.isLoggedIn(accountState),
         showModalDialog: getIn(state, ["view", "showModalDialog"]),
         showUseCasePicker: !(
-          showUseCaseGroups ||
+          showUseCaseGroup ||
           showCreatePost ||
           showCreateSearch
         ),
-        showUseCaseGroups,
+        showUseCaseGroup,
         showCreatePost,
         showCreateSearch,
         showSlideIns:
@@ -122,11 +127,7 @@ CreateController.$inject = [];
 
 export default {
   module: angular
-    .module("won.owner.components.create", [
-      ngAnimate,
-      usecaseGroupModule,
-      createSearchModule,
-    ])
+    .module("won.owner.components.create", [ngAnimate, createSearchModule])
     .controller("CreateController", [...serviceDependencies, CreateController])
     .name,
   controller: "CreateController",
