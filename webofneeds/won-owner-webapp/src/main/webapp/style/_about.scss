@@ -7,6 +7,7 @@ main.about {
   font-weight: 300;
 
   //General Section styling
+  & > won-preact.howTo,
   & > won-how-to,
   & > section {
     width: 100%;

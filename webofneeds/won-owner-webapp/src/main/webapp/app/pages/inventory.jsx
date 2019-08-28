@@ -6,13 +6,13 @@ import { get, getIn, sortByDate } from "../utils.js";
 import { attach, classOnComponentRoot } from "../cstm-ng-utils.js";
 import { connect2Redux } from "../configRedux.js";
 import { actionCreators } from "../actions/actions.js";
-import howToModule from "../components/howto.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as viewSelectors from "../redux/selectors/view-selectors.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as processUtils from "../redux/utils/process-utils.js";
 import * as accountUtils from "../redux/utils/account-utils.js";
 import * as viewUtils from "../redux/utils/view-utils.js";
+import WonHowTo from "../components/howto.jsx";
 import WonAtomCardGrid from "../components/atom-card-grid.jsx";
 import WonAtomInfo from "../components/atom-info.jsx";
 import WonAtomMessages from "../components/atom-messages.jsx";
@@ -73,7 +73,7 @@ const template = (
         className="ownerwelcome__text"
         ng-include="self.welcomeTemplatePath"
       />
-      <won-how-to />
+      <won-preact className="howTo" component="self.WonHowTo" props="{}" />
     </main>
     <main
       className="ownerinventory"
@@ -156,6 +156,7 @@ class Controller {
     this.WonMenu = WonMenu;
     this.WonSlideIn = WonSlideIn;
     this.WonFooter = WonFooter;
+    this.WonHowTo = WonHowTo;
 
     const selectFromState = state => {
       const viewConnUri = generalSelectors.getViewConnectionUriFromRoute(state);
@@ -255,7 +256,7 @@ Controller.$inject = [];
 
 export default {
   module: angular
-    .module("won.owner.components.inventory", [ngAnimate, howToModule])
+    .module("won.owner.components.inventory", [ngAnimate])
     .controller("InventoryController", [...serviceDependencies, Controller])
     .name,
   controller: "InventoryController",

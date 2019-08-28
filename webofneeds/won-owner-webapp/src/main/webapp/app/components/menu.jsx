@@ -46,7 +46,7 @@ const mapDispatchToProps = dispatch => {
       dispatch(actionCreators.router__stateGo(path, props));
     },
     updateCurrentLocation: locImm => {
-      this.view__updateCurrentLocation(locImm);
+      dispatch(actionCreators.view__updateCurrentLocation(locImm));
     },
     toggleSlideIns: () => {
       dispatch(actionCreators.view__toggleSlideIns());

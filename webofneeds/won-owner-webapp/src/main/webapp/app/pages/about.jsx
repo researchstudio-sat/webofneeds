@@ -7,8 +7,8 @@ import WonToasts from "../components/toasts.jsx";
 import WonMenu from "../components/menu.jsx";
 import WonSlideIn from "../components/slide-in.jsx";
 import WonFooter from "../components/footer.jsx";
+import WonHowTo from "../components/howto.jsx";
 import compareToModule from "../directives/compareTo.js";
-import howToModule from "../components/howto.js";
 import accordionModule from "../components/accordion.js";
 import flexGridModule from "../components/flexgrid.js";
 import { get, getIn, toAbsoluteURL } from "../utils.js";
@@ -96,8 +96,10 @@ const template = (
           </span>
         </div>
       </section>
-      <won-how-to
-        className="about__howto"
+      <won-preact
+        className="about__howto howTo"
+        component="self.WonHowTo"
+        props="{className: 'about__howto'}"
         ng-if="!self.visibleSection || self.visibleSection === 'aboutHowTo'"
       />
       <section
@@ -141,7 +143,7 @@ const template = (
         />
       </section>
     </main>
-    <won-preact class="footer" component="self.WonFooter" props="{}" />
+    <won-preact className="footer" component="self.WonFooter" props="{}" />
   </container>
 );
 
@@ -299,6 +301,7 @@ class AboutController {
     this.WonMenu = WonMenu;
     this.WonSlideIn = WonSlideIn;
     this.WonFooter = WonFooter;
+    this.WonHowTo = WonHowTo;
 
     window.ab4dbg = this;
 
@@ -351,7 +354,6 @@ export default {
       accordionModule,
       flexGridModule,
       compareToModule,
-      howToModule,
       ngAnimate,
     ])
     .controller("AboutController", [...serviceDependencies, AboutController])
