@@ -14,6 +14,7 @@ import WonToasts from "../components/toasts.jsx";
 import WonMenu from "../components/menu.jsx";
 import WonSlideIn from "../components/slide-in.jsx";
 import WonFooter from "../components/footer.jsx";
+import WonTopnav from "../components/topnav.jsx";
 import compareToModule from "../directives/compareTo.js";
 
 import * as accountUtils from "../redux/utils/account-utils.js";
@@ -29,7 +30,11 @@ const template = (
       props="{}"
       ng-if="self.showModalDialog"
     />
-    <won-topnav page-title="::'Sign Up'" />
+    <won-preact
+      className="topnav"
+      component="self.WonTopnav"
+      props="{pageTitle: 'Sign Up'}"
+    />
     <won-preact
       className="menu"
       component="self.WonMenu"
@@ -197,6 +202,7 @@ class SignupController {
     this.WonMenu = WonMenu;
     this.WonSlideIn = WonSlideIn;
     this.WonFooter = WonFooter;
+    this.WonTopnav = WonTopnav;
 
     const select = state => {
       const accountState = get(state, "account");

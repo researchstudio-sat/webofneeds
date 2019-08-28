@@ -12,6 +12,7 @@ import svgs from "../images/won-icons/*.svg";
 import "../style/won.scss";
 
 import angular from "angular";
+import "angular-marked";
 import "whatwg-fetch"; //polyfill for window.fetch (for backward-compatibility with older browsers)
 import "redux";
 import ngReduxModule from "ng-redux";
@@ -30,7 +31,6 @@ import configRedux from "./configRedux.js";
 //--------- Actions -----------
 import { actionCreators } from "./actions/actions.js";
 //-------- Components ---------
-import topnav from "./components/topnav.js";
 import connectionsComponent from "./pages/connections.jsx";
 import overviewComponent from "./pages/overview.jsx";
 import mapComponent from "./pages/map.jsx";
@@ -62,13 +62,12 @@ let app = angular.module("won.owner", [
      * here for details: https://ui-router.github.io/guide/ng1/migrate-to-1_0#state-change-events)
      */
   "ui.router.state.events",
-
+  "hc.marked",
   ngReduxModule,
   uiRouterModule,
   ngReduxRouterModule,
 
   //components
-  topnav,
   preactModule,
 
   //views

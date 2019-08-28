@@ -21,6 +21,7 @@ import WonToasts from "../components/toasts.jsx";
 import WonMenu from "../components/menu.jsx";
 import WonSlideIn from "../components/slide-in.jsx";
 import WonFooter from "../components/footer.jsx";
+import WonTopnav from "../components/topnav.jsx";
 
 import { h } from "preact";
 
@@ -45,7 +46,11 @@ const template = (
         className="atomMessages"
       />
     </div>
-    <won-topnav page-title="::'Inventory'" />
+    <won-preact
+      className="topnav"
+      component="self.WonTopnav"
+      props="{pageTitle: 'Inventory'}"
+    />
     <won-preact
       className="menu"
       component="self.WonMenu"
@@ -156,6 +161,7 @@ class Controller {
     this.WonMenu = WonMenu;
     this.WonSlideIn = WonSlideIn;
     this.WonFooter = WonFooter;
+    this.WonTopnav = WonTopnav;
     this.WonHowTo = WonHowTo;
 
     const selectFromState = state => {

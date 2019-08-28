@@ -33,7 +33,7 @@ export default class WonShareDropdown extends React.Component {
 
     return (
       <won-share-dropdown
-        class={this.props.className ? this.props.className : undefined}
+        class={this.props.className ? this.props.className : ""}
       >
         <svg
           className="sdd__icon__small clickable"

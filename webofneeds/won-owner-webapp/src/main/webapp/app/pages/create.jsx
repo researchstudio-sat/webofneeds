@@ -2,13 +2,13 @@
 
 import angular from "angular";
 import ngAnimate from "angular-animate";
-
 import WonCreateAtom from "../components/create-atom.jsx";
 import WonModalDialog from "../components/modal-dialog.jsx";
 import WonToasts from "../components/toasts.jsx";
 import WonMenu from "../components/menu.jsx";
 import WonSlideIn from "../components/slide-in.jsx";
 import WonFooter from "../components/footer.jsx";
+import WonTopnav from "../components/topnav.jsx";
 import WonUseCasePicker from "../components/usecase-picker.jsx";
 import WonUseCaseGroup from "../components/usecase-group.jsx";
 import { get, getIn } from "../utils.js";
@@ -30,7 +30,11 @@ const template = (
       props="{}"
       ng-if="self.showModalDialog"
     />
-    <won-topnav page-title="::'Create'" />
+    <won-preact
+      className="topnav"
+      component="self.WonTopnav"
+      props="{pageTitle: 'Create'}"
+    />
     <won-preact
       className="menu"
       component="self.WonMenu"
@@ -77,6 +81,7 @@ class CreateController {
     this.WonMenu = WonMenu;
     this.WonSlideIn = WonSlideIn;
     this.WonFooter = WonFooter;
+    this.WonTopnav = WonTopnav;
     this.WonUseCasePicker = WonUseCasePicker;
     this.WonUseCaseGroup = WonUseCaseGroup;
 

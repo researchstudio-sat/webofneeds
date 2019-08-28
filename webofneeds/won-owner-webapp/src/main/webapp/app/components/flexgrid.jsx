@@ -14,9 +14,7 @@ export default class WonFlexGrid extends React.Component {
 
   render() {
     return (
-      <won-flex-grid
-        class={this.props.className ? this.props.className : undefined}
-      >
+      <won-flex-grid class={this.props.className ? this.props.className : ""}>
         {this.props.items.map((item, index) => (
           <div className="flexgrid__item" key={index}>
             <div

@@ -2,6 +2,7 @@
 @import "button";
 @import "positioning-utils";
 
+won-preact.topnav,
 won-topnav {
   border-bottom: $thinBorderWidth solid $won-line-gray;
   background: white;
@@ -24,6 +25,7 @@ won-topnav {
 
       .topnav__button__icon {
         @include fixed-square($bigiconSize);
+        --local-primary: #{$won-primary-color};
       }
     }
 

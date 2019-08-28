@@ -15,7 +15,7 @@ export default class WonAccordion extends React.Component {
   render() {
     return (
       <won-accordion
-        className={this.props.className ? this.props.className : undefined}
+        className={this.props.className ? this.props.className : ""}
       >
         {this.props.items.map((item, index) => (
           <div

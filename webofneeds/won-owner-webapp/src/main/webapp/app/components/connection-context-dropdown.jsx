@@ -221,7 +221,7 @@ class WonConnectionContextDropdown extends React.Component {
 
     return (
       <won-connection-context-dropdown
-        class={this.props.className ? this.props.className : undefined}
+        class={this.props.className ? this.props.className : ""}
       >
         {iconElement}
         {dropdownElement}

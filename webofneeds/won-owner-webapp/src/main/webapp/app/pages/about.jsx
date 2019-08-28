@@ -7,6 +7,7 @@ import WonToasts from "../components/toasts.jsx";
 import WonMenu from "../components/menu.jsx";
 import WonSlideIn from "../components/slide-in.jsx";
 import WonFooter from "../components/footer.jsx";
+import WonTopnav from "../components/topnav.jsx";
 import WonHowTo from "../components/howto.jsx";
 import WonFlexGrid from "../components/flexgrid.jsx";
 import WonAccordion from "../components/accordion.jsx";
@@ -29,7 +30,11 @@ const template = (
       props="{}"
       ng-if="self.showModalDialog"
     />
-    <won-topnav page-title="::'About'" />
+    <won-preact
+      className="topnav"
+      component="self.WonTopnav"
+      props="{pageTitle: 'About'}"
+    />
     <won-preact
       className="menu"
       component="self.WonMenu"
@@ -302,6 +307,7 @@ class AboutController {
     this.WonMenu = WonMenu;
     this.WonSlideIn = WonSlideIn;
     this.WonFooter = WonFooter;
+    this.WonTopnav = WonTopnav;
     this.WonHowTo = WonHowTo;
     this.WonFlexGrid = WonFlexGrid;
     this.WonAccordion = WonAccordion;

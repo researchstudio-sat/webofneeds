@@ -16,6 +16,7 @@ import WonToasts from "../components/toasts.jsx";
 import WonMenu from "../components/menu.jsx";
 import WonSlideIn from "../components/slide-in.jsx";
 import WonFooter from "../components/footer.jsx";
+import WonTopnav from "../components/topnav.jsx";
 
 import { h } from "preact";
 
@@ -29,7 +30,11 @@ const template = (
       props="{}"
       ng-if="self.showModalDialog"
     />
-    <won-topnav page-title="::'Settings'" />
+    <won-preact
+      className="topnav"
+      component="self.WonTopnav"
+      props="{pageTitle: 'Settings'}"
+    />
     <won-preact
       className="menu"
       component="self.WonMenu"
@@ -66,6 +71,7 @@ class SettingsController {
     this.WonMenu = WonMenu;
     this.WonSlideIn = WonSlideIn;
     this.WonFooter = WonFooter;
+    this.WonTopnav = WonTopnav;
 
     const select = state => {
       const accountState = get(state, "account");

@@ -74,9 +74,7 @@ class WonHowTo extends React.Component {
 
   render() {
     return (
-      <won-how-to
-        class={this.props.className ? this.props.className : undefined}
-      >
+      <won-how-to class={this.props.className ? this.props.className : ""}>
         <h1 className="howto__title">How it works</h1>
         <h3 className="howto__subtitle">
           {"in " + howItWorksSteps.length + " Steps"}

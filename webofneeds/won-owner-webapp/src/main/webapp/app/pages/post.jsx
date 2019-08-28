@@ -17,6 +17,7 @@ import WonToasts from "../components/toasts.jsx";
 import WonMenu from "../components/menu.jsx";
 import WonSlideIn from "../components/slide-in.jsx";
 import WonFooter from "../components/footer.jsx";
+import WonTopnav from "../components/topnav.jsx";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as viewSelectors from "../redux/selectors/view-selectors.js";
 import * as processUtils from "../redux/utils/process-utils.js";
@@ -44,7 +45,11 @@ const template = (
         className="atomMessages"
       />
     </div>
-    <won-topnav page-title="self.atomTitle" />
+    <won-preact
+      className="topnav"
+      component="self.WonTopnav"
+      props="{pageTitle: self.atomTitle}"
+    />
     <won-preact
       className="menu"
       component="self.WonMenu"
@@ -108,6 +113,7 @@ class Controller {
     this.WonMenu = WonMenu;
     this.WonSlideIn = WonSlideIn;
     this.WonFooter = WonFooter;
+    this.WonTopnav = WonTopnav;
 
     const selectFromState = state => {
       const atomUri = generalSelectors.getPostUriFromRoute(state);

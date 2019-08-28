@@ -27,6 +27,7 @@ import WonToasts from "../components/toasts.jsx";
 import WonMenu from "../components/menu.jsx";
 import WonSlideIn from "../components/slide-in.jsx";
 import WonFooter from "../components/footer.jsx";
+import WonTopnav from "../components/topnav.jsx";
 
 import "~/style/_map.scss";
 import "~/style/_connection-overlay.scss";
@@ -49,7 +50,11 @@ const template = (
         className="atomMessages"
       />
     </div>
-    <won-topnav page-title="::'What\'s around'" />
+    <won-preact
+      className="topnav"
+      component="self.WonTopnav"
+      props="{pageTitle: 'What\'s around'}"
+    />
     <won-preact
       className="menu"
       component="self.WonMenu"
@@ -262,6 +267,7 @@ class Controller {
     this.WonMenu = WonMenu;
     this.WonSlideIn = WonSlideIn;
     this.WonFooter = WonFooter;
+    this.WonTopnav = WonTopnav;
 
     const selectFromState = state => {
       const viewConnUri = generalSelectors.getViewConnectionUriFromRoute(state);

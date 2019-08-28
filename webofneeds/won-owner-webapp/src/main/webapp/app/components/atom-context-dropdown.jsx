@@ -206,7 +206,7 @@ class WonAtomContextDropdown extends React.Component {
 
     return (
       <won-atom-context-dropdown
-        class={this.props.className ? this.props.className : undefined}
+        class={this.props.className ? this.props.className : ""}
       >
         {iconElement}
         {dropdownElement}

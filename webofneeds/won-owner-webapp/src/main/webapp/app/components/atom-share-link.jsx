@@ -95,7 +95,7 @@ class WonAtomShareLink extends React.Component {
 
     return (
       <won-atom-share-link
-        class={this.props.className ? this.props.className : undefined}
+        class={this.props.className ? this.props.className : ""}
       >
         <div className="asl__content">
           {labelElement}
