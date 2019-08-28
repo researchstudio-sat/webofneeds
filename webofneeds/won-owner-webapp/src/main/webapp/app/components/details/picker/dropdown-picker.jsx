@@ -21,11 +21,7 @@ export default class WonDropdownPicker extends React.Component {
           >
             <option value="">{self.detail.placeholder}</option>
             {this.props.detail.options.map((option, index) => (
-              <option
-                key={option.value + "-" + index}
-                ng-repeat="option in this.props.detail.options"
-                value={option.value}
-              >
+              <option key={option.value + "-" + index} value={option.value}>
                 {option.label}
               </option>
             ))}

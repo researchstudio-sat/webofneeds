@@ -9,8 +9,8 @@ import WonToasts from "../components/toasts.jsx";
 import WonMenu from "../components/menu.jsx";
 import WonSlideIn from "../components/slide-in.jsx";
 import WonFooter from "../components/footer.jsx";
+import WonUseCasePicker from "../components/usecase-picker.jsx";
 import createSearchModule from "../components/create-search.js";
-import usecasePickerModule from "../components/usecase-picker.js";
 import usecaseGroupModule from "../components/usecase-group.js";
 import { get, getIn } from "../utils.js";
 import { attach, classOnComponentRoot } from "../cstm-ng-utils.js";
@@ -47,7 +47,11 @@ const template = (
     />
     {/* RIGHT SIDE */}
     <main className="ownercreate">
-      <won-usecase-picker ng-if="self.showUseCasePicker" />
+      <won-preact
+        component="self.WonUseCasePicker"
+        props="{}"
+        ng-if="self.showUseCasePicker"
+      />
       <won-usecase-group ng-if="self.showUseCaseGroups" />
       <won-preact
         component="self.WonCreateAtom"
@@ -71,6 +75,7 @@ class CreateController {
     this.WonMenu = WonMenu;
     this.WonSlideIn = WonSlideIn;
     this.WonFooter = WonFooter;
+    this.WonUseCasePicker = WonUseCasePicker;
 
     const selectFromState = state => {
       const useCase = generalSelectors.getUseCaseFromRoute(state);
@@ -119,7 +124,6 @@ export default {
   module: angular
     .module("won.owner.components.create", [
       ngAnimate,
-      usecasePickerModule,
       usecaseGroupModule,
       createSearchModule,
     ])

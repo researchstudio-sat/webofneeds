@@ -66,35 +66,6 @@ won-usecase-picker {
     &__search {
       position: relative;
       display: grid;
-
-      &__input {
-        @extend .won-txt;
-        min-height: $formInputHeight;
-        max-height: $formInputHeight;
-
-        $verticalPadding: calcVerticalPaddingToHeight(
-          $normalFontSize,
-          22/16,
-          $thinBorderWidth,
-          $formInputHeight
-        );
-        padding: $verticalPadding 0.438rem + $bigiconSize $verticalPadding
-          0.438rem;
-      }
-
-      &__icon {
-        --local-primary: #{$won-primary-color};
-        @include fixed-square($bigiconSize);
-        position: absolute;
-        right: 0.5rem;
-        top: $formInputHeight / 2 - $bigiconSize / 2;
-        z-index: 1;
-      }
-
-      &__input::-ms-clear {
-        width: 0;
-        height: 0;
-      }
     }
 
     &__newcustom,
