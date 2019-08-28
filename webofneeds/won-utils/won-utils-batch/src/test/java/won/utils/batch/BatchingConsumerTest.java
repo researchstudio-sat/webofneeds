@@ -1,17 +1,15 @@
 package won.utils.batch;
 
+import org.junit.Assert;
+import org.junit.Test;
+import won.utils.batch.BatchingConsumer.Config;
+import won.utils.batch.BatchingConsumer.ConfigBuilder;
+
 import java.time.Duration;
 import java.util.Collection;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import org.junit.Assert;
-import org.junit.Test;
-
-import won.utils.batch.BatchingConsumer.Config;
-import won.utils.batch.BatchingConsumer.ConfigBuilder;
-
 
 public class BatchingConsumerTest {
     @Test

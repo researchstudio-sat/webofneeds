@@ -8,6 +8,7 @@ import WonGroupAtomMessages from "../components/group-atom-messages.jsx";
 import WonModalDialog from "../components/modal-dialog.jsx";
 import WonToasts from "../components/toasts.jsx";
 import WonMenu from "../components/menu.jsx";
+import WonSlideIn from "../components/slide-in.jsx";
 import WonFooter from "../components/footer.jsx";
 import { get, getIn } from "../utils.js";
 import { attach, classOnComponentRoot } from "../cstm-ng-utils.js";
@@ -49,7 +50,12 @@ const template = (
       ng-if="self.isLoggedIn"
     />
     <won-preact className="toasts" component="self.WonToasts" props="{}" />
-    <won-slide-in ng-if="self.showSlideIns" />
+    <won-preact
+      className="slideIn"
+      component="self.WonSlideIn"
+      props="{}"
+      ng-if="self.showSlideIns"
+    />
     <aside
       className="overview__left"
       ng-class="{'hide-in-responsive': self.hideListSideInResponsive}"
@@ -123,6 +129,7 @@ class ConnectionsController {
     this.WonModalDialog = WonModalDialog;
     this.WonToasts = WonToasts;
     this.WonMenu = WonMenu;
+    this.WonSlideIn = WonSlideIn;
     this.WonFooter = WonFooter;
 
     const selectFromState = state => {

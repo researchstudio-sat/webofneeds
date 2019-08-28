@@ -24,6 +24,7 @@ won-toasts {
 
       &__icon {
         @include fixed-square($toastIconSize);
+        --local-primary: #ccd2d2;
       }
       &__text {
         font-size: $smallFontSize;
@@ -36,6 +37,7 @@ won-toasts {
       &__close {
         float: right;
         @include fixed-square($toastIconCloseSize);
+        --local-primary: #{$won-primary-color};
       }
     }
   }

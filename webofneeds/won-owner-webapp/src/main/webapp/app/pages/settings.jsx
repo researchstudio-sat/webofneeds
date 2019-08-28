@@ -14,6 +14,7 @@ import * as accountUtils from "../redux/utils/account-utils.js";
 import WonModalDialog from "../components/modal-dialog.jsx";
 import WonToasts from "../components/toasts.jsx";
 import WonMenu from "../components/menu.jsx";
+import WonSlideIn from "../components/slide-in.jsx";
 import WonFooter from "../components/footer.jsx";
 
 import { h } from "preact";
@@ -36,7 +37,12 @@ const template = (
       ng-if="self.isLoggedIn"
     />
     <won-preact className="toasts" component="self.WonToasts" props="{}" />
-    <won-slide-in ng-if="self.showSlideIns" />
+    <won-preact
+      className="slideIn"
+      component="self.WonSlideIn"
+      props="{}"
+      ng-if="self.showSlideIns"
+    />
     <main className="settings">
       <won-settings-wrapper />
     </main>
@@ -58,6 +64,7 @@ class SettingsController {
     this.WonModalDialog = WonModalDialog;
     this.WonToasts = WonToasts;
     this.WonMenu = WonMenu;
+    this.WonSlideIn = WonSlideIn;
     this.WonFooter = WonFooter;
 
     const select = state => {

@@ -12,6 +12,7 @@ import WonLabelledHr from "../components/labelled-hr.jsx";
 import WonModalDialog from "../components/modal-dialog.jsx";
 import WonToasts from "../components/toasts.jsx";
 import WonMenu from "../components/menu.jsx";
+import WonSlideIn from "../components/slide-in.jsx";
 import WonFooter from "../components/footer.jsx";
 
 import * as accountUtils from "../redux/utils/account-utils.js";
@@ -35,7 +36,12 @@ const template = (
       ng-if="self.isLoggedIn"
     />
     <won-preact className="toasts" component="self.WonToasts" props="{}" />
-    <won-slide-in ng-if="self.showSlideIns" />
+    <won-preact
+      className="slideIn"
+      component="self.WonSlideIn"
+      props="{}"
+      ng-if="self.showSlideIns"
+    />
     <main className="signup" id="signupSection">
       <div className="signup__content">
         <div className="signup__content__form" ng-form name="registerForm">
@@ -188,6 +194,7 @@ class SignupController {
     this.WonModalDialog = WonModalDialog;
     this.WonToasts = WonToasts;
     this.WonMenu = WonMenu;
+    this.WonSlideIn = WonSlideIn;
     this.WonFooter = WonFooter;
 
     const select = state => {

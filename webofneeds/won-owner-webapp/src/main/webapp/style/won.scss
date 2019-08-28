@@ -89,12 +89,21 @@ body {
 
     > won-preact.toasts,
     > won-toasts,
+    > won-preact.slideIn,
     > won-slide-in {
       grid-area: info;
     }
 
-    > won-menu {
+    > won-menu,
+    > won-preact.menu {
       grid-area: menu;
+    }
+    > won-preact.menu {
+      display: grid;
+    }
+
+    > won-preact.menu > won-menu,
+    > won-menu {
       box-sizing: border-box;
       height: var(--menuHeight);
       top: var(--headerHeight);
@@ -207,6 +216,7 @@ body {
       }
     }
 
+    > won-preact.footer,
     > won-footer {
       grid-area: footer;
     }

@@ -5,6 +5,7 @@ import ngAnimate from "angular-animate";
 import WonModalDialog from "../components/modal-dialog.jsx";
 import WonToasts from "../components/toasts.jsx";
 import WonMenu from "../components/menu.jsx";
+import WonSlideIn from "../components/slide-in.jsx";
 import WonFooter from "../components/footer.jsx";
 import compareToModule from "../directives/compareTo.js";
 import howToModule from "../components/howto.js";
@@ -37,7 +38,12 @@ const template = (
       ng-if="self.isLoggedIn"
     />
     <won-preact className="toasts" component="self.WonToasts" props="{}" />
-    <won-slide-in ng-if="self.showSlideIns" />
+    <won-preact
+      className="slideIn"
+      component="self.WonSlideIn"
+      props="{}"
+      ng-if="self.showSlideIns"
+    />
     <main className="about" id="allSections">
       <section className="about__welcome" ng-if="!self.visibleSection">
         <div className="about__welcome__title">What is the Web of Needs?</div>
@@ -291,6 +297,7 @@ class AboutController {
     this.WonModalDialog = WonModalDialog;
     this.WonToasts = WonToasts;
     this.WonMenu = WonMenu;
+    this.WonSlideIn = WonSlideIn;
     this.WonFooter = WonFooter;
 
     window.ab4dbg = this;

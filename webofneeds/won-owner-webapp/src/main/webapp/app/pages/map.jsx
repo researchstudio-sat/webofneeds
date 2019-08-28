@@ -25,6 +25,7 @@ import WonAtomMessages from "../components/atom-messages.jsx";
 import WonModalDialog from "../components/modal-dialog.jsx";
 import WonToasts from "../components/toasts.jsx";
 import WonMenu from "../components/menu.jsx";
+import WonSlideIn from "../components/slide-in.jsx";
 import WonFooter from "../components/footer.jsx";
 
 import "~/style/_map.scss";
@@ -56,7 +57,12 @@ const template = (
       ng-if="self.isLoggedIn"
     />
     <won-preact className="toasts" component="self.WonToasts" props="{}" />
-    <won-slide-in ng-if="self.showSlideIns" />
+    <won-preact
+      className="slideIn"
+      component="self.WonSlideIn"
+      props="{}"
+      ng-if="self.showSlideIns"
+    />
     <main className="ownermap">
       <div
         className="ownermap__header"
@@ -254,6 +260,7 @@ class Controller {
     this.WonModalDialog = WonModalDialog;
     this.WonToasts = WonToasts;
     this.WonMenu = WonMenu;
+    this.WonSlideIn = WonSlideIn;
     this.WonFooter = WonFooter;
 
     const selectFromState = state => {

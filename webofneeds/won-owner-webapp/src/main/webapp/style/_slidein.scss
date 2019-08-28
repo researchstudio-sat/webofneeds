@@ -63,15 +63,6 @@
 won-slide-in {
   @include slideAnimationFixedHorizontal(0.5s, ease-in-out, 100vh);
 
-  & > input.si__anonymousLink {
-    //So the copy to clipboard function works but the input field is still "hidden"
-    height: 0;
-    max-height: 0;
-    position: absolute;
-    width: 0;
-    z-index: -1;
-  }
-
   display: grid;
   $maxSlideInWidth: $maxContentWidth;
   grid-template-columns: 1fr minmax(min-content, $maxSlideInWidth) 1fr;
