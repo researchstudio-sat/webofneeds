@@ -575,7 +575,7 @@ PageMap.propTypes = {
   isLocationAccessDenied: PropTypes.bool,
   lastWhatsAroundLocation: PropTypes.object,
   locations: PropTypes.arrayOf(PropTypes.object),
-  lastAtomUrisUpdateDate: PropTypes.string,
+  lastAtomUrisUpdateDate: PropTypes.number,
   friendlyLastAtomUrisUpdateTimestamp: PropTypes.string,
   sortedVisibleAtomUriArray: PropTypes.arrayOf(PropTypes.string),
   hasVisibleAtomUris: PropTypes.bool,

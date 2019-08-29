@@ -20,8 +20,8 @@ const mapDispatchToProps = dispatch => {
     routerGo: (path, props) => {
       dispatch(actionCreators.router__stateGo(path, props));
     },
-    hideMenu: () => {
-      dispatch(actionCreators.view__hideMenu());
+    hideMainMenu: () => {
+      dispatch(actionCreators.view__hideMainMenu());
     },
     logout: () => {
       dispatch(actionCreators.account__logout());
@@ -74,12 +74,12 @@ class WonLoggedInMenu extends React.Component {
   }
 
   goToSignUp() {
-    this.props.hideMenu();
+    this.props.hideMainMenu();
     this.props.routerGo("signup");
   }
 
   goToSettings() {
-    this.props.hideMenu();
+    this.props.hideMainMenu();
     this.props.routerGo("settings");
   }
 }
@@ -88,7 +88,7 @@ WonLoggedInMenu.propTypes = {
   isAnonymous: PropTypes.bool,
   email: PropTypes.string,
   routerGo: PropTypes.func,
-  hideMenu: PropTypes.func,
+  hideMainMenu: PropTypes.func,
   logout: PropTypes.func,
 };
 

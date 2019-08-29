@@ -11,7 +11,7 @@ export default class WonShareDropdown extends React.Component {
     this.state = {
       contextMenuOpen: false,
     };
-    //TODO: REACT ON CLICK OUTSIDE OF COMPONENT AND CLOSE THE DIALOG (maybe with hooks)
+    this.handleClick = this.handleClick.bind(this);
   }
 
   render() {
@@ -34,6 +34,7 @@ export default class WonShareDropdown extends React.Component {
     return (
       <won-share-dropdown
         class={this.props.className ? this.props.className : ""}
+        ref={node => (this.node = node)}
       >
         <svg
           className="sdd__icon__small clickable"
@@ -44,6 +45,21 @@ export default class WonShareDropdown extends React.Component {
         {dropdownElement}
       </won-share-dropdown>
     );
+  }
+
+  componentWillMount() {
+    document.addEventListener("mousedown", this.handleClick, false);
+  }
+  componentWillUnmount() {
+    document.removeEventListener("mousedown", this.handleClick, false);
+  }
+
+  handleClick(e) {
+    if (!this.node.contains(e.target) && this.state.contextMenuOpen) {
+      this.setState({ contextMenuOpen: false });
+
+      return;
+    }
   }
 }
 WonShareDropdown.propTypes = {

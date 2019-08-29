@@ -32,12 +32,16 @@ const mapDispatchToProps = dispatch => {
   };
 };
 
-//TODO: REACT ON CLICK OUTSIDE OF COMPONENT AND CLOSE THE DIALOG (maybe with hooks)
 class WonAccountMenu extends React.Component {
+  constructor(props) {
+    super(props);
+    this.handleClick = this.handleClick.bind(this);
+  }
   render() {
     return (
       <won-account-menu
         class={this.props.mainMenuVisible ? " wam--open " : " wam--closed "}
+        ref={node => (this.node = node)}
       >
         <div
           className="wam__header clickable"
@@ -69,6 +73,21 @@ class WonAccountMenu extends React.Component {
         )}
       </won-account-menu>
     );
+  }
+
+  componentWillMount() {
+    document.addEventListener("mousedown", this.handleClick, false);
+  }
+  componentWillUnmount() {
+    document.removeEventListener("mousedown", this.handleClick, false);
+  }
+
+  handleClick(e) {
+    if (!this.node.contains(e.target) && this.props.mainMenuVisible) {
+      this.props.hideMainMenu();
+
+      return;
+    }
   }
 }
 WonAccountMenu.propTypes = {

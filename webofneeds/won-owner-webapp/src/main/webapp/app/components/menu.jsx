@@ -54,7 +54,6 @@ const mapDispatchToProps = dispatch => {
   };
 };
 
-//TODO: REACT ON CLICK OUTSIDE OF COMPONENT AND CLOSE THE DIALOG (maybe with hooks)
 class WonMenu extends React.Component {
   constructor(props) {
     super(props);
@@ -64,11 +63,15 @@ class WonMenu extends React.Component {
     this.viewWhatsAround = this.viewWhatsAround.bind(this);
     this.viewWhatsNew = this.viewWhatsNew.bind(this);
     this.toggleSlideIns = this.toggleSlideIns.bind(this);
+    this.handleClick = this.handleClick.bind(this);
   }
 
   render() {
     return (
-      <won-menu class={this.generateRootClasses()}>
+      <won-menu
+        class={this.generateRootClasses()}
+        ref={node => (this.node = node)}
+      >
         <div className="menu">
           <a
             className={this.generateTabClasses(
@@ -248,6 +251,21 @@ class WonMenu extends React.Component {
       console.error("location could not be retrieved");
       this.props.locationAccessDenied();
       callback();
+    }
+  }
+
+  componentWillMount() {
+    document.addEventListener("mousedown", this.handleClick, false);
+  }
+  componentWillUnmount() {
+    document.removeEventListener("mousedown", this.handleClick, false);
+  }
+
+  handleClick(e) {
+    if (!this.node.contains(e.target) && this.props.isMenuVisible) {
+      this.props.hideMenu();
+
+      return;
     }
   }
 }

@@ -337,7 +337,7 @@ PageOverview.propTypes = {
   whatsNewAtoms: PropTypes.object,
   isLoggedIn: PropTypes.bool,
   currentLocation: PropTypes.object,
-  lastAtomUrisUpdateDate: PropTypes.string,
+  lastAtomUrisUpdateDate: PropTypes.number,
   friendlyLastAtomUrisUpdateTimestamp: PropTypes.string,
   sortedVisibleAtomUriArray: PropTypes.arrayOf(PropTypes.string),
   hasVisibleAtomUris: PropTypes.bool,
