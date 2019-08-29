@@ -167,12 +167,6 @@ class ChatTextfield extends React.Component {
   render() {
     let detailDrawerElement;
 
-    console.debug(
-      "allowDetails: ",
-      this.props.allowDetails,
-      "showAddMessageContent: ",
-      this.props.showAddMessageContent
-    );
     if (this.props.allowDetails && this.props.showAddMessageContent) {
       const selectDetailButtonElements =
         allMessageDetailsImm &&
