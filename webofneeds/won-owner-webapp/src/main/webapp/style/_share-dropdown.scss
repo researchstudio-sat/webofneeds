@@ -38,7 +38,8 @@ won-share-dropdown {
       padding: 0.5rem;
       max-width: 15rem;
       position: absolute;
-      right: 0;
+      right: -1px;
+      top: -5px;
       min-width: 15rem;
 
       a.won-button--outlined,
