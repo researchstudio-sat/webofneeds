@@ -8,29 +8,19 @@ function genComponentConf($ngRedux) {
     restrict: "E",
     scope: {
       component: "<",
-      props: "<",
-      onAction: "&",
     },
     link: (scope, element) => {
       render(
         createElement(Provider, { store: $ngRedux }, [
-          createElement(scope.component, scope.props),
+          createElement(scope.component),
         ]),
         element[0]
       );
 
-      scope.$watch("props", props => {
-        render(
-          createElement(Provider, { store: $ngRedux }, [
-            createElement(scope.component, props),
-          ]),
-          element[0]
-        );
-      });
       scope.$watch("component", component => {
         render(
           createElement(Provider, { store: $ngRedux }, [
-            createElement(component, scope.props),
+            createElement(component),
           ]),
           element[0]
         );
