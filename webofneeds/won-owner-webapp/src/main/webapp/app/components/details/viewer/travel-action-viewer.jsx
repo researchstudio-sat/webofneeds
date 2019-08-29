@@ -38,7 +38,7 @@ export default class WonTravelActionViewer extends React.Component {
         >
           <div>
             {fromAddress ? (
-              <span ng-if="self.content.get('fromAddress')">
+              <span>
                 <strong>From: </strong>
                 {fromAddress}
               </span>
@@ -47,7 +47,7 @@ export default class WonTravelActionViewer extends React.Component {
             )}
             <br />
             {toAddress ? (
-              <span ng-if="self.content.get('toAddress')">
+              <span>
                 <strong>To: </strong>
                 {toAddress}
               </span>

@@ -37,9 +37,9 @@ class WonFooter extends React.Component {
       <won-footer class={this.props.className ? this.props.className : ""}>
         <div className="footer">
           {/*<!-- TODO: find or create logos that are stylable -->
-        <!--<img src="skin/{{self.themeName}}/images/logo.svg" class="footer__logo">
+        <!--<img src="skin/{{this.props.themeName}}/images/logo.svg" class="footer__logo">
         <div class="footer__appTitle">
-            {{ self.appTitle }}
+            {{ this.props.appTitle }}
         </div>
         <div class="footer__tagLine">Web of Needs</div>-->*/}
           <div className="footer__linksdesktop hide-in-responsive">

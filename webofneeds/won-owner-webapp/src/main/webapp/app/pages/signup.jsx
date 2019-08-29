@@ -11,7 +11,7 @@ import { h } from "preact";
 
 const template = (
   <container>
-    <won-preact component="self.PageSignUp" props="{}" />
+    <won-preact component="self.PageSignUp" />
   </container>
 );
 

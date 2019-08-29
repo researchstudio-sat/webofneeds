@@ -107,8 +107,12 @@ class PageConnections extends React.Component {
         {/* RIGHT SIDE */}
         {this.props.showNoSelectionSide && (
           <main
-            className="overview__rightempty"
-            ng-class="{'hide-in-responsive' : self.hideNoSelectionInResponsive}"
+            className={
+              "overview__rightempty " +
+              (this.props.hideNoSelectionInResponsive
+                ? "hide-in-responsive"
+                : "")
+            }
           >
             <div className="overview__rightempty__noselection">
               <svg

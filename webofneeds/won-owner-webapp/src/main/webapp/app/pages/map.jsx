@@ -7,7 +7,7 @@ import PageMap from "./react/map.jsx";
 
 const template = (
   <container>
-    <won-preact component="self.PageMap" props="{}" />
+    <won-preact component="self.PageMap" />
   </container>
 );
 

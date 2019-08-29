@@ -223,8 +223,8 @@ class PageMap extends React.Component {
                     </div>
                   ) : (
                     <div className="ownermap__header__updated__time hide-in-responsive">
-                      Updated:{" "}
-                      {"{{ self.friendlyLastAtomUrisUpdateTimestamp }}"}
+                      {"Updated: " +
+                        this.props.friendlyLastAtomUrisUpdateTimestamp}
                     </div>
                   ))}
 
@@ -341,7 +341,7 @@ class PageMap extends React.Component {
               </div>
             )}
 
-          {!this.propsisOwnerAtomUrisToLoad &&
+          {!this.props.isOwnerAtomUrisToLoad &&
             !!this.props.lastWhatsAroundLocation && (
               <WonAtomMap
                 className={

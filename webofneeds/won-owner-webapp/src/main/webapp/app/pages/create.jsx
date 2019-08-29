@@ -7,7 +7,7 @@ import { h } from "preact";
 
 const template = (
   <container>
-    <won-preact component="self.PageCreate" props="{}" />
+    <won-preact component="self.PageCreate" />
   </container>
 );
 
