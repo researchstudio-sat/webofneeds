@@ -39,6 +39,7 @@ won-account-menu {
     right: 0;
     margin-top: 0.5rem;
     width: 100%;
+    min-width: 15rem;
     max-width: 18rem;
 
     > won-logged-in-menu {
@@ -63,6 +64,10 @@ won-account-menu {
     }
     > won-login-form {
       display: block;
+
+      button {
+        width: 100%;
+      }
     }
   }
 }
