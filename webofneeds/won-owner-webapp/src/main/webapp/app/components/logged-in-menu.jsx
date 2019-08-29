@@ -10,7 +10,6 @@ const mapStateToProps = (state, ownProps) => {
 
   return {
     className: ownProps.className,
-    loggedIn: accountUtils.isLoggedIn(accountState),
     email: accountUtils.getEmail(accountState),
     isAnonymous: accountUtils.isAnonymous(accountState),
   };
@@ -41,29 +40,27 @@ class WonLoggedInMenu extends React.Component {
       <won-logged-in-menu
         class={this.props.className ? this.props.className : ""}
       >
-        {this.props.loggedIn && (
-          <span
-            className="dd__userlabel show-in-responsive"
-            title={this.props.isAnonymous ? "Anonymous" : this.props.email}
-          >
-            {this.props.isAnonymous ? "Anonymous" : this.props.email}
-          </span>
-        )}
+        <span
+          className="wlim__userlabel show-in-responsive"
+          title={this.props.isAnonymous ? "Anonymous" : this.props.email}
+        >
+          {this.props.isAnonymous ? "Anonymous" : this.props.email}
+        </span>
         <hr className="show-in-responsive" />
         {this.props.isAnonymous && (
           <button
-            className="won-button--outlined thin red show-in-responsive"
+            className="won-button--outlined thin red wlim__button--signup"
             onClick={this.goToSignUp}
           >
-            Sign up
+            <span>Sign up</span>
           </button>
         )}
-        <a
+        <button
           className="won-button--outlined thin red"
           onClick={this.goToSettings}
         >
           <span>Account Settings</span>
-        </a>
+        </button>
         <hr />
         <button
           className="won-button--filled lighterblue"
@@ -88,7 +85,6 @@ class WonLoggedInMenu extends React.Component {
 }
 WonLoggedInMenu.propTypes = {
   className: PropTypes.string,
-  loggedIn: PropTypes.bool,
   isAnonymous: PropTypes.bool,
   email: PropTypes.string,
   routerGo: PropTypes.func,

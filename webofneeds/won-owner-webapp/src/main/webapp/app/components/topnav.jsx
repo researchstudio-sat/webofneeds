@@ -21,6 +21,7 @@ const mapStateToProps = (state, ownProps) => {
     pageTitle: ownProps.pageTitle,
     hasSlideIns: viewSelectors.hasSlideIns(state),
     isSlideInsVisible: viewSelectors.isSlideInsVisible(state),
+    mainMenuVisible: getIn(state, ["view", "showMainMenu"]),
     isMenuVisible: viewSelectors.isMenuVisible(state),
     themeName: getIn(state, ["config", "theme", "name"]),
     appTitle: getIn(state, ["config", "theme", "title"]),
@@ -159,7 +160,8 @@ class WonTopnav extends React.Component {
             </div>
           )}
           {!this.props.isSignUpView &&
-            !this.props.loggedIn && (
+            !this.props.loggedIn &&
+            !this.props.mainMenuVisible && (
               <button
                 onClick={() => this.props.routerGo("signup")}
                 className="topnav__signupbtn won-button--filled red hide-in-responsive"
@@ -239,6 +241,7 @@ WonTopnav.propTypes = {
   hasSlideIns: PropTypes.bool,
   isSlideInsVisible: PropTypes.bool,
   isMenuVisible: PropTypes.bool,
+  mainMenuVisible: PropTypes.bool,
   themeName: PropTypes.string,
   appTitle: PropTypes.string,
   loggedIn: PropTypes.bool,

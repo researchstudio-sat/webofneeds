@@ -19,16 +19,6 @@ won-topnav {
     align-items: center;
     max-width: $maxContentWidth;
 
-    .topnav__button {
-      //used within the dropdown directive
-      white-space: nowrap;
-
-      .topnav__button__icon {
-        @include fixed-square($bigiconSize);
-        --local-primary: #{$won-primary-color};
-      }
-    }
-
     .topnav__menuicon {
       grid-area: nav_menuicon;
       --local-primary: #{$won-primary-color};
@@ -135,9 +125,6 @@ won-topnav {
 
     won-account-menu {
       grid-area: nav_accountmenu;
-      .topnav__button__caption {
-        margin-right: 0.5rem;
-      }
     }
   }
 }

@@ -1,0 +1,68 @@
+@import "won-config";
+@import "sizing-utils";
+
+won-account-menu {
+  display: block;
+  position: relative;
+
+  &.wam--open {
+    > .wam__content {
+      border: $thinGrayBorder;
+      border-top: 0;
+    }
+  }
+
+  &.wam--closed {
+  }
+
+  .wam__header {
+    display: flex;
+    box-sizing: border-box;
+    align-items: center;
+    white-space: nowrap;
+
+    > .wam__header__icon {
+      @include fixed-square($bigiconSize);
+      --local-primary: #{$won-primary-color};
+    }
+    > .wam__header__caption {
+      margin-right: 0.5rem;
+      color: #{$won-primary-color};
+    }
+  }
+
+  .wam__content {
+    box-sizing: border-box;
+    background: white;
+    padding: 0.5rem;
+    position: absolute;
+    right: 0;
+    margin-top: 0.5rem;
+    width: 100%;
+    max-width: 18rem;
+
+    > won-logged-in-menu {
+      overflow: hidden;
+      display: block;
+      text-overflow: ellipsis;
+
+      .wlim__userlabel {
+        max-width: 18rem;
+        font-size: $normalFontSize;
+        color: $won-primary-color;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+      }
+      button {
+        width: 100%;
+      }
+      button.wlim__button--signup {
+        margin-bottom: 0.5rem;
+      }
+    }
+    > won-login-form {
+      display: block;
+    }
+  }
+}

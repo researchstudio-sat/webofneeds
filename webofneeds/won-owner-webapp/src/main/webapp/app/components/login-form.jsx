@@ -19,7 +19,6 @@ const mapStateToProps = (state, ownProps) => {
 
   return {
     className: ownProps.className,
-    loggedIn: accountUtils.isLoggedIn(accountState),
     loginError,
     processingResendVerificationEmail: getIn(state, [
       "process",
@@ -183,7 +182,6 @@ class WonLoginForm extends React.Component {
 }
 WonLoginForm.propTypes = {
   className: PropTypes.string,
-  loggedIn: PropTypes.bool,
   loginError: PropTypes.string,
   processingResendVerificationEmail: PropTypes.bool,
   isNotVerified: PropTypes.bool,
