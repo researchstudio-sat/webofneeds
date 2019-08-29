@@ -342,22 +342,24 @@ class PageMap extends React.Component {
             )}
 
           {!this.props.isOwnerAtomUrisToLoad &&
-            !!this.props.lastWhatsAroundLocation && (
-              <WonAtomMap
-                className={
-                  "owner__map hide-in-responsive won-atom-map " +
-                  (!(
-                    this.state.showLocationInput ||
-                    (this.props.isLocationAccessDenied &&
-                      !this.props.lastWhatsAroundLocation)
-                  )
-                    ? " ownermap__map--visible "
-                    : "")
-                }
-                locations={this.props.locations}
-                currentLocation={this.props.lastWhatsAroundLocation}
-              />
-            )}
+          !!this.props.lastWhatsAroundLocation ? (
+            <WonAtomMap
+              className={
+                "ownermap__map hide-in-responsive won-atom-map " +
+                (!(
+                  this.state.showLocationInput ||
+                  (this.props.isLocationAccessDenied &&
+                    !this.props.lastWhatsAroundLocation)
+                )
+                  ? " ownermap__map--visible "
+                  : "")
+              }
+              locations={this.props.locations}
+              currentLocation={this.props.lastWhatsAroundLocation}
+            />
+          ) : (
+            undefined
+          )}
           {this.props.lastWhatsAroundLocation &&
             (this.props.hasVisibleAtomUris ? (
               <div className="ownermap__content">
