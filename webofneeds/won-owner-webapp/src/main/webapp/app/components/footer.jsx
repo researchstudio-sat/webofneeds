@@ -8,8 +8,9 @@ import "~/style/_footer.scss";
 import won from "../won-es6";
 import Immutable from "immutable";
 
-const mapStateToProps = state => {
+const mapStateToProps = (state, ownProps) => {
   return {
+    className: ownProps.className,
     themeName: getIn(state, ["config", "theme", "name"]),
     appTitle: getIn(state, ["config", "theme", "title"]),
     shouldShowRdf: state.getIn(["view", "showRdf"]),
@@ -33,7 +34,7 @@ const mapDispatchToProps = dispatch => {
 class WonFooter extends React.Component {
   render() {
     return (
-      <won-footer>
+      <won-footer class={this.props.className ? this.props.className : ""}>
         <div className="footer">
           {/*<!-- TODO: find or create logos that are stylable -->
         <!--<img src="skin/{{self.themeName}}/images/logo.svg" class="footer__logo">
@@ -166,6 +167,7 @@ class WonFooter extends React.Component {
   }
 }
 WonFooter.propTypes = {
+  className: PropTypes.string,
   themeName: PropTypes.string,
   appTitle: PropTypes.string,
   shouldShowRdf: PropTypes.bool,

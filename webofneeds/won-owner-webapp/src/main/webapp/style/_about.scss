@@ -88,6 +88,7 @@ main.about {
         display: block;
         margin: 0 auto;
         @include fixed-square(1rem);
+        --local-primary: #{$won-primary-color};
       }
     }
   }

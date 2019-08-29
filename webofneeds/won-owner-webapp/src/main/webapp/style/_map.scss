@@ -74,45 +74,8 @@ main.ownermap {
       }
     }
 
-    &__input {
+    won-title-picker {
       grid-area: omh__location;
-      color: $won-primary-text-color;
-      --local-primary: #{$won-primary-text-color};
-
-      $reset-button-size: 2.25rem;
-
-      &__icon {
-        cursor: pointer;
-        --local-primary: #{$won-primary-text-color};
-
-        &:hover {
-          --local-primary: #{$won-primary-color-light};
-        }
-      }
-
-      &__inner {
-        @extend .won-txt;
-        border: $thinGrayBorder;
-        padding: 0.33rem 0.5rem + $reset-button-size 0.33rem 0.5rem;
-
-        &::-ms-clear {
-          width: 0;
-          height: 0;
-        }
-      }
-
-      &__reset {
-        @include fixed-square($reset-button-size);
-        position: absolute;
-        right: 0;
-        top: 0;
-        z-index: 1;
-
-        --local-primary: #{$won-primary-color};
-        &:hover {
-          --local-primary: #{$won-primary-color-light};
-        }
-      }
     }
 
     &__updated {

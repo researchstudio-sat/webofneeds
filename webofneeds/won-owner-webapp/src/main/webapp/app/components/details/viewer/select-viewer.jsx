@@ -27,7 +27,7 @@ export default class WonSelectViewer extends React.Component {
                 : "radio"
             }
             value={option.value}
-            disabled="true"
+            disabled={true}
             checked={this.isChecked(option)}
           />
           {option.label}
