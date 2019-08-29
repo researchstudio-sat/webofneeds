@@ -78,7 +78,6 @@ body {
       }
     }
 
-    > won-preact.topnav,
     > won-topnav {
       grid-area: header;
       position: sticky;
@@ -88,22 +87,15 @@ body {
       z-index: 1000;
     }
 
-    > won-preact.toasts,
     > won-toasts,
-    > won-preact.slideIn,
     > won-slide-in {
       grid-area: info;
     }
 
-    > won-menu,
-    > won-preact.menu {
+    > won-menu {
       grid-area: menu;
     }
-    > won-preact.menu {
-      display: grid;
-    }
 
-    > won-preact.menu > won-menu,
     > won-menu {
       box-sizing: border-box;
       height: var(--menuHeight);
@@ -178,24 +170,6 @@ body {
         background: white;
       }
 
-      //FIXME: This can be removed once the pages are react components
-      > won-preact.atomMessages {
-        display: block;
-        height: calc(100vh - var(--headerHeight) - var(--menuHeight));
-        > won-atom-messages {
-          height: 100%;
-        }
-      }
-      //FIXME: This can be removed once the pages are react components
-      > won-preact.groupAtomMessages {
-        display: block;
-        height: calc(100vh - var(--headerHeight) - var(--menuHeight));
-
-        > won-group-atom-messages {
-          height: 100%;
-        }
-      }
-
       > won-group-atom-messages,
       > won-atom-messages {
         height: calc(100vh - var(--headerHeight) - var(--menuHeight));
@@ -217,7 +191,6 @@ body {
       }
     }
 
-    > won-preact.footer,
     > won-footer {
       grid-area: footer;
     }

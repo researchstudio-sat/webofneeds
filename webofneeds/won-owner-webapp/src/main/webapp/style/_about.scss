@@ -7,7 +7,6 @@ main.about {
   font-weight: 300;
 
   //General Section styling
-  & > won-preact.howTo,
   & > won-how-to,
   & > section {
     width: 100%;
@@ -199,7 +198,6 @@ main.about {
       padding-bottom: 2rem;
     }
 
-    > won-preact.about__faq__questions,
     > won-accordion.about__faq__questions {
       display: block;
       max-width: 45rem;

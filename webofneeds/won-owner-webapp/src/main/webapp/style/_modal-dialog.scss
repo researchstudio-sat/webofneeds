@@ -2,7 +2,6 @@
 @import "animate";
 
 @media (max-width: $responsivenessBreakPoint) {
-  won-preact.modalDialog,
   won-modal-dialog {
     @include appearAnimation(0.5s);
     display: flex;
@@ -52,7 +51,6 @@
 }
 
 @media (min-width: $responsivenessBreakPoint) {
-  won-preact.modalDialog,
   won-modal-dialog {
     @include appearAnimation(0.5s);
     display: flex;

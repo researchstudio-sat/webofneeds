@@ -28,14 +28,11 @@ won-connections-overview {
         grid-template-columns: 1fr auto;
         min-width: 0;
 
-        & > won-preact.connectionIndicators > won-connection-indicators,
-        & > won-preact.atomHeader > won-atom-header,
         & > won-atom-header,
         & > won-connection-indicators {
           max-height: 2.5rem;
         }
 
-        & > won-preact.atomHeader > won-atom-header,
         & > won-atom-header {
           padding-right: 0.5rem;
         }

@@ -14,8 +14,7 @@ main.ownerwelcome {
   border: $thinGrayBorder;
   border-top: 0;
 
-  > won-how-to,
-  > won-preact.howTo > won-how-to {
+  > won-how-to {
     > .howto__createx > won-labelled-hr > .wlh__label > .wlh__label__text {
       background: white;
     }
@@ -78,7 +77,6 @@ main.ownerinventory {
     display: grid;
     grid-gap: 1rem;
 
-    > won-preact.atomInfo.ownerinventory__personas__persona,
     > won-atom-info.ownerinventory__personas__persona {
       background: white;
       border: $thinGrayBorder;
@@ -126,7 +124,7 @@ main.ownerinventory {
     }
   }
 
-  .ownerinventory__content > won-preact {
+  .ownerinventory__content {
     display: grid;
     padding: 1rem;
     grid-gap: 1rem;
