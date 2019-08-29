@@ -72,10 +72,8 @@ main.ownermap {
         text-overflow: ellipsis;
         overflow: hidden;
       }
-    }
-
-    won-title-picker {
-      grid-area: omh__location;
+      won-title-picker {
+      }
     }
 
     &__updated {
