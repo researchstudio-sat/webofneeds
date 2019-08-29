@@ -175,7 +175,7 @@ class AtomInfo extends React.Component {
       <won-atom-info
         class={
           (this.props.className ? this.props.className : "") +
-          (this.props.atomLoading && " won-is-loading ")
+          (this.props.atomLoading ? " won-is-loading " : "")
         }
       >
         <WonAtomHeaderBig atomUri={this.props.atomUri} />

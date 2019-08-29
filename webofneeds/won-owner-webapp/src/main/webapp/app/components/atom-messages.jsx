@@ -812,7 +812,7 @@ class AtomMessages extends React.Component {
       <won-atom-messages
         class={
           (this.props.className || "") +
-          (this.props.connectionOrAtomsLoading && " won-is-loading ")
+          (this.props.connectionOrAtomsLoading ? " won-is-loading " : "")
         }
       >
         {headerElement}
