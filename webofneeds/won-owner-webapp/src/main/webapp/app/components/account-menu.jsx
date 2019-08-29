@@ -32,6 +32,7 @@ const mapDispatchToProps = dispatch => {
   };
 };
 
+//TODO: REACT ON CLICK OUTSIDE OF COMPONENT AND CLOSE THE DIALOG (maybe with hooks)
 class WonAccountMenu extends React.Component {
   render() {
     return (
