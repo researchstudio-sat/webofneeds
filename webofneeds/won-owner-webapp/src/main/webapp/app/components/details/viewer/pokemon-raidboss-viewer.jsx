@@ -82,13 +82,19 @@ class PokemonRaidbossViewer extends React.Component {
 
     const expiration = this.props.hasExpired ? (
       <div className="prbv__content__expires prbv__content__expires--expired">
-        Has expired {this.props.friendlyExpiresTime} (
-        {this.props.expiresLocaleString})
+        {"Has expired " +
+          this.props.friendlyExpiresTime +
+          " (" +
+          this.props.expiresLocaleString +
+          ")"}
       </div>
     ) : (
       <div className="prbv__content__expires">
-        Expires {this.props.friendlyExpiresTime} (
-        {this.props.expiresLocaleString})
+        {"Expires " +
+          this.props.friendlyExpiresTime +
+          " (" +
+          this.props.expiresLocaleString +
+          ")"}
       </div>
     );
 
@@ -100,15 +106,17 @@ class PokemonRaidbossViewer extends React.Component {
             src={this.props.pokemon.imageUrl}
           />
           <div className="prbv__content__pokemon__id">
-            #{this.props.pokemon.id}
+            {"#" + this.props.pokemon.id}
           </div>
           <div className="prbv__content__pokemon__name">
             {this.props.pokemon.name}
-            (this.props.form ?{" "}
-            <span className="prbv__content__pokemon__name__form">
-              {"(" + this.props.form + ")"}
-            </span>{" "}
-            : undefined)
+            {this.props.form ? (
+              <span className="prbv__content__pokemon__name__form">
+                {"(" + this.props.form + ")"}
+              </span>
+            ) : (
+              undefined
+            )}
           </div>
         </div>
       ) : (
@@ -117,18 +125,24 @@ class PokemonRaidbossViewer extends React.Component {
             className="prbv__content__pokemon__image prbv__content__pokemon__image--unhatched"
             src={this.props.detail.fullPokemonList[0].imageUrl}
           />
-          <div className="prbv__content__pokemon__id">?</div>(
-          this.props.shouldHaveHatched ? (
-          <div className="prbv__content__pokemon__name">
-            Should have hatched {this.props.friendlyHatchesTime}{" "}
-            {"(" + this.props.hatchesLocaleString + ")"}
-          </div>
+          <div className="prbv__content__pokemon__id">?</div>
+          {this.props.shouldHaveHatched ? (
+            <div className="prbv__content__pokemon__name">
+              {"Should have hatched " +
+                this.props.friendlyHatchesTime +
+                " (" +
+                this.props.hatchesLocaleString +
+                ")"}
+            </div>
           ) : (
-          <div className="prbv__content__pokemon__name">
-            Hatches {this.props.friendlyHatchesTime} (
-            {"(" + this.props.hatchesLocaleString + ")"}
-          </div>
-          ) )
+            <div className="prbv__content__pokemon__name">
+              {"Hatches " +
+                this.props.friendlyHatchesTime +
+                " (" +
+                this.props.hatchesLocaleString +
+                ")"}
+            </div>
+          )}
         </div>
       );
 

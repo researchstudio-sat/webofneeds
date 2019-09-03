@@ -111,6 +111,15 @@ class PagePost extends React.Component {
     );
   }
 
+  componentDidMount() {
+    if (
+      this.props.atomUri &&
+      (!this.props.atom || (this.props.atomToLoad && !this.props.atomLoading))
+    ) {
+      this.props.fetchAtom(this.props.atomUri);
+    }
+  }
+
   componentDidUpdate(prevProps) {
     if (this.props.atomUri && this.props.atomUri !== prevProps.atomUri) {
       if (
