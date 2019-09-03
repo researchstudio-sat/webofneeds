@@ -6,12 +6,13 @@ import java.util.List;
 public class BotContextWrapper {
     public static final String KEY_ATOM_TARGET_ATOM_ASSOCIATION = "atom_target_atom";
     private final String botName;
-    private final String atomCreateListName = getBotName() + ":atomList";
+    private final String atomCreateListName;
     private BotContext botContext;
 
     public BotContextWrapper(BotContext botContext, String botName) {
         this.botContext = botContext;
         this.botName = botName;
+        this.atomCreateListName = botName + ":atomList";
     }
 
     public String getBotName() {
