@@ -40,7 +40,7 @@ For running WoN with Docker locally follow the steps in the [WoN with Docker Doc
 
 ### 2. Tomcat
 
-The Tomcat solution of running the WoN locally is mainly for development purposes. If you focus on just one aspect in the WoN you can combine the Docker and the Tomcat setup e.g.: Working on the WebApp, you just need to run the WebApp locally on tomcat and the Node and Matcher still with Docker. To do so we recommend Eclipse as IDE and you can find the setup documentation [here](/documentation/build-with-eclipse.md).
+The Tomcat solution of running the WoN locally is mainly for development purposes. If you focus on just one aspect in the WoN you can combine the Docker and the Tomcat setup e.g.: Working on the WebApp, you just need to run the WebApp locally on tomcat and the Node and Matcher still with Docker. To do so we recommend Eclipse as IDE and you can find the setup documentation [here](/documentation/building.md).
 
 ## Development
 

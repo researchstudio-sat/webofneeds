@@ -2,20 +2,20 @@
 
 ### Eclipse:
 
-1.  Download **Eclipse Oxygen: Java EE**:
+<!-- 1.  Download **Eclipse Oxygen: Java EE**:
     - either get the portable version here: https://www.eclipse.org/downloads/eclipse-packages/ » Eclipse IDE **for Enterprise Java Developers** » 64bit.
     - or use this direct link to the currently latest zip: https://www.eclipse.org/downloads/download.php?file=/technology/epp/downloads/release/oxygen/1a/eclipse-jee-oxygen-1a-win32-x86_64.zip
 2.  Install/unzip eclipse to a folder (e.g. `C:\DATA\DEV\...`)
 3.  Add `-clean -Xms512m -Xmx1024m` to the `.exe` shortcut
-4.  Clone project with git (e.g. to `C:\DATA\DEV\workspace`). It’s easier not to do this in eclipse, but with the git bash or gui)
-5.  Import project in eclipse: File >> Import >> Existing Maven Project >> point to `pom.xml`
-6.  Deactivate "autobuild": Window >> Preferences >> General >> Workspace >> uncheck "Build automatically"
-7.  Use the provided code style: Window >> Preferences >> Java >> Code Style >> Formatter
+4.  Clone project with git (e.g. to `C:\DATA\DEV\workspace`). It’s easier not to do this in eclipse, but with the git bash or gui) -->
+<!-- 5.  Import project in eclipse: File >> Import >> Existing Maven Project >> point to `pom.xml` -->
+<!-- 6.  Deactivate "autobuild": Window >> Preferences >> General >> Workspace >> uncheck "Build automatically"  -->
+<!-- 7.  Use the provided code style: Window >> Preferences >> Java >> Code Style >> Formatter
     1.  Click `Import`
     2.  Select the file `webofneeds/won-buildtools/src/main/resources/eclipse/formatter.xml`
-    3.  Click `Apply and Close`
-8.  Set maven profiles: right-click the webofneeds project in the package explorer >> Maven >> Select Maven Profiles. check `skip-tests`
-9.  If you develop on Windows you will need to setup `node`s `windows-build-tools` (see [this guide](./installation-setting-up-frontend-development-environment.md#installing-windows-build-tools-on-windows))
+    3.  Click `Apply and Close` -->
+<!-- 8.  Set maven profiles: right-click the webofneeds project in the package explorer >> Maven >> Select Maven Profiles. Check `skip-tests`. -->
+<!-- 9.  If you develop on Windows you will need to setup `node`s `windows-build-tools` (see [this guide](./installation-setting-up-frontend-development-environment.md#installing-windows-build-tools-on-windows)) -->
 
 ### Preparation: generate cryptographic keys
 
@@ -23,7 +23,7 @@ Follow the [instructions for generating your keys](https://github.com/researchst
 
 ### Tomcat integration:
 
-0.  Download/Install the latest [Tomcat 9 server](https://tomcat.apache.org/download-90.cgi)
+<!-- 0.  Download/Install the latest [Tomcat 9 server](https://tomcat.apache.org/download-90.cgi) -->
 1.  Create Server in Eclipse: File >> New >> Other >> Server
 1.  Choose Tomcat 9, then press "next" (not "finish")
 1.  Make sure you use a Java 8 JDK or JRE, not java 9, or tomcat will not start up and throw a JAXB-related exception.
