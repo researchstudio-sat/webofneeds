@@ -27,13 +27,17 @@ Anyone can run any of these components. They can all talk to each other.
 
 # Demo
 
-A **demo deployment of the Web of Needs** with a simple owner application, one won node and one matching service can be tested at www.matchat.org
+A **demo deployment of the Web of Needs** with a simple owner application, one won node and one matching service can be tested at <https://www.matchat.org>
 
 # Deployment
 
 If you want to **set up your own deployment of Web of Needs** components, here you find requirements for **getting started**:
 
-- follow the [docker tutorial](/documentation/how-to-won/docker.md) to set up all the neccessary components of web of needs locally
+- follow the ["WoN with docker" documentation](/webofneeds/won-docker/README.md) to set up all the neccessary components of web of needs locally
+
+# Development
+
+Check out this [overview over setup and development](./documentation/README.md).
 
 # Further resources
 
