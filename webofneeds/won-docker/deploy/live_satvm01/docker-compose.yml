@@ -47,6 +47,7 @@ services:
       - "61626:61626"
       - "61611:61611"
       - "61612:61612"
+      - "61613:61613"
     volumes:
       - $base_folder/letsencrypt/certs:/etc/letsencrypt/
       - $base_folder/nginx.conf:/etc/nginx/nginx.conf
