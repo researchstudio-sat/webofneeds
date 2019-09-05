@@ -18,7 +18,8 @@ ENV webroot_dir="/usr/share/nginx/html"
 # mail address that gets informed when the certificate is about to run out
 ENV certificate_email=florian.kleedorfer@researchstudio.at
 
-ENV domain_params="-d matchat.org -d www.matchat.org -d node.matchat.org -d ownerblue.master.matchat.org -d ownergreen.master.matchat.org -d nodeblue.master.matchat.org -d nodegreen.master.matchat.org -d hackathon.matchat.org -d hackathonnode.matchat.org"
+# first entry is the certificate name used by --cert-name, option of certbot command
+ENV domain_params="matchat.org -d matchat.org -d www.matchat.org -d node.matchat.org -d ownerblue.master.matchat.org -d ownergreen.master.matchat.org -d nodeblue.master.matchat.org -d nodegreen.master.matchat.org -d hackathon.matchat.org -d hackathonnode.matchat.org"
 
 # java key store password
 ENV key_store_password=changeit
