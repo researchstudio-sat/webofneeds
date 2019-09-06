@@ -86,7 +86,7 @@
     "eslint-plugin-standard": "^4.0.0",
     "husky": "^0.14.3",
     "lint-staged": "^7.3.0",
-    "node-elm-compiler": "^5.0.3",
+    "node-elm-compiler": "^5.0.4",
     "parcel-plugin-eslint": "^1.0.7",
     "parcel-plugin-static-files-copy": "^2.0.0",
     "parcel-plugin-svg-sprite": "^1.1.1",
