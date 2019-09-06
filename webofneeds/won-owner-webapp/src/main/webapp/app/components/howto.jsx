@@ -4,10 +4,11 @@ import Immutable from "immutable";
 import { connect } from "react-redux";
 import { actionCreators } from "../actions/actions.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
+import { getIn } from "../utils.js";
+
 import WonLabelledHr from "./labelled-hr.jsx";
 
 import "~/style/_howto.scss";
-import { getIn } from "../utils";
 
 const howItWorksSteps = [
   {
@@ -180,6 +181,18 @@ class WonHowTo extends React.Component {
             onClick={this.viewWhatsNew}
           >
             <span>{"What's new?"}</span>
+          </button>
+          <WonLabelledHr
+            className="labelledHr howto__createx__labelledhr"
+            label="Or"
+          />
+          <button
+            className="won-button--filled red howto__createx__spanbutton"
+            onClick={() =>
+              this.props.routerGo("create", { useCase: "persona" })
+            }
+          >
+            <span>Create your Persona!</span>
           </button>
           <WonLabelledHr
             className="labelledHr howto__createx__labelledhr"
