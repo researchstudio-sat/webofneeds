@@ -20,6 +20,7 @@ import won.protocol.util.DefaultAtomModelWrapper;
 import java.net.URI;
 import java.time.ZonedDateTime;
 import java.util.Collection;
+import java.util.Map;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AtomPojo {
@@ -40,6 +41,7 @@ public class AtomPojo {
     private URI heldBy;
     private Collection<URI> eventObjectAboutUris;
     private Collection<URI> seeksEventObjectAboutUris;
+    private Map<URI, URI> socketTypeUriMap;
 
     // TODO: add s:object/s:Event/s:about URI for content and seeks -> otherwise we
     // do not know which interest it is
@@ -66,6 +68,7 @@ public class AtomPojo {
         holds = atom.getHolds(); // TODO: IMPL ME
         seeksEventObjectAboutUris = atom.getSeeksEventObjectAboutUris();
         eventObjectAboutUris = atom.getContentEventObjectAboutUris();
+        socketTypeUriMap = atom.getSocketTypeUriMap();
     }
 
     /*
@@ -191,6 +194,10 @@ public class AtomPojo {
 
     public void setSeeksEventObjectAboutUris(Collection<URI> seeksEventObjectAboutUris) {
         this.seeksEventObjectAboutUris = seeksEventObjectAboutUris;
+    }
+
+    public Map<URI, URI> getSocketTypeUriMap() {
+        return socketTypeUriMap;
     }
 
     @Override

@@ -10,18 +10,6 @@
  */
 package won.owner.web.rest;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.text.ParseException;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.jena.query.Dataset;
 import org.slf4j.Logger;
@@ -35,12 +23,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-
+import org.springframework.web.bind.annotation.*;
 import won.owner.model.Draft;
 import won.owner.model.User;
 import won.owner.model.UserAtom;
@@ -55,6 +38,13 @@ import won.protocol.rest.LinkedDataFetchingException;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.text.ParseException;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 @Controller
 @RequestMapping("/rest/atoms")
@@ -155,7 +145,8 @@ public class RestAtomController {
                     @RequestParam(value = "latitude", required = false) Float latitude,
                     @RequestParam(value = "longitude", required = false) Float longitude,
                     @RequestParam(value = "maxDistance", required = false) Integer maxDistance,
-                    @RequestParam(value = "limit", required = false) int limit) {
+                    @RequestParam(value = "limit", required = false) Integer limit,
+                    @RequestParam(value = "filterBySocketTypeUri", required = false) String filterBySocketTypeUriString) {
         // the #atomList and fetch these as well
         // TODO: fetch with modifiedafter parameter and not only the uri
         ZonedDateTime modifiedAfter = StringUtils.isNotBlank(modifiedAfterIsoString)
@@ -169,6 +160,10 @@ public class RestAtomController {
         List<URI> atomUris = WonLinkedDataUtils.getNodeAtomUris(nodeURI, modifiedAfter, createdAfter, state,
                         linkedDataSource);
         Map<URI, AtomPojo> atomMap = new HashMap<>();
+        URI filterBySocketTypeUri = null;
+        if (filterBySocketTypeUriString != null) {
+            filterBySocketTypeUri = URI.create(filterBySocketTypeUriString);
+        }
         for (URI atomUri : atomUris) {
             try {
                 Dataset atomDataset = WonLinkedDataUtils.getDataForResource(atomUri, linkedDataSource);
@@ -178,9 +173,11 @@ public class RestAtomController {
                                 && ((createdAfter == null) || createdAfter.isBefore(atom.getCreationZonedDateTime()))
                                 && ((nearLocation == null)
                                                 || isNearLocation(nearLocation, atom.getLocation(), maxDistance)
-                                                || isNearLocation(nearLocation, atom.getJobLocation(), maxDistance))) {
+                                                || isNearLocation(nearLocation, atom.getJobLocation(), maxDistance))
+                                && ((filterBySocketTypeUri == null)
+                                                || atom.getSocketTypeUriMap().containsValue(filterBySocketTypeUri))) {
                     atomMap.put(atom.getUri(), atom);
-                    if (limit > 0 && atomMap.size() >= limit)
+                    if (limit != null && limit > 0 && atomMap.size() >= limit)
                         break; // break fetching if the limit has been reached
                 }
             } catch (LinkedDataFetchingException e) {
