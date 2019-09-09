@@ -97,7 +97,7 @@ services:
       - $base_folder/won-server-certshackathon:/usr/local/tomcat/conf/ssl/
       - $base_folder/won-client-certs/hackathon:/usr/local/tomcat/won/client-certs/
     depends_on:
-      - hackathonnode
+      - wonnode
       - postgres
       - gencert
 
