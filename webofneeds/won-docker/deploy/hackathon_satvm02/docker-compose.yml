@@ -210,13 +210,13 @@ services:
       - "wonNodeController.wonNode.crawl=https://hackathonnode.matchat.org/won/resource"
       - "cluster.local.port=2555"
       - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
-      - "JMX_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,address=62924,server=y,suspend=n
+      - "JMX_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,address=62927,server=y,suspend=n
         -Dcom.sun.management.jmxremote.port=9024 -Dcom.sun.management.jmxremote.authenticate=false
         -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9024
         -Djava.rmi.server.hostname=satvm02.researchstudio.at"
     ports:
       - "2555:2555"
-      - "62924:62924"
+      - "62927:62927"
       - "9024:9024"
     volumes:
       - $base_folder/won-client-certs/matcher_service:/usr/src/matcher-service/client-certs/
