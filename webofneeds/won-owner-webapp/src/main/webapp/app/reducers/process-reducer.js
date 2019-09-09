@@ -3,7 +3,7 @@
  */
 import { actionTypes } from "../actions/actions.js";
 import Immutable from "immutable";
-import { getIn, get } from "../utils.js";
+import { get, getIn } from "../utils.js";
 import { parseAtom } from "./atom-reducer/parse-atom.js";
 import { parseMessage } from "./atom-reducer/parse-message.js";
 import * as processUtils from "../redux/utils/process-utils.js";
@@ -20,6 +20,7 @@ const initialState = Immutable.fromJS({
   processingSendAnonymousLinkEmail: false,
   processingWhatsNew: false,
   processingWhatsAround: false,
+  processingMetaAtoms: false,
   atoms: Immutable.Map(),
   connections: Immutable.Map(),
 });
@@ -129,6 +130,9 @@ export default function(processState = initialState, action = {}) {
     case actionTypes.atoms.fetchWhatsAround:
       return processState.set("processingWhatsAround", true);
 
+    case actionTypes.atoms.fetchMetaAtoms:
+      return processState.set("processingMetaAtoms", true);
+
     case actionTypes.atoms.fetchWhatsNew:
       return processState.set("processingWhatsNew", true);
 
@@ -144,6 +148,21 @@ export default function(processState = initialState, action = {}) {
           }
         });
       return processState.set("processingWhatsNew", false);
+    }
+
+    case actionTypes.atoms.storeMetaAtoms: {
+      const metaAtoms = get(action.payload, "metaAtoms");
+
+      metaAtoms &&
+        metaAtoms.map((metaAtom, metaAtomUri) => {
+          if (!processUtils.isAtomLoaded(processState, metaAtomUri)) {
+            processState = updateAtomProcess(processState, metaAtomUri, {
+              toLoad: true,
+            });
+          }
+        });
+
+      return processState.set("processingMetaAtoms", false);
     }
 
     case actionTypes.atoms.storeWhatsAround: {

@@ -3,7 +3,7 @@
  */
 
 import Immutable from "immutable";
-import { actionTypes, actionCreators } from "./actions.js";
+import { actionCreators, actionTypes } from "./actions.js";
 
 import { checkAccessToCurrentRoute } from "../configRouting.js";
 
@@ -39,6 +39,13 @@ export const fetchWhatsNew = modifiedAfterDate => (dispatch, getState) => {
     type: actionTypes.atoms.fetchWhatsNew,
   });
   return stateStore.fetchWhatsNew(dispatch, getState, modifiedAfterDate);
+};
+
+export const fetchPersonas = () => (dispatch, getState) => {
+  dispatch({
+    type: actionTypes.atoms.fetchMetaAtoms,
+  });
+  return stateStore.fetchPersonas(dispatch, getState);
 };
 
 export const fetchWhatsAround = (modifiedAfterDate, location, maxDistance) => (

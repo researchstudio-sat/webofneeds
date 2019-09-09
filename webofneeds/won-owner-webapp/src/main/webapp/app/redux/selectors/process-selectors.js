@@ -15,6 +15,7 @@ export function isLoading(state) {
   return (
     processUtils.isProcessingInitialLoad(process) ||
     processUtils.isProcessingWhatsAround(process) ||
+    processUtils.isProcessingMetaAtoms(process) ||
     processUtils.isProcessingWhatsNew(process) ||
     processUtils.isProcessingLogin(process) ||
     processUtils.isProcessingLogout(process) ||
