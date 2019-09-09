@@ -117,6 +117,21 @@ public class LinkedDataServiceImpl implements LinkedDataService {
     }
 
     @Transactional
+    public Dataset listAtomURIs(AtomState atomState) {
+        Model model = ModelFactory.createDefaultModel();
+        setNsPrefixes(model);
+        Collection<URI> uris = atomInformationService.listAtomURIs(atomState);
+        Resource atomListPageResource = model.createResource(this.atomResourceURIPrefix + "/");
+        for (URI atomURI : uris) {
+            model.add(model.createStatement(atomListPageResource, RDFS.member,
+                            model.createResource(atomURI.toString())));
+        }
+        Dataset ret = newDatasetWithNamedModel(createDataGraphUriFromResource(atomListPageResource), model);
+        addBaseUriAndDefaultPrefixes(ret);
+        return ret;
+    }
+
+    @Transactional
     public AtomInformationService.PagedResource<Dataset, URI> listAtomURIs(final int pageNum) {
         return listAtomURIs(pageNum, null, null);
     }

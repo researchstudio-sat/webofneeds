@@ -298,9 +298,11 @@ public class LinkedDataWebController {
         Dataset rdfDataset;
         AtomState atomState = getAtomState(state);
         if (page == null && beforeId == null && afterId == null) {
-            // all atoms, does not support atom state filtering for clients that do not
-            // support paging
-            rdfDataset = linkedDataService.listAtomURIs();
+            if (atomState != null) {
+                rdfDataset = linkedDataService.listAtomURIs(atomState);
+            } else {
+                rdfDataset = linkedDataService.listAtomURIs();
+            }
         } else if (page != null) {
             AtomInformationService.PagedResource<Dataset, URI> resource = linkedDataService.listAtomURIs(page, null,
                             atomState);
@@ -547,10 +549,11 @@ public class LinkedDataWebController {
         String passableQuery = getPassableQueryMap("state", state);
         AtomState atomState = getAtomState(state);
         if (preferedSize == null && modifiedAfter == null) {
-            // client doesn not support paging - return all atoms; does not support atom
-            // state filtering for clients that do
-            // not support paging
-            rdfDataset = linkedDataService.listAtomURIs();
+            if (atomState != null) {
+                rdfDataset = linkedDataService.listAtomURIs(atomState);
+            } else {
+                rdfDataset = linkedDataService.listAtomURIs();
+            }
         } else if (page == null && beforeId == null && afterId == null && modifiedAfter == null) {
             // return latest atoms
             AtomInformationService.PagedResource<Dataset, URI> resource = linkedDataService.listAtomURIs(1,

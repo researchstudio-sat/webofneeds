@@ -10,21 +10,16 @@
  */
 package won.protocol.service;
 
+import org.apache.jena.rdf.model.Model;
+import org.springframework.data.domain.Slice;
+import won.protocol.exception.NoSuchAtomException;
+import won.protocol.exception.NoSuchConnectionException;
+import won.protocol.message.WonMessageType;
+import won.protocol.model.*;
+
 import java.net.URI;
 import java.util.Collection;
 import java.util.Date;
-
-import org.apache.jena.rdf.model.Model;
-import org.springframework.data.domain.Slice;
-
-import won.protocol.exception.NoSuchConnectionException;
-import won.protocol.exception.NoSuchAtomException;
-import won.protocol.message.WonMessageType;
-import won.protocol.model.Connection;
-import won.protocol.model.DataWithEtag;
-import won.protocol.model.MessageEventPlaceholder;
-import won.protocol.model.Atom;
-import won.protocol.model.AtomState;
 
 /**
  * Service for obtaining information about atoms and connections in the system
@@ -37,6 +32,14 @@ public interface AtomInformationService {
      * @return a collection of all atom URIs.
      */
     public Collection<URI> listAtomURIs();
+
+    /**
+     * Retrieves a list of all atoms with the given atomState on the atomserver.
+     * 
+     * @param atomState State that an atom needs to have to be included.
+     * @return a collection of all atom URIs.
+     */
+    public Collection<URI> listAtomURIs(AtomState atomState);
 
     /**
      * Retrieves a page of the list of atoms on the atomserver that have a given

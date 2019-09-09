@@ -17,13 +17,13 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
-import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchAtomException;
+import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.message.WonMessageType;
 import won.protocol.model.*;
+import won.protocol.repository.AtomRepository;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.MessageEventRepository;
-import won.protocol.repository.AtomRepository;
 import won.protocol.service.AtomInformationService;
 import won.protocol.util.DataAccessUtils;
 
@@ -50,6 +50,11 @@ public class AtomInformationServiceImpl implements AtomInformationService {
     @Override
     public Collection<URI> listAtomURIs() {
         return atomRepository.getAllAtomURIs();
+    }
+
+    @Override
+    public Collection<URI> listAtomURIs(AtomState atomState) {
+        return atomRepository.getAllAtomURIs(atomState);
     }
 
     @Override

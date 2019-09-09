@@ -13,12 +13,12 @@ package won.protocol.service;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.springframework.context.NoSuchMessageException;
-import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchAtomException;
+import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.message.WonMessageType;
+import won.protocol.model.AtomState;
 import won.protocol.model.Connection;
 import won.protocol.model.DataWithEtag;
-import won.protocol.model.AtomState;
 
 import java.net.URI;
 import java.util.Collection;
@@ -34,6 +34,14 @@ public interface LinkedDataService {
      * @return
      */
     public Dataset listAtomURIs();
+
+    /**
+     * Returns a model containing all atom URIs with the given atomState.
+     *
+     * @param atomState State that an atom needs to have to be included.
+     * @return
+     */
+    public Dataset listAtomURIs(AtomState atomState);
 
     /**
      * Returns a model containing all atom URIs. If page >= 0, paging is used and
