@@ -77,9 +77,11 @@ public class GroupCycleBot extends EventBot {
                                 logger.info("");
                                 logger.info("We will create {} groups with {} members each.", NUMBER_OF_GROUPS,
                                                 NUMBER_OF_GROUPMEMBERS);
-                                logger.info("The groups all be connected to each other, resulting in {} group-group connections",
+                                logger.info(
+                                                "The groups all be connected to each other, resulting in {} group-group connections",
                                                 NUMBER_OF_GROUPS * (NUMBER_OF_GROUPS - 1) / 2);
-                                logger.info("Then, one group member will send a message to its group, which should reach all other group members exactly once");
+                                logger.info(
+                                                "Then, one group member will send a message to its group, which should reach all other group members exactly once");
                                 logger.info("This will result in {} messages being received.",
                                                 NUMBER_OF_GROUPS * NUMBER_OF_GROUPMEMBERS - 1);
                                 logger.info("The groups will forward {} messages and suppress {} duplicates",
@@ -150,7 +152,8 @@ public class GroupCycleBot extends EventBot {
                                 protected void doRun(Event event, EventListener executingListener) throws Exception {
                                     CreateAtomCommandResultEvent resultEvent = (CreateAtomCommandResultEvent) event;
                                     logger.debug("creating group atom succeeded: {}, atom uri: {}",
-                                                    resultEvent.isSuccess(), resultEvent.getAtomURI());
+                                                    resultEvent.isSuccess(),
+                                                    resultEvent.getAtomURI());
                                     Optional<Object> uriMessage = resultEvent.isSuccess()
                                                     ? Optional.of(resultEvent.getAtomURI())
                                                     : Optional.empty();
@@ -200,8 +203,9 @@ public class GroupCycleBot extends EventBot {
                                                         resultEvent.isSuccess(), resultEvent.getAtomURI());
                                         if (resultEvent.isSuccess()) {
                                             members.add(resultEvent.getAtomURI());
-                                            context.getEventBus().publish(
-                                                            new GroupMemberCreatedEvent(resultEvent.getAtomURI()));
+                                            context.getEventBus()
+                                                            .publish(new GroupMemberCreatedEvent(
+                                                                            resultEvent.getAtomURI()));
                                         }
                                         memberCreationCounter.increment();
                                     }
@@ -236,7 +240,8 @@ public class GroupCycleBot extends EventBot {
                                                                                             EventListener executingListener)
                                                                                             throws Exception {
                                                                                 ConnectCommandResultEvent resultEvent = (ConnectCommandResultEvent) event;
-                                                                                logger.debug("sending connect to group atom {} on behalf of member {}, succeeded: {}",
+                                                                                logger.debug(
+                                                                                                "sending connect to group atom {} on behalf of member {}, succeeded: {}",
                                                                                                 new Object[] { connectCommandEvent
                                                                                                                 .getTargetAtomURI(),
                                                                                                                 connectCommandEvent
@@ -286,7 +291,8 @@ public class GroupCycleBot extends EventBot {
                                 @Override
                                 protected void doRun(Event event, EventListener executingListener) throws Exception {
                                     logger.debug("finished connecting all {} members to group {} ",
-                                                    NUMBER_OF_GROUPMEMBERS, groupAtomURI);
+                                                    NUMBER_OF_GROUPMEMBERS,
+                                                    groupAtomURI);
                                     context.getEventBus().publish(new GroupMembersConnectedEvent());
                                     deactivate();
                                 }
@@ -368,7 +374,8 @@ public class GroupCycleBot extends EventBot {
                                         return;
                                     TargetCountReachedEvent countEvent = (TargetCountReachedEvent) event;
                                     logger.info("successfully made {} connections between our {} groups",
-                                                    countEvent.getCount(), NUMBER_OF_GROUPS);
+                                                    countEvent.getCount(),
+                                                    NUMBER_OF_GROUPS);
                                     deactivate();
                                 }
                             }));
@@ -388,7 +395,8 @@ public class GroupCycleBot extends EventBot {
                                         protected void doRun(Event event, EventListener executingListener)
                                                         throws Exception {
                                             ConnectCommandResultEvent resultEvent = (ConnectCommandResultEvent) event;
-                                            logger.debug("sending connect to group atom {} on behalf of group atom {}, succeeded: {}",
+                                            logger.debug(
+                                                            "sending connect to group atom {} on behalf of group atom {}, succeeded: {}",
                                                             new Object[] { connectCommandEvent.getTargetAtomURI(),
                                                                             connectCommandEvent.getAtomURI(),
                                                                             resultEvent.isSuccess() });
@@ -447,8 +455,8 @@ public class GroupCycleBot extends EventBot {
                                     URI messageURI = message.getMessageURI();
                                     logger.debug("atom {} received message from atom {}, text: '{}', message uri: {}",
                                                     new Object[] { messageEvent.getAtomURI(),
-                                                                    messageEvent.getTargetAtomURI(), textMessage,
-                                                                    messageURI });
+                                                                    messageEvent.getTargetAtomURI(),
+                                                                    textMessage, messageURI });
                                 }
                             }));
         }
@@ -541,7 +549,8 @@ public class GroupCycleBot extends EventBot {
                                         logger.info("received group message {} of {} ...", currentCount, targetCount);
                                     } else if (currentCount == targetCount) {
                                         logger.info("received group message {} of {}, target count reached",
-                                                        currentCount, targetCount);
+                                                        currentCount,
+                                                        targetCount);
                                     } else {
                                         logger.warn("received group message {} but only expected {} - something is wrong!",
                                                         currentCount, targetCount);
@@ -562,28 +571,32 @@ public class GroupCycleBot extends EventBot {
 
         @Override
         protected void onActivate(Optional<Object> message) {
-            GroupBotContextWrapper botContextWrapper = (GroupBotContextWrapper) getBotContextWrapper();
+            // GroupBotContextWrapper botContextWrapper = (GroupBotContextWrapper)
+            // getBotContextWrapper();
             EventPublishingCounter counter = new EventPublishingCounter("groupCreationCounter", context);
             // count group creations
             subscribeWithAutoCleanup(GroupCreatedEvent.class,
                             new ActionOnEventListener(context, new IncrementCounterAction(context, counter)));
             // produce log messages about created groups
-            subscribeWithAutoCleanup(CountEvent.class, new ActionOnEventListener(context, counter.makeEventFilter(),
-                            new BaseEventBotAction(context) {
-                                @Override
-                                protected void doRun(Event event, EventListener executingListener) throws Exception {
-                                    if (!(event instanceof CountEvent))
-                                        return;
-                                    CountEvent countEvent = (CountEvent) event;
-                                    int currentCount = countEvent.getCount();
-                                    int targetCount = NUMBER_OF_GROUPS;
-                                    logger.info("created group {} of {} ", currentCount, targetCount);
-                                }
-                            }));
+            subscribeWithAutoCleanup(CountEvent.class,
+                            new ActionOnEventListener(context, counter.makeEventFilter(),
+                                            new BaseEventBotAction(context) {
+                                                @Override
+                                                protected void doRun(Event event, EventListener executingListener)
+                                                                throws Exception {
+                                                    if (!(event instanceof CountEvent))
+                                                        return;
+                                                    CountEvent countEvent = (CountEvent) event;
+                                                    int currentCount = countEvent.getCount();
+                                                    int targetCount = NUMBER_OF_GROUPS;
+                                                    logger.info("created group {} of {} ", currentCount, targetCount);
+                                                }
+                                            }));
             // count when all members are created
             EventPublishingCounter membersCreatedCounter = new EventPublishingCounter("membersCreatedCounter", context);
-            subscribeWithAutoCleanup(GroupMemberCreatedEvent.class, new ActionOnEventListener(context,
-                            new IncrementCounterAction(context, membersCreatedCounter)));
+            subscribeWithAutoCleanup(GroupMemberCreatedEvent.class,
+                            new ActionOnEventListener(context,
+                                            new IncrementCounterAction(context, membersCreatedCounter)));
             // produce log messages about created members
             subscribeWithAutoCleanup(CountEvent.class, new ActionOnEventListener(context,
                             membersCreatedCounter.makeEventFilter(), new BaseEventBotAction(context) {
@@ -600,8 +613,9 @@ public class GroupCycleBot extends EventBot {
             // count when all members are connected
             EventPublishingCounter membersConnectedCounter = new EventPublishingCounter("membersConnectedCounter",
                             context);
-            subscribeWithAutoCleanup(GroupMembersConnectedEvent.class, new ActionOnEventListener(context,
-                            new IncrementCounterAction(context, membersConnectedCounter)));
+            subscribeWithAutoCleanup(GroupMembersConnectedEvent.class,
+                            new ActionOnEventListener(context,
+                                            new IncrementCounterAction(context, membersConnectedCounter)));
             // produce log messages about connected members
             subscribeWithAutoCleanup(CountEvent.class, new ActionOnEventListener(context,
                             membersConnectedCounter.makeEventFilter(), new BaseEventBotAction(context) {

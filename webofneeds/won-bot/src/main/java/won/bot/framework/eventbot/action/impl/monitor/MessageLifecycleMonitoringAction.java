@@ -43,7 +43,6 @@ public class MessageLifecycleMonitoringAction extends BaseEventBotAction {
     Map<String, Split> msgSplitsBCDE = Collections.synchronizedMap(new HashMap<>());
     Map<URI, URI> connectionMsgUris = Collections.synchronizedMap(new HashMap<>());
     Map<URI, URI> responseMsgUris = Collections.synchronizedMap(new HashMap<>());
-    private long startTestTime = -1;
 
     public MessageLifecycleMonitoringAction(final EventListenerContext eventListenerContext) {
         super(eventListenerContext);
@@ -75,17 +74,17 @@ public class MessageLifecycleMonitoringAction extends BaseEventBotAction {
         } else if (event instanceof SuccessResponseEvent || event instanceof FailureResponseEvent) {
             DeliveryResponseEvent responseEvent = (DeliveryResponseEvent) event;
             if (connectionMsgUris.keySet().contains(responseEvent.getOriginalMessageURI())
-                            || connectionMsgUris.keySet().contains(responseEvent.getRemoteResponseToMessageURI())) {
+                    || connectionMsgUris.keySet().contains(responseEvent.getRemoteResponseToMessageURI())) {
                 responseMsgUris.put(responseEvent.getMessage().getMessageURI(), responseEvent.getAtomURI());
                 if (responseEvent.isRemoteResponse()) {
                     responseMsgUris.put(responseEvent.getMessage().getCorrespondingRemoteMessageURI(),
-                                    responseEvent.getTargetAtomURI());
+                            responseEvent.getTargetAtomURI());
                 }
             }
             if (responseEvent.isRemoteResponse()) {
                 if (msgSplitsBC.get(responseEvent.getRemoteResponseToMessageURI().toString()) != null) {
                     logger.debug("RECEIVED REMOTE RESPONSE EVENT {} for uri {}", event,
-                                    responseEvent.getRemoteResponseToMessageURI());
+                            responseEvent.getRemoteResponseToMessageURI());
                     msgSplitsBCDE.get(responseEvent.getRemoteResponseToMessageURI().toString()).stop();
                 }
             } else if (msgSplitsBC.get(responseEvent.getOriginalMessageURI().toString()) != null) {
@@ -112,7 +111,7 @@ public class MessageLifecycleMonitoringAction extends BaseEventBotAction {
             record(dataset, counter);
         }
         String sizeInfo = "\nSIZES for " + name + ":\n" + "messages=" + counter[0] + ", named-graphs=" + counter[1]
-                        + ", " + "quads=" + counter[2] + ", bytes-in-Trig-UTF8=" + counter[3];
+                + ", " + "quads=" + counter[2] + ", bytes-in-Trig-UTF8=" + counter[3];
         logger.info(sizeInfo);
     }
 

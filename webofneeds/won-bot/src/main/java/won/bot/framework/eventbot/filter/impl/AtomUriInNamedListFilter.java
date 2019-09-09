@@ -13,8 +13,8 @@ package won.bot.framework.eventbot.filter.impl;
 import java.net.URI;
 
 import won.bot.framework.eventbot.EventListenerContext;
-import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.AtomSpecificEvent;
+import won.bot.framework.eventbot.event.Event;
 
 /**
  * Filter that accepts AtomSpecificEvents if their atomURI is in the specified

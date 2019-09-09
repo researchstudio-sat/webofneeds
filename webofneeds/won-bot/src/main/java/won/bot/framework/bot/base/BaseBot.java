@@ -25,7 +25,9 @@ import java.lang.invoke.MethodHandles;
 import java.net.URI;
 
 /**
- * Basic Bot implementation intended to be extended. Does nothing.
+ * Basic Bot implementation intended to be extended. Does nothing. Implements
+ * Bot and OwnerCallback interfaces. Provides wrappers for initialize(),
+ * shutdown() and setters/getters.
  */
 public abstract class BaseBot implements Bot {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -49,12 +51,12 @@ public abstract class BaseBot implements Bot {
         if (!this.lifecyclePhase.isDown())
             return;
         this.lifecyclePhase = BotLifecyclePhase.STARTING_UP;
-        // try the connection with the bot context
+        // try to connect with the bot context
         try {
             botContextWrapper.getBotContext().saveToObjectMap("temp", "temp", "temp");
             Object o = botContextWrapper.getBotContext().loadFromObjectMap("temp", "temp");
-            Assert.isTrue("temp".equals(o), "does not equal 'temp'");
-        } catch (Exception e) {
+            Assert.state(o.equals("temp"), "Assertion failed.");
+        } catch (IllegalStateException e) {
             logger.error("Bot cannot establish connection with bot context");
             throw e;
         }
@@ -108,7 +110,7 @@ public abstract class BaseBot implements Bot {
 
     @Override
     public abstract void onNewAtomCreated(final URI atomUri, final URI wonNodeUri, final Dataset atomDataset)
-                    throws Exception;
+            throws Exception;
 
     @Override
     public abstract void onConnectFromOtherAtom(Connection con, final WonMessage wonMessage);
@@ -139,7 +141,7 @@ public abstract class BaseBot implements Bot {
 
     @Override
     public abstract void onNewAtomCreatedNotificationForMatcher(final URI wonNodeURI, final URI atomURI,
-                    final Dataset atomDataset);
+            final Dataset atomDataset);
 
     @Override
     public abstract void onAtomActivatedNotificationForMatcher(final URI wonNodeURI, final URI atomURI);

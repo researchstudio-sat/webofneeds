@@ -26,7 +26,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.springframework.context.ApplicationContext;
-import org.springframework.test.context.TestContextManager;
 
 /**
  * Tests for bot context. For the mongo db implementation you have to make
@@ -38,10 +37,8 @@ public class BotContextTests {
     private static final URI URI1 = URI.create("http://test.uri/number#1");
     private static final URI URI2 = URI.create("http://test.uri/number#2");
     private static final URI URI3 = URI.create("http://test.uri/number#3");
-    private TestContextManager testContextManager;
     private BotContext botContext;
     private Class botContextClass;
-    private ApplicationContext context;
 
     public BotContextTests(Class cl) {
         botContextClass = cl;

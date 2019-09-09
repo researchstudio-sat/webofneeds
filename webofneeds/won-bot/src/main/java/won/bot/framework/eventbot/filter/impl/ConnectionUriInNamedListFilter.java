@@ -13,9 +13,9 @@ package won.bot.framework.eventbot.filter.impl;
 import java.net.URI;
 
 import won.bot.framework.eventbot.EventListenerContext;
+import won.bot.framework.eventbot.event.AtomSpecificEvent;
 import won.bot.framework.eventbot.event.ConnectionSpecificEvent;
 import won.bot.framework.eventbot.event.Event;
-import won.bot.framework.eventbot.event.AtomSpecificEvent;
 
 /**
  * Filter that accepts ConnectionSpecificEvents if their atomURI is in the

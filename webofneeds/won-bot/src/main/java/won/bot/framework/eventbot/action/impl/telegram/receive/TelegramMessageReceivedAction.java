@@ -29,7 +29,7 @@ import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 
 public class TelegramMessageReceivedAction extends BaseEventBotAction {
-    private TelegramContentExtractor telegramContentExtractor;
+    private TelegramContentExtractor telegramContentExtractor; // TODO: unused variable/parameter
     private WonTelegramBotHandler wonTelegramBotHandler;
 
     public TelegramMessageReceivedAction(EventListenerContext eventListenerContext,

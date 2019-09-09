@@ -23,7 +23,7 @@ import won.protocol.model.SocketType;
 public class AtomCreatedEventForDebugConnect extends BaseAtomSpecificEvent {
     private final URI wonNodeUri;
     private final Dataset atomDataset;
-    private final SocketType socketType;
+    private final SocketType socketType; // TODO: unused parameter/variable
 
     public AtomCreatedEventForDebugConnect(final URI atomURI, final URI wonNodeUri, final Dataset atomDataset,
                     final SocketType socketType) {

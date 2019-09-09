@@ -50,7 +50,6 @@ public class ReplaceDebugAtomContentAction extends BaseEventBotAction {
         }
         ReplaceDebugAtomContentCommandEvent replaceDebugCommandEvent = (ReplaceDebugAtomContentCommandEvent) event;
         URI myAtomUri = replaceDebugCommandEvent.getCon().getAtomURI();
-        String replyText = "";
         Dataset atomDataset = getEventListenerContext().getLinkedDataSource().getDataForResource(myAtomUri);
         String titleString = null;
         if (atomDataset == null) {
@@ -70,7 +69,7 @@ public class ReplaceDebugAtomContentAction extends BaseEventBotAction {
         EventBus bus = ctx.getEventBus();
         final URI wonNodeUri = URI.create(atomModelWrapper.getWonNodeUri());
         logger.debug("replacing atom on won node {} with content {} ", wonNodeUri,
-                        StringUtils.abbreviate(RdfUtils.toString(onlyContentGraphDataset), 150));
+                StringUtils.abbreviate(RdfUtils.toString(onlyContentGraphDataset), 150));
         bus.publish(new ReplaceCommandEvent(onlyContentGraphDataset));
     }
 }

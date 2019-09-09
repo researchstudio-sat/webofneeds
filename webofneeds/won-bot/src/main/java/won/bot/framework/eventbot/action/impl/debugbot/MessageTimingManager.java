@@ -22,7 +22,7 @@ public class MessageTimingManager {
     public static final String KEY_LAST_MESSAGE_IN_TIMESTAMPS = "lastMessageInTimestamps";
     public static final String KEY_LAST_MESSAGE_OUT_TIMESTAMPS = "lastMessageOutTimestamps";
     private EventListenerContext context;
-    private int maxInstances;
+    private int maxInstances; // TODO: unused parameter/variable
 
     public MessageTimingManager(final EventListenerContext context, final int maxInstances) {
         this.context = context;
