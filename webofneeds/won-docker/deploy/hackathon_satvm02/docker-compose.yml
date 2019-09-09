@@ -121,10 +121,10 @@ services:
     build: ../../image/bots
     #image: webofneeds/bots:master
     environment:
-      - "node.default.host=wonnode"
+      - "node.default.host=hackathonnode.matchat.org"
       - "node.default.http.port=443"
       - "uri.prefix.owner=https://hackathon.matchat.org/debug_bot" # set this for the trust store alias
-      - "won.node.uris=https://hackathon.matchat.org/won/resource"
+      - "won.node.uris=https://hackathonnode.matchat.org/won/resource"
       - "botContext.impl=mongoBotContext"
       - "botContext.mongodb.user=won"
       - "botContext.mongodb.pass=$mongo_db_passwd"
