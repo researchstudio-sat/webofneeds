@@ -222,7 +222,9 @@ export function isConnectible(atom) {
 export function isDirectResponseAtom(atom) {
   return (
     getIn(atom, ["content", "flags"]) &&
-    getIn(atom, ["content", "flags"]).contains("con:DirectResponse")
+    getIn(atom, ["content", "flags"]).contains(
+      won.WONCON.DirectResponseCompacted
+    )
   );
 }
 
@@ -234,21 +236,23 @@ export function isDirectResponseAtom(atom) {
 export function isInvisibleAtom(atom) {
   return (
     getIn(atom, ["content", "flags"]) &&
-    getIn(atom, ["content", "flags"]).contains("match:NoHintForCounterpart")
+    getIn(atom, ["content", "flags"]).contains(
+      won.WONMATCH.NoHintForCounterpartCompacted
+    )
   );
 }
 
 export function isPersona(atom) {
   return (
     getIn(atom, ["content", "type"]) &&
-    getIn(atom, ["content", "type"]).has("won:Persona")
+    getIn(atom, ["content", "type"]).has(won.WON.PersonaCompacted)
   );
 }
 
 export function isAtom(atom) {
   return (
     getIn(atom, ["content", "type"]) &&
-    getIn(atom, ["content", "type"]).has("won:Atom")
+    getIn(atom, ["content", "type"]).has(won.WON.AtomCompacted)
   );
 }
 
@@ -526,23 +530,22 @@ export function sortByDistanceFrom(atomsImm, location, order = "ASC") {
 
 function getSocketKeysReset(socketsImm) {
   return socketsImm.mapKeys((key, value) => {
-    if (value === "chat:ChatSocket") {
-      return "#chatSocket";
-    }
-    if (value === "group:GroupSocket") {
-      return "#groupSocket";
-    }
-    if (value === "hold:HolderSocket") {
-      return "#holderSocket";
-    }
-    if (value === "hold:HoldableSocket") {
-      return "#holdableSocket";
-    }
-    if (value === "review:ReviewSocket") {
-      return "#reviewSocket";
-    }
-    if (value === "buddy:BuddySocket") {
-      return "#buddySocket";
+    switch (value) {
+      case won.CHAT.ChatSocketCompacted:
+        return "#chatSocket";
+      case won.GROUP.GroupSocketCompacted:
+        return "#groupSocket";
+      case won.HOLD.HolderSocketCompacted:
+        return "#holderSocket";
+      case won.HOLD.HoldableSocketCompacted:
+        return "#holdableSocket";
+      case won.REVIEW.ReviewSocketCompacted:
+        return "#reviewSocket";
+      case won.BUDDY.BuddySocketCompacted:
+        return "#buddySocket";
+      default:
+        console.warn("Trying to reset an unknown socket: ", value);
+        return "#unknownSocket";
     }
   });
 }

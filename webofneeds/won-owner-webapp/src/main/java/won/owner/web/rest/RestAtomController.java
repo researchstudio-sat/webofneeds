@@ -132,6 +132,14 @@ public class RestAtomController {
      * this timestamp (ISO 8601 format (UTC): yyyy-MM-dd'T'HH:mm:ss.SSS'Z')
      * @param createdAfterIsoString only return atoms that have been created after
      * this timestamp (ISO 8601 format (UTC): yyyy-MM-dd'T'HH:mm:ss.SSS'Z')
+     * @param longitude geo-location
+     * @param latitude geo-location
+     * @param maxDistance max distance in meters that the location of an atom is
+     * away from the given lat/lng coordinates
+     * @param filterBySocketTypeUriString filter the results to only contain Atoms
+     * with the given socketTypeUri
+     * @param filterByAtomTypeUriString filter the results to only contain Atoms
+     * with the given atomTypeUri
      * @param limit limit results to this size (if null, 0, or negative value do not
      * limit at all)
      * @return Map of AtomPojos -> atoms with certain metadata @see
@@ -145,9 +153,9 @@ public class RestAtomController {
                     @RequestParam(value = "latitude", required = false) Float latitude,
                     @RequestParam(value = "longitude", required = false) Float longitude,
                     @RequestParam(value = "maxDistance", required = false) Integer maxDistance,
-                    @RequestParam(value = "limit", required = false) Integer limit,
-                    @RequestParam(value = "filterBySocketTypeUri", required = false) String filterBySocketTypeUriString) {
-        // the #atomList and fetch these as well
+                    @RequestParam(value = "filterBySocketTypeUri", required = false) String filterBySocketTypeUriString,
+                    @RequestParam(value = "filterByAtomTypeUri", required = false) String filterByAtomTypeUriString,
+                    @RequestParam(value = "limit", required = false) Integer limit) {
         // TODO: fetch with modifiedafter parameter and not only the uri
         ZonedDateTime modifiedAfter = StringUtils.isNotBlank(modifiedAfterIsoString)
                         ? ZonedDateTime.parse(modifiedAfterIsoString, DateTimeFormatter.ISO_DATE_TIME)
@@ -164,6 +172,10 @@ public class RestAtomController {
         if (filterBySocketTypeUriString != null) {
             filterBySocketTypeUri = URI.create(filterBySocketTypeUriString);
         }
+        URI filterByAtomTypeUri = null;
+        if (filterByAtomTypeUriString != null) {
+            filterByAtomTypeUri = URI.create(filterByAtomTypeUriString);
+        }
         for (URI atomUri : atomUris) {
             try {
                 Dataset atomDataset = WonLinkedDataUtils.getDataForResource(atomUri, linkedDataSource);
@@ -175,7 +187,9 @@ public class RestAtomController {
                                                 || isNearLocation(nearLocation, atom.getLocation(), maxDistance)
                                                 || isNearLocation(nearLocation, atom.getJobLocation(), maxDistance))
                                 && ((filterBySocketTypeUri == null)
-                                                || atom.getSocketTypeUriMap().containsValue(filterBySocketTypeUri))) {
+                                                || atom.getSocketTypeUriMap().containsValue(filterBySocketTypeUri))
+                                && ((filterByAtomTypeUri == null)
+                                                || atom.getTypes().contains(filterByAtomTypeUri))) {
                     atomMap.put(atom.getUri(), atom);
                     if (limit != null && limit > 0 && atomMap.size() >= limit)
                         break; // break fetching if the limit has been reached

@@ -1,6 +1,7 @@
 import urljoin from "url-join";
 import { ownerBaseUrl } from "~/config/default.js";
 import * as wonUtils from "../won-utils.js";
+import won from "../won-es6.js";
 
 /**
  * Created by quasarchimaere on 11.06.2019.
@@ -352,8 +353,8 @@ export function getMessage(atomUri, eventUri) {
     urljoin(
       ownerBaseUrl,
       "/rest/linked-data/",
-      `?requester=${encodeURI(atomUri)}`,
-      `&uri=${encodeURI(eventUri)}`
+      `?requester=${encodeURIComponent(atomUri)}`,
+      `&uri=${encodeURIComponent(eventUri)}`
     ),
     {
       method: "get",
@@ -373,16 +374,81 @@ export function getAllMetaAtoms(
   state = "ACTIVE",
   limit = 200
 ) {
+  return getMetaAtoms(
+    modifiedAfterDate,
+    undefined,
+    state,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    limit
+  );
+}
+
+export function getAllActiveMetaPersonas() {
+  return getMetaAtoms(
+    undefined,
+    undefined,
+    "ACTIVE",
+    won.BUDDY.BuddySocket,
+    won.WON.Persona,
+    undefined,
+    undefined,
+    undefined
+  );
+}
+
+export function getMetaAtoms(
+  modifiedAfterDate,
+  createdAfterDate,
+  state,
+  filterBySocketTypeUri,
+  filterByAtomTypeUri,
+  location,
+  maxDistance,
+  limit
+) {
   return fetch(
     urljoin(
       ownerBaseUrl,
-      "/rest/atoms/all?state=" +
-        state +
+      "/rest/atoms/all?" +
+        (state ? "state=" + state + "&" : "") +
+        (limit ? "limit=" + limit + "&" : "") +
         (modifiedAfterDate
-          ? "&modifiedafter=" + modifiedAfterDate.toISOString()
+          ? "modifiedafter=" + modifiedAfterDate.toISOString() + "&"
           : "") +
-        "&limit=" +
-        limit
+        (createdAfterDate
+          ? "createdAfterDate=" + createdAfterDate.toISOString() + "&"
+          : "") +
+        (filterBySocketTypeUri
+          ? "filterBySocketTypeUri=" +
+            encodeURIComponent(filterBySocketTypeUri) +
+            "&"
+          : "") +
+        (filterByAtomTypeUri
+          ? "filterByAtomTypeUri=" +
+            encodeURIComponent(filterByAtomTypeUri) +
+            "&"
+          : "") +
+        (location &&
+        location.lat &&
+        location.lng &&
+        (maxDistance || maxDistance == 0)
+          ? "latitude=" + location.lat + "&"
+          : "") +
+        (location &&
+        location.lat &&
+        location.lng &&
+        (maxDistance || maxDistance == 0)
+          ? "longitude=" + location.lng + "&"
+          : "") +
+        (location &&
+        location.lat &&
+        location.lng &&
+        (maxDistance || maxDistance == 0)
+          ? "maxDistance=" + maxDistance + "&"
+          : "")
     ),
     {
       method: "get",
@@ -390,6 +456,7 @@ export function getAllMetaAtoms(
         Accept: "application/json",
         "Content-Type": "application/json",
       },
+      body: JSON.stringify(),
       credentials: "include",
     }
   )
@@ -405,35 +472,16 @@ export function getAllMetaAtomsNear(
   state = "ACTIVE"
 ) {
   if (location && location.lat && location.lng) {
-    return fetch(
-      urljoin(
-        ownerBaseUrl,
-        "/rest/atoms/all?state=" +
-          state +
-          "&limit=" +
-          limit +
-          "&latitude=" +
-          location.lat +
-          "&longitude=" +
-          location.lng +
-          "&maxDistance" +
-          maxDistance +
-          (modifiedAfterDate
-            ? "&modifiedafter=" + modifiedAfterDate.toISOString()
-            : "")
-      ),
-      {
-        method: "get",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(),
-        credentials: "include",
-      }
-    )
-      .then(checkHttpStatus)
-      .then(response => response.json());
+    return getMetaAtoms(
+      modifiedAfterDate,
+      undefined,
+      state,
+      undefined,
+      undefined,
+      location,
+      maxDistance,
+      limit
+    );
   } else {
     return Promise.reject();
   }

@@ -18,16 +18,17 @@
  * Created by LEIH-NB on 19.08.2014.
  */
 "format es6" /* required to force babel to transpile this so the minifier is happy */;
-import { is, isArray, clone } from "../utils.js";
+import { clone, is, isArray } from "../utils.js";
 import {
-  clearReadUris,
   clearDisclaimerAccepted,
+  clearReadUris,
   isDisclaimerAccepted,
   setDisclaimerAccepted,
 } from "../won-localstorage.js";
 import jsonld from "jsonld/dist/jsonld.js";
 
 import N3 from "n3";
+
 window.N34dbg = N3;
 
 let won = {};
@@ -109,6 +110,9 @@ won.WON.hasContentCompacted = won.WON.prefix + ":content";
 won.WON.messageContainer = won.WON.baseUri + "messageContainer";
 won.WON.messageContainerCompacted = won.WON.prefix + ":messageContainer";
 
+won.WON.Persona = won.WON.baseUri + "Persona";
+won.WON.PersonaCompacted = won.WON.prefix + ":Persona";
+
 won.WON.matchScore = won.WON.baseUri + "matchScore";
 won.WON.matchScoreCompacted = won.WON.prefix + ":matchScore";
 won.WON.matchCounterpart = won.WON.baseUri + "matchCounterpart";
@@ -133,6 +137,8 @@ won.WONCON.binaryRatingBad = won.WONCON.baseUri + "Bad";
 won.WONCON.feedback = won.WONCON.baseUri + "feedback";
 won.WONCON.binaryRating = won.WONCON.baseUri + "binaryRating";
 won.WONCON.feedbackTarget = won.WON.baseUri + "feedbackTarget";
+won.WONCON.DirectResponse = won.WON.baseUri + "DirectResponse";
+won.WONCON.DirectResponseCompacted = won.WONCON.prefix + ":DirectResponse";
 
 won.WONMATCH = {};
 won.WONMATCH.baseUri = "https://w3id.org/won/matching#";
