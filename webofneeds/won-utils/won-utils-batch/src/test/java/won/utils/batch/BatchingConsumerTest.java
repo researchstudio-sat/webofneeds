@@ -12,7 +12,6 @@ import org.junit.Test;
 import won.utils.batch.BatchingConsumer.Config;
 import won.utils.batch.BatchingConsumer.ConfigBuilder;
 
-
 public class BatchingConsumerTest {
     @Test
     public void testConsumeAllOneKey() {
