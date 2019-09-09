@@ -66,13 +66,13 @@ export function findUseCaseByAtom(atomImm) {
     getIn(atomImm, ["seeks", "type"]) &&
     getIn(atomImm, ["seeks", "type"])
       .toSet()
-      .remove("won:Atom");
+      .remove(won.WON.AtomCompacted);
 
   const contentTypes =
     getIn(atomImm, ["content", "type"]) &&
     getIn(atomImm, ["content", "type"])
       .toSet()
-      .remove("won:Atom");
+      .remove(won.WON.AtomCompacted);
   const useCases = useCaseDefinitions.getAllUseCases();
 
   if (hasSubElements(useCases)) {
@@ -84,7 +84,7 @@ export function findUseCaseByAtom(atomImm) {
           useCase
             .getIn(["draft", branch, "type"])
             .toSet()
-            .remove("won:Atom");
+            .remove(won.WON.AtomCompacted);
 
         const ucTypesSize = ucTypes ? ucTypes.size : 0;
 

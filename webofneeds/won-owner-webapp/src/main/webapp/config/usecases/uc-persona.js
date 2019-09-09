@@ -11,7 +11,7 @@ export const persona = {
   draft: {
     ...mergeInEmptyDraft({
       content: {
-        type: ["won:Persona"],
+        type: [won.WON.PersonaCompacted],
         sockets: {
           "#reviewSocket": won.REVIEW.ReviewSocketCompacted,
           "#holderSocket": won.HOLD.HolderSocketCompacted,

@@ -125,7 +125,10 @@ export default function(allAtomsInState = initialState, action = {}) {
           uri: action.payload.atomUri,
           creationDate: new Date(),
           content: {
-            type: Immutable.Set(["won:Atom", "won:Persona"]),
+            type: Immutable.Set([
+              won.WON.AtomCompacted,
+              won.WON.PersonaCompacted,
+            ]),
             sockets: Immutable.Map(),
           },
           connections: Immutable.Map(),

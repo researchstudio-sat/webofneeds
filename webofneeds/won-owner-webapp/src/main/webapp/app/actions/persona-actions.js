@@ -1,10 +1,10 @@
-import { getIn, get, generateIdString } from "../utils";
+import { generateIdString, get, getIn } from "../utils";
 import won from "../won-es6";
 import * as wonUtils from "../won-utils.js";
 import { actionTypes } from "./actions";
 import { getOwnedAtomByConnectionUri } from "../redux/selectors/general-selectors";
 import { getOwnedConnectionByUri } from "../redux/selectors/connection-selectors";
-import { buildConnectMessage, buildCloseMessage } from "../won-message-utils";
+import { buildCloseMessage, buildConnectMessage } from "../won-message-utils";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as ownerApi from "../api/owner-api.js";
 
@@ -21,7 +21,7 @@ export function createPersona(persona, nodeUri) {
     //FIXME: THIS SHOULD NOT USE ANY OF THE CODE BELOW BUT EXECUTE OUR ALREADY PRESENT ATOM-CREATION WITH A GIVEN DRAFT INSTEAD
     const graph = {
       "@id": publishedContentUri,
-      "@type": ["won:Atom", "won:Persona"],
+      "@type": [won.WON.AtomCompacted, won.WON.PersonaCompacted],
       "won:socket": [
         {
           "@id": "#holderSocket",
