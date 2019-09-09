@@ -8,9 +8,9 @@ Bots in the Web of Needs are generally reactive. Each bot uses [event listeners]
 
 The java application that runs a bot is usually a spring-boot application that loads all the necessary config and then starts the bot. For examples, look at the existing [Bot Apps](src/main/java/won/bot/app).
 
-The [base bot](/src/main/java/won/bot/base) consists of several interfaces and classes that build upon each other. The `Bot` interface extends the `OwnerCallback` interface and is partially implemented in the abstract `BaseBot` class, which represents the minimal viable bot. This is extended by the `BasicServiceBot`, which adds the functionality needed to connect to a node and interact with atoms. The next layer are the `ScheduledActionBot` and the `TriggeredBot`, which add Spring task scheduling with [triggers](https://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/scheduling/Trigger.html). This is then extended by the `EventBot`, which adds the event listener structure described here.
+The [base bot](src/main/java/won/bot/framework/bot/base/) consists of several interfaces and abstract classes that build upon each other. The `Bot` interface extends the `OwnerCallback` interface and is partially implemented in the abstract `BaseBot` class, which describes the methods needed for a minimal viable bot. This is extended by the `BasicServiceBot`, which adds the functionality needed to connect to a node and interact with atoms. The next layer are the `ScheduledActionBot` and the `TriggeredBot`, which add Spring task scheduling with [triggers](https://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/scheduling/Trigger.html). This is then extended by the `EventBot`, which adds the event listener structure described here.
 
-Furthermore, the `FactoryBot` builds upon the `EventBot` and adds some additional functionality for creating `FactoryAtoms`. However, due to general changes in the last year, we recommend using an `EventBot` and creating atoms as needed instead of using a factory atom.
+Furthermore, the `FactoryBot` builds upon the `EventBot` and adds some additional functionality for creating `FactoryAtoms`. This results in a different structure in which a matching query can be used to filter which atoms are sent to the bot by the matcher. It also creates an additional atom representing the bot that may be visible to other users. See the [TaxiBot](https://github.com/researchstudio-sat/won-transport/blob/master/won-taxi-bot/src/main/java/won/transport/taxi/bot/impl/TaxiBot.java) for a possible use for `FactoryBot`.
 
 <!-- TODO: bot lifecycle -->
 
@@ -22,14 +22,14 @@ Events can be generated in different situations:
 
 - as a bot reaches certain [stages in its life cycle](src/main/java/won/bot/framework/eventbot/event/impl/lifecycle), e.g. the [InitializeEvent](src/main/java/won/bot/framework/eventbot/event/impl/lifecycle/InitializeEvent.java) or the [WorkDoneEvent](src/main/java/won/bot/framework/eventbot/event/impl/lifecycle/WorkDoneEvent.java).
 - whenever a message is received for one of the atoms controlled by the bot.
-- at regular intervals, by attaching a [trigger](src/main/java/won/bot/framework/eventbot/action/impl/trigger/BotTrigger.java) to the bot that publishes [ActEvents](src/main/java/won/bot/framework/eventbot/event/impl/lifecycle/ActEvent.java) at regular intervals.
+- at regular intervals, by attaching a [trigger](src/main/java/won/bot/framework/eventbot/action/impl/trigger/BotTrigger.java) to the bot that publishes [ActEvents](src/main/java/won/bot/framework/eventbot/event/impl/lifecycle/ActEvent.java) at a regular interval that is specified when creating the `BotTrigger`.
 - as part of an action that is executed by the bot.
 
 <!-- TODO: maybe have some more concrete event examples here -->
 
 ### EventListeners/EventBus
 
-Each bot has an [event bus]() that receives all events sent to the bot. To listen for a specific event, an `EventListener` needs to subscribe to the bus and specify an `Action` to be taken if that event is received.
+Each bot has an [event bus](src\main\java\won\bot\framework\eventbot\bus\EventBus.java) that receives all events sent to the bot. To listen for a specific event, an `EventListener` needs to subscribe to the bus and specify an `Action` to be taken if that event is received.
 
 <!-- TODO: extend this? -->
 
@@ -46,7 +46,7 @@ While it is necessary that each bot remembers which atoms it created, all other 
 The `EventListenerContext` is used to connect the bot to various resources it may use, including:
 
 - The [LinkedDataSource](/webofneeds/won-core/src/main/java/won/protocol/util/linkeddata/LinkedDataSource.java) obtained via `EventListenerContext.getLinkedDataSource()`. It is used to query linked data.
-- The [AtomProducer](src/main/java/won/bot/framework/component/atomproducer/AtomProducer.java) obtained via `EventListenerContext.getAtomProducer()`. It's a facility for creating atoms, much like an iterator. Depending on the configured implementation, data can be read from any source and transformed into an atom. To see how this is done in practice, look at the [MailFileAtomProducer](src/main/java/won/bot/framework/component/atomproducer/impl/MailFileAtomProducer.java)
+- The [AtomProducer](src/main/java/won/bot/framework/component/atomproducer/AtomProducer.java) obtained via `EventListenerContext.getAtomProducer()`. It's a facility for creating atoms, much like a generator. Depending on the configured implementation, data can be read from any source and transformed into an atom. To see how this is done in practice, look at the [MailFileAtomProducer](src/main/java/won/bot/framework/component/atomproducer/impl/MailFileAtomProducer.java)
 - The [WonMessageSender](/webofneeds/won-core/src/main/java/won/protocol/message/sender/WonMessageSender.java) obtained via `EventListenerContext.getWonMessageSender()`. This object allows the bot to send WoN messages.
 
 ### Actions
@@ -62,6 +62,8 @@ Behaviours act as a wrapper to `EventListener`s and `Action`s and can be activat
 ## Implementing a Bot
 
 To create a new bot, currently the easiest way is to copy the app class and corresponding spring config files of an existing bot, e.g. the `EchoBot`, and modifying that.
+
+### Starting from scratch
 
 To write a bot from scratch, you'll need to create a new spring boot app. The main bot class has to establish a connection as a client to at least one node and provide an `EventBus`, `EventListenerContext` and `BotContext`. Refer to other bots and the framework described above to understand how all framework parts interact in determining a bots behaviour.
 
@@ -110,7 +112,7 @@ bus.subscribe(ActEvent.class, atomCreator);
 
 ### Sending WoN messages
 
-For doing anything on the WoN, a bot must send messages to a node or to specific atoms. This is done in two steps:
+For doing anything on the Web of Needs, a bot must send messages to a node or to specific atoms. This is done in two steps:
 
 1. Creating a [WonMessage](/webofneeds/won-core/src/main/java/won/protocol/message/WonMessage.java) using the [WonMessageBuilder](/webofneeds/won-core/src/main/java/won/protocol/message/WonMessageBuilder.java)
 2. Sending it using the `WonMessageSender` obtained from the `EventListenerContext`
@@ -162,7 +164,7 @@ Make sure this location contains the relevant property files, and you have speci
   - won.node.uris - specify values of nodes being tested - the bot will react to atoms published on those nodes
 - in [owner.properties](../conf/owner.properties)
   - specify default node data (node.default.host/scheme/port) - the bot will create its own atoms on that node
-  - make sure both a path to keystore and truststore (keystore/truststore.location) and their password (keystore/truststore.password) is specified
+  - make sure both a path to keystore and truststore (keystore/truststore.location) and their password (keystore/truststore.password) is specified. For additional details on the necessary keys and certificates, refer to the Web of Needs [installation notes](https://github.com/researchstudio-sat/webofneeds/blob/master/documentation/installation-cryptographic-keys-and-certificates.md).
 
 > **NOTE:** Use a separate keystore (and key pair) for your bot, especially if you are running another owner application locally - this will result in the node not delivering messages correctly because the queues used for delivery are defined based on certificates. If multiple applications from the same source share a certificate, there will be errors.
 
@@ -198,7 +200,7 @@ Make sure the config folder contains the relevant property files, and you have s
   - won.node.uris - specify values of nodes being tested - the bot will react to atoms published on those nodes
 - in [owner.properties](../conf/owner.properties)
   - specify default node data (node.default.host/scheme/port) - the bot will create its own atoms on that node
-  - make sure both a path to keystore and truststore (keystore/truststore.location) and their password (keystore/truststore.password) is specified
+  - make sure both a path to keystore and truststore (keystore/truststore.location) and their password (keystore/truststore.password) is specified.  For additional details on the necessary keys and certificates, refer to the Web of Needs [installation notes](https://github.com/researchstudio-sat/webofneeds/blob/master/documentation/installation-cryptographic-keys-and-certificates.md).
 
 ### Usage
 
