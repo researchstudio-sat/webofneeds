@@ -125,7 +125,7 @@ services:
       - "node.default.http.port=443"
       - "uri.prefix.owner=https://hackathon.matchat.org/debug_bot" # set this for the trust store alias
       - "won.node.uris=https://hackathonnode.matchat.org/won/resource"
-      - "uri.prefix.node.default=https://hackathonnode.matchat.org/won/"
+      - "uri.prefix.node.default=https://hackathonnode.matchat.org/won"
       - "botContext.impl=mongoBotContext"
       - "botContext.mongodb.user=won"
       - "botContext.mongodb.pass=$mongo_db_passwd"
