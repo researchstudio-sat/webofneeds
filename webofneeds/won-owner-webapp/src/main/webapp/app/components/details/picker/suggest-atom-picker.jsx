@@ -2,17 +2,17 @@
  * Created by quasarchimaere on 30.07.2019.
  */
 import React from "react";
-import { get, getIn, sortBy } from "../../../utils.js";
 import { actionCreators } from "../../../actions/actions.js";
 import { connect } from "react-redux";
-
-import * as generalSelectors from "../../../redux/selectors/general-selectors.js";
-
-import "~/style/_suggest-atom-picker.scss";
 import Immutable from "immutable";
+import PropTypes from "prop-types";
+
+import { get, getIn, sortBy } from "../../../utils.js";
+import * as generalSelectors from "../../../redux/selectors/general-selectors.js";
 import WonAtomHeader from "../../atom-header.jsx";
 import WonLabelledHr from "../../labelled-hr.jsx";
-import PropTypes from "prop-types";
+
+import "~/style/_suggest-atom-picker.scss";
 
 const mapStateToProps = (state, ownProps) => {
   const hasAtLeastOneAllowedSocket = (atom, allowedSockets) => {

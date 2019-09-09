@@ -1,12 +1,12 @@
 import Immutable from "immutable";
 import won from "../../won-es6.js";
 import * as useCaseUtils from "../../usecase-utils.js";
-import { isSearchAtom, isPersona } from "../../redux/utils/atom-utils.js";
+import { isPersona, isSearchAtom } from "../../redux/utils/atom-utils.js";
 import {
   generateHexColor,
   generateRgbColorArray,
-  getIn,
   get,
+  getIn,
 } from "../../utils.js";
 import shajs from "sha.js";
 import Identicon from "identicon.js";
@@ -116,10 +116,10 @@ export function parseMetaAtom(metaAtom) {
     Immutable.Set(
       eventObjectUris.map(eventObjectUri =>
         eventObjectUri
-          .replace("https://w3id.org/won/core#", "won:")
-          .replace("https://w3id.org/won/content#", "con:")
+          .replace(won.WON.baseUri, won.WON.prefix + ":")
+          .replace(won.WONCON.baseUri, won.WONCON.prefix + ":")
           .replace("https://w3id.org/won/ext/demo#", "demo:")
-          .replace("https://w3id.org/won/matching#", "match:")
+          .replace(won.WONMATCH.baseUri, won.WONMATCH.prefix + ":")
           .replace("http://schema.org/", "s:")
       )
     );
@@ -129,10 +129,10 @@ export function parseMetaAtom(metaAtom) {
     Immutable.Set(
       types.map(type =>
         type
-          .replace("https://w3id.org/won/core#", "won:")
-          .replace("https://w3id.org/won/content#", "con:")
+          .replace(won.WON.baseUri, won.WON.prefix + ":")
+          .replace(won.WONCON.baseUri, won.WONCON.prefix + ":")
           .replace("https://w3id.org/won/ext/demo#", "demo:")
-          .replace("https://w3id.org/won/matching#", "match:")
+          .replace(won.WONMATCH.baseUri, won.WONMATCH.prefix + ":")
           .replace("http://schema.org/", "s:")
       )
     );
@@ -140,10 +140,10 @@ export function parseMetaAtom(metaAtom) {
     flags &&
     flags.map(flag =>
       flag
-        .replace("https://w3id.org/won/core#", "won:")
-        .replace("https://w3id.org/won/content#", "con:")
+        .replace(won.WON.baseUri, won.WON.prefix + ":")
+        .replace(won.WONCON.baseUri, won.WONCON.prefix + ":")
         .replace("https://w3id.org/won/ext/demo#", "demo:")
-        .replace("https://w3id.org/won/matching#", "match:")
+        .replace(won.WONMATCH.baseUri, won.WONMATCH.prefix + ":")
         .replace("http://schema.org/", "s:")
     );
   const extractLocation = location =>
@@ -152,6 +152,18 @@ export function parseMetaAtom(metaAtom) {
       lat: get(location, "latitude"),
       lng: get(location, "longitude"),
     };
+
+  const extractSockets = socketTypeUriMap =>
+    socketTypeUriMap &&
+    socketTypeUriMap.map(socketType =>
+      socketType
+        .replace(won.CHAT.baseUri, won.CHAT.prefix + ":")
+        .replace(won.GROUP.baseUri, won.GROUP.prefix + ":")
+        .replace(won.HOLD.baseUri, won.HOLD.prefix + ":")
+        .replace(won.REVIEW.baseUri, won.REVIEW.prefix + ":")
+        .replace(won.BUDDY.baseUri, won.BUDDY.prefix + ":")
+    );
+
   const extractStateFromMeta = state => {
     switch (state) {
       case "ACTIVE":
@@ -178,6 +190,7 @@ export function parseMetaAtom(metaAtom) {
       groupMembers: Immutable.Set(),
       content: {
         type: extractTypes(get(metaAtomImm, "types")),
+        sockets: extractSockets(get(metaAtomImm, "socketTypeUriMap")),
         flags: extractFlags(get(metaAtomImm, "flags")),
         location: extractLocation(get(metaAtomImm, "location")),
         jobLocation: extractLocation(get(metaAtomImm, "jobLocation")),
