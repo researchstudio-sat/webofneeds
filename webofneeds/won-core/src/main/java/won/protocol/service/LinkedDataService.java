@@ -112,9 +112,10 @@ public interface LinkedDataService {
      * a certain date
      *
      * @param modifiedDate modification date of atoms
+     * @param atomState filter by atomState
      * @return
      */
-    public Dataset listModifiedAtomURIsAfter(Date modifiedDate);
+    public Dataset listModifiedAtomURIsAfter(Date modifiedDate, AtomState atomState);
 
     /**
      * Returns container dataset containing all connections. If deep is true, the

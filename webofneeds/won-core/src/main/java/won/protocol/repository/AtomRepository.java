@@ -49,6 +49,9 @@ public interface AtomRepository extends WonRepository<Atom> {
     Slice<URI> getAtomURIsAfter(@Param("referenceDate") Date referenceDate, @Param("atomState") AtomState atomState,
                     Pageable pageable);
 
+    @Query("select atomURI from Atom atom where atom.lastUpdate > :modifiedDate and atom.state = :atomState")
+    List<URI> findModifiedAtomURIsAfter(@Param("modifiedDate") Date modifiedDate, @Param("atomState") AtomState atomState);
+
     @Query("select atomURI from Atom atom where atom.lastUpdate > :modifiedDate")
     List<URI> findModifiedAtomURIsAfter(@Param("modifiedDate") Date modifiedDate);
 

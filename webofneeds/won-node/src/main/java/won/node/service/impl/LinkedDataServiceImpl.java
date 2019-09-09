@@ -168,14 +168,14 @@ public class LinkedDataServiceImpl implements LinkedDataService {
     }
 
     @Transactional
-    public Dataset listModifiedAtomURIsAfter(Date modifiedDate) {
+    public Dataset listModifiedAtomURIsAfter(Date modifiedDate, AtomState atomState) {
         Model model = ModelFactory.createDefaultModel();
         setNsPrefixes(model);
-        Collection<URI> uris = atomInformationService.listModifiedAtomURIsAfter(modifiedDate);
+        Collection<URI> uris = atomInformationService.listModifiedAtomURIsAfter(modifiedDate, atomState);
         Resource atomListPageResource = model.createResource(this.atomResourceURIPrefix + "/");
         for (URI atomURI : uris) {
             model.add(model.createStatement(atomListPageResource, RDFS.member,
-                            model.createResource(atomURI.toString())));
+                    model.createResource(atomURI.toString())));
         }
         Dataset ret = newDatasetWithNamedModel(createDataGraphUriFromResource(atomListPageResource), model);
         addBaseUriAndDefaultPrefixes(ret);

@@ -81,11 +81,12 @@ public interface AtomInformationService {
 
     /**
      * retrieves atoms that have been modified after a certain date
-     * 
+     *
      * @param modifiedAfter modification date of the atoms to retrieve
+     * @param atomState filterBy
      * @return collection of modified atoms
      */
-    public Collection<URI> listModifiedAtomURIsAfter(Date modifiedAfter);
+    public Collection<URI> listModifiedAtomURIsAfter(Date modifiedAfter, AtomState atomState);
 
     /**
      * Retrieves all connection URIs (regardless of state).

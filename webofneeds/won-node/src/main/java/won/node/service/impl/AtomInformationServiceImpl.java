@@ -99,8 +99,12 @@ public class AtomInformationServiceImpl implements AtomInformationService {
     }
 
     @Override
-    public Collection<URI> listModifiedAtomURIsAfter(Date modifiedAfter) {
-        return atomRepository.findModifiedAtomURIsAfter(modifiedAfter);
+    public Collection<URI> listModifiedAtomURIsAfter(Date modifiedAfter, AtomState atomState) {
+        if(atomState == null) {
+            return atomRepository.findModifiedAtomURIsAfter(modifiedAfter);
+        } else {
+            return atomRepository.findModifiedAtomURIsAfter(modifiedAfter, atomState);
+        }
     }
 
     @Override
