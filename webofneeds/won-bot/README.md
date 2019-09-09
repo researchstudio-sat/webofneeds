@@ -18,7 +18,7 @@ Furthermore, the `FactoryBot` builds upon the `EventBot` and adds some additiona
 
 ### Events
 
-Events can be generated in different situations:
+Events may be generated in different situations:
 
 - as a bot reaches certain [stages in its life cycle](src/main/java/won/bot/framework/eventbot/event/impl/lifecycle), e.g. the [InitializeEvent](src/main/java/won/bot/framework/eventbot/event/impl/lifecycle/InitializeEvent.java) or the [WorkDoneEvent](src/main/java/won/bot/framework/eventbot/event/impl/lifecycle/WorkDoneEvent.java).
 - whenever a message is received for one of the atoms controlled by the bot.
