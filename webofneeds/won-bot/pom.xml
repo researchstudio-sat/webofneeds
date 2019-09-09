@@ -4,11 +4,11 @@
 	<parent>
 		<groupId>at.researchstudio.sat</groupId>
 		<artifactId>webofneeds</artifactId>
-		<version>0.4</version>
+		<version>0.5-SNAPSHOT</version>
 	</parent>
 	<artifactId>won-bot</artifactId>
 	<packaging>jar</packaging>
-	<version>0.4</version>
+	<version>0.5-SNAPSHOT</version>
 	<name>Bot</name>
 	<url>http://maven.apache.org</url>
 	<properties>
