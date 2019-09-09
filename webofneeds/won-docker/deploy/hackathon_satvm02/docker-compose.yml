@@ -1,0 +1,283 @@
+version: "2"
+services:
+  # owner server self-signed certificate for communication with wonnode
+  gencert:
+    build: ../../image/gencert
+    #image: webofneeds/gencert:master
+    environment:
+      - "CN=hackathon.matchat.org"
+      - "PASS=file:/usr/local/certs/out/won_certificate_passwd_file"
+      - "OPENSSL_CONFIG_FILE=/usr/local/openssl.conf"
+    volumes:
+      - $base_folder/won-server-certshackathon:/usr/local/certs/out/
+      - $base_folder/openssl.conf:/usr/local/openssl.conf
+
+  # portsgres atom databases for owner and wonnode
+  postgres:
+    restart: always
+    #image: webofneeds/postgres:master
+    build: ../../image/postgres
+    environment:
+      - "POSTGRES_PASSWORD=$postgres_db_passwd"
+      - "PGDATA=/var/lib/postgresql/data/pgdata"
+    volumes:
+      - $base_folder/postgres/data/pgdata:/var/lib/postgresql/data/pgdata
+    ports:
+      - "5434:5432"
+
+  # wonnode => https://hackathonnode.matchat.org/won
+  wonnode:
+    restart: always
+    build: ../../image/wonnode
+    #image: webofneeds/wonnode:master
+    environment:
+      - "uri.host=hackathonnode.matchat.org"
+      - "http.port=8890"
+      - "uri.prefix=https://hackathonnode.matchat.org/won"
+      - "client.authentication.behind.proxy=true"
+      - "db.sql.jdbcDriverClass=org.postgresql.Driver"
+      - "db.sql.jdbcUrl=jdbc:postgresql://satvm02.researchstudio.at:5434/won_node"
+      - "db.ddl.strategy=validate"
+      - "db.sql.user=won"
+      - "db.sql.password=$postgres_db_passwd"
+      - "CERTIFICATE_PASSWORD=$won_certificate_passwd"
+      - "activemq.broker.port=61613"
+      - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
+      - "JMX_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,address=62924,server=y,suspend=n
+        -Dcom.sun.management.jmxremote.port=9030 -Dcom.sun.management.jmxremote.authenticate=false
+        -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9030
+        -Djava.rmi.server.hostname=satvm02.researchstudio.at"
+    ports:
+      - "8890:8443"
+      - "61623:61613"
+      - "62924:62924"
+      - "9030:9030"
+    volumes:
+      - $base_folder/letsencrypt/certs/live/matchat.org/fullchain.pem:/usr/local/tomcat/conf/ssl/t-cert.pem
+      - $base_folder/letsencrypt/certs/live/matchat.org/privkey.pem:/usr/local/tomcat/conf/ssl/t-key.pem
+      - $base_folder/letsencrypt/certs/live/matchat.org/t-key-cert.pfx:/usr/local/tomcat/conf/ssl/t-key-cert.pfx
+      - $base_folder/letsencrypt/certs/live/matchat.org/t-keystore.jks:/usr/local/tomcat/conf/ssl/t-keystore.jks
+      - $base_folder/won-client-certs/hackathonnode:/usr/local/tomcat/won/client-certs/
+    depends_on:
+      - postgres
+      - gencert
+
+  # owner => https://hackathon.matchat.org/owner
+  owner:
+    restart: always
+    build: ../../image/owner
+    #image: webofneeds/owner:master
+    environment:
+      - "node.default.host=hackathonnode.matchat.org"
+      - "uri.host=hackathon.matchat.org"
+      - "http.port=8083"
+      - "node.default.http.port=443"
+      - "uri.prefix=https://hackathon.matchat.org"
+      - "uri.prefix.node.default=https://hackathonnode.matchat.org/won"
+      - "db.sql.jdbcDriverClass=org.postgresql.Driver"
+      - "db.sql.jdbcUrl=jdbc:postgresql://satvm02.researchstudio.at:5434/won_owner"
+      - "db.ddl.strategy=validate"
+      - "db.sql.user=won"
+      - "db.sql.password=$postgres_db_passwd"
+      - "CERTIFICATE_PASSWORD=$won_certificate_passwd"
+      - "email.from.won.user=$MAIL_USER"
+      - "email.from.won.password=$MAIL_PASS"
+      - "email.from.won.smtp.host=$MAIL_HOST"
+      - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
+      - "JMX_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,address=62926,server=y,suspend=n
+        -Dcom.sun.management.jmxremote.port=9031 -Dcom.sun.management.jmxremote.authenticate=false
+        -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9031
+        -Djava.rmi.server.hostname=satvm02.researchstudio.at"
+    ports:
+      - "8083:8443"
+      - "62926:62926"
+      - "9031:9031"
+    volumes:
+      - $base_folder/custom_owner_skin:/usr/local/tomcat/webapps/owner/skin/current/
+      - $base_folder/won-server-certshackathon:/usr/local/tomcat/conf/ssl/
+      - $base_folder/won-client-certs/hackathon:/usr/local/tomcat/won/client-certs/
+    depends_on:
+      - hackathonnode
+      - postgres
+      - gencert
+  
+  #mongodb for persistent debug bot
+  mongodb:
+   restart: always
+   image: tutum/mongodb:3.2
+   environment:
+     - "MONGODB_USER=won"
+     - "MONGODB_DATABASE=master_bot"
+     - "MONGODB_PASS=$mongo_db_passwd"
+   ports:
+    - "27019:27017"
+    - "28019:28017"
+  volumes:
+    - $base_folder/mongodb/data/db:/data/db
+  
+  #debug bot used to test atom communication connect to wonnodes
+  debug_bot:
+    restart: always
+    build: ../../image/bots
+    #image: webofneeds/bots:master
+    environment:
+      - "node.default.host=wonnode"
+      - "node.default.http.port=443"
+      - "uri.prefix.owner=https://hackathon.matchat.org/debug_bot" # set this for the trust store alias
+      - "won.node.uris=https://hackathon.matchat.org/won/resource"
+      - "botContext.impl=mongoBotContext"
+      - "botContext.mongodb.user=won"
+      - "botContext.mongodb.pass=$mongo_db_passwd"
+      - "botContext.mongodb.host=satvm02.researchstudio.at"
+      - "botContext.mongodb.port=27019"
+      - "botContext.mongodb.database=hackathon_bot"
+    depends_on:
+      - mongodb
+      - wonnode
+
+# hokify_bot:
+#   restart: always
+#   build: ../../image/bots
+#   image: webofneeds/bots:int
+#   environment:
+#     - "MAIN_BOT=won.bot.app.HokifyJobBotApp"
+#     - "node.default.host=wonnode"
+#     - "node.default.http.port=443"
+#     - "uri.prefix.owner=https://master.matchat.org/hokify_bot" # set this for the trust store alias
+#     - "won.node.uris=https://hackathonnode.master.matchat.org/won/resource"
+#     - "hokifyjobbot.botname = Hokify Bot"
+#     - "hokifyjobbot.jsonURL = https://hokify.at/jobfeed-webofneeds.json/"
+#     - "hokifyjobbot.geoURL = https://nominatim.openstreetmap.org/search"
+#     - "hokifyjobbot.updateTime = 60"
+#     - "hokifyjobbot.publishTime = 10"
+#     - "hokifyjobbot.createAllInOne = false"
+#     - "botContext.impl=mongoBotContext"
+#     - "botContext.mongodb.user=won"
+#     - "botContext.mongodb.pass=$mongo_db_passwd"
+#     - "botContext.mongodb.host=satvm02.researchstudio.at"
+#     - "botContext.mongodb.port=27018"
+#     - "botContext.mongodb.database=master_bot"
+#   depends_on:
+#     - mongodb
+#     - wonnode
+# mail_bot:
+#   restart: always
+#   build: ../../image/bots
+#   image: webofneeds/bots:int
+#   environment:
+#     - "MAIN_BOT=won.bot.app.Mail2WonBotApp"
+#     - "node.default.host=wonnode"
+#     - "node.default.http.port=443"
+#     - "uri.prefix.owner=https://master.matchat.org/mail_bot" # set this for the trust store alias
+#     - "won.node.uris=https://hackathonnode.master.matchat.org/won/resource"
+#     - "botContext.impl=mongoBotContext"
+#     - "botContext.mongodb.user=won"
+#     - "botContext.mongodb.pass=$mongo_db_passwd"
+#     - "botContext.mongodb.host=satvm02.researchstudio.at"
+#     - "botContext.mongodb.port=27018"
+#     - "botContext.mongodb.database=master_bot"
+#     - "mailbot.email.user=won-internal"
+#     - "mailbot.email.address=won-internal@researchstudio.at"
+#     - "mailbot.email.name=Web of Needs Master Mail Bot"
+#     - "mailbot.email.password=$mailinglist_passwd"
+#     - "mailbot.email.imap.host=imap.researchstudio.at"
+#     - "mailbot.email.imap.port=993"
+#     - "mailbot.email.smtp.host=smtp.researchstudio.at"
+#     - "mailbot.email.smtp.port=587"
+#   depends_on:
+#     - mongodb
+#     - wonnode
+
+# bigdata rdf store for matcher service (this image is not built at deployment, it is downloaded from dockerhub)
+bigdata:
+  restart: always
+  build: ../../image/bigdata
+  volumes:
+    - $base_folder/bigdata/data/:/usr/src/bigdata/data
+  ports:
+    - "10000:9999"
+
+# matcher service connect with hackathonnode
+matcher_service:
+  restart: always
+  build: ../../image/matcher-service
+  #image: webofneeds/matcher_service:master
+  environment:
+    - "node.host=satvm02.researchstudio.at"
+    - "matcher.uri=https://hackathon.matchat.org/matcher_service" # set this for the trust store alias
+    - "cluster.seedNodes=satvm02.researchstudio.at:2555"
+    - "uri.sparql.endpoint=http://satvm02.researchstudio.at:10000/blazegraph/namespace/kb/sparql"
+    - "wonNodeController.wonNode.crawl=https://hackathonnode.matchat.org/won/resource"
+    - "cluster.local.port=2555"
+    - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
+    - "JMX_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,address=62924,server=y,suspend=n
+      -Dcom.sun.management.jmxremote.port=9024 -Dcom.sun.management.jmxremote.authenticate=false
+      -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9024
+      -Djava.rmi.server.hostname=satvm02.researchstudio.at"
+  ports:
+    - "2555:2555"
+    - "62924:62924"
+    - "9024:9024"
+  volumes:
+    - $base_folder/won-client-certs/matcher_service:/usr/src/matcher-service/client-certs/
+  depends_on:
+    - bigdata
+    - wonnode
+
+# solr server as an atom index
+# solr:
+#   restart: always
+#   build: ../../image/solr
+#   image: webofneeds/solr:master
+#   volumes:
+#     - $base_folder/solr/won/data:/opt/solr/server/solr/won/data
+#     - $base_folder/solr/wontest/data:/opt/solr/server/solr/wontest/data
+#   ports:
+#     - "8983:8983"
+# solr matcher and connect to matcher service
+# matcher_solr:
+#   restart: always
+#   build: ../../image/matcher-solr
+#   image: webofneeds/matcher_solr:master
+#   environment:
+#     - "node.host=satvm02.researchstudio.at"
+#     - "cluster.seedNodes=satvm02.researchstudio.at:2551,satvm02.researchstudio.at:2552"
+#     - "cluster.local.port=2552"
+#     - "matcher.solr.uri.solr.server=http://satvm02.researchstudio.at:8983/solr/"
+#     - "matcher.solr.uri.solr.server.public=http://satvm02.researchstudio.at:8983/solr/"
+#     - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
+#     - "JMX_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,address=62921,server=y,suspend=n
+#       -Dcom.sun.management.jmxremote.port=9021 -Dcom.sun.management.jmxremote.authenticate=false
+#       -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9021
+#       -Djava.rmi.server.hostname=satvm02.researchstudio.at"
+#   ports:
+#     - "2552:2552"
+#     - "9021:9021"
+#     - "62921:62921"
+#   depends_on:
+#     - solr
+#     - matcher_service
+
+# matcher_sparql:
+  restart: always
+  build: ../../image/matcher-sparql
+  image: webofneeds/matcher_sparql:int
+  environment:
+    - "node.host=satvm02.researchstudio.at"
+    - "cluster.seedNodes=satvm02.researchstudio.at:2556"
+    - "cluster.local.port=2556"
+    - "matcher.sparql.uri.sparql.endpoint=http://satvm02.researchstudio.at:10000/blazegraph/namespace/kb/sparql"
+    - "matcher.sparql.uri.public=http://satvm02.researchstudio.at/hackathonsparql/"
+    - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
+    - "JMX_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,address=62925,server=y,suspend=n
+      -Dcom.sun.management.jmxremote.port=9025 -Dcom.sun.management.jmxremote.authenticate=false
+      -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9025
+      -Djava.rmi.server.hostname=satvm02.researchstudio.at"
+  ports:
+    - "2556:2556"
+    - "9025:9025"
+    - "62925:62925"
+  depends_on:
+    - matcher_service
+  volumes:
+    - $base_folder/won-client-certs/matcher_sparql:/usr/src/matcher-sparql/client-certs/
