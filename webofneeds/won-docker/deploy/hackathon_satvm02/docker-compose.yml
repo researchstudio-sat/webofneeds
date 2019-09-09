@@ -107,7 +107,7 @@ services:
     image: tutum/mongodb:3.2
     environment:
       - "MONGODB_USER=won"
-      - "MONGODB_DATABASE=master_bot"
+      - "MONGODB_DATABASE=hackathon_bot"
       - "MONGODB_PASS=$mongo_db_passwd"
     ports:
       - "27019:27017"
