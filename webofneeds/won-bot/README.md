@@ -61,7 +61,7 @@ Behaviours act as a wrapper to `EventListener`s and `Action`s and can be activat
 
 ## Implementing a Bot
 
-To create a new bot, currently the easiest way is to copy the app class and corresponding spring config files of an existing bot, e.g. the `EchoBot`, and modifying that.
+To create a new bot, currently the easiest way is to copy the app class and corresponding spring config files of an existing bot, e.g. the `EchoBot`, and modify that.
 
 ### Starting from scratch
 
