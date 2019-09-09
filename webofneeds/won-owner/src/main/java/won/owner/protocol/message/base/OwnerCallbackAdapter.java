@@ -86,6 +86,9 @@ public abstract class OwnerCallbackAdapter implements WonMessageProcessor {
             case DELETE:
                 logger.debug("Handling DELETE for message {}", message);
                 break;
+            case REPLACE:
+                logger.debug("Handling REPLACE for message {}", message);
+                break;
             case DEACTIVATE:
                 logger.debug("Handling DEACTIVATE for message {}", message);
                 break;
