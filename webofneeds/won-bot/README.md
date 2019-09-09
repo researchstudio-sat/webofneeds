@@ -29,7 +29,7 @@ Events may be generated in different situations:
 
 ### EventListeners/EventBus
 
-Each bot has an [event bus](src\main\java\won\bot\framework\eventbot\bus\EventBus.java) that receives all events sent to the bot. To listen for a specific event, an `EventListener` needs to subscribe to the bus and specify an `Action` to be taken if that event is received.
+Each bot has an [event bus](src/main/java/won/bot/framework/eventbot/bus/EventBus.java) that receives all events sent to the bot. To listen for a specific event, an `EventListener` needs to subscribe to the bus and specify an `Action` to be taken if that event is received.
 
 <!-- TODO: extend this? -->
 
@@ -69,7 +69,7 @@ To write a bot from scratch, you'll need to create a new spring boot app. The ma
 
 ### Base Class
 
-Bot implementations are best created by extending [EventBot](src/main/java/won/bot/base/EventBot.java) and implementing its `initializeEventListeners()` method. This method should then be used to set up all the event listeners required for the bot to perform its work.
+Bot implementations are best created by extending [EventBot](src/main/java/won/bot/framework/bot/base/EventBot.java) and implementing its `initializeEventListeners()` method. This method should then be used to set up all the event listeners required for the bot to perform its work.
 
 ```
 public class MyBot extends EventBot
@@ -152,7 +152,7 @@ Other, more complex bots to look at are the [MailBot](src/main/java/won/bot/impl
 ## Debug Bot
 
 [DebugBotApp](src/main/java/won/bot/app/DebugBotApp.java) can be used to test if connections
-can be established with the atoms you are creating and if messages can be sent via those connections. For each atom created by you, the Bot will generate a connection request and a hint messages. Additionally, some actions can be triggered by sending text messages on those connections. Check supported [actions](src/main/java/won/bot/framework/events/action/impl/DebugBotIncomingMessageToEventMappingAction.java) for more information.
+can be established with the atoms you are creating and if messages can be sent via those connections. For each atom created by you, the Bot will generate a connection request and a hint messages. Additionally, some actions can be triggered by sending text messages on those connections. Check supported [actions](src/main/java/won/bot/framework/eventbot/action/impl/debugbot/DebugBotIncomingMessageToEventMappingAction.java) for more information.
 
 To run the [DebugBotApp](src/main/java/won/bot/app/DebugBotApp.java), an argument specifying the configuration location is needed, e.g:
 
