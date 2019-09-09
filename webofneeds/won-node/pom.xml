@@ -49,12 +49,6 @@
 
         <dependency>
             <groupId>at.researchstudio.sat</groupId>
-            <artifactId>won-cryptography</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>at.researchstudio.sat</groupId>
             <artifactId>won-utils-tls</artifactId>
             <version>${project.version}</version>
         </dependency>
