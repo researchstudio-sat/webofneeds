@@ -193,7 +193,7 @@ bigdata:
   restart: always
   build: ../../image/bigdata
   volumes:
-    - $base_folder/bigdata/data/:/usr/src/bigdata/data
+    - $base_folder/bigdata/data:/usr/src/bigdata/data/
   ports:
     - "10000:9999"
 
