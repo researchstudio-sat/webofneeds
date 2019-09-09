@@ -13,13 +13,10 @@ package won.bot.framework.component.atomproducer.impl;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.Lang;
-// import org.apache.jena.riot.RDFLanguages;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 
-// import won.protocol.model.AtomGraphType;
-// import won.protocol.util.AtomModelWrapper;
 import won.protocol.util.RdfUtils;
 
 import java.io.IOException;
@@ -42,13 +39,6 @@ public class TemplateBasedAtomProducer extends AbstractAtomProducerWrapper {
     }
 
     private Dataset wrapModel(final Dataset wrappedDataset) {
-        // if (this.templateModel != null) {
-        // // TODO: TEMPLATE BASED PRODUCER IS WEIRD NOW
-        // AtomModelWrapper atomModelWrapper = new AtomModelWrapper(wrappedDataset);
-        // Model atomModel = atomModelWrapper.copyAtomModel(AtomGraphType.ATOM);
-        // Model wrappedModel = RdfUtils.mergeModelsCombiningBaseResource(atomModel,
-        // this.templateModel);
-        // }
         return wrappedDataset;
     }
 
@@ -70,7 +60,6 @@ public class TemplateBasedAtomProducer extends AbstractAtomProducerWrapper {
 
     private void loadTemplateModel() {
         logger.info("loading atom templateModel model from resource " + this.template);
-        // Lang lang = RDFLanguages.filenameToLang(this.template.getFilename());
         try {
             this.templateModel = RdfUtils.readRdfSnippet(template.getInputStream(), Lang.TTL.getLabel());
         } catch (IOException e) {

@@ -25,7 +25,6 @@ import won.bot.impl.StandardTwoPhaseCommitNoVoteBot;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "classpath:/spring/app/standardTwoPhaseCommitNoVoteTest.xml" })
 public class StandardTwoPhaseCommitNoVoteBotTest {
-    // private static final int RUN_ONCE = 1;
     private static final long ACT_LOOP_TIMEOUT_MILLIS = 100;
     private static final long ACT_LOOP_INITIAL_DELAY_MILLIS = 100;
     MyBot bot;
@@ -98,7 +97,7 @@ public class StandardTwoPhaseCommitNoVoteBotTest {
             // its only purpose is to trip the CyclicBarrier instance that
             // the test method is waiting on
             getEventBus().subscribe(WorkDoneEvent.class, new ActionOnEventListener(getEventListenerContext(),
-                            new TripBarrierAction(getEventListenerContext(), barrier)));
+                    new TripBarrierAction(getEventListenerContext(), barrier)));
         }
 
         public CyclicBarrier getBarrier() {
