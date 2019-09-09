@@ -116,42 +116,32 @@ If your Windows User does not have admin permissions, installing `windows-build-
 
 **Note:** the keystore mentioned here is the one you generated earlier in the _Preparation_ step.
 
-   ```xml
-   <Service name="Catalina">
-   ...
-    <Connector
-        SSLCertificateFile="/home/rsinger/WoNKeystore/t-cert.pem"
-        SSLCertificateKeyFile="/home/rsinger/WoNKeystore/t-key.pem"
-        SSLEnabled="true"
-        SSLPassword="changeit"
-        SSLVerifyClient="optionalNoCA"
-        SSLVerifyDepth="2"
-        acceptCount="100" 
-        clientAuth="wanted" 
-        compressibleMimeType="text/html, text/xml, text/plain, text/css, text/javascript, application/javascript, application/x-font-ttf, image/svg+xml, text/turtle, application/rdf+xml, application/x-turtle, text/rdf+n3, application/json, application/trig, application/ld+json, application/n-quads"
-        compression="on"
-        disableUploadTimeout="true"
-        enableLookups="true" 
-        maxPostSize="5242880000"
-        maxSpareThreads="75"
-        maxThreads="200"
-        minSpareThreads="5" 
-        port="8443" 
-        protocol="org.apache.coyote.http11.Http11Nio2Protocol"
-        scheme="https" 
-        secure="true"
-        sslProtocol="TLS">
-    <SSLHostConfig
-            certificateVerification="optionalNoCA"
-            certificateVerificationDepth="2"
-            trustManagerClassName="won.utils.tls.AcceptAllCertsTrustManager"
-            protocols="all">
-            <Certificate
-                certificateKeystoreFile="/home/sringer/WoNKeystore/t-keystore.jks"
-                certificateKeystorePassword="changeit"/>
-        </SSLHostConfig>
-    </Connector>
-   ```
+```xml
+<Service name="Catalina">
+ ...
+ <Connector
+   SSLEnabled="true"
+   compressibleMimeType="text/html, text/xml, text/plain, text/css, text/javascript, application/javascript, application/x-font-ttf, image/svg+xml, text/turtle, application/rdf+xml, application/x-turtle, text/rdf+n3, application/json, application/trig, application/ld+json, application/n-quads"
+   compression="on"
+   disableUploadTimeout="true"
+   enableLookups="true"
+   maxThreads="200"
+   minSpareThreads="5"
+   port="8443"
+   protocol="org.apache.coyote.http11.Http11Nio2Protocol"
+   scheme="https"
+   secure="true">
+     <SSLHostConfig
+      certificateVerification="optionalNoCA"
+      certificateVerificationDepth="2"
+      trustManagerClassName="won.utils.tls.AcceptAllCertsTrustManager"
+      protocols="all">
+      <Certificate
+        certificateKeystoreFile="/home/username/WoNKeystore/t-keystore.jks"
+        certificateKeystorePassword="changeit"/>
+   </SSLHostConfig>
+ </Connector>
+```
 
 7. In the console navigate to the folder for the keystore created in previous steps (e.g. `/home/username/WoNKeystore/`), adapt(!) and run the following lines:
 
@@ -171,12 +161,13 @@ rm sometmpfile_deletme
 
 8. The other key stores, and the trust stores are created and filled in automatically when the application is run (in the locations defined in step 4 with the passwords defined in step 5).
 
-9. Depending on your java-setup it might not be able to generate keys of a relevant length. In that case, you need to download and install the [Java Cryptography Extension](http://www.oracle.com/technetwork/java/javase/downloads/jce-7-download-432124.html). There's a readme in the zip detailing its setup. At the time of this writing, this consists of copying the two jars into `$JAVA_HOME/(jre/)lib/security`. If you don't do this or the jars are in the wrong folder, you'll get an exception like `java.security.InvalidKeyException: Illegal key size` when trying to run the app.
+9. For Oracle Java 8: Depending on your java-setup it might not be able to generate keys of a relevant length. In that case, you need to download and install the [Java Cryptography Extension](https://www.oracle.com/java/technologies/jce8-downloads.html). There's a readme in the zip detailing its setup. At the time of this writing, this consists of copying the two jars into `$JAVA_HOME/(jre/)lib/security`. If you don't do this or the jars are in the wrong folder, you'll get an exception like `java.security.InvalidKeyException: Illegal key size` when trying to run the app. Check out step 3 [here](https://www.baeldung.com/java-bouncy-castle) for a more detailed guide. In OpenJDK the unlimted cryptography policy should be enabled by default.
 
-10. Install the bouncycaslte security provider: Locate the JRE you are using with eclipse (`Window -> Preferences -> Java -> Installed JREs`).
+10. Install the bouncycastle security provider and the trust manager: Locate the JRE you are using with eclipse (`Window -> Preferences -> Java -> Installed JREs`). 
 
     - Navigate to the `[JRE]/lib/security` folder
-    - edit the file `java.security`
+    - look for the `java.security` file in your JDK's folder structure (for Oracle Java it should be in `$JAVA_HOME/lib/security`, in OpenJDK-12 it was in `$JAVA_HOME/conf/security`)
+    - edit the file `java.security` <!--TODO for openjdk it's in [JDK]/conf/security/-->
     - find the `List of providers and their preference orders`, which looks like this:
 
     ```
@@ -191,28 +182,25 @@ rm sometmpfile_deletme
     ```
     security.provider.11=org.bouncycastle.jce.provider.BouncyCastleProvider
     ```
+    <!--
+    TODO dunno if we need the fully qualified package name. in openjdk12 only the class names are used 
+    TODO I've also copied the jars to tomcat's lib folder (at no avail tho)
+    -->
 
-    - copy `bcpkix-jdk15on-1.52.jar` and `bcprov-jdk15on-1.52.jar` from `[won-checkout-dir]/webofneeds/webofneeds/target/required-libs/` (which will be there after the first build) to the `[JRE]/lib/ext/` folder
+    - For Java 8: the contents of `[won-checkout-dir]/webofneeds/webofneeds/target/required-libs/` (which will be there after the first build) to the `[JRE]/lib/ext/` folder
+    - For Java >=9: add the contents of `[won-checkout-dir]/webofneeds/webofneeds/target/required-libs/` to the front of your class-path (support for `lib/ext` has been dropped with java 9). If you're using Eclipse for the build, you can do so via "[Run Button] >> Run Configurations >> [tomcat run config name] >> Classpath >> select 'Bootstrap Entries' >> Add JARs" 
 
     (if you miss this step, you'll see BC exceptions when running the owner/node)
 
-**NOTE:** During the steps layed out above, I've also updated to Tomcat 8 and I haven't verified that the app also runs on Tomcat 7.
+11. Restart Eclipse if you're using it for the deploy.
 
-**NOTE:** If you're re-deploying the project and want to use defferent to previously used digital certificates (e.g., generate new ones according to step 8, or use your server certificates certified by a CA), in addition to replacing corresponding server certificate files and the broker's key store, you have to also delete (or empty) all the trust store files used by the applications. Also, if you have deleted or replaced the owner keystore, and your deployment uses other then in-memory database, you have to empty this database (the stored data related to owner registration at node has to be deleted).
+**NOTE:** If you're re-deploying the project and want to use different digital certificates than previously used (e.g. by generate new ones according to step 8, or use your server certificates certified by a CA): in addition to replacing corresponding server certificate files and the broker's key store, you have to also delete (or empty) all the trust-store files used by the applications. Also, if you have deleted or replaced the owner keystore, and your deployment uses something other than the in-memory database, you have to empty this database as well -- the stored data related to owner registration at node has to be deleted.
 
 **NOTE:** If you're running docker containers:
 
 Deploy sripts for building and running web of needs as docker containsers (see `webofneeds/webofneeds/won-docker/deploy*.sh`) include building and running server/broker certificate generation container `gencert`. It generates self-signed certificates for the server with the specified name (or IP) protected with the specified password if there are no certificates already present in the mounted volume. The generated key and certificate are in pem format (for Tomcat server) and java keystore format (for broker). If you already have server certificate for your server, and they are in the required format, you don't need to run the `gencert`. If you do want to generate and use self-signed certificate for your web of needs deployment, run it with changed parameters (server name and password), so that they correspond to your server name and to your desired password. Make sure that the same volume containing the certificate is mounted to the wonnode or owner container it is intended for. E.g. the location with the certificate of `server.example.at` should be mounted when owner application is run as docker container if the owner is being deployed at `server.example.com`. When using other than default file pathes and passwords for certificates, make sure that the same values are used in application properies files and in `server.xml`.
 
-**NOTE:** Inspecting keystores using `keytool`:
-owner/node keystores are saved in bouncycastle's UBER format. Therefore, the bouncycastle libraries need to be present in the `<YOUR_JRE_DIR>/lib/ext` folder. Follow these steps:
-
-1. build the project. the bouncycastle libs are copied to `webofneeds/webofneeds/target/required-libs/`
-2. copy the bouncycastle libs to your JRE's `bin/ext` folder
-3. use keytool to inspect the keystore, naming the `providerclass` as shown below :
-
-`keytool -list -v -providerclass org.bouncycastle.jce.provider.BouncyCastleProvider -storetype UBER -storepass <YOUR_KEYSTORE_PASSWORD> -keystore t-keystore.jks`
-
+**NOTE:** Inspecting keystores using `keytool`: owner/node keystores are saved in bouncycastle's UBER format. `keytool -list -v -providerclass org.bouncycastle.jce.provider.BouncyCastleProvider -storetype UBER -storepass <YOUR_KEYSTORE_PASSWORD> -keystore t-keystore.jks`
 
 ## 12. Add Tomcat to Eclipse
 
@@ -223,13 +211,13 @@ owner/node keystores are saved in bouncycastle's UBER format. Therefore, the bou
 1. Make sure you use a Java 8 JDK or JRE, not java 9, or tomcat will not start up and throw a JAXB-related exception. <!-- TODO rly? Testing this with OpenJDK 12 -->
 1. Add node and owner and click finish
    1. If you do not have the options to add the owner and node application to the tomcat (also accessible via Server >> [your tomcat server] >> Add and Remove), something went wrong.
-      1. Make sure to run maven install at least once 
-            - right-click "webofneeds" in the project explorer >> Run As >> Maven install
-            - or in the command-line: `mvn install -P skip-tests`
+      1. Make sure to run maven install at least once
+         - right-click "webofneeds" in the project explorer >> Run As >> Maven install
+         - or in the command-line: `mvn install -P skip-tests`
       1. Make sure the following project facets are active for the won-owner-webapp and won-node-webapp-projects (right-click project >> Properties >> search: "facets" >> activate facets):
-            - Dynamic Web Module
-            - Java
-            - JavaScript
+         - Dynamic Web Module
+         - Java
+         - JavaScript
       1. Do an eclipse build (Project >> Build All)
       1. Maybe the import of the webofneeds maven project somehow did not work properly. Delete all imported projects (without deleting the sources), then import again (File >> Import... >> Maven >> Existing Maven Projects )
       1. Maybe you did not install eclipse for Java EE. Check Help >> About Eclipse. If it does not say 'Eclipse Java EE IDE for Web Developers.', the easiest is to download and install Eclipse for Java EE.
