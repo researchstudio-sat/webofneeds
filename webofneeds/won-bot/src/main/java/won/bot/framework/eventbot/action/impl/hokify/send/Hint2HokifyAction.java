@@ -32,10 +32,10 @@ public class Hint2HokifyAction extends BaseEventBotAction {
         logger.info("HintEvent received");
         EventListenerContext ctx = getEventListenerContext();
         if ((event instanceof AtomHintFromMatcherEvent || event instanceof SocketHintFromMatcherEvent)
-                && ctx.getBotContextWrapper() instanceof HokifyJobBotContextWrapper) {
+                        && ctx.getBotContextWrapper() instanceof HokifyJobBotContextWrapper) {
             HokifyJobBotContextWrapper botContextWrapper = (HokifyJobBotContextWrapper) ctx.getBotContextWrapper();
             Optional<URI> yourAtomUri = BotActionUtils.getRecipientAtomURIFromHintEvent(event,
-                    getEventListenerContext().getLinkedDataSource());
+                            getEventListenerContext().getLinkedDataSource());
             String jobURL = botContextWrapper.getJobURLForURI(yourAtomUri.get());
             if (jobURL == null) {
                 logger.error("No JobURL found for the specified atomUri");

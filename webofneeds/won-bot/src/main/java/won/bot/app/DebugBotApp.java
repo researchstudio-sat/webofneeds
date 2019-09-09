@@ -14,8 +14,8 @@ import org.springframework.boot.SpringApplication;
 // import org.springframework.context.ConfigurableApplicationContext;
 
 /**
- * App for DebugBot.
- * The debug bot can be used to simulate other users and to create connections and atoms.
+ * App for DebugBot. The debug bot can be used to simulate other users and to
+ * create connections and atoms.
  */
 public class DebugBotApp {
     public static void main(String[] args) throws Exception {

@@ -144,7 +144,7 @@ public class DirectoryBasedAtomProducer implements AtomProducer {
             logger.info("no files found in directory {} with regex {}", this.directory, this.filenameFilterRegex);
         } else {
             logger.debug("found {} files in directory {} with regex {}",
-                    new Object[] { files.length, this.directory, this.filenameFilterRegex });
+                            new Object[] { files.length, this.directory, this.filenameFilterRegex });
         }
         rewind();
         this.initialized.set(true);

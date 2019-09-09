@@ -137,7 +137,7 @@ public class GroupingBotTest {
             // its only purpose is to trip the CyclicBarrier instance that
             // the test method is waiting on
             getEventBus().subscribe(WorkDoneEvent.class, new ActionOnEventListener(getEventListenerContext(),
-                    new TripBarrierAction(getEventListenerContext(), barrier)));
+                            new TripBarrierAction(getEventListenerContext(), barrier)));
         }
 
         public CyclicBarrier getBarrier() {

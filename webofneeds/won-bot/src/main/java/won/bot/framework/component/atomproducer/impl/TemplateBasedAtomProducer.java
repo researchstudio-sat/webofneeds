@@ -67,8 +67,8 @@ public class TemplateBasedAtomProducer extends AbstractAtomProducerWrapper {
         }
         if (this.templateModel == null) {
             logger.warn(
-                    "reading RDF data from template {} resulted in a null or empty model. Wrapped models will not be modified",
-                    this.template);
+                            "reading RDF data from template {} resulted in a null or empty model. Wrapped models will not be modified",
+                            this.template);
         }
     }
 

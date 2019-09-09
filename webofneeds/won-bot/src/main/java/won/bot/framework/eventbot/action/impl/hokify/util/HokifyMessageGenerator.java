@@ -46,7 +46,7 @@ public class HokifyMessageGenerator {
         SendMessage sendMessage = new SendMessage();
         // sendMessage.setChatId(chatId);
         String text = "<b>Someone wants to connect with you!\n\n</b><a href='" + targetAtomUri + "'>" + title
-                + "\n\n</a>";
+                        + "\n\n</a>";
         if (description != null) {
             text = text + "<em>" + description + "</em>";
         }

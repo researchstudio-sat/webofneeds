@@ -69,7 +69,7 @@ public class ReplaceDebugAtomContentAction extends BaseEventBotAction {
         EventBus bus = ctx.getEventBus();
         final URI wonNodeUri = URI.create(atomModelWrapper.getWonNodeUri());
         logger.debug("replacing atom on won node {} with content {} ", wonNodeUri,
-                StringUtils.abbreviate(RdfUtils.toString(onlyContentGraphDataset), 150));
+                        StringUtils.abbreviate(RdfUtils.toString(onlyContentGraphDataset), 150));
         bus.publish(new ReplaceCommandEvent(onlyContentGraphDataset));
     }
 }

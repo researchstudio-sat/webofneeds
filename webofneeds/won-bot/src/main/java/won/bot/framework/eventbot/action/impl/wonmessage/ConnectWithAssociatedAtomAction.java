@@ -44,7 +44,7 @@ public class ConnectWithAssociatedAtomAction extends BaseEventBotAction {
     private String welcomeMessage;
 
     public ConnectWithAssociatedAtomAction(final EventListenerContext eventListenerContext, final URI targetSocketType,
-            final URI localSocketType, String welcomeMessage) {
+                    final URI localSocketType, String welcomeMessage) {
         super(eventListenerContext);
         Objects.requireNonNull(targetSocketType);
         Objects.requireNonNull(localSocketType);
@@ -87,27 +87,31 @@ public class ConnectWithAssociatedAtomAction extends BaseEventBotAction {
         LinkedDataSource linkedDataSource = getEventListenerContext().getLinkedDataSource();
         if (localSocketType.isPresent() && targetSocketType.isPresent()) {
             Optional<URI> localSocket = localSocketType.map(socketType -> WonLinkedDataUtils
-                    .getSocketsOfType(fromUri, socketType, linkedDataSource).stream().findFirst().orElse(null));
+                            .getSocketsOfType(fromUri, socketType, linkedDataSource).stream().findFirst().orElse(null));
             Optional<URI> targetSocket = targetSocketType.map(socketType -> WonLinkedDataUtils
-                    .getSocketsOfType(toUri, socketType, linkedDataSource).stream().findFirst().orElse(null));
+                            .getSocketsOfType(toUri, socketType, linkedDataSource).stream().findFirst().orElse(null));
             if (localSocket.isPresent() && targetSocket.isPresent()) {
                 return Optional.of(WonMessageBuilder
-                        .setMessagePropertiesForConnect(wonNodeInformationService.generateEventURI(localWonNode),
-                                localSocket, fromUri, localWonNode, targetSocket, toUri, remoteWonNode, welcomeMessage)
-                        .build());
+                                .setMessagePropertiesForConnect(
+                                                wonNodeInformationService.generateEventURI(localWonNode),
+                                                localSocket, fromUri, localWonNode, targetSocket, toUri, remoteWonNode,
+                                                welcomeMessage)
+                                .build());
             }
         }
         // no sockets specified or specified sockets not supported. try a random
         // compatibly pair
         Set<Pair<URI>> compatibleSockets = WonLinkedDataUtils.getCompatibleSocketsForAtoms(linkedDataSource, fromUri,
-                toUri);
+                        toUri);
         if (!compatibleSockets.isEmpty()) {
             List<Pair<URI>> shuffledSocketPairs = new ArrayList<>(compatibleSockets);
             Collections.shuffle(shuffledSocketPairs);
             Pair<URI> sockets = shuffledSocketPairs.get(0);
             return Optional.of(WonMessageBuilder.setMessagePropertiesForConnect(
-                    wonNodeInformationService.generateEventURI(localWonNode), Optional.of(sockets.getFirst()), fromUri,
-                    localWonNode, Optional.of(sockets.getSecond()), toUri, remoteWonNode, welcomeMessage).build());
+                            wonNodeInformationService.generateEventURI(localWonNode), Optional.of(sockets.getFirst()),
+                            fromUri,
+                            localWonNode, Optional.of(sockets.getSecond()), toUri, remoteWonNode, welcomeMessage)
+                            .build());
         }
         return Optional.empty();
     }

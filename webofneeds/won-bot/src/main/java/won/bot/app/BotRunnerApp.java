@@ -35,13 +35,11 @@ public class BotRunnerApp {
         app.setWebEnvironment(false);
         ConfigurableApplicationContext applicationContext = app.run(args);
         Bot bot = null;
-        
         // create a bot instance and auto-wire it
         AutowireCapableBeanFactory beanFactory = applicationContext.getAutowireCapableBeanFactory();
         bot = (Bot) beanFactory.autowire(Class.forName(botClass), AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, false);
         Object botBean = beanFactory.initializeBean(bot, "theBot");
         bot = (Bot) botBean;
-        
         // the bot also needs a trigger so its act() method is called regularly.
         // (there is no trigger bean in the context)
         if (bot instanceof TriggeredBot) {
@@ -49,7 +47,6 @@ public class BotRunnerApp {
             trigger.setInitialDelay(1000);
             ((TriggeredBot) bot).setTrigger(trigger);
         }
-        
         BotManager botManager = (BotManager) applicationContext.getBean("botManager");
         // adding the bot to the bot manager will cause it to be initialized.
         // at that point, the trigger starts.
