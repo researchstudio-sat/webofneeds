@@ -89,11 +89,12 @@ public class WonLinkedDataUtils {
     }
 
     public static List<URI> getNodeAtomUris(URI nodeURI, LinkedDataSource linkedDataSource) {
-        return getNodeAtomUris(nodeURI, null, null, null, linkedDataSource);
+        return getNodeAtomUris(nodeURI, null, null, null, null, null, linkedDataSource);
     }
 
     public static List<URI> getNodeAtomUris(URI nodeURI, ZonedDateTime modifiedAfter, ZonedDateTime createdAfter,
-                    AtomState atomState, LinkedDataSource linkedDataSource) {
+                    AtomState atomState, URI filterBySocketTypeUri, URI filterByAtomTypeUri,
+                    LinkedDataSource linkedDataSource) {
         Dataset nodeDataset = getDataForResource(nodeURI, linkedDataSource);
         WonNodeInfo wonNodeInfo = WonRdfUtils.WonNodeUtils.getWonNodeInfo(nodeURI, nodeDataset);
         URI atomListUri = URI.create(wonNodeInfo.getAtomListURI());
@@ -107,9 +108,17 @@ public class WonLinkedDataUtils {
             newQuery = (newQuery == null) ? queryPart : (newQuery + "&" + queryPart);
         }
         if (createdAfter != null) {
-            // TODO: rename this parameter once we handle that parameter in the node (use
-            // modifiedafter for now)
-            String queryPart = "modifiedafter=" + createdAfter;
+            String queryPart = "createdafter=" + createdAfter;
+            newQuery = (newQuery == null) ? queryPart : (newQuery + "&" + queryPart);
+        }
+        if (filterByAtomTypeUri != null) {
+            // TODO: IDK IF THERE NEEDS TO BE URI ENCODING
+            String queryPart = "filterByAtomTypeUri=" + filterByAtomTypeUri;
+            newQuery = (newQuery == null) ? queryPart : (newQuery + "&" + queryPart);
+        }
+        if (filterBySocketTypeUri != null) {
+            // TODO: IDK IF THERE NEEDS TO BE URI ENCODING
+            String queryPart = "filterBySocketTypeUri=" + filterBySocketTypeUri;
             newQuery = (newQuery == null) ? queryPart : (newQuery + "&" + queryPart);
         }
         try {

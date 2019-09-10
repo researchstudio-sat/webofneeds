@@ -156,7 +156,6 @@ public class RestAtomController {
                     @RequestParam(value = "filterBySocketTypeUri", required = false) String filterBySocketTypeUriString,
                     @RequestParam(value = "filterByAtomTypeUri", required = false) String filterByAtomTypeUriString,
                     @RequestParam(value = "limit", required = false) Integer limit) {
-        // TODO: fetch with modifiedafter parameter and not only the uri
         ZonedDateTime modifiedAfter = StringUtils.isNotBlank(modifiedAfterIsoString)
                         ? ZonedDateTime.parse(modifiedAfterIsoString, DateTimeFormatter.ISO_DATE_TIME)
                         : null;
@@ -165,9 +164,6 @@ public class RestAtomController {
                         : null;
         Coordinate nearLocation = (latitude != null && longitude != null) ? new Coordinate(latitude, longitude) : null;
         URI nodeURI = wonNodeInformationService.getDefaultWonNodeURI();
-        List<URI> atomUris = WonLinkedDataUtils.getNodeAtomUris(nodeURI, modifiedAfter, createdAfter, state,
-                        linkedDataSource);
-        Map<URI, AtomPojo> atomMap = new HashMap<>();
         URI filterBySocketTypeUri = null;
         if (filterBySocketTypeUriString != null) {
             filterBySocketTypeUri = URI.create(filterBySocketTypeUriString);
@@ -176,6 +172,10 @@ public class RestAtomController {
         if (filterByAtomTypeUriString != null) {
             filterByAtomTypeUri = URI.create(filterByAtomTypeUriString);
         }
+        List<URI> atomUris = WonLinkedDataUtils.getNodeAtomUris(nodeURI, modifiedAfter, createdAfter, state,
+                        filterBySocketTypeUri, filterByAtomTypeUri,
+                        linkedDataSource);
+        Map<URI, AtomPojo> atomMap = new HashMap<>();
         for (URI atomUri : atomUris) {
             try {
                 Dataset atomDataset = WonLinkedDataUtils.getDataForResource(atomUri, linkedDataSource);
