@@ -41,6 +41,7 @@ import won.protocol.repository.MessageEventRepository;
 import won.protocol.service.AtomInformationService;
 import won.protocol.service.LinkedDataService;
 import won.protocol.service.impl.UnreadInformationService;
+import won.protocol.util.DefaultAtomModelWrapper;
 import won.protocol.util.DefaultPrefixUtils;
 import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.RDFG;
@@ -113,11 +114,10 @@ public class LinkedDataServiceImpl implements LinkedDataService {
 
     @Transactional
     public Dataset listAtomURIs(AtomState atomState, URI filterSocketTypeUri, URI filterAtomTypeUri) {
-        // TODO: IMPL FILTERING FOR socketTypeUri and atomTypeUri
         Model model = ModelFactory.createDefaultModel();
         setNsPrefixes(model);
         Collection<URI> uris = atomInformationService.listAtomURIs(atomState);
-        return getAtomURIListDataset(model, uris);
+        return getFilteredAtomURIListDataset(model, uris, filterSocketTypeUri, filterAtomTypeUri);
     }
 
     @Transactional
@@ -159,21 +159,19 @@ public class LinkedDataServiceImpl implements LinkedDataService {
     @Transactional
     public Dataset listAtomURIsModifiedAfter(Date modifiedDate, AtomState atomState, URI filterSocketTypeUri,
                     URI filterAtomTypeUri) {
-        // TODO: IMPL FILTERING FOR socketTypeUri and atomTypeUri
         Model model = ModelFactory.createDefaultModel();
         setNsPrefixes(model);
         Collection<URI> uris = atomInformationService.listAtomURIsModifiedAfter(modifiedDate, atomState);
-        return getAtomURIListDataset(model, uris);
+        return getFilteredAtomURIListDataset(model, uris, filterSocketTypeUri, filterAtomTypeUri);
     }
 
     @Transactional
     public Dataset listAtomURIsCreatedAfter(Date createdDate, AtomState atomState, URI filterSocketTypeUri,
                     URI filterAtomTypeUri) {
-        // TODO: IMPL FILTERING FOR socketTypeUri and atomTypeUri
         Model model = ModelFactory.createDefaultModel();
         setNsPrefixes(model);
         Collection<URI> uris = atomInformationService.listAtomURIsCreatedAfter(createdDate, atomState);
-        return getAtomURIListDataset(model, uris);
+        return getFilteredAtomURIListDataset(model, uris, filterSocketTypeUri, filterAtomTypeUri);
     }
 
     @Transactional
@@ -924,11 +922,24 @@ public class LinkedDataServiceImpl implements LinkedDataService {
         this.activeMqMatcherProtocolTopicNameAtomDeleted = activeMqMatcherProtocolTopicNameAtomDeleted;
     }
 
-    private Dataset getAtomURIListDataset(Model model, Collection<URI> uris) {
+    private Dataset getFilteredAtomURIListDataset(Model model, Collection<URI> uris, URI filterSocketTypeUri,
+                    URI filterAtomTypeUri) {
         Resource atomListPageResource = model.createResource(this.atomResourceURIPrefix + "/");
-        for (URI atomURI : uris) {
-            model.add(model.createStatement(atomListPageResource, RDFS.member,
-                            model.createResource(atomURI.toString())));
+        if (filterSocketTypeUri == null && filterAtomTypeUri == null) {
+            uris.forEach(atomURI -> model.add(model.createStatement(atomListPageResource, RDFS.member,
+                            model.createResource(atomURI.toString()))));
+        } else {
+            uris.forEach(atomURI -> {
+                DataWithEtag<Dataset> dataWithEtag = getAtomDataset(atomURI, null);
+                DefaultAtomModelWrapper atomModelWrapper = new DefaultAtomModelWrapper(dataWithEtag.getData());
+                if ((filterSocketTypeUri == null
+                                || atomModelWrapper.getSocketTypeUriMap().containsValue(filterSocketTypeUri))
+                                && (filterAtomTypeUri == null
+                                                || atomModelWrapper.getContentTypes().contains(filterAtomTypeUri))) {
+                    model.add(model.createStatement(atomListPageResource, RDFS.member,
+                                    model.createResource(atomURI.toString())));
+                }
+            });
         }
         Dataset ret = newDatasetWithNamedModel(createDataGraphUriFromResource(atomListPageResource), model);
         addBaseUriAndDefaultPrefixes(ret);
