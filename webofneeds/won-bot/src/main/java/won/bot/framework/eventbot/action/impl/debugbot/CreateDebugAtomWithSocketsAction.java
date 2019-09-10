@@ -126,7 +126,7 @@ public class CreateDebugAtomWithSocketsAction extends AbstractCreateAtomAction {
                 // save the mapping between the original and the reaction in to the context.
                 getEventListenerContext().getBotContextWrapper().addUriAssociation(reactingToAtomUri, atomURI);
                 if (origEvent instanceof HintDebugCommandEvent || isInitialForHint) {
-                    HintType hintType = HintType.ATOM_HINT;
+                    HintType hintType = HintType.RANDOM_SOCKET_HINT; // default: hint to random compatible sockets
                     if (origEvent instanceof HintDebugCommandEvent) {
                         hintType = ((HintDebugCommandEvent) origEvent).getHintType();
                         bus.publish(new AtomCreatedEventForDebugHint(origEvent, atomURI, wonNodeUri,
