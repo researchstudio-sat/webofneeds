@@ -293,36 +293,127 @@ public class LinkedDataWebController {
     public String showAtomURIListPage(@RequestParam(value = "p", required = false) Integer page,
                     @RequestParam(value = "resumebefore", required = false) String beforeId,
                     @RequestParam(value = "resumeafter", required = false) String afterId,
+                    @RequestParam(value = "modifiedafter", required = false) String modifiedAfter,
+                    @RequestParam(value = "createdafter", required = false) String createdAfter,
+                    @RequestParam(value = "filterBySocketTypeUri", required = false) String filterBySocketTypeUriString,
+                    @RequestParam(value = "filterByAtomTypeUri", required = false) String filterByAtomTypeUriString,
                     @RequestParam(value = "state", required = false) String state, HttpServletRequest request,
-                    Model model, HttpServletResponse response) throws IOException {
+                    Model model, HttpServletResponse response) throws IOException, ParseException {
         Dataset rdfDataset;
         AtomState atomState = getAtomState(state);
-        if (page == null && beforeId == null && afterId == null) {
-            if (atomState != null) {
-                rdfDataset = linkedDataService.listAtomURIs(atomState);
-            } else {
-                rdfDataset = linkedDataService.listAtomURIs();
-            }
+        URI filterBySocketTypeUri = null;
+        if (filterBySocketTypeUriString != null) {
+            filterBySocketTypeUri = URI.create(filterBySocketTypeUriString);
+        }
+        URI filterByAtomTypeUri = null;
+        if (filterByAtomTypeUriString != null) {
+            filterByAtomTypeUri = URI.create(filterByAtomTypeUriString);
+        }
+        if (page == null && beforeId == null && afterId == null && modifiedAfter == null && createdAfter == null) {
+            rdfDataset = linkedDataService.listAtomURIs(atomState, filterBySocketTypeUri, filterByAtomTypeUri);
         } else if (page != null) {
-            AtomInformationService.PagedResource<Dataset, URI> resource = linkedDataService.listAtomURIs(page, null,
+            AtomInformationService.PagedResource<Dataset, URI> resource = linkedDataService.listPagedAtomURIs(page,
+                            null,
                             atomState);
             rdfDataset = resource.getContent();
         } else if (beforeId != null) {
             URI referenceAtom = URI.create(this.atomResourceURIPrefix + "/" + beforeId);
             AtomInformationService.PagedResource<Dataset, URI> resource = linkedDataService
-                            .listAtomURIsBefore(referenceAtom, null, atomState);
+                            .listPagedAtomURIsBefore(referenceAtom, null, atomState);
             rdfDataset = resource.getContent();
-        } else { // afterId != null
+        } else if (afterId != null) { // afterId != null
             URI referenceAtom = URI.create(this.atomResourceURIPrefix + "/" + afterId);
             AtomInformationService.PagedResource<Dataset, URI> resource = linkedDataService
-                            .listAtomURIsAfter(referenceAtom, null, atomState);
+                            .listPagedAtomURIsAfter(referenceAtom, null, atomState);
             rdfDataset = resource.getContent();
+        } else if (createdAfter != null) {
+            // do not support paging for now
+            rdfDataset = linkedDataService.listAtomURIsCreatedAfter(new DateParameter(createdAfter).getDate(),
+                            atomState, filterBySocketTypeUri, filterByAtomTypeUri);
+        } else {
+            // modifiedafter != null && createdafter == null
+            // do not support paging for now
+            rdfDataset = linkedDataService.listAtomURIsModifiedAfter(new DateParameter(modifiedAfter).getDate(),
+                            atomState, filterBySocketTypeUri, filterByAtomTypeUri);
         }
         model.addAttribute("rdfDataset", rdfDataset);
         model.addAttribute("resourceURI",
                         uriService.toResourceURIIfPossible(URI.create(request.getRequestURI())).toString());
         model.addAttribute("dataURI", uriService.toDataURIIfPossible(URI.create(request.getRequestURI())).toString());
         return "rdfDatasetView";
+    }
+
+    @RequestMapping(value = "${uri.path.data.atom}", method = RequestMethod.GET, produces = { "application/ld+json",
+                    "application/trig", "application/n-quads" })
+    public ResponseEntity<Dataset> listAtomURIs(HttpServletRequest request, HttpServletResponse response,
+                    @RequestParam(value = "p", required = false) Integer page,
+                    @RequestParam(value = "resumebefore", required = false) String beforeId,
+                    @RequestParam(value = "resumeafter", required = false) String afterId,
+                    @RequestParam(value = "modifiedafter", required = false) String modifiedAfter,
+                    @RequestParam(value = "createdafter", required = false) String createdAfter,
+                    @RequestParam(value = "filterBySocketTypeUri", required = false) String filterBySocketTypeUriString,
+                    @RequestParam(value = "filterByAtomTypeUri", required = false) String filterByAtomTypeUriString,
+                    @RequestParam(value = "state", required = false) String state) throws IOException, ParseException {
+        logger.debug("listAtomURIs() for page " + page + " called");
+        Dataset rdfDataset;
+        HttpHeaders headers = new HttpHeaders();
+        Integer preferedSize = getPreferredSize(request);
+        String passableQuery = getPassableQueryMap("state", state, "modifiedafter", modifiedAfter, "createdafter",
+                        createdAfter, "filterBySocketTypeUri", filterBySocketTypeUriString, "filterByAtomTypeUri",
+                        filterByAtomTypeUriString);
+        AtomState atomState = getAtomState(state);
+        URI filterBySocketTypeUri = null;
+        if (filterBySocketTypeUriString != null) {
+            filterBySocketTypeUri = URI.create(filterBySocketTypeUriString);
+        }
+        URI filterByAtomTypeUri = null;
+        if (filterByAtomTypeUriString != null) {
+            filterByAtomTypeUri = URI.create(filterByAtomTypeUriString);
+        }
+        if (preferedSize == null && modifiedAfter == null && createdAfter == null) {
+            rdfDataset = linkedDataService.listAtomURIs(atomState, filterBySocketTypeUri, filterByAtomTypeUri);
+        } else if (page == null && beforeId == null && afterId == null && modifiedAfter == null
+                        && createdAfter == null) {
+            // return latest atoms
+            AtomInformationService.PagedResource<Dataset, URI> resource = linkedDataService.listPagedAtomURIs(1,
+                            preferedSize, atomState);
+            rdfDataset = resource.getContent();
+            addPagedResourceInSequenceHeader(headers, URI.create(this.atomResourceURIPrefix), resource, passableQuery);
+            // resume before parameter specified - display the connections with activities
+            // before the specified event id
+        } else if (page != null) {
+            AtomInformationService.PagedResource<Dataset, URI> resource = linkedDataService.listPagedAtomURIs(page,
+                            preferedSize, atomState);
+            rdfDataset = resource.getContent();
+            addPagedResourceInSequenceHeader(headers, URI.create(this.atomResourceURIPrefix), resource, page,
+                            passableQuery);
+        } else if (beforeId != null) {
+            URI referenceAtom = URI.create(this.atomResourceURIPrefix + "/" + beforeId);
+            AtomInformationService.PagedResource<Dataset, URI> resource = linkedDataService
+                            .listPagedAtomURIsBefore(referenceAtom, preferedSize, atomState);
+            rdfDataset = resource.getContent();
+            addPagedResourceInSequenceHeader(headers, URI.create(this.atomResourceURIPrefix), resource, passableQuery);
+        } else if (afterId != null) {
+            URI referenceAtom = URI.create(this.atomResourceURIPrefix + "/" + afterId);
+            AtomInformationService.PagedResource<Dataset, URI> resource = linkedDataService
+                            .listPagedAtomURIsAfter(referenceAtom, preferedSize, atomState);
+            rdfDataset = resource.getContent();
+            addPagedResourceInSequenceHeader(headers, URI.create(this.atomResourceURIPrefix), resource, passableQuery);
+        } else if (createdAfter != null) {
+            // do not support paging for now
+            rdfDataset = linkedDataService.listAtomURIsCreatedAfter(new DateParameter(createdAfter).getDate(),
+                            atomState, filterBySocketTypeUri, filterByAtomTypeUri);
+        } else {
+            // modifiedafter != null && createdafter == null
+            // do not support paging for now
+            rdfDataset = linkedDataService.listAtomURIsModifiedAfter(new DateParameter(modifiedAfter).getDate(),
+                            atomState, filterBySocketTypeUri, filterByAtomTypeUri);
+        }
+        addLocationHeaderIfNecessary(headers, URI.create(request.getRequestURI()),
+                        URI.create(this.atomResourceURIPrefix));
+        addMutableResourceHeaders(headers);
+        addCORSHeader(headers);
+        return new ResponseEntity<>(rdfDataset, headers, HttpStatus.OK);
     }
 
     @RequestMapping("${uri.path.page}")
@@ -532,64 +623,6 @@ public class LinkedDataWebController {
             addImmutableResourceHeaders(headers);
         }
         return headers;
-    }
-
-    @RequestMapping(value = "${uri.path.data.atom}", method = RequestMethod.GET, produces = { "application/ld+json",
-                    "application/trig", "application/n-quads" })
-    public ResponseEntity<Dataset> listAtomURIs(HttpServletRequest request, HttpServletResponse response,
-                    @RequestParam(value = "p", required = false) Integer page,
-                    @RequestParam(value = "resumebefore", required = false) String beforeId,
-                    @RequestParam(value = "resumeafter", required = false) String afterId,
-                    @RequestParam(value = "modifiedafter", required = false) String modifiedAfter,
-                    @RequestParam(value = "state", required = false) String state) throws IOException, ParseException {
-        logger.debug("listAtomURIs() for page " + page + " called");
-        Dataset rdfDataset;
-        HttpHeaders headers = new HttpHeaders();
-        Integer preferedSize = getPreferredSize(request);
-        String passableQuery = getPassableQueryMap("state", state);
-        AtomState atomState = getAtomState(state);
-        if (preferedSize == null && modifiedAfter == null) {
-            if (atomState != null) {
-                rdfDataset = linkedDataService.listAtomURIs(atomState);
-            } else {
-                rdfDataset = linkedDataService.listAtomURIs();
-            }
-        } else if (page == null && beforeId == null && afterId == null && modifiedAfter == null) {
-            // return latest atoms
-            AtomInformationService.PagedResource<Dataset, URI> resource = linkedDataService.listAtomURIs(1,
-                            preferedSize, atomState);
-            rdfDataset = resource.getContent();
-            addPagedResourceInSequenceHeader(headers, URI.create(this.atomResourceURIPrefix), resource, passableQuery);
-            // resume before parameter specified - display the connections with activities
-            // before the specified event id
-        } else if (page != null) {
-            AtomInformationService.PagedResource<Dataset, URI> resource = linkedDataService.listAtomURIs(page,
-                            preferedSize, atomState);
-            rdfDataset = resource.getContent();
-            addPagedResourceInSequenceHeader(headers, URI.create(this.atomResourceURIPrefix), resource, page,
-                            passableQuery);
-        } else if (beforeId != null) {
-            URI referenceAtom = URI.create(this.atomResourceURIPrefix + "/" + beforeId);
-            AtomInformationService.PagedResource<Dataset, URI> resource = linkedDataService
-                            .listAtomURIsBefore(referenceAtom, preferedSize, atomState);
-            rdfDataset = resource.getContent();
-            addPagedResourceInSequenceHeader(headers, URI.create(this.atomResourceURIPrefix), resource, passableQuery);
-        } else if (afterId != null) {
-            URI referenceAtom = URI.create(this.atomResourceURIPrefix + "/" + afterId);
-            AtomInformationService.PagedResource<Dataset, URI> resource = linkedDataService
-                            .listAtomURIsAfter(referenceAtom, preferedSize, atomState);
-            rdfDataset = resource.getContent();
-            addPagedResourceInSequenceHeader(headers, URI.create(this.atomResourceURIPrefix), resource, passableQuery);
-        } else { // modifiedafter != null
-            // do not support paging for modified atoms for now
-            DateParameter modifiedDate = new DateParameter(modifiedAfter);
-            rdfDataset = linkedDataService.listModifiedAtomURIsAfter(modifiedDate.getDate());
-        }
-        addLocationHeaderIfNecessary(headers, URI.create(request.getRequestURI()),
-                        URI.create(this.atomResourceURIPrefix));
-        addMutableResourceHeaders(headers);
-        addCORSHeader(headers);
-        return new ResponseEntity<>(rdfDataset, headers, HttpStatus.OK);
     }
 
     private AtomState getAtomState(final String state) {

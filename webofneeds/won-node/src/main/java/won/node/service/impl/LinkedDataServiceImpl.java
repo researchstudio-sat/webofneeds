@@ -103,83 +103,77 @@ public class LinkedDataServiceImpl implements LinkedDataService {
 
     @Transactional
     public Dataset listAtomURIs() {
-        Model model = ModelFactory.createDefaultModel();
-        setNsPrefixes(model);
-        Collection<URI> uris = atomInformationService.listAtomURIs();
-        Resource atomListPageResource = model.createResource(this.atomResourceURIPrefix + "/");
-        for (URI atomURI : uris) {
-            model.add(model.createStatement(atomListPageResource, RDFS.member,
-                            model.createResource(atomURI.toString())));
-        }
-        Dataset ret = newDatasetWithNamedModel(createDataGraphUriFromResource(atomListPageResource), model);
-        addBaseUriAndDefaultPrefixes(ret);
-        return ret;
+        return listAtomURIs(null);
     }
 
     @Transactional
     public Dataset listAtomURIs(AtomState atomState) {
+        return listAtomURIs(atomState, null, null);
+    }
+
+    @Transactional
+    public Dataset listAtomURIs(AtomState atomState, URI filterSocketTypeUri, URI filterAtomTypeUri) {
+        // TODO: IMPL FILTERING FOR socketTypeUri and atomTypeUri
         Model model = ModelFactory.createDefaultModel();
         setNsPrefixes(model);
         Collection<URI> uris = atomInformationService.listAtomURIs(atomState);
-        Resource atomListPageResource = model.createResource(this.atomResourceURIPrefix + "/");
-        for (URI atomURI : uris) {
-            model.add(model.createStatement(atomListPageResource, RDFS.member,
-                            model.createResource(atomURI.toString())));
-        }
-        Dataset ret = newDatasetWithNamedModel(createDataGraphUriFromResource(atomListPageResource), model);
-        addBaseUriAndDefaultPrefixes(ret);
-        return ret;
+        return getAtomURIListDataset(model, uris);
     }
 
     @Transactional
-    public AtomInformationService.PagedResource<Dataset, URI> listAtomURIs(final int pageNum) {
-        return listAtomURIs(pageNum, null, null);
+    public AtomInformationService.PagedResource<Dataset, URI> listPagedAtomURIs(final int pageNum) {
+        return listPagedAtomURIs(pageNum, null, null);
     }
 
     @Transactional
-    public AtomInformationService.PagedResource<Dataset, URI> listAtomURIsBefore(final URI atom) {
-        return listAtomURIsBefore(atom, null, null);
+    public AtomInformationService.PagedResource<Dataset, URI> listPagedAtomURIsBefore(final URI atom) {
+        return listPagedAtomURIsBefore(atom, null, null);
     }
 
     @Transactional
-    public AtomInformationService.PagedResource<Dataset, URI> listAtomURIsAfter(final URI atom) {
-        return listAtomURIsAfter(atom, null, null);
+    public AtomInformationService.PagedResource<Dataset, URI> listPagedAtomURIsAfter(final URI atom) {
+        return listPagedAtomURIsAfter(atom, null, null);
     }
 
     @Transactional
-    public AtomInformationService.PagedResource<Dataset, URI> listAtomURIs(final int pageNum,
+    public AtomInformationService.PagedResource<Dataset, URI> listPagedAtomURIs(final int pageNum,
                     final Integer preferedSize, AtomState atomState) {
-        Slice<URI> slice = atomInformationService.listAtomURIs(pageNum, preferedSize, atomState);
+        Slice<URI> slice = atomInformationService.listPagedAtomURIs(pageNum, preferedSize, atomState);
         return toContainerPage(this.atomResourceURIPrefix + "/", slice);
     }
 
     @Transactional
-    public AtomInformationService.PagedResource<Dataset, URI> listAtomURIsBefore(final URI atom,
+    public AtomInformationService.PagedResource<Dataset, URI> listPagedAtomURIsBefore(final URI atom,
                     final Integer preferedSize, AtomState atomState) {
-        Slice<URI> slice = atomInformationService.listAtomURIsBefore(atom, preferedSize, atomState);
+        Slice<URI> slice = atomInformationService.listPagedAtomURIsBefore(atom, preferedSize, atomState);
         return toContainerPage(this.atomResourceURIPrefix + "/", slice);
     }
 
     @Transactional
-    public AtomInformationService.PagedResource<Dataset, URI> listAtomURIsAfter(final URI atom,
+    public AtomInformationService.PagedResource<Dataset, URI> listPagedAtomURIsAfter(final URI atom,
                     final Integer preferedSize, AtomState atomState) {
-        Slice<URI> slice = atomInformationService.listAtomURIsAfter(atom, preferedSize, atomState);
+        Slice<URI> slice = atomInformationService.listPagedAtomURIsAfter(atom, preferedSize, atomState);
         return toContainerPage(this.atomResourceURIPrefix + "/", slice);
     }
 
     @Transactional
-    public Dataset listModifiedAtomURIsAfter(Date modifiedDate, AtomState atomState) {
+    public Dataset listAtomURIsModifiedAfter(Date modifiedDate, AtomState atomState, URI filterSocketTypeUri,
+                    URI filterAtomTypeUri) {
+        // TODO: IMPL FILTERING FOR socketTypeUri and atomTypeUri
         Model model = ModelFactory.createDefaultModel();
         setNsPrefixes(model);
-        Collection<URI> uris = atomInformationService.listModifiedAtomURIsAfter(modifiedDate, atomState);
-        Resource atomListPageResource = model.createResource(this.atomResourceURIPrefix + "/");
-        for (URI atomURI : uris) {
-            model.add(model.createStatement(atomListPageResource, RDFS.member,
-                    model.createResource(atomURI.toString())));
-        }
-        Dataset ret = newDatasetWithNamedModel(createDataGraphUriFromResource(atomListPageResource), model);
-        addBaseUriAndDefaultPrefixes(ret);
-        return ret;
+        Collection<URI> uris = atomInformationService.listAtomURIsModifiedAfter(modifiedDate, atomState);
+        return getAtomURIListDataset(model, uris);
+    }
+
+    @Transactional
+    public Dataset listAtomURIsCreatedAfter(Date createdDate, AtomState atomState, URI filterSocketTypeUri,
+                    URI filterAtomTypeUri) {
+        // TODO: IMPL FILTERING FOR socketTypeUri and atomTypeUri
+        Model model = ModelFactory.createDefaultModel();
+        setNsPrefixes(model);
+        Collection<URI> uris = atomInformationService.listAtomURIsCreatedAfter(createdDate, atomState);
+        return getAtomURIListDataset(model, uris);
     }
 
     @Transactional
@@ -928,5 +922,16 @@ public class LinkedDataServiceImpl implements LinkedDataService {
     public void setActiveMqMatcherProtocolTopicNameAtomDeleted(
                     final String activeMqMatcherProtocolTopicNameAtomDeleted) {
         this.activeMqMatcherProtocolTopicNameAtomDeleted = activeMqMatcherProtocolTopicNameAtomDeleted;
+    }
+
+    private Dataset getAtomURIListDataset(Model model, Collection<URI> uris) {
+        Resource atomListPageResource = model.createResource(this.atomResourceURIPrefix + "/");
+        for (URI atomURI : uris) {
+            model.add(model.createStatement(atomListPageResource, RDFS.member,
+                            model.createResource(atomURI.toString())));
+        }
+        Dataset ret = newDatasetWithNamedModel(createDataGraphUriFromResource(atomListPageResource), model);
+        addBaseUriAndDefaultPrefixes(ret);
+        return ret;
     }
 }

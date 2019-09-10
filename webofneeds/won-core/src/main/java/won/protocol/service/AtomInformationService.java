@@ -51,7 +51,7 @@ public interface AtomInformationService {
      * @param atomState Active/Inactive, null => all states
      * @return a collection of all atom URIs.
      */
-    public Slice<URI> listAtomURIs(int page, Integer preferredSize, AtomState atomState);
+    public Slice<URI> listPagedAtomURIs(int page, Integer preferredSize, AtomState atomState);
 
     /**
      * Retrieves list of atoms on the atomserver that where created earlier than the
@@ -64,7 +64,7 @@ public interface AtomInformationService {
      * @param atomState Active/Inactive, null => all states
      * @return a collection of all atom URIs.
      */
-    public Slice<URI> listAtomURIsBefore(URI atom, Integer preferredSize, AtomState atomState);
+    public Slice<URI> listPagedAtomURIsBefore(URI atom, Integer preferredSize, AtomState atomState);
 
     /**
      * Retrieves list of atoms on the atomserver that where created later than the
@@ -77,7 +77,7 @@ public interface AtomInformationService {
      * @param atomState Active/Inactive, null => all states
      * @return a collection of all atom URIs.
      */
-    public Slice<URI> listAtomURIsAfter(URI atom, Integer preferredSize, AtomState atomState);
+    public Slice<URI> listPagedAtomURIsAfter(URI atom, Integer preferredSize, AtomState atomState);
 
     /**
      * retrieves atoms that have been modified after a certain date
@@ -86,7 +86,16 @@ public interface AtomInformationService {
      * @param atomState filterBy
      * @return collection of modified atoms
      */
-    public Collection<URI> listModifiedAtomURIsAfter(Date modifiedAfter, AtomState atomState);
+    public Collection<URI> listAtomURIsModifiedAfter(Date modifiedAfter, AtomState atomState);
+
+    /**
+     * retrieves atoms that have been modified after a certain date
+     *
+     * @param createdAfter modification date of the atoms to retrieve
+     * @param atomState filterBy
+     * @return collection of modified atoms
+     */
+    public Collection<URI> listAtomURIsCreatedAfter(Date createdAfter, AtomState atomState);
 
     /**
      * Retrieves all connection URIs (regardless of state).

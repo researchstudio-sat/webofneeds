@@ -44,13 +44,25 @@ public interface LinkedDataService {
     public Dataset listAtomURIs(AtomState atomState);
 
     /**
+     * Returns a model containing all atom URIs with the given atomState.
+     *
+     * @param atomState State that an atom needs to have to be included.
+     * @param filterBySocketTypeUri socket type uri that an atom needs to have to be
+     * included
+     * @param filterByAtomTypeUri atom type uri that an atom needs to have to be
+     * included
+     * @return
+     */
+    public Dataset listAtomURIs(AtomState atomState, URI filterBySocketTypeUri, URI filterByAtomTypeUri);
+
+    /**
      * Returns a model containing all atom URIs. If page >= 0, paging is used and
      * the respective page is returned.
      *
      * @param page
      * @return
      */
-    public AtomInformationService.PagedResource<Dataset, URI> listAtomURIs(final int page);
+    public AtomInformationService.PagedResource<Dataset, URI> listPagedAtomURIs(final int page);
 
     /**
      * Returns a model containing all atom URIs that are in the specified state. If
@@ -62,7 +74,8 @@ public interface LinkedDataService {
      * @param atomState
      * @return
      */
-    public AtomInformationService.PagedResource<Dataset, URI> listAtomURIs(final int page, final Integer preferedSize,
+    public AtomInformationService.PagedResource<Dataset, URI> listPagedAtomURIs(final int page,
+                    final Integer preferedSize,
                     AtomState atomState);
 
     /**
@@ -71,7 +84,7 @@ public interface LinkedDataService {
      * @param atom
      * @return
      */
-    public AtomInformationService.PagedResource<Dataset, URI> listAtomURIsBefore(final URI atom);
+    public AtomInformationService.PagedResource<Dataset, URI> listPagedAtomURIsBefore(final URI atom);
 
     /**
      * Return all atom URIs that where created after the provided atom
@@ -79,7 +92,7 @@ public interface LinkedDataService {
      * @param atom
      * @return
      */
-    public AtomInformationService.PagedResource<Dataset, URI> listAtomURIsAfter(final URI atom);
+    public AtomInformationService.PagedResource<Dataset, URI> listPagedAtomURIsAfter(final URI atom);
 
     /**
      * Return all atom URIs that where created after the provided atom and that are
@@ -91,7 +104,7 @@ public interface LinkedDataService {
      * @param atomState
      * @return
      */
-    public AtomInformationService.PagedResource<Dataset, URI> listAtomURIsBefore(final URI atom,
+    public AtomInformationService.PagedResource<Dataset, URI> listPagedAtomURIsBefore(final URI atom,
                     final Integer preferedSize, AtomState atomState);
 
     /**
@@ -104,7 +117,7 @@ public interface LinkedDataService {
      * @param atomState
      * @return
      */
-    public AtomInformationService.PagedResource<Dataset, URI> listAtomURIsAfter(final URI atom,
+    public AtomInformationService.PagedResource<Dataset, URI> listPagedAtomURIsAfter(final URI atom,
                     final Integer preferedSize, AtomState atomState);
 
     /**
@@ -113,9 +126,29 @@ public interface LinkedDataService {
      *
      * @param modifiedDate modification date of atoms
      * @param atomState filter by atomState
+     * @param filterBySocketTypeUri socket type uri that an atom needs to have to be
+     * included
+     * @param filterByAtomTypeUri atom type uri that an atom needs to have to be
+     * included
      * @return
      */
-    public Dataset listModifiedAtomURIsAfter(Date modifiedDate, AtomState atomState);
+    public Dataset listAtomURIsModifiedAfter(Date modifiedDate, AtomState atomState, URI filterBySocketTypeUri,
+                    URI filterByAtomTypeUri);
+
+    /**
+     * Returns container dataset containing all atoms that have been created after a
+     * certain date
+     *
+     * @param createdDate creation date of atoms
+     * @param atomState filter by atomState
+     * @param filterBySocketTypeUri socket type uri that an atom needs to have to be
+     * included
+     * @param filterByAtomTypeUri atom type uri that an atom needs to have to be
+     * included
+     * @return
+     */
+    public Dataset listAtomURIsCreatedAfter(Date createdDate, AtomState atomState, URI filterBySocketTypeUri,
+                    URI filterByAtomTypeUri);
 
     /**
      * Returns container dataset containing all connections. If deep is true, the

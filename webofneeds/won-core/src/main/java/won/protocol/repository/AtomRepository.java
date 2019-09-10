@@ -19,16 +19,10 @@ import java.util.List;
 public interface AtomRepository extends WonRepository<Atom> {
     List<Atom> findByAtomURI(URI URI);
 
-    @Query("select atomURI from Atom")
-    List<URI> getAllAtomURIs();
-
-    @Query("select atomURI from Atom atom where atom.state = :atomState")
+    @Query("select atomURI from Atom atom where :atomState is null or atom.state = :atomState")
     List<URI> getAllAtomURIs(@Param("atomState") AtomState atomState);
 
-    @Query("select atomURI from Atom atom")
-    Slice<URI> getAllAtomURIs(Pageable pageable);
-
-    @Query("select atomURI from Atom atom where atom.state = :atomState")
+    @Query("select atomURI from Atom atom where :atomState is null or atom.state = :atomState")
     Slice<URI> getAllAtomURIs(@Param("atomState") AtomState atomState, Pageable pageable);
 
     Atom findOneByAtomURI(URI atomURI);
@@ -49,11 +43,13 @@ public interface AtomRepository extends WonRepository<Atom> {
     Slice<URI> getAtomURIsAfter(@Param("referenceDate") Date referenceDate, @Param("atomState") AtomState atomState,
                     Pageable pageable);
 
-    @Query("select atomURI from Atom atom where atom.lastUpdate > :modifiedDate and atom.state = :atomState")
-    List<URI> findModifiedAtomURIsAfter(@Param("modifiedDate") Date modifiedDate, @Param("atomState") AtomState atomState);
+    @Query("select atomURI from Atom atom where atom.lastUpdate > :modifiedDate and (:atomState is null or atom.state = :atomState)")
+    List<URI> getAllAtomURIsModifiedAfter(@Param("modifiedDate") Date modifiedDate,
+                    @Param("atomState") AtomState atomState);
 
-    @Query("select atomURI from Atom atom where atom.lastUpdate > :modifiedDate")
-    List<URI> findModifiedAtomURIsAfter(@Param("modifiedDate") Date modifiedDate);
+    @Query("select atomURI from Atom atom where atom.creationDate > :createdDate and (:atomState is null or atom.state = :atomState)")
+    List<URI> getAllAtomURIsCreatedAfter(@Param("createdDate") Date createdDate,
+                    @Param("atomState") AtomState atomState);
 
     @Query("select state, count(*) from Connection where atomURI = :atom group by state")
     List<Object[]> getCountsPerConnectionState(@Param("atom") URI atomURI);
