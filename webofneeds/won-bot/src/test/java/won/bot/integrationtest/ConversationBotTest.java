@@ -38,7 +38,6 @@ import java.util.concurrent.TimeUnit;
 @ContextConfiguration(locations = { "classpath:/spring/app/simple2AtomConversationTest.xml" })
 public class ConversationBotTest {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    private static final int RUN_ONCE = 1;
     private static final long ACT_LOOP_TIMEOUT_MILLIS = 100;
     private static final long ACT_LOOP_INITIAL_DELAY_MILLIS = 100;
     MyBot bot;

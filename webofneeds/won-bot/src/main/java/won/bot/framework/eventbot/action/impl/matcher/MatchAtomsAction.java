@@ -59,7 +59,8 @@ public class MatchAtomsAction extends BaseEventBotAction {
                         getEventListenerContext().getLinkedDataSource().getDataForResource(atomURI), atomURI);
         return WonMessageBuilder
                         .setMessagePropertiesForHintToAtom(wonNodeInformationService.generateEventURI(localWonNode),
-                                        atomURI, localWonNode, otherAtomURI, originator, score)
+                                        atomURI,
+                                        localWonNode, otherAtomURI, originator, score)
                         .build();
     }
 }

@@ -8,11 +8,9 @@ import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.action.BotActionUtils;
 import won.bot.framework.eventbot.action.impl.hokify.WonHokifyJobBotHandler;
 import won.bot.framework.eventbot.event.Event;
-import won.bot.framework.eventbot.event.MessageEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.AtomHintFromMatcherEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.SocketHintFromMatcherEvent;
 import won.bot.framework.eventbot.listener.EventListener;
-import won.protocol.message.WonMessage;
 
 import java.lang.invoke.MethodHandles;
 import java.net.URI;
@@ -36,10 +34,7 @@ public class Hint2HokifyAction extends BaseEventBotAction {
         if ((event instanceof AtomHintFromMatcherEvent || event instanceof SocketHintFromMatcherEvent)
                         && ctx.getBotContextWrapper() instanceof HokifyJobBotContextWrapper) {
             HokifyJobBotContextWrapper botContextWrapper = (HokifyJobBotContextWrapper) ctx.getBotContextWrapper();
-            WonMessage wonMessage = ((MessageEvent) event).getWonMessage();
             Optional<URI> yourAtomUri = BotActionUtils.getRecipientAtomURIFromHintEvent(event,
-                            getEventListenerContext().getLinkedDataSource());
-            Optional<URI> targetAtomUri = BotActionUtils.getTargetAtomURIFromHintEvent(event,
                             getEventListenerContext().getLinkedDataSource());
             String jobURL = botContextWrapper.getJobURLForURI(yourAtomUri.get());
             if (jobURL == null) {

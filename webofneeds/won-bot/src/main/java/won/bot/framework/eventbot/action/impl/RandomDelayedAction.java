@@ -32,11 +32,11 @@ public class RandomDelayedAction extends DelayedDelegatingAction {
         this.minDelay = minDelay;
         this.maxDelay = maxDelay;
         this.salt = salt;
-        assert minDelay >= 0 : "minDelay must be >= 0";
-        assert maxDelay >= 0 : "maxDelay must be >= 0";
-        assert minDelay <= maxDelay : "minDelay must be <= maxDelay";
-        this.random = new Random(System.currentTimeMillis() + salt);
-        this.intervalLength = maxDelay - minDelay;
+        assert this.minDelay >= 0 : "minDelay must be >= 0";
+        assert this.maxDelay >= 0 : "maxDelay must be >= 0";
+        assert this.minDelay <= this.maxDelay : "minDelay must be <= maxDelay";
+        this.random = new Random(System.currentTimeMillis() + this.salt);
+        this.intervalLength = this.maxDelay - this.minDelay;
     }
 
     @Override

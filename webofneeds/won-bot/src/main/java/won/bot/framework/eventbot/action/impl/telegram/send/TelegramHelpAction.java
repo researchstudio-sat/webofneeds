@@ -11,7 +11,7 @@ import won.bot.framework.eventbot.listener.EventListener;
  * Created by fsuda on 15.12.2016.
  */
 public class TelegramHelpAction extends BaseEventBotAction {
-    private WonTelegramBotHandler wonTelegramBotHandler;
+    private WonTelegramBotHandler wonTelegramBotHandler; // TODO: unused variable/parameter
 
     public TelegramHelpAction(EventListenerContext eventListenerContext, WonTelegramBotHandler wonTelegramBotHandler) {
         super(eventListenerContext);

@@ -11,8 +11,17 @@ import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.action.impl.MultipleActions;
 import won.bot.framework.eventbot.action.impl.PublishEventAction;
 import won.bot.framework.eventbot.action.impl.atomlifecycle.AbstractCreateAtomAction;
-import won.bot.framework.eventbot.action.impl.counter.*;
-import won.bot.framework.eventbot.action.impl.trigger.*;
+import won.bot.framework.eventbot.action.impl.counter.Counter;
+import won.bot.framework.eventbot.action.impl.counter.CounterImpl;
+import won.bot.framework.eventbot.action.impl.counter.DecrementCounterAction;
+import won.bot.framework.eventbot.action.impl.counter.IncrementCounterAction;
+import won.bot.framework.eventbot.action.impl.counter.TargetCountReachedEvent;
+import won.bot.framework.eventbot.action.impl.counter.TargetCounterDecorator;
+import won.bot.framework.eventbot.action.impl.trigger.ActionOnTriggerEventListener;
+import won.bot.framework.eventbot.action.impl.trigger.BotTrigger;
+import won.bot.framework.eventbot.action.impl.trigger.BotTriggerEvent;
+import won.bot.framework.eventbot.action.impl.trigger.StartBotTriggerCommandEvent;
+import won.bot.framework.eventbot.action.impl.trigger.StopBotTriggerCommandEvent;
 import won.bot.framework.eventbot.action.impl.wonmessage.execCommand.ExecuteCreateAtomCommandAction;
 import won.bot.framework.eventbot.action.impl.wonmessage.execCommand.LogMessageCommandFailureAction;
 import won.bot.framework.eventbot.bus.EventBus;
@@ -112,31 +121,36 @@ public class InitFactoryAction extends AbstractCreateAtomAction {
                                         bus.publish(new FactoryAtomCreationSkippedEvent());
                                     } else {
                                         bus.publish(new CreateAtomCommandEvent(dataset,
-                                                        botContextWrapper.getFactoryListName(), usedForTesting,
-                                                        doNotMatch));
+                                                        botContextWrapper.getFactoryListName(),
+                                                        usedForTesting, doNotMatch));
                                     }
                                 }
                             }
                         }));
-        bus.subscribe(CreateAtomCommandSuccessEvent.class, new ActionOnEventListener(ctx,
-                        new MultipleActions(ctx, new DecrementCounterAction(ctx, creationUnfinishedCounter), // decrease
-                                                                                                             // the
-                                                                                                             // creationUnfinishedCounter
-                                        new IncrementCounterAction(ctx, atomCreationSuccessfulCounter), // count a
-                                                                                                        // successful
-                                                                                                        // atom creation
-                                        new BaseEventBotAction(ctx) {
-                                            @Override
-                                            protected void doRun(Event event, EventListener executingListener)
-                                                            throws Exception {
-                                                if (event instanceof CreateAtomCommandSuccessEvent) {
-                                                    CreateAtomCommandSuccessEvent atomCreatedEvent = (CreateAtomCommandSuccessEvent) event;
-                                                    botContextWrapper.addInternalIdToUriReference(
-                                                                    atomCreatedEvent.getAtomUriBeforeCreation(),
-                                                                    atomCreatedEvent.getAtomURI());
-                                                }
-                                            }
-                                        })));
+        bus.subscribe(CreateAtomCommandSuccessEvent.class,
+                        new ActionOnEventListener(ctx,
+                                        new MultipleActions(ctx,
+                                                        new DecrementCounterAction(ctx, creationUnfinishedCounter), // decrease
+                                                                                                                    // the
+                                                                                                                    // creationUnfinishedCounter
+                                                        new IncrementCounterAction(ctx, atomCreationSuccessfulCounter), // count
+                                                                                                                        // a
+                                                                                                                        // successful
+                                                                                                                        // atom
+                                                                                                                        // creation
+                                                        new BaseEventBotAction(ctx) {
+                                                            @Override
+                                                            protected void doRun(Event event,
+                                                                            EventListener executingListener)
+                                                                            throws Exception {
+                                                                if (event instanceof CreateAtomCommandSuccessEvent) {
+                                                                    CreateAtomCommandSuccessEvent atomCreatedEvent = (CreateAtomCommandSuccessEvent) event;
+                                                                    botContextWrapper.addInternalIdToUriReference(
+                                                                                    atomCreatedEvent.getAtomUriBeforeCreation(),
+                                                                                    atomCreatedEvent.getAtomURI());
+                                                                }
+                                                            }
+                                                        })));
         bus.subscribe(CreateAtomCommandEvent.class,
                         new ActionOnEventListener(ctx, new MultipleActions(ctx, new ExecuteCreateAtomCommandAction(ctx), // execute
                                                                                                                          // the
@@ -180,33 +194,41 @@ public class InitFactoryAction extends AbstractCreateAtomAction {
         // to wait until all unfinished atom creations finish
         // when they do, the InitFactoryFinishedEvent is published
         bus.subscribe(AtomProducerExhaustedEvent.class,
-                        new ActionOnFirstEventListener(ctx, new MultipleActions(ctx,
-                                        new PublishEventAction(ctx,
-                                                        new StopBotTriggerCommandEvent(createFactoryAtomTrigger)),
-                                        new BaseEventBotAction(ctx) {
-                                            @Override
-                                            protected void doRun(Event event, EventListener executingListener)
-                                                            throws Exception {
-                                                // when we're called, there probably are atom creations unfinished, but
-                                                // there
-                                                // may not be
-                                                // a)
-                                                // first, prepare for the case when there are unfinished atom creations:
-                                                // we register a listener, waiting for the unfinished counter to reach 0
-                                                EventListener waitForUnfinishedAtomsListener = new ActionOnFirstEventListener(
-                                                                ctx, new TargetCounterFilter(creationUnfinishedCounter),
-                                                                new PublishEventAction(ctx,
-                                                                                new InitFactoryFinishedEvent()));
-                                                bus.subscribe(TargetCountReachedEvent.class,
-                                                                waitForUnfinishedAtomsListener);
-                                                // now, we can check if we've already reached the target
-                                                if (creationUnfinishedCounter.getCount() <= 0) {
-                                                    // ok, turned out we didn't need that listener
-                                                    bus.unsubscribe(waitForUnfinishedAtomsListener);
-                                                    bus.publish(new InitFactoryFinishedEvent());
-                                                }
-                                            }
-                                        })));
+                        new ActionOnFirstEventListener(ctx,
+                                        new MultipleActions(ctx,
+                                                        new PublishEventAction(ctx,
+                                                                        new StopBotTriggerCommandEvent(
+                                                                                        createFactoryAtomTrigger)),
+                                                        new BaseEventBotAction(ctx) {
+                                                            @Override
+                                                            protected void doRun(Event event,
+                                                                            EventListener executingListener)
+                                                                            throws Exception {
+                                                                // when we're called, there probably are atom creations
+                                                                // unfinished, but
+                                                                // there
+                                                                // may not be
+                                                                // a)
+                                                                // first, prepare for the case when there are unfinished
+                                                                // atom creations:
+                                                                // we register a listener, waiting for the unfinished
+                                                                // counter to reach 0
+                                                                EventListener waitForUnfinishedAtomsListener = new ActionOnFirstEventListener(
+                                                                                ctx,
+                                                                                new TargetCounterFilter(
+                                                                                                creationUnfinishedCounter),
+                                                                                new PublishEventAction(ctx,
+                                                                                                new InitFactoryFinishedEvent()));
+                                                                bus.subscribe(TargetCountReachedEvent.class,
+                                                                                waitForUnfinishedAtomsListener);
+                                                                // now, we can check if we've already reached the target
+                                                                if (creationUnfinishedCounter.getCount() <= 0) {
+                                                                    // ok, turned out we didn't need that listener
+                                                                    bus.unsubscribe(waitForUnfinishedAtomsListener);
+                                                                    bus.publish(new InitFactoryFinishedEvent());
+                                                                }
+                                                            }
+                                                        })));
         bus.subscribe(InitFactoryFinishedEvent.class,
                         new ActionOnFirstEventListener(ctx, "factoryCreateStatsLogger", new BaseEventBotAction(ctx) {
                             @Override

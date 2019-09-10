@@ -11,16 +11,17 @@
 package won.bot.app;
 
 import org.springframework.boot.SpringApplication;
-import org.springframework.context.ConfigurableApplicationContext;
+// import org.springframework.context.ConfigurableApplicationContext;
 
 /**
- * App for EchoBot
+ * App for EchoBot. The echo bot echoes all sent messages back to the user.
  */
 public class EchoBotApp {
     public static void main(String[] args) throws Exception {
         SpringApplication app = new SpringApplication(new Object[] { "classpath:/spring/app/echoBotApp.xml" });
         app.setWebEnvironment(false);
-        ConfigurableApplicationContext applicationContext = app.run(args);
+        app.run(args);
+        // ConfigurableApplicationContext applicationContext = app.run(args);
         // Thread.sleep(5*60*1000);
         // app.exit(applicationContext);
     }

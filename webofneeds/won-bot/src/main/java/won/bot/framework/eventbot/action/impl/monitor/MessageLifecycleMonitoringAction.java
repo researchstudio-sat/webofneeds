@@ -43,7 +43,6 @@ public class MessageLifecycleMonitoringAction extends BaseEventBotAction {
     Map<String, Split> msgSplitsBCDE = Collections.synchronizedMap(new HashMap<>());
     Map<URI, URI> connectionMsgUris = Collections.synchronizedMap(new HashMap<>());
     Map<URI, URI> responseMsgUris = Collections.synchronizedMap(new HashMap<>());
-    private long startTestTime = -1;
 
     public MessageLifecycleMonitoringAction(final EventListenerContext eventListenerContext) {
         super(eventListenerContext);

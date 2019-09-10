@@ -41,7 +41,6 @@ import java.util.concurrent.atomic.AtomicReference;
 public class LastSeenAtomsMatcherBot extends EventBot {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private BaseEventListener matcherRegistrator;
-    private BaseEventListener matcherIndexer;
     private int registrationMatcherRetryInterval;
 
     public void setRegistrationMatcherRetryInterval(final int registrationMatcherRetryInterval) {
@@ -85,11 +84,11 @@ public class LastSeenAtomsMatcherBot extends EventBot {
                                     logger.info("Sending hint for {} and {}", currentAtomURI, lastAtomURI);
                                 }
                                 ctx.getMatcherProtocolAtomServiceClient().hint(currentAtomURI, lastAtomURI, 0.5,
-                                                originator, null,
-                                                createWonMessage(currentAtomURI, lastAtomURI, 0.5, originator));
+                                                originator,
+                                                null, createWonMessage(currentAtomURI, lastAtomURI, 0.5, originator));
                                 ctx.getMatcherProtocolAtomServiceClient().hint(lastAtomURI, currentAtomURI, 0.5,
-                                                originator, null,
-                                                createWonMessage(lastAtomURI, currentAtomURI, 0.5, originator));
+                                                originator,
+                                                null, createWonMessage(lastAtomURI, currentAtomURI, 0.5, originator));
                             }
                         }));
     }
@@ -101,7 +100,8 @@ public class LastSeenAtomsMatcherBot extends EventBot {
                         getEventListenerContext().getLinkedDataSource().getDataForResource(atomURI), atomURI);
         return WonMessageBuilder
                         .setMessagePropertiesForHintToAtom(wonNodeInformationService.generateEventURI(localWonNode),
-                                        atomURI, localWonNode, otherAtomURI, originator, score)
+                                        atomURI,
+                                        localWonNode, otherAtomURI, originator, score)
                         .build();
     }
 }

@@ -52,7 +52,6 @@ import java.util.concurrent.TimeUnit;
 @ContextConfiguration(locations = { "classpath:/spring/app/simpleCommentTest.xml" })
 public class CommentBotTest {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    private static final int RUN_ONCE = 1;
     private static final long ACT_LOOP_TIMEOUT_MILLIS = 100;
     private static final long ACT_LOOP_INITIAL_DELAY_MILLIS = 100;
     private static MyBot bot;
@@ -187,13 +186,11 @@ public class CommentBotTest {
             List<URI> atoms = ((CommentBotContextWrapper) getBotContextWrapper()).getCommentList();
             LinkedDataSource linkedDataSource = getEventListenerContext().getLinkedDataSource();
             List<URI> properties = new ArrayList<>();
-            List<URI> objects = new ArrayList<>();
             properties.add(URI.create(WON.connections.getURI()));
             // properties.add(RDF.type);
             properties.add(URI.create(WON.targetConnection.toString()));
             properties.add(URI.create(WON.targetAtom.toString()));
             properties.add(URI.create(RDFS.member.toString()));
-            List<URI> crawled = new ArrayList<>();
             ((CachingLinkedDataSource) linkedDataSource).clear();
             Dataset dataModel = linkedDataSource.getDataForResourceWithPropertyPath(atoms.get(0),
                             PropertyPathConfigurator.configurePropertyPaths(), 30, 8, true);
@@ -210,8 +207,8 @@ public class CommentBotTest {
                             // "} ."+
                             // "Graph ?g4 {" +
                             "?connection won:socket won:CommentSocket."
-                            + "?connection won:targetConnection ?connection2." + "?connection2 won:sourceAtom ?atom2 ."
-                            +
+                            + "?connection won:targetConnection ?connection2."
+                            + "?connection2 won:sourceAtom ?atom2 ." +
                             // "} ."+
                             "}";
             Query query = QueryFactory.create(queryString);
@@ -221,7 +218,7 @@ public class CommentBotTest {
             for (; results.hasNext();) {
                 QuerySolution soln = results.nextSolution();
                 actualList.add(soln.toString());
-                RDFNode node = soln.get("?connection");
+                // RDFNode node = soln.get("?connection");
             }
             Assert.assertEquals("wrong number of results", 1, actualList.size());
             qExec.close();
@@ -276,15 +273,9 @@ public class CommentBotTest {
                             + "?atom won:connections ?connections." + "?connections rdfs:member ?connection."
                             + "?connection won:connectionState ?state." + "}";
             logger.debug(RdfUtils.toString(atomModel));
-            Dataset dataset = null;
-            // Query query = queryString.asQuery();
-            // QueryExecution qExec = QueryExecutionFactory.create(query, dataset);
             Query query = QueryFactory.create(queryString);
             QueryExecution qExec = QueryExecutionFactory.create(query, commentModel);
-            // Query query = QueryFactory.create(queryString);
-            // QueryExecution qExec = QueryExecutionFactory.create(query, dsARQ);
             ResultSet results = qExec.execSelect();
-            // ResultSet results = executeQuery(queryString,atomModel);
             URI atomConnectionCollectionURI = null;
             URI atomConnectionURI = null;
             URI commentConnectionsURI = null;

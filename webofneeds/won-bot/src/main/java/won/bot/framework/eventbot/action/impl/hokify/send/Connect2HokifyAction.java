@@ -39,7 +39,6 @@ public class Connect2HokifyAction extends BaseEventBotAction {
             HokifyJobBotContextWrapper botContextWrapper = (HokifyJobBotContextWrapper) ctx.getBotContextWrapper();
             Connection con = ((ConnectFromOtherAtomEvent) event).getCon();
             URI yourAtomUri = con.getAtomURI();
-            URI targetAtomUri = con.getTargetAtomURI();
             try {
                 String message = "Hello!\n I found this job offer on " + "https://hokify.at";
                 final OpenCommandEvent openCommandEvent = new OpenCommandEvent(con, message);

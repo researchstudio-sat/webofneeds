@@ -1,20 +1,15 @@
 package won.bot.framework.bot.context;
 
-import java.io.Serializable;
-import java.net.URI;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
+
+import java.io.Serializable;
+import java.net.URI;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Bot context implementation using persistent mongo db for storage.
@@ -56,11 +51,13 @@ public class MongoBotContext implements BotContext {
 
     @Override
     public void removeAtomUriFromNamedAtomUriList(final URI uri, final String name) {
+        // TODO FIX REMOVAL URI CAN'T BE DELETED AND RESULTS IN AN ERROR
         template.remove(uri, name);
     }
 
     @Override
     public void appendToNamedAtomUriList(final URI uri, final String name) {
+        // TODO FIX BECAUSE REMOVAL URI CAN'T BE DELETED
         template.insert(uri, name);
     }
 

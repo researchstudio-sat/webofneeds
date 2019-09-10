@@ -17,7 +17,11 @@ import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.action.impl.MultipleActions;
 import won.bot.framework.eventbot.action.impl.atomlifecycle.CreateAtomWithSocketsAction;
-import won.bot.framework.eventbot.action.impl.counter.*;
+import won.bot.framework.eventbot.action.impl.counter.Counter;
+import won.bot.framework.eventbot.action.impl.counter.CounterImpl;
+import won.bot.framework.eventbot.action.impl.counter.DecrementCounterAction;
+import won.bot.framework.eventbot.action.impl.counter.IncrementCounterAction;
+import won.bot.framework.eventbot.action.impl.counter.TargetCounterDecorator;
 import won.bot.framework.eventbot.action.impl.listener.UnsubscribeListenerAction;
 import won.bot.framework.eventbot.action.impl.monitor.MatchingLoadTestMonitorAction;
 import won.bot.framework.eventbot.bus.EventBus;
@@ -54,10 +58,12 @@ public class AtomCreatorBot extends EventBot {
         final Counter creationUnfinishedCounter = new TargetCounterDecorator(ctx, new CounterImpl("creationUnfinished"),
                         0);
         // create atoms every trigger execution until the atom producer is exhausted
-        this.groupMemberCreator = new ActionOnEventListener(ctx, "groupMemberCreator", new MultipleActions(ctx,
-                        new IncrementCounterAction(ctx, atomCreationStartedCounter),
-                        new IncrementCounterAction(ctx, creationUnfinishedCounter),
-                        new CreateAtomWithSocketsAction(ctx, getBotContextWrapper().getAtomCreateListName())), -1);
+        this.groupMemberCreator = new ActionOnEventListener(ctx, "groupMemberCreator",
+                        new MultipleActions(ctx, new IncrementCounterAction(ctx, atomCreationStartedCounter),
+                                        new IncrementCounterAction(ctx, creationUnfinishedCounter),
+                                        new CreateAtomWithSocketsAction(ctx,
+                                                        getBotContextWrapper().getAtomCreateListName())),
+                        -1);
         bus.subscribe(ActEvent.class, this.groupMemberCreator);
         bus.subscribe(AtomCreatedEvent.class, new ActionOnEventListener(ctx, "logger", new BaseEventBotAction(ctx) {
             int lastOutput = 0;
@@ -69,7 +75,8 @@ public class AtomCreatorBot extends EventBot {
                 int successCnt = atomCreationSuccessfulCounter.getCount();
                 int failedCnt = atomCreationFailedCounter.getCount();
                 if (cnt - lastOutput >= 1) {
-                    logger.info("started creation of {} atoms, creation not yet finished for {}. Successful: {}, failed: {}",
+                    logger.info(
+                                    "started creation of {} atoms, creation not yet finished for {}. Successful: {}, failed: {}",
                                     new Object[] { cnt, unfinishedCount, successCnt, failedCnt });
                     lastOutput = cnt;
                 }

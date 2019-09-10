@@ -16,7 +16,7 @@ import java.lang.invoke.MethodHandles;
  */
 public class HokifyHelpAction extends BaseEventBotAction {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    private WonHokifyJobBotHandler wonHokifyJobBotHandler;
+    private WonHokifyJobBotHandler wonHokifyJobBotHandler; // TODO: unused variable/parameter
 
     public HokifyHelpAction(EventListenerContext eventListenerContext, WonHokifyJobBotHandler wonHokifyJobBotHandler) {
         super(eventListenerContext);

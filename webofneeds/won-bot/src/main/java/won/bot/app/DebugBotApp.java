@@ -11,16 +11,18 @@
 package won.bot.app;
 
 import org.springframework.boot.SpringApplication;
-import org.springframework.context.ConfigurableApplicationContext;
+// import org.springframework.context.ConfigurableApplicationContext;
 
 /**
- * App for EchoBot
+ * App for DebugBot. The debug bot can be used to simulate other users and to
+ * create connections and atoms.
  */
 public class DebugBotApp {
     public static void main(String[] args) throws Exception {
         SpringApplication app = new SpringApplication(new Object[] { "classpath:/spring/app/debugBotApp.xml" });
         app.setWebEnvironment(false);
-        ConfigurableApplicationContext applicationContext = app.run(args);
+        app.run(args);
+        // ConfigurableApplicationContext applicationContext = app.run(args);
         // Thread.sleep(5*60*1000);
         // app.exit(applicationContext);
     }

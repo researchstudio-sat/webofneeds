@@ -50,7 +50,6 @@ public class ReplaceDebugAtomContentAction extends BaseEventBotAction {
         }
         ReplaceDebugAtomContentCommandEvent replaceDebugCommandEvent = (ReplaceDebugAtomContentCommandEvent) event;
         URI myAtomUri = replaceDebugCommandEvent.getCon().getAtomURI();
-        String replyText = "";
         Dataset atomDataset = getEventListenerContext().getLinkedDataSource().getDataForResource(myAtomUri);
         String titleString = null;
         if (atomDataset == null) {

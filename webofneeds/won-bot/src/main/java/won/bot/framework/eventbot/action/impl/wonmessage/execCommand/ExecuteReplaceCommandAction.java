@@ -65,8 +65,9 @@ public class ExecuteReplaceCommandAction extends BaseEventBotAction {
         URI atomURI = URI.create(atomResource.getURI().toString());
         RdfUtils.replaceBaseURI(atomDataset, atomResource.getURI(), true);
         RdfUtils.replaceBaseResource(atomDataset, atomResource, true);
-        AtomModelWrapper atomModelWrapper = new AtomModelWrapper(atomDataset);
-        URI wonNodeURI = getEventListenerContext().getWonNodeInformationService().getWonNodeUri(atomURI);
+        // AtomModelWrapper atomModelWrapper = new AtomModelWrapper(atomDataset);
+        // URI wonNodeURI =
+        // getEventListenerContext().getWonNodeInformationService().getWonNodeUri(atomURI);
         final URI wonNodeUri = getEventListenerContext().getWonNodeInformationService().getWonNodeUri(atomURI);
         logger.debug("replacing atom content on won node {} with content {} ", wonNodeUri,
                         StringUtils.abbreviate(RdfUtils.toString(atomDataset), 150));

@@ -14,7 +14,11 @@ import won.bot.framework.eventbot.action.impl.factory.model.Precondition;
 import won.bot.framework.eventbot.action.impl.factory.model.Proposal;
 import won.bot.framework.eventbot.action.impl.factory.model.ProposalState;
 import won.bot.framework.eventbot.bus.EventBus;
-import won.bot.framework.eventbot.event.*;
+import won.bot.framework.eventbot.event.AtomSpecificEvent;
+import won.bot.framework.eventbot.event.ConnectionSpecificEvent;
+import won.bot.framework.eventbot.event.Event;
+import won.bot.framework.eventbot.event.MessageEvent;
+import won.bot.framework.eventbot.event.TargetAtomSpecificEvent;
 import won.bot.framework.eventbot.event.impl.analyzation.agreement.AgreementCancellationAcceptedEvent;
 import won.bot.framework.eventbot.event.impl.analyzation.agreement.ProposalAcceptedEvent;
 import won.bot.framework.eventbot.event.impl.analyzation.precondition.PreconditionMetEvent;
@@ -95,7 +99,8 @@ public class AnalyzeBehaviour extends BotBehaviour {
 
         @Override
         protected void doRun(Event event, EventListener executingListener) throws Exception {
-            logger.trace("################################## ANALYZING MESSAGE #########################################");
+            logger.trace(
+                            "################################## ANALYZING MESSAGE #########################################");
             EventListenerContext ctx = getEventListenerContext();
             EventBus bus = ctx.getEventBus();
             LinkedDataSource linkedDataSource = ctx.getLinkedDataSource();
@@ -111,9 +116,11 @@ public class AnalyzeBehaviour extends BotBehaviour {
                 wonMessage = ((MessageEvent) event).getWonMessage();
                 receivedMessage = true;
             } else {
-                logger.error("AnalyzeAction can only handle WonMessageReceivedOnConnectionEvent or ConnectionMessageCommandSuccessEvent, was an event of class: "
-                                + event.getClass());
-                logger.trace("################################## ANALYZING COMPLETE #########################################");
+                logger.error(
+                                "AnalyzeAction can only handle WonMessageReceivedOnConnectionEvent or ConnectionMessageCommandSuccessEvent, was an event of class: "
+                                                + event.getClass());
+                logger.trace(
+                                "################################## ANALYZING COMPLETE #########################################");
                 return;
             }
             URI atomUri = ((AtomSpecificEvent) eventToAnalyze).getAtomURI();
@@ -130,9 +137,11 @@ public class AnalyzeBehaviour extends BotBehaviour {
             logger.trace("WonMessage Dataset: ");
             logger.trace(getWonMessageString(wonMessage, Lang.TRIG));
             if (connectionUri == null || WonRdfUtils.MessageUtils.isProcessingMessage(wonMessage)) {
-                logger.debug("AnalyzeAction will not execute on processing messages or messages without a connectionUri (e.g. connect messages)");
+                logger.debug(
+                                "AnalyzeAction will not execute on processing messages or messages without a connectionUri (e.g. connect messages)");
                 logger.trace("--------------------------");
-                logger.trace("################################## ANALYZING COMPLETE #########################################");
+                logger.trace(
+                                "################################## ANALYZING COMPLETE #########################################");
                 return;
             }
             Dataset atomDataset = linkedDataSource.getDataForResource(atomUri);
@@ -217,8 +226,9 @@ public class AnalyzeBehaviour extends BotBehaviour {
                         break;
                     case REJECTS:
                         logger.trace("\tMessageEffect 'Rejects':");
-                        logger.trace("\t\tremove Proposal References for: "
-                                        + messageEffect.asRejects().getRejectedMessageUri());
+                        logger.trace(
+                                        "\t\tremove Proposal References for: "
+                                                        + messageEffect.asRejects().getRejectedMessageUri());
                         AnalyzeBehaviour.this
                                         .removeProposalReferences(messageEffect.asRejects().getRejectedMessageUri());
                         break;
@@ -282,7 +292,8 @@ public class AnalyzeBehaviour extends BotBehaviour {
                     }
                 }
             }
-            logger.trace("################################## ANALYZING COMPLETE #########################################");
+            logger.trace(
+                            "################################## ANALYZING COMPLETE #########################################");
         }
 
         // ********* Helper Methods **********
@@ -297,7 +308,8 @@ public class AnalyzeBehaviour extends BotBehaviour {
 
         private GoalInstantiationProducer getGoalInstantiationProducerLazyInit(
                         GoalInstantiationProducer goalInstantiationProducer, Dataset atomDataset,
-                        Dataset targetAtomDataset, Dataset conversationDataset) {
+                        Dataset targetAtomDataset,
+                        Dataset conversationDataset) {
             if (goalInstantiationProducer == null) {
                 return new GoalInstantiationProducer(atomDataset, targetAtomDataset, conversationDataset,
                                 "http://example.org/", "http://example.org/blended/");

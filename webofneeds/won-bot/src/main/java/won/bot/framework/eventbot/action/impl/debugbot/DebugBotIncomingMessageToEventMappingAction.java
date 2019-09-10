@@ -176,8 +176,10 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
                                     .textMessage("Ok, I'll create a new atom and send a " + hintType + " to you.");
                     bus.publish(new ConnectionMessageCommandEvent(con, messageModel));
                     bus.publish(new HintDebugCommandEvent(con,
-                                    socketHint ? incompatible ? HintType.INCOMPATIBLE_SOCKET_HINT
-                                                    : random ? HintType.RANDOM_SOCKET_HINT : HintType.SOCKET_HINT
+                                    socketHint
+                                                    ? incompatible ? HintType.INCOMPATIBLE_SOCKET_HINT
+                                                                    : random ? HintType.RANDOM_SOCKET_HINT
+                                                                                    : HintType.SOCKET_HINT
                                                     : HintType.ATOM_HINT));
                 } else if (PATTERN_CONNECT.matcher(message).matches()) {
                     Model messageModel = WonRdfUtils.MessageUtils
@@ -325,8 +327,9 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
                         ctx.getLinkedDataSource());
         crawlStopWatch.stop();
         Duration crawlDuration = Duration.ofMillis(crawlStopWatch.getLastTaskTimeMillis());
-        messageModel = WonRdfUtils.MessageUtils.textMessage(
-                        "Finished crawl in " + getDurationString(crawlDuration) + " seconds. The dataset has "
+        messageModel = WonRdfUtils.MessageUtils
+                        .textMessage("Finished crawl in " + getDurationString(crawlDuration)
+                                        + " seconds. The dataset has "
                                         + state.getConversationDataset().asDatasetGraph().size() + " rdf graphs.");
         getEventListenerContext().getEventBus().publish(new ConnectionMessageCommandEvent(con, messageModel));
         messageModel = makeReferringMessage(state, messageFinder, messageReferrer, textMessageMaker);
@@ -458,10 +461,11 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
                             if (uris == null || uris.length == 0 || uris[0] == null) {
                                 return "Sorry, I cannot propose the messages - I did not find any.";
                             }
-                            Optional<String> proposedString = state.getTextMessage(uris[0]);
+                            // Optional<String> proposedString = state.getTextMessage(uris[0]);
                             return "Ok, I am hereby making the proposal, containing " + uris.length + " clauses."
                                             + "\n The query for finding the clauses took "
-                                            + getDurationString(queryDuration) + " seconds.";
+                                            + getDurationString(queryDuration)
+                                            + " seconds.";
                         });
     }
 

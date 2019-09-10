@@ -12,8 +12,8 @@ package won.bot.framework.eventbot.event.impl.wonmessage;
 
 import java.net.URI;
 
-import won.bot.framework.eventbot.event.ConnectionSpecificEvent;
 import won.bot.framework.eventbot.event.AtomSpecificEvent;
+import won.bot.framework.eventbot.event.ConnectionSpecificEvent;
 import won.bot.framework.eventbot.event.TargetAtomSpecificEvent;
 import won.protocol.message.WonMessage;
 

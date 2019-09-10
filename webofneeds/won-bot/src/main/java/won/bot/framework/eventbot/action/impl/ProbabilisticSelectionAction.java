@@ -36,7 +36,7 @@ public class ProbabilisticSelectionAction extends BaseEventBotAction {
         this.delegateA = delegateA;
         this.delegateB = delegateB;
         this.salt = 0;
-        this.random = new Random(System.currentTimeMillis() + salt);
+        this.random = new Random(System.currentTimeMillis() + this.salt);
         assert probabilityA >= 0 && probabilityA <= 1 : "probability must be in [0,1]";
         assert delegateA != null : "delegateA must not be null";
         assert delegateB != null : "delegateB must not be null";
