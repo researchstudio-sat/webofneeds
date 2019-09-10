@@ -178,13 +178,9 @@ public class RestAtomController {
             try {
                 Dataset atomDataset = WonLinkedDataUtils.getDataForResource(atomUri, linkedDataSource);
                 AtomPojo atom = new AtomPojo(atomDataset);
-                if (((nearLocation == null)
+                if (nearLocation == null
                                 || isNearLocation(nearLocation, atom.getLocation(), maxDistance)
-                                || isNearLocation(nearLocation, atom.getJobLocation(), maxDistance))
-                                && ((filterBySocketTypeUri == null)
-                                                || atom.getSocketTypeUriMap().containsValue(filterBySocketTypeUri))
-                                && ((filterByAtomTypeUri == null)
-                                                || atom.getTypes().contains(filterByAtomTypeUri))) {
+                                || isNearLocation(nearLocation, atom.getJobLocation(), maxDistance)) {
                     atomMap.put(atom.getUri(), atom);
                     if (limit != null && limit > 0 && atomMap.size() >= limit)
                         break; // break fetching if the limit has been reached
