@@ -21,8 +21,8 @@ export const labels = deepFreeze({
   },
   flags: {
     ["match:NoHintForCounterpart"]: "Invisible",
-    ["match:NoHintForMeCompacted"]: "Silent",
-    ["match:UsedForTestingCompacted"]: "Used For Testing",
+    ["match:NoHintForMe"]: "Silent",
+    ["match:UsedForTesting"]: "Used For Testing",
   },
   sockets: {
     ["group:GroupSocket"]: "Group Chat enabled",

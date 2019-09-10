@@ -10,25 +10,9 @@
  */
 package won.protocol.util.linkeddata;
 
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.SimpleSelector;
-import org.apache.jena.rdf.model.Statement;
-import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.rdf.model.*;
 import org.apache.jena.shared.PrefixMapping;
 import org.apache.jena.shared.impl.PrefixMappingImpl;
 import org.apache.jena.sparql.path.Path;
@@ -36,7 +20,6 @@ import org.apache.jena.sparql.path.PathParser;
 import org.apache.jena.vocabulary.RDFS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import won.protocol.model.AtomState;
 import won.protocol.model.SocketDefinition;
 import won.protocol.model.SocketDefinitionImpl;
@@ -46,6 +29,12 @@ import won.protocol.util.RdfUtils.Pair;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WON;
 import won.protocol.vocabulary.WONMSG;
+
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.time.ZonedDateTime;
+import java.util.*;
 
 /**
  * Utilitiy functions for common linked data lookups.
@@ -100,28 +89,35 @@ public class WonLinkedDataUtils {
     }
 
     public static List<URI> getNodeAtomUris(URI nodeURI, LinkedDataSource linkedDataSource) {
-        return getNodeAtomUris(nodeURI, null, null, null, linkedDataSource);
+        return getNodeAtomUris(nodeURI, null, null, null, null, null, linkedDataSource);
     }
 
     public static List<URI> getNodeAtomUris(URI nodeURI, ZonedDateTime modifiedAfter, ZonedDateTime createdAfter,
-                    AtomState atomState, LinkedDataSource linkedDataSource) {
+                    AtomState atomState, URI filterBySocketTypeUri, URI filterByAtomTypeUri,
+                    LinkedDataSource linkedDataSource) {
         Dataset nodeDataset = getDataForResource(nodeURI, linkedDataSource);
         WonNodeInfo wonNodeInfo = WonRdfUtils.WonNodeUtils.getWonNodeInfo(nodeURI, nodeDataset);
         URI atomListUri = URI.create(wonNodeInfo.getAtomListURI());
         String newQuery = atomListUri.getQuery();
         if (atomState != null) {
-            String queryPart = "state=" + modifiedAfter;
-            newQuery = (newQuery == null) ? queryPart : ("&" + queryPart);
+            String queryPart = "state=" + atomState;
+            newQuery = (newQuery == null) ? queryPart : (newQuery + "&" + queryPart);
         }
         if (modifiedAfter != null) {
             String queryPart = "modifiedafter=" + modifiedAfter;
-            newQuery = (newQuery == null) ? queryPart : ("&" + queryPart);
+            newQuery = (newQuery == null) ? queryPart : (newQuery + "&" + queryPart);
         }
         if (createdAfter != null) {
-            // TODO: rename this parameter once we handle that parameter in the node (use
-            // modifiedafter for now)
-            String queryPart = "modifiedafter=" + createdAfter;
-            newQuery = (newQuery == null) ? queryPart : ("&" + queryPart);
+            String queryPart = "createdafter=" + createdAfter;
+            newQuery = (newQuery == null) ? queryPart : (newQuery + "&" + queryPart);
+        }
+        if (filterByAtomTypeUri != null) {
+            String queryPart = "filterByAtomTypeUri=" + filterByAtomTypeUri;
+            newQuery = (newQuery == null) ? queryPart : (newQuery + "&" + queryPart);
+        }
+        if (filterBySocketTypeUri != null) {
+            String queryPart = "filterBySocketTypeUri=" + filterBySocketTypeUri;
+            newQuery = (newQuery == null) ? queryPart : (newQuery + "&" + queryPart);
         }
         try {
             atomListUri = new URI(atomListUri.getScheme(), atomListUri.getAuthority(), atomListUri.getPath(), newQuery,

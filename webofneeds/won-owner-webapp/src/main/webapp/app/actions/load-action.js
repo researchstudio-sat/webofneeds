@@ -3,7 +3,7 @@
  */
 
 import Immutable from "immutable";
-import { actionTypes, actionCreators } from "./actions.js";
+import { actionCreators, actionTypes } from "./actions.js";
 
 import { checkAccessToCurrentRoute } from "../configRouting.js";
 
@@ -34,14 +34,21 @@ function loadingWhileSignedIn(dispatch, getState) {
   return stateStore.fetchOwnedData(dispatch, getState);
 }
 
-export const fetchWhatsNew = modifiedAfterDate => (dispatch, getState) => {
+export const fetchWhatsNew = createdAfterDate => (dispatch, getState) => {
   dispatch({
     type: actionTypes.atoms.fetchWhatsNew,
   });
-  return stateStore.fetchWhatsNew(dispatch, getState, modifiedAfterDate);
+  return stateStore.fetchWhatsNew(dispatch, getState, createdAfterDate);
 };
 
-export const fetchWhatsAround = (modifiedAfterDate, location, maxDistance) => (
+export const fetchPersonas = () => (dispatch, getState) => {
+  dispatch({
+    type: actionTypes.atoms.fetchMetaAtoms,
+  });
+  return stateStore.fetchPersonas(dispatch, getState);
+};
+
+export const fetchWhatsAround = (createdAfterDate, location, maxDistance) => (
   dispatch,
   getState
 ) => {
@@ -51,7 +58,7 @@ export const fetchWhatsAround = (modifiedAfterDate, location, maxDistance) => (
   return stateStore.fetchWhatsAround(
     dispatch,
     getState,
-    modifiedAfterDate,
+    createdAfterDate,
     location,
     maxDistance
   );

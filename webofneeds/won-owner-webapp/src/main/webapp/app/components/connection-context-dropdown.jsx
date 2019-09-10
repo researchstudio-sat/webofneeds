@@ -88,7 +88,7 @@ class WonConnectionContextDropdown extends React.Component {
     this.state = {
       contextMenuOpen: false,
     };
-    //TODO: REACT ON CLICK OUTSIDE OF COMPONENT AND CLOSE THE DIALOG (maybe with hooks)
+    this.handleClick = this.handleClick.bind(this);
   }
 
   render() {
@@ -221,7 +221,8 @@ class WonConnectionContextDropdown extends React.Component {
 
     return (
       <won-connection-context-dropdown
-        class={this.props.className ? this.props.className : undefined}
+        ref={node => (this.node = node)}
+        class={this.props.className ? this.props.className : ""}
       >
         {iconElement}
         {dropdownElement}
@@ -279,6 +280,21 @@ class WonConnectionContextDropdown extends React.Component {
     this.props.routerGo("post", {
       postUri: postUri,
     });
+  }
+
+  componentWillMount() {
+    document.addEventListener("mousedown", this.handleClick, false);
+  }
+  componentWillUnmount() {
+    document.removeEventListener("mousedown", this.handleClick, false);
+  }
+
+  handleClick(e) {
+    if (!this.node.contains(e.target) && this.state.contextMenuOpen) {
+      this.setState({ contextMenuOpen: false });
+
+      return;
+    }
   }
 }
 WonConnectionContextDropdown.propTypes = {

@@ -24,24 +24,6 @@ class WonAtomCardGrid extends React.Component {
     const showCreate = this.props.showCreate;
     const currentLocation = this.props.currentLocation;
 
-    console.debug(
-      "Render WonAtomCard-Grid for: \n",
-      "atomUris: ",
-      atomUris,
-      "\n",
-      "showPersona: ",
-      showPersona,
-      "\n",
-      "showSuggestions: ",
-      showSuggestions,
-      "\n",
-      "showCreate: ",
-      showCreate,
-      "\n",
-      "currentLocation: ",
-      currentLocation
-    );
-
     let atomCards = undefined;
 
     if (atomUris && atomUris.length > 0) {

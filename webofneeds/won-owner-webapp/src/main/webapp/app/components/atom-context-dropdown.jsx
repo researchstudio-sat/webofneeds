@@ -75,7 +75,7 @@ class WonAtomContextDropdown extends React.Component {
     this.state = {
       contextMenuOpen: false,
     };
-    //TODO: REACT ON CLICK OUTSIDE OF COMPONENT AND CLOSE THE DIALOG (maybe with hooks)
+    this.handleClick = this.handleClick.bind(this);
   }
 
   render() {
@@ -206,7 +206,8 @@ class WonAtomContextDropdown extends React.Component {
 
     return (
       <won-atom-context-dropdown
-        class={this.props.className ? this.props.className : undefined}
+        class={this.props.className ? this.props.className : ""}
+        ref={node => (this.node = node)}
       >
         {iconElement}
         {dropdownElement}
@@ -295,6 +296,21 @@ class WonAtomContextDropdown extends React.Component {
         ],
       };
       this.props.showModalDialog(payload);
+    }
+  }
+
+  componentWillMount() {
+    document.addEventListener("mousedown", this.handleClick, false);
+  }
+  componentWillUnmount() {
+    document.removeEventListener("mousedown", this.handleClick, false);
+  }
+
+  handleClick(e) {
+    if (!this.node.contains(e.target) && this.state.contextMenuOpen) {
+      this.setState({ contextMenuOpen: false });
+
+      return;
     }
   }
 }

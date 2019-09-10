@@ -43,7 +43,10 @@ class WonConnectionMessageStatus extends React.Component {
       let icons;
       if (isFailedToSend) {
         icons = (
-          <svg className="msgstatus__icons__icon" style="--local-primary: red;">
+          <svg
+            className="msgstatus__icons__icon"
+            style={{ "--local-primary": "red" }}
+          >
             <use
               xlinkHref="#ico16_indicator_warning"
               href="#ico16_indicator_warning"

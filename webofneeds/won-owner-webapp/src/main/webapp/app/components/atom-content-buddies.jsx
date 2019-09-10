@@ -68,6 +68,9 @@ const mapDispatchToProps = dispatch => {
         })
       );
     },
+    fetchPersonas: () => {
+      dispatch(actionCreators.atoms__fetchPersonas());
+    },
     hideModalDialog: () => {
       dispatch(actionCreators.view__hideModalDialog());
     },
@@ -113,6 +116,11 @@ class WonAtomContentBuddies extends React.Component {
 
   toggleSuggestions() {
     this.setState({ suggestAtomExpanded: !this.state.suggestAtomExpanded });
+  }
+
+  componentDidMount() {
+    //TODO: FETCH OTHER PERSONAS AND LIMIT TO ONE FETCH I FEEL THATS IMPORTANT
+    this.props.fetchPersonas();
   }
 
   render() {
@@ -374,6 +382,7 @@ WonAtomContentBuddies.propTypes = {
   buddiesArray: PropTypes.arrayOf(PropTypes.string),
   currentLocation: PropTypes.object,
   connectionMarkAsRead: PropTypes.func,
+  fetchPersonas: PropTypes.func,
   hideModalDialog: PropTypes.func,
   showModalDialog: PropTypes.func,
   connectionClose: PropTypes.func,

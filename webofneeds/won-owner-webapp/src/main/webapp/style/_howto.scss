@@ -175,6 +175,10 @@ won-how-to {
       @media (min-width: $responsivenessBreakPoint) {
         white-space: nowrap;
       }
+
+      > .won-button-icon {
+        --local-primary: white;
+      }
     }
 
     &__button {

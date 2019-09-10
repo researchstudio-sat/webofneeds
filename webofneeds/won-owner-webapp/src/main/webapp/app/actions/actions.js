@@ -39,12 +39,12 @@
 import { atomCreate, atomEdit } from "./create-atom-action.js";
 
 import {
-  atomsConnect,
-  fetchUnloadedAtom,
   atomsClose,
+  atomsClosedBySystem,
+  atomsConnect,
   atomsDelete,
   atomsOpen,
-  atomsClosedBySystem,
+  fetchUnloadedAtom,
 } from "./atoms-actions.js";
 
 import {
@@ -55,23 +55,18 @@ import {
   stateGoKeepParams,
   stateGoResetParams,
 } from "./cstm-router-actions.js";
-
-// </utils>
-
-// <action-creators>
-
 import {
+  accountAcceptDisclaimer,
+  accountAcceptTermsOfService,
+  accountChangePassword,
   accountLogin,
   accountLogout,
   accountRegister,
-  accountTransfer,
-  accountAcceptDisclaimer,
-  accountAcceptTermsOfService,
-  accountVerifyEmailAddress,
   accountResendVerificationEmail,
   accountSendAnonymousLinkEmail,
+  accountTransfer,
+  accountVerifyEmailAddress,
   reconnect,
-  accountChangePassword,
 } from "./account-actions.js";
 
 import * as cnct from "./connections-actions.js";
@@ -79,19 +74,24 @@ import * as messages from "./messages-actions.js";
 import * as configActions from "./config-actions.js";
 
 import {
-  pageLoadAction,
-  fetchWhatsNew,
+  fetchPersonas,
   fetchWhatsAround,
+  fetchWhatsNew,
+  pageLoadAction,
 } from "./load-action.js";
 import { stateGo, stateReload } from "redux-ui-router";
 import {
-  createPersona,
-  reviewPersona,
   connectPersona,
+  createPersona,
   disconnectPersona,
+  reviewPersona,
 } from "./persona-actions.js";
 import { deepFreeze } from "../utils.js";
 import won from "../won-es6";
+
+// </utils>
+
+// <action-creators>
 
 // </action-creators>
 
@@ -152,8 +152,11 @@ const actionHierarchy = {
     connect: atomsConnect,
     fetchUnloadedAtom: fetchUnloadedAtom,
 
+    fetchMetaAtoms: INJ_DEFAULT,
     fetchWhatsNew: fetchWhatsNew,
+    fetchPersonas: fetchPersonas,
     fetchWhatsAround: fetchWhatsAround,
+    storeMetaAtoms: INJ_DEFAULT,
     storeWhatsNew: INJ_DEFAULT,
     storeWhatsAround: INJ_DEFAULT,
 
@@ -171,6 +174,8 @@ const actionHierarchy = {
     review: reviewPersona,
     connect: connectPersona,
     disconnect: disconnectPersona,
+
+    fetchPersonas: fetchPersonas,
 
     store: INJ_DEFAULT,
     storeUriInLoading: INJ_DEFAULT,

@@ -379,7 +379,7 @@ class GroupAtomMessages extends React.Component {
       <won-group-atom-messages
         class={
           (this.props.className || "") +
-          (this.props.connectionOrAtomsLoading && " won-is-loading ")
+          (this.props.connectionOrAtomsLoading ? " won-is-loading " : "")
         }
       >
         {headerElement}

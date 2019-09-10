@@ -10,18 +10,6 @@
  */
 package won.owner.web.rest;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.text.ParseException;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.jena.query.Dataset;
 import org.slf4j.Logger;
@@ -35,12 +23,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-
+import org.springframework.web.bind.annotation.*;
 import won.owner.model.Draft;
 import won.owner.model.User;
 import won.owner.model.UserAtom;
@@ -56,11 +39,18 @@ import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
 
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+
 @Controller
 @RequestMapping("/rest/atoms")
 public class RestAtomController {
     private static final int DEFAULT_MAX_DISTANCE = 5000;
-    final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     @Autowired
     private DraftRepository draftRepository;
     @Autowired
@@ -107,13 +97,13 @@ public class RestAtomController {
     /**
      * Gets the current user. If no user is authenticated, an Exception is thrown
      * 
-     * @return
+     * @return the current user
      */
-    public User getCurrentUser() {
+    private User getCurrentUser() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         if (username == null)
             throw new AccessDeniedException("client is not authenticated");
-        return (User) userRepository.findByUsername(username);
+        return userRepository.findByUsername(username);
     }
 
     @ResponseBody
@@ -123,9 +113,7 @@ public class RestAtomController {
         User user = getCurrentUser();
         List<CreateDraftPojo> createDraftPojos = new ArrayList<>();
         Set<URI> draftURIs = user.getDraftURIs();
-        Iterator<URI> draftURIIterator = draftURIs.iterator();
-        while (draftURIIterator.hasNext()) {
-            URI draftURI = draftURIIterator.next();
+        for (URI draftURI : draftURIs) {
             Draft draft = draftRepository.findByDraftURI(draftURI).get(0);
             CreateDraftPojo createDraftPojo = new CreateDraftPojo(draftURI.toString(), draft.getContent());
             createDraftPojos.add(createDraftPojo);
@@ -142,6 +130,14 @@ public class RestAtomController {
      * this timestamp (ISO 8601 format (UTC): yyyy-MM-dd'T'HH:mm:ss.SSS'Z')
      * @param createdAfterIsoString only return atoms that have been created after
      * this timestamp (ISO 8601 format (UTC): yyyy-MM-dd'T'HH:mm:ss.SSS'Z')
+     * @param longitude geo-location
+     * @param latitude geo-location
+     * @param maxDistance max distance in meters that the location of an atom is
+     * away from the given lat/lng coordinates
+     * @param filterBySocketTypeUriString filter the results to only contain Atoms
+     * with the given socketTypeUri
+     * @param filterByAtomTypeUriString filter the results to only contain Atoms
+     * with the given atomTypeUri
      * @param limit limit results to this size (if null, 0, or negative value do not
      * limit at all)
      * @return Map of AtomPojos -> atoms with certain metadata @see
@@ -155,9 +151,9 @@ public class RestAtomController {
                     @RequestParam(value = "latitude", required = false) Float latitude,
                     @RequestParam(value = "longitude", required = false) Float longitude,
                     @RequestParam(value = "maxDistance", required = false) Integer maxDistance,
-                    @RequestParam(value = "limit", required = false) int limit) {
-        // the #atomList and fetch these as well
-        // TODO: fetch with modifiedafter parameter and not only the uri
+                    @RequestParam(value = "filterBySocketTypeUri", required = false) String filterBySocketTypeUriString,
+                    @RequestParam(value = "filterByAtomTypeUri", required = false) String filterByAtomTypeUriString,
+                    @RequestParam(value = "limit", required = false) Integer limit) {
         ZonedDateTime modifiedAfter = StringUtils.isNotBlank(modifiedAfterIsoString)
                         ? ZonedDateTime.parse(modifiedAfterIsoString, DateTimeFormatter.ISO_DATE_TIME)
                         : null;
@@ -166,21 +162,27 @@ public class RestAtomController {
                         : null;
         Coordinate nearLocation = (latitude != null && longitude != null) ? new Coordinate(latitude, longitude) : null;
         URI nodeURI = wonNodeInformationService.getDefaultWonNodeURI();
+        URI filterBySocketTypeUri = null;
+        if (filterBySocketTypeUriString != null) {
+            filterBySocketTypeUri = URI.create(filterBySocketTypeUriString);
+        }
+        URI filterByAtomTypeUri = null;
+        if (filterByAtomTypeUriString != null) {
+            filterByAtomTypeUri = URI.create(filterByAtomTypeUriString);
+        }
         List<URI> atomUris = WonLinkedDataUtils.getNodeAtomUris(nodeURI, modifiedAfter, createdAfter, state,
+                        filterBySocketTypeUri, filterByAtomTypeUri,
                         linkedDataSource);
         Map<URI, AtomPojo> atomMap = new HashMap<>();
         for (URI atomUri : atomUris) {
             try {
                 Dataset atomDataset = WonLinkedDataUtils.getDataForResource(atomUri, linkedDataSource);
                 AtomPojo atom = new AtomPojo(atomDataset);
-                if (state == null || atom.getState().equals(state)
-                                && ((modifiedAfter == null) || modifiedAfter.isBefore(atom.getModifiedZonedDateTime()))
-                                && ((createdAfter == null) || createdAfter.isBefore(atom.getCreationZonedDateTime()))
-                                && ((nearLocation == null)
-                                                || isNearLocation(nearLocation, atom.getLocation(), maxDistance)
-                                                || isNearLocation(nearLocation, atom.getJobLocation(), maxDistance))) {
+                if (nearLocation == null
+                                || isNearLocation(nearLocation, atom.getLocation(), maxDistance)
+                                || isNearLocation(nearLocation, atom.getJobLocation(), maxDistance)) {
                     atomMap.put(atom.getUri(), atom);
-                    if (limit > 0 && atomMap.size() >= limit)
+                    if (limit != null && limit > 0 && atomMap.size() >= limit)
                         break; // break fetching if the limit has been reached
                 }
             } catch (LinkedDataFetchingException e) {
@@ -195,10 +197,11 @@ public class RestAtomController {
      * if the distance is below or equal to the maxDistance parameter, if the
      * parameter is null we use 5000meters as the maxDistance
      * 
-     * @param nearLocation
-     * @param atomLocation
-     * @param maxDistance
-     * @return
+     * @param nearLocation lat/lng Coordinates of any given location
+     * @param atomLocation lat/lng Coordinates of an atom
+     * @param maxDistance distance in meters
+     * @return true if atomLocation is within the radius of nearLocation and the
+     * maxDistance
      */
     private boolean isNearLocation(Coordinate nearLocation, Coordinate atomLocation, Integer maxDistance) {
         if (atomLocation != null) {
@@ -228,13 +231,12 @@ public class RestAtomController {
     @RequestMapping(value = "/drafts", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
     // TODO: move transactionality annotation into the service layer
     @Transactional(propagation = Propagation.SUPPORTS)
-    public CreateDraftPojo createDraft(@RequestBody CreateDraftPojo createDraftObject) throws ParseException {
+    public CreateDraftPojo createDraft(@RequestBody CreateDraftPojo createDraftObject) {
         User user = getCurrentUser();
         URI draftURI = URI.create(createDraftObject.getDraftURI());
         user.getDraftURIs().add(draftURI);
         wonUserDetailService.save(user);
-        Draft draft = null;
-        draft = draftRepository.findOneByDraftURI(draftURI);
+        Draft draft = draftRepository.findOneByDraftURI(draftURI);
         if (draft == null) {
             draft = new Draft(draftURI, createDraftObject.getDraft());
         }
@@ -266,10 +268,9 @@ public class RestAtomController {
     @RequestMapping(value = "/drafts/draft", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
     public CreateDraftPojo getDraft(@RequestParam("uri") String uri) {
         logger.debug("getting draft: " + uri);
-        URI draftURI = null;
         CreateDraftPojo draftPojo = null;
         try {
-            draftURI = new URI(uri);
+            URI draftURI = new URI(uri);
             Draft draft = draftRepository.findOneByDraftURI(draftURI);
             if (draft == null) {
                 logger.warn("draft requested for delete was not found: " + uri);
@@ -286,11 +287,10 @@ public class RestAtomController {
     @RequestMapping(value = "/drafts/draft", method = RequestMethod.DELETE)
     public ResponseEntity<String> deleteDraft(@RequestParam("uri") String uri) {
         logger.debug("deleting draft: " + uri);
-        URI draftURI = null;
-        CreateDraftPojo draftPojo = null;
+        // CreateDraftPojo draftPojo = null;
         User user = getCurrentUser();
         try {
-            draftURI = new URI(uri);
+            URI draftURI = new URI(uri);
             user.getDraftURIs().remove(draftURI);
             wonUserDetailService.save(user);
             Draft draft = draftRepository.findOneByDraftURI(draftURI);

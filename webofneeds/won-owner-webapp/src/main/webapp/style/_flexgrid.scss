@@ -29,6 +29,7 @@ won-flex-grid {
       width: 7rem;
       margin: 0 auto;
       display: block;
+      --local-primary: #{$won-primary-color};
     }
 
     .fgi__text {
@@ -42,6 +43,7 @@ won-flex-grid {
       margin: 0 auto;
       width: 1rem;
       height: 4rem;
+      --local-primary: #{$won-primary-color};
     }
 
     .fgi__additionaltext {

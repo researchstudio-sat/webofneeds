@@ -1,19 +1,17 @@
 package won.protocol.repository;
 
-import java.net.URI;
-import java.util.Date;
-import java.util.List;
-
-import javax.persistence.LockModeType;
-
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-
 import won.protocol.model.Atom;
 import won.protocol.model.AtomState;
+
+import javax.persistence.LockModeType;
+import java.net.URI;
+import java.util.Date;
+import java.util.List;
 
 /**
  * User: Gabriel Date: 02.11.12 Time: 15:28
@@ -21,13 +19,10 @@ import won.protocol.model.AtomState;
 public interface AtomRepository extends WonRepository<Atom> {
     List<Atom> findByAtomURI(URI URI);
 
-    @Query("select atomURI from Atom")
-    List<URI> getAllAtomURIs();
+    @Query("select atomURI from Atom atom where :atomState is null or atom.state = :atomState")
+    List<URI> getAllAtomURIs(@Param("atomState") AtomState atomState);
 
-    @Query("select atomURI from Atom atom")
-    Slice<URI> getAllAtomURIs(Pageable pageable);
-
-    @Query("select atomURI from Atom atom where atom.state = :atomState")
+    @Query("select atomURI from Atom atom where :atomState is null or atom.state = :atomState")
     Slice<URI> getAllAtomURIs(@Param("atomState") AtomState atomState, Pageable pageable);
 
     Atom findOneByAtomURI(URI atomURI);
@@ -48,8 +43,13 @@ public interface AtomRepository extends WonRepository<Atom> {
     Slice<URI> getAtomURIsAfter(@Param("referenceDate") Date referenceDate, @Param("atomState") AtomState atomState,
                     Pageable pageable);
 
-    @Query("select atomURI from Atom atom where atom.lastUpdate > :modifiedDate")
-    List<URI> findModifiedAtomURIsAfter(@Param("modifiedDate") Date modifiedDate);
+    @Query("select atomURI from Atom atom where atom.lastUpdate > :modifiedDate and (:atomState is null or atom.state = :atomState)")
+    List<URI> getAllAtomURIsModifiedAfter(@Param("modifiedDate") Date modifiedDate,
+                    @Param("atomState") AtomState atomState);
+
+    @Query("select atomURI from Atom atom where atom.creationDate > :createdDate and (:atomState is null or atom.state = :atomState)")
+    List<URI> getAllAtomURIsCreatedAfter(@Param("createdDate") Date createdDate,
+                    @Param("atomState") AtomState atomState);
 
     @Query("select state, count(*) from Connection where atomURI = :atom group by state")
     List<Object[]> getCountsPerConnectionState(@Param("atom") URI atomURI);

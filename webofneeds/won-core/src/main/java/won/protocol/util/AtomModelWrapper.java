@@ -1,52 +1,27 @@
 package won.protocol.util;
 
-import java.net.URI;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.jena.datatypes.xsd.XSDDateTime;
 import org.apache.jena.graph.Node;
-import org.apache.jena.query.Dataset;
-import org.apache.jena.query.DatasetFactory;
-import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.query.QueryFactory;
-import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.ResultSet;
-import org.apache.jena.rdf.model.Literal;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.rdf.model.NodeIterator;
-import org.apache.jena.rdf.model.Property;
-import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.ResIterator;
-import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.Statement;
-import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.query.*;
+import org.apache.jena.rdf.model.*;
 import org.apache.jena.rdf.model.impl.ResourceImpl;
 import org.apache.jena.rdf.model.impl.StatementImpl;
 import org.apache.jena.sparql.path.Path;
 import org.apache.jena.sparql.path.PathParser;
 import org.apache.jena.vocabulary.DCTerms;
 import org.apache.jena.vocabulary.RDF;
-
 import won.protocol.exception.IncorrectPropertyCountException;
 import won.protocol.model.AtomGraphType;
 import won.protocol.model.AtomState;
 import won.protocol.vocabulary.WON;
 import won.protocol.vocabulary.WONMATCH;
+
+import java.net.URI;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * This class wraps the atom models (atom and sysinfo graphs in an atom
@@ -434,6 +409,16 @@ public class AtomModelWrapper {
         return socketUris;
     }
 
+    public Map<URI, URI> getSocketTypeUriMap() {
+        Map<URI, URI> socketTypeUriMap = new HashMap<>();
+        Collection<String> socketUris = getSocketUris();
+        socketUris.forEach(socketUri -> {
+            Optional<URI> socketTypeUri = getSocketTypeUri(socketUri);
+            socketTypeUri.ifPresent(uri -> socketTypeUriMap.put(URI.create(socketUri), uri));
+        });
+        return socketTypeUriMap;
+    }
+
     public Optional<String> getSocketType(String socketUri) {
         Resource socket = getAtomModel().createResource(socketUri);
         if (!getAtomContentNode().hasProperty(WON.socket, socket)) {
@@ -443,6 +428,17 @@ public class AtomModelWrapper {
         if (stmt == null)
             return Optional.empty();
         return Optional.of(stmt.getObject().toString());
+    }
+
+    public Optional<URI> getSocketTypeUri(String socketUri) {
+        Resource socket = getAtomModel().createResource(socketUri);
+        if (!getAtomContentNode().hasProperty(WON.socket, socket)) {
+            return Optional.empty();
+        }
+        Statement stmt = socket.getProperty(WON.socketDefinition);
+        if (stmt == null)
+            return Optional.empty();
+        return Optional.of(URI.create(stmt.getObject().toString()));
     }
 
     public Collection<Resource> getGoals() {

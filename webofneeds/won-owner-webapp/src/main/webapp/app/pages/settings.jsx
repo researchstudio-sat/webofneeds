@@ -4,28 +4,14 @@
  * Created by ksinger on 21.08.2017.
  */
 import angular from "angular";
-import ngAnimate from "angular-animate";
-import { get, getIn } from "../utils.js";
-import { attach, classOnComponentRoot } from "../cstm-ng-utils.js";
-import { actionCreators } from "../actions/actions.js";
-import settingsWrapper from "../components/settings-wrapper.js";
-import * as viewSelectors from "../redux/selectors/view-selectors.js";
-import * as accountUtils from "../redux/utils/account-utils.js";
-import { h } from "preact";
+import { attach } from "../cstm-ng-utils.js";
+import PageSettings from "./react/settings.jsx";
 
-import "~/style/_signup.scss";
+import { h } from "preact";
 
 const template = (
   <container>
-    <won-modal-dialog ng-if="self.showModalDialog" />
-    <won-topnav page-title="::'Settings'" />
-    <won-menu ng-if="self.isLoggedIn" />
-    <won-toasts />
-    <won-slide-in ng-if="self.showSlideIns" />
-    <main className="settings">
-      <won-settings-wrapper />
-    </main>
-    <won-footer />
+    <won-preact component="self.PageSettings" />
   </container>
 );
 
@@ -39,29 +25,13 @@ const serviceDependencies = [
 class SettingsController {
   constructor(/* arguments <- serviceDependencies */) {
     attach(this, serviceDependencies, arguments);
-    this.rememberMe = false;
-
-    const select = state => {
-      const accountState = get(state, "account");
-
-      return {
-        isLoggedIn: accountUtils.isLoggedIn(accountState),
-        appTitle: getIn(state, ["config", "theme", "title"]),
-        showModalDialog: state.getIn(["view", "showModalDialog"]),
-        showSlideIns:
-          viewSelectors.hasSlideIns(state) &&
-          viewSelectors.isSlideInsVisible(state),
-      };
-    };
-    const disconnect = this.$ngRedux.connect(select, actionCreators)(this);
-    classOnComponentRoot("won-signed-out", () => !this.isLoggedIn, this);
-    this.$scope.$on("$destroy", disconnect);
+    this.PageSettings = PageSettings;
   }
 }
 
 export default {
   module: angular
-    .module("won.owner.components.settings", [settingsWrapper, ngAnimate])
+    .module("won.owner.components.settings", [])
     .controller("SettingsController", [
       ...serviceDependencies,
       SettingsController,

@@ -23,7 +23,7 @@ const mapStateToProps = (state, ownProps) => {
 
 const AtomContentMessage = props => {
   return (
-    <won-atom-content-message class={props.atomLoading && "won-is-loading"}>
+    <won-atom-content-message class={props.atomLoading ? "won-is-loading" : ""}>
       <div className="won-cm__center">
         <div className="won-cm__center__bubble">
           <WonAtomMenu atomUri={props.atomUri} />

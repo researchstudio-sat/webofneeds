@@ -2,35 +2,11 @@
 @import "flex-layout";
 @import "sizing-utils";
 
-won-account-menu {
-  //display: block;
-  won-dd-header {
-    @include flex-row();
-    color: $won-primary-color;
-  }
-
-  .dd__menu {
-    margin-top: -0.5rem; // compensate for margin on header/open-button in title-bar
-  }
-
-  won-login-form {
-    display: block;
-  }
-}
-
 won-login-form {
-  display: block;
-  min-width: 10rem;
-
-  button {
-    width: 100%;
-  }
-
   > form.loginForm {
     padding-bottom: 0.5rem;
   }
 
-  > won-preact.labelledHr won-labelled-hr > .wlh__label > .wlh__label__text,
   > won-labelled-hr > .wlh__label > .wlh__label__text {
     background: white;
   }
@@ -59,69 +35,12 @@ won-login-form {
     }
   }
 
-  .wl__table {
-    display: table;
-
-    width: 100%;
-    padding-bottom: 1rem;
-    font-size: $smallFontSize;
-
-    .wlt__right,
-    .wlt__left {
-      display: table-cell;
-      width: 50%;
-      vertical-align: middle;
-    }
-
-    .wlt__right {
-      text-align: right;
-    }
-  }
-
   .wl__register {
     padding-top: 0.5rem;
     display: block;
 
     button.won-button--filled.red {
       margin: 0;
-    }
-  }
-
-  & .wl__button {
-    @include flex-row;
-    justify-content: flex-end;
-
-    padding-top: 0.5rem;
-    padding-bottom: 0.5rem;
-    cursor: pointer;
-
-    //TODO drop text (only use icons when there's no space)
-    .wl__button__caption {
-      color: black;
-      white-space: nowrap;
-
-      /*@media (max-width: $responsivenessBreakPoint) {
-        display: none;
-      }*/
-    }
-
-    .wl__button__icon {
-      @include fixed-square($bigiconSize);
-    }
-
-    & .wl__button__carret {
-      /*
-      // without svg-included margins
-      @include fixed-height(0.5rem);
-      @include fixed-width(0.875rem);
-      */
-
-      // with svg-included margins
-      @include carretSized;
-    }
-
-    &.open {
-      color: black;
     }
   }
 }

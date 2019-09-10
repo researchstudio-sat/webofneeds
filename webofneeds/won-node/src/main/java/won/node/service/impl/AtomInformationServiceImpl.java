@@ -17,13 +17,13 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
-import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchAtomException;
+import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.message.WonMessageType;
 import won.protocol.model.*;
+import won.protocol.repository.AtomRepository;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.MessageEventRepository;
-import won.protocol.repository.AtomRepository;
 import won.protocol.service.AtomInformationService;
 import won.protocol.util.DataAccessUtils;
 
@@ -49,31 +49,28 @@ public class AtomInformationServiceImpl implements AtomInformationService {
 
     @Override
     public Collection<URI> listAtomURIs() {
-        return atomRepository.getAllAtomURIs();
+        return atomRepository.getAllAtomURIs(null);
     }
 
     @Override
-    public Slice<URI> listAtomURIs(int page, Integer preferedPageSize, AtomState atomState) {
+    public Collection<URI> listAtomURIs(AtomState atomState) {
+        return atomRepository.getAllAtomURIs(atomState);
+    }
+
+    @Override
+    public Slice<URI> listPagedAtomURIs(int page, Integer preferedPageSize, AtomState atomState) {
         int pageSize = this.pageSize;
         int pageNum = page - 1;
         if (preferedPageSize != null && preferedPageSize < this.pageSize) {
             pageSize = preferedPageSize;
         }
-        Slice<URI> slice = null;
-        if (atomState == null) {
-            // use 'creationDate' to keep a constant atom order over requests
-            slice = atomRepository
-                            .getAllAtomURIs(new PageRequest(pageNum, pageSize, Sort.Direction.DESC, "creationDate"));
-        } else {
-            // use 'creationDate' to keep a constant atom order over requests
-            slice = atomRepository.getAllAtomURIs(atomState,
-                            new PageRequest(pageNum, pageSize, Sort.Direction.DESC, "creationDate"));
-        }
-        return slice;
+        // use 'creationDate' to keep a constant atom order over requests
+        return atomRepository.getAllAtomURIs(atomState,
+                        new PageRequest(pageNum, pageSize, Sort.Direction.DESC, "creationDate"));
     }
 
     @Override
-    public Slice<URI> listAtomURIsBefore(URI atomURI, Integer preferedPageSize, AtomState atomState) {
+    public Slice<URI> listPagedAtomURIsBefore(URI atomURI, Integer preferedPageSize, AtomState atomState) {
         Atom referenceAtom = atomRepository.findOneByAtomURI(atomURI);
         Date referenceDate = referenceAtom.getCreationDate();
         int pageSize = this.pageSize;
@@ -94,12 +91,17 @@ public class AtomInformationServiceImpl implements AtomInformationService {
     }
 
     @Override
-    public Collection<URI> listModifiedAtomURIsAfter(Date modifiedAfter) {
-        return atomRepository.findModifiedAtomURIsAfter(modifiedAfter);
+    public Collection<URI> listAtomURIsModifiedAfter(Date modifiedAfter, AtomState atomState) {
+        return atomRepository.getAllAtomURIsModifiedAfter(modifiedAfter, atomState);
     }
 
     @Override
-    public Slice<URI> listAtomURIsAfter(URI atomURI, Integer preferedPageSize, AtomState atomState) {
+    public Collection<URI> listAtomURIsCreatedAfter(Date createdAfter, AtomState atomState) {
+        return atomRepository.getAllAtomURIsCreatedAfter(createdAfter, atomState);
+    }
+
+    @Override
+    public Slice<URI> listPagedAtomURIsAfter(URI atomURI, Integer preferedPageSize, AtomState atomState) {
         Atom referenceAtom = atomRepository.findOneByAtomURI(atomURI);
         Date referenceDate = referenceAtom.getCreationDate();
         int pageSize = this.pageSize;

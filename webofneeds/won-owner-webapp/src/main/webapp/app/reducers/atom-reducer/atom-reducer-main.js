@@ -4,44 +4,44 @@
 import { actionTypes } from "../../actions/actions.js";
 import Immutable from "immutable";
 import won from "../../won-es6.js";
-import { msStringToDate, getIn, get } from "../../utils.js";
+import { get, getIn, msStringToDate } from "../../utils.js";
 import {
-  addAtomStub,
   addAtom,
   addAtomInCreation,
+  addAtomStub,
   addMetaAtomStubs,
   deleteAtom,
 } from "./reduce-atoms.js";
 import {
-  addMessage,
   addExistingMessages,
-  updateMessageStatus,
-  markMessageAsSelected,
-  markMessageAsCollapsed,
-  markMessageShowActions,
-  markMessageAsRead,
+  addMessage,
+  markMessageAsAccepted,
+  markMessageAsCancellationPending,
+  markMessageAsCancelled,
   markMessageAsClaimed,
+  markMessageAsCollapsed,
   markMessageAsProposed,
+  markMessageAsRead,
   markMessageAsRejected,
   markMessageAsRetracted,
-  markMessageAsAccepted,
-  markMessageAsCancelled,
-  markMessageAsCancellationPending,
+  markMessageAsSelected,
   markMessageExpandReferences,
+  markMessageShowActions,
+  updateMessageStatus,
 } from "./reduce-messages.js";
 import {
   addMetaConnections,
-  markConnectionAsRated,
-  markConnectionAsRead,
-  getAtomByConnectionUri,
   changeConnectionState,
   changeConnectionStateByFun,
+  getAtomByConnectionUri,
+  markConnectionAsRated,
+  markConnectionAsRead,
+  setMultiSelectType,
+  setShowAgreementData,
+  setShowPetriNetData,
   storeConnectionsData,
   updateAgreementStateData,
   updatePetriNetStateData,
-  setShowAgreementData,
-  setShowPetriNetData,
-  setMultiSelectType,
 } from "./reduce-connections.js";
 import * as atomUtils from "../../redux/utils/atom-utils.js";
 
@@ -60,6 +60,7 @@ export default function(allAtomsInState = initialState, action = {}) {
         atom.set("connections", Immutable.Map())
       );
 
+    case actionTypes.atoms.storeMetaAtoms:
     case actionTypes.atoms.storeWhatsNew:
     case actionTypes.atoms.storeWhatsAround:
     case actionTypes.atoms.storeOwnedMetaAtoms: {
@@ -124,7 +125,10 @@ export default function(allAtomsInState = initialState, action = {}) {
           uri: action.payload.atomUri,
           creationDate: new Date(),
           content: {
-            type: Immutable.Set(["won:Atom", "won:Persona"]),
+            type: Immutable.Set([
+              won.WON.AtomCompacted,
+              won.WON.PersonaCompacted,
+            ]),
             sockets: Immutable.Map(),
           },
           connections: Immutable.Map(),

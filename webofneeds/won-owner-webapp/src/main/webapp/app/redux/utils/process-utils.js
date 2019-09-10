@@ -27,6 +27,15 @@ export function isProcessingWhatsNew(process) {
 }
 
 /**
+ * Return true if fetching of MetaAtoms is currently active (e.g when fetchPersonas is running)
+ * @param process (full process from state)
+ * @returns {*}
+ */
+export function isProcessingMetaAtoms(process) {
+  return get(process, "processingMetaAtoms");
+}
+
+/**
  * Return true if fetchWhatsAround is currently active
  * @param process (full process from state)
  * @returns {*}

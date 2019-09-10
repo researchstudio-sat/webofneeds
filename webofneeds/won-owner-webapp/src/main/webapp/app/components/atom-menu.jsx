@@ -25,9 +25,11 @@ const mapStateToProps = (state, ownProps) => {
   const hasGroupSocket = atomUtils.hasGroupSocket(atom);
   const hasReviewSocket = atomUtils.hasReviewSocket(atom);
   const hasBuddySocket = atomUtils.hasBuddySocket(atom);
-  const reviewCount = hasReviewSocket && getIn(atom, ["rating", "reviewCount"]);
+  const reviewCount = hasReviewSocket
+    ? getIn(atom, ["rating", "reviewCount"])
+    : 0;
 
-  const groupMembers = hasGroupSocket && get(atom, "groupMembers");
+  const groupMembers = hasGroupSocket ? get(atom, "groupMembers") : 0;
   const groupChatConnections =
     isOwned &&
     hasGroupSocket &&

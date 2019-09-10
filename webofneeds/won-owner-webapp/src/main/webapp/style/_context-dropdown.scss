@@ -40,7 +40,8 @@ won-connection-context-dropdown {
       padding: 0.5rem;
       max-width: 15rem;
       position: absolute;
-      right: 0;
+      right: -1px;
+      top: -5px;
 
       a.won-button--outlined,
       button {

@@ -17,7 +17,7 @@ body {
   @include default-font;
   background-color: $won-lighter-gray;
 
-  > section.ng-scope {
+  > section.ng-scope > won-preact > section {
     display: grid;
     min-height: 100vh;
 
@@ -94,6 +94,9 @@ body {
 
     > won-menu {
       grid-area: menu;
+    }
+
+    > won-menu {
       box-sizing: border-box;
       height: var(--menuHeight);
       top: var(--headerHeight);
@@ -165,24 +168,6 @@ body {
           border-right: none;
         }
         background: white;
-      }
-
-      //FIXME: This can be removed once the pages are react components
-      > won-preact.atomMessages {
-        display: block;
-        height: calc(100vh - var(--headerHeight) - var(--menuHeight));
-        > won-atom-messages {
-          height: 100%;
-        }
-      }
-      //FIXME: This can be removed once the pages are react components
-      > won-preact.groupAtomMessages {
-        display: block;
-        height: calc(100vh - var(--headerHeight) - var(--menuHeight));
-
-        > won-group-atom-messages {
-          height: 100%;
-        }
       }
 
       > won-group-atom-messages,

@@ -45,7 +45,7 @@ main.about {
       color: white;
     }
 
-    .about__welcome__grid {
+    > .about__welcome__grid {
       margin-left: auto;
       margin-right: auto;
       $fourPortraitsWidth: 59rem;
@@ -87,6 +87,7 @@ main.about {
         display: block;
         margin: 0 auto;
         @include fixed-square(1rem);
+        --local-primary: #{$won-primary-color};
       }
     }
   }
@@ -197,7 +198,7 @@ main.about {
       padding-bottom: 2rem;
     }
 
-    won-accordion.about__faq__questions {
+    > won-accordion.about__faq__questions {
       display: block;
       max-width: 45rem;
       margin: 0 auto;

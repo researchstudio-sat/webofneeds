@@ -26,7 +26,7 @@ export default class WonPaypalPaymentViewer extends React.Component {
         </div>
         <div className="paypalpaymentv__content">
           <div className="paypalpaymentv__content__label">
-            {self.props.detail.amountLabel}
+            {this.props.detail.amountLabel}
           </div>
           <div className="paypalpaymentv__content__price">
             {this.getPriceWithCurrency()}

@@ -15,7 +15,7 @@ export default class WonTitlePicker extends React.Component {
   render() {
     return (
       <won-title-picker
-        class={this.props.className ? this.props.className : undefined}
+        class={this.props.className ? this.props.className : ""}
       >
         <div className="titlep__input">
           {this.state.value && (

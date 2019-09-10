@@ -12,7 +12,7 @@ import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as useCaseUtils from "../usecase-utils.js";
 import * as accountUtils from "../redux/utils/account-utils.js";
 
-import "~/style/_create-post.scss";
+import "~/style/_create-atom.scss";
 import "~/style/_responsiveness-utils.scss";
 import Immutable from "immutable";
 import WonCreateIsSeeks from "./create-isseeks.jsx";

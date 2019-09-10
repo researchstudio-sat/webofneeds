@@ -4,7 +4,7 @@ import { actionTypes } from "../actions/actions.js";
 import * as atomUtils from "./utils/atom-utils.js";
 import * as processUtils from "./utils/process-utils.js";
 import { parseMetaAtom } from "../reducers/atom-reducer/parse-atom.js";
-import { is, get, getIn, numOfEvts2pageSize } from "../utils.js";
+import { get, getIn, is, numOfEvts2pageSize } from "../utils.js";
 import won from "../won-es6";
 
 export function fetchOwnedData(dispatch, getState) {
@@ -194,12 +194,26 @@ export function fetchAtomAndDispatch(
     });
 }
 
+export function fetchPersonas(dispatch /*, getState,*/) {
+  return ownerApi.getAllActiveMetaPersonas().then(atoms => {
+    const atomsImm = Immutable.fromJS(atoms);
+    const atomUris = [...atomsImm.keys()];
+
+    dispatch({
+      type: actionTypes.atoms.storeMetaAtoms,
+      payload: Immutable.fromJS({ metaAtoms: atoms }),
+    });
+
+    return atomUris;
+  });
+}
+
 export function fetchWhatsNew(
   dispatch,
   getState,
-  modifiedAfterDate = new Date(Date.now() - 30 /*Days before*/ * 86400000)
+  createdAfterDate = new Date(Date.now() - 30 /*Days before*/ * 86400000)
 ) {
-  return ownerApi.getAllMetaAtoms(modifiedAfterDate).then(atoms => {
+  return ownerApi.getAllMetaAtoms(createdAfterDate).then(atoms => {
     const atomsImm = Immutable.fromJS(atoms);
     const atomUris = [...atomsImm.keys()];
 
@@ -214,12 +228,12 @@ export function fetchWhatsNew(
 export function fetchWhatsAround(
   dispatch,
   getState,
-  modifiedAfterDate,
+  createdAfterDate,
   location,
   maxDistance
 ) {
   return ownerApi
-    .getAllMetaAtomsNear(modifiedAfterDate, location, maxDistance)
+    .getAllMetaAtomsNear(createdAfterDate, location, maxDistance)
     .then(atoms => {
       const atomsImm = Immutable.fromJS(atoms);
       const atomUris = [...atomsImm.keys()];

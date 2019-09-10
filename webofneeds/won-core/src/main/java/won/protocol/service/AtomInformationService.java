@@ -10,21 +10,16 @@
  */
 package won.protocol.service;
 
+import org.apache.jena.rdf.model.Model;
+import org.springframework.data.domain.Slice;
+import won.protocol.exception.NoSuchAtomException;
+import won.protocol.exception.NoSuchConnectionException;
+import won.protocol.message.WonMessageType;
+import won.protocol.model.*;
+
 import java.net.URI;
 import java.util.Collection;
 import java.util.Date;
-
-import org.apache.jena.rdf.model.Model;
-import org.springframework.data.domain.Slice;
-
-import won.protocol.exception.NoSuchConnectionException;
-import won.protocol.exception.NoSuchAtomException;
-import won.protocol.message.WonMessageType;
-import won.protocol.model.Connection;
-import won.protocol.model.DataWithEtag;
-import won.protocol.model.MessageEventPlaceholder;
-import won.protocol.model.Atom;
-import won.protocol.model.AtomState;
 
 /**
  * Service for obtaining information about atoms and connections in the system
@@ -39,6 +34,14 @@ public interface AtomInformationService {
     public Collection<URI> listAtomURIs();
 
     /**
+     * Retrieves a list of all atoms with the given atomState on the atomserver.
+     * 
+     * @param atomState State that an atom needs to have to be included.
+     * @return a collection of all atom URIs.
+     */
+    public Collection<URI> listAtomURIs(AtomState atomState);
+
+    /**
      * Retrieves a page of the list of atoms on the atomserver that have a given
      * state with number of atom uris per page preference.
      *
@@ -48,7 +51,7 @@ public interface AtomInformationService {
      * @param atomState Active/Inactive, null => all states
      * @return a collection of all atom URIs.
      */
-    public Slice<URI> listAtomURIs(int page, Integer preferredSize, AtomState atomState);
+    public Slice<URI> listPagedAtomURIs(int page, Integer preferredSize, AtomState atomState);
 
     /**
      * Retrieves list of atoms on the atomserver that where created earlier than the
@@ -61,7 +64,7 @@ public interface AtomInformationService {
      * @param atomState Active/Inactive, null => all states
      * @return a collection of all atom URIs.
      */
-    public Slice<URI> listAtomURIsBefore(URI atom, Integer preferredSize, AtomState atomState);
+    public Slice<URI> listPagedAtomURIsBefore(URI atom, Integer preferredSize, AtomState atomState);
 
     /**
      * Retrieves list of atoms on the atomserver that where created later than the
@@ -74,15 +77,25 @@ public interface AtomInformationService {
      * @param atomState Active/Inactive, null => all states
      * @return a collection of all atom URIs.
      */
-    public Slice<URI> listAtomURIsAfter(URI atom, Integer preferredSize, AtomState atomState);
+    public Slice<URI> listPagedAtomURIsAfter(URI atom, Integer preferredSize, AtomState atomState);
 
     /**
      * retrieves atoms that have been modified after a certain date
-     * 
+     *
      * @param modifiedAfter modification date of the atoms to retrieve
+     * @param atomState filterBy
      * @return collection of modified atoms
      */
-    public Collection<URI> listModifiedAtomURIsAfter(Date modifiedAfter);
+    public Collection<URI> listAtomURIsModifiedAfter(Date modifiedAfter, AtomState atomState);
+
+    /**
+     * retrieves atoms that have been modified after a certain date
+     *
+     * @param createdAfter modification date of the atoms to retrieve
+     * @param atomState filterBy
+     * @return collection of modified atoms
+     */
+    public Collection<URI> listAtomURIsCreatedAfter(Date createdAfter, AtomState atomState);
 
     /**
      * Retrieves all connection URIs (regardless of state).
