@@ -10,8 +10,6 @@
  */
 package won.bot.framework.bot.base;
 
-import java.net.URI;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
@@ -30,7 +28,6 @@ import won.protocol.util.linkeddata.LinkedDataSource;
 public abstract class BasicServiceBot extends BaseBot {
     private NodeURISource nodeURISource;
     private MatcherNodeURISource matcherNodeURISource;
-    private URI solrServerURI;
     private AtomProducer atomProducer;
     private WonMessageSender wonMessageSender;
     private MatcherProtocolAtomServiceClientSide matcherProtocolAtomServiceClient;
@@ -70,14 +67,6 @@ public abstract class BasicServiceBot extends BaseBot {
         return matcherProtocolMatcherService;
     }
 
-    public URI getSolrServerURI() {
-        return solrServerURI;
-    }
-
-    public void setSolrServerURI(final URI solrServerURI) {
-        this.solrServerURI = solrServerURI;
-    }
-
     @Qualifier("default")
     @Autowired(required = true)
     public void setWonMessageSender(final WonMessageSender wonMessageSender) {
@@ -87,14 +76,14 @@ public abstract class BasicServiceBot extends BaseBot {
     @Qualifier("default")
     @Autowired(required = true)
     public void setMatcherProtocolAtomServiceClient(
-                    final MatcherProtocolAtomServiceClientSide matcherProtocolAtomServiceClient) {
+            final MatcherProtocolAtomServiceClientSide matcherProtocolAtomServiceClient) {
         this.matcherProtocolAtomServiceClient = matcherProtocolAtomServiceClient;
     }
 
     @Qualifier("default")
     @Autowired(required = true)
     public void setMatcherProtocolMatcherService(
-                    final MatcherProtocolMatcherServiceImplJMSBased matcherProtocolMatcherService) {
+            final MatcherProtocolMatcherServiceImplJMSBased matcherProtocolMatcherService) {
         this.matcherProtocolMatcherService = matcherProtocolMatcherService;
     }
 

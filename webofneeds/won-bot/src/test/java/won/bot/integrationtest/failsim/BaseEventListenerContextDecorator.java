@@ -45,11 +45,6 @@ public abstract class BaseEventListenerContextDecorator implements EventListener
     }
 
     @Override
-    public URI getSolrServerURI() {
-        return delegate.getSolrServerURI();
-    }
-
-    @Override
     public NodeURISource getNodeURISource() {
         return delegate.getNodeURISource();
     }

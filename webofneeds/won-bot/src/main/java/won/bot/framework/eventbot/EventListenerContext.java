@@ -40,8 +40,6 @@ public interface EventListenerContext {
      */
     public TaskScheduler getTaskScheduler();
 
-    public URI getSolrServerURI();
-
     /**
      * Returns the bot's NodeURISource. Used to obtain WON_BA node URIs.
      * 
