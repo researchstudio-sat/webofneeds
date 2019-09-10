@@ -211,9 +211,9 @@ export function fetchPersonas(dispatch /*, getState,*/) {
 export function fetchWhatsNew(
   dispatch,
   getState,
-  modifiedAfterDate = new Date(Date.now() - 30 /*Days before*/ * 86400000)
+  createdAfterDate = new Date(Date.now() - 30 /*Days before*/ * 86400000)
 ) {
-  return ownerApi.getAllMetaAtoms(modifiedAfterDate).then(atoms => {
+  return ownerApi.getAllMetaAtoms(createdAfterDate).then(atoms => {
     const atomsImm = Immutable.fromJS(atoms);
     const atomUris = [...atomsImm.keys()];
 
@@ -228,12 +228,12 @@ export function fetchWhatsNew(
 export function fetchWhatsAround(
   dispatch,
   getState,
-  modifiedAfterDate,
+  createdAfterDate,
   location,
   maxDistance
 ) {
   return ownerApi
-    .getAllMetaAtomsNear(modifiedAfterDate, location, maxDistance)
+    .getAllMetaAtomsNear(createdAfterDate, location, maxDistance)
     .then(atoms => {
       const atomsImm = Immutable.fromJS(atoms);
       const atomUris = [...atomsImm.keys()];

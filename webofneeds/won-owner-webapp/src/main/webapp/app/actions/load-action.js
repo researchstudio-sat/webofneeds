@@ -34,11 +34,11 @@ function loadingWhileSignedIn(dispatch, getState) {
   return stateStore.fetchOwnedData(dispatch, getState);
 }
 
-export const fetchWhatsNew = modifiedAfterDate => (dispatch, getState) => {
+export const fetchWhatsNew = createdAfterDate => (dispatch, getState) => {
   dispatch({
     type: actionTypes.atoms.fetchWhatsNew,
   });
-  return stateStore.fetchWhatsNew(dispatch, getState, modifiedAfterDate);
+  return stateStore.fetchWhatsNew(dispatch, getState, createdAfterDate);
 };
 
 export const fetchPersonas = () => (dispatch, getState) => {
@@ -48,7 +48,7 @@ export const fetchPersonas = () => (dispatch, getState) => {
   return stateStore.fetchPersonas(dispatch, getState);
 };
 
-export const fetchWhatsAround = (modifiedAfterDate, location, maxDistance) => (
+export const fetchWhatsAround = (createdAfterDate, location, maxDistance) => (
   dispatch,
   getState
 ) => {
@@ -58,7 +58,7 @@ export const fetchWhatsAround = (modifiedAfterDate, location, maxDistance) => (
   return stateStore.fetchWhatsAround(
     dispatch,
     getState,
-    modifiedAfterDate,
+    createdAfterDate,
     location,
     maxDistance
   );
