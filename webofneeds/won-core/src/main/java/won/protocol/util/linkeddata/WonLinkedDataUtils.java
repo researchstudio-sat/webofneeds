@@ -112,12 +112,10 @@ public class WonLinkedDataUtils {
             newQuery = (newQuery == null) ? queryPart : (newQuery + "&" + queryPart);
         }
         if (filterByAtomTypeUri != null) {
-            // TODO: IDK IF THERE NEEDS TO BE URI ENCODING
             String queryPart = "filterByAtomTypeUri=" + filterByAtomTypeUri;
             newQuery = (newQuery == null) ? queryPart : (newQuery + "&" + queryPart);
         }
         if (filterBySocketTypeUri != null) {
-            // TODO: IDK IF THERE NEEDS TO BE URI ENCODING
             String queryPart = "filterBySocketTypeUri=" + filterBySocketTypeUri;
             newQuery = (newQuery == null) ? queryPart : (newQuery + "&" + queryPart);
         }
