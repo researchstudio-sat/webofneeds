@@ -5,6 +5,12 @@ import org.junit.Test;
 import won.utils.batch.BatchingConsumer.Config;
 import won.utils.batch.BatchingConsumer.ConfigBuilder;
 
+import java.time.Duration;
+import java.util.Collection;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+
 public class BatchingConsumerTest {
     @Test
     public void testConsumeAllOneKey() {
