@@ -39,9 +39,9 @@ import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
 
+import java.lang.invoke.MethodHandles;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.text.ParseException;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -50,7 +50,7 @@ import java.util.*;
 @RequestMapping("/rest/atoms")
 public class RestAtomController {
     private static final int DEFAULT_MAX_DISTANCE = 5000;
-    final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     @Autowired
     private DraftRepository draftRepository;
     @Autowired
@@ -97,13 +97,13 @@ public class RestAtomController {
     /**
      * Gets the current user. If no user is authenticated, an Exception is thrown
      * 
-     * @return
+     * @return the current user
      */
-    public User getCurrentUser() {
+    private User getCurrentUser() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         if (username == null)
             throw new AccessDeniedException("client is not authenticated");
-        return (User) userRepository.findByUsername(username);
+        return userRepository.findByUsername(username);
     }
 
     @ResponseBody
@@ -113,9 +113,7 @@ public class RestAtomController {
         User user = getCurrentUser();
         List<CreateDraftPojo> createDraftPojos = new ArrayList<>();
         Set<URI> draftURIs = user.getDraftURIs();
-        Iterator<URI> draftURIIterator = draftURIs.iterator();
-        while (draftURIIterator.hasNext()) {
-            URI draftURI = draftURIIterator.next();
+        for (URI draftURI : draftURIs) {
             Draft draft = draftRepository.findByDraftURI(draftURI).get(0);
             CreateDraftPojo createDraftPojo = new CreateDraftPojo(draftURI.toString(), draft.getContent());
             createDraftPojos.add(createDraftPojo);
@@ -180,12 +178,9 @@ public class RestAtomController {
             try {
                 Dataset atomDataset = WonLinkedDataUtils.getDataForResource(atomUri, linkedDataSource);
                 AtomPojo atom = new AtomPojo(atomDataset);
-                if (state == null || atom.getState().equals(state)
-                                && ((modifiedAfter == null) || modifiedAfter.isBefore(atom.getModifiedZonedDateTime()))
-                                && ((createdAfter == null) || createdAfter.isBefore(atom.getCreationZonedDateTime()))
-                                && ((nearLocation == null)
-                                                || isNearLocation(nearLocation, atom.getLocation(), maxDistance)
-                                                || isNearLocation(nearLocation, atom.getJobLocation(), maxDistance))
+                if (((nearLocation == null)
+                                || isNearLocation(nearLocation, atom.getLocation(), maxDistance)
+                                || isNearLocation(nearLocation, atom.getJobLocation(), maxDistance))
                                 && ((filterBySocketTypeUri == null)
                                                 || atom.getSocketTypeUriMap().containsValue(filterBySocketTypeUri))
                                 && ((filterByAtomTypeUri == null)
@@ -206,10 +201,11 @@ public class RestAtomController {
      * if the distance is below or equal to the maxDistance parameter, if the
      * parameter is null we use 5000meters as the maxDistance
      * 
-     * @param nearLocation
-     * @param atomLocation
-     * @param maxDistance
-     * @return
+     * @param nearLocation lat/lng Coordinates of any given location
+     * @param atomLocation lat/lng Coordinates of an atom
+     * @param maxDistance distance in meters
+     * @return true if atomLocation is within the radius of nearLocation and the
+     * maxDistance
      */
     private boolean isNearLocation(Coordinate nearLocation, Coordinate atomLocation, Integer maxDistance) {
         if (atomLocation != null) {
@@ -239,13 +235,12 @@ public class RestAtomController {
     @RequestMapping(value = "/drafts", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
     // TODO: move transactionality annotation into the service layer
     @Transactional(propagation = Propagation.SUPPORTS)
-    public CreateDraftPojo createDraft(@RequestBody CreateDraftPojo createDraftObject) throws ParseException {
+    public CreateDraftPojo createDraft(@RequestBody CreateDraftPojo createDraftObject) {
         User user = getCurrentUser();
         URI draftURI = URI.create(createDraftObject.getDraftURI());
         user.getDraftURIs().add(draftURI);
         wonUserDetailService.save(user);
-        Draft draft = null;
-        draft = draftRepository.findOneByDraftURI(draftURI);
+        Draft draft = draftRepository.findOneByDraftURI(draftURI);
         if (draft == null) {
             draft = new Draft(draftURI, createDraftObject.getDraft());
         }
@@ -277,10 +272,9 @@ public class RestAtomController {
     @RequestMapping(value = "/drafts/draft", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
     public CreateDraftPojo getDraft(@RequestParam("uri") String uri) {
         logger.debug("getting draft: " + uri);
-        URI draftURI = null;
         CreateDraftPojo draftPojo = null;
         try {
-            draftURI = new URI(uri);
+            URI draftURI = new URI(uri);
             Draft draft = draftRepository.findOneByDraftURI(draftURI);
             if (draft == null) {
                 logger.warn("draft requested for delete was not found: " + uri);
@@ -297,11 +291,10 @@ public class RestAtomController {
     @RequestMapping(value = "/drafts/draft", method = RequestMethod.DELETE)
     public ResponseEntity<String> deleteDraft(@RequestParam("uri") String uri) {
         logger.debug("deleting draft: " + uri);
-        URI draftURI = null;
-        CreateDraftPojo draftPojo = null;
+        // CreateDraftPojo draftPojo = null;
         User user = getCurrentUser();
         try {
-            draftURI = new URI(uri);
+            URI draftURI = new URI(uri);
             user.getDraftURIs().remove(draftURI);
             wonUserDetailService.save(user);
             Draft draft = draftRepository.findOneByDraftURI(draftURI);

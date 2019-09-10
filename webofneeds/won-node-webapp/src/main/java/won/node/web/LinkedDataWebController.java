@@ -22,7 +22,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.server.ServletServerHttpRequest;
-import org.springframework.http.server.ServletServerHttpResponse;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
@@ -112,12 +111,8 @@ public class LinkedDataWebController {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     // full prefix of an atom resource
     private String atomResourceURIPrefix;
-    // path of an atom resource
-    private String atomResourceURIPath;
     // full prefix of a connection resource
     private String connectionResourceURIPrefix;
-    // path of a connection resource
-    private String connectionResourceURIPath;
     // prefix for URISs of RDF data
     private String dataURIPrefix;
     // prefix for URIs referring to real-world things
@@ -259,16 +254,7 @@ public class LinkedDataWebController {
     public String showEventPage(@PathVariable(value = "identifier") String identifier, Model model,
                     HttpServletResponse response) {
         URI eventURI = uriService.createEventURIForId(identifier);
-        DataWithEtag<Dataset> data = linkedDataService.getDatasetForUri(eventURI, null);
-        if (model != null && !data.isNotFound()) {
-            model.addAttribute("rdfDataset", data.getData());
-            model.addAttribute("resourceURI", eventURI.toString());
-            model.addAttribute("dataURI", uriService.toDataURIIfPossible(eventURI).toString());
-            return "rdfDatasetView";
-        } else {
-            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            return "notFoundView";
-        }
+        return createDatasetResponse(model, response, eventURI);
     }
 
     // webmvc controller method
@@ -276,16 +262,7 @@ public class LinkedDataWebController {
     public String showAttachmentPage(@PathVariable(value = "identifier") String identifier, Model model,
                     HttpServletResponse response) {
         URI attachmentURI = uriService.createAttachmentURIForId(identifier);
-        DataWithEtag<Dataset> data = linkedDataService.getDatasetForUri(attachmentURI, null);
-        if (model != null && !data.isNotFound()) {
-            model.addAttribute("rdfDataset", data.getData());
-            model.addAttribute("resourceURI", attachmentURI.toString());
-            model.addAttribute("dataURI", uriService.toDataURIIfPossible(attachmentURI).toString());
-            return "rdfDatasetView";
-        } else {
-            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            return "notFoundView";
-        }
+        return createDatasetResponse(model, response, attachmentURI);
     }
 
     // webmvc controller method
@@ -301,14 +278,8 @@ public class LinkedDataWebController {
                     Model model, HttpServletResponse response) throws IOException, ParseException {
         Dataset rdfDataset;
         AtomState atomState = getAtomState(state);
-        URI filterBySocketTypeUri = null;
-        if (filterBySocketTypeUriString != null) {
-            filterBySocketTypeUri = URI.create(filterBySocketTypeUriString);
-        }
-        URI filterByAtomTypeUri = null;
-        if (filterByAtomTypeUriString != null) {
-            filterByAtomTypeUri = URI.create(filterByAtomTypeUriString);
-        }
+        URI filterBySocketTypeUri = getURIOrNull(filterBySocketTypeUriString);
+        URI filterByAtomTypeUri = getURIOrNull(filterByAtomTypeUriString);
         if (page == null && beforeId == null && afterId == null && modifiedAfter == null && createdAfter == null) {
             rdfDataset = linkedDataService.listAtomURIs(atomState, filterBySocketTypeUri, filterByAtomTypeUri);
         } else if (page != null) {
@@ -362,14 +333,8 @@ public class LinkedDataWebController {
                         createdAfter, "filterBySocketTypeUri", filterBySocketTypeUriString, "filterByAtomTypeUri",
                         filterByAtomTypeUriString);
         AtomState atomState = getAtomState(state);
-        URI filterBySocketTypeUri = null;
-        if (filterBySocketTypeUriString != null) {
-            filterBySocketTypeUri = URI.create(filterBySocketTypeUriString);
-        }
-        URI filterByAtomTypeUri = null;
-        if (filterByAtomTypeUriString != null) {
-            filterByAtomTypeUri = URI.create(filterByAtomTypeUriString);
-        }
+        URI filterBySocketTypeUri = getURIOrNull(filterBySocketTypeUriString);
+        URI filterByAtomTypeUri = getURIOrNull(filterByAtomTypeUriString);
         if (preferedSize == null && modifiedAfter == null && createdAfter == null) {
             rdfDataset = linkedDataService.listAtomURIs(atomState, filterBySocketTypeUri, filterByAtomTypeUri);
         } else if (page == null && beforeId == null && afterId == null && modifiedAfter == null
@@ -551,7 +516,7 @@ public class LinkedDataWebController {
         return null;
     }
 
-    public void setResponseHeaders(final HttpServletResponse response, final HttpHeaders headers) {
+    private void setResponseHeaders(final HttpServletResponse response, final HttpHeaders headers) {
         for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
             for (String value : entry.getValue()) {
                 response.setHeader(entry.getKey(), value);
@@ -610,12 +575,11 @@ public class LinkedDataWebController {
      * @param requestUri
      * @return
      */
-    public HttpHeaders addExpiresHeadersBasedOnRequestURI(HttpHeaders headers, final String requestUri) {
+    private HttpHeaders addExpiresHeadersBasedOnRequestURI(HttpHeaders headers, final String requestUri) {
         // now, we want to suppress the 'never expires' header information
         // for /resource/atom and resource/connection so that crawlers always re-fetch
         // these data
         URI requestUriAsURI = URI.create(requestUri);
-        String requestPath = requestUriAsURI.getPath();
         if (uriService.isConnectionEventsURI(requestUriAsURI) || uriService.isAtomEventsURI(requestUriAsURI)
                         || uriService.isAtomURI(requestUriAsURI)) {
             addMutableResourceHeaders(headers);
@@ -625,9 +589,17 @@ public class LinkedDataWebController {
         return headers;
     }
 
-    private AtomState getAtomState(final String state) {
+    private static AtomState getAtomState(final String state) {
         if (state != null) {
             return AtomState.parseString(state);
+        } else {
+            return null;
+        }
+    }
+
+    private static URI getURIOrNull(final String uri) {
+        if (uri != null) {
+            return URI.create(uri);
         } else {
             return null;
         }
@@ -1253,14 +1225,14 @@ public class LinkedDataWebController {
     }
 
     private String getPassableQueryMap(String... nameValue) {
-        String queryPart = "";
+        StringBuilder queryPart = new StringBuilder();
         for (int i = 0; i < nameValue.length; i++) {
             if (nameValue[i + 1] != null) {
-                queryPart = queryPart + "&" + nameValue[i] + "=" + nameValue[i + 1];
+                queryPart.append("&").append(nameValue[i]).append("=").append(nameValue[i + 1]);
             }
             i++;
         }
-        return queryPart;
+        return queryPart.toString();
     }
 
     private String extractResourceLocalId(final URI uri) {
@@ -1335,11 +1307,6 @@ public class LinkedDataWebController {
      */
     private void addCORSHeader(final HttpHeaders headers) {
         headers.add("Access-Control-Allow-Origin", "*");
-    }
-
-    private HttpHeaders getHttpHeaders(final HttpServletResponse response) {
-        ServletServerHttpResponse servletResponse = new ServletServerHttpResponse(response);
-        return servletResponse.getHeaders();
     }
 
     private HttpHeaders getHttpHeaders(final HttpServletRequest request) {
@@ -1426,21 +1393,13 @@ public class LinkedDataWebController {
         this.nodeResourceURIPrefix = nodeResourceURIPrefix;
     }
 
-    public void setAtomResourceURIPath(final String atomResourceURIPath) {
-        this.atomResourceURIPath = atomResourceURIPath;
-    }
-
-    public void setConnectionResourceURIPath(final String connectionResourceURIPath) {
-        this.connectionResourceURIPath = connectionResourceURIPath;
-    }
-
     @RequestMapping(value = "${uri.path.resource}", method = RequestMethod.POST, produces = { "text/plain" })
     public ResponseEntity<String> register(@RequestParam("register") String registeredType, HttpServletRequest request)
                     throws CertificateException, UnsupportedEncodingException {
         logger.debug("REGISTERING " + registeredType);
         PreAuthenticatedAuthenticationToken authentication = (PreAuthenticatedAuthenticationToken) SecurityContextHolder
                         .getContext().getAuthentication();
-        if (!(authentication instanceof PreAuthenticatedAuthenticationToken)) {
+        if (authentication == null) {
             throw new BadCredentialsException("Could not register: PreAuthenticatedAuthenticationToken expected");
         }
         // Object principal = authentication.getPrincipal();
@@ -1482,7 +1441,7 @@ public class LinkedDataWebController {
          *
          * @param timestamp
          */
-        public DateParameter(final String timestamp) throws ParseException {
+        DateParameter(final String timestamp) throws ParseException {
             // timestamp string is expected in ISO 8601 format (UTC)
             DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
             format.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -1500,7 +1459,7 @@ public class LinkedDataWebController {
          *
          * @return
          */
-        public Date getDate() {
+        Date getDate() {
             return date;
         }
 
@@ -1509,8 +1468,21 @@ public class LinkedDataWebController {
          *
          * @return
          */
-        public String getTimestamp() {
+        String getTimestamp() {
             return timestamp;
+        }
+    }
+
+    private String createDatasetResponse(Model model, HttpServletResponse response, URI eventURI) {
+        DataWithEtag<Dataset> data = linkedDataService.getDatasetForUri(eventURI, null);
+        if (model != null && !data.isNotFound()) {
+            model.addAttribute("rdfDataset", data.getData());
+            model.addAttribute("resourceURI", eventURI.toString());
+            model.addAttribute("dataURI", uriService.toDataURIIfPossible(eventURI).toString());
+            return "rdfDatasetView";
+        } else {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            return "notFoundView";
         }
     }
 }

@@ -15,16 +15,14 @@
   ~ limitations under the License.
   -->
 
-<beans xmlns:sec="http://www.springframework.org/schema/security"
-       xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mvc="http://www.springframework.org/schema/mvc"
-       xmlns:context="http://www.springframework.org/schema/context"
-       xsi:schemaLocation="
-       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
+<beans
+        xmlns="http://www.springframework.org/schema/beans"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:mvc="http://www.springframework.org/schema/mvc"
+        xmlns:context="http://www.springframework.org/schema/context"
+        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.1.xsd
-       http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.1.xsd
-       http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.2.xsd">
+       http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.1.xsd">
 
 
     <!--import resource="classpath:/spring/webid-security.xml"/-->
@@ -63,9 +61,7 @@
         <property name="dataURIPrefix" value="${uri.path.data}" />
         <property name="pageURIPrefix" value="${uri.path.page}" />
         <property name="connectionResourceURIPrefix" value="${uri.prefix.connection}" />
-        <property name="connectionResourceURIPath" value="${uri.path.resource.connection}" />
         <property name="atomResourceURIPrefix" value="${uri.prefix.atom}" />
-        <property name="atomResourceURIPath" value="${uri.path.resource.atom}" />
         <property name="nodeResourceURIPrefix" value="${uri.prefix.node}"/>
         <property name="uriService" ref="uriService" />
         <property name="registrationServer" ref="registrationServer" />
