@@ -5,7 +5,7 @@ import javax.persistence.AttributeConverter;
 public class BooleanTFConverter implements AttributeConverter<Boolean, Character> {
     @Override
     public Character convertToDatabaseColumn(Boolean booleanValue) {
-        return booleanValue == null ? null : booleanValue.booleanValue() ? 'T' : 'F';
+        return booleanValue == null ? null : booleanValue ? 'T' : 'F';
     }
 
     @Override
@@ -13,10 +13,10 @@ public class BooleanTFConverter implements AttributeConverter<Boolean, Character
         if (charValue == null) {
             return null;
         }
-        if (charValue.charValue() == 'T') {
+        if (charValue == 'T') {
             return Boolean.TRUE;
         }
-        if (charValue.charValue() == 'F') {
+        if (charValue == 'F') {
             return Boolean.FALSE;
         }
         throw new IllegalArgumentException("Cannot map string '" + charValue + "' to Boolean");

@@ -290,17 +290,16 @@ public class LinkedDataSourceBase implements LinkedDataSource {
      */
     private Set<URI> getURIsToCrawl(Dataset dataset, Set<URI> excludedUris, final List<URI> properties) {
         Set<URI> toCrawl = new HashSet<>();
-        for (int i = 0; i < properties.size(); i++) {
-            final URI property = properties.get(i);
+        for (final URI property : properties) {
             NodeIterator objectIterator = RdfUtils.visitFlattenedToNodeIterator(dataset,
-                            new RdfUtils.ModelVisitor<NodeIterator>() {
-                                @Override
-                                public NodeIterator visit(final Model model) {
-                                    final Property p = model.createProperty(property.toString());
-                                    return model.listObjectsOfProperty(p);
-                                }
-                            });
-            for (; objectIterator.hasNext();) {
+                    new RdfUtils.ModelVisitor<NodeIterator>() {
+                        @Override
+                        public NodeIterator visit(final Model model) {
+                            final Property p = model.createProperty(property.toString());
+                            return model.listObjectsOfProperty(p);
+                        }
+                    });
+            for (; objectIterator.hasNext(); ) {
                 RDFNode objectNode = objectIterator.next();
                 if (objectNode.isURIResource()) {
                     URI discoveredUri = URI.create(objectNode.asResource().getURI());

@@ -835,8 +835,8 @@ public class AtomModelWrapper {
     public String getSomeContentPropertyStringValue(Resource contentNode, Property p, String... preferredLanguages) {
         Collection<String> values = null;
         if (preferredLanguages != null) {
-            for (int i = 0; i < preferredLanguages.length; i++) {
-                values = getContentPropertyStringValues(contentNode, p, preferredLanguages[i]);
+            for (String preferredLanguage : preferredLanguages) {
+                values = getContentPropertyStringValues(contentNode, p, preferredLanguage);
                 if (values != null && values.size() > 0)
                     return values.iterator().next();
             }
@@ -859,8 +859,8 @@ public class AtomModelWrapper {
     public String getSomeContentPropertyStringValue(Property p, String... preferredLanguages) {
         Resource contentNode = getAtomContentNode();
         if (preferredLanguages != null) {
-            for (int i = 0; i < preferredLanguages.length; i++) {
-                String valueOfContentNode = getSomeContentPropertyStringValue(contentNode, p, preferredLanguages[i]);
+            for (String preferredLanguage : preferredLanguages) {
+                String valueOfContentNode = getSomeContentPropertyStringValue(contentNode, p, preferredLanguage);
                 if (valueOfContentNode != null)
                     return valueOfContentNode;
             }
@@ -870,9 +870,9 @@ public class AtomModelWrapper {
             return valueOfAtomContentNode;
         Collection<Resource> nodes = getSeeksNodes();
         if (preferredLanguages != null) {
-            for (int i = 0; i < preferredLanguages.length; i++) {
+            for (String preferredLanguage : preferredLanguages) {
                 for (Resource node : nodes) {
-                    String valueOfContentNode = getSomeContentPropertyStringValue(node, p, preferredLanguages[i]);
+                    String valueOfContentNode = getSomeContentPropertyStringValue(node, p, preferredLanguage);
                     if (valueOfContentNode != null)
                         return valueOfContentNode;
                 }
@@ -898,8 +898,8 @@ public class AtomModelWrapper {
     public String getAtomContentPropertyStringValue(Property p, String... preferredLanguages) {
         Resource node = getAtomContentNode();
         if (preferredLanguages != null) {
-            for (int i = 0; i < preferredLanguages.length; i++) {
-                String valueOfContentNode = getSomeContentPropertyStringValue(node, p, preferredLanguages[i]);
+            for (String preferredLanguage : preferredLanguages) {
+                String valueOfContentNode = getSomeContentPropertyStringValue(node, p, preferredLanguage);
                 if (valueOfContentNode != null)
                     return valueOfContentNode;
             }

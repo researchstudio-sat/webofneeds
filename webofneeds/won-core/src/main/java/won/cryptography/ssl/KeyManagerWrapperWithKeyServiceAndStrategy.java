@@ -46,8 +46,7 @@ public class KeyManagerWrapperWithKeyServiceAndStrategy implements X509KeyManage
         KeyManager[] kms = kmf.getKeyManagers();
         if (kms != null) {
             if (aliasStrategy != null) {
-                for (int i = 0; i < kms.length; i++) {
-                    KeyManager km = kms[i];
+                for (KeyManager km : kms) {
                     if (km instanceof X509KeyManager) {
                         this.keyManager = (X509KeyManager) km;
                         return;

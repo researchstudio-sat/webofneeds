@@ -129,11 +129,11 @@ public class ActiveMQServiceImpl implements ActiveMQService {
     public Set<String> getMatcherProtocolTopicNamesWithResource(URI resourceURI) {
         Set<String> activeMQMatcherProtocolTopicNames = new HashSet<>();
         resourceURI = URI.create(resourceURI.toString() + pathInformation);
-        for (int i = 0; i < matcherProtocolTopicList.size(); i++) {
+        for (String s : matcherProtocolTopicList) {
             try {
-                Path path = PathParser.parse(matcherProtocolTopicList.get(i), PrefixMapping.Standard);
+                Path path = PathParser.parse(s, PrefixMapping.Standard);
                 activeMQMatcherProtocolTopicNames.add(RdfUtils.getStringPropertyForPropertyPath(
-                                linkedDataSource.getDataForResource(resourceURI), resourceURI, path));
+                        linkedDataSource.getDataForResource(resourceURI), resourceURI, path));
             } catch (HttpClientErrorException e) {
                 if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
                     return null;
