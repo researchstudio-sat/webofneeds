@@ -1161,7 +1161,7 @@ public class WonRdfUtils {
          * @return <code>URI</code> which is of type won:Atom
          */
         public static URI getAtomURI(Dataset dataset) {
-            return RdfUtils.findOne(dataset, model -> getAtomURI(model), true);
+            return RdfUtils.findOne(dataset, AtomUtils::getAtomURI, true);
         }
 
         /**
