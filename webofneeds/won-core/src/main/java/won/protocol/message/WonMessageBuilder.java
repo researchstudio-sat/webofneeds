@@ -1,31 +1,21 @@
 package won.protocol.message;
 
-import java.net.URI;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-
 import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Resource;
-
 import won.protocol.exception.WonMessageBuilderException;
-import won.protocol.message.WonMessageType;
 import won.protocol.util.CheapInsecureRandomString;
 import won.protocol.util.DefaultPrefixUtils;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.RDFG;
-import won.protocol.vocabulary.WON;
 import won.protocol.vocabulary.WONMSG;
+
+import java.net.URI;
+import java.util.*;
 
 /**
  * Class to build a WonMessage based on the specific properties.
@@ -713,12 +703,7 @@ public class WonMessageBuilder {
 
     private URI addContentInternal(Model content) {
         URI contentGraphUri = RdfUtils.createNewGraphURI(messageURI.toString(), CONTENT_URI_SUFFIX, 4,
-                        new RdfUtils.GraphNameCheck() {
-                            @Override
-                            public boolean isGraphUriOk(final String graphUri) {
-                                return !contentMap.keySet().contains(URI.create(graphUri));
-                            }
-                        });
+                graphUri -> !contentMap.keySet().contains(URI.create(graphUri)));
         contentMap.put(contentGraphUri, content);
         return contentGraphUri;
     }
@@ -753,23 +738,20 @@ public class WonMessageBuilder {
         });
         // replace the old graph uris with the new graph
         // uris in all graphs of our dataset
-        RdfUtils.visit(toAdd, new RdfUtils.ModelVisitor<Object>() {
-            @Override
-            public Object visit(Model model) {
-                if (model.size() == 0)
-                    return null;
-                changedGraphUris.entrySet().stream().forEach(graphNameMapping -> {
-                    // in the model, get both the old and new resource, then replace
-                    // the old by the new. Note: This will create a resource in the
-                    // model if it is not in there yet.
-                    Resource refToOld = model.getResource(graphNameMapping.getKey());
-                    Resource refToNew = model.getResource(graphNameMapping.getValue());
-                    // replace resource, modifying the model (which is already in
-                    // the builder's content map
-                    RdfUtils.replaceResourceInModel(refToOld, refToNew);
-                });
+        RdfUtils.visit(toAdd, model1 -> {
+            if (model1.size() == 0)
                 return null;
-            }
+            changedGraphUris.entrySet().stream().forEach(graphNameMapping -> {
+                // in the model, get both the old and new resource, then replace
+                // the old by the new. Note: This will create a resource in the
+                // model if it is not in there yet.
+                Resource refToOld = model1.getResource(graphNameMapping.getKey());
+                Resource refToNew = model1.getResource(graphNameMapping.getValue());
+                // replace resource, modifying the model (which is already in
+                // the builder's content map
+                RdfUtils.replaceResourceInModel(refToOld, refToNew);
+            });
+            return null;
         });
         return this;
     }

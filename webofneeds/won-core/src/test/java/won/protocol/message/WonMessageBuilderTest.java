@@ -78,15 +78,12 @@ public class WonMessageBuilderTest {
     public void test_wrap_retains_content_graphs() {
         WonMessage msg2 = wrapMessage(createMessageWithContent().build()).build();
         Assert.assertEquals(MSG_URI_1.toString(),
-                        RdfUtils.findOne(msg2.getMessageContent(), new RdfUtils.ModelVisitor<String>() {
-                            @Override
-                            public String visit(final Model model) {
-                                StmtIterator it = model.listStatements(null, RDF.type,
-                                                model.getResource(TYPE_URI_1.toString()));
-                                if (it.hasNext())
-                                    return it.nextStatement().getSubject().asResource().toString();
-                                return null;
-                            }
+                        RdfUtils.findOne(msg2.getMessageContent(), model -> {
+                            StmtIterator it = model.listStatements(null, RDF.type,
+                                            model.getResource(TYPE_URI_1.toString()));
+                            if (it.hasNext())
+                                return it.nextStatement().getSubject().asResource().toString();
+                            return null;
                         }, false));
         Assert.assertEquals(TYPE_URI_1.toString(),
                 RdfUtils.findOnePropertyFromResource(msg2.getMessageContent(), MSG_URI_1, RDF.type).asResource()
@@ -97,15 +94,12 @@ public class WonMessageBuilderTest {
     public void test_wrap_allows_new_content_graphs() {
         WonMessage msg2 = addContentWithDifferentURI(wrapMessage(createMessageWithoutContent().build())).build();
         Assert.assertEquals(MSG_URI_2.toString(),
-                        RdfUtils.findOne(msg2.getMessageContent(), new RdfUtils.ModelVisitor<String>() {
-                            @Override
-                            public String visit(final Model model) {
-                                StmtIterator it = model.listStatements(null, RDF.type,
-                                                model.getResource(TYPE_URI_2.toString()));
-                                if (it.hasNext())
-                                    return it.nextStatement().getSubject().asResource().toString();
-                                return null;
-                            }
+                        RdfUtils.findOne(msg2.getMessageContent(), model -> {
+                            StmtIterator it = model.listStatements(null, RDF.type,
+                                            model.getResource(TYPE_URI_2.toString()));
+                            if (it.hasNext())
+                                return it.nextStatement().getSubject().asResource().toString();
+                            return null;
                         }, false));
         Assert.assertEquals(TYPE_URI_2.toString(),
                 RdfUtils.findOnePropertyFromResource(msg2.getMessageContent(), MSG_URI_2, RDF.type).asResource()

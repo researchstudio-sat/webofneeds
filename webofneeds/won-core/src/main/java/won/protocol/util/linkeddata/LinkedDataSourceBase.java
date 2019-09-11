@@ -292,12 +292,9 @@ public class LinkedDataSourceBase implements LinkedDataSource {
         Set<URI> toCrawl = new HashSet<>();
         for (final URI property : properties) {
             NodeIterator objectIterator = RdfUtils.visitFlattenedToNodeIterator(dataset,
-                    new RdfUtils.ModelVisitor<NodeIterator>() {
-                        @Override
-                        public NodeIterator visit(final Model model) {
-                            final Property p = model.createProperty(property.toString());
-                            return model.listObjectsOfProperty(p);
-                        }
+                    model -> {
+                        final Property p = model.createProperty(property.toString());
+                        return model.listObjectsOfProperty(p);
                     });
             for (; objectIterator.hasNext(); ) {
                 RDFNode objectNode = objectIterator.next();

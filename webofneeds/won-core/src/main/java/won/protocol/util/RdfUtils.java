@@ -385,11 +385,9 @@ public class RdfUtils {
      * @param replacement
      */
     public static void renameResourceWithPrefix(Dataset dataset, String prefix, String replacement) {
-        visit(dataset, new ModelVisitor<Void>() {
-            public Void visit(Model model) {
-                renameResourceWithPrefix(model, prefix, replacement);
-                return null;
-            }
+        visit(dataset, (ModelVisitor<Void>) model -> {
+            renameResourceWithPrefix(model, prefix, replacement);
+            return null;
         });
         Iterator<String> modelNames = dataset.listNames();
         Map<String, String> toReplace = new HashMap<>();
@@ -492,12 +490,9 @@ public class RdfUtils {
     }
 
     public static void replaceBaseResource(Dataset dataset, final Resource replacement, boolean renamePrefixedURIs) {
-        visit(dataset, new ModelVisitor<Object>() {
-            @Override
-            public Object visit(Model model) {
-                replaceBaseResource(model, replacement, renamePrefixedURIs);
-                return null;
-            }
+        visit(dataset, model -> {
+            replaceBaseResource(model, replacement, renamePrefixedURIs);
+            return null;
         });
     }
 
@@ -1082,12 +1077,7 @@ public class RdfUtils {
      * @return
      */
     public static Node getNodeForPropertyPath(final Dataset dataset, final URI resourceURI, final Path propertyPath) {
-        return findFirst(dataset, new ModelVisitor<Node>() {
-            @Override
-            public Node visit(final Model model) {
-                return getNodeForPropertyPath(model, resourceURI, propertyPath);
-            }
-        });
+        return findFirst(dataset, model -> getNodeForPropertyPath(model, resourceURI, propertyPath));
     }
 
     /**
@@ -1183,56 +1173,47 @@ public class RdfUtils {
 
     public static <T> List<T> getObjectsOfProperty(final Dataset dataset, final URI resource, final URI property,
                     Function<RDFNode, T> resultMapper) {
-        return RdfUtils.visitFlattenedToList(dataset, new ModelVisitor<Collection<T>>() {
-            @Override
-            public Collection<T> visit(Model model) {
-                Resource res = model.getResource(resource.toString());
-                if (res == null) {
-                    return Collections.emptyList();
-                }
-                NodeIterator it = model.listObjectsOfProperty(res, model.createProperty(property.toString()));
-                List<T> ret = new ArrayList<>();
-                while (it.hasNext()) {
-                    RDFNode node = it.next();
-                    ret.add(resultMapper.apply(node));
-                }
-                return ret;
+        return RdfUtils.visitFlattenedToList(dataset, (ModelVisitor<Collection<T>>) model -> {
+            Resource res = model.getResource(resource.toString());
+            if (res == null) {
+                return Collections.emptyList();
             }
+            NodeIterator it = model.listObjectsOfProperty(res, model.createProperty(property.toString()));
+            List<T> ret = new ArrayList<>();
+            while (it.hasNext()) {
+                RDFNode node = it.next();
+                ret.add(resultMapper.apply(node));
+            }
+            return ret;
         });
     }
 
     public static <T> Optional<T> getFirstObjectOfProperty(final Dataset dataset, final URI resource,
                     final URI property, Function<RDFNode, T> resultMapper) {
-        T result = RdfUtils.findFirst(dataset, new ModelVisitor<T>() {
-            @Override
-            public T visit(Model model) {
-                Resource subj = model.getResource(resource.toString());
-                Property pred = model.getProperty(property.toString());
-                if (pred == null) {
-                    return null;
-                }
-                Statement stmt = model.getProperty(subj, pred);
-                RDFNode obj = stmt.getObject();
-                return resultMapper.apply(obj);
+        T result = RdfUtils.findFirst(dataset, model -> {
+            Resource subj = model.getResource(resource.toString());
+            Property pred = model.getProperty(property.toString());
+            if (pred == null) {
+                return null;
             }
+            Statement stmt = model.getProperty(subj, pred);
+            RDFNode obj = stmt.getObject();
+            return resultMapper.apply(obj);
         });
         return Optional.ofNullable(result);
     }
 
     public static <T> Optional<T> getFirstStatementMapped(final Dataset dataset, final URI subject, final URI predicate,
                     final URI object, Function<Statement, T> resultMapper) {
-        T result = RdfUtils.findFirst(dataset, new ModelVisitor<T>() {
-            @Override
-            public T visit(Model model) {
-                Resource subj = subject == null ? null : model.getResource(subject.toString());
-                Property pred = predicate == null ? null : model.getProperty(predicate.toString());
-                RDFNode obj = object == null ? null : model.getResource(object.toString());
-                StmtIterator it = model.listStatements(subj, pred, obj);
-                if (it.hasNext()) {
-                    return resultMapper.apply(it.next());
-                }
-                return null;
+        T result = RdfUtils.findFirst(dataset, model -> {
+            Resource subj = subject == null ? null : model.getResource(subject.toString());
+            Property pred = predicate == null ? null : model.getProperty(predicate.toString());
+            RDFNode obj = object == null ? null : model.getResource(object.toString());
+            StmtIterator it = model.listStatements(subj, pred, obj);
+            if (it.hasNext()) {
+                return resultMapper.apply(it.next());
             }
+            return null;
         });
         return Optional.ofNullable(result);
     }
@@ -1248,12 +1229,7 @@ public class RdfUtils {
      */
     public static Iterator<Node> getNodesForPropertyPath(final Dataset dataset, final URI resourceURI,
                     final Path propertyPath) {
-        return Iterators.concat(visit(dataset, new ModelVisitor<Iterator<Node>>() {
-            @Override
-            public Iterator<Node> visit(final Model model) {
-                return getNodesForPropertyPath(model, resourceURI, propertyPath);
-            }
-        }));
+        return Iterators.concat(visit(dataset, model -> getNodesForPropertyPath(model, resourceURI, propertyPath)));
     }
 
     public static URI toUriOrNull(final Object uriStringOrNull) {
@@ -1558,12 +1534,7 @@ public class RdfUtils {
      * @return <code>URI</code> of the resource
      */
     public static RDFNode findFirstPropertyFromResource(Dataset dataset, final URI resourceURI, final Property p) {
-        return RdfUtils.findFirst(dataset, new RdfUtils.ModelVisitor<RDFNode>() {
-            @Override
-            public RDFNode visit(final Model model) {
-                return findFirstPropertyFromResource(model, resourceURI, p);
-            }
-        });
+        return RdfUtils.findFirst(dataset, model -> findFirstPropertyFromResource(model, resourceURI, p));
     }
 
     /**
@@ -1576,30 +1547,15 @@ public class RdfUtils {
      * @return <code>URI</code> of the resource
      */
     public static RDFNode findOnePropertyFromResource(Dataset dataset, final URI resourceURI, final Property p) {
-        return RdfUtils.findOne(dataset, new RdfUtils.ModelVisitor<RDFNode>() {
-            @Override
-            public RDFNode visit(final Model model) {
-                return findOnePropertyFromResource(model, resourceURI, p);
-            }
-        }, true);
+        return RdfUtils.findOne(dataset, model -> findOnePropertyFromResource(model, resourceURI, p), true);
     }
 
     public static RDFNode findFirstPropertyFromResource(Dataset dataset, final Resource resource, final Property p) {
-        return RdfUtils.findFirst(dataset, new RdfUtils.ModelVisitor<RDFNode>() {
-            @Override
-            public RDFNode visit(final Model model) {
-                return findFirstPropertyFromResource(model, resource, p);
-            }
-        });
+        return RdfUtils.findFirst(dataset, model -> findFirstPropertyFromResource(model, resource, p));
     }
 
     public static RDFNode findOnePropertyFromResource(Dataset dataset, final Resource resource, final Property p) {
-        return RdfUtils.findOne(dataset, new RdfUtils.ModelVisitor<RDFNode>() {
-            @Override
-            public RDFNode visit(final Model model) {
-                return findOnePropertyFromResource(model, resource, p);
-            }
-        }, true);
+        return RdfUtils.findOne(dataset, model -> findOnePropertyFromResource(model, resource, p), true);
     }
 
     /**
@@ -1678,25 +1634,17 @@ public class RdfUtils {
     }
 
     public static Resource findOneSubjectResource(Dataset dataset, Property property, RDFNode object) {
-        return RdfUtils.findOne(dataset, new RdfUtils.ModelVisitor<Resource>() {
-            @Override
-            public Resource visit(final Model model) {
-                return findOneOrNoSubjectResource(model, property, object);
-            }
-        }, true);
+        return RdfUtils.findOne(dataset, model -> findOneOrNoSubjectResource(model, property, object), true);
     }
 
     public static List<Resource> findSubjectResources(Dataset dataset, Property property, RDFNode object) {
-        return RdfUtils.visitFlattenedToList(dataset, new RdfUtils.ModelVisitor<List<Resource>>() {
-            @Override
-            public List<Resource> visit(final Model model) {
-                List<Resource> ret = new ArrayList<>();
-                ResIterator it = model.listSubjectsWithProperty(property, object);
-                while (it.hasNext()) {
-                    ret.add(it.next());
-                }
-                return ret;
+        return RdfUtils.visitFlattenedToList(dataset, model -> {
+            List<Resource> ret = new ArrayList<>();
+            ResIterator it = model.listSubjectsWithProperty(property, object);
+            while (it.hasNext()) {
+                ret.add(it.next());
             }
+            return ret;
         });
     }
 
@@ -1790,12 +1738,7 @@ public class RdfUtils {
      * @return an URI that is previously unused as a graph URI.
      */
     public static URI createNewGraphURI(String baseURI, String toAppend, int length, final Dataset dataset) {
-        return createNewGraphURI(baseURI, toAppend, length, new GraphNameCheck() {
-            @Override
-            public boolean isGraphUriOk(final String graphUri) {
-                return !dataset.containsNamedModel(graphUri);
-            }
-        });
+        return createNewGraphURI(baseURI, toAppend, length, graphUri -> !dataset.containsNamedModel(graphUri));
     }
 
     /**
@@ -1972,12 +1915,9 @@ public class RdfUtils {
     public static void copyDatasetTriplesToModel(final Dataset dataset, final Model model) {
         assert dataset != null : "dataset must not be null";
         assert model != null : "model must not be null";
-        visit(dataset, new ModelVisitor<Object>() {
-            @Override
-            public Object visit(final Model datasetModel) {
-                model.add(datasetModel);
-                return null;
-            }
+        visit(dataset, datasetModel -> {
+            model.add(datasetModel);
+            return null;
         });
     }
 

@@ -275,12 +275,7 @@ public class WonLinkedDataUtils {
     }
 
     public static URI getWonNodeURIForAtomOrConnection(final URI resourceURI, final Dataset resourceDataset) {
-        return RdfUtils.findFirst(resourceDataset, new RdfUtils.ModelVisitor<URI>() {
-            @Override
-            public URI visit(final Model model) {
-                return getWonNodeURIForAtomOrConnection(resourceURI, model);
-            }
-        });
+        return RdfUtils.findFirst(resourceDataset, model -> getWonNodeURIForAtomOrConnection(resourceURI, model));
     }
 
     /**

@@ -143,56 +143,53 @@ public class WonRdfUtils {
         public static WonNodeInfo getWonNodeInfo(final URI wonNodeUri, Dataset dataset) {
             assert wonNodeUri != null : "wonNodeUri must not be null";
             assert dataset != null : "dataset must not be null";
-            return RdfUtils.findFirst(dataset, new RdfUtils.ModelVisitor<WonNodeInfo>() {
-                @Override
-                public WonNodeInfo visit(final Model model) {
-                    // use the first blank node found for [wonNodeUri]
-                    // won:hasUriPatternSpecification [blanknode]
-                    NodeIterator it = model.listObjectsOfProperty(model.getResource(wonNodeUri.toString()),
-                                    WON.uriPrefixSpecification);
-                    if (!it.hasNext())
-                        return null;
-                    WonNodeInfoBuilder wonNodeInfoBuilder = new WonNodeInfoBuilder();
-                    wonNodeInfoBuilder.setWonNodeURI(wonNodeUri.toString());
-                    RDFNode node = it.next();
-                    // set the URI prefixes
-                    it = model.listObjectsOfProperty(node.asResource(), WON.atomUriPrefix);
-                    if (!it.hasNext())
-                        return null;
-                    String atomUriPrefix = it.next().asLiteral().getString();
-                    wonNodeInfoBuilder.setAtomURIPrefix(atomUriPrefix);
-                    it = model.listObjectsOfProperty(node.asResource(), WON.connectionUriPrefix);
-                    if (!it.hasNext())
-                        return null;
-                    wonNodeInfoBuilder.setConnectionURIPrefix(it.next().asLiteral().getString());
-                    it = model.listObjectsOfProperty(node.asResource(), WON.eventUriPrefix);
-                    if (!it.hasNext())
-                        return null;
-                    wonNodeInfoBuilder.setEventURIPrefix(it.next().asLiteral().getString());
-                    // set the atom list URI
-                    it = model.listObjectsOfProperty(model.getResource(wonNodeUri.toString()), WON.atomList);
-                    if (it.hasNext()) {
-                        wonNodeInfoBuilder.setAtomListURI(it.next().asNode().getURI());
-                    } else {
-                        wonNodeInfoBuilder.setAtomListURI(atomUriPrefix);
+            return RdfUtils.findFirst(dataset, model -> {
+                // use the first blank node found for [wonNodeUri]
+                // won:hasUriPatternSpecification [blanknode]
+                NodeIterator it = model.listObjectsOfProperty(model.getResource(wonNodeUri.toString()),
+                                WON.uriPrefixSpecification);
+                if (!it.hasNext())
+                    return null;
+                WonNodeInfoBuilder wonNodeInfoBuilder = new WonNodeInfoBuilder();
+                wonNodeInfoBuilder.setWonNodeURI(wonNodeUri.toString());
+                RDFNode node = it.next();
+                // set the URI prefixes
+                it = model.listObjectsOfProperty(node.asResource(), WON.atomUriPrefix);
+                if (!it.hasNext())
+                    return null;
+                String atomUriPrefix = it.next().asLiteral().getString();
+                wonNodeInfoBuilder.setAtomURIPrefix(atomUriPrefix);
+                it = model.listObjectsOfProperty(node.asResource(), WON.connectionUriPrefix);
+                if (!it.hasNext())
+                    return null;
+                wonNodeInfoBuilder.setConnectionURIPrefix(it.next().asLiteral().getString());
+                it = model.listObjectsOfProperty(node.asResource(), WON.eventUriPrefix);
+                if (!it.hasNext())
+                    return null;
+                wonNodeInfoBuilder.setEventURIPrefix(it.next().asLiteral().getString());
+                // set the atom list URI
+                it = model.listObjectsOfProperty(model.getResource(wonNodeUri.toString()), WON.atomList);
+                if (it.hasNext()) {
+                    wonNodeInfoBuilder.setAtomListURI(it.next().asNode().getURI());
+                } else {
+                    wonNodeInfoBuilder.setAtomListURI(atomUriPrefix);
+                }
+                // set the supported protocol implementations
+                String queryString = "SELECT ?protocol ?param ?value WHERE { ?a <%s> ?c. "
+                                + "?c <%s> ?protocol. ?c ?param ?value. FILTER ( ?value != ?protocol ) }";
+                queryString = String.format(queryString, WON.supportsWonProtocolImpl.toString(),
+                                RDF.getURI() + "type");
+                Query protocolQuery = QueryFactory.create(queryString);
+                try (QueryExecution qexec = QueryExecutionFactory.create(protocolQuery, model)) {
+                    ResultSet rs = qexec.execSelect();
+                    while (rs.hasNext()) {
+                        QuerySolution qs = rs.nextSolution();
+                        String protocol = rdfNodeToString(qs.get("protocol"));
+                        String param = rdfNodeToString(qs.get("param"));
+                        String value = rdfNodeToString(qs.get("value"));
+                        wonNodeInfoBuilder.addSupportedProtocolImplParamValue(protocol, param, value);
                     }
-                    // set the supported protocol implementations
-                    String queryString = "SELECT ?protocol ?param ?value WHERE { ?a <%s> ?c. "
-                                    + "?c <%s> ?protocol. ?c ?param ?value. FILTER ( ?value != ?protocol ) }";
-                    queryString = String.format(queryString, WON.supportsWonProtocolImpl.toString(),
-                                    RDF.getURI() + "type");
-                    Query protocolQuery = QueryFactory.create(queryString);
-                    try (QueryExecution qexec = QueryExecutionFactory.create(protocolQuery, model)) {
-                        ResultSet rs = qexec.execSelect();
-                        while (rs.hasNext()) {
-                            QuerySolution qs = rs.nextSolution();
-                            String protocol = rdfNodeToString(qs.get("protocol"));
-                            String param = rdfNodeToString(qs.get("param"));
-                            String value = rdfNodeToString(qs.get("value"));
-                            wonNodeInfoBuilder.addSupportedProtocolImplParamValue(protocol, param, value);
-                        }
-                        return wonNodeInfoBuilder.build();
-                    }
+                    return wonNodeInfoBuilder.build();
                 }
             });
         }
@@ -1169,12 +1166,7 @@ public class WonRdfUtils {
          * @return <code>URI</code> which is of type won:Atom
          */
         public static URI getAtomURI(Dataset dataset) {
-            return RdfUtils.findOne(dataset, new RdfUtils.ModelVisitor<URI>() {
-                @Override
-                public URI visit(final Model model) {
-                    return getAtomURI(model);
-                }
-            }, true);
+            return RdfUtils.findOne(dataset, model -> getAtomURI(model), true);
         }
 
         /**
