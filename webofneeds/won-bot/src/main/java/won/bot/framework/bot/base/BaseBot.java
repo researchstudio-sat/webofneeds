@@ -10,41 +10,86 @@
  */
 package won.bot.framework.bot.base;
 
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+
 import org.apache.jena.query.Dataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.util.Assert;
+
 import won.bot.framework.bot.Bot;
 import won.bot.framework.bot.BotLifecyclePhase;
 import won.bot.framework.bot.context.BotContextWrapper;
+import won.bot.framework.component.atomproducer.AtomProducer;
+import won.bot.framework.component.nodeurisource.NodeURISource;
+import won.matcher.component.MatcherNodeURISource;
+import won.matcher.protocol.impl.MatcherProtocolMatcherServiceImplJMSBased;
+import won.protocol.matcher.MatcherProtocolAtomServiceClientSide;
 import won.protocol.message.WonMessage;
+import won.protocol.message.sender.WonMessageSender;
 import won.protocol.model.Connection;
-
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
+import won.protocol.service.WonNodeInformationService;
+import won.protocol.util.linkeddata.LinkedDataSource;
 
 /**
  * Basic Bot implementation intended to be extended. Does nothing. Implements
  * Bot and OwnerCallback interfaces. Provides wrappers for initialize(),
- * shutdown() and setters/getters.
+ * shutdown() and setters/getters. Holds information needed for connecting to
+ * nodes.
  */
 public abstract class BaseBot implements Bot {
+    // bot control variables
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private BotLifecyclePhase lifecyclePhase = BotLifecyclePhase.DOWN;
     private boolean workDone = false;
+    // node connection variables
+    private NodeURISource nodeURISource;
+    private MatcherNodeURISource matcherNodeURISource;
+    private AtomProducer atomProducer;
+    private WonMessageSender wonMessageSender;
+    private MatcherProtocolAtomServiceClientSide matcherProtocolAtomServiceClient;
+    private MatcherProtocolMatcherServiceImplJMSBased matcherProtocolMatcherService;
+    private LinkedDataSource linkedDataSource;
+    private WonNodeInformationService wonNodeInformationService;
+
+    // ================================================================================
+    // Bot Control Methods
+    // ================================================================================
+    @Override
+    public BotLifecyclePhase getLifecyclePhase() {
+        return this.lifecyclePhase;
+    }
+
+    /**
+     * Sets the workDone flag to true.
+     */
+    protected void workIsDone() {
+        this.workDone = true;
+    }
+
+    @Override
+    public boolean isWorkDone() {
+        return this.workDone;
+    }
+
     @Autowired
     private BotContextWrapper botContextWrapper;
 
-    @Override
-    public boolean knowsAtomURI(final URI atomURI) {
-        return this.botContextWrapper.getBotContext().isAtomKnown(atomURI);
+    public void setBotContextWrapper(final BotContextWrapper botContextWrapper) {
+        this.botContextWrapper = botContextWrapper;
     }
 
-    @Override
-    public boolean knowsNodeURI(final URI wonNodeURI) {
-        return this.botContextWrapper.getBotContext().isNodeKnown(wonNodeURI);
+    protected BotContextWrapper getBotContextWrapper() {
+        return botContextWrapper;
     }
+
+    /**
+     * Override this method to do initialization work.
+     */
+    protected abstract void doInitialize();
 
     @Override
     public synchronized void initialize() throws Exception {
@@ -64,6 +109,11 @@ public abstract class BaseBot implements Bot {
         this.lifecyclePhase = BotLifecyclePhase.ACTIVE;
     }
 
+    /**
+     * Override this method to do free resources during shutdown.
+     */
+    protected abstract void doShutdown();
+
     @Override
     public synchronized void shutdown() throws Exception {
         if (!this.lifecyclePhase.isActive())
@@ -73,39 +123,104 @@ public abstract class BaseBot implements Bot {
         this.lifecyclePhase = BotLifecyclePhase.DOWN;
     }
 
-    /**
-     * Override this method to do free resources during shutdown.
-     */
-    protected abstract void doShutdown();
+    @Override
+    public abstract void act() throws Exception;
 
-    /**
-     * Override this method to do initialization work.
-     */
-    protected abstract void doInitialize();
+    // ================================================================================
+    // Node Connection Setters/Getters
+    // ================================================================================
+    protected NodeURISource getNodeURISource() {
+        return nodeURISource;
+    }
 
-    /**
-     * Sets the workDone flag to true.
-     */
-    protected void workIsDone() {
-        this.workDone = true;
+    protected MatcherNodeURISource getMatcheNodeURISource() {
+        return matcherNodeURISource;
+    }
+
+    @Qualifier("default")
+    @Autowired(required = true)
+    public void setNodeURISource(final NodeURISource nodeURISource) {
+        this.nodeURISource = nodeURISource;
+    }
+
+    @Qualifier("default")
+    @Autowired(required = true)
+    public void setMatcherNodeURISource(final MatcherNodeURISource matcherNodeURISource) {
+        this.matcherNodeURISource = matcherNodeURISource;
+    }
+
+    protected WonMessageSender getWonMessageSender() {
+        return wonMessageSender;
+    }
+
+    @Qualifier("default")
+    @Autowired(required = true)
+    public void setWonMessageSender(final WonMessageSender wonMessageSender) {
+        this.wonMessageSender = wonMessageSender;
+    }
+
+    protected MatcherProtocolAtomServiceClientSide getMatcherProtocolAtomServiceClient() {
+        return matcherProtocolAtomServiceClient;
+    }
+
+    @Qualifier("default")
+    @Autowired(required = true)
+    public void setMatcherProtocolAtomServiceClient(
+                    final MatcherProtocolAtomServiceClientSide matcherProtocolAtomServiceClient) {
+        this.matcherProtocolAtomServiceClient = matcherProtocolAtomServiceClient;
+    }
+
+    protected MatcherProtocolMatcherServiceImplJMSBased getMatcherProtocolMatcherService() {
+        return matcherProtocolMatcherService;
+    }
+
+    @Qualifier("default")
+    @Autowired(required = true)
+    public void setMatcherProtocolMatcherService(
+                    final MatcherProtocolMatcherServiceImplJMSBased matcherProtocolMatcherService) {
+        this.matcherProtocolMatcherService = matcherProtocolMatcherService;
+    }
+
+    protected AtomProducer getAtomProducer() {
+        return atomProducer;
+    }
+
+    @Qualifier("default")
+    @Autowired(required = true)
+    public void setAtomProducer(final AtomProducer atomProducer) {
+        this.atomProducer = atomProducer;
+    }
+
+    public LinkedDataSource getLinkedDataSource() {
+        return linkedDataSource;
+    }
+
+    @Qualifier("default")
+    @Autowired(required = true)
+    public void setLinkedDataSource(final LinkedDataSource linkedDataSource) {
+        this.linkedDataSource = linkedDataSource;
+    }
+
+    public WonNodeInformationService getWonNodeInformationService() {
+        return wonNodeInformationService;
+    }
+
+    @Autowired(required = true)
+    public void setWonNodeInformationService(final WonNodeInformationService wonNodeInformationService) {
+        this.wonNodeInformationService = wonNodeInformationService;
+    }
+
+    // ================================================================================
+    // Atom Control Method Signatures
+    // ================================================================================
+    @Override
+    public boolean knowsAtomURI(final URI atomURI) {
+        return this.botContextWrapper.getBotContext().isAtomKnown(atomURI);
     }
 
     @Override
-    public boolean isWorkDone() {
-        return this.workDone;
-    }
-
-    @Override
-    public BotLifecyclePhase getLifecyclePhase() {
-        return this.lifecyclePhase;
-    }
-
-    public void setBotContextWrapper(final BotContextWrapper botContextWrapper) {
-        this.botContextWrapper = botContextWrapper;
-    }
-
-    protected BotContextWrapper getBotContextWrapper() {
-        return botContextWrapper;
+    public boolean knowsNodeURI(final URI wonNodeURI) {
+        return this.botContextWrapper.getBotContext().isNodeKnown(wonNodeURI);
     }
 
     @Override
@@ -148,7 +263,4 @@ public abstract class BaseBot implements Bot {
 
     @Override
     public abstract void onAtomDeactivatedNotificationForMatcher(final URI wonNodeURI, final URI atomURI);
-
-    @Override
-    public abstract void act() throws Exception;
 }

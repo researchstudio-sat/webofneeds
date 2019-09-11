@@ -18,7 +18,7 @@ import org.springframework.scheduling.TaskScheduler;
 /**
  * Bot that has access to a scheduler for performing recurring or deferred work
  */
-public abstract class ScheduledActionBot extends BasicServiceBot {
+public abstract class ScheduledActionBot extends BaseBot {
     private TaskScheduler taskScheduler;
     private Executor insideSchedulerExecutor = new InsideSchedulerExecutor();
 
