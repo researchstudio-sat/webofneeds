@@ -48,14 +48,9 @@
     <bean id="linkedDataService" class="won.node.service.impl.LinkedDataServiceImpl">
         <property name="atomInformationService" ref="atomInformationService" />
         <property name="resourceURIPrefix" value="${uri.prefix.resource}" />
-        <property name="dataURIPrefix" value="${uri.prefix.data}" />
         <property name="connectionResourceURIPrefix" value="${uri.prefix.connection}" />
         <property name="atomResourceURIPrefix" value="${uri.prefix.atom}" />
         <property name="eventResourceURIPrefix" value="${uri.prefix.event}" />
-        <property name="pageURIPrefix" value="${uri.prefix.page}" />
-        <property name="atomProtocolEndpoint" value="${uri.protocol.atom}" />
-        <property name="matcherProtocolEndpoint" value="${uri.protocol.matcher}" />
-        <property name="ownerProtocolEndpoint" value="${uri.protocol.owner}" />
         <property name="activeMqEndpoint" value="${uri.protocol.activemq}" />
         <property name="activeMqAtomProtcolQueueName" value="${activemq.queuename.atom.incoming}" />
         <property name="activeMqOwnerProtcolQueueName" value="${activemq.queuename.owner.incoming}" />

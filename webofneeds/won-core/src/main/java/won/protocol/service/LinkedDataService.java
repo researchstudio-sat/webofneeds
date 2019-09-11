@@ -333,6 +333,8 @@ public interface LinkedDataService {
      */
     public DataWithEtag<Dataset> getAtomDataset(final URI atomUri, String etag);
 
+    public Dataset getAtomDatasetForFilter(final URI atomUri);
+
     /**
      * Returns a dataset describing the atom with the specified URI. If the atom is
      * in state ACTIVE, 'deep' data is added if requested.
