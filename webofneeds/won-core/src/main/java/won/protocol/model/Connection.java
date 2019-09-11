@@ -10,30 +10,13 @@
  */
 package won.protocol.model;
 
-import java.net.URI;
-import java.util.Date;
-
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Convert;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Index;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
-import javax.persistence.PrePersist;
-import javax.persistence.PreUpdate;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.persistence.UniqueConstraint;
-
 import won.protocol.model.parentaware.ParentAware;
 import won.protocol.model.parentaware.VersionedEntity;
+
+import javax.persistence.*;
+import java.net.URI;
+import java.util.Date;
+import java.util.Objects;
 
 /**
  * User: fkleedorfer Date: 30.10.12
@@ -240,14 +223,13 @@ public class Connection implements ParentAware<ConnectionContainer>, VersionedEn
         if (!(o instanceof Connection))
             return false;
         final Connection that = (Connection) o;
-        if (connectionURI != null ? !connectionURI.equals(that.connectionURI) : that.connectionURI != null)
+        if (!Objects.equals(connectionURI, that.connectionURI))
             return false;
-        if (atomURI != null ? !atomURI.equals(that.atomURI) : that.atomURI != null)
+        if (!Objects.equals(atomURI, that.atomURI))
             return false;
-        if (targetConnectionURI != null ? !targetConnectionURI.equals(that.targetConnectionURI)
-                        : that.targetConnectionURI != null)
+        if (!Objects.equals(targetConnectionURI, that.targetConnectionURI))
             return false;
-        if (targetAtomURI != null ? !targetAtomURI.equals(that.targetAtomURI) : that.targetAtomURI != null)
+        if (!Objects.equals(targetAtomURI, that.targetAtomURI))
             return false;
         if (state != that.state)
             return false;

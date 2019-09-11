@@ -1,14 +1,8 @@
 package won.protocol.model;
 
+import javax.persistence.*;
 import java.net.URI;
-
-import javax.persistence.Column;
-import javax.persistence.Convert;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
+import java.util.Objects;
 
 /**
  * User: Danijel Date: 28.5.14.
@@ -46,17 +40,17 @@ public class BAState {
         if (!(o instanceof BAState))
             return false;
         final BAState baState = (BAState) o;
-        if (baStateURI != null ? !baStateURI.equals(baState.baStateURI) : baState.baStateURI != null)
+        if (!Objects.equals(baStateURI, baState.baStateURI))
             return false;
-        if (coordinatorURI != null ? !coordinatorURI.equals(baState.coordinatorURI) : baState.coordinatorURI != null)
+        if (!Objects.equals(coordinatorURI, baState.coordinatorURI))
             return false;
-        if (socketTypeURI != null ? !socketTypeURI.equals(baState.socketTypeURI) : baState.socketTypeURI != null)
+        if (!Objects.equals(socketTypeURI, baState.socketTypeURI))
             return false;
-        if (id != null ? !id.equals(baState.id) : baState.id != null)
+        if (!Objects.equals(id, baState.id))
             return false;
-        if (participantURI != null ? !participantURI.equals(baState.participantURI) : baState.participantURI != null)
+        if (!Objects.equals(participantURI, baState.participantURI))
             return false;
-        if (baPhaseURI != null ? !baPhaseURI.equals(baState.baPhaseURI) : baState.baPhaseURI != null)
+        if (!Objects.equals(baPhaseURI, baState.baPhaseURI))
             return false;
         return true;
     }

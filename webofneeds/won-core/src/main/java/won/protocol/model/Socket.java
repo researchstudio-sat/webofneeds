@@ -1,18 +1,13 @@
 package won.protocol.model;
 
+import javax.persistence.*;
 import java.net.URI;
+import java.util.Objects;
 
 /**
  * Created with IntelliJ IDEA. User: gabriel Date: 28.08.13 Time: 16:03 To
  * change this template use File | Settings | File Templates.
  */
-import javax.persistence.Column;
-import javax.persistence.Convert;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Index;
-import javax.persistence.Table;
 
 @Entity
 @Table(name = "socket", indexes = { @Index(name = "IDX_UNIQUE_SOCKET", columnList = "socketURI") })
@@ -80,11 +75,11 @@ public class Socket {
         if (o == null || getClass() != o.getClass())
             return false;
         Socket socket = (Socket) o;
-        if (id != null ? !id.equals(socket.id) : socket.id != null)
+        if (!Objects.equals(id, socket.id))
             return false;
-        if (atomURI != null ? !atomURI.equals(socket.atomURI) : socket.atomURI != null)
+        if (!Objects.equals(atomURI, socket.atomURI))
             return false;
-        if (typeURI != null ? !typeURI.equals(socket.typeURI) : socket.typeURI != null)
+        if (!Objects.equals(typeURI, socket.typeURI))
             return false;
         return true;
     }
