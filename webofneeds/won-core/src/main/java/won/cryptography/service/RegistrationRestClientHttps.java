@@ -45,7 +45,7 @@ public class RegistrationRestClientHttps implements RegistrationClient {
         }
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Collections.singletonList(MediaType.TEXT_PLAIN));
-        entity = new HttpEntity<String>("parameters", headers);
+        entity = new HttpEntity<>("parameters", headers);
     }
 
     public RegistrationRestClientHttps(KeyStoreService keyStoreService, PrivateKeyStrategy privateKeyStrategy,

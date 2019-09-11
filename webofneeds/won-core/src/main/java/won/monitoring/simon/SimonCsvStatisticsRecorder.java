@@ -95,7 +95,7 @@ public class SimonCsvStatisticsRecorder extends AbstractFileOutputRecorder {
 
         @Override
         public void visit(final Simon simon) throws IOException {
-            Map<String, Object> values = new HashMap<String, Object>(header.length);
+            Map<String, Object> values = new HashMap<>(header.length);
             Sample sample = simon.sample();
             values.put(header[0], sample.getName());
             values.put(header[1], simon.getClass().getName());

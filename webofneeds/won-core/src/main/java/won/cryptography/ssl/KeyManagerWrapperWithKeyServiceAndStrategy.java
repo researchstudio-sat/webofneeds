@@ -66,7 +66,7 @@ public class KeyManagerWrapperWithKeyServiceAndStrategy implements X509KeyManage
 
     @Override
     public String chooseClientAlias(final String[] keyTypes, final Principal[] issuers, final Socket socket) {
-        final Map<String, PrivateKeyDetails> validAliases = new HashMap<String, PrivateKeyDetails>();
+        final Map<String, PrivateKeyDetails> validAliases = new HashMap<>();
         for (final String keyType : keyTypes) {
             final String[] aliases = this.keyManager.getClientAliases(keyType, issuers);
             if (aliases != null) {
@@ -85,7 +85,7 @@ public class KeyManagerWrapperWithKeyServiceAndStrategy implements X509KeyManage
 
     @Override
     public String chooseServerAlias(final String keyType, final Principal[] issuers, final Socket socket) {
-        final Map<String, PrivateKeyDetails> validAliases = new HashMap<String, PrivateKeyDetails>();
+        final Map<String, PrivateKeyDetails> validAliases = new HashMap<>();
         final String[] aliases = this.keyManager.getServerAliases(keyType, issuers);
         if (aliases != null) {
             for (final String alias : aliases) {

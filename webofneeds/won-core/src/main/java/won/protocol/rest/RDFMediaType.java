@@ -31,9 +31,9 @@ public class RDFMediaType {
     public static final MediaType APPLICATION_NQUADS = new MediaType("application", "n-quads");
     public static final Set<MediaType> rdfMediaTypes;
     static {
-        HashSet<MediaType> types = new HashSet<MediaType>(Arrays
-                        .asList(TEXT_TURTLE, APPLICATION_RDF_XML, APPLICATION_X_TURTLE, TEXT_RDF_N3,
-                                APPLICATION_JSON, APPLICATION_TRIG, APPLICATION_JSONLD, APPLICATION_NQUADS));
+        HashSet<MediaType> types = new HashSet<>(Arrays
+                .asList(TEXT_TURTLE, APPLICATION_RDF_XML, APPLICATION_X_TURTLE, TEXT_RDF_N3,
+                        APPLICATION_JSON, APPLICATION_TRIG, APPLICATION_JSONLD, APPLICATION_NQUADS));
         rdfMediaTypes = Collections.unmodifiableSet(types);
     }
 

@@ -156,7 +156,7 @@ public class WonMessageBuilderTest {
                         actualContentDataset.getDefaultModel().isEmpty());
         Assert.assertTrue("messageContent dataset of message with content has no named graphs",
                         actualContentDataset.listNames().hasNext());
-        Set<String> names = new HashSet<String>();
+        Set<String> names = new HashSet<>();
         Iterators.addAll(names, actualContentDataset.listNames());
         Assert.assertEquals("incorrect number of named graphs", names.size(), 1);
         Assert.assertTrue("content different from the expected content",
@@ -193,7 +193,7 @@ public class WonMessageBuilderTest {
         Dataset actualContentDataset = msg.getMessageContent();
         Assert.assertTrue("messageContent dataset of message with content has non-empty default graph",
                         actualContentDataset.getDefaultModel().isEmpty());
-        Set<String> names = new HashSet<String>();
+        Set<String> names = new HashSet<>();
         Iterators.addAll(names, actualContentDataset.listNames());
         Assert.assertEquals("incorrect number of named graphs", names.size(), 2);
         Assert.assertTrue("content different from the expected content",
@@ -206,7 +206,7 @@ public class WonMessageBuilderTest {
         Dataset actualContentDataset = msg.getMessageContent();
         Assert.assertTrue("messageContent dataset of message with content has non-empty default graph",
                         actualContentDataset.getDefaultModel().isEmpty());
-        Set<String> names = new HashSet<String>();
+        Set<String> names = new HashSet<>();
         Iterators.addAll(names, actualContentDataset.listNames());
         Assert.assertEquals("incorrect number of named graphs", names.size(), 2);
         RdfUtils.toNamedModelStream(actualContentDataset, false).forEach(namedModel -> {

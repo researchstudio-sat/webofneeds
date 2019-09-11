@@ -1,16 +1,7 @@
 package won.protocol.util;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
@@ -20,29 +11,17 @@ import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.shared.PrefixMapping;
 import org.apache.jena.shared.impl.PrefixMappingImpl;
-import org.apache.jena.vocabulary.DC;
-import org.apache.jena.vocabulary.DCTerms;
-import org.apache.jena.vocabulary.OWL;
-import org.apache.jena.vocabulary.RDF;
-import org.apache.jena.vocabulary.RDFS;
-import org.apache.jena.vocabulary.XSD;
+import org.apache.jena.vocabulary.*;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StopWatch;
+import won.protocol.vocabulary.*;
 
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.Logger;
-import won.protocol.vocabulary.CERT;
-import won.protocol.vocabulary.SCHEMA;
-import won.protocol.vocabulary.SFSIG;
-import won.protocol.vocabulary.WON;
-import won.protocol.vocabulary.WONCON;
-import won.protocol.vocabulary.WONMATCH;
-import won.protocol.vocabulary.WONMSG;
-import won.protocol.vocabulary.WXBUDDY;
-import won.protocol.vocabulary.WXCHAT;
-import won.protocol.vocabulary.WXGROUP;
-import won.protocol.vocabulary.WXHOLD;
-import won.protocol.vocabulary.WXREVIEW;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Tests if it is viable to set exactly those prefixes that are used in a a
@@ -139,7 +118,7 @@ public class Prefixer {
     }
 
     public Stream<String> getPrefixes(Statement stmt) {
-        Set<String> prefixes = new HashSet<String>();
+        Set<String> prefixes = new HashSet<>();
         getUriPrefix(stmt.getSubject()).map(p -> prefixes.add(p));
         getUriPrefix(stmt.getPredicate()).map(p -> prefixes.add(p));
         getUriPrefix(stmt.getObject()).map(p -> prefixes.add(p));

@@ -173,8 +173,8 @@ public class LinkedDataSourceBase implements LinkedDataSource {
 
     private Dataset getDataForResource(final URI resourceURI, final URI requesterWebID, final int maxRequest,
                     final int maxDepth, BiFunction<Dataset, Set<URI>, Set<URI>> findNextUrisFunction) {
-        Set<URI> crawledURIs = new HashSet<URI>();
-        Set<URI> newlyDiscoveredURIs = new HashSet<URI>();
+        Set<URI> crawledURIs = new HashSet<>();
+        Set<URI> newlyDiscoveredURIs = new HashSet<>();
         newlyDiscoveredURIs.add(resourceURI);
         int depth = 0;
         int requests = 0;
@@ -225,7 +225,7 @@ public class LinkedDataSourceBase implements LinkedDataSource {
             }
             crawledURIs.addAll(urisToCrawl);
             requests += urisToCrawl.size();
-            newlyDiscoveredURIs = new HashSet<URI>(findNextUrisFunction.apply(dataset, crawledURIs));
+            newlyDiscoveredURIs = new HashSet<>(findNextUrisFunction.apply(dataset, crawledURIs));
             depth++;
             logger.debug("current Depth: " + depth);
         }
@@ -249,7 +249,7 @@ public class LinkedDataSourceBase implements LinkedDataSource {
             logger.debug("evaluating property paths on data crawled so far");
             RDFDataMgr.write(System.out, dataset, Lang.TRIG);
         }
-        Set<URI> toCrawl = new HashSet<URI>();
+        Set<URI> toCrawl = new HashSet<>();
         properties.stream().forEach(path -> {
             Iterator<URI> newURIs = RdfUtils.getURIsForPropertyPathByQuery(dataset, resourceURI, path);
             if (!newURIs.hasNext()) {
@@ -258,7 +258,7 @@ public class LinkedDataSourceBase implements LinkedDataSource {
                 }
                 return;
             }
-            Set<URI> newUrisThisIteration = new HashSet<URI>();
+            Set<URI> newUrisThisIteration = new HashSet<>();
             int skipped = 0;
             while (newURIs.hasNext()) {
                 URI newUri = newURIs.next();

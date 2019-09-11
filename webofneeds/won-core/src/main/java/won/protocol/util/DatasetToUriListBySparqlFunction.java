@@ -25,7 +25,7 @@ public class DatasetToUriListBySparqlFunction extends SparqlFunction<Dataset, Li
         Dataset result = DatasetFactory.createGeneral();
         result.begin(ReadWrite.WRITE);
         Query query = QueryFactory.create(sparql);
-        List<URI> ret = new ArrayList<URI>();
+        List<URI> ret = new ArrayList<>();
         try (QueryExecution queryExecution = QueryExecutionFactory.create(query, dataset)) {
             ResultSet resultSet = queryExecution.execSelect();
             if (!resultSet.getResultVars().contains("uri")) {

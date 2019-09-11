@@ -46,7 +46,7 @@ public class CertificateService {
      */
     public X509Certificate createSelfSignedCertificate(BigInteger serialNumber, KeyPair key, String commonName,
                     String webId) {
-        Map<ASN1ObjectIdentifier, String> subjectData = new HashMap<ASN1ObjectIdentifier, String>();
+        Map<ASN1ObjectIdentifier, String> subjectData = new HashMap<>();
         subjectData.put(BCStyle.CN, commonName);
         // ToDo: which attributes to use? make them configurable?
         // subjectData.put(BCStyle.C, "your county");
@@ -138,7 +138,7 @@ public class CertificateService {
 
     public static List<URI> getWebIdFromSubjectAlternativeNames(final X509Certificate cert)
                     throws CertificateParsingException {
-        List<URI> webIDs = new ArrayList<URI>();
+        List<URI> webIDs = new ArrayList<>();
         Collection<List<?>> alternativeNames = cert.getSubjectAlternativeNames();
         if (alternativeNames != null) {
             for (List<?> alternativeName : alternativeNames) {

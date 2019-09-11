@@ -279,14 +279,14 @@ public class WonMessage implements Serializable {
         if (this.envelopeGraphs != null)
             return this.envelopeGraphs;
         // initialize
-        List<Model> allEnvelopes = new ArrayList<Model>();
-        this.envelopeGraphNames = new ArrayList<String>();
-        this.contentGraphNames = new ArrayList<String>();
-        this.graphSignatures = new HashMap<String, Resource>();
+        List<Model> allEnvelopes = new ArrayList<>();
+        this.envelopeGraphNames = new ArrayList<>();
+        this.contentGraphNames = new ArrayList<>();
+        this.graphSignatures = new HashMap<>();
         URI currentMessageURI = null;
         this.outerEnvelopeGraph = null;
-        Set<String> envelopesContainedInOthers = new HashSet<String>();
-        Set<String> allEnvelopeGraphNames = new HashSet<String>();
+        Set<String> envelopesContainedInOthers = new HashSet<>();
+        Set<String> allEnvelopeGraphNames = new HashSet<>();
         // iterate over named graphs
         Iterator<String> modelUriIterator = this.completeDataset.listNames();
         while (modelUriIterator.hasNext()) {
@@ -618,7 +618,7 @@ public class WonMessage implements Serializable {
     }
 
     private synchronized List<URI> getEnvelopePropertyURIValues(Property property) {
-        List<URI> values = new ArrayList<URI>();
+        List<URI> values = new ArrayList<>();
         Model currentEnvelope = getOuterEnvelopeGraph();
         URI currentEnvelopeUri = getOuterEnvelopeGraphURI();
         // TODO would make sense to order envelope graphs in order from container to
