@@ -124,7 +124,6 @@ public class UriConsistencyCheckingWonMessageProcessor implements WonMessageProc
             URI atomURI = WonRdfUtils.AtomUtils.getAtomURI(message.getCompleteDataset());
             checkNodeConformance(localNodeInfo, atomURI, null, null);
         }
-        return;
     }
 
     private void checkNodeConformance(final WonNodeInfo info, final URI atomURI, final URI connURI,
@@ -159,6 +158,5 @@ public class UriConsistencyCheckingWonMessageProcessor implements WonMessageProc
             throw new UriNodePathException(
                             "URI '" + uri + "' does not start with the expected prefix '" + expectedPrefix + "'");
         }
-        return;
     }
 }

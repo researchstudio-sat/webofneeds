@@ -127,7 +127,7 @@ public class WonLinkedDataUtils {
         }
         Dataset atomListDataset = getDataForResource(atomListUri, linkedDataSource);
         return RdfUtils.visitFlattenedToList(atomListDataset, model -> {
-            StmtIterator it = model.listStatements((Resource) null, RDFS.member, (RDFNode) null);
+            StmtIterator it = model.listStatements(null, RDFS.member, (RDFNode) null);
             List<URI> ret = new ArrayList<>();
             while (it.hasNext()) {
                 ret.add(URI.create(it.next().getObject().toString()));
@@ -266,7 +266,7 @@ public class WonLinkedDataUtils {
             logger.debug("won:wonNode property of base resource {} is not a resource", baseResource);
             return null;
         }
-        URI wonNodeUri = URI.create(wonNodeNode.asResource().getURI().toString());
+        URI wonNodeUri = URI.create(wonNodeNode.asResource().getURI());
         logger.debug("obtained WON node URI: {}", wonNodeUri);
         if (wonNodeStatementIterator.hasNext()) {
             logger.warn("multiple WON node URIs found for resource {}, using first one: {} ", baseResource, wonNodeUri);

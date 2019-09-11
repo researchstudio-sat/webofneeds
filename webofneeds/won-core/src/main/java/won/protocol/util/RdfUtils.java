@@ -513,14 +513,14 @@ public class RdfUtils {
             throw new IllegalArgumentException("resource and replacement must be from the same model");
         Model model = resource.getModel();
         Model modelForNewStatements = ModelFactory.createDefaultModel();
-        StmtIterator iterator = model.listStatements(resource, (Property) null, (RDFNode) null);
+        StmtIterator iterator = model.listStatements(resource, null, (RDFNode) null);
         while (iterator.hasNext()) {
             Statement origStmt = iterator.next();
             Statement newStmt = new StatementImpl(replacement, origStmt.getPredicate(), origStmt.getObject());
             iterator.remove();
             modelForNewStatements.add(newStmt);
         }
-        iterator = model.listStatements(null, (Property) null, (RDFNode) resource);
+        iterator = model.listStatements(null, null, resource);
         while (iterator.hasNext()) {
             Statement origStmt = iterator.next();
             Statement newStmt = new StatementImpl(origStmt.getSubject(), origStmt.getPredicate(), replacement);
@@ -532,7 +532,7 @@ public class RdfUtils {
 
     public static void removeResource(Model model, Resource resource) {
         // remove statements where resource is subject
-        model.removeAll(resource, null, (RDFNode) null);
+        model.removeAll(resource, null, null);
         // remove statements where resource is object
         model.removeAll(null, null, resource);
     }
@@ -1902,7 +1902,7 @@ public class RdfUtils {
      */
     public static Set<String> getModelsOfSubjectResource(Dataset dataset, RDFNode resource) {
         return toNamedModelStream(dataset, false)
-                        .map(nm -> nm.model.contains(resource.asResource(), (Property) null, (RDFNode) null) ? nm.name
+                        .map(nm -> nm.model.contains(resource.asResource(), null, (RDFNode) null) ? nm.name
                                         : null)
                         .filter(name -> name != null).collect(Collectors.toSet());
     }

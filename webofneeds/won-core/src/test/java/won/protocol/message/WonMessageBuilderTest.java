@@ -10,7 +10,19 @@
  */
 package won.protocol.message;
 
-import static won.protocol.message.WonMessageBuilder.wrap;
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import com.google.common.collect.Iterators;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.DatasetFactory;
+import org.apache.jena.rdf.model.*;
+import org.apache.jena.vocabulary.RDF;
+import org.apache.jena.vocabulary.SKOS;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.slf4j.LoggerFactory;
+import won.protocol.util.RdfUtils;
 
 import java.net.URI;
 import java.util.HashSet;
@@ -18,27 +30,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.jena.query.Dataset;
-import org.apache.jena.query.DatasetFactory;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.Statement;
-import org.apache.jena.rdf.model.StmtIterator;
-import org.apache.jena.riot.Lang;
-import org.apache.jena.riot.RDFDataMgr;
-import org.apache.jena.vocabulary.RDF;
-import org.apache.jena.vocabulary.SKOS;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.collect.Iterators;
-
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.Logger;
-import won.protocol.util.RdfUtils;
+import static won.protocol.message.WonMessageBuilder.wrap;
 
 public class WonMessageBuilderTest {
     private static final URI MSG_URI_1 = URI.create("http://example.com/msg/1234");
@@ -97,8 +89,8 @@ public class WonMessageBuilderTest {
                             }
                         }, false));
         Assert.assertEquals(TYPE_URI_1.toString(),
-                        RdfUtils.findOnePropertyFromResource(msg2.getMessageContent(), MSG_URI_1, RDF.type).asResource()
-                                        .getURI().toString());
+                RdfUtils.findOnePropertyFromResource(msg2.getMessageContent(), MSG_URI_1, RDF.type).asResource()
+                                .getURI());
     }
 
     @Test
@@ -116,8 +108,8 @@ public class WonMessageBuilderTest {
                             }
                         }, false));
         Assert.assertEquals(TYPE_URI_2.toString(),
-                        RdfUtils.findOnePropertyFromResource(msg2.getMessageContent(), MSG_URI_2, RDF.type).asResource()
-                                        .getURI().toString());
+                RdfUtils.findOnePropertyFromResource(msg2.getMessageContent(), MSG_URI_2, RDF.type).asResource()
+                                .getURI());
     }
 
     @Test

@@ -10,12 +10,12 @@
  */
 package won.protocol.rest;
 
+import org.springframework.http.MediaType;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-
-import org.springframework.http.MediaType;
 
 /**
  * User: fkleedorfer Date: 28.11.12
@@ -32,8 +32,8 @@ public class RDFMediaType {
     public static final Set<MediaType> rdfMediaTypes;
     static {
         HashSet<MediaType> types = new HashSet<MediaType>(Arrays
-                        .asList(new MediaType[] { TEXT_TURTLE, APPLICATION_RDF_XML, APPLICATION_X_TURTLE, TEXT_RDF_N3,
-                                        APPLICATION_JSON, APPLICATION_TRIG, APPLICATION_JSONLD, APPLICATION_NQUADS }));
+                        .asList(TEXT_TURTLE, APPLICATION_RDF_XML, APPLICATION_X_TURTLE, TEXT_RDF_N3,
+                                APPLICATION_JSON, APPLICATION_TRIG, APPLICATION_JSONLD, APPLICATION_NQUADS));
         rdfMediaTypes = Collections.unmodifiableSet(types);
     }
 
