@@ -1153,7 +1153,6 @@ public class RdfUtils {
      * 
      * @param dataset
      * @param resourceURI
-     * @param propertyPath
      * @return
      */
     public static <T> Stream<T> getObjectStreamOfProperty(final Dataset dataset, URI resourceURI, URI property,

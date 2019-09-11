@@ -613,7 +613,6 @@ public class AtomModelWrapper {
     /**
      * get all content nodes of a specified type
      *
-     * @param type specifies which content nodes to return (IS, SEEKS, ALL, ...)
      * @return content nodes
      */
     public Collection<Resource> getSeeksNodes() {
@@ -671,7 +670,6 @@ public class AtomModelWrapper {
     /**
      * get all content nodes of a specified type
      *
-     * @param type specifies which content nodes to return (IS, SEEKS, ALL, ...)
      * @return content nodes
      */
     public Collection<Resource> getSeeksSeeksNodes() {

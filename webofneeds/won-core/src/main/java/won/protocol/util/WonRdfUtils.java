@@ -707,8 +707,8 @@ public class WonRdfUtils {
          * the dataset.
          * 
          * @param dataset
-         * @param leftAtom
-         * @param rightAtom
+         * @param firstAtom
+         * @param secondAtom
          * @return
          */
         public static Set<Pair<URI>> getCompatibleSocketsForAtoms(Dataset dataset, URI firstAtom, URI secondAtom) {
@@ -852,7 +852,6 @@ public class WonRdfUtils {
          * Returns all sockets of the base resource of the given type.
          * 
          * @param model
-         * @param subject
          * @param socketType
          * @return
          */
@@ -923,7 +922,7 @@ public class WonRdfUtils {
          * 
          * @param model
          * @param subject
-         * @param boolean returnAnyIfNoDefaultFound
+         * @param returnAnyIfNoDefaultFound
          * @return
          */
         public static Optional<URI> getDefaultSocket(Model model, Resource subject, boolean returnAnyIfNoDefaultFound) {

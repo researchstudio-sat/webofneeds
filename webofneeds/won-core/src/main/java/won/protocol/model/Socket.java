@@ -4,11 +4,6 @@ import javax.persistence.*;
 import java.net.URI;
 import java.util.Objects;
 
-/**
- * Created with IntelliJ IDEA. User: gabriel Date: 28.08.13 Time: 16:03 To
- * change this template use File | Settings | File Templates.
- */
-
 @Entity
 @Table(name = "socket", indexes = { @Index(name = "IDX_UNIQUE_SOCKET", columnList = "socketURI") })
 public class Socket {
