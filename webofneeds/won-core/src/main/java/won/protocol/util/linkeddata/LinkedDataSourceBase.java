@@ -225,8 +225,7 @@ public class LinkedDataSourceBase implements LinkedDataSource {
             }
             crawledURIs.addAll(urisToCrawl);
             requests += urisToCrawl.size();
-            newlyDiscoveredURIs = new HashSet<URI>();
-            newlyDiscoveredURIs.addAll(findNextUrisFunction.apply(dataset, crawledURIs));
+            newlyDiscoveredURIs = new HashSet<URI>(findNextUrisFunction.apply(dataset, crawledURIs));
             depth++;
             logger.debug("current Depth: " + depth);
         }

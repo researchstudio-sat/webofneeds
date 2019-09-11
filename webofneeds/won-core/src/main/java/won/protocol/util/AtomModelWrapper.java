@@ -781,10 +781,9 @@ public class AtomModelWrapper {
     }
 
     public Collection<String> getContentPropertyStringValues(Property p, String language) {
-        Collection<String> values = new LinkedList<>();
         Resource node = getAtomContentNode();
         Collection valuesOfContentNode = getContentPropertyStringValues(node, p, language);
-        values.addAll(valuesOfContentNode);
+        Collection<String> values = new LinkedList<>(valuesOfContentNode);
         return values;
     }
 
@@ -930,10 +929,9 @@ public class AtomModelWrapper {
     }
 
     public Collection<RDFNode> getContentPropertyObjects(Property p) {
-        Collection<RDFNode> values = new LinkedList<>();
         Resource node = getAtomContentNode();
         Collection valuesOfContentNode = getContentPropertyObjects(node, p);
-        values.addAll(valuesOfContentNode);
+        Collection<RDFNode> values = new LinkedList<>(valuesOfContentNode);
         return values;
     }
 

@@ -11,7 +11,7 @@ import won.cryptography.service.keystore.KeyStoreService;
 import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
-import java.util.Arrays;
+import java.util.Collections;
 
 /**
  * User: ypanchenko Date: 08.10.2015
@@ -44,7 +44,7 @@ public class RegistrationRestClientHttps implements RegistrationClient {
             throw new RuntimeException(msg, e);
         }
         HttpHeaders headers = new HttpHeaders();
-        headers.setAccept(Arrays.asList(MediaType.TEXT_PLAIN));
+        headers.setAccept(Collections.singletonList(MediaType.TEXT_PLAIN));
         entity = new HttpEntity<String>("parameters", headers);
     }
 
