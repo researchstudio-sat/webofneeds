@@ -38,7 +38,7 @@ public class RegisterMatcherAction extends BaseEventBotAction {
 
     @Override
     protected void doRun(Event event, EventListener executingListener) throws Exception {
-        final Iterator wonNodeUriIterator = getEventListenerContext().getMatcherNodeURISource().getNodeURIIterator();
+        final Iterator<?> wonNodeUriIterator = getEventListenerContext().getMatcherNodeURISource().getNodeURIIterator();
         while (wonNodeUriIterator.hasNext()) {
             URI wonNodeUri = (URI) wonNodeUriIterator.next();
             try {

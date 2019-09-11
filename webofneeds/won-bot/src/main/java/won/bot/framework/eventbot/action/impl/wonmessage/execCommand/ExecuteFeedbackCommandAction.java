@@ -65,7 +65,7 @@ public class ExecuteFeedbackCommandAction extends ExecuteSendMessageCommandActio
     }
 
     @Override
-    protected MessageCommandNotSentEvent createMessageNotSentEvent(FeedbackCommandEvent originalCommand,
+    protected MessageCommandNotSentEvent<?> createMessageNotSentEvent(FeedbackCommandEvent originalCommand,
                     String message) {
         return new MessageCommandNotSentEvent<FeedbackCommandEvent>(message, originalCommand);
     }
@@ -77,8 +77,11 @@ public class ExecuteFeedbackCommandAction extends ExecuteSendMessageCommandActio
         URI localAtom = WonRdfUtils.ConnectionUtils.getLocalAtomURIFromConnection(connectionRDF, connectionURI);
         URI wonNode = WonRdfUtils.ConnectionUtils.getWonNodeURIFromConnection(connectionRDF, connectionURI);
         // TODO: make more generic by using the URIs specified in the command.
-        return WonMessageBuilder.setMessagePropertiesForHintFeedback(
-                        wonNodeInformationService.generateEventURI(wonNode), connectionURI, localAtom, wonNode,
-                        URI.create(WONCON.Good.getURI()).equals(feedbackCommandEvent.getValue())).build();
+        return WonMessageBuilder
+                        .setMessagePropertiesForHintFeedback(wonNodeInformationService.generateEventURI(wonNode),
+                                        connectionURI,
+                                        localAtom, wonNode,
+                                        URI.create(WONCON.Good.getURI()).equals(feedbackCommandEvent.getValue()))
+                        .build();
     }
 }

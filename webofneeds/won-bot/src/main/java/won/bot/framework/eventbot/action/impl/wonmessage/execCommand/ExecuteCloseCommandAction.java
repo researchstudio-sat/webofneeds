@@ -66,7 +66,8 @@ public class ExecuteCloseCommandAction extends ExecuteSendMessageCommandAction<C
     }
 
     @Override
-    protected MessageCommandNotSentEvent createMessageNotSentEvent(CloseCommandEvent originalCommand, String message) {
+    protected MessageCommandNotSentEvent<?> createMessageNotSentEvent(CloseCommandEvent originalCommand,
+                    String message) {
         return new MessageCommandNotSentEvent<CloseCommandEvent>(message, originalCommand);
     }
 

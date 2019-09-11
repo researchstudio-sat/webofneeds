@@ -114,13 +114,12 @@ public abstract class AbstractCreateAtomAction extends BaseEventBotAction {
     public void setDoNotMatch(final boolean doNotMatch) {
         this.doNotMatch = doNotMatch;
     }
-
-    private boolean socket(SocketType socketToCheck) {
-        for (URI socket : sockets) {
-            if (socket.equals(socketToCheck.getURI())) {
-                return true;
-            }
-        }
-        return false;
-    }
+    // private boolean socket(SocketType socketToCheck) {
+    // for (URI socket : sockets) {
+    // if (socket.equals(socketToCheck.getURI())) {
+    // return true;
+    // }
+    // }
+    // return false;
+    // }
 }

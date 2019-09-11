@@ -58,7 +58,7 @@ public class ExecuteConnectionMessageCommandAction
     }
 
     @Override
-    protected MessageCommandNotSentEvent createMessageNotSentEvent(ConnectionMessageCommandEvent originalCommand,
+    protected MessageCommandNotSentEvent<?> createMessageNotSentEvent(ConnectionMessageCommandEvent originalCommand,
                     String message) {
         return new MessageCommandNotSentEvent<ConnectionMessageCommandEvent>(message, originalCommand);
     }

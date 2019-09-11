@@ -98,7 +98,7 @@ public class CrawlConnectionDataBehaviour extends BotBehaviour {
             }
         }, new Date(System.currentTimeMillis() + abortTimeout.toMillis()));
         ;
-        List<Path> propertyPaths = new ArrayList<>();
+        List<Path> propertyPaths = new ArrayList<Path>();
         PrefixMapping pmap = new PrefixMappingImpl();
         pmap.withDefaultMappings(PrefixMapping.Standard);
         pmap.setNsPrefix("won", WON.getURI());
@@ -107,7 +107,7 @@ public class CrawlConnectionDataBehaviour extends BotBehaviour {
         propertyPaths.add(PathParser.parse("won:messageContainer/rdfs:member", pmap));
         CrawlCommandEvent crawlAtomCommandEvent = new CrawlCommandEvent(command.getAtomURI(), command.getAtomURI(),
                         propertyPaths, 10000, 5);
-        propertyPaths = new ArrayList();
+        propertyPaths = new ArrayList<Path>();
         propertyPaths.add(PathParser.parse("won:messageContainer", pmap));
         propertyPaths.add(PathParser.parse("won:messageContainer/rdfs:member", pmap));
         propertyPaths.add(PathParser.parse("won:messageContainer/rdfs:member/msg:correspondingRemoteMessage", pmap));
@@ -117,17 +117,16 @@ public class CrawlConnectionDataBehaviour extends BotBehaviour {
         propertyPaths.add(PathParser.parse("won:targetConnection", pmap));
         propertyPaths.add(PathParser.parse("won:targetConnection/won:messageContainer", pmap));
         propertyPaths.add(PathParser.parse("won:targetConnection/won:messageContainer/rdfs:member", pmap));
-        propertyPaths.add(PathParser.parse(
-                        "won:targetConnection/won:messageContainer/rdfs:member/msg:correspondingRemoteMessage", pmap));
+        propertyPaths.add(PathParser
+                        .parse("won:targetConnection/won:messageContainer/rdfs:member/msg:correspondingRemoteMessage",
+                                        pmap));
         CrawlCommandEvent crawlConnectionCommandEvent = new CrawlCommandEvent(command.getAtomURI(),
                         command.getConnectionURI(), propertyPaths, 10000, 5);
         Dataset crawledData = DatasetFactory.createGeneral();
         // add crawlcommand listener
         this.subscribeWithAutoCleanup(CrawlCommandEvent.class,
-                        new ActionOnEventListener(context,
-                                        new OrFilter(new SameEventFilter(crawlAtomCommandEvent),
-                                                        new SameEventFilter(crawlConnectionCommandEvent)),
-                                        new CrawlAction(context)));
+                        new ActionOnEventListener(context, new OrFilter(new SameEventFilter(crawlAtomCommandEvent),
+                                        new SameEventFilter(crawlConnectionCommandEvent)), new CrawlAction(context)));
         // when the first crawl succeeds, start the second
         this.subscribeWithAutoCleanup(CrawlCommandSuccessEvent.class, new ActionOnEventListener(context,
                         new CommandResultFilter(crawlAtomCommandEvent), new BaseEventBotAction(context) {
@@ -166,8 +165,9 @@ public class CrawlConnectionDataBehaviour extends BotBehaviour {
                                                 CrawlCommandFailureEvent failureEvent = (CrawlCommandFailureEvent) event;
                                                 logger.debug("crawling failed for connection {}, message: {}",
                                                                 command.getConnectionURI(), failureEvent.getMessage());
-                                                context.getEventBus().publish(new CrawlConnectionCommandFailureEvent(
-                                                                failureEvent.getMessage(), command));
+                                                context.getEventBus().publish(
+                                                                new CrawlConnectionCommandFailureEvent(
+                                                                                failureEvent.getMessage(), command));
                                                 deactivate();
                                             }
                                         }));

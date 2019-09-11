@@ -66,7 +66,8 @@ public class ExecuteOpenCommandAction extends ExecuteSendMessageCommandAction<Op
     }
 
     @Override
-    protected MessageCommandNotSentEvent createMessageNotSentEvent(OpenCommandEvent originalCommand, String message) {
+    protected MessageCommandNotSentEvent<?> createMessageNotSentEvent(OpenCommandEvent originalCommand,
+                    String message) {
         return new MessageCommandNotSentEvent<OpenCommandEvent>(message, originalCommand);
     }
 

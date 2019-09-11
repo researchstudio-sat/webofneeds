@@ -20,7 +20,7 @@ public class MemoryBotContext implements BotContext {
     private Map<String, Map<String, Object>> contextObjectMap = new HashMap<>();
     private Map<String, Map<String, List<Object>>> contextListMap = new HashMap<>();
     private Set<URI> nodeUris = new HashSet<>();
-    private Map<String, List<URI>> namedAtomUriLists = new HashMap();
+    private Map<String, List<URI>> namedAtomUriLists = new HashMap<>();
 
     @Override
     public Set<URI> retrieveAllAtomUris() {
@@ -44,7 +44,7 @@ public class MemoryBotContext implements BotContext {
     public synchronized void appendToNamedAtomUriList(final URI uri, final String name) {
         List<URI> uris = this.namedAtomUriLists.get(name);
         if (uris == null) {
-            uris = new ArrayList();
+            uris = new ArrayList<URI>();
         }
         uris.add(uri);
         this.namedAtomUriLists.put(name, uris);

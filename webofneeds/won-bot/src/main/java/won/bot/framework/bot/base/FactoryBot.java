@@ -36,7 +36,7 @@ public abstract class FactoryBot extends EventBot {
             }
         };
         factoryBotInitBehaviour.onDeactivateActivate(runningBehaviour, factoryBotHintBehaviour,
-                messageCommandBehaviour);
+                        messageCommandBehaviour);
         factoryBotInitBehaviour.activate();
     }
 

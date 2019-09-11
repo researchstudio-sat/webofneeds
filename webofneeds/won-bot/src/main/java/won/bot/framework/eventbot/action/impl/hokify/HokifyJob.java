@@ -46,7 +46,7 @@ public class HokifyJob {
     @JsonProperty(JOBTYPE)
     private String jobtype;
     @JsonProperty(FIELD)
-    private List field;
+    private List<?> field;
     @JsonProperty(STATS)
     private Stats stats;
     @JsonProperty(PRIORIZE)
@@ -60,13 +60,17 @@ public class HokifyJob {
         if (this.stats != null) {
             return "HokifyJob [title=" + title + ", date=" + date + ", referencenumber=" + referencenumber + ", image="
                             + image + ", url=" + url + ", company=" + company + ", city=" + city + ", country="
-                            + country + ", description=" + description + ", salary=" + salary + ", jobtype=" + jobtype
-                            + ", field=" + field + ", stats=" + stats.toString() + ", priorize=" + priorize + "]";
+                            + country
+                            + ", description=" + description + ", salary=" + salary + ", jobtype=" + jobtype
+                            + ", field="
+                            + field + ", stats=" + stats.toString() + ", priorize=" + priorize + "]";
         } else {
             return "HokifyJob [title=" + title + ", date=" + date + ", referencenumber=" + referencenumber + ", image="
                             + image + ", url=" + url + ", company=" + company + ", city=" + city + ", country="
-                            + country + ", description=" + description + ", salary=" + salary + ", jobtype=" + jobtype
-                            + ", field=" + field + ", stats=" + 0 + ", priorize=" + priorize + "]";
+                            + country
+                            + ", description=" + description + ", salary=" + salary + ", jobtype=" + jobtype
+                            + ", field="
+                            + field + ", stats=" + 0 + ", priorize=" + priorize + "]";
         }
     }
 
@@ -158,11 +162,11 @@ public class HokifyJob {
         this.jobtype = jobtype;
     }
 
-    public List getField() {
+    public List<?> getField() {
         return field;
     }
 
-    public void setField(List field) {
+    public void setField(List<?> field) {
         this.field = field;
     }
 

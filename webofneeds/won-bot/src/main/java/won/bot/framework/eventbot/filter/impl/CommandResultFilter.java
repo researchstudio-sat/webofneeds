@@ -29,6 +29,6 @@ public class CommandResultFilter implements EventFilter {
     public boolean accept(Event event) {
         if (!(event instanceof CommandResultEvent))
             return false;
-        return ((CommandResultEvent) event).getOriginalCommandEvent() == orginalCommand;
+        return ((CommandResultEvent<?>) event).getOriginalCommandEvent() == orginalCommand;
     }
 }

@@ -89,8 +89,9 @@ public abstract class ExecuteSendMessageCommandAction<T extends MessageCommandEv
                 if (responseEvent instanceof FailureResponseEvent) {
                     FailureResponseEvent failureEvent = (FailureResponseEvent) responseEvent;
                     logger.info(makeLogMessageString(event) + " failed on local WoN node with message: {}",
-                                    WonRdfUtils.MessageUtils.getTextMessage(
-                                                    ((FailureResponseEvent) responseEvent).getFailureMessage()));
+                                    WonRdfUtils.MessageUtils
+                                                    .getTextMessage(((FailureResponseEvent) responseEvent)
+                                                                    .getFailureMessage()));
                     Event eventToPublish = createLocalNodeFailureEvent(messageCommandEvent, message, failureEvent);
                     if (eventToPublish != null) {
                         getEventListenerContext().getEventBus().publish(eventToPublish);
@@ -111,10 +112,12 @@ public abstract class ExecuteSendMessageCommandAction<T extends MessageCommandEv
                 }, responseEvent -> {
                     if (responseEvent instanceof FailureResponseEvent) {
                         FailureResponseEvent failureEvent = (FailureResponseEvent) responseEvent;
-                        logger.info(makeLogMessageString(event)
-                                        + " failed on remote WoN node with message (more on loglevel 'debug'): {}",
-                                        WonRdfUtils.MessageUtils.getTextMessage(
-                                                        ((FailureResponseEvent) responseEvent).getFailureMessage()));
+                        logger.info(
+                                        makeLogMessageString(event)
+                                                        + " failed on remote WoN node with message (more on loglevel 'debug'): {}",
+                                        WonRdfUtils.MessageUtils
+                                                        .getTextMessage(((FailureResponseEvent) responseEvent)
+                                                                        .getFailureMessage()));
                         if (logger.isDebugEnabled()) {
                             logger.debug("failed message: \n {}", RdfUtils.toString(message.getCompleteDataset()));
                         }
@@ -169,7 +172,7 @@ public abstract class ExecuteSendMessageCommandAction<T extends MessageCommandEv
      * Implementations can choose to return null here if they do not want an event
      * published.
      */
-    protected abstract MessageCommandNotSentEvent createMessageNotSentEvent(T originalCommand, String message);
+    protected abstract MessageCommandNotSentEvent<?> createMessageNotSentEvent(T originalCommand, String message);
 
     /**
      * Implementations must return a valid WoNMessage here or perform adequate

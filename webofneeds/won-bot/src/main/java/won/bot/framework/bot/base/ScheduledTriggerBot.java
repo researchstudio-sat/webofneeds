@@ -29,7 +29,7 @@ public abstract class ScheduledTriggerBot extends BaseBot {
     private TaskScheduler taskScheduler;
     private Executor insideSchedulerExecutor = new InsideSchedulerExecutor();
     private Trigger trigger;
-    private ScheduledFuture scheduledExecution;
+    private ScheduledFuture<?> scheduledExecution;
 
     @Override
     public synchronized void initialize() throws Exception {
@@ -47,7 +47,6 @@ public abstract class ScheduledTriggerBot extends BaseBot {
         } else {
             logger.info("This bot will not fire the ActEvent because no trigger was configured.");
         }
-
         super.initialize();
     }
 
@@ -101,7 +100,7 @@ public abstract class ScheduledTriggerBot extends BaseBot {
         scheduledExecution.cancel(true);
     }
 
-    protected ScheduledFuture getScheduledExecution() {
+    protected ScheduledFuture<?> getScheduledExecution() {
         return scheduledExecution;
     }
 

@@ -160,7 +160,7 @@ public abstract class BaseBot implements Bot {
     @Qualifier("default")
     @Autowired(required = true)
     public void setMatcherProtocolAtomServiceClient(
-            final MatcherProtocolAtomServiceClientSide matcherProtocolAtomServiceClient) {
+                    final MatcherProtocolAtomServiceClientSide matcherProtocolAtomServiceClient) {
         this.matcherProtocolAtomServiceClient = matcherProtocolAtomServiceClient;
     }
 
@@ -171,7 +171,7 @@ public abstract class BaseBot implements Bot {
     @Qualifier("default")
     @Autowired(required = true)
     public void setMatcherProtocolMatcherService(
-            final MatcherProtocolMatcherServiceImplJMSBased matcherProtocolMatcherService) {
+                    final MatcherProtocolMatcherServiceImplJMSBased matcherProtocolMatcherService) {
         this.matcherProtocolMatcherService = matcherProtocolMatcherService;
     }
 
@@ -219,7 +219,7 @@ public abstract class BaseBot implements Bot {
 
     @Override
     public abstract void onNewAtomCreated(final URI atomUri, final URI wonNodeUri, final Dataset atomDataset)
-            throws Exception;
+                    throws Exception;
 
     @Override
     public abstract void onConnectFromOtherAtom(Connection con, final WonMessage wonMessage);
@@ -250,7 +250,7 @@ public abstract class BaseBot implements Bot {
 
     @Override
     public abstract void onNewAtomCreatedNotificationForMatcher(final URI wonNodeURI, final URI atomURI,
-            final Dataset atomDataset);
+                    final Dataset atomDataset);
 
     @Override
     public abstract void onAtomActivatedNotificationForMatcher(final URI wonNodeURI, final URI atomURI);

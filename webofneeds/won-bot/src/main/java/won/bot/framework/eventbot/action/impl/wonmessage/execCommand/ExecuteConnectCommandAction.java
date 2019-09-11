@@ -66,7 +66,7 @@ public class ExecuteConnectCommandAction extends ExecuteSendMessageCommandAction
     }
 
     @Override
-    protected MessageCommandNotSentEvent createMessageNotSentEvent(ConnectCommandEvent originalCommand,
+    protected MessageCommandNotSentEvent<?> createMessageNotSentEvent(ConnectCommandEvent originalCommand,
                     String message) {
         return new MessageCommandNotSentEvent<ConnectCommandEvent>(message, originalCommand);
     }

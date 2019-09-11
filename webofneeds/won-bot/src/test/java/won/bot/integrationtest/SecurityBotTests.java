@@ -91,7 +91,7 @@ public class SecurityBotTests {
         // adding the bot to the bot manager will cause it to be initialized.
         // at that point, the trigger starts.
         botManager.addBot(bot);
-        final SettableListenableFuture<TestFinishedEvent> futureTestResult = new SettableListenableFuture();
+        final SettableListenableFuture<TestFinishedEvent> futureTestResult = new SettableListenableFuture<>();
         final EventListenerContext ctx = bot.getExposedEventListenerContext();
         // action for setting the future when we get a test result
         EventBotAction setFutureAction = new SetFutureAction(ctx, futureTestResult);
@@ -114,7 +114,7 @@ public class SecurityBotTests {
         private SettableListenableFuture<TestFinishedEvent> futureTestResult;
 
         private SetFutureAction(EventListenerContext eventListenerContext,
-                SettableListenableFuture<TestFinishedEvent> futureTestResult) {
+                        SettableListenableFuture<TestFinishedEvent> futureTestResult) {
             super(eventListenerContext);
             this.futureTestResult = futureTestResult;
         }
@@ -134,7 +134,7 @@ public class SecurityBotTests {
         private IntegrationtestBot bot;
 
         private SetFutureFromErrorEventAction(EventListenerContext eventListenerContext,
-                SettableListenableFuture<TestFinishedEvent> futureTestResult, IntegrationtestBot bot) {
+                        SettableListenableFuture<TestFinishedEvent> futureTestResult, IntegrationtestBot bot) {
             super(eventListenerContext);
             this.futureTestResult = futureTestResult;
             this.bot = bot;
