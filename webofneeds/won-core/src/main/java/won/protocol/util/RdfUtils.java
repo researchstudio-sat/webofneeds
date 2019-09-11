@@ -1833,7 +1833,7 @@ public class RdfUtils {
     public static Set<String> getModelsOfResource(Dataset dataset, RDFNode resource) {
         return toNamedModelStream(dataset, false)
                         .map(nm -> nm.model.containsResource(resource) ? nm.name : null)
-                        .filter(name -> name != null).collect(Collectors.toSet());
+                        .filter(Objects::nonNull).collect(Collectors.toSet());
     }
 
     /**
@@ -1847,7 +1847,7 @@ public class RdfUtils {
         return toNamedModelStream(dataset, false)
                         .map(nm -> nm.model.contains(resource.asResource(), null, (RDFNode) null) ? nm.name
                                         : null)
-                        .filter(name -> name != null).collect(Collectors.toSet());
+                        .filter(Objects::nonNull).collect(Collectors.toSet());
     }
 
     /**

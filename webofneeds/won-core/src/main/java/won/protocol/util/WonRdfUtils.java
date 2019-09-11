@@ -715,13 +715,11 @@ public class WonRdfUtils {
             Set<URI> firstAtomSockets = getSocketsOfAtom(dataset, firstAtom);
             Set<URI> secondAtomSockets = getSocketsOfAtom(dataset, secondAtom);
             Set<Pair<URI>> ret = new HashSet<>();
-            firstAtomSockets.forEach(firstAtomSocket -> {
-                secondAtomSockets.forEach(secondAtomSocket -> {
-                    if (isSocketsCompatible(dataset, firstAtomSocket, secondAtomSocket)) {
-                        ret.add(new Pair(firstAtomSocket, secondAtomSocket));
-                    }
-                });
-            });
+            firstAtomSockets.forEach(firstAtomSocket -> secondAtomSockets.forEach(secondAtomSocket -> {
+                if (isSocketsCompatible(dataset, firstAtomSocket, secondAtomSocket)) {
+                    ret.add(new Pair(firstAtomSocket, secondAtomSocket));
+                }
+            }));
             return ret;
         }
 
@@ -729,13 +727,11 @@ public class WonRdfUtils {
             Set<URI> firstAtomSockets = getSocketsOfAtom(dataset, firstAtom);
             Set<URI> secondAtomSockets = getSocketsOfAtom(dataset, secondAtom);
             Set<Pair<URI>> ret = new HashSet<>();
-            firstAtomSockets.forEach(firstAtomSocket -> {
-                secondAtomSockets.forEach(secondAtomSocket -> {
-                    if (!isSocketsCompatible(dataset, firstAtomSocket, secondAtomSocket)) {
-                        ret.add(new Pair(firstAtomSocket, secondAtomSocket));
-                    }
-                });
-            });
+            firstAtomSockets.forEach(firstAtomSocket -> secondAtomSockets.forEach(secondAtomSocket -> {
+                if (!isSocketsCompatible(dataset, firstAtomSocket, secondAtomSocket)) {
+                    ret.add(new Pair(firstAtomSocket, secondAtomSocket));
+                }
+            }));
             return ret;
         }
 
@@ -1256,7 +1252,7 @@ public class WonRdfUtils {
                                     NodeFactory.createURI(state.get().getURI().toString())));
                 }
                 return pattern;
-            }).map(pattern -> new OpBGP(pattern)).map(bgp -> new OpGraph(Var.alloc("g"), bgp)).reduce(Optional.empty(),
+            }).map(OpBGP::new).map(bgp -> new OpGraph(Var.alloc("g"), bgp)).reduce(Optional.empty(),
                             (union, pattern) -> {
                                 if (!union.isPresent()) {
                                     return Optional.of(pattern);

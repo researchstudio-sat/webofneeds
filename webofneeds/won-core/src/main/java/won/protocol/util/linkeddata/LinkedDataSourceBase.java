@@ -201,7 +201,7 @@ public class LinkedDataSourceBase implements LinkedDataSource {
                                     // be sure to remove the principal from the threadlocal after the call
                                     AuthenticationThreadLocal.remove();
                                 }
-                            }).reduce((all, current) -> RdfUtils.addDatasetToDataset(all, current)));
+                            }).reduce(RdfUtils::addDatasetToDataset));
             Optional<Dataset> crawledDataset;
             try {
                 crawledDataset = crawledData.get();

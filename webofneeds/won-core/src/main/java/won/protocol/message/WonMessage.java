@@ -339,7 +339,7 @@ public class WonMessage implements Serializable {
         this.outerEnvelopeGraph = this.completeDataset.getNamedModel(outerEnvelopeUri);
         this.envelopeGraphs = allEnvelopes;
         return Collections.unmodifiableList(
-                        allEnvelopes.stream().map(m -> RdfUtils.cloneModel(m)).collect(Collectors.toList()));
+                        allEnvelopes.stream().map(RdfUtils::cloneModel).collect(Collectors.toList()));
     }
 
     private synchronized URI findMessageUri(final Model model, final String modelUri) {

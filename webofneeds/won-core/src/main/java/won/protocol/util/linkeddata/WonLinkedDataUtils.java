@@ -364,9 +364,7 @@ public class WonLinkedDataUtils {
     public static Dataset loadDataForAtomWithSocketDefinitions(LinkedDataSource linkedDataSource, URI atomURI) {
         Dataset dataset = linkedDataSource.getDataForResource(atomURI);
         Set<URI> sockets = WonRdfUtils.SocketUtils.getSocketsOfAtom(dataset, atomURI);
-        sockets.forEach(socket -> {
-            RdfUtils.addDatasetToDataset(dataset, loadDataForSocket(linkedDataSource, socket));
-        });
+        sockets.forEach(socket -> RdfUtils.addDatasetToDataset(dataset, loadDataForSocket(linkedDataSource, socket)));
         return dataset;
     }
 

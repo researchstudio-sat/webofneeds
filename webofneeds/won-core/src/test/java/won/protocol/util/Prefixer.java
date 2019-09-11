@@ -87,8 +87,8 @@ public class Prefixer {
         Model dm = ds.getDefaultModel();
         StopWatch sw = new StopWatch();
         sw.start();
-        dm.getNsPrefixMap().keySet().stream().forEach(prefix -> dm.removeNsPrefix(prefix));
-        Set<String> prefixes = RdfUtils.toStatementStream(ds).flatMap(s -> getPrefixes(s)).collect(Collectors.toSet());
+        dm.getNsPrefixMap().keySet().stream().forEach(dm::removeNsPrefix);
+        Set<String> prefixes = RdfUtils.toStatementStream(ds).flatMap(this::getPrefixes).collect(Collectors.toSet());
         Map<String, String> defaultPrefixes = getPrefixes().getNsPrefixMap();
         defaultPrefixes.entrySet().stream()
                         .forEach(entry -> {
@@ -111,17 +111,15 @@ public class Prefixer {
         });
         prefixes.removeAll(getBlacklist());
         prefixes.stream()
-                        .forEach(prefix -> {
-                            dm.setNsPrefix("p" + cnt.getAndIncrement(), prefix);
-                        });
+                        .forEach(prefix -> dm.setNsPrefix("p" + cnt.getAndIncrement(), prefix));
         sw.stop();
     }
 
     public Stream<String> getPrefixes(Statement stmt) {
         Set<String> prefixes = new HashSet<>();
-        getUriPrefix(stmt.getSubject()).map(p -> prefixes.add(p));
-        getUriPrefix(stmt.getPredicate()).map(p -> prefixes.add(p));
-        getUriPrefix(stmt.getObject()).map(p -> prefixes.add(p));
+        getUriPrefix(stmt.getSubject()).map(prefixes::add);
+        getUriPrefix(stmt.getPredicate()).map(prefixes::add);
+        getUriPrefix(stmt.getObject()).map(prefixes::add);
         return prefixes.stream();
     }
 
