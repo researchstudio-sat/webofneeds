@@ -10,13 +10,12 @@
  */
 package won.protocol.model;
 
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import won.protocol.vocabulary.WON;
+
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
 
 /**
  * User: fkleedorfer Date: 30.10.12
@@ -52,7 +51,6 @@ public enum ConnectionState {
                     case PARTNER_OPEN:
                         return REQUEST_RECEIVED;
                     case OWNER_CLOSE:
-                        return CLOSED;
                     case PARTNER_CLOSE:
                         return CLOSED;
                     default:
@@ -64,7 +62,6 @@ public enum ConnectionState {
                     case PARTNER_OPEN:
                         return CONNECTED; // the partner accepted
                     case OWNER_CLOSE:
-                        return CLOSED;
                     case PARTNER_CLOSE:
                         return CLOSED;
                     default:
@@ -75,7 +72,6 @@ public enum ConnectionState {
                     case OWNER_OPEN:
                         return CONNECTED;
                     case OWNER_CLOSE:
-                        return CLOSED;
                     case PARTNER_CLOSE:
                         return CLOSED;
                     default:
@@ -84,7 +80,6 @@ public enum ConnectionState {
             case CONNECTED: // the connection is established
                 switch (msg) {
                     case PARTNER_CLOSE:
-                        return CLOSED;
                     case OWNER_CLOSE:
                         return CLOSED;
                     default:

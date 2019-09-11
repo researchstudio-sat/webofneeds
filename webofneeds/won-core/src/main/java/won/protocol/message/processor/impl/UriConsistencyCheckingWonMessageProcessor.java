@@ -101,11 +101,6 @@ public class UriConsistencyCheckingWonMessageProcessor implements WonMessageProc
                 }
                 break;
             case FROM_OWNER:
-                // local node should be a sender node
-                if (!localNode.equals(senderNode)) {
-                    throw new UriNodePathException(senderNode + " is expected to be " + localNode);
-                }
-                break;
             case FROM_SYSTEM:
                 // local node should be a sender node
                 if (!localNode.equals(senderNode)) {
