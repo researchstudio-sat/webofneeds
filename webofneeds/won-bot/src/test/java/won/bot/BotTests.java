@@ -48,7 +48,7 @@ public class BotTests {
         // bot impl that remembers which thread entered the initialize method
         final Bot bot = new DebugBot() {
             @Override
-            protected void doInitialize() {
+            public synchronized void initialize() throws Exception {
                 try {
                     Thread.sleep(100);
                 } catch (InterruptedException e) {
@@ -114,7 +114,7 @@ public class BotTests {
         // bot impl that remembers which thread entered the shutdown method
         final Bot bot = new DebugBot() {
             @Override
-            protected void doShutdown() {
+            public synchronized void shutdown() throws Exception {
                 try {
                     Thread.sleep(100);
                 } catch (InterruptedException e) {

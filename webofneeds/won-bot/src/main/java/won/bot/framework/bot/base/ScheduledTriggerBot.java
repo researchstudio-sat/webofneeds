@@ -10,6 +10,8 @@
  */
 package won.bot.framework.bot.base;
 
+import java.util.Date;
+import java.util.concurrent.Executor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.Trigger;
@@ -17,24 +19,26 @@ import org.springframework.scheduling.Trigger;
 import java.lang.invoke.MethodHandles;
 import java.util.concurrent.ScheduledFuture;
 
+import org.springframework.scheduling.TaskScheduler;
+
 /**
- * Bot base class that expects a trigger to be injected that will cause the
- * act() method to be called according to the trigger's specification.
+ * Bot that has access to a scheduler for performing recurring or deferred work
  */
-public abstract class TriggeredBot extends ScheduledActionBot {
+public abstract class ScheduledTriggerBot extends BaseBot {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private TaskScheduler taskScheduler;
+    private Executor insideSchedulerExecutor = new InsideSchedulerExecutor();
     private Trigger trigger;
     private ScheduledFuture scheduledExecution;
 
     @Override
-    protected void doInitialize() {
-        doInitializeCustom();
+    public synchronized void initialize() throws Exception {
         if (trigger != null) {
             this.scheduledExecution = getTaskScheduler().schedule(new Runnable() {
                 @Override
                 public void run() {
                     try {
-                        TriggeredBot.this.act();
+                        ScheduledTriggerBot.this.act();
                     } catch (Exception e) {
                         logger.warn("caught exception during triggered execution of act()", e);
                     }
@@ -43,34 +47,16 @@ public abstract class TriggeredBot extends ScheduledActionBot {
         } else {
             logger.info("This bot will not fire the ActEvent because no trigger was configured.");
         }
-    }
 
-    /**
-     * Returns true if the trigger won't cause any more executions (and none are
-     * currently running).
-     * 
-     * @return
-     */
-    protected boolean isTriggerDone() {
-        return this.scheduledExecution.isDone();
+        super.initialize();
     }
-
-    /**
-     * Override this method to do initialization work.
-     */
-    protected abstract void doInitializeCustom();
 
     @Override
-    protected void doShutdown() {
+    public synchronized void shutdown() throws Exception {
         logger.info("bot is shutting down");
         this.scheduledExecution.cancel(true);
-        doShutdownCustom();
+        super.shutdown();
     }
-
-    /**
-     * Override this method to do shutdown work.
-     */
-    protected abstract void doShutdownCustom();
 
     /**
      * Overrides the inherited method so as to also cancel the trigger when
@@ -81,6 +67,33 @@ public abstract class TriggeredBot extends ScheduledActionBot {
         logger.info("triggered bot signalling workIsDone");
         this.cancelTrigger();
         super.workIsDone();
+    }
+
+    /**
+     * Returns the TaskScheduler.
+     */
+    protected TaskScheduler getTaskScheduler() {
+        return taskScheduler;
+    }
+
+    /**
+     * Returns an executor that passes the tasks to the TaskScheduler for immediate
+     * execution.
+     */
+    protected Executor getExecutor() {
+        return this.insideSchedulerExecutor;
+    }
+
+    public void setTaskScheduler(final TaskScheduler taskScheduler) {
+        this.taskScheduler = taskScheduler;
+    }
+
+    /**
+     * Returns true if the trigger won't cause any more executions (and none are
+     * currently running).
+     */
+    protected boolean isTriggerDone() {
+        return this.scheduledExecution.isDone();
     }
 
     protected void cancelTrigger() {
@@ -94,5 +107,12 @@ public abstract class TriggeredBot extends ScheduledActionBot {
 
     public void setTrigger(final Trigger trigger) {
         this.trigger = trigger;
+    }
+
+    private class InsideSchedulerExecutor implements Executor {
+        @Override
+        public void execute(final Runnable command) {
+            getTaskScheduler().schedule(command, new Date());
+        }
     }
 }

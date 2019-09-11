@@ -23,7 +23,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.concurrent.SettableListenableFuture;
 import won.bot.IntegrationtestBot;
-import won.bot.framework.bot.base.TriggeredBot;
+import won.bot.framework.bot.base.ScheduledTriggerBot;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.action.EventBotAction;
@@ -87,7 +87,7 @@ public class SecurityBotTests {
         // (there is no trigger bean in the context)
         PeriodicTrigger trigger = new PeriodicTrigger(500, TimeUnit.MILLISECONDS);
         trigger.setInitialDelay(100);
-        ((TriggeredBot) bot).setTrigger(trigger);
+        ((ScheduledTriggerBot) bot).setTrigger(trigger);
         // adding the bot to the bot manager will cause it to be initialized.
         // at that point, the trigger starts.
         botManager.addBot(bot);
@@ -114,7 +114,7 @@ public class SecurityBotTests {
         private SettableListenableFuture<TestFinishedEvent> futureTestResult;
 
         private SetFutureAction(EventListenerContext eventListenerContext,
-                        SettableListenableFuture<TestFinishedEvent> futureTestResult) {
+                SettableListenableFuture<TestFinishedEvent> futureTestResult) {
             super(eventListenerContext);
             this.futureTestResult = futureTestResult;
         }
@@ -134,7 +134,7 @@ public class SecurityBotTests {
         private IntegrationtestBot bot;
 
         private SetFutureFromErrorEventAction(EventListenerContext eventListenerContext,
-                        SettableListenableFuture<TestFinishedEvent> futureTestResult, IntegrationtestBot bot) {
+                SettableListenableFuture<TestFinishedEvent> futureTestResult, IntegrationtestBot bot) {
             super(eventListenerContext);
             this.futureTestResult = futureTestResult;
             this.bot = bot;
