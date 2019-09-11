@@ -10,22 +10,15 @@
  */
 package won.node.service;
 
-import java.net.URI;
-import java.util.List;
-import java.util.Optional;
-
 import org.apache.jena.rdf.model.Resource;
-
-import won.node.service.impl.URIService;
-import won.protocol.exception.ConnectionAlreadyExistsException;
-import won.protocol.exception.IllegalMessageForConnectionStateException;
-import won.protocol.exception.IllegalMessageForAtomStateException;
-import won.protocol.exception.NoSuchConnectionException;
-import won.protocol.exception.NoSuchAtomException;
+import won.protocol.exception.*;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionEventType;
 import won.protocol.model.ConnectionState;
 import won.protocol.model.Socket;
+
+import java.net.URI;
+import java.util.Optional;
 
 /**
  * User: fkleedorfer Date: 18.04.14
@@ -68,6 +61,4 @@ public interface DataAccessService {
     boolean addFeedback(Connection connection, Resource feedback);
 
     void updateTargetConnectionURI(Connection con, URI targetConnectionURI);
-
-    void setURIService(URIService URIService);
 }

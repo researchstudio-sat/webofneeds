@@ -908,27 +908,26 @@ public class LinkedDataServiceImpl implements LinkedDataService {
             uris.forEach(atomURI -> model.add(model.createStatement(atomListPageResource, RDFS.member,
                             model.createResource(atomURI.toString()))));
         } else {
-            /*uris.forEach(atomURI -> {
-                Dataset atomDataset = getAtomDatasetForFilter(atomURI);
-                DefaultAtomModelWrapper atomModelWrapper = new DefaultAtomModelWrapper(atomDataset);
-                if ((filterSocketTypeUri == null
-                                || atomModelWrapper.getSocketTypeUriMap().containsValue(filterSocketTypeUri))
-                                && (filterAtomTypeUri == null
-                                                || atomModelWrapper.getContentTypes().contains(filterAtomTypeUri))) {
-                    model.add(model.createStatement(atomListPageResource, RDFS.member,
-                                    model.createResource(atomURI.toString())));
-                }
-            });*/
-             // Parallel Approach 1:
+            /*
+             * uris.forEach(atomURI -> { Dataset atomDataset =
+             * getAtomDatasetForFilter(atomURI); DefaultAtomModelWrapper atomModelWrapper =
+             * new DefaultAtomModelWrapper(atomDataset); if ((filterSocketTypeUri == null ||
+             * atomModelWrapper.getSocketTypeUriMap().containsValue(filterSocketTypeUri)) &&
+             * (filterAtomTypeUri == null ||
+             * atomModelWrapper.getContentTypes().contains(filterAtomTypeUri))) {
+             * model.add(model.createStatement(atomListPageResource, RDFS.member,
+             * model.createResource(atomURI.toString()))); } });
+             */
+            // Parallel Approach 1:
             uris.parallelStream().filter(atomURI -> {
                 Dataset atomDataset = getAtomDatasetForFilter(atomURI);
                 DefaultAtomModelWrapper atomModelWrapper = new DefaultAtomModelWrapper(atomDataset);
                 return (filterSocketTypeUri == null
-                            || atomModelWrapper.getSocketTypeUriMap().containsValue(filterSocketTypeUri))
-                            && (filterAtomTypeUri == null
-                                            || atomModelWrapper.getContentTypes().contains(filterAtomTypeUri));
-             }).forEach(atomURI -> model.add(model.createStatement(atomListPageResource,
-             RDFS.member, model.createResource(atomURI.toString()))));
+                                || atomModelWrapper.getSocketTypeUriMap().containsValue(filterSocketTypeUri))
+                                && (filterAtomTypeUri == null
+                                                || atomModelWrapper.getContentTypes().contains(filterAtomTypeUri));
+            }).forEach(atomURI -> model.add(model.createStatement(atomListPageResource,
+                            RDFS.member, model.createResource(atomURI.toString()))));
         }
         Dataset ret = newDatasetWithNamedModel(createDataGraphUriFromResource(atomListPageResource), model);
         addBaseUriAndDefaultPrefixes(ret);

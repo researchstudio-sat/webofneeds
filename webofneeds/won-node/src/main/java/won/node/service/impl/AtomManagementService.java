@@ -82,12 +82,14 @@ public class AtomManagementService {
         // does not exist at all)
         Atom atom = atomRepository.findOneByAtomURI(atomURI);
         if (atom == null) {
-            logger.debug("deactivateAtom called for atom {} but that atom was not found in the repository - doing nothing");
+            logger.debug("deactivateAtom called for atom {} but that atom was not found in the repository - doing nothing",
+                            atomURI);
             return;
         }
         URI wonNodeURI = wonNodeInformationService.getWonNodeUri(atomURI);
         if (wonNodeURI == null) {
-            logger.debug("deactivateAtom called for atom {} but we could not find a WonNodeURI for that atom - doing nothing");
+            logger.debug("deactivateAtom called for atom {} but we could not find a WonNodeURI for that atom - doing nothing",
+                            atomURI);
             return;
         }
         URI messageURI = wonNodeInformationService.generateEventURI(wonNodeURI);

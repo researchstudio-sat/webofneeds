@@ -75,9 +75,7 @@
     <!--bean id="QueueManagementService" class="won.node.service.impl.QueueManagementServiceImpl"/-->
 
     <!--- DataAccessService -->
-    <bean id="dataServiceRef" class="won.node.service.impl.DataAccessServiceImpl" depends-on="linkedDataService">
-        <property name="URIService" ref="uriService" />
-    </bean>
+    <bean id="dataServiceRef" class="won.node.service.impl.DataAccessServiceImpl" depends-on="linkedDataService"/>
 
 
     <bean id="atomInformationService" class="won.node.service.impl.AtomInformationServiceImpl">
