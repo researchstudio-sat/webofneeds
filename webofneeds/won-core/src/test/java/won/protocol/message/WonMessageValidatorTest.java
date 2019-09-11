@@ -1,7 +1,5 @@
 package won.protocol.message;
 
-import java.io.IOException;
-
 import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
@@ -14,12 +12,13 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.validation.WonMessageValidator;
 import won.protocol.vocabulary.SFSIG;
 import won.protocol.vocabulary.WONMSG;
+
+import java.io.IOException;
 
 /**
  * User: ypanchenko Date: 28.04.2015
@@ -159,7 +158,7 @@ public class WonMessageValidatorTest {
         WonMessageValidator validator = new WonMessageValidator();
         StringBuilder message = new StringBuilder();
         boolean valid = validator.validate(invalidDataset, message);
-        Assert.assertTrue("validation is expected to fail", !valid);
+        Assert.assertFalse(valid);
         Assert.assertTrue(message.toString().contains("invalid_default_graph"));
     }
 
@@ -179,7 +178,7 @@ public class WonMessageValidatorTest {
         WonMessageValidator validator = new WonMessageValidator();
         StringBuilder message = new StringBuilder();
         boolean valid = validator.validate(invalidDataset, message);
-        Assert.assertTrue("validation is expected to fail", !valid);
+        Assert.assertFalse(valid);
         Assert.assertTrue(message.toString().contains("missing_direction"));
         // create invalid dataset by adding a triple with invalid message direction
         Statement stmtNew = env2Model.createStatement(ResourceFactory.createResource(CREATE_ENV1_ENV2_MSG_URI),
@@ -187,7 +186,7 @@ public class WonMessageValidatorTest {
         env2Model.add(stmtNew);
         // validate this invalid dataset
         valid = validator.validate(invalidDataset, message);
-        Assert.assertTrue("validation is expected to fail", !valid);
+        Assert.assertFalse(valid);
         Assert.assertTrue(message.toString().contains("invalid_direction"));
     }
 
@@ -205,7 +204,7 @@ public class WonMessageValidatorTest {
         WonMessageValidator validator = new WonMessageValidator();
         StringBuilder message = new StringBuilder();
         boolean valid = validator.validate(invalidDataset, message);
-        Assert.assertTrue("validation is expected to fail", !valid);
+        Assert.assertFalse(valid);
         Assert.assertTrue(message.toString().contains("missing_type"));
         // create invalid dataset by adding a triple with invalid message type
         Statement stmtNew = env1Model.createStatement(ResourceFactory.createResource(CREATE_ENV1_ENV2_MSG_URI),
@@ -213,7 +212,7 @@ public class WonMessageValidatorTest {
         env1Model.add(stmtNew);
         // validate this invalid dataset
         valid = validator.validate(invalidDataset, message);
-        Assert.assertTrue("validation is expected to fail", !valid);
+        Assert.assertFalse(valid);
         Assert.assertTrue(message.toString().contains("invalid_type"));
     }
 
@@ -236,7 +235,7 @@ public class WonMessageValidatorTest {
         WonMessageValidator validator = new WonMessageValidator();
         StringBuilder message = new StringBuilder();
         boolean valid = validator.validate(invalidDataset, message);
-        Assert.assertTrue("validation is expected to fail", !valid);
+        Assert.assertFalse(valid);
         Assert.assertTrue(message.toString().contains("missing_timestamp"));
     }
 
@@ -257,7 +256,7 @@ public class WonMessageValidatorTest {
         WonMessageValidator validator = new WonMessageValidator();
         StringBuilder message = new StringBuilder();
         boolean valid = validator.validate(invalidDataset, message);
-        Assert.assertTrue("validation is expected to fail", !valid);
+        Assert.assertFalse(valid);
         Assert.assertTrue(message.toString().contains("validation/05_sign/invalid_from_owner_signer.rq"));
         // reset for further testing
         env2Model.add(stmtOld);
@@ -270,7 +269,7 @@ public class WonMessageValidatorTest {
         env1Model.add(stmtNew);
         // validate this invalid dataset
         valid = validator.validate(invalidDataset, message);
-        Assert.assertTrue("validation is expected to fail", !valid);
+        Assert.assertFalse(valid);
         Assert.assertTrue(message.toString().contains("validation/05_sign/invalid_from_owner_signer.rq"));
         // reset for further testing
         env1Model.remove(stmtNew);
@@ -282,7 +281,7 @@ public class WonMessageValidatorTest {
         env1Model.add(stmtNew);
         // validate this invalid dataset
         valid = validator.validate(invalidDataset, message);
-        Assert.assertTrue("validation is expected to fail", !valid);
+        Assert.assertFalse(valid);
         Assert.assertTrue(message.toString().contains("validation/05_sign/invalid_from_owner_signer.rq"));
         // reset for further testing
         env1Model.remove(stmtNew);
@@ -306,7 +305,7 @@ public class WonMessageValidatorTest {
         WonMessageValidator validator = new WonMessageValidator();
         StringBuilder message = new StringBuilder();
         boolean valid = validator.validate(invalidDataset, message);
-        Assert.assertTrue("validation is expected to fail", !valid);
+        Assert.assertFalse(valid);
         Assert.assertTrue(message.toString().contains("validation/05_sign/signature_chain.rq"));
         // reset for further testing
         env2Model.remove(stmtNew);
@@ -318,7 +317,7 @@ public class WonMessageValidatorTest {
         env1Model.remove(stmtOld);
         // validate this invalid dataset
         valid = validator.validate(invalidDataset, message);
-        Assert.assertTrue("validation is expected to fail", !valid);
+        Assert.assertFalse(valid);
         Assert.assertTrue(message.toString().contains("validation/05_sign/signature_chain.rq"));
         // reset for further testing
         env1Model.add(stmtOld);
@@ -343,7 +342,7 @@ public class WonMessageValidatorTest {
         StringBuilder message = new StringBuilder();
         // validate this invalid dataset
         boolean valid = validator.validate(invalidDataset, message);
-        Assert.assertTrue("validation is expected to fail", !valid);
+        Assert.assertFalse(valid);
         // reset for further testing:
         env1sigModel.remove(stmtNew);
         env1sigModel.add(stmtOld);
@@ -367,7 +366,7 @@ public class WonMessageValidatorTest {
         StringBuilder message = new StringBuilder();
         // validate this invalid dataset
         boolean valid = validator.validate(invalidDataset, message);
-        Assert.assertTrue("validation is expected to fail", !valid);
+        Assert.assertFalse(valid);
         Assert.assertTrue(message.toString().contains("invalid_from_owner_signer"));
         // reset for further testing:
         env1sigModel.remove(stmtNew);
@@ -387,7 +386,7 @@ public class WonMessageValidatorTest {
         message = new StringBuilder();
         // validate this invalid dataset
         valid = validator.validate(invalidDataset, message);
-        Assert.assertTrue("validation is expected to fail", !valid);
+        Assert.assertFalse(valid);
         Assert.assertTrue(message.toString().contains("invalid_from_owner_signer"));
         // reset for further testing:
         env1sigModel.remove(stmtNew);
@@ -413,7 +412,7 @@ public class WonMessageValidatorTest {
         StringBuilder message = new StringBuilder();
         // validate this invalid dataset
         boolean valid = validator.validate(invalidDataset, message);
-        Assert.assertTrue("validation is expected to fail", !valid);
+        Assert.assertFalse(valid);
         Assert.assertTrue(message.toString().contains("invalid_from_external_signer"));
         // reset for further testing:
         env3sigModel.remove(stmtNew);
@@ -431,7 +430,7 @@ public class WonMessageValidatorTest {
         message = new StringBuilder();
         // validate this invalid dataset
         valid = validator.validate(invalidDataset, message);
-        Assert.assertTrue("validation is expected to fail", !valid);
+        Assert.assertFalse(valid);
         Assert.assertTrue(message.toString().contains("invalid_from_external_signer"));
         // reset for further testing:
         env4sigModel.remove(stmtNew);
@@ -452,7 +451,7 @@ public class WonMessageValidatorTest {
         StringBuilder message = new StringBuilder();
         // validate this invalid dataset
         boolean valid = validator.validate(invalidDataset, message);
-        Assert.assertTrue("validation is expected to fail", !valid);
+        Assert.assertFalse(valid);
         Assert.assertTrue(message.toString().contains("signature_properties"));
         // reset for further testing:
         env1sigModel.add(stmtOld);
@@ -467,7 +466,7 @@ public class WonMessageValidatorTest {
         message = new StringBuilder();
         // validate this invalid dataset
         valid = validator.validate(invalidDataset, message);
-        Assert.assertTrue("validation is expected to fail", !valid);
+        Assert.assertFalse(valid);
         Assert.assertTrue(message.toString().contains("signature_properties"));
         // reset for further testing:
         env1sigModel.add(stmtOld);
@@ -491,7 +490,7 @@ public class WonMessageValidatorTest {
         StringBuilder message = new StringBuilder();
         // validate this invalid dataset
         boolean valid = validator.validate(invalidDataset, message);
-        Assert.assertTrue("validation is expected to fail", !valid);
+        Assert.assertFalse(valid);
         Assert.assertTrue(message.toString().contains("signature_reference_values"));
         // reset for further testing:
         env1sigModel.add(stmtOld);
@@ -515,7 +514,7 @@ public class WonMessageValidatorTest {
         StringBuilder message = new StringBuilder();
         // validate this invalid dataset
         boolean valid = validator.validate(invalidDataset, message);
-        Assert.assertTrue("validation is expected to fail", !valid);
+        Assert.assertFalse(valid);
         // actually
         Assert.assertTrue(message.toString().contains("signed_or_signature") || message.toString().contains("signer")
                         || message.toString().contains("graph_uris"));
@@ -556,7 +555,7 @@ public class WonMessageValidatorTest {
         StringBuilder message = new StringBuilder();
         // validate this invalid dataset
         boolean valid = validator.validate(invalidDataset, message);
-        Assert.assertTrue("validation is expected to fail", !valid);
+        Assert.assertFalse(valid);
         // actually
         Assert.assertTrue(message.toString().contains("signature_chain"));
         // reset for further testing:
@@ -607,7 +606,7 @@ public class WonMessageValidatorTest {
         StringBuilder message = new StringBuilder();
         // validate this invalid dataset
         boolean valid = validator.validate(invalidDataset, message);
-        Assert.assertTrue("validation is expected to fail", !valid);
+        Assert.assertFalse(valid);
         // actually
         Assert.assertTrue(message.toString().contains("graph_uris"));
         // reset for further testing:
@@ -636,7 +635,7 @@ public class WonMessageValidatorTest {
         StringBuilder message = new StringBuilder();
         // validate this invalid dataset
         boolean valid = validator.validate(invalidDataset, message);
-        Assert.assertTrue("validation is expected to fail", !valid);
+        Assert.assertFalse(valid);
         // actually
         Assert.assertTrue(message.toString().contains("number_of_events"));
         // reset for further testing:
