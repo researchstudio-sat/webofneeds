@@ -410,10 +410,10 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
                 RDFDataMgr.write(System.out, responseData.getDataset(), Lang.TRIG);
             }
         } else {
-            logger.debug("fetching linked data for URI {} without WebID", resource, requesterWebID);
+            logger.debug("fetching linked data for URI {} without WebID {}", resource, requesterWebID);
             responseData = linkedDataRestClient.readResourceDataWithHeaders(resource, headers);
             if (logger.isTraceEnabled()) {
-                logger.trace("fetched resource {} without requesterWebID:", resource, requesterWebID);
+                logger.trace("fetched resource {} without requesterWebID: {}", resource, requesterWebID);
                 RDFDataMgr.write(System.out, responseData.getDataset(), Lang.TRIG);
             }
         }
