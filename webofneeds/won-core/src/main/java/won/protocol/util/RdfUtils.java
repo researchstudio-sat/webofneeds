@@ -1444,7 +1444,6 @@ public class RdfUtils {
      * @return
      */
     public static <T> T findFirst(Dataset dataset, ModelVisitor<T> visitor, ModelSelector modelSelector) {
-        List<T> results = new LinkedList<>();
         for (Iterator<Model> modelIterator = modelSelector.select(dataset); modelIterator.hasNext();) {
             T result = visitor.visit(modelIterator.next());
             if (result != null)

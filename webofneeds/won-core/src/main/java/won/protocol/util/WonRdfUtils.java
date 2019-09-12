@@ -651,18 +651,6 @@ public class WonRdfUtils {
             return null;
         }
 
-        private static RDFNode getTextMessageForResource(Dataset dataset, URI uri) {
-            if (uri == null)
-                return null;
-            return RdfUtils.findFirstPropertyFromResource(dataset, uri, WONCON.text);
-        }
-
-        private static RDFNode getTextMessageForResource(Dataset dataset, Resource resource) {
-            if (resource == null)
-                return null;
-            return RdfUtils.findFirstPropertyFromResource(dataset, resource, WONCON.text);
-        }
-
         public static WonMessage copyByDatasetSerialization(final WonMessage toWrap) {
             return new WonMessage(RdfUtils.readDatasetFromString(
                             RdfUtils.writeDatasetToString(toWrap.getCompleteDataset(), Lang.TRIG), Lang.TRIG));

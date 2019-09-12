@@ -1,28 +1,17 @@
 package won.protocol.util;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.function.Function;
-
 import org.apache.jena.graph.Node;
-import org.apache.jena.query.Dataset;
-import org.apache.jena.query.DatasetFactory;
-import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryException;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.query.QueryFactory;
-import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.QuerySolutionMap;
-import org.apache.jena.query.ReadWrite;
-import org.apache.jena.query.ResultSet;
-import org.apache.jena.query.SortCondition;
+import org.apache.jena.query.*;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.shared.PrefixMapping;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.expr.Expr;
 import org.apache.jena.sparql.expr.ExprVar;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.function.Function;
 
 /**
  * Expects to be passed a file containing a sparql SELECT query and a function
@@ -34,8 +23,6 @@ public class SparqlSelectFunction<T> extends SparqlFunction<Dataset, List<T>> {
     private Long limit = null;
     private Long offset = null;
     private QuerySolutionMap initialBinding = null;
-    private String orderByVarName = null;
-    private Integer orderByDirection = null;
     private Function<QuerySolution, T> resultGenerator;
     private List<Expr> havingCondiditions = null;
     private List<SortCondition> orderBy = null;

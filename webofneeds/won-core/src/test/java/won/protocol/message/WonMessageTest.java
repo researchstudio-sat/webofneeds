@@ -18,11 +18,8 @@ import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WON;
 import won.protocol.vocabulary.WONMSG;
 
-import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.io.StringWriter;
 import java.net.URI;
-import java.nio.charset.Charset;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -31,19 +28,6 @@ import static org.junit.Assert.assertEquals;
 public class WonMessageTest {
     private InputStream getResourceAsStream(String name) {
         return getClass().getClassLoader().getResourceAsStream(name);
-    }
-
-    private String getResourceAsString(String name) throws Exception {
-        byte[] buffer = new byte[256];
-        StringWriter sw = new StringWriter();
-        try (InputStream in = getResourceAsStream(name)) {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            int bytesRead;
-            while ((bytesRead = in.read(buffer)) > -1) {
-                baos.write(buffer, 0, bytesRead);
-            }
-            return new String(baos.toByteArray(), Charset.defaultCharset());
-        }
     }
 
     @BeforeClass

@@ -171,8 +171,8 @@ public class WonMessage implements Serializable {
             return RdfUtils.cloneDataset(this.messageContent);
         } else {
             Dataset newMsgContent = DatasetFactory.createGeneral();
-            Iterator<String> modelNames = this.completeDataset.listNames();
-            List<String> envelopeGraphNames = getEnvelopeGraphURIs();
+            // Iterator<String> modelNames = this.completeDataset.listNames();
+            // List<String> envelopeGraphNames = getEnvelopeGraphURIs();
             List<String> contentGraphs = getContentGraphURIs();
             // add all models that are not envelope graphs or signature graphs to the
             // messageContent
@@ -229,7 +229,7 @@ public class WonMessage implements Serializable {
                                     envelopeGraphUri, this.messageURI);
                     continue;
                 }
-                String sigGraphUri = solution.getResource("attachmentSigGraphUri").getURI();
+                // String sigGraphUri = solution.getResource("attachmentSigGraphUri").getURI();
                 String attachmentGraphUri = solution.getResource("attachmentGraphUri").getURI();
                 String attachmentSigGraphUri = solution.getResource("attachmentSigGraphUri").getURI();
                 String attachmentDestinationUri = solution.getResource("attachmentDestinationUri").getURI();
@@ -599,16 +599,6 @@ public class WonMessage implements Serializable {
             currentEnvelope = null;
             if (currentEnvelopeUri != null) {
                 currentEnvelope = this.completeDataset.getNamedModel(currentEnvelopeUri.toString());
-            }
-        }
-        return null;
-    }
-
-    private synchronized URI getEnvelopeSubjectURIValue(Property property, RDFNode object) {
-        for (Model envelopeGraph : getEnvelopeGraphs()) {
-            URI val = RdfUtils.findFirstSubjectUri(envelopeGraph, property, object, true, true);
-            if (val != null) {
-                return val;
             }
         }
         return null;

@@ -39,21 +39,16 @@ public class WonMessageValidatorTest {
     private Dataset createMessageDataset;
     // response message local
     private static final String RESOURCE_FILE_RESPONSE_MSG_VALID = "/validation/valid/response_msg_local.trig";
-    private static final String RESPONSE_LOCAL_ENV1_NAME = "http://localhost:8080/won/resource/event/kpft39z0ladmp3cqm4ju#envelope-c37o";
     private static final String RESPONSE_LOCAL_ENV1_SIG_NAME = "http://localhost:8080/won/resource/event/kpft39z0ladmp3cqm4ju#envelope-c37o-sig";
-    private static final String RESPONSE_LOCAL_ENV2_NAME = "http://localhost:8080/won/resource/event/kpft39z0ladmp3cqm4ju#envelope-g66h";
-    private static final String RESPONSE_LOCAL_ENV1_ENV2_MSG_URI = "http://localhost:8080/won/resource/event/kpft39z0ladmp3cqm4ju";;
+
+
     private Dataset responseMessageDataset;
     // text message (i.e. connection message) sent from external node
     private static final String RESOURCE_FILE_TEXT_MSG_VALID = "/validation/valid/text_msg_remote.trig";
     private static final String RESOURCE_FILE_TEXT_MSG_VALID_WITH_MISLEADING_CONTENT = "/validation/valid/conversation_msg_with_potentially_misleading_content.trig";
-    private static final String TEXT_ENV1_NAME = "http://localhost:8080/won/resource/event/z7rgjxnyvjpo3l9m0d79#envelope-f65t";
-    private static final String TEXT_ENV1_SIG_NAME = "http://localhost:8080/won/resource/event/z7rgjxnyvjpo3l9m0d79#envelope-f65t-sig";
-    private static final String TEXT_ENV2_NAME = "http://localhost:8080/won/resource/event/z7rgjxnyvjpo3l9m0d79#envelope-qdpq";
     private static final String TEXT_ENV2_SIG_NAME = "http://localhost:8080/won/resource/event/z7rgjxnyvjpo3l9m0d79#envelope-qdpq-sig";
     private static final String TEXT_ENV3_NAME = "http://localhost:8080/won/resource/event/m8cjzr6892213okiek04#envelope-5t8c";
     private static final String TEXT_ENV3_SIG_NAME = "http://localhost:8080/won/resource/event/m8cjzr6892213okiek04#envelope-5t8c-sig";
-    private static final String TEXT_ENV4_NAME = "http://localhost:8080/won/resource/event/m8cjzr6892213okiek04#envelope-ojt8";
     private static final String TEXT_ENV4_SIG_NAME = "http://localhost:8080/won/resource/event/m8cjzr6892213okiek04#envelope-ojt8-sig";
     private Dataset textMessageDataset;
     private Dataset misleadingMessageDataset;

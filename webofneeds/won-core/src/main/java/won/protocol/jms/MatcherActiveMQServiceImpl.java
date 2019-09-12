@@ -30,7 +30,7 @@ import java.util.Set;
  */
 public class MatcherActiveMQServiceImpl extends ActiveMQServiceImpl implements MatcherActiveMQService {
     private List<String> matcherProtocolTopicList;
-    private String pathInformation;
+    // private String pathInformation;
     private static final String PATH_MATCHER_PROTOCOL_OUT_ATOM_CREATED = "<" + WON.supportsWonProtocolImpl + ">/<"
                     + WON.atomCreatedTopic + ">";
     private static final String PATH_MATCHER_PROTOCOL_OUT_ATOM_ACTIVATED = "<" + WON.supportsWonProtocolImpl + ">/<"

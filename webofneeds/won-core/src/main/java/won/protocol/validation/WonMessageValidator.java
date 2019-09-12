@@ -10,9 +10,6 @@
  */
 package won.protocol.validation;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * User: ypanchenko Date: 02.06.2015
  */
@@ -20,7 +17,6 @@ public class WonMessageValidator extends BaseValidator {
     private static final String resourceDir = "validation/message/";
 
     public WonMessageValidator() {
-        Map validatorDirs = new HashMap<>();
         String[] dirs = { resourceDir + "01_basic/", resourceDir + "02_prop/", resourceDir + "03_chain/",
                         resourceDir + "04_uri/", resourceDir + "05_sign/" };
         this.loadSparqlValidatorsFromDirectories(dirs);

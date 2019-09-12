@@ -35,8 +35,6 @@ public abstract class AtomBasedCamelConfiguratorImpl implements AtomProtocolCame
     private BiMap<URI, String> endpointMap = HashBiMap.create();
     protected BiMap<URI, String> brokerComponentMap = HashBiMap.create();
     private String componentName;
-    private final String localComponentName = "seda";
-    private String vmComponentName;
     private CamelContext camelContext;
     private MessagingContext messagingContext;
     @Autowired

@@ -53,7 +53,6 @@ import static java.util.EnumSet.noneOf;
 public class CachingLinkedDataSource extends LinkedDataSourceBase implements LinkedDataSource, InitializingBean {
     private static final String CACHE_NAME = "linkedDataCache";
     private static final String HTTP_DATE_FORMAT = "EEE, dd MMM yyyy HH:mm:ss z";
-    private static final int DEFAULT_EXPIRY_PERIOD = 600;
     private static final int DEFAULT_BYTE_ARRAY_SIZE = 500;
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     @Autowired(required = true)
@@ -435,15 +434,6 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
                             + "', marking as already expired");
             return new Date(0);
         }
-        return expires;
-    }
-
-    private Date addNSecondsToNow(int seconds) {
-        final Date expires;
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(new Date());
-        cal.add(Calendar.SECOND, seconds);
-        expires = cal.getTime();
         return expires;
     }
 

@@ -40,9 +40,7 @@ public class WonMessageBuilderTest {
     private static final URI TYPE_URI_1 = URI.create("http://example.com/type/1");
     private static final URI TYPE_URI_2 = URI.create("http://example.com/type/2");
     private static final URI CONNECTION_URI_1 = URI.create("http://example.com/won/res/con/1");
-    private static final URI CONNECTION_URI_2 = URI.create("http://example.com/won/res/con/2");
     private static final URI ATOM_URI_1 = URI.create("http://example.com/atom/1");
-    private static final URI ATOM_URI_2 = URI.create("http://example.com/atom/2");
 
     @BeforeClass
     public static void setLogLevel() {

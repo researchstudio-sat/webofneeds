@@ -42,7 +42,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.function.BiFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 /**
  * LinkedDataSource implementation that delegates fetching linked data resources
@@ -146,8 +145,7 @@ public class LinkedDataSourceBase implements LinkedDataSource {
     private Set<URI> retainOnlyAllowedAmount(Set<URI> newlyDiscoveredURIs, final int maxRequest, int requests) {
         if (newlyDiscoveredURIs.size() + requests > maxRequest) {
             // only crawl as many as we are allowed to
-            return newlyDiscoveredURIs.stream().collect(Collectors.toList()).subList(0, maxRequest - requests).stream()
-                            .collect(Collectors.toSet());
+            return new HashSet<>(new ArrayList<>(newlyDiscoveredURIs).subList(0, maxRequest - requests));
         }
         return newlyDiscoveredURIs;
     }
@@ -179,29 +177,29 @@ public class LinkedDataSourceBase implements LinkedDataSource {
         int depth = 0;
         int requests = 0;
         final Dataset dataset = makeDataset();
-        OUTER: while (newlyDiscoveredURIs.size() > 0 && depth < maxDepth && requests < maxRequest) {
+        while (newlyDiscoveredURIs.size() > 0 && depth < maxDepth && requests < maxRequest) {
             final Set<URI> urisToCrawl = retainOnlyAllowedAmount(newlyDiscoveredURIs, maxRequest, requests);
             // hack: there may be a threadLocal with the authentication data we need further
             // down the call stack
             // if there is one, we need to add that to the threads we use in the following
             // parallel construct
-            final Optional<Object> authenticationOpt = won.protocol.util.AuthenticationThreadLocal.hasValue()
-                            ? Optional.of(AuthenticationThreadLocal.getAuthentication())
-                            : Optional.empty();
+            final Optional<Object> authenticationOpt = AuthenticationThreadLocal.hasValue()
+                    ? Optional.of(AuthenticationThreadLocal.getAuthentication())
+                    : Optional.empty();
             Future<Optional<Dataset>> crawledData = parallelRequestsThreadpool
-                            .submit(() -> urisToCrawl.parallelStream().map(uri -> {
-                                try {
-                                    if (authenticationOpt.isPresent()) {
-                                        // theadlocal hack mentioned above
-                                        AuthenticationThreadLocal.setAuthentication(authenticationOpt.get());
-                                    }
-                                    return requesterWebID == null ? getDataForResource(uri)
-                                                    : getDataForResource(uri, requesterWebID);
-                                } finally {
-                                    // be sure to remove the principal from the threadlocal after the call
-                                    AuthenticationThreadLocal.remove();
-                                }
-                            }).reduce(RdfUtils::addDatasetToDataset));
+                    .submit(() -> urisToCrawl.parallelStream().map(uri -> {
+                        try {
+                            if (authenticationOpt.isPresent()) {
+                                // theadlocal hack mentioned above
+                                AuthenticationThreadLocal.setAuthentication(authenticationOpt.get());
+                            }
+                            return requesterWebID == null ? getDataForResource(uri)
+                                    : getDataForResource(uri, requesterWebID);
+                        } finally {
+                            // be sure to remove the principal from the threadlocal after the call
+                            AuthenticationThreadLocal.remove();
+                        }
+                    }).reduce(RdfUtils::addDatasetToDataset));
             Optional<Dataset> crawledDataset;
             try {
                 crawledDataset = crawledData.get();

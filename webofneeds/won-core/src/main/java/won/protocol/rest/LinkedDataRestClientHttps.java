@@ -54,7 +54,7 @@ public class LinkedDataRestClientHttps extends LinkedDataRestClient {
     @PostConstruct
     public void initialize() {
         datasetConverter = new RdfDatasetConverter();
-        HttpHeaders headers = new HttpHeaders();
+        // HttpHeaders headers = new HttpHeaders();
         this.acceptHeaderValue = MediaType.toString(datasetConverter.getSupportedMediaTypes());
     }
 

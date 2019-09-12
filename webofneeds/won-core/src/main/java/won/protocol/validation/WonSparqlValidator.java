@@ -112,10 +112,6 @@ public class WonSparqlValidator {
         }
     }
 
-    private void printResult(final ResultSet result) {
-        System.out.println(ResultSetFormatter.asText(result));
-    }
-
     private ValidationResult validateAsk(final Dataset input) {
         try (QueryExecution qe = QueryExecutionFactory.create(constraint, input)) {
             if (qe.execAsk()) {
