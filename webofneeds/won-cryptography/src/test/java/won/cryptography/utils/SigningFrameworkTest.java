@@ -1,12 +1,8 @@
 package won.cryptography.utils;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.Iterator;
-
+import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.GraphCollection;
+import de.uni_koblenz.aggrimm.icp.crypto.sign.trigplus.TriGPlusReader;
+import de.uni_koblenz.aggrimm.icp.crypto.sign.trigplus.TriGPlusWriter;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
@@ -17,9 +13,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.GraphCollection;
-import de.uni_koblenz.aggrimm.icp.crypto.sign.trigplus.TriGPlusReader;
-import de.uni_koblenz.aggrimm.icp.crypto.sign.trigplus.TriGPlusWriter;
+import java.io.*;
+import java.util.Iterator;
 
 /**
  * Created by ypanchenko on 18.06.2014.
@@ -34,8 +29,6 @@ public class SigningFrameworkTest {
                     // "/example_nested.trig"
     };
     private static final String SIGNING_FW_TEST_1_FILE_SIGNED = "/example_01-signed.trig";
-    private static final String RESOURCE_FILE = "/test_12_content_cupboard_45_45_15.ttl";
-    private static final String RESOURCE_URI = "http://www.example.com/resource/atom/12";
 
     // read write from signingframework by signingframework produces orig input?
     // yes

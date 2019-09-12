@@ -22,7 +22,7 @@ import java.util.List;
  */
 public class TrustWebIdStrategy implements TrustStrategy {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    private WebIDVerificationAgent verificationAgent;
+    private final WebIDVerificationAgent verificationAgent;
 
     public TrustWebIdStrategy(LinkedDataSource linkedDataSource) {
         this.verificationAgent = new WebIDVerificationAgent();
@@ -38,7 +38,7 @@ public class TrustWebIdStrategy implements TrustStrategy {
         X509Certificate cert = x509Certificates[0];
         PublicKey publicKey = cert.getPublicKey();
         // extract webID (can be several)
-        List<URI> webIDs = null;
+        List<URI> webIDs;
         try {
             webIDs = CertificateService.getWebIdFromSubjectAlternativeNames(cert);
         } catch (CertificateParsingException e) {
@@ -50,7 +50,7 @@ public class TrustWebIdStrategy implements TrustStrategy {
             return false;
         }
         // verify
-        List<String> verified = null;
+        List<String> verified;
         try {
             verified = verificationAgent.verify(publicKey, webIDs);
         } catch (Exception e) {

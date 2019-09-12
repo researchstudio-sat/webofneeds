@@ -1,15 +1,9 @@
 package won.protocol.message.processor.impl;
 
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Resource;
-
 import won.cryptography.rdfsign.SignatureVerificationState;
 import won.cryptography.rdfsign.SigningStage;
 import won.cryptography.rdfsign.WonSigner;
@@ -18,6 +12,11 @@ import won.protocol.message.WonMessage;
 import won.protocol.message.WonSignatureData;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WONMSG;
+
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.util.List;
+import java.util.Map;
 
 /**
  * User: ypanchenko Date: 08.04.2015
@@ -49,9 +48,8 @@ public class WonMessageSignerVerifier {
     private static void signEnvelopes(final Dataset msgDataset, final SigningStage sigStage, final WonSigner signer,
                     final PrivateKey privateKey, final String privateKeyUri, final PublicKey publicKey)
                     throws Exception {
-        List<String> envUris = sigStage.getUnsignedEnvUrisOrderedByContainment();
         WonSignatureData wonSignatureData = null;
-        String outerEnvUri = null;
+        // String outerEnvUri = null;
         for (String envUri : sigStage.getUnsignedEnvUrisOrderedByContainment()) {
             if (wonSignatureData != null) {
                 // this is the signature of the envelope we signed in the last iteration.
@@ -59,7 +57,7 @@ public class WonMessageSignerVerifier {
                 addSignature(wonSignatureData, envUri, msgDataset, true);
             }
             wonSignatureData = signer.sign(privateKey, privateKeyUri, publicKey, envUri).get(0);
-            outerEnvUri = envUri;
+            // outerEnvUri = envUri;
         }
         // this is the signature of the outermost envelopoe. put it in a new graph.
         msgDataset.addNamedModel(wonSignatureData.getSignatureUri(), ModelFactory.createDefaultModel());
@@ -120,13 +118,11 @@ public class WonMessageSignerVerifier {
      * @param sigStage
      */
     private static void addUnreferencedSigReferences(final Dataset msgDataset, final SigningStage sigStage) {
-        String innemostUnsignedEnvUri = null;
         List<String> envUris = sigStage.getUnsignedEnvUrisOrderedByContainment();
         if (envUris.isEmpty()) {
             return;
-        } else {
-            innemostUnsignedEnvUri = envUris.get(0);
         }
+        String innemostUnsignedEnvUri = envUris.get(0);
         WonSignatureData sigRef = sigStage.getOutermostSignature();
         if (sigRef != null) {
             addSignature(sigRef, innemostUnsignedEnvUri, msgDataset, true);

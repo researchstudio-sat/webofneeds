@@ -1,5 +1,8 @@
 package won.cryptography.utils;
 
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import won.cryptography.service.keystore.FileBasedKeyStoreService;
+
 import java.io.File;
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -7,16 +10,12 @@ import java.security.Security;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-
-import won.cryptography.service.keystore.FileBasedKeyStoreService;
-
 /**
  * User: ypanchenko Date: 12.04.2015
  */
 public class TestingKeys {
-    private Map<String, PublicKey> publicKeys = new HashMap<>();
-    private Map<String, PrivateKey> privateKeys = new HashMap<>();
+    private final Map<String, PublicKey> publicKeys = new HashMap<>();
+    private final Map<String, PrivateKey> privateKeys = new HashMap<>();
 
     public TestingKeys(final String keysFilePath) throws Exception {
         Security.addProvider(new BouncyCastleProvider());

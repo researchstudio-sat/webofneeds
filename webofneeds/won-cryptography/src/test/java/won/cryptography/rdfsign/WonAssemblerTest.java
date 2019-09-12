@@ -1,19 +1,18 @@
 package won.cryptography.rdfsign;
 
+import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.GraphCollection;
+import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.SignatureData;
+import org.apache.jena.query.Dataset;
+import org.junit.Assert;
+import org.junit.Test;
+import won.cryptography.utils.TestSigningUtils;
+import won.protocol.util.RdfUtils;
+
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Set;
-
-import org.apache.jena.query.Dataset;
-import org.junit.Assert;
-import org.junit.Test;
-
-import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.GraphCollection;
-import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.SignatureData;
-import won.cryptography.utils.TestSigningUtils;
-import won.protocol.util.RdfUtils;
 
 /**
  * Created by ypanchenko on 23.03.2015.
@@ -47,8 +46,7 @@ public class WonAssemblerTest {
                         namesList.size());
         Assert.assertTrue("should be some triples in signature graph",
                         testDataset.getNamedModel(ATOM_CORE_DATA_SIG_URI).listStatements().hasNext());
-        Assert.assertTrue("should be no triples in default graph",
-                        !testDataset.getDefaultModel().listStatements().hasNext());
+        Assert.assertFalse(testDataset.getDefaultModel().listStatements().hasNext());
         int triplesCounter = TestSigningUtils
                         .countTriples(testDataset.getNamedModel(ATOM_CORE_DATA_SIG_URI).listStatements());
         Set<String> subjs = TestSigningUtils.getSubjects(testDataset.getNamedModel(ATOM_CORE_DATA_SIG_URI));

@@ -1,16 +1,11 @@
 package won.cryptography.message;
 
-import java.io.File;
-import java.net.URI;
-import java.security.Security;
-
 import org.apache.jena.query.Dataset;
 import org.apache.jena.riot.Lang;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
 import won.cryptography.service.CryptographyService;
 import won.cryptography.service.keystore.FileBasedKeyStoreService;
 import won.cryptography.utils.TestSigningUtils;
@@ -23,6 +18,10 @@ import won.protocol.message.processor.impl.SignatureAddingWonMessageProcessor;
 import won.protocol.message.processor.impl.SignatureCheckingWonMessageProcessor;
 import won.protocol.util.RdfUtils;
 
+import java.io.File;
+import java.net.URI;
+import java.security.Security;
+
 /**
  * User: ypanchenko Date: 25.03.2015
  */
@@ -33,10 +32,9 @@ public class VerifyAndSignExamples {
     private static final String ATOM_CORE_DATA_SIG_URI = "http://localhost:8080/won/resource/atom/3144709509622353000/core/#data-sig";
     private static final String EVENT_ENV1_URI = "http://localhost:8080/won/resource/event/7719577021233193000#data";
     private static final String EVENT_ENV1_SIG_URI = "http://localhost:8080/won/resource/event/7719577021233193000#data-sig";
-    private static final String RESOURCE_FILE_NL = "/won-signed-messages/atom-with-nl-nosig.trig";
-    SignatureAddingWonMessageProcessor nodeAddingProcessor;
-    SignatureAddingWonMessageProcessor ownerAddingProcessor;
-    SignatureCheckingWonMessageProcessor checkingProcessor;
+    private SignatureAddingWonMessageProcessor nodeAddingProcessor;
+    private SignatureAddingWonMessageProcessor ownerAddingProcessor;
+    private SignatureCheckingWonMessageProcessor checkingProcessor;
 
     @Before
     public void init() throws Exception {
@@ -55,7 +53,7 @@ public class VerifyAndSignExamples {
     }
 
     @Test
-    /**
+    /*
      * Owner Server receives create atom message from Owner Client, adds public key
      * (this step is omitted in the below example), and signs the message.
      */
@@ -99,7 +97,7 @@ public class VerifyAndSignExamples {
     }
 
     @Test
-    /**
+    /*
      * Node receives create atom message, verifies it, if verification succeeds -
      * adds envelope that includes reference to verified signatures, and signs it.
      */

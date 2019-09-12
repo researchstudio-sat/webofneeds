@@ -20,7 +20,7 @@ public class CertificateCheckingBrokerPlugin implements BrokerPlugin {
     private String queueNamePrefixToCheck = "OwnerProtocol.Out.";
 
     @Override
-    public Broker installPlugin(final Broker broker) throws Exception {
+    public Broker installPlugin(final Broker broker) {
         return new CertificateCheckingBrokerFilter(broker, this.queueNamePrefixToCheck);
     }
 

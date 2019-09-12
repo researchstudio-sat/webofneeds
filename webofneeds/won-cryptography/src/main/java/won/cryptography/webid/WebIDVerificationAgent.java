@@ -1,20 +1,19 @@
 package won.cryptography.webid;
 
+import org.apache.jena.query.Dataset;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
+import org.springframework.security.core.AuthenticationException;
+import won.cryptography.rdfsign.WonKeysReaderWriter;
+import won.protocol.util.linkeddata.LinkedDataSource;
+
 import java.net.URI;
 import java.security.PublicKey;
 import java.security.interfaces.ECPublicKey;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-
-import org.apache.jena.query.Dataset;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.security.authentication.InternalAuthenticationServiceException;
-import org.springframework.security.core.AuthenticationException;
-
-import won.cryptography.rdfsign.WonKeysReaderWriter;
-import won.protocol.util.linkeddata.LinkedDataSource;
 
 /**
  * User: ypanchenko Date: 28.07.2015
@@ -24,7 +23,7 @@ public class WebIDVerificationAgent {
     private LinkedDataSource linkedDataSource;
 
     public boolean verify(PublicKey publicKey, URI webId) {
-        Dataset dataset = null;
+        Dataset dataset;
         try {
             dataset = linkedDataSource.getDataForResource(webId);
         } catch (Exception e) {
@@ -46,7 +45,7 @@ public class WebIDVerificationAgent {
         if (publicKey instanceof ECPublicKey) {
             ECPublicKey ecPublicKey = (ECPublicKey) publicKey;
             WonKeysReaderWriter ecKeyReader = new WonKeysReaderWriter();
-            Set<PublicKey> keys = null;
+            Set<PublicKey> keys;
             try {
                 keys = ecKeyReader.readFromDataset(dataset, webId.toString());
             } catch (Exception e) {
@@ -73,7 +72,7 @@ public class WebIDVerificationAgent {
      * constructor public key data
      */
     public List<String> verify(PublicKey publicKey, List<URI> webIDs) throws AuthenticationException {
-        List<String> verified = new ArrayList<String>();
+        List<String> verified = new ArrayList<>();
         for (URI webID : webIDs) {
             if (verify(publicKey, webID)) {
                 verified.add(webID.toString());

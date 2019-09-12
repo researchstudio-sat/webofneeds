@@ -1,12 +1,23 @@
 package won.cryptography.utils;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.StringReader;
-import java.io.StringWriter;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.DatasetFactory;
+import org.apache.jena.rdf.model.*;
+import org.apache.jena.riot.RDFDataMgr;
+import org.apache.jena.riot.RDFFormat;
+import org.bouncycastle.cert.X509CertificateHolder;
+import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.openssl.PEMParser;
+import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import won.cryptography.service.CertificateService;
+import won.cryptography.service.KeyPairService;
+import won.cryptography.service.keystore.FileBasedKeyStoreService;
+import won.cryptography.service.keystore.KeyStoreService;
+
+import java.io.*;
 import java.lang.invoke.MethodHandles;
 import java.math.BigInteger;
 import java.security.KeyPair;
@@ -17,28 +28,6 @@ import java.security.cert.X509Certificate;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.jena.query.Dataset;
-import org.apache.jena.query.DatasetFactory;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.NodeIterator;
-import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.Statement;
-import org.apache.jena.rdf.model.StmtIterator;
-import org.apache.jena.riot.RDFDataMgr;
-import org.apache.jena.riot.RDFFormat;
-import org.bouncycastle.cert.X509CertificateHolder;
-import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.bouncycastle.openssl.PEMParser;
-import org.bouncycastle.openssl.PEMWriter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import won.cryptography.service.CertificateService;
-import won.cryptography.service.KeyPairService;
-import won.cryptography.service.keystore.FileBasedKeyStoreService;
-import won.cryptography.service.keystore.KeyStoreService;
-
 /**
  * User: ypanchenko Date: 24.03.2015
  */
@@ -46,9 +35,9 @@ public class TestSigningUtils {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     public static final String KEYS_FILE = "/won-signed-messages/test-keys.jks";
     // theoretically can be a public key WebID...
-    public static String atomCertUri = "http://localhost:8080/won/resource/atom/3144709509622353000";
-    public static String ownerCertUri = "http://localhost:8080/owner/certificate";
-    public static String nodeCertUri = "http://localhost:8080/node/certificate";
+    public static final String atomCertUri = "http://localhost:8080/won/resource/atom/3144709509622353000";
+    public static final String ownerCertUri = "http://localhost:8080/owner/certificate";
+    public static final String nodeCertUri = "http://localhost:8080/node/certificate";
 
     public static int countTriples(final StmtIterator sti) {
         int countTriples = 0;
@@ -180,7 +169,7 @@ public class TestSigningUtils {
         System.out.println(certUri);
         X509Certificate cert = (X509Certificate) storeService.getCertificate(keyName);
         StringWriter sw = new StringWriter();
-        PEMWriter writer = new PEMWriter(sw);
+        JcaPEMWriter writer = new JcaPEMWriter(sw);
         writer.writeObject(cert);
         writer.close();
         System.out.println(sw.toString());
