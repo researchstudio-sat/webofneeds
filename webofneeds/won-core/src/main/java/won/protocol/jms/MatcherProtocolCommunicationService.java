@@ -19,10 +19,10 @@ import won.protocol.exception.CamelConfigurationFailedException;
  * User: LEIH-NB Date: 25.02.14
  */
 public interface MatcherProtocolCommunicationService extends ProtocolCommunicationService {
-    public CamelConfiguration configureCamelEndpoint(URI atomUri, String startingEndpoint) throws Exception;
+    CamelConfiguration configureCamelEndpoint(URI atomUri, String startingEndpoint) throws Exception;
 
-    public Set<String> getMatcherProtocolOutTopics(URI wonNodeURI);
+    Set<String> getMatcherProtocolOutTopics(URI wonNodeURI);
 
-    public void addRemoteTopicListeners(final Set<String> endpoints, final URI remoteEndpoint)
+    void addRemoteTopicListeners(final Set<String> endpoints, final URI remoteEndpoint)
                     throws CamelConfigurationFailedException;
 }

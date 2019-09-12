@@ -19,7 +19,7 @@ public interface RDFStorageService {
      * @param resourceURI
      * @param model
      */
-    public void storeModel(URI resourceURI, Model model);
+    void storeModel(URI resourceURI, Model model);
 
     /**
      * Stores a copy of the specified dataset.
@@ -27,7 +27,7 @@ public interface RDFStorageService {
      * @param resourceURI
      * @param dataset
      */
-    public void storeDataset(URI resourceURI, Dataset dataset);
+    void storeDataset(URI resourceURI, Dataset dataset);
 
     /**
      * Loads the default model of the stored dataset with the specified URL
@@ -35,7 +35,7 @@ public interface RDFStorageService {
      * @param resourceURI
      * @return
      */
-    public Model loadModel(URI resourceURI);
+    Model loadModel(URI resourceURI);
 
     /**
      * Compares the etag to the value derived from the data found in the storage for
@@ -45,7 +45,7 @@ public interface RDFStorageService {
      * @param etag
      * @return
      */
-    public DataWithEtag<Model> loadModel(URI resourceURI, String etag);
+    DataWithEtag<Model> loadModel(URI resourceURI, String etag);
 
     /**
      * Loads the dataset with the specified URL
@@ -53,7 +53,7 @@ public interface RDFStorageService {
      * @param resourceURI
      * @return
      */
-    public Dataset loadDataset(URI resourceURI);
+    Dataset loadDataset(URI resourceURI);
 
     /**
      * Compares the etag to the value derived from the data found in the storage for
@@ -63,7 +63,7 @@ public interface RDFStorageService {
      * @param etag
      * @return
      */
-    public DataWithEtag<Dataset> loadDataset(URI resourceURI, String etag);
+    DataWithEtag<Dataset> loadDataset(URI resourceURI, String etag);
 
-    public boolean removeContent(URI resourceURI);
+    boolean removeContent(URI resourceURI);
 }

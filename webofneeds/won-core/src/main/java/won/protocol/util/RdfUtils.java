@@ -1241,22 +1241,22 @@ public class RdfUtils {
      * Dataset visitor used for repeated application of model operations in a
      * dataset.
      */
-    public static interface ModelVisitor<T> {
-        public T visit(Model model);
+    public interface ModelVisitor<T> {
+        T visit(Model model);
     }
 
     /**
      * ModelSelector used to select which models in a dataset to visit.
      */
-    public static interface ModelSelector {
-        public Iterator<Model> select(Dataset dataset);
+    public interface ModelSelector {
+        Iterator<Model> select(Dataset dataset);
     }
 
     /**
      * ResultCombiner which combines to results of type T and returns it.
      */
-    public static interface ResultCombiner<T> {
-        public T combine(T first, T second);
+    public interface ResultCombiner<T> {
+        T combine(T first, T second);
     }
 
     /**
@@ -1949,7 +1949,7 @@ public class RdfUtils {
         return condensedModel;
     }
 
-    public static interface GraphNameCheck {
-        public boolean isGraphUriOk(String graphUri);
+    public interface GraphNameCheck {
+        boolean isGraphUriOk(String graphUri);
     }
 }

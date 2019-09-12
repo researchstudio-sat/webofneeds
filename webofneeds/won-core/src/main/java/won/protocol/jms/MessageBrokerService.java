@@ -25,5 +25,5 @@ public interface MessageBrokerService {
      * @param resourceUri
      * @return
      */
-    public URI getBrokerEndpoint(URI resourceUri);
+    URI getBrokerEndpoint(URI resourceUri);
 }

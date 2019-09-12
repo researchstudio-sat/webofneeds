@@ -52,7 +52,7 @@ public interface MessageEventRepository extends WonRepository<MessageEventPlaceh
                     + " where msg.messageURI = :messageUri and (" + "   ( con is null and msg.parentURI = :webId )"
                     + "   or con.atomURI = :webId " + "   or con.targetAtomURI = :webId "
                     + "   or msg.recipientNodeURI = :webId " + "   or msg.senderNodeURI = :webId " + ")")
-    public boolean isReadPermittedForWebID(@Param("messageUri") URI messageUri, @Param("webId") URI webId);
+    boolean isReadPermittedForWebID(@Param("messageUri") URI messageUri, @Param("webId") URI webId);
 
     /*
      * @Query( "select " +
@@ -81,16 +81,16 @@ public interface MessageEventRepository extends WonRepository<MessageEventPlaceh
                     + "		and m.messageType not in ('SUCCESS_RESPONSE', 'FAILURE_RESPONSE') \n"
                     + "        and (last is null or m.creationDate > last.creationDate) \n"
                     + "    group by c.connectionURI, c.state \n")
-    public List<UnreadMessageInfoForConnection> getUnreadInfoForAtom(@Param("atomUri") URI atomURI,
-                    @Param("lastSeenMessageUris") Collection<URI> lastSeenMessageURIs);
+    List<UnreadMessageInfoForConnection> getUnreadInfoForAtom(@Param("atomUri") URI atomURI,
+                                                              @Param("lastSeenMessageUris") Collection<URI> lastSeenMessageURIs);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select n,c from AtomMessageContainer c join MessageEventPlaceholder msg on msg.parentURI = c.parentUri join Atom n on c.parentUri = n.atomURI where msg.messageURI = :messageUri")
-    public void lockAtomAndMessageContainerByContainedMessageForUpdate(@Param("messageUri") URI messageUri);
+    void lockAtomAndMessageContainerByContainedMessageForUpdate(@Param("messageUri") URI messageUri);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select con,c from AtomMessageContainer c join MessageEventPlaceholder msg on msg.parentURI = c.parentUri join Connection con on c.parentUri = con.connectionURI where msg.messageURI = :messageUri")
-    public void lockConnectionAndMessageContainerByContainedMessageForUpdate(@Param("messageUri") URI messageUri);
+    void lockConnectionAndMessageContainerByContainedMessageForUpdate(@Param("messageUri") URI messageUri);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select msg from MessageEventPlaceholder msg where msg.messageURI = :uri")
@@ -248,8 +248,8 @@ public interface MessageEventRepository extends WonRepository<MessageEventPlaceh
                     // if both messages happen at the same instant, we need a tie-breaker: db id
                     "        msg.creationDate = otherMsg.creationDate and " + "        msg.id > otherMsg.id " + "    )"
                     + ")")
-    public boolean existEarlierMessageWithSameInnermostMessageURIAndRecipientAtomURI(
-                    @Param("messageUri") URI messageUri);
+    boolean existEarlierMessageWithSameInnermostMessageURIAndRecipientAtomURI(
+            @Param("messageUri") URI messageUri);
 
     /**
      * When we want to forward a message to recipient r, we first check if we have
@@ -266,8 +266,8 @@ public interface MessageEventRepository extends WonRepository<MessageEventPlaceh
                     + "otherMsg.messageURI <> msg.messageURI and " + "otherCon.atomURI = msg.recipientAtomURI and "
                     + "otherMsg.recipientAtomURI = msg.recipientAtomURI and "
                     + "otherMsg.innermostMessageURI = msg.innermostMessageURI")
-    public boolean isReceivedSameInnermostMessageFromSender(@Param("messageUri") URI messageUri,
-                    @Param("senderAtomUri") URI senderAtomURI);
+    boolean isReceivedSameInnermostMessageFromSender(@Param("messageUri") URI messageUri,
+                                                     @Param("senderAtomUri") URI senderAtomURI);
 
-    public void deleteByParentURI(URI parentUri);
+    void deleteByParentURI(URI parentUri);
 }

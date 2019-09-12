@@ -19,7 +19,7 @@ public interface KeyInformationExtractor {
      * @param key <code>Key</code> representing a private or public key
      * @return <code>String</code> with the name of the algorithm
      */
-    public String getAlgorithm(Key key);
+    String getAlgorithm(Key key);
 
     /**
      * returns the ID of the elliptic curve the key will be used for
@@ -27,7 +27,7 @@ public interface KeyInformationExtractor {
      * @param key <code>Key</code> representing a private or public key
      * @return <code>String</code> with the ID of the curve
      */
-    public String getCurveID(Key key) throws KeyNotSupportedException;
+    String getCurveID(Key key) throws KeyNotSupportedException;
 
     /**
      * returns the x coordinate of the public point Q (also named W) of the public
@@ -37,7 +37,7 @@ public interface KeyInformationExtractor {
      * @return <code>String</code> with base 16 notated number representing the x
      * coordinate
      */
-    public String getQX(PublicKey publicKey) throws KeyNotSupportedException;
+    String getQX(PublicKey publicKey) throws KeyNotSupportedException;
 
     /**
      * returns the y coordinate of the public point Q (also named W) of the public
@@ -47,5 +47,5 @@ public interface KeyInformationExtractor {
      * @return <code>String</code> with base 16 notated number representing the y
      * coordinate
      */
-    public String getQY(PublicKey publicKey) throws KeyNotSupportedException;
+    String getQY(PublicKey publicKey) throws KeyNotSupportedException;
 }

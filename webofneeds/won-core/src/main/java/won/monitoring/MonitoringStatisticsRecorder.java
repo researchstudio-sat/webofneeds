@@ -20,10 +20,10 @@ public interface MonitoringStatisticsRecorder {
      * 
      * @return
      */
-    public String getRecorderName();
+    String getRecorderName();
 
     /**
      * Records the current snapshost of the monitoring statistics.
      */
-    public void recordMonitoringStatistics();
+    void recordMonitoringStatistics();
 }

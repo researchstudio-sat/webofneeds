@@ -18,5 +18,5 @@ import org.javasimon.Simon;
  * Visitor for simons.
  */
 public interface SimonVisitor {
-    public void visit(Simon simon) throws IOException;
+    void visit(Simon simon) throws IOException;
 }

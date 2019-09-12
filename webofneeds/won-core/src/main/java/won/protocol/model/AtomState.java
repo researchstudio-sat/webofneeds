@@ -26,7 +26,7 @@ public enum AtomState {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private String name;
 
-    private AtomState(String name) {
+    AtomState(String name) {
         this.name = name;
     }
 

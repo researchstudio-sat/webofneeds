@@ -12,7 +12,7 @@ public enum WonMessageDirection {
     FROM_OWNER(WONMSG.FromOwner), FROM_SYSTEM(WONMSG.FromSystem), FROM_EXTERNAL(WONMSG.FromExternal);
     private Resource resource;
 
-    private WonMessageDirection(Resource resource) {
+    WonMessageDirection(Resource resource) {
         this.resource = resource;
     }
 

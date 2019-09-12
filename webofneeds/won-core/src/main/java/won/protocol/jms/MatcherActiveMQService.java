@@ -25,5 +25,5 @@ public interface MatcherActiveMQService extends ActiveMQService {
      * @param resourceURI
      * @return
      */
-    public Set<String> getMatcherProtocolTopicNamesWithResource(URI resourceURI);
+    Set<String> getMatcherProtocolTopicNamesWithResource(URI resourceURI);
 }

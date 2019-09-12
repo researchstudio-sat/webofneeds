@@ -27,7 +27,7 @@ public interface LinkedDataSource {
      * @return resource description as Dataset, or empty Dataset if not a valid URI
      * or not found
      */
-    public Dataset getDataForResource(URI resourceURI);
+    Dataset getDataForResource(URI resourceURI);
 
     /**
      * Obtains resource description of the resource identified by the given URI for
@@ -39,16 +39,16 @@ public interface LinkedDataSource {
      * @return resource description as Dataset, or empty Dataset if not a valid URI
      * or not found or access not granted
      */
-    public Dataset getDataForResource(URI resourceURI, URI requesterWebID);
+    Dataset getDataForResource(URI resourceURI, URI requesterWebID);
 
-    public Dataset getDataForResource(final URI resourceURI, List<URI> properties, int maxRequest, int maxDepth);
+    Dataset getDataForResource(final URI resourceURI, List<URI> properties, int maxRequest, int maxDepth);
 
-    public Dataset getDataForResource(final URI resourceURI, URI requesterWebID, List<URI> properties, int maxRequest,
-                    int maxDepth);
+    Dataset getDataForResource(final URI resourceURI, URI requesterWebID, List<URI> properties, int maxRequest,
+                               int maxDepth);
 
-    public Dataset getDataForResourceWithPropertyPath(final URI resourceURI, final List<Path> properties,
-                    int maxRequest, int maxDepth, final boolean moveAllTriplesInDefaultGraph);
+    Dataset getDataForResourceWithPropertyPath(final URI resourceURI, final List<Path> properties,
+                                               int maxRequest, int maxDepth, final boolean moveAllTriplesInDefaultGraph);
 
-    public Dataset getDataForResourceWithPropertyPath(final URI resourceURI, URI requesterWebID,
-                    final List<Path> properties, int maxRequest, int maxDepth);
+    Dataset getDataForResourceWithPropertyPath(final URI resourceURI, URI requesterWebID,
+                                               final List<Path> properties, int maxRequest, int maxDepth);
 }

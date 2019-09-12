@@ -21,5 +21,5 @@ public interface CamelConfigurator extends CamelContextAware {
 
     String getEndpoint(URI wonNodeUri);
 
-    public String setupBrokerComponentName(URI brokerUri);
+    String setupBrokerComponentName(URI brokerUri);
 }

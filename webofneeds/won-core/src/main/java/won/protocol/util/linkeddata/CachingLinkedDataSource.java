@@ -530,7 +530,7 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
         this.crawlerCallback = crawlerCallback;
     }
 
-    public static enum CacheControlFlag {
+    public enum CacheControlFlag {
         PUBLIC("public"), PRIVATE("private"), NO_CACHE("no-cache"), NO_STORE("no-store"),
         MUST_REVALIDATE("must-revalidate");
         private String name;

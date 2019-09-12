@@ -26,7 +26,7 @@ public enum ConnectionState {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private String name;
 
-    private ConnectionState(String name) {
+    ConnectionState(String name) {
         this.name = name;
     }
 

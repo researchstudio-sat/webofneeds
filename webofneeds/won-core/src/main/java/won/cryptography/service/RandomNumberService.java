@@ -11,5 +11,5 @@ public interface RandomNumberService {
      * 
      * @param length
      */
-    public String generateRandomString(int length);
+    String generateRandomString(int length);
 }

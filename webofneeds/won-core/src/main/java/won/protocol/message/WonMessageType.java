@@ -22,7 +22,7 @@ public enum WonMessageType {
     CHANGE_NOTIFICATION(WONMSG.ChangeNotificationMessage);
     private Resource resource;
 
-    private WonMessageType(Resource resource) {
+    WonMessageType(Resource resource) {
         this.resource = resource;
     }
 

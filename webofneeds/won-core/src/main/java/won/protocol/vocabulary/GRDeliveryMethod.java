@@ -16,7 +16,7 @@ public enum GRDeliveryMethod {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private String name;
 
-    private GRDeliveryMethod(String name) {
+    GRDeliveryMethod(String name) {
         this.name = name;
     }
 

@@ -25,5 +25,5 @@ public interface ActiveMQService extends MessageBrokerService {
      * @param resourceUri
      * @return
      */
-    public String getProtocolQueueNameWithResource(URI resourceUri);
+    String getProtocolQueueNameWithResource(URI resourceUri);
 }

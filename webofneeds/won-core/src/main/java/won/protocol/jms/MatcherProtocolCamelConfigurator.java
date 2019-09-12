@@ -19,11 +19,11 @@ import won.protocol.exception.CamelConfigurationFailedException;
  * User: LEIH-NB Date: 10.03.14
  */
 public interface MatcherProtocolCamelConfigurator extends AtomProtocolCamelConfigurator {
-    public void addRemoteTopicListeners(Set<String> endpoints, URI remoteEndpoint)
+    void addRemoteTopicListeners(Set<String> endpoints, URI remoteEndpoint)
                     throws CamelConfigurationFailedException;
 
     // TODO: more sophisticated approach for adding activemq components might be
     // needed to enable more detailed jms
     // configuration
-    public void addCamelComponentForWonNodeBrokerForTopics(URI brokerUri, String brokerComponentName);
+    void addCamelComponentForWonNodeBrokerForTopics(URI brokerUri, String brokerComponentName);
 }

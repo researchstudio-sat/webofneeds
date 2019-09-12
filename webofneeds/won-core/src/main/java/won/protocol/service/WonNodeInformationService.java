@@ -7,7 +7,7 @@ import java.net.URI;
  * required for messaging and creation of resources.
  */
 public interface WonNodeInformationService {
-    public WonNodeInfo getWonNodeInformation(URI wonNodeURI);
+    WonNodeInfo getWonNodeInformation(URI wonNodeURI);
 
     /**
      * Generates a random event URI according to the URI pattern of the default won
@@ -15,7 +15,7 @@ public interface WonNodeInformationService {
      *
      * @return
      */
-    public URI generateEventURI();
+    URI generateEventURI();
 
     /**
      * Generates a random event URI according to the URI pattern of the specified
@@ -24,7 +24,7 @@ public interface WonNodeInformationService {
      * @param wonNodeURI
      * @return
      */
-    public URI generateEventURI(URI wonNodeURI);
+    URI generateEventURI(URI wonNodeURI);
 
     /**
      * Checks if the passed event URI is matching the won node default pattern
@@ -32,7 +32,7 @@ public interface WonNodeInformationService {
      * @param eventURI
      * @return
      */
-    public boolean isValidEventURI(URI eventURI);
+    boolean isValidEventURI(URI eventURI);
 
     /**
      * Checks if the passed event URI is matching the won node pattern
@@ -41,7 +41,7 @@ public interface WonNodeInformationService {
      * @param wonNodeURI
      * @return
      */
-    public boolean isValidEventURI(URI eventURI, URI wonNodeURI);
+    boolean isValidEventURI(URI eventURI, URI wonNodeURI);
 
     /**
      * Generates a random connection URI according to the URI pattern of the default
@@ -49,7 +49,7 @@ public interface WonNodeInformationService {
      *
      * @return
      */
-    public URI generateConnectionURI();
+    URI generateConnectionURI();
 
     /**
      * Generates a random connection URI according to the URI pattern of the
@@ -58,7 +58,7 @@ public interface WonNodeInformationService {
      * @param wonNodeURI
      * @return
      */
-    public URI generateConnectionURI(URI wonNodeURI);
+    URI generateConnectionURI(URI wonNodeURI);
 
     /**
      * Checks if the passed connection URI is matching the won default node pattern
@@ -66,7 +66,7 @@ public interface WonNodeInformationService {
      * @param connectionURI
      * @return
      */
-    public boolean isValidConnectionURI(URI connectionURI);
+    boolean isValidConnectionURI(URI connectionURI);
 
     /**
      * Checks if the passed event URI is matching the won node pattern
@@ -75,7 +75,7 @@ public interface WonNodeInformationService {
      * @param wonNodeURI
      * @return
      */
-    public boolean isValidConnectionURI(URI connectionURI, URI wonNodeURI);
+    boolean isValidConnectionURI(URI connectionURI, URI wonNodeURI);
 
     /**
      * Generates a random atom URI according to the URI pattern of the default won
@@ -83,7 +83,7 @@ public interface WonNodeInformationService {
      *
      * @return
      */
-    public URI generateAtomURI();
+    URI generateAtomURI();
 
     /**
      * Generates a random atom URI according to the URI pattern of the specified won
@@ -92,7 +92,7 @@ public interface WonNodeInformationService {
      * @param wonNodeURI
      * @return
      */
-    public URI generateAtomURI(URI wonNodeURI);
+    URI generateAtomURI(URI wonNodeURI);
 
     /**
      * Checks if the passed atom URI is matching the won default node pattern
@@ -100,7 +100,7 @@ public interface WonNodeInformationService {
      * @param atomURI
      * @return
      */
-    public boolean isValidAtomURI(URI atomURI);
+    boolean isValidAtomURI(URI atomURI);
 
     /**
      * Checks if the passed atom URI is matching the won node pattern
@@ -109,9 +109,9 @@ public interface WonNodeInformationService {
      * @param wonNodeURI
      * @return
      */
-    public boolean isValidAtomURI(URI atomURI, URI wonNodeURI);
+    boolean isValidAtomURI(URI atomURI, URI wonNodeURI);
 
-    public URI getDefaultWonNodeURI();
+    URI getDefaultWonNodeURI();
 
     /**
      * Obtains the won node uri associated with the specified atom or connection
@@ -120,5 +120,5 @@ public interface WonNodeInformationService {
      * @param resourceURI
      * @return the won node URI or null if none is found.
      */
-    public URI getWonNodeUri(URI resourceURI);
+    URI getWonNodeUri(URI resourceURI);
 }

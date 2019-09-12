@@ -8,7 +8,7 @@ public enum ProtocolType {
     OwnerProtocol("OwnerProtocol"), AtomProtocol("AtomProtocol"), MatcherProtocol("MatcherProtocol");
     private String name;
 
-    private ProtocolType(String name) {
+    ProtocolType(String name) {
         this.name = name;
     }
 }
