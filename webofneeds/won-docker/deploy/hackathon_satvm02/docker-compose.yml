@@ -101,40 +101,40 @@ services:
       - postgres
       - gencert
 
-  #mongodb for persistent debug bot
-  mongodb:
-    restart: always
-    image: tutum/mongodb:3.2
-    environment:
-      - "MONGODB_USER=won"
-      - "MONGODB_DATABASE=hackathon_bot"
-      - "MONGODB_PASS=$mongo_db_passwd"
-    ports:
-      - "27019:27017"
-      - "28019:28017"
-    volumes:
-      - $base_folder/mongodb/data/db:/data/db
+  # #mongodb for persistent debug bot
+  # mongodb:
+  #   restart: always
+  #   image: tutum/mongodb:3.2
+  #   environment:
+  #     - "MONGODB_USER=won"
+  #     - "MONGODB_DATABASE=hackathon_bot"
+  #     - "MONGODB_PASS=$mongo_db_passwd"
+  #   ports:
+  #     - "27019:27017"
+  #     - "28019:28017"
+  #   volumes:
+  #     - $base_folder/mongodb/data/db:/data/db
 
-  #debug bot used to test atom communication connect to wonnodes
-  debug_bot:
-    restart: always
-    build: ../../image/bots
-    #image: webofneeds/bots:master
-    environment:
-      - "node.default.host=hackathonnode.matchat.org"
-      - "node.default.http.port=443"
-      - "uri.prefix.owner=https://hackathon.matchat.org/debug_bot" # set this for the trust store alias
-      - "won.node.uris=https://hackathonnode.matchat.org/won/resource"
-      - "uri.prefix.node.default=https://hackathonnode.matchat.org/won"
-      - "botContext.impl=mongoBotContext"
-      - "botContext.mongodb.user=won"
-      - "botContext.mongodb.pass=$mongo_db_passwd"
-      - "botContext.mongodb.host=satvm02.researchstudio.at"
-      - "botContext.mongodb.port=27019"
-      - "botContext.mongodb.database=hackathon_bot"
-    depends_on:
-      - mongodb
-      - wonnode
+  # #debug bot used to test atom communication connect to wonnodes
+  # debug_bot:
+  #   restart: always
+  #   build: ../../image/bots
+  #   #image: webofneeds/bots:master
+  #   environment:
+  #     - "node.default.host=hackathonnode.matchat.org"
+  #     - "node.default.http.port=443"
+  #     - "uri.prefix.owner=https://hackathon.matchat.org/debug_bot" # set this for the trust store alias
+  #     - "won.node.uris=https://hackathonnode.matchat.org/won/resource"
+  #     - "uri.prefix.node.default=https://hackathonnode.matchat.org/won"
+  #     - "botContext.impl=mongoBotContext"
+  #     - "botContext.mongodb.user=won"
+  #     - "botContext.mongodb.pass=$mongo_db_passwd"
+  #     - "botContext.mongodb.host=satvm02.researchstudio.at"
+  #     - "botContext.mongodb.port=27019"
+  #     - "botContext.mongodb.database=hackathon_bot"
+  #   depends_on:
+  #     - mongodb
+  #     - wonnode
 
   # hokify_bot:
   #   restart: always
