@@ -1191,15 +1191,15 @@ public class WonRdfUtils {
                 return null;
             else if (atomURIs.size() == 1)
                 return atomURIs.get(0);
-            else if (atomURIs.size() > 1) {
+            else {
+                atomURIs.size();
                 Resource u = atomURIs.get(0);
                 for (Resource uri : atomURIs) {
                     if (!uri.equals(u))
                         throw new IncorrectPropertyCountException(1, 2);
                 }
                 return u;
-            } else
-                return null;
+            }
         }
 
         /**

@@ -1621,15 +1621,15 @@ public class RdfUtils {
             return null;
         else if (foundNodes.size() == 1)
             return foundNodes.get(0);
-        else if (foundNodes.size() > 1) {
+        else {
+            foundNodes.size();
             RDFNode n = foundNodes.get(0);
             for (RDFNode node : foundNodes) {
                 if (!node.equals(n))
                     throw new IncorrectPropertyCountException(1, 2);
             }
             return n;
-        } else
-            return null;
+        }
     }
 
     public static Resource findOneSubjectResource(Dataset dataset, Property property, RDFNode object) {

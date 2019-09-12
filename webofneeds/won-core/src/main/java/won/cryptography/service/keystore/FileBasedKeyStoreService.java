@@ -161,19 +161,17 @@ public class FileBasedKeyStoreService extends AbstractKeyStoreService {
             logger.error("Could not create key store in file " + storeFile.getName(), e);
             throw e;
         }
-        if (outputStream != null) {
+        try {
+            store.store(outputStream, storePW.toCharArray());
+        } catch (Exception e) {
+            logger.error("Could not save key store to file" + storeFile.getName(), e);
+            throw new IOException(e);
+        } finally {
             try {
-                store.store(outputStream, storePW.toCharArray());
+                outputStream.close();
             } catch (Exception e) {
-                logger.error("Could not save key store to file" + storeFile.getName(), e);
-                throw new IOException(e);
-            } finally {
-                try {
-                    outputStream.close();
-                } catch (Exception e) {
-                    logger.error("Error closing stream of file" + storeFile.getName(), e);
-                    throw e;
-                }
+                logger.error("Error closing stream of file" + storeFile.getName(), e);
+                throw e;
             }
         }
     }
@@ -186,19 +184,17 @@ public class FileBasedKeyStoreService extends AbstractKeyStoreService {
             logger.error("Could not load key store from file" + storeFile.getName(), e);
             throw e;
         }
-        if (inputStream != null) {
+        try {
+            store.load(inputStream, storePW.toCharArray());
+        } catch (Exception e) {
+            logger.error("Could not load key store from file " + storeFile.getName(), e);
+            throw e;
+        } finally {
             try {
-                store.load(inputStream, storePW.toCharArray());
+                inputStream.close();
             } catch (Exception e) {
-                logger.error("Could not load key store from file " + storeFile.getName(), e);
+                logger.error("Error closing stream of file " + storeFile.getName(), e);
                 throw e;
-            } finally {
-                try {
-                    inputStream.close();
-                } catch (Exception e) {
-                    logger.error("Error closing stream of file " + storeFile.getName(), e);
-                    throw e;
-                }
             }
         }
     }

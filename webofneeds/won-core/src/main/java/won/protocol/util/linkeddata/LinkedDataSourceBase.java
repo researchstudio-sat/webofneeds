@@ -75,7 +75,7 @@ public class LinkedDataSourceBase implements LinkedDataSource {
                 }
             }
         }
-        return prevLink;
+        return null;
     }
 
     /**
