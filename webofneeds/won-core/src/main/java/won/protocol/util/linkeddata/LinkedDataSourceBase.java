@@ -184,22 +184,22 @@ public class LinkedDataSourceBase implements LinkedDataSource {
             // if there is one, we need to add that to the threads we use in the following
             // parallel construct
             final Optional<Object> authenticationOpt = AuthenticationThreadLocal.hasValue()
-                    ? Optional.of(AuthenticationThreadLocal.getAuthentication())
-                    : Optional.empty();
+                            ? Optional.of(AuthenticationThreadLocal.getAuthentication())
+                            : Optional.empty();
             Future<Optional<Dataset>> crawledData = parallelRequestsThreadpool
-                    .submit(() -> urisToCrawl.parallelStream().map(uri -> {
-                        try {
-                            if (authenticationOpt.isPresent()) {
-                                // theadlocal hack mentioned above
-                                AuthenticationThreadLocal.setAuthentication(authenticationOpt.get());
-                            }
-                            return requesterWebID == null ? getDataForResource(uri)
-                                    : getDataForResource(uri, requesterWebID);
-                        } finally {
-                            // be sure to remove the principal from the threadlocal after the call
-                            AuthenticationThreadLocal.remove();
-                        }
-                    }).reduce(RdfUtils::addDatasetToDataset));
+                            .submit(() -> urisToCrawl.parallelStream().map(uri -> {
+                                try {
+                                    if (authenticationOpt.isPresent()) {
+                                        // theadlocal hack mentioned above
+                                        AuthenticationThreadLocal.setAuthentication(authenticationOpt.get());
+                                    }
+                                    return requesterWebID == null ? getDataForResource(uri)
+                                                    : getDataForResource(uri, requesterWebID);
+                                } finally {
+                                    // be sure to remove the principal from the threadlocal after the call
+                                    AuthenticationThreadLocal.remove();
+                                }
+                            }).reduce(RdfUtils::addDatasetToDataset));
             Optional<Dataset> crawledDataset;
             try {
                 crawledDataset = crawledData.get();
@@ -290,11 +290,11 @@ public class LinkedDataSourceBase implements LinkedDataSource {
         Set<URI> toCrawl = new HashSet<>();
         for (final URI property : properties) {
             NodeIterator objectIterator = RdfUtils.visitFlattenedToNodeIterator(dataset,
-                    model -> {
-                        final Property p = model.createProperty(property.toString());
-                        return model.listObjectsOfProperty(p);
-                    });
-            for (; objectIterator.hasNext(); ) {
+                            model -> {
+                                final Property p = model.createProperty(property.toString());
+                                return model.listObjectsOfProperty(p);
+                            });
+            for (; objectIterator.hasNext();) {
                 RDFNode objectNode = objectIterator.next();
                 if (objectNode.isURIResource()) {
                     URI discoveredUri = URI.create(objectNode.asResource().getURI());

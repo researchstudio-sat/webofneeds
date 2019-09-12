@@ -40,8 +40,6 @@ public class WonMessageValidatorTest {
     // response message local
     private static final String RESOURCE_FILE_RESPONSE_MSG_VALID = "/validation/valid/response_msg_local.trig";
     private static final String RESPONSE_LOCAL_ENV1_SIG_NAME = "http://localhost:8080/won/resource/event/kpft39z0ladmp3cqm4ju#envelope-c37o-sig";
-
-
     private Dataset responseMessageDataset;
     // text message (i.e. connection message) sent from external node
     private static final String RESOURCE_FILE_TEXT_MSG_VALID = "/validation/valid/text_msg_remote.trig";

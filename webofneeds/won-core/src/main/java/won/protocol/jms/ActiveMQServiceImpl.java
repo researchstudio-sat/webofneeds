@@ -133,7 +133,7 @@ public class ActiveMQServiceImpl implements ActiveMQService {
             try {
                 Path path = PathParser.parse(s, PrefixMapping.Standard);
                 activeMQMatcherProtocolTopicNames.add(RdfUtils.getStringPropertyForPropertyPath(
-                        linkedDataSource.getDataForResource(resourceURI), resourceURI, path));
+                                linkedDataSource.getDataForResource(resourceURI), resourceURI, path));
             } catch (HttpClientErrorException e) {
                 if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
                     return null;

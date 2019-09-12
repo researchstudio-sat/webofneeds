@@ -157,7 +157,7 @@ public interface AtomInformationService {
      * @return a slice of connection URIs.
      */
     Slice<Connection> listConnectionsBefore(final URI resumeConnURI, final Integer preferredPageSize,
-                                            final Date timeSpot);
+                    final Date timeSpot);
 
     /**
      * Retrieves slice of the connections that follows the given connection URI from
@@ -172,7 +172,7 @@ public interface AtomInformationService {
      * @return a slice of connection URIs.
      */
     Slice<Connection> listConnectionsAfter(final URI resumeConnURI, final Integer preferredPageSize,
-                                           final Date timeSpot);
+                    final Date timeSpot);
 
     /**
      * Retrieves all connection URIs (regardless of state) for the specified local
@@ -213,7 +213,7 @@ public interface AtomInformationService {
      * atom URI
      */
     Slice<URI> listConnectionURIs(URI atomURI, int page, Integer preferredSize, WonMessageType messageType,
-                                  Date timeSpot);
+                    Date timeSpot);
 
     /**
      * Retrieves slice of the list of connections for the specified local atom URI.
@@ -231,7 +231,7 @@ public interface AtomInformationService {
      * atom URI
      */
     Slice<Connection> listConnections(URI atomURI, int page, Integer preferredSize, WonMessageType messageType,
-                                      Date timeSpot);
+                    Date timeSpot);
 
     /**
      * Retrieves slice of the connections for the specified local atom URI that
@@ -249,7 +249,7 @@ public interface AtomInformationService {
      * @return a slice of connection URIs.
      */
     Slice listConnectionsBefore(URI atomURI, URI resumeConnURI, Integer preferredPageSize,
-                                WonMessageType messageType, Date timeSpot);
+                    WonMessageType messageType, Date timeSpot);
 
     /**
      * Retrieves slice of the connections that follows the given connection URI from
@@ -266,7 +266,7 @@ public interface AtomInformationService {
      * @return a slice of connection URIs.
      */
     Slice listConnectionsAfter(URI atomURI, URI resumeConnURI, Integer preferredPageSize,
-                               WonMessageType messageType, Date timeSpot);
+                    WonMessageType messageType, Date timeSpot);
 
     /**
      * Read general information about the atom.
@@ -327,13 +327,13 @@ public interface AtomInformationService {
     Model readConnectionContent(URI connectionURI) throws NoSuchConnectionException;
 
     Slice<MessageEventPlaceholder> listConnectionEvents(URI connectionUri, int page, Integer preferredPageSize,
-                                                        WonMessageType messageType);
+                    WonMessageType messageType);
 
     Slice<MessageEventPlaceholder> listConnectionEventsBefore(URI connectionUri, URI msgURI,
-                                                              Integer preferredPageSize, WonMessageType msgType);
+                    Integer preferredPageSize, WonMessageType msgType);
 
     Slice<MessageEventPlaceholder> listConnectionEventsAfter(URI connectionUri, URI msgURI,
-                                                             Integer preferredPageSize, WonMessageType msgType);
+                    Integer preferredPageSize, WonMessageType msgType);
 
     class PagedResource<T, E> {
         private T content;

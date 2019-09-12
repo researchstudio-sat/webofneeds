@@ -1,21 +1,19 @@
 package won.protocol.repository;
 
-import java.net.URI;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-
-import javax.persistence.LockModeType;
-
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-
 import won.protocol.message.WonMessageType;
 import won.protocol.model.MessageEventPlaceholder;
 import won.protocol.model.unread.UnreadMessageInfoForConnection;
+
+import javax.persistence.LockModeType;
+import java.net.URI;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
 
 public interface MessageEventRepository extends WonRepository<MessageEventPlaceholder> {
     MessageEventPlaceholder findOneByMessageURI(URI URI);
@@ -82,7 +80,7 @@ public interface MessageEventRepository extends WonRepository<MessageEventPlaceh
                     + "        and (last is null or m.creationDate > last.creationDate) \n"
                     + "    group by c.connectionURI, c.state \n")
     List<UnreadMessageInfoForConnection> getUnreadInfoForAtom(@Param("atomUri") URI atomURI,
-                                                              @Param("lastSeenMessageUris") Collection<URI> lastSeenMessageURIs);
+                    @Param("lastSeenMessageUris") Collection<URI> lastSeenMessageURIs);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select n,c from AtomMessageContainer c join MessageEventPlaceholder msg on msg.parentURI = c.parentUri join Atom n on c.parentUri = n.atomURI where msg.messageURI = :messageUri")
@@ -249,7 +247,7 @@ public interface MessageEventRepository extends WonRepository<MessageEventPlaceh
                     "        msg.creationDate = otherMsg.creationDate and " + "        msg.id > otherMsg.id " + "    )"
                     + ")")
     boolean existEarlierMessageWithSameInnermostMessageURIAndRecipientAtomURI(
-            @Param("messageUri") URI messageUri);
+                    @Param("messageUri") URI messageUri);
 
     /**
      * When we want to forward a message to recipient r, we first check if we have
@@ -267,7 +265,7 @@ public interface MessageEventRepository extends WonRepository<MessageEventPlaceh
                     + "otherMsg.recipientAtomURI = msg.recipientAtomURI and "
                     + "otherMsg.innermostMessageURI = msg.innermostMessageURI")
     boolean isReceivedSameInnermostMessageFromSender(@Param("messageUri") URI messageUri,
-                                                     @Param("senderAtomUri") URI senderAtomURI);
+                    @Param("senderAtomUri") URI senderAtomURI);
 
     void deleteByParentURI(URI parentUri);
 }

@@ -701,7 +701,7 @@ public class WonMessageBuilder {
 
     private URI addContentInternal(Model content) {
         URI contentGraphUri = RdfUtils.createNewGraphURI(messageURI.toString(), CONTENT_URI_SUFFIX, 4,
-                graphUri -> !contentMap.keySet().contains(URI.create(graphUri)));
+                        graphUri -> !contentMap.keySet().contains(URI.create(graphUri)));
         contentMap.put(contentGraphUri, content);
         return contentGraphUri;
     }

@@ -57,8 +57,8 @@ public class JpaRepositoryBasedRdfStorageServiceImpl implements RDFStorageServic
         Integer version = Integer.valueOf(etag);
         DatasetHolder datasetHolder = datasetHolderRepository.findOneByUriAndVersionNot(resourceURI, version);
         return new DataWithEtag<>(
-                datasetHolder == null ? null : datasetHolder.getDataset().getDefaultModel(),
-                datasetHolder == null ? etag : Integer.toString(datasetHolder.getVersion()), etag);
+                        datasetHolder == null ? null : datasetHolder.getDataset().getDefaultModel(),
+                        datasetHolder == null ? etag : Integer.toString(datasetHolder.getVersion()), etag);
     }
 
     @Override
@@ -72,8 +72,8 @@ public class JpaRepositoryBasedRdfStorageServiceImpl implements RDFStorageServic
         Integer version = etag == null ? -1 : Integer.valueOf(etag);
         DatasetHolder datasetHolder = datasetHolderRepository.findOneByUriAndVersionNot(resourceURI, version);
         return new DataWithEtag<>(
-                datasetHolder == null ? null : datasetHolder.getDataset(),
-                datasetHolder == null ? etag : Integer.toString(datasetHolder.getVersion()), etag);
+                        datasetHolder == null ? null : datasetHolder.getDataset(),
+                        datasetHolder == null ? etag : Integer.toString(datasetHolder.getVersion()), etag);
     }
 
     @Override

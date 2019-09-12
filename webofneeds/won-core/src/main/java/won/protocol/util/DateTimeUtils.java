@@ -13,8 +13,8 @@ import java.util.Date;
  * User: atus Date: 23.04.13
  */
 public class DateTimeUtils {
-    // private static final String DATE_FORMAT_XSD_DATE_TIME_STAMP = "yyyy-MM-DD'T'hh:mm:ss.sssZ";
-
+    // private static final String DATE_FORMAT_XSD_DATE_TIME_STAMP =
+    // "yyyy-MM-DD'T'hh:mm:ss.sssZ";
     /**
      * Formats the date as xsd:dateTimeStamp (time stamp with timezone info).
      * 

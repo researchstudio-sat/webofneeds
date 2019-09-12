@@ -84,8 +84,8 @@ public class WonMessageBuilderTest {
                             return null;
                         }, false));
         Assert.assertEquals(TYPE_URI_1.toString(),
-                RdfUtils.findOnePropertyFromResource(msg2.getMessageContent(), MSG_URI_1, RDF.type).asResource()
-                                .getURI());
+                        RdfUtils.findOnePropertyFromResource(msg2.getMessageContent(), MSG_URI_1, RDF.type).asResource()
+                                        .getURI());
     }
 
     @Test
@@ -100,8 +100,8 @@ public class WonMessageBuilderTest {
                             return null;
                         }, false));
         Assert.assertEquals(TYPE_URI_2.toString(),
-                RdfUtils.findOnePropertyFromResource(msg2.getMessageContent(), MSG_URI_2, RDF.type).asResource()
-                                .getURI());
+                        RdfUtils.findOnePropertyFromResource(msg2.getMessageContent(), MSG_URI_2, RDF.type).asResource()
+                                        .getURI());
     }
 
     @Test

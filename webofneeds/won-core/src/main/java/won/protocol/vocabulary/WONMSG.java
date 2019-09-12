@@ -82,8 +82,8 @@ public class WONMSG {
     // TODO: delete if not needed
     public static boolean isResponseMessageType(Resource resource) {
         return resource.equals(CreateResponseMessage) || resource.equals(ConnectResponseMessage)
-                || resource.equals(AtomStateResponseMessage) || resource.equals(CloseResponseMessage)
-                || resource.equals(OpenResponseMessage) || resource.equals(ConnectionMessageResponseMessage);
+                        || resource.equals(AtomStateResponseMessage) || resource.equals(CloseResponseMessage)
+                        || resource.equals(OpenResponseMessage) || resource.equals(ConnectionMessageResponseMessage);
     }
 
     // response states
