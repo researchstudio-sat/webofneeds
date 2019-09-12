@@ -926,7 +926,7 @@ public class LinkedDataServiceImpl implements LinkedDataService {
                                 || atomModelWrapper.getSocketTypeUriMap().containsValue(filterSocketTypeUri))
                                 && (filterAtomTypeUri == null
                                                 || atomModelWrapper.getContentTypes().contains(filterAtomTypeUri));
-            }).forEach(atomURI -> model.add(model.createStatement(atomListPageResource,
+            }).collect(Collectors.toList()).forEach(atomURI -> model.add(model.createStatement(atomListPageResource,
                             RDFS.member, model.createResource(atomURI.toString()))));
         }
         Dataset ret = newDatasetWithNamedModel(createDataGraphUriFromResource(atomListPageResource), model);
