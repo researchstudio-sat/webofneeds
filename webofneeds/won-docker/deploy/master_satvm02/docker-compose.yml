@@ -1,6 +1,5 @@
-version: '2'
+version: "2"
 services:
-
   # owner server self-signed certificate for communication with wonnode
   gencertownerblue:
     build: ../../image/gencert
@@ -162,7 +161,7 @@ services:
     depends_on:
       - postgresgreen
 
-   # owner green (proxied by nginx) => https://ownergreen.master.matchat.org/owner
+    # owner green (proxied by nginx) => https://ownergreen.master.matchat.org/owner
   ownergreen:
     restart: always
     build: ../../image/owner
@@ -223,7 +222,7 @@ services:
     environment:
       - "node.default.host=nodeblue.master.matchat.org"
       - "node.default.http.port=443"
-      - "uri.prefix.owner=https://master.matchat.org/debug_bot"  # set this for the trust store alias
+      - "uri.prefix.owner=https://master.matchat.org/debug_bot" # set this for the trust store alias
       - "won.node.uris=https://nodeblue.master.matchat.org/won/resource https://nodegreen.master.matchat.org/won/resource"
       - "botContext.impl=mongoBotContext"
       - "botContext.mongodb.user=won"
@@ -244,7 +243,7 @@ services:
       - "MAIN_BOT=won.bot.app.HokifyJobBotApp"
       - "node.default.host=nodeblue.master.matchat.org"
       - "node.default.http.port=443"
-      - "uri.prefix.owner=https://master.matchat.org/hokify_bot"  # set this for the trust store alias
+      - "uri.prefix.owner=https://master.matchat.org/hokify_bot" # set this for the trust store alias
       - "won.node.uris=https://nodeblue.master.matchat.org/won/resource https://nodegreen.master.matchat.org/won/resource"
       - "hokifyjobbot.botname = Hokify Bot"
       - "hokifyjobbot.jsonURL = https://hokify.at/jobfeed-webofneeds.json/"
@@ -271,7 +270,7 @@ services:
       - "MAIN_BOT=won.bot.app.Mail2WonBotApp"
       - "node.default.host=nodeblue.master.matchat.org"
       - "node.default.http.port=443"
-      - "uri.prefix.owner=https://master.matchat.org/mail_bot"  # set this for the trust store alias
+      - "uri.prefix.owner=https://master.matchat.org/mail_bot" # set this for the trust store alias
       - "won.node.uris=https://nodeblue.master.matchat.org/won/resource https://nodegreen.master.matchat.org/won/resource"
       - "botContext.impl=mongoBotContext"
       - "botContext.mongodb.user=won"
@@ -392,27 +391,26 @@ services:
     depends_on:
       - matcher_service
 
-
   matcher_sparql:
     restart: always
     build: ../../image/matcher-sparql
     image: webofneeds/matcher_sparql:int
     environment:
-    - "node.host=satvm02.researchstudio.at"
-    - "cluster.seedNodes=satvm02.researchstudio.at:2551,satvm02.researchstudio.at:2553"
-    - "cluster.local.port=2554"
-    - "matcher.sparql.uri.sparql.endpoint=http://satvm02.researchstudio.at:9999/blazegraph/namespace/kb/sparql"
-    - "matcher.sparql.uri.public=http://satvm02.researchstudio.at/sparql/"
-    - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
-    - "JMX_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,address=62923,server=y,suspend=n
+      - "node.host=satvm02.researchstudio.at"
+      - "cluster.seedNodes=satvm02.researchstudio.at:2551,satvm02.researchstudio.at:2553"
+      - "cluster.local.port=2554"
+      - "matcher.sparql.uri.sparql.endpoint=http://satvm02.researchstudio.at:9999/blazegraph/namespace/kb/sparql"
+      - "matcher.sparql.uri.public=http://satvm02.researchstudio.at/sparql/"
+      - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
+      - "JMX_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,address=62923,server=y,suspend=n
         -Dcom.sun.management.jmxremote.port=9023 -Dcom.sun.management.jmxremote.authenticate=false
         -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9023
         -Djava.rmi.server.hostname=satvm05.researchstudio.at"
     ports:
-    - "2554:2554"
-    - "9023:9023"
-    - "62923:62923"
+      - "2554:2554"
+      - "9023:9023"
+      - "62923:62923"
     depends_on:
-    - matcher_service
+      - matcher_service
     volumes:
-    - $base_folder/won-client-certs/matcher_sparql:/usr/src/matcher-sparql/client-certs/
+      - $base_folder/won-client-certs/matcher_sparql:/usr/src/matcher-sparql/client-certs/

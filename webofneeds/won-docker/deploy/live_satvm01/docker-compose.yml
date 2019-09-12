@@ -24,21 +24,6 @@ services:
       - $base_folder/letsencrypt/certs:/etc/letsencrypt
       - $base_folder/letsencrypt/acme-challenge:/usr/share/nginx/html
 
-  letsencrypt_uki:
-    restart: always
-    build: ../../image/letsencrypt
-    image: webofneeds/letsencrypt:live
-    environment:
-      - "key_store_password=$uki_certificate_passwd"
-      - "domain_params=-d cbi.matchat.org"
-      - "key_pem_file=/etc/letsencrypt/live/cbi.matchat.org/privkey.pem"
-      - "cert_pem_file=/etc/letsencrypt/live/cbi.matchat.org/fullchain.pem"
-      - "pfx_store_file=/etc/letsencrypt/live/cbi.matchat.org/t-key-cert.pfx"
-      - "jks_store_file=/etc/letsencrypt/live/cbi.matchat.org/t-keystore.jks"
-    volumes:
-      - $base_folder/letsencrypt/certs:/etc/letsencrypt
-      - $base_folder/letsencrypt/acme-challenge:/usr/share/nginx/html
-
   # owner server self-signed certificate for communication with wonnode
   gencert:
     build: ../../image/gencert
@@ -62,6 +47,7 @@ services:
       - "61626:61626"
       - "61611:61611"
       - "61612:61612"
+      - "61613:61613"
     volumes:
       - $base_folder/letsencrypt/certs:/etc/letsencrypt/
       - $base_folder/nginx.conf:/etc/nginx/nginx.conf
