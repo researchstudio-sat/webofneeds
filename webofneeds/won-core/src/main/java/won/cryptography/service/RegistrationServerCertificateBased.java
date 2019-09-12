@@ -56,7 +56,7 @@ public class RegistrationServerCertificateBased implements RegistrationServer {
                 throw new WonProtocolException("Client cannot be trusted!");
             }
         } catch (CertificateException e) {
-            new WonProtocolException(e);
+            throw new WonProtocolException(e);
         }
     }
 }

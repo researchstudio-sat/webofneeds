@@ -18,7 +18,7 @@ public class AliasFromFingerprintGenerator implements AliasGenerator {
         try {
             fingerprint = digest(certificate.getPublicKey().getEncoded());
         } catch (Exception e) {
-            new CertificateException("Alias generation from certificate fingerprint failed", e);
+            throw new CertificateException("Alias generation from certificate fingerprint failed", e);
         }
         return fingerprint;
     }
