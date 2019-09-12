@@ -57,7 +57,7 @@ public class CryptographyUtils {
                     final TrustStrategy trustStrategy) throws Exception {
         String cacheKey = keyStrategy.getAlias();
         Element cacheElement = ehcache.get(cacheKey);
-        SSLContext sslContext = null;
+        SSLContext sslContext;
         if (cacheElement == null) {
             // we want to avoid creating the sslContext multiple times, so we snychronize on
             // an object shared by all threads:

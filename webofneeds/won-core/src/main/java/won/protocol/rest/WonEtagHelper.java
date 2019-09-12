@@ -10,13 +10,13 @@
  */
 package won.protocol.rest;
 
-import java.lang.invoke.MethodHandles;
-import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+
+import java.lang.invoke.MethodHandles;
+import java.util.List;
 
 /**
  * Utils for our very specific way of creating/parsing etags.
@@ -24,8 +24,8 @@ import org.springframework.http.MediaType;
 public class WonEtagHelper {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static final char VERSION_MEDIATYPE_DELIMITER = ' ';
-    private String version = null;
-    private MediaType mediaType = null;
+    private String version;
+    private MediaType mediaType;
 
     private WonEtagHelper(final String version, final MediaType mediaType) {
         this.version = version;
@@ -67,7 +67,7 @@ public class WonEtagHelper {
             // delimiter not found. Assume only version
             return new WonEtagHelper(etagValue.substring(1, etagValue.length() - 1), null);
         }
-        MediaType mt = null;
+        MediaType mt;
         try {
             mt = MediaType.parseMediaType(etagValue.substring(index, etagValue.length() - 1));
         } catch (Exception e) {

@@ -70,7 +70,7 @@ public class CertificateService {
      */
     public X509Certificate createSelfSignedCertificate(BigInteger serialNumber, KeyPair key,
                     Map<ASN1ObjectIdentifier, String> subjectData, String webId) {
-        X509Certificate cert = null;
+        X509Certificate cert;
         try {
             X509v3CertificateBuilder certBuilder = createBuilderWithBasicInfo(serialNumber, key, subjectData);
             if (webId != null) {

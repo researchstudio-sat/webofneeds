@@ -34,8 +34,8 @@ import java.util.List;
  */
 public class DatasetHolderAggregator {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    private List<InputStream> inputStreams = null;
-    private Lang rdfLanguage = null;
+    private List<InputStream> inputStreams;
+    private Lang rdfLanguage;
     private static final Lang DEFAULT_RDF_LANGUAGE = Lang.NQUADS;
     private Dataset aggregatedDataset = null;
 

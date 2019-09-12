@@ -35,7 +35,7 @@ public class KeyManagerWrapperWithKeyServiceAndStrategy implements X509KeyManage
                     final PrivateKeyStrategy aliasStrategy) {
         super();
         this.aliasStrategy = aliasStrategy;
-        KeyManagerFactory kmf = null;
+        KeyManagerFactory kmf;
         try {
             kmf = KeyManagerFactory.getInstance("SunX509");
             kmf.init(keyStoreService.getUnderlyingKeyStore(), keyStoreService.getPassword().toCharArray());

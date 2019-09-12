@@ -509,11 +509,11 @@ public class AtomModelWrapper {
         RDFNode state = RdfUtils.findOnePropertyFromResource(sysInfoModel, getAtomNode(AtomGraphType.SYSINFO),
                         WON.atomState);
         sysInfoModel.leaveCriticalSection();
-        if (state.equals(WON.ATOM_STATE_ACTIVE)) {
+        if (WON.ATOM_STATE_ACTIVE.equals(state)) {
             return AtomState.ACTIVE;
-        } else if (state.equals(WON.ATOM_STATE_INACTIVE)) {
+        } else if (WON.ATOM_STATE_INACTIVE.equals(state)) {
             return AtomState.INACTIVE;
-        } else if (state.equals(WON.ATOM_STATE_DELETED)) {
+        } else if (WON.ATOM_STATE_DELETED.equals(state)) {
             return AtomState.DELETED;
         }
         throw new IllegalStateException("Unrecognized atom state: " + state);
@@ -644,10 +644,9 @@ public class AtomModelWrapper {
      */
     public Collection<Resource> getAllContentNodes() {
         Collection<Resource> contentNodes = new LinkedList<>();
-        String queryClause = null;
         String seeksClause = "{ ?atomNode a won:Atom. ?atomNode match:seeks ?contentNode. FILTER NOT EXISTS { ?atomNode match:seeks/match:seeks ?contentNode. } }";
         String seeksSeeksClause = "{ ?atomNode a won:Atom. ?atomNode match:seeks/match:seeks ?contentNode. }";
-        queryClause = seeksClause + "UNION \n" + seeksSeeksClause;
+        String queryClause = seeksClause + "UNION \n" + seeksSeeksClause;
         String queryString = "prefix won: <https://w3id.org/won/core#> \n"
                         + "prefix match: <https://w3id.org/won/matching#> \n"
                         + "prefix con: <https://w3id.org/won/content#> \n"
@@ -674,14 +673,12 @@ public class AtomModelWrapper {
      */
     public Collection<Resource> getSeeksSeeksNodes() {
         Collection<Resource> contentNodes = new LinkedList<>();
-        String queryClause = null;
         String seeksSeeksClause = "{ ?atomNode a won:Atom. ?atomNode match:seeks/match:seeks ?contentNode. }";
-        queryClause = seeksSeeksClause;
         String queryString = "prefix won: <https://w3id.org/won/core#> \n"
                         + "prefix match: <https://w3id.org/won/matching#> \n"
                         + "prefix con: <https://w3id.org/won/content#> \n"
                         + "SELECT DISTINCT ?contentNode WHERE { \n"
-                        + queryClause + "\n }";
+                        + seeksSeeksClause + "\n }";
         Query query = QueryFactory.create(queryString);
         try (QueryExecution qexec = QueryExecutionFactory.create(query, getAtomModel())) {
             ResultSet rs = qexec.execSelect();
@@ -817,7 +814,7 @@ public class AtomModelWrapper {
      * @return the string value or null if nothing is found
      */
     public String getSomeContentPropertyStringValue(Resource contentNode, Property p) {
-        return getSomeContentPropertyStringValue(contentNode, p, null);
+        return getSomeContentPropertyStringValue(contentNode, p, (String) null);
     }
 
     /**
@@ -831,7 +828,7 @@ public class AtomModelWrapper {
      * @return the string value or null if nothing is found
      */
     public String getSomeContentPropertyStringValue(Resource contentNode, Property p, String... preferredLanguages) {
-        Collection<String> values = null;
+        Collection<String> values;
         if (preferredLanguages != null) {
             for (String preferredLanguage : preferredLanguages) {
                 values = getContentPropertyStringValues(contentNode, p, preferredLanguage);

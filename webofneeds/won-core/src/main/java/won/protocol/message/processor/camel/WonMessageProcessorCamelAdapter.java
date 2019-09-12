@@ -52,7 +52,7 @@ public class WonMessageProcessorCamelAdapter implements Processor {
                                             ((WonMessage) msg).getRecipientURI() });
         }
         // call the process method
-        WonMessage resultMsg = null;
+        WonMessage resultMsg;
         try {
             resultMsg = adaptee.process((WonMessage) msg);
             if (logger.isDebugEnabled()) {

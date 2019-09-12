@@ -6,7 +6,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.DefaultResponseErrorHandler;
 import org.springframework.web.client.RestTemplate;
-import won.cryptography.keymanagement.AtomUriAsAliasStrategy;
 import won.cryptography.keymanagement.KeyPairAliasDerivationStrategy;
 import won.cryptography.service.CryptographyUtils;
 import won.cryptography.service.TrustStoreService;
@@ -27,7 +26,7 @@ public class LinkedDataRestBridge {
     private KeyStoreService keyStoreService;
     private TrustStoreService trustStoreService;
     private TrustStrategy trustStrategy;
-    private KeyPairAliasDerivationStrategy keyPairAliasDerivationStrategy = new AtomUriAsAliasStrategy();
+    private KeyPairAliasDerivationStrategy keyPairAliasDerivationStrategy;
 
     public LinkedDataRestBridge(KeyStoreService keyStoreService, TrustStoreService trustStoreService,
                     TrustStrategy trustStrategy, KeyPairAliasDerivationStrategy keyPairAliasDerivationStrategy) {

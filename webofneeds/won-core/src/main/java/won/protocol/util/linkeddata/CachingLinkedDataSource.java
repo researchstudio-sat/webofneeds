@@ -130,7 +130,7 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
     public Dataset getDataForResource(URI resource, URI requesterWebID) {
         if (resource == null)
             throw new IllegalArgumentException("resource cannot be null");
-        Element element = null;
+        Element element;
         try {
             element = cache.get(makeCacheKey(resource, requesterWebID));
         } catch (CacheException e) {
@@ -181,7 +181,7 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
         // * if ETAG indicates not modified, return cached result but update caching
         // info
         // * return result
-        DatasetResponseWithStatusCodeAndHeaders responseData = null;
+        DatasetResponseWithStatusCodeAndHeaders responseData;
         HttpHeaders headers = new HttpHeaders();
         if (linkedDataCacheEntry != null) {
             Date now = new Date();
@@ -410,10 +410,10 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
                 RDFDataMgr.write(System.out, responseData.getDataset(), Lang.TRIG);
             }
         } else {
-            logger.debug("fetching linked data for URI {} without WebID {}", resource, requesterWebID);
+            logger.debug("fetching linked data for URI {} without WebID", resource);
             responseData = linkedDataRestClient.readResourceDataWithHeaders(resource, headers);
             if (logger.isTraceEnabled()) {
-                logger.trace("fetched resource {} without requesterWebID: {}", resource, requesterWebID);
+                logger.trace("fetched resource {} without WebID", resource);
                 RDFDataMgr.write(System.out, responseData.getDataset(), Lang.TRIG);
             }
         }
@@ -427,7 +427,7 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
         }
         expiresHeader = expiresHeader.trim();
         SimpleDateFormat format = new SimpleDateFormat(HTTP_DATE_FORMAT, Locale.ENGLISH);
-        Date expires = null;
+        Date expires;
         try {
             expires = format.parse(expiresHeader);
         } catch (ParseException e) {
@@ -454,7 +454,7 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
             return null;
         }
         SimpleDateFormat format = new SimpleDateFormat(HTTP_DATE_FORMAT, Locale.ENGLISH);
-        Date date = null;
+        Date date;
         try {
             date = format.parse(dateHeader);
         } catch (ParseException e) {
@@ -562,10 +562,10 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
     }
 
     public static class LinkedDataCacheEntry {
-        private String etag = null;
-        private Date expires = null;
-        private byte[] dataset = null;
-        private EnumSet<CacheControlFlag> cacheControlFlags = noneOf(CacheControlFlag.class);
+        private String etag;
+        private Date expires;
+        private byte[] dataset;
+        private EnumSet<CacheControlFlag> cacheControlFlags;
         private HttpHeaders headers;
         private int statusCode;
 

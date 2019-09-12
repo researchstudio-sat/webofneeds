@@ -17,7 +17,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
-import won.cryptography.keymanagement.AtomUriAsAliasStrategy;
 import won.cryptography.keymanagement.KeyPairAliasDerivationStrategy;
 import won.cryptography.service.CryptographyUtils;
 import won.cryptography.service.TrustStoreService;
@@ -40,7 +39,7 @@ public class LinkedDataRestClientHttps extends LinkedDataRestClient {
     private KeyStoreService keyStoreService;
     private TrustStoreService trustStoreService;
     private TrustStrategy trustStrategy;
-    private KeyPairAliasDerivationStrategy keyPairAliasDerivationStrategy = new AtomUriAsAliasStrategy();
+    private KeyPairAliasDerivationStrategy keyPairAliasDerivationStrategy;
 
     public LinkedDataRestClientHttps(KeyStoreService keyStoreService, TrustStoreService trustStoreService,
                     TrustStrategy trustStrategy, KeyPairAliasDerivationStrategy keyPairAliasDerivationStrategy) {
@@ -60,7 +59,7 @@ public class LinkedDataRestClientHttps extends LinkedDataRestClient {
     }
 
     private RestTemplate createRestTemplateForReadingLinkedData(String webID) {
-        RestTemplate template = null;
+        RestTemplate template;
         try {
             template = CryptographyUtils.createSslRestTemplate(this.keyStoreService.getUnderlyingKeyStore(),
                             this.keyStoreService.getPassword(),

@@ -63,7 +63,7 @@ public class LinkedDataSourceBase implements LinkedDataSource {
      * does not exist
      */
     public String getPreviousLinkFromDatasetWithHeaders(DatasetResponseWithStatusCodeAndHeaders datasetWithHeaders) {
-        String prevLink = null;
+        String prevLink;
         List<String> links = datasetWithHeaders.getResponseHeaders().get("Link");
         if (links != null) {
             for (String link : links) {

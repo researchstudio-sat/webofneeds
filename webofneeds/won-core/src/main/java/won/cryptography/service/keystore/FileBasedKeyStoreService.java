@@ -154,7 +154,7 @@ public class FileBasedKeyStoreService extends AbstractKeyStoreService {
     }
 
     protected synchronized void persistStore() throws Exception {
-        FileOutputStream outputStream = null;
+        FileOutputStream outputStream;
         try {
             outputStream = new FileOutputStream(storeFile);
         } catch (IOException e) {
@@ -177,7 +177,7 @@ public class FileBasedKeyStoreService extends AbstractKeyStoreService {
     }
 
     private void loadStoreFromFile() throws Exception {
-        FileInputStream inputStream = null;
+        FileInputStream inputStream;
         try {
             inputStream = new FileInputStream(storeFile);
         } catch (FileNotFoundException e) {

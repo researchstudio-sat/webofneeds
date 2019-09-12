@@ -1,16 +1,15 @@
 package won.cryptography.ssl;
 
+import won.cryptography.service.TrustStoreService;
+
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.X509TrustManager;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.TrustManagerFactory;
-import javax.net.ssl.X509TrustManager;
-
-import won.cryptography.service.TrustStoreService;
 
 /**
  * User: ypanchenko Date: 13.08.2015
@@ -25,7 +24,7 @@ public class TrustManagerWrapperWithTrustService implements X509TrustManager {
     @Override
     public void checkClientTrusted(final X509Certificate[] x509Certificates, final String authType)
                     throws CertificateException {
-        X509TrustManager tm = null;
+        X509TrustManager tm;
         try {
             tm = getDefaultTrustManagerForKeyStore(trustStoreService.getUnderlyingKeyStore());
         } catch (Exception e) {
@@ -40,7 +39,7 @@ public class TrustManagerWrapperWithTrustService implements X509TrustManager {
     @Override
     public void checkServerTrusted(final X509Certificate[] x509Certificates, final String authType)
                     throws CertificateException {
-        X509TrustManager tm = null;
+        X509TrustManager tm;
         try {
             tm = getDefaultTrustManagerForKeyStore(trustStoreService.getUnderlyingKeyStore());
         } catch (Exception e) {
@@ -54,7 +53,7 @@ public class TrustManagerWrapperWithTrustService implements X509TrustManager {
 
     @Override
     public X509Certificate[] getAcceptedIssuers() {
-        X509TrustManager tm = null;
+        X509TrustManager tm;
         try {
             tm = getDefaultTrustManagerForKeyStore(trustStoreService.getUnderlyingKeyStore());
         } catch (Exception e) {

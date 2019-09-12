@@ -32,7 +32,7 @@ public class SocketTypeExtractingCamelProcessor implements Processor {
 
     @Override
     public void process(Exchange exchange) throws Exception {
-        URI socketType = null;
+        URI socketType;
         WonMessage wonMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
         URI conUri = (URI) exchange.getIn().getHeader(WonCamelConstants.CONNECTION_URI_HEADER);
         if (conUri == null) {

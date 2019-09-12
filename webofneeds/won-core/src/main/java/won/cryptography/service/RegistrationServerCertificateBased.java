@@ -1,19 +1,17 @@
 package won.cryptography.service;
 
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
-
-import javax.transaction.Transactional;
-
 import org.apache.http.ssl.TrustStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import won.cryptography.ssl.AliasFromFingerprintGenerator;
 import won.cryptography.ssl.AliasGenerator;
 import won.protocol.exception.WonProtocolException;
 import won.protocol.service.ApplicationManagementService;
+
+import javax.transaction.Transactional;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 
 /**
  * User: ypanchenko Date: 08.10.2015
@@ -32,7 +30,7 @@ public class RegistrationServerCertificateBased implements RegistrationServer {
 
     @Transactional
     public String registerOwner(Object certificateChainObj) throws WonProtocolException {
-        String alias = null;
+        String alias;
         X509Certificate[] ownerCertChain = new X509Certificate[] { (X509Certificate) certificateChainObj };
         checkTrusted(ownerCertChain);
         try {

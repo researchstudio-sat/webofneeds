@@ -67,7 +67,7 @@ public class ActiveMQServiceImpl implements ActiveMQService {
 
     @Override
     public final String getProtocolQueueNameWithResource(URI resourceUri) {
-        String activeMQOwnerProtocolQueueName = null;
+        String activeMQOwnerProtocolQueueName;
         try {
             logger.debug("trying to get queue name prototol type {} on resource {}", protocolType, resourceUri);
             Path path = PathParser.parse(queueNamePath, PrefixMapping.Standard);
@@ -97,7 +97,7 @@ public class ActiveMQServiceImpl implements ActiveMQService {
     // todo: rename this method to getBrokerURIForNode
     public final URI getBrokerEndpoint(URI resourceUri) {
         logger.debug("obtaining broker URI for node {}", resourceUri);
-        URI activeMQEndpoint = null;
+        URI activeMQEndpoint;
         try {
             logger.debug("trying to get broker endpoint for {} on resource {}", protocolType, resourceUri);
             Path path = PathParser.parse(PATH_BROKER_URI, PrefixMapping.Standard);

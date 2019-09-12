@@ -283,7 +283,6 @@ public class WonMessage implements Serializable {
         this.envelopeGraphNames = new ArrayList<>();
         this.contentGraphNames = new ArrayList<>();
         this.graphSignatures = new HashMap<>();
-        URI currentMessageURI = null;
         this.outerEnvelopeGraph = null;
         Set<String> envelopesContainedInOthers = new HashSet<>();
         Set<String> allEnvelopeGraphNames = new HashSet<>();
@@ -298,7 +297,7 @@ public class WonMessage implements Serializable {
                 this.envelopeGraphNames.add(envelopeGraphUri);
                 allEnvelopeGraphNames.add(envelopeGraphUri);
                 allEnvelopes.add(envelopeGraph);
-                currentMessageURI = findMessageUri(envelopeGraph, envelopeGraphUri);
+                URI currentMessageURI = findMessageUri(envelopeGraph, envelopeGraphUri);
                 // check if the envelope contains references to 'contained' envelopes and
                 // remember their names
                 List<String> containedEnvelopes = findContainedEnvelopeUris(envelopeGraph, envelopeGraphUri);

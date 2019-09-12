@@ -35,7 +35,7 @@ public class Prefixer {
 
     private Dataset loadDatasetFromFile(String file) {
         try {
-            Dataset dataset = null;
+            Dataset dataset;
             dataset = DatasetFactory.createGeneral();
             RDFDataMgr.read(dataset, file);
             dataset.commit();

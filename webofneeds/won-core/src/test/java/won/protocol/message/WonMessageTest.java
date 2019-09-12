@@ -1,15 +1,7 @@
 package won.protocol.message;
 
-import static org.junit.Assert.assertEquals;
-
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.io.StringWriter;
-import java.net.URI;
-import java.nio.charset.Charset;
-import java.util.Iterator;
-import java.util.Set;
-
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Resource;
@@ -21,13 +13,20 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.LoggerFactory;
-
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.Logger;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WON;
 import won.protocol.vocabulary.WONMSG;
+
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.io.StringWriter;
+import java.net.URI;
+import java.nio.charset.Charset;
+import java.util.Iterator;
+import java.util.Set;
+
+import static org.junit.Assert.assertEquals;
 
 public class WonMessageTest {
     private InputStream getResourceAsStream(String name) {
@@ -39,7 +38,7 @@ public class WonMessageTest {
         StringWriter sw = new StringWriter();
         try (InputStream in = getResourceAsStream(name)) {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            int bytesRead = 0;
+            int bytesRead;
             while ((bytesRead = in.read(buffer)) > -1) {
                 baos.write(buffer, 0, bytesRead);
             }

@@ -225,9 +225,8 @@ public class WonLinkedDataUtils {
     public static Dataset getDataForResource(final URI connectionURI, final LinkedDataSource linkedDataSource) {
         assert linkedDataSource != null : "linkedDataSource must not be null";
         assert connectionURI != null : "connection URI must not be null";
-        Dataset dataset = null;
         logger.debug("loading model for connection {}", connectionURI);
-        dataset = linkedDataSource.getDataForResource(connectionURI);
+        Dataset dataset = linkedDataSource.getDataForResource(connectionURI);
         if (dataset == null) {
             throw new IllegalStateException("failed to load model for Connection " + connectionURI);
         }
@@ -457,8 +456,8 @@ public class WonLinkedDataUtils {
      * iterator of URIs.
      */
     private static class ModelFetchingIterator implements Iterator<Dataset> {
-        private Iterator<URI> uriIterator = null;
-        private LinkedDataSource linkedDataSource = null;
+        private Iterator<URI> uriIterator;
+        private LinkedDataSource linkedDataSource;
 
         private ModelFetchingIterator(final Iterator<URI> uriIterator, final LinkedDataSource linkedDataSource) {
             this.uriIterator = uriIterator;
