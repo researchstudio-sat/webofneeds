@@ -50,9 +50,7 @@ public class BAState {
             return false;
         if (!Objects.equals(participantURI, baState.participantURI))
             return false;
-        if (!Objects.equals(baPhaseURI, baState.baPhaseURI))
-            return false;
-        return true;
+        return Objects.equals(baPhaseURI, baState.baPhaseURI);
     }
 
     @Override

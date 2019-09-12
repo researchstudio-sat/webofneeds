@@ -202,9 +202,7 @@ public class Atom implements VersionedEntity {
             return false;
         if (!Objects.equals(creationDate, atom.creationDate))
             return false;
-        if (state != atom.state)
-            return false;
-        return true;
+        return state == atom.state;
     }
 
     @Override

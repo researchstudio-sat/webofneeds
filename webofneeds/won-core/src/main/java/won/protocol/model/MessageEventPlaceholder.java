@@ -258,11 +258,9 @@ public class MessageEventPlaceholder implements ParentAware<MessageContainer> {
             return false;
         if (!Objects.equals(recipientURI, that.recipientURI))
             return false;
-        if (!Objects.equals(senderURI, that.senderURI))
-            return false;
+        return Objects.equals(senderURI, that.senderURI);
         // if (signatures != null ? !signatures.equals(that.signatures) :
         // that.signatures != null) return false;
-        return true;
     }
 
     @Override

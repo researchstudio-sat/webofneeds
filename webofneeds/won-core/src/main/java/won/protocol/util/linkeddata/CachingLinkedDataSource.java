@@ -266,9 +266,8 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
                 // so the cache still doesn't have it. We think it's better to let every thread
                 // fetch it for itself.
             }
-            DatasetResponseWithStatusCodeAndHeaders datasetResponse = fetchAndCacheIfAppropriate(resource,
+            return fetchAndCacheIfAppropriate(resource,
                             requesterWebID, linkedDataCacheEntry, headers);
-            return datasetResponse;
         } finally {
             // remove the latch from the map if it is in there
             countDownLatchMap.remove(cacheKey, latch);

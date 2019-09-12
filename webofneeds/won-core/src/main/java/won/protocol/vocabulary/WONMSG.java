@@ -1,11 +1,11 @@
 package won.protocol.vocabulary;
 
-import java.net.URI;
-
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
+
+import java.net.URI;
 
 /**
  * User: ypanchenko Date: 04.08.2014
@@ -81,12 +81,9 @@ public class WONMSG {
 
     // TODO: delete if not needed
     public static boolean isResponseMessageType(Resource resource) {
-        if (resource.equals(CreateResponseMessage) || resource.equals(ConnectResponseMessage)
-                        || resource.equals(AtomStateResponseMessage) || resource.equals(CloseResponseMessage)
-                        || resource.equals(OpenResponseMessage) || resource.equals(ConnectionMessageResponseMessage))
-            return true;
-        else
-            return false;
+        return resource.equals(CreateResponseMessage) || resource.equals(ConnectResponseMessage)
+                || resource.equals(AtomStateResponseMessage) || resource.equals(CloseResponseMessage)
+                || resource.equals(OpenResponseMessage) || resource.equals(ConnectionMessageResponseMessage);
     }
 
     // response states

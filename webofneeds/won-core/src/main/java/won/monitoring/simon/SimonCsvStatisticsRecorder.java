@@ -42,7 +42,7 @@ public class SimonCsvStatisticsRecorder extends AbstractFileOutputRecorder {
      * @return the cell processors
      */
     private static CellProcessor[] getProcessors() {
-        final CellProcessor[] processors = new CellProcessor[] { new NotNull(), // name
+        return new CellProcessor[] { new NotNull(), // name
                         new NotNull(), // type
                         new Optional(), // counter
                         new Optional(), // total
@@ -55,7 +55,6 @@ public class SimonCsvStatisticsRecorder extends AbstractFileOutputRecorder {
                         new NotNull(), // last reset
                         new Optional() // note
         };
-        return processors;
     }
 
     private static String[] header = new String[] { "Name", "Type", "Counter", "Total", "Min", "Max", "Mean", "StdDev",

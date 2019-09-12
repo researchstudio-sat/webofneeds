@@ -52,8 +52,7 @@ public class WonNodeInfo {
     }
 
     public Set<String> getSupportedProtocolImpls() {
-        Set<String> protocols = new HashSet<>(supportedProtocolImpl.keySet());
-        return protocols;
+        return new HashSet<>(supportedProtocolImpl.keySet());
     }
 
     public Set<String> getSupportedProtocolImplParams(String protocol) {

@@ -106,8 +106,7 @@ public class CryptographyUtils {
             requestFactory.setConnectTimeout(connectionTimeout);
         }
         requestFactory.setHttpClient(httpClient);
-        RestTemplate restTemplate = new RestTemplate(requestFactory);
-        return restTemplate;
+        return new RestTemplate(requestFactory);
     }
 
     public static RestTemplate createSslRestTemplate(TrustStrategy trustStrategy, final Integer readTimeout,
@@ -128,7 +127,6 @@ public class CryptographyUtils {
             requestFactory.setConnectTimeout(connectionTimeout);
         }
         requestFactory.setHttpClient(httpClient);
-        RestTemplate restTemplate = new RestTemplate(requestFactory);
-        return restTemplate;
+        return new RestTemplate(requestFactory);
     }
 }

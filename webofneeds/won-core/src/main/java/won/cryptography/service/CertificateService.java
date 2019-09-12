@@ -115,8 +115,7 @@ public class CertificateService {
             throw new IllegalArgumentException(key.getPublic().getAlgorithm() + " is not supported");
         }
         JcaContentSignerBuilder csBuilder = new JcaContentSignerBuilder(signatureAlgorithm);
-        ContentSigner sigGen = csBuilder.setProvider(PROVIDER_BC).build(key.getPrivate());
-        return sigGen;
+        return csBuilder.setProvider(PROVIDER_BC).build(key.getPrivate());
     }
 
     private X509v3CertificateBuilder createBuilderWithBasicInfo(BigInteger serialNumber, KeyPair key,
@@ -131,9 +130,8 @@ public class CertificateService {
         X500Name subject = nameBuilder.build();
         SubjectPublicKeyInfo subjPubKeyInfo = new SubjectPublicKeyInfo(
                         ASN1Sequence.getInstance(key.getPublic().getEncoded()));
-        X509v3CertificateBuilder certGen = new X509v3CertificateBuilder(subject, serialNumber, notBefore, notAfter,
+        return new X509v3CertificateBuilder(subject, serialNumber, notBefore, notAfter,
                         subject, subjPubKeyInfo);
-        return certGen;
     }
 
     public static List<URI> getWebIdFromSubjectAlternativeNames(final X509Certificate cert)

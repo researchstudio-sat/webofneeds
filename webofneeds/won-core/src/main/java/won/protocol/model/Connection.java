@@ -231,9 +231,7 @@ public class Connection implements ParentAware<ConnectionContainer>, VersionedEn
             return false;
         if (!Objects.equals(targetAtomURI, that.targetAtomURI))
             return false;
-        if (state != that.state)
-            return false;
-        return true;
+        return state == that.state;
     }
 
     @Override

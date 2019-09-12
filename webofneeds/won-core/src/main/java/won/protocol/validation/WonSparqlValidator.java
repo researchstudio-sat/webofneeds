@@ -74,7 +74,7 @@ public class WonSparqlValidator {
                     return new ValidationResult();
                 }
             }
-            while (result.hasNext()) {
+            if (result.hasNext()) {
                 Binding binding = result.nextBinding();
                 Node node = binding.get(SELECT_VALIDATION_VARIABLE);
                 if (node != null) {

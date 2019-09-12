@@ -74,9 +74,7 @@ public class Socket {
             return false;
         if (!Objects.equals(atomURI, socket.atomURI))
             return false;
-        if (!Objects.equals(typeURI, socket.typeURI))
-            return false;
-        return true;
+        return Objects.equals(typeURI, socket.typeURI);
     }
 
     @Override

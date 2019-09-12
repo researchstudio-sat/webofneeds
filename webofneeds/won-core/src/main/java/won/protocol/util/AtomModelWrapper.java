@@ -208,9 +208,7 @@ public class AtomModelWrapper {
                         WON.derivedGraph);
         if (derivedGraphName.isPresent() && derivedGraphName.get().isURIResource()) {
             String name = derivedGraphName.get().asResource().getURI();
-            if (this.atomDataset.containsNamedModel(name)) {
-                return true;
-            }
+            return this.atomDataset.containsNamedModel(name);
         }
         return false;
     }
@@ -778,8 +776,7 @@ public class AtomModelWrapper {
     public Collection<String> getContentPropertyStringValues(Property p, String language) {
         Resource node = getAtomContentNode();
         Collection valuesOfContentNode = getContentPropertyStringValues(node, p, language);
-        Collection<String> values = new LinkedList<>(valuesOfContentNode);
-        return values;
+        return new LinkedList<>(valuesOfContentNode);
     }
 
     public Collection<String> getSeeksPropertyStringValues(Property p) {
@@ -899,10 +896,7 @@ public class AtomModelWrapper {
                     return valueOfContentNode;
             }
         }
-        String valueOfContentNode = getSomeContentPropertyStringValue(node, p);
-        if (valueOfContentNode != null)
-            return valueOfContentNode;
-        return null;
+        return getSomeContentPropertyStringValue(node, p);
     }
 
     private RDFNode getContentPropertyObject(Property p) {
@@ -926,8 +920,7 @@ public class AtomModelWrapper {
     public Collection<RDFNode> getContentPropertyObjects(Property p) {
         Resource node = getAtomContentNode();
         Collection valuesOfContentNode = getContentPropertyObjects(node, p);
-        Collection<RDFNode> values = new LinkedList<>(valuesOfContentNode);
-        return values;
+        return new LinkedList<>(valuesOfContentNode);
     }
 
     private Node getContentPropertyObject(String propertyPath) {

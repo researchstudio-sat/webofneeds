@@ -1,11 +1,10 @@
 package won.cryptography.ssl;
 
+import org.apache.http.ssl.TrustStrategy;
+import won.cryptography.service.TrustStoreService;
+
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-
-import org.apache.http.ssl.TrustStrategy;
-
-import won.cryptography.service.TrustStoreService;
 
 /**
  * User: ypanchenko Date: 07.10.2015
@@ -24,9 +23,6 @@ public class TrustFromStoreServiceStrategy implements TrustStrategy {
         }
         X509Certificate serverCert = chain[0];
         // consider trusted if we already know this certificate
-        if (trustStoreService.isCertKnown(serverCert)) {
-            return true;
-        }
-        return false;
+        return trustStoreService.isCertKnown(serverCert);
     }
 }

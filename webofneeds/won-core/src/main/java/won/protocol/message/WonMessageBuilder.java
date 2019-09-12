@@ -105,9 +105,7 @@ public class WonMessageBuilder {
                                 return true;
                             if (wrappedMessage.getEnvelopeGraphURIs().contains(graphUri))
                                 return false;
-                            if (wrappedMessage.getContentGraphURIs().contains(graphUri))
-                                return false;
-                            return true;
+                            return !wrappedMessage.getContentGraphURIs().contains(graphUri);
                         }).toString();
         dataset.addNamedModel(envelopeGraphURI, envelopeGraph);
         // message URI

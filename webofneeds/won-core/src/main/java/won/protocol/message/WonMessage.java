@@ -242,8 +242,6 @@ public class WonMessage implements Serializable {
                                 attachmentDataset);
                 newAttachmentHolders.add(attachmentHolder);
             }
-        } catch (Exception e) {
-            throw e;
         }
         this.attachmentHolders = newAttachmentHolders;
         return newAttachmentHolders;

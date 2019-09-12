@@ -56,10 +56,9 @@ public class JpaRepositoryBasedRdfStorageServiceImpl implements RDFStorageServic
     public DataWithEtag<Model> loadModel(final URI resourceURI, String etag) {
         Integer version = Integer.valueOf(etag);
         DatasetHolder datasetHolder = datasetHolderRepository.findOneByUriAndVersionNot(resourceURI, version);
-        DataWithEtag<Model> dataWithEtag = new DataWithEtag<>(
+        return new DataWithEtag<>(
                 datasetHolder == null ? null : datasetHolder.getDataset().getDefaultModel(),
                 datasetHolder == null ? etag : Integer.toString(datasetHolder.getVersion()), etag);
-        return dataWithEtag;
     }
 
     @Override
@@ -72,10 +71,9 @@ public class JpaRepositoryBasedRdfStorageServiceImpl implements RDFStorageServic
     public DataWithEtag<Dataset> loadDataset(final URI resourceURI, String etag) {
         Integer version = etag == null ? -1 : Integer.valueOf(etag);
         DatasetHolder datasetHolder = datasetHolderRepository.findOneByUriAndVersionNot(resourceURI, version);
-        DataWithEtag<Dataset> dataWithEtag = new DataWithEtag<>(
+        return new DataWithEtag<>(
                 datasetHolder == null ? null : datasetHolder.getDataset(),
                 datasetHolder == null ? etag : Integer.toString(datasetHolder.getVersion()), etag);
-        return dataWithEtag;
     }
 
     @Override

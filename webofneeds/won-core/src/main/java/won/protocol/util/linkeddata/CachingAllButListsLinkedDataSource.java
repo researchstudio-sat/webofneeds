@@ -45,10 +45,7 @@ public class CachingAllButListsLinkedDataSource extends CachingLinkedDataSource 
 
     private boolean isCachingAllowed(final Pattern noCachePattern, final URI resource) {
         Matcher matcher = noCachePattern.matcher(resource.toString());
-        if (matcher.matches()) {
-            return false;
-        }
-        return true;
+        return !matcher.matches();
     }
 
     private boolean isCachingAllowed(final URI resource) {
