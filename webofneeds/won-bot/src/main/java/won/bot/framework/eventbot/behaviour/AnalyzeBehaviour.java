@@ -416,8 +416,8 @@ public class AnalyzeBehaviour extends BotBehaviour {
      * Removes the stored entry for a preconditionPending Uri This method is used so
      * we can remove the pending precondition (e.g if a proposal can't be created)
      * 
-     * @param preconditionURI the string of the preconditionUri that is not
-     * pending anymore
+     * @param preconditionURI the string of the preconditionUri that is not pending
+     * anymore
      */
     public void removePreconditionMetPending(String preconditionURI) {
         botContext.removeFromObjectMap(preconditionMetPending, preconditionURI);

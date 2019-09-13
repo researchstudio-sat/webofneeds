@@ -47,6 +47,7 @@ public abstract class AbstractCompositeFilter implements CompositeFilter {
     /**
      * Replaces the filters by the specified ones, wrapping them in a synchronized
      * list.
+     * 
      * @param filters
      */
     @Override
