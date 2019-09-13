@@ -285,7 +285,7 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
                             Dataset atomNetwork = WonLinkedDataUtils.getConnectionNetwork(uri,
                                             ctx.getLinkedDataSource());
                             return (Set<URI>) WonRdfUtils.AtomUtils.getTargetConnectionURIsForTargetAtoms(atomNetwork,
-                                            Arrays.asList(targetAtom), Optional.of(ConnectionState.CONNECTED));
+                                    Collections.singletonList(targetAtom), Optional.of(ConnectionState.CONNECTED));
                         }).flatMap(Collection::stream).collect(Collectors.toSet());
         bus.publish(new ConnectionMessageCommandEvent(con, messageModel, targetConnections));
     }
@@ -368,7 +368,7 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
                                                             ? m.getSenderAtomURI().equals(con.getTargetAtomURI())
                                                             : m.getSenderAtomURI().equals(con.getAtomURI()),
                                             0);
-                            return uri == null ? Collections.EMPTY_LIST : Arrays.asList(uri);
+                            return uri == null ? Collections.EMPTY_LIST : Collections.singletonList(uri);
                         }, WonRdfUtils.MessageUtils::addRetracts,
                         (Duration queryDuration, AgreementProtocolState state, URI... uris) -> {
                             if (uris == null || uris.length == 0 || uris[0] == null) {
@@ -391,7 +391,7 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
                         state -> {
                             URI uri = state.getLatestProposesOrClaimsMessageSentByAtom(
                                             useWrongSender ? con.getAtomURI() : con.getTargetAtomURI());
-                            return uri == null ? Collections.EMPTY_LIST : Arrays.asList(uri);
+                            return uri == null ? Collections.EMPTY_LIST : Collections.singletonList(uri);
                         }, WonRdfUtils.MessageUtils::addRejects,
                         (Duration queryDuration, AgreementProtocolState state, URI... uris) -> {
                             if (uris == null || uris.length == 0 || uris[0] == null) {
@@ -475,7 +475,7 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
                         state -> {
                             URI uri = state.getLatestPendingProposalOrClaim(Optional.empty(),
                                             Optional.of(con.getTargetAtomURI()));
-                            return uri == null ? Collections.EMPTY_LIST : Arrays.asList(uri);
+                            return uri == null ? Collections.EMPTY_LIST : Collections.singletonList(uri);
                         }, WonRdfUtils.MessageUtils::addAccepts,
                         (Duration queryDuration, AgreementProtocolState state, URI... uris) -> {
                             if (uris == null || uris.length == 0 || uris[0] == null) {
@@ -492,7 +492,7 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
                         "ok, I'll propose to cancel our latest agreement - but I'll need to crawl the connection data first, please be patient.",
                         state -> {
                             URI uri = state.getLatestAgreement();
-                            return uri == null ? Collections.EMPTY_LIST : Arrays.asList(uri);
+                            return uri == null ? Collections.EMPTY_LIST : Collections.singletonList(uri);
                         }, WonRdfUtils.MessageUtils::addProposesToCancel,
                         (Duration queryDuration, AgreementProtocolState state, URI... uris) -> {
                             if (uris == null || uris.length == 0 || uris[0] == null || state == null) {

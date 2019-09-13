@@ -27,8 +27,7 @@ public class RoundRobinCompositeAtomProducer extends AbstractCompositeAtomProduc
     @Override
     protected synchronized AtomProducer selectActiveAtomFactory() {
         // work on a copy of the set to avoid concurrency problems
-        Set<AtomProducer> factories = new HashSet<>();
-        factories.addAll(getAtomFactories());
+        Set<AtomProducer> factories = new HashSet<>(getAtomFactories());
         Iterator<AtomProducer> factoryIterator = factories.iterator();
         if (!factoryIterator.hasNext()) {
             return null;

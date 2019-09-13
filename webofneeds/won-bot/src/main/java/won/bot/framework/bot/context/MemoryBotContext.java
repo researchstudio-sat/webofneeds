@@ -17,9 +17,7 @@ public class MemoryBotContext implements BotContext {
 
     @Override
     public Set<URI> retrieveAllAtomUris() {
-        Set<URI> ret = new HashSet<>();
-        ret.addAll(namedAtomUriLists.values().stream().flatMap(List::stream).collect(Collectors.toSet()));
-        return ret;
+        return new HashSet<>(namedAtomUriLists.values().stream().flatMap(List::stream).collect(Collectors.toSet()));
     }
 
     @Override
