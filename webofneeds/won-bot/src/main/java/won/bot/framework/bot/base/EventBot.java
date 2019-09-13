@@ -254,7 +254,7 @@ public abstract class EventBot extends ScheduledTriggerBot {
      */
     protected void shutdownEventListeners() {
         logger.info("shutdownEventListeners was not overridden by the subclass");
-    };
+    }
 
     /**
      * Init method used to create the event bus and allow event listeners to

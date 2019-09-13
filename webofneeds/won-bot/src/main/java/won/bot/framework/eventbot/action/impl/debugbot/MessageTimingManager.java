@@ -10,10 +10,10 @@
  */
 package won.bot.framework.eventbot.action.impl.debugbot;
 
+import won.bot.framework.eventbot.EventListenerContext;
+
 import java.net.URI;
 import java.util.Date;
-
-import won.bot.framework.eventbot.EventListenerContext;
 
 /**
  * Created by fkleedorfer on 10.06.2016.
@@ -29,7 +29,7 @@ public class MessageTimingManager {
         this.maxInstances = maxInstances;
     }
 
-    public static enum InactivityPeriod {
+    public enum InactivityPeriod {
         ACTIVE(60 * 1000, 60 * 1000), SHORT(5 * 60 * 1000, 60 * 1000), LONG(10 * 60 * 1000, 120 * 1000),
         TOO_LONG(-1, 120 * 1000);
         InactivityPeriod(final long timeout, final long minimalPauseBetweenMessages) {

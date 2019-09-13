@@ -16,5 +16,5 @@ import won.bot.framework.component.atomproducer.AtomProducer;
  * User: fkleedorfer Date: 17.12.13
  */
 public interface AtomProducerWrapper extends AtomProducer {
-    public void setWrappedProducer(final AtomProducer wrappedProducer);
+    void setWrappedProducer(final AtomProducer wrappedProducer);
 }

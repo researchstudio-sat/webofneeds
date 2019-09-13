@@ -25,7 +25,7 @@ public interface EventBus {
      * @param event
      * @param <T>
      */
-    public <T extends Event> void publish(T event);
+    <T extends Event> void publish(T event);
 
     /**
      * Subscribes a listener to an event type. If the listener implements the
@@ -36,7 +36,7 @@ public interface EventBus {
      * @param listener
      * @param <T>
      */
-    public <T extends Event> void subscribe(Class<T> eventClazz, EventListener listener);
+    <T extends Event> void subscribe(Class<T> eventClazz, EventListener listener);
 
     /**
      * Unsubscribes a listener from an event type. If the listener implements the
@@ -47,7 +47,7 @@ public interface EventBus {
      * @param listener
      * @param <T>
      */
-    public <T extends Event> void unsubscribe(Class<T> eventClazz, EventListener listener);
+    <T extends Event> void unsubscribe(Class<T> eventClazz, EventListener listener);
 
     /**
      * Unsubscribes a listener from all event types it is currently subscribed to.
@@ -56,7 +56,7 @@ public interface EventBus {
      * 
      * @param listener
      */
-    public void unsubscribe(EventListener listener);
+    void unsubscribe(EventListener listener);
 
     EventBusStatistics generateEventBusStatistics();
 }

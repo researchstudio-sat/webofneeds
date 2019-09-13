@@ -18,7 +18,7 @@ public final class CoordinationBehaviour extends BotBehaviour {
     private CoordinationType typeA;
     private CoordinationType typeB;
 
-    public static enum CoordinationType {
+    public enum CoordinationType {
         ACTIVATE, DEACTIVATE
     }
 

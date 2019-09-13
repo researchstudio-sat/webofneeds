@@ -14,5 +14,5 @@ package won.bot.framework.eventbot.listener;
  * Listener that finishes at some point.
  */
 public interface FinishingListener extends EventListener {
-    public boolean isFinished();
+    boolean isFinished();
 }

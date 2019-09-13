@@ -16,5 +16,5 @@ import java.net.URI;
  * Interface for events that are atom-specific.
  */
 public interface NodeSpecificEvent {
-    public URI getNodeURI();
+    URI getNodeURI();
 }

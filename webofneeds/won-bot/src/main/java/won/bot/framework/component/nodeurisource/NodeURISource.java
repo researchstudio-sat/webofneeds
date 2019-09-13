@@ -22,5 +22,5 @@ public interface NodeURISource {
      * 
      * @return
      */
-    public URI getNodeURI();
+    URI getNodeURI();
 }

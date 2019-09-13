@@ -10,14 +10,14 @@
  */
 package won.bot.framework.component.atomproducer;
 
+import org.apache.jena.query.Dataset;
+
 import java.io.File;
 import java.io.IOException;
-
-import org.apache.jena.query.Dataset;
 
 /**
  * User: fkleedorfer Date: 17.12.13
  */
 public interface FileBasedAtomProducer {
-    public Dataset readAtomFromFile(File file) throws IOException;
+    Dataset readAtomFromFile(File file) throws IOException;
 }

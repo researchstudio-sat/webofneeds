@@ -1,30 +1,30 @@
 package won.bot.framework.manager;
 
+import won.bot.framework.bot.Bot;
+
 import java.net.URI;
 import java.util.Collection;
 import java.util.List;
-
-import won.bot.framework.bot.Bot;
 
 /**
  *
  */
 public interface BotManager {
-    public Bot getBotForAtomURI(URI atomUri);
+    Bot getBotForAtomURI(URI atomUri);
 
-    public List<Bot> getBotsForNodeURI(URI nodeUri);
+    List<Bot> getBotsForNodeURI(URI nodeUri);
 
-    public void addBot(Bot bot);
+    void addBot(Bot bot);
 
     /**
      * Drops all registered bots and uses the specified ones.
      * 
      * @param bots
      */
-    public void setBots(Collection<Bot> bots);
+    void setBots(Collection<Bot> bots);
 
     /**
      * Indicates if all managed bots' work is done.
      */
-    public boolean isWorkDone();
+    boolean isWorkDone();
 }

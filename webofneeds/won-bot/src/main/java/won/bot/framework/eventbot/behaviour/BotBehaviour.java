@@ -87,7 +87,6 @@ public abstract class BotBehaviour {
         if (active.get()) {
             cleanup();
         }
-        ;
         try {
             onActivate(message);
             active.set(true);
@@ -146,7 +145,7 @@ public abstract class BotBehaviour {
      * are added with the subscribeWithAutoCleanup method.
      */
     protected void onCleanup() {
-    };
+    }
 
     /**
      * Activates the behaviour by registering listeners, if you addListeners with

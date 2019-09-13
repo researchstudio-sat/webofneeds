@@ -8,7 +8,7 @@ import won.protocol.message.WonMessageType;
  * protocol message was received. Used for counting received messages.
  */
 public interface MessageEvent {
-    public WonMessage getWonMessage();
+    WonMessage getWonMessage();
 
-    public WonMessageType getWonMessageType();
+    WonMessageType getWonMessageType();
 }

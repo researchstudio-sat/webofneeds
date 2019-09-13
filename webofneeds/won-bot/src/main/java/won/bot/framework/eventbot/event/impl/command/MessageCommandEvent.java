@@ -18,5 +18,5 @@ import won.protocol.message.WonMessageType;
  * message.
  */
 public interface MessageCommandEvent extends CommandEvent {
-    public WonMessageType getWonMessageType();
+    WonMessageType getWonMessageType();
 }

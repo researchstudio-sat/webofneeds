@@ -93,7 +93,6 @@ public class CrawlConnectionDataBehaviour extends BotBehaviour {
         }
         context.getTaskScheduler().schedule(this::deactivate,
                         new Date(System.currentTimeMillis() + abortTimeout.toMillis()));
-        ;
         List<Path> propertyPaths = new ArrayList<>();
         PrefixMapping pmap = new PrefixMappingImpl();
         pmap.withDefaultMappings(PrefixMapping.Standard);

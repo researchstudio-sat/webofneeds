@@ -10,61 +10,60 @@
  */
 package won.bot.framework.bot;
 
-import java.net.URI;
-
 import org.apache.jena.query.Dataset;
-
 import won.owner.protocol.message.OwnerCallback;
+
+import java.net.URI;
 
 /**
  * A bot that manipulates atoms. Note: Methods may throw runtime exceptions,
  * which will be handled by the execution framework.
  */
 public interface Bot extends OwnerCallback {
-    public boolean knowsAtomURI(URI atomURI);
+    boolean knowsAtomURI(URI atomURI);
 
-    public boolean knowsNodeURI(URI wonNodeURI);
+    boolean knowsNodeURI(URI wonNodeURI);
 
-    public void onNewAtomCreated(final URI atomUri, final URI wonNodeUri, final Dataset atomModel) throws Exception;
+    void onNewAtomCreated(final URI atomUri, final URI wonNodeUri, final Dataset atomModel) throws Exception;
 
-    public void onMatcherRegistered(URI wonNodeUri);
+    void onMatcherRegistered(URI wonNodeUri);
 
-    public void onNewAtomCreatedNotificationForMatcher(final URI wonNodeURI, final URI atomURI,
-                    final Dataset atomModel);
+    void onNewAtomCreatedNotificationForMatcher(final URI wonNodeURI, final URI atomURI,
+                                                final Dataset atomModel);
 
-    public void onAtomModifiedNotificationForMatcher(final URI wonNodeURI, final URI atomURI);
+    void onAtomModifiedNotificationForMatcher(final URI wonNodeURI, final URI atomURI);
 
-    public void onAtomActivatedNotificationForMatcher(final URI wonNodeURI, final URI atomURI);
+    void onAtomActivatedNotificationForMatcher(final URI wonNodeURI, final URI atomURI);
 
-    public void onAtomDeactivatedNotificationForMatcher(final URI wonNodeURI, final URI atomURI);
+    void onAtomDeactivatedNotificationForMatcher(final URI wonNodeURI, final URI atomURI);
 
     /**
      * Init method, called exactly once by the framework before any other method is
      * invoked. The callee must make sure this call is thread-safe, e.g. by explicit
      * synchronizing.
      */
-    public void initialize() throws Exception;
+    void initialize() throws Exception;
 
     /**
      * Called by the framework to execute non-reactive tasks. The callee must make
      * sure this call is thread-safe, but explicit synchronization is strongly
      * discouraged.
      */
-    public void act() throws Exception;
+    void act() throws Exception;
 
     /**
      * Shutdown method called exactly once by the framework to allow the bot to free
      * resources. The callee must make sure this call is thread-safe, e.g. by
      * explicit synchronizing.
      */
-    public void shutdown() throws Exception;
+    void shutdown() throws Exception;
 
     /**
      * The lifecycle phase the bot is currently in.
      * 
      * @return
      */
-    public BotLifecyclePhase getLifecyclePhase();
+    BotLifecyclePhase getLifecyclePhase();
 
     /**
      * Indicates whether the bot considers its work done. If true, the bot is ok
@@ -72,5 +71,5 @@ public interface Bot extends OwnerCallback {
      *
      * @return
      */
-    public boolean isWorkDone();
+    boolean isWorkDone();
 }

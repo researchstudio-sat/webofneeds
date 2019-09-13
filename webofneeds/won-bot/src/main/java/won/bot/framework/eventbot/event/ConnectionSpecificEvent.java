@@ -16,5 +16,5 @@ import java.net.URI;
  * Interface for events that are connection-specific.
  */
 public interface ConnectionSpecificEvent {
-    public URI getConnectionURI();
+    URI getConnectionURI();
 }

@@ -21,12 +21,12 @@ public interface ResponseEvent extends AtomSpecificEvent, ConnectionSpecificEven
      * 
      * @return
      */
-    public URI getOriginalMessageURI();
+    URI getOriginalMessageURI();
 
     /**
      * Returns the URI of the remote message that caused the response.
      * 
      * @return
      */
-    public URI getRemoteResponseToMessageURI();
+    URI getRemoteResponseToMessageURI();
 }
