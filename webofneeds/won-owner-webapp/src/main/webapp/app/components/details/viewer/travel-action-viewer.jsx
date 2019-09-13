@@ -33,7 +33,7 @@ export default class WonTravelActionViewer extends React.Component {
     const addressElement =
       fromAddress || toAddress ? (
         <div
-          className="lv__content__text clickable"
+          className="rv__content__text clickable"
           onClick={() => this.toggleLocation()}
         >
           <div>
@@ -55,10 +55,10 @@ export default class WonTravelActionViewer extends React.Component {
               undefined
             )}
           </div>
-          <svg className="lv__content__text__carret">
+          <svg className="rv__content__text__carret">
             <use xlinkHref="#ico-filter_map" href="#ico-filter_map" />
           </svg>
-          <svg className="lv__content__text__carret">
+          <svg className="rv__content__text__carret">
             {this.state.locationExpanded ? (
               <use xlinkHref="#ico16_arrow_up" href="#ico16_arrow_up" />
             ) : (
