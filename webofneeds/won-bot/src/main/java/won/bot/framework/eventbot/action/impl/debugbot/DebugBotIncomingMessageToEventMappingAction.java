@@ -346,7 +346,7 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
         StopWatch queryStopWatch = new StopWatch();
         queryStopWatch.start("query");
         List<URI> targetUris = messageFinder.findMessages(state);
-        URI[] targetUriArray = targetUris.toArray(new URI[targetUris.size()]);
+        URI[] targetUriArray = targetUris.toArray(new URI[0]);
         queryStopWatch.stop();
         Thread.currentThread().setPriority(origPrio);
         Duration queryDuration = Duration.ofMillis(queryStopWatch.getLastTaskTimeMillis());
