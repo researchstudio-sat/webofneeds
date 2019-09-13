@@ -344,8 +344,7 @@ public class AnalyzeBehaviour extends BotBehaviour {
             try {
                 MessageDigest digest = MessageDigest.getInstance("SHA-256");
                 byte[] hash = digest.digest(strStatements.getBytes(StandardCharsets.UTF_8));
-                String strHash = new String(Base64.getEncoder().encode(hash));
-                return strHash;
+                return new String(Base64.getEncoder().encode(hash));
             } catch (NoSuchAlgorithmException e) {
                 return strStatements;
             }

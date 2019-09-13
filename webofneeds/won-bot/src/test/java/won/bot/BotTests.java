@@ -86,7 +86,7 @@ public class BotTests {
         // make sure the bot is initialized
         Assert.assertTrue(bot.getLifecyclePhase().isActive());
         // make sure it was initialized only once
-        Assert.assertTrue(threadsInInit.size() == 1);
+        Assert.assertEquals(1, threadsInInit.size());
     }
 
     @Test
@@ -149,6 +149,6 @@ public class BotTests {
         // make sure the bot is shutdownd
         Assert.assertTrue(bot.getLifecyclePhase().isDown());
         // make sure it was shutdownd only once
-        Assert.assertTrue(threadsInShutdown.size() == 1);
+        Assert.assertEquals(1, threadsInShutdown.size());
     }
 }

@@ -122,7 +122,7 @@ public abstract class BotBehaviour {
         }
     }
 
-    private final synchronized void cleanup() {
+    private synchronized void cleanup() {
         onCleanup();
         for (EventListener eventListener : activeListeners) {
             context.getEventBus().unsubscribe(eventListener);

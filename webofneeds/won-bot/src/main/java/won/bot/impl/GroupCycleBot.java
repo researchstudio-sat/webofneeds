@@ -578,8 +578,8 @@ public class GroupCycleBot extends EventBot {
                                                         return;
                                                     CountEvent countEvent = (CountEvent) event;
                                                     int currentCount = countEvent.getCount();
-                                                    int targetCount = NUMBER_OF_GROUPS;
-                                                    logger.info("created group {} of {} ", currentCount, targetCount);
+                                                    logger.info("created group {} of {} ", currentCount,
+                                                                    NUMBER_OF_GROUPS);
                                                 }
                                             }));
             // count when all members are created
@@ -615,9 +615,8 @@ public class GroupCycleBot extends EventBot {
                                         return;
                                     CountEvent countEvent = (CountEvent) event;
                                     int currentCount = countEvent.getCount();
-                                    int targetCount = NUMBER_OF_GROUPS;
                                     logger.info("connected all group members to group {} of {}", currentCount,
-                                                    targetCount);
+                                                    NUMBER_OF_GROUPS);
                                 }
                             }));
         }
