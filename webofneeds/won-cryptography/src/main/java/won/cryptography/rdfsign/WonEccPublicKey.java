@@ -4,10 +4,10 @@ package won.cryptography.rdfsign;
  * User: ypanchenko Date: 30.03.2015
  */
 public class WonEccPublicKey {
-    private String curveId;
-    private String algorithm;
-    private String qx;
-    private String qy;
+    private final String curveId;
+    private final String algorithm;
+    private final String qx;
+    private final String qy;
 
     public WonEccPublicKey(final String curveId, final String algorithm, final String qx, final String qy) {
         this.curveId = curveId;

@@ -22,5 +22,5 @@ public interface KeyPairAliasDerivationStrategy {
      * @throws IllegalArgumentException if the argument cannot be converted to an
      * alias.
      */
-    public String getAliasForAtomUri(String atomURI);
+    String getAliasForAtomUri(String atomURI);
 }

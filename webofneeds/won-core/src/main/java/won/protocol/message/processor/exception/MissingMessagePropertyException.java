@@ -37,4 +37,8 @@ public class MissingMessagePropertyException extends WonMessageNotWellFormedExce
         super(createExceptionMessage(missingProperty), cause, enableSuppression, writableStackTrace);
         this.missingProperty = missingProperty;
     }
+
+    public URI getMissingProperty() {
+        return missingProperty;
+    }
 }

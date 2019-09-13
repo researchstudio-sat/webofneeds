@@ -1,12 +1,8 @@
 package won.cryptography.rdfsign;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.LinkedList;
-
+import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.GraphCollection;
+import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.NamedGraph;
+import de.uni_koblenz.aggrimm.icp.crypto.sign.trigplus.TriGPlusWriter;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
@@ -18,9 +14,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.GraphCollection;
-import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.NamedGraph;
-import de.uni_koblenz.aggrimm.icp.crypto.sign.trigplus.TriGPlusWriter;
+import java.io.*;
+import java.util.LinkedList;
 
 /**
  * Created by ypanchenko on 09.07.2014.
@@ -81,7 +76,7 @@ public class ModelConverterTest {
 
     @Test
     @Ignore
-    /**
+    /*
      * Reads from TRIG with Jena API into Dataset 1, transforms one named Model from
      * that Dataset into Signingframework's API GraphCollection with one NamedGraph,
      * transforms (converts) that NamedGraph into Jena's Model, and checks if the

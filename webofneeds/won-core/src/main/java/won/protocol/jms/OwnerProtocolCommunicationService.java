@@ -18,9 +18,9 @@ import won.protocol.exception.NoSuchConnectionException;
  * User: LEIH-NB Date: 25.02.14
  */
 public interface OwnerProtocolCommunicationService extends ProtocolCommunicationService {
-    public CamelConfiguration configureCamelEndpoint(URI wonNodeUri, String ownerId) throws Exception;
+    CamelConfiguration configureCamelEndpoint(URI wonNodeUri, String ownerId) throws Exception;
 
-    public URI getWonNodeUriWithConnectionUri(URI connectionUri) throws NoSuchConnectionException;
+    URI getWonNodeUriWithConnectionUri(URI connectionUri) throws NoSuchConnectionException;
 
-    public URI getWonNodeUriWithAtomUri(URI atomUri) throws NoSuchConnectionException;
+    URI getWonNodeUriWithAtomUri(URI atomUri) throws NoSuchConnectionException;
 }

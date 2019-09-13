@@ -42,7 +42,7 @@ public class WellformednessCheckingWonMessageProcessor implements WonMessageProc
     public WonMessage process(final WonMessage message) throws WonMessageProcessingException {
         Dataset dataset = message.getCompleteDataset();
         StringBuilder errorMessage = new StringBuilder("Message is not valid, failed at check ");
-        boolean valid = false;
+        boolean valid;
         try {
             dataset.getLock().enterCriticalSection(true);
             valid = validator.validate(dataset, errorMessage);

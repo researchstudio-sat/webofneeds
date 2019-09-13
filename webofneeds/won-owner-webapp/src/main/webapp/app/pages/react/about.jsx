@@ -159,26 +159,14 @@ const questions = [
 
 const mapStateToProps = state => {
   const visibleSection = generalSelectors.getAboutSectionFromRoute(state);
-  const themeName = getIn(state, ["config", "theme", "name"]);
+  const theme = getIn(state, ["config", "theme"]);
+  const themeName = get(theme, "name");
   return {
     isLoggedIn: accountUtils.isLoggedIn(get(state, "account")),
-    themeName,
     visibleSection,
-    tosTemplate:
-      "./skin/" +
-      themeName +
-      "/" +
-      getIn(state, ["config", "theme", "tosTemplate"]),
-    imprintTemplate:
-      "./skin/" +
-      themeName +
-      "/" +
-      getIn(state, ["config", "theme", "imprintTemplate"]),
-    privacyPolicyTemplate:
-      "./skin/" +
-      themeName +
-      "/" +
-      getIn(state, ["config", "theme", "privacyPolicyTemplate"]),
+    tosTemplateHtml: get(theme, "tosTemplate"),
+    imprintTemplateHtml: get(theme, "imprintTemplate"),
+    privacyPolicyTemplateHtml: get(theme, "privacyPolicyTemplate"),
     peopleGrid: peopleGrid({ themeName }),
     showModalDialog: getIn(state, ["view", "showModalDialog"]),
     showSlideIns:
@@ -266,7 +254,7 @@ class PageAbout extends React.Component {
               <div
                 className="about__privacyPolicy__text"
                 dangerouslySetInnerHTML={{
-                  __html: this.props.privacyPolicyTemplate,
+                  __html: this.props.privacyPolicyTemplateHtml,
                 }}
               />
             </section>
@@ -279,7 +267,7 @@ class PageAbout extends React.Component {
               </div>
               <div
                 className="about__termsOfService__text"
-                dangerouslySetInnerHTML={{ __html: this.props.tosTemplate }}
+                dangerouslySetInnerHTML={{ __html: this.props.tosTemplateHtml }}
               />
             </section>
           )}
@@ -289,7 +277,9 @@ class PageAbout extends React.Component {
               <div className="about__imprint__title">Imprint</div>
               <div
                 className="about__imprint__text"
-                dangerouslySetInnerHTML={{ __html: this.props.imprintTemplate }}
+                dangerouslySetInnerHTML={{
+                  __html: this.props.imprintTemplateHtml,
+                }}
               />
             </section>
           )}
@@ -320,9 +310,9 @@ PageAbout.propTypes = {
   isLoggedIn: PropTypes.bool,
   showSlideIns: PropTypes.bool,
   visibleSection: PropTypes.string,
-  privacyPolicyTemplate: PropTypes.string,
-  tosTemplate: PropTypes.string,
-  imprintTemplate: PropTypes.string,
+  privacyPolicyTemplateHtml: PropTypes.string,
+  tosTemplateHtml: PropTypes.string,
+  imprintTemplateHtml: PropTypes.string,
   peopleGrid: PropTypes.arrayOf(PropTypes.object),
 };
 

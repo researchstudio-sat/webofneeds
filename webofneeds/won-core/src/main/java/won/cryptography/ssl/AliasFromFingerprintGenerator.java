@@ -18,7 +18,7 @@ public class AliasFromFingerprintGenerator implements AliasGenerator {
         try {
             fingerprint = digest(certificate.getPublicKey().getEncoded());
         } catch (Exception e) {
-            new CertificateException("Alias generation from certificate fingerprint failed", e);
+            throw new CertificateException("Alias generation from certificate fingerprint failed", e);
         }
         return fingerprint;
     }
@@ -26,9 +26,9 @@ public class AliasFromFingerprintGenerator implements AliasGenerator {
     public String digest(final byte[] data) throws NoSuchAlgorithmException {
         MessageDigest md = MessageDigest.getInstance("SHA3-224");
         byte[] hash = md.digest(data);
-        StringBuffer hexString = new StringBuffer();
-        for (int i = 0; i < hash.length; i++) {
-            String hex = Integer.toHexString(0xff & hash[i]);
+        StringBuilder hexString = new StringBuilder();
+        for (byte b : hash) {
+            String hex = Integer.toHexString(0xff & b);
             if (hex.length() == 1)
                 hexString.append('0');
             hexString.append(hex);

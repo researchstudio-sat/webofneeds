@@ -41,6 +41,6 @@ public interface MatcherFacingAtomCommunicationService {
      * @throws won.protocol.exception.IllegalMessageForAtomStateException if the
      * atom is not active
      */
-    public void hint(URI atomURI, URI otherAtom, double score, URI originator, Model content, WonMessage wonMessage)
+    void hint(URI atomURI, URI otherAtom, double score, URI originator, Model content, WonMessage wonMessage)
                     throws Exception;
 }

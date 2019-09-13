@@ -10,17 +10,16 @@
  */
 package won.protocol.repository.rdfstorage.impl;
 
-import java.net.URI;
-
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import won.protocol.model.DataWithEtag;
 import won.protocol.model.DatasetHolder;
 import won.protocol.repository.DatasetHolderRepository;
 import won.protocol.repository.rdfstorage.RDFStorageService;
+
+import java.net.URI;
 
 /**
  * Rdf Storage service that delegates to a JPA repository
@@ -57,10 +56,9 @@ public class JpaRepositoryBasedRdfStorageServiceImpl implements RDFStorageServic
     public DataWithEtag<Model> loadModel(final URI resourceURI, String etag) {
         Integer version = Integer.valueOf(etag);
         DatasetHolder datasetHolder = datasetHolderRepository.findOneByUriAndVersionNot(resourceURI, version);
-        DataWithEtag<Model> dataWithEtag = new DataWithEtag<Model>(
+        return new DataWithEtag<>(
                         datasetHolder == null ? null : datasetHolder.getDataset().getDefaultModel(),
                         datasetHolder == null ? etag : Integer.toString(datasetHolder.getVersion()), etag);
-        return dataWithEtag;
     }
 
     @Override
@@ -73,10 +71,9 @@ public class JpaRepositoryBasedRdfStorageServiceImpl implements RDFStorageServic
     public DataWithEtag<Dataset> loadDataset(final URI resourceURI, String etag) {
         Integer version = etag == null ? -1 : Integer.valueOf(etag);
         DatasetHolder datasetHolder = datasetHolderRepository.findOneByUriAndVersionNot(resourceURI, version);
-        DataWithEtag<Dataset> dataWithEtag = new DataWithEtag<Dataset>(
+        return new DataWithEtag<>(
                         datasetHolder == null ? null : datasetHolder.getDataset(),
                         datasetHolder == null ? etag : Integer.toString(datasetHolder.getVersion()), etag);
-        return dataWithEtag;
     }
 
     @Override

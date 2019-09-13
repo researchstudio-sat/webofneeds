@@ -16,9 +16,9 @@ import java.util.Date;
  * Created by fkleedorfer on 28.03.2017.
  */
 public interface VersionedEntity {
-    public int getVersion();
+    int getVersion();
 
-    public void incrementVersion();
+    void incrementVersion();
 
-    public Date getLastUpdate();
+    Date getLastUpdate();
 }

@@ -18,5 +18,5 @@ import org.apache.jena.query.Dataset;
  * Callback that is informed of each Dataset downloaded.
  */
 public interface CrawlerCallback {
-    public void onDatasetCrawled(URI uri, Dataset dataset);
+    void onDatasetCrawled(URI uri, Dataset dataset);
 }

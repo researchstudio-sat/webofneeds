@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import won.protocol.exception.*;
 import won.protocol.model.*;
 import won.protocol.repository.*;
-import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.DataAccessUtils;
 import won.protocol.vocabulary.WONCON;
 
@@ -27,15 +26,12 @@ import java.util.Optional;
  */
 public class DataAccessServiceImpl implements won.node.service.DataAccessService {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    private URIService URIService;
     @Autowired
     private AtomRepository atomRepository;
     @Autowired
     private ConnectionRepository connectionRepository;
     @Autowired
     private SocketRepository socketRepository;
-    @Autowired
-    private WonNodeInformationService wonNodeInformationService;
     @Autowired
     protected ConnectionContainerRepository connectionContainerRepository;
     @Autowired
@@ -174,7 +170,7 @@ public class DataAccessServiceImpl implements won.node.service.DataAccessService
         // think about locking.
         logger.debug("adding feedback to resource {}", connection);
         DatasetHolder datasetHolder = connection.getDatasetHolder();
-        Dataset dataset = null;
+        Dataset dataset;
         if (datasetHolder == null) {
             // if no dataset is found, we create one.
             dataset = DatasetFactory.create();
@@ -231,10 +227,5 @@ public class DataAccessServiceImpl implements won.node.service.DataAccessService
             throw new IllegalMessageForConnectionStateException(con.getConnectionURI(), msg.name(), con.getState());
         }
         return con.getState().transit(msg);
-    }
-
-    @Override
-    public void setURIService(URIService URIService) {
-        this.URIService = URIService;
     }
 }

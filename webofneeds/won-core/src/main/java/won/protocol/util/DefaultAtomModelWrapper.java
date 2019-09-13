@@ -1,9 +1,5 @@
 package won.protocol.util;
 
-import java.net.URI;
-import java.util.Collection;
-import java.util.LinkedList;
-
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Property;
@@ -11,10 +7,16 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.DC;
 import org.apache.jena.vocabulary.RDF;
-
 import won.protocol.model.AtomGraphType;
 import won.protocol.model.Coordinate;
-import won.protocol.vocabulary.*;
+import won.protocol.vocabulary.SCHEMA;
+import won.protocol.vocabulary.WON;
+import won.protocol.vocabulary.WONCON;
+import won.protocol.vocabulary.WONMATCH;
+
+import java.net.URI;
+import java.util.Collection;
+import java.util.LinkedList;
 
 /**
  * Extends {@link AtomModelWrapper} to add matchat specific methods to access
@@ -72,9 +74,7 @@ public class DefaultAtomModelWrapper extends AtomModelWrapper {
         if (title != null)
             return title;
         title = getSomeContentPropertyStringValue(DC.title, preferredLanguages);
-        if (title != null)
-            return title;
-        return null;
+        return title;
     }
 
     public Collection<String> getTitles(Resource contentNode) {

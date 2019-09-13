@@ -14,7 +14,7 @@ package won.cryptography.keymanagement;
  * Always uses the predefined alias
  */
 public class PredefinedAliasStrategy implements KeyPairAliasDerivationStrategy {
-    private String predefinedAlias = null;
+    private String predefinedAlias;
 
     public PredefinedAliasStrategy(String predefinedAlias) {
         this.predefinedAlias = predefinedAlias;

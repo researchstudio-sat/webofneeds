@@ -65,16 +65,13 @@ const mapStateToProps = state => {
   const viewState = get(state, "view");
 
   const theme = getIn(state, ["config", "theme"]);
-  const themeName = get(theme, "name");
-  const welcomeTemplate = get(theme, "welcomeTemplate");
-
   const accountState = get(state, "account");
   const process = get(state, "process");
 
   return {
     isInitialLoadInProgress: processUtils.isProcessingInitialLoad(process),
     isLoggedIn: accountUtils.isLoggedIn(accountState),
-    welcomeTemplatePath: "./skin/" + themeName + "/" + welcomeTemplate,
+    welcomeTemplateHtml: get(theme, "welcomeTemplate"),
     currentLocation: generalSelectors.getCurrentLocation(state),
     sortedOwnedUnassignedAtomUriArray,
     sortedOwnedInactiveAtomUriArray,
@@ -212,7 +209,7 @@ class PageInventory extends React.Component {
             <div
               className="ownerwelcome__text"
               dangerouslySetInnerHTML={{
-                __html: this.props.welcomeTemplatePath,
+                __html: this.props.welcomeTemplateHtml,
               }}
             />
             <WonHowTo />
@@ -227,7 +224,7 @@ class PageInventory extends React.Component {
 PageInventory.propTypes = {
   isLoggedIn: PropTypes.bool,
   isInitialLoadInProgress: PropTypes.bool,
-  welcomeTemplatePath: PropTypes.string,
+  welcomeTemplateHtml: PropTypes.string,
   currentLocation: PropTypes.object,
   sortedOwnedUnassignedAtomUriArray: PropTypes.arrayOf(PropTypes.string),
   sortedOwnedInactiveAtomUriArray: PropTypes.arrayOf(PropTypes.string),

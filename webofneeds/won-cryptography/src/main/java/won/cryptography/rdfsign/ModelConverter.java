@@ -1,12 +1,10 @@
 package won.cryptography.rdfsign;
 
-import java.io.BufferedWriter;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.OutputStreamWriter;
-import java.util.List;
-import java.util.Map;
-
+import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.GraphCollection;
+import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.NamedGraph;
+import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.Prefix;
+import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.Triple;
+import de.uni_koblenz.aggrimm.icp.crypto.sign.trigplus.TriGPlusWriter;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
@@ -16,11 +14,12 @@ import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
 
-import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.GraphCollection;
-import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.NamedGraph;
-import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.Prefix;
-import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.Triple;
-import de.uni_koblenz.aggrimm.icp.crypto.sign.trigplus.TriGPlusWriter;
+import java.io.BufferedWriter;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStreamWriter;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by ypanchenko on 09.07.2014.
@@ -82,7 +81,7 @@ public class ModelConverter {
         // write NamedGraph
         TriGPlusWriter.writeGraph(writer, graph, 3);
         writer.close();
-        String content = os.toString();
+        // String content = os.toString();
         // read the result with Jena as Dataset
         ByteArrayInputStream is = new ByteArrayInputStream(os.toByteArray());
         Dataset dataset = DatasetFactory.createGeneral();
@@ -136,7 +135,7 @@ public class ModelConverter {
     }
 
     private static String rdfNodeAsString(final RDFNode rdfNode) {
-        String result = null;
+        String result;
         if (rdfNode.isURIResource()) {
             String uri = rdfNode.asResource().getURI();
             result = enclose(uri, "<", ">");

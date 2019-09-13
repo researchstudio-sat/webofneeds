@@ -7,7 +7,7 @@ import org.apache.jena.rdf.model.Model;
  * change this template use File | Settings | File Templates.
  */
 public interface ModelMapper<T> {
-    public Model toModel(T tobject);
+    Model toModel(T tobject);
 
-    public T fromModel(Model model);
+    T fromModel(Model model);
 }

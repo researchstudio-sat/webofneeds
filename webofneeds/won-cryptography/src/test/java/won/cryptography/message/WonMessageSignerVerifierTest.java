@@ -1,13 +1,5 @@
 package won.cryptography.message;
 
-import java.io.File;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.Security;
-import java.security.interfaces.ECPrivateKey;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.jena.query.Dataset;
 import org.apache.jena.riot.Lang;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -15,13 +7,20 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-
 import won.cryptography.rdfsign.SignatureVerificationState;
 import won.cryptography.service.keystore.FileBasedKeyStoreService;
 import won.cryptography.utils.TestSigningUtils;
 import won.protocol.message.WonMessage;
 import won.protocol.message.processor.impl.WonMessageSignerVerifier;
 import won.protocol.util.RdfUtils;
+
+import java.io.File;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.Security;
+import java.security.interfaces.ECPrivateKey;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * User: ypanchenko Date: 09.04.2015
@@ -37,7 +36,7 @@ public class WonMessageSignerVerifierTest {
     private static final String EVENT_ENV1_SIG_URI = "http://localhost:8080/won/resource/event/7719577021233193000#data-sig";
     private static final String EVENT_ENV2_URI = "http://localhost:8080/won/resource/event/7719577021233193000#envelope-s7gl";
     private static final String EVENT_ENV2_SIG_URI = "http://localhost:8080/won/resource/event/7719577021233193000#envelope-s7gl-sig";
-    Map<String, PublicKey> pubKeysMap = new HashMap<String, PublicKey>();
+    private final Map<String, PublicKey> pubKeysMap = new HashMap<>();
     private PrivateKey atomKey;
     private PrivateKey ownerKey;
     private PrivateKey nodeKey;

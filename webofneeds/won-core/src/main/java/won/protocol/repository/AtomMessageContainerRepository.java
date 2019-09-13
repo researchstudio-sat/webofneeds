@@ -24,23 +24,23 @@ import won.protocol.model.AtomMessageContainer;
  * Created by fkleedorfer on 05.12.2016.
  */
 public interface AtomMessageContainerRepository extends WonRepository<AtomMessageContainer> {
-    public AtomMessageContainer findOneByParentUri(URI parentUri);
+    AtomMessageContainer findOneByParentUri(URI parentUri);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select c from AtomMessageContainer c where c.parentUri = :parentUri")
-    public AtomMessageContainer findOneByParentUriForUpdate(@Param("parentUri") URI parentUri);
+    AtomMessageContainer findOneByParentUriForUpdate(@Param("parentUri") URI parentUri);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select atom, c from Atom atom join AtomMessageContainer c on atom.atomURI = c.parentUri where c.parentUri = :parentUri")
-    public void lockParentAndContainerByParentUriForUpdate(@Param("parentUri") URI parentUri);
+    void lockParentAndContainerByParentUriForUpdate(@Param("parentUri") URI parentUri);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select c from AtomMessageContainer c join MessageEventPlaceholder msg on msg.parentURI = c.parentUri where msg.messageURI = :messageUri")
-    public AtomMessageContainer findOneByContainedMessageUriForUpdate(@Param("messageUri") URI messageUri);
+    AtomMessageContainer findOneByContainedMessageUriForUpdate(@Param("messageUri") URI messageUri);
 
     @Query("select case when (count(n) > 0) then true else false end "
                     + "from Atom n left outer join Connection con on (n.atomURI = con.atomURI) "
                     + " where n.atomURI = :atomUri and " + "( " + "   n.atomURI = :webId or "
                     + "   con.targetAtomURI = :webId " + ")")
-    public boolean isReadPermittedForWebID(@Param("atomUri") URI connectionUri, @Param("webId") URI webId);
+    boolean isReadPermittedForWebID(@Param("atomUri") URI connectionUri, @Param("webId") URI webId);
 }

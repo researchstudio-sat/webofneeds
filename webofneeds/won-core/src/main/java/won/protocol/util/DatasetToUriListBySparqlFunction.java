@@ -1,19 +1,11 @@
 package won.protocol.util;
 
+import org.apache.jena.query.*;
+import org.apache.jena.rdf.model.RDFNode;
+
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.apache.jena.query.Dataset;
-import org.apache.jena.query.DatasetFactory;
-import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.query.QueryFactory;
-import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.ReadWrite;
-import org.apache.jena.query.ResultSet;
-import org.apache.jena.rdf.model.RDFNode;
 
 /**
  * Expects to be passed a file containing a sparql query that projects a
@@ -33,7 +25,7 @@ public class DatasetToUriListBySparqlFunction extends SparqlFunction<Dataset, Li
         Dataset result = DatasetFactory.createGeneral();
         result.begin(ReadWrite.WRITE);
         Query query = QueryFactory.create(sparql);
-        List<URI> ret = new ArrayList<URI>();
+        List<URI> ret = new ArrayList<>();
         try (QueryExecution queryExecution = QueryExecutionFactory.create(query, dataset)) {
             ResultSet resultSet = queryExecution.execSelect();
             if (!resultSet.getResultVars().contains("uri")) {
@@ -50,7 +42,7 @@ public class DatasetToUriListBySparqlFunction extends SparqlFunction<Dataset, Li
                     throw new IllegalStateException(
                                     "Value of result variable 'uri' is not a resource (read from: " + sparqlFile + ")");
                 }
-                ret.add(URI.create(uriNode.asResource().getURI().toString()));
+                ret.add(URI.create(uriNode.asResource().getURI()));
             }
         }
         return ret;

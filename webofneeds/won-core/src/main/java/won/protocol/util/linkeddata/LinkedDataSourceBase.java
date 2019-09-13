@@ -42,7 +42,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.function.BiFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 /**
  * LinkedDataSource implementation that delegates fetching linked data resources
@@ -63,7 +62,7 @@ public class LinkedDataSourceBase implements LinkedDataSource {
      * does not exist
      */
     public String getPreviousLinkFromDatasetWithHeaders(DatasetResponseWithStatusCodeAndHeaders datasetWithHeaders) {
-        String prevLink = null;
+        String prevLink;
         List<String> links = datasetWithHeaders.getResponseHeaders().get("Link");
         if (links != null) {
             for (String link : links) {
@@ -75,7 +74,7 @@ public class LinkedDataSourceBase implements LinkedDataSource {
                 }
             }
         }
-        return prevLink;
+        return null;
     }
 
     /**
@@ -146,8 +145,7 @@ public class LinkedDataSourceBase implements LinkedDataSource {
     private Set<URI> retainOnlyAllowedAmount(Set<URI> newlyDiscoveredURIs, final int maxRequest, int requests) {
         if (newlyDiscoveredURIs.size() + requests > maxRequest) {
             // only crawl as many as we are allowed to
-            return newlyDiscoveredURIs.stream().collect(Collectors.toList()).subList(0, maxRequest - requests).stream()
-                            .collect(Collectors.toSet());
+            return new HashSet<>(new ArrayList<>(newlyDiscoveredURIs).subList(0, maxRequest - requests));
         }
         return newlyDiscoveredURIs;
     }
@@ -173,19 +171,19 @@ public class LinkedDataSourceBase implements LinkedDataSource {
 
     private Dataset getDataForResource(final URI resourceURI, final URI requesterWebID, final int maxRequest,
                     final int maxDepth, BiFunction<Dataset, Set<URI>, Set<URI>> findNextUrisFunction) {
-        Set<URI> crawledURIs = new HashSet<URI>();
-        Set<URI> newlyDiscoveredURIs = new HashSet<URI>();
+        Set<URI> crawledURIs = new HashSet<>();
+        Set<URI> newlyDiscoveredURIs = new HashSet<>();
         newlyDiscoveredURIs.add(resourceURI);
         int depth = 0;
         int requests = 0;
         final Dataset dataset = makeDataset();
-        OUTER: while (newlyDiscoveredURIs.size() > 0 && depth < maxDepth && requests < maxRequest) {
+        while (newlyDiscoveredURIs.size() > 0 && depth < maxDepth && requests < maxRequest) {
             final Set<URI> urisToCrawl = retainOnlyAllowedAmount(newlyDiscoveredURIs, maxRequest, requests);
             // hack: there may be a threadLocal with the authentication data we need further
             // down the call stack
             // if there is one, we need to add that to the threads we use in the following
             // parallel construct
-            final Optional<Object> authenticationOpt = won.protocol.util.AuthenticationThreadLocal.hasValue()
+            final Optional<Object> authenticationOpt = AuthenticationThreadLocal.hasValue()
                             ? Optional.of(AuthenticationThreadLocal.getAuthentication())
                             : Optional.empty();
             Future<Optional<Dataset>> crawledData = parallelRequestsThreadpool
@@ -201,7 +199,7 @@ public class LinkedDataSourceBase implements LinkedDataSource {
                                     // be sure to remove the principal from the threadlocal after the call
                                     AuthenticationThreadLocal.remove();
                                 }
-                            }).reduce((all, current) -> RdfUtils.addDatasetToDataset(all, current)));
+                            }).reduce(RdfUtils::addDatasetToDataset));
             Optional<Dataset> crawledDataset;
             try {
                 crawledDataset = crawledData.get();
@@ -225,8 +223,7 @@ public class LinkedDataSourceBase implements LinkedDataSource {
             }
             crawledURIs.addAll(urisToCrawl);
             requests += urisToCrawl.size();
-            newlyDiscoveredURIs = new HashSet<URI>();
-            newlyDiscoveredURIs.addAll(findNextUrisFunction.apply(dataset, crawledURIs));
+            newlyDiscoveredURIs = new HashSet<>(findNextUrisFunction.apply(dataset, crawledURIs));
             depth++;
             logger.debug("current Depth: " + depth);
         }
@@ -250,7 +247,7 @@ public class LinkedDataSourceBase implements LinkedDataSource {
             logger.debug("evaluating property paths on data crawled so far");
             RDFDataMgr.write(System.out, dataset, Lang.TRIG);
         }
-        Set<URI> toCrawl = new HashSet<URI>();
+        Set<URI> toCrawl = new HashSet<>();
         properties.stream().forEach(path -> {
             Iterator<URI> newURIs = RdfUtils.getURIsForPropertyPathByQuery(dataset, resourceURI, path);
             if (!newURIs.hasNext()) {
@@ -259,7 +256,7 @@ public class LinkedDataSourceBase implements LinkedDataSource {
                 }
                 return;
             }
-            Set<URI> newUrisThisIteration = new HashSet<URI>();
+            Set<URI> newUrisThisIteration = new HashSet<>();
             int skipped = 0;
             while (newURIs.hasNext()) {
                 URI newUri = newURIs.next();
@@ -291,15 +288,11 @@ public class LinkedDataSourceBase implements LinkedDataSource {
      */
     private Set<URI> getURIsToCrawl(Dataset dataset, Set<URI> excludedUris, final List<URI> properties) {
         Set<URI> toCrawl = new HashSet<>();
-        for (int i = 0; i < properties.size(); i++) {
-            final URI property = properties.get(i);
+        for (final URI property : properties) {
             NodeIterator objectIterator = RdfUtils.visitFlattenedToNodeIterator(dataset,
-                            new RdfUtils.ModelVisitor<NodeIterator>() {
-                                @Override
-                                public NodeIterator visit(final Model model) {
-                                    final Property p = model.createProperty(property.toString());
-                                    return model.listObjectsOfProperty(p);
-                                }
+                            model -> {
+                                final Property p = model.createProperty(property.toString());
+                                return model.listObjectsOfProperty(p);
                             });
             for (; objectIterator.hasNext();) {
                 RDFNode objectNode = objectIterator.next();

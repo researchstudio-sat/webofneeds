@@ -31,7 +31,7 @@ public interface AtomInformationService {
      *
      * @return a collection of all atom URIs.
      */
-    public Collection<URI> listAtomURIs();
+    Collection<URI> listAtomURIs();
 
     /**
      * Retrieves a list of all atoms with the given atomState on the atomserver.
@@ -39,7 +39,7 @@ public interface AtomInformationService {
      * @param atomState State that an atom needs to have to be included.
      * @return a collection of all atom URIs.
      */
-    public Collection<URI> listAtomURIs(AtomState atomState);
+    Collection<URI> listAtomURIs(AtomState atomState);
 
     /**
      * Retrieves a page of the list of atoms on the atomserver that have a given
@@ -51,7 +51,7 @@ public interface AtomInformationService {
      * @param atomState Active/Inactive, null => all states
      * @return a collection of all atom URIs.
      */
-    public Slice<URI> listPagedAtomURIs(int page, Integer preferredSize, AtomState atomState);
+    Slice<URI> listPagedAtomURIs(int page, Integer preferredSize, AtomState atomState);
 
     /**
      * Retrieves list of atoms on the atomserver that where created earlier than the
@@ -64,7 +64,7 @@ public interface AtomInformationService {
      * @param atomState Active/Inactive, null => all states
      * @return a collection of all atom URIs.
      */
-    public Slice<URI> listPagedAtomURIsBefore(URI atom, Integer preferredSize, AtomState atomState);
+    Slice<URI> listPagedAtomURIsBefore(URI atom, Integer preferredSize, AtomState atomState);
 
     /**
      * Retrieves list of atoms on the atomserver that where created later than the
@@ -77,7 +77,7 @@ public interface AtomInformationService {
      * @param atomState Active/Inactive, null => all states
      * @return a collection of all atom URIs.
      */
-    public Slice<URI> listPagedAtomURIsAfter(URI atom, Integer preferredSize, AtomState atomState);
+    Slice<URI> listPagedAtomURIsAfter(URI atom, Integer preferredSize, AtomState atomState);
 
     /**
      * retrieves atoms that have been modified after a certain date
@@ -86,7 +86,7 @@ public interface AtomInformationService {
      * @param atomState filterBy
      * @return collection of modified atoms
      */
-    public Collection<URI> listAtomURIsModifiedAfter(Date modifiedAfter, AtomState atomState);
+    Collection<URI> listAtomURIsModifiedAfter(Date modifiedAfter, AtomState atomState);
 
     /**
      * retrieves atoms that have been modified after a certain date
@@ -95,21 +95,21 @@ public interface AtomInformationService {
      * @param atomState filterBy
      * @return collection of modified atoms
      */
-    public Collection<URI> listAtomURIsCreatedAfter(Date createdAfter, AtomState atomState);
+    Collection<URI> listAtomURIsCreatedAfter(Date createdAfter, AtomState atomState);
 
     /**
      * Retrieves all connection URIs (regardless of state).
      *
      * @return a collection of connection URIs.
      */
-    public Collection<URI> listConnectionURIs();
+    Collection<URI> listConnectionURIs();
 
     /**
      * Retrieves all connections (regardless of state).
      *
      * @return a collection of connections.
      */
-    public Collection<Connection> listConnections();
+    Collection<Connection> listConnections();
 
     /**
      * Retrieves all connections that were modified (by adding events) after a
@@ -118,7 +118,7 @@ public interface AtomInformationService {
      * @param modifiedAfter modification date
      * @return
      */
-    public Collection<Connection> listModifiedConnectionsAfter(Date modifiedAfter);
+    Collection<Connection> listModifiedConnectionsAfter(Date modifiedAfter);
 
     /**
      * Retrieves slice of the connection URIs list for a given page number
@@ -130,7 +130,7 @@ public interface AtomInformationService {
      * current state
      * @return a slice connection URIs.
      */
-    public Slice<URI> listConnectionURIs(int page, Integer preferredSize, Date timeSpot);
+    Slice<URI> listConnectionURIs(int page, Integer preferredSize, Date timeSpot);
 
     /**
      * Retrieves slice of the connection URIs list for a given page number
@@ -142,7 +142,7 @@ public interface AtomInformationService {
      * current state
      * @return a slice connection URIs.
      */
-    public Slice<Connection> listConnections(int page, Integer preferredSize, Date timeSpot);
+    Slice<Connection> listConnections(int page, Integer preferredSize, Date timeSpot);
 
     /**
      * Retrieves slice of the connections that precede the given connection URI from
@@ -156,7 +156,7 @@ public interface AtomInformationService {
      * null
      * @return a slice of connection URIs.
      */
-    public Slice<Connection> listConnectionsBefore(final URI resumeConnURI, final Integer preferredPageSize,
+    Slice<Connection> listConnectionsBefore(final URI resumeConnURI, final Integer preferredPageSize,
                     final Date timeSpot);
 
     /**
@@ -171,7 +171,7 @@ public interface AtomInformationService {
      * null
      * @return a slice of connection URIs.
      */
-    public Slice<Connection> listConnectionsAfter(final URI resumeConnURI, final Integer preferredPageSize,
+    Slice<Connection> listConnectionsAfter(final URI resumeConnURI, final Integer preferredPageSize,
                     final Date timeSpot);
 
     /**
@@ -183,7 +183,7 @@ public interface AtomInformationService {
      * @throws won.protocol.exception.NoSuchAtomException if atomURI is not a known
      * atom URI
      */
-    public Collection<URI> listConnectionURIs(URI atomURI) throws NoSuchAtomException;
+    Collection<URI> listConnectionURIs(URI atomURI) throws NoSuchAtomException;
 
     /**
      * Retrieves all connections (regardless of state) for the specified local atom
@@ -194,7 +194,7 @@ public interface AtomInformationService {
      * @throws won.protocol.exception.NoSuchAtomException if atomURI is not a known
      * atom URI
      */
-    public Collection<Connection> listConnections(URI atomURI) throws NoSuchAtomException;
+    Collection<Connection> listConnections(URI atomURI) throws NoSuchAtomException;
 
     /**
      * Retrieves slice of the list of connection URIs for the specified local atom
@@ -212,7 +212,7 @@ public interface AtomInformationService {
      * @throws won.protocol.exception.NoSuchAtomException if atomURI is not a known
      * atom URI
      */
-    public Slice<URI> listConnectionURIs(URI atomURI, int page, Integer preferredSize, WonMessageType messageType,
+    Slice<URI> listConnectionURIs(URI atomURI, int page, Integer preferredSize, WonMessageType messageType,
                     Date timeSpot);
 
     /**
@@ -230,7 +230,7 @@ public interface AtomInformationService {
      * @throws won.protocol.exception.NoSuchAtomException if atomURI is not a known
      * atom URI
      */
-    public Slice<Connection> listConnections(URI atomURI, int page, Integer preferredSize, WonMessageType messageType,
+    Slice<Connection> listConnections(URI atomURI, int page, Integer preferredSize, WonMessageType messageType,
                     Date timeSpot);
 
     /**
@@ -248,7 +248,7 @@ public interface AtomInformationService {
      * null
      * @return a slice of connection URIs.
      */
-    public Slice listConnectionsBefore(URI atomURI, URI resumeConnURI, Integer preferredPageSize,
+    Slice listConnectionsBefore(URI atomURI, URI resumeConnURI, Integer preferredPageSize,
                     WonMessageType messageType, Date timeSpot);
 
     /**
@@ -265,7 +265,7 @@ public interface AtomInformationService {
      * null
      * @return a slice of connection URIs.
      */
-    public Slice listConnectionsAfter(URI atomURI, URI resumeConnURI, Integer preferredPageSize,
+    Slice listConnectionsAfter(URI atomURI, URI resumeConnURI, Integer preferredPageSize,
                     WonMessageType messageType, Date timeSpot);
 
     /**
@@ -275,7 +275,7 @@ public interface AtomInformationService {
      * @return
      * @throws NoSuchAtomException
      */
-    public Atom readAtom(URI atomURI) throws NoSuchAtomException;
+    Atom readAtom(URI atomURI) throws NoSuchAtomException;
 
     /**
      * read atom data including if atom version number is equal to etag
@@ -286,7 +286,7 @@ public interface AtomInformationService {
      * with the specified URI or the version number of the etag is found
      * @throws NoSuchAtomException
      */
-    public DataWithEtag<Atom> readAtom(URI atomURI, String etag) throws NoSuchAtomException;
+    DataWithEtag<Atom> readAtom(URI atomURI, String etag) throws NoSuchAtomException;
 
     /**
      * Retrieves the public description of the atom as an RDF graph.
@@ -295,7 +295,7 @@ public interface AtomInformationService {
      * @return
      * @throws NoSuchAtomException
      */
-    public Model readAtomContent(URI atomURI) throws NoSuchAtomException;
+    Model readAtomContent(URI atomURI) throws NoSuchAtomException;
 
     /**
      * Read general information about the connection.
@@ -304,7 +304,7 @@ public interface AtomInformationService {
      * @return
      * @throws NoSuchAtomException
      */
-    public Connection readConnection(URI connectionURI) throws NoSuchConnectionException;
+    Connection readConnection(URI connectionURI) throws NoSuchConnectionException;
 
     /**
      * read connection data including etag if connection version number is equal to
@@ -315,7 +315,7 @@ public interface AtomInformationService {
      * @return connection data with corresponding etag version number or null if no
      * atom with the specified URI or the version number of the etag is found
      */
-    public DataWithEtag<Connection> readConnection(URI connectionURI, String Etag);
+    DataWithEtag<Connection> readConnection(URI connectionURI, String Etag);
 
     /**
      * Retrieves the public description of the connection as an RDF graph.
@@ -324,18 +324,18 @@ public interface AtomInformationService {
      * @return
      * @throws NoSuchAtomException
      */
-    public Model readConnectionContent(URI connectionURI) throws NoSuchConnectionException;
+    Model readConnectionContent(URI connectionURI) throws NoSuchConnectionException;
 
-    public Slice<MessageEventPlaceholder> listConnectionEvents(URI connectionUri, int page, Integer preferredPageSize,
+    Slice<MessageEventPlaceholder> listConnectionEvents(URI connectionUri, int page, Integer preferredPageSize,
                     WonMessageType messageType);
 
-    public Slice<MessageEventPlaceholder> listConnectionEventsBefore(URI connectionUri, URI msgURI,
+    Slice<MessageEventPlaceholder> listConnectionEventsBefore(URI connectionUri, URI msgURI,
                     Integer preferredPageSize, WonMessageType msgType);
 
-    public Slice<MessageEventPlaceholder> listConnectionEventsAfter(URI connectionUri, URI msgURI,
+    Slice<MessageEventPlaceholder> listConnectionEventsAfter(URI connectionUri, URI msgURI,
                     Integer preferredPageSize, WonMessageType msgType);
 
-    public static class PagedResource<T, E> {
+    class PagedResource<T, E> {
         private T content;
         private E resumeBefore = null;
         private E resumeAfter = null;

@@ -119,8 +119,8 @@ class WonAtomContentBuddies extends React.Component {
   }
 
   componentDidMount() {
-    //TODO: FETCH OTHER PERSONAS AND LIMIT TO ONE FETCH I FEEL THATS IMPORTANT
-    this.props.fetchPersonas();
+    // TODO: FETCH OTHER PERSONAS (Performance of the call is too slow for large datasets so we won't do this for now)
+    // this.props.fetchPersonas();
   }
 
   render() {

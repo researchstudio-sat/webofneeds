@@ -57,7 +57,7 @@ public class SignatureCheckingWonMessageProcessor implements WonMessageProcessor
 
     @Override
     public WonMessage process(final WonMessage message) throws WonMessageProcessingException {
-        SignatureVerificationState result = null;
+        SignatureVerificationState result;
         /*
          * If the message is a successResponse to a delete Message then we can't check
          * the signature as it is stored in the deleted Atom, so we just accept the

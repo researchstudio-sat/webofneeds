@@ -18,5 +18,5 @@ public interface MonitoringResetter {
     /**
      * Resets the monitoring statistics.
      */
-    public void resetMonitoringStatistics();
+    void resetMonitoringStatistics();
 }

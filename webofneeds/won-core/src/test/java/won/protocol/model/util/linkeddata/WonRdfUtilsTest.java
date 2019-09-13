@@ -1,12 +1,7 @@
 package won.protocol.model.util.linkeddata;
 
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.io.StringWriter;
-import java.net.URI;
-import java.nio.charset.Charset;
-import java.util.Collection;
-
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.riot.Lang;
@@ -15,29 +10,17 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.LoggerFactory;
-
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.Logger;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WXCHAT;
 import won.protocol.vocabulary.WXGROUP;
 
+import java.io.InputStream;
+import java.net.URI;
+import java.util.Collection;
+
 public class WonRdfUtilsTest {
     private InputStream getResourceAsStream(String name) {
         return getClass().getClassLoader().getResourceAsStream(name);
-    }
-
-    private String getResourceAsString(String name) throws Exception {
-        byte[] buffer = new byte[256];
-        StringWriter sw = new StringWriter();
-        try (InputStream in = getResourceAsStream(name)) {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            int bytesRead = 0;
-            while ((bytesRead = in.read(buffer)) > -1) {
-                baos.write(buffer, 0, bytesRead);
-            }
-            return new String(baos.toByteArray(), Charset.defaultCharset());
-        }
     }
 
     private Dataset loadTestDatasetFromClasspathResource(String resource) {

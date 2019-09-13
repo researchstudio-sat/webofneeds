@@ -50,6 +50,8 @@ import won.protocol.vocabulary.WON;
 import java.lang.invoke.MethodHandles;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -66,12 +68,8 @@ public class LinkedDataServiceImpl implements LinkedDataService {
     private String connectionResourceURIPrefix;
     // prefix of a event resource
     private String eventResourceURIPrefix;
-    // prefix for URISs of RDF data
-    private String dataURIPrefix;
     // prefix for URIs referring to real-world things
     private String resourceURIPrefix;
-    // prefix for human readable pages
-    private String pageURIPrefix;
     @Autowired
     private MessageEventRepository messageEventRepository;
     @Autowired
@@ -89,9 +87,6 @@ public class LinkedDataServiceImpl implements LinkedDataService {
     private CryptographyService cryptographyService;
     @Autowired
     private UnreadInformationService unreadInformationService;
-    private String atomProtocolEndpoint;
-    private String matcherProtocolEndpoint;
-    private String ownerProtocolEndpoint;
     private AtomInformationService atomInformationService;
     private String activeMqEndpoint;
     private String activeMqAtomProtcolQueueName;
@@ -176,20 +171,33 @@ public class LinkedDataServiceImpl implements LinkedDataService {
 
     @Transactional
     public DataWithEtag<Dataset> getAtomDataset(final URI atomUri, String etag) {
-        DataWithEtag<Atom> data;
+        Instant start = logger.isDebugEnabled() ? Instant.now() : null;
+        DataWithEtag<Atom> atomDataWithEtag;
         try {
-            data = atomInformationService.readAtom(atomUri, etag);
+            atomDataWithEtag = atomInformationService.readAtom(atomUri, etag);
         } catch (NoSuchAtomException e) {
+            if (logger.isDebugEnabled() && start != null) {
+                Instant finish = Instant.now();
+                logger.debug("getAtomDataset({}) took {}ms", atomUri, Duration.between(start, finish).toMillis());
+            }
             return DataWithEtag.dataNotFound();
         }
-        if (data.isNotFound()) {
+        if (atomDataWithEtag.isNotFound()) {
+            if (logger.isDebugEnabled() && start != null) {
+                Instant finish = Instant.now();
+                logger.debug("getAtomDataset({}) took {}ms", atomUri, Duration.between(start, finish).toMillis());
+            }
             return DataWithEtag.dataNotFound();
         }
-        if (!data.isChanged()) {
-            return DataWithEtag.dataNotChanged(data);
+        if (!atomDataWithEtag.isChanged()) {
+            if (logger.isDebugEnabled() && start != null) {
+                Instant finish = Instant.now();
+                logger.debug("getAtomDataset({}) took {}ms", atomUri, Duration.between(start, finish).toMillis());
+            }
+            return DataWithEtag.dataNotChanged(atomDataWithEtag);
         }
-        Atom atom = data.getData();
-        String newEtag = data.getEtag();
+        Atom atom = atomDataWithEtag.getData();
+        String newEtag = atomDataWithEtag.getEtag();
         // load the dataset from storage
         boolean isDeleted = (atom.getState() == AtomState.DELETED);
         Dataset dataset = isDeleted ? DatasetFactory.createGeneral() : atom.getDatatsetHolder().getDataset();
@@ -224,6 +232,10 @@ public class LinkedDataServiceImpl implements LinkedDataService {
         // add meta model to dataset
         dataset.addNamedModel(atomMetaInformationURI, metaModel);
         addBaseUriAndDefaultPrefixes(dataset);
+        if (logger.isDebugEnabled() && start != null) {
+            Instant finish = Instant.now();
+            logger.debug("getAtomDataset({}) took {}ms", atomUri, Duration.between(start, finish).toMillis());
+        }
         return new DataWithEtag<>(dataset, newEtag, etag, isDeleted);
     }
 
@@ -636,14 +648,6 @@ public class LinkedDataServiceImpl implements LinkedDataService {
                         deep);
     }
 
-    private Dataset setDefaults(Dataset dataset) {
-        if (dataset == null)
-            return null;
-        DefaultPrefixUtils.setDefaultPrefixes(dataset.getDefaultModel());
-        addBaseUriAndDefaultPrefixes(dataset);
-        return dataset;
-    }
-
     @Override
     @Transactional
     public DataWithEtag<Dataset> getDatasetForUri(URI datasetUri, String etag) {
@@ -689,12 +693,6 @@ public class LinkedDataServiceImpl implements LinkedDataService {
             targetModel.add(targetModel.createStatement(targetResource, WON.additionalData, additionalData));
             targetModel.add(fromModel);
         }
-    }
-
-    private String addPageQueryString(String uri, int page) {
-        // TODO: simple implementation for adding page number to uri - breaks as soon as
-        // other query strings are present!
-        return uri + "?page=" + page;
     }
 
     private void setNsPrefixes(final Model model) {
@@ -854,32 +852,12 @@ public class LinkedDataServiceImpl implements LinkedDataService {
         this.eventResourceURIPrefix = eventResourceURIPrefix;
     }
 
-    public void setDataURIPrefix(final String dataURIPrefix) {
-        this.dataURIPrefix = dataURIPrefix;
-    }
-
     public void setResourceURIPrefix(final String resourceURIPrefix) {
         this.resourceURIPrefix = resourceURIPrefix;
     }
 
     public void setAtomInformationService(final AtomInformationService atomInformationService) {
         this.atomInformationService = atomInformationService;
-    }
-
-    public void setAtomProtocolEndpoint(final String atomProtocolEndpoint) {
-        this.atomProtocolEndpoint = atomProtocolEndpoint;
-    }
-
-    public void setMatcherProtocolEndpoint(final String matcherProtocolEndpoint) {
-        this.matcherProtocolEndpoint = matcherProtocolEndpoint;
-    }
-
-    public void setOwnerProtocolEndpoint(final String ownerProtocolEndpoint) {
-        this.ownerProtocolEndpoint = ownerProtocolEndpoint;
-    }
-
-    public void setPageURIPrefix(final String pageURIPrefix) {
-        this.pageURIPrefix = pageURIPrefix;
     }
 
     public void setUriService(URIService uriService) {
@@ -925,24 +903,99 @@ public class LinkedDataServiceImpl implements LinkedDataService {
     private Dataset getFilteredAtomURIListDataset(Model model, Collection<URI> uris, URI filterSocketTypeUri,
                     URI filterAtomTypeUri) {
         Resource atomListPageResource = model.createResource(this.atomResourceURIPrefix + "/");
+        Instant start = logger.isDebugEnabled() ? Instant.now() : null;
         if (filterSocketTypeUri == null && filterAtomTypeUri == null) {
             uris.forEach(atomURI -> model.add(model.createStatement(atomListPageResource, RDFS.member,
                             model.createResource(atomURI.toString()))));
         } else {
             uris.forEach(atomURI -> {
-                DataWithEtag<Dataset> dataWithEtag = getAtomDataset(atomURI, null);
-                DefaultAtomModelWrapper atomModelWrapper = new DefaultAtomModelWrapper(dataWithEtag.getData());
-                if ((filterSocketTypeUri == null
-                                || atomModelWrapper.getSocketTypeUriMap().containsValue(filterSocketTypeUri))
-                                && (filterAtomTypeUri == null
-                                                || atomModelWrapper.getContentTypes().contains(filterAtomTypeUri))) {
+                Dataset atomDataset = getAtomDatasetForFilter(atomURI);
+                DefaultAtomModelWrapper atomModelWrapper = new DefaultAtomModelWrapper(atomDataset);
+                if ((filterSocketTypeUri == null ||
+                                atomModelWrapper.getSocketTypeUriMap().containsValue(filterSocketTypeUri)) &&
+                                (filterAtomTypeUri == null ||
+                                                atomModelWrapper.getContentTypes().contains(filterAtomTypeUri))) {
                     model.add(model.createStatement(atomListPageResource, RDFS.member,
                                     model.createResource(atomURI.toString())));
                 }
             });
+            // Parallel Approach 1:
+            // The parallel Approach leads to LazyInitializationException due to the lazy
+            // fetch of the Atom, and thus cant be used
+            // for now, TODO: FIGURE OUT A DIFFERENT APPROACH TO MAKE PARALLEL PROCESSING
+            // POSSIBLE OR TO ENHANCE THE PERFORMANCE
+            //
+            // uris.parallelStream().filter(atomURI -> {
+            // Dataset atomDataset = getAtomDatasetForFilter(atomURI);
+            // DefaultAtomModelWrapper atomModelWrapper = new
+            // DefaultAtomModelWrapper(atomDataset);
+            // return (filterSocketTypeUri == null
+            // || atomModelWrapper.getSocketTypeUriMap().containsValue(filterSocketTypeUri))
+            // && (filterAtomTypeUri == null
+            // || atomModelWrapper.getContentTypes().contains(filterAtomTypeUri));
+            // }).collect(Collectors.toList()).forEach(atomURI ->
+            // model.add(model.createStatement(atomListPageResource,
+            // RDFS.member, model.createResource(atomURI.toString()))));
         }
         Dataset ret = newDatasetWithNamedModel(createDataGraphUriFromResource(atomListPageResource), model);
         addBaseUriAndDefaultPrefixes(ret);
+        if (logger.isDebugEnabled() && start != null) {
+            Instant finish = Instant.now();
+            logger.debug("getFilteredAtomURIListDataset for {} Uris took {}ms", uris.size(),
+                            Duration.between(start, finish).toMillis());
+        }
         return ret;
+    }
+
+    @Transactional
+    @Override
+    public Dataset getAtomDatasetForFilter(final URI atomUri) {
+        Instant start = logger.isDebugEnabled() ? Instant.now() : null;
+        DataWithEtag<Atom> atomDataWithEtag;
+        try {
+            atomDataWithEtag = atomInformationService.readAtom(atomUri, null);
+        } catch (NoSuchAtomException e) {
+            if (logger.isDebugEnabled() && start != null) {
+                Instant finish = Instant.now();
+                logger.debug("getAtomDatasetForfilter({}) took {}ms", atomUri,
+                                Duration.between(start, finish).toMillis());
+            }
+            return null;
+        }
+        if (atomDataWithEtag.isNotFound()) {
+            if (logger.isDebugEnabled() && start != null) {
+                Instant finish = Instant.now();
+                logger.debug("getAtomDatasetForfilter({}) took {}ms", atomUri,
+                                Duration.between(start, finish).toMillis());
+            }
+            return null;
+        }
+        Atom atom = atomDataWithEtag.getData();
+        // load the dataset from storage
+        boolean isDeleted = (atom.getState() == AtomState.DELETED);
+        Dataset dataset = isDeleted ? DatasetFactory.createGeneral() : atom.getDatatsetHolder().getDataset();
+        Model metaModel = atomModelMapper.toModel(atom);
+        Resource atomResource = metaModel.getResource(atomUri.toString());
+        String atomMetaInformationURI = uriService.createAtomSysInfoGraphURI(atomUri).toString();
+        Resource atomMetaInformationResource = metaModel.getResource(atomMetaInformationURI);
+        // link atomMetaInformationURI to atom via rdfg:subGraphOf
+        atomMetaInformationResource.addProperty(RDFG.SUBGRAPH_OF, atomResource);
+        // add WON node link
+        atomResource.addProperty(WON.wonNode, metaModel.createResource(this.resourceURIPrefix));
+        // link all atom graphs taken from the create message to atom uri:
+        Iterator<String> namesIt = dataset.listNames();
+        while (namesIt.hasNext()) {
+            String name = namesIt.next();
+            Resource atomGraphResource = metaModel.getResource(name);
+            atomResource.addProperty(WON.contentGraph, atomGraphResource);
+        }
+        // add meta model to dataset
+        dataset.addNamedModel(atomMetaInformationURI, metaModel);
+        addBaseUriAndDefaultPrefixes(dataset);
+        if (logger.isDebugEnabled() && start != null) {
+            Instant finish = Instant.now();
+            logger.debug("getAtomDatasetForfilter({}) took {}ms", atomUri, Duration.between(start, finish).toMillis());
+        }
+        return dataset;
     }
 }

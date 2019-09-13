@@ -52,17 +52,11 @@ public class WonNodeInfo {
     }
 
     public Set<String> getSupportedProtocolImpls() {
-        Set<String> protocols = new HashSet<>();
-        protocols.addAll(supportedProtocolImpl.keySet());
-        return protocols;
+        return new HashSet<>(supportedProtocolImpl.keySet());
     }
 
     public Set<String> getSupportedProtocolImplParams(String protocol) {
-        Set<String> protocols = new HashSet<>();
         Map<String, String> protocolMap = supportedProtocolImpl.get(protocol);
-        if (protocolMap != null) {
-            protocols.addAll(protocolMap.keySet());
-        }
         return protocolMap.keySet();
     }
 

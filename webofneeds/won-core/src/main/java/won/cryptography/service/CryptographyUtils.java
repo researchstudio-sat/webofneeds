@@ -1,10 +1,9 @@
 package won.cryptography.service;
 
-import java.security.KeyStore;
-
-import javax.crypto.Cipher;
-import javax.net.ssl.SSLContext;
-
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Ehcache;
+import net.sf.ehcache.Element;
 import org.apache.http.client.HttpClient;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.impl.client.HttpClients;
@@ -14,12 +13,11 @@ import org.apache.http.ssl.SSLContexts;
 import org.apache.http.ssl.TrustStrategy;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
-
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Ehcache;
-import net.sf.ehcache.Element;
 import won.cryptography.ssl.PredefinedAliasPrivateKeyStrategy;
+
+import javax.crypto.Cipher;
+import javax.net.ssl.SSLContext;
+import java.security.KeyStore;
 
 /**
  * User: fsalcher Date: 12.06.2014
@@ -59,7 +57,7 @@ public class CryptographyUtils {
                     final TrustStrategy trustStrategy) throws Exception {
         String cacheKey = keyStrategy.getAlias();
         Element cacheElement = ehcache.get(cacheKey);
-        SSLContext sslContext = null;
+        SSLContext sslContext;
         if (cacheElement == null) {
             // we want to avoid creating the sslContext multiple times, so we snychronize on
             // an object shared by all threads:
@@ -102,14 +100,13 @@ public class CryptographyUtils {
                         .setSSLSocketFactory(sslConnectionSocketFactory).build();
         HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
         if (readTimeout != null) {
-            requestFactory.setReadTimeout(readTimeout.intValue());
+            requestFactory.setReadTimeout(readTimeout);
         }
         if (connectionTimeout != null) {
-            requestFactory.setConnectTimeout(connectionTimeout.intValue());
+            requestFactory.setConnectTimeout(connectionTimeout);
         }
         requestFactory.setHttpClient(httpClient);
-        RestTemplate restTemplate = new RestTemplate(requestFactory);
-        return restTemplate;
+        return new RestTemplate(requestFactory);
     }
 
     public static RestTemplate createSslRestTemplate(TrustStrategy trustStrategy, final Integer readTimeout,
@@ -124,13 +121,12 @@ public class CryptographyUtils {
                         .setSSLSocketFactory(sslConnectionSocketFactory).build();
         HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
         if (readTimeout != null) {
-            requestFactory.setReadTimeout(readTimeout.intValue());
+            requestFactory.setReadTimeout(readTimeout);
         }
         if (connectionTimeout != null) {
-            requestFactory.setConnectTimeout(connectionTimeout.intValue());
+            requestFactory.setConnectTimeout(connectionTimeout);
         }
         requestFactory.setHttpClient(httpClient);
-        RestTemplate restTemplate = new RestTemplate(requestFactory);
-        return restTemplate;
+        return new RestTemplate(requestFactory);
     }
 }

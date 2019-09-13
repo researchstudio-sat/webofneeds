@@ -14,7 +14,7 @@ public class SocketDefinitionImpl implements SocketDefinition {
     private Set<URI> compatibleSocketTypes = new HashSet<>();
     private Optional<Boolean> autoOpen = Optional.empty();
     private Optional<Integer> capacity = Optional.empty();
-    private Set<URI> inconsistentProperties = new HashSet<URI>();
+    private Set<URI> inconsistentProperties = new HashSet<>();
 
     public SocketDefinitionImpl(URI socketURI) {
         this.socketURI = socketURI;

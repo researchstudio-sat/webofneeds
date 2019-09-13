@@ -1,14 +1,13 @@
 package won.protocol.message;
 
-import java.io.IOException;
-
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.Query;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
 import won.protocol.validation.WonSparqlValidator;
+
+import java.io.IOException;
 
 /**
  * User: ypanchenko Date: 02.06.2015
@@ -42,7 +41,7 @@ public class WonSparqlValidatorTest {
     public void testAskConstraintOnInvalidDataset() throws IOException {
         WonSparqlValidator validator = new WonSparqlValidator(askConstraint);
         boolean valid = validator.validate(createMessageDatasetInvalid).isValid();
-        Assert.assertTrue(!valid);
+        Assert.assertFalse(valid);
     }
 
     @Test
@@ -56,6 +55,6 @@ public class WonSparqlValidatorTest {
     public void testSelectConstraintOnInvalidDataset() throws IOException {
         WonSparqlValidator validator = new WonSparqlValidator(selectConstraint);
         boolean valid = validator.validate(createMessageDatasetInvalid).isValid();
-        Assert.assertTrue(!valid);
+        Assert.assertFalse(valid);
     }
 }

@@ -37,7 +37,7 @@ public class WonSigner {
     public static final String ENV_HASH_ALGORITHM = "sha-256";
     private SignatureAlgorithmInterface algorithm;
     private Dataset dataset;
-    public static final Model defaultGraphSigningMethod;
+    private static final Model defaultGraphSigningMethod;
     static {
         // initialize a model with the triples indicating the default graph signing
         // method, so we are not
@@ -90,7 +90,7 @@ public class WonSigner {
             GraphCollection inputGraph = ModelConverter.modelToGraphCollection(signedGraphUri, dataset);
             // sign the NamedGraph inside that GraphCollection
             SignatureData sigValue = signNamedGraph(inputGraph, privateKey, cert);
-            String hash = new String(Base64.getEncoder().encodeToString(sigValue.getHash().toByteArray()));
+            String hash = Base64.getEncoder().encodeToString(sigValue.getHash().toByteArray());
             WonSignatureData sigRef = new WonSignatureData(signedGraphUri, signatureUri, sigValue.getSignature(), hash,
                             fingerprint, cert);
             sigRefs.add(sigRef);

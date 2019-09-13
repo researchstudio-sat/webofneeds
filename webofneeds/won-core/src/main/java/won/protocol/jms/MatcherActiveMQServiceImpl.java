@@ -30,7 +30,7 @@ import java.util.Set;
  */
 public class MatcherActiveMQServiceImpl extends ActiveMQServiceImpl implements MatcherActiveMQService {
     private List<String> matcherProtocolTopicList;
-    private String pathInformation;
+    // private String pathInformation;
     private static final String PATH_MATCHER_PROTOCOL_OUT_ATOM_CREATED = "<" + WON.supportsWonProtocolImpl + ">/<"
                     + WON.atomCreatedTopic + ">";
     private static final String PATH_MATCHER_PROTOCOL_OUT_ATOM_ACTIVATED = "<" + WON.supportsWonProtocolImpl + ">/<"
@@ -52,9 +52,9 @@ public class MatcherActiveMQServiceImpl extends ActiveMQServiceImpl implements M
 
     public final Set<String> getMatcherProtocolTopicNamesWithResource(URI resourceURI) {
         Set<String> activeMQMatcherProtocolTopicNames = new HashSet<>();
-        for (int i = 0; i < matcherProtocolTopicList.size(); i++) {
+        for (String s : matcherProtocolTopicList) {
             try {
-                Path path = PathParser.parse(matcherProtocolTopicList.get(i), PrefixMapping.Standard);
+                Path path = PathParser.parse(s, PrefixMapping.Standard);
                 activeMQMatcherProtocolTopicNames.add(RdfUtils.getStringPropertyForPropertyPath(
                                 linkedDataSource.getDataForResource(resourceURI), resourceURI, path));
             } catch (HttpClientErrorException e) {

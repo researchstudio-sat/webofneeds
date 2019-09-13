@@ -1,11 +1,5 @@
 package won.cryptography.utils;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
-
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
@@ -16,6 +10,8 @@ import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.io.*;
 
 /**
  * User: ypanchenko Date: 15.07.2014
@@ -42,7 +38,6 @@ public class JenaBnodeInDatasetTest {
         RDFDataMgr.write(os, dataset, RDFFormat.TRIG_BLOCKS);
         os.close();
         InputStream is2 = new FileInputStream(outFile);
-        ;
         Dataset dataset2 = DatasetFactory.createGeneral();
         RDFDataMgr.read(dataset2, is2, RDFFormat.TRIG.getLang());
         is2.close();

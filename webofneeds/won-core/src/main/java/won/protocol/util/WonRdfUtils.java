@@ -1,46 +1,10 @@
 package won.protocol.util;
 
-import static won.protocol.util.RdfUtils.findOnePropertyFromResource;
-import static won.protocol.util.RdfUtils.findOrCreateBaseResource;
-import static won.protocol.util.RdfUtils.visit;
-
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.graph.Triple;
-import org.apache.jena.query.Dataset;
-import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.query.QueryFactory;
-import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.QuerySolutionMap;
-import org.apache.jena.query.ResultSet;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.rdf.model.NodeIterator;
-import org.apache.jena.rdf.model.Property;
-import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.ResIterator;
-import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.Statement;
-import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.query.*;
+import org.apache.jena.rdf.model.*;
 import org.apache.jena.rdf.model.impl.PropertyImpl;
 import org.apache.jena.rdf.model.impl.ResourceImpl;
 import org.apache.jena.riot.Lang;
@@ -62,7 +26,6 @@ import org.apache.jena.vocabulary.RDF;
 import org.hibernate.cfg.NotYetImplementedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import won.protocol.exception.IncorrectPropertyCountException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageDirection;
@@ -72,14 +35,16 @@ import won.protocol.model.ConnectionState;
 import won.protocol.model.SocketDefinitionImpl;
 import won.protocol.service.WonNodeInfo;
 import won.protocol.service.WonNodeInfoBuilder;
-import won.protocol.util.RdfUtils.Pair;
-import won.protocol.vocabulary.SCHEMA;
-import won.protocol.vocabulary.SFSIG;
-import won.protocol.vocabulary.WON;
-import won.protocol.vocabulary.WONAGR;
-import won.protocol.vocabulary.WONCON;
-import won.protocol.vocabulary.WONMOD;
-import won.protocol.vocabulary.WONMSG;
+import won.protocol.util.RdfUtils.*;
+import won.protocol.vocabulary.*;
+
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static won.protocol.util.RdfUtils.*;
 
 /**
  * Utilities for populating/manipulating the RDF models used throughout the WON
@@ -178,56 +143,53 @@ public class WonRdfUtils {
         public static WonNodeInfo getWonNodeInfo(final URI wonNodeUri, Dataset dataset) {
             assert wonNodeUri != null : "wonNodeUri must not be null";
             assert dataset != null : "dataset must not be null";
-            return RdfUtils.findFirst(dataset, new RdfUtils.ModelVisitor<WonNodeInfo>() {
-                @Override
-                public WonNodeInfo visit(final Model model) {
-                    // use the first blank node found for [wonNodeUri]
-                    // won:hasUriPatternSpecification [blanknode]
-                    NodeIterator it = model.listObjectsOfProperty(model.getResource(wonNodeUri.toString()),
-                                    WON.uriPrefixSpecification);
-                    if (!it.hasNext())
-                        return null;
-                    WonNodeInfoBuilder wonNodeInfoBuilder = new WonNodeInfoBuilder();
-                    wonNodeInfoBuilder.setWonNodeURI(wonNodeUri.toString());
-                    RDFNode node = it.next();
-                    // set the URI prefixes
-                    it = model.listObjectsOfProperty(node.asResource(), WON.atomUriPrefix);
-                    if (!it.hasNext())
-                        return null;
-                    String atomUriPrefix = it.next().asLiteral().getString();
-                    wonNodeInfoBuilder.setAtomURIPrefix(atomUriPrefix);
-                    it = model.listObjectsOfProperty(node.asResource(), WON.connectionUriPrefix);
-                    if (!it.hasNext())
-                        return null;
-                    wonNodeInfoBuilder.setConnectionURIPrefix(it.next().asLiteral().getString());
-                    it = model.listObjectsOfProperty(node.asResource(), WON.eventUriPrefix);
-                    if (!it.hasNext())
-                        return null;
-                    wonNodeInfoBuilder.setEventURIPrefix(it.next().asLiteral().getString());
-                    // set the atom list URI
-                    it = model.listObjectsOfProperty(model.getResource(wonNodeUri.toString()), WON.atomList);
-                    if (it.hasNext()) {
-                        wonNodeInfoBuilder.setAtomListURI(it.next().asNode().getURI());
-                    } else {
-                        wonNodeInfoBuilder.setAtomListURI(atomUriPrefix);
+            return RdfUtils.findFirst(dataset, model -> {
+                // use the first blank node found for [wonNodeUri]
+                // won:hasUriPatternSpecification [blanknode]
+                NodeIterator it = model.listObjectsOfProperty(model.getResource(wonNodeUri.toString()),
+                                WON.uriPrefixSpecification);
+                if (!it.hasNext())
+                    return null;
+                WonNodeInfoBuilder wonNodeInfoBuilder = new WonNodeInfoBuilder();
+                wonNodeInfoBuilder.setWonNodeURI(wonNodeUri.toString());
+                RDFNode node = it.next();
+                // set the URI prefixes
+                it = model.listObjectsOfProperty(node.asResource(), WON.atomUriPrefix);
+                if (!it.hasNext())
+                    return null;
+                String atomUriPrefix = it.next().asLiteral().getString();
+                wonNodeInfoBuilder.setAtomURIPrefix(atomUriPrefix);
+                it = model.listObjectsOfProperty(node.asResource(), WON.connectionUriPrefix);
+                if (!it.hasNext())
+                    return null;
+                wonNodeInfoBuilder.setConnectionURIPrefix(it.next().asLiteral().getString());
+                it = model.listObjectsOfProperty(node.asResource(), WON.eventUriPrefix);
+                if (!it.hasNext())
+                    return null;
+                wonNodeInfoBuilder.setEventURIPrefix(it.next().asLiteral().getString());
+                // set the atom list URI
+                it = model.listObjectsOfProperty(model.getResource(wonNodeUri.toString()), WON.atomList);
+                if (it.hasNext()) {
+                    wonNodeInfoBuilder.setAtomListURI(it.next().asNode().getURI());
+                } else {
+                    wonNodeInfoBuilder.setAtomListURI(atomUriPrefix);
+                }
+                // set the supported protocol implementations
+                String queryString = "SELECT ?protocol ?param ?value WHERE { ?a <%s> ?c. "
+                                + "?c <%s> ?protocol. ?c ?param ?value. FILTER ( ?value != ?protocol ) }";
+                queryString = String.format(queryString, WON.supportsWonProtocolImpl.toString(),
+                                RDF.getURI() + "type");
+                Query protocolQuery = QueryFactory.create(queryString);
+                try (QueryExecution qexec = QueryExecutionFactory.create(protocolQuery, model)) {
+                    ResultSet rs = qexec.execSelect();
+                    while (rs.hasNext()) {
+                        QuerySolution qs = rs.nextSolution();
+                        String protocol = rdfNodeToString(qs.get("protocol"));
+                        String param = rdfNodeToString(qs.get("param"));
+                        String value = rdfNodeToString(qs.get("value"));
+                        wonNodeInfoBuilder.addSupportedProtocolImplParamValue(protocol, param, value);
                     }
-                    // set the supported protocol implementations
-                    String queryString = "SELECT ?protocol ?param ?value WHERE { ?a <%s> ?c. "
-                                    + "?c <%s> ?protocol. ?c ?param ?value. FILTER ( ?value != ?protocol ) }";
-                    queryString = String.format(queryString, WON.supportsWonProtocolImpl.toString(),
-                                    RDF.getURI() + "type");
-                    Query protocolQuery = QueryFactory.create(queryString);
-                    try (QueryExecution qexec = QueryExecutionFactory.create(protocolQuery, model)) {
-                        ResultSet rs = qexec.execSelect();
-                        while (rs.hasNext()) {
-                            QuerySolution qs = rs.nextSolution();
-                            String protocol = rdfNodeToString(qs.get("protocol"));
-                            String param = rdfNodeToString(qs.get("param"));
-                            String value = rdfNodeToString(qs.get("value"));
-                            wonNodeInfoBuilder.addSupportedProtocolImplParamValue(protocol, param, value);
-                        }
-                        return wonNodeInfoBuilder.build();
-                    }
+                    return wonNodeInfoBuilder.build();
                 }
             });
         }
@@ -689,18 +651,6 @@ public class WonRdfUtils {
             return null;
         }
 
-        private static RDFNode getTextMessageForResource(Dataset dataset, URI uri) {
-            if (uri == null)
-                return null;
-            return RdfUtils.findFirstPropertyFromResource(dataset, uri, WONCON.text);
-        }
-
-        private static RDFNode getTextMessageForResource(Dataset dataset, Resource resource) {
-            if (resource == null)
-                return null;
-            return RdfUtils.findFirstPropertyFromResource(dataset, resource, WONCON.text);
-        }
-
         public static WonMessage copyByDatasetSerialization(final WonMessage toWrap) {
             return new WonMessage(RdfUtils.readDatasetFromString(
                             RdfUtils.writeDatasetToString(toWrap.getCompleteDataset(), Lang.TRIG), Lang.TRIG));
@@ -745,21 +695,19 @@ public class WonRdfUtils {
          * the dataset.
          * 
          * @param dataset
-         * @param leftAtom
-         * @param rightAtom
+         * @param firstAtom
+         * @param secondAtom
          * @return
          */
         public static Set<Pair<URI>> getCompatibleSocketsForAtoms(Dataset dataset, URI firstAtom, URI secondAtom) {
             Set<URI> firstAtomSockets = getSocketsOfAtom(dataset, firstAtom);
             Set<URI> secondAtomSockets = getSocketsOfAtom(dataset, secondAtom);
             Set<Pair<URI>> ret = new HashSet<>();
-            firstAtomSockets.forEach(firstAtomSocket -> {
-                secondAtomSockets.forEach(secondAtomSocket -> {
-                    if (isSocketsCompatible(dataset, firstAtomSocket, secondAtomSocket)) {
-                        ret.add(new Pair(firstAtomSocket, secondAtomSocket));
-                    }
-                });
-            });
+            firstAtomSockets.forEach(firstAtomSocket -> secondAtomSockets.forEach(secondAtomSocket -> {
+                if (isSocketsCompatible(dataset, firstAtomSocket, secondAtomSocket)) {
+                    ret.add(new Pair(firstAtomSocket, secondAtomSocket));
+                }
+            }));
             return ret;
         }
 
@@ -767,13 +715,11 @@ public class WonRdfUtils {
             Set<URI> firstAtomSockets = getSocketsOfAtom(dataset, firstAtom);
             Set<URI> secondAtomSockets = getSocketsOfAtom(dataset, secondAtom);
             Set<Pair<URI>> ret = new HashSet<>();
-            firstAtomSockets.forEach(firstAtomSocket -> {
-                secondAtomSockets.forEach(secondAtomSocket -> {
-                    if (!isSocketsCompatible(dataset, firstAtomSocket, secondAtomSocket)) {
-                        ret.add(new Pair(firstAtomSocket, secondAtomSocket));
-                    }
-                });
-            });
+            firstAtomSockets.forEach(firstAtomSocket -> secondAtomSockets.forEach(secondAtomSocket -> {
+                if (!isSocketsCompatible(dataset, firstAtomSocket, secondAtomSocket)) {
+                    ret.add(new Pair(firstAtomSocket, secondAtomSocket));
+                }
+            }));
             return ret;
         }
 
@@ -894,7 +840,6 @@ public class WonRdfUtils {
          * Returns all sockets of the base resource of the given type.
          * 
          * @param model
-         * @param subject
          * @param socketType
          * @return
          */
@@ -965,7 +910,7 @@ public class WonRdfUtils {
          * 
          * @param model
          * @param subject
-         * @param boolean returnAnyIfNoDefaultFound
+         * @param returnAnyIfNoDefaultFound
          * @return
          */
         public static Optional<URI> getDefaultSocket(Model model, Resource subject, boolean returnAnyIfNoDefaultFound) {
@@ -1102,7 +1047,7 @@ public class WonRdfUtils {
                                                             : null)
                             .flatMap(def -> RdfUtils.getObjectStreamOfProperty(dataset, def,
                                             URI.create(WON.autoOpen.getURI()),
-                                            node -> node.isLiteral() ? (Boolean) node.asLiteral().getBoolean() : null))
+                                            node -> node.isLiteral() ? node.asLiteral().getBoolean() : null))
                             .collect(Collectors.toSet());
             if (autoOpens.size() > 1) {
                 socketConfiguration.addInconsistentProperty(URI.create(WON.autoOpen.getURI()));
@@ -1118,7 +1063,7 @@ public class WonRdfUtils {
                                                             : null)
                             .flatMap(def -> RdfUtils.getObjectStreamOfProperty(dataset, def,
                                             URI.create(WON.socketCapacity.getURI()),
-                                            node -> node.isLiteral() ? (Integer) node.asLiteral().getInt() : null))
+                                            node -> node.isLiteral() ? node.asLiteral().getInt() : null))
                             .collect(Collectors.toSet());
             if (socketCapacities.size() > 1) {
                 socketConfiguration.addInconsistentProperty(URI.create(WON.socketCapacity.getURI()));
@@ -1204,12 +1149,7 @@ public class WonRdfUtils {
          * @return <code>URI</code> which is of type won:Atom
          */
         public static URI getAtomURI(Dataset dataset) {
-            return RdfUtils.findOne(dataset, new RdfUtils.ModelVisitor<URI>() {
-                @Override
-                public URI visit(final Model model) {
-                    return getAtomURI(model);
-                }
-            }, true);
+            return RdfUtils.findOne(dataset, AtomUtils::getAtomURI, true);
         }
 
         /**
@@ -1239,15 +1179,15 @@ public class WonRdfUtils {
                 return null;
             else if (atomURIs.size() == 1)
                 return atomURIs.get(0);
-            else if (atomURIs.size() > 1) {
+            else {
+                atomURIs.size();
                 Resource u = atomURIs.get(0);
                 for (Resource uri : atomURIs) {
                     if (!uri.equals(u))
                         throw new IncorrectPropertyCountException(1, 2);
                 }
                 return u;
-            } else
-                return null;
+            }
         }
 
         /**
@@ -1299,7 +1239,7 @@ public class WonRdfUtils {
                                     NodeFactory.createURI(state.get().getURI().toString())));
                 }
                 return pattern;
-            }).map(pattern -> new OpBGP(pattern)).map(bgp -> new OpGraph(Var.alloc("g"), bgp)).reduce(Optional.empty(),
+            }).map(OpBGP::new).map(bgp -> new OpGraph(Var.alloc("g"), bgp)).reduce(Optional.empty(),
                             (union, pattern) -> {
                                 if (!union.isPresent()) {
                                     return Optional.of(pattern);

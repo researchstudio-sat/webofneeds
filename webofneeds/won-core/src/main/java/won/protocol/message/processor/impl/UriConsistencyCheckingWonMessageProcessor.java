@@ -101,11 +101,6 @@ public class UriConsistencyCheckingWonMessageProcessor implements WonMessageProc
                 }
                 break;
             case FROM_OWNER:
-                // local node should be a sender node
-                if (!localNode.equals(senderNode)) {
-                    throw new UriNodePathException(senderNode + " is expected to be " + localNode);
-                }
-                break;
             case FROM_SYSTEM:
                 // local node should be a sender node
                 if (!localNode.equals(senderNode)) {
@@ -129,7 +124,6 @@ public class UriConsistencyCheckingWonMessageProcessor implements WonMessageProc
             URI atomURI = WonRdfUtils.AtomUtils.getAtomURI(message.getCompleteDataset());
             checkNodeConformance(localNodeInfo, atomURI, null, null);
         }
-        return;
     }
 
     private void checkNodeConformance(final WonNodeInfo info, final URI atomURI, final URI connURI,
@@ -164,6 +158,5 @@ public class UriConsistencyCheckingWonMessageProcessor implements WonMessageProc
             throw new UriNodePathException(
                             "URI '" + uri + "' does not start with the expected prefix '" + expectedPrefix + "'");
         }
-        return;
     }
 }

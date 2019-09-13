@@ -1,5 +1,16 @@
 package won.cryptography.utils;
 
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.DatasetFactory;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.sparql.path.Path;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import won.cryptography.rdfsign.WonKeysReaderWriter;
+import won.cryptography.service.keystore.FileBasedKeyStoreService;
+import won.protocol.util.DefaultPrefixUtils;
+import won.protocol.util.linkeddata.LinkedDataSource;
+
 import java.io.File;
 import java.net.URI;
 import java.security.PublicKey;
@@ -8,23 +19,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.jena.query.Dataset;
-import org.apache.jena.query.DatasetFactory;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.sparql.path.Path;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-
-import won.cryptography.rdfsign.WonKeysReaderWriter;
-import won.cryptography.service.keystore.FileBasedKeyStoreService;
-import won.protocol.util.DefaultPrefixUtils;
-import won.protocol.util.linkeddata.LinkedDataSource;
-
 /**
  * User: ypanchenko Date: 12.04.2015
  */
 public class TestingDataSource implements LinkedDataSource {
-    Map<String, PublicKey> pubKeysMap = new HashMap<String, PublicKey>();
+    private final Map<String, PublicKey> pubKeysMap = new HashMap<>();
 
     public TestingDataSource() throws Exception {
         // load public keys:

@@ -14,7 +14,6 @@ import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.engine.spi.EntityEntry;
 import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.engine.spi.Status;
 import org.hibernate.event.spi.FlushEntityEvent;
 import org.hibernate.event.spi.FlushEntityEventListener;
 import org.hibernate.persister.entity.EntityPersister;
@@ -51,10 +50,6 @@ public class ParentAwareFlushEventListener implements FlushEntityEventListener {
                 event.getSession().save(parent);
             }
         }
-    }
-
-    private boolean deleted(FlushEntityEvent event) {
-        return event.getEntityEntry().getStatus() == Status.DELETED;
     }
 
     private boolean updated(FlushEntityEvent event) {

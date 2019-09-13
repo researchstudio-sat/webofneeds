@@ -1,47 +1,23 @@
 package won.protocol.message;
 
-import java.io.Serializable;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
-import org.apache.jena.query.Dataset;
-import org.apache.jena.query.DatasetFactory;
-import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.query.QueryFactory;
-import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.QuerySolutionMap;
-import org.apache.jena.query.ResultSet;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.rdf.model.NodeIterator;
-import org.apache.jena.rdf.model.Property;
-import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.ResIterator;
-import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.StmtIterator;
+import com.google.common.collect.Sets;
+import org.apache.jena.query.*;
+import org.apache.jena.rdf.model.*;
 import org.apache.jena.rdf.model.impl.ResourceImpl;
 import org.apache.jena.tdb.TDB;
 import org.apache.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.collect.Sets;
-
 import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.RDFG;
 import won.protocol.vocabulary.SFSIG;
 import won.protocol.vocabulary.WONMSG;
+
+import java.io.Serializable;
+import java.net.URI;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * Wraps an RDF dataset representing a WoN message.
@@ -195,8 +171,8 @@ public class WonMessage implements Serializable {
             return RdfUtils.cloneDataset(this.messageContent);
         } else {
             Dataset newMsgContent = DatasetFactory.createGeneral();
-            Iterator<String> modelNames = this.completeDataset.listNames();
-            List<String> envelopeGraphNames = getEnvelopeGraphURIs();
+            // Iterator<String> modelNames = this.completeDataset.listNames();
+            // List<String> envelopeGraphNames = getEnvelopeGraphURIs();
             List<String> contentGraphs = getContentGraphURIs();
             // add all models that are not envelope graphs or signature graphs to the
             // messageContent
@@ -253,7 +229,7 @@ public class WonMessage implements Serializable {
                                     envelopeGraphUri, this.messageURI);
                     continue;
                 }
-                String sigGraphUri = solution.getResource("attachmentSigGraphUri").getURI().toString();
+                // String sigGraphUri = solution.getResource("attachmentSigGraphUri").getURI();
                 String attachmentGraphUri = solution.getResource("attachmentGraphUri").getURI();
                 String attachmentSigGraphUri = solution.getResource("attachmentSigGraphUri").getURI();
                 String attachmentDestinationUri = solution.getResource("attachmentDestinationUri").getURI();
@@ -266,8 +242,6 @@ public class WonMessage implements Serializable {
                                 attachmentDataset);
                 newAttachmentHolders.add(attachmentHolder);
             }
-        } catch (Exception e) {
-            throw e;
         }
         this.attachmentHolders = newAttachmentHolders;
         return newAttachmentHolders;
@@ -303,14 +277,13 @@ public class WonMessage implements Serializable {
         if (this.envelopeGraphs != null)
             return this.envelopeGraphs;
         // initialize
-        List<Model> allEnvelopes = new ArrayList<Model>();
-        this.envelopeGraphNames = new ArrayList<String>();
-        this.contentGraphNames = new ArrayList<String>();
-        this.graphSignatures = new HashMap<String, Resource>();
-        URI currentMessageURI = null;
+        List<Model> allEnvelopes = new ArrayList<>();
+        this.envelopeGraphNames = new ArrayList<>();
+        this.contentGraphNames = new ArrayList<>();
+        this.graphSignatures = new HashMap<>();
         this.outerEnvelopeGraph = null;
-        Set<String> envelopesContainedInOthers = new HashSet<String>();
-        Set<String> allEnvelopeGraphNames = new HashSet<String>();
+        Set<String> envelopesContainedInOthers = new HashSet<>();
+        Set<String> allEnvelopeGraphNames = new HashSet<>();
         // iterate over named graphs
         Iterator<String> modelUriIterator = this.completeDataset.listNames();
         while (modelUriIterator.hasNext()) {
@@ -322,7 +295,7 @@ public class WonMessage implements Serializable {
                 this.envelopeGraphNames.add(envelopeGraphUri);
                 allEnvelopeGraphNames.add(envelopeGraphUri);
                 allEnvelopes.add(envelopeGraph);
-                currentMessageURI = findMessageUri(envelopeGraph, envelopeGraphUri);
+                URI currentMessageURI = findMessageUri(envelopeGraph, envelopeGraphUri);
                 // check if the envelope contains references to 'contained' envelopes and
                 // remember their names
                 List<String> containedEnvelopes = findContainedEnvelopeUris(envelopeGraph, envelopeGraphUri);
@@ -363,7 +336,7 @@ public class WonMessage implements Serializable {
         this.outerEnvelopeGraph = this.completeDataset.getNamedModel(outerEnvelopeUri);
         this.envelopeGraphs = allEnvelopes;
         return Collections.unmodifiableList(
-                        allEnvelopes.stream().map(m -> RdfUtils.cloneModel(m)).collect(Collectors.toList()));
+                        allEnvelopes.stream().map(RdfUtils::cloneModel).collect(Collectors.toList()));
     }
 
     private synchronized URI findMessageUri(final Model model, final String modelUri) {
@@ -631,18 +604,8 @@ public class WonMessage implements Serializable {
         return null;
     }
 
-    private synchronized URI getEnvelopeSubjectURIValue(Property property, RDFNode object) {
-        for (Model envelopeGraph : getEnvelopeGraphs()) {
-            URI val = RdfUtils.findFirstSubjectUri(envelopeGraph, property, object, true, true);
-            if (val != null) {
-                return val;
-            }
-        }
-        return null;
-    }
-
     private synchronized List<URI> getEnvelopePropertyURIValues(Property property) {
-        List<URI> values = new ArrayList<URI>();
+        List<URI> values = new ArrayList<>();
         Model currentEnvelope = getOuterEnvelopeGraph();
         URI currentEnvelopeUri = getOuterEnvelopeGraphURI();
         // TODO would make sense to order envelope graphs in order from container to

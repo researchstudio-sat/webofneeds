@@ -50,12 +50,10 @@ public class KeyPairService {
 
     // TODO make better api for curve support, and ideally also add RSA support...
     public KeyPair generateNewKeyPairInSecp384r1() {
-        KeyPair pair = keyPairGeneratorSecp384r1.generateKeyPair();
-        return pair;
+        return keyPairGeneratorSecp384r1.generateKeyPair();
     }
 
     public KeyPair generateNewKeyPairInBrainpoolp384r1() {
-        KeyPair pair = keyPairGeneratorBrainpoolp384r1.generateKeyPair();
-        return pair;
+        return keyPairGeneratorBrainpoolp384r1.generateKeyPair();
     }
 }

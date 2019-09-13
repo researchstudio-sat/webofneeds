@@ -74,7 +74,7 @@ public class WonSparqlValidator {
                     return new ValidationResult();
                 }
             }
-            while (result.hasNext()) {
+            if (result.hasNext()) {
                 Binding binding = result.nextBinding();
                 Node node = binding.get(SELECT_VALIDATION_VARIABLE);
                 if (node != null) {
@@ -110,10 +110,6 @@ public class WonSparqlValidator {
                             "No result obtained from query, there seems to be some problem with the constraint: "
                                             + constraint.toString(Syntax.syntaxSPARQL_11));
         }
-    }
-
-    private void printResult(final ResultSet result) {
-        System.out.println(ResultSetFormatter.asText(result));
     }
 
     private ValidationResult validateAsk(final Dataset input) {

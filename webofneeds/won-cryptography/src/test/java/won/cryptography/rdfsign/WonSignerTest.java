@@ -1,17 +1,16 @@
 package won.cryptography.rdfsign;
 
-import java.util.List;
-
 import org.apache.jena.query.Dataset;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-
 import won.cryptography.utils.TestSigningUtils;
 import won.cryptography.utils.TestingKeys;
 import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.SFSIG;
+
+import java.util.List;
 
 /**
  * User: ypanchenko Date: 14.07.2014
@@ -73,7 +72,7 @@ public class WonSignerTest {
         // sign it
         WonSigner signer = new WonSigner(testDataset);
         signer.sign(keys.getPrivateKey(TestSigningUtils.atomCertUri), TestSigningUtils.atomCertUri,
-                        keys.getPublicKey(TestSigningUtils.atomCertUri), new String[] { EVENT_ENV1_URI });
+                        keys.getPublicKey(TestSigningUtils.atomCertUri), EVENT_ENV1_URI);
         // write for debugging
         // TestSigningUtils.writeToTempFile(testDataset);
         // extract names of the named graphs
@@ -106,7 +105,7 @@ public class WonSignerTest {
         // sign it
         WonSigner signer = new WonSigner(testDataset);
         signer.sign(keys.getPrivateKey(TestSigningUtils.nodeCertUri), TestSigningUtils.nodeCertUri,
-                        keys.getPublicKey(TestSigningUtils.nodeCertUri), new String[] { EVENT_ENV2_URI });
+                        keys.getPublicKey(TestSigningUtils.nodeCertUri), EVENT_ENV2_URI);
         // write for debugging
         TestSigningUtils.writeToTempFile(testDataset);
         // verify

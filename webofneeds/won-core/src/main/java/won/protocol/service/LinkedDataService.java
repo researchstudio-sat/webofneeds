@@ -33,7 +33,7 @@ public interface LinkedDataService {
      *
      * @return
      */
-    public Dataset listAtomURIs();
+    Dataset listAtomURIs();
 
     /**
      * Returns a model containing all atom URIs with the given atomState.
@@ -41,7 +41,7 @@ public interface LinkedDataService {
      * @param atomState State that an atom needs to have to be included.
      * @return
      */
-    public Dataset listAtomURIs(AtomState atomState);
+    Dataset listAtomURIs(AtomState atomState);
 
     /**
      * Returns a model containing all atom URIs with the given atomState.
@@ -53,7 +53,7 @@ public interface LinkedDataService {
      * included
      * @return
      */
-    public Dataset listAtomURIs(AtomState atomState, URI filterBySocketTypeUri, URI filterByAtomTypeUri);
+    Dataset listAtomURIs(AtomState atomState, URI filterBySocketTypeUri, URI filterByAtomTypeUri);
 
     /**
      * Returns a model containing all atom URIs. If page >= 0, paging is used and
@@ -62,7 +62,7 @@ public interface LinkedDataService {
      * @param page
      * @return
      */
-    public AtomInformationService.PagedResource<Dataset, URI> listPagedAtomURIs(final int page);
+    AtomInformationService.PagedResource<Dataset, URI> listPagedAtomURIs(final int page);
 
     /**
      * Returns a model containing all atom URIs that are in the specified state. If
@@ -74,7 +74,7 @@ public interface LinkedDataService {
      * @param atomState
      * @return
      */
-    public AtomInformationService.PagedResource<Dataset, URI> listPagedAtomURIs(final int page,
+    AtomInformationService.PagedResource<Dataset, URI> listPagedAtomURIs(final int page,
                     final Integer preferedSize,
                     AtomState atomState);
 
@@ -84,7 +84,7 @@ public interface LinkedDataService {
      * @param atom
      * @return
      */
-    public AtomInformationService.PagedResource<Dataset, URI> listPagedAtomURIsBefore(final URI atom);
+    AtomInformationService.PagedResource<Dataset, URI> listPagedAtomURIsBefore(final URI atom);
 
     /**
      * Return all atom URIs that where created after the provided atom
@@ -92,7 +92,7 @@ public interface LinkedDataService {
      * @param atom
      * @return
      */
-    public AtomInformationService.PagedResource<Dataset, URI> listPagedAtomURIsAfter(final URI atom);
+    AtomInformationService.PagedResource<Dataset, URI> listPagedAtomURIsAfter(final URI atom);
 
     /**
      * Return all atom URIs that where created after the provided atom and that are
@@ -104,7 +104,7 @@ public interface LinkedDataService {
      * @param atomState
      * @return
      */
-    public AtomInformationService.PagedResource<Dataset, URI> listPagedAtomURIsBefore(final URI atom,
+    AtomInformationService.PagedResource<Dataset, URI> listPagedAtomURIsBefore(final URI atom,
                     final Integer preferedSize, AtomState atomState);
 
     /**
@@ -117,7 +117,7 @@ public interface LinkedDataService {
      * @param atomState
      * @return
      */
-    public AtomInformationService.PagedResource<Dataset, URI> listPagedAtomURIsAfter(final URI atom,
+    AtomInformationService.PagedResource<Dataset, URI> listPagedAtomURIsAfter(final URI atom,
                     final Integer preferedSize, AtomState atomState);
 
     /**
@@ -132,7 +132,7 @@ public interface LinkedDataService {
      * included
      * @return
      */
-    public Dataset listAtomURIsModifiedAfter(Date modifiedDate, AtomState atomState, URI filterBySocketTypeUri,
+    Dataset listAtomURIsModifiedAfter(Date modifiedDate, AtomState atomState, URI filterBySocketTypeUri,
                     URI filterByAtomTypeUri);
 
     /**
@@ -147,7 +147,7 @@ public interface LinkedDataService {
      * included
      * @return
      */
-    public Dataset listAtomURIsCreatedAfter(Date createdDate, AtomState atomState, URI filterBySocketTypeUri,
+    Dataset listAtomURIsCreatedAfter(Date createdDate, AtomState atomState, URI filterBySocketTypeUri,
                     URI filterByAtomTypeUri);
 
     /**
@@ -159,7 +159,7 @@ public interface LinkedDataService {
      * @throws NoSuchConnectionException only in case deep is set to true and
      * connection data for a member connection uri cannot be retrieved.
      */
-    public AtomInformationService.PagedResource<Dataset, Connection> listConnections(final boolean deep)
+    AtomInformationService.PagedResource<Dataset, Connection> listConnections(final boolean deep)
                     throws NoSuchConnectionException;
 
     /**
@@ -172,7 +172,7 @@ public interface LinkedDataService {
      * @return
      * @throws NoSuchConnectionException
      */
-    public AtomInformationService.PagedResource<Dataset, Connection> listModifiedConnectionsAfter(Date modifiedAfter,
+    AtomInformationService.PagedResource<Dataset, Connection> listModifiedConnectionsAfter(Date modifiedAfter,
                     boolean deep) throws NoSuchConnectionException;
 
     /**
@@ -188,7 +188,7 @@ public interface LinkedDataService {
      * @throws NoSuchAtomException
      * @throws NoSuchConnectionException
      */
-    public AtomInformationService.PagedResource<Dataset, Connection> listConnections(final int page,
+    AtomInformationService.PagedResource<Dataset, Connection> listConnections(final int page,
                     final Integer preferredSize, Date timeSpot, final boolean deep) throws NoSuchConnectionException;
 
     /**
@@ -209,7 +209,7 @@ public interface LinkedDataService {
      * @throws NoSuchConnectionException only in case deep is set to true and
      * connection data for a member connection uri cannot be retrieved.
      */
-    public AtomInformationService.PagedResource<Dataset, Connection> listConnectionsBefore(URI beforeConnURI,
+    AtomInformationService.PagedResource<Dataset, Connection> listConnectionsBefore(URI beforeConnURI,
                     final Integer preferredSize, Date timeSpot, final boolean deep) throws NoSuchConnectionException;
 
     /**
@@ -230,7 +230,7 @@ public interface LinkedDataService {
      * @throws NoSuchConnectionException only in case deep is set to true and
      * connection data for a member connection uri cannot be retrieved.
      */
-    public AtomInformationService.PagedResource<Dataset, Connection> listConnectionsAfter(URI afterConnURI,
+    AtomInformationService.PagedResource<Dataset, Connection> listConnectionsAfter(URI afterConnURI,
                     final Integer preferredSize, Date timeSpot, final boolean deep) throws NoSuchConnectionException;
 
     /**
@@ -244,7 +244,7 @@ public interface LinkedDataService {
      * @return
      * @throws NoSuchAtomException
      */
-    public AtomInformationService.PagedResource<Dataset, Connection> listConnections(final URI atomURI, boolean deep,
+    AtomInformationService.PagedResource<Dataset, Connection> listConnections(final URI atomURI, boolean deep,
                     final boolean addMetadata) throws NoSuchAtomException, NoSuchConnectionException;
 
     /**
@@ -267,7 +267,7 @@ public interface LinkedDataService {
      * @throws NoSuchConnectionException only in case deep is set to true and
      * connection data for a member connection uri cannot be retrieved.
      */
-    public AtomInformationService.PagedResource<Dataset, Connection> listConnections(int page, URI atomURI,
+    AtomInformationService.PagedResource<Dataset, Connection> listConnections(int page, URI atomURI,
                     Integer preferredSize, WonMessageType messageType, Date timeSpot, boolean deep, boolean addMetadata)
                     throws NoSuchAtomException, NoSuchConnectionException;
 
@@ -293,7 +293,7 @@ public interface LinkedDataService {
      * @throws NoSuchConnectionException only in case deep is set to true and
      * connection data for a member connection uri cannot be retrieved.
      */
-    public AtomInformationService.PagedResource<Dataset, Connection> listConnectionsBefore(URI atomURI,
+    AtomInformationService.PagedResource<Dataset, Connection> listConnectionsBefore(URI atomURI,
                     URI resumeConnURI, Integer preferredSize, WonMessageType messageType, Date timeSpot, boolean deep,
                     boolean addMetadata) throws NoSuchAtomException, NoSuchConnectionException;
 
@@ -319,7 +319,7 @@ public interface LinkedDataService {
      * @throws NoSuchConnectionException only in case deep is set to true and
      * connection data for a member connection uri cannot be retrieved.
      */
-    public AtomInformationService.PagedResource<Dataset, Connection> listConnectionsAfter(URI atomURI,
+    AtomInformationService.PagedResource<Dataset, Connection> listConnectionsAfter(URI atomURI,
                     URI resumeConnURI, Integer preferredSize, WonMessageType messageType, Date timeSpot, boolean deep,
                     boolean addMetadata) throws NoSuchAtomException, NoSuchConnectionException;
 
@@ -331,7 +331,9 @@ public interface LinkedDataService {
      * @param etag
      * @return dataset with etag describing the atom or null if not found
      */
-    public DataWithEtag<Dataset> getAtomDataset(final URI atomUri, String etag);
+    DataWithEtag<Dataset> getAtomDataset(final URI atomUri, String etag);
+
+    Dataset getAtomDatasetForFilter(final URI atomUri);
 
     /**
      * Returns a dataset describing the atom with the specified URI. If the atom is
@@ -345,7 +347,7 @@ public interface LinkedDataService {
      * @return
      * @throws NoSuchAtomException
      */
-    public Dataset getAtomDataset(final URI atomUri, final boolean deep, final Integer deepLayerSize)
+    Dataset getAtomDataset(final URI atomUri, final boolean deep, final Integer deepLayerSize)
                     throws NoSuchAtomException, NoSuchConnectionException, NoSuchMessageException;
 
     /**
@@ -369,7 +371,7 @@ public interface LinkedDataService {
      * @return
      * @throws NoSuchConnectionException
      */
-    public Dataset listConnectionEventURIs(final URI connectionUri, final boolean deep)
+    Dataset listConnectionEventURIs(final URI connectionUri, final boolean deep)
                     throws NoSuchConnectionException;
 
     /**
@@ -384,7 +386,7 @@ public interface LinkedDataService {
      * @return
      * @throws NoSuchConnectionException
      */
-    public AtomInformationService.PagedResource<Dataset, URI> listConnectionEventURIs(final URI connectionUri,
+    AtomInformationService.PagedResource<Dataset, URI> listConnectionEventURIs(final URI connectionUri,
                     final int pageNum, Integer preferedSize, WonMessageType messageType, boolean deep)
                     throws NoSuchConnectionException;
 
@@ -401,7 +403,7 @@ public interface LinkedDataService {
      * @return
      * @throws NoSuchConnectionException
      */
-    public AtomInformationService.PagedResource<Dataset, URI> listConnectionEventURIsAfter(final URI connectionUri,
+    AtomInformationService.PagedResource<Dataset, URI> listConnectionEventURIsAfter(final URI connectionUri,
                     final URI msgURI, Integer preferedSize, WonMessageType msgType, boolean deep)
                     throws NoSuchConnectionException;
 
@@ -418,11 +420,11 @@ public interface LinkedDataService {
      * @return
      * @throws NoSuchConnectionException
      */
-    public AtomInformationService.PagedResource<Dataset, URI> listConnectionEventURIsBefore(final URI connectionUri,
+    AtomInformationService.PagedResource<Dataset, URI> listConnectionEventURIsBefore(final URI connectionUri,
                     final URI msgURI, Integer preferedSize, WonMessageType msgType, boolean deep)
                     throws NoSuchConnectionException;
 
-    public Dataset getNodeDataset();
+    Dataset getNodeDataset();
 
     /**
      * returns a dataset of the (message) event with the specified URI, with a value
@@ -431,7 +433,7 @@ public interface LinkedDataService {
      *
      * @param eventURI
      */
-    public DataWithEtag<Dataset> getDatasetForUri(final URI eventURI, String etag);
+    DataWithEtag<Dataset> getDatasetForUri(final URI eventURI, String etag);
 
     /**
      * Returns a model specifying the number of messages and their latest and

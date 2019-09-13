@@ -35,7 +35,7 @@ public class KeyManagerWrapperWithKeyServiceAndStrategy implements X509KeyManage
                     final PrivateKeyStrategy aliasStrategy) {
         super();
         this.aliasStrategy = aliasStrategy;
-        KeyManagerFactory kmf = null;
+        KeyManagerFactory kmf;
         try {
             kmf = KeyManagerFactory.getInstance("SunX509");
             kmf.init(keyStoreService.getUnderlyingKeyStore(), keyStoreService.getPassword().toCharArray());
@@ -46,8 +46,7 @@ public class KeyManagerWrapperWithKeyServiceAndStrategy implements X509KeyManage
         KeyManager[] kms = kmf.getKeyManagers();
         if (kms != null) {
             if (aliasStrategy != null) {
-                for (int i = 0; i < kms.length; i++) {
-                    KeyManager km = kms[i];
+                for (KeyManager km : kms) {
                     if (km instanceof X509KeyManager) {
                         this.keyManager = (X509KeyManager) km;
                         return;
@@ -67,7 +66,7 @@ public class KeyManagerWrapperWithKeyServiceAndStrategy implements X509KeyManage
 
     @Override
     public String chooseClientAlias(final String[] keyTypes, final Principal[] issuers, final Socket socket) {
-        final Map<String, PrivateKeyDetails> validAliases = new HashMap<String, PrivateKeyDetails>();
+        final Map<String, PrivateKeyDetails> validAliases = new HashMap<>();
         for (final String keyType : keyTypes) {
             final String[] aliases = this.keyManager.getClientAliases(keyType, issuers);
             if (aliases != null) {
@@ -86,7 +85,7 @@ public class KeyManagerWrapperWithKeyServiceAndStrategy implements X509KeyManage
 
     @Override
     public String chooseServerAlias(final String keyType, final Principal[] issuers, final Socket socket) {
-        final Map<String, PrivateKeyDetails> validAliases = new HashMap<String, PrivateKeyDetails>();
+        final Map<String, PrivateKeyDetails> validAliases = new HashMap<>();
         final String[] aliases = this.keyManager.getServerAliases(keyType, issuers);
         if (aliases != null) {
             for (final String alias : aliases) {

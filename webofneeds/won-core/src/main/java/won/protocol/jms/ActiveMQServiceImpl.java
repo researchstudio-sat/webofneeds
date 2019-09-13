@@ -67,7 +67,7 @@ public class ActiveMQServiceImpl implements ActiveMQService {
 
     @Override
     public final String getProtocolQueueNameWithResource(URI resourceUri) {
-        String activeMQOwnerProtocolQueueName = null;
+        String activeMQOwnerProtocolQueueName;
         try {
             logger.debug("trying to get queue name prototol type {} on resource {}", protocolType, resourceUri);
             Path path = PathParser.parse(queueNamePath, PrefixMapping.Standard);
@@ -97,7 +97,7 @@ public class ActiveMQServiceImpl implements ActiveMQService {
     // todo: rename this method to getBrokerURIForNode
     public final URI getBrokerEndpoint(URI resourceUri) {
         logger.debug("obtaining broker URI for node {}", resourceUri);
-        URI activeMQEndpoint = null;
+        URI activeMQEndpoint;
         try {
             logger.debug("trying to get broker endpoint for {} on resource {}", protocolType, resourceUri);
             Path path = PathParser.parse(PATH_BROKER_URI, PrefixMapping.Standard);
@@ -129,9 +129,9 @@ public class ActiveMQServiceImpl implements ActiveMQService {
     public Set<String> getMatcherProtocolTopicNamesWithResource(URI resourceURI) {
         Set<String> activeMQMatcherProtocolTopicNames = new HashSet<>();
         resourceURI = URI.create(resourceURI.toString() + pathInformation);
-        for (int i = 0; i < matcherProtocolTopicList.size(); i++) {
+        for (String s : matcherProtocolTopicList) {
             try {
-                Path path = PathParser.parse(matcherProtocolTopicList.get(i), PrefixMapping.Standard);
+                Path path = PathParser.parse(s, PrefixMapping.Standard);
                 activeMQMatcherProtocolTopicNames.add(RdfUtils.getStringPropertyForPropertyPath(
                                 linkedDataSource.getDataForResource(resourceURI), resourceURI, path));
             } catch (HttpClientErrorException e) {

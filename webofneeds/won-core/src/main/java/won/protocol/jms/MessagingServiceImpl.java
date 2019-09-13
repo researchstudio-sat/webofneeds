@@ -83,7 +83,7 @@ public class MessagingServiceImpl<T> implements ApplicationContextAware, Messagi
     }
 
     public void inspectProperties(Exchange exchange) {
-        Map properties = (Map) exchange.getProperties();
+        Map properties = exchange.getProperties();
         Iterator iter = properties.entrySet().iterator();
         if (logger.isDebugEnabled()) {
             logger.debug("WIRETAP: properties size: " + properties.size());
@@ -99,7 +99,7 @@ public class MessagingServiceImpl<T> implements ApplicationContextAware, Messagi
     }
 
     public void inspectHeaders(Exchange exchange) {
-        Map headers = (Map) exchange.getIn().getHeaders();
+        Map headers = exchange.getIn().getHeaders();
         Iterator iter = headers.entrySet().iterator();
         if (logger.isDebugEnabled()) {
             logger.debug("WIRETAP: headers size: " + headers.size());

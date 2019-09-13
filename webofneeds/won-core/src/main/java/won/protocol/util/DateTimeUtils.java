@@ -1,22 +1,20 @@
 package won.protocol.util;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-
 import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.datatypes.xsd.XSDDateTime;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 
+import java.util.Calendar;
+import java.util.Date;
+
 /**
  * User: atus Date: 23.04.13
  */
 public class DateTimeUtils {
-    private static SimpleDateFormat sdf;
-    private static final String DATE_FORMAT_XSD_DATE_TIME_STAMP = "yyyy-MM-DD'T'hh:mm:ss.sssZ";
-
+    // private static final String DATE_FORMAT_XSD_DATE_TIME_STAMP =
+    // "yyyy-MM-DD'T'hh:mm:ss.sssZ";
     /**
      * Formats the date as xsd:dateTimeStamp (time stamp with timezone info).
      * 

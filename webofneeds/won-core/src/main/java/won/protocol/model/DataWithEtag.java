@@ -21,8 +21,8 @@ public class DataWithEtag<T> {
     private String etag;
     private String oldEtag;
     // if true indicates that the data was not found (as opposed to unchanged)
-    private boolean notFound = false;
-    private boolean isDeleted = false;
+    private boolean notFound;
+    private boolean isDeleted;
 
     public static DataWithEtag dataNotFound() {
         return new DataWithEtag(null, null, null, true, false);

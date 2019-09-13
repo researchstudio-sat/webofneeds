@@ -83,12 +83,12 @@ public enum SocketType {
     private String name;
     private String nsPrefix;;
 
-    private SocketType(String name) {
+    SocketType(String name) {
         this.name = name;
         this.nsPrefix = WON.DEFAULT_PREFIX;
     }
 
-    private SocketType(String prefix, String name) {
+    SocketType(String prefix, String name) {
         this(name);
         this.nsPrefix = prefix;
     }

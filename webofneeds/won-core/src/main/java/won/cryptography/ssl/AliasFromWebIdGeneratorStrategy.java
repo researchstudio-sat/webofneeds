@@ -1,11 +1,11 @@
 package won.cryptography.ssl;
 
+import won.cryptography.service.CertificateService;
+
 import java.net.URI;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.List;
-
-import won.cryptography.service.CertificateService;
 
 /**
  * User: ypanchenko Date: 19.10.2015
@@ -13,7 +13,7 @@ import won.cryptography.service.CertificateService;
 public class AliasFromWebIdGeneratorStrategy implements AliasGenerator {
     @Override
     public String generateAlias(final X509Certificate certificate) throws CertificateException {
-        String alias = null;
+        String alias;
         try {
             List<URI> webIds = CertificateService.getWebIdFromSubjectAlternativeNames(certificate);
             alias = webIds.get(0).toString();

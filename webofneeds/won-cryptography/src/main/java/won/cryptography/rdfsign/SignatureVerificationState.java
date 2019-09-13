@@ -10,22 +10,22 @@ import java.util.*;
 public class SignatureVerificationState {
     private Boolean verificationPassed = null;
     private String message = "";
-    private Map<String, List<String>> signedGraphNameToSignatureGraphName = new LinkedHashMap<>();
-    private Map<String, Boolean> signatureGraphNameToVerified = new HashMap<>();
-    private Map<String, String> signatureGraphNameToSignedGraphName = new HashMap<>();
-    private Map<String, String> signatureGraphNameToSignatureValue = new HashMap<>();
-    private List<WonSignatureData> signatures = new ArrayList<>();
+    private final Map<String, List<String>> signedGraphNameToSignatureGraphName = new LinkedHashMap<>();
+    private final Map<String, Boolean> signatureGraphNameToVerified = new HashMap<>();
+    private final Map<String, String> signatureGraphNameToSignedGraphName = new HashMap<>();
+    private final Map<String, String> signatureGraphNameToSignatureValue = new HashMap<>();
+    private final List<WonSignatureData> signatures = new ArrayList<>();
 
     public void addSignedGraphName(String signedGraphName) {
         if (!signedGraphNameToSignatureGraphName.containsKey(signedGraphName)) {
-            signedGraphNameToSignatureGraphName.put(signedGraphName, new ArrayList<String>());
+            signedGraphNameToSignatureGraphName.put(signedGraphName, new ArrayList<>());
         }
     }
 
     public void addSignatureData(WonSignatureData wonSignatureData) {
         signatures.add(wonSignatureData);
         if (!signedGraphNameToSignatureGraphName.containsKey(wonSignatureData.getSignedGraphUri())) {
-            signedGraphNameToSignatureGraphName.put(wonSignatureData.getSignedGraphUri(), new ArrayList<String>());
+            signedGraphNameToSignatureGraphName.put(wonSignatureData.getSignedGraphUri(), new ArrayList<>());
         }
         signatureGraphNameToSignedGraphName.put(wonSignatureData.getSignatureUri(),
                         wonSignatureData.getSignedGraphUri());
@@ -36,19 +36,19 @@ public class SignatureVerificationState {
     }
 
     public boolean isVerificationPassed() {
-        if (verificationPassed != null) {
-            return verificationPassed;
+        if (this.verificationPassed != null) {
+            return this.verificationPassed;
         }
         // check whether there is at least one signature for each non-signature graph
         for (String signedName : signedGraphNameToSignatureGraphName.keySet()) {
             if (signedGraphNameToSignatureGraphName.get(signedName).size() < 1) {
-                verificationPassed = false;
+                this.verificationPassed = false;
                 message = "No signatures found for " + signedName;
-                return verificationPassed;
+                return this.verificationPassed;
             }
         }
         verificationPassed = true;
-        return verificationPassed;
+        return this.verificationPassed;
     }
 
     public void setVerificationFailed(String signatureGraphName, String message) {

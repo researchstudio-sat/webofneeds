@@ -127,7 +127,7 @@ public class WonLinkedDataUtils {
         }
         Dataset atomListDataset = getDataForResource(atomListUri, linkedDataSource);
         return RdfUtils.visitFlattenedToList(atomListDataset, model -> {
-            StmtIterator it = model.listStatements((Resource) null, RDFS.member, (RDFNode) null);
+            StmtIterator it = model.listStatements(null, RDFS.member, (RDFNode) null);
             List<URI> ret = new ArrayList<>();
             while (it.hasNext()) {
                 ret.add(URI.create(it.next().getObject().toString()));
@@ -225,9 +225,8 @@ public class WonLinkedDataUtils {
     public static Dataset getDataForResource(final URI connectionURI, final LinkedDataSource linkedDataSource) {
         assert linkedDataSource != null : "linkedDataSource must not be null";
         assert connectionURI != null : "connection URI must not be null";
-        Dataset dataset = null;
         logger.debug("loading model for connection {}", connectionURI);
-        dataset = linkedDataSource.getDataForResource(connectionURI);
+        Dataset dataset = linkedDataSource.getDataForResource(connectionURI);
         if (dataset == null) {
             throw new IllegalStateException("failed to load model for Connection " + connectionURI);
         }
@@ -266,7 +265,7 @@ public class WonLinkedDataUtils {
             logger.debug("won:wonNode property of base resource {} is not a resource", baseResource);
             return null;
         }
-        URI wonNodeUri = URI.create(wonNodeNode.asResource().getURI().toString());
+        URI wonNodeUri = URI.create(wonNodeNode.asResource().getURI());
         logger.debug("obtained WON node URI: {}", wonNodeUri);
         if (wonNodeStatementIterator.hasNext()) {
             logger.warn("multiple WON node URIs found for resource {}, using first one: {} ", baseResource, wonNodeUri);
@@ -275,12 +274,7 @@ public class WonLinkedDataUtils {
     }
 
     public static URI getWonNodeURIForAtomOrConnection(final URI resourceURI, final Dataset resourceDataset) {
-        return RdfUtils.findFirst(resourceDataset, new RdfUtils.ModelVisitor<URI>() {
-            @Override
-            public URI visit(final Model model) {
-                return getWonNodeURIForAtomOrConnection(resourceURI, model);
-            }
-        });
+        return RdfUtils.findFirst(resourceDataset, model -> getWonNodeURIForAtomOrConnection(resourceURI, model));
     }
 
     /**
@@ -369,9 +363,7 @@ public class WonLinkedDataUtils {
     public static Dataset loadDataForAtomWithSocketDefinitions(LinkedDataSource linkedDataSource, URI atomURI) {
         Dataset dataset = linkedDataSource.getDataForResource(atomURI);
         Set<URI> sockets = WonRdfUtils.SocketUtils.getSocketsOfAtom(dataset, atomURI);
-        sockets.forEach(socket -> {
-            RdfUtils.addDatasetToDataset(dataset, loadDataForSocket(linkedDataSource, socket));
-        });
+        sockets.forEach(socket -> RdfUtils.addDatasetToDataset(dataset, loadDataForSocket(linkedDataSource, socket)));
         return dataset;
     }
 
@@ -464,8 +456,8 @@ public class WonLinkedDataUtils {
      * iterator of URIs.
      */
     private static class ModelFetchingIterator implements Iterator<Dataset> {
-        private Iterator<URI> uriIterator = null;
-        private LinkedDataSource linkedDataSource = null;
+        private Iterator<URI> uriIterator;
+        private LinkedDataSource linkedDataSource;
 
         private ModelFetchingIterator(final Iterator<URI> uriIterator, final LinkedDataSource linkedDataSource) {
             this.uriIterator = uriIterator;

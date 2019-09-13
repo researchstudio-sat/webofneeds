@@ -8,7 +8,7 @@ public enum MessagingType {
     Queue("Queue"), Topic("Topic");
     private String type;
 
-    private MessagingType(String type) {
+    MessagingType(String type) {
         this.type = type;
     }
 }

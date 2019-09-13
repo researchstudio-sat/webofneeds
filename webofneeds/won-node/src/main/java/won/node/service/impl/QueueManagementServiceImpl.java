@@ -10,16 +10,16 @@
  */
 package won.node.service.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import won.protocol.model.OwnerApplication;
 import won.protocol.repository.OwnerApplicationRepository;
 import won.protocol.service.QueueManagementService;
+
+import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * User: LEIH-NB Date: 13.11.13
@@ -27,15 +27,7 @@ import won.protocol.service.QueueManagementService;
 public class QueueManagementServiceImpl implements QueueManagementService {
     @Autowired
     private OwnerApplicationRepository ownerApplicationRepository;
-    final Logger logger = LoggerFactory.getLogger(getClass());
-    private String defaultUriScheme;
-    private String ownerProtocolComponentName;
-    private String matecherProtocolComponentName;
-    private String ownerProtocolMessagingType;
-    private String matcherProtocolMessagingType;
-    private String ownerProtocolOutgoingMessageName;
-    private String matcherProtocolOutgoingMessageName;
-    private List<String> queueNames;
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override
     public List<String> generateQueueNamesForOwnerApplication(OwnerApplication ownerApplication) {

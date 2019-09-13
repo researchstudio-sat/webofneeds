@@ -7,7 +7,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-
 import won.cryptography.utils.TestSigningUtils;
 import won.cryptography.utils.TestingKeys;
 
@@ -23,7 +22,7 @@ public class WonVerifierTest {
     private static final String EVENT_ENV1_SIG_URI = "http://localhost:8080/won/resource/event/7719577021233193000#data-sig";
     private static final String EVENT_ENV2_URI = "http://localhost:8080/won/resource/event/7719577021233193000#envelope-s7gl";
     private static final String EVENT_ENV2_SIG_URI = "http://localhost:8080/won/resource/event/7719577021233193000#envelope-s7gl-sig";
-    TestingKeys keys;
+    private TestingKeys keys;
 
     @Before
     public void init() throws Exception {
@@ -50,7 +49,7 @@ public class WonVerifierTest {
         verifier = new WonVerifier(testDataset);
         verified = verifier.verify(keys.getPublicKeys());
         result = verifier.getVerificationResult();
-        Assert.assertTrue(!verified);
+        Assert.assertFalse(verified);
         Assert.assertEquals(1, result.getSignatureGraphNames().size());
         Assert.assertEquals(ATOM_CORE_DATA_URI, result.getSignedGraphName(ATOM_CORE_DATA_SIG_URI));
         // add the removed statement back

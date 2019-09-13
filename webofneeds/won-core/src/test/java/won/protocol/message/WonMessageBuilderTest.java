@@ -10,7 +10,19 @@
  */
 package won.protocol.message;
 
-import static won.protocol.message.WonMessageBuilder.wrap;
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import com.google.common.collect.Iterators;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.DatasetFactory;
+import org.apache.jena.rdf.model.*;
+import org.apache.jena.vocabulary.RDF;
+import org.apache.jena.vocabulary.SKOS;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.slf4j.LoggerFactory;
+import won.protocol.util.RdfUtils;
 
 import java.net.URI;
 import java.util.HashSet;
@@ -18,27 +30,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.jena.query.Dataset;
-import org.apache.jena.query.DatasetFactory;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.Statement;
-import org.apache.jena.rdf.model.StmtIterator;
-import org.apache.jena.riot.Lang;
-import org.apache.jena.riot.RDFDataMgr;
-import org.apache.jena.vocabulary.RDF;
-import org.apache.jena.vocabulary.SKOS;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.collect.Iterators;
-
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.Logger;
-import won.protocol.util.RdfUtils;
+import static won.protocol.message.WonMessageBuilder.wrap;
 
 public class WonMessageBuilderTest {
     private static final URI MSG_URI_1 = URI.create("http://example.com/msg/1234");
@@ -48,9 +40,7 @@ public class WonMessageBuilderTest {
     private static final URI TYPE_URI_1 = URI.create("http://example.com/type/1");
     private static final URI TYPE_URI_2 = URI.create("http://example.com/type/2");
     private static final URI CONNECTION_URI_1 = URI.create("http://example.com/won/res/con/1");
-    private static final URI CONNECTION_URI_2 = URI.create("http://example.com/won/res/con/2");
     private static final URI ATOM_URI_1 = URI.create("http://example.com/atom/1");
-    private static final URI ATOM_URI_2 = URI.create("http://example.com/atom/2");
 
     @BeforeClass
     public static void setLogLevel() {
@@ -86,38 +76,32 @@ public class WonMessageBuilderTest {
     public void test_wrap_retains_content_graphs() {
         WonMessage msg2 = wrapMessage(createMessageWithContent().build()).build();
         Assert.assertEquals(MSG_URI_1.toString(),
-                        RdfUtils.findOne(msg2.getMessageContent(), new RdfUtils.ModelVisitor<String>() {
-                            @Override
-                            public String visit(final Model model) {
-                                StmtIterator it = model.listStatements(null, RDF.type,
-                                                model.getResource(TYPE_URI_1.toString()));
-                                if (it.hasNext())
-                                    return it.nextStatement().getSubject().asResource().toString();
-                                return null;
-                            }
+                        RdfUtils.findOne(msg2.getMessageContent(), model -> {
+                            StmtIterator it = model.listStatements(null, RDF.type,
+                                            model.getResource(TYPE_URI_1.toString()));
+                            if (it.hasNext())
+                                return it.nextStatement().getSubject().asResource().toString();
+                            return null;
                         }, false));
         Assert.assertEquals(TYPE_URI_1.toString(),
                         RdfUtils.findOnePropertyFromResource(msg2.getMessageContent(), MSG_URI_1, RDF.type).asResource()
-                                        .getURI().toString());
+                                        .getURI());
     }
 
     @Test
     public void test_wrap_allows_new_content_graphs() {
         WonMessage msg2 = addContentWithDifferentURI(wrapMessage(createMessageWithoutContent().build())).build();
         Assert.assertEquals(MSG_URI_2.toString(),
-                        RdfUtils.findOne(msg2.getMessageContent(), new RdfUtils.ModelVisitor<String>() {
-                            @Override
-                            public String visit(final Model model) {
-                                StmtIterator it = model.listStatements(null, RDF.type,
-                                                model.getResource(TYPE_URI_2.toString()));
-                                if (it.hasNext())
-                                    return it.nextStatement().getSubject().asResource().toString();
-                                return null;
-                            }
+                        RdfUtils.findOne(msg2.getMessageContent(), model -> {
+                            StmtIterator it = model.listStatements(null, RDF.type,
+                                            model.getResource(TYPE_URI_2.toString()));
+                            if (it.hasNext())
+                                return it.nextStatement().getSubject().asResource().toString();
+                            return null;
                         }, false));
         Assert.assertEquals(TYPE_URI_2.toString(),
                         RdfUtils.findOnePropertyFromResource(msg2.getMessageContent(), MSG_URI_2, RDF.type).asResource()
-                                        .getURI().toString());
+                                        .getURI());
     }
 
     @Test
@@ -164,7 +148,7 @@ public class WonMessageBuilderTest {
                         actualContentDataset.getDefaultModel().isEmpty());
         Assert.assertTrue("messageContent dataset of message with content has no named graphs",
                         actualContentDataset.listNames().hasNext());
-        Set<String> names = new HashSet<String>();
+        Set<String> names = new HashSet<>();
         Iterators.addAll(names, actualContentDataset.listNames());
         Assert.assertEquals("incorrect number of named graphs", names.size(), 1);
         Assert.assertTrue("content different from the expected content",
@@ -201,7 +185,7 @@ public class WonMessageBuilderTest {
         Dataset actualContentDataset = msg.getMessageContent();
         Assert.assertTrue("messageContent dataset of message with content has non-empty default graph",
                         actualContentDataset.getDefaultModel().isEmpty());
-        Set<String> names = new HashSet<String>();
+        Set<String> names = new HashSet<>();
         Iterators.addAll(names, actualContentDataset.listNames());
         Assert.assertEquals("incorrect number of named graphs", names.size(), 2);
         Assert.assertTrue("content different from the expected content",
@@ -214,7 +198,7 @@ public class WonMessageBuilderTest {
         Dataset actualContentDataset = msg.getMessageContent();
         Assert.assertTrue("messageContent dataset of message with content has non-empty default graph",
                         actualContentDataset.getDefaultModel().isEmpty());
-        Set<String> names = new HashSet<String>();
+        Set<String> names = new HashSet<>();
         Iterators.addAll(names, actualContentDataset.listNames());
         Assert.assertEquals("incorrect number of named graphs", names.size(), 2);
         RdfUtils.toNamedModelStream(actualContentDataset, false).forEach(namedModel -> {

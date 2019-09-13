@@ -73,8 +73,8 @@ public abstract class LinkedDataRestClient {
         // Model with MIME media type text/html,
         // it was probably the wrong resourceURI
         Dataset result;
-        int statusCode = -1;
-        HttpHeaders responseHeaders = null;
+        int statusCode;
+        HttpHeaders responseHeaders;
         try {
             HttpEntity entity = new HttpEntity(null, requestHeaders);
             ResponseEntity<Dataset> response = restTemplate.exchange(resourceURI, HttpMethod.GET, entity,

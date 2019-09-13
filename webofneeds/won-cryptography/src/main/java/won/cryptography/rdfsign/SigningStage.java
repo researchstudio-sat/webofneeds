@@ -1,23 +1,17 @@
 package won.cryptography.rdfsign;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.StmtIterator;
-
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonSignatureData;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.RDFG;
 import won.protocol.vocabulary.WONMSG;
+
+import java.util.*;
 
 /**
  * A helper class to represent the won message information such as which content
@@ -27,15 +21,15 @@ import won.protocol.vocabulary.WONMSG;
  * ypanchenko Date: 09.04.2015
  */
 public class SigningStage {
-    private Set<String> envUris = new HashSet<>();
-    private Set<String> contentUris = new HashSet<>();
-    private Map<String, String> contentUriToContainingItEnvUri = new HashMap<>();
-    private Map<String, String> envUriToContainedInItEnvUri = new HashMap<>();
-    private Map<String, String> graphUriToSigUri = new HashMap<>();
-    private Map<String, WonSignatureData> sigUriToSigReference = new HashMap<>();
-    private List<String> envOrderedByContainment = new ArrayList<>();
+    private final Set<String> envUris = new HashSet<>();
+    private final Set<String> contentUris = new HashSet<>();
+    private final Map<String, String> contentUriToContainingItEnvUri = new HashMap<>();
+    private final Map<String, String> envUriToContainedInItEnvUri = new HashMap<>();
+    private final Map<String, String> graphUriToSigUri = new HashMap<>();
+    private final Map<String, WonSignatureData> sigUriToSigReference = new HashMap<>();
+    private final List<String> envOrderedByContainment = new ArrayList<>();
     private String messageUri;
-    private Map<String, String> graphUriToItsMessageUri = new HashMap<>();
+    private final Map<String, String> graphUriToItsMessageUri = new HashMap<>();
     private String outermostSignatureUri = null;
 
     public SigningStage(WonMessage message) {

@@ -18,7 +18,7 @@ import won.protocol.model.OwnerApplication;
  * User: sbyim Date: 13.11.13
  */
 public interface QueueManagementService {
-    public List<String> generateQueueNamesForOwnerApplication(OwnerApplication ownerApplication);
+    List<String> generateQueueNamesForOwnerApplication(OwnerApplication ownerApplication);
 
-    public String getEndpointForMessage(String methodName, String ownerApplicationID);
+    String getEndpointForMessage(String methodName, String ownerApplicationID);
 }

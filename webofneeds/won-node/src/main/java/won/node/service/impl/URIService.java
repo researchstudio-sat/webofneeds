@@ -10,14 +10,13 @@
  */
 package won.node.service.impl;
 
+import org.springframework.beans.factory.InitializingBean;
+import won.protocol.model.Atom;
+import won.protocol.model.Connection;
+
 import java.net.URI;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.springframework.beans.factory.InitializingBean;
-
-import won.protocol.model.Connection;
-import won.protocol.model.Atom;
 
 /**
  * User: fkleedorfer Date: 06.11.12
@@ -181,7 +180,7 @@ public class URIService implements InitializingBean {
     }
 
     public URI createAtomURIForId(String id) {
-        return URI.create(atomResourceURIPrefix.toString() + "/" + id);
+        return URI.create(atomResourceURIPrefix + "/" + id);
     }
 
     public URI createConnectionsURIForAtom(URI atomURI) {
@@ -193,23 +192,23 @@ public class URIService implements InitializingBean {
     }
 
     public URI createConnectionURIForId(String id) {
-        return URI.create(connectionResourceURIPrefix.toString() + "/" + id);
+        return URI.create(connectionResourceURIPrefix + "/" + id);
     }
 
     public URI createEventURIForId(String id) {
-        return URI.create(eventResourceURIPrefix.toString() + "/" + id);
+        return URI.create(eventResourceURIPrefix + "/" + id);
     }
 
     public URI createAttachmentURIForId(String id) {
-        return URI.create(attachmentResourceURIPrefix.toString() + "/" + id);
+        return URI.create(attachmentResourceURIPrefix + "/" + id);
     }
 
     public URI createAtomURI(Atom atom) {
-        return URI.create(atomResourceURIPrefix.toString() + "/" + atom.getId());
+        return URI.create(atomResourceURIPrefix + "/" + atom.getId());
     }
 
     public URI createConnectionURI(Connection con) {
-        return URI.create(connectionResourceURIPrefix.toString() + "/" + con.getId());
+        return URI.create(connectionResourceURIPrefix + "/" + con.getId());
     }
 
     public void setAtomResourceURIPrefix(final String atomResourceURIPrefix) {
@@ -260,7 +259,7 @@ public class URIService implements InitializingBean {
      */
     public Long getEventIdFromEventURI(final URI eventURI) {
         String path = eventURI.getPath();
-        return new Long(path.substring(path.lastIndexOf("/") + 1, path.length()));
+        return new Long(path.substring(path.lastIndexOf("/") + 1));
     }
 
     public String getGeneralURIPrefix() {

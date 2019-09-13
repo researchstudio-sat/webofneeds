@@ -29,8 +29,8 @@ import java.security.cert.X509Certificate;
  * to.
  */
 public class CertificateCheckingBrokerFilter extends BrokerFilter {
-    private String queueNamePrefixToCheck;
-    private AliasGenerator aliasGenerator = new AliasFromFingerprintGenerator();
+    private final String queueNamePrefixToCheck;
+    private final AliasGenerator aliasGenerator = new AliasFromFingerprintGenerator();
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public CertificateCheckingBrokerFilter(final Broker next, String queueNamePrefixToCheck) {
@@ -43,7 +43,7 @@ public class CertificateCheckingBrokerFilter extends BrokerFilter {
         assert info != null : "ConsumerInfo must not be null";
         assert context != null : "ConnectionContext must not be null";
         if (shouldCheck(info)) {
-            boolean checkPassed = false;
+            boolean checkPassed;
             try {
                 checkPassed = isOwnerAllowedToConsume(context, info);
             } catch (Exception e) {
@@ -95,9 +95,6 @@ public class CertificateCheckingBrokerFilter extends BrokerFilter {
     }
 
     private boolean shouldCheck(final ConsumerInfo info) {
-        if (info.getDestination().getPhysicalName().indexOf(queueNamePrefixToCheck) == 0) {
-            return true;
-        }
-        return false;
+        return info.getDestination().getPhysicalName().indexOf(queueNamePrefixToCheck) == 0;
     }
 }

@@ -1,34 +1,12 @@
 package won.cryptography.rdfsign;
 
-import java.math.BigInteger;
-import java.security.KeyFactory;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.PublicKey;
-import java.security.spec.InvalidKeySpecException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.transaction.NotSupportedException;
-
 import org.apache.jena.query.Dataset;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.rdf.model.NodeIterator;
-import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.Statement;
-import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.rdf.model.*;
 import org.apache.jena.vocabulary.RDF;
 import org.bouncycastle.jce.ECNamedCurveTable;
 import org.bouncycastle.jce.interfaces.ECPublicKey;
 import org.bouncycastle.jce.spec.ECNamedCurveParameterSpec;
 import org.bouncycastle.jce.spec.ECPublicKeySpec;
-
 import won.cryptography.exception.KeyNotSupportedException;
 import won.cryptography.key.KeyInformationExtractor;
 import won.cryptography.key.KeyInformationExtractorBouncyCastle;
@@ -36,6 +14,15 @@ import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.CERT;
 import won.protocol.vocabulary.SFSIG;
 import won.protocol.vocabulary.WON;
+
+import javax.transaction.NotSupportedException;
+import java.math.BigInteger;
+import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.PublicKey;
+import java.security.spec.InvalidKeySpecException;
+import java.util.*;
 
 /**
  * A helper class to read from/write to RDF EC public key won representation, as
@@ -79,7 +66,7 @@ public class WonKeysReaderWriter {
         return keys;
     }
 
-    public PublicKey readFromModel(Model model, String keyUri)
+    private PublicKey readFromModel(Model model, String keyUri)
                     throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException {
         Map<String, PublicKey> keys = new HashMap<>();
         Resource keyRes = model.createResource(keyUri);
@@ -109,10 +96,10 @@ public class WonKeysReaderWriter {
                 if (eccPubKeyStmts.hasNext()) {
                     // extract properties of ECC public key:
                     ni = model.listObjectsOfProperty(eccKeyObj.asResource(), WON.ecc_algorithm);
-                    String algName = null;
-                    String curveId = null;
-                    String qx = null;
-                    String qy = null;
+                    String algName;
+                    String curveId;
+                    String qx;
+                    String qy;
                     if (ni.hasNext()) {
                         algName = ni.next().asLiteral().toString();
                     } else {
@@ -150,22 +137,18 @@ public class WonKeysReaderWriter {
     }
 
     public Set<String> readKeyReferences(Dataset dataset) {
-        List<String> keyRefs = RdfUtils.visitFlattenedToList(dataset, new RdfUtils.ModelVisitor<List<String>>() {
-            @Override
-            public List<String> visit(Model model) {
-                StmtIterator it = model.listStatements((Resource) null, SFSIG.HAS_VERIFICATION_CERT, (RDFNode) null);
-                List<String> ret = new ArrayList<>();
-                while (it.hasNext()) {
-                    ret.add(it.next().getObject().toString());
-                }
-                return ret;
+        List<String> keyRefs = RdfUtils.visitFlattenedToList(dataset, model -> {
+            StmtIterator it = model.listStatements((Resource) null, SFSIG.HAS_VERIFICATION_CERT, (RDFNode) null);
+            List<String> ret = new ArrayList<>();
+            while (it.hasNext()) {
+                ret.add(it.next().getObject().toString());
             }
+            return ret;
         });
-        Set<String> ret = new HashSet<>(keyRefs);
-        return ret;
+        return new HashSet<>(keyRefs);
     }
 
-    public void writeToModel(Model model, Resource keySubject, WonEccPublicKey pubKey) {
+    private void writeToModel(Model model, Resource keySubject, WonEccPublicKey pubKey) {
         // EC public key triples
         Resource bn = model.createResource();
         Statement stmt = model.createStatement(bn, RDF.type, WON.ECCPublicKey);

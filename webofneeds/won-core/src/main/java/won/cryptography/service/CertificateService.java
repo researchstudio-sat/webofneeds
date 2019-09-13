@@ -46,7 +46,7 @@ public class CertificateService {
      */
     public X509Certificate createSelfSignedCertificate(BigInteger serialNumber, KeyPair key, String commonName,
                     String webId) {
-        Map<ASN1ObjectIdentifier, String> subjectData = new HashMap<ASN1ObjectIdentifier, String>();
+        Map<ASN1ObjectIdentifier, String> subjectData = new HashMap<>();
         subjectData.put(BCStyle.CN, commonName);
         // ToDo: which attributes to use? make them configurable?
         // subjectData.put(BCStyle.C, "your county");
@@ -70,7 +70,7 @@ public class CertificateService {
      */
     public X509Certificate createSelfSignedCertificate(BigInteger serialNumber, KeyPair key,
                     Map<ASN1ObjectIdentifier, String> subjectData, String webId) {
-        X509Certificate cert = null;
+        X509Certificate cert;
         try {
             X509v3CertificateBuilder certBuilder = createBuilderWithBasicInfo(serialNumber, key, subjectData);
             if (webId != null) {
@@ -115,8 +115,7 @@ public class CertificateService {
             throw new IllegalArgumentException(key.getPublic().getAlgorithm() + " is not supported");
         }
         JcaContentSignerBuilder csBuilder = new JcaContentSignerBuilder(signatureAlgorithm);
-        ContentSigner sigGen = csBuilder.setProvider(PROVIDER_BC).build(key.getPrivate());
-        return sigGen;
+        return csBuilder.setProvider(PROVIDER_BC).build(key.getPrivate());
     }
 
     private X509v3CertificateBuilder createBuilderWithBasicInfo(BigInteger serialNumber, KeyPair key,
@@ -131,14 +130,13 @@ public class CertificateService {
         X500Name subject = nameBuilder.build();
         SubjectPublicKeyInfo subjPubKeyInfo = new SubjectPublicKeyInfo(
                         ASN1Sequence.getInstance(key.getPublic().getEncoded()));
-        X509v3CertificateBuilder certGen = new X509v3CertificateBuilder(subject, serialNumber, notBefore, notAfter,
+        return new X509v3CertificateBuilder(subject, serialNumber, notBefore, notAfter,
                         subject, subjPubKeyInfo);
-        return certGen;
     }
 
     public static List<URI> getWebIdFromSubjectAlternativeNames(final X509Certificate cert)
                     throws CertificateParsingException {
-        List<URI> webIDs = new ArrayList<URI>();
+        List<URI> webIDs = new ArrayList<>();
         Collection<List<?>> alternativeNames = cert.getSubjectAlternativeNames();
         if (alternativeNames != null) {
             for (List<?> alternativeName : alternativeNames) {

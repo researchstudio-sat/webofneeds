@@ -208,9 +208,7 @@ public class AtomModelWrapper {
                         WON.derivedGraph);
         if (derivedGraphName.isPresent() && derivedGraphName.get().isURIResource()) {
             String name = derivedGraphName.get().asResource().getURI();
-            if (this.atomDataset.containsNamedModel(name)) {
-                return true;
-            }
+            return this.atomDataset.containsNamedModel(name);
         }
         return false;
     }
@@ -509,11 +507,11 @@ public class AtomModelWrapper {
         RDFNode state = RdfUtils.findOnePropertyFromResource(sysInfoModel, getAtomNode(AtomGraphType.SYSINFO),
                         WON.atomState);
         sysInfoModel.leaveCriticalSection();
-        if (state.equals(WON.ATOM_STATE_ACTIVE)) {
+        if (WON.ATOM_STATE_ACTIVE.equals(state)) {
             return AtomState.ACTIVE;
-        } else if (state.equals(WON.ATOM_STATE_INACTIVE)) {
+        } else if (WON.ATOM_STATE_INACTIVE.equals(state)) {
             return AtomState.INACTIVE;
-        } else if (state.equals(WON.ATOM_STATE_DELETED)) {
+        } else if (WON.ATOM_STATE_DELETED.equals(state)) {
             return AtomState.DELETED;
         }
         throw new IllegalStateException("Unrecognized atom state: " + state);
@@ -613,7 +611,6 @@ public class AtomModelWrapper {
     /**
      * get all content nodes of a specified type
      *
-     * @param type specifies which content nodes to return (IS, SEEKS, ALL, ...)
      * @return content nodes
      */
     public Collection<Resource> getSeeksNodes() {
@@ -645,10 +642,9 @@ public class AtomModelWrapper {
      */
     public Collection<Resource> getAllContentNodes() {
         Collection<Resource> contentNodes = new LinkedList<>();
-        String queryClause = null;
         String seeksClause = "{ ?atomNode a won:Atom. ?atomNode match:seeks ?contentNode. FILTER NOT EXISTS { ?atomNode match:seeks/match:seeks ?contentNode. } }";
         String seeksSeeksClause = "{ ?atomNode a won:Atom. ?atomNode match:seeks/match:seeks ?contentNode. }";
-        queryClause = seeksClause + "UNION \n" + seeksSeeksClause;
+        String queryClause = seeksClause + "UNION \n" + seeksSeeksClause;
         String queryString = "prefix won: <https://w3id.org/won/core#> \n"
                         + "prefix match: <https://w3id.org/won/matching#> \n"
                         + "prefix con: <https://w3id.org/won/content#> \n"
@@ -671,19 +667,16 @@ public class AtomModelWrapper {
     /**
      * get all content nodes of a specified type
      *
-     * @param type specifies which content nodes to return (IS, SEEKS, ALL, ...)
      * @return content nodes
      */
     public Collection<Resource> getSeeksSeeksNodes() {
         Collection<Resource> contentNodes = new LinkedList<>();
-        String queryClause = null;
         String seeksSeeksClause = "{ ?atomNode a won:Atom. ?atomNode match:seeks/match:seeks ?contentNode. }";
-        queryClause = seeksSeeksClause;
         String queryString = "prefix won: <https://w3id.org/won/core#> \n"
                         + "prefix match: <https://w3id.org/won/matching#> \n"
                         + "prefix con: <https://w3id.org/won/content#> \n"
                         + "SELECT DISTINCT ?contentNode WHERE { \n"
-                        + queryClause + "\n }";
+                        + seeksSeeksClause + "\n }";
         Query query = QueryFactory.create(queryString);
         try (QueryExecution qexec = QueryExecutionFactory.create(query, getAtomModel())) {
             ResultSet rs = qexec.execSelect();
@@ -781,11 +774,9 @@ public class AtomModelWrapper {
     }
 
     public Collection<String> getContentPropertyStringValues(Property p, String language) {
-        Collection<String> values = new LinkedList<>();
         Resource node = getAtomContentNode();
         Collection valuesOfContentNode = getContentPropertyStringValues(node, p, language);
-        values.addAll(valuesOfContentNode);
-        return values;
+        return new LinkedList<>(valuesOfContentNode);
     }
 
     public Collection<String> getSeeksPropertyStringValues(Property p) {
@@ -820,7 +811,7 @@ public class AtomModelWrapper {
      * @return the string value or null if nothing is found
      */
     public String getSomeContentPropertyStringValue(Resource contentNode, Property p) {
-        return getSomeContentPropertyStringValue(contentNode, p, null);
+        return getSomeContentPropertyStringValue(contentNode, p, (String) null);
     }
 
     /**
@@ -834,10 +825,10 @@ public class AtomModelWrapper {
      * @return the string value or null if nothing is found
      */
     public String getSomeContentPropertyStringValue(Resource contentNode, Property p, String... preferredLanguages) {
-        Collection<String> values = null;
+        Collection<String> values;
         if (preferredLanguages != null) {
-            for (int i = 0; i < preferredLanguages.length; i++) {
-                values = getContentPropertyStringValues(contentNode, p, preferredLanguages[i]);
+            for (String preferredLanguage : preferredLanguages) {
+                values = getContentPropertyStringValues(contentNode, p, preferredLanguage);
                 if (values != null && values.size() > 0)
                     return values.iterator().next();
             }
@@ -860,8 +851,8 @@ public class AtomModelWrapper {
     public String getSomeContentPropertyStringValue(Property p, String... preferredLanguages) {
         Resource contentNode = getAtomContentNode();
         if (preferredLanguages != null) {
-            for (int i = 0; i < preferredLanguages.length; i++) {
-                String valueOfContentNode = getSomeContentPropertyStringValue(contentNode, p, preferredLanguages[i]);
+            for (String preferredLanguage : preferredLanguages) {
+                String valueOfContentNode = getSomeContentPropertyStringValue(contentNode, p, preferredLanguage);
                 if (valueOfContentNode != null)
                     return valueOfContentNode;
             }
@@ -871,9 +862,9 @@ public class AtomModelWrapper {
             return valueOfAtomContentNode;
         Collection<Resource> nodes = getSeeksNodes();
         if (preferredLanguages != null) {
-            for (int i = 0; i < preferredLanguages.length; i++) {
+            for (String preferredLanguage : preferredLanguages) {
                 for (Resource node : nodes) {
-                    String valueOfContentNode = getSomeContentPropertyStringValue(node, p, preferredLanguages[i]);
+                    String valueOfContentNode = getSomeContentPropertyStringValue(node, p, preferredLanguage);
                     if (valueOfContentNode != null)
                         return valueOfContentNode;
                 }
@@ -899,16 +890,13 @@ public class AtomModelWrapper {
     public String getAtomContentPropertyStringValue(Property p, String... preferredLanguages) {
         Resource node = getAtomContentNode();
         if (preferredLanguages != null) {
-            for (int i = 0; i < preferredLanguages.length; i++) {
-                String valueOfContentNode = getSomeContentPropertyStringValue(node, p, preferredLanguages[i]);
+            for (String preferredLanguage : preferredLanguages) {
+                String valueOfContentNode = getSomeContentPropertyStringValue(node, p, preferredLanguage);
                 if (valueOfContentNode != null)
                     return valueOfContentNode;
             }
         }
-        String valueOfContentNode = getSomeContentPropertyStringValue(node, p);
-        if (valueOfContentNode != null)
-            return valueOfContentNode;
-        return null;
+        return getSomeContentPropertyStringValue(node, p);
     }
 
     private RDFNode getContentPropertyObject(Property p) {
@@ -930,11 +918,9 @@ public class AtomModelWrapper {
     }
 
     public Collection<RDFNode> getContentPropertyObjects(Property p) {
-        Collection<RDFNode> values = new LinkedList<>();
         Resource node = getAtomContentNode();
         Collection valuesOfContentNode = getContentPropertyObjects(node, p);
-        values.addAll(valuesOfContentNode);
-        return values;
+        return new LinkedList<>(valuesOfContentNode);
     }
 
     private Node getContentPropertyObject(String propertyPath) {

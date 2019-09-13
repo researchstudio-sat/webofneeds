@@ -1,11 +1,5 @@
 package won.protocol.rest;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.List;
-
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.NodeIterator;
@@ -16,11 +10,16 @@ import org.springframework.http.MediaType;
 import org.springframework.http.converter.AbstractHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.HttpMessageNotWritableException;
-
 import won.protocol.exception.IncorrectPropertyCountException;
 import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.CNT;
 import won.protocol.vocabulary.WONMSG;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.Arrays;
+import java.util.Base64;
+import java.util.List;
 
 /**
  * User: fsalcher Date: 15.09.2014
@@ -62,15 +61,12 @@ public class RdfDatasetAttachmentConverter extends AbstractHttpMessageConverter<
     @Override
     protected void writeInternal(Dataset dataset, HttpOutputMessage httpOutputMessage)
                     throws IOException, HttpMessageNotWritableException {
-        ContentAndMimeType content = RdfUtils.findOne(dataset, new RdfUtils.ModelVisitor<ContentAndMimeType>() {
-            @Override
-            public ContentAndMimeType visit(Model model) {
-                String content = getObjectOfPropertyAsString(model, CNT.BYTES);
-                if (content == null)
-                    return null;
-                String contentType = getObjectOfPropertyAsString(model, WONMSG.contentType);
-                return new ContentAndMimeType(content, contentType);
-            }
+        ContentAndMimeType content = RdfUtils.findOne(dataset, model -> {
+            String content1 = getObjectOfPropertyAsString(model, CNT.BYTES);
+            if (content1 == null)
+                return null;
+            String contentType = getObjectOfPropertyAsString(model, WONMSG.contentType);
+            return new ContentAndMimeType(content1, contentType);
         }, false);
         if (content.content == null)
             throw new IncorrectPropertyCountException("expected one property cnt:bytes", 1, 0);

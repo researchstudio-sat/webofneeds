@@ -35,8 +35,8 @@ import static won.cryptography.rdfsign.WonSigner.SIGNING_ALGORITHM_PROVIDER;
  */
 public class WonVerifier {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    private Dataset dataset;
-    private SignatureVerificationState verificationState = new SignatureVerificationState();
+    private final Dataset dataset;
+    private final SignatureVerificationState verificationState = new SignatureVerificationState();
 
     public WonVerifier(Dataset dataset) {
         Provider provider = new BouncyCastleProvider();

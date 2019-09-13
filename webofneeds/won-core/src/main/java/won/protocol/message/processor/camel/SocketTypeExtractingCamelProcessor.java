@@ -10,18 +10,17 @@
  */
 package won.protocol.message.processor.camel;
 
-import java.net.URI;
-
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import won.protocol.message.WonMessage;
 import won.protocol.message.processor.exception.MissingMessagePropertyException;
 import won.protocol.message.processor.exception.WonMessageProcessingException;
 import won.protocol.model.Connection;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.vocabulary.WONMSG;
+
+import java.net.URI;
 
 /**
  * Extracts the socket looking into the 'wonConnectionURI' header and looking up
@@ -33,11 +32,11 @@ public class SocketTypeExtractingCamelProcessor implements Processor {
 
     @Override
     public void process(Exchange exchange) throws Exception {
-        URI socketType = null;
+        URI socketType;
         WonMessage wonMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
         URI conUri = (URI) exchange.getIn().getHeader(WonCamelConstants.CONNECTION_URI_HEADER);
         if (conUri == null) {
-            throw new MissingMessagePropertyException(URI.create(WONMSG.recipient.getURI().toString()));
+            throw new MissingMessagePropertyException(URI.create(WONMSG.recipient.getURI()));
         }
         Connection con = connectionRepository.findOneByConnectionURI(conUri);
         socketType = con.getTypeURI();
