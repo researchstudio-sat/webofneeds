@@ -256,9 +256,7 @@ public class GroupCycleBot extends EventBot {
                                                             OpenFromOtherAtomEvent openEvent = (OpenFromOtherAtomEvent) event1;
                                                             if (!groupAtomURI.equals(openEvent.getTargetAtomURI()))
                                                                 return false;
-                                                            if (!memberURI.equals(openEvent.getAtomURI()))
-                                                                return false;
-                                                            return true;
+                                                            return memberURI.equals(openEvent.getAtomURI());
                                                         }, new BaseEventBotAction(context) {
                                                             @Override
                                                             protected void doRun(Event event,
@@ -406,9 +404,7 @@ public class GroupCycleBot extends EventBot {
                                         OpenFromOtherAtomEvent openEvent = (OpenFromOtherAtomEvent) event;
                                         if (!remoteGroupAtomURI.equals(openEvent.getTargetAtomURI()))
                                             return false;
-                                        if (!groupAtomURI.equals(openEvent.getAtomURI()))
-                                            return false;
-                                        return true;
+                                        return groupAtomURI.equals(openEvent.getAtomURI());
                                     }, new BaseEventBotAction(context) {
                                         @Override
                                         protected void doRun(Event event, EventListener executingListener)

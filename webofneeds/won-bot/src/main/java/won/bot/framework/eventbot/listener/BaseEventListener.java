@@ -138,7 +138,7 @@ public abstract class BaseEventListener implements EventListener {
      * @return
      */
     protected final boolean shouldHandleEvent(final Event event) {
-        return eventFilter == null ? true : eventFilter.accept(event);
+        return eventFilter == null || eventFilter.accept(event);
     }
 
     @Override

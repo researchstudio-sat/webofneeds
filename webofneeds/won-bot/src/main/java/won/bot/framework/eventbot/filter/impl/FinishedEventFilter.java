@@ -28,8 +28,7 @@ public class FinishedEventFilter implements EventFilter {
     @Override
     public boolean accept(final Event event) {
         if (event instanceof FinishedEvent) {
-            if (((FinishedEvent) event).getListener() == listener)
-                return true;
+            return ((FinishedEvent) event).getListener() == listener;
         }
         return false;
     }
