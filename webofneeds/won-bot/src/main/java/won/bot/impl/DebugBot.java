@@ -174,7 +174,7 @@ public class DebugBot extends EventBot {
         bus.subscribe(ConnectDebugCommandEvent.class, atomCreator);
         bus.subscribe(SendNDebugCommandEvent.class, new ActionOnEventListener(ctx, new SendNDebugMessagesAction(ctx,
                         DELAY_BETWEEN_N_MESSAGES, DebugBotIncomingMessageToEventMappingAction.N_MESSAGES)));
-        MessageTimingManager timingManager = new MessageTimingManager(ctx, 20);
+        MessageTimingManager timingManager = new MessageTimingManager(ctx);
         // on every actEvent there is a chance we send a chatty message
         bus.subscribe(ActEvent.class,
                         new ActionOnEventListener(ctx,

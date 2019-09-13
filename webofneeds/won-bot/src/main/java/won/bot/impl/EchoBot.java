@@ -39,13 +39,6 @@ import won.protocol.model.SocketType;
  * and connects. When a connection is established, all messages are just echoed.
  */
 public class EchoBot extends EventBot {
-    private BaseEventListener matcherRegistrator;
-    protected BaseEventListener atomCreator;
-    protected BaseEventListener atomConnector;
-    protected BaseEventListener autoOpener;
-    protected BaseEventListener autoResponder;
-    protected BaseEventListener connectionCloser;
-    protected BaseEventListener atomDeactivator;
     private Integer numberOfEchoAtomsPerAtom;
     private int registrationMatcherRetryInterval;
 
@@ -59,34 +52,34 @@ public class EchoBot extends EventBot {
         EventBus bus = getEventBus();
         // register with WoN nodes, be notified when new atoms are created
         RegisterMatcherAction registerMatcherAction = new RegisterMatcherAction(ctx);
-        this.matcherRegistrator = new ActionOnEventListener(ctx, registerMatcherAction, 1);
-        bus.subscribe(ActEvent.class, this.matcherRegistrator);
+        BaseEventListener matcherRegistrator = new ActionOnEventListener(ctx, registerMatcherAction, 1);
+        bus.subscribe(ActEvent.class, matcherRegistrator);
         RandomDelayedAction delayedRegistration = new RandomDelayedAction(ctx, registrationMatcherRetryInterval,
                         registrationMatcherRetryInterval, 0, registerMatcherAction);
         ActionOnEventListener matcherRetryRegistrator = new ActionOnEventListener(ctx, delayedRegistration);
         bus.subscribe(MatcherRegisterFailedEvent.class, matcherRetryRegistrator);
         // create the echo atom - if we're not reacting to the creation of our own echo
         // atom.
-        this.atomCreator = new ActionOnEventListener(ctx,
+        BaseEventListener atomCreator = new ActionOnEventListener(ctx,
                         new NotFilter(new AtomUriInNamedListFilter(ctx,
                                         ctx.getBotContextWrapper().getAtomCreateListName())),
                         prepareCreateAtomAction(ctx));
-        bus.subscribe(AtomCreatedEventForMatcher.class, this.atomCreator);
+        bus.subscribe(AtomCreatedEventForMatcher.class, atomCreator);
         // as soon as the echo atom is created, connect to original
-        this.atomConnector = new ActionOnEventListener(ctx, "atomConnector",
+        BaseEventListener atomConnector = new ActionOnEventListener(ctx, "atomConnector",
                         new RandomDelayedAction(ctx, 5000, 5000, 1, new ConnectWithAssociatedAtomAction(ctx,
                                         SocketType.ChatSocket.getURI(), SocketType.ChatSocket.getURI(),
                                         "Greetings! I am the EchoBot! I will repeat everything you say, which you might "
                                                         + "find useful for testing purposes.")));
-        bus.subscribe(AtomCreatedEvent.class, this.atomConnector);
+        bus.subscribe(AtomCreatedEvent.class, atomConnector);
         // add a listener that auto-responds to messages by a message
         // after 10 messages, it unsubscribes from all events
         // subscribe it to:
         // * message events - so it responds
         // * open events - so it initiates the chain reaction of responses
-        this.autoResponder = new ActionOnEventListener(ctx, new RespondWithEchoToMessageAction(ctx));
-        bus.subscribe(OpenFromOtherAtomEvent.class, this.autoResponder);
-        bus.subscribe(MessageFromOtherAtomEvent.class, this.autoResponder);
+        BaseEventListener autoResponder = new ActionOnEventListener(ctx, new RespondWithEchoToMessageAction(ctx));
+        bus.subscribe(OpenFromOtherAtomEvent.class, autoResponder);
+        bus.subscribe(MessageFromOtherAtomEvent.class, autoResponder);
         bus.subscribe(CloseFromOtherAtomEvent.class,
                         new ActionOnEventListener(ctx, new LogAction(ctx, "received close message from remote atom.")));
     }
