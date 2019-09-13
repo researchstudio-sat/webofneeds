@@ -31,6 +31,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.lang.invoke.MethodHandles;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.text.MessageFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -476,7 +477,7 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
         String cacheControlHeaderValue = responseData.getResponseHeaders().getFirst(HttpHeaders.CACHE_CONTROL);
         if (cacheControlHeaderValue == null)
             return null;
-        Pattern maxagePattern = Pattern.compile("[^\\s,]*max-age\\s*=\\s*(\\d+)[$\\s,]");
+        Pattern maxagePattern = Pattern.compile("[^\\s,]*max-age\\s*=\\s*(\\d+)[^\\d]*");
         Matcher m = maxagePattern.matcher(cacheControlHeaderValue);
         if (!m.find())
             return null;
@@ -636,9 +637,16 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
     }
 
     private String makeCacheKey(URI resource, URI requesterWebID) {
+        URI resourceForCacheKey = resource;
+        try {
+            resourceForCacheKey = new URI(resource.getScheme(), resource.getUserInfo(), resource.getHost(),
+                            resource.getPort(), resource.getPath(), resource.getQuery(), null);
+        } catch (URISyntaxException e) {
+            logger.warn("could not remove fragment from uri {} when generating cache key, using it as-is", resource, e);
+        }
         // using spaces in the null placeholder to make it impossible to inject a
         // requesterWebID URI that is equal to the
         // null place holder (because an URI can't have spaces).
-        return resource.toString() + (requesterWebID == null ? " (no Web ID)" : requesterWebID.toString());
+        return resourceForCacheKey.toString() + (requesterWebID == null ? " (no Web ID)" : requesterWebID.toString());
     }
 }
