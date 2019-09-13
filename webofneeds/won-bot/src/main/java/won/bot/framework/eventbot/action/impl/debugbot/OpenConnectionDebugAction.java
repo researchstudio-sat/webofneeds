@@ -87,9 +87,7 @@ public class OpenConnectionDebugAction extends BaseEventBotAction {
             }
             final WonMessage toSend = deny ? createCloseWonMessage(connectionUri, finalWelcomeMessage)
                             : createOpenWonMessage(connectionUri, finalWelcomeMessage);
-            Runnable task = () -> {
-                getEventListenerContext().getWonMessageSender().sendWonMessage(toSend);
-            };
+            Runnable task = () -> getEventListenerContext().getWonMessageSender().sendWonMessage(toSend);
             if (wait) {
                 Date when = new Date(System.currentTimeMillis() + waitSeconds * 1000);
                 getEventListenerContext().getTaskScheduler().schedule(task, when);

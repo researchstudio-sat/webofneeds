@@ -59,7 +59,7 @@ public class BehaviourBarrier extends BotBehaviour {
                                 synchronized (behavioursToWaitFor) {
                                     deactivatedBehaviours.add(((BotBehaviourDeactivatedEvent) event).getBehaviour());
                                     if (deactivatedBehaviours.containsAll(behavioursToWaitFor)) {
-                                        behavioursToStart.forEach(behaviour -> behaviour.activate());
+                                        behavioursToStart.forEach(BotBehaviour::activate);
                                         deactivate();
                                     }
                                 }

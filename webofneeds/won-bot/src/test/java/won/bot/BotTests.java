@@ -61,28 +61,25 @@ public class BotTests {
         final Random rnd = new Random(System.currentTimeMillis());
         final CyclicBarrier barrier = new CyclicBarrier(numThreads + 1);
         for (int i = 0; i < numThreads; i++) {
-            Thread thread = new Thread() {
-                @Override
-                public void run() {
-                    try {
-                        Thread.sleep(rnd.nextInt(100));
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    try {
-                        bot.initialize();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    try {
-                        barrier.await();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    } catch (BrokenBarrierException e) {
-                        e.printStackTrace();
-                    }
+            Thread thread = new Thread(() -> {
+                try {
+                    Thread.sleep(rnd.nextInt(100));
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
-            };
+                try {
+                    bot.initialize();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                try {
+                    barrier.await();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (BrokenBarrierException e) {
+                    e.printStackTrace();
+                }
+            });
             thread.start();
         }
         barrier.await();
@@ -127,28 +124,25 @@ public class BotTests {
         final Random rnd = new Random(System.currentTimeMillis());
         final CyclicBarrier barrier = new CyclicBarrier(numThreads + 1);
         for (int i = 0; i < numThreads; i++) {
-            Thread thread = new Thread() {
-                @Override
-                public void run() {
-                    try {
-                        Thread.sleep(rnd.nextInt(100));
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    try {
-                        bot.shutdown();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    try {
-                        barrier.await();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    } catch (BrokenBarrierException e) {
-                        e.printStackTrace();
-                    }
+            Thread thread = new Thread(() -> {
+                try {
+                    Thread.sleep(rnd.nextInt(100));
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
-            };
+                try {
+                    bot.shutdown();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                try {
+                    barrier.await();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (BrokenBarrierException e) {
+                    e.printStackTrace();
+                }
+            });
             thread.start();
         }
         barrier.await();

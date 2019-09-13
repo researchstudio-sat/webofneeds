@@ -80,11 +80,7 @@ public class MemoryBotContext implements BotContext {
     }
 
     private Map<String, Object> getObjectMap(String collectionName) {
-        Map<String, Object> collection = contextObjectMap.get(collectionName);
-        if (collection == null) {
-            collection = new HashMap<>();
-            contextObjectMap.put(collectionName, collection);
-        }
+        Map<String, Object> collection = contextObjectMap.computeIfAbsent(collectionName, k -> new HashMap<>());
         return collection;
     }
 
@@ -114,20 +110,12 @@ public class MemoryBotContext implements BotContext {
     }
 
     private Map<String, List<Object>> getListMap(String collectionName) {
-        Map<String, List<Object>> collection = contextListMap.get(collectionName);
-        if (collection == null) {
-            collection = new HashMap<>();
-            contextListMap.put(collectionName, collection);
-        }
+        Map<String, List<Object>> collection = contextListMap.computeIfAbsent(collectionName, k -> new HashMap<>());
         return collection;
     }
 
     private List<Object> getList(String collectionName, String key) {
-        List<Object> objectList = getListMap(collectionName).get(key);
-        if (objectList == null) {
-            objectList = new LinkedList<>();
-            getListMap(collectionName).put(key, objectList);
-        }
+        List<Object> objectList = getListMap(collectionName).computeIfAbsent(key, k -> new LinkedList<>());
         return objectList;
     }
 

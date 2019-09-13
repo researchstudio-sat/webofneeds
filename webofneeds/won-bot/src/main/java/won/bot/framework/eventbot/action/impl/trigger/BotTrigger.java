@@ -122,7 +122,7 @@ public class BotTrigger {
         PeriodicTrigger myTrigger = new PeriodicTrigger(getInterval().toMillis());
         myTrigger.setInitialDelay(getInterval().toMillis());
         // schedule a task that publishes the BotTriggerEvent
-        BotTrigger.this.cancelableTask = context.getTaskScheduler().schedule(() -> fire(), myTrigger);
+        BotTrigger.this.cancelableTask = context.getTaskScheduler().schedule(this::fire, myTrigger);
     }
 
     protected void fire() {

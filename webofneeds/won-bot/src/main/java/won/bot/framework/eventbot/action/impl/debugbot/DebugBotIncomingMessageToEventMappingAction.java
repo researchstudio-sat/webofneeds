@@ -32,6 +32,7 @@ import won.bot.framework.eventbot.event.impl.crawlconnection.CrawlConnectionComm
 import won.bot.framework.eventbot.event.impl.debugbot.*;
 import won.bot.framework.eventbot.listener.EventListener;
 import won.protocol.agreement.AgreementProtocolState;
+import won.protocol.agreement.effect.MessageEffect;
 import won.protocol.message.WonMessage;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionState;
@@ -285,7 +286,7 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
                                             ctx.getLinkedDataSource());
                             return (Set<URI>) WonRdfUtils.AtomUtils.getTargetConnectionURIsForTargetAtoms(atomNetwork,
                                             Arrays.asList(targetAtom), Optional.of(ConnectionState.CONNECTED));
-                        }).flatMap(set -> set.stream()).collect(Collectors.toSet());
+                        }).flatMap(Collection::stream).collect(Collectors.toSet());
         bus.publish(new ConnectionMessageCommandEvent(con, messageModel, targetConnections));
     }
 
@@ -361,13 +362,14 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
                         + "message - but 'll need to crawl the connection data first, please be patient.", state -> {
                             URI uri = state.getNthLatestMessage(m -> onlyProposes
                                             ? (m.isProposesMessage() || m.isProposesToCancelMessage())
-                                                            && m.getEffects().stream().anyMatch(e -> e.isProposes())
+                                                            && m.getEffects().stream()
+                                                                            .anyMatch(MessageEffect::isProposes)
                                             : true && useWrongSender
                                                             ? m.getSenderAtomURI().equals(con.getTargetAtomURI())
                                                             : m.getSenderAtomURI().equals(con.getAtomURI()),
                                             0);
                             return uri == null ? Collections.EMPTY_LIST : Arrays.asList(uri);
-                        }, (messageModel, uris) -> WonRdfUtils.MessageUtils.addRetracts(messageModel, uris),
+                        }, WonRdfUtils.MessageUtils::addRetracts,
                         (Duration queryDuration, AgreementProtocolState state, URI... uris) -> {
                             if (uris == null || uris.length == 0 || uris[0] == null) {
                                 return "Sorry, I cannot retract any messages - I did not find any.";
@@ -390,7 +392,7 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
                             URI uri = state.getLatestProposesOrClaimsMessageSentByAtom(
                                             useWrongSender ? con.getAtomURI() : con.getTargetAtomURI());
                             return uri == null ? Collections.EMPTY_LIST : Arrays.asList(uri);
-                        }, (messageModel, uris) -> WonRdfUtils.MessageUtils.addRejects(messageModel, uris),
+                        }, WonRdfUtils.MessageUtils::addRejects,
                         (Duration queryDuration, AgreementProtocolState state, URI... uris) -> {
                             if (uris == null || uris.length == 0 || uris[0] == null) {
                                 return "Sorry, I cannot reject any of " + whose
@@ -447,16 +449,14 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
                         : allowCounterpartClauses ? "your" : " - sorry, don't know which ones to choose, actually - ";
         referToEarlierMessages(ctx, bus, con, "ok, I'll make a proposal containing " + count + " of " + whose
                         + " latest messages as clauses - but I'll need to crawl the connection data first, please be patient.",
-                        state -> {
-                            return state.getNLatestMessageUris(m -> {
-                                URI ownedAtomUri = con.getAtomURI();
-                                URI targetAtomUri = con.getTargetAtomURI();
-                                return ownedAtomUri != null && ownedAtomUri.equals(m.getSenderAtomURI())
-                                                && allowOwnClauses
-                                                || targetAtomUri != null && targetAtomUri.equals(m.getSenderAtomURI())
-                                                                && allowCounterpartClauses;
-                            }, count + 1).subList(1, count + 1);
-                        }, (messageModel, uris) -> WonRdfUtils.MessageUtils.addProposes(messageModel, uris),
+                        state -> state.getNLatestMessageUris(m -> {
+                            URI ownedAtomUri = con.getAtomURI();
+                            URI targetAtomUri = con.getTargetAtomURI();
+                            return ownedAtomUri != null && ownedAtomUri.equals(m.getSenderAtomURI())
+                                            && allowOwnClauses
+                                            || targetAtomUri != null && targetAtomUri.equals(m.getSenderAtomURI())
+                                                            && allowCounterpartClauses;
+                        }, count + 1).subList(1, count + 1), WonRdfUtils.MessageUtils::addProposes,
                         (Duration queryDuration, AgreementProtocolState state, URI... uris) -> {
                             if (uris == null || uris.length == 0 || uris[0] == null) {
                                 return "Sorry, I cannot propose the messages - I did not find any.";
@@ -476,7 +476,7 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
                             URI uri = state.getLatestPendingProposalOrClaim(Optional.empty(),
                                             Optional.of(con.getTargetAtomURI()));
                             return uri == null ? Collections.EMPTY_LIST : Arrays.asList(uri);
-                        }, (messageModel, uris) -> WonRdfUtils.MessageUtils.addAccepts(messageModel, uris),
+                        }, WonRdfUtils.MessageUtils::addAccepts,
                         (Duration queryDuration, AgreementProtocolState state, URI... uris) -> {
                             if (uris == null || uris.length == 0 || uris[0] == null) {
                                 return "Sorry, I cannot accept any proposal - I did not find pending proposals";
@@ -493,7 +493,7 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
                         state -> {
                             URI uri = state.getLatestAgreement();
                             return uri == null ? Collections.EMPTY_LIST : Arrays.asList(uri);
-                        }, (messageModel, uris) -> WonRdfUtils.MessageUtils.addProposesToCancel(messageModel, uris),
+                        }, WonRdfUtils.MessageUtils::addProposesToCancel,
                         (Duration queryDuration, AgreementProtocolState state, URI... uris) -> {
                             if (uris == null || uris.length == 0 || uris[0] == null || state == null) {
                                 return "Sorry, I cannot propose to cancel any agreement - I did not find any";

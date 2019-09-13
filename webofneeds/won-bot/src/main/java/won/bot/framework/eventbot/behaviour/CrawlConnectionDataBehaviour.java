@@ -91,7 +91,7 @@ public class CrawlConnectionDataBehaviour extends BotBehaviour {
             ((CachingLinkedDataSource) linkedDataSource).invalidate(toInvalidate);
             ((CachingLinkedDataSource) linkedDataSource).invalidate(toInvalidate, command.getAtomURI());
         }
-        context.getTaskScheduler().schedule(() -> deactivate(),
+        context.getTaskScheduler().schedule(this::deactivate,
                         new Date(System.currentTimeMillis() + abortTimeout.toMillis()));
         ;
         List<Path> propertyPaths = new ArrayList<>();

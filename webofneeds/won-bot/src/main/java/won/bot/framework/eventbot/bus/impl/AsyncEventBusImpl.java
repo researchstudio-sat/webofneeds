@@ -170,11 +170,11 @@ public class AsyncEventBusImpl implements EventBus {
     @Override
     public EventBusStatistics generateEventBusStatistics() {
         EventBusStatistics statistics = new EventBusStatistics();
-        statistics.setListenerCount(listenerMap.values().stream().flatMap(l -> l.stream()).distinct().count());
+        statistics.setListenerCount(listenerMap.values().stream().flatMap(Collection::stream).distinct().count());
         statistics.setListenerCountPerEvent(listenerMap.entrySet().stream()
-                        .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue().stream().distinct().count())));
-        statistics.setListenerCountPerListenerClass(listenerMap.values().stream().flatMap(l -> l.stream()).distinct()
-                        .collect(Collectors.groupingBy(l -> l.getClass(), Collectors.counting())));
+                        .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().stream().distinct().count())));
+        statistics.setListenerCountPerListenerClass(listenerMap.values().stream().flatMap(Collection::stream).distinct()
+                        .collect(Collectors.groupingBy(EventListener::getClass, Collectors.counting())));
         return statistics;
     }
 }

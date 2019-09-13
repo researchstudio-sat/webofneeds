@@ -55,18 +55,14 @@ public class MatchingLoadTestMonitorAction extends BaseEventBotAction {
             logger.info("RECEIVED EVENT {} for uri {}", event, atomUri);
             long hintReceivedTime = System.currentTimeMillis();
             atomSplits.get(atomUri).stop();
-            if (hintEventReceivedTime.get(atomUri) == null) {
-                hintEventReceivedTime.put(atomUri, new LinkedList<>());
-            }
+            hintEventReceivedTime.computeIfAbsent(atomUri, k -> new LinkedList<>());
             hintEventReceivedTime.get(atomUri).add(hintReceivedTime);
         } else if (event instanceof SocketHintFromMatcherEvent) {
             String atomUri = ((SocketHintFromMatcherEvent) event).getRecipientSocket().toString();
             logger.info("RECEIVED EVENT {} for uri {}", event, atomUri);
             long hintReceivedTime = System.currentTimeMillis();
             atomSplits.get(atomUri).stop();
-            if (hintEventReceivedTime.get(atomUri) == null) {
-                hintEventReceivedTime.put(atomUri, new LinkedList<>());
-            }
+            hintEventReceivedTime.computeIfAbsent(atomUri, k -> new LinkedList<>());
             hintEventReceivedTime.get(atomUri).add(hintReceivedTime);
         }
         if (startTestTime == -1) {
