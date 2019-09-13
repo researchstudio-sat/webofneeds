@@ -126,7 +126,7 @@ public class CreateAtomFromMailAction extends AbstractCreateAtomAction {
                 ctx.getWonMessageSender().sendWonMessage(createAtomMessage);
                 logger.debug("atom creation message sent with message URI {}", createAtomMessage.getMessageURI());
             } catch (MessagingException me) {
-                logger.error("messaging exception occurred: {}", me);
+                logger.error("messaging exception occurred:", me);
             }
         }
     }

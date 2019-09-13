@@ -228,10 +228,10 @@ public class MailCommandAction extends BaseEventBotAction {
                     return mailAction;
             }
         } catch (MessagingException me) {
-            logger.error("exception occurred checking command mail: {}", me);
+            logger.error("exception occurred checking command mail:", me);
             return ActionType.NO_ACTION;
         } catch (IOException ioe) {
-            logger.error("exception occurred checking command mail: {}", ioe);
+            logger.error("exception occurred checking command mail:", ioe);
             return ActionType.NO_ACTION;
         }
     }

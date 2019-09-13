@@ -47,7 +47,7 @@ public class MailParserAction extends BaseEventBotAction {
                                     senderMailAddress, message.getSubject());
                 }
             } catch (MessagingException me) {
-                logger.error("Messaging exception occurred while processing MimeMessage: {}", me);
+                logger.error("Messaging exception occurred while processing MimeMessage:", me);
                 logger.warn("mail from user '{}' with subject '{}' could not be processed", senderMailAddress,
                                 message.getSubject());
             }

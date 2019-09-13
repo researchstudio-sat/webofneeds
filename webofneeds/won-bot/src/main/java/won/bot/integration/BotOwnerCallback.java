@@ -33,7 +33,7 @@ public class BotOwnerCallback implements OwnerCallback {
                                 wonMessage.getMessageURI());
                 getBotForAtomUri(con.getAtomURI()).onCloseFromOtherAtom(con, wonMessage);
             } catch (NoBotResponsibleException e) {
-                logger.debug("error while handling onCloseFromOtherAtom()", e.getMessage());
+                logger.debug("error while handling onCloseFromOtherAtom() message: {}", e.getMessage());
             } catch (Exception e) {
                 logger.warn("error while handling onCloseFromOtherAtom()", e);
             }
@@ -47,7 +47,7 @@ public class BotOwnerCallback implements OwnerCallback {
                 try {
                     getBotForAtomUri(wonMessage.getRecipientAtomURI()).onAtomHintFromMatcher(wonMessage);
                 } catch (NoBotResponsibleException e) {
-                    logger.debug("error while handling onAtomHintFromMatcher()", e.getMessage());
+                    logger.debug("error while handling onAtomHintFromMatcher() message: {}", e.getMessage());
                 } catch (Exception e) {
                     logger.warn("error while handling onAtomHintFromMatcher()", e);
                 }
@@ -64,7 +64,7 @@ public class BotOwnerCallback implements OwnerCallback {
                 try {
                     getBotForAtomUri(wonMessage.getRecipientAtomURI()).onSocketHintFromMatcher(wonMessage);
                 } catch (NoBotResponsibleException e) {
-                    logger.debug("error while handling onAtomHintFromMatcher()", e.getMessage());
+                    logger.debug("error while handling onAtomHintFromMatcher() message: {}", e.getMessage());
                 } catch (Exception e) {
                     logger.warn("error while handling onAtomHintFromMatcher()", e);
                 }
@@ -83,7 +83,7 @@ public class BotOwnerCallback implements OwnerCallback {
                                     con.getConnectionURI(), wonMessage.getMessageURI());
                     getBotForAtomUri(con.getAtomURI()).onConnectFromOtherAtom(con, wonMessage);
                 } catch (NoBotResponsibleException e) {
-                    logger.debug("error while handling onConnectFromOtherAtom()", e.getMessage());
+                    logger.debug("error while handling onConnectFromOtherAtom() message: {}", e.getMessage());
                 } catch (Exception e) {
                     logger.warn("error while handling onConnectFromOtherAtom()", e);
                 }
@@ -100,7 +100,7 @@ public class BotOwnerCallback implements OwnerCallback {
                 try {
                     getBotForAtomUri(con.getAtomURI()).onOpenFromOtherAtom(con, wonMessage);
                 } catch (NoBotResponsibleException e) {
-                    logger.debug("error while handling onOpenFromOtherAtom()", e.getMessage());
+                    logger.debug("error while handling onOpenFromOtherAtom() message: {}", e.getMessage());
                 } catch (Exception e) {
                     logger.warn("error while handling onOpenFromOtherAtom()", e);
                 }
@@ -119,7 +119,7 @@ public class BotOwnerCallback implements OwnerCallback {
                                     wonMessage.getMessageURI());
                     getBotForAtomUri(con.getAtomURI()).onMessageFromOtherAtom(con, wonMessage);
                 } catch (NoBotResponsibleException e) {
-                    logger.debug("error while handling onMessageFromOtherAtom()", e.getMessage());
+                    logger.debug("error while handling onMessageFromOtherAtom() message: {}", e.getMessage());
                 } catch (Exception e) {
                     logger.warn("error while handling onMessageFromOtherAtom()", e);
                 }
@@ -137,7 +137,7 @@ public class BotOwnerCallback implements OwnerCallback {
                 URI atomUri = wonMessage.getRecipientAtomURI();
                 getBotForAtomUri(atomUri).onSuccessResponse(successfulMessageUri, wonMessage);
             } catch (NoBotResponsibleException e) {
-                logger.debug("error while handling onSuccessResponse()", e.getMessage());
+                logger.debug("error while handling onSuccessResponse() message: {}", e.getMessage());
             } catch (Exception e) {
                 logger.warn("error while handling onSuccessResponse()", e);
             }
@@ -152,7 +152,7 @@ public class BotOwnerCallback implements OwnerCallback {
                 URI atomUri = wonMessage.getRecipientAtomURI();
                 getBotForAtomUri(atomUri).onFailureResponse(failedMessageUri, wonMessage);
             } catch (NoBotResponsibleException e) {
-                logger.debug("error while handling onFailureResponse()", e.getMessage());
+                logger.debug("error while handling onFailureResponse() message: {}", e.getMessage());
             } catch (Exception e) {
                 logger.warn("error while handling onFailureResponse()", e);
             }

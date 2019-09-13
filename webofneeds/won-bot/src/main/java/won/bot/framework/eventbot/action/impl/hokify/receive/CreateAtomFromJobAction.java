@@ -79,7 +79,7 @@ public class CreateAtomFromJobAction extends AbstractCreateAtomAction {
                     }
                 }
             } catch (Exception me) {
-                logger.error("messaging exception occurred: {}", me);
+                logger.error("messaging exception occurred:", me);
             }
         }
     }

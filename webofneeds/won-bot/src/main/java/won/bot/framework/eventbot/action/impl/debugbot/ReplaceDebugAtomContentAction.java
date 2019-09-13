@@ -45,7 +45,7 @@ public class ReplaceDebugAtomContentAction extends BaseEventBotAction {
     @Override
     protected void doRun(Event event, EventListener executingListener) throws Exception {
         if (!(event instanceof ReplaceDebugAtomContentCommandEvent)) {
-            logger.warn("could not process event {}, expecting only ReplaceDebugCommandEvent events");
+            logger.warn("could not process event {}, expecting only ReplaceDebugCommandEvent events", event);
             return;
         }
         ReplaceDebugAtomContentCommandEvent replaceDebugCommandEvent = (ReplaceDebugAtomContentCommandEvent) event;
