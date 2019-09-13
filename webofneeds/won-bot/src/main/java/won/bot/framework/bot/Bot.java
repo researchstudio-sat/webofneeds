@@ -29,7 +29,7 @@ public interface Bot extends OwnerCallback {
     void onMatcherRegistered(URI wonNodeUri);
 
     void onNewAtomCreatedNotificationForMatcher(final URI wonNodeURI, final URI atomURI,
-                                                final Dataset atomModel);
+                    final Dataset atomModel);
 
     void onAtomModifiedNotificationForMatcher(final URI wonNodeURI, final URI atomURI);
 

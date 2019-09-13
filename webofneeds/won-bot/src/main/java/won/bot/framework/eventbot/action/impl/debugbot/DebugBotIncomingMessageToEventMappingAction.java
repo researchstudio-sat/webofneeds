@@ -376,7 +376,8 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
                                 return "Sorry, I cannot retract any messages - I did not find any.";
                             }
                             Optional<String> retractedString = state.getTextMessage(uris[0]);
-                            String finalRetractedString = retractedString.map(s -> ", which read, '" + s + "'").orElse(", which had no text message");
+                            String finalRetractedString = retractedString.map(s -> ", which read, '" + s + "'")
+                                            .orElse(", which had no text message");
                             return "Ok, I am hereby retracting " + whose + " message" + finalRetractedString + " (uri: "
                                             + uris[0] + ")." + "\n The query for finding that message took "
                                             + getDurationString(queryDuration) + " seconds.";
@@ -398,7 +399,8 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
                                                 + " messages - I did not find any suitable message.";
                             }
                             Optional<String> retractedString = state.getTextMessage(uris[0]);
-                            String finalRetractedString = retractedString.map(s -> ", which read, '" + s + "'").orElse(", which had no text message");
+                            String finalRetractedString = retractedString.map(s -> ", which read, '" + s + "'")
+                                            .orElse(", which had no text message");
                             return "Ok, I am hereby rejecting " + whose + " message" + finalRetractedString + " (uri: "
                                             + uris[0] + ")." + "\n The query for finding that message took "
                                             + getDurationString(queryDuration) + " seconds.";
