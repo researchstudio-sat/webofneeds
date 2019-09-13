@@ -10,11 +10,7 @@
  */
 package won.bot.framework.eventbot.action.impl.debugbot;
 
-import java.net.URI;
-import java.util.Date;
-
 import org.apache.jena.query.Dataset;
-
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.event.Event;
@@ -25,6 +21,9 @@ import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.WonRdfUtils;
+
+import java.net.URI;
+import java.util.Date;
 
 /**
  * Created by fkleedorfer on 09.06.2016.
@@ -58,13 +57,8 @@ public class SendNDebugMessagesAction extends BaseEventBotAction {
     }
 
     private Runnable createMessageTask(final URI connectionURI, final String messageText) {
-        return new Runnable() {
-            @Override
-            public void run() {
-                getEventListenerContext().getWonMessageSender()
-                                .sendWonMessage(createWonMessage(connectionURI, messageText));
-            }
-        };
+        return () -> getEventListenerContext().getWonMessageSender()
+                        .sendWonMessage(createWonMessage(connectionURI, messageText));
     }
 
     private WonMessage createWonMessage(URI connectionURI, String message) throws WonMessageBuilderException {

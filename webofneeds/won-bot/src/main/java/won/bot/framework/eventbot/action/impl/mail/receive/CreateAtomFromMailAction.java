@@ -42,7 +42,7 @@ public class CreateAtomFromMailAction extends AbstractCreateAtomAction {
         this.mailContentExtractor = mailContentExtractor;
         if (sockets == null || sockets.length == 0) {
             // add the default socket if none is present.
-            this.sockets = new ArrayList<URI>(1);
+            this.sockets = new ArrayList<>(1);
             this.sockets.add(SocketType.ChatSocket.getURI());
         } else {
             this.sockets = Arrays.asList(sockets);
@@ -105,26 +105,20 @@ public class CreateAtomFromMailAction extends AbstractCreateAtomAction {
                                 isUsedForTesting, isDoNotMatch);
                 EventBotActionUtils.rememberInList(ctx, atomURI, uriListName);
                 botContextWrapper.addUriMimeMessageRelation(atomURI, message);
-                EventListener successCallback = new EventListener() {
-                    @Override
-                    public void onEvent(Event event) throws Exception {
-                        logger.debug("atom creation successful, new atom URI is {}", atomURI);
-                        String sender = MailContentExtractor
-                                        .getFromAddressString(botContextWrapper.getMimeMessageForURI(atomURI));
-                        botContextWrapper.addMailAddressWonURIRelation(sender, new WonURI(atomURI, UriType.ATOM));
-                        logger.debug("created atom was from sender: " + sender);
-                    }
+                EventListener successCallback = event12 -> {
+                    logger.debug("atom creation successful, new atom URI is {}", atomURI);
+                    String sender = MailContentExtractor
+                                    .getFromAddressString(botContextWrapper.getMimeMessageForURI(atomURI));
+                    botContextWrapper.addMailAddressWonURIRelation(sender, new WonURI(atomURI, UriType.ATOM));
+                    logger.debug("created atom was from sender: " + sender);
                 };
-                EventListener failureCallback = new EventListener() {
-                    @Override
-                    public void onEvent(Event event) throws Exception {
-                        String textMessage = WonRdfUtils.MessageUtils
-                                        .getTextMessage(((FailureResponseEvent) event).getFailureMessage());
-                        logger.debug("atom creation failed for atom URI {}, original message URI {}: {}", new Object[] {
-                                        atomURI, ((FailureResponseEvent) event).getOriginalMessageURI(), textMessage });
-                        EventBotActionUtils.removeFromList(ctx, atomURI, uriListName);
-                        botContextWrapper.removeUriMimeMessageRelation(atomURI);
-                    }
+                EventListener failureCallback = event1 -> {
+                    String textMessage = WonRdfUtils.MessageUtils
+                                    .getTextMessage(((FailureResponseEvent) event1).getFailureMessage());
+                    logger.debug("atom creation failed for atom URI {}, original message URI {}: {}", new Object[] {
+                                    atomURI, ((FailureResponseEvent) event1).getOriginalMessageURI(), textMessage });
+                    EventBotActionUtils.removeFromList(ctx, atomURI, uriListName);
+                    botContextWrapper.removeUriMimeMessageRelation(atomURI);
                 };
                 EventBotActionUtils.makeAndSubscribeResponseListener(createAtomMessage, successCallback,
                                 failureCallback, ctx);

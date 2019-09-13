@@ -87,7 +87,7 @@ public class SendChattyMessageAction extends BaseEventBotAction {
                     break;
                 case TOO_LONG:
                     if (toRemove == null)
-                        toRemove = new HashSet<URI>();
+                        toRemove = new HashSet<>();
                     toRemove.add(conURI);
                     message = "Ok, you've been absent for a while now. I will stop bugging you. If you want me to resume "
                                     + "doing that, say 'chatty on'. For more information, say 'usage'";

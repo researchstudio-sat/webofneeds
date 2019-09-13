@@ -91,14 +91,10 @@ public class CrawlConnectionDataBehaviour extends BotBehaviour {
             ((CachingLinkedDataSource) linkedDataSource).invalidate(toInvalidate);
             ((CachingLinkedDataSource) linkedDataSource).invalidate(toInvalidate, command.getAtomURI());
         }
-        context.getTaskScheduler().schedule(new Runnable() {
-            @Override
-            public void run() {
-                deactivate();
-            }
-        }, new Date(System.currentTimeMillis() + abortTimeout.toMillis()));
+        context.getTaskScheduler().schedule(() -> deactivate(),
+                        new Date(System.currentTimeMillis() + abortTimeout.toMillis()));
         ;
-        List<Path> propertyPaths = new ArrayList<Path>();
+        List<Path> propertyPaths = new ArrayList<>();
         PrefixMapping pmap = new PrefixMappingImpl();
         pmap.withDefaultMappings(PrefixMapping.Standard);
         pmap.setNsPrefix("won", WON.getURI());
@@ -107,7 +103,7 @@ public class CrawlConnectionDataBehaviour extends BotBehaviour {
         propertyPaths.add(PathParser.parse("won:messageContainer/rdfs:member", pmap));
         CrawlCommandEvent crawlAtomCommandEvent = new CrawlCommandEvent(command.getAtomURI(), command.getAtomURI(),
                         propertyPaths, 10000, 5);
-        propertyPaths = new ArrayList<Path>();
+        propertyPaths = new ArrayList<>();
         propertyPaths.add(PathParser.parse("won:messageContainer", pmap));
         propertyPaths.add(PathParser.parse("won:messageContainer/rdfs:member", pmap));
         propertyPaths.add(PathParser.parse("won:messageContainer/rdfs:member/msg:correspondingRemoteMessage", pmap));

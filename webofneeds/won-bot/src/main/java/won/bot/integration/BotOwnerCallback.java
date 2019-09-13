@@ -27,150 +27,134 @@ public class BotOwnerCallback implements OwnerCallback {
 
     @Override
     public void onCloseFromOtherAtom(final Connection con, final WonMessage wonMessage) {
-        taskScheduler.schedule(new Runnable() {
-            public void run() {
-                try {
-                    logger.debug("onCloseFromOtherAtom received for connection {}, message {} ", con.getConnectionURI(),
-                                    wonMessage.getMessageURI());
-                    getBotForAtomUri(con.getAtomURI()).onCloseFromOtherAtom(con, wonMessage);
-                } catch (NoBotResponsibleException e) {
-                    logger.debug("error while handling onCloseFromOtherAtom()", e.getMessage());
-                } catch (Exception e) {
-                    logger.warn("error while handling onCloseFromOtherAtom()", e);
-                }
+        taskScheduler.schedule(() -> {
+            try {
+                logger.debug("onCloseFromOtherAtom received for connection {}, message {} ", con.getConnectionURI(),
+                                wonMessage.getMessageURI());
+                getBotForAtomUri(con.getAtomURI()).onCloseFromOtherAtom(con, wonMessage);
+            } catch (NoBotResponsibleException e) {
+                logger.debug("error while handling onCloseFromOtherAtom()", e.getMessage());
+            } catch (Exception e) {
+                logger.warn("error while handling onCloseFromOtherAtom()", e);
             }
         }, new Date());
     }
 
     @Override
     public void onAtomHintFromMatcher(final WonMessage wonMessage) {
-        taskScheduler.schedule(new Runnable() {
-            public void run() {
-                if (wonMessage.getEnvelopeType() != WonMessageDirection.FROM_OWNER) {
-                    try {
-                        getBotForAtomUri(wonMessage.getRecipientAtomURI()).onAtomHintFromMatcher(wonMessage);
-                    } catch (NoBotResponsibleException e) {
-                        logger.debug("error while handling onAtomHintFromMatcher()", e.getMessage());
-                    } catch (Exception e) {
-                        logger.warn("error while handling onAtomHintFromMatcher()", e);
-                    }
-                } else {
-                    logger.debug("Received echo for onAtomHintFromMatcher");
+        taskScheduler.schedule(() -> {
+            if (wonMessage.getEnvelopeType() != WonMessageDirection.FROM_OWNER) {
+                try {
+                    getBotForAtomUri(wonMessage.getRecipientAtomURI()).onAtomHintFromMatcher(wonMessage);
+                } catch (NoBotResponsibleException e) {
+                    logger.debug("error while handling onAtomHintFromMatcher()", e.getMessage());
+                } catch (Exception e) {
+                    logger.warn("error while handling onAtomHintFromMatcher()", e);
                 }
+            } else {
+                logger.debug("Received echo for onAtomHintFromMatcher");
             }
         }, new Date());
     }
 
     @Override
     public void onSocketHintFromMatcher(final WonMessage wonMessage) {
-        taskScheduler.schedule(new Runnable() {
-            public void run() {
-                if (wonMessage.getEnvelopeType() != WonMessageDirection.FROM_OWNER) {
-                    try {
-                        getBotForAtomUri(wonMessage.getRecipientAtomURI()).onSocketHintFromMatcher(wonMessage);
-                    } catch (NoBotResponsibleException e) {
-                        logger.debug("error while handling onAtomHintFromMatcher()", e.getMessage());
-                    } catch (Exception e) {
-                        logger.warn("error while handling onAtomHintFromMatcher()", e);
-                    }
-                } else {
-                    logger.debug("Received echo for onAtomHintFromMatcher");
+        taskScheduler.schedule(() -> {
+            if (wonMessage.getEnvelopeType() != WonMessageDirection.FROM_OWNER) {
+                try {
+                    getBotForAtomUri(wonMessage.getRecipientAtomURI()).onSocketHintFromMatcher(wonMessage);
+                } catch (NoBotResponsibleException e) {
+                    logger.debug("error while handling onAtomHintFromMatcher()", e.getMessage());
+                } catch (Exception e) {
+                    logger.warn("error while handling onAtomHintFromMatcher()", e);
                 }
+            } else {
+                logger.debug("Received echo for onAtomHintFromMatcher");
             }
         }, new Date());
     }
 
     @Override
     public void onConnectFromOtherAtom(final Connection con, final WonMessage wonMessage) {
-        taskScheduler.schedule(new Runnable() {
-            public void run() {
-                if (wonMessage.getEnvelopeType() != WonMessageDirection.FROM_OWNER) {
-                    try {
-                        logger.debug("onConnectFromOtherAtom called for connection {}, message {}",
-                                        con.getConnectionURI(), wonMessage.getMessageURI());
-                        getBotForAtomUri(con.getAtomURI()).onConnectFromOtherAtom(con, wonMessage);
-                    } catch (NoBotResponsibleException e) {
-                        logger.debug("error while handling onConnectFromOtherAtom()", e.getMessage());
-                    } catch (Exception e) {
-                        logger.warn("error while handling onConnectFromOtherAtom()", e);
-                    }
-                } else {
-                    logger.debug("Received echo for onConnectFromOtherAtom");
+        taskScheduler.schedule(() -> {
+            if (wonMessage.getEnvelopeType() != WonMessageDirection.FROM_OWNER) {
+                try {
+                    logger.debug("onConnectFromOtherAtom called for connection {}, message {}",
+                                    con.getConnectionURI(), wonMessage.getMessageURI());
+                    getBotForAtomUri(con.getAtomURI()).onConnectFromOtherAtom(con, wonMessage);
+                } catch (NoBotResponsibleException e) {
+                    logger.debug("error while handling onConnectFromOtherAtom()", e.getMessage());
+                } catch (Exception e) {
+                    logger.warn("error while handling onConnectFromOtherAtom()", e);
                 }
+            } else {
+                logger.debug("Received echo for onConnectFromOtherAtom");
             }
         }, new Date());
     }
 
     @Override
     public void onOpenFromOtherAtom(final Connection con, final WonMessage wonMessage) {
-        taskScheduler.schedule(new Runnable() {
-            public void run() {
-                if (wonMessage.getEnvelopeType() != WonMessageDirection.FROM_OWNER) {
-                    try {
-                        getBotForAtomUri(con.getAtomURI()).onOpenFromOtherAtom(con, wonMessage);
-                    } catch (NoBotResponsibleException e) {
-                        logger.debug("error while handling onOpenFromOtherAtom()", e.getMessage());
-                    } catch (Exception e) {
-                        logger.warn("error while handling onOpenFromOtherAtom()", e);
-                    }
-                } else {
-                    logger.debug("Received echo for onOpenFromOtherAtom");
+        taskScheduler.schedule(() -> {
+            if (wonMessage.getEnvelopeType() != WonMessageDirection.FROM_OWNER) {
+                try {
+                    getBotForAtomUri(con.getAtomURI()).onOpenFromOtherAtom(con, wonMessage);
+                } catch (NoBotResponsibleException e) {
+                    logger.debug("error while handling onOpenFromOtherAtom()", e.getMessage());
+                } catch (Exception e) {
+                    logger.warn("error while handling onOpenFromOtherAtom()", e);
                 }
+            } else {
+                logger.debug("Received echo for onOpenFromOtherAtom");
             }
         }, new Date());
     }
 
     @Override
     public void onMessageFromOtherAtom(final Connection con, final WonMessage wonMessage) {
-        taskScheduler.schedule(new Runnable() {
-            public void run() {
-                if (wonMessage.getEnvelopeType() != WonMessageDirection.FROM_OWNER) {
-                    try {
-                        logger.debug("onMessageFromOtherAtom for Connection {}, message {}", con.getConnectionURI(),
-                                        wonMessage.getMessageURI());
-                        getBotForAtomUri(con.getAtomURI()).onMessageFromOtherAtom(con, wonMessage);
-                    } catch (NoBotResponsibleException e) {
-                        logger.debug("error while handling onMessageFromOtherAtom()", e.getMessage());
-                    } catch (Exception e) {
-                        logger.warn("error while handling onMessageFromOtherAtom()", e);
-                    }
-                } else {
-                    logger.debug("Received echo for onMessageFromOtherAtom");
+        taskScheduler.schedule(() -> {
+            if (wonMessage.getEnvelopeType() != WonMessageDirection.FROM_OWNER) {
+                try {
+                    logger.debug("onMessageFromOtherAtom for Connection {}, message {}", con.getConnectionURI(),
+                                    wonMessage.getMessageURI());
+                    getBotForAtomUri(con.getAtomURI()).onMessageFromOtherAtom(con, wonMessage);
+                } catch (NoBotResponsibleException e) {
+                    logger.debug("error while handling onMessageFromOtherAtom()", e.getMessage());
+                } catch (Exception e) {
+                    logger.warn("error while handling onMessageFromOtherAtom()", e);
                 }
+            } else {
+                logger.debug("Received echo for onMessageFromOtherAtom");
             }
         }, new Date());
     }
 
     @Override
     public void onSuccessResponse(final URI successfulMessageUri, final WonMessage wonMessage) {
-        taskScheduler.schedule(new Runnable() {
-            public void run() {
-                try {
-                    logger.debug("onSuccessResponse for message {} ", successfulMessageUri);
-                    URI atomUri = wonMessage.getRecipientAtomURI();
-                    getBotForAtomUri(atomUri).onSuccessResponse(successfulMessageUri, wonMessage);
-                } catch (NoBotResponsibleException e) {
-                    logger.debug("error while handling onSuccessResponse()", e.getMessage());
-                } catch (Exception e) {
-                    logger.warn("error while handling onSuccessResponse()", e);
-                }
+        taskScheduler.schedule(() -> {
+            try {
+                logger.debug("onSuccessResponse for message {} ", successfulMessageUri);
+                URI atomUri = wonMessage.getRecipientAtomURI();
+                getBotForAtomUri(atomUri).onSuccessResponse(successfulMessageUri, wonMessage);
+            } catch (NoBotResponsibleException e) {
+                logger.debug("error while handling onSuccessResponse()", e.getMessage());
+            } catch (Exception e) {
+                logger.warn("error while handling onSuccessResponse()", e);
             }
         }, new Date());
     }
 
     @Override
     public void onFailureResponse(final URI failedMessageUri, final WonMessage wonMessage) {
-        taskScheduler.schedule(new Runnable() {
-            public void run() {
-                try {
-                    logger.debug("onFailureResponse for message {} ", failedMessageUri);
-                    URI atomUri = wonMessage.getRecipientAtomURI();
-                    getBotForAtomUri(atomUri).onFailureResponse(failedMessageUri, wonMessage);
-                } catch (NoBotResponsibleException e) {
-                    logger.debug("error while handling onFailureResponse()", e.getMessage());
-                } catch (Exception e) {
-                    logger.warn("error while handling onFailureResponse()", e);
-                }
+        taskScheduler.schedule(() -> {
+            try {
+                logger.debug("onFailureResponse for message {} ", failedMessageUri);
+                URI atomUri = wonMessage.getRecipientAtomURI();
+                getBotForAtomUri(atomUri).onFailureResponse(failedMessageUri, wonMessage);
+            } catch (NoBotResponsibleException e) {
+                logger.debug("error while handling onFailureResponse()", e.getMessage());
+            } catch (Exception e) {
+                logger.warn("error while handling onFailureResponse()", e);
             }
         }, new Date());
     }

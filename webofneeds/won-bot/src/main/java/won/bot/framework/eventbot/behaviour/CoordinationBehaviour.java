@@ -1,14 +1,13 @@
 package won.bot.framework.eventbot.behaviour;
 
-import java.util.Optional;
-
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.action.EventBotAction;
 import won.bot.framework.eventbot.event.Event;
-import won.bot.framework.eventbot.filter.EventFilter;
 import won.bot.framework.eventbot.listener.EventListener;
 import won.bot.framework.eventbot.listener.impl.ActionOnEventListener;
+
+import java.util.Optional;
 
 /**
  * Combines two behaviours. Deactivates automatically after execution.
@@ -92,11 +91,7 @@ public final class CoordinationBehaviour extends BotBehaviour {
         } else {
             eventClazz = BotBehaviourDeactivatedEvent.class;
         }
-        subscribeWithAutoCleanup(eventClazz, new ActionOnEventListener(context, new EventFilter() {
-            @Override
-            public boolean accept(Event event) {
-                return ((BotBehaviourEvent) event).getBehaviour() == behaviourA;
-            }
-        }, actionToExecute));
+        subscribeWithAutoCleanup(eventClazz, new ActionOnEventListener(context,
+                        event -> ((BotBehaviourEvent) event).getBehaviour() == behaviourA, actionToExecute));
     }
 }

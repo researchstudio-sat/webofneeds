@@ -67,82 +67,72 @@ public class BotMatcherProtocolMatcherServiceCallback implements MatcherProtocol
 
     @Override
     public void onRegistered(final URI wonNodeUri) {
-        taskScheduler.schedule(new Runnable() {
-            public void run() {
-                try {
-                    List<Bot> bots = getBotsForNodeUri(wonNodeUri);
-                    for (int i = 0; i < bots.size(); i++) {
-                        logger.debug("bot {} matcher registered on wonNode {}", bots.get(i), wonNodeUri.toString());
-                        bots.get(i).onMatcherRegistered(wonNodeUri);
-                    }
-                } catch (Exception e) {
-                    logger.warn("error while handling onRegistered()", e);
+        taskScheduler.schedule(() -> {
+            try {
+                List<Bot> bots = getBotsForNodeUri(wonNodeUri);
+                for (Bot bot : bots) {
+                    logger.debug("bot {} matcher registered on wonNode {}", bot, wonNodeUri.toString());
+                    bot.onMatcherRegistered(wonNodeUri);
                 }
+            } catch (Exception e) {
+                logger.warn("error while handling onRegistered()", e);
             }
         }, new Date());
     }
 
     @Override
     public void onNewAtom(final URI wonNodeURI, final URI atomURI, final Dataset content) {
-        taskScheduler.schedule(new Runnable() {
-            public void run() {
-                try {
-                    List<Bot> bots = getBotsForNodeUri(wonNodeURI);
-                    for (int i = 0; i < bots.size(); i++) {
-                        logger.debug("bot {} matcher registered on wonNode {}", bots.get(i), wonNodeURI.toString());
-                        bots.get(i).onNewAtomCreatedNotificationForMatcher(wonNodeURI, atomURI, content);
-                    }
-                } catch (Exception e) {
-                    logger.warn("error while handling onRegistered()", e);
+        taskScheduler.schedule(() -> {
+            try {
+                List<Bot> bots = getBotsForNodeUri(wonNodeURI);
+                for (Bot bot : bots) {
+                    logger.debug("bot {} matcher registered on wonNode {}", bot, wonNodeURI.toString());
+                    bot.onNewAtomCreatedNotificationForMatcher(wonNodeURI, atomURI, content);
                 }
+            } catch (Exception e) {
+                logger.warn("error while handling onRegistered()", e);
             }
         }, new Date());
     }
 
     @Override
     public void onAtomModified(final URI wonNodeURI, final URI atomURI) {
-        taskScheduler.schedule(new Runnable() {
-            public void run() {
-                try {
-                    logger.debug("onAtomModified for atom {} ", atomURI.toString());
-                    getBotForAtomUri(atomURI).onAtomModifiedNotificationForMatcher(wonNodeURI, atomURI);
-                    // getBotForAtomUri(atomURI.getAtomURI()).onMessageFromOtherAtom(con, message,
-                    // content);
-                } catch (Exception e) {
-                    logger.warn("error while handling onAtomModified()", e);
-                }
+        taskScheduler.schedule(() -> {
+            try {
+                logger.debug("onAtomModified for atom {} ", atomURI.toString());
+                getBotForAtomUri(atomURI).onAtomModifiedNotificationForMatcher(wonNodeURI, atomURI);
+                // getBotForAtomUri(atomURI.getAtomURI()).onMessageFromOtherAtom(con, message,
+                // content);
+            } catch (Exception e) {
+                logger.warn("error while handling onAtomModified()", e);
             }
         }, new Date());
     }
 
     @Override
     public void onAtomActivated(final URI wonNodeURI, final URI atomURI) {
-        taskScheduler.schedule(new Runnable() {
-            public void run() {
-                try {
-                    logger.debug("onAtomActivated for atom {} ", atomURI.toString());
-                    getBotForAtomUri(atomURI).onAtomActivatedNotificationForMatcher(wonNodeURI, atomURI);
-                    // getBotForAtomUri(atomURI.getAtomURI()).onMessageFromOtherAtom(con, message,
-                    // content);
-                } catch (Exception e) {
-                    logger.warn("error while handling onAtomActivated()", e);
-                }
+        taskScheduler.schedule(() -> {
+            try {
+                logger.debug("onAtomActivated for atom {} ", atomURI.toString());
+                getBotForAtomUri(atomURI).onAtomActivatedNotificationForMatcher(wonNodeURI, atomURI);
+                // getBotForAtomUri(atomURI.getAtomURI()).onMessageFromOtherAtom(con, message,
+                // content);
+            } catch (Exception e) {
+                logger.warn("error while handling onAtomActivated()", e);
             }
         }, new Date());
     }
 
     @Override
     public void onAtomDeactivated(final URI wonNodeURI, final URI atomURI) {
-        taskScheduler.schedule(new Runnable() {
-            public void run() {
-                try {
-                    logger.debug("onAtomDeactivated for atom {} ", atomURI.toString());
-                    getBotForAtomUri(atomURI).onAtomDeactivatedNotificationForMatcher(wonNodeURI, atomURI);
-                    // getBotForAtomUri(atomURI.getAtomURI()).onMessageFromOtherAtom(con, message,
-                    // content);
-                } catch (Exception e) {
-                    logger.warn("error while handling onAtomDeactivated()", e);
-                }
+        taskScheduler.schedule(() -> {
+            try {
+                logger.debug("onAtomDeactivated for atom {} ", atomURI.toString());
+                getBotForAtomUri(atomURI).onAtomDeactivatedNotificationForMatcher(wonNodeURI, atomURI);
+                // getBotForAtomUri(atomURI.getAtomURI()).onMessageFromOtherAtom(con, message,
+                // content);
+            } catch (Exception e) {
+                logger.warn("error while handling onAtomDeactivated()", e);
             }
         }, new Date());
     }

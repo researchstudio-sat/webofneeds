@@ -107,17 +107,14 @@ public class AsyncEventBusImpl implements EventBus {
     private void callEventListeners(final List<EventListener> listeners, final Event event) {
         if (listeners == null || listeners.isEmpty())
             return;
-        this.executor.execute(new Runnable() {
-            @Override
-            public void run() {
-                logger.debug("processing event {} with {} listeners", event, listeners.size());
-                for (EventListener listener : listeners) {
-                    try {
-                        listener.onEvent(event);
-                    } catch (Exception e) {
-                        logger.warn("caught exception during execution of event {} on listener {}", event, listener);
-                        logger.warn("stacktrace:", e);
-                    }
+        this.executor.execute(() -> {
+            logger.debug("processing event {} with {} listeners", event, listeners.size());
+            for (EventListener listener : listeners) {
+                try {
+                    listener.onEvent(event);
+                } catch (Exception e) {
+                    logger.warn("caught exception during execution of event {} on listener {}", event, listener);
+                    logger.warn("stacktrace:", e);
                 }
             }
         });
@@ -152,8 +149,8 @@ public class AsyncEventBusImpl implements EventBus {
 
     private List<EventListener> copyOrCreateList(final List<EventListener> listenerList) {
         if (listenerList == null)
-            return new ArrayList<EventListener>(1);
-        List<EventListener> newListenerList = new ArrayList<EventListener>(listenerList.size() + 1);
+            return new ArrayList<>(1);
+        List<EventListener> newListenerList = new ArrayList<>(listenerList.size() + 1);
         newListenerList.addAll(listenerList);
         return newListenerList;
     }

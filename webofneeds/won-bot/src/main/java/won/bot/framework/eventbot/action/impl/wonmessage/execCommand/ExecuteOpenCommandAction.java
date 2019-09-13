@@ -10,10 +10,7 @@
  */
 package won.bot.framework.eventbot.action.impl.wonmessage.execCommand;
 
-import java.net.URI;
-
 import org.apache.jena.query.Dataset;
-
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.event.impl.command.MessageCommandFailureEvent;
 import won.bot.framework.eventbot.event.impl.command.MessageCommandNotSentEvent;
@@ -28,6 +25,8 @@ import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.WonRdfUtils;
+
+import java.net.URI;
 
 /**
  * Action executing a ConnectCommandEvent, connecting to the targetAtom on
@@ -68,7 +67,7 @@ public class ExecuteOpenCommandAction extends ExecuteSendMessageCommandAction<Op
     @Override
     protected MessageCommandNotSentEvent<?> createMessageNotSentEvent(OpenCommandEvent originalCommand,
                     String message) {
-        return new MessageCommandNotSentEvent<OpenCommandEvent>(message, originalCommand);
+        return new MessageCommandNotSentEvent<>(message, originalCommand);
     }
 
     protected WonMessage createWonMessage(OpenCommandEvent connectCommandEvent) throws WonMessageBuilderException {

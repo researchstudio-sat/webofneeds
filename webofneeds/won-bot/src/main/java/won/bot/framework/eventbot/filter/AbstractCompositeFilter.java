@@ -19,7 +19,7 @@ public abstract class AbstractCompositeFilter implements CompositeFilter {
     private List<EventFilter> filters;
 
     public AbstractCompositeFilter() {
-        this(new LinkedList<EventFilter>());
+        this(new LinkedList<>());
     }
 
     public AbstractCompositeFilter(final List<EventFilter> filters) {

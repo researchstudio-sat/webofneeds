@@ -11,7 +11,6 @@
 package won.bot.framework.eventbot.action.impl.counter;
 
 import won.bot.framework.eventbot.EventListenerContext;
-import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.filter.EventFilter;
 
 /**
@@ -79,14 +78,11 @@ public class TargetCounterDecorator implements Counter {
     }
 
     public EventFilter makeEventFilter() {
-        return new EventFilter() {
-            @Override
-            public boolean accept(Event event) {
-                if (!(event instanceof TargetCountReachedEvent)) {
-                    return false;
-                }
-                return ((TargetCountReachedEvent) event).getCounter() == TargetCounterDecorator.this;
+        return event -> {
+            if (!(event instanceof TargetCountReachedEvent)) {
+                return false;
             }
+            return ((TargetCountReachedEvent) event).getCounter() == TargetCounterDecorator.this;
         };
     }
 }

@@ -10,11 +10,11 @@
  */
 package won.bot.framework.component.atomproducer.impl;
 
+import won.bot.framework.component.atomproducer.AtomProducer;
+
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-
-import won.bot.framework.component.atomproducer.AtomProducer;
 
 /**
  * Composite Atomproducer that will cycle through atomFactories, returning a
@@ -27,7 +27,7 @@ public class RoundRobinCompositeAtomProducer extends AbstractCompositeAtomProduc
     @Override
     protected synchronized AtomProducer selectActiveAtomFactory() {
         // work on a copy of the set to avoid concurrency problems
-        Set<AtomProducer> factories = new HashSet<AtomProducer>();
+        Set<AtomProducer> factories = new HashSet<>();
         factories.addAll(getAtomFactories());
         Iterator<AtomProducer> factoryIterator = factories.iterator();
         if (!factoryIterator.hasNext()) {

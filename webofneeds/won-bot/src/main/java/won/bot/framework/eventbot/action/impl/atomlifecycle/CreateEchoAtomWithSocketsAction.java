@@ -79,25 +79,19 @@ public class CreateEchoAtomWithSocketsAction extends AbstractCreateAtomAction {
                         echoAtomDataset);
         // remember the atom URI so we can react to success/failure responses
         EventBotActionUtils.rememberInList(ctx, atomURI, uriListName);
-        EventListener successCallback = new EventListener() {
-            @Override
-            public void onEvent(Event event) throws Exception {
-                logger.debug("atom creation successful, new atom URI is {}", atomURI);
-                // save the mapping between the original and the reaction in to the context.
-                getEventListenerContext().getBotContextWrapper().addUriAssociation(reactingToAtomUri, atomURI);
-                ctx.getEventBus().publish(new AtomCreatedEvent(atomURI, wonNodeUri, echoAtomDataset, null));
-            }
+        EventListener successCallback = event12 -> {
+            logger.debug("atom creation successful, new atom URI is {}", atomURI);
+            // save the mapping between the original and the reaction in to the context.
+            getEventListenerContext().getBotContextWrapper().addUriAssociation(reactingToAtomUri, atomURI);
+            ctx.getEventBus().publish(new AtomCreatedEvent(atomURI, wonNodeUri, echoAtomDataset, null));
         };
-        EventListener failureCallback = new EventListener() {
-            @Override
-            public void onEvent(Event event) throws Exception {
-                String textMessage = WonRdfUtils.MessageUtils
-                                .getTextMessage(((FailureResponseEvent) event).getFailureMessage());
-                logger.debug("atom creation failed for atom URI {}, original message URI {}: {}", new Object[] {
-                                atomURI, ((FailureResponseEvent) event).getOriginalMessageURI(), textMessage });
-                EventBotActionUtils.removeFromList(ctx, atomURI, uriListName);
-                ctx.getEventBus().publish(new AtomCreationFailedEvent(wonNodeUri));
-            }
+        EventListener failureCallback = event1 -> {
+            String textMessage = WonRdfUtils.MessageUtils
+                            .getTextMessage(((FailureResponseEvent) event1).getFailureMessage());
+            logger.debug("atom creation failed for atom URI {}, original message URI {}: {}", new Object[] {
+                            atomURI, ((FailureResponseEvent) event1).getOriginalMessageURI(), textMessage });
+            EventBotActionUtils.removeFromList(ctx, atomURI, uriListName);
+            ctx.getEventBus().publish(new AtomCreationFailedEvent(wonNodeUri));
         };
         EventBotActionUtils.makeAndSubscribeResponseListener(createAtomMessage, successCallback, failureCallback, ctx);
         logger.debug("registered listeners for response to message URI {}", createAtomMessage.getMessageURI());

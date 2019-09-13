@@ -10,18 +10,17 @@
  */
 package won.bot;
 
+import org.junit.Assert;
+import org.junit.Test;
+import won.bot.framework.bot.Bot;
+import won.bot.impl.DebugBot;
+
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
-
-import org.junit.Assert;
-import org.junit.Test;
-
-import won.bot.framework.bot.Bot;
-import won.bot.impl.DebugBot;
 
 /**
  * User: fkleedorfer Date: 17.01.14
@@ -44,7 +43,7 @@ public class BotTests {
     @Test
     public void testIsInitializedMultiThreaded() throws BrokenBarrierException, InterruptedException {
         // set of threads that managed to enter the initialize method
-        final Set<Thread> threadsInInit = Collections.synchronizedSet(new HashSet<Thread>());
+        final Set<Thread> threadsInInit = Collections.synchronizedSet(new HashSet<>());
         // bot impl that remembers which thread entered the initialize method
         final Bot bot = new DebugBot() {
             @Override
@@ -110,7 +109,7 @@ public class BotTests {
     @Test
     public void testIsShutdownMultiThreaded() throws BrokenBarrierException, InterruptedException {
         // set of threads that managed to enter the shutdown method
-        final Set<Thread> threadsInShutdown = Collections.synchronizedSet(new HashSet<Thread>());
+        final Set<Thread> threadsInShutdown = Collections.synchronizedSet(new HashSet<>());
         // bot impl that remembers which thread entered the shutdown method
         final Bot bot = new DebugBot() {
             @Override

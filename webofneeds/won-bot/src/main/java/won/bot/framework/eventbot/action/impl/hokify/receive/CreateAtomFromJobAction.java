@@ -101,23 +101,17 @@ public class CreateAtomFromJobAction extends AbstractCreateAtomAction {
             EventBotActionUtils.rememberInList(ctx, atomURI, uriListName);
             botContextWrapper.addURIJobURLRelation(hokifyJob.getUrl(), atomURI);
             EventBus bus = ctx.getEventBus();
-            EventListener successCallback = new EventListener() {
-                @Override
-                public void onEvent(Event event) throws Exception {
-                    logger.debug("atom creation successful, new atom URI is {}", atomURI);
-                    bus.publish(new AtomCreatedEvent(atomURI, wonNodeUri, dataset, null));
-                }
+            EventListener successCallback = event -> {
+                logger.debug("atom creation successful, new atom URI is {}", atomURI);
+                bus.publish(new AtomCreatedEvent(atomURI, wonNodeUri, dataset, null));
             };
-            EventListener failureCallback = new EventListener() {
-                @Override
-                public void onEvent(Event event) throws Exception {
-                    String textMessage = WonRdfUtils.MessageUtils
-                                    .getTextMessage(((FailureResponseEvent) event).getFailureMessage());
-                    logger.error("atom creation failed for atom URI {}, original message URI {}: {}", new Object[] {
-                                    atomURI, ((FailureResponseEvent) event).getOriginalMessageURI(), textMessage });
-                    EventBotActionUtils.removeFromList(ctx, atomURI, uriListName);
-                    botContextWrapper.removeURIJobURLRelation(atomURI);
-                }
+            EventListener failureCallback = event -> {
+                String textMessage = WonRdfUtils.MessageUtils
+                                .getTextMessage(((FailureResponseEvent) event).getFailureMessage());
+                logger.error("atom creation failed for atom URI {}, original message URI {}: {}", new Object[] {
+                                atomURI, ((FailureResponseEvent) event).getOriginalMessageURI(), textMessage });
+                EventBotActionUtils.removeFromList(ctx, atomURI, uriListName);
+                botContextWrapper.removeURIJobURLRelation(atomURI);
             };
             EventBotActionUtils.makeAndSubscribeResponseListener(createAtomMessage, successCallback, failureCallback,
                             ctx);

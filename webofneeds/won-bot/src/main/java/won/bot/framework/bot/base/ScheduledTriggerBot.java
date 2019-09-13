@@ -10,16 +10,15 @@
  */
 package won.bot.framework.bot.base;
 
-import java.util.Date;
-import java.util.concurrent.Executor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.Trigger;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Date;
+import java.util.concurrent.Executor;
 import java.util.concurrent.ScheduledFuture;
-
-import org.springframework.scheduling.TaskScheduler;
 
 /**
  * Bot that has access to a scheduler for performing recurring or deferred work
@@ -34,14 +33,11 @@ public abstract class ScheduledTriggerBot extends BaseBot {
     @Override
     public synchronized void initialize() throws Exception {
         if (trigger != null) {
-            this.scheduledExecution = getTaskScheduler().schedule(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        ScheduledTriggerBot.this.act();
-                    } catch (Exception e) {
-                        logger.warn("caught exception during triggered execution of act()", e);
-                    }
+            this.scheduledExecution = getTaskScheduler().schedule(() -> {
+                try {
+                    ScheduledTriggerBot.this.act();
+                } catch (Exception e) {
+                    logger.warn("caught exception during triggered execution of act()", e);
                 }
             }, trigger);
         } else {

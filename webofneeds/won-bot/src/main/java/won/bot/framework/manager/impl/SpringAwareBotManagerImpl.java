@@ -111,18 +111,15 @@ public class SpringAwareBotManagerImpl extends BotManagerImpl
             logger.info("no trigger set on SpringAwareBotManagerImpl, not checking bots' workDone status");
             return;
         }
-        this.taskScheduler.schedule(new Runnable() {
-            @Override
-            public void run() {
-                boolean workDone = isWorkDone();
-                if (!shutdownApplicationContextIfWorkDone) {
-                    logger.debug("botmanager will not shutdown spring context when work is done. (workDone:{})",
-                                    workDone);
-                } else {
-                    logger.debug("botmanager will shutdown spring context when work is done. (workDone:{})", workDone);
-                    if (workDone)
-                        SpringApplication.exit(applicationContext);
-                }
+        this.taskScheduler.schedule(() -> {
+            boolean workDone = isWorkDone();
+            if (!shutdownApplicationContextIfWorkDone) {
+                logger.debug("botmanager will not shutdown spring context when work is done. (workDone:{})",
+                                workDone);
+            } else {
+                logger.debug("botmanager will shutdown spring context when work is done. (workDone:{})", workDone);
+                if (workDone)
+                    SpringApplication.exit(applicationContext);
             }
         }, checkWorkDoneTrigger);
     }

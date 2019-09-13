@@ -35,7 +35,6 @@ import won.bot.framework.eventbot.event.impl.lifecycle.InitializeEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.ConnectFromOtherAtomEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.MessageFromOtherAtomEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.OpenFromOtherAtomEvent;
-import won.bot.framework.eventbot.filter.EventFilter;
 import won.bot.framework.eventbot.filter.impl.AtomUriEventFilter;
 import won.bot.framework.eventbot.filter.impl.CommandResultFilter;
 import won.bot.framework.eventbot.listener.EventListener;
@@ -185,7 +184,7 @@ public class GroupCycleBot extends EventBot {
                             new CounterImpl("memberCreationCounter", 0), NUMBER_OF_GROUPMEMBERS);
             TargetCounterDecorator membersConnectedCounter = new TargetCounterDecorator(context,
                             new CounterImpl("membersConnectedCounter", 0), NUMBER_OF_GROUPMEMBERS);
-            Set<URI> members = new HashSet<URI>();
+            Set<URI> members = new HashSet<>();
             // create N group members
             for (int i = 0; i < NUMBER_OF_GROUPMEMBERS; i++) {
                 Dataset atomDataset = createAtomDataset("Group Memeber Atom",
@@ -251,18 +250,15 @@ public class GroupCycleBot extends EventBot {
                                                                         }));
                                         // set up a listener for the response from the group atom
                                         subscribeWithAutoCleanup(OpenFromOtherAtomEvent.class,
-                                                        new ActionOnEventListener(context, new EventFilter() {
-                                                            @Override
-                                                            public boolean accept(Event event) {
-                                                                if (!(event instanceof OpenFromOtherAtomEvent))
-                                                                    return false;
-                                                                OpenFromOtherAtomEvent openEvent = (OpenFromOtherAtomEvent) event;
-                                                                if (!groupAtomURI.equals(openEvent.getTargetAtomURI()))
-                                                                    return false;
-                                                                if (!memberURI.equals(openEvent.getAtomURI()))
-                                                                    return false;
-                                                                return true;
-                                                            }
+                                                        new ActionOnEventListener(context, event1 -> {
+                                                            if (!(event1 instanceof OpenFromOtherAtomEvent))
+                                                                return false;
+                                                            OpenFromOtherAtomEvent openEvent = (OpenFromOtherAtomEvent) event1;
+                                                            if (!groupAtomURI.equals(openEvent.getTargetAtomURI()))
+                                                                return false;
+                                                            if (!memberURI.equals(openEvent.getAtomURI()))
+                                                                return false;
+                                                            return true;
                                                         }, new BaseEventBotAction(context) {
                                                             @Override
                                                             protected void doRun(Event event,
@@ -404,18 +400,15 @@ public class GroupCycleBot extends EventBot {
                                     }));
                     // set up a listener for the response from the group atom
                     subscribeWithAutoCleanup(OpenFromOtherAtomEvent.class,
-                                    new ActionOnEventListener(context, new EventFilter() {
-                                        @Override
-                                        public boolean accept(Event event) {
-                                            if (!(event instanceof OpenFromOtherAtomEvent))
-                                                return false;
-                                            OpenFromOtherAtomEvent openEvent = (OpenFromOtherAtomEvent) event;
-                                            if (!remoteGroupAtomURI.equals(openEvent.getTargetAtomURI()))
-                                                return false;
-                                            if (!groupAtomURI.equals(openEvent.getAtomURI()))
-                                                return false;
-                                            return true;
-                                        }
+                                    new ActionOnEventListener(context, event -> {
+                                        if (!(event instanceof OpenFromOtherAtomEvent))
+                                            return false;
+                                        OpenFromOtherAtomEvent openEvent = (OpenFromOtherAtomEvent) event;
+                                        if (!remoteGroupAtomURI.equals(openEvent.getTargetAtomURI()))
+                                            return false;
+                                        if (!groupAtomURI.equals(openEvent.getAtomURI()))
+                                            return false;
+                                        return true;
                                     }, new BaseEventBotAction(context) {
                                         @Override
                                         protected void doRun(Event event, EventListener executingListener)
@@ -522,18 +515,15 @@ public class GroupCycleBot extends EventBot {
                             context);
             // count connection messages received by group members coming from groups
             subscribeWithAutoCleanup(MessageFromOtherAtomEvent.class,
-                            new ActionOnEventListener(context, new EventFilter() {
-                                @Override
-                                public boolean accept(Event event) {
-                                    if (!(event instanceof MessageFromOtherAtomEvent))
-                                        return false;
-                                    MessageFromOtherAtomEvent messageEvent = (MessageFromOtherAtomEvent) event;
-                                    URI senderAtom = messageEvent.getTargetAtomURI();
-                                    URI recipientAtom = messageEvent.getAtomURI();
-                                    if (!botContextWrapper.getGroupMemberAtomUris().contains(recipientAtom))
-                                        return false;
-                                    return botContextWrapper.getGroupAtomUris().contains(senderAtom);
-                                }
+                            new ActionOnEventListener(context, event -> {
+                                if (!(event instanceof MessageFromOtherAtomEvent))
+                                    return false;
+                                MessageFromOtherAtomEvent messageEvent = (MessageFromOtherAtomEvent) event;
+                                URI senderAtom = messageEvent.getTargetAtomURI();
+                                URI recipientAtom = messageEvent.getAtomURI();
+                                if (!botContextWrapper.getGroupMemberAtomUris().contains(recipientAtom))
+                                    return false;
+                                return botContextWrapper.getGroupAtomUris().contains(senderAtom);
                             }, new IncrementCounterAction(context, receivedMessagesCounter)));
             // produce log messages about the actual and expeced number of messages
             subscribeWithAutoCleanup(CountEvent.class, new ActionOnEventListener(context,

@@ -1,23 +1,21 @@
 package won.bot.framework.eventbot.action.impl.hokify.util;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.HashMap;
-
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.json.JSONArray;
 import org.json.JSONObject;
-
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import won.bot.framework.eventbot.action.impl.hokify.HokifyJob;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * @author MS Handles all needed webrequests
@@ -32,7 +30,7 @@ public class HokifyBotsApi {
     }
 
     public ArrayList<HokifyJob> fetchHokifyData() {
-        ArrayList<HokifyJob> jobsList = new ArrayList<HokifyJob>();
+        ArrayList<HokifyJob> jobsList = new ArrayList<>();
         CloseableHttpResponse response = null;
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             HttpGet getRequest = new HttpGet(jsonURL);
@@ -98,7 +96,7 @@ public class HokifyBotsApi {
             }
             JSONArray jsonArray = new JSONArray(sb.toString());
             if (jsonArray.length() > 0) {
-                loc = new HashMap<String, String>();
+                loc = new HashMap<>();
                 JSONObject obj = jsonArray.getJSONObject(0);
                 JSONArray bBox = (JSONArray) obj.get("boundingbox");
                 loc.put("nwlat", (String) bBox.get(1));

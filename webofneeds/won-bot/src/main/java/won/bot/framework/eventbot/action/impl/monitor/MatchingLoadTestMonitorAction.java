@@ -56,7 +56,7 @@ public class MatchingLoadTestMonitorAction extends BaseEventBotAction {
             long hintReceivedTime = System.currentTimeMillis();
             atomSplits.get(atomUri).stop();
             if (hintEventReceivedTime.get(atomUri) == null) {
-                hintEventReceivedTime.put(atomUri, new LinkedList<Long>());
+                hintEventReceivedTime.put(atomUri, new LinkedList<>());
             }
             hintEventReceivedTime.get(atomUri).add(hintReceivedTime);
         } else if (event instanceof SocketHintFromMatcherEvent) {
@@ -65,7 +65,7 @@ public class MatchingLoadTestMonitorAction extends BaseEventBotAction {
             long hintReceivedTime = System.currentTimeMillis();
             atomSplits.get(atomUri).stop();
             if (hintEventReceivedTime.get(atomUri) == null) {
-                hintEventReceivedTime.put(atomUri, new LinkedList<Long>());
+                hintEventReceivedTime.put(atomUri, new LinkedList<>());
             }
             hintEventReceivedTime.get(atomUri).add(hintReceivedTime);
         }

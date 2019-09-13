@@ -35,9 +35,8 @@ public class MailFileAtomProducer implements FileBasedAtomProducer {
     @Override
     public synchronized Dataset readAtomFromFile(final File file) throws IOException {
         logger.debug("processing as mail file: {} ", file);
-        FileInputStream fis = new FileInputStream(file);
-        DefaultAtomModelWrapper atomModelWrapper = new DefaultAtomModelWrapper("no:uri");
-        try {
+        try (FileInputStream fis = new FileInputStream(file)) {
+            DefaultAtomModelWrapper atomModelWrapper = new DefaultAtomModelWrapper("no:uri");
             MimeMessage emailMessage = new MimeMessage(null, fis);
             MimeMessageParser parser = new MimeMessageParser(emailMessage);
             parser.parse();
@@ -61,9 +60,6 @@ public class MailFileAtomProducer implements FileBasedAtomProducer {
             return atomModelWrapper.copyDataset();
         } catch (Exception e) {
             logger.error("could not parse email from file {} ", file, e);
-        } finally {
-            if (fis != null)
-                fis.close();
         }
         return null;
     }

@@ -2,14 +2,7 @@ package won.bot.framework.bot.context;
 
 import java.io.Serializable;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -44,7 +37,7 @@ public class MemoryBotContext implements BotContext {
     public synchronized void appendToNamedAtomUriList(final URI uri, final String name) {
         List<URI> uris = this.namedAtomUriLists.get(name);
         if (uris == null) {
-            uris = new ArrayList<URI>();
+            uris = new ArrayList<>();
         }
         uris.add(uri);
         this.namedAtomUriLists.put(name, uris);
@@ -112,7 +105,7 @@ public class MemoryBotContext implements BotContext {
 
     @Override
     public Map<String, Object> loadObjectMap(final String collectionName) {
-        return new HashMap<String, Object>(getObjectMap(collectionName));
+        return new HashMap<>(getObjectMap(collectionName));
     }
 
     @Override

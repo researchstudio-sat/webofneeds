@@ -46,7 +46,7 @@ public class TelegramCreateAction extends AbstractCreateAtomAction {
         this.telegramContentExtractor = telegramContentExtractor;
         if (sockets == null || sockets.length == 0) {
             // add the default socket if none is present.
-            this.sockets = new ArrayList<URI>(1);
+            this.sockets = new ArrayList<>(1);
             this.sockets.add(SocketType.ChatSocket.getURI());
         } else {
             this.sockets = Arrays.asList(sockets);
@@ -110,30 +110,24 @@ public class TelegramCreateAction extends AbstractCreateAtomAction {
                 EventBotActionUtils.rememberInList(ctx, atomURI, uriListName);
                 botContextWrapper.addChatIdWonURIRelation(chatId, new WonURI(atomURI, UriType.ATOM));
                 botContextWrapper.addURIChatIdRelation(atomURI, chatId);
-                EventListener successCallback = new EventListener() {
-                    @Override
-                    public void onEvent(Event event) throws Exception {
-                        logger.debug("atom creation successful, new atom URI is {}", atomURI);
-                        logger.debug("created atom was from sender: " + botContextWrapper.getChatIdForURI(atomURI));
-                        try {
-                            Message message = telegramCreateAtomEvent.getAbsSender().sendMessage(wonTelegramBotHandler
-                                            .getTelegramMessageGenerator().getCreatedAtomMessage(chatId, atomURI));
-                            botContextWrapper.addMessageIdWonURIRelation(message.getMessageId(),
-                                            new WonURI(atomURI, UriType.ATOM));
-                        } catch (TelegramApiException te) {
-                            logger.error(te.getMessage());
-                        }
+                EventListener successCallback = event12 -> {
+                    logger.debug("atom creation successful, new atom URI is {}", atomURI);
+                    logger.debug("created atom was from sender: " + botContextWrapper.getChatIdForURI(atomURI));
+                    try {
+                        Message message = telegramCreateAtomEvent.getAbsSender().sendMessage(wonTelegramBotHandler
+                                        .getTelegramMessageGenerator().getCreatedAtomMessage(chatId, atomURI));
+                        botContextWrapper.addMessageIdWonURIRelation(message.getMessageId(),
+                                        new WonURI(atomURI, UriType.ATOM));
+                    } catch (TelegramApiException te) {
+                        logger.error(te.getMessage());
                     }
                 };
-                EventListener failureCallback = new EventListener() {
-                    @Override
-                    public void onEvent(Event event) throws Exception {
-                        String textMessage = WonRdfUtils.MessageUtils
-                                        .getTextMessage(((FailureResponseEvent) event).getFailureMessage());
-                        logger.error("atom creation failed for atom URI {}, original message URI {}: {}", new Object[] {
-                                        atomURI, ((FailureResponseEvent) event).getOriginalMessageURI(), textMessage });
-                        EventBotActionUtils.removeFromList(getEventListenerContext(), atomURI, uriListName);
-                    }
+                EventListener failureCallback = event1 -> {
+                    String textMessage = WonRdfUtils.MessageUtils
+                                    .getTextMessage(((FailureResponseEvent) event1).getFailureMessage());
+                    logger.error("atom creation failed for atom URI {}, original message URI {}: {}", new Object[] {
+                                    atomURI, ((FailureResponseEvent) event1).getOriginalMessageURI(), textMessage });
+                    EventBotActionUtils.removeFromList(getEventListenerContext(), atomURI, uriListName);
                 };
                 EventBotActionUtils.makeAndSubscribeResponseListener(createAtomMessage, successCallback,
                                 failureCallback, getEventListenerContext());

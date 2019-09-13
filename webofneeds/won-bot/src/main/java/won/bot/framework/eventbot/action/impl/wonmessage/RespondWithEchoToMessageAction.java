@@ -55,24 +55,21 @@ public class RespondWithEchoToMessageAction extends BaseEventBotAction {
     }
 
     private void handleMessageEvent(final ConnectionSpecificEvent messageEvent) {
-        getEventListenerContext().getTaskScheduler().schedule(new Runnable() {
-            @Override
-            public void run() {
-                String message = null;
-                if (messageEvent instanceof MessageEvent) {
-                    message = createMessage(
-                                    extractTextMessageFromWonMessage(((MessageEvent) messageEvent).getWonMessage()));
-                } else {
-                    message = createMessage(null);
-                }
-                URI connectionUri = messageEvent.getConnectionURI();
-                logger.debug("sending message " + message);
-                try {
-                    getEventListenerContext().getWonMessageSender()
-                                    .sendWonMessage(createWonMessage(connectionUri, message));
-                } catch (Exception e) {
-                    logger.warn("could not send message via connection {}", connectionUri, e);
-                }
+        getEventListenerContext().getTaskScheduler().schedule(() -> {
+            String message = null;
+            if (messageEvent instanceof MessageEvent) {
+                message = createMessage(
+                                extractTextMessageFromWonMessage(((MessageEvent) messageEvent).getWonMessage()));
+            } else {
+                message = createMessage(null);
+            }
+            URI connectionUri = messageEvent.getConnectionURI();
+            logger.debug("sending message " + message);
+            try {
+                getEventListenerContext().getWonMessageSender()
+                                .sendWonMessage(createWonMessage(connectionUri, message));
+            } catch (Exception e) {
+                logger.warn("could not send message via connection {}", connectionUri, e);
             }
         }, new Date(System.currentTimeMillis() + this.millisTimeoutBeforeReply));
     }

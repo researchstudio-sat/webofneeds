@@ -134,19 +134,17 @@ public class ConnectFromListToListAction extends BaseEventBotAction {
 
     private void performConnect(final URI fromUri, final URI toUri, final Date when) throws Exception {
         logger.debug("scheduling connection message for date {}", when);
-        getEventListenerContext().getTaskScheduler().schedule(new Runnable() {
-            public void run() {
-                try {
-                    logger.debug("connecting atoms {} and {}", fromUri, toUri);
-                    if (connectHook != null) {
-                        connectHook.onConnect(fromUri, toUri);
-                    }
-                    WonMessage connMessage = createWonMessage(fromUri, toUri);
-                    getEventListenerContext().getWonMessageSender().sendWonMessage(connMessage);
-                } catch (Exception e) {
-                    logger.warn("could not connect {} and {}", fromUri, toUri); // throws
-                    logger.warn("caught exception", e);
+        getEventListenerContext().getTaskScheduler().schedule(() -> {
+            try {
+                logger.debug("connecting atoms {} and {}", fromUri, toUri);
+                if (connectHook != null) {
+                    connectHook.onConnect(fromUri, toUri);
                 }
+                WonMessage connMessage = createWonMessage(fromUri, toUri);
+                getEventListenerContext().getWonMessageSender().sendWonMessage(connMessage);
+            } catch (Exception e) {
+                logger.warn("could not connect {} and {}", fromUri, toUri); // throws
+                logger.warn("caught exception", e);
             }
         }, when);
     }

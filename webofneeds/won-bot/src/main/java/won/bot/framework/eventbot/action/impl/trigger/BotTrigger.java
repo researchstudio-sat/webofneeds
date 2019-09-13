@@ -10,17 +10,16 @@
  */
 package won.bot.framework.eventbot.action.impl.trigger;
 
-import java.time.Duration;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import org.springframework.scheduling.support.PeriodicTrigger;
-
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.listener.EventListener;
 import won.bot.framework.eventbot.listener.impl.ActionOnFirstEventListener;
+
+import java.time.Duration;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Publishes BotTriggerEvents on the eventBus at configurable intervals. Upon
@@ -123,12 +122,7 @@ public class BotTrigger {
         PeriodicTrigger myTrigger = new PeriodicTrigger(getInterval().toMillis());
         myTrigger.setInitialDelay(getInterval().toMillis());
         // schedule a task that publishes the BotTriggerEvent
-        BotTrigger.this.cancelableTask = context.getTaskScheduler().schedule(new Runnable() {
-            @Override
-            public void run() {
-                fire();
-            }
-        }, myTrigger);
+        BotTrigger.this.cancelableTask = context.getTaskScheduler().schedule(() -> fire(), myTrigger);
     }
 
     protected void fire() {
