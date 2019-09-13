@@ -48,8 +48,8 @@ public class TwoPhaseCommitDeactivateOnCloseAction extends BaseEventBotAction {
                             model -> model.listObjectsOfProperty(
                                             model.createProperty(WON_TX.COORDINATION_MESSAGE.getURI())));
             assert ni.hasNext() : "no additional content found in close message, expected a commit";
-            String coordinationMessageUri = ni.toList().get(0).asResource().getURI().toString();
-            assert coordinationMessageUri.equals(WON_TX.COORDINATION_MESSAGE_COMMIT.getURI().toString()) : "expected a "
+            String coordinationMessageUri = ni.toList().get(0).asResource().getURI();
+            assert coordinationMessageUri.equals(WON_TX.COORDINATION_MESSAGE_COMMIT.getURI()) : "expected a "
                             + "Commmit message";
             getEventListenerContext().getWonMessageSender().sendWonMessage(createWonMessage(atomURI));
             getEventListenerContext().getEventBus().publish(new AtomDeactivatedEvent(atomURI));

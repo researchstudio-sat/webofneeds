@@ -62,7 +62,7 @@ public class ExecuteReplaceCommandAction extends BaseEventBotAction {
         if (!atomResource.isURIResource()) {
             throw new IllegalArgumentException("atom resource in dataset is not an URI");
         }
-        URI atomURI = URI.create(atomResource.getURI().toString());
+        URI atomURI = URI.create(atomResource.getURI());
         RdfUtils.replaceBaseURI(atomDataset, atomResource.getURI(), true);
         RdfUtils.replaceBaseResource(atomDataset, atomResource, true);
         // AtomModelWrapper atomModelWrapper = new AtomModelWrapper(atomDataset);

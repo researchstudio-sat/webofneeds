@@ -51,8 +51,8 @@ public class TwoPhaseCommitNoVoteDeactivateAllAtomsAction extends BaseEventBotAc
                             model -> model.listObjectsOfProperty(
                                             model.createProperty(WON_TX.COORDINATION_MESSAGE.getURI())));
             if (ni.hasNext()) {
-                String coordinationMessageUri = ni.toList().get(0).asResource().getURI().toString();
-                if (coordinationMessageUri.equals(WON_TX.COORDINATION_MESSAGE_ABORT.getURI().toString()))
+                String coordinationMessageUri = ni.toList().get(0).asResource().getURI();
+                if (coordinationMessageUri.equals(WON_TX.COORDINATION_MESSAGE_ABORT.getURI()))
                     logger.debug("Sent COORDINATION_MESSAGE: {}", coordinationMessageUri);
                 else
                     logger.error("Content of the COORDINATION_MESSAGE must be: {}. Currently it is: {}",

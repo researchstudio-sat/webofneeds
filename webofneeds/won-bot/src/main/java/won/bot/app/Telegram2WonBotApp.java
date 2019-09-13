@@ -8,7 +8,7 @@ import org.springframework.boot.SpringApplication;
  */
 public class Telegram2WonBotApp {
     public static void main(String[] args) throws Exception {
-        SpringApplication app = new SpringApplication(new Object[] { "classpath:/spring/app/telegram2wonBotApp.xml" });
+        SpringApplication app = new SpringApplication("classpath:/spring/app/telegram2wonBotApp.xml");
         app.setWebEnvironment(false);
         app.run(args);
         // ConfigurableApplicationContext applicationContext = app.run(args);

@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class AtomCreatorBotApp implements CommandLineRunner {
     public static void main(String[] args) {
-        SpringApplication app = new SpringApplication(new Object[] { "classpath:/spring/app/atomCreatorBotApp.xml" });
+        SpringApplication app = new SpringApplication("classpath:/spring/app/atomCreatorBotApp.xml");
         app.setWebEnvironment(false);
         app.run(args);
     }

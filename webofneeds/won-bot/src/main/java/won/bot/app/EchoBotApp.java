@@ -18,7 +18,7 @@ import org.springframework.boot.SpringApplication;
  */
 public class EchoBotApp {
     public static void main(String[] args) throws Exception {
-        SpringApplication app = new SpringApplication(new Object[] { "classpath:/spring/app/echoBotApp.xml" });
+        SpringApplication app = new SpringApplication("classpath:/spring/app/echoBotApp.xml");
         app.setWebEnvironment(false);
         app.run(args);
         // ConfigurableApplicationContext applicationContext = app.run(args);

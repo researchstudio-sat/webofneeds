@@ -10,16 +10,16 @@
  */
 package won.bot.framework.eventbot.event.impl.command.create;
 
-import java.net.URI;
-import java.util.Arrays;
-import java.util.List;
-
 import org.apache.jena.query.Dataset;
-
 import won.bot.framework.bot.context.BotContext;
 import won.bot.framework.eventbot.event.impl.command.MessageCommandEvent;
 import won.protocol.message.WonMessageType;
 import won.protocol.model.SocketType;
+
+import java.net.URI;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Instructs the bot to create an atom.
@@ -45,7 +45,7 @@ public class CreateAtomCommandEvent implements MessageCommandEvent {
         if (sockets != null && sockets.length > 0) {
             this.sockets = Arrays.asList(sockets);
         } else {
-            this.sockets = Arrays.asList(new URI[] { SocketType.ChatSocket.getURI() });
+            this.sockets = Collections.singletonList(SocketType.ChatSocket.getURI());
         }
         this.usedForTesting = usedForTesting;
         this.doNotMatch = doNotMatch;

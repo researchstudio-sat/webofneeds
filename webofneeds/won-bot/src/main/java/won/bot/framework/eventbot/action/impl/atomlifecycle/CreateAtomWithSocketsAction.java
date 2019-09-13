@@ -64,7 +64,7 @@ public class CreateAtomWithSocketsAction extends AbstractCreateAtomAction {
         URI atomUriFromProducer = null;
         Resource atomResource = WonRdfUtils.AtomUtils.getAtomResource(atomDataset);
         if (atomResource.isURIResource()) {
-            atomUriFromProducer = URI.create(atomResource.getURI().toString());
+            atomUriFromProducer = URI.create(atomResource.getURI());
             RdfUtils.replaceBaseURI(atomDataset, atomResource.getURI(), true);
         } else {
             RdfUtils.replaceBaseResource(atomDataset, atomResource, true);

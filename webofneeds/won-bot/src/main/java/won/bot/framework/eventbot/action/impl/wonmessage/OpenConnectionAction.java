@@ -54,7 +54,6 @@ public class OpenConnectionAction extends BaseEventBotAction {
             logger.debug("auto-replying to connect for connection {}", connectEvent.getConnectionURI());
             getEventListenerContext().getWonMessageSender()
                             .sendWonMessage(createOpenWonMessage(connectEvent.getConnectionURI()));
-            return;
         } else if (event instanceof OpenFromOtherAtomEvent) {
             ConnectionSpecificEvent connectEvent = (ConnectionSpecificEvent) event;
             URI connectionState = WonLinkedDataUtils.getConnectionStateforConnectionURI(connectEvent.getConnectionURI(),
@@ -67,7 +66,6 @@ public class OpenConnectionAction extends BaseEventBotAction {
             } else {
                 // else do not respond - we assume the connection is now established.
             }
-            return;
         } else if (event instanceof AtomHintFromMatcherEvent) {
             // TODO: the hint with a match object is not really suitable here. Would be
             // better to

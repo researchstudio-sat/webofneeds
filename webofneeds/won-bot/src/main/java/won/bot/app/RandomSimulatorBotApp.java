@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 public class RandomSimulatorBotApp implements CommandLineRunner {
     public static void main(String[] args) {
         SpringApplication app = new SpringApplication(
-                        new Object[] { "classpath:/spring/app/randomSimulatorBotApp.xml" });
+                        "classpath:/spring/app/randomSimulatorBotApp.xml");
         app.setWebEnvironment(false);
         app.run(args);
     }

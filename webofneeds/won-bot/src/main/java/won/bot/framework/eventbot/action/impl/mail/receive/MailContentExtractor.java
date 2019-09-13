@@ -1,10 +1,7 @@
 package won.bot.framework.eventbot.action.impl.mail.receive;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import won.bot.framework.eventbot.action.impl.mail.model.ActionType;
+import won.bot.framework.eventbot.action.impl.mail.model.MailPropertyType;
 
 import javax.mail.Address;
 import javax.mail.BodyPart;
@@ -12,9 +9,11 @@ import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
-
-import won.bot.framework.eventbot.action.impl.mail.model.ActionType;
-import won.bot.framework.eventbot.action.impl.mail.model.MailPropertyType;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Extracts atom properties like title, description, atom type, etc from mails.
@@ -232,7 +231,7 @@ public class MailContentExtractor {
     public String[] getTags(MimeMessage message) throws MessagingException, IOException {
         HashSet<String> tags = new HashSet<>();
         Matcher m = tagExtractionPattern.matcher(
-                        new StringBuilder(message.getSubject()).append(" ").append(message.getContent()).toString());
+                        message.getSubject() + " " + message.getContent());
         while (m.find()) {
             tags.add(m.group());
         }

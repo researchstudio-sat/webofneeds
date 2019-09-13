@@ -284,8 +284,9 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
                             // atom of the current conversation
                             Dataset atomNetwork = WonLinkedDataUtils.getConnectionNetwork(uri,
                                             ctx.getLinkedDataSource());
-                            return (Set<URI>) WonRdfUtils.AtomUtils.getTargetConnectionURIsForTargetAtoms(atomNetwork,
-                                    Collections.singletonList(targetAtom), Optional.of(ConnectionState.CONNECTED));
+                            return WonRdfUtils.AtomUtils.getTargetConnectionURIsForTargetAtoms(atomNetwork,
+                                            Collections.singletonList(targetAtom),
+                                            Optional.of(ConnectionState.CONNECTED));
                         }).flatMap(Collection::stream).collect(Collectors.toSet());
         bus.publish(new ConnectionMessageCommandEvent(con, messageModel, targetConnections));
     }
