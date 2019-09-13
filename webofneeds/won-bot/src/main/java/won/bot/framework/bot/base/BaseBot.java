@@ -10,16 +10,12 @@
  */
 package won.bot.framework.bot.base;
 
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
-
 import org.apache.jena.query.Dataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.util.Assert;
-
 import won.bot.framework.bot.Bot;
 import won.bot.framework.bot.BotLifecyclePhase;
 import won.bot.framework.bot.context.BotContextWrapper;
@@ -33,6 +29,9 @@ import won.protocol.message.sender.WonMessageSender;
 import won.protocol.model.Connection;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.linkeddata.LinkedDataSource;
+
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
 
 /**
  * Basic Bot implementation intended to be extended. Does nothing. Implements
@@ -128,7 +127,7 @@ public abstract class BaseBot implements Bot {
     }
 
     @Qualifier("default")
-    @Autowired(required = true)
+    @Autowired()
     public void setNodeURISource(final NodeURISource nodeURISource) {
         this.nodeURISource = nodeURISource;
     }
@@ -138,7 +137,7 @@ public abstract class BaseBot implements Bot {
     }
 
     @Qualifier("default")
-    @Autowired(required = true)
+    @Autowired()
     public void setMatcherNodeURISource(final MatcherNodeURISource matcherNodeURISource) {
         this.matcherNodeURISource = matcherNodeURISource;
     }
@@ -148,7 +147,7 @@ public abstract class BaseBot implements Bot {
     }
 
     @Qualifier("default")
-    @Autowired(required = true)
+    @Autowired()
     public void setWonMessageSender(final WonMessageSender wonMessageSender) {
         this.wonMessageSender = wonMessageSender;
     }
@@ -158,7 +157,7 @@ public abstract class BaseBot implements Bot {
     }
 
     @Qualifier("default")
-    @Autowired(required = true)
+    @Autowired()
     public void setMatcherProtocolAtomServiceClient(
                     final MatcherProtocolAtomServiceClientSide matcherProtocolAtomServiceClient) {
         this.matcherProtocolAtomServiceClient = matcherProtocolAtomServiceClient;
@@ -169,7 +168,7 @@ public abstract class BaseBot implements Bot {
     }
 
     @Qualifier("default")
-    @Autowired(required = true)
+    @Autowired()
     public void setMatcherProtocolMatcherService(
                     final MatcherProtocolMatcherServiceImplJMSBased matcherProtocolMatcherService) {
         this.matcherProtocolMatcherService = matcherProtocolMatcherService;
@@ -180,7 +179,7 @@ public abstract class BaseBot implements Bot {
     }
 
     @Qualifier("default")
-    @Autowired(required = true)
+    @Autowired()
     public void setAtomProducer(final AtomProducer atomProducer) {
         this.atomProducer = atomProducer;
     }
@@ -190,7 +189,7 @@ public abstract class BaseBot implements Bot {
     }
 
     @Qualifier("default")
-    @Autowired(required = true)
+    @Autowired()
     public void setLinkedDataSource(final LinkedDataSource linkedDataSource) {
         this.linkedDataSource = linkedDataSource;
     }
@@ -199,7 +198,7 @@ public abstract class BaseBot implements Bot {
         return wonNodeInformationService;
     }
 
-    @Autowired(required = true)
+    @Autowired()
     public void setWonNodeInformationService(final WonNodeInformationService wonNodeInformationService) {
         this.wonNodeInformationService = wonNodeInformationService;
     }

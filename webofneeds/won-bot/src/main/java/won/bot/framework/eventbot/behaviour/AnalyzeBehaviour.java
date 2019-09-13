@@ -69,7 +69,6 @@ public class AnalyzeBehaviour extends BotBehaviour {
 
     public AnalyzeBehaviour(EventListenerContext context, String name) {
         super(context, name);
-        context.getBotContextWrapper().getBotName();
         botContext = context.getBotContext();
         String botName = context.getBotContextWrapper().getBotName();
         this.preconditionToProposalListMapName = botName + ":" + name + ":preconditionToProposalListMap";
