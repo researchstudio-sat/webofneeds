@@ -10,26 +10,13 @@
  */
 package won.bot.impl;
 
-import java.net.URI;
-
 import won.bot.framework.bot.base.EventBot;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.action.EventBotAction;
 import won.bot.framework.eventbot.action.impl.MultipleActions;
 import won.bot.framework.eventbot.action.impl.RandomDelayedAction;
-import won.bot.framework.eventbot.action.impl.debugbot.AnswerWithElizaAction;
-import won.bot.framework.eventbot.action.impl.debugbot.CreateDebugAtomWithSocketsAction;
-import won.bot.framework.eventbot.action.impl.debugbot.DebugBotIncomingMessageToEventMappingAction;
-import won.bot.framework.eventbot.action.impl.debugbot.MessageTimingManager;
-import won.bot.framework.eventbot.action.impl.debugbot.OpenConnectionDebugAction;
-import won.bot.framework.eventbot.action.impl.debugbot.PublishSetChattinessEventAction;
-import won.bot.framework.eventbot.action.impl.debugbot.RecordMessageReceivedTimeAction;
-import won.bot.framework.eventbot.action.impl.debugbot.RecordMessageSentTimeAction;
-import won.bot.framework.eventbot.action.impl.debugbot.ReplaceDebugAtomContentAction;
-import won.bot.framework.eventbot.action.impl.debugbot.SendChattyMessageAction;
-import won.bot.framework.eventbot.action.impl.debugbot.SendNDebugMessagesAction;
-import won.bot.framework.eventbot.action.impl.debugbot.SetChattinessAction;
+import won.bot.framework.eventbot.action.impl.debugbot.*;
 import won.bot.framework.eventbot.action.impl.matcher.RegisterMatcherAction;
 import won.bot.framework.eventbot.action.impl.wonmessage.ConnectWithAssociatedAtomAction;
 import won.bot.framework.eventbot.action.impl.wonmessage.HintAssociatedAtomAction;
@@ -40,31 +27,19 @@ import won.bot.framework.eventbot.behaviour.ExecuteWonMessageCommandBehaviour;
 import won.bot.framework.eventbot.bus.EventBus;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.impl.command.close.CloseCommandSuccessEvent;
-import won.bot.framework.eventbot.event.impl.debugbot.AtomCreatedEventForDebugConnect;
-import won.bot.framework.eventbot.event.impl.debugbot.AtomCreatedEventForDebugHint;
-import won.bot.framework.eventbot.event.impl.debugbot.ConnectDebugCommandEvent;
-import won.bot.framework.eventbot.event.impl.debugbot.HintDebugCommandEvent;
-import won.bot.framework.eventbot.event.impl.debugbot.MessageToElizaEvent;
-import won.bot.framework.eventbot.event.impl.debugbot.ReplaceDebugAtomContentCommandEvent;
-import won.bot.framework.eventbot.event.impl.debugbot.SendNDebugCommandEvent;
-import won.bot.framework.eventbot.event.impl.debugbot.SetCacheEagernessCommandEvent;
-import won.bot.framework.eventbot.event.impl.debugbot.SetChattinessDebugCommandEvent;
-import won.bot.framework.eventbot.event.impl.debugbot.UsageDebugCommandEvent;
+import won.bot.framework.eventbot.event.impl.debugbot.*;
 import won.bot.framework.eventbot.event.impl.lifecycle.ActEvent;
 import won.bot.framework.eventbot.event.impl.matcher.AtomCreatedEventForMatcher;
 import won.bot.framework.eventbot.event.impl.matcher.MatcherRegisterFailedEvent;
-import won.bot.framework.eventbot.event.impl.wonmessage.CloseFromOtherAtomEvent;
-import won.bot.framework.eventbot.event.impl.wonmessage.ConnectFromOtherAtomEvent;
-import won.bot.framework.eventbot.event.impl.wonmessage.MessageFromOtherAtomEvent;
-import won.bot.framework.eventbot.event.impl.wonmessage.OpenFromOtherAtomEvent;
-import won.bot.framework.eventbot.event.impl.wonmessage.WonMessageReceivedOnConnectionEvent;
-import won.bot.framework.eventbot.event.impl.wonmessage.WonMessageSentOnConnectionEvent;
+import won.bot.framework.eventbot.event.impl.wonmessage.*;
 import won.bot.framework.eventbot.filter.impl.AtomUriInNamedListFilter;
 import won.bot.framework.eventbot.filter.impl.NotFilter;
 import won.bot.framework.eventbot.listener.BaseEventListener;
 import won.bot.framework.eventbot.listener.EventListener;
 import won.bot.framework.eventbot.listener.impl.ActionOnEventListener;
 import won.protocol.model.SocketType;
+
+import java.net.URI;
 
 /**
  * Bot that reacts to each new atom that is created in the system by creating
@@ -225,16 +200,5 @@ public class DebugBot extends EventBot {
                         new ActionOnEventListener(ctx, new RecordMessageSentTimeAction(ctx, timingManager)));
         bus.subscribe(ReplaceDebugAtomContentCommandEvent.class,
                         new ActionOnEventListener(ctx, new ReplaceDebugAtomContentAction(ctx)));
-    }
-
-    public static void main(String[] args) {
-        String str = "test";
-        System.out.println(str);
-        str = str.replaceFirst("( \\(edit #\\d+\\)|$)", " (edit #1)");
-        System.out.println(str);
-        str = str.replaceFirst("( \\(edit #\\d+\\)|$)", " (edit #2)");
-        System.out.println(str);
-        str = str.replaceFirst("( \\(edit #\\d+\\)|$)", " (edit #3)");
-        System.out.println(str);
     }
 }
