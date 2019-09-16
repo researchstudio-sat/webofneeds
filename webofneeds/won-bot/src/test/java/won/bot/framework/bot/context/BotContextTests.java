@@ -143,8 +143,8 @@ public class BotContextTests {
         Assert.assertEquals(URI1, botContext.loadFromObjectMap("col1", "uri1"));
         Assert.assertEquals(URI2, botContext.loadFromObjectMap("col1", "uri2"));
         Assert.assertEquals(3, botContext.loadObjectMap("col2").size());
-        Assert.assertTrue(botContext.loadObjectMap("col2").values().contains(URI2));
-        Assert.assertTrue(botContext.loadObjectMap("col2").values().contains(URI3));
+        Assert.assertTrue(botContext.loadObjectMap("col2").containsValue(URI2));
+        Assert.assertTrue(botContext.loadObjectMap("col2").containsValue(URI3));
         botContext.removeFromObjectMap("col3", "uri1");
         botContext.removeFromObjectMap("col2", "uri3");
         botContext.removeFromObjectMap("col1", "uri1");
