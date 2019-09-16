@@ -365,7 +365,7 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
                                             ? (m.isProposesMessage() || m.isProposesToCancelMessage())
                                                             && m.getEffects().stream()
                                                                             .anyMatch(MessageEffect::isProposes)
-                                            : true && useWrongSender
+                                            : useWrongSender
                                                             ? m.getSenderAtomURI().equals(con.getTargetAtomURI())
                                                             : m.getSenderAtomURI().equals(con.getAtomURI()),
                                             0);
