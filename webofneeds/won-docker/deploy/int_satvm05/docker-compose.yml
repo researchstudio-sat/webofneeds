@@ -269,34 +269,34 @@ services:
       - wonnode1
       - wonnode2
 
-  mail_bot:
-    restart: always
-    build: ../../image/bots
-    image: webofneeds/bots:int
-    environment:
-      - "MAIN_BOT=won.bot.app.Mail2WonBotApp"
-      - "node.default.host=satvm05.researchstudio.at"
-      - "node.default.http.port=8888"
-      - "uri.prefix.owner=https://satvm05.researchstudio.at/mail_bot" # set this for the trust store alias
-      - "won.node.uris=https://satvm05.researchstudio.at:8888/won/resource https://satvm05.researchstudio.at/won/resource"
-      - "botContext.impl=mongoBotContext"
-      - "botContext.mongodb.user=won"
-      - "botContext.mongodb.pass=$mongo_db_passwd"
-      - "botContext.mongodb.host=satvm05.researchstudio.at"
-      - "botContext.mongodb.port=27018"
-      - "botContext.mongodb.database=int_bot"
-      - "mailbot.email.user=won-internal"
-      - "mailbot.email.address=won-internal@researchstudio.at"
-      - "mailbot.email.name=Web of Needs Integration-Test Mail Bot"
-      - "mailbot.email.password=$mailinglist_passwd"
-      - "mailbot.email.imap.host=imap.researchstudio.at"
-      - "mailbot.email.imap.port=993"
-      - "mailbot.email.smtp.host=smtp.researchstudio.at"
-      - "mailbot.email.smtp.port=587"
-    depends_on:
-      - mongodb
-      - wonnode1
-      - wonnode2
+#  mail_bot:
+#    restart: always
+#    build: ../../image/bots
+#    image: webofneeds/bots:int
+#    environment:
+#      - "MAIN_BOT=won.bot.app.Mail2WonBotApp"
+#      - "node.default.host=satvm05.researchstudio.at"
+#      - "node.default.http.port=8888"
+#      - "uri.prefix.owner=https://satvm05.researchstudio.at/mail_bot" # set this for the trust store alias
+#      - "won.node.uris=https://satvm05.researchstudio.at:8888/won/resource https://satvm05.researchstudio.at/won/resource"
+#      - "botContext.impl=mongoBotContext"
+#      - "botContext.mongodb.user=won"
+#      - "botContext.mongodb.pass=$mongo_db_passwd"
+#      - "botContext.mongodb.host=satvm05.researchstudio.at"
+#      - "botContext.mongodb.port=27018"
+#      - "botContext.mongodb.database=int_bot"
+#      - "mailbot.email.user=won-internal"
+#      - "mailbot.email.address=won-internal@researchstudio.at"
+#      - "mailbot.email.name=Web of Needs Integration-Test Mail Bot"
+#      - "mailbot.email.password=$mailinglist_passwd"
+#      - "mailbot.email.imap.host=imap.researchstudio.at"
+#      - "mailbot.email.imap.port=993"
+#      - "mailbot.email.smtp.host=smtp.researchstudio.at"
+#      - "mailbot.email.smtp.port=587"
+#    depends_on:
+#      - mongodb
+#      - wonnode1
+#      - wonnode2
 
   # bigdata rdf store for matcher service (this image is not built at deployment, it is downloaded from dockerhub)
   bigdata:
