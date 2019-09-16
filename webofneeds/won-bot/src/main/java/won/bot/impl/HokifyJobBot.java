@@ -11,7 +11,6 @@ import won.bot.framework.eventbot.action.impl.hokify.receive.CreateAtomFromJobAc
 import won.bot.framework.eventbot.action.impl.hokify.send.Connect2HokifyAction;
 import won.bot.framework.eventbot.action.impl.hokify.send.Message2HokifyAction;
 import won.bot.framework.eventbot.action.impl.hokify.util.HokifyBotsApi;
-import won.bot.framework.eventbot.action.impl.hokify.util.HokifyMessageGenerator;
 import won.bot.framework.eventbot.action.impl.trigger.ActionOnTriggerEventListener;
 import won.bot.framework.eventbot.action.impl.trigger.BotTrigger;
 import won.bot.framework.eventbot.action.impl.trigger.BotTriggerEvent;
@@ -47,15 +46,10 @@ public class HokifyJobBot extends EventBot {
     private boolean createAllInOne;
     private ArrayList<HokifyJob> hokifyJobsList;
     private EventBus bus;
-    // private WonHokifyJobBotHandler wonHokifyJobBotHandler;
-    // @Autowired
-    private HokifyMessageGenerator hokifyMessageGenerator;
 
     @Override
     protected void initializeEventListeners() {
         EventListenerContext ctx = getEventListenerContext();
-        this.hokifyMessageGenerator = new HokifyMessageGenerator();
-        this.hokifyMessageGenerator.setEventListenerContext(ctx);
         bus = getEventBus();
         HokifyBotsApi hokifyBotsApi = new HokifyBotsApi(this.jsonURL, this.geoURL);
         hokifyJobsList = hokifyBotsApi.fetchHokifyData();
@@ -120,14 +114,6 @@ public class HokifyJobBot extends EventBot {
 
     public void setJsonURL(final String jsonURL) {
         this.jsonURL = jsonURL;
-    }
-
-    public HokifyMessageGenerator getHokifyMessageGenerator() {
-        return hokifyMessageGenerator;
-    }
-
-    public void setHokifyMessageGenerator(HokifyMessageGenerator hokifyMessageGenerator) {
-        this.hokifyMessageGenerator = hokifyMessageGenerator;
     }
 
     public int getUpdateTime() {

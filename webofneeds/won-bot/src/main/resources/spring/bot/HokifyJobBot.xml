@@ -35,7 +35,6 @@
         <property name ="updateTime" value="${hokifyjobbot.updateTime}"/>
         <property name ="publishTime" value ="${hokifyjobbot.publishTime}"/>
         <property name ="createAllInOne" value ="${hokifyjobbot.createAllInOne}"/>
-        <property name="hokifyMessageGenerator" ref="hokifyGenerator"/>
         <property name="atomProducer">
             <bean class="won.bot.framework.component.atomproducer.impl.NopAtomProducer" />
         </property>
@@ -60,8 +59,4 @@
         <constructor-arg name="botContext" ref="${botContext.impl}"/>
         <constructor-arg name="botName" value="${hokifyjobbot.botname}"/>
     </bean>
-    
-    <bean id="hokifyGenerator" class="won.bot.framework.eventbot.action.impl.hokify.util.HokifyMessageGenerator">
-    </bean>
-
 </beans>

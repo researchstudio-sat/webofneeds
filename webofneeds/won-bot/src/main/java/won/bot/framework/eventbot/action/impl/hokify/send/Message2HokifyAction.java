@@ -6,7 +6,6 @@ import org.slf4j.LoggerFactory;
 import won.bot.framework.bot.context.HokifyJobBotContextWrapper;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
-import won.bot.framework.eventbot.action.impl.hokify.WonHokifyJobBotHandler;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.impl.command.connectionmessage.ConnectionMessageCommandEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.MessageFromOtherAtomEvent;
@@ -22,7 +21,6 @@ import java.net.URI;
  */
 public class Message2HokifyAction extends BaseEventBotAction {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    WonHokifyJobBotHandler wonHokifyBotHandler;
 
     public Message2HokifyAction(EventListenerContext ctx) {
         super(ctx);

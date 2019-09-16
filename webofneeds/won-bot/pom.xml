@@ -258,11 +258,6 @@
 			<artifactId>eliza</artifactId>
 			<version>1.0.1</version>
 		</dependency>
-		<!-- telegram bot api -->
-		<dependency>
-			<groupId>org.telegram</groupId>
-			<artifactId>telegrambots</artifactId>
-		</dependency>
 	</dependencies>
 	<profiles>
 		<profile>

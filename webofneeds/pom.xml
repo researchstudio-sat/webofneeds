@@ -782,12 +782,6 @@
                 <version>2.4.11</version>
             </dependency>
 
-            <!-- telegram bot api -->
-            <dependency>
-                <groupId>org.telegram</groupId>
-                <artifactId>telegrambots</artifactId>
-                <version>2.4.4</version>
-            </dependency>
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
                 <artifactId>httpmime</artifactId>
