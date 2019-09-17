@@ -11,7 +11,6 @@
 package won.bot;
 
 // import won.bot.impl.DebugBot;
-
 /**
  * User: fkleedorfer Date: 17.01.14
  */
