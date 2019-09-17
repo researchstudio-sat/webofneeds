@@ -51,14 +51,14 @@ public class MongoBotContext implements BotContext {
 
     @Override
     public void removeAtomUriFromNamedAtomUriList(final URI uri, final String name) {
-        // TODO FIX REMOVAL URI CAN'T BE DELETED AND RESULTS IN AN ERROR
-        template.remove(uri, name);
+        MongoContextObject obj = new MongoContextObject(uri.toString(), uri);
+        template.remove(obj, name);
     }
 
     @Override
     public void appendToNamedAtomUriList(final URI uri, final String name) {
-        // TODO FIX BECAUSE REMOVAL URI CAN'T BE DELETED
-        template.insert(uri, name);
+        MongoContextObject obj = new MongoContextObject(uri.toString(), uri);
+        template.insert(obj, name);
     }
 
     @Override

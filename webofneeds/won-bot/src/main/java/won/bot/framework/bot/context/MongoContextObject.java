@@ -21,6 +21,10 @@ public class MongoContextObject {
         return id;
     }
 
+    public String getIdProperty() {
+        return id;
+    }
+
     public Object getObject() {
         return object;
     }
