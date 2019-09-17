@@ -12,7 +12,7 @@ ENV LOGBACK_CONFIG=logback.xml
 # add the default monitoring output directory
 RUN mkdir -p /usr/src/bots/monitoring/logs
 ENV monitoring.output.dir=/usr/src/bots/monitoring/logs
-ENV MAIN_BOT=won.bot.app.DebugBotApp
+# ENV MAIN_BOT=won.bot.app.DebugBotApp #IDK WHAT TO DO HERE
 
 # add the jar and the conf directory
 ADD ./bots.jar /usr/src/bots/
