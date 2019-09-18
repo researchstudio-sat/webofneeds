@@ -67,26 +67,27 @@ atom:sitl5bx3kk96
 ## \<atom\> won:is \<description\>
 
 `won:is` is used to link the atom's URI to RDF structures that describe it positively. If present, the description can be used to display the atom in user interfaces. There is almost no restriction as to the data that can be added here. However, the webofneeds implementation only uses a few things here:
-* `dc:title`
-* `dc:description'
-* `con:tag`
-* `won:location` expecting a structure of `s:Place`, `s:name`, `s:geo` and `con:boundingBox` as shown in the example.
+
+- `dc:title`
+- `dc:description'
+- `con:tag`
+- `won:location` expecting a structure of `s:Place`, `s:name`, `s:geo` and `con:boundingBox` as shown in the example.
 
 ## \<atom\> match:seeks \<search-definition\>
 
 `match:seeks`links the atom's URI to one or more searches. Matchers should use these to search within other atom's descritpions (i.e., their content referenced by `won:is`)
-The matcher of the current demo system looks for the properties listed above in the content referenced by `match:seeks` and searches for matches in the other atoms' description, and also vice versa. 
+The matcher of the current demo system looks for the properties listed above in the content referenced by `match:seeks` and searches for matches in the other atoms' description, and also vice versa.
 
 ## \<atom\> match:flag \<flag\>
 
 `match:flag` is used to define certain binary properties
 the following flags are defined:
-* `match:WhatsAround` : An Atom specifying this flag indicates that matchers should not match with anything but the location within this atom. The intention of this Flag is to simply find other atoms around a certain location.
-* `match:NoHintForCounterpart`: An Atom specifying this flag indicates that matchers should not send Hint messages to the counterpart in case of a match. If the NoHintForMe flag is also present, matchers should disregard this atom completely.
-* `match:NoHintForMe`: An Atom specifying this flag indicates that matchers should not send Hint messages to that Atom. If the NoHintForCounterpart flag is also present, matchers should disregard this atom completely.
-* `match:UsedForTesting`: An Atom specifying this flag indicates that it is created for testing purposes. This may trigger diagnostic behaviour in matchers and bots. In the current implementation, the DebugBot will connect with the atom.
+
+- `match:WhatsAround` : An Atom specifying this flag indicates that matchers should not match with anything but the location within this atom. The intention of this Flag is to simply find other atoms around a certain location.
+- `match:NoHintForCounterpart`: An Atom specifying this flag indicates that matchers should not send Hint messages to the counterpart in case of a match. If the NoHintForMe flag is also present, matchers should disregard this atom completely.
+- `match:NoHintForMe`: An Atom specifying this flag indicates that matchers should not send Hint messages to that Atom. If the NoHintForCounterpart flag is also present, matchers should disregard this atom completely.
+- `match:UsedForTesting`: An Atom specifying this flag indicates that it is created for testing purposes. This may trigger diagnostic behaviour in matchers and bots. In the current implementation, the DebugBot will connect with the atom.
 
 ## \<atom\> won:socket \<socket\>
+
 Sockets will be explained in a later update, for now it's sufficient to know that won:OwnerSocket is the only in use.
-
-
