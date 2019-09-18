@@ -69,7 +69,7 @@ Information coming soon [here](installation-setting-up-build-environment-in-jenk
 - Try [Chatting with the Debug Bot and Viewing the RDF](/documentation/viewing-rdf.md) that the owner webapp and won nodes are exchanging
 - Learn how to [Run your own WoN services](webofneeds/won-docker/README.md)
 - [Build-instructions](/documentation/building.md) and [Troubleshooting](documentation/troubleshooting.md)
-- [Security architecture](webofneeds/won-core/README.md) and how to [Set up the Keys and Certificates](documentation/installation-cryptographic-keys-and-certificates.md)
+- [Security architecture](webofneeds/won-core/README.md) 
 - [Linked Data interface](webofneeds/won-node-webapp/README.md)
 - [Matching Service Architecture](webofneeds/won-matcher-service/README.md)
 - [Bot Framework](webofneeds/won-bot/README.md) for interacting with WoN nodes programmatically
