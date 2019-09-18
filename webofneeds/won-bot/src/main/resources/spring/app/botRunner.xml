@@ -20,18 +20,6 @@
         http://www.springframework.org/schema/beans/spring-beans-4.1.xsd">
 
     <import resource="classpath:/spring/owner-jmsonly.xml"/>
-
-    <!-- monitoring -->
-    <!--
-    <import resource="classpath:/spring/component/monitoring/bot-monitoring-jmx.xml" />
-    <import resource="classpath:/spring/component/monitoring/bot-monitoring.xml" />
-    -->
-
-    <!-- this introduces the email-based subsystem for generating atoms to be loaded, which is not desirable for most
-     applications. -->
-    <!-- import resource="classpath:/spring/component/atomproducer/atomproducer-mixed.xml" /-->
-
-    <import resource="classpath:/spring/component/monitoring/monitoring-recorder.xml"/>
     <import resource="classpath:/spring/component/matcherProtocolAtomServiceClient/matcherProtocolAtomServiceClient-jms.xml"/>
     <import resource="classpath:/spring/component/MatcherProtocolMatcherService/matcherProtocolMatcherService-jms.xml"/>
     <import resource="classpath:/spring/component/camel/matcher-camel.xml"/>
