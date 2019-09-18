@@ -125,6 +125,8 @@ Or in your terminal:
 mvn install -P skip-tests 
 ```
 
+This is required e.g. so the project-local npm exists for the next step, the required WAR-archives and JAR-files exist, etc.
+
 Further information on what you can do with the maven-configuration can be found in [./maven.md](./maven.md).
 
 ## 8. On Windows: build-tools for project-local npm
