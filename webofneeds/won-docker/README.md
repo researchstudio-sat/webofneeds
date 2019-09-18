@@ -24,11 +24,11 @@ The [steps](#steps) below should guide you quickly through everything necessary 
    - owner: [https://10.0.75.1:8082/owner](https://10.0.75.1:8082/owner)
    - wonnode: [https://10.0.75.1:8889/won](https://10.0.75.1:8889/won)
 
-### Troubleshooting based on steps
+### Troubleshooting 
 
-**Step 1:** Docker is too slow: Make sure after installing Docker Desktop, that it has enough resources on your machine `Docker Desktop` -> `Settings` -> `Advanced`
+Docker is too slow: Make sure after installing Docker Desktop, that it has enough resources on your machine `Docker Desktop` -> `Settings` -> `Advanced`
 
-**Step 3:** Problems starting docker:
+Problems starting docker:
 
 - The scripts define the `deploy_host` which represents the docker local network address: Check if this matches your local docker network address
 - The scripts define a default `base_folder`: Change it to another existing folder
