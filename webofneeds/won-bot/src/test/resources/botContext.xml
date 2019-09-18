@@ -18,49 +18,15 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:mongo="http://www.springframework.org/schema/data/mongo"
-       xmlns:context="http://www.springframework.org/schema/context"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans         http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
         http://www.springframework.org/schema/data/mongo
-        http://www.springframework.org/schema/data/mongo/spring-mongo-1.0.xsd
-        http://www.springframework.org/schema/context
-        http://www.springframework.org/schema/context/spring-context-4.1.xsd">
+        http://www.springframework.org/schema/data/mongo/spring-mongo-1.0.xsd">
 
     <!-- MongoDB config -->
-    <mongo:mongo id="mongo" host="localhost" port="27017"/>
+    <mongo:mongo id="mongo" host="localhost" port="27017" />
 
-    <bean id="mongoClientUri" class="com.mongodb.MongoClientURI">
-        <constructor-arg
-                value="mongodb://${botContext.mongodb.user}:${botContext.mongodb.pass}@${botContext.mongodb.host}:${botContext.mongodb.port}/${botContext.mongodb.database}"/>
-    </bean>
-
-    <!-- define the mongo database name -->
-    <bean id="mongoDbFactory" class="org.springframework.data.mongodb.core.SimpleMongoDbFactory">
-        <!--<constructor-arg ref="mongo"/>-->
-        <!--<constructor-arg value="botContextTest"/>-->
-        <constructor-arg ref="mongoClientUri"/>
-    </bean>
-
-    <!-- use this mongo converter to be able to save keys with dots -->
-    <bean id="mongoConverter" class="org.springframework.data.mongodb.core.convert.MappingMongoConverter">
-        <constructor-arg index="0" ref="mongoDbFactory" />
-        <constructor-arg index="1">
-            <bean class="org.springframework.data.mongodb.core.mapping.MongoMappingContext" />
-        </constructor-arg>
-
-        <!-- replace dots by '^^^' -->
-        <property name="mapKeyDotReplacement" value="\^\^\^"/>
-    </bean>
-
-    <!-- template is used for find, save, remove, ... -->
-    <bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
-        <constructor-arg ref="mongoDbFactory"/>
-        <constructor-arg ref="mongoConverter"/>
-    </bean>
-
-    <bean id="mongoBotContext" class="won.bot.framework.bot.context.MongoBotContext">
-        <property name="template" ref="mongoTemplate"/>
-    </bean>
-
-    <bean id="memoryBotContext" class="won.bot.framework.bot.context.MemoryBotContext"/>
-
+    <import resource="classpath:spring/component/botContext/memoryBotContext.xml"/>
+    <!-- We exclude mongoBotContext for now TODO: find a better strategy for embedded mongodb integration Testing -->
+    <!--<import resource="classpath:spring/component/botContext/mongoBotContext.xml"/>-->
 </beans>
