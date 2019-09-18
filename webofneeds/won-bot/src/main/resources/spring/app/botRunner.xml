@@ -41,7 +41,6 @@
     <import resource="classpath:/spring/component/linkeddatasource/matcher-linkeddatasource.xml"/>
     <import resource="classpath:/spring/component/ehcache/spring-matcher-ehcache.xml"/>
     <import resource="classpath:/spring/component/nodeurisource/matcher-nodeurisource-all.xml"/>
-    <import resource="classpath:/spring/component/threadpool.xml"/>
 
     <bean id="taskScheduler" class="org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler"
           destroy-method="destroy">
