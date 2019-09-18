@@ -82,21 +82,11 @@ Make sure it's on the system `$PATH`.
 
 ## 4. Git Clone to Your Eclipse Workspace
 
-For Windows, there's [Git SCM](https://git-scm.com/download/win) that also installs the "git bash" command-line-terminal (which is in fact Cygwin and generally works like a Linux bash). On Linux git should already be installed or is most certainly available via your package manager.
+Using your terminal (we recommend [Git SCM](https://git-scm.com/download/win) if you're on Windows) run:
 
-You can then check out the repository from a command-line terminal in the following two ways:
-
-- Using SSH (only needs you to unlock your SSH key when pulling/pushing; but requires that you've added your public key to your Github account):
-  ```
-  cd <PATH_TO_YOUR_ECLIPSE_WORKSPACE>
-  git clone git@github.com:researchstudio-sat/webofneeds.git
-  ```
-- Using HTTPS:
-  ```
-  cd <PATH_TO_YOUR_ECLIPSE_WORKSPACE>
-  git clone https://github.com/researchstudio-sat/webofneeds.git
-  ```
-- Alternatively, Eclipse includes a graphical git client, that you can use to check out the repository.
+```
+git clone https://github.com/researchstudio-sat/webofneeds.git
+```
 
 ## 5. Import the Maven-project in Eclipse
 
