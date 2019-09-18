@@ -10,14 +10,7 @@ The applications have to be told where to look for this file via a system proper
 
 # Log Levels
 
-The following logging levels are used:
-
-- **ERROR**: if the application fails to start up, or doesnt't work at all;
-- **WARN**: situations where methods can't execute as they are to be expected (methods called in states where they are not allowed, parametes pointing to not existing atoms, etc.) but the application is still in a operative state; calls, data structures, etc., which go not conform with guidelines, good practices or hard constraints.
-- **INFO**: only in infrequent calls; one time initializations; atom status changes (protocol calls);
-- **DEBUG**: everything else.
-
-We do not use TRACE (see http://www.slf4j.org/faq.html#trace).
+We use ERROR, WARN, INFO and DEBUG. You can find documentation on these [here](https://logging.apache.org/log4j/2.x/manual/architecture.html#Log_Levels) and a basic tutorial [here](https://www.tutorialspoint.com/log4j/log4j_logging_levels.htm).
 
 # Usage for developers
 
