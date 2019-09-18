@@ -12,7 +12,7 @@ At least maven 3.3.3
   - skip the 'frontend' install but do generation (i.e. resource munging with gulp) before building the webapp with the maven profile `skip-frontend-all-but-gulp`
   - skip building the webapp using the maven profile `skip-owner-webapp-war`
   - skip building the war file and just exploding the webapp in the target folder with the maven profile `skip-owner-webapp-war-but-explode`
-- `/webofneeds/won-bot/target/bots.jar`: a jar file that includes all the necessary dependencies for running some Bot implementations. Note that this might be deprecated information, as we're currently in the process of moving the bots to seperate repositories
+- `/webofneeds/won-bot/target/bots.jar`: a jar file that includes all the necessary dependencies for running some Bot implementations. Note that this might be deprecated information, as we're currently in the process of moving the bots to seperate repositories. Refer to those repositories for more up-to-date information.
     - skip this using the maven profile `skip-bot-uberjar`
 - `/webofneeds/won-matcher-service/target/won-matcher-service.jar`: a jar file that includes all the necessary dependencies for running the main matching service
   - skip this using the maven profile `skip-matcher-uberjar`
